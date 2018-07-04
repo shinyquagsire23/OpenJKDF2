@@ -33,6 +33,24 @@ struct CpInfo
     char defaultChar[2];
     char leadByte[12];
 };
+
+
+struct WIN32_FIND_DATAA 
+{
+    uint32_t dwFileAttributes;
+    uint32_t ftCreationTime;
+    uint32_t ftLastAccessTime;
+    uint64_t idk;
+    uint32_t ftLastWriteTime;
+    uint32_t nFileSizeHigh;
+    uint32_t nFileSizeLow;
+    uint32_t dwReserved0;
+    uint32_t dwReserved1;
+    uint32_t idk2;
+    char cFileName[260];
+    char cAlternateFileName[14];
+    char unk[2];
+};
 #pragma pack(pop)
 
 #define STD_INPUT_HANDLE  (-10)
@@ -41,6 +59,9 @@ struct CpInfo
 
 #define FILE_TYPE_DISK 0x0001
 #define FILE_TYPE_CHAR 0x0002
+
+#define ERROR_FILE_NOT_FOUND (2)
+#define ERROR_NO_MORE_FILES (18)
 
 class Kernel32 : public QObject
 {
@@ -54,8 +75,10 @@ public:
     uint32_t heap_addr;
     uint32_t heap_max;
     uint32_t last_alloc;
+    uint32_t last_error;
+    uint32_t file_search_hand;
 
-    Q_INVOKABLE Kernel32(uc_engine *uc) : uc(uc) {}
+    Q_INVOKABLE Kernel32(uc_engine *uc) : uc(uc), heap_handle(1), last_error(0), file_search_hand(1) {}
     
     Q_INVOKABLE uint32_t HeapCreate(uint32_t a, uint32_t b, uint32_t c);
     Q_INVOKABLE uint32_t HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size);
@@ -77,6 +100,17 @@ public:
     Q_INVOKABLE uint32_t GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c);
     Q_INVOKABLE uint32_t GetModuleHandleA(uint32_t a);
     Q_INVOKABLE uint32_t GetProcAddress(uint32_t a, uint32_t funcName);
+    Q_INVOKABLE void OutputDebugStringA(uint32_t str_ptr);
+    Q_INVOKABLE uint32_t GetLastError();
+    Q_INVOKABLE uint32_t LoadLibraryA(uint32_t dllStr_ptr);
+    Q_INVOKABLE uint32_t FindFirstFileA(uint32_t lpFileName, uint32_t lpFindFileData);
+    Q_INVOKABLE uint32_t FindNextFileA(uint32_t hFindFile, uint32_t lpFindFileData);
+    Q_INVOKABLE uint32_t FindClose(uint32_t hFindFile);
+    Q_INVOKABLE uint32_t FileTimeToLocalFileTime(uint32_t a, uint32_t b);
+    Q_INVOKABLE uint32_t FileTimeToSystemTime(uint32_t a, uint32_t b);
+    Q_INVOKABLE uint32_t CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, uint32_t lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, uint32_t hTemplateFile);
+    Q_INVOKABLE uint32_t ReadFile(uint32_t hFile, uint32_t lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t lpNumberOfBytesRead, uint32_t lpOverlapped);
+    Q_INVOKABLE uint32_t SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t lpDistanceToMoveHigh, uint32_t dwMoveMethod);
 
 //    Q_INVOKABLE uint32_t ();
 };

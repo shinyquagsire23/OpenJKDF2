@@ -3,20 +3,11 @@
 #include <stdint.h>
 
 #include <cstring>
-#include <regex>
-#include <experimental/filesystem>
 #include <iostream>
 #include <vector>
-#include <deque>
 
 #include <QMetaMethod>
 #include <QDebug>
-
-#include "dlls/kernel32.h"
-#include "dlls/user32.h"
-#include "dlls/gdi32.h"
-
-namespace fs = std::experimental::filesystem;
 
 struct DosHeader
 {
@@ -178,41 +169,23 @@ struct ImportDesc {
 #define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT	    13
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR	14
 
-#define ERROR_FILE_NOT_FOUND (2)
-#define ERROR_NO_MORE_FILES (18)
-
-struct WIN32_FIND_DATAA 
-{
-    uint32_t dwFileAttributes;
-    uint32_t ftCreationTime;
-    uint32_t ftLastAccessTime;
-    uint64_t idk;
-    uint32_t ftLastWriteTime;
-    uint32_t nFileSizeHigh;
-    uint32_t nFileSizeLow;
-    uint32_t dwReserved0;
-    uint32_t dwReserved1;
-    char cFileName[260];
-    char cAlternateFileName[14];
-    char unk[2];
-};
-
-uc_engine *uc;
 uint32_t code_addr;
 uint32_t stack_addr;
 uint32_t start_addr;
 uint32_t next_hook;
-uint32_t last_error;
+uint32_t ret_addr;
 uint32_t callret_addr;
 uint32_t callret_ret;
 uint32_t callret_ret_addr;
-
-uint32_t heap_handle = 1;
-uint32_t file_search_hand = 1;
+bool pc_over;
 
 Kernel32 *kernel32;
 User32 *user32;
 Gdi32 *gdi32;
+ComCtl32 *comctl32;
+AdvApi32 *advapi32;
+Ole32 *ole32;
+DDraw *ddraw;
 
 std::map<std::string, ImportTracker*> import_store;
 std::vector<QObject*> dll_store;
@@ -402,27 +375,8 @@ static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user
     }
 }
 
-std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
-{
-    std::deque<fs::path> result;
-
-    for (const auto& p : fs::recursive_directory_iterator(dir))
-    {
-        if (fs::is_regular_file(p) && std::regex_match(p.path().string(), pattern))
-        {
-            //printf("%s\n", p.path().string().c_str());
-            result.push_back(p);
-        }
-    }
-    
-    return result;
-}
-
-std::map<int, std::deque<fs::path>> file_searches;
-
 static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import)
 {
-    uint32_t ret_addr;
     printf("Hit import %s\n", import->name.c_str());
     
     uc_stack_pop(uc, &ret_addr, 1);
@@ -443,13 +397,20 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
                 
                 uc_stack_pop(uc, args, method.parameterCount());
                 
-                bool succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), Q_ARG(uint32_t, args[0]), Q_ARG(uint32_t, args[1]), Q_ARG(uint32_t, args[2]), Q_ARG(uint32_t, args[3]), Q_ARG(uint32_t, args[4]), Q_ARG(uint32_t, args[5]), Q_ARG(uint32_t, args[6]), Q_ARG(uint32_t, args[7]), Q_ARG(uint32_t, args[8]));
+                bool succ;
+                if (method.returnType() == QMetaType::Void)
+                    succ = method.invoke(obj, Q_ARG(uint32_t, args[0]), Q_ARG(uint32_t, args[1]), Q_ARG(uint32_t, args[2]), Q_ARG(uint32_t, args[3]), Q_ARG(uint32_t, args[4]), Q_ARG(uint32_t, args[5]), Q_ARG(uint32_t, args[6]), Q_ARG(uint32_t, args[7]), Q_ARG(uint32_t, args[8]));
+                else
+                    succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), Q_ARG(uint32_t, args[0]), Q_ARG(uint32_t, args[1]), Q_ARG(uint32_t, args[2]), Q_ARG(uint32_t, args[3]), Q_ARG(uint32_t, args[4]), Q_ARG(uint32_t, args[5]), Q_ARG(uint32_t, args[6]), Q_ARG(uint32_t, args[7]), Q_ARG(uint32_t, args[8]));
 
                 //printf("%x %x %x\n", succ, retVal, method.parameterCount());
                 if (succ)
                 {
-                    uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
-                    uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
+                    if (method.returnType() != QMetaType::Void)
+                        uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
+
+                    if (!pc_over)
+                        uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
                     return;
                 }
                 else
@@ -471,77 +432,6 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         eax = 0;
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
-    else if (!strcmp(import->name.c_str(), "RegisterClassExA"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO
-        
-        eax = 444;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FindWindowA"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetSystemMetrics"))
-    {
-        uint32_t metric;
-        uint32_t eax;
-        
-        uc_stack_pop(uc, &metric, 1); //TODO
-        
-        switch (metric)
-        {
-            case 0: //hres
-                eax = 1280;
-                break;
-            case 1: //vres
-                eax = 1024;
-                break;
-            case 15:
-                eax = 0;
-                break;
-            case 32:
-                eax = 0;
-                break;
-            default:
-                eax = 16;
-                printf("Unknown metric %x\n", metric);
-                break;
-        }
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetDeviceCaps"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        printf("Get caps for %x, index %i\n", args[0], args[1]);
-        
-        switch (args[1])
-        {
-            case 12: //BITSPIXEL
-                eax = 16;
-                break;
-            default:
-                eax = 0;
-                break;
-        }
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
     else if (!strcmp(import->name.c_str(), "CreateWindowExA"))
     {
         uint32_t args[12];
@@ -549,366 +439,7 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         
         uc_stack_pop(uc, args, 12); //TODO
         
-        eax = 333; //HWND
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "ShowWindow"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "UpdateWindow"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO
-        
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "InitCommonControls")) {}
-    else if (!strcmp(import->name.c_str(), "RegCreateKeyExA"))
-    {
-        uint32_t args[9];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 9); //TODO
-        
-        std::string subkey = uc_read_string(uc, args[1]);
-        printf("Stub: Create key %s\n", subkey.c_str());
-        
-        eax = 1; //not success
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FindFirstFileA"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        std::string match = uc_read_string(uc, args[0]);
-
-        std::string linux_path = std::regex_replace(match, std::regex("\\\\"), "/");
-        std::string regex_str = std::regex_replace(match, std::regex("\\\\"), "\\/");
-        regex_str = std::regex_replace(regex_str, std::regex("\\*"), ".*");
-
-        //TODO: filenames are insensitive, but paths aren't
-        auto files = file_search(fs::path(linux_path).parent_path(), std::regex(regex_str.c_str(), std::regex_constants::icase));
-        
-        //TODO errors
-        
-        //printf("found %s\n", files[0].c_str());
-        std::string windows_path = std::regex_replace(files[0].string(), std::regex("\\/"), "\\");
-        
-        //TODO
-        /*
-        uint32_t ftCreationTime;
-        uint32_t ftLastAccessTime;
-        uint32_t ftLastWriteTime;
-        char cAlternateFileName[14]; ?
-        */
-        
-        struct WIN32_FIND_DATAA *out = new struct WIN32_FIND_DATAA();
-        memset(out, 0, sizeof(*out));
-        out->dwFileAttributes = 0x80;
-        out->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-        out->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
-        strncpy(out->cFileName, files[0].filename().c_str(), 260);
-        strncpy(out->cAlternateFileName, "test", 14);
-        
-        uc_mem_write(uc, args[1], out, sizeof(struct WIN32_FIND_DATAA));
-        
-        file_searches[file_search_hand] = files;
-        
-        eax = file_search_hand++;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-        free(out);
-    }
-    else if (!strcmp(import->name.c_str(), "FindNextFileA"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        auto files = file_searches[args[0]];
-        files.pop_front();
-        
-        if (files.size() > 0)
-        {
-            file_searches[args[0]] = files;
-            std::string windows_path = std::regex_replace(files[0].string(), std::regex("\\/"), "\\");
-            
-            struct WIN32_FIND_DATAA *out = new struct WIN32_FIND_DATAA();
-            memset(out, 0, sizeof(*out));
-            out->dwFileAttributes = 0x80;
-            out->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-            out->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
-            strncpy(out->cFileName, files[0].filename().c_str(), 260);
-            strncpy(out->cAlternateFileName, "test", 14);
-            
-            uc_mem_write(uc, args[1], out, sizeof(struct WIN32_FIND_DATAA));
-            
-            eax = 1;
-            free(out);
-        }
-        else
-        {
-            eax = 0;
-            last_error = ERROR_NO_MORE_FILES;
-        }
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FindClose"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO
-        
-        file_searches.erase(args[0]); //TODO errors
-
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FileTimeToLocalFileTime"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FileTimeToSystemTime"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "CreateFileA"))
-    {
-        uint32_t args[7];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 7); //TODO
-        std::string fname = uc_read_string(uc, args[0]);
-        std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
-        printf("Stub: Create file %s\n", linux_path.c_str());
-        
-        FILE *f = fopen(linux_path.c_str(), "rw");
-        if (!f)
-        {
-            eax = -1;
-            last_error = ERROR_FILE_NOT_FOUND;
-        }
-        else
-            eax = fileno(f);
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "ReadFile"))
-    {
-        uint32_t args[5];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 5); //TODO
-        
-        FILE* f = fdopen(args[0], "rw");
-        //printf("Stub: Read file %x at %x, size %x to %x\n", args[0], ftell(f), args[2], args[1]);
-        
-        void* buf = malloc(args[2]);
-        uint32_t read = fread(buf, 1, args[2], f);
-        
-        // Write bytes read and actual contents
-        uc_mem_write(uc, args[3], &read, sizeof(uint32_t));
-        uc_mem_write(uc, args[1], buf, read);
-        
-        eax = read;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "SetFilePointer"))
-    {
-        uint32_t args[4];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 4); //TODO
-        printf("Stub: seek file %x\n", args[0]);
-        
-        FILE* f = fdopen(args[0], "rw");
-        
-        uint32_t high_val = 0;
-        if (args[2])
-            uc_mem_read(uc, args[2], &high_val, sizeof(uint32_t));
-
-        uint64_t pos = args[1] | (high_val << 32);
-        fseek(f, pos, args[3]);
-        
-        eax = 0; //TODO error
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetLastError"))
-    {
-        uc_reg_write(uc, UC_X86_REG_EAX, &last_error);
-    }
-    else if (!strcmp(import->name.c_str(), "RegOpenKeyExA"))
-    {
-        uint32_t args[5];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 5); //TODO
-        std::string subKey = uc_read_string(uc, args[1]);
-        printf("Stub: open key %x, %s\n", args[0], subKey.c_str());
-        
-        //TODO write handle
-        
-        eax = 0; //TODO error
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "RegQueryValueExA"))
-    {
-        uint32_t args[6];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 6); //TODO
-        std::string valueName = uc_read_string(uc, args[1]);
-        printf("Stub: open value %x, %s\n", args[0], valueName.c_str());
-        
-        //TODO write data
-        
-        eax = 1; //TODO error
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "RegCloseKey"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO
-        printf("Stub: close key %x\n", args[0]);
-        
-        //TODO write data
-        
-        eax = 0; //TODO error
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "OutputDebugStringA"))
-    {
-        uint32_t args[1];
-        
-        uc_stack_pop(uc, args, 1); //TODO
-        std::string text = uc_read_string(uc, args[0]);
-        printf("OutputDebugString: %s\n", text.c_str());
-    }
-    else if (!strcmp(import->name.c_str(), "MessageBoxW"))
-    {
-        uint32_t args[4];
-        
-        uc_stack_pop(uc, args, 4); //TODO
-        std::string text = uc_read_wstring(uc, args[1]);
-        std::string caption = uc_read_wstring(uc, args[2]);
-        printf("MessageBoxW: %s, %s\n", text.c_str(), caption.c_str());
-    }
-    else if (!strcmp(import->name.c_str(), "GetDesktopWindow"))
-    {
-        uint32_t eax = 0xabcd; //TODO handles?
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetDC"))
-    {
-        uint32_t args[1];
-        
-        uc_stack_pop(uc, args, 1); //TODO
-    
-        uint32_t eax = 0xefab; //TODO handles?
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "ReleaseDC"))
-    {
-        uint32_t args[2];
-        
-        uc_stack_pop(uc, args, 2); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "EnumDisplaySettingsA"))
-    {
-        uint32_t args[3];
-        
-        uc_stack_pop(uc, args, 3); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "ChangeDisplaySettingsA"))
-    {
-        uint32_t args[2];
-        
-        uc_stack_pop(uc, args, 2); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "SetWindowPos"))
-    {
-        uint32_t args[7];
-        
-        uc_stack_pop(uc, args, 7); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "DirectDrawEnumerateA"))
-    {
-        uint32_t args[2];
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        uint32_t callback = args[0];
-        uint32_t context = args[1];
-        
-        printf("Jump to %x, ret %x\n", callback, callret_addr);
-
-        callret_ret = 0;
-        callret_ret_addr = ret_addr;
-        
-        // Map some memory for these strings
-        // TODO: memleaks
-        uc_mem_map(uc, kernel32->last_alloc + 0x1000, 0x1000, UC_PROT_ALL); //TODO prot
-        kernel32->last_alloc += 0x10000;
-        
-        const char* driver_desc = "DirectDraw HAL";
-        const char* driver_name = "display";
-        uc_mem_write(uc, kernel32->last_alloc, driver_desc, strlen(driver_desc));
-        uc_mem_write(uc, kernel32->last_alloc+strlen(driver_desc)+1, driver_name, strlen(driver_name));
-        
-        
-        uint32_t callback_args[4] = {0, kernel32->last_alloc, kernel32->last_alloc+strlen(driver_desc)+1, context};
-        uc_stack_push(uc, callback_args, 4);
-        uc_stack_push(uc, &callret_addr, 1);
-        
-        uc_reg_write(uc, UC_X86_REG_EIP, &callback);
-        return;
-    }
-    else if (!strcmp(import->name.c_str(), "DirectDrawCreate"))
-    {
-        uint32_t args[3];
-        
-        uc_stack_pop(uc, args, 3); //TODO
-    
-        uint32_t eax = 1;
+        eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
     else if (!strcmp(import->name.c_str(), "CallRet"))
@@ -919,24 +450,6 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         uint32_t eax = callret_ret;
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
-    else if (!strcmp(import->name.c_str(), "CoInitialize"))
-    {
-        uint32_t args[1];
-        
-        uc_stack_pop(uc, args, 1); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "CoCreateInstance"))
-    {
-        uint32_t args[5];
-        
-        uc_stack_pop(uc, args, 5); //TODO
-    
-        uint32_t eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
     else
     {
         printf("Import doesn't have impl, exiting\n");
@@ -944,7 +457,8 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         return;
     }
     
-    uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
+    if (!pc_over)
+        uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
 }
 
 // callback for tracing memory access (READ or WRITE)
@@ -1127,6 +641,7 @@ int load_executable(uc_engine *uc)
 
 int main(int argc, char **argv, char **envp)
 {
+    uc_engine *uc;
     uc_err err;
     uint32_t tmp;
     uc_hook trace1, trace2, trace3;
@@ -1149,9 +664,17 @@ int main(int argc, char **argv, char **envp)
     kernel32 = new Kernel32(uc);
     user32 = new User32(uc);
     gdi32 = new Gdi32(uc);
+    comctl32 = new ComCtl32(uc);
+    advapi32 = new AdvApi32(uc);
+    ole32 = new Ole32(uc);
+    ddraw = new DDraw(uc);
     dll_store.push_back((QObject*)kernel32);
     dll_store.push_back((QObject*)user32);
     dll_store.push_back((QObject*)gdi32);
+    dll_store.push_back((QObject*)comctl32);
+    dll_store.push_back((QObject*)advapi32);
+    dll_store.push_back((QObject*)ole32);
+    dll_store.push_back((QObject*)ddraw);
 
     // Map hook mem
     next_hook = 0xd0000000;
@@ -1188,7 +711,7 @@ int main(int argc, char **argv, char **envp)
     err = uc_reg_write(uc, UC_X86_REG_FS, &r_fs);
 
     //uc_hook_add(uc, &trace1, UC_HOOK_BLOCK, (void*)hook_block, NULL, 1, 0);
-    uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
+    //uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
     uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED | UC_ERR_FETCH_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
     
     register_import(uc, "CallRet", NULL);

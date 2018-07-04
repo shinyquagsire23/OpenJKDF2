@@ -7,6 +7,13 @@
 #include <map>
 #include <string>
 
+#include "dlls/kernel32.h"
+#include "dlls/user32.h"
+#include "dlls/gdi32.h"
+#include "dlls/comctl32.h"
+#include "dlls/advapi32.h"
+#include "dlls/ole32.h"
+#include "dlls/ddraw.h"
 
 class ImportTracker
 {
@@ -24,9 +31,25 @@ public:
 
 extern std::map<std::string, ImportTracker*> import_store;
 
+extern Kernel32 *kernel32;
+extern User32 *user32;
+extern Gdi32 *gdi32;
+extern ComCtl32 *comctl32;
+extern AdvApi32 *advapi32;
+extern Ole32 *ole32;
+extern DDraw *ddraw;
+
+extern uint32_t ret_addr;
+extern uint32_t callret_addr;
+extern uint32_t callret_ret;
+extern uint32_t callret_ret_addr;
+extern bool pc_over;
+
 void register_import(uc_engine *uc, std::string name, uint32_t import_addr);
 void print_registers(uc_engine *uc);
 std::string uc_read_string(uc_engine *uc, uint32_t addr);
 std::string uc_read_wstring(uc_engine *uc, uint32_t addr);
+void uc_stack_pop(uc_engine *uc, uint32_t *out, int num);
+void uc_stack_push(uc_engine *uc, uint32_t *in, int num);
 
 #endif // MAIN_H
