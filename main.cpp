@@ -1,14 +1,20 @@
-#include <unicorn/unicorn.h>
+#include "main.h"
+
 #include <stdint.h>
 
 #include <cstring>
-#include <string>
-#include <map>
 #include <regex>
 #include <experimental/filesystem>
 #include <iostream>
 #include <vector>
 #include <deque>
+
+#include <QMetaMethod>
+#include <QDebug>
+
+#include "dlls/kernel32.h"
+#include "dlls/user32.h"
+#include "dlls/gdi32.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -154,34 +160,6 @@ struct ImportDesc {
 	uint32_t import_ptr_list;
 };
 
-struct StartupInfo
-{
-    uint32_t  cb;
-    uint32_t  lpReserved;
-    uint32_t  lpDesktop;
-    uint32_t  lpTitle;
-    uint32_t  dwX;
-    uint32_t  dwY;
-    uint32_t  dwXSize;
-    uint32_t  dwYSize;
-    uint32_t  dwXCountChars;
-    uint32_t  dwYCountChars;
-    uint32_t  dwFillAttribute;
-    uint32_t  dwFlags;
-    uint16_t   wShowWindow;
-    uint16_t   cbReserved2;
-    uint32_t lpReserved2;
-    uint32_t hStdInput;
-    uint32_t hStdOutput;
-    uint32_t hStdError;
-};
-
-struct CpInfo
-{
-    uint32_t maxCharSize;
-    char defaultChar[2];
-    char leadByte[12];
-};
 #pragma pack(pop)
 
 #define IMAGE_DIRECTORY_ENTRY_EXPORT	        0
@@ -200,15 +178,8 @@ struct CpInfo
 #define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT	    13
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR	14
 
-#define STD_INPUT_HANDLE  (-10)
-#define STD_OUTPUT_HANDLE (-11)
-#define STD_ERROR_HANDLE  (-12)
-
 #define ERROR_FILE_NOT_FOUND (2)
 #define ERROR_NO_MORE_FILES (18)
-
-#define FILE_TYPE_DISK 0x0001
-#define FILE_TYPE_CHAR 0x0002
 
 struct WIN32_FIND_DATAA 
 {
@@ -226,37 +197,28 @@ struct WIN32_FIND_DATAA
     char unk[2];
 };
 
-class ImportTracker
-{
-public:
-    std::string name;
-    uint32_t addr;
-    uint32_t hook;
-    
-    uc_hook trace;
-
-    ImportTracker(std::string name, uint32_t addr, uint32_t hook) : name(name), addr(addr), hook(hook)
-    {
-    }
-};
-
 uc_engine *uc;
 uint32_t code_addr;
 uint32_t stack_addr;
-uint32_t heap_addr;
-uint32_t heap_max;
 uint32_t start_addr;
 uint32_t next_hook;
-uint32_t last_alloc;
 uint32_t last_error;
+uint32_t callret_addr;
+uint32_t callret_ret;
+uint32_t callret_ret_addr;
 
 uint32_t heap_handle = 1;
 uint32_t file_search_hand = 1;
 
+Kernel32 *kernel32;
+User32 *user32;
+Gdi32 *gdi32;
+
 std::map<std::string, ImportTracker*> import_store;
+std::vector<QObject*> dll_store;
 
 
-static void print_registers(uc_engine *uc)
+void print_registers(uc_engine *uc)
 {
     int32_t eax, ecx, edx, ebx;
     int32_t esp, ebp, esi, edi;
@@ -305,9 +267,9 @@ void uc_stack_push(uc_engine *uc, uint32_t *in, int num)
     uint32_t esp;
     uc_reg_read(uc, UC_X86_REG_ESP, &esp);
     
-    for (int i = 0; i < num; i++)
+    for (int i = 1; i < num+1; i++)
     {
-        uc_mem_write(uc, esp - i * sizeof(uint32_t), &in[i], sizeof(uint32_t));
+        uc_mem_write(uc, esp - i * sizeof(uint32_t), &in[i-1], sizeof(uint32_t));
     }
     
     esp -= num * sizeof(uint32_t);
@@ -433,6 +395,11 @@ static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user
         printf("idk(0x%x, \"%s\" (%x))\n", esi, fname.c_str(), eax);
         //uc_emu_stop(uc);
     }
+    else if (address == 0x425950)
+    {
+        print_registers(uc);
+        uc_stack_dump(uc);
+    }
 }
 
 std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
@@ -460,276 +427,46 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
     
     uc_stack_pop(uc, &ret_addr, 1);
     
-    if (!strcmp(import->name.c_str(), "HeapCreate"))
+    //TODO DLL names
+    
+    for (auto obj : dll_store)
     {
-        uint32_t args[3];
-        
-        uc_stack_pop(uc, args, 3);
-        uc_reg_write(uc, UC_X86_REG_EAX, &heap_handle);
-        printf("%x %x %x\n", args[0], args[1], args[2]);
-
-        heap_handle++;
-    }
-    else if (!strcmp(import->name.c_str(), "HeapAlloc"))
-    {
-        uint32_t args[3];
-        
-        uc_stack_pop(uc, args, 3);
-        uc_reg_write(uc, UC_X86_REG_EAX, &heap_addr); //TODO
-        printf("%x %x %x\n", args[0], args[1], args[2]);
-
-        heap_max = (heap_addr & ~0xFFF);
-        while (heap_max < heap_addr + args[2])
+        for (int i = 0; i < obj->metaObject()->methodCount(); i++)
         {
-            //printf("mapping %x\n", heap_max);
-            uc_mem_map(uc, heap_max, 0x1000, UC_PROT_ALL);
-            heap_max += 0x1000;
+            QMetaMethod method = obj->metaObject()->method(i);
+            //qDebug() << method.methodSignature();
+            
+            if (method.name() == import->name.c_str())
+            {
+                uint32_t args[9];
+                uint32_t retVal;
+                
+                uc_stack_pop(uc, args, method.parameterCount());
+                
+                bool succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), Q_ARG(uint32_t, args[0]), Q_ARG(uint32_t, args[1]), Q_ARG(uint32_t, args[2]), Q_ARG(uint32_t, args[3]), Q_ARG(uint32_t, args[4]), Q_ARG(uint32_t, args[5]), Q_ARG(uint32_t, args[6]), Q_ARG(uint32_t, args[7]), Q_ARG(uint32_t, args[8]));
+
+                //printf("%x %x %x\n", succ, retVal, method.parameterCount());
+                if (succ)
+                {
+                    uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
+                    uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
+                    return;
+                }
+                else
+                {
+                    uc_stack_push(uc, args, method.parameterCount());
+                }
+            }
         }
-
-        heap_addr += args[2];
     }
-    else if (!strcmp(import->name.c_str(), "GetVersion"))
-    {
-    }
-    else if (!strcmp(import->name.c_str(), "VirtualAlloc"))
-    {
-        uint32_t args[4];
-        
-        uc_stack_pop(uc, args, 4);
-        uint32_t lpAddress = args[0];
-        uint32_t dwSize = args[1];
-        uint32_t flAllocationType = args[2];
-        uint32_t flProtect = args[3];
-        printf("%x %x %x %x\n", args[0], args[1], args[2], args[3]);
-
-        uint32_t alloc_addr = lpAddress ? lpAddress : last_alloc + dwSize;
-        uc_mem_map(uc, alloc_addr, dwSize, UC_PROT_ALL); //TODO prot
-        
-        if (!lpAddress)
-            last_alloc = last_alloc + dwSize;
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &alloc_addr);
-    }
-    else if (!strcmp(import->name.c_str(), "GetStartupInfoA"))
-    {
-        uint32_t lpStartupInfo;
-        uc_stack_pop(uc, &lpStartupInfo, 1);
-        
-        struct StartupInfo out;
-        memset(&out, 0, sizeof(out));
-        out.cb = sizeof(out);
-        out.hStdInput = STD_INPUT_HANDLE;
-        out.hStdOutput = STD_OUTPUT_HANDLE;
-        out.hStdError = STD_ERROR_HANDLE;
-        //TODO
-        
-        uc_mem_write(uc, lpStartupInfo, &out, sizeof(out));
-    }
-    else if (!strcmp(import->name.c_str(), "GetStdHandle"))
-    {
-        uint32_t nStdHandle;
-        uc_stack_pop(uc, &nStdHandle, 1);
-        
-        printf("handle %x\n", nStdHandle);
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &nStdHandle);
-    }
-    else if (!strcmp(import->name.c_str(), "GetFileType"))
-    {
-        uint32_t hFile, eax;
-        uc_stack_pop(uc, &hFile, 1);
-        
-        printf("handle %x\n", hFile);
-        
-        switch (hFile)
-        {
-            case STD_INPUT_HANDLE:
-            case STD_OUTPUT_HANDLE:
-            case STD_ERROR_HANDLE:
-                eax = FILE_TYPE_CHAR;
-                break;
-            default:
-                eax = FILE_TYPE_DISK;
-        }
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "SetHandleCount"))
-    {
-        uint32_t uNumber;
-        uc_stack_pop(uc, &uNumber, 1);
-        
-        printf("Handle count %x\n", uNumber);
-    }
-    else if (!strcmp(import->name.c_str(), "GetACP"))
-    {
-        uint32_t eax = 20127;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetCPInfo"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2);
-        
-        struct CpInfo out;
-        memset(&out, 0, sizeof(out));
-        out.maxCharSize = 1;
-        out.defaultChar[0] = '?';
-
-        uc_mem_write(uc, args[1], &out, sizeof(out));
-        eax = 1;
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetStringTypeW"))
-    {
-        uint32_t args[4];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 4);
-        
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax); //TODO
-    }
-    else if (!strcmp(import->name.c_str(), "MultiByteToWideChar"))
-    {
-        uint32_t args[6];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 6);
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax); //TODO
-    }
-    else if (!strcmp(import->name.c_str(), "WideCharToMultiByte"))
-    {
-        uint32_t args[8];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 8);
-        
-        eax = 1;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax); //TODO
-    }
-    else if (!strcmp(import->name.c_str(), "LCMapStringW"))
-    {
-        uint32_t args[6];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 6);
-        
-        eax = 2;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax); //TODO
-    }
-    else if (!strcmp(import->name.c_str(), "GetCommandLineA"))
-    {
-        uint32_t eax;
-        
-        char *args = "JK.EXE -windowGUI"; //TODO
-        uc_mem_map(uc, last_alloc, 0x1000, UC_PROT_ALL); //TODO prot
-        eax = last_alloc;
-        last_alloc = last_alloc + 0x1000;
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetEnvironmentStringsW"))
-    {
-        uint32_t eax;
-        
-        char *args = "\x00\x00\x00\x00"; //TODO
-        uc_mem_map(uc, last_alloc, 0x1000, UC_PROT_ALL); //TODO prot
-        eax = last_alloc;
-        last_alloc = last_alloc + 0x1000;
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "FreeEnvironmentStringsW"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO: free
-        eax = 1;
-        
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetModuleFileNameA"))
-    {
-        uint32_t args[3];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 3); //TODO: real names
-        
-        char* out = "ABC";
-        uc_mem_write(uc, args[1], &out, sizeof(out));
-        
-        eax = 3;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetModuleHandleA"))
+    
+    
+    if (!strcmp(import->name.c_str(), "IsProcessorFeaturePresent"))
     {
         uint32_t args[1];
         uint32_t eax;
         
         uc_stack_pop(uc, args, 1); //TODO: real handles
-        
-        eax = 999;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetProcAddress"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO: real names
-        
-        std::string requested = uc_read_string(uc, args[1]);
-        printf("requested addr for %s\n", requested.c_str());
-        
-        if (import_store.find(requested) == import_store.end())
-            register_import(uc, requested, 0);
-        
-        eax = import_store[requested]->hook;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "IsProcessorFeaturePresent"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO: real handles
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "LoadIconA"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "LoadCursorA"))
-    {
-        uint32_t args[2];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 2); //TODO
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "GetStockObject"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO
         
         eax = 0;
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
@@ -1050,7 +787,7 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         
         //TODO write data
         
-        eax = 0; //TODO error
+        eax = 1; //TODO error
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
     else if (!strcmp(import->name.c_str(), "RegCloseKey"))
@@ -1129,6 +866,73 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         uint32_t args[7];
         
         uc_stack_pop(uc, args, 7); //TODO
+    
+        uint32_t eax = 1;
+        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
+    }
+    else if (!strcmp(import->name.c_str(), "DirectDrawEnumerateA"))
+    {
+        uint32_t args[2];
+        
+        uc_stack_pop(uc, args, 2); //TODO
+        
+        uint32_t callback = args[0];
+        uint32_t context = args[1];
+        
+        printf("Jump to %x, ret %x\n", callback, callret_addr);
+
+        callret_ret = 0;
+        callret_ret_addr = ret_addr;
+        
+        // Map some memory for these strings
+        // TODO: memleaks
+        uc_mem_map(uc, kernel32->last_alloc + 0x1000, 0x1000, UC_PROT_ALL); //TODO prot
+        kernel32->last_alloc += 0x10000;
+        
+        const char* driver_desc = "DirectDraw HAL";
+        const char* driver_name = "display";
+        uc_mem_write(uc, kernel32->last_alloc, driver_desc, strlen(driver_desc));
+        uc_mem_write(uc, kernel32->last_alloc+strlen(driver_desc)+1, driver_name, strlen(driver_name));
+        
+        
+        uint32_t callback_args[4] = {0, kernel32->last_alloc, kernel32->last_alloc+strlen(driver_desc)+1, context};
+        uc_stack_push(uc, callback_args, 4);
+        uc_stack_push(uc, &callret_addr, 1);
+        
+        uc_reg_write(uc, UC_X86_REG_EIP, &callback);
+        return;
+    }
+    else if (!strcmp(import->name.c_str(), "DirectDrawCreate"))
+    {
+        uint32_t args[3];
+        
+        uc_stack_pop(uc, args, 3); //TODO
+    
+        uint32_t eax = 1;
+        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
+    }
+    else if (!strcmp(import->name.c_str(), "CallRet"))
+    {
+        ret_addr = callret_ret_addr;
+        uc_stack_push(uc, &ret_addr, 1);
+    
+        uint32_t eax = callret_ret;
+        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
+    }
+    else if (!strcmp(import->name.c_str(), "CoInitialize"))
+    {
+        uint32_t args[1];
+        
+        uc_stack_pop(uc, args, 1); //TODO
+    
+        uint32_t eax = 1;
+        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
+    }
+    else if (!strcmp(import->name.c_str(), "CoCreateInstance"))
+    {
+        uint32_t args[5];
+        
+        uc_stack_pop(uc, args, 5); //TODO
     
         uint32_t eax = 1;
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
@@ -1226,8 +1030,8 @@ int load_executable(uc_engine *uc)
     
     code_addr = peHeader.baseOfCode + peHeader.imageBase;
     stack_addr = peHeader.imageBase - peHeader.sizeOfStackReserve;
-    heap_addr = 0x90000000;
-    last_alloc = 0x80000000;
+    kernel32->heap_addr = 0x90000000;
+    kernel32->last_alloc = 0x80000000;
     
     uc_mem_map(uc, stack_addr, peHeader.sizeOfStackReserve, UC_PROT_ALL);
     uc_reg_write(uc, UC_X86_REG_ESP, &peHeader.imageBase);
@@ -1341,6 +1145,13 @@ int main(int argc, char **argv, char **envp)
         printf("Failed on uc_open() with error returned: %u\n", err);
         return -1;
     }
+    
+    kernel32 = new Kernel32(uc);
+    user32 = new User32(uc);
+    gdi32 = new Gdi32(uc);
+    dll_store.push_back((QObject*)kernel32);
+    dll_store.push_back((QObject*)user32);
+    dll_store.push_back((QObject*)gdi32);
 
     // Map hook mem
     next_hook = 0xd0000000;
@@ -1377,8 +1188,11 @@ int main(int argc, char **argv, char **envp)
     err = uc_reg_write(uc, UC_X86_REG_FS, &r_fs);
 
     //uc_hook_add(uc, &trace1, UC_HOOK_BLOCK, (void*)hook_block, NULL, 1, 0);
-    //uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
+    uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
     uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED | UC_ERR_FETCH_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
+    
+    register_import(uc, "CallRet", NULL);
+    callret_addr = import_store["CallRet"]->hook;
 
     printf("Emulation begins at %x\n", start_addr);
 

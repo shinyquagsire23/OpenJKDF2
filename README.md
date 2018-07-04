@@ -1,3 +1,3 @@
 # OpenJKDF2
 
-`g++ main.cpp -lunicorn -lpthread -lstdc++fs && ./a.out`
+`qmake openjkdf2.pro && make && ./openjkdf2`
