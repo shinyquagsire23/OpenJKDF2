@@ -8,12 +8,9 @@ class ComCtl32 : public QObject
 {
 Q_OBJECT
 
-private:
-    uc_engine *uc;
-
 public:
 
-    Q_INVOKABLE ComCtl32(uc_engine *uc) : uc(uc) {}
+    Q_INVOKABLE ComCtl32() {}
     
     Q_INVOKABLE void InitCommonControls();
 

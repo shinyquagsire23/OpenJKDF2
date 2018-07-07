@@ -4,6 +4,7 @@
 #include <deque>
 #include <experimental/filesystem>
 
+#include "uc_utils.h"
 #include "main.h"
 
 namespace fs = std::experimental::filesystem;
@@ -26,6 +27,12 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
     return result;
 }
 
+uint32_t Kernel32::Unicorn_MapHeaps()
+{
+    uc_mem_map_ptr(current_uc, heap_addr, (heap_size & ~0xFFF) + 0x1000, UC_PROT_ALL, heap_mem);
+    uc_mem_map_ptr(current_uc, virtual_addr, (virtual_size & ~0xFFF) + 0x1000, UC_PROT_ALL, virtual_mem);
+}
+
 uint32_t Kernel32::HeapCreate(uint32_t a, uint32_t b, uint32_t c)
 {
     return heap_handle++;
@@ -33,45 +40,57 @@ uint32_t Kernel32::HeapCreate(uint32_t a, uint32_t b, uint32_t c)
 
 uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
 {
-    uint32_t retval = heap_addr;
+    uint32_t retval = heap_addr + heap_size;
 
     printf("%x %x %x\n", a, b, alloc_size);
-
-    heap_max = (heap_addr & ~0xFFF);
-    while (heap_max < heap_addr + alloc_size)
-    {
-        //printf("mapping %x\n", heap_max);
-        uc_mem_map(uc, heap_max, 0x1000, UC_PROT_ALL);
-        heap_max += 0x1000;
-    }
-
-    heap_addr += alloc_size;
+    
+    uc_mem_unmap(current_uc, heap_addr, (heap_size & ~0xFFF) + 0x1000);
+    
+    heap_size += alloc_size;
+    heap_mem = realloc(heap_mem, (heap_size & ~0xFFF) + 0x1000);
+    Unicorn_MapHeaps();
+    
+    printf("return %x, %x %x\n", retval, (heap_size & ~0xFFF) + 0x1000, heap_size);
         
     return retval;
 }
 
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
 {
-    uint32_t alloc_addr = lpAddress ? lpAddress : last_alloc + dwSize;
-    uc_mem_map(uc, alloc_addr, dwSize, UC_PROT_ALL); //TODO prot
+    /*uint32_t alloc_addr = lpAddress ? lpAddress : last_alloc + dwSize;
+    uc_mem_map(current_uc, alloc_addr, dwSize, UC_PROT_ALL); //TODO prot
         
     if (!lpAddress)
         last_alloc = last_alloc + dwSize;
         
-    return alloc_addr;
+    return alloc_addr;*/
+    
+    printf("alloc %x\n", dwSize);
+    
+    uint32_t retval = virtual_addr + virtual_size;
+    
+    uc_mem_unmap(current_uc, virtual_addr, (virtual_size & ~0xFFF) + 0x1000);
+    
+    // round up
+    dwSize = (dwSize & ~0xFFF) + 0x1000;
+    
+    virtual_size += dwSize;
+    virtual_mem = realloc(virtual_mem, (virtual_size & ~0xFFF) + 0x1000);
+    Unicorn_MapHeaps();
+    
+    printf("return %x, %x %x\n", retval, (virtual_size & ~0xFFF) + 0x1000, virtual_size);
+        
+    return retval;
 }
 
-uint32_t Kernel32::GetStartupInfoA(uint32_t lpStartupInfo)
+uint32_t Kernel32::GetStartupInfoA(struct StartupInfo* lpStartupInfo)
 {
-    struct StartupInfo out;
-    memset(&out, 0, sizeof(out));
-    out.cb = sizeof(out);
-    out.hStdInput = STD_INPUT_HANDLE;
-    out.hStdOutput = STD_OUTPUT_HANDLE;
-    out.hStdError = STD_ERROR_HANDLE;
+    memset(lpStartupInfo, 0, sizeof(struct StartupInfo));
+    lpStartupInfo->cb = sizeof(struct StartupInfo);
+    lpStartupInfo->hStdInput = STD_INPUT_HANDLE;
+    lpStartupInfo->hStdOutput = STD_OUTPUT_HANDLE;
+    lpStartupInfo->hStdError = STD_ERROR_HANDLE;
     //TODO
-        
-    uc_mem_write(uc, lpStartupInfo, &out, sizeof(out));
 }
 
 uint32_t Kernel32::GetStdHandle(uint32_t nStdHandle)
@@ -103,15 +122,13 @@ uint32_t Kernel32::GetACP()
     return 20127;
 }
 
-uint32_t Kernel32::GetCPInfo(uint32_t a, uint32_t outPtr)
+uint32_t Kernel32::GetCPInfo(uint32_t a, void* outPtr)
 {
-    struct CpInfo out;
-    memset(&out, 0, sizeof(out));
-    out.maxCharSize = 1;
-    out.defaultChar[0] = '?';
+    struct CpInfo* out = (struct CpInfo*)outPtr;
+    memset(out, 0, sizeof(out));
+    out->maxCharSize = 1;
+    out->defaultChar[0] = '?';
 
-    uc_mem_write(uc, outPtr, &out, sizeof(out));
-    
     return true;
 }
 
@@ -140,7 +157,7 @@ uint32_t Kernel32::GetCommandLineA()
     const char *args = ""; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
-    uc_mem_write(uc, ptr, args, strlen(args)+1);
+    uc_mem_write(current_uc, ptr, args, strlen(args)+1);
     return ptr;
 }
 
@@ -149,7 +166,7 @@ uint32_t Kernel32::GetEnvironmentStringsW()
     const char *args = ""; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
-    uc_mem_write(uc, ptr, args, strlen(args)+1);
+    uc_mem_write(current_uc, ptr, args, strlen(args)+1);
     return ptr;
 }
 
@@ -161,7 +178,7 @@ uint32_t Kernel32::FreeEnvironmentStringsW(uint32_t ptr)
 uint32_t Kernel32::GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c)
 {        
     char* out = "ABC";
-    uc_mem_write(uc, b, &out, strlen(out)+1);
+    uc_mem_write(current_uc, b, &out, strlen(out)+1);
         
     return 3;
 }
@@ -173,18 +190,21 @@ uint32_t Kernel32::GetModuleHandleA(uint32_t a)
 
 uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
 {
-    std::string requested = uc_read_string(uc, funcName);
+    std::string requested = uc_read_string(current_uc, funcName);
     printf("requested addr for %s\n", requested.c_str());
         
     if (import_store.find(requested) == import_store.end())
-        register_import(uc, requested, 0);
+    {
+        register_import(requested, 0);
+        sync_imports(current_uc);
+    }
         
     return import_store[requested]->hook;
 }
 
 void Kernel32::OutputDebugStringA(uint32_t str_ptr)
 {
-    std::string text = uc_read_string(uc, str_ptr);
+    std::string text = uc_read_string(current_uc, str_ptr);
     printf("OutputDebugString: %s\n", text.c_str());
 }
 
@@ -195,13 +215,13 @@ uint32_t Kernel32::GetLastError()
 
 uint32_t Kernel32::LoadLibraryA(uint32_t dllStr_ptr)
 {
-    std::string text = uc_read_string(uc, dllStr_ptr);
+    std::string text = uc_read_string(current_uc, dllStr_ptr);
     printf("Stub: Load library %s\n", text.c_str());
 }
 
-uint32_t Kernel32::FindFirstFileA(uint32_t lpFileName, uint32_t lpFindFileData)
+uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpFindFileData)
 {
-    std::string match = uc_read_string(uc, lpFileName);
+    std::string match = std::string(lpFileName);
 
     std::string linux_path = std::regex_replace(match, std::regex("\\\\"), "/");
     std::string regex_str = std::regex_replace(match, std::regex("\\\\"), "\\/");
@@ -224,23 +244,19 @@ uint32_t Kernel32::FindFirstFileA(uint32_t lpFileName, uint32_t lpFindFileData)
     char cAlternateFileName[14]; ?
     */
         
-    struct WIN32_FIND_DATAA *out = new struct WIN32_FIND_DATAA();
-    memset(out, 0, sizeof(*out));
-    out->dwFileAttributes = 0x80;
-    out->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-    out->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
-    strncpy(out->cFileName, files[0].filename().c_str(), 260);
-    strncpy(out->cAlternateFileName, "test", 14);
-        
-    uc_mem_write(uc, lpFindFileData, out, sizeof(struct WIN32_FIND_DATAA));
+    memset(lpFindFileData, 0, sizeof(struct WIN32_FIND_DATAA));
+    lpFindFileData->dwFileAttributes = 0x80;
+    lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
+    lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+    strncpy(lpFindFileData->cFileName, files[0].filename().c_str(), 260);
+    strncpy(lpFindFileData->cAlternateFileName, "test", 14);
     
     file_searches[file_search_hand] = files;
-    free(out);
 
     return file_search_hand++;
 }
     
-uint32_t Kernel32::FindNextFileA(uint32_t hFindFile, uint32_t lpFindFileData)
+uint32_t Kernel32::FindNextFileA(uint32_t hFindFile, struct WIN32_FIND_DATAA* lpFindFileData)
 {
     auto files = file_searches[hFindFile];
     files.pop_front();
@@ -250,17 +266,13 @@ uint32_t Kernel32::FindNextFileA(uint32_t hFindFile, uint32_t lpFindFileData)
         file_searches[hFindFile] = files;
         std::string windows_path = std::regex_replace(files[0].string(), std::regex("\\/"), "\\");
             
-        struct WIN32_FIND_DATAA *out = new struct WIN32_FIND_DATAA();
-        memset(out, 0, sizeof(*out));
-        out->dwFileAttributes = 0x80;
-        out->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-        out->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
-        strncpy(out->cFileName, files[0].filename().c_str(), 260);
-        strncpy(out->cAlternateFileName, "test", 14);
-            
-        uc_mem_write(uc, lpFindFileData, out, sizeof(struct WIN32_FIND_DATAA));
-            
-        free(out);
+        memset(lpFindFileData, 0, sizeof(struct WIN32_FIND_DATAA));
+        lpFindFileData->dwFileAttributes = 0x80;
+        lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
+        lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+        strncpy(lpFindFileData->cFileName, files[0].filename().c_str(), 260);
+        strncpy(lpFindFileData->cAlternateFileName, "test", 14);
+
         return 1;
     }
     else
@@ -289,7 +301,7 @@ uint32_t Kernel32::FileTimeToSystemTime(uint32_t a, uint32_t b)
 
 uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, uint32_t lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, uint32_t hTemplateFile)
 {
-    std::string fname = uc_read_string(uc, lpFileName);
+    std::string fname = uc_read_string(current_uc, lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     printf("Stub: Create file %s\n", linux_path.c_str());
         
@@ -303,22 +315,17 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
         return fileno(f);
 }
     
-uint32_t Kernel32::ReadFile(uint32_t hFile, uint32_t lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t lpNumberOfBytesRead, uint32_t lpOverlapped)
+uint32_t Kernel32::ReadFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t *lpNumberOfBytesRead, uint32_t lpOverlapped)
 {
     FILE* f = fdopen(hFile, "rw");
     //printf("Stub: Read file %x at %x, size %x to %x\n", hFindFile, ftell(f), nNumberOfBytesToRead, lpBuffer);
         
-    void* buf = malloc(nNumberOfBytesToRead);
-    uint32_t read = fread(buf, 1, nNumberOfBytesToRead, f);
+    *lpNumberOfBytesRead = fread(lpBuffer, 1, nNumberOfBytesToRead, f);
         
-    // Write bytes read and actual contents
-    uc_mem_write(uc, lpNumberOfBytesRead, &read, sizeof(uint32_t));
-    uc_mem_write(uc, lpBuffer, buf, read);
-        
-    return read;
+    return *lpNumberOfBytesRead;
 }
 
-uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t lpDistanceToMoveHigh, uint32_t dwMoveMethod)
+uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t* lpDistanceToMoveHigh, uint32_t dwMoveMethod)
 {
     printf("Stub: seek file %x\n", hFile);
         
@@ -326,7 +333,7 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
         
     uint32_t high_val = 0;
     if (lpDistanceToMoveHigh)
-        uc_mem_read(uc, lpDistanceToMoveHigh, &high_val, sizeof(uint32_t));
+        high_val = *lpDistanceToMoveHigh;
 
     uint64_t pos = lDistanceToMove | (high_val << 32);
     fseek(f, pos, dwMoveMethod);

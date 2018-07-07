@@ -1,6 +1,6 @@
 #include "user32.h"
 
-#include "main.h"
+#include "uc_utils.h"
 
 uint32_t User32::LoadIconA(uint32_t a, uint32_t b)
 {
@@ -66,16 +66,16 @@ uint32_t User32::GetLastActivePopup(uint32_t hWnd)
 
 void User32::MessageBoxA(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType)
 {
-    std::string text = uc_read_string(uc, lpText);
-    std::string caption = uc_read_string(uc, lpCaption);
+    std::string text = uc_read_string(current_uc, lpText);
+    std::string caption = uc_read_string(current_uc, lpCaption);
     
     printf("MessageBoxA: [%s] %s\n", caption.c_str(), text.c_str());
 }
 
 void User32::MessageBoxW(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType)
 {
-    std::string text = uc_read_wstring(uc, lpText);
-    std::string caption = uc_read_wstring(uc, lpCaption);
+    std::string text = uc_read_wstring(current_uc, lpText);
+    std::string caption = uc_read_wstring(current_uc, lpCaption);
     
     printf("MessageBoxW: [%s] %s\n", caption.c_str(), text.c_str());
 }

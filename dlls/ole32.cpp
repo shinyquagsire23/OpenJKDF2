@@ -1,6 +1,6 @@
 #include "ole32.h"
 
-#include "main.h"
+#include "uc_utils.h"
 
 uint32_t Ole32::CoInitialize(uint32_t a)
 {

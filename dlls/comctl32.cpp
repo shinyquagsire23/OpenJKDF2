@@ -1,6 +1,6 @@
 #include "comctl32.h"
 
-#include "main.h"
+#include "uc_utils.h"
 
 void ComCtl32::InitCommonControls()
 {

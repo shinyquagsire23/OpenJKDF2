@@ -39,13 +39,8 @@ extern AdvApi32 *advapi32;
 extern Ole32 *ole32;
 extern DDraw *ddraw;
 
-extern uint32_t ret_addr;
-extern uint32_t callret_addr;
-extern uint32_t callret_ret;
-extern uint32_t callret_ret_addr;
-extern bool pc_over;
-
-void register_import(uc_engine *uc, std::string name, uint32_t import_addr);
+void register_import(std::string name, uint32_t import_addr);
+void sync_imports(uc_engine *uc);
 void print_registers(uc_engine *uc);
 std::string uc_read_string(uc_engine *uc, uint32_t addr);
 std::string uc_read_wstring(uc_engine *uc, uint32_t addr);
