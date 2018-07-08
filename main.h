@@ -41,10 +41,7 @@ extern DDraw *ddraw;
 
 void register_import(std::string name, uint32_t import_addr);
 void sync_imports(uc_engine *uc);
-void print_registers(uc_engine *uc);
-std::string uc_read_string(uc_engine *uc, uint32_t addr);
-std::string uc_read_wstring(uc_engine *uc, uint32_t addr);
-void uc_stack_pop(uc_engine *uc, uint32_t *out, int num);
-void uc_stack_push(uc_engine *uc, uint32_t *in, int num);
+
+uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args);
 
 #endif // MAIN_H

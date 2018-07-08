@@ -55,6 +55,6 @@ std::string uc_read_string(uc_engine *uc, uint32_t addr);
 std::string uc_read_wstring(uc_engine *uc, uint32_t addr);
 void uc_stack_dump(uc_engine *uc);
 
-void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr);
+void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp);
 
 #endif // UC_UTILS_H

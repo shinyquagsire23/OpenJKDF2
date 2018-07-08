@@ -2,7 +2,7 @@
 
 #include "main.h"
 
-uc_engine *current_uc;
+uc_engine *current_uc = nullptr;
 
 void uc_print_regs(uc_engine *uc)
 {
@@ -225,12 +225,12 @@ static void init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint3
     desc->system = 1;  //code or data
 }
 
-void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr)
+void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uc_err err;
     uc_hook trace1, trace2, trace3;
     uc_x86_mmr gdtr;
-    uint32_t esp;
+    uc_engine *uc_last;
 
     const uint64_t gdt_address = 0xc0000000;
     const uint64_t fs_address = 0x7efdd000;
@@ -246,7 +246,8 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
         return;
     }
 
-    esp = stack_addr + stack_size;
+    if (!esp)
+        esp = stack_addr + stack_size;
     uc_reg_write(uc, UC_X86_REG_ESP, &esp);
     
     uc_mem_map_ptr(uc, image_addr, image_mem_size + stack_size, UC_PROT_ALL, image_mem);
@@ -278,12 +279,13 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
     uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED | UC_ERR_FETCH_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
 
     sync_imports(uc);
+    uc_last = current_uc;
     current_uc = uc;
 
     kernel32->Unicorn_MapHeaps();
     printf("Emulation instance at %x\n", start_addr);
 
-    err = uc_emu_start(uc, start_addr, start_addr + 0x193, 0, 0);
+    err = uc_emu_start(uc, start_addr, end_addr, 0, 0);
     if (err) 
     {
         printf("Failed on uc_emu_start() with error returned %u: %s\n",
@@ -294,4 +296,12 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
     uc_print_regs(uc);
 
     uc_close(uc);
+
+    // Re-sync last instance
+    current_uc = uc_last;
+    if (current_uc)
+    {
+        sync_imports(current_uc);
+        kernel32->Unicorn_MapHeaps();
+    }
 }

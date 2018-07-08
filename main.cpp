@@ -15,7 +15,7 @@
 uint32_t image_mem_addr;
 void* image_mem;
 uint32_t image_mem_size;
-uint32_t stack_size;
+uint32_t stack_size, stack_addr;
 
 uint32_t next_hook;
 
@@ -169,6 +169,25 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
     uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
 }
 
+uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args)
+{
+    uc_engine *uc_new;
+    uint32_t esp, eax, dummy;
+
+    dummy = import_store["dummy"]->hook;
+
+    uc_stack_push(current_uc, args, num_args);
+    uc_stack_push(current_uc, &dummy, 1);
+    uc_reg_read(current_uc, UC_X86_REG_ESP, &esp);
+
+    uc_run(uc_new, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
+    uc_stack_pop(current_uc, &dummy, 1);
+    uc_stack_pop(current_uc, args, num_args);
+    
+    uc_reg_read(uc_new, UC_X86_REG_EAX, &eax);
+    return eax;
+}
+
 int main(int argc, char **argv, char **envp)
 {
     uc_engine *uc;
@@ -196,10 +215,11 @@ int main(int argc, char **argv, char **envp)
     
     // Map hook mem
     next_hook = 0xd0000000;
-    uint32_t stack_addr;
     uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
+    
+    register_import("dummy", 0);
 
-    uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr);
+    uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
 
     return 0;
 }
