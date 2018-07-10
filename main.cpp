@@ -25,16 +25,28 @@ Gdi32 *gdi32;
 ComCtl32 *comctl32;
 AdvApi32 *advapi32;
 Ole32 *ole32;
+Nmm *nmm;
 DDraw *ddraw;
+DSound *dsound;
+DInput *dinput;
+IDirectPlay3 *idirectplay3;
+IDirectSound *idirectsound;
+IDirectInputA *idirectinputa;
 
 std::map<std::string, ImportTracker*> import_store;
-std::vector<QObject*> dll_store;
+std::map<std::string, QObject*> dll_store;
+std::map<std::string, QObject*> interface_store;
 
 static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import);
 
-void register_import(std::string name, uint32_t import_addr)
+uint32_t import_get_hook_addr(std::string name)
 {
-    import_store[name] = new ImportTracker(name, import_addr, next_hook);
+    return import_store[name]->hook;
+}
+
+void register_import(std::string dll, std::string name, uint32_t import_addr)
+{
+    import_store[name] = new ImportTracker(dll, name, import_addr, next_hook);
 
     next_hook += 1;
 }
@@ -69,7 +81,29 @@ void *uc_ptr_to_real_ptr(uint32_t uc_ptr)
     }
     else
     {
+        printf("Could not convert uc ptr %x to real pointer\n", uc_ptr);
         return nullptr;
+    }
+}
+
+uint32_t real_ptr_to_uc_ptr(void* real_ptr)
+{
+    if (real_ptr >= image_mem && real_ptr <= image_mem + image_mem_size + stack_size)
+    {
+        return image_mem_addr + ((size_t)real_ptr - (size_t)image_mem);
+    }
+    else if (real_ptr >= kernel32->heap_mem && real_ptr <= kernel32->heap_mem + kernel32->heap_size)
+    {
+        return kernel32->heap_addr + ((size_t)real_ptr - (size_t)kernel32->heap_mem);
+    }
+    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size)
+    {
+        return kernel32->virtual_addr + ((size_t)real_ptr - (size_t)kernel32->virtual_mem);
+    }
+    else
+    {
+        printf("Could not convert real ptr %p to Unicorn pointer\n", real_ptr);
+        return 0;
     }
 }
 
@@ -83,7 +117,8 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
     
     //TODO DLL names
     
-    for (auto obj : dll_store)
+    auto obj = dll_store[import->dll];
+    if (obj)
     {
         for (int i = 0; i < obj->metaObject()->methodCount(); i++)
         {
@@ -155,13 +190,12 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         
         uc_stack_pop(uc, args, 12); //TODO
         
-        //eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
-        eax = 1;
+        eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
     else
     {
-        printf("Import doesn't have impl, exiting\n");
+        printf("Import %s from %s doesn't have impl, exiting\n", import->name.c_str(), import->dll.c_str());
         uc_emu_stop(uc);
         return;
     }
@@ -180,11 +214,10 @@ uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args)
     uc_stack_push(current_uc, &dummy, 1);
     uc_reg_read(current_uc, UC_X86_REG_ESP, &esp);
 
-    uc_run(uc_new, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
+    eax = uc_run(uc_new, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
     uc_stack_pop(current_uc, &dummy, 1);
     uc_stack_pop(current_uc, args, num_args);
-    
-    uc_reg_read(uc_new, UC_X86_REG_EAX, &eax);
+
     return eax;
 }
 
@@ -199,16 +232,31 @@ int main(int argc, char **argv, char **envp)
     comctl32 = new ComCtl32();
     advapi32 = new AdvApi32();
     ole32 = new Ole32();
+    nmm = new Nmm();
     ddraw = new DDraw();
-    dll_store.push_back((QObject*)kernel32);
-    dll_store.push_back((QObject*)user32);
-    dll_store.push_back((QObject*)gdi32);
-    dll_store.push_back((QObject*)comctl32);
-    dll_store.push_back((QObject*)advapi32);
-    dll_store.push_back((QObject*)ole32);
-    dll_store.push_back((QObject*)ddraw);
+    dsound = new DSound();
+    dinput = new DInput();
+    idirectplay3 = new IDirectPlay3();
+    idirectsound = new IDirectSound();
+    idirectinputa = new IDirectInputA();
+    dll_store["KERNEL32.dll"] = (QObject*)kernel32;
+    dll_store["USER32.dll"] = (QObject*)user32;
+    dll_store["user32.dll"] = (QObject*)user32;
+    dll_store["GDI32.dll"] = (QObject*)gdi32;
+    dll_store["COMCTL32.dll"] = (QObject*)comctl32;
+    dll_store["ADVAPI32.dll"] = (QObject*)advapi32;
+    dll_store["ole32.dll"] = (QObject*)ole32;
+    dll_store["__NMM.dll"] = (QObject*)nmm;
+    dll_store["DDRAW.dll"] = (QObject*)ddraw;
+    dll_store["DSOUND.dll"] = (QObject*)dsound;
+    dll_store["DINPUT.dll"] = (QObject*)dinput;
+    dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
+    dll_store["IDirectSound"] = (QObject*)idirectsound;
+    dll_store["IDirectInputA"] = (QObject*)idirectinputa;
     
-    //QMetaObject::invokeMethod(kernel32, "FindFirstFileA", Q_ARG(char*, "asdf"), Q_ARG(uint32_t, 123));
+    interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
+    interface_store["IDirectSound"] = (QObject*)idirectsound;
+    interface_store["IDirectInputA"] = (QObject*)idirectinputa;
     
     qRegisterMetaType<char*>("char*");
     qRegisterMetaType<char*>("uint32_t*");
@@ -217,7 +265,7 @@ int main(int argc, char **argv, char **envp)
     next_hook = 0xd0000000;
     uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
     
-    register_import("dummy", 0);
+    register_import("dummy", "dummy", 0);
 
     uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
 

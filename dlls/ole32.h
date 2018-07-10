@@ -13,7 +13,7 @@ public:
     Q_INVOKABLE Ole32() {}
     
     Q_INVOKABLE uint32_t CoInitialize(uint32_t a);
-    Q_INVOKABLE uint32_t CoCreateInstance(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);
+    Q_INVOKABLE uint32_t CoCreateInstance(uint8_t* rclsid, void* pUnkOuter, void* dwClsContext, uint8_t* riid, uint32_t* ppv);
 
 //    Q_INVOKABLE uint32_t ();
 };

@@ -2,6 +2,7 @@
 
 #include "uc_utils.h"
 #include "main.h"
+#include "winutils.h"
 
 uint32_t DDraw::DirectDrawEnumerateA(uint32_t callback, uint32_t context)
 {
@@ -22,9 +23,12 @@ uint32_t DDraw::DirectDrawEnumerateA(uint32_t callback, uint32_t context)
     return 0;
 }
 
-uint32_t DDraw::DirectDrawCreate(uint32_t a, uint32_t b, uint32_t c)
+uint32_t DDraw::DirectDrawCreate(uint8_t* lpGUID, uint32_t* lplpDD, void* pUnkOuter)
 {
-    printf("STUB! DirectDrawCreate\n");
+    printf("STUB! DirectDrawCreate");
+    
+    *lplpDD = CreateInterfaceInstance("IDirectDraw4", 200);
+    
     return 1;
 }
 

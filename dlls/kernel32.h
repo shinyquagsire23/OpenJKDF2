@@ -72,6 +72,7 @@ public:
     void *heap_mem;
     uint32_t heap_addr;
     uint32_t heap_size;
+    uint32_t heap_size_actual;
     
     void *virtual_mem;
     uint32_t virtual_addr;

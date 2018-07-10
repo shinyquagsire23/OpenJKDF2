@@ -225,12 +225,13 @@ static void init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint3
     desc->system = 1;  //code or data
 }
 
-void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
+uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uc_err err;
     uc_hook trace1, trace2, trace3;
     uc_x86_mmr gdtr;
     uc_engine *uc_last;
+    uint32_t eax;
 
     const uint64_t gdt_address = 0xc0000000;
     const uint64_t fs_address = 0x7efdd000;
@@ -243,7 +244,7 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
     err = uc_open(UC_ARCH_X86, UC_MODE_32, &uc);
     if (err) {
         printf("Failed on uc_open() with error returned: %u\n", err);
-        return;
+        return 0;
     }
 
     if (!esp)
@@ -295,6 +296,7 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
     printf(">>> Emulation done. Below is the CPU context\n");
     uc_print_regs(uc);
 
+    uc_reg_read(uc, UC_X86_REG_EAX, &eax);
     uc_close(uc);
 
     // Re-sync last instance
@@ -304,4 +306,6 @@ void uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_
         sync_imports(current_uc);
         kernel32->Unicorn_MapHeaps();
     }
+    
+    return eax;
 }

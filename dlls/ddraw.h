@@ -13,7 +13,7 @@ public:
     Q_INVOKABLE DDraw() {}
     
     Q_INVOKABLE uint32_t DirectDrawEnumerateA(uint32_t callback, uint32_t context);
-    Q_INVOKABLE uint32_t DirectDrawCreate(uint32_t a, uint32_t b, uint32_t c);
+    Q_INVOKABLE uint32_t DirectDrawCreate(uint8_t* lpGUID, uint32_t* lplpDD, void* pUnkOuter);
 
 //    Q_INVOKABLE uint32_t ();
 };

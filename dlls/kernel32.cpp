@@ -29,8 +29,22 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
 
 uint32_t Kernel32::Unicorn_MapHeaps()
 {
-    uc_mem_map_ptr(current_uc, heap_addr, (heap_size & ~0xFFF) + 0x1000, UC_PROT_ALL, heap_mem);
-    uc_mem_map_ptr(current_uc, virtual_addr, (virtual_size & ~0xFFF) + 0x1000, UC_PROT_ALL, virtual_mem);
+    uc_err ret;
+    uc_mem_region *regions;
+    uint32_t count;
+
+    uc_mem_regions(current_uc, &regions, &count);
+    for (int i = 0; i < count; i++)
+    {
+        if (regions[i].begin == heap_addr || regions[i].begin == virtual_addr)
+            uc_mem_unmap(current_uc, regions[i].begin, regions[i].end-regions[i].begin+1);
+    }
+    
+    ret = uc_mem_map_ptr(current_uc, heap_addr, heap_size_actual, UC_PROT_ALL, heap_mem);
+    //printf("%x %s\n", heap_size_actual, uc_strerror(ret));
+    
+    ret = uc_mem_map_ptr(current_uc, virtual_addr, virtual_size, UC_PROT_ALL, virtual_mem);
+    //printf("%x %s\n", virtual_size, uc_strerror(ret));
 }
 
 uint32_t Kernel32::HeapCreate(uint32_t a, uint32_t b, uint32_t c)
@@ -42,15 +56,14 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
 {
     uint32_t retval = heap_addr + heap_size;
 
-    printf("%x %x %x\n", a, b, alloc_size);
-    
-    uc_mem_unmap(current_uc, heap_addr, (heap_size & ~0xFFF) + 0x1000);
-    
+    //printf("%x %x %x\n", a, b, alloc_size);
+
     heap_size += alloc_size;
-    heap_mem = realloc(heap_mem, (heap_size & ~0xFFF) + 0x1000);
+    heap_size_actual = (heap_size & ~0xFFF) + 0x1000;
+    heap_mem = realloc(heap_mem, heap_size_actual);
     Unicorn_MapHeaps();
     
-    printf("return %x, %x %x\n", retval, (heap_size & ~0xFFF) + 0x1000, heap_size);
+    //printf("return %x, %x %x\n", retval, heap_size_actual, heap_size);
         
     return retval;
 }
@@ -65,20 +78,17 @@ uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t fl
         
     return alloc_addr;*/
     
-    printf("alloc %x\n", dwSize);
-    
     uint32_t retval = virtual_addr + virtual_size;
     
-    uc_mem_unmap(current_uc, virtual_addr, (virtual_size & ~0xFFF) + 0x1000);
+    //printf("alloc %x\n", dwSize);
     
-    // round up
     dwSize = (dwSize & ~0xFFF) + 0x1000;
-    
+
     virtual_size += dwSize;
-    virtual_mem = realloc(virtual_mem, (virtual_size & ~0xFFF) + 0x1000);
+    virtual_mem = realloc(virtual_mem, virtual_size);
     Unicorn_MapHeaps();
     
-    printf("return %x, %x %x\n", retval, (virtual_size & ~0xFFF) + 0x1000, virtual_size);
+    //printf("return %x, %x %x\n", retval, virtual_size, virtual_size);
         
     return retval;
 }
@@ -195,7 +205,7 @@ uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
         
     if (import_store.find(requested) == import_store.end())
     {
-        register_import(requested, 0);
+        register_import("idk", requested, 0);
         sync_imports(current_uc);
     }
         
