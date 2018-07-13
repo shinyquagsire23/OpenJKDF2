@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <unicorn/unicorn.h>
+#include <chrono>
 
 class Nmm : public QObject
 {
@@ -25,6 +26,11 @@ public:
     Q_INVOKABLE uint32_t joyGetNumDevs(void)
     {
         return 0;
+    }
+    
+    Q_INVOKABLE uint32_t timeGetTime(void)
+    {
+        return (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     }
 
 //    Q_INVOKABLE uint32_t ();

@@ -7,20 +7,20 @@
 #pragma pack(push, 1)
 struct StartupInfo
 {
-    uint32_t  cb;
-    uint32_t  lpReserved;
-    uint32_t  lpDesktop;
-    uint32_t  lpTitle;
-    uint32_t  dwX;
-    uint32_t  dwY;
-    uint32_t  dwXSize;
-    uint32_t  dwYSize;
-    uint32_t  dwXCountChars;
-    uint32_t  dwYCountChars;
-    uint32_t  dwFillAttribute;
-    uint32_t  dwFlags;
-    uint16_t   wShowWindow;
-    uint16_t   cbReserved2;
+    uint32_t cb;
+    uint32_t lpReserved;
+    uint32_t lpDesktop;
+    uint32_t lpTitle;
+    uint32_t dwX;
+    uint32_t dwY;
+    uint32_t dwXSize;
+    uint32_t dwYSize;
+    uint32_t dwXCountChars;
+    uint32_t dwYCountChars;
+    uint32_t dwFillAttribute;
+    uint32_t dwFlags;
+    uint16_t wShowWindow;
+    uint16_t cbReserved2;
     uint32_t lpReserved2;
     uint32_t hStdInput;
     uint32_t hStdOutput;
@@ -90,6 +90,8 @@ public:
     Q_INVOKABLE uint32_t Unicorn_MapHeaps();
     Q_INVOKABLE uint32_t HeapCreate(uint32_t a, uint32_t b, uint32_t c);
     Q_INVOKABLE uint32_t HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size);
+    Q_INVOKABLE uint32_t HeapFree(uint32_t hHeap, uint32_t dwFlags, uint32_t mem);
+    Q_INVOKABLE uint32_t CloseHandle(uint32_t handle);
     Q_INVOKABLE uint32_t GetVersion() { return 0; };
     Q_INVOKABLE uint32_t VirtualAlloc(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
     Q_INVOKABLE uint32_t GetStartupInfoA(struct StartupInfo* lpStartupInfo);

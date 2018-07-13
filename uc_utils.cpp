@@ -189,12 +189,12 @@ static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type,
             printf(">>> Missing memory is being READ at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
                          address, size, value);
             uc_print_regs(uc);
-            return false;
+            return true;
         case UC_MEM_WRITE_UNMAPPED:
             printf(">>> Missing memory is being WRITE at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
                          address, size, value);
             uc_print_regs(uc);
-            return false;
+            return true;
         case UC_ERR_FETCH_UNMAPPED:
             printf(">>> Missing memory is being EXEC at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
                          address, size, value);
@@ -277,7 +277,7 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
 
     //uc_hook_add(uc, &trace1, UC_HOOK_BLOCK, (void*)hook_block, NULL, 1, 0);
     //uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
-    uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED | UC_ERR_FETCH_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
+    uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
 
     sync_imports(uc);
     uc_last = current_uc;

@@ -17,9 +17,9 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
 
     for (const auto& p : fs::recursive_directory_iterator(dir))
     {
-        if (fs::is_regular_file(p) && std::regex_match(p.path().string(), pattern))
+        if (/*fs::is_regular_file(p) && */std::regex_match(p.path().string(), pattern))
         {
-            //printf("%s\n", p.path().string().c_str());
+            printf("%s\n", p.path().string().c_str());
             result.push_back(p);
         }
     }
@@ -66,6 +66,16 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
     //printf("return %x, %x %x\n", retval, heap_size_actual, heap_size);
         
     return retval;
+}
+
+uint32_t Kernel32::HeapFree(uint32_t hHeap, uint32_t dwFlags, uint32_t mem)
+{
+    printf("STUB: HeapFree %x, heap %x\n", mem, hHeap);
+}
+
+uint32_t Kernel32::CloseHandle(uint32_t handle)
+{
+    printf("STUB: CloseHandle %x\n", handle);
 }
 
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
@@ -164,7 +174,7 @@ uint32_t Kernel32::LCMapStringW(uint32_t a, uint32_t b, uint32_t c, uint32_t d, 
 
 uint32_t Kernel32::GetCommandLineA()
 {
-    const char *args = ""; //TODO
+    const char *args = "-windowGUI"; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
     uc_mem_write(current_uc, ptr, args, strlen(args)+1);
@@ -234,6 +244,7 @@ uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpF
     std::string match = std::string(lpFileName);
 
     std::string linux_path = std::regex_replace(match, std::regex("\\\\"), "/");
+    linux_path = std::regex_replace(linux_path, std::regex("\\*\\.\\*"), "*");
     std::string regex_str = std::regex_replace(match, std::regex("\\\\"), "\\/");
     regex_str = std::regex_replace(regex_str, std::regex("\\*"), ".*");
 
@@ -255,9 +266,18 @@ uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpF
     */
         
     memset(lpFindFileData, 0, sizeof(struct WIN32_FIND_DATAA));
-    lpFindFileData->dwFileAttributes = 0x80;
-    lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-    lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+    if (fs::is_regular_file(files[0]))
+    {
+        lpFindFileData->dwFileAttributes = 0x80;
+        lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
+        lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+    }
+    else
+    {
+        lpFindFileData->dwFileAttributes = 0x10;
+        lpFindFileData->nFileSizeHigh = 0;
+        lpFindFileData->nFileSizeLow = 0;
+    }
     strncpy(lpFindFileData->cFileName, files[0].filename().c_str(), 260);
     strncpy(lpFindFileData->cAlternateFileName, "test", 14);
     
@@ -277,9 +297,18 @@ uint32_t Kernel32::FindNextFileA(uint32_t hFindFile, struct WIN32_FIND_DATAA* lp
         std::string windows_path = std::regex_replace(files[0].string(), std::regex("\\/"), "\\");
             
         memset(lpFindFileData, 0, sizeof(struct WIN32_FIND_DATAA));
-        lpFindFileData->dwFileAttributes = 0x80;
-        lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
-        lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+        if (fs::is_regular_file(files[0]))
+        {
+            lpFindFileData->dwFileAttributes = 0x80;
+            lpFindFileData->nFileSizeHigh = (fs::file_size(files[0]) & 0xFFFFFFFF00000000) >> 32;
+            lpFindFileData->nFileSizeLow = fs::file_size(files[0]) & 0xFFFFFFFF;
+        }
+        else
+        {
+            lpFindFileData->dwFileAttributes = 0x10;
+            lpFindFileData->nFileSizeHigh = 0;
+            lpFindFileData->nFileSizeLow = 0;
+        }
         strncpy(lpFindFileData->cFileName, files[0].filename().c_str(), 260);
         strncpy(lpFindFileData->cAlternateFileName, "test", 14);
 
@@ -318,6 +347,7 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
     FILE *f = fopen(linux_path.c_str(), "rw");
     if (!f)
     {
+        printf("Failed to open file %s\n", linux_path.c_str());
         last_error = ERROR_FILE_NOT_FOUND;
         return -1;
     }

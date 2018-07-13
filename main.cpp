@@ -28,10 +28,18 @@ Ole32 *ole32;
 Nmm *nmm;
 DDraw *ddraw;
 DSound *dsound;
+DPlay *dplay;
 DInput *dinput;
 IDirectPlay3 *idirectplay3;
+IDirectPlayLobby3 *idirectplaylobby3;
 IDirectSound *idirectsound;
 IDirectInputA *idirectinputa;
+SmackW32 *smackw32;
+
+SDL_Window* displayWindow;
+SDL_Renderer* displayRenderer;
+SDL_RendererInfo displayRendererInfo;
+SDL_Event event;
 
 std::map<std::string, ImportTracker*> import_store;
 std::map<std::string, QObject*> dll_store;
@@ -111,9 +119,9 @@ QGenericArgument q_args[9];
 static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import)
 {
     uint32_t ret_addr;
-    printf("Hit import %s\n", import->name.c_str());
-    
     uc_stack_pop(uc, &ret_addr, 1);
+    
+    //printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
     
     //TODO DLL names
     
@@ -193,6 +201,17 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
         eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
         uc_reg_write(uc, UC_X86_REG_EAX, &eax);
     }
+    else if (!strcmp(import->name.c_str(), "CreateFontA"))
+    {
+        uint32_t args[14];
+        uint32_t eax;
+        
+        uc_stack_pop(uc, args, 14); //TODO
+        
+        //int16_t cHeight, int16_t cWidth, int16_t cEscapement, int16_t cOrientation, int16_t    cWeight, uint32_t bItalic, uint32_t bUnderline, uint32_t bStrikeOut, uint32_t iCharSet, uint32_t iOutPrecision, uint32_t iClipPrecision, uint32_t iQuality, uint32_t iPitchAndFamily, char* pszFaceName
+        eax = gdi32->CreateFontA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], (char*)uc_ptr_to_real_ptr(args[13]));
+        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
+    }
     else
     {
         printf("Import %s from %s doesn't have impl, exiting\n", import->name.c_str(), import->dll.c_str());
@@ -203,7 +222,7 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
     uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
 }
 
-uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args)
+uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret)
 {
     uc_engine *uc_new;
     uint32_t esp, eax, dummy;
@@ -211,14 +230,22 @@ uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args)
     dummy = import_store["dummy"]->hook;
 
     uc_stack_push(current_uc, args, num_args);
-    uc_stack_push(current_uc, &dummy, 1);
+    if (push_ret)
+        uc_stack_push(current_uc, &dummy, 1);
     uc_reg_read(current_uc, UC_X86_REG_ESP, &esp);
 
     eax = uc_run(uc_new, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
-    uc_stack_pop(current_uc, &dummy, 1);
+    if (push_ret)
+        uc_stack_pop(current_uc, &dummy, 1);
     uc_stack_pop(current_uc, args, num_args);
 
     return eax;
+}
+
+static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
+{
+    printf("Hook at %x\n", address);
+    uc_print_regs(uc);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -234,11 +261,14 @@ int main(int argc, char **argv, char **envp)
     ole32 = new Ole32();
     nmm = new Nmm();
     ddraw = new DDraw();
+    dplay = new DPlay();
     dsound = new DSound();
     dinput = new DInput();
     idirectplay3 = new IDirectPlay3();
+    idirectplaylobby3 = new IDirectPlayLobby3();
     idirectsound = new IDirectSound();
     idirectinputa = new IDirectInputA();
+    smackw32 = new SmackW32();
     dll_store["KERNEL32.dll"] = (QObject*)kernel32;
     dll_store["USER32.dll"] = (QObject*)user32;
     dll_store["user32.dll"] = (QObject*)user32;
@@ -248,24 +278,38 @@ int main(int argc, char **argv, char **envp)
     dll_store["ole32.dll"] = (QObject*)ole32;
     dll_store["__NMM.dll"] = (QObject*)nmm;
     dll_store["DDRAW.dll"] = (QObject*)ddraw;
+    dll_store["DPLAYX.dll"] = (QObject*)dplay;
     dll_store["DSOUND.dll"] = (QObject*)dsound;
     dll_store["DINPUT.dll"] = (QObject*)dinput;
     dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
+    dll_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     dll_store["IDirectSound"] = (QObject*)idirectsound;
     dll_store["IDirectInputA"] = (QObject*)idirectinputa;
+    dll_store["smackw32.DLL"] = (QObject*)smackw32;
     
     interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
+    interface_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     interface_store["IDirectSound"] = (QObject*)idirectsound;
     interface_store["IDirectInputA"] = (QObject*)idirectinputa;
     
     qRegisterMetaType<char*>("char*");
     qRegisterMetaType<char*>("uint32_t*");
     
+    // Init SDL
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+
+    SDL_CreateWindowAndRenderer(640, 480, 0, &displayWindow, &displayRenderer);
+    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+
+    
     // Map hook mem
     next_hook = 0xd0000000;
     uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
     
     register_import("dummy", "dummy", 0);
+    //uc_hook trace;
+    //uc_hook_add(uc, &trace, UC_HOOK_CODE, (void*)hook_test, nullptr, 0x426838, 0x426838);
 
     uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
 
