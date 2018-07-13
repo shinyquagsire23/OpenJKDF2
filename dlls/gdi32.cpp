@@ -42,6 +42,9 @@ uint32_t Gdi32::SelectObject(uint32_t hdc, uint32_t h)
 
 uint32_t Gdi32::GdiFlush()
 {
+    SDL_UpdateWindowSurface(displayWindow);
+    SDL_RenderPresent(displayRenderer);
+
     return 1;
 }
 
@@ -72,12 +75,7 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
         SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
         SDL_RenderDrawPoint(displayRenderer, i % 640, i / 640);
     }
-    
-    //SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
-    //SDL_RenderDrawPoint(displayRenderer, x, y);
 
-    SDL_UpdateWindowSurface(displayWindow);
-    SDL_RenderPresent(displayRenderer);
     return 1;
 }
 

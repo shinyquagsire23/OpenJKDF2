@@ -45,6 +45,8 @@ std::map<std::string, ImportTracker*> import_store;
 std::map<std::string, QObject*> dll_store;
 std::map<std::string, QObject*> interface_store;
 
+std::map<std::string, std::map<std::string, int> > method_cache;
+
 static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import);
 
 uint32_t import_get_hook_addr(std::string name)
@@ -123,59 +125,57 @@ static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTr
     
     //printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
     
-    //TODO DLL names
-    
+    //TODO: get things faster so these can go where they should be
+    SDL_UpdateWindowSurface(displayWindow);
+    SDL_RenderPresent(displayRenderer);
+
     auto obj = dll_store[import->dll];
     if (obj)
     {
-        for (int i = 0; i < obj->metaObject()->methodCount(); i++)
+        QMetaMethod method = obj->metaObject()->method(method_cache[import->dll][import->name]);
+
+        if (method.parameterCount() <= 9)
         {
-            QMetaMethod method = obj->metaObject()->method(i);
-            //qDebug() << method.methodSignature();
+            void* trans_args[9];
+            uint32_t args[9];
+            uint32_t retVal;
             
-            if (method.name() == import->name.c_str() && method.parameterCount() <= 9)
+            uc_stack_pop(uc, args, method.parameterCount());
+            
+            // Translate args from Unicorn pointers to usable pointers
+            char* idk;
+            for (int j = 0; j < method.parameterCount(); j++)
             {
-                void* trans_args[9];
-                uint32_t args[9];
-                uint32_t retVal;
-                
-                uc_stack_pop(uc, args, method.parameterCount());
-                
-                // Translate args from Unicorn pointers to usable pointers
-                char* idk;
-                for (int j = 0; j < method.parameterCount(); j++)
+                char *param_type = (char*)method.parameterTypes()[j].data();
+                if (param_type[strlen(param_type) - 1] == '*')
                 {
-                    char *param_type = (char*)method.parameterTypes()[j].data();
-                    if (param_type[strlen(param_type) - 1] == '*')
-                    {
-                        trans_args[j] = uc_ptr_to_real_ptr(args[j]);
-                        q_args[j] = QGenericArgument(method.parameterTypes()[j], &trans_args[j]);
-                    }
-                    else 
-                    {
-                        q_args[j] = Q_ARG(uint32_t, args[j]);
-                    }
+                    trans_args[j] = uc_ptr_to_real_ptr(args[j]);
+                    q_args[j] = QGenericArgument(method.parameterTypes()[j], &trans_args[j]);
                 }
+                else 
+                {
+                    q_args[j] = Q_ARG(uint32_t, args[j]);
+                }
+            }
                 
-                bool succ;
-                if (method.returnType() == QMetaType::Void)
-                    succ = method.invoke(obj, q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
-                else
-                    succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
+            bool succ;
+            if (method.returnType() == QMetaType::Void)
+                succ = method.invoke(obj, q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
+            else
+                succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
 
-                //printf("%x %x %x\n", succ, retVal, method.parameterCount());
-                if (succ)
-                {
-                    if (method.returnType() != QMetaType::Void)
-                        uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
+            //printf("%x %x %x\n", succ, retVal, method.parameterCount());
+            if (succ)
+            {
+                if (method.returnType() != QMetaType::Void)
+                    uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
 
-                    uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
-                    return;
-                }
-                else
-                {
-                    uc_stack_push(uc, args, method.parameterCount());
-                }
+                uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
+                return;
+            }
+            else
+            {
+                uc_stack_push(uc, args, method.parameterCount());
             }
         }
     }
@@ -301,6 +301,21 @@ int main(int argc, char **argv, char **envp)
     SDL_CreateWindowAndRenderer(640, 480, 0, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+    
+    printf("Caching functions\n");
+    for (auto obj_pair : dll_store)
+    {
+        auto obj = obj_pair.second;
+        for (int i = 0; i < obj->metaObject()->methodCount(); i++)
+        {
+            QMetaMethod method = obj->metaObject()->method(i);
+            char* name = method.name().data();
+            std::string strname = std::string(name);
+            
+            method_cache[obj_pair.first][strname] = i;
+            printf("%s %s %i\n", obj_pair.first.c_str(), name, i);
+        }
+    }
 
     
     // Map hook mem
