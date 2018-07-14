@@ -37,4 +37,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern Gdi32 *gdi32;
+
 #endif // GDI32_H

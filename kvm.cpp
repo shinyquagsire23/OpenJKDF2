@@ -1,0 +1,405 @@
+#include "kvm.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <string.h>
+#include <stdint.h>
+#include <linux/kvm.h>
+
+#include <map>
+
+#include "vm.h"
+#include "main.h"
+#include "dlls/kernel32.h"
+
+/* CR0 bits */
+#define CR0_PE 1u
+#define CR0_MP (1U << 1)
+#define CR0_EM (1U << 2)
+#define CR0_TS (1U << 3)
+#define CR0_ET (1U << 4)
+#define CR0_NE (1U << 5)
+#define CR0_WP (1U << 16)
+#define CR0_AM (1U << 18)
+#define CR0_NW (1U << 29)
+#define CR0_CD (1U << 30)
+#define CR0_PG (1U << 31)
+
+#define EFER_SCE 1
+#define EFER_LME (1U << 8)
+#define EFER_LMA (1U << 10)
+#define EFER_NXE (1U << 11)
+
+const uint64_t gdt_address = 0xc0000000;
+const uint64_t fs_address = 0x7efdd000;
+
+void* fs_mem;
+void* gdt_mem;
+
+struct vm *current_kvm;
+struct vm *last_kvm;
+
+void kvm_reg_write(struct vm *vm, int id, uint32_t value)
+{
+    struct kvm_regs regs;
+    if (ioctl(vm->vcpu.fd, KVM_GET_REGS, &regs) < 0) 
+    {
+        perror("KVM_GET_REGS");
+        exit(1);
+    }
+
+    switch (id)
+    {
+        case UC_X86_REG_EAX:
+            regs.rax = value;
+        break;
+        case UC_X86_REG_ECX:
+            regs.rcx = value;
+        break;
+        case UC_X86_REG_EDX:
+            regs.rdx = value;
+        break;
+        case UC_X86_REG_EBX:
+            regs.rbx = value;
+        break;
+        case UC_X86_REG_ESP:
+            regs.rsp = value;
+        break;
+        case UC_X86_REG_EBP:
+            regs.rbp = value;
+        break;
+        case UC_X86_REG_ESI:
+            regs.rsi = value;
+        break;
+        case UC_X86_REG_EDI:
+            regs.rdi = value;
+        break;
+        case UC_X86_REG_EIP:
+            regs.rip = value;
+        break;
+        default:
+            printf("Unknown reg %i\n", id);
+            break;
+    }
+    
+    if (ioctl(vm->vcpu.fd, KVM_SET_REGS, &regs) < 0) {
+        perror("KVM_SET_REGS");
+        exit(1);
+    }
+}
+
+uint32_t kvm_reg_read(struct vm *vm, int id)
+{
+    struct kvm_regs regs;
+    if (ioctl(vm->vcpu.fd, KVM_GET_REGS, &regs) < 0) 
+    {
+        perror("KVM_GET_REGS");
+        exit(1);
+    }
+
+    switch (id)
+    {
+        case UC_X86_REG_EAX:
+            return regs.rax;
+        case UC_X86_REG_ECX:
+            return regs.rcx;
+        case UC_X86_REG_EDX:
+            return regs.rdx;
+        case UC_X86_REG_EBX:
+            return regs.rbx;
+        case UC_X86_REG_ESP:
+            return regs.rsp;
+        case UC_X86_REG_EBP:
+            return regs.rbp;
+        case UC_X86_REG_ESI:
+            return regs.rsi;
+        case UC_X86_REG_EDI:
+            return regs.rdi;
+        case UC_X86_REG_EIP:
+            return regs.rip;
+        default:
+            printf("Unknown reg %i\n", id);
+            return 0;
+    }
+}
+
+void kvm_print_regs(struct vm *vm)
+{
+    struct kvm_regs regs;
+    if (ioctl(vm->vcpu.fd, KVM_GET_REGS, &regs) < 0) 
+    {
+        perror("KVM_GET_REGS");
+        exit(1);
+    }
+
+    printf("Register dump:\n");
+    printf("eax %8.8x ", regs.rax);
+    printf("ecx %8.8x ", regs.rcx);
+    printf("edx %8.8x ", regs.rdx);
+    printf("ebx %8.8x\n", regs.rbx);
+    printf("esp %8.8x ", regs.rsp);
+    printf("ebp %8.8x ", regs.rbp);
+    printf("esi %8.8x ", regs.rsi);
+    printf("edi %8.8x ", regs.rdi);
+    printf("\n");
+    printf("eip %8.8x ", regs.rip);
+    printf("\n");
+}
+
+void kvm_mem_map_ptr(struct vm *vm, uint64_t address, size_t size, uint32_t perms, void *ptr)
+{
+    static int slot_count = 0;
+
+    struct kvm_userspace_memory_region memreg;
+    memreg.slot = slot_count++;
+    memreg.flags = 0;
+    memreg.guest_phys_addr = address;
+    memreg.memory_size = size;
+    memreg.userspace_addr = (unsigned long)ptr;
+
+    if (ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &memreg) < 0) 
+    {
+        perror("KVM_SET_USER_MEMORY_REGION");
+                //exit(1);
+    }
+}
+
+void vm_init(struct vm *vm)
+{
+    int api_ver;
+    //size_t mem_size = 0x200000;
+
+    vm->sys_fd = open("/dev/kvm", O_RDWR);
+    if (vm->sys_fd < 0) {
+        perror("open /dev/kvm");
+        exit(1);
+    }
+
+    api_ver = ioctl(vm->sys_fd, KVM_GET_API_VERSION, 0);
+    if (api_ver < 0) {
+        perror("KVM_GET_API_VERSION");
+        exit(1);
+    }
+
+    if (api_ver != KVM_API_VERSION) {
+        fprintf(stderr, "Got KVM api version %d, expected %d\n",
+            api_ver, KVM_API_VERSION);
+        exit(1);
+    }
+
+    vm->fd = ioctl(vm->sys_fd, KVM_CREATE_VM, 0);
+    if (vm->fd < 0) {
+        perror("KVM_CREATE_VM");
+        exit(1);
+    }
+
+        if (ioctl(vm->fd, KVM_SET_TSS_ADDR, 0xfffbd000) < 0) {
+                perror("KVM_SET_TSS_ADDR");
+        exit(1);
+    }
+}
+
+void vcpu_init(struct vm *vm)
+{
+    int vcpu_mmap_size;
+
+    vm->vcpu.fd = ioctl(vm->fd, KVM_CREATE_VCPU, 0);
+        if (vm->vcpu.fd < 0) {
+        perror("KVM_CREATE_VCPU");
+                exit(1);
+    }
+
+    vcpu_mmap_size = ioctl(vm->sys_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+        if (vcpu_mmap_size <= 0) {
+        perror("KVM_GET_VCPU_MMAP_SIZE");
+                exit(1);
+    }
+
+    vm->vcpu.kvm_run = (struct kvm_run*)mmap(NULL, vcpu_mmap_size, PROT_READ | PROT_WRITE,
+                 MAP_SHARED, vm->vcpu.fd, 0);
+    if (vm->vcpu.kvm_run == MAP_FAILED) {
+        perror("mmap kvm_run");
+        exit(1);
+    }
+}
+
+uint32_t run_vm(struct vm *vm, size_t sz)
+{
+    struct kvm_regs regs;
+    uint64_t memval = 0;
+    ImportTracker *import;
+    
+    vm->stopped = false;
+
+    for (;;) {
+        if (vm->stopped) break;
+    
+        if (ioctl(vm->vcpu.fd, KVM_RUN, 0) < 0) {
+            perror("KVM_RUN");
+            exit(1);
+        }
+
+        switch (vm->vcpu.kvm_run->exit_reason) {
+
+        case 17:
+            if (ioctl(vm->vcpu.fd, KVM_GET_REGS, &regs) < 0) {
+                perror("KVM_GET_REGS");
+                exit(1);
+            }
+            
+            import = import_hooks[regs.rip];
+            if (import)
+            {
+                //printf("Hit import %s\n", import->name.c_str());
+                vm_process_import(import);
+            }
+            else
+            {
+                fprintf(stderr,    "Got exit_reason %d,"
+                    " expected KVM_EXIT_HLT (%d)\n",
+                    vm->vcpu.kvm_run->exit_reason, KVM_EXIT_HLT);  
+                kvm_print_regs(vm);
+                kvm_stop(vm);
+            }
+            break;
+
+            /* fall through */
+        default:
+            fprintf(stderr,    "Got exit_reason %d,"
+                " expected KVM_EXIT_HLT (%d)\n",
+                vm->vcpu.kvm_run->exit_reason, KVM_EXIT_HLT);  
+            kvm_print_regs(vm);
+            kvm_stop(vm);
+        }
+    }
+
+    if (ioctl(vm->vcpu.fd, KVM_GET_REGS, &regs) < 0) {
+        perror("KVM_GET_REGS");
+        exit(1);
+    }
+
+    return regs.rax;
+}
+
+static void setup_protected_mode(struct kvm_sregs *sregs)
+{
+    struct kvm_segment seg;
+    seg.base = 0,
+    seg.limit = 0xffffffff,
+    seg.selector = 1 << 3,
+    seg.present = 1,
+    seg.type = 11, /* Code: execute, read, accessed */
+    seg.dpl = 0,
+    seg.db = 1,
+    seg.s = 1, /* Code/data */
+    seg.l = 0,
+    seg.g = 1, /* 4KB granularity */
+
+    sregs->cr0 |= CR0_PE; /* enter protected mode */
+
+    sregs->cs = seg;
+    
+    /*int r_cs = 0x73;
+    int r_ss = 0x88;      //ring 0
+    int r_ds = 0x7b;
+    int r_es = 0x7b;
+    int r_fs = 0x83;*/
+
+    seg.type = 3; /* Data: read/write, accessed */
+    seg.selector = 2 << 3;
+    sregs->ds = sregs->es = sregs->gs = sregs->ss = seg;
+    
+    seg.base = fs_address;
+    
+    sregs->fs = seg;
+}
+
+uint32_t run_protected_mode(struct vm *vm, uint32_t start, uint32_t esp)
+{
+    struct kvm_sregs sregs;
+    struct kvm_regs regs;
+
+    printf("Testing protected mode\n");
+
+    if (ioctl(vm->vcpu.fd, KVM_GET_SREGS, &sregs) < 0) {
+        perror("KVM_GET_SREGS");
+        exit(1);
+    }
+
+    setup_protected_mode(&sregs);
+
+    if (ioctl(vm->vcpu.fd, KVM_SET_SREGS, &sregs) < 0) {
+        perror("KVM_SET_SREGS");
+        exit(1);
+    }
+
+    memset(&regs, 0, sizeof(regs));
+    /* Clear all FLAGS bits, except bit 1 which is always set. */
+    regs.rflags = 2;
+    regs.rip = start;
+    regs.rsp = esp;
+    
+    sregs.gdt.base = gdt_address;
+    sregs.gdt.limit = 31 * sizeof(struct SegmentDescriptor) - 1;
+
+    if (ioctl(vm->vcpu.fd, KVM_SET_REGS, &regs) < 0) {
+        perror("KVM_SET_REGS");
+        exit(1);
+    }
+
+    return run_vm(vm, 4);
+}
+
+uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
+{
+    printf("KVM run\n");
+    vm_init(kvm);
+    
+    last_kvm = current_kvm;
+    current_kvm = kvm;
+    
+    if (!esp)
+        esp = stack_addr + stack_size;
+    kvm_mem_map_ptr(kvm, image_addr, image_mem_size + stack_size, 0, image_mem);
+    
+    fs_mem = vm_alloc(0x1000);
+    gdt_mem = vm_alloc(0x10000);
+    
+    // init gdt
+    struct SegmentDescriptor *gdt = (struct SegmentDescriptor*)gdt_mem;
+    vm_init_descriptor(&gdt[14], 0, 0xfffff000, 1);  //code segment
+    vm_init_descriptor(&gdt[15], 0, 0xfffff000, 0);  //data segment
+    vm_init_descriptor(&gdt[16], gdt_address, 0xfff, 0);  //one page data segment simulate fs
+    vm_init_descriptor(&gdt[17], 0, 0xfffff000, 0);  //ring 0 data
+    gdt[17].dpl = 0;  //set descriptor privilege level
+    
+    kvm_mem_map_ptr(kvm, fs_address, 0x1000, 0, fs_mem);
+
+    //*(uint32_t*)(image_mem + 0x8F0524 - image_addr) = 0x12345678;
+    vm_sync_imports();
+    
+    kernel32->Unicorn_MapHeaps();
+
+    vcpu_init(kvm);
+    uint32_t eax = run_protected_mode(kvm, start_addr, esp);
+
+    // Re-sync last instance
+    current_kvm = last_kvm;
+    if (current_kvm)
+    {
+        vm_sync_imports();
+        kernel32->Unicorn_MapHeaps();
+    }
+    
+    return eax;
+}
+
+void kvm_stop(struct vm *kvm)
+{
+    kvm->stopped = true;
+}

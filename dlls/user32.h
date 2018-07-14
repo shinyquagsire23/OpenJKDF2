@@ -53,30 +53,30 @@ struct WNDCLASSEXA
 #define WM_ERASEBKGND       0x14
 #define WM_SYSCOLORCHANGE   0x15
 #define WM_ENDSESSION       0x16
-#define WM_SYSTEMERROR 0x17
-#define WM_SHOWWINDOW 0x18
-#define WM_CTLCOLOR 0x19
-#define WM_WININICHANGE 0x1A
-#define WM_SETTINGCHANGE 0x1A
-#define WM_DEVMODECHANGE 0x1B
-#define WM_ACTIVATEAPP 0x1C
-#define WM_FONTCHANGE 0x1D
-#define WM_TIMECHANGE 0x1E
-#define WM_CANCELMODE 0x1F
-#define WM_SETCURSOR 0x20
-#define WM_MOUSEACTIVATE 0x21
-#define WM_CHILDACTIVATE 0x22
-#define WM_QUEUESYNC 0x23
-#define WM_GETMINMAXINFO 0x24
-#define WM_PAINTICON 0x26
-#define WM_ICONERASEBKGND 0x27
-#define WM_NEXTDLGCTL 0x28
-#define WM_SPOOLERSTATUS 0x2A
-#define WM_DRAWITEM 0x2B
-#define WM_MEASUREITEM 0x2C
-#define WM_DELETEITEM 0x2D
-#define WM_VKEYTOITEM 0x2E
-#define WM_CHARTOITEM 0x2F
+#define WM_SYSTEMERROR      0x17
+#define WM_SHOWWINDOW       0x18
+#define WM_CTLCOLOR         0x19
+#define WM_WININICHANGE     0x1A
+#define WM_SETTINGCHANGE    0x1A
+#define WM_DEVMODECHANGE    0x1B
+#define WM_ACTIVATEAPP      0x1C
+#define WM_FONTCHANGE       0x1D
+#define WM_TIMECHANGE       0x1E
+#define WM_CANCELMODE       0x1F
+#define WM_SETCURSOR        0x20
+#define WM_MOUSEACTIVATE    0x21
+#define WM_CHILDACTIVATE    0x22
+#define WM_QUEUESYNC        0x23
+#define WM_GETMINMAXINFO    0x24
+#define WM_PAINTICON        0x26
+#define WM_ICONERASEBKGND   0x27
+#define WM_NEXTDLGCTL       0x28
+#define WM_SPOOLERSTATUS    0x2A
+#define WM_DRAWITEM         0x2B
+#define WM_MEASUREITEM      0x2C
+#define WM_DELETEITEM       0x2D
+#define WM_VKEYTOITEM       0x2E
+#define WM_CHARTOITEM       0x2F
 
 #define WM_SETFONT 0x30
 #define WM_GETFONT 0x31
@@ -267,6 +267,12 @@ private:
     uint32_t activeWindow;
     uint32_t lpfnWndProc;
     std::queue<struct tagMSG> messages;
+public:
+
+    Q_INVOKABLE User32() : hWndCnt(1)
+    {
+//        WM_MOUSEACTIVATE
+    }
     
     void SendMessage(uint32_t hWnd, uint32_t msg, uint32_t wParam = 0, uint32_t lParam = 0, uint32_t x = 0, uint32_t y = 0)
     {
@@ -278,13 +284,6 @@ private:
         gen_msg.x = x;
         gen_msg.y = y;
         messages.push(gen_msg);
-    }
-
-public:
-
-    Q_INVOKABLE User32() : hWndCnt(1)
-    {
-//        WM_MOUSEACTIVATE
     }
     
     Q_INVOKABLE uint32_t LoadIconA(uint32_t a, uint32_t b);
@@ -315,5 +314,7 @@ public:
 
 //    Q_INVOKABLE uint32_t ();
 };
+
+extern User32 *user32;
 
 #endif // USER32_H

@@ -1,6 +1,7 @@
 #include "uc_utils.h"
 
 #include "main.h"
+#include "vm.h"
 
 uc_engine *current_uc = nullptr;
 
@@ -31,79 +32,6 @@ void uc_print_regs(uc_engine *uc)
     printf("\n");
     printf("eip %8.8x ", eip);
     printf("\n");
-}
-
-void uc_stack_pop(uc_engine *uc, uint32_t *out, int num)
-{
-    uint32_t esp;
-    uc_reg_read(uc, UC_X86_REG_ESP, &esp);
-    
-    for (int i = 0; i < num; i++)
-    {
-        uc_mem_read(uc, esp + i * sizeof(uint32_t), &out[i], sizeof(uint32_t));
-    }
-    
-    esp += num * sizeof(uint32_t);
-    
-    uc_reg_write(uc, UC_X86_REG_ESP, &esp);
-}
-
-void uc_stack_push(uc_engine *uc, uint32_t *in, int num)
-{
-    uint32_t esp;
-    uc_reg_read(uc, UC_X86_REG_ESP, &esp);
-    
-    for (int i = 1; i < num+1; i++)
-    {
-        uc_mem_write(uc, esp - i * sizeof(uint32_t), &in[i-1], sizeof(uint32_t));
-    }
-    
-    esp -= num * sizeof(uint32_t);
-    
-    uc_reg_write(uc, UC_X86_REG_ESP, &esp);
-}
-
-std::string uc_read_string(uc_engine *uc, uint32_t addr)
-{
-    char c;
-    std::string str;
-
-    do
-    {
-        uc_mem_read(uc, addr + str.length(), &c, sizeof(char));
-                    
-        str += c;
-     }
-     while(c);
-     
-     return str;
-}
-
-std::string uc_read_wstring(uc_engine *uc, uint32_t addr)
-{
-    char c;
-    std::string str;
-    
-    int num_zeroes = 0;
-    int count = 0;
-
-    do
-    {
-        uc_mem_read(uc, addr + count++, &c, sizeof(char));
-
-        if (c)
-        {
-            str += c;
-            num_zeroes = 0;
-        }
-        else
-        {
-            num_zeroes++;
-        }
-     }
-     while(num_zeroes < 2);
-     
-     return str;
 }
 
 void uc_stack_dump(uc_engine *uc)
@@ -143,8 +71,8 @@ static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user
         uint32_t eax, ecx;
         uc_reg_read(uc, UC_X86_REG_EAX, &eax);
         uc_reg_read(uc, UC_X86_REG_ECX, &ecx);
-        std::string fname = uc_read_string(uc, ecx);
-        std::string mode = uc_read_string(uc, eax);
+        std::string fname = vm_read_string(ecx);
+        std::string mode = vm_read_string(eax);
         
         //printf("fopen(\"%s\", \"%s\")\n", fname.c_str(), mode.c_str());
     }
@@ -164,7 +92,7 @@ static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user
     {
         uint32_t eax, esi;
         uc_reg_read(uc, UC_X86_REG_ESI, &eax);
-        std::string fname = uc_read_string(uc, eax);
+        std::string fname = vm_read_string(eax);
         
         printf("idk(0x%x, \"%s\" (%x))\n", esi, fname.c_str(), eax);
         //uc_emu_stop(uc);
@@ -202,29 +130,6 @@ static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type,
     }
 }
 
-//VERY basic descriptor init function, sets many fields to user space sane defaults
-static void init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint32_t limit, uint8_t is_code)
-{
-    desc->desc = 0;  //clear the descriptor
-    desc->base0 = base & 0xffff;
-    desc->base1 = (base >> 16) & 0xff;
-    desc->base2 = base >> 24;
-    if (limit > 0xfffff) {
-        //need Giant granularity
-        limit >>= 12;
-        desc->granularity = 1;
-    }
-    desc->limit0 = limit & 0xffff;
-    desc->limit1 = limit >> 16;
-
-    //some sane defaults
-    desc->dpl = 3;
-    desc->present = 1;
-    desc->db = 1;   //32 bit
-    desc->type = is_code ? 0xb : 3;
-    desc->system = 1;  //code or data
-}
-
 uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uc_err err;
@@ -257,10 +162,10 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
     gdtr.base = gdt_address;  
     gdtr.limit = 31 * sizeof(struct SegmentDescriptor) - 1;
 
-    init_descriptor(&gdt[14], 0, 0xfffff000, 1);  //code segment
-    init_descriptor(&gdt[15], 0, 0xfffff000, 0);  //data segment
-    init_descriptor(&gdt[16], gdt_address, 0xfff, 0);  //one page data segment simulate fs
-    init_descriptor(&gdt[17], 0, 0xfffff000, 0);  //ring 0 data
+    vm_init_descriptor(&gdt[14], 0, 0xfffff000, 1);  //code segment
+    vm_init_descriptor(&gdt[15], 0, 0xfffff000, 0);  //data segment
+    vm_init_descriptor(&gdt[16], gdt_address, 0xfff, 0);  //one page data segment simulate fs
+    vm_init_descriptor(&gdt[17], 0, 0xfffff000, 0);  //ring 0 data
     gdt[17].dpl = 0;  //set descriptor privilege level
 
     err = uc_mem_map(uc, gdt_address, 0x10000, UC_PROT_WRITE | UC_PROT_READ);
@@ -279,9 +184,9 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
     //uc_hook_add(uc, &trace2, UC_HOOK_CODE, (void*)hook_code, NULL, 1, 0);
     uc_hook_add(uc, &trace3, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED, (void*)hook_mem_invalid, NULL, 1, 0);
 
-    sync_imports(uc);
     uc_last = current_uc;
     current_uc = uc;
+    vm_sync_imports();
 
     kernel32->Unicorn_MapHeaps();
     printf("Emulation instance at %x\n", start_addr);
@@ -303,7 +208,7 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
     current_uc = uc_last;
     if (current_uc)
     {
-        sync_imports(current_uc);
+        vm_sync_imports();
         kernel32->Unicorn_MapHeaps();
     }
     

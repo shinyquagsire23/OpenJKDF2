@@ -75,6 +75,8 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
         SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
         SDL_RenderDrawPoint(displayRenderer, i % 640, i / 640);
     }
+    //uc_emu_stop(current_uc);
+    //uc_reg_write(current_uc, UC_X86_REG_EIP, 0);
 
     return 1;
 }
@@ -90,7 +92,7 @@ uint32_t Gdi32::SetDIBColorTable(uint32_t hdc, uint32_t iStart, uint32_t cEntrie
     printf("STUB: SetDIBColorTable %x %x %x, colors...\n", hdc, iStart, cEntries);
     for (int i = 0; i < cEntries; i++)
     {
-        printf("%08x\n", prgbq[iStart + i]);
+        //printf("%08x\n", prgbq[iStart + i]);
         palette[i] = prgbq[iStart + i];
     }
     

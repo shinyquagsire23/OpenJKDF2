@@ -11,11 +11,7 @@
 
 #include "loaders/exe.h"
 #include "uc_utils.h"
-
-uint32_t image_mem_addr;
-void* image_mem;
-uint32_t image_mem_size;
-uint32_t stack_size, stack_addr;
+#include "vm.h"
 
 uint32_t next_hook;
 
@@ -47,8 +43,6 @@ std::map<std::string, QObject*> interface_store;
 
 std::map<std::string, std::map<std::string, int> > method_cache;
 
-static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import);
-
 uint32_t import_get_hook_addr(std::string name)
 {
     return import_store[name]->hook;
@@ -56,27 +50,39 @@ uint32_t import_get_hook_addr(std::string name)
 
 void register_import(std::string dll, std::string name, uint32_t import_addr)
 {
+    if (import_store[name]) return;
+
     import_store[name] = new ImportTracker(dll, name, import_addr, next_hook);
+    
+    auto obj = dll_store[dll];
+    if (obj)
+    {
+        auto method = obj->metaObject()->method(method_cache[dll][name]);
+        import_store[name]->method = method;
+        import_store[name]->obj = obj;
+        
+        for (int i = 0; i < method.parameterCount(); i++)
+        {
+            char *param_type = (char*)method.parameterTypes()[i].data();
+            if (param_type[strlen(param_type) - 1] == '*')
+            {
+                import_store[name]->is_param_ptr.push_back(true);
+            }
+            else 
+            {
+                import_store[name]->is_param_ptr.push_back(false);
+            }
+            
+        }
+    }
 
     next_hook += 1;
 }
 
-void sync_imports(uc_engine *uc)
-{
-    for (auto pair : import_store)
-    {
-        auto import = pair.second;
-        
-        if (import->addr)
-            uc_mem_write(uc, import->addr, &import->hook, sizeof(uint32_t));
-        
-        uc_mem_map(uc, import->hook, 0x1000, UC_PROT_ALL);
-        uc_hook_add(uc, &import->trace, UC_HOOK_CODE, (void*)hook_import, (void*)import, import->hook, import->hook);
-    }
-}
-
 void *uc_ptr_to_real_ptr(uint32_t uc_ptr)
 {
+    if (uc_ptr == 0) return nullptr;
+
     if (uc_ptr >= image_mem_addr && uc_ptr <= image_mem_addr + image_mem_size + stack_size)
     {
         return image_mem + uc_ptr - image_mem_addr;
@@ -98,6 +104,8 @@ void *uc_ptr_to_real_ptr(uint32_t uc_ptr)
 
 uint32_t real_ptr_to_uc_ptr(void* real_ptr)
 {
+    if (real_ptr == nullptr) return 0;
+
     if (real_ptr >= image_mem && real_ptr <= image_mem + image_mem_size + stack_size)
     {
         return image_mem_addr + ((size_t)real_ptr - (size_t)image_mem);
@@ -117,131 +125,6 @@ uint32_t real_ptr_to_uc_ptr(void* real_ptr)
     }
 }
 
-QGenericArgument q_args[9];
-static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import)
-{
-    uint32_t ret_addr;
-    uc_stack_pop(uc, &ret_addr, 1);
-    
-    //printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
-    
-    //TODO: get things faster so these can go where they should be
-    SDL_UpdateWindowSurface(displayWindow);
-    SDL_RenderPresent(displayRenderer);
-
-    auto obj = dll_store[import->dll];
-    if (obj)
-    {
-        QMetaMethod method = obj->metaObject()->method(method_cache[import->dll][import->name]);
-
-        if (method.parameterCount() <= 9)
-        {
-            void* trans_args[9];
-            uint32_t args[9];
-            uint32_t retVal;
-            
-            uc_stack_pop(uc, args, method.parameterCount());
-            
-            // Translate args from Unicorn pointers to usable pointers
-            char* idk;
-            for (int j = 0; j < method.parameterCount(); j++)
-            {
-                char *param_type = (char*)method.parameterTypes()[j].data();
-                if (param_type[strlen(param_type) - 1] == '*')
-                {
-                    trans_args[j] = uc_ptr_to_real_ptr(args[j]);
-                    q_args[j] = QGenericArgument(method.parameterTypes()[j], &trans_args[j]);
-                }
-                else 
-                {
-                    q_args[j] = Q_ARG(uint32_t, args[j]);
-                }
-            }
-                
-            bool succ;
-            if (method.returnType() == QMetaType::Void)
-                succ = method.invoke(obj, q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
-            else
-                succ = method.invoke(obj, Q_RETURN_ARG(uint32_t, retVal), q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
-
-            //printf("%x %x %x\n", succ, retVal, method.parameterCount());
-            if (succ)
-            {
-                if (method.returnType() != QMetaType::Void)
-                    uc_reg_write(uc, UC_X86_REG_EAX, &retVal);
-
-                uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
-                return;
-            }
-            else
-            {
-                uc_stack_push(uc, args, method.parameterCount());
-            }
-        }
-    }
-    
-    
-    if (!strcmp(import->name.c_str(), "IsProcessorFeaturePresent"))
-    {
-        uint32_t args[1];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 1); //TODO: real handles
-        
-        eax = 0;
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "CreateWindowExA"))
-    {
-        uint32_t args[12];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 12); //TODO
-        
-        eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else if (!strcmp(import->name.c_str(), "CreateFontA"))
-    {
-        uint32_t args[14];
-        uint32_t eax;
-        
-        uc_stack_pop(uc, args, 14); //TODO
-        
-        //int16_t cHeight, int16_t cWidth, int16_t cEscapement, int16_t cOrientation, int16_t    cWeight, uint32_t bItalic, uint32_t bUnderline, uint32_t bStrikeOut, uint32_t iCharSet, uint32_t iOutPrecision, uint32_t iClipPrecision, uint32_t iQuality, uint32_t iPitchAndFamily, char* pszFaceName
-        eax = gdi32->CreateFontA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], (char*)uc_ptr_to_real_ptr(args[13]));
-        uc_reg_write(uc, UC_X86_REG_EAX, &eax);
-    }
-    else
-    {
-        printf("Import %s from %s doesn't have impl, exiting\n", import->name.c_str(), import->dll.c_str());
-        uc_emu_stop(uc);
-        return;
-    }
-    
-    uc_reg_write(uc, UC_X86_REG_EIP, &ret_addr);
-}
-
-uint32_t call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret)
-{
-    uc_engine *uc_new;
-    uint32_t esp, eax, dummy;
-
-    dummy = import_store["dummy"]->hook;
-
-    uc_stack_push(current_uc, args, num_args);
-    if (push_ret)
-        uc_stack_push(current_uc, &dummy, 1);
-    uc_reg_read(current_uc, UC_X86_REG_ESP, &esp);
-
-    eax = uc_run(uc_new, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
-    if (push_ret)
-        uc_stack_pop(current_uc, &dummy, 1);
-    uc_stack_pop(current_uc, args, num_args);
-
-    return eax;
-}
-
 static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
 {
     printf("Hook at %x\n", address);
@@ -250,7 +133,7 @@ static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
 
 int main(int argc, char **argv, char **envp)
 {
-    uc_engine *uc;
+    struct vm_inst vm;
 
     // Set up DLL classes
     kernel32 = new Kernel32();
@@ -317,7 +200,6 @@ int main(int argc, char **argv, char **envp)
         }
     }
 
-    
     // Map hook mem
     next_hook = 0xd0000000;
     uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
@@ -326,7 +208,8 @@ int main(int argc, char **argv, char **envp)
     //uc_hook trace;
     //uc_hook_add(uc, &trace, UC_HOOK_CODE, (void*)hook_test, nullptr, 0x426838, 0x426838);
 
-    uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
+    vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
+    //uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
 
     return 0;
 }

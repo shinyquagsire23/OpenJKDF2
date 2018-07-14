@@ -5,6 +5,7 @@
 #include <experimental/filesystem>
 
 #include "uc_utils.h"
+#include "vm.h"
 #include "main.h"
 
 namespace fs = std::experimental::filesystem;
@@ -32,18 +33,11 @@ uint32_t Kernel32::Unicorn_MapHeaps()
     uc_err ret;
     uc_mem_region *regions;
     uint32_t count;
-
-    uc_mem_regions(current_uc, &regions, &count);
-    for (int i = 0; i < count; i++)
-    {
-        if (regions[i].begin == heap_addr || regions[i].begin == virtual_addr)
-            uc_mem_unmap(current_uc, regions[i].begin, regions[i].end-regions[i].begin+1);
-    }
     
-    ret = uc_mem_map_ptr(current_uc, heap_addr, heap_size_actual, UC_PROT_ALL, heap_mem);
+    vm_mem_map_ptr(heap_addr, heap_size_actual, UC_PROT_ALL, heap_mem);
     //printf("%x %s\n", heap_size_actual, uc_strerror(ret));
     
-    ret = uc_mem_map_ptr(current_uc, virtual_addr, virtual_size, UC_PROT_ALL, virtual_mem);
+    vm_mem_map_ptr(virtual_addr, virtual_size_actual, UC_PROT_ALL, virtual_mem);
     //printf("%x %s\n", virtual_size, uc_strerror(ret));
 }
 
@@ -59,9 +53,6 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
     //printf("%x %x %x\n", a, b, alloc_size);
 
     heap_size += alloc_size;
-    heap_size_actual = (heap_size & ~0xFFF) + 0x1000;
-    heap_mem = realloc(heap_mem, heap_size_actual);
-    Unicorn_MapHeaps();
     
     //printf("return %x, %x %x\n", retval, heap_size_actual, heap_size);
         
@@ -80,23 +71,13 @@ uint32_t Kernel32::CloseHandle(uint32_t handle)
 
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
 {
-    /*uint32_t alloc_addr = lpAddress ? lpAddress : last_alloc + dwSize;
-    uc_mem_map(current_uc, alloc_addr, dwSize, UC_PROT_ALL); //TODO prot
-        
-    if (!lpAddress)
-        last_alloc = last_alloc + dwSize;
-        
-    return alloc_addr;*/
-    
+    //TODO: lpAddress
     uint32_t retval = virtual_addr + virtual_size;
     
     //printf("alloc %x\n", dwSize);
     
     dwSize = (dwSize & ~0xFFF) + 0x1000;
-
     virtual_size += dwSize;
-    virtual_mem = realloc(virtual_mem, virtual_size);
-    Unicorn_MapHeaps();
     
     //printf("return %x, %x %x\n", retval, virtual_size, virtual_size);
         
@@ -174,19 +155,19 @@ uint32_t Kernel32::LCMapStringW(uint32_t a, uint32_t b, uint32_t c, uint32_t d, 
 
 uint32_t Kernel32::GetCommandLineA()
 {
-    const char *args = "-windowGUI"; //TODO
+    char *args = "-windowGUI"; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
-    uc_mem_write(current_uc, ptr, args, strlen(args)+1);
+    vm_mem_write(ptr, args, strlen(args)+1);
     return ptr;
 }
 
 uint32_t Kernel32::GetEnvironmentStringsW()
 {
-    const char *args = ""; //TODO
+    char *args = ""; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
-    uc_mem_write(current_uc, ptr, args, strlen(args)+1);
+    vm_mem_write(ptr, args, strlen(args)+1);
     return ptr;
 }
 
@@ -198,7 +179,7 @@ uint32_t Kernel32::FreeEnvironmentStringsW(uint32_t ptr)
 uint32_t Kernel32::GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c)
 {        
     char* out = "ABC";
-    uc_mem_write(current_uc, b, &out, strlen(out)+1);
+    vm_mem_write(b, &out, strlen(out)+1);
         
     return 3;
 }
@@ -210,13 +191,13 @@ uint32_t Kernel32::GetModuleHandleA(uint32_t a)
 
 uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
 {
-    std::string requested = uc_read_string(current_uc, funcName);
+    std::string requested = vm_read_string(funcName);
     printf("requested addr for %s\n", requested.c_str());
         
     if (import_store.find(requested) == import_store.end())
     {
         register_import("idk", requested, 0);
-        sync_imports(current_uc);
+        vm_sync_imports();
     }
         
     return import_store[requested]->hook;
@@ -224,7 +205,7 @@ uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
 
 void Kernel32::OutputDebugStringA(uint32_t str_ptr)
 {
-    std::string text = uc_read_string(current_uc, str_ptr);
+    std::string text = vm_read_string(str_ptr);
     printf("OutputDebugString: %s\n", text.c_str());
 }
 
@@ -235,7 +216,7 @@ uint32_t Kernel32::GetLastError()
 
 uint32_t Kernel32::LoadLibraryA(uint32_t dllStr_ptr)
 {
-    std::string text = uc_read_string(current_uc, dllStr_ptr);
+    std::string text = vm_read_string(dllStr_ptr);
     printf("Stub: Load library %s\n", text.c_str());
 }
 
@@ -340,7 +321,7 @@ uint32_t Kernel32::FileTimeToSystemTime(uint32_t a, uint32_t b)
 
 uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, uint32_t lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, uint32_t hTemplateFile)
 {
-    std::string fname = uc_read_string(current_uc, lpFileName);
+    std::string fname = vm_read_string(lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     printf("Stub: Create file %s\n", linux_path.c_str());
         
@@ -352,14 +333,17 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
         return -1;
     }
     else
-        return fileno(f);
+    {
+        openFiles[hFileCnt] = f;
+        return hFileCnt++;
+    }
 }
     
 uint32_t Kernel32::ReadFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t *lpNumberOfBytesRead, uint32_t lpOverlapped)
 {
-    FILE* f = fdopen(hFile, "rw");
+    FILE* f = openFiles[hFile];
     //printf("Stub: Read file %x at %x, size %x to %x\n", hFindFile, ftell(f), nNumberOfBytesToRead, lpBuffer);
-        
+
     *lpNumberOfBytesRead = fread(lpBuffer, 1, nNumberOfBytesToRead, f);
         
     return *lpNumberOfBytesRead;
@@ -369,7 +353,7 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
 {
     printf("Stub: seek file %x\n", hFile);
         
-    FILE* f = fdopen(hFile, "rw");
+    FILE* f = openFiles[hFile];
         
     uint32_t high_val = 0;
     if (lpDistanceToMoveHigh)

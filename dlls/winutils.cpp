@@ -44,7 +44,7 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
         }
     }
     
-    sync_imports(current_uc);
+    vm_sync_imports();
     
     *imem = real_ptr_to_uc_ptr(vtable);
     return real_ptr_to_uc_ptr(imem);
