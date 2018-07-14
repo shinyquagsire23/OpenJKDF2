@@ -187,7 +187,7 @@ void handleMouseMove(SDL_MouseMotionEvent *event)
 {
     uint32_t pos = ((event->x) & 0xFFFF) | ((event->y << 16) & 0xFFFF0000);
 
-    //user32->SendMessage(user32->GetActiveWindow(), WM_MOUSEMOVE, 0/*TODO*/, pos);
+    user32->SendMessage(user32->GetActiveWindow(), WM_MOUSEMOVE, 0/*TODO*/, pos);
 }
 
 void update_input()
@@ -205,7 +205,7 @@ void update_input()
                 break;
             case SDL_MOUSEMOTION:
                 handleMouseMove(&event.motion);
-                //user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
+                user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
