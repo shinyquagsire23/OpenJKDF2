@@ -1,6 +1,6 @@
 # OpenJKDF2
 
-![The title screen](https://pbs.twimg.com/media/Dh9lk5WVQAEPTuK.jpg)
+![in game](https://i.imgur.com/GH5Hgkx.png)
 
 ## Compiling
 
@@ -8,4 +8,6 @@
 
 ## Notes
 
-Filenames are case-sensitive to whatever the game wants. Notable files are `resource/jk_.cd`, `resource/Res1hi.gob`, `resource/Res2.gob`, and `resource/video/01-02a.smk` in order to get to the menu.
+The game currently runs (almost) perfectly with the 8bpp software renderer.
+
+Filenames are case-sensitive to whatever the game wants. Notable files are `resource/jk_.cd`, `resource/Res1hi.gob`, `resource/Res2.gob`, `resource/video/01-02a.smk`, `episode/JK1.gob`, `episode/JK1CTF.gob`, and `JK1MP.gob` in order to get to the menu.
