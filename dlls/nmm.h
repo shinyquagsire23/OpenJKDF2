@@ -36,4 +36,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern Nmm *nmm;
+
 #endif // NMM_H

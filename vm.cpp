@@ -207,7 +207,7 @@ void vm_process_import(ImportTracker* import)
     uint32_t ret_addr;
     vm_stack_pop(&ret_addr, 1);
     
-    printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
+    //printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
 
     if (import->obj)
     {

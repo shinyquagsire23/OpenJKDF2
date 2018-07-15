@@ -277,10 +277,6 @@ uint32_t run_vm(struct vm *vm, size_t sz)
             }
             else
             {
-                fprintf(stderr,    "Got exit_reason %d,"
-                    " expected KVM_EXIT_HLT (%d)\n",
-                    vm->vcpu.kvm_run->exit_reason, KVM_EXIT_HLT);  
-                kvm_print_regs(vm);
                 kvm_stop(vm);
             }
             break;
@@ -338,8 +334,6 @@ static void setup_protected_mode(struct kvm_sregs *sregs)
 
 uint32_t run_protected_mode(struct vm *vm, uint32_t start, uint32_t esp)
 {
-    printf("Testing protected mode\n");
-
     if (ioctl(vcpu_fd, KVM_GET_SREGS, &vm->vcpu.sregs) < 0) {
         perror("KVM_GET_SREGS");
         exit(1);

@@ -92,8 +92,8 @@ public:
     Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1)
     {
         qRegisterMetaType<struct WIN32_FIND_DATAA*>("struct WIN32_FIND_DATAA*");
-        heap_size_actual = 0x1000000;
-        virtual_size_actual = 0x1000000;
+        heap_size_actual = 0x8000000;
+        virtual_size_actual = 0x8000000;
         heap_mem = vm_alloc(heap_size_actual);
         virtual_mem = vm_alloc(virtual_size_actual);
     }
@@ -131,7 +131,9 @@ public:
     Q_INVOKABLE uint32_t FileTimeToSystemTime(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, uint32_t dwShareMode, uint32_t lpSecurityAttributes, uint32_t dwCreationDisposition, uint32_t dwFlagsAndAttributes, uint32_t hTemplateFile);
     Q_INVOKABLE uint32_t ReadFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t *lpNumberOfBytesRead, uint32_t lpOverlapped);
+    Q_INVOKABLE uint32_t WriteFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToWrite, uint32_t *lpNumberOfBytesWritten, uint32_t lpOverlapped);
     Q_INVOKABLE uint32_t SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t* lpDistanceToMoveHigh, uint32_t dwMoveMethod);
+    Q_INVOKABLE uint32_t CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes);
 
 //    Q_INVOKABLE uint32_t ();
 };

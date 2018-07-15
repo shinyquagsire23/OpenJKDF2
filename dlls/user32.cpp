@@ -2,6 +2,7 @@
 
 #include "uc_utils.h"
 #include "main.h"
+#include "nmm.h"
 
 uint32_t User32::LoadIconA(uint32_t a, uint32_t b)
 {
@@ -183,11 +184,46 @@ void handleTouchEvent(SDL_TouchFingerEvent* event)
     }
 }*/
 
+/* function to handle key press events */
+void handleKey(SDL_Keysym *keysym, int msg, uint32_t lpMask)
+{
+    user32->keystate_changed.push(std::pair<int, bool>(keysym->scancode, msg == WM_KEYDOWN ? true : false));
+    switch (keysym->sym)
+    {
+        case SDLK_ESCAPE:
+            user32->SendMessage(user32->GetActiveWindow(), msg, 0x1B, lpMask | keysym->scancode << 16);
+        break;
+        
+        case SDLK_RETURN:
+            user32->SendMessage(user32->GetActiveWindow(), msg, 0xD, lpMask | keysym->scancode << 16);
+        break;
+        
+        case SDLK_DOWN:
+            user32->SendMessage(user32->GetActiveWindow(), msg, 0x28, lpMask | keysym->scancode << 16);
+        break;
+        
+        case SDLK_UP:
+            user32->SendMessage(user32->GetActiveWindow(), msg, 0x26, lpMask | keysym->scancode << 16);
+        break;
+        
+        default:
+        break;
+    }
+    return;
+}
+
+bool mouseMoveRet = true;
+
 void handleMouseMove(SDL_MouseMotionEvent *event)
 {
+    //printf("Mouse pos %i,%i\n", event->x, event->y);
     uint32_t pos = ((event->x) & 0xFFFF) | ((event->y << 16) & 0xFFFF0000);
 
-    user32->SendMessage(user32->GetActiveWindow(), WM_MOUSEMOVE, 0/*TODO*/, pos);
+    if (mouseMoveRet)
+    {
+        user32->SendMessage(user32->GetActiveWindow(), WM_MOUSEMOVE, 0/*TODO*/, pos);
+        mouseMoveRet = false;
+    }
 }
 
 void update_input()
@@ -201,11 +237,14 @@ void update_input()
         switch (event.type)
         {
             case SDL_KEYDOWN:
-                //handleKeyPress(&event.key.keysym);
+                handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
+                break;
+            case SDL_KEYUP:
+                handleKey(&event.key.keysym, WM_KEYUP, 0xc00000001);
                 break;
             case SDL_MOUSEMOTION:
                 handleMouseMove(&event.motion);
-                user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
+                //user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
@@ -216,13 +255,12 @@ void update_input()
                 msgl = event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP;
                 msgr = event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP;
                 
-                printf("mouse button %x %x\n", left, right);
+                printf("mouse button %x %x %x\n", left, right, pos);
                 
                 if (left)
                     user32->SendMessage(user32->GetActiveWindow(), msgl, left | right, pos);
                 if (right)
                     user32->SendMessage(user32->GetActiveWindow(), msgr, left | right, pos);
-                user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
                 break;
             /*case SDL_FINGERMOTION:
             case SDL_FINGERDOWN:
@@ -231,6 +269,7 @@ void update_input()
                 break;*/
             case SDL_QUIT:
                 printf("Quit!\n");
+                vm_stop();
                 //done = TRUE;
                 break;
             default:
@@ -246,11 +285,22 @@ void update_input()
         mouse_right();*/
 }
 
+uint32_t last_ms = 0;
+
 uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsgFilterMin, uint16_t wMsgFilterMax, uint16_t wRemoveMsg)
 {
-    //SDL_UpdateWindowSurface(displayWindow);
-    //SDL_RenderPresent(displayRenderer);
     update_input();
+    
+    
+    //HACK: Always update framebuf?
+    uint32_t ms = nmm->timeGetTime();
+    if (ms - last_ms > 32)
+    {
+        uint32_t hdcSrc = gdi32->selectedHdcSrc;
+        struct color rop;
+        gdi32->BitBlt(0xefab,0,0,0,0,hdcSrc,0,0,rop);
+        last_ms = ms;
+    }
 
     if (messages.size())
     {
@@ -283,8 +333,14 @@ uint32_t User32::TranslateMessage(struct tagMSG* lpMsg)
 
 uint32_t User32::DispatchMessageA(struct tagMSG* lpMsg)
 {
-    uint32_t callback_args[4] = {lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam};
-    vm_call_function(lpfnWndProc, 4, callback_args, false);
+    //printf("Dispatch %x %x %x %x\n", lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
+    uint32_t callback_args[4] = {lpMsg->lParam, lpMsg->wParam, lpMsg->message, lpMsg->hWnd};
+    vm_call_function(lpfnWndProc, 4, callback_args);
+    
+    if (lpMsg->message == WM_MOUSEMOVE)
+    {
+        mouseMoveRet = true;
+    }
     
     return 1;
 }
@@ -292,6 +348,7 @@ uint32_t User32::DispatchMessageA(struct tagMSG* lpMsg)
 uint32_t User32::DefWindowProcA(uint32_t hWnd, uint32_t msg, uint32_t wParam, uint32_t lParam)
 {
     printf("STUB: DefWindowProcA(0x%04x, 0x%08x, 0x%04x, 0x%08x)\n", hWnd, msg, wParam, lParam);
+
     return 1;
 }
 
@@ -300,6 +357,10 @@ uint32_t User32::SetFocus(uint32_t hWnd)
     return hWnd;
 }
 
+uint32_t User32::SetActiveWindow(uint32_t hWnd)
+{
+    return hWnd;
+}
 
 /*uint32_t User32::(uint32_t )
 {

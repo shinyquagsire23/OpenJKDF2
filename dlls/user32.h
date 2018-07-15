@@ -269,6 +269,8 @@ private:
     std::queue<struct tagMSG> messages;
 public:
 
+    std::queue<std::pair<int, bool> > keystate_changed;
+
     Q_INVOKABLE User32() : hWndCnt(1)
     {
 //        WM_MOUSEACTIVATE
@@ -311,6 +313,16 @@ public:
     Q_INVOKABLE uint32_t DispatchMessageA(struct tagMSG* lpMsg);
     Q_INVOKABLE uint32_t DefWindowProcA(uint32_t hWnd, uint32_t msg, uint32_t wParam, uint32_t lParam);
     Q_INVOKABLE uint32_t SetFocus(uint32_t hWnd);
+    Q_INVOKABLE uint32_t SetActiveWindow(uint32_t hWnd);
+    Q_INVOKABLE uint32_t ValidateRect(uint32_t hWnd, void *lpRect)
+    {
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetUpdateRect(uint32_t hWnd, void *lpRect, bool bErase)
+    {
+        return 0;
+    }
 
 //    Q_INVOKABLE uint32_t ();
 };

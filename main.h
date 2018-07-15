@@ -24,7 +24,9 @@
 #include "dlls/dplay/IDirectPlay3.h"
 #include "dlls/dplay/IDirectPlayLobby3.h"
 #include "dlls/dsound/IDirectSound.h"
+#include "dlls/dsound/IDirectSoundBuffer.h"
 #include "dlls/dinput/IDirectInputA.h"
+#include "dlls/dinput/IDirectInputDeviceA.h"
 #include "dlls/smackw32.h"
 
 #include <SDL2/SDL.h>
@@ -37,7 +39,6 @@ extern std::map<std::string, QObject*> interface_store;
 extern ComCtl32 *comctl32;
 extern AdvApi32 *advapi32;
 extern Ole32 *ole32;
-extern Nmm *nmm;
 extern DDraw *ddraw;
 extern IDirectPlay3 *idirectplay3;
 extern IDirectSound* idirectsound;

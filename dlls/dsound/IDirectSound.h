@@ -5,6 +5,8 @@
 #include <QObject>
 #include <unicorn/unicorn.h>
 
+#include "dlls/winutils.h"
+
 class IDirectSound : public QObject
 {
 Q_OBJECT
@@ -19,7 +21,10 @@ public:
     Q_INVOKABLE void Release(void* this_ptr){}
     
     /*** IDirectSound ***/
-    Q_INVOKABLE void CreateSoundBuffer(void* this_ptr, uint32_t a, uint32_t b, uint32_t c){}
+    Q_INVOKABLE void CreateSoundBuffer(void* this_ptr, uint32_t a, uint32_t *ppDSBuffer, void* pUnkOuter)
+    {
+        *ppDSBuffer = CreateInterfaceInstance("IDirectSoundBuffer", 200);
+    }
     Q_INVOKABLE void GetCaps(void* this_ptr, uint32_t a){}
     Q_INVOKABLE void DuplicateSoundBuffer(void* this_ptr, uint32_t a, uint32_t b){}
     Q_INVOKABLE void SetCooperativeLevel(void* this_ptr, uint32_t a, uint32_t b){}

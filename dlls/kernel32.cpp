@@ -20,7 +20,7 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
     {
         if (/*fs::is_regular_file(p) && */std::regex_match(p.path().string(), pattern))
         {
-            printf("%s\n", p.path().string().c_str());
+            //printf("%s\n", p.path().string().c_str());
             result.push_back(p);
         }
     }
@@ -323,12 +323,12 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
 {
     std::string fname = vm_read_string(lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
-    printf("Stub: Create file %s\n", linux_path.c_str());
+    //printf("Stub: Create file %s\n", linux_path.c_str());
         
     FILE *f = fopen(linux_path.c_str(), "rw");
     if (!f)
     {
-        printf("Failed to open file %s\n", linux_path.c_str());
+        //printf("Failed to open file %s\n", linux_path.c_str());
         last_error = ERROR_FILE_NOT_FOUND;
         return -1;
     }
@@ -349,9 +349,19 @@ uint32_t Kernel32::ReadFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBy
     return *lpNumberOfBytesRead;
 }
 
+uint32_t Kernel32::WriteFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToWrite, uint32_t *lpNumberOfBytesWritten, uint32_t lpOverlapped)
+{
+    FILE* f = openFiles[hFile];
+    //printf("Stub: Read file %x at %x, size %x to %x\n", hFindFile, ftell(f), nNumberOfBytesToRead, lpBuffer);
+
+    *lpNumberOfBytesWritten = fwrite(lpBuffer, 1, nNumberOfBytesToWrite, f);
+        
+    return *lpNumberOfBytesWritten;
+}
+
 uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t* lpDistanceToMoveHigh, uint32_t dwMoveMethod)
 {
-    printf("Stub: seek file %x\n", hFile);
+    //printf("Stub: seek file %x\n", hFile);
         
     FILE* f = openFiles[hFile];
         
@@ -363,6 +373,12 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
     fseek(f, pos, dwMoveMethod);
         
     return 0;
+}
+
+uint32_t Kernel32::CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes)
+{
+    printf("STUB: Create Dir %s\n", lpPathName);
+    return 1;
 }
 
 /*uint32_t Kernel32::(uint32_t )

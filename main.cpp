@@ -30,6 +30,8 @@ IDirectPlay3 *idirectplay3;
 IDirectPlayLobby3 *idirectplaylobby3;
 IDirectSound *idirectsound;
 IDirectInputA *idirectinputa;
+IDirectInputDeviceA* idirectinputdevicea;
+IDirectSoundBuffer *idirectsoundbuffer;
 SmackW32 *smackw32;
 
 SDL_Window* displayWindow;
@@ -55,7 +57,7 @@ void register_import(std::string dll, std::string name, uint32_t import_addr)
     import_store[name] = new ImportTracker(dll, name, import_addr, next_hook);
     
     auto obj = dll_store[dll];
-    if (obj)
+    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
     {
         auto method = obj->metaObject()->method(method_cache[dll][name]);
         import_store[name]->method = method;
@@ -150,7 +152,9 @@ int main(int argc, char **argv, char **envp)
     idirectplay3 = new IDirectPlay3();
     idirectplaylobby3 = new IDirectPlayLobby3();
     idirectsound = new IDirectSound();
+    idirectsoundbuffer = new IDirectSoundBuffer();
     idirectinputa = new IDirectInputA();
+    idirectinputdevicea = new IDirectInputDeviceA();
     smackw32 = new SmackW32();
     dll_store["KERNEL32.dll"] = (QObject*)kernel32;
     dll_store["USER32.dll"] = (QObject*)user32;
@@ -167,13 +171,17 @@ int main(int argc, char **argv, char **envp)
     dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
     dll_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     dll_store["IDirectSound"] = (QObject*)idirectsound;
+    dll_store["IDirectSoundBuffer"] = (QObject*)idirectsoundbuffer;
     dll_store["IDirectInputA"] = (QObject*)idirectinputa;
+    dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     dll_store["smackw32.DLL"] = (QObject*)smackw32;
     
     interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
     interface_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     interface_store["IDirectSound"] = (QObject*)idirectsound;
+    interface_store["IDirectSoundBuffer"] = (QObject*)idirectsoundbuffer;
     interface_store["IDirectInputA"] = (QObject*)idirectinputa;
+    interface_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     
     qRegisterMetaType<char*>("char*");
     qRegisterMetaType<char*>("uint32_t*");
