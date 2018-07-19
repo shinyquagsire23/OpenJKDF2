@@ -2,8 +2,9 @@
 
 #include <QMetaMethod>
 
+#include "dlls/kernel32.h"
+#include "vm.h"
 #include "main.h"
-#include "uc_utils.h"
 
 std::string guid_to_string(uint8_t* lpGUID)
 {
@@ -15,10 +16,8 @@ std::string guid_to_string(uint8_t* lpGUID)
 
 uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
 {
-    uint32_t* imem = (uint32_t*)uc_ptr_to_real_ptr(kernel32->VirtualAlloc(0, 0x1000, 0, 0));
-    uint32_t* vtable = (uint32_t*)uc_ptr_to_real_ptr(kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0));
-    
-    kernel32->Unicorn_MapHeaps();
+    uint32_t* imem = (uint32_t*)vm_ptr_to_real_ptr(kernel32->VirtualAlloc(0, 0x1000, 0, 0));
+    uint32_t* vtable = (uint32_t*)vm_ptr_to_real_ptr(kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0));
     
     for (int i = 0; i < num_funcs; i++)
     {
@@ -27,11 +26,12 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             QMetaMethod method = interface_store[name]->metaObject()->method(i + 5); //TODO: idk about this hardcoded shift
             std::string method_name = std::string((char*)method.name().data());
             
-            //printf("finding %u, %s\n", i, method_name.c_str());
+            if (method_name == "") break;
             
             register_import(name, std::string(method_name), 0);
             
-            vtable[i] = import_get_hook_addr(std::string(method_name));
+            vtable[i] = import_get_hook_addr(name, std::string(method_name));
+            //printf("finding %u, %s, %x\n", i, method_name.c_str(), import_get_hook_addr(name, std::string(method_name)));
         }
         else
         {
@@ -40,12 +40,12 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             snprintf(tmp, 256, "%s_%u", name.c_str(), i);
             register_import(name, std::string(tmp), 0);
             
-            vtable[i] = import_get_hook_addr(std::string(tmp));
+            vtable[i] = import_get_hook_addr(name, std::string(tmp));
         }
     }
     
     vm_sync_imports();
     
-    *imem = real_ptr_to_uc_ptr(vtable);
-    return real_ptr_to_uc_ptr(imem);
+    *imem = real_ptr_to_vm_ptr(vtable);
+    return real_ptr_to_vm_ptr(imem);
 }

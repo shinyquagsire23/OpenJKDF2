@@ -18,4 +18,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern Ole32 *ole32;
+
 #endif // OLE32_H

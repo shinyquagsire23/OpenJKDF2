@@ -17,4 +17,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern ComCtl32 *comctl32;
+
 #endif // COMCTL32_H

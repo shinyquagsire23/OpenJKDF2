@@ -1,8 +1,9 @@
 #include "user32.h"
 
-#include "uc_utils.h"
-#include "main.h"
+#include "dlls/gdi32.h"
+#include "vm.h"
 #include "nmm.h"
+#include "main.h"
 
 uint32_t User32::LoadIconA(uint32_t a, uint32_t b)
 {
@@ -16,8 +17,8 @@ uint32_t User32::LoadCursorA(uint32_t a, uint32_t b)
 
 uint32_t User32::RegisterClassExA(struct WNDCLASSEXA* lpwcx)
 {
-    char *menuName = (char*)uc_ptr_to_real_ptr(lpwcx->lpszMenuName);
-    char* className = (char*)uc_ptr_to_real_ptr(lpwcx->lpszClassName);
+    char *menuName = (char*)vm_ptr_to_real_ptr(lpwcx->lpszMenuName);
+    char* className = (char*)vm_ptr_to_real_ptr(lpwcx->lpszClassName);
     
     lpfnWndProc = lpwcx->lpfnWndProc;
     

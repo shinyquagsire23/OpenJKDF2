@@ -6,6 +6,7 @@
 #include "kvm.h"
 #include "uc_utils.h"
 
+#include "dlls/kernel32.h"
 #include "dlls/user32.h"
 #include "dlls/gdi32.h"
 
@@ -19,8 +20,53 @@ bool using_kvm = false;
 std::map<uint32_t, ImportTracker*> import_hooks;
 
 QGenericArgument q_args[9];
-void *uc_ptr_to_real_ptr(uint32_t uc_ptr);
-uint32_t real_ptr_to_uc_ptr(void* real_ptr);
+
+
+void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
+{
+    if (vm_ptr == 0) return nullptr;
+
+    if (vm_ptr >= image_mem_addr && vm_ptr <= image_mem_addr + image_mem_size + stack_size)
+    {
+        return image_mem + vm_ptr - image_mem_addr;
+    }
+    else if (vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
+    {
+        return kernel32->heap_mem + vm_ptr - kernel32->heap_addr;
+    }
+    else if (vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size)
+    {
+        return kernel32->virtual_mem + vm_ptr - kernel32->virtual_addr;
+    }
+    else
+    {
+        printf("Could not convert VM ptr %x to real pointer\n", vm_ptr);
+        return nullptr;
+    }
+}
+
+uint32_t real_ptr_to_vm_ptr(void* real_ptr)
+{
+    if (real_ptr == nullptr) return 0;
+
+    if (real_ptr >= image_mem && real_ptr <= image_mem + image_mem_size + stack_size)
+    {
+        return image_mem_addr + ((size_t)real_ptr - (size_t)image_mem);
+    }
+    else if (real_ptr >= kernel32->heap_mem && real_ptr <= kernel32->heap_mem + kernel32->heap_size)
+    {
+        return kernel32->heap_addr + ((size_t)real_ptr - (size_t)kernel32->heap_mem);
+    }
+    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size)
+    {
+        return kernel32->virtual_addr + ((size_t)real_ptr - (size_t)kernel32->virtual_mem);
+    }
+    else
+    {
+        printf("Could not convert real ptr %p to VM pointer\n", real_ptr);
+        return 0;
+    }
+}
 
 //VERY basic descriptor init function, sets many fields to user space sane defaults
 void vm_init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint32_t limit, uint8_t is_code)
@@ -126,12 +172,12 @@ uint32_t vm_reg_read(int id)
 
 void vm_mem_read(uint32_t addr, void* out, size_t size)
 {
-    memcpy(out, uc_ptr_to_real_ptr(addr), size);
+    memcpy(out, vm_ptr_to_real_ptr(addr), size);
 }
 
 void vm_mem_write(uint32_t addr, void* in, size_t size)
 {
-    memcpy(uc_ptr_to_real_ptr(addr), in, size);
+    memcpy(vm_ptr_to_real_ptr(addr), in, size);
 }
 
 
@@ -226,7 +272,7 @@ void vm_process_import(ImportTracker* import)
             {
                 if (import->is_param_ptr[j])
                 {
-                    trans_args[j] = uc_ptr_to_real_ptr(args[j]);
+                    trans_args[j] = vm_ptr_to_real_ptr(args[j]);
                     q_args[j] = QGenericArgument(method.parameterTypes()[j], &trans_args[j]);
                 }
                 else 
@@ -286,7 +332,7 @@ void vm_process_import(ImportTracker* import)
         vm_stack_pop(args, 14); //TODO
         
         //int16_t cHeight, int16_t cWidth, int16_t cEscapement, int16_t cOrientation, int16_t    cWeight, uint32_t bItalic, uint32_t bUnderline, uint32_t bStrikeOut, uint32_t iCharSet, uint32_t iOutPrecision, uint32_t iClipPrecision, uint32_t iQuality, uint32_t iPitchAndFamily, char* pszFaceName
-        eax = gdi32->CreateFontA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], (char*)uc_ptr_to_real_ptr(args[13]));
+        eax = gdi32->CreateFontA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], (char*)vm_ptr_to_real_ptr(args[13]));
         vm_reg_write(UC_X86_REG_EAX, eax);
     }
     else
@@ -305,7 +351,7 @@ uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool
     struct vm_inst new_vm;
     uint32_t esp, eax, dummy;
 
-    dummy = import_store["dummy"]->hook;
+    dummy = import_store["dummy::dummy"]->hook;
 
     vm_stack_push(args, num_args);
     if (push_ret)

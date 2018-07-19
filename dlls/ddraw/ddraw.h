@@ -18,4 +18,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern DDraw *ddraw;
+
 #endif // DDRAW_H

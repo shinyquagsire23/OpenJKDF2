@@ -14,12 +14,27 @@ public:
     Q_INVOKABLE IDirectPlayLobby3() {}
 
     /*** Base ***/
-    Q_INVOKABLE void QueryInterface(void* this_ptr, uint32_t a, uint32_t b){}
-    Q_INVOKABLE void AddRef(void* this_ptr){}
-    Q_INVOKABLE void Release(void* this_ptr){}
+    Q_INVOKABLE void QueryInterface(void* this_ptr, uint32_t a, uint32_t b)
+    {
+        printf("STUB: IDirectPlayLobby3::QueryInterface\n");
+    }
+
+    Q_INVOKABLE void AddRef(void* this_ptr)
+    {
+        printf("STUB: IDirectPlayLobby3::AddRef\n");
+    }
+
+    Q_INVOKABLE void Release(void* this_ptr)
+    {
+        printf("STUB: IDirectPlayLobby3::Release\n");
+    }
     
     /*** IDirectPlayLobby ***/
-    Q_INVOKABLE void Connect(void* this_ptr, uint32_t a, uint32_t b, uint32_t c){}
+    Q_INVOKABLE void Connect(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
+    {
+        printf("STUB: IDirectPlayLobby3::Connect\n");
+    }
+
     Q_INVOKABLE void ConnectEx(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d){}
     Q_INVOKABLE void CreateAddress(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f){}
     Q_INVOKABLE void CreateCompoundAddress(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d){}

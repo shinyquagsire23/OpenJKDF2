@@ -80,6 +80,9 @@ extern uint32_t stack_size, stack_addr;
 extern std::map<uint32_t, ImportTracker*> import_hooks;
 extern std::map<std::string, ImportTracker*> import_store;
 
+void *vm_ptr_to_real_ptr(uint32_t vm_ptr);
+uint32_t real_ptr_to_vm_ptr(void* real_ptr);
+
 void vm_init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint32_t limit, uint8_t is_code);
 
 void vm_mem_map_ptr(uint64_t address, size_t size, uint32_t perms, void *ptr);

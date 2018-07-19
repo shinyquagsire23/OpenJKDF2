@@ -200,7 +200,7 @@ uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
         vm_sync_imports();
     }
         
-    return import_store[requested]->hook;
+    return import_store["idk::"+requested]->hook;
 }
 
 void Kernel32::OutputDebugStringA(uint32_t str_ptr)

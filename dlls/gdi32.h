@@ -48,6 +48,7 @@ public:
     Q_INVOKABLE uint32_t RealizePalette(uint32_t hdc);
     Q_INVOKABLE uint32_t DeleteObject(uint32_t no);
     Q_INVOKABLE uint32_t DeleteDC(uint32_t hdc);
+    Q_INVOKABLE uint32_t GetSystemPaletteEntries(uint32_t hdc, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries);
 
 //    Q_INVOKABLE uint32_t ();
 };

@@ -21,4 +21,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern DInput* dinput;
+
 #endif // DINPUT_H

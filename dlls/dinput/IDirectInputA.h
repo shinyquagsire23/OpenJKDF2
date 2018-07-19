@@ -49,4 +49,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern IDirectInputA* idirectinputa;
+
 #endif // IDIRECTINPUTA_H

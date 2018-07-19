@@ -272,7 +272,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
             import = import_hooks[regs.rip];
             if (import)
             {
-                //printf("Hit import %s\n", import->name.c_str());
+                //printf("Hit import %s::%s\n", import->dll.c_str(), import->name.c_str());
                 vm_process_import(import);
             }
             else
@@ -288,6 +288,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
                 vm->vcpu.kvm_run->exit_reason, KVM_EXIT_HLT);  
             kvm_print_regs(vm);
             kvm_stop(vm);
+            break;
         }
     }
 

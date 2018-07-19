@@ -9,6 +9,28 @@
 #include <QMetaMethod>
 #include <QDebug>
 
+#include "dlls/kernel32.h"
+#include "dlls/user32.h"
+#include "dlls/gdi32.h"
+#include "dlls/comctl32.h"
+#include "dlls/advapi32.h"
+#include "dlls/ole32.h"
+#include "dlls/nmm.h"
+#include "dlls/ddraw/ddraw.h"
+#include "dlls/ddraw/IDirectDraw4.h"
+#include "dlls/ddraw/IDirectDrawSurface3.h"
+#include "dlls/ddraw/IDirect3D3.h"
+#include "dlls/dsound/dsound.h"
+#include "dlls/dplay/dplay.h"
+#include "dlls/dinput/dinput.h"
+#include "dlls/dplay/IDirectPlay3.h"
+#include "dlls/dplay/IDirectPlayLobby3.h"
+#include "dlls/dsound/IDirectSound.h"
+#include "dlls/dsound/IDirectSoundBuffer.h"
+#include "dlls/dinput/IDirectInputA.h"
+#include "dlls/dinput/IDirectInputDeviceA.h"
+#include "dlls/smackw32.h"
+
 #include "loaders/exe.h"
 #include "uc_utils.h"
 #include "vm.h"
@@ -26,6 +48,9 @@ DDraw *ddraw;
 DSound *dsound;
 DPlay *dplay;
 DInput *dinput;
+IDirect3D3 *idirect3d3;
+IDirectDraw4 *idirectdraw4;
+IDirectDrawSurface3 *idirectdrawsurface3;
 IDirectPlay3 *idirectplay3;
 IDirectPlayLobby3 *idirectplaylobby3;
 IDirectSound *idirectsound;
@@ -45,86 +70,43 @@ std::map<std::string, QObject*> interface_store;
 
 std::map<std::string, std::map<std::string, int> > method_cache;
 
-uint32_t import_get_hook_addr(std::string name)
+uint32_t import_get_hook_addr(std::string dll, std::string name)
 {
-    return import_store[name]->hook;
+    std::string import_name = dll + "::" + name;
+    return import_store[import_name]->hook;
 }
 
 void register_import(std::string dll, std::string name, uint32_t import_addr)
 {
-    if (import_store[name]) return;
+    std::string import_name = dll + "::" + name;
 
-    import_store[name] = new ImportTracker(dll, name, import_addr, next_hook);
+    if (import_store[import_name]) return;
+
+    import_store[import_name] = new ImportTracker(dll, name, import_addr, next_hook);
     
     auto obj = dll_store[dll];
     if (obj && method_cache[dll].find(name) != method_cache[dll].end())
     {
         auto method = obj->metaObject()->method(method_cache[dll][name]);
-        import_store[name]->method = method;
-        import_store[name]->obj = obj;
+        import_store[import_name]->method = method;
+        import_store[import_name]->obj = obj;
         
         for (int i = 0; i < method.parameterCount(); i++)
         {
             char *param_type = (char*)method.parameterTypes()[i].data();
             if (param_type[strlen(param_type) - 1] == '*')
             {
-                import_store[name]->is_param_ptr.push_back(true);
+                import_store[import_name]->is_param_ptr.push_back(true);
             }
             else 
             {
-                import_store[name]->is_param_ptr.push_back(false);
+                import_store[import_name]->is_param_ptr.push_back(false);
             }
             
         }
     }
 
     next_hook += 1;
-}
-
-void *uc_ptr_to_real_ptr(uint32_t uc_ptr)
-{
-    if (uc_ptr == 0) return nullptr;
-
-    if (uc_ptr >= image_mem_addr && uc_ptr <= image_mem_addr + image_mem_size + stack_size)
-    {
-        return image_mem + uc_ptr - image_mem_addr;
-    }
-    else if (uc_ptr >= kernel32->heap_addr && uc_ptr <= kernel32->heap_addr + kernel32->heap_size)
-    {
-        return kernel32->heap_mem + uc_ptr - kernel32->heap_addr;
-    }
-    else if (uc_ptr >= kernel32->virtual_addr && uc_ptr <= kernel32->virtual_addr + kernel32->virtual_size)
-    {
-        return kernel32->virtual_mem + uc_ptr - kernel32->virtual_addr;
-    }
-    else
-    {
-        printf("Could not convert uc ptr %x to real pointer\n", uc_ptr);
-        return nullptr;
-    }
-}
-
-uint32_t real_ptr_to_uc_ptr(void* real_ptr)
-{
-    if (real_ptr == nullptr) return 0;
-
-    if (real_ptr >= image_mem && real_ptr <= image_mem + image_mem_size + stack_size)
-    {
-        return image_mem_addr + ((size_t)real_ptr - (size_t)image_mem);
-    }
-    else if (real_ptr >= kernel32->heap_mem && real_ptr <= kernel32->heap_mem + kernel32->heap_size)
-    {
-        return kernel32->heap_addr + ((size_t)real_ptr - (size_t)kernel32->heap_mem);
-    }
-    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size)
-    {
-        return kernel32->virtual_addr + ((size_t)real_ptr - (size_t)kernel32->virtual_mem);
-    }
-    else
-    {
-        printf("Could not convert real ptr %p to Unicorn pointer\n", real_ptr);
-        return 0;
-    }
 }
 
 static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
@@ -149,6 +131,9 @@ int main(int argc, char **argv, char **envp)
     dplay = new DPlay();
     dsound = new DSound();
     dinput = new DInput();
+    idirectdraw4 = new IDirectDraw4();
+    idirectdrawsurface3 = new IDirectDrawSurface3();
+    idirect3d3 = new IDirect3D3();
     idirectplay3 = new IDirectPlay3();
     idirectplaylobby3 = new IDirectPlayLobby3();
     idirectsound = new IDirectSound();
@@ -168,6 +153,9 @@ int main(int argc, char **argv, char **envp)
     dll_store["DPLAYX.dll"] = (QObject*)dplay;
     dll_store["DSOUND.dll"] = (QObject*)dsound;
     dll_store["DINPUT.dll"] = (QObject*)dinput;
+    dll_store["IDirect3D3"] = (QObject*)idirect3d3;
+    dll_store["IDirectDraw4"] = (QObject*)idirectdraw4;
+    dll_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
     dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
     dll_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     dll_store["IDirectSound"] = (QObject*)idirectsound;
@@ -176,6 +164,9 @@ int main(int argc, char **argv, char **envp)
     dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     dll_store["smackw32.DLL"] = (QObject*)smackw32;
     
+    interface_store["IDirect3D3"] = (QObject*)idirect3d3;
+    interface_store["IDirectDraw4"] = (QObject*)idirectdraw4;
+    interface_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
     interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
     interface_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     interface_store["IDirectSound"] = (QObject*)idirectsound;

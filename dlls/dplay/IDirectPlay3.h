@@ -70,4 +70,6 @@ public:
 //    Q_INVOKABLE uint32_t ();
 };
 
+extern IDirectPlay3 *idirectplay3;
+
 #endif // IDIRECTPLAY3_H

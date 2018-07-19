@@ -1,6 +1,7 @@
 #include "gdi32.h"
 
-#include "uc_utils.h"
+#include "vm.h"
+#include "kernel32.h"
 #include "main.h"
 
 uint32_t Gdi32::GetStockObject(uint32_t a)
@@ -22,13 +23,13 @@ uint32_t Gdi32::GetDeviceCaps(uint32_t device, uint32_t index)
 
 uint32_t Gdi32::CreateDIBSection(uint32_t hdc, void* pbmi, uint32_t usage, uint32_t* ppvBits, uint32_t hSection, uint32_t offset)
 {
-    printf("STUB: CreateDibSection hdc %x, pbmi %x, usage %x, hsection %x, offset %x\n", hdc, real_ptr_to_uc_ptr(pbmi), usage, hSection, offset);
+    printf("STUB: CreateDibSection hdc %x, pbmi %x, usage %x, hsection %x, offset %x\n", hdc, real_ptr_to_vm_ptr(pbmi), usage, hSection, offset);
     *ppvBits = kernel32->VirtualAlloc(0, 0x80000, 0, 0);
     
     SDL_Surface *surface = SDL_CreateRGBSurface(0, 640, 480, 8, 0,0,0,0);
     
     dc_surface[hdc] = surface;
-    dc_fbufs[hdc] = (uint8_t*)uc_ptr_to_real_ptr(*ppvBits);
+    dc_fbufs[hdc] = (uint8_t*)vm_ptr_to_real_ptr(*ppvBits);
     
     return hBitmapCnt++;
 }
@@ -125,6 +126,13 @@ uint32_t Gdi32::DeleteDC(uint32_t hdc)
 {
     printf("STUB: DeleteDC(0x%x)\n", hdc);
     return 1;
+}
+
+uint32_t Gdi32::GetSystemPaletteEntries(uint32_t hdc, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries)
+{
+    printf("STUB: Gdi32::GetSystemPaletteEntries\n");
+    
+    return cEntries;
 }
 
 /*uint32_t Gdi32::(uint32_t )

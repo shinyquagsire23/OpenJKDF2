@@ -1,5 +1,6 @@
 #include "uc_utils.h"
 
+#include "dlls/kernel32.h"
 #include "main.h"
 #include "vm.h"
 

@@ -1,7 +1,6 @@
-#include "ddraw.h"
+#include "smackw32.h"
 
-#include "uc_utils.h"
-#include "main.h"
+#include "vm.h"
 #include "kernel32.h"
 
 void SmackW32::SmackSoundUseDirectSound(void* lpDSound)
