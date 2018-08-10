@@ -39,7 +39,7 @@ public:
     {
         printf("STUB: IDirect3D3::Initialize\n");
     }
-	Q_INVOKABLE uint32_t EnumDevices(void* this_ptr, uint32_t callback, void* unkOuter)
+	Q_INVOKABLE uint32_t EnumDevices(vm_ptr<void*> this_ptr, uint32_t callback, void* unkOuter)
     {
         printf("STUB: IDirect3D3::EnumDevices\n");
         
@@ -57,10 +57,9 @@ public:
         
         // Device descs
         uint32_t device_ptr = kernel32->VirtualAlloc(0, 0x1000, 0, 0);
-        //DDSURFACEDESC* desc = (struct DDSURFACEDESC*)vm_ptr_to_real_ptr(surface_ptr);
         
             
-        uint32_t callback_args[6] = {0xabcdef, device_ptr, device_ptr, device_name_ptr, device_desc_ptr, real_ptr_to_vm_ptr(this_ptr)};
+        uint32_t callback_args[6] = {0xabcdef, device_ptr, device_ptr, device_name_ptr, device_desc_ptr, this_ptr.raw_vm_ptr};
         uint32_t ret = vm_call_function(callback, 6, callback_args);
         
         return 0;

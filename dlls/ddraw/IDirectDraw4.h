@@ -178,22 +178,20 @@ public:
         printf("STUB: IDirectDraw4::EnumDisplayModes\n");
         
         {
-            uint32_t surface_ptr = kernel32->VirtualAlloc(0, 0x1000, 0, 0);
-            DDSURFACEDESC* desc = (struct DDSURFACEDESC*)vm_ptr_to_real_ptr(surface_ptr);
-            memset(desc, 0, sizeof(struct DDSURFACEDESC));
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
             desc->dwWidth = 640;
             desc->dwHeight = 480;
             desc->lPitch = 640;
             desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
             
-            uint32_t callback_args[2] = {0xabcdef, surface_ptr};
+            uint32_t callback_args[2] = {0xabcdef, desc.raw_vm_ptr};
             uint32_t ret = vm_call_function(callback, 2, callback_args);
         }
         
         /*{
-            uint32_t surface_ptr = kernel32->VirtualAlloc(0, 0x1000, 0, 0);
-            DDSURFACEDESC* desc = (struct DDSURFACEDESC*)vm_ptr_to_real_ptr(surface_ptr);
-            memset(desc, 0, sizeof(struct DDSURFACEDESC));
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
             desc->dwWidth = 640;
             desc->dwHeight = 480;
             desc->lPitch = 640;
@@ -205,7 +203,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x00FF0000;
             desc->ddpfPixelFormat.dwBBitMask = 0xFF000000;
             
-            uint32_t callback_args[2] = {0xabcdef, surface_ptr};
+            uint32_t callback_args[2] = {0xabcdef, desc.raw_vm_ptr};
             uint32_t ret = vm_call_function(callback, 2, callback_args);
         }*/
         

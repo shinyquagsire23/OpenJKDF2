@@ -4,6 +4,7 @@
 #include <QObject>
 #include <unicorn/unicorn.h>
 #include <queue>
+#include "vm.h"
 
 struct tagMSG
 {
@@ -27,8 +28,8 @@ struct WNDCLASSEXA
     uint32_t hIcon;
     uint32_t hCursor;
     uint32_t hbrBackground;
-    uint32_t lpszMenuName;
-    uint32_t lpszClassName;
+    vm_ptr<char*> lpszMenuName;
+    vm_ptr<char*> lpszClassName;
     uint32_t hIconSm;
 };
 
@@ -290,7 +291,7 @@ public:
     
     Q_INVOKABLE uint32_t LoadIconA(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t LoadCursorA(uint32_t a, uint32_t b);
-    Q_INVOKABLE uint32_t RegisterClassExA(struct WNDCLASSEXA* lpwcx);
+    Q_INVOKABLE uint32_t RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx);
     Q_INVOKABLE uint32_t FindWindowA(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t GetSystemMetrics(uint32_t metric);
     Q_INVOKABLE uint32_t CreateWindowExA(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l);
@@ -298,7 +299,7 @@ public:
     Q_INVOKABLE uint32_t UpdateWindow(uint32_t a);
     Q_INVOKABLE uint32_t GetActiveWindow();
     Q_INVOKABLE uint32_t GetLastActivePopup(uint32_t hWnd);
-    Q_INVOKABLE void MessageBoxA(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType);
+    Q_INVOKABLE void MessageBoxA(uint32_t hWnd, vm_ptr<char*> lpText, vm_ptr<char*> lpCaption, uint32_t uType);
     Q_INVOKABLE void MessageBoxW(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType);
     Q_INVOKABLE uint32_t GetDC(uint32_t a);
     Q_INVOKABLE uint32_t ReleaseDC(uint32_t a, uint32_t b);

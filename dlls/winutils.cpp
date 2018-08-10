@@ -16,8 +16,8 @@ std::string guid_to_string(uint8_t* lpGUID)
 
 uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
 {
-    uint32_t* imem = (uint32_t*)vm_ptr_to_real_ptr(kernel32->VirtualAlloc(0, 0x1000, 0, 0));
-    uint32_t* vtable = (uint32_t*)vm_ptr_to_real_ptr(kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0));
+    vm_ptr<uint32_t*> imem = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+    vm_ptr<uint32_t*> vtable = {kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0)};
     
     for (int i = 0; i < num_funcs; i++)
     {
@@ -30,7 +30,7 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             
             register_import(name, std::string(method_name), 0);
             
-            vtable[i] = import_get_hook_addr(name, std::string(method_name));
+            vtable.translated()[i] = import_get_hook_addr(name, std::string(method_name));
             //printf("finding %u, %s, %x\n", i, method_name.c_str(), import_get_hook_addr(name, std::string(method_name)));
         }
         else
@@ -40,12 +40,12 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             snprintf(tmp, 256, "%s_%u", name.c_str(), i);
             register_import(name, std::string(tmp), 0);
             
-            vtable[i] = import_get_hook_addr(name, std::string(tmp));
+            vtable.translated()[i] = import_get_hook_addr(name, std::string(tmp));
         }
     }
     
     vm_sync_imports();
     
-    *imem = real_ptr_to_vm_ptr(vtable);
-    return real_ptr_to_vm_ptr(imem);
+    *imem.translated() = vtable.raw_vm_ptr;
+    return imem.raw_vm_ptr;
 }

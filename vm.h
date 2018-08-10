@@ -104,4 +104,26 @@ uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool
 uint32_t vm_run(struct vm_inst *vm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp);
 void vm_stop();
 
+
+template <typename T>
+struct vm_ptr
+{
+    uint32_t raw_vm_ptr;
+    
+    T translated()
+    {
+        return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
+    }
+
+    T operator* ()
+    {
+        return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
+    }
+
+    T operator-> ()
+    {
+        return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
+    }
+};
+
 #endif // VM_H

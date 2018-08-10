@@ -15,14 +15,11 @@ uint32_t User32::LoadCursorA(uint32_t a, uint32_t b)
     return 0;
 }
 
-uint32_t User32::RegisterClassExA(struct WNDCLASSEXA* lpwcx)
+uint32_t User32::RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx)
 {
-    char *menuName = (char*)vm_ptr_to_real_ptr(lpwcx->lpszMenuName);
-    char* className = (char*)vm_ptr_to_real_ptr(lpwcx->lpszClassName);
-    
     lpfnWndProc = lpwcx->lpfnWndProc;
     
-    printf("Register class %s, %s\n", menuName, className);
+    printf("Register class %s, %s\n", lpwcx->lpszMenuName.translated(), lpwcx->lpszClassName.translated());
     return 444;
 }
 
@@ -80,12 +77,9 @@ uint32_t User32::GetLastActivePopup(uint32_t hWnd)
     return 123;
 }
 
-void User32::MessageBoxA(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType)
+void User32::MessageBoxA(uint32_t hWnd, vm_ptr<char*> lpText, vm_ptr<char*> lpCaption, uint32_t uType)
 {
-    std::string text = vm_read_string(lpText);
-    std::string caption = vm_read_string(lpCaption);
-    
-    printf("MessageBoxA: [%s] %s\n", caption.c_str(), text.c_str());
+    printf("MessageBoxA: [%s] %s\n", lpText.translated(), lpCaption.translated());
 }
 
 void User32::MessageBoxW(uint32_t hWnd, uint32_t lpText, uint32_t lpCaption, uint32_t uType)
