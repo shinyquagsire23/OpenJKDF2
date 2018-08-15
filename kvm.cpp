@@ -46,7 +46,6 @@ int vm_fd;
 int vcpu_fd;
 
 struct vm *current_kvm = nullptr;
-struct vm *last_kvm = nullptr;
 
 void kvm_reg_write(struct vm *vm, int id, uint32_t value)
 {
@@ -268,7 +267,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
                 perror("KVM_GET_REGS");
                 exit(1);
             }
-            
+
             import = import_hooks[regs.rip];
             if (import)
             {
@@ -277,8 +276,11 @@ uint32_t run_vm(struct vm *vm, size_t sz)
             }
             else
             {
+                printf("Failed import %x\n", regs.rip);
+                kvm_print_regs(vm);
                 kvm_stop(vm);
             }
+
             break;
 
             /* fall through */
@@ -384,7 +386,7 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
         }
     }
     
-    last_kvm = current_kvm;
+    struct vm *last_kvm = current_kvm;
     current_kvm = kvm;
     
     if (!initialized)

@@ -59,8 +59,7 @@ public:
         uint32_t device_ptr = kernel32->VirtualAlloc(0, 0x1000, 0, 0);
         
             
-        uint32_t callback_args[6] = {0xabcdef, device_ptr, device_ptr, device_name_ptr, device_desc_ptr, this_ptr.raw_vm_ptr};
-        uint32_t ret = vm_call_function(callback, 6, callback_args);
+        uint32_t ret = vm_call_func(callback, device_ptr, this_ptr.raw_vm_ptr, device_desc_ptr, device_name_ptr, device_ptr, 0xabcdef);
         
         return 0;
     }

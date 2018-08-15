@@ -30,6 +30,7 @@
 #include "dlls/dinput/IDirectInputA.h"
 #include "dlls/dinput/IDirectInputDeviceA.h"
 #include "dlls/smackw32.h"
+#include "dlls/jk.h"
 
 #include "loaders/exe.h"
 #include "uc_utils.h"
@@ -58,6 +59,7 @@ IDirectInputA *idirectinputa;
 IDirectInputDeviceA* idirectinputdevicea;
 IDirectSoundBuffer *idirectsoundbuffer;
 SmackW32 *smackw32;
+JK *jk;
 
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
@@ -76,6 +78,45 @@ uint32_t import_get_hook_addr(std::string dll, std::string name)
     return import_store[import_name]->hook;
 }
 
+void register_hook(std::string dll, std::string name, uint32_t hook_addr)
+{
+    std::string import_name = dll + "::" + name;
+
+    if (import_store[import_name]) return;
+
+    import_store[import_name] = new ImportTracker(dll, name, 0, hook_addr);
+    import_store[import_name]->is_hook = true;
+
+    // Write UND instruction for VM hook
+    vm_ptr<uint8_t*> und_write = {hook_addr};
+    und_write.translated()[0] = 0x0f;
+    und_write.translated()[1] = 0x0b;
+
+    auto obj = dll_store[dll];
+    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
+    {
+        auto method = obj->metaObject()->method(method_cache[dll][name]);
+        import_store[import_name]->method = method;
+        import_store[import_name]->obj = obj;
+        
+        for (int i = 0; i < method.parameterCount(); i++)
+        {
+            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
+            {
+                import_store[import_name]->is_param_ptr.push_back(true);
+            }
+            else 
+            {
+                import_store[import_name]->is_param_ptr.push_back(false);
+            }
+            
+        }
+    }
+
+    next_hook += 1;
+}
+
+
 void register_import(std::string dll, std::string name, uint32_t import_addr)
 {
     std::string import_name = dll + "::" + name;
@@ -93,8 +134,7 @@ void register_import(std::string dll, std::string name, uint32_t import_addr)
         
         for (int i = 0; i < method.parameterCount(); i++)
         {
-            char *param_type = (char*)method.parameterTypes()[i].data();
-            if (param_type[strlen(param_type) - 1] == '*')
+            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
             {
                 import_store[import_name]->is_param_ptr.push_back(true);
             }
@@ -141,6 +181,8 @@ int main(int argc, char **argv, char **envp)
     idirectinputa = new IDirectInputA();
     idirectinputdevicea = new IDirectInputDeviceA();
     smackw32 = new SmackW32();
+    jk = new JK();
+
     dll_store["KERNEL32.dll"] = (QObject*)kernel32;
     dll_store["USER32.dll"] = (QObject*)user32;
     dll_store["user32.dll"] = (QObject*)user32;
@@ -163,6 +205,7 @@ int main(int argc, char **argv, char **envp)
     dll_store["IDirectInputA"] = (QObject*)idirectinputa;
     dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     dll_store["smackw32.DLL"] = (QObject*)smackw32;
+    dll_store["JK"] = (QObject*)jk;
     
     interface_store["IDirect3D3"] = (QObject*)idirect3d3;
     interface_store["IDirectDraw4"] = (QObject*)idirectdraw4;
@@ -191,11 +234,10 @@ int main(int argc, char **argv, char **envp)
         for (int i = 0; i < obj->metaObject()->methodCount(); i++)
         {
             QMetaMethod method = obj->metaObject()->method(i);
-            char* name = method.name().data();
-            std::string strname = std::string(name);
+            std::string strname = std::string(method.name().data());
             
             method_cache[obj_pair.first][strname] = i;
-            printf("%s %s %i\n", obj_pair.first.c_str(), name, i);
+            //printf("%s %s %i\n", obj_pair.first.c_str(), name, i);
         }
     }
 
@@ -203,6 +245,9 @@ int main(int argc, char **argv, char **envp)
     next_hook = 0xd0000000;
     uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
     
+    // Hook JK
+    jk->hook();
+
     register_import("dummy", "dummy", 0);
     //uc_hook trace;
     //uc_hook_add(uc, &trace, UC_HOOK_CODE, (void*)hook_test, nullptr, 0x426838, 0x426838);

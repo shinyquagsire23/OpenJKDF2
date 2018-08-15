@@ -185,11 +185,10 @@ public:
             desc->lPitch = 640;
             desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
             
-            uint32_t callback_args[2] = {0xabcdef, desc.raw_vm_ptr};
-            uint32_t ret = vm_call_function(callback, 2, callback_args);
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
         }
         
-        /*{
+        {
             vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
             memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
             desc->dwWidth = 640;
@@ -203,9 +202,8 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x00FF0000;
             desc->ddpfPixelFormat.dwBBitMask = 0xFF000000;
             
-            uint32_t callback_args[2] = {0xabcdef, desc.raw_vm_ptr};
-            uint32_t ret = vm_call_function(callback, 2, callback_args);
-        }*/
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+        }
         
         return 0;
     }

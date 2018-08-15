@@ -329,8 +329,7 @@ uint32_t User32::TranslateMessage(struct tagMSG* lpMsg)
 uint32_t User32::DispatchMessageA(struct tagMSG* lpMsg)
 {
     //printf("Dispatch %x %x %x %x\n", lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
-    uint32_t callback_args[4] = {lpMsg->lParam, lpMsg->wParam, lpMsg->message, lpMsg->hWnd};
-    vm_call_function(lpfnWndProc, 4, callback_args);
+    vm_call_func(lpfnWndProc, lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
     
     if (lpMsg->message == WM_MOUSEMOVE)
     {

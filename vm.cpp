@@ -287,7 +287,8 @@ void vm_process_import(ImportTracker* import)
             else
                 succ = method.invoke(import->obj, Q_RETURN_ARG(uint32_t, retVal), q_args[0], q_args[1], q_args[2], q_args[3], q_args[4], q_args[5], q_args[6], q_args[7], q_args[8]);
 
-            //printf("%x %x %x\n", succ, retVal, method.parameterCount());
+            //printf("%x %x %x %x\n", succ, retVal, method.parameterCount(), ret_addr);
+
             if (succ)
             {
                 if (method.returnType() != QMetaType::Void)
@@ -345,6 +346,22 @@ void vm_process_import(ImportTracker* import)
     vm_reg_write(UC_X86_REG_EIP, ret_addr);
 }
 
+uint32_t vm_call_function(uint32_t addr, uint32_t num_args...)
+{
+    va_list args;
+    va_start(args, num_args);
+
+    uint32_t* arg_list = (uint32_t*)malloc(num_args * sizeof(uint32_t));
+
+    for (int i = 0; i < num_args; i++)
+    {
+        arg_list[i] = va_arg(args, uint32_t);
+    }
+
+    vm_call_function(addr, num_args, arg_list, true);
+
+    va_end(args);
+}
 
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret)
 {
@@ -353,15 +370,20 @@ uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool
 
     dummy = import_store["dummy::dummy"]->hook;
 
-    vm_stack_push(args, num_args);
+    uint32_t old_esp = vm_reg_read(UC_X86_REG_ESP);
+
+    for (int i = 0; i < num_args; i++)
+    {
+        vm_stack_push(&args[num_args-i-1], 1);
+    }
+
     if (push_ret)
         vm_stack_push(&dummy, 1);
     esp = vm_reg_read(UC_X86_REG_ESP);
 
     eax = vm_run(&new_vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
-    if (push_ret)
-        vm_stack_pop(&dummy, 1);
-    vm_stack_pop(args, num_args);
+
+    vm_reg_write(UC_X86_REG_ESP, old_esp);
 
     return eax;
 }

@@ -23,10 +23,7 @@ uint32_t DDraw::DirectDrawEnumerateA(uint32_t callback, uint32_t context)
     vm_mem_write(driver_name_ptr, driver_name, strlen(driver_name));
     vm_mem_write(guid_ptr, guid, strlen(guid));
 
-    uint32_t callback_args[4] = {context, driver_desc_ptr, driver_name_ptr, guid_ptr};
-    //uint32_t callback_args[4] = {0xabcdef, ptr, ptr+strlen(driver_desc)+1, context};
-    //uint32_t callback_args[4] = {context, ptr+strlen(driver_desc)+1, ptr, 0xabcdef};
-    vm_call_function(callback, 4, callback_args);
+    vm_call_func(callback, guid_ptr, driver_name_ptr, driver_desc_ptr, context);
     printf("back!\n");
 
     return 0;
