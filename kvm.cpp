@@ -268,6 +268,13 @@ uint32_t run_vm(struct vm *vm, size_t sz)
                 exit(1);
             }
 
+            struct kvm_vcpu_events events;
+            if (ioctl(vcpu_fd, KVM_GET_VCPU_EVENTS, &events) < 0)
+            {
+                perror("KVM_GET_VCPU_EVENTS");
+                exit(1);
+            }
+
             import = import_hooks[regs.rip];
             if (import)
             {
@@ -279,6 +286,13 @@ uint32_t run_vm(struct vm *vm, size_t sz)
                 printf("Failed import %x\n", regs.rip);
                 kvm_print_regs(vm);
                 kvm_stop(vm);
+            }
+
+            memset(&events, 0, sizeof(events));
+            if (ioctl(vcpu_fd, KVM_SET_VCPU_EVENTS, &events) < 0)
+            {
+                perror("KVM_SET_VCPU_EVENTS");
+                exit(1);
             }
 
             break;

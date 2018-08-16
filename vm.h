@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <cstring>
+#include <unordered_map>
 
 #include <unicorn/unicorn.h>
 #include <QMetaMethod>
@@ -80,7 +81,7 @@ extern uint32_t image_mem_addr;
 extern void* image_mem;
 extern uint32_t image_mem_size;
 extern uint32_t stack_size, stack_addr;
-extern std::map<uint32_t, ImportTracker*> import_hooks;
+extern std::unordered_map<uint32_t, ImportTracker*> import_hooks;
 extern std::map<std::string, ImportTracker*> import_store;
 
 void *vm_ptr_to_real_ptr(uint32_t vm_ptr);

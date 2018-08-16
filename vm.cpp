@@ -17,7 +17,7 @@ uint32_t stack_size, stack_addr;
 
 bool using_kvm = false;
 
-std::map<uint32_t, ImportTracker*> import_hooks;
+std::unordered_map<uint32_t, ImportTracker*> import_hooks;
 
 QGenericArgument q_args[9];
 
@@ -266,6 +266,9 @@ void vm_process_import(ImportTracker* import)
             uint32_t retVal;
             
             vm_stack_pop(args, method.parameterCount());
+
+            if (import->is_hook)
+                vm_stack_push(args, method.parameterCount());
             
             // Translate args from Unicorn pointers to usable pointers
             for (int j = 0; j < method.parameterCount(); j++)

@@ -69,6 +69,12 @@ public:
     void hook()
     {
         register_hook("JK", "WinMain", 0x41EBD0);
+        register_hook("JK", "jk_main", 0x50E750);
+
+        // Switching between HLE and VM is sloooowwww
+        //register_hook("JK", "_atoi", 0x512840);
+        //register_hook("JK", "_strtok", 0x512850);
+
         //register_hook("JK", "verify_key", 0x40EBB0);
     }
     
@@ -80,6 +86,16 @@ public:
     }
     
     Q_INVOKABLE uint32_t jk_main(uint32_t hInstance, uint32_t hPrevInstance, uint32_t lpCmdLine, uint32_t nShowCmd, vm_ptr<char*> lpWindowName);
+
+    Q_INVOKABLE uint32_t _atoi(char* a)
+    {
+        return atoi(a);
+    }
+
+    Q_INVOKABLE uint32_t _strtok(char* a, char* b)
+    {
+        return real_ptr_to_vm_ptr(strtok(a, b));
+    }
 
     /*Q_INVOKABLE uint32_t verify_key(uint32_t a)
     {
