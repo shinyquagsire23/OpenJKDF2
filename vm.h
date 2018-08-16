@@ -116,19 +116,37 @@ struct vm_ptr
 {
     uint32_t raw_vm_ptr;
     
+    vm_ptr() : raw_vm_ptr(0) {}
+    vm_ptr(uint32_t ptr) : raw_vm_ptr(ptr) {}
+
+    vm_ptr<T> operator=(const T& other) // copy assignment
+    {
+        printf("assigned to %x\n", other);
+
+        // handle nullptr assignment
+        if (other == 0)
+            raw_vm_ptr = 0;
+
+        //TODO: translate non-VM ptrs to VM ptrs
+        //this->translated() = 
+
+        return *this;
+    }
+
     T translated()
     {
+        //printf("translating %x to %p\n", raw_vm_ptr, vm_ptr_to_real_ptr(this->raw_vm_ptr));
         return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
     }
 
     T operator* ()
     {
-        return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
+        return this->translated();
     }
 
     T operator-> ()
     {
-        return (T)vm_ptr_to_real_ptr(this->raw_vm_ptr);
+        return this->translated();
     }
 };
 

@@ -270,9 +270,10 @@ private:
     std::queue<struct tagMSG> messages;
 public:
 
+    bool stopping;
     std::queue<std::pair<int, bool> > keystate_changed;
 
-    Q_INVOKABLE User32() : hWndCnt(1)
+    Q_INVOKABLE User32() : hWndCnt(1), stopping(false)
     {
 //        WM_MOUSEACTIVATE
     }
@@ -292,9 +293,10 @@ public:
     Q_INVOKABLE uint32_t LoadIconA(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t LoadCursorA(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx);
-    Q_INVOKABLE uint32_t FindWindowA(uint32_t a, uint32_t b);
+    uint32_t RegisterClassExA(struct WNDCLASSEXA* lpwcx);
+    Q_INVOKABLE uint32_t FindWindowA(uint32_t a, vm_ptr<char*> b);
     Q_INVOKABLE uint32_t GetSystemMetrics(uint32_t metric);
-    Q_INVOKABLE uint32_t CreateWindowExA(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l);
+    Q_INVOKABLE uint32_t CreateWindowExA(uint32_t a, uint32_t b, vm_ptr<char*> c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l);
     Q_INVOKABLE uint32_t ShowWindow(uint32_t a, uint32_t b);
     Q_INVOKABLE uint32_t UpdateWindow(uint32_t a);
     Q_INVOKABLE uint32_t GetActiveWindow();
@@ -324,7 +326,6 @@ public:
     {
         return 0;
     }
-
 //    Q_INVOKABLE uint32_t ();
 };
 

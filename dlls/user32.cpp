@@ -17,13 +17,19 @@ uint32_t User32::LoadCursorA(uint32_t a, uint32_t b)
 
 uint32_t User32::RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx)
 {
+    return this->RegisterClassExA(lpwcx.translated());
+}
+
+uint32_t User32::RegisterClassExA(struct WNDCLASSEXA* lpwcx)
+{
     lpfnWndProc = lpwcx->lpfnWndProc;
     
     printf("Register class %s, %s\n", lpwcx->lpszMenuName.translated(), lpwcx->lpszClassName.translated());
     return 444;
 }
 
-uint32_t User32::FindWindowA(uint32_t a, uint32_t b)
+
+uint32_t User32::FindWindowA(uint32_t a, vm_ptr<char*> b)
 {
     return 0;
 }
@@ -45,7 +51,7 @@ uint32_t User32::GetSystemMetrics(uint32_t metric)
     }
 }
 
-uint32_t User32::CreateWindowExA(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l)
+uint32_t User32::CreateWindowExA(uint32_t a, uint32_t b, vm_ptr<char*> c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l)
 {
     uint32_t hWnd = hWndCnt++;
     
@@ -221,7 +227,7 @@ void handleMouseMove(SDL_MouseMotionEvent *event)
     }
 }
 
-void update_input()
+bool update_input()
 {
     uint16_t left, right;
     uint32_t pos, msgl, msgr;
@@ -265,8 +271,7 @@ void update_input()
             case SDL_QUIT:
                 printf("Quit!\n");
                 vm_stop();
-                //done = TRUE;
-                break;
+                return true;
             default:
                 break;
         }
@@ -278,13 +283,15 @@ void update_input()
 
     if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
         mouse_right();*/
+
+    return false;
 }
 
 uint32_t last_ms = 0;
 
 uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsgFilterMin, uint16_t wMsgFilterMax, uint16_t wRemoveMsg)
 {
-    update_input();
+    if (update_input()) stopping = true;
     
     
     //HACK: Always update framebuf?

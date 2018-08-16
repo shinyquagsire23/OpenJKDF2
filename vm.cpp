@@ -30,11 +30,11 @@ void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
     {
         return image_mem + vm_ptr - image_mem_addr;
     }
-    else if (vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
+    else if (kernel32 && vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
     {
         return kernel32->heap_mem + vm_ptr - kernel32->heap_addr;
     }
-    else if (vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size)
+    else if (kernel32 && vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size)
     {
         return kernel32->virtual_mem + vm_ptr - kernel32->virtual_addr;
     }
