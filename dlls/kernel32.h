@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <unicorn/unicorn.h>
+#include <bitset>
+#include <map>
 
 #include "vm.h"
 
@@ -69,6 +71,11 @@ class Kernel32 : public QObject
 {
 Q_OBJECT
 
+private:
+    std::map<uint32_t, uint32_t> virtual_allocs;
+    std::bitset<0x10000000 / 0x1000> virtual_bitmap;
+    int virtual_head;
+
 public:
     uint32_t heap_handle;
     void *heap_mem;
@@ -89,11 +96,11 @@ public:
     
     std::map<uint32_t, FILE*> openFiles;
 
-    Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1)
+    Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1), virtual_head(0)
     {
         qRegisterMetaType<struct WIN32_FIND_DATAA*>("struct WIN32_FIND_DATAA*");
         heap_size_actual = 0x8000000;
-        virtual_size_actual = 0x8000000;
+        virtual_size_actual = 0x10000000;
         heap_mem = vm_alloc(heap_size_actual);
         virtual_mem = vm_alloc(virtual_size_actual);
     }
@@ -105,6 +112,7 @@ public:
     Q_INVOKABLE uint32_t CloseHandle(uint32_t handle);
     Q_INVOKABLE uint32_t GetVersion() { return 0; };
     Q_INVOKABLE uint32_t VirtualAlloc(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+    Q_INVOKABLE uint32_t VirtualFree(uint32_t lpAddress, uint32_t dwSize, uint32_t dwFreeType);
     Q_INVOKABLE uint32_t GetStartupInfoA(struct StartupInfo* lpStartupInfo);
     Q_INVOKABLE uint32_t GetStdHandle(uint32_t nStdHandle);
     Q_INVOKABLE uint32_t GetFileType(uint32_t hFile);
@@ -134,6 +142,65 @@ public:
     Q_INVOKABLE uint32_t WriteFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToWrite, uint32_t *lpNumberOfBytesWritten, uint32_t lpOverlapped);
     Q_INVOKABLE uint32_t SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t* lpDistanceToMoveHigh, uint32_t dwMoveMethod);
     Q_INVOKABLE uint32_t CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes);
+    Q_INVOKABLE void InitializeCriticalSection(uint32_t a){}
+    Q_INVOKABLE uint32_t TlsAlloc()
+    {
+        return 0;
+    }
+
+    Q_INVOKABLE void EnterCriticalSection(uint32_t lpCriticalSection)
+    {
+    }
+
+    Q_INVOKABLE void LeaveCriticalSection(uint32_t lpCriticalSection)
+    {
+    }
+
+    Q_INVOKABLE uint32_t TlsSetValue(uint32_t dwTlsIndex, uint32_t lpTlsValue)
+    {
+        printf("STUB: TlsSetValue %x to %x\n", dwTlsIndex, lpTlsValue);
+    }
+
+    Q_INVOKABLE uint32_t TlsGetValue(uint32_t dwTlsIndex)
+    {
+        printf("STUB: TlsGetValue %x\n", dwTlsIndex);
+        
+        return 0;
+    } 
+
+    Q_INVOKABLE uint32_t GetCurrentThreadId()
+    {
+        printf("STUB: GetCurrentThreadId\n");
+        return 0xbaddad;
+    }
+
+    Q_INVOKABLE uint32_t SetUnhandledExceptionFilter(uint32_t a)
+    {
+        printf("STUB: SetUnhandledExceptionFilter\n");
+        return 0xaaaaaa;
+    }
+
+    Q_INVOKABLE uint32_t FindResourceA(uint32_t a, char* name, uint32_t c)
+    {
+        printf("STUB: FindResourceA %u, %s, %u\n", a, name, c);
+        
+        return 0xbbbbbb;
+    }
+
+    Q_INVOKABLE uint32_t GetCurrentDirectoryA(uint32_t bufSize, char* buf)
+    {
+        char cwd[256];
+        getcwd(cwd, 256);
+
+        strncpy(buf, cwd, bufSize);
+        return 1;
+    }
+
+    Q_INVOKABLE uint32_t SetCurrentDirectoryA(char* buf);
+    Q_INVOKABLE void SetLastError(uint32_t err)
+    {
+        last_error = err;
+    }
 
 //    Q_INVOKABLE uint32_t ();
 };

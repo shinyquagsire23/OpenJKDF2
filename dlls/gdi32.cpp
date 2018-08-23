@@ -21,15 +21,18 @@ uint32_t Gdi32::GetDeviceCaps(uint32_t device, uint32_t index)
     }
 }
 
-uint32_t Gdi32::CreateDIBSection(uint32_t hdc, void* pbmi, uint32_t usage, uint32_t* ppvBits, uint32_t hSection, uint32_t offset)
+uint32_t Gdi32::CreateDIBSection(uint32_t hdc, struct BITMAPINFO* pbmi, uint32_t usage, uint32_t* ppvBits, uint32_t hSection, uint32_t offset)
 {
-    printf("STUB: CreateDibSection hdc %x, pbmi %x, usage %x, hsection %x, offset %x\n", hdc, real_ptr_to_vm_ptr(pbmi), usage, hSection, offset);
-    *ppvBits = kernel32->VirtualAlloc(0, 0x80000, 0, 0);
+    printf("STUB: CreateDibSection hdc %x, pbmi %x, usage %x, hsection %x, offset %x, %dx%d\n", hdc, real_ptr_to_vm_ptr(pbmi), usage, hSection, offset, pbmi->bmiHeader.biWidth, pbmi->bmiHeader.biHeight);
+    *ppvBits = kernel32->VirtualAlloc(0, abs(pbmi->bmiHeader.biWidth)*abs(pbmi->bmiHeader.biHeight), 0, 0);
     
-    SDL_Surface *surface = SDL_CreateRGBSurface(0, 640, 480, 8, 0,0,0,0);
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, abs(pbmi->bmiHeader.biWidth), abs(pbmi->bmiHeader.biHeight), 8, 0,0,0,0);
+    
+    SDL_SetWindowSize(displayWindow, abs(pbmi->bmiHeader.biWidth), abs(pbmi->bmiHeader.biHeight));
     
     dc_surface[hdc] = surface;
     dc_fbufs[hdc] = (uint8_t*)vm_ptr_to_real_ptr(*ppvBits);
+    gdi_render = true;
     
     return hBitmapCnt++;
 }
@@ -60,16 +63,19 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
 {
     if (!dc_fbufs[hdc]) return 1;
 
-    printf("STUB: BitBlt %x %i %i %i %i %x %i %i %x\n", hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
+    printf("STUB: BitBlt hdc %x, x %i, y %i, cx %i, cy %i, hdcSrc %x, x1 %i, y1 %i, rop %x\n", hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
     
-    memcpy(dc_surface[hdc]->pixels, dc_fbufs[hdc], 640*480);
-    SDL_SetPaletteColors(dc_surface[hdc]->format->palette, dc_palettes[hdcSrc], 0, 256);
-    
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, dc_surface[hdc]);
-    SDL_RenderClear(displayRenderer);
-    SDL_RenderCopy(displayRenderer, texture, NULL, NULL);
-    SDL_RenderPresent(displayRenderer);
-    SDL_DestroyTexture(texture);
+    if (gdi_render)
+    {    
+        memcpy(dc_surface[hdc]->pixels, dc_fbufs[hdc], dc_surface[hdc]->w*dc_surface[hdc]->h);
+        SDL_SetPaletteColors(dc_surface[hdc]->format->palette, dc_palettes[hdcSrc], 0, 256);
+        
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, dc_surface[hdc]);
+        SDL_RenderClear(displayRenderer);
+        SDL_RenderCopy(displayRenderer, texture, NULL, NULL);
+        SDL_RenderPresent(displayRenderer);
+        SDL_DestroyTexture(texture);
+    }
 
     return 1;
 }

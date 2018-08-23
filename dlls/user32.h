@@ -326,6 +326,17 @@ public:
     {
         return 0;
     }
+
+    Q_INVOKABLE void LoadStringA(uint32_t hRes, uint32_t size, char* buf, uint32_t idk)
+    {
+        printf("STUB: LoadStringA\n");
+    }
+
+    Q_INVOKABLE uint32_t SetWindowLongA(uint32_t hWnd, uint32_t nIndex, uint32_t dwNewLong)
+    {
+        printf("STUB: SetWindowLong(%x, %x, %x)\n", hWnd, nIndex, dwNewLong);
+        return 1;
+    }
 //    Q_INVOKABLE uint32_t ();
 };
 

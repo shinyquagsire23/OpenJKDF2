@@ -292,8 +292,7 @@ uint32_t last_ms = 0;
 uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsgFilterMin, uint16_t wMsgFilterMax, uint16_t wRemoveMsg)
 {
     if (update_input()) stopping = true;
-    
-    
+
     //HACK: Always update framebuf?
     uint32_t ms = nmm->timeGetTime();
     if (ms - last_ms > 32)

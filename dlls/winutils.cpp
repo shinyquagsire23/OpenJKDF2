@@ -6,6 +6,8 @@
 #include "vm.h"
 #include "main.h"
 
+std::map<std::string, uint32_t> vtable_store;
+
 std::string guid_to_string(uint8_t* lpGUID)
 {
     char tmp[256];
@@ -48,4 +50,41 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
     
     *imem.translated() = vtable.raw_vm_ptr;
     return imem.raw_vm_ptr;
+}
+
+uint32_t GlobalQueryInterface(std::string iid_str, uint32_t* lpInterface)
+{
+    if (iid_str == "3bba0080-2421-11cf-a31a-00aa00b93356")
+    {
+        *lpInterface = CreateInterfaceInstance("IDirect3D3", 200);
+        return 0;
+    }
+    else if (iid_str == "0194c220-a303-11d0-9c4f-00a0c905425e")
+    {
+        *lpInterface = CreateInterfaceInstance("IDirectPlayLobby3", 16);
+        return 0;
+    }
+    else if (iid_str == "b3a6f3e0-2b43-11cf-a2de-00aa00b93356")
+    {
+        *lpInterface = CreateInterfaceInstance("IDirectDraw4", 200);
+        return 0;
+    }
+    else if (iid_str == "62626262-6262-6262-6262-626262626262")
+    {
+        *lpInterface = CreateInterfaceInstance("IDirect3DDevice", 200);
+        return 0;
+    }
+    else if (iid_str == "2cdcd9e0-25a0-11cf-a31a-00aa00b93356")
+    {
+        *lpInterface = CreateInterfaceInstance("IDirect3DTexture", 200);
+        return 0;
+    }
+
+    return 1;
+}
+
+void GlobalRelease(void* this_ptr)
+{
+    kernel32->VirtualFree(*(uint32_t*)this_ptr, 0, 0);
+    kernel32->VirtualFree(real_ptr_to_vm_ptr(this_ptr), 0, 0); //TODO
 }

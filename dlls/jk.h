@@ -76,6 +76,19 @@ public:
         //register_hook("JK", "_strtok", 0x512850);
 
         //register_hook("JK", "verify_key", 0x40EBB0);
+        //register_hook("JK", "test", 0x42A4B5);
+
+        // nop out b3DAccel set to 0 for 16bpp render
+        /*((uint8_t*)vm_ptr_to_real_ptr(0x414897))[0] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[1] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[2] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[3] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[4] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[5] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[6] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[7] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[8] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[9] = 0x90;*/
     }
     
     Q_INVOKABLE uint32_t WinMain(uint32_t hInstance, uint32_t hPrevInstance, uint32_t lpCmdLine, uint32_t nShowCmd)
@@ -95,6 +108,17 @@ public:
     Q_INVOKABLE uint32_t _strtok(char* a, char* b)
     {
         return real_ptr_to_vm_ptr(strtok(a, b));
+    }
+
+    Q_INVOKABLE void test()
+    {
+        for (int i = 0; i < 0x10; i++)
+        {
+            printf("aaa %x\n", vm_reg_read(UC_X86_REG_EBP));
+            //printf("aaa %x+%x %x\n", vm_reg_read(UC_X86_REG_EAX), i*4, *(uint32_t*)(vm_ptr_to_real_ptr(vm_reg_read(UC_X86_REG_EAX)+i*4)));
+        }
+        vm_stop();
+        while(1);
     }
 
     /*Q_INVOKABLE uint32_t verify_key(uint32_t a)

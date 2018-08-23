@@ -16,6 +16,7 @@
 #include "vm.h"
 #include "main.h"
 #include "dlls/kernel32.h"
+#include "dlls/user32.h"
 
 /* CR0 bits */
 #define CR0_PE 1u
@@ -299,6 +300,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
 
             /* fall through */
         default:
+            user32->stopping = true;
             fprintf(stderr,    "Got exit_reason %d,"
                 " expected KVM_EXIT_HLT (%d)\n",
                 vm->vcpu.kvm_run->exit_reason, KVM_EXIT_HLT);  

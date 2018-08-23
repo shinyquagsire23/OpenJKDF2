@@ -19,7 +19,12 @@
 #include "dlls/ddraw/ddraw.h"
 #include "dlls/ddraw/IDirectDraw4.h"
 #include "dlls/ddraw/IDirectDrawSurface3.h"
+#include "dlls/ddraw/IDirectDrawPalette.h"
 #include "dlls/ddraw/IDirect3D3.h"
+#include "dlls/ddraw/IDirect3DDevice.h"
+#include "dlls/ddraw/IDirect3DTexture.h"
+#include "dlls/ddraw/IDirect3DViewport.h"
+#include "dlls/ddraw/IDirect3DExecuteBuffer.h"
 #include "dlls/dsound/dsound.h"
 #include "dlls/dplay/dplay.h"
 #include "dlls/dinput/dinput.h"
@@ -50,8 +55,13 @@ DSound *dsound;
 DPlay *dplay;
 DInput *dinput;
 IDirect3D3 *idirect3d3;
+IDirect3DDevice *idirect3ddevice;
+IDirect3DTexture *idirect3dtexture;
+IDirect3DViewport *idirect3dviewport;
+IDirect3DExecuteBuffer *idirect3dexecutebuffer;
 IDirectDraw4 *idirectdraw4;
 IDirectDrawSurface3 *idirectdrawsurface3;
+IDirectDrawPalette *idirectdrawpalette;
 IDirectPlay3 *idirectplay3;
 IDirectPlayLobby3 *idirectplaylobby3;
 IDirectSound *idirectsound;
@@ -173,7 +183,12 @@ int main(int argc, char **argv, char **envp)
     dinput = new DInput();
     idirectdraw4 = new IDirectDraw4();
     idirectdrawsurface3 = new IDirectDrawSurface3();
+    idirectdrawpalette = new IDirectDrawPalette();
     idirect3d3 = new IDirect3D3();
+    idirect3ddevice = new IDirect3DDevice();
+    idirect3dtexture = new IDirect3DTexture();
+    idirect3dviewport = new IDirect3DViewport();
+    idirect3dexecutebuffer = new IDirect3DExecuteBuffer();
     idirectplay3 = new IDirectPlay3();
     idirectplaylobby3 = new IDirectPlayLobby3();
     idirectsound = new IDirectSound();
@@ -191,13 +206,19 @@ int main(int argc, char **argv, char **envp)
     dll_store["ADVAPI32.dll"] = (QObject*)advapi32;
     dll_store["ole32.dll"] = (QObject*)ole32;
     dll_store["__NMM.dll"] = (QObject*)nmm;
+    dll_store["WINMM.dll"] = (QObject*)nmm;
     dll_store["DDRAW.dll"] = (QObject*)ddraw;
     dll_store["DPLAYX.dll"] = (QObject*)dplay;
     dll_store["DSOUND.dll"] = (QObject*)dsound;
     dll_store["DINPUT.dll"] = (QObject*)dinput;
     dll_store["IDirect3D3"] = (QObject*)idirect3d3;
+    dll_store["IDirect3DDevice"] = (QObject*)idirect3ddevice;
+    dll_store["IDirect3DTexture"] = (QObject*)idirect3dtexture;
+    dll_store["IDirect3DViewport"] = (QObject*)idirect3dviewport;
+    dll_store["IDirect3DExecuteBuffer"] = (QObject*)idirect3dexecutebuffer;
     dll_store["IDirectDraw4"] = (QObject*)idirectdraw4;
     dll_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
+    dll_store["IDirectDrawPalette"] = (QObject*)idirectdrawpalette;
     dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
     dll_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     dll_store["IDirectSound"] = (QObject*)idirectsound;
@@ -208,8 +229,13 @@ int main(int argc, char **argv, char **envp)
     dll_store["JK"] = (QObject*)jk;
     
     interface_store["IDirect3D3"] = (QObject*)idirect3d3;
+    interface_store["IDirect3DDevice"] = (QObject*)idirect3ddevice;
+    interface_store["IDirect3DTexture"] = (QObject*)idirect3dtexture;
+    interface_store["IDirect3DViewport"] = (QObject*)idirect3dviewport;
+    interface_store["IDirect3DExecuteBuffer"] = (QObject*)idirect3dexecutebuffer;
     interface_store["IDirectDraw4"] = (QObject*)idirectdraw4;
     interface_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
+    interface_store["IDirectDrawPalette"] = (QObject*)idirectdrawpalette;
     interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
     interface_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
     interface_store["IDirectSound"] = (QObject*)idirectsound;

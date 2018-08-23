@@ -6,9 +6,34 @@
 #include "dlls/kernel32.h"
 #include "vm.h"
 #include "dlls/winutils.h"
+#include "dlls/gdi32.h"
 
+#define DDPF_ALPHAPIXELS     0x1
 #define DDPF_PALETTEINDEXED8 0x20
-#define DDPF_RGB 0x40
+#define DDPF_RGB             0x40
+
+#define DDSCAPS_BACKBUFFER 0x4
+#define DDSCAPS_COMPLEX 0x00000008
+#define DDSCAPS_PRIMARYSURFACE 0x200
+#define DDSCAPS_TEXTURE 0x00001000
+#define DDSCAPS_MIPMAP  0x00400000
+
+#define DDSD_CAPS           0x00000001
+#define DDSD_HEIGHT         0x00000002
+#define DDSD_WIDTH          0x00000004
+#define DDSD_PITCH          0x00000008
+#define DDSD_PIXELFORMAT    0x00001000
+#define DDSD_MIPMAPCOUNT    0x00020000
+#define DDSD_LINEARSIZE     0x00080000
+#define DDSD_DEPTH          0x00800000
+
+struct ddraw_color
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    uint8_t a;
+};
 
 struct DDCOLORKEY
 {
@@ -34,19 +59,21 @@ struct DDSURFACEDESC
     uint32_t dwFlags;
     uint32_t dwHeight;
     uint32_t dwWidth;
-    uint32_t lPitch;
+    uint32_t lPitch; //10
     uint32_t dwBackBufferCount;
     uint32_t dwMipMapCount;
     uint32_t dwAlphaBitDepth;
-    uint32_t dwReserved;
+    uint32_t dwReserved; //20
     uint32_t lpSurface;
-    struct DDCOLORKEY ddckCKDestOverlay;
-    struct DDCOLORKEY ddckCKDestBltl;
-    struct DDCOLORKEY ddckCKSrcOverlay;
-    struct DDCOLORKEY ddckCKSrcBlt;
-    struct DDPIXELFORMAT ddpfPixelFormat;
+    struct DDCOLORKEY ddckCKDestOverlay; //28
+    struct DDCOLORKEY ddckCKDestBltl; //30
+    struct DDCOLORKEY ddckCKSrcOverlay; //38
+    struct DDCOLORKEY ddckCKSrcBlt; //40
+    struct DDPIXELFORMAT ddpfPixelFormat; //48
     uint32_t ddsCaps;
 };
+
+//x $ebp+0x4c
 
 struct DDCAPS
 {
@@ -109,6 +136,8 @@ Q_OBJECT
 
 public:
 
+    std::map<uint32_t, SDL_Color[256]> palettes;
+
     Q_INVOKABLE IDirectDraw4() {}
 
     /*** Base ***/
@@ -117,18 +146,7 @@ public:
         std::string iid_str = guid_to_string(iid);
         printf("STUB: IDirectDraw4::QueryInterface %s\n", iid_str.c_str());
         
-        if (iid_str == "3bba0080-2421-11cf-a31a-00aa00b93356")
-        {
-            *lpInterface = CreateInterfaceInstance("IDirect3D3", 200);
-            return 0;
-        }
-        else if (iid_str == "0194c220-a303-11d0-9c4f-00a0c905425e")
-        {
-            *lpInterface = CreateInterfaceInstance("IDirectPlayLobby3", 16);
-            return 0;
-        }
-        
-        return 1;
+        return GlobalQueryInterface(iid_str, lpInterface);
     }
 
     Q_INVOKABLE void AddRef(void* this_ptr)
@@ -139,6 +157,8 @@ public:
     Q_INVOKABLE void Release(void* this_ptr)
     {
         printf("STUB: IDirectDraw4::Release\n");
+        
+        GlobalRelease(this_ptr);
     }
     
     /*** IDirectDraw methods ***/
@@ -147,14 +167,25 @@ public:
         printf("STUB: IDirectDraw4::Compact\n");
     }
     
-    Q_INVOKABLE void CreateClipper(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
+    Q_INVOKABLE void CreateClipper(void* this_ptr, uint32_t a, uint32_t b, uint32_t lpUnkOuter)
     {
         printf("STUB: IDirectDraw4::CreateClipper\n");
     }
     
-    Q_INVOKABLE uint32_t CreatePalette(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d)
+    Q_INVOKABLE uint32_t CreatePalette(void* this_ptr, uint32_t a, struct ddraw_color* lpPaletteEntry, uint32_t* lpDDPalette, uint32_t lpUnkOuter)
     {
-        printf("STUB: IDirectDraw4::CreatePalette\n");
+        printf("STUB: IDirectDraw4::CreatePalette(%u)\n", a);
+        
+        *lpDDPalette = CreateInterfaceInstance("IDirectDrawPalette", 200);
+        uint32_t key = *(uint32_t*)(vm_ptr_to_real_ptr(*lpDDPalette));
+
+        for(int i = 0; i < 256; i++)
+        {
+            palettes[key][i].r = lpPaletteEntry[i].r;
+            palettes[key][i].g = lpPaletteEntry[i].g;
+            palettes[key][i].b = lpPaletteEntry[i].b;
+            palettes[key][i].a = 0xFF;
+        }
         
         return 0;
     }
@@ -163,7 +194,20 @@ public:
     {
         printf("STUB: IDirectDraw4::CreateSurface\n");
         
-        *lpDDSurface = CreateInterfaceInstance("IDirectDrawSurface3", 200);
+        *lpDDSurface = CreateInterfaceInstance("IDirectDrawSurface3", 200); //4
+        
+        uint32_t* ext = (uint32_t*)vm_ptr_to_real_ptr(*lpDDSurface);
+        memcpy(&ext[2], desc, sizeof(DDSURFACEDESC));
+        desc->lPitch = desc->dwWidth;
+
+        if (!(desc->ddsCaps & DDSCAPS_TEXTURE))
+        {
+            lpDDSurface[1] = CreateInterfaceInstance("IDirect3DTexture", 200);
+            
+        }
+        //printf("thing %x %x %x\n", lpDDSurface[0], lpDDSurface[1], desc->ddsCaps);
+        //lpDDSurface[2] = kernel32->VirtualAlloc(0, 640*480*400, 0, 0);
+        //memcpy(&lpDDSurface[3], desc, sizeof(DDSURFACEDESC));
         
         return 0;
     }
@@ -177,17 +221,55 @@ public:
     {
         printf("STUB: IDirectDraw4::EnumDisplayModes\n");
         
+        // a 640x480 8bpp display is mandatory for JK
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwSize = sizeof(desc);
+            desc->dwWidth = 640;
+            desc->dwHeight = 480;
+            desc->lPitch = 0x1000;
+            desc->ddpfPixelFormat.dwSize = sizeof(desc->ddpfPixelFormat);
+            desc->ddpfPixelFormat.dwRGBBitCount = 8;
+            desc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
+
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+        
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1280;
+            desc->dwHeight = 1024;
+            desc->lPitch = 1280;
+            desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
+
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+#if 0        
         {
             vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
             memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
             desc->dwWidth = 640;
             desc->dwHeight = 480;
             desc->lPitch = 640;
-            desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
+            desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
+            
+            desc->ddpfPixelFormat.dwRGBBitCount = 32;
+            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+            desc->ddpfPixelFormat.dwRBitMask = 0x00FF0000;
+            desc->ddpfPixelFormat.dwGBitMask = 0x0000FF00;
+            desc->ddpfPixelFormat.dwBBitMask = 0x000000FF;
             
             uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
-        
+#endif
         {
             vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
             memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
@@ -197,12 +279,14 @@ public:
             desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
             
             desc->ddpfPixelFormat.dwRGBBitCount = 16;
-            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0x000000FF;
-            desc->ddpfPixelFormat.dwRBitMask = 0x0000FF;
-            desc->ddpfPixelFormat.dwGBitMask = 0x00FF0000;
-            desc->ddpfPixelFormat.dwBBitMask = 0xFF000000;
+            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+            desc->ddpfPixelFormat.dwRBitMask = 0xF800;
+            desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
+            desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
             uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
         
         return 0;
@@ -224,6 +308,10 @@ public:
         
         caps1->dwCaps |= 1;
         caps2->dwCaps |= 1;
+        caps1->dwVidMemTotal = 0x10000000;
+        caps1->dwVidMemFree = 0x10000000;
+        caps2->dwVidMemTotal = 0x10000000;
+        caps2->dwVidMemFree = 0x10000000;
         
         return 0;
     }
@@ -275,16 +363,18 @@ public:
         return 0;
     }
     
-    Q_INVOKABLE uint32_t SetDisplayMode(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+    Q_INVOKABLE uint32_t SetDisplayMode(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
     {
-        printf("STUB: IDirectDraw4::SetDisplayMode\n");
+        printf("STUB: IDirectDraw4::SetDisplayMode %u, %u, %u\n", a, b, c);
         
         return 0;
     }
     
-    Q_INVOKABLE void WaitForVerticalBlank(void* this_ptr, uint32_t a, uint32_t b)
+    Q_INVOKABLE uint32_t WaitForVerticalBlank(void* this_ptr, uint32_t a, uint32_t b)
     {
         printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
+        
+        return 0;
     }
 
     /*** IDirectDraw2 methods ***/

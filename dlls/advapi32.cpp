@@ -41,12 +41,13 @@ uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c
     }
     else if (!strcmp(valuename, "displayDeviceGUID"))
     {
-        memset(lpData, 0xAA, *lpcbData);
+        memset(lpData, 0x61, *lpcbData);
         return 0;
     }
     else if (!strcmp(valuename, "3DDeviceGUID"))
     {
-        memset(lpData, 0xAA, *lpcbData);
+        uint8_t id[0x10] = {0x80, 0x1A, 0x05, 0x87, 0xFC, 0x13, 0xD1, 0x11, 0x97, 0xC0, 0x00, 0xA0, 0x24, 0x29, 0x30, 0x05};
+        memcpy(lpData, id, *lpcbData);
         return 0;
     }
 

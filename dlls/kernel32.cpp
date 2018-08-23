@@ -55,7 +55,7 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
     heap_size += alloc_size;
     
     //printf("return %x, %x %x\n", retval, heap_size_actual, heap_size);
-        
+
     return retval;
 }
 
@@ -72,16 +72,55 @@ uint32_t Kernel32::CloseHandle(uint32_t handle)
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
 {
     //TODO: lpAddress
-    uint32_t retval = virtual_addr + virtual_size;
-    
-    //printf("alloc %x\n", dwSize);
-    
+
     dwSize = (dwSize & ~0xFFF) + 0x1000;
-    virtual_size += dwSize;
+    uint32_t numBits = dwSize / 0x1000;
     
-    //printf("return %x, %x %x\n", retval, virtual_size, virtual_size);
+    //TODO: don't loop forever if there's no space
+
+    int i = numBits;
+    while (i)
+    {
+        if (virtual_head >= virtual_bitmap.size())
+        {
+            i = numBits;
+            virtual_head = 0;
+        }
+
+        if (!virtual_bitmap[virtual_head])
+            i--;
+        else
+            i = numBits;
         
+        virtual_head++;        
+    }
+    
+    for (i = 0; i < numBits; i++)
+    {
+        virtual_bitmap.set(virtual_head - i - 1, true);
+    }
+    
+    virtual_size += dwSize;
+    uint32_t retval = virtual_addr + (virtual_head * 0x1000) - dwSize;
+    virtual_allocs[retval] = dwSize;
+
     return retval;
+}
+
+uint32_t Kernel32::VirtualFree(uint32_t lpAddress, uint32_t dwSize, uint32_t dwFreeType)
+{    
+    uint32_t startBit = (lpAddress - virtual_addr) / 0x1000;
+    uint32_t numBits = virtual_allocs[lpAddress] / 0x1000;
+
+    for (int i = startBit; i < startBit+numBits; i++)
+    {
+        virtual_bitmap.set(i, false);
+    }
+    
+    virtual_size -= virtual_allocs[lpAddress];
+    virtual_allocs[lpAddress] = 0;
+    
+    return 1;
 }
 
 uint32_t Kernel32::GetStartupInfoA(struct StartupInfo* lpStartupInfo)
@@ -222,7 +261,7 @@ uint32_t Kernel32::LoadLibraryA(uint32_t dllStr_ptr)
 
 uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpFindFileData)
 {
-    std::string match = std::string(lpFileName);
+    std::string match = "./" + std::string(lpFileName);
 
     std::string linux_path = std::regex_replace(match, std::regex("\\\\"), "/");
     linux_path = std::regex_replace(linux_path, std::regex("\\*\\.\\*"), "*");
@@ -323,6 +362,7 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
 {
     std::string fname = vm_read_string(lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
+    linux_path = std::regex_replace(linux_path, std::regex("//"), "");
     //printf("Stub: Create file %s\n", linux_path.c_str());
         
     FILE *f = fopen(linux_path.c_str(), "rw");
@@ -378,6 +418,21 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
 uint32_t Kernel32::CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes)
 {
     printf("STUB: Create Dir %s\n", lpPathName);
+    return 1;
+}
+
+uint32_t Kernel32::SetCurrentDirectoryA(char* buf)
+{
+    std::string path = std::string(buf);
+    std::string linux_path = std::regex_replace(path, std::regex("\\\\"), "/");
+    
+    printf("STUB: SetCurrentDirectoryA to %s\n", linux_path.c_str());
+    chdir(linux_path.c_str());
+    
+    char cwd[256];
+    getcwd(cwd, 256);
+    printf("cwd is %s\n", cwd);
+    
     return 1;
 }
 

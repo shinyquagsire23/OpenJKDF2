@@ -34,7 +34,7 @@ void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
     {
         return kernel32->heap_mem + vm_ptr - kernel32->heap_addr;
     }
-    else if (kernel32 && vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size)
+    else if (kernel32 && vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size_actual)
     {
         return kernel32->virtual_mem + vm_ptr - kernel32->virtual_addr;
     }
@@ -57,7 +57,7 @@ uint32_t real_ptr_to_vm_ptr(void* real_ptr)
     {
         return kernel32->heap_addr + ((size_t)real_ptr - (size_t)kernel32->heap_mem);
     }
-    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size)
+    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size_actual)
     {
         return kernel32->virtual_addr + ((size_t)real_ptr - (size_t)kernel32->virtual_mem);
     }
