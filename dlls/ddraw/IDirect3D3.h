@@ -10,6 +10,18 @@
 #define D3DCOLOR_MONO 1
 #define D3DCOLOR_RGB  2
 
+#define D3DPSHADECAPS_ALPHAFLATBLEND       0x00001000
+#define D3DPSHADECAPS_ALPHAFLATSTIPPLED    0x00002000
+
+#define D3DPTBLENDCAPS_DECAL            0x00000001
+#define D3DPTBLENDCAPS_MODULATE         0x00000002
+#define D3DPTBLENDCAPS_DECALALPHA       0x00000004
+#define D3DPTBLENDCAPS_MODULATEALPHA    0x00000008
+#define D3DPTBLENDCAPS_DECALMASK        0x00000010
+#define D3DPTBLENDCAPS_MODULATEMASK     0x00000020
+#define D3DPTBLENDCAPS_COPY             0x00000040
+#define D3DPTBLENDCAPS_ADD              0x00000080
+
 #define D3DPTEXTURECAPS_PERSPECTIVE 1
 #define D3DPTEXTURECAPS_ALPHA 4
 #define D3DPTEXTURECAPS_TRANSPARENCY 8
@@ -72,6 +84,20 @@ struct D3DDeviceDesc
     uint32_t dwMaxStippleHeight;
 };
 
+struct D3DVIEWPORT {
+ uint32_t dwSize;
+ uint32_t dwX;
+ uint32_t dwY;
+ uint32_t dwWidth;
+ uint32_t dwHeight;
+ float dvScaleX;
+ float dvScaleY;
+ float dvMaxX;
+ float dvMaxY;
+ float dvMinZ;
+ float dvMaxZ;
+};
+
 class IDirect3D3 : public QObject
 {
 Q_OBJECT
@@ -132,29 +158,35 @@ public:
         vm_ptr<struct D3DDeviceDesc*> desc(device_ptr);
         desc->dcmColorModel = D3DCOLOR_RGB;
         desc->dwDeviceZBufferBitDepth = 0x400;
-        desc->dpcTriCaps.dwTextureCaps = D3DPTEXTURECAPS_PERSPECTIVE | D3DPTEXTURECAPS_ALPHA /*| D3DPTEXTURECAPS_SQUAREONLY*/ | D3DPTEXTURECAPS_TRANSPARENCY;
+        desc->dpcTriCaps.dwTextureCaps = D3DPTEXTURECAPS_PERSPECTIVE | D3DPTEXTURECAPS_ALPHA | D3DPTEXTURECAPS_SQUAREONLY | D3DPTEXTURECAPS_TRANSPARENCY;
         desc->dpcTriCaps.dwZCmpCaps = 0xFF; // we support anything for z comparison
-        desc->dwMaxBufferSize = 0x10000000;
-        desc->dwMaxVertexCount = 0x10000000;
+        desc->dpcTriCaps.dwShadeCaps = 0;//D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAFLATSTIPPLED;
+        desc->dpcTriCaps.dwTextureBlendCaps = 0;//D3DPTBLENDCAPS_MODULATEALPHA;
+        desc->dwMaxBufferSize = 0x100000;
+        desc->dwMaxVertexCount = 0x1000;
 
         uint32_t ret = vm_call_func(callback, iid_ptr, device_desc_ptr, device_name_ptr, device_ptr,device_ptr, 0xabcdef);
         
         kernel32->VirtualFree(device_ptr, 0, 0);
         kernel32->VirtualFree(name_ptrs, 0, 0);
         
-        //TODO: HACK
+        //TODO: JK.EXE HACK
         **vm_ptr<uint32_t*>(0x8605C8) = 0;
 
         return 0;
     }
-	Q_INVOKABLE void CreateLight(void* this_ptr, uint32_t* LPDIRECT3DLIGHT, uint32_t* IUnknown)
+	Q_INVOKABLE uint32_t CreateLight(void* this_ptr, uint32_t* LPDIRECT3DLIGHT, uint32_t* IUnknown)
     {
         printf("STUB: IDirect3D3::CreateLight\n");
+        
+        return 0;
     }
 
-	Q_INVOKABLE void CreateMaterial(void* this_ptr, uint32_t* LPDIRECT3DMATERIAL, uint32_t* IUnknown)
+	Q_INVOKABLE uint32_t CreateMaterial(void* this_ptr, uint32_t* LPDIRECT3DMATERIAL, uint32_t* IUnknown)
     {
         printf("STUB: IDirect3D3::CreateMaterial\n");
+        
+        return 0;
     }
 
 	Q_INVOKABLE uint32_t CreateViewport(void* this_ptr, uint32_t* lpDirect3DViewport, uint32_t* IUnknown)
@@ -166,9 +198,11 @@ public:
         return 0;
     }
 
-	Q_INVOKABLE void FindDevice(void* this_ptr, uint32_t LPD3DFINDDEVICESEARCH, uint32_t LPD3DFINDDEVICERESULT)
+	Q_INVOKABLE uint32_t FindDevice(void* this_ptr, uint32_t LPD3DFINDDEVICESEARCH, uint32_t LPD3DFINDDEVICERESULT)
     {
         printf("STUB: IDirect3D3::FindDevice\n");
+        
+        return 0;
     }
 
 //    Q_INVOKABLE uint32_t ();

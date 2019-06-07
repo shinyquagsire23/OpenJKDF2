@@ -6,6 +6,7 @@
 #include <bitset>
 #include <map>
 
+
 #include "vm.h"
 
 #pragma pack(push, 1)
@@ -64,6 +65,8 @@ struct WIN32_FIND_DATAA
 #define FILE_TYPE_DISK 0x0001
 #define FILE_TYPE_CHAR 0x0002
 
+#define INVALID_HANDLE_VALUE -1
+
 #define ERROR_FILE_NOT_FOUND (2)
 #define ERROR_NO_MORE_FILES (18)
 
@@ -72,9 +75,11 @@ class Kernel32 : public QObject
 Q_OBJECT
 
 private:
+    std::map<uint32_t, uint32_t> tls_vals;
     std::map<uint32_t, uint32_t> virtual_allocs;
     std::bitset<0x10000000 / 0x1000> virtual_bitmap;
     int virtual_head;
+    int tls_index;
 
 public:
     uint32_t heap_handle;
@@ -96,7 +101,7 @@ public:
     
     std::map<uint32_t, FILE*> openFiles;
 
-    Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1), virtual_head(0)
+    Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1), virtual_head(0), tls_index(0)
     {
         qRegisterMetaType<struct WIN32_FIND_DATAA*>("struct WIN32_FIND_DATAA*");
         heap_size_actual = 0x8000000;
@@ -145,7 +150,7 @@ public:
     Q_INVOKABLE void InitializeCriticalSection(uint32_t a){}
     Q_INVOKABLE uint32_t TlsAlloc()
     {
-        return 0;
+        return tls_index++;
     }
 
     Q_INVOKABLE void EnterCriticalSection(uint32_t lpCriticalSection)
@@ -158,14 +163,16 @@ public:
 
     Q_INVOKABLE uint32_t TlsSetValue(uint32_t dwTlsIndex, uint32_t lpTlsValue)
     {
-        printf("STUB: TlsSetValue %x to %x\n", dwTlsIndex, lpTlsValue);
+        //printf("STUB: TlsSetValue %x to %x\n", dwTlsIndex, lpTlsValue);
+        
+        tls_vals[dwTlsIndex] = lpTlsValue;
     }
 
     Q_INVOKABLE uint32_t TlsGetValue(uint32_t dwTlsIndex)
     {
-        printf("STUB: TlsGetValue %x\n", dwTlsIndex);
+        //printf("STUB: TlsGetValue %x\n", dwTlsIndex);
         
-        return 0;
+        return tls_vals[dwTlsIndex];
     } 
 
     Q_INVOKABLE uint32_t GetCurrentThreadId()
@@ -200,6 +207,21 @@ public:
     Q_INVOKABLE void SetLastError(uint32_t err)
     {
         last_error = err;
+    }
+    
+    Q_INVOKABLE void Sleep(uint32_t ms)
+    {
+        //TODO
+    }
+    
+    Q_INVOKABLE uint32_t CreateThread(uint32_t lpThreadAttributes, uint32_t dwStackSize, uint32_t lpStartAddress, uint32_t lpParameter, uint32_t dwCreationFlags, uint32_t lpThreadId)
+    {
+        printf("STUB: Kernel32::CreateThread %x %x %x %x %x %x\n", lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, dwCreationFlags, lpThreadId);
+        
+        //TODO: run this somehow
+        //vm_call_func(lpStartAddress, lpParameter);
+        
+        return 0xbbbccc;
     }
 
 //    Q_INVOKABLE uint32_t ();

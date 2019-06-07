@@ -64,7 +64,7 @@ public:
 
     Q_INVOKABLE uint32_t SetEntries(void* this_ptr, uint32_t dwFlags, uint32_t dwStartingEntry, uint32_t dwCount, struct ddraw_color* lpEntries)
     {
-        printf("STUB: IDirectDrawPalette::SetEntries\n");
+        printf("STUB: IDirectDrawPalette::SetEntries flags %x start %x cnt %x\n", dwFlags, dwStartingEntry, dwCount);
         
         uint32_t key = real_ptr_to_vm_ptr(this_ptr);
         

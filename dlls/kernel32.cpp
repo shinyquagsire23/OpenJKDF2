@@ -16,13 +16,19 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
 {
     std::deque<fs::path> result;
 
-    for (const auto& p : fs::recursive_directory_iterator(dir))
+    try
     {
-        if (/*fs::is_regular_file(p) && */std::regex_match(p.path().string(), pattern))
+        for (const auto& p : fs::recursive_directory_iterator(dir))
         {
-            //printf("%s\n", p.path().string().c_str());
-            result.push_back(p);
+            if (/*fs::is_regular_file(p) && */std::regex_match(p.path().string(), pattern))
+            {
+                //printf("%s\n", p.path().string().c_str());
+                result.push_back(p);
+            }
         }
+    }
+    catch (...)
+    {
     }
     
     return result;
@@ -271,6 +277,12 @@ uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpF
     //TODO: filenames are insensitive, but paths aren't
     printf("searching for %s\n", linux_path.c_str());
     auto files = file_search(fs::path(linux_path).parent_path(), std::regex(regex_str.c_str(), std::regex_constants::icase));
+    
+    if (!files.size())
+    {
+        last_error = ERROR_FILE_NOT_FOUND;
+        return INVALID_HANDLE_VALUE;
+    }
         
     //TODO errors
         
@@ -418,6 +430,11 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
 uint32_t Kernel32::CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes)
 {
     printf("STUB: Create Dir %s\n", lpPathName);
+    
+    std::string linux_path = std::regex_replace(std::string(lpPathName), std::regex("\\\\"), "/");
+    linux_path = std::regex_replace(linux_path, std::regex("//"), "");
+    
+    fs::create_directories(linux_path);
     return 1;
 }
 

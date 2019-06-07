@@ -12,11 +12,15 @@
 #define DDPF_PALETTEINDEXED8 0x20
 #define DDPF_RGB             0x40
 
-#define DDSCAPS_BACKBUFFER 0x4
-#define DDSCAPS_COMPLEX 0x00000008
-#define DDSCAPS_PRIMARYSURFACE 0x200
-#define DDSCAPS_TEXTURE 0x00001000
-#define DDSCAPS_MIPMAP  0x00400000
+#define DDSCAPS_BACKBUFFER         0x00000004
+#define DDSCAPS_COMPLEX            0x00000008
+#define DDSCAPS_PALETTE            0x00000100
+#define DDSCAPS_PRIMARYSURFACE     0x00000200
+#define DDSCAPS_PRIMARYSURFACELEFT 0x00000400
+#define DDSCAPS_SYSTEMMEMORY       0x00000800
+#define DDSCAPS_TEXTURE            0x00001000
+#define DDSCAPS_VIDEOMEMORY        0x00004000
+#define DDSCAPS_MIPMAP             0x00400000
 
 #define DDSD_CAPS           0x00000001
 #define DDSD_HEIGHT         0x00000002
@@ -130,6 +134,25 @@ struct DDCAPS
   uint32_t dwReserved6;
 };
 
+struct ddsurface_ext
+{
+    uint32_t lpVtbl;
+    uint32_t unk;
+    DDSURFACEDESC desc;
+    vm_ptr<struct d3dtex_ext*> tex;
+    DDSURFACEDESC locked_desc;
+    uint32_t alloc;
+    uint32_t palette;
+};
+
+struct d3dtex_ext
+{
+    uint32_t lpVtbl;
+    uint32_t padding[0x200/4];
+    vm_ptr<struct ddsurface_ext*> parent_surface;
+    uint32_t handle;
+};
+
 class IDirectDraw4 : public QObject
 {
 Q_OBJECT
@@ -196,13 +219,21 @@ public:
         
         *lpDDSurface = CreateInterfaceInstance("IDirectDrawSurface3", 200); //4
         
-        uint32_t* ext = (uint32_t*)vm_ptr_to_real_ptr(*lpDDSurface);
-        memcpy(&ext[2], desc, sizeof(DDSURFACEDESC));
+        struct ddsurface_ext* ext = (struct ddsurface_ext*)vm_ptr_to_real_ptr(*lpDDSurface);
+        ext->desc = *desc;
         desc->lPitch = desc->dwWidth;
+        
+        //if (!desc->dwWidth)
+        //    desc->lPitch = 256;
+        
+        printf("%ux%u %x %x %x\n", desc->dwWidth, desc->dwHeight, desc->lPitch, desc->ddsCaps, desc->ddpfPixelFormat.dwFlags);
+        
+        ext->tex = {CreateInterfaceInstance("IDirect3DTexture", 200)}; //TODO memleaks, use this
+        ext->tex->parent_surface = {*lpDDSurface};
 
         if (!(desc->ddsCaps & DDSCAPS_TEXTURE))
         {
-            lpDDSurface[1] = CreateInterfaceInstance("IDirect3DTexture", 200);
+            lpDDSurface[1] = ext->tex.raw_vm_ptr;
             
         }
         //printf("thing %x %x %x\n", lpDDSurface[0], lpDDSurface[1], desc->ddsCaps);
@@ -250,6 +281,19 @@ public:
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
+        
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1920;
+            desc->dwHeight = 1080;
+            desc->lPitch = 1920;
+            desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
+
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
 #if 0        
         {
             vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
@@ -276,6 +320,45 @@ public:
             desc->dwWidth = 640;
             desc->dwHeight = 480;
             desc->lPitch = 640;
+            desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
+            
+            desc->ddpfPixelFormat.dwRGBBitCount = 16;
+            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+            desc->ddpfPixelFormat.dwRBitMask = 0xF800;
+            desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
+            desc->ddpfPixelFormat.dwBBitMask = 0x001F;
+            
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+        
+#if 0
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1280;
+            desc->dwHeight = 1024;
+            desc->lPitch = 1280;
+            desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
+            
+            desc->ddpfPixelFormat.dwRGBBitCount = 16;
+            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+            desc->ddpfPixelFormat.dwRBitMask = 0xF800;
+            desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
+            desc->ddpfPixelFormat.dwBBitMask = 0x001F;
+            
+            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+#endif
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1920;
+            desc->dwHeight = 1080;
+            desc->lPitch = 0x1000;
             desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
             
             desc->ddpfPixelFormat.dwRGBBitCount = 16;
@@ -372,15 +455,20 @@ public:
     
     Q_INVOKABLE uint32_t WaitForVerticalBlank(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
+        //printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
         
         return 0;
     }
 
     /*** IDirectDraw2 methods ***/
-    Q_INVOKABLE void GetAvailableVidMem(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
+    Q_INVOKABLE uint32_t GetAvailableVidMem(void* this_ptr, uint32_t caps, uint32_t* total, uint32_t* free)
     {
         printf("STUB: IDirectDraw4::GetAvailableVidMem\n");
+        
+        *total = 0x8000000;
+        *free = 0x8000000;
+        
+        return 0;
     }
 
     /*** IDirectDraw4 methods ***/

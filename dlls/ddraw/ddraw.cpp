@@ -35,7 +35,7 @@ uint32_t DDraw::DirectDrawCreate(uint8_t* lpGUID, uint32_t* lplpDD, void* pUnkOu
     
     *lplpDD = CreateInterfaceInstance("IDirectDraw4", 200);
     
-    return 0; // TODO: 0 for 3D stuff
+    return this->force_error; // TODO: 0 for 3D stuff
 }
 
 /*uint32_t DDraw::(uint32_t )

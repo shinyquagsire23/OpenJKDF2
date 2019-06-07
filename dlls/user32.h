@@ -337,6 +337,17 @@ public:
         printf("STUB: SetWindowLong(%x, %x, %x)\n", hWnd, nIndex, dwNewLong);
         return 1;
     }
+    
+    Q_INVOKABLE uint32_t SetCapture(uint32_t hWnd)
+    {
+        printf("STUB: User32::SetCapture %x\n", hWnd);
+        return GetActiveWindow();
+    }
+    
+    Q_INVOKABLE uint32_t ReleaseCapture()
+    {
+        return 1;
+    }
 //    Q_INVOKABLE uint32_t ();
 };
 

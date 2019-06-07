@@ -3,16 +3,16 @@
 #include "main.h"
 #include "vm.h"
 
-uint32_t load_executable(uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size)
+uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size)
 {
     struct DosHeader dosHeader;
     struct COFFHeader coffHeader;
     struct PEOptHeader peHeader;
     
-    FILE *f = fopen("JK.EXE", "rb");
+    FILE *f = fopen(path, "rb");
     if (!f)
     {
-        printf("Failed to open JK.EXE, exiting\n");
+        printf("Failed to open %s, exiting\n", path);
         return -1;
     }
     

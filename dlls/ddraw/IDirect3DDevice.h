@@ -5,8 +5,10 @@
 #include <QObject>
 #include "dlls/kernel32.h"
 #include "vm.h"
+#include "main.h"
 #include "dlls/winutils.h"
 #include "dlls/ddraw/IDirectDraw4.h"
+#include "dlls/ddraw/IDirect3DExecuteBuffer.h"
 
 class IDirect3DDevice : public QObject
 {
@@ -34,6 +36,8 @@ public:
     {
         printf("STUB: IDirect3DDevice::Release\n");
         
+        idirect3dexecutebuffer->free_resources();
+        
         GlobalRelease(this_ptr);
     }
     
@@ -59,9 +63,11 @@ public:
         return 0;
     }
 
-    Q_INVOKABLE uint32_t CreateExecuteBuffer(void* this_ptr, uint32_t desc, uint32_t* lpDirect3DExecuteBuffer, uint32_t pUnkOuter)
+    Q_INVOKABLE uint32_t CreateExecuteBuffer(void* this_ptr, struct D3DEXECUTEBUFFERDESC* desc, uint32_t* lpDirect3DExecuteBuffer, uint32_t pUnkOuter)
     {
         printf("STUB:: IDirect3DDevice::CreateExecuteBuffer\n");
+        
+        printf("desc size %x, flags %x, caps %x, buffer size %x, buf %x\n", desc->dwSize, desc->dwFlags, desc->dwCaps, desc->dwBufferSize, desc->lpData);
 
         *lpDirect3DExecuteBuffer = CreateInterfaceInstance("IDirect3DExecuteBuffer", 200);
 
@@ -77,7 +83,7 @@ public:
 
     Q_INVOKABLE uint32_t Execute(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
     {
-        printf("STUB:: IDirect3DDevice::Execute\n");
+        //printf("STUB:: IDirect3DDevice::Execute\n");
 
         return 0;
     }
@@ -137,7 +143,7 @@ public:
         desc->ddpfPixelFormat.dwRBitMask = 0x7C00;
         desc->ddpfPixelFormat.dwGBitMask = 0x03E0;
         desc->ddpfPixelFormat.dwBBitMask = 0x001F;
-        desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0x0;
+        desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0x8000;
         vm_call_func(callback, desc_ptr, pUnkOuter);
         
         /* B5G5R5A1_UNORM */
@@ -149,7 +155,7 @@ public:
         desc->ddpfPixelFormat.dwBBitMask = 0x001F;
         desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0x8000;
         vm_call_func(callback, desc_ptr, pUnkOuter);
-        
+#if 0        
         /* B4G4R4A4_UNORM */
         desc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
         desc->ddpfPixelFormat.dwFourCC = 0;
@@ -159,7 +165,7 @@ public:
         desc->ddpfPixelFormat.dwBBitMask = 0x000F;
         desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0xF000;
         vm_call_func(callback, desc_ptr, pUnkOuter);
-        
+
         /* B5G6R5_UNORM */
         desc->ddpfPixelFormat.dwFlags = DDPF_RGB;
         desc->ddpfPixelFormat.dwFourCC = 0;
@@ -208,7 +214,7 @@ public:
         desc->ddpfPixelFormat.dwGBitMask = 0x00;
         desc->ddpfPixelFormat.dwBBitMask = 0x00;
         vm_call_func(callback, desc_ptr, pUnkOuter);
-        
+#endif    
         kernel32->VirtualFree(desc_ptr, 0, 0);
 
         return 0;
@@ -244,14 +250,15 @@ public:
 
     Q_INVOKABLE uint32_t BeginScene(void* this_ptr)
     {
-        printf("STUB:: IDirect3DDevice::BeginScene\n");
+        gdi32->gdi_render = false;
+        idirect3dexecutebuffer->init_resources();
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t EndScene(void* this_ptr)
     {
-        printf("STUB:: IDirect3DDevice::EndScene\n");
+   	    SDL_GL_SwapWindow(displayWindow);
 
         return 0;
     }

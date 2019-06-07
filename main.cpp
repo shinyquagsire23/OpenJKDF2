@@ -9,6 +9,9 @@
 #include <QMetaMethod>
 #include <QDebug>
 
+#include <GL/glew.h>
+#include "SDL2/SDL_mixer.h"
+
 #include "dlls/kernel32.h"
 #include "dlls/user32.h"
 #include "dlls/gdi32.h"
@@ -165,9 +168,38 @@ static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
     uc_print_regs(uc);
 }
 
+int sdl_audio_mix(void* audio, uint32_t len, int32_t vol)
+{
+    Mix_Chunk chunk;
+    
+    chunk.allocated = 0;
+    chunk.abuf = (uint8_t*)audio;
+    chunk.alen = len;
+    chunk.volume = (uint8_t)(128.0 - ((float)vol * 128.0f/-10000.0f));
+    
+    return Mix_PlayChannel(-1, &chunk, 0);
+}
+
+void sdl_audio_halt(int channel)
+{
+    Mix_HaltChannel(channel);
+}
+
 int main(int argc, char **argv, char **envp)
 {
     struct vm_inst vm;
+    
+    if (argc < 2)
+    {
+        printf("Usage: %s [options] <to_run.exe>\n", argv[0]);
+        printf("\n");
+        printf("Options:\n");
+        printf("-forceswrend        Sets DirectDrawCreate to error, forcing GDI32 rendering\n");
+        printf("-nojk               Disable JK.EXE hacks\n");
+        return 0;
+    }
+    
+    char* exe_path = argv[argc-1];
 
     // Set up DLL classes
     kernel32 = new Kernel32();
@@ -226,7 +258,7 @@ int main(int argc, char **argv, char **envp)
     dll_store["IDirectInputA"] = (QObject*)idirectinputa;
     dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     dll_store["smackw32.DLL"] = (QObject*)smackw32;
-    dll_store["JK"] = (QObject*)jk;
+    dll_store["JK.EXE"] = (QObject*)jk;
     
     interface_store["IDirect3D3"] = (QObject*)idirect3d3;
     interface_store["IDirect3DDevice"] = (QObject*)idirect3ddevice;
@@ -249,9 +281,31 @@ int main(int argc, char **argv, char **envp)
     // Init SDL
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
-    SDL_CreateWindowAndRenderer(640, 480, 0, &displayWindow, &displayRenderer);
+    SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	if (SDL_GL_CreateContext(displayWindow) == NULL) {
+		return EXIT_FAILURE;
+	}
+	
+	if (Mix_OpenAudio(11025, AUDIO_S16SYS, 1, 1024) < 0)
+	{
+	    return EXIT_FAILURE;
+	}
+	
+	SDL_PauseAudio(0);
+
+	GLenum glew_status = glewInit();
+	if (glew_status != GLEW_OK) {
+		return -1;
+	}
+	if (!GLEW_VERSION_2_0) {
+		return -1;
+	}
     
     printf("Caching functions\n");
     for (auto obj_pair : dll_store)
@@ -269,17 +323,62 @@ int main(int argc, char **argv, char **envp)
 
     // Map hook mem
     next_hook = 0xd0000000;
-    uint32_t start_addr = load_executable(&image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
+    uint32_t start_addr = load_executable(exe_path, &image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
+    
+    // Parse arguments
+    bool no_jk_hax = false;
+    bool do_memdump = false;
+    for (int i = 1; i < argc-1; i++)
+    {
+        if (!strcmp(argv[i], "-forceswrend"))
+        {
+            ddraw->force_error = 1;
+        }
+        
+        if (!strcmp(argv[i], "-notjk"))
+        {
+            no_jk_hax = true;
+        }
+        
+        if (!strcmp(argv[i], "-memdump"))
+        {
+            do_memdump = true;
+        }
+    }
     
     // Hook JK
-    jk->hook();
+    if (!no_jk_hax)
+        jk->hook();
 
     register_import("dummy", "dummy", 0);
     //uc_hook trace;
     //uc_hook_add(uc, &trace, UC_HOOK_CODE, (void*)hook_test, nullptr, 0x426838, 0x426838);
+    
+    
 
     vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
     //uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
+
+    if (do_memdump)
+    {
+        FILE* dump1 = fopen("heap_dump.bin", "wb");
+        fwrite(kernel32->heap_mem, kernel32->heap_size_actual, 1, dump1);
+        fclose(dump1);
+        
+        FILE* dump2 = fopen("mem_dump.bin", "wb");
+        fwrite(image_mem, image_mem_size, 1, dump2);
+        fclose(dump2);
+        
+        FILE* dump3 = fopen("stack_dump.bin", "wb");
+        fwrite(image_mem + image_mem_size, stack_size, 1, dump3);
+        fclose(dump3);
+        
+        FILE* dump4 = fopen("virt_dump.bin", "wb");
+        fwrite(kernel32->virtual_mem, kernel32->virtual_size_actual, 1, dump4);
+        fclose(dump4);
+    }
+    
+    Mix_CloseAudio();
 
     return 0;
 }

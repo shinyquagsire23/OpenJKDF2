@@ -122,7 +122,7 @@ struct vm_ptr
 
     vm_ptr<T> operator=(const T& other) // copy assignment
     {
-        printf("assigned to %x\n", other);
+        //printf("assigned to %x\n", other);
 
         // handle nullptr assignment
         if (other == 0)

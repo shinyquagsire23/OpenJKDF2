@@ -311,7 +311,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
     }
 
     if (ioctl(vcpu_fd, KVM_GET_REGS, &regs) < 0) {
-        perror("KVM_GET_REGSs");
+        perror("KVM_GET_REGS");
         exit(1);
     }
 
@@ -386,7 +386,7 @@ bool initialized = false;
 
 uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
-    printf("KVM run %x\n", start_addr);
+    //printf("KVM run %x\n", start_addr);
     
     // Save state
     if (current_kvm)
@@ -441,12 +441,12 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
     
     if (ioctl(vcpu_fd, KVM_SET_SREGS, &current_kvm->vcpu.sregs) < 0) {
         perror("KVM_SET_SREGS");
-        exit(1);
+        //exit(1);
     }
     
     if (ioctl(vcpu_fd, KVM_SET_REGS, &current_kvm->vcpu.regs) < 0) {
         perror("KVM_SET_REGS");
-        exit(1);
+        //exit(1);
     }
     
     return eax;

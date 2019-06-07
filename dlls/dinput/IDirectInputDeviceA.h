@@ -8,6 +8,8 @@
 #include "dlls/nmm.h"
 #include "dlls/user32.h"
 
+#include "dlls/dinput/IDirectInputA.h"
+
 /****************************************************************************
  *
  *      DirectInput keyboard scan codes
@@ -411,13 +413,16 @@ struct DIDEVICEOBJECTDATA {
     uint32_t  dwSequence;
 };
 
+extern uint8_t keyboard_arr[256];
+
 class IDirectInputDeviceA : public QObject
 {
 Q_OBJECT
 
 public:
+    InputDeviceType devicetype;
 
-    Q_INVOKABLE IDirectInputDeviceA() {}
+    Q_INVOKABLE IDirectInputDeviceA() : devicetype(InputDeviceType_None) {}
 
     /*** Base ***/
     Q_INVOKABLE void QueryInterface(void* this_ptr, uint32_t a, uint32_t b){}
@@ -425,49 +430,83 @@ public:
     Q_INVOKABLE void Release(void* this_ptr){}
     
     /*** IDirectInputDevice ***/
-    Q_INVOKABLE void GetCapabilities(void *this_ptr, void* LPDIDEVCAPS)
+    Q_INVOKABLE void GetCapabilities(dinputdevice_ext* obj, void* LPDIDEVCAPS)
     {
         printf("STUB: IDirectInputDeviceA::GetCapabilities\n");
     }
     
-    Q_INVOKABLE void EnumObjects(void *this_ptr, void* LPDIENUMDEVICEOBJECTSCALLBACKA, void* b, uint32_t c)
+    Q_INVOKABLE void EnumObjects(dinputdevice_ext* obj, void* LPDIENUMDEVICEOBJECTSCALLBACKA, void* b, uint32_t c)
     {
         printf("STUB: IDirectInputDeviceA::GetProperty\n");
     }
     
-    Q_INVOKABLE void GetProperty(void *this_ptr, uint8_t* refGUID, void* LPDIPROPHEADER)
+    Q_INVOKABLE void GetProperty(dinputdevice_ext* obj, uint8_t* refGUID, void* LPDIPROPHEADER)
     {
         printf("STUB: IDirectInputDeviceA::\n");
     }
     
-    Q_INVOKABLE void SetProperty(void *this_ptr, uint8_t* refGUID, void* LPCDIPROPHEADER)
+    Q_INVOKABLE uint32_t SetProperty(dinputdevice_ext* obj, uint8_t* refGUID, void* LPCDIPROPHEADER)
     {
         printf("STUB: IDirectInputDeviceA::SetProperty\n");
+        
+        return DI_OK;
     }
     
-    Q_INVOKABLE void Acquire(void* this_ptr)
+    Q_INVOKABLE uint32_t Acquire(dinputdevice_ext* obj)
     {
         printf("STUB: IDirectInputDeviceA::Acquire\n");
+        
+        return DI_OK;
     }
     
-    Q_INVOKABLE void Unacquire(void* this_ptr)
+    Q_INVOKABLE uint32_t Unacquire(dinputdevice_ext* obj)
     {
         printf("STUB: IDirectInputDeviceA::Unacquire\n");
-    }
-    
-    Q_INVOKABLE void GetDeviceState(void *this_ptr, uint32_t num, void* out)
-    {
-        printf("STUB: IDirectInputDeviceA::GetDeviceState\n");
-    }
-    
-    Q_INVOKABLE uint32_t GetDeviceData(void *this_ptr, uint32_t cgObjectData, struct DIDEVICEOBJECTDATA* rgdod, uint32_t* pdwInOut, uint32_t dwFlags)
-    {
-        printf("STUB: IDirectInputDeviceA::GetDeviceData %p\n", rgdod);
         
-        if (!rgdod)
+        return DI_OK;
+    }
+    
+    Q_INVOKABLE uint32_t GetDeviceState(dinputdevice_ext* obj, uint32_t cbData, void* lpvData)
+    {
+        //printf("STUB: IDirectInputDeviceA::GetDeviceState (%s)\n", obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        
+        memset(lpvData, 0, cbData);
+        if (obj->type == InputDeviceType_Keyboard)
+        {
+            uint8_t* keys = (uint8_t*)lpvData;
+
+            /*while (user32->keystate_changed.size())
+            {
+                auto change = user32->keystate_changed.front();
+                
+                int scancode = change.first;
+                bool state = change.second;
+                
+                keyboard_arr[sdltodx[scancode]] = state ? 1 : 0;
+                
+                user32->keystate_changed.pop();
+            }*/
+            
+            memcpy(keys, keyboard_arr, cbData);
+            
+            return 0;
+        }
+        else if (obj->type == InputDeviceType_Mouse)
+        {
+            //TODO
+        }
+        
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetDeviceData(dinputdevice_ext* obj, uint32_t cgObjectData, struct DIDEVICEOBJECTDATA* rgdod, uint32_t* pdwInOut, uint32_t dwFlags)
+    {
+        //printf("STUB: IDirectInputDeviceA::GetDeviceData %p (%s)\n", rgdod, obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        
+        if (!rgdod || obj->type == InputDeviceType_Mouse)
         {
             *pdwInOut = 0;
-            return 0;
+            return DI_OK;
         }
         
         int written = 0;
@@ -483,46 +522,52 @@ public:
             rgdod[i].dwData = state ? 1 : 0;
             rgdod[i].dwTimeStamp = nmm->timeGetTime();
             
+            keyboard_arr[sdltodx[scancode]] = state ? 1 : 0;
+            
             user32->keystate_changed.pop();
         }
         
-        printf("%x changes\n", written);
+        //printf("%x changes\n", written);
         
         *pdwInOut = written;
         return 1;
     }
     
-    Q_INVOKABLE void SetDataFormat(void *this_ptr, void* LPCDIDATAFORMAT)
+    Q_INVOKABLE uint32_t SetDataFormat(dinputdevice_ext* obj, void* LPCDIDATAFORMAT)
     {
         printf("STUB: IDirectInputDeviceA::SetDataFormat\n");
+        
+        return DI_OK;
     }
     
-    Q_INVOKABLE void SetEventNotification(void *this_ptr, uint32_t HANDLE)
+    Q_INVOKABLE void SetEventNotification(dinputdevice_ext* obj, uint32_t HANDLE)
     {
         printf("STUB: IDirectInputDeviceA::SetEventNotification\n");
     }
     
-    Q_INVOKABLE void SetCooperativeLevel(void *this_ptr, uint32_t hWnd, uint32_t c)
+    Q_INVOKABLE uint32_t SetCooperativeLevel(dinputdevice_ext* obj, uint32_t hWnd, uint32_t c)
     {
         printf("STUB: IDirectInputDeviceA::SetCooperativeLevel\n");
+        
+        return DI_OK;
     }
     
-    Q_INVOKABLE void GetObjectInfo(void *this_ptr, void* LPDIDEVICEOBJECTINSTANCEA, uint32_t b, uint32_t c)
+    Q_INVOKABLE void GetObjectInfo(dinputdevice_ext* obj, void* LPDIDEVICEOBJECTINSTANCEA, uint32_t b, uint32_t c)
     {
         printf("STUB: IDirectInputDeviceA::GetObjectInfo\n");
     }
     
-    Q_INVOKABLE void GetDeviceInfo(void *this_ptr, void* LPDIDEVICEINSTANCEA)
+    Q_INVOKABLE void GetDeviceInfo(dinputdevice_ext* obj, void* LPDIDEVICEINSTANCEA)
     {
         printf("STUB: IDirectInputDeviceA::GetDeviceInfo\n");
     }
     
-    Q_INVOKABLE void RunControlPanel(void *this_ptr, uint32_t hWnd, uint32_t a)
+    Q_INVOKABLE void RunControlPanel(dinputdevice_ext* obj, uint32_t hWnd, uint32_t a)
     {
         printf("STUB: IDirectInputDeviceA::RunControlPanel\n");
     }
     
-    Q_INVOKABLE void Initialize(void *this_ptr, uint32_t hInst, uint32_t a, uint8_t* refGUID)
+    Q_INVOKABLE void Initialize(dinputdevice_ext* obj, uint32_t hInst, uint32_t a, uint8_t* refGUID)
     {
         printf("STUB: IDirectInputDeviceA::Initialize\n");
     }

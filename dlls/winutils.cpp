@@ -21,6 +21,8 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
     vm_ptr<uint32_t*> imem = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
     vm_ptr<uint32_t*> vtable = {kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0)};
     
+    memset(imem.translated(), 0, 0x1000);
+    
     for (int i = 0; i < num_funcs; i++)
     {
         if (interface_store[name])
@@ -47,7 +49,9 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
     }
     
     vm_sync_imports();
-    
+
+    printf("%s vtable %x, obj %x\n", name.c_str(), vtable.raw_vm_ptr, imem.raw_vm_ptr);
+
     *imem.translated() = vtable.raw_vm_ptr;
     return imem.raw_vm_ptr;
 }

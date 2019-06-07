@@ -253,7 +253,8 @@ void vm_process_import(ImportTracker* import)
     uint32_t ret_addr;
     vm_stack_pop(&ret_addr, 1);
     
-    //printf("Hit import %s, ret %x\n", import->name.c_str(), ret_addr);
+    //if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
+        //printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
 
     if (import->obj)
     {
@@ -341,7 +342,8 @@ void vm_process_import(ImportTracker* import)
     }
     else
     {
-        printf("Import %s from %s doesn't have impl, exiting\n", import->name.c_str(), import->dll.c_str());
+        if (import->name != "dummy")
+            printf("Import %s from %s doesn't have impl, exiting\n", import->name.c_str(), import->dll.c_str());
         vm_stop();
         return;
     }

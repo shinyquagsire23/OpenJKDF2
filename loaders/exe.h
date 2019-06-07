@@ -127,6 +127,6 @@ struct ImportDesc {
 #define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT	    13
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR	14
 
-uint32_t load_executable(uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size);
+uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size);
 
 #endif // EXE_H

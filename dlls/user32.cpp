@@ -185,30 +185,289 @@ void handleTouchEvent(SDL_TouchFingerEvent* event)
     }
 }*/
 
+const uint8_t sdltouser32[256] =
+{
+    0,
+    0,
+    0,
+    0,
+    0x41,
+    0x42,
+    0x43,
+    0x44,
+    0x45,
+    0x46,
+    0x47,
+    0x48,
+    0x49,
+    0x4A,
+    0x4B,
+    0x4C,
+    0x4D,
+    0x4E,
+    0x4F,
+    0x50,
+    0x51,
+    0x52,
+    0x53,
+    0x54,
+    0x55,
+    0x56,
+    0x57,
+    0x58,
+    0x59,
+    0x5A,
+
+    0x31,
+    0x32,
+    0x33,
+    0x34,
+    0x35,
+    0x36,
+    0x37,
+    0x38,
+    0x39,
+    0x30,
+
+    0x0D,
+    0x1B,
+    0x08,
+    0x09,
+    0x20,
+
+    0xBD,
+    0,
+    0,//LBRACKET,
+    0,//RBRACKET,
+    0,//BACKSLASH,
+    0,
+    0,//SEMICOLON,
+    0,//APOSTROPHE,
+    0,//GRAVE,
+    0,//COMMA,
+    0,//PERIOD,
+    0,//SLASH,
+
+    0,//CAPITAL,
+
+    0x70,//F1,
+    0x71,//F2,
+    0x72,//F3,
+    0x73,//F4,
+    0x74,//F5,
+    0x75,//F6,
+    0x76,//F7,
+    0x77,//F8,
+    0x78,//F9,
+    0x79,//F10,
+    0x7A,//F11,
+    0x7B,//F12,
+
+    0,//PRINTSCREEN,
+    0,//SCROLL,
+    0,//PAUSE,
+    0,//INSERT,
+    0,//HOME,
+    0,//PRIOR,
+    0,//DELETE,
+    0,//END,
+    0,//NEXT,
+    0x27,//RIGHT,
+    0x25,//LEFT,
+    0x28,//DOWN,
+    0x26,//UP,
+
+    0,//NUMLOCKCLEAR,
+    0,//DIVIDE,
+    0,//MULTIPLY,
+    0,//SUBTRACT,
+    0,//ADD,
+    0,//NUMPADENTER,
+    0,//NUMPAD1,
+    0,//NUMPAD2,
+    0,//NUMPAD3,
+    0,//NUMPAD4,
+    0,//NUMPAD5,
+    0,//NUMPAD6,
+    0,//NUMPAD7,
+    0,//NUMPAD8,
+    0,//NUMPAD9,
+    0,//NUMPAD0,
+    0,//DECIMAL,
+
+    0,//BACKSLASH,
+    0,//APPLICATION,
+    0,//POWER,
+    0,//NUMPADEQUALS,
+    0x7C,//F13,
+    0x7D,//F14,
+    0x7E,//F15,
+    0x7F,//F16,
+    0x80,//F17,
+    0x81,//F18,
+    0x82,//F19,
+    0x83,//F20,
+    0x84,//F21,
+    0x85,//F22,
+    0x86,//F23,
+    0x87,//F24,
+    0,//EXECUTE,
+    0,//HELP,
+    0,//MENU,
+    0,//SELECT,
+    0,//STOP,
+    0,//AGAIN,
+    0,//UNDO,
+    0,//CUT,
+    0,//COPY,
+    0,//PASTE,
+    0,//FIND,
+    0,//MUTE,
+    0,//VOLUMEUP,
+    0,//VOLUMEDOWN,
+    0,
+    0,
+    0,
+    0,//NUMPADCOMMA,
+    0,//NUMPADEQUALS,
+
+    0,//INTERNATIONAL1,
+    0,//INTERNATIONAL2,
+    0,//INTERNATIONAL3,
+    0,//INTERNATIONAL4,
+    0,//INTERNATIONAL5,
+    0,//INTERNATIONAL6,
+    0,//INTERNATIONAL7,
+    0,//INTERNATIONAL8,
+    0,//INTERNATIONAL9,
+    0,//LANG1,
+    0,//LANG2,
+    0,//LANG3,
+    0,//LANG4,
+    0,//LANG5,
+    0,//LANG6,
+    0,//LANG7,
+    0,//LANG8,
+    0,//LANG9,
+
+    0,//ALTERASE,
+    0,//SYSREQ,
+    0,//CANCEL,
+    0,//CLEAR,
+    0,//PRIOR,
+    0,//RETURN2,
+    0,//SEPARATOR,
+    0,//OUT,
+    0,//OPER,
+    0,//CLEARAGAIN,
+    0,//CRSEL,
+    0,//EXSEL,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,//KP_00,
+    0,//KP_000,
+    0,//THOUSANDSSEPARATOR,
+    0,//DECIMALSEPARATOR,
+    0,//CURRENCYUNIT,
+    0,//CURRENCYSUBUNIT,
+    0,//KP_LEFTPAREN,
+    0,//KP_RIGHTPAREN,
+    0,//KP_LEFTBRACE,
+    0,//KP_RIGHTBRACE,
+    0,//KP_TAB,
+    0,//KP_BACKSPACE,
+    0,//KP_A,
+    0,//KP_B,
+    0,//KP_C,
+    0,//KP_D,
+    0,//KP_E,
+    0,//KP_F,
+    0,//KP_XOR,
+    0,//KP_POWER,
+    0,//KP_PERCENT,
+    0,//KP_LESS,
+    0,//KP_GREATER,
+    0,//KP_AMPERSAND,
+    0,//KP_DBLAMPERSAND,
+    0,//KP_VERTICALBAR,
+    0,//KP_DBLVERTICALBAR,
+    0,//KP_COLON,
+    0,//KP_HASH,
+    0,//KP_SPACE,
+    0,//KP_AT,
+    0,//KP_EXCLAM,
+    0,//KP_MEMSTORE,
+    0,//KP_MEMRECALL,
+    0,//KP_MEMCLEAR,
+    0,//KP_MEMADD,
+    0,//KP_MEMSUBTRACT,
+    0,//KP_MEMMULTIPLY,
+    0,//KP_MEMDIVIDE,
+    0,//KP_PLUSMINUS,
+    0,//KP_CLEAR,
+    0,//KP_CLEARENTRY,
+    0,//KP_BINARY,
+    0,//KP_OCTAL,
+    0,//KP_DECIMAL,
+    0,//KP_HEXADECIMAL,
+    0,
+    0,
+    0,//LCONTROL,
+    0,//LSHIFT,
+    0,//LMENU,
+    0,//LGUI,
+    0,//RCONTROL,
+    0,//RSHIFT,
+    0,//RMENU,
+    0,//RGUI,
+};
+
 /* function to handle key press events */
 void handleKey(SDL_Keysym *keysym, int msg, uint32_t lpMask)
 {
     user32->keystate_changed.push(std::pair<int, bool>(keysym->scancode, msg == WM_KEYDOWN ? true : false));
-    switch (keysym->sym)
+    
+    if (sdltouser32[keysym->scancode])
     {
-        case SDLK_ESCAPE:
-            user32->SendMessage(user32->GetActiveWindow(), msg, 0x1B, lpMask | keysym->scancode << 16);
-        break;
+        user32->SendMessage(user32->GetActiveWindow(), msg, sdltouser32[keysym->scancode], lpMask | keysym->scancode << 16);
         
-        case SDLK_RETURN:
-            user32->SendMessage(user32->GetActiveWindow(), msg, 0xD, lpMask | keysym->scancode << 16);
-        break;
-        
-        case SDLK_DOWN:
-            user32->SendMessage(user32->GetActiveWindow(), msg, 0x28, lpMask | keysym->scancode << 16);
-        break;
-        
-        case SDLK_UP:
-            user32->SendMessage(user32->GetActiveWindow(), msg, 0x26, lpMask | keysym->scancode << 16);
-        break;
-        
-        default:
-        break;
+        if (msg == WM_KEYDOWN)
+        {
+            char val = SDL_GetKeyName(keysym->sym)[0];
+            switch (keysym->sym)
+            {
+                case SDLK_BACKSPACE:
+                    val = 0x8;
+                    break;
+                case SDLK_RETURN:
+                case SDLK_RETURN2:
+                    val = keysym->mod & KMOD_SHIFT ? 0xA : 0xD;
+                    break;
+                case SDLK_ESCAPE:
+                    val = 0x1B;
+                    break;
+                case SDLK_TAB:
+                    val = 0x9;
+                    break;
+                    
+                case SDLK_SPACE:
+                    val = ' ';
+                    break;
+                default:
+                    val = SDL_GetKeyName(keysym->sym)[0];
+                    break;
+            }
+            user32->SendMessage(user32->GetActiveWindow(), WM_CHAR, val, lpMask | keysym->scancode << 16);
+        }
     }
     return;
 }
@@ -347,7 +606,7 @@ uint32_t User32::DispatchMessageA(struct tagMSG* lpMsg)
 
 uint32_t User32::DefWindowProcA(uint32_t hWnd, uint32_t msg, uint32_t wParam, uint32_t lParam)
 {
-    printf("STUB: DefWindowProcA(0x%04x, 0x%08x, 0x%04x, 0x%08x)\n", hWnd, msg, wParam, lParam);
+    //printf("STUB: DefWindowProcA(0x%04x, 0x%08x, 0x%04x, 0x%08x)\n", hWnd, msg, wParam, lParam);
 
     return 1;
 }

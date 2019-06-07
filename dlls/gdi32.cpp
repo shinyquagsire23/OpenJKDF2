@@ -63,7 +63,7 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
 {
     if (!dc_fbufs[hdc]) return 1;
 
-    printf("STUB: BitBlt hdc %x, x %i, y %i, cx %i, cy %i, hdcSrc %x, x1 %i, y1 %i, rop %x\n", hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
+    //printf("STUB: BitBlt hdc %x, x %i, y %i, cx %i, cy %i, hdcSrc %x, x1 %i, y1 %i, rop %x\n", hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
     
     if (gdi_render)
     {    
@@ -73,6 +73,7 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
         SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, dc_surface[hdc]);
         SDL_RenderClear(displayRenderer);
         SDL_RenderCopy(displayRenderer, texture, NULL, NULL);
+        //SDL_UpdateWindowSurface(displayWindow);
         SDL_RenderPresent(displayRenderer);
         SDL_DestroyTexture(texture);
     }
@@ -136,7 +137,7 @@ uint32_t Gdi32::DeleteDC(uint32_t hdc)
 
 uint32_t Gdi32::GetSystemPaletteEntries(uint32_t hdc, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries)
 {
-    printf("STUB: Gdi32::GetSystemPaletteEntries\n");
+    printf("STUB: Gdi32::GetSystemPaletteEntries hdc %x start %x cnt %x\n", hdc, iStart, cEntries);
     
     return cEntries;
 }

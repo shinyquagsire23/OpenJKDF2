@@ -6,6 +6,9 @@
 #include "dlls/kernel32.h"
 #include "vm.h"
 #include "dlls/winutils.h"
+#include "main.h"
+#include "dlls/ddraw/IDirect3D3.h"
+#include "dlls/ddraw/IDirect3DExecuteBuffer.h"
 
 class IDirect3DViewport : public QObject
 {
@@ -39,126 +42,131 @@ public:
     /* IDirect3DViewport methods */
     Q_INVOKABLE uint32_t Initialize(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::Initialize\n");
+        printf("STUB:: IDirect3DViewport::Initialize\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t GetViewport(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::GetViewport\n");
+        printf("STUB:: IDirect3DViewport::GetViewport\n");
 
         return 0;
     }
 
-    Q_INVOKABLE uint32_t SetViewport(void* this_ptr, uint32_t a)
+    Q_INVOKABLE uint32_t SetViewport(void* this_ptr, struct D3DVIEWPORT* view)
     {
-        printf("STUB:: IDirect3DDevice::SetViewport\n");
+        printf("STUB:: IDirect3DViewport::SetViewport x %u, y %u, width %u, height %u, scaleX %f, scaleY %f, maxX %f, maxY %f, minZ %f, maxZ %f\n", view->dwX, view->dwY, view->dwWidth, view->dwHeight, view->dvScaleX, view->dvScaleY, view->dvMaxX, view->dvMaxY, view->dvMinZ, view->dvMaxZ);
+        
+        SDL_SetWindowSize(displayWindow, view->dwWidth, view->dwHeight);
+        idirect3dexecutebuffer->view = *view;
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t TransformVertices(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d)
     {
-        printf("STUB:: IDirect3DDevice::TransformVertices\n");
+        printf("STUB:: IDirect3DViewport::TransformVertices\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t LightElements(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB:: IDirect3DDevice::LightElements\n");
+        printf("STUB:: IDirect3DViewport::LightElements\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t SetBackground(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::SetBackground\n");
+        printf("STUB:: IDirect3DViewport::SetBackground\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t GetBackground(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB:: IDirect3DDevice::GetBackground\n");
+        printf("STUB:: IDirect3DViewport::GetBackground\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t SetBackgroundDepth(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::SetBackgroundDepth\n");
+        printf("STUB:: IDirect3DViewport::SetBackgroundDepth\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t GetBackgroundDepth(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB:: IDirect3DDevice::GetBackgroundDepth\n");
+        printf("STUB:: IDirect3DViewport::GetBackgroundDepth\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t Clear(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
     {
-        printf("STUB:: IDirect3DDevice::Clear\n");
+        printf("STUB:: IDirect3DViewport::Clear\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t AddLight(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::AddLight\n");
+        printf("STUB:: IDirect3DViewport::AddLight\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t DeleteLight(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::DeleteLight\n");
+        printf("STUB:: IDirect3DViewport::DeleteLight\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t NextLight(void* this_ptr, uint32_t a, uint32_t b, uint32_t c)
     {
-        printf("STUB:: IDirect3DDevice::NextLight\n");
+        printf("STUB:: IDirect3DViewport::NextLight\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t GetViewport2(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::GetViewport2\n");
+        printf("STUB:: IDirect3DViewport::GetViewport2\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t SetViewport2(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::SetViewport2\n");
+        printf("STUB:: IDirect3DViewport::SetViewport2\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t SetBackgroundDepth2(void* this_ptr, uint32_t a)
     {
-        printf("STUB:: IDirect3DDevice::SetBackgroundDepth2\n");
+        printf("STUB:: IDirect3DViewport::SetBackgroundDepth2\n");
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t GetBackgroundDepth2(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB:: IDirect3DDevice::GetBackgroundDepth2\n");
+        printf("STUB:: IDirect3DViewport::GetBackgroundDepth2\n");
 
         return 0;
     }
 
-    Q_INVOKABLE uint32_t Clear2(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
+    Q_INVOKABLE uint32_t Clear2(void* this_ptr, uint32_t count, uint32_t lpRects, uint32_t flags, uint32_t color, uint32_t z, uint32_t stencil)
     {
-        printf("STUB:: IDirect3DDevice::Clear2\n");
+        // Hacky but eh
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+	    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         return 0;
     }
