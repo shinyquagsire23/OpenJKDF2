@@ -21,8 +21,6 @@ extern SDL_Window* displayWindow;
 extern SDL_Renderer* displayRenderer;
 extern SDL_RendererInfo displayRendererInfo;
 extern SDL_Event event;
-int sdl_audio_mix(void* audio, uint32_t len, int32_t vol);
-void sdl_audio_halt(int channel);
 
 uint32_t import_get_hook_addr(std::string dll, std::string name);
 void register_hook(std::string dll, std::string name, uint32_t hook_addr);

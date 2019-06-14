@@ -11,6 +11,8 @@
 #include "main.h"
 #include "dlls/dsound/IDirectSound.h"
 
+#define DSBPLAY_LOOPING 1
+
 class IDirectSoundBuffer : public QObject
 {
 Q_OBJECT
@@ -40,6 +42,15 @@ public:
         if (obj->buffer.raw_vm_ptr)
             kernel32->VirtualFree(obj->buffer.raw_vm_ptr, 0, 0);
         
+        if (obj->raw_buffer)
+            free(obj->raw_buffer);
+        
+        if (obj->converted)
+            free(obj->converted);
+        
+        if (obj->chunk)
+            Mix_FreeChunk(obj->chunk);
+
         GlobalRelease(obj);
     }
     
@@ -120,24 +131,36 @@ public:
         return 0;
     }
 
-    Q_INVOKABLE uint32_t Play(struct dsndbuffer_ext* obj, uint32_t res, uint32_t res2, uint32_t c)
+    Q_INVOKABLE uint32_t Play(struct dsndbuffer_ext* obj, uint32_t res, uint32_t res2, uint32_t flags)
     {
-        //printf("STUB: IDirectSoundBuffer::Play %x\n", c);
-
-        if (obj->buffer.raw_vm_ptr)
+        printf("STUB: IDirectSoundBuffer::Play %x\n", flags);
+        
+        if (obj->raw_buffer)
         {
-            obj->channel = sdl_audio_mix(obj->buffer.translated(), obj->size, obj->volume);
+            SDL_AudioStream *stream = SDL_NewAudioStream(AUDIO_S16, obj->format.nChannels, obj->format.nSamplesPerSec, AUDIO_S16, 2, 48000);
+
+            SDL_AudioStreamPut(stream, obj->raw_buffer, obj->size);
+            SDL_AudioStreamFlush(stream);
+            size_t avail = SDL_AudioStreamAvailable(stream);
+
+            if (obj->converted)
+                free(obj->converted);
+            obj->converted = malloc(avail);
+
+            obj->converted_size = avail;
+            SDL_AudioStreamGet(stream, obj->converted, avail);
+            SDL_AudioStreamClear(stream);
+            SDL_FreeAudioStream(stream);
             
-            /*FILE* test = fopen("sound_dump2.bin", "wb");
-            fwrite(obj->buffer.translated(), obj->size, 1, test);
-            fclose(test);
-            
-            uint8_t* audio = obj->buffer.translated();
-            for (int i = 0; i < 0x100; i++)
-            {
-                printf("%s%02x ", (i && i % 16 == 0 ? "\n" : ""), audio[i]);
-            }
-            printf("\n");*/
+            if (obj->chunk)
+                Mix_FreeChunk(obj->chunk);
+            obj->chunk = Mix_QuickLoad_RAW((uint8_t*)obj->converted, obj->converted_size);
+        }
+
+        if (obj->chunk)
+        {
+            obj->channel = Mix_PlayChannel(-1, obj->chunk, flags & DSBPLAY_LOOPING ? -1 : 0);
+            Mix_Volume(obj->channel, (uint8_t)(128.0 - ((float)obj->volume * 128.0f/-10000.0f)));
         }
 
         return 0;
@@ -162,7 +185,10 @@ public:
         //printf("STUB:: IDirectSoundBuffer::SetVolume %i\n", lVolume);
         
         obj->volume = lVolume;
-        //Mix_Volume
+
+        //TODO: This can currently interfere if a channel gets reassigned...
+        if (obj->channel >= 0)
+            Mix_Volume(obj->channel, (uint8_t)(128.0 - ((float)obj->volume * 128.0f/-10000.0f)));
         
         return 0;
     }
@@ -176,19 +202,22 @@ public:
         return 0;
     }
 
-    Q_INVOKABLE uint32_t SetFrequency(struct dsndbuffer_ext* obj, uint32_t a)
+    Q_INVOKABLE uint32_t SetFrequency(struct dsndbuffer_ext* obj, uint32_t freq)
     {
-        printf("STUB:: IDirectSoundBuffer::SetFrequency %x\n", a);
+        printf("STUB:: IDirectSoundBuffer::SetFrequency %u\n", freq);
         
+        obj->format.nSamplesPerSec = freq;
+
         return 0;
     }
 
     Q_INVOKABLE uint32_t Stop(struct dsndbuffer_ext* obj)
     {
-        //printf("STUB: IDirectSoundBuffer::Stop\n");
+        printf("STUB: IDirectSoundBuffer::Stop\n");
 
-        if (obj->channel > 0)
-            sdl_audio_halt(obj->channel);
+        if (obj->channel >= 0)
+            Mix_ExpireChannel(obj->channel, 2000);
+
         obj->channel = -1;
 
         return 0;
@@ -201,16 +230,10 @@ public:
         obj->size = dwAudioBytes1;
         obj->channel = -1;
         
-        /*FILE* test = fopen("sound_dump.bin", "wb");
-        fwrite(obj->buffer.translated(), dwAudioBytes1, 1, test);
-        fclose(test);
-        
-        uint8_t* audio = obj->buffer.translated();
-        for (int i = 0; i < 0x100; i++)
-        {
-            printf("%s%02x ", (i && i % 16 == 0 ? "\n" : ""), audio[i]);
-        }
-        printf("\n");*/
+        if (obj->raw_buffer)
+            free(obj->raw_buffer);
+        obj->raw_buffer = malloc(obj->size);
+        memcpy(obj->raw_buffer, obj->buffer.translated(), obj->size);
 
         return 0;
     }

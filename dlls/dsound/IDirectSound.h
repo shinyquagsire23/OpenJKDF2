@@ -9,6 +9,8 @@
 #include "vm.h"
 #include "dlls/kernel32.h"
 #include "dlls/winutils.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 typedef struct WAVEFORMATEX 
 {
@@ -39,6 +41,12 @@ struct dsndbuffer_ext
     uint32_t size;
     int channel;
     int volume;
+    
+    WAVEFORMATEX format;
+    Mix_Chunk* chunk;
+    void* raw_buffer;
+    void* converted;
+    size_t converted_size;
 };
 
 class IDirectSound : public QObject
@@ -74,19 +82,30 @@ public:
     Q_INVOKABLE uint32_t CreateSoundBuffer(void* this_ptr, DSBUFFERDESC* pcDSBufferDesc, uint32_t *ppDSBuffer, void* pUnkOuter)
     {
         printf("STUB: IDirectSound::CreateSoundBuffer desc(%x %x)", pcDSBufferDesc->dwFlags, pcDSBufferDesc->dwBufferBytes);
+        
+        *ppDSBuffer = CreateInterfaceInstance("IDirectSoundBuffer", 21);
+        struct dsndbuffer_ext* new_obj = (struct dsndbuffer_ext*)vm_ptr_to_real_ptr(*ppDSBuffer);
+        
+        new_obj->converted_size = 0;
+        new_obj->converted = NULL;
+        
         if (pcDSBufferDesc->lpwfxFormat.translated())
         {
             WAVEFORMATEX* format = pcDSBufferDesc->lpwfxFormat.translated();
+            new_obj->format = *format;
+            
             printf(" format(tag %x, channels %u, samples/sec %u, avg bytes/sec 0x%x, block align %x, bits/sample %u, cbSize %x)",
                    format->wFormatTag, format->nChannels, format->nSamplesPerSec, format->nAvgBytesPerSec, format->nBlockAlign,
                    format->wBitsPerSample, format->cbSize);
-            //TODO: SDL_AudioStream
         }
         printf("\n");
-        
-        *ppDSBuffer = CreateInterfaceInstance("IDirectSoundBuffer", 200);
-        struct dsndbuffer_ext* new_obj = (struct dsndbuffer_ext*)vm_ptr_to_real_ptr(*ppDSBuffer);
+
+        new_obj->buffer = 0;
+        new_obj->raw_buffer = NULL;
         new_obj->volume = 0;
+        new_obj->channel = -1;
+        new_obj->size = 0;
+        new_obj->chunk = NULL;
 
         return 0;
     }
@@ -100,20 +119,33 @@ public:
     {
         printf("STUB: IDirectSound::DuplicateSoundBuffer\n");
         
-        *duplicate = CreateInterfaceInstance("IDirectSoundBuffer", 200);
+        *duplicate = CreateInterfaceInstance("IDirectSoundBuffer", 21);
         
         struct dsndbuffer_ext* dup = (struct dsndbuffer_ext*)vm_ptr_to_real_ptr(*duplicate);
         dup->buffer = 0;
         dup->size = orig->size;
         dup->channel = -1;
         dup->volume = orig->volume;
+        dup->converted = NULL;
+        dup->converted_size = orig->converted_size;
+        dup->format = orig->format;
+        dup->chunk = NULL;
         
-        if (orig->buffer.translated())
+        if (orig->converted)
         {
-            dup->buffer = kernel32->VirtualAlloc(0, dup->size, 0, 0);
-            memcpy(dup->buffer.translated(), orig->buffer.translated(), dup->size);
+            dup->converted = malloc(dup->converted_size);
+            memcpy(dup->converted, orig->converted, dup->converted_size);
+            
+            dup->chunk = Mix_QuickLoad_RAW((uint8_t*)dup->converted, dup->converted_size);
         }
         
+        //TODO: refcnt this stuff instead?
+        if (orig->raw_buffer)
+        {
+            dup->raw_buffer = malloc(dup->size);
+            memcpy(dup->raw_buffer, orig->raw_buffer, dup->size);
+        }
+
         return 0;
     }
 

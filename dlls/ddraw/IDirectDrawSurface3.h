@@ -90,7 +90,7 @@ public:
     Q_INVOKABLE uint32_t Blt(struct ddsurface_ext* this_ptr, struct RECT* lpDestRect, struct ddsurface_ext* lpDDSrcSurface, struct RECT* lpSrcRect, uint32_t dwFlags, struct DDBLTFX* lpDDBltFx)
     {
         printf("STUB: IDirectDrawSurface3::Blt %p %p %x %x %x\n", lpDestRect, lpDDSrcSurface, lpSrcRect, dwFlags, lpDDBltFx);
-#if 0
+#if 1
         uint32_t dstl = 0, dstr = 0, dstt = 0, dstb = 0;
         uint32_t srcl = 0, srcr = 0, srct = 0, srcb = 0;
         if (lpDestRect)
@@ -99,7 +99,7 @@ public:
             dstr = lpDestRect->right;
             dstt = lpDestRect->top;
             dstb = lpDestRect->bottom;
-            printf("To rect: %u %u %u %u\n", dstl, dstr, dstt, dstb);
+            printf("To: %ux%u, %u %u %u %u\n", this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, dstl, dstr, dstt, dstb);
         }
         
         if (lpDDSrcSurface)
@@ -109,7 +109,7 @@ public:
             srct = lpSrcRect->top;
             srcb = lpSrcRect->bottom;
             printf("From: %ux%u, %u %u %u %u\n", lpDDSrcSurface->desc.dwWidth, lpDDSrcSurface->desc.dwHeight, srcl, srcr, srct, srcb);
-            if (lpDDSrcSurface->alloc && this_ptr->alloc)
+            /*if (lpDDSrcSurface->alloc && this_ptr->alloc)
             {
                 //TODO: figure out this blitting stuff idk
                 uint8_t* src = (uint8_t*)vm_ptr_to_real_ptr(lpDDSrcSurface->alloc);
@@ -127,9 +127,9 @@ public:
                         {
                             dst[(dstt+y)*640 + dstl+x] = src[(srct+y)*640 + srcl+x];
                         }
-                    }*/
+                    }* /
                 }
-            }
+            }*/
         }
         
         printf("size %x DDFX %x DDROP %x others...%x %x %x %x %x %x %x\n", lpDDBltFx->dwSize, lpDDBltFx->dwDDFX, lpDDBltFx->dwROP, lpDDBltFx->dwDDROP, lpDDBltFx->dwRotationAngle, lpDDBltFx->dwZBufferOpCode, lpDDBltFx->dwZBufferLow, lpDDBltFx->dwZBufferHigh, lpDDBltFx->dwZBufferBaseDest, lpDDBltFx->dwZDestConstBitDepth);

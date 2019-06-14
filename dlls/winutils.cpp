@@ -60,7 +60,7 @@ uint32_t GlobalQueryInterface(std::string iid_str, uint32_t* lpInterface)
 {
     if (iid_str == "3bba0080-2421-11cf-a31a-00aa00b93356")
     {
-        *lpInterface = CreateInterfaceInstance("IDirect3D3", 200);
+        *lpInterface = CreateInterfaceInstance("IDirect3D3", 64);
         return 0;
     }
     else if (iid_str == "0194c220-a303-11d0-9c4f-00a0c905425e")
@@ -70,17 +70,17 @@ uint32_t GlobalQueryInterface(std::string iid_str, uint32_t* lpInterface)
     }
     else if (iid_str == "b3a6f3e0-2b43-11cf-a2de-00aa00b93356")
     {
-        *lpInterface = CreateInterfaceInstance("IDirectDraw4", 200);
+        *lpInterface = CreateInterfaceInstance("IDirectDraw4", 32);
         return 0;
     }
     else if (iid_str == "62626262-6262-6262-6262-626262626262")
     {
-        *lpInterface = CreateInterfaceInstance("IDirect3DDevice", 200);
+        *lpInterface = CreateInterfaceInstance("IDirect3DDevice", 64);
         return 0;
     }
     else if (iid_str == "2cdcd9e0-25a0-11cf-a31a-00aa00b93356")
     {
-        *lpInterface = CreateInterfaceInstance("IDirect3DTexture", 200);
+        *lpInterface = CreateInterfaceInstance("IDirect3DTexture", 64);
         return 0;
     }
 

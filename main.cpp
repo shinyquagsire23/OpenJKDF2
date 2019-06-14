@@ -10,7 +10,7 @@
 #include <QDebug>
 
 #include <GL/glew.h>
-#include "SDL2/SDL_mixer.h"
+#include <SDL2/SDL_mixer.h>
 
 #include "dlls/kernel32.h"
 #include "dlls/user32.h"
@@ -168,23 +168,6 @@ static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
     uc_print_regs(uc);
 }
 
-int sdl_audio_mix(void* audio, uint32_t len, int32_t vol)
-{
-    Mix_Chunk chunk;
-    
-    chunk.allocated = 0;
-    chunk.abuf = (uint8_t*)audio;
-    chunk.alen = len;
-    chunk.volume = (uint8_t)(128.0 - ((float)vol * 128.0f/-10000.0f));
-    
-    return Mix_PlayChannel(-1, &chunk, 0);
-}
-
-void sdl_audio_halt(int channel)
-{
-    Mix_HaltChannel(channel);
-}
-
 int main(int argc, char **argv, char **envp)
 {
     struct vm_inst vm;
@@ -292,12 +275,11 @@ int main(int argc, char **argv, char **envp)
 		return EXIT_FAILURE;
 	}
 	
-	if (Mix_OpenAudio(11025, AUDIO_S16SYS, 1, 1024) < 0)
+	if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
 	{
 	    return EXIT_FAILURE;
 	}
-	
-	SDL_PauseAudio(0);
+	Mix_AllocateChannels(32);
 
 	GLenum glew_status = glewInit();
 	if (glew_status != GLEW_OK) {
