@@ -11,7 +11,11 @@
 #include "main.h"
 #include "dlls/dsound/IDirectSound.h"
 
+#define NUM_CHANNELS 32
 #define DSBPLAY_LOOPING 1
+
+extern std::array<Mix_Chunk*, NUM_CHANNELS> active_channels;
+extern void channel_done(int channel);
 
 class IDirectSoundBuffer : public QObject
 {
@@ -44,12 +48,6 @@ public:
         
         if (obj->raw_buffer)
             free(obj->raw_buffer);
-        
-        if (obj->converted)
-            free(obj->converted);
-        
-        if (obj->chunk)
-            Mix_FreeChunk(obj->chunk);
 
         GlobalRelease(obj);
     }
@@ -143,24 +141,25 @@ public:
             SDL_AudioStreamFlush(stream);
             size_t avail = SDL_AudioStreamAvailable(stream);
 
-            if (obj->converted)
-                free(obj->converted);
-            obj->converted = malloc(avail);
+            void* converted = malloc(avail);
 
-            obj->converted_size = avail;
-            SDL_AudioStreamGet(stream, obj->converted, avail);
+            size_t converted_size = avail;
+            SDL_AudioStreamGet(stream, converted, avail);
             SDL_AudioStreamClear(stream);
             SDL_FreeAudioStream(stream);
             
-            if (obj->chunk)
-                Mix_FreeChunk(obj->chunk);
-            obj->chunk = Mix_QuickLoad_RAW((uint8_t*)obj->converted, obj->converted_size);
-        }
-
-        if (obj->chunk)
-        {
-            obj->channel = Mix_PlayChannel(-1, obj->chunk, flags & DSBPLAY_LOOPING ? -1 : 0);
+            /*char tmp[0x100];
+            snprintf(tmp, 0x100, "auddump/%p.bin", converted);
+            FILE* dump = fopen(tmp, "wb");
+            fwrite(converted, converted_size, 1, dump);
+            fclose(dump);*/
+            
+            Mix_ChannelFinished(channel_done);
+            Mix_Chunk* chunk = Mix_QuickLoad_RAW((uint8_t*)converted, converted_size);
+            obj->channel = Mix_PlayChannel(-1, chunk, flags & DSBPLAY_LOOPING ? -1 : 0);
             Mix_Volume(obj->channel, (uint8_t)(128.0 - ((float)obj->volume * 128.0f/-10000.0f)));
+            
+            active_channels[obj->channel] = chunk;
         }
 
         return 0;

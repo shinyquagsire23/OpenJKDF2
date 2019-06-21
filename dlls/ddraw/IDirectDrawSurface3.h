@@ -262,11 +262,14 @@ public:
         w = 512 > surfacedesc->dwWidth ? 512 : surfacedesc->dwWidth;
         h = 512 > surfacedesc->dwHeight ? 512 : surfacedesc->dwHeight;
         
+        int bpp = surfacedesc->ddpfPixelFormat.dwRGBBitCount;
+        if (!bpp)
+            bpp = 8;
+
+        surfacedesc->lPitch = surfacedesc->dwWidth * (bpp/8);
         surfacedesc->lpSurface = kernel32->VirtualAlloc(0, w*h, 0, 0);
         memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0xFF, w*h);
 
-        surfacedesc->lPitch = surfacedesc->dwWidth*2;
-        
         if (this_ptr->alloc)
             kernel32->VirtualFree(this_ptr->alloc, 0, 0);
         this_ptr->alloc = surfacedesc->lpSurface;
@@ -378,6 +381,8 @@ public:
             SDL_FreeSurface(surface);
         }
 #endif
+
+#if 0
         uint16_t* tex_data = (uint16_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
         
         static int id = 0;
@@ -385,20 +390,14 @@ public:
         
         //printf("%u %ux%u\n", id, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight);
         
-        /*if (this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwWidth <= 128)
+        if (this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwHeight <= 128)
         {
             snprintf(tmp, 256, "texdump/%u_%ux%u.bin",  id++, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight);
             FILE* test = fopen(tmp, "wb");
             fwrite(tex_data, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight*2, 1, test);
             fclose(test);
-        }*/
-        
-        if (!(this_ptr->locked_desc.ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS)) return 0;
-
-        for (int i = 0; i < this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwWidth; i++)
-        {
-            if (!tex_data[i]) tex_data[i] |= 0x8000;
         }
+#endif
         //printf("\n");
         
         return 0;

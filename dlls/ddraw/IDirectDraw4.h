@@ -226,7 +226,10 @@ public:
         //if (!desc->dwWidth)
         //    desc->lPitch = 256;
         
-        printf("%ux%u %x %x %x\n", desc->dwWidth, desc->dwHeight, desc->lPitch, desc->ddsCaps, desc->ddpfPixelFormat.dwFlags);
+        if (!desc->ddpfPixelFormat.dwRGBBitCount)
+            desc->ddpfPixelFormat.dwRGBBitCount = 8;
+        
+        printf("%ux%u %x %x %x bpp %x format %x %x %x %x\n", desc->dwWidth, desc->dwHeight, desc->lPitch, desc->ddsCaps, desc->ddpfPixelFormat.dwFlags, desc->ddpfPixelFormat.dwRGBBitCount, desc->ddpfPixelFormat.dwRBitMask, desc->ddpfPixelFormat.dwGBitMask, desc->ddpfPixelFormat.dwBBitMask, desc->ddpfPixelFormat.dwRGBAlphaBitMask);
         
         ext->tex = {CreateInterfaceInstance("IDirect3DTexture", 200)}; //TODO memleaks, use this
         ext->tex->parent_surface = {*lpDDSurface};

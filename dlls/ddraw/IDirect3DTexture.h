@@ -62,18 +62,24 @@ public:
         glBindTexture(GL_TEXTURE_2D, id);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, this_ptr->parent_surface->locked_desc.dwWidth);
         
+        int format = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+        if (this_ptr->parent_surface->locked_desc.ddpfPixelFormat.dwRBitMask == 0xF00)
+            format = GL_UNSIGNED_SHORT_4_4_4_4_REV;
+
+        bool has_alpha = false;
+        if (this_ptr->parent_surface->locked_desc.ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+            has_alpha = true;
 
         glTexImage2D(GL_TEXTURE_2D,
                  0, 
-                 GL_RGBA,
+                 has_alpha ? GL_RGBA : GL_RGB,
                  (GLsizei)this_ptr->parent_surface->locked_desc.dwWidth, 
                  (GLsizei)this_ptr->parent_surface->locked_desc.dwHeight,
                  0, 
-                 GL_BGRA, 
-                 GL_UNSIGNED_SHORT_1_5_5_5_REV,
+                 has_alpha ? GL_BGRA : GL_BGRA, 
+                 format,
                  vm_ptr_to_real_ptr(this_ptr->parent_surface->alloc));
 
-        // Nice trilinear filtering.
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

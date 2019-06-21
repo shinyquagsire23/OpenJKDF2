@@ -118,10 +118,10 @@ private:
     "void main(void) {\n"
     "  vec4 sampled = texture2D(tex, f_uv);\n"
     "  float transparency = 1.0;\n"
-    "  if (sampled.a > 0.0) {\n"
-    "    transparency = (sampled.rgb == vec3(0.0, 0.0, 0.0) ? 0.0 : 1.0);\n"
+    "  if (sampled.a < 1.0) {\n"
+    "    transparency = sampled.a;\n"
     "  }\n"
-    "  gl_FragColor = vec4(sampled.r, sampled.g, sampled.b, transparency) * vec4(f_color.r, f_color.g, f_color.b, 1.0);\n"
+    "  gl_FragColor = vec4(sampled.r, sampled.g, sampled.b, sampled.a) * vec4(f_color.r, f_color.g, f_color.b, 1.0);\n"
     "}";
 
     const char* gl_vert = 

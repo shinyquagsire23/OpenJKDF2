@@ -413,6 +413,14 @@ struct DIDEVICEOBJECTDATA {
     uint32_t  dwSequence;
 };
 
+typedef struct DIMOUSESTATE
+{
+    uint32_t lX;
+    uint32_t lY;
+    uint32_t lZ;
+    uint8_t bButtons[4];
+} DIMOUSESTATE;
+
 extern uint8_t keyboard_arr[256];
 
 class IDirectInputDeviceA : public QObject
@@ -440,9 +448,11 @@ public:
         printf("STUB: IDirectInputDeviceA::GetProperty\n");
     }
     
-    Q_INVOKABLE void GetProperty(dinputdevice_ext* obj, uint8_t* refGUID, void* LPDIPROPHEADER)
+    Q_INVOKABLE uint32_t GetProperty(dinputdevice_ext* obj, uint8_t* refGUID, void* LPDIPROPHEADER)
     {
         printf("STUB: IDirectInputDeviceA::\n");
+        
+        return DI_OK;
     }
     
     Q_INVOKABLE uint32_t SetProperty(dinputdevice_ext* obj, uint8_t* refGUID, void* LPCDIPROPHEADER)
@@ -456,6 +466,11 @@ public:
     {
         printf("STUB: IDirectInputDeviceA::Acquire\n");
         
+        if (obj->type == InputDeviceType_Mouse)
+        {
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+        }
+        
         return DI_OK;
     }
     
@@ -463,12 +478,17 @@ public:
     {
         printf("STUB: IDirectInputDeviceA::Unacquire\n");
         
+        if (obj->type == InputDeviceType_Mouse)
+        {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+        }
+        
         return DI_OK;
     }
     
     Q_INVOKABLE uint32_t GetDeviceState(dinputdevice_ext* obj, uint32_t cbData, void* lpvData)
     {
-        //printf("STUB: IDirectInputDeviceA::GetDeviceState (%s)\n", obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        printf("STUB: IDirectInputDeviceA::GetDeviceState (%s)\n", obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
         
         memset(lpvData, 0, cbData);
         if (obj->type == InputDeviceType_Keyboard)
@@ -489,11 +509,26 @@ public:
             
             memcpy(keys, keyboard_arr, cbData);
             
-            return 0;
+            return DI_OK;
         }
         else if (obj->type == InputDeviceType_Mouse)
         {
-            //TODO
+            DIMOUSESTATE *state = (DIMOUSESTATE*)lpvData;
+            state->lX = user32->mousestate.x;
+            state->lY = user32->mousestate.y;
+            state->lZ = 0;
+
+            if (user32->mousestate.lbutton)
+                state->bButtons[0] = 0x80;
+            else
+                state->bButtons[0] = 0x0;
+            //if (user32->mousestate.rbutton)
+                //state->bButtons[0] |= 2;
+
+            printf("%x %x %x\n", user32->mousestate.lbutton, user32->mousestate.rbutton, state->bButtons[0]);
+            user32->mousestate.x = 0;
+            user32->mousestate.y = 0;
+            return DI_OK;
         }
         
         return 1;
@@ -501,11 +536,25 @@ public:
     
     Q_INVOKABLE uint32_t GetDeviceData(dinputdevice_ext* obj, uint32_t cgObjectData, struct DIDEVICEOBJECTDATA* rgdod, uint32_t* pdwInOut, uint32_t dwFlags)
     {
-        //printf("STUB: IDirectInputDeviceA::GetDeviceData %p (%s)\n", rgdod, obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        printf("STUB: IDirectInputDeviceA::GetDeviceData %p (%s)\n", rgdod, obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
         
-        if (!rgdod || obj->type == InputDeviceType_Mouse)
+        if (!rgdod)
         {
             *pdwInOut = 0;
+            return DI_OK;
+        }
+        
+        if (obj->type == InputDeviceType_Mouse)
+        {
+            rgdod[0].dwOfs = 0xC;
+            rgdod[0].dwData = user32->mousestate.lbutton ? 1 : 0;
+            rgdod[0].dwTimeStamp = nmm->timeGetTime();
+            
+            rgdod[1].dwOfs = 0xD;
+            rgdod[1].dwData = user32->mousestate.rbutton ? 1 : 0;
+            rgdod[1].dwTimeStamp = nmm->timeGetTime();
+            
+            *pdwInOut = 2;
             return DI_OK;
         }
         
@@ -540,9 +589,11 @@ public:
         return DI_OK;
     }
     
-    Q_INVOKABLE void SetEventNotification(dinputdevice_ext* obj, uint32_t HANDLE)
+    Q_INVOKABLE uint32_t SetEventNotification(dinputdevice_ext* obj, uint32_t HANDLE)
     {
         printf("STUB: IDirectInputDeviceA::SetEventNotification\n");
+        
+        return DI_OK;
     }
     
     Q_INVOKABLE uint32_t SetCooperativeLevel(dinputdevice_ext* obj, uint32_t hWnd, uint32_t c)

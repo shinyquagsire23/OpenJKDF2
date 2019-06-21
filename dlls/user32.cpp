@@ -491,6 +491,7 @@ bool update_input()
     uint16_t left, right;
     uint32_t pos, msgl, msgr;
     SDL_MouseButtonEvent* mevent;
+    mouse_state* mstate = &user32->mousestate;
 
     while (SDL_PollEvent(&event))
     {
@@ -505,16 +506,39 @@ bool update_input()
             case SDL_MOUSEMOTION:
                 handleMouseMove(&event.motion);
                 //user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
+
+                mstate->x = event.motion.xrel * 2;
+                mstate->y = event.motion.yrel * 2;
+                //mstate->lbutton = !!(event.motion.state & SDL_BUTTON_LMASK);
+                //mstate->rbutton = !!(event.motion.state & SDL_BUTTON_RMASK);
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
                 mevent = (SDL_MouseButtonEvent*)&event;
-                left = (mevent->button & SDL_BUTTON(SDL_BUTTON_LEFT)) ? 1 : 0;
-                right = (mevent->button & SDL_BUTTON(SDL_BUTTON_RIGHT)) ? 2 : 0;
-                pos = ((mevent->x) & 0xFFFF) | ((mevent->y << 16) & 0xFFFF0000);
-                msgl = event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP;
-                msgr = event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP;
+                if (mevent->button == SDL_BUTTON_LEFT)
+                {
+                    mstate->lbutton = (event.type == SDL_MOUSEBUTTONDOWN ? true : false);
+                }
+                else if (mevent->button == SDL_BUTTON_RIGHT)
+                {
+                    mstate->rbutton = (event.type == SDL_MOUSEBUTTONDOWN ? true : false);
+                }
                 
+                if (event.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    left = mstate->lbutton ? 1 : 0;
+                    right = mstate->rbutton ? 2 : 0;
+                }
+                else
+                {
+                    left = mstate->lbutton ? 0 : 1;
+                    right = mstate->rbutton ? 0 : 2;
+                }
+
+                pos = ((mevent->x) & 0xFFFF) | ((mevent->y << 16) & 0xFFFF0000);
+                msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
+                msgr = (event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
+
                 printf("mouse button %x %x %x\n", left, right, pos);
                 
                 if (left)

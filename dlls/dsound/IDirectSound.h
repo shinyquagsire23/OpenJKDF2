@@ -43,10 +43,7 @@ struct dsndbuffer_ext
     int volume;
     
     WAVEFORMATEX format;
-    Mix_Chunk* chunk;
     void* raw_buffer;
-    void* converted;
-    size_t converted_size;
 };
 
 class IDirectSound : public QObject
@@ -86,9 +83,6 @@ public:
         *ppDSBuffer = CreateInterfaceInstance("IDirectSoundBuffer", 21);
         struct dsndbuffer_ext* new_obj = (struct dsndbuffer_ext*)vm_ptr_to_real_ptr(*ppDSBuffer);
         
-        new_obj->converted_size = 0;
-        new_obj->converted = NULL;
-        
         if (pcDSBufferDesc->lpwfxFormat.translated())
         {
             WAVEFORMATEX* format = pcDSBufferDesc->lpwfxFormat.translated();
@@ -105,7 +99,6 @@ public:
         new_obj->volume = 0;
         new_obj->channel = -1;
         new_obj->size = 0;
-        new_obj->chunk = NULL;
 
         return 0;
     }
@@ -126,18 +119,7 @@ public:
         dup->size = orig->size;
         dup->channel = -1;
         dup->volume = orig->volume;
-        dup->converted = NULL;
-        dup->converted_size = orig->converted_size;
         dup->format = orig->format;
-        dup->chunk = NULL;
-        
-        if (orig->converted)
-        {
-            dup->converted = malloc(dup->converted_size);
-            memcpy(dup->converted, orig->converted, dup->converted_size);
-            
-            dup->chunk = Mix_QuickLoad_RAW((uint8_t*)dup->converted, dup->converted_size);
-        }
         
         //TODO: refcnt this stuff instead?
         if (orig->raw_buffer)

@@ -2,9 +2,10 @@
 #define USER32_H
 
 #include <QObject>
-#include <unicorn/unicorn.h>
 #include <queue>
 #include "vm.h"
+
+#include <SDL2/SDL.h>
 
 struct tagMSG
 {
@@ -259,6 +260,14 @@ struct WNDCLASSEXA
 
 #define WA_ACTIVE 2
 
+typedef struct mouse_state
+{
+    bool lbutton;
+    bool rbutton;
+    uint32_t x;
+    uint32_t y;
+};
+
 class User32 : public QObject
 {
 Q_OBJECT
@@ -272,10 +281,15 @@ public:
 
     bool stopping;
     std::queue<std::pair<int, bool> > keystate_changed;
+    mouse_state mousestate;
 
     Q_INVOKABLE User32() : hWndCnt(1), stopping(false)
     {
 //        WM_MOUSEACTIVATE
+        mousestate.lbutton = false;
+        mousestate.rbutton = false;
+        mousestate.x = 0;
+        mousestate.y = 0;
     }
     
     void SendMessage(uint32_t hWnd, uint32_t msg, uint32_t wParam = 0, uint32_t lParam = 0, uint32_t x = 0, uint32_t y = 0)
@@ -341,11 +355,15 @@ public:
     Q_INVOKABLE uint32_t SetCapture(uint32_t hWnd)
     {
         printf("STUB: User32::SetCapture %x\n", hWnd);
+        
+        SDL_CaptureMouse(SDL_TRUE);
+        
         return GetActiveWindow();
     }
     
     Q_INVOKABLE uint32_t ReleaseCapture()
     {
+        SDL_CaptureMouse(SDL_FALSE);
         return 1;
     }
 //    Q_INVOKABLE uint32_t ();
