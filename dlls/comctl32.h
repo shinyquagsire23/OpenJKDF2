@@ -13,6 +13,7 @@ public:
     Q_INVOKABLE ComCtl32() {}
     
     Q_INVOKABLE void InitCommonControls();
+    Q_INVOKABLE uint32_t InitCommonControlsEx(uint32_t a);
 
 //    Q_INVOKABLE uint32_t ();
 };

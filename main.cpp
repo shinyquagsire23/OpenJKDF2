@@ -38,7 +38,12 @@
 #include "dlls/dinput/IDirectInputA.h"
 #include "dlls/dinput/IDirectInputDeviceA.h"
 #include "dlls/smackw32.h"
+#include "dlls/msvcrt.h"
 #include "dlls/jk.h"
+
+#include "3rdparty/imgui/imgui.h"
+#include "3rdparty/imgui/imgui_impl_sdl.h"
+#include "3rdparty/imgui/imgui_impl_opengl3.h"
 
 #include "loaders/exe.h"
 #include "uc_utils.h"
@@ -72,8 +77,10 @@ IDirectInputA *idirectinputa;
 IDirectInputDeviceA* idirectinputdevicea;
 IDirectSoundBuffer *idirectsoundbuffer;
 SmackW32 *smackw32;
+Msvcrt *msvcrt;
 JK *jk;
 
+ImGuiIO io;
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
@@ -171,6 +178,9 @@ static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
 int main(int argc, char **argv, char **envp)
 {
     struct vm_inst vm;
+    bool no_jk_hax = false;
+    bool do_memdump = false;
+    bool force_swrend = false;
     
     if (argc < 2)
     {
@@ -179,10 +189,66 @@ int main(int argc, char **argv, char **envp)
         printf("Options:\n");
         printf("-forceswrend        Sets DirectDrawCreate to error, forcing GDI32 rendering\n");
         printf("-nojk               Disable JK.EXE hacks\n");
+        printf("-memdump            Dump memory before exiting\n");
+        printf("-cwd <path>         Change current working directory\n");
         return 0;
     }
-    
+
+    // Parse arguments
     char* exe_path = argv[argc-1];
+    for (int i = 1; i < argc-1; i++)
+    {
+        if (!strcmp(argv[i], "-forceswrend"))
+        {
+            force_swrend = true;
+        }
+        
+        if (!strcmp(argv[i], "-nojk"))
+        {
+            no_jk_hax = true;
+        }
+        
+        if (!strcmp(argv[i], "-memdump"))
+        {
+            do_memdump = true;
+        }
+        
+        if (!strcmp(argv[i], "-cwd"))
+        {
+            chdir(argv[i+1]);
+            i++;
+        }
+    }
+
+    // Init SDL
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+
+    SDL_CreateWindowAndRenderer(640*2, 480*2, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &displayWindow, &displayRenderer);
+    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	
+	SDL_GLContext gl_context = SDL_GL_CreateContext(displayWindow);
+	if (gl_context == NULL)
+		return EXIT_FAILURE;
+		
+    SDL_GL_MakeCurrent(displayWindow, gl_context);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+	
+	if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
+	    return EXIT_FAILURE;
+
+	Mix_AllocateChannels(32);
+
+	GLenum glew_status = glewInit();
+	if (glew_status != GLEW_OK)
+		return -1;
+
+	if (!GLEW_VERSION_2_0)
+		return -1;
 
     // Set up DLL classes
     kernel32 = new Kernel32();
@@ -211,6 +277,7 @@ int main(int argc, char **argv, char **envp)
     idirectinputa = new IDirectInputA();
     idirectinputdevicea = new IDirectInputDeviceA();
     smackw32 = new SmackW32();
+    msvcrt = new Msvcrt();    
     jk = new JK();
 
     dll_store["KERNEL32.dll"] = (QObject*)kernel32;
@@ -241,6 +308,7 @@ int main(int argc, char **argv, char **envp)
     dll_store["IDirectInputA"] = (QObject*)idirectinputa;
     dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     dll_store["smackw32.DLL"] = (QObject*)smackw32;
+    dll_store["msvcrt.dll"] = (QObject*)msvcrt;
     dll_store["JK.EXE"] = (QObject*)jk;
     
     interface_store["IDirect3D3"] = (QObject*)idirect3d3;
@@ -259,35 +327,7 @@ int main(int argc, char **argv, char **envp)
     interface_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
     
     qRegisterMetaType<char*>("char*");
-    qRegisterMetaType<char*>("uint32_t*");
-    
-    // Init SDL
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
-
-    SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
-    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
-    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
-    
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	if (SDL_GL_CreateContext(displayWindow) == NULL) {
-		return EXIT_FAILURE;
-	}
-	
-	if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
-	{
-	    return EXIT_FAILURE;
-	}
-	Mix_AllocateChannels(32);
-
-	GLenum glew_status = glewInit();
-	if (glew_status != GLEW_OK) {
-		return -1;
-	}
-	if (!GLEW_VERSION_2_0) {
-		return -1;
-	}
+    qRegisterMetaType<uint32_t*>("uint32_t*");
     
     printf("Caching functions\n");
     for (auto obj_pair : dll_store)
@@ -307,40 +347,38 @@ int main(int argc, char **argv, char **envp)
     next_hook = 0xd0000000;
     uint32_t start_addr = load_executable(exe_path, &image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
     
-    // Parse arguments
-    bool no_jk_hax = false;
-    bool do_memdump = false;
-    for (int i = 1; i < argc-1; i++)
-    {
-        if (!strcmp(argv[i], "-forceswrend"))
-        {
-            ddraw->force_error = 1;
-        }
-        
-        if (!strcmp(argv[i], "-notjk"))
-        {
-            no_jk_hax = true;
-        }
-        
-        if (!strcmp(argv[i], "-memdump"))
-        {
-            do_memdump = true;
-        }
-    }
+    // Apply options
+    ddraw->force_error = force_swrend ? 1 : 0;
     
     // Hook JK
     if (!no_jk_hax)
+    {
         jk->hook();
+    }
+    
+    // Hook DLLs
+    msvcrt->hook();
+    
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplSDL2_InitForOpenGL(displayWindow, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 120");
+
+    // Start VM
     register_import("dummy", "dummy", 0);
-    //uc_hook trace;
-    //uc_hook_add(uc, &trace, UC_HOOK_CODE, (void*)hook_test, nullptr, 0x426838, 0x426838);
-    
-    
-
     vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
-    //uc_run(uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
 
+    // Post-VM dumps and cleanup
     if (do_memdump)
     {
         FILE* dump1 = fopen("heap_dump.bin", "wb");
@@ -361,6 +399,15 @@ int main(int argc, char **argv, char **envp)
     }
     
     Mix_CloseAudio();
+    
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+    
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(displayWindow);
+    SDL_Quit();
 
     return 0;
 }

@@ -9,6 +9,7 @@
 #include "dlls/gdi32.h"
 #include "dlls/winutils.h"
 #include "main.h"
+#include "dlls/user32.h"
 
 #include "dlls/ddraw/IDirect3D3.h"
 
@@ -146,10 +147,46 @@ public:
 
     bool has_initted = false;
     D3DVIEWPORT view;
+    GLuint fb;
+    GLuint fbTex;
+    GLuint fbRbo;
 
     bool init_resources() 
     {
         if (has_initted) return true;
+        
+        printf("fb\n");
+        
+        // Generate the framebuffer
+        fb = 0;
+        glGenFramebuffers(1, &fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, fb);
+        
+        // Set up our framebuffer texture
+        glGenTextures(1, &fbTex);
+        glBindTexture(GL_TEXTURE_2D, fbTex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, view.dwWidth, view.dwHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        // Attach fbTex to our currently bound framebuffer fb
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTex, 0); 
+        
+        printf("depth\n");
+        
+        // Set up our render buffer
+        glGenRenderbuffers(1, &fbRbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, fbRbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, view.dwWidth, view.dwHeight);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        
+        // Bind it to our framebuffer fb
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbRbo);
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	        printf("ERROR: Framebuffer is incomplete!\n");
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
 	    GLint link_ok = GL_FALSE;
 	    
 	    GLuint vs, fs;
@@ -207,12 +244,7 @@ public:
 		    printf("Could not bind attribute %s!\n", attribute_name);
 		    return false;
 	    }
-	    
-	    glEnable(GL_BLEND);
-	    glEnable(GL_DEPTH_TEST);
-	    glDepthFunc(GL_LESS);
-	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	    
+
 	    has_initted = true;
 	    
 	    return true;
@@ -228,9 +260,9 @@ public:
 
         float d3dmat[16] = {
            view.dvMaxX*1/(float)view.dvScaleX,      0,                                          0,      0, // right
-           0,                                       -view.dvMaxY*1/view.dvScaleY,               0,      0, // up
+           0,                                       view.dvMaxY*1/view.dvScaleY,               0,      0, // up
            0,                                       0,                                          -1,     0, // forward
-           -((float)view.dwWidth/2)/view.dvScaleX,  ((float)view.dwHeight/2)/view.dvScaleY,     1,      1  // pos
+           -((float)view.dwWidth/2)/view.dvScaleX,  -((float)view.dwHeight/2)/view.dvScaleY,     1,      1  // pos
         };
 
         memcpy(glm::value_ptr(viewmat), d3dmat, sizeof(d3dmat));
@@ -250,6 +282,8 @@ public:
     void free_resources() 
     {
 	    glDeleteProgram(program);
+	    
+	    has_initted = false;
     }
 
     Q_INVOKABLE IDirect3DExecuteBuffer() {}
@@ -277,6 +311,8 @@ public:
             kernel32->VirtualFree(locked_objs[real_ptr_to_vm_ptr(this_ptr)], 0, 0);
             locked_objs[real_ptr_to_vm_ptr(this_ptr)] = 0;
         }
+        
+        
         
         GlobalRelease(this_ptr);
     }
@@ -311,7 +347,7 @@ public:
     Q_INVOKABLE uint32_t SetExecuteData(void* this_ptr, struct D3DEXECUTEDATA* desc)
     {
         //TODO: wait for Execute
-        //printf("execute offset %x, count %x,  instr offset %x, instr count %x, hvertex offset %x\n", desc->dwVertexOffset, desc->dwVertexCount, desc->dwInstructionOffset, desc->dwInstructionLength, desc->dwHVertexOffset);
+        //printf("IDirect3DExecuteBuffer::SetExecuteData: execute offset %x, count %x,  instr offset %x, instr count %x, hvertex offset %x\n", desc->dwVertexOffset, desc->dwVertexCount, desc->dwInstructionOffset, desc->dwInstructionLength, desc->dwHVertexOffset);
 
         // Generate vertices list
         GLuint vbo_vertices, vbo_colors, vbo_uvs;

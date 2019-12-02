@@ -58,7 +58,7 @@ public:
     {
         printf("STUB:: IDirect3DViewport::SetViewport x %u, y %u, width %u, height %u, scaleX %f, scaleY %f, maxX %f, maxY %f, minZ %f, maxZ %f\n", view->dwX, view->dwY, view->dwWidth, view->dwHeight, view->dvScaleX, view->dvScaleY, view->dvMaxX, view->dvMaxY, view->dvMinZ, view->dvMaxZ);
         
-        SDL_SetWindowSize(displayWindow, view->dwWidth, view->dwHeight);
+        //SDL_SetWindowSize(displayWindow, view->dwWidth, view->dwHeight);
         idirect3dexecutebuffer->view = *view;
 
         return 0;
@@ -164,9 +164,10 @@ public:
 
     Q_INVOKABLE uint32_t Clear2(void* this_ptr, uint32_t count, uint32_t lpRects, uint32_t flags, uint32_t color, uint32_t z, uint32_t stencil)
     {
+        //printf("IDirect3DViewport::Clear2\n");
         // Hacky but eh
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-	    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        //glClearColor(1.0, 0.0, 0.0, 1.0);
+	    //glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         return 0;
     }

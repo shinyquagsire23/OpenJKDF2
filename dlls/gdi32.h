@@ -31,11 +31,11 @@ struct BITMAPINFOHEADER
     uint32_t biClrImportant;
 };
 
-struct BITMAPINFO
+typedef struct BITMAPINFO
 {
     struct BITMAPINFOHEADER bmiHeader;
     uint32_t bmiColors;
-};
+} BITMAPINFO;
 
 #pragma pack(pop)
 
@@ -77,6 +77,87 @@ public:
     Q_INVOKABLE uint32_t DeleteObject(uint32_t no);
     Q_INVOKABLE uint32_t DeleteDC(uint32_t hdc);
     Q_INVOKABLE uint32_t GetSystemPaletteEntries(uint32_t hdc, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries);
+    
+    Q_INVOKABLE uint32_t GetLayout(uint32_t hWnd)
+    {
+        printf("STUB: GDI32.dll::GetLayout(%x)\n", hWnd);
+        
+        return 0;
+    }
+
+    Q_INVOKABLE uint32_t SetLayout(uint32_t hWnd, uint32_t a)
+    {
+        printf("STUB: GDI32.dll::SetLayout(%x, %x)\n", hWnd, a);
+        
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t CreateCompatibleBitmap(uint32_t hWnd, int w, int h)
+    {
+        printf("STUB: GDI32.dll::CreateCompatibleBitmap(%x, %u, %u)\n", hWnd, w, h);
+        
+        return 0xbbab;
+    }
+    
+    Q_INVOKABLE uint32_t GetObjectA(uint32_t handle, int c, void* pv)
+    {
+        printf("STUB: GDI32.dll::GetObjectA(%x, %u, ...)\n", handle, c);
+        
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t SetSystemPaletteUse(uint32_t hdc, uint32_t use)
+    {
+        printf("STUB: GDI32.dll::SetSystemPaletteUse(%x, %x)\n", hdc, use);
+        
+        return 1; //SYSPAL_STATIC
+    }
+    
+    Q_INVOKABLE uint32_t StretchDIBits(
+      uint32_t         hdc,
+      int              xDest,
+      int              yDest,
+      int              DestWidth,
+      int              DestHeight,
+      int              xSrc,
+      int              ySrc,
+      int              SrcWidth,
+      int              SrcHeight,
+      void*       lpBits,
+      BITMAPINFO *lpbmi,
+      uint32_t         iUsage,
+      uint32_t         rop
+    )
+    {
+        printf("STUB: GDI32.dll::StretchDIBits(%x, %x, %x, %x, %x, %x, %x, %x, %x, ..., ..., %x, %x)\n", hdc, xDest, yDest, DestWidth, DestHeight, xSrc, ySrc, SrcWidth, SrcHeight, iUsage, rop);
+        return DestWidth;
+    }
+    
+    Q_INVOKABLE uint32_t ResizePalette(uint32_t hPal, uint32_t n)
+    {
+        printf("STUB: GDI32.dll::ResizePalette(%x, %x)\n", hPal, n);
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t SetPaletteEntries(uint32_t hPal, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries)
+    {
+        printf("STUB: GDI32.dll::SetPaletteEntries(%x, %x, %x, ...)\n", hPal, iStart, cEntries);
+        
+        return cEntries;
+    }
+    
+    Q_INVOKABLE uint32_t GetPaletteEntries(uint32_t hPal, uint32_t iStart, uint32_t cEntries, struct color* pPalEntries)
+    {
+        printf("STUB: GDI32.dll::GetPaletteEntries(%x, %x, %x, ...)\n", hPal, iStart, cEntries);
+        
+        return cEntries;
+    }
+    
+    Q_INVOKABLE uint32_t CreateHalftonePalette(uint32_t hdc)
+    {
+        printf("STUB: GDI32.dll::CreateHalftonePalette(%x)\n", hdc);
+        return 0xAABBCC8;
+    }
 
 //    Q_INVOKABLE uint32_t ();
 };

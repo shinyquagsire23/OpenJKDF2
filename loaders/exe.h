@@ -2,7 +2,8 @@
 #define EXE_H
 
 #include <unicorn/unicorn.h>
-
+#include <map>
+#include <string>
 
 struct DosHeader
 {
@@ -111,6 +112,34 @@ struct ImportDesc {
 
 #pragma pack(pop)
 
+typedef struct ResourceDirTable
+{
+    uint32_t characteristics;
+    uint32_t timestamp;
+    uint16_t major;
+    uint16_t minor;
+    uint16_t cnt_names;
+    uint16_t cnt_ids;
+} ResourceDirTable;
+
+typedef struct ResourceDirEntry
+{
+    union
+    {
+        uint32_t name_offset;
+        uint32_t id;
+    };
+    uint32_t offset;
+} ResourceDirEntry;
+
+typedef struct
+{
+    uint32_t ptr;
+    uint32_t size;
+    uint32_t unk;
+    uint32_t unk2;
+} ResourceData;
+
 #define IMAGE_DIRECTORY_ENTRY_EXPORT	        0
 #define IMAGE_DIRECTORY_ENTRY_IMPORT	        1
 #define IMAGE_DIRECTORY_ENTRY_RESOURCE	        2
@@ -127,6 +156,31 @@ struct ImportDesc {
 #define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT	    13
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR	14
 
+#define RT_CURSOR         1
+#define RT_BITMAP         2
+#define RT_ICON           3
+#define RT_MENU           4
+#define RT_DIALOG         5
+#define RT_STRING         6
+#define RT_FONTDIR        7
+#define RT_FONT           8
+#define RT_ACCELERATOR    9
+#define RT_RCDATA         10
+#define RT_MESSAGETABLE   11
+#define RT_GROUP_CURSOR   12
+#define RT_GROUP_ICON     14
+#define RT_VERSION        16
+#define RT_DLGINCLUDE     17
+#define RT_PLUGPLAY       19
+#define RT_VXD            20
+#define RT_ANICURSOR      21
+#define RT_ANIICON        22
+#define RT_HTML           23
+
+extern std::map<int, std::map<int, ResourceData*> > resource_id_map;
+extern std::map<int, std::map<std::string, ResourceData*> > resource_str_map;
+
 uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size);
+std::string from_wstring(void* wstring, bool tolower = false);
 
 #endif // EXE_H

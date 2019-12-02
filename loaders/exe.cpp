@@ -3,6 +3,93 @@
 #include "main.h"
 #include "vm.h"
 
+std::map<int, std::map<int, ResourceData*> > resource_id_map;
+std::map<int, std::map<std::string, ResourceData*> > resource_str_map;
+
+std::string from_wstring(void* wstring, bool tolower)
+{
+    uint16_t len = *(uint16_t*)wstring;
+    wstring += sizeof(uint16_t);
+    
+    std::string out = "";
+    for (int i = 0; i < len; i++)
+    {
+        char val = *(char*)wstring;
+        if (tolower)
+            val = std::tolower(val);
+        out += val;
+        wstring += sizeof(uint16_t);
+    }
+    return out;
+}
+
+void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, int type = 0, int parent_id = 0, std::string parent_name = "")
+{
+    ResourceDirTable* table = (ResourceDirTable*)resource_iter;
+    resource_iter += sizeof(ResourceDirTable);
+    
+    /*for (int j = 0; j < level; j++)
+    {
+        printf("  ");
+    }
+    
+    printf("tbl head %x %x %u.%u names %u, ids %u\n", table->characteristics, table->timestamp, table->major, table->minor, table->cnt_names, table->cnt_ids);*/
+    for (int i = 0; i < table->cnt_names; i++)
+    {
+        ResourceDirEntry* entry = (ResourceDirEntry*)resource_iter;
+        bool dir = (entry->offset & 0x80000000);
+        uint32_t entry_offset = entry->offset & 0x7FFFFFFF;
+        ResourceData* entry_data = (ResourceData*)(resource_dir + entry_offset);
+
+        if (entry_data->ptr < image_mem_addr)
+            entry_data->ptr += image_mem_addr;
+        
+        for (int j = 0; j < level; j++)
+        {
+            printf("  ");
+        }
+        std::string name_str = from_wstring(resource_dir + (entry->name_offset & 0x7FFFFFFF), true);
+        printf("name %s, %s offset %x\n", name_str.c_str(), dir ? "subdir" : "data", entry->offset & 0x7FFFFFFF);
+        
+        if (dir)
+            parse_rsrc_table(resource_dir, resource_dir + (entry->offset & 0x7FFFFFFF), level + 1, type, parent_id, name_str);
+        else
+            resource_str_map[type][parent_name] = entry_data;
+        
+        resource_iter += sizeof(ResourceDirEntry);
+    }
+    
+    for (int i = 0; i < table->cnt_ids; i++)
+    {
+        ResourceDirEntry* entry = (ResourceDirEntry*)resource_iter;
+        bool dir = (entry->offset & 0x80000000);
+        uint32_t entry_offset = entry->offset & 0x7FFFFFFF;
+        ResourceData* entry_data = (ResourceData*)(resource_dir + entry_offset);
+        
+        if (entry_data->ptr < image_mem_addr)
+            entry_data->ptr += image_mem_addr;
+        
+        for (int j = 0; j < level; j++)
+        {
+            printf("  ");
+        }
+        printf("id %u, %s offset %x\n", entry->id, dir ? "subdir" : "data", entry_offset);
+
+        if (level == 0)
+            type = entry->id;
+
+        if (dir)
+            parse_rsrc_table(resource_dir, resource_dir + (entry->offset & 0x7FFFFFFF), level + 1, type, entry->id, "");
+        else
+        {
+            printf("%u, %u, %p\n", type, parent_id, entry_data);
+            resource_id_map[type][parent_id] = entry_data;
+        }
+        
+        resource_iter += sizeof(ResourceDirEntry);
+    }
+}
+
 uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size)
 {
     struct DosHeader dosHeader;
@@ -40,10 +127,16 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
     *stack_size = peHeader.sizeOfStackReserve;
     
     *image_addr = peHeader.imageBase;
+    
+    uint64_t totalSize = peHeader.sizeOfImage + peHeader.sizeOfStackReserve;
+    totalSize = (totalSize + 0xFFF) & ~0xFFF;
+    
     //*image_mem = malloc(peHeader.sizeOfImage + peHeader.sizeOfStackReserve);
-    *image_mem = vm_alloc(peHeader.sizeOfImage + peHeader.sizeOfStackReserve);
+    *image_mem = vm_alloc(totalSize);
     *image_size = peHeader.sizeOfImage;
     
+    void* resource_sect = nullptr;
+    void* resource_dir = nullptr;
     for (int i = 0; i < coffHeader.numberOfSections; i++)
     {
         uint64_t temp;
@@ -57,12 +150,20 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
         fread(*image_mem + peSection.virtualAddress, peSection.sizeOfRawData, 1, f);
         
         fseek(f, temp, SEEK_SET);
+        
+        if (!strcmp(peSection.name, ".rsrc"))
+        {
+            resource_sect = *image_mem + peSection.virtualAddress;
+        }
     }
     
     // Iterate directories and link
     for (int i = 0; i < 16; i++)
     {
-        //printf("directory %i, %x size %x\n", i, peHeader.dataDirectory[i].virtualAddress, peHeader.dataDirectory[i].size);
+        printf("directory %i, %x size %x\n", i, peHeader.dataDirectory[i].virtualAddress, peHeader.dataDirectory[i].size);
+        
+        if (i == IMAGE_DIRECTORY_ENTRY_RESOURCE)
+            resource_dir = *image_mem + peHeader.dataDirectory[i].virtualAddress;
         
         struct ImportDesc tmp;
         if (i != IMAGE_DIRECTORY_ENTRY_IMPORT) continue;
@@ -153,6 +254,15 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
             }
             printf("\n");
         }
+    }
+    
+    if (resource_sect != nullptr)
+    {
+        void* resource_iter = resource_sect;
+
+        parse_rsrc_table(resource_dir, resource_iter);
+        
+        //while (1);
     }
     
     fclose(f);

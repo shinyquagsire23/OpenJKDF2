@@ -2,6 +2,7 @@
 
 #include <sys/mman.h>
 #include <stdlib.h>
+#include <cwchar>
 
 #include "kvm.h"
 #include "uc_utils.h"
@@ -9,6 +10,7 @@
 #include "dlls/kernel32.h"
 #include "dlls/user32.h"
 #include "dlls/gdi32.h"
+#include "dlls/msvcrt.h"
 
 uint32_t image_mem_addr;
 void* image_mem;
@@ -40,7 +42,7 @@ void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
     }
     else
     {
-        printf("Could not convert VM ptr %x to real pointer\n", vm_ptr);
+        printf("Could not convert VM ptr %x to real pointer %x\n", vm_ptr, image_mem_addr);
         return nullptr;
     }
 }
@@ -143,6 +145,18 @@ void vm_stack_push(uint32_t *in, int num)
     vm_reg_write(UC_X86_REG_ESP, esp);
 }
 
+void vm_print_regs()
+{
+    if (using_kvm)
+    {
+        kvm_print_regs(current_kvm);
+    }
+    else
+    {
+        
+    }
+}
+
 void vm_reg_write(int id, uint32_t value)
 {
     if (using_kvm)
@@ -234,6 +248,7 @@ void vm_sync_imports()
     for (auto pair : import_store)
     {
         auto import = pair.second;
+        if (!import) continue;
         
         if (import->addr)
             vm_mem_write(import->addr, &import->hook, sizeof(uint32_t));
@@ -256,6 +271,7 @@ void vm_process_import(ImportTracker* import)
     //if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
         //printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
 
+    //vm_print_regs();
     if (import->obj)
     {
         QMetaMethod method = import->method;
@@ -307,8 +323,7 @@ void vm_process_import(ImportTracker* import)
             }
         }
     }
-    
-    
+
     if (!strcmp(import->name.c_str(), "IsProcessorFeaturePresent"))
     {
         uint32_t args[1];
@@ -319,17 +334,17 @@ void vm_process_import(ImportTracker* import)
         eax = 0;
         vm_reg_write(UC_X86_REG_EAX, eax);
     }
-    else if (!strcmp(import->name.c_str(), "CreateWindowExA"))
+    else if (import->name == "CreateWindowExA")
     {
         uint32_t args[12];
         uint32_t eax;
         
         vm_stack_pop(args, 12); //TODO
         
-        eax = user32->CreateWindowExA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
+        eax = user32->CreateWindowExA(args[0], (char*)vm_ptr_to_real_ptr(args[1]), (char*)vm_ptr_to_real_ptr(args[2]), args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
         vm_reg_write(UC_X86_REG_EAX, eax);
     }
-    else if (!strcmp(import->name.c_str(), "CreateFontA"))
+    else if (import->name == "CreateFontA")
     {
         uint32_t args[14];
         uint32_t eax;
@@ -339,6 +354,153 @@ void vm_process_import(ImportTracker* import)
         //int16_t cHeight, int16_t cWidth, int16_t cEscapement, int16_t cOrientation, int16_t    cWeight, uint32_t bItalic, uint32_t bUnderline, uint32_t bStrikeOut, uint32_t iCharSet, uint32_t iOutPrecision, uint32_t iClipPrecision, uint32_t iQuality, uint32_t iPitchAndFamily, char* pszFaceName
         eax = gdi32->CreateFontA(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], (char*)vm_ptr_to_real_ptr(args[13]));
         vm_reg_write(UC_X86_REG_EAX, eax);
+    }
+    else if (import->name == "sprintf")
+    {
+        uint32_t args[2];
+        uint32_t eax;
+        
+        vm_stack_pop(args, 2); //TODO
+        
+        char* out = (char*)vm_ptr_to_real_ptr(args[0]);
+        char* format = (char*)vm_ptr_to_real_ptr(args[1]);
+        char** format_split = nullptr;
+        
+        int num_args = 0;
+        int last_arg_start = 0;
+        for (int i = 0; i < strlen(format); i++)
+        {
+            if (format[i] != '%') continue;
+            if (format[i+1] == '%') continue;
+
+            num_args++;
+            
+            format_split = (char**)realloc(format_split, sizeof(char*) * num_args);
+            
+            if (num_args > 1)
+            {
+                format_split[num_args-2] = (char*)malloc(i - last_arg_start + 1);
+                strncpy(format_split[num_args-2], &format[last_arg_start], i - last_arg_start);
+                last_arg_start = i;
+            }
+        }
+        
+        if (num_args >= 1)
+        {
+            format_split[num_args-1] = (char*)malloc(strlen(format) - last_arg_start + 1);
+            strncpy(format_split[num_args-1], &format[last_arg_start], strlen(format) - last_arg_start);
+            
+            out[0] = 0;
+            for (int i = 0; i < num_args; i++)
+            {
+                uint32_t popped = 0;
+                vm_stack_pop(&popped, 1);
+                
+                //printf("%s %s\n", out, format_split[i]);
+                sprintf(out + strlen(out), format_split[i], popped);
+                free(format_split[i]);
+            }
+            free(format_split);
+            //printf("%s\n", out);
+        }
+        else
+        {
+            sprintf(out, format);
+        }
+        
+        
+        printf("IFFY: msvcrt.dll::sprintf(0x%x, \"%s\") -> %s\n", args[0], format, out);
+    }
+    else if (import->name == "wsprintfA")
+    {
+        uint32_t args[2];
+        uint32_t eax;
+        
+        vm_stack_pop(args, 2); //TODO
+        
+        wchar_t* out = (wchar_t*)vm_ptr_to_real_ptr(args[0]);
+        char* format = (char*)vm_ptr_to_real_ptr(args[1]);
+        char** format_split = nullptr;
+        wchar_t tmp[255];
+        
+        int num_args = 0;
+        int last_arg_start = 0;
+        for (int i = 0; i < strlen(format); i++)
+        {
+            if (format[i] != '%') continue;
+            if (format[i+1] == '%') continue;
+
+            num_args++;
+            
+            format_split = (char**)realloc(format_split, sizeof(char*) * num_args);
+            
+            if (num_args > 1)
+            {
+                format_split[num_args-2] = (char*)malloc(i - last_arg_start + 1);
+                strncpy(format_split[num_args-2], &format[last_arg_start], i - last_arg_start);
+                last_arg_start = i;
+            }
+        }
+        
+        if (num_args >= 1)
+        {
+            format_split[num_args-1] = (char*)malloc((strlen(format) - last_arg_start + 1) * sizeof(char));
+            strncpy(format_split[num_args-1], &format[last_arg_start], strlen(format) - last_arg_start);
+            
+            out[0] = 0;
+            for (int i = 0; i < num_args; i++)
+            {
+                uint32_t popped = 0;
+                vm_stack_pop(&popped, 1);
+                
+                //printf("%s %s\n", out, format_split[i]);
+                
+                swprintf(tmp, 255, L"%hs", format_split[i]);
+                
+                swprintf(out + wcslen(out) * sizeof(wchar_t), 255, tmp, popped);
+                free(format_split[i]);
+            }
+            free(format_split);
+            //printf("%s\n", out);
+        }
+        else
+        {
+            swprintf(tmp, 255, L"%hs", format);
+            
+            swprintf(out, 255, tmp);
+        }
+        
+        
+        printf("IFFY: msvcrt.dll::wsprintfA(0x%x, \"%s\") -> %s\n", args[0], format, out);
+    }
+    else if (import->name == "StretchDIBits")
+    {
+        uint32_t args[13];
+        uint32_t eax;
+        
+        vm_stack_pop(args, 13); //TODO
+        
+        eax = gdi32->StretchDIBits(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], (void*)vm_ptr_to_real_ptr(args[9]), (BITMAPINFO*)vm_ptr_to_real_ptr(args[10]), args[11], args[12]);
+        vm_reg_write(UC_X86_REG_EAX, eax);
+    }
+    else if (import->name == "??2@YAPAXI@Z")
+    {
+        uint32_t args[1];
+        uint32_t eax;
+        
+        vm_stack_pop(args, 1); //TODO: real handles
+        
+        eax = msvcrt->malloc(args[0]);
+        vm_reg_write(UC_X86_REG_EAX, eax);
+    }
+    else if (import->name == "??3@YAXPAX@Z")
+    {
+        uint32_t args[1];
+        uint32_t eax;
+        
+        vm_stack_pop(args, 1); //TODO: real handles
+        
+        msvcrt->free(args[0]);
     }
     else
     {

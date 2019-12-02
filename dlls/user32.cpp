@@ -5,24 +5,24 @@
 #include "nmm.h"
 #include "main.h"
 
-uint32_t User32::LoadIconA(uint32_t a, uint32_t b)
+#include "3rdparty/imgui/imgui.h"
+#include "3rdparty/imgui/imgui_impl_sdl.h"
+
+uint32_t User32::LoadIconA(uint32_t hInstance, uint32_t b)
 {
+    printf("STUB: LoadIconA(%x, %x)\n", hInstance, b);
     return 0;
 }
 
 uint32_t User32::LoadCursorA(uint32_t a, uint32_t b)
 {
+    printf("STUB: LoadCursorA(%x, %x)\n", a, b);
     return 0;
-}
-
-uint32_t User32::RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx)
-{
-    return this->RegisterClassExA(lpwcx.translated());
 }
 
 uint32_t User32::RegisterClassExA(struct WNDCLASSEXA* lpwcx)
 {
-    lpfnWndProc = lpwcx->lpfnWndProc;
+    lpfnWndProcStr[std::string(lpwcx->lpszClassName.translated())] = lpwcx->lpfnWndProc;
     
     printf("Register class %s, %s\n", lpwcx->lpszMenuName.translated(), lpwcx->lpszClassName.translated());
     return 444;
@@ -51,9 +51,14 @@ uint32_t User32::GetSystemMetrics(uint32_t metric)
     }
 }
 
-uint32_t User32::CreateWindowExA(uint32_t a, uint32_t b, vm_ptr<char*> c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l)
+uint32_t User32::CreateWindowExA(uint32_t a, char* lpClassName, char* lpWindowName, uint32_t dwStyle, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t i, uint32_t j, uint32_t hInstance, uint32_t l)
 {
     uint32_t hWnd = hWndCnt++;
+    
+    lpfnWndProc[hWnd] = lpfnWndProcStr[std::string(lpClassName)];
+    
+    printf("User32::CreateWindowExA, %s %s %u,%u %ux%u %x %x %x %x\n", lpClassName, lpWindowName, x, y, width, height, hWnd, hInstance, lpfnWndProcStr[std::string(lpClassName)], lpfnWndProc[hWnd]);
+    
     
     activeWindow = hWnd;
     SendMessage(hWnd, WM_CREATE);
@@ -64,7 +69,14 @@ uint32_t User32::ShowWindow(uint32_t hWnd, uint32_t show)
 {
     SendMessage(hWnd, WM_ACTIVATE, WA_ACTIVE);
     SendMessage(hWnd, WM_ACTIVATEAPP, 1);
+    SendMessage(hWnd, WM_SHOWWINDOW, 0);
     return 0;
+}
+
+uint32_t User32::MoveWindow(uint32_t hWnd, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+{
+    printf("STUB: User32.dll::MoveWindow(%x, %u %u %u %u %u\n", hWnd, a, b, c, d, e);
+    return 1;
 }
 
 uint32_t User32::UpdateWindow(uint32_t hWnd)
@@ -474,10 +486,11 @@ void handleKey(SDL_Keysym *keysym, int msg, uint32_t lpMask)
 
 bool mouseMoveRet = true;
 
-void handleMouseMove(SDL_MouseMotionEvent *event)
+void handleMouseMove(SDL_MouseMotionEvent *event, int mouseOffsX, int mouseOffsY)
 {
     //printf("Mouse pos %i,%i\n", event->x, event->y);
-    uint32_t pos = ((event->x) & 0xFFFF) | ((event->y << 16) & 0xFFFF0000);
+    //TODO hwnd to imgui
+    uint32_t pos = ((event->x - mouseOffsX) & 0xFFFF) | (((event->y - mouseOffsY) << 16) & 0xFFFF0000);
 
     if (mouseMoveRet)
     {
@@ -486,7 +499,7 @@ void handleMouseMove(SDL_MouseMotionEvent *event)
     }
 }
 
-bool update_input()
+bool update_input(int mouseOffsX, int mouseOffsY)
 {
     uint16_t left, right;
     uint32_t pos, msgl, msgr;
@@ -495,6 +508,7 @@ bool update_input()
 
     while (SDL_PollEvent(&event))
     {
+        ImGui_ImplSDL2_ProcessEvent(&event);
         switch (event.type)
         {
             case SDL_KEYDOWN:
@@ -504,7 +518,7 @@ bool update_input()
                 handleKey(&event.key.keysym, WM_KEYUP, 0xc00000001);
                 break;
             case SDL_MOUSEMOTION:
-                handleMouseMove(&event.motion);
+                handleMouseMove(&event.motion, mouseOffsX, mouseOffsY);
                 //user32->SendMessage(user32->GetActiveWindow(), WM_PAINT);
 
                 mstate->x = event.motion.xrel * 2;
@@ -535,7 +549,8 @@ bool update_input()
                     right = mstate->rbutton ? 0 : 2;
                 }
 
-                pos = ((mevent->x) & 0xFFFF) | ((mevent->y << 16) & 0xFFFF0000);
+                //TODO hwnd to imgui
+                pos = ((mevent->x - mouseOffsX) & 0xFFFF) | (((mevent->y - mouseOffsY) << 16) & 0xFFFF0000);
                 msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
                 msgr = (event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
 
@@ -574,7 +589,9 @@ uint32_t last_ms = 0;
 
 uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsgFilterMin, uint16_t wMsgFilterMax, uint16_t wRemoveMsg)
 {
-    if (update_input()) stopping = true;
+    //printf("User32::PeekMessage(hwnd %x lpfnWndProc %x)\n", hWnd, lpfnWndProc[hWnd]);
+    //TODO tie hwnd to imgui
+    if (update_input(mouseOffsX, mouseOffsY)) stopping = true;
 
     //HACK: Always update framebuf?
     uint32_t ms = nmm->timeGetTime();
@@ -590,7 +607,10 @@ uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsg
     {
         *lpMsg = messages.front();
         if (wRemoveMsg)
+        {
+            vm_call_func(lpfnWndProc[hWnd], lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
             messages.pop();
+        }
         return 1;
     }
 
@@ -618,7 +638,7 @@ uint32_t User32::TranslateMessage(struct tagMSG* lpMsg)
 uint32_t User32::DispatchMessageA(struct tagMSG* lpMsg)
 {
     //printf("Dispatch %x %x %x %x\n", lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
-    vm_call_func(lpfnWndProc, lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
+    vm_call_func(lpfnWndProc[lpMsg->hWnd], lpMsg->hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
     
     if (lpMsg->message == WM_MOUSEMOVE)
     {

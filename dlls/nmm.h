@@ -137,6 +137,12 @@ public:
     {
         return (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     }
+    
+    Q_INVOKABLE uint32_t waveOutGetNumDevs(void)
+    {
+        printf("STUB: WINMM.dll::waveOutGetNumDevs\n");
+        return 0;
+    }
 
 //    Q_INVOKABLE uint32_t ();
 };

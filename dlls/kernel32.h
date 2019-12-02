@@ -5,7 +5,7 @@
 #include <unicorn/unicorn.h>
 #include <bitset>
 #include <map>
-
+#include "loaders/exe.h"
 
 #include "vm.h"
 
@@ -132,7 +132,7 @@ public:
     Q_INVOKABLE uint32_t GetEnvironmentStringsW();
     Q_INVOKABLE uint32_t FreeEnvironmentStringsW(uint32_t ptr);
     Q_INVOKABLE uint32_t GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c);
-    Q_INVOKABLE uint32_t GetModuleHandleA(uint32_t a);
+    Q_INVOKABLE uint32_t GetModuleHandleA(char* module);
     Q_INVOKABLE uint32_t GetProcAddress(uint32_t a, uint32_t funcName);
     Q_INVOKABLE void OutputDebugStringA(uint32_t str_ptr);
     Q_INVOKABLE uint32_t GetLastError();
@@ -148,6 +148,7 @@ public:
     Q_INVOKABLE uint32_t SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint32_t* lpDistanceToMoveHigh, uint32_t dwMoveMethod);
     Q_INVOKABLE uint32_t CreateDirectoryA(char* lpPathName, void *lpSecurityAttributes);
     Q_INVOKABLE void InitializeCriticalSection(uint32_t a){}
+    Q_INVOKABLE uint32_t GetDriveTypeA(char* lpRootPathName);
     Q_INVOKABLE uint32_t TlsAlloc()
     {
         return tls_index++;
@@ -187,11 +188,19 @@ public:
         return 0xaaaaaa;
     }
 
-    Q_INVOKABLE uint32_t FindResourceA(uint32_t a, char* name, uint32_t c)
+    Q_INVOKABLE uint32_t FindResourceA(uint32_t hModule, char* lpName, uint32_t lpType)
     {
-        printf("STUB: FindResourceA %u, %s, %u\n", a, name, c);
+        printf("STUB: FindResourceA %x, %s, %u\n", hModule, lpName, lpType);
         
-        return 0xbbbbbb;
+        std::string str = std::string(lpName);
+        
+        std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c){ return std::tolower(c); });
+        return real_ptr_to_vm_ptr(resource_str_map[lpType][str]);
+    }
+    
+    Q_INVOKABLE uint32_t LoadResource(uint32_t hModule, ResourceData* hResInfo)
+    {
+        return hResInfo->ptr;
     }
 
     Q_INVOKABLE uint32_t GetCurrentDirectoryA(uint32_t bufSize, char* buf)
@@ -222,6 +231,139 @@ public:
         //vm_call_func(lpStartAddress, lpParameter);
         
         return 0xbbbccc;
+    }
+    
+    Q_INVOKABLE uint32_t GetCurrentThread()
+    {
+        return 0xcccbbb;
+    }
+    
+    Q_INVOKABLE uint32_t SetThreadPriority(uint32_t hThread, uint32_t prio)
+    {
+        printf("STUB: Kernel32::SetThreadPriority(%x, %x)\n", hThread, prio);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t lstrlenA(char* str)
+    {
+        return strlen(str);
+    }
+    
+    Q_INVOKABLE void lstrcpyA(char* dst, char* src)
+    {
+        strcpy(dst, src);
+    }
+    
+    Q_INVOKABLE void lstrcatA(char* dst, char* src)
+    {
+        strcat(dst, src);
+    }
+    
+    Q_INVOKABLE uint32_t lstrcmpA(char* a, char* b)
+    {
+        return strcmp(a, b);
+    }
+    
+    Q_INVOKABLE void lstrcpynA(char* dst, char* src, int len)
+    {
+        strncpy(dst, src, len);
+    }
+    
+    Q_INVOKABLE uint32_t GetPrivateProfileIntA(char* sect, char* key, int def, char* file)
+    {
+        printf("STUB: Kernel32::GetPrivateProfileIntA(`%s', `%s', %u, `%s')\n", sect, key, def, file);
+        return def;
+    }
+    
+    Q_INVOKABLE uint32_t OpenFile(char* lpFileName, uint32_t lpReOpenBuff, uint32_t uStyle);
+    Q_INVOKABLE uint32_t _lread(uint32_t hFile, char* buff, uint32_t bytes);
+    Q_INVOKABLE uint32_t _hread(uint32_t hFile, char* buff, uint32_t bytes)
+    {
+        return _lread(hFile, buff, bytes);
+    }
+    Q_INVOKABLE uint32_t _lclose(uint32_t hFile);
+    
+    Q_INVOKABLE uint32_t GlobalAlloc(uint32_t flags, uint32_t size)
+    {
+        return VirtualAlloc(0, size, 0, 0);
+    }
+    
+    Q_INVOKABLE uint32_t GlobalLock(uint32_t ptr)
+    {
+        return ptr;
+    }
+    
+    Q_INVOKABLE uint32_t GlobalFree(uint32_t ptr)
+    {
+        VirtualFree(ptr, 0, 0);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t GlobalUnlock(uint32_t h)
+    {
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t GetTimeZoneInformation(uint32_t lpTimeZoneInformation)
+    {
+        return 1; //TIME_ZONE_ID_STANDARD
+    }
+    
+    Q_INVOKABLE void GetLocalTime(uint32_t lpSystemTime)
+    {
+        printf("STUB: Kernel32::GetLocalTime(%x)\n", lpSystemTime);
+        return;
+    }
+    
+    Q_INVOKABLE uint32_t LocalAlloc(uint32_t flags, uint32_t size)
+    {
+        return VirtualAlloc(0, size, 0, 0);
+    }
+    
+    Q_INVOKABLE uint32_t LocalLock(uint32_t ptr)
+    {
+        return ptr;
+    }
+    
+    Q_INVOKABLE uint32_t LocalFree(uint32_t ptr)
+    {
+        VirtualFree(ptr, 0, 0);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t LocalUnlock(uint32_t h)
+    {
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t LocalReAlloc(uint32_t hMem, uint32_t size, uint32_t flags)
+    {
+        uint32_t newptr = VirtualAlloc(0, size, 0, 0);
+        void* newptr_real = vm_ptr_to_real_ptr(newptr);
+        void* oldptr_real = vm_ptr_to_real_ptr(hMem);
+        
+        memcpy(newptr_real, oldptr_real, size); //TODO hmmmmm
+        
+        return newptr;
+    }
+    
+    Q_INVOKABLE uint32_t SetErrorMode(uint32_t uMode)
+    {
+        printf("STUB: Kernel32::SetErrorMode(%u)\n", uMode);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t InterlockedDecrement(uint32_t* addend)
+    {
+        printf("STUB: Kernel32::InterlockedDecrement(...)\n");
+        *addend--;
+        return *addend;
+    }
+    
+    Q_INVOKABLE uint32_t WritePrivateProfileStringA(char* lpAppName, char* lpKeyName, char* lpString, char* lpFileName)
+    {
+        printf("STUB: Kernel32::WritePrivateProfileStringA(`%s', `%s', `%s', `%s')\n", lpAppName, lpKeyName, lpString, lpFileName);
+        return 1;
     }
 
 //    Q_INVOKABLE uint32_t ();

@@ -4,8 +4,17 @@
 #include <QObject>
 #include <queue>
 #include "vm.h"
+#include "loaders/exe.h"
 
 #include <SDL2/SDL.h>
+
+typedef struct tagRECT
+{
+    uint32_t left;
+    uint32_t top;
+    uint32_t right;
+    uint32_t bottom;
+} tagRECT;
 
 struct tagMSG
 {
@@ -33,6 +42,21 @@ struct WNDCLASSEXA
     vm_ptr<char*> lpszClassName;
     uint32_t hIconSm;
 };
+
+struct WNDCLASSA
+{
+    uint32_t style;
+    uint32_t lpfnWndProc;
+    uint32_t cbClsExtra;
+    uint32_t cbWndExtra;
+    uint32_t hInstance;
+    uint32_t hIcon;
+    uint32_t hCursor;
+    uint32_t hbrBackground;
+    vm_ptr<char*> lpszMenuName;
+    vm_ptr<char*> lpszClassName;
+};
+
 
 #define WM_NULL             0x00
 #define WM_CREATE           0x01
@@ -275,15 +299,17 @@ Q_OBJECT
 private:
     uint32_t hWndCnt;
     uint32_t activeWindow;
-    uint32_t lpfnWndProc;
+    std::map<std::string, uint32_t> lpfnWndProcStr;
+    std::map<uint32_t, uint32_t> lpfnWndProc;
     std::queue<struct tagMSG> messages;
+    int mouseOffsX, mouseOffsY;
 public:
 
     bool stopping;
     std::queue<std::pair<int, bool> > keystate_changed;
     mouse_state mousestate;
 
-    Q_INVOKABLE User32() : hWndCnt(1), stopping(false)
+    Q_INVOKABLE User32() : hWndCnt(1), stopping(false), mouseOffsX(0), mouseOffsY(0)
     {
 //        WM_MOUSEACTIVATE
         mousestate.lbutton = false;
@@ -304,14 +330,20 @@ public:
         messages.push(gen_msg);
     }
     
-    Q_INVOKABLE uint32_t LoadIconA(uint32_t a, uint32_t b);
+    void SetMouseOffset(int x, int y)
+    {
+        mouseOffsX = x;
+        mouseOffsY = y;
+    }
+    
+    Q_INVOKABLE uint32_t LoadIconA(uint32_t hInstance, uint32_t b);
     Q_INVOKABLE uint32_t LoadCursorA(uint32_t a, uint32_t b);
-    Q_INVOKABLE uint32_t RegisterClassExA(vm_ptr<struct WNDCLASSEXA*> lpwcx);
-    uint32_t RegisterClassExA(struct WNDCLASSEXA* lpwcx);
+    Q_INVOKABLE uint32_t RegisterClassExA(struct WNDCLASSEXA* lpwcx);
     Q_INVOKABLE uint32_t FindWindowA(uint32_t a, vm_ptr<char*> b);
     Q_INVOKABLE uint32_t GetSystemMetrics(uint32_t metric);
-    Q_INVOKABLE uint32_t CreateWindowExA(uint32_t a, uint32_t b, vm_ptr<char*> c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t k, uint32_t l);
+    uint32_t CreateWindowExA(uint32_t a, char* b, char* c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i, uint32_t j, uint32_t hInstance, uint32_t l);
     Q_INVOKABLE uint32_t ShowWindow(uint32_t a, uint32_t b);
+    Q_INVOKABLE uint32_t MoveWindow(uint32_t hWnd, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);
     Q_INVOKABLE uint32_t UpdateWindow(uint32_t a);
     Q_INVOKABLE uint32_t GetActiveWindow();
     Q_INVOKABLE uint32_t GetLastActivePopup(uint32_t hWnd);
@@ -341,9 +373,25 @@ public:
         return 0;
     }
 
-    Q_INVOKABLE void LoadStringA(uint32_t hRes, uint32_t size, char* buf, uint32_t idk)
+    Q_INVOKABLE uint32_t LoadStringA(uint32_t hInstance, uint32_t uID, char* lpBuffer, uint32_t bufferMax)
     {
-        printf("STUB: LoadStringA\n");
+        uint32_t resId = (uID >> 4) + 1;
+        uint32_t strIdx = uID & 0xF;
+        
+        ResourceData* resPtr = resource_id_map[RT_STRING][resId];
+        std::string val = "";
+        void* wstring_ptr = vm_ptr_to_real_ptr(resPtr->ptr);
+        for (int i = 0; i < strIdx+1; i++)
+        {
+            uint16_t len = *(uint16_t*)wstring_ptr;
+            val = from_wstring(wstring_ptr);
+            wstring_ptr += (len + 1) * sizeof(uint16_t);
+        }
+        
+        printf("STUB: LoadStringA(%x, (resid %x, idx %x), ..., %x, `%s')\n", hInstance, resId, strIdx, bufferMax, val.c_str());
+        
+        strncpy(lpBuffer, val.c_str(), bufferMax);
+        return strlen(lpBuffer);
     }
 
     Q_INVOKABLE uint32_t SetWindowLongA(uint32_t hWnd, uint32_t nIndex, uint32_t dwNewLong)
@@ -365,6 +413,188 @@ public:
     {
         SDL_CaptureMouse(SDL_FALSE);
         return 1;
+    }
+    
+    Q_INVOKABLE uint32_t RegisterWindowMessageA(char* str)
+    {
+        printf("STUB: User32::RegisterWindowMessageA(\"%s\")\n", str);
+        
+        return 0xC000;
+    }
+    
+    Q_INVOKABLE uint32_t RegisterClassA(struct WNDCLASSA* lpwc)
+    {
+        std::string classname = std::string(lpwc->lpszClassName.translated());
+        lpfnWndProcStr[classname] = lpwc->lpfnWndProc;
+        
+        printf("Register hInst %x %x class %s, %s, lpfnWndProc %x\n", lpwc->hInstance, lpwc->style, lpwc->lpszMenuName.translated(), classname.c_str(), lpwc->lpfnWndProc);
+        
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t UnregisterClassA(char* a, uint32_t b)
+    {
+        printf("STUB: User32::UnregisterClassA(\"%s\", %x\)\n", a, b);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t GetWindowRect(uint32_t hWnd, tagRECT* rect)
+    {
+        printf("STUB: User32::GetWindowRect(%x, ...)\n", hWnd);
+        
+        rect->left = 0;
+        rect->right = 0;
+        rect->top = 0;
+        rect->bottom = 0;
+        
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t LoadBitmapA(uint32_t hInstance, char* str)
+    {
+        printf("STUB: USER32.dll::LoadBitmapA(%x, \"%s\")\n", hInstance, str);
+        
+        return 0xabbb;
+    }
+    
+    Q_INVOKABLE uint32_t MapVirtualKeyA(uint32_t uCode, uint32_t uMapType)
+    {
+        printf("STUB: User32.dll::MapVirtualKeyA(%u, %u)\n", uCode, uMapType);
+
+        return 16;
+    }
+    
+    Q_INVOKABLE uint32_t GetKeyNameTextA(uint32_t lParam, char* lpString, int cchSize)
+    {
+        printf("STUB: User32.dll::GetKeyNameTextA(%x, %p, %x)\n", lParam, lpString, cchSize);
+        
+        if ((lParam >> 16) == 0)
+            strncpy(lpString, "right", cchSize);
+        else if ((lParam >> 16) == 1)
+            strncpy(lpString, "left", cchSize);
+        
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetMenu(uint32_t hWnd)
+    {
+        printf("STUB: User32.dll::GetMenu(%x)\n", hWnd);
+        return 0xaccac;
+    }
+    
+    Q_INVOKABLE uint32_t CheckMenuItem(uint32_t hMenu, uint32_t uIDCheckItem, uint32_t uCheck)
+    {
+        printf("STUB: User32.dll::CheckMenuItem(%x, %x, %x)\n", hMenu, uIDCheckItem, uCheck);
+        return 0xbccac;
+    }
+    
+    Q_INVOKABLE uint32_t EnableMenuItem(uint32_t hMenu, uint32_t uIDEnableItem, uint32_t uEnable)
+    {
+        printf("STUB: User32.dll::EnableMenuItem(%x, %x, %x)\n", hMenu, uIDEnableItem, uEnable);
+        return 0xbccac;
+    }
+    
+    Q_INVOKABLE uint32_t DeleteMenu(uint32_t hMenu, uint32_t uPosition, uint32_t uFlags)
+    {
+        printf("STUB: User32.dll::DeleteMenu(%x, %x, %x)\n", hMenu, uPosition, uFlags);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t DrawMenuBar(uint32_t hMenu)
+    {
+        printf("STUB: User32.dll::DrawMenuBar(%x)\n", hMenu);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t DestroyWindow(uint32_t hWnd)
+    {
+        printf("STUB: User32.dll::DestroyWindow(%x)\n", hWnd);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t SetCursor(uint32_t hCursor)
+    {
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t BeginPaint(uint32_t hWnd, uint32_t lpPaint)
+    {
+        printf("STUB: User32.dll::BeginPaint(%x, %x)\n", hWnd, lpPaint);
+        return 0xabc123d;
+    }
+    
+    Q_INVOKABLE uint32_t EndPaint(uint32_t hWnd, uint32_t lpPaint)
+    {
+        printf("STUB: User32.dll::EndPaint(%x, %x)\n", hWnd, lpPaint);
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetCursorPos(uint32_t lpPos)
+    {
+        printf("STUB: User32.dll::GetCursorPos(%x)\n", lpPos);
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetSysColor(uint32_t nIndex)
+    {
+        printf("STUB: User32.dll::GetSysColor(%u)\n", nIndex);
+        return 0;
+    }
+    
+    Q_INVOKABLE uint32_t GetSysColorBrush(uint32_t nIndex)
+    {
+        printf("STUB: User32.dll::GetSysColorBrush(%u)\n", nIndex);
+        
+        return 0x8127AAA;
+        
+    }
+    
+    Q_INVOKABLE uint32_t SetWindowsHookExA(uint32_t idHook, uint32_t lpfn, uint32_t hmod, uint32_t dwThreadId)
+    {
+        printf("STUB: User32.dll::SetWindowsHookExA(%x, %x, %x, %x)\n", idHook, lpfn, hmod, dwThreadId);
+        return 0x8123AAA;
+    }
+    
+    Q_INVOKABLE uint32_t SetRectEmpty(void* lpRect)
+    {
+        printf("STUB: User32.dll::SetRectEmpty(...)\n");
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetClassInfoA(uint32_t hInstance, char* lpClassName, struct WNDCLASSA* lpWndClass)
+    {
+        printf("STUB: User32.dll::GetClassInfoA(%x, \"%s\", ...)\n", hInstance, lpClassName);
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t LoadMenuA(uint32_t hInstance, char* lpMenuName)
+    {
+        printf("STUB: User32.dll::LoadMenuA(%x, \"%s\", ...)\n", hInstance, lpMenuName);
+        return 0x8123AAB;
+    }
+    
+    Q_INVOKABLE uint32_t OffsetRect(void* lpRect, int dx, int dy)
+    {
+        printf("STUB: User32.dll::OffsetRect(..., %x, %x)\n", dx, dy);
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t LoadAcceleratorsA(uint32_t hInstance, char* lpTableName)
+    {
+        printf("STUB: User32.dll::LoadAcceleratorsA(%x, \"%s\")\n", hInstance, lpTableName);
+        return 0x8123AAC;
+    }
+    
+    Q_INVOKABLE uint32_t GetDlgItem(uint32_t hDlg, int nIDDlgItem)
+    {
+        printf("STUB: User32.dll::GetDlgItem(%x, %x)\n", hDlg, nIDDlgItem);
+        return 0x8123AAD;
+    }
+    
+    Q_INVOKABLE uint32_t GetTopWindow(uint32_t hWnd)
+    {
+        printf("STUB: User32.dll::GetTopWindow(%x)\n", hWnd);
+        return 0;
     }
 //    Q_INVOKABLE uint32_t ();
 };

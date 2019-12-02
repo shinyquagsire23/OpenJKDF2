@@ -10,9 +10,15 @@
 #include "dlls/ddraw/IDirectDraw4.h"
 #include "dlls/ddraw/IDirect3DExecuteBuffer.h"
 
+#include "3rdparty/imgui/imgui.h"
+#include "3rdparty/imgui/imgui_impl_sdl.h"
+#include "3rdparty/imgui/imgui_impl_opengl3.h"
+
 class IDirect3DDevice : public QObject
 {
 Q_OBJECT
+private:
+    GLint window_fbo;
 
 public:
 
@@ -250,14 +256,57 @@ public:
 
     Q_INVOKABLE uint32_t BeginScene(void* this_ptr)
     {
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &window_fbo);
+    
+        printf("IDirect3DDevice::BeginScene\n");
         gdi32->gdi_render = false;
         idirect3dexecutebuffer->init_resources();
+        
+        //SDL_SetRenderTarget(displayRenderer, idirect3dexecutebuffer->fb_texture);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
+        glEnable(GL_BLEND);
+	    glEnable(GL_DEPTH_TEST);
+	    glDepthFunc(GL_LESS);
+	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	    
+	    // Technically this should be from Clear2
+	    glClearColor(0.0, 0.0, 0.0, 1.0);
+	    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         return 0;
     }
 
     Q_INVOKABLE uint32_t EndScene(void* this_ptr)
     {
+        printf("IDirect3DDevice::EndScene\n");
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, window_fbo);
+        SDL_SetRenderTarget(displayRenderer, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+		
+		//TODO: idk how I feel about this
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(displayWindow);
+        ImGui::NewFrame();
+        
+        //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
+        ImGui::Begin("D3D Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+        ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+        ImGui::Image((void*)(intptr_t)idirect3dexecutebuffer->fbTex, ImVec2(idirect3dexecutebuffer->view.dwWidth, idirect3dexecutebuffer->view.dwHeight));
+        ImGui::End();
+        
+        user32->SetMouseOffset(screen_pos.x, screen_pos.y);
+        
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        ImGui::Render();
+        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        
+        //SDL_GL_UnbindTexture(idirect3dexecutebuffer->fb_texture);
+        
    	    SDL_GL_SwapWindow(displayWindow);
 
         return 0;

@@ -167,7 +167,11 @@ void kvm_mem_map_ptr(struct vm *vm, uint64_t address, size_t size, uint32_t perm
     if (ioctl(vm_fd, KVM_SET_USER_MEMORY_REGION, &memreg) < 0) 
     {
         perror("KVM_SET_USER_MEMORY_REGION");
-                //exit(1);
+        printf("Failed to map address %lx, size %zx, perms %x, ptr %p\n", address, size, perms, ptr);
+    }
+    else
+    {
+        printf("Mapped address %lx, size %zx, perms %x, ptr %p\n", address, size, perms, ptr);
     }
 }
 
@@ -411,7 +415,10 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
 
         if (!esp)
             esp = stack_addr + stack_size;
-        kvm_mem_map_ptr(kvm, image_addr, image_mem_size + stack_size, 0, image_mem);
+        
+        uint64_t totalSize = image_mem_size + stack_size;
+        totalSize = (totalSize + 0xFFF) & ~0xFFF;
+        kvm_mem_map_ptr(kvm, image_addr, totalSize, 0, image_mem);
         
         fs_mem = vm_alloc(0x1000);
         gdt_mem = vm_alloc(0x10000);

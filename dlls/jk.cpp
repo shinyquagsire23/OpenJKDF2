@@ -54,7 +54,7 @@ uint32_t JK::jk_main(uint32_t hInstance, uint32_t hPrevInstance, uint32_t lpCmdL
 
         uint32_t hres = user32->GetSystemMetrics(1);
         uint32_t vres = user32->GetSystemMetrics(0);
-        g_hWnd = user32->CreateWindowExA(0x40000u, 0x54F6A4 /*"wKernel"*/, lpWindowName, 0x90000000, 0, 0, vres, hres, 0, 0, hInstance, 0);
+        g_hWnd = user32->CreateWindowExA(0x40000u, "wKernel" /*0x54F6A4*/, lpWindowName.translated(), 0x90000000, 0, 0, vres, hres, 0, 0, hInstance, 0);
 
         if (g_hWnd)
         {

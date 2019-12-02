@@ -221,23 +221,26 @@ uint32_t Kernel32::FreeEnvironmentStringsW(uint32_t ptr)
     return 1;
 }
 
-uint32_t Kernel32::GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c)
+uint32_t Kernel32::GetModuleFileNameA(uint32_t hModule, uint32_t lpFilename, uint32_t nSize)
 {        
-    char* out = "ABC";
-    vm_mem_write(b, &out, strlen(out)+1);
+    char* out = "Yodesk.exe";
+    vm_mem_write(lpFilename, out, strlen(out)+1);
         
-    return 3;
+    return strlen(out);
 }
 
-uint32_t Kernel32::GetModuleHandleA(uint32_t a)
+uint32_t Kernel32::GetModuleHandleA(char* module)
 {
+    if (!module)
+        return image_mem_addr;
+    printf("STUB: Kernel32.dll::GetModuleHandleA(\"%s\")\n", module);
     return 999;
 }
 
 uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
 {
     std::string requested = vm_read_string(funcName);
-    printf("requested addr for %s\n", requested.c_str());
+    printf("Kernel32.dll::GetProcAddress...requested addr for %s\n", requested.c_str());
         
     if (import_store.find(requested) == import_store.end())
     {
@@ -275,7 +278,7 @@ uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpF
     regex_str = std::regex_replace(regex_str, std::regex("\\*"), ".*");
 
     //TODO: filenames are insensitive, but paths aren't
-    printf("searching for %s\n", linux_path.c_str());
+    printf("Kernel32::FindFirstFileA: searching for %s\n", linux_path.c_str());
     auto files = file_search(fs::path(linux_path).parent_path(), std::regex(regex_str.c_str(), std::regex_constants::icase));
     
     if (!files.size())
@@ -286,7 +289,7 @@ uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpF
         
     //TODO errors
         
-    printf("found %s\n", files[0].c_str());
+    printf("Kernel32::FindFirstFileA: found %s\n", files[0].c_str());
     std::string windows_path = std::regex_replace(files[0].string(), std::regex("\\/"), "\\");
         
     //TODO
@@ -390,6 +393,40 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
         return hFileCnt++;
     }
 }
+
+uint32_t Kernel32::OpenFile(char* lpFileName, uint32_t lpReOpenBuff, uint32_t uStyle)
+{
+    std::string fname = std::string(lpFileName);
+    std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
+    linux_path = std::regex_replace(linux_path, std::regex("//"), "");
+    printf("STUB: Kernel32::OpenFile %s\n", linux_path.c_str());
+        
+    FILE *f = fopen(linux_path.c_str(), "rw");
+    if (!f)
+    {
+        printf("Failed to open file %s\n", linux_path.c_str());
+        last_error = ERROR_FILE_NOT_FOUND;
+        return -1;
+    }
+    else
+    {
+        openFiles[hFileCnt] = f;
+        return hFileCnt++;
+    }
+}
+
+uint32_t Kernel32::_lread(uint32_t hFile, char* buff, uint32_t bytes)
+{
+    FILE* f = openFiles[hFile];
+    return fread(buff, bytes, 1, f);
+}
+
+uint32_t Kernel32::_lclose(uint32_t hFile)
+{
+    FILE* f = openFiles[hFile];
+    openFiles[hFile] = nullptr;
+    return fclose(f);
+}
     
 uint32_t Kernel32::ReadFile(uint32_t hFile, void* lpBuffer, uint32_t nNumberOfBytesToRead, uint32_t *lpNumberOfBytesRead, uint32_t lpOverlapped)
 {
@@ -450,6 +487,12 @@ uint32_t Kernel32::SetCurrentDirectoryA(char* buf)
     getcwd(cwd, 256);
     printf("cwd is %s\n", cwd);
     
+    return 1;
+}
+
+uint32_t Kernel32::GetDriveTypeA(char* lpRootPathName)
+{
+    printf("STUB: Kernel32::GetDriveTypeA(\"%s\") -> 1\n", lpRootPathName);
     return 1;
 }
 
