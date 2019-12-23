@@ -4,14 +4,14 @@
 
 uint32_t AdvApi32::RegCreateKeyExA(uint32_t a, char* subkey, uint32_t c, uint32_t d, uint32_t e, uint32_t f, uint32_t g, uint32_t h, uint32_t i)
 {
-    printf("Stub: Create key %s\n", subkey);
+    printf("STUB: AdvApi32::RegCreateKeyExA(subkey %s, ...)\n", subkey);
         
     return 1; //not success
 }
 
 uint32_t AdvApi32::RegOpenKeyExA(uint32_t keyHnd, char* subkey, uint32_t c, uint32_t d, uint32_t* phkResult)
 {
-    printf("Stub: open key %x, %s\n", keyHnd, subkey);
+    printf("STUB: AdvApi32::RegOpenKeyExA(keyHnd %x, subkey %s, ...)\n", keyHnd, subkey);
 
     *phkResult = hKeyCnt++;
 
@@ -20,7 +20,7 @@ uint32_t AdvApi32::RegOpenKeyExA(uint32_t keyHnd, char* subkey, uint32_t c, uint
 
 uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c, uint32_t lpType, void* lpData, uint32_t *lpcbData)
 {
-    printf("Stub: open value %x, %s\n", keyHnd, valuename);
+    printf("STUB: AdvApi32::RegQueryValueExA(keyHnd %x, valuename %s, ...)\n", keyHnd, valuename);
 
     //TODO write data
 
@@ -46,7 +46,7 @@ uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c
     }
     else if (!strcmp(valuename, "3DDeviceGUID"))
     {
-        uint8_t id[0x10] = {0x80, 0x1A, 0x05, 0x87, 0xFC, 0x13, 0xD1, 0x11, 0x97, 0xC0, 0x00, 0xA0, 0x24, 0x29, 0x30, 0x05};
+        uint8_t id[0x10] = {0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62, 0x62};
         memcpy(lpData, id, *lpcbData);
         return 0;
     }
@@ -56,7 +56,7 @@ uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c
 
 uint32_t AdvApi32::RegCloseKey(uint32_t keyHnd)
 {
-    printf("Stub: close key %x\n", keyHnd);
+    printf("STUB: AdvApi32::RegCloseKey(keyhnd %x)\n", keyHnd);
 
     return 0; //TODO error
 }

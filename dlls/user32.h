@@ -404,7 +404,7 @@ public:
     {
         printf("STUB: User32::SetCapture %x\n", hWnd);
         
-        SDL_CaptureMouse(SDL_TRUE);
+        //SDL_CaptureMouse(SDL_TRUE);
         
         return GetActiveWindow();
     }

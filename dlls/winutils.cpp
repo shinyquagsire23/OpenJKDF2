@@ -10,6 +10,9 @@ std::map<std::string, uint32_t> vtable_store;
 
 std::string guid_to_string(uint8_t* lpGUID)
 {
+    if (!lpGUID)
+        return "(null GUID)";
+
     char tmp[256];
     sprintf(tmp, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", *(uint32_t*)&lpGUID[0], *(uint16_t*)&lpGUID[4], *(uint16_t*)&lpGUID[6], lpGUID[8], lpGUID[9], lpGUID[10], lpGUID[11], lpGUID[12], lpGUID[13], lpGUID[14], lpGUID[15]);
     
@@ -73,7 +76,8 @@ uint32_t GlobalQueryInterface(std::string iid_str, uint32_t* lpInterface)
         *lpInterface = CreateInterfaceInstance("IDirectDraw4", 32);
         return 0;
     }
-    else if (iid_str == "62626262-6262-6262-6262-626262626262")
+    else if (iid_str == "62626262-6262-6262-6262-626262626262" 
+             || iid_str == "87051a80-13fc-11d1-97c0-00a024293005")
     {
         *lpInterface = CreateInterfaceInstance("IDirect3DDevice", 64);
         return 0;

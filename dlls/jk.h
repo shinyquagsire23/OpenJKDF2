@@ -79,7 +79,7 @@ public:
         //register_hook("JK", "test", 0x42A4B5);
 
         // nop out b3DAccel set to 0 for 16bpp render
-        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[0] = 0x90;
+        /*((uint8_t*)vm_ptr_to_real_ptr(0x414897))[0] = 0x90;
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[1] = 0x90;
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[2] = 0x90;
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[3] = 0x90;
@@ -88,7 +88,12 @@ public:
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[6] = 0x90;
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[7] = 0x90;
         ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[8] = 0x90;
-        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[9] = 0x90;
+        ((uint8_t*)vm_ptr_to_real_ptr(0x414897))[9] = 0x90;*/
+        
+        //((uint8_t*)vm_ptr_to_real_ptr(0x414852))[0] = 0x00;
+        //((uint8_t*)vm_ptr_to_real_ptr(0x414852))[1] = 0x90;
+        //((uint8_t*)vm_ptr_to_real_ptr(0x414858))[0] = 0x00;
+        //((uint8_t*)vm_ptr_to_real_ptr(0x414858))[1] = 0x90;
     }
     
     Q_INVOKABLE uint32_t WinMain(uint32_t hInstance, uint32_t hPrevInstance, uint32_t lpCmdLine, uint32_t nShowCmd)

@@ -175,6 +175,19 @@ static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
     uc_print_regs(uc);
 }
 
+void GLAPIENTRY glMessageCallback(GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam)
+{
+    fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+            type, severity, message);
+}
+
 int main(int argc, char **argv, char **envp)
 {
     struct vm_inst vm;
@@ -249,6 +262,9 @@ int main(int argc, char **argv, char **envp)
 
 	if (!GLEW_VERSION_2_0)
 		return -1;
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(glMessageCallback, 0);
 
     // Set up DLL classes
     kernel32 = new Kernel32();
@@ -377,6 +393,32 @@ int main(int argc, char **argv, char **envp)
     // Start VM
     register_import("dummy", "dummy", 0);
     vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
+    
+#if 0
+    for (int i = 0; i < 2; i++)
+    {
+        uint32_t base = 0x522BF8; // 0x90518470
+        uint32_t stride = 0x30;
+        
+        if (i == 1)
+            base = 0x8605DC-stride;
+        
+        printf("%08x\n  %08x %08x %08x %08x\n  %08x %08x %08x %08x\n  %08x %08x %08x %08x\n", 
+        base+stride*i,
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i), 
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+4), 
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+8),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0xC),        
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x10),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x14),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x18),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x1C),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x20),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x24), 
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x28),
+        *(uint32_t*)vm_ptr_to_real_ptr(base+stride*i+0x2C));
+    }
+#endif
 
     // Post-VM dumps and cleanup
     if (do_memdump)

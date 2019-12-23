@@ -8,6 +8,7 @@
 #include "dlls/gdi32.h"
 #include "dlls/winutils.h"
 #include "dlls/ddraw/IDirectDraw4.h"
+#include "dlls/ddraw/IDirect3DDevice.h"
 #include <map>
 
 #include "main.h"
@@ -100,6 +101,8 @@ public:
             dstt = lpDestRect->top;
             dstb = lpDestRect->bottom;
             printf("To: %ux%u, %u %u %u %u\n", this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, dstl, dstr, dstt, dstb);
+            if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE)
+                printf("Blitting to the primary surface!\n");
         }
         
         if (lpDDSrcSurface)
@@ -109,27 +112,63 @@ public:
             srct = lpSrcRect->top;
             srcb = lpSrcRect->bottom;
             printf("From: %ux%u, %u %u %u %u\n", lpDDSrcSurface->desc.dwWidth, lpDDSrcSurface->desc.dwHeight, srcl, srcr, srct, srcb);
-            /*if (lpDDSrcSurface->alloc && this_ptr->alloc)
+            
+            if (!lpDDSrcSurface->alloc && this_ptr->alloc)
             {
+                int bytes_per_pixel_dst = this_ptr->desc.ddpfPixelFormat.dwRGBBitCount / sizeof(uint8_t);
+                uint32_t dst_pitch = this_ptr->desc.lPitch;
+
+                if (!this_ptr->desc.ddpfPixelFormat.dwRGBBitCount)
+                    bytes_per_pixel_dst = sizeof(uint8_t);
+
+                //TODO: figure out this blitting stuff idk
+                uint8_t* dst = (uint8_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
+                
+                int copy_w = srcr-srcl;
+                int copy_h = srcb-srct;
+                
+                for (int x = 0; x < copy_w; x++)
+                {
+                    for (int y = 0; y < copy_h; y++)
+                    {
+                        //TODO bpp
+                        uint8_t srcByte = 0;
+                        uint8_t dstByte = dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x];
+                        dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x] = srcByte;
+                    }
+                }
+            }
+            else if (lpDDSrcSurface->alloc && this_ptr->alloc)
+            {
+                int bytes_per_pixel_src = sizeof(uint8_t);
+                int bytes_per_pixel_dst = sizeof(uint8_t);
+                uint32_t src_pitch = lpDDSrcSurface->desc.lPitch;
+                uint32_t dst_pitch = this_ptr->desc.lPitch;
+
+                if (!lpDDSrcSurface->desc.ddpfPixelFormat.dwRGBBitCount)
+                    bytes_per_pixel_src = sizeof(uint8_t);
+                if (!this_ptr->desc.ddpfPixelFormat.dwRGBBitCount)
+                    bytes_per_pixel_dst = sizeof(uint8_t);
+
                 //TODO: figure out this blitting stuff idk
                 uint8_t* src = (uint8_t*)vm_ptr_to_real_ptr(lpDDSrcSurface->alloc);
                 uint8_t* dst = (uint8_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
                 
-                if (!dstl && !srcl && !dstt && !srct && dstr == srcr && dstb == srcb)
+                int copy_w = srcr-srcl;
+                int copy_h = srcb-srct;
+                
+                for (int x = 0; x < copy_w; x++)
                 {
-                    memcpy(vm_ptr_to_real_ptr(this_ptr->alloc), vm_ptr_to_real_ptr(lpDDSrcSurface->alloc), lpDDSrcSurface->desc.dwWidth*lpDDSrcSurface->desc.dwHeight);
-                }
-                else
-                {
-                    /*for (int x = 0; x < srcl-srcr; x++)
+                    for (int y = 0; y < copy_h; y++)
                     {
-                        for (int y = 0; y < srct-srcb; y++)
-                        {
-                            dst[(dstt+y)*640 + dstl+x] = src[(srct+y)*640 + srcl+x];
-                        }
-                    }* /
+                        //TODO bpp
+                        uint8_t srcByte = src[(srct+y)*src_pitch*bytes_per_pixel_src + srcl+x];
+                        uint8_t dstByte = dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x];
+                        //if (srcByte)
+                        dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x] = srcByte;
+                    }
                 }
-            }*/
+            }
         }
         
         printf("size %x DDFX %x DDROP %x others...%x %x %x %x %x %x %x\n", lpDDBltFx->dwSize, lpDDBltFx->dwDDFX, lpDDBltFx->dwROP, lpDDBltFx->dwDDROP, lpDDBltFx->dwRotationAngle, lpDDBltFx->dwZBufferOpCode, lpDDBltFx->dwZBufferLow, lpDDBltFx->dwZBufferHigh, lpDDBltFx->dwZBufferBaseDest, lpDDBltFx->dwZDestConstBitDepth);
@@ -267,15 +306,18 @@ public:
             bpp = 8;
 
         surfacedesc->lPitch = surfacedesc->dwWidth * (bpp/8);
-        surfacedesc->lpSurface = kernel32->VirtualAlloc(0, w*h, 0, 0);
-        memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0xFF, w*h);
+        surfacedesc->lpSurface = kernel32->VirtualAlloc(0, surfacedesc->lPitch*h, 0, 0);
+        memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0, surfacedesc->lPitch*h);
 
         if (this_ptr->alloc)
+        {
+            memcpy(vm_ptr_to_real_ptr(surfacedesc->lpSurface), vm_ptr_to_real_ptr(this_ptr->alloc), surfacedesc->lPitch*h);
             kernel32->VirtualFree(this_ptr->alloc, 0, 0);
+        }
         this_ptr->alloc = surfacedesc->lpSurface;
         this_ptr->locked_desc = *surfacedesc;
         
-        //printf("%ux%u %x\n", surfacedesc->dwWidth, surfacedesc->dwHeight, surfacedesc->lPitch);
+        printf("IDirectDrawSurface3::Lock: %ux%u pitch %x\n", surfacedesc->dwWidth, surfacedesc->dwHeight, surfacedesc->lPitch);
         
         return 0;
     }
@@ -301,7 +343,7 @@ public:
 
     Q_INVOKABLE uint32_t SetColorKey(struct ddsurface_ext* this_ptr, uint32_t a, uint32_t* b)
     {
-        printf("STUB: IDirectDrawSurface3::SetColorKey(%u)\n", a);
+        printf("STUB: IDirectDrawSurface3::SetColorKey(%u, %x, %x, %x)\n", a, b[0], b[1], b[2]);
         
         /*for (int i = 0; i < 256; i++)
         {
@@ -336,7 +378,7 @@ public:
 
     Q_INVOKABLE uint32_t Unlock(struct ddsurface_ext* this_ptr, uint32_t a)
     {
-        //printf("STUB: IDirectDrawSurface3::Unlock %x\n", this_ptr->locked_desc.ddsCaps);
+        printf("STUB: IDirectDrawSurface3::Unlock %x\n", this_ptr->locked_desc.ddsCaps);
         
         /*for (int i = 0; i < 640*480; i++)
         {
@@ -388,18 +430,27 @@ public:
         static int id = 0;
         char tmp[256];
         
-        //printf("%u %ux%u\n", id, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight);
+        printf("%u %ux%u, %x\n", id, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight, this_ptr->alloc);
         
-        if (this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwHeight <= 128)
+        if (this_ptr->alloc && this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwHeight <= 480)
         {
             snprintf(tmp, 256, "texdump/%u_%ux%u.bin",  id++, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight);
             FILE* test = fopen(tmp, "wb");
-            fwrite(tex_data, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight*2, 1, test);
+            fwrite(tex_data, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight, 1, test);
             fclose(test);
         }
 #endif
         //printf("\n");
-        
+// This is definitely a draw cue, but we need rendering on its own thread
+#if 0
+        if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE)
+        {
+            idirect3dexecutebuffer->view.dwWidth = 640;
+            idirect3dexecutebuffer->view.dwHeight = 480;
+            idirect3ddevice->BeginScene(NULL);
+            idirect3ddevice->EndScene(NULL);
+        }
+#endif
         return 0;
     }
 

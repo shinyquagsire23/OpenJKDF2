@@ -281,16 +281,22 @@ public:
     {
         printf("IDirect3DDevice::EndScene\n");
         
+        idirect3dexecutebuffer->renderOverlay();
+        
         glBindFramebuffer(GL_FRAMEBUFFER, window_fbo);
         SDL_SetRenderTarget(displayRenderer, NULL);
         glBindTexture(GL_TEXTURE_2D, 0);
 		
 		//TODO: idk how I feel about this
+		//ImGuiIO& io = ImGui::GetIO();
+		//io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+		
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(displayWindow);
         ImGui::NewFrame();
         
         //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
+        ImGui::SetNextWindowPos(ImVec2(0,0));
         ImGui::Begin("D3D Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImGui::Image((void*)(intptr_t)idirect3dexecutebuffer->fbTex, ImVec2(idirect3dexecutebuffer->view.dwWidth, idirect3dexecutebuffer->view.dwHeight));
@@ -304,8 +310,6 @@ public:
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
-        //SDL_GL_UnbindTexture(idirect3dexecutebuffer->fb_texture);
         
    	    SDL_GL_SwapWindow(displayWindow);
 

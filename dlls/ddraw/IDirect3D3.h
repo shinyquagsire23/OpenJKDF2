@@ -13,19 +13,27 @@
 #define D3DPSHADECAPS_ALPHAFLATBLEND       0x00001000
 #define D3DPSHADECAPS_ALPHAFLATSTIPPLED    0x00002000
 
-#define D3DPTBLENDCAPS_DECAL            0x00000001
-#define D3DPTBLENDCAPS_MODULATE         0x00000002
-#define D3DPTBLENDCAPS_DECALALPHA       0x00000004
-#define D3DPTBLENDCAPS_MODULATEALPHA    0x00000008
-#define D3DPTBLENDCAPS_DECALMASK        0x00000010
-#define D3DPTBLENDCAPS_MODULATEMASK     0x00000020
-#define D3DPTBLENDCAPS_COPY             0x00000040
-#define D3DPTBLENDCAPS_ADD              0x00000080
+#define D3DPTBLENDCAPS_DECAL               0x00000001
+#define D3DPTBLENDCAPS_MODULATE            0x00000002
+#define D3DPTBLENDCAPS_DECALALPHA          0x00000004
+#define D3DPTBLENDCAPS_MODULATEALPHA       0x00000008
+#define D3DPTBLENDCAPS_DECALMASK           0x00000010
+#define D3DPTBLENDCAPS_MODULATEMASK        0x00000020
+#define D3DPTBLENDCAPS_COPY                0x00000040
+#define D3DPTBLENDCAPS_ADD                 0x00000080
 
-#define D3DPTEXTURECAPS_PERSPECTIVE 1
-#define D3DPTEXTURECAPS_ALPHA 4
-#define D3DPTEXTURECAPS_TRANSPARENCY 8
-#define D3DPTEXTURECAPS_SQUAREONLY 0x20
+#define D3DPTEXTURECAPS_PERSPECTIVE        0x01
+#define D3DPTEXTURECAPS_ALPHA              0x04
+#define D3DPTEXTURECAPS_TRANSPARENCY       0x08
+#define D3DPTEXTURECAPS_SQUAREONLY         0x20
+
+#define DDBD_1                             0x00004000
+#define DDBD_2                             0x00002000
+#define DDBD_4                             0x00001000
+#define DDBD_8                             0x00000800
+#define DDBD_16                            0x00000400
+#define DDBD_24                            0x00000200
+#define DDBD_32                            0x00000100
 
 struct D3DPrimCaps
 {
@@ -143,7 +151,7 @@ public:
 
         char* device_desc = "Direct3D meme";
         char* device_name = "idk";
-        char* iid = "bbbbbbbbbbbbbbbb";
+        uint32_t iid[4] = {0x62626262, 0x62626262, 0x62626262, 0x62626262};
         
         uint32_t device_desc_ptr = name_ptrs;
         uint32_t device_name_ptr = name_ptrs+strlen(device_desc)+1;
@@ -162,16 +170,22 @@ public:
         desc->dpcTriCaps.dwZCmpCaps = 0xFF; // we support anything for z comparison
         desc->dpcTriCaps.dwShadeCaps = 0;//D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAFLATSTIPPLED;
         desc->dpcTriCaps.dwTextureBlendCaps = 0;//D3DPTBLENDCAPS_MODULATEALPHA;
-        desc->dwMaxBufferSize = 0x100000;
-        desc->dwMaxVertexCount = 0x1000;
+        desc->dwMaxBufferSize = 0;
+        desc->dwMaxVertexCount = 65536;
+        desc->dwMinTextureWidth = 1;
+        desc->dwMinTextureHeight = 1;
+        desc->dwMaxTextureWidth = 4096;
+        desc->dwMaxTextureHeight = 4096;
+        desc->dwMinStippleWidth = 1;
+        desc->dwMaxStippleWidth = 4096;
+        desc->dwMinStippleHeight = 1;
+        desc->dwMaxStippleHeight = 4096;
+        desc->dwDeviceRenderBitDepth = DDBD_8 | DDBD_16 | DDBD_24 | DDBD_32;
 
         uint32_t ret = vm_call_func(callback, iid_ptr, device_desc_ptr, device_name_ptr, device_ptr,device_ptr, 0xabcdef);
         
         kernel32->VirtualFree(device_ptr, 0, 0);
         kernel32->VirtualFree(name_ptrs, 0, 0);
-        
-        //TODO: JK.EXE HACK
-        **vm_ptr<uint32_t*>(0x8605C8) = 0;
 
         return 0;
     }
