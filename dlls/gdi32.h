@@ -49,12 +49,18 @@ private:
     std::map<uint32_t, SDL_Surface*> dc_surface;
     uint32_t hdcCnt;
     uint32_t hBitmapCnt;
+    uint32_t defaultHdcPal;
     
     
     uint32_t xres;
     uint32_t yres;
 
 public:
+
+    SDL_Color* getDefaultPal()
+    {
+        return dc_palettes[defaultHdcPal];
+    }
 
     uint32_t selectedHdcSrc;
     bool gdi_render;

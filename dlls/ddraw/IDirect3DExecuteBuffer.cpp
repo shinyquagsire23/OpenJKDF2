@@ -22,8 +22,6 @@ bool IDirect3DExecuteBuffer::init_resources()
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTex, 0); 
     
-    printf("depth\n");
-    
     // Set up our render buffer
     glGenRenderbuffers(1, &fbRbo);
     glBindRenderbuffer(GL_RENDERBUFFER, fbRbo);
@@ -97,6 +95,14 @@ bool IDirect3DExecuteBuffer::init_resources()
     uniform_name = "tex_mode";
     uniform_tex_mode = glGetUniformLocation(program, uniform_name);
     if (uniform_tex_mode == -1) 
+    {
+        printf("Could not bind attribute %s!\n", attribute_name);
+        return false;
+    }
+    
+    uniform_name = "blend_mode";
+    uniform_blend_mode = glGetUniformLocation(program, uniform_name);
+    if (uniform_blend_mode == -1) 
     {
         printf("Could not bind attribute %s!\n", attribute_name);
         return false;
@@ -179,8 +185,9 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
     GLuint vbo_vertices, vbo_colors, vbo_uvs;
     GLuint ibo_triangle;
     GLfloat* data_vertices = (GLfloat*)malloc(desc->dwVertexCount * 3 * sizeof(GLfloat));
-    GLfloat* data_colors = (GLfloat*)malloc(desc->dwVertexCount * 3 * sizeof(GLfloat));
+    GLfloat* data_colors = (GLfloat*)malloc(desc->dwVertexCount * 4 * sizeof(GLfloat));
     GLfloat* data_uvs = (GLfloat*)malloc(desc->dwVertexCount * 2 * sizeof(GLfloat));
+    GLfloat* data_norms = (GLfloat*)malloc(desc->dwVertexCount * 3 * sizeof(GLfloat));
 
     struct D3DVERTEX* vertexes = (struct D3DVERTEX*)vm_ptr_to_real_ptr(locked_objs[real_ptr_to_vm_ptr(this_ptr)] + desc->dwVertexOffset);
 
@@ -189,16 +196,30 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
         /*printf("%f %f %f, %f %f %f, %f %f\n", vertexes[i].x, vertexes[i].y, vertexes[i].z,
                                               vertexes[i].nx, vertexes[i].ny, vertexes[i].nz,
                                               vertexes[i].tu, vertexes[i].tv);*/
-                                              
+                                             
+        uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
+        uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
+        uint32_t v_unknz = *(uint32_t*)&vertexes[i].nx;
+        uint8_t v_a = (v_color >> 24) & 0xFF;
+        uint8_t v_r = (v_color >> 16) & 0xFF;
+        uint8_t v_g = (v_color >> 8) & 0xFF;
+        uint8_t v_b = v_color & 0xFF;
+ 
         data_vertices[(i*3)+0] = vertexes[i].x;
         data_vertices[(i*3)+1] = vertexes[i].y;
         data_vertices[(i*3)+2] = vertexes[i].z;
-        data_colors[(i*3)+0] = 1.0f;
-        data_colors[(i*3)+1] = 1.0f;
-        data_colors[(i*3)+2] = 1.0f;
+        data_colors[(i*4)+0] = (float)v_r / 255.0f;
+        data_colors[(i*4)+1] = (float)v_g / 255.0f;
+        data_colors[(i*4)+2] = (float)v_b / 255.0f;
+        data_colors[(i*4)+3] = (float)v_a / 255.0f;
         
         data_uvs[(i*2)+0] = vertexes[i].tu;
         data_uvs[(i*2)+1] = vertexes[i].tv;
+        
+        data_norms[(i*3)+0] = vertexes[i].nx;
+        data_norms[(i*3)+1] = vertexes[i].ny;
+        data_norms[(i*3)+2] = vertexes[i].nz;
+        //printf("nx, ny, nz %x %x %x, %f %f \n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz);
     }
     
     glGenBuffers(1, &vbo_vertices);
@@ -208,12 +229,17 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
     
     glGenBuffers(1, &vbo_colors);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-    glBufferData(GL_ARRAY_BUFFER, desc->dwVertexCount * 3 * sizeof(GLfloat), data_colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, desc->dwVertexCount * 4 * sizeof(GLfloat), data_colors, GL_STATIC_DRAW);
     
     glGenBuffers(1, &vbo_uvs);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
     glBufferData(GL_ARRAY_BUFFER, desc->dwVertexCount * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
     
+    /*glGenBuffers(1, &vbo_norms);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_norms);
+    glBufferData(GL_ARRAY_BUFFER, desc->dwVertexCount * 3 * sizeof(GLfloat), data_norms, GL_STATIC_DRAW);*/
+    
+    glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
     
     logic();
     
@@ -234,6 +260,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
             glEnableVertexAttribArray(attribute_coord3d);
             glEnableVertexAttribArray(attribute_v_color);
             glEnableVertexAttribArray(attribute_v_uv);
+            //glEnableVertexAttribArray(attribute_v_norm);
             
             // Describe our vertices array to OpenGL (it can't guess its format automatically)
             glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
@@ -250,7 +277,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
             glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
             glVertexAttribPointer(
                 attribute_v_color, // attribute
-                3,                 // number of elements per vertex, here (R,G,B)
+                4,                 // number of elements per vertex, here (R,G,B,A)
                 GL_FLOAT,          // the type of each element
                 GL_FALSE,          // take our values as-is
                 0,                 // no extra data between each position
@@ -267,6 +294,16 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
                 0,                 // no extra data between each position
                 0                  // offset of first element
             );
+            
+            /*glBindBuffer(GL_ARRAY_BUFFER, vbo_norms);
+            glVertexAttribPointer(
+                attribute_v_uv,    // attribute
+                3,                 // number of elements per vertex, here (nX, nY, nZ)
+                GL_FLOAT,          // the type of each element
+                GL_FALSE,          // take our values as-is
+                0,                 // no extra data between each position
+                0                  // offset of first element
+            );*/
     
             GLushort* data_elements = new GLushort[instr->wCount * 3];
             struct D3DTRIANGLE* tris = (struct D3DTRIANGLE*)opData;
@@ -302,6 +339,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
             glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
             glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
+            //glDisableVertexAttribArray(attribute_v_norm);
             glDisableVertexAttribArray(attribute_v_uv);
             glDisableVertexAttribArray(attribute_v_color);
             glDisableVertexAttribArray(attribute_coord3d);
@@ -312,36 +350,82 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
         else if (instr->bOpcode == D3DOP_PROCESSVERTICES)
         {
             //idk on this one
+            printf("STUB: D3DOP_PROCESSVERTICES size 0x%x count %u\n", instr->bSize, instr->wCount);
         }
         else if (instr->bOpcode == D3DOP_STATERENDER)
         {
-            uint32_t renderOp = *(uint32_t*)(opData+0);
-            uint32_t renderArg = *(uint32_t*)(opData+4);
-            //printf("op %u arg %u\n", renderOp, renderArg);
-            
-            if (renderOp == 1) // Texture
+            //printf("STUB: D3DOP_STATERENDER size 0x%x count %u\n", instr->bSize, instr->wCount);
+            for (int i = 0; i < instr->wCount; i++)
             {
-                //printf("texture %x\n", renderArg);
+                uint32_t renderOp = *(uint32_t*)(opData+0);
+                uint32_t renderArg = *(uint32_t*)(opData+4);
+                //printf("op %u arg %u\n", renderOp, renderArg);
                 
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, renderArg);
-                glUniform1i(uniform_tex, 0);
-                glUniform1i(uniform_tex_mode, TEX_MODE_BGR);
+                if (renderOp == D3DRENDERSTATE_TEXTUREHANDLE) // Texture
+                {
+                    printf("texture %x\n", renderArg);
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, renderArg);
+                    glUniform1i(uniform_tex, 0);
+                    glUniform1i(uniform_tex_mode, TEX_MODE_BGR);
+                    
+                    if (renderArg == 0)
+                        glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
+                }
+                else if (renderOp == D3DRENDERSTATE_ZFUNC)
+                {
+                    //printf("zfunc %x\n", renderArg);
+                    /*
+                    D3DCMP_NEVER               = 1,
+                    D3DCMP_LESS                = 2,
+                    D3DCMP_EQUAL               = 3,
+                    D3DCMP_LESSEQUAL           = 4,
+                    D3DCMP_GREATER             = 5,
+                    D3DCMP_NOTEQUAL            = 6,
+                    D3DCMP_GREATEREQUAL        = 7,
+                    D3DCMP_ALWAYS              = 8,
+                    */
+                }
+                else if (renderOp == D3DRENDERSTATE_SRCBLEND)
+                {
+                    printf("D3DRENDERSTATE_SRCBLEND: %u\n", renderArg);
+                    glUniform1i(uniform_blend_mode, renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_TEXTUREPERSPECTIVE)
+                {
+                    printf("D3DRENDERSTATE_TEXTUREPERSPECTIVE: %u\n", renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_MONOENABLE)
+                {
+                    printf("D3DRENDERSTATE_MONOENABLE: %u\n", renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_ZWRITEENABLE)
+                {
+                    printf("D3DRENDERSTATE_ZWRITEENABLE: %u\n", renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_DESTBLEND)
+                {
+                    printf("D3DRENDERSTATE_DESTBLEND: %u\n", renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_TEXTUREMAPBLEND)
+                {
+                    printf("D3DRENDERSTATE_TEXTUREMAPBLEND: %u\n", renderArg);
+                }
+                else if (renderOp == D3DRENDERSTATE_ALPHABLENDENABLE)
+                {
+                    printf("D3DRENDERSTATE_ALPHABLENDENABLE: %u\n", renderArg);
+                }
+                else
+                {
+                    printf("IDirect3DExecuteBuffer::SetExecuteData: Unhandled STATERENDER operation %u!\n", renderOp);
+                }
+                opData += instr->bSize;
             }
-            else if (renderOp == 23)
-            {
-                //printf("zfunc %x\n", renderArg);
-                /*
-                D3DCMP_NEVER               = 1,
-                D3DCMP_LESS                = 2,
-                D3DCMP_EQUAL               = 3,
-                D3DCMP_LESSEQUAL           = 4,
-                D3DCMP_GREATER             = 5,
-                D3DCMP_NOTEQUAL            = 6,
-                D3DCMP_GREATEREQUAL        = 7,
-                D3DCMP_ALWAYS              = 8,
-                */
-            }
+        }
+        else
+        {
+            printf("Uprocessed D3DOP %u\n", instr->bOpcode);
         }
         
         offset += instr->bSize * instr->wCount;
@@ -350,9 +434,11 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
     glDeleteBuffers(1, &vbo_vertices);
     glDeleteBuffers(1, &vbo_colors);
     glDeleteBuffers(1, &vbo_uvs);
+    //glDeleteBuffers(1, &vbo_norms);
     free(data_vertices);
     free(data_colors);    
-    free(data_uvs);    
+    free(data_uvs);
+    free(data_norms);
 
     //render(displayWindow);
         

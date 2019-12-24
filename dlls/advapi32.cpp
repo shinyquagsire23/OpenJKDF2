@@ -50,6 +50,11 @@ uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c
         memcpy(lpData, id, *lpcbData);
         return 0;
     }
+    else if (!strcmp(valuename, "displayMode"))
+    {
+        *(uint32_t*)lpData = 0;
+        return 0;
+    }
 
     return 1; //TODO error
 }

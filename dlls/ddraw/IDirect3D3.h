@@ -168,8 +168,8 @@ public:
         desc->dwDeviceZBufferBitDepth = 0x400;
         desc->dpcTriCaps.dwTextureCaps = D3DPTEXTURECAPS_PERSPECTIVE | D3DPTEXTURECAPS_ALPHA | D3DPTEXTURECAPS_SQUAREONLY | D3DPTEXTURECAPS_TRANSPARENCY;
         desc->dpcTriCaps.dwZCmpCaps = 0xFF; // we support anything for z comparison
-        desc->dpcTriCaps.dwShadeCaps = 0;//D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAFLATSTIPPLED;
-        desc->dpcTriCaps.dwTextureBlendCaps = 0;//D3DPTBLENDCAPS_MODULATEALPHA;
+        desc->dpcTriCaps.dwShadeCaps = D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAFLATSTIPPLED;
+        desc->dpcTriCaps.dwTextureBlendCaps = D3DPTBLENDCAPS_MODULATEALPHA;
         desc->dwMaxBufferSize = 0;
         desc->dwMaxVertexCount = 65536;
         desc->dwMinTextureWidth = 1;

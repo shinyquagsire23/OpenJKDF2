@@ -115,7 +115,7 @@ public:
             
             if (!lpDDSrcSurface->alloc && this_ptr->alloc)
             {
-                int bytes_per_pixel_dst = this_ptr->desc.ddpfPixelFormat.dwRGBBitCount / sizeof(uint8_t);
+                int bytes_per_pixel_dst = this_ptr->desc.ddpfPixelFormat.dwRGBBitCount / 8;
                 uint32_t dst_pitch = this_ptr->desc.lPitch;
 
                 if (!this_ptr->desc.ddpfPixelFormat.dwRGBBitCount)
@@ -132,18 +132,23 @@ public:
                     for (int y = 0; y < copy_h; y++)
                     {
                         //TODO bpp
-                        uint8_t srcByte = 0;
-                        uint8_t dstByte = dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x];
-                        dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x] = srcByte;
+                        for (int i = 0; i < bytes_per_pixel_dst; i++)
+                        {
+                            uint8_t srcByte = bytes_per_pixel_dst == 1 ? 0 : 0xFF;
+                            uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
+                            dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i] = srcByte;
+                        }
                     }
                 }
             }
             else if (lpDDSrcSurface->alloc && this_ptr->alloc)
             {
-                int bytes_per_pixel_src = sizeof(uint8_t);
-                int bytes_per_pixel_dst = sizeof(uint8_t);
+                int bytes_per_pixel_src = lpDDSrcSurface->desc.ddpfPixelFormat.dwRGBBitCount / 8;
+                int bytes_per_pixel_dst = this_ptr->desc.ddpfPixelFormat.dwRGBBitCount / 8;
                 uint32_t src_pitch = lpDDSrcSurface->desc.lPitch;
                 uint32_t dst_pitch = this_ptr->desc.lPitch;
+                
+                printf("asdf %x %x\n", bytes_per_pixel_src, bytes_per_pixel_dst);
 
                 if (!lpDDSrcSurface->desc.ddpfPixelFormat.dwRGBBitCount)
                     bytes_per_pixel_src = sizeof(uint8_t);
@@ -161,11 +166,14 @@ public:
                 {
                     for (int y = 0; y < copy_h; y++)
                     {
-                        //TODO bpp
-                        uint8_t srcByte = src[(srct+y)*src_pitch*bytes_per_pixel_src + srcl+x];
-                        uint8_t dstByte = dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x];
-                        //if (srcByte)
-                        dst[(dstt+y)*dst_pitch*bytes_per_pixel_dst + dstl+x] = srcByte;
+                        for (int i = 0; i < bytes_per_pixel_dst; i++)
+                        {
+                            uint8_t srcByte = src[(srct+y)*src_pitch + (srcl+x)*bytes_per_pixel_src + i];
+                            uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
+                            //if (srcByte != 0xFF)
+                            //    printf("src %x dst %x\n", srcByte, dstByte);
+                            dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i] = srcByte;
+                        }
                     }
                 }
             }
@@ -307,7 +315,38 @@ public:
 
         surfacedesc->lPitch = surfacedesc->dwWidth * (bpp/8);
         surfacedesc->lpSurface = kernel32->VirtualAlloc(0, surfacedesc->lPitch*h, 0, 0);
-        memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0, surfacedesc->lPitch*h);
+        if (bpp == 8)
+            memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0, surfacedesc->lPitch*h);
+        else
+        {
+            if (surfacedesc->ddpfPixelFormat.dwRBitMask == 0x7C00)
+            {
+                uint16_t transparent = 0x3C0F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
+                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+            else if (surfacedesc->ddpfPixelFormat.dwRBitMask == 0xF00)
+            {
+                uint16_t transparent = 0xF0F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
+                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+            else
+            {
+                uint16_t transparent = 0xF81F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
+                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+        }
 
         if (this_ptr->alloc)
         {
@@ -424,6 +463,12 @@ public:
         }
 #endif
 
+        /*if (this_ptr->locked_desc.dwWidth > 128 && this_ptr->locked_desc.dwWidth <= 256)
+        {
+            uint16_t* tex_data = (uint16_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
+            memset(tex_data, 0xFF, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight*2);
+        }*/
+
 #if 0
         uint16_t* tex_data = (uint16_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
         
@@ -432,11 +477,11 @@ public:
         
         printf("%u %ux%u, %x\n", id, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight, this_ptr->alloc);
         
-        if (this_ptr->alloc && this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwHeight <= 480)
+        if (this_ptr->alloc && this_ptr->locked_desc.dwWidth && this_ptr->locked_desc.dwHeight <= 32)
         {
             snprintf(tmp, 256, "texdump/%u_%ux%u.bin",  id++, this_ptr->locked_desc.dwWidth, this_ptr->locked_desc.dwHeight);
             FILE* test = fopen(tmp, "wb");
-            fwrite(tex_data, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight, 1, test);
+            fwrite(tex_data, this_ptr->locked_desc.dwWidth*this_ptr->locked_desc.dwHeight*2, 1, test);
             fclose(test);
         }
 #endif

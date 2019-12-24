@@ -147,6 +147,7 @@ struct ddsurface_ext
     DDSURFACEDESC locked_desc;
     uint32_t alloc;
     uint32_t palette;
+    uint32_t handle;
 };
 
 struct d3dtex_ext
@@ -165,6 +166,10 @@ public:
 
     std::map<uint32_t, SDL_Color[256]> palettes;
     struct ddsurface_ext* primary_surface;
+    
+    uint32_t displayModeWidth;
+    uint32_t displayModeHeight;
+    uint32_t displayModeBpp;
 
     Q_INVOKABLE IDirectDraw4() {}
 
@@ -228,12 +233,18 @@ public:
         *lpDDSurface = CreateInterfaceInstance("IDirectDrawSurface3", 200); //4
         
         struct ddsurface_ext* ext = (struct ddsurface_ext*)vm_ptr_to_real_ptr(*lpDDSurface);
-        
+
         if (!desc->ddpfPixelFormat.dwRGBBitCount)
-            desc->ddpfPixelFormat.dwRGBBitCount = 8;
+        {
+            desc->ddpfPixelFormat.dwRGBBitCount = displayModeBpp;
+            //TODO fill the rest of the bitmask info?
+        }
+
         desc->lPitch = desc->dwWidth * (desc->ddpfPixelFormat.dwRGBBitCount / 8);
         
         ext->desc = *desc;
+        ext->palette = -1;
+        ext->handle = 0;
 
         printf("IDirectDraw4::CreateSurface: texinfo, %ux%u pitch %u ddsCaps %x dwFlags %x bpp %x R,G,B,ABitMask %x %x %x %x\n", desc->dwWidth, desc->dwHeight, desc->lPitch, desc->ddsCaps, desc->ddpfPixelFormat.dwFlags, desc->ddpfPixelFormat.dwRGBBitCount, desc->ddpfPixelFormat.dwRBitMask, desc->ddpfPixelFormat.dwGBitMask, desc->ddpfPixelFormat.dwBBitMask, desc->ddpfPixelFormat.dwRGBAlphaBitMask);
         
@@ -499,6 +510,10 @@ public:
     Q_INVOKABLE uint32_t SetDisplayMode(void* this_ptr, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBpp /*, uint32_t dwRefreshrate, uint32_t dwFlags*/)
     {
         printf("STUB: IDirectDraw4::SetDisplayMode %ux%u, %ubpp\n", dwWidth, dwHeight, dwBpp);
+        
+        displayModeWidth = dwWidth;
+        displayModeHeight = dwHeight;
+        displayModeBpp = dwBpp;
         
         return 0;
     }

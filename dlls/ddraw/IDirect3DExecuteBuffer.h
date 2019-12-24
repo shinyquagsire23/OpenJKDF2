@@ -41,6 +41,39 @@ enum D3DOPCODE {
     D3DOP_SETSTATUS        = 14,
 };
 
+enum D3DRENDERSTATE {
+    D3DRENDERSTATE_TEXTUREHANDLE      = 1,
+    D3DRENDERSTATE_TEXTUREPERSPECTIVE = 4,
+    D3DRENDERSTATE_MONOENABLE         = 11,
+    D3DRENDERSTATE_ZWRITEENABLE       = 14,
+    D3DRENDERSTATE_SRCBLEND           = 19,
+    D3DRENDERSTATE_DESTBLEND          = 20,
+    D3DRENDERSTATE_TEXTUREMAPBLEND    = 21,
+    D3DRENDERSTATE_ZFUNC              = 23,
+    D3DRENDERSTATE_ALPHABLENDENABLE   = 27,
+    D3DRENDERSTATE_FOGENABLE          = 28,
+    D3DRENDERSTATE_FOGCOLOR           = 34,
+    D3DRENDERSTATE_FOGTABLEMODE       = 35,
+    D3DRENDERSTATE_FOGTABLESTART      = 36,
+    D3DRENDERSTATE_FOGTABLEEND        = 37,
+};
+
+enum D3DBLEND {
+    D3DBLEND_ZERO             = 1,
+    D3DBLEND_ONE              = 2,
+    D3DBLEND_SRCCOLOR         = 3,
+    D3DBLEND_INVSRCCOLOR      = 4,
+    D3DBLEND_SRCALPHA         = 5,
+    D3DBLEND_INVSRCALPHA      = 6,
+    D3DBLEND_DESTALPHA        = 7,
+    D3DBLEND_INVDESTALPHA     = 8,
+    D3DBLEND_DESTCOLOR        = 9,
+    D3DBLEND_INVDESTCOLOR     = 10,
+    D3DBLEND_SRCALPHASAT      = 11,
+    D3DBLEND_BOTHSRCALPHA     = 12,
+    D3DBLEND_BOTHINVSRCALPHA  = 13,
+};
+
 struct D3DVERTEX
 {
     float x;
@@ -103,6 +136,8 @@ struct D3DEXECUTEDATA {
 
 #define TEX_MODE_BGR 0
 #define TEX_MODE_RGB 1
+#define TEX_MODE_BGR_WHITETRANSPARENCY 2
+#define TEX_MODE_TEST 3
 
 class IDirect3DExecuteBuffer : public QObject
 {
@@ -112,29 +147,51 @@ private:
     std::map<uint32_t, uint32_t> locked_objs;
 
     GLuint program;
-    GLint attribute_coord3d, attribute_v_color, attribute_v_uv;
-    GLint uniform_mvp, uniform_tex, uniform_tex_mode;
+    GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
+    GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode;
 
     const char* gl_frag = 
     "uniform sampler2D tex;\n"
     "uniform int tex_mode;\n"
-    "varying vec3 f_color;\n"
+    "uniform int blend_mode;\n"
+    "varying vec4 f_color;\n"
     "varying vec2 f_uv;\n"
     "varying vec3 f_coord;\n"
     "void main(void) {\n"
     "  vec4 sampled = texture2D(tex, f_uv);\n"
+    "  vec4 sampled_color = vec4(0.0, 0.0, 0.0, 0.0);\n"
+    "  vec4 vertex_color = f_color;\n"
+    "  vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
+    "  \n"
     "  if (tex_mode == 0)\n"
-    "    gl_FragColor = vec4(sampled.b, sampled.g, sampled.r, sampled.a) * vec4(f_color.r, f_color.g, f_color.b, 1.0);\n"
+    "    sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);\n"
     "  else if (tex_mode == 1)\n"
-    "    gl_FragColor = vec4(sampled.r, sampled.g, sampled.b, sampled.a) * vec4(f_color.r, f_color.g, f_color.b, 1.0);\n"
+    "    sampled_color = vec4(sampled.r, sampled.g, sampled.b, sampled.a);\n"
+    "  else if (tex_mode == 2)\n"
+    "  {\n"
+    "    float transparency = sampled.a;\n"
+    "    if (sampled.r == 1.0 && sampled.g == 0.0 && sampled.b == 1.0)\n"
+    "      transparency = 0.0;\n"
+    "    sampled_color = vec4(sampled.b, sampled.g, sampled.r, transparency);\n"
+    "  }\n"
+    "  else if (tex_mode == 3)\n"
+    "  {\n"
+    "    sampled_color = vec4(1.0, 1.0, 1.0, 0.7);\n"
+    "  }\n"
+    "  \n"
+    "  if (blend_mode == 5)\n"
+    "  {\n"
+    "    blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
+    "  }\n"
+    "  gl_FragColor = sampled_color * vertex_color * blend;\n"
     "}";
 
     const char* gl_vert = 
     "attribute vec3 coord3d;\n"
-    "attribute vec3 v_color;\n"
+    "attribute vec4 v_color;\n"
     "attribute vec2 v_uv;\n"
     "uniform mat4 mvp;\n"
-    "varying vec3 f_color;\n"
+    "varying vec4 f_color;\n"
     "varying vec2 f_uv;\n"
     "varying vec3 f_coord;\n"
     "void main(void) {\n"
@@ -181,17 +238,125 @@ public:
         int h_int = primary->desc.dwHeight;
         float w = (float)w_int;
         float h = (float)h_int;
+        
+        SDL_Surface* surface = NULL;
+        SDL_Texture* texture = NULL;
 
-        SDL_Surface *surface = SDL_CreateRGBSurface(0, w_int, h_int, 8, 0,0,0,0);
-        memcpy(surface->pixels, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int);
-        memset(surface->pixels, 0xFF, w_int*h_int);
-        memset(vm_ptr_to_real_ptr(primary->alloc), 0, w_int*h_int);
-        SDL_SetPaletteColors(surface->format->palette, idirectdraw4->palettes[primary->palette], 0, 256);
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, surface);
+        if (!primary->desc.ddpfPixelFormat.dwRGBBitCount
+            ||primary->desc.ddpfPixelFormat.dwRGBBitCount == 8)
+        {
+            surface = SDL_CreateRGBSurface(0, w_int, h_int, 8, 0,0,0,0);
+            memcpy(surface->pixels, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int);
+            memset(vm_ptr_to_real_ptr(primary->alloc), 0, w_int*h_int);
+            
+            SDL_Color* palette = NULL;
+            //TODO: ehhhh
+            if (primary->palette != -1)
+                palette = idirectdraw4->palettes[primary->palette];
+            else
+                palette = gdi32->getDefaultPal();
 
-        SDL_GL_BindTexture(texture, NULL, NULL);
+            if (palette)
+                SDL_SetPaletteColors(surface->format->palette, palette, 0, 256);
+            texture = SDL_CreateTextureFromSurface(displayRenderer, surface);
+
+            SDL_GL_BindTexture(texture, NULL, NULL);
+            glUniform1i(uniform_tex_mode, TEX_MODE_RGB);
+            glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+        }
+        else
+        {
+            printf("STUB: IDirect3DTexture::GetHandle\n");
+
+            if (!primary->handle)
+            {
+                GLuint id;
+                glGenTextures(1, &id);
+                primary->handle = id;
+            }
+
+            glBindTexture(GL_TEXTURE_2D, primary->handle);
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, primary->locked_desc.dwWidth);
+            
+            bool has_alpha = false;
+            
+            // These textures are actually BGRA usually.
+            // However, BGR565 is invalid for some reason, so we just swap colors
+            // in the shader.
+            printf("overlay %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
+            int format_order = GL_RGB;
+            int format = GL_UNSIGNED_SHORT_5_6_5_REV;
+            if (primary->locked_desc.ddpfPixelFormat.dwRBitMask == 0x7C00)
+            {
+                format = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+                format_order = GL_RGBA;
+                has_alpha = true;
+            }
+            else if (primary->locked_desc.ddpfPixelFormat.dwRBitMask == 0xF00)
+            {
+                has_alpha = true;
+                format = GL_UNSIGNED_SHORT_4_4_4_4_REV;
+                format_order = GL_RGBA;
+            }
+            else if (primary->locked_desc.ddpfPixelFormat.dwRBitMask == 0xF800)
+            {
+                format = GL_UNSIGNED_SHORT_5_6_5_REV;
+                format_order = GL_RGB;
+                has_alpha = false;
+            }
+            else
+            {
+                printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
+            }
+
+            glTexImage2D(GL_TEXTURE_2D,
+                     0, 
+                     has_alpha ? GL_RGBA : GL_RGB,
+                     (GLsizei)primary->locked_desc.dwWidth, 
+                     (GLsizei)primary->locked_desc.dwHeight,
+                     0, 
+                     format_order,
+                     format,
+                     vm_ptr_to_real_ptr(primary->alloc));
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glUniform1i(uniform_tex_mode, TEX_MODE_BGR_WHITETRANSPARENCY);
+            glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+            
+            
+            if (format == GL_UNSIGNED_SHORT_1_5_5_5_REV)
+            {
+                uint16_t transparent = 0x3C0F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
+                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+            else if (format == GL_UNSIGNED_SHORT_4_4_4_4_REV)
+            {
+                uint16_t transparent = 0xF0F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
+                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+            else if (format == GL_UNSIGNED_SHORT_5_6_5_REV)
+            {
+                uint16_t transparent = 0xF81F;
+                uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
+                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                {
+                    pixels[i] = transparent;
+                }
+            }
+        }
         glUniform1i(uniform_tex, 0);
-        glUniform1i(uniform_tex_mode, TEX_MODE_RGB);
+        
         
         // Top-left
         data_vertices[0 * 3 + 0] = 0.0f;
@@ -306,8 +471,10 @@ public:
         glDeleteBuffers(1, &vbo_colors);
         glDeleteBuffers(1, &vbo_uvs);
         
-        SDL_DestroyTexture(texture);
-        SDL_FreeSurface(surface);
+        if (texture)
+            SDL_DestroyTexture(texture);
+        if (surface)
+            SDL_FreeSurface(surface);
     }
 
     Q_INVOKABLE IDirect3DExecuteBuffer() {}
