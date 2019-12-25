@@ -199,7 +199,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
                                              
         uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
         uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
-        uint32_t v_unknz = *(uint32_t*)&vertexes[i].nx;
+        uint32_t v_unknz = *(uint32_t*)&vertexes[i].nz;
         uint8_t v_a = (v_color >> 24) & 0xFF;
         uint8_t v_r = (v_color >> 16) & 0xFF;
         uint8_t v_g = (v_color >> 8) & 0xFF;
@@ -219,7 +219,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
         data_norms[(i*3)+0] = vertexes[i].nx;
         data_norms[(i*3)+1] = vertexes[i].ny;
         data_norms[(i*3)+2] = vertexes[i].nz;
-        //printf("nx, ny, nz %x %x %x, %f %f \n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz);
+        //printf("nx, ny, nz %x %x %x, %f %f, %f\n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz, vertexes[i].z);
     }
     
     glGenBuffers(1, &vbo_vertices);
@@ -256,6 +256,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
         if (instr->bOpcode == D3DOP_EXIT) break;
         else if (instr->bOpcode == D3DOP_TRIANGLE)
         {
+            printf("D3DOP_TRIANGLE\n");
             glUseProgram(program);
             glEnableVertexAttribArray(attribute_coord3d);
             glEnableVertexAttribArray(attribute_v_color);
@@ -363,7 +364,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
                 
                 if (renderOp == D3DRENDERSTATE_TEXTUREHANDLE) // Texture
                 {
-                    printf("texture %x\n", renderArg);
+                    //printf("texture %x\n", renderArg);
 
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, renderArg);
@@ -376,16 +377,33 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
                 else if (renderOp == D3DRENDERSTATE_ZFUNC)
                 {
                     //printf("zfunc %x\n", renderArg);
-                    /*
-                    D3DCMP_NEVER               = 1,
-                    D3DCMP_LESS                = 2,
-                    D3DCMP_EQUAL               = 3,
-                    D3DCMP_LESSEQUAL           = 4,
-                    D3DCMP_GREATER             = 5,
-                    D3DCMP_NOTEQUAL            = 6,
-                    D3DCMP_GREATEREQUAL        = 7,
-                    D3DCMP_ALWAYS              = 8,
-                    */
+                    switch (renderArg)
+                    {
+                        case D3DCMP_NEVER:
+                            glDepthFunc(GL_NEVER);
+                            break;
+                        case D3DCMP_LESS:
+                            glDepthFunc(GL_GREATER);
+                            break;
+                        case D3DCMP_EQUAL:
+                            glDepthFunc(GL_EQUAL);
+                            break;
+                        case D3DCMP_LESSEQUAL:
+                            glDepthFunc(GL_GEQUAL);
+                            break;
+                        case D3DCMP_GREATER:
+                            glDepthFunc(GL_LESS);
+                            break;
+                        case D3DCMP_NOTEQUAL:
+                            glDepthFunc(GL_NOTEQUAL);
+                            break;
+                        case D3DCMP_GREATEREQUAL:
+                            glDepthFunc(GL_LEQUAL);
+                            break;
+                        case D3DCMP_ALWAYS:
+                            glDepthFunc(GL_ALWAYS);
+                            break;
+                    }
                 }
                 else if (renderOp == D3DRENDERSTATE_SRCBLEND)
                 {

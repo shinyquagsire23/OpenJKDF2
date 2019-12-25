@@ -297,6 +297,7 @@ public:
         
         //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
         ImGui::SetNextWindowPos(ImVec2(0,0));
+        ImGui::SetNextWindowCollapsed(false);
         ImGui::Begin("D3D Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImGui::Image((void*)(intptr_t)idirect3dexecutebuffer->fbTex, ImVec2(idirect3dexecutebuffer->view.dwWidth, idirect3dexecutebuffer->view.dwHeight));
@@ -310,7 +311,7 @@ public:
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
+
    	    SDL_GL_SwapWindow(displayWindow);
 
         return 0;

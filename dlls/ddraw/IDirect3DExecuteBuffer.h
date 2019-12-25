@@ -74,6 +74,18 @@ enum D3DBLEND {
     D3DBLEND_BOTHINVSRCALPHA  = 13,
 };
 
+enum D3DCMP
+{
+    D3DCMP_NEVER               = 1,
+    D3DCMP_LESS                = 2,
+    D3DCMP_EQUAL               = 3,
+    D3DCMP_LESSEQUAL           = 4,
+    D3DCMP_GREATER             = 5,
+    D3DCMP_NOTEQUAL            = 6,
+    D3DCMP_GREATEREQUAL        = 7,
+    D3DCMP_ALWAYS              = 8,
+};
+
 struct D3DVERTEX
 {
     float x;
@@ -176,12 +188,14 @@ private:
     "  }\n"
     "  else if (tex_mode == 3)\n"
     "  {\n"
-    "    sampled_color = vec4(1.0, 1.0, 1.0, 0.7);\n"
+    "    sampled_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
     "  }\n"
     "  \n"
     "  if (blend_mode == 5)\n"
     "  {\n"
     "    blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
+    "    if (sampled_color.a < 0.1)\n"
+    "      discard;\n"
     "  }\n"
     "  gl_FragColor = sampled_color * vertex_color * blend;\n"
     "}";
@@ -226,6 +240,9 @@ public:
         GLfloat data_colors[4 * 3 * sizeof(GLfloat)];
         GLfloat data_uvs[4 * 2 * sizeof(GLfloat)];
         
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthFunc(GL_ALWAYS);
+        
         // Set texture
         glActiveTexture(GL_TEXTURE0);
         //glBindTexture(GL_TEXTURE_2D, texid);
@@ -266,8 +283,6 @@ public:
         }
         else
         {
-            printf("STUB: IDirect3DTexture::GetHandle\n");
-
             if (!primary->handle)
             {
                 GLuint id;
