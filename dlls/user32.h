@@ -290,7 +290,7 @@ typedef struct mouse_state
     bool rbutton;
     uint32_t x;
     uint32_t y;
-};
+} mouse_state;
 
 class User32 : public QObject
 {
@@ -309,7 +309,7 @@ public:
     std::queue<std::pair<int, bool> > keystate_changed;
     mouse_state mousestate;
 
-    Q_INVOKABLE User32() : hWndCnt(1), stopping(false), mouseOffsX(0), mouseOffsY(0)
+    Q_INVOKABLE User32() : hWndCnt(1), mouseOffsX(0), mouseOffsY(0), stopping(false)
     {
 //        WM_MOUSEACTIVATE
         mousestate.lbutton = false;
@@ -380,11 +380,11 @@ public:
         
         ResourceData* resPtr = resource_id_map[RT_STRING][resId];
         std::string val = "";
-        void* wstring_ptr = vm_ptr_to_real_ptr(resPtr->ptr);
-        for (int i = 0; i < strIdx+1; i++)
+        intptr_t wstring_ptr = (intptr_t)vm_ptr_to_real_ptr(resPtr->ptr);
+        for (uint32_t i = 0; i < strIdx+1; i++)
         {
             uint16_t len = *(uint16_t*)wstring_ptr;
-            val = from_wstring(wstring_ptr);
+            val = from_wstring((void*)wstring_ptr);
             wstring_ptr += (len + 1) * sizeof(uint16_t);
         }
         
@@ -434,7 +434,7 @@ public:
     
     Q_INVOKABLE uint32_t UnregisterClassA(char* a, uint32_t b)
     {
-        printf("STUB: User32::UnregisterClassA(\"%s\", %x\)\n", a, b);
+        printf("STUB: User32::UnregisterClassA(\"%s\", %x)\n", a, b);
         return 0;
     }
     

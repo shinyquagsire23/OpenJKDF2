@@ -49,8 +49,6 @@
 #include "uc_utils.h"
 #include "vm.h"
 
-uint32_t next_hook;
-
 Kernel32 *kernel32;
 User32 *user32;
 Gdi32 *gdi32;
@@ -85,95 +83,8 @@ SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
 SDL_Event event;
+SDL_GLContext gl_context;
 
-std::map<std::string, ImportTracker*> import_store;
-std::map<std::string, QObject*> dll_store;
-std::map<std::string, QObject*> interface_store;
-
-std::map<std::string, std::map<std::string, int> > method_cache;
-
-uint32_t import_get_hook_addr(std::string dll, std::string name)
-{
-    std::string import_name = dll + "::" + name;
-    return import_store[import_name]->hook;
-}
-
-void register_hook(std::string dll, std::string name, uint32_t hook_addr)
-{
-    std::string import_name = dll + "::" + name;
-
-    if (import_store[import_name]) return;
-
-    import_store[import_name] = new ImportTracker(dll, name, 0, hook_addr);
-    import_store[import_name]->is_hook = true;
-
-    // Write UND instruction for VM hook
-    vm_ptr<uint8_t*> und_write = {hook_addr};
-    und_write.translated()[0] = 0x0f;
-    und_write.translated()[1] = 0x0b;
-
-    auto obj = dll_store[dll];
-    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
-    {
-        auto method = obj->metaObject()->method(method_cache[dll][name]);
-        import_store[import_name]->method = method;
-        import_store[import_name]->obj = obj;
-        
-        for (int i = 0; i < method.parameterCount(); i++)
-        {
-            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
-            {
-                import_store[import_name]->is_param_ptr.push_back(true);
-            }
-            else 
-            {
-                import_store[import_name]->is_param_ptr.push_back(false);
-            }
-            
-        }
-    }
-
-    next_hook += 1;
-}
-
-
-void register_import(std::string dll, std::string name, uint32_t import_addr)
-{
-    std::string import_name = dll + "::" + name;
-
-    if (import_store[import_name]) return;
-
-    import_store[import_name] = new ImportTracker(dll, name, import_addr, next_hook);
-    
-    auto obj = dll_store[dll];
-    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
-    {
-        auto method = obj->metaObject()->method(method_cache[dll][name]);
-        import_store[import_name]->method = method;
-        import_store[import_name]->obj = obj;
-        
-        for (int i = 0; i < method.parameterCount(); i++)
-        {
-            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
-            {
-                import_store[import_name]->is_param_ptr.push_back(true);
-            }
-            else 
-            {
-                import_store[import_name]->is_param_ptr.push_back(false);
-            }
-            
-        }
-    }
-
-    next_hook += 1;
-}
-
-static void hook_test(uc_engine *uc, uint64_t address, uint32_t size)
-{
-    printf("Hook at %x\n", address);
-    uc_print_regs(uc);
-}
 
 void GLAPIENTRY glMessageCallback(GLenum source,
                  GLenum type,
@@ -188,8 +99,99 @@ void GLAPIENTRY glMessageCallback(GLenum source,
             type, severity, message);
 }
 
+void *PrintHello(void *threadid) {
+   long tid;
+   tid = (long)threadid;
+   printf("Hello World! Thread ID, %lu", tid);
+   pthread_exit(NULL);
+}
+
+int init_renderer()
+{
+	// Init SDL
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+
+    SDL_CreateWindowAndRenderer(640*2, 480*2, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &displayWindow, &displayRenderer);
+    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	
+	gl_context = SDL_GL_CreateContext(displayWindow);
+	if (gl_context == NULL)
+		return EXIT_FAILURE;
+		
+    SDL_GL_MakeCurrent(displayWindow, gl_context);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+
+	GLenum glew_status = glewInit();
+	if (glew_status != GLEW_OK)
+		return EXIT_FAILURE;
+
+	if (!GLEW_VERSION_2_0)
+		return EXIT_FAILURE;
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(glMessageCallback, 0);
+    
+    return 0;
+}
+
+int init_audio()
+{
+	if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
+	    return EXIT_FAILURE;
+
+	Mix_AllocateChannels(32);
+	
+	return 0;
+}
+
+int init_renderer_imgui()
+{
+	// Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplSDL2_InitForOpenGL(displayWindow, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 120");
+    
+    return 0;
+}
+
+int deinit_audio()
+{
+    Mix_CloseAudio();
+    
+    return 0;
+}
+
+int deinit_renderer()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+    
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(displayWindow);
+    SDL_Quit();
+
+	return 0;
+}
+
 int main(int argc, char **argv, char **envp)
 {
+	int retval;
     struct vm_inst vm;
     bool no_jk_hax = false;
     bool do_memdump = false;
@@ -233,38 +235,11 @@ int main(int argc, char **argv, char **envp)
         }
     }
 
-    // Init SDL
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
-
-    SDL_CreateWindowAndRenderer(640*2, 480*2, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &displayWindow, &displayRenderer);
-    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
-    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+    retval = init_renderer();
+    if (retval) return retval;
     
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	
-	SDL_GLContext gl_context = SDL_GL_CreateContext(displayWindow);
-	if (gl_context == NULL)
-		return EXIT_FAILURE;
-		
-    SDL_GL_MakeCurrent(displayWindow, gl_context);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
-	
-	if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
-	    return EXIT_FAILURE;
-
-	Mix_AllocateChannels(32);
-
-	GLenum glew_status = glewInit();
-	if (glew_status != GLEW_OK)
-		return -1;
-
-	if (!GLEW_VERSION_2_0)
-		return -1;
-
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(glMessageCallback, 0);
+    retval = init_audio();
+    if (retval) return retval;
 
     // Set up DLL classes
     kernel32 = new Kernel32();
@@ -296,71 +271,59 @@ int main(int argc, char **argv, char **envp)
     msvcrt = new Msvcrt();    
     jk = new JK();
 
-    dll_store["KERNEL32.dll"] = (QObject*)kernel32;
-    dll_store["USER32.dll"] = (QObject*)user32;
-    dll_store["user32.dll"] = (QObject*)user32;
-    dll_store["GDI32.dll"] = (QObject*)gdi32;
-    dll_store["COMCTL32.dll"] = (QObject*)comctl32;
-    dll_store["ADVAPI32.dll"] = (QObject*)advapi32;
-    dll_store["ole32.dll"] = (QObject*)ole32;
-    dll_store["__NMM.dll"] = (QObject*)nmm;
-    dll_store["WINMM.dll"] = (QObject*)nmm;
-    dll_store["DDRAW.dll"] = (QObject*)ddraw;
-    dll_store["DPLAYX.dll"] = (QObject*)dplay;
-    dll_store["DSOUND.dll"] = (QObject*)dsound;
-    dll_store["DINPUT.dll"] = (QObject*)dinput;
-    dll_store["IDirect3D3"] = (QObject*)idirect3d3;
-    dll_store["IDirect3DDevice"] = (QObject*)idirect3ddevice;
-    dll_store["IDirect3DTexture"] = (QObject*)idirect3dtexture;
-    dll_store["IDirect3DViewport"] = (QObject*)idirect3dviewport;
-    dll_store["IDirect3DExecuteBuffer"] = (QObject*)idirect3dexecutebuffer;
-    dll_store["IDirectDraw4"] = (QObject*)idirectdraw4;
-    dll_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
-    dll_store["IDirectDrawPalette"] = (QObject*)idirectdrawpalette;
-    dll_store["IDirectPlay3"] = (QObject*)idirectplay3;
-    dll_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
-    dll_store["IDirectSound"] = (QObject*)idirectsound;
-    dll_store["IDirectSoundBuffer"] = (QObject*)idirectsoundbuffer;
-    dll_store["IDirectInputA"] = (QObject*)idirectinputa;
-    dll_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
-    dll_store["smackw32.DLL"] = (QObject*)smackw32;
-    dll_store["msvcrt.dll"] = (QObject*)msvcrt;
-    dll_store["JK.EXE"] = (QObject*)jk;
+    vm_dll_register("KERNEL32.dll", (QObject*)kernel32);
+    vm_dll_register("USER32.dll", (QObject*)user32);
+    vm_dll_register("user32.dll", (QObject*)user32);
+    vm_dll_register("GDI32.dll", (QObject*)gdi32);
+    vm_dll_register("COMCTL32.dll", (QObject*)comctl32);
+    vm_dll_register("ADVAPI32.dll", (QObject*)advapi32);
+    vm_dll_register("ole32.dll", (QObject*)ole32);
+    vm_dll_register("__NMM.dll", (QObject*)nmm);
+    vm_dll_register("WINMM.dll", (QObject*)nmm);
+    vm_dll_register("DDRAW.dll", (QObject*)ddraw);
+    vm_dll_register("DPLAYX.dll", (QObject*)dplay);
+    vm_dll_register("DSOUND.dll", (QObject*)dsound);
+    vm_dll_register("DINPUT.dll", (QObject*)dinput);
+    vm_dll_register("IDirect3D3", (QObject*)idirect3d3);
+    vm_dll_register("IDirect3DDevice", (QObject*)idirect3ddevice);
+    vm_dll_register("IDirect3DTexture", (QObject*)idirect3dtexture);
+    vm_dll_register("IDirect3DViewport", (QObject*)idirect3dviewport);
+    vm_dll_register("IDirect3DExecuteBuffer", (QObject*)idirect3dexecutebuffer);
+    vm_dll_register("IDirectDraw4", (QObject*)idirectdraw4);
+    vm_dll_register("IDirectDrawSurface3", (QObject*)idirectdrawsurface3);
+    vm_dll_register("IDirectDrawPalette", (QObject*)idirectdrawpalette);
+    vm_dll_register("IDirectPlay3", (QObject*)idirectplay3);
+    vm_dll_register("IDirectPlayLobby3", (QObject*)idirectplaylobby3);
+    vm_dll_register("IDirectSound", (QObject*)idirectsound);
+    vm_dll_register("IDirectSoundBuffer", (QObject*)idirectsoundbuffer);
+    vm_dll_register("IDirectInputA", (QObject*)idirectinputa);
+    vm_dll_register("IDirectInputDeviceA", (QObject*)idirectinputdevicea);
+    vm_dll_register("smackw32.DLL", (QObject*)smackw32);
+    vm_dll_register("msvcrt.dll", (QObject*)msvcrt);
+    vm_dll_register("JK.EXE", (QObject*)jk);
     
-    interface_store["IDirect3D3"] = (QObject*)idirect3d3;
-    interface_store["IDirect3DDevice"] = (QObject*)idirect3ddevice;
-    interface_store["IDirect3DTexture"] = (QObject*)idirect3dtexture;
-    interface_store["IDirect3DViewport"] = (QObject*)idirect3dviewport;
-    interface_store["IDirect3DExecuteBuffer"] = (QObject*)idirect3dexecutebuffer;
-    interface_store["IDirectDraw4"] = (QObject*)idirectdraw4;
-    interface_store["IDirectDrawSurface3"] = (QObject*)idirectdrawsurface3;
-    interface_store["IDirectDrawPalette"] = (QObject*)idirectdrawpalette;
-    interface_store["IDirectPlay3"] = (QObject*)idirectplay3;
-    interface_store["IDirectPlayLobby3"] = (QObject*)idirectplaylobby3;
-    interface_store["IDirectSound"] = (QObject*)idirectsound;
-    interface_store["IDirectSoundBuffer"] = (QObject*)idirectsoundbuffer;
-    interface_store["IDirectInputA"] = (QObject*)idirectinputa;
-    interface_store["IDirectInputDeviceA"] = (QObject*)idirectinputdevicea;
+    vm_interface_register("IDirect3D3", (QObject*)idirect3d3);
+    vm_interface_register("IDirect3DDevice", (QObject*)idirect3ddevice);
+    vm_interface_register("IDirect3DTexture", (QObject*)idirect3dtexture);
+    vm_interface_register("IDirect3DViewport", (QObject*)idirect3dviewport);
+    vm_interface_register("IDirect3DExecuteBuffer", (QObject*)idirect3dexecutebuffer);
+    vm_interface_register("IDirectDraw4", (QObject*)idirectdraw4);
+    vm_interface_register("IDirectDrawSurface3", (QObject*)idirectdrawsurface3);
+    vm_interface_register("IDirectDrawPalette", (QObject*)idirectdrawpalette);
+    vm_interface_register("IDirectPlay3", (QObject*)idirectplay3);
+    vm_interface_register("IDirectPlayLobby3", (QObject*)idirectplaylobby3);
+    vm_interface_register("IDirectSound", (QObject*)idirectsound);
+    vm_interface_register("IDirectSoundBuffer", (QObject*)idirectsoundbuffer);
+    vm_interface_register("IDirectInputA", (QObject*)idirectinputa);
+    vm_interface_register("IDirectInputDeviceA", (QObject*)idirectinputdevicea);
     
     qRegisterMetaType<char*>("char*");
     qRegisterMetaType<uint32_t*>("uint32_t*");
     
-    printf("Caching functions\n");
-    for (auto obj_pair : dll_store)
-    {
-        auto obj = obj_pair.second;
-        for (int i = 0; i < obj->metaObject()->methodCount(); i++)
-        {
-            QMetaMethod method = obj->metaObject()->method(i);
-            std::string strname = std::string(method.name().data());
-            
-            method_cache[obj_pair.first][strname] = i;
-            //printf("%s %s %i\n", obj_pair.first.c_str(), name, i);
-        }
-    }
+    vm_cache_functions();
 
     // Map hook mem
-    next_hook = 0xd0000000;
+    vm_set_hookmem(0xd0000000);
     uint32_t start_addr = load_executable(exe_path, &image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
     
     // Apply options
@@ -375,23 +338,11 @@ int main(int argc, char **argv, char **envp)
     // Hook DLLs
     msvcrt->hook();
     
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer bindings
-    ImGui_ImplSDL2_InitForOpenGL(displayWindow, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 120");
+    // Set up imgui
+    init_renderer_imgui();
 
     // Start VM
-    register_import("dummy", "dummy", 0);
+    vm_import_register("dummy", "dummy", 0);
     vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
     
 #if 0
@@ -432,7 +383,7 @@ int main(int argc, char **argv, char **envp)
         fclose(dump2);
         
         FILE* dump3 = fopen("stack_dump.bin", "wb");
-        fwrite(image_mem + image_mem_size, stack_size, 1, dump3);
+        fwrite((void*)((intptr_t)image_mem + image_mem_size), stack_size, 1, dump3);
         fclose(dump3);
         
         FILE* dump4 = fopen("virt_dump.bin", "wb");
@@ -440,16 +391,9 @@ int main(int argc, char **argv, char **envp)
         fclose(dump4);
     }
     
-    Mix_CloseAudio();
-    
     // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-    
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(displayWindow);
-    SDL_Quit();
+    deinit_audio();
+    deinit_renderer();
 
     return 0;
 }

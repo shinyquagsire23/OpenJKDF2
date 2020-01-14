@@ -15,7 +15,7 @@ public:
     
     Q_INVOKABLE void DirectPlayLobbyCreateA(uint8_t* lpGUID, uint32_t* lplpDPL, void* lpUnk, void* lpData, uint32_t dwDatasize)
     {
-        printf("Create DirectPlayLobby\n");
+        printf("DPlay::DirectPlayLobbyCreateA: Created DirectPlayLobby\n");
         *lplpDPL = CreateInterfaceInstance("IDirectPlayLobby3", 16);
     }
 

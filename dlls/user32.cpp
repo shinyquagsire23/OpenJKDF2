@@ -515,7 +515,7 @@ bool update_input(int mouseOffsX, int mouseOffsY)
                 handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
                 break;
             case SDL_KEYUP:
-                handleKey(&event.key.keysym, WM_KEYUP, 0xc00000001);
+                handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
                 break;
             case SDL_MOUSEMOTION:
                 handleMouseMove(&event.motion, mouseOffsX, mouseOffsY);

@@ -2,7 +2,6 @@
 #define KERNEL32_H
 
 #include <QObject>
-#include <unicorn/unicorn.h>
 #include <bitset>
 #include <map>
 #include "loaders/exe.h"
@@ -78,7 +77,7 @@ private:
     std::map<uint32_t, uint32_t> tls_vals;
     std::map<uint32_t, uint32_t> virtual_allocs;
     std::bitset<0x10000000 / 0x1000> virtual_bitmap;
-    int virtual_head;
+    size_t virtual_head;
     int tls_index;
 
 public:
@@ -101,7 +100,7 @@ public:
     
     std::map<uint32_t, FILE*> openFiles;
 
-    Q_INVOKABLE Kernel32() : heap_addr(0x90000000), virtual_addr(0x80000000), heap_handle(1), heap_size(0), virtual_size(0), last_error(0), file_search_hand(1) , hFileCnt(1), virtual_head(0), tls_index(0)
+    Q_INVOKABLE Kernel32() : virtual_head(0), tls_index(0), heap_handle(1), heap_addr(0x90000000), heap_size(0), virtual_addr(0x80000000), virtual_size(0), last_alloc(0), last_error(0), file_search_hand(1) , hFileCnt(1)
     {
         qRegisterMetaType<struct WIN32_FIND_DATAA*>("struct WIN32_FIND_DATAA*");
         heap_size_actual = 0x8000000;
@@ -110,7 +109,7 @@ public:
         virtual_mem = vm_alloc(virtual_size_actual);
     }
     
-    Q_INVOKABLE uint32_t Unicorn_MapHeaps();
+    Q_INVOKABLE uint32_t VM_MapHeaps();
     Q_INVOKABLE uint32_t HeapCreate(uint32_t a, uint32_t b, uint32_t c);
     Q_INVOKABLE uint32_t HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size);
     Q_INVOKABLE uint32_t HeapFree(uint32_t hHeap, uint32_t dwFlags, uint32_t mem);
@@ -133,7 +132,7 @@ public:
     Q_INVOKABLE uint32_t FreeEnvironmentStringsW(uint32_t ptr);
     Q_INVOKABLE uint32_t GetModuleFileNameA(uint32_t a, uint32_t b, uint32_t c);
     Q_INVOKABLE uint32_t GetModuleHandleA(char* module);
-    Q_INVOKABLE uint32_t GetProcAddress(uint32_t a, uint32_t funcName);
+    Q_INVOKABLE uint32_t GetProcAddress(uint32_t a, char* funcName);
     Q_INVOKABLE void OutputDebugStringA(uint32_t str_ptr);
     Q_INVOKABLE uint32_t GetLastError();
     Q_INVOKABLE uint32_t LoadLibraryA(uint32_t dllStr_ptr);
@@ -167,6 +166,8 @@ public:
         //printf("STUB: TlsSetValue %x to %x\n", dwTlsIndex, lpTlsValue);
         
         tls_vals[dwTlsIndex] = lpTlsValue;
+        
+        return 1;
     }
 
     Q_INVOKABLE uint32_t TlsGetValue(uint32_t dwTlsIndex)
@@ -356,7 +357,7 @@ public:
     Q_INVOKABLE uint32_t InterlockedDecrement(uint32_t* addend)
     {
         printf("STUB: Kernel32::InterlockedDecrement(...)\n");
-        *addend--;
+        (*addend)--;
         return *addend;
     }
     

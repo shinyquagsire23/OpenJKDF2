@@ -106,6 +106,7 @@ public:
     Q_INVOKABLE uint32_t GetCaps(void* this_ptr, uint32_t a)
     {
         printf("STUB: IDirectSound::GetCaps\n");
+        return 0;
     }
     
     Q_INVOKABLE uint32_t DuplicateSoundBuffer(void* this_ptr, struct dsndbuffer_ext* orig, uint32_t* duplicate)
@@ -134,26 +135,31 @@ public:
     Q_INVOKABLE uint32_t SetCooperativeLevel(void* this_ptr, uint32_t a, uint32_t b)
     {
         printf("STUB: IDirectSound::SetCooperativeLevel\n");
+        return 0;
     }
 
     Q_INVOKABLE uint32_t Compact(void* this_ptr)
     {
         printf("STUB: IDirectSound::Compact\n");
+        return 0;
     }
 
     Q_INVOKABLE uint32_t GetSpeakerConfig(void* this_ptr, uint32_t a)
     {
         printf("STUB: IDirectSound::GetSpeakerConfig\n");
+        return 0;
     }
 
     Q_INVOKABLE uint32_t SetSpeakerConfig(void* this_ptr, uint32_t b)
     {
         printf("STUB: IDirectSound::SetSpeakerConfig\n");
+        return 0;
     }
 
     Q_INVOKABLE uint32_t Initialize(void* this_ptr, uint32_t a)
     {
         printf("STUB: IDirectSound::Initialize\n");
+        return 0;
     }
 
 //    Q_INVOKABLE uint32_t ();

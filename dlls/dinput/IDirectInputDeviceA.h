@@ -558,8 +558,8 @@ public:
             return DI_OK;
         }
         
-        int written = 0;
-        for (int i = 0; i < *pdwInOut; i++, written++)
+        uint32_t written = 0;
+        for (uint32_t i = 0; i < *pdwInOut; i++, written++)
         {
             if (!user32->keystate_changed.size()) break;
 

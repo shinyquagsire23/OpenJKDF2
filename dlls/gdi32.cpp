@@ -129,7 +129,7 @@ uint32_t Gdi32::SetDIBColorTable(uint32_t hdc, uint32_t iStart, uint32_t cEntrie
     printf("STUB: SetDIBColorTable %x %x %x, colors...\n", hdc, iStart, cEntries);
     
     this->defaultHdcPal = hdc;
-    for (int i = 0; i < cEntries; i++)
+    for (uint32_t i = 0; i < cEntries; i++)
     {
         dc_palettes[hdc][i].r = prgbq[iStart + i].r;
         dc_palettes[hdc][i].g = prgbq[iStart + i].g;

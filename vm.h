@@ -83,27 +83,45 @@ extern uint32_t image_mem_size;
 extern uint32_t stack_size, stack_addr;
 extern std::unordered_map<uint32_t, ImportTracker*> import_hooks;
 extern std::map<std::string, ImportTracker*> import_store;
+extern std::map<std::string, QObject*> interface_store;
 
+// Address translation
 void *vm_ptr_to_real_ptr(uint32_t vm_ptr);
 uint32_t real_ptr_to_vm_ptr(void* real_ptr);
 
+// Helper function
 void vm_init_descriptor(struct SegmentDescriptor *desc, uint32_t base, uint32_t limit, uint8_t is_code);
 
+// Memory mapping, memory reading, memory writing
 void vm_mem_map_ptr(uint64_t address, size_t size, uint32_t perms, void *ptr);
 void vm_mem_read(uint32_t addr, void* out, size_t size);
 void vm_mem_write(uint32_t addr, void* in, size_t size);
 std::string vm_read_string(uint32_t addr);
 std::string vm_read_wstring(uint32_t addr);
 
+// Register read/write
 uint32_t vm_reg_read(int id);
 void vm_reg_write(int id, uint32_t value);
 
+// Stack helpers, push/pop
 void vm_stack_pop(uint32_t *out, int num);
 void vm_stack_push(uint32_t *in, int num);
 
+// Reimplementation helpers
 void* vm_alloc(uint32_t size);
+
+// DLL/COM registration, synchronization
 void vm_sync_imports();
 void vm_process_import(ImportTracker* import);
+void vm_dll_register(std::string dll_fname, QObject* dll_obj);
+void vm_interface_register(std::string interface_name, QObject* interface_obj);
+void vm_cache_functions();
+
+// Function hooking
+void vm_set_hookmem(uint32_t addr);
+uint32_t vm_import_get_hook_addr(std::string dll, std::string name);
+void vm_hook_register(std::string dll, std::string name, uint32_t hook_addr);
+void vm_import_register(std::string dll, std::string name, uint32_t import_addr);
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args...);
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret = true);
 uint32_t vm_run(struct vm_inst *vm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp);

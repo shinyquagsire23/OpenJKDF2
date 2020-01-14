@@ -286,7 +286,7 @@ public:
             desc->ddpfPixelFormat.dwRGBBitCount = 8;
             desc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0);
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -299,7 +299,7 @@ public:
             desc->lPitch = 1280*sizeof(uint8_t);
             desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
 
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0);
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -312,7 +312,7 @@ public:
             desc->lPitch = 1920*sizeof(uint8_t);
             desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
 
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0);
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -331,7 +331,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x0000FF00;
             desc->ddpfPixelFormat.dwBBitMask = 0x000000FF;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -351,7 +351,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
             desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0);
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -371,7 +371,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
             desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0);
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -391,7 +391,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
             desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -410,7 +410,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
             desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }
@@ -429,7 +429,7 @@ public:
             desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
             desc->ddpfPixelFormat.dwBBitMask = 0x001F;
             
-            uint32_t ret = vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
             
             kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
         }

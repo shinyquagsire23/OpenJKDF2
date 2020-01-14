@@ -17,9 +17,15 @@ void* image_mem;
 uint32_t image_mem_size;
 uint32_t stack_size, stack_addr;
 
+uint32_t next_hook;
+
 bool using_kvm = false;
 
 std::unordered_map<uint32_t, ImportTracker*> import_hooks;
+std::map<std::string, ImportTracker*> import_store;
+std::map<std::string, QObject*> dll_store;
+std::map<std::string, QObject*> interface_store;
+std::map<std::string, std::map<std::string, int> > method_cache;
 
 QGenericArgument q_args[9];
 
@@ -30,15 +36,15 @@ void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
 
     if (vm_ptr >= image_mem_addr && vm_ptr <= image_mem_addr + image_mem_size + stack_size)
     {
-        return image_mem + vm_ptr - image_mem_addr;
+        return (void*)((intptr_t)image_mem + vm_ptr - image_mem_addr);
     }
     else if (kernel32 && vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
     {
-        return kernel32->heap_mem + vm_ptr - kernel32->heap_addr;
+        return (void*)((intptr_t)kernel32->heap_mem + vm_ptr - kernel32->heap_addr);
     }
     else if (kernel32 && vm_ptr >= kernel32->virtual_addr && vm_ptr <= kernel32->virtual_addr + kernel32->virtual_size_actual)
     {
-        return kernel32->virtual_mem + vm_ptr - kernel32->virtual_addr;
+        return (void*)((intptr_t)kernel32->virtual_mem + vm_ptr - kernel32->virtual_addr);
     }
     else
     {
@@ -51,17 +57,17 @@ uint32_t real_ptr_to_vm_ptr(void* real_ptr)
 {
     if (real_ptr == nullptr) return 0;
 
-    if (real_ptr >= image_mem && real_ptr <= image_mem + image_mem_size + stack_size)
+    if (real_ptr >= image_mem && (intptr_t)real_ptr <= (intptr_t)image_mem + image_mem_size + stack_size)
     {
-        return image_mem_addr + ((size_t)real_ptr - (size_t)image_mem);
+        return image_mem_addr + ((intptr_t)real_ptr - (intptr_t)image_mem);
     }
-    else if (real_ptr >= kernel32->heap_mem && real_ptr <= kernel32->heap_mem + kernel32->heap_size)
+    else if (real_ptr >= kernel32->heap_mem && (intptr_t)real_ptr <= (intptr_t)kernel32->heap_mem + kernel32->heap_size)
     {
-        return kernel32->heap_addr + ((size_t)real_ptr - (size_t)kernel32->heap_mem);
+        return kernel32->heap_addr + ((intptr_t)real_ptr - (intptr_t)kernel32->heap_mem);
     }
-    else if (real_ptr >= kernel32->virtual_mem && real_ptr <= kernel32->virtual_mem + kernel32->virtual_size_actual)
+    else if (real_ptr >= kernel32->virtual_mem && (intptr_t)real_ptr <= (intptr_t)kernel32->virtual_mem + kernel32->virtual_size_actual)
     {
-        return kernel32->virtual_addr + ((size_t)real_ptr - (size_t)kernel32->virtual_mem);
+        return kernel32->virtual_addr + ((intptr_t)real_ptr - (intptr_t)kernel32->virtual_mem);
     }
     else
     {
@@ -153,7 +159,7 @@ void vm_print_regs()
     }
     else
     {
-        
+        uc_print_regs(current_uc);
     }
 }
 
@@ -238,7 +244,116 @@ std::string vm_read_wstring(uint32_t addr)
      return str;
 }
 
-static void hook_import(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import)
+void vm_dll_register(std::string dll_fname, QObject* dll_obj)
+{
+	dll_store[dll_fname] = (QObject*)dll_obj;
+}
+
+void vm_interface_register(std::string interface_name, QObject* interface_obj)
+{
+	interface_store[interface_name] = (QObject*)interface_obj;
+}
+
+void vm_cache_functions()
+{
+	printf("Caching functions\n");
+    for (auto obj_pair : dll_store)
+    {
+        auto obj = obj_pair.second;
+        for (int i = 0; i < obj->metaObject()->methodCount(); i++)
+        {
+            QMetaMethod method = obj->metaObject()->method(i);
+            std::string strname = std::string(method.name().data());
+            
+            method_cache[obj_pair.first][strname] = i;
+            //printf("%s %s %i\n", obj_pair.first.c_str(), name, i);
+        }
+    }
+}
+
+void vm_set_hookmem(uint32_t addr)
+{
+	next_hook = addr;
+}
+
+uint32_t vm_import_get_hook_addr(std::string dll, std::string name)
+{
+    std::string import_name = dll + "::" + name;
+    return import_store[import_name]->hook;
+}
+
+void vm_hook_register(std::string dll, std::string name, uint32_t hook_addr)
+{
+    std::string import_name = dll + "::" + name;
+
+    if (import_store[import_name]) return;
+
+    import_store[import_name] = new ImportTracker(dll, name, 0, hook_addr);
+    import_store[import_name]->is_hook = true;
+
+    // Write UND instruction for VM hook
+    vm_ptr<uint8_t*> und_write = {hook_addr};
+    und_write.translated()[0] = 0x0f;
+    und_write.translated()[1] = 0x0b;
+
+    auto obj = dll_store[dll];
+    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
+    {
+        auto method = obj->metaObject()->method(method_cache[dll][name]);
+        import_store[import_name]->method = method;
+        import_store[import_name]->obj = obj;
+        
+        for (int i = 0; i < method.parameterCount(); i++)
+        {
+            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
+            {
+                import_store[import_name]->is_param_ptr.push_back(true);
+            }
+            else 
+            {
+                import_store[import_name]->is_param_ptr.push_back(false);
+            }
+            
+        }
+    }
+
+    next_hook += 1;
+}
+
+
+void vm_import_register(std::string dll, std::string name, uint32_t import_addr)
+{
+    std::string import_name = dll + "::" + name;
+
+    if (import_store[import_name]) return;
+
+    import_store[import_name] = new ImportTracker(dll, name, import_addr, next_hook);
+    
+    auto obj = dll_store[dll];
+    if (obj && method_cache[dll].find(name) != method_cache[dll].end())
+    {
+        auto method = obj->metaObject()->method(method_cache[dll][name]);
+        import_store[import_name]->method = method;
+        import_store[import_name]->obj = obj;
+        
+        for (int i = 0; i < method.parameterCount(); i++)
+        {
+            if (method.parameterTypes()[i].data()[strlen(method.parameterTypes()[i].data()) - 1] == '*')
+            {
+                import_store[import_name]->is_param_ptr.push_back(true);
+            }
+            else 
+            {
+                import_store[import_name]->is_param_ptr.push_back(false);
+            }
+            
+        }
+    }
+
+    next_hook += 1;
+}
+
+static void vm_import_hook(uc_engine *uc, uint64_t address, uint32_t size, ImportTracker *import)
 {
     vm_process_import(import);
 }
@@ -258,7 +373,7 @@ void vm_sync_imports()
         if (!using_kvm)
         {
             uc_mem_map(current_uc, import->hook, 0x1000, UC_PROT_ALL);
-            uc_hook_add(current_uc, &import->trace, UC_HOOK_CODE, (void*)hook_import, (void*)import, import->hook, import->hook);
+            uc_hook_add(current_uc, &import->trace, UC_HOOK_CODE, (void*)vm_import_hook, (void*)import, import->hook, import->hook);
         }
     }
 }
@@ -268,8 +383,8 @@ void vm_process_import(ImportTracker* import)
     uint32_t ret_addr;
     vm_stack_pop(&ret_addr, 1);
     
-    //if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
-    //    printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
+    if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
+        printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
 
     //vm_print_regs();
     if (import->obj)
@@ -358,7 +473,6 @@ void vm_process_import(ImportTracker* import)
     else if (import->name == "sprintf")
     {
         uint32_t args[2];
-        uint32_t eax;
         
         vm_stack_pop(args, 2); //TODO
         
@@ -368,7 +482,7 @@ void vm_process_import(ImportTracker* import)
         
         int num_args = 0;
         int last_arg_start = 0;
-        for (int i = 0; i < strlen(format); i++)
+        for (int i = 0; i < (int)strlen(format); i++)
         {
             if (format[i] != '%') continue;
             if (format[i+1] == '%') continue;
@@ -409,12 +523,11 @@ void vm_process_import(ImportTracker* import)
         }
         
         
-        printf("IFFY: msvcrt.dll::sprintf(0x%x, \"%s\") -> %s\n", args[0], format, out);
+        printf("IFFY: msvcrt.dll::sprintf(0x%x, \"%s\") -> \n", args[0], format/*, out*/);
     }
     else if (import->name == "wsprintfA")
     {
         uint32_t args[2];
-        uint32_t eax;
         
         vm_stack_pop(args, 2); //TODO
         
@@ -425,7 +538,7 @@ void vm_process_import(ImportTracker* import)
         
         int num_args = 0;
         int last_arg_start = 0;
-        for (int i = 0; i < strlen(format); i++)
+        for (int i = 0; i < (int)strlen(format); i++)
         {
             if (format[i] != '%') continue;
             if (format[i+1] == '%') continue;
@@ -471,7 +584,7 @@ void vm_process_import(ImportTracker* import)
         }
         
         
-        printf("IFFY: msvcrt.dll::wsprintfA(0x%x, \"%s\") -> %s\n", args[0], format, out);
+        printf("IFFY: msvcrt.dll::wsprintfA(0x%x, \"%s\") -> \n", args[0], format/*, out*/);
     }
     else if (import->name == "StretchDIBits")
     {
@@ -496,7 +609,6 @@ void vm_process_import(ImportTracker* import)
     else if (import->name == "??3@YAXPAX@Z")
     {
         uint32_t args[1];
-        uint32_t eax;
         
         vm_stack_pop(args, 1); //TODO: real handles
         
@@ -515,19 +627,22 @@ void vm_process_import(ImportTracker* import)
 
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args...)
 {
+	uint32_t eax;
     va_list args;
     va_start(args, num_args);
 
     uint32_t* arg_list = (uint32_t*)malloc(num_args * sizeof(uint32_t));
 
-    for (int i = 0; i < num_args; i++)
+    for (uint32_t i = 0; i < num_args; i++)
     {
         arg_list[i] = va_arg(args, uint32_t);
     }
 
-    vm_call_function(addr, num_args, arg_list, true);
+    eax = vm_call_function(addr, num_args, arg_list, true);
 
     va_end(args);
+    
+    return eax;
 }
 
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret)
@@ -539,7 +654,7 @@ uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool
 
     uint32_t old_esp = vm_reg_read(UC_X86_REG_ESP);
 
-    for (int i = 0; i < num_args; i++)
+    for (uint32_t i = 0; i < num_args; i++)
     {
         vm_stack_push(&args[num_args-i-1], 1);
     }

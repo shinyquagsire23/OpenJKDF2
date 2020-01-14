@@ -140,16 +140,16 @@ void kvm_print_regs(struct vm *vm)
     }
 
     printf("Register dump:\n");
-    printf("eax %8.8x ", regs.rax);
-    printf("ecx %8.8x ", regs.rcx);
-    printf("edx %8.8x ", regs.rdx);
-    printf("ebx %8.8x\n", regs.rbx);
-    printf("esp %8.8x ", regs.rsp);
-    printf("ebp %8.8x ", regs.rbp);
-    printf("esi %8.8x ", regs.rsi);
-    printf("edi %8.8x ", regs.rdi);
+    printf("eax %8.8" PRIx64 " ", regs.rax);
+    printf("ecx %8.8" PRIx64 " ", regs.rcx);
+    printf("edx %8.8" PRIx64 " ", regs.rdx);
+    printf("ebx %8.8" PRIx64 "\n", regs.rbx);
+    printf("esp %8.8" PRIx64 " ", regs.rsp);
+    printf("ebp %8.8" PRIx64 " ", regs.rbp);
+    printf("esi %8.8" PRIx64 " ", regs.rsi);
+    printf("edi %8.8" PRIx64 " ", regs.rdi);
     printf("\n");
-    printf("eip %8.8x ", regs.rip);
+    printf("eip %8.8" PRIx64 " ", regs.rip);
     printf("\n");
 }
 
@@ -167,11 +167,11 @@ void kvm_mem_map_ptr(struct vm *vm, uint64_t address, size_t size, uint32_t perm
     if (ioctl(vm_fd, KVM_SET_USER_MEMORY_REGION, &memreg) < 0) 
     {
         perror("KVM_SET_USER_MEMORY_REGION");
-        printf("Failed to map address %lx, size %zx, perms %x, ptr %p\n", address, size, perms, ptr);
+        printf("Failed to map address %" PRIx64 ", size %zx, perms %" PRIx32 ", ptr %p\n", address, size, perms, ptr);
     }
     else
     {
-        printf("Mapped address %lx, size %zx, perms %x, ptr %p\n", address, size, perms, ptr);
+        printf("Mapped address %" PRIx64 ", size %zx, perms %" PRIx32 ", ptr %p\n", address, size, perms, ptr);
     }
 }
 
@@ -242,7 +242,6 @@ void vcpu_init(struct vm *vm)
 uint32_t run_vm(struct vm *vm, size_t sz)
 {
     struct kvm_regs regs;
-    uint64_t memval = 0;
     ImportTracker *import;
     
     vm->stopped = false;
@@ -288,7 +287,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
             }
             else
             {
-                printf("Failed import %x\n", regs.rip);
+                printf("Failed import %" PRIx64 "\n", regs.rip);
                 kvm_print_regs(vm);
                 kvm_stop(vm);
             }
@@ -390,7 +389,7 @@ bool initialized = false;
 
 uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
-    //printf("KVM run %x\n", start_addr);
+    //printf("KVM run %" PRIx32 "\n", start_addr);
     
     // Save state
     if (current_kvm)
@@ -436,7 +435,7 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
         //*(uint32_t*)(image_mem + 0x8F0524 - image_addr) = 0x12345678;
         vm_sync_imports();
         
-        kernel32->Unicorn_MapHeaps();
+        kernel32->VM_MapHeaps();
         initialized = true;
     }
 

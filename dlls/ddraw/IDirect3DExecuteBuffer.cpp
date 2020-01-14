@@ -157,7 +157,7 @@ uint32_t IDirect3DExecuteBuffer::Initialize(void* this_ptr, uint32_t a, uint32_t
     return 0;
 }
 
-uint32_t IDirect3DExecuteBuffer::Lock(void* this_ptr, struct D3DEXECUTEBUFFERDESC* desc)
+uint32_t IDirect3DExecuteBuffer::Lock(void* this_ptr, D3DEXECUTEBUFFERDESC* desc)
 {
     if (locked_objs[real_ptr_to_vm_ptr(this_ptr)])
     {
@@ -176,7 +176,7 @@ uint32_t IDirect3DExecuteBuffer::Unlock(void* this_ptr)
     return 0;
 }
 
-uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUTEDATA* desc)
+uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, D3DEXECUTEDATA* desc)
 {
     //TODO: wait for Execute
     printf("IDirect3DExecuteBuffer::SetExecuteData: execute offset %x, count %x,  instr offset %x, instr count %x, hvertex offset %x\n", desc->dwVertexOffset, desc->dwVertexCount, desc->dwInstructionOffset, desc->dwInstructionLength, desc->dwHVertexOffset);
@@ -189,7 +189,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
     GLfloat* data_uvs = (GLfloat*)malloc(desc->dwVertexCount * 2 * sizeof(GLfloat));
     GLfloat* data_norms = (GLfloat*)malloc(desc->dwVertexCount * 3 * sizeof(GLfloat));
 
-    struct D3DVERTEX* vertexes = (struct D3DVERTEX*)vm_ptr_to_real_ptr(locked_objs[real_ptr_to_vm_ptr(this_ptr)] + desc->dwVertexOffset);
+    D3DVERTEX* vertexes = (D3DVERTEX*)vm_ptr_to_real_ptr(locked_objs[real_ptr_to_vm_ptr(this_ptr)] + desc->dwVertexOffset);
 
     for (int i = 0; i < desc->dwVertexCount; i++)
     {
@@ -246,7 +246,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
     int offset = desc->dwInstructionOffset;
     for (int i = 0; i < desc->dwInstructionLength; i++)
     {
-        struct D3DINSTRUCTION* instr = (struct D3DINSTRUCTION*)vm_ptr_to_real_ptr(locked_objs[real_ptr_to_vm_ptr(this_ptr)] + offset);
+        D3DINSTRUCTION* instr = (D3DINSTRUCTION*)vm_ptr_to_real_ptr(locked_objs[real_ptr_to_vm_ptr(this_ptr)] + offset);
         
         //printf("instr opcode %x, size %x, count %x\n", instr->bOpcode, instr->bSize, instr->wCount);
         
@@ -256,7 +256,6 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
         if (instr->bOpcode == D3DOP_EXIT) break;
         else if (instr->bOpcode == D3DOP_TRIANGLE)
         {
-            printf("D3DOP_TRIANGLE\n");
             glUseProgram(program);
             glEnableVertexAttribArray(attribute_coord3d);
             glEnableVertexAttribArray(attribute_v_color);
@@ -307,7 +306,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, struct D3DEXECUT
             );*/
     
             GLushort* data_elements = new GLushort[instr->wCount * 3];
-            struct D3DTRIANGLE* tris = (struct D3DTRIANGLE*)opData;
+            D3DTRIANGLE* tris = (D3DTRIANGLE*)opData;
             for (int j = 0; j < instr->wCount; j++)
             {
                 //printf("tri %u,%u,%u, flags %x\n", tris[j].v1, tris[j].v2, tris[j].v3, tris[j].flags);

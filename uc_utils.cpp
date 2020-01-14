@@ -45,11 +45,11 @@ void uc_stack_dump(uc_engine *uc)
         uint32_t tmp;
 
         uc_mem_read(uc, esp + i*sizeof(uint32_t), &tmp, sizeof(uint32_t));
-        printf("@%08x: %08x\n", esp + i*sizeof(uint32_t), tmp);
+        printf("@%08" PRIx32 ": %08" PRIx32 "\n", (uint32_t)(esp + i*sizeof(uint32_t)), tmp);
     }
 }
 
-
+#if 0
 static void hook_block(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
 {
     //printf(">>> Tracing basic block at 0x%"PRIx64 ", block size = 0x%x\n", address, size);
@@ -104,28 +104,29 @@ static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user
         uc_stack_dump(uc);
     }
 }
-
+#endif
 
 // callback for tracing memory access (READ or WRITE)
 static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type,
         uint64_t address, int size, int64_t value, void *user_data)
 {
-    switch(type) {
+    switch(type) 
+    {
         default:
             // return false to indicate we want to stop emulation
             return false;
         case UC_MEM_READ_UNMAPPED:
-            printf(">>> Missing memory is being READ at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
+            printf(">>> Missing memory is being READ at 0x%" PRIx64 ", data size = %u, data value = 0x%" PRIx64 "\n",
                          address, size, value);
             uc_print_regs(uc);
             return true;
         case UC_MEM_WRITE_UNMAPPED:
-            printf(">>> Missing memory is being WRITE at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
+            printf(">>> Missing memory is being WRITE at 0x%" PRIx64 ", data size = %u, data value = 0x%" PRIx64 "\n",
                          address, size, value);
             uc_print_regs(uc);
             return true;
-        case UC_ERR_FETCH_UNMAPPED:
-            printf(">>> Missing memory is being EXEC at 0x%"PRIx64 ", data size = %u, data value = 0x%"PRIx64 "\n",
+        case UC_MEM_FETCH_UNMAPPED:
+            printf(">>> Missing memory is being EXEC at 0x%" PRIx64 ", data size = %u, data value = 0x%" PRIx64 "\n",
                          address, size, value);
             return false;
     }
@@ -134,7 +135,7 @@ static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type,
 uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uc_err err;
-    uc_hook trace1, trace2, trace3;
+    uc_hook /*trace1, trace2,*/ trace3;
     uc_x86_mmr gdtr;
     uc_engine *uc_last;
     uint32_t eax;
@@ -189,7 +190,7 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
     current_uc = uc;
     vm_sync_imports();
 
-    kernel32->Unicorn_MapHeaps();
+    kernel32->VM_MapHeaps();
     printf("Emulation instance at %x\n", start_addr);
 
     err = uc_emu_start(uc, start_addr, end_addr, 0, 0);
@@ -210,7 +211,7 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
     if (current_uc)
     {
         vm_sync_imports();
-        kernel32->Unicorn_MapHeaps();
+        kernel32->VM_MapHeaps();
     }
     
     return eax;

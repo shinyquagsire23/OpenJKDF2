@@ -68,7 +68,7 @@ public:
         
         uint32_t key = real_ptr_to_vm_ptr(this_ptr);
         
-        for(int i = 0; i < dwCount; i++)
+        for(uint32_t i = 0; i < dwCount; i++)
         {
             idirectdraw4->palettes[key][i+dwStartingEntry].r = lpEntries[i].r;
             idirectdraw4->palettes[key][i+dwStartingEntry].g = lpEntries[i].g;

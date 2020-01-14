@@ -4,7 +4,6 @@
 
 #include "dlls/kernel32.h"
 #include "vm.h"
-#include "main.h"
 
 std::map<std::string, uint32_t> vtable_store;
 
@@ -22,7 +21,7 @@ std::string guid_to_string(uint8_t* lpGUID)
 uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
 {
     vm_ptr<uint32_t*> imem = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
-    vm_ptr<uint32_t*> vtable = {kernel32->VirtualAlloc(0, (num_funcs*sizeof(uint32_t))&~0xFFF + 0x1000, 0, 0)};
+    vm_ptr<uint32_t*> vtable = {kernel32->VirtualAlloc(0, ((num_funcs*sizeof(uint32_t)) & ~0xFFF) + 0x1000, 0, 0)};
     
     memset(imem.translated(), 0, 0x1000);
     
@@ -35,9 +34,9 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             
             if (method_name == "") break;
             
-            register_import(name, std::string(method_name), 0);
+            vm_import_register(name, std::string(method_name), 0);
             
-            vtable.translated()[i] = import_get_hook_addr(name, std::string(method_name));
+            vtable.translated()[i] = vm_import_get_hook_addr(name, std::string(method_name));
             //printf("finding %u, %s, %x\n", i, method_name.c_str(), import_get_hook_addr(name, std::string(method_name)));
         }
         else
@@ -45,9 +44,9 @@ uint32_t CreateInterfaceInstance(std::string name, int num_funcs)
             char tmp[256];
             
             snprintf(tmp, 256, "%s_%u", name.c_str(), i);
-            register_import(name, std::string(tmp), 0);
+            vm_import_register(name, std::string(tmp), 0);
             
-            vtable.translated()[i] = import_get_hook_addr(name, std::string(tmp));
+            vtable.translated()[i] = vm_import_get_hook_addr(name, std::string(tmp));
         }
     }
     

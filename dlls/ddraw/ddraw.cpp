@@ -11,9 +11,9 @@ uint32_t DDraw::DirectDrawEnumerateA(uint32_t callback, uint32_t context)
     uint32_t ptr = kernel32->VirtualAlloc(0, 0x1000, 0, 0);
     printf("got ptr %x\n", ptr);
 
-    char* driver_desc = "DirectDraw HAL";
-    char* driver_name = "display";
-    char* guid = "aaaaaaaaaaaaaaaa";
+    char* driver_desc = (char*)"DirectDraw HAL";
+    char* driver_name = (char*)"display";
+    char* guid = (char*)"aaaaaaaaaaaaaaaa";
     
     uint32_t driver_desc_ptr = ptr;
     uint32_t driver_name_ptr = ptr+strlen(driver_desc)+1;

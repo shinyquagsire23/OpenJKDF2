@@ -34,17 +34,15 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
     return result;
 }
 
-uint32_t Kernel32::Unicorn_MapHeaps()
+uint32_t Kernel32::VM_MapHeaps()
 {
-    uc_err ret;
-    uc_mem_region *regions;
-    uint32_t count;
-    
     vm_mem_map_ptr(heap_addr, heap_size_actual, UC_PROT_ALL, heap_mem);
     //printf("%x %s\n", heap_size_actual, uc_strerror(ret));
     
     vm_mem_map_ptr(virtual_addr, virtual_size_actual, UC_PROT_ALL, virtual_mem);
     //printf("%x %s\n", virtual_size, uc_strerror(ret));
+    
+    return 0;
 }
 
 uint32_t Kernel32::HeapCreate(uint32_t a, uint32_t b, uint32_t c)
@@ -68,11 +66,15 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
 uint32_t Kernel32::HeapFree(uint32_t hHeap, uint32_t dwFlags, uint32_t mem)
 {
     printf("STUB: HeapFree %x, heap %x\n", mem, hHeap);
+    
+    return 1;
 }
 
 uint32_t Kernel32::CloseHandle(uint32_t handle)
 {
     printf("STUB: CloseHandle %x\n", handle);
+    
+    return 1;
 }
 
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
@@ -84,7 +86,7 @@ uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t fl
     
     //TODO: don't loop forever if there's no space
 
-    int i = numBits;
+    uint32_t i = numBits;
     while (i)
     {
         if (virtual_head >= virtual_bitmap.size())
@@ -118,7 +120,7 @@ uint32_t Kernel32::VirtualFree(uint32_t lpAddress, uint32_t dwSize, uint32_t dwF
     uint32_t startBit = (lpAddress - virtual_addr) / 0x1000;
     uint32_t numBits = virtual_allocs[lpAddress] / 0x1000;
 
-    for (int i = startBit; i < startBit+numBits; i++)
+    for (uint32_t i = startBit; i < startBit+numBits; i++)
     {
         virtual_bitmap.set(i, false);
     }
@@ -137,6 +139,8 @@ uint32_t Kernel32::GetStartupInfoA(struct StartupInfo* lpStartupInfo)
     lpStartupInfo->hStdOutput = STD_OUTPUT_HANDLE;
     lpStartupInfo->hStdError = STD_ERROR_HANDLE;
     //TODO
+    
+    return 1;
 }
 
 uint32_t Kernel32::GetStdHandle(uint32_t nStdHandle)
@@ -161,6 +165,7 @@ uint32_t Kernel32::GetFileType(uint32_t hFile)
 uint32_t Kernel32::SetHandleCount(uint32_t uNumber)
 {
     printf("Handle count %x\n", uNumber);
+    return 1;
 }
 
 uint32_t Kernel32::GetACP()
@@ -171,7 +176,7 @@ uint32_t Kernel32::GetACP()
 uint32_t Kernel32::GetCPInfo(uint32_t a, void* outPtr)
 {
     struct CpInfo* out = (struct CpInfo*)outPtr;
-    memset(out, 0, sizeof(out));
+    memset(out, 0, sizeof(*out));
     out->maxCharSize = 1;
     out->defaultChar[0] = '?';
 
@@ -200,7 +205,7 @@ uint32_t Kernel32::LCMapStringW(uint32_t a, uint32_t b, uint32_t c, uint32_t d, 
 
 uint32_t Kernel32::GetCommandLineA()
 {
-    char *args = "-windowGUI"; //TODO
+    char *args = (char*)"-windowGUI"; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
     vm_mem_write(ptr, args, strlen(args)+1);
@@ -209,7 +214,7 @@ uint32_t Kernel32::GetCommandLineA()
 
 uint32_t Kernel32::GetEnvironmentStringsW()
 {
-    char *args = ""; //TODO
+    char *args = (char*)""; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
     vm_mem_write(ptr, args, strlen(args)+1);
@@ -223,7 +228,7 @@ uint32_t Kernel32::FreeEnvironmentStringsW(uint32_t ptr)
 
 uint32_t Kernel32::GetModuleFileNameA(uint32_t hModule, uint32_t lpFilename, uint32_t nSize)
 {        
-    char* out = "Yodesk.exe";
+    char* out = (char*)"Yodesk.exe";
     vm_mem_write(lpFilename, out, strlen(out)+1);
         
     return strlen(out);
@@ -237,18 +242,17 @@ uint32_t Kernel32::GetModuleHandleA(char* module)
     return 999;
 }
 
-uint32_t Kernel32::GetProcAddress(uint32_t a, uint32_t funcName)
+uint32_t Kernel32::GetProcAddress(uint32_t a, char* funcName)
 {
-    std::string requested = vm_read_string(funcName);
-    printf("Kernel32.dll::GetProcAddress...requested addr for %s\n", requested.c_str());
+    printf("Kernel32.dll::GetProcAddress...requested addr for %s\n", funcName);
         
-    if (import_store.find(requested) == import_store.end())
+    if (import_store.find(std::string(funcName)) == import_store.end())
     {
-        register_import("idk", requested, 0);
+        vm_import_register("idk", std::string(funcName), 0);
         vm_sync_imports();
     }
         
-    return import_store["idk::"+requested]->hook;
+    return vm_import_get_hook_addr("idk", std::string(funcName));
 }
 
 void Kernel32::OutputDebugStringA(uint32_t str_ptr)
@@ -266,6 +270,8 @@ uint32_t Kernel32::LoadLibraryA(uint32_t dllStr_ptr)
 {
     std::string text = vm_read_string(dllStr_ptr);
     printf("Stub: Load library %s\n", text.c_str());
+    
+    return 0x999aaa9;
 }
 
 uint32_t Kernel32::FindFirstFileA(char* lpFileName, struct WIN32_FIND_DATAA* lpFindFileData)
@@ -458,7 +464,7 @@ uint32_t Kernel32::SetFilePointer(uint32_t hFile, uint32_t lDistanceToMove, uint
     if (lpDistanceToMoveHigh)
         high_val = *lpDistanceToMoveHigh;
 
-    uint64_t pos = lDistanceToMove | (high_val << 32);
+    uint64_t pos = lDistanceToMove | ((uint64_t)high_val << 32);
     fseek(f, pos, dwMoveMethod);
         
     return 0;

@@ -24,7 +24,8 @@
 #define D3DTRIFLAG_EDGEENABLE2 0x200
 #define D3DTRIFLAG_EDGEENABLE3 0x400
 
-enum D3DOPCODE {
+enum D3DOPCODE
+{
     D3DOP_POINT            = 1,
     D3DOP_LINE             = 2,
     D3DOP_TRIANGLE         = 3,
@@ -41,7 +42,8 @@ enum D3DOPCODE {
     D3DOP_SETSTATUS        = 14,
 };
 
-enum D3DRENDERSTATE {
+enum D3DRENDERSTATE
+{
     D3DRENDERSTATE_TEXTUREHANDLE      = 1,
     D3DRENDERSTATE_TEXTUREPERSPECTIVE = 4,
     D3DRENDERSTATE_MONOENABLE         = 11,
@@ -58,7 +60,8 @@ enum D3DRENDERSTATE {
     D3DRENDERSTATE_FOGTABLEEND        = 37,
 };
 
-enum D3DBLEND {
+enum D3DBLEND
+{
     D3DBLEND_ZERO             = 1,
     D3DBLEND_ONE              = 2,
     D3DBLEND_SRCCOLOR         = 3,
@@ -86,7 +89,7 @@ enum D3DCMP
     D3DCMP_ALWAYS              = 8,
 };
 
-struct D3DVERTEX
+typedef struct D3DVERTEX
 {
     float x;
     float y;
@@ -96,55 +99,56 @@ struct D3DVERTEX
     float nz;
     float tu;
     float tv;
-};
+} D3DVERTEX;
 
-struct D3DTRIANGLE
+typedef struct D3DTRIANGLE
 {
     uint16_t v1;
     uint16_t v2;
     uint16_t v3;
     uint16_t flags;
-};
+} D3DTRIANGLE;
 
-struct D3DINSTRUCTION
+typedef struct D3DINSTRUCTION
 {
     uint8_t bOpcode;
     uint8_t bSize;
     uint16_t wCount;
-};
+} D3DINSTRUCTION;
 
-struct D3DRECT
+typedef struct D3DRECT
 {
     uint32_t x1;
     uint32_t y1;
     uint32_t x2;
     uint32_t y2;
-};
+} D3DRECT;
 
 typedef struct D3DSTATUS {
   uint32_t dwFlags;
   uint32_t dwStatus;
-  struct D3DRECT drExtent;
-};
+  D3DRECT drExtent;
+} D3DSTATUS;
 
-struct D3DEXECUTEBUFFERDESC
+typedef struct D3DEXECUTEBUFFERDESC
 {
     uint32_t dwSize;
     uint32_t dwFlags;
     uint32_t dwCaps;
     uint32_t dwBufferSize;
     uint32_t lpData;
-};
+} D3DEXECUTEBUFFERDESC;
 
-struct D3DEXECUTEDATA {
+typedef struct D3DEXECUTEDATA
+{
   uint32_t dwSize;
   uint32_t dwVertexOffset;
   uint32_t dwVertexCount;
   uint32_t dwInstructionOffset;
   uint32_t dwInstructionLength;
   uint32_t dwHVertexOffset;
-  struct D3DSTATUS dsStatus;
-};
+  D3DSTATUS dsStatus;
+} D3DEXECUTEDATA;
 
 #define TEX_MODE_BGR 0
 #define TEX_MODE_RGB 1
@@ -268,7 +272,7 @@ public:
             
             SDL_Color* palette = NULL;
             //TODO: ehhhh
-            if (primary->palette != -1)
+            if (primary->palette != (uint32_t)-1)
                 palette = idirectdraw4->palettes[primary->palette];
             else
                 palette = gdi32->getDefaultPal();
@@ -346,7 +350,7 @@ public:
             {
                 uint16_t transparent = 0x3C0F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
-                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                for (uint32_t i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -355,7 +359,7 @@ public:
             {
                 uint16_t transparent = 0xF0F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
-                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                for (uint32_t i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -364,7 +368,7 @@ public:
             {
                 uint16_t transparent = 0xF81F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(primary->alloc);
-                for (int i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
+                for (uint32_t i = 0; i < primary->locked_desc.dwWidth*primary->locked_desc.dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -525,9 +529,9 @@ public:
     
     /* IDirect3DExecuteBuffer methods */
     Q_INVOKABLE uint32_t Initialize(void* this_ptr, uint32_t a, uint32_t b);
-    Q_INVOKABLE uint32_t Lock(void* this_ptr, struct D3DEXECUTEBUFFERDESC* desc);
+    Q_INVOKABLE uint32_t Lock(void* this_ptr, D3DEXECUTEBUFFERDESC* desc);
     Q_INVOKABLE uint32_t Unlock(void* this_ptr);
-    Q_INVOKABLE uint32_t SetExecuteData(void* this_ptr, struct D3DEXECUTEDATA* desc);
+    Q_INVOKABLE uint32_t SetExecuteData(void* this_ptr, D3DEXECUTEDATA* desc);
     Q_INVOKABLE uint32_t GetExecuteData(void* this_ptr, uint32_t a);
     Q_INVOKABLE uint32_t Validate(void* this_ptr, uint32_t a, uint32_t b, uint32_t c, uint32_t d);
     Q_INVOKABLE uint32_t Optimize(void* this_ptr, uint32_t a);

@@ -2,7 +2,6 @@
 #define JK_H
 
 #include <QObject>
-#include "main.h"
 #include "user32.h"
 #include "gdi32.h"
 #include "comctl32.h"
@@ -68,15 +67,15 @@ public:
     
     void hook()
     {
-        register_hook("JK.EXE", "WinMain", 0x41EBD0);
-        register_hook("JK.EXE", "jk_main", 0x50E750);
+        vm_hook_register("JK.EXE", "WinMain", 0x41EBD0);
+        vm_hook_register("JK.EXE", "jk_main", 0x50E750);
 
         // Switching between HLE and VM is sloooowwww
-        //register_hook("JK", "_atoi", 0x512840);
-        //register_hook("JK", "_strtok", 0x512850);
+        //vm_hook_register("JK", "_atoi", 0x512840);
+        //vm_hook_register("JK", "_strtok", 0x512850);
 
-        //register_hook("JK", "verify_key", 0x40EBB0);
-        //register_hook("JK", "test", 0x42A4B5);
+        //vm_hook_register("JK", "verify_key", 0x40EBB0);
+        //vm_hook_register("JK", "test", 0x42A4B5);
 
         // nop out b3DAccel set to 0 for 16bpp render
         /*((uint8_t*)vm_ptr_to_real_ptr(0x414897))[0] = 0x90;

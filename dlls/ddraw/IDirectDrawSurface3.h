@@ -90,7 +90,7 @@ public:
 
     Q_INVOKABLE uint32_t Blt(struct ddsurface_ext* this_ptr, struct RECT* lpDestRect, struct ddsurface_ext* lpDDSrcSurface, struct RECT* lpSrcRect, uint32_t dwFlags, struct DDBLTFX* lpDDBltFx)
     {
-        printf("STUB: IDirectDrawSurface3::Blt %p %p %x %x %x\n", lpDestRect, lpDDSrcSurface, lpSrcRect, dwFlags, lpDDBltFx);
+        printf("STUB: IDirectDrawSurface3::Blt %p %p %p %x %p\n", lpDestRect, lpDDSrcSurface, lpSrcRect, dwFlags, lpDDBltFx);
 #if 1
         uint32_t dstl = 0, dstr = 0, dstt = 0, dstb = 0;
         uint32_t srcl = 0, srcr = 0, srct = 0, srcb = 0;
@@ -135,7 +135,7 @@ public:
                         for (int i = 0; i < bytes_per_pixel_dst; i++)
                         {
                             uint8_t srcByte = bytes_per_pixel_dst == 1 ? 0 : 0xFF;
-                            uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
+                            //uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
                             dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i] = srcByte;
                         }
                     }
@@ -169,7 +169,7 @@ public:
                         for (int i = 0; i < bytes_per_pixel_dst; i++)
                         {
                             uint8_t srcByte = src[(srct+y)*src_pitch + (srcl+x)*bytes_per_pixel_src + i];
-                            uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
+                            //uint8_t dstByte = dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i];
                             //if (srcByte != 0xFF)
                             //    printf("src %x dst %x\n", srcByte, dstByte);
                             dst[(dstt+y)*dst_pitch + (dstl+x)*bytes_per_pixel_dst + i] = srcByte;
@@ -301,29 +301,23 @@ public:
     Q_INVOKABLE uint32_t Lock(struct ddsurface_ext* this_ptr, uint32_t rect, struct DDSURFACEDESC* surfacedesc, uint32_t flags, uint32_t d)
     {
         //printf("STUB: IDirectDrawSurface3::Lock %x %x\n", rect, flags);
-        
-        int w,h;
-        
         memcpy(surfacedesc, &this_ptr->desc, sizeof(struct DDSURFACEDESC));
-        
-        w = 512 > surfacedesc->dwWidth ? 512 : surfacedesc->dwWidth;
-        h = 512 > surfacedesc->dwHeight ? 512 : surfacedesc->dwHeight;
         
         int bpp = surfacedesc->ddpfPixelFormat.dwRGBBitCount;
         if (!bpp)
             bpp = 8;
 
         surfacedesc->lPitch = surfacedesc->dwWidth * (bpp/8);
-        surfacedesc->lpSurface = kernel32->VirtualAlloc(0, surfacedesc->lPitch*h, 0, 0);
+        surfacedesc->lpSurface = kernel32->VirtualAlloc(0, surfacedesc->lPitch*surfacedesc->dwHeight, 0, 0);
         if (bpp == 8)
-            memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0, surfacedesc->lPitch*h);
+            memset(vm_ptr_to_real_ptr(surfacedesc->lpSurface), 0, surfacedesc->lPitch*surfacedesc->dwHeight);
         else
         {
             if (surfacedesc->ddpfPixelFormat.dwRBitMask == 0x7C00)
             {
                 uint16_t transparent = 0x3C0F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
-                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                for (uint32_t i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -332,7 +326,7 @@ public:
             {
                 uint16_t transparent = 0xF0F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
-                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                for (uint32_t i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -341,7 +335,7 @@ public:
             {
                 uint16_t transparent = 0xF81F;
                 uint16_t* pixels = (uint16_t*)vm_ptr_to_real_ptr(surfacedesc->lpSurface);
-                for (int i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
+                for (uint32_t i = 0; i < surfacedesc->dwWidth*surfacedesc->dwHeight; i++)
                 {
                     pixels[i] = transparent;
                 }
@@ -350,7 +344,7 @@ public:
 
         if (this_ptr->alloc)
         {
-            memcpy(vm_ptr_to_real_ptr(surfacedesc->lpSurface), vm_ptr_to_real_ptr(this_ptr->alloc), surfacedesc->lPitch*h);
+            memcpy(vm_ptr_to_real_ptr(surfacedesc->lpSurface), vm_ptr_to_real_ptr(this_ptr->alloc), surfacedesc->lPitch*surfacedesc->dwHeight);
             kernel32->VirtualFree(this_ptr->alloc, 0, 0);
         }
         this_ptr->alloc = surfacedesc->lpSurface;
@@ -426,7 +420,6 @@ public:
         
         // 840 for overlay, 0x218 for main
         
-        static int test = 0;
         //test += 640;
 
 #if 0

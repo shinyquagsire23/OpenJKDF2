@@ -45,8 +45,8 @@ uint32_t SmackW32::SmackWait(void *smackInst)
 {
     //HACK: Set frames processed to end
     
-    *(uint32_t*)(smackInst + 0xC) = 1;
-    *(uint32_t*)(smackInst + 0x374) = 0;
+    *(uint32_t*)((intptr_t)smackInst + 0xC) = 1;
+    *(uint32_t*)((intptr_t)smackInst + 0x374) = 0;
     
     return 0;
 }

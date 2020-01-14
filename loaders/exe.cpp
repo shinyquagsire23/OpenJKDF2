@@ -9,7 +9,7 @@ std::map<int, std::map<std::string, ResourceData*> > resource_str_map;
 std::string from_wstring(void* wstring, bool tolower)
 {
     uint16_t len = *(uint16_t*)wstring;
-    wstring += sizeof(uint16_t);
+    wstring = (void*)((intptr_t)wstring + sizeof(uint16_t));
     
     std::string out = "";
     for (int i = 0; i < len; i++)
@@ -18,7 +18,7 @@ std::string from_wstring(void* wstring, bool tolower)
         if (tolower)
             val = std::tolower(val);
         out += val;
-        wstring += sizeof(uint16_t);
+        wstring = (void*)((intptr_t)wstring + sizeof(uint16_t));
     }
     return out;
 }
@@ -26,7 +26,7 @@ std::string from_wstring(void* wstring, bool tolower)
 void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, int type = 0, int parent_id = 0, std::string parent_name = "")
 {
     ResourceDirTable* table = (ResourceDirTable*)resource_iter;
-    resource_iter += sizeof(ResourceDirTable);
+    resource_iter = (void*)(table + 1);
     
     /*for (int j = 0; j < level; j++)
     {
@@ -39,7 +39,7 @@ void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, in
         ResourceDirEntry* entry = (ResourceDirEntry*)resource_iter;
         bool dir = (entry->offset & 0x80000000);
         uint32_t entry_offset = entry->offset & 0x7FFFFFFF;
-        ResourceData* entry_data = (ResourceData*)(resource_dir + entry_offset);
+        ResourceData* entry_data = (ResourceData*)((intptr_t)resource_dir + entry_offset);
 
         if (entry_data->ptr < image_mem_addr)
             entry_data->ptr += image_mem_addr;
@@ -48,15 +48,15 @@ void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, in
         {
             printf("  ");
         }
-        std::string name_str = from_wstring(resource_dir + (entry->name_offset & 0x7FFFFFFF), true);
+        std::string name_str = from_wstring((void*)((intptr_t)resource_dir + (entry->name_offset & 0x7FFFFFFF)), true);
         printf("name %s, %s offset %x\n", name_str.c_str(), dir ? "subdir" : "data", entry->offset & 0x7FFFFFFF);
         
         if (dir)
-            parse_rsrc_table(resource_dir, resource_dir + (entry->offset & 0x7FFFFFFF), level + 1, type, parent_id, name_str);
+            parse_rsrc_table(resource_dir, (void*)((intptr_t)resource_dir + (entry->offset & 0x7FFFFFFF)), level + 1, type, parent_id, name_str);
         else
             resource_str_map[type][parent_name] = entry_data;
         
-        resource_iter += sizeof(ResourceDirEntry);
+        resource_iter = (void*)(entry + 1);
     }
     
     for (int i = 0; i < table->cnt_ids; i++)
@@ -64,7 +64,7 @@ void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, in
         ResourceDirEntry* entry = (ResourceDirEntry*)resource_iter;
         bool dir = (entry->offset & 0x80000000);
         uint32_t entry_offset = entry->offset & 0x7FFFFFFF;
-        ResourceData* entry_data = (ResourceData*)(resource_dir + entry_offset);
+        ResourceData* entry_data = (ResourceData*)((intptr_t)resource_dir + entry_offset);
         
         if (entry_data->ptr < image_mem_addr)
             entry_data->ptr += image_mem_addr;
@@ -79,14 +79,14 @@ void parse_rsrc_table(void* resource_dir, void* resource_iter, int level = 0, in
             type = entry->id;
 
         if (dir)
-            parse_rsrc_table(resource_dir, resource_dir + (entry->offset & 0x7FFFFFFF), level + 1, type, entry->id, "");
+            parse_rsrc_table(resource_dir, (void*)((intptr_t)resource_dir + (entry->offset & 0x7FFFFFFF)), level + 1, type, entry->id, "");
         else
         {
             printf("%u, %u, %p\n", type, parent_id, entry_data);
             resource_id_map[type][parent_id] = entry_data;
         }
         
-        resource_iter += sizeof(ResourceDirEntry);
+        resource_iter = (void*)(entry + 1);
     }
 }
 
@@ -147,13 +147,13 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
         printf("Section %.8s size 0x%x, vsize 0x%x, vaddr 0x%0x at file 0x%x. %x relocs, %x lines\n", peSection.name, peSection.sizeOfRawData, peSection.addr.virtualSize, peSection.virtualAddress, peSection.pointerToRawData, peSection.numberOfRelocations, peSection.numberOfLinenumbers);
         
         fseek(f, peSection.pointerToRawData, SEEK_SET);
-        fread(*image_mem + peSection.virtualAddress, peSection.sizeOfRawData, 1, f);
+        fread((void*)((intptr_t)*image_mem + peSection.virtualAddress), peSection.sizeOfRawData, 1, f);
         
         fseek(f, temp, SEEK_SET);
         
         if (!strcmp(peSection.name, ".rsrc"))
         {
-            resource_sect = *image_mem + peSection.virtualAddress;
+            resource_sect = (void*)((intptr_t)*image_mem + peSection.virtualAddress);
         }
     }
     
@@ -163,23 +163,23 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
         printf("directory %i, %x size %x\n", i, peHeader.dataDirectory[i].virtualAddress, peHeader.dataDirectory[i].size);
         
         if (i == IMAGE_DIRECTORY_ENTRY_RESOURCE)
-            resource_dir = *image_mem + peHeader.dataDirectory[i].virtualAddress;
+            resource_dir = (void*)((intptr_t)*image_mem + peHeader.dataDirectory[i].virtualAddress);
         
         struct ImportDesc tmp;
         if (i != IMAGE_DIRECTORY_ENTRY_IMPORT) continue;
 
-        for (int j = 0; j < peHeader.dataDirectory[i].size / sizeof(struct ImportDesc); j++)
+        for (uint32_t j = 0; j < (uint32_t)(peHeader.dataDirectory[i].size / sizeof(struct ImportDesc)); j++)
         {
-            memcpy(&tmp, *image_mem + peHeader.dataDirectory[i].virtualAddress + j*sizeof(struct ImportDesc), sizeof(struct ImportDesc));
+            memcpy(&tmp, (void*)((intptr_t)*image_mem + peHeader.dataDirectory[i].virtualAddress + j*sizeof(struct ImportDesc)), sizeof(struct ImportDesc));
 
-            std::string name = std::string((char*)(*image_mem + tmp.name));
+            std::string name = std::string((char*)((intptr_t)*image_mem + tmp.name));
             printf("%s:\n", name.c_str());
             
             printf("%x %x\n", peHeader.imageBase + tmp.name_desc_ptr, peHeader.imageBase + tmp.import_ptr_list);
             
             for (int i = 0; true; i++)
             {
-                uint32_t importEntryRelAddr = *(uint32_t*)(*image_mem + tmp.name_desc_ptr + i*sizeof(uint32_t));
+                uint32_t importEntryRelAddr = *(uint32_t*)((intptr_t)*image_mem + tmp.name_desc_ptr + i*sizeof(uint32_t));
                 
                 if (!importEntryRelAddr) break;
                 if (importEntryRelAddr & 0x80000000)
@@ -240,17 +240,17 @@ uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uin
                         continue;
                     }
                     
-                    register_import(name, to_register, peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
-                    printf("%s:%s at 0x%x\n", name.c_str(), to_register.c_str(), peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
+                    vm_import_register(name, to_register, peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
+                    printf("%s::%s at 0x%" PRIx32 "\n", name.c_str(), to_register.c_str(), (uint32_t)(peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t)));
                     continue;
                 }
                 
-                uint16_t hint = *(uint16_t*)(*image_mem + importEntryRelAddr);
+                //uint16_t hint = *(uint16_t*)((intptr_t)*image_mem + importEntryRelAddr);
 
-                std::string funcName = std::string((char*)(*image_mem + importEntryRelAddr + sizeof(uint16_t)));
-                register_import(name, funcName, peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
+                std::string funcName = std::string((char*)((intptr_t)*image_mem + importEntryRelAddr + sizeof(uint16_t)));
+                vm_import_register(name, funcName, peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
 
-                printf("%s:%s at 0x%x\n", name.c_str(), funcName.c_str(), peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t));
+                printf("%s::%s at 0x%" PRIx32 "\n", name.c_str(), funcName.c_str(), (uint32_t)(peHeader.imageBase + tmp.import_ptr_list + i*sizeof(uint32_t)));
             }
             printf("\n");
         }
