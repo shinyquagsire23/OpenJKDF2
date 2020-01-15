@@ -10,6 +10,7 @@
 #include "3rdparty/imgui/imgui.h"
 #include "3rdparty/imgui/imgui_impl_sdl.h"
 #include "3rdparty/imgui/imgui_impl_opengl3.h"
+#include "renderer.h"
 
 uint32_t Gdi32::GetStockObject(uint32_t a)
 {
@@ -66,6 +67,13 @@ uint32_t Gdi32::GdiFlush()
     return 1;
 }
 
+static void onTexDestroy(void* textureArg)
+{
+	SDL_Texture* texture = (SDL_Texture*)textureArg;
+	
+    SDL_DestroyTexture(texture);
+}
+
 uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcSrc, int x1, int y1, struct color rop)
 {
     if (!dc_fbufs[hdc]) return 1;
@@ -78,41 +86,20 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
         SDL_SetPaletteColors(dc_surface[hdc]->format->palette, dc_palettes[hdcSrc], 0, 256);
         
         SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, dc_surface[hdc]);
-        /*SDL_RenderClear(displayRenderer);
-        SDL_RenderCopy(displayRenderer, texture, NULL, NULL);
-        //SDL_UpdateWindowSurface(displayWindow);
-        SDL_RenderPresent(displayRenderer);*/
-        
         SDL_GL_BindTexture(texture, NULL, NULL);
         
         GLint whichID;
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &whichID); 
         
-        //TODO: idk how I feel about this
-        SDL_SetRenderTarget(displayRenderer, NULL);
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(displayWindow);
-        ImGui::NewFrame();
-        
         //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
-        ImGui::Begin("GDI32 Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+        /*ImGui::Begin("GDI32 Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImGui::Image((void*)(intptr_t)whichID, ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
-        ImGui::End();
-        
-        user32->SetMouseOffset(screen_pos.x, screen_pos.y);
-        
+        ImGui::End();*/
+        renderer_feedwindowinfo("GDI32 Render", whichID, ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h), onTexDestroy, NULL, texture);
+        renderer_waitforvblank();
         SDL_GL_UnbindTexture(texture);
         
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        ImGui::Render();
-        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(displayWindow);
-        
-        SDL_DestroyTexture(texture);
     }
 
     return 1;

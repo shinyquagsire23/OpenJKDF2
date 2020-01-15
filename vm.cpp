@@ -383,8 +383,8 @@ void vm_process_import(ImportTracker* import)
     uint32_t ret_addr;
     vm_stack_pop(&ret_addr, 1);
     
-    if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
-        printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
+    //if (import->dll != "KERNEL32.dll" && import->dll != "USER32.dll" && import->dll != "WINMM.dll")
+    //    printf("Hit %s import %s, ret %x\n", import->dll.c_str(), import->name.c_str(), ret_addr);
 
     //vm_print_regs();
     if (import->obj)

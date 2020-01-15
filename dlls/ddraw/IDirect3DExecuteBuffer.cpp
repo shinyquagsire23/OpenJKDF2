@@ -1,38 +1,72 @@
 #include "IDirect3DExecuteBuffer.h"
 
-bool IDirect3DExecuteBuffer::init_resources() 
+void IDirect3DExecuteBuffer::generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
 {
-    if (has_initted) return true;
-    
-    printf("fb\n");
-    
-    // Generate the framebuffer
-    fb = 0;
-    glGenFramebuffers(1, &fb);
-    glBindFramebuffer(GL_FRAMEBUFFER, fb);
+	// Generate the framebuffer
+    *fbOut = 0;
+    glGenFramebuffers(1, fbOut);
+    glBindFramebuffer(GL_FRAMEBUFFER, *fbOut);
     
     // Set up our framebuffer texture
-    glGenTextures(1, &fbTex);
-    glBindTexture(GL_TEXTURE_2D, fbTex);
+    glGenTextures(1, fbTexOut);
+    glBindTexture(GL_TEXTURE_2D, *fbTexOut);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, view.dwWidth, view.dwHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     // Attach fbTex to our currently bound framebuffer fb
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTex, 0); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *fbTexOut, 0); 
     
     // Set up our render buffer
-    glGenRenderbuffers(1, &fbRbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, fbRbo);
+    glGenRenderbuffers(1, fbRboOut);
+    glBindRenderbuffer(GL_RENDERBUFFER, *fbRboOut);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, view.dwWidth, view.dwHeight);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
     // Bind it to our framebuffer fb
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbRbo);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *fbRboOut);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             printf("ERROR: Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void IDirect3DExecuteBuffer::deleteFramebuffer(GLuint fbIn, GLuint fbTexIn, GLuint fbRboIn)
+{
+	glDeleteFramebuffers(1, &fbIn);
+	glDeleteTextures(1, &fbTexIn);
+	glDeleteRenderbuffers(1, &fbRboIn);
+}
+
+void IDirect3DExecuteBuffer::swap_framebuffers()
+{
+	if (activeFb == 2)
+	{
+		activeFb = 1;
+		fb = fb1;
+   		fbTex = fbTex1;
+	    fbRbo = fbRbo1;
+	}
+	else
+	{
+		activeFb = 2;
+		fb = fb2;
+   		fbTex = fbTex2;
+	    fbRbo = fbRbo2;
+	}
+}
+
+bool IDirect3DExecuteBuffer::init_resources() 
+{
+    if (has_initted) return true;
+    
+    generateFramebuffer(&fb1, &fbTex1, &fbRbo1);
+    generateFramebuffer(&fb2, &fbTex2, &fbRbo2);
+
+    activeFb = 1;
+    fb = fb1;
+    fbTex = fbTex1;
+    fbRbo = fbRbo1;
     
     GLint link_ok = GL_FALSE;
     
@@ -116,7 +150,8 @@ bool IDirect3DExecuteBuffer::init_resources()
 void IDirect3DExecuteBuffer::free_resources() 
 {
     glDeleteProgram(program);
-    
+    deleteFramebuffer(fb1, fbTex1, fbRbo1);
+    deleteFramebuffer(fb2, fbTex2, fbRbo2);
     has_initted = false;
 }
 
@@ -456,8 +491,6 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, D3DEXECUTEDATA* 
     free(data_colors);    
     free(data_uvs);
     free(data_norms);
-
-    //render(displayWindow);
         
     glBindTexture(GL_TEXTURE_2D, 0);
 

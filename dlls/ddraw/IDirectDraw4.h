@@ -7,6 +7,7 @@
 #include "vm.h"
 #include "dlls/winutils.h"
 #include "dlls/gdi32.h"
+#include "renderer.h"
 
 #define DDPF_ALPHAPIXELS     0x1
 #define DDPF_PALETTEINDEXED8 0x20
@@ -520,7 +521,9 @@ public:
     
     Q_INVOKABLE uint32_t WaitForVerticalBlank(void* this_ptr, uint32_t a, uint32_t b)
     {
-        //printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
+        printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
+        
+        renderer_waitforvblank();
         
         return 0;
     }

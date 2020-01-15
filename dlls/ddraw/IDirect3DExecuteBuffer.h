@@ -222,6 +222,9 @@ private:
     "  f_coord = coord3d;\n"
     "}";
 
+	void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut);
+	void deleteFramebuffer(GLuint fbIn, GLuint fbTexIn, GLuint fbRboIn);
+
 public:
 
     bool has_initted = false;
@@ -229,7 +232,20 @@ public:
     GLuint fb;
     GLuint fbTex;
     GLuint fbRbo;
+    
+    GLuint fb1;
+    GLuint fbTex1;
+    GLuint fbRbo1;
+    
+    GLuint fb2;
+    GLuint fbTex2;
+    GLuint fbRbo2;
+    
+    void* last_overlay = NULL;
+    
+    int activeFb;
 
+	void swap_framebuffers();
     bool init_resources();
     void free_resources();
 
@@ -287,11 +303,13 @@ public:
         }
         else
         {
+            bool newtex = false;
             if (!primary->handle)
             {
                 GLuint id;
                 glGenTextures(1, &id);
                 primary->handle = id;
+                newtex = true;
             }
 
             glBindTexture(GL_TEXTURE_2D, primary->handle);
@@ -327,16 +345,43 @@ public:
             {
                 printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
             }
+            
+            bool needs_update = false;
+            if (last_overlay)
+            {
+                if (memcmp(last_overlay, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int*sizeof(uint16_t)))
+                    needs_update = true;
+            }
+            else
+            {
+                last_overlay = malloc(w_int*h_int*sizeof(uint16_t));
+            }
+            memcpy(last_overlay, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int*sizeof(uint16_t));
 
-            glTexImage2D(GL_TEXTURE_2D,
-                     0, 
-                     has_alpha ? GL_RGBA : GL_RGB,
-                     (GLsizei)primary->locked_desc.dwWidth, 
-                     (GLsizei)primary->locked_desc.dwHeight,
-                     0, 
-                     format_order,
-                     format,
-                     vm_ptr_to_real_ptr(primary->alloc));
+            if (newtex)
+            {
+                glTexImage2D(GL_TEXTURE_2D,
+                         0, 
+                         has_alpha ? GL_RGBA : GL_RGB,
+                         (GLsizei)primary->locked_desc.dwWidth, 
+                         (GLsizei)primary->locked_desc.dwHeight,
+                         0, 
+                         format_order,
+                         format,
+                         vm_ptr_to_real_ptr(primary->alloc));
+            }
+            else if (needs_update)
+            {
+                glTexSubImage2D(GL_TEXTURE_2D,
+                         0,
+                         0,
+                         0, 
+                         (GLsizei)primary->locked_desc.dwWidth, 
+                         (GLsizei)primary->locked_desc.dwHeight,
+                         format_order,
+                         format,
+                         vm_ptr_to_real_ptr(primary->alloc));
+            }
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -522,7 +567,8 @@ public:
             locked_objs[real_ptr_to_vm_ptr(this_ptr)] = 0;
         }
         
-        
+        free(last_overlay);
+        last_overlay = NULL;
         
         GlobalRelease(this_ptr);
     }

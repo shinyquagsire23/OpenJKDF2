@@ -48,6 +48,7 @@
 #include "loaders/exe.h"
 #include "uc_utils.h"
 #include "vm.h"
+#include "renderer.h"
 
 Kernel32 *kernel32;
 User32 *user32;
@@ -78,13 +79,11 @@ SmackW32 *smackw32;
 Msvcrt *msvcrt;
 JK *jk;
 
-ImGuiIO io;
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
 SDL_Event event;
-SDL_GLContext gl_context;
-
+SDL_GLContext glWindowContext, glVmContext;
 
 void GLAPIENTRY glMessageCallback(GLenum source,
                  GLenum type,
@@ -99,15 +98,11 @@ void GLAPIENTRY glMessageCallback(GLenum source,
             type, severity, message);
 }
 
-void *PrintHello(void *threadid) {
-   long tid;
-   tid = (long)threadid;
-   printf("Hello World! Thread ID, %lu", tid);
-   pthread_exit(NULL);
-}
 
 int init_renderer()
 {
+	int retval = 0;
+
 	// Init SDL
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
@@ -119,12 +114,14 @@ int init_renderer()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	
-	gl_context = SDL_GL_CreateContext(displayWindow);
-	if (gl_context == NULL)
+	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+	glWindowContext = SDL_GL_CreateContext(displayWindow);
+	glVmContext = SDL_GL_CreateContext(displayWindow);
+	if (glWindowContext == NULL || glVmContext == NULL)
 		return EXIT_FAILURE;
 		
-    SDL_GL_MakeCurrent(displayWindow, gl_context);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_GL_MakeCurrent(displayWindow, glWindowContext);
+    SDL_GL_SetSwapInterval(0); // Enable vsync
 
 	GLenum glew_status = glewInit();
 	if (glew_status != GLEW_OK)
@@ -135,6 +132,29 @@ int init_renderer()
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(glMessageCallback, 0);
+    
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplSDL2_InitForOpenGL(displayWindow, glWindowContext);
+    ImGui_ImplOpenGL3_Init("#version 120");
+    
+    // Begin the render thread
+    retval = renderer_spawnthread(displayWindow, displayRenderer, glWindowContext);
+    if (retval)
+    {
+    	printf("Failed to create render thread! Retval %i\n", retval);
+    	return EXIT_FAILURE;
+    }
+    
+    // Switch to the VM context
+    SDL_GL_MakeCurrent(displayWindow, glVmContext);
     
     return 0;
 }
@@ -149,26 +169,6 @@ int init_audio()
 	return 0;
 }
 
-int init_renderer_imgui()
-{
-	// Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer bindings
-    ImGui_ImplSDL2_InitForOpenGL(displayWindow, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 120");
-    
-    return 0;
-}
-
 int deinit_audio()
 {
     Mix_CloseAudio();
@@ -178,11 +178,20 @@ int deinit_audio()
 
 int deinit_renderer()
 {
+	int retval = 0;
+	
+	retval = renderer_jointhread();
+	if (retval)
+	{
+		printf("Failed to join render thread...\n");
+	}
+
 	ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     
-    SDL_GL_DeleteContext(gl_context);
+    SDL_GL_DeleteContext(glWindowContext);
+    SDL_GL_DeleteContext(glVmContext);
     SDL_DestroyWindow(displayWindow);
     SDL_Quit();
 
@@ -338,9 +347,6 @@ int main(int argc, char **argv, char **envp)
     // Hook DLLs
     msvcrt->hook();
     
-    // Set up imgui
-    init_renderer_imgui();
-
     // Start VM
     vm_import_register("dummy", "dummy", 0);
     vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);

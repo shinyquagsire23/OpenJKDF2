@@ -595,7 +595,7 @@ uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsg
 
     //HACK: Always update framebuf?
     uint32_t ms = nmm->timeGetTime();
-    if (ms - last_ms > 32)
+    if (ms - last_ms > 16)
     {
         uint32_t hdcSrc = gdi32->selectedHdcSrc;
         struct color rop;

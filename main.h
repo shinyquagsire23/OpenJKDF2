@@ -19,6 +19,5 @@ extern SDL_Window* displayWindow;
 extern SDL_Renderer* displayRenderer;
 extern SDL_RendererInfo displayRendererInfo;
 extern SDL_Event event;
-extern ImGuiIO io;
 
 #endif // MAIN_H
