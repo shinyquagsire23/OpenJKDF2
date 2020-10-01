@@ -132,7 +132,7 @@ static GLuint       g_GlVersion = 0;                // Extracted at runtime usin
 static char         g_GlslVersionString[32] = "";   // Specified by user or detected based on compile time GL settings.
 static GLuint       g_FontTexture = 0;
 static GLuint       g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
-static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;                                // Uniforms location
+static int          g_AttribLocationTex = 0, g_AttribLocationPaletteTex = 0, g_AttribLocationProjMtx = 0, g_AttribLocationType = 0;                                // Uniforms location
 static int          g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 0, g_AttribLocationVtxColor = 0; // Vertex attributes location
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
@@ -239,6 +239,8 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
     };
     glUseProgram(g_ShaderHandle);
     glUniform1i(g_AttribLocationTex, 0);
+    glUniform1i(g_AttribLocationPaletteTex, 1);
+    glUniform1i(g_AttribLocationType, 0);
     glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
 #ifdef GL_SAMPLER_BINDING
     glBindSampler(0, 0); // We use combined texture/sampler state. Applications using GL 3.3 may set that otherwise.
@@ -357,7 +359,14 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                         glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z, (int)clip_rect.w); // Support for GL 4.5 rarely used glClipControl(GL_UPPER_LEFT)
 
                     // Bind texture, Draw
+                    glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+                    glUniform1i(g_AttribLocationTex, 0);
+    
+                    glUniform1i(g_AttribLocationType, pcmd->Type);
+                    glActiveTexture(GL_TEXTURE1);
+                    glBindTexture(GL_TEXTURE_1D, (GLuint)(intptr_t)pcmd->PalTextureId);
+                    glUniform1i(g_AttribLocationPaletteTex, 1);
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
                     if (g_GlVersion >= 3200)
                         glDrawElementsBaseVertex(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)), (GLint)pcmd->VtxOffset);
@@ -551,11 +560,19 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "    precision mediump float;\n"
         "#endif\n"
         "uniform sampler2D Texture;\n"
+        "uniform sampler1D Palette;\n"
         "varying vec2 Frag_UV;\n"
         "varying vec4 Frag_Color;\n"
+        "uniform int Type;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+        "    if (Type == 0) {\n"
+        "      gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+        "    } else {\n"
+        "      float index = texture2D(Texture, Frag_UV.st).r;\n"
+        "      vec4 palval = texture1D(Palette, index);\n"
+        "      gl_FragColor = vec4(palval.r, palval.g, palval.b, 1.0);\n"
+        "    }\n"
         "}\n";
 
     const GLchar* fragment_shader_glsl_130 =
@@ -634,6 +651,8 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
 
     g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
     g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");
+    g_AttribLocationType = glGetUniformLocation(g_ShaderHandle, "Type");
+    g_AttribLocationPaletteTex = glGetUniformLocation(g_ShaderHandle, "Palette");
     g_AttribLocationVtxPos = glGetAttribLocation(g_ShaderHandle, "Position");
     g_AttribLocationVtxUV = glGetAttribLocation(g_ShaderHandle, "UV");
     g_AttribLocationVtxColor = glGetAttribLocation(g_ShaderHandle, "Color");

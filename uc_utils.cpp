@@ -132,7 +132,7 @@ static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type,
     }
 }
 
-uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
+uint32_t uc_run(uc_engine *uc, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uc_err err;
     uc_hook /*trace1, trace2,*/ trace3;
@@ -158,7 +158,8 @@ uint32_t uc_run(uc_engine *uc, uint32_t image_addr, void* image_mem, uint32_t im
         esp = stack_addr + stack_size;
     uc_reg_write(uc, UC_X86_REG_ESP, &esp);
     
-    uc_mem_map_ptr(uc, image_addr, image_mem_size + stack_size, UC_PROT_ALL, image_mem);
+    //uc_mem_map_ptr(uc, image_addr, image_mem_size + stack_size, UC_PROT_ALL, image_mem);
+    vm_map_images();
 
     struct SegmentDescriptor *gdt = (struct SegmentDescriptor*)calloc(31, sizeof(struct SegmentDescriptor));
     gdtr.base = gdt_address;  

@@ -806,7 +806,7 @@ static void ShowDemoWindowWidgets()
 
         ImGui::Text("%.0fx%.0f", my_tex_w, my_tex_h);
         ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
+        ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), 0, ImVec2(0,0), ImVec2(1,1), ImVec4(1.0f,1.0f,1.0f,1.0f), ImVec4(1.0f,1.0f,1.0f,0.5f));
         if (ImGui::IsItemHovered())
         {
             ImGui::BeginTooltip();
@@ -818,7 +818,7 @@ static void ShowDemoWindowWidgets()
             ImGui::Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
             ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y) / my_tex_h);
             ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y + region_sz) / my_tex_h);
-            ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1, ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 0.5f));
+            ImGui::Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), 0, uv0, uv1, ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 0.5f));
             ImGui::EndTooltip();
         }
         ImGui::TextWrapped("And now some textured buttons..");
@@ -3472,7 +3472,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
             {
                 ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
                 ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
-                ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
+                ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), 0, ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
                 ImGui::TreePop();
             }
 

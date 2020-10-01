@@ -149,6 +149,8 @@ struct ddsurface_ext
     uint32_t alloc;
     uint32_t palette;
     uint32_t handle;
+    void* surfacebuf;
+    GLuint surfacetex, surfacepaltex;
 };
 
 struct d3dtex_ext
@@ -262,6 +264,33 @@ public:
         {
             ext->unk = ext->tex.raw_vm_ptr;
         }
+        
+        
+        // TODO duplicated in IDirectDraw4.h
+        GLuint image_texture, pal_texture;
+        glGenTextures(1, &image_texture);
+        glGenTextures(1, &pal_texture);
+        void* image_data = malloc(desc->dwWidth*desc->dwHeight*sizeof(uint32_t));
+        
+        glBindTexture(GL_TEXTURE_1D, pal_texture);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
+        memset(image_data, 0xFF, 256);
+        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+        
+
+        glBindTexture(GL_TEXTURE_2D, image_texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, desc->dwWidth, desc->dwHeight, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+        
+        ext->surfacebuf = image_data;
+        ext->surfacetex = image_texture;
+        ext->surfacepaltex = pal_texture;
         
         return 0;
     }

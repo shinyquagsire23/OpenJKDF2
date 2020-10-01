@@ -60,6 +60,8 @@ uint32_t Kernel32::HeapAlloc(uint32_t a, uint32_t b, uint32_t alloc_size)
     
     //printf("return %x, %x %x\n", retval, heap_size_actual, heap_size);
 
+    
+
     return retval;
 }
 
@@ -80,19 +82,24 @@ uint32_t Kernel32::CloseHandle(uint32_t handle)
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
 {
     //TODO: lpAddress
+    printf("valloc %x %x %x %x\n", lpAddress, dwSize, flAllocationType, flProtect);
 
     dwSize = (dwSize & ~0xFFF) + 0x1000;
     uint32_t numBits = dwSize / 0x1000;
     
     //TODO: don't loop forever if there's no space
 
+    bool loop_once = false;
     uint32_t i = numBits;
     while (i)
     {
         if (virtual_head >= virtual_bitmap.size())
         {
+            if (loop_once)
+                return 0;
             i = numBits;
             virtual_head = 0;
+            loop_once = true;
         }
 
         if (!virtual_bitmap[virtual_head])
@@ -111,6 +118,17 @@ uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t fl
     virtual_size += dwSize;
     uint32_t retval = virtual_addr + (virtual_head * 0x1000) - dwSize;
     virtual_allocs[retval] = dwSize;
+    
+    // SMACKW32 debug
+#if 0
+    printf("a %x\n", retval);
+    if (flAllocationType == 0x1000)
+    {
+        *(uint8_t*)vm_ptr_to_real_ptr(0x4089f9 - 0x401000 + 0x9f6000) = 0x0f;
+        *(uint8_t*)vm_ptr_to_real_ptr(0x4089fa - 0x401000 + 0x9f6000) = 0x0b;
+        memset(vm_ptr_to_real_ptr(retval), 0, dwSize);
+    }
+#endif
 
     return retval;
 }
@@ -148,7 +166,7 @@ uint32_t Kernel32::GetStdHandle(uint32_t nStdHandle)
     return nStdHandle;
 }
 
-uint32_t Kernel32::GetFileType(uint32_t hFile)
+uint32_t Kernel32::GetFileType(int32_t hFile)
 {
     switch (hFile)
     {
@@ -205,7 +223,7 @@ uint32_t Kernel32::LCMapStringW(uint32_t a, uint32_t b, uint32_t c, uint32_t d, 
 
 uint32_t Kernel32::GetCommandLineA()
 {
-    char *args = (char*)"-windowGUI"; //TODO
+    char *args = (char*)"-windowGUI -verbose 2 -debug con"; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
     vm_mem_write(ptr, args, strlen(args)+1);
@@ -384,12 +402,13 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
     std::string fname = vm_read_string(lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     linux_path = std::regex_replace(linux_path, std::regex("//"), "");
-    //printf("Stub: Create file %s\n", linux_path.c_str());
+    linux_path = std::regex_replace(linux_path, std::regex("[A-Z]:/"), "disk/");
+    printf("Stub: Create file %s\n", linux_path.c_str());
         
     FILE *f = fopen(linux_path.c_str(), "rw");
     if (!f)
     {
-        //printf("Failed to open file %s\n", linux_path.c_str());
+        printf("Failed to open file %s\n", linux_path.c_str());
         last_error = ERROR_FILE_NOT_FOUND;
         return -1;
     }
@@ -499,6 +518,10 @@ uint32_t Kernel32::SetCurrentDirectoryA(char* buf)
 uint32_t Kernel32::GetDriveTypeA(char* lpRootPathName)
 {
     printf("STUB: Kernel32::GetDriveTypeA(\"%s\") -> 1\n", lpRootPathName);
+    
+    if (!strcmp(lpRootPathName, "D:\\"))
+        return 5;
+
     return 1;
 }
 

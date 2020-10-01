@@ -54,20 +54,23 @@ struct SegmentDescriptor {
 class ImportTracker
 {
 public:
+    std::string pe;
     std::string dll;
     std::string name;
     QObject* obj;
     QMetaMethod method;
     std::vector<bool> is_param_ptr;
-    uint32_t addr;
+    std::vector<uint32_t> addrs;
     uint32_t hook;
 
     bool is_hook;
 
     uc_hook trace;
 
-    ImportTracker(std::string dll, std::string name, uint32_t addr, uint32_t hook) : dll(dll), name(name), addr(addr), hook(hook), is_hook(false)
+    ImportTracker(std::string dll, std::string name, uint32_t addr, uint32_t hook) : dll(dll), name(name), hook(hook), is_hook(false)
     {
+        addrs = std::vector<uint32_t>();
+        addrs.push_back(addr);
     }
 };
 
@@ -77,15 +80,17 @@ struct vm_inst
     struct vm kvm;
 };
 
-extern uint32_t image_mem_addr;
-extern void* image_mem;
-extern uint32_t image_mem_size;
-extern uint32_t stack_size, stack_addr;
+extern uint32_t stack_addr, stack_size;
+extern uint32_t image_mem_addr[16];
+extern void* image_mem[16];
+extern uint32_t image_mem_size[16];
 extern std::unordered_map<uint32_t, ImportTracker*> import_hooks;
 extern std::map<std::string, ImportTracker*> import_store;
 extern std::map<std::string, QObject*> interface_store;
 
 // Address translation
+void vm_register_image(void* mem, uint32_t addr, uint32_t size);
+void vm_map_images();
 void *vm_ptr_to_real_ptr(uint32_t vm_ptr);
 uint32_t real_ptr_to_vm_ptr(void* real_ptr);
 
@@ -124,7 +129,7 @@ void vm_hook_register(std::string dll, std::string name, uint32_t hook_addr);
 void vm_import_register(std::string dll, std::string name, uint32_t import_addr);
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args...);
 uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool push_ret = true);
-uint32_t vm_run(struct vm_inst *vm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp);
+uint32_t vm_run(struct vm_inst *vm, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp);
 void vm_stop();
 
 #define vm_call_func(addr, ...) vm_call_function(addr, PP_NARG(__VA_ARGS__), __VA_ARGS__)

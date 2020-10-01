@@ -5,7 +5,8 @@ HEADERS += main.h uc_utils.h kvm.h vm.h renderer.h loaders/exe.h dlls/kernel32.h
 HEADERS += 3rdparty/imgui/imgui.h 3rdparty/imgui/imgui_internal.h 3rdparty/imgui/imstb_rectpack.h 3rdparty/imgui/imstb_textedit.h 3rdparty/imgui/imstb_truetype.h 3rdparty/imgui/imconfig.h 3rdparty/imgui/imgui_impl_opengl2.h 3rdparty/imgui/imgui_impl_opengl3.h 3rdparty/imgui/imgui_impl_sdl.h 3rdparty/imgui/imgui_memory_editor.h
 SOURCES += main.cpp uc_utils.cpp kvm.cpp vm.cpp renderer.cpp loaders/exe.cpp dlls/kernel32.cpp dlls/user32.cpp dlls/gdi32.cpp dlls/comctl32.cpp dlls/advapi32.cpp dlls/ole32.cpp dlls/nmm.cpp dlls/ddraw/ddraw.cpp dlls/winutils.cpp dlls/msvcrt.cpp dlls/dplay/IDirectPlay3.cpp dlls/dsound/IDirectSound.cpp dlls/dsound/dsound.cpp dlls/dinput/IDirectInputA.cpp dlls/dplay/dplay.cpp dlls/dplay/IDirectPlayLobby3.cpp dlls/smackw32.cpp dlls/dsound/IDirectSoundBuffer.cpp dlls/dinput/IDirectInputDeviceA.cpp dlls/ddraw/IDirectDraw4.cpp dlls/ddraw/IDirect3D3.cpp dlls/ddraw/IDirect3DTexture.cpp dlls/ddraw/IDirectDrawSurface3.cpp dlls/ddraw/IDirect3DDevice.cpp dlls/ddraw/IDirect3DViewport.cpp dlls/ddraw/IDirect3DExecuteBuffer.cpp dlls/ddraw/IDirectDrawPalette.cpp dlls/jk.cpp render/shader_utils.cpp
 SOURCES += 3rdparty/imgui/imgui.cpp 3rdparty/imgui/imgui_demo.cpp 3rdparty/imgui/imgui_draw.cpp 3rdparty/imgui/imgui_widgets.cpp 3rdparty/imgui/imgui_impl_opengl2.cpp 3rdparty/imgui/imgui_impl_opengl3.cpp 3rdparty/imgui/imgui_impl_sdl.cpp
-QMAKE_CFLAGS_DEBUG += -Wno-unused-parameter #-fsanitize=address
-QMAKE_CXXFLAGS_DEBUG += -Wno-unused-parameter #-fsanitize=address
-QMAKE_CFLAGS_RELEASE += -Wno-unused-parameter
-QMAKE_CXXFLAGS_RELEASE += -Wno-unused-parameter
+OBJECTS_DIR = build/
+QMAKE_CFLAGS_DEBUG += -Wno-unused-parameter -fpermissive #-fsanitize=address
+QMAKE_CXXFLAGS_DEBUG += -Wno-unused-parameter -fpermissive #-fsanitize=address
+QMAKE_CFLAGS_RELEASE += -Wno-unused-parameter -fpermissive
+QMAKE_CXXFLAGS_RELEASE += -Wno-unused-parameter -fpermissive

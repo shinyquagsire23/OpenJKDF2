@@ -64,12 +64,14 @@ public:
 
     Q_INVOKABLE uint32_t SetEntries(void* this_ptr, uint32_t dwFlags, uint32_t dwStartingEntry, uint32_t dwCount, struct ddraw_color* lpEntries)
     {
-        printf("STUB: IDirectDrawPalette::SetEntries flags %x start %x cnt %x\n", dwFlags, dwStartingEntry, dwCount);
+        printf("STUB: IDirectDrawPalette::SetEntries flags %x start %x cnt %x %08x\n", dwFlags, dwStartingEntry, dwCount, real_ptr_to_vm_ptr(this_ptr));
         
-        uint32_t key = real_ptr_to_vm_ptr(this_ptr);
+        uint32_t key = *(uint32_t*)this_ptr;
         
         for(uint32_t i = 0; i < dwCount; i++)
         {
+            if (i+dwStartingEntry == 0xFE)
+                printf("%x: %08x %08x->%p\n", i+dwStartingEntry, *(uint32_t*)&lpEntries[i], key, idirectdraw4->palettes[key]); 
             idirectdraw4->palettes[key][i+dwStartingEntry].r = lpEntries[i].r;
             idirectdraw4->palettes[key][i+dwStartingEntry].g = lpEntries[i].g;
             idirectdraw4->palettes[key][i+dwStartingEntry].b = lpEntries[i].b;

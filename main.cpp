@@ -278,7 +278,7 @@ int main(int argc, char **argv, char **envp)
     idirectinputdevicea = new IDirectInputDeviceA();
     smackw32 = new SmackW32();
     msvcrt = new Msvcrt();    
-    jk = new JK();
+    //jk = new JK();
 
     vm_dll_register("KERNEL32.dll", (QObject*)kernel32);
     vm_dll_register("USER32.dll", (QObject*)user32);
@@ -309,7 +309,7 @@ int main(int argc, char **argv, char **envp)
     vm_dll_register("IDirectInputDeviceA", (QObject*)idirectinputdevicea);
     vm_dll_register("smackw32.DLL", (QObject*)smackw32);
     vm_dll_register("msvcrt.dll", (QObject*)msvcrt);
-    vm_dll_register("JK.EXE", (QObject*)jk);
+    //vm_dll_register("JK.EXE", (QObject*)jk);
     
     vm_interface_register("IDirect3D3", (QObject*)idirect3d3);
     vm_interface_register("IDirect3DDevice", (QObject*)idirect3ddevice);
@@ -333,23 +333,67 @@ int main(int argc, char **argv, char **envp)
 
     // Map hook mem
     vm_set_hookmem(0xd0000000);
-    uint32_t start_addr = load_executable(exe_path, &image_mem_addr, &image_mem, &image_mem_size, &stack_addr, &stack_size);
+    PortableExecutable exe = PortableExecutable(std::string(exe_path), 0);
+    uint32_t exe_addr, exe_size;
+    void* exe_mem;
+    uint32_t start_addr = exe.load_executable(&exe_addr, &exe_mem, &exe_size, &stack_addr, &stack_size);
+    vm_register_image(exe_mem, exe_addr, exe_size+stack_size);
+#if 1    
+    PortableExecutable replace = PortableExecutable("df2_reimpl.dll", stack_addr + stack_size); // "SMACKW32.DLL"
+#endif
+    uint32_t dll_addr,dll_size,dll_stackaddr,dll_stacksize;
+    void* dll_mem;
+#if 1
+    printf("Loading dlls...\n");
+    uint32_t dllentry = replace.load_executable(&dll_addr, &dll_mem, &dll_size, &dll_stackaddr, &dll_stacksize);
+    vm_register_image(dll_mem, dll_addr, dll_size+dll_stacksize);
+#endif
+    exe.load_imports();
+#if 1
+    replace.load_imports();
+#endif
+    printf("Done loading\n");
     
     // Apply options
     ddraw->force_error = force_swrend ? 1 : 0;
     
     // Hook JK
-    if (!no_jk_hax)
+    /*if (!no_jk_hax)
     {
         jk->hook();
-    }
+    }*/
     
     // Hook DLLs
     msvcrt->hook();
     
     // Start VM
     vm_import_register("dummy", "dummy", 0);
-    vm_run(&vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, 0, 0);
+    
+    //printf("jump to %08x\n", dllentry);
+    uint32_t dllmain_args[3] = {1,1,1};
+    
+    uint32_t esp_dll = stack_addr+stack_size-0x10;
+    *(uint32_t*)vm_ptr_to_real_ptr(esp_dll) = 0xF00FF00F;
+    *(uint32_t*)vm_ptr_to_real_ptr(esp_dll+4) = 1;
+    *(uint32_t*)vm_ptr_to_real_ptr(esp_dll+8) = 1;
+    *(uint32_t*)vm_ptr_to_real_ptr(esp_dll+12) = 1;
+#if 1
+    //*(uint8_t*)vm_ptr_to_real_ptr(0x40880B - 0x401000 + 0x9f6000) = 0x0f;
+    //*(uint8_t*)vm_ptr_to_real_ptr(0x40880C - 0x401000 + 0x9f6000) = 0x0b;
+    if (!no_jk_hax)
+        vm_run(&vm, stack_addr, stack_size, dllentry, 0, esp_dll);
+#endif
+    printf("asdf\n");
+    
+    memset(vm_ptr_to_real_ptr(stack_addr), 0, stack_size);
+    
+    
+    //*(uint8_t*)vm_ptr_to_real_ptr(0x513a00 ) = 0x0f;
+    //*(uint8_t*)vm_ptr_to_real_ptr(0x513a00+1) = 0x0b;
+    
+    esp_dll = stack_addr+stack_size-0x4;
+    *(uint32_t*)vm_ptr_to_real_ptr(esp_dll) = 0xF00FF00F;
+    vm_run(&vm, stack_addr, stack_size, start_addr, 0, esp_dll);
     
 #if 0
     for (int i = 0; i < 2; i++)
@@ -377,6 +421,12 @@ int main(int argc, char **argv, char **envp)
     }
 #endif
 
+    {
+        FILE* dump3 = fopen("stack_dump.bin", "wb");
+        fwrite((void*)((intptr_t)exe_mem + exe_size), stack_size, 1, dump3);
+        fclose(dump3);
+    }
+
     // Post-VM dumps and cleanup
     if (do_memdump)
     {
@@ -385,11 +435,11 @@ int main(int argc, char **argv, char **envp)
         fclose(dump1);
         
         FILE* dump2 = fopen("mem_dump.bin", "wb");
-        fwrite(image_mem, image_mem_size, 1, dump2);
+        fwrite(exe_mem, exe_size, 1, dump2);
         fclose(dump2);
         
         FILE* dump3 = fopen("stack_dump.bin", "wb");
-        fwrite((void*)((intptr_t)image_mem + image_mem_size), stack_size, 1, dump3);
+        fwrite((void*)((intptr_t)exe_mem + exe_size), stack_size, 1, dump3);
         fclose(dump3);
         
         FILE* dump4 = fopen("virt_dump.bin", "wb");

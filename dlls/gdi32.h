@@ -4,6 +4,7 @@
 #include <QObject>
 #include <unicorn/unicorn.h>
 #include <SDL2/SDL.h>
+#include <GL/glew.h>
 
 #define BITSPIXEL 12
 
@@ -37,6 +38,12 @@ typedef struct BITMAPINFO
     uint32_t bmiColors;
 } BITMAPINFO;
 
+typedef struct DCSurfaceInfo
+{
+    uint32_t w;
+    uint32_t h;
+} DCSurfaceInfo;
+
 #pragma pack(pop)
 
 class Gdi32 : public QObject
@@ -46,7 +53,10 @@ Q_OBJECT
 private:
     std::map<uint32_t, uint8_t*> dc_fbufs;
     std::map<uint32_t, SDL_Color[256]> dc_palettes;
-    std::map<uint32_t, SDL_Surface*> dc_surface;
+    std::map<uint32_t, GLuint> dc_surfacetex;
+    std::map<uint32_t, GLuint> dc_surfacepal;
+    std::map<uint32_t, void*> dc_surfacebuf;
+    std::map<uint32_t, DCSurfaceInfo> dc_surface;
     uint32_t hdcCnt;
     uint32_t hBitmapCnt;
     uint32_t defaultHdcPal;

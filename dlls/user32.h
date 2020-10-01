@@ -308,8 +308,9 @@ public:
     bool stopping;
     std::queue<std::pair<int, bool> > keystate_changed;
     mouse_state mousestate;
+    int mousePosX, mousePosY;
 
-    Q_INVOKABLE User32() : hWndCnt(1), mouseOffsX(0), mouseOffsY(0), stopping(false)
+    Q_INVOKABLE User32() : hWndCnt(1), mouseOffsX(0), mouseOffsY(0), stopping(false), mousePosX(0), mousePosY(0)
     {
 //        WM_MOUSEACTIVATE
         mousestate.lbutton = false;
@@ -429,7 +430,7 @@ public:
         
         printf("Register hInst %x %x class %s, %s, lpfnWndProc %x\n", lpwc->hInstance, lpwc->style, lpwc->lpszMenuName.translated(), classname.c_str(), lpwc->lpfnWndProc);
         
-        return 0;
+        return 1;
     }
     
     Q_INVOKABLE uint32_t UnregisterClassA(char* a, uint32_t b)
@@ -529,9 +530,11 @@ public:
         return 1;
     }
     
-    Q_INVOKABLE uint32_t GetCursorPos(uint32_t lpPos)
+    Q_INVOKABLE uint32_t GetCursorPos(uint32_t* lpPos)
     {
-        printf("STUB: User32.dll::GetCursorPos(%x)\n", lpPos);
+        printf("STUB: User32.dll::GetCursorPos(...)\n");
+        lpPos[0] = mousePosX;
+        lpPos[1] = mousePosY;
         return 1;
     }
     

@@ -7,6 +7,7 @@
 #include "loaders/exe.h"
 
 #include "vm.h"
+#include "renderer.h"
 
 #pragma pack(push, 1)
 struct StartupInfo
@@ -28,7 +29,7 @@ struct StartupInfo
     uint32_t lpReserved2;
     uint32_t hStdInput;
     uint32_t hStdOutput;
-    uint32_t hStdError;
+    int32_t hStdError;
 };
 
 struct CpInfo
@@ -119,7 +120,7 @@ public:
     Q_INVOKABLE uint32_t VirtualFree(uint32_t lpAddress, uint32_t dwSize, uint32_t dwFreeType);
     Q_INVOKABLE uint32_t GetStartupInfoA(struct StartupInfo* lpStartupInfo);
     Q_INVOKABLE uint32_t GetStdHandle(uint32_t nStdHandle);
-    Q_INVOKABLE uint32_t GetFileType(uint32_t hFile);
+    Q_INVOKABLE uint32_t GetFileType(int32_t hFile);
     Q_INVOKABLE uint32_t SetHandleCount(uint32_t uNumber);
     Q_INVOKABLE uint32_t GetACP();
     Q_INVOKABLE uint32_t GetCPInfo(uint32_t a, void* outPtr);
@@ -365,6 +366,63 @@ public:
     {
         printf("STUB: Kernel32::WritePrivateProfileStringA(`%s', `%s', `%s', `%s')\n", lpAppName, lpKeyName, lpString, lpFileName);
         return 1;
+    }
+    
+    Q_INVOKABLE uint32_t AllocConsole()
+    {
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t SetConsoleTitleA(char* lpConsoleTitle)
+    {
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t SetConsoleTextAttribute(uint32_t handle, uint32_t attributes)
+    {
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t FillConsoleOutputCharacterA(uint32_t handle, uint32_t a, uint32_t b, uint32_t c, uint32_t d)
+    {
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t WriteConsoleA(uint32_t handle, char* buf, uint32_t buflen, uint32_t a, uint32_t b)
+    {
+        printf("STUB: Kernel32::WriteConsoleA(%x, `%s`, ...)\n", handle, buf);
+        renderer_print(std::string(buf));
+        return 1;
+    }
+    
+    Q_INVOKABLE void GetSystemTimeAsFileTime(void* lpSystemTimeAsFileTime)
+    {
+        printf("STUB: Kernel32::GetSystemTimeAsFileTime(...)\n");
+        return;
+    }
+    
+    Q_INVOKABLE uint32_t GetCurrentProcessId()
+    {
+        printf("STUB: Kernel32::GetCurrentProcessId(...)\n");
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t GetTickCount()
+    {
+        printf("STUB: Kernel32::GetTickCount(...)\n");
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t QueryPerformanceCounter(void* lpPerformanceCount)
+    {
+        printf("STUB: Kernel32::QueryPerformanceCounter(...)\n");
+        return 1;
+    }
+    
+    Q_INVOKABLE uint32_t QueryPerformanceFrequency(uint32_t* out)
+    {
+        *out = 0;
+        return 0;
     }
 
 //    Q_INVOKABLE uint32_t ();

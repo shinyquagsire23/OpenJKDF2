@@ -70,7 +70,20 @@ public:
         if (this_ptr->alloc)
         {
             kernel32->VirtualFree(this_ptr->alloc, 0, 0);
-            this_ptr->alloc = 0;
+            this_ptr->alloc = NULL;
+        }
+        
+        GLuint image_texture = this_ptr->surfacetex;
+        if (image_texture)
+        {
+            glDeleteTextures(1, &image_texture);
+            this_ptr->surfacetex = 0;
+        }
+        
+        if (this_ptr->surfacebuf)
+        {
+            free(this_ptr->surfacebuf);
+            this_ptr->surfacebuf = NULL;
         }
         GlobalRelease(this_ptr);
     }
@@ -182,6 +195,61 @@ public:
         printf("size %x DDFX %x DDROP %x others...%x %x %x %x %x %x %x\n", lpDDBltFx->dwSize, lpDDBltFx->dwDDFX, lpDDBltFx->dwROP, lpDDBltFx->dwDDROP, lpDDBltFx->dwRotationAngle, lpDDBltFx->dwZBufferOpCode, lpDDBltFx->dwZBufferLow, lpDDBltFx->dwZBufferHigh, lpDDBltFx->dwZBufferBaseDest, lpDDBltFx->dwZDestConstBitDepth);
         #endif
         
+        if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE && !idirect3dexecutebuffer->has_initted && this_ptr->surfacebuf && lpDestRect)
+        {
+            printf("Blitting to the primary surface! %x\n", this_ptr->desc.ddpfPixelFormat.dwRGBBitCount);
+
+            //else
+                //memset(surface->pixels, 0, this_ptr->desc.dwWidth*this_ptr->desc.dwHeight);
+            
+            SDL_Color* palette = NULL;
+            //TODO: ehhhh
+            if (this_ptr->palette != (uint32_t)-1)
+                palette = idirectdraw4->palettes[this_ptr->palette];
+            else
+                palette = gdi32->getDefaultPal();
+
+            GLuint image_texture = this_ptr->surfacetex;
+            void* image_data = this_ptr->surfacebuf;
+            GLuint image_pal = this_ptr->surfacepaltex;
+            
+            //TODO keep this palette in IDirectDrawPalette so it can be updated separate from here
+            glBindTexture(GL_TEXTURE_1D, image_pal);
+            glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGBA, GL_UNSIGNED_BYTE, palette);
+
+            bool once = false;
+            uint8_t* paletted_img = (uint8_t*)vm_ptr_to_real_ptr(this_ptr->alloc);
+            /*if (palette && paletted_img)
+            {
+                uint32_t* img_out = (uint32_t*)image_data;
+                uint32_t* pal = (uint32_t*)palette;
+                for (uint32_t x = dstl; x < dstr; x++)
+                {
+                    for (uint32_t y = dstt; y < dstb; y++)
+                    {
+                        size_t i = (y * this_ptr->desc.dwWidth) + x;
+                        if (paletted_img[i] == 0xFE && !once)
+                        {
+                            printf("%02x %08x %08x->%p\n", paletted_img[i], pal[paletted_img[i]], this_ptr->palette, pal);
+                            once = true;
+                        }
+                        img_out[i] = pal[paletted_img[i]];
+                    }
+                }
+            }
+            else
+            {
+                printf("missing pal!\n");
+                //memset(image_data, 0, this_ptr->desc.dwWidth*this_ptr->desc.dwHeight*sizeof(uint32_t));
+            }*/
+            
+            glBindTexture(GL_TEXTURE_2D, image_texture);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, GL_RED, GL_UNSIGNED_BYTE, paletted_img);
+            
+            renderer_feedwindowinfo("DDraw Render", image_texture, image_pal, ImVec2(this_ptr->desc.dwWidth, this_ptr->desc.dwHeight), NULL, NULL, NULL);
+            renderer_waitforvblank();
+        }
+        
         return 0;
     }
 
@@ -289,6 +357,7 @@ public:
     Q_INVOKABLE uint32_t Initialize(struct ddsurface_ext* this_ptr, uint32_t a, uint32_t b)
     {
         printf("STUB: IDirectDrawSurface3::Initialize\n");
+        
         return 0;
     }
 
@@ -300,7 +369,7 @@ public:
 
     Q_INVOKABLE uint32_t Lock(struct ddsurface_ext* this_ptr, uint32_t rect, struct DDSURFACEDESC* surfacedesc, uint32_t flags, uint32_t d)
     {
-        //printf("STUB: IDirectDrawSurface3::Lock %x %x\n", rect, flags);
+        printf("STUB: IDirectDrawSurface3::Lock %x %x\n", rect, flags);
         memcpy(surfacedesc, &this_ptr->desc, sizeof(struct DDSURFACEDESC));
         
         int bpp = surfacedesc->ddpfPixelFormat.dwRGBBitCount;
@@ -346,7 +415,28 @@ public:
         {
             memcpy(vm_ptr_to_real_ptr(surfacedesc->lpSurface), vm_ptr_to_real_ptr(this_ptr->alloc), surfacedesc->lPitch*surfacedesc->dwHeight);
             kernel32->VirtualFree(this_ptr->alloc, 0, 0);
+            
+            //GLuint image_texture = this_ptr->surfacetex;
+            //glDeleteTextures(1, &image_texture);
+            //free(this_ptr->surfacebuf);
         }
+        
+        // TODO duplicated in IDirectDraw4.h
+        /*GLuint image_texture;
+        glGenTextures(1, &image_texture);
+        glBindTexture(GL_TEXTURE_2D, image_texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
+        
+        void* image_data = malloc(surfacedesc->dwWidth*surfacedesc->dwHeight*sizeof(uint32_t));
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surfacedesc->dwWidth, surfacedesc->dwHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+        this_ptr->surfacebuf = image_data;
+        this_ptr->surfacetex = image_texture;*/
+        
+
         this_ptr->alloc = surfacedesc->lpSurface;
         this_ptr->locked_desc = *surfacedesc;
         

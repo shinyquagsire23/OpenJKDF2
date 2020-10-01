@@ -12,10 +12,11 @@
 #include "dlls/gdi32.h"
 #include "dlls/msvcrt.h"
 
-uint32_t image_mem_addr;
-void* image_mem;
-uint32_t image_mem_size;
-uint32_t stack_size, stack_addr;
+uint32_t image_mem_addr[16];
+void* image_mem[16];
+uint32_t image_mem_size[16];
+uint32_t stack_addr, stack_size;
+uint32_t num_images = 0;
 
 uint32_t next_hook;
 
@@ -29,16 +30,34 @@ std::map<std::string, std::map<std::string, int> > method_cache;
 
 QGenericArgument q_args[9];
 
+void vm_register_image(void* mem, uint32_t addr, uint32_t size)
+{
+    image_mem[num_images] = mem;
+    image_mem_addr[num_images] = addr;
+    image_mem_size[num_images++] = size;
+}
+
+void vm_map_images()
+{
+    for (int i = 0; i < num_images; i++)
+    {
+        vm_mem_map_ptr(image_mem_addr[i], image_mem_size[i], 0, image_mem[i]);
+    }
+}
 
 void *vm_ptr_to_real_ptr(uint32_t vm_ptr)
 {
     if (vm_ptr == 0) return nullptr;
 
-    if (vm_ptr >= image_mem_addr && vm_ptr <= image_mem_addr + image_mem_size + stack_size)
+    for (int i = 0; i < num_images; i++)
     {
-        return (void*)((intptr_t)image_mem + vm_ptr - image_mem_addr);
+        if (vm_ptr >= image_mem_addr[i] && vm_ptr <= image_mem_addr[i] + image_mem_size[i])
+        {
+            return (void*)((intptr_t)image_mem[i] + vm_ptr - image_mem_addr[i]);
+        }
     }
-    else if (kernel32 && vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
+    
+    if (kernel32 && vm_ptr >= kernel32->heap_addr && vm_ptr <= kernel32->heap_addr + kernel32->heap_size)
     {
         return (void*)((intptr_t)kernel32->heap_mem + vm_ptr - kernel32->heap_addr);
     }
@@ -57,11 +76,15 @@ uint32_t real_ptr_to_vm_ptr(void* real_ptr)
 {
     if (real_ptr == nullptr) return 0;
 
-    if (real_ptr >= image_mem && (intptr_t)real_ptr <= (intptr_t)image_mem + image_mem_size + stack_size)
+    for (int i = 0; i < num_images; i++)
     {
-        return image_mem_addr + ((intptr_t)real_ptr - (intptr_t)image_mem);
+        if (real_ptr >= image_mem[i] && (intptr_t)real_ptr <= (intptr_t)image_mem[i] + image_mem_size[i])
+        {
+            return image_mem_addr[i] + ((intptr_t)real_ptr - (intptr_t)image_mem[i]);
+        }
     }
-    else if (real_ptr >= kernel32->heap_mem && (intptr_t)real_ptr <= (intptr_t)kernel32->heap_mem + kernel32->heap_size)
+    
+    if (real_ptr >= kernel32->heap_mem && (intptr_t)real_ptr <= (intptr_t)kernel32->heap_mem + kernel32->heap_size)
     {
         return kernel32->heap_addr + ((intptr_t)real_ptr - (intptr_t)kernel32->heap_mem);
     }
@@ -115,7 +138,7 @@ void vm_mem_map_ptr(uint64_t address, size_t size, uint32_t perms, void *ptr)
 {
     if (using_kvm)
     {
-        kvm_mem_map_ptr(current_kvm, address, size, perms, ptr);
+        kvm_mem_map_ptr(current_kvm, address, size, 0, ptr);
     }
     else
     {
@@ -279,6 +302,8 @@ void vm_set_hookmem(uint32_t addr)
 uint32_t vm_import_get_hook_addr(std::string dll, std::string name)
 {
     std::string import_name = dll + "::" + name;
+    if (!import_store[import_name])
+        return 0;
     return import_store[import_name]->hook;
 }
 
@@ -325,7 +350,11 @@ void vm_import_register(std::string dll, std::string name, uint32_t import_addr)
 {
     std::string import_name = dll + "::" + name;
 
-    if (import_store[import_name]) return;
+    if (import_store[import_name])
+    {
+        import_store[import_name]->addrs.push_back(import_addr);
+        return;
+    }
 
     import_store[import_name] = new ImportTracker(dll, name, import_addr, next_hook);
     
@@ -365,8 +394,10 @@ void vm_sync_imports()
         auto import = pair.second;
         if (!import) continue;
         
-        if (import->addr)
-            vm_mem_write(import->addr, &import->hook, sizeof(uint32_t));
+        for(auto it = std::begin(import->addrs); it != std::end(import->addrs); ++it) {
+            if (*it)
+                vm_mem_write(*it, &import->hook, sizeof(uint32_t));
+        }
         
         import_hooks[import->hook] = import;
         
@@ -663,21 +694,22 @@ uint32_t vm_call_function(uint32_t addr, uint32_t num_args, uint32_t* args, bool
         vm_stack_push(&dummy, 1);
     esp = vm_reg_read(UC_X86_REG_ESP);
 
-    eax = vm_run(&new_vm, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, addr, dummy, esp);
+    // TODO is this kosher?
+    eax = vm_run(&new_vm, stack_addr, stack_size, addr, dummy, esp);
 
     vm_reg_write(UC_X86_REG_ESP, old_esp);
 
     return eax;
 }
 
-uint32_t vm_run(struct vm_inst *vm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
+uint32_t vm_run(struct vm_inst *vm, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     uint32_t eax;
     using_kvm = true;
     if (using_kvm)
-        eax = kvm_run(&vm->kvm, image_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, end_addr, esp);
+        eax = kvm_run(&vm->kvm, stack_addr, stack_size, start_addr, end_addr, esp);
     else
-        eax = uc_run(vm->uc, image_mem_addr, image_mem, image_mem_size, stack_addr, stack_size, start_addr, end_addr, esp);
+        eax = uc_run(vm->uc, stack_addr, stack_size, start_addr, end_addr, esp);
 
     return eax;
 }

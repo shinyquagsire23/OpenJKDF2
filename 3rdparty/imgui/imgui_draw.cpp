@@ -371,6 +371,8 @@ void ImDrawList::Clear()
     _IdxWritePtr = NULL;
     _ClipRectStack.resize(0);
     _TextureIdStack.resize(0);
+    _PalTextureIdStack.resize(0);
+    _TypeStack.resize(0);
     _Path.resize(0);
     _Splitter.Clear();
 }
@@ -385,6 +387,8 @@ void ImDrawList::ClearFreeMemory()
     _IdxWritePtr = NULL;
     _ClipRectStack.clear();
     _TextureIdStack.clear();
+    _PalTextureIdStack.clear();
+    _TypeStack.clear();
     _Path.clear();
     _Splitter.ClearFreeMemory();
 }
@@ -402,12 +406,16 @@ ImDrawList* ImDrawList::CloneOutput() const
 // Using macros because C++ is a terrible language, we want guaranteed inline, no code in header, and no overhead in Debug builds
 #define GetCurrentClipRect()    (_ClipRectStack.Size ? _ClipRectStack.Data[_ClipRectStack.Size-1]  : _Data->ClipRectFullscreen)
 #define GetCurrentTextureId()   (_TextureIdStack.Size ? _TextureIdStack.Data[_TextureIdStack.Size-1] : (ImTextureID)NULL)
+#define GetCurrentPalTextureId()   (_PalTextureIdStack.Size ? _PalTextureIdStack.Data[_PalTextureIdStack.Size-1] : (ImTextureID)NULL)
+#define GetCurrentType()   (_TypeStack.Size ? _TypeStack.Data[_TypeStack.Size-1] : (int)0)
 
 void ImDrawList::AddDrawCmd()
 {
     ImDrawCmd draw_cmd;
     draw_cmd.ClipRect = GetCurrentClipRect();
     draw_cmd.TextureId = GetCurrentTextureId();
+    draw_cmd.PalTextureId = GetCurrentPalTextureId();
+    draw_cmd.Type = GetCurrentType();
     draw_cmd.VtxOffset = _VtxCurrentOffset;
     draw_cmd.IdxOffset = IdxBuffer.Size;
 
@@ -514,6 +522,28 @@ void ImDrawList::PopTextureID()
     IM_ASSERT(_TextureIdStack.Size > 0);
     _TextureIdStack.pop_back();
     UpdateTextureID();
+}
+
+void ImDrawList::PushPalTextureID(ImTextureID texture_id)
+{
+    _PalTextureIdStack.push_back(texture_id);
+}
+
+void ImDrawList::PopPalTextureID()
+{
+    IM_ASSERT(_PalTextureIdStack.Size > 0);
+    _PalTextureIdStack.pop_back();
+}
+
+void ImDrawList::PushType(int type)
+{
+    _TypeStack.push_back(type);
+}
+
+void ImDrawList::PopType()
+{
+    IM_ASSERT(_TypeStack.Size > 0);
+    _TypeStack.pop_back();
 }
 
 // NB: this can be called with negative count for removing primitives (as long as the result does not underflow)
@@ -1134,10 +1164,19 @@ void ImDrawList::AddText(const ImVec2& pos, ImU32 col, const char* text_begin, c
     AddText(NULL, 0.0f, pos, col, text_begin, text_end);
 }
 
-void ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
+void ImDrawList::AddImage(ImTextureID user_texture_id, const int type, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
+
+    if (type == 2)
+    {
+        PushPalTextureID(user_texture_id);
+        return;
+    }
+
+    PushType(type);
+    AddDrawCmd();
 
     const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
     if (push_texture_id)
@@ -1146,8 +1185,11 @@ void ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& p_min, cons
     PrimReserve(6, 4);
     PrimRectUV(p_min, p_max, uv_min, uv_max, col);
 
+    PopType();
     if (push_texture_id)
         PopTextureID();
+    if (type == 1)
+         PopPalTextureID();
 }
 
 void ImDrawList::AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1, const ImVec2& uv2, const ImVec2& uv3, const ImVec2& uv4, ImU32 col)
@@ -1155,6 +1197,7 @@ void ImDrawList::AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, con
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
+    PushType(0);
     const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
     if (push_texture_id)
         PushTextureID(user_texture_id);
@@ -1162,6 +1205,7 @@ void ImDrawList::AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, con
     PrimReserve(6, 4);
     PrimQuadUV(p1, p2, p3, p4, uv1, uv2, uv3, uv4, col);
 
+    PopType();
     if (push_texture_id)
         PopTextureID();
 }
@@ -1173,10 +1217,11 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
 
     if (rounding <= 0.0f || (rounding_corners & ImDrawCornerFlags_All) == 0)
     {
-        AddImage(user_texture_id, p_min, p_max, uv_min, uv_max, col);
+        AddImage(user_texture_id, 0, p_min, p_max, uv_min, uv_max, col);
         return;
     }
 
+    PushType(0);
     const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
     if (push_texture_id)
         PushTextureID(user_texture_id);
@@ -1187,6 +1232,7 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
     int vert_end_idx = VtxBuffer.Size;
     ImGui::ShadeVertsLinearUV(this, vert_start_idx, vert_end_idx, p_min, p_max, uv_min, uv_max, true);
 
+    PopType();
     if (push_texture_id)
         PopTextureID();
 }
@@ -3052,10 +3098,10 @@ void ImGui::RenderMouseCursor(ImDrawList* draw_list, ImVec2 pos, float scale, Im
         pos -= offset;
         const ImTextureID tex_id = font_atlas->TexID;
         draw_list->PushTextureID(tex_id);
-        draw_list->AddImage(tex_id, pos + ImVec2(1,0)*scale, pos + ImVec2(1,0)*scale + size*scale, uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos + ImVec2(2,0)*scale, pos + ImVec2(2,0)*scale + size*scale, uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos,                     pos + size*scale,                     uv[2], uv[3], col_border);
-        draw_list->AddImage(tex_id, pos,                     pos + size*scale,                     uv[0], uv[1], col_fill);
+        draw_list->AddImage(tex_id, 0, pos + ImVec2(1,0)*scale, pos + ImVec2(1,0)*scale + size*scale, uv[2], uv[3], col_shadow);
+        draw_list->AddImage(tex_id, 0, pos + ImVec2(2,0)*scale, pos + ImVec2(2,0)*scale + size*scale, uv[2], uv[3], col_shadow);
+        draw_list->AddImage(tex_id, 0, pos,                     pos + size*scale,                     uv[2], uv[3], col_border);
+        draw_list->AddImage(tex_id, 0, pos,                     pos + size*scale,                     uv[0], uv[1], col_fill);
         draw_list->PopTextureID();
     }
 }

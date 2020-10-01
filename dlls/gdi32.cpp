@@ -34,11 +34,35 @@ uint32_t Gdi32::CreateDIBSection(uint32_t hdc, struct BITMAPINFO* pbmi, uint32_t
     printf("STUB: CreateDibSection hdc %x, pbmi %x, usage %x, hsection %x, offset %x, %dx%d\n", hdc, real_ptr_to_vm_ptr(pbmi), usage, hSection, offset, pbmi->bmiHeader.biWidth, pbmi->bmiHeader.biHeight);
     *ppvBits = kernel32->VirtualAlloc(0, abs(pbmi->bmiHeader.biWidth)*abs(pbmi->bmiHeader.biHeight), 0, 0);
     
-    SDL_Surface *surface = SDL_CreateRGBSurface(0, abs(pbmi->bmiHeader.biWidth), abs(pbmi->bmiHeader.biHeight), 8, 0,0,0,0);
+    dc_surface[hdc] = {.w = pbmi->bmiHeader.biWidth, .h = -pbmi->bmiHeader.biHeight};
+    
+    GLuint image_texture, pal_texture;
+    glGenTextures(1, &image_texture);
+    glGenTextures(1, &pal_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
+    
+    void* image_data = malloc(dc_surface[hdc].w*dc_surface[hdc].h*sizeof(uint8_t));
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, dc_surface[hdc].w, dc_surface[hdc].h, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+    
+    glBindTexture(GL_TEXTURE_1D, pal_texture);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    memset(image_data, 0xFF, 256);
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     
     //SDL_SetWindowSize(displayWindow, abs(pbmi->bmiHeader.biWidth), abs(pbmi->bmiHeader.biHeight));
     
-    dc_surface[hdc] = surface;
+    dc_surfacebuf[hdc] = image_data;
+    dc_surfacetex[hdc] = image_texture;
+    dc_surfacepal[hdc] = pal_texture;
     dc_fbufs[hdc] = (uint8_t*)vm_ptr_to_real_ptr(*ppvBits);
     gdi_render = true;
     
@@ -69,9 +93,9 @@ uint32_t Gdi32::GdiFlush()
 
 static void onTexDestroy(void* textureArg)
 {
-	SDL_Texture* texture = (SDL_Texture*)textureArg;
+	GLuint image_texture = (GLuint)textureArg;
 	
-    SDL_DestroyTexture(texture);
+	//glDeleteTextures(1, &image_texture);
 }
 
 uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcSrc, int x1, int y1, struct color rop)
@@ -81,25 +105,46 @@ uint32_t Gdi32::BitBlt(uint32_t hdc, int x, int y, int cx, int cy, uint32_t hdcS
     //printf("STUB: BitBlt hdc %x, x %i, y %i, cx %i, cy %i, hdcSrc %x, x1 %i, y1 %i, rop %x\n", hdc, x, y, cx, cy, hdcSrc, x1, y1, rop);
     
     if (gdi_render)
-    {    
-        memcpy(dc_surface[hdc]->pixels, dc_fbufs[hdc], dc_surface[hdc]->w*dc_surface[hdc]->h);
-        SDL_SetPaletteColors(dc_surface[hdc]->format->palette, dc_palettes[hdcSrc], 0, 256);
+    {
+        //TODO this is duplicated in GDI32
+        //TODO use shaders
+
+        GLuint image_texture = dc_surfacetex[hdc];
+        GLuint image_pal = dc_surfacepal[hdc];
+
+        void* image_data = dc_surfacebuf[hdc];
+        uint8_t* paletted_img = (uint8_t*)dc_fbufs[hdc];
         
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(displayRenderer, dc_surface[hdc]);
-        SDL_GL_BindTexture(texture, NULL, NULL);
+        glBindTexture(GL_TEXTURE_1D, image_pal);
+        glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGBA, GL_UNSIGNED_BYTE, &dc_palettes[hdcSrc]);
+
+        if (dc_fbufs[hdc])
+        {
+            uint8_t* img_out = (uint8_t*)image_data;
+            /*uint32_t* pal = (uint32_t*)&dc_palettes[hdcSrc];
+            for (size_t i = 0; i < dc_surface[hdc].w*dc_surface[hdc].h; i++)
+            {
+                *img_out++ = pal[*paletted_img++];
+            }*/
+            //memcpy(img_out, paletted_img, dc_surface[hdc].w*dc_surface[hdc].h);
+        }
+        else
+        {
+            memset(image_data, 0, dc_surface[hdc].w*dc_surface[hdc].h*sizeof(uint32_t));
+        }
         
-        GLint whichID;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &whichID); 
+        glBindTexture(GL_TEXTURE_2D, image_texture);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dc_surface[hdc].w, dc_surface[hdc].h, GL_RED, GL_UNSIGNED_BYTE, paletted_img);
         
-        //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
+        //TODO this is leaking texture allocs (one on every pause)
+        
+        //ImGui::SetNextWindowSize(ImVec2(dc_surface[hdc].w, dc_surface[hdc].h));
         /*ImGui::Begin("GDI32 Render", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
-        ImGui::Image((void*)(intptr_t)whichID, ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h));
+        ImGui::Image((void*)(intptr_t)whichID, ImVec2(dc_surface[hdc].w, dc_surface[hdc].h));
         ImGui::End();*/
-        renderer_feedwindowinfo("GDI32 Render", whichID, ImVec2(dc_surface[hdc]->w, dc_surface[hdc]->h), onTexDestroy, NULL, texture);
-        renderer_waitforvblank();
-        SDL_GL_UnbindTexture(texture);
-        
+        renderer_feedwindowinfo("GDI32 Render", image_texture, image_pal, ImVec2(dc_surface[hdc].w, dc_surface[hdc].h), onTexDestroy, NULL, image_texture);
+        //renderer_waitforvblank();
     }
 
     return 1;

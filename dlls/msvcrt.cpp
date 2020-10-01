@@ -41,6 +41,8 @@ uint32_t Msvcrt::__p__commode(void)
 void Msvcrt::_initterm(uint32_t a, uint32_t b)
 {
     printf("STUB: msvcrt.dll::__initterm(%x, %x)\n", a, b);
+    uint32_t idk[2] = {0x1234,0x5678};
+    vm_stack_push(idk, 2);
 }
 
 uint32_t Msvcrt::__getmainargs(int* out_argc, uint32_t* out_argv, uint32_t* out_env, int dowildcard, uint32_t startupinfo)

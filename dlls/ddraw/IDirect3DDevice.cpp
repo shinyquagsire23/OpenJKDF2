@@ -239,7 +239,7 @@ uint32_t IDirect3DDevice::EndScene(void* this_ptr)
     
     idirect3dexecutebuffer->renderOverlay();
 
-    renderer_feedwindowinfo("D3D Render", idirect3dexecutebuffer->fbTex, ImVec2(idirect3dexecutebuffer->view.dwWidth, idirect3dexecutebuffer->view.dwHeight), NULL, onD3DVblank, NULL);
+    renderer_feedwindowinfo("D3D Render", idirect3dexecutebuffer->fbTex, 0, ImVec2(idirect3dexecutebuffer->view.dwWidth, idirect3dexecutebuffer->view.dwHeight), NULL, onD3DVblank, NULL);
     idirect3dexecutebuffer->swap_framebuffers();
 
     return 0;

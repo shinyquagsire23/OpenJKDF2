@@ -80,7 +80,7 @@ struct PEOptHeader
     uint32_t sizeOfHeapCommit;
     uint32_t loaderFlags;
     uint32_t numberOfRvaAndSizes;
-    struct data_directory dataDirectory[16];
+    //struct data_directory dataDirectory[16];
 };
 
 struct PESection
@@ -109,6 +109,25 @@ struct ImportDesc {
 	uint32_t name;
 	uint32_t import_ptr_list;
 };
+
+typedef struct ExportDesc {
+	uint32_t characteristics;
+	uint32_t timeDateStamp;
+	uint16_t majorVersion;
+	uint16_t minorVersion;
+	uint32_t name;
+	uint32_t base;
+	uint32_t numberOfFunctions;
+	uint32_t numberOfNames;
+	uint32_t addressOfFunctions;
+	uint32_t addressOfNames;
+	uint32_t addressOfNameOrdinals;
+} ExportDesc;
+
+typedef struct RelocDesc {
+    uint32_t vaddr;
+    uint32_t block_size;
+} RelocDesc;
 
 #pragma pack(pop)
 
@@ -156,6 +175,15 @@ typedef struct
 #define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT	    13
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR	14
 
+#define IMAGE_REL_BASED_ABSOLUTE     (0)
+#define IMAGE_REL_BASED_HIGH         (1)
+#define IMAGE_REL_BASED_LOW          (2)
+#define IMAGE_REL_BASED_HIGHLOW      (3)
+#define IMAGE_REL_BASED_HIGHADJ      (4)
+#define IMAGE_REL_BASED_MIPS_JMPADDR (5)
+#define IMAGE_REL_BASED_SECTION      (6)
+#define IMAGE_REL_BASED_REL32        (7)
+
 #define RT_CURSOR         1
 #define RT_BITMAP         2
 #define RT_ICON           3
@@ -180,7 +208,37 @@ typedef struct
 extern std::map<int, std::map<int, ResourceData*> > resource_id_map;
 extern std::map<int, std::map<std::string, ResourceData*> > resource_str_map;
 
-uint32_t load_executable(char* path, uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size);
 std::string from_wstring(void* wstring, bool tolower = false);
+
+class PortableExecutable
+{
+private:
+    std::string path;
+    struct DosHeader dosHeader;
+    struct COFFHeader coffHeader;
+    struct PEOptHeader peHeader;
+    uint32_t va_base;
+    uint32_t import_diridx;
+    void* pe_mem;
+    struct data_directory* dataDirectory;
+
+public:
+    PortableExecutable(std::string path, uint32_t va_base) : path(path), va_base(va_base), dataDirectory(NULL), pe_mem(NULL)
+    {
+    }
+    
+    ~PortableExecutable()
+    {
+        if (dataDirectory)
+            free(dataDirectory);
+    }
+    
+    void load_imports();
+    void load_exports(void* image_mem, struct data_directory* dataDirectory);
+    void load_relocations(void* image_mem, struct data_directory* dataDirectory);
+    
+    uint32_t load_executable(uint32_t *image_addr, void **image_mem, uint32_t *image_size, uint32_t *stack_addr, uint32_t *stack_size);
+private:
+};
 
 #endif // EXE_H

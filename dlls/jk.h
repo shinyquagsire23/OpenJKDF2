@@ -67,8 +67,8 @@ public:
     
     void hook()
     {
-        vm_hook_register("JK.EXE", "WinMain", 0x41EBD0);
-        vm_hook_register("JK.EXE", "jk_main", 0x50E750);
+        //vm_hook_register("JK.EXE", "WinMain", 0x41EBD0);
+        //vm_hook_register("JK.EXE", "jk_main", 0x50E750);
 
         // Switching between HLE and VM is sloooowwww
         //vm_hook_register("JK", "_atoi", 0x512840);

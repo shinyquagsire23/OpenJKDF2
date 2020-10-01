@@ -491,6 +491,8 @@ void handleMouseMove(SDL_MouseMotionEvent *event, int mouseOffsX, int mouseOffsY
     //printf("Mouse pos %i,%i\n", event->x, event->y);
     //TODO hwnd to imgui
     uint32_t pos = ((event->x - mouseOffsX) & 0xFFFF) | (((event->y - mouseOffsY) << 16) & 0xFFFF0000);
+    user32->mousePosX = event->x - mouseOffsX;
+    user32->mousePosY = event->y - mouseOffsY;
 
     if (mouseMoveRet)
     {
@@ -598,7 +600,7 @@ uint32_t User32::PeekMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsg
     if (ms - last_ms > 16)
     {
         uint32_t hdcSrc = gdi32->selectedHdcSrc;
-        struct color rop;
+        struct color rop = {0};
         gdi32->BitBlt(0xefab,0,0,0,0,hdcSrc,0,0,rop);
         last_ms = ms;
     }
@@ -621,7 +623,8 @@ uint32_t User32::GetMessageA(struct tagMSG* lpMsg, uint32_t hWnd, uint16_t wMsgF
 {
     if (messages.size())
     {
-        *lpMsg = messages.front();
+        //if (lpMsg)
+            *lpMsg = messages.front();
         messages.pop();
         return 1;
     }

@@ -18,6 +18,23 @@
 #include "dlls/kernel32.h"
 #include "dlls/user32.h"
 
+// 32-bit page directory entry bits
+#define PDE32_PRESENT 1
+#define PDE32_RW (1 << 1)
+#define PDE32_USER (1 << 2)
+#define PDE32_PS (1 << 7)
+
+// 64-bit page * entry bits
+#define PDE64_PRESENT 1
+#define PDE64_RW (1 << 1)
+#define PDE64_USER (1 << 2)
+#define PDE64_ACCESSED (1 << 5)
+#define PDE64_DIRTY (1 << 6)
+#define PDE64_PS (1 << 7)
+#define PDE64_G (1 << 8)
+
+#define CR4_PSE (1 << 8)
+
 /* CR0 bits */
 #define CR0_PE 1u
 #define CR0_MP (1U << 1)
@@ -31,16 +48,23 @@
 #define CR0_CD (1U << 30)
 #define CR0_PG (1U << 31)
 
+#define CR4_OSFXSR (1 << 8)
+#define CR4_OSXMMEXCPT (1 << 10)
+
 #define EFER_SCE 1
 #define EFER_LME (1U << 8)
 #define EFER_LMA (1U << 10)
 #define EFER_NXE (1U << 11)
 
-const uint64_t gdt_address = 0xc0000000;
-const uint64_t fs_address = 0x7efdd000;
+const uint64_t gdt_address  = 0xc0000000;
+const uint64_t fs_address   = 0x7efdd000;
+const uint64_t es_address   = 0x7efde000;
+const uint64_t pd_address   = 0x7efdc000;
 
 void* fs_mem;
+void* es_mem;
 void* gdt_mem;
+void* pd_mem;
 
 int sys_fd;
 int vm_fd;
@@ -261,6 +285,7 @@ uint32_t run_vm(struct vm *vm, size_t sz)
     
         if (ioctl(vcpu_fd, KVM_RUN, 0) < 0) {
             perror("KVM_RUN");
+            kvm_print_regs(vm);
             exit(1);
         }
 
@@ -278,18 +303,32 @@ uint32_t run_vm(struct vm *vm, size_t sz)
                 perror("KVM_GET_VCPU_EVENTS");
                 exit(1);
             }
-
+            
+            //printf("%x %x %x %x %x\n", events.exception.injected, events.exception.nr, events.exception.has_error_code, events.exception.error_code, regs.rip);
+            
             import = import_hooks[regs.rip];
-            if (import)
+            
+            /*if (events.exception.nr == 0xd && regs.rip < 0x80000000)
+            {
+                //uint32_t popped = 0;
+                //vm_stack_pop(&popped, 1);
+                //printf("%08x\n", popped);
+                vm_reg_write(UC_X86_REG_EIP, regs.rip + 2);
+                kvm_print_regs(vm);
+            }
+            else */if (import)
             {
                 //printf("Hit import %s::%s\n", import->dll.c_str(), import->name.c_str());
                 vm_process_import(import);
+                //kvm_print_regs(vm);
             }
             else
             {
                 printf("Failed import %" PRIx64 "\n", regs.rip);
                 kvm_print_regs(vm);
                 kvm_stop(vm);
+                
+                printf("%08x\n", current_kvm->vcpu.sregs.es.selector);
             }
 
             memset(&events, 0, sizeof(events));
@@ -324,47 +363,75 @@ uint32_t run_vm(struct vm *vm, size_t sz)
 static void setup_protected_mode(struct kvm_sregs *sregs)
 {
     struct kvm_segment seg;
-    seg.base = 0,
-    seg.limit = 0xffffffff,
-    seg.selector = 1 << 3,
-    seg.present = 1,
-    seg.type = 11, /* Code: execute, read, accessed */
-    seg.dpl = 0,
-    seg.db = 1,
-    seg.s = 1, /* Code/data */
-    seg.l = 0,
-    seg.g = 1, /* 4KB granularity */
+    seg.base = 0;
+    seg.limit = 0xffffffff;
+    seg.selector = 1 << 3;
+    seg.present = 1;
+    seg.type = 11; /* Code: execute, read, accessed */
+    seg.dpl = 0;
+    seg.db = 1;
+    seg.s = 1; /* Code/data */
+    seg.l = 0;
+    seg.g = 1; /* 4KB granularity */
+    
+    // Set up paging
+    uint64_t *pd = pd_mem;
+    
+    for (int i = 0; i < 0x10000/8; i++)
+    {
+        pd[i] = PDE32_PRESENT | PDE32_RW | PDE32_USER | PDE32_PS | (i * 0x400000);
+    }
 
-    sregs->cr0 |= CR0_PE; /* enter protected mode */
+    //sregs->cr3 = pd_address;
+    //sregs->cr4 = CR4_PSE;
+    sregs->cr0 = CR0_PE;// | CR0_MP | CR0_ET | CR0_NE | CR0_WP | CR0_AM;
+
+    //sregs->cr0 |= CR0_PE | CR0_ET | CR0_PG; /* enter protected mode */
 
     sregs->cs = seg;
     
-    /*int r_cs = 0x73;
-    int r_ss = 0x88;      //ring 0
-    int r_ds = 0x7b;
-    int r_es = 0x7b;
-    int r_fs = 0x83;*/
-
     seg.type = 3; /* Data: read/write, accessed */
     seg.selector = 2 << 3;
-    sregs->ds = sregs->es = sregs->gs = sregs->ss = seg;
+    sregs->ds = seg;
+    sregs->es = seg;
+    
+    seg.type = 3; /* Data: read/write, accessed */
+    seg.selector = 2 << 3;
+    sregs->gs = seg;
+    sregs->ss = seg;
     
     seg.base = fs_address;
-    
     sregs->fs = seg;
+
+#if 0
+    seg.type = 3; /* Data: read/write, accessed */
+    seg.selector = 0 << 3;
+    sregs->gs = sregs->ss = seg;
+    
+    seg.base = fs_address;
+    sregs->fs = seg;
+    
+    seg.selector = 0 << 3;
+    seg.base = 0; // TODO?
+    sregs->ds = seg;
+    
+    seg.selector = 0 << 3;
+    seg.base = es_address;
+    sregs->es = seg;
+#endif
 }
 
 uint32_t run_protected_mode(struct vm *vm, uint32_t start, uint32_t esp)
 {
     if (ioctl(vcpu_fd, KVM_GET_SREGS, &vm->vcpu.sregs) < 0) {
-        perror("KVM_GET_SREGS");
+        perror("KVM_GET_SREGS (run_protected_mode)");
         exit(1);
     }
 
     setup_protected_mode(&vm->vcpu.sregs);
 
     if (ioctl(vcpu_fd, KVM_SET_SREGS, &vm->vcpu.sregs) < 0) {
-        perror("KVM_SET_SREGS");
+        perror("KVM_SET_SREGS (run_protected_mode)");
         exit(1);
     }
 
@@ -378,7 +445,7 @@ uint32_t run_protected_mode(struct vm *vm, uint32_t start, uint32_t esp)
     vm->vcpu.sregs.gdt.limit = 31 * sizeof(struct SegmentDescriptor) - 1;
 
     if (ioctl(vcpu_fd, KVM_SET_REGS, &vm->vcpu.regs) < 0) {
-        perror("KVM_SET_REGS");
+        perror("KVM_SET_REGS (run_protected_mode end)");
         exit(1);
     }
 
@@ -387,7 +454,7 @@ uint32_t run_protected_mode(struct vm *vm, uint32_t start, uint32_t esp)
 
 bool initialized = false;
 
-uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t image_mem_size, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
+uint32_t kvm_run(struct vm *kvm, uint32_t stack_addr, uint32_t stack_size, uint32_t start_addr, uint32_t end_addr, uint32_t esp)
 {
     //printf("KVM run %" PRIx32 "\n", start_addr);
     
@@ -395,12 +462,12 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
     if (current_kvm)
     {
         if (ioctl(vcpu_fd, KVM_GET_SREGS, &current_kvm->vcpu.sregs) < 0) {
-            perror("KVM_GET_SREGS");
+            perror("KVM_GET_SREGS (kvm_run)");
             exit(1);
         }
         
         if (ioctl(vcpu_fd, KVM_GET_REGS, &current_kvm->vcpu.regs) < 0) {
-            perror("KVM_GET_REGS");
+            perror("KVM_GET_REGS (kvm_run)");
             exit(1);
         }
     }
@@ -408,19 +475,21 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
     struct vm *last_kvm = current_kvm;
     current_kvm = kvm;
     
+    if (!esp)
+        esp = stack_addr + stack_size;
+    
     if (!initialized)
     {
         vm_init(kvm);
-
-        if (!esp)
-            esp = stack_addr + stack_size;
         
-        uint64_t totalSize = image_mem_size + stack_size;
-        totalSize = (totalSize + 0xFFF) & ~0xFFF;
-        kvm_mem_map_ptr(kvm, image_addr, totalSize, 0, image_mem);
+        vm_map_images();
         
         fs_mem = vm_alloc(0x1000);
+        es_mem = vm_alloc(0x1000);
         gdt_mem = vm_alloc(0x10000);
+        pd_mem = vm_alloc(0x10000);
+        
+        memset(gdt_mem, 0, 0x10000);
         
         // init gdt
         struct SegmentDescriptor *gdt = (struct SegmentDescriptor*)gdt_mem;
@@ -430,7 +499,13 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
         vm_init_descriptor(&gdt[17], 0, 0xfffff000, 0);  //ring 0 data
         gdt[17].dpl = 0;  //set descriptor privilege level
         
+        vm_init_descriptor(&gdt[0], 0, 0xfffff000, 0);
+        vm_init_descriptor(&gdt[1], 0, 0xfffff000, 1);
+        vm_init_descriptor(&gdt[2], 0, 0xfffff000, 0);
+        
         kvm_mem_map_ptr(kvm, fs_address, 0x1000, 0, fs_mem);
+        kvm_mem_map_ptr(kvm, es_address, 0x1000, 0, es_mem);
+        kvm_mem_map_ptr(kvm, pd_address, 0x1000, 0, pd_mem);
 
         //*(uint32_t*)(image_mem + 0x8F0524 - image_addr) = 0x12345678;
         vm_sync_imports();
@@ -442,16 +517,21 @@ uint32_t kvm_run(struct vm *kvm, uint32_t image_addr, void* image_mem, uint32_t 
     vcpu_init(kvm);
     uint32_t eax = run_protected_mode(kvm, start_addr, esp);
 
+    //printf("%08x\n", current_kvm->vcpu.sregs.es.selector);
+
     // Restore state
     current_kvm = last_kvm;
     
+    if (!current_kvm)
+        return eax;
+
     if (ioctl(vcpu_fd, KVM_SET_SREGS, &current_kvm->vcpu.sregs) < 0) {
-        perror("KVM_SET_SREGS");
+        perror("KVM_SET_SREGS (kvm_run)");
         //exit(1);
     }
     
     if (ioctl(vcpu_fd, KVM_SET_REGS, &current_kvm->vcpu.regs) < 0) {
-        perror("KVM_SET_REGS");
+        perror("KVM_SET_REGS (kvm_run)");
         //exit(1);
     }
     

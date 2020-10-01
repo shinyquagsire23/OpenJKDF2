@@ -31,6 +31,7 @@ bool hasDestroyedTex = false;
 bool gameRendering = false;
 std::string gameTitle = "";
 GLint gameTex = 0;
+GLint gamePal = 0;
 ImVec2 gameDims(640,480);
 void (*gameTexDestroy)(void*) = NULL;
 void (*gameOnVblank)(void*) = NULL;
@@ -41,7 +42,12 @@ static uint32_t last_ms = 0;
 static uint32_t game_ms = 0;
 static uint32_t last_game_ms = 0;
 
-static MemoryEditor mem_edit;
+static MemoryEditor mem_edit1;
+static MemoryEditor mem_edit2;
+static MemoryEditor mem_edit3;
+static MemoryEditor mem_edit4;
+
+std::string console = "";
 
 char toHexViewerCharacter(uint8_t val)
 {
@@ -98,7 +104,15 @@ void *renderer_thread(void *threadid)
             ImGui::SetNextWindowCollapsed(false);
             ImGui::Begin(gameTitle.c_str(), NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
             ImVec2 screen_pos = ImGui::GetCursorScreenPos();
-            ImGui::Image((void*)((intptr_t)gameTex), gameDims);
+            if (gamePal)
+            {
+                ImGui::Image((void*)((intptr_t)gamePal), gameDims, 2);
+                ImGui::Image((void*)((intptr_t)gameTex), gameDims, 1);
+            }
+            else
+            {
+                ImGui::Image((void*)((intptr_t)gameTex), gameDims, 0);
+            }
             ImGui::End();
 
             if (user32)
@@ -111,6 +125,11 @@ void *renderer_thread(void *threadid)
         ImGui::Begin("Info", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("imgui FPS = %i", ms_diff ? 1000 / ms_diff : 0);
         ImGui::Text("game FPS = %i", game_ms_diff ? 1000 / game_ms_diff : 0);
+        ImGui::End();
+        
+        ImGui::SetNextWindowCollapsed(false);
+        ImGui::Begin("Console", NULL);
+        //ImGui::Text((char*)vm_ptr_to_real_ptr(0x8BC020));
         ImGui::End();
         
         /*ImGui::SetNextWindowCollapsed(false);
@@ -139,18 +158,18 @@ void *renderer_thread(void *threadid)
         
         uint8_t* heap_mem = (uint8_t*)vm_ptr_to_real_ptr(0x90000000);
         if (heap_mem)
-            mem_edit.DrawWindow("Heap Memory Viewer", heap_mem, 0x8000000, 0x90000000);
+            mem_edit1.DrawWindow("Heap Memory Viewer", heap_mem, 0x8000000, 0x90000000);
         
         uint8_t* virt_mem = (uint8_t*)vm_ptr_to_real_ptr(0x80000000);
         if (heap_mem)
-            mem_edit.DrawWindow("Virtual Memory Viewer", heap_mem, 0x10000000, 0x80000000);
+            mem_edit2.DrawWindow("Virtual Memory Viewer", heap_mem, 0x10000000, 0x80000000);
             
-        if (image_mem)
-            mem_edit.DrawWindow("EXE Memory Viewer", image_mem, image_mem_size, image_mem_addr);
+        //if (image_mem)
+        //    mem_edit3.DrawWindow("EXE Memory Viewer", image_mem, image_mem_size, image_mem_addr);
             
-        uint8_t* stack_mem = (uint8_t*)vm_ptr_to_real_ptr(stack_addr);
+        /*uint8_t* stack_mem = (uint8_t*)vm_ptr_to_real_ptr(stack_addr);
         if (image_mem)
-            mem_edit.DrawWindow("Stack Memory Viewer", stack_mem, stack_size, stack_addr);
+            mem_edit.DrawWindow("Stack Memory Viewer", stack_mem, stack_size, stack_addr);*/
 
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         ImGui::Render();
@@ -198,7 +217,7 @@ int renderer_jointhread()
     return pthread_join(render_thread, &status);
 }
 
-void renderer_feedwindowinfo(std::string title, GLint texID, ImVec2 dims, void (*onTexDestroy)(void*), void (*onVblank)(void*), void* destroyExtra)
+void renderer_feedwindowinfo(std::string title, GLint texID, GLint palTexId, ImVec2 dims, void (*onTexDestroy)(void*), void (*onVblank)(void*), void* destroyExtra)
 {
 	last_game_ms = game_ms;
 	game_ms = nmm->timeGetTime();
@@ -215,6 +234,7 @@ void renderer_feedwindowinfo(std::string title, GLint texID, ImVec2 dims, void (
     
     gameTitle = title;
     gameTex = texID;
+    gamePal = palTexId;
     gameDims = dims;
     gameTexDestroy = onTexDestroy;
     gameOnVblank = onVblank;
@@ -234,4 +254,9 @@ void renderer_waitforvblank()
     pthread_mutex_lock(&context_lock);
     pthread_cond_wait(&cond_vblank, &context_lock);
     pthread_mutex_unlock(&context_lock);
+}
+
+void renderer_print(std::string new_line)
+{
+    console += new_line;
 }

@@ -31,11 +31,11 @@ public:
         
         if (!adjust_fdiv_import || !acmdln_import) return;
 
-        vm_ptr<uint32_t*> import_ptr = {adjust_fdiv_import->addr};
+        vm_ptr<uint32_t*> import_ptr = {adjust_fdiv_import->addrs[0]};
         *import_ptr.translated() = stash + 0x20;
         adjust_fdiv_import->hook = stash + 0x20;
         
-        vm_ptr<uint32_t*> acmdln_ptr = {acmdln_import->addr};
+        vm_ptr<uint32_t*> acmdln_ptr = {acmdln_import->addrs[0]};
         *acmdln_ptr.translated() = stash + 0x50;
         acmdln_import->hook = stash + 0x50;
         
