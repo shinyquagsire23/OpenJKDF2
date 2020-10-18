@@ -27,3 +27,10 @@ DW
 *.til
 *.bin
 *.dll
+*.sqlite
+*.BinExport
+*.BinDiff
+df2_reimpl/byacc/yacc
+df2_reimpl/flex/flex
+df2_reimpl/flex/parse.c
+df2_reimpl/flex/parse.h

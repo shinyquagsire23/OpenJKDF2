@@ -986,14 +986,14 @@ int cog_init()
     g_cog_symboltable_hashmap = cog_alloc_symboltable(512);
     if (!g_cog_symboltable_hashmap )
     {
-        jk_assert(common_functions_ptr_2->print_loglevel0, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
+        jk_assert(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
         return 0;
     }
   
     g_cog_hashtable = hashmap_init_maybe(256);
     if (!g_cog_hashtable)
     {
-        jk_assert(common_functions_ptr_2->print_loglevel0, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
+        jk_assert(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
         return 0;
     }
     *(uint32_t*)(g_cog_symboltable_hashmap + 16) = 256;
@@ -1004,41 +1004,11 @@ int cog_init()
     cog_noise_verbs_init(g_cog_symboltable_hashmap);
     cog_sector_verbs_init(g_cog_symboltable_hashmap);
     cog_player_verbs_init(g_cog_symboltable_hashmap);
-    v3 = hashmap_create_entry(g_cog_symboltable_hashmap, "activate");
-    if ( v3 )
-    {
-        a2.type = COG_TYPE_MESSAGE;
-        a2.val = 1;
-        hashmap_set_entry(v3, &a2);
-    }
-    v4 = hashmap_create_entry(g_cog_symboltable_hashmap, "activated");
-    if ( v4 )
-    {
-        a2.type = COG_TYPE_MESSAGE;
-        a2.val = 1;
-        hashmap_set_entry(v4, &a2);
-    }
-    v5 = hashmap_create_entry(g_cog_symboltable_hashmap, "startup");
-    if ( v5 )
-    {
-        a2.type = COG_TYPE_MESSAGE;
-        a2.val = COG_TYPE_MESSAGE;
-        hashmap_set_entry(v5, &a2);
-    }
-    v6 = hashmap_create_entry(g_cog_symboltable_hashmap, "timer");
-    if ( v6 )
-    {
-        a2.type = COG_TYPE_MESSAGE;
-        a2.val = 4;
-        hashmap_set_entry(v6, &a2);
-    }
-    v7 = hashmap_create_entry(g_cog_symboltable_hashmap, "blocked");
-    if ( v7 )
-    {
-        a2.type = COG_TYPE_MESSAGE;
-        a2.val = 5;
-        hashmap_set_entry(v7, &a2);
-    }
+	cog_register_message(g_cog_symboltable_hashmap, 1, "activate");
+	cog_register_message(g_cog_symboltable_hashmap, 1, "activated");
+    cog_register_message(g_cog_symboltable_hashmap, 3, "startup");
+    cog_register_message(g_cog_symboltable_hashmap, 4, "timer");
+    cog_register_message(g_cog_symboltable_hashmap, 5, "blocked");
     cog_register_message(g_cog_symboltable_hashmap, 6, "entered");
     cog_register_message(g_cog_symboltable_hashmap, 7, "exited");
     cog_register_message(g_cog_symboltable_hashmap, 8, "crossed");

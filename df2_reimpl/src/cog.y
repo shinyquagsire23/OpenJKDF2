@@ -199,7 +199,7 @@ jump_statement
     ;
 
 %%
-#include <stdio.h>
+#include "jk.h"
 
 extern char yytext[];
 extern int linenum;

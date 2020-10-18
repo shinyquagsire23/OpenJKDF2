@@ -10,6 +10,7 @@
 #include "jkl.h"
 #include "stdMath.h"
 #include "rdVector.h"
+#include "stdConffile.h"
 
 int yyparse();
 
@@ -227,6 +228,21 @@ __declspec(dllexport) void hook_init(void)
     
     // sithCogParse
     //hook_function(sithCogYACC_yyparse_ADDR, yyparse);
+    
+    // stdConffile
+    hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
+    hook_function(stdConffile_OpenWrite_ADDR, stdConffile_OpenWrite);
+    hook_function(stdConffile_OpenMode_ADDR, stdConffile_OpenMode);
+    hook_function(stdConffile_Close_ADDR, stdConffile_Close);
+    hook_function(stdConffile_CloseWrite_ADDR, stdConffile_CloseWrite);
+    hook_function(stdConffile_WriteLine_ADDR, stdConffile_WriteLine);
+    hook_function(stdConffile_Write_ADDR, stdConffile_Write);
+    hook_function(stdConffile_Printf_ADDR, stdConffile_Printf);
+    hook_function(stdConffile_Read_ADDR, stdConffile_Read);
+    hook_function(stdConffile_ReadArgsFromStr_ADDR, stdConffile_ReadArgsFromStr);
+    hook_function(stdConffile_ReadArgs_ADDR, stdConffile_ReadArgs);
+    hook_function(stdConffile_ReadLine_ADDR, stdConffile_ReadLine);
+    hook_function(stdConffile_GetFileHandle_ADDR, stdConffile_GetFileHandle);
     
     //hook_function();
 }

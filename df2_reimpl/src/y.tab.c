@@ -392,7 +392,7 @@ YYSTYPE yylval;
 short yyss[YYSTACKSIZE];
 YYSTYPE yyvs[YYSTACKSIZE];
 #line 202 "cog.y"
-#include <stdio.h>
+#include "jk.h"
 
 extern char yytext[];
 extern int linenum;

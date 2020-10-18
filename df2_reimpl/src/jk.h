@@ -2,6 +2,7 @@
 #define JK_H
 
 #include "types.h"
+#include <stdio.h>
 
 #define WinMain_ADDR (0x41EBD0)
 
@@ -12,33 +13,33 @@
 typedef struct common_functions
 {
     uint32_t some_float;
-    uint32_t print_loglevel1;
-    uint32_t print_unk2;
-    uint32_t print_unk;
-    uint32_t print_loglevel0;
-    uint32_t print_loglevel2;
-    uint32_t messagebox;
+    int (*messagePrint)(const char *, ...);
+    int (*statusPrint)(const char *, ...);
+    int (*warningPrint)(const char *, ...);
+    int (*errorPrint)(const char *, ...);
+    int (*debugPrint)(const char *, ...);
+    int (*assert)(char *, char *, int);
     uint32_t unk_0;
-    uint32_t alloc;
-    uint32_t free;
+    void *(*alloc)(unsigned int);
+    void (*free)(void *);
     uint32_t realloc;
     uint32_t timeGetTime;
-    uint32_t fopen;
-    uint32_t fclose;
-    uint32_t fread;
-    uint32_t fgets;
-    uint32_t fwrite;
-    uint32_t feof;
-    uint32_t ftell;
-    uint32_t fseek;
-    uint32_t getfilesize;
-    uint32_t fprintf;
+    int (*fileOpen)(char *, char *);
+    int (*fileClose)(int);
+    size_t (*fileRead)(int, void *, size_t);
+    char *(*fileGets)(int, char *, int);
+    size_t (*fileWrite)(int, void *, size_t);
+    int (*feof)(FILE *);
+    int (*ftell)(FILE *);
+    int (*fseek)(FILE *, int, int);
+    int (*fileSize)(char *);
+    int (*filePrintf)(FILE *, char*, ...);
     uint32_t fgetws;
-    uint32_t malloc_ish;
-    uint32_t free_ish;
-    uint32_t realloc_ish;
-    uint32_t return_arg;
-    uint32_t nullsub;
+    uint32_t allocHandle;
+    uint32_t freeHandle;
+    uint32_t reallocHandle;
+    uint32_t lockHandle;
+    uint32_t unlockHandle;
 } common_functions;
 
 typedef struct hashmap_entry
@@ -89,7 +90,14 @@ extern char* (*_strncpy)(char *, const char *, size_t);
 extern int (*__strcmpi)(const char *, const char *);
 extern int (*_sscanf)(const char*, const char*, ...);
 extern void* (*_memcpy)(void*, const void*, size_t);
+char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);
+
+static int (*__vsnprintf)(char *a1, size_t a2, const char *a3, va_list a4) = 0x512AC0;
+static char* (*_strtok)(char * a, const char * b) = 0x512850;
+static char* (*_strchr)(char * a, char b) = 0x513280;
+static char* (*strtolower)(char* str) = 0x42F4F0;
+int _strlen(char *str);
 
 // JK globals
 VM_VAR_DECL(g_hWnd, HWND);
@@ -132,7 +140,7 @@ VM_VAR_DECL(g_cog_symboltable_hashmap, void*);
 
 #define wm_msg_main_handler (0x50ECB0)
 
-#define common_functions_ptr_2 (*((struct common_functions **)0x82F0A4))
+#define pSithHS (*((struct common_functions **)0x82F0A4))
 #define g_cog_hashtable (*(void**)0x836C3C)
 
 void jk_init();

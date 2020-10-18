@@ -49,6 +49,23 @@ int _memcmp (const void* str1, const void* str2, size_t count)
   return 0;
 }
 
+int _strlen(char *str)
+{
+    int len;
+    for (len = 0; str[len]; len++);
+    return len;
+}
+
+char* _strcpy(char *dst, const char *src)
+{
+    if (!dst) return NULL;
+    if (!src) return NULL;
+
+    char *tmp = dst;
+    while(*dst++ = *src++);
+    return tmp;
+}
+
 // JK globals
 VM_VAR(g_hWnd, HWND, 0x855DE0);
 
