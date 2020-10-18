@@ -1,0 +1,206 @@
+Miscellaneous flex stuff.  In here you'll find an out-of-date VMS makefile
+for flex and notes someone sent me regarding converting flex to deal with
+8 bit characters.  This stuff is provided so that ambitious folks can pick
+it up and turn it into something viable.  I'd appreciate being sent any
+updates resulting from work on this.
+
+The makefile is from Fred Brehm (fwb@demon.siemens.com); the 8 bit chars
+from Earle Horton (arizona!earleh@eleazar.Dartmouth.EDU).
+
+
+
+############################ VMS MAKEFILE ##############################
+
+# VMS make file for "flex" tool
+
+# Redefine the following for your own environment
+BIN = tools$$exe
+LIB = tools$$library
+INC = tools$$include
+MAN = tools$$manual
+LINKFLAGS = ,$(LIB):cc/opt
+
+SKELETON_FILE = "DEFAULT_SKELETON_FILE=""$(LIB):FLEX.SKEL"""
+F_SKELETON_FILE = "FAST_SKELETON_FILE=""$(LIB):FLEX.FASTSKEL"""
+
+CCFLAGS = VMS
+FLEX_FLAGS = -is
+
+FLEXOBJS = ccl.obj dfa.obj ecs.obj main.obj misc.obj nfa.obj parse.obj \
+scan.obj sym.obj tblcmp.obj yylex.obj
+
+OBJ = ccl.obj,dfa.obj,ecs.obj,main.obj,misc.obj,nfa.obj,parse.obj,\
+scan.obj,sym.obj,tblcmp.obj,yylex.obj
+
+default : flex
+install : inc lib bin man
+inc : $(INC):flexskeldef.h $(INC):fastskeldef.h $(INC):flexskelcom.h
+lib : $(LIB):flex.skel $(LIB):flex.fastskel
+bin : $(BIN):flex
+	flex :== $$ $(BIN):flex
+man : $(MAN):flex.doc
+
+$(INC):flexskeldef.h : flexskeldef.h
+	copy flexskeldef.h $(INC)
+$(INC):fastskeldef.h : fastskeldef.h
+	copy fastskeldef.h $(INC)
+$(INC):flexskelcom.h : flexskelcom.h
+	copy flexskelcom.h $(INC)
+$(LIB):flex.skel : flex.skel
+	copy flex.skel $(LIB)
+$(LIB):flex.fastskel : flex.fastskel
+	copy flex.fastskel $(LIB)
+$(BIN):flex.exe : flex.exe
+	copy flex.exe $(BIN)
+$(MAN):flex.doc : flex.doc
+	copy flex.doc $(MAN)
+
+flex : flex.exe
+	flex :== $$ 'f$$environment("default")'flex
+
+flex.exe : $(FLEXOBJS)
+	link /exe=flex $(OBJ) $(LINKFLAGS)
+
+parse.h : parse.c
+
+parse.c : parse.y
+	yacc :== $$ sys$$sysroot:[shellexe]yacc
+	yacc -d parse.y
+	copy y_tab.c parse.c
+	copy y_tab.h parse.h
+	del y_tab.h;*,y_tab.c;*
+
+#scan.c : scan.l
+#	flex $(FLEX_FLAGS) scan.l
+#	copy lex_yy.c scan.c
+#	del lex_yy.c;*
+scan.c : scan.dist
+	copy scan.dist scan.c
+
+ccl.obj : ccl.c flexdef.h
+	cc /define=$(CCFLAGS) ccl.c
+dfa.obj : dfa.c flexdef.h
+	cc /define=$(CCFLAGS) dfa.c
+ecs.obj : ecs.c flexdef.h
+	cc /define=$(CCFLAGS) ecs.c
+main.obj : main.c flexdef.h
+	cc /define=($(CCFLAGS),$(SKELETON_FILE),$(F_SKELETON_FILE)) main.c
+misc.obj : misc.c flexdef.h
+	cc /define=$(CCFLAGS) misc.c
+nfa.obj : nfa.c flexdef.h
+	cc /define=$(CCFLAGS) nfa.c
+parse.obj : parse.c flexdef.h
+	cc /define=$(CCFLAGS) parse.c
+scan.obj : scan.c parse.h flexdef.h
+	cc /define=$(CCFLAGS) scan.c
+sym.obj : sym.c flexdef.h
+	cc /define=$(CCFLAGS) sym.c
+tblcmp.obj : tblcmp.c flexdef.h
+	cc /define=$(CCFLAGS) tblcmp.c
+yylex.obj : yylex.c parse.h flexdef.h
+	cc /define=$(CCFLAGS) yylex.c
+
+clean :
+	del flex.exe;*
+	del scan.c;*
+	del parse.c;*
+	del parse.h;*
+	del lex_yy.c;*
+	del *.obj;*
+	del flex*.tmp;*
+	del *.diff;*
+	del y_tab.*;*
+	del makefile.;*
+	purge/log
+	copy makefile.vms makefile.
+
+makefile : makefile.vms
+	copy makefile.vms makefile.
+
+test : flex
+	define tools$$lib 'f$$environment("default")'
+	flex $(FLEX_FLAGS) scan.l
+	define tools$$lib tools$$sys:[lib]
+	diff/out=flex.diff scan.dist lex_yy.c
+	type/page flex.diff
+
+
+
+######################### Stuff for 8 Bit chars ########################
+
+
+Earle Horton has made a version of flex run on the MacIntosh under MPW.  Not
+being content to scan regular ascii, he deals with all 8 bits.  I also have
+wanted to write VMS filters that recognize <CSI>, etc. so I contacted him
+about his work.  He seems to be unable to reach you directly--the rest of
+this is his note...
+---------------------------Note from Earle------------------
+>From arizona!earleh@eleazar.Dartmouth.EDU Fri May 27 11:33:09 1988
+Received: from DARTVAX.DARTMOUTH.EDU by megaron.arizona.edu; Fri, 27 May 88 10:55:39 MST
+Received: from eleazar.dartmouth.edu by dartvax.dartmouth.edu (5.59/3.4ROOT)
+	id AA17044; Fri, 27 May 88 13:53:18 EDT
+Received: by eleazar.dartmouth.edu (5.59/3.2LEAF)
+	id AA15906; Fri, 27 May 88 13:53:04 EDT
+Date: Fri, 27 May 88 13:53:04 EDT
+From: arizona!earleh@eleazar.Dartmouth.EDU (Earle R. Horton)
+Message-Id: <8805271753.AA15906@eleazar.dartmouth.edu>
+To: eleazar!earleh, earleh@eleazar.Dartmouth.EDU, naucse!jdc
+Subject: Re: Flex and DEC multi-nationals, help!
+Status: R
+
+John,
+
+     I have posted the diffs to comp.sources.unix, and I think that
+they could be used to generate a VAX C version which scans DEC
+multi-nationals with little extra effort.  I tried the address which
+you give for Vern several times, only to have it bounce back to me for
+some mysterious reason known only to a mail daemon somewhere.  I would
+indeed appreciate it if you could forward this to him.
+
+     I have found that the full internal representation of all
+characters as shorts is not necessary.  Rather, it is only necessary to
+
+     a)  Prevent conversion of valid characters to negative ints.  I
+         do this with a mask, defined for the Mac and UNIX as 
+         "#define BYTEMASK 0xFF".  Any time a char is converted to an
+         int, AND it with the mask.  Then you don't have to declare
+         chars as unsigned chars, which is tiresome.
+
+     b)  The routine mkeccl() uses negation of characters for a flag
+         to determine whether they have been processed.  I used a
+         debugger to estimate how many times this routine is actually
+         called when Flex scans scan.l.  Based on what this looked
+         like to me, I decided that it would be appropriate to have
+         only the routine mkeccl() use an array of shorts for its
+         internal processing.  When mkeccl() is called, it gets a
+         pointer to an array of shorts using alloca(), and then reads
+         the characters which it is to process into this array using
+         the method in (a).  When mkeccl() is done, the shorts are put
+         back into chars, and things proceed.  The internal processing
+         done by mkeccl() is the same.
+
+     Flex compiled with these changes correctly scans all characters
+in the Macintosh character set, to the best of my ability to test it.
+In addition, it correctly scans chars with values > 127 on a UNIX VAX!
+Contrary to "common knowledge", text files which exist on a UNIX
+machine may have valid characters in the range [\0177-\0377].  An
+example is if I want to write a program to run on a UNIX machine which
+converts German characters to ASCII.  The ess-tset (I believe that is
+the name) can be converted to "ss" with little loss of sense in most cases.
+         
+     The only question I have about my procedure is that it looks
+expensive to convert the ccltbl array to shorts and back every time
+mkeccl() is called.  However, the routine is not called an inordinately
+large number of times, and this conversion is probably not more
+expensive than a couple of calls to strcpy(), for instance.  To
+determine whether this is the most efficient method, one would have to
+go through the effort to convert Flex to use shorts for all internal
+representation, then profile the two methods.  Not my idea of a good
+time.
+
+     Flex is a real nice program.  I couldn't find anything else wrong
+with it.
+
+Earle Horton
+
+

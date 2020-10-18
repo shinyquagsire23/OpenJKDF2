@@ -33,6 +33,21 @@ cog_entry* (*hashmap_set_entry)(hashmap_entry* map, cog_entry* val) = (void*)0x4
 void* (*hashmap_init_maybe)(int amt) = (void*)0x437AF0;
 char* (*_strncpy)(char *, const char *, size_t) = (void*)0x5126A0;
 int (*__strcmpi)(const char *, const char *) = (void*)0x520D10;
+int (*_sscanf)(const char*, const char*, ...) = (void*)0x512CB0;
+void* (*_memcpy)(void*, const void*, size_t) = (void*)0x514D00;
+
+int _memcmp (const void* str1, const void* str2, size_t count)
+{
+  register const unsigned char *s1 = (const unsigned char*)str1;
+  register const unsigned char *s2 = (const unsigned char*)str2;
+
+  while (count-- > 0)
+    {
+      if (*s1++ != *s2++)
+	  return s1[-1] < s2[-1] ? -1 : 1;
+    }
+  return 0;
+}
 
 // JK globals
 VM_VAR(g_hWnd, HWND, 0x855DE0);

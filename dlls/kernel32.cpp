@@ -223,7 +223,7 @@ uint32_t Kernel32::LCMapStringW(uint32_t a, uint32_t b, uint32_t c, uint32_t d, 
 
 uint32_t Kernel32::GetCommandLineA()
 {
-    char *args = (char*)"-windowGUI -verbose 2 -debug con"; //TODO
+    char *args = (char*)"-windowGUI -verbose 2 -debug con "; //TODO
     uint32_t ptr = VirtualAlloc(0, 0x1000, 0, 0);
 
     vm_mem_write(ptr, args, strlen(args)+1);

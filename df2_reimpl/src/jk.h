@@ -87,6 +87,9 @@ extern cog_entry* (*hashmap_set_entry)(hashmap_entry* map, cog_entry* val);
 extern void* (*hashmap_init_maybe)(int amt);
 extern char* (*_strncpy)(char *, const char *, size_t);
 extern int (*__strcmpi)(const char *, const char *);
+extern int (*_sscanf)(const char*, const char*, ...);
+extern void* (*_memcpy)(void*, const void*, size_t);
+int _memcmp(const void* str1, const void* str2, size_t count);
 
 // JK globals
 VM_VAR_DECL(g_hWnd, HWND);

@@ -1,4 +1,4 @@
-#include "cog.h"
+#include "sithCog.h"
 
 #include "jk.h"
 #include "types.h"
@@ -15,6 +15,14 @@ enum COG_TYPE
     COG_TYPE_MESSAGE  = 3
 };
 
+//void (*sithCogParse_GetSymbolScriptIdx)(sith_cog* ctx) = (void*)0x004FD410;
+//void (*sithCogParse_LexAddSymbol)(sith_cog* ctx) = (void*)0x004FD7F0;
+//void (*sithCogParse_LexGetSym)(sith_cog* ctx) = (void*)0x004FD650;
+//void (*sithCogParse_LexScanVector3)(sith_cog* ctx) = (void*)0x004FD8E0;
+//void (*sithCogParse_AddLeaf)(sith_cog* ctx) = (void*)0x004FD450;
+//void (*sithCogParse_AddLeafVector)(sith_cog* ctx) = (void*)0x004FD4F0;
+//void (*sithCogParse_AddLinkingNode)(sith_cog* ctx) = (void*)0x004FD5A0;
+
 void* (*cog_alloc_symboltable)(int amt) = (void*)0x004FD050;
 void (*cog_debug)(void) = (void*)0x004EE2F0;
 void (*cog_deinit)(sith_cog* ctx) = (void*)0x004DE590;
@@ -22,11 +30,10 @@ void (*cog_exec)(sith_cog* ctx, int b) = (void*)0x004E2350;
 void (*cog_register_global_message)(void* ctx, char* name, int id) = (void*)0x004E06C0;
 void (*cog_register_message)(void* ctx, int msg, char* name) = (void*)0x004E0600;
 int (*cog_register_msg_hander)(int a1, intptr_t a2, int a3, int a4) = (void*)0x4F2860;
-
 void (*cog_activatebin)(sith_cog* ctx) = (void*)0x004E1520;
 void (*cog_activateweapon)(sith_cog* ctx) = (void*)0x00507870;
 void (*cog_adddynamicadd)(sith_cog* ctx) = (void*)0x005075F0;
-void (*cog_adddynamicint)(sith_cog* ctx) = (void*)0x00507580;
+void (*cog_adddynamictint)(sith_cog* ctx) = (void*)0x00507580;
 void (*cog_addscoretoteam)(sith_cog* ctx) = (void*)0x004E1640;
 void (*cog_addthingvel)(sith_cog* ctx) = (void*)0x00503300;
 void (*cog_aiclearmode)(sith_cog* ctx) = (void*)0x00500FE0;
@@ -69,13 +76,13 @@ void (*cog_clearmultimodeflags)(sith_cog* ctx) = (void*)0x00507C30;
 void (*cog_clearphysicsflag)(sith_cog* ctx) = (void*)0x005047A0;
 void (*cog_clearsectorflags)(sith_cog* ctx) = (void*)0x004FEDC0;
 void (*cog_clearsubmodeflag)(sith_cog* ctx) = (void*)0x00506A50;
-void (*cog_clearsurfaceflag)(sith_cog* ctx) = (void*)0x00500510;
+void (*cog_clearsurfaceflags)(sith_cog* ctx) = (void*)0x00500510;
 void (*cog_clearthingattachflags)(sith_cog* ctx) = (void*)0x00504C80;
 void (*cog_clearthingflags)(sith_cog* ctx) = (void*)0x00503B00;
 void (*cog_copy_symboltable)(sith_cog* ctx) = (void*)0x004FCFD0;
 void (*cog_createbackpack)(sith_cog* ctx) = (void*)0x004E12F0;
 void (*cog_creatething)(sith_cog* ctx) = (void*)0x005020B0;
-void (*cog_createthingatp)(sith_cog* ctx) = (void*)0x00502290;
+void (*cog_createthingatpos)(sith_cog* ctx) = (void*)0x00502290;
 void (*cog_createthingatposnr)(sith_cog* ctx) = (void*)0x005022A0;
 void (*cog_createthingnr)(sith_cog* ctx) = (void*)0x00502150;
 void (*cog_cyclecamera)(sith_cog* ctx) = (void*)0x00507100;
@@ -92,10 +99,10 @@ void (*cog_fireprojectile)(sith_cog* ctx) = (void*)0x00507650;
 void (*cog_firstthinginsector)(sith_cog* ctx) = (void*)0x00503D10;
 void (*cog_firstthinginview)(sith_cog* ctx) = (void*)0x00501030;
 void (*cog_free_symboltable)(sith_cog* ctx) = (void*)0x004FD1C0;
-void (*cog_freecoloreffect_modifycoloreffect)(sith_cog* ctx) = (void*)0x00507560;
+void (*cog_modifycoloreffect)(sith_cog* ctx) = (void*)0x507470;
+void (*cog_freecoloreffect)(sith_cog* ctx) = (void*)0x00507560;
 void (*cog_getXflags)(sith_cog* ctx) = (void*)0x00504E60;
 void (*cog_get_symbol)(sith_cog* ctx) = (void*)0x004FD380;
-void (*cog_get_symbol_script_idx)(sith_cog* ctx) = (void*)0x004FD410;
 void (*cog_getabsolutemax)(sith_cog* ctx) = (void*)0x004E0D90;
 void (*cog_getactorweapon)(sith_cog* ctx) = (void*)0x00504680;
 void (*cog_getajoinflags)(sith_cog* ctx) = (void*)0x00500660;
@@ -122,7 +129,7 @@ void (*cog_getflexgametime)(sith_cog* ctx) = (void*)0x005069F0;
 void (*cog_getgametime)(sith_cog* ctx) = (void*)0x005069D0;
 void (*cog_getgoalframe)(sith_cog* ctx) = (void*)0x00502C00;
 void (*cog_getgravity)(sith_cog* ctx) = (void*)0x00506C40;
-void (*cog_getheadlightin)(sith_cog* ctx) = (void*)0x00504050;
+void (*cog_getheadlightintensity)(sith_cog* ctx) = (void*)0x00504050;
 void (*cog_gethorizonskyoffset)(sith_cog* ctx) = (void*)0x004FFFD0;
 void (*cog_getinv)(sith_cog* ctx) = (void*)0x00502FC0;
 void (*cog_getinv_internal)(sith_cog* ctx) = (void*)0x004D1FC0;
@@ -162,7 +169,7 @@ void (*cog_getsecondaryfocus)(sith_cog* ctx) = (void*)0x00507010;
 void (*cog_getsectorcenter)(sith_cog* ctx) = (void*)0x004FEEF0;
 void (*cog_getsectorcount)(sith_cog* ctx) = (void*)0x004FEED0;
 void (*cog_getsectorflags)(sith_cog* ctx) = (void*)0x004FEE20;
-void (*cog_getsectorint)(sith_cog* ctx) = (void*)0x004FE8A0;
+void (*cog_getsectortint)(sith_cog* ctx) = (void*)0x004FE8A0;
 void (*cog_getsectorlight)(sith_cog* ctx) = (void*)0x004FEA00;
 void (*cog_getsectornumvertices)(sith_cog* ctx) = (void*)0x004FEF30;
 void (*cog_getsectorplayercount)(sith_cog* ctx) = (void*)0x004FEE90;
@@ -184,7 +191,7 @@ void (*cog_getsurfaceadjoin)(sith_cog* ctx) = (void*)0x004FFE80;
 void (*cog_getsurfaceanim)(sith_cog* ctx) = (void*)0x00506180;
 void (*cog_getsurfacecenter)(sith_cog* ctx) = (void*)0x00500A20;
 void (*cog_getsurfacecount)(sith_cog* ctx) = (void*)0x00500A70;
-void (*cog_getsurfaceflag)(sith_cog* ctx) = (void*)0x00500570;
+void (*cog_getsurfaceflags)(sith_cog* ctx) = (void*)0x00500570;
 void (*cog_getsurfacelight)(sith_cog* ctx) = (void*)0x005009F0;
 void (*cog_getsurfacemat)(sith_cog* ctx) = (void*)0x005003C0;
 void (*cog_getsurfacenormal)(sith_cog* ctx) = (void*)0x00500AA0;
@@ -205,7 +212,7 @@ void (*cog_getthinglightmode)(sith_cog* ctx) = (void*)0x00504230;
 void (*cog_getthinglook)(sith_cog* ctx) = (void*)0x00504A10;
 void (*cog_getthinglvec)(sith_cog* ctx) = (void*)0x00503390;
 void (*cog_getthingmass)(sith_cog* ctx) = (void*)0x005052A0;
-void (*cog_getthingmode)(sith_cog* ctx) = (void*)0x005041D0;
+void (*cog_getthinggeomode)(sith_cog* ctx) = (void*)0x005041D0;
 void (*cog_getthingmodel)(sith_cog* ctx) = (void*)0x005039B0;
 void (*cog_getthingmovesize)(sith_cog* ctx) = (void*)0x00505230;
 void (*cog_getthingparent)(sith_cog* ctx) = (void*)0x00502EB0;
@@ -280,10 +287,7 @@ void (*cog_jkstringconcatvector)(sith_cog* ctx) = (void*)0x0040B1C0;
 void (*cog_jkstringoutput)(sith_cog* ctx) = (void*)0x0040B270;
 void (*cog_jumptoframe)(sith_cog* ctx) = (void*)0x00502650;
 void (*cog_killtimerex)(sith_cog* ctx) = (void*)0x00506470;
-void (*cog_lex_addsymbol)(sith_cog* ctx) = (void*)0x004FD7F0;
 void (*cog_lex_flex_scanner)(sith_cog* ctx) = (void*)0x0050D260;
-void (*cog_lex_get_sym)(sith_cog* ctx) = (void*)0x004FD650;
-void (*cog_lex_scan_vector3)(sith_cog* ctx) = (void*)0x004FD8E0;
 void (*cog_loadkeyframe)(sith_cog* ctx) = (void*)0x00506200;
 void (*cog_loadmodel)(sith_cog* ctx) = (void*)0x00506240;
 void (*cog_loadsound)(sith_cog* ctx) = (void*)0x004FF880;
@@ -298,9 +302,6 @@ void (*cog_nthbackpackbin)(sith_cog* ctx) = (void*)0x004E1210;
 void (*cog_nthbackpackvalue)(sith_cog* ctx) = (void*)0x004E1260;
 void (*cog_numbackpackitems)(sith_cog* ctx) = (void*)0x004E12B0;
 void (*cog_parsearg)(sith_cog* ctx) = (void*)0x005048D0;
-void (*cog_parser_addleaf)(sith_cog* ctx) = (void*)0x004FD450;
-void (*cog_parser_addleaf_vector)(sith_cog* ctx) = (void*)0x004FD4F0;
-void (*cog_parser_addlinkingnode)(sith_cog* ctx) = (void*)0x004FD5A0;
 void (*cog_pathmovepause)(sith_cog* ctx) = (void*)0x00503FA0;
 void (*cog_pathmoveresume)(sith_cog* ctx) = (void*)0x005040E0;
 void (*cog_pickupbackpack)(sith_cog* ctx) = (void*)0x004E11C0;
@@ -403,11 +404,11 @@ void (*cog_setrespawnmask)(sith_cog* ctx) = (void*)0x004E14E0;
 void (*cog_setscorelimit)(sith_cog* ctx) = (void*)0x00507DD0;
 void (*cog_setsectoradjoins_sectoradjoins)(sith_cog* ctx) = (void*)0x004FEAD0;
 void (*cog_setsectorflags)(sith_cog* ctx) = (void*)0x004FED60;
-void (*cog_setsectorint)(sith_cog* ctx) = (void*)0x004FE8F0;
+void (*cog_setsectortint)(sith_cog* ctx) = (void*)0x004FE8F0;
 void (*cog_setsectorlight_sectorlight)(sith_cog* ctx) = (void*)0x004FEA30;
 void (*cog_setsectorthrust)(sith_cog* ctx) = (void*)0x004FEC70;
 void (*cog_setsubmodeflag)(sith_cog* ctx) = (void*)0x00506A30;
-void (*cog_setsurfaceflag)(sith_cog* ctx) = (void*)0x005004B0;
+void (*cog_setsurfaceflags)(sith_cog* ctx) = (void*)0x005004B0;
 void (*cog_setsurfacelight)(sith_cog* ctx) = (void*)0x00500950;
 void (*cog_setsurfacemat)(sith_cog* ctx) = (void*)0x00500410;
 void (*cog_setteamscore)(sith_cog* ctx) = (void*)0x00507D10;
@@ -612,9 +613,9 @@ void cog_math_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_getmapmodeflag, "getmapmodeflag");
     cog_verb_register(a1, (intptr_t)cog_clearmapmodeflag, "clearmapmodeflag");
     cog_verb_register(a1, (intptr_t)cog_newcoloreffect, "newcoloreffect");
-    cog_verb_register(a1, (intptr_t)cog_freecoloreffect_modifycoloreffect, "freecoloreffect_modifycoloreffect");
-    cog_verb_register(a1, (intptr_t)cog_freecoloreffect_modifycoloreffect, "freecoloreffect_modifycoloreffect");
-    cog_verb_register(a1, (intptr_t)cog_adddynamicint, "adddynamicint");
+    cog_verb_register(a1, (intptr_t)cog_freecoloreffect, "freecoloreffect");
+    cog_verb_register(a1, (intptr_t)cog_modifycoloreffect, "modifycoloreffect");
+    cog_verb_register(a1, (intptr_t)cog_adddynamictint, "adddynamictint");
     cog_verb_register(a1, (intptr_t)cog_adddynamicadd, "adddynamicadd");
     cog_verb_register(a1, (intptr_t)cog_getmaterialcel, "getmaterialcel");
     cog_verb_register(a1, (intptr_t)cog_setmaterialcel, "setmaterialcel");
@@ -664,7 +665,7 @@ void cog_thing_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_rotate, "rotate");
     cog_verb_register(a1, (intptr_t)cog_creatething, "creatething");
     cog_verb_register(a1, (intptr_t)cog_createthingnr, "createthingnr");
-    cog_verb_register(a1, (intptr_t)cog_createthingatp, "createthingatp");
+    cog_verb_register(a1, (intptr_t)cog_createthingatpos, "createthingatpos");
     cog_verb_register(a1, (intptr_t)cog_createthingatposnr, "createthingatposnr");
     cog_verb_register(a1, (intptr_t)cog_rotatepivot, "rotatepivot");
     cog_verb_register(a1, (intptr_t)cog_capturething, "capturething");
@@ -684,8 +685,8 @@ void cog_thing_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_setthingtype, "setthingtype");
     cog_verb_register(a1, (intptr_t)cog_setcollidetype, "setcollidetype");
     cog_verb_register(a1, (intptr_t)cog_setheadlightintensity, "setheadlightintensity");
-    cog_verb_register(a1, (intptr_t)cog_getthingmode, "getthingmode");
-    cog_verb_register(a1, (intptr_t)cog_setthingmode, "setthingmode");
+    cog_verb_register(a1, (intptr_t)cog_getthinggeomode, "getthinggeomode");
+    cog_verb_register(a1, (intptr_t)cog_setthingmode, "setthinggeomode");
     cog_verb_register(a1, (intptr_t)cog_getthinglightmode, "getthinglightmode");
     cog_verb_register(a1, (intptr_t)cog_setthinglightmode, "setthinglightmode");
     cog_verb_register(a1, (intptr_t)cog_getthingtexmode, "getthingtexmode");
@@ -712,7 +713,7 @@ void cog_thing_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_getthingrvec, "getthingrvec");
     cog_verb_register(a1, (intptr_t)cog_getthingflags, "getthingflags");
     cog_verb_register(a1, (intptr_t)cog_getcollidetype, "getcollidetype");
-    cog_verb_register(a1, (intptr_t)cog_getheadlightin, "getheadlightin");
+    cog_verb_register(a1, (intptr_t)cog_getheadlightintensity, "getheadlightintensity");
     cog_verb_register(a1, (intptr_t)cog_isthingvisible, "isthingvisible");
     cog_verb_register(a1, (intptr_t)cog_setthingpulse, "setthingpulse");
     cog_verb_register(a1, (intptr_t)cog_setthingtimer, "setthingtimer");
@@ -773,24 +774,24 @@ void cog_thing_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_setparticlegrowthspeed, "setparticlegrowthspeed");
     cog_verb_register(a1, (intptr_t)cog_getparticletimeoutrate, "getparticletimeoutrate");
     cog_verb_register(a1, (intptr_t)cog_setparticletimeoutrate, "setparticletimeoutrate");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
-    cog_verb_register(a1, (intptr_t)cog_getXflags, "getXflags");
-    cog_verb_register(a1, (intptr_t)cog_setXflags, "setXflags");
-    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearXflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "gettypeflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "settypeflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "cleartypeflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "getactorflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "setactorflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearactorflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "getweaponflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "setweaponflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearweaponflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "getexplosionflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "setexplosionflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearexplosionflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "getitemflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "setitemflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearitemflags");
+    cog_verb_register(a1, (intptr_t)cog_getXflags, "getparticleflags");
+    cog_verb_register(a1, (intptr_t)cog_setXflags, "setparticleflags");
+    cog_verb_register(a1, (intptr_t)cog_clearXflags, "clearparticleflags");
     cog_verb_register(a1, (intptr_t)cog_takeitem, "takeitem");
     cog_verb_register(a1, (intptr_t)cog_haslos, "haslos");
     cog_verb_register(a1, (intptr_t)cog_getthingfireoffset, "getthingfireoffset");
@@ -848,13 +849,13 @@ void cog_surface_verbs_init(void* a1)
     cog_verb_register(a1, (intptr_t)cog_slidewall_slidesurface, "slidesurface");
     cog_verb_register(a1, (intptr_t)cog_getwallcel, "getwallcel");
     cog_verb_register(a1, (intptr_t)cog_setwallcel, "setwallcel");
-    cog_verb_register(a1, (intptr_t)cog_getwallcel, "getwallcel");
-    cog_verb_register(a1, (intptr_t)cog_setwallcel, "setwallcel");
+    cog_verb_register(a1, (intptr_t)cog_getwallcel, "getsurfacecel");
+    cog_verb_register(a1, (intptr_t)cog_setwallcel, "setsurfacecel");
     cog_verb_register(a1, (intptr_t)cog_getsurfacemat, "getsurfacemat");
     cog_verb_register(a1, (intptr_t)cog_setsurfacemat, "setsurfacemat");
-    cog_verb_register(a1, (intptr_t)cog_getsurfaceflag, "getsurfaceflag");
-    cog_verb_register(a1, (intptr_t)cog_setsurfaceflag, "setsurfaceflag");
-    cog_verb_register(a1, (intptr_t)cog_clearsurfaceflag, "clearsurfaceflag");
+    cog_verb_register(a1, (intptr_t)cog_getsurfaceflags, "getsurfaceflags");
+    cog_verb_register(a1, (intptr_t)cog_setsurfaceflags, "setsurfaceflags");
+    cog_verb_register(a1, (intptr_t)cog_clearsurfaceflags, "clearsurfaceflags");
     cog_verb_register(a1, (intptr_t)cog_getajoinflags, "getajoinflags");
     cog_verb_register(a1, (intptr_t)cog_setadjoinflags, "setadjoinflags");
     cog_verb_register(a1, (intptr_t)cog_clearadjoinflags, "clearadjoinflags");
@@ -898,8 +899,8 @@ void cog_noise_verbs_init(void* a1)
 
 void cog_sector_verbs_init(void* a1)
 {
-    cog_verb_register(a1, (intptr_t)cog_getsectorint, "getsectorint");
-    cog_verb_register(a1, (intptr_t)cog_setsectorint, "setsectorint");
+    cog_verb_register(a1, (intptr_t)cog_getsectortint, "getsectortint");
+    cog_verb_register(a1, (intptr_t)cog_setsectortint, "setsectortint");
     cog_verb_register(a1, (intptr_t)cog_setsectoradjoins_sectoradjoins, "setsectoradjoins");
     cog_verb_register(a1, (intptr_t)cog_setsectoradjoins_sectoradjoins, "sectoradjoins");
     cog_verb_register(a1, (intptr_t)cog_getsectorlight, "getsectorlight");
@@ -985,14 +986,14 @@ int cog_init()
     g_cog_symboltable_hashmap = cog_alloc_symboltable(512);
     if (!g_cog_symboltable_hashmap )
     {
-        jk_assert(common_functions_ptr_2->print_loglevel0, ".\Cog\sithCog.c", 118, "Could not allocate COG symboltable.");
+        jk_assert(common_functions_ptr_2->print_loglevel0, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
         return 0;
     }
   
     g_cog_hashtable = hashmap_init_maybe(256);
     if (!g_cog_hashtable)
     {
-        jk_assert(common_functions_ptr_2->print_loglevel0, ".\Cog\sithCog.c", 124, "Could not allocate COG hashtable.");
+        jk_assert(common_functions_ptr_2->print_loglevel0, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
         return 0;
     }
     *(uint32_t*)(g_cog_symboltable_hashmap + 16) = 256;

@@ -12,6 +12,8 @@
 #define cog_sector_verbs_init_ADDR (0x004FE680)
 #define cog_surface_verbs_init_ADDR (0x004FFB50)
 
+#define sithCogYACC_yyparse_ADDR (0x50BF50)
+
 void cog_register_jk_verbs();
 int cog_jk_init();
 int cog_init();
