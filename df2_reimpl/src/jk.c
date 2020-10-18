@@ -66,6 +66,12 @@ char* _strcpy(char *dst, const char *src)
     return tmp;
 }
 
+char* _strcat(char* str, const char* concat)
+{
+    _strcpy(str+_strlen(str), concat);
+    return str;
+}
+
 // JK globals
 VM_VAR(g_hWnd, HWND, 0x855DE0);
 

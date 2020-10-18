@@ -95,9 +95,12 @@ int _memcmp(const void* str1, const void* str2, size_t count);
 
 static int (*__vsnprintf)(char *a1, size_t a2, const char *a3, va_list a4) = 0x512AC0;
 static char* (*_strtok)(char * a, const char * b) = 0x512850;
+static char* (*_strrchr)(char * a, char b) = 0x514460;
 static char* (*_strchr)(char * a, char b) = 0x513280;
 static char* (*strtolower)(char* str) = 0x42F4F0;
+static char* (*_strncat)(char*, const char*, size_t) = 0x5135E0;
 int _strlen(char *str);
+char* _strcat(char* str, const char* concat);
 
 // JK globals
 VM_VAR_DECL(g_hWnd, HWND);

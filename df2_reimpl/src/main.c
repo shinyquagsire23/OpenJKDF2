@@ -11,6 +11,7 @@
 #include "stdMath.h"
 #include "rdVector.h"
 #include "stdConffile.h"
+#include "stdFnames.h"
 
 int yyparse();
 
@@ -243,6 +244,22 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConffile_ReadArgs_ADDR, stdConffile_ReadArgs);
     hook_function(stdConffile_ReadLine_ADDR, stdConffile_ReadLine);
     hook_function(stdConffile_GetFileHandle_ADDR, stdConffile_GetFileHandle);
+    
+    // stdFnames
+    hook_function(stdFnames_FindMedName_ADDR, stdFnames_FindMedName);
+    hook_function(stdFnames_FindExt_ADDR, stdFnames_FindExt);
+    hook_function(stdFnames_AddDefaultExt_ADDR, stdFnames_AddDefaultExt);
+    hook_function(stdFnames_StripExt_ADDR, stdFnames_StripExt);
+    hook_function(stdFnames_StripExtAndDot_ADDR, stdFnames_StripExtAndDot);
+    hook_function(stdFnames_ChangeExt_ADDR, stdFnames_ChangeExt);
+    hook_function(stdFnames_StripDirAndExt_ADDR, stdFnames_StripDirAndExt);
+    hook_function(stdFnames_CopyExt_ADDR, stdFnames_CopyExt);
+    hook_function(stdFnames_CopyMedName_ADDR, stdFnames_CopyMedName);
+    hook_function(stdFnames_CopyDir_ADDR, stdFnames_CopyDir);
+    hook_function(stdFnames_CopyShortName_ADDR, stdFnames_CopyShortName);
+    hook_function(stdFnames_Concat_ADDR, stdFnames_Concat);
+    hook_function(stdFnames_MakePath_ADDR, stdFnames_MakePath);
+    hook_function(stdFnames_MakePath3_ADDR, stdFnames_MakePath3);
     
     //hook_function();
 }
