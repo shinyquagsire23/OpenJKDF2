@@ -34,7 +34,7 @@ typedef struct common_functions
     int (*fseek)(FILE *, int, int);
     int (*fileSize)(char *);
     int (*filePrintf)(FILE *, char*, ...);
-    uint32_t fgetws;
+    wchar_t* (*fileGetws)(int, wchar_t *, unsigned int);
     uint32_t allocHandle;
     uint32_t freeHandle;
     uint32_t reallocHandle;

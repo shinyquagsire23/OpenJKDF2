@@ -12,6 +12,7 @@
 #include "rdVector.h"
 #include "stdConffile.h"
 #include "stdFnames.h"
+#include "stdGob.h"
 
 int yyparse();
 
@@ -260,6 +261,18 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdFnames_Concat_ADDR, stdFnames_Concat);
     hook_function(stdFnames_MakePath_ADDR, stdFnames_MakePath);
     hook_function(stdFnames_MakePath3_ADDR, stdFnames_MakePath3);
+    
+    // stdGob
+    hook_function(stdGob_Startup_ADDR, stdGob_Startup);
+    hook_function(stdGob_Shutdown_ADDR, stdGob_Shutdown);
+    hook_function(stdGob_FileOpen_ADDR, stdGob_FileOpen);
+    hook_function(stdGob_FileClose_ADDR, stdGob_FileClose);
+    hook_function(stdGob_FSeek_ADDR, stdGob_FSeek);
+    hook_function(stdGob_FTell_ADDR, stdGob_FTell);
+    hook_function(stdGob_FEof_ADDR, stdGob_FEof);
+    hook_function(stdGob_FileRead_ADDR, stdGob_FileRead);
+    hook_function(stdGob_FileGets_ADDR, stdGob_FileGets);
+    hook_function(stdGob_FileGetws_ADDR, stdGob_FileGetws);
     
     //hook_function();
 }
