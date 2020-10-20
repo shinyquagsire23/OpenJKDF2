@@ -167,11 +167,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         return 0;
 
     v9 = &hashmap->buckets[hashmap->keyHashToIndex(key, hashmap->numBuckets)];
-
-    // TODO this is an inlined func
-    v10 = v9;
-    for ( j = v10->child; j; j = j->child )
-        v10 = j;
+    v10 = stdHashKey_GetLastChild(v9);
 
     if ( v10->key )
     {
@@ -257,6 +253,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
 
     if ( !foundKey )
         return 0;
+
     stdHashKey_UnlinkChild(foundKey);
     bucketTopKey = &hashtable->buckets[v2];
     if ( bucketTopKey == foundKey )
@@ -353,42 +350,58 @@ void stdHashtable_Dump(stdHashTable *hashtable)
 
 stdHashKey* stdHashKey_AddLink(stdHashKey *parent, stdHashKey *child)
 {
-  stdHashKey *child_; // eax
+    stdHashKey *child_;
 
-  child_ = parent->child;
-  child->parent = parent;
-  child->child = child_;
-  parent->child = child;
-  if ( child_ )
-    child_->parent = child;
-  return child_;
+    child_ = parent->child;
+    child->parent = parent;
+    child->child = child_;
+    parent->child = child;
+    if ( child_ )
+        child_->parent = child;
+    return child_;
 }
 
 stdHashKey* stdHashKey_UnlinkChild(stdHashKey *hashkey)
 {
-  stdHashKey *result; // eax
-  stdHashKey *hashkey_parent; // ecx
-  stdHashKey *hashkey_child; // edx
+    stdHashKey *result;
+    stdHashKey *hashkey_parent;
+    stdHashKey *hashkey_child;
 
-  result = hashkey;
-  hashkey_parent = hashkey->parent;
-  if ( hashkey->parent )
-    hashkey_parent->child = hashkey->child;
-  hashkey_child = hashkey->child;
-  if ( hashkey_child )
-    hashkey_child->parent = hashkey_parent;
-  hashkey->child = 0;
-  hashkey->parent = 0;
-  return result;
+    result = hashkey;
+    hashkey_parent = hashkey->parent;
+    if ( hashkey->parent )
+        hashkey_parent->child = hashkey->child;
+
+    hashkey_child = hashkey->child;
+    if ( hashkey_child )
+        hashkey_child->parent = hashkey_parent;
+
+    hashkey->child = 0;
+    hashkey->parent = 0;
+    return result;
 }
 
 int stdHashKey_NumChildren(stdHashKey *hashkey)
 {
-  stdHashKey *hashkey_iter;
-  int result;
+    stdHashKey *hashkey_iter;
+    int result;
 
-  hashkey_iter = hashkey;
-  for ( result = 0; hashkey_iter; ++result )
-    hashkey_iter = hashkey_iter->child;
-  return result;
+    hashkey_iter = hashkey;
+    for ( result = 0; hashkey_iter; ++result )
+        hashkey_iter = hashkey_iter->child;
+    return result;
+}
+
+stdHashKey* stdHashKey_GetLastChild(stdHashKey *hashkey)
+{
+    stdHashKey *result; // eax
+    stdHashKey *i; // ecx
+
+    result = hashkey;
+    if ( hashkey )
+    {
+        for ( i = hashkey->child; i; i = i->child )
+            result = i;
+    }
+    return result;
 }

@@ -55,5 +55,6 @@ void stdHashtable_Dump(stdHashTable *hashtable);
 stdHashKey* stdHashKey_AddLink(stdHashKey *parent, stdHashKey *child);
 stdHashKey* stdHashKey_UnlinkChild(stdHashKey *hashkey);
 int stdHashKey_NumChildren(stdHashKey *hashkey);
+stdHashKey* stdHashKey_GetLastChild(stdHashKey *hashkey);
 
 #endif // _STDHASHTABLE_H
