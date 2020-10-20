@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include "rdMatrix.h"
-#include "stdMath.h"
+#include "General/stdMath.h"
 
 rdVector2* rdVector_Set2(rdVector2* v, float x, float y)
 {

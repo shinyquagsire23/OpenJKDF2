@@ -5,7 +5,7 @@ E			[Ee][+-]?{D}+
 
 %{
 #include <stdio.h>
-#include "rdVector.h"
+#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 #include "y.tab.h"
 

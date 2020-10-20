@@ -5,7 +5,7 @@
 #include "jk.h"
 #include "stdPlatform.h"
 
-#include "stdHashTable.h"
+#include "General/stdHashTable.h"
 
 int stdGob_Startup(common_functions *pHS_in)
 {

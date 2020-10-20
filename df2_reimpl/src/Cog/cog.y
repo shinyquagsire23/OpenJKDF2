@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "rdVector.h"
+#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 %}
 

@@ -110,7 +110,7 @@ char *yytext;
 #define INITIAL 0
 # line 7 "cog.l"
 #include <stdio.h>
-#include "rdVector.h"
+#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 #include "y.tab.h"
 

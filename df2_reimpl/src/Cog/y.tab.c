@@ -3,7 +3,7 @@ char yysccsid[] = "@(#)yaccpar	1.4 (Berkeley) 02/25/90";
 #endif
 #line 2 "cog.y"
 #include <stdio.h>
-#include "rdVector.h"
+#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 #line 16 "cog.y"
 typedef union {

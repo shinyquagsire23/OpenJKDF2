@@ -1,7 +1,7 @@
 #ifndef _SITHCOGPARSE_H
 #define _SITHCOGPARSE_H
 
-#include "rdVector.h"
+#include "Primitives/rdVector.h"
 
 #define COG_OPCODE_NOP   (0)
 #define COG_OPCODE_PUSHINT  (1)

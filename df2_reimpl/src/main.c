@@ -6,14 +6,14 @@
 #include "jk.h"
 #include "types.h"
 
-#include "sithCog.h"
+#include "Cog/sithCog.h"
 #include "jkl.h"
-#include "stdMath.h"
-#include "rdVector.h"
-#include "stdConffile.h"
-#include "stdFnames.h"
-#include "stdGob.h"
-#include "stdHashTable.h"
+#include "General/stdMath.h"
+#include "Primitives/rdVector.h"
+#include "General/stdConffile.h"
+#include "General/stdFnames.h"
+#include "Win95/stdGob.h"
+#include "General/stdHashTable.h"
 
 int yyparse();
 
