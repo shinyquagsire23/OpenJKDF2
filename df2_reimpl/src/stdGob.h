@@ -73,7 +73,8 @@ void stdGob_Shutdown();
 stdGob* stdGob_Load(char *fpath, int a2, int a3);
 
 //TODO
-static int (*stdGob_LoadEntry)(stdGob* gob, char* path, int a2, int a3) = stdGob_LoadEntry_ADDR;
+//static int (*stdGob_LoadEntry)(stdGob* gob, char* path, int a2, int a3) = stdGob_LoadEntry_ADDR;
+int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4);
 
 stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath);
 void stdGob_FileClose(stdGobFile *f);

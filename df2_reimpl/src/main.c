@@ -13,6 +13,7 @@
 #include "stdConffile.h"
 #include "stdFnames.h"
 #include "stdGob.h"
+#include "stdHashTable.h"
 
 int yyparse();
 
@@ -265,6 +266,8 @@ __declspec(dllexport) void hook_init(void)
     // stdGob
     hook_function(stdGob_Startup_ADDR, stdGob_Startup);
     hook_function(stdGob_Shutdown_ADDR, stdGob_Shutdown);
+    hook_function(stdGob_Load_ADDR, stdGob_Load);
+    hook_function(stdGob_LoadEntry_ADDR, stdGob_LoadEntry);
     hook_function(stdGob_FileOpen_ADDR, stdGob_FileOpen);
     hook_function(stdGob_FileClose_ADDR, stdGob_FileClose);
     hook_function(stdGob_FSeek_ADDR, stdGob_FSeek);
@@ -273,6 +276,17 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdGob_FileRead_ADDR, stdGob_FileRead);
     hook_function(stdGob_FileGets_ADDR, stdGob_FileGets);
     hook_function(stdGob_FileGetws_ADDR, stdGob_FileGetws);
+    
+    // stdHashTable
+    hook_function(stdHashTable_HashStringToIdx_ADDR, stdHashTable_HashStringToIdx);
+    hook_function(stdHashTable_New_ADDR, stdHashTable_New);
+    hook_function(stdHashTable_Free_ADDR, stdHashTable_Free);
+    hook_function(stdHashTable_SetKeyVal_ADDR, stdHashTable_SetKeyVal);
+    hook_function(stdHashTable_GetKeyVal_ADDR, stdHashTable_GetKeyVal);
+    hook_function(stdHashTable_FreeKey_ADDR, stdHashTable_FreeKey);
+    hook_function(stdHashtable_PrintDiagnostics_ADDR, stdHashtable_PrintDiagnostics);
+    hook_function(stdHashtable_Dump_ADDR, stdHashtable_Dump);
+    hook_function(stdHashKey_AddLink_ADDR, stdHashKey_AddLink);
     
     //hook_function();
 }

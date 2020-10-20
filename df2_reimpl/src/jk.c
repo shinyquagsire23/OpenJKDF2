@@ -17,6 +17,12 @@ uint32_t (__stdcall *jk_RegisterClassExA)(void* a);
 HICON (__stdcall *jk_LoadIconA)(uint32_t a, char* b);
 HCURSOR (__stdcall *jk_LoadCursorA)(uint32_t a, char* b);
 HGDIOBJ (__stdcall *jk_GetStockObject)(uint32_t a);
+HANDLE (__stdcall *jk_CreateFileA)(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+HANDLE (__stdcall *jk_CreateFileMappingA)(HANDLE hFile, LPSECURITY_ATTRIBUTES lpFileMappingAttributes, DWORD flProtect, DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName);
+HLOCAL (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
+LPVOID (__stdcall *jk_MapViewOfFile)(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap);
+BOOL (__stdcall *jk_UnmapViewOfFile)(LPCVOID lpBaseAddress);
+BOOL (__stdcall *jk_CloseHandle)(HANDLE hObject);
 
 // JK functions
 void (*jk_exit)(int a) = (void*)0x512590;
@@ -72,6 +78,23 @@ char* _strcat(char* str, const char* concat)
     return str;
 }
 
+void* _memset(void* ptr, int val, size_t num)
+{
+    int i;
+    for (i = 0; i < num; i++)
+    {
+        *(uint8_t*)(ptr+i) = val;
+    }
+    return ptr;
+}
+
+int _strcmp(const char* s1, const char* s2)
+{
+    while (*s1 && (*s1 == *s2))
+        s1++, s2++;
+    return *(const unsigned char*)s1 - *(const unsigned char*)s2;
+}
+
 // JK globals
 VM_VAR(g_hWnd, HWND, 0x855DE0);
 
@@ -107,4 +130,10 @@ void jk_init()
     jk_LoadIconA = *(void**)0x8F0624;
     jk_LoadCursorA = *(void**)0x8F0628;
     jk_GetStockObject = *(void**)0x8F046C;
+    jk_CreateFileA = *(void**)0x8F048C;
+    jk_CreateFileMappingA = *(void**)0x8F0488;
+    jk_LocalAlloc = *(void**)0x8F04D0;
+    jk_MapViewOfFile = *(void**)0x8F04D4;
+    jk_UnmapViewOfFile = *(void**)0x8F0478;
+    jk_CloseHandle = *(void**)0x8F0474;
 }

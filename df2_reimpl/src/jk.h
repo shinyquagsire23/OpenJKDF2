@@ -72,6 +72,10 @@ extern uint32_t (__stdcall *jk_RegisterClassExA)(void* a);
 extern HICON (__stdcall *jk_LoadIconA)(uint32_t a, char* b);
 extern HCURSOR (__stdcall *jk_LoadCursorA)(uint32_t a, char* b);
 extern HGDIOBJ (__stdcall *jk_GetStockObject)(uint32_t a);
+extern HANDLE (__stdcall *jk_CreateFileA)(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+extern HANDLE (__stdcall *jk_CreateFileMappingA)(HANDLE hFile, LPSECURITY_ATTRIBUTES lpFileMappingAttributes, DWORD flProtect, DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName);
+extern HLOCAL (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
+extern LPVOID (__stdcall *jk_MapViewOfFile)(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap);
 
 // JK functions
 extern void (*jk_exit)(int a);
@@ -92,6 +96,7 @@ extern int (*_sscanf)(const char*, const char*, ...);
 extern void* (*_memcpy)(void*, const void*, size_t);
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);
+void* _memset(void* ptr, int val, size_t num);
 
 static int (*__vsnprintf)(char *a1, size_t a2, const char *a3, va_list a4) = 0x512AC0;
 static char* (*_strtok)(char * a, const char * b) = 0x512850;
@@ -101,6 +106,7 @@ static char* (*strtolower)(char* str) = 0x42F4F0;
 static char* (*_strncat)(char*, const char*, size_t) = 0x5135E0;
 int _strlen(char *str);
 char* _strcat(char* str, const char* concat);
+int _strcmp(const char* s1, const char* s2);
 
 // JK globals
 VM_VAR_DECL(g_hWnd, HWND);
