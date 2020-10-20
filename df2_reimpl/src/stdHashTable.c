@@ -244,7 +244,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
         key_iter = i->key;
         if ( !key_iter )
             break;
-        if ( !strcmp(key_iter, key) )
+        if ( !_strcmp(key_iter, key) )
         {
             foundKey = i;
             break;
