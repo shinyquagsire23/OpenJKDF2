@@ -14,6 +14,7 @@
 #include "General/stdFnames.h"
 #include "Win95/stdGob.h"
 #include "General/stdHashTable.h"
+#include "Engine/rdroid.h"
 
 int yyparse();
 
@@ -287,6 +288,35 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdHashtable_PrintDiagnostics_ADDR, stdHashtable_PrintDiagnostics);
     hook_function(stdHashtable_Dump_ADDR, stdHashtable_Dump);
     hook_function(stdHashKey_AddLink_ADDR, stdHashKey_AddLink);
+    
+    // rdroid
+    hook_function(rdStartup_ADDR, rdStartup);
+    hook_function(rdShutdown_ADDR, rdShutdown);
+    hook_function(rdOpen_ADDR, rdOpen);
+    hook_function(rdClose_ADDR, rdClose);
+    hook_function(rdSetGeometryMode_ADDR, rdSetGeometryMode);
+    hook_function(rdSetLightingMode_ADDR, rdSetLightingMode);
+    hook_function(rdSetTextureMode_ADDR, rdSetTextureMode);
+    hook_function(rdSetSortingMethod_ADDR, rdSetSortingMethod);
+    hook_function(rdSetOcclusionMethod_ADDR, rdSetOcclusionMethod);
+    hook_function(rdSetZBufferMethod_ADDR, rdSetZBufferMethod);
+    hook_function(rdSetCullFlags_ADDR, rdSetCullFlags);
+    hook_function(rdSetProcFaceUserdata_ADDR, rdSetProcFaceUserdata);
+    hook_function(rdSetVertexColorMode_ADDR, rdSetVertexColorMode);
+    hook_function(rdGetGeometryMode_ADDR, rdGetGeometryMode);
+    hook_function(rdGetLightingMode_ADDR, rdGetLightingMode);
+    hook_function(rdGetTextureMode_ADDR, rdGetTextureMode);
+    hook_function(rdGetSortingMethod_ADDR, rdGetSortingMethod);
+    hook_function(rdGetOcclusionMethod_ADDR, rdGetOcclusionMethod);
+    hook_function(rdGetZBufferMethod_ADDR, rdGetZBufferMethod);
+    hook_function(rdGetCullFlags_ADDR, rdGetCullFlags);
+    hook_function(rdGetProcFaceUserdata_ADDR, rdGetProcFaceUserdata);
+    hook_function(rdGetVertexColorMode_ADDR, rdGetVertexColorMode);
+    hook_function(rdSetMipDistances_ADDR, rdSetMipDistances);
+    hook_function(rdSetColorEffects_ADDR, rdSetColorEffects);
+    hook_function(rdAdvanceFrame_ADDR, rdAdvanceFrame);
+    hook_function(rdFinishFrame_ADDR, rdFinishFrame);
+    hook_function(rdClearPostStatistics_ADDR, rdClearPostStatistics);
     
     //hook_function();
 }
