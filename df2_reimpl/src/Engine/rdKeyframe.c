@@ -44,26 +44,25 @@ rdKeyframe* rdKeyframe_Load(char *fname)
 
 int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 {
-    char *key_fname_only; // eax
-    rdJoint *joints; // edi
-    rdKeyframe *num_joints; // eax
-    unsigned int num_markers_read; // edi
-    rdMarkers *markers; // esi
-    rdJoint *joint; // edi
-    rdAnimEntry *v11; // eax
-    rdAnimEntry *anim_entry; // esi
-    int anim_entry_read; // ebp
-    unsigned int num_markers; // [esp+10h] [ebp-68h]
-    int node_idx; // [esp+14h] [ebp-64h]
-    int anim_entry_cnt; // [esp+18h] [ebp-60h]
-    unsigned int num_nodes; // [esp+1Ch] [ebp-5Ch]
-    rdVector3 pos; // [esp+24h] [ebp-54h]
-    rdVector3 orientation; // [esp+30h] [ebp-48h]
-    rdVector3 vel; // [esp+3Ch] [ebp-3Ch]
-    rdVector3 angVel; // [esp+48h] [ebp-30h]
-    char entry_num; // [esp+54h] [ebp-24h]
-    char mesh_name[32]; // [esp+58h] [ebp-20h]
-    unsigned int nodes_read; // [esp+7Ch] [ebp+4h]
+    char *key_fname_only;
+    rdJoint *joints;
+    rdKeyframe *num_joints;
+    unsigned int num_markers_read;
+    rdMarkers *markers;
+    rdJoint *joint;
+    rdAnimEntry *anim_entry;
+    int anim_entry_read;
+    unsigned int num_markers;
+    int node_idx;
+    int anim_entry_cnt;
+    unsigned int num_nodes;
+    rdVector3 pos;
+    rdVector3 orientation;
+    rdVector3 vel;
+    rdVector3 angVel;
+    char entry_num;
+    char mesh_name[32];
+    unsigned int nodes_read;
 
     _memset(keyframe, 0, sizeof(rdKeyframe));
     _strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
