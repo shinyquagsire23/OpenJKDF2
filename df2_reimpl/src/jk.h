@@ -33,7 +33,7 @@ typedef struct common_functions
     int (*ftell)(FILE *);
     int (*fseek)(FILE *, int, int);
     int (*fileSize)(char *);
-    int (*filePrintf)(FILE *, char*, ...);
+    void (*filePrintf)(int, char*, ...);
     wchar_t* (*fileGetws)(int, wchar_t *, unsigned int);
     uint32_t allocHandle;
     uint32_t freeHandle;
@@ -58,24 +58,180 @@ typedef struct cog_entry
 //static void (*jk_main)(uint32_t a, uint32_t b, char* c, int d, char* e) = (void*)0x50E750;
 
 // Imports
-extern HWND (__stdcall *jk_CreateWindowExA)(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
-extern HWND (__stdcall *jk_FindWindowA)(LPCSTR lpClassName, LPCSTR lpWindowName);
-extern int (__stdcall *jk_GetSystemMetrics)(int nIndex);
-extern BOOL (__stdcall *jk_ShowWindow)(HWND hWnd, int nCmdShow);
-extern int (__stdcall *jk_UpdateWindow)(HWND hWnd);
-extern void (__stdcall *jk_InitCommonControls)(void);
-extern BOOL (__stdcall *jk_PeekMessageA)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
-extern BOOL (__stdcall *jk_GetMessageA)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
-extern BOOL (__stdcall *jk_TranslateMessage)(const MSG* lpMsg);
-extern LRESULT (__stdcall *jk_DispatchMessageA)(const MSG* lpMsg);
-extern uint32_t (__stdcall *jk_RegisterClassExA)(void* a);
-extern HICON (__stdcall *jk_LoadIconA)(uint32_t a, char* b);
-extern HCURSOR (__stdcall *jk_LoadCursorA)(uint32_t a, char* b);
-extern HGDIOBJ (__stdcall *jk_GetStockObject)(uint32_t a);
-extern HANDLE (__stdcall *jk_CreateFileA)(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+extern LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
+extern LSTATUS (__stdcall *jk_RegDeleteKeyA)(HKEY hKey, LPCSTR lpSubKey);
+extern LSTATUS (__stdcall *jk_RegQueryValueExA)(HKEY hKey, LPCSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
+extern LSTATUS (__stdcall *jk_RegOpenKeyExA)(HKEY hKey, LPCSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
+extern LSTATUS (__stdcall *jk_RegCloseKey)(HKEY hKey);
+extern LSTATUS (__stdcall *jk_RegCreateKeyExA)(HKEY hKey, LPCSTR lpSubKey, DWORD Reserved, LPSTR lpClass, DWORD dwOptions, REGSAM samDesired, const LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition);
+
+extern void (__stdcall *jk_InitCommonControls)();
+
+extern HRESULT (__stdcall *jk_DirectDrawEnumerateA)(LPDDENUMCALLBACKA lpCallback, LPVOID lpContext);
+extern HRESULT (__stdcall *jk_DirectDrawCreate)(GUID *lpGUID, LPDIRECTDRAW *lplpDD, IUnknown *pUnkOuter);
+
+extern HRESULT (__stdcall *jk_DirectInputCreateA)(HINSTANCE hinst, DWORD dwVersion, LPDIRECTINPUTA *ppDI, LPUNKNOWN punkOuter);
+
+extern HRESULT (__stdcall *jk_DirectPlayLobbyCreateA)(LPGUID, LPDIRECTPLAYLOBBYA *, IUnknown *, LPVOID, DWORD);
+
+extern HRESULT (__stdcall *jk_DirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
+
+extern BOOL (__stdcall *jk_DeleteDC)(HDC hdc);
+extern UINT (__stdcall *jk_GetSystemPaletteEntries)(HDC hdc, UINT iStart, UINT cEntries, LPPALETTEENTRY pPalEntries);
+extern int (__stdcall *jk_GetDeviceCaps)(HDC hdc, int index);
+extern BOOL (__stdcall *jk_DeleteObject)(HGDIOBJ ho);
+extern HFONT (__stdcall *jk_CreateFontA)(int cHeight, int cWidth, int cEscapement, int cOrientation, int cWeight, DWORD bItalic, DWORD bUnderline, DWORD bStrikeOut, DWORD iCharSet, DWORD iOutPrecision, DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily, LPCSTR pszFaceName);
+extern BOOL (__stdcall *jk_BitBlt)(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop);
+extern BOOL (__stdcall *jk_GdiFlush)();
+extern HGDIOBJ (__stdcall *jk_SelectObject)(HDC hdc, HGDIOBJ h);
+extern HDC (__stdcall *jk_CreateCompatibleDC)(HDC hdc);
+extern BOOL (__stdcall *jk_TextOutA)(HDC hdc, int x, int y, LPCSTR lpString, int c);
+extern COLORREF (__stdcall *jk_SetTextColor)(HDC hdc, COLORREF color);
+extern int (__stdcall *jk_SetBkMode)(HDC hdc, int mode);
+extern HBITMAP (__stdcall *jk_CreateDIBSection)(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, void **ppvBits, HANDLE hSection, DWORD offset);
+extern UINT (__stdcall *jk_RealizePalette)(HDC hdc);
+extern BOOL (__stdcall *jk_AnimatePalette)(HPALETTE hPal, UINT iStartIndex, UINT cEntries, const PALETTEENTRY *ppe);
+extern HPALETTE (__stdcall *jk_SelectPalette)(HDC hdc, HPALETTE hPal, BOOL bForceBkgd);
+extern HPALETTE (__stdcall *jk_CreatePalette)(const LOGPALETTE *plpal);
+extern UINT (__stdcall *jk_SetDIBColorTable)(HDC hdc, UINT iStart, UINT cEntries, const RGBQUAD *prgbq);
+extern BOOL (__stdcall *jk_GetTextExtentPoint32A)(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl);
+extern HGDIOBJ (__stdcall *jk_GetStockObject)(int i);
+
+extern BOOL (__stdcall *jk_CloseHandle)(HANDLE hObject);
+extern BOOL (__stdcall *jk_UnmapViewOfFile)(LPCVOID lpBaseAddress);
+extern BOOL (__stdcall *jk_FindNextFileA)(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData);
+extern BOOL (__stdcall *jk_DeleteFileA)(LPCSTR lpFileName);
+extern BOOL (__stdcall *jk_FindClose)(HANDLE hFindFile);
 extern HANDLE (__stdcall *jk_CreateFileMappingA)(HANDLE hFile, LPSECURITY_ATTRIBUTES lpFileMappingAttributes, DWORD flProtect, DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName);
+extern HANDLE (__stdcall *jk_CreateFileA)(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+extern BOOL (__stdcall *jk_RemoveDirectoryA)(LPCSTR lpPathName);
+extern HANDLE (__stdcall *jk_FindFirstFileA)(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData);
+extern BOOL (__stdcall *jk_CreateDirectoryA)(LPCSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+extern void (__stdcall *jk_GetLocalTime)(LPSYSTEMTIME lpSystemTime);
+extern void (__stdcall *jk_OutputDebugStringA)(LPCSTR lpOutputString);
+extern void (__stdcall *jk_DebugBreak)();
+extern BOOL (__stdcall *jk_WriteConsoleA)(HANDLE hConsoleOutput, const void *lpBuffer, DWORD nNumberOfCharsToWrite, LPDWORD lpNumberOfCharsWritten, LPVOID lpReserved);
+extern BOOL (__stdcall *jk_FlushConsoleInputBuffer)(HANDLE hConsoleInput);
+extern BOOL (__stdcall *jk_SetConsoleCursorInfo)(HANDLE hConsoleOutput, const CONSOLE_CURSOR_INFO *lpConsoleCursorInfo);
+extern BOOL (__stdcall *jk_GetConsoleScreenBufferInfo)(HANDLE hConsoleOutput, PCONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
+extern BOOL (__stdcall *jk_SetConsoleCursorPosition)(HANDLE hConsoleOutput, COORD dwCursorPosition);
+extern BOOL (__stdcall *jk_FreeConsole)();
+extern BOOL (__stdcall *jk_AllocConsole)();
+extern BOOL (__stdcall *jk_SetConsoleTitleA)(LPCSTR lpConsoleTitle);
+extern HANDLE (__stdcall *jk_GetStdHandle)(DWORD nStdHandle);
+extern BOOL (__stdcall *jk_SetConsoleTextAttribute)(HANDLE hConsoleOutput, WORD wAttributes);
 extern HLOCAL (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
 extern LPVOID (__stdcall *jk_MapViewOfFile)(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap);
+extern UINT (__stdcall *jk_WinExec)(LPCSTR lpCmdLine, UINT uCmdShow);
+extern BOOL (__stdcall *jk_SetStdHandle)(DWORD nStdHandle, HANDLE hHandle);
+extern DWORD (__stdcall *jk_SetFilePointer)(HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
+extern void (__stdcall *jk_RaiseException)(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments, const ULONG_PTR *lpArguments);
+extern HANDLE (__stdcall *jk_HeapCreate)(DWORD flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSize);
+extern BOOL (__stdcall *jk_SetEndOfFile)(HANDLE hFile);
+extern int (__stdcall *jk_LCMapStringW)(LCID Locale, DWORD dwMapFlags, LPCWSTR lpSrcStr, int cchSrc, LPWSTR lpDestStr, int cchDest);
+extern int (__stdcall *jk_LCMapStringA)(LCID Locale, DWORD dwMapFlags, LPCSTR lpSrcStr, int cchSrc, LPSTR lpDestStr, int cchDest);
+extern BOOL (__stdcall *jk_HeapDestroy)(HANDLE hHeap);
+extern BOOL (__stdcall *jk_GetStringTypeW)(DWORD dwInfoType, LPCWSTR lpSrcStr, int cchSrc, LPWORD lpCharType);
+extern BOOL (__stdcall *jk_GetStringTypeA)(LCID Locale, DWORD dwInfoType, LPCSTR lpSrcStr, int cchSrc, LPWORD lpCharType);
+extern int (__stdcall *jk_MultiByteToWideChar)(UINT CodePage, DWORD dwFlags, LPCSTR lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
+extern BOOL (__stdcall *jk_WriteFile)(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
+extern BOOL (__stdcall *jk_FlushFileBuffers)(HANDLE hFile);
+extern int (__stdcall *jk_WideCharToMultiByte)(UINT CodePage, DWORD dwFlags, LPCWSTR lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar);
+extern BOOL (__stdcall *jk_FileTimeToLocalFileTime)(const FILETIME *lpFileTime, LPFILETIME lpLocalFileTime);
+extern BOOL (__stdcall *jk_FileTimeToSystemTime)(const FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTime);
+extern FARPROC (__stdcall *jk_GetProcAddress)(HMODULE hModule, LPCSTR lpProcName);
+extern LPVOID (__stdcall *jk_HeapAlloc)(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes);
+extern DWORD (__stdcall *jk_GetVersion)();
+extern LPVOID (__stdcall *jk_HeapReAlloc)(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem, SIZE_T dwBytes);
+extern void (__stdcall *jk_GetStartupInfoA)(LPSTARTUPINFOA lpStartupInfo);
+extern HMODULE (__stdcall *jk_GetModuleHandleA)(LPCSTR lpModuleName);
+extern LPSTR (__stdcall *jk_GetCommandLineA)();
+extern BOOL (__stdcall *jk_HeapFree)(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
+extern BOOL (__stdcall *jk_SetEnvironmentVariableA)(LPCSTR lpName, LPCSTR lpValue);
+extern DWORD (__stdcall *jk_GetLastError)();
+extern HANDLE (__stdcall *jk_GetCurrentProcess)();
+extern BOOL (__stdcall *jk_TerminateProcess)(HANDLE hProcess, UINT uExitCode);
+extern void (__stdcall *jk_ExitProcess)(UINT uExitCode);
+extern BOOL (__stdcall *jk_VirtualFree)(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType);
+extern LPVOID (__stdcall *jk_VirtualAlloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+extern LONG (__stdcall *jk_UnhandledExceptionFilter)(struct _EXCEPTION_POINTERS *ExceptionInfo);
+extern DWORD (__stdcall *jk_GetModuleFileNameA)(HMODULE hModule, LPSTR lpFilename, DWORD nSize);
+extern BOOL (__stdcall *jk_FreeEnvironmentStringsA)(LPCH);
+extern BOOL (__stdcall *jk_FillConsoleOutputCharacterA)(HANDLE hConsoleOutput, CHAR cCharacter, DWORD nLength, COORD dwWriteCoord, LPDWORD lpNumberOfCharsWritten);
+extern DWORD (__stdcall *jk_GetTimeZoneInformation)(LPTIME_ZONE_INFORMATION lpTimeZoneInformation);
+extern LPWCH (__stdcall *jk_GetEnvironmentStringsW)();
+extern BOOL (__stdcall *jk_GetCPInfo)(UINT CodePage, LPCPINFO lpCPInfo);
+extern LPCH (__stdcall *jk_GetEnvironmentStrings)();
+extern UINT (__stdcall *jk_GetACP)();
+extern UINT (__stdcall *jk_SetHandleCount)(UINT uNumber);
+extern DWORD (__stdcall *jk_GetFileType)(HANDLE hFile);
+extern void (__stdcall *jk_RtlUnwind)(PVOID TargetFrame, PVOID TargetIp, PEXCEPTION_RECORD ExceptionRecord, PVOID ReturnValue);
+extern int (__stdcall *jk_CompareStringW)(LCID Locale, DWORD dwCmpFlags, PCNZWCH lpString1, int cchCount1, PCNZWCH lpString2, int cchCount2);
+extern int (__stdcall *jk_CompareStringA)(LCID Locale, DWORD dwCmpFlags, PCNZCH lpString1, int cchCount1, PCNZCH lpString2, int cchCount2);
+extern BOOL (__stdcall *jk_FreeEnvironmentStringsW)(LPWCH);
+extern BOOL (__stdcall *jk_ReadFile)(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
+extern HMODULE (__stdcall *jk_LoadLibraryA)(LPCSTR lpLibFileName);
+extern UINT (__stdcall *jk_GetOEMCP)();
+
+
+extern BOOL (__stdcall *jk_PostMessageA)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern BOOL (__stdcall *jk_MessageBeep)(UINT uType);
+extern LRESULT (__stdcall *jk_DispatchMessageA)(const MSG *lpMsg);
+extern int (__stdcall *jk_ReleaseDC)(HWND hWnd, HDC hDC);
+extern HDC (__stdcall *jk_GetDC)(HWND hWnd);
+extern HWND (__stdcall *jk_GetDesktopWindow)();
+extern int (__stdcall *jk_ShowCursor)(BOOL bShow);
+extern BOOL (__stdcall *jk_ValidateRect)(HWND hWnd, const RECT *lpRect);
+extern int (__stdcall *jk_GetSystemMetrics)(int nIndex);
+extern HCURSOR (__stdcall *jk_SetCursor)(HCURSOR hCursor);
+extern HWND (__stdcall *jk_SetActiveWindow)(HWND hWnd);
+extern HWND (__stdcall *jk_SetFocus)(HWND hWnd);
+extern int (__stdcall *jk_MessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+extern HWND (__stdcall *jk_CreateDialogParamA)(HINSTANCE hInstance, LPCSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+extern HWND (__stdcall *jk_GetDlgItem)(HWND hDlg, int nIDDlgItem);
+extern BOOL (__stdcall *jk_SetDlgItemTextA)(HWND hDlg, int nIDDlgItem, LPCSTR lpString);
+extern UINT (__stdcall *jk_GetDlgItemTextA)(HWND hDlg, int nIDDlgItem, LPSTR lpString, int cchMax);
+extern HWND (__stdcall *jk_GetFocus)();
+extern BOOL (__stdcall *jk_ShowWindow)(HWND hWnd, int nCmdShow);
+extern HWND (__stdcall *jk_FindWindowA)(LPCSTR lpClassName, LPCSTR lpWindowName);
+extern BOOL (__stdcall *jk_InvalidateRect)(HWND hWnd, const RECT *lpRect, BOOL bErase);
+extern int (__stdcall *jk_MessageBoxA)(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);
+extern BOOL (__stdcall *jk_EndPaint)(HWND hWnd, const PAINTSTRUCT *lpPaint);
+extern BOOL (__stdcall *jk_GetUpdateRect)(HWND hWnd, LPRECT lpRect, BOOL bErase);
+extern HDC (__stdcall *jk_BeginPaint)(HWND hWnd, LPPAINTSTRUCT lpPaint);
+extern DWORD (__stdcall *jk_GetWindowThreadProcessId)(HWND hWnd, LPDWORD lpdwProcessId);
+extern BOOL (__stdcall *jk_GetCursorPos)(LPPOINT lpPoint);
+extern void (__stdcall *jk_PostQuitMessage)(int nExitCode);
+extern BOOL (__stdcall *jk_SetWindowPos)(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
+extern LRESULT (__stdcall *jk_DefWindowProcA)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern LONG (__stdcall *jk_SetWindowLongA)(HWND hWnd, int nIndex, LONG dwNewLong);
+extern ATOM (__stdcall *jk_RegisterClassExA)(const WNDCLASSEXA *);
+extern HICON (__stdcall *jk_LoadIconA)(HINSTANCE hInstance, LPCSTR lpIconName);
+extern HCURSOR (__stdcall *jk_LoadCursorA)(HINSTANCE hInstance, LPCSTR lpCursorName);
+extern BOOL (__stdcall *jk_IsDialogMessageA)(HWND hDlg, LPMSG lpMsg);
+extern HWND (__stdcall *jk_CreateWindowExA)(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
+extern BOOL (__stdcall *jk_UpdateWindow)(HWND hWnd);
+extern BOOL (__stdcall *jk_TranslateMessage)(const MSG *lpMsg);
+extern BOOL (__stdcall *jk_PeekMessageA)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
+extern BOOL (__stdcall *jk_GetMessageA)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
+extern LRESULT (__stdcall *jk_SendMessageA)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+extern MMRESULT (__stdcall *jk_auxGetVolume)(UINT uDeviceID, LPDWORD pdwVolume);
+extern MMRESULT (__stdcall *jk_auxSetVolume)(UINT uDeviceID, DWORD dwVolume);
+extern MCIERROR (__stdcall *jk_mciSendCommandA)(MCIDEVICEID mciId, UINT uMsg, DWORD_PTR dwParam1, DWORD_PTR dwParam2);
+extern UINT (__stdcall *jk_auxGetNumDevs)();
+extern MMRESULT (__stdcall *jk_auxGetDevCapsA)(UINT_PTR uDeviceID, LPAUXCAPSA pac, UINT cbac);
+extern MMRESULT (__stdcall *jk_joyGetPosEx)(UINT uJoyID, LPJOYINFOEX pji);
+extern UINT (__stdcall *jk_joyGetNumDevs)();
+extern MMRESULT (__stdcall *jk_joyGetPos)(UINT uJoyID, LPJOYINFO pji);
+extern DWORD (__stdcall *jk_timeGetTime)();
+extern MMRESULT (__stdcall *jk_joyGetDevCapsA)(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc);
+
+extern HRESULT (__stdcall *jk_CoInitialize)(LPVOID pvReserved);
+extern HRESULT (__stdcall *jk_CoCreateInstance)(const IID *const rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, const IID *const riid, LPVOID *ppv);
+
+
+
 
 // JK functions
 extern void (*jk_exit)(int a);

@@ -18,4 +18,11 @@
 #define BOOl uint32_t
 #define LPMSG const MSG*
 
+// TODO find some headers for these
+#define LPDDENUMCALLBACKA void*
+#define LPDIRECTDRAW void*
+#define LPDIRECTINPUTA void*
+#define LPDIRECTPLAYLOBBYA void*
+#define LPDIRECTSOUND void*
+
 #endif // TYPES_H

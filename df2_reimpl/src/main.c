@@ -15,6 +15,7 @@
 #include "Win95/stdGob.h"
 #include "General/stdHashTable.h"
 #include "Engine/rdroid.h"
+#include "Engine/rdKeyframe.h"
 
 int yyparse();
 
@@ -317,6 +318,16 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdAdvanceFrame_ADDR, rdAdvanceFrame);
     hook_function(rdFinishFrame_ADDR, rdFinishFrame);
     hook_function(rdClearPostStatistics_ADDR, rdClearPostStatistics);
+    
+    // rdKeyframe
+    hook_function(rdKeyframe_RegisterLoader_ADDR, rdKeyframe_RegisterLoader);
+    hook_function(rdKeyframe_RegisterUnloader_ADDR, rdKeyframe_RegisterUnloader);
+    hook_function(rdKeyframe_NewEntry_ADDR, rdKeyframe_NewEntry);
+    hook_function(rdKeyframe_Load_ADDR, rdKeyframe_Load);
+    hook_function(rdKeyframe_LoadEntry_ADDR, rdKeyframe_LoadEntry);
+    hook_function(rdKeyframe_Write_ADDR, rdKeyframe_Write);
+    hook_function(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
+    hook_function(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
     
     //hook_function();
 }
