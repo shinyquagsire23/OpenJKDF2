@@ -16,6 +16,7 @@
 #include "General/stdHashTable.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
+#include "Engine/rdLight.h"
 
 int yyparse();
 
@@ -328,6 +329,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdKeyframe_Write_ADDR, rdKeyframe_Write);
     hook_function(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
     hook_function(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
+    
+    // rdLight
+    hook_function(rdLight_New_ADDR, rdLight_New);
+    hook_function(rdLight_NewEntry_ADDR, rdLight_NewEntry);
+    hook_function(rdLight_Free_ADDR, rdLight_Free);
+    hook_function(rdLight_FreeEntry_ADDR, rdLight_FreeEntry);
+    hook_function(rdLight_CalcVertexIntensities_ADDR, rdLight_CalcVertexIntensities);
+    hook_function(rdLight_CalcFaceIntensity_ADDR, rdLight_CalcFaceIntensity);
     
     //hook_function();
 }
