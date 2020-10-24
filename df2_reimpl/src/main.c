@@ -309,7 +309,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdSetOcclusionMethod_ADDR, rdSetOcclusionMethod);
     hook_function(rdSetZBufferMethod_ADDR, rdSetZBufferMethod);
     hook_function(rdSetCullFlags_ADDR, rdSetCullFlags);
-    hook_function(rdSetProcFaceUserdata_ADDR, rdSetProcFaceUserdata);
+    hook_function(rdSetProcFaceUserData_ADDR, rdSetProcFaceUserData);
     hook_function(rdSetVertexColorMode_ADDR, rdSetVertexColorMode);
     hook_function(rdGetGeometryMode_ADDR, rdGetGeometryMode);
     hook_function(rdGetLightingMode_ADDR, rdGetLightingMode);
@@ -318,7 +318,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdGetOcclusionMethod_ADDR, rdGetOcclusionMethod);
     hook_function(rdGetZBufferMethod_ADDR, rdGetZBufferMethod);
     hook_function(rdGetCullFlags_ADDR, rdGetCullFlags);
-    hook_function(rdGetProcFaceUserdata_ADDR, rdGetProcFaceUserdata);
+    hook_function(rdGetProcFaceUserData_ADDR, rdGetProcFaceUserData);
     hook_function(rdGetVertexColorMode_ADDR, rdGetVertexColorMode);
     hook_function(rdSetMipDistances_ADDR, rdSetMipDistances);
     hook_function(rdSetColorEffects_ADDR, rdSetColorEffects);

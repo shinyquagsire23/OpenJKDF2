@@ -16,7 +16,7 @@
 #define rdSetOcclusionMethod_ADDR (0x0043AAA0)
 #define rdSetZBufferMethod_ADDR (0x0043AAB0)
 #define rdSetCullFlags_ADDR (0x0043AAC0)
-#define rdSetProcFaceUserdata_ADDR (0x0043AAD0)
+#define rdSetProcFaceUserData_ADDR (0x0043AAD0)
 #define rdSetVertexColorMode_ADDR (0x0043AAE0)
 #define rdGetGeometryMode_ADDR (0x0043AAF0)
 #define rdGetLightingMode_ADDR (0x0043AB00)
@@ -25,7 +25,7 @@
 #define rdGetOcclusionMethod_ADDR (0x0043AB30)
 #define rdGetZBufferMethod_ADDR (0x0043AB40)
 #define rdGetCullFlags_ADDR (0x0043AB50)
-#define rdGetProcFaceUserdata_ADDR (0x0043AB60)
+#define rdGetProcFaceUserData_ADDR (0x0043AB60)
 #define rdGetVertexColorMode_ADDR (0x0043AB70)
 #define rdSetMipDistances_ADDR (0x0043AB80)
 #define rdSetColorEffects_ADDR (0x0043ABB0)
@@ -65,7 +65,7 @@ void rdSetSortingMethod(int a1);
 void rdSetOcclusionMethod(int a1);
 void rdSetZBufferMethod(int a1);
 void rdSetCullFlags(int a1);
-void rdSetProcFaceUserdata(int a1);
+void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);
 
 int rdGetGeometryMode(void);
@@ -75,7 +75,7 @@ int rdGetSortingMethod(void);
 int rdGetOcclusionMethod(void);
 int rdGetZBufferMethod(void);
 int rdGetCullFlags(void);
-int rdGetProcFaceUserdata(void);
+int rdGetProcFaceUserData(void);
 int rdGetVertexColorMode(void);
 
 int rdSetMipDistances(rdVector4 *dists);

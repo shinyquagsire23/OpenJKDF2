@@ -96,7 +96,7 @@ void rdSetCullFlags(int a1)
     rdroid_curCullFlags = a1;
 }
 
-void rdSetProcFaceUserdata(int a1)
+void rdSetProcFaceUserData(int a1)
 {
     rdroid_curProcFaceUserData = a1;
 }
@@ -141,7 +141,7 @@ int rdGetCullFlags(void)
     return rdroid_curCullFlags;
 }
 
-int rdGetProcFaceUserdata(void)
+int rdGetProcFaceUserData(void)
 {
     return rdroid_curProcFaceUserData;
 }
