@@ -7,6 +7,7 @@
 #include "types.h"
 
 #include "Cog/sithCog.h"
+#include "Cog/jkCog.h"
 #include "jkl.h"
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
@@ -17,6 +18,11 @@
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
+#include "Engine/rdMaterial.h"
+#include "Engine/rdColormap.h"
+#include "Primitives/rdPolyLine.h"
+#include "World/sithWeapon.h"
+#include "Engine/sithTime.h"
 
 int yyparse();
 
@@ -144,16 +150,16 @@ __declspec(dllexport) void hook_init(void)
     jk_init();
     
     hook_function(WinMain_ADDR, WinMain_);
-    hook_function(cog_register_jk_verbs_ADDR, cog_register_jk_verbs);
-    hook_function(cog_jk_init_ADDR, cog_jk_init);
-    hook_function(cog_init_ADDR, cog_init);
-    hook_function(cog_math_verbs_init_ADDR, cog_math_verbs_init);
-    hook_function(cog_thing_verbs_init_ADDR, cog_thing_verbs_init);
-    hook_function(cog_ai_verbs_init_ADDR, cog_ai_verbs_init);
-    hook_function(cog_surface_verbs_init_ADDR, cog_surface_verbs_init);
-    hook_function(cog_noise_verbs_init_ADDR, cog_noise_verbs_init);
-    hook_function(cog_sector_verbs_init_ADDR, cog_sector_verbs_init);
-    hook_function(cog_player_verbs_init_ADDR, cog_player_verbs_init);
+    hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
+    hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
+    hook_function(sithCog_Startup_ADDR, sithCog_Startup);
+    hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
+    hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
+    hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
+    hook_function(sithCogSurface_Initialize_ADDR, sithCogSurface_Initialize);
+    hook_function(sithCogSound_Initialize_ADDR, sithCogSound_Initialize);
+    hook_function(sithCogSector_Initialize_ADDR, sithCogSector_Initialize);
+    hook_function(sithCogPlayer_Initialize_ADDR, sithCogPlayer_Initialize);
     
     hook_function(jkl_init_parsers_ADDR, jkl_init_parsers);
     hook_function(jkl_set_section_parser_ADDR, jkl_set_section_parser);
@@ -337,6 +343,37 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdLight_FreeEntry_ADDR, rdLight_FreeEntry);
     hook_function(rdLight_CalcVertexIntensities_ADDR, rdLight_CalcVertexIntensities);
     hook_function(rdLight_CalcFaceIntensity_ADDR, rdLight_CalcFaceIntensity);
+    
+    // rdMaterial
+    hook_function(rdMaterial_RegisterLoader_ADDR, rdMaterial_RegisterLoader);
+    hook_function(rdMaterial_RegisterUnloader_ADDR, rdMaterial_RegisterUnloader);
+    hook_function(rdMaterial_Load_ADDR, rdMaterial_Load);
+    hook_function(rdMaterial_LoadEntry_ADDR, rdMaterial_LoadEntry);
+    hook_function(rdMaterial_Free_ADDR, rdMaterial_Free);
+    hook_function(rdMaterial_FreeEntry_ADDR, rdMaterial_FreeEntry);
+    
+    // rdPolyLine
+    hook_function(rdPolyLine_New_ADDR, rdPolyLine_New);
+    
+    // rdColormap
+    hook_function(rdColormap_SetCurrent_ADDR, rdColormap_SetCurrent);
+    hook_function(rdColormap_SetIdentity_ADDR, rdColormap_SetIdentity);
+    hook_function(rdColormap_Load_ADDR, rdColormap_Load);
+    hook_function(rdColormap_Free_ADDR, rdColormap_Free);
+    hook_function(rdColormap_FreeEntry_ADDR, rdColormap_FreeEntry);
+    hook_function(rdColormap_Write_ADDR, rdColormap_Write);
+    
+    // sithWeapon
+    hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
+    hook_function(sithWeapon_InitDefaults2_ADDR, sithWeapon_InitDefaults2);
+    
+    // sithTime
+    hook_function(sithTime_Tick_ADDR, sithTime_Tick);
+    hook_function(sithTime_Pause_ADDR, sithTime_Pause);
+    hook_function(sithTime_Resume_ADDR, sithTime_Resume);
+    hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
+    hook_function(sithTime_Startup_ADDR, sithTime_Startup);
+    hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
     
     //hook_function();
 }

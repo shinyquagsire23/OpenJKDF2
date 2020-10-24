@@ -225,17 +225,17 @@ void rdVector_Cross3Acc(rdVector3 *v1, rdVector3 *v2)
 
 float rdVector_Len2(rdVector2* v)
 {
-    return sqrtf((v->x*v->x) + (v->y*v->y));
+    return sqrtf(rdVector_Dot2(v,v));
 }
 
 float rdVector_Len3(rdVector3* v)
 {
-    return sqrt((v->x*v->x) + (v->y*v->y) + (v->z*v->z));
+    return sqrtf(rdVector_Dot3(v,v));
 }
 
 float rdVector_Len4(rdVector4* v)
 {
-    return sqrtf((v->x*v->x) + (v->y*v->y) + (v->z*v->z) + (v->w*v->w));
+    return sqrtf(rdVector_Dot4(v,v));
 }
 
 float rdVector_Normalize2(rdVector2 *v1, rdVector2 *v2)

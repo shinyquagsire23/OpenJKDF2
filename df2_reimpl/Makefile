@@ -41,4 +41,4 @@ $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-e_hook_init -nostartfiles
+	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles

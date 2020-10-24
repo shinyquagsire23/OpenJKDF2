@@ -181,7 +181,6 @@ void (*jk_exit)(int a) = (void*)0x512590;
 int (*sub_401000)(char* a) = (void*)0x401000;
 int (*sub_436D10)(int a) = (void*)0x436D10;
 int (*sub_436D30)(int a) = (void*)0x436D30;
-int (*sub_4E0640)() = (void*)0x4E0640;
 int (*other_window_stuff)(void) = (void*)0x4037E0;
 int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
 void (*cog_verb_register)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
