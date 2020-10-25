@@ -268,6 +268,7 @@ public:
         //glBindTexture(GL_TEXTURE_2D, texid);
         
         struct ddsurface_ext* primary = idirectdraw4->primary_surface;
+        printf("overlay?\n");
         if (!primary->alloc)
             return;
 
@@ -282,6 +283,7 @@ public:
         if (!primary->desc.ddpfPixelFormat.dwRGBBitCount
             ||primary->desc.ddpfPixelFormat.dwRGBBitCount == 8)
         {
+            printf("overlaying 8bpp\n");
             surface = SDL_CreateRGBSurface(0, w_int, h_int, 8, 0,0,0,0);
             memcpy(surface->pixels, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int);
             memset(vm_ptr_to_real_ptr(primary->alloc), 0, w_int*h_int);
@@ -303,6 +305,7 @@ public:
         }
         else
         {
+            printf("overlaying 16bpp\n");
             bool newtex = false;
             if (!primary->handle)
             {
@@ -356,7 +359,8 @@ public:
             {
                 last_overlay = malloc(w_int*h_int*sizeof(uint16_t));
             }
-            memcpy(last_overlay, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int*sizeof(uint16_t));
+            if (last_overlay)
+                memcpy(last_overlay, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int*sizeof(uint16_t));
 
             if (newtex)
             {

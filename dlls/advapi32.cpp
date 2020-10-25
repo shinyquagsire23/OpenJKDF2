@@ -52,7 +52,7 @@ uint32_t AdvApi32::RegQueryValueExA(uint32_t keyHnd, char* valuename, uint32_t c
     }
     else if (!strcmp(valuename, "displayMode"))
     {
-        *(uint32_t*)lpData = 0;
+        *(uint32_t*)lpData = 2;
         return 0;
     }
     else if (!strcmp(valuename, "InstallType"))

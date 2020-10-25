@@ -115,7 +115,10 @@ public:
             dstb = lpDestRect->bottom;
             printf("To: %ux%u, %u %u %u %u\n", this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, dstl, dstr, dstt, dstb);
             if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE)
+            {
                 printf("Blitting to the primary surface!\n");
+                idirectdraw4->primary_surface = this_ptr;
+            }
         }
         
         if (lpDDSrcSurface)
@@ -125,6 +128,8 @@ public:
             srct = lpSrcRect->top;
             srcb = lpSrcRect->bottom;
             printf("From: %ux%u, %u %u %u %u\n", lpDDSrcSurface->desc.dwWidth, lpDDSrcSurface->desc.dwHeight, srcl, srcr, srct, srcb);
+            if (srcr > lpDDSrcSurface->desc.dwWidth)
+                srcr = lpDDSrcSurface->desc.dwWidth;
             
             if (!lpDDSrcSurface->alloc && this_ptr->alloc)
             {
