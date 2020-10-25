@@ -72,3 +72,235 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
     }
     return retval;
 }
+
+char* stdString_GetQuotedStringContents(char *in, char *out, int out_size)
+{
+    char *result; // eax
+    char *v4; // esi
+    unsigned int v5; // edx
+
+    if ( out )
+        *out = 0;
+    result = _strchr(in, '"');
+    if ( result )
+    {
+        v4 = result + 1;
+        result = _strchr(result + 1, '"');
+        if ( result )
+        {
+            if ( out )
+            {
+                v5 = result - v4;
+                if ( result - v4 >= (unsigned int)(out_size - 1) )
+                    v5 = out_size - 1;
+                _memcpy(out, v4, v5);
+                out[v5] = 0;
+            }
+            ++result;
+        }
+    }
+    return result;
+}
+
+int stdString_CharToWchar(uint16_t *a1, char *a2, int a3)
+{
+    int result; // eax
+    char *v4; // esi
+    uint16_t *v5; // edx
+
+    result = 0;
+    if ( a3 <= 0 )
+    {
+        v5 = a1;
+    }
+    else
+    {
+        v4 = a2;
+        v5 = a1;
+        do
+        {
+            if ( !*v4 )
+                break;
+            *v5 = (unsigned __int8)*v4;
+            ++v5;
+            ++v4;
+            ++result;
+        }
+        while ( result < a3 );
+    }
+    if ( result < a3 )
+        *v5 = 0;
+    return result;
+}
+
+int stdString_WcharToChar(char *a1, uint16_t *a2, int a3)
+{
+    int result; // eax
+    uint16_t *v4; // ecx
+    char *v5; // esi
+
+    result = 0;
+    if ( a3 <= 0 )
+    {
+        v5 = a1;
+    }
+    else
+    {
+        v4 = a2;
+        v5 = a1;
+        do
+        {
+            if ( !*v4 )
+                break;
+            *v5 = *v4 <= 0xFFu ? *(char *)v4 : '?';
+            ++v4;
+            ++v5;
+            ++result;
+        }
+        while ( result < a3 );
+    }
+    if ( result < a3 )
+        *v5 = 0;
+    return result;
+}
+
+int stdString_wstrncpy(wchar_t *a1, int a2, int a3)
+{
+    int result; // eax
+    int v4; // edx
+    int v5; // eax
+
+    result = _wcslen(a1);
+    if ( a2 < result )
+    {
+        v4 = a3;
+        v5 = result - a2;
+        if ( a3 >= v5 )
+            v4 = v5;
+        result = 2 * (v5 - v4) + 2;
+        _memcpy(&a1[a2], &a1[a2 + v4], result);
+    }
+    return result;
+}
+
+int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
+{
+    wchar_t *v4; // ebp
+    size_t v5; // ebx
+    signed int v6; // eax
+    wchar_t *v7; // edx
+    int v8; // ebx
+    int v9; // edi
+    int v10; // ebx
+    wchar_t *v11; // ecx
+    int v12; // edx
+    int v13; // ebx
+    int result; // eax
+    wchar_t *v15; // [esp+14h] [ebp+4h]
+
+    v4 = a1;
+    v5 = _wcslen(a1);
+    v6 = _wcslen(a4);
+    v7 = &a1[a3];
+    v8 = v5 - a3 + 1;
+    v15 = &a1[a3];
+    v9 = (int)&v4[v6 + a3];
+    if ( v8 >= a2 - a3 - v6 )
+        v8 = a2 - a3 - v6;
+    if ( v8 > 0 )
+    {
+        v10 = v8 - 1;
+        if ( v10 >= 0 )
+        {
+            v11 = (wchar_t *)(v9 + 2 * v10);
+            v12 = (int)v7 - v9;
+            v13 = v10 + 1;
+            do
+            {
+                *v11 = *(wchar_t *)((char *)v11 + v12);
+                --v11;
+                --v13;
+            }
+            while ( v13 );
+            v7 = v15;
+        }
+    }
+    if ( v6 >= a2 - a3 - 1 )
+        v6 = a2 - a3 - 1;
+    _memcpy(v7, a4, 2 * v6);
+    result = a2;
+    v4[a2 - 1] = 0;
+    return result;
+}
+
+wchar_t* stdString_CstrCopy(const char *a1)
+{
+    wchar_t *v1; // ebp
+    signed int v2; // eax
+    wchar_t *v3; // esi
+    signed int v4; // ecx
+    unsigned __int8 v5; // dl
+
+    v1 = (wchar_t *)std_pHS->alloc(2 * _strlen(a1) + 2);
+    v2 = 0;
+    v3 = v1;
+    v4 = _strlen(a1);
+    if ( v4 > 0 )
+    {
+        do
+        {
+            v5 = a1[v2];
+            if ( !v5 )
+                break;
+            *v3 = v5;
+            ++v3;
+            ++v2;
+        }
+        while ( v2 < v4 );
+    }
+    if ( v2 < v4 )
+        *v3 = 0;
+    v1[_strlen(a1)] = 0;
+    return v1;
+}
+
+char* stdString_WcharCopy(wchar_t *a1)
+{
+    size_t v1; // eax
+    char *v2; // esi
+    signed int v3; // ebp
+    signed int v4; // edi
+    wchar_t *v5; // ecx
+    char *i; // edx
+
+    v1 = _wcslen(a1);
+    v2 = (char *)std_pHS->alloc(v1 + 1);
+    v3 = _wcslen(a1);
+    v4 = 0;
+    v5 = a1;
+    for ( i = v2; v4 < v3; ++v4 )
+    {
+        if ( !*v5 )
+            break;
+        *i = *v5 <= 0xFFu ? *(char *)v5 : '?';
+        ++v5;
+        ++i;
+    }
+    if ( v4 < v3 )
+        *i = 0;
+    v2[_wcslen(a1)] = 0;
+    return v2;
+}
+
+void stdString_CStrToLower(char *a1)
+{
+    char *v1; // esi
+    char result; // al
+
+    v1 = a1;
+    for (result = *a1; result; ++v1 )
+    {
+        *v1 = __tolower(result);
+        result = v1[1];
+    }
+}

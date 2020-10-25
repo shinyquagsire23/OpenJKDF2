@@ -312,6 +312,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdString_FastCopy_ADDR, stdString_FastCopy);
     hook_function(stdString_snprintf_ADDR, stdString_snprintf);
     hook_function(stdString_CopyBetweenDelimiter_ADDR, stdString_CopyBetweenDelimiter);
+    hook_function(stdString_GetQuotedStringContents_ADDR, stdString_GetQuotedStringContents);
+    hook_function(stdString_CharToWchar_ADDR, stdString_CharToWchar);
+    hook_function(stdString_WcharToChar_ADDR, stdString_WcharToChar);
+    hook_function(stdString_wstrncpy_ADDR, stdString_wstrncpy);
+    hook_function(stdString_wstrncat_ADDR, stdString_wstrncat);
+    hook_function(stdString_CstrCopy_ADDR, stdString_CstrCopy);
+    hook_function(stdString_WcharCopy_ADDR, stdString_WcharCopy);
+    hook_function(stdString_CStrToLower_ADDR, stdString_CStrToLower);
     
     // rdroid
     hook_function(rdStartup_ADDR, rdStartup);

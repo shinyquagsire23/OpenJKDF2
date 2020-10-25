@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "jk.h"
+#include "stdString.h"
 
 int stdConffile_OpenRead(char *fpath)
 {
@@ -223,7 +224,7 @@ int stdConffile_ReadLine()
       find_comment = _strchr(line_iter, '#');
       if ( find_comment )
         *find_comment = 0;
-      strtolower(line_iter);
+      stdString_CStrToLower(line_iter);
 
       line_len = _strlen(stdConffile_aLine);
       if ( stdConffile_aLine[line_len - 2] == '\\' )
