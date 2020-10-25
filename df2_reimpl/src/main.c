@@ -14,6 +14,7 @@
 #include "General/stdConffile.h"
 #include "General/stdFnames.h"
 #include "Win95/stdGob.h"
+#include "Win95/stdMci.h"
 #include "General/stdHashTable.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
@@ -285,6 +286,15 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdGob_FileRead_ADDR, stdGob_FileRead);
     hook_function(stdGob_FileGets_ADDR, stdGob_FileGets);
     hook_function(stdGob_FileGetws_ADDR, stdGob_FileGetws);
+    
+    // stdMci
+    hook_function(stdMci_Startup_ADDR, stdMci_Startup);
+    hook_function(stdMci_Shutdown_ADDR, stdMci_Shutdown);
+    hook_function(stdMci_Play_ADDR, stdMci_Play);
+    hook_function(stdMci_SetVolume_ADDR, stdMci_SetVolume);
+    hook_function(stdMci_Stop_ADDR, stdMci_Stop);
+    hook_function(stdMci_CheckStatus_ADDR, stdMci_CheckStatus);
+    hook_function(stdMci_GetTrackLength_ADDR, stdMci_GetTrackLength);
     
     // stdHashTable
     hook_function(stdHashTable_HashStringToIdx_ADDR, stdHashTable_HashStringToIdx);
