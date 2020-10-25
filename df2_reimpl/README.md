@@ -27,7 +27,6 @@ stdBm                          0xa4       0.015%        0.000%
 jkGuiGeneral                   0xc5       0.018%        0.000%       
 daFree                         0xd2       0.020%        0.000%       
 sithActor                      0xea       0.022%        0.000%       
-DialogFunc                     0xf2       0.023%        0.000%       
 rdFace                         0xf6       0.023%        0.000%       
 jkGuiControlOptions            0x105      0.024%        0.000%       
 stdHashKey                     0x107      0.025%        41.825%      
@@ -38,26 +37,23 @@ stdHashtable                   0x1aa      0.040%        100.000%
 daAlloc                        0x1d6      0.044%        0.000%       
 rdroid                         0x1f6      0.047%        100.000%     
 sithHeader                     0x1f9      0.047%        0.000%       
+gui                            0x213      0.050%        0.000%       
 sithTime                       0x213      0.050%        100.000%     
 sithItem                       0x218      0.050%        0.000%       
 jkGuiSingleTally               0x21b      0.050%        0.000%       
 jkGuiSetup                     0x240      0.054%        0.000%       
 jkGuiSound                     0x274      0.059%        0.000%       
-WinIdk                         0x289      0.061%        0.000%       
-util                           0x2ad      0.064%        0.000%       
 jkGuiGameplay                  0x2b2      0.065%        0.000%       
 stdMemory                      0x2ba      0.065%        0.000%       
 sithTimer                      0x2e3      0.069%        0.000%       
-stdMci                         0x2ef      0.070%        0.000%       
+stdMci                         0x2ef      0.070%        100.000%     
 jkGuiObjectives                0x308      0.073%        0.000%       
-cheats                         0x32c      0.076%        0.000%       
 jkControl                      0x331      0.076%        0.000%       
 jkCutscene                     0x347      0.079%        0.000%       
 jkDisplay                      0x359      0.080%        0.000%       
 stdString                      0x3b3      0.089%        0.000%       
 rdPolyLine                     0x3cb      0.091%        9.063%       
 jkGuiDialog                    0x3e0      0.093%        0.000%       
-draw                           0x3e5      0.093%        0.000%       
 sithModel                      0x3f1      0.094%        0.000%       
 stdres                         0x426      0.099%        0.000%       
 stdHashTable                   0x42c      0.100%        94.663%      
@@ -103,7 +99,6 @@ stdConffile                    0x78d      0.181%        100.000%
 jkGuiMap                       0x793      0.181%        0.000%       
 sithTemplate                   0x79d      0.182%        0.000%       
 sithParticle                   0x7f5      0.191%        0.000%       
-thing                          0x82a      0.196%        0.000%       
 Main                           0x87b      0.203%        0.000%       
 jkGuiMultiTally                0x8aa      0.208%        0.000%       
 jkCredits                      0x8e4      0.213%        0.000%       
@@ -198,5 +193,5 @@ rdAFRaster                     0x1620d    8.482%        0.000%
 rdNRaster                      0x304d4    18.515%       0.000%       
 ------------------------------
 
-Total completion: 3.020%
+Total completion: 3.091%
 ```

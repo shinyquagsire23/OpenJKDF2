@@ -999,13 +999,13 @@ stdHashTable_GetKeyVal	.text	00437D80	00000080	00000010	00000008	R	.	.	.	.	T	.
 stdHashTable_FreeKey	.text	00437E00	00000115	00000010	00000008	R	.	.	.	.	T	.
 stdHashtable_PrintDiagnostics	.text	00437F20	0000011E	00000020	00000004	R	.	.	.	.	T	.
 stdHashtable_Dump	.text	00438040	0000008C	00000008	00000004	R	.	.	.	.	T	.
-stdMci_Initialize	.text	004380D0	000000E4	00000060	00000000	R	.	.	.	.	.	.
+stdMci_Startup	.text	004380D0	000000E4	00000060	00000000	R	.	.	.	.	.	.
 stdMci_Shutdown	.text	004381C0	0000005A	00000004	00000000	R	.	.	.	.	.	.
-stdMci_Play	.text	00438220	00000077	0000001C	00000008	R	.	.	.	.	.	.
+stdMci_Play	.text	00438220	00000077	0000001C	00000008	R	.	.	.	.	T	.
 stdMci_SetVolume	.text	004382A0	00000034	00000004	00000004	R	.	.	.	.	T	.
-stdMci_Stop	.text	004382E0	0000001F			R	.	.	.	.	.	.
+stdMci_Stop	.text	004382E0	0000001F			R	.	.	.	.	T	.
 stdMci_CheckStatus	.text	00438300	0000005B	00000010	00000000	R	.	.	.	.	.	.
-stdMci_CheckStatus2	.text	00438360	0000008C	00000010	00000004	R	.	.	.	.	.	.
+stdMci_GetTrackLength	.text	00438360	0000008C	00000010	00000004	R	.	.	.	.	.	.
 stdGif_Load	.text	004383F0	000006E1	000000A0	0000000C	R	.	.	.	.	T	.
 stdGif_Write	.text	00438AE0	000005E0	00000038	00000008	R	.	.	.	.	.	.
 stdGif_lzwDecomp	.text	004390C0	000002D0	00000010	00000004	R	.	.	.	.	.	.

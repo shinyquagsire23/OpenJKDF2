@@ -1,5 +1,6 @@
 funclist = open("ida_copypaste_funclist_nostdlib.txt", "r").read().split("\n")
 
+exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub"]
 file_sizes = {}
 decomped_sizes = {}
 total_size = 0
@@ -65,6 +66,9 @@ for line in funclist:
 total_percent = 0
 print ("[file]".ljust(30), "[size]".ljust(10), "[% of text]".ljust(13), "[% complete]".ljust(13))
 for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
+    if (keyvalpair[0] in exclude_filefrom):
+        continue
+
     decomp_size = decomped_sizes[keyvalpair[0]]
     decomp_percent_num = (decomp_size/total_size)
     comp_percent_num = keyvalpair[1]/total_size
