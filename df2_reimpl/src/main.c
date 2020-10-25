@@ -16,6 +16,7 @@
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
 #include "General/stdHashTable.h"
+#include "General/stdString.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -306,6 +307,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdHashtable_PrintDiagnostics_ADDR, stdHashtable_PrintDiagnostics);
     hook_function(stdHashtable_Dump_ADDR, stdHashtable_Dump);
     hook_function(stdHashKey_AddLink_ADDR, stdHashKey_AddLink);
+    
+    // stdString
+    hook_function(stdString_FastCopy_ADDR, stdString_FastCopy);
+    hook_function(stdString_snprintf_ADDR, stdString_snprintf);
+    hook_function(stdString_CopyBetweenDelimiter_ADDR, stdString_CopyBetweenDelimiter);
     
     // rdroid
     hook_function(rdStartup_ADDR, rdStartup);
