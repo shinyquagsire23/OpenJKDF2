@@ -54,7 +54,7 @@ typedef struct texture_format
     uint32_t field_48;
 } texture_format;
 
-typedef struct rdVBuffer
+typedef struct stdVBuffer
 {
     uint32_t surface_locked;
     uint32_t lock_cnt;
@@ -66,7 +66,7 @@ typedef struct rdVBuffer
     sith_tex_2 *ddraw_surface;
     void* ddraw_palette; // LPDIRECTDRAWPALETTE
     uint8_t desc[0x6c];
-} rdVBuffer;
+} stdVBuffer;
 
 typedef struct rdTexture
 {
@@ -77,7 +77,7 @@ typedef struct rdTexture
     uint32_t width_minus_1;
     uint32_t height_minus_1;
     uint32_t num_mipmaps;
-    rdVBuffer *texture_struct[4];
+    stdVBuffer *texture_struct[4];
     uint8_t field_2C[120];
     sith_tex_2 field_A4[4];
     uint8_t field_304[488];

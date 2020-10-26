@@ -133,9 +133,9 @@ void sithCogUtil_RandVec(sithCog *ctx)
 {
     rdVector3 rvec;
 
-    rvec.x = (double)rand() * 0.000030518509;
-    rvec.y = (double)rand() * 0.000030518509;
-    rvec.z = (double)rand() * 0.000030518509;
+    rvec.x = (double)_rand() * 0.000030518509;
+    rvec.y = (double)_rand() * 0.000030518509;
+    rvec.z = (double)_rand() * 0.000030518509;
     sithCogVm_PushVector3(ctx, &rvec);
 }
 
@@ -152,7 +152,7 @@ void sithCogUtil_Sleep(sithCog *ctx)
         fSecs_ = 0.1;
     
     // TODO this is probably an inlined func?
-    if ( ctx_->cog_debug_maybe & 1 )
+    if ( ctx_->flags & COGFLAGS_TRACE )
     {
         _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs_);
         DebugConsole_Print(std_genBuffer);

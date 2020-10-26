@@ -6,6 +6,7 @@
 #include "stdPlatform.h"
 
 #include "General/stdHashTable.h"
+#include "General/stdString.h"
 
 int stdGob_Startup(common_functions *pHS_in)
 {
@@ -149,7 +150,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath)
 
     _strncpy(stdGob_fpath, filepath, 127);
     stdGob_fpath[127] = 0;
-    strtolower(stdGob_fpath);
+    stdString_CStrToLower(stdGob_fpath);
     entry = (stdGobEntry*)stdHashTable_GetKeyVal(gob->entriesHashtable, stdGob_fpath);
     if (!entry)
         return 0;

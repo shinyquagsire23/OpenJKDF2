@@ -187,11 +187,6 @@ void (*cog_verb_register)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...) = (void*)0x426D80;
 hashmap_entry* (*hashmap_create_entry)(void* map, char* str) = (void*)0x4FD260;
 cog_entry* (*hashmap_set_entry)(hashmap_entry* map, cog_entry* val) = (void*)0x4FD350;
-void* (*hashmap_init_maybe)(int amt) = (void*)0x437AF0;
-char* (*_strncpy)(char *, const char *, size_t) = (void*)0x5126A0;
-int (*__strcmpi)(const char *, const char *) = (void*)0x520D10;
-int (*_sscanf)(const char*, const char*, ...) = (void*)0x512CB0;
-void* (*_memcpy)(void*, const void*, size_t) = (void*)0x514D00;
 
 int _memcmp (const void* str1, const void* str2, size_t count)
 {

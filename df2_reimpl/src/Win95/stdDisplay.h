@@ -12,11 +12,11 @@
 
 
 static void (*stdDisplay_ddraw_waitforvblank)(void) = stdDisplay_ddraw_waitforvblank_ADDR;
-static void (__cdecl *stdDisplay_free_texture)(rdVBuffer *a1) = stdDisplay_free_texture_ADDR;
+static void (__cdecl *stdDisplay_free_texture)(stdVBuffer *a1) = stdDisplay_free_texture_ADDR;
 
-static rdVBuffer* (__cdecl *stdDisplay_VBufferNew)(texture_format *a1, int create_ddraw_surface, int gpu_mem, int is_paletted) = stdDisplay_VBufferNew_ADDR;
-static int (__cdecl *stdDisplay_VBufferSetColorKey)(rdVBuffer *a1, int color) = stdDisplay_VBufferSetColorKey_ADDR;
-static void (__cdecl *stdDisplay_VBufferLock)(rdVBuffer *a1) = stdDisplay_VBufferLock_ADDR;
-static void (__cdecl *stdDisplay_VBufferUnlock)(rdVBuffer *a1) = stdDisplay_VBufferUnlock_ADDR;
+static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(texture_format *a1, int create_ddraw_surface, int gpu_mem, int is_paletted) = stdDisplay_VBufferNew_ADDR;
+static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = stdDisplay_VBufferSetColorKey_ADDR;
+static void (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = stdDisplay_VBufferLock_ADDR;
+static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = stdDisplay_VBufferUnlock_ADDR;
 
 #endif // _STDDISPLAY_H

@@ -22,7 +22,7 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
     void **v6;
     int *v7;
     unsigned int v8;
-    rdVBuffer **v9;
+    stdVBuffer **v9;
     unsigned int gpu_mem;
 
     if (pMaterialsLoader)
@@ -53,7 +53,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   rdTexture *texture; // esi
   unsigned int mipmap_num; // ebx
   int bpp; // eax
-  rdVBuffer **texture_struct; // edi
+  stdVBuffer **texture_struct; // edi
   void *v19; // ebp
   int v21; // cf
   unsigned int v22; // edi
@@ -72,7 +72,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   texture_format format; // [esp+60h] [ebp-D8h]
   rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
   int textures_idk[8]; // [esp+F8h] [ebp-40h]
-  rdVBuffer *created_tex; // eax
+  stdVBuffer *created_tex; // eax
 
   material_ = material;
   _memset(material, 0, sizeof(rdMaterial));
@@ -160,7 +160,7 @@ LABEL_21:
         if ( !v21 )
           goto LABEL_22;
       }
-      texture_struct = (rdVBuffer **)texture->texture_struct;
+      texture_struct = (stdVBuffer **)texture->texture_struct;
       v19 = (void*)&texture->field_A4[0].surface_desc + 0xC;//.dwWidth;
       while ( 1 )
       {
@@ -254,7 +254,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
     void **v6;
     int *v7;
     unsigned int v8;
-    rdVBuffer **v9;
+    stdVBuffer **v9;
     unsigned int gpu_mem;
 
     v5 = 0;
@@ -278,7 +278,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         v8 = 0;
         if ( *v7 )
         {
-          v9 = (rdVBuffer **)(v7 + 1);
+          v9 = (stdVBuffer **)(v7 + 1);
           do
           {
             stdDisplay_free_texture(*v9);

@@ -37,7 +37,7 @@ typedef struct sithCog sithCog;
 typedef struct sithCog
 {
     void* cogscript; // sithCogScript*
-    uint32_t cog_debug_maybe;
+    uint32_t flags;
     sithCog* selfCog;
     uint32_t script_running;
     uint32_t cogscript_pc;
@@ -61,6 +61,12 @@ typedef struct sithCog
     char cogscript_fpath[32];
     char field_4BC[4104];
 } sithCog;
+
+enum COGFLAGS
+{
+    COGFLAGS_TRACE = 1,
+    COGFLAGS_PAUSED = 2,
+};
 
 enum COG_TYPE
 {

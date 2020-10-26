@@ -15,6 +15,7 @@
 #include "General/stdFnames.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
+#include "Win95/stdConsole.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 #include "Engine/rdroid.h"
@@ -22,7 +23,9 @@
 #include "Engine/rdLight.h"
 #include "Engine/rdMaterial.h"
 #include "Engine/rdColormap.h"
+#include "Engine/rdClip.h"
 #include "Primitives/rdPolyLine.h"
+#include "Primitives/rdMatrix.h"
 #include "World/sithWeapon.h"
 #include "Engine/sithTime.h"
 
@@ -321,6 +324,28 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdString_WcharCopy_ADDR, stdString_WcharCopy);
     hook_function(stdString_CStrToLower_ADDR, stdString_CStrToLower);
     
+    // stdConsole
+    hook_function(stdConsole_Startup_ADDR, stdConsole_Startup);
+    hook_function(stdConsole_Shutdown_ADDR, stdConsole_Shutdown);
+    hook_function(stdConsole_New_ADDR, stdConsole_New);
+    hook_function(stdConsole_Free_ADDR, stdConsole_Free);
+    hook_function(stdConsole_SetCursorPos_ADDR, stdConsole_SetCursorPos);
+    hook_function(stdConsole_GetCursorPos_ADDR, stdConsole_GetCursorPos);
+    hook_function(stdConsole_ToggleCursor_ADDR, stdConsole_ToggleCursor);
+    hook_function(stdConsole_GetTextAttribute_ADDR, stdConsole_GetTextAttribute);
+    hook_function(stdConsole_SetTextAttribute_ADDR, stdConsole_SetTextAttribute);
+    hook_function(stdConsole_Flush_ADDR, stdConsole_Flush);
+    hook_function(stdConsole_Clear_ADDR, stdConsole_Clear);
+    hook_function(stdConsole_Reset_ADDR, stdConsole_Reset);
+    hook_function(stdConsole_Putc_ADDR, stdConsole_Putc);
+    hook_function(stdConsole_Puts_ADDR, stdConsole_Puts);
+    hook_function(stdConsole_ClearBuf_ADDR, stdConsole_ClearBuf);
+    hook_function(stdConsole_ClearBuf2_ADDR, stdConsole_ClearBuf2);
+    hook_function(stdConsole_WriteBorderMaybe_ADDR, stdConsole_WriteBorderMaybe);
+    hook_function(stdConsole_WriteBorderMaybe2_ADDR, stdConsole_WriteBorderMaybe2);
+    hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
+    hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
+    
     // rdroid
     hook_function(rdStartup_ADDR, rdStartup);
     hook_function(rdShutdown_ADDR, rdShutdown);
@@ -387,6 +412,68 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdColormap_FreeEntry_ADDR, rdColormap_FreeEntry);
     hook_function(rdColormap_Write_ADDR, rdColormap_Write);
     
+    // rdClip
+    hook_function(rdClip_Line2_ADDR, rdClip_Line2);
+    hook_function(rdClip_CalcOutcode2_ADDR, rdClip_CalcOutcode2);
+    
+    // rdMatrix
+    hook_function(rdMatrix_Build34_ADDR, rdMatrix_Build34);
+    hook_function(rdMatrix_BuildFromLook34_ADDR, rdMatrix_BuildFromLook34);
+    hook_function(rdMatrix_BuildCamera34_ADDR, rdMatrix_BuildCamera34);
+    hook_function(rdMatrix_InvertOrtho34_ADDR, rdMatrix_InvertOrtho34);
+    hook_function(rdMatrix_Build44_ADDR, rdMatrix_Build44);
+    hook_function(rdMatrix_BuildRotate34_ADDR, rdMatrix_BuildRotate34);
+    hook_function(rdMatrix_BuildInverseRotate34_ADDR, rdMatrix_BuildInverseRotate34);
+    hook_function(rdMatrix_BuildRotate44_ADDR, rdMatrix_BuildRotate44);
+    hook_function(rdMatrix_BuildTranslate34_ADDR, rdMatrix_BuildTranslate34);
+    hook_function(rdMatrix_BuildTranslate44_ADDR, rdMatrix_BuildTranslate44);
+    hook_function(rdMatrix_BuildScale34_ADDR, rdMatrix_BuildScale34);
+    hook_function(rdMatrix_BuildScale44_ADDR, rdMatrix_BuildScale44);
+    hook_function(rdMatrix_BuildFromVectorAngle34_ADDR, rdMatrix_BuildFromVectorAngle34);
+    hook_function(rdMatrix_LookAt_ADDR, rdMatrix_LookAt);
+    //hook_function(rdMatrix_ExtractAngles34_ADDR, rdMatrix_ExtractAngles34); // TODO fix
+    hook_function(rdMatrix_Normalize34_ADDR, rdMatrix_Normalize34);
+    hook_function(rdMatrix_Identity34_ADDR, rdMatrix_Identity34);
+    hook_function(rdMatrix_Identity44_ADDR, rdMatrix_Identity44);
+    hook_function(rdMatrix_Copy34_ADDR, rdMatrix_Copy34);
+    hook_function(rdMatrix_Copy44_ADDR, rdMatrix_Copy44);
+    hook_function(rdMatrix_Copy34to44_ADDR, rdMatrix_Copy34to44);
+    hook_function(rdMatrix_Copy44to34_ADDR, rdMatrix_Copy44to34);
+    hook_function(rdMatrix_Transpose44_ADDR, rdMatrix_Transpose44);
+    hook_function(rdMatrix_Multiply34_ADDR, rdMatrix_Multiply34);
+    hook_function(rdMatrix_Multiply44_ADDR, rdMatrix_Multiply44);
+    hook_function(rdMatrix_PreMultiply34_ADDR, rdMatrix_PreMultiply34);
+    hook_function(rdMatrix_PreMultiply44_ADDR, rdMatrix_PreMultiply44);
+    hook_function(rdMatrix_PostMultiply34_ADDR, rdMatrix_PostMultiply34);
+    hook_function(rdMatrix_PostMultiply44_ADDR, rdMatrix_PostMultiply44);
+    hook_function(rdMatrix_PreRotate34_ADDR, rdMatrix_PreRotate34);
+    hook_function(rdMatrix_PreRotate44_ADDR, rdMatrix_PreRotate44);
+    hook_function(rdMatrix_PostRotate34_ADDR, rdMatrix_PostRotate34);
+    hook_function(rdMatrix_PostRotate44_ADDR, rdMatrix_PostRotate44);
+    hook_function(rdMatrix_PreTranslate34_ADDR, rdMatrix_PreTranslate34);
+    hook_function(rdMatrix_PreTranslate44_ADDR, rdMatrix_PreTranslate44);
+    hook_function(rdMatrix_PostTranslate34_ADDR, rdMatrix_PostTranslate34);
+    hook_function(rdMatrix_PostTranslate44_ADDR, rdMatrix_PostTranslate44);
+    hook_function(rdMatrix_PreScale34_ADDR, rdMatrix_PreScale34);
+    hook_function(rdMatrix_PreScale44_ADDR, rdMatrix_PreScale44);
+    hook_function(rdMatrix_PostScale34_ADDR, rdMatrix_PostScale34);
+    hook_function(rdMatrix_PostScale44_ADDR, rdMatrix_PostScale44);
+    hook_function(rdMatrix_SetRowVector34_ADDR, rdMatrix_SetRowVector34);
+    hook_function(rdMatrix_SetRowVector44_ADDR, rdMatrix_SetRowVector44);
+    hook_function(rdMatrix_GetRowVector34_ADDR, rdMatrix_GetRowVector34);
+    hook_function(rdMatrix_GetRowVector44_ADDR, rdMatrix_GetRowVector44);
+    hook_function(rdMatrix_TransformVector34_ADDR, rdMatrix_TransformVector34);
+    hook_function(rdMatrix_TransformVector34Acc_0_ADDR, rdMatrix_TransformVector34Acc_0);
+    hook_function(rdMatrix_TransformVector34Acc_ADDR, rdMatrix_TransformVector34Acc);
+    hook_function(rdMatrix_TransformVector44_ADDR, rdMatrix_TransformVector44);
+    hook_function(rdMatrix_TransformVector44Acc_ADDR, rdMatrix_TransformVector44Acc);
+    hook_function(rdMatrix_TransformPoint34_ADDR, rdMatrix_TransformPoint34);
+    hook_function(rdMatrix_TransformPoint34Acc_ADDR, rdMatrix_TransformPoint34Acc);
+    hook_function(rdMatrix_TransformPoint44_ADDR, rdMatrix_TransformPoint44);
+    hook_function(rdMatrix_TransformPoint44Acc_ADDR, rdMatrix_TransformPoint44Acc);
+    hook_function(rdMatrix_TransformPointLst34_ADDR, rdMatrix_TransformPointLst34);
+    hook_function(rdMatrix_TransformPointLst44_ADDR, rdMatrix_TransformPointLst44);
+    
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_InitDefaults2_ADDR, sithWeapon_InitDefaults2);
@@ -398,6 +485,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
     hook_function(sithTime_Startup_ADDR, sithTime_Startup);
     hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
+    
+    // test saber time
+    //*(float*)0x5220C4 = 0.01f;
     
     //hook_function();
 }

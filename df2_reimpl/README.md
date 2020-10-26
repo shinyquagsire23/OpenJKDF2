@@ -51,7 +51,7 @@ jkGuiObjectives                0x308      0.073%        0.000%
 jkControl                      0x331      0.076%        0.000%       
 jkCutscene                     0x347      0.079%        0.000%       
 jkDisplay                      0x359      0.080%        0.000%       
-stdString                      0x3b3      0.089%        0.000%       
+stdString                      0x3b3      0.089%        100.000%     
 rdPolyLine                     0x3cb      0.091%        9.063%       
 jkGuiDialog                    0x3e0      0.093%        0.000%       
 sithModel                      0x3f1      0.094%        0.000%       
@@ -139,7 +139,7 @@ sithPlayer                     0xe72      0.346%        0.000%
 sithCogSurface                 0xe92      0.349%        21.582%      
 sithSector                     0xee7      0.357%        0.000%       
 cheatfn                        0xfa7      0.375%        0.000%       
-stdConsole                     0xfff      0.383%        0.000%       
+stdConsole                     0xfff      0.383%        100.000%     
 rdPuppet                       0x101f     0.386%        0.000%       
 DirectPlay                     0x10cc     0.402%        0.000%       
 VBuffer                        0x10dc     0.404%        0.000%       
@@ -178,7 +178,7 @@ sithAI                         0x2771     0.945%        0.000%
 sithUnk3                       0x2827     0.962%        0.000%       
 rdModel3                       0x2a7e     1.018%        0.000%       
 std3D                          0x2c4a     1.061%        0.000%       
-rdMatrix                       0x2c85     1.067%        0.000%       
+rdMatrix                       0x2c85     1.067%        100.000%     
 sithAICmd                      0x2cc0     1.072%        0.000%       
 jkPlayer                       0x2da2     1.093%        0.000%       
 sithWeapon                     0x32a8     1.214%        0.987%       
@@ -186,12 +186,13 @@ rdCache                        0x331c     1.224%        0.000%
 sithCogThing                   0x3a4c     1.397%        19.908%      
 cogMsg                         0x3ad7     1.410%        0.000%       
 sithThing                      0x4946     1.755%        0.000%       
-rdClip                         0x81f2     3.113%        0.000%       
+rdClip                         0x81f2     3.113%        2.567%       
 rdRaster                       0xf04d     5.757%        0.000%       
 rdZRaster                      0x15fb4    8.426%        0.000%       
 rdAFRaster                     0x1620d    8.482%        0.000%       
 rdNRaster                      0x304d4    18.515%       0.000%       
 ------------------------------
 
-Total completion: 3.091%
+Total completion: 4.709%
+
 ```

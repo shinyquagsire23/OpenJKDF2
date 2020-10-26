@@ -11,6 +11,8 @@
 #include "sithCogSound.h"
 #include "jkCog.h"
 
+#include "General/stdHashTable.h"
+
 //void (*sithCogParse_GetSymbolScriptIdx)(sithCog* ctx) = (void*)0x004FD410;
 //void (*sithCogParse_LexAddSymbol)(sithCog* ctx) = (void*)0x004FD7F0;
 //void (*sithCogParse_LexGetSym)(sithCog* ctx) = (void*)0x004FD650;
@@ -45,7 +47,7 @@ int sithCog_Startup()
         return 0;
     }
   
-    g_cog_hashtable = hashmap_init_maybe(256);
+    g_cog_hashtable = stdHashTable_New(256);
     if (!g_cog_hashtable)
     {
         jk_assert(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
