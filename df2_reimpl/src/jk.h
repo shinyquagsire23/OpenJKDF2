@@ -4,6 +4,8 @@
 #include "types.h"
 #include <stdio.h>
 
+#include "Cog/sithCogParse.h"
+
 #define WinMain_ADDR (0x41EBD0)
 
 #define VM_VAR(name, type, ptr) \
@@ -46,14 +48,6 @@ typedef struct hashmap_entry
 {
     
 } hashmap_entry;
-
-typedef struct cog_entry
-{
-    int type;
-    int val;
-    int func;
-    uint32_t field_C;
-} cog_entry;
 
 //static void (*jk_main)(uint32_t a, uint32_t b, char* c, int d, char* e) = (void*)0x50E750;
 
@@ -243,7 +237,7 @@ extern int (*jk_printf)(const char* fmt, ...);
 extern void (*cog_verb_register)(void* a, intptr_t func, char* cmd);
 extern int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...);
 extern hashmap_entry* (*hashmap_create_entry)(void* map, char* str);
-extern cog_entry* (*hashmap_set_entry)(hashmap_entry* map, cog_entry* val);
+extern cogSymbol* (*hashmap_set_entry)(hashmap_entry* map, cogSymbol* val);
 static char* (*_strncpy)(char *, const char *, size_t) = (void*)0x5126A0;
 static int (*__strcmpi)(const char *, const char *) = (void*)0x520D10;
 static int (*_sscanf)(const char*, const char*, ...) = (void*)0x512CB0;

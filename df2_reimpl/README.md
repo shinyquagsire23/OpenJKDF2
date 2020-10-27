@@ -166,7 +166,7 @@ jkGuiMenu                      0x1e2d     0.723%        0.000%
 sithCog                        0x1ed3     0.738%        16.487%      
 jkSaber                        0x1f4a     0.750%        0.000%       
 sithInventory                  0x2150     0.798%        0.000%       
-sithCogVm                      0x22f7     0.838%        0.000%       
+sithCogVm                      0x22f7     0.838%        16.367%      
 sithRender                     0x23de     0.859%        0.000%       
 sithMulti                      0x250c     0.888%        0.000%       
 jkGuiBuildMulti                0x258b     0.899%        0.000%       
@@ -193,6 +193,5 @@ rdAFRaster                     0x1620d    8.482%        0.000%
 rdNRaster                      0x304d4    18.515%       0.000%       
 ------------------------------
 
-Total completion: 4.709%
-
+Total completion: 4.846%
 ```

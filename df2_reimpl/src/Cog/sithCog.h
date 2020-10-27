@@ -2,6 +2,8 @@
 #define _SITHCOG_H
 
 #include <stdint.h>
+#include "sithCogVm.h"
+#include "sithCogScript.h"
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Initialize_ADDR (0x40A0C0)
@@ -36,7 +38,7 @@ typedef struct sithCog sithCog;
 
 typedef struct sithCog
 {
-    void* cogscript; // sithCogScript*
+    sithCogScript* cogscript;
     uint32_t flags;
     sithCog* selfCog;
     uint32_t script_running;
@@ -57,7 +59,7 @@ typedef struct sithCog
     uint32_t calldepth;
     void* variable_hashmap_maybe;
     sithCogStackvar variable_array[64];
-    uint32_t stack_pos_idk;
+    uint32_t callDepthDecrement;
     char cogscript_fpath[32];
     char field_4BC[4104];
 } sithCog;
@@ -66,14 +68,6 @@ enum COGFLAGS
 {
     COGFLAGS_TRACE = 1,
     COGFLAGS_PAUSED = 2,
-};
-
-enum COG_TYPE
-{
-    COG_TYPE_VERB    = 0,
-    COG_TYPE_1       = 1,
-    COG_TYPE_GLOBAL  = 2,
-    COG_TYPE_MESSAGE  = 3
 };
 
 enum COGMSG_ID

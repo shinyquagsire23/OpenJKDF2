@@ -2,39 +2,41 @@
 #define _SITHCOGPARSE_H
 
 #include "Primitives/rdVector.h"
+#include "sithCogVm.h"
 
-#define COG_OPCODE_NOP   (0)
-#define COG_OPCODE_PUSHINT  (1)
-#define COG_OPCODE_PUSHFLOAT  (2)
-#define COG_OPCODE_PUSHSYMBOL  (3)
-#define COG_OPCODE_ARRAYINDEX  (4)
-#define COG_OPCODE_CALLFUNC  (5)
-#define COG_OPCODE_ASSIGN  (6)
-#define COG_OPCODE_PUSHVECTOR  (7)
-#define COG_OPCODE_ADD   (8)
-#define COG_OPCODE_SUB   (9)
-#define COG_OPCODE_MUL   (10)
-#define COG_OPCODE_DIV   (11)
-#define COG_OPCODE_MOD   (12)
-#define COG_OPCODE_CMPFALSE  (13)
-#define COG_OPCODE_NEG   (14)
-#define COG_OPCODE_CMPGT  (15)
-#define COG_OPCODE_CMPLS  (16)
-#define COG_OPCODE_CMPEQ  (17)
-#define COG_OPCODE_CMPLE  (18)
-#define COG_OPCODE_CMPGE  (19)
-#define COG_OPCODE_CMPAND  (20)
-#define COG_OPCODE_CMPOR  (21)
-#define COG_OPCODE_CMPNE  (22)
-#define COG_OPCODE_ANDI  (23)
-#define COG_OPCODE_ORI   (24)
-#define COG_OPCODE_XORI  (25)
-#define COG_OPCODE_GOFALSE  (26)
-#define COG_OPCODE_GOTRUE  (27)
-#define COG_OPCODE_GO    (28)
-#define COG_OPCODE_RET   (29)
-#define COG_OPCODE_UNK30  (30)
-#define COG_OPCODE_CALL  (31)
+#define sithCogParse_Reset_ADDR (0x004FC9A0)
+#define sithCogParse_Load_ADDR (0x004FC9D0)
+#define sithCogParse_LoadEntry_ADDR (0x004FCD70)
+#define sithCogParse_copy_symboltable_ADDR (0x004FCFD0)
+#define sithCogParse_alloc_symboltable_ADDR (0x004FD050)
+#define sithCogParse_Free_ADDR (0x004FD130)
+#define sithCogParse_free_symboltable_ADDR (0x004FD1C0)
+#define sithCogParse_AddSymbol_ADDR (0x004FD260)
+#define sithCogParse_SetSymbolVal_ADDR (0x004FD350)
+#define sithCogParse_GetSymbolVal_ADDR (0x004FD380)
+#define sithCogParse_GetSymbol_ADDR (0x004FD3D0)
+#define sithCogParse_GetSymbolScriptIdx_ADDR (0x004FD410)
+#define sithCogParse_AddLeaf_ADDR (0x004FD450)
+#define sithCogParse_AddLeafVector_ADDR (0x004FD4F0)
+#define sithCogParse_AddLinkingNode_ADDR (0x004FD5A0)
+#define sithCogParse_LexGetSym_ADDR (0x004FD650)
+#define sithCogParse_LexAddSymbol_ADDR (0x004FD7F0)
+#define sithCogParse_LexScanVector3_ADDR (0x004FD8E0)
+#define sithCogParse_IncrementLoopdepth_ADDR (0x004FD930)
+#define sithCogParse_recurse_stackdepth_ADDR (0x004FD940)
+#define sithCogParse_recurse_write_ADDR (0x004FDA00)
+#define sithCogParse_ParseSymbol_ADDR (0x004FDAE0)
+#define sithCogParse_ParseFlex_ADDR (0x004FDE10)
+#define sithCogParse_ParseInt_ADDR (0x004FE040)
+#define sithCogParse_ParseVector_ADDR (0x004FE280)
+#define sithCogParse_ParseMessage_ADDR (0x004FE4D0)
+
+typedef struct cogSymbol
+{
+    int type;
+    int val;
+    int func;
+} cogSymbol;
 
 typedef struct sith_cog_parser_node sith_cog_parser_node;
 
@@ -53,9 +55,11 @@ typedef struct sith_cog_parser_node
 //sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector);
 //sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
 
-static sith_cog_parser_node* (*sithCogParse_AddLeaf)(int op, int val) = (void*)0x004FD450;
-static sith_cog_parser_node* (*sithCogParse_AddLeafVector)(int op, rdVector3* vector) = (void*)0x004FD4F0;
-static sith_cog_parser_node* (*sithCogParse_AddLinkingNode)(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val) = (void*)0x004FD5A0;
+static cogSymbol* (__cdecl *sithCogParse_GetSymbol)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
+
+static sith_cog_parser_node* (*sithCogParse_AddLeaf)(int op, int val) = (void*)sithCogParse_AddLeaf_ADDR;
+static sith_cog_parser_node* (*sithCogParse_AddLeafVector)(int op, rdVector3* vector) = (void*)sithCogParse_AddLeafVector_ADDR;
+static sith_cog_parser_node* (*sithCogParse_AddLinkingNode)(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val) = (void*)sithCogParse_AddLinkingNode_ADDR;
 
 int cog_parsescript();
 

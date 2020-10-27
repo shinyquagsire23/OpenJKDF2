@@ -7,6 +7,7 @@
 #include "types.h"
 
 #include "Cog/sithCog.h"
+#include "Cog/sithCogVm.h"
 #include "Cog/jkCog.h"
 #include "jkl.h"
 #include "General/stdMath.h"
@@ -155,8 +156,12 @@ __declspec(dllexport) void hook_init(void)
     jk_init();
     
     hook_function(WinMain_ADDR, WinMain_);
+    
+    // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
     hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
+    
+    // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
@@ -169,6 +174,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkl_init_parsers_ADDR, jkl_init_parsers);
     hook_function(jkl_set_section_parser_ADDR, jkl_set_section_parser);
     hook_function(jkl_find_section_parser_ADDR, jkl_find_section_parser);
+    
+    // sithCogVm
+    hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
+    hook_function(sithCogVm_Shutdown_ADDR, sithCogVm_Shutdown);
+    hook_function(sithCogVm_SetMsgFunc_ADDR, sithCogVm_SetMsgFunc);
+    hook_function(sithCogVm_Set104_ADDR, sithCogVm_Set104);
+    hook_function(sithCogVm_InvokeMsgByIdx_ADDR, sithCogVm_InvokeMsgByIdx);
+    hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);

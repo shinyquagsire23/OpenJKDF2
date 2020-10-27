@@ -8,9 +8,9 @@
 #define stdCalcBitPos_ADDR (0x427080)
 #define stdPlatform_GetTimeMsec_ADDR (0x0042C2B0)
 
-static int (*stdPrintf)(int a1, char *a2, int line, char *fmt, ...) = 0x426D80;
-static int (__cdecl *stdFileFromPath)(char *) = stdFileFromPath_ADDR;
-static int (__cdecl *stdCalcBitPos)(signed int a1) = stdCalcBitPos_ADDR;
-static int (__cdecl *stdPlatform_GetTimeMsec)(void) = stdPlatform_GetTimeMsec_ADDR;
+static int (*stdPrintf)(int a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
+static int (__cdecl *stdFileFromPath)(char *) = (void*)stdFileFromPath_ADDR;
+static int (__cdecl *stdCalcBitPos)(signed int a1) = (void*)stdCalcBitPos_ADDR;
+static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 
 #endif // _STDPLATFORM_H
