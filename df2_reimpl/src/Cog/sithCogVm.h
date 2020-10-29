@@ -45,7 +45,7 @@
 #define sithCogVm_PushFlex_ADDR (0x004E33C0)
 #define sithCogVm_PushVector3_ADDR (0x004E3450)
 #define sithCogVm_PopProgramVal_ADDR (0x004E34E0)
-#define sithCogVm_sub_4E3510_ADDR (0x004E3510)
+#define sithCogVm_ResetStack_ADDR (0x004E3510)
 #define sithCogVm_Call_ADDR (0x004E3530)
 #define sithCogVm_Ret_ADDR (0x004E3590)
 #define sithCogVm_PopStackVar_ADDR (0x004E35E0)
@@ -351,15 +351,25 @@ sithThing* sithCogVm_PopTemplate(sithCog *ctx);
 rdMaterial* sithCogVm_PopMaterial(sithCog *ctx);
 rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx);
 char* sithCogVm_PopString(sithCog *ctx);
-void sithCogVm_MathOperation(sithCog *cog_ctx, int op);
+void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val);
+void sithCogVm_PushInt(sithCog *ctx, int val);
+void sithCogVm_PushFlex(sithCog *ctx, float val);
+void sithCogVm_PushVector3(sithCog *ctx, rdVector3* val);
+int sithCogVm_PopProgramVal(sithCog *ctx);
+void sithCogVm_ResetStack(sithCog *ctx);
+void sithCogVm_Call(sithCog *ctx);
+void sithCogVm_Ret(sithCog *cog_ctx);
+int sithCogVm_PopStackVar(sithCog *cog, sithCogStackvar *out);
 void sithCogVm_BitOperation(sithCog *cog_ctx, int op);
+void sithCogVm_MathOperation(sithCog *cog_ctx, int op);
+sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in);
 
-static void (__cdecl *sithCogVm_Ret)(sithCog *cog) = (void*)sithCogVm_Ret_ADDR;
-static void (__cdecl *sithCogVm_Call)(sithCog *cog) = (void*)sithCogVm_Call_ADDR;
+//static void (__cdecl *sithCogVm_Ret)(sithCog *cog) = (void*)sithCogVm_Ret_ADDR;
+//static void (__cdecl *sithCogVm_Call)(sithCog *cog) = (void*)sithCogVm_Call_ADDR;
 
-static int (__cdecl *sithCogVm_PopProgramVal)(sithCog *cog) = (void*)sithCogVm_PopProgramVal_ADDR;
-static int (__cdecl *sithCogVm_PopStackVar)(sithCog *cog, sithCogStackvar *out) = (void*)sithCogVm_PopStackVar_ADDR;
-static sithCogStackvar* (__cdecl *sithCogVm_AssignStackVar)(sithCogStackvar *a1, int a2, sithCogStackvar *a3) = (void*)sithCogVm_AssignStackVar_ADDR;
+//static int (__cdecl *sithCogVm_PopProgramVal)(sithCog *cog) = (void*)sithCogVm_PopProgramVal_ADDR;
+//static int (__cdecl *sithCogVm_PopStackVar)(sithCog *cog, sithCogStackvar *out) = (void*)sithCogVm_PopStackVar_ADDR;
+//static sithCogStackvar* (__cdecl *sithCogVm_AssignStackVar)(sithCogStackvar *a1, sithCog* a2, sithCogStackvar *a3) = (void*)sithCogVm_AssignStackVar_ADDR;
 //static void (__cdecl *sithCogVm_MathOperation)(sithCog *cog, int op) = (void*)sithCogVm_MathOperation_ADDR;
 //static void (__cdecl *sithCogVm_BitOperation)(sithCog *cog, int op) = (void*)sithCogVm_BitOperation_ADDR;
 //static int (__cdecl *sithCogVm_PopValue)(sithCog *ctx, int *out) = (void*)sithCogVm_PopValue_ADDR;
@@ -374,10 +384,10 @@ static void* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_Po
 //static int (__cdecl *sithCogVm_PopSymbolIdx)(sithCog *ctx) = (void*)sithCogVm_PopSymbolIdx_ADDR;
 static cogSymbolFunc_t (__cdecl *sithCogVm_PopSymbolFunc)(sithCog *cog_ctx) = (void*)sithCogVm_PopSymbolFunc_ADDR;
 
-static void (__cdecl *sithCogVm_PushVar)(sithCog *ctx, sithCogStackvar *val) = (void*)sithCogVm_PushVar_ADDR;
-static void (__cdecl *sithCogVm_PushInt)(sithCog *ctx, int val) = (void*)sithCogVm_PushInt_ADDR;
-static void (__cdecl *sithCogVm_PushFlex)(sithCog *ctx, float val) = (void*)sithCogVm_PushFlex_ADDR;
-static void (__cdecl *sithCogVm_PushVector3)(sithCog *ctx, rdVector3 *val) = (void*)sithCogVm_PushVector3_ADDR;
+//static void (__cdecl *sithCogVm_PushVar)(sithCog *ctx, sithCogStackvar *val) = (void*)sithCogVm_PushVar_ADDR;
+//static void (__cdecl *sithCogVm_PushInt)(sithCog *ctx, int val) = (void*)sithCogVm_PushInt_ADDR;
+//static void (__cdecl *sithCogVm_PushFlex)(sithCog *ctx, float val) = (void*)sithCogVm_PushFlex_ADDR;
+//static void (__cdecl *sithCogVm_PushVector3)(sithCog *ctx, rdVector3 *val) = (void*)sithCogVm_PushVector3_ADDR;
 
 
 #endif // _SITHCOGVM_H

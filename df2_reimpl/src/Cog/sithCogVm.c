@@ -143,11 +143,15 @@ int sithCogVm_InvokeMsgByIdx(net_msg *a1)
     return result;
 }
 
+// syncwithplayers
+
 void sithCogVm_ClearMsgTmpBuf()
 {
     memset(sithCogVm_MsgTmpBuf, 0, sizeof(sithCogVm_MsgTmpBuf));
     sithCogVm_idk2 = 0;
 }
+
+//sithCogVm_ClearTmpBuf2_cogmsg_40
 
 void sithCogVm_Exec(sithCog *cog_ctx)
 {
@@ -233,7 +237,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 if (!sithCogVm_PopStackVar(cog_ctx, &val) )
                     break;
 
-                tmpStackVar = sithCogVm_AssignStackVar(&outVar, (int)cog_ctx, &val);
+                tmpStackVar = sithCogVm_AssignStackVar(&outVar, cog_ctx, &val);
                 val.type = tmpStackVar->type;
                 val.data[0] = tmpStackVar->data[0];
                 val.data[1] = tmpStackVar->data[1];
@@ -327,13 +331,7 @@ void sithCogVm_ExecCog(sithCog *ctx, int trigIdx)
         {
             if ( ctx->script_running == 1 )
                 ctx->script_running = 4;
-            if ( ctx->calldepth != 4 )
-            {
-                ctx->callstack[ctx->calldepth].pc = ctx->cogscript_pc;
-                ctx->callstack[ctx->calldepth].script_running = ctx->script_running;
-                ctx->callstack[ctx->calldepth].waketimeMs = ctx->wakeTimeMs;
-                ctx->callstack[ctx->calldepth++].trigId = ctx->trigId;
-            }
+            sithCogVm_Call(ctx);
         }
         else if ( ctx->stackPos )
         {
@@ -814,7 +812,7 @@ char* sithCogVm_PopString(sithCog *ctx)
     v1 = ctx->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, ctx->stackPos = v2, v3 = ctx->stack[v2].data[1], v4 = ctx->stack[v2].data[2], ctx->stack[v2].type != 1)
-      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->val != 4) )
+      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->val != COG_VARTYPE_STR) )
     {
         result = 0;
     }
@@ -823,6 +821,136 @@ char* sithCogVm_PopString(sithCog *ctx)
         result = (char *)v5->func;
     }
     return result;
+}
+
+void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val)
+{
+    sithCogStackvar *pushVar;
+
+    if ( ctx->stackPos == 64 )
+    {
+        memcpy(ctx->stack, &ctx->stack[1], 0x3F0u);
+        --ctx->stackPos;
+    }
+    
+    pushVar = &ctx->stack[ctx->stackPos];
+    pushVar->type = val->type;
+    pushVar->data[0] = val->data[0];
+    pushVar->data[1] = val->data[1];
+    pushVar->data[2] = val->data[2];
+    ++ctx->stackPos;
+}
+
+void sithCogVm_PushInt(sithCog *ctx, int val)
+{
+    sithCogStackvar v;
+    v.type = COG_VARTYPE_INT;
+    v.data[0] = val;
+    sithCogVm_PushVar(ctx, &v);
+}
+
+void sithCogVm_PushFlex(sithCog *ctx, float val)
+{
+    sithCogStackvar v;
+    v.type = COG_VARTYPE_FLEX;
+    v.dataAsFloat[0] = val;
+    sithCogVm_PushVar(ctx, &v);
+}
+
+void sithCogVm_PushVector3(sithCog *ctx, rdVector3* val)
+{
+    sithCogStackvar v;
+    v.type = COG_VARTYPE_VECTOR;
+    v.dataAsFloat[0] = val->x;
+    v.dataAsFloat[1] = val->y;
+    v.dataAsFloat[2] = val->z;
+    sithCogVm_PushVar(ctx, &v);
+}
+
+int sithCogVm_PopProgramVal(sithCog *ctx)
+{
+    if ( ctx->cogscript_pc >= ctx->cogscript->program_pc_max - 1 )
+        return COG_OPCODE_RET;
+
+    return ctx->cogscript->script_program[ctx->cogscript_pc++];
+}
+
+void sithCogVm_ResetStack(sithCog *ctx)
+{
+    if ( ctx->stackPos )
+        ctx->stackPos = 0;
+}
+
+void sithCogVm_Call(sithCog *ctx)
+{
+    if ( ctx->calldepth != 4 )
+    {
+        ctx->callstack[ctx->calldepth].pc = ctx->cogscript_pc;
+        ctx->callstack[ctx->calldepth].script_running = ctx->script_running;
+        ctx->callstack[ctx->calldepth].waketimeMs = ctx->wakeTimeMs;
+        ctx->callstack[ctx->calldepth++].trigId = ctx->trigId;
+    }
+}
+
+void sithCogVm_Ret(sithCog *ctx)
+{
+    if ( ctx->calldepth )
+    {
+        ctx->script_running = ctx->callstack[ctx->calldepth].script_running;
+        ctx->cogscript_pc = ctx->callstack[ctx->calldepth].pc;
+        ctx->wakeTimeMs = ctx->callstack[ctx->calldepth].waketimeMs;
+        ctx->trigId = ctx->callstack[ctx->calldepth--].trigId;
+    }
+    else
+    {
+        ctx->script_running = 0;
+    }
+}
+
+int sithCogVm_PopStackVar(sithCog *cog, sithCogStackvar *out)
+{
+    sithCogStackvar *pop; // eax
+
+    if ( cog->stackPos < 1 )
+        return 0;
+
+    pop = &cog->stack[--cog->stackPos];
+    out->type = pop->type;
+    out->data[0] = pop->data[0];
+    out->data[1] = pop->data[1];
+    out->data[2] = pop->data[2];
+
+    return 1;
+}
+
+void sithCogVm_BitOperation(sithCog *cog_ctx, int op)
+{
+    int operand_a = sithCogVm_PopInt(cog_ctx);
+    int operand_b = sithCogVm_PopInt(cog_ctx);
+    switch ( op )
+    {
+        case COG_OPCODE_CMPAND:
+            sithCogVm_PushInt(cog_ctx, (operand_a && operand_b) ? 1 : 0);
+            break;
+            
+        case COG_OPCODE_CMPOR:
+            sithCogVm_PushInt(cog_ctx, (operand_a || operand_b) ? 1 : 0);
+            break;
+        case COG_OPCODE_CMPNE:
+            sithCogVm_PushInt(cog_ctx, (operand_a != operand_b) ? 1 : 0);
+            break;
+        case COG_OPCODE_ANDI:
+            sithCogVm_PushInt(cog_ctx, operand_a & operand_b);
+            break;
+        case COG_OPCODE_ORI:
+            sithCogVm_PushInt(cog_ctx, operand_a | operand_b);
+            break;
+        case COG_OPCODE_XORI:
+            sithCogVm_PushInt(cog_ctx, operand_a ^ operand_b);
+            break;
+        default:
+            return;
+    }
 }
 
 void sithCogVm_MathOperation(sithCog *cog_ctx, int op)
@@ -866,32 +994,26 @@ void sithCogVm_MathOperation(sithCog *cog_ctx, int op)
     }
 }
 
-void sithCogVm_BitOperation(sithCog *cog_ctx, int op)
+sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in)
 {
-    int operand_a = sithCogVm_PopInt(cog_ctx);
-    int operand_b = sithCogVm_PopInt(cog_ctx);
-    switch ( op )
+    if ( in->type == COG_VARTYPE_SYMBOL )
+        in = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, in->data[0])->val;
+    if ( in->type != COG_VARTYPE_VERB)
     {
-        case COG_OPCODE_CMPAND:
-            sithCogVm_PushInt(cog_ctx, (operand_a && operand_b) ? 1 : 0);
-            break;
-            
-        case COG_OPCODE_CMPOR:
-            sithCogVm_PushInt(cog_ctx, (operand_a || operand_b) ? 1 : 0);
-            break;
-        case COG_OPCODE_CMPNE:
-            sithCogVm_PushInt(cog_ctx, (operand_a != operand_b) ? 1 : 0);
-            break;
-        case COG_OPCODE_ANDI:
-            sithCogVm_PushInt(cog_ctx, operand_a & operand_b);
-            break;
-        case COG_OPCODE_ORI:
-            sithCogVm_PushInt(cog_ctx, operand_a | operand_b);
-            break;
-        case COG_OPCODE_XORI:
-            sithCogVm_PushInt(cog_ctx, operand_a ^ operand_b);
-            break;
-        default:
-            return;
+        out->type = in->type;
+        out->data[0] = in->data[0];
+        out->data[1] = in->data[1];
+        out->data[2] = in->data[2];
+        return out;
     }
+    else
+    {
+        out->type = COG_VARTYPE_INT;
+        out->data[0] = *(int*)in->data[0];
+        out->data[1] = in->data[1]; // these are undefined in the original
+        out->data[2] = in->data[2];
+        return out;
+    }
+
+    
 }

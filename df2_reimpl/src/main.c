@@ -195,6 +195,16 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_PopMaterial_ADDR, sithCogVm_PopMaterial);
     hook_function(sithCogVm_PopKeyframe_ADDR, sithCogVm_PopKeyframe);
     hook_function(sithCogVm_PopString_ADDR, sithCogVm_PopString);
+    hook_function(sithCogVm_PushVar_ADDR, sithCogVm_PushVar);
+    hook_function(sithCogVm_PushInt_ADDR, sithCogVm_PushInt);
+    hook_function(sithCogVm_PushFlex_ADDR, sithCogVm_PushFlex);
+    hook_function(sithCogVm_PushVector3_ADDR, sithCogVm_PushVector3);
+    hook_function(sithCogVm_PopProgramVal_ADDR, sithCogVm_PopProgramVal);
+    hook_function(sithCogVm_ResetStack_ADDR, sithCogVm_ResetStack);
+    hook_function(sithCogVm_Call_ADDR, sithCogVm_Call);
+    hook_function(sithCogVm_Ret_ADDR, sithCogVm_Ret);
+    hook_function(sithCogVm_PopStackVar_ADDR, sithCogVm_PopStackVar);
+    hook_function(sithCogVm_AssignStackVar_ADDR, sithCogVm_AssignStackVar);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);
