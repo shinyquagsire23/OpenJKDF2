@@ -4,6 +4,7 @@
 #include "Primitives/rdVector.h"
 #include "Primitives/rdFace.h"
 #include "Engine/rdMaterial.h"
+#include "Primitives/rdMatrix.h"
 
 #define rdModel3_RegisterLoader_ADDR (0x00443DA0)
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)

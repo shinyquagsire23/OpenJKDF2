@@ -449,6 +449,10 @@ __declspec(dllexport) void hook_init(void)
     
     // rdPolyLine
     hook_function(rdPolyLine_New_ADDR, rdPolyLine_New);
+    hook_function(rdPolyLine_NewEntry_ADDR, rdPolyLine_NewEntry);
+    hook_function(rdPolyLine_Free_ADDR, rdPolyLine_Free);
+    hook_function(rdPolyLine_FreeEntry_ADDR, rdPolyLine_FreeEntry);
+    hook_function(rdPolyLine_Draw_ADDR, rdPolyLine_Draw);
     
     // rdColormap
     hook_function(rdColormap_SetCurrent_ADDR, rdColormap_SetCurrent);

@@ -9,14 +9,25 @@
 #define rdFace_Free_ADDR      (0x0046D1E0)
 #define rdFace_FreeEntry_ADDR (0x0046D220)
 
+typedef struct rdVertexIdxInfo
+{
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
+    rdVector3* vertices;
+    rdVector2* extraUV;
+    uint32_t field_14;
+    uint32_t field_18;
+} rdVertexIdxInfo;
+
 typedef struct rdFace
 {
     int num;
     int type;
     int geometryMode;
-    int light;
-    int textureMode;
-    int num_verts;
+    int lightMode;
+    int sortingMethod;
+    int numVertices;
     int* vertexPosIdx;
     int* vertexUVIdx;
     rdMaterial* material;

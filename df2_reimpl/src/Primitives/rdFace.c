@@ -19,7 +19,7 @@ int rdFace_NewEntry(rdFace* out)
 {
     out->num = 0;
     out->type = 0;
-    out->num_verts = 0;
+    out->numVertices = 0;
     out->vertexPosIdx = 0;
     out->vertexUVIdx = 0;
     out->material = 0;

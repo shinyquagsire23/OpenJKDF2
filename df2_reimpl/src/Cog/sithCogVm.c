@@ -173,7 +173,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
     {
         cogscript = cog_ctx->cogscript;
         op = sithCogVm_PopProgramVal(cog_ctx);
-        jk_printf("cog trace %s %x op %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc, op);
+        //jk_printf("cog trace %s %x op %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc, op);
         switch ( op )
         {
             case COG_OPCODE_NOP:
@@ -896,10 +896,10 @@ void sithCogVm_Ret(sithCog *ctx)
 {
     if ( ctx->calldepth )
     {
-        ctx->script_running = ctx->callstack[ctx->calldepth].script_running;
+        ctx->script_running = ctx->callstack[--ctx->calldepth].script_running;
         ctx->cogscript_pc = ctx->callstack[ctx->calldepth].pc;
         ctx->wakeTimeMs = ctx->callstack[ctx->calldepth].waketimeMs;
-        ctx->trigId = ctx->callstack[ctx->calldepth--].trigId;
+        ctx->trigId = ctx->callstack[ctx->calldepth].trigId;
     }
     else
     {
