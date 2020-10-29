@@ -51,7 +51,6 @@ jkControl                      0x331      0.076%        0.000%
 jkCutscene                     0x347      0.078%        0.000%       
 jkDisplay                      0x359      0.079%        0.000%       
 stdString                      0x3b3      0.088%        100.000%     
-rdPolyLine                     0x3cb      0.090%        9.063%       
 jkGuiDialog                    0x3e0      0.092%        0.000%       
 sithModel                      0x3f1      0.093%        0.000%       
 stdres                         0x426      0.098%        0.000%       
@@ -92,7 +91,6 @@ jkGuiControlSaveLoad           0x732      0.171%        0.000%
 jkGuiPlayer                    0x73a      0.171%        0.000%       
 jkGuiMultiplayer               0x749      0.173%        0.000%       
 rdSprite                       0x76d      0.176%        0.000%       
-rdPolyline                     0x777      0.177%        0.000%       
 stdConffile                    0x78d      0.179%        100.000%     
 jkGuiMap                       0x793      0.180%        0.000%       
 sithTemplate                   0x79d      0.181%        0.000%       
@@ -117,6 +115,7 @@ rdKeyframe                     0xa99      0.251%        100.000%
 rdCamera                       0xaa8      0.253%        0.000%       
 jkGame                         0xaef      0.259%        0.000%       
 jkGuiSaveLoad                  0xb21      0.264%        0.000%       
+rdPolyLine                     0xb42      0.267%        74.844%      
 jkGuiKeyboard                  0xb57      0.269%        0.000%       
 jkGuiNetHost                   0xbc6      0.279%        0.000%       
 sithMapView                    0xbf8      0.284%        0.000%       
@@ -163,7 +162,7 @@ jkGuiMenu                      0x1e2d     0.716%        0.000%
 sithCog                        0x1ed3     0.731%        16.487%      
 jkSaber                        0x1f4a     0.742%        0.000%       
 sithInventory                  0x2150     0.790%        0.000%       
-sithCogVm                      0x22f7     0.829%        67.020%      
+sithCogVm                      0x22f7     0.829%        68.171%      
 sithRender                     0x23de     0.851%        0.000%       
 sithMulti                      0x250c     0.879%        0.000%       
 jkGuiBuildMulti                0x258b     0.891%        0.000%       
@@ -191,5 +190,6 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 5.376%
+Total completion: 5.577%
+
 ```
