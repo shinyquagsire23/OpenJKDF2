@@ -62,7 +62,7 @@ public:
     
     Q_INVOKABLE void GetDeviceStatus(void* this_ptr, uint32_t a)
     {
-        printf("STUB: GetDeviceStatus\n");
+        //printf("STUB: GetDeviceStatus\n");
     }
     
     Q_INVOKABLE void RunControlPanel(void* this_ptr, uint32_t a, uint32_t b){}

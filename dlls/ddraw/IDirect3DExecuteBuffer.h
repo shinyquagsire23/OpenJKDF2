@@ -268,7 +268,7 @@ public:
         //glBindTexture(GL_TEXTURE_2D, texid);
         
         struct ddsurface_ext* primary = idirectdraw4->primary_surface;
-        printf("overlay?\n");
+        //printf("overlay?\n");
         if (!primary->alloc)
             return;
 
@@ -283,7 +283,7 @@ public:
         if (!primary->desc.ddpfPixelFormat.dwRGBBitCount
             ||primary->desc.ddpfPixelFormat.dwRGBBitCount == 8)
         {
-            printf("overlaying 8bpp\n");
+            //printf("overlaying 8bpp\n");
             surface = SDL_CreateRGBSurface(0, w_int, h_int, 8, 0,0,0,0);
             memcpy(surface->pixels, vm_ptr_to_real_ptr(primary->alloc), w_int*h_int);
             memset(vm_ptr_to_real_ptr(primary->alloc), 0, w_int*h_int);
@@ -305,7 +305,7 @@ public:
         }
         else
         {
-            printf("overlaying 16bpp\n");
+            //printf("overlaying 16bpp\n");
             bool newtex = false;
             if (!primary->handle)
             {
@@ -323,7 +323,7 @@ public:
             // These textures are actually BGRA usually.
             // However, BGR565 is invalid for some reason, so we just swap colors
             // in the shader.
-            printf("overlay %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
+            //printf("overlay %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
             int format_order = GL_RGB;
             int format = GL_UNSIGNED_SHORT_5_6_5_REV;
             if (primary->locked_desc.ddpfPixelFormat.dwRBitMask == 0x7C00)
@@ -346,7 +346,7 @@ public:
             }
             else
             {
-                printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
+                //printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", primary->locked_desc.ddpfPixelFormat.dwRBitMask);
             }
             
             bool needs_update = false;

@@ -212,7 +212,7 @@ pthread_mutex_t vblank_lock = PTHREAD_MUTEX_INITIALIZER;
 
 uint32_t IDirect3DDevice::BeginScene(void* this_ptr)
 {
-    printf("IDirect3DDevice::BeginScene\n");
+    //printf("IDirect3DDevice::BeginScene\n");
     gdi32->gdi_render = false;
     idirect3dexecutebuffer->init_resources();
     
@@ -235,7 +235,7 @@ static void onD3DVblank(void* textureArg)
 
 uint32_t IDirect3DDevice::EndScene(void* this_ptr)
 {
-    printf("IDirect3DDevice::EndScene\n");
+    //printf("IDirect3DDevice::EndScene\n");
     
     idirect3dexecutebuffer->renderOverlay();
 

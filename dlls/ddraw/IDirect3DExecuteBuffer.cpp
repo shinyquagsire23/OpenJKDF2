@@ -214,7 +214,7 @@ uint32_t IDirect3DExecuteBuffer::Unlock(void* this_ptr)
 uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, D3DEXECUTEDATA* desc)
 {
     //TODO: wait for Execute
-    printf("IDirect3DExecuteBuffer::SetExecuteData: execute offset %x, count %x,  instr offset %x, instr count %x, hvertex offset %x\n", desc->dwVertexOffset, desc->dwVertexCount, desc->dwInstructionOffset, desc->dwInstructionLength, desc->dwHVertexOffset);
+   //printf("IDirect3DExecuteBuffer::SetExecuteData: execute offset %x, count %x,  instr offset %x, instr count %x, hvertex offset %x\n", desc->dwVertexOffset, desc->dwVertexCount, desc->dwInstructionOffset, desc->dwInstructionLength, desc->dwHVertexOffset);
 
     // Generate vertices list
     GLuint vbo_vertices, vbo_colors, vbo_uvs;
@@ -385,7 +385,7 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, D3DEXECUTEDATA* 
         else if (instr->bOpcode == D3DOP_PROCESSVERTICES)
         {
             //idk on this one
-            printf("STUB: D3DOP_PROCESSVERTICES size 0x%x count %u\n", instr->bSize, instr->wCount);
+            //printf("STUB: D3DOP_PROCESSVERTICES size 0x%x count %u\n", instr->bSize, instr->wCount);
         }
         else if (instr->bOpcode == D3DOP_STATERENDER)
         {
@@ -441,36 +441,36 @@ uint32_t IDirect3DExecuteBuffer::SetExecuteData(void* this_ptr, D3DEXECUTEDATA* 
                 }
                 else if (renderOp == D3DRENDERSTATE_SRCBLEND)
                 {
-                    printf("D3DRENDERSTATE_SRCBLEND: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_SRCBLEND: %u\n", renderArg);
                     glUniform1i(uniform_blend_mode, renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_TEXTUREPERSPECTIVE)
                 {
-                    printf("D3DRENDERSTATE_TEXTUREPERSPECTIVE: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_TEXTUREPERSPECTIVE: %u\n", renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_MONOENABLE)
                 {
-                    printf("D3DRENDERSTATE_MONOENABLE: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_MONOENABLE: %u\n", renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_ZWRITEENABLE)
                 {
-                    printf("D3DRENDERSTATE_ZWRITEENABLE: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_ZWRITEENABLE: %u\n", renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_DESTBLEND)
                 {
-                    printf("D3DRENDERSTATE_DESTBLEND: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_DESTBLEND: %u\n", renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_TEXTUREMAPBLEND)
                 {
-                    printf("D3DRENDERSTATE_TEXTUREMAPBLEND: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_TEXTUREMAPBLEND: %u\n", renderArg);
                 }
                 else if (renderOp == D3DRENDERSTATE_ALPHABLENDENABLE)
                 {
-                    printf("D3DRENDERSTATE_ALPHABLENDENABLE: %u\n", renderArg);
+                    //printf("D3DRENDERSTATE_ALPHABLENDENABLE: %u\n", renderArg);
                 }
                 else
                 {
-                    printf("IDirect3DExecuteBuffer::SetExecuteData: Unhandled STATERENDER operation %u!\n", renderOp);
+                    //printf("IDirect3DExecuteBuffer::SetExecuteData: Unhandled STATERENDER operation %u!\n", renderOp);
                 }
                 opData += instr->bSize;
             }

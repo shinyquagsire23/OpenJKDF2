@@ -82,7 +82,7 @@ uint32_t Kernel32::CloseHandle(uint32_t handle)
 uint32_t Kernel32::VirtualAlloc(uint32_t lpAddress, uint32_t dwSize, uint32_t flAllocationType, uint32_t flProtect)
 {
     //TODO: lpAddress
-    printf("valloc %x %x %x %x\n", lpAddress, dwSize, flAllocationType, flProtect);
+    //printf("valloc %x %x %x %x\n", lpAddress, dwSize, flAllocationType, flProtect);
 
     dwSize = (dwSize & ~0xFFF) + 0x1000;
     uint32_t numBits = dwSize / 0x1000;

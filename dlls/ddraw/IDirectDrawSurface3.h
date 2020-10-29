@@ -103,7 +103,7 @@ public:
 
     Q_INVOKABLE uint32_t Blt(struct ddsurface_ext* this_ptr, struct RECT* lpDestRect, struct ddsurface_ext* lpDDSrcSurface, struct RECT* lpSrcRect, uint32_t dwFlags, struct DDBLTFX* lpDDBltFx)
     {
-        printf("STUB: IDirectDrawSurface3::Blt %p %p %p %x %p\n", lpDestRect, lpDDSrcSurface, lpSrcRect, dwFlags, lpDDBltFx);
+        //printf("STUB: IDirectDrawSurface3::Blt %p %p %p %x %p\n", lpDestRect, lpDDSrcSurface, lpSrcRect, dwFlags, lpDDBltFx);
 #if 1
         uint32_t dstl = 0, dstr = 0, dstt = 0, dstb = 0;
         uint32_t srcl = 0, srcr = 0, srct = 0, srcb = 0;
@@ -113,10 +113,10 @@ public:
             dstr = lpDestRect->right;
             dstt = lpDestRect->top;
             dstb = lpDestRect->bottom;
-            printf("To: %ux%u, %u %u %u %u\n", this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, dstl, dstr, dstt, dstb);
+            //printf("To: %ux%u, %u %u %u %u\n", this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, dstl, dstr, dstt, dstb);
             if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE)
             {
-                printf("Blitting to the primary surface!\n");
+                //printf("Blitting to the primary surface!\n");
                 idirectdraw4->primary_surface = this_ptr;
             }
         }
@@ -127,7 +127,7 @@ public:
             srcr =  lpSrcRect->right;
             srct = lpSrcRect->top;
             srcb = lpSrcRect->bottom;
-            printf("From: %ux%u, %u %u %u %u\n", lpDDSrcSurface->desc.dwWidth, lpDDSrcSurface->desc.dwHeight, srcl, srcr, srct, srcb);
+            //printf("From: %ux%u, %u %u %u %u\n", lpDDSrcSurface->desc.dwWidth, lpDDSrcSurface->desc.dwHeight, srcl, srcr, srct, srcb);
             if (srcr > lpDDSrcSurface->desc.dwWidth)
                 srcr = lpDDSrcSurface->desc.dwWidth;
             
@@ -166,7 +166,7 @@ public:
                 uint32_t src_pitch = lpDDSrcSurface->desc.lPitch;
                 uint32_t dst_pitch = this_ptr->desc.lPitch;
                 
-                printf("asdf %x %x\n", bytes_per_pixel_src, bytes_per_pixel_dst);
+                //printf("asdf %x %x\n", bytes_per_pixel_src, bytes_per_pixel_dst);
 
                 if (!lpDDSrcSurface->desc.ddpfPixelFormat.dwRGBBitCount)
                     bytes_per_pixel_src = sizeof(uint8_t);
@@ -197,12 +197,12 @@ public:
             }
         }
         
-        printf("size %x DDFX %x DDROP %x others...%x %x %x %x %x %x %x\n", lpDDBltFx->dwSize, lpDDBltFx->dwDDFX, lpDDBltFx->dwROP, lpDDBltFx->dwDDROP, lpDDBltFx->dwRotationAngle, lpDDBltFx->dwZBufferOpCode, lpDDBltFx->dwZBufferLow, lpDDBltFx->dwZBufferHigh, lpDDBltFx->dwZBufferBaseDest, lpDDBltFx->dwZDestConstBitDepth);
+        //printf("size %x DDFX %x DDROP %x others...%x %x %x %x %x %x %x\n", lpDDBltFx->dwSize, lpDDBltFx->dwDDFX, lpDDBltFx->dwROP, lpDDBltFx->dwDDROP, lpDDBltFx->dwRotationAngle, lpDDBltFx->dwZBufferOpCode, lpDDBltFx->dwZBufferLow, lpDDBltFx->dwZBufferHigh, lpDDBltFx->dwZBufferBaseDest, lpDDBltFx->dwZDestConstBitDepth);
         #endif
         
         if (this_ptr->desc.ddsCaps & DDSCAPS_PRIMARYSURFACE && !idirect3dexecutebuffer->has_initted && this_ptr->surfacebuf && lpDestRect)
         {
-            printf("Blitting to the primary surface! %x\n", this_ptr->desc.ddpfPixelFormat.dwRGBBitCount);
+            //printf("Blitting to the primary surface! %x\n", this_ptr->desc.ddpfPixelFormat.dwRGBBitCount);
 
             //else
                 //memset(surface->pixels, 0, this_ptr->desc.dwWidth*this_ptr->desc.dwHeight);
@@ -374,7 +374,7 @@ public:
 
     Q_INVOKABLE uint32_t Lock(struct ddsurface_ext* this_ptr, uint32_t rect, struct DDSURFACEDESC* surfacedesc, uint32_t flags, uint32_t d)
     {
-        printf("STUB: IDirectDrawSurface3::Lock %x %x\n", rect, flags);
+        //printf("STUB: IDirectDrawSurface3::Lock %x %x\n", rect, flags);
         memcpy(surfacedesc, &this_ptr->desc, sizeof(struct DDSURFACEDESC));
         
         int bpp = surfacedesc->ddpfPixelFormat.dwRGBBitCount;
@@ -445,7 +445,7 @@ public:
         this_ptr->alloc = surfacedesc->lpSurface;
         this_ptr->locked_desc = *surfacedesc;
         
-        printf("IDirectDrawSurface3::Lock: %ux%u pitch %x\n", surfacedesc->dwWidth, surfacedesc->dwHeight, surfacedesc->lPitch);
+        //printf("IDirectDrawSurface3::Lock: %ux%u pitch %x\n", surfacedesc->dwWidth, surfacedesc->dwHeight, surfacedesc->lPitch);
         
         return 0;
     }
@@ -506,7 +506,7 @@ public:
 
     Q_INVOKABLE uint32_t Unlock(struct ddsurface_ext* this_ptr, uint32_t a)
     {
-        printf("STUB: IDirectDrawSurface3::Unlock %x\n", this_ptr->locked_desc.ddsCaps);
+        //printf("STUB: IDirectDrawSurface3::Unlock %x\n", this_ptr->locked_desc.ddsCaps);
         
         /*for (int i = 0; i < 640*480; i++)
         {

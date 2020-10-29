@@ -3,12 +3,12 @@
 /* IDirect3DTexture methods */
 void IDirect3DTexture::Initialize(struct d3dtex_ext* this_ptr, uint32_t device, uint32_t surface)
 {
-    printf("STUB: IDirect3DTexture::Initialize\n");
+    //printf("STUB: IDirect3DTexture::Initialize\n");
 }
 
 uint32_t IDirect3DTexture::GetHandle(struct d3dtex_ext* this_ptr, uint32_t device, uint32_t* handle)
 {
-    printf("STUB: IDirect3DTexture::GetHandle\n");
+    //printf("STUB: IDirect3DTexture::GetHandle\n");
     
     if (this_ptr->handle) 
     {
@@ -51,7 +51,7 @@ uint32_t IDirect3DTexture::GetHandle(struct d3dtex_ext* this_ptr, uint32_t devic
     }
     else
     {
-        printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", this_ptr->parent_surface->locked_desc.ddpfPixelFormat.dwRBitMask);
+        //printf("IDirect3DTexture::GetHandle Unknown texture format? Rbitmask %x\n", this_ptr->parent_surface->locked_desc.ddpfPixelFormat.dwRBitMask);
     }
 
     glTexImage2D(GL_TEXTURE_2D,
@@ -75,7 +75,7 @@ uint32_t IDirect3DTexture::GetHandle(struct d3dtex_ext* this_ptr, uint32_t devic
     *handle = id;
     this_ptr->handle = *handle;
     
-    printf("%ux%u id %x\n", this_ptr->parent_surface->locked_desc.dwWidth, this_ptr->parent_surface->locked_desc.dwHeight, id);
+    //printf("%ux%u id %x\n", this_ptr->parent_surface->locked_desc.dwWidth, this_ptr->parent_surface->locked_desc.dwHeight, id);
     
     return 0;
 }

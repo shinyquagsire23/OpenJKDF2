@@ -550,7 +550,7 @@ public:
     
     Q_INVOKABLE uint32_t WaitForVerticalBlank(void* this_ptr, uint32_t a, uint32_t b)
     {
-        printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
+        //printf("STUB: IDirectDraw4::WaitForVerticalBlank\n");
         
         renderer_waitforvblank();
         

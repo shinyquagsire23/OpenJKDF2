@@ -131,7 +131,7 @@ public:
 
     Q_INVOKABLE uint32_t Play(struct dsndbuffer_ext* obj, uint32_t res, uint32_t res2, uint32_t flags)
     {
-        printf("STUB: IDirectSoundBuffer::Play %x\n", flags);
+        //printf("STUB: IDirectSoundBuffer::Play %x\n", flags);
         
         if (obj->raw_buffer)
         {
@@ -212,7 +212,7 @@ public:
 
     Q_INVOKABLE uint32_t Stop(struct dsndbuffer_ext* obj)
     {
-        printf("STUB: IDirectSoundBuffer::Stop\n");
+        //printf("STUB: IDirectSoundBuffer::Stop\n");
 
         if (obj->channel >= 0)
             Mix_ExpireChannel(obj->channel, 2000);

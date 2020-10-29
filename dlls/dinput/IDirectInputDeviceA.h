@@ -488,7 +488,7 @@ public:
     
     Q_INVOKABLE uint32_t GetDeviceState(dinputdevice_ext* obj, uint32_t cbData, void* lpvData)
     {
-        printf("STUB: IDirectInputDeviceA::GetDeviceState (%s)\n", obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        //printf("STUB: IDirectInputDeviceA::GetDeviceState (%s)\n", obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
         
         memset(lpvData, 0, cbData);
         if (obj->type == InputDeviceType_Keyboard)
@@ -525,7 +525,7 @@ public:
             //if (user32->mousestate.rbutton)
                 //state->bButtons[0] |= 2;
 
-            printf("%x %x %x\n", user32->mousestate.lbutton, user32->mousestate.rbutton, state->bButtons[0]);
+            //printf("%x %x %x\n", user32->mousestate.lbutton, user32->mousestate.rbutton, state->bButtons[0]);
             user32->mousestate.x = 0;
             user32->mousestate.y = 0;
             return DI_OK;
@@ -536,7 +536,7 @@ public:
     
     Q_INVOKABLE uint32_t GetDeviceData(dinputdevice_ext* obj, uint32_t cgObjectData, struct DIDEVICEOBJECTDATA* rgdod, uint32_t* pdwInOut, uint32_t dwFlags)
     {
-        printf("STUB: IDirectInputDeviceA::GetDeviceData %p (%s)\n", rgdod, obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
+        //printf("STUB: IDirectInputDeviceA::GetDeviceData %p (%s)\n", rgdod, obj->type == InputDeviceType_Keyboard ? "KEYBOARD" : "MOUSE");
         
         if (!rgdod)
         {
