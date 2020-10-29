@@ -9,8 +9,8 @@ sith_cog_parser_node* cogparser_nodes_alloc = 0;
 int cogparser_num_nodes = 0;
 int cogparser_current_nodeidx;
 
-int yyparse();
-extern int linenum;
+//int yyparse();
+//extern int linenum;
 
 int* cogvm_stack;
 int cogvm_stackpos = 0;
@@ -175,8 +175,8 @@ int cogparser_recurse_write(sith_cog_parser_node* node)
 
 int cog_parsescript()
 {
-    linenum = 1;
-    if (yyparse())
+    //linenum = 1;
+    //if (yyparse())
         goto error;
     
     printf("Performing second pass...\n");
@@ -210,7 +210,7 @@ int cog_parsescript()
     return 1;
 
 error:
-    printf("Error while parsing line %u\n", linenum);
+    //printf("Error while parsing line %u\n", linenum);
     if (cogparser_topnode)
     {
         cogparser_current_nodeidx = 0;

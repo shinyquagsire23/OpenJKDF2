@@ -181,7 +181,20 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_SetMsgFunc_ADDR, sithCogVm_SetMsgFunc);
     hook_function(sithCogVm_Set104_ADDR, sithCogVm_Set104);
     hook_function(sithCogVm_InvokeMsgByIdx_ADDR, sithCogVm_InvokeMsgByIdx);
+    hook_function(sithCogVm_ClearMsgTmpBuf_ADDR, sithCogVm_ClearMsgTmpBuf);
     hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
+    hook_function(sithCogVm_ExecCog_ADDR, sithCogVm_ExecCog);
+    hook_function(sithCogVm_PopValue_ADDR, sithCogVm_PopValue);
+    hook_function(sithCogVm_PopFlex_ADDR, sithCogVm_PopFlex);
+    hook_function(sithCogVm_PopInt_ADDR, sithCogVm_PopInt);
+    hook_function(sithCogVm_PopSymbolIdx_ADDR, sithCogVm_PopSymbolIdx);
+    hook_function(sithCogVm_PopVector3_ADDR, sithCogVm_PopVector3);
+    hook_function(sithCogVm_PopCog_ADDR, sithCogVm_PopCog);
+    hook_function(sithCogVm_PopThing_ADDR, sithCogVm_PopThing);
+    hook_function(sithCogVm_PopTemplate_ADDR, sithCogVm_PopTemplate);
+    hook_function(sithCogVm_PopMaterial_ADDR, sithCogVm_PopMaterial);
+    hook_function(sithCogVm_PopKeyframe_ADDR, sithCogVm_PopKeyframe);
+    hook_function(sithCogVm_PopString_ADDR, sithCogVm_PopString);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);

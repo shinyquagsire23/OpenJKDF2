@@ -31,13 +31,6 @@
 #define sithCogParse_ParseVector_ADDR (0x004FE280)
 #define sithCogParse_ParseMessage_ADDR (0x004FE4D0)
 
-typedef struct cogSymbol
-{
-    int type;
-    int val;
-    int func;
-} cogSymbol;
-
 typedef struct sith_cog_parser_node sith_cog_parser_node;
 
 typedef struct sith_cog_parser_node 

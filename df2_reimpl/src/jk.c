@@ -186,7 +186,7 @@ int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
 void (*cog_verb_register)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...) = (void*)0x426D80;
 hashmap_entry* (*hashmap_create_entry)(void* map, char* str) = (void*)0x4FD260;
-cog_entry* (*hashmap_set_entry)(hashmap_entry* map, cog_entry* val) = (void*)0x4FD350;
+cogSymbol* (*hashmap_set_entry)(hashmap_entry* map, cogSymbol* val) = (void*)0x4FD350;
 
 int _memcmp (const void* str1, const void* str2, size_t count)
 {

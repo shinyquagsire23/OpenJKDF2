@@ -3,7 +3,9 @@
 
 #include "Primitives/rdVector.h"
 #include "Engine/rdKeyframe.h"
-#include "sithCog.h"
+#include "sithCogScript.h"
+#include "World/sithThing.h"
+#include "Engine/rdMaterial.h"
 #include <stdint.h>
 
 #define sithCogVm_Startup_ADDR (0x004E1700)
@@ -23,7 +25,7 @@
 #define sithCogVm_PopValue_ADDR (0x004E2440)
 #define sithCogVm_PopFlex_ADDR (0x004E24F0)
 #define sithCogVm_PopInt_ADDR (0x004E25C0)
-#define sithCogVm_PopUnk_ADDR (0x004E2690)
+#define sithCogVm_PopSymbolIdx_ADDR (0x004E2690)
 #define sithCogVm_PopVector3_ADDR (0x004E26E0)
 #define sithCogVm_PopCog_ADDR (0x004E27B0)
 #define sithCogVm_PopThing_ADDR (0x004E28C0)
@@ -35,21 +37,109 @@
 #define sithCogVm_PopModel3_ADDR (0x004E2EB0)
 #define sithCogVm_PopKeyframe_ADDR (0x004E2FB0)
 #define sithCogVm_PopAIClass_ADDR (0x004E30B0)
-#define sithCogVm_PopUnk2_ADDR (0x004E31B0)
+#define sithCogVm_PopSymbolFunc_ADDR (0x004E31B0)
 #define sithCogVm_PopString_ADDR (0x004E3260)
 
 #define sithCogVm_PushVar_ADDR (0x004E32D0)
 #define sithCogVm_PushInt_ADDR (0x004E3340)
 #define sithCogVm_PushFlex_ADDR (0x004E33C0)
 #define sithCogVm_PushVector3_ADDR (0x004E3450)
-#define sithCogVm_StackPopVal_ADDR (0x004E34E0)
+#define sithCogVm_PopProgramVal_ADDR (0x004E34E0)
 #define sithCogVm_sub_4E3510_ADDR (0x004E3510)
 #define sithCogVm_Call_ADDR (0x004E3530)
 #define sithCogVm_Ret_ADDR (0x004E3590)
 #define sithCogVm_PopStackVar_ADDR (0x004E35E0)
 #define sithCogVm_BitOperation_ADDR (0x004E3630)
 #define sithCogVm_MathOperation_ADDR (0x004E3870)
-#define sithCogVm_GetSymbolIdk_ADDR (0x004E3B90)
+#define sithCogVm_AssignStackVar_ADDR (0x004E3B90)
+
+#define COGVM_FLAG_TRACE (1)
+#define COGVM_FLAG_IDK   (2)
+
+enum COGFLAGS
+{
+    COGFLAGS_TRACE = 1,
+    COGFLAGS_PAUSED = 2,
+};
+
+enum COGMSG_ID
+{
+    COGMSG_TELEPORTTHING  = 1,
+    COGMSG_CHAT      = 2,
+    COGMSG_SYNCSECTORALT  = 3,
+    COGMSG_FIREPROJECTILE  = 4,
+    COGMSG_DEATH     = 5,
+    COGMSG_DAMAGE    = 6,
+    COGMSG_SETTHINGMODEL  = 7,
+    COGMSG_SENDTRIGGER  = 8,
+    COGMSG_PLAYKEY   = 9,
+    COGMSG_PLAYSOUNDPOS  = 10,
+    COGMSG_SYNCTHING  = 11,
+    COGMSG_SYNCTHINGFULL  = 12,
+    COGMSG_SYNCCOG   = 13,
+    COGMSG_SYNCSURFACE  = 14,
+    COGMSG_SYNCAI    = 15,
+    COGMSG_SYNCITEMDESC  = 16,
+    COGMSG_STOPANIM  = 17,
+    COGMSG_SYNCSECTOR  = 18,
+    COGMSG_OPENDOOR  = 19,
+    COGMSG_SYNCTHINGFRAME  = 20,
+    COGMSG_SYNCPUPPET  = 21,
+    COGMSG_SYNCTHINGATTACHMENT  = 22,
+    COGMSG_SYNCTIMERS  = 23,
+    COGMSG_SYNCCAMERAS  = 24,
+    COGMSG_TAKEITEM1  = 25,
+    COGMSG_TAKEITEM2  = 26,
+    COGMSG_STOPKEY   = 27,
+    COGMSG_STOPSOUND  = 28,
+    COGMSG_CREATETHING  = 29,
+    COGMSG_SYNCPALEFFECTS  = 30,
+    COGMSG_ID_1F     = 31,
+    COGMSG_LEAVEJOIN  = 32,
+    COGMSG_JOINLEAVE  = 33,
+    COGMSG_REQUESTCONNECT  = 34,
+    COGMSG_DESTROYTHING  = 35,
+    COGMSG_JOINING   = 36,
+    COGMSG_SOUNDCLASSPLAY  = 37,
+    COGMSG_PING      = 38,
+    COGMSG_PINGREPLY  = 39,
+    COGMSG_RESET     = 40,
+    COGMSG_ENUMPLAYERS  = 41,
+    COGMSG_KICK      = 42,
+    COGMSG_ID_2B     = 43,
+    COGMSG_ID_2C     = 44,
+    COGMSG_ID_2D     = 45,
+    COGMSG_ID_2E     = 46,
+    COGMSG_ID_2F     = 47,
+    COGMSG_JKENABLESABER  = 48,
+    COGMSG_SABERINFO3  = 49,
+    COGMSG_ID_32     = 50,
+    COGMSG_ID_33     = 51,
+    COGMSG_ID_34     = 52,
+    COGMSG_HUDTARGET  = 53,
+    COGMSG_ID_36     = 54,
+    COGMSG_JKPRINTUNISTRING  = 55,
+    COGMSG_ENDLEVEL  = 56,
+    COGMSG_SABERINFO1  = 57,
+    COGMSG_SABERINFO2  = 58,
+    COGMSG_JKSETWEAPONMESH  = 59,
+    COGMSG_SETTEAM   = 60,
+    COGMSG_61        = 61
+};
+
+enum SENDERTYPE
+{
+    SENDERTYPE_0     = 0,
+    SENDERTYPE_SYSTEM  = 1,
+    SENDERTYPE_2     = 2,
+    SENDERTYPE_THING  = 3,
+    SENDERTYPE_4     = 4,
+    SENDERTYPE_SECTOR  = 5,
+    SENDERTYPE_SURFACE  = 6,
+    SENDERTYPE_7     = 7,
+    SENDERTYPE_8     = 8,
+    SENDERTYPE_COG   = 9
+};
 
 enum COG_TYPE
 {
@@ -171,7 +261,65 @@ typedef struct cogMsg_Entry
     uint32_t field_824;
 } cogMsg_Entry;
 
-#define sithCogVm_MsgTmpBuf (*(cogMsg_Entry**)0xcogMsg_Entry)
+typedef struct sithCogCallstack
+{
+    uint32_t pc;
+    uint32_t script_running;
+    uint32_t waketimeMs;
+    uint32_t trigId;
+} sithCogCallstack;
+
+typedef struct sithCogStackvar
+{
+    uint32_t type;
+    union
+    {
+        uint32_t data[3];
+        float dataAsFloat[3];
+    };
+} sithCogStackvar;
+
+typedef struct sithCog sithCog;
+typedef void (__cdecl *cogSymbolFunc_t)(sithCog *);
+
+typedef struct cogSymbol
+{
+    int type;
+    int val;
+    cogSymbolFunc_t func;
+} cogSymbol;
+
+typedef struct sithCog sithCog;
+
+typedef struct sithCog
+{
+    sithCogScript* cogscript;
+    uint32_t flags;
+    sithCog* selfCog;
+    uint32_t script_running;
+    uint32_t cogscript_pc;
+    uint32_t wakeTimeMs;
+    uint32_t field_18;
+    uint32_t field_1C;
+    uint32_t field_20;
+    uint32_t senderId;
+    uint32_t senderRef;
+    uint32_t senderType;
+    uint32_t sourceRef;
+    uint32_t sourceType;
+    uint32_t trigId;
+    float params[4];
+    float returnEx;
+    sithCogCallstack callstack[4];
+    uint32_t calldepth;
+    sithCogSymboltable* symbolTable;
+    sithCogStackvar stack[64];
+    uint32_t stackPos;
+    char cogscript_fpath[32];
+    char field_4BC[4104];
+} sithCog;
+
+#define sithCogVm_MsgTmpBuf (*(cogMsg_Entry**)0x837468)
 #define sithCogVm_jkl_map_idk (*(jkl_map_idk*)0x00847968)
 #define sithCogVm_globals (*(sithCogVmGlobals*)0x00847D68)
 #define sithCogVm_idk (*(int*)0x00847E6C)
@@ -188,26 +336,43 @@ void sithCogVm_SetMsgFunc(int msgid, void *func);
 
 void sithCogVm_Set104();
 int sithCogVm_InvokeMsgByIdx(net_msg *a1);
+void sithCogVm_ClearMsgTmpBuf();
 
 void sithCogVm_Exec(sithCog *cog_ctx);
+void sithCogVm_ExecCog(sithCog *ctx, int trigIdx);
+int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar);
+float sithCogVm_PopFlex(sithCog *ctx);
+int sithCogVm_PopInt(sithCog *ctx);
+int sithCogVm_PopSymbolIdx(sithCog *ctx);
+int sithCogVm_PopVector3(sithCog *ctx, rdVector3* out);
+sithCog* sithCogVm_PopCog(sithCog *ctx);
+sithThing* sithCogVm_PopThing(sithCog *ctx);
+sithThing* sithCogVm_PopTemplate(sithCog *ctx);
+rdMaterial* sithCogVm_PopMaterial(sithCog *ctx);
+rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx);
+char* sithCogVm_PopString(sithCog *ctx);
+void sithCogVm_MathOperation(sithCog *cog_ctx, int op);
+void sithCogVm_BitOperation(sithCog *cog_ctx, int op);
 
 static void (__cdecl *sithCogVm_Ret)(sithCog *cog) = (void*)sithCogVm_Ret_ADDR;
 static void (__cdecl *sithCogVm_Call)(sithCog *cog) = (void*)sithCogVm_Call_ADDR;
 
-static int (__cdecl *sithCogVm_StackPopVal)(sithCog *cog) = (void*)sithCogVm_StackPopVal_ADDR;
+static int (__cdecl *sithCogVm_PopProgramVal)(sithCog *cog) = (void*)sithCogVm_PopProgramVal_ADDR;
 static int (__cdecl *sithCogVm_PopStackVar)(sithCog *cog, sithCogStackvar *out) = (void*)sithCogVm_PopStackVar_ADDR;
-static sithCogStackvar* (__cdecl *sithCogVm_GetSymbolIdk)(sithCogStackvar *a1, int a2, sithCogStackvar *a3) = (void*)sithCogVm_GetSymbolIdk_ADDR;
-static void (__cdecl *sithCogVm_MathOperation)(sithCog *cog, int op) = (void*)sithCogVm_MathOperation_ADDR;
-static void (__cdecl *sithCogVm_BitOperation)(sithCog *cog, int op) = (void*)sithCogVm_BitOperation_ADDR;
-static int (__cdecl *sithCogVm_PopValue)(sithCog *ctx, int *out) = (void*)sithCogVm_PopValue_ADDR;
-static float (__cdecl *sithCogVm_PopFlex)(sithCog *ctx) = (void*)sithCogVm_PopFlex_ADDR;
-static int (__cdecl *sithCogVm_PopInt)(sithCog *ctx) = (void*)sithCogVm_PopInt_ADDR;
-static int (__cdecl *sithCogVm_PopVector3)(sithCog *ctx, rdVector3* out) = (void*)sithCogVm_PopVector3_ADDR;
-static char* (__cdecl *sithCogVm_PopString)(sithCog *ctx) = (void*)sithCogVm_PopString_ADDR;
+static sithCogStackvar* (__cdecl *sithCogVm_AssignStackVar)(sithCogStackvar *a1, int a2, sithCogStackvar *a3) = (void*)sithCogVm_AssignStackVar_ADDR;
+//static void (__cdecl *sithCogVm_MathOperation)(sithCog *cog, int op) = (void*)sithCogVm_MathOperation_ADDR;
+//static void (__cdecl *sithCogVm_BitOperation)(sithCog *cog, int op) = (void*)sithCogVm_BitOperation_ADDR;
+//static int (__cdecl *sithCogVm_PopValue)(sithCog *ctx, int *out) = (void*)sithCogVm_PopValue_ADDR;
+//static float (__cdecl *sithCogVm_PopFlex)(sithCog *ctx) = (void*)sithCogVm_PopFlex_ADDR;
+//static int (__cdecl *sithCogVm_PopInt)(sithCog *ctx) = (void*)sithCogVm_PopInt_ADDR;
+//static int (__cdecl *sithCogVm_PopVector3)(sithCog *ctx, rdVector3* out) = (void*)sithCogVm_PopVector3_ADDR;
+//static char* (__cdecl *sithCogVm_PopString)(sithCog *ctx) = (void*)sithCogVm_PopString_ADDR;
 static void* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_PopSurface_ADDR;
-static void* (__cdecl *sithCogVm_PopMaterial)(sithCog* ctx) = (void*)sithCogVm_PopMaterial_ADDR;
-static rdKeyframe* (__cdecl *sithCogVm_PopKeyframe)(sithCog* ctx) = (void*)sithCogVm_PopKeyframe_ADDR;
-static sithCog* (__cdecl *sithCogVm_PopCog)(sithCog* ctx) = (void*)sithCogVm_PopCog_ADDR;
+//static void* (__cdecl *sithCogVm_PopMaterial)(sithCog* ctx) = (void*)sithCogVm_PopMaterial_ADDR;
+//static rdKeyframe* (__cdecl *sithCogVm_PopKeyframe_)(sithCog* ctx) = (void*)sithCogVm_PopKeyframe_ADDR;
+//static sithCog* (__cdecl *sithCogVm_PopCog)(sithCog* ctx) = (void*)sithCogVm_PopCog_ADDR;
+//static int (__cdecl *sithCogVm_PopSymbolIdx)(sithCog *ctx) = (void*)sithCogVm_PopSymbolIdx_ADDR;
+static cogSymbolFunc_t (__cdecl *sithCogVm_PopSymbolFunc)(sithCog *cog_ctx) = (void*)sithCogVm_PopSymbolFunc_ADDR;
 
 static void (__cdecl *sithCogVm_PushVar)(sithCog *ctx, sithCogStackvar *val) = (void*)sithCogVm_PushVar_ADDR;
 static void (__cdecl *sithCogVm_PushInt)(sithCog *ctx, int val) = (void*)sithCogVm_PushInt_ADDR;

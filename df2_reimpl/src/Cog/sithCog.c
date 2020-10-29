@@ -9,6 +9,8 @@
 #include "sithCogSurface.h"
 #include "sithCogSector.h"
 #include "sithCogSound.h"
+#include "sithCogVm.h"
+#include "sithCogParse.h"
 #include "jkCog.h"
 
 #include "General/stdHashTable.h"
@@ -38,7 +40,7 @@ int sithCog_Startup()
     hashmap_entry *v5; // eax
     hashmap_entry *v6; // eax
     hashmap_entry *v7; // eax
-    struct cog_entry a2; // [esp+8h] [ebp-10h]
+    struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
     g_cog_symboltable_hashmap = cog_alloc_symboltable(512);
     if (!g_cog_symboltable_hashmap )

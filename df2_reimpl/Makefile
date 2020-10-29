@@ -4,7 +4,7 @@ TARGET := df2_reimpl.dll
 SRC := src
 OBJ := build
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -19,7 +19,7 @@ all: $(OBJ) $(TARGET)
 clean:
 	rm -rf $(OBJ)
 	rm -f $(TARGET)
-	rm $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 
 $(OBJ):
 	@mkdir -p $(OBJ)
