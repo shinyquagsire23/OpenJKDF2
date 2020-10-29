@@ -3,6 +3,7 @@
 
 #include "Primitives/rdVector.h"
 #include "Primitives/rdFace.h"
+#include "Engine/rdMaterial.h"
 
 #define rdModel3_RegisterLoader_ADDR (0x00443DA0)
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)
@@ -28,6 +29,63 @@
 #define rdModel3_DrawMesh_ADDR (0x00446110)
 #define rdModel3_DrawFace_ADDR (0x00446580)
 
-static void (*rdModel3_ClearFrameCounters)(void) = rdModel3_ClearFrameCounters_ADDR;
+typedef struct rdThing rdThing;
+typedef struct rdHierarchyNode rdHierarchyNode;
+
+typedef struct rdHierarchyNode
+{
+    char name[32];
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t flags;
+    uint32_t idx;
+    int type;
+    void* mesh; // rdMesh
+    rdHierarchyNode* parent;
+    uint32_t numChildren;
+    rdHierarchyNode* child;
+    rdHierarchyNode* nextSibling;
+    rdVector3 pivot;
+    rdVector3 pos;
+    rdVector3 rot;
+    rdMatrix34 posRotMatrix;
+} rdHierarchyNode;
+
+typedef struct rdModel3
+{
+    char filename[32];
+    int id;
+    uint32_t num_meshes;
+    void* meshes_alloc; // rdMesh*
+    uint32_t sortingMethod;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t field_40;
+    uint32_t num_geosets;
+    rdMaterial* materials_alloc;
+    uint32_t num_materials;
+    uint32_t field_50;
+    uint32_t numHierarchyNodes;
+    rdHierarchyNode* hierarchyNodes;
+    float radius;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    rdVector3 insert_offset;
+} rdModel3;
+
+static void (*rdModel3_ClearFrameCounters)(void) = (void*)rdModel3_ClearFrameCounters_ADDR;
+static void (*rdModel3_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdModel3_Draw_ADDR;
 
 #endif // _RDMODEL3_H

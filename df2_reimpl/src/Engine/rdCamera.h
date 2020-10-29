@@ -28,6 +28,8 @@
 #define rdCamera_ClearLights_ADDR (0x00443CF0)
 #define rdCamera_AdvanceFrame_ADDR (0x00443D10)
 
+typedef void rdCamera;
+
 static void (*rdCamera_AdvanceFrame)(void) = rdCamera_AdvanceFrame_ADDR;
 
 

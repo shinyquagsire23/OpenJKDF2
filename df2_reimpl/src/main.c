@@ -22,6 +22,8 @@
 #include "Engine/rdMaterial.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdClip.h"
+#include "Engine/rdCanvas.h"
+#include "Engine/rdThing.h"
 #include "Engine/sithTime.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdMatrix.h"
@@ -465,6 +467,25 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdFace_NewEntry_ADDR, rdFace_NewEntry);
     hook_function(rdFace_Free_ADDR, rdFace_Free);
     hook_function(rdFace_FreeEntry_ADDR, rdFace_FreeEntry);
+    
+    // rdCanvas
+    hook_function(rdCanvas_New_ADDR, rdCanvas_New);
+    hook_function(rdCanvas_NewEntry_ADDR, rdCanvas_NewEntry);
+    hook_function(rdCanvas_Free_ADDR, rdCanvas_Free);
+    hook_function(rdCanvas_FreeEntry_ADDR, rdCanvas_FreeEntry);
+    
+    // rdThing
+    hook_function(rdThing_New_ADDR, rdThing_New);
+    hook_function(rdThing_NewEntry_ADDR, rdThing_NewEntry);
+    hook_function(rdThing_Free_ADDR, rdThing_Free);
+    hook_function(rdThing_FreeEntry_ADDR, rdThing_FreeEntry);
+    hook_function(rdThing_SetModel3_ADDR, rdThing_SetModel3);
+    hook_function(rdThing_SetCamera_ADDR, rdThing_SetCamera);
+    hook_function(rdThing_SetLight_ADDR, rdThing_SetLight);
+    hook_function(rdThing_SetSprite3_ADDR, rdThing_SetSprite3);
+    hook_function(rdThing_SetPolyline_ADDR, rdThing_SetPolyline);
+    hook_function(rdThing_Draw_ADDR, rdThing_Draw);
+    hook_function(rdThing_AccumulateMatrices_ADDR, rdThing_AccumulateMatrices);
     
     // rdMatrix
     hook_function(rdMatrix_Build34_ADDR, rdMatrix_Build34);

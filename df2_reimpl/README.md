@@ -26,10 +26,10 @@ Windows                        0x98       0.014%        0.000%
 jkGuiGeneral                   0xc5       0.018%        0.000%       
 daFree                         0xd2       0.019%        0.000%       
 sithActor                      0xea       0.022%        0.000%       
-rdFace                         0xf6       0.023%        0.000%       
+rdFace                         0xf6       0.023%        100.000%     
 jkGuiControlOptions            0x105      0.024%        0.000%       
 stdHashKey                     0x107      0.024%        41.825%      
-rdCanvas                       0x113      0.025%        0.000%       
+rdCanvas                       0x113      0.025%        100.000%     
 stdStr                         0x152      0.031%        0.000%       
 jkGuiEsc                       0x18f      0.037%        0.000%       
 stdHashtable                   0x1aa      0.039%        100.000%     
@@ -56,7 +56,7 @@ jkGuiDialog                    0x3e0      0.092%        0.000%
 sithModel                      0x3f1      0.093%        0.000%       
 stdres                         0x426      0.098%        0.000%       
 stdHashTable                   0x42c      0.099%        94.663%      
-rdThing                        0x42f      0.099%        0.000%       
+rdThing                        0x42f      0.099%        100.000%     
 stdGdi                         0x430      0.099%        0.000%       
 sithKeyFrame                   0x44e      0.102%        0.000%       
 stdPcx                         0x45e      0.104%        0.000%       
@@ -127,7 +127,7 @@ rdVector                       0xd29      0.312%        100.000%
 jkGuiMouse                     0xdb5      0.325%        0.000%       
 DirectDraw                     0xdd4      0.328%        0.000%       
 jkEpisode                      0xdd9      0.328%        0.000%       
-stdPlatform                    0xdde      0.329%        0.000%       
+stdPlatform                    0xdde      0.329%        4.930%       
 jkGui                          0xde3      0.329%        0.000%       
 sithCogPlayer                  0xdf0      0.331%        22.029%      
 sithUnk4                       0xdfd      0.332%        0.000%       
@@ -191,6 +191,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 5.212%
-
+Total completion: 5.376%
 ```
