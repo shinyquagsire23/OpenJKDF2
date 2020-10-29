@@ -3,6 +3,7 @@
 #include "Engine/rdroid.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
+#include "Win95/std.h"
 #include "jk.h"
 
 void rdKeyframe_RegisterLoader(keyframeLoader_t loader)

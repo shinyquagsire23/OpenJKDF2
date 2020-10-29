@@ -14,9 +14,6 @@
 #include "Primitives/rdVector.h"
 #include "General/stdConffile.h"
 #include "General/stdFnames.h"
-#include "Win95/stdGob.h"
-#include "Win95/stdMci.h"
-#include "Win95/stdConsole.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 #include "Engine/rdroid.h"
@@ -25,10 +22,15 @@
 #include "Engine/rdMaterial.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdClip.h"
+#include "Engine/sithTime.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdMatrix.h"
+#include "Primitives/rdFace.h"
 #include "World/sithWeapon.h"
-#include "Engine/sithTime.h"
+#include "Win95/std.h"
+#include "Win95/stdGob.h"
+#include "Win95/stdMci.h"
+#include "Win95/stdConsole.h"
 
 int yyparse();
 
@@ -282,6 +284,12 @@ __declspec(dllexport) void hook_init(void)
     // sithCogParse
     //hook_function(sithCogYACC_yyparse_ADDR, yyparse);
     
+    // std
+    hook_function(stdCalcBitPos_ADDR, stdCalcBitPos);
+    hook_function(stdReadRaw_ADDR, stdReadRaw);
+    hook_function(stdFGetc_ADDR, stdFGetc);
+    hook_function(stdFPutc_ADDR, stdFPutc);
+    
     // stdConffile
     hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
     hook_function(stdConffile_OpenWrite_ADDR, stdConffile_OpenWrite);
@@ -451,6 +459,12 @@ __declspec(dllexport) void hook_init(void)
     // rdClip
     hook_function(rdClip_Line2_ADDR, rdClip_Line2);
     hook_function(rdClip_CalcOutcode2_ADDR, rdClip_CalcOutcode2);
+    
+    // rdFace
+    hook_function(rdFace_New_ADDR, rdFace_New);
+    hook_function(rdFace_NewEntry_ADDR, rdFace_NewEntry);
+    hook_function(rdFace_Free_ADDR, rdFace_Free);
+    hook_function(rdFace_FreeEntry_ADDR, rdFace_FreeEntry);
     
     // rdMatrix
     hook_function(rdMatrix_Build34_ADDR, rdMatrix_Build34);

@@ -2,6 +2,7 @@
 #define _RDMODEL3_H
 
 #include "Primitives/rdVector.h"
+#include "Primitives/rdFace.h"
 
 #define rdModel3_RegisterLoader_ADDR (0x00443DA0)
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)
@@ -26,23 +27,6 @@
 #define rdModel3_DrawHNode_ADDR (0x00446090)
 #define rdModel3_DrawMesh_ADDR (0x00446110)
 #define rdModel3_DrawFace_ADDR (0x00446580)
-
-typedef struct rdFace
-{
-    uint32_t num;
-    uint32_t type;
-    uint32_t geometryMode;
-    uint32_t light;
-    uint32_t textureMode;
-    uint32_t num_verts;
-    uint32_t* vertexPosIdx;
-    uint32_t* vertexUVIdx;
-    void* material; // rdMaterial*
-    uint32_t field_24;
-    rdVector2 field_28;
-    float extralight;
-    rdVector3 normal;
-} rdFace;
 
 static void (*rdModel3_ClearFrameCounters)(void) = rdModel3_ClearFrameCounters_ADDR;
 

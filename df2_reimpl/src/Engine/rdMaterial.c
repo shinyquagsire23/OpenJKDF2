@@ -2,6 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/std.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
