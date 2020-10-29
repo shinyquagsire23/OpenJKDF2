@@ -24,8 +24,8 @@ typedef struct rdFace
 {
     int num;
     int type;
-    int geometryMode;
-    int lightMode;
+    int lightingMode;
+    int textureMode;
     int sortingMethod;
     int numVertices;
     int* vertexPosIdx;

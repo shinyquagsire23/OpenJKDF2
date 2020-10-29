@@ -3,20 +3,26 @@
 #include "Engine/rdroid.h"
 #include "Engine/rdCamera.h"
 #include "General/stdMath.h"
+#include "Engine/rdCache.h"
+#include "Engine/rdColormap.h"
+#include "Primitives/rdPrimit3.h"
 
-rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int geomode, int lightmode, int sortingmethod, float extraLight)
+rdVector3 polylineVerts[32]; // idk the size on this
+rdVector3 rdPolyLine_FaceVerts[32];
+
+rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight)
 {
     rdPolyLine* polyline;
 
     polyline = (rdPolyLine *)rdroid_pHS->alloc(sizeof(rdPolyLine));
     if (polyline)
     {
-        rdPolyLine_NewEntry(polyline, polyline_fname, material_fname, material_fname2, length, base_rad, tip_rad, geomode, lightmode, sortingmethod, extraLight);
+        rdPolyLine_NewEntry(polyline, polyline_fname, material_fname, material_fname2, length, base_rad, tip_rad, lightmode, texmode, sortingmethod, extraLight);
     }
     return polyline;
 }
 
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeGeomode, int edgeLightMode, int edgeSortingMethod, float extraLight)
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeLightingMode, int edgeTextureMode, int edgeSortingMethod, float extraLight)
 {
 
     rdMaterial *mat;
@@ -36,12 +42,12 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->baseRadius = base_rad;
     polyline->edgeFace.sortingMethod = edgeSortingMethod;
     polyline->sortingMethod = edgeSortingMethod;
-    polyline->lightMode = edgeLightMode;
+    polyline->textureMode = edgeTextureMode;
     polyline->tipRadius = tip_rad;
     polyline->edgeFace.type = 0;
-    polyline->edgeFace.geometryMode = edgeGeomode;
-    polyline->edgeFace.lightMode = edgeLightMode;
-    polyline->geoMode = edgeGeomode;
+    polyline->edgeFace.lightingMode = edgeLightingMode;
+    polyline->edgeFace.textureMode = edgeTextureMode;
+    polyline->lightingMode = edgeLightingMode;
     polyline->edgeFace.extralight = extraLight;
 
     polyline->edgeFace.material = rdMaterial_Load(material_side_fname, 0, 0);
@@ -55,7 +61,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     numVertices = polyline->edgeFace.numVertices;
     for (int i = 0; i < numVertices; ++vertexPosIdx )
         *vertexPosIdx = i++;
-    if ( polyline->edgeFace.geometryMode >= 4 )
+    if ( polyline->edgeFace.lightingMode >= 4 )
     {
         vertexUVIdx = (int *)rdroid_pHS->alloc(4 * numVertices);
         polyline->edgeFace.vertexUVIdx = vertexUVIdx;
@@ -79,11 +85,11 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     }
     polyline->tipFace.sortingMethod = edgeSortingMethod;
     polyline->sortingMethod = edgeSortingMethod;
-    polyline->lightMode = edgeLightMode;
+    polyline->textureMode = edgeTextureMode;
     polyline->tipFace.type = 0;
-    polyline->tipFace.geometryMode = edgeGeomode;
-    polyline->tipFace.lightMode = edgeLightMode;
-    polyline->geoMode = edgeGeomode;
+    polyline->tipFace.lightingMode = edgeLightingMode;
+    polyline->tipFace.textureMode = edgeTextureMode;
+    polyline->lightingMode = edgeLightingMode;
     polyline->tipFace.extralight = extraLight;
     polyline->tipFace.material = rdMaterial_Load(material_tip_fname, 0, 0);
     if ( !polyline->tipFace.material )
@@ -95,7 +101,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         return 0;
     for (int k = 0; k < polyline->tipFace.numVertices; ++vertexPosIdx )
         *vertexPosIdx = k++;
-    if ( polyline->tipFace.geometryMode >= 4 )
+    if ( polyline->tipFace.lightingMode >= 4 )
     {
         vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
         polyline->tipFace.vertexUVIdx = vertexUVIdx;
@@ -162,8 +168,6 @@ void rdPolyLine_FreeEntry(rdPolyLine *polyline)
         polyline->edgeFace.vertexUVIdx = 0;
     }
 }
-
-rdVector3 polylineVerts[10]; // idk the size on this
 
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 {
@@ -255,4 +259,156 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     idxInfo.extraUV = polyline->extraUVTipMaybe;
     rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     return 1;
+}
+
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
+{
+    rdProcEntry *procEntry;
+    int lightingMode;
+    int sortingMethod;
+    rdMeshinfo mesh_out;
+    float staticLight;
+
+    procEntry = rdCache_GetProcEntry();
+    if (!procEntry)
+        return;
+
+    mesh_out.verticesProjected = rdPolyLine_FaceVerts;
+    mesh_out.verticesOrig = procEntry->vertices;
+    mesh_out.vertices_uvs_in_pixels_ = procEntry->vertices_uvs_in_pixels;
+    mesh_out.vertex_lights_maybe_ = procEntry->vertex_lights_maybe;
+    
+    idxInfo->numVertices = face->numVertices;
+    idxInfo->vertexPosIdx = face->vertexPosIdx;
+    idxInfo->vertexUVIdx = face->vertexUVIdx;
+    
+    if ( rdroid_curLightingMode >= face->lightingMode )
+        rdroid_curLightingMode = face->lightingMode;
+    lightingMode = thing->lightingMode;
+    if ( rdroid_curLightingMode < thing->lightingMode )
+    {
+        if ( rdroid_curLightingMode >= face->lightingMode )
+            lightingMode = face->lightingMode;
+        else
+            lightingMode = rdroid_curLightingMode;
+    }
+    
+    procEntry->lightingMode = lightingMode;
+    if ( rdroid_curGeometryMode & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    {
+        procEntry->textureMode = 0;
+    }
+    else
+    {
+        if ( rdroid_curTextureMode >= face->textureMode )
+            rdroid_curTextureMode = face->textureMode;
+        if ( rdroid_curTextureMode >= thing->textureMode )
+        {
+            face->textureMode = thing->textureMode;
+        }
+        else if ( rdroid_curTextureMode < face->textureMode )
+        {
+            face->textureMode = rdroid_curTextureMode;
+        }
+        procEntry->textureMode = face->textureMode;
+    }
+    
+    if ( rdroid_curSortingMethod >= face->sortingMethod )
+        rdroid_curSortingMethod = face->sortingMethod;
+    sortingMethod = thing->sortingMethod;
+    if ( rdroid_curSortingMethod < sortingMethod )
+    {
+        if ( rdroid_curSortingMethod >= face->sortingMethod )
+            sortingMethod = face->sortingMethod;
+        else
+            sortingMethod = rdroid_curSortingMethod;
+    }
+    
+    procEntry->sortingMethod = sortingMethod;
+    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, lightingMode, procEntry->textureMode, sortingMethod, idxInfo, &mesh_out, &face->field_28);
+    if ( mesh_out.num_vertices < 3 )
+        return;
+
+    rdCamera_pCurCamera->projectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.num_vertices);
+
+    if ( rdroid_curGeometryMode & 2 )
+        procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
+    else
+        procEntry->ambientLight = 0.0;
+
+    if ( procEntry->textureMode )
+    {
+        if ( procEntry->ambientLight < 1.0 )
+        {
+            if ( procEntry->textureMode == 2 )
+            {
+                if ( procEntry->light_level_static < 1.0 || rdColormap_pCurMap != rdColormap_pIdentityMap )
+                {
+                    if ( procEntry->light_level_static <= 0.0 )
+                        procEntry->textureMode = 1;
+                }
+                else
+                {
+                    procEntry->textureMode = 0;
+                }
+            }
+            else if ( procEntry->textureMode == 3 )
+            {
+                int i;
+                staticLight = *procEntry->vertex_lights_maybe;
+                for (i = 1; i < mesh_out.num_vertices; i++)
+                {
+                    if ( procEntry->vertex_lights_maybe[i] != staticLight )
+                        break;
+                }
+                if ( i == mesh_out.num_vertices )
+                {
+                    if ( staticLight == 1.0 )
+                    {
+                        if ( rdColormap_pCurMap == rdColormap_pIdentityMap )
+                        {
+                            procEntry->textureMode = 0;
+                        }
+                        else
+                        {
+                            procEntry->textureMode = 2;
+                            procEntry->light_level_static = 1.0;
+                        }
+                    }
+                    else if ( staticLight == 0.0 )
+                    {
+                        procEntry->textureMode = 1;
+                        procEntry->light_level_static = 0.0;
+                    }
+                    else
+                    {
+                        procEntry->textureMode = 2;
+                        procEntry->light_level_static = staticLight;
+                    }
+                }
+            }
+        }
+        else if ( rdColormap_pCurMap == rdColormap_pIdentityMap )
+        {
+            procEntry->textureMode = 0;
+        }
+        else
+        {
+            procEntry->textureMode = 2;
+            procEntry->light_level_static = 1.0;
+        }
+    }
+    
+    int procFaceFlags = 1;
+    if ( procEntry->lightingMode >= 4 )
+        procFaceFlags = 3;
+    if ( procEntry->textureMode >= 3 )
+        procFaceFlags |= 4u;
+
+    procEntry->light_flags = 0;
+    procEntry->sith_tex_3_idx_2 = thing->gap2C;
+    procEntry->type = face->type;
+    procEntry->extralight = face->extralight;
+    procEntry->material = face->material;
+    rdCache_AddProcFace(0, mesh_out.num_vertices, procFaceFlags);
 }

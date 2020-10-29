@@ -18,8 +18,8 @@ typedef struct rdPolyLine
     float length;
     float baseRadius;
     float tipRadius;
-    uint32_t geoMode;
-    uint32_t lightMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
     uint32_t sortingMethod;
     rdFace edgeFace;
     rdFace tipFace;
@@ -28,12 +28,13 @@ typedef struct rdPolyLine
 }
 rdPolyLine;
 
-rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int geomode, int lightmode, int sortingmethod, float extraLight);
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeGeomode, int edgeLightMode, int edgeSortingMethod, float extraLight);
+rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight);
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeLightingMode, int edgeTextureMode, int edgeSortingMethod, float extraLight);
 void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);
 
-static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo);
+//static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
 
 #endif // _RDPOLYLINE_H
