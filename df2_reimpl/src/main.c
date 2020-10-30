@@ -398,6 +398,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdShutdown_ADDR, rdShutdown);
     hook_function(rdOpen_ADDR, rdOpen);
     hook_function(rdClose_ADDR, rdClose);
+    hook_function(rdSetRenderOptions_ADDR, rdSetRenderOptions);
     hook_function(rdSetGeometryMode_ADDR, rdSetGeometryMode);
     hook_function(rdSetLightingMode_ADDR, rdSetLightingMode);
     hook_function(rdSetTextureMode_ADDR, rdSetTextureMode);
@@ -406,7 +407,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdSetZBufferMethod_ADDR, rdSetZBufferMethod);
     hook_function(rdSetCullFlags_ADDR, rdSetCullFlags);
     hook_function(rdSetProcFaceUserData_ADDR, rdSetProcFaceUserData);
-    hook_function(rdSetVertexColorMode_ADDR, rdSetVertexColorMode);
+    hook_function(rdGetRenderOptions_ADDR, rdGetRenderOptions);
     hook_function(rdGetGeometryMode_ADDR, rdGetGeometryMode);
     hook_function(rdGetLightingMode_ADDR, rdGetLightingMode);
     hook_function(rdGetTextureMode_ADDR, rdGetTextureMode);
@@ -415,7 +416,6 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdGetZBufferMethod_ADDR, rdGetZBufferMethod);
     hook_function(rdGetCullFlags_ADDR, rdGetCullFlags);
     hook_function(rdGetProcFaceUserData_ADDR, rdGetProcFaceUserData);
-    hook_function(rdGetVertexColorMode_ADDR, rdGetVertexColorMode);
     hook_function(rdSetMipDistances_ADDR, rdSetMipDistances);
     hook_function(rdSetColorEffects_ADDR, rdSetColorEffects);
     hook_function(rdAdvanceFrame_ADDR, rdAdvanceFrame);
@@ -486,8 +486,24 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdModel3_ClearFrameCounters_ADDR, rdModel3_ClearFrameCounters);
     hook_function(rdModel3_NewEntry_ADDR, rdModel3_NewEntry);
     hook_function(rdModel3_New_ADDR, rdModel3_New);
-    hook_function(rdModel3_Free_ADDR, rdModel3_Free);
     hook_function(rdModel3_Load_ADDR, rdModel3_Load);
+    hook_function(rdModel3_LoadPostProcess_ADDR, rdModel3_LoadPostProcess);
+    hook_function(rdModel3_WriteText_ADDR, rdModel3_WriteText);
+    hook_function(rdModel3_Free_ADDR, rdModel3_Free);
+    hook_function(rdModel3_FreeEntry_ADDR, rdModel3_FreeEntry);
+    hook_function(rdModel3_FreeEntryGeometryOnly_ADDR, rdModel3_FreeEntryGeometryOnly);
+    hook_function(rdModel3_Validate_ADDR, rdModel3_Validate);
+    hook_function(rdModel3_CalcBoundingBoxes_ADDR, rdModel3_CalcBoundingBoxes);
+    hook_function(rdModel3_BuildExpandedRadius_ADDR, rdModel3_BuildExpandedRadius);
+    hook_function(rdModel3_CalcFaceNormals_ADDR, rdModel3_CalcFaceNormals);
+    //hook_function(rdModel3_CalcVertexNormals_ADDR, rdModel3_CalcVertexNormals);
+    hook_function(rdModel3_FindNamedNode_ADDR, rdModel3_FindNamedNode);
+    hook_function(rdModel3_GetMeshMatrix_ADDR, rdModel3_GetMeshMatrix);
+    hook_function(rdModel3_ReplaceMesh_ADDR, rdModel3_ReplaceMesh);
+    hook_function(rdModel3_Draw_ADDR, rdModel3_Draw);
+    hook_function(rdModel3_DrawHNode_ADDR, rdModel3_DrawHNode);
+    hook_function(rdModel3_DrawMesh_ADDR,rdModel3_DrawMesh);
+    hook_function(rdModel3_DrawFace_ADDR,rdModel3_DrawFace);
     
     // rdThing
     hook_function(rdThing_New_ADDR, rdThing_New);

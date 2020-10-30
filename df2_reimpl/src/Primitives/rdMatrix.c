@@ -4,15 +4,15 @@
 #include <math.h>
 #include "General/stdMath.h"
 
-rdMatrix34 rdroid_identMatrix34 = {{1.0, 0.0, 0.0}, 
-                                   {0.0, 1.0, 0.0}, 
-                                   {0.0, 0.0, 1.0},
-                                   {0.0, 0.0, 0.0}};
+const rdMatrix34 rdroid_identMatrix34 = {{1.0, 0.0, 0.0}, 
+                                         {0.0, 1.0, 0.0}, 
+                                         {0.0, 0.0, 1.0},
+                                         {0.0, 0.0, 0.0}};
 
-rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
-                                   {0.0, 1.0, 0.0, 0.0}, 
-                                   {0.0, 0.0, 1.0, 0.0}, 
-                                   {0.0, 0.0, 0.0, 1.0}};
+const rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
+                                         {0.0, 1.0, 0.0, 0.0}, 
+                                         {0.0, 0.0, 1.0, 0.0}, 
+                                         {0.0, 0.0, 0.0, 1.0}};
 
 void rdMatrix_Build34(rdMatrix34 *out, rdVector3 *rot, rdVector3 *pos)
 {

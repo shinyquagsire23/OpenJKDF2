@@ -2,6 +2,7 @@
 #define _RDCLIP_H
 
 #include "rdCanvas.h"
+#include "Primitives/rdVector.h"
 
 #define rdClip_Line2_ADDR (0x0046D6F0)
 #define rdClip_CalcOutcode2_ADDR (0x0046DA10)
@@ -21,6 +22,8 @@
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
 
+typedef struct rdClipFrustum rdClipFrustum;
+
 enum CLIP_OUTCODE
 {
     CLIP_LEFT = 0x1,
@@ -31,5 +34,7 @@ enum CLIP_OUTCODE
 
 int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
 int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);
+
+static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
 
 #endif // _RDCLIP_H

@@ -18,9 +18,9 @@ typedef struct rdPolyLine
     float length;
     float baseRadius;
     float tipRadius;
+    uint32_t geometryMode;
     uint32_t lightingMode;
     uint32_t textureMode;
-    uint32_t sortingMethod;
     rdFace edgeFace;
     rdFace tipFace;
     rdVector2* extraUVTipMaybe;
@@ -29,7 +29,7 @@ typedef struct rdPolyLine
 rdPolyLine;
 
 rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight);
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeLightingMode, int edgeTextureMode, int edgeSortingMethod, float extraLight);
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeGeometryMode, int edgeLightingMode, int edgeTextureMode, float extraLight);
 void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);

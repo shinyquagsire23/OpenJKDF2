@@ -22,5 +22,6 @@
 #define rdPuppet_BuildJointMatrices_ADDR (0x0043EEB0)
 
 static void (__cdecl *rdPuppet_Free)(void* pup) = (void*)rdPuppet_Free_ADDR;
+static void (__cdecl *rdPuppet_BuildJointMatrices)(rdThing *thing_1, rdMatrix34 *matrix) = rdPuppet_BuildJointMatrices_ADDR;
 
 #endif // _RDPUPPET_H

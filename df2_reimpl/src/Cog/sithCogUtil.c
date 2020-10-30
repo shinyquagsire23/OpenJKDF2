@@ -291,7 +291,7 @@ void sithCogUtil_VectorSub(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &inA);
     sithCogVm_PopVector3(ctx, &inB);
-    rdVector_Sub3(&out, &inA, &inB);
+    rdVector_Sub3(&out, &inB, &inA);
     sithCogVm_PushVector3(ctx, &out);
 }
 

@@ -53,15 +53,15 @@ typedef struct rdThing
     uint32_t field_10;
     void* puppet; // rdPuppet*
     uint32_t field_18;
-    uint32_t field_1C;
+    uint32_t frameTrue;
     rdMatrix34 *hierarchyNodeMatrices;
     uint32_t hierarchyNodes2;
     int* amputatedJoints;
     uint32_t gap2C;
-    uint32_t dword30;
+    uint32_t geosetSelect;
+    uint32_t geometryMode;
     uint32_t lightingMode;
     uint32_t textureMode;
-    uint32_t sortingMethod;
     uint32_t clippingIdk;
     sithThing* parentSithThing;
 } rdThing;

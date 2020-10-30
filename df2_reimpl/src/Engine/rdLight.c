@@ -75,7 +75,7 @@ void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPo
             diff.z = localLightPoses[i].z - vertexIter->z;
             light = *meshLightIter;
             len = rdVector_Len3(&diff);
-            if ( len < (*meshLightIter)->falloff )
+            if ( len < (*meshLightIter)->falloffMin )
             {
                 rdVector_Normalize3Acc(&diff);
                 lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
@@ -121,7 +121,7 @@ float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses
         diff.z = lightPosIter->z - vertices[*v9].z;
         v10 = rdMath_DistancePointToPlane(lightPosIter, faceNormal, &vertices[*v9]);
         meshLightsa = v10;
-        if ( v10 < meshLight->falloff )
+        if ( v10 < meshLight->falloffMin )
         {
           rdVector_Normalize3Acc(&diff);
           v11 = rdVector_Dot3(faceNormal, &diff);

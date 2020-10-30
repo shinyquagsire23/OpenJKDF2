@@ -136,4 +136,6 @@ void rdVector_Rotate3(rdVector3 *out, rdVector3 *in, rdVector3 *vAngs);
 void rdVector_Rotate3Acc(rdVector3 *out, rdVector3 *vAngs);
 void rdVector_ExtractAngle(rdVector3 *v1, rdVector3 *out);
 
+float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2);
+
 #endif // _RDVECTOR_H

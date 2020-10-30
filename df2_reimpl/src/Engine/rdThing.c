@@ -21,16 +21,16 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->type = 0;
     thing->puppet = 0;
     thing->field_18 = 0;
-    thing->field_1C = 0;
-    thing->dword30 = -1;
+    thing->frameTrue = 0;
+    thing->geosetSelect = -1;
     thing->gap2C = -1;
     thing->hierarchyNodeMatrices = 0;
     thing->gap8 = 4;
     thing->field_C = 3;
     thing->field_10 = 2;
-    thing->lightingMode = 4;
-    thing->textureMode = 3;
-    thing->sortingMethod = 2;
+    thing->geometryMode = 4;
+    thing->lightingMode = 3;
+    thing->textureMode = 2;
     thing->parentSithThing = parent;
     return 1;
 }
@@ -75,7 +75,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 {
     thing->type = RD_THINGTYPE_MODEL;
     thing->model3 = model;
-    thing->dword30 = -1;
+    thing->geosetSelect = -1;
  
     thing->hierarchyNodeMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
     
@@ -147,7 +147,7 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
 
 void rdThing_Draw(rdThing *thing, rdMatrix34 *m)
 {
-    if (!rdroid_curLightingMode)
+    if (!rdroid_curGeometryMode)
         return;
 
     switch ( thing->type )

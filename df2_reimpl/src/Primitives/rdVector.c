@@ -566,3 +566,12 @@ void rdVector_ExtractAngle(rdVector3 *v1, rdVector3 *out)
     out->y = stdMath_ArcTan4(v1->y, v1->x);
     out->z = 0.0;
 }
+
+// Added
+float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2)
+{
+    rdVector3 tmp;
+    
+    rdVector_Sub3(&tmp, v1, v2);
+    return rdVector_Len3(&tmp);
+}

@@ -172,7 +172,7 @@ sithCogUtil                    0x26c2     0.919%        46.966%
 sithControl                    0x2723     0.928%        0.000%       
 sithAI                         0x2771     0.936%        0.000%       
 sithUnk3                       0x2827     0.952%        0.000%       
-rdModel3                       0x2a7e     1.008%        32.570%      
+rdModel3                       0x2a7e     1.008%        94.466%      
 std3D                          0x2c4a     1.051%        0.000%       
 rdMatrix                       0x2c85     1.056%        100.000%     
 sithAICmd                      0x2cc0     1.062%        0.000%       
@@ -190,5 +190,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 5.972%
+Total completion: 6.596%
 ```

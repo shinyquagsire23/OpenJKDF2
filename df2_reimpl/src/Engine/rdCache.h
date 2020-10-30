@@ -27,14 +27,14 @@ typedef struct rdProcEntry
 {
     void* extraData;
     int type;
+    uint32_t geometryMode;
     uint32_t lightingMode;
     uint32_t textureMode;
-    uint32_t sortingMethod;
     uint32_t anonymous_4;
     uint32_t anonymous_5;
     uint32_t numVertices;
     rdVector3* vertices;
-    rdVector2* vertices_uvs_in_pixels;
+    rdVector2* vertexUVs;
     float* vertex_lights_maybe;
     rdMaterial* material;
     uint32_t sith_tex_3_idx_2;
@@ -56,11 +56,11 @@ typedef struct rdProcEntry
 
 typedef struct rdMeshinfo
 {
-    uint32_t num_vertices;
-    rdVector3* vertices;
-    rdVector2* unk08;
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
     rdVector3* verticesProjected;
-    rdVector2* vertices_uvs_in_pixels_;
+    rdVector2* vertexUVs;
     float* vertex_lights_maybe_;
     uint32_t field_18;
     rdVector3* verticesOrig;

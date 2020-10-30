@@ -38,6 +38,6 @@ typedef struct stdPalEffect
     float scalar_idk;
 } stdPalEffect;
 
-static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = stdPalEffects_ResetEffect_ADDR;
+static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
 
 #endif // _STDPALEFFECTS_H

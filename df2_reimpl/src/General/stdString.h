@@ -17,7 +17,6 @@
 
 
 char* stdString_FastCopy(const char *str);
-//static int (*stdString_snprintf)(char *out, int num, char *fmt, ...) = stdString_snprintf_ADDR;
 int stdString_snprintf(char *out, int num, char *fmt, ...);
 char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, char *find_str);
 char* stdString_GetQuotedStringContents(char *in, char *out, int out_size);

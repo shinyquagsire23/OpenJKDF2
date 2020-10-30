@@ -18,7 +18,7 @@
 
 typedef struct rdLight
 {
-    uint32_t gap0;
+    uint32_t id;
     uint32_t dword4;
     uint32_t active;
     rdVector3 direction;
@@ -26,8 +26,8 @@ typedef struct rdLight
     uint32_t color;
     uint32_t dword20;
     uint32_t dword24;
-    float falloff;
-    uint32_t field_2C;
+    float falloffMin;
+    float falloffMax;
 } rdLight;
 
 rdLight *rdLight_New();

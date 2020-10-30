@@ -142,6 +142,8 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, rdMatrix44 *a2);
 void rdMatrix_TransformPointLst34(rdMatrix34 *m, rdVector3 *in, rdVector3 *out, int num);
 void rdMatrix_TransformPointLst44(rdMatrix44 *m, rdVector4 *in, rdVector4 *out, int num);
 
+extern const rdMatrix34 rdroid_identMatrix34;
+extern const rdMatrix44 rdroid_identMatrix44;
 
 //IMPORT_FUNC(rdMatrix_BuildRotate34, void, (rdMatrix34*, rdVector3*), rdMatrix_BuildRotate34_ADDR)
 //IMPORT_FUNC(rdMatrix_BuildRotate44, void, (rdMatrix44*, rdVector3*), rdMatrix_BuildRotate44_ADDR)
