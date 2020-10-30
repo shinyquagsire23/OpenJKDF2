@@ -25,6 +25,7 @@
 #include "Engine/rdCanvas.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithTime.h"
+#include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
@@ -478,6 +479,15 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdCanvas_NewEntry_ADDR, rdCanvas_NewEntry);
     hook_function(rdCanvas_Free_ADDR, rdCanvas_Free);
     hook_function(rdCanvas_FreeEntry_ADDR, rdCanvas_FreeEntry);
+    
+    // rdModel3
+    hook_function(rdModel3_RegisterLoader_ADDR, rdModel3_RegisterLoader);
+    hook_function(rdModel3_RegisterUnloader_ADDR, rdModel3_RegisterUnloader);
+    hook_function(rdModel3_ClearFrameCounters_ADDR, rdModel3_ClearFrameCounters);
+    hook_function(rdModel3_NewEntry_ADDR, rdModel3_NewEntry);
+    hook_function(rdModel3_New_ADDR, rdModel3_New);
+    hook_function(rdModel3_Free_ADDR, rdModel3_Free);
+    hook_function(rdModel3_Load_ADDR, rdModel3_Load);
     
     // rdThing
     hook_function(rdThing_New_ADDR, rdThing_New);

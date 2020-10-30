@@ -1,6 +1,12 @@
 #ifndef _RDPRIMIT3_H
 #define _RDPRIMIT3_H
 
+#include "Engine/rdCamera.h"
+#include "Primitives/rdModel3.h"
+#include "Primitives/rdFace.h"
+#include "Primitives/rdVector.h"
+#include "Engine/rdCache.h"
+
 #define rdPrimit3_ClearFrameCounters_ADDR (0x00446F50)
 #define rdPrimit3_GetScreenCoord_ADDR (0x00446F60)
 #define rdPrimit3_DrawPoint_ADDR (0x00446FF0)
@@ -14,6 +20,6 @@
 
 void rdPrimit3_ClearFrameCounters(void);
 
-void (__cdecl *rdPrimit3_ClipFace)(rdClipFrustum *a1, signed int a2, signed int a3, int sortingMethod, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *a7) = (void*)rdPrimit3_ClipFace_ADDR;
+static void (__cdecl *rdPrimit3_ClipFace)(rdClipFrustum *a1, signed int a2, signed int a3, int sortingMethod, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *a7) = (void*)rdPrimit3_ClipFace_ADDR;
 
 #endif // _RDPRIMIT3_H

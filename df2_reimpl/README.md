@@ -115,7 +115,7 @@ rdKeyframe                     0xa99      0.251%        100.000%
 rdCamera                       0xaa8      0.253%        0.000%       
 jkGame                         0xaef      0.259%        0.000%       
 jkGuiSaveLoad                  0xb21      0.264%        0.000%       
-rdPolyLine                     0xb42      0.267%        74.844%      
+rdPolyLine                     0xb42      0.267%        100.000%     
 jkGuiKeyboard                  0xb57      0.269%        0.000%       
 jkGuiNetHost                   0xbc6      0.279%        0.000%       
 sithMapView                    0xbf8      0.284%        0.000%       
@@ -172,7 +172,7 @@ sithCogUtil                    0x26c2     0.919%        46.966%
 sithControl                    0x2723     0.928%        0.000%       
 sithAI                         0x2771     0.936%        0.000%       
 sithUnk3                       0x2827     0.952%        0.000%       
-rdModel3                       0x2a7e     1.008%        0.000%       
+rdModel3                       0x2a7e     1.008%        32.570%      
 std3D                          0x2c4a     1.051%        0.000%       
 rdMatrix                       0x2c85     1.056%        100.000%     
 sithAICmd                      0x2cc0     1.062%        0.000%       
@@ -190,6 +190,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 5.577%
-
+Total completion: 5.972%
 ```

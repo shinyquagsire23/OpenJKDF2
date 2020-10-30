@@ -10,8 +10,8 @@
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)
 #define rdModel3_ClearFrameCounters_ADDR (0x00443DC0)
 #define rdModel3_NewEntry_ADDR (0x00443DD0)
-#define rdModel3_Load_ADDR (0x00443E00)
-#define rdModel3_LoadEntryText_ADDR (0x00443E80)
+#define rdModel3_New_ADDR (0x00443E00)
+#define rdModel3_Load_ADDR (0x00443E80)
 #define rdModel3_LoadPostProcess_ADDR (0x00444B60)
 #define rdModel3_WriteText_ADDR (0x00444B90)
 #define rdModel3_Free_ADDR (0x004453C0)
@@ -32,6 +32,7 @@
 
 typedef struct rdThing rdThing;
 typedef struct rdHierarchyNode rdHierarchyNode;
+typedef struct rdMesh rdMesh;
 
 typedef struct rdHierarchyNode
 {
@@ -47,7 +48,7 @@ typedef struct rdHierarchyNode
     uint32_t flags;
     uint32_t idx;
     int type;
-    void* mesh; // rdMesh
+    rdMesh* mesh;
     rdHierarchyNode* parent;
     uint32_t numChildren;
     rdHierarchyNode* child;
@@ -58,21 +59,20 @@ typedef struct rdHierarchyNode
     rdMatrix34 posRotMatrix;
 } rdHierarchyNode;
 
+typedef struct rdGeoset
+{
+    uint32_t numMeshes;
+    rdMesh* meshes;    
+} rdGeoset;
+
 typedef struct rdModel3
 {
     char filename[32];
     int id;
-    uint32_t num_meshes;
-    void* meshes_alloc; // rdMesh*
-    uint32_t sortingMethod;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t num_geosets;
-    rdMaterial* materials_alloc;
-    uint32_t num_materials;
+    rdGeoset geosets[4];
+    uint32_t numGeosets;
+    rdMaterial** materials;
+    uint32_t numMaterials;
     uint32_t field_50;
     uint32_t numHierarchyNodes;
     rdHierarchyNode* hierarchyNodes;
@@ -83,10 +83,83 @@ typedef struct rdModel3
     uint32_t field_6C;
     uint32_t field_70;
     uint32_t field_74;
-    rdVector3 insert_offset;
+    rdVector3 insertOffset;
 } rdModel3;
 
-static void (*rdModel3_ClearFrameCounters)(void) = (void*)rdModel3_ClearFrameCounters_ADDR;
+typedef struct rdMesh
+{
+    char name[32];
+    int mesh_num;
+    int lightingMode;
+    int textureMode;
+    int sortingMethod;
+    rdVector3* vertices;
+    rdVector2* vertexUVs;
+    float* vertices_i;
+    float* vertices_unk;
+    rdFace* faces;
+    rdVector3* vertexNormals;
+    int numVertices;
+    int numUVs;
+    int numFaces;
+    float radius;
+    int field_58;
+    int field_5C;
+    int field_60;
+    int field_64;
+    int field_68;
+    int field_6C;
+} rdMesh;
+
+typedef int (__cdecl *model3Loader_t)(char *, rdModel3*);
+typedef int (__cdecl *model3Unloader_t)(rdModel3*);
+
+#define dword_73A3D8 (*(int*)0x0073A3D8)
+#define localCamera (*(rdVector3*)0x0073A3E0)
+// rdVector3[32]
+#define aFaceVerts (*(rdVector3*)0x0073A3F0)
+#define vertexDst (*(rdMeshinfo*)0x0073A570)
+#define curLightingMode (*(int*)0x0073A590)
+// rdLight* apGeoLights[64]
+#define apGeoLights (*(rdLight*)0x0073A598)
+
+//rdVector3 [64]
+#define aLocalLightPos (*(rdVector3*)0x0073A698)
+#define meshFrustrumCull (*(int*)0x0073A998)
+#define curSortingMethod (*(int*)0x0073A99C)
+#define aView (*(rdVector3*)0x0073A9A0)
+
+// rdMesh *pCurMesh
+#define pCurMesh (*(void**)0x0073C1A0)
+#define thingFrustrumCull (*(int*)0x0073C1A4)
+#define vertexSrc (*(rdMeshinfo*)0x0073C1A8)
+
+#define pCurModel3 (*(rdModel3**)0x0073C1C8)
+#define rdModel3_sortingMethod (*(int*)0x0073C1CC)
+#define curTextureMode (*(int*)0x0073C1D0)
+
+// rdLight*[64]
+#define apMeshLights (*(rdLight**)0x0073C1D8)
+#define pCurThing (*(rdThing**)0x0073C2D8)
+#define rdModel3_textureMode (*(int*)0x0073C2DC)
+#define rdModel3_lightingMode (*(int*)0x0073C2E0)
+#define rdModel3_numDrawnModels (*(int*)0x0073C2E4)
+#define pModel3Loader (*(model3Loader_t*)0x0073C2E8)
+#define pModel3Unloader (*(model3Unloader_t*)0x0073C2EC)
+#define rdModel3_numGeoLights (*(int*)0x0073C2F0)
+#define rdModel3_numMeshLights (*(int*)0x0073C2F4)
+#define rdModel3_fRadius (*(float*)0x0073C2F8)
+
+void rdModel3_RegisterLoader(model3Loader_t loader);
+void rdModel3_RegisterUnloader(model3Unloader_t unloader);
+void rdModel3_ClearFrameCounters();
+int rdModel3_NewEntry(rdModel3 *model);
+rdModel3* rdModel3_New(char *path);
+void rdModel3_Free(rdModel3 *model);
+int rdModel3_Load(char *model_fpath, rdModel3 *model);
+
+//static int (__cdecl *rdModel3_Load)(char *model_fpath, rdModel3 *model) = (void*)rdModel3_Load_ADDR;
+static void (__cdecl *rdModel3_FreeEntry)(rdModel3 *model) = (void*)rdModel3_FreeEntry_ADDR;
 static void (*rdModel3_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdModel3_Draw_ADDR;
 
 #endif // _RDMODEL3_H

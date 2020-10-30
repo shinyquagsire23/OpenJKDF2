@@ -1,6 +1,10 @@
 #ifndef _RDCAMERA_H
 #define _RDCAMERA_H
 
+#include "Primitives/rdVector.h"
+#include "Primitives/rdMatrix.h"
+#include "Engine/rdCanvas.h"
+
 #define rdCamera_NewEntry_ADDR (0x00443260)
 #define rdCamera_SetProjectType_ADDR (0x00443360)
 #define rdCamera_Free_ADDR (0x00443440)
