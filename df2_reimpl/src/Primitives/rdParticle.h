@@ -1,7 +1,11 @@
 #ifndef _RDPARTICLE_H
 #define _RDPARTICLE_H
 
-#define rdParticle_Startup_ADDR (0x0046BF70)
+#include "Engine/rdMaterial.h"
+#include "Primitives/rdVector.h"
+#include "Primitives/rdMatrix.h"
+
+#define rdParticle_RegisterLoader_ADDR (0x0046BF70)
 #define rdParticle_New_ADDR (0x0046BF80)
 #define rdParticle_NewEntry_ADDR (0x0046BFC0)
 #define rdParticle_Clone_ADDR (0x0046C090)
@@ -16,8 +20,32 @@ typedef struct rdThing rdThing;
 
 typedef struct rdParticle
 {
+    char name[32];
+    int lightingMode;
+    uint32_t numVertices;
+    rdVector3* vertices;
+    int* vertexCel;
+    float diameter;
+    float radius;
+    rdMaterial* material;
+    float cloudRadius;
+    int hasVertices;
+    rdVector3 insertOffset;
 } rdParticle;
 
-static void (*rdParticle_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdParticle_Draw_ADDR;
+typedef rdParticle* (__cdecl *rdParticleLoader_t)(char*);
+
+void rdParticle_RegisterLoader(rdParticleLoader_t loader);
+rdParticle* rdParticle_New(int numVertices, float size, rdMaterial *material, int lightingMode, int allocateVertices);
+int rdParticle_NewEntry(rdParticle *particle, int numVertices, float size, rdMaterial *material, int lightingMode, int allocateVertices);
+rdParticle* rdParticle_Clone(rdParticle *particle);
+void rdParticle_Free(rdParticle *particle);
+void rdParticle_FreeEntry(rdParticle *particle);
+rdParticle* rdParticle_Load(char *path);
+int rdParticle_LoadEntry(char *fpath, rdParticle *particle);
+int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy);
+int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
+
+//static void (*rdParticle_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdParticle_Draw_ADDR;
 
 #endif // _RDPARTICLE_H

@@ -36,5 +36,6 @@ int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int 
 int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);
 
 static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
+static int (__cdecl *rdClip_Face3S)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3S_ADDR;
 
 #endif // _RDCLIP_H

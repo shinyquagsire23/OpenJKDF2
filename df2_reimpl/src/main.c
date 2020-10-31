@@ -27,6 +27,7 @@
 #include "Engine/sithTime.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
+#include "Primitives/rdParticle.h"
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "World/sithWeapon.h"
@@ -504,6 +505,18 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdModel3_DrawHNode_ADDR, rdModel3_DrawHNode);
     hook_function(rdModel3_DrawMesh_ADDR,rdModel3_DrawMesh);
     hook_function(rdModel3_DrawFace_ADDR,rdModel3_DrawFace);
+    
+    // rdParticle
+    hook_function(rdParticle_RegisterLoader_ADDR, rdParticle_RegisterLoader);
+    hook_function(rdParticle_New_ADDR, rdParticle_New);
+    hook_function(rdParticle_NewEntry_ADDR, rdParticle_NewEntry);
+    hook_function(rdParticle_Clone_ADDR, rdParticle_Clone);
+    hook_function(rdParticle_Free_ADDR, rdParticle_Free);
+    hook_function(rdParticle_FreeEntry_ADDR, rdParticle_FreeEntry);
+    hook_function(rdParticle_Load_ADDR, rdParticle_Load);
+    hook_function(rdParticle_LoadEntry_ADDR, rdParticle_LoadEntry);
+    hook_function(rdParticle_Write_ADDR, rdParticle_Write);
+    hook_function(rdParticle_Draw_ADDR, rdParticle_Draw);
     
     // rdThing
     hook_function(rdThing_New_ADDR, rdThing_New);
