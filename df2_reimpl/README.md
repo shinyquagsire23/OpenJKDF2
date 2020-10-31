@@ -90,7 +90,7 @@ sith                           0x72b      0.170%        0.000%
 jkGuiControlSaveLoad           0x732      0.171%        0.000%       
 jkGuiPlayer                    0x73a      0.171%        0.000%       
 jkGuiMultiplayer               0x749      0.173%        0.000%       
-rdSprite                       0x76d      0.176%        0.000%       
+rdSprite                       0x76d      0.176%        100.000%     
 stdConffile                    0x78d      0.179%        100.000%     
 jkGuiMap                       0x793      0.180%        0.000%       
 sithTemplate                   0x79d      0.181%        0.000%       
@@ -106,7 +106,7 @@ stdSound                       0x9bf      0.231%        0.000%
 sithSave                       0x9bf      0.231%        0.000%       
 jkGuiForce                     0x9dd      0.234%        0.000%       
 sithSound                      0xa00      0.237%        0.000%       
-rdParticle                     0xa0d      0.238%        0.000%       
+rdParticle                     0xa0d      0.238%        99.611%      
 rdMaterial                     0xa2d      0.241%        68.599%      
 sithSoundClass                 0xa46      0.244%        0.000%       
 stdPalEffects                  0xa66      0.247%        0.000%       
@@ -190,5 +190,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 6.596%
+Total completion: 7.010%
 ```
