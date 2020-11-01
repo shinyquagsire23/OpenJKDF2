@@ -18,6 +18,7 @@ typedef struct rdModel3 rdModel3;
 int sithModel_Startup();
 void sithModel_Shutdown();
 int sithModel_Load(sithWorld *world, int a2);
+void sithModel_Free(sithWorld *world);
 rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk);
 int sithModel_GetMemorySize(rdModel3 *model);
 int sithModel_New(sithWorld *world, int num);

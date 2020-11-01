@@ -64,6 +64,22 @@ int sithModel_Load(sithWorld *world, int a2)
     return 1;
 }
 
+void sithModel_Free(sithWorld *world)
+{
+    if (!world->numModels )
+        return;
+
+    for (int i = 0; i < world->numModelsLoaded; i++)
+    {
+        stdHashTable_FreeKey(sithModel_hashtable, world->models[i].filename);
+        rdModel3_FreeEntryGeometryOnly(&world->models[i]);
+    }
+    pSithHS->free(world->models);
+    world->models = 0;
+    world->numModelsLoaded = 0;
+    world->numModels = 0;
+}
+
 rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
 {
     rdModel3 *model;

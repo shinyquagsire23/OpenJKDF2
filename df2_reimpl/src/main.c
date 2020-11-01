@@ -615,6 +615,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithModel_Startup_ADDR, sithModel_Startup);
     hook_function(sithModel_Shutdown_ADDR, sithModel_Shutdown);
     hook_function(sithModel_Load_ADDR, sithModel_Load);
+    hook_function(sithModel_Free_ADDR, sithModel_Free);
     hook_function(sithModel_LoadEntry_ADDR, sithModel_LoadEntry);
     hook_function(sithModel_GetMemorySize_ADDR, sithModel_GetMemorySize);
     hook_function(sithModel_New_ADDR, sithModel_New);
