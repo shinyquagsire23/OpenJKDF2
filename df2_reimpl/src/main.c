@@ -16,6 +16,8 @@
 #include "General/stdFnames.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
+#include "General/stdStrTable.h"
+#include "General/sithStrTable.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -374,6 +376,17 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdString_CstrCopy_ADDR, stdString_CstrCopy);
     hook_function(stdString_WcharCopy_ADDR, stdString_WcharCopy);
     hook_function(stdString_CStrToLower_ADDR, stdString_CStrToLower);
+    
+    // stdStrTable
+    hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
+    hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
+    hook_function(stdStrTable_GetString_ADDR, stdStrTable_GetString);
+    
+    // sithStrTable
+    hook_function(sithStrTable_Startup_ADDR, sithStrTable_Startup);
+    hook_function(sithStrTable_Shutdown_ADDR, sithStrTable_Shutdown);
+    hook_function(sithStrTable_GetUniString_ADDR, sithStrTable_GetUniString);
+    hook_function(sithStrTable_GetString_ADDR, sithStrTable_GetString);
     
     // stdConsole
     hook_function(stdConsole_Startup_ADDR, stdConsole_Startup);

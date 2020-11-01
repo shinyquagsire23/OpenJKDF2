@@ -18,7 +18,7 @@ jkGob                          0x29       0.004%        0.000%
 Res                            0x2e       0.004%        0.000%       
 jkUnk3                         0x41       0.006%        0.000%       
 jkGuiDecision                  0x45       0.006%        0.000%       
-sithStrTable                   0x5b       0.008%        0.000%       
+sithStrTable                   0x5b       0.008%        100.000%     
 sithCopyright                  0x67       0.010%        0.000%       
 jkStrings                      0x89       0.013%        0.000%       
 daRealloc                      0x8e       0.013%        0.000%       
@@ -51,7 +51,7 @@ jkCutscene                     0x347      0.078%        0.000%
 jkDisplay                      0x359      0.079%        0.000%       
 stdString                      0x3b3      0.088%        100.000%     
 jkGuiDialog                    0x3e0      0.092%        0.000%       
-sithModel                      0x3f1      0.093%        88.603%      
+sithModel                      0x3f1      0.093%        100.000%     
 stdres                         0x426      0.098%        0.000%       
 stdHashTable                   0x42c      0.099%        94.663%      
 rdThing                        0x42f      0.099%        100.000%     
@@ -92,7 +92,7 @@ rdSprite                       0x76d      0.176%        100.000%
 stdConffile                    0x78d      0.179%        100.000%     
 jkGuiMap                       0x793      0.180%        0.000%       
 sithTemplate                   0x79d      0.181%        0.000%       
-stdStrTable                    0x7b6      0.183%        0.000%       
+stdStrTable                    0x7b6      0.183%        11.905%      
 sithParticle                   0x7f5      0.189%        0.000%       
 Main                           0x87b      0.201%        0.000%       
 jkGuiMultiTally                0x8aa      0.206%        0.000%       
@@ -189,5 +189,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 7.096%
+Total completion: 7.137%
 ```
