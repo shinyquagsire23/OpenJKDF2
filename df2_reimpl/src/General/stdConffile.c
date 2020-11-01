@@ -39,14 +39,14 @@ int stdConffile_OpenMode(char *fpath, char* mode)
         apBufferStack[stackLevel] = stdConffile_aLine;
         
         stdConffile_linenum = 0;
-        openFile = NULL;
+        openFile = 0;
         _memcpy((void *)(aEntryStack + (1028 * stackLevel)), &stdConffile_entry, sizeof(stdConffileEntry));
         stackLevel++;
     }
 
     if (!_memcmp(fpath, "none", 5u))
     {
-        openFile = NULL;
+        openFile = 0;
     }
     else
     {

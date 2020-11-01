@@ -175,7 +175,7 @@ typedef struct rdMaterial
     rdTexture* textures;
 } rdMaterial;
 
-typedef int (__cdecl *rdMaterialUnloader_t)(int);
+typedef int (__cdecl *rdMaterialUnloader_t)(rdMaterial*);
 typedef int (__cdecl *rdMaterialLoader_t)(char*, int, int);
 
 #define pMaterialsLoader (*(rdMaterialLoader_t*)0x73D600)

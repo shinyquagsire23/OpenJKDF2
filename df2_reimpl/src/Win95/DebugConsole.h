@@ -16,6 +16,6 @@
 #define DebugConsole_AlertSound_ADDR (0x004DA3D0)
 
 
-void (__cdecl *DebugConsole_Print)(char *str) = DebugConsole_Print_ADDR;
+static void (__cdecl *DebugConsole_Print)(char *str) = (void*)DebugConsole_Print_ADDR;
 
 #endif // _DEBUGCONSOLE_H

@@ -83,7 +83,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->hierarchyNodeMatrices)
         return 0;
 
-    thing->hierarchyNodes2 = rdroid_pHS->alloc(sizeof(rdVector3) * model->numHierarchyNodes);
+    thing->hierarchyNodes2 = (rdVector3*)rdroid_pHS->alloc(sizeof(rdVector3) * model->numHierarchyNodes);
     // memset used to be here??
 
     // thing->hierarchyNodeMatrices check used to be here??

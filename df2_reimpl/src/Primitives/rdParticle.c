@@ -6,6 +6,7 @@
 #include "jk.h"
 #include "Engine/rdCache.h"
 #include "Engine/rdClip.h"
+#include "Win95/std.h"
 
 static rdVector3 aParticleVerticesTmp[32];
 static rdVector3 aParticleVertices[256];

@@ -201,7 +201,7 @@ int _memcmp (const void* str1, const void* str2, size_t count)
   return 0;
 }
 
-int _strlen(char *str)
+int _strlen(const char *str)
 {
     int len;
     for (len = 0; str[len]; len++);

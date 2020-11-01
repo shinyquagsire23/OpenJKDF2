@@ -62,6 +62,6 @@ void rdColormap_Free(rdColormap *colormap);
 void rdColormap_FreeEntry(rdColormap *colormap);
 int rdColormap_Write(char *outpath, rdColormap *colormap);
 
-static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = rdColormap_LoadEntry_ADDR;
+static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = (void*)rdColormap_LoadEntry_ADDR;
 
 #endif // _RDCOLORMAP_H

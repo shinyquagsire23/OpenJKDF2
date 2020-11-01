@@ -6,9 +6,10 @@
 #include "Engine/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
+#include <math.h>
 
-rdVector3 polylineVerts[32]; // idk the size on this
-rdVector3 rdPolyLine_FaceVerts[32];
+static rdVector3 polylineVerts[32]; // idk the size on this
+static rdVector3 rdPolyLine_FaceVerts[32];
 
 rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight)
 {

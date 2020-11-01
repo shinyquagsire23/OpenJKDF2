@@ -20,7 +20,7 @@
 #define sithWorld_New_ADDR (0x004D00B0)
 #define sithWorld_FreeEntry_ADDR (0x004D00E0)
 #define sithWorld_GetMemorySize_ADDR (0x004D0540)
-#define sithWorld_set_section_parser_ADDR (0x004D0820)
+#define sithWorld_SetSectionParser_ADDR (0x004D0820)
 #define sithWorld_sub_4D08B0_ADDR (0x004D08B0)
 #define sithWorld_sub_4D0930_ADDR (0x004D0930)
 #define sithWorld_sub_4D0A20_ADDR (0x004D0A20)
@@ -31,7 +31,6 @@
 #define sithWorld_TimeSectionParse_ADDR (0x004D0D50)
 #define sithWorld_FindSectionParser_ADDR (0x004D0E20)
 #define sithWorld_LoadGeoresource_ADDR (0x004D0E70)
-
 
 typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 
@@ -116,11 +115,27 @@ typedef struct sithWorld
     void* animclasses;
 } sithWorld;
 
+typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
+
+typedef struct sith_map_section_and_func
+{
+    char section_name[32];
+    sithWorldSectionParser_t funcptr;
+} sith_map_section_and_func;
+
+int sithWorld_Startup();
+void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
 void sithWorld_UpdateLoadPercent(float percent);
+int sithHeader_Load(sithWorld *world, int junk);
+int sithCopyright_Load(sithWorld *lvl, int junk);
+int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
+int sithWorld_FindSectionParser(char *a1);
 
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)
 #define sithWorld_pLoading (*(sithWorld**)0x8339D0)
+#define sithWorld_numParsers (*(uint32_t*)0x8339D4)
+#define sithWorld_bInitted (*(uint32_t*)0x8339D8)
 
 #endif // _SITHWORLD_H

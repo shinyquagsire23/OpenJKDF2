@@ -7,7 +7,7 @@
 typedef struct stdConffileArg
 {
     char* key;
-    char* value
+    char* value;
 } stdConffileArg;
 
 typedef struct stdConffileEntry
@@ -17,7 +17,7 @@ typedef struct stdConffileEntry
 } stdConffileEntry;
 
 #define aFilenameStack  ((char*)0x0055D620)
-#define apBufferStack ((int*)0x55E020)
+#define apBufferStack ((char**)0x55E020)
 #define linenumStack  ((int*)0x55E070)
 #define aEntryStack   ((char*)0x0055E0C0)
 #define openFileStack ((int*)0x563110)

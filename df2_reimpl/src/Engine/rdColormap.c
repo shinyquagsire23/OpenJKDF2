@@ -80,7 +80,7 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
     rdColormapHeader header;
 
     _memset(&header, 0, sizeof(header));
-    _strncpy(&header.magic, "CMP ", 4);
+    _strncpy((char*)&header.magic, "CMP ", 4);
     header.version = 30;
     rdVector_Copy3(&header.tint, &colormap->tint);
     header.flags = colormap->flags;

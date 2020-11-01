@@ -93,6 +93,7 @@ void sithCogParse_LexAddSymbol(char* text)
     //printf("Add sym %s\n", text);
 }
 
+#if 0
 int cogparser_recurse_stackdepth(sith_cog_parser_node* node)
 {
     if ( node->child_loop_depth )
@@ -179,11 +180,11 @@ int cog_parsescript()
     //if (yyparse())
         goto error;
     
-    printf("Performing second pass...\n");
+    //printf("Performing second pass...\n");
     cogvm_stackpos = 0;
     
     cogparser_recurse_stackdepth(cogparser_topnode);
-    printf("Stack max: %x\n", cogvm_stackpos);
+    //printf("Stack max: %x\n", cogvm_stackpos);
     
     int* script_program = malloc(4 * (cogvm_stackpos + 1));
     //script->script_program = script_program;
@@ -201,10 +202,10 @@ int cog_parsescript()
     cogparser_current_nodeidx = 0;
     cogparser_topnode = 0;
     
-    printf("Done with second pass\n");
+    //printf("Done with second pass\n");
     for (int i = 0; i < cogvm_stackpos; i++)
     {
-        printf("%08x: %08x\n", i, script_program[i]);
+        //printf("%08x: %08x\n", i, script_program[i]);
     }
     
     return 1;
@@ -219,3 +220,4 @@ error:
     cogvm_stackpos = 0;
     return 0;
 }
+#endif

@@ -31,9 +31,9 @@ typedef struct common_functions
     size_t (*fileRead)(int, void *, size_t);
     char *(*fileGets)(int, char *, int);
     size_t (*fileWrite)(int, void *, size_t);
-    int (*feof)(FILE *);
-    int (*ftell)(FILE *);
-    int (*fseek)(FILE *, int, int);
+    int (*feof)(int);
+    int (*ftell)(int);
+    int (*fseek)(int, int, int);
     int (*fileSize)(char *);
     void (*filePrintf)(int, char*, ...);
     wchar_t* (*fileGetws)(int, wchar_t *, unsigned int);
@@ -260,7 +260,7 @@ static int (__cdecl *__tolower)(char SrcStr) = (void*)0x514550;
 static void* (__cdecl *_malloc)(size_t) = (void*)0x514210;
 static void (__cdecl *_free)(void *) = (void*)0x00513740;
 static int (__cdecl *_atoi)(const char*) = (void*)0x512840;
-int _strlen(char *str);
+int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);
 

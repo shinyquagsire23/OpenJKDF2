@@ -10,7 +10,7 @@
 #define rdActive_BuildEdges_ADDR (0x0044C690)
 #define rdActive_AddActiveFace_ADDR (0x0044C7E0)
 
-static int (*rdActive_Startup)(void) = rdActive_Startup_ADDR;
-static void (*rdActive_ClearFrameCounters)(void) = rdActive_ClearFrameCounters_ADDR;
+static int (*rdActive_Startup)(void) = (void*)rdActive_Startup_ADDR;
+static void (*rdActive_ClearFrameCounters)(void) = (void*)rdActive_ClearFrameCounters_ADDR;
 
 #endif // _RDACTIVE_H

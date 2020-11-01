@@ -5,6 +5,7 @@
 #include "Engine/rdClip.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
+#include <math.h>
 
 static rdVector3 rdSprite_inVerts[32];
 static rdVector3 rdSprite_tmpVerts[32];

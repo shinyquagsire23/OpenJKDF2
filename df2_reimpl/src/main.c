@@ -9,7 +9,6 @@
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
 #include "Cog/jkCog.h"
-#include "jkl.h"
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
 #include "General/stdConffile.h"
@@ -181,10 +180,6 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogSound_Initialize_ADDR, sithCogSound_Initialize);
     hook_function(sithCogSector_Initialize_ADDR, sithCogSector_Initialize);
     hook_function(sithCogPlayer_Initialize_ADDR, sithCogPlayer_Initialize);
-    
-    hook_function(jkl_init_parsers_ADDR, jkl_init_parsers);
-    hook_function(jkl_set_section_parser_ADDR, jkl_set_section_parser);
-    hook_function(jkl_find_section_parser_ADDR, jkl_find_section_parser);
     
     // sithCogVm
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
@@ -635,8 +630,12 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithModel_GetByIdx_ADDR, sithModel_GetByIdx);
     
     // sithWorld
+    hook_function(sithWorld_Startup_ADDR, sithWorld_Startup);
+    hook_function(sithWorld_Shutdown_ADDR, sithWorld_Shutdown);
     hook_function(sithWorld_SetLoadPercentCallback_ADDR, sithWorld_SetLoadPercentCallback);
     hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
+    hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
+    hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
     
     // test saber time
     //*(float*)0x5220C4 = 0.01f;

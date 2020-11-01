@@ -6,6 +6,7 @@
 #include "Cog/sithCogScript.h"
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
+#include "Win95/DebugConsole.h"
 
 #include <stdint.h>
 #include <math.h>
