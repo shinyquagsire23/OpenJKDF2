@@ -259,6 +259,7 @@ static char* (__cdecl *_strpbrk)(const char *, const char *) = (void*)0x5144D0;
 static int (__cdecl *__tolower)(char SrcStr) = (void*)0x514550;
 static void* (__cdecl *_malloc)(size_t) = (void*)0x514210;
 static void (__cdecl *_free)(void *) = (void*)0x00513740;
+static int (__cdecl *_atoi)(const char*) = (void*)0x512840;
 int _strlen(char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);

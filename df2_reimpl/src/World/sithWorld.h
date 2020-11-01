@@ -9,6 +9,32 @@
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
 
+#define sithWorld_Startup_ADDR (0x004CF6F0)
+#define sithWorld_Shutdown_ADDR (0x004CFAB0)
+#define sithWorld_SetLoadPercentCallback_ADDR (0x004CFB00)
+#define sithWorld_UpdateLoadPercent_ADDR (0x004CFB10)
+#define sithWorld_Load_ADDR (0x004CFB30)
+#define sithWorld_NewEntry_ADDR (0x004CFD50)
+#define sithWorld_Parse_ADDR (0x004CFF20)
+#define sithWorld_Free_ADDR (0x004D0080)
+#define sithWorld_New_ADDR (0x004D00B0)
+#define sithWorld_FreeEntry_ADDR (0x004D00E0)
+#define sithWorld_GetMemorySize_ADDR (0x004D0540)
+#define sithWorld_set_section_parser_ADDR (0x004D0820)
+#define sithWorld_sub_4D08B0_ADDR (0x004D08B0)
+#define sithWorld_sub_4D0930_ADDR (0x004D0930)
+#define sithWorld_sub_4D0A20_ADDR (0x004D0A20)
+#define sithWorld_sub_4D0AA0_ADDR (0x004D0AA0)
+#define sithWorld_Verify_ADDR (0x004D0B00)
+#define sithWorld_CalcChecksumIdk_ADDR (0x004D0C30)
+#define sithWorld_Initialize_ADDR (0x004D0D10)
+#define sithWorld_TimeSectionParse_ADDR (0x004D0D50)
+#define sithWorld_FindSectionParser_ADDR (0x004D0E20)
+#define sithWorld_LoadGeoresource_ADDR (0x004D0E70)
+
+
+typedef void (__cdecl *sithWorldProgressCallback_t)(float);
+
 typedef struct sithWorld
 {
     uint32_t level_type_maybe;
@@ -22,9 +48,9 @@ typedef struct sithWorld
     int numMaterials;
     rdMaterial* materials;
     uint32_t materials2;
-    int numModelsLoaded;
-    int numModels;
-    void* models;
+    uint32_t numModelsLoaded;
+    uint32_t numModels;
+    rdModel3* models;
     int numSpritesLoaded;
     int numSprites;
     void* sprites;
@@ -89,6 +115,9 @@ typedef struct sithWorld
     int numAnimClasses;
     void* animclasses;
 } sithWorld;
+
+void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
+void sithWorld_UpdateLoadPercent(float percent);
 
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)

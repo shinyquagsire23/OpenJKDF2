@@ -25,6 +25,7 @@
 #include "Engine/rdCanvas.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithModel.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -32,6 +33,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "World/sithWeapon.h"
+#include "World/sithWorld.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -608,6 +610,19 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
     hook_function(sithTime_Startup_ADDR, sithTime_Startup);
     hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
+    
+    // sithModel
+    hook_function(sithModel_Startup_ADDR, sithModel_Startup);
+    hook_function(sithModel_Shutdown_ADDR, sithModel_Shutdown);
+    hook_function(sithModel_Load_ADDR, sithModel_Load);
+    hook_function(sithModel_LoadEntry_ADDR, sithModel_LoadEntry);
+    hook_function(sithModel_GetMemorySize_ADDR, sithModel_GetMemorySize);
+    hook_function(sithModel_New_ADDR, sithModel_New);
+    hook_function(sithModel_GetByIdx_ADDR, sithModel_GetByIdx);
+    
+    // sithWorld
+    hook_function(sithWorld_SetLoadPercentCallback_ADDR, sithWorld_SetLoadPercentCallback);
+    hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
     
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
