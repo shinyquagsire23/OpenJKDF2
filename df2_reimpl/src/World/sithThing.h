@@ -4,6 +4,7 @@
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
 #include "Engine/rdThing.h"
+#include "World/sithPlayer.h"
 
 enum THINGPARAM
 {
@@ -187,7 +188,7 @@ typedef struct sithThing
     float fov;
     float error;
     uint32_t field_1BC;
-    void* playerinfo;
+    sithPlayerInfo* playerinfo;
     uint32_t field_1C4;
     uint32_t field_1C8;
     uint32_t field_1CC;

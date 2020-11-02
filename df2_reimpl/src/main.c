@@ -35,6 +35,7 @@
 #include "Primitives/rdFace.h"
 #include "World/sithWeapon.h"
 #include "World/sithWorld.h"
+#include "World/sithInventory.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -636,6 +637,56 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
     hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
     hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
+    
+    // sithInventory
+    hook_function(sithInventory_NewEntry_ADDR, sithInventory_NewEntry);
+    hook_function(sithInventory_GetNumBinsWithFlag_ADDR, sithInventory_GetNumBinsWithFlag);
+    hook_function(sithInventory_GetNumBinsWithFlagRev_ADDR, sithInventory_GetNumBinsWithFlagRev);
+    hook_function(sithInventory_GetNumItemsPriorToIdx_ADDR, sithInventory_GetNumItemsPriorToIdx);
+    hook_function(sithInventory_GetNumItemsFollowingIdx_ADDR, sithInventory_GetNumItemsFollowingIdx);
+    hook_function(sithInventory_SelectItem_ADDR, sithInventory_SelectItem);
+    hook_function(sithInventory_SelectItemPrior_ADDR, sithInventory_SelectItemPrior);
+    hook_function(sithInventory_SelectItemFollowing_ADDR, sithInventory_SelectItemFollowing);
+    hook_function(sithInventory_HasWeaponByIdx_ADDR, sithInventory_HasWeaponByIdx);
+    hook_function(sithInventory_GetBinByIdx_ADDR, sithInventory_GetBinByIdx);
+    hook_function(sithInventory_GetCurWeapon_ADDR, sithInventory_GetCurWeapon);
+    hook_function(sithInventory_SetCurWeapon_ADDR, sithInventory_SetCurWeapon);
+    hook_function(sithInventory_GetCurItem_ADDR, sithInventory_GetCurItem);
+    hook_function(sithInventory_SetCurItem_ADDR, sithInventory_SetCurItem);
+    hook_function(sithInventory_GetCurPower_ADDR, sithInventory_GetCurPower);
+    hook_function(sithInventory_SetCurPower_ADDR, sithInventory_SetCurPower);
+    hook_function(sithInventory_GetWeaponPrior_ADDR, sithInventory_GetWeaponPrior);
+    hook_function(sithInventory_GetWeaponFollowing_ADDR, sithInventory_GetWeaponFollowing);
+    hook_function(sithInventory_GetPowerPrior_ADDR, sithInventory_GetPowerPrior);
+    hook_function(sithInventory_GetPowerFollowing_ADDR, sithInventory_GetPowerFollowing);
+    hook_function(sithInventory_SelectPower_ADDR, sithInventory_SelectPower);
+    hook_function(sithInventory_SelectPowerPrior_ADDR, sithInventory_SelectPowerPrior);
+    hook_function(sithInventory_SelectPowerFollowing_ADDR, sithInventory_SelectPowerFollowing);
+    hook_function(sithInventory_ActivateBin_ADDR, sithInventory_ActivateBin);
+    hook_function(sithInventory_DeactivateBin_ADDR, sithInventory_DeactivateBin);
+    hook_function(sithInventory_BinSendActivate_ADDR, sithInventory_BinSendActivate);
+    hook_function(sithInventory_BinSendDeactivate_ADDR, sithInventory_BinSendDeactivate);
+    hook_function(sithInventory_ChangeInv_ADDR, sithInventory_ChangeInv);
+    hook_function(sithInventory_GetBinAmount_ADDR, sithInventory_GetBinAmount);
+    hook_function(sithInventory_SetBinAmount_ADDR, sithInventory_SetBinAmount);
+    hook_function(sithInventory_SetActivate_ADDR, sithInventory_SetActivate);
+    hook_function(sithInventory_GetActivate_ADDR, sithInventory_GetActivate);
+    hook_function(sithInventory_SetAvailable_ADDR, sithInventory_SetAvailable);
+    hook_function(sithInventory_GetAvailable_ADDR, sithInventory_GetAvailable);
+    hook_function(sithInventory_SetCarries_ADDR, sithInventory_SetCarries);
+    hook_function(sithInventory_GetCarries_ADDR, sithInventory_GetCarries);
+    hook_function(sithInventory_IsBackpackable_ADDR, sithInventory_IsBackpackable);
+    hook_function(sithInventory_GetMin_ADDR, sithInventory_GetMin);
+    hook_function(sithInventory_GetMax_ADDR, sithInventory_GetMax);
+    hook_function(sithInventory_SetFlags_ADDR, sithInventory_SetFlags);
+    hook_function(sithInventory_GetFlags_ADDR, sithInventory_GetFlags);
+    hook_function(sithInventory_UnsetFlags_ADDR, sithInventory_UnsetFlags);
+    hook_function(sithInventory_SendMessageToAllWithState_ADDR, sithInventory_SendMessageToAllWithState);
+    hook_function(sithInventory_SendMessageToAllWithFlag_ADDR, sithInventory_SendMessageToAllWithFlag);
+    hook_function(sithInventory_ClearUncarried_ADDR, sithInventory_ClearUncarried);
+    hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
+    hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
+    hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
     
     // test saber time
     //*(float*)0x5220C4 = 0.01f;

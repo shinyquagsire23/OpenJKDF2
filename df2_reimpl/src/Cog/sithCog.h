@@ -20,6 +20,51 @@
 
 typedef int SITH_MESSAGE;
 
+enum SITH_MESSAGE_E
+{
+    SITH_MESSAGE_0   = 0,
+    SITH_MESSAGE_ACTIVATE  = 1,
+    SITH_MESSAGE_REMOVED  = 2,
+    SITH_MESSAGE_STARTUP  = 3,
+    SITH_MESSAGE_TIMER  = 4,
+    SITH_MESSAGE_BLOCKED  = 5,
+    SITH_MESSAGE_ENTERED  = 6,
+    SITH_MESSAGE_EXITED  = 7,
+    SITH_MESSAGE_CROSSED  = 8,
+    SITH_MESSAGE_SIGHTED  = 9,
+    SITH_MESSAGE_DAMAGED  = 10,
+    SITH_MESSAGE_ARRIVED  = 11,
+    SITH_MESSAGE_KILLED  = 12,
+    SITH_MESSAGE_PULSE  = 13,
+    SITH_MESSAGE_TOUCHED  = 14,
+    SITH_MESSAGE_CREATED  = 15,
+    SITH_MESSAGE_LOADING  = 16,
+    SITH_MESSAGE_SELECTED  = 17,
+    SITH_MESSAGE_DESELECTED  = 18,
+    SITH_MESSAGE_AUTOSELECT  = 19,
+    SITH_MESSAGE_CHANGED  = 20,
+    SITH_MESSAGE_DEACTIVATED  = 21,
+    SITH_MESSAGE_SHUTDOWN  = 22,
+    SITH_MESSAGE_RESPAWN  = 23,
+    SITH_MESSAGE_AIEVENT  = 24,
+    SITH_MESSAGE_SKILL  = 25,
+    SITH_MESSAGE_TAKEN  = 26,
+    SITH_MESSAGE_USER0  = 27,
+    SITH_MESSAGE_USER1  = 28,
+    SITH_MESSAGE_USER2  = 29,
+    SITH_MESSAGE_USER3  = 30,
+    SITH_MESSAGE_USER4  = 31,
+    SITH_MESSAGE_USER5  = 32,
+    SITH_MESSAGE_USER6  = 33,
+    SITH_MESSAGE_USER7  = 34,
+    SITH_MESSAGE_NEWPLAYER  = 35,
+    SITH_MESSAGE_FIRE  = 36,
+    SITH_MESSAGE_JOIN  = 37,
+    SITH_MESSAGE_LEAVE  = 38,
+    SITH_MESSAGE_SPLASH  = 39,
+    SITH_MESSAGE_TRIGGER  = 40,
+};
+
 static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
 static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;

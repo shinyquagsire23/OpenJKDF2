@@ -150,7 +150,7 @@ jkGuiJoystick                  0x13ef     0.473%        0.000%
 sithCogYACC                    0x14ff     0.498%        0.000%       
 jkRes                          0x15b6     0.515%        0.000%       
 rdPrimit3                      0x16e0     0.543%        0.017%       
-sithWorld                      0x1718     0.548%        18.995%      
+sithWorld                      0x1718     0.548%        21.262%      
 stdFont                        0x181a     0.572%        0.000%       
 stdMath                        0x182a     0.573%        32.218%      
 rdActive                       0x1a55     0.625%        0.000%       
@@ -160,7 +160,7 @@ jkHud                          0x1c9b     0.679%        0.000%
 jkGuiMenu                      0x1e2d     0.716%        0.000%       
 sithCog                        0x1ed3     0.731%        16.487%      
 jkSaber                        0x1f4a     0.742%        0.000%       
-sithInventory                  0x2150     0.790%        0.000%       
+sithInventory                  0x2150     0.790%        63.075%      
 sithCogVm                      0x22f7     0.829%        68.171%      
 sithRender                     0x23de     0.851%        0.000%       
 sithMulti                      0x250c     0.879%        0.000%       
@@ -189,5 +189,6 @@ rdAFRaster                     0x1620d    8.398%        0.000%
 rdNRaster                      0x304d4    18.332%       0.000%       
 ------------------------------
 
-Total completion: 7.295%
+Total completion: 7.806%
+
 ```
