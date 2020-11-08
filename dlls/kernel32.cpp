@@ -403,9 +403,9 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     linux_path = std::regex_replace(linux_path, std::regex("//"), "");
     linux_path = std::regex_replace(linux_path, std::regex("[A-Z]:/"), "disk/");
-    printf("Stub: Create file %s\n", linux_path.c_str());
+    printf("Stub: Create file %s %x %x\n", linux_path.c_str(), dwCreationDisposition, dwDesiredAccess);
         
-    FILE *f = fopen(linux_path.c_str(), "rw");
+    FILE *f = fopen(linux_path.c_str(), dwCreationDisposition == 3 ? "rw" : "wb+");
     if (!f)
     {
         printf("Failed to open file %s\n", linux_path.c_str());

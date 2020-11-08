@@ -104,7 +104,7 @@ public:
     Q_INVOKABLE Kernel32() : virtual_head(0), tls_index(0), heap_handle(1), heap_addr(0x90000000), heap_size(0), virtual_addr(0x80000000), virtual_size(0), last_alloc(0), last_error(0), file_search_hand(1) , hFileCnt(1)
     {
         qRegisterMetaType<struct WIN32_FIND_DATAA*>("struct WIN32_FIND_DATAA*");
-        heap_size_actual = 0x8000000;
+        heap_size_actual = 0x10000000;
         virtual_size_actual = 0x10000000;
         heap_mem = vm_alloc(heap_size_actual);
         virtual_mem = vm_alloc(virtual_size_actual);
