@@ -37,7 +37,7 @@
 #define sithSurface_Sync_ADDR (0x004F0B50)
 #define sithSurface_ScrollSky_ADDR (0x004F0BC0)
 
-int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
-int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;
+static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
+static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;
 
 #endif // _SITHSURFACE_H

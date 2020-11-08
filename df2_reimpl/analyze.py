@@ -1,8 +1,10 @@
 funclist = open("ida_copypaste_funclist_nostdlib.txt", "r").read().split("\n")
 
-exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub"]
+exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub", "daRealloc", "daFree", "daAlloc", "WinMain(x,x,x,x)", ]
 file_sizes = {}
 decomped_sizes = {}
+decomped_funcs = {}
+total_funcs = {}
 total_size = 0
 
 mapread = open("output.map", "r").read().split("\n")
@@ -56,15 +58,24 @@ for line in funclist:
     if filefrom not in decomped_sizes:
         decomped_sizes[filefrom] = 0
     
+    if filefrom not in decomped_funcs:
+        decomped_funcs[filefrom] = 0
+        total_funcs[filefrom] = 0
+    
+    #if funcname not in decompiled_funcs and filefrom == "sithModel":
+    #    print (funcname, filefrom)
+    
     if funcname in decompiled_funcs:
         #print (funcname, filefrom)
         decomped_sizes[filefrom] += size
+        decomped_funcs[filefrom] += 1
     
+    total_funcs[filefrom] += 1
     total_size += size
     #print (filefrom, funcname, sect, start, size)
 
 total_percent = 0
-print ("[file]".ljust(30), "[size]".ljust(10), "[% of text]".ljust(13), "[% complete]".ljust(13))
+print ("[file]".ljust(30), "[size]".ljust(10), "[% of text]".ljust(13), "[% complete]".ljust(13), "[decomp / total]".ljust(17))
 for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     if (keyvalpair[0] in exclude_filefrom):
         continue
@@ -76,10 +87,10 @@ for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     
     comp_percent = '{:.3%}'.format(comp_percent_num)
     decomp_percent = '{:.3%}'.format(decomp_percent_num/comp_percent_num)
+    decomp_fraction = str(decomped_funcs[keyvalpair[0]]).rjust(3) + " / " + str(total_funcs[keyvalpair[0]])
     
     
-    
-    print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13))
+    print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13), decomp_fraction.ljust(17))
 
 print("------------------------------\n")
 print ("Total completion:", '{:.3%}'.format(total_percent))

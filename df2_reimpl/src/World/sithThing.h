@@ -6,6 +6,22 @@
 #include "Engine/rdThing.h"
 #include "World/sithPlayer.h"
 
+#define sithThing_Startup_ADDR (0x004CC130)
+#define sithThing_Shutdown_ADDR (0x004CC1A0)
+#define sithThing_SetHandler_ADDR (0x004CC1D0)
+#define sithThing_TickMaybe_ADDR (0x004CC1E0)
+#define sithThing_DetachThing_ADDR (0x004CC4C0)
+#define sithThing_Remove_ADDR (0x004CC610)
+#define sithThing_GetParent_ADDR (0x004CC6A0)
+#define sithThing_GetThingByIdx_ADDR (0x004CC6D0)
+#define sithThing_GetById_ADDR (0x004CC710)
+#define sithThing_Destroy_ADDR (0x004CC7A0)
+#define sithThing_Damage_ADDR (0x004CC7D0)
+#define sithThing_Create_ADDR (0x004CC8C0)
+#define sithThing_Free_ADDR (0x004CCA10)
+
+typedef struct sithAnimclass sithAnimclass;
+
 enum THINGPARAM
 {
     THINGPARAM_0     = 0,
@@ -158,7 +174,7 @@ typedef struct sithThing
     float light_2;
     int isVisible;
     void* soundclass;
-    void* animclass;
+    sithAnimclass* animclass;
     uint32_t unkPtrMajorMode;
     uint32_t typeflags;
     float health;
@@ -225,8 +241,12 @@ typedef struct sithThing
     sithCog* class_cog;
     sithCog* capture_cog;
     void* saberInfo;
-    uint32_t render_flags;
+    uint32_t jkFlags;
     void* userdata;
 } sithThing;
+
+static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
+static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
+static signed int (*sithThing_ParseArgs)(char **a1, sithThing *thing) = (void*)0x004CEB90;
 
 #endif // _SITHTHING_H

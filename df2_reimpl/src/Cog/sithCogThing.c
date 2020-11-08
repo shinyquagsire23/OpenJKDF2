@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-static void (*sithCogThing_GetThingType)(sithCog* ctx) = (void*)0x00502080;
 static void (*sithCogThing_CreateThing)(sithCog* ctx) = (void*)0x005020B0;
 static void (*sithCogThing_CreateThingNr)(sithCog* ctx) = (void*)0x00502150;
 static void (*sithCogThing_createThingUnused)(sithCog* ctx) = (void*)0x005021F0;
@@ -143,6 +142,25 @@ static void (*sithCogThing_SyncThingPos)(sithCog* ctx) = (void*)0x00505340;
 static void (*sithCogThing_SyncThingAttachment)(sithCog* ctx) = (void*)0x00505360;
 static void (*sithCogThing_SyncThingState)(sithCog* ctx) = (void*)0x00505390;
 static void (*sithCogThing_GetMajorMode)(sithCog* ctx) = (void*)0x005053B0;
+
+void sithCogThing_GetThingType(sithCog *ctx)
+{
+    sithThing *thing;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+        sithCogVm_PushInt(ctx, thing->thingType);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+// creatething
+// createthingnr
+// createthingunused
+// pos
+// posnr
+// pos_nr
+// damagething
 
 void sithCogThing_Initialize(void* ctx)
 {

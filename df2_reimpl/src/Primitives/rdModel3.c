@@ -994,6 +994,78 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
     } 
 }
 
+void rdModel3_CalcVertexNormals(rdModel3 *model)
+{
+    double v10; // st7
+    double v11; // st6
+    double v12; // st5
+    double v13; // st4
+    unsigned int v15; // eax
+    rdVector3 *v19; // ecx
+    int v22; // edx
+
+    for (int geosetNum = 0; geosetNum < model->numGeosets; geosetNum++)
+    {
+        rdGeoset* geoset = &model->geosets[geosetNum];
+        for (int meshNum = 0; meshNum < geoset->numMeshes; meshNum++)
+        {
+            rdMesh* mesh = &geoset->meshes[meshNum];
+
+            for (int vtxNum = 0; vtxNum < mesh->numVertices; vtxNum++)
+            {
+                rdFace* faceRoot = mesh->faces;
+                v10 = 0.0;
+                v11 = 0.0;
+                v12 = 0.0;
+                v13 = 0.0;
+                for (int faceNum = 0; faceNum < mesh->numFaces; faceNum++)
+                {
+                    rdFace* face = &mesh->faces[faceNum];
+                    v15 = 0;
+                    for (int i = 0; i < face->numVertices; i++)
+                    {
+                        if ( face->vertexPosIdx[v15] != vtxNum )
+                        {
+                            ++v15;
+                            if ( v15 >= face->numVertices )
+                                break;
+                            continue;
+                        }
+                        v10 = v10 + face->normal.x;
+                        v11 = v11 + face->normal.y;
+                        v12 = v12 + face->normal.z;
+                        v13 = v13 - -1.0;
+                    }
+                }
+                if ( v13 == 0.0 )
+                {
+                    mesh->vertexNormals[vtxNum].x = 1.0;
+                    mesh->vertexNormals[vtxNum].y = 0.0;
+                    mesh->vertexNormals[vtxNum].z = 0.0;
+                }
+                else
+                {
+                    if ( v13 == 1.0 )
+                    {
+                        v19 = &mesh->vertices[faceRoot->vertexPosIdx[faceRoot->numVertices - 1]];
+                        v22 = faceRoot->vertexPosIdx[1 % faceRoot->numVertices];
+                        mesh->vertexNormals[vtxNum].y = (mesh->vertices->y - mesh->vertices[v22].y) + (mesh->vertices->y - v19->y);
+                        mesh->vertexNormals[vtxNum].z = (mesh->vertices->z - mesh->vertices[v22].z) + (mesh->vertices->z - v19->z);
+                        mesh->vertexNormals[vtxNum].x = (mesh->vertices->x - mesh->vertices[v22].x) + (mesh->vertices->x - v19->x);
+                    }
+                    else
+                    {
+                        mesh->vertexNormals[vtxNum].x = v10 / v13;
+                        mesh->vertexNormals[vtxNum].y = v11 / v13;
+                        mesh->vertexNormals[vtxNum].z = v12 / v13;
+                    }
+                    rdVector_Normalize3Acc(&mesh->vertexNormals[vtxNum]);
+                }
+            }
+        }
+    }
+}
+
 //vertexnormals, technically unused, from editors?
 
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model)

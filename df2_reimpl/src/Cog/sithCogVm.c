@@ -7,6 +7,7 @@
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "Win95/DebugConsole.h"
+#include "Engine/sithTemplate.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -525,7 +526,6 @@ sithThing* sithCogVm_PopTemplate(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -547,19 +547,8 @@ sithThing* sithCogVm_PopTemplate(sithCog *ctx)
     {
         idx = -1;
     }
-    
-    if ( idx & 0x8000 )
-    {
-        world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF; // ?
-    }
-    
-    if ( world && idx >= 0 && idx < world->numTemplatesLoaded )
-    {
-        return &world->templates[idx];
-    }
 
-    return NULL;
+    return sithTemplate_GetEntryByIdx(idx);
 }
 
 #if 0

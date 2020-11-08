@@ -27,6 +27,10 @@
 #include "Engine/rdThing.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithModel.h"
+#include "Engine/sithParticle.h"
+#include "Engine/sithSprite.h"
+#include "Engine/sithSurface.h"
+#include "Engine/sithTemplate.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -36,10 +40,15 @@
 #include "World/sithWeapon.h"
 #include "World/sithWorld.h"
 #include "World/sithInventory.h"
+#include "World/jkPlayer.h"
+#include "World/jkSaber.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
 #include "Win95/stdConsole.h"
+#include "AI/sithAI.h"
+#include "AI/sithAIClass.h"
+#include "AI/sithAICmd.h"
 
 int yyparse();
 
@@ -611,7 +620,7 @@ __declspec(dllexport) void hook_init(void)
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_InitDefaults2_ADDR, sithWeapon_InitDefaults2);
-    
+
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
     hook_function(sithTime_Pause_ADDR, sithTime_Pause);
@@ -637,7 +646,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
     hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
     hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
-    
+
     // sithInventory
     hook_function(sithInventory_NewEntry_ADDR, sithInventory_NewEntry);
     hook_function(sithInventory_GetNumBinsWithFlag_ADDR, sithInventory_GetNumBinsWithFlag);
@@ -687,9 +696,38 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
     hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
+
+    // sithTemplate
+    hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
+    hook_function(sithTemplate_Shutdown_ADDR, sithTemplate_Shutdown);
+    hook_function(sithTemplate_New_ADDR, sithTemplate_New);
+    hook_function(sithTemplate_GetEntryByIdx_ADDR, sithTemplate_GetEntryByIdx);
+    hook_function(sithTemplate_Load_ADDR, sithTemplate_Load);
+    hook_function(sithTemplate_OldNew_ADDR, sithTemplate_OldNew);
+    hook_function(sithTemplate_OldFree_ADDR, sithTemplate_OldFree);
+    hook_function(sithTemplate_FreeWorld_ADDR, sithTemplate_FreeWorld);
+    hook_function(sithTemplate_GetEntryByName_ADDR, sithTemplate_GetEntryByName);
+    hook_function(sithTemplate_CreateEntry_ADDR, sithTemplate_CreateEntry);
     
+    // jkPlayer
+    hook_function(jkPlayer_renderSaberWeaponMesh_ADDR, jkPlayer_renderSaberWeaponMesh);
+    
+    // jkSaber
+    hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
+    
+    // sithAI
+    hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
+    hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
+
+    // sithAIClass
+    
+    // sithAICmd
+    hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);
+
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
+
+    
     
     //hook_function();
 }

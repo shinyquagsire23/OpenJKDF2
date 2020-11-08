@@ -79,7 +79,7 @@ typedef struct rdModel3
     rdHierarchyNode* hierarchyNodes;
     float radius;
     uint32_t field_60;
-    uint32_t field_64;
+    float field_64;
     uint32_t field_68;
     uint32_t field_6C;
     uint32_t field_70;
@@ -168,7 +168,7 @@ rdModel3* rdModel3_Validate(rdModel3 *model);
 void rdModel3_CalcBoundingBoxes(rdModel3 *model);
 void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, rdMatrix34 *matrix);
 void rdModel3_CalcFaceNormals(rdModel3 *model);
-//void rdModel3_CalcVertexNormals(rdModel3 *model)
+void rdModel3_CalcVertexNormals(rdModel3 *model);
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);
 int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeIdx, rdMatrix34 *out);
 int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
@@ -177,6 +177,6 @@ void rdModel3_DrawHNode(rdHierarchyNode *node);
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
 int rdModel3_DrawFace(rdFace *face, int lightFlags);
 
-static int (__cdecl *rdModel3_CalcVertexNormals)(rdModel3 *model) = (void*)rdModel3_CalcVertexNormals_ADDR;
+//static int (__cdecl *rdModel3_CalcVertexNormals)(rdModel3 *model) = (void*)rdModel3_CalcVertexNormals_ADDR;
 
 #endif // _RDMODEL3_H
