@@ -16,6 +16,9 @@
 #define sithCogSector_Initialize_ADDR (0x004FE680)
 #define sithCogSurface_Initialize_ADDR (0x004FFB50)
 
+#define sithCog_SendMessageFromThing_ADDR (0x4DFAC0)
+#define sithCog_SendMessageFromThingEx_ADDR (0x004DFAF0)
+
 #define sithCogYACC_yyparse_ADDR (0x50BF50)
 
 typedef int SITH_MESSAGE;
@@ -79,5 +82,8 @@ void sithCogSound_Initialize(void* a1);
 void sithCogPlayer_Initialize(void* a1);
 void sithCogSector_Initialize(void* a1);
 void sithCogSurface_Initialize(void* a1);
+
+void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
+static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
 
 #endif // _SITHCOG_H

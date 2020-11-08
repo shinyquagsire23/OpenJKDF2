@@ -32,10 +32,10 @@ rdroid                         0x1f6      0.047%        100.000%       27 / 27
 sithHeader                     0x1f9      0.047%        100.000%        1 / 1          
 gui                            0x213      0.049%        0.000%          0 / 1          
 sithTime                       0x213      0.049%        100.000%        6 / 6          
-sithItem                       0x218      0.050%        0.000%          0 / 4          
 jkGuiSingleTally               0x21b      0.050%        0.000%          0 / 4          
 jkGuiSetup                     0x240      0.053%        0.000%          0 / 4          
 jkGuiSound                     0x274      0.058%        0.000%          0 / 3          
+sithItem                       0x275      0.058%        0.000%          0 / 5          
 jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3          
 stdMemory                      0x2ba      0.065%        0.000%          0 / 7          
 sithTimer                      0x2e3      0.068%        0.000%          0 / 9          
@@ -154,8 +154,8 @@ sithCogParse                   0x1b2a     0.644%        10.282%         4 / 26
 sithSurface                    0x1c6a     0.674%        0.000%          0 / 35         
 jkHud                          0x1c9b     0.679%        0.000%          0 / 17         
 jkGuiMenu                      0x1e2d     0.716%        0.000%          0 / 33         
-sithCog                        0x1ed3     0.731%        16.487%         1 / 28         
-jkSaber                        0x1f4a     0.742%        3.895%          2 / 40         
+sithCog                        0x1ed3     0.731%        16.918%         2 / 28         
+jkSaber                        0x1f4a     0.742%        33.296%         5 / 40         
 sithInventory                  0x2150     0.790%        63.075%        48 / 62         
 sithCogVm                      0x22f7     0.829%        68.171%        31 / 42         
 sithRender                     0x23de     0.851%        0.000%          0 / 22         
@@ -171,13 +171,13 @@ rdModel3                       0x2a7e     1.008%        100.000%       23 / 23
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
 rdMatrix                       0x2c85     1.056%        100.000%       56 / 56         
 sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22         
-jkPlayer                       0x2da2     1.082%        0.000%          0 / 45         
+jkPlayer                       0x2da2     1.082%        4.254%          1 / 45         
 sithWeapon                     0x32a8     1.202%        0.987%          1 / 33         
 rdCache                        0x331c     1.212%        0.000%          0 / 16         
 sithCogThing                   0x3a4c     1.383%        20.216%         2 / 142        
 cogMsg                         0x3ad7     1.396%        0.000%          0 / 60         
-sithSector                     0x3e7d     1.482%        0.000%          0 / 37         
-sithThing                      0x481b     1.710%        0.000%          0 / 69         
+sithSector                     0x3af2     1.398%        0.000%          0 / 35         
+sithThing                      0x4b49     1.786%        0.000%          0 / 70         
 rdClip                         0x81f2     3.082%        2.567%          2 / 17         
 rdRaster                       0xf04d     5.700%        0.000%          0 / 89         
 rdZRaster                      0x15fb4    8.342%        0.000%          0 / 73         
@@ -185,5 +185,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 8.148%
+Total completion: 8.416%
 ```

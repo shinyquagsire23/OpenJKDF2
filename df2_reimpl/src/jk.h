@@ -264,6 +264,8 @@ int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);
 
+float _frand();
+
 // JK globals
 VM_VAR_DECL(g_hWnd, HWND);
 

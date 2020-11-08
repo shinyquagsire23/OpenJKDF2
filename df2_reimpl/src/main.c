@@ -183,6 +183,7 @@ __declspec(dllexport) void hook_init(void)
     
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
+    hook_function(sithCog_SendMessageFromThing_ADDR, sithCog_SendMessageFromThing);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
@@ -713,7 +714,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkPlayer_renderSaberWeaponMesh_ADDR, jkPlayer_renderSaberWeaponMesh);
     
     // jkSaber
+    hook_function(jkSaber_InitializeSaberInfo_ADDR, jkSaber_InitializeSaberInfo);
+    hook_function(jkSaber_PolylineRand_ADDR, jkSaber_PolylineRand);
     hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
+    hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
+    hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

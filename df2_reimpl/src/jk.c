@@ -241,6 +241,11 @@ int _strcmp(const char* s1, const char* s2)
     return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
+float _frand()
+{
+    return (float)_rand() * 0.000030518509;
+}
+
 // JK globals
 VM_VAR(g_hWnd, HWND, 0x855DE0);
 

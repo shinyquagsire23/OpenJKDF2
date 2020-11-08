@@ -38,7 +38,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
             if (thing->jkFlags & JKFLAG_SABERON)
             {
-                jkSaber_PolylineRandidk(&saberInfo->polylineThing);
+                jkSaber_PolylineRand(&saberInfo->polylineThing);
                 rdThing_Draw(&saberInfo->polylineThing, primaryMat);
                 if ( thing->jkFlags & JKFLAG_DUALSABERS)
                     rdThing_Draw(&saberInfo->polylineThing, secondaryMat);
@@ -56,7 +56,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
         
         if (thing->jkFlags & JKFLAG_SABERON)
         {
-            //jkSaber_PolylineRandidk(&saberInfo->polylineThing);
+            //jkSaber_PolylineRand(&saberInfo->polylineThing);
             rdThing_Draw(&saberInfo->polylineThing, primaryMat);
             if (thing->jkFlags & JKFLAG_DUALSABERS)
                 rdThing_Draw(&saberInfo->polylineThing, secondaryMat);

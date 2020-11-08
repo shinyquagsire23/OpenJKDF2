@@ -9,11 +9,17 @@
 #define jkPlayer_renderSaberWeaponMesh_ADDR (0x405520)
 #define jkPlayer_renderSaberTwinkle_ADDR (0x405720)
 
+typedef struct sithSurface sithSurface;
+
 enum JKFLAG
 {
     JKFLAG_SABERON = 1,
+    JKFLAG_SABERNODAMAGE = 2,
+    JKFLAG_SABEREXTEND = 4,
+    JKFLAG_SABERRETRACT = 8,
     JKFLAG_DUALSABERS = 0x10,
-    JKFLAG_PERSUASION = 0x20
+    JKFLAG_PERSUASION = 0x20,
+    JKFLAG_SABERFORCEON = 0x80
 };
 
 typedef struct jkSaberInfo
@@ -26,25 +32,15 @@ typedef struct jkSaberInfo
     rdPolyLine polyline;
     rdThing polylineThing;
     uint32_t field_1A4;
-    uint32_t field_1A8;
+    float damage;
     uint32_t field_1AC;
     uint32_t field_1B0;
     uint32_t field_1B4;
-    uint32_t field_1B8;
-    uint32_t field_1BC;
-    uint32_t field_1C0;
-    uint32_t field_1C4;
-    uint32_t field_1C8;
-    uint32_t field_1CC;
-    uint32_t field_1D0;
-    uint32_t numIdks;
-    void* idk;
-    uint32_t field_1DC;
-    uint32_t field_1E0;
-    uint32_t field_1E4;
-    uint32_t field_1E8;
-    uint32_t field_1EC;
-    uint32_t field_1F0;
+    uint32_t numDamagedThings;
+    sithThing* damagedThings[6];
+    uint32_t numDamagedSurfaces;
+    sithSurface* damagedSurfaces[6];
+    uint32_t lastSparkSpawnMs;
     sithThing* wall_sparks;
     sithThing* blood_sparks;
     sithThing* saber_sparks;

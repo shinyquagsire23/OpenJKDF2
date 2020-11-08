@@ -124,3 +124,8 @@ int sithCog_Startup()
     //cog_initialized = 1;
     return 1;
 }
+
+void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
+{
+    sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
+}

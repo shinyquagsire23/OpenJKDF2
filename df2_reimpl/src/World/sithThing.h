@@ -19,8 +19,10 @@
 #define sithThing_Damage_ADDR (0x004CC7D0)
 #define sithThing_Create_ADDR (0x004CC8C0)
 #define sithThing_Free_ADDR (0x004CCA10)
+#define sithThing_SpawnThingInSector_ADDR (0x4CD9E0)
 
 typedef struct sithAnimclass sithAnimclass;
+typedef struct sithSector sithSector;
 
 enum THINGPARAM
 {
@@ -125,8 +127,306 @@ enum SITH_DT
     SITH_DT_SABER    = 0x10
 };
 
+enum SITH_TF
+{
+    SITH_TF_LIGHT    = 1,
+    SITH_TF_WILLBEREMOVED  = 2,
+    SITH_TF_CAPTURED  = 4,
+    SITH_TF_LEVELGEO  = 8,
+    SITH_TF_10       = 0x10,
+    SITH_TF_20       = 0x20,
+    SITH_TF_STANDABLE  = 0x40,
+    SITH_TF_80       = 0x80,
+    SITH_TF_INVULN   = 0x100,
+    SITH_TF_DEAD     = 0x200,
+    SITH_TF_400      = 0x400,
+    SITH_TF_NOIMPACTDAMAGE  = 0x800,
+    SITH_TF_NOEASY   = 0x1000,
+    SITH_TF_NOMEDIUM  = 0x2000,
+    SITH_TF_NOHARD   = 0x4000,
+    SITH_TF_8000     = 0x8000,
+    SITH_TF_10000    = 0x10000,
+    SITH_TF_PULSE    = 0x20000,
+    SITH_TF_TIMER    = 0x40000,
+    SITH_TF_DISABLED  = 0x80000,
+    SITH_TF_INCAMFOV  = 0x100000,
+    SITH_TF_RENDERWEAPON  = 0x200000,
+    SITH_TF_METAL    = 0x400000,
+    SITH_TF_EARTH    = 0x800000,
+    SITH_TF_1000000  = 0x1000000,
+    SITH_TF_WATER    = 0x2000000,
+    SITH_TF_4000000  = 0x4000000,
+    SITH_TF_DROWNS   = 0x8000000,
+    SITH_TF_WATERCREATURE  = 0x10000000,
+    SITH_TF_SPLASHES  = 0x20000000
+};
+
+enum THING_TYPEFLAGS
+{
+    THING_TYPEFLAGS_1  = 0x1,
+    THING_TYPEFLAGS_FORCE  = 0x2,
+    THING_TYPEFLAGS_DAMAGE  = 0x4,
+    THING_TYPEFLAGS_8  = 0x8,
+    THING_TYPEFLAGS_LIGHT  = 0x10,
+    THING_TYPEFLAGS_20  = 0x20,
+    THING_TYPEFLAGS_40  = 0x40,
+    THING_TYPEFLAGS_80  = 0x80,
+    THING_TYPEFLAGS_DROID  = 0x100,
+    THING_TYPEFLAGS_BOSS  = 0x200,
+    THING_TYPEFLAGS_DEAF  = 0x400,
+    THING_TYPEFLAGS_BLIND  = 0x800,
+    THING_TYPEFLAGS_1000  = 0x1000,
+    THING_TYPEFLAGS_ISBLOCKING  = 0x2000,
+    THING_TYPEFLAGS_4000  = 0x4000,
+    THING_TYPEFLAGS_8000  = 0x8000,
+    THING_TYPEFLAGS_SCREAMING  = 0x10000,
+    THING_TYPEFLAGS_20000  = 0x20000,
+    THING_TYPEFLAGS_40000  = 0x40000,
+    THING_TYPEFLAGS_CANTSHOOTUNDERWATER  = 0x80000,
+    THING_TYPEFLAGS_100000  = 0x100000,
+    THING_TYPEFLAGS_IMMOBILE  = 0x200000,
+    THING_TYPEFLAGS_400000  = 0x400000,
+    THING_TYPEFLAGS_800000  = 0x800000,
+    THING_TYPEFLAGS_1000000  = 0x1000000,
+    THING_TYPEFLAGS_2000000  = 0x2000000,
+    THING_TYPEFLAGS_4000000  = 0x4000000,
+    THING_TYPEFLAGS_8000000  = 0x8000000,
+    THING_TYPEFLAGS_10000000  = 0x10000000,
+    THING_TYPEFLAGS_20000000  = 0x20000000,
+    THING_TYPEFLAGS_40000000  = 0x40000000,
+    THING_TYPEFLAGS_80000000  = 0x80000000
+};
+
 typedef struct sithThing sithThing; 
 typedef struct sithCog sithCog;
+
+typedef struct sithThingParticleParams
+{
+    uint32_t field_0;
+    uint32_t count;
+    uint32_t field_8;
+    float elementSize;
+    float maxThrust;
+    float minSize;
+    float range;
+    float pitchRange;
+    float yawRange;
+    float rate;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    rdVector3 field_38;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+} sithThingParticleParams;
+
+typedef struct sithThingExplosionParams
+{
+    uint32_t typeflags;
+    uint32_t lifeLeftMs;
+    float range;
+    float force;
+    int blastTime;
+    float maxLight;
+    uint32_t field_18;
+    float damage;
+    uint32_t damageClass;
+    int flashR;
+    int flashG;
+    int flashB;
+    sithThing* debrisTemplates[4];
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+    uint32_t field_80;
+} sithThingExplosionParams;
+
+typedef struct sithThingItemParams
+{
+    uint32_t typeflags;
+    uint32_t field_4;
+    uint32_t material;
+    uint32_t field_C;
+    uint32_t field_10;
+    uint32_t respawn;
+    uint32_t respawnTime;
+    uint32_t field_1C;
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+    uint32_t field_80;
+} sithThingItemParams;
+
+typedef struct sithThingWeaponParams
+{
+    uint32_t typeflags;
+    uint32_t damageClass;
+    rdMaterial* material;
+    float damage;
+    sithThing* explodeTemplate;
+    sithThing* fleshHitTemplate;
+    uint32_t field_18;
+    float rate;
+    float mindDamage;
+    sithThing* trailThing;
+    float elementSize;
+    float trailCylRadius;
+    float trainRandAngle;
+    uint32_t field_34;
+    float range;
+    float force;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+    uint32_t field_80;
+    uint32_t field_84;
+    uint32_t field_88;
+    uint32_t field_8C;
+} sithThingWeaponParams;
+
+typedef struct sithThingActorParams
+{
+    uint32_t typeflags;
+    float health;
+    float maxHealth;
+    float force;
+    float jumpSpeed;
+    float extraSpeed;
+    float maxThrust;
+    float maxRotThrust;
+    sithThing* templateWeapon;
+    sithThing* templateWeapon2;
+    sithThing* templateExplode;
+    rdVector3 eyePYR;
+    rdVector3 eyeOffset;
+    float minHeadPitch;
+    float maxHeadPitch;
+    rdVector3 fire_offset;
+    rdVector3 lightOffset;
+    float lightIntensity;
+    rdVector3 saberBladePos;
+    float timeLeftLengthChange;
+    uint32_t field_1A8;
+    uint32_t field_1AC;
+    float chance;
+    float fov;
+    float error;
+    uint32_t field_1BC;
+    sithPlayerInfo *playerinfo;
+    uint32_t field_1C4;
+    uint32_t field_1C8;
+    uint32_t field_1CC;
+} sithThingActorParams;
+
+typedef struct sithThingPhysParams
+{
+    uint32_t physflags;
+    rdVector3 vel;
+    rdVector3 angVel;
+    rdVector3 acceleration;
+    rdVector3 field_1F8;
+    float mass;
+    float height;
+    float airDrag;
+    float surfaceDrag;
+    float staticDrag;
+    float maxRotVel;
+    float maxVel;
+    float orientSpeed;
+    float buoyancy;
+} sithThingPhysParams;
+
+typedef struct sithThingFrame
+{
+    rdVector3 from;
+    rdVector3 to;
+} sithThingFrame;
+
+typedef struct sithThingTrackParams
+{
+    uint32_t numFrames;
+    uint32_t loadedFrames;
+    sithThingFrame *frames;
+    uint32_t field_C;
+    uint32_t field_10;
+    uint32_t field_14;
+    uint32_t field_18;
+    uint32_t field_1C;
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+} sithThingTrackParams;
 
 typedef struct sithThing
 {
@@ -175,53 +475,20 @@ typedef struct sithThing
     int isVisible;
     void* soundclass;
     sithAnimclass* animclass;
-    uint32_t unkPtrMajorMode;
-    uint32_t typeflags;
-    float health;
-    float maxHealth;
-    float force;
-    float jumpSpeed;
-    float extraSpeed;
-    float maxThrust_;
-    float maxRotThrust;
-    uint32_t templateWeapon;
-    uint32_t templateWeapon2;
-    uint32_t templateExplode;
-    rdVector3 field_15C;
-    rdVector3 eyeOffset;
-    float minHeadPitch;
-    float maxHeadPitch;
-    rdVector3 fire_offset;
-    rdVector3 lightOffset;
-    float lightIntensity;
-    uint32_t field_198;
-    uint32_t field_19C;
-    uint32_t field_1A0;
-    float timeLeftLengthChange;
-    uint32_t field_1A8;
-    uint32_t field_1AC;
-    float chance;
-    float fov;
-    float error;
-    uint32_t field_1BC;
-    sithPlayerInfo* playerinfo;
-    uint32_t field_1C4;
-    uint32_t field_1C8;
-    uint32_t field_1CC;
-    uint32_t physflags;
-    rdVector3 vel;
-    rdVector3 angVel;
-    rdVector3 acceleration;
-    rdVector3 field_1F8;
-    float mass;
-    float height;
-    float airDrag;
-    float surfaceDrag;
-    float staticDrag;
-    float maxRotVel;
-    float maxVel;
-    float orientSpeed;
-    float buoyancy;
+    uint32_t puppet;
+    union
+    {
+        sithThingActorParams actorParams;
+        sithThingWeaponParams weaponParams;
+        sithThingItemParams itemParams;
+        sithThingExplosionParams explosionParams;
+        sithThingParticleParams particleParams;
+    };
+    union
+    {
+        sithThingPhysParams physicsParams;
+        sithThingTrackParams trackParams;
+    };
     rdVector3 field_228;
     rdVector3 field_234;
     uint32_t field_240;
@@ -248,5 +515,8 @@ typedef struct sithThing
 static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
 static signed int (*sithThing_ParseArgs)(char **a1, sithThing *thing) = (void*)0x004CEB90;
+
+static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
+static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 
 #endif // _SITHTHING_H
