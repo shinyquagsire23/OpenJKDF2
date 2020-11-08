@@ -28,6 +28,8 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
         }
 
         jkSaber_PolylineRandidk(&playerThings[playerThingIdx].polylineThing);
-        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].field_4C.hierarchyNodeMatrices[5]);
+        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].field_4C.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
+        //if (thing->jkFlags & JKFLAG_DUALSABERS)
+        //    rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].field_4C.hierarchyNodeMatrices[2]); // K_Lhand
     }
 }
