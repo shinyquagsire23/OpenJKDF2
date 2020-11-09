@@ -32,7 +32,7 @@
 #define sithSurface_SetSectorLight_ADDR (0x004F04A0)
 #define sithSurface_SetThingLight_ADDR (0x004F0560)
 #define sithSurface_tick_ADDR (0x004F0630)
-#define sithSurface_StopSurfaceAnim_ADDR (0x004F09F0)
+#define sithSurface_GetRdSurface_ADDR (0x004F09F0)
 #define sithSurface_detachthing_ADDR (0x004F0A30)
 #define sithSurface_GetByIdx_ADDR (0x004F0AA0)
 #define sithSurface_Alloc_ADDR (0x004F0AF0)
@@ -42,6 +42,7 @@
 typedef struct sithSector sithSector;
 typedef struct sithAdjoin sithAdjoin;
 typedef struct rdMaterial rdMaterial;
+typedef struct rdSurface rdSurface;
 
 typedef struct sithSurfaceInfo
 {
@@ -76,5 +77,9 @@ typedef struct sithSurface
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;
+static sithSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADDR;
+static int (*sithSurface_StopAnim)(sithSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
+static rdSurface* (__cdecl *sithSurface_GetRdSurface)(sithSurface *a1) = (void*)sithSurface_GetRdSurface_ADDR;
+static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
 
 #endif // _SITHSURFACE_H

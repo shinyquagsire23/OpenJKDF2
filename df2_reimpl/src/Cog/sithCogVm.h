@@ -56,6 +56,8 @@
 #define COGVM_FLAG_TRACE (1)
 #define COGVM_FLAG_IDK   (2)
 
+typedef struct sithSurface sithSurface;
+
 enum COGFLAGS
 {
     COGFLAGS_TRACE = 1,
@@ -377,7 +379,7 @@ sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, si
 //static int (__cdecl *sithCogVm_PopInt)(sithCog *ctx) = (void*)sithCogVm_PopInt_ADDR;
 //static int (__cdecl *sithCogVm_PopVector3)(sithCog *ctx, rdVector3* out) = (void*)sithCogVm_PopVector3_ADDR;
 //static char* (__cdecl *sithCogVm_PopString)(sithCog *ctx) = (void*)sithCogVm_PopString_ADDR;
-static void* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_PopSurface_ADDR;
+static sithSurface* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_PopSurface_ADDR;
 //static void* (__cdecl *sithCogVm_PopMaterial)(sithCog* ctx) = (void*)sithCogVm_PopMaterial_ADDR;
 //static rdKeyframe* (__cdecl *sithCogVm_PopKeyframe_)(sithCog* ctx) = (void*)sithCogVm_PopKeyframe_ADDR;
 //static sithCog* (__cdecl *sithCogVm_PopCog)(sithCog* ctx) = (void*)sithCogVm_PopCog_ADDR;

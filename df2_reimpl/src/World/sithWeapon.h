@@ -1,7 +1,7 @@
 #ifndef _SITHWEAPON_H
 #define _SITHWEAPON_H
 
-//#define  (*(*)0x)
+#include "Primitives/rdMatrix.h"
 
 #define sithWeapon_InitDefaults_ADDR (0x004D3430)
 #define sithWeapon_InitDefaults2_ADDR (0x004D34B0)
@@ -59,6 +59,9 @@
 #define sithWeapon_fireWait (*(float*)0x008BD0A8)
 #define sithWeapon_fireRate (*(float*)0x008BD0AC)
 #define sithWeapon_LastFireTimeSecs (*(*)0x008BD0B0)
+
+typedef struct sithThing sithThing;
+typedef struct sithSurface sithSurface;
 
 void sithWeapon_InitDefaults();
 void sithWeapon_InitDefaults2();

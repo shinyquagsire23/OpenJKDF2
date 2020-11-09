@@ -10,35 +10,19 @@
 #include "stdPlatform.h"
 #include "General/stdString.h"
 #include "Engine/sithSurface.h"
+#include "World/sithSector.h"
+#include "World/sithTrackThing.h"
+#include "Engine/sithTemplate.h"
+#include "Engine/sithKeyFrame.h"
+#include "Engine/rdKeyframe.h"
+#include "Engine/sithModel.h"
+#include "World/sithWorld.h"
+#include "Main/jkGame.h"
 
-static void (*sithCogUtil_StopThing)(sithCog* ctx) = (void*)0x005060B0; // unused?
-static void (*sithCogUtil_StopAnim)(sithCog* ctx) = (void*)0x005060E0;
-static void (*sithCogUtil_StopSurfaceAnim)(sithCog* ctx) = (void*)0x00506130;
-static void (*sithCogUtil_GetSurfaceAnim)(sithCog* ctx) = (void*)0x00506180;
-static void (*sithCogUtil_LoadTemplate)(sithCog* ctx) = (void*)0x005061C0;
-static void (*sithCogUtil_LoadKeyframe)(sithCog* ctx) = (void*)0x00506200;
-static void (*sithCogUtil_LoadModel)(sithCog* ctx) = (void*)0x00506240;
-static void (*sithCogUtil_SetPulse)(sithCog* ctx) = (void*)0x00506280;
-static void (*sithCogUtil_SetTimer)(sithCog* ctx) = (void*)0x00506340;
 static void (*sithCogUtil_SetTimerEx)(sithCog* ctx) = (void*)0x005063F0;
 static void (*sithCogUtil_KillTimerEx)(sithCog* ctx) = (void*)0x00506470;
 
-static void (*sithCogUtil_GetSithMode)(sithCog* ctx) = (void*)0x005069B0;
-static void (*sithCogUtil_GetGametime)(sithCog* ctx) = (void*)0x005069D0;
-static void (*sithCogUtil_GetFlexGameTime)(sithCog* ctx) = (void*)0x005069F0;
-static void (*sithCogUtil_GetDifficulty)(sithCog* ctx) = (void*)0x00506A10;
-static void (*sithCogUtil_SetSubmodeFlags)(sithCog* ctx) = (void*)0x00506A30;
-static void (*sithCogUtil_ClearSubmodeFlags)(sithCog* ctx) = (void*)0x00506A50;
-static void (*sithCogUtil_GetSubmodeFlags)(sithCog* ctx) = (void*)0x00506A70;
-static void (*sithCogUtil_SetDebugModeFlags)(sithCog* ctx) = (void*)0x00506A90;
-static void (*sithCogUtil_ClearDebugModeFlags)(sithCog* ctx) = (void*)0x00506AB0;
-static void (*sithCogUtil_GetDebugModeFlags)(sithCog* ctx) = (void*)0x00506AD0;
-
-static void (*sithCogUtil_GetLevelTime)(sithCog* ctx) = (void*)0x00506B80;
-static void (*sithCogUtil_GetThingCount)(sithCog* ctx) = (void*)0x00506BC0;
 static void (*sithCogUtil_GetThingTemplateCount)(sithCog* ctx) = (void*)0x00506BE0;
-static void (*sithCogUtil_GetGravity)(sithCog* ctx) = (void*)0x00506C40;
-static void (*sithCogUtil_SetGravity)(sithCog* ctx) = (void*)0x00506C60;
 
 static void (*sithCogUtil_SetMaterialCel)(sithCog* ctx) = (void*)0x00506DE0;
 static void (*sithCogUtil_GetMaterialCel)(sithCog* ctx) = (void*)0x00506E20;
@@ -96,7 +80,6 @@ static void (*sithCogUtil_GetScoreLimit)(sithCog* ctx) = (void*)0x00507DB0;
 static void (*sithCogUtil_SetScoreLimit)(sithCog* ctx) = (void*)0x00507DD0;
 static void (*sithCogUtil_ChangeFireRate)(sithCog* ctx) = (void*)0x00507DF0;
 static void (*sithCogUtil_AutoSaveGame)(sithCog* ctx) = (void*)0x00507E40;
-
 
 void sithCogUtil_GetSenderId(sithCog* ctx)
 {
@@ -256,6 +239,166 @@ void sithCogUtil_MaterialAnim(sithCog *ctx)
         sithCogVm_PushInt(ctx_, -1);
 }
 
+void sithCogUtil_StopThing(sithCog *ctx) // unused
+{
+    sithThing *v1;
+
+    v1 = sithCogVm_PopThing(ctx);
+    if ( v1 )
+    {
+        if ( v1->move_type == 1 )
+        {
+            sithSector_StopPhysicsThing(v1);
+        }
+        else if ( v1->move_type == 2 )
+        {
+            sithTrackThing_Stop(v1);
+        }
+    }
+}
+
+void sithCogUtil_StopAnim(sithCog *ctx)
+{
+    int v1; // eax
+    sithSurface *v2; // eax
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithSurface_GetByIdx(v1);
+    if ( v2 )
+    {
+        sithSurface_StopAnim(v2);
+        if ( sithCogVm_isMultiplayer )
+            sithSector_cogMsg_SendStopAnim(v2, -1, 255);
+    }
+}
+
+void sithCogUtil_StopSurfaceAnim(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+    rdSurface *v2; // eax
+    rdSurface *v3; // esi
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+    {
+        v2 = sithSurface_GetRdSurface(v1);
+        v3 = v2;
+        if ( v2 )
+        {
+            sithSurface_StopAnim(v2);
+            if ( sithCogVm_isMultiplayer )
+                sithSector_cogMsg_SendStopAnim((sithSurface *)v3, -1, 255);
+        }
+    }
+}
+
+void sithCogUtil_GetSurfaceAnim(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+    int v2; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+    {
+        v2 = sithSurface_GetSurfaceAnim((int)v1);
+        sithCogVm_PushInt(ctx, v2);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogUtil_LoadTemplate(sithCog *ctx)
+{
+    char *v1; // eax
+    sithThing *v2; // eax
+
+    v1 = sithCogVm_PopString(ctx);
+    if ( v1 && (v2 = sithTemplate_GetEntryByName(v1)) != 0 )
+        sithCogVm_PushInt(ctx, v2->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_LoadKeyframe(sithCog *a1)
+{
+    char *v1; // eax
+    rdKeyframe *v2; // eax
+
+    v1 = sithCogVm_PopString(a1);
+    if ( v1 && (v2 = sithKeyFrame_LoadEntry(v1)) != 0 )
+        sithCogVm_PushInt(a1, v2->id);
+    else
+        sithCogVm_PushInt(a1, -1);
+}
+
+void sithCogUtil_LoadModel(sithCog *ctx)
+{
+    char *v1; // eax
+    rdModel3 *v2; // eax
+
+    v1 = sithCogVm_PopString(ctx);
+    if ( v1 && (v2 = sithModel_LoadEntry(v1, 1)) != 0 )
+        sithCogVm_PushInt(ctx, v2->id);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_SetPulse(sithCog *ctx)
+{
+    float popFlex;
+
+    popFlex = sithCogVm_PopFlex(ctx);
+    if ( popFlex <= 0.0 )
+    {
+        if ( ctx->flags & 1 )
+        {
+            sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
+            DebugConsole_Print(std_genBuffer);
+        }
+        ctx->flags &= ~4;
+    }
+    else
+    {
+        if ( ctx->flags & 1 )
+        {
+            sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            DebugConsole_Print(std_genBuffer);
+        }
+        ctx->flags |= 4;
+        ctx->field_18 = (int)(popFlex * 1000.0);
+        ctx->field_1C = (int)(popFlex * 1000.0) + sithTime_curMs;
+    }
+}
+
+void sithCogUtil_SetTimer(sithCog *ctx)
+{
+    float popFlex = sithCogVm_PopFlex(ctx);
+    if ( popFlex <= 0.0 )
+    {
+        if ( ctx->flags & 1 )
+        {
+            sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
+            DebugConsole_Print(std_genBuffer);
+        }
+        ctx->flags &= ~8;
+    }
+    else
+    {
+        if ( ctx->flags & 1 )
+        {
+            sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            DebugConsole_Print(std_genBuffer);
+        }
+        ctx->flags |= 8u;
+        ctx->field_20 = sithTime_curMs + (int)(popFlex * 1000.0);
+    }
+}
+
+// settimerex
+// killtimerex
+
 void sithCogUtil_Reset(sithCog *ctx)
 {
     ctx->calldepth = 0;
@@ -383,10 +526,60 @@ void sithCogUtil_GetKeyLen(sithCog *ctx)
     sithCogVm_PushFlex(ctx, (double)keyframe->numFrames / keyframe->fps);
 }
 
+void sithCogUtil_GetSithMode(sithCog* ctx)
+{
+    sithCogVm_PushInt(ctx, g_sithMode);
+}
+
+void sithCogUtil_GetGametime(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, sithTime_curMs);
+}
+
+void sithCogUtil_GetFlexGameTime(sithCog *ctx)
+{
+    sithCogVm_PushFlex(ctx, sithTime_curSeconds);
+}
+
+void sithCogUtil_GetDifficulty(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, g_playersetDifficulty);
+}
+
+void sithCogUtil_SetSubmodeFlags(sithCog *ctx)
+{
+    g_submodeFlags |= sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_ClearSubmodeFlags(sithCog *ctx)
+{
+    g_submodeFlags &= ~sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_GetSubmodeFlags(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, g_submodeFlags);
+}
+
+void sithCogUtil_SetDebugModeFlags(sithCog *ctx)
+{
+    g_debugmodeFlags |= sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_ClearDebugModeFlags(sithCog *ctx)
+{
+    g_debugmodeFlags &= ~sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_GetDebugModeFlags(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, g_debugmodeFlags);
+}
+
 void sithCogUtil_BitSet(sithCog *ctx)
 {
-    signed int a; // esi
-    signed int b; // eax
+    signed int a;
+    signed int b;
 
     a = sithCogVm_PopInt(ctx);
     b = sithCogVm_PopInt(ctx);
@@ -395,8 +588,8 @@ void sithCogUtil_BitSet(sithCog *ctx)
 
 void sithCogUtil_BitTest(sithCog *ctx)
 {
-    signed int a; // esi
-    signed int b; // eax
+    signed int a;
+    signed int b;
 
     a = sithCogVm_PopInt(ctx);
     b = sithCogVm_PopInt(ctx);
@@ -405,12 +598,34 @@ void sithCogUtil_BitTest(sithCog *ctx)
 
 void sithCogUtil_BitClear(sithCog *ctx)
 {
-    signed int a; // esi
-    signed int b; // eax
+    signed int a;
+    signed int b;
 
     a = sithCogVm_PopInt(ctx);
     b = sithCogVm_PopInt(ctx);
     sithCogVm_PushInt(ctx, b & ~a);
+}
+
+void sithCogUtil_GetLevelTime(sithCog *ctx)
+{
+    sithCogVm_PushFlex(ctx, sithTime_curMs * 0.001);
+}
+
+void sithCogUtil_GetThingCount(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numThingsLoaded);
+}
+
+// thingtemplatecount
+
+void sithCogUtil_GetGravity(sithCog *ctx)
+{
+    sithCogVm_PushFlex(ctx, sithWorld_pCurWorld->worldGravity);
+}
+
+void sithCogUtil_SetGravity(sithCog *ctx)
+{
+    sithWorld_pCurWorld->worldGravity = sithCogVm_PopFlex(ctx);
 }
 
 void sithCogUtil_ReturnEx(sithCog *ctx)
