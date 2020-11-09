@@ -12,7 +12,7 @@
 #define sithWeapon_Fire_ADDR (0x004D44F0)
 #define sithWeapon_FireProjectile_0_ADDR (0x004D45A0)
 #define sithWeapon_setstimealive_ADDR (0x004D4880)
-#define sithWeapon_phys_3_ADDR (0x004D48C0)
+#define sithWeapon_Collide_ADDR (0x004D48C0)
 #define sithWeapon_HitDebug_ADDR (0x004D4E40)
 #define sithWeapon_Draw_ADDR (0x004D5160)
 #define sithWeapon_sub_4D51F0_ADDR (0x004D51F0)
@@ -62,5 +62,8 @@
 
 void sithWeapon_InitDefaults();
 void sithWeapon_InitDefaults2();
+
+static void (*sithWeapon_Collide)(sithThing *physicsThing, sithThing *collidedThing, rdMatrix34 *a4, int a5) = (void*)sithWeapon_Collide_ADDR;
+static int (*sithWeapon_HitDebug)(sithThing *thing, sithSurface *surface, void *a3) = (void*)sithWeapon_HitDebug_ADDR;
 
 #endif // _SITHWEAPON_H

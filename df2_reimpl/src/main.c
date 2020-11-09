@@ -42,6 +42,7 @@
 #include "World/sithInventory.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
+#include "World/sithUnk3.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -719,6 +720,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
     hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
+    
+    // sithUnk3
+    hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
+    hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
+    hook_function(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

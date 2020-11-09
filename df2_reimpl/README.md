@@ -166,7 +166,7 @@ stdDisplay                     0x267b     0.913%        0.000%          0 / 37
 sithCogUtil                    0x26c2     0.919%        46.966%        37 / 119        
 sithControl                    0x2723     0.928%        0.000%          0 / 32         
 sithAI                         0x2771     0.936%        2.209%          2 / 35         
-sithUnk3                       0x2827     0.952%        0.000%          0 / 22         
+sithUnk3                       0x2827     0.952%        5.215%          2 / 22         
 rdModel3                       0x2a7e     1.008%        100.000%       23 / 23         
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
 rdMatrix                       0x2c85     1.056%        100.000%       56 / 56         
@@ -185,5 +185,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 8.416%
+Total completion: 8.465%
 ```
