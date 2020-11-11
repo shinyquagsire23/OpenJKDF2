@@ -18,6 +18,7 @@
 
 #define sithCog_SendMessageFromThing_ADDR (0x4DFAC0)
 #define sithCog_SendMessageFromThingEx_ADDR (0x004DFAF0)
+#define sithCog_SendMessageToAll_ADDR (0x4DEB00)
 
 #define sithCogYACC_yyparse_ADDR (0x50BF50)
 
@@ -85,5 +86,8 @@ void sithCogSurface_Initialize(void* a1);
 
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
+static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
+
+#define sithCog_masterCog (*(sithCog**)0x008B542C)
 
 #endif // _SITHCOG_H

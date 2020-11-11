@@ -16,70 +16,22 @@
 #include "Engine/sithKeyFrame.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/sithModel.h"
+#include "Engine/sithRender.h"
+#include "Engine/sithCamera.h"
+#include "Engine/sithSound.h"
+#include "Engine/sithNet.h"
+#include "Engine/sithSave.h"
+#include "Engine/sithTimer.h"
+#include "World/sithPlayer.h"
+#include "World/sithThingPlayer.h"
 #include "World/sithWorld.h"
+#include "World/sithWeapon.h"
+#include "World/jkPlayer.h"
 #include "Main/jkGame.h"
+#include "General/stdFnames.h"
+#include "General/stdPalEffects.h"
 
-static void (*sithCogUtil_SetTimerEx)(sithCog* ctx) = (void*)0x005063F0;
-static void (*sithCogUtil_KillTimerEx)(sithCog* ctx) = (void*)0x00506470;
-
-static void (*sithCogUtil_GetThingTemplateCount)(sithCog* ctx) = (void*)0x00506BE0;
-
-static void (*sithCogUtil_SetMaterialCel)(sithCog* ctx) = (void*)0x00506DE0;
-static void (*sithCogUtil_GetMaterialCel)(sithCog* ctx) = (void*)0x00506E20;
-static void (*sithCogUtil_EnableIRMode)(sithCog* ctx) = (void*)0x00506E50;
-static void (*sithCogUtil_DisableIRMode)(sithCog* ctx) = (void*)0x00506E90;
-static void (*sithCogUtil_SetInvFlags)(sithCog* ctx) = (void*)0x00506EA0;
-static void (*sithCogUtil_SetMapModeFlags)(sithCog* ctx) = (void*)0x00506F00;
-static void (*sithCogUtil_GetMapModeFlags)(sithCog* ctx) = (void*)0x00506F20;
-static void (*sithCogUtil_ClearMapModeFlags)(sithCog* ctx) = (void*)0x00506F40;
-static void (*sithCogUtil_SetCameraFocus)(sithCog* ctx) = (void*)0x00506F60;
-static void (*sithCogUtil_GetPrimaryFocus)(sithCog* ctx) = (void*)0x00506FB0;
-static void (*sithCogUtil_GetSecondaryFocus)(sithCog* ctx) = (void*)0x00507010;
-static void (*sithCogUtil_SetCurrentCamera)(sithCog* ctx) = (void*)0x00507070;
-static void (*sithCogUtil_GetCurrentCamera)(sithCog* ctx) = (void*)0x005070B0;
-static void (*sithCogUtil_CycleCamera)(sithCog* ctx) = (void*)0x00507100;
-static void (*sithCogUtil_SetPovShake)(sithCog* ctx) = (void*)0x00507110;
-static void (*sithCogUtil_HeapNew)(sithCog* ctx) = (void*)0x00507180;
-static void (*sithCogUtil_HeapSet)(sithCog* ctx) = (void*)0x005071F0;
-static void (*sithCogUtil_HeapGet)(sithCog* ctx) = (void*)0x00507250;
-static void (*sithCogUtil_HeapFree)(sithCog* ctx) = (void*)0x005072C0;
-static void (*sithCogUtil_GetSelfCog)(sithCog* ctx) = (void*)0x005072F0;
-static void (*sithCogUtil_GetMasterCog)(sithCog* ctx) = (void*)0x00507310;
-static void (*sithCogUtil_SetMasterCog)(sithCog* ctx) = (void*)0x00507340;
-static void (*sithCogUtil_NewColorEffect)(sithCog* ctx) = (void*)0x00507360;
-static void (*sithCogUtil_ModifyColorEffect)(sithCog* ctx) = (void*)0x00507470;
-static void (*sithCogUtil_FreeColorEffect)(sithCog* ctx) = (void*)0x00507560;
-static void (*sithCogUtil_AddDynamicTint)(sithCog* ctx) = (void*)0x00507580;
-static void (*sithCogUtil_AddDynamicAdd)(sithCog* ctx) = (void*)0x005075F0;
-static void (*sithCogUtil_FireProjectile)(sithCog* ctx) = (void*)0x00507650;
-static void (*sithCogUtil_SendTrigger)(sithCog* ctx) = (void*)0x00507730;
-static void (*sithCogUtil_ActivateWeapon)(sithCog* ctx) = (void*)0x00507870;
-static void (*sithCogUtil_DeactivateWeapon)(sithCog* ctx) = (void*)0x005078D0;
-static void (*sithCogUtil_SetFireWait)(sithCog* ctx) = (void*)0x00507930;
-static void (*sithCogUtil_SetMountWait)(sithCog* ctx) = (void*)0x00507980;
-static void (*sithCogUtil_SelectWeapon)(sithCog* ctx) = (void*)0x005079D0;
-static void (*sithCogUtil_AssignWeapon)(sithCog* ctx) = (void*)0x00507A10;
-static void (*sithCogUtil_AutoSelectWeapon)(sithCog* ctx) = (void*)0x00507A50;
-static void (*sithCogUtil_SetCurWeapon)(sithCog* ctx) = (void*)0x00507AA0;
-static void (*sithCogUtil_GetWeaponPriority)(sithCog* ctx) = (void*)0x00507AE0;
-static void (*sithCogUtil_GetCurWeaponMode)(sithCog* ctx) = (void*)0x00507B70;
-static void (*sithCogUtil_GetCurWeapon)(sithCog* ctx) = (void*)0x00507B90;
-static void (*sithCogUtil_GetCameraState)(sithCog* ctx) = (void*)0x00507BD0;
-static void (*sithCogUtil_SetCameraStateFlags)(sithCog* ctx) = (void*)0x00507BF0;
-static void (*sithCogUtil_SetMultiModeFlags)(sithCog* ctx) = (void*)0x00507C10;
-static void (*sithCogUtil_ClearMultiModeFlags)(sithCog* ctx) = (void*)0x00507C30;
-static void (*sithCogUtil_GetMultiModeFlags)(sithCog* ctx) = (void*)0x00507C50;
-static void (*sithCogUtil_IsMulti)(sithCog* ctx) = (void*)0x00507C70;
-static void (*sithCogUtil_IsServer)(sithCog* ctx) = (void*)0x00507CA0;
-static void (*sithCogUtil_ReturnBool)(sithCog* ctx) = (void*)0x00507CA5; // util func
-static void (*sithCogUtil_GetTeamScore)(sithCog* ctx) = (void*)0x00507CD0;
-static void (*sithCogUtil_SetTeamScore)(sithCog* ctx) = (void*)0x00507D10;
-static void (*sithCogUtil_GetTimeLimit)(sithCog* ctx) = (void*)0x00507D40;
-static void (*sithCogUtil_SetTimeLimit)(sithCog* ctx) = (void*)0x00507D80;
-static void (*sithCogUtil_GetScoreLimit)(sithCog* ctx) = (void*)0x00507DB0;
-static void (*sithCogUtil_SetScoreLimit)(sithCog* ctx) = (void*)0x00507DD0;
-static void (*sithCogUtil_ChangeFireRate)(sithCog* ctx) = (void*)0x00507DF0;
-static void (*sithCogUtil_AutoSaveGame)(sithCog* ctx) = (void*)0x00507E40;
+void sithCogUtil_ReturnBool(int a1, sithCog *a2);
 
 void sithCogUtil_GetSenderId(sithCog* ctx)
 {
@@ -260,7 +212,7 @@ void sithCogUtil_StopThing(sithCog *ctx) // unused
 void sithCogUtil_StopAnim(sithCog *ctx)
 {
     int v1; // eax
-    sithSurface *v2; // eax
+    rdSurface *v2; // eax
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithSurface_GetByIdx(v1);
@@ -268,7 +220,7 @@ void sithCogUtil_StopAnim(sithCog *ctx)
     {
         sithSurface_StopAnim(v2);
         if ( sithCogVm_isMultiplayer )
-            sithSector_cogMsg_SendStopAnim(v2, -1, 255);
+            sithSector_cogMsg_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
     }
 }
 
@@ -276,18 +228,16 @@ void sithCogUtil_StopSurfaceAnim(sithCog *ctx)
 {
     sithSurface *v1; // eax
     rdSurface *v2; // eax
-    rdSurface *v3; // esi
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
     {
         v2 = sithSurface_GetRdSurface(v1);
-        v3 = v2;
         if ( v2 )
         {
             sithSurface_StopAnim(v2);
             if ( sithCogVm_isMultiplayer )
-                sithSector_cogMsg_SendStopAnim((sithSurface *)v3, -1, 255);
+                sithSector_cogMsg_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
         }
     }
 }
@@ -300,7 +250,7 @@ void sithCogUtil_GetSurfaceAnim(sithCog *ctx)
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
     {
-        v2 = sithSurface_GetSurfaceAnim((int)v1);
+        v2 = sithSurface_GetSurfaceAnim(v1);
         sithCogVm_PushInt(ctx, v2);
     }
     else
@@ -396,8 +346,55 @@ void sithCogUtil_SetTimer(sithCog *ctx)
     }
 }
 
-// settimerex
-// killtimerex
+void sithCogUtil_SetTimerEx(sithCog *ctx)
+{
+    sithTimerInfo timerInfo; // [esp+4h] [ebp-14h]
+    int timerMs; // [esp+14h] [ebp-4h]
+    float a1a; // [esp+20h] [ebp+8h]
+
+    timerInfo.field_14 = sithCogVm_PopFlex(ctx);
+    timerInfo.field_10 = sithCogVm_PopFlex(ctx);
+    timerInfo.timerIdx = sithCogVm_PopInt(ctx);
+    timerInfo.cogIdx = ctx->selfCog;
+    a1a = sithCogVm_PopFlex(ctx) * 1000.0;
+    timerMs = (signed int)a1a;
+    if ( timerMs >= 0 )
+        sithTimer_Set(4, &timerInfo, (signed int)a1a);
+}
+
+void sithCogUtil_KillTimerEx(sithCog *ctx)
+{
+    signed int v1; // ebx
+    sithTimer *v2; // eax
+    sithTimer *v3; // edi
+    sithTimer *v4; // esi
+
+    v1 = sithCogVm_PopInt(ctx);
+    if ( v1 > 0 )
+    {
+        v2 = sithTimer_arr;
+        v3 = 0;
+        if ( sithTimer_arr )
+        {
+            do
+            {
+                v4 = v2->nextTimer;
+                if ( v2->field_4 == 4 && v2->timerInfo.cogIdx == ctx->selfCog && v2->timerInfo.timerIdx == v1 )
+                {
+                    if ( v3 )
+                        v3->nextTimer = v4;
+                    else
+                        sithTimer_arr = v2->nextTimer;
+                    sithTimer_Kill(v2);
+                    v2 = v3;
+                }
+                v3 = v2;
+                v2 = v4;
+            }
+            while ( v4 );
+        }
+    }
+}
 
 void sithCogUtil_Reset(sithCog *ctx)
 {
@@ -616,7 +613,26 @@ void sithCogUtil_GetThingCount(sithCog *ctx)
     sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numThingsLoaded);
 }
 
-// thingtemplatecount
+void sithCogUtil_GetThingTemplateCount(sithCog *ctx)
+{
+    sithWorld *v1; // esi
+    sithThing *v2; // eax
+    int template_count; // edi
+
+    v1 = sithWorld_pCurWorld;
+    v2 = sithCogVm_PopTemplate(ctx);
+    if ( v2 )
+    {
+        template_count = 0;
+        for (int i = 0; i < v1->numThings; i++ )
+        {
+            sithThing* thing = &v1->things[i];
+            if ( thing->thingType && thing->thingType != THINGTYPE_CORPSE && thing->template_related == v2 )
+                ++template_count;
+        }
+        sithCogVm_PushInt(ctx, template_count);
+    }
+}
 
 void sithCogUtil_GetGravity(sithCog *ctx)
 {
@@ -685,6 +701,715 @@ void sithCogUtil_VectorNorm(sithCog *ctx)
     sithCogVm_PopVector3(ctx, &popVec);
     rdVector_Normalize3(&out, &popVec);
     sithCogVm_PushVector3(ctx, &out);
+}
+
+void sithCogUtil_SetMaterialCel(sithCog *ctx)
+{
+    signed int cel; // esi
+    rdMaterial *mat; // eax
+
+    cel = sithCogVm_PopInt(ctx);
+    mat = sithCogVm_PopMaterial(ctx);
+    if ( mat && cel >= 0 && (unsigned int)cel < mat->num_texinfo )
+        mat->celIdx = cel;
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_GetMaterialCel(sithCog *ctx)
+{
+    rdMaterial *mat; // eax
+
+    mat = sithCogVm_PopMaterial(ctx);
+    if ( mat )
+        sithCogVm_PushInt(ctx, mat->celIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_EnableIRMode(sithCog *ctx)
+{
+    float flex1 = sithCogVm_PopFlex(ctx);
+    float flex2 = sithCogVm_PopFlex(ctx);
+    sithRender_EnableIRMode(flex2, flex1);
+}
+
+void sithCogUtil_DisableIRMode()
+{
+    sithRender_DisableIRMode();
+}
+
+void sithCogUtil_SetInvFlags(sithCog *ctx)
+{
+    int flags;
+    int binIdx;
+    sithThing *player;
+
+    flags = sithCogVm_PopInt(ctx);
+    binIdx = sithCogVm_PopInt(ctx);
+    player = sithCogVm_PopThing(ctx);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+        sithInventory_SetFlags(player, binIdx, flags);
+}
+
+void sithCogUtil_SetMapModeFlags(sithCog *ctx)
+{
+    g_mapModeFlags |= sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_GetMapModeFlags(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, g_mapModeFlags);
+}
+
+void sithCogUtil_ClearMapModeFlags(sithCog *ctx)
+{
+    g_mapModeFlags &= ~sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_SetCameraFocus(sithCog *ctx)
+{
+    sithThing *focusThing; // esi
+    signed int camIdx; // eax
+
+    focusThing = sithCogVm_PopThing(ctx);
+    camIdx = sithCogVm_PopInt(ctx);
+    if ( camIdx > -1 && camIdx < 7 )
+    {
+        if ( focusThing )
+            sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], focusThing, 0);
+    }
+}
+
+void sithCogUtil_GetPrimaryFocus(sithCog *ctx)
+{
+    signed int camIdx; // eax
+    sithThing *v2; // eax
+
+    camIdx = sithCogVm_PopInt(ctx);
+    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_cameras[camIdx])) != 0 )
+        sithCogVm_PushInt(ctx, v2->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_GetSecondaryFocus(sithCog *ctx)
+{
+    signed int camIdx; // eax
+    sithThing *v2; // eax
+
+    camIdx = sithCogVm_PopInt(ctx);
+    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_cameras[camIdx])) != 0 )
+        sithCogVm_PushInt(ctx, v2->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_SetCurrentCamera(sithCog *ctx)
+{
+    signed int camIdx; // eax
+
+    camIdx = sithCogVm_PopInt(ctx);
+    if ( camIdx > -1 && camIdx < 7 )
+        sithCamera_SetCurrentCamera(&sithCamera_cameras[camIdx]);
+}
+
+void sithCogUtil_GetCurrentCamera(sithCog *ctx)
+{
+    int camIdx; // edx
+
+    if ( sithCamera_currentCamera && (camIdx = sithCamera_currentCamera - sithCamera_cameras, camIdx < 7) )
+        sithCogVm_PushInt(ctx, camIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_CycleCamera()
+{
+    sithCamera_CycleCamera();
+}
+
+void sithCogUtil_SetPovShake(sithCog *ctx)
+{
+    float v2; // [esp+4h] [ebp-1Ch]
+    rdVector3 v3; // [esp+8h] [ebp-18h]
+    rdVector3 v4; // [esp+14h] [ebp-Ch]
+    float a1a; // [esp+24h] [ebp+4h]
+
+    a1a = sithCogVm_PopFlex(ctx);
+    v2 = sithCogVm_PopFlex(ctx);
+    if ( sithCogVm_PopVector3(ctx, &v3) )
+    {
+        if ( sithCogVm_PopVector3(ctx, &v4) )
+            sithCamera_SetPovShake(&v4, &v3, v2, a1a);
+    }
+}
+
+void sithCogUtil_HeapNew(sithCog *ctx)
+{
+    int numHeapVars; // ebp
+    sithCogStackvar *oldHeap; // eax
+    sithCogStackvar *newHeap; // edi
+
+    numHeapVars = sithCogVm_PopInt(ctx);
+    if ( numHeapVars > 0 )
+    {
+        oldHeap = ctx->heap;
+        if ( oldHeap )
+        {
+            pSithHS->free(oldHeap);
+            ctx->numHeapVars = 0;
+        }
+        newHeap = (sithCogStackvar *)pSithHS->alloc(sizeof(sithCogStackvar) * numHeapVars);
+        ctx->heap = newHeap;
+        _memset(newHeap, 0, (sizeof(sithCogStackvar) * numHeapVars));
+        ctx->numHeapVars = numHeapVars;
+    }
+}
+
+void sithCogUtil_HeapSet(sithCog *ctx)
+{
+    int val;
+    int idx;
+    sithCogStackvar stackVar;
+
+    val = sithCogVm_PopValue(ctx, &stackVar);
+    idx = sithCogVm_PopInt(ctx);
+    if ( val && idx >= 0 && idx < ctx->numHeapVars )
+        ctx->heap[idx] = stackVar;
+}
+
+void sithCogUtil_HeapGet(sithCog *ctx)
+{
+    int idx;
+    sithCogStackvar *heapVar;
+    sithCogStackvar tmp;
+
+    idx = sithCogVm_PopInt(ctx);
+    if (idx < 0 || idx >= ctx->numHeapVars)
+    {
+        sithCogVm_PushInt(ctx, 0);
+    }
+    else
+    {
+        heapVar = &ctx->heap[idx];
+        tmp.type = heapVar->type;
+        tmp.data[0] = heapVar->data[0];
+        tmp.data[1] = heapVar->data[1];
+        tmp.data[2] = heapVar->data[2];
+        sithCogVm_PushVar(ctx, &tmp);
+    }
+}
+
+void sithCogUtil_HeapFree(sithCog *ctx)
+{
+    if ( ctx->heap )
+    {
+        pSithHS->free(ctx->heap);
+        ctx->numHeapVars = 0;
+    }
+}
+
+void sithCogUtil_GetSelfCog(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, ctx->selfCog);
+}
+
+void sithCogUtil_GetMasterCog(sithCog *ctx)
+{
+    if ( sithCog_masterCog )
+        sithCogVm_PushInt(ctx, sithCog_masterCog->selfCog);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogUtil_SetMasterCog(sithCog *ctx)
+{
+    sithCog_masterCog = sithCogVm_PopCog(ctx);
+}
+
+void sithCogUtil_NewColorEffect(sithCog *ctx)
+{
+    sithCog *v1; // esi
+    int v2; // ebx
+    int v3; // ebp
+    int idx; // edi
+    signed int a3; // [esp+10h] [ebp-1Ch]
+    signed int a2; // [esp+14h] [ebp-18h]
+    float a4; // [esp+18h] [ebp-14h]
+    float v8; // [esp+1Ch] [ebp-10h]
+    float v9; // [esp+20h] [ebp-Ch]
+    signed int v10; // [esp+24h] [ebp-8h]
+    float v11; // [esp+28h] [ebp-4h]
+    int a1a; // [esp+30h] [ebp+4h]
+
+    v1 = ctx;
+    v11 = sithCogVm_PopFlex(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    v3 = sithCogVm_PopInt(ctx);
+    v10 = sithCogVm_PopInt(ctx);
+    a4 = sithCogVm_PopFlex(ctx);
+    v8 = sithCogVm_PopFlex(ctx);
+    v9 = sithCogVm_PopFlex(ctx);
+    a1a = sithCogVm_PopInt(ctx);
+    a3 = sithCogVm_PopInt(v1);
+    a2 = sithCogVm_PopInt(v1);
+    idx = stdPalEffects_NewRequest(1);
+    if ( idx == -1 )
+    {
+        sithCogVm_PushInt(v1, -1);
+    }
+    else
+    {
+        stdPalEffects_SetFilter(idx, a2, a3, a1a);
+        stdPalEffects_SetTint(idx, v9, v8, a4);
+        stdPalEffects_SetAdd(idx, v10, v3, v2);
+        stdPalEffects_SetFade(idx, v11);
+        sithCogVm_PushInt(v1, idx);
+    }
+}
+
+void sithCogUtil_ModifyColorEffect(sithCog *ctx)
+{
+    sithCog *v1; // esi
+    float v2; // ST34_4
+    int v3; // edi
+    int v4; // ebx
+    int v5; // ebp
+    float a4; // ST28_4
+    float v7; // ST2C_4
+    float v8; // ST30_4
+    signed int a3; // ST20_4
+    signed int a2; // ST24_4
+    int v11; // esi
+    int a1a; // [esp+2Ch] [ebp+4h]
+
+    v1 = ctx;
+    v2 = sithCogVm_PopFlex(ctx);
+    v3 = sithCogVm_PopInt(ctx);
+    v4 = sithCogVm_PopInt(ctx);
+    v5 = sithCogVm_PopInt(ctx);
+    a4 = sithCogVm_PopFlex(ctx);
+    v7 = sithCogVm_PopFlex(ctx);
+    v8 = sithCogVm_PopFlex(ctx);
+    a1a = sithCogVm_PopInt(ctx);
+    a3 = sithCogVm_PopInt(v1);
+    a2 = sithCogVm_PopInt(v1);
+    v11 = sithCogVm_PopInt(v1);
+    stdPalEffects_SetFilter(v11, a2, a3, a1a);
+    stdPalEffects_SetTint(v11, v8, v7, a4);
+    stdPalEffects_SetAdd(v11, v5, v4, v3);
+    stdPalEffects_SetFade(v11, v2);
+}
+
+void sithCogUtil_FreeColorEffect(sithCog *ctx)
+{
+    int v1; // eax
+
+    v1 = sithCogVm_PopInt(ctx);
+    stdPalEffects_FreeRequest(v1);
+}
+
+void sithCogUtil_AddDynamicTint(sithCog *ctx)
+{
+    sithCog *v1; // esi
+    sithThing *player; // eax
+    float fG; // [esp+4h] [ebp-8h]
+    float fR; // [esp+8h] [ebp-4h]
+    float fB; // [esp+10h] [ebp+4h]
+
+    v1 = ctx;
+    fB = sithCogVm_PopFlex(ctx);
+    fG = sithCogVm_PopFlex(v1);
+    fR = sithCogVm_PopFlex(v1);
+    player = sithCogVm_PopThing(v1);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player == g_localPlayerThing )
+        sithPlayer_AddDynamicTint(fR, fG, fB);
+}
+
+void sithCogUtil_AddDynamicAdd(sithCog *ctx)
+{
+    int b; // edi
+    int g; // ebx
+    int r; // ebp
+    sithThing *playerThing; // eax
+
+    b = sithCogVm_PopInt(ctx);
+    g = sithCogVm_PopInt(ctx);
+    r = sithCogVm_PopInt(ctx);
+    playerThing = sithCogVm_PopThing(ctx);
+    if ( playerThing && playerThing->thingType == THINGTYPE_PLAYER && playerThing == g_localPlayerThing )
+        sithPlayer_AddDyamicAdd(r, g, b);
+}
+
+// modifycoloreffect, freecoloreffect, adddynamictint, adddynamicadd
+
+void sithCogUtil_FireProjectile(sithCog *ctx)
+{
+    int scaleFlags; // di
+    int mode; // ebx
+    sithSound *fireSound; // ebp
+    sithThing *sender; // eax
+    sithThing *spawnedProjectile; // eax
+    float autoaimFov; // [esp+10h] [ebp-24h]
+    float scale; // [esp+14h] [ebp-20h]
+    sithThing *projectileTemplate; // [esp+18h] [ebp-1Ch]
+    rdVector3 aimError; // [esp+1Ch] [ebp-18h]
+    rdVector3 fireOffset; // [esp+28h] [ebp-Ch]
+    float autoaimMaxDist; // [esp+38h] [ebp+4h]
+
+    autoaimMaxDist = sithCogVm_PopFlex(ctx);
+    autoaimFov = sithCogVm_PopFlex(ctx);
+    scaleFlags = sithCogVm_PopInt(ctx);
+    scale = sithCogVm_PopFlex(ctx);
+    sithCogVm_PopVector3(ctx, &aimError);
+    sithCogVm_PopVector3(ctx, &fireOffset);
+    mode = sithCogVm_PopInt(ctx);
+    fireSound = sithCogVm_PopSound(ctx);
+    projectileTemplate = sithCogVm_PopTemplate(ctx);
+    sender = sithCogVm_PopThing(ctx);
+    if ( sender
+      && (spawnedProjectile = sithWeapon_FireProjectile(
+                                  sender,
+                                  projectileTemplate,
+                                  fireSound,
+                                  mode,
+                                  &fireOffset,
+                                  &aimError,
+                                  scale,
+                                  scaleFlags,
+                                  autoaimFov,
+                                  autoaimMaxDist)) != 0 )
+    {
+        sithCogVm_PushInt(ctx, spawnedProjectile->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogUtil_SendTrigger(sithCog *ctx)
+{
+    int sourceType; // edi
+    sithThing *sourceThing; // eax
+    sithPlayerInfo *playerinfo; // ecx
+    float arg3; // [esp+10h] [ebp-Ch]
+    float arg2; // [esp+14h] [ebp-8h]
+    float arg1; // [esp+18h] [ebp-4h]
+    float arg0; // [esp+20h] [ebp+4h]
+
+    arg3 = sithCogVm_PopFlex(ctx);
+    arg2 = sithCogVm_PopFlex(ctx);
+    arg1 = sithCogVm_PopFlex(ctx);
+    arg0 = sithCogVm_PopFlex(ctx);
+    sourceType = sithCogVm_PopInt(ctx);
+    sourceThing = sithCogVm_PopThing(ctx);
+    if ( sourceThing )
+    {
+        if ( sourceThing->thingType == THINGTYPE_PLAYER )
+        {
+            playerinfo = sourceThing->actorParams.playerinfo;
+            if ( playerinfo )
+            {
+                if ( playerinfo->flags & 1 )
+                {
+                    if ( sourceThing == g_localPlayerThing )
+                        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, g_localPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+                    else
+                        sithThingPlayer_cogMsg_SendSendTrigger(
+                            0,
+                            SITH_MESSAGE_TRIGGER,
+                            SENDERTYPE_THING,
+                            g_localPlayerThing->thingIdx,
+                            0,
+                            sourceType,
+                            0,
+                            arg0,
+                            arg1,
+                            arg2,
+                            arg3,
+                            playerinfo->net_id);
+                }
+            }
+        }
+    }
+    else
+    {
+        sithThingPlayer_cogMsg_SendSendTrigger(
+            0,
+            SITH_MESSAGE_TRIGGER,
+            SENDERTYPE_THING,
+            g_localPlayerThing->thingIdx,
+            0,
+            sourceType,
+            0,
+            arg0,
+            arg1,
+            arg2,
+            arg3,
+            -1);
+        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, g_localPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+    }
+}
+
+void sithCogUtil_ActivateWeapon(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    float fireRate = sithCogVm_PopFlex(ctx);
+    sithThing* weaponThing = sithCogVm_PopThing(ctx);
+
+    if ( weaponThing && fireRate >= 0.0 && mode >= 0 && mode < 2 )
+        sithWeapon_Activate(weaponThing, ctx, fireRate, mode);
+}
+
+void sithCogUtil_DeactivateWeapon(sithCog *ctx)
+{
+    int mode; // edi
+    sithThing *weapon; // eax
+    float a1a; // [esp+Ch] [ebp+4h]
+
+    mode = sithCogVm_PopInt(ctx);
+    weapon = sithCogVm_PopThing(ctx);
+    if ( weapon && mode >= 0 && mode < 2 )
+    {
+        sithCogVm_PushFlex(ctx, sithWeapon_Deactivate(weapon, ctx, mode));
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1.0);
+    }
+}
+
+void sithCogUtil_SetFireWait(sithCog *ctx)
+{
+    float fireRate = sithCogVm_PopFlex(ctx);
+    sithThing* weapon = sithCogVm_PopThing(ctx);
+
+    if ( weapon && weapon == g_localPlayerThing && fireRate >= -1.0 )
+        sithWeapon_SetFireWait(weapon, fireRate);
+}
+
+void sithCogUtil_SetMountWait(sithCog *ctx)
+{
+    float mountWait = sithCogVm_PopFlex(ctx);
+    sithThing* weapon = sithCogVm_PopThing(ctx);
+
+    if ( weapon && weapon == g_localPlayerThing && mountWait >= -1.0 )
+        sithWeapon_SetMountWait(weapon, mountWait);
+}
+
+void sithCogUtil_SelectWeapon(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player )
+    {
+        if ( binIdx >= 0 )
+            sithWeapon_SelectWeapon(player, binIdx, 0);
+    }
+}
+
+void sithCogUtil_AssignWeapon(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player )
+    {
+        if ( binIdx >= 1 )
+            sithWeapon_SelectWeapon(player, binIdx, 1);
+    }
+}
+
+void sithCogUtil_AutoSelectWeapon(sithCog *ctx)
+{
+    int weapIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( weapIdx >= 0 && weapIdx <= 2 && player )
+    {
+        sithCogVm_PushInt(ctx, sithWeapon_AutoSelect(player, weapIdx));
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogUtil_SetCurWeapon(sithCog *ctx)
+{
+    int v4; // eax
+
+    int idx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ( player )
+    {
+        if ( player->thingType == THINGTYPE_PLAYER )
+        {
+            v4 = sithInventory_SelectWeaponFollowing(idx);
+            sithInventory_SetCurWeapon(player, v4);
+        }
+    }
+}
+
+void sithCogUtil_GetWeaponPriority(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER )
+    {
+        if ( mode < 0 || mode > 2 )
+        {
+            sithCogVm_PushInt(ctx, -1);
+            return;
+        }
+        if ( binIdx >= 0 && binIdx < 200 )
+        {
+            sithCogVm_PushFlex(ctx, sithWeapon_GetPriority(player, binIdx, mode));
+            return;
+        }
+    }
+    sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogUtil_GetCurWeaponMode(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, sithWeapon_GetCurWeaponMode());
+}
+
+void sithCogUtil_GetCurWeapon(sithCog *ctx)
+{
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER )
+    {
+        sithCogVm_PushInt(ctx, sithInventory_GetCurWeapon(player));
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogUtil_GetCameraState(sithCog *ctx)
+{
+    int v1; // eax
+
+    v1 = sithCamera_GetState();
+    sithCogVm_PushInt(ctx, v1);
+}
+
+void sithCogUtil_SetCameraStateFlags(sithCog *ctx)
+{
+    int v1; // eax
+
+    v1 = sithCogVm_PopInt(ctx);
+    sithCamera_SetState(v1);
+}
+
+void sithCogUtil_SetMultiModeFlags(sithCog *ctx)
+{
+    net_MultiModeFlags |= sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_GetMultiModeFlags(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, net_MultiModeFlags);
+}
+
+void sithCogUtil_ClearMultiModeFlags(sithCog *ctx)
+{
+    net_MultiModeFlags &= ~sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_IsMulti(sithCog *ctx)
+{
+    if ( net_isMulti )
+        sithCogVm_PushInt(ctx, 1);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogUtil_IsServer(sithCog *ctx)
+{
+    sithCogUtil_ReturnBool(net_isServer, ctx);
+}
+
+// unused
+void sithCogUtil_ReturnBool(int a1, sithCog *a2)
+{
+    if ( a1 )
+        sithCogVm_PushInt(a2, 1);
+    else
+        sithCogVm_PushInt(a2, 0);
+}
+
+void sithCogUtil_GetTeamScore(sithCog *ctx)
+{
+    signed int idx; // eax
+
+    idx = sithCogVm_PopInt(ctx);
+    if ( idx <= 0 || idx >= 5 )
+        sithCogVm_PushInt(ctx, -999999);
+    else
+        sithCogVm_PushInt(ctx, net_teamScore[idx]);
+}
+
+void sithCogUtil_SetTeamScore(sithCog *ctx)
+{
+    signed int score; // edi
+    signed int idx; // eax
+
+    score = sithCogVm_PopInt(ctx);
+    idx = sithCogVm_PopInt(ctx);
+    if ( idx > 0 && idx < 5 )
+        net_teamScore[idx] = score;
+}
+
+void sithCogUtil_GetTimeLimit(sithCog *a1)
+{
+    float a2; // ST04_4
+
+    a2 = (double)(unsigned int)multiplayer_timelimit * 0.000016666667;
+    sithCogVm_PushFlex(a1, a2);
+}
+
+void sithCogUtil_SetTimeLimit(sithCog *ctx)
+{
+    float v1 = sithCogVm_PopFlex(ctx);
+    if ( v1 >= 0.0 )
+        multiplayer_timelimit = (int)(v1 * 60000.0);
+}
+
+void sithCogUtil_GetScoreLimit(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, net_scorelimit);
+}
+
+void sithCogUtil_SetScoreLimit(sithCog *ctx)
+{
+    net_scorelimit = sithCogVm_PopInt(ctx);
+}
+
+void sithCogUtil_ChangeFireRate(sithCog *ctx)
+{
+    float fireRate = sithCogVm_PopFlex(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player == g_localPlayerThing && fireRate > 0.0 )
+        sithWeapon_SetFireRate(player, fireRate);
+}
+
+void sithCogUtil_AutoSaveGame()
+{
+    char tmp[128];
+
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+    stdFnames_ChangeExt(tmp, "jks");
+    sithSave_Write(tmp, 1, 0, 0);
 }
 
 void sithCogUtil_Initialize(void* ctx)

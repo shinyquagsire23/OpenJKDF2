@@ -89,7 +89,7 @@ typedef struct sithWorld
     rdVector4 loadDistance;
     float perspectiveDistance;
     float gouradDistance;
-    void* cameraFocus;
+    sithThing* cameraFocus;
     sithThing* playerThing;
     uint32_t field_128;
     int numSoundsLoaded;

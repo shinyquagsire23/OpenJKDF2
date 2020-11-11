@@ -62,11 +62,23 @@
 
 typedef struct sithThing sithThing;
 typedef struct sithSurface sithSurface;
+typedef struct sithSound sithSound;
 
 void sithWeapon_InitDefaults();
 void sithWeapon_InitDefaults2();
 
 static void (*sithWeapon_Collide)(sithThing *physicsThing, sithThing *collidedThing, rdMatrix34 *a4, int a5) = (void*)sithWeapon_Collide_ADDR;
 static int (*sithWeapon_HitDebug)(sithThing *thing, sithSurface *surface, void *a3) = (void*)sithWeapon_HitDebug_ADDR;
+
+static void (*sithWeapon_Activate)(sithThing *weapon, sithCog *cogCtx, float fireRate, int mode) = (void*)sithWeapon_Activate_ADDR;
+static float (*sithWeapon_Deactivate)(sithThing *weapon, sithCog *cogCtx, int mode) = (void*)sithWeapon_Deactivate_ADDR;
+static void (*sithWeapon_SetFireWait)(sithThing *weapon, float firewait) = (void*)sithWeapon_SetFireWait_ADDR;
+static void (*sithWeapon_SetMountWait)(sithThing *a1, float mountWait) = (void*)sithWeapon_SetMountWait_ADDR;
+static int (*sithWeapon_SelectWeapon)(sithThing *player, int binIdx, int a3) = (void*)sithWeapon_SelectWeapon_ADDR;
+static int (*sithWeapon_AutoSelect)(sithThing *player, int weapIdx) = (void*)sithWeapon_AutoSelect_ADDR;
+static float (*sithWeapon_GetPriority)(sithThing *player, int binIdx, int mode) = (void*)sithWeapon_GetPriority_ADDR;
+static int (*sithWeapon_GetCurWeaponMode)() = (void*)sithWeapon_GetCurWeaponMode_ADDR;
+static void (*sithWeapon_SetFireRate)(sithThing *a1, float fireRate) = (void*)sithWeapon_SetFireRate_ADDR;
+static sithThing* (*sithWeapon_FireProjectile)(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, __int16 scaleFlags, float autoaimFov, float autoaimMaxDist) = (void*)sithWeapon_FireProjectile_ADDR;
 
 #endif // _SITHWEAPON_H

@@ -161,7 +161,7 @@ typedef struct rdMaterial
     rdTexformat tex_format;
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;
-    uint32_t unk_set_0;
+    uint32_t celIdx;
     rdTexinfo *texinfos[8];
     uint32_t field_8C;
     uint32_t field_90;

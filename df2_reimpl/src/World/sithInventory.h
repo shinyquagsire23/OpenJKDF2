@@ -11,7 +11,7 @@
 #define sithInventory_SelectItem_ADDR (0x004D1440)
 #define sithInventory_SelectItemPrior_ADDR (0x004D1540)
 #define sithInventory_SelectItemFollowing_ADDR (0x004D15F0)
-#define sithInventory_HasWeaponByIdx_ADDR (0x004D16A0)
+#define sithInventory_SelectWeaponFollowing_ADDR (0x004D16A0)
 #define sithInventory_GetBinByIdx_ADDR (0x004D16D0)
 #define sithInventory_GetCurWeapon_ADDR (0x004D16F0)
 #define sithInventory_SetCurWeapon_ADDR (0x004D1710)
@@ -212,7 +212,7 @@ int sithInventory_GetNumItemsFollowingIdx(sithThing *thing, signed int binNumSta
 void sithInventory_SelectItem(sithThing *thing, int binIdx);
 void sithInventory_SelectItemPrior(sithThing *thing);
 void sithInventory_SelectItemFollowing(sithThing *thing);
-int sithInventory_HasWeaponByIdx(int idx);
+int sithInventory_SelectWeaponFollowing(int idx);
 sithItemDescriptor* sithInventory_GetBinByIdx(int idx);
 int sithInventory_GetCurWeapon(sithThing *player);
 void sithInventory_SetCurWeapon(sithThing *player, int idx);

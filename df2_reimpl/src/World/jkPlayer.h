@@ -58,7 +58,8 @@ typedef struct jkSaberInfo
 
 #define bShowInvisibleThings (*(int*)0x8EE640)
 #define playerThingIdx (*(int*)0x83199C)
-#define selfPlayerInfo (*(sithPlayerInfo **)0x8319A8)
+#define g_localPlayerThing (*(sithThing**)0x8319A4)
+#define g_selfPlayerInfo (*(sithPlayerInfo **)0x8319A8)
 #define playerThings ((jkSaberInfo*)0x85B580)
 #define jkSaber_rotateMat (*(rdMatrix34*)0x85FA80)
 

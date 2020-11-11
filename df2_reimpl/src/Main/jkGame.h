@@ -18,10 +18,13 @@
 #define jkGame_SetVideoMode_ADDR (0x00402D00)
 #define jkGame_SetVideoModeGdi_ADDR (0x00402E40)
 
+typedef struct sithThing sithThing;
+
 #define g_sithMode (*(int*)0x8EE660)
 #define g_submodeFlags (*(int*)0x8EE664)
 #define g_debugmodeFlags (*(int*)0x8EE66C)
 #define g_playersetDifficulty (*(int*)0x8EE670)
+#define g_mapModeFlags (*(int*)0x8EE674)
 
 static int (*jkGame_GetCurrentGuiState)() = (void*)jkGame_GetCurrentGuiState_ADDR;
 

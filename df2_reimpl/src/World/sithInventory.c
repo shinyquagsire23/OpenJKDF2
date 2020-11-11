@@ -124,7 +124,7 @@ void sithInventory_SelectItemFollowing(sithThing *thing)
     sithInventory_SelectItem(thing, sithInventory_GetNumItemsFollowingIdx(thing, thing->actorParams.playerinfo->curItem));
 }
 
-int sithInventory_HasWeaponByIdx(int idx)
+int sithInventory_SelectWeaponFollowing(int idx)
 {
     int count = 0;
     for (int i = 0; i < 200; i++)

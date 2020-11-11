@@ -22,7 +22,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
-        if ( selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
+        if ( g_selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
             thing->rdthing.geometryMode = thing->rdthing.gap8;
             rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);

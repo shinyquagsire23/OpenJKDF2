@@ -90,7 +90,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     material->num_textures = mat_header.num_textures;
     material->tex_type = tex_type;
     material->num_texinfo = num_texinfo;
-    material->unk_set_0 = 0;
+    material->celIdx = 0;
     tex_num = 0;
     _memcpy(&material->tex_format, &mat_header.tex_format, sizeof(material->tex_format));
     if ( num_texinfo )

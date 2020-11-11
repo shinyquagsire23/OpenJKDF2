@@ -658,7 +658,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithInventory_SelectItem_ADDR, sithInventory_SelectItem);
     hook_function(sithInventory_SelectItemPrior_ADDR, sithInventory_SelectItemPrior);
     hook_function(sithInventory_SelectItemFollowing_ADDR, sithInventory_SelectItemFollowing);
-    hook_function(sithInventory_HasWeaponByIdx_ADDR, sithInventory_HasWeaponByIdx);
+    hook_function(sithInventory_SelectWeaponFollowing_ADDR, sithInventory_SelectWeaponFollowing);
     hook_function(sithInventory_GetBinByIdx_ADDR, sithInventory_GetBinByIdx);
     hook_function(sithInventory_GetCurWeapon_ADDR, sithInventory_GetCurWeapon);
     hook_function(sithInventory_SetCurWeapon_ADDR, sithInventory_SetCurWeapon);

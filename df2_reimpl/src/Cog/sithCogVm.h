@@ -57,6 +57,7 @@
 #define COGVM_FLAG_IDK   (2)
 
 typedef struct sithSurface sithSurface;
+typedef struct sithSound sithSound;
 
 enum COGFLAGS
 {
@@ -297,7 +298,7 @@ typedef struct sithCog
 {
     sithCogScript* cogscript;
     uint32_t flags;
-    sithCog* selfCog;
+    int selfCog;
     uint32_t script_running;
     uint32_t cogscript_pc;
     uint32_t wakeTimeMs;
@@ -318,7 +319,9 @@ typedef struct sithCog
     sithCogStackvar stack[64];
     uint32_t stackPos;
     char cogscript_fpath[32];
-    char field_4BC[4104];
+    char field_4BC[4096];
+    sithCogStackvar* heap;
+    int numHeapVars;
 } sithCog;
 
 #define sithCogVm_MsgTmpBuf (*(cogMsg_Entry**)0x837468)
@@ -380,6 +383,7 @@ sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, si
 //static int (__cdecl *sithCogVm_PopVector3)(sithCog *ctx, rdVector3* out) = (void*)sithCogVm_PopVector3_ADDR;
 //static char* (__cdecl *sithCogVm_PopString)(sithCog *ctx) = (void*)sithCogVm_PopString_ADDR;
 static sithSurface* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_PopSurface_ADDR;
+static sithSound* (__cdecl *sithCogVm_PopSound)(sithCog* ctx) = (void*)sithCogVm_PopSound_ADDR;
 //static void* (__cdecl *sithCogVm_PopMaterial)(sithCog* ctx) = (void*)sithCogVm_PopMaterial_ADDR;
 //static rdKeyframe* (__cdecl *sithCogVm_PopKeyframe_)(sithCog* ctx) = (void*)sithCogVm_PopKeyframe_ADDR;
 //static sithCog* (__cdecl *sithCogVm_PopCog)(sithCog* ctx) = (void*)sithCogVm_PopCog_ADDR;

@@ -1,0 +1,6 @@
+#ifndef _SITHCOGTHING_H
+#define _SITHCOGTHING_H
+
+
+
+#endif // _SITHCOGTHING_H

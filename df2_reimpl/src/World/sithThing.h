@@ -460,7 +460,7 @@ typedef struct sithThing
     sithThing* childThing;
     sithThing* parentThing;
     uint32_t signature;
-    uint32_t template_related;
+    sithThing* template_related;
     uint32_t template;
     sithThing* prev_thing;
     uint32_t child_signature;
