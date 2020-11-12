@@ -20,6 +20,7 @@
 #define sithThing_Create_ADDR (0x004CC8C0)
 #define sithThing_Free_ADDR (0x004CCA10)
 #define sithThing_SpawnThingInSector_ADDR (0x4CD9E0)
+#define sithThing_SpawnTemplate_ADDR (0x4CDCD0)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
@@ -517,6 +518,7 @@ static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (v
 static signed int (*sithThing_ParseArgs)(char **a1, sithThing *thing) = (void*)0x004CEB90;
 
 static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
+static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 
 #endif // _SITHTHING_H

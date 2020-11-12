@@ -158,7 +158,7 @@ jkGuiMenu                      0x1e2d     0.716%        0.000%          0 / 33
 sithCog                        0x1ed3     0.731%        16.918%         2 / 28         
 jkSaber                        0x1f4a     0.742%        33.296%         5 / 40         
 sithInventory                  0x2150     0.790%        63.075%        48 / 62         
-sithCogVm                      0x22f7     0.829%        68.171%        31 / 42         
+sithCogVm                      0x22f7     0.829%        76.092%        34 / 42         
 sithRender                     0x23de     0.851%        0.000%          0 / 22         
 sithMulti                      0x250c     0.879%        0.000%          0 / 34         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
@@ -175,7 +175,7 @@ sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22
 jkPlayer                       0x2da2     1.082%        4.254%          1 / 45         
 sithWeapon                     0x32a8     1.202%        0.987%          1 / 33         
 rdCache                        0x331c     1.212%        0.000%          0 / 16         
-sithCogThing                   0x3a4c     1.383%        20.216%         2 / 142        
+sithCogThing                   0x3a4c     1.383%        26.079%         8 / 142        
 sithThing                      0x3c73     1.434%        0.000%          0 / 55         
 sithSector                     0x79f9     2.893%        0.000%          0 / 96         
 rdClip                         0x81f2     3.082%        2.567%          2 / 17         
@@ -185,5 +185,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 8.963%
+Total completion: 9.110%
 ```

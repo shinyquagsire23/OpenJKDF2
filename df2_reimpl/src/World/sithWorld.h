@@ -8,6 +8,7 @@
 #include "Engine/rdKeyframe.h"
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
+#include "Engine/sithSurface.h"
 
 #define sithWorld_Startup_ADDR (0x004CF6F0)
 #define sithWorld_Shutdown_ADDR (0x004CFAB0)
@@ -34,15 +35,18 @@
 
 typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 
+typedef struct sithSector sithSector;
+typedef struct rdColormap rdColormap;
+
 typedef struct sithWorld
 {
     uint32_t level_type_maybe;
     char map_jkl_fname[32];
     char some_text_jk1[32];
     int numColormaps;
-    void* colormaps;
+    rdColormap* colormaps;
     int numSectors;
-    void* sectors;
+    sithSector* sectors;
     int numMaterialsLoaded;
     int numMaterials;
     rdMaterial* materials;
@@ -68,7 +72,7 @@ typedef struct sithWorld
     int numVertexUVs;
     void* vertexUVs;
     int numSurfaces;
-    void* surfaces;
+    sithSurface* surfaces;
     int numAdjoinsLoaded;
     int numAdjoins;
     void* adjoins;

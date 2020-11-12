@@ -32,7 +32,7 @@ typedef struct stdHashKey
 {
     stdHashKey* parent;
     stdHashKey* child;
-    char* key;
+    const char* key;
     void* value;
 } stdHashKey;
 
@@ -40,10 +40,10 @@ typedef struct stdHashTable
 {
     int numBuckets;
     stdHashKey* buckets;
-    int (*keyHashToIndex)(uint8_t *data, int numBuckets);
+    int (*keyHashToIndex)(const char *data, int numBuckets);
 } stdHashTable;
 
-int stdHashTable_HashStringToIdx(uint8_t *data, int numBuckets);
+int stdHashTable_HashStringToIdx(const char *data, int numBuckets);
 stdHashTable* stdHashTable_New(int maxEntries);
 void stdHashTable_Free(stdHashTable *table);
 void* stdHashTable_GetKeyVal(stdHashTable *table, const char *key);

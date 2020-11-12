@@ -1,13 +1,12 @@
 #include "sithCogThing.h"
 
 #include <stdint.h>
+#include "World/sithSector.h"
+#include "World/sithThing.h"
+#include "Engine/rdThing.h"
 
-static void (*sithCogThing_CreateThing)(sithCog* ctx) = (void*)0x005020B0;
-static void (*sithCogThing_CreateThingNr)(sithCog* ctx) = (void*)0x00502150;
-static void (*sithCogThing_createThingUnused)(sithCog* ctx) = (void*)0x005021F0;
-static void (*sithCogThing_CreateThingAtPos)(sithCog* ctx) = (void*)0x00502290;
-static void (*sithCogThing_CreateThingAtPosNr)(sithCog* ctx) = (void*)0x005022A0;
-static void (*sithCogThing_createThingAtPos_nr)(sithCog* ctx) = (void*)0x005022B0;
+void sithCogThing_createThingAtPos_nr(sithCog *ctx);
+
 static void (*sithCogThing_DamageThing)(sithCog* ctx) = (void*)0x00502430;
 static void (*sithCogThing_HealThing)(sithCog* ctx) = (void*)0x00502500;
 static void (*sithCogThing_GetThingHealth)(sithCog* ctx) = (void*)0x00502570;
@@ -154,12 +153,155 @@ void sithCogThing_GetThingType(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-// creatething
-// createthingnr
-// createthingunused
-// pos
-// posnr
-// pos_nr
+void sithCogThing_CreateThing(sithCog *ctx)
+{
+    sithThing *v1; // esi
+    sithThing *v2; // ebx
+    sithThing *v3; // edi
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopTemplate(ctx);
+    if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
+    {
+        if ( sithCogVm_isMultiplayer )
+        {
+            if ( !(ctx->flags & 0x200) )
+            {
+                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+            }
+        }
+        sithCogVm_PushInt(ctx, v3->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+
+void sithCogThing_CreateThingNr(sithCog *ctx)
+{
+    sithThing *v1; // esi
+    sithThing *v2; // ebx
+    sithThing *v3; // edi
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopTemplate(ctx);
+    if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
+    {
+        if ( sithCogVm_isMultiplayer )
+        {
+            if ( !(ctx->flags & 0x200) )
+            {
+                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+            }
+        }
+        sithCogVm_PushInt(ctx, v3->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_createThingUnused(sithCog *ctx)
+{
+    sithThing *v1; // esi
+    sithThing *v2; // ebx
+    sithThing *v3; // edi
+    int v6; // [esp+18h] [ebp+8h]
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopTemplate(ctx);
+    if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
+    {
+        if ( sithCogVm_isMultiplayer )
+        {
+            if ( !(ctx->flags & 0x200) )
+            {
+                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, v6);
+            }
+        }
+        sithCogVm_PushInt(ctx, v3->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_CreateThingAtPos(sithCog *ctx)
+{
+    sithCogThing_createThingAtPos_nr(ctx);
+}
+
+void sithCogThing_CreateThingAtPosNr(sithCog *ctx)
+{
+    sithCogThing_createThingAtPos_nr(ctx);
+}
+
+void sithCogThing_createThingAtPos_nr(sithCog *ctx)
+{
+    sithSector *popSector; // ebp
+    sithThing *popTemplate; // eax
+    rdVector3 *v5; // eax
+    rdVector3 *v6; // ecx
+    sithThing *v7; // ebx
+    rdVector3 a1; // [esp+10h] [ebp-54h]
+    rdVector3 pos; // [esp+1Ch] [ebp-48h]
+    rdVector3 rot; // [esp+28h] [ebp-3Ch]
+    rdMatrix34 a3; // [esp+34h] [ebp-30h]
+    int a8; // [esp+6Ch] [ebp+8h]
+
+    sithCogVm_PopVector3(ctx, &rot);
+    sithCogVm_PopVector3(ctx, &pos);
+    popSector = sithCogVm_PopSector(ctx);
+    popTemplate = sithCogVm_PopTemplate(ctx);
+    if ( !popTemplate || !popSector )
+    {
+        sithCogVm_PushInt(ctx, -1);
+        return;
+    }
+    if (popTemplate->rdthing.type == RD_THINGTYPE_MODEL)
+    {
+        a1 = popTemplate->rdthing.model3->insertOffset;
+    }
+    else if (popTemplate->rdthing.type == RD_THINGTYPE_SPRITE3)
+    {
+        a1 = popTemplate->rdthing.sprite3->offset;
+    }
+    else
+    {
+        a1.x = 0.0;
+        a1.y = 0.0;
+        a1.z = 0.0;
+    }
+
+    rdMatrix_BuildRotate34(&a3, &rot);
+    rdMatrix_TransformVector34Acc(&a1, &a3);
+    rdVector_Add3Acc(&pos, &a1);
+    v7 = sithThing_SpawnThingInSector(popTemplate, &pos, &a3, popSector, 0);
+    if ( v7 )
+    {
+        if ( sithCogVm_isMultiplayer )
+        {
+            if ( !(ctx->flags & 0x200) )
+            {
+                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+                    sithSector_cogMsg_SendCreateThing(popTemplate, v7, 0, popSector, (int *)&pos, (int *)&rot, 255, a8);
+            }
+        }
+        sithCogVm_PushInt(ctx, v7->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
 // damagething
 
 void sithCogThing_Initialize(void* ctx)

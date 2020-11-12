@@ -6,6 +6,7 @@
 #include "Cog/sithCogScript.h"
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
+#include "World/sithSector.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
 
@@ -592,6 +593,7 @@ sithSound* sithCogVm_PopSound(sithCog *ctx)
 
     return NULL;
 }
+#endif
 
 sithSector* sithCogVm_PopSector(sithCog *ctx)
 {
@@ -662,7 +664,7 @@ sithSurface* sithCogVm_PopSurface(sithCog *ctx)
 
     return NULL;
 }
-#endif
+
 
 rdMaterial* sithCogVm_PopMaterial(sithCog *ctx)
 {
@@ -705,7 +707,6 @@ rdMaterial* sithCogVm_PopMaterial(sithCog *ctx)
     return NULL;
 }
 
-#if 0
 rdModel3* sithCogVm_PopModel3(sithCog *ctx)
 {
     sithCogStackvar tmp;
@@ -746,7 +747,6 @@ rdModel3* sithCogVm_PopModel3(sithCog *ctx)
 
     return NULL;
 }
-#endif
 
 rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
 {

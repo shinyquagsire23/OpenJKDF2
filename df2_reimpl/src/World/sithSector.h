@@ -100,12 +100,41 @@ typedef struct sithSurface sithSurface;
 #define sithSector_cogmsg_send31_ADDR (0x004FA420)
 #define sithSector_cogmsg_31_ADDR (0x004FA5D0)
 
+typedef struct rdClipFrustum rdClipFrustum;
+typedef struct sithThing sithThing;
+typedef struct sithAdjoin sithAdjoin;
+typedef struct rdColormap rdColormap;
 
 typedef struct sithSector
 {
+    uint32_t id;
+    float ambientLight;
+    float extraLight;
+    rdColormap* colormap;
+    rdVector3 tint;
+    uint32_t numVertices;
+    int* verticeIdxs;
+    uint32_t numSurfaces;
+    sithSurface* surfaces;
+    sithAdjoin* adjoins;
+    sithThing* thingsList;
+    uint32_t flags;
+    rdVector3 center;
+    rdVector3 thrust;
+    uint32_t field_50;
+    uint32_t field_54;
+    rdVector3 collidebox_onecorner;
+    rdVector3 collidebox_othercorner;
+    rdVector3 boundingbox_onecorner;
+    rdVector3 boundingbox_othercorner;
+    float radius;
+    uint32_t field_8C;
+    uint32_t field_90;
+    rdClipFrustum* clipFrustum;
 } sithSector;
 
 static void (*sithSector_StopPhysicsThing)(sithThing* thing) = (void*)sithSector_StopPhysicsThing_ADDR;
 static int (*sithSector_cogMsg_SendStopAnim)(sithSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;
+static int (*sithSector_cogMsg_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithSector_cogMsg_SendCreateThing_ADDR;
 
 #endif // _SITHSECTOR_H

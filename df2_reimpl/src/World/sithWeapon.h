@@ -63,6 +63,7 @@
 typedef struct sithThing sithThing;
 typedef struct sithSurface sithSurface;
 typedef struct sithSound sithSound;
+typedef struct sithCog sithCog;
 
 void sithWeapon_InitDefaults();
 void sithWeapon_InitDefaults2();

@@ -43,7 +43,7 @@ int hashmapBucketSizes[hashmapBucketSizes_MAX] =
     1999
 };
 
-int stdHashTable_HashStringToIdx(uint8_t *data, int numBuckets)
+int stdHashTable_HashStringToIdx(const char *data, int numBuckets)
 {
     int hash;
     uint8_t i;
@@ -52,7 +52,7 @@ int stdHashTable_HashStringToIdx(uint8_t *data, int numBuckets)
     for ( i = *data; i; ++data )
     {
         hash = (65599 * hash) + i;
-        i = data[1];
+        i = (uint8_t)data[1];
     }
     return abs(hash % numBuckets);
 }
@@ -179,8 +179,8 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         new_child->child = 0;
         new_child->key = 0;
         new_child->value = 0;
-        new_child->key = (int)key;
-        new_child->value = (int)value;
+        new_child->key = key;
+        new_child->value = value;
         stdHashKey_AddLink(v10, new_child);
     }
     else
@@ -189,8 +189,8 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         v9->child = 0;
         v9->key = 0;
         v9->value = 0;
-        v9->key = (int)key;
-        v9->value = (int)value;
+        v9->key = key;
+        v9->value = value;
     }
     return 1;
 }
