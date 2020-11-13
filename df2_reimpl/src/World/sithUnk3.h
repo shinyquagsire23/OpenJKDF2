@@ -67,6 +67,7 @@ static float (*sithUnk3_SearchRadiusForThings)(sithSector *sector, sithThing *a2
 //static sithUnk3SearchEntry* (*sithUnk3_NextSearchResult)(void) = (void*)sithUnk3_NextSearchResult_ADDR;
 static int (*sithUnk3_DebrisDebrisCollide)(sithThing *arg0, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisDebrisCollide_ADDR;
 static int (*sithUnk3_DebrisPlayerCollide)(sithThing *thing, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisPlayerCollide_ADDR;
+static int (*sithUnk3_HasLos)(sithThing *a1, sithThing *a2, int flag) = (void*)sithUnk3_HasLos_ADDR;
 
 #define sithUnk3_stackIdk ((int*)0x847F28)
 #define sithUnk3_collisionHandlers ((sithUnk3Entry*)0x00847F38)

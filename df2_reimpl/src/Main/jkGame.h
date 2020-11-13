@@ -1,6 +1,8 @@
 #ifndef _JKGAME_H
 #define _JKGAME_H
 
+#include "jk.h"
+
 #define jkGame_SetDefaultSettings_ADDR (0x00401480)
 #define jkGame_ForceRefresh_ADDR (0x00401EC0)
 #define jkGame_Update_ADDR (0x00401EE0)
@@ -19,6 +21,8 @@
 #define jkGame_SetVideoModeGdi_ADDR (0x00402E40)
 
 typedef struct sithThing sithThing;
+
+#define pHS (*(common_functions**)0x860440)
 
 #define g_sithMode (*(int*)0x8EE660)
 #define g_submodeFlags (*(int*)0x8EE664)

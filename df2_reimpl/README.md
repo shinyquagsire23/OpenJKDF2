@@ -11,15 +11,13 @@ Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (se
 
 ```
 [file]                         [size]     [% of text]   [% complete]  [decomp / total] 
-WinCalibrateJoystick           0xe        0.001%        0.000%          0 / 1          
 DirectX                        0x1e       0.003%        0.000%          0 / 5          
-jkGob                          0x29       0.004%        0.000%          0 / 2          
-Res                            0x2e       0.004%        0.000%          0 / 1          
+jkGob                          0x29       0.004%        100.000%        2 / 2          
 jkUnk3                         0x41       0.006%        0.000%          0 / 2          
 jkGuiDecision                  0x45       0.006%        0.000%          0 / 3          
 sithStrTable                   0x5b       0.008%        100.000%        4 / 4          
 sithCopyright                  0x67       0.010%        100.000%        1 / 1          
-jkStrings                      0x89       0.013%        0.000%          0 / 5          
+jkStrings                      0x89       0.013%        100.000%        5 / 5          
 jkGuiGeneral                   0xc5       0.018%        0.000%          0 / 3          
 rdFace                         0xf6       0.023%        100.000%        4 / 4          
 jkGuiControlOptions            0x105      0.024%        0.000%          0 / 3          
@@ -34,10 +32,10 @@ sithTime                       0x213      0.049%        100.000%        6 / 6
 jkGuiSingleTally               0x21b      0.050%        0.000%          0 / 4          
 jkGuiSetup                     0x240      0.053%        0.000%          0 / 4          
 jkGuiSound                     0x274      0.058%        0.000%          0 / 3          
-sithItem                       0x275      0.058%        0.000%          0 / 5          
+sithItem                       0x275      0.058%        100.000%        5 / 5          
 jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3          
 stdMemory                      0x2ba      0.065%        0.000%          0 / 7          
-sithTimer                      0x2e3      0.068%        0.000%          0 / 9          
+sithTimer                      0x2e3      0.068%        12.720%         1 / 9          
 stdMci                         0x2ef      0.070%        100.000%        7 / 7          
 jkGuiObjectives                0x308      0.072%        0.000%          0 / 4          
 jkControl                      0x331      0.076%        0.000%          0 / 4          
@@ -176,7 +174,7 @@ jkPlayer                       0x2da2     1.082%        4.254%          1 / 45
 sithWeapon                     0x32a8     1.202%        0.987%          1 / 33         
 rdCache                        0x331c     1.212%        0.000%          0 / 16         
 sithCogThing                   0x3a4c     1.383%        26.079%         8 / 142        
-sithThing                      0x3c73     1.434%        0.000%          0 / 55         
+sithThing                      0x3c4c     1.430%        0.000%          0 / 54         
 sithSector                     0x79f9     2.893%        0.000%          0 / 96         
 rdClip                         0x81f2     3.082%        2.567%          2 / 17         
 rdRaster                       0xf04d     5.700%        0.000%          0 / 89         
@@ -185,5 +183,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 9.110%
+Total completion: 9.193%
 ```

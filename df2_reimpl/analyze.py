@@ -1,6 +1,6 @@
 funclist = open("ida_copypaste_funclist_nostdlib.txt", "r").read().split("\n")
 
-exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub", "daRealloc", "daFree", "daAlloc", "WinMain(x,x,x,x)", ]
+exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub", "daRealloc", "daFree", "daAlloc", "WinMain(x,x,x,x)", "WinCalibrateJoystick"]
 file_sizes = {}
 decomped_sizes = {}
 decomped_funcs = {}

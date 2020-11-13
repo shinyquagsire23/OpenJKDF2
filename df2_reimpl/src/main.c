@@ -31,6 +31,7 @@
 #include "Engine/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
+#include "Engine/sithTimer.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -38,6 +39,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "World/sithWeapon.h"
+#include "World/sithItem.h"
 #include "World/sithWorld.h"
 #include "World/sithInventory.h"
 #include "World/jkPlayer.h"
@@ -50,6 +52,8 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkGob.h"
+#include "Main/jkStrings.h"
 
 int yyparse();
 
@@ -721,10 +725,32 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
     
+    // jkGob
+    hook_function(jkGob_Startup_ADDR, jkGob_Startup);
+    hook_function(jkGob_Shutdown_ADDR, jkGob_Shutdown);
+    
+    // jkStrings
+    hook_function(jkStrings_Initialize_ADDR, jkStrings_Initialize);
+    hook_function(jkStrings_Shutdown_ADDR, jkStrings_Shutdown);
+    hook_function(jkStrings_GetText2_ADDR, jkStrings_GetText2);
+    hook_function(jkStrings_GetText_ADDR, jkStrings_GetText);
+    hook_function(jkStrings_unused_sub_40B490_ADDR, jkStrings_unused_sub_40B490);
+    
     // sithUnk3
     hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
     hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
     hook_function(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
+    
+    // sithItem
+    hook_function(sithItem_Collide_ADDR, sithItem_Collide);
+    hook_function(sithItem_New_ADDR, sithItem_New);
+    hook_function(sithItem_Take_ADDR, sithItem_Take);
+    hook_function(sithItem_Remove_ADDR, sithItem_Remove);
+    hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
+    hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
+    
+    // sithTimer
+    hook_function(sithTimer_Startup_ADDR, sithTimer_Startup);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

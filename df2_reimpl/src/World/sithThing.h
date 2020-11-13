@@ -21,6 +21,9 @@
 #define sithThing_Free_ADDR (0x004CCA10)
 #define sithThing_SpawnThingInSector_ADDR (0x4CD9E0)
 #define sithThing_SpawnTemplate_ADDR (0x4CDCD0)
+#define sithThing_LeaveSector_ADDR (0x004CD220)
+#define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
+#define sithThing_MoveToSector_ADDR (0x004CD1E0)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
@@ -272,10 +275,8 @@ typedef struct sithThingExplosionParams
 typedef struct sithThingItemParams
 {
     uint32_t typeflags;
-    uint32_t field_4;
-    uint32_t material;
-    uint32_t field_C;
-    uint32_t field_10;
+    rdVector3 position;
+    sithSector* sector;
     uint32_t respawn;
     uint32_t respawnTime;
     uint32_t field_1C;
@@ -520,5 +521,9 @@ static signed int (*sithThing_ParseArgs)(char **a1, sithThing *thing) = (void*)0
 static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
+static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
+static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
+static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
+static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;
 
 #endif // _SITHTHING_H
