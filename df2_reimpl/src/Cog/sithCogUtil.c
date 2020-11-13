@@ -372,9 +372,9 @@ void sithCogUtil_KillTimerEx(sithCog *ctx)
     v1 = sithCogVm_PopInt(ctx);
     if ( v1 > 0 )
     {
-        v2 = sithTimer_arr;
+        v2 = sithTimer_list;
         v3 = 0;
-        if ( sithTimer_arr )
+        if ( sithTimer_list )
         {
             do
             {
@@ -384,7 +384,7 @@ void sithCogUtil_KillTimerEx(sithCog *ctx)
                     if ( v3 )
                         v3->nextTimer = v4;
                     else
-                        sithTimer_arr = v2->nextTimer;
+                        sithTimer_list = v2->nextTimer;
                     sithTimer_Kill(v2);
                     v2 = v3;
                 }

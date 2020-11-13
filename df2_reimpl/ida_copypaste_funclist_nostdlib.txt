@@ -2524,11 +2524,11 @@ sithSprite_sub_4F25F0	.text	004F25F0	0000005C	0000000C	00000008	R	.	.	.	.	.	.
 sithTimer_Startup	.text	004F2650	0000005E			R	.	.	.	.	.	.
 sithTimer_Shutdown	.text	004F26B0	00000014			R	.	.	.	.	.	.
 sithTimer_Open	.text	004F26D0	00000014			R	.	.	.	.	.	.
-sithTimer_Close	.text	004F26F0	00000049			R	.	.	.	.	.	.
-sithTimer_Serialize	.text	004F2740	0000003C	00000004	00000000	R	.	.	.	.	.	.
+sithTimer_Close	.text	004F26F0	00000049			R	.	.	.	.	T	.
+sithTimer_Reset	.text	004F2740	0000003C	00000004	00000000	R	.	.	.	.	T	.
 sithTimer_Set	.text	004F2780	0000009D	00000004	0000000C	R	.	.	.	.	T	.
 sithTimer_Kill	.text	004F2820	0000003F	00000004	00000004	R	.	.	.	.	T	.
-sithTimer_RegisterFunc	.text	004F2860	00000044	00000000	00000010	R	.	.	.	.	.	.
+sithTimer_RegisterFunc	.text	004F2860	00000044	00000000	00000010	R	.	.	.	.	T	.
 sithTimer_Advance	.text	004F28B0	000000B8	00000008	00000000	R	.	.	.	.	.	.
 sithStrTable_Startup	.text	004F2970	0000001D			R	.	.	.	.	.	.
 sithStrTable_Shutdown	.text	004F2990	00000018			R	.	.	.	.	.	.

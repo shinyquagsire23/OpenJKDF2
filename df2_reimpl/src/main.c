@@ -751,6 +751,14 @@ __declspec(dllexport) void hook_init(void)
     
     // sithTimer
     hook_function(sithTimer_Startup_ADDR, sithTimer_Startup);
+    hook_function(sithTimer_Shutdown_ADDR, sithTimer_Shutdown);
+    hook_function(sithTimer_Open_ADDR, sithTimer_Open);
+    hook_function(sithTimer_Close_ADDR, sithTimer_Close);
+    hook_function(sithTimer_Reset_ADDR, sithTimer_Reset);
+    hook_function(sithTimer_Set_ADDR, sithTimer_Set);
+    hook_function(sithTimer_Kill_ADDR, sithTimer_Kill);
+    hook_function(sithTimer_RegisterFunc_ADDR, sithTimer_RegisterFunc);
+    hook_function(sithTimer_Advance_ADDR, sithTimer_Advance);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

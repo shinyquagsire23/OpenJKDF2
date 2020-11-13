@@ -35,7 +35,7 @@ jkGuiSound                     0x274      0.058%        0.000%          0 / 3
 sithItem                       0x275      0.058%        100.000%        5 / 5          
 jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3          
 stdMemory                      0x2ba      0.065%        0.000%          0 / 7          
-sithTimer                      0x2e3      0.068%        12.720%         1 / 9          
+sithTimer                      0x2e3      0.068%        100.000%        9 / 9          
 stdMci                         0x2ef      0.070%        100.000%        7 / 7          
 jkGuiObjectives                0x308      0.072%        0.000%          0 / 4          
 jkControl                      0x331      0.076%        0.000%          0 / 4          
@@ -183,5 +183,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 9.193%
+Total completion: 9.253%
 ```

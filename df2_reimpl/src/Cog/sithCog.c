@@ -12,6 +12,7 @@
 #include "sithCogVm.h"
 #include "sithCogParse.h"
 #include "jkCog.h"
+#include "Engine/sithTimer.h"
 
 #include "General/stdHashTable.h"
 
@@ -30,7 +31,6 @@ void (*cog_exec)(sithCog* ctx, int b) = (void*)0x004E2350;
 static int (*sithCogScript_TimerTick)() = (void*)0x4E0640;
 void (*sithCogScript_RegisterGlobalMessage)(void* ctx, char* name, int id) = (void*)0x004E06C0;
 void (*sithCogScript_RegisterMessageSymbol)(void* ctx, int msg, char* name) = (void*)0x004E0600;
-int (*sithTimer_RegisterFunc)(int a1, intptr_t a2, int a3, int a4) = (void*)0x4F2860;
 
 
 int sithCog_Startup()
