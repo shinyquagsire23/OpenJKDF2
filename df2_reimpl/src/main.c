@@ -32,6 +32,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithTimer.h"
+#include "Engine/sithKeyFrame.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -759,6 +760,13 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithTimer_Kill_ADDR, sithTimer_Kill);
     hook_function(sithTimer_RegisterFunc_ADDR, sithTimer_RegisterFunc);
     hook_function(sithTimer_Advance_ADDR, sithTimer_Advance);
+    
+    // sithKeyFrame
+    hook_function(sithKeyFrame_Load_ADDR, sithKeyFrame_Load);
+    hook_function(sithKeyFrame_GetByIdx_ADDR, sithKeyFrame_GetByIdx);
+    hook_function(sithKeyFrame_LoadEntry_ADDR, sithKeyFrame_LoadEntry);
+    hook_function(sithKeyFrame_New_ADDR, sithKeyFrame_New);
+    hook_function(sithKeyFrame_Free_ADDR, sithKeyFrame_Free);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

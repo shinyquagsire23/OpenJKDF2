@@ -2318,10 +2318,10 @@ sithAnimClass_LoadPupEntry	.text	004E5180	0000033D	00000090	00000008	R	.	.	.	.	T
 sithAnimClass_New	.text	004E54C0	00000067	0000000C	00000008	R	.	.	.	.	.	.
 sithAnimClass_Free	.text	004E5530	0000007C	00000004	00000004	R	.	.	.	.	T	.
 sithKeyFrame_Load	.text	004E55B0	0000025D	00000094	00000008	R	.	.	.	.	T	.
-sithKeyFrame_GetFName	.text	004E5810	00000038	00000000	00000004	R	.	.	.	.	.	.
-sithKeyFrame_LoadEntry	.text	004E5850	000000CD	00000088	00000004	R	.	.	.	.	.	.
-sithKeyFrame_New	.text	004E5920	0000005E	0000000C	00000008	R	.	.	.	.	.	.
-sithKeyFrame_Free	.text	004E5980	0000008E	00000004	00000004	R	.	.	.	.	.	.
+sithKeyFrame_GetByIdx	.text	004E5810	00000038	00000000	00000004	R	.	.	.	.	T	.
+sithKeyFrame_LoadEntry	.text	004E5850	000000CD	00000088	00000004	R	.	.	.	.	T	.
+sithKeyFrame_New	.text	004E5920	0000005E	0000000C	00000008	R	.	.	.	.	T	.
+sithKeyFrame_Free	.text	004E5980	0000008E	00000004	00000004	R	.	.	.	.	T	.
 sithSurface_sub_4E5A10	.text	004E5A10	00000011	00000000	00000004	R	.	.	.	.	.	.
 sithSurface_sub_4E5A30	.text	004E5A30	00000011	00000000	00000004	R	.	.	.	.	.	.
 sithSurface_New	.text	004E5A50	00000078	0000000C	00000008	R	.	.	.	.	T	.

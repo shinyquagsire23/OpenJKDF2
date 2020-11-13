@@ -49,7 +49,7 @@ stdres                         0x426      0.098%        0.000%          0 / 2
 stdHashTable                   0x42c      0.099%        94.663%         6 / 8          
 rdThing                        0x42f      0.099%        100.000%       12 / 12         
 stdGdi                         0x430      0.099%        0.000%          0 / 10         
-sithKeyFrame                   0x44e      0.102%        0.000%          0 / 5          
+sithKeyFrame                   0x44e      0.102%        100.000%        5 / 5          
 stdPcx                         0x45e      0.104%        0.000%          0 / 2          
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
 rdMath                         0x47d      0.106%        4.613%          1 / 6          
@@ -183,5 +183,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 9.253%
+Total completion: 9.355%
 ```
