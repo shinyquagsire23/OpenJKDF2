@@ -139,5 +139,9 @@ static int (*sithSector_cogMsg_SendCreateThing)(sithThing *a1, sithThing *a2, si
 static void (*sithSector_cogMsg_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithSector_cogMsg_SendTakeItem_ADDR;
 static void (*sithSector_cogMsg_SendSyncThing)(sithThing *a1, int a2, int a3) = (void*)sithSector_cogMsg_SendSyncThing_ADDR;
 static void (*sithSector_cogMsg_SendTeleportThing)(sithThing *a1, int a2, int a3) = (void*)sithSector_cogMsg_SendTeleportThing_ADDR;
+static void (*sithSector_cogMsg_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithSector_cogMsg_SendDamage_ADDR;
+static void (*sithSector_cogMsg_SendDestroyThing)(int a1, int a2) = (void*)sithSector_cogMsg_SendDestroyThing_ADDR;
+static void (*sithSector_cogMsg_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithSector_cogMsg_SendSyncThingFrame_ADDR;
+static void (*sithSector_ThingApplyForce)(sithThing *a1, rdVector3 *a2) = (void*)sithSector_ThingApplyForce_ADDR;
 
 #endif // _SITHSECTOR_H

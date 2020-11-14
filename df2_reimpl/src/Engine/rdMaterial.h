@@ -31,6 +31,24 @@ typedef struct sith_tex_2
     sith_tex_2* tex_next;
 } sith_tex_2;
 
+typedef struct rdTexformat
+{
+    uint32_t is16bit;
+    uint32_t bpp;
+    uint32_t r_bits;
+    uint32_t g_bits;
+    uint32_t b_bits;
+    uint32_t r_shift;
+    uint32_t g_shift;
+    uint32_t b_shift;
+    uint32_t r_bitdiff;
+    uint32_t g_bitdiff;
+    uint32_t b_bitdiff;
+    uint32_t unk_40;
+    uint32_t unk_44;
+    uint32_t unk_48;
+} rdTexformat;
+
 typedef struct texture_format
 {
     uint32_t width;
@@ -38,20 +56,7 @@ typedef struct texture_format
     uint32_t texture_size_in_bytes;
     uint32_t width_in_bytes;
     uint32_t width_in_pixels;
-    uint32_t unk;
-    uint32_t bpp;
-    uint32_t field_1C;
-    uint32_t field_20;
-    uint32_t field_24;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t field_44;
-    uint32_t field_48;
+    rdTexformat format;
 } texture_format;
 
 typedef struct stdVBuffer
@@ -82,24 +87,6 @@ typedef struct rdTexture
     sith_tex_2 field_A4[4];
     uint8_t field_304[488];
 } rdTexture;
-
-typedef struct rdTexformat
-{
-    uint32_t unk;
-    uint32_t bpp;
-    uint32_t r_bits;
-    uint32_t g_bits;
-    uint32_t b_bits;
-    uint32_t r_shift;
-    uint32_t g_shift;
-    uint32_t b_shift;
-    uint32_t r_bitdiff;
-    uint32_t g_bitdiff;
-    uint32_t b_bitdiff;
-    uint32_t unk_40;
-    uint32_t unk_44;
-    uint32_t unk_48;
-} rdTexformat;
 
 typedef struct rdColor24
 {

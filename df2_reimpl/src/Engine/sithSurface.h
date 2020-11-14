@@ -64,6 +64,29 @@ typedef struct sithSurfaceInfo
     uint32_t field_44;
 } sithSurfaceInfo;
 
+struct rdSurface
+{
+  int field_0;
+  int field_4;
+  sithSector *parent_sector;
+  sithAdjoin *adjoin;
+  int surfaceFlags;
+  sithSurface *sithSurfaceParent;
+  int faceType;
+  int geoMode;
+  int lightMode;
+  int texMode;
+  int numVertices;
+  int *vertexIdxs;
+  int field_30;
+  rdMaterial *material;
+  int wallCel;
+  int field_3C;
+  int field_40;
+  int field_44;
+  int field_48;
+};
+
 typedef struct sithSurface
 {
     uint32_t field_0;
@@ -81,5 +104,6 @@ static rdSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADD
 static int (*sithSurface_StopAnim)(rdSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
 static rdSurface* (__cdecl *sithSurface_GetRdSurface)(sithSurface *a1) = (void*)sithSurface_GetRdSurface_ADDR;
 static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
+static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 
 #endif // _SITHSURFACE_H

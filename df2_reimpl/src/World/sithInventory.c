@@ -3,6 +3,10 @@
 #include "jk.h"
 #include "Cog/sithCog.h"
 #include "Engine/sithTime.h"
+#include "General/stdConffile.h"
+#include "stdPlatform.h"
+#include "Engine/sithNet.h"
+#include "World/sithSector.h"
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
 {
@@ -423,7 +427,20 @@ int sithInventory_IsBackpackable(sithThing *player, int binIdx)
     return sithInventory_aDescriptors[binIdx].flags & (ITEMINFO_VALID | ITEMINFO_MP_BACKPACK) == (ITEMINFO_VALID | ITEMINFO_MP_BACKPACK);
 }
 
-// serializedwrite
+void sithInventory_SerializedWrite(sithThing *thing)
+{
+    for (int i= 0; i < 200; i++)
+    {
+        sithItemInfo* iteminfo = &thing->actorParams.playerinfo->iteminfo[i];
+        if ( sithInventory_aDescriptors[i].flags & 1 )
+        {
+            *(float *)&std_genBuffer[0] = iteminfo->ammoAmt;
+            *(int*)&std_genBuffer[4] = iteminfo->field_4;
+            *(float *)&std_genBuffer[8] = iteminfo->state;
+            stdConffile_Write(std_genBuffer, 12);
+        }
+    }
+}
 
 float sithInventory_GetMin(sithThing *player, int binIdx)
 {
@@ -513,6 +530,8 @@ float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, 
     return param0;
 }
 
+// sithInventory_Reset
+
 void sithInventory_ClearUncarried(sithThing *player)
 {
     for (int i = 0; i < 200; i++)
@@ -520,6 +539,122 @@ void sithInventory_ClearUncarried(sithThing *player)
         if (sithInventory_aDescriptors[i].flags & ITEMINFO_NOTCARRIED)
             sithInventory_SetBinAmount(player, i, 0.0);
     }
+}
+
+sithThing* sithInventory_CreateBackpack(sithThing *player)
+{
+    sithThing *templateThing;
+    sithThing *backpack;
+
+    if ( !net_isMulti )
+        return 0;
+
+    templateThing = sithTemplate_GetEntryByName("+backpack");
+    if ( !templateThing )
+        return 0;
+
+    backpack = sithThing_SpawnTemplate(templateThing, player);
+    if ( !backpack )
+        return 0;
+
+    backpack->itemParams.numBins = 0;
+    backpack->itemParams.typeflags |= THING_TYPEFLAGS_DAMAGE; // ??
+    
+    for (int i = 0; i < 200; i++)
+    {
+        sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+        if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
+        {
+            float ammoAmt = 0.0;
+            if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
+                ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
+
+            if ( backpack->itemParams.numBins < 16 && ammoAmt > 0.0 )
+            {
+                backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
+                backpack->itemParams.contents[backpack->itemParams.numBins++].value = ammoAmt;
+            }
+        }
+    }
+
+    sithSector_cogMsg_SendCreateThing(templateThing, backpack, player, 0, 0, 0, 255, 1);
+    sithSector_cogMsg_SendSyncThing(backpack, -1, 255);
+    return backpack;
+}
+
+void sithInventory_PickupBackpack(sithThing *player, sithThing *backpack)
+{
+    for (int i = 0; i < backpack->itemParams.numBins; i++)
+    {
+        sithBackpackItem* item = &backpack->itemParams.contents[i];
+        sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+
+        if ((desc->flags & ITEMINFO_VALID) && (desc->flags & ITEMINFO_MP_BACKPACK))
+        {
+            sithInventory_ChangeInv(player, item->binIdx, item->value);
+        }
+    }
+}
+
+int sithInventory_NthBackpackBin(sithThing *item, signed int n)
+{
+    if ( n >= item->itemParams.numBins )
+        return -1;
+    else
+        return item->itemParams.contents[n].binIdx;
+}
+
+float sithInventory_NthBackpackValue(sithThing *item, signed int n)
+{
+    if ( n >= item->itemParams.numBins )
+        return -1.0;
+    else
+        return item->itemParams.contents[n].value;
+}
+
+int sithInventory_NumBackpackItems(sithThing *item)
+{
+    return item->itemParams.numBins;
+}
+
+// handleinvskillkeys
+
+void sithInventory_SendFire(sithThing *player)
+{
+    for (int i = 0; i < 200; i++) // TODO I think the actual game has an off by one here
+    {
+        sithItemInfo* iteminfo = &player->actorParams.playerinfo->iteminfo[i];
+        sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+        
+        if ( iteminfo->activationDelaySecs > 0.0 
+             && sithTime_curSeconds >= iteminfo->binWait 
+             && desc->flags & ITEMINFO_POWER )
+        {
+            if ( desc->cog )
+            {
+                iteminfo->binWait = sithTime_curSeconds + iteminfo->activationDelaySecs;
+                sithCog_SendMessageEx(desc->cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
+            }
+        }
+    }
+}
+
+sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx)
+{
+    if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 
+         && sithInventory_aDescriptors[binIdx].flags & ITEMINFO_VALID )
+        return &player->actorParams.playerinfo->iteminfo[binIdx];
+    else
+        return NULL;
+}
+
+sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx)
+{
+    if ( player->actorParams.playerinfo == (sithPlayerInfo *)-136 
+    || !(sithInventory_aDescriptors[idx].flags & ITEMINFO_VALID) )
+        return NULL;
+
+    return &sithInventory_aDescriptors[idx];
 }
 
 void sithInventory_ClearInventory(sithThing *player)

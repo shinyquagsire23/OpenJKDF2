@@ -80,6 +80,8 @@ typedef struct rdVector4
     float w;
 } rdVector4;
 
+extern const rdVector3 rdroid_zeroVector3;
+
 rdVector2* rdVector_Set2(rdVector2* v, float x, float y);
 rdVector3* rdVector_Set3(rdVector3* v, float x, float y, float z);
 rdVector4* rdVector_Set4(rdVector4* v, float x, float y, float z, float w);

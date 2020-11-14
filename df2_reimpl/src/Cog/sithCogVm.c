@@ -9,6 +9,7 @@
 #include "World/sithSector.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
+#include "Engine/sithSound.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -552,7 +553,6 @@ sithThing* sithCogVm_PopTemplate(sithCog *ctx)
     return sithTemplate_GetEntryByIdx(idx);
 }
 
-#if 0
 sithSound* sithCogVm_PopSound(sithCog *ctx)
 {
     sithCogStackvar tmp;
@@ -593,7 +593,6 @@ sithSound* sithCogVm_PopSound(sithCog *ctx)
 
     return NULL;
 }
-#endif
 
 sithSector* sithCogVm_PopSector(sithCog *ctx)
 {
@@ -789,6 +788,35 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
 
 // aiclass
 // popsymbolfunc is unused
+
+cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
+{
+    sithCogStackvar *v3; // ecx
+    struct cogSymbol *v7; // eax
+    int v12; // [esp+10h] [ebp-Ch]
+
+    if ( cog_ctx->stackPos < 1 )
+        return 0;
+    cog_ctx->stackPos--;
+    v3 = &cog_ctx->stack[cog_ctx->stackPos];
+
+    if ( v3->type == COG_VARTYPE_SYMBOL )
+    {
+        v7 = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
+        if ( v7->val )
+            return (cogSymbolFunc_t)&v7->func;
+        else
+            return v7->func;
+    }
+    else if ( v3->type )
+    {
+        return (cogSymbolFunc_t)v12; // aaaaa
+    }
+    else
+    {
+        return cog_ctx->stack[cog_ctx->stackPos].data[0];
+    }
+}
 
 char* sithCogVm_PopString(sithCog *ctx)
 {

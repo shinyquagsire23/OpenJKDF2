@@ -142,6 +142,38 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
   return 1;
 }
 
+void stdGob_Free(stdGob *gob)
+{
+    if (!gob )
+        return;
+
+    stdGob_FreeEntry(gob);
+    std_pHS->free(gob);
+}
+
+void stdGob_FreeEntry(stdGob *gob)
+{
+    if ( gob->viewMapped )
+    {
+        jk_UnmapViewOfFile(gob->viewAddr);
+        jk_CloseHandle(gob->viewHandle);
+        jk_CloseHandle(gob->viewHandle2);
+    }
+    else
+    {
+        if ( gob->entries )
+        {
+            std_pHS->free(gob->entries);
+            gob->entries = 0;
+        }
+        if ( gob->entriesHashtable )
+        {
+            stdHashTable_Free(gob->entriesHashtable);
+            gob->entriesHashtable = 0;
+        }
+    }
+}
+
 stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath)
 {
     stdGobEntry *entry;

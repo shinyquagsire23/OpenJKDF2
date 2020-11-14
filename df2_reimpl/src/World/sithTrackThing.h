@@ -18,5 +18,9 @@ typedef struct sithThing sithThing;
 #define sithTrackThing_idkpathmove_ADDR (0x004FB6D0)
 
 static void (*sithTrackThing_Stop)(sithThing* thing) = (void*)sithTrackThing_Stop_ADDR;
+static void (*sithTrackThing_MoveToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_MoveToFrame_ADDR;
+static void (*sithTrackThing_SkipToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_SkipToFrame_ADDR;
+static int (*sithTrackThing_RotatePivot)(sithThing *a1, rdVector3 *a2, rdVector3 *a3, float a4) = (void*)sithTrackThing_RotatePivot_ADDR;
+static void (*sithTrackThing_Rotate)(sithThing *a1, rdVector3 *a2) = (void*)sithTrackThing_Rotate_ADDR;
 
 #endif // _SITHTRACKTHING_H

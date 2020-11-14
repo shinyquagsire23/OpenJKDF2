@@ -24,9 +24,20 @@
 #define sithThing_LeaveSector_ADDR (0x004CD220)
 #define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
 #define sithThing_MoveToSector_ADDR (0x004CD1E0)
+#define sithThing_EnterSector_ADDR (0x4CD2C0)
+#define sithThing_DetachThing__ADDR (0x4CE380)
+#define sithThing_Release_ADDR (0x4E0740)
+#define sithThing_SyncThingPos_ADDR (0x4CF560)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
+
+enum MOVETYPE
+{
+  MOVETYPE_NONE = 0x0,
+  MOVETYPE_PHYSICS = 0x1,
+  MOVETYPE_PATH = 0x2,
+};
 
 enum THINGPARAM
 {
@@ -135,7 +146,7 @@ enum SITH_TF
 {
     SITH_TF_LIGHT    = 1,
     SITH_TF_WILLBEREMOVED  = 2,
-    SITH_TF_CAPTURED  = 4,
+    SITH_TF_4  = 4,
     SITH_TF_LEVELGEO  = 8,
     SITH_TF_10       = 0x10,
     SITH_TF_20       = 0x20,
@@ -143,7 +154,7 @@ enum SITH_TF
     SITH_TF_80       = 0x80,
     SITH_TF_INVULN   = 0x100,
     SITH_TF_DEAD     = 0x200,
-    SITH_TF_400      = 0x400,
+    SITH_TF_CAPTURED = 0x400,
     SITH_TF_NOIMPACTDAMAGE  = 0x800,
     SITH_TF_NOEASY   = 0x1000,
     SITH_TF_NOMEDIUM  = 0x2000,
@@ -272,6 +283,13 @@ typedef struct sithThingExplosionParams
     uint32_t field_80;
 } sithThingExplosionParams;
 
+typedef struct sithBackpackItem
+{
+    int16_t binIdx;
+    int16_t field_2;
+    float value;
+} sithBackpackItem;
+
 typedef struct sithThingItemParams
 {
     uint32_t typeflags;
@@ -279,31 +297,9 @@ typedef struct sithThingItemParams
     sithSector* sector;
     uint32_t respawn;
     uint32_t respawnTime;
-    uint32_t field_1C;
-    uint32_t field_20;
-    uint32_t field_24;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t field_44;
-    uint32_t field_48;
-    uint32_t field_4C;
-    uint32_t field_50;
-    uint32_t field_54;
-    uint32_t field_58;
-    uint32_t field_5C;
-    uint32_t field_60;
-    uint32_t field_64;
-    uint32_t field_68;
-    uint32_t field_6C;
-    uint32_t field_70;
-    uint32_t field_74;
-    uint32_t field_78;
-    uint32_t field_7C;
+    int16_t numBins;
+    int16_t field_1E;
+    sithBackpackItem contents[12];
     uint32_t field_80;
 } sithThingItemParams;
 
@@ -401,8 +397,8 @@ typedef struct sithThingPhysParams
 
 typedef struct sithThingFrame
 {
-    rdVector3 from;
-    rdVector3 to;
+    rdVector3 pos;
+    rdVector3 rot;
 } sithThingFrame;
 
 typedef struct sithThingTrackParams
@@ -411,11 +407,9 @@ typedef struct sithThingTrackParams
     uint32_t loadedFrames;
     sithThingFrame *frames;
     uint32_t field_C;
-    uint32_t field_10;
-    uint32_t field_14;
-    uint32_t field_18;
+    rdVector3 vel;
     uint32_t field_1C;
-    uint32_t field_20;
+    float field_20;
     uint32_t field_24;
     uint32_t field_28;
     uint32_t field_2C;
@@ -525,5 +519,10 @@ static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
 static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
 static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
 static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;
+static void (*sithThing_EnterSector)(sithThing *a1, sithSector *a2, int a3, int a4) = (void*)sithThing_EnterSector_ADDR;
+static int (*sithThing_DetachThing_)(sithThing *a1) = (void*)sithThing_DetachThing__ADDR;
+static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
+static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
+static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
 
 #endif // _SITHTHING_H

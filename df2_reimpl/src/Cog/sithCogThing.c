@@ -3,48 +3,19 @@
 #include <stdint.h>
 #include "World/sithSector.h"
 #include "World/sithThing.h"
+#include "World/sithTrackThing.h"
+#include "World/sithInventory.h"
 #include "Engine/rdThing.h"
+#include "Engine/sithNet.h"
+#include "Engine/sithSurface.h"
+#include "Engine/sithTime.h"
+//#include "Engine/rdSurface.h"
+
+#include "stdPlatform.h"
+#include "Win95/DebugConsole.h"
 
 void sithCogThing_createThingAtPos_nr(sithCog *ctx);
 
-static void (*sithCogThing_DamageThing)(sithCog* ctx) = (void*)0x00502430;
-static void (*sithCogThing_HealThing)(sithCog* ctx) = (void*)0x00502500;
-static void (*sithCogThing_GetThingHealth)(sithCog* ctx) = (void*)0x00502570;
-static void (*sithCogThing_SetHealth)(sithCog* ctx) = (void*)0x005025C0;
-static void (*sithCogThing_DestroyThing)(sithCog* ctx) = (void*)0x00502600;
-static void (*sithCogThing_JumpToFrame)(sithCog* ctx) = (void*)0x00502650;
-static void (*sithCogThing_MoveToFrame)(sithCog* ctx) = (void*)0x00502720;
-static void (*sithCogThing_SkipToFrame)(sithCog* ctx) = (void*)0x005027D0;
-static void (*sithCogThing_RotatePivot)(sithCog* ctx) = (void*)0x00502880;
-static void (*sithCogThing_Rotate)(sithCog* ctx) = (void*)0x00502950;
-static void (*sithCogThing_GetThingLight)(sithCog* ctx) = (void*)0x00502990;
-static void (*sithCogThing_SetThingLight)(sithCog* ctx) = (void*)0x005029D0;
-static void (*sithCogThing_ThingLightAnim)(sithCog* ctx) = (void*)0x00502A60;
-static void (*sithCogThing_WaitForStop)(sithCog* ctx) = (void*)0x00502B10;
-static void (*sithCogThing_GetThingSector)(sithCog* ctx) = (void*)0x00502B80;
-static void (*sithCogThing_GetCurFrame)(sithCog* ctx) = (void*)0x00502BC0;
-static void (*sithCogThing_GetGoalFrame)(sithCog* ctx) = (void*)0x00502C00;
-static void (*sithCogThing_StopThing)(sithCog* ctx) = (void*)0x00502C40;
-static void (*sithCogThing_IsMoving)(sithCog* ctx) = (void*)0x00502CB0;
-static void (*sithCogThing_SetThingPulse)(sithCog* ctx) = (void*)0x00502D60;
-static void (*sithCogThing_SetThingTimer)(sithCog* ctx) = (void*)0x00502DD0;
-static void (*sithCogThing_CaptureThing)(sithCog* ctx) = (void*)0x00502E40;
-static void (*sithCogThing_ReleaseThing)(sithCog* ctx) = (void*)0x00502E70;
-static void (*sithCogThing_GetThingParent)(sithCog* ctx) = (void*)0x00502EB0;
-static void (*sithCogThing_GetThingPos)(sithCog* ctx) = (void*)0x00502EF0;
-static void (*sithCogThing_SetThingPos)(sithCog* ctx) = (void*)0x00502F30;
-static void (*sithCogThing_GetInv)(sithCog* ctx) = (void*)0x00502FC0;
-static void (*sithCogThing_SetInv)(sithCog* ctx) = (void*)0x00503020;
-static void (*sithCogThing_ChangeInv)(sithCog* ctx) = (void*)0x00503080;
-static void (*sithCogThing_GetInvCog)(sithCog* ctx) = (void*)0x005030F0;
-static void (*sithCogThing_GetThingVel)(sithCog* ctx) = (void*)0x00503160;
-static void (*sithCogThing_SetThingVel)(sithCog* ctx) = (void*)0x00503210;
-static void (*sithCogThing_ApplyForce)(sithCog* ctx) = (void*)0x00503290;
-static void (*sithCogThing_AddThingVel)(sithCog* ctx) = (void*)0x00503300;
-static void (*sithCogThing_GetThingLvec)(sithCog* ctx) = (void*)0x00503390;
-static void (*sithCogThing_GetThingUvec)(sithCog* ctx) = (void*)0x005033D0;
-static void (*sithCogThing_GetThingRvec)(sithCog* ctx) = (void*)0x00503410;
-static void (*sithCogThing_sub_503450)(sithCog* ctx) = (void*)0x00503450;
 static void (*sithCogThing_DetachThing)(sithCog* ctx) = (void*)0x00503490;
 static void (*sithCogThing_GetAttachFlags)(sithCog* ctx) = (void*)0x005034F0;
 static void (*sithCogThing_AttachThingToSurf)(sithCog* ctx) = (void*)0x00503520;
@@ -302,7 +273,650 @@ void sithCogThing_createThingAtPos_nr(sithCog *ctx)
     }
 }
 
-// damagething
+void sithCogThing_DamageThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    int a4 = sithCogVm_PopInt(ctx);
+    float a5 = sithCogVm_PopFlex(ctx);
+    sithThing* thing2 = sithCogVm_PopThing(ctx);
+
+    if ( a5 > 0.0 && thing2 )
+    {
+        if ( !thing )
+            thing = thing2;
+        if ( sithCogVm_isMultiplayer )
+        {
+            if ( !(ctx->flags & 0x200) )
+            {
+                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+                {
+                    if ( net_isServer )
+                        sithSector_cogMsg_SendDamage(thing2, thing, a5, a4, -1, 1);
+                }
+            }
+        }
+        sithCogVm_PushFlex(ctx, sithThing_Damage(thing2, thing, a5, a4));
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_HealThing(sithCog *ctx)
+{
+    float amt = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (amt > 0.0 && thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+    {
+        thing->actorParams.health += amt;
+        if ( thing->actorParams.health > thing->actorParams.maxHealth)
+            thing->actorParams.health = thing->actorParams.maxHealth;
+    }
+}
+
+void sithCogThing_GetThingHealth(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) )
+        sithCogVm_PushFlex(ctx, thing->actorParams.health);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetHealth(sithCog *ctx)
+{
+    float amt = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+        thing->actorParams.health = amt;
+}
+
+void sithCogThing_DestroyThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (!thing)
+        return;
+
+    if (sithCogVm_isMultiplayer 
+        && !(ctx->flags & 0x200) 
+        && ctx->trigId != SITH_MESSAGE_STARTUP 
+        && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+        sithSector_cogMsg_SendDestroyThing(thing->thing_id, -1);
+
+    sithThing_Destroy(thing);
+}
+
+void sithCogThing_JumpToFrame(sithCog *ctx)
+{
+    sithSector* sector = sithCogVm_PopSector(ctx);
+    uint32_t frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && sector && thing->move_type == 2 && frame < thing->trackParams.loadedFrames )
+    {
+        if ( thing->sector && sector != thing->sector )
+            sithThing_LeaveSector(thing);
+
+        if ( thing->attach_flags )
+            sithThing_DetachThing_(thing);
+
+        rdMatrix_BuildRotate34(&thing->lookOrientation, &thing->trackParams.frames[frame].rot);
+        rdVector_Copy3(&thing->position, &thing->trackParams.frames[frame].pos);
+
+        if ( !thing->sector )
+            sithThing_EnterSector(thing, sector, 1, 0);
+    }
+}
+
+void sithCogThing_MoveToFrame(sithCog *ctx)
+{
+    float speed = sithCogVm_PopFlex(ctx) * 0.1;
+    int frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PATH && thing->trackParams.loadedFrames > frame )
+    {
+        if ( speed == 0.0 )
+            speed = 0.5;
+
+        sithTrackThing_MoveToFrame(thing, frame, speed);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200) 
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+            sithSector_cogMsg_SendSyncThingFrame(thing, frame, speed, 0, -1, 255);
+    }
+}
+
+void sithCogThing_SkipToFrame(sithCog *ctx)
+{
+    float speed = sithCogVm_PopFlex(ctx) * 0.1;
+    int frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PATH && thing->trackParams.loadedFrames > frame )
+    {
+        if ( speed == 0.0 )
+            speed = 0.5;
+
+        sithTrackThing_SkipToFrame(thing, frame, speed);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200) 
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
+            sithSector_cogMsg_SendSyncThingFrame(thing, frame, speed, 1, -1, 255);
+    }
+}
+
+void sithCogThing_RotatePivot(sithCog *ctx)
+{
+    float speed = sithCogVm_PopFlex(ctx);
+    uint32_t frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( speed == 0.0 )
+        speed = 1.0;
+
+    if ( thing && thing->move_type == MOVETYPE_PATH && thing->trackParams.loadedFrames > frame )
+    {
+        rdVector3* pos = &thing->trackParams.frames[frame].pos;
+        rdVector3* rot = &thing->trackParams.frames[frame].rot;
+        if ( speed <= 0.0 )
+        {
+            rdVector3 negRot;
+
+            rdVector_Neg3(&negRot, rot);
+            float negSpeed = -speed;
+            sithTrackThing_RotatePivot(thing, pos, &negRot, negSpeed);
+        }
+        else
+        {
+            sithTrackThing_RotatePivot(thing, pos, rot, speed);
+        }
+    }
+}
+
+void sithCogThing_Rotate(sithCog *ctx)
+{
+    rdVector3 rot;
+
+    sithCogVm_PopVector3(ctx, &rot);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+    {
+        if ( thing->move_type == MOVETYPE_PATH )
+            sithTrackThing_Rotate(thing, &rot);
+    }
+}
+
+void sithCogThing_GetThingLight(sithCog *ctx)
+{
+    sithThing *thing;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+        sithCogVm_PushFlex(ctx, thing->light);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetThingLight(sithCog *ctx)
+{
+    float idk = sithCogVm_PopFlex(ctx);
+    float light = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && light >= 0.0 )
+    {
+        if ( idk == 0.0 )
+        {
+            thing->light = light;
+            if ( light != 0.0 )
+            {
+                thing->thingflags |= SITH_TF_LIGHT;
+            }
+        }
+        else
+        {
+            sithSurface_SetThingLight(thing, light, idk, 0);
+        }
+    }
+}
+
+void sithCogThing_ThingLightAnim(sithCog *ctx)
+{
+    sithThing *thing; // ecx
+    float idk_; // ST08_4
+    rdSurface *surface; // eax
+    float idk; // [esp+Ch] [ebp-8h]
+    float light2; // [esp+10h] [ebp-4h]
+    float light; // [esp+18h] [ebp+4h]
+
+    idk = sithCogVm_PopFlex(ctx);
+    light2 = sithCogVm_PopFlex(ctx);
+    light = sithCogVm_PopFlex(ctx);
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing
+      && light2 >= (double)light
+      && idk > 0.0
+      && (idk_ = idk * 0.5, thing->light = light, (surface = sithSurface_SetThingLight(thing, light2, idk_, 1)) != 0) )
+    {
+        sithCogVm_PushInt(ctx, surface->field_0);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_WaitForStop(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PATH && thing->trackParams.field_C & 3 )
+    {
+        int idx = thing->thingIdx;
+        ctx->script_running = 3;
+        ctx->wakeTimeMs = idx;
+
+        if ( ctx->flags & 1 )
+        {
+            _sprintf(std_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
+            DebugConsole_Print(std_genBuffer);
+        }
+    }
+}
+
+void sithCogThing_GetThingSector(sithCog *ctx)
+{
+    sithThing *thing;
+    sithSector *sector;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (sector = thing->sector) != 0 )
+        sithCogVm_PushInt(ctx, sector->id);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_GetCurFrame(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PATH )
+        sithCogVm_PushInt(ctx, thing->curframe);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogThing_GetGoalFrame(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PATH )
+        sithCogVm_PushInt(ctx, thing->goalframe);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogThing_StopThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (!thing)
+        return;
+
+    if ( thing->move_type == MOVETYPE_PATH )
+    {
+        sithTrackThing_Stop(thing);
+        if (sithCogVm_isMultiplayer && !(ctx->flags & 0x200) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+            sithSector_cogMsg_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
+    }
+    else if (thing->move_type == MOVETYPE_PHYSICS)
+    {
+        sithSector_StopPhysicsThing(thing);
+    }
+}
+
+void sithCogThing_IsMoving(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( !thing || thing->thingType == THINGTYPE_FREE )
+    {
+        sithCogVm_PushInt(ctx, 0);
+        return;
+    }
+
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        if ( thing->physicsParams.vel.x != 0.0 || thing->physicsParams.vel.y != 0.0 || thing->physicsParams.vel.z != 0.0 )
+        {
+            sithCogVm_PushInt(ctx, 1);
+            return;
+        }
+    }
+    else if ( thing->move_type == MOVETYPE_PATH )
+    {
+        sithCogVm_PushInt(ctx, thing->trackParams.field_C & 3);
+        return;
+    }
+
+    sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogThing_SetThingPulse(sithCog *ctx)
+{
+    float pulseSecs = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (!thing)
+        return;
+
+    if ( pulseSecs == 0.0 )
+    {
+        thing->pulse_end_ms = 0;
+        thing->thingflags &= ~SITH_TF_PULSE;
+        thing->pulse_ms = 0;
+    }
+    else
+    {
+        thing->thingflags |= SITH_TF_PULSE;
+        thing->pulse_ms = (int)(pulseSecs * 1000.0);
+        thing->pulse_end_ms = thing->pulse_ms + sithTime_curMs;
+    }
+}
+
+void sithCogThing_SetThingTimer(sithCog *ctx)
+{
+    float timerSecs = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (!thing)
+        return;
+
+    if ( timerSecs == 0.0 )
+    {
+        thing->timer = 0;
+        thing->thingflags &= ~SITH_TF_TIMER;
+    }
+    else
+    {
+        thing->thingflags |= SITH_TF_TIMER;
+        thing->timer = sithTime_curMs + (uint32_t)(timerSecs * 1000.0);
+    }
+}
+
+void sithCogThing_CaptureThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        thing->capture_cog = ctx;
+        thing->thingflags |= SITH_TF_CAPTURED;
+    }
+}
+
+void sithCogThing_ReleaseThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+    {
+        sithCog* class_cog = thing->class_cog;
+        thing->capture_cog = NULL;
+        if ( !class_cog && !sithThing_Release(thing) )
+        {
+            thing->thingflags &= ~SITH_TF_CAPTURED;
+        }
+    }
+}
+
+void sithCogThing_GetThingParent(sithCog *ctx)
+{
+    sithThing* thing;
+    sithThing* parent;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (parent = sithThing_GetParent(thing)) != 0 )
+        sithCogVm_PushInt(ctx, parent->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_GetThingPos(sithCog *ctx)
+{
+    sithThing *thing; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+        sithCogVm_PushVector3(ctx, &thing->position);
+    else
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+}
+
+void sithCogThing_SetThingPos(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        rdVector_Copy3(&thing->position, &poppedVec);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendTeleportThing(thing, -1, 1);
+        }
+        sithCogVm_PushInt(ctx, 1);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, 0);
+    }
+}
+
+void sithCogThing_GetInv(sithCog *ctx)
+{
+    unsigned int binIdx;
+    sithThing *playerThing;
+
+    binIdx = sithCogVm_PopInt(ctx);
+    playerThing = sithCogVm_PopThing(ctx);
+    if ( playerThing 
+         && playerThing->thingType == THINGTYPE_PLAYER 
+         && playerThing->actorParams.playerinfo 
+         && binIdx < 200 )
+    {
+        sithCogVm_PushFlex(ctx, sithInventory_GetBinAmount(playerThing, binIdx));
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, 0.0);
+    }
+}
+
+void sithCogThing_SetInv(sithCog *ctx)
+{
+    float amt = sithCogVm_PopFlex(ctx);
+    uint32_t binIdx = sithCogVm_PopInt(ctx);
+    sithThing* playerThing = sithCogVm_PopThing(ctx);
+
+    if ( playerThing 
+         && playerThing->thingType == THINGTYPE_PLAYER 
+         && playerThing->actorParams.playerinfo 
+         && binIdx < 200 )
+        sithInventory_SetBinAmount(playerThing, binIdx, amt);
+}
+
+void sithCogThing_ChangeInv(sithCog *ctx)
+{
+    float amt = sithCogVm_PopFlex(ctx);
+    uint32_t binIdx = sithCogVm_PopInt(ctx);
+    sithThing* playerThing = sithCogVm_PopThing(ctx);
+
+    if ( playerThing 
+         && playerThing->thingType == THINGTYPE_PLAYER 
+         && playerThing->actorParams.playerinfo 
+         && binIdx < 200 )
+    {
+        sithCogVm_PushFlex(ctx, sithInventory_ChangeInv(playerThing, binIdx, amt));
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, 0.0);
+    }
+}
+
+void sithCogThing_GetInvCog(sithCog *ctx)
+{
+    unsigned int binIdx;
+    sithThing *playerThing;
+    sithItemDescriptor *desc;
+    sithCog *descCog;
+
+    binIdx = sithCogVm_PopInt(ctx);
+    playerThing = sithCogVm_PopThing(ctx);
+    if ( playerThing
+      && playerThing->thingType == THINGTYPE_PLAYER
+      && playerThing->actorParams.playerinfo
+      && (desc = sithInventory_GetItemDesc(playerThing, binIdx), binIdx < 200)
+      && desc
+      && (descCog = desc->cog) != 0 )
+    {
+        sithCogVm_PushInt(ctx, descCog->selfCog);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_GetThingVel(sithCog *ctx)
+{
+    rdVector3 retval;
+
+    rdVector_Copy3(&retval, &rdroid_zeroVector3);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+    {
+        if ( thing->move_type == MOVETYPE_PHYSICS)
+        {
+            rdVector_Copy3(&retval, &thing->physicsParams.vel);
+        }
+        else if ( thing->move_type == MOVETYPE_PATH )
+        {
+            rdVector_Scale3(&retval, &thing->trackParams.vel, thing->trackParams.field_20);
+        }
+        sithCogVm_PushVector3(ctx, &retval);
+    }
+    else
+    {
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+    }
+}
+
+void sithCogThing_SetThingVel(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        rdVector_Copy3(&thing->physicsParams.vel, &poppedVec);
+        if ( sithCogVm_isMultiplayer 
+             && !(ctx->flags & 0x200)
+             && ctx->trigId != SITH_MESSAGE_STARTUP 
+             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos((int)thing, 1);
+        }
+    }
+}
+
+void sithCogThing_ApplyForce(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        sithSector_ThingApplyForce(thing, &poppedVec);
+        if ( sithCogVm_isMultiplayer 
+             && !(ctx->flags & 0x200)
+             && ctx->trigId != SITH_MESSAGE_STARTUP 
+             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos((int)thing, 1);
+        }
+    }
+}
+
+void sithCogThing_AddThingVel(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        rdVector_Add3Acc(&thing->physicsParams.vel, &poppedVec);
+        if ( sithCogVm_isMultiplayer 
+             && !(ctx->flags & 0x200)
+             && ctx->trigId != SITH_MESSAGE_STARTUP 
+             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos((int)thing, 1);
+        }
+    }
+}
+
+void sithCogThing_GetThingLvec(sithCog *ctx)
+{
+    sithThing *thing; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+        sithCogVm_PushVector3(ctx, &thing->lookOrientation.lvec);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_GetThingUvec(sithCog *ctx)
+{
+    sithThing *thing; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+        sithCogVm_PushVector3(ctx, &thing->lookOrientation.uvec);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_GetThingRvec(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing )
+        sithCogVm_PushVector3(ctx, &thing->lookOrientation.rvec);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_GetEyePYR(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+        sithCogVm_PushVector3(ctx, &thing->actorParams.eyePYR);
+    else
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+}
 
 void sithCogThing_Initialize(void* ctx)
 {

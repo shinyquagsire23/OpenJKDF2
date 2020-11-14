@@ -136,3 +136,7 @@ float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses
   }
   return intensity;
 }
+
+// TODO? unused
+void rdLight_CalcDistVertexIntensities(){}
+void rdLight_CalcDistFaceIntensity(){}

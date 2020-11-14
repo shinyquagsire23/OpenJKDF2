@@ -119,6 +119,33 @@ loop_escape:
     return hashtable;
 }
 
+stdHashKey* stdHashTable_GetBucketTail(stdHashKey *a1)
+{
+    stdHashKey *result; // eax
+    stdHashKey *i; // ecx
+
+    result = a1;
+    for ( i = a1->child; i; i = i->child )
+        result = i;
+    return result;
+}
+
+void stdHashTable_FreeBuckets(stdHashKey *a1)
+{
+    stdHashKey *iter;
+
+    iter = a1->child;
+    if ( iter )
+    {
+        do
+        {
+            std_pHS->free(iter);
+            iter = iter->child;
+        }
+        while (iter);
+    }
+}
+
 void stdHashTable_Free(stdHashTable *table)
 {
     int bucketIdx;
@@ -132,17 +159,7 @@ void stdHashTable_Free(stdHashTable *table)
         bucketIdx2 = 0;
         do
         {
-            iter = table->buckets[bucketIdx2].child;
-            if ( iter )
-            {
-                do
-                {
-                    iter_child = iter->child;
-                    std_pHS->free(iter);
-                    iter = iter_child;
-                }
-                while ( iter_child );
-            }
+            stdHashTable_FreeBuckets(&table->buckets[bucketIdx2]);
             ++bucketIdx;
             ++bucketIdx2;
         }
@@ -283,7 +300,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
     return 1;
 }
 
-void stdHashtable_PrintDiagnostics(stdHashTable *hashtable)
+void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
 {
     stdHashTable *hashtable_; // esi
     int maxLookups; // edi
@@ -325,7 +342,7 @@ void stdHashtable_PrintDiagnostics(stdHashTable *hashtable)
     std_pHS->debugPrint("---------------------\n");
 }
 
-void stdHashtable_Dump(stdHashTable *hashtable)
+void stdHashTable_Dump(stdHashTable *hashtable)
 {
     int index;
     stdHashKey *key_iter;
@@ -361,6 +378,52 @@ stdHashKey* stdHashKey_AddLink(stdHashKey *parent, stdHashKey *child)
     return child_;
 }
 
+stdHashKey* stdHashKey_InsertAtTop(stdHashKey *a1, stdHashKey *a2)
+{
+    stdHashKey *result; // eax
+
+    result = a1->parent;
+    a2->child = a1;
+    a2->parent = result;
+    a1->parent = a2;
+    if ( result )
+        result->child = a2;
+    return result;
+}
+
+stdHashKey* stdHashKey_InsertAtEnd(stdHashKey *a1, stdHashKey *a2)
+{
+    stdHashKey *v2; // ecx
+    stdHashKey *i; // eax
+    stdHashKey *result; // eax
+
+    v2 = a1;
+    for ( i = a1->child; i; i = i->child )
+        v2 = i;
+    result = a2;
+    v2->child = a2;
+    a2->parent = v2;
+    a2->child = 0;
+    return result;
+}
+
+void stdHashKey_DisownMaybe(stdHashKey *a1)
+{
+    if ( a1->parent )
+        a1->parent->child = 0;
+    a1->parent = 0;
+}
+
+stdHashKey* stdHashKey_OrphanAndDisown(stdHashKey *a1)
+{
+    stdHashKey *result; // eax
+
+    result = a1;
+    a1->parent = 0;
+    a1->child = 0;
+    return result;
+}
+
 stdHashKey* stdHashKey_UnlinkChild(stdHashKey *hashkey)
 {
     stdHashKey *result;
@@ -392,6 +455,27 @@ int stdHashKey_NumChildren(stdHashKey *hashkey)
     return result;
 }
 
+stdHashKey* stdHashKey_GetNthChild(stdHashKey *key, int n)
+{
+    stdHashKey *result; // eax
+    int v3; // ecx
+
+    result = key;
+    if ( key )
+    {
+        v3 = n;
+        do
+        {
+            if ( v3 <= 0 )
+                break;
+            result = result->child;
+            --v3;
+        }
+        while ( result );
+    }
+    return result;
+}
+
 stdHashKey* stdHashKey_GetLastChild(stdHashKey *hashkey)
 {
     stdHashKey *result; // eax
@@ -402,6 +486,28 @@ stdHashKey* stdHashKey_GetLastChild(stdHashKey *hashkey)
     {
         for ( i = hashkey->child; i; i = i->child )
             result = i;
+    }
+    return result;
+}
+
+stdHashKey* stdHashKey_GetFirstParent(stdHashKey *a1)
+{
+    stdHashKey *result; // eax
+    stdHashKey *v2; // ecx
+
+    result = a1;
+    if ( a1 )
+    {
+        v2 = a1->parent;
+        if ( a1->parent )
+        {
+            do
+            {
+                result = v2;
+                v2 = v2->parent;
+            }
+            while ( v2 );
+        }
     }
     return result;
 }

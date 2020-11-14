@@ -353,12 +353,14 @@ int sithCogVm_PopVector3(sithCog *ctx, rdVector3* out);
 sithCog* sithCogVm_PopCog(sithCog *ctx);
 sithThing* sithCogVm_PopThing(sithCog *ctx);
 sithThing* sithCogVm_PopTemplate(sithCog *ctx);
+sithSound* sithCogVm_PopSound(sithCog *ctx);
 sithSector* sithCogVm_PopSector(sithCog *ctx);
 sithSurface* sithCogVm_PopSurface(sithCog *ctx);
 rdMaterial* sithCogVm_PopMaterial(sithCog *ctx);
 rdModel3* sithCogVm_PopModel3(sithCog *ctx);
 rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx);
 char* sithCogVm_PopString(sithCog *ctx);
+cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx);
 void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val);
 void sithCogVm_PushInt(sithCog *ctx, int val);
 void sithCogVm_PushFlex(sithCog *ctx, float val);
@@ -386,12 +388,11 @@ sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, si
 //static int (__cdecl *sithCogVm_PopVector3)(sithCog *ctx, rdVector3* out) = (void*)sithCogVm_PopVector3_ADDR;
 //static char* (__cdecl *sithCogVm_PopString)(sithCog *ctx) = (void*)sithCogVm_PopString_ADDR;
 //static sithSurface* (__cdecl *sithCogVm_PopSurface)(sithCog* ctx) = (void*)sithCogVm_PopSurface_ADDR;
-static sithSound* (__cdecl *sithCogVm_PopSound)(sithCog* ctx) = (void*)sithCogVm_PopSound_ADDR;
 //static void* (__cdecl *sithCogVm_PopMaterial)(sithCog* ctx) = (void*)sithCogVm_PopMaterial_ADDR;
 //static rdKeyframe* (__cdecl *sithCogVm_PopKeyframe_)(sithCog* ctx) = (void*)sithCogVm_PopKeyframe_ADDR;
 //static sithCog* (__cdecl *sithCogVm_PopCog)(sithCog* ctx) = (void*)sithCogVm_PopCog_ADDR;
 //static int (__cdecl *sithCogVm_PopSymbolIdx)(sithCog *ctx) = (void*)sithCogVm_PopSymbolIdx_ADDR;
-static cogSymbolFunc_t (__cdecl *sithCogVm_PopSymbolFunc)(sithCog *cog_ctx) = (void*)sithCogVm_PopSymbolFunc_ADDR;
+//static cogSymbolFunc_t (__cdecl *sithCogVm_PopSymbolFunc)(sithCog *cog_ctx) = (void*)sithCogVm_PopSymbolFunc_ADDR;
 
 //static void (__cdecl *sithCogVm_PushVar)(sithCog *ctx, sithCogStackvar *val) = (void*)sithCogVm_PushVar_ADDR;
 //static void (__cdecl *sithCogVm_PushInt)(sithCog *ctx, int val) = (void*)sithCogVm_PushInt_ADDR;

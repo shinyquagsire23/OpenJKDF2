@@ -11,10 +11,10 @@ typedef struct rdCanvas
     float screen_width_half;
     stdVBuffer* d3d_vbuf;
     uint32_t field_14;
-    uint32_t xStart;
-    uint32_t yStart;
-    uint32_t widthMinusOne;
-    uint32_t heightMinusOne;
+    int xStart;
+    int yStart;
+    int widthMinusOne;
+    int heightMinusOne;
 } rdCanvas;
 
 #define rdCanvas_New_ADDR (0x0043AC20)

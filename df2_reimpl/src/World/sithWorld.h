@@ -37,6 +37,7 @@ typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 
 typedef struct sithSector sithSector;
 typedef struct rdColormap rdColormap;
+typedef struct sithSound sithSound;
 
 typedef struct sithWorld
 {
@@ -98,7 +99,7 @@ typedef struct sithWorld
     uint32_t field_128;
     int numSoundsLoaded;
     int numSounds;
-    void* sounds;
+    sithSound* sounds;
     int numSoundClassesLoaded;
     int numSoundClasses;
     void* soundclasses;

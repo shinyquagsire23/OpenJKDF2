@@ -246,6 +246,7 @@ static void* (*_memcpy)(void*, const void*, size_t) = (void*)0x514D00;
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);
 void* _memset(void* ptr, int val, size_t num);
+void* _memset32(void* ptr, uint32_t val, size_t num);
 
 static int (*__vsnprintf)(char *a1, size_t a2, const char *a3, va_list a4) = (void*)0x512AC0;
 static int (*_sprintf)(char *, const char *, ...) = (void*)0x512B60;

@@ -55,10 +55,10 @@
 #define sithInventory_NthBackpackValue_ADDR (0x004D28E0)
 #define sithInventory_NumBackpackItems_ADDR (0x004D2910)
 #define sithInventory_HandleInvSkillKeys_ADDR (0x004D2920)
-#define sithInventory_sendfiremsg_ADDR (0x004D3020)
+#define sithInventory_SendFire_ADDR (0x004D3020)
 #define sithInventory_GetBin_ADDR (0x004D30B0)
 #define sithInventory_GetItemDesc_ADDR (0x004D30F0)
-#define sithInventory_items_init_related_ADDR (0x004D3120)
+#define sithInventory_KeybindInit_ADDR (0x004D3120)
 #define sithInventory_SetPowerKeybind_ADDR (0x004D3190)
 #define sithInventory_GetPowerKeybind_ADDR (0x004D31C0)
 #define sithInventory_ClearInventory_ADDR (0x004D31E0)
@@ -241,7 +241,7 @@ int sithInventory_GetAvailable(sithThing *player, int binIdx);
 void sithInventory_SetCarries(sithThing *player, int binIdx, int bCarries);
 int sithInventory_GetCarries(sithThing *player, int binIdx);
 int sithInventory_IsBackpackable(sithThing *player, int binIdx);
-
+void sithInventory_SerializedWrite(sithThing *thing);
 float sithInventory_GetMin(sithThing *player, int binIdx);
 float sithInventory_GetMax(sithThing *player, int binIdx);
 void sithInventory_SetFlags(sithThing *player, int binIdx, int flags);
@@ -249,8 +249,20 @@ int sithInventory_GetFlags(sithThing *player, int binIdx);
 void sithInventory_UnsetFlags(sithThing *player, int binIdx, int flags);
 float sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, float param0, float param1, float param2, float param3);
 float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, float param0, float param1, float param2, float param3);
+// sithInventory_Reset
 void sithInventory_ClearUncarried(sithThing *player);
-
+sithThing* sithInventory_CreateBackpack(sithThing *player);
+void sithInventory_PickupBackpack(sithThing *player, sithThing *backpack);
+int sithInventory_NthBackpackBin(sithThing *player, signed int n);
+float sithInventory_NthBackpackValue(sithThing *item, signed int n);
+int sithInventory_NumBackpackItems(sithThing *item);
+//sithInventory_HandleInvSkillKeys
+void sithInventory_SendFire(sithThing *player);
+sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx);
+sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx);
+// sithInventory_KeybindInit
+// sithInventory_SetPowerKeybind
+// sithInventory_GetPowerKeybind
 void sithInventory_ClearInventory(sithThing *player);
 void sithInventory_SendKilledMessageToAll(sithThing *player, sithThing *sender);
 void sithInventory_SetBinWait(sithThing *player, int binIdx, float wait);

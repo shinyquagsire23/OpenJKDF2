@@ -29,6 +29,7 @@
 #define GOB_VERSION_LATEST (20)
 
 typedef struct stdGob stdGob;
+typedef struct stdHashTable stdHashTable;
 
 typedef struct stdGobHeader
 {
@@ -58,7 +59,7 @@ typedef struct stdGob
     int fhand;
     uint32_t numFiles;
     stdGobEntry* entries;
-    void* entriesHashtable;
+    stdHashTable* entriesHashtable;
     uint32_t numFilesOpen;
     stdGobFile *openedFile;
     stdGobFile *lastReadFile;
@@ -71,9 +72,9 @@ typedef struct stdGob
 int stdGob_Startup(common_functions *pHS_in);
 void stdGob_Shutdown();
 stdGob* stdGob_Load(char *fpath, int a2, int a3);
-
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4);
-
+void stdGob_Free(stdGob *gob);
+void stdGob_FreeEntry(stdGob *gob);
 stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath);
 void stdGob_FileClose(stdGobFile *f);
 int stdGob_FSeek(stdGobFile *f, int pos, int whence);

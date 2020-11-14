@@ -149,8 +149,8 @@ LABEL_32:
         format.width = tex_header_1.width;
         format.height = tex_header_1.height;
         bpp = material_->tex_format.bpp;
-        format.unk = material->tex_format.unk;
-        format.bpp = bpp;
+        format.format.is16bit = material->tex_format.is16bit;
+        format.format.bpp = bpp;
         if ( texture->num_mipmaps )
           break;
 LABEL_21:

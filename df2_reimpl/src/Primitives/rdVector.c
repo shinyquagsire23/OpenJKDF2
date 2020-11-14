@@ -4,6 +4,8 @@
 #include "rdMatrix.h"
 #include "General/stdMath.h"
 
+const rdVector3 rdroid_zeroVector3 = {0.0,0.0,0.0};
+
 rdVector2* rdVector_Set2(rdVector2* v, float x, float y)
 {
     v->x = x;

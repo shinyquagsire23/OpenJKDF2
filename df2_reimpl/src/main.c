@@ -17,6 +17,7 @@
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "General/sithStrTable.h"
+#include "General/stdPcx.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -39,6 +40,7 @@
 #include "Primitives/rdSprite.h"
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
+#include "Primitives/rdMath.h"
 #include "World/sithWeapon.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
@@ -215,7 +217,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_PopCog_ADDR, sithCogVm_PopCog);
     hook_function(sithCogVm_PopThing_ADDR, sithCogVm_PopThing);
     hook_function(sithCogVm_PopTemplate_ADDR, sithCogVm_PopTemplate);
+    hook_function(sithCogVm_PopSound_ADDR, sithCogVm_PopSound);
+    hook_function(sithCogVm_PopSector_ADDR, sithCogVm_PopSector);
+    hook_function(sithCogVm_PopSurface_ADDR, sithCogVm_PopSurface);
     hook_function(sithCogVm_PopMaterial_ADDR, sithCogVm_PopMaterial);
+    hook_function(sithCogVm_PopModel3_ADDR, sithCogVm_PopModel3);
     hook_function(sithCogVm_PopKeyframe_ADDR, sithCogVm_PopKeyframe);
     hook_function(sithCogVm_PopString_ADDR, sithCogVm_PopString);
     hook_function(sithCogVm_PushVar_ADDR, sithCogVm_PushVar);
@@ -347,6 +353,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdGob_Shutdown_ADDR, stdGob_Shutdown);
     hook_function(stdGob_Load_ADDR, stdGob_Load);
     hook_function(stdGob_LoadEntry_ADDR, stdGob_LoadEntry);
+    hook_function(stdGob_Free_ADDR, stdGob_Free);
+    hook_function(stdGob_FreeEntry_ADDR, stdGob_FreeEntry);
     hook_function(stdGob_FileOpen_ADDR, stdGob_FileOpen);
     hook_function(stdGob_FileClose_ADDR, stdGob_FileClose);
     hook_function(stdGob_FSeek_ADDR, stdGob_FSeek);
@@ -368,13 +376,23 @@ __declspec(dllexport) void hook_init(void)
     // stdHashTable
     hook_function(stdHashTable_HashStringToIdx_ADDR, stdHashTable_HashStringToIdx);
     hook_function(stdHashTable_New_ADDR, stdHashTable_New);
+    hook_function(stdHashTable_GetBucketTail_ADDR, stdHashTable_GetBucketTail);
+    hook_function(stdHashTable_FreeBuckets_ADDR, stdHashTable_FreeBuckets);
     hook_function(stdHashTable_Free_ADDR, stdHashTable_Free);
     hook_function(stdHashTable_SetKeyVal_ADDR, stdHashTable_SetKeyVal);
     hook_function(stdHashTable_GetKeyVal_ADDR, stdHashTable_GetKeyVal);
     hook_function(stdHashTable_FreeKey_ADDR, stdHashTable_FreeKey);
-    hook_function(stdHashtable_PrintDiagnostics_ADDR, stdHashtable_PrintDiagnostics);
-    hook_function(stdHashtable_Dump_ADDR, stdHashtable_Dump);
+    hook_function(stdHashTable_PrintDiagnostics_ADDR, stdHashTable_PrintDiagnostics);
+    hook_function(stdHashTable_Dump_ADDR, stdHashTable_Dump);
     hook_function(stdHashKey_AddLink_ADDR, stdHashKey_AddLink);
+    hook_function(stdHashKey_InsertAtTop_ADDR, stdHashKey_InsertAtTop);
+    hook_function(stdHashKey_InsertAtEnd_ADDR, stdHashKey_InsertAtEnd);
+    hook_function(stdHashKey_UnlinkChild_ADDR, stdHashKey_UnlinkChild);
+    hook_function(stdHashKey_NumChildren_ADDR, stdHashKey_NumChildren);
+    hook_function(stdHashKey_DisownMaybe_ADDR, stdHashKey_DisownMaybe);
+    hook_function(stdHashKey_OrphanAndDisown_ADDR, stdHashKey_OrphanAndDisown);
+    hook_function(stdHashKey_GetNthChild_ADDR, stdHashKey_GetNthChild);
+    hook_function(stdHashKey_GetFirstParent_ADDR, stdHashKey_GetFirstParent);
     
     // stdString
     hook_function(stdString_FastCopy_ADDR, stdString_FastCopy);
@@ -393,6 +411,10 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
     hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
     hook_function(stdStrTable_GetString_ADDR, stdStrTable_GetString);
+    
+    // stdPcx
+    hook_function(stdPcx_Load_ADDR, stdPcx_Load);
+    hook_function(stdPcx_Write_ADDR, stdPcx_Write);
     
     // sithStrTable
     hook_function(sithStrTable_Startup_ADDR, sithStrTable_Startup);
@@ -502,6 +524,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdFace_NewEntry_ADDR, rdFace_NewEntry);
     hook_function(rdFace_Free_ADDR, rdFace_Free);
     hook_function(rdFace_FreeEntry_ADDR, rdFace_FreeEntry);
+    
+    // rdMath
+    hook_function(rdMath_CalcSurfaceNormal_ADDR, rdMath_CalcSurfaceNormal);
+    hook_function(rdMath_DistancePointToPlane_ADDR, rdMath_DistancePointToPlane);
+    hook_function(rdMath_DeltaAngleNormalizedAbs_ADDR, rdMath_DeltaAngleNormalizedAbs);
+    hook_function(rdMath_DeltaAngleNormalized_ADDR, rdMath_DeltaAngleNormalized);
+    hook_function(rdMath_ClampVector_ADDR, rdMath_ClampVector);
+    hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
     
     // rdCanvas
     hook_function(rdCanvas_New_ADDR, rdCanvas_New);
@@ -692,6 +722,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithInventory_SetCarries_ADDR, sithInventory_SetCarries);
     hook_function(sithInventory_GetCarries_ADDR, sithInventory_GetCarries);
     hook_function(sithInventory_IsBackpackable_ADDR, sithInventory_IsBackpackable);
+    hook_function(sithInventory_SerializedWrite_ADDR, sithInventory_SerializedWrite);
     hook_function(sithInventory_GetMin_ADDR, sithInventory_GetMin);
     hook_function(sithInventory_GetMax_ADDR, sithInventory_GetMax);
     hook_function(sithInventory_SetFlags_ADDR, sithInventory_SetFlags);
@@ -700,6 +731,15 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithInventory_SendMessageToAllWithState_ADDR, sithInventory_SendMessageToAllWithState);
     hook_function(sithInventory_SendMessageToAllWithFlag_ADDR, sithInventory_SendMessageToAllWithFlag);
     hook_function(sithInventory_ClearUncarried_ADDR, sithInventory_ClearUncarried);
+    hook_function(sithInventory_CreateBackpack_ADDR, sithInventory_CreateBackpack);
+    hook_function(sithInventory_PickupBackpack_ADDR, sithInventory_PickupBackpack);
+    hook_function(sithInventory_NthBackpackBin_ADDR, sithInventory_NthBackpackBin);
+    hook_function(sithInventory_NthBackpackValue_ADDR, sithInventory_NthBackpackValue);
+    hook_function(sithInventory_NumBackpackItems_ADDR, sithInventory_NumBackpackItems);
+    // handleinvskillkeys
+    hook_function(sithInventory_SendFire_ADDR, sithInventory_SendFire);
+    hook_function(sithInventory_GetBin_ADDR, sithInventory_GetBin);
+    hook_function(sithInventory_GetItemDesc_ADDR, sithInventory_GetItemDesc);
     hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
     hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);

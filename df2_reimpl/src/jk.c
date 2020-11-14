@@ -237,6 +237,16 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
+void* _memset32(void* ptr, uint32_t val, size_t num)
+{
+    int i;
+    for (i = 0; i < num; i++)
+    {
+        *(uint32_t*)(ptr+(i*sizeof(uint32_t))) = val;
+    }
+    return ptr;
+}
+
 int _strcmp(const char* s1, const char* s2)
 {
     while (*s1 && (*s1 == *s2))
