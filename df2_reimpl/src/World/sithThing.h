@@ -28,15 +28,51 @@
 #define sithThing_DetachThing__ADDR (0x4CE380)
 #define sithThing_Release_ADDR (0x4E0740)
 #define sithThing_SyncThingPos_ADDR (0x4CF560)
+#define sithThing_AttachToSurface_ADDR (0x4CDE80)
+#define sithThing_AttachThing_ADDR (0x4CE2C0)
+#define sithThing_SetNewModel_ADDR (0x4CD830)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
+typedef struct sithSurface sithSurface;
 
 enum MOVETYPE
 {
   MOVETYPE_NONE = 0x0,
   MOVETYPE_PHYSICS = 0x1,
   MOVETYPE_PATH = 0x2,
+};
+
+enum THING_PHYSFLAGS
+{
+  PHYSFLAGS_GRAVITY = 0x1,
+  PHYSFLAGS_USESTHRUST = 0x2,
+  THINGSTATE_4 = 0x4,
+  THINGSTATE_8 = 0x8,
+  PHYSFLAGS_SURFACEALIGN = 0x10,
+  PHYSFLAGS_SURFACEBOUNCE = 0x20,
+  PHYSFLAGS_FLOORSTICK = 0x40,
+  PHYSFLAGS_WALLSTICK = 0x80,
+  THINGSTATE_100 = 0x100,
+  PHYSFLAGS_ROTVEL = 0x200,
+  PHYSFLAGS_BANKEDTURNS = 0x400,
+  THINGSTATE_800 = 0x800,
+  PHYSFLAGS_ANGTHRUST = 0x1000,
+  PHYSFLAGS_FLYING = 0x2000,
+  PHYSFLAGS_FEELBLASTFORCE = 0x4000,
+  THINGSTATE_8000 = 0x8000,
+  PHYSFLAGS_CROUCHING = 0x10000,
+  THINGSTATE_20000 = 0x20000,
+  PHYSFLAGS_PARTIALGRAVITY = 0x40000,
+  THINGSTATE_80000 = 0x80000,
+  PHYSFLAGS_MIDAIR = 0x100000,
+  THINGSTATE_200000 = 0x200000,
+  PHYSFLAGS_NOTHRUST = 0x400000,
+  THINGSTATE_800000 = 0x800000,
+  THINGSTATE_1000000 = 0x1000000,
+  THINGSTATE_2000000 = 0x2000000,
+  THINGSTATE_4000000 = 0x4000000,
+  THINGSTATE_8000000 = 0x8000000,
 };
 
 enum THINGPARAM
@@ -214,6 +250,7 @@ enum THING_TYPEFLAGS
 
 typedef struct sithThing sithThing; 
 typedef struct sithCog sithCog;
+typedef struct sithPuppet sithPuppet;
 
 typedef struct sithThingParticleParams
 {
@@ -221,7 +258,7 @@ typedef struct sithThingParticleParams
     uint32_t count;
     uint32_t field_8;
     float elementSize;
-    float maxThrust;
+    float growthSpeed;
     float minSize;
     float range;
     float pitchRange;
@@ -419,9 +456,7 @@ typedef struct sithThingTrackParams
     uint32_t field_3C;
     uint32_t field_40;
     uint32_t field_44;
-    uint32_t field_48;
-    uint32_t field_4C;
-    uint32_t field_50;
+    rdVector3 field_48;
 } sithThingTrackParams;
 
 typedef struct sithThing
@@ -437,8 +472,8 @@ typedef struct sithThing
     uint32_t pulse_end_ms;
     uint32_t pulse_ms;
     uint32_t collide;
-    float move_size;
-    float collide_size;
+    float moveSize;
+    float collideSize;
     uint32_t attach_flags;
     uint32_t field_38;
     uint32_t field_3C;
@@ -450,13 +485,13 @@ typedef struct sithThing
     uint32_t field_54;
     sithThing* attachedThing;
     void* sector;
-    sithThing* next_thing;
-    uint32_t field_64;
+    sithThing* nextThing;
+    sithThing* prevThing;
     sithThing* attachedParentMaybe;
     sithThing* childThing;
     sithThing* parentThing;
     uint32_t signature;
-    sithThing* template_related;
+    sithThing* templateBase;
     uint32_t template;
     sithThing* prev_thing;
     uint32_t child_signature;
@@ -471,7 +506,7 @@ typedef struct sithThing
     int isVisible;
     void* soundclass;
     sithAnimclass* animclass;
-    uint32_t puppet;
+    sithPuppet* puppet;
     union
     {
         sithThingActorParams actorParams;
@@ -505,7 +540,7 @@ typedef struct sithThing
     sithCog* capture_cog;
     void* saberInfo;
     uint32_t jkFlags;
-    void* userdata;
+    float userdata;
 } sithThing;
 
 static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
@@ -524,5 +559,8 @@ static int (*sithThing_DetachThing_)(sithThing *a1) = (void*)sithThing_DetachThi
 static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
 static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
+static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
+static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;
+static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;
 
 #endif // _SITHTHING_H

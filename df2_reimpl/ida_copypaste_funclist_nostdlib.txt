@@ -1782,7 +1782,7 @@ sithCamera_IdkChecksDword4	.text	004C5640	0000002A	00000000	00000004	R	.	.	.	.	T
 sithCamera_SetCameraFocus	.text	004C5670	00000013	00000000	0000000C	R	.	.	.	.	T	.
 sithCamera_GetPrimaryFocus	.text	004C5690	00000008	00000000	00000004	R	.	.	.	.	T	.
 sithCamera_GetSecondaryFocus	.text	004C56A0	00000008	00000000	00000004	R	.	.	.	.	T	.
-sithCamera_updateidk	.text	004C56B0	00000884	0000008C	00000004	R	.	.	.	.	T	.
+sithCamera_FollowFocus	.text	004C56B0	00000884	0000008C	00000004	R	.	.	.	.	T	.
 sithCamera_SetRdCameraAndRenderidk	.text	004C5FD0	0000002C	00000000	00000000	R	.	.	.	.	.	.
 sithCamera_SetPovShake	.text	004C6000	0000004E	00000000	00000010	R	.	.	.	.	T	.
 sithCamera_create_unk_struct	.text	004C6050	00000107	00000018	00000018	R	.	.	.	.	T	.
@@ -1920,7 +1920,7 @@ sithThing_SetNewModel	.text	004CD830	00000069	00000010	00000008	R	.	.	.	.	T	.
 sithThing_sub_4CD8A0	.text	004CD8A0	00000140	0000001C	00000008	R	.	.	.	.	T	.
 sithThing_SpawnThingInSector	.text	004CD9E0	000002F0	00000010	00000014	R	.	.	.	.	T	.
 sithThing_SpawnTemplate	.text	004CDCD0	000001A5	00000030	00000008	R	.	.	.	.	T	.
-sithThing_LandSurface	.text	004CDE80	000001CC	00000018	0000000C	R	.	.	.	.	T	.
+sithThing_AttachToSurface	.text	004CDE80	000001CC	00000018	0000000C	R	.	.	.	.	T	.
 sithThing_LandThing	.text	004CE050	0000026F	0000002C	00000014	R	.	.	.	.	T	.
 sithThing_AttachThing	.text	004CE2C0	000000B4	00000014	00000008	R	.	.	.	.	T	.
 sithThing_DetachThing_	.text	004CE380	000001B4	00000018	00000004	R	.	.	.	.	T	.
@@ -2305,7 +2305,7 @@ sithPuppet_resetidk	.text	004E42C0	00000050	00000004	00000004	R	.	.	.	.	.	.
 sithPuppet_advanceidk	.text	004E4310	00000063	00000008	00000008	R	.	.	.	.	.	.
 sithPuppet_sub_4E4380	.text	004E4380	000003D3	00000020	00000004	R	.	.	.	.	T	.
 sithPuppet_sub_4E4760	.text	004E4760	00000031	00000000	00000008	R	.	.	.	.	.	.
-sithPuppet_SetArmedMode	.text	004E47A0	00000026	00000000	00000008	R	.	.	.	.	.	.
+sithPuppet_SetArmedMode	.text	004E47A0	00000026	00000000	00000008	R	.	.	.	.	T	.
 sithPuppet_PlayMode	.text	004E47D0	000000DD	00000010	0000000C	R	.	.	.	.	T	.
 sithPuppet_StartKey	.text	004E48B0	00000107	00000010	00000018	R	.	.	.	.	T	.
 sithPuppet_StopKey	.text	004E49C0	00000059	00000004	0000000C	R	.	.	.	.	T	.
@@ -2552,13 +2552,13 @@ sithSector_cogmsg_SendPlaySoundPos	.text	004F37B0	000000B1	00000000	00000024	R	.
 sithSector_cogMsg_HandlePlaySoundPos	.text	004F3870	000000E5	0000001C	00000004	R	.	.	.	.	T	.
 sithSector_cogMsg_SoundClassPlay	.text	004F3960	00000060	00000000	00000010	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleSoundClassPlay	.text	004F39C0	00000067	00000004	00000004	R	.	.	.	.	T	.
-sithSector_cogMsg_SendPlayKey	.text	004F3A30	0000006F	00000000	0000001C	R	.	.	.	.	.	.
+sithSector_cogMsg_SendPlayKey	.text	004F3A30	0000006F	00000000	0000001C	R	.	.	.	.	T	.
 sithSector_cogMsg_HandlePlayKey	.text	004F3AA0	0000008B	00000008	00000004	R	.	.	.	.	.	.
-sithSector_cogMsg_SendOpenDoor	.text	004F3B30	00000059	00000000	00000014	R	.	.	.	.	.	.
+sithSector_cogMsg_SendOpenDoor	.text	004F3B30	00000059	00000000	00000014	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleOpenDoor	.text	004F3B90	00000068	0000000C	00000004	R	.	.	.	.	.	.
-sithSector_cogMsg_SendSetThingModel	.text	004F3C00	00000071	00000000	00000008	R	.	.	.	.	.	.
+sithSector_cogMsg_SendSetThingModel	.text	004F3C00	00000071	00000000	00000008	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleSetThingModel	.text	004F3C80	00000069	00000028	00000004	R	.	.	.	.	T	.
-sithSector_cogMsg_SendStopKey	.text	004F3CF0	00000057	00000000	00000014	R	.	.	.	.	.	.
+sithSector_cogMsg_SendStopKey	.text	004F3CF0	00000057	00000000	00000014	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleStopKey	.text	004F3D50	00000068	00000008	00000004	R	.	.	.	.	T	.
 sithSector_cogMsg_SendStopSound	.text	004F3DC0	0000004E	00000000	00000010	R	.	.	.	.	.	.
 sithSector_cogMsg_HandleStopSound	.text	004F3E10	0000005E	00000004	00000004	R	.	.	.	.	T	.
@@ -2572,7 +2572,7 @@ sithSector_cogMsg_SendSyncThingFull	.text	004F4210	000004BC	00000010	0000000C	R	
 sithSector_cogMsg_HandleSyncThingFull	.text	004F46F0	00000542	00000010	00000004	R	.	.	.	.	.	.
 sithSector_cogMsg_SendSyncThingFrame	.text	004F4C60	000000F7	0000000C	00000018	R	.	.	.	.	T	.
 sithSector_cogmsg_HandleSyncThingFrame	.text	004F4D60	0000011E	0000001C	00000004	R	.	.	.	.	.	.
-sithSector_cogMsg_SendSyncThingAttachment	.text	004F4E80	000000D0	00000004	00000010	R	.	.	.	.	.	.
+sithSector_cogMsg_SendSyncThingAttachment	.text	004F4E80	000000D0	00000004	00000010	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleSyncThingAttachment	.text	004F4F50	000000E7	0000000C	00000004	R	.	.	.	.	.	.
 sithSector_cogMsg_SendTakeItem	.text	004F5040	0000010F	00000008	0000000C	R	.	.	.	.	T	.
 sithSector_cogMsg_HandleTakeItem	.text	004F5150	000000C3	00000010	00000004	R	.	.	.	.	T	.
@@ -2641,8 +2641,8 @@ sithTrackThing_LoadPathParams	.text	004FB390	00000149	0000001C	0000000C	R	.	.	.	
 sithTrackThing_BlockedIdk	.text	004FB4E0	0000001E	00000000	00000004	R	.	.	.	.	T	.
 sithTrackThing_StoppedMoving	.text	004FB500	000000E3	00000008	00000004	R	.	.	.	.	T	.
 sithTrackThing_Stop	.text	004FB5F0	00000060	00000008	00000004	R	.	.	.	.	T	.
-sithTrackThing_PauseMovingSound	.text	004FB650	00000032	00000004	00000004	R	.	.	.	.	T	.
-sithTrackThing_PlayMovingSound	.text	004FB690	00000032	00000004	00000004	R	.	.	.	.	T	.
+sithTrackThing_PathMovePause	.text	004FB650	00000032	00000004	00000004	R	.	.	.	.	T	.
+sithTrackThing_PathMoveResume	.text	004FB690	00000032	00000004	00000004	R	.	.	.	.	T	.
 sithTrackThing_idkpathmove	.text	004FB6D0	000000C0	0000001C	0000000C	R	.	.	.	.	.	.
 sithExplosion_CreateThing	.text	004FB790	000000CA	00000018	00000004	R	.	.	.	.	T	.
 sithExplosion_UpdateLight	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	T	.
@@ -2849,9 +2849,9 @@ sithCogThing_NextThingInSector	.text	00503D60	00000035	00000004	00000004	R	.	.	.
 sithCogThing_PrevThingInSector	.text	00503DA0	00000035	00000004	00000004	R	.	.	.	.	T	.
 sithCogThing_GetInvMin	.text	00503DE0	0000005E	00000008	00000004	R	.	.	.	.	T	.
 sithCogThing_GetInvMax	.text	00503E40	0000005E	00000008	00000004	R	.	.	.	.	T	.
-sithCogThing_sub_503EA0	.text	00503EA0	00000037	00000004	00000004	R	.	.	.	.	T	.
-sithCogThing_sub_503EE0	.text	00503EE0	00000053	00000008	00000004	R	.	.	.	.	T	.
-sithCogThing_sub_503F40	.text	00503F40	00000054	00000008	00000004	R	.	.	.	.	T	.
+sithCogThing_GetLoadedFrames	.text	00503EA0	00000037	00000004	00000004	R	.	.	.	.	T	.
+sithCogThing_GetFramePos	.text	00503EE0	00000053	00000008	00000004	R	.	.	.	.	T	.
+sithCogThing_GetFrameRot	.text	00503F40	00000054	00000008	00000004	R	.	.	.	.	T	.
 sithCogThing_PathMovePause	.text	00503FA0	0000004E	0000000C	00000004	R	.	.	.	.	T	.
 sithCogThing_SetHeadlightIntensity	.text	00503FF0	00000054	00000004	00000004	R	.	.	.	.	T	.
 sithCogThing_GetHeadlightIntensity	.text	00504050	0000004C	00000004	00000004	R	.	.	.	.	T	.
@@ -2867,7 +2867,7 @@ sithCogThing_SetThingTexMode	.text	00504260	00000027	00000008	00000004	R	.	.	.	.
 sithCogThing_GetThingTexMode	.text	00504290	00000024	00000004	00000004	R	.	.	.	.	T	.
 sithCogThing_SetThingCurGeoMode	.text	005042C0	00000051	00000008	00000004	R	.	.	.	.	T	.
 sithCogThing_GetThingCurGeoMode	.text	00504320	00000024	00000004	00000004	R	.	.	.	.	T	.
-sithCogThing_SetThingCurLightmode	.text	00504350	00000027	00000008	00000004	R	.	.	.	.	T	.
+sithCogThing_SetThingCurLightMode	.text	00504350	00000027	00000008	00000004	R	.	.	.	.	T	.
 sithCogThing_GetThingCurLightMode	.text	00504380	00000024	00000004	00000004	R	.	.	.	.	T	.
 sithCogThing_SetThingCurTexMode	.text	005043B0	00000027	00000008	00000004	R	.	.	.	.	T	.
 sithCogThing_GetThingCurTexMode	.text	005043E0	00000024	00000004	00000004	R	.	.	.	.	T	.

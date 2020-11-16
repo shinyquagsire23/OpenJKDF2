@@ -627,7 +627,7 @@ void sithCogUtil_GetThingTemplateCount(sithCog *ctx)
         for (int i = 0; i < v1->numThings; i++ )
         {
             sithThing* thing = &v1->things[i];
-            if ( thing->thingType && thing->thingType != THINGTYPE_CORPSE && thing->template_related == v2 )
+            if ( thing->thingType && thing->thingType != THINGTYPE_CORPSE && thing->templateBase == v2 )
                 ++template_count;
         }
         sithCogVm_PushInt(ctx, template_count);

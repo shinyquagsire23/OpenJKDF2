@@ -45,6 +45,7 @@ stdConsole                     0xfff      0.379%        100.000%       20 / 20
 sithCogUtil                    0x26c2     0.919%        100.000%      119 / 119        
 rdModel3                       0x2a7e     1.008%        100.000%       23 / 23         
 rdMatrix                       0x2c85     1.056%        100.000%       56 / 56         
+sithCogThing                   0x3a4c     1.383%        100.000%      142 / 142        
 DirectX                        0x1e       0.003%        0.000%          0 / 5          
 jkUnk3                         0x41       0.006%        0.000%          0 / 2          
 jkGuiDecision                  0x45       0.006%        0.000%          0 / 3          
@@ -173,7 +174,6 @@ sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22
 jkPlayer                       0x2da2     1.082%        4.254%          1 / 45         
 sithWeapon                     0x32a8     1.202%        0.987%          1 / 33         
 rdCache                        0x331c     1.212%        0.000%          0 / 16         
-sithCogThing                   0x3a4c     1.383%        52.077%        46 / 142        
 sithThing                      0x3c4c     1.430%        0.000%          0 / 54         
 sithSector                     0x79f9     2.893%        0.000%          0 / 96         
 rdClip                         0x81f2     3.082%        2.567%          2 / 17         
@@ -183,5 +183,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 10.069%
+Total completion: 10.731%
 ```

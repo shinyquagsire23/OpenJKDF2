@@ -25,9 +25,9 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->geosetSelect = -1;
     thing->gap2C = -1;
     thing->hierarchyNodeMatrices = 0;
-    thing->gap8 = 4;
-    thing->field_C = 3;
-    thing->field_10 = 2;
+    thing->geoMode = 4;
+    thing->lightMode = 3;
+    thing->texMode = 2;
     thing->geometryMode = 4;
     thing->lightingMode = 3;
     thing->textureMode = 2;

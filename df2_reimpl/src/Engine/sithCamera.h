@@ -18,7 +18,7 @@
 #define sithCamera_SetCameraFocus_ADDR (0x004C5670)
 #define sithCamera_GetPrimaryFocus_ADDR (0x004C5690)
 #define sithCamera_GetSecondaryFocus_ADDR (0x004C56A0)
-#define sithCamera_updateidk_ADDR (0x004C56B0)
+#define sithCamera_FollowFocus_ADDR (0x004C56B0)
 #define sithCamera_SetRdCameraAndRenderidk_ADDR (0x004C5FD0)
 #define sithCamera_SetPovShake_ADDR (0x004C6000)
 #define sithCamera_create_unk_struct_ADDR (0x004C6050)
@@ -50,6 +50,7 @@ static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, float a3, fl
 static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
 static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;
 static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
+static void (*sithCamera_FollowFocus)(sithCamera *cam) = (void*)sithCamera_FollowFocus_ADDR;
 
 #define sithCamera_cameras ((sithCamera*)0x8EC380)
 #define sithCamera_dword_8EE5A0 (*(int*)0x8EE5A0)

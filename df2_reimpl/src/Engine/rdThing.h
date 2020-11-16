@@ -6,6 +6,7 @@
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
 #include "Primitives/rdSprite.h"
+#include "Engine/rdPuppet.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdLight.h"
 #include "types.h"
@@ -48,10 +49,10 @@ typedef struct rdThing
         rdParticle* particlecloud;
         rdPolyLine* polyline;
     };
-    uint32_t gap8;
-    uint32_t field_C;
-    uint32_t field_10;
-    void* puppet; // rdPuppet*
+    uint32_t geoMode;
+    uint32_t lightMode;
+    uint32_t texMode;
+    rdPuppet* puppet;
     uint32_t field_18;
     uint32_t frameTrue;
     rdMatrix34 *hierarchyNodeMatrices;

@@ -5,120 +5,32 @@
 #include "World/sithThing.h"
 #include "World/sithTrackThing.h"
 #include "World/sithInventory.h"
+#include "World/jkPlayer.h"
+#include "World/sithThingPlayer.h"
+#include "World/sithItem.h"
+#include "World/sithUnk3.h"
+#include "Engine/sithCamera.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithSurface.h"
+#include "Engine/sithPuppet.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithAnimclass.h"
 //#include "Engine/rdSurface.h"
 
+#include "General/stdConffile.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
+#include "jk.h"
 
 void sithCogThing_createThingAtPos_nr(sithCog *ctx);
-
-static void (*sithCogThing_DetachThing)(sithCog* ctx) = (void*)0x00503490;
-static void (*sithCogThing_GetAttachFlags)(sithCog* ctx) = (void*)0x005034F0;
-static void (*sithCogThing_AttachThingToSurf)(sithCog* ctx) = (void*)0x00503520;
-static void (*sithCogThing_AttachThingToThing)(sithCog* ctx) = (void*)0x00503590;
-static void (*sithCogThing_AttachThingToThingEx)(sithCog* ctx) = (void*)0x00503600;
-static void (*sithCogThing_PlayMode)(sithCog* ctx) = (void*)0x00503680;
-static void (*sithCogThing_PlayKey)(sithCog* ctx) = (void*)0x00503740;
-static void (*sithCogThing_StopKey)(sithCog* ctx) = (void*)0x00503870;
-static void (*sithCogThing_SetThingModel)(sithCog* ctx) = (void*)0x00503920;
-static void (*sithCogThing_GetThingModel)(sithCog* ctx) = (void*)0x005039B0;
-static void (*sithCogThing_SetArmedMode)(sithCog* ctx) = (void*)0x00503A00;
-static void (*sithCogThing_GetThingFlags)(sithCog* ctx) = (void*)0x00503A70;
-static void (*sithCogThing_SetThingFlags)(sithCog* ctx) = (void*)0x00503AA0;
-static void (*sithCogThing_ClearThingFlags)(sithCog* ctx) = (void*)0x00503B00;
-static void (*sithCogThing_TeleportThing)(sithCog* ctx) = (void*)0x00503B60;
-static void (*sithCogThing_SetThingType)(sithCog* ctx) = (void*)0x00503C50;
-static void (*sithCogThing_GetCollideType)(sithCog* ctx) = (void*)0x00503C80;
-static void (*sithCogThing_SetCollideType)(sithCog* ctx) = (void*)0x00503CB0;
-static void (*sithCogThing_FirstThingInSector)(sithCog* ctx) = (void*)0x00503D10;
-static void (*sithCogThing_NextThingInSector)(sithCog* ctx) = (void*)0x00503D60;
-static void (*sithCogThing_PrevThingInSector)(sithCog* ctx) = (void*)0x00503DA0;
-static void (*sithCogThing_GetInvMin)(sithCog* ctx) = (void*)0x00503DE0;
-static void (*sithCogThing_GetInvMax)(sithCog* ctx) = (void*)0x00503E40;
-static void (*sithCogThing_sub_503EA0)(sithCog* ctx) = (void*)0x00503EA0;
-static void (*sithCogThing_sub_503EE0)(sithCog* ctx) = (void*)0x00503EE0;
-static void (*sithCogThing_sub_503F40)(sithCog* ctx) = (void*)0x00503F40;
-static void (*sithCogThing_PathMovePause)(sithCog* ctx) = (void*)0x00503FA0;
-static void (*sithCogThing_SetHeadlightIntensity)(sithCog* ctx) = (void*)0x00503FF0;
-static void (*sithCogThing_GetHeadlightIntensity)(sithCog* ctx) = (void*)0x00504050;
-static void (*sithCogThing_IsThingVisible)(sithCog* ctx) = (void*)0x005040A0;
-static void (*sithCogThing_PathMoveResume)(sithCog* ctx) = (void*)0x005040E0;
-static void (*sithCogThing_SetCurInvWeapon)(sithCog* ctx) = (void*)0x00504130;
-static void (*sithCogThing_GetCurInvWeapon)(sithCog* ctx) = (void*)0x00504160;
-static void (*sithCogThing_SetThingGeoMode)(sithCog* ctx) = (void*)0x005041A0;
-static void (*sithCogThing_GetThingGeoMode)(sithCog* ctx) = (void*)0x005041D0;
-static void (*sithCogThing_SetThingLightMode)(sithCog* ctx) = (void*)0x00504200;
-static void (*sithCogThing_GetThingLightMode)(sithCog* ctx) = (void*)0x00504230;
-static void (*sithCogThing_SetThingTexMode)(sithCog* ctx) = (void*)0x00504260;
-static void (*sithCogThing_GetThingTexMode)(sithCog* ctx) = (void*)0x00504290;
-static void (*sithCogThing_SetThingCurGeoMode)(sithCog* ctx) = (void*)0x005042C0;
-static void (*sithCogThing_GetThingCurGeoMode)(sithCog* ctx) = (void*)0x00504320;
-static void (*sithCogThing_SetThingCurLightmode)(sithCog* ctx) = (void*)0x00504350;
-static void (*sithCogThing_GetThingCurLightMode)(sithCog* ctx) = (void*)0x00504380;
-static void (*sithCogThing_SetThingCurTexMode)(sithCog* ctx) = (void*)0x005043B0;
-static void (*sithCogThing_GetThingCurTexMode)(sithCog* ctx) = (void*)0x005043E0;
-static void (*sithCogThing_SetActorExtraSpeed)(sithCog* ctx) = (void*)0x00504410;
-static void (*sithCogThing_GetThingTemplate)(sithCog* ctx) = (void*)0x00504440;
-static void (*sithCogThing_SetLifeLeft)(sithCog* ctx) = (void*)0x00504480;
-static void (*sithCogThing_GetLifeLeft)(sithCog* ctx) = (void*)0x00504500;
-static void (*sithCogThing_SetThingThrust)(sithCog* ctx) = (void*)0x00504540;
-static void (*sithCogThing_GetThingThrust)(sithCog* ctx) = (void*)0x005045A0;
-static void (*sithCogThing_AmputateJoint)(sithCog* ctx) = (void*)0x005045D0;
-static void (*sithCogThing_SetActorWeapon)(sithCog* ctx) = (void*)0x00504620;
-static void (*sithCogThing_GetActorWeapon)(sithCog* ctx) = (void*)0x00504680;
-static void (*sithCogThing_GetPhysicsFlags)(sithCog* ctx) = (void*)0x005046F0;
-static void (*sithCogThing_SetPhysicsFlags)(sithCog* ctx) = (void*)0x00504730;
-static void (*sithCogThing_ClearPhysicsFlags)(sithCog* ctx) = (void*)0x005047A0;
-static void (*sithCogThing_SkillTarget)(sithCog* ctx) = (void*)0x005047E0;
-static void (*sithCogThing_ParseArg)(sithCog* ctx) = (void*)0x005048D0;
-static void (*sithCogThing_SetThingRotVel)(sithCog* ctx) = (void*)0x00504950;
-static void (*sithCogThing_GetThingRotVel)(sithCog* ctx) = (void*)0x005049D0;
-static void (*sithCogThing_SetThingLook)(sithCog* ctx) = (void*)0x00504A10;
-static void (*sithCogThing_IsCrouching)(sithCog* ctx) = (void*)0x00504A90;
-static void (*sithCogThing_GetThingClassCog)(sithCog* ctx) = (void*)0x00504AE0;
-static void (*sithCogThing_SetThingClassCog)(sithCog* ctx) = (void*)0x00504B20;
-static void (*sithCogThing_GetThingCaptureCog)(sithCog* ctx) = (void*)0x00504B50;
-static void (*sithCogThing_SetThingCaptureCog)(sithCog* ctx) = (void*)0x00504B90;
-static void (*sithCogThing_GetThingRespawn)(sithCog* ctx) = (void*)0x00504BC0;
-static void (*sithCogThing_GetThingSignature)(sithCog* ctx) = (void*)0x00504BF0;
-static void (*sithCogThing_SetThingAttachFlags)(sithCog* ctx) = (void*)0x00504C20;
-static void (*sithCogThing_ClearThingAttachFlags)(sithCog* ctx) = (void*)0x00504C80;
-static void (*sithCogThing_GetParticleSize)(sithCog* ctx) = (void*)0x00504CE0;
-static void (*sithCogThing_SetParticleSize)(sithCog* ctx) = (void*)0x00504D20;
-static void (*sithCogThing_GetParticleGrowthSpeed)(sithCog* ctx) = (void*)0x00504D60;
-static void (*sithCogThing_SetParticleGrowthSpeed)(sithCog* ctx) = (void*)0x00504DA0;
-static void (*sithCogThing_GetParticleTimeoutRate)(sithCog* ctx) = (void*)0x00504DE0;
-static void (*sithCogThing_SetParticleTimeoutRate)(sithCog* ctx) = (void*)0x00504E20;
-static void (*sithCogThing_GetXFlags)(sithCog* ctx) = (void*)0x00504E60;
-static void (*sithCogThing_SetXFlags)(sithCog* ctx) = (void*)0x00504EF0;
-static void (*sithCogThing_ClearXFlags)(sithCog* ctx) = (void*)0x00504F80;
-static void (*sithCogThing_TakeItem)(sithCog* ctx) = (void*)0x00505020;
-static void (*sithCogThing_HasLos)(sithCog* ctx) = (void*)0x00505060;
-static void (*sithCogThing_GetThingFireOffset)(sithCog* ctx) = (void*)0x005050C0;
-static void (*sithCogThing_SetThingFireOffset)(sithCog* ctx) = (void*)0x00505100;
-static void (*sithCogThing_GetThingUserdata)(sithCog* ctx) = (void*)0x00505150;
-static void (*sithCogThing_SetThingUserdata)(sithCog* ctx) = (void*)0x00505190;
-static void (*sithCogThing_GetThingCollideSize)(sithCog* ctx) = (void*)0x005051C0;
-static void (*sithCogThing_SetThingCollideSize)(sithCog* ctx) = (void*)0x00505200;
-static void (*sithCogThing_GetThingMoveSize)(sithCog* ctx) = (void*)0x00505230;
-static void (*sithCogThing_SetThingMoveSize)(sithCog* ctx) = (void*)0x00505270;
-static void (*sithCogThing_GetThingMass)(sithCog* ctx) = (void*)0x005052A0;
-static void (*sithCogThing_SetThingMass)(sithCog* ctx) = (void*)0x005052E0;
-static void (*sithCogThing_SyncThingPos)(sithCog* ctx) = (void*)0x00505340;
-static void (*sithCogThing_SyncThingAttachment)(sithCog* ctx) = (void*)0x00505360;
-static void (*sithCogThing_SyncThingState)(sithCog* ctx) = (void*)0x00505390;
-static void (*sithCogThing_GetMajorMode)(sithCog* ctx) = (void*)0x005053B0;
 
 void sithCogThing_GetThingType(sithCog *ctx)
 {
     sithThing *thing;
 
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
         sithCogVm_PushInt(ctx, thing->thingType);
     else
         sithCogVm_PushInt(ctx, -1);
@@ -458,7 +370,7 @@ void sithCogThing_GetThingLight(sithCog *ctx)
     sithThing *thing;
 
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
         sithCogVm_PushFlex(ctx, thing->light);
     else
         sithCogVm_PushFlex(ctx, -1.0);
@@ -661,7 +573,7 @@ void sithCogThing_CaptureThing(sithCog *ctx)
 void sithCogThing_ReleaseThing(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
     {
         sithCog* class_cog = thing->class_cog;
         thing->capture_cog = NULL;
@@ -689,7 +601,7 @@ void sithCogThing_GetThingPos(sithCog *ctx)
     sithThing *thing; // eax
 
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
         sithCogVm_PushVector3(ctx, &thing->position);
     else
         sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
@@ -801,7 +713,7 @@ void sithCogThing_GetThingVel(sithCog *ctx)
 
     rdVector_Copy3(&retval, &rdroid_zeroVector3);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
     {
         if ( thing->move_type == MOVETYPE_PHYSICS)
         {
@@ -833,7 +745,7 @@ void sithCogThing_SetThingVel(sithCog *ctx)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithThing_SyncThingPos((int)thing, 1);
+            sithThing_SyncThingPos(thing, 1);
         }
     }
 }
@@ -852,7 +764,7 @@ void sithCogThing_ApplyForce(sithCog *ctx)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithThing_SyncThingPos((int)thing, 1);
+            sithThing_SyncThingPos(thing, 1);
         }
     }
 }
@@ -871,7 +783,7 @@ void sithCogThing_AddThingVel(sithCog *ctx)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithThing_SyncThingPos((int)thing, 1);
+            sithThing_SyncThingPos(thing, 1);
         }
     }
 }
@@ -881,7 +793,7 @@ void sithCogThing_GetThingLvec(sithCog *ctx)
     sithThing *thing; // eax
 
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.lvec);
     else
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
@@ -892,7 +804,7 @@ void sithCogThing_GetThingUvec(sithCog *ctx)
     sithThing *thing; // eax
 
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.uvec);
     else
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
@@ -902,7 +814,7 @@ void sithCogThing_GetThingRvec(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing )
+    if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.rvec);
     else
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
@@ -916,6 +828,1381 @@ void sithCogThing_GetEyePYR(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &thing->actorParams.eyePYR);
     else
         sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+}
+
+void sithCogThing_DetachThing(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        sithThing_DetachThing_(thing);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_GetAttachFlags(sithCog *ctx)
+{
+    sithThing *thing; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->attach_flags);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_AttachThingToSurf(sithCog *ctx)
+{
+    sithSurface* surface = sithCogVm_PopSurface(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && surface)
+    {
+        sithThing_AttachToSurface(thing, surface, 1);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_AttachThingToThing(sithCog *ctx)
+{
+    sithThing* attached = sithCogVm_PopThing(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && attached)
+    {
+        sithThing_AttachThing(thing, attached);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_AttachThingToThingEx(sithCog *ctx)
+{
+    int attachFlags = sithCogVm_PopInt(ctx);
+    sithThing* attached = sithCogVm_PopThing(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && attached)
+    {
+        sithThing_AttachThing(thing, attached);
+        thing->attach_flags |= attachFlags;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_PlayMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( mode < 43 && thing && thing->animclass && thing->rdthing.puppet)
+    {
+        int track = sithPuppet_PlayMode(thing, mode, 0);
+        if (track >= 0)
+        {
+            sithCogVm_PushInt(ctx, track);
+            if (sithCogVm_isMultiplayer 
+                && !(ctx->flags & 0x200)
+                && ctx->trigId != SITH_MESSAGE_STARTUP 
+                && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+            {
+                sithSector_cogMsg_SendOpenDoor(thing, mode, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
+            }
+        }
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void __cdecl sithCogThing_PlayKey(sithCog *ctx)
+{
+    int trackNum = sithCogVm_PopInt(ctx);
+    int popInt = sithCogVm_PopInt(ctx);
+    rdKeyframe* keyframe = sithCogVm_PopKeyframe(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( !thing )
+        goto fail;
+
+    rdPuppet* puppet = thing->rdthing.puppet;
+    if ( !puppet )
+        goto fail;
+
+    if ( !keyframe )
+    {
+        sithCogVm_PushInt(ctx, -1);
+        return;
+    }
+    
+    int track = sithPuppet_StartKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
+    if ( track >= 0 )
+    {
+        sithCogVm_PushInt(ctx, track);
+        if ( thing->move_type == MOVETYPE_PATH )
+        {
+            if ( thing->trackParams.field_C )
+                sithTrackThing_Stop(thing);
+            rdVector_Copy3(&thing->trackParams.field_48, &thing->position);
+        }
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendPlayKey(thing, keyframe, trackNum, popInt, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
+        }
+    }
+
+    return;
+
+fail:
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_StopKey(sithCog *ctx)
+{
+    float poppedFlex = sithCogVm_PopFlex(ctx);
+    int track = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (!thing)
+        return;
+
+    rdPuppet* puppet = thing->rdthing.puppet;
+    if (!puppet)
+        return;
+
+    if ( track >= 0 && track < 4 && poppedFlex >= 0.0 )
+    {
+        int v6 = puppet->tracks[track].field_130;
+        if ( sithPuppet_StopKey(puppet, track, poppedFlex) )
+        {
+            if (sithCogVm_isMultiplayer 
+                && !(ctx->flags & 0x200)
+                && ctx->trigId != SITH_MESSAGE_STARTUP 
+                && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+            {
+                sithSector_cogMsg_SendStopKey(thing, v6, poppedFlex, -1, 255);
+            }
+        }
+    }
+}
+
+void sithCogThing_SetThingModel(sithCog *ctx)
+{
+    rdModel3* model = sithCogVm_PopModel3(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && model)
+    {
+        rdModel3* v4 = thing->rdthing.model3;
+        int v5;
+        if (v4)
+        {
+            v5 = -1;
+        }
+        else
+        {
+            v5 = v4->id;
+            sithThing_SetNewModel(thing, model);
+        }
+
+        sithCogVm_PushInt(ctx, v5);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSetThingModel(thing, -1);
+        }
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_GetThingModel(sithCog *ctx)
+{
+    rdModel3 *model;
+
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->rdthing.type == RD_THINGTYPE_MODEL && (model = thing->rdthing.model3) != 0 )
+        sithCogVm_PushInt(ctx, model->id);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetArmedMode(sithCog *ctx)
+{
+    int poppedInt = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && poppedInt >= 0 && poppedInt <= 2)
+    {
+        sithPuppet_SetArmedMode(thing, poppedInt);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThing(thing, -1, 255);
+        }
+    }
+}
+
+void sithCogThing_GetThingFlags(sithCog *ctx)
+{
+    sithThing *thing; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->thingflags);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetThingFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && flags)
+    {
+        thing->thingflags |= flags;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_ClearThingFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && flags)
+    {
+        thing->thingflags &= ~flags;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_TeleportThing(sithCog *ctx)
+{
+    sithThing* thingTo = sithCogVm_PopThing(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thingTo )
+    {
+        if ( thing->attach_flags )
+            sithThing_DetachThing_(thing);
+
+        rdMatrix_Copy34(&thing->lookOrientation, &thingTo->lookOrientation);
+        rdVector_Copy3(&thing->position, &thingTo->position);
+        sithThing_MoveToSector(thing, thingTo->sector, 0);
+        if (thing->move_type == MOVETYPE_PHYSICS && thing->physicsParams.physflags & PHYSFLAGS_FLOORSTICK)
+            sithSector_ThingLandIdk(thing, 1);
+
+        if ( thing == g_localPlayerThing )
+            sithCamera_FollowFocus(sithCamera_currentCamera);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendTeleportThing(thing, -1, 1);
+        }
+    }
+}
+
+void __cdecl sithCogThing_SetThingType(sithCog *ctx)
+{
+    int type = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && type >= 0 && type < 12 )
+        thing->thingType = type;
+}
+
+void sithCogThing_GetCollideType(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->collide);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetCollideType(sithCog *ctx)
+{
+    int collideType = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && collideType < 4)
+    {
+        thing->collide = collideType;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_FirstThingInSector(sithCog *ctx)
+{
+    sithSector* sector = sithCogVm_PopSector(ctx);
+    if (sector)
+    {
+        sithThing* thing = sector->thingsList;
+
+        if (thing)
+            sithCogVm_PushInt(ctx, thing->thingIdx);
+        else
+            sithCogVm_PushInt(ctx, -1);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_NextThingInSector(sithCog *ctx)
+{
+    sithThing *thing;
+    sithThing *nextThing;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (nextThing = thing->nextThing) != 0 )
+        sithCogVm_PushInt(ctx, nextThing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_PrevThingInSector(sithCog *ctx)
+{
+    sithThing *thing;
+    sithThing *prevThing;
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (prevThing = thing->prevThing) != 0 )
+        sithCogVm_PushInt(ctx, prevThing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_GetInvMin(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo )
+    {
+        sithCogVm_PushFlex(ctx, sithInventory_GetMin(player, binIdx));
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1.0);
+    }
+}
+
+void sithCogThing_GetInvMax(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo )
+    {
+        sithCogVm_PushFlex(ctx, sithInventory_GetMax(player, binIdx));
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1.0);
+    }
+}
+
+// unused/unreferenced
+void sithCogThing_GetLoadedFrames(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->move_type == MOVETYPE_PATH)
+        sithCogVm_PushInt(ctx, thing->trackParams.loadedFrames);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+// unused/unreferenced
+void sithCogThing_GetFramePos(sithCog *ctx)
+{
+    uint32_t frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PATH && frame < thing->trackParams.loadedFrames )
+        sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].pos);
+    sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+// unused/unreferenced
+void sithCogThing_GetFrameRot(sithCog *ctx)
+{
+    uint32_t frame = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->move_type == MOVETYPE_PATH && frame < thing->trackParams.loadedFrames)
+        sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].rot);
+    sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_PathMovePause(sithCog *ctx)
+{
+    int ret = 0;
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PATH )
+        ret = sithTrackThing_PathMovePause(thing);
+
+    if ( ret == 1 )
+        sithCogVm_PushInt(ctx, thing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetHeadlightIntensity(sithCog *ctx)
+{
+    float intensity = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+    {
+        thing->actorParams.lightIntensity = intensity;
+        sithCogVm_PushFlex(ctx, intensity);
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1.0);
+    }
+}
+
+void sithCogThing_GetHeadlightIntensity(sithCog *ctx)
+{
+    sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+        sithCogVm_PushFlex(ctx, thing->actorParams.lightIntensity);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_IsThingVisible(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->isVisible + 1 >= (unsigned int)bShowInvisibleThings);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogThing_PathMoveResume(sithCog *ctx)
+{
+    int ret = 0;
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == THINGTYPE_ACTOR )
+        ret = sithTrackThing_PathMoveResume(thing);
+    if ( ret == 1 )
+        sithCogVm_PushInt(ctx, thing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetCurInvWeapon(sithCog *ctx)
+{
+    int idx = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithInventory_SetCurWeapon(thing, idx);
+}
+
+void sithCogThing_GetCurInvWeapon(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        sithCogVm_PushInt(ctx, sithInventory_GetCurWeapon(thing));
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_SetThingGeoMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->rdthing.geoMode = mode;
+}
+
+void sithCogThing_GetThingGeoMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.geoMode);
+}
+
+void sithCogThing_SetThingLightMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->rdthing.lightMode = mode;
+}
+
+void sithCogThing_GetThingLightMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.lightMode);
+}
+
+void sithCogThing_SetThingTexMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->rdthing.texMode = mode;
+}
+
+void sithCogThing_GetThingTexMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.texMode);
+}
+
+void sithCogThing_SetThingCurGeoMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        thing->rdthing.geometryMode = mode;
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+                sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_GetThingCurGeoMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.geometryMode);
+}
+
+void sithCogThing_SetThingCurLightMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->rdthing.lightingMode = mode;
+}
+
+void sithCogThing_GetThingCurLightMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.lightingMode);
+}
+
+void sithCogThing_SetThingCurTexMode(sithCog *ctx)
+{
+    int mode = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->rdthing.textureMode = mode;
+}
+
+void sithCogThing_GetThingCurTexMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushInt(ctx, thing->rdthing.textureMode);
+}
+
+void sithCogThing_SetActorExtraSpeed(sithCog *ctx)
+{
+    float extraSpeed = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+        thing->actorParams.extraSpeed = extraSpeed;
+}
+
+void sithCogThing_GetThingTemplate(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->templateBase)
+        sithCogVm_PushInt(ctx, thing->templateBase->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetLifeLeft(sithCog *ctx)
+{
+    float lifeLeftSecs = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && lifeLeftSecs >= 0.0)
+    {
+        thing->lifeLeftMs = (int)(lifeLeftSecs * 1000.0);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_GetLifeLeft(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        sithCogVm_PushFlex(ctx, (double)(unsigned int)thing->lifeLeftMs * 0.001);
+    }
+}
+
+void sithCogThing_SetThingThrust(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    int couldPopVec = sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS && couldPopVec)
+    {
+        sithCogVm_PushVector3(ctx, &thing->physicsParams.acceleration);
+        rdVector_Copy3(&thing->physicsParams.acceleration, &poppedVec);
+    }
+}
+
+void sithCogThing_GetThingThrust(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing )
+    {
+        if ( thing->move_type == MOVETYPE_PHYSICS )
+            sithCogVm_PushVector3(ctx, &thing->physicsParams.acceleration);
+    }
+}
+
+void sithCogThing_AmputateJoint(sithCog *ctx)
+{
+    uint32_t idx = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+    {
+        rdThing* rdthing = &thing->rdthing;
+        if ( thing != (sithThing *)-196 )
+        {
+            sithAnimclass* animclass = thing->animclass;
+            if (animclass && idx < 0xA)
+            {
+                int jointIdx = animclass->bodypart_to_joint[idx];
+                if ( jointIdx >= 0 )
+                    rdthing->amputatedJoints[jointIdx] = 1;
+            }
+        }
+    }
+}
+
+void sithCogThing_SetActorWeapon(sithCog *ctx)
+{
+    sithThing* weapTemplate = sithCogVm_PopTemplate(ctx);
+    int weap_idx = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+    {
+        if ( weap_idx == 1 )
+        {
+            thing->actorParams.templateWeapon = weapTemplate;
+        }
+        else if ( weap_idx == 2 )
+        {
+            thing->actorParams.templateWeapon2 = weapTemplate;
+        }
+    }
+}
+
+void sithCogThing_GetActorWeapon(sithCog *ctx)
+{
+    int weap_idx = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
+    {
+        if ( weap_idx == 1 && thing->actorParams.templateWeapon)
+        {
+            sithCogVm_PushInt(ctx, thing->actorParams.templateWeapon->thingIdx);
+        }
+        else if (weap_idx == 2 && thing->actorParams.templateWeapon2)
+        {
+            sithCogVm_PushInt(ctx, thing->actorParams.templateWeapon2->thingIdx);
+        }
+    }
+    
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_GetPhysicsFlags(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS )
+        sithCogVm_PushInt(ctx, thing->physicsParams.physflags);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetPhysicsFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && flags && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        thing->physicsParams.physflags |= flags;
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_ClearPhysicsFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && flags && thing->move_type == MOVETYPE_PHYSICS)
+        thing->physicsParams.physflags &= ~flags;
+}
+
+void sithCogThing_SkillTarget(sithCog *ctx)
+{
+    sithCog *classCog;
+
+    float param1 = sithCogVm_PopFlex(ctx);
+    float param0 = sithCogVm_PopFlex(ctx);
+    sithThing* otherThing = sithCogVm_PopThing(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && otherThing && (classCog = thing->class_cog) != 0 )
+    {
+        if ( net_isMulti && thing->thingType == THINGTYPE_PLAYER )
+        {
+            sithThingPlayer_cogMsg_SendSendTrigger(
+                classCog,
+                SITH_MESSAGE_SKILL,
+                SENDERTYPE_THING,
+                thing->thingIdx,
+                SENDERTYPE_THING,
+                otherThing->thingIdx,
+                0,
+                param0,
+                param1,
+                0.0,
+                0.0,
+                thing->actorParams.playerinfo->net_id);
+            sithCogVm_PushFlex(ctx, 0.0);
+        }
+        else
+        {
+            float ret = sithCog_SendMessageEx(
+                          classCog,
+                          SITH_MESSAGE_SKILL,
+                          SENDERTYPE_THING,
+                          thing->thingIdx,
+                          SENDERTYPE_THING,
+                          otherThing->thingIdx,
+                          0,
+                          param0,
+                          param1,
+                          0.0,
+                          0.0);
+            sithCogVm_PushFlex(ctx, ret);
+        }
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1.0);
+    }
+}
+
+void sithCogThing_ParseArg(sithCog *ctx)
+{
+    char* str = sithCogVm_PopString(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( str && thing)
+    {
+        strncpy(std_genBuffer, str, 0x3FFu);
+        std_genBuffer[1023] = 0;
+
+        stdConffile_ReadArgsFromStr(std_genBuffer);
+        for (int i = 0 ; i < stdConffile_entry.numArgs; i++)
+        {
+            stdConffileArg* arg = &stdConffile_entry.args[i];
+            sithThing_ParseArgs(arg, thing);
+        }
+    }
+}
+
+void sithCogThing_SetThingRotVel(sithCog *ctx)
+{
+    rdVector3 popped_vector3;
+
+    sithCogVm_PopVector3(ctx, &popped_vector3);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        rdVector_Copy3(&thing->physicsParams.angVel, &popped_vector3);
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 1);
+        }
+    }
+}
+
+void sithCogThing_GetThingRotVel(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( thing && thing->move_type == MOVETYPE_PHYSICS )
+        sithCogVm_PushVector3(ctx, &thing->physicsParams.angVel);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_SetThingLook(sithCog *ctx)
+{
+    rdVector3 popped_vector3;
+
+    int pop_v3_retval = sithCogVm_PopVector3(ctx, &popped_vector3);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && pop_v3_retval == 1)
+    {
+        rdVector_Normalize3Acc(&popped_vector3);
+        rdMatrix_BuildFromLook34(&thing->lookOrientation, &popped_vector3);
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 1);
+        }
+    }
+}
+
+void sithCogThing_IsCrouching(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if ( !thing || thing->move_type != MOVETYPE_PHYSICS )
+        sithCogVm_PushInt(ctx, -1);
+
+    if (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING)
+        sithCogVm_PushInt(ctx, 1);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogThing_GetThingClassCog(sithCog *ctx)
+{
+    sithThing *thing; // eax
+    sithCog *classCog; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (classCog = thing->class_cog) != 0 )
+        sithCogVm_PushInt(ctx, classCog->selfCog);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetThingClassCog(sithCog *ctx)
+{
+    sithCog *classCog; // edi
+    sithThing *thing; // eax
+
+    classCog = sithCogVm_PopCog(ctx);
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+    {
+        if ( classCog )
+            thing->class_cog = classCog;
+    }
+}
+
+void sithCogThing_GetThingCaptureCog(sithCog *ctx)
+{
+    sithThing *thing; // eax
+    sithCog *captureCog; // eax
+
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing && (captureCog = thing->capture_cog) != 0 )
+        sithCogVm_PushInt(ctx, captureCog->selfCog);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetThingCaptureCog(sithCog *ctx)
+{
+    sithCog *captureCog; // edi
+    sithThing *thing; // eax
+
+    captureCog = sithCogVm_PopCog(ctx);
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+    {
+        if ( captureCog )
+            thing->capture_cog = captureCog;
+    }
+}
+
+void sithCogThing_GetThingRespawn(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing && thing->thingType == THINGTYPE_ITEM)
+    {
+        sithCogVm_PushFlex(ctx, thing->itemParams.respawn);
+    }
+}
+
+void sithCogThing_GetThingSignature(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing )
+        sithCogVm_PushInt(ctx, thing->signature);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetThingAttachFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && flags)
+    {
+        thing->attach_flags |= flags;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_ClearThingAttachFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && flags)
+    {
+        thing->attach_flags &= ~flags;
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+        }
+    }
+}
+
+void sithCogThing_GetParticleSize(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->thingType == THINGTYPE_PARTICLE)
+        sithCogVm_PushFlex(ctx, thing->particleParams.elementSize);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetParticleSize(sithCog *ctx)
+{
+    float size = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->thingType == THINGTYPE_PARTICLE)
+    {
+        thing->particleParams.elementSize = size;
+    }
+}
+
+void sithCogThing_GetParticleGrowthSpeed(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->thingType == THINGTYPE_PARTICLE )
+        sithCogVm_PushFlex(ctx, thing->particleParams.growthSpeed);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetParticleGrowthSpeed(sithCog *ctx)
+{
+    float speed = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->thingType == THINGTYPE_PARTICLE)
+    {
+        thing->particleParams.growthSpeed = speed;
+    }
+}
+
+void sithCogThing_GetParticleTimeoutRate(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && thing->thingType == THINGTYPE_PARTICLE )
+        sithCogVm_PushFlex(ctx, thing->particleParams.rate);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetParticleTimeoutRate(sithCog *ctx)
+{
+    float rate = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->thingType == THINGTYPE_PARTICLE)
+    {
+        thing->particleParams.rate = rate;
+    }
+}
+
+void sithCogThing_GetXFlags(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        switch ( thing->thingType )
+        {
+            case THINGTYPE_ACTOR:
+            case THINGTYPE_ITEM:
+            case THINGTYPE_PLAYER:
+                sithCogVm_PushInt(ctx, thing->actorParams.typeflags);
+                return;
+            case THINGTYPE_WEAPON:
+            case THINGTYPE_PARTICLE:
+                sithCogVm_PushInt(ctx, thing->weaponParams.typeflags);
+                return;
+            case THINGTYPE_EXPLOSION:
+                sithCogVm_PushInt(ctx, thing->explosionParams.typeflags);
+                return;
+        }
+    }
+
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogThing_SetXFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && flags )
+    {
+        switch ( thing->thingType )
+        {
+            case THINGTYPE_ACTOR:
+            case THINGTYPE_WEAPON:
+            case THINGTYPE_ITEM:
+            case THINGTYPE_EXPLOSION:
+            case THINGTYPE_PLAYER:
+            case THINGTYPE_PARTICLE:
+                thing->actorParams.typeflags |= flags;
+                break;
+            default:
+                break;
+        }
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_ClearXFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if ( thing && flags )
+    {
+        switch ( thing->thingType )
+        {
+            case THINGTYPE_ACTOR:
+            case THINGTYPE_WEAPON:
+            case THINGTYPE_ITEM:
+            case THINGTYPE_EXPLOSION:
+            case THINGTYPE_PLAYER:
+            case THINGTYPE_PARTICLE:
+                thing->actorParams.typeflags &= ~flags;
+                break;
+            default:
+                break;
+        }
+
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_TakeItem(sithCog *ctx)
+{
+    sithThing* player = sithCogVm_PopThing(ctx);
+    sithThing* itemThing = sithCogVm_PopThing(ctx);
+    if ( itemThing && player && itemThing->thingType == THINGTYPE_ITEM )
+        sithItem_Take(itemThing, player, 0);
+}
+
+void sithCogThing_HasLos(sithCog *ctx)
+{
+    sithThing* thingB = sithCogVm_PopThing(ctx);
+    sithThing* thingA = sithCogVm_PopThing(ctx);
+
+    if ( thingA && thingB )
+    {
+        if ( sithUnk3_HasLos(thingA, thingB, 0) )
+            sithCogVm_PushInt(ctx, 1);
+        else
+            sithCogVm_PushInt(ctx, 0);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogThing_GetThingFireOffset(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushVector3(ctx, &thing->actorParams.fire_offset);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogThing_SetThingFireOffset(sithCog *ctx)
+{
+    rdVector3 poppedVec;
+
+    sithCogVm_PopVector3(ctx, &poppedVec);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+    {
+        rdVector_Copy3(&thing->actorParams.fire_offset, &poppedVec);
+    }
+}
+
+void sithCogThing_GetThingUserdata(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushFlex(ctx, thing->userdata);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetThingUserdata(sithCog *ctx)
+{
+    float userdata = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        thing->userdata = userdata;
+}
+
+void sithCogThing_GetThingCollideSize(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushFlex(ctx, thing->collideSize);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetThingCollideSize(sithCog *ctx)
+{
+    float size = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        thing->collideSize = size;
+}
+
+void sithCogThing_GetThingMoveSize(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithCogVm_PushFlex(ctx, thing->moveSize);
+    else
+        sithCogVm_PushFlex(ctx, -1.0);
+}
+
+void sithCogThing_SetThingMoveSize(sithCog *ctx)
+{
+    float moveSize = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        thing->moveSize = moveSize;
+}
+
+void sithCogThing_GetThingMass(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+    if (thing)
+    {
+        if (thing->move_type == MOVETYPE_PHYSICS)
+            sithCogVm_PushFlex(ctx, thing->physicsParams.mass);
+        else
+            sithCogVm_PushFlex(ctx, 0.0);
+    }
+}
+
+void sithCogThing_SetThingMass(sithCog *ctx)
+{
+    float mass = sithCogVm_PopFlex(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->move_type == MOVETYPE_PHYSICS)
+    {
+        thing->physicsParams.mass = mass;
+        if (sithCogVm_isMultiplayer 
+            && !(ctx->flags & 0x200)
+            && ctx->trigId != SITH_MESSAGE_STARTUP 
+            && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        {
+            sithThing_SyncThingPos(thing, 2);
+        }
+    }
+}
+
+void sithCogThing_SyncThingPos(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithThing_SyncThingPos(thing, 1);
+}
+
+void sithCogThing_SyncThingAttachment(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 0);
+}
+
+void sithCogThing_SyncThingState(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing)
+        sithThing_SyncThingPos(thing, 2);
+}
+
+void sithCogThing_GetMajorMode(sithCog *ctx)
+{
+    sithThing* thing = sithCogVm_PopThing(ctx);
+
+    if (thing && thing->animclass && thing->rdthing.puppet)
+        sithCogVm_PushInt(ctx, thing->puppet->majorMode);
+    else
+        sithCogVm_PushInt(ctx, -1);
 }
 
 void sithCogThing_Initialize(void* ctx)
@@ -962,7 +2249,7 @@ void sithCogThing_Initialize(void* ctx)
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_GetThingCurGeoMode, "getthingcurgeomode");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_SetThingCurGeoMode, "setthingcurgeomode");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_GetThingCurLightMode, "getthingcurlightmode");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_SetThingCurLightmode, "setthingcurlightmode");
+    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_SetThingCurLightMode, "setthingcurlightmode");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_GetThingCurTexMode, "getthingcurtexmode");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_SetThingCurTexMode, "setthingcurtexmode");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogThing_SetActorExtraSpeed, "setactorextraspeed");

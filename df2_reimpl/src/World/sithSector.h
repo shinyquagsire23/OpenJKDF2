@@ -143,5 +143,11 @@ static void (*sithSector_cogMsg_SendDamage)(sithThing *a1, sithThing *a2, float 
 static void (*sithSector_cogMsg_SendDestroyThing)(int a1, int a2) = (void*)sithSector_cogMsg_SendDestroyThing_ADDR;
 static void (*sithSector_cogMsg_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithSector_cogMsg_SendSyncThingFrame_ADDR;
 static void (*sithSector_ThingApplyForce)(sithThing *a1, rdVector3 *a2) = (void*)sithSector_ThingApplyForce_ADDR;
+static void (*sithSector_cogMsg_SendSyncThingAttachment)(sithThing *a1, int a2, int a3, int a4) = (void*)sithSector_cogMsg_SendSyncThingAttachment_ADDR;
+static void (*sithSector_cogMsg_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithSector_cogMsg_SendOpenDoor_ADDR;
+static void (*sithSector_cogMsg_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithSector_cogMsg_SendPlayKey_ADDR;
+static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithSector_cogMsg_SendStopKey_ADDR;
+static void (*sithSector_cogMsg_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithSector_cogMsg_SendSetThingModel_ADDR;
+static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
 
 #endif // _SITHSECTOR_H
