@@ -711,7 +711,7 @@ void sithCogThing_GetThingVel(sithCog *ctx)
 {
     rdVector3 retval;
 
-    rdVector_Copy3(&retval, &rdroid_zeroVector3);
+    rdVector_Copy3(&retval, (rdVector3*)&rdroid_zeroVector3);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
     {
@@ -796,7 +796,7 @@ void sithCogThing_GetThingLvec(sithCog *ctx)
     if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.lvec);
     else
-        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_GetThingUvec(sithCog *ctx)
@@ -807,7 +807,7 @@ void sithCogThing_GetThingUvec(sithCog *ctx)
     if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.uvec);
     else
-        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_GetThingRvec(sithCog *ctx)
@@ -817,7 +817,7 @@ void sithCogThing_GetThingRvec(sithCog *ctx)
     if (thing)
         sithCogVm_PushVector3(ctx, &thing->lookOrientation.rvec);
     else
-        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_GetEyePYR(sithCog *ctx)
@@ -1279,7 +1279,7 @@ void sithCogThing_GetFramePos(sithCog *ctx)
 
     if ( thing && thing->move_type == MOVETYPE_PATH && frame < thing->trackParams.loadedFrames )
         sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].pos);
-    sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+    sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 // unused/unreferenced
@@ -1290,7 +1290,7 @@ void sithCogThing_GetFrameRot(sithCog *ctx)
 
     if (thing && thing->move_type == MOVETYPE_PATH && frame < thing->trackParams.loadedFrames)
         sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].rot);
-    sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+    sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_PathMovePause(sithCog *ctx)
@@ -1596,17 +1596,30 @@ void sithCogThing_GetActorWeapon(sithCog *ctx)
 
     if (thing && (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER))
     {
-        if ( weap_idx == 1 && thing->actorParams.templateWeapon)
+        sithThing* weapTemplate;
+        if ( weap_idx == 1 )
         {
-            sithCogVm_PushInt(ctx, thing->actorParams.templateWeapon->thingIdx);
+            weapTemplate = thing->actorParams.templateWeapon;
         }
-        else if (weap_idx == 2 && thing->actorParams.templateWeapon2)
+        else if ( weap_idx == 2 )
         {
-            sithCogVm_PushInt(ctx, thing->actorParams.templateWeapon2->thingIdx);
+            weapTemplate = thing->actorParams.templateWeapon2;
         }
+        else
+        {
+            sithCogVm_PushInt(ctx, -1);
+            return;
+        }
+
+        if (weapTemplate)
+        {
+            sithCogVm_PushInt(ctx, weapTemplate->thingIdx);
+            return;
+        }
+
+        sithCogVm_PushInt(ctx, -1);
+        return;
     }
-    
-    sithCogVm_PushInt(ctx, -1);
 }
 
 void sithCogThing_GetPhysicsFlags(sithCog *ctx)
@@ -1653,6 +1666,7 @@ void sithCogThing_SkillTarget(sithCog *ctx)
     float param0 = sithCogVm_PopFlex(ctx);
     sithThing* otherThing = sithCogVm_PopThing(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
+
     if ( thing && otherThing && (classCog = thing->class_cog) != 0 )
     {
         if ( net_isMulti && thing->thingType == THINGTYPE_PLAYER )
@@ -1739,7 +1753,7 @@ void sithCogThing_GetThingRotVel(sithCog *ctx)
     if ( thing && thing->move_type == MOVETYPE_PHYSICS )
         sithCogVm_PushVector3(ctx, &thing->physicsParams.angVel);
     else
-        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_SetThingLook(sithCog *ctx)
@@ -2050,7 +2064,7 @@ void sithCogThing_HasLos(sithCog *ctx)
 
     if ( thingA && thingB )
     {
-        if ( sithUnk3_HasLos(thingA, thingB, 0) )
+        if (sithUnk3_HasLos(thingA, thingB, 0))
             sithCogVm_PushInt(ctx, 1);
         else
             sithCogVm_PushInt(ctx, 0);
@@ -2068,7 +2082,7 @@ void sithCogThing_GetThingFireOffset(sithCog *ctx)
     if (thing)
         sithCogVm_PushVector3(ctx, &thing->actorParams.fire_offset);
     else
-        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogThing_SetThingFireOffset(sithCog *ctx)

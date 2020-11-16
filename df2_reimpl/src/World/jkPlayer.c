@@ -24,7 +24,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
     {
         if ( g_selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
-            thing->rdthing.geometryMode = thing->rdthing.gap8;
+            thing->rdthing.geometryMode = thing->rdthing.geoMode;
             rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
             rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
 

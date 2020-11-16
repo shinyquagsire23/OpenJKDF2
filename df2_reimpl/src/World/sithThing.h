@@ -5,6 +5,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Engine/rdThing.h"
 #include "World/sithPlayer.h"
+#include "General/stdConffile.h"
 
 #define sithThing_Startup_ADDR (0x004CC130)
 #define sithThing_Shutdown_ADDR (0x004CC1A0)
@@ -545,7 +546,7 @@ typedef struct sithThing
 
 static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
-static signed int (*sithThing_ParseArgs)(char **a1, sithThing *thing) = (void*)0x004CEB90;
+static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
 
 static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
