@@ -287,7 +287,7 @@ jkGuiMain_sub_4104D0	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.
 jkGuiMain_sub_4105B0	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.
 jkGuiPlayer_Initialize	.text	004105F0	00000032			R	.	.	.	.	.	.
 jkGuiPlayer_Shutdown	.text	00410630	0000000B			R	.	.	.	.	.	.
-jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	.
+jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	T	.
 jkGuiPlayer_ShowNewPlayer	.text	00410870	00000481	00000674	00000004	R	.	.	.	.	.	.
 jkGuiPlayer_NewPlayerIdk	.text	00410D10	0000005B	00000000	00000004	R	.	.	.	.	.	.
 jkGuiSound_Initialize	.text	00410D70	000000B4			R	.	.	.	.	.	.
@@ -413,7 +413,7 @@ jkGuiTitle_Shutdown	.text	00418990	00000001			R	.	.	.	.	.	.
 jkGuiTitle_sub_4189A0	.text	004189A0	00000023	00000004	00000004	R	.	.	.	.	.	.
 jkGuiTitle_quicksave_related_func1	.text	004189D0	000000C4	0000008C	00000008	R	.	.	.	.	T	.
 jkGuiTitle_sub_418AA0	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	.
-jkGuiTitle_sub_418B90	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	.	.
+jkGuiTitle_sub_418B90	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	T	.
 jkGuiTitle_WorldLoadCallback	.text	00418C60	00000085	00000000	00000004	R	.	.	.	.	.	.
 jkGuiTitle_sub_418CF0	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.
 jkGuiTitle_gui_level_texts	.text	00418D80	00000121	0000008C	00000008	R	.	.	.	.	T	.
@@ -568,7 +568,7 @@ stdDisplay_Close	.text	004224D0	000001C6	00000004	00000000	R	.	.	.	.	.	.
 stdDisplay_SetMode	.text	004226A0	000003B0	00000010	0000000C	R	.	.	.	.	T	.
 stdDisplay_422A50	.text	00422A50	000001D4	00000008	00000000	R	.	.	.	.	.	.
 stdDisplay_ClearMode	.text	00422C30	00000243	00000010	00000000	R	.	.	.	.	.	.
-stdDisplay_DrawAndFlipGdi	.text	00422E80	0000010F	00000004	00000000	R	.	.	.	.	.	.
+stdDisplay_DrawAndFlipGdi	.text	00422E80	0000010F	00000004	00000000	R	.	.	.	.	T	.
 stdDisplay_SetCooperativeLevel	.text	00422F90	0000002F			R	.	.	.	.	.	.
 stdDisplay_ddraw_surface_flip	.text	00422FC0	0000008D			R	.	.	.	.	.	.
 stdDisplay_ddraw_surface_flip2	.text	00423050	00000042			R	.	.	.	.	.	.
@@ -579,7 +579,7 @@ stdDisplay_423360	.text	00423360	00000055	00000004	00000004	R	.	.	.	.	.	.
 stdDisplay_VBufferLock	.text	004233C0	0000008E	0000000C	00000004	R	.	.	.	.	T	.
 stdDisplay_VBufferUnlock	.text	00423450	00000085	00000008	00000004	R	.	.	.	.	T	.
 stdDisplay_VBufferFill	.text	004234E0	00000255	00000014	0000000C	R	.	.	.	B	T	.
-stdDisplay_streamidk	.text	00423740	00000061	00000000	0000000C	R	.	.	.	.	.	.
+stdDisplay_streamidk	.text	00423740	00000061	00000000	0000000C	R	.	.	.	.	T	.
 stdDisplay_VBufferCopy	.text	004237B0	0000007C	00000000	00000015	R	.	.	.	.	T	.
 stdDisplay_VBufferSetColorKey	.text	00423830	00000046	00000008	00000008	R	.	.	.	.	T	.
 stdDisplay_VBufferConvertColorFormat	.text	00423880	000002F4	0000005C	00000008	R	.	.	.	.	.	.
@@ -598,10 +598,10 @@ stdDisplay_FindClosestMode	.text	00424340	000000A4	00000014	0000000C	R	.	.	.	.	T
 stdDisplay_GetModeInfo	.text	004243F0	00000047	00000000	00000010	R	.	.	.	.	.	.
 stdDisplay_sub_424440	.text	00424440	0000029C	00000040	0000000C	R	.	.	.	.	.	.
 stdDisplay_SortVideoModes	.text	004246E0	00000066	00000004	00000008	R	.	.	.	.	T	.
-VBuffer_RawToRaw_UnlockedToUnlocked	.text	00424750	0000043D	00000010	00000018	R	.	.	.	.	.	.
+VBuffer_RawToRaw_UnlockedToUnlocked	.text	00424750	0000043D	00000010	00000018	R	.	.	.	.	T	.
 VBuffer_RawToRaw_LockedToLocked	.text	00424BC0	000002B8	00000094	00000015	R	.	.	.	.	T	.
 VBuffer_RawToRaw_UnlockedToLocked	.text	00424E80	000004F8	00000018	00000018	R	.	.	.	.	T	.
-VBuffer_RawToRaw_LockedToUnlocked	.text	00425380	000004EF	00000018	00000018	R	.	.	.	.	.	.
+VBuffer_RawToRaw_LockedToUnlocked	.text	00425380	000004EF	00000018	00000018	R	.	.	.	.	T	.
 DirectDraw_Startup	.text	00425870	000000BD	00000004	00000004	R	.	.	.	.	.	.
 DirectDraw_Shutdown	.text	00425930	0000001A	00000000	00000000	R	.	.	.	.	.	.
 DirectDraw_EnumCallback	.text	00425950	000001E2	00000300	0000000C	R	.	.	.	.	T	.
@@ -613,7 +613,7 @@ DirectDraw_sub_426310	.text	00426310	000000BD	00000004	00000000	R	.	.	.	.	.	.
 DirectDraw_sub_4263D0	.text	004263D0	00000054	0000000C	00000004	R	.	.	.	.	.	.
 DirectDraw_sub_426430	.text	00426430	0000004E	00000008	00000004	R	.	.	.	.	.	.
 DirectDraw_sub_426480	.text	00426480	0000003E	00000000	00000000	R	.	.	.	.	.	.
-DirectDraw_sub_4264C0	.text	004264C0	000000EE	00000080	0000000C	R	.	.	.	.	.	.
+DirectDraw_sub_4264C0	.text	004264C0	000000EE	00000080	0000000C	R	.	.	.	.	T	.
 DirectDraw_blitidk	.text	004265B0	00000072	00000404	00000004	R	.	.	.	.	.	.
 DirectDraw_setformatidk	.text	00426630	00000012	00000000	00000000	R	.	.	.	.	.	.
 DirectDraw_CreateGDISurface	.text	00426650	0000008F	00000000	00000010	R	.	.	.	.	T	.
@@ -914,7 +914,7 @@ stdFont_Write	.text	00434480	00000196	00000040	00000008	R	.	.	.	.	.	.
 stdFont_Free	.text	00434620	00000041	00000008	00000004	R	.	.	.	.	.	.
 stdFont_Draw1	.text	00434670	0000018E	00000024	0000001C	R	.	.	.	.	T	.
 stdFont_Draw2	.text	00434800	000001CF	00000028	0000001C	R	.	.	.	.	.	.
-stdFont_Draw3	.text	004349D0	00000392	00000028	0000001C	R	.	.	.	.	.	.
+stdFont_Draw3	.text	004349D0	00000392	00000028	0000001C	R	.	.	.	.	T	.
 stdFont_Draw4	.text	00434D70	0000014D	00000018	00000024	R	.	.	.	.	T	.
 stdFont_sub_434EC0	.text	00434EC0	00000116	00000014	00000020	R	.	.	.	.	T	.
 stdFont_DrawAscii	.text	00434FE0	000001A9	00000024	0000001C	R	.	.	.	.	T	.
@@ -2517,9 +2517,9 @@ sithParticle_FreeEntry	.text	004F20B0	0000007C	00000004	00000004	R	.	.	.	.	.	.
 sithSprite_Startup	.text	004F2130	00000040			R	.	.	.	.	.	.
 sithSprite_Shutdown	.text	004F2170	0000001D			R	.	.	.	.	.	.
 sithSprite_Load	.text	004F2190	00000192	0000000C	00000008	R	.	.	.	.	T	.
-sithSprite_FreeEntry	.text	004F2330	00000073	00000004	00000004	R	.	.	.	.	.	.
+sithSprite_FreeEntry	.text	004F2330	00000073	00000004	00000004	R	.	.	.	.	T	.
 sithSprite_LoadEntry	.text	004F23B0	00000233	000000D4	00000004	R	.	.	.	.	T	.
-sithSprite_sub_4F25F0	.text	004F25F0	0000005C	0000000C	00000008	R	.	.	.	.	.	.
+sithSprite_New	.text	004F25F0	0000005C	0000000C	00000008	R	.	.	.	.	T	.
 sithTimer_Startup	.text	004F2650	0000005E			R	.	.	.	.	.	.
 sithTimer_Shutdown	.text	004F26B0	00000014			R	.	.	.	.	.	.
 sithTimer_Open	.text	004F26D0	00000014			R	.	.	.	.	.	.
@@ -3091,7 +3091,7 @@ DirectX_DirectSoundCreate	.text	0050D68C	00000006	00000000	00000000	R	.	.	.	.	T	
 DirectX_DirectPlayLobbyCreateA	.text	0050D692	00000006	00000000	00000000	R	.	.	.	.	T	.
 DirectX_DirectInputCreateA	.text	0050E748	00000006	00000000	00000010	R	.	.	.	.	T	.
 Window_Main	.text	0050E750	00000263	0000006C	00000014	R	.	.	.	.	T	.
-Window_MessageLoop	.text	0050E9C0	000000E0	0000002C	00000000	R	.	.	.	.	.	.
+Window_MessageLoop	.text	0050E9C0	000000E0	0000002C	00000000	R	.	.	.	.	T	.
 Window_ShowCursorUnwindowed	.text	0050EAA0	0000005D	00000000	00000004	R	.	.	.	.	.	.
 Window_Fullscreen	.text	0050EAFD	00000023	00000000	00000000	R	.	.	.	.	.	.
 Window_Show	.text	0050EB20	0000000F	00000000	00000000	R	.	.	.	.	.	.
@@ -3100,8 +3100,8 @@ Window_AddMsgHandler	.text	0050EB40	0000003C	00000000	00000004	R	.	.	.	.	T	.
 Window_RemoveMsgHandler	.text	0050EB80	00000041	00000000	00000004	R	.	.	.	.	.	.
 Window_gui_dialogidk	.text	0050EBD0	00000024	00000000	00000004	R	.	.	.	.	.	.
 Window_sub_50EC00	.text	0050EC00	00000064	00000008	00000004	R	.	.	.	.	.	.
-Window_gui_sets_funcs	.text	0050EC70	00000014	00000000	00000008	R	.	.	.	.	.	.
-Window_gui_gets_vars	.text	0050EC90	00000018	00000000	00000008	R	.	.	.	.	.	.
+Window_gui_sets_funcs	.text	0050EC70	00000014	00000000	00000008	R	.	.	.	.	T	.
+Window_gui_gets_vars	.text	0050EC90	00000018	00000000	00000008	R	.	.	.	.	T	.
 Window_msg_main_handler	.text	0050ECB0	000001CE	00000018	00000010	R	.	.	.	.	T	.
 wuRegistry_Startup	.text	0050EEB0	0000017D	000000E0	0000000C	R	.	.	.	.	T	.
 wuRegistry_Shutdown	.text	0050F030	0000000B			R	.	.	.	.	.	.
@@ -3115,32 +3115,32 @@ wuRegistry_SaveBytes	.text	0050F2E0	00000059	00000004	0000000C	R	.	.	.	.	T	.
 wuRegistry_GetBytes	.text	0050F340	0000006B	00000004	0000000C	R	.	.	.	.	T	.
 wuRegistry_SetString	.text	0050F3B0	00000055	00000004	00000008	R	.	.	.	.	T	.
 wuRegistry_GetString	.text	0050F410	0000009A	00000014	00000010	R	.	.	.	.	T	.
-jkGui_CopyVBuffer	.text	0050F4B0	0000003C	00000000	00000008	R	.	.	.	.	T	.
-jkGui_SetPalette	.text	0050F4F0	00000015	00000008	00000004	R	.	.	.	.	.	.
-jkGui_sub_50F510	.text	0050F510	000001E6	00000018	0000000C	R	.	.	.	.	.	.
-jkGui_UpdateDrawMenu	.text	0050F700	00000076	00000000	00000004	R	.	.	.	.	T	.
-jkGui_Paint	.text	0050F780	000000EF	00000008	00000004	R	.	.	.	.	T	.
-jkGui_SetClickableIdk	.text	0050F870	0000000C	00000000	00000008	R	.	.	.	.	T	.
-jkGui_MenuSetLastButton	.text	0050F880	0000000C	00000000	00000008	R	.	.	.	.	T	.
-jkGui_SetDisplayingStruct	.text	0050F890	0000000C	00000000	00000008	R	.	.	.	.	T	.
-jkGui_DisplayAndReturnClicked	.text	0050F8A0	00000223	00000014	00000004	R	.	.	.	.	T	.
-jkGui_sub_50FAD0	.text	0050FAD0	0000012B	00000010	00000004	R	.	.	.	.	T	.
-jkGui_gui_sets_handler_framebufs	.text	0050FC00	00000145	00000008	00000004	R	.	.	.	.	.	.
-jkGui_Menuidk	.text	0050FD50	0000005B	00000004	00000000	R	.	.	.	.	.	.
-jkGui_sub_50FDB0	.text	0050FDB0	0000003A	00000000	00000000	R	.	.	.	.	.	.
+jkGuiRend_CopyVBuffer	.text	0050F4B0	0000003C	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_SetPalette	.text	0050F4F0	00000015	00000008	00000004	R	.	.	.	.	T	.
+jkGuiRend_DrawRect	.text	0050F510	000001E6	00000018	0000000A	R	.	.	.	.	T	.
+jkGuiRend_UpdateDrawMenu	.text	0050F700	00000076	00000000	00000004	R	.	.	.	.	T	.
+jkGuiRend_Paint	.text	0050F780	000000EF	00000008	00000004	R	.	.	.	.	T	.
+jkGuiRend_SetElementIdk	.text	0050F870	0000000C	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_MenuSetLastElement	.text	0050F880	0000000C	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_SetDisplayingStruct	.text	0050F890	0000000C	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_DisplayAndReturnClicked	.text	0050F8A0	00000223	00000014	00000004	R	.	.	.	.	T	.
+jkGuiRend_sub_50FAD0	.text	0050FAD0	0000012B	00000010	00000004	R	.	.	.	.	T	.
+jkGuiRend_gui_sets_handler_framebufs	.text	0050FC00	00000145	00000008	00000004	R	.	.	.	.	T	.
+jkGuiRend_Menuidk	.text	0050FD50	0000005B	00000004	00000000	R	.	.	.	.	.	.
+jkGuiRend_sub_50FDB0	.text	0050FDB0	0000003A	00000000	00000000	R	.	.	.	.	T	.
 jkGuiRend_Initialize	.text	0050FDF0	0000000B	00000000	00000000	R	.	.	.	.	.	.
 jkGuiRend_Shutdown	.text	0050FE00	0000000B			R	.	.	.	.	.	.
-jkGuiRend_Open	.text	0050FE10	00000028	00000000	0000000C	R	.	.	.	.	.	.
-jkGuiRend_Close	.text	0050FE40	0000001C			R	.	.	.	.	.	.
+jkGuiRend_Open	.text	0050FE10	00000028	00000000	0000000C	R	.	.	.	.	T	.
+jkGuiRend_Close	.text	0050FE40	0000001C			R	.	.	.	.	T	.
 jkGuiRend_MenuGetClickableById	.text	0050FE60	00000022	00000000	00000008	R	.	.	.	.	T	.
 jkGuiRend_PlayWav	.text	0050FE90	00000210	00000124	00000004	R	.	.	.	.	T	.
-jkGuiRend_SetCursorVisible	.text	005100A0	0000006A	00000000	00000004	R	.	.	.	.	.	.
-jkGuiRend_UpdateCursor	.text	00510110	00000066	00000000	00000000	R	.	.	.	.	.	.
+jkGuiRend_SetCursorVisible	.text	005100A0	0000006A	00000000	00000004	R	.	.	.	.	T	.
+jkGuiRend_UpdateCursor	.text	00510110	00000066	00000000	00000000	R	.	.	.	.	T	.
 jkGuiRend_UpdateSurface	.text	00510180	0000003B			R	.	.	.	.	T	.
-jkGuiRend_DrawAndFlip	.text	005101C0	00000010	00000000	00000000	R	.	.	.	.	.	.
-jkGuiRend_Invalidate	.text	005101D0	00000014	00000000	00000000	R	.	.	.	.	.	.
-jkGuiRend_DarrayNewIdk	.text	005101F0	0000001E	00000004	0000000C	R	.	.	.	.	.	.
-jkGuiRend_DarrayReallocIdk	.text	00510210	0000005C	00000008	0000000C	R	.	.	.	.	T	.
+jkGuiRend_DrawAndFlip	.text	005101C0	00000010	00000000	00000000	R	.	.	.	.	T	.
+jkGuiRend_Invalidate	.text	005101D0	00000014	00000000	00000000	R	.	.	.	.	T	.
+jkGuiRend_DarrayNewStr	.text	005101F0	0000001E	00000004	0000000C	R	.	.	.	.	T	.
+jkGuiRend_DarrayReallocStr	.text	00510210	0000005C	00000008	0000000C	R	.	.	.	.	T	.
 jkGuiRend_AddStringEntry	.text	00510270	0000004B	00000004	0000000C	R	.	.	.	.	T	.
 jkGuiRend_SetClickableString	.text	005102C0	00000017	00000000	00000008	R	.	.	.	.	T	.
 jkGuiRend_GetString	.text	005102E0	00000015	00000000	00000008	R	.	.	.	.	T	.
@@ -3149,38 +3149,38 @@ jkGuiRend_GetStringEntry	.text	00510320	00000013	00000000	00000008	R	.	.	.	.	T	.
 jkGuiRend_DarrayFree	.text	00510340	0000004F	00000008	00000004	R	.	.	.	.	T	.
 jkGuiRend_DarrayFreeEntry	.text	00510390	00000046	00000008	00000004	R	.	.	.	.	T	.
 jkGuiRend_sub_5103E0	.text	005103E0	00000027	00000000	00000004	R	.	.	.	.	T	.
-jkGuiRend_unused_bool	.text	00510410	00000031	00000000	00000004	R	.	.	.	.	T	.
-jkGuiMenu_UpdateAndDrawClickable	.text	00510460	000001E7	00000018	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_InvokeButtonDown	.text	00510650	0000004B	00000004	00000014	R	.	.	.	.	T	.
-jkGuiMenu_InvokeButtonUp	.text	005106A0	00000050	00000004	00000014	R	.	.	.	.	T	.
-jkGuiMenu_PlayClickSound	.text	005106F0	00000018	00000000	00000008	R	.	.	.	.	T	.
-jkGuiMenu_RenderFocused	.text	00510710	00000057	0000000C	00000008	R	.	.	.	.	T	.
-jkGuiMenu_RenderIdk2	.text	00510770	000000C1	00000010	00000004	R	.	.	.	.	T	.
-jkGuiMenu_RenderAll	.text	00510840	000000CF	0000000C	00000004	R	.	.	.	.	T	.
-jkGuiMenu_ClickableMouseover	.text	00510910	00000087	00000008	00000008	R	.	.	.	.	T	.
-jkGuiMenu_MouseMovedCallback	.text	005109B0	00000170	00000010	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_SetVisibleAndDraw	.text	00510B50	00000021	00000000	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_ClickableHover	.text	00510B80	000000DC	0000000C	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_sub_510C60	.text	00510C60	00000081	00000008	00000004	R	.	.	.	.	T	.
-jkGuiMenu_HoverSound	.text	00510CF0	00000023	00000000	00000014	R	.	.	.	.	T	.
-jkGuiMenu_HoverOn	.text	00510D20	0000002F	00000004	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_updateidk	.text	00510D50	00000277	00000010	00000010	R	.	.	.	.	T	.
-jkGuiMenu_DrawTexAndFontidk	.text	00511000	00000254	00000030	00000010	R	.	.	.	.	T	.
-jkGuiMenu_DrawFontidk	.text	00511260	000000E4	00000020	00000010	R	.	.	.	.	T	.
-jkGuiMenu_DrawClickableAndUpdatebool	.text	00511350	00000024	00000000	00000008	R	.	.	.	.	T	.
-jkGuiMenu_WindowHandler	.text	00511380	00000428	00000060	00000010	R	.	.	.	.	T	.
-jkGuiMenu_UpdateMouse	.text	005117B0	00000047	00000008	00000000	R	.	.	.	.	.	.
-jkGuiMenu_FlipAndDraw	.text	00511800	0000006E	00000014	00000008	R	.	.	.	.	T	.
-jkGuiMenu_GetMousePos	.text	00511870	00000050	00000008	00000008	R	.	.	.	.	.	.
-jkGuiMenu_idksets0	.text	005118C0	0000000B			R	.	.	.	.	.	.
-jkGuiMenu_InvalidateGdi	.text	005118D0	00000011	00000000	00000000	R	.	.	.	.	.	.
-jkGuiMenu_drawidk	.text	005118F0	00000250	0000001C	00000010	R	.	.	.	.	T	.
-jkGuiMenu_sub_511B60	.text	00511B60	000002A8	0000006C	00000010	R	.	.	.	.	T	.
-jkGuiMenu_clickableidk	.text	00511E10	0000024A	00000010	00000010	R	.	.	.	.	T	.
-jkGuiMenu_sub_512080	.text	00512080	00000178	00000020	00000010	R	.	.	.	.	.	.
-jkGuiMenu_sub_512200	.text	00512200	0000004F	00000008	00000010	R	.	.	.	.	.	.
-jkGuiMenu_sub_512250	.text	00512250	00000064	00000000	0000000C	R	.	.	.	.	.	.
-jkGuiMenu_sub_5122C0	.text	005122C0	000000AF	0000001C	00000010	R	.	.	.	.	.	.
-jkGuiMenu_sub_512370	.text	00512370	0000004E	00000000	0000000C	R	.	.	.	.	T	.
-jkGuiMenu_sub_5123C0	.text	005123C0	0000005F	00000010	00000010	R	.	.	.	.	.	.
+jkGuiRend_ElementHasHoverSound	.text	00510410	00000031	00000000	00000004	R	.	.	.	.	T	.
+jkGuiRend_UpdateAndDrawClickable	.text	00510460	000001E7	00000018	0000000C	R	.	.	.	.	T	.
+jkGuiRend_InvokeButtonDown	.text	00510650	0000004B	00000004	00000014	R	.	.	.	.	T	.
+jkGuiRend_InvokeButtonUp	.text	005106A0	00000050	00000004	00000014	R	.	.	.	.	T	.
+jkGuiRend_PlayClickSound	.text	005106F0	00000018	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_RenderFocused	.text	00510710	00000057	0000000C	00000008	R	.	.	.	.	T	.
+jkGuiRend_RenderIdk2	.text	00510770	000000C1	00000010	00000004	R	.	.	.	.	T	.
+jkGuiRend_RenderAll	.text	00510840	000000CF	0000000C	00000004	R	.	.	.	.	T	.
+jkGuiRend_ClickableMouseover	.text	00510910	00000087	00000008	00000008	R	.	.	.	.	T	.
+jkGuiRend_MouseMovedCallback	.text	005109B0	00000170	00000010	0000000C	R	.	.	.	.	T	.
+jkGuiRend_SetVisibleAndDraw	.text	00510B50	00000021	00000000	0000000C	R	.	.	.	.	T	.
+jkGuiRend_ClickableHover	.text	00510B80	000000DC	0000000C	0000000C	R	.	.	.	.	T	.
+jkGuiRend_sub_510C60	.text	00510C60	00000081	00000008	00000004	R	.	.	.	.	T	.
+jkGuiRend_ClickSound	.text	00510CF0	00000023	00000000	00000014	R	.	.	.	.	T	.
+jkGuiRend_HoverOn	.text	00510D20	0000002F	00000004	0000000C	R	.	.	.	.	T	.
+jkGuiRend_ListBoxButtonDown	.text	00510D50	00000277	00000010	00000010	R	.	.	.	.	T	.
+jkGuiRend_ListBoxDraw	.text	00511000	00000254	00000030	00000010	R	.	.	.	.	T	.
+jkGuiRend_CheckBoxDraw	.text	00511260	000000E4	00000020	00000010	R	.	.	.	.	T	.
+jkGuiRend_DrawClickableAndUpdatebool	.text	00511350	00000024	00000000	00000008	R	.	.	.	.	T	.
+jkGuiRend_WindowHandler	.text	00511380	00000428	00000060	00000010	R	.	.	.	.	T	.
+jkGuiRend_UpdateMouse	.text	005117B0	00000047	00000008	00000000	R	.	.	.	.	.	.
+jkGuiRend_FlipAndDraw	.text	00511800	0000006E	00000014	00000008	R	.	.	.	.	T	.
+jkGuiRend_GetMousePos	.text	00511870	00000050	00000008	00000008	R	.	.	.	.	T	.
+jkGuiRend_ResetMouseLatestMs	.text	005118C0	0000000B			R	.	.	.	.	.	.
+jkGuiRend_InvalidateGdi	.text	005118D0	00000011	00000000	00000000	R	.	.	.	.	.	.
+jkGuiRend_SliderButtonDown	.text	005118F0	00000250	0000001C	00000010	R	.	.	.	.	T	.
+jkGuiRend_SliderDraw	.text	00511B60	000002A8	0000006C	00000010	R	.	.	.	.	T	.
+jkGuiRend_TextBoxButtonDown	.text	00511E10	0000024A	00000010	00000010	R	.	.	.	.	T	.
+jkGuiRend_TextBoxDraw	.text	00512080	00000178	00000020	00000010	R	.	.	.	.	T	.
+jkGuiRend_TextDraw	.text	00512200	0000004F	00000008	00000010	R	.	.	.	.	T	.
+jkGuiRend_PicButtonButtonDown	.text	00512250	00000064	00000000	00000010	R	.	.	.	.	T	.
+jkGuiRend_PicButtonDraw	.text	005122C0	000000AF	0000001C	00000010	R	.	.	.	.	T	.
+jkGuiRend_TextButtonButtonDown	.text	00512370	0000004E	00000000	0000000C	R	.	.	.	.	T	.
+jkGuiRend_TextButtonDraw	.text	005123C0	0000005F	00000010	00000010	R	.	.	.	.	T	.
 

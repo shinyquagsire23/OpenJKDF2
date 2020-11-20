@@ -62,8 +62,8 @@ for line in funclist:
         decomped_funcs[filefrom] = 0
         total_funcs[filefrom] = 0
     
-    #if funcname not in decompiled_funcs and filefrom == "sithModel":
-    #    print (funcname, filefrom)
+    if funcname not in decompiled_funcs and filefrom == "jkGuiRend":
+        print (funcname, filefrom)
     
     if funcname in decompiled_funcs:
         #print (funcname, filefrom)

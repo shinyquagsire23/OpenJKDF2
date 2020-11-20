@@ -38,6 +38,7 @@ typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 typedef struct sithSector sithSector;
 typedef struct rdColormap rdColormap;
 typedef struct sithSound sithSound;
+typedef struct rdSprite rdSprite;
 
 typedef struct sithWorld
 {
@@ -57,7 +58,7 @@ typedef struct sithWorld
     rdModel3* models;
     int numSpritesLoaded;
     int numSprites;
-    void* sprites;
+    rdSprite* sprites;
     int numParticles;
     uint8_t field_80;
     uint8_t field_81;

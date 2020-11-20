@@ -23,7 +23,7 @@ rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, float width, 
     return sprite;
 }
 
-void rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extralight, rdVector3 *offset)
+int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extralight, rdVector3 *offset)
 {
     if (spritepath)
     {
@@ -57,7 +57,7 @@ void rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *mater
             {
                 sprite->face.vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
                 if ( !sprite->face.vertexUVIdx )
-                    return;
+                    return 0;
                 sprite->face.numVertices;
                 for (int i = 0; i < sprite->face.numVertices; i++)
                 {
@@ -66,7 +66,7 @@ void rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *mater
                 }
                 sprite->vertexUVs = (rdVector2 *)rdroid_pHS->alloc(sizeof(rdVector2) * sprite->face.numVertices);
                 if ( !sprite->vertexUVs )
-                    return;
+                    return 0;
                 uint32_t* v24 = (uint32_t*)sprite->face.material->texinfos[0]->texture_ptr->texture_struct[0];
 
                 sprite->vertexUVs[0].x = 0.5;
@@ -81,9 +81,10 @@ void rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *mater
             sprite->halfWidth = sprite->width * 0.5;
             sprite->halfHeight = sprite->height * 0.5;
             sprite->radius = sqrt(sprite->halfWidth * sprite->halfWidth + sprite->halfHeight * sprite->halfHeight);
-            return;
+            return 1;
         }
     }
+    return 0;
 }
 
 void rdSprite_Free(rdSprite *sprite)

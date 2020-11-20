@@ -144,7 +144,7 @@ int stdConffile_Printf(char *fmt, ...)
 int stdConffile_Read(char* out, int len)
 {
   if (stdConffile_bOpen && openFile)
-    return std_pHS->fileRead((FILE *)openFile, (void *)out, len) == len;
+    return std_pHS->fileRead(openFile, (void *)out, len) == len;
   else
     return 0;
 }
@@ -160,7 +160,7 @@ int stdConffile_ReadArgsFromStr(char *str)
   iter = _strtok(str, ", \t\n\r");
   if ( iter )
   {
-    stdConffileArg* arg = (char **)&stdConffile_entry.args[0];
+    stdConffileArg* arg = &stdConffile_entry.args[0];
     do
     {
       valstr = _strchr(iter, '=');

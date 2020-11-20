@@ -18,6 +18,9 @@
 #include "General/stdStrTable.h"
 #include "General/sithStrTable.h"
 #include "General/stdPcx.h"
+#include "General/Darray.h"
+#include "Gui/jkGUIRend.h"
+#include "Gui/jkGUI.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -34,6 +37,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithKeyFrame.h"
+#include "Engine/sithSprite.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -808,6 +812,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithKeyFrame_New_ADDR, sithKeyFrame_New);
     hook_function(sithKeyFrame_Free_ADDR, sithKeyFrame_Free);
     
+    // sithSprite
+    hook_function(sithSprite_Startup_ADDR, sithSprite_Startup);
+    hook_function(sithSprite_Shutdown_ADDR, sithSprite_Shutdown);
+    hook_function(sithSprite_Load_ADDR, sithSprite_Load);
+    hook_function(sithSprite_FreeEntry_ADDR, sithSprite_FreeEntry);
+    hook_function(sithSprite_LoadEntry_ADDR, sithSprite_LoadEntry);
+    hook_function(sithSprite_New_ADDR, sithSprite_New);
+    
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
     hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
@@ -816,6 +828,87 @@ __declspec(dllexport) void hook_init(void)
     
     // sithAICmd
     hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);
+
+    // jkGUIRend
+    hook_function(jkGuiRend_CopyVBuffer_ADDR, jkGuiRend_CopyVBuffer);
+    hook_function(jkGuiRend_SetPalette_ADDR, jkGuiRend_SetPalette);
+    hook_function(jkGuiRend_DrawRect_ADDR, jkGuiRend_DrawRect);
+    hook_function(jkGuiRend_UpdateDrawMenu_ADDR, jkGuiRend_UpdateDrawMenu);
+    hook_function(jkGuiRend_Paint_ADDR, jkGuiRend_Paint);
+    hook_function(jkGuiRend_SetElementIdk_ADDR, jkGuiRend_SetElementIdk);
+    hook_function(jkGuiRend_MenuSetLastElement_ADDR, jkGuiRend_MenuSetLastElement);
+    hook_function(jkGuiRend_SetDisplayingStruct_ADDR, jkGuiRend_SetDisplayingStruct);
+    hook_function(jkGuiRend_DisplayAndReturnClicked_ADDR, jkGuiRend_DisplayAndReturnClicked);
+    hook_function(jkGuiRend_sub_50FAD0_ADDR, jkGuiRend_sub_50FAD0);
+    hook_function(jkGuiRend_gui_sets_handler_framebufs_ADDR, jkGuiRend_gui_sets_handler_framebufs);
+    hook_function(jkGuiRend_Menuidk_ADDR, jkGuiRend_Menuidk);
+    hook_function(jkGuiRend_sub_50FDB0_ADDR, jkGuiRend_sub_50FDB0);
+    hook_function(jkGuiRend_Initialize_ADDR, jkGuiRend_Initialize);
+    hook_function(jkGuiRend_Shutdown_ADDR, jkGuiRend_Shutdown);
+    hook_function(jkGuiRend_Open_ADDR, jkGuiRend_Open);
+    hook_function(jkGuiRend_Close_ADDR, jkGuiRend_Close);
+    hook_function(jkGuiRend_MenuGetClickableById_ADDR, jkGuiRend_MenuGetClickableById);
+    //hook_function();
+    hook_function(jkGuiRend_SetCursorVisible_ADDR, jkGuiRend_SetCursorVisible);
+    hook_function(jkGuiRend_UpdateCursor_ADDR, jkGuiRend_UpdateCursor);
+    hook_function(jkGuiRend_UpdateSurface_ADDR, jkGuiRend_UpdateSurface);
+    hook_function(jkGuiRend_DrawAndFlip_ADDR, jkGuiRend_DrawAndFlip);
+    hook_function(jkGuiRend_Invalidate_ADDR, jkGuiRend_Invalidate);
+    hook_function(jkGuiRend_DarrayNewStr_ADDR, jkGuiRend_DarrayNewStr);
+    hook_function(jkGuiRend_DarrayReallocStr_ADDR, jkGuiRend_DarrayReallocStr);
+    hook_function(jkGuiRend_AddStringEntry_ADDR, jkGuiRend_AddStringEntry);
+    hook_function(jkGuiRend_SetClickableString_ADDR, jkGuiRend_SetClickableString);
+    hook_function(jkGuiRend_GetString_ADDR, jkGuiRend_GetString);
+    hook_function(jkGuiRend_GetId_ADDR, jkGuiRend_GetId);
+    hook_function(jkGuiRend_GetStringEntry_ADDR, jkGuiRend_GetStringEntry);
+    hook_function(jkGuiRend_DarrayFree_ADDR, jkGuiRend_DarrayFree);
+    hook_function(jkGuiRend_DarrayFreeEntry_ADDR, jkGuiRend_DarrayFreeEntry);
+    hook_function(jkGuiRend_sub_5103E0_ADDR, jkGuiRend_sub_5103E0);
+    hook_function(jkGuiRend_ElementHasHoverSound_ADDR, jkGuiRend_ElementHasHoverSound);
+    hook_function(jkGuiRend_UpdateAndDrawClickable_ADDR, jkGuiRend_UpdateAndDrawClickable);
+    hook_function(jkGuiRend_InvokeButtonDown_ADDR, jkGuiRend_InvokeButtonDown);
+    hook_function(jkGuiRend_InvokeButtonUp_ADDR, jkGuiRend_InvokeButtonUp);
+    hook_function(jkGuiRend_PlayClickSound_ADDR, jkGuiRend_PlayClickSound);
+    hook_function(jkGuiRend_RenderFocused_ADDR, jkGuiRend_RenderFocused);
+    hook_function(jkGuiRend_RenderIdk2_ADDR, jkGuiRend_RenderIdk2);
+    hook_function(jkGuiRend_RenderAll_ADDR, jkGuiRend_RenderAll);
+    hook_function(jkGuiRend_ClickableMouseover_ADDR, jkGuiRend_ClickableMouseover);
+    hook_function(jkGuiRend_MouseMovedCallback_ADDR, jkGuiRend_MouseMovedCallback);
+    hook_function(jkGuiRend_SetVisibleAndDraw_ADDR, jkGuiRend_SetVisibleAndDraw);
+    hook_function(jkGuiRend_ClickableHover_ADDR, jkGuiRend_ClickableHover);
+    hook_function(jkGuiRend_sub_510C60_ADDR, jkGuiRend_sub_510C60);
+    hook_function(jkGuiRend_ClickSound_ADDR, jkGuiRend_ClickSound);
+    hook_function(jkGuiRend_HoverOn_ADDR, jkGuiRend_HoverOn);
+    hook_function(jkGuiRend_ListBoxButtonDown_ADDR, jkGuiRend_ListBoxButtonDown);
+    hook_function(jkGuiRend_ListBoxDraw_ADDR, jkGuiRend_ListBoxDraw);
+    hook_function(jkGuiRend_CheckBoxDraw_ADDR, jkGuiRend_CheckBoxDraw);
+    hook_function(jkGuiRend_DrawClickableAndUpdatebool_ADDR, jkGuiRend_DrawClickableAndUpdatebool);
+    hook_function(jkGuiRend_WindowHandler_ADDR, jkGuiRend_WindowHandler);
+    hook_function(jkGuiRend_UpdateMouse_ADDR, jkGuiRend_UpdateMouse);
+    hook_function(jkGuiRend_FlipAndDraw_ADDR, jkGuiRend_FlipAndDraw);
+    hook_function(jkGuiRend_GetMousePos_ADDR, jkGuiRend_GetMousePos);
+    hook_function(jkGuiRend_ResetMouseLatestMs_ADDR, jkGuiRend_ResetMouseLatestMs);
+    hook_function(jkGuiRend_InvalidateGdi_ADDR, jkGuiRend_InvalidateGdi);
+    hook_function(jkGuiRend_SliderButtonDown_ADDR, jkGuiRend_SliderButtonDown);
+    hook_function(jkGuiRend_SliderDraw_ADDR, jkGuiRend_SliderDraw);
+    hook_function(jkGuiRend_TextBoxButtonDown_ADDR, jkGuiRend_TextBoxButtonDown);
+    hook_function(jkGuiRend_TextBoxDraw_ADDR, jkGuiRend_TextBoxDraw);
+    hook_function(jkGuiRend_TextDraw_ADDR, jkGuiRend_TextDraw);
+    hook_function(jkGuiRend_PicButtonButtonDown_ADDR, jkGuiRend_PicButtonButtonDown);
+    hook_function(jkGuiRend_PicButtonDraw_ADDR, jkGuiRend_PicButtonDraw);
+    hook_function(jkGuiRend_TextButtonButtonDown_ADDR, jkGuiRend_TextButtonButtonDown);
+    hook_function(jkGuiRend_TextButtonDraw_ADDR, jkGuiRend_TextButtonDraw);
+    
+    // jkGUI
+    hook_function(jkGui_InitMenu_ADDR, jkGui_InitMenu);
+    
+    // Darray
+    hook_function(Darray_New_ADDR, Darray_New);
+    hook_function(Darray_Free_ADDR, Darray_Free);
+    hook_function(Darray_NewEntry_ADDR, Darray_NewEntry);
+    hook_function(Darray_GetIndex_ADDR, Darray_GetIndex);
+    hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
+    hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
 
     // test saber time
     //*(float*)0x5220C4 = 0.01f;

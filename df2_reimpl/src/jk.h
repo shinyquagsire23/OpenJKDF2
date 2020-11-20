@@ -24,7 +24,7 @@ typedef struct common_functions
     uint32_t unk_0;
     void *(*alloc)(unsigned int);
     void (*free)(void *);
-    uint32_t realloc;
+    void *(__cdecl *realloc)(void *, unsigned int);
     uint32_t timeGetTime;
     int (*fileOpen)(char *, char *);
     int (*fileClose)(int);
@@ -255,6 +255,7 @@ static char* (*_strrchr)(char * a, char b) = (void*)0x514460;
 static char* (*_strchr)(char * a, char b) = (void*)0x513280;
 static char* (*_strncat)(char*, const char*, size_t) = (void*)0x5135E0;
 static size_t (__cdecl *_wcslen)(const wchar_t *) = (void*)0x512FE0;
+static wchar_t* (__cdecl *_wcscpy)(wchar_t *, const wchar_t *) = (void*)0x5130A0;
 static int (*_rand)() = (void*)0x512D00;
 static size_t (__cdecl *_strspn)(const char *, const char *) = (void*)0x00514510;
 static char* (__cdecl *_strpbrk)(const char *, const char *) = (void*)0x5144D0;

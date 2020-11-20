@@ -59,6 +59,12 @@
 #define rdVector_Rotate3Acc_ADDR (0x0044A09E)
 #define rdVector_ExtractAngle_ADDR (0x0044A0CE)
 
+typedef struct rdVector2i
+{
+    int x;
+    int y;
+} rdVector2i;
+
 typedef struct rdVector2
 {
     float x;

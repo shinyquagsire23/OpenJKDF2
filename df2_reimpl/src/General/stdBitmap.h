@@ -53,6 +53,6 @@ typedef struct stdBitmap
 #define stdBitmap_NewEntry_ADDR (0x0042D920)
 #define stdBitmap_MemUsage_ADDR (0x0042D9D0)
 
-void (*stdBitmap_Free)(stdBitmap *bitmap) = (void*)stdBitmap_Free_ADDR;
+static void (*stdBitmap_Free)(stdBitmap *bitmap) = (void*)stdBitmap_Free_ADDR;
 
 #endif // _STDBITMAP_H

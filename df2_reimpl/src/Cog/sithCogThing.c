@@ -939,7 +939,7 @@ void sithCogThing_PlayMode(sithCog *ctx)
     }
 }
 
-void __cdecl sithCogThing_PlayKey(sithCog *ctx)
+void sithCogThing_PlayKey(sithCog *ctx)
 {
     int trackNum = sithCogVm_PopInt(ctx);
     int popInt = sithCogVm_PopInt(ctx);
@@ -1151,7 +1151,7 @@ void sithCogThing_TeleportThing(sithCog *ctx)
     }
 }
 
-void __cdecl sithCogThing_SetThingType(sithCog *ctx)
+void sithCogThing_SetThingType(sithCog *ctx)
 {
     int type = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
