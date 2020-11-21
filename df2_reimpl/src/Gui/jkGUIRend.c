@@ -1308,8 +1308,8 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
     int element; // [esp+34h] [ebp+4h]
 
     v6 = element_->anonymous_13;
-    v20 = menu->ui_structs[0][*v6];
-    v21 = menu->ui_structs[0][v6[1]];
+    v20 = menu->ui_structs[*v6];
+    v21 = menu->ui_structs[v6[1]];
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element_->texInfo.rect);
     if ( menu->focusedElement == element_ )
@@ -1404,7 +1404,7 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
 
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
-    v4 = (*menu->ui_structs)[menu->anonymous_3];
+    v4 = menu->ui_structs[menu->anonymous_3];
     v6 = v4->mipSurfaces[(element->selectedTextEntry != 0) ? 1 : 0];
     v7 = (unsigned int)(element->rect.height - v6->format.height) / 2;
     if ( v7 < 0 )
@@ -1672,7 +1672,6 @@ int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, s
     int v11; // ebx
     int v12; // edi
     int *v13; // ebp
-    stdBitmap *(*v14)[4]; // edx
     int v15; // ecx
     stdBitmap *v16; // ecx
     stdBitmap *v17; // edx
@@ -1691,7 +1690,7 @@ int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, s
     jkGuiStringEntry *v32; // ecx
     int v33; // [esp+0h] [ebp-1Ch]
     int v34; // [esp+10h] [ebp-Ch]
-    stdBitmap *(*v35)[4]; // [esp+14h] [ebp-8h]
+
 
     switch ( a3 )
     {
@@ -1726,17 +1725,14 @@ LABEL_5:
                 if ( &v33 != (int *)-44 )
                     a4 = 0;
                 v13 = (int *)element->anonymous_13;
-                v14 = menu->ui_structs;
                 v15 = *v13;
-                v35 = v14;
-                v16 = (*v14)[v15];
+                v16 = menu->ui_structs[v15];
                 if ( v16 )
                 {
                     v12 = (*v16->mipSurfaces)->format.width;
-                    v14 = v35;
                     v11 = (v9 - v12) / 2;
                 }
-                v17 = (*v14)[v13[1]];
+                v17 = menu->ui_structs[v13[1]];
                 if ( v17 )
                 {
                     v18 = (*v17->mipSurfaces)->format.width;
@@ -1823,7 +1819,6 @@ LABEL_24:
 
 int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    stdBitmap *(*v5)[4]; // ecx
     unsigned int v6; // edi
     signed int *v7; // eax
     signed int v8; // ebx
@@ -1848,7 +1843,6 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
     int v27; // ecx
     int v28; // ecx
     uint32_t *v29; // edi
-    stdBitmap *(*v30)[4]; // ebx
     stdBitmap *v31; // edx
     int v32; // ecx
     int v33; // ebp
@@ -1880,16 +1874,15 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
     unsigned int redrawa; // [esp+7Ch] [ebp+10h]
     int redrawb; // [esp+7Ch] [ebp+10h]
 
-    v5 = menu->ui_structs;
     v6 = 0;
     v7 = (signed int *)element->anonymous_13;
     v43 = 0;
     v8 = v7[1];
     result = *v7;
-    v10 = (*v5)[v8];
-    v11 = (*v5)[result];
+    v10 = menu->ui_structs[v8];
+    v11 = menu->ui_structs[result];
     v44 = v10;
-    elementa = (*v5)[result];
+    elementa = menu->ui_structs[result];
     if ( v10 && v11 )
     {
         if ( element == menu->lastMouseOverClickable )
@@ -1946,9 +1939,8 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
         drawRect.y = blitY - v54;
         stdDisplay_VBufferCopy(vbuf, elementa->mipSurfaces[v46], blitX, blitY, &drawRect, 1);
         v29 = element->anonymous_13;
-        v30 = menu->ui_structs;
         elementb = (jkGuiStringEntry *)element->selectedTextEntry;
-        v31 = (*v30)[*v29];
+        v31 = menu->ui_structs[*v29];
         v32 = 0;
         v33 = element->rect.width;
         if ( v31 )
@@ -1956,11 +1948,11 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
             v33 = (*v31->mipSurfaces)->format.width;
             v32 = (element->rect.width - v33) / 2;
         }
-        v34 = (*v30)[v29[1]];
+        v34 = menu->ui_structs[v29[1]];
         if ( v34 )
         {
             v33 -= (*v34->mipSurfaces)->format.width;
-            v32 += v34->field_6C;
+            v32 += v34->xPos;
         }
         if ( (signed int)elementb < 0 )
         {
@@ -1974,7 +1966,7 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
         blitX2 = blit_x;
         blitY2 = blit_y;
         v38 = v44->mipSurfaces[v43];
-        v39 = blit_y + v47 + v44->field_70;
+        v39 = blit_y + v47 + v44->yPos;
         v40 = v38->format.width;
         v55 = v38->format.height;
         if ( (signed int)blit_x <= v35 )
@@ -2211,21 +2203,20 @@ void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *outB
 
 int jkGuiRend_PicButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a, int b)
 {
-    stdBitmap *v5; // ecx
-
     if ( a )
         return 0;
-    v5 = (*menu->ui_structs)[element->selectedTextEntry];
-    if ( v5 )
+
+    stdBitmap* bitmap = menu->ui_structs[element->selectedTextEntry];
+    if ( bitmap )
     {
         if ( element->rect.x < 0 )
-            element->rect.x = v5->field_6C;
+            element->rect.x = bitmap->xPos;
         if ( element->rect.y < 0 )
-            element->rect.y = v5->field_70;
+            element->rect.y = bitmap->yPos;
         if ( element->rect.width < 0 )
-            element->rect.width = v5->mipSurfaces[0]->format.width;
+            element->rect.width = bitmap->mipSurfaces[0]->format.width;
         if ( element->rect.height < 0 )
-            element->rect.height = v5->mipSurfaces[0]->format.height;
+            element->rect.height = bitmap->mipSurfaces[0]->format.height;
     }
 
     return 1;
@@ -2234,11 +2225,6 @@ int jkGuiRend_PicButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a,
 void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
     int v4; // ebx
-    stdBitmap *v5; // eax
-    int v6; // edx
-    int v7; // ecx
-    int v8; // edi
-    int v9; // edi
     rdRect rect; // [esp+Ch] [ebp-10h]
 
     v4 = 0;
@@ -2247,24 +2233,25 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer 
         v4 = (v4 & 0xFFFFFF00) | (menu->lastMouseDownClickable == element);
         ++v4;
     }
+
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
-    v5 = (*menu->ui_structs)[element->selectedTextEntry];
-    if ( v5 )
+
+    stdBitmap* bitmap = menu->ui_structs[element->selectedTextEntry];
+    if ( bitmap )
     {
-        v6 = element->rect.width;
         rect.x = 0;
         rect.y = 0;
-        v7 = v4;
-        v8 = v5->mipSurfaces[v4]->format.width;
-        rect.width = v6;
-        if ( v6 >= v8 )
-            rect.width = v8;
-        v9 = v5->mipSurfaces[v7]->format.height;
+
+        rect.width = element->rect.width;
+        if ( rect.width >= bitmap->mipSurfaces[v4]->format.width )
+            rect.width = bitmap->mipSurfaces[v4]->format.width;
+
         rect.height = element->rect.height;
-        if ( rect.height >= v9 )
-            rect.height = v9;
-        stdDisplay_VBufferCopy(vbuf, v5->mipSurfaces[v7], element->rect.x, element->rect.y, &rect, 1);
+        if ( rect.height >= bitmap->mipSurfaces[v4]->format.height )
+            rect.height = bitmap->mipSurfaces[v4]->format.height;
+
+        stdDisplay_VBufferCopy(vbuf, bitmap->mipSurfaces[v4], element->rect.x, element->rect.y, &rect, 1);
     }
 }
 

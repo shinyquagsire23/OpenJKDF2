@@ -915,7 +915,7 @@ __declspec(dllexport) void hook_init(void)
     // jkGUIForce
     hook_function(jkGuiForce_ChoiceRemoveStar_ADDR, jkGuiForce_ChoiceRemoveStar);
     hook_function(jkGuiForce_ChoiceRemoveStars_ADDR, jkGuiForce_ChoiceRemoveStars);
-    hook_function(jkGuiForce_LightDarkDraw_ADDR, jkGuiForce_LightDarkDraw);
+    hook_function(jkGuiForce_ForceStarsDraw_ADDR, jkGuiForce_ForceStarsDraw);
     hook_function(jkGuiForce_ExtraClick_ADDR, jkGuiForce_ExtraClick);
     hook_function(jkGuiForce_ButtonClick_ADDR, jkGuiForce_ButtonClick);
     hook_function(jkGuiForce_ButtonClick_ADDR, jkGuiForce_ButtonClick);

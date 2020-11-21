@@ -28,7 +28,7 @@
 #define sithPlayer_sub_4C93F0_ADDR (0x004C93F0)
 #define sithPlayer_GetNum_ADDR (0x004C9420)
 #define sithPlayer_GetNumidk_ADDR (0x004C9470)
-#define sithPlayer_idk3_ADDR (0x004C94C0)
+#define sithPlayer_SetBinCarries_ADDR (0x004C94C0)
 #define sithPlayer_idk2_ADDR (0x004C9500)
 
 
@@ -85,7 +85,7 @@ typedef struct sithPlayerInfo
     uint32_t field_13B0;
 } sithPlayerInfo;
 
-static void (*sithPlayer_idk3)(int a1, int a2) = (void*)sithPlayer_idk3_ADDR;
+static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;
 static void (*sithPlayer_SetBinAmt)(int idx, float a2) =(void*)sithPlayer_SetBinAmt_ADDR;
 static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)sithPlayer_AddDynamicTint_ADDR;

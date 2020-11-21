@@ -97,7 +97,7 @@ enum jkGuiElementType_t
     ELEMENT_LISTBOX = 4,
     ELEMENT_TEXTBOX = 5,
     ELEMENT_SLIDER = 6,
-    ELEMENT_7 = 7,
+    ELEMENT_CUSTOM = 7,
     ELEMENT_8 = 8,
     ELEMENT_END = 9,
 };
@@ -157,7 +157,7 @@ struct jkGuiMenu
   int anonymous_3;
   stdVBuffer *texture;
   uint8_t* palette;
-  stdBitmap *(*ui_structs)[4];
+  stdBitmap **ui_structs;
   int (*anonymous_6)[];
   int anonymous_7;
   void (__cdecl *idkFunc)(jkGuiMenu *);

@@ -3,7 +3,7 @@
 
 #define jkGuiForce_ChoiceRemoveStar_ADDR (0x00415E90)
 #define jkGuiForce_ChoiceRemoveStars_ADDR (0x00415F70)
-#define jkGuiForce_LightDarkDraw_ADDR (0x004160F0)
+#define jkGuiForce_ForceStarsDraw_ADDR (0x004160F0)
 #define jkGuiForce_ExtraClick_ADDR (0x00416240)
 #define jkGuiForce_ButtonClick_ADDR (0x00416250)
 #define jkGuiForce_ResetClick_ADDR (0x004163B0)
@@ -19,7 +19,7 @@ typedef struct stdVBuffer stdVBuffer;
 
 void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount);
 void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu);
-void jkGuiForce_LightDarkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);

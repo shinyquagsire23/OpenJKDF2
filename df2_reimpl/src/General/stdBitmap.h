@@ -32,8 +32,8 @@ typedef struct stdBitmap
     void *palette;
     int numMips;
     int field_68;
-    int field_6C;
-    int field_70;
+    int xPos;
+    int yPos;
     void* colorkey;
     stdVBuffer **mipSurfaces;
 } stdBitmap;

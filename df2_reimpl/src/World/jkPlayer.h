@@ -8,9 +8,8 @@
 
 #define jkPlayer_renderSaberWeaponMesh_ADDR (0x405520)
 #define jkPlayer_renderSaberTwinkle_ADDR (0x405720)
-#define jkPlayer_sub_405CF0_ADDR (0x405CF0)
+#define jkPlayer_CalcDarkLightBalance_ADDR (0x405CF0)
 #define jkPlayer_sub_405CC0_ADDR (0x405CC0)
-#define jkPlayer_sub_407040_ADDR (0x407040)
 #define jkPlayer_GetJediRank_ADDR (0x4074D0)
 #define jkPlayer_sub_407210_ADDR (0x407210)
 #define jkPlayer_SetAccessiblePowers_ADDR (0x406860)
@@ -79,11 +78,10 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *a1);
 static void (*jkPlayer_SetAccessiblePowers)(int rank) = (void*)jkPlayer_SetAccessiblePowers_ADDR;
 static int (*jkPlayer_SetProtectionDeadlysight)() = (void*)jkPlayer_SetProtectionDeadlysight_ADDR;
 static int (*jkPlayer_GetAlignment)() = (void*)jkPlayer_GetAlignment_ADDR;
-static int (*jkPlayer_sub_407040)() = (void*)jkPlayer_sub_407040_ADDR;
 static int (*jkPlayer_GetJediRank)() = (void*)jkPlayer_GetJediRank_ADDR;
 static int (*jkPlayer_sub_407210)() = (void*)jkPlayer_sub_407210_ADDR;
 static void (*jkPlayer_sub_405CC0)(signed int a1) = (void*)jkPlayer_sub_405CC0_ADDR;
-static double (*jkPlayer_sub_405CF0)(float a1) = (void*)jkPlayer_sub_405CF0_ADDR;
+static double (*jkPlayer_CalcDarkLightBalance)(float a1) = (void*)jkPlayer_CalcDarkLightBalance_ADDR;
 static void (__cdecl *jkPlayer_renderSaberTwinkle)(sithThing *a1) = (void*)jkPlayer_renderSaberTwinkle_ADDR;
 
 #endif // _JK_PLAYER_H
