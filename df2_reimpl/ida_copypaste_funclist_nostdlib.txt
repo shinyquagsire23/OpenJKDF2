@@ -112,19 +112,19 @@ jkPlayer_MPCWrite	.text	00406270	00000158	000000D4	0000000C	R	.	.	.	B	.	.
 jkPlayer_DebugWrite	.text	004063D0	00000066	0000000C	00000000	R	.	.	.	.	.	.
 jkPlayer_DebugRead	.text	00406440	000000A0	0000000C	00000000	R	.	.	.	.	.	.
 jkPlayer_sub_4064E0	.text	004064E0	00000084	00000008	00000000	R	.	.	.	.	.	.
-jkPlayer_sub_406570	.text	00406570	000002ED	00000014	00000000	R	.	.	.	.	.	.
-jkPlayer_sub_406860	.text	00406860	00000125	0000000C	00000004	R	.	.	.	.	.	.
+jkPlayer_GetAlignment	.text	00406570	000002ED	00000014	00000000	R	.	.	.	.	.	.
+jkPlayer_SetAccessiblePowers	.text	00406860	00000125	0000000C	00000004	R	.	.	.	.	T	.
 jkPlayer_sub_406990	.text	00406990	0000001E	00000004	00000000	R	.	.	.	.	.	.
 jkPlayer_WriteConfSwap	.text	004069B0	0000024A	000000B4	0000000C	R	.	.	.	.	T	.
 jkPlayer_WriteCutsceneConf	.text	00406C00	0000006C	0000000C	00000000	R	.	.	.	.	.	.
 jkPlayer_ReadCutsceneConf	.text	00406C70	000000D5	00000010	00000000	R	.	.	.	.	.	.
 jkPlayer_sub_406D50	.text	00406D50	00000285	00000014	00000000	R	.	.	.	.	.	.
 jkPlayer_sub_406FE0	.text	00406FE0	00000055	00000008	00000000	R	.	.	.	.	.	.
-jkPlayer_sub_407040	.text	00407040	000001D0	0000001C	00000000	R	.	.	.	.	.	.
+jkPlayer_SetProtectionDeadlysight	.text	00407040	000001D0	0000001C	00000000	R	.	.	.	.	.	.
 jkPlayer_sub_407210	.text	00407210	00000103	00000008	00000004	R	.	.	.	.	.	.
 jkPlayer_WriteOptionsConf	.text	00407320	00000097	00000000	00000000	R	.	.	.	.	.	.
 jkPlayer_ReadOptionsConf	.text	004073C0	00000105	00000000	00000000	R	.	.	.	.	.	.
-jkPlayer_sub_4074D0	.text	004074D0	0000000F			R	.	.	.	.	.	.
+jkPlayer_GetJediRank	.text	004074D0	0000000F			R	.	.	.	.	T	.
 jkPlayer_sub_4074E0	.text	004074E0	00000013	00000004	00000004	R	.	.	.	.	.	.
 jkHud_Startup	.text	00407500	00000040			R	.	.	.	.	.	.
 jkHud_Shutdown	.text	00407540	00000017			R	.	.	.	.	.	.
@@ -319,7 +319,7 @@ jkGuiKeyboard_Shutdown	.text	00412990	00000001			R	.	.	.	.	.	.
 jkGui_InitMenu	.text	004129A0	0000006D	00000004	00000008	R	.	.	.	.	T	.
 jkGui_MessageBeep	.text	00412A10	00000009			R	.	.	.	.	.	.
 jkGui_Initialize	.text	00412A20	0000014C	000000A4	00000000	R	.	.	.	.	.	.
-jkGui_Shutdown	.text	00412B70	00000085	00000024	00000000	R	.	.	.	.	.	.
+jkGui_Shutdown	.text	00412B70	00000085	00000024	00000000	R	.	.	.	.	T	.
 jkGui_SetModeMenu	.text	00412C00	000001E2	00000074	00000004	R	.	.	.	.	T	.
 jkGui_SetModeGame	.text	00412DF0	00000028			R	.	.	.	.	.	.
 jkGui_sub_412E20	.text	00412E20	00000075	00000010	00000010	R	.	.	.	.	T	.
@@ -362,17 +362,17 @@ jkGuiMap_sub_415B40	.text	00415B40	00000015	00000000	00000000	R	.	.	.	.	.	.
 jkGuiMap_sub_415B60	.text	00415B60	00000003	00000000	00000000	R	.	.	.	.	.	.
 jkGuiMap_sub_415B70	.text	00415B70	000000D5	0000000C	00000008	R	.	.	.	.	.	.
 jkGuiMap_Show	.text	00415C50	00000239	0000005C	00000000	R	.	.	.	.	.	.
-jkGuiForce_choiceidk	.text	00415E90	000000D7	0000000C	0000000C	R	.	.	.	.	.	.
-jkGuiForce_sub_415F70	.text	00415F70	00000171	0000000C	00000004	R	.	.	.	.	.	.
-jkGuiForce_sub_4160F0	.text	004160F0	0000014A	00000010	0000000C	R	.	.	.	.	.	.
-jkGuiForce_sub_416240	.text	00416240	00000003	00000000	00000000	R	.	.	.	.	.	.
-jkGuiForce_sub_416250	.text	00416250	0000015A	00000014	00000008	R	.	.	.	.	.	.
-jkGuiForce_sub_4163B0	.text	004163B0	000000CE	00000008	00000008	R	.	.	.	.	.	.
+jkGuiForce_ChoiceRemoveStar	.text	00415E90	000000D7	0000000C	0000000C	R	.	.	.	.	T	.
+jkGuiForce_ChoiceRemoveStars	.text	00415F70	00000171	0000000C	00000004	R	.	.	.	.	T	.
+jkGuiForce_LightDarkDraw	.text	004160F0	0000014A	00000010	0000000C	R	.	.	.	.	T	.
+jkGuiForce_ExtraClick	.text	00416240	00000003	00000000	00000000	R	.	.	.	.	.	.
+jkGuiForce_ButtonClick	.text	00416250	0000015A	00000014	00000008	R	.	.	.	.	T	.
+jkGuiForce_ResetClick	.text	004163B0	000000CE	00000008	00000008	R	.	.	.	.	T	.
 jkGuiForce_Show	.text	00416480	0000032F	00000018	00000018	R	.	.	.	.	T	.
-jkGuiForce_Initialize	.text	004167B0	00000077	00000084	00000000	R	.	.	.	.	.	.
+jkGuiForce_Initialize	.text	004167B0	00000077	00000084	00000000	R	.	.	.	.	T	.
 jkGuiForce_Shutdown	.text	00416830	00000028	00000004	00000000	R	.	.	.	.	.	.
-jkGuiForce_sub_416860	.text	00416860	00000051	00000000	00000000	R	.	.	.	.	.	.
-jkGuiForce_nullsub_48	.text	004168C0	00000001	00000000	00000000	R	.	.	.	.	.	.
+jkGuiForce_UpdateViewForRank	.text	00416860	00000051	00000000	00000000	R	.	.	.	.	T	.
+jkGuiForce_DarkLightHoverDraw	.text	004168C0	00000001	00000000	00000000	R	.	.	.	.	.	.
 jkGuiDialog_Initialize	.text	004168D0	0000001F			R	.	.	.	.	.	.
 jkGuiDialog_Shutdown	.text	004168F0	00000001			R	.	.	.	.	.	.
 jkGuiDialog_sub_416900	.text	00416900	00000062	00000004	00000000	R	.	.	.	.	.	.
@@ -564,9 +564,9 @@ jkCredits_Handler	.text	00421F60	0000005E	00000000	0000000C	R	.	.	.	.	.	.
 stdDisplay_Startup	.text	00421FC0	000000E8	00000004	00000000	R	.	.	.	.	.	.
 stdDisplay_RestoreDisplayMode	.text	004220B0	00000028			R	.	.	.	.	.	.
 stdDisplay_Open	.text	004220E0	000003F0	0000000C	00000004	R	.	.	.	.	T	.
-stdDisplay_Close	.text	004224D0	000001C6	00000004	00000000	R	.	.	.	.	.	.
+stdDisplay_Close	.text	004224D0	000001C6	00000004	00000000	R	.	.	.	.	T	.
 stdDisplay_SetMode	.text	004226A0	000003B0	00000010	0000000C	R	.	.	.	.	T	.
-stdDisplay_422A50	.text	00422A50	000001D4	00000008	00000000	R	.	.	.	.	.	.
+stdDisplay_422A50	.text	00422A50	000001D4	00000008	00000000	R	.	.	.	.	T	.
 stdDisplay_ClearMode	.text	00422C30	00000243	00000010	00000000	R	.	.	.	.	.	.
 stdDisplay_DrawAndFlipGdi	.text	00422E80	0000010F	00000004	00000000	R	.	.	.	.	T	.
 stdDisplay_SetCooperativeLevel	.text	00422F90	0000002F			R	.	.	.	.	.	.
@@ -593,7 +593,7 @@ stdDisplay_GammaCorrect4	.text	00423F80	00000068	00000008	00000010	R	.	.	.	.	.	.
 stdDisplay_GetPalette	.text	00423FF0	00000006			R	.	.	.	.	.	.
 stdDisplay_SetPalette	.text	00424000	000000EC	00000708	00000000	R	.	.	.	.	.	.
 stdDisplay_TextOut	.text	004240F0	000001BC	00000010	0000000C	R	.	.	.	.	.	.
-stdDisplay_FindClosestDevice	.text	004242B0	00000085	00000014	00000004	R	.	.	.	.	.	.
+stdDisplay_FindClosestDevice	.text	004242B0	00000085	00000014	00000004	R	.	.	.	.	T	.
 stdDisplay_FindClosestMode	.text	00424340	000000A4	00000014	0000000C	R	.	.	.	.	T	.
 stdDisplay_GetModeInfo	.text	004243F0	00000047	00000000	00000010	R	.	.	.	.	.	.
 stdDisplay_sub_424440	.text	00424440	0000029C	00000040	0000000C	R	.	.	.	.	.	.
@@ -911,7 +911,7 @@ stdColor_Indexed8ToRGB16	.text	00434070	00000063	00000004	0000000C	R	.	.	.	.	.	.
 stdFont_New	.text	004340E0	00000079	0000000C	00000014	R	.	.	.	.	T	.
 stdFont_Load	.text	00434160	00000319	00000054	0000000C	R	.	.	.	.	T	.
 stdFont_Write	.text	00434480	00000196	00000040	00000008	R	.	.	.	.	.	.
-stdFont_Free	.text	00434620	00000041	00000008	00000004	R	.	.	.	.	.	.
+stdFont_Free	.text	00434620	00000041	00000008	00000004	R	.	.	.	.	T	.
 stdFont_Draw1	.text	00434670	0000018E	00000024	0000001C	R	.	.	.	.	T	.
 stdFont_Draw2	.text	00434800	000001CF	00000028	0000001C	R	.	.	.	.	.	.
 stdFont_Draw3	.text	004349D0	00000392	00000028	0000001C	R	.	.	.	.	T	.
@@ -1829,13 +1829,13 @@ sithPlayer_FindPlayerByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	
 sithPlayer_DoesNetIdExist	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	T	.
 sithPlayer_sub_4C9150	.text	004C9150	00000086	0000000C	00000008	R	.	.	.	.	.	.
 sithPlayer_HandleSentDeathPkt	.text	004C91E0	00000161	00000088	00000004	R	.	.	.	.	.	.
-sithPlayer_episode_getsomevar	.text	004C9350	00000025	00000000	00000004	R	.	.	.	.	.	.
-sithPlayer_episode_setsomevar	.text	004C9380	00000029	00000000	00000008	R	.	.	.	.	T	.
+sithPlayer_GetBinAmt	.text	004C9350	00000025	00000000	00000004	R	.	.	.	.	T	.
+sithPlayer_SetBinAmt	.text	004C9380	00000029	00000000	00000008	R	.	.	.	.	T	.
 sithPlayer_sub_4C93B0	.text	004C93B0	0000003D	00000000	00000008	R	.	.	.	.	.	.
 sithPlayer_sub_4C93F0	.text	004C93F0	0000002C	00000000	00000004	R	.	.	.	.	.	.
 sithPlayer_GetNum	.text	004C9420	0000004E	00000008	00000004	R	.	.	.	.	T	.
 sithPlayer_GetNumidk	.text	004C9470	0000004A	0000000C	00000004	R	.	.	.	.	.	.
-sithPlayer_idk3	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	.	.
+sithPlayer_idk3	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	T	.
 sithPlayer_idk2	.text	004C9500	0000002C	00000000	00000004	R	.	.	.	.	.	.
 sithDplay_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.
 sithDplay_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	.

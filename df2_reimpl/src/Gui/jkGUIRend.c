@@ -210,9 +210,9 @@ void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
         {
             jkGuiElement* clickable = menu->lastMouseOverClickable;
             if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->anonymous_9 )
-                menu->clickables[idx].unistr = clickable->hintText;
+                menu->clickables[idx].str = clickable->hintText;
             else
-                menu->clickables[idx].unistr = 0;
+                menu->clickables[idx].str = 0;
             jkGuiRend_UpdateAndDrawClickable(&menu->clickables[menu->clickableIdxIdk], menu, 1);
         }
     }
@@ -1144,9 +1144,6 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
     int v10; // ebx
     int v11; // ebp
     int v12; // ebx
-    int (__cdecl *v13)(jkGuiElement *, jkGuiMenu *, int, int, int); // eax
-    int (__cdecl *v14)(jkGuiElement *, jkGuiMenu *, int, int, int); // eax
-    int (__cdecl *v15)(jkGuiElement *, jkGuiMenu *, int, int, int); // eax
     int selectedIdx; // eax
     int maxTextEntries; // esi
     int v18; // edx
@@ -1214,16 +1211,14 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
             switch ( mouseX )
             {
                 case 13:
-                    v13 = element_->func;
-                    if ( v13 )
-                        menu->lastButtonUp = v13(element_, menu, v12, v11, 1);
+                    if ( element_->func )
+                        menu->lastButtonUp = element_->func(element_, menu, v12, v11, 1);
                     break;
                 case 27:
-                    v14 = element_->func;
-                    if ( v14 )
+                    if ( element_->func )
                     {
                         element_->texInfo.anonymous_18 = 1;
-                        menu->lastButtonUp = v14(element_, menu, v12, v11, 0);
+                        menu->lastButtonUp = element_->func(element_, menu, v12, v11, 0);
                         element_->texInfo.anonymous_18 = 0;
                     }
                     break;
@@ -1248,10 +1243,9 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
             }
             if ( element_->selectedTextEntry != a1a )
             {
-                v15 = element_->func;
-                if ( v15 )
+                if ( element_->func )
                 {
-                    menu->lastButtonUp = v15(element_, menu, v12, v11, 0);
+                    menu->lastButtonUp = element_->func(element_, menu, v12, v11, 0);
                     return 0;
                 }
             }

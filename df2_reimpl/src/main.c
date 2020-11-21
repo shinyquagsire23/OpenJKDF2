@@ -21,6 +21,7 @@
 #include "General/Darray.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIForce.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -901,6 +902,29 @@ __declspec(dllexport) void hook_init(void)
     
     // jkGUI
     hook_function(jkGui_InitMenu_ADDR, jkGui_InitMenu);
+    hook_function(jkGui_MessageBeep_ADDR, jkGui_MessageBeep);
+    hook_function(jkGui_Initialize_ADDR, jkGui_Initialize);
+    hook_function(jkGui_Shutdown_ADDR, jkGui_Shutdown);
+    hook_function(jkGui_SetModeMenu_ADDR, jkGui_SetModeMenu);
+    hook_function(jkGui_SetModeGame_ADDR, jkGui_SetModeGame);
+    hook_function(jkGui_sub_412E20_ADDR, jkGui_sub_412E20);
+    hook_function(jkGui_copies_string_ADDR, jkGui_copies_string);
+    hook_function(jkGui_sub_412EC0_ADDR, jkGui_sub_412EC0);
+    hook_function(jkGui_sub_412ED0_ADDR, jkGui_sub_412ED0);
+    
+    // jkGUIForce
+    hook_function(jkGuiForce_ChoiceRemoveStar_ADDR, jkGuiForce_ChoiceRemoveStar);
+    hook_function(jkGuiForce_ChoiceRemoveStars_ADDR, jkGuiForce_ChoiceRemoveStars);
+    hook_function(jkGuiForce_LightDarkDraw_ADDR, jkGuiForce_LightDarkDraw);
+    hook_function(jkGuiForce_ExtraClick_ADDR, jkGuiForce_ExtraClick);
+    hook_function(jkGuiForce_ButtonClick_ADDR, jkGuiForce_ButtonClick);
+    hook_function(jkGuiForce_ButtonClick_ADDR, jkGuiForce_ButtonClick);
+    hook_function(jkGuiForce_ResetClick_ADDR, jkGuiForce_ResetClick);
+    hook_function(jkGuiForce_Show_ADDR, jkGuiForce_Show);
+    hook_function(jkGuiForce_Initialize_ADDR, jkGuiForce_Initialize);
+    hook_function(jkGuiForce_Shutdown_ADDR, jkGuiForce_Shutdown);
+    hook_function(jkGuiForce_UpdateViewForRank_ADDR, jkGuiForce_UpdateViewForRank);
+    hook_function(jkGuiForce_DarkLightHoverDraw_ADDR, jkGuiForce_DarkLightHoverDraw);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);

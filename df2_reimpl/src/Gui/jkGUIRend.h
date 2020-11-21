@@ -124,14 +124,19 @@ struct jkGuiElement
   int type;
   int hoverId;
   int field_8;
-  jkGuiStringEntry *unistr;
+  union
+  {
+      jkGuiStringEntry *unistr;
+      const char* str;
+      int extraInt;
+  };
   int selectedTextEntry;
   rdRect rect;
   int bIsVisible;
   int anonymous_9;
-  jkGuiStringEntry* hintText;
+  const char* hintText;
   jkGuiDrawFunc_t drawFuncOverride;
-  int (__cdecl *func)(jkGuiElement *, jkGuiMenu *, int, int, int);
+  jkGuiButtonUpFunc_t func;
   void *anonymous_13;
   jkGuiTexInfo texInfo;
   int elementIdk;

@@ -16,7 +16,23 @@
 
 typedef struct jkGuiMenu jkGuiMenu;
 typedef struct stdBitmap stdBitmap;
+typedef struct stdFont stdFont;
 
 void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap);
+int jkGui_MessageBeep();
+int jkGui_Initialize();
+void jkGui_Shutdown();
+int jkGui_SetModeMenu(const void *palette);
+void jkGui_SetModeGame();
+void jkGui_sub_412E20(jkGuiMenu* menu, int a2, int a3, int a4);
+void jkGui_copies_string(char* out);
+char *jkGui_sub_412EC0();
+wchar_t* jkGui_sub_412ED0();
+
+#define jkGui_unkstr ((char*)0x856880)
+#define jkGui_GdiMode (*(int*)0x00556020)
+#define jkGui_modesets (*(int*)0x0055603c)
+#define jkGui_stdBitmaps ((stdBitmap**)0x008567E0)
+#define jkGui_stdFonts ((stdFont**)0x008568A0)
 
 #endif // _JKGUI_H

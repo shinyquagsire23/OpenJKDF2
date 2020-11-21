@@ -19,6 +19,7 @@
 
 typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
 
+static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static void (*Window_gui_gets_vars)(int *a1, int *a2) = (void*)Window_gui_gets_vars_ADDR;
 static void (*Window_gui_sets_funcs)(int a1, int a2) = (void*)Window_gui_sets_funcs_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;

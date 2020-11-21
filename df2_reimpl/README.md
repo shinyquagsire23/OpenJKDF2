@@ -34,10 +34,12 @@ rdMath                         0x47d      0.106%        100.000%        6 / 6
 rdLight                        0x49f      0.110%        100.000%        8 / 8          
 stdFnames                      0x4ee      0.117%        100.000%       14 / 14         
 sithSprite                     0x4f1      0.117%        100.000%        6 / 6          
+jkGui                          0x4fb      0.118%        100.000%       10 / 10         
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
 stdConffile                    0x78d      0.179%        100.000%       13 / 13         
 sithTemplate                   0x79d      0.181%        100.000%       10 / 10         
+jkGuiForce                     0x9dd      0.234%        100.000%       11 / 11         
 rdParticle                     0xa0d      0.238%        100.000%       10 / 10         
 rdKeyframe                     0xa99      0.251%        100.000%        8 / 8          
 rdPolyLine                     0xb42      0.267%        100.000%        6 / 6          
@@ -71,7 +73,6 @@ stdres                         0x426      0.098%        0.000%          0 / 2
 stdGdi                         0x430      0.099%        0.000%          0 / 10         
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
 jkGuiMain                      0x4b1      0.111%        0.000%          0 / 6          
-jkGui                          0x4fb      0.118%        8.549%          1 / 10         
 jkGuiTitle                     0x4fb      0.118%        0.000%          0 / 10         
 sithMaterial                   0x4fd      0.118%        0.000%          0 / 9          
 smack                          0x50d      0.120%        0.000%          0 / 7          
@@ -107,7 +108,6 @@ jkGuiNet                       0x94e      0.221%        0.000%          0 / 10
 stdColor                       0x97e      0.225%        0.000%          0 / 11         
 stdSound                       0x9bf      0.231%        0.000%          0 / 27         
 sithSave                       0x9bf      0.231%        0.000%          0 / 7          
-jkGuiForce                     0x9dd      0.234%        0.000%          0 / 11         
 sithSound                      0xa00      0.237%        0.000%          0 / 13         
 rdMaterial                     0xa2d      0.241%        68.599%         6 / 9          
 sithSoundClass                 0xa46      0.244%        0.000%          0 / 16         
@@ -182,5 +182,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 11.922%
+Total completion: 12.264%
 ```
