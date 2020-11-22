@@ -23,6 +23,7 @@
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIEsc.h"
+#include "Gui/jkGUIDecision.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -931,6 +932,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiEsc_Startup_ADDR, jkGuiEsc_Startup);
     hook_function(jkGuiEsc_Shutdown_ADDR, jkGuiEsc_Shutdown);
     hook_function(jkGuiEsc_Show_ADDR, jkGuiEsc_Show);
+    
+    // jkGUIDecision
+    hook_function(jkGuiDecision_Initialize_ADDR, jkGuiDecision_Initialize);
+    hook_function(jkGuiDecision_Shutdown_ADDR, jkGuiDecision_Shutdown);
+    hook_function(jkGuiDecision_Show_ADDR, jkGuiDecision_Show);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);

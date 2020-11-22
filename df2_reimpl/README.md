@@ -12,12 +12,14 @@ Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (se
 ```
 [file]                         [size]     [% of text]   [% complete]  [decomp / total] 
 jkGob                          0x29       0.004%        100.000%        2 / 2          
+jkGuiDecision                  0x45       0.006%        100.000%        3 / 3          
 sithStrTable                   0x5b       0.008%        100.000%        4 / 4          
 sithCopyright                  0x67       0.010%        100.000%        1 / 1          
 jkStrings                      0x89       0.013%        100.000%        5 / 5          
 rdFace                         0xf6       0.023%        100.000%        4 / 4          
 stdHashKey                     0x107      0.024%        100.000%       10 / 10         
 rdCanvas                       0x113      0.025%        100.000%        4 / 4          
+jkGuiEsc                       0x18f      0.037%        100.000%        3 / 3          
 rdroid                         0x1f6      0.047%        100.000%       27 / 27         
 sithHeader                     0x1f9      0.047%        100.000%        1 / 1          
 sithTime                       0x213      0.049%        100.000%        6 / 6          
@@ -52,10 +54,8 @@ jkGuiRend                      0x2cd7     1.064%        100.000%       68 / 68
 sithCogThing                   0x3a4c     1.383%        100.000%      142 / 142        
 DirectX                        0x1e       0.003%        0.000%          0 / 5          
 jkUnk3                         0x41       0.006%        0.000%          0 / 2          
-jkGuiDecision                  0x45       0.006%        0.000%          0 / 3          
 jkGuiGeneral                   0xc5       0.018%        0.000%          0 / 3          
 jkGuiControlOptions            0x105      0.024%        0.000%          0 / 3          
-jkGuiEsc                       0x18f      0.037%        0.000%          0 / 3          
 stdHashtable                   0x1aa      0.039%        0.000%          0 / 2          
 gui                            0x213      0.049%        0.000%          0 / 1          
 jkGuiSingleTally               0x21b      0.050%        0.000%          0 / 4          
@@ -182,5 +182,5 @@ rdAFRaster                     0x1620d    8.398%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.331%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 12.264%
+Total completion: 12.308%
 ```

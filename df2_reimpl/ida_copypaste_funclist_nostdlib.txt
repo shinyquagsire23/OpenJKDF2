@@ -105,7 +105,7 @@ jkPlayer_SetPlayerstridk	.text	00405C10	0000001E	00000000	00000004	R	.	.	.	.	T	.
 jkPlayer_GetPlayerInfoidk	.text	00405C30	0000008E	00000008	00000014	R	.	.	.	.	T	.
 jkPlayer_sub_405CC0	.text	00405CC0	00000013	00000004	00000004	R	.	.	.	.	.	.
 jkPlayer_GetChoice	.text	00405CE0	0000000F			R	.	.	.	.	.	.
-jkPlayer_sub_405CF0	.text	00405CF0	0000013F	00000008	00000004	R	.	.	.	.	T	.
+jkPlayer_CalcDarkLightBalance	.text	00405CF0	0000013F	00000008	00000004	R	.	.	.	.	T	.
 jkPlayer_net_thingstuff	.text	00405E30	00000173	000000F0	00000004	R	.	.	.	.	.	.
 jkPlayer_MPCParse	.text	00405FB0	000002C0	000000D8	00000014	R	.	.	.	.	T	.
 jkPlayer_MPCWrite	.text	00406270	00000158	000000D4	0000000C	R	.	.	.	B	.	.
@@ -121,7 +121,7 @@ jkPlayer_ReadCutsceneConf	.text	00406C70	000000D5	00000010	00000000	R	.	.	.	.	.	
 jkPlayer_sub_406D50	.text	00406D50	00000285	00000014	00000000	R	.	.	.	.	.	.
 jkPlayer_sub_406FE0	.text	00406FE0	00000055	00000008	00000000	R	.	.	.	.	.	.
 jkPlayer_SetProtectionDeadlysight	.text	00407040	000001D0	0000001C	00000000	R	.	.	.	.	.	.
-jkPlayer_sub_407210	.text	00407210	00000103	00000008	00000004	R	.	.	.	.	.	.
+jkPlayer_sub_407210	.text	00407210	00000103	00000008	00000004	R	.	.	.	.	T	.
 jkPlayer_WriteOptionsConf	.text	00407320	00000097	00000000	00000000	R	.	.	.	.	.	.
 jkPlayer_ReadOptionsConf	.text	004073C0	00000105	00000000	00000000	R	.	.	.	.	.	.
 jkPlayer_GetJediRank	.text	004074D0	0000000F			R	.	.	.	.	T	.
@@ -364,7 +364,7 @@ jkGuiMap_sub_415B70	.text	00415B70	000000D5	0000000C	00000008	R	.	.	.	.	.	.
 jkGuiMap_Show	.text	00415C50	00000239	0000005C	00000000	R	.	.	.	.	.	.
 jkGuiForce_ChoiceRemoveStar	.text	00415E90	000000D7	0000000C	0000000C	R	.	.	.	.	T	.
 jkGuiForce_ChoiceRemoveStars	.text	00415F70	00000171	0000000C	00000004	R	.	.	.	.	T	.
-jkGuiForce_LightDarkDraw	.text	004160F0	0000014A	00000010	0000000C	R	.	.	.	.	T	.
+jkGuiForce_ForceStarsDraw	.text	004160F0	0000014A	00000010	0000000C	R	.	.	.	.	T	.
 jkGuiForce_ExtraClick	.text	00416240	00000003	00000000	00000000	R	.	.	.	.	.	.
 jkGuiForce_ButtonClick	.text	00416250	0000015A	00000014	00000008	R	.	.	.	.	T	.
 jkGuiForce_ResetClick	.text	004163B0	000000CE	00000008	00000008	R	.	.	.	.	T	.
@@ -480,12 +480,12 @@ jkGuiBuildMulti_sub_41D000	.text	0041D000	000000DB	00000014	00000008	R	.	.	.	.	.
 jkGuiBuildMulti_ShowLoad	.text	0041D0E0	00000513	0000041C	00000011	R	.	.	.	.	T	.
 jkGuiBuildMulti_sub_41D680	.text	0041D680	000001AD	00000014	00000008	R	.	.	.	.	.	.
 jkGuiBuildMulti_sub_41D830	.text	0041D830	000000C1	0000000C	00000014	R	.	.	.	.	.	.
-jkGuiSaveLoad_sub_41D900	.text	0041D900	0000003B	00000004	00000014	R	.	.	.	.	.	.
+jkGuiSaveLoad_sub_41D900	.text	0041D900	0000003B	00000004	00000014	R	.	.	.	.	T	.
 jkGuiSaveLoad_displayidk	.text	0041D940	00000316	00000020	00000004	R	.	.	.	.	.	.
 jkGuiSaveLoad_delete	.text	0041DC60	00000167	00000088	00000008	R	.	.	.	.	.	.
 jkGuiSaveLoad_listidk	.text	0041DDD0	00000205	000007D0	00000000	R	.	.	.	.	.	.
 jkGuiSaveLoad_SaveSort	.text	0041DFE0	00000029	00000000	00000008	R	.	.	.	.	T	.
-jkGuiSaveLoad_sub_41E010	.text	0041E010	00000419	00000294	00000004	R	.	.	.	.	.	.
+jkGuiSaveLoad_Show	.text	0041E010	00000419	00000294	00000004	R	.	.	.	.	.	.
 jkGuiSaveLoad_sub_41E430	.text	0041E430	0000000D	00000000	00000000	R	.	.	.	.	.	.
 jkGuiSaveLoad_Initialize	.text	0041E440	00000014			R	.	.	.	.	.	.
 jkGuiSaveLoad_Shutdown	.text	0041E460	00000001			R	.	.	.	.	.	.
@@ -1823,7 +1823,7 @@ sithPlayer_AddDynamicTint	.text	004C8C10	000000BF	00000000	0000000C	R	.	.	.	.	T	
 sithPlayer_AddDyamicAdd	.text	004C8CD0	00000060	00000000	0000000C	R	.	.	.	.	T	.
 sithPlayer_SetScreenTint	.text	004C8D30	000000DC	00000000	0000000C	R	.	.	.	.	T	.
 sithPlayer_debug_loadauto	.text	004C8E10	000000A9	00000084	00000004	R	.	.	.	.	.	.
-sithPlayer_debug_ToNextCheckpoint	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	.	.
+sithPlayer_debug_ToNextCheckpoint	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	T	.
 sithPlayer_sub_4C9060	.text	004C9060	0000005E	00000004	00000008	R	.	.	.	.	.	.
 sithPlayer_FindPlayerByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	T	.
 sithPlayer_DoesNetIdExist	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	T	.
@@ -1835,7 +1835,7 @@ sithPlayer_sub_4C93B0	.text	004C93B0	0000003D	00000000	00000008	R	.	.	.	.	.	.
 sithPlayer_sub_4C93F0	.text	004C93F0	0000002C	00000000	00000004	R	.	.	.	.	.	.
 sithPlayer_GetNum	.text	004C9420	0000004E	00000008	00000004	R	.	.	.	.	T	.
 sithPlayer_GetNumidk	.text	004C9470	0000004A	0000000C	00000004	R	.	.	.	.	.	.
-sithPlayer_idk3	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	T	.
+sithPlayer_SetBinCarries	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	T	.
 sithPlayer_idk2	.text	004C9500	0000002C	00000000	00000004	R	.	.	.	.	.	.
 sithDplay_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.
 sithDplay_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	.
