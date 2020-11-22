@@ -46,31 +46,58 @@ static stdBitmap* jkGuiForce_aBitmaps[17];
 static rdVector2i jkGuiForce_idkExtra = {16, 15};
 
 static jkGuiElement jkGuiForce_buttons[25] = {
-{ ELEMENT_TEXT,       0,  2, NULL,               3, {160, 320, 320, 30}, 1, 0, NULL,                   0,  0,                      0, {0},  0},
-{ ELEMENT_TEXT,       0,  2, NULL,               3, {10, 15, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
-{ ELEMENT_TEXT,       0,  2, NULL,               3, {10, 46, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
-{ ELEMENT_PICBUTTON,  28, 0, NULL,               0, {-1, -1, -1, -1},    1, 0, "GUI_HINT_ABSORB",      0, jkGuiForce_ButtonClick,  0, {0},  0},
-{ ELEMENT_PICBUTTON,  27, 0, NULL,               1, {-1, -1, -1, -1},    1, 0, "GUI_HINT_BLINDING",    0, jkGuiForce_ButtonClick,  0, {0},  0},
-{ ELEMENT_PICBUTTON,  33, 0, NULL,               3, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DESTRUCTION", 0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  31, 0, NULL,               4, {-1, -1, -1, -1},    1, 0, "GUI_HINT_GRIP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  25, 0, NULL,               5, {-1, -1, -1, -1},    1, 0, "GUI_HINT_HEALING",     0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  21, 0, NULL,               6, {-1, -1, -1, -1},    1, 0, "GUI_HINT_JUMP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  26, 0, NULL,               7, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PERSUASION",  0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  24, 0, NULL,               9, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PULL",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  23, 0, NULL,              10, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SEEING",      0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  22, 0, NULL,              11, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SPEED",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  30, 0, NULL,              12, {-1, -1, -1, -1},    1, 0, "GUI_HINT_THROW",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  32, 0, NULL,              13, {-1, -1, -1, -1},    1, 0, "GUI_HINT_LIGHTNING",   0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  29, 0, NULL,               8, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PROTECTION",  0, jkGuiForce_ExtraClick,   0, {0},  0}, 
-{ ELEMENT_PICBUTTON,  34, 0, NULL,               2, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DEADLYSIGHT", 0, jkGuiForce_ExtraClick,   0, {0},  0}, 
-{ ELEMENT_TEXTBUTTON,  1, 2, .str = "GUI_OK",    3, {550, 420, 80, 40},  1, 0, NULL,                   0, 0,                       0, {0},  0}, 
-{ ELEMENT_TEXTBUTTON,  0, 2, .str = "GUI_RESET", 3, {270, 350, 100, 30}, 1, 0, NULL,                   0, jkGuiForce_ResetClick,   0, {0},  0}, 
-{ ELEMENT_TEXTBUTTON, -1, 2, .str = "GUI_QUIT",  3, { 0, 420, 100, 40},  1, 0, NULL,                   0,  0,                      0, {0},  0}, 
-{ ELEMENT_CUSTOM,      0, 0, NULL,               0, { 0, 390, 640, 30},  1, 0, NULL,            jkGuiForce_ForceStarsDraw,     0,  0, {0},  0}, 
-{ ELEMENT_CUSTOM,      0, 0, NULL,               0, {320, 418, 170, 40}, 1, 0, "GUI_DARKSIDE",  jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
-{ ELEMENT_CUSTOM,      0, 0, NULL,               0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
-{ ELEMENT_SLIDER,      0, 0, .extraInt = 200,  100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
-{ ELEMENT_END,         0, 0, NULL,               0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}
+    { ELEMENT_TEXT,       0,  2, NULL,               
+     3, {160, 320, 320, 30}, 1, 0, NULL,                   0,  0,                      0, {0},  0},
+    { ELEMENT_TEXT,       0,  2, NULL,               
+     3, {10, 15, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
+    { ELEMENT_TEXT,       0,  2, NULL,               
+     3, {10, 46, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
+
+    { ELEMENT_PICBUTTON,  SITHBIN_F_ABSORB, 0, NULL,               
+      0, {-1, -1, -1, -1},    1, 0, "GUI_HINT_ABSORB",      0, jkGuiForce_ButtonClick,  0, {0},  0},
+    { ELEMENT_PICBUTTON,  SITHBIN_F_BLINDING, 0, NULL,               
+      1, {-1, -1, -1, -1},    1, 0, "GUI_HINT_BLINDING",    0, jkGuiForce_ButtonClick,  0, {0},  0},
+    { ELEMENT_PICBUTTON,  SITHBIN_F_DESTRUCTION, 0, NULL,               
+      3, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DESTRUCTION", 0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_GRIP, 0, NULL,               
+      4, {-1, -1, -1, -1},    1, 0, "GUI_HINT_GRIP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_HEALING, 0, NULL,               
+      5, {-1, -1, -1, -1},    1, 0, "GUI_HINT_HEALING",     0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_JUMP, 0, NULL,               
+      6, {-1, -1, -1, -1},    1, 0, "GUI_HINT_JUMP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_PERSUASION, 0, NULL,               
+      7, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PERSUASION",  0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_PULL, 0, NULL,               
+      9, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PULL",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_SEEING, 0, NULL,              
+     10, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SEEING",      0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_SPEED, 0, NULL,              
+     11, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SPEED",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_THROW,       0, NULL,              
+     12, {-1, -1, -1, -1},    1, 0, "GUI_HINT_THROW",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_LIGHTNING,   0, NULL,              
+     13, {-1, -1, -1, -1},    1, 0, "GUI_HINT_LIGHTNING",   0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_PROTECTION,  0, NULL,               
+      8, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PROTECTION",  0, jkGuiForce_ExtraClick,   0, {0},  0}, 
+    { ELEMENT_PICBUTTON,  SITHBIN_F_DEADLYSIGHT, 0, NULL,               
+      2, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DEADLYSIGHT", 0, jkGuiForce_ExtraClick,   0, {0},  0}, 
+
+    { ELEMENT_TEXTBUTTON,  1, 2, .str = "GUI_OK",    
+      3, {550, 420, 80, 40},  1, 0, NULL,                   0, 0,                       0, {0},  0}, 
+    { ELEMENT_TEXTBUTTON,  0, 2, .str = "GUI_RESET", 
+      3, {270, 350, 100, 30}, 1, 0, NULL,                   0, jkGuiForce_ResetClick,   0, {0},  0}, 
+    { ELEMENT_TEXTBUTTON, -1, 2, .str = "GUI_QUIT",  
+      3, { 0, 420, 100, 40},  1, 0, NULL,                   0,  0,                      0, {0},  0}, 
+    { ELEMENT_CUSTOM,      0, 0, NULL,               
+      0, { 0, 390, 640, 30},  1, 0, NULL,            jkGuiForce_ForceStarsDraw,     0,  0, {0},  0}, 
+    { ELEMENT_CUSTOM,      0, 0, NULL,               
+      0, {320, 418, 170, 40}, 1, 0, "GUI_DARKSIDE",  jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
+    { ELEMENT_CUSTOM,      0, 0, NULL,               
+      0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
+    { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
+    100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
+    { ELEMENT_END,         0, 0, NULL,               
+      0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}
 };
 
 static jkGuiMenu jkGuiForce_menu =
@@ -88,7 +115,7 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
     {
         jkGuiRend_PlayWav("ForceBlind01.wav");
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    jkGuiForce_buttons[23].selectedTextEntry = 100 - ((int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
 
     for (int i = 3; i < 17; i++)
     {
@@ -116,10 +143,10 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
         for (int i = beginIdx; i < endIdx; i++)
         {
             sithPlayer_SetBinCarries(i, 0);
-            int v2 = (int)sithPlayer_GetBinAmt(i);
-            if (v2 > 0)
+            int curAmt = (int)sithPlayer_GetBinAmt(i);
+            if (curAmt > 0)
             {
-                jkGuiForce_ChoiceRemoveStar(menu, i, v2);
+                jkGuiForce_ChoiceRemoveStar(menu, i, curAmt);
                 return;
             }
         }
@@ -130,11 +157,11 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
         }
         else if ( jkGuiForce_alignment == 1 )
         {
-            jkPlayer_sub_405CC0(1);
+            jkPlayer_sub_405CC0(jkGuiForce_alignment);
         }
 
         jkGuiForce_alignment = 0;
-        jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcDarkLightBalance(0.0);
+        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(0.0);
         for (int i = 3; i < 17; i++)
         {
             int id = jkGuiForce_buttons[i].hoverId;
@@ -195,15 +222,13 @@ int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
 
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
 {
-    float v8; // ST04_4
-    signed int v9; // eax
-    int v12; // ecx
-
-    int binIdx = element->hoverId;
     if ( !jkGuiForce_bCanSpendStars )
         return 0;
+
+    int binIdx = element->hoverId;
     int spendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
     int curLevel = (int)sithPlayer_GetBinAmt(binIdx);
+
     if ( curLevel < 4 && spendStars > 0 )
     {
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars - 1));
@@ -216,22 +241,15 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
     {
         if ( curLevel == 4 || !spendStars )
         {
-            v8 = (double)(spendStars + curLevel);
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, v8);
+            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars + curLevel));
             sithPlayer_SetBinAmt(binIdx, 0.0);
             jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
         }
-        jkPlayer_SetProtectionDeadlysight();
-        v9 = jkPlayer_GetJediRank();
-        if ( v9 >= 7 )
-            jkPlayer_sub_407210(v9);
-        for (int i = 3; i < 17; i++)
-        {
-            int id = jkGuiForce_buttons[i].hoverId;
-            jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
-        }
+
+        jkGuiForce_UpdateViewForRank();
         jkGuiRend_Paint(menu);
     }
+
     return 0;
 }
 
@@ -248,14 +266,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
 
     if (jkGuiForce_darkLightBalance != 0.0)
     {
-        jkPlayer_SetProtectionDeadlysight();
-        if ( jkPlayer_GetJediRank() >= 7 )
-            jkPlayer_sub_407210(jkPlayer_GetJediRank());
-        for (int i = 3; i < 17; i++)
-        {
-            int id = jkGuiForce_buttons[i].hoverId;
-            jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
-        }
+        jkGuiForce_UpdateViewForRank();
     }
     jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
     jkGuiRend_Paint(menu);
@@ -264,25 +275,20 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
 
 int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5, int *pbIsLight, int bEnableIdk)
 {
-    int jediRank; // ebx
-    int newStars; // esi
-    int spendStars; // edi
-    float totalStars; // ST10_4
-    int v21; // eax
-    int isLight; // [esp+14h] [ebp-4h]
-    float darklight_float; // [esp+1Ch] [ebp+4h]
+    int newStars;
+    int spendStars;
 
-    //bCanSpendStars = 1;
-    //bEnableIdk = 1;
-
-    isLight = 1;
+    int isLight = 1;
     jkGuiForce_bCanSpendStars = bCanSpendStars;
-    jkGuiForce_buttons[18].bIsVisible = bCanSpendStars;    
     jkGuiForce_darkLightBalance = darkLightBalance;
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[9]->palette);
+    
     jkGuiForce_buttons[1].unistr = jkPlayer_playerShortName;
-    darklight_float = jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    jkGuiForce_buttons[18].bIsVisible = bCanSpendStars;
     jkGuiForce_buttons[19].bIsVisible = bEnableIdk != 0;
+
+    float darklight_float = jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
 
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
     jkGuiForce_buttons[2].unistr = jkStrings_GetText(std_genBuffer);
@@ -291,8 +297,7 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
         spendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
         sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0.0);
-        totalStars = (double)(newStars + spendStars);
-        sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, totalStars);
+        sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(newStars + spendStars));
     }
     jkGuiForce_numSpendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
     jkGuiForce_buttons[23].bIsVisible = 1;
@@ -341,15 +346,16 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
     }
     jkGuiRend_MenuSetLastElement(&jkGuiForce_menu, &jkGuiForce_buttons[17]);
 
+    int clicked;
     while (1)
     {
-        v21 = jkGuiRend_DisplayAndReturnClicked(&jkGuiForce_menu);
-        if ( v21 == -1 )
+        clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiForce_menu);
+        if ( clicked == -1 )
         {
             if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_ABORT_GAME"), jkStrings_GetText("GUI_CONFIRM_ABORTCD")) )
                 continue;
         }
-        else if ( v21 != 1 )
+        else if ( clicked != 1 )
         {
             continue;
         }
@@ -366,7 +372,7 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
     if ( pbIsLight )
         *pbIsLight = isLight;
 
-    return v21;
+    return clicked;
 }
 
 void jkGuiForce_Initialize()
