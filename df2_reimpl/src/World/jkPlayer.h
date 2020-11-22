@@ -15,6 +15,7 @@
 #define jkPlayer_SetAccessiblePowers_ADDR (0x406860)
 #define jkPlayer_SetProtectionDeadlysight_ADDR (0x407040)
 #define jkPlayer_GetAlignment_ADDR (0x406570)
+#define jkPlayer_LoadAutosave_ADDR (0x404600)
 
 typedef struct sithSurface sithSurface;
 
@@ -83,5 +84,6 @@ static int (*jkPlayer_sub_407210)() = (void*)jkPlayer_sub_407210_ADDR;
 static void (*jkPlayer_sub_405CC0)(signed int a1) = (void*)jkPlayer_sub_405CC0_ADDR;
 static double (*jkPlayer_CalcDarkLightBalance)(float a1) = (void*)jkPlayer_CalcDarkLightBalance_ADDR;
 static void (__cdecl *jkPlayer_renderSaberTwinkle)(sithThing *a1) = (void*)jkPlayer_renderSaberTwinkle_ADDR;
+static int (*jkPlayer_LoadAutosave)() = (void*)jkPlayer_LoadAutosave_ADDR;
 
 #endif // _JK_PLAYER_H

@@ -115,7 +115,7 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
     {
         jkGuiRend_PlayWav("ForceBlind01.wav");
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - ((int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
 
     for (int i = 3; i < 17; i++)
     {
