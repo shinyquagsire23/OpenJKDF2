@@ -5,6 +5,8 @@
 #define jk_MissionReload_ADDR (0x00403440)
 #define jk_sub_403470_ADDR (0x00403470)
 #define jk_sub_4034D0_ADDR (0x004034D0)
+#define jk_loadFile_ADDR (0x00403570)
+#define jk_loadFile2_ADDR (0x004035F0)
 #define jk_SwitchTo5_2_ADDR (0x004036B0)
 #define jk_SwitchTo5_ADDR (0x004036F0)
 #define jk_SwitchTo12_ADDR (0x00403740)
@@ -44,5 +46,7 @@
 
 static int (*jk_MissionReload)() = (void*)jk_MissionReload_ADDR;
 static int (*jk_MenuReturn)() = (void*)jk_MenuReturn_ADDR;
+static int (*jk_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;
+static int (*jk_sub_403470)(char *a1) = (void*)jk_sub_403470_ADDR;
 
 #endif // _MAINJK_H

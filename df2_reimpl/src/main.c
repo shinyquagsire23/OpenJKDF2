@@ -24,6 +24,7 @@
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUIDecision.h"
+#include "Gui/jkGUISingleplayer.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -764,6 +765,19 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithTemplate_CreateEntry_ADDR, sithTemplate_CreateEntry);
     
     // jkPlayer
+    hook_function(jkPlayer_LoadAutosave_ADDR, jkPlayer_LoadAutosave);
+    hook_function(jkPlayer_LoadSave_ADDR, jkPlayer_LoadSave);
+    hook_function(jkPlayer_Startup_ADDR, jkPlayer_Startup);
+    hook_function(jkPlayer_Shutdown_ADDR, jkPlayer_Shutdown);
+    hook_function(jkPlayer_nullsub_29_ADDR, jkPlayer_nullsub_29);
+    hook_function(jkPlayer_nullsub_30_ADDR, jkPlayer_nullsub_30);
+    hook_function(jkPlayer_InitSaber_ADDR, jkPlayer_InitSaber);
+    hook_function(jkPlayer_InitThings_ADDR, jkPlayer_InitThings);
+    hook_function(jkPlayer_nullsub_1_ADDR, jkPlayer_nullsub_1);
+    hook_function(jkPlayer_CreateConf_ADDR, jkPlayer_CreateConf);
+    hook_function(jkPlayer_WriteConf_ADDR, jkPlayer_WriteConf);
+    hook_function(jkPlayer_ReadConf_ADDR, jkPlayer_ReadConf);
+    hook_function(jkPlayer_SetPovModel_ADDR, jkPlayer_SetPovModel);
     hook_function(jkPlayer_renderSaberWeaponMesh_ADDR, jkPlayer_renderSaberWeaponMesh);
     
     // jkSaber
@@ -937,6 +951,15 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiDecision_Initialize_ADDR, jkGuiDecision_Initialize);
     hook_function(jkGuiDecision_Shutdown_ADDR, jkGuiDecision_Shutdown);
     hook_function(jkGuiDecision_Show_ADDR, jkGuiDecision_Show);
+    
+    // jkGUISingleplayer
+    hook_function(jkGuiSingleplayer_Initialize_ADDR, jkGuiSingleplayer_Initialize);
+    hook_function(jkGuiSingleplayer_Shutdown_ADDR, jkGuiSingleplayer_Shutdown);
+    hook_function(jkGuiSingleplayer_Show_ADDR, jkGuiSingleplayer_Show);
+    hook_function(jkGuiSingleplayer_sub_41A9B0_ADDR, jkGuiSingleplayer_sub_41A9B0);
+    hook_function(jkGuiSingleplayer_sub_41AA30_ADDR, jkGuiSingleplayer_sub_41AA30);
+    hook_function(jkGuiSingleplayer_sub_41AC70_ADDR, jkGuiSingleplayer_sub_41AC70);
+    hook_function(jkGuiSingleplayer_sub_41AD00_ADDR, jkGuiSingleplayer_sub_41AD00);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);

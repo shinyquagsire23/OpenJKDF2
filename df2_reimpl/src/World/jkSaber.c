@@ -12,7 +12,7 @@
 #include "Engine/sithPuppet.h"
 #include "World/sithSector.h"
 #include "World/sithUnk3.h"
-#include "Main/jkGame.h"
+#include "Main/jkMain.h"
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)
@@ -51,18 +51,18 @@ void jkSaber_PolylineRand(rdThing *thing)
 void jkSaber_Draw(rdMatrix34 *posRotMat)
 {
     if ( playerThings[playerThingIdx].spawnedSparks->jkFlags & JKFLAG_SABERON
-      && playerThings[playerThingIdx].field_4C.model3
+      && playerThings[playerThingIdx].povModel.model3
       && playerThings[playerThingIdx].polylineThing.model3 )
     {
-        if ( playerThings[playerThingIdx].field_4C.frameTrue != rdroid_frameTrue )
+        if ( playerThings[playerThingIdx].povModel.frameTrue != rdroid_frameTrue )
         {
-            rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].field_4C, posRotMat);
+            rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, posRotMat);
         }
 
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
-        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].field_4C.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
+        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
         //if (thing->jkFlags & JKFLAG_DUALSABERS)
-        //    rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].field_4C.hierarchyNodeMatrices[2]); // K_Lhand
+        //    rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]); // K_Lhand
     }
 }
 
@@ -149,7 +149,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
     matrix.scale.x = player->position.x;
     matrix.scale.y = player->position.y;
     matrix.scale.z = player->position.z;
-    if ( jkGame_GetCurrentGuiState() == 6 )
+    if ( jkSmack_GetCurrentGuiState() == 6 )
         rdPuppet_BuildJointMatrices(&player->rdthing, &matrix);
     if ( !rdModel3_GetMeshMatrix(&player->rdthing, &matrix, joint, &jointMat) )
         return;

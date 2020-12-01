@@ -113,6 +113,7 @@ typedef struct rdPuppet
     rdPuppetTrack tracks[4];
 } rdPuppet;
 
+static rdPuppet* (*rdPuppet_New)(rdThing *thing) = (void*)rdPuppet_New_ADDR;
 static void (__cdecl *rdPuppet_Free)(void* pup) = (void*)rdPuppet_Free_ADDR;
 static void (__cdecl *rdPuppet_BuildJointMatrices)(rdThing *thing_1, rdMatrix34 *matrix) = (void*)rdPuppet_BuildJointMatrices_ADDR;
 

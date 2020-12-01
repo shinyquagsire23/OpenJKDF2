@@ -16,9 +16,6 @@
 #define jkGame_Initialize_ADDR (0x00402820)
 #define jkGame_Shutdown_ADDR (0x00402840)
 #define jkGame_ParseSection_ADDR (0x00402850)
-#define jkGame_GetCurrentGuiState_ADDR (0x00402C00)
-#define jkGame_SetVideoMode_ADDR (0x00402D00)
-#define jkGame_SetVideoModeGdi_ADDR (0x00402E40)
 
 typedef struct sithThing sithThing;
 
@@ -27,9 +24,9 @@ typedef struct sithThing sithThing;
 #define g_sithMode (*(int*)0x8EE660)
 #define g_submodeFlags (*(int*)0x8EE664)
 #define g_debugmodeFlags (*(int*)0x8EE66C)
-#define g_playersetDifficulty (*(int*)0x8EE670)
+//#define g_playersetDifficulty (*(int*)0x8EE670)
 #define g_mapModeFlags (*(int*)0x8EE674)
 
-static int (*jkGame_GetCurrentGuiState)() = (void*)jkGame_GetCurrentGuiState_ADDR;
+static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
 
 #endif // _JKGAME_H

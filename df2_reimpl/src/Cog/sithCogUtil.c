@@ -540,7 +540,7 @@ void sithCogUtil_GetFlexGameTime(sithCog *ctx)
 
 void sithCogUtil_GetDifficulty(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, g_playersetDifficulty);
+    sithCogVm_PushInt(ctx, jkPlayer_setDiff);
 }
 
 void sithCogUtil_SetSubmodeFlags(sithCog *ctx)

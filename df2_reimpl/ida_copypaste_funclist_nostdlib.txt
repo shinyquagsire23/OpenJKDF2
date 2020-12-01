@@ -42,8 +42,8 @@ jk_MenuReturn	.text	00403410	00000024			R	.	.	.	.	.	.
 jk_MissionReload	.text	00403440	00000024			R	.	.	.	.	.	.
 jk_sub_403470	.text	00403470	00000053	00000000	00000004	R	.	.	.	.	T	.
 jk_sub_4034D0	.text	004034D0	0000009C	00000004	00000010	R	.	.	.	.	T	.
-idk_loadfile	.text	00403570	00000078	00000004	00000004	R	.	.	.	.	T	.
-idk_loadfile2	.text	004035F0	000000B5	0000000C	00000008	R	.	.	.	.	T	.
+jk_loadFile	.text	00403570	00000078	00000004	00000004	R	.	.	.	.	T	.
+jk_loadFile2	.text	004035F0	000000B5	0000000C	00000008	R	.	.	.	.	T	.
 jk_SwitchTo5_2	.text	004036B0	00000033	00000000	00000000	R	.	.	.	.	.	.
 jk_SwitchTo5	.text	004036F0	00000049	00000000	00000004	R	.	.	.	.	.	.
 jk_SwitchTo12	.text	00403740	00000024			R	.	.	.	.	.	.
@@ -242,19 +242,19 @@ jkSaber_cogMsg_HandleSetTeam	.text	0040D450	000000BB	00000004	00000004	R	.	.	.	.
 jkEpisode_Startup	.text	0040D510	00000013			R	.	.	.	.	.	.
 jkEpisode_Shutdown	.text	0040D530	00000001	00000000	00000000	R	.	.	.	.	.	.
 jkEpisode_UpdateExtra	.text	0040D540	00000017	00000000	00000004	R	.	.	.	.	T	.
-jkEpisode_Load	.text	0040D560	000006ED	00000158	00000004	R	.	.	.	.	.	.
+jkEpisode_Load	.text	0040D560	000006ED	00000158	00000004	R	.	.	.	.	T	.
 jkEpisode_idk1	.text	0040DC50	00000010	00000000	00000004	R	.	.	.	.	.	.
 jkEpisode_idk2	.text	0040DC60	00000069	00000010	00000008	R	.	.	.	.	.	.
 jkEpisode_EndLevel	.text	0040DCD0	0000003A	00000008	00000008	R	.	.	.	.	.	.
 jkEpisode_idk4	.text	0040DD10	00000052	00000010	00000008	R	.	.	.	.	T	.
-jkEpisode_load_verify_idk	.text	0040DD70	0000053E	000001E0	00000000	R	.	.	.	.	.	.
+jkEpisode_LoadVerify	.text	0040DD70	0000053E	000001E0	00000000	R	.	.	.	.	.	.
 jkEpisode_idk6	.text	0040E2B0	0000007E	0000000C	00000004	R	.	.	.	.	.	.
 jkGob_Startup	.text	0040E330	00000019			R	.	.	.	.	.	.
 jkGob_Shutdown	.text	0040E350	00000010			R	.	.	.	.	T	.
 jkRes_Startup	.text	0040E360	0000012D	00000000	00000004	R	.	.	.	.	T	.
 jkRes_Shutdown	.text	0040E490	000000CE			R	.	.	.	.	.	.
 jkRes_New	.text	0040E560	00000050	00000008	00000004	R	.	.	.	.	.	.
-jkRes_idk2_gobfile	.text	0040E5B0	000003CF	00000090	00000004	R	.	.	.	.	T	.
+jkRes_LoadGob	.text	0040E5B0	000003CF	00000090	00000004	R	.	.	.	.	T	.
 jkRes_LoadCd	.text	0040E980	000000A7	0000008C	00000004	R	.	.	.	.	T	.
 jkRes_HookHS	.text	0040EA30	00000062			R	.	.	.	.	.	.
 jkRes_UnhookHS	.text	0040EAA0	00000078			R	.	.	.	.	T	.
@@ -412,8 +412,8 @@ jkGuiTitle_Initialize	.text	00418960	00000028			R	.	.	.	.	.	.
 jkGuiTitle_Shutdown	.text	00418990	00000001			R	.	.	.	.	.	.
 jkGuiTitle_sub_4189A0	.text	004189A0	00000023	00000004	00000004	R	.	.	.	.	.	.
 jkGuiTitle_quicksave_related_func1	.text	004189D0	000000C4	0000008C	00000008	R	.	.	.	.	T	.
-jkGuiTitle_sub_418AA0	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	.
-jkGuiTitle_sub_418B90	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	T	.
+jkGuiTitle_UnkDraw	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	.
+jkGuiTitle_LoadBarDraw	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	T	.
 jkGuiTitle_WorldLoadCallback	.text	00418C60	00000085	00000000	00000004	R	.	.	.	.	.	.
 jkGuiTitle_sub_418CF0	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.
 jkGuiTitle_gui_level_texts	.text	00418D80	00000121	0000008C	00000008	R	.	.	.	.	T	.
@@ -441,10 +441,10 @@ jkGuiDecision_Show	.text	0041A410	00000030	00000004	00000000	R	.	.	.	.	.	.
 jkGuiSingleplayer_Initialize	.text	0041A440	00000050			R	.	.	.	.	.	.
 jkGuiSingleplayer_Shutdown	.text	0041A490	00000001			R	.	.	.	.	.	.
 jkGuiSingleplayer_Show	.text	0041A4A0	0000050D	000001D8	00000000	R	.	.	.	.	.	.
-sub_41A9B0	.text	0041A9B0	00000077	0000000C	00000010	R	.	.	.	.	.	.
-sub_41AA30	.text	0041AA30	00000232	000001B4	00000020	R	.	.	.	.	.	.
-sub_41AC70	.text	0041AC70	0000008F	00000020	0000000C	R	.	.	.	.	.	.
-sub_41AD00	.text	0041AD00	00000042	0000000C	00000004	R	.	.	.	.	.	.
+jkGuiSingleplayer_sub_41A9B0	.text	0041A9B0	00000077	0000000C	00000010	R	.	.	.	.	T	.
+jkGuiSingleplayer_sub_41AA30	.text	0041AA30	00000232	000001B4	00000020	R	.	.	.	.	T	.
+jkGuiSingleplayer_sub_41AC70	.text	0041AC70	0000008F	00000020	0000000C	R	.	.	.	.	T	.
+jkGuiSingleplayer_sub_41AD00	.text	0041AD00	00000042	0000000C	00000004	R	.	.	.	.	T	.
 nullsub_51	.text	0041AD50	00000001	00000000	00000000	R	.	.	.	.	.	.
 jkGuiJoystick_sub_41AD60	.text	0041AD60	00000066	0000000C	00000014	R	.	.	.	.	.	.
 jkGuiJoystick_sub_41ADD0	.text	0041ADD0	0000044A	00000018	00000008	R	.	.	.	.	.	.
@@ -864,7 +864,7 @@ stdConffile_ReadArgs	.text	004315C0	0000008F	00000010	00000000	R	.	.	.	.	.	.
 stdConffile_ReadLine	.text	00431650	000000D2	00000010	00000000	R	.	.	.	.	.	.
 stdConffile_GetFileHandle	.text	00431730	00000006			R	.	.	.	.	.	.
 stdFileUtil_NewFind	.text	00431740	00000094	00000004	0000000C	R	.	.	.	.	T	.
-stdFileUtil_DisposeFind	.text	004317E0	00000032	00000004	00000004	R	.	.	.	.	.	.
+stdFileUtil_DisposeFind	.text	004317E0	00000032	00000004	00000004	R	.	.	.	.	T	.
 stdFileUtil_FindReset	.text	00431820	0000002C	00000004	00000004	R	.	.	.	.	.	.
 stdFileUtil_FindNext	.text	00431850	000000B5	00000120	00000008	R	.	.	.	.	T	.
 stdFileUtil_FindQuick	.text	00431910	0000015B	00000124	00000010	R	.	.	.	.	.	.

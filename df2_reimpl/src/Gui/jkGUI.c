@@ -139,7 +139,7 @@ int jkGui_Initialize()
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
     }
 
-    Window_ShowCursorUnwindowed(Main_dword_860788 == 0);
+    Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);
     jkGuiRend_SetPalette(jkGui_stdBitmaps[0]->palette);
     jkGui_bInitialized = 1;
     return 1;
@@ -207,7 +207,7 @@ int jkGui_SetModeMenu(const void *palette)
     ++jkGui_modesets;
     if ( jkGui_GdiMode )
         return 0;
-    params.field_10 = Main_dword_860788 == 0;
+    params.field_10 = Main_bWindowGUI == 0;
     v2 = stdDisplay_FindClosestDevice(&params);
     v3 = 1;
     if ( stdDisplay_bOpen )
@@ -225,7 +225,7 @@ int jkGui_SetModeMenu(const void *palette)
         return 0;
     }
 
-    if ( Main_dword_860788 )
+    if ( Main_bWindowGUI )
         Window_ShowCursorUnwindowed(0);
     else
         Window_ShowCursorUnwindowed(1);

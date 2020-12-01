@@ -1,19 +1,29 @@
 #ifndef _STDFILEUTIL_H
 #define _STDFILEUTIL_H
 
-/*
-stdFileUtil_NewFind	.text	00431740	00000094	00000004	0000000C	R	.	.	.	.	T	.
-stdFileUtil_DisposeFind	.text	004317E0	00000032	00000004	00000004	R	.	.	.	.	.	.
-stdFileUtil_FindReset	.text	00431820	0000002C	00000004	00000004	R	.	.	.	.	.	.
-stdFileUtil_FindNext	.text	00431850	000000B5	00000120	00000008	R	.	.	.	.	T	.
-stdFileUtil_FindQuick	.text	00431910	0000015B	00000124	00000010	R	.	.	.	.	.	.
-stdFileUtil_CountMatches	.text	00431A70	00000145	00000238	0000000C	R	.	.	.	.	.	.
-stdFileUtil_MkDir	.text	00431BC0	0000000E	00000000	00000004	R	.	.	.	.	T	.
-stdFileUtil_DirExists	.text	00431BD0	00000026	00000140	00000004	R	.	.	.	.	.	.
-stdFileUtil_RmDir	.text	00431C00	0000000C	00000000	00000004	R	.	.	.	.	.	.
-stdFileUtil_DelFile	.text	00431C10	0000000C	00000000	00000004	R	.	.	.	.	T	.
-stdFileUtil_Deltree	.text	00431C20	000001F4	00000258	00000004	R	.	.	.	.	T	.
+#define stdFileUtil_NewFind_ADDR (0x00431740)
+#define stdFileUtil_DisposeFind_ADDR (0x004317E0)
+#define stdFileUtil_FindReset_ADDR (0x00431820)
+#define stdFileUtil_FindNext_ADDR (0x00431850)
+#define stdFileUtil_FindQuick_ADDR (0x00431910)
+#define stdFileUtil_CountMatches_ADDR (0x00431A70)
+#define stdFileUtil_MkDir_ADDR (0x00431BC0)
+#define stdFileUtil_DirExists_ADDR (0x00431BD0)
+#define stdFileUtil_RmDir_ADDR (0x00431C00)
+#define stdFileUtil_DelFile_ADDR (0x00431C10)
+#define stdFileUtil_Deltree_ADDR (0x00431C20)
 
-*/
+typedef struct stdFileSearch
+{
+  int field_0;
+  int field_4;
+  char path[128];
+  int field_88;
+} stdFileSearch;
+
+static int (*stdFileUtil_MkDir)(char* lpPathName) = (void*)stdFileUtil_MkDir_ADDR;
+static stdFileSearch* (*stdFileUtil_NewFind)(char *path, int a2, char *extension) = (void*)stdFileUtil_NewFind_ADDR;
+static int (*stdFileUtil_FindNext)(stdFileSearch *a1, char *a2) = (void*)stdFileUtil_FindNext_ADDR;
+static void (*stdFileUtil_DisposeFind)(stdFileSearch *a1) = (void*)stdFileUtil_DisposeFind_ADDR;
 
 #endif // _STDFILEUTIL_H

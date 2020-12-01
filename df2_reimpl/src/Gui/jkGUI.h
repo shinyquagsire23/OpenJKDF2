@@ -14,9 +14,17 @@
 #define jkGui_sub_412EC0_ADDR (0x00412EC0)
 #define jkGui_sub_412ED0_ADDR (0x00412ED0)
 
+enum jkGUIButtonID_t
+{
+    JKGUI_NEWGAME = 100,
+    JKGUI_LOAD = 101,
+    JKGUI_DEBUGPLAY = 102
+};
+
 typedef struct jkGuiMenu jkGuiMenu;
 typedef struct stdBitmap stdBitmap;
 typedef struct stdFont stdFont;
+typedef struct jkEpisodeLoad jkEpisodeLoad;
 
 void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap);
 int jkGui_MessageBeep();
@@ -34,5 +42,6 @@ wchar_t* jkGui_sub_412ED0();
 #define jkGui_modesets (*(int*)0x0055603c)
 #define jkGui_stdBitmaps ((stdBitmap**)0x008567E0)
 #define jkGui_stdFonts ((stdFont**)0x008568A0)
+#define jkGui_episodeLoad (*(jkEpisodeLoad*)0x00556028)
 
 #endif // _JKGUI_H

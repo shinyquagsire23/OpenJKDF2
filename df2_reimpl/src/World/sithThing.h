@@ -532,7 +532,7 @@ typedef struct sithThing
     uint32_t field_258;
     uint32_t goalframe;
     uint32_t field_260;
-    uint32_t field_264;
+    float waggle;
     rdVector3 field_268;
     void* ai;
     void* actor;

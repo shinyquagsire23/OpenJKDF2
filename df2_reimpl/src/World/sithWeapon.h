@@ -81,5 +81,7 @@ static float (*sithWeapon_GetPriority)(sithThing *player, int binIdx, int mode) 
 static int (*sithWeapon_GetCurWeaponMode)() = (void*)sithWeapon_GetCurWeaponMode_ADDR;
 static void (*sithWeapon_SetFireRate)(sithThing *a1, float fireRate) = (void*)sithWeapon_SetFireRate_ADDR;
 static sithThing* (*sithWeapon_FireProjectile)(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, __int16 scaleFlags, float autoaimFov, float autoaimMaxDist) = (void*)sithWeapon_FireProjectile_ADDR;
+static int (*sithWeapon_WriteConf)() = (void*)sithWeapon_WriteConf_ADDR;
+static int (*sithWeapon_ReadConf)() = (void*)sithWeapon_ReadConf_ADDR;
 
 #endif // _SITHWEAPON_H

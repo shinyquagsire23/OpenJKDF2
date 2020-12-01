@@ -66,6 +66,8 @@
 #define sithInventory_SetBinWait_ADDR (0x004D32F0)
 #define sithInventory_SelectPower_ADDR (0x004D3330)
 
+typedef struct stdBitmap stdBitmap;
+
 enum SITHBIN
 {
     SITHBIN_NONE     = 0,
@@ -187,7 +189,7 @@ typedef struct sithItemDescriptor
     sithCog* cog;
     uint32_t field_90;
     uint32_t field_94;
-    uint32_t used_in_render;
+    stdBitmap* hudBitmap;
 } sithItemDescriptor;
 
 typedef struct sithItemInfo

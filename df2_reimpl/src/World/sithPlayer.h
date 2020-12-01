@@ -59,7 +59,7 @@ typedef struct sithPlayerInfo
     int curItem;
     int curWeapon;
     int curPower;
-    sithItemInfo field_1354;
+    int field_1354;
     sithThing* playerThing;
     uint32_t field_135C;
     uint32_t field_1360;
