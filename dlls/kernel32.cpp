@@ -76,6 +76,8 @@ uint32_t Kernel32::CloseHandle(uint32_t handle)
 {
     printf("STUB: CloseHandle %x\n", handle);
     
+    _lclose(handle);
+    
     return 1;
 }
 
