@@ -252,6 +252,7 @@ enum THING_TYPEFLAGS
 typedef struct sithThing sithThing; 
 typedef struct sithCog sithCog;
 typedef struct sithPuppet sithPuppet;
+typedef struct jkPlayerInfo jkPlayerInfo;
 
 typedef struct sithThingParticleParams
 {
@@ -539,7 +540,7 @@ typedef struct sithThing
     char template_name[32];
     sithCog* class_cog;
     sithCog* capture_cog;
-    void* saberInfo;
+    jkPlayerInfo* playerInfo;
     uint32_t jkFlags;
     float userdata;
 } sithThing;

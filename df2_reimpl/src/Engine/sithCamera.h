@@ -25,6 +25,16 @@
 #define sithCamera_SetState_ADDR (0x004C6160)
 #define sithCamera_GetState_ADDR (0x004C6170)
 
+typedef struct rdColormap rdColormap;
+
+typedef struct sithCameraRenderInfo
+{
+    uint32_t field_0;
+    float field_4;
+    float field_8;
+    rdColormap* colormap;
+} sithCameraRenderInfo;
+
 typedef struct sithCamera
 {
     uint32_t cameraPerspective;
@@ -33,10 +43,10 @@ typedef struct sithCamera
     float floatC;
     sithThing* primaryFocus;
     sithThing* secondaryFocus;
-    float* unk_struct;
+    sithCameraRenderInfo* renderInfo;
     rdVector3 vec3_3;
     rdVector3 vec3_4;
-    rdMatrix34 matrix_4_3_idk;
+    rdMatrix34 viewMat;
     rdVector3 vec3_1;
     rdVector3 vec3_2;
     rdCamera rdCam;

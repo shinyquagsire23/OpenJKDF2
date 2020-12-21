@@ -49,7 +49,7 @@ typedef struct rdHierarchyNode
     uint32_t flags;
     uint32_t idx;
     int type;
-    int meshIdx;
+    uint32_t meshIdx;
     rdHierarchyNode* parent;
     uint32_t numChildren;
     rdHierarchyNode* child;

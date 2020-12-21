@@ -778,7 +778,38 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkPlayer_WriteConf_ADDR, jkPlayer_WriteConf);
     hook_function(jkPlayer_ReadConf_ADDR, jkPlayer_ReadConf);
     hook_function(jkPlayer_SetPovModel_ADDR, jkPlayer_SetPovModel);
+    hook_function(jkPlayer_DrawPov_ADDR, jkPlayer_DrawPov);
     hook_function(jkPlayer_renderSaberWeaponMesh_ADDR, jkPlayer_renderSaberWeaponMesh);
+    hook_function(jkPlayer_renderSaberTwinkle_ADDR, jkPlayer_renderSaberTwinkle);
+    hook_function(jkPlayer_SetWaggle_ADDR, jkPlayer_SetWaggle);
+    hook_function(jkPlayer_VerifyWcharName_ADDR, jkPlayer_VerifyWcharName);
+    hook_function(jkPlayer_VerifyCharName_ADDR, jkPlayer_VerifyCharName);
+    hook_function(jkPlayer_SetMpcInfo_ADDR, jkPlayer_SetMpcInfo);
+    hook_function(jkPlayer_SetPlayerName_ADDR, jkPlayer_SetPlayerName);
+    hook_function(jkPlayer_GetMpcInfo_ADDR, jkPlayer_GetMpcInfo);
+    hook_function(jkPlayer_SetChoice_ADDR, jkPlayer_SetChoice);
+    hook_function(jkPlayer_GetChoice_ADDR, jkPlayer_GetChoice);
+    hook_function(jkPlayer_CalcAlignment_ADDR, jkPlayer_CalcAlignment);
+    hook_function(jkPlayer_MpcInitBins_ADDR, jkPlayer_MpcInitBins);
+    hook_function(jkPlayer_MPCParse_ADDR, jkPlayer_MPCParse);
+    hook_function(jkPlayer_MPCWrite_ADDR, jkPlayer_MPCWrite);
+    hook_function(jkPlayer_MPCBinWrite_ADDR, jkPlayer_MPCBinWrite);
+    hook_function(jkPlayer_MPCBinRead_ADDR, jkPlayer_MPCBinRead);
+    hook_function(jkPlayer_InitForceBins_ADDR, jkPlayer_InitForceBins);
+    hook_function(jkPlayer_GetAlignment_ADDR, jkPlayer_GetAlignment);
+    hook_function(jkPlayer_SetAccessiblePowers_ADDR, jkPlayer_SetAccessiblePowers);
+    hook_function(jkPlayer_ResetPowers_ADDR, jkPlayer_ResetPowers);
+    hook_function(jkPlayer_WriteConfSwap_ADDR, jkPlayer_WriteConfSwap);
+    hook_function(jkPlayer_WriteCutsceneConf_ADDR, jkPlayer_WriteCutsceneConf);
+    hook_function(jkPlayer_ReadCutsceneConf_ADDR, jkPlayer_ReadCutsceneConf);
+    hook_function(jkPlayer_FixStars_ADDR, jkPlayer_FixStars);
+    hook_function(jkPlayer_CalcStarsAlign_ADDR, jkPlayer_CalcStarsAlign);
+    hook_function(jkPlayer_SetProtectionDeadlysight_ADDR, jkPlayer_SetProtectionDeadlysight);
+    hook_function(jkPlayer_DisallowOtherSide_ADDR, jkPlayer_DisallowOtherSide);
+    hook_function(jkPlayer_WriteOptionsConf_ADDR, jkPlayer_WriteOptionsConf);
+    hook_function(jkPlayer_ReadOptionsConf_ADDR, jkPlayer_ReadOptionsConf);
+    hook_function(jkPlayer_GetJediRank_ADDR, jkPlayer_GetJediRank);
+    hook_function(jkPlayer_SetRank_ADDR, jkPlayer_SetRank);
     
     // jkSaber
     hook_function(jkSaber_InitializeSaberInfo_ADDR, jkSaber_InitializeSaberInfo);

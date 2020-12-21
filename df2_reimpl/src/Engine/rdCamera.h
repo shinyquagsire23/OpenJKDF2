@@ -59,6 +59,7 @@ typedef struct rdCamera
     float attenuationMax;
 } rdCamera;
 
+static void (*rdCamera_SetAmbientLight)(rdCamera *camera, float amt) = (void*)rdCamera_SetAmbientLight_ADDR;
 static void (*rdCamera_AdvanceFrame)(void) = (void*)rdCamera_AdvanceFrame_ADDR;
 
 #define rdCamera_pCurCamera (*(rdCamera**)0x73A3D0)

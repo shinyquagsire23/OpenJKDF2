@@ -40,7 +40,7 @@ static int jkGuiForce_alignment;
 static float jkGuiForce_flt_556674;
 static int jkGuiForce_numSpendStars;
 static int jkGuiForce_bCanSpendStars;
-static float jkGuiForce_darkLightBalance;
+static float jkGuiForce_isMulti;
 static stdBitmap* jkGuiForce_aBitmaps[17];
 
 static rdVector2i jkGuiForce_idkExtra = {16, 15};
@@ -115,7 +115,7 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
     {
         jkGuiRend_PlayWav("ForceBlind01.wav");
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
 
     for (int i = 3; i < 17; i++)
     {
@@ -153,15 +153,15 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
 
         if ( jkGuiForce_alignment == 2 )
         {
-            jkPlayer_sub_405CC0(jkGuiForce_alignment);
+            jkPlayer_SetChoice(jkGuiForce_alignment);
         }
         else if ( jkGuiForce_alignment == 1 )
         {
-            jkPlayer_sub_405CC0(jkGuiForce_alignment);
+            jkPlayer_SetChoice(jkGuiForce_alignment);
         }
 
         jkGuiForce_alignment = 0;
-        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(0.0);
+        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(0.0);
         for (int i = 3; i < 17; i++)
         {
             int id = jkGuiForce_buttons[i].hoverId;
@@ -233,17 +233,17 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
     {
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars - 1));
         sithPlayer_SetBinAmt(binIdx, (float)(curLevel + 1));
-        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
         jkGuiRend_Paint(menu);
     }
 
-    if (jkGuiForce_darkLightBalance != 0.0)
+    if (jkGuiForce_isMulti)
     {
         if ( curLevel == 4 || !spendStars )
         {
             sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars + curLevel));
             sithPlayer_SetBinAmt(binIdx, 0.0);
-            jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+            jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
         }
 
         jkGuiForce_UpdateViewForRank();
@@ -264,23 +264,23 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
         sithPlayer_SetBinAmt(jkGuiForce_buttons[i].hoverId, v5);
     }
 
-    if (jkGuiForce_darkLightBalance != 0.0)
+    if (jkGuiForce_isMulti)
     {
         jkGuiForce_UpdateViewForRank();
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     jkGuiRend_Paint(menu);
     return 0;
 }
 
-int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5, int *pbIsLight, int bEnableIdk)
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIsLight, int bEnableIdk)
 {
     int newStars;
     int spendStars;
 
     int isLight = 1;
     jkGuiForce_bCanSpendStars = bCanSpendStars;
-    jkGuiForce_darkLightBalance = darkLightBalance;
+    jkGuiForce_isMulti = isMulti;
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[9]->palette);
     
@@ -288,7 +288,7 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
     jkGuiForce_buttons[18].bIsVisible = bCanSpendStars;
     jkGuiForce_buttons[19].bIsVisible = bEnableIdk != 0;
 
-    float darklight_float = jkPlayer_CalcDarkLightBalance(jkGuiForce_darkLightBalance);
+    float darklight_float = jkPlayer_CalcAlignment(jkGuiForce_isMulti);
 
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
     jkGuiForce_buttons[2].unistr = jkStrings_GetText(std_genBuffer);
@@ -303,7 +303,7 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
     jkGuiForce_buttons[23].bIsVisible = 1;
     jkGuiForce_buttons[23].anonymous_9 = 1;
     jkGuiForce_buttons[23].selectedTextEntry = 100 - (uint32_t)darklight_float;
-    if ( darkLightBalance != 0.0 )
+    if (isMulti)
     {
         jkPlayer_SetAccessiblePowers(jkPlayer_GetJediRank());
         jkGuiForce_UpdateViewForRank();
@@ -363,7 +363,7 @@ int jkGuiForce_Show(int bCanSpendStars, float darkLightBalance, float a4, int a5
         break;
     }
     
-    if ( darkLightBalance != 0.0 )
+    if (isMulti)
     {
         sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0.0);
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, 0.0);
@@ -405,7 +405,7 @@ void jkGuiForce_UpdateViewForRank()
 {
     jkPlayer_SetProtectionDeadlysight();
     if ( jkPlayer_GetJediRank() >= 7 )
-        jkPlayer_sub_407210(jkPlayer_GetJediRank());
+        jkPlayer_DisallowOtherSide(jkPlayer_GetJediRank());
     for (int i = 3; i < 17; i++)
     {
         int id = jkGuiForce_buttons[i].hoverId;
