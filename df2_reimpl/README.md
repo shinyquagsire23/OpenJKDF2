@@ -168,7 +168,7 @@ sithUnk3                       0x2827     0.952%        6.275%          4 / 22
 std3D                          0x2c4a     1.050%        0.000%          0 / 39         
 sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22         
 sithWeapon                     0x32a8     1.201%        0.987%          1 / 33         
-rdCache                        0x331c     1.211%        0.000%          0 / 16         
+rdCache                        0x331c     1.211%        39.315%        12 / 16         
 sithThing                      0x3c4c     1.429%        0.000%          0 / 54         
 sithSector                     0x79f9     2.891%        0.000%          0 / 96         
 rdClip                         0x81f2     3.080%        2.567%          2 / 17         
@@ -178,5 +178,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 13.543%
+Total completion: 14.019%
 ```
