@@ -1364,7 +1364,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     procEntry->textureMode = textureMode;
     vertexDst.verticesOrig = procEntry->vertices;
     vertexDst.vertexUVs = procEntry->vertexUVs;
-    vertexDst.vertex_lights_maybe_ = procEntry->vertex_lights_maybe;
+    vertexDst.vertex_lights_maybe_ = procEntry->vertexIntensities;
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
@@ -1431,7 +1431,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
         for (int i = 1; i < vertexDst.numVertices; i++ )
         {
-                float level = procEntry->vertex_lights_maybe[i] - procEntry->vertex_lights_maybe[0];
+                float level = procEntry->vertexIntensities[i] - procEntry->vertexIntensities[0];
                 if ( level < 0.0 )
                     level = -level;
 
@@ -1439,9 +1439,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                     goto LABEL_44;
         }
         
-        if ( procEntry->vertex_lights_maybe[0] != 1.0 )
+        if ( procEntry->vertexIntensities[0] != 1.0 )
         {
-            if ( procEntry->vertex_lights_maybe[0] == 0.0 )
+            if ( procEntry->vertexIntensities[0] == 0.0 )
             {
                 procEntry->lightingMode = 1;
                 procEntry->light_level_static = 0.0;
@@ -1449,7 +1449,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
             else
             {
                 procEntry->lightingMode = 2;
-                procEntry->light_level_static = procEntry->vertex_lights_maybe[0];
+                procEntry->light_level_static = procEntry->vertexIntensities[0];
             }
             goto LABEL_44;
         }

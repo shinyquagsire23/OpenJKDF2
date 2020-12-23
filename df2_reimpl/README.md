@@ -52,13 +52,13 @@ sithCogUtil                    0x26c2     0.919%        100.000%      119 / 119
 rdModel3                       0x2a7e     1.007%        100.000%       23 / 23         
 rdMatrix                       0x2c85     1.055%        100.000%       56 / 56         
 jkGuiRend                      0x2cd7     1.063%        100.000%       68 / 68         
+jkPlayer                       0x2da2     1.082%        100.000%       45 / 45         
 sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142        
 DirectX                        0x1e       0.003%        0.000%          0 / 5          
-jkUnk3                         0x41       0.006%        0.000%          0 / 2          
 jkGuiGeneral                   0xc5       0.018%        0.000%          0 / 3          
+jkSmack                        0xee       0.022%        0.000%          0 / 4          
 jkGuiControlOptions            0x105      0.024%        0.000%          0 / 3          
 stdHashtable                   0x1aa      0.039%        0.000%          0 / 2          
-gui                            0x213      0.049%        0.000%          0 / 1          
 jkGuiSingleTally               0x21b      0.050%        0.000%          0 / 4          
 jkGuiSetup                     0x240      0.053%        0.000%          0 / 4          
 jkGuiSound                     0x274      0.058%        0.000%          0 / 3          
@@ -66,21 +66,18 @@ jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3
 stdMemory                      0x2ba      0.065%        0.000%          0 / 7          
 jkGuiObjectives                0x308      0.072%        0.000%          0 / 4          
 jkControl                      0x331      0.076%        0.000%          0 / 4          
-jkCutscene                     0x347      0.078%        0.000%          0 / 6          
-jkDisplay                      0x359      0.079%        0.000%          0 / 4          
-Windows                        0x38c      0.084%        0.000%          0 / 10         
+Windows                        0x39a      0.085%        0.000%          0 / 11         
 jkGuiDialog                    0x3e0      0.092%        0.000%          0 / 6          
-stdres                         0x426      0.098%        0.000%          0 / 2          
 stdGdi                         0x430      0.099%        0.000%          0 / 10         
+jkCutscene                     0x443      0.101%        0.000%          0 / 7          
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
+smack                          0x466      0.104%        0.000%          0 / 6          
 jkGuiMain                      0x4b1      0.111%        0.000%          0 / 6          
 jkGuiTitle                     0x4fb      0.118%        0.000%          0 / 10         
 sithMaterial                   0x4fd      0.118%        0.000%          0 / 9          
-smack                          0x50d      0.120%        0.000%          0 / 7          
 sithDplay                      0x53c      0.124%        0.000%          0 / 17         
 sithActor                      0x559      0.127%        0.000%          0 / 5          
 wuRegistry                     0x5b2      0.135%        0.000%          0 / 12         
-jkDev                          0x5c7      0.137%        0.000%          0 / 2          
 Video                          0x5dc      0.139%        0.000%          0 / 5          
 DebugConsole                   0x5de      0.139%        0.000%          0 / 13         
 sithExplosion                  0x61d      0.145%        0.000%          0 / 4          
@@ -106,6 +103,7 @@ sithCogSector                  0x93a      0.219%        22.820%         1 / 22
 sithCogAI                      0x943      0.220%        14.720%         1 / 20         
 jkGuiNet                       0x94e      0.221%        0.000%          0 / 10         
 stdColor                       0x97e      0.225%        0.000%          0 / 11         
+jkGame                         0x98f      0.227%        0.000%          0 / 13         
 stdSound                       0x9bf      0.231%        0.000%          0 / 27         
 sithSave                       0x9bf      0.231%        0.000%          0 / 7          
 sithSound                      0xa00      0.237%        0.000%          0 / 13         
@@ -114,7 +112,6 @@ sithSoundClass                 0xa46      0.243%        0.000%          0 / 16
 stdPalEffects                  0xa66      0.246%        0.000%          0 / 21         
 sithCogSound                   0xa97      0.251%        9.369%          1 / 14         
 rdCamera                       0xaa8      0.253%        0.000%          0 / 26         
-jkGame                         0xaef      0.259%        0.000%          0 / 16         
 jkGuiSaveLoad                  0xb21      0.264%        0.000%          0 / 9          
 jkGuiKeyboard                  0xb57      0.269%        0.000%          0 / 14         
 jkGuiNetHost                   0xbc6      0.279%        0.000%          0 / 6          
@@ -124,7 +121,6 @@ rdColormap                     0xcf4      0.307%        26.327%         6 / 12
 sithTrackThing                 0xd6b      0.318%        0.000%          0 / 13         
 jkGuiMouse                     0xdb5      0.325%        0.000%          0 / 14         
 DirectDraw                     0xdd4      0.328%        0.000%          0 / 16         
-jk                             0xdd7      0.328%        0.000%          0 / 42         
 jkEpisode                      0xdd9      0.328%        0.000%          0 / 10         
 stdPlatform                    0xdde      0.329%        4.930%          5 / 43         
 sithCogPlayer                  0xdf0      0.330%        22.029%         1 / 42         
@@ -133,7 +129,6 @@ jkHudInv                       0xe43      0.338%        0.000%          0 / 9
 sithPlayer                     0xe72      0.342%        0.000%          0 / 27         
 sithCogSurface                 0xe92      0.345%        21.582%         1 / 38         
 stdBitmap                      0xeb6      0.349%        0.000%          0 / 14         
-cheatfn                        0xfa7      0.371%        0.000%          0 / 18         
 rdPuppet                       0x101f     0.382%        0.000%          0 / 19         
 DirectPlay                     0x10cc     0.398%        0.000%          0 / 31         
 VBuffer                        0x10dc     0.400%        0.000%          0 / 4          
@@ -145,9 +140,10 @@ sithCamera                     0x124b     0.434%        0.000%          0 / 23
 sithCollide                    0x12a8     0.442%        0.000%          0 / 12         
 jkGuiDisplay                   0x12ff     0.450%        0.000%          0 / 11         
 stdControl                     0x1323     0.454%        0.000%          0 / 23         
-jkGuiJoystick                  0x13ef     0.472%        0.000%          0 / 18         
+jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
 sithCogYACC                    0x152b     0.502%        0.000%          0 / 10         
 jkRes                          0x15b6     0.515%        0.000%          0 / 23         
+jkMain                         0x16cd     0.540%        0.000%          0 / 53         
 rdPrimit3                      0x16e0     0.542%        0.017%          1 / 9          
 sithWorld                      0x1718     0.547%        21.262%         6 / 22         
 stdFont                        0x181a     0.571%        0.000%          0 / 20         
@@ -156,6 +152,7 @@ rdActive                       0x1a55     0.624%        0.000%          0 / 8
 sithCogParse                   0x1b2a     0.644%        10.282%         4 / 26         
 sithSurface                    0x1c6a     0.673%        0.000%          0 / 35         
 jkHud                          0x1c9b     0.678%        0.000%          0 / 17         
+jkDev                          0x1e60     0.720%        0.000%          0 / 39         
 sithCog                        0x1ed3     0.731%        16.918%         2 / 28         
 jkSaber                        0x1f4a     0.742%        33.296%         5 / 40         
 sithInventory                  0x2150     0.790%        72.256%        57 / 62         
@@ -170,17 +167,16 @@ sithAI                         0x2771     0.935%        2.209%          2 / 35
 sithUnk3                       0x2827     0.952%        6.275%          4 / 22         
 std3D                          0x2c4a     1.050%        0.000%          0 / 39         
 sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22         
-jkPlayer                       0x2da2     1.082%        4.254%          1 / 45         
 sithWeapon                     0x32a8     1.201%        0.987%          1 / 33         
 rdCache                        0x331c     1.211%        0.000%          0 / 16         
 sithThing                      0x3c4c     1.429%        0.000%          0 / 54         
 sithSector                     0x79f9     2.891%        0.000%          0 / 96         
 rdClip                         0x81f2     3.080%        2.567%          2 / 17         
 rdRaster                       0xf04d     5.695%        0.000%          0 / 89         
-rdZRaster                      0x15fb4    8.336%        0.000%          0 / 73         
+rdZRaster                      0x15fb4    8.335%        0.000%          0 / 73         
 rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122        
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 12.507%
+Total completion: 13.543%
 ```

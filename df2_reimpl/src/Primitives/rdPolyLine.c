@@ -277,7 +277,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     mesh_out.verticesProjected = rdPolyLine_FaceVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
-    mesh_out.vertex_lights_maybe_ = procEntry->vertex_lights_maybe;
+    mesh_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
     
     idxInfo->numVertices = face->numVertices;
     idxInfo->vertexPosIdx = face->vertexPosIdx;
@@ -356,10 +356,10 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
             else if ( procEntry->lightingMode == 3 )
             {
                 int i;
-                staticLight = *procEntry->vertex_lights_maybe;
+                staticLight = *procEntry->vertexIntensities;
                 for (i = 1; i < mesh_out.numVertices; i++)
                 {
-                    if ( procEntry->vertex_lights_maybe[i] != staticLight )
+                    if ( procEntry->vertexIntensities[i] != staticLight )
                         break;
                 }
                 if ( i == mesh_out.numVertices )

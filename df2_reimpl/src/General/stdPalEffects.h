@@ -30,12 +30,10 @@
 
 typedef struct stdPalEffect
 {
-    rdVector3 a;
-    rdVector3 b;
-    uint32_t field_18;
-    uint32_t field_1C;
-    uint32_t field_20;
-    float scalar_idk;
+    rdVector3 filter;
+    rdVector3 tint;
+    rdVector3 add;
+    float fade;
 } stdPalEffect;
 
 static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;

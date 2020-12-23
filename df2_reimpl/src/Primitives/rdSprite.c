@@ -150,7 +150,7 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     mesh_out.verticesProjected = rdSprite_tmpVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
-    mesh_out.vertex_lights_maybe_ = procEntry->vertex_lights_maybe;
+    mesh_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
     rdSprite_inVerts[0].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
     rdSprite_inVerts[1].y = sprite->offset.y + vertex_out.y;
     rdSprite_inVerts[1].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;
@@ -253,12 +253,12 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
                 int lightIdx;
                 for (lightIdx = 1; lightIdx < mesh_out.numVertices; lightIdx++)
                 {
-                    if ( procEntry->vertex_lights_maybe[lightIdx] != procEntry->vertex_lights_maybe[0] )
+                    if ( procEntry->vertexIntensities[lightIdx] != procEntry->vertexIntensities[0] )
                         break;
                 }
                 if ( lightIdx == mesh_out.numVertices )
                 {
-                    if ( procEntry->vertex_lights_maybe[0] == 1.0 )
+                    if ( procEntry->vertexIntensities[0] == 1.0 )
                     {
                         if ( rdColormap_pCurMap == rdColormap_pIdentityMap )
                         {
@@ -270,7 +270,7 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
                             procEntry->light_level_static = 1.0;
                         }
                     }
-                    else if ( procEntry->vertex_lights_maybe[0] == 0.0 )
+                    else if ( procEntry->vertexIntensities[0] == 0.0 )
                     {
                         procEntry->lightingMode = 1;
                         procEntry->light_level_static = 0.0;
@@ -278,7 +278,7 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
                     else
                     {
                         procEntry->lightingMode = 2;
-                        procEntry->light_level_static = procEntry->vertex_lights_maybe[0];
+                        procEntry->light_level_static = procEntry->vertexIntensities[0];
                     }
                 }
             }

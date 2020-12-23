@@ -266,6 +266,7 @@ static int (__cdecl *_atoi)(const char*) = (void*)0x512840;
 static double (__cdecl *_atof)(const char*) = (void*)0x513000;
 static wchar_t* (__cdecl *_wcsncpy)(wchar_t *a1, const wchar_t *a2, size_t a3) = (void*)0x512C70;
 static int (__cdecl *msvc_sub_512D30)(int a, int b) = (void*)0x512D30;
+static void (__cdecl *_qsort)(void *, size_t, size_t, int (__cdecl *)(const void *, const void *)) = (void*)0x00512DA0;
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);

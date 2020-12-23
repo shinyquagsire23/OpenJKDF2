@@ -55,7 +55,6 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   unsigned int mipmap_num; // ebx
   int bpp; // eax
   stdVBuffer **texture_struct; // edi
-  void *v19; // ebp
   int v21; // cf
   unsigned int v22; // edi
   int *v23; // esi
@@ -162,13 +161,12 @@ LABEL_21:
           goto LABEL_22;
       }
       texture_struct = (stdVBuffer **)texture->texture_struct;
-      v19 = (void*)&texture->field_A4[0].surface_desc + 0xC;//.dwWidth;
       while ( 1 )
       {
-        *((uint32_t *)v19 - 5) = 0;
-        *(uint32_t *)v19 = 0;
-        *((uint32_t *)v19 + 147) = 0;
-        *((uint32_t *)v19 + 152) = 0;
+        texture->alphaMats[mipmap_num].texture_loaded = 0;
+        texture->alphaMats[mipmap_num].gpu_accel_maybe = 0;
+        texture->opaqueMats[mipmap_num].texture_loaded = 0;
+        texture->opaqueMats[mipmap_num].gpu_accel_maybe = 0;
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
         if ( !created_tex )
@@ -185,7 +183,6 @@ LABEL_21:
         format.height = (unsigned int)format.height >> 1;
         ++mipmap_num;
         ++texture_struct;
-        v19 = (char *)v19 + 0x98;
         if ( mipmap_num >= texture->num_mipmaps )
         {
           material_ = material;

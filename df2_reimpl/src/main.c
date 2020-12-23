@@ -29,6 +29,7 @@
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
 #include "Engine/rdMaterial.h"
+#include "Engine/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdCanvas.h"
@@ -514,6 +515,19 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdPolyLine_FreeEntry_ADDR, rdPolyLine_FreeEntry);
     hook_function(rdPolyLine_Draw_ADDR, rdPolyLine_Draw);
     hook_function(rdPolyLine_DrawFace_ADDR, rdPolyLine_DrawFace);
+    
+    // rdCache
+    hook_function(rdCache_Startup_ADDR, rdCache_Startup);
+    hook_function(rdCache_AdvanceFrame_ADDR, rdCache_AdvanceFrame);
+    hook_function(rdCache_FinishFrame_ADDR, rdCache_FinishFrame);
+    hook_function(rdCache_Reset_ADDR, rdCache_Reset);
+    hook_function(rdCache_ClearFrameCounters_ADDR, rdCache_ClearFrameCounters);
+    hook_function(rdCache_GetProcEntry_ADDR, rdCache_GetProcEntry);
+    hook_function(rdCache_Flush_ADDR, rdCache_Flush);
+    hook_function(rdCache_SendFaceListToHardware_ADDR, rdCache_SendFaceListToHardware);
+    hook_function(rdCache_ResetRenderList_ADDR, rdCache_ResetRenderList);
+    hook_function(rdCache_DrawRenderList_ADDR, rdCache_DrawRenderList);
+    hook_function(rdCache_TriCompare_ADDR, rdCache_TriCompare);
     
     // rdColormap
     hook_function(rdColormap_SetCurrent_ADDR, rdColormap_SetCurrent);

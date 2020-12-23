@@ -37,6 +37,17 @@ typedef struct rdLight rdLight;
 
 typedef struct rdClipFrustum
 {
+  rdVector3 field_0;
+  float field_C;
+  float field_10;
+  float field_14;
+  float field_18;
+  float field_1C;
+  float field_20;
+  float field_24;
+  float field_28;
+  float field_2C;
+  float field_30;
 } rdClipFrustum;
 
 typedef struct rdCamera

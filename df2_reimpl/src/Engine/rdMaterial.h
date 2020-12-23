@@ -83,9 +83,8 @@ typedef struct rdTexture
     uint32_t height_minus_1;
     uint32_t num_mipmaps;
     stdVBuffer *texture_struct[4];
-    uint8_t field_2C[120];
-    sith_tex_2 field_A4[4];
-    uint8_t field_304[488];
+    sith_tex_2 alphaMats[4];
+    sith_tex_2 opaqueMats[4];
 } rdTexture;
 
 typedef struct rdColor24
@@ -174,6 +173,8 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
 int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem);
 void rdMaterial_Free(rdMaterial *material);
 void rdMaterial_FreeEntry(rdMaterial* material);
+
+static int (*rdMaterial_AddToTextureCache)(rdMaterial *material, rdTexture *a2, int mipmap_level, int no_alpha) = (void*)rdMaterial_AddToTextureCache_ADDR;
 
 //int rdMaterial_AddToTextureCache(rdMaterial *material, sith_tex *a2, int mipmap_level, int no_alpha);
 
