@@ -585,3 +585,13 @@ rdVector3* rdVector_MultAcc3(rdVector3 *v1, rdVector3 *v2, float scale)
     v1->z = v2->z * scale + v1->z;
     return v1;
 }
+
+void rdVector_Zero3(rdVector3 *v)
+{
+    rdVector_Copy3(v, &rdroid_zeroVector3);
+}
+
+int rdVector_IsZero3(rdVector3* v)
+{
+    return (v->x == 0.0 && v->y == 0.0 && v->z == 0.0);
+}

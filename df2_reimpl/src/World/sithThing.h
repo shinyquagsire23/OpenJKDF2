@@ -522,7 +522,7 @@ typedef struct sithThing
     };
     rdVector3 addedVelocity;
     rdVector3 velocityMaybe;
-    float field_240;
+    float physicsRolloverFrames;
     uint32_t field_244;
     uint32_t field_248;
     uint32_t field_24C;

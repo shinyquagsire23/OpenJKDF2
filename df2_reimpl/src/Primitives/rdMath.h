@@ -17,5 +17,7 @@ float rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3);
 void rdMath_ClampVector(rdVector3* out, float minVal);
 int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3);
 
+void rdMath_ClampVectorRange(rdVector3* out, float minVal, float maxVal);
+float rdMath_clampf(float d, float min, float max);
 
 #endif // _RDMATH_H

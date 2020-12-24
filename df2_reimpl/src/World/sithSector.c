@@ -11,28 +11,24 @@
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs)
 {
-    double v4;
-
     if ( mag == 0.0 || rdVector_Len3(vec) >= mag )
     {
         if ( drag != 0.0 )
         {
-            v4 = deltaSecs * drag;
-            if ( v4 > 1.0 )
-                v4 = 1.0;
+            double scaled = deltaSecs * drag;
+            if ( scaled > 1.0 )
+                scaled = 1.0;
 
-            vec->x = vec->x * -v4 + vec->x;
-            vec->y = vec->y * -v4 + vec->y;
-            vec->z = vec->z * -v4 + vec->z;
+            vec->x = vec->x * -scaled + vec->x;
+            vec->y = vec->y * -scaled + vec->y;
+            vec->z = vec->z * -scaled + vec->z;
             
             rdMath_ClampVector(vec, 0.00001);
         }
     }
     else
     {
-        vec->x = 0.0;
-        vec->y = 0.0;
-        vec->z = 0.0;
+        rdVector_Zero3(vec);
     }
 }
 
@@ -40,13 +36,13 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
 {
     if ( thing->sector )
     {
-        rdVector_Copy3(&thing->velocityMaybe, &rdroid_zeroVector3);
-        rdVector_Copy3(&thing->addedVelocity, &rdroid_zeroVector3);
+        rdVector_Zero3(&thing->velocityMaybe);
+        rdVector_Zero3(&thing->addedVelocity);
 
         if ((thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) 
             && (thing->actorParams.typeflags & SITH_TF_TIMER))
         {
-            rdVector_Copy3(&thing->physicsParams.acceleration, &rdroid_zeroVector3);
+            rdVector_Zero3(&thing->physicsParams.acceleration);
         }
 
         if (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE | ATTACHFLAGS_WORLDSURFACE))
@@ -68,86 +64,123 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     }
 }
 
+void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
+{
+    rdVector3 a1a;
+    rdVector3 a3;
+    rdMatrix34 a;
+
+    rdVector_Zero3(&thing->addedVelocity);
+    rdVector_Zero3(&a1a);
+
+    if (thing->physicsParams.physflags & PHYSFLAGS_ANGTHRUST)
+    {
+        if (!rdVector_IsZero3(&thing->physicsParams.angVel))
+        {
+            sithSector_ApplyDrag(&thing->physicsParams.angVel, thing->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
+        }
+
+        thing->physicsParams.angVel.x = thing->physicsParams.field_1F8.x * deltaSeconds + thing->physicsParams.angVel.x;
+        thing->physicsParams.angVel.y = thing->physicsParams.field_1F8.y * deltaSeconds + thing->physicsParams.angVel.y;
+        thing->physicsParams.angVel.z = thing->physicsParams.field_1F8.z * deltaSeconds + thing->physicsParams.angVel.z;
+        
+        rdMath_ClampVectorRange(&thing->physicsParams.angVel, -thing->physicsParams.maxRotVel, thing->physicsParams.maxRotVel);
+        rdMath_ClampVector(&thing->physicsParams.angVel, 0.00001);
+    }
+
+    if (rdVector_IsZero3(&thing->physicsParams.angVel))
+    {
+        rdVector_Zero3(&a3);
+    }
+    else
+    {
+        rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
+    }
+
+    if (!rdVector_IsZero3(&a3))
+    {
+        rdMatrix_BuildRotate34(&a, &a3);
+        sithUnk3_sub_4E7670(thing, &a);
+
+        if ( (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+            rdMatrix_TransformVector34Acc(&thing->physicsParams.vel, &a);
+
+        if ( ((bShowInvisibleThings + (thing->thingIdx & 0xFF)) & 7) == 0 )
+            rdMatrix_Normalize34(&thing->lookOrientation);
+    }
+
+    if ( thing->physicsParams.airDrag != 0.0 )
+        sithSector_ApplyDrag(&thing->physicsParams.vel, thing->physicsParams.airDrag, 0.0, deltaSeconds);
+
+    if (thing->physicsParams.physflags & PHYSFLAGS_USESTHRUST)
+    {
+        if (!(thing->physicsParams.physflags & PHYSFLAGS_FLYING))
+        {
+            rdVector_Scale3Acc(&thing->physicsParams.acceleration, 0.30000001);
+        }
+        rdVector_Scale3(&a1a, &thing->physicsParams.acceleration, deltaSeconds);
+        rdMatrix_TransformVector34Acc(&a1a, &thing->lookOrientation);
+    }
+
+    if (thing->physicsParams.mass != 0.0 
+        && (thing->sector->flags & SITH_SF_HASTHRUST) 
+        && !(thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
+    {
+        rdVector_MultAcc3(&a1a, &thing->sector->thrust, deltaSeconds);
+    }
+
+    if (thing->physicsParams.mass != 0.0 
+        && thing->physicsParams.physflags & PHYSFLAGS_GRAVITY
+        && !(thing->sector->flags & SITH_SF_NOGRAVITY))
+    {
+        float gravity = sithWorld_pCurWorld->worldGravity * deltaSeconds;
+        if ( (thing->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
+            gravity *= 0.5;
+        a1a.z = a1a.z - gravity;
+        thing->addedVelocity.z = -gravity;
+    }
+
+    rdVector_Add3Acc(&thing->physicsParams.vel, &a1a);
+    rdMath_ClampVector(&thing->physicsParams.vel, 0.00001);
+
+    if (!rdVector_IsZero3(&thing->physicsParams.vel))
+    {
+        rdVector_Scale3(&thing->velocityMaybe, &thing->physicsParams.vel, deltaSeconds);
+    }
+}
+
 void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 {
-    double v6; // st6
-    double v7; // st6
-    double v22; // st7
-    double v23; // st7
-    rdMatrix34 a; // [esp+18h] [ebp-54h] BYREF
-    rdVector3 a3; // [esp+48h] [ebp-24h] BYREF
-    rdVector3 a1a; // [esp+54h] [ebp-18h] BYREF
-    float v30; // [esp+64h] [ebp-8h]
-    float playerc; // [esp+74h] [ebp+8h]
-    float deltaSecondsb; // [esp+78h] [ebp+Ch]
+    rdMatrix34 a;
+    rdVector3 a3;
+    rdVector3 a1a;
 
-    rdVector_Copy3(&player->addedVelocity, &rdroid_zeroVector3);
+    rdVector_Zero3(&player->addedVelocity);
     if (player->physicsParams.physflags & PHYSFLAGS_ANGTHRUST)
     {
-        if ( player->physicsParams.angVel.x != 0.0
-          || player->physicsParams.angVel.y != 0.0
-          || player->physicsParams.angVel.z != 0.0 )
+        if (!rdVector_IsZero3(&player->physicsParams.angVel))
         {
             sithSector_ApplyDrag(&player->physicsParams.angVel, player->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
 
         player->physicsParams.angVel.x = (player->physicsParams.field_1F8.x * deltaSeconds + player->physicsParams.angVel.x);
         player->physicsParams.angVel.y = (player->physicsParams.field_1F8.y * deltaSeconds + player->physicsParams.angVel.y);
-        v30 = player->physicsParams.field_1F8.z * deltaSeconds + player->physicsParams.angVel.z;
-        player->physicsParams.angVel.z = v30;
-        float v5 = -player->physicsParams.maxRotVel;
+        player->physicsParams.angVel.z = player->physicsParams.field_1F8.z * deltaSeconds + player->physicsParams.angVel.z;
 
-        if ( player->physicsParams.angVel.x < v5 )
-        {
-            v6 = v5;
-        }
-        else if ( player->physicsParams.maxRotVel < (double)player->physicsParams.angVel.x )
-        {
-            v6 = player->physicsParams.maxRotVel;
-        }
-        else
-        {
-            v6 = player->physicsParams.angVel.x;
-        }
-        player->physicsParams.angVel.x = v6;
-
-        if ( player->physicsParams.angVel.y < v5 )
-        {
-            v7 = v5;
-        }
-        else if ( player->physicsParams.maxRotVel < (double)player->physicsParams.angVel.y )
-        {
-            v7 = player->physicsParams.maxRotVel;
-        }
-        else
-        {
-            v7 = player->physicsParams.angVel.y;
-        }
-        player->physicsParams.angVel.y = v7;
-
-        if ( v30 >= v5 )
-        {
-            if ( player->physicsParams.maxRotVel < (double)v30 )
-                v5 = player->physicsParams.maxRotVel;
-            else
-                v5 = v30;
-        }
-        player->physicsParams.angVel.z = v5;
-
+        rdMath_ClampVectorRange(&player->physicsParams.angVel, -player->physicsParams.maxRotVel, player->physicsParams.maxRotVel);
         rdMath_ClampVector(&player->physicsParams.angVel, 0.00001);
     }
-    if ( player->physicsParams.angVel.x == 0.0
-      && player->physicsParams.angVel.y == 0.0
-      && player->physicsParams.angVel.z == 0.0 )
+
+    if (rdVector_IsZero3(&player->physicsParams.angVel))
     {
-        rdVector_Copy3(&a3, &rdroid_zeroVector3);
+        rdVector_Zero3(&a3);
     }
     else
     {
         rdVector_Scale3(&a3, &player->physicsParams.angVel, deltaSeconds);
     }
 
-    if ( a3.x != 0.0 || a3.y != 0.0 || a3.z != 0.0 )
+    if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
         sithUnk3_sub_4E7670(player, &a);
@@ -164,14 +197,16 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
         rdVector_Scale3Acc(&player->physicsParams.acceleration, 0.30000001);
     }
 
-    deltaSecondsb = deltaSeconds + player->field_240;
+    // I think all of this is specifically for multiplayer, so that player things
+    // sync better between clients.
+    float rolloverCombine = deltaSeconds + player->physicsRolloverFrames;
 
-    playerc = deltaSecondsb * 50.0; // get number of 50FPS steps passed
-    player->field_240 = deltaSecondsb - (double)(unsigned int)(int)playerc * DELTA_50FPS;
+    float framesToApply = rolloverCombine * 50.0; // get number of 50FPS steps passed
+    player->physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * DELTA_50FPS;
 
-    for (int i = (int)playerc; i > 0; i--)
+    for (int i = (int)framesToApply; i > 0; i--)
     {
-        rdVector_Copy3(&a1a, &rdroid_zeroVector3);
+        rdVector_Zero3(&a1a);
         if ( player->physicsParams.airDrag != 0.0 )
         {
             sithSector_ApplyDrag(&player->physicsParams.vel, player->physicsParams.airDrag, 0.0, DELTA_50FPS);
@@ -185,7 +220,8 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
         if ( player->physicsParams.mass != 0.0 )
         {
-            if ( (player->sector->flags & SITH_SF_HASTHRUST) != 0 && !(player->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
+            if ((player->sector->flags & SITH_SF_HASTHRUST)
+                && !(player->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
             {
                 rdVector_MultAcc3(&a1a, &player->sector->thrust, DELTA_50FPS);
             }

@@ -166,9 +166,11 @@ typedef struct sithSector
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
 void sithSector_ThingPhysicsTick(sithThing *thing, float force);
+void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds);
 void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 
-static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
+
+//static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
 static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;

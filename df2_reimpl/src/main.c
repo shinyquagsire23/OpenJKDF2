@@ -680,6 +680,7 @@ __declspec(dllexport) void hook_init(void)
     // sithSector
     hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
     hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
+    hook_function(sithSector_ThingPhysGeneral_ADDR, sithSector_ThingPhysGeneral);
     hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
     
     // sithWeapon

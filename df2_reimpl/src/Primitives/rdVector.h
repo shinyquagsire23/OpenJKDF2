@@ -144,7 +144,10 @@ void rdVector_Rotate3(rdVector3 *out, rdVector3 *in, rdVector3 *vAngs);
 void rdVector_Rotate3Acc(rdVector3 *out, rdVector3 *vAngs);
 void rdVector_ExtractAngle(rdVector3 *v1, rdVector3 *out);
 
+// Added
 float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2);
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, rdVector3 *v2, float scale);
+void rdVector_Zero3(rdVector3 *v);
+int rdVector_IsZero3(rdVector3* v);
 
 #endif // _RDVECTOR_H

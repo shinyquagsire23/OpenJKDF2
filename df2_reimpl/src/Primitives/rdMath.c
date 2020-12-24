@@ -90,3 +90,17 @@ int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
         v16 = -v16;
     return (v16 >= 0.99900001 && v16 <= 1.001);
 }
+
+// added
+void rdMath_ClampVectorRange(rdVector3* out, float minVal, float maxVal)
+{
+    out->x = rdMath_clampf(out->x, minVal, maxVal);
+    out->y = rdMath_clampf(out->y, minVal, maxVal);
+    out->z = rdMath_clampf(out->z, minVal, maxVal);
+}
+
+float rdMath_clampf(float d, float min, float max)
+{
+  const float t = d < min ? min : d;
+  return t > max ? max : t;
+}
