@@ -577,3 +577,11 @@ float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2)
     rdVector_Sub3(&tmp, v1, v2);
     return rdVector_Len3(&tmp);
 }
+
+rdVector3* rdVector_MultAcc3(rdVector3 *v1, rdVector3 *v2, float scale)
+{
+    v1->x = v2->x * scale + v1->x;
+    v1->y = v2->y * scale + v1->y;
+    v1->z = v2->z * scale + v1->z;
+    return v1;
+}

@@ -1,6 +1,10 @@
 #ifndef _SITHSECTOR_H
 #define _SITHSECTOR_H
 
+#include "Primitives/rdVector.h"
+#include "types.h"
+
+typedef struct rdKeyframe rdKeyframe;
 typedef struct sithSurface sithSurface;
 
 #define sithSector_Startup_ADDR (0x004F29F0)
@@ -53,17 +57,17 @@ typedef struct sithSurface sithSurface;
 #define sithSector_TransitionMovingThing_ADDR (0x004F5440)
 #define sithSector_ThingLandIdk_ADDR (0x004F5550)
 #define sithSector_ThingPhysIdk_inlined_ADDR (0x004F5870)
-#define sithSector_Thingidkphys2_ADDR (0x004F5900)
+#define sithSector_ThingPhysicsTick_ADDR (0x004F5900)
 #define sithSector_ThingApplyForce_ADDR (0x004F59B0)
 #define sithSector_ThingSetLook_ADDR (0x004F5A80)
-#define sithSector_Thingphyshelper_ADDR (0x004F5D50)
+#define sithSector_ApplyDrag_ADDR (0x004F5D50)
 #define sithSector_LoadThingPhysicsParams_ADDR (0x004F5EC0)
 #define sithSector_StopPhysicsThing_ADDR (0x004F61A0)
 #define sithSector_ThingGetInsertOffsetZ_ADDR (0x004F6210)
-#define sithSector_ThingPhysIdk1000_ADDR (0x004F6270)
-#define sithSector_Thingphysidk3_ADDR (0x004F6860)
-#define sithSector_Thingphysidk2_ADDR (0x004F6D80)
-#define sithSector_Thingphysidk_ADDR (0x004F7430)
+#define sithSector_ThingPhysGeneral_ADDR (0x004F6270)
+#define sithSector_ThingPhysPlayer_ADDR (0x004F6860)
+#define sithSector_ThingPhysUnderwater_ADDR (0x004F6D80)
+#define sithSector_ThingPhysAttached_ADDR (0x004F7430)
 #define sithSector_Load_ADDR (0x004F8720)
 #define sithSector_GetIdxFromPtr_ADDR (0x004F8BB0)
 #define sithSector_New_ADDR (0x004F8BF0)
@@ -100,6 +104,33 @@ typedef struct sithSurface sithSurface;
 #define sithSector_cogmsg_send31_ADDR (0x004FA420)
 #define sithSector_cogmsg_31_ADDR (0x004FA5D0)
 
+typedef enum ATTACHFLAGS
+{
+  ATTACHFLAGS_WORLDSURFACE = 0x1,
+  ATTACHFLAGS_THINGSURFACE = 0x2,
+  ATTACHFLAGS_THING = 0x4,
+  ATTACHFLAGS_THING_RELATIVE = 0x8,
+} ATTACHFLAGS;
+
+typedef enum SITH_SF
+{
+  SITH_SF_NOGRAVITY = 0x1,
+  SITH_SF_UNDERWATER = 0x2,
+  SITH_SF_COGLINKED = 0x4,
+  SITH_SF_HASTHRUST = 0x8,
+  SITH_SF_AUTOMAPHIDE = 0x10,
+  SITH_SF_NOACTORS = 0x20,
+  SITH_SF_PIT = 0x40,
+  SITH_SF_80 = 0x80,
+  SITH_SF_100 = 0x100,
+  SITH_SF_200 = 0x200,
+  SITH_SF_400 = 0x400,
+  SITH_SF_800 = 0x800,
+  SITH_SF_COLLIDEBOX = 0x1000,
+  SITH_SF_2000 = 0x2000,
+  SITH_SF_AUTOMAPVISIBLE = 0x4000,
+} SITH_SF;
+
 typedef struct rdClipFrustum rdClipFrustum;
 typedef struct sithThing sithThing;
 typedef struct sithAdjoin sithAdjoin;
@@ -132,6 +163,15 @@ typedef struct sithSector
     uint32_t field_90;
     rdClipFrustum* clipFrustum;
 } sithSector;
+
+void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
+void sithSector_ThingPhysicsTick(sithThing *thing, float force);
+void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
+
+static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
+//static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
+static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
+static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
 
 static void (*sithSector_StopPhysicsThing)(sithThing* thing) = (void*)sithSector_StopPhysicsThing_ADDR;
 static int (*sithSector_cogMsg_SendStopAnim)(sithSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;

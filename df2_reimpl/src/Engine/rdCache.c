@@ -1154,7 +1154,7 @@ LABEL_282:
         }
         std3D_RenderListVerticesFinish();
         if ( rdroid_curZBufferMethod == 2 )
-            _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), (int (__cdecl *)(const void *, const void *))rdCache_TriCompare);
+            _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
         if ( rdCache_totalSolidTris )
             std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
         if ( rdCache_totalNormalTris )

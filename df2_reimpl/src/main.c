@@ -50,6 +50,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdMath.h"
+#include "World/sithSector.h"
 #include "World/sithWeapon.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
@@ -675,6 +676,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdMatrix_TransformPoint44Acc_ADDR, rdMatrix_TransformPoint44Acc);
     hook_function(rdMatrix_TransformPointLst34_ADDR, rdMatrix_TransformPointLst34);
     hook_function(rdMatrix_TransformPointLst44_ADDR, rdMatrix_TransformPointLst44);
+    
+    // sithSector
+    hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
+    hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
+    hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
