@@ -7,21 +7,20 @@
 #include "World/sithUnk3.h"
 #include "jk.h"
 
-#define DELTA_50FPS (0.02)
+#define TARGET_FPS (50.0)
+#define DELTA_50FPS (1.0/TARGET_FPS)
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs)
 {
-    if ( mag == 0.0 || rdVector_Len3(vec) >= mag )
+    if (mag == 0.0 || rdVector_Len3(vec) >= mag)
     {
-        if ( drag != 0.0 )
+        if (drag != 0.0)
         {
             double scaled = deltaSecs * drag;
-            if ( scaled > 1.0 )
+            if (scaled > 1.0)
                 scaled = 1.0;
 
-            vec->x = vec->x * -scaled + vec->x;
-            vec->y = vec->y * -scaled + vec->y;
-            vec->z = vec->z * -scaled + vec->z;
+            rdVector_MultAcc3(vec, vec, -scaled);
             
             rdMath_ClampVector(vec, 0.00001);
         }
@@ -34,33 +33,33 @@ void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs
 
 void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
 {
-    if ( thing->sector )
+    if (!thing->sector)
+        return;
+
+    rdVector_Zero3(&thing->velocityMaybe);
+    rdVector_Zero3(&thing->addedVelocity);
+
+    if ((thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) 
+        && (thing->actorParams.typeflags & SITH_TF_TIMER))
     {
-        rdVector_Zero3(&thing->velocityMaybe);
-        rdVector_Zero3(&thing->addedVelocity);
+        rdVector_Zero3(&thing->physicsParams.acceleration);
+    }
 
-        if ((thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) 
-            && (thing->actorParams.typeflags & SITH_TF_TIMER))
-        {
-            rdVector_Zero3(&thing->physicsParams.acceleration);
-        }
-
-        if (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE | ATTACHFLAGS_WORLDSURFACE))
-        {
-            sithSector_ThingPhysAttached(thing, deltaSecs);
-        }
-        else if (thing->sector->flags & SITH_SF_UNDERWATER)
-        {
-            sithSector_ThingPhysUnderwater(thing, deltaSecs);
-        }
-        else if ( thing->thingType == THINGTYPE_PLAYER )
-        {
-            sithSector_ThingPhysPlayer(thing, deltaSecs);
-        }
-        else
-        {
-            sithSector_ThingPhysGeneral(thing, deltaSecs);
-        }
+    if (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE | ATTACHFLAGS_WORLDSURFACE))
+    {
+        sithSector_ThingPhysAttached(thing, deltaSecs);
+    }
+    else if (thing->sector->flags & SITH_SF_UNDERWATER)
+    {
+        sithSector_ThingPhysUnderwater(thing, deltaSecs);
+    }
+    else if ( thing->thingType == THINGTYPE_PLAYER )
+    {
+        sithSector_ThingPhysPlayer(thing, deltaSecs);
+    }
+    else
+    {
+        sithSector_ThingPhysGeneral(thing, deltaSecs);
     }
 }
 
@@ -80,9 +79,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
             sithSector_ApplyDrag(&thing->physicsParams.angVel, thing->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
 
-        thing->physicsParams.angVel.x = thing->physicsParams.field_1F8.x * deltaSeconds + thing->physicsParams.angVel.x;
-        thing->physicsParams.angVel.y = thing->physicsParams.field_1F8.y * deltaSeconds + thing->physicsParams.angVel.y;
-        thing->physicsParams.angVel.z = thing->physicsParams.field_1F8.z * deltaSeconds + thing->physicsParams.angVel.z;
+        rdVector_MultAcc3(&thing->physicsParams.angVel, &thing->physicsParams.field_1F8, deltaSeconds);
         
         rdMath_ClampVectorRange(&thing->physicsParams.angVel, -thing->physicsParams.maxRotVel, thing->physicsParams.maxRotVel);
         rdMath_ClampVector(&thing->physicsParams.angVel, 0.00001);
@@ -163,9 +160,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
             sithSector_ApplyDrag(&player->physicsParams.angVel, player->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
 
-        player->physicsParams.angVel.x = (player->physicsParams.field_1F8.x * deltaSeconds + player->physicsParams.angVel.x);
-        player->physicsParams.angVel.y = (player->physicsParams.field_1F8.y * deltaSeconds + player->physicsParams.angVel.y);
-        player->physicsParams.angVel.z = player->physicsParams.field_1F8.z * deltaSeconds + player->physicsParams.angVel.z;
+        rdVector_MultAcc3(&player->physicsParams.angVel, &player->physicsParams.field_1F8, deltaSeconds);
 
         rdMath_ClampVectorRange(&player->physicsParams.angVel, -player->physicsParams.maxRotVel, player->physicsParams.maxRotVel);
         rdMath_ClampVector(&player->physicsParams.angVel, 0.00001);
@@ -201,7 +196,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     // sync better between clients.
     float rolloverCombine = deltaSeconds + player->physicsRolloverFrames;
 
-    float framesToApply = rolloverCombine * 50.0; // get number of 50FPS steps passed
+    float framesToApply = rolloverCombine * TARGET_FPS; // get number of 50FPS steps passed
     player->physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * DELTA_50FPS;
 
     for (int i = (int)framesToApply; i > 0; i--)

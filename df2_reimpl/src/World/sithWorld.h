@@ -138,6 +138,8 @@ int sithCopyright_Load(sithWorld *lvl, int junk);
 int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_FindSectionParser(char *a1);
 
+static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
+
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)
 #define sithWorld_pLoading (*(sithWorld**)0x8339D0)

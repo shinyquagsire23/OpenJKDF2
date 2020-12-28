@@ -11,6 +11,7 @@
 #include "Cog/jkCog.h"
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
+#include "General/stdMemory.h"
 #include "General/stdConffile.h"
 #include "General/stdFnames.h"
 #include "General/stdHashTable.h"
@@ -21,6 +22,7 @@
 #include "General/Darray.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIGeneral.h"
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUIDecision.h"
@@ -34,7 +36,9 @@
 #include "Engine/rdClip.h"
 #include "Engine/rdCanvas.h"
 #include "Engine/rdThing.h"
+#include "Engine/sithCamera.h"
 #include "Engine/sithTime.h"
+#include "Engine/sith.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithSprite.h"
@@ -58,6 +62,7 @@
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithUnk3.h"
+#include "Win95/DirectX.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -65,6 +70,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkSmack.h"
 #include "Main/jkGob.h"
 #include "Main/jkStrings.h"
 
@@ -321,6 +327,13 @@ __declspec(dllexport) void hook_init(void)
     // sithCogParse
     //hook_function(sithCogYACC_yyparse_ADDR, yyparse);
     
+    // DirectX
+    /*hook_function(DirectX_DirectDrawEnumerateA_ADDR, DirectX_DirectDrawEnumerateA);
+    hook_function(DirectX_DirectDrawCreate_ADDR, DirectX_DirectDrawCreate);
+    hook_function(DirectX_DirectSoundCreate_ADDR, DirectX_DirectSoundCreate);
+    hook_function(DirectX_DirectPlayLobbyCreateA_ADDR, DirectX_DirectPlayLobbyCreateA);
+    hook_function(DirectX_DirectInputCreateA_ADDR, DirectX_DirectInputCreateA);*/
+    
     // std
     hook_function(stdCalcBitPos_ADDR, stdCalcBitPos);
     hook_function(stdReadRaw_ADDR, stdReadRaw);
@@ -453,6 +466,15 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConsole_WriteBorderMaybe2_ADDR, stdConsole_WriteBorderMaybe2);
     hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
+    
+    // stdMemory
+    hook_function(stdMemory_Startup_ADDR, stdMemory_Startup);
+    hook_function(stdMemory_Shutdown_ADDR, stdMemory_Shutdown);
+    hook_function(stdMemory_Open_ADDR, stdMemory_Open);
+    hook_function(stdMemory_Dump_ADDR, stdMemory_Dump);
+    hook_function(stdMemory_BlockAlloc_ADDR, stdMemory_BlockAlloc);
+    hook_function(stdMemory_BlockFree_ADDR, stdMemory_BlockFree);
+    hook_function(stdMemory_BlockRealloc_ADDR, stdMemory_BlockRealloc);
     
     // rdroid
     hook_function(rdStartup_ADDR, rdStartup);
@@ -677,6 +699,12 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdMatrix_TransformPointLst34_ADDR, rdMatrix_TransformPointLst34);
     hook_function(rdMatrix_TransformPointLst44_ADDR, rdMatrix_TransformPointLst44);
     
+    // sith
+    hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
+    
+    // sithCamera
+    hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
+    
     // sithSector
     hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
     hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
@@ -685,7 +713,8 @@ __declspec(dllexport) void hook_init(void)
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
-    hook_function(sithWeapon_InitDefaults2_ADDR, sithWeapon_InitDefaults2);
+    hook_function(sithWeapon_Startup_ADDR, sithWeapon_Startup);
+    hook_function(sithWeapon_Underwater_ADDR, sithWeapon_Underwater);
 
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
@@ -838,6 +867,12 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
     hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
+    
+    // jkSmack
+    hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);
+    hook_function(jkSmack_Shutdown_ADDR, jkSmack_Shutdown);
+    hook_function(jkSmack_GetCurrentGuiState_ADDR, jkSmack_GetCurrentGuiState);
+    hook_function(jkSmack_SmackPlay_ADDR, jkSmack_SmackPlay);
     
     // jkGob
     hook_function(jkGob_Startup_ADDR, jkGob_Startup);
@@ -993,6 +1028,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiForce_Shutdown_ADDR, jkGuiForce_Shutdown);
     hook_function(jkGuiForce_UpdateViewForRank_ADDR, jkGuiForce_UpdateViewForRank);
     hook_function(jkGuiForce_DarkLightHoverDraw_ADDR, jkGuiForce_DarkLightHoverDraw);
+    
+    // jkGUIGeneral
+    hook_function(jkGuiGeneral_Initialize_ADDR, jkGuiGeneral_Initialize);
+    hook_function(jkGuiGeneral_Shutdown_ADDR, jkGuiGeneral_Shutdown);
+    hook_function(jkGuiGeneral_Show_ADDR, jkGuiGeneral_Show);
     
     // jkGUIEsc
     hook_function(jkGuiEsc_Startup_ADDR, jkGuiEsc_Startup);

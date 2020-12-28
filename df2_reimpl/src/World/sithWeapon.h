@@ -4,8 +4,8 @@
 #include "Primitives/rdMatrix.h"
 
 #define sithWeapon_InitDefaults_ADDR (0x004D3430)
-#define sithWeapon_InitDefaults2_ADDR (0x004D34B0)
-#define sithWeapon_underwater_ADDR (0x004D3530)
+#define sithWeapon_Startup_ADDR (0x004D34B0)
+#define sithWeapon_Underwater_ADDR (0x004D3530)
 #define sithWeapon_sub_4D35E0_ADDR (0x004D35E0)
 #define sithWeapon_sub_4D3920_ADDR (0x004D3920)
 #define sithWeapon_LoadParams_ADDR (0x004D4290)
@@ -66,8 +66,11 @@ typedef struct sithSound sithSound;
 typedef struct sithCog sithCog;
 
 void sithWeapon_InitDefaults();
-void sithWeapon_InitDefaults2();
+void sithWeapon_Startup();
+void sithWeapon_Underwater(sithThing *weapon, float deltaSeconds);
 
+static void (*sithWeapon_sub_4D35E0)(sithThing *a1) = (void*)sithWeapon_sub_4D35E0_ADDR;
+static void (*sithWeapon_sub_4D3920)(sithThing *a1) = (void*)sithWeapon_sub_4D3920_ADDR;
 static void (*sithWeapon_Collide)(sithThing *physicsThing, sithThing *collidedThing, rdMatrix34 *a4, int a5) = (void*)sithWeapon_Collide_ADDR;
 static int (*sithWeapon_HitDebug)(sithThing *thing, sithSurface *surface, void *a3) = (void*)sithWeapon_HitDebug_ADDR;
 

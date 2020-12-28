@@ -7,5 +7,6 @@
 #define jkGuiSetup_Shutdown_0_ADDR (0x00413170)
 
 static void (*jkGuiSetup_Show)() = (void*)jkGuiSetup_Show_ADDR;
+static void (*jkGuiSetup_sub_412EF0)(jkGuiMenu *menu, int a2) = (void*)jkGuiSetup_sub_412EF0_ADDR;
 
 #endif // _JKGUISETUP_H

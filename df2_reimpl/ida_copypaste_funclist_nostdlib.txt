@@ -24,10 +24,10 @@ jkControl_Initialize	.text	00402860	00000051			R	.	.	.	.	.	.	.
 jkControl_Shutdown	.text	004028C0	00000010	00000000	00000000	R	.	.	.	.	.	.	.
 jkControl_nullsub_37	.text	004028D0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkControl_HandleHudKeys	.text	004028E0	000002CF	00000308	00000004	R	.	.	.	.	.	.	.
-jkSmack_Initialize	.text	00402BB0	00000017			R	.	.	.	.	.	.	.
-jkSmack_Shutdown	.text	00402BD0	0000002A			R	.	.	.	.	.	.	.
+jkSmack_Initialize	.text	00402BB0	00000017			R	.	.	.	.	.	T	.
+jkSmack_Shutdown	.text	00402BD0	0000002A			R	.	.	.	.	.	T	.
 jkSmack_GetCurrentGuiState	.text	00402C00	00000006			R	.	.	.	.	.	.	.
-jkSmack_SmackPlay	.text	00402C10	000000A7	00000000	00000004	R	.	.	.	.	.	.	.
+jkSmack_SmackPlay	.text	00402C10	000000A7	00000000	00000004	R	.	.	.	.	.	T	.
 jkMain_Startup	.text	00402CC0	00000015	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_Shutdown	.text	00402CE0	00000015	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_SetVideoMode	.text	00402D00	00000137	0000000C	00000000	R	.	.	.	.	.	.	.
@@ -106,11 +106,11 @@ jkPlayer_GetMpcInfo	.text	00405C30	0000008E	00000008	00000014	R	.	.	.	.	.	T	.
 jkPlayer_SetChoice	.text	00405CC0	00000013	00000004	00000004	R	.	.	.	.	.	T	.
 jkPlayer_GetChoice	.text	00405CE0	0000000F			R	.	.	.	.	.	T	.
 jkPlayer_CalcAlignment	.text	00405CF0	0000013F	00000008	00000004	R	.	.	.	.	.	T	.
-jkPlayer_MpcInitBins	.text	00405E30	00000173	000000F0	00000004	R	.	.	.	.	.	.	.
+jkPlayer_MpcInitBins	.text	00405E30	00000173	000000F0	00000004	R	.	.	.	.	.	T	.
 jkPlayer_MPCParse	.text	00405FB0	000002C0	000000D8	00000014	R	.	.	.	.	.	T	.
-jkPlayer_MPCWrite	.text	00406270	00000158	000000D4	0000000C	R	.	.	.	.	B	.	.
-jkPlayer_MPCBinWrite	.text	004063D0	00000066	0000000C	00000000	R	.	.	.	.	.	.	.
-jkPlayer_MPCBinRead	.text	00406440	000000A0	0000000C	00000000	R	.	.	.	.	.	.	.
+jkPlayer_MPCWrite	.text	00406270	00000158	000000D4	0000000C	R	.	.	.	.	B	T	.
+jkPlayer_MPCBinWrite	.text	004063D0	00000066	0000000C	00000000	R	.	.	.	.	.	T	.
+jkPlayer_MPCBinRead	.text	00406440	000000A0	0000000C	00000000	R	.	.	.	.	.	T	.
 jkPlayer_InitForceBins	.text	004064E0	00000084	00000008	00000000	R	.	.	.	.	.	.	.
 jkPlayer_GetAlignment	.text	00406570	000002ED	00000014	00000000	R	.	.	.	.	.	.	.
 jkPlayer_SetAccessiblePowers	.text	00406860	00000125	0000000C	00000004	R	.	.	.	.	.	T	.
@@ -125,7 +125,7 @@ jkPlayer_DisallowOtherSide	.text	00407210	00000103	00000008	00000004	R	.	.	.	.	.
 jkPlayer_WriteOptionsConf	.text	00407320	00000097	00000000	00000000	R	.	.	.	.	.	.	.
 jkPlayer_ReadOptionsConf	.text	004073C0	00000105	00000000	00000000	R	.	.	.	.	.	.	.
 jkPlayer_GetJediRank	.text	004074D0	0000000F			R	.	.	.	.	.	T	.
-jkPlayer_SetRank	.text	004074E0	00000013	00000004	00000004	R	.	.	.	.	.	.	.
+jkPlayer_SetRank	.text	004074E0	00000013	00000004	00000004	R	.	.	.	.	.	T	.
 jkHud_Startup	.text	00407500	00000040			R	.	.	.	.	.	.	.
 jkHud_Shutdown	.text	00407540	00000017			R	.	.	.	.	.	.	.
 jkHud_InitRes	.text	00407560	0000041A	0000008C	00000000	R	.	.	.	.	.	.	.
@@ -712,7 +712,7 @@ std3D_ResetRenderList	.text	00429910	00000055			R	.	.	.	.	.	.	.
 std3D_AddRenderListVertices	.text	00429970	0000005D	00000004	00000008	R	.	.	.	.	.	T	.
 std3D_RenderListVerticesFinish	.text	004299D0	00000044			R	.	.	.	.	.	.	.
 std3D_AddRenderListTris	.text	00429A20	000001AC	00000010	00000008	R	.	.	.	.	.	T	.
-std3D_DrawRenderList	.text	00429BD0	000000AA	00000034	00000000	R	.	.	.	.	.	.	.
+std3D_DrawRenderList	.text	00429BD0	000000AA	00000034	00000000	R	.	.	.	.	.	T	.
 std3D_AddRenderListTrisAttributes	.text	00429C80	0000026E	00000004	00000004	R	.	.	.	.	.	.	.
 std3D_SetCurrentPalette	.text	00429EF0	000000A2	0000000C	00000005	R	.	.	.	.	.	T	.
 std3D_GetValidDimension	.text	00429FA0	00000097	0000000C	00000010	R	.	.	.	.	.	.	.
@@ -799,7 +799,7 @@ stdString_wstrncat	.text	0042F360	00000094	00000010	00000010	R	.	.	.	.	.	T	.
 stdString_CstrCopy	.text	0042F400	00000070	00000010	00000004	R	.	.	.	.	.	.	.
 stdString_WcharCopy	.text	0042F470	00000079	00000010	00000004	R	.	.	.	.	.	.	.
 stdString_CStrToLower	.text	0042F4F0	00000023	00000004	00000004	R	.	.	.	.	.	.	.
-util_FileExists	.text	0042F520	0000002E	00000000	00000004	R	.	.	.	.	.	.	.
+util_FileExists	.text	0042F520	0000002E	00000000	00000004	R	.	.	.	.	.	T	.
 util_files_exists	.text	0042F550	000001AE	00000114	00000010	R	.	.	.	.	.	.	.
 util_unkcomparison1	.text	0042F700	0000004D	00000008	00000008	R	.	.	.	.	.	.	.
 util_unkcomparison2	.text	0042F750	0000004D	00000008	00000008	R	.	.	.	.	.	.	.
@@ -997,8 +997,8 @@ stdHashTable_Free	.text	00437C00	0000005D	00000008	00000004	R	.	.	.	.	.	T	.
 stdHashTable_SetKeyVal	.text	00437C60	00000119	00000010	0000000C	R	.	.	.	.	.	T	.
 stdHashTable_GetKeyVal	.text	00437D80	00000080	00000010	00000008	R	.	.	.	.	.	T	.
 stdHashTable_FreeKey	.text	00437E00	00000115	00000010	00000008	R	.	.	.	.	.	T	.
-stdHashtable_PrintDiagnostics	.text	00437F20	0000011E	00000020	00000004	R	.	.	.	.	.	T	.
-stdHashtable_Dump	.text	00438040	0000008C	00000008	00000004	R	.	.	.	.	.	T	.
+stdHashTable_PrintDiagnostics	.text	00437F20	0000011E	00000020	00000004	R	.	.	.	.	.	T	.
+stdHashTable_Dump	.text	00438040	0000008C	00000008	00000004	R	.	.	.	.	.	T	.
 stdMci_Startup	.text	004380D0	000000E4	00000060	00000000	R	.	.	.	.	.	.	.
 stdMci_Shutdown	.text	004381C0	0000005A	00000004	00000000	R	.	.	.	.	.	.	.
 stdMci_Play	.text	00438220	00000077	0000001C	00000008	R	.	.	.	.	.	T	.
@@ -1065,20 +1065,20 @@ rdCanvas_NewEntry	.text	0043AC70	000000B2	00000008	00000024	R	.	.	.	.	.	T	.
 rdCanvas_Free	.text	0043AD30	00000015	00000000	00000004	R	.	.	.	.	.	T	.
 rdCanvas_FreeEntry	.text	0043AD50	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 rdCache_Startup	.text	0043AD60	00000006			R	.	.	.	.	.	.	.
-rdCache_AdvanceFrame	.text	0043AD70	0000000F	00000000	00000000	R	.	.	.	.	.	.	.
-rdCache_FinishFrame	.text	0043AD80	0000000F	00000000	00000000	R	.	.	.	.	.	.	.
-rdCache_Reset	.text	0043AD90	00000032	00000000	00000000	R	.	.	.	.	.	.	.
+rdCache_AdvanceFrame	.text	0043AD70	0000000F	00000000	00000000	R	.	.	.	.	.	T	.
+rdCache_FinishFrame	.text	0043AD80	0000000F	00000000	00000000	R	.	.	.	.	.	T	.
+rdCache_Reset	.text	0043AD90	00000032	00000000	00000000	R	.	.	.	.	.	T	.
 rdCache_ClearFrameCounters	.text	0043ADD0	0000000B			R	.	.	.	.	.	.	.
 rdCache_GetProcEntry	.text	0043ADE0	0000008E	00000008	00000000	R	.	.	.	.	.	.	.
-rdCache_Flush	.text	0043AE70	0000011E	00000004	00000000	R	.	.	.	.	.	.	.
+rdCache_Flush	.text	0043AE70	0000011E	00000004	00000000	R	.	.	.	.	.	T	.
 rdCache_AddProcFace	.text	0043AF90	0000022B	00000028	00000009	R	.	.	.	.	B	T	.
 rdCache_SendFaceListToHardware	.text	0043B1C0	000010F7	000000A4	00000000	R	.	.	.	.	B	.	.
-rdCache_ResetRenderList	.text	0043C2C0	00000017	00000000	00000000	R	.	.	.	.	.	.	.
-rdCache_DrawRenderList	.text	0043C2E0	00000094	00000000	00000000	R	.	.	.	.	.	.	.
+rdCache_ResetRenderList	.text	0043C2C0	00000017	00000000	00000000	R	.	.	.	.	.	T	.
+rdCache_DrawRenderList	.text	0043C2E0	00000094	00000000	00000000	R	.	.	.	.	.	T	.
 rdCache_TriCompare	.text	0043C380	0000003A	00000004	00000008	R	.	.	.	.	.	T	.
 rdCache_DrawFaceN	.text	0043C3C0	00000AC9	00000014	00000004	R	.	.	.	.	.	T	.
 rdCache_DrawFaceZ	.text	0043CED0	00000AC9	00000014	00000004	R	.	.	.	.	.	T	.
-rdCache_DrawFaceUser	.text	0043D9E0	00000747	00000018	00000004	R	.	.	.	.	.	.	.
+rdCache_DrawFaceUser	.text	0043D9E0	00000747	00000018	00000004	R	.	.	.	.	.	T	.
 rdCache_ProcFaceCompare	.text	0043E170	0000002F	00000000	00000008	R	.	.	.	.	.	T	.
 rdThing_New	.text	0043E1A0	0000005F	00000000	00000004	R	.	.	.	.	.	T	.
 rdThing_NewEntry	.text	0043E200	00000054	00000000	00000008	R	.	.	.	.	.	T	.
@@ -1330,7 +1330,7 @@ rdLight_CalcFaceIntensity	.text	0044B960	00000136	00000024	0000001C	R	.	.	.	.	.	
 rdLight_CalcDistFaceIntensity	.text	0044BAA0	00000091	00000014	00000018	R	.	.	.	.	.	.	.
 rdRaster_Startup	.text	0044BB40	00000078	00000008	00000000	R	.	.	.	.	.	.	.
 rdActive_Startup	.text	0044BBC0	00000006			R	.	.	.	.	.	.	.
-rdActive_AdvanceFrame	.text	0044BBD0	000000A0	0000000C	00000000	R	.	.	.	.	.	.	.
+rdActive_AdvanceFrame	.text	0044BBD0	000000A0	0000000C	00000000	R	.	.	.	.	.	T	.
 rdActive_ClearFrameCounters	.text	0044BC70	0000000B			R	.	.	.	.	.	.	.
 rdActive_DrawScene	.text	0044BC80	00000178	0000000C	00000000	R	.	.	.	.	.	.	.
 rdActive_BuildSpans	.text	0044BE00	00000840	00000034	00000000	R	.	.	.	.	B	.	.
@@ -1839,19 +1839,19 @@ sithPlayer_SetBinCarries	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	.	T
 sithPlayer_idk2	.text	004C9500	0000002C	00000000	00000004	R	.	.	.	.	.	.	.
 sithDplay_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.	.
 sithDplay_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	.	.
-sithDplay_Open	.text	004C9570	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
-sithDplay_destroy1	.text	004C95B0	00000046	00000004	00000000	R	.	.	.	.	.	.	.
+sithDplay_OpenConnection	.text	004C9570	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
+sithDplay_CloseConnection	.text	004C95B0	00000046	00000004	00000000	R	.	.	.	.	.	.	.
 sithDplay_EnumSessions	.text	004C9600	00000013	00000000	00000008	R	.	.	.	.	.	T	.
 sithDplay_EnumSessions2	.text	004C9620	00000005	00000054	00000000	R	.	.	.	.	.	.	.
 sithDplay_EnumPlayers	.text	004C9630	0000000E	00000000	00000004	R	.	.	.	.	.	.	.
 sithDplay_SendToPlayer	.text	004C9640	000000C9	00000010	00000008	R	.	.	.	.	.	.	.
 sithDplay_Recv	.text	004C9710	00000090	00000008	00000004	R	.	.	.	.	.	.	.
-sithDplay_open1	.text	004C97A0	0000007F	00000004	00000008	R	.	.	.	.	.	T	.
-sithDplay_destroy2	.text	004C9820	00000025			R	.	.	.	.	.	.	.
-sithDplay_createplayer	.text	004C9850	0000007B	00000004	00000004	R	.	.	.	.	.	.	.
+sithDplay_Open	.text	004C97A0	0000007F	00000004	00000008	R	.	.	.	.	.	T	.
+sithDplay_Close	.text	004C9820	00000025			R	.	.	.	.	.	.	.
+sithDplay_CreatePlayer	.text	004C9850	0000007B	00000004	00000004	R	.	.	.	.	.	.	.
 sithDplay_seed_idk	.text	004C98D0	00000055	00000004	00000004	R	.	.	.	.	.	.	.
-sithDplay_earlyinit	.text	004C9930	00000073			R	.	.	.	.	.	.	.
-sithDplay_doReceive	.text	004C99B0	0000002B	00000008	00000000	R	.	.	.	.	.	.	.
+sithDplay_EarlyInit	.text	004C9930	00000073			R	.	.	.	.	.	.	.
+sithDplay_DoReceive	.text	004C99B0	0000002B	00000008	00000000	R	.	.	.	.	.	.	.
 sithDplay_cogMsg_SendEnumPlayers	.text	004C99E0	00000060	00000000	00000004	R	.	.	.	.	.	.	.
 sithDplay_cogMsg_HandleEnumPlayers	.text	004C9A40	00000096	00000010	00000004	R	.	.	.	.	.	.	.
 sithMulti_Startup	.text	004C9AE0	000001CE	00000010	00000000	R	.	.	.	.	.	.	.
@@ -2583,17 +2583,17 @@ sithSector_cogMsg_HandleDestroyThing	.text	004F5410	00000024	00000000	00000004	R
 sithSector_TransitionMovingThing	.text	004F5440	00000106	00000014	0000000C	R	.	.	.	.	.	T	.
 sithSector_ThingLandIdk	.text	004F5550	0000031C	00000030	00000008	R	.	.	.	.	.	T	.
 sithSector_ThingPhysIdk_inlined	.text	004F5870	00000083	00000008	00000004	R	.	.	.	.	.	T	.
-sithSector_Thingidkphys2	.text	004F5900	000000AB	00000000	00000008	R	.	.	.	.	.	T	.
+sithSector_ThingPhysicsTick	.text	004F5900	000000AB	00000000	00000008	R	.	.	.	.	.	T	.
 sithSector_ThingApplyForce	.text	004F59B0	000000C1	00000010	00000008	R	.	.	.	.	.	T	.
 sithSector_ThingSetLook	.text	004F5A80	000002CA	0000000C	0000000C	R	.	.	.	.	.	T	.
-sithSector_Thingphyshelper	.text	004F5D50	00000166	00000004	00000010	R	.	.	.	.	.	T	.
+sithSector_ApplyDrag	.text	004F5D50	00000166	00000004	00000010	R	.	.	.	.	.	T	.
 sithSector_LoadThingPhysicsParams	.text	004F5EC0	0000027B	00000000	0000000C	R	.	.	.	.	.	T	.
 sithSector_StopPhysicsThing	.text	004F61A0	0000006A	00000000	00000004	R	.	.	.	.	.	T	.
 sithSector_ThingGetInsertOffsetZ	.text	004F6210	00000051	00000000	00000004	R	.	.	.	.	.	T	.
-sithSector_ThingPhysIdk1000	.text	004F6270	000005EC	0000006C	00000008	R	.	.	.	.	.	T	.
-sithSector_Thingphysidk3	.text	004F6860	0000051C	00000070	00000008	R	.	.	.	.	B	T	.
-sithSector_Thingphysidk2	.text	004F6D80	000006A3	0000006C	00000008	R	.	.	.	.	.	T	.
-sithSector_Thingphysidk	.text	004F7430	000012EF	00000094	00000008	R	.	.	.	.	.	T	.
+sithSector_ThingPhysGeneral	.text	004F6270	000005EC	0000006C	00000008	R	.	.	.	.	.	T	.
+sithSector_ThingPhysPlayer	.text	004F6860	0000051C	00000070	00000008	R	.	.	.	.	B	T	.
+sithSector_ThingPhysUnderwater	.text	004F6D80	000006A3	0000006C	00000008	R	.	.	.	.	.	T	.
+sithSector_ThingPhysAttached	.text	004F7430	000012EF	00000094	00000008	R	.	.	.	.	.	T	.
 sithSector_Load	.text	004F8720	00000488	0000004C	00000008	R	.	.	.	.	.	T	.
 sithSector_GetIdxFromPtr	.text	004F8BB0	0000003B	00000004	00000004	R	.	.	.	.	.	.	.
 sithSector_New	.text	004F8BF0	00000075	00000010	00000008	R	.	.	.	.	.	T	.
@@ -2636,7 +2636,7 @@ sithTrackThing_Rotate	.text	004FA980	00000135	00000010	00000008	R	.	.	.	.	.	T	.
 sithTrackThing_Arrivedidk	.text	004FAAC0	000001F4	0000000C	00000004	R	.	.	.	.	.	T	.
 sub_4FACC0	.text	004FACC0	0000008B	00000004	00000008	R	.	.	.	.	.	T	.
 sub_4FAD50	.text	004FAD50	000001A9	0000002C	0000000C	R	.	.	.	.	.	T	.
-sithTrackThing_idk	.text	004FAF00	00000485	00000050	00000008	R	.	.	.	.	.	T	.
+sithTrackThing_Tick	.text	004FAF00	00000485	00000050	00000008	R	.	.	.	.	.	T	.
 sithTrackThing_LoadPathParams	.text	004FB390	00000149	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_BlockedIdk	.text	004FB4E0	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_StoppedMoving	.text	004FB500	000000E3	00000008	00000004	R	.	.	.	.	.	T	.

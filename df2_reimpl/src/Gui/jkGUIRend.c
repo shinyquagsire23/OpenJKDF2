@@ -23,8 +23,8 @@ static jkGuiMenu *jkGuiRend_activeMenu;
 static stdVBuffer* jkGuiRend_menuBuffer;
 static stdVBuffer *jkGuiRend_texture_dword_8561E8;
 
-static int jkGuiRend_thing_five;
-static int jkGuiRend_thing_four;
+int jkGuiRend_thing_five;
+int jkGuiRend_thing_four;
 static int jkGuiRend_bIsSurfaceValid;
 static int jkGuiRend_bInitted;
 static int jkGuiRend_bOpen;

@@ -22,6 +22,7 @@
 #include "World/sithPlayer.h"
 #include "World/sithWeapon.h"
 #include "World/sithWorld.h"
+#include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
 #include "Win95/sithControl.h"
 #include "Gui/jkHudInv.h"
@@ -360,7 +361,7 @@ void jkPlayer_DrawPov()
             rdSetSortingMethod(2);
             rdSetOcclusionMethod(0);
 
-            float ambLight = sithCamera_currentCamera->renderInfo->field_8 + sithCamera_currentCamera->renderInfo->field_4;
+            float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
             if ( ambLight < 0.0 )
             {
                 ambLight = 0.0;
@@ -371,7 +372,7 @@ void jkPlayer_DrawPov()
             }
 
             rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
-            rdColormap_SetCurrent(sithCamera_currentCamera->renderInfo->colormap);
+            rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
 
             rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
             rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);

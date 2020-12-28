@@ -199,6 +199,9 @@ struct jkGuiMenu
 //#define jkGuiRend_CursorVisible (*(int*)0x54F6BC)
 //#define jkGuiRend_elementHandlers ((jkGuiElementHandlers*)0x54F6D0)
 
+extern int jkGuiRend_thing_five;
+extern int jkGuiRend_thing_four;
+
 void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect);
 void jkGuiRend_SetPalette(uint8_t* pal);
 void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, __int16 color);
