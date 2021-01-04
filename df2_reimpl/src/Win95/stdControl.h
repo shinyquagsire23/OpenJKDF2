@@ -41,5 +41,7 @@
 #define stdControl_GetAxis2_ADDR (0x004D6D70)
 
 static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
+static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
+static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;
 
 #endif // _STDCONTROL_H

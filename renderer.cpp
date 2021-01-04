@@ -81,8 +81,8 @@ void *renderer_thread(void *threadid)
         uint32_t game_ms_diff = game_ms - last_game_ms;
         last_ms = ms;
         
-        if (ms_diff < (1000/60))
-            usleep(((1000/60) - ms_diff) * 1000);
+        //if (ms_diff < (1000/120))
+        //    usleep(((1000/120) - ms_diff) * 1000);
 
         glBindFramebuffer(GL_FRAMEBUFFER, window_fbo);
         SDL_SetRenderTarget(renderRenderer, NULL);

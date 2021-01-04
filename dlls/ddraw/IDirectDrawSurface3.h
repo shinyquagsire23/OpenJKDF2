@@ -249,7 +249,7 @@ public:
             }*/
             
             glBindTexture(GL_TEXTURE_2D, image_texture);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, GL_RED, GL_UNSIGNED_BYTE, paletted_img);
+            //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this_ptr->desc.dwWidth, this_ptr->desc.dwHeight, GL_RED, GL_UNSIGNED_BYTE, paletted_img);
             
             renderer_feedwindowinfo("DDraw Render", image_texture, image_pal, ImVec2(this_ptr->desc.dwWidth, this_ptr->desc.dwHeight), NULL, NULL, NULL);
             renderer_waitforvblank();

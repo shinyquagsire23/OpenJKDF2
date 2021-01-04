@@ -70,6 +70,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkMain.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGob.h"
 #include "Main/jkStrings.h"
@@ -195,11 +196,17 @@ __declspec(dllexport) int WinMain_(uint32_t hInstance, uint32_t hPrevInstance, c
     return 0;
 }
 
+void _pei386_runtime_relocator(){}
+
 __declspec(dllexport) void hook_init(void)
 {
     jk_init();
     
     hook_function(WinMain_ADDR, WinMain_);
+    
+    // jkMain
+    hook_function(jkMain_gui_loop_ADDR, jkMain_gui_loop);
+    hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
     
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);

@@ -28,5 +28,7 @@ typedef struct sithThing sithThing;
 #define g_mapModeFlags (*(int*)0x8EE674)
 
 static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
+static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
+static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
 
 #endif // _JKGAME_H

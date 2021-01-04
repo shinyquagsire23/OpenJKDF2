@@ -53,10 +53,10 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     {
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
     }
-    else if ( thing->thingType == THINGTYPE_PLAYER )
+    /*else if ( thing->thingType == THINGTYPE_PLAYER )
     {
         sithSector_ThingPhysPlayer(thing, deltaSecs);
-    }
+    }*/
     else
     {
         sithSector_ThingPhysGeneral(thing, deltaSecs);

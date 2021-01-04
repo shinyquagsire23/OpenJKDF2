@@ -53,6 +53,7 @@ void jkSaber_Draw(rdMatrix34 *posRotMat);
 void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint);
 
+static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;
 
 #endif // _JKSABER_H

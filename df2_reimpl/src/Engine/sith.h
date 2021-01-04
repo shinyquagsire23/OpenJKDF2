@@ -21,5 +21,6 @@
 #define dword_8EE678 (*(int*)0x008EE678)
 
 void sith_UpdateCamera();
+static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 
 #endif // _SITH__H
