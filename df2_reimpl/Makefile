@@ -1,5 +1,6 @@
 CC := i686-w64-mingw32-gcc
 TARGET := df2_reimpl.dll
+TARGET_WIN := df2_reimpl_win.dll
 
 SRC := src
 OBJ := build
@@ -15,7 +16,7 @@ YACC_BIN := $(ROOT_DIR)/byacc/yacc
 
 #CFLAGS=
 
-all: $(OBJ) $(TARGET)
+all: $(OBJ) $(TARGET) $(TARGET_WIN)
 clean:
 	rm -rf $(OBJ)
 	rm -f $(TARGET)
@@ -40,5 +41,8 @@ $(OBJ)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+$(TARGET_WIN): $(OBJECTS)
+	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -static-libgcc
+
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles
+	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static-libgcc

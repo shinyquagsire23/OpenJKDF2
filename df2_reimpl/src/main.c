@@ -196,6 +196,20 @@ __declspec(dllexport) int WinMain_(uint32_t hInstance, uint32_t hPrevInstance, c
     return 0;
 }
 
+__declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd)
+{
+    DWORD old;
+    VirtualProtect((void*)0x401000, 0x522000-0x401000, PAGE_EXECUTE_READWRITE, &old);
+    
+    hook_init();
+    
+    VirtualProtect((void*)0x401000, 0x522000-0x401000, old, NULL);
+    
+    jk_printf("asdf\n");
+    
+    jk_main(hInstance, hPrevInstance, "-windowGUI", nShowCmd, "Jedi Knight");
+}
+
 void _pei386_runtime_relocator(){}
 
 __declspec(dllexport) void hook_init(void)
@@ -1070,8 +1084,6 @@ __declspec(dllexport) void hook_init(void)
 
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
-
-    
     
     //hook_function();
 }

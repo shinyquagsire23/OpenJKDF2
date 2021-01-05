@@ -5,6 +5,26 @@ This directory contains a WIP reimplementation of DF2 in C. Files are organized 
 ## Methodology
 Most functions are a copy-paste from IDA's Hex-Rays decompiler into the source material, with some cleanup and renaming. Most functions decompile fairly well as long as the structures are correct, though for loops often need reworking. If you'd like a copy of my IDB, let me know.
 
+## Usage
+`df2_reimpl` supports both the KVM target from the directory above as well as WINE/Windows, though no guarantees are made for the addition of ie jkgfxmod, other patches nor other hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl_win.dll` is compiled without those linker flags.
+
+Hooking is done by patching JK.EXE with `JK-hook.ips` (using Lunar IPS or similar). This patch replaces `Window_Main` at offset 0x10db50 with the following:
+```
+68 70 E7 50 00 FF 15 98 05 8F 00 68 80 E7 50 00 50 FF 15 1C 05 8F 00 FF D0 C3 00 00 00 00 00 00 64 66 32 5F 72 65 69 6D 70 6C 2E 64 6C 6C 00 00 68 6F 6F 6B 5F 69 6E 69 74 5F 77 69 6E 00 00 00
+```
+which is just some small shellcode for
+```
+int (*v1)(void); 
+v1 = GetProcAddress(LoadLibraryA("df2_reimpl.dll"), "hook_init_win");
+return v1();
+```
+OpenJKDF2 then calls the necessary `VirtualProtect` functions from `hook_init_win`, hooks all the functions it needs and then calls its own implementation of `Window_Main` which was replaced with the loader.
+
+TL;DR for Windows users
+- Patch JK.EXE with `JK-hook.ips`
+- Compile df2_reimpl
+- Copy `df2_reimpl_win.dll` to the same folder as `JK.EXE`, renamed to `df2_reimpl.dll`
+
 ## Current Progress
 
 Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (see `ida_copypaste_funclist.txt` for a full function name listing).
