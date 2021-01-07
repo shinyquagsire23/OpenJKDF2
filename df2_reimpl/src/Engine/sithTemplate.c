@@ -74,7 +74,7 @@ int sithTemplate_Load(sithWorld *world, int a2)
     if ( _memcmp(stdConffile_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_entry.args[1].value, "templates", 0xAu) )
         return 0;
 
-    numTemplates = atoi(stdConffile_entry.args[2].value);
+    numTemplates = _atoi(stdConffile_entry.args[2].value);
     if ( !numTemplates )
         return 1;
     

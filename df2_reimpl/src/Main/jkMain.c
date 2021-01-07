@@ -13,7 +13,11 @@
 #include "stdPlatform.h"
 #include "jkGame.h"
 
+#ifdef QOL_IMPROVEMENTS
+#define TICKRATE_MS (1) // no cap
+#else
 #define TICKRATE_MS (20) // 50fps
+#endif
 
 void jkMain_gui_loop()
 {
@@ -39,35 +43,39 @@ void jkMain_gui_loop()
                 if ( !thing_six )
                 {
                     v1 = stdPlatform_GetTimeMsec();
-                    if ( v1 <= dword_552B9C + TICKRATE_MS || (dword_552B9C = v1, !sith_Tick()) )
+                    
+                    if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                     {
-                        if ( g_sithMode == 5 )
-                        {
-                            if ( jkGuiRend_thing_five )
-                                jkGuiRend_thing_four = 1;
-                            jkSmack_stopTick = 1;
-                            jkSmack_nextGuiState = 3;
-                            thing_nine = 0;
-                            return;
-                        }
-                        if ( net_dword_832638 )
-                        {
-                            net_dword_832638 = 0;
-                            if ( net_isServer )
-                                jkSaber_cogMsg_SendEndLevel();
-                        }
-                        if ( sith_bEndLevel )
-                        {
-                            sith_bEndLevel = 0;
-                            jkMain_EndLevel(1);
-                        }
-                        jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                        dword_552B5C += stdPlatform_GetTimeMsec() - v1;
-                        v3 = stdPlatform_GetTimeMsec();
-                        if ( g_app_suspended && v0 != 6 )
-                            jkGame_Update(v2);
-                        game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
+                        jkMain_lastTickMs = v1;
+                        if (!sith_Tick()) return;
                     }
+                    
+                    if ( g_sithMode == 5 )
+                    {
+                        if ( jkGuiRend_thing_five )
+                            jkGuiRend_thing_four = 1;
+                        jkSmack_stopTick = 1;
+                        jkSmack_nextGuiState = 3;
+                        thing_nine = 0;
+                        return;
+                    }
+                    if ( net_dword_832638 )
+                    {
+                        net_dword_832638 = 0;
+                        if ( net_isServer )
+                            jkSaber_cogMsg_SendEndLevel();
+                    }
+                    if ( sith_bEndLevel )
+                    {
+                        sith_bEndLevel = 0;
+                        jkMain_EndLevel(1);
+                    }
+                    jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
+                    dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                    v3 = stdPlatform_GetTimeMsec();
+                    if ( g_app_suspended && v0 != 6 )
+                        jkGame_Update(v2);
+                    game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
         }
@@ -119,25 +127,28 @@ LABEL_35:
     }
 }
 
-signed int jkMain_GameplayTick(int a2)
+void jkMain_EscapeMenuTick(int a2)
 {
-    signed int result; // eax
-    unsigned int v3; // esi
-    int v4; // esi
+    unsigned int v1; // esi
+    void *v2; // ecx
+    int v3; // esi
 
-    result = thing_six;
-    if ( !thing_six )
+    if ( net_isMulti )
     {
-        result = thing_eight;
-        if ( thing_eight )
+        if ( !thing_six )
         {
-            v3 = stdPlatform_GetTimeMsec();
-            
-            if ( v3 <= dword_552B9C + TICKRATE_MS || (dword_552B9C = v3, (result = sith_Tick()) == 0) )
+            if ( thing_eight )
             {
+                v1 = stdPlatform_GetTimeMsec();
+                
+                if (v1 > jkMain_lastTickMs + TICKRATE_MS)
+                {
+                    jkMain_lastTickMs = v1;
+                    if (sith_Tick()) return;
+                }
+                
                 if ( g_sithMode == 5 )
                 {
-                    result = jkGuiRend_thing_five;
                     if ( jkGuiRend_thing_five )
                         jkGuiRend_thing_four = 1;
                     jkSmack_stopTick = 1;
@@ -157,15 +168,62 @@ signed int jkMain_GameplayTick(int a2)
                         jkMain_EndLevel(1);
                     }
                     jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                    dword_552B5C += stdPlatform_GetTimeMsec() - v3;
-                    v4 = stdPlatform_GetTimeMsec();
+                    dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                    v3 = stdPlatform_GetTimeMsec();
                     if ( g_app_suspended && a2 != 6 )
-                        jkGame_Update();
-                    result = stdPlatform_GetTimeMsec() - v4;
-                    game_updateMsecsTotal += result;
+                        jkGame_Update(v2);
+                    game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
         }
     }
-    return result;
+}
+
+void jkMain_GameplayTick(int a2)
+{
+    unsigned int v1; // esi
+    void *v2; // ecx
+    int v3; // esi
+
+    if ( !thing_six )
+    {
+        if ( thing_eight )
+        {
+            v1 = stdPlatform_GetTimeMsec();
+            
+            if (v1 > jkMain_lastTickMs + TICKRATE_MS)
+            {
+                jkMain_lastTickMs = v1;
+                if (sith_Tick()) return;
+            }
+            
+            if ( g_sithMode == 5 )
+            {
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = 3;
+            }
+            else
+            {
+                if ( net_dword_832638 )
+                {
+                    net_dword_832638 = 0;
+                    if ( net_isServer )
+                        jkSaber_cogMsg_SendEndLevel();
+                }
+                if ( sith_bEndLevel )
+                {
+                    sith_bEndLevel = 0;
+                    jkMain_EndLevel(1);
+                }
+                jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
+                dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                v3 = stdPlatform_GetTimeMsec();
+                if ( g_app_suspended && a2 != 6 )
+                    jkGame_Update(v2);
+                game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
+            }
+        }
+    }
 }

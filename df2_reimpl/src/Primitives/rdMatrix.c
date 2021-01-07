@@ -415,7 +415,7 @@ void rdMatrix_Normalize34(rdMatrix34 *m)
     m->rvec.z = (m->uvec.y * m->lvec.x) - (m->lvec.y * m->uvec.x);
 }
 
-void rdMatrix_Identity34(rdMatrix33 *out)
+void rdMatrix_Identity34(rdMatrix34 *out)
 {
     _memcpy(out, &rdroid_identMatrix34, sizeof(*out));
 }

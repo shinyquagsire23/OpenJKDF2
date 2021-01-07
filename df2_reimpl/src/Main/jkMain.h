@@ -59,7 +59,7 @@
 #define thing_nine (*(int*)0x0052552C)
 #define thing_six (*(int*)0x00552B90)
 #define thing_eight (*(int*)0x00552B94)
-#define dword_552B9C (*(int*)0x552B9C)
+#define jkMain_lastTickMs (*(int*)0x552B9C)
 #define dword_552B5C (*(int*)0x552B5C)
 #define sith_bEndLevel (*(int*)0x0082F0A8)
 #define game_updateMsecsTotal (*(int*)0x00552B58)
@@ -73,7 +73,8 @@ typedef struct jkGuiStateFuncs
 } jkGuiStateFuncs;
 
 void jkMain_gui_loop();
-int jkMain_GameplayTick(int a2);
+void jkMain_EscapeMenuTick(int a2);
+void jkMain_GameplayTick(int a2);
 static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 
 #endif // _JKMAIN_H

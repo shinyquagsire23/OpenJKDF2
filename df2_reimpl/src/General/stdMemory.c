@@ -4,7 +4,7 @@
 
 void stdMemory_Startup()
 {
-    memset(&stdMemory_info, 0, sizeof(stdMemory_info));
+    _memset(&stdMemory_info, 0, sizeof(stdMemory_info));
     stdMemory_bInitted = 1;
 }
 
@@ -68,7 +68,7 @@ stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int
         if ( v5 )
             v5->next = result;
         result->next = &stdMemory_info.allocTop;
-        memset(&result[1], 0xCCu, allocSize);
+        _memset(&result[1], 0xCCu, allocSize);
         stdMemory_info.allocTop.prev = result;
         result->magic = 0x12345678;
         *(int *)((char *)&result[1].num + allocSize) = 0x12345678;
@@ -91,7 +91,7 @@ void stdMemory_BlockFree(stdMemoryAlloc *alloc)
     int v4; // esi
 
     v1 = alloc - 1;
-    memset(alloc, 0xDDu, alloc[-1].size);
+    _memset(alloc, 0xDDu, alloc[-1].size);
     v2 = alloc[-1].prev;
     if ( v2 )
         v2->next = v1->next;
@@ -145,7 +145,7 @@ stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, cha
     else
     {
         v5 = alloc - 1;
-        memset(alloc, 0xDDu, alloc[-1].size);
+        _memset(alloc, 0xDDu, alloc[-1].size);
         v6 = alloc[-1].prev;
         if ( v6 )
             v6->next = v5->next;

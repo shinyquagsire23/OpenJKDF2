@@ -10,8 +10,8 @@
 #define sithThing_Startup_ADDR (0x004CC130)
 #define sithThing_Shutdown_ADDR (0x004CC1A0)
 #define sithThing_SetHandler_ADDR (0x004CC1D0)
-#define sithThing_TickMaybe_ADDR (0x004CC1E0)
-#define sithThing_DetachThing_ADDR (0x004CC4C0)
+#define sithThing_TickAll_ADDR (0x004CC1E0)
+#define sithThing_TickPhysics_ADDR (0x004CC4C0)
 #define sithThing_Remove_ADDR (0x004CC610)
 #define sithThing_GetParent_ADDR (0x004CC6A0)
 #define sithThing_GetThingByIdx_ADDR (0x004CC6D0)
@@ -26,7 +26,7 @@
 #define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
 #define sithThing_MoveToSector_ADDR (0x004CD1E0)
 #define sithThing_EnterSector_ADDR (0x4CD2C0)
-#define sithThing_DetachThing__ADDR (0x4CE380)
+#define sithThing_DetachThing_ADDR (0x4CE380)
 #define sithThing_Release_ADDR (0x4E0740)
 #define sithThing_SyncThingPos_ADDR (0x4CF560)
 #define sithThing_AttachToSurface_ADDR (0x4CDE80)
@@ -543,6 +543,20 @@ typedef struct sithThing
     float userdata;
 } sithThing;
 
+typedef int (__cdecl *sithThing_handler_t)(sithThing*);
+
+#define sithThing_paramKeyToParamValMap (*(stdHashTable**)0x008326A8)
+#define sithThing_handler (*(sithThing_handler_t*)0x008330FC)
+
+void sithThing_Startup();
+int sithThing_Shutdown();
+void sithThing_SetHandler(sithThing_handler_t handler);
+void sithThing_TickAll(float deltaSeconds, int deltaMs);
+void sithThing_Remove(sithThing *thing);
+sithThing* sithThing_GetParent(sithThing *thing);
+sithThing* sithThing_GetThingByIdx(int idx);
+
+static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
 static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
 static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
@@ -555,9 +569,9 @@ static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSect
 static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
 static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;
 static void (*sithThing_EnterSector)(sithThing *a1, sithSector *a2, int a3, int a4) = (void*)sithThing_EnterSector_ADDR;
-static int (*sithThing_DetachThing_)(sithThing *a1) = (void*)sithThing_DetachThing__ADDR;
+static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThing_ADDR;
 static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
-static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
+//static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
 static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
 static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
 static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;

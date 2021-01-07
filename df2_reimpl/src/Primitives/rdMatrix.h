@@ -101,7 +101,7 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, rdVector3 *v, float angle)
 void rdMatrix_LookAt(rdMatrix34 *out, rdVector3 *v1, rdVector3 *v2, float angle);
 void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out);
 void rdMatrix_Normalize34(rdMatrix34 *m);
-void rdMatrix_Identity34(rdMatrix33 *out);
+void rdMatrix_Identity34(rdMatrix34 *out);
 void rdMatrix_Identity44(rdMatrix44 *out);
 void rdMatrix_Copy34(rdMatrix34 *dst, rdMatrix34 *src);
 void rdMatrix_Copy44(rdMatrix44 *dst, rdMatrix44 *src);

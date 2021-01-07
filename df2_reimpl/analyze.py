@@ -50,6 +50,9 @@ for line in funclist:
     if (filefrom == "j" or filefrom == "sub"):
         continue
     
+#    if ("Raster" in filefrom):
+#        continue
+    
     if filefrom not in file_sizes:
         file_sizes[filefrom] = size
     else:

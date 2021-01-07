@@ -6,6 +6,7 @@
 #include "World/sithWorld.h"
 #include "World/sithUnk3.h"
 #include "jk.h"
+#include "Engine/sithNet.h"
 
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
@@ -53,10 +54,17 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     {
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
     }
-    /*else if ( thing->thingType == THINGTYPE_PLAYER )
+#ifdef QOL_IMPROVEMENTS
+    else if ( thing->thingType == THINGTYPE_PLAYER && net_isMulti)
     {
         sithSector_ThingPhysPlayer(thing, deltaSecs);
-    }*/
+    }
+#else
+    else if ( thing->thingType == THINGTYPE_PLAYER )
+    {
+        sithSector_ThingPhysPlayer(thing, deltaSecs);
+    }
+#endif
     else
     {
         sithSector_ThingPhysGeneral(thing, deltaSecs);

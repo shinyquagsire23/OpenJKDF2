@@ -85,7 +85,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         }
         else
         {
-            CloseHandle(gob->viewHandle2);
+            jk_CloseHandle(gob->viewHandle2);
         }
     }
 
@@ -336,6 +336,6 @@ wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
     len_wide = ((f->entry->fileSize - seekOffs_) >> 1) + 1;
   ret = pGobHS->fileGetws(gob->fhand, out, len_wide);
   if (ret)
-    f->seekOffs += wcslen(ret);
+    f->seekOffs += _wcslen(ret);
   return ret;
 }

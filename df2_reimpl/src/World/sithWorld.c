@@ -149,19 +149,31 @@ int sithHeader_Load(sithWorld *world, int junk)
     _sscanf(
         stdConffile_aLine,
         "mipmap distances %f %f %f %f",
-        &world->mipmapDistance,
+        &world->mipmapDistance.x,
         &world->mipmapDistance.y,
         &world->mipmapDistance.z,
         &world->mipmapDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &world->loadDistance, &world->loadDistance.y, &world->loadDistance.z, &world->loadDistance.w);
+    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &world->loadDistance.x, &world->loadDistance.y, &world->loadDistance.z, &world->loadDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_aLine, "perspective distance %f", &world->perspectiveDistance);
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_aLine, "gouraud distance %f", &world->gouradDistance);
+
+#ifdef QOL_IMPROVEMENTS
+    world->mipmapDistance.x = 200.0;
+    world->mipmapDistance.y = 200.0;
+    world->mipmapDistance.z = 200.0;
+    world->mipmapDistance.w = 200.0;
+    world->loadDistance.x = 200.0;
+    world->loadDistance.y = 200.0;
+    world->loadDistance.z = 200.0;
+    world->loadDistance.w = 200.0;
+#endif
+
     return 1;
 }
 

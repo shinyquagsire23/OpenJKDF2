@@ -6,7 +6,7 @@
 #define sithPuppet_NewEntry_ADDR (0x004E3D00)
 #define sithPuppet_FreeEntry_ADDR (0x004E3D70)
 #define sithPuppet_ResetTrack_ADDR (0x004E3DA0)
-#define sithPuppet_tracksidk_ADDR (0x004E3DE0)
+#define sithPuppet_Tick_ADDR (0x004E3DE0)
 #define sithPuppet_startidk_ADDR (0x004E4150)
 #define sithPuppet_resetidk_ADDR (0x004E42C0)
 #define sithPuppet_advanceidk_ADDR (0x004E4310)
@@ -32,6 +32,8 @@ struct sithPuppet
   int field_20;
 };
 
+static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;
+static void (*sithPuppet_Tick)(sithThing *thing, float a2) = (void*)sithPuppet_Tick_ADDR;
 static int (__cdecl *sithPuppet_PlayMode)(sithThing *a1, signed int anim, int callback) = (void*)sithPuppet_PlayMode_ADDR;
 static int (*sithPuppet_StartKey)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, int callback) = (void*)sithPuppet_StartKey_ADDR;
 static int (*sithPuppet_StopKey)(rdPuppet *a1, int track, float a3) = (void*)sithPuppet_StopKey_ADDR;

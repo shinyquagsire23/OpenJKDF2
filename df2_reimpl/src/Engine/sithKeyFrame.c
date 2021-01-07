@@ -20,7 +20,7 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
     if ( _memcmp(stdConffile_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_entry.args[1].value, "keyframes", 0xAu) )
         return 0;
 
-    int numKeyframes = atoi(stdConffile_entry.args[2].value);
+    int numKeyframes = _atoi(stdConffile_entry.args[2].value);
     if ( !numKeyframes )
         return 1;
 

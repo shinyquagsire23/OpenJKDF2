@@ -41,12 +41,13 @@ typedef struct sithCameraRenderInfo
     rdColormap* colormap;
 } sithCameraRenderInfo;
 
+#pragma pack(push, 4)
 typedef struct sithCamera
 {
     uint32_t cameraPerspective;
     uint32_t dword4;
-    float float8;
-    float floatC;
+    float fov;
+    float aspectRatio;
     sithThing* primaryFocus;
     sithThing* secondaryFocus;
     sithSector* sector;
@@ -57,9 +58,14 @@ typedef struct sithCamera
     rdVector3 vec3_2;
     rdCamera rdCam;
 } sithCamera;
+#pragma pack(pop)
+
+int sithCamera_Startup();
+int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near);
 
 void sithCamera_FollowFocus(sithCamera *cam);
 
+static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
 static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCamera_GetPrimaryFocus_ADDR;
 static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
@@ -81,6 +87,7 @@ static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2
 #define sithCamera_povShakeF1 (*(float*)0x008EE5C4)
 #define sithCamera_povShakeF2 (*(float*)0x008EE5C8)
 #define sithCamera_currentCamera (*(sithCamera**)0x82F104)
+#define sithCamera_bInitted (*(int*)0x0082F108)
 #define sithCamera_viewMat (*(rdMatrix34*)0x8EE5E0)
 #define sithCamera_focusMat (*(rdMatrix34*)0x0082F0B8)
 

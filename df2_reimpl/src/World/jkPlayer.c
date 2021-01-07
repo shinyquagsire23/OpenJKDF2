@@ -946,7 +946,7 @@ int jkPlayer_WriteConfSwap(int unk, int a2, char *a3)
 LABEL_8:
         if ( jkPlayer_setNumCutscenes >= 32 )
             return 0;
-        strncpy(&jkPlayer_cutscenePath[32 * jkPlayer_setNumCutscenes], a3, 0x1Fu);
+        _strncpy(&jkPlayer_cutscenePath[32 * jkPlayer_setNumCutscenes], a3, 0x1Fu);
         v7 = jkPlayer_setNumCutscenes;
         v8 = 32 * jkPlayer_setNumCutscenes;
         jkPlayer_aCutsceneVal[jkPlayer_setNumCutscenes] = a2;
@@ -988,7 +988,7 @@ LABEL_8:
     else
     {
         v5 = jkPlayer_cutscenePath;
-        while ( strcmp(v5, a3) )
+        while ( _strcmp(v5, a3) )
         {
             ++v4;
             v5 += 32;
@@ -1034,8 +1034,8 @@ int jkPlayer_ReadCutsceneConf()
 
     if ( stdConffile_ReadArgs()
       && stdConffile_entry.numArgs
-      && !strcmp(stdConffile_entry.args[0].key, "numcutscenes")
-      && sscanf(stdConffile_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
+      && !_strcmp(stdConffile_entry.args[0].key, "numcutscenes")
+      && _sscanf(stdConffile_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
     {
         v0 = 0;
         if ( jkPlayer_setNumCutscenes <= 0 )
@@ -1044,8 +1044,8 @@ int jkPlayer_ReadCutsceneConf()
         for ( i = jkPlayer_cutscenePath;
               stdConffile_ReadArgs()
            && stdConffile_entry.numArgs >= 2u
-           && sscanf(stdConffile_entry.args[0].key, "%s", i) == 1
-           && sscanf(stdConffile_entry.args[1].value, "%d", v1) == 1;
+           && _sscanf(stdConffile_entry.args[0].key, "%s", i) == 1
+           && _sscanf(stdConffile_entry.args[1].value, "%d", v1) == 1;
               i += 32 )
         {
             ++v0;

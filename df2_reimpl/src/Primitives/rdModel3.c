@@ -331,7 +331,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 rdFace_NewEntry(face);
                 _strtok(stdConffile_aLine, " \t");
                 tmpTxt = _strtok(0, " \t");
-                v36 = atoi(tmpTxt);
+                v36 = _atoi(tmpTxt);
                 face->num = j;
                 face->material = (v36 == -1) ? 0 : model->materials[v36];
                 tmpTxt = _strtok(0, " \t");
@@ -350,7 +350,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if ( _sscanf(tmpTxt, "%f", &face->extralight) != 1 )
                     goto fail;
                 to_num_verts = _strtok(0, " \t");
-                face->numVertices = atoi(to_num_verts);
+                face->numVertices = _atoi(to_num_verts);
                 if ( !face->numVertices )
                     goto fail;
                 if ( face->numVertices > 24 )
@@ -366,10 +366,10 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     for (v49 = 0; v49 < face->numVertices; v49++)
                     {
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexPosIdx[v49] = atoi(tmpTxt);
+                        face->vertexPosIdx[v49] = _atoi(tmpTxt);
                         
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexUVIdx[v49] = atoi(tmpTxt);
+                        face->vertexUVIdx[v49] = _atoi(tmpTxt);
                     }
                 }
                 else
@@ -378,7 +378,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     for (v52 = 0; v52 < face->numVertices; v52++)
                     {
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexPosIdx[v52] = atoi(tmpTxt);
+                        face->vertexPosIdx[v52] = _atoi(tmpTxt);
                         _strtok(0, " \t,");
                     }
                 }

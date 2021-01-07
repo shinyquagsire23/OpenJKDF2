@@ -151,7 +151,7 @@ int sithCogVm_InvokeMsgByIdx(net_msg *a1)
 
 void sithCogVm_ClearMsgTmpBuf()
 {
-    memset(sithCogVm_MsgTmpBuf, 0, sizeof(sithCogVm_MsgTmpBuf));
+    _memset(sithCogVm_MsgTmpBuf, 0, sizeof(sithCogVm_MsgTmpBuf));
     sithCogVm_idk2 = 0;
 }
 

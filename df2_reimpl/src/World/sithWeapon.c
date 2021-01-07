@@ -28,7 +28,7 @@ void sithWeapon_Startup()
     sithWeapon_InitDefaults();
 }
 
-void sithWeapon_Underwater(sithThing *weapon, float deltaSeconds)
+void sithWeapon_Tick(sithThing *weapon, float deltaSeconds)
 {
     int typeFlags = weapon->weaponParams.typeflags;
     if (typeFlags & THING_TYPEFLAGS_ISBLOCKING)

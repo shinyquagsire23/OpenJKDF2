@@ -57,10 +57,10 @@ jkMain_MainShow	.text	00403A80	00000005			R	.	.	.	.	.	.	.
 jkMain_MainTick	.text	00403A90	00000001			R	.	.	.	.	.	.	.
 jkMain_MainLeave	.text	00403AA0	00000001			R	.	.	.	.	.	.	.
 jkMain_GameplayShow	.text	00403AB0	0000028F	00000008	00000008	R	.	.	.	.	.	.	.
-jkMain_GameplayTick	.text	00403D40	0000011F	00000004	00000004	R	.	.	.	.	.	.	.
+jkMain_GameplayTick	.text	00403D40	0000011F	00000004	00000004	R	.	.	.	.	.	T	.
 jkMain_GameplayLeave	.text	00403E60	000000DA	00000008	00000008	R	.	.	.	.	.	.	.
 jkMain_EscapeMenuShow	.text	00403F40	00000024	00000000	00000000	R	.	.	.	.	.	.	.
-jkMain_EscapeMenuTick	.text	00403F70	0000012C	00000004	00000004	R	.	.	.	.	.	.	.
+jkMain_EscapeMenuTick	.text	00403F70	0000012C	00000004	00000004	R	.	.	.	.	.	T	.
 jkMain_EscapeMenuLeave	.text	004040A0	000000F6	00000008	00000008	R	.	.	.	.	.	.	.
 jkMain_EndLevelScreenShow	.text	004041A0	00000099	00000004	00000000	R	.	.	.	.	.	.	.
 jkMain_EndLevelScreenTick	.text	00404240	00000001	00000000	00000000	R	.	.	.	.	.	.	.
@@ -1013,13 +1013,13 @@ stdGif_lzwComp	.text	00439390	000001D1	00000010	00000006	R	.	.	.	.	.	.	.
 stdLbm_Load	.text	00439570	0000069B	000000A8	0000000C	R	.	.	.	.	.	T	.
 stdLbm_Write	.text	00439C10	00000414	000007F8	00000008	R	.	.	.	.	.	.	.
 stdLbm_Compress	.text	0043A030	00000175	00000008	00000001	R	.	.	.	.	.	.	.
-stdMemory_Startup	.text	0043A1C0	0000001B	00000004	00000000	R	.	.	.	.	.	.	.
+stdMemory_Startup	.text	0043A1C0	0000001B	00000004	00000000	R	.	.	.	.	.	T	.
 stdMemory_Shutdown	.text	0043A1E0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 stdMemory_Open	.text	0043A1F0	00000017	00000000	00000000	R	.	.	.	.	.	.	.
-stdMemory_Dump	.text	0043A210	00000071	00000000	00000000	R	.	.	.	.	.	.	.
-stdMemory_BlockAlloc	.text	0043A290	000000AD	00000004	0000000C	R	.	.	.	.	.	.	.
-stdMemory_BlockFree	.text	0043A340	00000060	00000008	00000004	R	.	.	.	.	.	.	.
-stdMemory_BlockRealloc	.text	0043A3A0	000000FF	00000008	00000010	R	.	.	.	.	.	.	.
+stdMemory_Dump	.text	0043A210	00000071	00000000	00000000	R	.	.	.	.	.	T	.
+stdMemory_BlockAlloc	.text	0043A290	000000AD	00000004	0000000C	R	.	.	.	.	.	T	.
+stdMemory_BlockFree	.text	0043A340	00000060	00000008	00000004	R	.	.	.	.	.	T	.
+stdMemory_BlockRealloc	.text	0043A3A0	000000FF	00000008	00000010	R	.	.	.	.	.	T	.
 daAlloc	.text	0043A4A0	000001D6	00000010	00000004	R	.	.	.	.	.	T	.
 daFree	.text	0043A680	000000D2	00000008	00000004	R	.	.	.	.	.	T	.
 daRealloc	.text	0043A760	0000008E	00000010	00000008	R	.	.	.	.	.	.	.
@@ -1181,8 +1181,8 @@ rdColormap_BuildAlpha	.text	00443060	00000130	0000003C	0000000C	R	.	.	.	.	.	.	.
 rdColormap_BuildGrayRamp	.text	00443190	000000CE	00000004	00000004	R	.	.	.	.	.	T	.
 rdCamera_New	.text	00443260	000000F9	00000004	00000014	R	.	.	.	.	.	T	.
 rdCamera_NewEntry	.text	00443360	000000DE	00000000	00000018	R	.	.	.	.	.	T	.
-rdCamera_Free	.text	00443440	0000002B	00000004	00000004	R	.	.	.	.	.	.	.
-rdCamera_FreeEntry	.text	00443470	00000019	00000000	00000004	R	.	.	.	.	.	.	.
+rdCamera_Free	.text	00443440	0000002B	00000004	00000004	R	.	.	.	.	.	T	.
+rdCamera_FreeEntry	.text	00443470	00000019	00000000	00000004	R	.	.	.	.	.	T	.
 rdCamera_SetCanvas	.text	00443490	0000001A	00000000	00000008	R	.	.	.	.	.	T	.
 rdCamera_SetCurrent	.text	004434B0	00000019	00000000	00000004	R	.	.	.	.	.	T	.
 rdCamera_SetFOV	.text	004434D0	0000004C	00000000	00000008	R	.	.	.	.	.	T	.
@@ -1239,7 +1239,7 @@ rdPrimit3_DrawPoint	.text	00446FF0	000000CE	00000018	0000000A	R	.	.	.	.	.	.	.
 rdPrimit3_DrawLine	.text	004470C0	00000119	00000030	00000020	R	.	.	.	.	.	.	.
 rdPrimit3_DrawCircle	.text	004471E0	000000C8	00000040	00000014	R	.	.	.	.	.	T	.
 rdPrimit3_BuildVertexLst	.text	004472B0	00000583	00000020	00000018	R	.	.	.	.	.	.	.
-rdPrimit3_ClipVertexLst	.text	00447860	000001CD	00000004	00000014	R	.	.	.	.	.	.	.
+rdPrimit3_ClipVertexLst	.text	00447860	000001CD	00000004	00000014	R	.	.	.	.	.	T	.
 rdPrimit3_ClipFace	.text	00447A60	000006D2	00000024	0000001C	R	.	.	.	.	.	T	.
 rdPrimit3_NoClipFace	.text	00448160	00000588	00000020	00000018	R	.	.	.	.	.	T	.
 rdPolyLine_New	.text	00448710	00000058	00000004	00000028	R	.	.	.	.	.	T	.
@@ -1529,11 +1529,11 @@ rdMath_PointsCollinear	.text	0046D600	000000E9	00000018	0000000C	R	.	.	.	.	.	T	.
 rdClip_Line2	.text	0046D6F0	0000031B	00000030	00000014	R	.	.	.	.	.	T	.
 rdClip_CalcOutcode2	.text	0046DA10	0000003B	00000004	0000000C	R	.	.	.	.	.	T	.
 rdClip_Point3	.text	0046DA50	000000B4	00000004	00000008	R	.	.	.	.	.	T	.
-rdClip_Line3	.text	0046DB10	0000096F	0000000C	00000014	R	.	.	.	.	.	T	.
+rdClip_Line3Project	.text	0046DB10	0000096F	0000000C	00000014	R	.	.	.	.	.	T	.
 rdClip_Line3Ortho	.text	0046E480	00000545	0000000C	00000014	R	.	.	.	.	.	T	.
-rdClip_Line3Project	.text	0046E9D0	0000011A	00000034	0000001C	R	.	.	.	.	.	T	.
-rdClip_Face3W	.text	0046EAF0	00000928	00000018	0000000C	R	.	.	.	.	.	.	.
-rdClip_Face3WOrtho	.text	0046F420	000006B8	00000010	0000000C	R	.	.	.	.	.	.	.
+rdClip_Line3	.text	0046E9D0	0000011A	00000034	0000001C	R	.	.	.	.	.	T	.
+rdClip_Face3W	.text	0046EAF0	00000928	00000018	0000000C	R	.	.	.	.	.	T	.
+rdClip_Face3WOrtho	.text	0046F420	000006B8	00000010	0000000C	R	.	.	.	.	.	T	.
 rdClip_Face3S	.text	0046FAE0	00000928	00000018	0000000C	R	.	.	.	.	.	T	.
 rdClip_Face3SOrtho	.text	00470410	000006B8	00000010	0000000C	R	.	.	.	.	.	.	.
 rdClip_Face3GS	.text	00470AD0	00000C16	00000020	00000010	R	.	.	.	.	.	.	.
@@ -1770,7 +1770,7 @@ sithCamera_Shutdown	.text	004C4EF0	00000029	00000004	00000000	R	.	.	.	.	.	.	.
 sithCamera_Open	.text	004C4F20	00000201	00000000	00000008	R	.	.	.	.	.	T	.
 sithCamera_Close	.text	004C5130	00000014			R	.	.	.	.	.	.	.
 sithCamera_SetsFocus	.text	004C5150	00000106	00000018	00000000	R	.	.	.	.	.	.	.
-sithCamera_New	.text	004C5260	0000004D	00000004	0000001C	R	.	.	.	.	.	.	.
+sithCamera_New	.text	004C5260	0000004D	00000004	0000001C	R	.	.	.	.	.	T	.
 sithCamera_NewEntry	.text	004C52B0	000000BF	0000000C	00000020	R	.	.	.	.	.	T	.
 sithCamera_FreeEntry	.text	004C5370	00000024	00000004	00000004	R	.	.	.	.	.	.	.
 sithCamera_Free	.text	004C53A0	00000011	00000000	00000004	R	.	.	.	.	.	.	.
@@ -1818,7 +1818,7 @@ sithPlayer_sub_4C87C0	.text	004C87C0	0000004E	00000000	00000008	R	.	.	.	.	.	.	.
 sithPlayer_idk	.text	004C8810	000000B3	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_ResetPalEffects	.text	004C88D0	00000032			R	.	.	.	.	.	.	.
 sithPlayer_sub_4C8910	.text	004C8910	000000B9	00000004	00000004	R	.	.	.	.	.	.	.
-sithPlayer_Underwater	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
+sithPlayer_Tick	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
 sithPlayer_AddDynamicTint	.text	004C8C10	000000BF	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_AddDyamicAdd	.text	004C8CD0	00000060	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_SetScreenTint	.text	004C8D30	000000DC	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -1888,12 +1888,12 @@ sithMulti_HandleDeath	.text	004CBC50	00000183	0000010C	0000000C	R	.	.	.	.	.	T	.
 sithMulti_HandleScore	.text	004CBDE0	000001A4	00000010	00000000	R	.	.	.	.	.	.	.
 sithMulti_EndLevel	.text	004CBF90	00000026	00000000	00000008	R	.	.	.	.	.	.	.
 sithMulti_sub_4CBFC0	.text	004CBFC0	00000147	000000A0	00000004	R	.	.	.	.	.	.	.
-sithThing_thingfreeidk	.text	004CC110	0000001E	00000000	00000004	R	.	.	.	.	.	.	.
+sithMulti_FreeThing	.text	004CC110	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_Startup	.text	004CC130	0000006F	00000008	00000000	R	.	.	.	.	.	T	.
 sithThing_Shutdown	.text	004CC1A0	0000002A			R	.	.	.	.	.	.	.
-sithThing_SetHandler	.text	004CC1D0	0000000E	00000000	00000004	R	.	.	.	.	.	.	.
+sithThing_SetHandler	.text	004CC1D0	0000000E	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_TickMaybe	.text	004CC1E0	000002AE	00000004	00000014	R	.	.	.	.	.	T	.
-sithThing_DetachThing	.text	004CC4C0	00000144	00000024	00000008	R	.	.	.	.	.	T	.
+sithThing_TickPhysics	.text	004CC4C0	00000144	00000024	00000008	R	.	.	.	.	.	T	.
 sithThing_Remove	.text	004CC610	00000067	00000000	00000004	R	.	.	.	.	.	.	.
 sithThing_GetParent	.text	004CC6A0	0000002A	00000004	00000004	R	.	.	.	.	.	T	.
 sithThing_GetThingByIdx	.text	004CC6D0	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
@@ -1923,7 +1923,7 @@ sithThing_SpawnTemplate	.text	004CDCD0	000001A5	00000030	00000008	R	.	.	.	.	.	T	
 sithThing_AttachToSurface	.text	004CDE80	000001CC	00000018	0000000C	R	.	.	.	.	.	T	.
 sithThing_LandThing	.text	004CE050	0000026F	0000002C	00000014	R	.	.	.	.	.	T	.
 sithThing_AttachThing	.text	004CE2C0	000000B4	00000014	00000008	R	.	.	.	.	.	T	.
-sithThing_DetachThing_	.text	004CE380	000001B4	00000018	00000004	R	.	.	.	.	.	T	.
+sithThing_DetachThing	.text	004CE380	000001B4	00000018	00000004	R	.	.	.	.	.	T	.
 sithThing_detachallchildren	.text	004CE540	00000020	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_IsAttachFlagsAnd6	.text	004CE560	00000013	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_LotsOfFreeing	.text	004CE580	00000190	00000018	00000004	R	.	.	.	.	.	T	.
@@ -2025,7 +2025,7 @@ sithInventory_SetBinWait	.text	004D32F0	0000003D	00000000	0000000C	R	.	.	.	.	.	T
 sithInventory_SelectPower	.text	004D3330	000000F3	00000008	00000008	R	.	.	.	.	.	T	.
 sithWeapon_InitDefaults	.text	004D3430	00000080			R	.	.	.	.	.	.	.
 sithWeapon_Startup	.text	004D34B0	00000080			R	.	.	.	.	.	.	.
-sithWeapon_Underwater	.text	004D3530	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
+sithWeapon_Tick	.text	004D3530	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D35E0	.text	004D35E0	00000338	00000038	00000004	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D3920	.text	004D3920	00000963	000000C0	00000004	R	.	.	.	.	.	T	.
 sithWeapon_LoadParams	.text	004D4290	000001F2	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -2034,7 +2034,7 @@ sithWeapon_FireProjectile_0	.text	004D45A0	000002DA	00000058	00000024	R	.	.	.	.	
 sithWeapon_SetTimeLeft	.text	004D4880	00000036	00000000	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_Collide	.text	004D48C0	0000057D	0000001C	00000010	R	.	.	.	.	.	T	.
 sithWeapon_HitDebug	.text	004D4E40	00000317	0000000C	0000000C	R	.	.	.	.	.	T	.
-sithWeapon_Remove	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	.	.
+sithWeapon_Remove	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D51F0	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	.	.
 sithWeapon_InitializeEntry	.text	004D5270	0000004B			R	.	.	.	.	.	.	.
 sithWeapon_ShutdownEntry	.text	004D52C0	00000001			R	.	.	.	.	.	.	.
@@ -2146,7 +2146,7 @@ sithSoundSys_sub_4DC790	.text	004DC790	00000463	00000018	00000008	R	.	.	.	.	.	T	
 sithSoundSys_sub_4DCC00	.text	004DCC00	00000209	00000018	00000004	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DCE10	.text	004DCE10	00000069	0000000C	00000004	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DCE80	.text	004DCE80	0000009A	00000008	00000004	R	.	.	.	.	.	.	.
-sithSoundSys_sub_4DCF20	.text	004DCF20	00000114	00000008	00000004	R	.	.	.	.	.	.	.
+sithSoundSys_FreeThing	.text	004DCF20	00000114	00000008	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_GetSoundFromRef	.text	004DD040	00000040	00000004	00000004	R	.	.	.	.	.	.	.
 sithSoundClass_sub_4DD080	.text	004DD080	0000010B	00000010	00000008	R	.	.	.	.	.	T	.
 sithSoundSys_sub_4DD190	.text	004DD190	00000175	00000010	00000004	R	.	.	.	.	.	.	.
@@ -2299,7 +2299,7 @@ sithPuppet_Shutdown	.text	004E3CA0	00000055			R	.	.	.	.	.	.	.
 sithPuppet_NewEntry	.text	004E3D00	00000070	00000004	00000004	R	.	.	.	.	.	T	.
 sithPuppet_FreeEntry	.text	004E3D70	00000027	00000004	00000004	R	.	.	.	.	.	T	.
 sithPuppet_ResetTrack	.text	004E3DA0	0000003A	00000008	00000004	R	.	.	.	.	.	T	.
-sithPuppet_tracksidk	.text	004E3DE0	0000036B	00000018	00000008	R	.	.	.	.	.	T	.
+sithPuppet_Tick	.text	004E3DE0	0000036B	00000018	00000008	R	.	.	.	.	.	T	.
 sithPuppet_startidk	.text	004E4150	00000167	0000000C	00000004	R	.	.	.	.	.	.	.
 sithPuppet_resetidk	.text	004E42C0	00000050	00000004	00000004	R	.	.	.	.	.	.	.
 sithPuppet_advanceidk	.text	004E4310	00000063	00000008	00000008	R	.	.	.	.	.	.	.
@@ -2394,9 +2394,9 @@ sithAI_PrintThings	.text	004EA190	00000095	00000000	00000000	R	.	.	.	.	.	.	.
 sithAI_PrintThingStatus	.text	004EA230	000001B1	00000048	00000008	R	.	.	.	.	B	T	.
 sithAI_LoadThingActorParams	.text	004EA3F0	00000127	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithAI_idkframesalloc	.text	004EA520	000000C0	0000001C	0000000C	R	.	.	.	.	.	T	.
-sithAI_idk2	.text	004EA5E0	0000004C	00000008	00000010	R	.	.	.	.	.	T	.
+sithAI_Tick	.text	004EA5E0	0000004C	00000008	00000008	R	.	.	.	.	.	T	.
 sithAI_sub_4EA630	.text	004EA630	0000025B	0000000C	00000008	R	.	.	.	.	.	T	.
-sithAI_idk_msgarrived_target	.text	004EA890	000002E4	00000030	00000018	R	.	.	.	.	.	T	.
+sithAI_idk_msgarrived_target	.text	004EA890	000002E4	00000030	00000018	R	.	.	.	.	.	.	.
 sithAI_SetLookFrame	.text	004EAB80	00000103	00000018	00000008	R	.	.	.	.	.	T	.
 sithAI_SetMoveThing	.text	004EAC90	00000053	00000004	0000000C	R	.	.	.	.	.	T	.
 sithAI_Jump	.text	004EACF0	00000068	00000004	0000000C	R	.	.	.	.	.	T	.
@@ -2421,7 +2421,7 @@ sithUnk4_sub_4EC4D0	.text	004EC4D0	00000074	00000004	00000004	R	.	.	.	.	.	T	.
 sithUnk4_sub_4EC550	.text	004EC550	00000470	00000098	00000004	R	.	.	.	.	B	T	.
 sithUnk4_sub_4EC9C0	.text	004EC9C0	000001A1	00000020	0000000C	R	.	.	.	.	.	.	.
 sithUnk4_SetMaxHeathForDifficulty	.text	004ECB70	00000069	00000000	00000004	R	.	.	.	.	.	T	.
-sithActor_Underwater	.text	004ECBE0	000000A7	00000004	00000008	R	.	.	.	.	.	T	.
+sithActor_Tick	.text	004ECBE0	000000A7	00000004	00000008	R	.	.	.	.	.	T	.
 sithThing_Hit	.text	004ECC90	00000200	0000001C	00000010	R	.	.	.	.	.	T	.
 sithThing_HurtSound	.text	004ECE90	0000010A	00000000	0000000C	R	.	.	.	.	.	T	.
 sithThing_SpawnDeadBodyMaybe	.text	004ECFE0	000001EC	0000000C	0000000C	R	.	.	.	.	.	T	.
@@ -2430,7 +2430,7 @@ sithUnk4_ActorActorCollide	.text	004ED210	00000067	0000000C	00000010	R	.	.	.	.	.
 sithUnk4_MoveJointsForEyePYR	.text	004ED280	00000120	00000010	00000008	R	.	.	.	.	.	T	.
 sithUnk4_turretfireidk	.text	004ED3A0	0000004C	00000008	00000004	R	.	.	.	.	.	T	.
 sithUnk4_thing_anim_blocked	.text	004ED3F0	0000036D	00000064	0000000C	R	.	.	.	.	.	T	.
-sithActor_Remove	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	.	.
+sithActor_Remove	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	T	.
 sithCorpse_Remove	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_LoadActorPlayerParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
 sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	.	.
@@ -2645,7 +2645,7 @@ sithTrackThing_PathMovePause	.text	004FB650	00000032	00000004	00000004	R	.	.	.	.
 sithTrackThing_PathMoveResume	.text	004FB690	00000032	00000004	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_idkpathmove	.text	004FB6D0	000000C0	0000001C	0000000C	R	.	.	.	.	.	.	.
 sithExplosion_CreateThing	.text	004FB790	000000CA	00000018	00000004	R	.	.	.	.	.	T	.
-sithExplosion_UpdateLight	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	.	T	.
+sithExplosion_Tick	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	.	T	.
 sithExplosion_UpdateForce	.text	004FB920	000002B0	00000060	00000004	R	.	.	.	.	.	T	.
 sithExplosion_LoadThingParams	.text	004FBBD0	000001E6	00000008	0000000C	R	.	.	.	.	.	T	.
 sithItem_Collide	.text	004FBE10	0000005D	00000008	00000008	R	.	.	.	.	.	T	.

@@ -41,7 +41,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->mipSurfaces = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer *) * 1);
     if ( !bitmap->mipSurfaces )
         goto fail;
-    memset(&format, 0, sizeof(format));
+    _memset(&format, 0, sizeof(format));
     format.format.is16bit = 0;
     format.format.bpp = (unsigned __int8)pcxHeader.bitDepth;
     format.height = pcxHeader.yMax + 1;
@@ -120,8 +120,8 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     pcxHeader.colorDims = 1;
     pcxHeader.stride = bitmap->mipSurfaces[0]->format.width;
     pcxHeader.paletteMode = 0;
-    memset(pcxHeader.egaPalette, 0, sizeof(pcxHeader.egaPalette));
-    memset(&pcxHeader.width, 0, 0x38u);
+    _memset(pcxHeader.egaPalette, 0, sizeof(pcxHeader.egaPalette));
+    _memset(&pcxHeader.width, 0, 0x38u);
     *(uint16_t*)&pcxHeader.reserved_4A[52] = 0;
     
     int fhand = std_pHS->fileOpen(fpath, "wb");

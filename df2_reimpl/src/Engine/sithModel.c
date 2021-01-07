@@ -171,7 +171,7 @@ int sithModel_New(sithWorld *world, int num)
 
     world->numModels = num;
     world->numModelsLoaded = 0;
-    memset(world->models, 0, sizeof(rdModel3) * num);
+    _memset(world->models, 0, sizeof(rdModel3) * num);
 
     return 1;
 }

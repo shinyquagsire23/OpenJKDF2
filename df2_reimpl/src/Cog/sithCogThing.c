@@ -273,7 +273,7 @@ void sithCogThing_JumpToFrame(sithCog *ctx)
             sithThing_LeaveSector(thing);
 
         if ( thing->attach_flags )
-            sithThing_DetachThing_(thing);
+            sithThing_DetachThing(thing);
 
         rdMatrix_BuildRotate34(&thing->lookOrientation, &thing->trackParams.frames[frame].rot);
         rdVector_Copy3(&thing->position, &thing->trackParams.frames[frame].pos);
@@ -835,7 +835,7 @@ void sithCogThing_DetachThing(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
     {
-        sithThing_DetachThing_(thing);
+        sithThing_DetachThing(thing);
         if (sithCogVm_isMultiplayer 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
@@ -1130,7 +1130,7 @@ void sithCogThing_TeleportThing(sithCog *ctx)
     if ( thing && thingTo )
     {
         if ( thing->attach_flags )
-            sithThing_DetachThing_(thing);
+            sithThing_DetachThing(thing);
 
         rdMatrix_Copy34(&thing->lookOrientation, &thingTo->lookOrientation);
         rdVector_Copy3(&thing->position, &thingTo->position);
@@ -1716,7 +1716,7 @@ void sithCogThing_ParseArg(sithCog *ctx)
 
     if ( str && thing)
     {
-        strncpy(std_genBuffer, str, 0x3FFu);
+        _strncpy(std_genBuffer, str, 0x3FFu);
         std_genBuffer[1023] = 0;
 
         stdConffile_ReadArgsFromStr(std_genBuffer);

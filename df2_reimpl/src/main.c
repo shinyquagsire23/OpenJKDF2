@@ -54,8 +54,10 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdMath.h"
+#include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
+#include "World/sithCorpse.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
 #include "World/sithInventory.h"
@@ -220,6 +222,7 @@ __declspec(dllexport) void hook_init(void)
     
     // jkMain
     hook_function(jkMain_gui_loop_ADDR, jkMain_gui_loop);
+    hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
     hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
     
     // jkCog
@@ -584,6 +587,12 @@ __declspec(dllexport) void hook_init(void)
     // rdClip
     hook_function(rdClip_Line2_ADDR, rdClip_Line2);
     hook_function(rdClip_CalcOutcode2_ADDR, rdClip_CalcOutcode2);
+    hook_function(rdClip_Point3_ADDR, rdClip_Point3);
+    hook_function(rdClip_Line3Project_ADDR, rdClip_Line3Project);
+    hook_function(rdClip_Line3Ortho_ADDR, rdClip_Line3Ortho);
+    hook_function(rdClip_Line3_ADDR, rdClip_Line3);
+    
+    hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
     
     // rdFace
     hook_function(rdFace_New_ADDR, rdFace_New);
@@ -720,11 +729,42 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdMatrix_TransformPointLst34_ADDR, rdMatrix_TransformPointLst34);
     hook_function(rdMatrix_TransformPointLst44_ADDR, rdMatrix_TransformPointLst44);
     
+    // rdCamera
+    hook_function(rdCamera_New_ADDR, rdCamera_New);
+    hook_function(rdCamera_NewEntry_ADDR, rdCamera_NewEntry);
+    hook_function(rdCamera_Free_ADDR, rdCamera_Free);
+    hook_function(rdCamera_FreeEntry_ADDR, rdCamera_FreeEntry);
+    hook_function(rdCamera_SetCanvas_ADDR, rdCamera_SetCanvas);
+    hook_function(rdCamera_SetCurrent_ADDR, rdCamera_SetCurrent);
+    hook_function(rdCamera_SetFOV_ADDR, rdCamera_SetFOV);
+    hook_function(rdCamera_SetProjectType_ADDR, rdCamera_SetProjectType);
+    hook_function(rdCamera_SetOrthoScale_ADDR, rdCamera_SetOrthoScale);
+    hook_function(rdCamera_SetAspectRatio_ADDR, rdCamera_SetAspectRatio);
+    hook_function(rdCamera_BuildFOV_ADDR, rdCamera_BuildFOV);
+    hook_function(rdCamera_BuildClipFrustum_ADDR, rdCamera_BuildClipFrustum);
+    hook_function(rdCamera_Update_ADDR, rdCamera_Update);
+    
+    hook_function(rdCamera_SetAmbientLight_ADDR, rdCamera_SetAmbientLight);
+    hook_function(rdCamera_SetAttenuation_ADDR, rdCamera_SetAttenuation);
+    hook_function(rdCamera_AddLight_ADDR, rdCamera_AddLight);
+    hook_function(rdCamera_ClearLights_ADDR, rdCamera_ClearLights);
+    
     // sith
     hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
     
     // sithCamera
+    hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
+    hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
     hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
+    
+    // sithThing
+    hook_function(sithThing_Startup_ADDR, sithThing_Startup);
+    hook_function(sithThing_Shutdown_ADDR, sithThing_Shutdown);
+    hook_function(sithThing_SetHandler_ADDR, sithThing_SetHandler);
+    hook_function(sithThing_TickAll_ADDR, sithThing_TickAll);
+    hook_function(sithThing_Remove_ADDR, sithThing_Remove);
+    hook_function(sithThing_GetParent_ADDR, sithThing_GetParent);
+    hook_function(sithThing_GetThingByIdx_ADDR, sithThing_GetThingByIdx);
     
     // sithSector
     hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
@@ -735,7 +775,10 @@ __declspec(dllexport) void hook_init(void)
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_Startup_ADDR, sithWeapon_Startup);
-    hook_function(sithWeapon_Underwater_ADDR, sithWeapon_Underwater);
+    hook_function(sithWeapon_Tick_ADDR, sithWeapon_Tick);
+    
+    // sithCorpse
+    hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);
 
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
@@ -1082,6 +1125,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
 
+    hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
     

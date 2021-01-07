@@ -278,7 +278,7 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
         {
             jkGuiRend_thing_four = 0;
             if ( g_should_exit )
-                exit(msgret);
+                jk_exit(msgret);
             if ( menu->idkFunc && !menu->lastButtonUp )
                 menu->idkFunc(menu);
         }
@@ -1473,7 +1473,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int
                     int timeMs = stdPlatform_GetTimeMsec();
                     if ( stdDisplay_pCurDevice->video_device[0].windowedMaybe )
                     {
-                        GetCursorPos((LPPOINT)&Rect);
+                        jk_GetCursorPos((LPPOINT)&Rect);
                         mouseX = Rect.x;
                         mouseY = Rect.y;
                     }
@@ -1567,13 +1567,13 @@ LABEL_47:
 
         case WM_PAINT:
         {
-            ret = GetUpdateRect(hWnd, (LPRECT)&Rect, 0);
+            ret = jk_GetUpdateRect(hWnd, (LPRECT)&Rect, 0);
             if ( ret )
-                BeginPaint(hWnd, &Paint);
+                jk_BeginPaint(hWnd, &Paint);
             jkGuiRend_Paint(jkGuiRend_activeMenu);
             if ( ret )
             {
-                EndPaint(hWnd, &Paint);
+                jk_EndPaint(hWnd, &Paint);
                 return 1;
             }
             return 1;
@@ -1582,9 +1582,9 @@ LABEL_47:
         {
             if ( !jkGuiRend_hCursor )
             {
-                jkGuiRend_hCursor = LoadCursorA(stdGdi_GetHInstance(), (LPCSTR)0x91D);
+                jkGuiRend_hCursor = jk_LoadCursorA(stdGdi_GetHInstance(), (LPCSTR)0x91D);
             }
-            SetCursor(jkGuiRend_hCursor);
+            jk_SetCursor(jkGuiRend_hCursor);
             return 1;
         }
     }
@@ -1599,7 +1599,7 @@ void jkGuiRend_UpdateMouse()
 
     if ( stdDisplay_pCurDevice->video_device[0].windowedMaybe )
     {
-        GetCursorPos(&Point);
+        jk_GetCursorPos(&Point);
         mouseX = Point.x;
         mouseY = Point.y;
     }
@@ -1642,7 +1642,7 @@ void jkGuiRend_GetMousePos(int *pX, int *pY)
 
     if ( stdDisplay_pCurDevice->video_device[0].windowedMaybe )
     {
-        GetCursorPos(&Point);
+        jk_GetCursorPos(&Point);
         *(struct tagPOINT *)pX = Point;
     }
     else
@@ -1659,7 +1659,7 @@ void jkGuiRend_ResetMouseLatestMs()
 
 void jkGuiRend_InvalidateGdi()
 {
-    InvalidateRect(stdGdi_GetHwnd(), 0, 1);
+    jk_InvalidateRect(stdGdi_GetHwnd(), 0, 1);
 }
 
 int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, signed int a4)

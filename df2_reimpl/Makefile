@@ -9,7 +9,7 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC)
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc
@@ -45,4 +45,4 @@ $(TARGET_WIN): $(OBJECTS)
 	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -static-libgcc
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static-libgcc
+	$(CC) -o $@ -s -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++

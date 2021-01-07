@@ -237,6 +237,16 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
+void* memset(void* ptr, int val, size_t num)
+{
+    int i;
+    for (i = 0; i < num; i++)
+    {
+        *(uint8_t*)(ptr+i) = val;
+    }
+    return ptr;
+}
+
 void* _memset32(void* ptr, uint32_t val, size_t num)
 {
     int i;

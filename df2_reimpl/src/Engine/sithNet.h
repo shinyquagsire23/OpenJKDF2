@@ -9,4 +9,7 @@
 #define net_isServer (*(int*)0x832628)
 #define net_dword_832638 (*(int*)0x832638)
 
+#define net_things_idx (*(int*)0x008330F0)
+#define net_things ((int*)0x008326B0)
+
 #endif // _SITHNET_H

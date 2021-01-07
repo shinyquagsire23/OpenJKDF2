@@ -6,12 +6,58 @@
 #include "World/jkPlayer.h"
 #include "World/sithUnk3.h"
 #include "Primitives/rdMath.h"
+#include "Primitives/rdVector.h"
+#include "Primitives/rdMatrix.h"
 #include "Engine/sithTime.h"
+#include "Engine/rdCamera.h"
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
 static rdVector3 sithCamera_trans2 = {0.0, 0.2, 0.0};
 static rdVector3 sithCamera_trans3 = {0.0, 1.0, 1.0};
+
+#define SITHCAMERA_FOV (90.0)
+#define SITHCAMERA_ASPECT (1.0)
+
+int sithCamera_Startup()
+{
+    sithCamera_NewEntry(&sithCamera_cameras[0], 0, 1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[1], 0, 4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_cameras[1].vec3_3.x = 0.0;
+    sithCamera_cameras[1].vec3_3.y = -0.2;
+    sithCamera_cameras[1].vec3_3.z = 0.059999999;
+    sithCamera_NewEntry(&sithCamera_cameras[2], 0, 8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[4], 0, 32, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[5], 0, 64, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[6], 0, 128, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_curCameraIdx = 0;
+    sithCamera_bInitted = 1;
+
+    return 1;
+}
+
+int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near)
+{
+    camera->cameraPerspective = a3;
+    camera->dword4 = a2;
+    camera->primaryFocus = focus_far;
+    camera->fov = fov;
+    camera->aspectRatio = aspectRatio;
+    camera->secondaryFocus = focus_near;
+    rdCamera_NewEntry(&camera->rdCam, fov, 0.0, 1.0/64.0, 64.0, aspectRatio);
+    rdCamera_SetAttenuation(&camera->rdCam, 0.40000001, 0.80000001);
+
+    if (canvas)
+        rdCamera_SetCanvas(&camera->rdCam, canvas);
+
+    rdVector_Zero3(&camera->vec3_1);
+    rdVector_Zero3(&camera->vec3_2);
+    rdVector_Zero3(&camera->vec3_3);
+    rdVector_Zero3(&camera->vec3_4);
+    rdMatrix_Identity34(&camera->viewMat);
+
+    return 1;
+}
 
 void sithCamera_FollowFocus(sithCamera *cam)
 {

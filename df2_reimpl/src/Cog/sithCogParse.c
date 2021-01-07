@@ -50,7 +50,7 @@ sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, 
     }
     
     sith_cog_parser_node* node = &cogparser_nodes_alloc[cogparser_current_nodeidx++];
-    memset(node, 0, sizeof(sith_cog_parser_node));
+    _memset(node, 0, sizeof(sith_cog_parser_node));
     node->opcode = opcode;
     node->value = val;
     node->parent = parent;

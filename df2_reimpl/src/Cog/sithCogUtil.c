@@ -304,7 +304,7 @@ void sithCogUtil_SetPulse(sithCog *ctx)
     {
         if ( ctx->flags & 1 )
         {
-            sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
+            _sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
         }
         ctx->flags &= ~4;
@@ -313,7 +313,7 @@ void sithCogUtil_SetPulse(sithCog *ctx)
     {
         if ( ctx->flags & 1 )
         {
-            sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            _sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
             DebugConsole_Print(std_genBuffer);
         }
         ctx->flags |= 4;
@@ -329,7 +329,7 @@ void sithCogUtil_SetTimer(sithCog *ctx)
     {
         if ( ctx->flags & 1 )
         {
-            sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
+            _sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
         }
         ctx->flags &= ~8;
@@ -338,7 +338,7 @@ void sithCogUtil_SetTimer(sithCog *ctx)
     {
         if ( ctx->flags & 1 )
         {
-            sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            _sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
             DebugConsole_Print(std_genBuffer);
         }
         ctx->flags |= 8u;

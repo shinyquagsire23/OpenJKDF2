@@ -18,7 +18,7 @@
 #define sithAI_PrintThingStatus_ADDR (0x004EA230)
 #define sithAI_LoadThingActorParams_ADDR (0x004EA3F0)
 #define sithAI_idkframesalloc_ADDR (0x004EA520)
-#define sithAI_idk2_ADDR (0x004EA5E0)
+#define sithAI_Tick_ADDR (0x004EA5E0)
 #define sithAI_sub_4EA630_ADDR (0x004EA630)
 #define sithAI_idk_msgarrived_target_ADDR (0x004EA890)
 #define sithAI_SetLookFrame_ADDR (0x004EAB80)
@@ -56,5 +56,8 @@ typedef struct sithAICommand
 
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
+
+static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
+static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI_Tick_ADDR;
 
 #endif // _SITHAI_H

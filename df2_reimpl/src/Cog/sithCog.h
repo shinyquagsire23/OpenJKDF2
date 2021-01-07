@@ -18,6 +18,7 @@
 
 #define sithCog_SendMessageFromThing_ADDR (0x4DFAC0)
 #define sithCog_SendMessageFromThingEx_ADDR (0x004DFAF0)
+#define sithCog_HandleThingTimerPulse_ADDR (0x004DEA60)
 #define sithCog_SendMessageToAll_ADDR (0x4DEB00)
 
 #define sithCogYACC_yyparse_ADDR (0x50BF50)
@@ -72,7 +73,7 @@ enum SITH_MESSAGE_E
 static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
 static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
-
+static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
 
 int sithCog_Startup();
 

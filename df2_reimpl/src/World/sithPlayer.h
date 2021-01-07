@@ -11,7 +11,7 @@
 #define sithPlayer_idk_ADDR (0x004C8810)
 #define sithPlayer_ResetPalEffects_ADDR (0x004C88D0)
 #define sithPlayer_sub_4C8910_ADDR (0x004C8910)
-#define sithPlayer_Underwater_ADDR (0x004C89D0)
+#define sithPlayer_Tick_ADDR (0x004C89D0)
 #define sithPlayer_AddDynamicTint_ADDR (0x004C8C10)
 #define sithPlayer_AddDyamicAdd_ADDR (0x004C8CD0)
 #define sithPlayer_SetScreenTint_ADDR (0x004C8D30)
@@ -85,6 +85,7 @@ typedef struct sithPlayerInfo
     uint32_t field_13B0;
 } sithPlayerInfo;
 
+static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;
 static void (*sithPlayer_SetBinAmt)(int idx, float a2) =(void*)sithPlayer_SetBinAmt_ADDR;
