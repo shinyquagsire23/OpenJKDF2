@@ -4,6 +4,10 @@
 #include "jk.h"
 #include "Engine/rdroid.h"
 #include "General/stdMath.h"
+#include "Win95/stdDisplay.h"
+#include "Win95/std3D.h"
+
+static rdVector3 rdCamera_camRotation;
 
 rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio)
 {
@@ -26,8 +30,8 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5,
     {
         camera->canvas = 0;
         rdCamera_SetFOV(camera, fov);
+        rdCamera_SetOrthoScale(camera, 1.0);
 
-        camera->orthoScale = 1.0;
         camera->cameraClipFrustum->field_0.x = a3;
         camera->cameraClipFrustum->field_0.y = a4;
         camera->cameraClipFrustum->field_0.z = a5;
@@ -253,6 +257,74 @@ void rdCamera_Update(rdMatrix34 *orthoProj)
     rdMatrix_ExtractAngles34(&rdCamera_camMatrix, &rdCamera_camRotation);
 }
 
+void rdCamera_PerspProject(rdVector3* out, rdVector3* v)
+{
+    out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = -(v->z * rdCamera_pCurCamera->orthoScale) * rdCamera_pCurCamera->screenAspectRatio + rdCamera_pCurCamera->canvas->screen_width_half;
+    out->z = v->y;
+}
+
+void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_PerspProject(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
+void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v)
+{
+    out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * rdCamera_pCurCamera->orthoScale;
+    out->z = v->y;
+}
+
+void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_PerspProjectSquare(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
+void rdCamera_OrthoProject(rdVector3 *out, rdVector3 *v)
+{
+    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - rdCamera_pCurCamera->screenAspectRatio * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    out->z = v->y;
+}
+
+void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_OrthoProject(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
+void rdCamera_OrthoProjectSquare(rdVector3 *out, rdVector3 *v)
+{
+    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
+    out->z = v->y;
+}
+
+void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_OrthoProjectSquare(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt)
 {
     camera->ambientLight = amt;
@@ -301,4 +373,34 @@ int rdCamera_ClearLights(rdCamera *camera)
 {
     camera->numLights = 0;
     return 1;
+}
+
+void rdCamera_AdvanceFrame()
+{
+    rdCanvas *v0; // eax
+    rdRect a4; // [esp+0h] [ebp-10h] BYREF
+
+    v0 = rdCamera_pCurCamera->canvas;
+    if ( (rdroid_curRenderOptions & 0x100) != 0 && (v0->bIdk & 2) != 0 )
+    {
+        if ( rdroid_curAcceleration <= 0 )
+        {
+            if ( (v0->bIdk & 1) != 0 )
+            {
+                a4.x = v0->xStart;
+                a4.y = v0->yStart;
+                a4.width = v0->widthMinusOne - v0->xStart + 1;
+                a4.height = v0->heightMinusOne - v0->yStart + 1;
+                stdDisplay_VBufferFill(v0->d3d_vbuf, 0, &a4);
+            }
+            else
+            {
+                stdDisplay_VBufferFill(v0->d3d_vbuf, 0, 0);
+            }
+        }
+        else
+        {
+            std3D_ClearZBuffer();
+        }
+    }
 }

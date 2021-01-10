@@ -400,7 +400,7 @@ jkGuiObjectives_Shutdown	.text	00417E20	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Show	.text	00417E30	00000187	00000048	00000000	R	.	.	.	.	.	.	.
 jkGuiSingleTally_Initialize	.text	00417FC0	0000002A			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Shutdown	.text	00417FF0	00000001			R	.	.	.	.	.	.	.
-jkGuiSingleTally_sub_418000	.text	00418000	00000069	0000000C	0000000C	R	.	.	.	.	.	.	.
+jkGuiSingleTally_ForceStarsRender	.text	00418000	00000069	0000000C	0000000C	R	.	.	.	.	.	.	.
 jkGuiMultiTally_Show	.text	00418070	00000525	00029EA0	00000004	R	.	.	.	.	.	.	.
 jkGuiMultiTally_SortPlayerScore	.text	004185A0	00000098	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiMultiTally_Initalize	.text	00418640	0000003C			R	.	.	.	.	.	.	.

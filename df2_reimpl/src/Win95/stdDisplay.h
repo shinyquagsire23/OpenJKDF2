@@ -117,6 +117,7 @@ typedef struct render_pair
   uint32_t field_50;
 } render_pair;
 
+static int (*stdDisplay_VBufferFill)(stdVBuffer *a2, int fillColor, rdRect *a4) = (void*)stdDisplay_VBufferFill_ADDR;
 static int (*stdDisplay_FindClosestMode)(render_pair *a1, struct stdVideoMode *render_surface, unsigned int max_modes) = (void*)stdDisplay_FindClosestMode_ADDR;
 static int (*stdDisplay_FindClosestDevice)(stdDeviceParams *a1) = (void*)stdDisplay_FindClosestDevice_ADDR;
 static void (*stdDisplay_Close)() = (void*)stdDisplay_Close_ADDR;

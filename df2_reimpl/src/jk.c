@@ -179,6 +179,8 @@ HRESULT (__stdcall *jk_CoCreateInstance)(const IID *const rclsid, LPUNKNOWN pUnk
 LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dwFlags);
 BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
 
+int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
+
 // JK functions
 void (*jk_exit)(int a) = (void*)0x512590;
 int (*sub_401000)(char* a) = (void*)0x401000;
@@ -465,4 +467,6 @@ void jk_init()
     
     jk_ChangeDisplaySettingsA = *(void**)0x8F4153;
     jk_EnumDisplaySettingsA = *(void**)0x8F4157;
+    
+    jk_snwprintf = (void*)0x00512BD0;
 }

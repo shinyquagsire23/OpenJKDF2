@@ -46,6 +46,7 @@ jkGuiEsc                       0x18f      0.037%        100.000%        3 / 3
 rdroid                         0x1f6      0.046%        100.000%       27 / 27         
 sithHeader                     0x1f9      0.047%        100.000%        1 / 1          
 sithTime                       0x213      0.049%        100.000%        6 / 6          
+jkGuiSingleTally               0x21b      0.050%        100.000%        4 / 4          
 sithItem                       0x275      0.058%        100.000%        5 / 5          
 stdMemory                      0x2ba      0.065%        100.000%        7 / 7          
 sithTimer                      0x2e3      0.068%        100.000%        9 / 9          
@@ -69,6 +70,7 @@ jkGuiSingleplayer              0x8d8      0.210%        100.000%        7 / 7
 jkGuiForce                     0x9dd      0.234%        100.000%       11 / 11         
 rdParticle                     0xa0d      0.238%        100.000%       10 / 10         
 rdKeyframe                     0xa99      0.251%        100.000%        8 / 8          
+rdCamera                       0xaa8      0.253%        100.000%       26 / 26         
 rdPolyLine                     0xb42      0.267%        100.000%        6 / 6          
 rdVector                       0xd29      0.312%        100.000%       55 / 55         
 stdConsole                     0xfff      0.379%        100.000%       20 / 20         
@@ -79,7 +81,6 @@ jkGuiRend                      0x2cd7     1.063%        100.000%       68 / 68
 jkPlayer                       0x2da2     1.082%        100.000%       45 / 45         
 sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142        
 jkGuiControlOptions            0x105      0.024%        0.000%          0 / 3          
-jkGuiSingleTally               0x21b      0.050%        0.000%          0 / 4          
 jkGuiSetup                     0x240      0.053%        0.000%          0 / 4          
 jkGuiSound                     0x274      0.058%        0.000%          0 / 3          
 jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3          
@@ -130,7 +131,6 @@ rdMaterial                     0xa2d      0.241%        68.599%         6 / 9
 sithSoundClass                 0xa46      0.243%        0.000%          0 / 16         
 stdPalEffects                  0xa66      0.246%        0.000%          0 / 21         
 sithCogSound                   0xa97      0.251%        9.369%          1 / 14         
-rdCamera                       0xaa8      0.253%        69.025%        17 / 26         
 jkGuiSaveLoad                  0xb21      0.264%        0.000%          0 / 9          
 jkGuiKeyboard                  0xb57      0.269%        0.000%          0 / 14         
 jkGuiNetHost                   0xbc6      0.279%        0.000%          0 / 6          
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 15.516%
+Total completion: 15.644%
 ```

@@ -226,6 +226,7 @@ extern HRESULT (__stdcall *jk_CoCreateInstance)(const IID *const rclsid, LPUNKNO
 
 extern LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dwFlags);
 extern BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
+extern int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
 
 
 // JK functions

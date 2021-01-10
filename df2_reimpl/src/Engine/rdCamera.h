@@ -86,31 +86,21 @@ int rdCamera_SetAspectRatio(rdCamera *camera, float ratio);
 int rdCamera_BuildFOV(rdCamera *camera);
 int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
 void rdCamera_Update(rdMatrix34 *orthoProj);
-
+void rdCamera_PerspProject(rdVector3* out, rdVector3* v);
+void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
+void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+void rdCamera_OrthoProject(rdVector3 *out, rdVector3 *v);
+void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+void rdCamera_OrthoProjectSquare(rdVector3 *out, rdVector3 *v);
+void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt);
 void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal);
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
 int rdCamera_ClearLights(rdCamera *camera);
-
-//static int (*rdCamera_NewEntry)(rdCamera *camera, float fov, float a3, float a4, float a5, float a6) = (void*)rdCamera_NewEntry_ADDR;
-//static void (*rdCamera_SetAttenuation)(rdCamera *a1, float a2, float a3) = (void*)rdCamera_SetAttenuation_ADDR;
-//static int (*rdCamera_BuildFOV)(rdCamera *camera) = (void*)rdCamera_BuildFOV_ADDR;
-//static int (*rdCamera_SetCanvas)(rdCamera *camera, rdCanvas *canvas) = (void*)rdCamera_SetCanvas_ADDR;
-//static void (*rdCamera_SetAmbientLight)(rdCamera *camera, float amt) = (void*)rdCamera_SetAmbientLight_ADDR;
-static void (*rdCamera_AdvanceFrame)(void) = (void*)rdCamera_AdvanceFrame_ADDR;
-
-static void (*rdCamera_PerspProjectSquare)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_PerspProjectSquare_ADDR;
-static void (*rdCamera_PerspProjectSquareLst)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_PerspProjectSquareLst_ADDR;
-static void (*rdCamera_PerspProject)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_PerspProject_ADDR;
-static void (*rdCamera_PerspProjectLst)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_PerspProjectLst_ADDR;
-
-static void (*rdCamera_OrthoProjectSquare)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_OrthoProjectSquare_ADDR;
-static void (*rdCamera_OrthoProjectSquareLst)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_OrthoProjectSquareLst_ADDR;
-static void (*rdCamera_OrthoProject)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_OrthoProject_ADDR;
-static void (*rdCamera_OrthoProjectLst)(rdVector3 *a1, rdVector3 *a2) = (void*)rdCamera_OrthoProjectLst_ADDR;
+void rdCamera_AdvanceFrame();
 
 #define rdCamera_pCurCamera (*(rdCamera**)0x73A3D0)
-#define rdCamera_camRotation (*(rdVector3*)0x86EE20)
 #define rdCamera_camMatrix  (*(rdMatrix34*)0x86EE40)
 
 #endif // _RDCAMERA_H

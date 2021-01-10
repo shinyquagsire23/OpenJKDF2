@@ -27,6 +27,7 @@
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUIDecision.h"
 #include "Gui/jkGUISingleplayer.h"
+#include "Gui/jkGUISingleTally.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -743,11 +744,19 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdCamera_BuildFOV_ADDR, rdCamera_BuildFOV);
     hook_function(rdCamera_BuildClipFrustum_ADDR, rdCamera_BuildClipFrustum);
     hook_function(rdCamera_Update_ADDR, rdCamera_Update);
-    
+    hook_function(rdCamera_PerspProject_ADDR, rdCamera_PerspProject);
+    hook_function(rdCamera_PerspProjectLst_ADDR, rdCamera_PerspProjectLst);
+    hook_function(rdCamera_PerspProjectSquare_ADDR, rdCamera_PerspProjectSquare);
+    hook_function(rdCamera_PerspProjectSquareLst_ADDR, rdCamera_PerspProjectSquareLst);
+    hook_function(rdCamera_OrthoProject_ADDR, rdCamera_OrthoProject);
+    hook_function(rdCamera_OrthoProjectLst_ADDR, rdCamera_OrthoProjectLst);
+    hook_function(rdCamera_OrthoProjectSquare_ADDR, rdCamera_OrthoProjectSquare);
+    hook_function(rdCamera_OrthoProjectSquareLst_ADDR, rdCamera_OrthoProjectSquareLst);
     hook_function(rdCamera_SetAmbientLight_ADDR, rdCamera_SetAmbientLight);
     hook_function(rdCamera_SetAttenuation_ADDR, rdCamera_SetAttenuation);
     hook_function(rdCamera_AddLight_ADDR, rdCamera_AddLight);
     hook_function(rdCamera_ClearLights_ADDR, rdCamera_ClearLights);
+    hook_function(rdCamera_AdvanceFrame_ADDR, rdCamera_AdvanceFrame);
     
     // sith
     hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
@@ -1116,6 +1125,10 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiSingleplayer_sub_41AA30_ADDR, jkGuiSingleplayer_sub_41AA30);
     hook_function(jkGuiSingleplayer_sub_41AC70_ADDR, jkGuiSingleplayer_sub_41AC70);
     hook_function(jkGuiSingleplayer_sub_41AD00_ADDR, jkGuiSingleplayer_sub_41AD00);
+    
+    // jkGUISingleTally
+    hook_function(jkGuiSingleTally_Show_ADDR, jkGuiSingleTally_Show);
+    hook_function(jkGuiSingleTally_Initialize_ADDR, jkGuiSingleTally_Initialize);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
