@@ -328,8 +328,8 @@ jkGui_sub_412EC0	.text	00412EC0	00000006	00000000	00000000	R	.	.	.	.	.	.	.
 jkGui_sub_412ED0	.text	00412ED0	00000013			R	.	.	.	.	.	.	.
 jkGuiSetup_sub_412EF0	.text	00412EF0	0000004A	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiSetup_Show	.text	00412F40	000001CD	00000008	00000000	R	.	.	.	.	.	.	.
-jkGuiSetup_Initialize_0	.text	00413140	00000028			R	.	.	.	.	.	.	.
-jkGuiSetup_Shutdown_0	.text	00413170	00000001			R	.	.	.	.	.	.	.
+jkGuiSetup_Initialize	.text	00413140	00000028			R	.	.	.	.	.	.	.
+jkGuiSetup_Shutdown	.text	00413170	00000001			R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Initialize	.text	00413180	00000059			R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Shutdown	.text	004131E0	0000000B			R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Show	.text	004131F0	000006E5	00000264	00000000	R	.	.	.	.	.	.	.
@@ -415,9 +415,9 @@ jkGuiTitle_quicksave_related_func1	.text	004189D0	000000C4	0000008C	00000008	R	.
 jkGuiTitle_UnkDraw	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	.	.
 jkGuiTitle_LoadBarDraw	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiTitle_WorldLoadCallback	.text	00418C60	00000085	00000000	00000004	R	.	.	.	.	.	.	.
-jkGuiTitle_sub_418CF0	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.	.
-jkGuiTitle_gui_level_texts	.text	00418D80	00000121	0000008C	00000008	R	.	.	.	.	.	T	.
-jkGuiTitle_sub_418EB0	.text	00418EB0	00000014	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiTitle_ShowLoadingStatic	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.	.
+jkGuiTitle_ShowLoading	.text	00418D80	00000121	0000008C	00000008	R	.	.	.	.	.	T	.
+jkGuiTitle_LoadingFinalize	.text	00418EB0	00000014	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Initalize	.text	00418ED0	00000014			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Shutdown_0	.text	00418EF0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiBuildMulti_ModelLoader	.text	00418F00	00000054	00000084	00000004	R	.	.	.	.	.	.	.

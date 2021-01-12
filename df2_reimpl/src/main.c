@@ -28,6 +28,15 @@
 #include "Gui/jkGUIDecision.h"
 #include "Gui/jkGUISingleplayer.h"
 #include "Gui/jkGUISingleTally.h"
+#include "Gui/jkGUIControlOptions.h"
+#include "Gui/jkGUISetup.h"
+#include "Gui/jkGUIGameplay.h"
+#include "Gui/jkGUIDisplay.h"
+#include "Gui/jkGUISound.h"
+#include "Gui/jkGUIKeyboard.h"
+#include "Gui/jkGUIMouse.h"
+#include "Gui/jkGUIJoystick.h"
+#include "Gui/jkGUITitle.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -78,6 +87,7 @@
 #include "Main/jkGob.h"
 #include "Main/jkStrings.h"
 
+__declspec(dllexport) void hook_init(void);
 int yyparse();
 
 int jk_main(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd, char* lpWindowName)
@@ -1130,6 +1140,33 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiSingleTally_Show_ADDR, jkGuiSingleTally_Show);
     hook_function(jkGuiSingleTally_Initialize_ADDR, jkGuiSingleTally_Initialize);
     
+    // jkGUIControlOptions
+    hook_function(jkGuiControlOptions_Initialize_ADDR, jkGuiControlOptions_Initialize);
+    hook_function(jkGuiControlOptions_Shutdown_ADDR, jkGuiControlOptions_Shutdown);
+    hook_function(jkGuiControlOptions_Show_ADDR, jkGuiControlOptions_Show);
+    
+    // jkGUISetup
+    hook_function(jkGuiSetup_sub_412EF0_ADDR, jkGuiSetup_sub_412EF0);
+    hook_function(jkGuiSetup_Initialize_ADDR, jkGuiSetup_Initialize);
+    hook_function(jkGuiSetup_Shutdown_ADDR, jkGuiSetup_Shutdown);
+    hook_function(jkGuiSetup_Show_ADDR, jkGuiSetup_Show);
+    
+    // jkGUIGameplay
+    hook_function(jkGuiGameplay_Initialize_ADDR, jkGuiGameplay_Initialize);
+    hook_function(jkGuiGameplay_Shutdown_ADDR, jkGuiGameplay_Shutdown);
+    hook_function(jkGuiGameplay_Show_ADDR, jkGuiGameplay_Show);
+    
+    // jkGUITitle
+    hook_function(jkGuiTitle_Initialize_ADDR, jkGuiTitle_Initialize);
+    hook_function(jkGuiTitle_Shutdown_ADDR, jkGuiTitle_Shutdown);
+    hook_function(jkGuiTitle_sub_4189A0_ADDR, jkGuiTitle_sub_4189A0);
+    hook_function(jkGuiTitle_quicksave_related_func1_ADDR, jkGuiTitle_quicksave_related_func1);
+    hook_function(jkGuiTitle_UnkDraw_ADDR, jkGuiTitle_UnkDraw);
+    hook_function(jkGuiTitle_WorldLoadCallback_ADDR, jkGuiTitle_WorldLoadCallback);
+    hook_function(jkGuiTitle_ShowLoadingStatic_ADDR, jkGuiTitle_ShowLoadingStatic);
+    hook_function(jkGuiTitle_ShowLoading_ADDR, jkGuiTitle_ShowLoading);
+    hook_function(jkGuiTitle_LoadingFinalize_ADDR, jkGuiTitle_LoadingFinalize);
+    
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
     hook_function(Darray_Free_ADDR, Darray_Free);
@@ -1138,7 +1175,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
 
-    hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
+    //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
     

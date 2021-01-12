@@ -75,7 +75,7 @@
 #define jkGuiRend_TextButtonButtonDown_ADDR (0x00512370)
 #define jkGuiRend_TextButtonDraw_ADDR (0x005123C0)
 
-
+typedef struct stdFont stdFont;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
@@ -121,25 +121,30 @@ struct jkGuiTexInfo
 
 struct jkGuiElement
 {
-  int type;
-  int hoverId;
-  int field_8;
-  union
-  {
+    int type;
+    int hoverId;
+    int field_8;
+    union
+    {
       jkGuiStringEntry *unistr;
       const char* str;
+      wchar_t* wstr;
       int extraInt;
-  };
-  int selectedTextEntry;
-  rdRect rect;
-  int bIsVisible;
-  int anonymous_9;
-  const char* hintText;
-  jkGuiDrawFunc_t drawFuncOverride;
-  jkGuiButtonUpFunc_t func;
-  void *anonymous_13;
-  jkGuiTexInfo texInfo;
-  int elementIdk;
+    };
+    union
+    {
+        int selectedTextEntry;
+        int boxChecked;
+    };
+    rdRect rect;
+    int bIsVisible;
+    int anonymous_9;
+    const char* hintText;
+    jkGuiDrawFunc_t drawFuncOverride;
+    jkGuiButtonUpFunc_t func;
+    void *anonymous_13;
+    jkGuiTexInfo texInfo;
+    int elementIdk;
 };
 
 struct jkGuiStringEntry
@@ -158,7 +163,7 @@ struct jkGuiMenu
   stdVBuffer *texture;
   uint8_t* palette;
   stdBitmap **ui_structs;
-  int (*anonymous_6)[];
+  stdFont** fonts;
   int anonymous_7;
   void (__cdecl *idkFunc)(jkGuiMenu *);
   char *soundHover;

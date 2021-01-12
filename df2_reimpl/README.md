@@ -40,6 +40,7 @@ jkStrings                      0x89       0.013%        100.000%        5 / 5
 jkGuiGeneral                   0xc5       0.018%        100.000%        3 / 3          
 jkSmack                        0xee       0.022%        100.000%        4 / 4          
 rdFace                         0xf6       0.023%        100.000%        4 / 4          
+jkGuiControlOptions            0x105      0.024%        100.000%        3 / 3          
 stdHashKey                     0x107      0.024%        100.000%       10 / 10         
 rdCanvas                       0x113      0.025%        100.000%        4 / 4          
 jkGuiEsc                       0x18f      0.037%        100.000%        3 / 3          
@@ -47,7 +48,9 @@ rdroid                         0x1f6      0.046%        100.000%       27 / 27
 sithHeader                     0x1f9      0.047%        100.000%        1 / 1          
 sithTime                       0x213      0.049%        100.000%        6 / 6          
 jkGuiSingleTally               0x21b      0.050%        100.000%        4 / 4          
+jkGuiSetup                     0x240      0.053%        100.000%        4 / 4          
 sithItem                       0x275      0.058%        100.000%        5 / 5          
+jkGuiGameplay                  0x2b2      0.064%        100.000%        3 / 3          
 stdMemory                      0x2ba      0.065%        100.000%        7 / 7          
 sithTimer                      0x2e3      0.068%        100.000%        9 / 9          
 stdMci                         0x2ef      0.070%        100.000%        7 / 7          
@@ -61,6 +64,7 @@ rdLight                        0x49f      0.110%        100.000%        8 / 8
 stdFnames                      0x4ee      0.117%        100.000%       14 / 14         
 sithSprite                     0x4f1      0.117%        100.000%        6 / 6          
 jkGui                          0x4fb      0.118%        100.000%       10 / 10         
+jkGuiTitle                     0x4fb      0.118%        100.000%       10 / 10         
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
@@ -80,10 +84,7 @@ rdMatrix                       0x2c85     1.055%        100.000%       56 / 56
 jkGuiRend                      0x2cd7     1.063%        100.000%       68 / 68         
 jkPlayer                       0x2da2     1.082%        100.000%       45 / 45         
 sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142        
-jkGuiControlOptions            0x105      0.024%        0.000%          0 / 3          
-jkGuiSetup                     0x240      0.053%        0.000%          0 / 4          
 jkGuiSound                     0x274      0.058%        0.000%          0 / 3          
-jkGuiGameplay                  0x2b2      0.064%        0.000%          0 / 3          
 jkGuiObjectives                0x308      0.072%        0.000%          0 / 4          
 jkControl                      0x331      0.076%        0.000%          0 / 4          
 Windows                        0x39a      0.085%        0.000%          0 / 11         
@@ -93,7 +94,6 @@ jkCutscene                     0x443      0.101%        0.000%          0 / 7
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
 smack                          0x466      0.104%        0.000%          0 / 6          
 jkGuiMain                      0x4b1      0.111%        0.000%          0 / 6          
-jkGuiTitle                     0x4fb      0.118%        0.000%          0 / 10         
 sithMaterial                   0x4fd      0.118%        0.000%          0 / 9          
 sithDplay                      0x53c      0.124%        0.000%          0 / 17         
 sithActor                      0x559      0.127%        0.000%          0 / 5          
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 15.644%
+Total completion: 15.904%
 ```

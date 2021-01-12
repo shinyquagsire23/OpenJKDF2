@@ -39,6 +39,8 @@
 #define sithAI_sub_4EBE80_ADDR (0x004EBE80)
 #define sithAI_sub_4EC140_ADDR (0x004EC140)
 
+typedef struct sithThing sithThing;
+
 typedef int (*sithAICommandFunc_t)(void *actor, void *a8, void *a3, int a4);
 
 typedef struct sithAICommand

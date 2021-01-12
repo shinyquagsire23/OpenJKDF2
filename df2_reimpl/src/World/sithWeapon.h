@@ -37,6 +37,7 @@
 #define sithWeapon_Syncunused2_ADDR (0x004D6750)
 #define sithWeapon_SetFireRate_ADDR (0x004D6830)
 
+#define sithWeapon_controlOptions (*(int*)0x008BD020)
 #define g_flt_8BD040 (*(float*)0x008BD040)
 #define g_flt_8BD044 (*(float*)0x008BD044)
 #define g_flt_8BD048 (*(float*)0x008BD048)
