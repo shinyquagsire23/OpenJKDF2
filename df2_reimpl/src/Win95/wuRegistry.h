@@ -16,6 +16,11 @@
 #define wuRegistry_SetString_ADDR (0x0050F3B0)
 #define wuRegistry_GetString_ADDR (0x0050F410)
 
+static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, float val) = (void*)wuRegistry_SaveFloat_ADDR;
+static int (*wuRegistry_SaveInt)(LPCSTR lpValueName, int val) = (void*)wuRegistry_SaveInt_ADDR;
+static int (*wuRegistry_SaveBool)(LPCSTR lpValueName, HKEY phkResult) = (void*)wuRegistry_SaveBool_ADDR;
+static float (*wuRegistry_GetFloat)(LPCSTR lpValueName, float v5) = (void*)wuRegistry_GetFloat_ADDR;
+static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_GetInt_ADDR;
 static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
 static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
 

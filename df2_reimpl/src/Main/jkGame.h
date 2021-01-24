@@ -7,8 +7,8 @@
 #define jkGame_ForceRefresh_ADDR (0x00401EC0)
 #define jkGame_Update_ADDR (0x00401EE0)
 #define jkGame_cam_idk_maybe_ADDR (0x00402230)
-#define jkGame_Screensize2_ADDR (0x00402540)
-#define jkGame_Screensize_ADDR (0x00402570)
+#define jkGame_ScreensizeIncrease_ADDR (0x00402540)
+#define jkGame_ScreensizeDecrease_ADDR (0x00402570)
 #define jkGame_Gamma_ADDR (0x004025A0)
 #define jkGame_Screenshot_ADDR (0x004025E0)
 #define jkGame_ddraw_idk_palettes_ADDR (0x004027C0)
@@ -26,9 +26,15 @@ typedef struct sithThing sithThing;
 #define g_debugmodeFlags (*(int*)0x8EE66C)
 //#define g_playersetDifficulty (*(int*)0x8EE670)
 #define g_mapModeFlags (*(int*)0x8EE674)
+#define jkGame_gamma (*(int*)0x008606A4)
+#define jkGame_screenSize (*(int*)0x008605F0)
 
+static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
+static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
 static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
 static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
+static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
+static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
 
 #endif // _JKGAME_H

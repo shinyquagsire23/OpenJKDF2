@@ -44,4 +44,6 @@ static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_A
 static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
 static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;
 
+static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
+
 #endif // _STDCONTROL_H

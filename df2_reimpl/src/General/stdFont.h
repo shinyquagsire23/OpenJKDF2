@@ -88,5 +88,6 @@ static int (*stdFont_sub_4355B0)(int a1, uint16_t a2) = (void*)stdFont_sub_4355B
 static int (*stdFont_sub_435810)(int a1, WCHAR *a2, int a3) = (void*)stdFont_sub_435810_ADDR;
 static uint32_t (*stdFont_Draw1)(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, WCHAR *a6, int alpha_maybe) = (void*)stdFont_Draw1_ADDR;
 static int (*stdFont_sub_4357C0)(stdFont *a1, wchar_t *text, rdRect *rect) = (void*)stdFont_sub_4357C0_ADDR;
+static void (*stdFont_Draw2)(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7) = (void*)stdFont_Draw2_ADDR;
 
 #endif // _STDFONT_H

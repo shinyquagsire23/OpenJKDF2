@@ -1,6 +1,8 @@
 #ifndef _JKCOG_H
 #define _JKCOG_H
 
+#include "types.h"
+
 #include "sithCog.h"
 
 void jkCog_RegisterVerbs();

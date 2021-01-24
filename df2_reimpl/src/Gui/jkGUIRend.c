@@ -1686,9 +1686,9 @@ int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, s
     int v30; // ecx
     int v31; // edx
     jkGuiStringEntry *v32; // ecx
-    int v33; // [esp+0h] [ebp-1Ch]
-    int v34; // [esp+10h] [ebp-Ch]
-
+    uint8_t v33[16]; // [esp+0h] [ebp-1Ch]
+    int pY; // [esp+10h] [ebp-Ch]
+    int pX;
 
     switch ( a3 )
     {
@@ -1707,12 +1707,12 @@ int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, s
 LABEL_5:
             v7 = element->selectedTextEntry;
             v7 = element->selectedTextEntry;
-            jkGuiRend_GetMousePos((int *)&element, &v34);
+            jkGuiRend_GetMousePos(&pX, &pY);
             v8 = element->rect.x;
-            if ( (signed int)element < v8 - 32
-              || (v9 = element->rect.width, (signed int)element > v9 + v8 + 32)
-              || (v10 = element->rect.y, v34 < v10 - 32)
-              || v34 > element->rect.height + v10 + 32 )
+            if ( pX < v8 - 32
+              || (v9 = element->rect.width, pX > v9 + v8 + 32)
+              || (v10 = element->rect.y, pY < v10 - 32)
+              || pY > element->rect.height + v10 + 32 )
             {
                 element->selectedTextEntry = element->texInfo.numTextEntries;
             }
@@ -1720,7 +1720,7 @@ LABEL_5:
             {
                 v11 = 0;
                 v12 = element->rect.width;
-                if ( &v33 != (int *)-44 )
+                if ( v33 != (uint8_t*)-44 )
                     a4 = 0;
                 v13 = (int *)element->anonymous_13;
                 v15 = *v13;
@@ -1735,15 +1735,15 @@ LABEL_5:
                 {
                     v18 = (*v17->mipSurfaces)->format.width;
                     v12 -= v18;
-                    if ( &v33 != (int *)-44 )
+                    if ( v33 != (uint8_t*)-44 )
                     {
                         v19 = element->rect.x + v11 + element->selectedTextEntry * v12 / (uint32_t)element->unistr;
-                        if ( (signed int)element >= v19 - 4 && (signed int)element < (signed int)(v19 + v18 + 4) )
+                        if ( pX >= v19 - 4 && pX < (signed int)(v19 + v18 + 4) )
                             a4 = 1;
                     }
                 }
                 v20 = (int)element->unistr;
-                v21 = v20 * (signed int)((char *)element - v11 - element->rect.x) / v12;
+                v21 = v20 * (pX - v11 - element->rect.x) / v12;
                 if ( v21 < 0 )
                 {
                     v21 = 0;

@@ -1,6 +1,8 @@
 #ifndef _SITHWEAPON_H
 #define _SITHWEAPON_H
 
+#include "types.h"
+
 #include "Primitives/rdMatrix.h"
 
 #define sithWeapon_InitDefaults_ADDR (0x004D3430)
@@ -61,11 +63,6 @@
 #define sithWeapon_fireRate (*(float*)0x008BD0AC)
 #define sithWeapon_LastFireTimeSecs (*(*)0x008BD0B0)
 
-typedef struct sithThing sithThing;
-typedef struct sithSurface sithSurface;
-typedef struct sithSound sithSound;
-typedef struct sithCog sithCog;
-
 void sithWeapon_InitDefaults();
 void sithWeapon_Startup();
 void sithWeapon_Tick(sithThing *weapon, float deltaSeconds);
@@ -88,5 +85,7 @@ static void (*sithWeapon_SetFireRate)(sithThing *a1, float fireRate) = (void*)si
 static sithThing* (*sithWeapon_FireProjectile)(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, __int16 scaleFlags, float autoaimFov, float autoaimMaxDist) = (void*)sithWeapon_FireProjectile_ADDR;
 static int (*sithWeapon_WriteConf)() = (void*)sithWeapon_WriteConf_ADDR;
 static int (*sithWeapon_ReadConf)() = (void*)sithWeapon_ReadConf_ADDR;
+
+static int (*sithWeapon_HandleWeaponKeys)(sithThing *a1, float a2) = (void*)sithWeapon_HandleWeaponKeys_ADDR;
 
 #endif // _SITHWEAPON_H

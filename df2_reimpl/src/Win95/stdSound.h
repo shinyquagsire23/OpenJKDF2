@@ -35,6 +35,7 @@ typedef struct IDirectSoundBuffer
 {
 } IDirectSoundBuffer;
 
+static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;
 static int (*stdSound_BufferReset)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferReset_ADDR;
 static int (*stdSound_BufferPlay)(LPDIRECTSOUNDBUFFER a1, int a2) = (void*)stdSound_BufferPlay_ADDR;
 static uint32_t (*stdSound_ParseWav)(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset) = (void*)stdSound_ParseWav_ADDR;

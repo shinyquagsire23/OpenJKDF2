@@ -29,6 +29,7 @@
 #include "Gui/jkGUISingleplayer.h"
 #include "Gui/jkGUISingleTally.h"
 #include "Gui/jkGUIControlOptions.h"
+#include "Gui/jkGUIObjectives.h"
 #include "Gui/jkGUISetup.h"
 #include "Gui/jkGUIGameplay.h"
 #include "Gui/jkGUIDisplay.h"
@@ -86,6 +87,7 @@
 #include "Main/jkSmack.h"
 #include "Main/jkGob.h"
 #include "Main/jkStrings.h"
+#include "Main/jkControl.h"
 
 __declspec(dllexport) void hook_init(void);
 int yyparse();
@@ -968,6 +970,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkStrings_GetText_ADDR, jkStrings_GetText);
     hook_function(jkStrings_unused_sub_40B490_ADDR, jkStrings_unused_sub_40B490);
     
+    // jkControl
+    hook_function(jkControl_Initialize_ADDR, jkControl_Initialize);
+    hook_function(jkControl_Shutdown_ADDR, jkControl_Shutdown);
+    hook_function(jkControl_HandleHudKeys_ADDR, jkControl_HandleHudKeys);
+    
     // sithUnk3
     hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
     hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
@@ -1167,6 +1174,17 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiTitle_ShowLoading_ADDR, jkGuiTitle_ShowLoading);
     hook_function(jkGuiTitle_LoadingFinalize_ADDR, jkGuiTitle_LoadingFinalize);
     
+    // jkGUISound
+    hook_function(jkGuiSound_Initialize_ADDR, jkGuiSound_Initialize);
+    hook_function(jkGuiSound_Shutdown_ADDR, jkGuiSound_Shutdown);
+    hook_function(jkGuiSound_Show_ADDR, jkGuiSound_Show);
+    
+    // jkGUIObjectives
+    hook_function(jkGuiObjectives_CustomRender_ADDR, jkGuiObjectives_CustomRender);
+    hook_function(jkGuiObjectives_Show_ADDR, jkGuiObjectives_Show);
+    hook_function(jkGuiObjectives_Initialize_ADDR, jkGuiObjectives_Initialize);
+    hook_function(jkGuiObjectives_Shutdown_ADDR, jkGuiObjectives_Shutdown);
+    
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
     hook_function(Darray_Free_ADDR, Darray_Free);
@@ -1175,7 +1193,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
 
-    //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
+    hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
     

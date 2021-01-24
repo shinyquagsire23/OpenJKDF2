@@ -393,7 +393,7 @@ jkGuiMouse_sub_417860	.text	00417860	00000068	00000004	00000008	R	.	.	.	.	.	.	.
 jkGuiMouse_Show	.text	004178D0	000001FE	0000000C	00000000	R	.	.	.	.	.	.	.
 jkGuiMouse_Initialize	.text	00417AD0	00000014			R	.	.	.	.	.	.	.
 jkGuiMouse_Shutdown	.text	00417AF0	00000001			R	.	.	.	.	.	.	.
-jkGuiObjectives_sub_417B00	.text	00417B00	000001DA	0000002C	00000010	R	.	.	.	.	.	.	.
+jkGuiObjectives_CustomRender	.text	00417B00	000001DA	0000002C	00000010	R	.	.	.	.	.	.	.
 jkGuiObjectives_Show	.text	00417CE0	00000119	0000008C	00000000	R	.	.	.	.	.	.	.
 jkGuiObjectives_Initialize	.text	00417E00	00000014			R	.	.	.	.	.	.	.
 jkGuiObjectives_Shutdown	.text	00417E20	00000001			R	.	.	.	.	.	.	.

@@ -8,6 +8,7 @@
 #define jkGuiDialog_ErrorDialog_ADDR (0x00416A90)
 #define jkGuiDialog_YesNoDialog_ADDR (0x00416BA0)
 
+static void (*jkGuiDialog_ErrorDialog)(wchar_t *a1, wchar_t *a2) = (void*)jkGuiDialog_ErrorDialog_ADDR;
 static int (*jkGuiDialog_YesNoDialog)(wchar_t* a1, wchar_t* a2) = (void*)jkGuiDialog_YesNoDialog_ADDR;
 
 #endif // _JKGUIDIALOG_H
