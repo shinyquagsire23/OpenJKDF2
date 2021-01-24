@@ -137,6 +137,7 @@ static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_AD
 static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperativeLevel_ADDR;
 static int (*stdDisplay_ddraw_surface_flip)() = (void*)stdDisplay_ddraw_surface_flip_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
+static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 
 #define Video_curMode (*(int*)0x00866D7C)
 #define Video_otherBuf (*(stdVBuffer*)0x866CA0)

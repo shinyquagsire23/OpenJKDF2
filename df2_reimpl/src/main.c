@@ -80,6 +80,7 @@
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
 #include "Win95/stdConsole.h"
+#include "Win95/Windows.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
@@ -503,6 +504,19 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConsole_WriteBorderMaybe2_ADDR, stdConsole_WriteBorderMaybe2);
     hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
+    
+    // Windows
+    hook_function(Windows_Startup_ADDR, Windows_Startup);
+    hook_function(Windows_Shutdown_ADDR, Windows_Shutdown);
+    hook_function(Windows_InitWindow_ADDR, Windows_InitWindow);
+    hook_function(Windows_InitGdi_ADDR, Windows_InitGdi);
+    hook_function(Windows_ShutdownGdi_ADDR, Windows_ShutdownGdi);
+    hook_function(Windows_CalibrateJoystick_ADDR, Windows_CalibrateJoystick);
+    hook_function(Windows_DefaultHandler_ADDR, Windows_DefaultHandler);
+    hook_function(Windows_GdiHandler_ADDR, Windows_GdiHandler);
+    hook_function(Windows_ErrorMsgboxWide_ADDR, Windows_ErrorMsgboxWide);
+    hook_function(Windows_ErrorMsgbox_ADDR, Windows_ErrorMsgbox);
+    hook_function(Windows_GameErrorMsgbox_ADDR, Windows_GameErrorMsgbox);
     
     // stdMemory
     hook_function(stdMemory_Startup_ADDR, stdMemory_Startup);

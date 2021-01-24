@@ -31,5 +31,6 @@
 
 static int (*jkRes_FileExists)(char *fpath, char *a2, int len) = (void*)jkRes_FileExists_ADDR;
 static void (*jkRes_LoadGob)(char *a1) = (void*)jkRes_LoadGob_ADDR;
+static void (*jkRes_LoadCd)(char *a1) = (void*)jkRes_LoadCd_ADDR;
 
 #endif // _JKRES_H

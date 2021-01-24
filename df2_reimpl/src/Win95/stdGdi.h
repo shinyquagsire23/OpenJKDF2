@@ -14,7 +14,7 @@
 #define stdGdi_SetHInstance_ADDR (0x00436D30)
 #define stdGdi_GetHInstance_ADDR (0x00436D40)
 
-static int (*stdGdi_GetHwnd)() = (void*)stdGdi_GetHwnd_ADDR;
+static HWND (*stdGdi_GetHwnd)() = (void*)stdGdi_GetHwnd_ADDR;
 static HINSTANCE (*stdGdi_GetHInstance)() = (void*)stdGdi_GetHInstance_ADDR;
 
 #endif // _STDGDI_H

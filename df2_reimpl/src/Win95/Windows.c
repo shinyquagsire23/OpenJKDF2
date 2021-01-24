@@ -1,0 +1,222 @@
+#include "Windows.h"
+
+#include "Win95/WinIdk.h"
+#include "Win95/wuRegistry.h"
+#include "Win95/Window.h"
+#include "Win95/stdGdi.h"
+#include "Win95/stdControl.h"
+#include "Win95/stdDisplay.h"
+#include "Main/jkRes.h"
+#include "Main/jkHud.h"
+#include "Main/jkMain.h"
+#include "Main/jkStrings.h"
+#include "jk.h"
+
+static int Windows_bInitted;
+static uint32_t Windows_DplayGuid[4] = {0x0BF0613C0, 0x11D0DE79, 0x0A000C999, 0x4BAD7624};
+static char Windows_cpu_info[0x4c];
+static char Windows_cdpath_default[4]; // ???
+
+static int Windows_bInittedGdi;
+static int Windows_bWindowed;
+static int Windows_bUnk;
+
+void Windows_Startup()
+{
+    char cdPath[128]; // [esp+0h] [ebp-80h] BYREF
+
+    Windows_bInitted = 1;
+    WinIdk_SetDplayGuid(Windows_DplayGuid);
+    WinIdk_detect_cpu(Windows_cpu_info);
+    wuRegistry_GetString("CD Path", (LPBYTE)cdPath, 128, Windows_cdpath_default); // ????
+    jkRes_LoadCd(cdPath);
+    Windows_installType = wuRegistry_GetInt("InstallType", 9);
+    Window_AddMsgHandler(Windows_DefaultHandler);
+}
+
+void Windows_Shutdown()
+{
+    Window_RemoveMsgHandler(Windows_DefaultHandler);
+    wuRegistry_Shutdown();
+    Windows_bInitted = 0;
+}
+
+int Windows_InitWindow()
+{
+    HDC v2; // esi
+    unsigned int v3; // ebx
+    HWND v4; // eax
+
+    v2 = jk_GetDC(jk_GetDesktopWindow());
+    v3 = jk_GetDeviceCaps(v2, 12);
+    jk_ReleaseDC(jk_GetDesktopWindow(), v2);
+
+    if ( v3 < 8 )
+        Windows_GameErrorMsgbox("ERR_NEED_256_COLOR");
+
+    return 1;
+}
+
+void Windows_InitGdi(int windowed)
+{
+    Windows_bInittedGdi = 1;
+    jk_SetFocus(stdGdi_GetHwnd());
+    jk_SetActiveWindow(stdGdi_GetHwnd());
+
+    Windows_bWindowed = windowed;
+    if ( windowed )
+        jk_ShowCursor(0);
+    else
+        Window_ShowCursorUnwindowed(0);
+
+    jk_ValidateRect(stdGdi_GetHwnd(), 0);
+    Window_AddMsgHandler(Windows_GdiHandler);
+    Windows_bUnk = 0;
+}
+
+void Windows_ShutdownGdi()
+{
+    if ( Windows_bInittedGdi )
+    {
+        Windows_bInittedGdi = 0;
+        Window_RemoveMsgHandler(Windows_GdiHandler);
+        if ( Windows_bWindowed )
+            ShowCursor(1);
+        Windows_bUnk = 0;
+    }
+}
+
+UINT Windows_CalibrateJoystick()
+{
+    return jk_WinExec("CONTROL JOY.CPL", 5u);
+}
+
+int Windows_DefaultHandler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5)
+{
+    signed int result; // eax
+
+    result = 0;
+    if ( a2 == 0x14 )
+    {
+        result = 1;
+        *a5 = 1;
+    }
+    
+    return result;
+}
+
+int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
+{
+    signed int v5; // esi
+    int v6; // eax
+    int v8; // eax
+
+    v5 = 0;
+    switch ( msg )
+    {
+        case 0x10u:
+            v5 = 1;
+            *a5 = 1;
+            break;
+        case 0x20u:
+            if ( Windows_bWindowed )
+            {
+                jk_SetCursor(0);
+                v5 = 1;
+                *a5 = 1;
+            }
+            break;
+        case 0x100u:
+            if ( wParam == 0x1B )               // ESC
+            {
+                if ( jkHud_dword_553E94 )
+                    jkHud_idk_time();
+                else
+                    jkMain_do_guistate6();
+            }
+            else if ( wParam > 0x5A && wParam <= 0x5C )// WIN
+            {
+                v5 = 1;
+                *a5 = 1;
+            }
+            break;
+        case 0x102u:
+            if ( jkHud_dword_553E94 )
+            {
+                jkHud_send_message(wParam);
+                v5 = 1;
+                *a5 = 1;
+            }
+            break;
+        default:
+            break;
+    }
+    v6 = stdControl_ShowCursor(0);
+
+    int v7 = v6 < -1;
+    if ( v6 > -1 )
+    {
+        do
+        {
+            v8 = stdControl_ShowCursor(0);
+            v7 = v8 < -1;
+        }
+        while ( v8 > -1 );
+    }
+    if ( v7 )
+    {
+        while ( stdControl_ShowCursor(1) < -1 )
+            ;
+    }
+    return v5;
+}
+
+int Windows_ErrorMsgboxWide(const char *a1, ...)
+{
+    wchar_t *v1; // eax
+    HWND v2; // eax
+    wchar_t *v4; // [esp-8h] [ebp-808h]
+    wchar_t Text[1024]; // [esp+0h] [ebp-800h] BYREF
+    va_list va; // [esp+808h] [ebp+8h] BYREF
+
+    va_start(va, a1);
+    v1 = jkStrings_GetText(a1);
+    _vsnwprintf(Text, 0x400u, v1, va);
+    v4 = jkStrings_GetText("ERROR");
+    v2 = stdGdi_GetHwnd();
+    return jk_MessageBoxW(v2, Text, v4, 0x10u);
+}
+
+int Windows_ErrorMsgbox(const char *a1, ...)
+{
+    wchar_t *v1; // eax
+    HWND v2; // eax
+    wchar_t *v4; // [esp-8h] [ebp-408h]
+    wchar_t Text[512]; // [esp+0h] [ebp-400h] BYREF
+    va_list va; // [esp+408h] [ebp+8h] BYREF
+
+    va_start(va, a1);
+    v1 = jkStrings_GetText(a1);
+    jk_vsnwprintf(Text, 0x200u, v1, va);
+    v4 = jkStrings_GetText("ERROR");
+    v2 = stdGdi_GetHwnd();
+    return jk_MessageBoxW(v2, Text, v4, 0x10u);
+}
+
+void Windows_GameErrorMsgbox(const char *a1, ...)
+{
+    wchar_t *v1; // eax
+    HWND v2; // eax
+    wchar_t *v3; // [esp-8h] [ebp-408h]
+    wchar_t Text[512]; // [esp+0h] [ebp-400h] BYREF
+    va_list va; // [esp+408h] [ebp+8h] BYREF
+
+    va_start(va, a1);
+    stdDisplay_ClearMode();
+    v1 = jkStrings_GetText(a1);
+    jk_vsnwprintf(Text, 0x200u, v1, va);
+    v3 = jkStrings_GetText("ERROR");
+    v2 = stdGdi_GetHwnd();
+    jk_MessageBoxW(v2, Text, v3, 0x10u);
+    jk_exit(1);
+}

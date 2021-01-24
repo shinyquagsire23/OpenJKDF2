@@ -24,4 +24,6 @@ static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_
 static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
 static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
 
+static void (*wuRegistry_Shutdown)() = (void*)wuRegistry_Shutdown_ADDR;
+
 #endif // _WUREGISTRY_H

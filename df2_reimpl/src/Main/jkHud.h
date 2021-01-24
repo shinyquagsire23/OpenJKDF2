@@ -24,4 +24,7 @@
 static void (*jkHud_Chat)() = (void*)jkHud_Chat_ADDR;
 static void (*jkHud_Tally)() = (void*)jkHud_Tally_ADDR;
 
+static void (*jkHud_idk_time)() = (void*)jkHud_idk_time_ADDR;
+static void (*jkHud_send_message)(char a1) = (void*)jkHud_send_message_ADDR;
+
 #endif // _JKHUD_H

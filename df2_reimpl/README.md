@@ -57,6 +57,7 @@ sithTimer                      0x2e3      0.068%        100.000%        9 / 9
 stdMci                         0x2ef      0.070%        100.000%        7 / 7          
 jkGuiObjectives                0x308      0.072%        100.000%        4 / 4          
 jkControl                      0x331      0.076%        100.000%        4 / 4          
+Windows                        0x39a      0.085%        100.000%       11 / 11         
 stdString                      0x3b3      0.088%        100.000%       11 / 11         
 sithModel                      0x3f1      0.093%        100.000%        8 / 8          
 rdThing                        0x42f      0.099%        100.000%       12 / 12         
@@ -87,7 +88,6 @@ rdMatrix                       0x2c85     1.055%        100.000%       56 / 56
 jkGuiRend                      0x2cd7     1.063%        100.000%       68 / 68         
 jkPlayer                       0x2da2     1.082%        100.000%       45 / 45         
 sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142        
-Windows                        0x39a      0.085%        0.000%          0 / 11         
 jkGuiDialog                    0x3e0      0.092%        0.000%          0 / 6          
 stdGdi                         0x430      0.099%        0.000%          0 / 10         
 jkCutscene                     0x443      0.101%        0.000%          0 / 7          
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 16.109%
+Total completion: 16.195%
 ```
