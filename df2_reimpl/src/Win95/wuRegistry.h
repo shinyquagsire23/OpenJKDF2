@@ -16,14 +16,34 @@
 #define wuRegistry_SetString_ADDR (0x0050F3B0)
 #define wuRegistry_GetString_ADDR (0x0050F410)
 
-static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, float val) = (void*)wuRegistry_SaveFloat_ADDR;
-static int (*wuRegistry_SaveInt)(LPCSTR lpValueName, int val) = (void*)wuRegistry_SaveInt_ADDR;
-static int (*wuRegistry_SaveBool)(LPCSTR lpValueName, HKEY phkResult) = (void*)wuRegistry_SaveBool_ADDR;
-static float (*wuRegistry_GetFloat)(LPCSTR lpValueName, float v5) = (void*)wuRegistry_GetFloat_ADDR;
-static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_GetInt_ADDR;
-static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
-static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
+LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData);
+void wuRegistry_Shutdown();
+int wuRegistry_SaveInt(LPCSTR lpValueName, int val);
+int wuRegistry_SaveFloat(LPCSTR lpValueName, float val);
+int wuRegistry_GetInt(LPCSTR lpValueName, int a2);
+float wuRegistry_GetFloat(LPCSTR lpValueName, float v5);
+int wuRegistry_SaveBool(LPCSTR lpValueName, HKEY phkResult);
+int wuRegistry_GetBool(LPCSTR lpValueName, int a2);
+int wuRegistry_SaveBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData);
+int wuRegistry_GetBytes(LPCSTR lpValueName, DWORD Type, DWORD cbData);
+LSTATUS wuRegistry_SetString(LPCSTR lpValueName, BYTE *lpData);
+int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out);
 
-static void (*wuRegistry_Shutdown)() = (void*)wuRegistry_Shutdown_ADDR;
+//static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, float val) = (void*)wuRegistry_SaveFloat_ADDR;
+//static int (*wuRegistry_SaveInt)(LPCSTR lpValueName, int val) = (void*)wuRegistry_SaveInt_ADDR;
+//static int (*wuRegistry_SaveBool)(LPCSTR lpValueName, HKEY phkResult) = (void*)wuRegistry_SaveBool_ADDR;
+//static float (*wuRegistry_GetFloat)(LPCSTR lpValueName, float v5) = (void*)wuRegistry_GetFloat_ADDR;
+//static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_GetInt_ADDR;
+//static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
+//static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
+
+//static void (*wuRegistry_Shutdown)() = (void*)wuRegistry_Shutdown_ADDR;
+
+
+#define wuRegistry_bInitted (*(int*)0x00855EA4)
+#define wuRegistry_lpClass ((uint8_t*)0x00855EB0)
+#define wuRegistry_byte_855EB4 ((uint8_t*)0x00855EB4)
+#define wuRegistry_hKey (*(HKEY*)0x00855EAC)
+#define wuRegistry_lpSubKey (*(LPCSTR*)0x00855EA8)
 
 #endif // _WUREGISTRY_H

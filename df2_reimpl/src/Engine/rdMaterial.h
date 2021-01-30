@@ -65,7 +65,7 @@ typedef struct stdVBuffer
     uint32_t lock_cnt;
     uint32_t gap8;
     texture_format format;
-    uint32_t field_58;
+    void* palette;
     char* surface_lock_alloc;
     uint32_t transparent_color;
     sith_tex_2 *ddraw_surface;

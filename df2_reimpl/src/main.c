@@ -38,6 +38,7 @@
 #include "Gui/jkGUIMouse.h"
 #include "Gui/jkGUIJoystick.h"
 #include "Gui/jkGUITitle.h"
+#include "Gui/jkGUIDialog.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
@@ -81,6 +82,8 @@
 #include "Win95/stdMci.h"
 #include "Win95/stdConsole.h"
 #include "Win95/Windows.h"
+#include "Win95/wuRegistry.h"
+#include "Win95/stdGdi.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
@@ -517,6 +520,32 @@ __declspec(dllexport) void hook_init(void)
     hook_function(Windows_ErrorMsgboxWide_ADDR, Windows_ErrorMsgboxWide);
     hook_function(Windows_ErrorMsgbox_ADDR, Windows_ErrorMsgbox);
     hook_function(Windows_GameErrorMsgbox_ADDR, Windows_GameErrorMsgbox);
+    
+    // wuRegistry
+    hook_function(wuRegistry_Startup_ADDR, wuRegistry_Startup);
+    hook_function(wuRegistry_Shutdown_ADDR, wuRegistry_Shutdown);
+    hook_function(wuRegistry_SaveInt_ADDR, wuRegistry_SaveInt);
+    hook_function(wuRegistry_SaveFloat_ADDR, wuRegistry_SaveFloat);
+    hook_function(wuRegistry_GetInt_ADDR, wuRegistry_GetInt);
+    hook_function(wuRegistry_GetFloat_ADDR, wuRegistry_GetFloat);
+    hook_function(wuRegistry_SaveBool_ADDR, wuRegistry_SaveBool);
+    hook_function(wuRegistry_GetBool_ADDR, wuRegistry_GetBool);
+    hook_function(wuRegistry_SaveBytes_ADDR, wuRegistry_SaveBytes);
+    hook_function(wuRegistry_GetBytes_ADDR, wuRegistry_GetBytes);
+    hook_function(wuRegistry_SetString_ADDR, wuRegistry_SetString);
+    hook_function(wuRegistry_GetString_ADDR, wuRegistry_GetString);
+    
+    // stdGdi
+    hook_function(stdGdi_Create8bppPaletted_ADDR, stdGdi_Create8bppPaletted);
+    hook_function(stdGdi_CreateRGB_ADDR, stdGdi_CreateRGB);
+    hook_function(stdGdi_Create16bppPaletted_ADDR, stdGdi_Create16bppPaletted);
+    hook_function(stdGdi_SetPalette_ADDR, stdGdi_SetPalette);
+    hook_function(stdGdi_SetPalette2_ADDR, stdGdi_SetPalette2);
+    hook_function(stdGdi_GetSystemInfo_ADDR, stdGdi_GetSystemInfo);
+    hook_function(stdGdi_SetHwnd_ADDR, stdGdi_SetHwnd);
+    hook_function(stdGdi_GetHwnd_ADDR, stdGdi_GetHwnd);
+    hook_function(stdGdi_SetHInstance_ADDR, stdGdi_SetHInstance);
+    hook_function(stdGdi_GetHInstance_ADDR, stdGdi_GetHInstance);
     
     // stdMemory
     hook_function(stdMemory_Startup_ADDR, stdMemory_Startup);
@@ -1199,6 +1228,13 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiObjectives_Initialize_ADDR, jkGuiObjectives_Initialize);
     hook_function(jkGuiObjectives_Shutdown_ADDR, jkGuiObjectives_Shutdown);
     
+    // jkGUIDialog
+    hook_function(jkGuiDialog_Initialize_ADDR, jkGuiDialog_Initialize);
+    hook_function(jkGuiDialog_Shutdown_ADDR, jkGuiDialog_Shutdown);
+    hook_function(jkGuiDialog_OkCancelDialog_ADDR, jkGuiDialog_OkCancelDialog);
+    hook_function(jkGuiDialog_ErrorDialog_ADDR, jkGuiDialog_ErrorDialog);
+    hook_function(jkGuiDialog_YesNoDialog_ADDR, jkGuiDialog_YesNoDialog);
+    
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
     hook_function(Darray_Free_ADDR, Darray_Free);
@@ -1207,7 +1243,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
 
-    hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
+    //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
     //*(float*)0x5220C4 = 0.01f;
     

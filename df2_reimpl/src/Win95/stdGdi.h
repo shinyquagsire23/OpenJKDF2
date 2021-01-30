@@ -14,7 +14,15 @@
 #define stdGdi_SetHInstance_ADDR (0x00436D30)
 #define stdGdi_GetHInstance_ADDR (0x00436D40)
 
-static HWND (*stdGdi_GetHwnd)() = (void*)stdGdi_GetHwnd_ADDR;
-static HINSTANCE (*stdGdi_GetHInstance)() = (void*)stdGdi_GetHInstance_ADDR;
+HBITMAP stdGdi_Create8bppPaletted(HDC hdc, int a2, int a3, void **ppvBits, uint8_t *a5);
+HBITMAP stdGdi_CreateRGB(HDC hdc, LONG width, int height, void **ppvBits);
+HBITMAP stdGdi_Create16bppPaletted(HDC hdc, int width, int height, void **ppvBits);
+UINT stdGdi_SetPalette(HDC hdc, BYTE *a2);
+UINT stdGdi_SetPalette2(HDC hdc, uint8_t* a2, UINT iStartIndex, UINT cEntries);
+void stdGdi_GetSystemInfo(int *a1, int *a2, int a3, int a4);
+void stdGdi_SetHwnd(HWND a1);
+HWND stdGdi_GetHwnd();
+void stdGdi_SetHInstance(HINSTANCE a1);
+HINSTANCE stdGdi_GetHInstance();
 
 #endif // _STDGDI_H
