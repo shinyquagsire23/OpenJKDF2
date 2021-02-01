@@ -256,9 +256,9 @@ typedef struct jkPlayerInfo jkPlayerInfo;
 
 typedef struct sithThingParticleParams
 {
-    uint32_t field_0;
+    uint32_t typeFlags;
     uint32_t count;
-    uint32_t field_8;
+    rdMaterial* material;
     float elementSize;
     float growthSpeed;
     float minSize;
@@ -266,8 +266,8 @@ typedef struct sithThingParticleParams
     float pitchRange;
     float yawRange;
     float rate;
-    uint32_t field_28;
-    uint32_t field_2C;
+    float field_28;
+    float field_2C;
     uint32_t field_30;
     uint32_t field_34;
     rdVector3 field_38;

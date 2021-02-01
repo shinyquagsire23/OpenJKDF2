@@ -59,6 +59,8 @@
 #include "Engine/sithTimer.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithSprite.h"
+#include "Engine/sithMaterial.h"
+#include "Engine/sithParticle.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -1056,6 +1058,29 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithSprite_FreeEntry_ADDR, sithSprite_FreeEntry);
     hook_function(sithSprite_LoadEntry_ADDR, sithSprite_LoadEntry);
     hook_function(sithSprite_New_ADDR, sithSprite_New);
+    
+    // sithMaterial
+    hook_function(sithMaterial_Startup_ADDR, sithMaterial_Startup);
+    hook_function(sithMaterial_Shutdown_ADDR, sithMaterial_Shutdown);
+    hook_function(sithMaterial_Free_ADDR, sithMaterial_Free);
+    hook_function(sithMaterial_Load_ADDR, sithMaterial_Load);
+    hook_function(sithMaterial_LoadEntry_ADDR, sithMaterial_LoadEntry);
+    hook_function(sithMaterial_GetByIdx_ADDR, sithMaterial_GetByIdx);
+    hook_function(sithMaterial_GetMemorySize_ADDR, sithMaterial_GetMemorySize);
+    hook_function(sithMaterial_New_ADDR, sithMaterial_New);
+    hook_function(sithMaterial_UnloadAll_ADDR, sithMaterial_UnloadAll);
+    
+    // sithParticle
+    hook_function(sithParticle_Startup_ADDR, sithParticle_Startup);
+    hook_function(sithParticle_Shutdown_ADDR, sithParticle_Shutdown);
+    hook_function(sithParticle_LoadEntry_ADDR, sithParticle_LoadEntry);
+    hook_function(sithParticle_New_ADDR, sithParticle_New);
+    hook_function(sithParticle_LoadThingParams_ADDR, sithParticle_LoadThingParams);
+    hook_function(sithParticle_Tick_ADDR, sithParticle_Tick);
+    hook_function(sithParticle_CreateThing_ADDR, sithParticle_CreateThing);
+    hook_function(sithParticle_Remove_ADDR, sithParticle_Remove);
+    hook_function(sithParticle_FreeEntry_ADDR, sithParticle_FreeEntry);
+    hook_function(sithParticle_Free_ADDR, sithParticle_Free);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

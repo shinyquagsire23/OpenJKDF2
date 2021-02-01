@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <windows.h>
+#include "Primitives/rdVector.h"
 
 // TODO find some headers for these
 #define LPDDENUMCALLBACKA void*
@@ -18,6 +19,10 @@ typedef struct stdVBuffer stdVBuffer;
 typedef struct sithSurface sithSurface;
 typedef struct sithSound sithSound;
 typedef struct sithCog sithCog;
+typedef struct sithWorld sithWorld;
 typedef struct stdStrTable stdStrTable;
+typedef struct rdMaterial rdMaterial;
+typedef struct rdParticle rdParticle;
+typedef struct stdConffileArg stdConffileArg;
 
 #endif // TYPES_H

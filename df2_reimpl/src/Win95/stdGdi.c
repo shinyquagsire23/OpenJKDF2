@@ -49,7 +49,7 @@ HBITMAP stdGdi_Create8bppPaletted(HDC hdc, int a2, int a3, void **ppvBits, uint8
         bmi_.bmi.bmiColors[i].rgbGreen = a5[i*3 + 1];
         bmi_.bmi.bmiColors[i].rgbBlue = a5[i*3 + 2];
         bmi_.bmi.bmiColors[i].rgbReserved = 0;
-        jk_printf("%u\n", i);
+        //jk_printf("%u\n", i);
     }
 
     return jk_CreateDIBSection(hdc, &bmi_.bmi, 0, ppvBits, 0, 0);

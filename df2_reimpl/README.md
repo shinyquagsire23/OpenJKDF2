@@ -71,12 +71,14 @@ stdFnames                      0x4ee      0.117%        100.000%       14 / 14
 sithSprite                     0x4f1      0.117%        100.000%        6 / 6          
 jkGui                          0x4fb      0.118%        100.000%       10 / 10         
 jkGuiTitle                     0x4fb      0.118%        100.000%       10 / 10         
+sithMaterial                   0x4fd      0.118%        100.000%        9 / 9          
 wuRegistry                     0x5b2      0.135%        100.000%       12 / 12         
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
 stdConffile                    0x78d      0.179%        100.000%       13 / 13         
 sithTemplate                   0x79d      0.180%        100.000%       10 / 10         
+sithParticle                   0x7f5      0.189%        100.000%       10 / 10         
 jkGuiSingleplayer              0x8d8      0.210%        100.000%        7 / 7          
 jkGuiForce                     0x9dd      0.234%        100.000%       11 / 11         
 rdParticle                     0xa0d      0.238%        100.000%       10 / 10         
@@ -95,7 +97,6 @@ jkCutscene                     0x443      0.101%        0.000%          0 / 7
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
 smack                          0x466      0.104%        0.000%          0 / 6          
 jkGuiMain                      0x4b1      0.111%        0.000%          0 / 6          
-sithMaterial                   0x4fd      0.118%        0.000%          0 / 9          
 sithDplay                      0x53c      0.124%        0.000%          0 / 17         
 sithActor                      0x559      0.127%        0.000%          0 / 5          
 Video                          0x5dc      0.139%        0.000%          0 / 5          
@@ -115,7 +116,6 @@ jkGuiPlayer                    0x73a      0.171%        0.000%          0 / 5
 jkGuiMultiplayer               0x749      0.173%        0.000%          0 / 3          
 jkGuiMap                       0x793      0.180%        0.000%          0 / 8          
 stdStrTable                    0x7b6      0.183%        11.905%         3 / 6          
-sithParticle                   0x7f5      0.189%        0.000%          0 / 10         
 Main                           0x87b      0.201%        0.000%          0 / 4          
 jkGuiMultiTally                0x8aa      0.205%        0.000%          0 / 7          
 jkCredits                      0x8e4      0.211%        0.000%          0 / 6          
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 16.521%
+Total completion: 16.828%
 ```

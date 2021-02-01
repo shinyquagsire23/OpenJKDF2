@@ -5,6 +5,9 @@
 #include "General/stdMath.h"
 
 const rdVector3 rdroid_zeroVector3 = {0.0,0.0,0.0};
+const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
+const rdVector3 rdroid_yVector3 = {0.0,1.0,0.0};
+const rdVector3 rdroid_zVector3 = {0.0,0.0,1.0};
 
 rdVector2* rdVector_Set2(rdVector2* v, float x, float y)
 {
@@ -30,20 +33,20 @@ rdVector4* rdVector_Set4(rdVector4* v, float x, float y, float z, float w)
     return v;
 }
 
-void rdVector_Copy2(rdVector2* v1, rdVector2* v2)
+void rdVector_Copy2(rdVector2* v1, const rdVector2* v2)
 {
     v1->x = v2->x;
     v1->y = v2->y;
 }
 
-void rdVector_Copy3(rdVector3* v1, rdVector3* v2)
+void rdVector_Copy3(rdVector3* v1, const rdVector3* v2)
 {
     v1->x = v2->x;
     v1->y = v2->y;
     v1->z = v2->z;
 }
 
-void rdVector_Copy4(rdVector4* v1, rdVector4* v2)
+void rdVector_Copy4(rdVector4* v1, const rdVector4* v2)
 {
     v1->x = v2->x;
     v1->y = v2->y;
@@ -51,14 +54,14 @@ void rdVector_Copy4(rdVector4* v1, rdVector4* v2)
     v1->w = v2->w;
 }
 
-rdVector2* rdVector_Neg2(rdVector2* v1, rdVector2* v2)
+rdVector2* rdVector_Neg2(rdVector2* v1, const rdVector2* v2)
 {
     v1->x = -v2->x;
     v1->y = -v2->y;
     return v1;
 }
 
-rdVector3* rdVector_Neg3(rdVector3* v1, rdVector3* v2)
+rdVector3* rdVector_Neg3(rdVector3* v1, const rdVector3* v2)
 {
     v1->x = -v2->x;
     v1->y = -v2->y;
@@ -66,7 +69,7 @@ rdVector3* rdVector_Neg3(rdVector3* v1, rdVector3* v2)
     return v1;
 }
 
-rdVector4* rdVector_Neg4(rdVector4* v1, rdVector4* v2)
+rdVector4* rdVector_Neg4(rdVector4* v1, const rdVector4* v2)
 {
     v1->x = -v2->x;
     v1->y = -v2->y;
@@ -99,14 +102,14 @@ rdVector4* rdVector_Neg4Acc(rdVector4* v1)
     return v1;
 }
 
-rdVector2* rdVector_Add2(rdVector2* v1, rdVector2* v2, rdVector2* v3)
+rdVector2* rdVector_Add2(rdVector2* v1, const rdVector2* v2, const rdVector2* v3)
 {
     v1->x = v2->x + v3->x;
     v1->y = v2->y + v3->y;
     return v1;
 }
 
-rdVector3* rdVector_Add3(rdVector3* v1, rdVector3* v2, rdVector3* v3)
+rdVector3* rdVector_Add3(rdVector3* v1, const rdVector3* v2, const rdVector3* v3)
 {
     v1->x = v2->x + v3->x;
     v1->y = v2->y + v3->y;
@@ -114,7 +117,7 @@ rdVector3* rdVector_Add3(rdVector3* v1, rdVector3* v2, rdVector3* v3)
     return v1;
 }
 
-rdVector4* rdVector_Add4(rdVector4* v1, rdVector4* v2, rdVector4* v3)
+rdVector4* rdVector_Add4(rdVector4* v1, const rdVector4* v2, const rdVector4* v3)
 {
     v1->x = v2->x + v3->x;
     v1->y = v2->y + v3->y;
@@ -123,14 +126,14 @@ rdVector4* rdVector_Add4(rdVector4* v1, rdVector4* v2, rdVector4* v3)
     return v1;
 }
 
-rdVector2* rdVector_Add2Acc(rdVector2* v1, rdVector2* v2)
+rdVector2* rdVector_Add2Acc(rdVector2* v1, const rdVector2* v2)
 {
     v1->x = v2->x + v1->x;
     v1->y = v2->y + v1->y;
     return v1;
 }
 
-rdVector3* rdVector_Add3Acc(rdVector3* v1, rdVector3* v2)
+rdVector3* rdVector_Add3Acc(rdVector3* v1, const rdVector3* v2)
 {
     v1->x = v2->x + v1->x;
     v1->y = v2->y + v1->y;
@@ -138,7 +141,7 @@ rdVector3* rdVector_Add3Acc(rdVector3* v1, rdVector3* v2)
     return v1;
 }
 
-rdVector4* rdVector_Add4Acc(rdVector4* v1, rdVector4* v2)
+rdVector4* rdVector_Add4Acc(rdVector4* v1, const rdVector4* v2)
 {
     v1->x = v2->x + v1->x;
     v1->y = v2->y + v1->y;
@@ -148,14 +151,14 @@ rdVector4* rdVector_Add4Acc(rdVector4* v1, rdVector4* v2)
 }
 
 
-rdVector2* rdVector_Sub2(rdVector2* v1, rdVector2* v2, rdVector2* v3)
+rdVector2* rdVector_Sub2(rdVector2* v1, const rdVector2* v2, const rdVector2* v3)
 {
     v1->x = v2->x - v3->x;
     v1->y = v2->y - v3->y;
     return v1;
 }
 
-rdVector3* rdVector_Sub3(rdVector3* v1, rdVector3* v2, rdVector3* v3)
+rdVector3* rdVector_Sub3(rdVector3* v1, const rdVector3* v2, const rdVector3* v3)
 {
     v1->x = v2->x - v3->x;
     v1->y = v2->y - v3->y;
@@ -163,7 +166,7 @@ rdVector3* rdVector_Sub3(rdVector3* v1, rdVector3* v2, rdVector3* v3)
     return v1;
 }
 
-rdVector4* rdVector_Sub4(rdVector4* v1, rdVector4* v2, rdVector4* v3)
+rdVector4* rdVector_Sub4(rdVector4* v1, const rdVector4* v2, const rdVector4* v3)
 {
     v1->x = v2->x - v3->x;
     v1->y = v2->y - v3->y;
@@ -172,14 +175,14 @@ rdVector4* rdVector_Sub4(rdVector4* v1, rdVector4* v2, rdVector4* v3)
     return v1;
 }
 
-rdVector2* rdVector_Sub2Acc(rdVector2* v1, rdVector2* v2)
+rdVector2* rdVector_Sub2Acc(rdVector2* v1, const rdVector2* v2)
 {
     v1->x = -v2->x + v1->x;
     v1->y = -v2->y + v1->y;
     return v1;
 }
 
-rdVector3* rdVector_Sub3Acc(rdVector3* v1, rdVector3* v2)
+rdVector3* rdVector_Sub3Acc(rdVector3* v1, const rdVector3* v2)
 {
     v1->x = -v2->x + v1->x;
     v1->y = -v2->y + v1->y;
@@ -187,7 +190,7 @@ rdVector3* rdVector_Sub3Acc(rdVector3* v1, rdVector3* v2)
     return v1;
 }
 
-rdVector4* rdVector_Sub4Acc(rdVector4* v1, rdVector4* v2)
+rdVector4* rdVector_Sub4Acc(rdVector4* v1, const rdVector4* v2)
 {
     v1->x = -v2->x + v1->x;
     v1->y = -v2->y + v1->y;
@@ -196,29 +199,29 @@ rdVector4* rdVector_Sub4Acc(rdVector4* v1, rdVector4* v2)
     return v1;
 }
 
-float rdVector_Dot2(rdVector2* v1, rdVector2* v2)
+float rdVector_Dot2(rdVector2* v1, const rdVector2* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y);
 }
 
-float rdVector_Dot3(rdVector3* v1, rdVector3* v2)
+float rdVector_Dot3(rdVector3* v1, const rdVector3* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z);
 }
 
-float rdVector_Dot4(rdVector4* v1, rdVector4* v2)
+float rdVector_Dot4(rdVector4* v1, const rdVector4* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z) + (v1->w * v2->w);
 }
 
-void rdVector_Cross3(rdVector3 *v1, rdVector3 *v2, rdVector3 *v3)
+void rdVector_Cross3(rdVector3 *v1, const rdVector3 *v2, const rdVector3 *v3)
 {
     v1->x = (v3->z * v2->y) - (v2->z * v3->y);
     v1->y = (v2->z * v3->x) - (v3->z * v2->x);
     v1->z = (v3->y * v2->x) - (v2->y * v3->x);
 }
 
-void rdVector_Cross3Acc(rdVector3 *v1, rdVector3 *v2)
+void rdVector_Cross3Acc(rdVector3 *v1, const rdVector3 *v2)
 {
     v1->x = (v2->z * v1->y) - (v1->z * v2->y);
     v1->y = (v1->z * v2->x) - (v2->z * v1->x);
@@ -240,7 +243,7 @@ float rdVector_Len4(rdVector4* v)
     return sqrtf(rdVector_Dot4(v,v));
 }
 
-float rdVector_Normalize2(rdVector2 *v1, rdVector2 *v2)
+float rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
 {
     float len = rdVector_Len2(v2);
     if (len == 0.0)
@@ -256,7 +259,7 @@ float rdVector_Normalize2(rdVector2 *v1, rdVector2 *v2)
     return len;
 }
 
-float rdVector_Normalize3(rdVector3 *v1, rdVector3 *v2)
+float rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
 {
     float len = rdVector_Len3(v2);
     if (len == 0.0)
@@ -274,7 +277,7 @@ float rdVector_Normalize3(rdVector3 *v1, rdVector3 *v2)
     return len;
 }
 
-float rdVector_Normalize3Quick(rdVector3 *v1, rdVector3 *v2)
+float rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)
 {
     float series_1;
     float series_2;
@@ -325,7 +328,7 @@ float rdVector_Normalize3Quick(rdVector3 *v1, rdVector3 *v2)
     return len;
 }
 
-float rdVector_Normalize4(rdVector4 *v1, rdVector4 *v2)
+float rdVector_Normalize4(rdVector4 *v1, const rdVector4 *v2)
 {
     float len = rdVector_Len4(v2);
     if (len == 0.0)
@@ -450,14 +453,14 @@ float rdVector_Normalize4Acc(rdVector4 *v1)
     return len;
 }
 
-rdVector2* rdVector_Scale2(rdVector2 *v1, rdVector2 *v2, float scale)
+rdVector2* rdVector_Scale2(rdVector2 *v1, const rdVector2 *v2, float scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
     return v1;
 }
 
-rdVector3* rdVector_Scale3(rdVector3 *v1, rdVector3 *v2, float scale)
+rdVector3* rdVector_Scale3(rdVector3 *v1, const rdVector3 *v2, float scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
@@ -465,7 +468,7 @@ rdVector3* rdVector_Scale3(rdVector3 *v1, rdVector3 *v2, float scale)
     return v1;
 }
 
-rdVector4* rdVector_Scale4(rdVector4 *v1, rdVector4 *v2, float scale)
+rdVector4* rdVector_Scale4(rdVector4 *v1, const rdVector4 *v2, float scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
@@ -498,14 +501,14 @@ rdVector4* rdVector_Scale4Acc(rdVector4 *v1, float scale)
     return v1;
 }
 
-rdVector2* rdVector_InvScale2(rdVector2 *v1, rdVector2 *v2, float scale)
+rdVector2* rdVector_InvScale2(rdVector2 *v1, const rdVector2 *v2, float scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
     return v1;
 }
 
-rdVector3* rdVector_InvScale3(rdVector3 *v1, rdVector3 *v2, float scale)
+rdVector3* rdVector_InvScale3(rdVector3 *v1, const rdVector3 *v2, float scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
@@ -513,7 +516,7 @@ rdVector3* rdVector_InvScale3(rdVector3 *v1, rdVector3 *v2, float scale)
     return v1;
 }
 
-rdVector4* rdVector_InvScale4(rdVector4 *v1, rdVector4 *v2, float scale)
+rdVector4* rdVector_InvScale4(rdVector4 *v1, const rdVector4 *v2, float scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
@@ -546,7 +549,7 @@ rdVector4* rdVector_InvScale4Acc(rdVector4 *v1, float scale)
     return v1;
 }
 
-void rdVector_Rotate3(rdVector3 *out, rdVector3 *in, rdVector3 *vAngs)
+void rdVector_Rotate3(rdVector3 *out, const rdVector3 *in, const rdVector3 *vAngs)
 {
     rdMatrix34 tmp;
 
@@ -554,7 +557,7 @@ void rdVector_Rotate3(rdVector3 *out, rdVector3 *in, rdVector3 *vAngs)
     rdMatrix_TransformVector34(out, in, &tmp);
 }
 
-void rdVector_Rotate3Acc(rdVector3 *out, rdVector3 *vAngs)
+void rdVector_Rotate3Acc(rdVector3 *out, const rdVector3 *vAngs)
 {
     rdMatrix34 tmp;
 
@@ -562,7 +565,7 @@ void rdVector_Rotate3Acc(rdVector3 *out, rdVector3 *vAngs)
     rdMatrix_TransformVector34Acc(out, &tmp);
 }
 
-void rdVector_ExtractAngle(rdVector3 *v1, rdVector3 *out)
+void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out)
 {
     out->x = stdMath_ArcSin3(v1->z);
     out->y = stdMath_ArcTan4(v1->y, v1->x);
@@ -570,7 +573,7 @@ void rdVector_ExtractAngle(rdVector3 *v1, rdVector3 *out)
 }
 
 // Added
-float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2)
+float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
 {
     rdVector3 tmp;
     
@@ -578,7 +581,7 @@ float rdVector_Dist3(rdVector3 *v1, rdVector3 *v2)
     return rdVector_Len3(&tmp);
 }
 
-rdVector3* rdVector_MultAcc3(rdVector3 *v1, rdVector3 *v2, float scale)
+rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale)
 {
     v1->x = v2->x * scale + v1->x;
     v1->y = v2->y * scale + v1->y;

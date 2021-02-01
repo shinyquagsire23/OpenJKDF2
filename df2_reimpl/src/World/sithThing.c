@@ -232,7 +232,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             sithAI_FreeEntry(thingIter);
 
         if ( thingIter->thingType == THINGTYPE_PARTICLE )
-            sithParticle_Free(thingIter);
+            sithParticle_FreeEntry(thingIter);
 
         if ( thingIter->animclass )
             sithPuppet_FreeEntry(thingIter);
