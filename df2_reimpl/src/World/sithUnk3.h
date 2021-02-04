@@ -64,7 +64,7 @@ sithUnk3SearchEntry* sithUnk3_NextSearchResult();
 static void (*sithUnk3_sub_4E7670)(sithThing *a1, rdMatrix34 *a2) = (void*)sithUnk3_sub_4E7670_ADDR;
 static sithSector* (*sithUnk3_GetSectorLookAt)(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5) = (void*)sithUnk3_GetSectorLookAt_ADDR;
 static void (*sithUnk3_SearchClose)(void) = (void*)sithUnk3_SearchClose_ADDR;
-static float (*sithUnk3_SearchRadiusForThings)(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags) = (void*)sithUnk3_SearchRadiusForThings_ADDR;
+static float (*sithUnk3_SearchRadiusForThings)(sithSector *sector, sithThing *a2, rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags) = (void*)sithUnk3_SearchRadiusForThings_ADDR;
 //static sithUnk3SearchEntry* (*sithUnk3_NextSearchResult)(void) = (void*)sithUnk3_NextSearchResult_ADDR;
 static int (*sithUnk3_DebrisDebrisCollide)(sithThing *arg0, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisDebrisCollide_ADDR;
 static int (*sithUnk3_DebrisPlayerCollide)(sithThing *thing, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisPlayerCollide_ADDR;

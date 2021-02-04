@@ -164,14 +164,38 @@ int read();
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
-%% section 1 definitions go here
+#define YY_CHAR char
+# line 1 "cog.l"
+#define INITIAL 0
+# line 7 "cog.l"
+#include <stdio.h>
+#include "Primitives/rdVector.h"
+#include "Cog/sithCogParse.h"
+#include "jk.h"
+#include "y.tab.h"
+
+#define printf(...) _printf(__VA_ARGS__)
+#define fwrite(x,y,z,w) _fwrite(x,y,z,w)
+#define atoi(x) _atoi(x)
+#define exit(x) jk_exit(x)
+#define malloc(x) _malloc(x)
+#define free(x) _free(x)
+#define memcpy(x,y,z) _memcpy(x,y,z)
+#define strlen(x) _strlen(x)
+#define strcpy(x,y) _strcpy(x,y)
+
+#define FLEX_DEBUG
+
+//int linenum = 0;
+
+# line 29 "cog.l"
 
 /* done after the current pattern has been matched and before the
  * corresponding action - sets up yytext
  */
 #define YY_DO_BEFORE_ACTION \
 	yytext = yy_bp; \
-%% code to fiddle yytext and yyleng for yymore() goes here
+	yyleng = yy_cp - yy_bp; \
 	yy_hold_char = *yy_cp; \
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
@@ -251,7 +275,162 @@ int yyleng;
 #define yyin (*(int*)0x00855D90)
 #define yyout (*(int*)0x00855D94)
 
-%% data tables for the DFA go here
+#define YY_END_OF_BUFFER 57
+typedef int yy_state_type;
+static const short int yy_accept[121] =
+    {   0,
+        0,    0,   57,   55,   54,   53,   53,   40,   55,   46,
+       48,   39,   55,   34,   35,   44,   43,   31,   42,   38,
+       47,   16,   16,   32,   28,   49,   33,   50,   36,   37,
+       51,   13,   13,   13,   13,   13,   13,   13,   13,   13,
+       13,   13,   29,   52,   30,   41,   27,    0,   20,    0,
+       46,   22,    0,   21,    0,   18,   45,   19,   15,    0,
+        0,   16,   24,   26,   25,   13,   13,   13,   13,    3,
+       13,   13,   13,   13,    7,   13,   13,   13,   23,    0,
+       45,   18,    0,    0,   17,   14,   13,   13,   13,   13,
+       11,    5,   13,   13,   13,   13,    0,   18,    0,    0,
+
+       19,   13,   12,   13,    4,    6,   13,    8,   13,    0,
+       18,    1,   13,   13,   10,   13,    9,   13,    2,    0
+    } ;
+
+static const YY_CHAR yy_ec[128] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
+        2,    2,    4,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    5,    6,    7,    1,    8,    9,   10,   11,
+       12,   13,   14,   15,   16,   17,   18,   19,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   21,   22,   23,
+       24,   25,    1,    1,   31,   32,   33,   34,   35,   36,
+       37,   38,   39,   30,   40,   41,   30,   42,   43,   44,
+       30,   45,   46,   47,   48,   30,   49,   50,   30,   30,
+       26,   27,   28,   29,   30,    1,   31,   32,   33,   34,
+
+       35,   36,   37,   38,   39,   30,   40,   41,   30,   42,
+       43,   44,   30,   45,   46,   47,   48,   30,   49,   50,
+       30,   30,   51,   52,   53,   54,    1
+    } ;
+
+static const YY_CHAR yy_meta[55] =
+    {   0,
+        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    3,    3,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        1,    1,    1,    1
+    } ;
+
+static const short int yy_base[126] =
+    {   0,
+        0,    0,  197,  198,  198,  198,  198,  172,   49,    0,
+      198,  186,   46,  198,  198,  198,  198,  198,  198,   38,
+      176,   42,   46,  198,  198,  169,  168,  167,  198,  198,
+      198,    0,  145,   29,  146,   26,  145,  144,  150,  150,
+      137,  145,  198,  130,  198,  198,  198,   58,  198,  178,
+        0,  198,   59,  198,  177,   55,    0,   59,   63,   77,
+       68,   88,  198,  198,  198,    0,  144,  137,  135,    0,
+      130,  141,  129,  126,    0,  125,  128,  131,  198,   95,
+        0,   93,  102,   51,  100,  105,  138,  127,  120,  131,
+        0,    0,  122,  116,  119,  120,  107,  110,  128,  112,
+
+      114,  115,    0,  104,    0,    0,   90,    0,   82,  126,
+      130,    0,   68,   64,    0,   47,    0,   54,    0,  198,
+      150,  153,  156,   81,  159
+    } ;
+
+static const short int yy_def[126] =
+    {   0,
+      120,    1,  120,  120,  120,  120,  120,  120,  121,  122,
+      120,  120,  123,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  124,  120,  120,  120,  120,  120,  121,  120,  121,
+      122,  120,  123,  120,  123,  120,  125,  120,  120,  120,
+      120,  120,  120,  120,  120,  124,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  120,  120,
+      125,  120,  120,  120,  120,  120,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  120,  120,  120,  120,
+
+      120,  124,  124,  124,  124,  124,  124,  124,  124,  120,
+      120,  124,  124,  124,  124,  124,  124,  124,  124,    0,
+      120,  120,  120,  120,  120
+    } ;
+
+static const short int yy_nxt[253] =
+    {   0,
+        4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
+       14,   15,   16,   17,   18,   19,   20,   21,   22,   23,
+       24,   25,   26,   27,   28,   29,    4,   30,   31,   32,
+       32,   33,   34,   35,   36,   37,   38,   32,   39,   32,
+       32,   32,   32,   32,   40,   41,   32,   32,   42,   32,
+       43,   44,   45,   46,   49,   54,   56,   56,   58,   68,
+       59,   59,   58,   49,   62,   62,   71,   72,   54,   85,
+       85,   69,   55,   56,   56,   50,   60,   82,   82,   58,
+       60,   59,   59,   66,   50,   55,   86,   86,  119,   80,
+       84,   61,   84,   83,  118,   85,   85,   60,   86,   86,
+
+       86,   86,   86,   86,   58,  117,   62,   62,   97,  116,
+       97,   82,   82,   98,   98,  100,  115,  100,   85,   85,
+      101,  101,   60,   86,   86,   98,   98,   99,   98,   98,
+      101,  101,  101,  101,  114,   86,   86,   86,   86,   86,
+       86,  110,  113,  110,  111,  111,  111,  111,  111,  111,
+       48,   48,   48,   51,  112,   51,   53,   53,   53,   81,
+      109,   81,  108,  107,  106,  105,  104,  103,  102,   96,
+       95,   94,   93,   92,   91,   90,   89,   88,   87,  120,
+      120,   79,   78,   77,   76,   75,   74,   73,   70,   67,
+       65,   64,   63,   57,   52,   47,  120,    3,  120,  120,
+
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120
+    } ;
+
+static const short int yy_chk[253] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    9,   13,   20,   20,   22,   34,
+       22,   22,   23,   48,   23,   23,   36,   36,   53,   84,
+       84,   34,   13,   56,   56,    9,   22,   58,   58,   59,
+       23,   59,   59,  124,   48,   53,   61,   61,  118,   56,
+       60,   22,   60,   58,  116,   60,   60,   59,   61,   61,
+
+       61,   61,   61,   61,   62,  114,   62,   62,   80,  113,
+       80,   82,   82,   80,   80,   83,  109,   83,   85,   85,
+       83,   83,   62,   86,   86,   97,   97,   82,   98,   98,
+      100,  100,  101,  101,  107,   86,   86,   86,   86,   86,
+       86,   99,  104,   99,  110,  110,   99,   99,  111,  111,
+      121,  121,  121,  122,  102,  122,  123,  123,  123,  125,
+       96,  125,   95,   94,   93,   90,   89,   88,   87,   78,
+       77,   76,   74,   73,   72,   71,   69,   68,   67,   55,
+       50,   44,   42,   41,   40,   39,   38,   37,   35,   33,
+       28,   27,   26,   21,   12,    8,    3,  120,  120,  120,
+
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120
+    } ;
+
+static yy_state_type yy_last_accepting_state;
+static YY_CHAR *yy_last_accepting_cpos;
+
+/* the intent behind this definition is that it'll catch
+ * any uses of REJECT which flex missed
+ */
+#define REJECT reject_used_but_not_detected
+#define yymore() yymore_used_but_not_detected
+#define YY_MORE_ADJ 0
 
 /* these variables are all declared out here so that section 3 code can
  * manipulate them
@@ -291,7 +470,8 @@ YY_DECL
     register YY_CHAR *yy_cp, *yy_bp;
     register int yy_act;
 
-%% user's declarations go here
+
+
 
     if ( yy_init )
 	{
@@ -318,7 +498,6 @@ YY_DECL
 
     while ( 1 )		/* loops until end-of-file is reached */
 	{
-%% yymore()-related code goes here
 	yy_cp = yy_c_buf_p;
 
 	/* support of yytext */
@@ -329,21 +508,273 @@ YY_DECL
 	 */
 	yy_bp = yy_cp;
 
-%% code to set up and find next match goes here
+	yy_current_state = yy_start;
+yy_match:
+	do
+	    {
+	    register YY_CHAR yy_c = yy_ec[*yy_cp];
+	    if ( yy_accept[yy_current_state] )
+		{
+		yy_last_accepting_state = yy_current_state;
+		yy_last_accepting_cpos = yy_cp;
+		}
+	    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+		{
+		yy_current_state = yy_def[yy_current_state];
+		if ( yy_current_state >= 121 )
+		    yy_c = yy_meta[yy_c];
+		}
+	    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+	    ++yy_cp;
+	    }
+	while ( yy_current_state != 120 );
+	yy_cp = yy_last_accepting_cpos;
+	yy_current_state = yy_last_accepting_state;
 
 yy_find_action:
-%% code to find the action number goes here
+	yy_act = yy_accept[yy_current_state];
 
 	YY_DO_BEFORE_ACTION;
 	YY_USER_ACTION;
 
 do_action:	/* this label is used only to access EOF actions */
 
-%% debug code goes here
 
 	switch ( yy_act )
 	    {
-%% actions go here
+	    case 0: /* must backtrack */
+	    /* undo the effects of YY_DO_BEFORE_ACTION */
+	    *yy_cp = yy_hold_char;
+	    yy_cp = yy_last_accepting_cpos;
+	    yy_current_state = yy_last_accepting_state;
+	    goto yy_find_action;
+
+case 1:
+# line 31 "cog.l"
+{ return(BREAK); }
+	YY_BREAK
+case 2:
+# line 32 "cog.l"
+{ return(CONTINUE); }
+	YY_BREAK
+case 3:
+# line 33 "cog.l"
+{ return(DO); }
+	YY_BREAK
+case 4:
+# line 34 "cog.l"
+{ return(ELSE); }
+	YY_BREAK
+case 5:
+# line 35 "cog.l"
+{ return(FOR); }
+	YY_BREAK
+case 6:
+# line 36 "cog.l"
+{ return(GOTO); }
+	YY_BREAK
+case 7:
+# line 37 "cog.l"
+{ return(IF); }
+	YY_BREAK
+case 8:
+# line 38 "cog.l"
+{ return(RETURN); }
+	YY_BREAK
+case 9:
+# line 39 "cog.l"
+{ return(RETURN); }
+	YY_BREAK
+case 10:
+# line 40 "cog.l"
+{ return(WHILE); }
+	YY_BREAK
+case 11:
+# line 41 "cog.l"
+{ yyterminate(); }
+	YY_BREAK
+case 12:
+# line 42 "cog.l"
+{ return(CALL); }
+	YY_BREAK
+case 13:
+# line 44 "cog.l"
+{ sithCogParse_LexGetSym(yytext); return(IDENTIFIER); }
+	YY_BREAK
+case 14:
+# line 46 "cog.l"
+{ _sscanf(yytext, "%x", &yylval.as_int); return(CONSTANT_INT); }
+	YY_BREAK
+case 15:
+# line 47 "cog.l"
+{ _sscanf(yytext, "%i", &yylval.as_int); return(CONSTANT_INT); }
+	YY_BREAK
+case 16:
+# line 48 "cog.l"
+{ yylval.as_int = _atoi(yytext); return(CONSTANT_INT); }
+	YY_BREAK
+case 17:
+# line 51 "cog.l"
+{ yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
+	YY_BREAK
+case 18:
+# line 52 "cog.l"
+{ yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
+	YY_BREAK
+case 19:
+# line 53 "cog.l"
+{ yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
+	YY_BREAK
+case 20:
+# line 55 "cog.l"
+{ sithCogParse_LexAddSymbol(yytext); return(STRING_LITERAL); }
+	YY_BREAK
+case 21:
+# line 56 "cog.l"
+{ sithCogParse_LexScanVector3(yytext); return(VECTOR_LITERAL); }
+	YY_BREAK
+case 22:
+# line 58 "cog.l"
+{ return(AND_OP); }
+	YY_BREAK
+case 23:
+# line 59 "cog.l"
+{ return(OR_OP); }
+	YY_BREAK
+case 24:
+# line 60 "cog.l"
+{ return(LE_OP); }
+	YY_BREAK
+case 25:
+# line 61 "cog.l"
+{ return(GE_OP); }
+	YY_BREAK
+case 26:
+# line 62 "cog.l"
+{ return(EQ_OP); }
+	YY_BREAK
+case 27:
+# line 63 "cog.l"
+{ return(NE_OP); }
+	YY_BREAK
+case 28:
+# line 64 "cog.l"
+{ return(';'); }
+	YY_BREAK
+case 29:
+# line 65 "cog.l"
+{ return('{'); }
+	YY_BREAK
+case 30:
+# line 66 "cog.l"
+{ return('}'); }
+	YY_BREAK
+case 31:
+# line 67 "cog.l"
+{ return(','); }
+	YY_BREAK
+case 32:
+# line 68 "cog.l"
+{ return(':'); }
+	YY_BREAK
+case 33:
+# line 69 "cog.l"
+{ return('='); }
+	YY_BREAK
+case 34:
+# line 70 "cog.l"
+{ return('('); }
+	YY_BREAK
+case 35:
+# line 71 "cog.l"
+{ return(')'); }
+	YY_BREAK
+case 36:
+# line 72 "cog.l"
+{ return('['); }
+	YY_BREAK
+case 37:
+# line 73 "cog.l"
+{ return(']'); }
+	YY_BREAK
+case 38:
+# line 74 "cog.l"
+{ return('.'); }
+	YY_BREAK
+case 39:
+# line 75 "cog.l"
+{ return('&'); }
+	YY_BREAK
+case 40:
+# line 76 "cog.l"
+{ return('!'); }
+	YY_BREAK
+case 41:
+# line 77 "cog.l"
+{ return('~'); }
+	YY_BREAK
+case 42:
+# line 78 "cog.l"
+{ return('-'); }
+	YY_BREAK
+case 43:
+# line 79 "cog.l"
+{ return('+'); }
+	YY_BREAK
+case 44:
+# line 80 "cog.l"
+{ return('*'); }
+	YY_BREAK
+case 45:
+# line 81 "cog.l"
+{ /* comment */ }
+	YY_BREAK
+case 46:
+# line 82 "cog.l"
+{ /* comment */ }
+	YY_BREAK
+case 47:
+# line 83 "cog.l"
+{ return('/'); }
+	YY_BREAK
+case 48:
+# line 84 "cog.l"
+{ return('%'); }
+	YY_BREAK
+case 49:
+# line 85 "cog.l"
+{ return('<'); }
+	YY_BREAK
+case 50:
+# line 86 "cog.l"
+{ return('>'); }
+	YY_BREAK
+case 51:
+# line 87 "cog.l"
+{ return('^'); }
+	YY_BREAK
+case 52:
+# line 88 "cog.l"
+{ return('|'); }
+	YY_BREAK
+case 53:
+# line 90 "cog.l"
+{ yacc_linenum++; }
+	YY_BREAK
+case 54:
+# line 91 "cog.l"
+{ }
+	YY_BREAK
+case 55:
+# line 92 "cog.l"
+{ /* ignore bad characters */ }
+	YY_BREAK
+case 56:
+# line 94 "cog.l"
+ECHO;
+	YY_BREAK
+case YY_STATE_EOF(INITIAL):
+    yyterminate();
 
 	    case YY_END_OF_BUFFER:
 		{
@@ -391,7 +822,8 @@ do_action:	/* this label is used only to access EOF actions */
 
 		    else
 			{
-%% code to do backtracking for compressed tables and set up yy_cp goes here
+			    yy_cp = yy_last_accepting_cpos;
+			    yy_current_state = yy_last_accepting_state;
 			goto yy_find_action;
 			}
 		    }
@@ -557,11 +989,23 @@ static yy_state_type yy_get_previous_state()
     register yy_state_type yy_current_state;
     register YY_CHAR *yy_cp;
 
-%% code to get the start state into yy_current_state goes here
+    yy_current_state = yy_start;
 
     for ( yy_cp = yytext + YY_MORE_ADJ; yy_cp < yy_c_buf_p; ++yy_cp )
 	{
-%% code to find the next state goes here
+	register YY_CHAR yy_c = (*yy_cp ? yy_ec[*yy_cp] : 1);
+	if ( yy_accept[yy_current_state] )
+	    {
+	    yy_last_accepting_state = yy_current_state;
+	    yy_last_accepting_cpos = yy_cp;
+	    }
+	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+	    {
+	    yy_current_state = yy_def[yy_current_state];
+	    if ( yy_current_state >= 121 )
+		yy_c = yy_meta[yy_c];
+	    }
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	}
 
     return ( yy_current_state );
@@ -583,7 +1027,22 @@ register yy_state_type yy_current_state;
 
     {
     register int yy_is_jam;
-%% code to find the next state, and perhaps do backtracking, goes here
+    register YY_CHAR *yy_cp = yy_c_buf_p;
+
+    register YY_CHAR yy_c = 1;
+    if ( yy_accept[yy_current_state] )
+	{
+	yy_last_accepting_state = yy_current_state;
+	yy_last_accepting_cpos = yy_cp;
+	}
+    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+	{
+	yy_current_state = yy_def[yy_current_state];
+	if ( yy_current_state >= 121 )
+	    yy_c = yy_meta[yy_c];
+	}
+    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+    yy_is_jam = (yy_current_state == 120);
 
     return ( yy_is_jam ? 0 : yy_current_state );
     }
@@ -837,3 +1296,5 @@ FILE *file;
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
+# line 94 "cog.l"
+

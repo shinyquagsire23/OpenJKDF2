@@ -1,0 +1,34 @@
+   File Name		Archive #	Description
+----------------------------------------------------------
+PACKNOTES                  1	Warnings about long lines, etc
+README                     1	
+MANIFEST                   1	
+COPYING                    2	
+Changes                    9	
+MISC                       1	
+MISC/Atari.patches         4	
+MISC/MSDOS.notes           9	
+MISC/Makefile.VMS         10	
+MISC/README                1	
+MISC/Turbo-C.notes         9	
+Makefile                  10	
+ccl.c                     10	
+dfa.c                      6	
+ecs.c                      9	
+flex.1                     4	
+flex.skel                  6	
+flexdef.h                  5	
+flexdoc.1.01               2	(part 1)
+flexdoc.1.02               8	(part 2)
+gen.c                      1	
+initscan.c.01              3	(part 1)
+initscan.c.02              7	(part 2)
+libmain.c                  1	
+main.c                     5	
+misc.c                     8	
+nfa.c                      8	
+parse.y                    9	
+scan.l                     1	
+sym.c                      7	
+tblcmp.c                   7	
+yylex.c                    6	

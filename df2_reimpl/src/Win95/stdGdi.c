@@ -161,29 +161,29 @@ void stdGdi_GetSystemInfo(int *a1, int *a2, int a3, int a4)
     {
         if ( (a3 & 0x40000) != 0 )
         {
-            v7 = 2 * GetSystemMetrics(32);
-            v8 = GetSystemMetrics(33);
+            v7 = 2 * jk_GetSystemMetrics(32);
+            v8 = jk_GetSystemMetrics(33);
         }
         else
         {
-            v7 = 2 * GetSystemMetrics(5);
-            v8 = GetSystemMetrics(6);
+            v7 = 2 * jk_GetSystemMetrics(5);
+            v8 = jk_GetSystemMetrics(6);
         }
         v6 = 2 * v8;
     }
     if ( (a3 & 0xC00000) != 0 )
     {
-        v9 = GetSystemMetrics(6);
-        v10 = GetSystemMetrics(4) - v9;
+        v9 = jk_GetSystemMetrics(6);
+        v10 = jk_GetSystemMetrics(4) - v9;
         v5 = a3;
         v6 += v10;
     }
     if ( a4 )
-        v6 += GetSystemMetrics(15);
+        v6 += jk_GetSystemMetrics(15);
     if ( (v5 & 0x200000) != 0 )
-        v7 += GetSystemMetrics(2);
+        v7 += jk_GetSystemMetrics(2);
     if ( (v5 & 0x100000) != 0 )
-        v6 += GetSystemMetrics(21);
+        v6 += jk_GetSystemMetrics(21);
     *a1 += v7;
     *a2 += v6;
 }

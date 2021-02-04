@@ -1,0 +1,269 @@
+(Message inbox:25)
+Date:  Tue, 29 Aug 89 18:57:48 pst
+From:  few@quad1.quad.com (Frank Whaley)
+Subject:  Re: flex 2.1 for Turbo C
+To:  vern@cs.cornell.edu
+
+> Sorry it's taken me so long to get back to you - I've been out of touch
+> for about the last month.
+
+I didn't expect to hear from you soon -- hope your journey was nice.
+
+> I'd like to have your 'adjustments' for Turbo C, so if you still have
+> them lying conveniently around, please mail them to me.  Thanks.
+
+After a little more fiddling, the changes are relatively small.  Probably
+the largest problem is that Turbo C does not yet claim to adhere to the
+draft standard, so even though they support many "modern" constructs, they
+still are not __STDC__.  Thus the diffs from flex.skl (note the name):
+
+	62c62
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	104c104
+	< #if !(defined(__STDC__) || defined(__TURBOC__))
+	---
+	> #ifndef __STDC__
+	134c134
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	390c390
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	482c482
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+
+and initscan.c:
+
+	63c63
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	105c105
+	< #if !(defined(__STDC__) || defined(__TURBOC__))
+	---
+	> #ifndef __STDC__
+	677c677
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	1658c1658
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+	1750c1750
+	< #if defined(__STDC__) || defined(__TURBOC__)
+	---
+	> #ifdef __STDC__
+
+are pretty simple.  BTW, simply adding -D__STDC__=1 to CFLAGS works, but
+__STDC__ is used in many Turbo C header files, and can confuse things.
+It would also mean that all flex-generated code must be compiled with
+that flag.
+
+flexdef.h also had one small problem:
+
+	44,46c44
+	< #ifndef MS_DOS
+	< char *memset();		/*  should be declared in string.h  */
+	< #endif
+	---
+	> char *memset();
+
+as the Turbo C definiton of memset() is:
+	void *memset(void *s, int c, size_t n);
+
+The 128-byte command line limit of MS-DOS prevents us from using tcc to
+link the objects together, so I provide a tlink script, flex.lnk:
+-----
+\turboc\lib\c0l+
+ccl+
+dfa+
+ecs+
+gen+
+main+
+misc+
+nfa+
+parse+
+scan+
+sym+
+tblcmp+
+yylex
+flex.exe
+
+\turboc\lib\cl
+-----
+
+The blank line is required.
+
+The makefile needed a lot of hacking, so here it is in its entirety.
+I don't think it is completely finished, but I'll be happy to work on
+it more if you'd like.  Some of the changes are specific to my environment
+(my yacc outputs ytab.c and ytab.h) and most MS-DOS people won't have
+cp, mv and rm.  Some people like separate makefiles for different
+systems, but we like one makefile with obscene parameterization.
+
+I should note that all of my experiments with FLEX_FLAGS=-{c,f,F,e}
+have failed, mostly due to scan.c becoming too large to be a single
+module.  Damn toy operating system.
+-----
+# make file for "flex" tool
+
+# @(#) $Header: Makefile,v 2.3 89/06/20 17:27:12 vern Exp $ (LBL)
+
+# Porting considerations:
+#
+#    For BSD machines:
+#  CFLAGS =
+#  LDFLAGS = -s
+#  LINK = $(CC) $(CFLAGS) -o flex $(LDFLAGS) $(FLEXOBJS)
+#  SKELETON_DIR = .
+#  SKELETON_FILE = flex.skel
+#  SKELFLAGS = -DDEFAULT_SKELETON_FILE=\"$(SKELETON_DIR)/$(SKELETON_FILE)\"
+#  O = o
+#  YTAB = y.tab
+#  FLEX = ./flex
+#
+#    For System V Unix or Vax/VMS machines, merely add:
+#  CFLAGS = -DSYS_V
+#
+#    For MS-DOS, Turbo C:
+CC = tcc
+CFLAGS = -DSYS_V -DMS_DOS -O -G -Z -ml -v
+LINK = tlink @flex.lnk/c/x/v
+SKELETON_DIR = .
+SKELETON_FILE = flex.skl
+SKELFLAGS = -DDEFAULT_SKELETON_FILE="$(SKELETON_DIR)/$(SKELETON_FILE)"
+O = obj
+EXE = .exe
+YTAB = ytab
+FLEX = flex
+
+#
+# the first time around use "make first_flex"
+#
+
+FLEX_FLAGS =
+
+FLEXOBJS = \
+	ccl.$O \
+	dfa.$O \
+	ecs.$O \
+	gen.$O \
+	main.$O \
+	misc.$O \
+	nfa.$O \
+	parse.$O \
+	scan.$O \
+	sym.$O \
+	tblcmp.$O \
+	yylex.$O
+
+FLEX_C_SOURCES = \
+	ccl.c \
+	dfa.c \
+	ecs.c \
+	gen.c \
+	main.c \
+	misc.c \
+	nfa.c \
+	parse.c \
+	scan.c \
+	sym.c \
+	tblcmp.c \
+	yylex.c
+
+flex$(EXE): $(FLEXOBJS)
+	$(LINK)
+
+first_flex:
+	cp initscan.c scan.c
+	$(MAKE) flex$(EXE)
+
+parse.h parse.c: parse.y
+	$(YACC) -d parse.y
+	@mv $(YTAB).c parse.c
+	@mv $(YTAB).h parse.h
+
+scan.c: scan.l
+	$(FLEX) -ist $(FLEX_FLAGS) scan.l >scan.c
+
+scan.$O: scan.c parse.h
+
+main.$O: main.c
+	$(CC) $(CFLAGS) -c $(SKELFLAGS) main.c
+
+flex.man: flex.1
+	nroff -man flex.1 >flex.man
+
+lint: $(FLEX_C_SOURCES)
+	lint $(FLEX_C_SOURCES) > flex.lint
+
+distrib:
+	mv scan.c initscan.c
+	chmod 444 initscan.c
+	$(MAKE) clean
+
+clean:
+	rm -f core errs flex *.$O parse.c *.lint parse.h flex.man tags
+
+tags:
+	ctags $(FLEX_C_SOURCES)
+
+vms:	flex.man
+	$(MAKE) distrib
+
+test:
+	$(FLEX) -ist $(FLEX_FLAGS) scan.l | diff scan.c -
+-----
+
+BTW, thanks for a great tool.
+
+Frank Whaley
+Senior Development Engineer
+Quadratron Systems Incorporated
+few@quad1.quad.com
+uunet!ccicpg!quad1!few
+(Message inbox:8)
+Date:  Thu, 31 Aug 89 14:57:36 pst
+From:  few@quad1.quad.com (Frank Whaley)
+Subject:  Re: flex 2.1 for Turbo C
+To:  vern@cs.cornell.edu
+
+> Thanks for the diffs and Makefile.  I'll endeavor to integrate them
+> into the next release.
+
+One terribly important thing I forgot -- Turbo C (and most MS-DOS C
+compilers) provide only a 4K default stack.  Not having thoroughly
+tested flex, I can't say that this is enough.  The makefile I provided
+to you builds a version without stack checking code.  I would suggest
+adding "-N" to CFLAGS, which will include some simple stack overflow
+checking code.  You may wish to include the following lines to main.c:
+
+	#ifdef __TURBOC__
+	unsigned _stklen = 16384;	/*  some reasonably large number  */
+	#endif
+
+In addition, the flags in the makefile build a version with symbols
+for Turbo Debugger (like -g).  You may wan't to leave these flags off
+(remove "-v" from CFLAGS and "/v" from LINK) or you may wish to provide
+an "install" target like so:
+
+	BINDIR = {/usr/local/bin | c:\bin}
+	STRIP = {strip | tdstrip}
+
+	install: flex$(EXE)
+		$(CP) flex$(EXE) $(BINDIR)
+		$(STRIP) $(BINDIR)/flex$(EXE)
+
+Regards,
+	few
+
+few@quad1.quad.com
+uunet!ccicpg!quad1!few
+

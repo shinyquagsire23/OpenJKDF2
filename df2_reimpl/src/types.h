@@ -24,5 +24,7 @@ typedef struct stdStrTable stdStrTable;
 typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
 typedef struct stdConffileArg stdConffileArg;
+typedef struct rdEdge rdEdge;
+typedef struct stdHashTable stdHashTable;
 
 #endif // TYPES_H

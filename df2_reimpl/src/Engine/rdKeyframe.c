@@ -19,7 +19,7 @@ void rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 void rdKeyframe_NewEntry(rdKeyframe *keyframe)
 {
     _memset(keyframe, 0, sizeof(rdKeyframe));
-    strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
+    _strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
     keyframe->name[31] = 0;
 }
 

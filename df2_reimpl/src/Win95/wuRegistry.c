@@ -17,31 +17,31 @@ LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
     wuRegistry_bInitted = 1;
     wuRegistry_lpSubKey = lpSubKey;
     wuRegistry_hKey = hKey;
-    result = RegCreateKeyExA(hKey, lpSubKey, 0, wuRegistry_lpClass, 0, 0xF003Fu, 0, &phkResult, &dwDisposition);
+    result = jk_RegCreateKeyExA(hKey, lpSubKey, 0, wuRegistry_lpClass, 0, 0xF003Fu, 0, &phkResult, &dwDisposition);
     v6 = result;
     if ( !result )
     {
-        RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &v8);
+        jk_RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &v8);
         cbData = 128;
-        v7 = RegQueryValueExA(v8, "Version", 0, &Type, Data, &cbData) == 0;
-        result = RegCloseKey(v8);
+        v7 = jk_RegQueryValueExA(v8, "Version", 0, &Type, Data, &cbData) == 0;
+        result = jk_RegCloseKey(v8);
         if ( v7 )
         {
             result = _strcmpi((const char *)Data, (const char *)lpData);
             if ( result )
             {
-                RegDeleteKeyA(wuRegistry_hKey, wuRegistry_lpSubKey);
-                result = RegCreateKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, wuRegistry_byte_855EB4, 0, 0xF003F, 0, &phkResult, &dwDisposition);
+                jk_RegDeleteKeyA(wuRegistry_hKey, wuRegistry_lpSubKey);
+                result = jk_RegCreateKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, wuRegistry_byte_855EB4, 0, 0xF003F, 0, &phkResult, &dwDisposition);
                 v6 = result;
             }
         }
     }
     if ( !v6 )
     {
-        RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &v8);
-        RegSetValueExA(v8, "Version", 0, 1u, lpData, strlen((const char *)lpData));
-        RegCloseKey(v8);
-        result = RegCloseKey(phkResult);
+        jk_RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &v8);
+        jk_RegSetValueExA(v8, "Version", 0, 1u, lpData, _strlen((const char *)lpData));
+        jk_RegCloseKey(v8);
+        result = jk_RegCloseKey(phkResult);
     }
     return result;
 }

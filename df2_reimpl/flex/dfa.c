@@ -1,41 +1,45 @@
 /* dfa - DFA construction routines */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
 static char rcsid[] =
-    "@(#) $Header: dfa.c,v 2.0 89/06/20 15:49:30 vern Locked $ (LBL)";
-
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/dfa.c,v 2.7 90/06/27 23:48:15 vern Exp $ (LBL)";
 #endif
 
 #include "flexdef.h"
+
+
+/* declare functions that have forward references */
+
+void dump_associated_rules PROTO((FILE*, int));
+void dump_transitions PROTO((FILE*, int[]));
+void sympartition PROTO((int[], int, int[], int[]));
+int symfollowset PROTO((int[], int, int, int[]));
 
 
 /* check_for_backtracking - check a DFA state for backtracking
@@ -49,7 +53,7 @@ static char rcsid[] =
  * associated with this state
  */
 
-check_for_backtracking( ds, state )
+void check_for_backtracking( ds, state )
 int ds;
 int state[];
 
@@ -80,9 +84,7 @@ int state[];
  * synopsis
  *    int nfa_states[num_states+1], num_states;
  *    int accset[nacc+1], nacc;
- *    int check_trailing_context();
- *    true/false = check_trailing_context( nfa_states, num_states,
- *                                         accset, nacc );
+ *    check_trailing_context( nfa_states, num_states, accset, nacc );
  *
  * NOTES
  *    Trailing context is "dangerous" if both the head and the trailing
@@ -98,7 +100,7 @@ int state[];
  *    accset[1 .. nacc] is the list of accepting numbers for the DFA state.
  */
 
-int check_trailing_context( nfa_states, num_states, accset, nacc )
+void check_trailing_context( nfa_states, num_states, accset, nacc )
 int *nfa_states, num_states;
 int *accset;
 register int nacc;
@@ -127,8 +129,8 @@ register int nacc;
 		if ( accset[j] & YY_TRAILING_HEAD_MASK )
 		    {
 		    fprintf( stderr,
-		     "flex: Dangerous trailing context in rule at line %d\n",
-			     rule_linenum[ar] );
+		     "%s: Dangerous trailing context in rule at line %d\n",
+			     program_name, rule_linenum[ar] );
 		    return;
 		    }
 	    }
@@ -148,7 +150,7 @@ register int nacc;
  * and writes a report to the given file
  */
 
-dump_associated_rules( file, ds )
+void dump_associated_rules( file, ds )
 FILE *file;
 int ds;
 
@@ -176,7 +178,7 @@ int ds;
 
     bubble( rule_set, num_associated_rules );
 
-    fprintf( file, " associated rules:" );
+    fprintf( file, " associated rule line numbers:" );
 
     for ( i = 1; i <= num_associated_rules; ++i )
 	{
@@ -203,21 +205,17 @@ int ds;
  * is done to the given file.
  */
 
-dump_transitions( file, state )
+void dump_transitions( file, state )
 FILE *file;
 int state[];
 
     {
     register int i, ec;
-    int out_char_set[CSIZE + 1];
+    int out_char_set[CSIZE];
 
-    for ( i = 1; i <= CSIZE; ++i )
+    for ( i = 0; i < csize; ++i )
 	{
-	ec = ecgroup[i];
-
-	if ( ec < 0 )
-	    ec = -ec;
-
+	ec = abs( ecgroup[i] );
 	out_char_set[i] = state[ec];
 	}
     
@@ -226,7 +224,7 @@ int state[];
     list_character_set( file, out_char_set );
 
     /* now invert the members of the set to get the jam transitions */
-    for ( i = 1; i <= CSIZE; ++i )
+    for ( i = 0; i < csize; ++i )
 	out_char_set[i] = ! out_char_set[i];
 
     fprintf( file, "\n jam-transitions: EOF " );
@@ -381,7 +379,7 @@ int *t, *ns_addr, accset[], *nacc_addr, *hv_addr;
 
 /* increase_max_dfas - increase the maximum number of DFAs */
 
-increase_max_dfas()
+void increase_max_dfas()
 
     {
     current_max_dfas += MAX_DFAS_INCREMENT;
@@ -395,6 +393,9 @@ increase_max_dfas()
     dhash = reallocate_integer_array( dhash, current_max_dfas );
     dss = reallocate_int_ptr_array( dss, current_max_dfas );
     dfaacc = reallocate_dfaacc_union( dfaacc, current_max_dfas );
+
+    if ( nultrans )
+	nultrans = reallocate_integer_array( nultrans, current_max_dfas );
     }
 
 
@@ -406,17 +407,28 @@ increase_max_dfas()
  *  creates the dfa corresponding to the ndfa we've constructed.  the
  *  dfa starts out in state #1.
  */
-ntod()
+
+void ntod()
 
     {
     int *accset, ds, nacc, newds;
-    int duplist[CSIZE + 1], sym, hashval, numstates, dsize;
-    int targfreq[CSIZE + 1], targstate[CSIZE + 1], state[CSIZE + 1];
+    int sym, hashval, numstates, dsize;
+    int num_full_table_rows;	/* used only for -f */
     int *nset, *dset;
     int targptr, totaltrans, i, comstate, comfreq, targ;
     int *epsclosure(), snstods(), symlist[CSIZE + 1];
     int num_start_states;
     int todo_head, todo_next;
+
+    /* note that the following are indexed by *equivalence classes*
+     * and not by characters.  Since equivalence classes are indexed
+     * beginning with 1, even if the scanner accepts NUL's, this
+     * means that (since every character is potentially in its own
+     * equivalence class) these arrays must have room for indices
+     * from 1 to CSIZE, so their size must be CSIZE + 1.
+     */
+    int duplist[CSIZE + 1], state[CSIZE + 1];
+    int targfreq[CSIZE + 1], targstate[CSIZE + 1];
 
     /* this is so find_table_space(...) will know where to start looking in
      * chk/nxt for unused records for space to put in the state
@@ -435,7 +447,7 @@ ntod()
      */
     todo_head = todo_next = 0;
 
-    for ( i = 0; i <= CSIZE; ++i )
+    for ( i = 0; i <= csize; ++i )
 	{
 	duplist[i] = NIL;
 	symlist[i] = false;
@@ -452,6 +464,59 @@ ntod()
 
     inittbl();
 
+    /* check to see whether we should build a separate table for transitions
+     * on NUL characters.  We don't do this for full-speed (-F) scanners,
+     * since for them we don't have a simple state number lying around with
+     * which to index the table.  We also don't bother doing it for scanners
+     * unless (1) NUL is in its own equivalence class (indicated by a
+     * positive value of ecgroup[NUL]), (2) NUL's equilvalence class is
+     * the last equivalence class, and (3) the number of equivalence classes
+     * is the same as the number of characters.  This latter case comes about
+     * when useecs is false or when its true but every character still
+     * manages to land in its own class (unlikely, but it's cheap to check
+     * for).  If all these things are true then the character code needed
+     * to represent NUL's equivalence class for indexing the tables is
+     * going to take one more bit than the number of characters, and therefore
+     * we won't be assured of being able to fit it into a YY_CHAR variable.
+     * This rules out storing the transitions in a compressed table, since
+     * the code for interpreting them uses a YY_CHAR variable (perhaps it
+     * should just use an integer, though; this is worth pondering ... ###).
+     *
+     * Finally, for full tables, we want the number of entries in the
+     * table to be a power of two so the array references go fast (it
+     * will just take a shift to compute the major index).  If encoding
+     * NUL's transitions in the table will spoil this, we give it its
+     * own table (note that this will be the case if we're not using
+     * equivalence classes).
+     */
+
+    /* note that the test for ecgroup[0] == numecs below accomplishes
+     * both (1) and (2) above
+     */
+    if ( ! fullspd && ecgroup[0] == numecs )
+	{ /* NUL is alone in its equivalence class, which is the last one */
+	int use_NUL_table = (numecs == csize);
+
+	if ( fulltbl && ! use_NUL_table )
+	    { /* we still may want to use the table if numecs is a power of 2 */
+	    int power_of_two;
+
+	    for ( power_of_two = 1; power_of_two <= csize; power_of_two *= 2 )
+		if ( numecs == power_of_two )
+		    {
+		    use_NUL_table = true;
+		    break;
+		    }
+	    }
+
+	if ( use_NUL_table )
+	    nultrans = allocate_integer_array( current_max_dfas );
+	    /* from now on, nultrans != nil indicates that we're
+	     * saving null transitions for later, separate encoding
+	     */
+	}
+
+
     if ( fullspd )
 	{
 	for ( i = 0; i <= numecs; ++i )
@@ -459,16 +524,30 @@ ntod()
 	place_state( state, 0, 0 );
 	}
 
-    if ( fulltbl )
+    else if ( fulltbl )
 	{
+	if ( nultrans )
+	    /* we won't be including NUL's transitions in the table,
+	     * so build it for entries from 0 .. numecs - 1
+	     */
+	    num_full_table_rows = numecs;
+
+	else
+	    /* take into account the fact that we'll be including
+	     * the NUL entries in the transition table.  Build it
+	     * from 0 .. numecs.
+	     */
+	    num_full_table_rows = numecs + 1;
+
 	/* declare it "short" because it's a real long-shot that that
-	 * won't be large enough
+	 * won't be large enough.
 	 */
-	printf( "static short int %s[][%d] =\n    {\n", NEXTARRAY,
-		numecs + 1 ); /* '}' so vi doesn't get too confused */
+	printf( "static short int yy_nxt[][%d] =\n    {\n",
+		/* '}' so vi doesn't get too confused */
+		num_full_table_rows );
 
 	/* generate 0 entries for state #0 */
-	for ( i = 0; i <= numecs; ++i )
+	for ( i = 0; i < num_full_table_rows; ++i )
 	    mk2data( 0 );
 
 	/* force ',' and dataflush() next call to mk2data */
@@ -609,6 +688,12 @@ ntod()
 	if ( ds > num_start_states )
 	    check_for_backtracking( ds, state );
 
+	if ( nultrans )
+	    {
+	    nultrans[ds] = state[NUL_ec];
+	    state[NUL_ec] = 0;	/* remove transition */
+	    }
+
 	if ( fulltbl )
 	    {
 	    /* supply array's 0-element */
@@ -617,7 +702,7 @@ ntod()
 	    else
 		mk2data( end_of_buffer_state );
 
-	    for ( i = 1; i <= numecs; ++i )
+	    for ( i = 1; i < num_full_table_rows; ++i )
 		/* jams are marked by negative of state number */
 		mk2data( state[i] ? state[i] : -ds );
 
@@ -694,7 +779,6 @@ int sns[], numstates, accset[], nacc, hashval, *newds_addr;
     int didsort = 0;
     register int i, j;
     int newds, *oldsns;
-    char *malloc();
 
     for ( i = 1; i <= lastdfa; ++i )
 	if ( hashval == dhash[i] )
@@ -841,6 +925,9 @@ int ds[], dsize, transsym, nset[];
 		    { /* loop through negated character class */
 		    ch = ccltbl[ccllist + j];
 
+		    if ( ch == 0 )
+			ch = NUL_ec;
+
 		    if ( ch > transsym )
 			break;	/* transsym isn't in negated ccl */
 
@@ -856,6 +943,9 @@ int ds[], dsize, transsym, nset[];
 		for ( j = 0; j < lenccl; ++j )
 		    {
 		    ch = ccltbl[ccllist + j];
+
+		    if ( ch == 0 )
+			ch = NUL_ec;
 
 		    if ( ch > transsym )
 			break;
@@ -875,7 +965,7 @@ int ds[], dsize, transsym, nset[];
 	    { /* do nothing */
 	    }
 
-	else if ( ecgroup[sym] == transsym )
+	else if ( abs( ecgroup[sym] ) == transsym )
 	    nset[++numstates] = tsp;
 
 bottom:
@@ -894,7 +984,7 @@ bottom:
  *    sympartition( ds, numstates, symlist, duplist );
  */
 
-sympartition( ds, numstates, symlist, duplist )
+void sympartition( ds, numstates, symlist, duplist )
 int ds[], numstates, duplist[];
 int symlist[];
 
@@ -922,13 +1012,23 @@ int symlist[];
 
 	if ( tch != SYM_EPSILON )
 	    {
-	    if ( tch < -lastccl || tch > CSIZE )
-		flexfatal( "bad transition character detected in sympartition()" );
+	    if ( tch < -lastccl || tch > csize )
+		{
+		if ( tch > csize && tch <= CSIZE )
+		    flexerror( "scanner requires -8 flag" );
 
-	    if ( tch > 0 )
+		else
+		    flexfatal(
+			"bad transition character detected in sympartition()" );
+		}
+
+	    if ( tch >= 0 )
 		{ /* character transition */
-		mkechar( ecgroup[tch], dupfwd, duplist );
-		symlist[ecgroup[tch]] = 1;
+		/* abs() needed for fake %t ec's */
+		int ec = abs( ecgroup[tch] );
+
+		mkechar( ec, dupfwd, duplist );
+		symlist[ec] = 1;
 		}
 
 	    else
@@ -937,7 +1037,8 @@ int symlist[];
 
 		lenccl = ccllen[tch];
 		cclp = cclmap[tch];
-		mkeccl( ccltbl + cclp, lenccl, dupfwd, duplist, numecs );
+		mkeccl( ccltbl + cclp, lenccl, dupfwd, duplist, numecs,
+			NUL_ec );
 
 		if ( cclng[tch] )
 		    {
@@ -946,6 +1047,9 @@ int symlist[];
 		    for ( k = 0; k < lenccl; ++k )
 			{
 			ich = ccltbl[cclp + k];
+
+			if ( ich == 0 )
+			    ich = NUL_ec;
 
 			for ( ++j; j < ich; ++j )
 			    symlist[j] = 1;
@@ -959,6 +1063,10 @@ int symlist[];
 		    for ( k = 0; k < lenccl; ++k )
 			{
 			ich = ccltbl[cclp + k];
+
+			if ( ich == 0 )
+			    ich = NUL_ec;
+
 			symlist[ich] = 1;
 			}
 		}

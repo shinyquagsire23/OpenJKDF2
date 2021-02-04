@@ -1,38 +1,34 @@
 /* ccl - routines for character classes */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
 static char rcsid[] =
-    "@(#) $Header: ccl.c,v 2.0 89/06/20 15:49:07 vern Locked $ (LBL)";
-
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/ccl.c,v 2.5 90/06/27 23:48:13 vern Exp $ (LBL)";
 #endif
 
 #include "flexdef.h"
@@ -41,13 +37,13 @@ static char rcsid[] =
  *
  * synopsis
  *    int cclp;
- *    char ch;
+ *    int ch;
  *    ccladd( cclp, ch );
  */
 
-ccladd( cclp, ch )
+void ccladd( cclp, ch )
 int cclp;
-char ch;
+int ch;
 
     {
     int ind, len, newpos, i;
@@ -124,7 +120,7 @@ int cclinit()
  *    cclnegate( ccl );
  */
 
-cclnegate( cclp )
+void cclnegate( cclp )
 int cclp;
 
     {
@@ -135,7 +131,7 @@ int cclp;
 /* list_character_set - list the members of a set of characters in CCL form
  *
  * synopsis
- *     int cset[CSIZE + 1];
+ *     int cset[CSIZE];
  *     FILE *file;
  *     list_character_set( cset );
  *
@@ -144,7 +140,7 @@ int cclp;
  * has a non-zero value in the set array.
  */
 
-list_character_set( file, cset )
+void list_character_set( file, cset )
 FILE *file;
 int cset[];
 
@@ -154,7 +150,7 @@ int cset[];
 
     putc( '[', file );
 
-    for ( i = 1; i <= CSIZE; ++i )
+    for ( i = 0; i < csize; ++i )
 	{
 	if ( cset[i] )
 	    {
@@ -164,7 +160,7 @@ int cset[];
 
 	    fputs( readable_form( i ), file );
 
-	    while ( ++i <= CSIZE && cset[i] )
+	    while ( ++i < csize && cset[i] )
 		;
 
 	    if ( i - 1 > start_char )

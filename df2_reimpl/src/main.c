@@ -9,6 +9,8 @@
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
 #include "Cog/jkCog.h"
+#include "Cog/sithCogYACC.h"
+#include "Cog/y.tab.h"
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
 #include "General/stdMemory.h"
@@ -40,6 +42,7 @@
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
 #include "Engine/rdroid.h"
+#include "Engine/rdActive.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdLight.h"
 #include "Engine/rdMaterial.h"
@@ -71,6 +74,7 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
+#include "World/sithExplosion.h"
 #include "World/sithCorpse.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
@@ -368,6 +372,27 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdVector_ExtractAngle_ADDR, rdVector_ExtractAngle);
     
     // sithCogParse
+    hook_function(sithCogParse_AddLeaf_ADDR, sithCogParse_AddLeaf);
+    hook_function(sithCogParse_AddLeafVector_ADDR, sithCogParse_AddLeafVector);
+    hook_function(sithCogParse_AddLinkingNode_ADDR, sithCogParse_AddLinkingNode);
+    hook_function(sithCogParse_GetSymbolScriptIdx_ADDR, sithCogParse_GetSymbolScriptIdx);
+    hook_function(sithCogParse_IncrementLoopdepth_ADDR, sithCogParse_IncrementLoopdepth);
+    hook_function(sithCogParse_LexGetSym_ADDR, sithCogParse_LexGetSym);
+    hook_function(sithCogParse_LexAddSymbol_ADDR, sithCogParse_LexAddSymbol);
+    hook_function(sithCogParse_LexScanVector3_ADDR, sithCogParse_LexScanVector3);
+    hook_function(sithCogParse_RecurseStackdepth_ADDR, sithCogParse_RecurseStackdepth);
+    
+    hook_function(sithCogYACC_yyerror_ADDR, yyerror);
+    hook_function(sithCogYACC_yyparse_ADDR, yyparse);
+    hook_function(sithCogYACC_yylex_ADDR, yylex);
+    //hook_function(sithCogYACC_yy_get_next_buffer_ADDR, yy_get_next_buffer);
+    hook_function(sithCogYACC_yyrestart_ADDR, yyrestart);
+    hook_function(sithCogYACC_yy_switch_to_buffer_ADDR, yy_switch_to_buffer);
+    hook_function(sithCogYACC_yy_load_buffer_state_ADDR, yy_load_buffer_state);
+    hook_function(sithCogYACC_yy_create_buffer_ADDR, yy_create_buffer);
+    hook_function(sithCogYACC_yy_delete_buffer_ADDR, yy_delete_buffer);
+    hook_function(sithCogYACC_yy_init_buffer_ADDR, yy_init_buffer);
+    //hook_function();
     //hook_function(sithCogYACC_yyparse_ADDR, yyparse);
     
     // DirectX
@@ -586,6 +611,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdAdvanceFrame_ADDR, rdAdvanceFrame);
     hook_function(rdFinishFrame_ADDR, rdFinishFrame);
     hook_function(rdClearPostStatistics_ADDR, rdClearPostStatistics);
+    
+    // rdActive
+    hook_function(rdActive_Startup_ADDR, rdActive_Startup);
+    hook_function(rdActive_AdvanceFrame_ADDR, rdActive_AdvanceFrame);
+    hook_function(rdActive_ClearFrameCounters_ADDR, rdActive_ClearFrameCounters);
     
     // rdKeyframe
     hook_function(rdKeyframe_RegisterLoader_ADDR, rdKeyframe_RegisterLoader);
@@ -842,6 +872,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_Startup_ADDR, sithWeapon_Startup);
     hook_function(sithWeapon_Tick_ADDR, sithWeapon_Tick);
+    
+    // sithExplosion
+    hook_function(sithExplosion_CreateThing_ADDR, sithExplosion_CreateThing);
+    hook_function(sithExplosion_Tick_ADDR, sithExplosion_Tick);
+    hook_function(sithExplosion_UpdateForce_ADDR, sithExplosion_UpdateForce);
     
     // sithCorpse
     hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);

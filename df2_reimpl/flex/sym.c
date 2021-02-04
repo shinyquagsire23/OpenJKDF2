@@ -1,41 +1,43 @@
 /* sym - symbol table routines */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
 static char rcsid[] =
-    "@(#) $Header: sym.c,v 2.0 89/06/20 15:50:17 vern Locked $ (LBL)";
-
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/sym.c,v 2.4 90/06/27 23:48:36 vern Exp $ (LBL)";
 #endif
 
 #include "flexdef.h"
+
+
+/* declare functions that have forward references */
+
+int hashfunct PROTO((register char[], int));
+
 
 struct hash_entry *ndtbl[NAME_TABLE_HASH_SIZE];
 struct hash_entry *sctbl[START_COND_HASH_SIZE];
@@ -68,7 +70,6 @@ int table_size;
     register struct hash_entry *sym_entry = table[hash_val];
     register struct hash_entry *new_entry;
     register struct hash_entry *successor;
-    char *malloc();
 
     while ( sym_entry )
 	{
@@ -108,22 +109,22 @@ int table_size;
 /* cclinstal - save the text of a character class
  *
  * synopsis
- *    char ccltxt[];
+ *    Char ccltxt[];
  *    int cclnum;
  *    cclinstal( ccltxt, cclnum );
  */
 
-cclinstal( ccltxt, cclnum )
-char ccltxt[];
+void cclinstal( ccltxt, cclnum )
+Char ccltxt[];
 int cclnum;
 
     {
     /* we don't bother checking the return status because we are not called
      * unless the symbol is new
      */
-    char *copy_string();
+    Char *copy_unsigned_string();
 
-    (void) addsym( copy_string( ccltxt ), (char *) 0, cclnum,
+    (void) addsym( (char *) copy_unsigned_string( ccltxt ), (char *) 0, cclnum,
 		   ccltab, CCL_HASH_SIZE );
     }
 
@@ -131,16 +132,16 @@ int cclnum;
 /* ccllookup - lookup the number associated with character class text
  *
  * synopsis
- *    char ccltxt[];
+ *    Char ccltxt[];
  *    int ccllookup, cclval;
  *    cclval/0 = ccllookup( ccltxt );
  */
 
 int ccllookup( ccltxt )
-char ccltxt[];
+Char ccltxt[];
 
     {
-    return ( findsym( ccltxt, ccltab, CCL_HASH_SIZE )->int_val );
+    return ( findsym( (char *) ccltxt, ccltab, CCL_HASH_SIZE )->int_val );
     }
 
 
@@ -206,17 +207,20 @@ int hash_size;
 /* ndinstal - install a name definition
  *
  * synopsis
- *    char nd[], def[];
+ *    char nd[];
+ *    Char def[];
  *    ndinstal( nd, def );
  */
 
-ndinstal( nd, def )
-char nd[], def[];
+void ndinstal( nd, def )
+char nd[];
+Char def[];
 
     {
     char *copy_string();
+    Char *copy_unsigned_string();
 
-    if ( addsym( copy_string( nd ), copy_string( def ), 0,
+    if ( addsym( copy_string( nd ), (char *) copy_unsigned_string( def ), 0,
 		 ndtbl, NAME_TABLE_HASH_SIZE ) )
 	synerr( "name defined twice" );
     }
@@ -230,11 +234,11 @@ char nd[], def[];
  *    def/NULL = ndlookup( nd );
  */
 
-char *ndlookup( nd )
+Char *ndlookup( nd )
 char nd[];
 
     {
-    return ( findsym( nd, ndtbl, NAME_TABLE_HASH_SIZE )->str_val );
+    return ( (Char *) findsym( nd, ndtbl, NAME_TABLE_HASH_SIZE )->str_val );
     }
 
 
@@ -249,7 +253,7 @@ char nd[];
  *    the start condition is Exclusive if xcluflg is true
  */
 
-scinstal( str, xcluflg )
+void scinstal( str, xcluflg )
 char str[];
 int xcluflg;
 
@@ -286,7 +290,7 @@ int xcluflg;
 
     if ( addsym( scname[lastsc], (char *) 0, lastsc,
 		 sctbl, START_COND_HASH_SIZE ) )
-	lerrsf( "start condition %s declared twice", str );
+	format_pinpoint_message( "start condition %s declared twice", str );
 
     scset[lastsc] = mkstate( SYM_EPSILON );
     scbol[lastsc] = mkstate( SYM_EPSILON );

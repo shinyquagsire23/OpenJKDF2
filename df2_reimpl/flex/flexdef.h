@@ -1,66 +1,107 @@
 /* flexdef - definitions file for flex */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* @(#) $Header: flexdef.h,v 2.0 89/06/20 15:49:50 vern Locked $ (LBL) */
+/* @(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/flexdef.h,v 2.10 90/08/03 14:09:52 vern Exp $ (LBL) */
 
 #ifndef FILE
 #include <stdio.h>
 #endif
 
+/* always be prepared to generate an 8-bit scanner */
+#define FLEX_8_BIT_CHARS
+
+#ifdef FLEX_8_BIT_CHARS
+#define CSIZE 256
+#define Char unsigned char
+#else
+#define Char char
+#define CSIZE 128
+#endif
+
+/* size of input alphabet - should be size of ASCII set */
+#ifndef DEFAULT_CSIZE
+#define DEFAULT_CSIZE 128
+#endif
+
+#ifndef PROTO
+#ifdef __STDC__
+#define PROTO(proto) proto
+#else
+#define PROTO(proto) ()
+#endif
+#endif
+
+
+#ifdef USG
+#define SYS_V
+#endif
+
 #ifdef SYS_V
 #include <string.h>
-
-#ifdef AMIGA
-#define bzero(s, n) setmem((char *)(s), (unsigned)(n), '\0')
-#define abs(x) ((x) < 0 ? -(x) : (x))
 #else
-#define bzero(s, n) memset((char *)(s), '\0', (unsigned)(n))
-#endif
 
-#ifndef VMS
-char *memset();
-#else
-/* memset is needed for old versions of the VMS C runtime library */
-#define memset(s, c, n) \
-	{ \
-	register char *t = s; \
-	register unsigned int m = n; \
-	while ( m-- > 0 ) \
-	    *t++ = c; \
-	}
-#define unlink delete
-#define SHORT_FILE_NAMES
-#endif
-#endif
-
-#ifndef SYS_V
 #include <strings.h>
 #ifdef lint
 char *sprintf(); /* keep lint happy */
 #endif
+#ifdef SCO_UNIX
+void *memset();
+#else
+char *memset();
+#endif
+#endif
+
+#ifdef AMIGA
+#define bzero(s, n) setmem((char *)(s), n, '\0')
+#ifndef abs
+#define abs(x) ((x) < 0 ? -(x) : (x))
+#endif
+#else
+#define bzero(s, n) (void) memset((char *)(s), '\0', n)
+#endif
+
+#ifdef VMS
+#define unlink delete
+#define SHORT_FILE_NAMES
+#endif
+
+#ifdef __STDC__
+
+#ifdef __GNUC__
+#include <stddef.h>
+void *malloc( size_t );
+void free( void* );
+#else
+#include <stdlib.h>
+#endif
+
+#else	/* ! __STDC__ */
+char *malloc(), *realloc();
 #endif
 
 
@@ -70,11 +111,17 @@ char *sprintf(); /* keep lint happy */
 /* maximum size of file name */
 #define FILENAMESIZE 1024
 
+#ifndef min
 #define min(x,y) ((x) < (y) ? (x) : (y))
+#endif
+#ifndef max
 #define max(x,y) ((x) > (y) ? (x) : (y))
+#endif
 
 #ifdef MS_DOS
+#ifndef abs
 #define abs(x) ((x) < 0 ? -(x) : (x))
+#endif
 #define SHORT_FILE_NAMES
 #endif
 
@@ -125,22 +172,6 @@ char *sprintf(); /* keep lint happy */
 #define INITIAL_MAX_DFA_SIZE 750
 #define MAX_DFA_SIZE_INCREMENT 750
 
-/* array names to be used in generated machine.  They're short because
- * we write out one data statement (which names the array) for each element
- * in the array.
- */
-
-/* points to list of rules accepted for a state */
-#define ALIST "yy_accept"
-#define ACCEPT "yy_acclist"	/* list of rules accepted for a state */
-#define ECARRAY "yy_ec"	/* maps input characters to equivalence classes */
-/* maps equivalence classes to meta-equivalence classes */
-#define MATCHARRAY "yy_meta"
-#define BASEARRAY "yy_base"	/* "base" array */
-#define DEFARRAY "yy_def"	/* "default" array */
-#define NEXTARRAY "yy_nxt"	/* "next" array */
-#define CHECKARRAY "yy_chk"	/* "check" array */
-
 
 /* a note on the following masks.  They are used to mark accepting numbers
  * as being special.  As such, they implicitly limit the number of accepting
@@ -169,9 +200,6 @@ char *sprintf(); /* keep lint happy */
 #define NO_TRANSITION NIL
 #define UNIQUE -1	/* marks a symbol as an e.c. representative */
 #define INFINITY -1	/* for x{5,} constructions */
-
-/* size of input alphabet - should be size of ASCII set */
-#define CSIZE 127
 
 #define INITIAL_MAX_CCLS 100	/* max number of unique character classes */
 #define MAX_CCLS_INCREMENT 100
@@ -205,7 +233,7 @@ char *sprintf(); /* keep lint happy */
 #define INITIAL_MAX_TEMPLATE_XPAIRS 2500
 #define MAX_TEMPLATE_XPAIRS_INCREMENT 2500
 
-#define SYM_EPSILON 0	/* to mark transitions on the symbol epsilon */
+#define SYM_EPSILON (CSIZE + 1)	/* to mark transitions on the symbol epsilon */
 
 #define INITIAL_MAX_SCS 40	/* maximum number of start conditions */
 #define MAX_SCS_INCREMENT 40	/* amount to bump by if it's not enough */
@@ -325,29 +353,31 @@ extern struct hash_entry *ccltab[CCL_HASH_SIZE];
  * spprdflt - if true (-s), suppress the default rule
  * interactive - if true (-I), generate an interactive scanner
  * caseins - if true (-i), generate a case-insensitive scanner
- * useecs - if true (-ce flag), use equivalence classes
- * fulltbl - if true (-cf flag), don't compress the DFA state table
- * usemecs - if true (-cm flag), use meta-equivalence classes
+ * useecs - if true (-Ce flag), use equivalence classes
+ * fulltbl - if true (-Cf flag), don't compress the DFA state table
+ * usemecs - if true (-Cm flag), use meta-equivalence classes
  * fullspd - if true (-F flag), use Jacobson method of table representation
  * gen_line_dirs - if true (i.e., no -L flag), generate #line directives
  * performance_report - if true (i.e., -p flag), generate a report relating
  *   to scanner performance
  * backtrack_report - if true (i.e., -b flag), generate "lex.backtrack" file
  *   listing backtracking states
+ * csize - size of character set for the scanner we're generating;
+ *   128 for 7-bit chars and 256 for 8-bit
  * yymore_used - if true, yymore() is used in input rules
  * reject - if true, generate backtracking tables for REJECT macro
  * real_reject - if true, scanner really uses REJECT (as opposed to just
- *               having "reject" set for variable trailing context)
+ *   having "reject" set for variable trailing context)
  * continued_action - true if this rule's action is to "fall through" to
- *                    the next rule's action (i.e., the '|' action)
+ *   the next rule's action (i.e., the '|' action)
  * yymore_really_used - has a REALLY_xxx value indicating whether a
- *                      %used or %notused was used with yymore()
+ *   %used or %notused was used with yymore()
  * reject_really_used - same for REJECT
  */
 
 extern int printstats, syntaxerror, eofseen, ddebug, trace, spprdflt;
 extern int interactive, caseins, useecs, fulltbl, usemecs;
-extern int fullspd, gen_line_dirs, performance_report, backtrack_report;
+extern int fullspd, gen_line_dirs, performance_report, backtrack_report, csize;
 extern int yymore_used, reject, real_reject, continued_action;
 
 #define REALLY_NOT_DETERMINED 0
@@ -360,19 +390,25 @@ extern int yymore_really_used, reject_really_used;
  * datapos - characters on current output line
  * dataline - number of contiguous lines of data in current data
  *    statement.  Used to generate readable -f output
+ * linenum - current input line number
  * skelfile - the skeleton file
  * yyin - input file
  * temp_action_file - temporary file to hold actions
  * backtrack_file - file to summarize backtracking states to
- * action_file_name - name of the temporary file
  * infilename - name of input file
- * linenum - current input line number
+ * action_file_name - name of the temporary file
+ * input_files - array holding names of input files
+ * num_input_files - size of input_files array
+ * program_name - name with which program was invoked 
  */
 
 extern int datapos, dataline, linenum;
 extern FILE *skelfile, *yyin, *temp_action_file, *backtrack_file;
 extern char *infilename;
-extern char action_file_name[];
+extern char *action_file_name;
+extern char **input_files;
+extern int num_input_files;
+extern char *program_name;
 
 
 /* variables for stack of states having only one out-transition:
@@ -461,10 +497,26 @@ extern int protcomst[MSP], firstprot, lastprot, protsave[PROT_SAVE_SIZE];
  *   templates)
  * tecfwd - forward link of meta-equivalence classes members
  * tecbck - backward link of MEC's
+ * xlation - maps character codes to their translations, or nil if no %t table
+ * num_xlations - number of different xlation values
  */
 
+/* reserve enough room in the equivalence class arrays so that we
+ * can use the CSIZE'th element to hold equivalence class information
+ * for the NUL character.  Later we'll move this information into
+ * the 0th element.
+ */
 extern int numecs, nextecm[CSIZE + 1], ecgroup[CSIZE + 1], nummecs;
+
+/* meta-equivalence classes are indexed starting at 1, so it's possible
+ * that they will require positions from 1 .. CSIZE, i.e., CSIZE + 1
+ * slots total (since the arrays are 0-based).  nextecm[] and ecgroup[]
+ * don't require the extra position since they're indexed from 1 .. CSIZE - 1.
+ */
 extern int tecfwd[CSIZE + 1], tecbck[CSIZE + 1];
+
+extern int *xlation;
+extern int num_xlations;
 
 
 /* variables for start conditions:
@@ -493,6 +545,8 @@ extern char **scname;
  * tnxt - internal nxt table for templates
  * base - offset into "nxt" for given state
  * def - where to go if "chk" disallows "nxt" entry
+ * nultrans - NUL transition for each state
+ * NUL_ec - equivalence class of the NUL character
  * tblend - last "nxt/chk" table entry being used
  * firstfree - first empty entry in "nxt/chk" table
  * dss - nfa state set for each dfa
@@ -513,7 +567,7 @@ extern char **scname;
 extern int current_max_dfa_size, current_max_xpairs;
 extern int current_max_template_xpairs, current_max_dfas;
 extern int lastdfa, lasttemp, *nxt, *chk, *tnxt;
-extern int *base, *def, tblend, firstfree, **dss, *dfasiz;
+extern int *base, *def, *nultrans, NUL_ec, tblend, firstfree, **dss, *dfasiz;
 extern union dfaacc_union
     {
     int *dfaacc_set;
@@ -537,7 +591,7 @@ extern int end_of_buffer_state;
 
 extern int lastccl, current_maxccls, *cclmap, *ccllen, *cclng, cclreuse;
 extern int current_max_ccl_tbl_size;
-extern char *ccltbl;
+extern Char *ccltbl;
 
 
 /* variables for miscellaneous information:
@@ -567,13 +621,13 @@ extern int sectnum, nummt, hshcol, dfaeql, numeps, eps2, num_reallocs;
 extern int tmpuses, totnst, peakpairs, numuniq, numdup, hshsave;
 extern int num_backtracking, bol_needed;
 
-char *allocate_array(), *reallocate_array();
+void *allocate_array(), *reallocate_array();
 
 #define allocate_integer_array(size) \
 	(int *) allocate_array( size, sizeof( int ) )
 
 #define reallocate_integer_array(array,size) \
-	(int *) reallocate_array( (char *) array, size, sizeof( int ) )
+	(int *) reallocate_array( (void *) array, size, sizeof( int ) )
 
 #define allocate_int_ptr_array(size) \
 	(int **) allocate_array( size, sizeof( int * ) )
@@ -586,21 +640,232 @@ char *allocate_array(), *reallocate_array();
 		allocate_array( size, sizeof( union dfaacc_union ) )
 
 #define reallocate_int_ptr_array(array,size) \
-	(int **) reallocate_array( (char *) array, size, sizeof( int * ) )
+	(int **) reallocate_array( (void *) array, size, sizeof( int * ) )
 
 #define reallocate_char_ptr_array(array,size) \
-	(char **) reallocate_array( (char *) array, size, sizeof( char * ) )
+	(char **) reallocate_array( (void *) array, size, sizeof( char * ) )
 
 #define reallocate_dfaacc_union(array, size) \
-	(union dfaacc_union *)  reallocate_array( (char *) array, size, sizeof( union dfaacc_union ) )
+	(union dfaacc_union *) \
+	reallocate_array( (void *) array, size, sizeof( union dfaacc_union ) )
 
-#define allocate_character_array(size) allocate_array( size, sizeof( char ) )
+#define allocate_character_array(size) \
+	(Char *) allocate_array( size, sizeof( Char ) )
 
 #define reallocate_character_array(array,size) \
-	reallocate_array( array, size, sizeof( char ) )
+	(Char *) reallocate_array( (void *) array, size, sizeof( Char ) )
 
 
 /* used to communicate between scanner and parser.  The type should really
  * be YYSTYPE, but we can't easily get our hands on it.
  */
 extern int yylval;
+
+
+/* external functions that are cross-referenced among the flex source files */
+
+
+/* from file ccl.c */
+
+extern void ccladd PROTO((int, int));	/* Add a single character to a ccl */
+extern int cclinit PROTO(());	/* make an empty ccl */
+extern void cclnegate PROTO((int));	/* negate a ccl */
+
+/* list the members of a set of characters in CCL form */
+extern void list_character_set PROTO((FILE*, int[]));
+
+
+/* from file dfa.c */
+
+/* increase the maximum number of dfas */
+extern void increase_max_dfas PROTO(());
+
+extern void ntod PROTO(());	/* convert a ndfa to a dfa */
+
+
+/* from file ecs.c */
+
+/* convert character classes to set of equivalence classes */
+extern void ccl2ecl PROTO(());
+
+/* associate equivalence class numbers with class members */
+extern int cre8ecs PROTO((int[], int[], int));
+
+/* associate equivalence class numbers using %t table */
+extern int ecs_from_xlation PROTO((int[]));
+
+/* update equivalence classes based on character class transitions */
+extern void mkeccl PROTO((Char[], int, int[], int[], int, int));
+
+/* create equivalence class for single character */
+extern void mkechar PROTO((int, int[], int[]));
+
+
+/* from file gen.c */
+
+extern void make_tables PROTO(());	/* generate transition tables */
+
+
+/* from file main.c */
+
+extern void flexend PROTO((int));
+
+
+/* from file misc.c */
+
+/* write out the actions from the temporary file to lex.yy.c */
+extern void action_out PROTO(());
+
+/* true if a string is all lower case */
+extern int all_lower PROTO((register Char *));
+
+/* true if a string is all upper case */
+extern int all_upper PROTO((register Char *));
+
+/* bubble sort an integer array */
+extern void bubble PROTO((int [], int));
+
+/* shell sort a character array */
+extern void cshell PROTO((Char [], int, int));
+
+extern void dataend PROTO(());	/* finish up a block of data declarations */
+
+/* report an error message and terminate */
+extern void flexerror PROTO((char[]));
+
+/* report a fatal error message and terminate */
+extern void flexfatal PROTO((char[]));
+
+/* report an error message formatted with one integer argument */
+extern void lerrif PROTO((char[], int));
+
+/* report an error message formatted with one string argument */
+extern void lerrsf PROTO((char[], char[]));
+
+/* spit out a "# line" statement */
+extern void line_directive_out PROTO((FILE*));
+
+/* generate a data statment for a two-dimensional array */
+extern void mk2data PROTO((int));
+
+extern void mkdata PROTO((int));	/* generate a data statement */
+
+/* return the integer represented by a string of digits */
+extern int myctoi PROTO((Char []));
+
+/* write out one section of the skeleton file */
+extern void skelout PROTO(());
+
+/* output a yy_trans_info structure */
+extern void transition_struct_out PROTO((int, int));
+
+
+/* from file nfa.c */
+
+/* add an accepting state to a machine */
+extern void add_accept PROTO((int, int));
+
+/* make a given number of copies of a singleton machine */
+extern int copysingl PROTO((int, int));
+
+/* debugging routine to write out an nfa */
+extern void dumpnfa PROTO((int));
+
+/* finish up the processing for a rule */
+extern void finish_rule PROTO((int, int, int, int));
+
+/* connect two machines together */
+extern int link_machines PROTO((int, int));
+
+/* mark each "beginning" state in a machine as being a "normal" (i.e.,
+ * not trailing context associated) state
+ */
+extern void mark_beginning_as_normal PROTO((register int));
+
+/* make a machine that branches to two machines */
+extern int mkbranch PROTO((int, int));
+
+extern int mkclos PROTO((int));	/* convert a machine into a closure */
+extern int mkopt PROTO((int));	/* make a machine optional */
+
+/* make a machine that matches either one of two machines */
+extern int mkor PROTO((int, int));
+
+/* convert a machine into a positive closure */
+extern int mkposcl PROTO((int));
+
+extern int mkrep PROTO((int, int, int));	/* make a replicated machine */
+
+/* create a state with a transition on a given symbol */
+extern int mkstate PROTO((int));
+
+extern void new_rule PROTO(());	/* initialize for a new rule */
+
+
+/* from file parse.y */
+
+/* write out a message formatted with one string, pinpointing its location */
+extern void format_pinpoint_message PROTO((char[], char[]));
+
+/* write out a message, pinpointing its location */
+extern void pinpoint_message PROTO((char[]));
+
+extern void synerr PROTO((char []));	/* report a syntax error */
+extern int yyparse PROTO(());	/* the YACC parser */
+
+
+/* from file scan.l */
+
+extern int flexscan PROTO(());	/* the Flex-generated scanner for flex */
+
+/* open the given file (if NULL, stdin) for scanning */
+extern void set_input_file PROTO((char*));
+
+extern int yywrap PROTO(());	/* wrapup a file in the lexical analyzer */
+
+
+/* from file sym.c */
+
+/* save the text of a character class */
+extern void cclinstal PROTO ((Char [], int));
+
+/* lookup the number associated with character class */
+extern int ccllookup PROTO((Char []));
+
+extern void ndinstal PROTO((char[], Char[]));	/* install a name definition */
+extern void scinstal PROTO((char[], int));	/* make a start condition */
+
+/* lookup the number associated with a start condition */
+extern int sclookup PROTO((char[]));
+
+
+/* from file tblcmp.c */
+
+/* build table entries for dfa state */
+extern void bldtbl PROTO((int[], int, int, int, int));
+
+extern void cmptmps PROTO(());	/* compress template table entries */
+extern void inittbl PROTO(());	/* initialize transition tables */
+extern void mkdeftbl PROTO(());	/* make the default, "jam" table entries */
+
+/* create table entries for a state (or state fragment) which has
+ * only one out-transition */
+extern void mk1tbl PROTO((int, int, int, int));
+
+/* place a state into full speed transition table */
+extern void place_state PROTO((int*, int, int));
+
+/* save states with only one out-transition to be processed later */
+extern void stack1 PROTO((int, int, int, int));
+
+
+/* from file yylex.c */
+
+extern int yylex PROTO(());
+
+
+/* The Unix kernel calls used here */
+
+extern int read PROTO((int, char*, int));
+extern int unlink PROTO((char*));
+extern int write PROTO((int, char*, int));

@@ -10,6 +10,8 @@
 
 #include "jk.h"
 
+static stdHashTable *sithParticle_alloc;
+
 int sithParticle_Startup()
 {
     sithParticle_alloc = stdHashTable_New(128);
@@ -115,7 +117,7 @@ int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int para
             return 1;
 
         case THINGPARAM_COUNT:
-            thing->particleParams.count = atoi(arg->value);
+            thing->particleParams.count = _atoi(arg->value);
             return 1;
 
         case THINGPARAM_ELEMENTSIZE:

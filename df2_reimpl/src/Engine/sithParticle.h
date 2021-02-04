@@ -14,8 +14,6 @@
 #define sithParticle_FreeEntry_ADDR (0x004F2080)
 #define sithParticle_Free_ADDR (0x004F20B0)
 
-#define sithParticle_alloc (*(stdHashTable**)0x00852F8C)
-
 int sithParticle_Startup();
 void sithParticle_Shutdown();
 rdParticle* sithParticle_LoadEntry(const char *a1);

@@ -1,44 +1,51 @@
 /* misc - miscellaneous flex routines */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
 static char rcsid[] =
-    "@(#) $Header: misc.c,v 2.0 89/06/20 15:50:00 vern Locked $ (LBL)";
-
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/misc.c,v 2.9 90/08/14 00:10:24 vern Exp $ (LBL)";
 #endif
 
 #include <ctype.h>
 #include "flexdef.h"
 
-char *malloc(), *realloc();
+
+/* ANSI C does not guarantee that isascii() is defined */
+#ifndef isascii
+#define isascii(c) ((c) <= 0177)
+#endif
+
+
+
+/* declare functions that have forward references */
+
+void dataflush PROTO(());
+int otoi PROTO((Char []));
 
 
 /* action_out - write the actions from the temporary file to lex.yy.c
@@ -49,7 +56,7 @@ char *malloc(), *realloc();
  *     Copies the action file up to %% (or end-of-file) to lex.yy.c
  */
 
-action_out()
+void action_out()
 
     {
     char buf[MAXLINE];
@@ -64,11 +71,11 @@ action_out()
 
 /* allocate_array - allocate memory for an integer array of the given size */
 
-char *allocate_array( size, element_size )
+void *allocate_array( size, element_size )
 int size, element_size;
 
     {
-    register char *mem;
+    register void *mem;
 
     /* on 16-bit int machines (e.g., 80286) we might be trying to
      * allocate more than a signed int can hold, and that won't
@@ -76,8 +83,8 @@ int size, element_size;
      */
     if ( element_size * size <= 0 )
         flexfatal( "request for < 1 byte in allocate_array()" );
-    
-    mem = malloc( (unsigned) (element_size * size) );
+
+    mem = (void *) malloc( (unsigned) (element_size * size) );
 
     if ( mem == NULL )
 	flexfatal( "memory allocation failed in allocate_array()" );
@@ -89,18 +96,18 @@ int size, element_size;
 /* all_lower - true if a string is all lower-case
  *
  * synopsis:
- *    char *str;
+ *    Char *str;
  *    int all_lower();
  *    true/false = all_lower( str );
  */
 
 int all_lower( str )
-register char *str;
+register Char *str;
 
     {
     while ( *str )
 	{
-	if ( ! islower( *str ) )
+	if ( ! isascii( *str ) || ! islower( *str ) )
 	    return ( 0 );
 	++str;
 	}
@@ -112,18 +119,18 @@ register char *str;
 /* all_upper - true if a string is all upper-case
  *
  * synopsis:
- *    char *str;
+ *    Char *str;
  *    int all_upper();
  *    true/false = all_upper( str );
  */
 
 int all_upper( str )
-register char *str;
+register Char *str;
 
     {
     while ( *str )
 	{
-	if ( ! isupper( *str ) )
+	if ( ! isascii( *str ) || ! isupper( (char) *str ) )
 	    return ( 0 );
 	++str;
 	}
@@ -146,7 +153,7 @@ register char *str;
  *   v - the array to be sorted
  *   n - the number of elements of 'v' to be sorted */
 
-bubble( v, n )
+void bubble( v, n )
 int v[], n;
 
     {
@@ -166,15 +173,16 @@ int v[], n;
 /* clower - replace upper-case letter to lower-case
  *
  * synopsis:
- *    char clower(), c;
+ *    Char clower();
+ *    int c;
  *    c = clower( c );
  */
 
-char clower( c )
-register char c;
+Char clower( c )
+register int c;
 
     {
-    return ( isupper(c) ? tolower(c) : c );
+    return ( (isascii( c ) && isupper( c )) ? tolower( c ) : c );
     }
 
 
@@ -203,7 +211,38 @@ register char *str;
 
     for ( c = copy; (*c++ = *str++); )
 	;
-    
+
+    return ( copy );
+    }
+
+
+/* copy_unsigned_string -
+ *    returns a dynamically allocated copy of a (potentially) unsigned string
+ *
+ * synopsis
+ *    Char *str, *copy, *copy_unsigned_string();
+ *    copy = copy_unsigned_string( str );
+ */
+
+Char *copy_unsigned_string( str )
+register Char *str;
+
+    {
+    register Char *c;
+    Char *copy;
+
+    /* find length */
+    for ( c = str; *c; ++c )
+	;
+
+    copy = (Char *) malloc( (unsigned) ((c - str + 1) * sizeof( Char )) );
+
+    if ( copy == NULL )
+	flexfatal( "dynamic memory failure in copy_unsigned_string()" );
+
+    for ( c = copy; (*c++ = *str++); )
+	;
+
     return ( copy );
     }
 
@@ -212,24 +251,27 @@ register char *str;
  *
  * synopsis
  *
- *   char v[n];
- *   int n;
- *   cshell( v, n );
+ *   Char v[n];
+ *   int n, special_case_0;
+ *   cshell( v, n, special_case_0 );
  *
  * description
  *   does a shell sort of the first n elements of array v.
+ *   If special_case_0 is true, then any element equal to 0
+ *   is instead assumed to have infinite weight.
  *
  * passed
  *   v - array to be sorted
  *   n - number of elements of v to be sorted
  */
-cshell( v, n )
-char v[];
-int n;
+
+void cshell( v, n, special_case_0 )
+Char v[];
+int n, special_case_0;
 
     {
     int gap, i, j, jg;
-    char k;
+    Char k;
 
     for ( gap = n / 2; gap > 0; gap = gap / 2 )
 	for ( i = gap; i < n; ++i )
@@ -237,7 +279,16 @@ int n;
 		{
 		jg = j + gap;
 
-		if ( v[j] <= v[jg] )
+		if ( special_case_0 )
+		    {
+		    if ( v[jg] == 0 )
+			break;
+
+		    else if ( v[j] != 0 && v[j] <= v[jg] )
+			break;
+		    }
+
+		else if ( v[j] <= v[jg] )
 		    break;
 
 		k = v[j];
@@ -252,7 +303,8 @@ int n;
  * synopsis
  *    dataend();
  */
-dataend()
+
+void dataend()
 
     {
     if ( datapos > 0 )
@@ -262,6 +314,7 @@ dataend()
     puts( "    } ;\n" );
 
     dataline = 0;
+    datapos = 0;
     }
 
 
@@ -271,7 +324,8 @@ dataend()
  * synopsis
  *    dataflush();
  */
-dataflush()
+
+void dataflush()
 
     {
     putchar( '\n' );
@@ -288,6 +342,40 @@ dataflush()
     /* reset the number of characters written on the current line */
     datapos = 0;
     }
+
+
+/* flexerror - report an error message and terminate
+ *
+ * synopsis
+ *    char msg[];
+ *    flexerror( msg );
+ */
+
+void flexerror( msg )
+char msg[];
+
+    {
+    fprintf( stderr, "%s: %s\n", program_name, msg );
+
+    flexend( 1 );
+    }
+
+
+/* flexfatal - report a fatal error message and terminate
+ *
+ * synopsis
+ *    char msg[];
+ *    flexfatal( msg );
+ */
+
+void flexfatal( msg )
+char msg[];
+
+    {
+    fprintf( stderr, "%s: fatal internal error, %s\n", program_name, msg );
+    flexend( 1 );
+    }
+
 
 /* flex_gettime - return current time
  *
@@ -340,7 +428,7 @@ char *flex_gettime()
  *    lerrif( msg, arg );
  */
 
-lerrif( msg, arg )
+void lerrif( msg, arg )
 char msg[];
 int arg;
 
@@ -358,7 +446,7 @@ int arg;
  *    lerrsf( msg, arg );
  */
 
-lerrsf( msg, arg )
+void lerrsf( msg, arg )
 char msg[], arg[];
 
     {
@@ -369,46 +457,65 @@ char msg[], arg[];
     }
 
 
-/* flexerror - report an error message and terminate
+/* htoi - convert a hexadecimal digit string to an integer value
  *
- * synopsis
- *    char msg[];
- *    flexerror( msg );
+ * synopsis:
+ *    int val, htoi();
+ *    Char str[];
+ *    val = htoi( str );
  */
 
-flexerror( msg )
-char msg[];
+int htoi( str )
+Char str[];
 
     {
-    fprintf( stderr, "flex: %s\n", msg );
+    int result;
 
-    flexend( 1 );
+    (void) sscanf( (char *) str, "%x", &result );
+
+    return ( result );
     }
 
 
-/* flexfatal - report a fatal error message and terminate
+/* is_hex_digit - returns true if a character is a valid hex digit, false
+ *		  otherwise
  *
- * synopsis
- *    char msg[];
- *    flexfatal( msg );
+ * synopsis:
+ *    int true_or_false, is_hex_digit();
+ *    int ch;
+ *    val = is_hex_digit( ch );
  */
 
-flexfatal( msg )
-char msg[];
+int is_hex_digit( ch )
+int ch;
 
     {
-    fprintf( stderr, "flex: fatal internal error %s\n", msg );
-    flexend( 1 );
+    if ( isdigit( ch ) )
+	return ( 1 );
+
+    switch ( clower( ch ) )
+	{
+	case 'a':
+	case 'b':
+	case 'c':
+	case 'd':
+	case 'e':
+	case 'f':
+	    return ( 1 );
+
+	default:
+	    return ( 0 );
+	}
     }
 
 
 /* line_directive_out - spit out a "# line" statement */
 
-line_directive_out( output_file_name )
+void line_directive_out( output_file_name )
 FILE *output_file_name;
 
     {
-    if ( infilename && gen_line_dirs ) 
+    if ( infilename && gen_line_dirs )
         fprintf( output_file_name, "# line %d \"%s\"\n", linenum, infilename );
     }
 
@@ -421,7 +528,7 @@ FILE *output_file_name;
  *
  *  generates a data statement initializing the current 2-D array to "value"
  */
-mk2data( value )
+void mk2data( value )
 int value;
 
     {
@@ -453,7 +560,7 @@ int value;
  *  generates a data statement initializing the current array element to
  *  "value"
  */
-mkdata( value )
+void mkdata( value )
 int value;
 
     {
@@ -479,19 +586,19 @@ int value;
 /* myctoi - return the integer represented by a string of digits
  *
  * synopsis
- *    char array[];
+ *    Char array[];
  *    int val, myctoi();
  *    val = myctoi( array );
  *
  */
 
 int myctoi( array )
-char array[];
+Char array[];
 
     {
     int val = 0;
 
-    (void) sscanf( array, "%d", &val );
+    (void) sscanf( (char *) array, "%d", &val );
 
     return ( val );
     }
@@ -500,15 +607,18 @@ char array[];
 /* myesc - return character corresponding to escape sequence
  *
  * synopsis
- *    char array[], c, myesc();
+ *    Char array[], c, myesc();
  *    c = myesc( array );
  *
  */
 
-char myesc( array )
-char array[];
+Char myesc( array )
+Char array[];
 
     {
+    Char c, esc_char;
+    register int sptr;
+
     switch ( array[1] )
 	{
 	case 'a': return ( '\a' );
@@ -530,12 +640,11 @@ char array[];
 	case '8':
 	case '9':
 	    { /* \<octal> */
-	    char c, esc_char;
-	    register int sptr = 1;
+	    sptr = 1;
 
-	    while ( isdigit(array[sptr]) )
+	    while ( isascii( array[sptr] ) && isdigit( array[sptr] ) )
 		/* don't increment inside loop control because if
-		 * isdigit() is a macro it will expand it to two
+		 * isdigit() is a macro it might expand into multiple
 		 * increments ...
 		 */
 		++sptr;
@@ -544,13 +653,29 @@ char array[];
 	    array[sptr] = '\0';
 
 	    esc_char = otoi( array + 1 );
+
 	    array[sptr] = c;
 
-	    if ( esc_char == '\0' )
-		{
-		synerr( "escape sequence for null not allowed" );
-		return ( 1 );
-		}
+	    return ( esc_char );
+	    }
+
+	case 'x':
+	    { /* \x<hex> */
+	    int sptr = 2;
+
+	    while ( isascii( array[sptr] ) && is_hex_digit( array[sptr] ) )
+		/* don't increment inside loop control because if
+		 * isdigit() is a macro it might expand into multiple
+		 * increments ...
+		 */
+		++sptr;
+
+	    c = array[sptr];
+	    array[sptr] = '\0';
+
+	    esc_char = htoi( array + 2 );
+
+	    array[sptr] = c;
 
 	    return ( esc_char );
 	    }
@@ -565,17 +690,17 @@ char array[];
  *
  * synopsis:
  *    int val, otoi();
- *    char str[];
+ *    Char str[];
  *    val = otoi( str );
  */
 
 int otoi( str )
-char str[];
+Char str[];
 
     {
     int result;
 
-    (void) sscanf( str, "%o", &result );
+    (void) sscanf( (char *) str, "%o", &result );
 
     return ( result );
     }
@@ -597,7 +722,7 @@ register int c;
     {
     static char rform[10];
 
-    if ( (c >= 0 && c < 32) || c == 127 )
+    if ( (c >= 0 && c < 32) || c >= 127 )
 	{
 	switch ( c )
 	    {
@@ -608,14 +733,14 @@ register int c;
 	    case '\b': return ( "\\b" );
 
 	    default:
-		sprintf( rform, "\\%.3o", c );
+		(void) sprintf( rform, "\\%.3o", c );
 		return ( rform );
 	    }
 	}
-    
+
     else if ( c == ' ' )
 	return ( "' '" );
-    
+
     else
 	{
 	rform[0] = c;
@@ -628,22 +753,23 @@ register int c;
 
 /* reallocate_array - increase the size of a dynamic array */
 
-char *reallocate_array( array, size, element_size )
-char *array;
+void *reallocate_array( array, size, element_size )
+void *array;
 int size, element_size;
 
     {
-    register char *new_array;
+    register void *new_array;
 
     /* same worry as in allocate_array(): */
     if ( size * element_size <= 0 )
         flexfatal( "attempt to increase array size by less than 1 byte" );
-    
-    new_array = realloc( array, (unsigned) (size * element_size ));
+
+    new_array =
+	(void *) realloc( (char *)array, (unsigned) (size * element_size ));
 
     if ( new_array == NULL )
 	flexfatal( "attempt to increase array size failed" );
-    
+
     return ( new_array );
     }
 
@@ -657,7 +783,7 @@ int size, element_size;
  *    Copies from skelfile to stdout until a line beginning with "%%" or
  *    EOF is found.
  */
-skelout()
+void skelout()
 
     {
     char buf[MAXLINE];
@@ -680,7 +806,7 @@ skelout()
  * element_n.  Formats the output with spaces and carriage returns.
  */
 
-transition_struct_out( element_v, element_n )
+void transition_struct_out( element_v, element_n )
 int element_v, element_n;
 
     {

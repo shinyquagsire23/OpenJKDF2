@@ -1,0 +1,4 @@
+# "flexdoc.1" was split into 2 parts; to create it, do
+	cat flexdoc.1.0[1-9] >flexdoc.1
+# "initscan.c" was split into 2 parts; to create it, do
+	cat initscan.c.0[1-9] >initscan.c

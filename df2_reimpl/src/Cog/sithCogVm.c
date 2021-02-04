@@ -847,7 +847,7 @@ void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val)
 
     if ( ctx->stackPos == 64 )
     {
-        memcpy(ctx->stack, &ctx->stack[1], 0x3F0u);
+        _memcpy(ctx->stack, &ctx->stack[1], 0x3F0u);
         --ctx->stackPos;
     }
     

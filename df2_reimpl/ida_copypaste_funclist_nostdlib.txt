@@ -10,7 +10,7 @@ Video_SwitchToGDI	.text	00401C10	000000B6			R	.	.	.	.	.	.	.
 Video_camera_related	.text	00401CD0	000001EB	00000030	00000000	R	.	.	.	.	.	.	.
 jkGame_ForceRefresh	.text	00401EC0	00000014	00000000	00000000	R	.	.	.	.	.	.	.
 jkGame_Update	.text	00401EE0	0000034B	00000038	00000000	R	.	.	.	.	.	.	.
-jkGame_cam_idk_maybe	.text	00402230	0000030C	00000010	0000000C	R	.	.	.	.	.	T	.
+jkGame_PrecalcViewSizes	.text	00402230	0000030C	00000010	0000000C	R	.	.	.	.	.	T	.
 jkGame_Screensize2	.text	00402540	0000002D			R	.	.	.	.	.	.	.
 jkGame_Screensize	.text	00402570	0000002D			R	.	.	.	.	.	.	.
 jkGame_Gamma	.text	004025A0	0000003D			R	.	.	.	.	.	.	.
@@ -23,7 +23,7 @@ jkGame_ParseSection	.text	00402850	0000000C	00000000	00000008	R	.	.	.	.	.	.	.
 jkControl_Initialize	.text	00402860	00000051			R	.	.	.	.	.	.	.
 jkControl_Shutdown	.text	004028C0	00000010	00000000	00000000	R	.	.	.	.	.	.	.
 jkControl_nullsub_37	.text	004028D0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkControl_HandleHudKeys	.text	004028E0	000002CF	00000308	00000004	R	.	.	.	.	.	.	.
+jkControl_HandleHudKeys	.text	004028E0	000002CF	00000308	00000004	R	.	.	.	.	.	T	.
 jkSmack_Initialize	.text	00402BB0	00000017			R	.	.	.	.	.	T	.
 jkSmack_Shutdown	.text	00402BD0	0000002A			R	.	.	.	.	.	T	.
 jkSmack_GetCurrentGuiState	.text	00402C00	00000006			R	.	.	.	.	.	.	.
@@ -291,7 +291,7 @@ jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	T	.
 jkGuiPlayer_ShowNewPlayer	.text	00410870	00000481	00000674	00000004	R	.	.	.	.	.	.	.
 jkGuiPlayer_NewPlayerIdk	.text	00410D10	0000005B	00000000	00000004	R	.	.	.	.	.	.	.
 jkGuiSound_Initialize	.text	00410D70	000000B4			R	.	.	.	.	.	.	.
-jkGuiSound_Shutdown	.text	00410E30	0000003C			R	.	.	.	.	.	.	.
+jkGuiSound_Shutdown	.text	00410E30	0000003C			R	.	.	.	.	.	T	.
 jkGuiSound_Show	.text	00410E70	00000184	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiNetHost_Initialize	.text	00411000	00000103	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiNetHost_Shutdown	.text	00411110	000000A8			R	.	.	.	.	.	.	.
@@ -343,7 +343,7 @@ jkGuiNet_sub_413E50	.text	00413E50	0000025A	00000028	00000004	R	.	.	.	.	.	.	.
 jkGuiNet_sub_4140B0	.text	004140B0	00000175	00000004	00000004	R	.	.	.	.	.	.	.
 jkGuiNet_idk	.text	00414230	00000089	00000000	00000004	R	.	.	.	.	.	.	.
 jkGuiNet_sub_4142C0	.text	004142C0	00000051	00000000	00000004	R	.	.	.	.	.	.	.
-jkGuiDisplay_Initialize	.text	00414320	000005C8	00000080	00000000	R	.	.	.	.	.	.	.
+jkGuiDisplay_Initialize	.text	00414320	000005C8	00000080	00000000	R	.	.	.	.	.	T	.
 jkGuiDisplay_Shutdown	.text	004148F0	000000C1			R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_4149C0	.text	004149C0	00000047	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiDisplay_Show	.text	00414A10	0000024C	00000154	00000000	R	.	.	.	.	.	.	.
@@ -376,9 +376,9 @@ jkGuiForce_DarkLightHoverDraw	.text	004168C0	00000001	00000000	00000000	R	.	.	.	
 jkGuiDialog_Initialize	.text	004168D0	0000001F			R	.	.	.	.	.	.	.
 jkGuiDialog_Shutdown	.text	004168F0	00000001			R	.	.	.	.	.	.	.
 jkGuiDialog_sub_416900	.text	00416900	00000062	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiDialog_OkCancelDialog	.text	00416970	00000120	00000008	00000008	R	.	.	.	.	.	.	.
-jkGuiDialog_ErrorDialog	.text	00416A90	0000010C	00000008	00000008	R	.	.	.	.	.	.	.
-jkGuiDialog_YesNoDialog	.text	00416BA0	00000132	00000008	00000008	R	.	.	.	.	.	.	.
+jkGuiDialog_OkCancelDialog	.text	00416970	00000120	00000008	00000008	R	.	.	.	.	.	T	.
+jkGuiDialog_ErrorDialog	.text	00416A90	0000010C	00000008	00000008	R	.	.	.	.	.	T	.
+jkGuiDialog_YesNoDialog	.text	00416BA0	00000132	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiMouse_sub_416CE0	.text	00416CE0	0000005D	0000000C	00000014	R	.	.	.	.	.	.	.
 jkGuiMouse_sub_416D40	.text	00416D40	0000033A	00000018	00000008	R	.	.	.	.	.	.	.
 jkGuiMouse_sub_417080	.text	00417080	00000073	0000000C	00000014	R	.	.	.	.	.	.	.
@@ -393,14 +393,14 @@ jkGuiMouse_sub_417860	.text	00417860	00000068	00000004	00000008	R	.	.	.	.	.	.	.
 jkGuiMouse_Show	.text	004178D0	000001FE	0000000C	00000000	R	.	.	.	.	.	.	.
 jkGuiMouse_Initialize	.text	00417AD0	00000014			R	.	.	.	.	.	.	.
 jkGuiMouse_Shutdown	.text	00417AF0	00000001			R	.	.	.	.	.	.	.
-jkGuiObjectives_CustomRender	.text	00417B00	000001DA	0000002C	00000010	R	.	.	.	.	.	.	.
+jkGuiObjectives_CustomRender	.text	00417B00	000001DA	0000002C	00000010	R	.	.	.	.	.	T	.
 jkGuiObjectives_Show	.text	00417CE0	00000119	0000008C	00000000	R	.	.	.	.	.	.	.
 jkGuiObjectives_Initialize	.text	00417E00	00000014			R	.	.	.	.	.	.	.
 jkGuiObjectives_Shutdown	.text	00417E20	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Show	.text	00417E30	00000187	00000048	00000000	R	.	.	.	.	.	.	.
 jkGuiSingleTally_Initialize	.text	00417FC0	0000002A			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Shutdown	.text	00417FF0	00000001			R	.	.	.	.	.	.	.
-jkGuiSingleTally_ForceStarsRender	.text	00418000	00000069	0000000C	0000000C	R	.	.	.	.	.	.	.
+jkGuiSingleTally_ForceStarsRender	.text	00418000	00000069	0000000C	0000000C	R	.	.	.	.	.	T	.
 jkGuiMultiTally_Show	.text	00418070	00000525	00029EA0	00000004	R	.	.	.	.	.	.	.
 jkGuiMultiTally_SortPlayerScore	.text	004185A0	00000098	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiMultiTally_Initalize	.text	00418640	0000003C			R	.	.	.	.	.	.	.
@@ -410,9 +410,9 @@ jkGuiMultiTally_Sortidk	.text	00418870	0000003C	00000004	00000008	R	.	.	.	.	.	T	
 jkGuiMultiTally_sub_4188B0	.text	004188B0	000000A5	00000004	00000004	R	.	.	.	.	.	.	.
 jkGuiTitle_Initialize	.text	00418960	00000028			R	.	.	.	.	.	.	.
 jkGuiTitle_Shutdown	.text	00418990	00000001			R	.	.	.	.	.	.	.
-jkGuiTitle_sub_4189A0	.text	004189A0	00000023	00000004	00000004	R	.	.	.	.	.	.	.
+jkGuiTitle_sub_4189A0	.text	004189A0	00000023	00000004	00000004	R	.	.	.	.	.	T	.
 jkGuiTitle_quicksave_related_func1	.text	004189D0	000000C4	0000008C	00000008	R	.	.	.	.	.	T	.
-jkGuiTitle_UnkDraw	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	.	.
+jkGuiTitle_UnkDraw	.text	00418AA0	000000E6	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiTitle_LoadBarDraw	.text	00418B90	000000CA	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiTitle_WorldLoadCallback	.text	00418C60	00000085	00000000	00000004	R	.	.	.	.	.	.	.
 jkGuiTitle_ShowLoadingStatic	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.	.
@@ -446,9 +446,9 @@ jkGuiSingleplayer_sub_41AA30	.text	0041AA30	00000232	000001B4	00000020	R	.	.	.	.
 jkGuiSingleplayer_sub_41AC70	.text	0041AC70	0000008F	00000020	0000000C	R	.	.	.	.	.	T	.
 jkGuiSingleplayer_sub_41AD00	.text	0041AD00	00000042	0000000C	00000004	R	.	.	.	.	.	T	.
 jkGuiJoystick_nullsub_51	.text	0041AD50	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41AD60	.text	0041AD60	00000066	0000000C	00000014	R	.	.	.	.	.	.	.
+jkGuiJoystick_sub_41AD60	.text	0041AD60	00000066	0000000C	00000014	R	.	.	.	.	.	T	.
 jkGuiJoystick_sub_41ADD0	.text	0041ADD0	0000044A	00000018	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B220	.text	0041B220	0000007F	00000000	00000014	R	.	.	.	.	.	.	.
+jkGuiJoystick_sub_41B220	.text	0041B220	0000007F	00000000	00000014	R	.	.	.	.	.	T	.
 jkGuiJoystick_sub_41B2A0	.text	0041B2A0	000000EB	00000014	00000008	R	.	.	.	.	.	.	.
 jkGuiJoystick_sub_41B390	.text	0041B390	000001D2	00000218	00000000	R	.	.	.	.	.	.	.
 jkGuiJoystick_sub_41B570	.text	0041B570	000001CE	00000234	0000001C	R	.	.	.	.	.	.	.
@@ -520,7 +520,7 @@ jkDev_sub_41FC40	.text	0041FC40	00000043	00000100	00000008	R	.	.	.	.	.	.	.
 jkDev_sub_41FC90	.text	0041FC90	00000041	00000004	00000004	R	.	.	.	.	.	.	.
 jkDev_RegisterCmd	.text	0041FCE0	00000079	00000000	00000010	R	.	.	.	.	.	T	.
 jkDev_TryCommand	.text	0041FD60	000000BE	000000A4	00000004	R	.	.	.	.	.	T	.
-jkDev_Decrypt	.text	0041FE20	00000018	00000000	00000004	R	.	.	.	.	.	.	.
+jkDev_Decrypt	.text	0041FE20	00000018	00000000	00000004	R	.	.	.	.	.	T	.
 jkDev_CmdVersion	.text	0041FE40	00000045	00000000	00000000	R	.	.	.	.	.	.	.
 jkDev_CmdFramerate	.text	0041FE90	00000018	00000000	00000000	R	.	.	.	.	.	.	.
 jkDev_CmdDispStats	.text	0041FEB0	00000018	00000000	00000000	R	.	.	.	.	.	.	.
@@ -548,13 +548,13 @@ jkDev_CmdTeam	.text	00420F80	0000004D	00000000	00000008	R	.	.	.	.	.	.	.
 jkDev_DialogFunc	.text	00420FD0	000000F2	00000408	0000000C	R	.	.	.	.	.	T	.
 sub_4210D0	.text	004210D0	000000B7	0000000C	00000000	R	.	.	.	.	.	.	.
 sub_421190	.text	00421190	000000BF	00000018	00000000	R	.	.	.	.	.	.	.
-jkCutscene_Initialize	.text	00421250	0000007E	00000000	00000004	R	.	.	.	.	.	.	.
+jkCutscene_Initialize	.text	00421250	0000007E	00000000	00000004	R	.	.	.	.	.	T	.
 jkCutscene_Shutdown	.text	004212D0	00000034			R	.	.	.	.	.	.	.
 jkCutscene_sub_421310	.text	00421310	000000FF	00000084	00000004	R	.	.	.	.	.	.	.
 jkCutscene_sub_421410	.text	00421410	00000036			R	.	.	.	.	.	.	.
 jkCutscene_smack_related_loops	.text	00421450	00000102	00000004	00000000	R	.	.	.	.	.	.	.
 jkCutscene_PauseShow	.text	00421560	0000005E			R	.	.	.	.	.	.	.
-jkCutscene_Handler	.text	004215C0	000000FC	00000004	0000000C	R	.	.	.	.	.	.	.
+jkCutscene_Handler	.text	004215C0	000000FC	00000004	0000000C	R	.	.	.	.	.	T	.
 jkCredits_Initialize	.text	004216C0	00000049	00000000	00000004	R	.	.	.	.	.	.	.
 jkCredits_Shutdown	.text	00421710	00000050			R	.	.	.	.	.	.	.
 jkCredits_Show	.text	00421760	00000358	000000C4	00000000	R	.	.	.	.	.	.	.
@@ -668,7 +668,7 @@ stdConsole_SetTextAttribute	.text	00427AC0	00000018	00000000	00000002	R	.	.	.	.	
 stdConsole_Flush	.text	00427AE0	0000000D	00000000	00000000	R	.	.	.	.	.	T	.
 stdConsole_Clear	.text	00427AF0	00000067	00000010	00000000	R	.	.	.	.	.	T	.
 stdConsole_Reset	.text	00427B60	00000050	00000008	00000002	R	.	.	.	.	.	T	.
-stdConsole_Putc	.text	00427BB0	0000003B	00000000	00000006	R	.	.	.	.	.	.	.
+stdConsole_Putc	.text	00427BB0	0000003B	00000000	00000008	R	.	.	.	.	.	.	.
 stdConsole_Puts	.text	00427BF0	00000049	00000004	00000006	R	.	.	.	.	.	T	.
 stdConsole_ClearBuf	.text	00427C40	00000033	00000008	00000004	R	.	.	.	.	.	T	.
 stdConsole_ClearBuf2	.text	00427C80	0000002E	00000008	00000008	R	.	.	.	.	.	T	.
@@ -913,18 +913,18 @@ stdFont_Load	.text	00434160	00000319	00000054	0000000C	R	.	.	.	.	.	T	.
 stdFont_Write	.text	00434480	00000196	00000040	00000008	R	.	.	.	.	.	.	.
 stdFont_Free	.text	00434620	00000041	00000008	00000004	R	.	.	.	.	.	T	.
 stdFont_Draw1	.text	00434670	0000018E	00000024	0000001C	R	.	.	.	.	.	T	.
-stdFont_Draw2	.text	00434800	000001CF	00000028	0000001C	R	.	.	.	.	.	.	.
+stdFont_Draw2	.text	00434800	000001CF	00000028	0000001C	R	.	.	.	.	.	T	.
 stdFont_Draw3	.text	004349D0	00000392	00000028	0000001C	R	.	.	.	.	.	T	.
 stdFont_Draw4	.text	00434D70	0000014D	00000018	00000024	R	.	.	.	.	.	T	.
 stdFont_sub_434EC0	.text	00434EC0	00000116	00000014	00000020	R	.	.	.	.	.	T	.
 stdFont_DrawAscii	.text	00434FE0	000001A9	00000024	0000001C	R	.	.	.	.	.	T	.
 stdFont_sub_435190	.text	00435190	00000121	00000020	00000018	R	.	.	.	.	.	T	.
-stdFont_sub_4352C0	.text	004352C0	000002A2	0000001C	00000014	R	.	.	.	.	.	.	.
+stdFont_sub_4352C0	.text	004352C0	000002A2	0000001C	00000014	R	.	.	.	.	.	T	.
 stdFont_sub_435570	.text	00435570	00000035	00000004	00000002	R	.	.	.	.	.	.	.
 stdFont_sub_4355B0	.text	004355B0	00000038	00000000	00000006	R	.	.	.	.	.	.	.
 stdFont_sub_4355F0	.text	004355F0	000000B4	00000010	00000008	R	.	.	.	.	.	.	.
 stdFont_sub_4356B0	.text	004356B0	00000103	00000008	0000000C	R	.	.	.	.	.	.	.
-stdFont_sub_4357C0	.text	004357C0	00000042	00000008	0000000C	R	.	.	.	.	.	.	.
+stdFont_sub_4357C0	.text	004357C0	00000042	00000008	0000000C	R	.	.	.	.	.	T	.
 stdFont_sub_435810	.text	00435810	000000B4	00000010	0000000C	R	.	.	.	.	.	.	.
 stdFont_sub_4358D0	.text	004358D0	0000007C	00000010	0000000C	R	.	.	.	.	.	.	.
 stdFont_sub_435950	.text	00435950	0000005D	00000000	00000010	R	.	.	.	.	.	.	.
@@ -949,14 +949,14 @@ stdGob_FileRead	.text	00436710	00000071	00000004	0000000C	R	.	.	.	.	.	T	.
 stdGob_FileGets	.text	00436790	00000092	00000004	0000000C	R	.	.	.	.	.	T	.
 stdGob_FileGetws	.text	00436830	00000091	00000004	0000000C	R	.	.	.	.	.	T	.
 stdGdi_Create8bppPaletted	.text	004368D0	000000A2	00000430	00000014	R	.	.	.	.	.	T	.
-stdGdi_CreateRGB	.text	00436980	00000088	00000228	00000010	R	.	.	.	.	.	.	.
+stdGdi_CreateRGB	.text	00436980	00000088	00000228	00000010	R	.	.	.	.	.	T	.
 stdGdi_Create16bppPaletted	.text	00436A10	00000061	0000002C	00000010	R	.	.	.	.	.	T	.
 stdGdi_SetPalette	.text	00436A80	000000EE	00000818	00000008	R	.	.	.	.	.	T	.
 stdGdi_SetPalette2	.text	00436B70	000000FC	00000818	00000010	R	.	.	.	.	.	T	.
-stdGdi_GetSystemInfo	.text	00436C70	0000009B	00000018	00000010	R	.	.	.	.	.	.	.
-stdGdi_SetHwnd	.text	00436D10	0000000A	00000000	00000004	R	.	.	.	.	.	.	.
+stdGdi_GetSystemInfo	.text	00436C70	0000009B	00000018	00000010	R	.	.	.	.	.	T	.
+stdGdi_SetHwnd	.text	00436D10	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 stdGdi_GetHwnd	.text	00436D20	00000006			R	.	.	.	.	.	.	.
-stdGdi_SetHInstance	.text	00436D30	0000000A	00000000	00000004	R	.	.	.	.	.	.	.
+stdGdi_SetHInstance	.text	00436D30	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 stdGdi_GetHInstance	.text	00436D40	00000006			R	.	.	.	.	.	.	.
 WinIdk_SetDplayGuid	.text	00436D50	00000028	00000000	00000004	R	.	.	.	.	.	.	.
 WinIdk_GetDplayGuid	.text	00436D80	00000006			R	.	.	.	.	.	.	.
@@ -1894,9 +1894,9 @@ sithThing_Shutdown	.text	004CC1A0	0000002A			R	.	.	.	.	.	.	.
 sithThing_SetHandler	.text	004CC1D0	0000000E	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_TickMaybe	.text	004CC1E0	000002AE	00000004	00000014	R	.	.	.	.	.	T	.
 sithThing_TickPhysics	.text	004CC4C0	00000144	00000024	00000008	R	.	.	.	.	.	T	.
-sithThing_Remove	.text	004CC610	00000067	00000000	00000004	R	.	.	.	.	.	.	.
+sithThing_Remove	.text	004CC610	00000067	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_GetParent	.text	004CC6A0	0000002A	00000004	00000004	R	.	.	.	.	.	T	.
-sithThing_GetThingByIdx	.text	004CC6D0	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
+sithThing_GetThingByIdx	.text	004CC6D0	0000003A	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_GetById	.text	004CC710	00000088	00000008	00000004	R	.	.	.	.	.	.	.
 sithThing_Destroy	.text	004CC7A0	00000023	00000000	00000004	R	.	.	.	.	.	.	.
 sithThing_Damage	.text	004CC7D0	000000E1	00000020	00000010	R	.	.	.	.	.	T	.
@@ -2122,7 +2122,7 @@ sithSoundSys_Startup	.text	004DAE00	0000003F	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_Shutdown	.text	004DAE40	00000019			R	.	.	.	.	.	.	.
 sithSoundSys_PlaySong	.text	004DAE60	000000B4	00000010	00000010	R	.	.	.	.	.	.	.
 sithSoundSys_StopSong	.text	004DAF20	00000019			R	.	.	.	.	.	.	.
-sithSoundSys_SetVals	.text	004DAF40	00000139	00000004	00000004	R	.	.	.	.	.	T	.
+sithSoundSys_UpdateMusicVolume	.text	004DAF40	00000139	00000004	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_SetMusicVol	.text	004DB080	00000065	00000004	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_ResumeMusic	.text	004DB0F0	00000086	00000000	00000004	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DB180	.text	004DB180	000000A6	00000010	00000000	R	.	.	.	.	.	.	.
@@ -2493,10 +2493,10 @@ sithMaterial_Shutdown	.text	004F0CE0	0000001D			R	.	.	.	.	.	.	.
 sithMaterial_Free	.text	004F0D00	00000085	00000004	00000004	R	.	.	.	.	.	T	.
 sithMaterial_Load	.text	004F0D90	000001DB	00000024	00000008	R	.	.	.	.	.	T	.
 sithMaterial_LoadEntry	.text	004F0F70	0000012A	00000094	0000000C	R	.	.	.	.	.	T	.
-sithMaterial_GetByIdx	.text	004F10A0	00000035	00000000	00000004	R	.	.	.	.	.	.	.
+sithMaterial_GetByIdx	.text	004F10A0	00000035	00000000	00000004	R	.	.	.	.	.	T	.
 sithMaterial_GetMemorySize	.text	004F10E0	00000058	00000004	00000004	R	.	.	.	.	.	T	.
 sithMaterial_New	.text	004F1140	0000007D	00000008	00000008	R	.	.	.	.	.	T	.
-sithMaterial_UnloadAll	.text	004F11C0	00000030	00000008	00000000	R	.	.	.	.	.	.	.
+sithMaterial_UnloadAll	.text	004F11C0	00000030	00000008	00000000	R	.	.	.	.	.	T	.
 sithAIClass_Startup	.text	004F11F0	00000019			R	.	.	.	.	.	.	.
 sithAIClass_Shutdown	.text	004F1210	0000001D			R	.	.	.	.	.	.	.
 sithAIClass_ParseSection	.text	004F1230	00000165	0000000C	00000008	R	.	.	.	.	.	T	.
@@ -2507,13 +2507,13 @@ sithAIClass_LoadEntry	.text	004F15C0	000002E8	000000A8	00000008	R	.	.	.	.	B	T	.
 sithParticle_Startup	.text	004F18B0	00000040			R	.	.	.	.	.	.	.
 sithParticle_Shutdown	.text	004F18F0	0000001D			R	.	.	.	.	.	.	.
 sithParticle_LoadEntry	.text	004F1910	000000EB	0000008C	00000004	R	.	.	.	.	.	.	.
-sithParticle_New	.text	004F1A00	00000057	0000000C	00000008	R	.	.	.	.	.	.	.
+sithParticle_New	.text	004F1A00	00000057	0000000C	00000008	R	.	.	.	.	.	T	.
 sithParticle_LoadThingParams	.text	004F1A60	00000172	00000000	0000000C	R	.	.	.	.	.	T	.
 sithParticle_Tick	.text	004F1C30	0000016D	00000044	00000008	R	.	.	.	.	.	T	.
 sithParticle_CreateThing	.text	004F1DA0	0000026D	00000030	00000004	R	.	.	.	.	.	T	.
 sithParticle_Remove	.text	004F2010	0000006A	00000004	00000004	R	.	.	.	.	.	T	.
-sithParticle_Free	.text	004F2080	00000024	00000004	00000004	R	.	.	.	.	.	T	.
-sithParticle_FreeEntry	.text	004F20B0	0000007C	00000004	00000004	R	.	.	.	.	.	.	.
+sithParticle_FreeEntry	.text	004F2080	00000024	00000004	00000004	R	.	.	.	.	.	T	.
+sithParticle_Free	.text	004F20B0	0000007C	00000004	00000004	R	.	.	.	.	.	T	.
 sithSprite_Startup	.text	004F2130	00000040			R	.	.	.	.	.	.	.
 sithSprite_Shutdown	.text	004F2170	0000001D			R	.	.	.	.	.	.	.
 sithSprite_Load	.text	004F2190	00000192	0000000C	00000008	R	.	.	.	.	.	T	.
@@ -2669,9 +2669,9 @@ sithCogParse_Free	.text	004FD130	00000082	00000010	00000004	R	.	.	.	.	.	.	.
 sithCogParse_free_symboltable	.text	004FD1C0	00000095	00000010	00000004	R	.	.	.	.	.	.	.
 sithCogParse_AddSymbol	.text	004FD260	000000EA	00000004	00000008	R	.	.	.	.	.	.	.
 sithCogParse_SetSymbolVal	.text	004FD350	00000022	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogParse_GetSymbolVal	.text	004FD380	00000046	00000008	00000008	R	.	.	.	.	.	.	.
+sithCogParse_GetSymbolVal	.text	004FD380	00000046	00000008	00000008	R	.	.	.	.	.	T	.
 sithCogParse_GetSymbol	.text	004FD3D0	00000035	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogParse_GetSymbolScriptIdx	.text	004FD410	0000003B	00000000	00000004	R	.	.	.	.	.	.	.
+sithCogParse_GetSymbolScriptIdx	.text	004FD410	0000003B	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogParse_AddLeaf	.text	004FD450	0000009C	00000008	00000008	R	.	.	.	.	.	T	.
 sithCogParse_AddLeafVector	.text	004FD4F0	000000AC	00000008	00000008	R	.	.	.	.	.	T	.
 sithCogParse_AddLinkingNode	.text	004FD5A0	000000AA	00000008	00000010	R	.	.	.	.	.	T	.
@@ -2679,7 +2679,7 @@ sithCogParse_LexGetSym	.text	004FD650	00000196	00000020	00000004	R	.	.	.	.	.	T	.
 sithCogParse_LexAddSymbol	.text	004FD7F0	000000EA	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogParse_LexScanVector3	.text	004FD8E0	00000045	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogParse_IncrementLoopdepth	.text	004FD930	00000010			R	.	.	.	.	.	.	.
-sithCogParse_recurse_stackdepth	.text	004FD940	00000083	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogParse_RecurseStackdepth	.text	004FD940	00000083	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogParse_recurse_write	.text	004FDA00	0000009F	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogParse_ParseSymbol	.text	004FDAE0	00000321	00000024	0000000C	R	.	.	.	.	.	.	.
 sithCogParse_ParseFlex	.text	004FDE10	00000221	00000028	00000008	R	.	.	.	.	.	.	.
@@ -3078,13 +3078,13 @@ sithAICmd_Talk	.text	0050BE20	000000EA	0000000C	0000000C	R	.	.	.	.	.	T	.
 sithCogYACC_yyerror	.text	0050BF10	0000002D	00000000	00000001	.	.	.	.	.	.	.	.
 sithCogYACC_yyparse	.text	0050BF50	0000096C	00000010	00000000	R	.	.	.	.	.	.	.
 sithCogYACC_yylex	.text	0050C9C0	000007A5	00000014	00000000	R	.	.	.	.	.	.	.
-sithCogYACC_lex_flex_scanner	.text	0050D260	000001C6	0000000C	00000000	R	.	.	.	.	.	.	.
-sithCogYACC_InitFileWrapper	.text	0050D430	00000054	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogYACC_lex_sub_50D490	.text	0050D490	00000065	00000000	00000004	R	.	.	.	.	.	.	.
-sithCogYACC_lex_sub_50D500	.text	0050D500	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
-sithCogYACC_lex_sub_50D530	.text	0050D530	000000E6	00000004	00000008	R	.	.	.	.	.	.	.
-sithCogYACC_lex_sub_50D620	.text	0050D620	0000002F	00000004	00000004	R	.	.	.	.	.	.	.
-sithCogYACC_sub_50D650	.text	0050D650	0000002C	00000000	00000008	R	.	.	.	.	.	.	.
+sithCogYACC_yy_get_next_buffer	.text	0050D260	000001C6	0000000C	00000000	R	.	.	.	.	.	.	.
+sithCogYACC_yyrestart	.text	0050D430	00000054	00000000	00000004	R	.	.	.	.	.	T	.
+sithCogYACC_yy_switch_to_buffer	.text	0050D490	00000065	00000000	00000004	R	.	.	.	.	.	.	.
+sithCogYACC_yy_load_buffer_state	.text	0050D500	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
+sithCogYACC_yy_create_buffer	.text	0050D530	000000E6	00000004	00000008	R	.	.	.	.	.	T	.
+sithCogYACC_yy_delete_buffer	.text	0050D620	0000002F	00000004	00000004	R	.	.	.	.	.	.	.
+sithCogYACC_yy_init_buffer	.text	0050D650	0000002C	00000000	00000008	R	.	.	.	.	.	.	.
 DirectX_DirectDrawEnumerateA	.text	0050D680	00000006	00000000	00000008	R	.	.	.	.	.	T	.
 DirectX_DirectDrawCreate	.text	0050D686	00000006	00000000	0000000C	R	.	.	.	.	.	T	.
 DirectX_DirectSoundCreate	.text	0050D68C	00000006	00000000	00000000	R	.	.	.	.	.	T	.
@@ -3181,5 +3181,5 @@ jkGuiRend_TextBoxDraw	.text	00512080	00000178	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_TextDraw	.text	00512200	0000004F	00000008	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_PicButtonButtonDown	.text	00512250	00000064	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_PicButtonDraw	.text	005122C0	000000AF	0000001C	00000010	R	.	.	.	.	.	T	.
-jkGuiRend_TextButtonButtonDown	.text	00512370	0000004E	00000000	0000000C	R	.	.	.	.	.	T	.
+jkGuiRend_TextButtonButtonDown	.text	00512370	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_TextButtonDraw	.text	005123C0	0000005F	00000010	00000010	R	.	.	.	.	.	T	.

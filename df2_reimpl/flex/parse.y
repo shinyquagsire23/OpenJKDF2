@@ -1,49 +1,45 @@
+
 /* parse.y - parser for flex input */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+%token CHAR NUMBER SECTEND SCDECL XSCDECL WHITESPACE NAME PREVCCL EOF_OP
+
+%{
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-%token CHAR NUMBER SECTEND SCDECL XSCDECL WHITESPACE NAME PREVCCL EOF_OP
-
-%{
+#ifndef lint
+static char rcsid[] =
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/parse.y,v 2.7 90/06/27 23:48:31 vern Exp $ (LBL)";
+#endif
 
 #include "flexdef.h"
 
-#ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
-static char rcsid[] =
-    "@(#) $Header: parse.y,v 2.1 89/06/20 17:23:54 vern Exp $ (LBL)";
-
-#endif
-
 int pat, scnum, eps, headcnt, trailcnt, anyccl, lastchar, i, actvp, rulelen;
 int trlcontxt, xcluflg, cclsorted, varlength, variable_trail_rule;
-char clower();
+Char clower();
 
 static int madeany = false;  /* whether we've made the '.' character class */
 int previous_continued_action;	/* whether the previous rule's action was '|' */
@@ -83,7 +79,7 @@ initlex         :
 			scinstal( "INITIAL", false );
 			}
 		;
-			
+
 sect1		:  sect1 startconddecl WHITESPACE namelist1 '\n'
 		|
 		|  error '\n'
@@ -102,7 +98,7 @@ startconddecl   :  SCDECL
 
 			xcluflg = false;
 			}
-		
+
 		|  XSCDECL
 			{ xcluflg = true; }
 		;
@@ -132,9 +128,9 @@ initforrule     :
 			}
 		;
 
-flexrule        :  scon '^' re eol 
+flexrule        :  scon '^' rule
                         {
-			pat = link_machines( $3, $4 );
+			pat = $3;
 			finish_rule( pat, variable_trail_rule,
 				     headcnt, trailcnt );
 
@@ -147,25 +143,25 @@ flexrule        :  scon '^' re eol
 			    bol_needed = true;
 
 			    if ( performance_report )
-				fprintf( stderr,
-			"'^' operator results in sub-optimal performance\n" );
+				pinpoint_message( 
+			    "'^' operator results in sub-optimal performance" );
 			    }
 			}
 
-		|  scon re eol 
+		|  scon rule
                         {
-			pat = link_machines( $2, $3 );
+			pat = $2;
 			finish_rule( pat, variable_trail_rule,
 				     headcnt, trailcnt );
 
 			for ( i = 1; i <= actvp; ++i )
-			    scset[actvsc[i]] = 
+			    scset[actvsc[i]] =
 				mkbranch( scset[actvsc[i]], pat );
 			}
 
-                |  '^' re eol 
+                |  '^' rule
 			{
-			pat = link_machines( $2, $3 );
+			pat = $2;
 			finish_rule( pat, variable_trail_rule,
 				     headcnt, trailcnt );
 
@@ -182,14 +178,14 @@ flexrule        :  scon '^' re eol
 			    bol_needed = true;
 
 			    if ( performance_report )
-				fprintf( stderr,
-			"'^' operator results in sub-optimal performance\n" );
+				pinpoint_message(
+			    "'^' operator results in sub-optimal performance" );
 			    }
 			}
 
-                |  re eol 
+                |  rule
 			{
-			pat = link_machines( $1, $2 );
+			pat = $1;
 			finish_rule( pat, variable_trail_rule,
 				     headcnt, trailcnt );
 
@@ -203,9 +199,21 @@ flexrule        :  scon '^' re eol
 
                 |  EOF_OP
 			{
-			/* this EOF applies only to the INITIAL start cond. */
-			actvsc[actvp = 1] = 1;
-			build_eof_action();
+			/* this EOF applies to all start conditions
+			 * which don't already have EOF actions
+			 */
+			actvp = 0;
+
+			for ( i = 1; i <= lastsc; ++i )
+			    if ( ! sceof[i] )
+				actvsc[++actvp] = i;
+
+			if ( actvp == 0 )
+			    pinpoint_message(
+		"warning - all start conditions already have <<EOF>> rules" );
+
+			else
+			    build_eof_action();
 			}
 
                 |  error
@@ -218,7 +226,8 @@ scon            :  '<' namelist2 '>'
 namelist2       :  namelist2 ',' NAME
                         {
 			if ( (scnum = sclookup( nmstr )) == 0 )
-			    lerrsf( "undeclared start condition %s", nmstr );
+			    format_pinpoint_message(
+				"undeclared start condition %s", nmstr );
 
 			else
 			    actvsc[++actvp] = scnum;
@@ -227,7 +236,8 @@ namelist2       :  namelist2 ',' NAME
 		|  NAME
 			{
 			if ( (scnum = sclookup( nmstr )) == 0 )
-			    lerrsf( "undeclared start condition %s", nmstr );
+			    format_pinpoint_message(
+				"undeclared start condition %s", nmstr );
 			else
 			    actvsc[actvp = 1] = scnum;
 			}
@@ -236,51 +246,7 @@ namelist2       :  namelist2 ',' NAME
 			{ synerr( "bad start condition list" ); }
 		;
 
-eol             :  '$'
-                        {
-			if ( trlcontxt )
-			    {
-			    synerr( "trailing context used twice" );
-			    $$ = mkstate( SYM_EPSILON );
-			    }
-			else
-			    {
-			    trlcontxt = true;
-
-			    if ( ! varlength )
-				headcnt = rulelen;
-
-			    ++rulelen;
-			    trailcnt = 1;
-
-			    eps = mkstate( SYM_EPSILON );
-			    $$ = link_machines( eps, mkstate( '\n' ) );
-			    }
-			}
-
-		|
-		        {
-		        $$ = mkstate( SYM_EPSILON );
-
-			if ( trlcontxt )
-			    {
-			    if ( varlength && headcnt == 0 )
-				/* both head and trail are variable-length */
-				variable_trail_rule = true;
-			    else
-				trailcnt = rulelen;
-			    }
-		        }
-		;
-
-re              :  re '|' series
-                        {
-			varlength = true;
-
-			$$ = mkor( $1, $3 );
-			}
-
-		|  re2 series
+rule            :  re2 re
 			{
 			if ( transchar[lastst[$2]] != SYM_EPSILON )
 			    /* provide final transition \now/ so it
@@ -305,8 +271,8 @@ re              :  re '|' series
 			    if ( ! varlength || headcnt != 0 )
 				{
 				fprintf( stderr,
-    "flex: warning - trailing context rule at line %d made variable because\n",
-					 linenum );
+    "%s: warning - trailing context rule at line %d made variable because\n",
+					 program_name, linenum );
 				fprintf( stderr,
 					 "      of preceding '|' action\n" );
 				}
@@ -328,9 +294,78 @@ re              :  re '|' series
 			     * state ...
 			     */
 			    add_accept( $1, num_rules | YY_TRAILING_HEAD_MASK );
+			    variable_trail_rule = true;
 			    }
+			
+			else
+			    trailcnt = rulelen;
 
 			$$ = link_machines( $1, $2 );
+			}
+
+		|  re2 re '$'
+			{ synerr( "trailing context used twice" ); }
+
+		|  re '$'
+                        {
+			if ( trlcontxt )
+			    {
+			    synerr( "trailing context used twice" );
+			    $$ = mkstate( SYM_EPSILON );
+			    }
+
+			else if ( previous_continued_action )
+			    {
+			    /* see the comment in the rule for "re2 re"
+			     * above
+			     */
+			    if ( ! varlength || headcnt != 0 )
+				{
+				fprintf( stderr,
+    "%s: warning - trailing context rule at line %d made variable because\n",
+					 program_name, linenum );
+				fprintf( stderr,
+					 "      of preceding '|' action\n" );
+				}
+
+			    /* mark as variable */
+			    varlength = true;
+			    headcnt = 0;
+			    }
+
+			trlcontxt = true;
+
+			if ( ! varlength )
+			    headcnt = rulelen;
+
+			++rulelen;
+			trailcnt = 1;
+
+			eps = mkstate( SYM_EPSILON );
+			$$ = link_machines( $1,
+				 link_machines( eps, mkstate( '\n' ) ) );
+			}
+
+		|  re
+			{
+		        $$ = $1;
+
+			if ( trlcontxt )
+			    {
+			    if ( varlength && headcnt == 0 )
+				/* both head and trail are variable-length */
+				variable_trail_rule = true;
+			    else
+				trailcnt = rulelen;
+			    }
+		        }
+		;
+
+
+re              :  re '|' series
+                        {
+			varlength = true;
+			$$ = mkor( $1, $3 );
 			}
 
 		|  series
@@ -340,8 +375,8 @@ re              :  re '|' series
 
 re2		:  re '/'
 			{
-			/* this rule is separate from the others for "re" so
-			 * that the reduction will occur before the trailing
+			/* this rule is written separately so
+			 * the reduction will occur before the trailing
 			 * series is parsed
 			 */
 
@@ -381,7 +416,7 @@ singleton       :  singleton '*'
 
 			$$ = mkclos( $1 );
 			}
-			
+
 		|  singleton '+'
 			{
 			varlength = true;
@@ -413,7 +448,7 @@ singleton       :  singleton '*'
 				$$ = mkrep( $1, $3, $5 );
 			    }
 			}
-				
+
 		|  singleton '{' NUMBER ',' '}'
 			{
 			varlength = true;
@@ -458,8 +493,8 @@ singleton       :  singleton '*'
 			    if ( useecs )
 				mkeccl( ccltbl + cclmap[anyccl],
 					ccllen[anyccl], nextecm,
-					ecgroup, CSIZE );
-			    
+					ecgroup, csize, csize );
+
 			    madeany = true;
 			    }
 
@@ -474,12 +509,12 @@ singleton       :  singleton '*'
 			    /* sort characters for fast searching.  We use a
 			     * shell sort since this list could be large.
 			     */
-			    cshell( ccltbl + cclmap[$1], ccllen[$1] );
+			    cshell( ccltbl + cclmap[$1], ccllen[$1], true );
 
 			if ( useecs )
 			    mkeccl( ccltbl + cclmap[$1], ccllen[$1],
-				    nextecm, ecgroup, CSIZE );
-				     
+				    nextecm, ecgroup, csize, csize );
+
 			++rulelen;
 
 			$$ = mkstate( -$1 );
@@ -501,9 +536,6 @@ singleton       :  singleton '*'
 		|  CHAR
 			{
 			++rulelen;
-
-			if ( $1 == '\0' )
-			    synerr( "null in rule" );
 
 			if ( caseins && $1 >= 'A' && $1 <= 'Z' )
 			    $1 = clower( $1 );
@@ -553,7 +585,7 @@ ccl             :  ccl CHAR '-' CHAR
 			    cclsorted = cclsorted && ($2 > lastchar);
 			    lastchar = $4;
 			    }
-			
+
 			$$ = $1;
 			}
 
@@ -599,7 +631,7 @@ string		:  string CHAR
  *                    conditions
  */
 
-build_eof_action()
+void build_eof_action()
 
     {
     register int i;
@@ -607,7 +639,8 @@ build_eof_action()
     for ( i = 1; i <= actvp; ++i )
 	{
 	if ( sceof[actvsc[i]] )
-	    lerrsf( "multiple <<EOF>> rules for start condition %s",
+	    format_pinpoint_message(
+		"multiple <<EOF>> rules for start condition %s",
 		    scname[actvsc[i]] );
 
 	else
@@ -622,30 +655,47 @@ build_eof_action()
     }
 
 
-/* synerr - report a syntax error
- *
- * synopsis
- *    char str[];
- *    synerr( str );
- */
+/* synerr - report a syntax error */
 
-synerr( str )
+void synerr( str )
 char str[];
 
     {
     syntaxerror = true;
-    fprintf( stderr, "Syntax error at line %d: %s\n", linenum, str );
+    pinpoint_message( str );
     }
 
 
-/* yyerror - eat up an error message from the parser
- *
- * synopsis
- *    char msg[];
- *    yyerror( msg );
+/* format_pinpoint_message - write out a message formatted with one string,
+ *			     pinpointing its location
  */
 
-yyerror( msg )
+void format_pinpoint_message( msg, arg )
+char msg[], arg[];
+
+    {
+    char errmsg[MAXLINE];
+
+    (void) sprintf( errmsg, msg, arg );
+    pinpoint_message( errmsg );
+    }
+
+
+/* pinpoint_message - write out a message, pinpointing its location */
+
+void pinpoint_message( str )
+char str[];
+
+    {
+    fprintf( stderr, "\"%s\", line %d: %s\n", infilename, linenum, str );
+    }
+
+
+/* yyerror - eat up an error message from the parser;
+ *	     currently, messages are ignore
+ */
+
+void yyerror( msg )
 char msg[];
 
     {

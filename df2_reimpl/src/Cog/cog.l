@@ -6,12 +6,24 @@ E			[Ee][+-]?{D}+
 %{
 #include <stdio.h>
 #include "Primitives/rdVector.h"
-#include "sithCogParse.h"
+#include "Cog/sithCogParse.h"
+#include "jk.h"
 #include "y.tab.h"
 
-int linenum = 0;
+#define printf(...) _printf(__VA_ARGS__)
+#define fwrite(x,y,z,w) _fwrite(x,y,z,w)
+#define atoi(x) _atoi(x)
+#define exit(x) jk_exit(x)
+#define malloc(x) _malloc(x)
+#define free(x) _free(x)
+#define memcpy(x,y,z) _memcpy(x,y,z)
+#define strlen(x) _strlen(x)
+#define strcpy(x,y) _strcpy(x,y)
 
-void sithCogParse_LexScanVector3(char* text);
+#define FLEX_DEBUG
+
+//int linenum = 0;
+
 %}
 
 %%
@@ -31,14 +43,14 @@ void sithCogParse_LexScanVector3(char* text);
 
 {L}({L}|{D})*	{ sithCogParse_LexGetSym(yytext); return(IDENTIFIER); }
 
-0[xX]{H}+		{ sscanf(yytext, "%x", &yylval.as_int); return(CONSTANT_INT); }
-0{D}+		    { sscanf(yytext, "%i", &yylval.as_int); return(CONSTANT_INT); }
-{D}+		    { yylval.as_int = atoi(yytext); return(CONSTANT_INT); }
+0[xX]{H}+		{ _sscanf(yytext, "%x", &yylval.as_int); return(CONSTANT_INT); }
+0{D}+		    { _sscanf(yytext, "%i", &yylval.as_int); return(CONSTANT_INT); }
+{D}+		    { yylval.as_int = _atoi(yytext); return(CONSTANT_INT); }
 
 
-{D}+{E}		        { yylval.as_float = atof(yytext); return(CONSTANT_FLOAT); }
-{D}*"."{D}+({E})?	{ yylval.as_float = atof(yytext); return(CONSTANT_FLOAT); }
-{D}+"."{D}*({E})?	{ yylval.as_float = atof(yytext); return(CONSTANT_FLOAT); }
+{D}+{E}		        { yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
+{D}*"."{D}+({E})?	{ yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
+{D}+"."{D}*({E})?	{ yylval.as_float = _atof(yytext); return(CONSTANT_FLOAT); }
 
 \"(\\.|[^\\"])*\"	{ sithCogParse_LexAddSymbol(yytext); return(STRING_LITERAL); }
 \'(\\.|[^\\'])*\'	{ sithCogParse_LexScanVector3(yytext); return(VECTOR_LITERAL); }
@@ -75,15 +87,8 @@ void sithCogParse_LexScanVector3(char* text);
 "^"			{ return('^'); }
 "|"			{ return('|'); }
 
-[\n\r]		{ linenum++; }
+[\n\r]		{ yacc_linenum++; }
 [ \t\v\f]	{ }
 .			{ /* ignore bad characters */ }
 
 %%
-
-void sithCogParse_LexScanVector3(char* text)
-{
-    rdVector3 scan_in;
-    sscanf(text, "\'%f %f %f\'", &scan_in.x, &scan_in.y, &scan_in.z);
-    yylval.as_vector = scan_in;
-}

@@ -1,41 +1,44 @@
 /* nfa - NFA construction routines */
 
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
  * 
- * The United States Government has rights in this work pursuant to
- * contract no. DE-AC03-76SF00098 between the United States Department of
- * Energy and the University of California.
+ * The United States Government has rights in this work pursuant
+ * to contract no. DE-AC03-76SF00098 between the United States
+ * Department of Energy and the University of California.
  *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #ifndef lint
-
-static char copyright[] =
-    "@(#) Copyright (c) 1989 The Regents of the University of California.\n";
-static char CR_continuation[] = "@(#) All rights reserved.\n";
-
 static char rcsid[] =
-    "@(#) $Header: nfa.c,v 2.0 89/06/20 15:50:05 vern Locked $ (LBL)";
-
+    "@(#) $Header: /usr/fsys/odin/a/vern/flex/RCS/nfa.c,v 2.6 90/06/27 23:48:29 vern Exp $ (LBL)";
 #endif
 
 #include "flexdef.h"
+
+
+/* declare functions that have forward references */
+
+int dupmachine PROTO((int));
+void mkxtion PROTO((int, int));
+
 
 /* add_accept - add an accepting state to a machine
  *
@@ -46,8 +49,8 @@ static char rcsid[] =
  * accepting_number becomes mach's accepting number.
  */
 
-add_accept( mach, accepting_number )
-int mach;
+void add_accept( mach, accepting_number )
+int mach, accepting_number;
 
     {
     /* hang the accepting number off an epsilon state.  if it is associated
@@ -101,7 +104,7 @@ int singl, num;
  *    dumpnfa( state1 );
  */
 
-dumpnfa( state1 )
+void dumpnfa( state1 )
 int state1;
 
     {
@@ -191,6 +194,7 @@ int mach;
     return ( init );
     }
 
+
 /* finish_rule - finish up the processing for a rule
  *
  * synopsis
@@ -207,7 +211,7 @@ int mach;
  * context has variable length.
  */
 
-finish_rule( mach, variable_trail_rule, headcnt, trailcnt )
+void finish_rule( mach, variable_trail_rule, headcnt, trailcnt )
 int mach, variable_trail_rule, headcnt, trailcnt;
 
     {
@@ -217,6 +221,12 @@ int mach, variable_trail_rule, headcnt, trailcnt;
      * number because we do it before we start parsing the current rule
      */
     rule_linenum[num_rules] = linenum;
+
+    /* if this is a continued action, then the line-number has
+     * already been updated, giving us the wrong number
+     */
+    if ( continued_action )
+	--rule_linenum[num_rules];
 
     fprintf( temp_action_file, "case %d:\n", num_rules );
 
@@ -245,15 +255,8 @@ int mach, variable_trail_rule, headcnt, trailcnt;
 	"*yy_cp = yy_hold_char; /* undo effects of setting up yytext */\n" );
 
 	    if ( headcnt > 0 )
-		{
-		if ( headcnt > 0 )
-		    fprintf( temp_action_file, "%s = %s + %d;\n",
-			     scanner_cp, scanner_bp, headcnt );
-
-		else
-		    fprintf( temp_action_file, "%s = %s;\n",
-			     scanner_cp, scanner_bp );
-		}
+		fprintf( temp_action_file, "%s = %s + %d;\n",
+			 scanner_cp, scanner_bp, headcnt );
 
 	    else
 		fprintf( temp_action_file,
@@ -319,7 +322,7 @@ int first, last;
  * The "beginning" states are the epsilon closure of the first state
  */
 
-mark_beginning_as_normal( mach )
+void mark_beginning_as_normal( mach )
 register int mach;
 
     {
@@ -649,7 +652,8 @@ int sym;
     else
 	{
 	if ( useecs )
-	    mkechar( sym, nextecm, ecgroup );
+	    /* map NUL's to csize */
+	    mkechar( sym ? sym : csize, nextecm, ecgroup );
 	}
 
     return ( lastnfa );
@@ -666,7 +670,7 @@ int sym;
  *     stateto   - the state to which the transition is to be made
  */
 
-mkxtion( statefrom, stateto )
+void mkxtion( statefrom, stateto )
 int statefrom, stateto;
 
     {
@@ -694,7 +698,7 @@ int statefrom, stateto;
  * arrays (such as rule_type[]) are grown as needed.
  */
 
-new_rule()
+void new_rule()
 
     {
     if ( ++num_rules >= current_max_rules )

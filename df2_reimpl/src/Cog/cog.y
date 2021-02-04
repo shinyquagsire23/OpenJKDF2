@@ -2,6 +2,17 @@
 #include <stdio.h>
 #include "Primitives/rdVector.h"
 #include "sithCogParse.h"
+#include "stdPlatform.h"
+
+#define printf(...) _printf(__VA_ARGS__)
+#define fwrite(x,y,z,w) _fwrite(x,y,z,w)
+#define atoi(x) _atoi(x)
+#define exit(x) jk_exit(x)
+#define malloc(x) _malloc(x)
+#define free(x) _free(x)
+#define memcpy(x,y,z) _memcpy(x,y,z)
+#define strlen(x) _strlen(x)
+#define strcpy(x,y) _strcpy(x,y)
 %}
 
 %token IDENTIFIER CONSTANT_INT CONSTANT_FLOAT STRING_LITERAL VECTOR_LITERAL
@@ -26,7 +37,7 @@
 primary_expression
     : IDENTIFIER         { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHSYMBOL, $1.as_int); }
     | CONSTANT_INT       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHINT, $1.as_int); }
-    | CONSTANT_FLOAT     { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHFLOAT, $1.as_float); }
+    | CONSTANT_FLOAT     { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHFLOAT, $1.as_int); }
     | STRING_LITERAL     { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHSYMBOL, $1.as_int); }
     | VECTOR_LITERAL     { $$.as_node = sithCogParse_AddLeafVector(COG_OPCODE_PUSHVECTOR, &$1.as_vector); }
     | '(' expression ')' { $$.as_node = $2.as_node; }
@@ -51,7 +62,7 @@ unary_operator
 
 unary_expression
     : postfix_expression
-    | unary_operator unary_expression                       { $$.as_node = sithCogParse_AddLinkingNode($1.as_node, $2.as_node, COG_OPCODE_NOP, 0); }
+    | unary_operator unary_expression                       { $$.as_node = sithCogParse_AddLinkingNode($2.as_node, $1.as_node, COG_OPCODE_NOP, 0); }
     ;
 
 multiplicative_expression
@@ -113,7 +124,7 @@ assignment_expression
 
 expression
     : assignment_expression
-    | expression ',' assignment_expression                  { printf("expr\n");$$.as_node = sithCogParse_AddLinkingNode($1.as_node, $3.as_node, COG_OPCODE_NOP, 0); }
+    | expression ',' assignment_expression                  { $$.as_node = sithCogParse_AddLinkingNode($1.as_node, $3.as_node, COG_OPCODE_NOP, 0); }
     ;
 
 statement
@@ -128,7 +139,7 @@ statement
 labeled_statement
     : IDENTIFIER ':' statement                              { 
                                                             $$.as_node = sithCogParse_AddLinkingNode($3.as_node, 0, COG_OPCODE_NOP, 0); 
-                                                            $$.as_node->child_loop_depth = sithCogParse_GetSymbolScriptIdx($1.as_node);
+                                                            $$.as_node->child_loop_depth = sithCogParse_GetSymbolScriptIdx($1.as_int);
                                                             }
     ;
 
@@ -139,7 +150,7 @@ compound_statement
 
 statement_list
     : statement
-    | statement_list statement                              { printf("statement list\n"); $$.as_node = sithCogParse_AddLinkingNode($1.as_node, $2.as_node, COG_OPCODE_NOP, 0);  }
+    | statement_list statement                              { $$.as_node = sithCogParse_AddLinkingNode($1.as_node, $2.as_node, COG_OPCODE_NOP, 0);  }
     ;
 
 expression_statement
@@ -149,18 +160,18 @@ expression_statement
 
 selection_statement
     : IF '(' expression ')' statement                       {
-                                                            sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($3.as_node, 0, 0, 0);
+                                                            sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($5.as_node, 0, COG_OPCODE_NOP, 0);
                                                             tmp->parent_loop_depth = sithCogParse_IncrementLoopdepth();
-                                                            sith_cog_parser_node* tmp2 = sithCogParse_AddLinkingNode($1.as_node, 0, COG_OPCODE_GOFALSE, tmp->parent_loop_depth);
-                                                            $$.as_node = sithCogParse_AddLinkingNode(tmp2, tmp, 0, 0);
+                                                            sith_cog_parser_node* tmp2 = sithCogParse_AddLinkingNode($3.as_node, 0, COG_OPCODE_GOFALSE, tmp->parent_loop_depth);
+                                                            $$.as_node = sithCogParse_AddLinkingNode(tmp2, tmp, COG_OPCODE_NOP, 0);
                                                             }
     | IF '(' expression ')' statement ELSE statement        {
-                                                            sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($7.as_node, 0, 0, 0);
+                                                            sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($7.as_node, 0, COG_OPCODE_NOP, 0);
                                                             tmp->child_loop_depth = sithCogParse_IncrementLoopdepth();
                                                             tmp->parent_loop_depth = sithCogParse_IncrementLoopdepth();
                                                             sith_cog_parser_node* tmp2 = sithCogParse_AddLinkingNode($3.as_node, 0, COG_OPCODE_GOFALSE, tmp->child_loop_depth);
                                                             tmp2 = sithCogParse_AddLinkingNode(tmp2, $5.as_node, COG_OPCODE_GO, tmp->parent_loop_depth);
-                                                            $$.as_node = sithCogParse_AddLinkingNode(tmp2, tmp, 0, 0);
+                                                            $$.as_node = sithCogParse_AddLinkingNode(tmp2, tmp, COG_OPCODE_NOP, 0);
                                                             }
     ;
 
@@ -179,7 +190,7 @@ iteration_statement
                                                             $$.as_node->value = $$.as_node->child_loop_depth;
                                                             }
     | FOR '(' expression_statement expression_statement expression ')' statement {
-                                                                                 sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($7.as_node, 0, 0, 0);
+                                                                                 sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode($7.as_node, 0, COG_OPCODE_NOP, 0);
                                                                                  tmp->parent_loop_depth = sithCogParse_IncrementLoopdepth();
                                                                                  
                                                                                  sith_cog_parser_node* tmp2 = sithCogParse_AddLinkingNode($4.as_node, 0, COG_OPCODE_GOFALSE, tmp->parent_loop_depth);
@@ -187,14 +198,14 @@ iteration_statement
                                                                                  $$.as_node = sithCogParse_AddLinkingNode(tmp, $5.as_node, COG_OPCODE_GO, tmp2->child_loop_depth);
                                                                                  tmp2->value = sithCogParse_IncrementLoopdepth();
                                                                                  $$.as_node->parent_loop_depth = tmp2->value;
-                                                                                 sith_cog_parser_node* tmp3 = sithCogParse_AddLinkingNode($3.as_node, tmp2, 0, 0);
-                                                                                 $$.as_node = sithCogParse_AddLinkingNode(tmp3, $$.as_node, 0, 0);
+                                                                                 sith_cog_parser_node* tmp3 = sithCogParse_AddLinkingNode($3.as_node, tmp2, COG_OPCODE_NOP, 0);
+                                                                                 $$.as_node = sithCogParse_AddLinkingNode(tmp3, $$.as_node, COG_OPCODE_NOP, 0);
                                                                                  }
     ;
 
 jump_statement
-    : GOTO IDENTIFIER ';'       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_GO, sithCogParse_GetSymbolScriptIdx($2.as_node)); }
-    | CALL IDENTIFIER ';'       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_CALL, sithCogParse_GetSymbolScriptIdx($2.as_node)); }
+    : GOTO IDENTIFIER ';'       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_GO, sithCogParse_GetSymbolScriptIdx($2.as_int)); }
+    | CALL IDENTIFIER ';'       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_CALL, sithCogParse_GetSymbolScriptIdx($2.as_int)); }
     | RETURN ';'                { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_RET, 0); }
     ;
 
@@ -202,11 +213,10 @@ jump_statement
 #include "jk.h"
 
 extern char yytext[];
-extern int linenum;
+//extern int linenum;
 
 yyerror(s)
 char *s;
 {
-    fflush(stdout);
-    printf("PARSER %s: line %d.\n", s, linenum);
+    stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
 }

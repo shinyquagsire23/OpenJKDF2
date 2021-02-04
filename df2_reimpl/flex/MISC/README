@@ -1,0 +1,15 @@
+Miscellaneous flex stuff.  In here you'll find:
+
+  - a VMS makefile for flex
+
+  - out-of-date patches for flex on the Atari and for Minix,
+    from Ronald Lamprecht (V61%DHDURZ1.BITNET@CUNYVM.CUNY.EDU,
+    ...!unido!DHDURZ1.bitnet!V61, V61@DHDURZ1 (Bitnet));
+
+  - somewhat out-of-date notes on porting flex to MS-DOS, from
+    Jeffrey R. Jones (jjones@angate.att.com);
+
+  - notes on porting flex to Turbo-C, from Frank Whaley (few@quad1.quad.com,
+    uunet!ccicpg!quad1!few).
+
+Updated versions of these will be welcome!

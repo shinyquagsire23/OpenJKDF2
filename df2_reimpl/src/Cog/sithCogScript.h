@@ -1,6 +1,8 @@
 #ifndef _SITHCOGSCRIPT_H
 #define _SITHCOGSCRIPT_H
 
+#include "types.h"
+
 typedef struct sithCogTrigger
 {
     uint32_t trigId;
@@ -8,10 +10,32 @@ typedef struct sithCogTrigger
     uint32_t field_8;
 } sithCogTrigger;
 
+typedef struct sithCogSymboltableBucket
+{
+    uint32_t field_0;
+    uint32_t field_4;
+    uint32_t field_8;
+    uint32_t field_C;
+    uint32_t field_10;
+    uint32_t field_14;
+    uint32_t field_18;
+} sithCogSymboltableBucket;
+
+typedef struct sithCogSymbol
+{
+  int symbol_id;
+  int symbol_type;
+  char *symbol_name;
+  int field_C;
+  int field_10;
+  int field_14;
+  char* field_18;
+} sithCogSymbol;
+
 typedef struct sithCogSymboltable
 {
-    uint32_t hashmap_buckets_maybe;
-    uint32_t hashmap_idk_amt_twice;
+    sithCogSymboltableBucket* buckets;
+    stdHashTable* hashtable;
     uint32_t entry_cnt;
     uint32_t max_entries;
     uint32_t bucket_idx;

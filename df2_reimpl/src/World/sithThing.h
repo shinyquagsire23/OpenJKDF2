@@ -294,7 +294,7 @@ typedef struct sithThingExplosionParams
     uint32_t lifeLeftMs;
     float range;
     float force;
-    int blastTime;
+    uint32_t blastTime;
     float maxLight;
     uint32_t field_18;
     float damage;
@@ -469,7 +469,7 @@ typedef struct sithThing
     uint32_t thingType;
     uint32_t move_type;
     uint32_t thingtype;
-    uint32_t lifeLeftMs;
+    int lifeLeftMs;
     uint32_t timer;
     uint32_t pulse_end_ms;
     uint32_t pulse_ms;
@@ -502,7 +502,7 @@ typedef struct sithThing
     float radius_idk;
     uint32_t field_114;
     float light;
-    float light_2;
+    float lightMin;
     int isVisible;
     void* soundclass;
     sithAnimclass* animclass;

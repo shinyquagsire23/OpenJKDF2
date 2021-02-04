@@ -228,7 +228,8 @@ extern LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dw
 extern BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
 extern int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
 static int (__cdecl *jk_vsnwprintf)(wchar_t *, size_t, const wchar_t *, va_list) = (void*)0x005138E0;
-
+static size_t (*_fwrite)(const void *, size_t, size_t, FILE *) = (void*)0x00513D40;
+static int (*_printf)(const char *, ...) = (void*)0x005141D0;
 
 // JK functions
 extern void (*jk_exit)(int a);
@@ -270,6 +271,9 @@ static wchar_t* (__cdecl *_wcsncpy)(wchar_t *a1, const wchar_t *a2, size_t a3) =
 static int (__cdecl *msvc_sub_512D30)(int a, int b) = (void*)0x512D30;
 static void (__cdecl *_qsort)(void *, size_t, size_t, int (__cdecl *)(const void *, const void *)) = (void*)0x00512DA0;
 static int (__cdecl *_string_modify_idk)(int SrcStr) = (void*)0x00513170;
+static int (*_fputs)(const char *, FILE *) = (void*)0x005151B0;
+static int (*_strtolower)(LPCSTR lpSrcStr) = (void*)0x005137C0;
+
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);
@@ -293,7 +297,7 @@ VM_VAR_DECL(g_855E8C, uint32_t);
 VM_VAR_DECL(g_855E90, uint32_t);
 VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 
-VM_VAR_DECL(g_cog_symboltable_hashmap, void*);
+//VM_VAR_DECL(g_cog_symboltable_hashmap, void*);
 
 // TODO: defsym?
 
@@ -313,7 +317,7 @@ VM_VAR_DECL(g_cog_symboltable_hashmap, void*);
 #define g_855E8C *(g_855E8C_ptr)
 #define g_855E90 *(g_855E90_ptr)
 #define g_window_not_destroyed *(g_window_not_destroyed_ptr)
-#define g_cog_symboltable_hashmap *(g_cog_symboltable_hashmap_ptr)
+#define g_cog_symboltable_hashmap (*(sithCogSymboltable**)0x008B5428)
 
 #define wm_msg_main_handler (0x50ECB0)
 

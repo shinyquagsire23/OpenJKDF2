@@ -1,38 +1,68 @@
 #include "sithCogParse.h"
-#include "y.tab.h"
 
 #include <stdlib.h>
 
-//int loopdepth = 0;
-sith_cog_parser_node* cogparser_topnode;
-sith_cog_parser_node* cogparser_nodes_alloc = 0;
-int cogparser_num_nodes = 0;
-int cogparser_current_nodeidx;
+#include "Cog/y.tab.h"
+#include "General/stdHashTable.h"
+#include "stdPlatform.h"
 
-//int yyparse();
-//extern int linenum;
+#include "jk.h"
 
-int* cogvm_stack;
-int cogvm_stackpos = 0;
-int cog_parser_node_stackpos[512];
+// For progress tracking script...
+void sithCogYACC_yyerror(){}
+void sithCogYACC_yyparse(){}
+void sithCogYACC_yylex(){}
+void sithCogYACC_yy_get_next_buffer(){}
+void sithCogYACC_yyrestart(){}
+void sithCogYACC_yy_switch_to_buffer(){}
+void sithCogYACC_yy_load_buffer_state(){}
+void sithCogYACC_yy_create_buffer(){}
+void sithCogYACC_yy_delete_buffer(){}
+void sithCogYACC_yy_init_buffer(){}
 
-//void (*sithCogParse_GetSymbolScriptIdx)(sith_cog* ctx) = (void*)0x004FD410;
-//void (*sithCogParse_LexAddSymbol)(char* str) = (void*)0x004FD7F0;
-//void (*sithCogParse_LexGetSym)(char* str) = (void*)0x004FD650;
-//void (*sithCogParse_LexScanVector3)(sith_cog* ctx) = (void*)0x004FD8E0;
-//sith_cog_parser_node* (*sithCogParse_AddLeaf)(int op, int val) = (void*)0x004FD450;
-//sith_cog_parser_node* (*sithCogParse_AddLeafVector)(int op, rdVector3* vector) = (void*)0x004FD4F0;
-//sith_cog_parser_node* (*sithCogParse_AddLinkingNode)(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val) = (void*)0x004FD5A0;
-
-#if 0
-sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val)
+void* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2)
 {
-    returnsithCogParse_AddLinkingNode(NULL, NULL, op, (int)val);
+    void *result; // eax
+
+    if ( (!symbolTable->hashtable || (result = stdHashTable_GetKeyVal(symbolTable->hashtable, a2)) == 0)
+      && (!g_cog_symboltable_hashmap
+       || symbolTable == g_cog_symboltable_hashmap
+       || (g_cog_symboltable_hashmap->hashtable) == 0
+       || (result = stdHashTable_GetKeyVal(g_cog_symboltable_hashmap->hashtable, a2)) == 0) )
+    {
+        result = 0;
+    }
+    return result;
 }
 
-sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector)
+sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val)
 {
-    return sithCogParse_AddLinkingNode(NULL, NULL, op, (int)vector);
+    return sithCogParse_AddLinkingNode(NULL, NULL, op, (int)val);
+}
+
+sith_cog_parser_node* sithCogParse_AddLeafVector(int opcode, rdVector3* vector)
+{
+    if (!cogparser_nodes_alloc)
+    {
+        cogparser_nodes_alloc = (sith_cog_parser_node *)malloc(8096 * sizeof(sith_cog_parser_node));
+        cogparser_num_nodes = 8096;
+    }
+    
+    if ( cogparser_current_nodeidx == cogparser_num_nodes )
+    {
+        cogparser_nodes_alloc = (sith_cog_parser_node*)realloc(cogparser_nodes_alloc, 2 * cogparser_num_nodes * sizeof(sith_cog_parser_node));
+        cogparser_num_nodes *= 2;
+    }
+    
+    sith_cog_parser_node* node = &cogparser_nodes_alloc[cogparser_current_nodeidx++];
+    _memset(node, 0, sizeof(sith_cog_parser_node));
+    node->opcode = opcode;
+    node->vector = *vector;
+    
+    cogparser_topnode = node;
+    //printf("Add node %p w/ op %x, %p %p\n", node, opcode, parent, child);
+    
+    return node;
 }
 
 sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val)
@@ -61,36 +91,181 @@ sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, 
     
    return node;
 }
-#endif
 
 int sithCogParse_IncrementLoopdepth()
 {
-	void (*func)(void) = (void*)0x4FD930; //TODO impl
-    func();
-    //return loopdepth++;
+    return cog_yacc_loop_depth++;
 }
 
-int sithCogParse_GetSymbolScriptIdx(int symbol)
+int sithCogParse_GetSymbolScriptIdx(unsigned int idx)
 {
-	int (*func)(int ctx) = (void*)0x004FD410; //TODO impl
-    return func(symbol);
+    unsigned int idx_; // ecx
+    sithCogSymboltable *table; // eax
+    int result; // eax
+
+    idx_ = idx;
+    table = sithCogParse_symbolTable;
+    if ( idx >= 0x100 )
+    {
+        table = g_cog_symboltable_hashmap;
+        idx_ = idx - 256;
+    }
+    if ( table && idx_ < table->entry_cnt )
+        result = table->buckets[idx_].field_14;
+    else
+        result = table->buckets[0].field_14; // ????
+    return result;
 }
 
-int sithCogParse_LexGetSym(char* text)
+void sithCogParse_LexGetSym(char *symName)
 {
-	int (*func)(char* a) = (void*)0x004FD650; //TODO impl
-    return func(text);
-    //printf("Get sym %s\n", text);
-    //yylval.as_int = *(int*)text;
-    //return yylval.as_int;
+    sithCogSymbol *v6; // ecx
+    unsigned int v9; // ecx
+    sithCogSymbol *v11; // ebx
+    stdHashTable *v12; // ecx
+    sithCogSymbol *v13; // edi
+    int v14; // eax
+    int v15; // [esp+18h] [ebp-8h]
+    int v16; // [esp+1Ch] [ebp-4h]
+    char *lpSrcStra; // [esp+24h] [ebp+4h]
+
+    _strtolower(symName);
+    v6 = sithCogParse_GetSymbolVal(sithCogParse_symbolTable, symName);
+
+    if ( v6 )
+    {
+        yylval.as_int = v6->symbol_id;
+    }
+    else
+    {
+        v9 = sithCogParse_symbolTable->entry_cnt;
+        if ( sithCogParse_symbolTable->max_entries > v9 )
+        {
+            v11 = (sithCogSymbol *)&sithCogParse_symbolTable->buckets[v9];
+            sithCogParse_symbolTable->entry_cnt = v9 + 1;
+            if ( symName )
+            {
+                lpSrcStra = (char *)pSithHS->alloc(_strlen(symName) + 1);
+                _strcpy(lpSrcStra, symName);
+                v12 = sithCogParse_symbolTable->hashtable;
+                v11->field_18 = lpSrcStra;
+                if ( v12 )
+                    stdHashTable_SetKeyVal(v12, lpSrcStra, v11);
+            }
+            v13 = (sithCogSymbol *)sithCogParse_symbolTable->buckets;
+            v14 = cog_yacc_loop_depth + 1;
+            v11->field_14 = cog_yacc_loop_depth;
+            cog_yacc_loop_depth = v14;
+            v11->symbol_id = sithCogParse_symbolTable->bucket_idx + v11 - v13;
+        }
+        else
+        {
+            stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", symName);
+            v11 = 0;
+        }
+        if ( v11 )
+        {
+            v11->symbol_type = 2;
+            v11->symbol_name = 0;
+            v11->field_C = 0;//v15;
+            yylval.as_int = v11->symbol_id;
+            v11->field_10 = 0;//v16;
+        }
+    }
 }
 
-void sithCogParse_LexAddSymbol(char* text)
+void sithCogParse_LexAddSymbol(const char *symName)
 {
-	void (*func)(char* a) = (void*)0x004FD7F0; //TODO impl
-    func(text);
-    
-    //printf("Add sym %s\n", text);
+    sithCogSymboltable *v1; // edi
+    unsigned int v2; // eax
+    sithCogSymbol *symbol; // esi
+    sithCogSymboltableBucket *v4; // edx
+    sithCogSymbol *v5; // ecx
+    int v6; // eax
+    unsigned int v7; // edx
+    char *name; // edx
+
+    v1 = sithCogParse_symbolTable;
+    v2 = sithCogParse_symbolTable->entry_cnt;
+    if ( sithCogParse_symbolTable->max_entries > v2 )
+    {
+        v4 = sithCogParse_symbolTable->buckets;
+        sithCogParse_symbolTable->entry_cnt = v2 + 1;
+        v5 = (sithCogSymbol *)&v4[v2];
+        v6 = cog_yacc_loop_depth + 1;
+        v5->field_14 = cog_yacc_loop_depth;
+        cog_yacc_loop_depth = v6;
+        symbol = v5;
+        v7 = (int)((uint64_t)(2454267027 * ((char *)v5 - (char *)v4)) >> 32) >> 4;
+        v5->symbol_id = v1->bucket_idx + (v7 >> 31) + v7;
+    }
+    else
+    {
+        stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", 0);
+        symbol = 0;
+    }
+    if ( symbol )
+    {
+        symbol->symbol_type = COG_VARTYPE_STR;
+        name = (char *)pSithHS->alloc(_strlen(symName) - 1);
+        symbol->symbol_name = name;
+        _strncpy(name, symName + 1, _strlen(symName) - 2);
+        symbol->symbol_name[_strlen(symName) - 2] = 0;
+        yylval.as_int = symbol->symbol_id;
+    }
+}
+
+void sithCogParse_LexScanVector3(char* text)
+{
+    rdVector3 scan_in;
+    _sscanf(text, "'%f %f %f'", &scan_in.x, &scan_in.y, &scan_in.z);
+    yylval.as_vector = scan_in;
+}
+
+int sithCogParse_RecurseStackdepth(sith_cog_parser_node *node)
+{
+    int result; // eax
+    int v2; // esi
+
+    if ( node->child_loop_depth )
+        cog_parser_node_stackpos[node->child_loop_depth] = cogvm_stackpos;
+
+    if ( node->parent )
+        sithCogParse_RecurseStackdepth(node->parent);
+
+    if ( node->child )
+        sithCogParse_RecurseStackdepth(node->child);
+
+    result = node->opcode;
+    switch ( result )
+    {
+        case COG_OPCODE_NOP:
+            goto LABEL_12;
+        case COG_OPCODE_PUSHINT:
+        case COG_OPCODE_PUSHFLOAT:
+        case COG_OPCODE_PUSHSYMBOL:
+        case COG_OPCODE_GOFALSE:
+        case COG_OPCODE_GOTRUE:
+        case COG_OPCODE_GO:
+        case COG_OPCODE_CALL:
+            result = cogvm_stackpos + 2;
+            goto LABEL_11;
+        case COG_OPCODE_PUSHVECTOR:
+            result = cogvm_stackpos + 4;
+            goto LABEL_11;
+        default:
+            result = cogvm_stackpos + 1;
+LABEL_11:
+            cogvm_stackpos = result;
+LABEL_12:
+            v2 = node->parent_loop_depth;
+            if ( v2 )
+            {
+                result = cogvm_stackpos;
+                cog_parser_node_stackpos[v2] = cogvm_stackpos;
+            }
+            return result;
+    }
 }
 
 #if 0

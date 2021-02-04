@@ -1,0 +1,132 @@
+############################ VMS MAKEFILE ##############################
+#IMPORTANT:  Before you use this makefile fill in the contents of GNULIB.
+#
+# Define tools$$exe, tools$$library, and tools$$manual to reflect the 
+# locations where you would like to store the executables, library (flex.skel)
+# and the manual pages.  These names can be defined at the command line
+# prompt:  eg.
+#    $ define tools$$exe disk:[dir1.dir2.etc]
+#   
+# Once these names have been defined the following commands
+# can be executed at the command line:
+#
+#   $ mms install
+#   $ mms test
+#   $ mms clean
+#
+# When "mms test" is executed the diff should not show any differences. In fact
+# the same effect can be achieved by
+#
+#   $ mms install, test, clean
+#
+#  The filename of the the mms description file, i.e., this file,
+#  should either be "makefile." or "decrip.mms"
+#
+# VMS make file for "flex" tool
+
+# Redefine the following for your own environment
+BIN = tools$$exe
+LIB = tools$$library
+MAN = tools$$manual
+GNULIB = <******directory where you keep alloca.obj and bcopy.obj***>
+
+SKELETON_FILE = "DEFAULT_SKELETON_FILE=""$(LIB):FLEX.SKEL"""
+
+CCFLAGS = VMS,USG
+FLEX_FLAGS = -is
+
+FLEXOBJS = ccl.obj dfa.obj ecs.obj gen.obj main.obj misc.obj nfa.obj  -
+           parse.obj scan.obj sym.obj tblcmp.obj yylex.obj 
+
+OBJ = ccl.obj,dfa.obj,ecs.obj,gen.obj,main.obj,misc.obj,nfa.obj,parse.obj, -
+      scan.obj,sym.obj,tblcmp.obj,yylex.obj
+
+default : flex
+	! installed FLEX
+
+install : lib man bin 
+	!Installed FLEX and LIBRARIES
+
+lib : $(LIB):flex.skel
+	! Installed $(LIB):flex.skel
+
+bin : $(BIN):flex.exe
+	flex :== $ $(BIN):flex.exe
+
+man : $(MAN):flex.doc
+	! installed $(MAN):flex.doc
+
+$(LIB):flex.skel : flex.skel
+	copy flex.skel $(LIB):flex.skel
+$(BIN):flex.exe : flex.exe
+	copy flex.exe $(BIN):flex.exe
+$(MAN):flex.doc : flex.1
+	copy flex.1 $(MAN):flex.doc
+
+flex : flex.exe
+	copy flex.exe $(BIN):flex.exe
+
+flex.exe : $(FLEXOBJS)
+	link /exe=flex.exe -
+		$(OBJ),  -
+		$(GNULIB)alloca.obj,  -
+		$(GNULIB)bcopy.obj
+
+
+parse.c : parse.y
+	bison/defines/verbose/fixed_outfiles parse.y
+	copy y_tab.c parse.c
+	del/noconfirm y_tab.c;*
+
+parse.h : parse.c
+	copy y_tab.h parse.h
+	del/noconfirm y_tab.h;*
+
+scan.c : initscan.c
+	copy initscan.c scan.c
+
+ccl.obj : ccl.c flexdef.h
+	cc /define=($(CCFLAGS)) ccl.c
+dfa.obj : dfa.c flexdef.h
+	cc /define=($(CCFLAGS)) dfa.c
+ecs.obj : ecs.c flexdef.h
+	cc /define=($(CCFLAGS)) ecs.c
+gen.obj : gen.c flexdef.h
+	cc /define=($(CCFLAGS)) gen.c
+main.obj : main.c flexdef.h
+	cc /define=($(CCFLAGS),$(SKELETON_FILE)) main.c
+misc.obj : misc.c flexdef.h
+	cc /define=($(CCFLAGS)) misc.c
+nfa.obj : nfa.c flexdef.h
+	cc /define=($(CCFLAGS)) nfa.c
+parse.obj : parse.c flexdef.h parse.h
+	cc /define=($(CCFLAGS)) parse.c
+scan.obj : scan.c parse.h flexdef.h
+	cc /define=($(CCFLAGS)) scan.c
+sym.obj : sym.c flexdef.h
+	cc /define=($(CCFLAGS)) sym.c
+tblcmp.obj : tblcmp.c flexdef.h
+	cc /define=($(CCFLAGS)) tblcmp.c
+yylex.obj : yylex.c parse.h flexdef.h
+	cc /define=($(CCFLAGS)) yylex.c
+
+clean :
+	! Cleaning up by deleting unnecessary object files etc.
+	- delete/noconfirm scan.c;*
+	- delete/noconfirm parse.c;*
+	- delete/noconfirm parse.h;*
+	- delete/noconfirm lexyy.c;*
+	- delete/noconfirm *.obj;*
+	- delete/noconfirm flex*.tmp;*
+	- delete/noconfirm y.output;*
+	- delete/noconfirm *.diff;*
+	- delete/noconfirm y_tab.*;*
+	- purge/log
+
+test :  $(BIN):flex.exe
+	flex :== $ $(BIN):flex.exe
+	define tools$$library 'f$environment("default")'
+	sho log tool$$library
+	flex $(FLEX_FLAGS) scan.l
+	diff/out=flex.diff initscan.c lexyy.c
+	type/page flex.diff

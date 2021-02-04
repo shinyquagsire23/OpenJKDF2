@@ -81,7 +81,7 @@ void Windows_ShutdownGdi()
         Windows_bInittedGdi = 0;
         Window_RemoveMsgHandler(Windows_GdiHandler);
         if ( Windows_bWindowed )
-            ShowCursor(1);
+            jk_ShowCursor(1);
         Windows_bUnk = 0;
     }
 }
@@ -181,7 +181,7 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
 
     va_start(va, a1);
     v1 = jkStrings_GetText(a1);
-    _vsnwprintf(Text, 0x400u, v1, va);
+    jk_vsnwprintf(Text, 0x400u, v1, va);
     v4 = jkStrings_GetText("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
