@@ -282,18 +282,6 @@ typedef struct sithCogStackvar
     };
 } sithCogStackvar;
 
-typedef struct sithCog sithCog;
-typedef void (__cdecl *cogSymbolFunc_t)(sithCog *);
-
-typedef struct cogSymbol
-{
-    int type;
-    int val;
-    cogSymbolFunc_t func;
-} cogSymbol;
-
-typedef struct sithCog sithCog;
-
 typedef struct sithCog
 {
     sithCogScript* cogscript;

@@ -168,7 +168,7 @@ sithWorld                      0x1718     0.547%        21.262%         6 / 22
 stdFont                        0x181a     0.571%        0.000%          0 / 20         
 stdMath                        0x182a     0.573%        32.218%        13 / 23         
 rdActive                       0x1a55     0.624%        2.626%          3 / 8          
-sithCogParse                   0x1b2a     0.644%        21.326%        10 / 26         
+sithCogParse                   0x1b2a     0.644%        46.362%        15 / 26         
 sithSurface                    0x1c6a     0.673%        0.000%          0 / 35         
 jkHud                          0x1c9b     0.678%        0.000%          0 / 17         
 jkDev                          0x1e60     0.720%        0.000%          0 / 39         
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 17.562%
+Total completion: 17.723%
 ```

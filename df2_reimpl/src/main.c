@@ -372,15 +372,26 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdVector_ExtractAngle_ADDR, rdVector_ExtractAngle);
     
     // sithCogParse
+    hook_function(sithCogParse_Reset_ADDR, sithCogParse_Reset);
+    hook_function(sithCogParse_Load_ADDR, sithCogParse_Load);
+    hook_function(sithCogParse_LoadEntry_ADDR, sithCogParse_LoadEntry);
+    hook_function(sithCogParse_CopySymboltable_ADDR, sithCogParse_CopySymboltable);
+    hook_function(sithCogParse_NewSymboltable_ADDR, sithCogParse_NewSymboltable);
+    hook_function(sithCogParse_ReallocSymboltable_ADDR, sithCogParse_ReallocSymboltable);
+    hook_function(sithCogParse_FreeSymboltable_ADDR, sithCogParse_FreeSymboltable);
+    hook_function(sithCogParse_AddSymbol_ADDR, sithCogParse_AddSymbol);
+    hook_function(sithCogParse_GetSymbolVal_ADDR, sithCogParse_GetSymbolVal);
+    hook_function(sithCogParse_GetSymbol_ADDR, sithCogParse_GetSymbol);
+    hook_function(sithCogParse_GetSymbolScriptIdx_ADDR, sithCogParse_GetSymbolScriptIdx);
     hook_function(sithCogParse_AddLeaf_ADDR, sithCogParse_AddLeaf);
     hook_function(sithCogParse_AddLeafVector_ADDR, sithCogParse_AddLeafVector);
     hook_function(sithCogParse_AddLinkingNode_ADDR, sithCogParse_AddLinkingNode);
-    hook_function(sithCogParse_GetSymbolScriptIdx_ADDR, sithCogParse_GetSymbolScriptIdx);
     hook_function(sithCogParse_IncrementLoopdepth_ADDR, sithCogParse_IncrementLoopdepth);
     hook_function(sithCogParse_LexGetSym_ADDR, sithCogParse_LexGetSym);
     hook_function(sithCogParse_LexAddSymbol_ADDR, sithCogParse_LexAddSymbol);
     hook_function(sithCogParse_LexScanVector3_ADDR, sithCogParse_LexScanVector3);
     hook_function(sithCogParse_RecurseStackdepth_ADDR, sithCogParse_RecurseStackdepth);
+    hook_function(sithCogParse_RecurseWrite_ADDR, sithCogParse_RecurseWrite);
     
     hook_function(sithCogYACC_yyerror_ADDR, yyerror);
     hook_function(sithCogYACC_yyparse_ADDR, yyparse);

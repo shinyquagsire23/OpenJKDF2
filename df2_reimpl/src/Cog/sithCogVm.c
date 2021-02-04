@@ -161,7 +161,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
 {
     sithCogScript *cogscript;
     int op;
-    struct cogSymbol *v12; // eax
+    sithCogSymbol *v12; // eax
     cogSymbolFunc_t func; // eax
     int *vec; // ecx
     int v19; // eax
@@ -230,7 +230,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 v12 = sithCogParse_GetSymbol(cog_ctx->symbolTable, tmpStackVar->data[0]);
                 if (!v12 )
                     break;
-                if (v12->val)
+                if (v12->symbol_type)
                     break;
                 if ( v12->func )
                     v12->func(cog_ctx); 
@@ -792,7 +792,7 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
 cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
 {
     sithCogStackvar *v3; // ecx
-    struct cogSymbol *v7; // eax
+    sithCogSymbol *v7; // eax
     int v12; // [esp+10h] [ebp-Ch]
 
     if ( cog_ctx->stackPos < 1 )
@@ -803,7 +803,7 @@ cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
     if ( v3->type == COG_VARTYPE_SYMBOL )
     {
         v7 = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
-        if ( v7->val )
+        if ( v7->symbol_type )
             return (cogSymbolFunc_t)&v7->func;
         else
             return v7->func;
@@ -824,13 +824,13 @@ char* sithCogVm_PopString(sithCog *ctx)
     int v2; // eax
     int v3; // ST18_4
     int v4; // ST1C_4
-    struct cogSymbol *v5; // eax
+    sithCogSymbol *v5; // eax
     char *result; // eax
 
     v1 = ctx->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, ctx->stackPos = v2, v3 = ctx->stack[v2].data[1], v4 = ctx->stack[v2].data[2], ctx->stack[v2].type != 1)
-      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->val != COG_VARTYPE_STR) )
+      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->symbol_type != COG_VARTYPE_STR) )
     {
         result = 0;
     }

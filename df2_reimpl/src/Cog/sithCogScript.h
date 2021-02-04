@@ -10,22 +10,25 @@ typedef struct sithCogTrigger
     uint32_t field_8;
 } sithCogTrigger;
 
-typedef struct sithCogSymboltableBucket
+typedef struct sithCog sithCog;
+typedef void (__cdecl *cogSymbolFunc_t)(sithCog *);
+
+typedef struct cogSymbol
 {
-    uint32_t field_0;
-    uint32_t field_4;
-    uint32_t field_8;
-    uint32_t field_C;
-    uint32_t field_10;
-    uint32_t field_14;
-    uint32_t field_18;
-} sithCogSymboltableBucket;
+    int type;
+    int val;
+    cogSymbolFunc_t func;
+} cogSymbol;
 
 typedef struct sithCogSymbol
 {
   int symbol_id;
   int symbol_type;
-  char *symbol_name;
+  union
+  {
+    char *symbol_name;
+    cogSymbolFunc_t func;
+  };
   int field_C;
   int field_10;
   int field_14;
@@ -34,7 +37,7 @@ typedef struct sithCogSymbol
 
 typedef struct sithCogSymboltable
 {
-    sithCogSymboltableBucket* buckets;
+    sithCogSymbol* buckets;
     stdHashTable* hashtable;
     uint32_t entry_cnt;
     uint32_t max_entries;

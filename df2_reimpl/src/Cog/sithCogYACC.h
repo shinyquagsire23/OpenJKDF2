@@ -15,23 +15,16 @@
 #define sithCogYACC_yy_init_buffer_ADDR (0x0050D650)
 
 typedef struct sith_cog_parser_node sith_cog_parser_node;
-
-typedef union sith_cog_yacc_yystype {
-    rdVector3 as_vector;
-    float as_float;
-    int as_int;
-    sith_cog_parser_node* as_node;
-} sith_cog_yacc_yystype;
-
+//typedef YYSTYPE sith_cog_yacc_yystype;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
-void yyerror(char* s);
-int yylex();
-void yyrestart (FILE *input_file);
-void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer);
-void yy_load_buffer_state (void);
-YY_BUFFER_STATE yy_create_buffer (FILE *file, int size );
-void yy_delete_buffer (YY_BUFFER_STATE b);
-void yy_init_buffer (YY_BUFFER_STATE b, FILE *file );
+extern void yyerror(char* s);
+extern int yylex();
+extern void yyrestart (FILE *input_file);
+extern void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer);
+extern void yy_load_buffer_state (void);
+extern YY_BUFFER_STATE yy_create_buffer (FILE *file, int size );
+extern void yy_delete_buffer (YY_BUFFER_STATE b);
+extern void yy_init_buffer (YY_BUFFER_STATE b, FILE *file );
 
 #endif // _SITHCOGYACC_H

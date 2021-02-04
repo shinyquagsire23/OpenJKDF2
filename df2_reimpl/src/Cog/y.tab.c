@@ -406,14 +406,13 @@ YYSTYPE yyvs[YYSTACKSIZE];
 #include "jk.h"
 
 extern char yytext[];
-//extern int linenum;
 
 yyerror(s)
 char *s;
 {
     stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
 }
-#line 417 "y.tab.c"
+#line 416 "y.tab.c"
 #define YYABORT goto yyabort
 #define YYACCEPT goto yyaccept
 #define YYERROR goto yyerrlab
@@ -770,7 +769,7 @@ case 66:
 #line 209 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_RET, 0); }
 break;
-#line 774 "y.tab.c"
+#line 773 "y.tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;
