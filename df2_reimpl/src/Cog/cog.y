@@ -213,7 +213,6 @@ jump_statement
 #include "jk.h"
 
 extern char yytext[];
-//extern int linenum;
 
 yyerror(s)
 char *s;

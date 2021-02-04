@@ -20,10 +20,6 @@ E			[Ee][+-]?{D}+
 #define strlen(x) _strlen(x)
 #define strcpy(x,y) _strcpy(x,y)
 
-#define FLEX_DEBUG
-
-//int linenum = 0;
-
 %}
 
 %%
