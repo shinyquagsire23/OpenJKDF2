@@ -338,7 +338,11 @@ void jkPlayer_DrawPov()
             sithThing* player = playerThings[playerThingIdx].actorThing;
 
             // TODO: I think this explains some weird duplication
+#ifndef QOL_IMPROVEMENTS
             float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
+#else
+            float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag * (sithTime_deltaSeconds / 0.02); // scale animation to be in line w/ 50fps og limit
+#endif
             if ( waggleAmt == 0.0 )
                 jkPlayer_waggleAngle = 0.0;
             else
