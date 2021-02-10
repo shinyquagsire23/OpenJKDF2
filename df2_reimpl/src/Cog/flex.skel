@@ -85,7 +85,7 @@ int read();
 /* this used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite()
  */
-#define ECHO (void) _fwrite( (char *) yytext, yyleng, 1, yyout )
+#define ECHO (void) _fwrite( (char *) yytext, yyleng, 1, (FILE*)yyout )
 
 /* gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
  * is returned in "result".
@@ -143,7 +143,7 @@ int read();
 #define YY_NEW_FILE \
 	do \
 		{ \
-		yy_init_buffer( yy_current_buffer, yyin ); \
+		yy_init_buffer( yy_current_buffer, (FILE*)yyin ); \
 		yy_load_buffer_state(); \
 		} \
 	while ( 0 )
@@ -277,8 +277,6 @@ YY_BUFFER_STATE yy_create_buffer YY_PROTO(( FILE *file, int size ));
 void yy_delete_buffer YY_PROTO(( YY_BUFFER_STATE b ));
 void yy_init_buffer YY_PROTO(( YY_BUFFER_STATE b, FILE *file ));
 
-#define yy_new_buffer yy_create_buffer
-
 #ifdef __cplusplus
 static int yyinput YY_PROTO(( void ));
 #else
@@ -301,15 +299,15 @@ YY_DECL
 	    yy_start = 1;	/* first start state */
 
 	if ( ! yyin )
-	    yyin = stdin;
+	    yyin = (int)stdin;
 
 	if ( ! yyout )
-	    yyout = stdout;
+	    yyout = (int)stdout;
 
 	if ( yy_current_buffer )
-	    yy_init_buffer( yy_current_buffer, yyin );
+	    yy_init_buffer( yy_current_buffer, (FILE*)yyin );
 	else
-	    yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE );
+	    yy_current_buffer = yy_create_buffer( (FILE*)yyin, YY_BUF_SIZE );
 
 	yy_load_buffer_state();
 
@@ -755,7 +753,7 @@ void yy_load_buffer_state()
     {
     yy_n_chars = yy_current_buffer->yy_n_chars;
     yytext = yy_c_buf_p = yy_current_buffer->yy_buf_pos;
-    yyin = yy_current_buffer->yy_input_file;
+    yyin = (int)yy_current_buffer->yy_input_file;
     yy_hold_char = *yy_c_buf_p;
     }
 

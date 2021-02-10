@@ -214,8 +214,7 @@ jump_statement
 
 extern char yytext[];
 
-yyerror(s)
-char *s;
+void yyerror(char* s)
 {
     stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
 }
