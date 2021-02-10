@@ -2,6 +2,15 @@
 
 #include "stdPlatform.h"
 
+// original game will speed up if framerate is over 100?
+#ifndef QOL_IMPROVEMENTS
+#define SITHTIME_MINDELTA (10)
+#define SITHTIME_MAXDELTA (500)
+#else
+#define SITHTIME_MINDELTA (1)
+#define SITHTIME_MAXDELTA (500)
+#endif
+
 void sithTime_Tick()
 {
     sithTime_SetDelta(stdPlatform_GetTimeMsec() - sithTime_curMsAbsolute);
@@ -29,13 +38,13 @@ void sithTime_SetDelta(int deltaMs)
 {
     sithTime_deltaMs = deltaMs;
     sithTime_curMsAbsolute = stdPlatform_GetTimeMsec();
-    if ( sithTime_deltaMs < 10 )
+    if ( sithTime_deltaMs < SITHTIME_MINDELTA )
     {
-        sithTime_deltaMs = 10;
+        sithTime_deltaMs = SITHTIME_MINDELTA;
     }
-    if ( sithTime_deltaMs > 500 )
+    if ( sithTime_deltaMs > SITHTIME_MAXDELTA )
     {
-        sithTime_deltaMs = 500;
+        sithTime_deltaMs = SITHTIME_MAXDELTA;
     }
     sithTime_curMs += sithTime_deltaMs;
     sithTime_deltaSeconds = (double)sithTime_deltaMs * 0.001;
