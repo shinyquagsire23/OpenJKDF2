@@ -2,30 +2,21 @@
 
 #include "jk.h"
 #include "types.h"
-#include "sithCogUtil.h"
-#include "sithCogThing.h"
-#include "sithCogPlayer.h"
-#include "sithCogAI.h"
-#include "sithCogSurface.h"
-#include "sithCogSector.h"
-#include "sithCogSound.h"
-#include "sithCogVm.h"
-#include "sithCogParse.h"
+#include "Cog/sithCogUtil.h"
+#include "Cog/sithCogThing.h"
+#include "Cog/sithCogPlayer.h"
+#include "Cog/sithCogAI.h"
+#include "Cog/sithCogSurface.h"
+#include "Cog/sithCogSector.h"
+#include "Cog/sithCogSound.h"
+#include "Cog/sithCogVm.h"
+#include "Cog/sithCogParse.h"
 #include "jkCog.h"
 #include "Engine/sithTimer.h"
 
 #include "General/stdHashTable.h"
 
-//void (*sithCogParse_GetSymbolScriptIdx)(sithCog* ctx) = (void*)0x004FD410;
-//void (*sithCogParse_LexAddSymbol)(sithCog* ctx) = (void*)0x004FD7F0;
-//void (*sithCogParse_LexGetSym)(sithCog* ctx) = (void*)0x004FD650;
-//void (*sithCogParse_LexScanVector3)(sithCog* ctx) = (void*)0x004FD8E0;
-//void (*sithCogParse_AddLeaf)(sithCog* ctx) = (void*)0x004FD450;
-//void (*sithCogParse_AddLeafVector)(sithCog* ctx) = (void*)0x004FD4F0;
-//void (*sithCogParse_AddLinkingNode)(sithCog* ctx) = (void*)0x004FD5A0;
-
-void* (*cog_alloc_symboltable)(int amt) = (void*)0x004FD050;
-void (*cog_debug)(void) = (void*)0x004EE2F0;
+void (*sithDebugConsole_CmdCogList)(void) = (void*)0x004EE2F0;
 void (*cog_deinit)(sithCog* ctx) = (void*)0x004DE590;
 void (*cog_exec)(sithCog* ctx, int b) = (void*)0x004E2350;
 static int (*sithCogScript_TimerTick)() = (void*)0x4E0640;
@@ -42,7 +33,7 @@ int sithCog_Startup()
     hashmap_entry *v7; // eax
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    g_cog_symboltable_hashmap = cog_alloc_symboltable(512);
+    g_cog_symboltable_hashmap = sithCogParse_NewSymboltable(512);
     if (!g_cog_symboltable_hashmap )
     {
         jk_assert(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
@@ -55,7 +46,7 @@ int sithCog_Startup()
         jk_assert(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
         return 0;
     }
-    *(uint32_t*)(g_cog_symboltable_hashmap + 16) = 256;
+    g_cog_symboltable_hashmap->bucket_idx = 0x100;
     sithCogUtil_Initialize(g_cog_symboltable_hashmap);
     sithCogThing_Initialize(g_cog_symboltable_hashmap);
     sithCogAI_Initialize(g_cog_symboltable_hashmap);
@@ -120,7 +111,7 @@ int sithCog_Startup()
     sithCogScript_RegisterGlobalMessage(g_cog_symboltable_hashmap, "global13", 0);
     sithCogScript_RegisterGlobalMessage(g_cog_symboltable_hashmap, "global14", 0);
     sithCogScript_RegisterGlobalMessage(g_cog_symboltable_hashmap, "global15", 0);
-    sithTimer_RegisterFunc(4, (int)sithCogScript_TimerTick, 0, 2);
+    sithTimer_RegisterFunc(4, sithCogScript_TimerTick, 0, 2);
     //cog_initialized = 1;
     return 1;
 }

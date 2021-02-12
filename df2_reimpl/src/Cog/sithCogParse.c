@@ -6,6 +6,8 @@
 #include "Cog/sithCogYACC.h"
 #include "General/stdHashTable.h"
 #include "stdPlatform.h"
+#include "Win95/std.h"
+#include "General/stdConffile.h"
 
 #include "jk.h"
 
@@ -21,6 +23,7 @@ void sithCogYACC_yy_create_buffer(){}
 void sithCogYACC_yy_delete_buffer(){}
 void sithCogYACC_yy_init_buffer(){}
 
+extern int yyparse();
 #define yyin (*(int*)0x00855D90)
 #define yyout (*(int*)0x00855D94)
 
@@ -170,7 +173,7 @@ LABEL_54:
 
 int sithCogParse_LoadEntry(sithCogScript *script)
 {
-    FILE *fhand; // eax
+    int fhand; // eax
     sith_cog_parser_node *v2; // eax
     sith_cog_parser_node *v3; // esi
     sith_cog_parser_node *v4; // eax
@@ -483,6 +486,9 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
         symbol->field_14 = cog_yacc_loop_depth;
         cog_yacc_loop_depth++;
         symbol->symbol_id = table->bucket_idx + symbol - table->buckets;
+        //v7 = ((((char *)v5 - (char *)sithCogParse_symbolTable->buckets) * 4) / 7) >> 4;
+        
+        jk_printf("Added sym %s, %x\n", symbolName, symbol->symbol_id);
         return symbol;
     }
     else
@@ -492,62 +498,46 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
     }
 }
 
-void* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2)
+sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2)
 {
     void *result; // eax
 
-    if ( (!symbolTable->hashtable || (result = stdHashTable_GetKeyVal(symbolTable->hashtable, a2)) == 0)
-      && (!g_cog_symboltable_hashmap
-       || symbolTable == g_cog_symboltable_hashmap
-       || (g_cog_symboltable_hashmap->hashtable) == 0
-       || (result = stdHashTable_GetKeyVal(g_cog_symboltable_hashmap->hashtable, a2)) == 0) )
-    {
-        result = 0;
-    }
-    return result;
+    if (!symbolTable->hashtable)
+        return NULL;
+    
+    if (result = stdHashTable_GetKeyVal(symbolTable->hashtable, a2))
+        return result;
+
+    if (symbolTable == g_cog_symboltable_hashmap) return NULL;
+
+    return sithCogParse_GetSymbolVal(g_cog_symboltable_hashmap, a2);
 }
 
 sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int idx)
 {
-    unsigned int idx_; // eax
-    sithCogSymboltable *symbolTable; // ecx
     sithCogSymbol *result; // eax
 
-    idx_ = idx;
-    if ( idx < 0x100 )
+    if ( idx >= 0x100 )
     {
-        symbolTable = table;
+        table = g_cog_symboltable_hashmap;
+        idx -= 256;
     }
+
+    if (table)
+        jk_printf("Get symbol %x, max %x\n", idx, table->entry_cnt);
+
+    if ( table && idx < table->entry_cnt )
+        result = &table->buckets[idx];
     else
-    {
-        symbolTable = g_cog_symboltable_hashmap;
-        idx_ = idx - 256;
-    }
-    if ( symbolTable && idx_ < symbolTable->entry_cnt )
-        result = &symbolTable->buckets[idx_];
-    else
-        result = 0;
+        result = NULL;
+
     return result;
 }
 
 int sithCogParse_GetSymbolScriptIdx(unsigned int idx)
 {
-    unsigned int idx_; // ecx
-    sithCogSymboltable *table; // eax
-    int result; // eax
-
-    idx_ = idx;
-    table = sithCogParse_symbolTable;
-    if ( idx >= 0x100 )
-    {
-        table = g_cog_symboltable_hashmap;
-        idx_ = idx - 256;
-    }
-    if ( table && idx_ < table->entry_cnt )
-        result = table->buckets[idx_].field_14;
-    else
-        result = table->buckets[0].field_14; // ????
-    return result;
+    // aaaaaaaaaaaaa this will dereference a nullptr
+    return sithCogParse_GetSymbol(sithCogParse_symbolTable, idx)->field_14;
 }
 
 sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val)
@@ -615,14 +605,6 @@ int sithCogParse_IncrementLoopdepth()
 void sithCogParse_LexGetSym(char *symName)
 {
     sithCogSymbol *v6; // ecx
-    unsigned int v9; // ecx
-    sithCogSymbol *v11; // ebx
-    stdHashTable *v12; // ecx
-    sithCogSymbol *v13; // edi
-    int v14; // eax
-    int v15; // [esp+18h] [ebp-8h]
-    int v16; // [esp+1Ch] [ebp-4h]
-    char *lpSrcStra; // [esp+24h] [ebp+4h]
 
     _strtolower(symName);
     v6 = sithCogParse_GetSymbolVal(sithCogParse_symbolTable, symName);
@@ -630,79 +612,34 @@ void sithCogParse_LexGetSym(char *symName)
     if ( v6 )
     {
         yylval.as_int = v6->symbol_id;
+        jk_printf("lex got existing symbol %s %x\n", symName, v6->symbol_id);
     }
     else
     {
-        v9 = sithCogParse_symbolTable->entry_cnt;
-        if ( sithCogParse_symbolTable->max_entries > v9 )
+        v6 = sithCogParse_AddSymbol(sithCogParse_symbolTable, symName);
+
+        if ( v6 )
         {
-            v11 = &sithCogParse_symbolTable->buckets[v9];
-            sithCogParse_symbolTable->entry_cnt = v9 + 1;
-            if ( symName )
-            {
-                lpSrcStra = (char *)pSithHS->alloc(_strlen(symName) + 1);
-                _strcpy(lpSrcStra, symName);
-                v12 = sithCogParse_symbolTable->hashtable;
-                v11->field_18 = lpSrcStra;
-                if ( v12 )
-                    stdHashTable_SetKeyVal(v12, lpSrcStra, v11);
-            }
-            v13 = sithCogParse_symbolTable->buckets;
-            v14 = cog_yacc_loop_depth + 1;
-            v11->field_14 = cog_yacc_loop_depth;
-            cog_yacc_loop_depth = v14;
-            v11->symbol_id = sithCogParse_symbolTable->bucket_idx + v11 - v13;
-        }
-        else
-        {
-            stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", symName);
-            v11 = 0;
-        }
-        if ( v11 )
-        {
-            v11->symbol_type = 2;
-            v11->symbol_name = 0;
-            v11->field_C = 0;//v15;
-            yylval.as_int = v11->symbol_id;
-            v11->field_10 = 0;//v16;
+            v6->symbol_type = 2;
+            v6->symbol_name = 0;
+            v6->field_C = 0;//v15;
+            v6->field_10 = 0;//v16;
+            yylval.as_int = v6->symbol_id;
         }
     }
 }
 
 void sithCogParse_LexAddSymbol(const char *symName)
 {
-    sithCogSymboltable *v1; // edi
-    unsigned int v2; // eax
     sithCogSymbol *symbol; // esi
-    sithCogSymbol *v5; // ecx
-    int v6; // eax
-    unsigned int v7; // edx
-    char *name; // edx
 
-    v1 = sithCogParse_symbolTable;
-    v2 = sithCogParse_symbolTable->entry_cnt;
-    if ( sithCogParse_symbolTable->max_entries > v2 )
-    {
-        sithCogParse_symbolTable->entry_cnt = v2 + 1;
-        v5 = &sithCogParse_symbolTable->buckets[v2];
-        v6 = cog_yacc_loop_depth + 1;
-        v5->field_14 = cog_yacc_loop_depth;
-        cog_yacc_loop_depth = v6;
-        symbol = v5;
-        v7 = (int)((uint64_t)(2454267027 * ((char *)v5 - (char *)sithCogParse_symbolTable->buckets)) >> 32) >> 4;
-        v5->symbol_id = v1->bucket_idx + (v7 >> 31) + v7;
-    }
-    else
-    {
-        stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", 0);
-        symbol = 0;
-    }
+    symbol = sithCogParse_AddSymbol(sithCogParse_symbolTable, symName);
+    
     if ( symbol )
     {
         symbol->symbol_type = COG_VARTYPE_STR;
-        name = (char *)pSithHS->alloc(_strlen(symName) - 1);
-        symbol->symbol_name = name;
-        _strncpy(name, symName + 1, _strlen(symName) - 2);
+        symbol->symbol_name = (char *)pSithHS->alloc(_strlen(symName) - 1);
+        _strncpy(symbol->symbol_name, symName + 1, _strlen(symName) - 2);
         symbol->symbol_name[_strlen(symName) - 2] = 0;
         yylval.as_int = symbol->symbol_id;
     }

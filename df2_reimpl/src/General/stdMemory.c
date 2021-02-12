@@ -62,7 +62,7 @@ stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int
         result->filePath = filePath;
         v5 = stdMemory_info.allocTop.prev;
         result->lineNum = lineNum;
-        result->alloc = (int)result;
+        result->alloc = (void*)result;
         result->size = allocSize;
         result->prev = v5;
         if ( v5 )
@@ -125,7 +125,7 @@ stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, cha
         {
             result->filePath = filePath;
             v10 = result->prev;
-            result->alloc = (int)result;
+            result->alloc = (void*)result;
             result->size = allocSize;
             result->lineNum = lineNum;
             if ( v10 )

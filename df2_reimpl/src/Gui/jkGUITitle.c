@@ -13,12 +13,15 @@
 #include "Cog/jkCog.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
+#include "World/sithWorld.h"
+#include "General/stdString.h"
+#include "General/stdFnames.h"
 
 static float jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[5] = {
     {ELEMENT_TEXT,  0,  2,  0,  3, {250, 50, 390, 80},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  0, 0xE1,  0, {330, 131, 240, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
+    {ELEMENT_CUSTOM,  0,  0, .extraInt = 0xE1,  0, {330, 131, 240, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_LOADING",  3, {330, 152, 240, 20},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_CUSTOM,  0,  8,  0,  0, {310, 200, 280, 275},  1,  0,  0, jkGuiTitle_UnkDraw,  0,  0, {0},  0},
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
@@ -28,7 +31,7 @@ static jkGuiMenu jkGuiTitle_menuLoad = {jkGuiTitle_elementsLoad, 0xFFFFFFFF, 0xF
 
 static jkGuiElement jkGuiTitle_elementsLoadStatic[6] = {
     {ELEMENT_TEXT,  0,  2, "GUI_LOADING",  3, {60, 280, 520, 30},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  0, 0xE1,  0, {220, 240, 200, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
+    {ELEMENT_CUSTOM,  0,  0, .extraInt = 0xE1,  0, {220, 240, 200, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  1, "GUI_COPYRIGHT1",  3, {10, 420, 620, 30},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  1, "GUI_COPYRIGHT2",  3, {10, 440, 620, 30},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0,  0,  3, {560, 440, 70, 30},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -89,7 +92,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     return retval;
 }
 
-int jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
+void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
 {
     int v4; // esi
     jkGuiStringEntry *v5; // ecx
@@ -132,30 +135,26 @@ int jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf,
             a4a.height = v11;
             v13 = menu->fonts;
             a4a.y = v4;
-            stdFont_Draw3(vbuf, (int)v13[result]->name, v4, &a4a, 1, (jkGuiStringEntry *)v6, 1);
-            v14 = stdFont_sub_4357C0(menu->fonts[v12]->name, v6, &a4a) + v4;
+            stdFont_Draw3(vbuf, (int)v13[result]->name, v4, &a4a, 1, v6, 1);
+            v14 = stdFont_sub_4357C0(menu->fonts[v12], v6, &a4a) + v4;
             result = (*menu->fonts[v12]->bitmap->mipSurfaces)->format.height;
             v4 = ((unsigned int)(3 * result) >> 2) + v14;
             v5 = v16;
         }
         v16 = ++v5;
     }
-
-    return result;
 }
 
-int jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
+void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
 {
-    int result; // eax
     int v6; // ebx
     int v7; // eax
     int v8; // edx
     int v9; // ecx
     int v10; // esi
     rdRect a4a; // [esp+10h] [ebp-10h] BYREF
-    char *a3a; // [esp+24h] [ebp+4h]
+    int a3a; // [esp+24h] [ebp+4h]
 
-    result = g_app_suspended;
     if ( g_app_suspended )
     {
         v6 = element->selectedTextEntry;
@@ -167,7 +166,7 @@ int jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
         {
             v6 = 100;
         }
-        a3a = element->unistr;
+        a3a = element->extraInt;
         element->selectedTextEntry = v6;
         if ( a4 )
             jkGuiRend_CopyVBuffer(menu, &element->rect);
@@ -179,13 +178,11 @@ int jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
         a4a.x = v7 + 3;
         a4a.width = v8;
         v10 = element->rect.height - 6;
-        result = (unsigned int)((unsigned __int64)(0x51EB851F * v9) >> 32) >> 31;
         a4a.height = v10;
         a4a.width = v9 / 100;
         if ( v9 / 100 > 0 && v10 > 0 )
-            result = stdDisplay_VBufferFill(vbuf, (int)a3a, &a4a);
+            stdDisplay_VBufferFill(vbuf, a3a, &a4a);
     }
-    return result;
 }
 
 void jkGuiTitle_WorldLoadCallback(float percentage)
@@ -226,8 +223,8 @@ void jkGuiTitle_ShowLoadingStatic()
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
     guiVersionStr = jkStrings_GetText("GUI_VERSION");
-    jk_snwprintf(v4, 0x10u, guiVersionStr, verMajor, verMinor, verRevision);
-    jkGuiTitle_elementsLoadStatic[4].unistr = (char *)v4;
+    jk_snwprintf(v4, sizeof(v4), guiVersionStr, verMajor, verMinor, verRevision);
+    jkGuiTitle_elementsLoadStatic[4].wstr = v4; // AAAAAAAAAAAAAAAaaaaaa undefined behavior
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);
 }

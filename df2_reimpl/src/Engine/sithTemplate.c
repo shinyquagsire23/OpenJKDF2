@@ -168,7 +168,7 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
 
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {
-        sithThing_ParseArgs(&stdConffile_entry.args[i].key, &tmp);
+        sithThing_ParseArgs(&stdConffile_entry.args[i], &tmp);
     }
 
     if (!tmp.thingType )

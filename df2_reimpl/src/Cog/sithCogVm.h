@@ -13,8 +13,8 @@
 #define sithCogVm_SetMsgFunc_ADDR (0x004E1900)
 #define sithCogVm_SendMsgToPlayer_ADDR (0x004E1910)
 #define sithCogVm_FileWrite_ADDR (0x004E1B30)
-#define sithCogVm_sub_4E1B70_ADDR (0x004E1B70)
-#define sithCogVm_Set104_ADDR (0x004E1DC0)
+#define sithCogVm_Sync_ADDR (0x004E1B70)
+#define sithCogVm_SetNeedsSync_ADDR (0x004E1DC0)
 #define sithCogVm_InvokeMsgByIdx_ADDR (0x004E1DD0)
 #define sithCogVm_SyncWithPlayers_ADDR (0x004E1E00)
 #define sithCogVm_ClearMsgTmpBuf_ADDR (0x004E1EC0)
@@ -211,9 +211,6 @@ typedef struct net_msg
     uint32_t msg_size;
     uint16_t msg_id;
     uint16_t field_26;
-    char strptr_8B4C28[4];
-    uint32_t some_thing_id;
-    uint16_t net_num_players;
 } net_msg;
 
 typedef int (__cdecl *cogMsg_Handler)(net_msg*);
@@ -315,9 +312,9 @@ typedef struct sithCog
 #define sithCogVm_MsgTmpBuf (*(cogMsg_Entry**)0x837468)
 #define sithCogVm_jkl_map_idk (*(jkl_map_idk*)0x00847968)
 #define sithCogVm_globals (*(sithCogVmGlobals*)0x00847D68)
-#define sithCogVm_idk (*(int*)0x00847E6C)
-#define sithCogVm_isMultiplayer (*(int*)0x847E70)
-#define sithCogVm_multiIdk (*(int*)0x847E74)
+#define sithCogVm_needsSync (*(int*)0x00847E6C)
+#define sithCogVm_multiplayerFlags (*(int*)0x847E70)
+#define sithCogVm_bSyncMultiplayer (*(int*)0x847E74)
 #define sithCogVm_idk2 (*(int*)0x00847E7C)
 #define sithCogVm_bInit (*(int*)0x00847E80)
 #define sithCogVm_dword_847E84 (*(int*)0x00847E84)
@@ -327,7 +324,7 @@ int sithCogVm_Startup();
 void sithCogVm_Shutdown();
 void sithCogVm_SetMsgFunc(int msgid, void *func);
 
-void sithCogVm_Set104();
+void sithCogVm_SetNeedsSync();
 int sithCogVm_InvokeMsgByIdx(net_msg *a1);
 void sithCogVm_ClearMsgTmpBuf();
 

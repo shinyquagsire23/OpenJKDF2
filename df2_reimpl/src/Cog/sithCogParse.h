@@ -53,7 +53,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt);
 int sithCogParse_ReallocSymboltable(sithCogSymboltable *table);
 void sithCogParse_FreeSymboltable(sithCogSymboltable *table);
 sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *symbolName);
-void* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2);
+sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2);
 sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int idx);
 int sithCogParse_GetSymbolScriptIdx(unsigned int idx);
 sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
@@ -70,8 +70,9 @@ void sithCogParse_RecurseWrite(sith_cog_parser_node *node);
 //sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector);
 //sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
 
-//static cogSymbol* (__cdecl *sithCogParse_GetSymbol)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
+static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
 //static int (*sithCogParse_RecurseWrite)(sith_cog_parser_node *node) = (void*)sithCogParse_RecurseWrite_ADDR;
+
 static int (*sithCogParse_ParseSymbol)(sithCogScript *a1, int a2, int a3) = (void*)sithCogParse_ParseSymbol_ADDR;
 static int (*sithCogParse_ParseFlex)(sithCogScript *a1, int a2) = (void*)sithCogParse_ParseFlex_ADDR;
 static int (*sithCogParse_ParseInt)(sithCogScript *a1, int a2) = (void*)sithCogParse_ParseInt_ADDR;
@@ -88,7 +89,7 @@ static int (*sithCogParse_ParseMessage)(sithCogScript *a1) = (void*)sithCogParse
 #define cogvm_stack (*(int**)0x00855CC8)
 #define cogparser_num_nodes (*(int*)0x00855CE0)
 #define cogparser_current_nodeidx (*(int*)0x00855CDC)
-#define parsing_script (*(int*)0x00855CD4)
+#define parsing_script (*(sithCogScript**)0x00855CD4)
 #define parsing_script_idk (*(int*)0x0054C854)
 
 int cog_parsescript();

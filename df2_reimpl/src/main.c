@@ -267,7 +267,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
     hook_function(sithCogVm_Shutdown_ADDR, sithCogVm_Shutdown);
     hook_function(sithCogVm_SetMsgFunc_ADDR, sithCogVm_SetMsgFunc);
-    hook_function(sithCogVm_Set104_ADDR, sithCogVm_Set104);
+    hook_function(sithCogVm_SetNeedsSync_ADDR, sithCogVm_SetNeedsSync);
     hook_function(sithCogVm_InvokeMsgByIdx_ADDR, sithCogVm_InvokeMsgByIdx);
     hook_function(sithCogVm_ClearMsgTmpBuf_ADDR, sithCogVm_ClearMsgTmpBuf);
     hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
@@ -404,7 +404,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogYACC_yy_delete_buffer_ADDR, yy_delete_buffer);
     hook_function(sithCogYACC_yy_init_buffer_ADDR, yy_init_buffer);
     //hook_function();
-    //hook_function(sithCogYACC_yyparse_ADDR, yyparse);
+    //hook_function(sithCogYACC_yyparse_ADDR, yyparse);*/
     
     // DirectX
     /*hook_function(DirectX_DirectDrawEnumerateA_ADDR, DirectX_DirectDrawEnumerateA);

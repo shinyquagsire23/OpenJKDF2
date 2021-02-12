@@ -14,9 +14,11 @@
 #include "Gui/jkGUIMap.h"
 #include "Gui/jkGUISaveLoad.h"
 #include "Gui/jkGUISetup.h"
+#include "Gui/jkGUIForce.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithNet.h"
 #include "Main/jk.h"
+#include "Main/jkStrings.h"
 
 static int jkGuiEsc_bInitialized;
 

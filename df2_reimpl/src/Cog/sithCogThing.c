@@ -46,7 +46,7 @@ void sithCogThing_CreateThing(sithCog *ctx)
     v2 = sithCogVm_PopTemplate(ctx);
     if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
     {
-        if ( sithCogVm_isMultiplayer )
+        if ( sithCogVm_multiplayerFlags )
         {
             if ( !(ctx->flags & 0x200) )
             {
@@ -73,7 +73,7 @@ void sithCogThing_CreateThingNr(sithCog *ctx)
     v2 = sithCogVm_PopTemplate(ctx);
     if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
     {
-        if ( sithCogVm_isMultiplayer )
+        if ( sithCogVm_multiplayerFlags )
         {
             if ( !(ctx->flags & 0x200) )
             {
@@ -100,7 +100,7 @@ void sithCogThing_createThingUnused(sithCog *ctx)
     v2 = sithCogVm_PopTemplate(ctx);
     if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
     {
-        if ( sithCogVm_isMultiplayer )
+        if ( sithCogVm_multiplayerFlags )
         {
             if ( !(ctx->flags & 0x200) )
             {
@@ -169,7 +169,7 @@ void sithCogThing_createThingAtPos_nr(sithCog *ctx)
     v7 = sithThing_SpawnThingInSector(popTemplate, &pos, &a3, popSector, 0);
     if ( v7 )
     {
-        if ( sithCogVm_isMultiplayer )
+        if ( sithCogVm_multiplayerFlags )
         {
             if ( !(ctx->flags & 0x200) )
             {
@@ -196,7 +196,7 @@ void sithCogThing_DamageThing(sithCog *ctx)
     {
         if ( !thing )
             thing = thing2;
-        if ( sithCogVm_isMultiplayer )
+        if ( sithCogVm_multiplayerFlags )
         {
             if ( !(ctx->flags & 0x200) )
             {
@@ -252,7 +252,7 @@ void sithCogThing_DestroyThing(sithCog *ctx)
     if (!thing)
         return;
 
-    if (sithCogVm_isMultiplayer 
+    if (sithCogVm_multiplayerFlags 
         && !(ctx->flags & 0x200) 
         && ctx->trigId != SITH_MESSAGE_STARTUP 
         && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
@@ -295,7 +295,7 @@ void sithCogThing_MoveToFrame(sithCog *ctx)
 
         sithTrackThing_MoveToFrame(thing, frame, speed);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200) 
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
@@ -315,7 +315,7 @@ void sithCogThing_SkipToFrame(sithCog *ctx)
 
         sithTrackThing_SkipToFrame(thing, frame, speed);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200) 
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
@@ -485,7 +485,7 @@ void sithCogThing_StopThing(sithCog *ctx)
     if ( thing->move_type == MOVETYPE_PATH )
     {
         sithTrackThing_Stop(thing);
-        if (sithCogVm_isMultiplayer && !(ctx->flags & 0x200) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+        if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
             sithSector_cogMsg_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
     }
     else if (thing->move_type == MOVETYPE_PHYSICS)
@@ -616,7 +616,7 @@ void sithCogThing_SetThingPos(sithCog *ctx)
     if (thing)
     {
         rdVector_Copy3(&thing->position, &poppedVec);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -740,7 +740,7 @@ void sithCogThing_SetThingVel(sithCog *ctx)
     if ( thing && thing->move_type == MOVETYPE_PHYSICS)
     {
         rdVector_Copy3(&thing->physicsParams.vel, &poppedVec);
-        if ( sithCogVm_isMultiplayer 
+        if ( sithCogVm_multiplayerFlags 
              && !(ctx->flags & 0x200)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -759,7 +759,7 @@ void sithCogThing_ApplyForce(sithCog *ctx)
     if ( thing && thing->move_type == MOVETYPE_PHYSICS)
     {
         sithSector_ThingApplyForce(thing, &poppedVec);
-        if ( sithCogVm_isMultiplayer 
+        if ( sithCogVm_multiplayerFlags 
              && !(ctx->flags & 0x200)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -778,7 +778,7 @@ void sithCogThing_AddThingVel(sithCog *ctx)
     if ( thing && thing->move_type == MOVETYPE_PHYSICS)
     {
         rdVector_Add3Acc(&thing->physicsParams.vel, &poppedVec);
-        if ( sithCogVm_isMultiplayer 
+        if ( sithCogVm_multiplayerFlags 
              && !(ctx->flags & 0x200)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
              && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -836,7 +836,7 @@ void sithCogThing_DetachThing(sithCog *ctx)
     if (thing)
     {
         sithThing_DetachThing(thing);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -865,7 +865,7 @@ void sithCogThing_AttachThingToSurf(sithCog *ctx)
     if (thing && surface)
     {
         sithThing_AttachToSurface(thing, surface, 1);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -883,7 +883,7 @@ void sithCogThing_AttachThingToThing(sithCog *ctx)
     if (thing && attached)
     {
         sithThing_AttachThing(thing, attached);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -904,7 +904,7 @@ void sithCogThing_AttachThingToThingEx(sithCog *ctx)
         sithThing_AttachThing(thing, attached);
         thing->attach_flags |= attachFlags;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -924,7 +924,7 @@ void sithCogThing_PlayMode(sithCog *ctx)
         if (track >= 0)
         {
             sithCogVm_PushInt(ctx, track);
-            if (sithCogVm_isMultiplayer 
+            if (sithCogVm_multiplayerFlags 
                 && !(ctx->flags & 0x200)
                 && ctx->trigId != SITH_MESSAGE_STARTUP 
                 && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -969,7 +969,7 @@ void sithCogThing_PlayKey(sithCog *ctx)
                 sithTrackThing_Stop(thing);
             rdVector_Copy3(&thing->trackParams.field_48, &thing->position);
         }
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1001,7 +1001,7 @@ void sithCogThing_StopKey(sithCog *ctx)
         int v6 = puppet->tracks[track].field_130;
         if ( sithPuppet_StopKey(puppet, track, poppedFlex) )
         {
-            if (sithCogVm_isMultiplayer 
+            if (sithCogVm_multiplayerFlags 
                 && !(ctx->flags & 0x200)
                 && ctx->trigId != SITH_MESSAGE_STARTUP 
                 && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1032,7 +1032,7 @@ void sithCogThing_SetThingModel(sithCog *ctx)
 
         sithCogVm_PushInt(ctx, v5);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1065,7 +1065,7 @@ void sithCogThing_SetArmedMode(sithCog *ctx)
     {
         sithPuppet_SetArmedMode(thing, poppedInt);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1094,7 +1094,7 @@ void sithCogThing_SetThingFlags(sithCog *ctx)
     {
         thing->thingflags |= flags;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1112,7 +1112,7 @@ void sithCogThing_ClearThingFlags(sithCog *ctx)
     {
         thing->thingflags &= ~flags;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1141,7 +1141,7 @@ void sithCogThing_TeleportThing(sithCog *ctx)
         if ( thing == g_localPlayerThing )
             sithCamera_FollowFocus(sithCamera_currentCamera);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1179,7 +1179,7 @@ void sithCogThing_SetCollideType(sithCog *ctx)
     {
         thing->collide = collideType;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1215,7 +1215,9 @@ void sithCogThing_NextThingInSector(sithCog *ctx)
 
     thing = sithCogVm_PopThing(ctx);
     if ( thing && (nextThing = thing->nextThing) != 0 )
+    {
         sithCogVm_PushInt(ctx, nextThing->thingIdx);
+    }
     else
         sithCogVm_PushInt(ctx, -1);
 }
@@ -1430,7 +1432,7 @@ void sithCogThing_SetThingCurGeoMode(sithCog *ctx)
     if (thing)
     {
         thing->rdthing.geometryMode = mode;
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1505,7 +1507,7 @@ void sithCogThing_SetLifeLeft(sithCog *ctx)
     if ( thing && lifeLeftSecs >= 0.0)
     {
         thing->lifeLeftMs = (int)(lifeLeftSecs * 1000.0);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1639,7 +1641,7 @@ void sithCogThing_SetPhysicsFlags(sithCog *ctx)
     if (thing && flags && thing->move_type == MOVETYPE_PHYSICS)
     {
         thing->physicsParams.physflags |= flags;
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1737,7 +1739,7 @@ void sithCogThing_SetThingRotVel(sithCog *ctx)
     if ( thing && thing->move_type == MOVETYPE_PHYSICS)
     {
         rdVector_Copy3(&thing->physicsParams.angVel, &popped_vector3);
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1768,7 +1770,7 @@ void sithCogThing_SetThingLook(sithCog *ctx)
         rdVector_Normalize3Acc(&popped_vector3);
         rdMatrix_BuildFromLook34(&thing->lookOrientation, &popped_vector3);
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1870,7 +1872,7 @@ void sithCogThing_SetThingAttachFlags(sithCog *ctx)
     {
         thing->attach_flags |= flags;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -1889,7 +1891,7 @@ void sithCogThing_ClearThingAttachFlags(sithCog *ctx)
     {
         thing->attach_flags &= ~flags;
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -2008,7 +2010,7 @@ void sithCogThing_SetXFlags(sithCog *ctx)
                 break;
         }
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -2039,7 +2041,7 @@ void sithCogThing_ClearXFlags(sithCog *ctx)
                 break;
         }
 
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
@@ -2175,7 +2177,7 @@ void sithCogThing_SetThingMass(sithCog *ctx)
     if (thing && thing->move_type == MOVETYPE_PHYSICS)
     {
         thing->physicsParams.mass = mass;
-        if (sithCogVm_isMultiplayer 
+        if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)

@@ -57,7 +57,7 @@ typedef struct sithUnk3SearchResult
 } sithUnk3SearchResult;
 
 int sithUnk3_Startup();
-void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, int func, int a4);
+void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, void* func, int a4);
 void sithUnk3_RegisterHitHandler(int thingType, void* a2);
 sithUnk3SearchEntry* sithUnk3_NextSearchResult();
 

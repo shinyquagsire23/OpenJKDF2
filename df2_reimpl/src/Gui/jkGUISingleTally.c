@@ -15,6 +15,7 @@
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
+#include "General/stdString.h"
 
 static jkGuiElement jkGuiSingleTally_buttons[8] = {
 {ELEMENT_TEXT, 0, 2, 0, 3, {0, 20, 640, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -39,9 +40,9 @@ int jkGuiSingleTally_Show()
     jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
     jkGuiRend_MenuSetLastElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
     jkGuiRend_SetDisplayingStruct(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);
-    jkGuiSingleTally_buttons[0].unistr = jkPlayer_playerShortName;
+    jkGuiSingleTally_buttons[0].wstr = jkPlayer_playerShortName;
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (jkPlayer_CalcAlignment(0) >= 0.0) ? 'L' : 'D');
-    jkGuiSingleTally_buttons[1].unistr = jkStrings_GetText(std_genBuffer);
+    jkGuiSingleTally_buttons[1].wstr = jkStrings_GetText(std_genBuffer);
     if ( (int)sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS) <= 0 )
     {
         jk_snwprintf(v14, 0x20u, L"%ls %ls", jkStrings_GetText("GUI_SECRETS_FOUND"), jkStrings_GetText("GUI_NO_SECRETS"));
@@ -50,8 +51,8 @@ int jkGuiSingleTally_Show()
     {
         jk_snwprintf(v14, 0x20u, L"%ls %d/%d", jkStrings_GetText("GUI_SECRETS_FOUND"), (int)sithPlayer_GetBinAmt(SITHBIN_SECRETS), (int)sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS));
     }
-    jkGuiSingleTally_buttons[2].unistr = v14;
-    jkGuiSingleTally_buttons[3].unistr = jkStrings_GetText("GUI_STARS_EARNED");
+    jkGuiSingleTally_buttons[2].wstr = v14;
+    jkGuiSingleTally_buttons[3].wstr = jkStrings_GetText("GUI_STARS_EARNED");
     do
     {
         v7 = 1;

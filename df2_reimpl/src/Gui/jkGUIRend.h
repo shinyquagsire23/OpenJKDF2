@@ -126,8 +126,8 @@ struct jkGuiElement
     int field_8;
     union
     {
-      jkGuiStringEntry *unistr;
       const char* str;
+      jkGuiStringEntry *unistr;
       wchar_t* wstr;
       int extraInt;
     };
@@ -139,7 +139,11 @@ struct jkGuiElement
     rdRect rect;
     int bIsVisible;
     int anonymous_9;
-    const char* hintText;
+    union
+    {
+        const char* hintText;
+        wchar_t* wHintText;
+    };
     jkGuiDrawFunc_t drawFuncOverride;
     jkGuiButtonUpFunc_t func;
     void *anonymous_13;
@@ -245,7 +249,7 @@ int jkGuiRend_ElementHasHoverSound(jkGuiElement *element);
 void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, int forceRedraw);
 int jkGuiRend_InvokeButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4);
 int jkGuiRend_InvokeButtonUp(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, int a5);
-int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu);
+int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 void jkGuiRend_RenderFocused(jkGuiMenu *menu, jkGuiElement *element);
 void jkGuiRend_RenderIdk2(jkGuiMenu *menu);
 void jkGuiRend_RenderAll(jkGuiMenu *menu);
@@ -259,7 +263,7 @@ void jkGuiRend_HoverOn(jkGuiElement *element, jkGuiMenu *menu, int a3);
 int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mouseY, int mouseX);
 void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *vbuf, int a4);
 void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
-int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu);
+int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam);
 void jkGuiRend_UpdateMouse();
 void jkGuiRend_FlipAndDraw(jkGuiMenu *menu, rdRect *drawRect);
@@ -267,7 +271,7 @@ void jkGuiRend_GetMousePos(int *pX, int *pY);
 void jkGuiRend_ResetMouseLatestMs();
 void jkGuiRend_InvalidateGdi();
 int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, signed int a4);
-int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 int jkGuiRend_TextBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4);
 void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *outBuf, int redraw);

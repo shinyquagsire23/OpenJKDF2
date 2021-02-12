@@ -19,6 +19,7 @@
 #include "World/jkPlayer.h"
 #include "Main/Main.h"
 #include "Main/jkGame.h"
+#include "Main/jkStrings.h"
 #include "Cog/jkCog.h"
 
 const char* jkGui_aBitmaps[35] = {
@@ -89,9 +90,9 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
     {
         if ( iter->hintText )
         {
-            wchar_t* text = jkStrings_GetText2((const char *)iter->hintText);
+            wchar_t* text = jkStrings_GetText2(iter->hintText);
             if ( text )
-                iter->hintText = (jkGuiStringEntry *)text;
+                iter->wHintText = text;
         }
 
         if ( !iter->type || iter->type == 2 || iter->type == 3 )

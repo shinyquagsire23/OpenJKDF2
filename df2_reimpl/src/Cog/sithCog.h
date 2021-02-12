@@ -21,8 +21,6 @@
 #define sithCog_HandleThingTimerPulse_ADDR (0x004DEA60)
 #define sithCog_SendMessageToAll_ADDR (0x4DEB00)
 
-#define sithCogYACC_yyparse_ADDR (0x50BF50)
-
 typedef int SITH_MESSAGE;
 
 enum SITH_MESSAGE_E

@@ -29,14 +29,14 @@ int sithUnk3_Startup()
     sithUnk3_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_COG, sithWeapon_Collide, 0);
     sithUnk3_RegisterCollisionHandler(THINGTYPE_ITEM, THINGTYPE_PLAYER, sithItem_Collide, 0);
 
-    sithUnk3_RegisterHitHandler(THINGTYPE_ACTOR, sithUnk4_sub_4ED1D0_ADDR);
+    sithUnk3_RegisterHitHandler(THINGTYPE_ACTOR, (void*)sithUnk4_sub_4ED1D0_ADDR);
     sithUnk3_RegisterHitHandler(THINGTYPE_WEAPON, sithWeapon_HitDebug);
 
     sithUnk3_initted = 1;
     return 1;
 }
 
-void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, int func, int a4)
+void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, void* func, int a4)
 {
     int idx = idxB + 12 * idxA;
     sithUnk3_collisionHandlers[idx].handler = func;

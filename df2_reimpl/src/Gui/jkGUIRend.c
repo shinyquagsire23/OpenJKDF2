@@ -779,7 +779,7 @@ int jkGuiRend_InvokeButtonUp(jkGuiElement *clickable, jkGuiMenu *menu, int mouse
     return menu->lastButtonUp;
 }
 
-int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu)
+int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
 {
     jkGuiRend_PlayWav(menu->soundClick);
     return element->hoverId;
@@ -1428,7 +1428,7 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     }
 }
 
-int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu)
+int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
 {
     element->selectedTextEntry = element->selectedTextEntry == 0;
     jkGuiRend_UpdateAndDrawClickable(element, menu, 1);
@@ -1815,12 +1815,11 @@ LABEL_24:
     }
 }
 
-int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
     unsigned int v6; // edi
     signed int *v7; // eax
     signed int v8; // ebx
-    signed int result; // eax
     stdBitmap *v10; // ebx
     stdBitmap *v11; // ebp
     int v12; // ebp
@@ -1876,11 +1875,10 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
     v7 = (signed int *)element->anonymous_13;
     v43 = 0;
     v8 = v7[1];
-    result = *v7;
     v10 = menu->ui_structs[v8];
-    v11 = menu->ui_structs[result];
+    v11 = menu->ui_structs[*v7];
     v44 = v10;
-    elementa = menu->ui_structs[result];
+    elementa = menu->ui_structs[*v7];
     if ( v10 && v11 )
     {
         if ( element == menu->lastMouseOverClickable )
@@ -1982,9 +1980,8 @@ int jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbu
         drawRect.height = v42 - blitY2;
         drawRect.x = blitX2 - v35;
         drawRect.y = blitY2 - v39;
-        return stdDisplay_VBufferCopy(vbuf, v44->mipSurfaces[v43], blitX2, blitY2, &drawRect, 1);
+        stdDisplay_VBufferCopy(vbuf, v44->mipSurfaces[v43], blitX2, blitY2, &drawRect, 1);
     }
-    return result;
 }
 
 int jkGuiRend_TextBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)

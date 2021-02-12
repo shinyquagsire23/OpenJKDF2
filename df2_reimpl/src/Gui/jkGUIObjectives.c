@@ -13,6 +13,8 @@
 #include "World/jkPlayer.h"
 #include "Win95/stdDisplay.h"
 #include "Cog/jkCog.h"
+#include "Main/jkStrings.h"
+#include "General/stdString.h"
 
 static jkGuiStringEntry jkGuiObjectives_aTexts[50];
 
