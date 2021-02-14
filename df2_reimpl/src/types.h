@@ -12,19 +12,27 @@
 #define LPDIRECTPLAYLOBBYA void*
 #define LPDIRECTSOUND void*
 
-typedef struct sithThing sithThing;
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
-typedef struct stdVBuffer stdVBuffer;
-typedef struct sithSurface sithSurface;
-typedef struct sithSound sithSound;
+
+typedef struct sithAIClass sithAIClass;
 typedef struct sithCog sithCog;
+typedef struct sithCogMsg sithCogMsg;
+typedef struct sithSector sithSector;
+typedef struct sithSound sithSound;
+typedef struct sithSurface sithSurface;
+typedef struct sithThing sithThing;
 typedef struct sithWorld sithWorld;
+
 typedef struct stdStrTable stdStrTable;
+typedef struct stdConffileArg stdConffileArg;
+typedef struct stdHashTable stdHashTable;
+typedef struct stdVBuffer stdVBuffer;
+
+typedef struct rdColormap rdColormap;
+typedef struct rdSprite rdSprite;
+typedef struct rdEdge rdEdge;
 typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
-typedef struct stdConffileArg stdConffileArg;
-typedef struct rdEdge rdEdge;
-typedef struct stdHashTable stdHashTable;
 
 #endif // TYPES_H

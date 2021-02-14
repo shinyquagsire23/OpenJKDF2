@@ -1826,7 +1826,7 @@ sithPlayer_debug_loadauto	.text	004C8E10	000000A9	00000084	00000004	R	.	.	.	.	.	
 sithPlayer_debug_ToNextCheckpoint	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C9060	.text	004C9060	0000005E	00000004	00000008	R	.	.	.	.	.	.	.
 sithPlayer_FindPlayerByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	.	T	.
-sithPlayer_DoesNetIdExist	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
+sithPlayer_ThingIdxToPlayerIdx	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C9150	.text	004C9150	00000086	0000000C	00000008	R	.	.	.	.	.	.	.
 sithPlayer_HandleSentDeathPkt	.text	004C91E0	00000161	00000088	00000004	R	.	.	.	.	.	.	.
 sithPlayer_GetBinAmt	.text	004C9350	00000025	00000000	00000004	R	.	.	.	.	.	T	.
@@ -1845,7 +1845,7 @@ sithDplay_EnumSessions	.text	004C9600	00000013	00000000	00000008	R	.	.	.	.	.	T	.
 sithDplay_EnumSessions2	.text	004C9620	00000005	00000054	00000000	R	.	.	.	.	.	.	.
 sithDplay_EnumPlayers	.text	004C9630	0000000E	00000000	00000004	R	.	.	.	.	.	.	.
 sithDplay_SendToPlayer	.text	004C9640	000000C9	00000010	00000008	R	.	.	.	.	.	.	.
-sithDplay_Recv	.text	004C9710	00000090	00000008	00000004	R	.	.	.	.	.	.	.
+sithDplay_Recv	.text	004C9710	00000090	00000008	00000004	R	.	.	.	.	.	T	.
 sithDplay_Open	.text	004C97A0	0000007F	00000004	00000008	R	.	.	.	.	.	T	.
 sithDplay_Close	.text	004C9820	00000025			R	.	.	.	.	.	.	.
 sithDplay_CreatePlayer	.text	004C9850	0000007B	00000004	00000004	R	.	.	.	.	.	.	.
@@ -2252,17 +2252,17 @@ sithCogPlayer_GetNumPlayersInTeam	.text	004E15F0	00000047	00000008	00000004	R	.	
 sithCogPlayer_AddScoreToTeamMembers	.text	004E1640	00000048	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogPlayer_SetBinWait	.text	004E1690	00000056	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogPlayer_SyncScores	.text	004E16F0	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Startup	.text	004E1700	000001D5			R	.	.	.	.	.	.	.
+sithCogVm_Startup	.text	004E1700	000001D5	00000000	00000000	R	.	.	.	.	.	.	.
 sithCogVm_Shutdown	.text	004E18E0	00000014			R	.	.	.	.	.	T	.
 sithCogVm_SetMsgFunc	.text	004E1900	00000010	00000000	00000008	R	.	.	.	.	.	T	.
 sithCogVm_SendMsgToPlayer	.text	004E1910	00000211	0000000C	00000010	R	.	.	.	.	.	T	.
 sithCogVm_FileWrite	.text	004E1B30	00000034	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogVm_sub_4E1B70	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
-sithCogVm_Set104	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
+sithCogVm_Sync	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
+sithCogVm_SetNeedsSync	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 sithCogVm_InvokeMsgByIdx	.text	004E1DD0	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogVm_SyncWithPlayers	.text	004E1E00	000000BB	00000000	00000000	R	.	.	.	.	.	.	.
 sithCogVm_ClearMsgTmpBuf	.text	004E1EC0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
-sithCogVm_ClearTmpBuf2_cogmsg_40	.text	004E1EE0	0000007F	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogVm_cogMsg_Reset	.text	004E1EE0	0000007F	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogVm_Exec	.text	004E1F60	0000038A	000000A0	00000004	R	.	.	.	.	.	T	.
 sithCogVm_ExecCog	.text	004E2350	000000EC	00000008	00000008	R	.	.	.	.	.	T	.
 sithCogVm_PopValue	.text	004E2440	000000A6	00000018	00000008	R	.	.	.	.	.	T	.
@@ -2660,14 +2660,14 @@ sithThingPlayer_cogMsg_SendSendTrigger	.text	004FC520	00000104	0000000C	00000030
 sithThingPlayer_cogMsg_HandleSendTrigger	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
 sithThingPlayer_cogMsg_SendSyncCog	.text	004FC770	0000012C	00000010	0000000C	R	.	.	.	.	.	T	.
 sithThingPlayer_cogMsg_HandleSyncCog	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	.	.
-sithCogParse_Reset	.text	004FC9A0	0000002A			R	.	.	.	.	.	.	.
+sithCogParse_Reset	.text	004FC9A0	0000002A			R	.	.	.	.	.	T	.
 sithCogParse_Load	.text	004FC9D0	00000391	00000010	0000000C	R	.	.	.	.	.	T	.
 sithCogParse_LoadEntry	.text	004FCD70	000001F3	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_copy_symboltable	.text	004FCFD0	0000007A	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_alloc_symboltable	.text	004FD050	000000DF	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_Free	.text	004FD130	00000082	00000010	00000004	R	.	.	.	.	.	.	.
-sithCogParse_free_symboltable	.text	004FD1C0	00000095	00000010	00000004	R	.	.	.	.	.	.	.
-sithCogParse_AddSymbol	.text	004FD260	000000EA	00000004	00000008	R	.	.	.	.	.	.	.
+sithCogParse_CopySymboltable	.text	004FCFD0	0000007A	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_NewSymboltable	.text	004FD050	000000DF	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_ReallocSymboltable	.text	004FD130	00000082	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_FreeSymboltable	.text	004FD1C0	00000095	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_AddSymbol	.text	004FD260	000000EA	00000004	00000008	R	.	.	.	.	.	T	.
 sithCogParse_SetSymbolVal	.text	004FD350	00000022	00000000	00000008	R	.	.	.	.	.	T	.
 sithCogParse_GetSymbolVal	.text	004FD380	00000046	00000008	00000008	R	.	.	.	.	.	T	.
 sithCogParse_GetSymbol	.text	004FD3D0	00000035	00000000	00000008	R	.	.	.	.	.	T	.
@@ -2680,12 +2680,12 @@ sithCogParse_LexAddSymbol	.text	004FD7F0	000000EA	0000000C	00000004	R	.	.	.	.	.	
 sithCogParse_LexScanVector3	.text	004FD8E0	00000045	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogParse_IncrementLoopdepth	.text	004FD930	00000010			R	.	.	.	.	.	.	.
 sithCogParse_RecurseStackdepth	.text	004FD940	00000083	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogParse_recurse_write	.text	004FDA00	0000009F	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogParse_ParseSymbol	.text	004FDAE0	00000321	00000024	0000000C	R	.	.	.	.	.	.	.
-sithCogParse_ParseFlex	.text	004FDE10	00000221	00000028	00000008	R	.	.	.	.	.	.	.
-sithCogParse_ParseInt	.text	004FE040	00000238	00000028	00000008	R	.	.	.	.	.	.	.
-sithCogParse_ParseVector	.text	004FE280	00000246	00000028	00000008	R	.	.	.	.	.	.	.
-sithCogParse_ParseMessage	.text	004FE4D0	000001A1	00000018	00000004	R	.	.	.	.	.	.	.
+sithCogParse_RecurseWrite	.text	004FDA00	0000009F	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogParse_ParseSymbol	.text	004FDAE0	00000321	00000024	0000000C	R	.	.	.	.	.	T	.
+sithCogParse_ParseFlex	.text	004FDE10	00000221	00000028	00000008	R	.	.	.	.	.	T	.
+sithCogParse_ParseInt	.text	004FE040	00000238	00000028	00000008	R	.	.	.	.	.	T	.
+sithCogParse_ParseVector	.text	004FE280	00000246	00000028	00000008	R	.	.	.	.	.	T	.
+sithCogParse_ParseMessage	.text	004FE4D0	000001A1	00000018	00000004	R	.	.	.	.	.	T	.
 sithCogSector_Initialize	.text	004FE680	0000021B	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogSector_GetTint	.text	004FE8A0	00000050	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogSector_SetTint	.text	004FE8F0	00000102	00000010	00000004	R	.	.	.	.	.	T	.

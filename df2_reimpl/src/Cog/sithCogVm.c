@@ -7,9 +7,17 @@
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
+#include "World/sithPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithSound.h"
+#include "Engine/sithTime.h"
+#include "World/jkPlayer.h"
+#include "Win95/sithDplay.h"
+#include "Main/jkGame.h"
+#include "Engine/sithNet.h"
+#include "Engine/sithMulti.h"
+#include "AI/sithAIClass.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -57,58 +65,57 @@
 #define cogMsg_HandleSyncCog ((void*)0x004FC8A0)
 #define cogmsg_31 ((void*)0x4FA5D0)
 #define sithDplay_cogMsg_HandleEnumPlayers ((void*)0x004C9A40)
-#define sithCogVm_ClearTmpBuf2_cogmsg_40 ((void*)0x004E1EE0)
 
 
 int sithCogVm_Startup()
 {
     if (sithCogVm_bInit)
         return 0;
-    _memset(&sithCogVm_globals, 0, sizeof(sithCogVm_globals));
-    _memset(&sithCogVm_jkl_map_idk, 0, sizeof(sithCogVm_jkl_map_idk));
+    _memset(sithCogVm_msgFuncs, 0, sizeof(cogMsg_Handler) * 65);
+    _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80);
     sithCogVm_dword_847E84 = 0;
-    jkl_map_idk_set_one = 1;
-    sithCogVm_globals.msgFuncs[COGMSG_TELEPORTTHING] = cogMsg_HandleTeleportThing;
-    sithCogVm_globals.msgFuncs[COGMSG_FIREPROJECTILE] = cogMsg_HandleFireProjectile;
-    sithCogVm_globals.msgFuncs[COGMSG_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
-    sithCogVm_globals.msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;
-    sithCogVm_globals.msgFuncs[COGMSG_DEATH] = cogMsg_HandleDeath;
-    sithCogVm_globals.msgFuncs[COGMSG_DAMAGE] = cogMsg_HandleDamage;
-    sithCogVm_globals.msgFuncs[COGMSG_SENDTRIGGER] = cogMsg_HandleSendTrigger;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
-    sithCogVm_globals.msgFuncs[COGMSG_PLAYSOUNDPOS] = cogMsg_HandlePlaySoundPos;
-    sithCogVm_globals.msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCTHINGFULL] = cogMsg_HandleSyncThingFull;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCCOG] = cogMsg_HandleSyncCog;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCSURFACE] = cogMsg_HandleSyncSurface;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCAI] = cogMsg_HandleSyncAI;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCITEMDESC] = cogMsg_HandleSyncItemDesc;
-    sithCogVm_globals.msgFuncs[COGMSG_STOPANIM] = cogMsg_HandleStopAnim;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCSECTOR] = cogMsg_HandleSyncSector;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCTHINGFRAME] = cogmsg_HandleSyncThingFrame;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCPUPPET] = cogMsg_HandleSyncPuppet;
-    sithCogVm_globals.msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = cogMsg_HandleSyncThingAttachment;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCTIMERS] = cogMsg_HandleSyncTimers;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCCAMERAS] = cogMsg_HandleSyncCameras;
-    sithCogVm_globals.msgFuncs[COGMSG_TAKEITEM1] = cogMsg_HandleTakeItem;
-    sithCogVm_globals.msgFuncs[COGMSG_TAKEITEM2] = cogMsg_HandleTakeItem;
-    sithCogVm_globals.msgFuncs[COGMSG_STOPKEY] = cogMsg_HandleStopKey;
-    sithCogVm_globals.msgFuncs[COGMSG_STOPSOUND] = cogMsg_HandleStopSound;
-    sithCogVm_globals.msgFuncs[COGMSG_CREATETHING] = cogMsg_HandleCreateThing;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCPALEFFECTS] = cogMsg_HandleSyncPalEffects;
-    sithCogVm_globals.msgFuncs[COGMSG_ID_1F] = cogmsg_31;
-    sithCogVm_globals.msgFuncs[COGMSG_CHAT] = sithMulti_HandleChat;
-    sithCogVm_globals.msgFuncs[COGMSG_DESTROYTHING] = cogMsg_HandleDestroyThing;
-    sithCogVm_globals.msgFuncs[COGMSG_SYNCSECTORALT] = cogMsg_HandleSyncSectorAlt;
-    sithCogVm_globals.msgFuncs[COGMSG_SOUNDCLASSPLAY] = cogMsg_HandleSoundClassPlay;
-    sithCogVm_globals.msgFuncs[COGMSG_OPENDOOR] = cogMsg_HandleOpenDoor;
-    sithCogVm_globals.msgFuncs[COGMSG_SETTHINGMODEL] = cogMsg_HandleSetThingModel;
-    sithCogVm_globals.msgFuncs[COGMSG_PING] = sithMulti_HandlePing;
-    sithCogVm_globals.msgFuncs[COGMSG_PINGREPLY] = sithMulti_HandlePingResponse;
-    sithCogVm_globals.msgFuncs[COGMSG_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
-    sithCogVm_globals.msgFuncs[COGMSG_RESET] = sithCogVm_ClearTmpBuf2_cogmsg_40;
-    sithCogVm_globals.msgFuncs[COGMSG_KICK] = sithMulti_HandleKickPlayer;
+    sithCogVm_msgId = 1;
+    sithCogVm_msgFuncs[COGMSG_TELEPORTTHING] = cogMsg_HandleTeleportThing;
+    sithCogVm_msgFuncs[COGMSG_FIREPROJECTILE] = cogMsg_HandleFireProjectile;
+    sithCogVm_msgFuncs[COGMSG_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
+    sithCogVm_msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;
+    sithCogVm_msgFuncs[COGMSG_DEATH] = cogMsg_HandleDeath;
+    sithCogVm_msgFuncs[COGMSG_DAMAGE] = cogMsg_HandleDamage;
+    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = cogMsg_HandleSendTrigger;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
+    sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = cogMsg_HandlePlaySoundPos;
+    sithCogVm_msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = cogMsg_HandleSyncThingFull;
+    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = cogMsg_HandleSyncCog;
+    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = cogMsg_HandleSyncSurface;
+    sithCogVm_msgFuncs[COGMSG_SYNCAI] = cogMsg_HandleSyncAI;
+    sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = cogMsg_HandleSyncItemDesc;
+    sithCogVm_msgFuncs[COGMSG_STOPANIM] = cogMsg_HandleStopAnim;
+    sithCogVm_msgFuncs[COGMSG_SYNCSECTOR] = cogMsg_HandleSyncSector;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFRAME] = cogmsg_HandleSyncThingFrame;
+    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = cogMsg_HandleSyncPuppet;
+    sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = cogMsg_HandleSyncThingAttachment;
+    sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = cogMsg_HandleSyncTimers;
+    sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = cogMsg_HandleSyncCameras;
+    sithCogVm_msgFuncs[COGMSG_TAKEITEM1] = cogMsg_HandleTakeItem;
+    sithCogVm_msgFuncs[COGMSG_TAKEITEM2] = cogMsg_HandleTakeItem;
+    sithCogVm_msgFuncs[COGMSG_STOPKEY] = cogMsg_HandleStopKey;
+    sithCogVm_msgFuncs[COGMSG_STOPSOUND] = cogMsg_HandleStopSound;
+    sithCogVm_msgFuncs[COGMSG_CREATETHING] = cogMsg_HandleCreateThing;
+    sithCogVm_msgFuncs[COGMSG_SYNCPALEFFECTS] = cogMsg_HandleSyncPalEffects;
+    sithCogVm_msgFuncs[COGMSG_ID_1F] = cogmsg_31;
+    sithCogVm_msgFuncs[COGMSG_CHAT] = sithMulti_HandleChat;
+    sithCogVm_msgFuncs[COGMSG_DESTROYTHING] = cogMsg_HandleDestroyThing;
+    sithCogVm_msgFuncs[COGMSG_SYNCSECTORALT] = cogMsg_HandleSyncSectorAlt;
+    sithCogVm_msgFuncs[COGMSG_SOUNDCLASSPLAY] = cogMsg_HandleSoundClassPlay;
+    sithCogVm_msgFuncs[COGMSG_OPENDOOR] = cogMsg_HandleOpenDoor;
+    sithCogVm_msgFuncs[COGMSG_SETTHINGMODEL] = cogMsg_HandleSetThingModel;
+    sithCogVm_msgFuncs[COGMSG_PING] = sithMulti_HandlePing;
+    sithCogVm_msgFuncs[COGMSG_PINGREPLY] = sithMulti_HandlePingResponse;
+    sithCogVm_msgFuncs[COGMSG_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
+    sithCogVm_msgFuncs[COGMSG_RESET] = sithCogVm_cogMsg_Reset;
+    sithCogVm_msgFuncs[COGMSG_KICK] = sithMulti_HandleKickPlayer;
     sithCogVm_bInit = 1;
     return 1;
 }
@@ -121,33 +128,261 @@ void sithCogVm_Shutdown()
 
 void sithCogVm_SetMsgFunc(int msgid, void *func)
 {
-    sithCogVm_globals.msgFuncs[msgid] = func;
+    sithCogVm_msgFuncs[msgid] = func;
 }
 
-//sendmsgtoplayer
-//filewrite
-//sub
+int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
+{
+    char multiplayerFlags; // bl
+    unsigned int curMs; // esi
+    __int16 v9; // ax
+    unsigned int v10; // ebx
+    int v11; // edi
+    int idx; // ecx
+    sithCogMsg *v14; // eax
+    int v16; // eax
+    sithCogMsg *v17; // edi
+    int v19; // ecx
+    int v20; // eax
+    char multiplayerFlags_; // [esp+8h] [ebp-4h]
+    int idx_; // [esp+18h] [ebp+Ch]
+
+    int ret = 1;
+    multiplayerFlags = sithCogVm_multiplayerFlags & mpFlags;
+    multiplayerFlags_ = sithCogVm_multiplayerFlags & mpFlags;
+    if ( (sithCogVm_multiplayerFlags & mpFlags) == 0 )
+        return 1;
+    curMs = sithTime_curMs;
+    msg->netMsg.thingIdx = playerThingIdx;
+    msg->netMsg.timeMs = curMs;
+    if ( (multiplayerFlags & 1) != 0 )
+    {
+        if ( a4 )
+        {
+            v9 = sithCogVm_msgId;
+            if ( !sithCogVm_msgId )
+                v9 = 1;
+            v10 = jkPlayer_maxPlayers;
+            v11 = a2;
+            msg->netMsg.msgId = v9;
+            sithCogVm_msgId = v9 + 1;
+            msg->netMsg.field_C = a2;
+            idx_ = 0;
+            msg->netMsg.timeMs2 = curMs;
+            msg->netMsg.field_14 = 0;
+            for (int i = 0; i < v10; i++)
+            {
+                if ( i != playerThingIdx && (jkPlayer_playerInfos[i].net_id == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
+                    msg->netMsg.field_14 |= 1 << i;
+            }
+            if ( !msg->netMsg.field_14 )
+                goto LABEL_35;
+            
+            for (idx = 0; idx < 32; idx++)
+            {
+                v14 = &sithCogVm_MsgTmpBuf[idx];
+                if ( !v14->netMsg.msgId )
+                    break;
+                if ( v14->netMsg.timeMs < curMs )
+                {
+                    curMs = v14->netMsg.timeMs;
+                    idx_ = idx;
+                }
+                ++v14;
+            }
+
+            if ( idx == 32 )
+            {
+                v16 = sithTime_curMs;
+                v17 = &sithCogVm_MsgTmpBuf[idx_];
+                v17->netMsg.field_18 = sithCogVm_MsgTmpBuf[idx_].netMsg.field_18 + 1;
+                v17->netMsg.timeMs2 = v16;
+                if ( v10 )
+                {
+                    for (unsigned int v15 = 0; v15 < jkPlayer_maxPlayers; v15++)
+                    {
+                        v19 = sithCogVm_MsgTmpBuf[idx_].netMsg.field_14;
+                        if ( (v19 & (1 << v15)) != 0 )
+                        {
+                            if (jkPlayer_playerInfos[v15].net_id)
+                                sithDplay_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
+                            else
+                                sithCogVm_MsgTmpBuf[idx_].netMsg.field_14 = ~(1 << v15) & v19;
+                        }
+                    }
+                }
+                if ( !sithCogVm_MsgTmpBuf[idx_].netMsg.field_14 || sithCogVm_MsgTmpBuf[idx_].netMsg.field_18 >= 6u )
+                {
+                    _memset(v17, 0, sizeof(sithCogMsg));
+                    --sithCogVm_idk2;
+                }
+                idx = idx_;
+                --sithCogVm_idk2;
+            }
+            ++sithCogVm_idk2;
+            v20 = msg->netMsg.field_14;
+            _memcpy(&sithCogVm_MsgTmpBuf[idx_], msg, sizeof(sithCogMsg));
+            v11 = a2;
+            if ( !v20 )
+LABEL_35:
+                msg->netMsg.msgId = 0;
+            multiplayerFlags = multiplayerFlags_;
+        }
+        else
+        {
+            v11 = a2;
+            msg->netMsg.msgId = 0;
+        }
+        ret = sithDplay_SendToPlayer(msg, v11);
+    }
+    if ( (multiplayerFlags & 4) != 0 )
+    {
+        sithCogVm_FileWrite(msg);
+    }
+    return ret;
+}
+
+void sithCogVm_FileWrite(sithCogMsg *ctx)
+{
+    stdConffile_Write((const char*)&ctx->netMsg.cogMsgId, sizeof(int));
+    stdConffile_Write((const char*)&ctx->netMsg.msg_size, sizeof(int));
+    stdConffile_Write((const char*)&ctx->pktData[0], ctx->netMsg.msg_size);
+}
+
+int sithCogVm_Sync()
+{
+    int v1; // eax
+    unsigned __int16 v2; // dx
+    int *v3; // ecx
+    int v4; // eax
+    unsigned int v5; // ecx
+    int v12; // ecx
+    int v13; // [esp+4h] [ebp-4h]
+
+    v13 = 0;
+    sithCogVm_needsSync = 0;
+    if ( !sithCogVm_bSyncMultiplayer )
+        return 0;
+    while ( sithDplay_Recv(&g_netMsgTmp) == 1 )
+    {
+        ++v13;
+        if ( g_netMsgTmp.netMsg.thingIdx )
+        {
+            v1 = sithPlayer_ThingIdxToPlayerIdx(g_netMsgTmp.netMsg.thingIdx);
+            v2 = g_netMsgTmp.netMsg.cogMsgId;
+            if ( v1 >= 0 )
+            {
+                jkPlayer_playerInfos[v1].field_13B0 = sithTime_curMs;
+LABEL_14:
+                if ( g_netMsgTmp.netMsg.msgId )
+                {
+                    sithCogVm_MsgTmpBuf2.netMsg.msgId = 0;
+                    *(uint16_t*)sithCogVm_MsgTmpBuf2.pktData = g_netMsgTmp.netMsg.msgId;
+                    sithCogVm_MsgTmpBuf2.netMsg.field_C = g_netMsgTmp.netMsg.thingIdx;
+                    sithCogVm_MsgTmpBuf2.netMsg.cogMsgId = COGMSG_RESET;
+                    sithCogVm_MsgTmpBuf2.netMsg.msg_size = 2;
+                    sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, g_netMsgTmp.netMsg.thingIdx);
+                    v3 = &sithCogVm_aMsgPairs[0].msgId;
+                    v4 = (unsigned __int16)g_netMsgTmp.netMsg.msgId;
+                    while ( g_netMsgTmp.netMsg.thingIdx != *(v3 - 1) || (unsigned __int16)g_netMsgTmp.netMsg.msgId != *v3 )
+                    {
+                        v3 += 2;
+                        if ( v3 >= (int *)&sithCogVm_msgFuncs[1] )
+                        {
+                            v5 = sithCogVm_dword_847E84;
+                            sithCogVm_aMsgPairs[sithCogVm_dword_847E84].thingIdx = g_netMsgTmp.netMsg.thingIdx;
+                            sithCogVm_aMsgPairs[v5].msgId = v4;
+                            sithCogVm_dword_847E84 = v5 + 1;
+                            if ( v5 + 1 >= 0x80 )
+                                sithCogVm_dword_847E84 = 0;
+                            v2 = g_netMsgTmp.netMsg.cogMsgId;
+                            goto LABEL_22;
+                        }
+                    }
+                }
+                else
+                {
+LABEL_22:
+                    if ( v2 < (unsigned int)COGMSG_MAX )
+                    {
+                        if ( sithCogVm_msgFuncs[v2] )
+                            sithCogVm_msgFuncs[v2](&g_netMsgTmp);
+                    }
+                }
+                goto LABEL_25;
+            }
+            if ( g_netMsgTmp.netMsg.cogMsgId == COGMSG_JOINLEAVE
+              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_REQUESTCONNECT
+              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_RESET
+              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_LEAVEJOIN
+              || (g_submodeFlags & 8) != 0 )
+            {
+                goto LABEL_14;
+            }
+            if ( net_isServer )
+                sithMulti_SendKickPlayer(g_netMsgTmp.netMsg.thingIdx);
+        }
+LABEL_25:
+        if ( sithCogVm_needsSync )
+            break;
+    }
+    sithCogVm_SyncWithPlayers();
+    return v13;
+}
 
 void sithCogVm_SetNeedsSync()
 {
     sithCogVm_needsSync = 1;
 }
 
-int sithCogVm_InvokeMsgByIdx(net_msg *a1)
+int sithCogVm_InvokeMsgByIdx(sithCogMsg *a1)
 {
     int v1; // eax
-    int (__cdecl *v2)(net_msg *); // eax
     int result; // eax
 
-    v1 = a1->msg_id;
-    if ( (signed int)(unsigned __int16)v1 < 65 && (v2 = (int (__cdecl *)(net_msg *))sithCogVm_globals.msgFuncs[v1]) != 0 )
-        result = v2(a1);
+    v1 = a1->netMsg.cogMsgId;
+    if ( (signed int)(unsigned __int16)v1 < 65 && sithCogVm_msgFuncs[v1])
+        result = sithCogVm_msgFuncs[v1](a1);
     else
         result = 1;
     return result;
 }
 
-// syncwithplayers
+void sithCogVm_SyncWithPlayers()
+{
+    if ( sithCogVm_idk2 )
+    {
+        
+        for (int i = 0; i < 32; i++) // off by one?
+        {
+            if (!sithCogVm_MsgTmpBuf[i].netMsg.msgId)
+                continue;
+
+            if ( sithCogVm_MsgTmpBuf[i].netMsg.timeMs2 + 1700 <= sithTime_curMs )
+            {
+                sithCogVm_MsgTmpBuf[i].netMsg.field_18++;
+                sithCogVm_MsgTmpBuf[i].netMsg.timeMs2 = sithTime_curMs;
+
+                for (int v9 = 0; v9 < jkPlayer_maxPlayers; v9++)
+                {
+                    if (sithCogVm_MsgTmpBuf[i].netMsg.field_14 & (1 << v9))
+                    {
+                        if (jkPlayer_playerInfos[v9].net_id)
+                            sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf[i], jkPlayer_playerInfos[v9].net_id);
+                        else
+                            sithCogVm_MsgTmpBuf[i].netMsg.field_14 &= ~(1 << v9);
+                    }
+                }
+
+                if ( !sithCogVm_MsgTmpBuf[i].netMsg.field_14 || sithCogVm_MsgTmpBuf[i].netMsg.field_18 >= 6 )
+                {
+                    _memset(&sithCogVm_MsgTmpBuf[i], 0, sizeof(sithCogMsg));
+                    --sithCogVm_idk2;
+                }
+            }
+        }
+    }
+}
 
 void sithCogVm_ClearMsgTmpBuf()
 {
@@ -155,7 +390,36 @@ void sithCogVm_ClearMsgTmpBuf()
     sithCogVm_idk2 = 0;
 }
 
-//sithCogVm_ClearTmpBuf2_cogmsg_40
+int sithCogVm_cogMsg_Reset(sithCogMsg *msg)
+{
+    int v1; // edi
+    char playerIdx; // al
+    
+    int foundIdx;
+
+    v1 = *(uint16_t*)&msg->pktData[0];
+    playerIdx = sithPlayer_ThingIdxToPlayerIdx(msg->netMsg.thingIdx);
+    foundIdx = 0;
+    
+    for (foundIdx = 0; foundIdx < 32; foundIdx++)
+    {
+        if (sithCogVm_MsgTmpBuf[foundIdx].netMsg.msgId == v1 )
+            break;
+        ++foundIdx;
+    }
+
+    if ( foundIdx != 32 )
+    {
+        sithCogVm_MsgTmpBuf[foundIdx].netMsg.field_14 &= ~(1 << playerIdx);
+        if (!sithCogVm_MsgTmpBuf[foundIdx].netMsg.field_14)
+        {
+            _memset(&sithCogVm_MsgTmpBuf[foundIdx], 0, sizeof(sithCogMsg));
+            --sithCogVm_idk2;
+        }
+    }
+
+    return 1;
+}
 
 void sithCogVm_Exec(sithCog *cog_ctx)
 {
@@ -360,35 +624,39 @@ int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
 
     sithCogStackvar *tmp; // eax
     int *v5; // edx
-    int v6; // eax
-    int v7; // edi
     int type; // ecx
-    int v9; // edx
+    int d0; // edx
+    int d1;
+    int d2;
 
     if ( ctx->stackPos < 1 )
         return 0;
+
     *stackVar = ctx->stack[--ctx->stackPos];
     tmp = stackVar;
+
     if ( stackVar->type == COG_VARTYPE_SYMBOL )
         tmp = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, stackVar->data[0])->symbol_type;
+
     if ( tmp->type )
     {
         type = tmp->type;
-        v9 = tmp->data[0];
-        v7 = tmp->data[1];
-        v6 = tmp->data[2];
+        d0 = tmp->data[0];
+        d1 = tmp->data[1];
+        d2 = tmp->data[2];
     }
     else
     {
         type = COG_VARTYPE_INT;
-        v9 = tmp->data[0];
-        v6 = tmp->data[1]; // the original game sets these two to undefined values? Weird compiler optimization fail?
-        v7 = tmp->data[2];
+        d0 = tmp->data[0];
+        d1 = tmp->data[1]; // the original game sets these two to undefined values? Weird compiler optimization fail?
+        d2 = tmp->data[2];
     }
+
     stackVar->type = type;
-    stackVar->data[0] = v9;
-    stackVar->data[1] = v7;
-    stackVar->data[2] = v6;
+    stackVar->data[0] = d0;
+    stackVar->data[1] = d1;
+    stackVar->data[2] = d2;
     return 1;
 }
 
@@ -787,13 +1055,44 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
     return NULL;
 }
 
-// aiclass
-// popsymbolfunc is unused
+sithAIClass* sithCogVm_PopAIClass(sithCog *ctx)
+{
+    sithCogStackvar tmp;
+    int32_t idx;
+    sithWorld* world = sithWorld_pCurWorld;
 
+    if (!sithCogVm_PopValue(ctx, &tmp))
+    {
+        tmp.type = COG_VARTYPE_INT;
+        tmp.data[0] = -1;
+    }
+    
+    if ( tmp.type == COG_VARTYPE_INT )
+    {
+        idx = tmp.data[0];
+    }
+    else if ( tmp.type == COG_VARTYPE_FLEX )
+    {
+        idx = (int)(double)tmp.dataAsFloat[0];
+        if (idx == -1)
+            return NULL;
+    }
+    else
+    {
+        idx = -1;
+    }
+    
+    if ( world && idx >= 0 && idx < world->numAIClassesLoaded )
+        return &world->aiclasses[idx];
+
+    return NULL;
+}
+
+// popsymbolfunc is unused
 cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
 {
     sithCogStackvar *v3; // ecx
-    sithCogSymbol *v7; // eax
+    sithCogSymbol *sym; // eax
     int v12; // [esp+10h] [ebp-Ch]
 
     if ( cog_ctx->stackPos < 1 )
@@ -803,11 +1102,11 @@ cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
 
     if ( v3->type == COG_VARTYPE_SYMBOL )
     {
-        v7 = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
-        if ( v7->symbol_type )
-            return (cogSymbolFunc_t)&v7->func;
+        sym = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
+        if ( sym->symbol_type )
+            return (cogSymbolFunc_t)&sym->func;
         else
-            return v7->func;
+            return sym->func;
     }
     else if ( v3->type )
     {

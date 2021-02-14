@@ -19,7 +19,7 @@
 #define sithPlayer_debug_ToNextCheckpoint_ADDR (0x004C8EC0)
 #define sithPlayer_sub_4C9060_ADDR (0x004C9060)
 #define sithPlayer_FindPlayerByName_ADDR (0x004C90C0)
-#define sithPlayer_DoesNetIdExist_ADDR (0x004C9120)
+#define sithPlayer_ThingIdxToPlayerIdx_ADDR (0x004C9120)
 #define sithPlayer_sub_4C9150_ADDR (0x004C9150)
 #define sithPlayer_HandleSentDeathPkt_ADDR (0x004C91E0)
 #define sithPlayer_GetBinAmt_ADDR (0x004C9350)
@@ -91,5 +91,6 @@ static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADD
 static void (*sithPlayer_SetBinAmt)(int idx, float a2) =(void*)sithPlayer_SetBinAmt_ADDR;
 static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)sithPlayer_AddDynamicTint_ADDR;
 static void (*sithPlayer_AddDyamicAdd)(int r, int g, int b) = (void*)sithPlayer_AddDyamicAdd_ADDR;
+static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlayer_ThingIdxToPlayerIdx_ADDR;
 
 #endif // _SITHPLAYER_H

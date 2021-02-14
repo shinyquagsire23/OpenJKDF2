@@ -38,5 +38,6 @@
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
 static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
+static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
 
 #endif // _SITHMULTI_H

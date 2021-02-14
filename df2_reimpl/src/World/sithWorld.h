@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "types.h"
+
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
 #include "Engine/rdKeyframe.h"
@@ -34,11 +36,6 @@
 #define sithWorld_LoadGeoresource_ADDR (0x004D0E70)
 
 typedef void (__cdecl *sithWorldProgressCallback_t)(float);
-
-typedef struct sithSector sithSector;
-typedef struct rdColormap rdColormap;
-typedef struct sithSound sithSound;
-typedef struct rdSprite rdSprite;
 
 typedef struct sithWorld
 {
@@ -109,7 +106,7 @@ typedef struct sithWorld
     sithCog* cogs;
     int numAIClassesLoaded;
     int numAIClasses;
-    void* aiclasses;
+    sithAIClass* aiclasses;
     int numKeyframesLoaded;
     int numKeyframes;
     rdKeyframe* keyframes;

@@ -1,6 +1,8 @@
 #ifndef _SITHDPLAY_H
 #define _SITHDPLAY_H
 
+#include "types.h"
+
 #define sithDplay_Startup_ADDR (0x004C9530)
 #define sithDplay_Shutdown_ADDR (0x004C9550)
 #define sithDplay_OpenConnection_ADDR (0x004C9570)
@@ -20,5 +22,7 @@
 #define sithDplay_cogMsg_HandleEnumPlayers_ADDR (0x004C9A40)
 
 static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
+static int (*sithDplay_SendToPlayer)(sithCogMsg *msg, int a2) = (void*)sithDplay_SendToPlayer_ADDR;
+static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 
 #endif // _SITHDPLAY_H

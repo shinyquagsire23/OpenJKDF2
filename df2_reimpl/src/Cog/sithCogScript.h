@@ -28,6 +28,8 @@ typedef struct sithCogSymbol
   {
     char *symbol_name;
     cogSymbolFunc_t func;
+    float as_float;
+    int as_int;
   };
   int field_C;
   int field_10;
@@ -45,21 +47,35 @@ typedef struct sithCogSymboltable
     uint32_t unk_14;
 } sithCogSymboltable;
 
+typedef struct sithCogIdk
+{
+    int type;
+    int flags;
+    int linkid;
+    int mask;
+    int hash;
+    char* desc;
+    int field_18;
+    int field_1C;
+    int field_20;
+    int field_24;
+    int field_28;
+    int field_2C;
+    int field_30;
+    int field_34;
+} sithCogIdk;
+
 typedef struct sithCogScript
 {
     uint32_t debug_maybe;
     char cog_fpath[32];
     int* script_program;
     uint32_t program_pc_max;
-    sithCogSymboltable *symboltable_hashmap;
+    sithCogSymboltable *symbolTable;
     uint32_t num_triggers;
-    sithCogTrigger triggers[4];
-    uint32_t field_64;
-    uint32_t field_68;
-    uint32_t field_6C;
-    uint32_t field_70;
-    uint32_t field_74[1872];
-    uint32_t field_1DB4;
+    sithCogTrigger triggers[32];
+    sithCogIdk aIdk[128];
+    uint32_t numIdk;
 } sithCogScript;
 
 #endif // _SITHCOGSCRIPT_H

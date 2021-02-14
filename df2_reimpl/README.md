@@ -89,6 +89,7 @@ rdPolyLine                     0xb42      0.267%        100.000%        6 / 6
 rdVector                       0xd29      0.312%        100.000%       55 / 55         
 stdConsole                     0xfff      0.379%        100.000%       20 / 20         
 sithCogYACC                    0x152b     0.502%        100.000%       10 / 10         
+sithCogVm                      0x22f7     0.829%        100.000%       42 / 42         
 sithCogUtil                    0x26c2     0.919%        100.000%      119 / 119        
 rdModel3                       0x2a7e     1.007%        100.000%       23 / 23         
 rdMatrix                       0x2c85     1.055%        100.000%       56 / 56         
@@ -168,14 +169,13 @@ sithWorld                      0x1718     0.547%        21.262%         6 / 22
 stdFont                        0x181a     0.571%        0.000%          0 / 20         
 stdMath                        0x182a     0.573%        32.218%        13 / 23         
 rdActive                       0x1a55     0.624%        2.626%          3 / 8          
-sithCogParse                   0x1b2a     0.644%        46.362%        15 / 26         
+sithCogParse                   0x1b2a     0.644%        99.511%        25 / 26         
 sithSurface                    0x1c6a     0.673%        0.000%          0 / 35         
 jkHud                          0x1c9b     0.678%        0.000%          0 / 17         
 jkDev                          0x1e60     0.720%        0.000%          0 / 39         
 sithCog                        0x1ed3     0.731%        16.918%         2 / 28         
 jkSaber                        0x1f4a     0.742%        33.296%         5 / 40         
 sithInventory                  0x2150     0.790%        72.256%        57 / 62         
-sithCogVm                      0x22f7     0.829%        80.751%        36 / 42         
 sithRender                     0x23de     0.850%        0.000%          0 / 22         
 sithMulti                      0x252a     0.881%        0.000%          0 / 35         
 jkGuiBuildMulti                0x258b     0.890%        0.000%          0 / 24         
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 17.723%
+Total completion: 18.224%
 ```

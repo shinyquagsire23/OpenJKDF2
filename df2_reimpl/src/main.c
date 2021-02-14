@@ -267,9 +267,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
     hook_function(sithCogVm_Shutdown_ADDR, sithCogVm_Shutdown);
     hook_function(sithCogVm_SetMsgFunc_ADDR, sithCogVm_SetMsgFunc);
+    hook_function(sithCogVm_SendMsgToPlayer_ADDR, sithCogVm_SendMsgToPlayer);
+    hook_function(sithCogVm_FileWrite_ADDR, sithCogVm_FileWrite);
+    hook_function(sithCogVm_Sync_ADDR, sithCogVm_Sync);
     hook_function(sithCogVm_SetNeedsSync_ADDR, sithCogVm_SetNeedsSync);
     hook_function(sithCogVm_InvokeMsgByIdx_ADDR, sithCogVm_InvokeMsgByIdx);
+    hook_function(sithCogVm_SyncWithPlayers_ADDR, sithCogVm_SyncWithPlayers);
     hook_function(sithCogVm_ClearMsgTmpBuf_ADDR, sithCogVm_ClearMsgTmpBuf);
+    hook_function(sithCogVm_cogMsg_Reset_ADDR, sithCogVm_cogMsg_Reset);
     hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
     hook_function(sithCogVm_ExecCog_ADDR, sithCogVm_ExecCog);
     hook_function(sithCogVm_PopValue_ADDR, sithCogVm_PopValue);
@@ -392,6 +397,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogParse_LexScanVector3_ADDR, sithCogParse_LexScanVector3);
     hook_function(sithCogParse_RecurseStackdepth_ADDR, sithCogParse_RecurseStackdepth);
     hook_function(sithCogParse_RecurseWrite_ADDR, sithCogParse_RecurseWrite);
+    hook_function(sithCogParse_ParseSymbol_ADDR, sithCogParse_ParseSymbol);
+    hook_function(sithCogParse_ParseFlex_ADDR, sithCogParse_ParseFlex);
+    hook_function(sithCogParse_ParseInt_ADDR, sithCogParse_ParseInt);
+    hook_function(sithCogParse_ParseVector_ADDR, sithCogParse_ParseVector);
+    hook_function(sithCogParse_ParseMessage_ADDR, sithCogParse_ParseMessage);
     
     hook_function(sithCogYACC_yyerror_ADDR, yyerror);
     hook_function(sithCogYACC_yyparse_ADDR, yyparse);

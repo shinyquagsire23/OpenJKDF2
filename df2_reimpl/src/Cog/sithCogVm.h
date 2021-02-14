@@ -3,7 +3,7 @@
 
 #include "Primitives/rdVector.h"
 #include "Engine/rdKeyframe.h"
-#include "sithCogScript.h"
+#include "Cog/sithCogScript.h"
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
 #include <stdint.h>
@@ -18,7 +18,7 @@
 #define sithCogVm_InvokeMsgByIdx_ADDR (0x004E1DD0)
 #define sithCogVm_SyncWithPlayers_ADDR (0x004E1E00)
 #define sithCogVm_ClearMsgTmpBuf_ADDR (0x004E1EC0)
-#define sithCogVm_ClearTmpBuf2_cogmsg_40_ADDR (0x004E1EE0)
+#define sithCogVm_cogMsg_Reset_ADDR (0x004E1EE0)
 #define sithCogVm_Exec_ADDR (0x004E1F60)
 #define sithCogVm_ExecCog_ADDR (0x004E2350)
 
@@ -127,7 +127,11 @@ enum COGMSG_ID
     COGMSG_SABERINFO2  = 58,
     COGMSG_JKSETWEAPONMESH  = 59,
     COGMSG_SETTEAM   = 60,
-    COGMSG_61        = 61
+    COGMSG_61        = 61,
+    COGMSG_62        = 62,
+    COGMSG_63        = 63,
+    COGMSG_64        = 64,
+    COGMSG_MAX        = 66
 };
 
 enum SENDERTYPE
@@ -149,7 +153,8 @@ enum COG_TYPE
     COG_TYPE_VERB    = 0,
     COG_TYPE_1       = 1,
     COG_TYPE_GLOBAL  = 2,
-    COG_TYPE_MESSAGE  = 3
+    COG_TYPE_MESSAGE  = 3,
+    COG_TYPE_VECTOR = 11,
 };
 
 enum COG_VARTYPE
@@ -200,66 +205,32 @@ enum COG_OPCODE
 
 typedef struct net_msg
 {
-    uint32_t field_0;
+    uint32_t timeMs;
     uint32_t flag_maybe;
     uint32_t field_8;
     uint32_t field_C;
-    uint32_t field_10;
+    uint32_t timeMs2;
     uint32_t field_14;
     uint32_t field_18;
-    uint32_t anonymous_0;
+    uint32_t thingIdx;
     uint32_t msg_size;
-    uint16_t msg_id;
-    uint16_t field_26;
+    uint16_t cogMsgId;
+    uint16_t msgId;
 } net_msg;
 
-typedef int (__cdecl *cogMsg_Handler)(net_msg*);
-
-typedef struct jkl_map_idk
+typedef struct sithCogMsg_Pair
 {
-    uint32_t anonymous_0;
-    uint32_t anonymous_1;
-    uint8_t anonymous_2[16];
-    uint8_t field_18[1000];
-} jkl_map_idk;
+    uint32_t thingIdx;
+    uint32_t msgId;
+} sithCogMsg_Pair;
 
-typedef struct sithCogVmGlobals
+typedef struct sithCogMsg
 {
-    cogMsg_Handler msgFuncs[60];
-    uint32_t field_F0;
-    uint32_t field_F4;
-    uint32_t field_F8;
-    uint32_t field_FC;
-    uint32_t field_100;
-} sithCogVmGlobals;
+    net_msg netMsg;
+    uint32_t pktData[512];
+} sithCogMsg;
 
-typedef struct cogMsg_Entry
-{
-    uint32_t field_0;
-    uint32_t field_4;
-    uint32_t field_8;
-    uint32_t field_C;
-    uint32_t field_10;
-    uint32_t field_14;
-    uint32_t field_18;
-    uint32_t field_1C;
-    uint32_t field_20;
-    uint32_t field_24;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t field_44;
-    uint32_t field_48;
-    uint32_t field_4C;
-    uint32_t field_50;
-    uint32_t field_54;
-    uint32_t field_58[499];
-    uint32_t field_824;
-} cogMsg_Entry;
+typedef int (__cdecl *cogMsg_Handler)(sithCogMsg*);
 
 typedef struct sithCogCallstack
 {
@@ -309,25 +280,30 @@ typedef struct sithCog
     int numHeapVars;
 } sithCog;
 
-#define sithCogVm_MsgTmpBuf (*(cogMsg_Entry**)0x837468)
-#define sithCogVm_jkl_map_idk (*(jkl_map_idk*)0x00847968)
-#define sithCogVm_globals (*(sithCogVmGlobals*)0x00847D68)
+#define sithCogVm_MsgTmpBuf ((sithCogMsg*)0x837468)
+#define sithCogVm_aMsgPairs ((sithCogMsg_Pair*)0x00847968)
+#define sithCogVm_msgFuncs ((cogMsg_Handler*)0x00847D68)
 #define sithCogVm_needsSync (*(int*)0x00847E6C)
 #define sithCogVm_multiplayerFlags (*(int*)0x847E70)
 #define sithCogVm_bSyncMultiplayer (*(int*)0x847E74)
 #define sithCogVm_idk2 (*(int*)0x00847E7C)
 #define sithCogVm_bInit (*(int*)0x00847E80)
-#define sithCogVm_dword_847E84 (*(int*)0x00847E84)
-#define jkl_map_idk_set_one (*(int*)0x54B004)
+#define sithCogVm_dword_847E84 (*(uint32_t*)0x00847E84)
+#define sithCogVm_msgId (*(int*)0x54B004)
+#define sithCogVm_MsgTmpBuf2 (*(sithCogMsg*)0x00836C40)
+#define g_netMsgTmp (*(sithCogMsg*)0x008B4C00)
 
 int sithCogVm_Startup();
 void sithCogVm_Shutdown();
 void sithCogVm_SetMsgFunc(int msgid, void *func);
-
+int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4);
+void sithCogVm_FileWrite(sithCogMsg *ctx);
+int sithCogVm_Sync();
 void sithCogVm_SetNeedsSync();
-int sithCogVm_InvokeMsgByIdx(net_msg *a1);
+int sithCogVm_InvokeMsgByIdx(sithCogMsg *a1);
+void sithCogVm_SyncWithPlayers();
 void sithCogVm_ClearMsgTmpBuf();
-
+int sithCogVm_cogMsg_Reset();
 void sithCogVm_Exec(sithCog *cog_ctx);
 void sithCogVm_ExecCog(sithCog *ctx, int trigIdx);
 int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar);
@@ -344,6 +320,7 @@ sithSurface* sithCogVm_PopSurface(sithCog *ctx);
 rdMaterial* sithCogVm_PopMaterial(sithCog *ctx);
 rdModel3* sithCogVm_PopModel3(sithCog *ctx);
 rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx);
+sithAIClass* sithCogVm_PopAIClass(sithCog *ctx);
 char* sithCogVm_PopString(sithCog *ctx);
 cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx);
 void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val);

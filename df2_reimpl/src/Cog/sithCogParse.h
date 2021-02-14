@@ -65,6 +65,11 @@ void sithCogParse_LexScanVector3(char *inStr);
 int sithCogParse_IncrementLoopdepth();
 int sithCogParse_RecurseStackdepth(sith_cog_parser_node *node);
 void sithCogParse_RecurseWrite(sith_cog_parser_node *node);
+int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk);
+int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2);
+int sithCogParse_ParseInt(sithCogScript *cogScript, int a2);
+int sithCogParse_ParseVector(sithCogScript *cogScript, int a2);
+int sithCogParse_ParseMessage(sithCogScript *cogScript);
 
 //sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val);
 //sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector);
@@ -72,12 +77,6 @@ void sithCogParse_RecurseWrite(sith_cog_parser_node *node);
 
 static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
 //static int (*sithCogParse_RecurseWrite)(sith_cog_parser_node *node) = (void*)sithCogParse_RecurseWrite_ADDR;
-
-static int (*sithCogParse_ParseSymbol)(sithCogScript *a1, int a2, int a3) = (void*)sithCogParse_ParseSymbol_ADDR;
-static int (*sithCogParse_ParseFlex)(sithCogScript *a1, int a2) = (void*)sithCogParse_ParseFlex_ADDR;
-static int (*sithCogParse_ParseInt)(sithCogScript *a1, int a2) = (void*)sithCogParse_ParseInt_ADDR;
-static int (*sithCogParse_ParseVector)(sithCogScript *a1, int a2) = (void*)sithCogParse_ParseVector_ADDR;
-static int (*sithCogParse_ParseMessage)(sithCogScript *a1) = (void*)sithCogParse_ParseMessage_ADDR;
 
 #define sithCogParse_symbolTable (*(sithCogSymboltable**)0x008554C0)
 #define yacc_linenum (*(int*)0x00889F0C)

@@ -297,7 +297,7 @@ VM_VAR_DECL(g_855E8C, uint32_t);
 VM_VAR_DECL(g_855E90, uint32_t);
 VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 
-//VM_VAR_DECL(g_cog_symboltable_hashmap, void*);
+//VM_VAR_DECL(g_cog_symbolTable, void*);
 
 // TODO: defsym?
 
@@ -317,7 +317,7 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define g_855E8C *(g_855E8C_ptr)
 #define g_855E90 *(g_855E90_ptr)
 #define g_window_not_destroyed *(g_window_not_destroyed_ptr)
-#define g_cog_symboltable_hashmap (*(sithCogSymboltable**)0x008B5428)
+#define g_cog_symbolTable (*(sithCogSymboltable**)0x008B5428)
 
 #define wm_msg_main_handler (0x50ECB0)
 
