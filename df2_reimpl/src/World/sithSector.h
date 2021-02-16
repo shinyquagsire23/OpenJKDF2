@@ -174,6 +174,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
 static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
+static void (*sithSector_ThingSetLook)(sithThing *a1, rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
 
 static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
 static void (*sithSector_StopPhysicsThing)(sithThing* thing) = (void*)sithSector_StopPhysicsThing_ADDR;
@@ -192,5 +193,6 @@ static void (*sithSector_cogMsg_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int 
 static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithSector_cogMsg_SendStopKey_ADDR;
 static void (*sithSector_cogMsg_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithSector_cogMsg_SendSetThingModel_ADDR;
 static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
+static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithSector_cogMsg_SendFireProjectile_ADDR;
 
 #endif // _SITHSECTOR_H

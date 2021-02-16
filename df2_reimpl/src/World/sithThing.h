@@ -561,7 +561,7 @@ static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD
 static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
 static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
 
-static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
+static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;

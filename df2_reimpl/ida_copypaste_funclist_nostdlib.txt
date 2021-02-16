@@ -1822,7 +1822,7 @@ sithPlayer_Tick	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
 sithPlayer_AddDynamicTint	.text	004C8C10	000000BF	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_AddDyamicAdd	.text	004C8CD0	00000060	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_SetScreenTint	.text	004C8D30	000000DC	00000000	0000000C	R	.	.	.	.	.	T	.
-sithPlayer_debug_loadauto	.text	004C8E10	000000A9	00000084	00000004	R	.	.	.	.	.	.	.
+sithPlayer_debug_loadauto	.text	004C8E10	000000A9	00000084	00000004	R	.	.	.	.	.	T	.
 sithPlayer_debug_ToNextCheckpoint	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C9060	.text	004C9060	0000005E	00000004	00000008	R	.	.	.	.	.	.	.
 sithPlayer_FindPlayerByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	.	T	.
@@ -2029,23 +2029,23 @@ sithWeapon_Tick	.text	004D3530	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D35E0	.text	004D35E0	00000338	00000038	00000004	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D3920	.text	004D3920	00000963	000000C0	00000004	R	.	.	.	.	.	T	.
 sithWeapon_LoadParams	.text	004D4290	000001F2	00000000	0000000C	R	.	.	.	.	.	T	.
-sithWeapon_Fire	.text	004D44F0	000000A2	00000010	00000024	R	.	.	.	.	.	.	.
+sithWeapon_Fire	.text	004D44F0	000000A2	00000010	00000024	R	.	.	.	.	.	T	.
 sithWeapon_FireProjectile_0	.text	004D45A0	000002DA	00000058	00000024	R	.	.	.	.	.	T	.
 sithWeapon_SetTimeLeft	.text	004D4880	00000036	00000000	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_Collide	.text	004D48C0	0000057D	0000001C	00000010	R	.	.	.	.	.	T	.
 sithWeapon_HitDebug	.text	004D4E40	00000317	0000000C	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_Remove	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	T	.
-sithWeapon_sub_4D51F0	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	.	.
+sithWeapon_RemoveAndExplode	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	T	.
 sithWeapon_InitializeEntry	.text	004D5270	0000004B			R	.	.	.	.	.	.	.
 sithWeapon_ShutdownEntry	.text	004D52C0	00000001			R	.	.	.	.	.	.	.
 sithWeapon_SelectWeapon	.text	004D52D0	00000182	00000010	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_SetMountWait	.text	004D5460	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithWeapon_SetFireWait	.text	004D5480	00000040	00000000	00000008	R	.	.	.	.	.	T	.
-sithWeapon_handle_inv_msgs	.text	004D54C0	00000186	00000004	00000004	R	.	.	.	.	.	.	.
+sithWeapon_handle_inv_msgs	.text	004D54C0	00000186	00000004	00000004	R	.	.	.	.	.	T	.
 sithWeapon_Activate	.text	004D5650	000000A1	00000000	00000010	R	.	.	.	.	.	T	.
 sithWeapon_Deactivate	.text	004D5700	00000091	00000000	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_AutoSelect	.text	004D57A0	0000008A	00000014	00000008	R	.	.	.	.	.	T	.
-sithWeapon_HandleWeaponKeys	.text	004D5830	00000428	00000018	00000004	R	.	.	.	.	.	.	.
+sithWeapon_HandleWeaponKeys	.text	004D5830	00000428	00000018	00000004	R	.	.	.	.	.	T	.
 sithWeapon_ProjectileAutoAim	.text	004D5C60	000002B2	00000058	00000018	R	.	.	.	.	.	T	.
 sithWeapon_FireProjectile	.text	004D5F20	0000038B	0000007C	00000028	R	.	.	.	.	.	T	.
 sithWeapon_GetPriority	.text	004D62B0	00000058	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -2177,8 +2177,8 @@ sithCog_Shutdown	.text	004DE590	0000003A			R	.	.	.	.	.	.	.
 sithCog_Open	.text	004DE5D0	0000020A	00000018	00000000	R	.	.	.	.	.	.	.
 sithCog_Close	.text	004DE7E0	0000003E	00000004	00000000	R	.	.	.	.	.	.	.
 sithCog_Free	.text	004DE820	00000186	00000014	00000004	R	.	.	.	.	.	T	.
-sithCog_FreeEntry	.text	004DE9B0	0000006B	0000000C	00000004	R	.	.	.	.	.	.	.
-sithCog_Free2	.text	004DEA20	00000037	00000004	00000004	R	.	.	.	.	.	.	.
+sithCog_FreeEntry	.text	004DE9B0	0000006B	0000000C	00000004	R	.	.	.	.	.	T	.
+sithCog_Free2	.text	004DEA20	00000037	00000004	00000004	R	.	.	.	.	.	T	.
 sithCog_HandleThingTimerPulse	.text	004DEA60	0000006E	00000004	00000004	R	.	.	.	.	.	T	.
 sithCog_SendSimpleMessageToAll	.text	004DEAD0	0000002A	00000000	00000014	R	.	.	.	.	.	.	.
 sithCog_SendMessageToAll	.text	004DEB00	000000D4	00000010	00000024	R	.	.	.	.	.	T	.

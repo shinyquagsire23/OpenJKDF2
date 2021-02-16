@@ -26,7 +26,7 @@ typedef struct sithSector sithSector;
 #define sithUnk3_SearchClose_ADDR (0x004E8420)
 #define sithUnk3_UpdateSectorThingCollision_ADDR (0x004E8430)
 #define sithUnk3_sub_4E86D0_ADDR (0x004E86D0)
-#define sithUnk3_sub_4E8B40_ADDR (0x004E8B40)
+#define sithUnk3_DefaultHitHandler_ADDR (0x004E8B40)
 #define sithUnk3_DebrisDebrisCollide_ADDR (0x004E8C50)
 #define sithUnk3_sub_4E9090_ADDR (0x004E9090)
 #define sithUnk3_FallHurt_ADDR (0x004E9550)
@@ -69,6 +69,8 @@ static float (*sithUnk3_SearchRadiusForThings)(sithSector *sector, sithThing *a2
 static int (*sithUnk3_DebrisDebrisCollide)(sithThing *arg0, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisDebrisCollide_ADDR;
 static int (*sithUnk3_DebrisPlayerCollide)(sithThing *thing, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisPlayerCollide_ADDR;
 static int (*sithUnk3_HasLos)(sithThing *a1, sithThing *a2, int flag) = (void*)sithUnk3_HasLos_ADDR;
+static float (*sithUnk3_UpdateThingCollision)(sithThing *a3, rdVector3 *a2, float a6, int a8) = (void*)sithUnk3_UpdateThingCollision_ADDR;
+static int (*sithUnk3_DefaultHitHandler)(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3) = (void*)sithUnk3_DefaultHitHandler_ADDR;
 
 #define sithUnk3_stackIdk ((int*)0x847F28)
 #define sithUnk3_collisionHandlers ((sithUnk3Entry*)0x00847F38)

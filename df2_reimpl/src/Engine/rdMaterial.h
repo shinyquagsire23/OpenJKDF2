@@ -143,7 +143,7 @@ typedef struct rdMaterial
 {
     uint32_t tex_type;
     char mat_fpath[32];
-    uint32_t field_24;
+    uint32_t id;
     rdTexformat tex_format;
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;

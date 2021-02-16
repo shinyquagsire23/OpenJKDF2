@@ -819,7 +819,7 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
     
     sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     memset(cogIdk, 0, sizeof(sithCogIdk)); // added
-    cogIdk->type = COG_VARTYPE_FLEX; // hmm
+    cogIdk->type = COG_TYPE_FLEX; // hmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
     cogIdk->desc = v20;
@@ -860,7 +860,7 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
     
     sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     memset(cogIdk, 0, sizeof(sithCogIdk)); // added
-    cogIdk->type = COG_VARTYPE_INT; // hmmm
+    cogIdk->type = COG_TYPE_INT; // hmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
     cogIdk->desc = v20;
@@ -922,7 +922,7 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     if (!symbol) return 0;
     
     symbol->symbol_name = symbolGet->symbol_name;
-    symbol->symbol_type = COG_TYPE_MESSAGE;
+    symbol->symbol_type = COG_TYPE_INT;
     cogScript->triggers[cogScript->num_triggers].trigId = symbolGet->symbol_name;
     cogScript->triggers[cogScript->num_triggers].field_8 = symbol->field_14;
     

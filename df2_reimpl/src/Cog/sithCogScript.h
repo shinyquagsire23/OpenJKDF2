@@ -29,7 +29,10 @@ typedef struct sithCogSymbol
     char *symbol_name;
     cogSymbolFunc_t func;
     float as_float;
+    float as_flex;
     int as_int;
+    void* as_data;
+    sithAIClass* as_aiclass;
   };
   int field_C;
   int field_10;

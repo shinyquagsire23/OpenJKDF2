@@ -167,7 +167,7 @@ int jk_main(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nSh
 
     while (1)
     {
-        *(uint32_t*)0x8EE66C = 0x100;
+        //*(uint32_t*)0x8EE66C = 0x100;
         if (jk_PeekMessageA(&msg, 0, 0, 0, 0))
         {
             if (!jk_GetMessageA(&msg, 0, 0, 0))
@@ -254,6 +254,8 @@ __declspec(dllexport) void hook_init(void)
     
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
+    hook_function(sithCog_Shutdown_ADDR, sithCog_Shutdown);
+    hook_function(sithCog_LoadEntry_ADDR, sithCog_LoadEntry);
     hook_function(sithCog_SendMessageFromThing_ADDR, sithCog_SendMessageFromThing);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
@@ -893,6 +895,34 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_Startup_ADDR, sithWeapon_Startup);
     hook_function(sithWeapon_Tick_ADDR, sithWeapon_Tick);
+    hook_function(sithWeapon_sub_4D35E0_ADDR, sithWeapon_sub_4D35E0);
+    hook_function(sithWeapon_sub_4D3920_ADDR, sithWeapon_sub_4D3920);
+    hook_function(sithWeapon_LoadParams_ADDR, sithWeapon_LoadParams);
+    hook_function(sithWeapon_Fire_ADDR, sithWeapon_Fire);
+    hook_function(sithWeapon_FireProjectile_0_ADDR, sithWeapon_FireProjectile_0);
+    hook_function(sithWeapon_SetTimeLeft_ADDR, sithWeapon_SetTimeLeft);
+    hook_function(sithWeapon_Collide_ADDR, sithWeapon_Collide);
+    hook_function(sithWeapon_HitDebug_ADDR, sithWeapon_HitDebug);
+    hook_function(sithWeapon_Remove_ADDR, sithWeapon_Remove);
+    hook_function(sithWeapon_RemoveAndExplode_ADDR, sithWeapon_RemoveAndExplode);
+    hook_function(sithWeapon_InitializeEntry_ADDR, sithWeapon_InitializeEntry);
+    hook_function(sithWeapon_ShutdownEntry_ADDR, sithWeapon_ShutdownEntry);
+
+    hook_function(sithWeapon_SetMountWait_ADDR, sithWeapon_SetMountWait);
+    hook_function(sithWeapon_SetFireWait_ADDR, sithWeapon_SetFireWait);
+    hook_function(sithWeapon_handle_inv_msgs_ADDR, sithWeapon_handle_inv_msgs);
+    hook_function(sithWeapon_Activate_ADDR, sithWeapon_Activate);
+    hook_function(sithWeapon_Deactivate_ADDR, sithWeapon_Deactivate);
+    hook_function(sithWeapon_AutoSelect_ADDR, sithWeapon_AutoSelect);
+    hook_function(sithWeapon_HandleWeaponKeys_ADDR, sithWeapon_HandleWeaponKeys);
+    
+    hook_function(sithWeapon_FireProjectile_ADDR, sithWeapon_FireProjectile);
+    hook_function(sithWeapon_GetPriority_ADDR, sithWeapon_GetPriority);
+    hook_function(sithWeapon_GetCurWeaponMode_ADDR, sithWeapon_GetCurWeaponMode);
+    hook_function(sithWeapon_SyncPuppet_ADDR, sithWeapon_SyncPuppet);
+    hook_function(sithWeapon_WriteConf_ADDR, sithWeapon_WriteConf);
+    hook_function(sithWeapon_ReadConf_ADDR, sithWeapon_ReadConf);
+    hook_function(sithWeapon_SetFireRate_ADDR, sithWeapon_SetFireRate);
     
     // sithExplosion
     hook_function(sithExplosion_CreateThing_ADDR, sithExplosion_CreateThing);

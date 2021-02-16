@@ -95,6 +95,7 @@ rdModel3                       0x2a7e     1.007%        100.000%       23 / 23
 rdMatrix                       0x2c85     1.055%        100.000%       56 / 56         
 jkGuiRend                      0x2cd7     1.063%        100.000%       68 / 68         
 jkPlayer                       0x2da2     1.082%        100.000%       45 / 45         
+sithWeapon                     0x32a8     1.201%        100.000%       33 / 33         
 sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142        
 jkCutscene                     0x443      0.101%        0.000%          0 / 7          
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
@@ -173,7 +174,7 @@ sithCogParse                   0x1b2a     0.644%        99.511%        25 / 26
 sithSurface                    0x1c6a     0.673%        0.000%          0 / 35         
 jkHud                          0x1c9b     0.678%        0.000%          0 / 17         
 jkDev                          0x1e60     0.720%        0.000%          0 / 39         
-sithCog                        0x1ed3     0.731%        16.918%         2 / 28         
+sithCog                        0x1ed3     0.731%        23.508%         4 / 28         
 jkSaber                        0x1f4a     0.742%        33.296%         5 / 40         
 sithInventory                  0x2150     0.790%        72.256%        57 / 62         
 sithRender                     0x23de     0.850%        0.000%          0 / 22         
@@ -186,7 +187,6 @@ sithAI                         0x2771     0.935%        2.209%          2 / 35
 sithUnk3                       0x2827     0.952%        6.275%          4 / 22         
 std3D                          0x2c4a     1.050%        0.000%          0 / 39         
 sithAICmd                      0x2cc0     1.061%        4.958%          1 / 22         
-sithWeapon                     0x32a8     1.201%        3.324%          3 / 33         
 rdCache                        0x331c     1.211%        39.315%        12 / 16         
 sithThing                      0x3c2e     1.426%        2.402%          6 / 53         
 sithSector                     0x79f9     2.891%        10.738%         4 / 96         
@@ -197,5 +197,5 @@ rdAFRaster                     0x1620d    8.391%        0.000%          0 / 122
 rdNRaster                      0x304d4    18.316%       0.000%          0 / 87         
 ------------------------------
 
-Total completion: 18.224%
+Total completion: 19.433%
 ```

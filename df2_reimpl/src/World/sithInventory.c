@@ -7,6 +7,7 @@
 #include "stdPlatform.h"
 #include "Engine/sithNet.h"
 #include "World/sithSector.h"
+#include "Engine/sithTemplate.h"
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
 {

@@ -7,7 +7,6 @@
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Initialize_ADDR (0x40A0C0)
-#define sithCog_Startup_ADDR    (0x4DE070)
 #define sithCogUtil_Initialize_ADDR (0x00505400)
 #define sithCogThing_Initialize_ADDR (0x005014E0)
 #define sithCogAI_Initialize_ADDR (0x00500B00)
@@ -16,10 +15,43 @@
 #define sithCogSector_Initialize_ADDR (0x004FE680)
 #define sithCogSurface_Initialize_ADDR (0x004FFB50)
 
-#define sithCog_SendMessageFromThing_ADDR (0x4DFAC0)
-#define sithCog_SendMessageFromThingEx_ADDR (0x004DFAF0)
+#define sithCog_Startup_ADDR (0x004DE070)
+#define sithCog_Shutdown_ADDR (0x004DE590)
+#define sithCog_Open_ADDR (0x004DE5D0)
+#define sithCog_Close_ADDR (0x004DE7E0)
+#define sithCog_Free_ADDR (0x004DE820)
+#define sithCog_FreeEntry_ADDR (0x004DE9B0)
+#define sithCog_Free2_ADDR (0x004DEA20)
 #define sithCog_HandleThingTimerPulse_ADDR (0x004DEA60)
-#define sithCog_SendMessageToAll_ADDR (0x4DEB00)
+#define sithCog_SendSimpleMessageToAll_ADDR (0x004DEAD0)
+#define sithCog_SendMessageToAll_ADDR (0x004DEB00)
+#define sithCog_SendMessage_ADDR (0x004DEBE0)
+#define sithCog_SendMessageEx_ADDR (0x004DEDC0)
+#define sithCog_InitScripts_ADDR (0x004DEFF0)
+#define sithCog_InitCogs_ADDR (0x004DF080)
+#define sithCog_Load_ADDR (0x004DF110)
+#define sithCog_LoadEntry_ADDR (0x004DF410)
+#define sithCog_ThingsSectorsRegSymbolIdk_ADDR (0x004DF610)
+#define sithCog_LoadCogscript_ADDR (0x004DF7D0)
+#define sithCog_GetByIdx_ADDR (0x004DF930)
+#define sithCog_ThingFromSymbolidk_ADDR (0x004DF980)
+#define sithCog_Thingidk_ADDR (0x004DFA00)
+#define sithCog_Sectoridk_ADDR (0x004DFA60)
+#define sithCog_SendMessageFromThing_ADDR (0x004DFAC0)
+#define sithCog_SendMessageFromThingEx_ADDR (0x004DFAF0)
+#define sithCog_SendMessageFromSector_ADDR (0x004DFD60)
+#define sithCog_SendMessageFromSectorEx_ADDR (0x004DFD90)
+#define sithCog_SendMessageFromSurface_ADDR (0x004DFED0)
+#define sithCog_SendMessageFromSurfaceEx_ADDR (0x004DFF00)
+#define sithCogScript_Load_ADDR (0x004E0040)
+#define sithCogScript_LoadEntry_ADDR (0x004E0240)
+#define sithCogScript_Tick_ADDR (0x004E0300)
+#define sithCogScript_TickAll_ADDR (0x004E0400)
+#define sithCogScript_DevCmdCogStatus_ADDR (0x004E0480)
+#define sithCogScript_RegisterMessageSymbol_ADDR (0x004E0600)
+#define sithCogScript_TimerTick_ADDR (0x004E0640)
+#define sithCogScript_RegisterGlobalMessage_ADDR (0x004E06C0)
+#define sithCogScript_RegisterVerb_ADDR (0x004E0700)
 
 typedef int SITH_MESSAGE;
 
@@ -74,6 +106,8 @@ static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message,
 static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
 
 int sithCog_Startup();
+void sithCog_Shutdown();
+int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);
 
 void sithCogUtil_Initialize(void* a1);
 void sithCogThing_Initialize(void* a1);

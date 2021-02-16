@@ -34,5 +34,6 @@ typedef struct rdSprite rdSprite;
 typedef struct rdEdge rdEdge;
 typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
+typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
 
 #endif // TYPES_H

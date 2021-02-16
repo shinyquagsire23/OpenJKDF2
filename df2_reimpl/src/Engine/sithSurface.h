@@ -97,6 +97,38 @@ typedef struct sithSurface
     sithSurfaceInfo surfaceInfo;
 } sithSurface;
 
+typedef enum SURFACEFLAGS
+{
+    SURFACEFLAGS_1 = 0x1,
+    SURFACEFLAGS_2 = 0x2,
+    SURFACEFLAGS_4 = 0x4,
+    SURFACEFLAGS_8 = 0x8,
+    SURFACEFLAGS_10 = 0x10,
+    SURFACEFLAGS_20 = 0x20,
+    SURFACEFLAGS_40 = 0x40,
+    SURFACEFLAGS_80 = 0x80,
+    SURFACEFLAGS_100 = 0x100,
+    SURFACEFLAGS_200 = 0x200,
+    SURFACEFLAGS_400 = 0x400,
+    SURFACEFLAGS_800 = 0x800,
+    SURFACEFLAGS_1000 = 0x1000,
+    SURFACEFLAGS_2000 = 0x2000,
+    SURFACEFLAGS_4000 = 0x4000,
+    SURFACEFLAGS_8000 = 0x8000,
+    SURFACEFLAGS_METAL = 0x10000,
+    SURFACEFLAGS_WATER = 0x20000,
+    SURFACEFLAGS_PUDDLE = 0x40000,
+    SURFACEFLAGS_EARTH = 0x80000,
+    SURFACEFLAGS_100000 = 0x100000,
+    SURFACEFLAGS_200000 = 0x200000,
+    SURFACEFLAGS_400000 = 0x400000,
+    SURFACEFLAGS_800000 = 0x800000,
+    SURFACEFLAGS_1000000 = 0x1000000,
+    SURFACEFLAGS_2000000 = 0x2000000,
+    SURFACEFLAGS_4000000 = 0x4000000,
+    SURFACEFLAGS_8000000 = 0x8000000,
+} SURFACEFLAGS;
+
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;

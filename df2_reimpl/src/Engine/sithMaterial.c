@@ -167,11 +167,11 @@ LABEL_10:
             stdHashTable_SetKeyVal(sithMaterial_hashmap, v8->mat_fpath, v8);
             v10 = v4->level_type_maybe;
             v11 = v4->numMaterialsLoaded;
-            v8->field_24 = v11;
+            v8->id = v11;
             if ( (v10 & 1) != 0 )
             {
                 v12 = v11 | 0x8000;
-                v8->field_24 = v12;
+                v8->id = v12;
             }
             v4->numMaterialsLoaded = v11 + 1;
             return v8;
