@@ -152,8 +152,8 @@ typedef struct sithSector
     uint32_t flags;
     rdVector3 center;
     rdVector3 thrust;
-    uint32_t field_50;
-    uint32_t field_54;
+    sithSound* field_50;
+    float field_54;
     rdVector3 collidebox_onecorner;
     rdVector3 collidebox_othercorner;
     rdVector3 boundingbox_onecorner;
@@ -194,5 +194,8 @@ static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, in
 static void (*sithSector_cogMsg_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithSector_cogMsg_SendSetThingModel_ADDR;
 static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
 static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithSector_cogMsg_SendFireProjectile_ADDR;
+static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
+static int (*sithSector_cogMsg_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithSector_cogMsg_SendStopSound_ADDR;
+static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithSector_cogMsg_SoundClassPlay_ADDR;
 
 #endif // _SITHSECTOR_H

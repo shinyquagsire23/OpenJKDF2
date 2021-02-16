@@ -105,6 +105,7 @@ enum SITHBIN
     SITHBIN_F_LIGHTNING  = 32,
     SITHBIN_F_DESTRUCTION  = 33,
     SITHBIN_F_DEADLYSIGHT  = 34,
+
     SITHBIN_BACTATANK  = 40,
     SITHBIN_IRGOGGLES  = 41,
     SITHBIN_FIELDLIGHT  = 42,
@@ -117,6 +118,7 @@ enum SITHBIN
     SITHBIN_WRCHBLUE  = 49,
     SITHBIN_WRCHYELLOW  = 50,
     SITHBIN_KEYGREEN  = 51,
+
     SITHBIN_SHIELDS  = 60,
     SITHBIN_FORCEARMOR  = 61,
     SITHBIN_SUPERSHIELDS  = 62,
@@ -124,17 +126,20 @@ enum SITHBIN
     SITHBIN_S_DARK   = 64,
     SITHBIN_S_LIGHT  = 65,
     SITHBIN_REVIVE   = 66,
+
     SITHBIN_SECRETS  = 70,
     SITHBIN_MAXSECRETS  = 71,
     SITHBIN_PEDS_KILLED  = 72,
     SITHBIN_PEDS_TOTAL  = 73,
     SITHBIN_FORCE_MORALITY  = 74,
     SITHBIN_ALIGNMENT  = 75,
+
     SITHBIN_TEAMCOLOR  = 80,
     SITHBIN_REDFLAG  = 81,
     SITHBIN_GOLDFLAG  = 82,
     SITHBIN_REDKEY   = 83,
     SITHBIN_GOLDKEY  = 84,
+
     SITHBIN_STRINGOFFS  = 99,
     SITHBIN_GOAL00   = 100,
     SITHBIN_GOAL01   = 101,
@@ -152,7 +157,9 @@ enum SITHBIN
     SITHBIN_GOAL13   = 113,
     SITHBIN_GOAL14   = 114,
     SITHBIN_GOAL15   = 115,
+
     SITHBIN_HOTKEYOFFS  = 150,
+
     SITHBIN_MAX      = 199
 };
 
@@ -202,9 +209,20 @@ typedef struct sithItemInfo
     float binWait;
 } sithItemInfo;
 
+typedef struct sithKeybind {
+    int enabled;
+    int binding;
+    int idk;
+} sithKeybind;
+
+#define sithInventory_powerKeybinds ((sithKeybind*)0x008BD0C0)
+#define sithInventory_549FA0 (*(int*)0x00549FA0)
 #define sithInventory_aDescriptors ((sithItemDescriptor*)0x008BD1C0)
 #define sithInventory_bUnk (*(int*)0x008339E4)
 #define sithInventory_bUnkPower (*(int*)0x008339E8)
+#define sithInventory_8339EC (*(int*)0x008339EC)
+#define sithInventory_bRendIsHidden (*(int*)0x008339F0)
+#define sithInventory_8339F4 (*(int*)0x008339F4)
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags);
 int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags);
@@ -251,15 +269,15 @@ int sithInventory_GetFlags(sithThing *player, int binIdx);
 void sithInventory_UnsetFlags(sithThing *player, int binIdx, int flags);
 float sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, float param0, float param1, float param2, float param3);
 float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, float param0, float param1, float param2, float param3);
-// sithInventory_Reset
+void sithInventory_Reset(sithThing *player);
 void sithInventory_ClearUncarried(sithThing *player);
 sithThing* sithInventory_CreateBackpack(sithThing *player);
 void sithInventory_PickupBackpack(sithThing *player, sithThing *backpack);
 int sithInventory_NthBackpackBin(sithThing *player, signed int n);
 float sithInventory_NthBackpackValue(sithThing *item, signed int n);
 int sithInventory_NumBackpackItems(sithThing *item);
-//sithInventory_HandleInvSkillKeys
-static int (*sithInventory_HandleInvSkillKeys)(sithThing *player, float b) = (void*)sithInventory_HandleInvSkillKeys_ADDR;
+int sithInventory_HandleInvSkillKeys(sithThing *player);
+//static int (*sithInventory_HandleInvSkillKeys)(sithThing *player, float b) = (void*)sithInventory_HandleInvSkillKeys_ADDR;
 void sithInventory_SendFire(sithThing *player);
 sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx);
 sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx);

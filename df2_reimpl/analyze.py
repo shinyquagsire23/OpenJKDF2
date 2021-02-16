@@ -1,11 +1,14 @@
 funclist = open("ida_copypaste_funclist_nostdlib.txt", "r").read().split("\n")
 
-exclude_filefrom = ["nullsub", "sithCorpse", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub", "daRealloc", "daFree", "daAlloc", "WinMain(x,x,x,x)", "WinCalibrateJoystick", ""]
+exclude_filefrom = ["nullsub", "menu", "init", "show", "gdi", "get", "cheat", "msgbox", "DialogFunc", "devcmd", "do", "idk", "wm", "WinIdk", "util", "cheats", "draw", "thing", "j", "sub", "daRealloc", "daFree", "daAlloc", "WinMain(x,x,x,x)", "WinCalibrateJoystick", ""]
 file_sizes = {}
 decomped_sizes = {}
 decomped_funcs = {}
 total_funcs = {}
 total_size = 0
+total_numFuncs = 0
+total_decompFuncs = 0
+total_raster = 0
 
 mapread = open("output.map", "r").read().split("\n")
 
@@ -75,6 +78,9 @@ for line in funclist:
     
     total_funcs[filefrom] += 1
     total_size += size
+    
+    if "Raster" in filefrom:
+        total_raster += size
     #print (filefrom, funcname, sect, start, size)
 
 total_decomp = 0
@@ -96,6 +102,8 @@ for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     decomp_percent = '{:.3%}'.format(decomp_percent_num/comp_percent_num)
     decomp_fraction = str(decomped_funcs[keyvalpair[0]]).rjust(3) + " / " + str(total_funcs[keyvalpair[0]])
     
+    total_decompFuncs += decomped_funcs[keyvalpair[0]]
+    total_numFuncs += total_funcs[keyvalpair[0]]
     
     print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13), decomp_fraction.ljust(17))
 
@@ -116,9 +124,15 @@ for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     decomp_percent = '{:.3%}'.format(decomp_percent_num/comp_percent_num)
     decomp_fraction = str(decomped_funcs[keyvalpair[0]]).rjust(3) + " / " + str(total_funcs[keyvalpair[0]])
     
+    total_decompFuncs += decomped_funcs[keyvalpair[0]]
+    total_numFuncs += total_funcs[keyvalpair[0]]
     
     print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13), decomp_fraction.ljust(17))
 
-print("------------------------------\n")
-print ("Total completion:", '{:.3%}'.format(total_decomp/total_size))
+print("---------------------------------------------------------------------------------\n")
+print ("Total completion:")
+print ("-----------------")
+print('{:.3%}'.format(total_decomp/total_size) + " by weight")
+print('{:.3%}'.format(total_decomp/(total_size - total_raster)) + " by weight excluding rasterizer")
+print(str(total_decompFuncs) + " / " + str(total_numFuncs) + " functions")
 

@@ -1,5 +1,5 @@
-#ifndef _SITHCONTROL_H
-#define _SITHCONTROL_H
+#ifndef _WIN95SITHCONTROL_H
+#define _WIN95SITHCONTROL_H
 
 #define sithControl_Initialize_ADDR (0x004D6840)
 #define sithControl_Shutdown_ADDR (0x004D6880)
@@ -41,4 +41,4 @@ static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
 static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 
-#endif // _SITHCONTROL_H
+#endif // _WIN95SITHCONTROL_H

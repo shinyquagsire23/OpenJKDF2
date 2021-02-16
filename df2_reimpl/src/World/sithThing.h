@@ -504,7 +504,7 @@ typedef struct sithThing
     float light;
     float lightMin;
     int isVisible;
-    void* soundclass;
+    sithSoundClass* soundclass;
     sithAnimclass* animclass;
     sithPuppet* puppet;
     union

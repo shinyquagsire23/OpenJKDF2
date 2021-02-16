@@ -5,7 +5,7 @@
 #include "Engine/rdroid.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithAnimclass.h"
-#include "Engine/sithSoundclass.h"
+#include "Engine/sithSoundClass.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
@@ -13,6 +13,7 @@
 #include "World/sithSector.h"
 #include "World/sithUnk3.h"
 #include "Main/jkMain.h"
+#include "Main/jkSmack.h"
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)

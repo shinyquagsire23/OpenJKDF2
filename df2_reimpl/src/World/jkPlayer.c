@@ -96,7 +96,7 @@ void jkPlayer_InitSaber()
         playerInfoJk->maxTwinkles = 8;
         playerInfoJk->twinkleSpawnRate = 16;
         playerInfoJk->field_21C = 0;
-        playerInfoJk->field_220 = 0;
+        playerInfoJk->shields = 0;
         playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
         playerInfoJk->field_224 = 0;
         

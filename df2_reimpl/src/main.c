@@ -387,6 +387,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogParse_ReallocSymboltable_ADDR, sithCogParse_ReallocSymboltable);
     hook_function(sithCogParse_FreeSymboltable_ADDR, sithCogParse_FreeSymboltable);
     hook_function(sithCogParse_AddSymbol_ADDR, sithCogParse_AddSymbol);
+    hook_function(sithCogParse_SetSymbolVal_ADDR, sithCogParse_SetSymbolVal);
     hook_function(sithCogParse_GetSymbolVal_ADDR, sithCogParse_GetSymbolVal);
     hook_function(sithCogParse_GetSymbol_ADDR, sithCogParse_GetSymbol);
     hook_function(sithCogParse_GetSymbolScriptIdx_ADDR, sithCogParse_GetSymbolScriptIdx);
@@ -1004,19 +1005,24 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithInventory_UnsetFlags_ADDR, sithInventory_UnsetFlags);
     hook_function(sithInventory_SendMessageToAllWithState_ADDR, sithInventory_SendMessageToAllWithState);
     hook_function(sithInventory_SendMessageToAllWithFlag_ADDR, sithInventory_SendMessageToAllWithFlag);
+    hook_function(sithInventory_Reset_ADDR, sithInventory_Reset);
     hook_function(sithInventory_ClearUncarried_ADDR, sithInventory_ClearUncarried);
     hook_function(sithInventory_CreateBackpack_ADDR, sithInventory_CreateBackpack);
     hook_function(sithInventory_PickupBackpack_ADDR, sithInventory_PickupBackpack);
     hook_function(sithInventory_NthBackpackBin_ADDR, sithInventory_NthBackpackBin);
     hook_function(sithInventory_NthBackpackValue_ADDR, sithInventory_NthBackpackValue);
     hook_function(sithInventory_NumBackpackItems_ADDR, sithInventory_NumBackpackItems);
-    // handleinvskillkeys
+    hook_function(sithInventory_HandleInvSkillKeys_ADDR, sithInventory_HandleInvSkillKeys);
     hook_function(sithInventory_SendFire_ADDR, sithInventory_SendFire);
     hook_function(sithInventory_GetBin_ADDR, sithInventory_GetBin);
     hook_function(sithInventory_GetItemDesc_ADDR, sithInventory_GetItemDesc);
     hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
     hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
+
+    // sithPlayer
+    hook_function(sithPlayer_GetBinAmt_ADDR, sithPlayer_GetBinAmt);
+    hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);

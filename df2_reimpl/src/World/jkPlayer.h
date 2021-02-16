@@ -95,7 +95,7 @@ typedef struct jkPlayerInfo
     uint32_t nextTwinkleSpawnMs;
     uint32_t numTwinkles;
     uint32_t field_21C;
-    uint32_t field_220;
+    int shields;
     uint32_t field_224;
 } jkPlayerInfo;
 

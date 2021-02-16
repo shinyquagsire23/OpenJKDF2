@@ -491,6 +491,13 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
     }
 }
 
+void sithCogParse_SetSymbolVal(sithCogSymbol *a1, struct cogSymbol *a2)
+{
+    // TODO fix all this
+    *(struct cogSymbol *)&a1->symbol_type = *a2;
+    a1->field_10 = a2[1].type;
+}
+
 sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2)
 {
     void *result; // eax
