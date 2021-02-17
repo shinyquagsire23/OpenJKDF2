@@ -77,8 +77,8 @@ typedef struct sithPlayerInfo
     uint32_t field_1390;
     uint32_t field_1394;
     uint32_t field_1398;
-    uint32_t field_139C;
-    uint32_t field_13A0;
+    uint32_t teamNum;
+    uint32_t numKills;
     uint32_t field_13A4;
     uint32_t field_13A8;
     uint32_t score;
@@ -87,6 +87,7 @@ typedef struct sithPlayerInfo
 
 float sithPlayer_GetBinAmt(int idx);
 void sithPlayer_SetBinAmt(int idx, float amt);
+int sithPlayer_GetNum(sithThing *player);
 
 static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;

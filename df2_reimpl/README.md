@@ -147,10 +147,10 @@ jkGuiMouse                     0xdb5      0.325%        0.000%          0 / 14
 DirectDraw                     0xdd4      0.328%        0.000%          0 / 16         
 jkEpisode                      0xdd9      0.328%        0.000%          0 / 10         
 stdPlatform                    0xdde      0.329%        4.930%          5 / 43         
-sithCogPlayer                  0xdf0      0.330%        22.029%         1 / 42         
+sithCogPlayer                  0xdf0      0.330%        57.147%        18 / 42         
 sithUnk4                       0xdfd      0.332%        0.000%          0 / 12         
 jkHudInv                       0xe43      0.338%        0.000%          0 / 9          
-sithPlayer                     0xe72      0.342%        2.109%          2 / 27         
+sithPlayer                     0xe72      0.342%        4.218%          3 / 27         
 sithCogSurface                 0xe92      0.345%        21.582%         1 / 38         
 stdBitmap                      0xeb6      0.349%        0.000%          0 / 14         
 rdPuppet                       0x101f     0.382%        0.000%          0 / 19         
@@ -200,7 +200,8 @@ rdNRaster                      0x304d4    18.316%       0.000%          0 / 87
 
 Total completion:
 -----------------
-19.877% by weight
-33.541% by weight excluding rasterizer
-1225 / 3165 functions
+20.000% by weight
+33.749% by weight excluding rasterizer
+1243 / 3165 functions
+
 ```

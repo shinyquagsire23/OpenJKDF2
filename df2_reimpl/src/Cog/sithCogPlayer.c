@@ -1,22 +1,10 @@
 #include "sithCogPlayer.h"
 
-static void (*sithCogPlayer_SetInvActivate)(sithCog* ctx) = (void*)0x004E0AA0;
-static void (*sithCogPlayer_SetInvAvailable)(sithCog* ctx) = (void*)0x004E0B10;
-static void (*sithCogPlayer_IsInvActivated)(sithCog* ctx) = (void*)0x004E0B80;
-static void (*sithCogPlayer_IsInvAvailable)(sithCog* ctx) = (void*)0x004E0BE0;
-static void (*sithCogPlayer_SetGoalFlags)(sithCog* ctx) = (void*)0x004E0C40;
-static void (*sithCogPlayer_ClearGoalFlags)(sithCog* ctx) = (void*)0x004E0CC0;
-static void (*sithCogPlayer_GetNumPlayers)(sithCog* ctx) = (void*)0x004E0D40;
-static void (*sithCogPlayer_GetMaxPlayers)(sithCog* ctx) = (void*)0x004E0D70;
-static void (*sithCogPlayer_GetAbsoluteMaxPlayers)(sithCog* ctx) = (void*)0x004E0D90;
-static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
-static void (*sithCogPlayer_GetPlayerThing)(sithCog* ctx) = (void*)0x004E0DD0;
-static void (*sithCogPlayer_GetPlayerNum)(sithCog* ctx) = (void*)0x004E0E20;
-static void (*sithCogPlayer_GetPlayerTeam)(sithCog* ctx) = (void*)0x004E0E60;
-static void (*sithCogPlayer_SetPlayerTeam)(sithCog* ctx) = (void*)0x004E0EB0;
-static void (*sithCogPlayer_GetPlayerScore)(sithCog* ctx) = (void*)0x004E0F10;
-static void (*sithCogPlayer_SetPlayerScore)(sithCog* ctx) = (void*)0x004E0F60;
-static void (*sithCogPlayer_GetPlayerKills)(sithCog* ctx) = (void*)0x004E0FC0;
+#include "World/jkPlayer.h"
+#include "World/sithPlayer.h"
+#include "Engine/sithMulti.h"
+#include "Engine/sithNet.h"
+
 static void (*sithCogPlayer_SetPlayerKills)(sithCog* ctx) = (void*)0x004E1010;
 static void (*sithCogPlayer_GetPlayerKilled)(sithCog* ctx) = (void*)0x004E1070;
 static void (*sithCogPlayer_SetPlayerKilled)(sithCog* ctx) = (void*)0x004E10C0;
@@ -41,6 +29,216 @@ static void (*sithCogPlayer_GetNumPlayersInTeam)(sithCog* ctx) = (void*)0x004E15
 static void (*sithCogPlayer_AddScoreToTeamMembers)(sithCog* ctx) = (void*)0x004E1640;
 static void (*sithCogPlayer_SetBinWait)(sithCog* ctx) = (void*)0x004E1690;
 static void (*sithCogPlayer_SyncScores)(sithCog* ctx) = (void*)0x004E16F0;
+
+void sithCogPlayer_SetInvActivate(sithCog *ctx)
+{
+    int bActivate = sithCogVm_PopInt(ctx);
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        if ( bActivate )
+            sithInventory_SetActivate(player, binIdx, 1);
+        else
+            sithInventory_SetActivate(player, binIdx, 0);
+    }
+}
+
+void sithCogPlayer_SetInvAvailable(sithCog *ctx)
+{
+    int bAvailable = sithCogVm_PopInt(ctx);
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        if ( bAvailable )
+            sithInventory_SetAvailable(player, binIdx, 1);
+        else
+            sithInventory_SetAvailable(player, binIdx, 0);
+    }
+}
+
+void sithCogPlayer_IsInvActivated(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        if ( sithInventory_GetActivate(player, binIdx) )
+            sithCogVm_PushInt(ctx, 1);
+        else
+            sithCogVm_PushInt(ctx, 0);
+    }
+}
+
+void sithCogPlayer_IsInvAvailable(sithCog *ctx)
+{
+    int binIdx = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        if ( sithInventory_GetAvailable(player, binIdx) )
+            sithCogVm_PushInt(ctx, 1);
+        else
+            sithCogVm_PushInt(ctx, 0);
+    }
+}
+
+void sithCogPlayer_SetGoalFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) | flags);
+        sithInventory_SetBinAmount(player, binIdx, amt);
+    }
+}
+
+void sithCogPlayer_ClearGoalFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+    int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    {
+        float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags);
+        sithInventory_SetBinAmount(player, binIdx, amt);
+    }
+}
+
+void sithCogPlayer_GetNumPlayers(sithCog *ctx)
+{
+    int numPlayers = 0;
+
+    for (int i = 0; i < jkPlayer_maxPlayers; i++)
+    {
+        if (jkPlayer_playerInfos[i].flags & 1)
+            ++numPlayers;
+    }
+
+    sithCogVm_PushInt(ctx, numPlayers);
+}
+
+void sithCogPlayer_GetMaxPlayers(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, jkPlayer_maxPlayers);
+}
+
+void sithCogPlayer_GetAbsoluteMaxPlayers(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, 32);
+}
+
+void sithCogPlayer_GetLocalPlayerThing(sithCog *ctx)
+{
+    if ( g_localPlayerThing )
+        sithCogVm_PushInt(ctx, g_localPlayerThing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogPlayer_GetPlayerThing(sithCog *ctx)
+{
+    uint32_t idx = sithCogVm_PopInt(ctx);
+    if ( idx < jkPlayer_maxPlayers )
+        sithCogVm_PushInt(ctx, jkPlayer_playerInfos[idx].playerThing->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogPlayer_GetPlayerNum(sithCog *ctx)
+{
+    int playerIdx;
+
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if (player 
+        && player->thingType == THINGTYPE_PLAYER 
+        && (playerIdx = sithPlayer_GetNum(player), playerIdx != -1))
+        sithCogVm_PushInt(ctx, playerIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogPlayer_GetPlayerTeam(sithCog *ctx)
+{
+    sithPlayerInfo *playerInfo;
+
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if (player 
+        && player->thingType == THINGTYPE_PLAYER 
+        && (playerInfo = player->actorParams.playerinfo) != 0 )
+        sithCogVm_PushInt(ctx, playerInfo->teamNum);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
+{
+    int teamNum = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ((!net_isMulti || net_isServer)
+        && player
+        && player->thingType == THINGTYPE_PLAYER)
+    {
+        sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
+        if ( playerInfo )
+        {
+            playerInfo->teamNum = teamNum;
+            if ( net_isMulti )
+                sithMulti_SyncScores();
+        }
+    }
+}
+
+void sithCogPlayer_GetPlayerScore(sithCog *ctx)
+{
+    sithPlayerInfo *playerInfo;
+
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if (player 
+        && player->thingType == THINGTYPE_PLAYER 
+        && (playerInfo = player->actorParams.playerinfo) != 0 )
+        sithCogVm_PushInt(ctx, playerInfo->score);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogPlayer_SetPlayerScore(sithCog *ctx)
+{
+    int score = sithCogVm_PopInt(ctx);
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if ((!net_isMulti || net_isServer)
+        && player
+        && player->thingType == THINGTYPE_PLAYER)
+    {
+        sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
+        if ( playerInfo )
+        {
+            playerInfo->score = score;
+            if ( net_isMulti )
+                sithMulti_SyncScores();
+        }
+    }
+}
+
+void sithCogPlayer_GetPlayerKills(sithCog *ctx)
+{
+    sithPlayerInfo *playerInfo;
+
+    sithThing* player = sithCogVm_PopThing(ctx);
+    if (player 
+        && player->thingType == THINGTYPE_PLAYER 
+        && (playerInfo = player->actorParams.playerinfo) != 0 )
+        sithCogVm_PushInt(ctx, playerInfo->numKills);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
 
 void sithCogPlayer_Initialize(void* ctx)
 {
