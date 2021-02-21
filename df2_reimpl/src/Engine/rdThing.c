@@ -145,30 +145,29 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
     return 1;
 }
 
-void rdThing_Draw(rdThing *thing, rdMatrix34 *m)
+int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
 {
     if (!rdroid_curGeometryMode)
-        return;
+        return 0;
 
     switch ( thing->type )
     {
         case RD_THINGTYPE_0:
         case RD_THINGTYPE_CAMERA:
         case RD_THINGTYPE_LIGHT:
-            return;
+            return 0;
         case RD_THINGTYPE_MODEL:
-            rdModel3_Draw(thing, m);
-            break;
+            return rdModel3_Draw(thing, m);
         case RD_THINGTYPE_SPRITE3:
-            rdSprite_Draw(thing, m);
-            break;
+            return rdSprite_Draw(thing, m);
         case RD_THINGTYPE_PARTICLECLOUD:
-            rdParticle_Draw(thing, m);
-            break;
+            return rdParticle_Draw(thing, m);
         case RD_THINGTYPE_POLYLINE:
-            rdPolyLine_Draw(thing, m);
-            break;
+            return rdPolyLine_Draw(thing, m);
     }
+    
+    // aaaaaaaaaaaaaaaaaa original game returns undefined for other types, this is to replicate that
+    return (intptr_t)thing;
 }
 
 void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc)

@@ -415,7 +415,7 @@ LABEL_280:
             mipmap_level = a3;
             vertices_to_add = rdCache_totalVerts;
         }
-        v14 = active_6c->sith_tex_3_idx_2;
+        v14 = active_6c->wallCel;
         if ( v14 == -1 )
         {
             v14 = v11.material->celIdx;

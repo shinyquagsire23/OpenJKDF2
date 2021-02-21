@@ -41,6 +41,7 @@
 #define jkDev_CmdTeam_ADDR (0x00420F80)
 #define jkDev_DialogFunc_ADDR (0x00420FD0)
 
+static int (*jkDev_Startup)(void) = (void*)jkDev_Startup_ADDR;
 static int (*jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
 
 #endif // _JKDEV_H

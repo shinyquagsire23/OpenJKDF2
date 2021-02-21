@@ -53,15 +53,14 @@ typedef struct sithSurfaceInfo
     uint32_t texMode;
     uint32_t numVertices;
     int* vertexIdxs;
-    uint32_t field_1C;
+    int* vertexUVIdxs;
     rdMaterial* material;
     uint32_t wallCel;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
+    rdVector2 clipIdk;
+    float extraLight;
     rdVector3 surfaceNormal;
-    uint32_t field_40;
-    uint32_t field_44;
+    int* field_40;
+    uint32_t lastTouchedMs;
 } sithSurfaceInfo;
 
 struct rdSurface
@@ -76,7 +75,7 @@ struct rdSurface
   int geoMode;
   int lightMode;
   int texMode;
-  int numVertices;
+  uint32_t numVertices;
   int *vertexIdxs;
   int field_30;
   rdMaterial *material;

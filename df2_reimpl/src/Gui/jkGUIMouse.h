@@ -16,6 +16,7 @@
 #define jkGuiMouse_Initialize_ADDR (0x00417AD0)
 #define jkGuiMouse_Shutdown_ADDR (0x00417AF0)
 
+static int (*jkGuiMouse_Initialize)() = (void*)jkGuiMouse_Initialize_ADDR;
 static int (*jkGuiMouse_Show)() = (void*)jkGuiMouse_Show_ADDR;
 
 #endif // _JKGUI_MOUSE_H

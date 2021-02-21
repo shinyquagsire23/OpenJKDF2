@@ -4,6 +4,7 @@
 #include "Engine/rdMaterial.h"
 #include "Primitives/rdRect.h"
 #include "types.h"
+#include "Win95/Video.h"
 
 #define stdDisplay_Startup_ADDR (0x0421FC0)
 #define stdDisplay_RestoreDisplayMode_ADDR (0x04220B0)
@@ -139,11 +140,6 @@ static int (*stdDisplay_ddraw_surface_flip)() = (void*)stdDisplay_ddraw_surface_
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 
-#define Video_curMode (*(int*)0x00866D7C)
-#define Video_otherBuf (*(stdVBuffer*)0x866CA0)
-#define Video_dword_866D78 (*(int*)0x866D78)
-#define Video_menuBuffer (*(stdVBuffer*)0x86AC00)
-#define Video_renderSurface ((stdVideoMode*)0x00866D80)
 #define stdDisplay_pCurDevice (*(stdVideoDevice**)0x0055B3E8)
 #define stdDisplay_pCurVideoMode (*(stdVideoMode **)0x0055B3F0)
 #define stdDisplay_bOpen (*(int*)0x55B3DC)

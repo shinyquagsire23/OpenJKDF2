@@ -57,7 +57,7 @@ typedef struct rdProcEntry
     rdVector2* vertexUVs;
     float* vertexIntensities;
     rdMaterial* material;
-    uint32_t sith_tex_3_idx_2;
+    uint32_t wallCel;
     float ambientLight;
     float light_level_static;
     float extralight;

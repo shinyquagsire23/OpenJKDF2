@@ -36,8 +36,13 @@ typedef struct rdSprite rdSprite;
 typedef struct rdEdge rdEdge;
 typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
+typedef struct rdClipFrustum rdClipFrustum;
+typedef struct rdVertexIdxInfo rdVertexIdxInfo;
 typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;
+typedef struct sithAI sithAI;
+typedef struct sithAICommand sithAICommand;
+typedef struct sithActor sithActor;
 
 #endif // TYPES_H

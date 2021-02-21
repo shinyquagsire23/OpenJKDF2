@@ -40,6 +40,6 @@ rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, float width, 
 int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extralight, rdVector3 *offset);
 void rdSprite_Free(rdSprite *sprite);
 void rdSprite_FreeEntry(rdSprite *sprite);
-void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat);
+int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat);
 
 #endif // _RDSPRITE_H

@@ -16,6 +16,7 @@
 #define jkGuiKeyboard_Initialize_ADDR (0x00412970)
 #define jkGuiKeyboard_Shutdown_ADDR (0x00412990)
 
+static int (*jkGuiKeyboard_Initialize)() = (void*)jkGuiKeyboard_Initialize_ADDR;
 static int (*jkGuiKeyboard_Show)() = (void*)jkGuiKeyboard_Show_ADDR;
 
 #endif // _JKGUI_KEYBOARD_H

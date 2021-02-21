@@ -9,6 +9,7 @@
 #define jkCutscene_PauseShow_ADDR (0x00421560)
 #define jkCutscene_Handler_ADDR (0x004215C0)
 
+static void (*jkCutscene_Initialize)() = (void*)jkCutscene_Initialize_ADDR;
 static void (*jkCutscene_PauseShow)() = (void*)jkCutscene_PauseShow_ADDR;
 
 #endif // _JK_CUTSCENE_H

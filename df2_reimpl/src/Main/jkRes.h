@@ -29,8 +29,10 @@
 #define jkRes_episodeGobName ((char*)0x00555C70)
 #define jkRes_curDir ((char*)0x00555C90)
 
+static int (*jkRes_Startup)(common_functions *a1) = (void*)jkRes_Startup_ADDR;
 static int (*jkRes_FileExists)(char *fpath, char *a2, int len) = (void*)jkRes_FileExists_ADDR;
 static void (*jkRes_LoadGob)(char *a1) = (void*)jkRes_LoadGob_ADDR;
 static void (*jkRes_LoadCd)(char *a1) = (void*)jkRes_LoadCd_ADDR;
+static int (*jkRes_LoadCD)(int a1) = (void*)jkRes_LoadCD_ADDR;
 
 #endif // _JKRES_H

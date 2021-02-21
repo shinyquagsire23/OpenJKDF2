@@ -82,7 +82,7 @@ typedef struct stdConsole
     uint32_t dword8C;
 } stdConsole;
 
-int stdConsole_Startup(LPCSTR lpConsoleTitle, COORD dwWriteCoord, int a3);
+int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3);
 BOOL stdConsole_Shutdown();
 stdConsole* stdConsole_New(int a1, int a2, int a3, int a4, char *a5, char a6, char a7, char a8, char a9, __int16 a10, unsigned __int8 a11, unsigned __int8 a12, char a13);
 void stdConsole_Free(stdConsole *a1);

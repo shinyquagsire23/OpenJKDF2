@@ -64,6 +64,7 @@
 #include "Engine/sithSprite.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithParticle.h"
+#include "Engine/sithRender.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -87,6 +88,7 @@
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
 #include "Win95/stdConsole.h"
+#include "Win95/Window.h"
 #include "Win95/Windows.h"
 #include "Win95/wuRegistry.h"
 #include "Win95/stdGdi.h"
@@ -98,126 +100,14 @@
 #include "Main/jkGob.h"
 #include "Main/jkStrings.h"
 #include "Main/jkControl.h"
+#include "Main/Main.h"
 
 __declspec(dllexport) void hook_init(void);
 int yyparse();
 
-int jk_main(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd, char* lpWindowName)
-{
-    int result;
-    WNDCLASSEXA wndClass;
-    MSG msg;
-
-    g_handler_count = 0;
-    g_thing_two_some_dialog_count = 0;
-    g_should_exit = 0;
-    g_window_not_destroyed = 0;
-    g_hInstance = hInstance;
-    g_nShowCmd = nShowCmd;
-
-    wndClass.cbSize = 48;
-    wndClass.hInstance = hInstance;
-    wndClass.lpszClassName = "wKernel";
-    wndClass.lpszMenuName = 0;
-    wndClass.lpfnWndProc = wm_msg_main_handler;
-    wndClass.style = 3;
-    wndClass.hIcon = jk_LoadIconA(hInstance, "APPICON");
-    if ( !wndClass.hIcon )
-        wndClass.hIcon = jk_LoadIconA(0, 32512);
-    wndClass.hIconSm = jk_LoadIconA(hInstance, "APPICON");
-    if ( !wndClass.hIconSm )
-        wndClass.hIconSm = jk_LoadIconA(0, 32512);
-    wndClass.hCursor = jk_LoadCursorA(0, 0x7F00);
-    wndClass.cbClsExtra = 0;
-    wndClass.cbWndExtra = 0;
-    wndClass.hbrBackground = jk_GetStockObject(4);
-
-    if (jk_RegisterClassExA(&wndClass))
-    {
-        if ( jk_FindWindowA("wKernel", lpWindowName) )
-            jk_exit(-1);
-
-        uint32_t hres = jk_GetSystemMetrics(1);
-        uint32_t vres = jk_GetSystemMetrics(0);
-        g_hWnd = jk_CreateWindowExA(0x40000u, "wKernel", lpWindowName, 0x90000000, 0, 0, vres, hres, 0, 0, hInstance, 0);
-
-        if (g_hWnd)
-        {
-            g_hInstance = (int)hInstance;
-            jk_ShowWindow(g_hWnd, 1);
-            jk_UpdateWindow(g_hWnd);
-        }
-    }
-
-    sub_436D10(g_hWnd);
-    sub_436D30(g_hInstance);
-    jk_InitCommonControls();
-
-    g_855E8C = 2 * jk_GetSystemMetrics(32);
-    uint32_t metrics_32 = jk_GetSystemMetrics(32);
-    g_855E90 = jk_GetSystemMetrics(15) + 2 * metrics_32;
-    result = sub_401000(lpCmdLine);
-    
-    //jk_printf("aaa %x\n", &msg);
-
-    if (!result) return result;
-
-    
-    g_window_not_destroyed = 1;
-
-    while (1)
-    {
-        //*(uint32_t*)0x8EE66C = 0x100;
-        if (jk_PeekMessageA(&msg, 0, 0, 0, 0))
-        {
-            if (!jk_GetMessageA(&msg, 0, 0, 0))
-            {
-                result = msg.wParam;
-                g_should_exit = 1;
-                break;
-            }
-
-            uint32_t some_cnt = 0;
-            if (g_thing_two_some_dialog_count > 0)
-            {
-#if 0
-                v16 = &thing_three;
-                do
-                {
-                    //TODO if ( jk_IsDialogMessageA(*v16, &msg) )
-                    //  break;
-                    ++some_cnt;
-                    ++v16;
-                }
-                while ( some_cnt < g_thing_two_some_dialog_count );
-#endif
-            }
-
-            if (some_cnt == g_thing_two_some_dialog_count)
-            {
-                jk_TranslateMessage(&msg);
-                jk_DispatchMessageA(&msg);
-            }
-
-            if (!jk_PeekMessageA(&msg, 0, 0, 0, 0))
-            {
-                result = 0;
-                if ( g_should_exit )
-                    return result;
-            }
-        }
-
-        //if (user32->stopping) break;
-
-        other_window_stuff();
-    }
-
-    return result;
-}
-
 __declspec(dllexport) int WinMain_(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd)
 {
-    jk_main(hInstance, hPrevInstance, lpCmdLine, nShowCmd, "Jedi Knight");
+    Window_Main(hInstance, hPrevInstance, lpCmdLine, nShowCmd, "Jedi Knight");
     return 0;
 }
 
@@ -230,9 +120,7 @@ __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInsta
     
     VirtualProtect((void*)0x401000, 0x522000-0x401000, old, NULL);
     
-    jk_printf("asdf\n");
-    
-    jk_main(hInstance, hPrevInstance, "-windowGUI", nShowCmd, "Jedi Knight");
+    Window_Main(hInstance, hPrevInstance, "-windowGUI", nShowCmd, "Jedi Knight");
 }
 
 void _pei386_runtime_relocator(){}
@@ -1112,6 +1000,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkControl_Shutdown_ADDR, jkControl_Shutdown);
     hook_function(jkControl_HandleHudKeys_ADDR, jkControl_HandleHudKeys);
     
+    // Main
+    hook_function(Main_Startup_ADDR, Main_Startup);
+    
     // sithUnk3
     hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
     hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
@@ -1173,6 +1064,30 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithParticle_Remove_ADDR, sithParticle_Remove);
     hook_function(sithParticle_FreeEntry_ADDR, sithParticle_FreeEntry);
     hook_function(sithParticle_Free_ADDR, sithParticle_Free);
+    
+    // sithRender
+    hook_function(sithRender_Startup_ADDR, sithRender_Startup);
+    hook_function(sithRender_Open_ADDR, sithRender_Open);
+    hook_function(sithRender_Close_ADDR, sithRender_Close);
+    hook_function(sithRender_Shutdown_ADDR, sithRender_Shutdown);
+    hook_function(sithRender_SetSomeRenderflag_ADDR, sithRender_SetSomeRenderflag);
+    hook_function(sithRender_GetSomeRenderFlag_ADDR, sithRender_GetSomeRenderFlag);
+    hook_function(sithRender_EnableIRMode_ADDR, sithRender_EnableIRMode);
+    hook_function(sithRender_DisableIRMode_ADDR, sithRender_DisableIRMode);
+    hook_function(sithRender_SetGeoMode_ADDR, sithRender_SetGeoMode);
+    hook_function(sithRender_SetLightMode_ADDR, sithRender_SetLightMode);
+    hook_function(sithRender_SetTexMode_ADDR, sithRender_SetTexMode);
+    hook_function(sithRender_SetPalette_ADDR, sithRender_SetPalette);
+    hook_function(sithRender_Draw_ADDR, sithRender_Draw);
+    hook_function(sithRender_Clip_ADDR, sithRender_Clip);
+    hook_function(sithRender_RenderLevelGeometry_ADDR, sithRender_RenderLevelGeometry);
+    hook_function(sithRender_UpdateAllLights_ADDR, sithRender_UpdateAllLights);
+    hook_function(sithRender_UpdateLights_ADDR, sithRender_UpdateLights);
+    hook_function(sithRender_RenderDynamicLights_ADDR, sithRender_RenderDynamicLights);
+    hook_function(sithRender_RenderThings_ADDR, sithRender_RenderThings);
+    hook_function(sithRender_RenderPov_ADDR, sithRender_RenderPov);
+    hook_function(sithRender_RenderAlphaSurfaces_ADDR, sithRender_RenderAlphaSurfaces);
+    hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

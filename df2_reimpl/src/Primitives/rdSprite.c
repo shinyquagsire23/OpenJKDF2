@@ -115,7 +115,7 @@ void rdSprite_FreeEntry(rdSprite *sprite)
     }
 }
 
-void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
+int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 {
     rdProcEntry *procEntry;
     rdVector2 *vertexUVs;
@@ -134,11 +134,11 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         clipResult = thing->clippingIdk;
 
     if ( clipResult == 2 )
-        return;
+        return 0;
 
     procEntry = rdCache_GetProcEntry();
     if (!procEntry)
-        return;
+        return 0;
 
     mesh_in.numVertices = sprite->face.numVertices;
     mesh_in.vertexPosIdx = sprite->face.vertexPosIdx;
@@ -223,7 +223,7 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     else
         rdPrimit3_NoClipFace(procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, &mesh_in, &mesh_out, &sprite->face.field_28);
     if ( mesh_out.numVertices < 3u )
-        return;
+        return 0;
 
     rdCamera_pCurCamera->projectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
 
@@ -296,10 +296,11 @@ void rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         procFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->sith_tex_3_idx_2 = thing->gap2C;
+    procEntry->wallCel = thing->gap2C;
     procEntry->type = sprite->face.type;
     procEntry->extralight = sprite->face.extralight;
     procEntry->material = sprite->face.material;
 
     rdCache_AddProcFace(0, mesh_out.numVertices, procFlags);
+    return 1;
 }

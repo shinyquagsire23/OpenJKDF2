@@ -17,7 +17,7 @@ int sithMaterial_Startup();
 void sithMaterial_Shutdown();
 void sithMaterial_Free(sithWorld *world);
 int sithMaterial_Load(sithWorld *world, int a2);
-rdMaterial* sithMaterial_LoadEntry(char *a1, int create_ddraw_surface, int gpu_mem);
+rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int gpu_mem);
 rdMaterial* sithMaterial_GetByIdx(int idx);
 int sithMaterial_GetMemorySize(rdMaterial *mat);
 rdVector2* sithMaterial_New(sithWorld *world, int num);

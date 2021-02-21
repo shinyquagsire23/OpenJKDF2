@@ -21,6 +21,7 @@
 #define jkGuiJoystick_Initialize_ADDR (0x0041C1C0)
 #define jkGuiJoystick_Shutdown_ADDR (0x0041C1E0)
 
+static int (*jkGuiJoystick_Initialize)() = (void*)jkGuiJoystick_Initialize_ADDR;
 static int (*jkGuiJoystick_Show)() = (void*)jkGuiJoystick_Show_ADDR;
 
 #endif // _JKGUI_JOYSTICK_H

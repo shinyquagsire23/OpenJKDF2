@@ -15,7 +15,7 @@ typedef struct sithSurface sithSurface;
 #define sithSector_sub_4F2C30_ADDR (0x004F2C30)
 #define sithSector_SetSkyParams_ADDR (0x004F2D30)
 #define sithSector_Close_ADDR (0x004F2DC0)
-#define sithSector_sub_4F2DD0_ADDR (0x004F2DD0)
+#define sithSector_UpdateSky_ADDR (0x004F2DD0)
 #define sithSector_sub_4F2E30_ADDR (0x004F2E30)
 #define sithSector_sub_4F2F60_ADDR (0x004F2F60)
 #define sithSector_cogMsg_SendTeleportThing_ADDR (0x004F3120)
@@ -164,6 +164,8 @@ typedef struct sithSector
     rdClipFrustum* clipFrustum;
 } sithSector;
 
+void sithSector_Close();
+
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
 void sithSector_ThingPhysicsTick(sithThing *thing, float force);
 void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds);
@@ -197,5 +199,9 @@ static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing 
 static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
 static int (*sithSector_cogMsg_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithSector_cogMsg_SendStopSound_ADDR;
 static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithSector_cogMsg_SoundClassPlay_ADDR;
+static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;
+static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
+static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
+static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 
 #endif // _SITHSECTOR_H

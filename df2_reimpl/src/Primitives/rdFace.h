@@ -16,8 +16,8 @@ typedef struct rdVertexIdxInfo
     int* vertexUVIdx;
     rdVector3* vertices;
     rdVector2* extraUV;
-    uint32_t field_14;
-    uint32_t field_18;
+    void* field_14;
+    int* field_18;
 } rdVertexIdxInfo;
 
 typedef struct rdFace

@@ -74,13 +74,13 @@ typedef struct sithPlayerInfo
     uint32_t field_1384;
     uint32_t field_1388;
     uint32_t field_138C;
-    uint32_t field_1390;
+    uint32_t respawnMask;
     uint32_t field_1394;
     uint32_t field_1398;
     uint32_t teamNum;
     uint32_t numKills;
-    uint32_t field_13A4;
-    uint32_t field_13A8;
+    uint32_t numKilled;
+    uint32_t numSuicides;
     uint32_t score;
     uint32_t field_13B0;
 } sithPlayerInfo;
@@ -96,5 +96,6 @@ static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetB
 static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)sithPlayer_AddDynamicTint_ADDR;
 static void (*sithPlayer_AddDyamicAdd)(int r, int g, int b) = (void*)sithPlayer_AddDyamicAdd_ADDR;
 static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlayer_ThingIdxToPlayerIdx_ADDR;
+static void (*sithPlayer_SetScreenTint)(float r, float g, float b) = (void*)sithPlayer_SetScreenTint_ADDR;
 
 #endif // _SITHPLAYER_H

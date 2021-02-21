@@ -8,6 +8,7 @@
 #define jkGuiControlSaveLoad_Initialize_ADDR (0x0041EBA0)
 #define jkGuiControlSaveLoad_Shutdown_ADDR (0x0041EBC0)
 
+static int (*jkGuiControlSaveLoad_Initialize)() = (void*)jkGuiControlSaveLoad_Initialize_ADDR;
 static int (*jkGuiControlSaveLoad_Write)(int a1) = (void*)jkGuiControlSaveLoad_Write_ADDR;
 
 #endif // _JKGUI_CONTROLSAVELOAD_H

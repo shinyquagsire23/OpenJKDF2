@@ -40,4 +40,8 @@ int stdReadRaw(char *fpath, void *out, signed int len);
 char stdFGetc(int fd);
 void stdFPutc(char c, int fd);
 
+static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
+static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
+static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
+
 #endif // _STDLEC_H

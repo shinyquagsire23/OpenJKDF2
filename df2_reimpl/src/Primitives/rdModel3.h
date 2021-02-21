@@ -112,8 +112,8 @@ typedef struct rdMesh
     int field_6C;
 } rdMesh;
 
-typedef int (__cdecl *model3Loader_t)(char *, rdModel3*);
-typedef int (__cdecl *model3Unloader_t)(rdModel3*);
+typedef rdModel3* (*model3Loader_t)(const char *, int);
+typedef int (*model3Unloader_t)(rdModel3*);
 
 #define rdModel3_pCurGeoset (*(rdGeoset**)0x0073A3D8)
 #define localCamera (*(rdVector3*)0x0073A3E0)

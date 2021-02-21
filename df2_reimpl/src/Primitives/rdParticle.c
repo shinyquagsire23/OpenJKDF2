@@ -429,7 +429,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
                 v30 = v29[v32];
                 v5->geometryMode = 3;
                 v5->type = 0;
-                v5->sith_tex_3_idx_2 = v30;
+                v5->wallCel = v30;
                 v5->light_flags = 0;
                 rdCache_AddProcFace(0, v27, 1);
             }

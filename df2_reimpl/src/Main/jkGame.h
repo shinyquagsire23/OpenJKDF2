@@ -2,6 +2,7 @@
 #define _JKGAME_H
 
 #include "jk.h"
+#include "Main/Main.h"
 
 #define jkGame_SetDefaultSettings_ADDR (0x00401480)
 #define jkGame_ForceRefresh_ADDR (0x00401EC0)
@@ -19,8 +20,6 @@
 
 typedef struct sithThing sithThing;
 
-#define pHS (*(common_functions**)0x860440)
-
 #define g_sithMode (*(int*)0x8EE660)
 #define g_submodeFlags (*(int*)0x8EE664)
 #define g_debugmodeFlags (*(int*)0x8EE66C)
@@ -29,6 +28,7 @@ typedef struct sithThing sithThing;
 #define jkGame_gamma (*(int*)0x008606A4)
 #define jkGame_screenSize (*(int*)0x008605F0)
 
+static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
 static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;

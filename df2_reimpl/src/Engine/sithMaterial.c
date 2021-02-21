@@ -122,7 +122,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
     return result;
 }
 
-rdMaterial* sithMaterial_LoadEntry(char *a1, int create_ddraw_surface, int gpu_mem)
+rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int gpu_mem)
 {
     sithWorld *v4; // ebp
     rdMaterial *result; // eax

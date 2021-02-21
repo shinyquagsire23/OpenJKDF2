@@ -284,7 +284,7 @@ float _frand();
 VM_VAR_DECL(g_hWnd, HWND);
 
 VM_VAR_DECL(g_nShowCmd, uint32_t);
-VM_VAR_DECL(g_hInstance, uint32_t);
+VM_VAR_DECL(g_hInstance, HINSTANCE);
 
 VM_VAR_DECL(g_app_suspended, uint32_t);
 VM_VAR_DECL(g_window_active, uint32_t);
@@ -319,7 +319,7 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define g_window_not_destroyed *(g_window_not_destroyed_ptr)
 #define g_cog_symbolTable (*(sithCogSymboltable**)0x008B5428)
 
-#define wm_msg_main_handler (0x50ECB0)
+#define wm_msg_main_handler ((WNDPROC)0x50ECB0)
 
 #define pSithHS (*((struct common_functions **)0x82F0A4))
 #define g_cog_hashtable (*(void**)0x836C3C)

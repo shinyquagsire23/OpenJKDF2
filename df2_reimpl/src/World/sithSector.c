@@ -11,6 +11,10 @@
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
 
+void sithSector_Close()
+{
+}
+
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs)
 {
     if (mag == 0.0 || rdVector_Len3(vec) >= mag)

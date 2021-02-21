@@ -3,7 +3,7 @@
 #include "jk.h"
 #include <windows.h>
 
-int stdConsole_Startup(LPCSTR lpConsoleTitle, COORD dwWriteCoord, int a3)
+int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
 {
     const CHAR *v3; // ebx
     void *v5; // eax
@@ -17,15 +17,14 @@ int stdConsole_Startup(LPCSTR lpConsoleTitle, COORD dwWriteCoord, int a3)
     jk_SetConsoleTitleA(lpConsoleTitle);
     stdConsole_hConsoleInput = jk_GetStdHandle(0xFFFFFFF6);
     v5 = (void *)jk_GetStdHandle(0xFFFFFFF5);
-    stdConsole_wAttributes = dwWriteCoord.X;
+    stdConsole_wAttributes = dwWriteCoord;
     stdConsole_hConsoleOutput = v5;
     stdConsole_ConsoleCursorInfo.dwSize = 8;
     stdConsole_ConsoleCursorInfo.bVisible = 1;
     stdConsole_cursorHidden = 0;
-    stdConsole_foregroundAttr = dwWriteCoord.X & 0xF0;
-    jk_SetConsoleTextAttribute(v5, dwWriteCoord.X & 0xF0);
-    dwWriteCoord.X = 0;
-    dwWriteCoord.Y = 0;
+    stdConsole_foregroundAttr = dwWriteCoord & 0xF0;
+    jk_SetConsoleTextAttribute(v5, dwWriteCoord & 0xF0);
+    dwWriteCoord = 0;
     jk_FillConsoleOutputCharacterA(stdConsole_hConsoleOutput, ' ', 0x7D0u, nopCoord, (LPDWORD)&tmp);
     v7 = (v7 & 0xFFFF0000) | stdConsole_wAttributes;
     stdConsole_foregroundAttr = stdConsole_wAttributes;

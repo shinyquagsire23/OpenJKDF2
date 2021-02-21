@@ -1411,7 +1411,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         procEntry->ambientLight = 0.0;
 
     int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
-    procEntry->sith_tex_3_idx_2 = face->field_24;
+    procEntry->wallCel = face->field_24;
     if ( procEntry->ambientLight < 1.0 )
     {
         if ( procEntry->lightingMode == 2 )

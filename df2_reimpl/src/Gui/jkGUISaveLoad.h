@@ -11,6 +11,7 @@
 #define jkGuiSaveLoad_Initialize_ADDR (0x0041E440)
 #define jkGuiSaveLoad_Shutdown_ADDR (0x0041E460)
 
+static int (*jkGuiSaveLoad_Initialize)() = (void*)jkGuiSaveLoad_Initialize_ADDR;
 static int (*jkGuiSaveLoad_Show)(int a1) = (void*)jkGuiSaveLoad_Show_ADDR;
 
 #endif // _JKGUISAVELOAD_H

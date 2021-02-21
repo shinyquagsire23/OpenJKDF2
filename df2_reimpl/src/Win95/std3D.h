@@ -214,6 +214,7 @@ static int (*std3D_RenderListVerticesFinish)() = (void*)std3D_RenderListVertices
 static int (*std3D_AddRenderListVertices)(void *vertex_array, int count) = (void*)std3D_AddRenderListVertices_ADDR;
 static void (*std3D_AddRenderListTris)(rdTri *tris, unsigned int num_tris) = (void*)std3D_AddRenderListTris_ADDR;
 static signed int (__cdecl *std3D_SetCurrentPalette)(rdColor24 *a1, int a2) = (void*)std3D_SetCurrentPalette_ADDR;
+static void (*std3D_UnloadAllTextures)() = (void*)std3D_UnloadAllTextures_ADDR;
 
 static unsigned int* (*std3D_GetValidDimension)(unsigned int a1, unsigned int a2, unsigned int *a3, unsigned int *a4) = (void*)std3D_GetValidDimension_ADDR;
 

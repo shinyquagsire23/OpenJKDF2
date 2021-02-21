@@ -407,7 +407,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
         procFaceFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->sith_tex_3_idx_2 = thing->gap2C;
+    procEntry->wallCel = thing->gap2C;
     procEntry->type = face->type;
     procEntry->extralight = face->extralight;
     procEntry->material = face->material;

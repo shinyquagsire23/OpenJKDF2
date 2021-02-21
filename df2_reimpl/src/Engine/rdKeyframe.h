@@ -15,7 +15,7 @@
 
 typedef struct rdKeyframe rdKeyframe; 
 
-typedef int (__cdecl *keyframeLoader_t)(char*);
+typedef rdKeyframe* (__cdecl *keyframeLoader_t)(const char*);
 typedef int (__cdecl *keyframeUnloader_t)(rdKeyframe*);
 
 typedef struct rdMarkers
