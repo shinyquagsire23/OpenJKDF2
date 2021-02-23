@@ -776,6 +776,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithThing_GetThingByIdx_ADDR, sithThing_GetThingByIdx);
     
     // sithSector
+    hook_function(sithSector_Startup_ADDR, sithSector_Startup);
+    hook_function(sithSector_Shutdown_ADDR, sithSector_Shutdown);
     hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
     hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
     hook_function(sithSector_ThingPhysGeneral_ADDR, sithSector_ThingPhysGeneral);

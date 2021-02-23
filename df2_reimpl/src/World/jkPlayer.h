@@ -196,6 +196,13 @@ int jkPlayer_ReadOptionsConf();
 int jkPlayer_GetJediRank();
 void jkPlayer_SetRank(int rank);
 
+#ifdef QOL_IMPROVEMENTS
+extern int jkPlayer_fov;
+
+#define FOV_MIN (90.0)
+#define FOV_MAX (160.0)
+#endif
+
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;
 //static int (*jkPlayer_ReadConf)(wchar_t *a1) = (void*)jkPlayer_ReadConf_ADDR;
 //static int (*jkPlayer_VerifyWcharName)(wchar_t *a1) = (void*)jkPlayer_VerifyWcharName_ADDR;

@@ -19,7 +19,11 @@ enum jkGuiDecisionButton_t
     GUI_CONTROLS = 104
 };
 
-static jkGuiElement jkGuiGeneral_aElements[13] = { 
+static wchar_t slider_val_text[5] = {0};
+static int slider_1[2] = {18, 17};
+void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+
+static jkGuiElement jkGuiGeneral_aElements[18] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -32,6 +36,13 @@ static jkGuiElement jkGuiGeneral_aElements[13] = {
     { ELEMENT_CHECKBOX,    0,            0, "GUI_DISABLECUTSCENES", 0, {20, 180, 300, 40},  1, 0, "GUI_DISABLECUTSCENES_HINT", 0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1,            2, "GUI_CANCEL",           3, {0, 430, 200, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+
+#ifdef QOL_IMPROVEMENTS
+    {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, 100,                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+#endif
+
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
 
@@ -47,6 +58,20 @@ void jkGuiGeneral_Shutdown()
     ;
 }
 
+#ifdef QOL_IMPROVEMENTS
+void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+{
+    jkPlayer_fov = FOV_MIN + (int)((double)jkGuiGeneral_aElements[13].selectedTextEntry * (FOV_MAX - FOV_MIN) * 0.01);
+    
+    jk_snwprintf(slider_val_text, 5, L"%u", jkPlayer_fov);
+    jkGuiGeneral_aElements[14].wstr = slider_val_text;
+    
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiGeneral_aElements[14], menu, 1);
+    
+    jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
+}
+#endif
+
 int jkGuiGeneral_Show()
 {
     int v0; // esi
@@ -58,6 +83,11 @@ int jkGuiGeneral_Show()
     jkGuiRend_MenuSetLastElement(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[10]);
     jkGuiRend_SetDisplayingStruct(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[11]);
     jkGuiSetup_sub_412EF0(&jkGuiGeneral_menu, 0);
+
+#ifdef QOL_IMPROVEMENTS
+    jkGuiGeneral_aElements[13].selectedTextEntry = (int)((double)(jkPlayer_fov - FOV_MIN) * (1.0 / (double)(FOV_MAX - FOV_MIN)) * 100.0);
+#endif
+
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);
     if ( v0 != -1 )
     {

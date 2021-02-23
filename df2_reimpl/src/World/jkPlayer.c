@@ -29,6 +29,10 @@
 #include "Main/jkGame.h"
 #include "jk.h"
 
+#ifdef QOL_IMPROVEMENTS
+int jkPlayer_fov = 90;
+#endif
+
 int jkPlayer_LoadAutosave()
 {
     char tmp[128];
@@ -236,6 +240,9 @@ void jkPlayer_WriteConf(wchar_t *name)
                 pathIter += 32;
             }
         }
+#ifdef QOL_IMPROVEMENTS
+        stdConffile_Printf("fov %d\n", jkPlayer_fov);
+#endif
         stdConffile_CloseWrite();
     }
 }
@@ -293,6 +300,16 @@ int jkPlayer_ReadConf(wchar_t *name)
                 }
             }
         }
+#ifdef QOL_IMPROVEMENTS
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "fov %d", &jkPlayer_fov);
+            if (jkPlayer_fov < FOV_MIN)
+                jkPlayer_fov = FOV_MIN;
+            if (jkPlayer_fov > FOV_MAX)
+                jkPlayer_fov = FOV_MAX;
+        }
+#endif
         stdConffile_Close();
         return 1;
     }

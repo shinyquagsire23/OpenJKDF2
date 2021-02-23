@@ -7,9 +7,34 @@
 #include "World/sithUnk3.h"
 #include "jk.h"
 #include "Engine/sithNet.h"
+#include "Engine/sithTimer.h"
 
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
+
+int sithSector_Startup()
+{
+    sithSector_allocPerSector = (sithSectorAlloc *)pSithHS->alloc(sizeof(sithSectorAlloc) * sithWorld_pCurWorld->numSectors);
+    if (sithSector_allocPerSector)
+    {
+        sithSector_numEntries = 0;
+        if ( sithTimer_RegisterFunc(3, sithSector_TimerTick, 1000, 1) )
+        {
+            sithSector_bInitted = 1;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void sithSector_Shutdown()
+{
+    pSithHS->free(sithSector_allocPerSector);
+    sithSector_allocPerSector = 0;
+    sithTimer_RegisterFunc(3, NULL, 0, 0);
+    sithSector_bInitted = 0;
+}
 
 void sithSector_Close()
 {

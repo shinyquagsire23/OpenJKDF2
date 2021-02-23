@@ -164,6 +164,46 @@ typedef struct sithSector
     rdClipFrustum* clipFrustum;
 } sithSector;
 
+typedef struct sithSectorEntry
+{
+    sithSector *sector;
+    sithThing *thing;
+    rdVector3 pos;
+    int field_14;
+    float field_18;
+} sithSectorEntry;
+
+typedef struct sithSectorAlloc
+{
+    int field_0;
+    float field_4;
+    int field_8;
+    int field_C;
+    int field_10;
+    int field_14;
+    int field_18;
+    int field_1C;
+    int field_20;
+    int field_24;
+    int field_28;
+    int field_2C;
+    int field_30;
+    int field_34;
+    int field_38;
+    int field_3C;
+    int field_40;
+    int field_44;
+    int field_48;
+    int field_4C;
+    int field_50;
+    int field_54;
+    int field_58;
+    int field_5C;
+    int field_60;
+} sithSectorAlloc;
+
+int sithSector_Startup();
+void sithSector_Shutdown();
 void sithSector_Close();
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
@@ -203,5 +243,26 @@ static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizo
 static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
 static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
+static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
+
+#define sithSector_aEntries ((sithSectorEntry*)0x00855028)
+#define sithSector_allocPerSector (*(sithSectorAlloc**)0x008553A8)
+#define sithSector_numEntries (*(int*)0x008553AC)
+#define sithSector_bInitted (*(int*)0x008553B0)
+#define sithSector_timerTicks (*(int*)0x008553B4)
+#define sithSector_flt_8553B8 (*(float*)0x008553B8)
+#define sithSector_horizontalPixelsPerRev (*(float*)0x008553BC)
+#define sithSector_flt_8553C0 (*(float*)0x008553C0)
+#define sithSector_flt_8553C4 (*(float*)0x008553C4)
+#define sithSector_flt_8553C8 (*(float*)0x008553C8)
+#define sithSector_zMaxVec (*(rdVector3*)0x008553D0)
+#define sithSector_ceilingSky (*(float*)0x008553DC)
+#define sithSector_zMinVec (*(rdVector3*)0x008553E0)
+#define sithSector_horizontalPixelsPerRev_idk (*(float*)0x008553EC)
+#define sithSector_horizontalDist (*(float*)0x008553F0)
+#define sithSector_flt_8553F4 (*(float*)0x008553F4)
+#define sithSector_aSyncIdk ((sithSector**)0x00855438)
+#define sithSector_aSyncIdk2 (*(int*)0x00855478)
+#define sithSector_numSync (*(int*)0x008554B8)
 
 #endif // _SITHSECTOR_H
