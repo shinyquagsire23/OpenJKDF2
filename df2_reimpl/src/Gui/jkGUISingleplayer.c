@@ -19,6 +19,7 @@
 #include "Main/jk.h"
 #include "Win95/Windows.h"
 #include "Primitives/rdVector.h"
+#include "General/stdString.h"
 
 static rdVector2i unk_52B170 = {0xd, 0xe};
 

@@ -96,6 +96,8 @@ void sithCogThing_createThingUnused(sithCog *ctx)
     sithThing *v3; // edi
     int v6; // [esp+18h] [ebp+8h]
 
+    v6 = 0; // aaaaaa original is undefined
+
     v1 = sithCogVm_PopThing(ctx);
     v2 = sithCogVm_PopTemplate(ctx);
     if ( v1 && v1->thingType && v1->sector && v2 && (v3 = sithThing_SpawnTemplate(v2, v1)) != 0 )
@@ -162,6 +164,8 @@ void sithCogThing_createThingAtPos_nr(sithCog *ctx)
         a1.y = 0.0;
         a1.z = 0.0;
     }
+    
+    a8 = 0; // aaaaaa undefined in original
 
     rdMatrix_BuildRotate34(&a3, &rot);
     rdMatrix_TransformVector34Acc(&a1, &a3);

@@ -367,7 +367,7 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     {
         Window_AddMsgHandler(jkGuiRend_WindowHandler);
         Window_gui_gets_vars(&jkGuiRend_idk, &jkGuiRend_idk2);
-        Window_gui_sets_funcs((int)jkGuiRend_DrawAndFlip, (int)jkGuiRend_Invalidate);
+        Window_SetDrawHandlers((int)jkGuiRend_DrawAndFlip, (int)jkGuiRend_Invalidate);
     }
     ++jkGuiRend_HandlerIsSet;
     
@@ -394,7 +394,7 @@ void jkGuiRend_sub_50FDB0()
     if ( !--jkGuiRend_HandlerIsSet )
     {
         Window_RemoveMsgHandler(jkGuiRend_WindowHandler);
-        Window_gui_sets_funcs(jkGuiRend_idk, jkGuiRend_idk2);
+        Window_SetDrawHandlers(jkGuiRend_idk, jkGuiRend_idk2);
     }
     jkGuiRend_activeMenu = 0;
 }
@@ -1424,7 +1424,7 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
         drawRect.width = v10 - v15;
         v17 = element->field_8;
         drawRect.x = v15 + v9;
-        stdFont_Draw3(vbuf, menu->fonts[v17 + (v14 == element)], element->rect.y, &drawRect, 2, element->unistr, 1);
+        stdFont_Draw3(vbuf, menu->fonts[v17 + (v14 == element)], element->rect.y, &drawRect, 2, element->wstr, 1);
     }
 }
 
@@ -2007,7 +2007,7 @@ int jkGuiRend_TextBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, 
     jkGuiElement *v23; // esi
     int v24; // eax
     jkGuiElement *v25; // esi
-    int v26; // eax
+    stdFont* v26; // eax
     int v27; // eax
     int *v28; // eax
     int v29; // ebp
@@ -2107,7 +2107,7 @@ LABEL_23:
         v26 = menu->fonts[element->field_8];
         if ( v26 )
         {
-            v27 = *(uint32_t *)(**(uint32_t **)(*(uint32_t *)(v26 + 44) + 120) + 16) + 3;
+            v27 = (*v26->bitmap->mipSurfaces)->format.height + 3;
             if ( element->rect.height > v27 )
                 v27 = element->rect.height;
             element->rect.height = v27;
@@ -2189,7 +2189,7 @@ void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *outB
         jkGuiRend_CopyVBuffer(menu, &element->rect);
 
     if ( element->unistr )
-        stdFont_Draw3(outBuf, menu->fonts[element->field_8], element->rect.y, &element->rect, element->selectedTextEntry, element->unistr, 1);
+        stdFont_Draw3(outBuf, menu->fonts[element->field_8], element->rect.y, &element->rect, element->selectedTextEntry, element->wstr, 1);
 }
 
 int jkGuiRend_PicButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a, int b)
@@ -2286,5 +2286,5 @@ void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer
     v5 = element->selectedTextEntry;
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
-    stdFont_Draw3(vbuf, menu->fonts[element->field_8 + v4], element->rect.y, &element->rect, v5, element->unistr, 1);
+    stdFont_Draw3(vbuf, menu->fonts[element->field_8 + v4], element->rect.y, &element->rect, v5, element->wstr, 1);
 }

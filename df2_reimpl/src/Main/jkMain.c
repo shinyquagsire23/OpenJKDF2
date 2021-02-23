@@ -23,7 +23,6 @@ void jkMain_gui_loop()
 {
     int v0; // edi
     unsigned int v1; // esi
-    void *v2; // ecx
     int v3; // esi
     int v4; // esi
     void (__cdecl *v5)(int, int); // ecx
@@ -74,7 +73,7 @@ void jkMain_gui_loop()
                     dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                     v3 = stdPlatform_GetTimeMsec();
                     if ( g_app_suspended && v0 != 6 )
-                        jkGame_Update(v2);
+                        jkGame_Update();
                     game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
@@ -130,7 +129,6 @@ LABEL_35:
 void jkMain_EscapeMenuTick(int a2)
 {
     unsigned int v1; // esi
-    void *v2; // ecx
     int v3; // esi
 
     if ( net_isMulti )
@@ -171,7 +169,7 @@ void jkMain_EscapeMenuTick(int a2)
                     dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                     v3 = stdPlatform_GetTimeMsec();
                     if ( g_app_suspended && a2 != 6 )
-                        jkGame_Update(v2);
+                        jkGame_Update();
                     game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
@@ -182,7 +180,6 @@ void jkMain_EscapeMenuTick(int a2)
 void jkMain_GameplayTick(int a2)
 {
     unsigned int v1; // esi
-    void *v2; // ecx
     int v3; // esi
 
     if ( !thing_six )
@@ -221,7 +218,7 @@ void jkMain_GameplayTick(int a2)
                 dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && a2 != 6 )
-                    jkGame_Update(v2);
+                    jkGame_Update();
                 game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }

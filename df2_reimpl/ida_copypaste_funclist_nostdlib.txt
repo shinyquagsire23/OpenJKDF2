@@ -9,7 +9,7 @@ Video_SetVideoDesc	.text	00401940	000002C8	00000010	00000004	R	.	.	.	.	.	T	.
 Video_SwitchToGDI	.text	00401C10	000000B6			R	.	.	.	.	.	.	.
 Video_camera_related	.text	00401CD0	000001EB	00000030	00000000	R	.	.	.	.	.	.	.
 jkGame_ForceRefresh	.text	00401EC0	00000014	00000000	00000000	R	.	.	.	.	.	.	.
-jkGame_Update	.text	00401EE0	0000034B	00000038	00000000	R	.	.	.	.	.	.	.
+jkGame_Update	.text	00401EE0	0000034B	00000038	00000000	R	.	.	.	.	.	T	.
 jkGame_PrecalcViewSizes	.text	00402230	0000030C	00000010	0000000C	R	.	.	.	.	.	T	.
 jkGame_Screensize2	.text	00402540	0000002D			R	.	.	.	.	.	.	.
 jkGame_Screensize	.text	00402570	0000002D			R	.	.	.	.	.	.	.
@@ -265,7 +265,7 @@ jkRes_LoadNew	.text	0040F190	000001C9	00000114	0000000C	R	.	.	.	.	.	T	.
 jkRes_NewGob	.text	0040F360	0000015F	00000004	0000000C	R	.	.	.	.	.	T	.
 jkRes_FileOpen	.text	0040F4C0	000001E7	0000001C	00000008	R	.	.	.	.	.	T	.
 jkRes_FileClose	.text	0040F6B0	00000051	00000004	00000004	R	.	.	.	.	.	.	.
-jkRes_FileRead	.text	0040F710	00000052	00000000	0000000C	R	.	.	.	.	.	.	.
+jkRes_FileRead	.text	0040F710	00000052	00000000	0000000C	R	.	.	.	.	.	T	.
 jkRes_FileWrite	.text	0040F770	0000003B	00000000	0000000C	R	.	.	.	.	.	.	.
 jkRes_FileGets	.text	0040F7B0	00000052	00000000	0000000C	R	.	.	.	.	.	.	.
 jkRes_FileGetws	.text	0040F810	00000052	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -962,7 +962,7 @@ WinIdk_SetDplayGuid	.text	00436D50	00000028	00000000	00000004	R	.	.	.	.	.	.	.
 WinIdk_GetDplayGuid	.text	00436D80	00000006			R	.	.	.	.	.	.	.
 WinIdk_PrintConsole	.text	00436D90	000000E3	0000006C	0000000C	R	.	.	.	.	.	T	.
 stdSound_Initialize	.text	00436E80	00000259	00000068	00000000	R	.	.	.	.	.	.	.
-stdSound_Shutdown	.text	004370E0	0000006B	00000004	00000000	R	.	.	.	.	.	.	.
+stdSound_Shutdown	.text	004370E0	0000006B	00000004	00000000	R	.	.	.	.	.	T	.
 stdSound_SetMenuVolume	.text	00437150	00000031	00000004	00000004	R	.	.	.	.	.	T	.
 stdSound_BufferCreate	.text	00437190	00000137	0000002C	00000010	R	.	.	.	.	.	T	.
 stdSound_BufferQueryInterface	.text	004372D0	00000022	00000008	00000004	R	.	.	.	.	.	T	.
@@ -1809,7 +1809,7 @@ sithRender_RenderDynamicLights	.text	004C79A0	0000023F	00000144	00000000	R	.	.	.
 sithRender_RenderThings	.text	004C7BE0	00000471	0000001C	00000000	R	.	.	.	.	.	.	.
 sithRender_RenderPov	.text	004C8070	000001AC	0000001C	00000004	R	.	.	.	.	.	T	.
 sithRender_RenderAlphaSurfaces	.text	004C8220	000003D6	00000014	00000000	R	.	.	.	.	.	.	.
-sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	.	.
+sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 sithPlayer_Close	.text	004C8620	00000042			R	.	.	.	.	.	.	.
 sithPlayer_NewEntry	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
@@ -2453,13 +2453,13 @@ sithDebugConsole_CmdPlayers	.text	004EEC70	0000009F	00000028	00000000	R	.	.	.	.	
 sithDebugConsole_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	.	.
 sithDebugConsole_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
-sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	.	.
+sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	T	.
 sithSound_Shutdown	.text	004EEEC0	0000003D			R	.	.	.	.	.	.	.
 sithSound_Load	.text	004EEF00	000001B6	00000010	00000008	R	.	.	.	.	.	T	.
 sithSound_Free	.text	004EF0C0	000000A9	00000008	00000004	R	.	.	.	.	.	T	.
 sithSound_New	.text	004EF170	0000005A	0000000C	00000008	R	.	.	.	.	.	T	.
 sithSound_LoadEntry	.text	004EF1D0	00000212	00000094	00000008	R	.	.	.	.	.	T	.
-sithSound_GetFromIdx	.text	004EF3F0	00000037	00000000	00000004	R	.	.	.	.	.	.	.
+sithSound_GetFromIdx	.text	004EF3F0	00000037	00000000	00000004	R	.	.	.	.	.	T	.
 sithSound_LoadFileData	.text	004EF430	00000195	00000094	00000004	R	.	.	.	.	.	T	.
 sithSound_UnloadData	.text	004EF5D0	00000041	00000004	00000004	R	.	.	.	.	.	T	.
 sithSound_LoadData	.text	004EF620	00000034	00000004	00000004	R	.	.	.	.	.	T	.
@@ -3045,7 +3045,7 @@ sithCollide_sub_507EA0	.text	00507EA0	00000085	00000008	00000018	R	.	.	.	.	.	.	.
 sithCollide_IsSphereInSector	.text	00507F30	0000013F	00000010	0000000C	R	.	.	.	.	.	T	.
 sithCollide_sub_508070	.text	00508070	00000057	00000010	00000014	R	.	.	.	.	.	.	.
 sithCollide_sub_5080D0	.text	005080D0	0000029A	0000005C	0000002C	R	.	.	.	.	.	T	.
-sithCollide_sub_508370	.text	00508370	00000086	0000000C	00000024	R	.	.	.	.	.	.	.
+sithCollide_sub_508370	.text	00508370	00000086	0000000C	00000024	R	.	.	.	.	.	T	.
 sithCollide_sub_508400	.text	00508400	0000013A	00000020	00000020	R	.	.	.	.	.	T	.
 sithCollide_sub_508540	.text	00508540	00000208	0000000C	00000024	R	.	.	.	.	.	T	.
 sithCollide_sub_508750	.text	00508750	00000233	00000030	00000014	R	.	.	.	.	.	T	.

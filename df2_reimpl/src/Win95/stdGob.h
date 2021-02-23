@@ -81,7 +81,7 @@ int stdGob_FSeek(stdGobFile *f, int pos, int whence);
 int32_t stdGob_FTell(stdGobFile *f);
 bool stdGob_FEof(stdGobFile *f);
 size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len);
-char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
-wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
+const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
+const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
 
 #endif // _STDGOB_H

@@ -275,7 +275,6 @@ float _frand()
 VM_VAR(g_hWnd, HWND, 0x855DE0);
 
 VM_VAR(g_nShowCmd, uint32_t, 0x855DE8);
-VM_VAR(g_hInstance, uint32_t, 0x855DEC);
 
 VM_VAR(g_app_suspended, uint32_t, 0x855E70);
 VM_VAR(g_window_active, uint32_t, 0x855E74);

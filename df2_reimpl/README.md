@@ -83,6 +83,7 @@ sithTemplate                   0x79d      0.180%        100.000%       10 / 10
 sithParticle                   0x7f5      0.189%        100.000%       10 / 10         
 jkGuiSingleplayer              0x8d8      0.210%        100.000%        7 / 7          
 jkGuiForce                     0x9dd      0.234%        100.000%       11 / 11         
+sithSound                      0xa00      0.237%        100.000%       13 / 13         
 rdParticle                     0xa0d      0.238%        100.000%       10 / 10         
 sithCogSound                   0xa97      0.251%        100.000%       14 / 14         
 rdKeyframe                     0xa99      0.251%        100.000%        8 / 8          
@@ -134,7 +135,6 @@ stdColor                       0x97e      0.225%        0.000%          0 / 11
 jkGame                         0x98f      0.227%        0.000%          0 / 13         
 stdSound                       0x9bf      0.231%        0.000%          0 / 27         
 sithSave                       0x9bf      0.231%        0.000%          0 / 7          
-sithSound                      0xa00      0.237%        0.000%          0 / 13         
 rdMaterial                     0xa2d      0.241%        68.599%         6 / 9          
 sithSoundClass                 0xa46      0.243%        0.000%          0 / 16         
 stdPalEffects                  0xa66      0.246%        0.000%          0 / 21         
@@ -200,7 +200,9 @@ rdNRaster                      0x304d4    18.316%       0.000%          0 / 87
 
 Total completion:
 -----------------
-21.130% by weight
-35.655% by weight excluding rasterizer
-1292 / 3165 functions
+21.367% by weight
+36.055% by weight excluding rasterizer
+1305 / 3165 functions
+1305 / 2794 functions excluding rasterizer
+
 ```

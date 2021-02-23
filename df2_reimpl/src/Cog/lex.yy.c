@@ -452,6 +452,12 @@ YY_BUFFER_STATE yy_create_buffer YY_PROTO(( FILE *file, int size ));
 void yy_delete_buffer YY_PROTO(( YY_BUFFER_STATE b ));
 void yy_init_buffer YY_PROTO(( YY_BUFFER_STATE b, FILE *file ));
 
+static void idk_stack_scrub()
+{
+    int scrub[128];
+    _memset(scrub, 0, sizeof(scrub));
+}
+
 #ifdef __cplusplus
 static int yyinput YY_PROTO(( void ));
 #else
@@ -493,6 +499,7 @@ YY_DECL
     while ( 1 )		/* loops until end-of-file is reached */
 	{
 	yy_cp = yy_c_buf_p;
+	idk_stack_scrub(); // aaaaaaa where is the undefined data coming from
 
 	/* support of yytext */
 	*yy_cp = yy_hold_char;
@@ -1224,7 +1231,7 @@ int size;
     {
     YY_BUFFER_STATE b;
 
-    b = (YY_BUFFER_STATE) malloc( sizeof( struct yy_buffer_state ) );
+    b = (YY_BUFFER_STATE) _malloc( sizeof( struct yy_buffer_state ) );
 
     if ( ! b )
 	YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
@@ -1234,7 +1241,7 @@ int size;
     /* yy_ch_buf has to be 2 characters longer than the size given because
      * we need to put in 2 end-of-buffer characters.
      */
-    b->yy_ch_buf = (YY_CHAR *) malloc( (unsigned) (b->yy_buf_size + 2) );
+    b->yy_ch_buf = (YY_CHAR *) _malloc( (unsigned) (b->yy_buf_size + 2) );
 
     if ( ! b->yy_ch_buf )
 	YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
@@ -1256,8 +1263,8 @@ YY_BUFFER_STATE b;
     if ( b == yy_current_buffer )
 	yy_current_buffer = (YY_BUFFER_STATE) 0;
 
-    free( (char *) b->yy_ch_buf );
-    free( (char *) b );
+    _free( (char *) b->yy_ch_buf );
+    _free( (char *) b );
     }
 
 

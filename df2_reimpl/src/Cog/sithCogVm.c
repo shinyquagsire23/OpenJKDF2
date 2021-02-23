@@ -1110,7 +1110,8 @@ cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
     }
     else if ( v3->type )
     {
-        return (cogSymbolFunc_t)v12; // aaaaa
+        v12 = 0;
+        return (cogSymbolFunc_t)v12; // aaaaa undefined in original
     }
     else
     {

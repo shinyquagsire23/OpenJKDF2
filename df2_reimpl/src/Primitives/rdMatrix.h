@@ -108,7 +108,7 @@ void rdMatrix_Copy44(rdMatrix44 *dst, rdMatrix44 *src);
 void rdMatrix_Copy34to44(rdMatrix44 *dst, rdMatrix34 *src);
 void rdMatrix_Copy44to34(rdMatrix34 *dst, rdMatrix44 *src);
 void rdMatrix_Transpose44(rdMatrix44 *out, rdMatrix44 *src);
-void rdMatrix_Multiply34(rdMatrix34 *out, rdMatrix34 *mat1, rdMatrix34 *mat2);
+void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix34 *mat2);
 void rdMatrix_Multiply44(rdMatrix44 *out, rdMatrix44 *mat1, rdMatrix44 *mat2);
 void rdMatrix_PreMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2);
 void rdMatrix_PreMultiply44(rdMatrix44 *mat1, rdMatrix44 *mat2);

@@ -49,7 +49,6 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     int *v16; // edi
     common_functions *v17; // edx
     stdGobEntry *v18; // eax
-    int *v19; // eax
     stdGobEntry *ent; // edi
     const char *ent_fname; // ebp
     stdGobHeader header; // [esp+10h] [ebp-Ch]
@@ -123,9 +122,9 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     gob->entries = v18;
     if ( !v18 )
       return 0;
-    v19 = stdHashTable_New(1024);
+
     ent = gob->entries;
-    gob->entriesHashtable = v19;
+    gob->entriesHashtable = stdHashTable_New(1024);
     if ( gob->numFiles > 0u )
     {
       ent_fname = ent->fname;
@@ -259,7 +258,6 @@ bool stdGob_FEof(stdGobFile *f)
 size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len)
 {
     stdGob *gob;
-    unsigned int readLen;
     size_t result;
 
     gob = f->parent;
@@ -270,22 +268,20 @@ size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len)
         gob->lastReadFile = f;
     }
 
-    readLen = len;
     if ( f->entry->fileSize - f->seekOffs < len )
-        readLen = f->entry->fileSize - f->seekOffs;
+        len = f->entry->fileSize - f->seekOffs;
 
-    result = pGobHS->fileRead(gob->fhand, out, readLen);
+    result = pGobHS->fileRead(gob->fhand, out, len);
     f->seekOffs += result;
     return result;
 }
 
-char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
+const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
 {
     stdGobEntry *entry;
     int seekOffs;
     const char *result;
     stdGob *gob;
-    int readLen;
 
     entry = f->entry;
     seekOffs = f->seekOffs;
@@ -298,18 +294,18 @@ char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
         gob = f->parent;
         gob->lastReadFile = f;
     }
-    readLen = len;
-    if ( f->entry->fileSize - f->seekOffs + 1 < len )
-        readLen = f->entry->fileSize - f->seekOffs + 1;
 
-    result = pGobHS->fileGets(gob->fhand, out, readLen);
+    if ( f->entry->fileSize - f->seekOffs + 1 < len )
+        len = f->entry->fileSize - f->seekOffs + 1;
+
+    result = pGobHS->fileGets(gob->fhand, out, len);
     if ( result )
         f->seekOffs += _strlen(result);
 
     return result;
 }
 
-wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
+const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
 {
   stdGobEntry *entry; // ecx
   int seekOffs; // edx

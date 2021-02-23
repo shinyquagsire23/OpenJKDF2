@@ -913,7 +913,7 @@ void rdModel3_CalcBoundingBoxes(rdModel3 *model)
     model->radius = rdModel3_fRadius * 0.1 + rdModel3_fRadius;
 }
 
-void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, rdMatrix34 *matrix)
+void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix)
 {
     rdVector3 vertex_out;
     rdVector3 vecTmp;

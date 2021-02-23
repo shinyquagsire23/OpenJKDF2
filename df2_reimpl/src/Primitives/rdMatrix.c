@@ -325,16 +325,11 @@ void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out)
     float v9; // ST24_4
     float v11; // ST00_4
     double v13; // st7
-    unsigned __int8 v14; // c0
-    unsigned __int8 v15; // c3
     float v17; // ST00_4
     double v19; // st7
-    unsigned __int8 v20; // c0
-    unsigned __int8 v21; // c3
     double v22; // st7
     double v23; // st7
     long double v25; // st6
-    char v26; // c0
     float v30; // [esp+18h] [ebp-10h]
     float v31; // [esp+1Ch] [ebp-Ch]
     float v32; // [esp+20h] [ebp-8h]
@@ -348,7 +343,7 @@ void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out)
         v13 = 90.0 - stdMath_ArcSin3(in->rvec.x);
         
         // TODO ?? some floating point comparison, ah 41h
-        if ( !(v14 | v15) && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
+        if ( in->lvec.z < 0.0 && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
             v13 = -v13;
         out->z = v13;
         out->y = 0.0;
@@ -356,7 +351,7 @@ void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out)
     else
     {
         out->y = 90.0 - stdMath_ArcSin3(in->lvec.y / v33);
-        if ( !(v20 | v21) ) // TODO ?? some floating point comparison, ah 41h
+        if (out->y < 0.0) // TODO ?? some floating point comparison, ah 41h
             out->y = -out->y;
     }
     if ( v33 >= 0.001 )
@@ -381,7 +376,7 @@ void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out)
         out->x = -out->x;
     v23 = -in->lvec.y;
     v25 = sqrt(v23 * v23 + (in->lvec.x * in->lvec.x));
-    if ( !v26 )
+    if (v25 != 0.0) // TODO verify
     {
         v35 = (v23 * -in->rvec.x + -in->rvec.y * in->lvec.x) / v25;
         if ( v35 < 1.0 )
@@ -494,7 +489,7 @@ void rdMatrix_Transpose44(rdMatrix44 *out, rdMatrix44 *src)
     _memcpy(out, &tmp, sizeof(rdMatrix44));
 }
 
-void rdMatrix_Multiply34(rdMatrix34 *out, rdMatrix34 *mat1, rdMatrix34 *mat2)
+void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix34 *mat2)
 {
     out->rvec.x = (mat1->uvec.x * mat2->rvec.z)
                   + (mat2->rvec.y * mat1->lvec.x)

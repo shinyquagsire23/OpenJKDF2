@@ -16,6 +16,8 @@
 #include "Gui/jkGUIKeyboard.h"
 #include "Gui/jkGUIMouse.h"
 #include "Gui/jkGUIJoystick.h"
+#include "Gui/jkGUIGeneral.h"
+#include "Gui/jkGUIControlOptions.h"
 
 static jkGuiElement jkGuiSetup_buttons[9] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},

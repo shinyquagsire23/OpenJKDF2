@@ -218,7 +218,6 @@ int rdCache_SendFaceListToHardware()
     double v78; // st7
     int v79; // eax
     sith_tex_2 *v80; // edx
-    rdVector3 *v85; // esi
     double v87; // st7
     double v88; // st7
     double v89; // st6
@@ -285,6 +284,7 @@ int rdCache_SendFaceListToHardware()
     int red_and_alpha; // [esp+98h] [ebp-8h]
     int green; // [esp+9Ch] [ebp-4h]
 
+    a3 = 0; // added? aaaaaaa undefined
     v0 = 0;
     v1 = 0;
     v130 = 0;
@@ -929,7 +929,7 @@ LABEL_232:
                                             rdCache_aHWVertices[rdCache_totalVerts].x = round(iterating_6c->vertices[tmpiter].x);
                                             rdCache_aHWVertices[rdCache_totalVerts].y = round(iterating_6c->vertices[tmpiter].y);
                                             v87 = iterating_6c->vertices[tmpiter].z;
-                                            mipmap_relatedb = (int)v85;
+
                                             if ( v87 == 0.0 )
                                                 v88 = 0.0;
                                             else

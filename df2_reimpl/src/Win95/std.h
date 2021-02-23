@@ -1,6 +1,8 @@
 #ifndef _STDLEC_H
 #define _STDLEC_H
 
+#include "types.h"
+
 #define stdStartup_ADDR (0x00426BB0)
 #define stdShutdown_ADDR (0x00426C10)
 #define stdInitServices_ADDR (0x00426C30)

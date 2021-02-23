@@ -135,7 +135,7 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
             a4a.height = v11;
             v13 = menu->fonts;
             a4a.y = v4;
-            stdFont_Draw3(vbuf, (int)v13[result]->name, v4, &a4a, 1, v6, 1);
+            stdFont_Draw3(vbuf, v13[result], v4, &a4a, 1, v6, 1);
             v14 = stdFont_sub_4357C0(menu->fonts[v12], v6, &a4a) + v4;
             result = (*menu->fonts[v12]->bitmap->mipSurfaces)->format.height;
             v4 = ((unsigned int)(3 * result) >> 2) + v14;

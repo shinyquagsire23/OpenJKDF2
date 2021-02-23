@@ -1,39 +1,30 @@
 #include "sithWorld.h"
 
 #include "General/stdConffile.h"
+#include "Engine/sithModel.h"
+#include "Engine/sithSprite.h"
+#include "Engine/sithTemplate.h"
+#include "Engine/sithMaterial.h"
+#include "Engine/sithSound.h"
+#include "Cog/sithCog.h"
+#include "Cog/sithCogScript.h"
+#include "Engine/sithKeyFrame.h"
+#include "Engine/sithAnimclass.h"
+#include "AI/sithAIClass.h"
+#include "Engine/sithSoundClass.h"
 #include "jk.h"
 
 #define jkl_section_parsers ((sith_map_section_and_func*)0x833548)
 
-int (*jkl_parse_adjoins_surfaces)(sithWorld* jkl, int b) = (void*)0x004E5C00;
-//int (*jkl_init_parsers)(sithWorld* jkl, int b) = (void*)0x004CF6F0;
-//int (*sithWorld_SetSectionParser)(sithWorld* jkl, int b) = (void*)0x004D0820;
-//int (*sithWorld_FindSectionParser)(sithWorld* jkl, int b) = (void*)0x004D0E20;
-int (*jkl_parse_next_line)(void) = (void*)0x004315C0;
-int (*jkl_read_line)(void) = (void*)0x431650;
+int (*sithThing_Load)(sithWorld* jkl, int b) = (void*)0x004CE710;
+int (*sithSector_Load)(sithWorld* jkl, int b) = (void*)0x004F8720;
+int (*sithWorld_LoadGeoresource)(sithWorld* jkl, int b) = (void*)0x004D0E70;
+int (*sithAnimClass_Load)(sithWorld* jkl, int b) = (void*)0x004E4ED0;
 
-int (*jkl_things_parse)(sithWorld* jkl, int b) = (void*)0x004CE710;
-int (*jkl_templates_parse)(sithWorld* jkl, int b) = (void*)0x004DD9B0;
-int (*jkl_sprites_parse)(sithWorld* jkl, int b) = (void*)0x004F2190;
-int (*jkl_sounds_parse)(sithWorld* jkl, int b) = (void*)0x004EEF00;
-int (*jkl_soundclass_parse)(sithWorld* jkl, int b) = (void*)0x004E64C0;
-int (*jkl_sectors_parse)(sithWorld* jkl, int b) = (void*)0x004F8720;
-int (*jkl_models_parse)(sithWorld* jkl, int b) = (void*)0x004E96A0;
-int (*jkl_materials_parse_)(sithWorld* jkl, int b) = (void*)0x004F0D94;
-int (*jkl_materials_parse)(sithWorld* jkl, int b) = (void*)0x004F0D90;
-int (*jkl_keyframes_parse)(sithWorld* jkl, int b) = (void*)0x004E55B0;
-//int (*jkl_header_parse)(sithWorld* jkl, int b) = (void*)0x004D02D0;
-int (*jkl_georesource_parse)(sithWorld* jkl, int b) = (void*)0x004D0E70;
-//int (*jkl_copyright_parse)(sithWorld* jkl, int b) = (void*)0x004D04D0;
-int (*jkl_cogsripts_parse)(sithWorld* jkl, int b) = (void*)0x004E0040;
-int (*jkl_cogscript_parse)(sithWorld* jkl, int b) = (void*)0x004FC9D0;
-int (*jkl_cogs_parse)(sithWorld* jkl, int b) = (void*)0x004DF110;
-int (*jkl_animclass_parse)(sithWorld* jkl, int b) = (void*)0x004E4ED0;
-int (*jkl_aiclass_parse)(sithWorld* jkl, int b) = (void*)0x004F1230;
-
-#define jkl_line_that_was_read (*(char**)0x860D40)
-#define jkl_read_copyright ((char*)0x833108)
+//#define jkl_read_copyright ((char*)0x833108)
 #define some_integer_4 (*(uint32_t*)0x8339E0)
+
+static char jkl_read_copyright[1088];
 
 const char* g_level_header =
     "................................"
@@ -76,22 +67,22 @@ static sithWorldProgressCallback_t sithWorld_LoadPercentCallback;
 int sithWorld_Startup()
 {
     sithWorld_numParsers = 0;
-    sithWorld_SetSectionParser("georesource", jkl_georesource_parse);
+    sithWorld_SetSectionParser("georesource", sithWorld_LoadGeoresource);
     sithWorld_SetSectionParser("copyright", sithCopyright_Load);
     sithWorld_SetSectionParser("header", sithHeader_Load);
-    sithWorld_SetSectionParser("sectors", jkl_sectors_parse);
-    sithWorld_SetSectionParser("models", jkl_models_parse);
-    sithWorld_SetSectionParser("sprites", jkl_sprites_parse);
-    sithWorld_SetSectionParser("things", jkl_things_parse);
-    sithWorld_SetSectionParser("templates", jkl_templates_parse);
-    sithWorld_SetSectionParser("materials", jkl_materials_parse);
-    sithWorld_SetSectionParser("sounds", jkl_sounds_parse);
-    sithWorld_SetSectionParser("cogs", jkl_cogs_parse);
-    sithWorld_SetSectionParser("cogscripts", jkl_cogsripts_parse);
-    sithWorld_SetSectionParser("keyframes", jkl_keyframes_parse);
-    sithWorld_SetSectionParser("animclass", jkl_animclass_parse);
-    sithWorld_SetSectionParser("aiclass", jkl_aiclass_parse);
-    sithWorld_SetSectionParser("soundclass", jkl_soundclass_parse);
+    sithWorld_SetSectionParser("sectors", sithSector_Load);
+    sithWorld_SetSectionParser("models", sithModel_Load);
+    sithWorld_SetSectionParser("sprites", sithSprite_Load);
+    sithWorld_SetSectionParser("things", sithThing_Load);
+    sithWorld_SetSectionParser("templates", sithTemplate_Load);
+    sithWorld_SetSectionParser("materials", sithMaterial_Load);
+    sithWorld_SetSectionParser("sounds", sithSound_Load);
+    sithWorld_SetSectionParser("cogs", sithCog_Load);
+    sithWorld_SetSectionParser("cogscripts", sithCogScript_Load);
+    sithWorld_SetSectionParser("keyframes", sithKeyFrame_Load);
+    sithWorld_SetSectionParser("animclass", sithAnimClass_Load);
+    sithWorld_SetSectionParser("aiclass", sithAIClass_ParseSection);
+    sithWorld_SetSectionParser("soundclass", sithSoundClass_Load);
     sithWorld_bInitted = 1;
     return 1;
 }
@@ -187,9 +178,9 @@ int sithCopyright_Load(sithWorld *lvl, int junk)
     iter = jkl_read_copyright;
     do
     {
-        if (!jkl_read_line())
+        if (!stdConffile_ReadLine())
             return 0;
-        _memcpy(iter, jkl_line_that_was_read, 0x20);
+        _memcpy(iter, stdConffile_aLine, 0x20);
         iter += 0x20;
     }
     while (iter < &jkl_read_copyright[0x440]);

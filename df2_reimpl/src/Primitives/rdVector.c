@@ -199,17 +199,17 @@ rdVector4* rdVector_Sub4Acc(rdVector4* v1, const rdVector4* v2)
     return v1;
 }
 
-float rdVector_Dot2(rdVector2* v1, const rdVector2* v2)
+float rdVector_Dot2(const rdVector2* v1, const rdVector2* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y);
 }
 
-float rdVector_Dot3(rdVector3* v1, const rdVector3* v2)
+float rdVector_Dot3(const rdVector3* v1, const rdVector3* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z);
 }
 
-float rdVector_Dot4(rdVector4* v1, const rdVector4* v2)
+float rdVector_Dot4(const rdVector4* v1, const rdVector4* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z) + (v1->w * v2->w);
 }
@@ -228,17 +228,17 @@ void rdVector_Cross3Acc(rdVector3 *v1, const rdVector3 *v2)
     v1->z = (v2->y * v1->x) - (v1->y * v2->x);
 }
 
-float rdVector_Len2(rdVector2* v)
+float rdVector_Len2(const rdVector2* v)
 {
     return sqrtf(rdVector_Dot2(v,v));
 }
 
-float rdVector_Len3(rdVector3* v)
+float rdVector_Len3(const rdVector3* v)
 {
     return sqrtf(rdVector_Dot3(v,v));
 }
 
-float rdVector_Len4(rdVector4* v)
+float rdVector_Len4(const rdVector4* v)
 {
     return sqrtf(rdVector_Dot4(v,v));
 }

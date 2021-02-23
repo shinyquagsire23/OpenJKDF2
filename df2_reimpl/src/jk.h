@@ -284,7 +284,6 @@ float _frand();
 VM_VAR_DECL(g_hWnd, HWND);
 
 VM_VAR_DECL(g_nShowCmd, uint32_t);
-VM_VAR_DECL(g_hInstance, HINSTANCE);
 
 VM_VAR_DECL(g_app_suspended, uint32_t);
 VM_VAR_DECL(g_window_active, uint32_t);
@@ -305,7 +304,7 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define g_hWnd *(g_hWnd_ptr)
 
 #define g_nShowCmd *(g_nShowCmd_ptr)
-#define g_hInstance *(g_hInstance_ptr)
+#define g_hInstance (*(HINSTANCE*)0x00855DEC)
 
 #define g_app_suspended *(g_app_suspended_ptr)
 #define g_window_active *(g_window_active_ptr)

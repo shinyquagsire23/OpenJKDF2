@@ -23,7 +23,7 @@
 #define Video_otherBuf (*(stdVBuffer*)0x00866CA0)
 #define Video_dword_866D78 (*(int*)0x00866D78)
 #define Video_curMode (*(int*)0x00866D7C)
-#define Video_renderSurface (*(stdVideoMode**)0x00866D80)
+#define Video_renderSurface ((stdVideoMode*)0x00866D80)
 #define Video_menuBuffer (*(stdVBuffer*)0x0086AC00)
 
 static int (*Video_Startup)() = (void*)Video_Startup_ADDR;

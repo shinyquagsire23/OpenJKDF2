@@ -65,6 +65,7 @@
 #include "Engine/sithMaterial.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithRender.h"
+#include "Engine/sithSound.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -1088,6 +1089,20 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithRender_RenderPov_ADDR, sithRender_RenderPov);
     hook_function(sithRender_RenderAlphaSurfaces_ADDR, sithRender_RenderAlphaSurfaces);
     hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
+    
+    // sithSound
+    hook_function(sithSound_Startup_ADDR, sithSound_Startup);
+    hook_function(sithSound_Shutdown_ADDR, sithSound_Shutdown);
+    hook_function(sithSound_Load_ADDR, sithSound_Load);
+    hook_function(sithSound_Free_ADDR, sithSound_Free);
+    hook_function(sithSound_New_ADDR, sithSound_New);
+    hook_function(sithSound_LoadEntry_ADDR, sithSound_LoadEntry);
+    hook_function(sithSound_GetFromIdx_ADDR, sithSound_GetFromIdx);
+    hook_function(sithSound_LoadFileData_ADDR, sithSound_LoadFileData);
+    hook_function(sithSound_UnloadData_ADDR, sithSound_UnloadData);
+    hook_function(sithSound_LoadData_ADDR, sithSound_LoadData);
+    hook_function(sithSound_StopAll_ADDR, sithSound_StopAll);
+    hook_function(sithSound_InitFromPath_ADDR, sithSound_InitFromPath);
     
     // sithAI
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);

@@ -15,6 +15,7 @@
 #include "World/sithPlayer.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Windows.h"
+#include "Main/jkStrings.h"
 
 static const char* jkGuiForce_bitmaps[17] = {
     "foAbsorb.bm",
@@ -284,14 +285,14 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[9]->palette);
     
-    jkGuiForce_buttons[1].unistr = jkPlayer_playerShortName;
+    jkGuiForce_buttons[1].wstr = jkPlayer_playerShortName;
     jkGuiForce_buttons[18].bIsVisible = bCanSpendStars;
     jkGuiForce_buttons[19].bIsVisible = bEnableIdk != 0;
 
     float darklight_float = jkPlayer_CalcAlignment(jkGuiForce_isMulti);
 
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
-    jkGuiForce_buttons[2].unistr = jkStrings_GetText(std_genBuffer);
+    jkGuiForce_buttons[2].wstr = jkStrings_GetText(std_genBuffer);
     if ( a4 == 0.0 )
     {
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
@@ -307,7 +308,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
     {
         jkPlayer_SetAccessiblePowers(jkPlayer_GetJediRank());
         jkGuiForce_UpdateViewForRank();
-        jkGuiForce_buttons[1].unistr = (wchar_t *)a5;
+        jkGuiForce_buttons[1].wstr = (wchar_t *)a5;
     }
     
     for (int i = 3; i < 17; i++)
@@ -323,7 +324,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
     {
         if ( darklight_float >= 0.0 )
         {
-            jkGuiForce_buttons[2].unistr = jkStrings_GetText("GUI_PATH_LIGHT");
+            jkGuiForce_buttons[2].wstr = jkStrings_GetText("GUI_PATH_LIGHT");
             if ( jkPlayer_GetAlignment() == 1 )
             {
                 sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 1);
@@ -334,7 +335,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
         }
         else
         {
-            jkGuiForce_buttons[2].unistr = jkStrings_GetText("GUI_PATH_DARK");
+            jkGuiForce_buttons[2].wstr = jkStrings_GetText("GUI_PATH_DARK");
             if ( jkPlayer_GetAlignment() == 2 )
             {
                 sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 1);

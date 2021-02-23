@@ -166,7 +166,7 @@ void rdModel3_FreeEntry(rdModel3 *model);
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model);
 rdModel3* rdModel3_Validate(rdModel3 *model);
 void rdModel3_CalcBoundingBoxes(rdModel3 *model);
-void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, rdMatrix34 *matrix);
+void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
 void rdModel3_CalcFaceNormals(rdModel3 *model);
 void rdModel3_CalcVertexNormals(rdModel3 *model);
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);

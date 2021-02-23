@@ -12,7 +12,9 @@
 #define LPDIRECTINPUTA void*
 #define LPDIRECTPLAYLOBBYA void*
 #define LPDIRECTSOUND void*
-#define LPDIRECTSOUNDBUFFER void*
+
+typedef struct IDirectSoundBuffer IDirectSoundBuffer;
+typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
 
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
@@ -38,11 +40,15 @@ typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
 typedef struct rdClipFrustum rdClipFrustum;
 typedef struct rdVertexIdxInfo rdVertexIdxInfo;
+typedef struct rdProcEntry rdProcEntry;
 typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithAI sithAI;
 typedef struct sithAICommand sithAICommand;
 typedef struct sithActor sithActor;
+typedef struct sithSurfaceInfo sithSurfaceInfo;
+
+typedef struct common_functions common_functions;
 
 #endif // TYPES_H

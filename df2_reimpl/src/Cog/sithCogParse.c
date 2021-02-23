@@ -644,6 +644,7 @@ void sithCogParse_LexAddSymbol(const char *symName)
 void sithCogParse_LexScanVector3(char* text)
 {
     rdVector3 scan_in;
+    _memset(&scan_in, 0, sizeof(scan_in));
     _sscanf(text, "'%f %f %f'", &scan_in.x, &scan_in.y, &scan_in.z);
     yylval.as_vector = scan_in;
 }

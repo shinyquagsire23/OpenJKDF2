@@ -14,6 +14,7 @@ typedef struct sithAIClass
     uint8_t unk[0x94c];
 } sithAIClass;
 
+static int (*sithAIClass_ParseSection)(sithWorld *world, int a2) = (void*)sithAIClass_ParseSection_ADDR;
 static sithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
 
 #endif // _SITHAICLASS_H
