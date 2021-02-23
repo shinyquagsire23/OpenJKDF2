@@ -39,7 +39,7 @@ static jkGuiElement jkGuiGeneral_aElements[18] = {
 
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, 100,                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
 #endif
 
@@ -61,7 +61,7 @@ void jkGuiGeneral_Shutdown()
 #ifdef QOL_IMPROVEMENTS
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    jkPlayer_fov = FOV_MIN + (int)((double)jkGuiGeneral_aElements[13].selectedTextEntry * (FOV_MAX - FOV_MIN) * 0.01);
+    jkPlayer_fov = FOV_MIN + jkGuiGeneral_aElements[13].selectedTextEntry;
     
     jk_snwprintf(slider_val_text, 5, L"%u", jkPlayer_fov);
     jkGuiGeneral_aElements[14].wstr = slider_val_text;
@@ -85,7 +85,7 @@ int jkGuiGeneral_Show()
     jkGuiSetup_sub_412EF0(&jkGuiGeneral_menu, 0);
 
 #ifdef QOL_IMPROVEMENTS
-    jkGuiGeneral_aElements[13].selectedTextEntry = (int)((double)(jkPlayer_fov - FOV_MIN) * (1.0 / (double)(FOV_MAX - FOV_MIN)) * 100.0);
+    jkGuiGeneral_aElements[13].selectedTextEntry = jkPlayer_fov - FOV_MIN;
 #endif
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);

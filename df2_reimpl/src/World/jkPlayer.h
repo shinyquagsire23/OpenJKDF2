@@ -199,8 +199,8 @@ void jkPlayer_SetRank(int rank);
 #ifdef QOL_IMPROVEMENTS
 extern int jkPlayer_fov;
 
-#define FOV_MIN (90.0)
-#define FOV_MAX (160.0)
+#define FOV_MIN (90)
+#define FOV_MAX (160)
 #endif
 
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;
