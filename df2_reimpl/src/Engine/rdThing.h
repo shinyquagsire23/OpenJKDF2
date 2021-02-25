@@ -40,7 +40,7 @@ typedef struct sithThing sithThing;
 typedef struct rdThing
 {
     int type;
-    union containedObj
+    union
     {
         rdModel3* model3;
         rdCamera* camera;

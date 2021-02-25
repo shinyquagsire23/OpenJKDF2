@@ -252,7 +252,7 @@ void sithCogVm_FileWrite(sithCogMsg *ctx)
 int sithCogVm_Sync()
 {
     int v1; // eax
-    unsigned __int16 v2; // dx
+    uint16_t v2; // dx
     int *v3; // ecx
     int v4; // eax
     unsigned int v5; // ecx
@@ -283,8 +283,8 @@ LABEL_14:
                     sithCogVm_MsgTmpBuf2.netMsg.msg_size = 2;
                     sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, g_netMsgTmp.netMsg.thingIdx);
                     v3 = &sithCogVm_aMsgPairs[0].msgId;
-                    v4 = (unsigned __int16)g_netMsgTmp.netMsg.msgId;
-                    while ( g_netMsgTmp.netMsg.thingIdx != *(v3 - 1) || (unsigned __int16)g_netMsgTmp.netMsg.msgId != *v3 )
+                    v4 = (uint16_t)g_netMsgTmp.netMsg.msgId;
+                    while ( g_netMsgTmp.netMsg.thingIdx != *(v3 - 1) || (uint16_t)g_netMsgTmp.netMsg.msgId != *v3 )
                     {
                         v3 += 2;
                         if ( v3 >= (int *)&sithCogVm_msgFuncs[1] )
@@ -341,7 +341,7 @@ int sithCogVm_InvokeMsgByIdx(sithCogMsg *a1)
     int result; // eax
 
     v1 = a1->netMsg.cogMsgId;
-    if ( (signed int)(unsigned __int16)v1 < 65 && sithCogVm_msgFuncs[v1])
+    if ( (signed int)(uint16_t)v1 < 65 && sithCogVm_msgFuncs[v1])
         result = sithCogVm_msgFuncs[v1](a1);
     else
         result = 1;

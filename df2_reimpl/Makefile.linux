@@ -1,22 +1,21 @@
-CC := i686-w64-mingw32-gcc
-TARGET := df2_reimpl.dll
-TARGET_WIN := df2_reimpl_win.dll
+CC := gcc
+TARGET := openjkdf2
 
 SRC := src
-OBJ := build
+OBJ := build_linux
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -Wuninitialized
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -Wuninitialized
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc
 
 #CFLAGS=
 
-all: initial $(OBJ) $(TARGET) $(TARGET_WIN)
+all: initial $(OBJ) $(TARGET)
 clean:
 	rm -rf $(OBJ)
 	rm -f $(TARGET)
@@ -51,8 +50,5 @@ $(OBJ)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
-$(TARGET_WIN): $(OBJECTS)
-	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -static-libgcc
-
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++
+	$(CC) -o $@ -g $^ -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++

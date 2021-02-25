@@ -1,7 +1,8 @@
 #include "stdConsole.h"
 
 #include "jk.h"
-#include <windows.h>
+
+#ifdef WIN32
 
 int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
 {
@@ -790,3 +791,4 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
         }
     }
 }
+#endif

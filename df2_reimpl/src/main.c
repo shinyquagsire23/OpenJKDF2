@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <windows.h>
 
 #include "hook.h"
 #include "jk.h"
@@ -103,6 +102,7 @@
 #include "Main/jkControl.h"
 #include "Main/Main.h"
 
+#ifdef WIN32
 __declspec(dllexport) void hook_init(void);
 int yyparse();
 
@@ -1298,3 +1298,4 @@ __declspec(dllexport) void hook_init(void)
     
     //hook_function();
 }
+#endif

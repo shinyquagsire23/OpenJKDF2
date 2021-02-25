@@ -1,7 +1,7 @@
 #ifndef _STDSTRING_H
 #define _STDSTRING_H
 
-#include <stdint.h>
+#include "types.h"
 
 #define stdString_FastCopy_ADDR (0x0042F120)
 #define stdString_snprintf_ADDR (0x0042F170)

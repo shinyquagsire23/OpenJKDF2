@@ -1,6 +1,7 @@
 #ifndef _SITHPLAYER_H
 #define _SITHPLAYER_H
 
+#include "types.h"
 #include "World/sithInventory.h"
 
 #define sithPlayer_Open_ADDR (0x004C8610)

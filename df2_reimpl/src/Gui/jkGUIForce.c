@@ -269,7 +269,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
     {
         jkGuiForce_UpdateViewForRank();
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (unsigned __int64)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
+    jkGuiForce_buttons[23].selectedTextEntry = 100 - (uint64_t)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     jkGuiRend_Paint(menu);
     return 0;
 }

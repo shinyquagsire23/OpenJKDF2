@@ -1,9 +1,11 @@
 #ifndef _STDMCI_H
 #define _STDMCI_H
 
-#include <windows.h>
+#include "types.h"
+
+#ifdef WIN32
 #include <mmsystem.h>
-#include <stdint.h>
+#endif
 
 #define stdMci_Startup_ADDR (0x004380D0)
 #define stdMci_Shutdown_ADDR (0x004381C0)

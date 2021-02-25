@@ -189,7 +189,7 @@ int rdCache_SendFaceListToHardware()
     double v47; // st7
     __int64 v48; // rax
     double v49; // st7
-    unsigned __int8 vertex_b; // cl
+    uint8_t vertex_b; // cl
     rdProcEntry *v52; // esi
     int final_vertex_color; // eax
     rdVector2 *uvs_in_pixels; // eax
@@ -233,7 +233,7 @@ int rdCache_SendFaceListToHardware()
     double v99; // st7
     __int64 v100; // rax
     double v101; // st7
-    unsigned __int8 v103; // cl
+    uint8_t v103; // cl
     int v104; // eax
     float v105; // ecx
     int v106; // edi
@@ -668,13 +668,13 @@ LABEL_142:
                                                 {
                                                     v46 = iterating_6c->colormap;
                                                     v47 = v45->tint.y * (double)green;
-                                                    vertex_r = (unsigned __int8)(__int64)(v45->tint.x * (double)red_and_alpha);
+                                                    vertex_r = (uint8_t)(__int64)(v45->tint.x * (double)red_and_alpha);
                                                     red_and_alpha = vertex_r;
                                                     v48 = (__int64)v47;
                                                     v49 = *(float *)(v46 + 44) * (double)blue;
-                                                    vertex_g = (unsigned __int8)v48;
-                                                    green = (unsigned __int8)v48;
-                                                    vertex_b_ = (unsigned __int8)(__int64)v49;
+                                                    vertex_g = (uint8_t)v48;
+                                                    green = (uint8_t)v48;
+                                                    vertex_b_ = (uint8_t)(__int64)v49;
                                                     flags_idk_ |= 0x8000;
                                                     blue = vertex_b_;
                                                 }
@@ -740,7 +740,7 @@ LABEL_142:
                                                     vertex_b = vertex_b_;
                                                 }
                                                 v52 = iterating_6c;
-                                                final_vertex_color = vertex_b | (((unsigned __int8)vertex_g | ((vertex_a | (unsigned __int8)vertex_r) << 8)) << 8);
+                                                final_vertex_color = vertex_b | (((uint8_t)vertex_g | ((vertex_a | (uint8_t)vertex_r) << 8)) << 8);
                                                 
                                                 // For some reason, ny holds the vertex color.
                                                 *(uint32_t*)&rdCache_aHWVertices[rdCache_totalVerts].ny = final_vertex_color;
@@ -946,9 +946,9 @@ LABEL_232:
                                             {
                                                 v91 = (rdColormap *)iterating_6c->colormap;
                                                 v97 = v137->header.field_4;
-                                                v94 = (unsigned __int8)v91->colors[v97].g;
-                                                v98 = (unsigned __int8)v91->colors[v97].b;
-                                                v96 = (unsigned __int8)v91->colors[v97].r;
+                                                v94 = (uint8_t)v91->colors[v97].g;
+                                                v98 = (uint8_t)v91->colors[v97].b;
+                                                v96 = (uint8_t)v91->colors[v97].r;
                                                 red_and_alpha = v96;
                                                 green = v94;
                                                 blue = v98;
@@ -960,10 +960,10 @@ LABEL_232:
                                                     v92 = iterating_6c->vertexIntensities[vtx_idx];
                                                 else
                                                     v92 = iterating_6c->light_level_static;
-                                                v93 = *((unsigned __int8 *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
-                                                v94 = (unsigned __int8)v91->colors[v93].g;
-                                                v95 = (unsigned __int8)v91->colors[v93].b;
-                                                v96 = (unsigned __int8)v91->colors[v93].r;
+                                                v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
+                                                v94 = (uint8_t)v91->colors[v93].g;
+                                                v95 = (uint8_t)v91->colors[v93].b;
+                                                v96 = (uint8_t)v91->colors[v93].r;
                                                 red_and_alpha = v96;
                                                 green = v94;
                                                 blue = v95;
@@ -971,13 +971,13 @@ LABEL_232:
                                             if ( v91 != rdColormap_pIdentityMap )
                                             {
                                                 v99 = v91->tint.y * (double)green;
-                                                v96 = (unsigned __int8)(__int64)(v91->tint.x * (double)red_and_alpha);
+                                                v96 = (uint8_t)(__int64)(v91->tint.x * (double)red_and_alpha);
                                                 red_and_alpha = v96;
                                                 v100 = (__int64)v99;
                                                 v101 = v91->tint.z * (double)blue;
-                                                v94 = (unsigned __int8)v100;
-                                                green = (unsigned __int8)v100;
-                                                blue = (unsigned __int8)(__int64)v101;
+                                                v94 = (uint8_t)v100;
+                                                green = (uint8_t)v100;
+                                                blue = (uint8_t)(__int64)v101;
                                             }
                                             flags_idk_ |= 0x8000;
                                             if ( v129 )
@@ -1034,7 +1034,7 @@ LABEL_232:
                                             {
                                                 v103 = -1;
                                             }
-                                            v104 = v103 | (((unsigned __int8)v94 | ((alpha_upshifta | (unsigned __int8)v96) << 8)) << 8);
+                                            v104 = v103 | (((uint8_t)v94 | ((alpha_upshifta | (uint8_t)v96) << 8)) << 8);
                                             v105 = tris_to_push;
                                             v106 = rdCache_totalVerts + 1;
                                             *(uint32_t *)&rdCache_aHWVertices[rdCache_totalVerts].ny = v104;

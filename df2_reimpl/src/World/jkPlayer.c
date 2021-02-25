@@ -493,11 +493,11 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
             rdThing* rdthing = &playerInfo->actorThing->rdthing;
             playerInfo->nextTwinkleSpawnMs += 40;
             rdModel3* model = rdthing->model3;
-            uint32_t meshIdx = model->hierarchyNodes[(unsigned __int64)(signed __int64)(_frand() * (double)(unsigned int)model->numHierarchyNodes)].meshIdx;
+            uint32_t meshIdx = model->hierarchyNodes[(uint64_t)(int64_t)(_frand() * (double)(unsigned int)model->numHierarchyNodes)].meshIdx;
 
             if ( meshIdx != -1 && model->geosets[0].meshes[meshIdx].numVertices)
             {
-                int vtxIdx = (signed __int64)(_frand() * (double)model->geosets[0].meshes[meshIdx].numVertices);
+                int vtxIdx = (int64_t)(_frand() * (double)model->geosets[0].meshes[meshIdx].numVertices);
 
                 rdModel3_GetMeshMatrix(rdthing, &playerInfo->actorThing->lookOrientation, meshIdx, &matTmp);
                 rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].vertices[vtxIdx], &matTmp);

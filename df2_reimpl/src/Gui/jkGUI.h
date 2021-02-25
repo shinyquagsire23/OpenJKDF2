@@ -1,6 +1,7 @@
 #ifndef _JKGUI_H
 #define _JKGUI_H
 
+#include "types.h"
 #include "Primitives/rdRect.h"
 
 #define jkGui_InitMenu_ADDR (0x004129A0)

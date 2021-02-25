@@ -3,6 +3,7 @@
 #include "types.h"
 
 // Imports
+#ifdef WIN32
 LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
 LSTATUS (__stdcall *jk_RegDeleteKeyA)(HKEY hKey, LPCSTR lpSubKey);
 LSTATUS (__stdcall *jk_RegQueryValueExA)(HKEY hKey, LPCSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
@@ -183,15 +184,9 @@ int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
 
 // JK functions
 void (*jk_exit)(int a) = (void*)0x512590;
-int (*sub_401000)(char* a) = (void*)0x401000;
-int (*sub_436D10)(int a) = (void*)0x436D10;
-int (*sub_436D30)(int a) = (void*)0x436D30;
-int (*other_window_stuff)(void) = (void*)0x4037E0;
 int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
-void (*cog_verb_register)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...) = (void*)0x426D80;
-hashmap_entry* (*hashmap_create_entry)(void* map, char* str) = (void*)0x4FD260;
-cogSymbol* (*hashmap_set_entry)(hashmap_entry* map, cogSymbol* val) = (void*)0x4FD350;
+#endif
 
 int _memcmp (const void* str1, const void* str2, size_t count)
 {
@@ -291,6 +286,7 @@ VM_VAR(g_cog_symboltable_hashmap, void*, 0x8B5428);
 
 void jk_init()
 {
+#ifdef WIN32
     jk_RegSetValueExA = *(void**)0x008F03D8;
     jk_RegDeleteKeyA = *(void**)0x008F03DC;
     jk_RegQueryValueExA = *(void**)0x008F03E0;
@@ -468,4 +464,5 @@ void jk_init()
     jk_EnumDisplaySettingsA = *(void**)0x8F4157;
     
     jk_snwprintf = (void*)0x00512BD0;
+#endif
 }

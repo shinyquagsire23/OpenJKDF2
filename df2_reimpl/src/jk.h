@@ -51,6 +51,7 @@ typedef struct hashmap_entry
 
 //static void (*jk_main)(uint32_t a, uint32_t b, char* c, int d, char* e) = (void*)0x50E750;
 
+#ifdef WIN32
 // Imports
 extern LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
 extern LSTATUS (__stdcall *jk_RegDeleteKeyA)(HKEY hKey, LPCSTR lpSubKey);
@@ -233,15 +234,8 @@ static int (*_printf)(const char *, ...) = (void*)0x005141D0;
 
 // JK functions
 extern void (*jk_exit)(int a);
-extern int (*sub_401000)(char* a);
-extern int (*sub_436D10)(int a);
-extern int (*sub_436D30)(int a);
-extern int (*other_window_stuff)(void);
 extern int (*jk_printf)(const char* fmt, ...);
-extern void (*cog_verb_register)(void* a, intptr_t func, char* cmd);
 extern int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...);
-extern hashmap_entry* (*hashmap_create_entry)(void* map, char* str);
-extern cogSymbol* (*hashmap_set_entry)(hashmap_entry* map, cogSymbol* val);
 static char* (*_strncpy)(char *, const char *, size_t) = (void*)0x5126A0;
 static int (*__strcmpi)(const char *, const char *) = (void*)0x520D10;
 static int (*_sscanf)(const char*, const char*, ...) = (void*)0x512CB0;
@@ -273,6 +267,7 @@ static void (__cdecl *_qsort)(void *, size_t, size_t, int (__cdecl *)(const void
 static int (__cdecl *_string_modify_idk)(int SrcStr) = (void*)0x00513170;
 static int (*_fputs)(const char *, FILE *) = (void*)0x005151B0;
 static int (*_strtolower)(LPCSTR lpSrcStr) = (void*)0x005137C0;
+#endif
 
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);

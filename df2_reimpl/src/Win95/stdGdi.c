@@ -2,6 +2,8 @@
 
 #include "jk.h"
 
+#ifdef WIN32
+
 typedef struct BITMAPINFO_stack
 {
     union
@@ -207,3 +209,5 @@ HINSTANCE stdGdi_GetHInstance()
 {
     return stdGdi_HInstance;
 }
+
+#endif // WIN32

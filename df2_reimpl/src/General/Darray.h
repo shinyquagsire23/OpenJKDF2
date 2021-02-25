@@ -23,6 +23,6 @@ void Darray_Free(Darray *array);
 void* Darray_NewEntry(Darray *array);
 void* Darray_GetIndex(Darray *array, int idx);
 void Darray_ClearAll(Darray *array);
-int Darray_sub_520CB0(Darray *a1, int (__cdecl *a2)(int, int), int a3);
+int Darray_sub_520CB0(Darray *a1, int (*a2)(int, int), int a3);
 
 #endif // _DARRAY_H

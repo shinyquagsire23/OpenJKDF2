@@ -43,7 +43,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
         goto fail;
     _memset(&format, 0, sizeof(format));
     format.format.is16bit = 0;
-    format.format.bpp = (unsigned __int8)pcxHeader.bitDepth;
+    format.format.bpp = (uint8_t)pcxHeader.bitDepth;
     format.height = pcxHeader.yMax + 1;
     format.width = pcxHeader.stride / (signed int)((unsigned int)pcxHeader.bitDepth >> 3);
 

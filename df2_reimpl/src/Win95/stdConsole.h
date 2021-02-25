@@ -1,7 +1,7 @@
 #ifndef _STDCONSOLE_H
 #define _STDCONSOLE_H
 
-#include <windows.h>
+#include "types.h"
 #include <stdint.h>
 
 #define stdConsole_Startup_ADDR (0x004277B0)
@@ -82,6 +82,7 @@ typedef struct stdConsole
     uint32_t dword8C;
 } stdConsole;
 
+#ifdef WIN32
 int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3);
 BOOL stdConsole_Shutdown();
 stdConsole* stdConsole_New(int a1, int a2, int a3, int a4, char *a5, char a6, char a7, char a8, char a9, __int16 a10, unsigned __int8 a11, unsigned __int8 a12, char a13);
@@ -102,5 +103,6 @@ void stdConsole_WriteBorderMaybe(stdConsole *console);
 void stdConsole_WriteBorderMaybe2(stdConsole *console, char *a2, signed int a3);
 void stdConsole_WriteBorderMaybe3(stdConsole *a1);
 void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3, WORD wAttributes);
+#endif // WIN32
 
 #endif // _STDCONSOLE_H

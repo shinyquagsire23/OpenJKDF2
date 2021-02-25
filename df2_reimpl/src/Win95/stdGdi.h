@@ -14,6 +14,8 @@
 #define stdGdi_SetHInstance_ADDR (0x00436D30)
 #define stdGdi_GetHInstance_ADDR (0x00436D40)
 
+#ifdef WIN32
+
 HBITMAP stdGdi_Create8bppPaletted(HDC hdc, int a2, int a3, void **ppvBits, uint8_t *a5);
 HBITMAP stdGdi_CreateRGB(HDC hdc, LONG width, int height, void **ppvBits);
 HBITMAP stdGdi_Create16bppPaletted(HDC hdc, int width, int height, void **ppvBits);
@@ -24,5 +26,7 @@ void stdGdi_SetHwnd(HWND a1);
 HWND stdGdi_GetHwnd();
 void stdGdi_SetHInstance(HINSTANCE a1);
 HINSTANCE stdGdi_GetHInstance();
+
+#endif
 
 #endif // _STDGDI_H

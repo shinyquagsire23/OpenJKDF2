@@ -2,6 +2,8 @@
 
 #include "jk.h"
 
+#ifdef WIN32
+
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
 {
     LSTATUS result; // eax
@@ -206,3 +208,4 @@ int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *o
     }
     return result;
 }
+#endif

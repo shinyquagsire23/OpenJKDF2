@@ -190,8 +190,8 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     double v13; // st5
     double v14; // st7
     double v16; // st6
-    unsigned __int8 v17; // c0
-    unsigned __int8 v18; // c3
+    uint8_t v17; // c0
+    uint8_t v18; // c3
     double v19; // st6
     double normAng; // st7
     sithSector *sectorLook; // eax
@@ -212,8 +212,8 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     double v37; // st5
     double v38; // st7
     double v40; // st6
-    unsigned __int8 v41; // c0
-    unsigned __int8 v42; // c3
+    uint8_t v41; // c0
+    uint8_t v42; // c3
     double v43; // st6
     double v44; // st7
     sithSector *sectorLook_; // eax

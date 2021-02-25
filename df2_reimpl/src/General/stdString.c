@@ -121,7 +121,7 @@ int stdString_CharToWchar(uint16_t *a1, char *a2, int a3)
         {
             if ( !*v4 )
                 break;
-            *v5 = (unsigned __int8)*v4;
+            *v5 = (uint8_t)*v4;
             ++v5;
             ++v4;
             ++result;
@@ -239,7 +239,7 @@ wchar_t* stdString_CstrCopy(const char *a1)
     signed int v2; // eax
     wchar_t *v3; // esi
     signed int v4; // ecx
-    unsigned __int8 v5; // dl
+    uint8_t v5; // dl
 
     v1 = (wchar_t *)std_pHS->alloc(2 * _strlen(a1) + 2);
     v2 = 0;

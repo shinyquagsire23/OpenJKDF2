@@ -1,7 +1,8 @@
 #include "stdMci.h"
 
-#include <stdint.h>
 #include "jk.h"
+
+#ifdef WIN32
 
 int stdMci_Startup()
 {
@@ -113,3 +114,5 @@ double stdMci_GetTrackLength(int track)
 
     return (double)((statusParms.dwReturn >> 16) & 0xFF) + (double)((statusParms.dwReturn >> 8) & 0xFF) * 60.0;
 }
+
+#endif

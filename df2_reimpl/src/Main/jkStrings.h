@@ -1,7 +1,7 @@
 #ifndef _JKSTRINGS_H
 #define _JKSTRINGS_H
 
-#include <stdint.h>
+#include "types.h"
 
 #define jkStrings_Initialize_ADDR (0x0040B3F0)
 #define jkStrings_Shutdown_ADDR (0x0040B410)

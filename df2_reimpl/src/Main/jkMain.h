@@ -67,9 +67,9 @@
 
 typedef struct jkGuiStateFuncs
 {
-  void (__cdecl *showFunc)(int, int);
-  int (__cdecl *tickFunc)(int);
-  void (__cdecl *leaveFunc)(int, int);
+  void (*showFunc)(int, int);
+  int (*tickFunc)(int);
+  void (*leaveFunc)(int, int);
 } jkGuiStateFuncs;
 
 void jkMain_gui_loop();

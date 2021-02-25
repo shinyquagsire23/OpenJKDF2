@@ -1,8 +1,12 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stdint.h>
+#ifdef WIN32
 #include <windows.h>
+#endif
+
+#include <stdint.h>
+#include <stddef.h>
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
 
@@ -50,5 +54,104 @@ typedef struct sithActor sithActor;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 
 typedef struct common_functions common_functions;
+
+#ifdef LINUX
+#define __stdcall
+#define __cdecl
+typedef int HKEY;
+typedef char* LPCSTR;
+typedef uint32_t DWORD;
+typedef uint32_t* LPDWORD;
+typedef uint32_t LSTATUS;
+typedef uint8_t BYTE;
+typedef uint8_t* LPBYTE;
+typedef int REGSAM;
+typedef HKEY* PHKEY;
+typedef char* LPSTR;
+typedef void* LPSECURITY_ATTRIBUTES;
+typedef int HRESULT;
+typedef void** LPVOID;
+typedef uint32_t HINSTANCE;
+typedef void* LPUNKNOWN;
+typedef int HDC;
+typedef int BOOL;
+typedef uint32_t UINT;
+typedef void* LPPALETTEENTRY;
+typedef int* HGDIOBJ;
+typedef int HFONT;
+typedef int COLORREF;
+typedef int HBITMAP;
+typedef void BITMAPINFO;
+typedef int HANDLE;
+typedef int HPALETTE;
+typedef void PALETTEENTRY;
+typedef int LOGPALETTE;
+typedef void RGBQUAD;
+typedef void* LPCVOID;
+typedef uint32_t SIZE_T;
+typedef int HWND;
+typedef uint16_t WORD;
+typedef int16_t SHORT;
+typedef int LONG;
+typedef wchar_t WCHAR;
+
+typedef int8_t __int8;
+typedef int16_t __int16;
+typedef int32_t __int32;
+typedef int64_t __int64;
+
+typedef uint32_t* GUID;
+typedef GUID* LPGUID;
+typedef int IUnknown;
+typedef uint16_t WPARAM;
+typedef uint32_t LRESULT;
+typedef int HCURSOR;
+typedef int* LPARAM;
+
+#define WM_LBUTTONDOWN 0
+#define WM_LBUTTONUP 1
+#define WM_MOUSEMOVE 2
+#define WM_KEYFIRST 3
+#define WM_KEYUP 4
+#define WM_CHAR 5
+#define WM_PAINT 6
+#define WM_SETCURSOR 7
+#define HKEY_LOCAL_MACHINE 0
+
+typedef struct COORD
+{
+    int x;
+    int y;
+} COORD;
+
+typedef struct RECT
+{
+    int x;
+    int y;
+    int w;
+    int h;
+} RECT;
+
+typedef struct tagPOINT
+{
+  LONG x;
+  LONG y;
+} tagPOINT;
+
+typedef tagPOINT POINT;
+typedef POINT* LPPOINT;
+
+typedef struct tagPAINTSTRUCT
+{
+  HDC hdc;
+  BOOL fErase;
+  RECT rcPaint;
+  BOOL fRestore;
+  BOOL fIncUpdate;
+  BYTE rgbReserved[32];
+} tagPAINTSTRUCT;
+
+typedef RECT* LPRECT;
+#endif
 
 #endif // TYPES_H

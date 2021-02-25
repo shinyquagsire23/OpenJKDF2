@@ -1506,7 +1506,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int
         case WM_MOUSEMOVE:
             mouseX = (uint16_t)(lParam & 0xFFFF);
             mouseY = lParam >> 16;
-            jkGuiRend_mouseX = (unsigned __int16)lParam;
+            jkGuiRend_mouseX = (uint16_t)lParam;
             jkGuiRend_mouseY = lParam >> 16;
             jkGuiRend_UpdateMouse();
             if ( jkGuiRend_activeMenu->lastMouseDownClickable )
@@ -1987,7 +1987,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
 int jkGuiRend_TextBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)
 {
     jkGuiElement *v5; // esi
-    unsigned __int16 v6; // bx
+    uint16_t v6; // bx
     jkGuiStringEntry *v7; // edi
     int v8; // eax
     int v9; // ebp
