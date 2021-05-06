@@ -24,4 +24,6 @@ void sith_UpdateCamera();
 static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 
+static void (*sith_set_some_text_jk1)(char *text) = (void*)sith_set_some_text_jk1_ADDR;
+
 #endif // _SITH__H

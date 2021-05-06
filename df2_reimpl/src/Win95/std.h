@@ -36,14 +36,34 @@
 #define stdBuildDisplayEnvironment_ADDR (0x004273E0)
 #define stdFreeDisplayEnvironment_ADDR (0x00427730)
 
+void stdStartup(common_functions *a1);
+void stdShutdown();
+void stdInitServices(common_functions *a1);
+
 char* stdFileFromPath(char *fpath);
 int stdCalcBitPos(signed int val);
 int stdReadRaw(char *fpath, void *out, signed int len);
 char stdFGetc(int fd);
 void stdFPutc(char c, int fd);
 
-static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
-static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
+//static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
+//static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
 static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
+static int (*stdFileOpen)(char*,char*) = (void*)stdFileOpen_ADDR;
+static int (*stdFileClose)(int) = (void*)stdFileClose_ADDR;
+static size_t (*stdFileRead)(int,void*,size_t) = (void*)stdFileRead_ADDR;
+static size_t (*stdFileWrite)(int,void*,size_t) = (void*)stdFileWrite_ADDR;
+static char* (*stdFileGets)(int,void*,size_t) = (void*)stdFileGets_ADDR;
+static int (*stdFeof)(char*) = (void*)stdFeof_ADDR;
+static int (*stdFtell)(char*) = (void*)stdFtell_ADDR;
+static int (*stdFseek)(int,int,int) = (void*)stdFseek_ADDR;
+static int (*stdFileSize)(char*) = (void*)stdFileSize_ADDR;
+static int (*stdFilePrintf)(int, const char *a1, ...) = (void*)stdFilePrintf_ADDR;
+static wchar_t* (*stdFileGetws)(int,void*,size_t) = (void*)stdFileGetws_ADDR;
+
+#define word_860800 (*(uint16_t*)0x860800)
+#define word_860802 (*(uint16_t*)0x860802)
+#define word_860804 (*(uint16_t*)0x860804)
+#define word_860806 (*(uint16_t*)0x860806)
 
 #endif // _STDLEC_H

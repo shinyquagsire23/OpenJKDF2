@@ -24,19 +24,19 @@ typedef struct common_functions
     uint32_t unk_0;
     void *(*alloc)(unsigned int);
     void (*free)(void *);
-    void *(__cdecl *realloc)(void *, unsigned int);
-    uint32_t timeGetTime;
-    int (*fileOpen)(char *, char *);
-    int (*fileClose)(int);
-    size_t (*fileRead)(int, void *, size_t);
-    char *(*fileGets)(int, char *, int);
-    size_t (*fileWrite)(int, void *, size_t);
-    int (*feof)(int);
-    int (*ftell)(int);
-    int (*fseek)(int, int, int);
+    void *(*realloc)(void *, unsigned int);
+    int (*getTimerTick)();
+    stdFile_t (*fileOpen)(char *, char *);
+    int (*fileClose)(stdFile_t);
+    size_t (*fileRead)(stdFile_t, void *, size_t);
+    char *(*fileGets)(stdFile_t, char *, int);
+    size_t (*fileWrite)(stdFile_t, void *, size_t);
+    int (*feof)(stdFile_t);
+    int (*ftell)(stdFile_t);
+    int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(char *);
-    void (*filePrintf)(int, char*, ...);
-    wchar_t* (*fileGetws)(int, wchar_t *, unsigned int);
+    void (*filePrintf)(stdFile_t, char*, ...);
+    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, unsigned int);
     uint32_t allocHandle;
     uint32_t freeHandle;
     uint32_t reallocHandle;
@@ -267,6 +267,10 @@ static void (__cdecl *_qsort)(void *, size_t, size_t, int (__cdecl *)(const void
 static int (__cdecl *_string_modify_idk)(int SrcStr) = (void*)0x00513170;
 static int (*_fputs)(const char *, FILE *) = (void*)0x005151B0;
 static int (*_strtolower)(LPCSTR lpSrcStr) = (void*)0x005137C0;
+static int (*__snprintf)(char *, size_t, const char *, ...) = (void*)0x00513340;
+static int (*__findnext)(__int32 hFindFile, struct _finddata_t *a2) = (void*)0x00514870;
+static int (*__findfirst)(const char *lpFileName, struct _finddata_t *a2) = (void*)0x00514740;
+static int (*__findclose)(__int32 hFindFile) = (void*)0x00514990;
 #endif
 
 int _strlen(const char *str);

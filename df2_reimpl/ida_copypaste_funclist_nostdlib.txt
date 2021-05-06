@@ -283,8 +283,8 @@ jkGuiMain_Show	.text	004100F0	000000FD	00000008	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_ShowCutscenes	.text	00410210	0000028F	0000016C	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_Initialize	.text	004104A0	00000014			R	.	.	.	.	.	.	.
 jkGuiMain_Shutdown	.text	004104C0	00000001			R	.	.	.	.	.	.	.
-jkGuiMain_sub_4104D0	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.	.
-jkGuiMain_sub_4105B0	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.	.
+jkGuiMain_PopulateCutscenes	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	T	.
+jkGuiMain_FreeCutscenes	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiPlayer_Initialize	.text	004105F0	00000032			R	.	.	.	.	.	.	.
 jkGuiPlayer_Shutdown	.text	00410630	0000000B			R	.	.	.	.	.	.	.
 jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	T	.
@@ -2534,7 +2534,7 @@ sithStrTable_Shutdown	.text	004F2990	00000018			R	.	.	.	.	.	.	.
 sithStrTable_GetUniString	.text	004F29B0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
 sithStrTable_GetString	.text	004F29D0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
 sithSector_Startup	.text	004F29F0	0000005D			R	.	.	.	.	.	.	.
-sithSector_Shutdown	.text	004F2A50	00000037			R	.	.	.	.	.	.	.
+sithSector_Shutdown	.text	004F2A50	00000037			R	.	.	.	.	.	T	.
 sithSector_AddEntry	.text	004F2A90	00000077	00000000	00000014	R	.	.	.	.	.	T	.
 sithSector_sub_4F2B10	.text	004F2B10	0000004C	00000008	00000000	R	.	.	.	.	.	.	.
 sithSector_TimerTick	.text	004F2B60	000000D0	00000004	00000000	R	.	.	.	.	.	.	.
@@ -2611,7 +2611,7 @@ sithSector_cogMsg_SendSyncSurface	.text	004F8F80	000000CE	00000000	0000000C	R	.	
 sithSector_cogMsg_HandleSyncSurface	.text	004F9050	000000C1	00000004	00000004	R	.	.	.	.	.	.	.
 sithSector_cogMsg_SendSyncSector	.text	004F9120	000000C9	00000004	0000000C	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandleSyncSector	.text	004F91F0	000000E5	00000008	00000004	R	.	.	.	.	.	.	.
-sithSector_cogMsg_SendSyncSectorAlt	.text	004F92E0	0000006B	00000000	0000000C	R	.	.	.	.	.	.	.
+sithSector_cogMsg_SendSyncSectorAlt	.text	004F92E0	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandleSyncSectorAlt	.text	004F9350	0000005C	00000004	00000004	R	.	.	.	.	.	T	.
 sithSector_cogMsg_SendSyncAI	.text	004F93B0	00000286	00000010	0000000C	R	.	.	.	.	.	.	.
 sithSector_cogMsg_HandleSyncAI	.text	004F9640	000002B4	00000010	00000004	R	.	.	.	.	.	.	.

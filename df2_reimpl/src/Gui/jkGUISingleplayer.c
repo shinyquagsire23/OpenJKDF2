@@ -296,7 +296,7 @@ void __cdecl jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, 
     void *a1a; // [esp+14h] [ebp-1A0h]
     stdStrTable strtable; // [esp+18h] [ebp-19Ch]
     char tmp[128]; // [esp+28h] [ebp-18Ch]
-    char a2[256]; // [esp+A8h] [ebp-10Ch]
+    stdFileSearchResult a2; // [esp+A8h] [ebp-10Ch]
 
     stdStrTable_Load(&strtable, "misc\\cogStrings.uni");
     for ( i = 0; i < (signed int)array->total; ++i )
@@ -318,17 +318,17 @@ void __cdecl jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, 
     a1 = search;
     if ( search )
     {
-        if ( stdFileUtil_FindNext(search, a2) )
+        if ( stdFileUtil_FindNext(search, &a2) )
         {
             do
             {
-                v14 = (char *)pHS->alloc(_strlen(a2) + 1);
-                v15 = _strcpy(v14, a2);
+                v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1);
+                v15 = _strcpy(v14, a2.fpath);
                 v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
                 jkGuiRend_DarrayReallocStr(array, v16, (int)v15);
                 ++v22;
             }
-            while ( stdFileUtil_FindNext(a1, a2) );
+            while ( stdFileUtil_FindNext(a1, &a2) );
             v13 = a1;
         }
         stdFileUtil_DisposeFind((int)v13);

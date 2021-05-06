@@ -7,13 +7,13 @@ char* stdFnames_FindMedName(char *path)
     char *result; // eax
     char v2; // cl
 
-    result = _strrchr(path, '\\');
+    result = _strrchr(path, LEC_PATH_SEPARATOR_CHR);
     if (!result)
         return path;
 
-    if ( *result == '\\' )
+    if ( *result == LEC_PATH_SEPARATOR_CHR )
     {
-        while ( (result++)[1] == '\\' );
+        while ( (result++)[1] == LEC_PATH_SEPARATOR_CHR );
     }
     return result;
 }
@@ -80,7 +80,7 @@ int stdFnames_StripDirAndExt(char *str)
     if (find_drive)
         strip = find_drive + 1;
 
-    find_lastfolder = _strrchr(strip, '\\');
+    find_lastfolder = _strrchr(strip, LEC_PATH_SEPARATOR_CHR);
     if ( find_lastfolder )
         strip = find_lastfolder + 1;
 
@@ -140,7 +140,7 @@ char* stdFnames_CopyDir(char *out, int out_size, char *path)
     _strncpy(out, path, out_size - 1);
     out[out_size - 1] = 0;
 
-    result = _strrchr(out, '\\');
+    result = _strrchr(out, LEC_PATH_SEPARATOR_CHR);
     if (result)
         *result = 0;
 
@@ -155,14 +155,14 @@ char* stdFnames_CopyShortName(char *a1, int a2, char *a3)
   char v6; // cl
   char *result; // eax
 
-  v3 = _strrchr(a3, '\\');
+  v3 = _strrchr(a3, LEC_PATH_SEPARATOR_CHR);
   if ( v3 )
   {
-    if ( *v3 == '\\' )
+    if ( *v3 == LEC_PATH_SEPARATOR_CHR )
     {
       do
         v4 = (v3++)[1];
-      while ( v4 == '\\' );
+      while ( v4 == LEC_PATH_SEPARATOR_CHR );
     }
   }
   else
@@ -171,14 +171,14 @@ char* stdFnames_CopyShortName(char *a1, int a2, char *a3)
   }
   _strncpy(a1, v3, a2 - 1);
   a1[a2 - 1] = 0;
-  v5 = _strrchr(a1, '\\');
+  v5 = _strrchr(a1, LEC_PATH_SEPARATOR_CHR);
   if ( v5 )
   {
-    if ( *v5 == '\\' )
+    if ( *v5 == LEC_PATH_SEPARATOR_CHR )
     {
       do
         v6 = (v5++)[1];
-      while ( v6 == '\\' );
+      while ( v6 == LEC_PATH_SEPARATOR_CHR );
     }
   }
   else
@@ -200,9 +200,9 @@ char* stdFnames_Concat(char *a1, char *a2, int a3)
 
   v4 = _strlen(a1) + 1;
   v3 = v4 - 1;
-  if ( a1[v4 - 2] != '\\' && v3 < a3 - 1 && *a1 )
+  if ( a1[v4 - 2] != LEC_PATH_SEPARATOR_CHR && v3 < a3 - 1 && *a1 )
   {
-    a1[v3] = '\\';
+    a1[v3] = LEC_PATH_SEPARATOR_CHR;
     v3 = v4;
     a1[v4] = 0;
   }
@@ -219,9 +219,9 @@ char* stdFnames_MakePath(char *a1, int a2, char *a3, char *a4)
   a1[a2 - 1] = 0;
   v5 = _strlen(a1) + 1;
   v4 = v5 - 1;
-  if ( a1[v5 - 2] != '\\' && v4 < a2 - 1 && *a1 )
+  if ( a1[v5 - 2] != LEC_PATH_SEPARATOR_CHR && v4 < a2 - 1 && *a1 )
   {
-    a1[v4] = '\\';
+    a1[v4] = LEC_PATH_SEPARATOR_CHR;
     v4 = v5;
     a1[v5] = 0;
   }
@@ -242,18 +242,18 @@ char* stdFnames_MakePath3(char *a1, int a2, char *a3, char *a4, char *a5)
   a1[a2 - 1] = 0;
   v7 = _strlen(a1) + 1;
   v6 = v7 - 1;
-  if ( a1[v7 - 2] != '\\' && v6 < v5 && *a1 )
+  if ( a1[v7 - 2] != LEC_PATH_SEPARATOR_CHR && v6 < v5 && *a1 )
   {
-    a1[v6] = '\\';
+    a1[v6] = LEC_PATH_SEPARATOR_CHR;
     v6 = v7;
     a1[v7] = 0;
   }
   _strncat(a1, a4, a2 - v6 - 1);
   v9 = _strlen(a1) + 1;
   v8 = v9 - 1;
-  if ( a1[v9 - 2] != '\\' && v8 < v5 && *a1 )
+  if ( a1[v9 - 2] != LEC_PATH_SEPARATOR_CHR && v8 < v5 && *a1 )
   {
-    a1[v8] = '\\';
+    a1[v8] = LEC_PATH_SEPARATOR_CHR;
     v8 = v9;
     a1[v9] = 0;
   }

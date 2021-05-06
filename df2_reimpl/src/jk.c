@@ -2,6 +2,13 @@
 
 #include "types.h"
 
+#ifdef LINUX
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#endif
+
 // Imports
 #ifdef WIN32
 LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
@@ -466,3 +473,357 @@ void jk_init()
     jk_snwprintf = (void*)0x00512BD0;
 #endif
 }
+
+#ifdef LINUX
+int _sscanf(const char * s, const char * format, ...)
+{
+    va_list args;
+    va_start (args, format);
+    int ret = vsscanf (s, format, args);
+    va_end (args);
+    return ret;
+}
+
+int _sprintf(const char * s, const char * format, ...)
+{
+    va_list args;
+    va_start (args, format);
+    int ret = vsprintf (s, format, args);
+    va_end (args);
+    return ret;
+}
+
+int _rand()
+{
+    return rand();
+}
+
+char* _strncpy(char* dst, const char* src, size_t num)
+{
+    return strncpy(dst, src, num);
+}
+
+void* _memcpy(void* dst, const void* src, size_t len)
+{
+    return memcpy(dst, src, len);
+}
+
+double _atof(const char* str)
+{
+    return atof(str);
+}
+
+int _atoi(const char* str)
+{
+    return atoi(str);
+}
+
+size_t _fwrite(const void * a, size_t b, size_t c, FILE * d)
+{
+    return fwrite(a,b,c,d);
+}
+
+int _fputs(const char * a, FILE * b)
+{
+    return fputs(a, b);
+}
+
+void jk_exit(int a)
+{
+    exit(a);
+}
+
+int jk_printf(const char* fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    int ret = vprintf(fmt, args);
+    va_end (args);
+    return ret;
+}
+
+int _printf(const char* fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    int ret = vprintf(fmt, args);
+    va_end (args);
+    return ret;
+}
+
+int jk_assert(void* log_func, char* file, int line_num, char *fmt, ...)
+{
+    
+}
+
+void* _malloc(size_t a)
+{
+    return malloc(a);
+}
+
+void _free(void* a)
+{
+    free(a);
+}
+
+wchar_t* _wcsncpy(wchar_t *a1, const wchar_t *a2, size_t a3)
+{
+    return wcsncpy(a1,a2,a3);
+}
+
+void _strtolower(char* str)
+{
+    for(int i = 0; str[i]; i++){
+      str[i] = tolower(str[i]);
+    }
+}
+
+void _qsort(void *a, size_t b, size_t c, int (__cdecl *d)(const void *, const void *))
+{
+    qsort(a,b,c,d);
+}
+
+char* _strchr(char * a, char b)
+{
+    return strchr(a,b);
+}
+
+char* _strrchr(char * a, char b)
+{
+    return strrchr(a,b);
+}
+
+char* _strtok(char * a, const char * b)
+{
+    return strtok(a,b);
+}
+
+char* _strncat(char* a, const char* b, size_t c)
+{
+    return strncat(a,b,c);
+}
+
+size_t _strspn(const char* a, const char* b)
+{
+    return strspn(a,b);
+}
+
+char* _strpbrk(const char* a, const char* b)
+{
+    return strpbrk(a,b);
+}
+
+size_t _wcslen(const wchar_t * a)
+{
+    return wcslen(a);
+}
+
+int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    int ret = vswprintf(a1, fmt, args); // TODO ehh
+    va_end (args);
+    return ret;
+}
+
+wchar_t* _wcscpy(wchar_t * a, const wchar_t *b)
+{
+    return wcscpy(a,b);
+}
+
+int jk_MessageBeep(int a)
+{
+}
+
+int __strcmpi(const char *a, const char *b)
+{
+    return strcmp(a,b); // TODO verify
+}
+
+char __tolower(char a)
+{
+    return tolower(a);
+}
+
+int msvc_sub_512D30(int a, int b)
+{
+    assert(0);
+}
+
+int jk_MessageBoxW()
+{
+    assert(0);
+}
+
+void stdGdi_GetHwnd()
+{
+    assert(0);
+}
+
+void jk_PostMessageA()
+{
+    assert(0);
+}
+
+void jk_GetCursorPos()
+{
+    assert(0);
+}
+
+void jk_GetUpdateRect()
+{
+    assert(0);
+}
+
+void jk_BeginPaint()
+{
+    assert(0);
+}
+
+int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
+{
+    return vswprintf(a, fmt, list);
+}
+
+void jk_EndPaint()
+{
+    assert(0);
+}
+
+void stdGdi_GetHInstance()
+{
+    assert(0);
+}
+
+void jk_LoadCursorA()
+{
+    assert(0);
+}
+
+void jk_SetCursor()
+{
+    assert(0);
+}
+
+void jk_InvalidateRect()
+{
+    assert(0);
+}
+
+void jk_ChangeDisplaySettingsA()
+{
+    assert(0);
+}
+
+void stdConsole_Startup()
+{
+    assert(0);
+}
+
+void jk_DirectDrawEnumerateA()
+{
+    assert(0);
+}
+
+void jk_DirectDrawCreate()
+{
+    assert(0);
+}
+
+void jk_DirectSoundCreate()
+{
+    assert(0);
+}
+
+void jk_DirectPlayLobbyCreateA()
+{
+    assert(0);
+}
+
+void jk_DirectInputCreateA()
+{
+    assert(0);
+}
+
+void jk_CreateFileA()
+{
+    assert(0);
+}
+
+void jk_CreateFileMappingA()
+{
+    assert(0);
+}
+
+void jk_LocalAlloc()
+{
+    assert(0);
+}
+
+void jk_MapViewOfFile()
+{
+    assert(0);
+}
+
+void jk_UnmapViewOfFile()
+{
+    assert(0);
+}
+
+void jk_CloseHandle()
+{
+    assert(0);
+}
+
+void jk_GetDesktopWindow()
+{
+    assert(0);
+}
+
+void jk_GetDC()
+{
+    assert(0);
+}
+
+void jk_GetDeviceCaps()
+{
+    assert(0);
+}
+
+void jk_WinExec()
+{
+    assert(0);
+}
+
+void _string_modify_idk()
+{
+    assert(0);
+}
+
+void jk_ReleaseDC()
+{
+    assert(0);
+}
+
+void jk_SetFocus()
+{
+    assert(0);
+}
+
+void jk_SetActiveWindow()
+{
+    assert(0);
+}
+
+void jk_ShowCursor()
+{
+    assert(0);
+}
+
+void jk_ValidateRect()
+{
+    assert(0);
+}
+
+#endif

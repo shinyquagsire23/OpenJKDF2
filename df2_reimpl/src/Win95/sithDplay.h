@@ -25,4 +25,6 @@ static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 static int (*sithDplay_SendToPlayer)(sithCogMsg *msg, int a2) = (void*)sithDplay_SendToPlayer_ADDR;
 static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 
+#define sithDplay_idk (*(int*)0x008321F8)
+
 #endif // _SITHDPLAY_H

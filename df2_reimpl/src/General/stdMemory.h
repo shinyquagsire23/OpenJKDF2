@@ -11,6 +11,10 @@
 #define stdMemory_BlockFree_ADDR (0x0043A340)
 #define stdMemory_BlockRealloc_ADDR (0x0043A3A0)
 
+#define daAlloc_ADDR (0x0043A4A0)
+#define daFree_ADDR (0x0043A680)
+#define daRealloc_ADDR (0x0043A760)
+
 #define stdMemory_bInitted (*(int*)0x00570384)
 #define stdMemory_bOpened (*(int*)0x00570388)
 #define stdMemory_info (*(stdMemoryInfo*)0x008607C0)
@@ -44,5 +48,9 @@ void stdMemory_Dump();
 stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int lineNum);
 void stdMemory_BlockFree(stdMemoryAlloc *alloc);
 stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum);
+
+static void* (*daAlloc)(uint32_t) = (void*)daAlloc_ADDR;
+static void* (*daFree)(void*) = (void*)daFree_ADDR;
+static void* (*daRealloc)(void*, uint32_t) = (void*)daRealloc_ADDR;
 
 #endif // _STDMEMORY_H

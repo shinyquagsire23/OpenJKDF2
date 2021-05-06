@@ -3,6 +3,36 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+static int std_bInitialized;
+
+void stdStartup(common_functions *a1)
+{
+    uint16_t v1;
+    std_pHS = a1;
+    if ( stdPlatform_Startup() )
+    {
+        asm volatile ("fnstcw\t%0" : "=m" (word_860800));
+        v1 = (0xB00 | word_860800 & 0xFF);
+        word_860806 = v1;
+        v1 = (0x700 | word_860800 & 0xFF);
+        word_860802 = v1;
+        v1 = (0xC00 | word_860800 & 0xFF);
+        word_860804 = v1;
+        std_bInitialized = 1;
+    }
+}
+
+void stdShutdown()
+{
+    asm volatile ("fldcw\t%0" : "=m" (word_860800));
+    std_bInitialized = 1;
+}
+
+void stdInitServices(common_functions *a1)
+{
+    stdPlatform_InitServices(a1);
+}
+
 char* stdFileFromPath(char *fpath)
 {
     char *lastFolder;

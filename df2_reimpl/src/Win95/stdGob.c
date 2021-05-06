@@ -8,6 +8,11 @@
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 
+static common_functions gobHS;
+static common_functions* pGobHS;
+static int stdGob_bInit;
+static char stdGob_fpath[128];
+
 int stdGob_Startup(common_functions *pHS_in)
 {
     _memcpy(&gobHS, pHS_in, sizeof(gobHS));
@@ -41,14 +46,6 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     HANDLE v7; // eax
     int v8; // edx
     stdGobFile *v9; // eax
-    common_functions *v10; // ecx
-    int fhand_; // eax
-    stdGobFile *v13; // edi
-    char v14; // dl
-    unsigned int v15; // ecx
-    int *v16; // edi
-    common_functions *v17; // edx
-    stdGobEntry *v18; // eax
     stdGobEntry *ent; // edi
     const char *ent_fname; // ebp
     stdGobHeader header; // [esp+10h] [ebp-Ch]
@@ -88,24 +85,15 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         }
     }
 
-    v10 = pGobHS;
     gob->viewMapped = 0;
-    fhand_ = v10->fileOpen(gob->fpath, "r+b");
-    gob->fhand = fhand_;
-    if ( !fhand_ )
+    gob->fhand = pGobHS->fileOpen(gob->fpath, "r+b");
+    if ( !gob->fhand )
       return 0;
-    v13 = (stdGobFile *)std_pHS->alloc(16 * gob->numFilesOpen);
-    gob->openedFile = v13;
-    if ( !v13 )
+    gob->openedFile = (stdGobFile *)std_pHS->alloc(sizeof(stdGobFile) * gob->numFilesOpen);
+    if ( !gob->openedFile )
       return 0;
-    v14 = 16 * (gob->numFilesOpen & 0xFF);
-    v15 = (unsigned int)(16 * gob->numFilesOpen) >> 2;
-    _memset(v13, 0, 4 * v15);
-    v16 = &v13->isOpen + v15;
-    v15 = (v15 & 0xFFFFFF00) | (v14 & 0xFF);
-    v17 = pGobHS;
-    _memset(v16, 0, v15 & 3);
-    v17->fileRead(gob->fhand, &header, 12);
+    _memset(gob->openedFile, 0, sizeof(stdGobFile) * gob->numFilesOpen);
+    pGobHS->fileRead(gob->fhand, &header, sizeof(stdGobHeader));
     if ( _memcmp((const char *)&header, "GOB ", 4u) )
     {
       stdPrintf((int)std_pHS->errorPrint, ".\\Win95\\stdGob.c", 270, "Error: Bad signature in header of gob file.\n", 0, 0, 0, 0);
@@ -117,28 +105,28 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
       return 0;
     }
     pGobHS->fseek(gob->fhand, header.entryTable_offs, 0);
-    pGobHS->fileRead(gob->fhand, &gob->numFiles, 4);
-    v18 = (stdGobEntry *)std_pHS->alloc(136 * gob->numFiles);
-    gob->entries = v18;
-    if ( !v18 )
+    pGobHS->fileRead(gob->fhand, &gob->numFiles, sizeof(uint32_t));
+    gob->entries = (stdGobEntry *)std_pHS->alloc(sizeof(stdGobEntry) * gob->numFiles);
+    if ( !gob->entries )
       return 0;
 
     ent = gob->entries;
     gob->entriesHashtable = stdHashTable_New(1024);
     if ( gob->numFiles > 0u )
     {
-      ent_fname = ent->fname;
-      do
-      {
-        pGobHS->fileRead(gob->fhand, ent, 0x88);
-        stdHashTable_SetKeyVal(gob->entriesHashtable, ent_fname, ent);
-        ++ent;
-        ent_fname += sizeof(stdGobEntry);
-        ++v4;
-      }
-      while ( v4 < gob->numFiles );
+        ent_fname = ent->fname;
+        do
+        {
+            pGobHS->fileRead(gob->fhand, ent, sizeof(stdGobEntry));
+            stdHashTable_SetKeyVal(gob->entriesHashtable, ent_fname, ent);
+            ++ent;
+            ent_fname += sizeof(stdGobEntry);
+            ++v4;
+        }
+        while ( v4 < gob->numFiles );
     }
-  return 1;
+    
+    return 1;
 }
 
 void stdGob_Free(stdGob *gob)
@@ -307,31 +295,31 @@ const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
 
 const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
 {
-  stdGobEntry *entry; // ecx
-  int seekOffs; // edx
-  stdGob *gob; // eax
-  unsigned int seekOffs_; // edi
-  unsigned int len_wide; // ecx
-  const wchar_t *ret; // eax
-  const wchar_t *ret_; // edi
+    stdGobEntry *entry; // ecx
+    int seekOffs; // edx
+    stdGob *gob; // eax
+    unsigned int seekOffs_; // edi
+    unsigned int len_wide; // ecx
+    const wchar_t *ret; // eax
+    const wchar_t *ret_; // edi
 
-  entry = f->entry;
-  seekOffs = f->seekOffs;
-  if ( seekOffs >= entry->fileSize - 1 )
-    return 0;
-  gob = f->parent;
-  if ( gob->lastReadFile != f )
-  {
-    pGobHS->fseek(gob->fhand, seekOffs + entry->fileOffset, 0);
+    entry = f->entry;
+    seekOffs = f->seekOffs;
+    if ( seekOffs >= entry->fileSize - 1 )
+        return 0;
     gob = f->parent;
-    gob->lastReadFile = f;
-  }
-  seekOffs_ = f->seekOffs;
-  len_wide = len;
-  if ( ((f->entry->fileSize - seekOffs_) >> 1) + 1 < len )
-    len_wide = ((f->entry->fileSize - seekOffs_) >> 1) + 1;
-  ret = pGobHS->fileGetws(gob->fhand, out, len_wide);
-  if (ret)
-    f->seekOffs += _wcslen(ret);
-  return ret;
+    if ( gob->lastReadFile != f )
+    {
+        pGobHS->fseek(gob->fhand, seekOffs + entry->fileOffset, 0);
+        gob = f->parent;
+        gob->lastReadFile = f;
+    }
+    seekOffs_ = f->seekOffs;
+    len_wide = len;
+    if ( ((f->entry->fileSize - seekOffs_) >> 1) + 1 < len )
+        len_wide = ((f->entry->fileSize - seekOffs_) >> 1) + 1;
+    ret = pGobHS->fileGetws(gob->fhand, out, len_wide);
+    if (ret)
+        f->seekOffs += _wcslen(ret);
+    return ret;
 }

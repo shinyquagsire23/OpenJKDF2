@@ -2,6 +2,7 @@
 
 #include "Win95/stdGdi.h"
 #include "Main/Main.h"
+#include "Main/jkMain.h"
 
 #include "jk.h"
 
@@ -121,6 +122,40 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
 
 #ifdef LINUX
 
+#include <string.h>
+
+int Window_Main_Linux(int argc, char** argv)
+{
+    char cmdLine[1024];
+    int result;
+    
+    strcpy(cmdLine, "");
+    
+    g_handler_count = 0;
+    g_thing_two_some_dialog_count = 0;
+    g_should_exit = 0;
+    g_window_not_destroyed = 0;
+    g_hInstance = 0;//hInstance;
+    g_nShowCmd = 0;//nShowCmd;
+    
+    for (int i = 1; i < argc; i++)
+    {
+        strcat(cmdLine, argv[i]);
+        strcat(cmdLine, " ");
+    }
+    
+    result = Main_Startup(cmdLine);
+
+    if (!result) return result;
+
+    g_window_not_destroyed = 1;
+    
+    while (1)
+    {
+        jkMain_gui_loop();
+    }
+}
+
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)
 {
     int result;
@@ -210,6 +245,18 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
     }
 #endif
     return result;
+}
+
+int Window_AddMsgHandler(WindowHandler_t handler)
+{
+    //TODO
+    return 1;
+}
+
+int Window_RemoveMsgHandler(WindowHandler_t handler)
+{
+    //TODO
+    return 1;
 }
 
 #endif

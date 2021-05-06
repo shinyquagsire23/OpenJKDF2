@@ -211,3 +211,124 @@ int Main_Startup(const char *cmdline)
     }
     return 0;
 }
+
+// Main_Shutdown
+
+void Main_ParseCmdLine(char *cmdline)
+{
+    char *v1; // esi
+    char *v2; // esi
+    char *v3; // esi
+    char *v4; // eax
+
+    v1 = _strtok(cmdline, " \t");
+    if ( v1 )
+    {
+        while ( 1 )
+        {
+            if ( !__strcmpi(v1, "-path") || !__strcmpi(v1, "/path") )
+            {
+                v4 = _strtok(0, " \t");
+                _strncpy(Main_path, v4, 0x7Fu);
+                Main_path[127] = 0;
+                goto LABEL_40;
+            }
+            if ( !__strcmpi(v1, "-devMode") || !__strcmpi(v1, "devMode") )
+                break;
+            if ( __strcmpi(v1, "-dispStats") && __strcmpi(v1, "/dispStats") )
+            {
+                if ( __strcmpi(v1, "-frameRate") && __strcmpi(v1, "/frameRate") )
+                {
+                    if ( __strcmpi(v1, "-windowGUI") && __strcmpi(v1, "/windowGUI") )
+                    {
+                        if ( !__strcmpi(v1, "-displayConfig") || !__strcmpi(v1, "/displayConfig") )
+                            goto LABEL_38;
+                        if ( !__strcmpi(v1, "-?") || !__strcmpi(v1, "/?") )
+                            goto LABEL_43;
+                        if ( __strcmpi(v1, "-debug") && __strcmpi(v1, "/debug") )
+                        {
+                            if ( __strcmpi(v1, "-verbose") && __strcmpi(v1, "/verbose") )
+                            {
+                                if ( __strcmpi(v1, "-noHUD") && __strcmpi(v1, "/noHUD") )
+                                {
+                                    pHS->errorPrint("Error in arguments.\n", 0, 0, 0, 0);
+LABEL_43:
+                                    pHS->messagePrint("\n", 0, 0, 0, 0);
+                                    pHS->messagePrint(
+                                        "Dark Forces II: Jedi Knight v%d.%02d%c\n",
+                                        jkGuiTitle_verMajor,
+                                        jkGuiTitle_verMinor,
+                                        jkGuiTitle_verRevision,
+                                        0);
+                                    pHS->messagePrint("(c) 1997 Lucasfilm Ltd. and LucasArts Entertainment Company. All Rights Reserved.", 0, 0, 0, 0);
+                                    pHS->messagePrint("Built %s %s\n", "Sep 10 1997", "09:39:21", 0, 0);
+                                    pHS->messagePrint("\n", 0, 0, 0, 0);
+                                    pHS->messagePrint("\n", 0, 0, 0, 0);
+                                    jk_exit(3);
+                                }
+                                Main_bNoHUD = 1;
+                            }
+                            else
+                            {
+                                v2 = _strtok(0, " \t");
+                                if ( _atoi(v2) < 0 )
+                                {
+                                    Main_verboseLevel = 0;
+                                }
+                                else if ( _atoi(v2) > 2 )
+                                {
+                                    Main_verboseLevel = 2;
+                                }
+                                else
+                                {
+                                    Main_verboseLevel = _atoi(v2);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            v3 = _strtok(0, " \t");
+                            if ( __strcmpi(v3, "con") )
+                            {
+                                if ( __strcmpi(v3, "log") )
+                                {
+                                    if ( __strcmpi(v3, "none") )
+                                        goto LABEL_43;
+                                    Main_logLevel = 0;
+                                }
+                                else
+                                {
+                                    Main_logLevel = 2;
+                                }
+                            }
+                            else
+                            {
+                                Main_logLevel = 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Main_bWindowGUI = 1;
+                    }
+                }
+                else
+                {
+                    Main_bFrameRate = 1;
+                }
+            }
+            else
+            {
+                Main_bDispStats = 1;
+            }
+LABEL_40:
+            v1 = _strtok(0, " \t");
+            if ( !v1 )
+                return;
+        }
+        Main_bDevMode = 1;
+LABEL_38:
+        Main_bDisplayConfig = 1;
+        goto LABEL_40;
+    }
+}

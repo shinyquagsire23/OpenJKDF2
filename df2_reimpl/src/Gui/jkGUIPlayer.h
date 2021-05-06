@@ -8,5 +8,6 @@
 #define jkGuiPlayer_NewPlayerIdk_ADDR (0x00410D10)
 
 static int (*jkGuiPlayer_Initialize)() = (void*)jkGuiPlayer_Initialize_ADDR;
+static void (*jkGuiPlayer_ShowNewPlayer)(int) = (void*)jkGuiPlayer_ShowNewPlayer_ADDR;
 
 #endif // _JKGUIPLAYER_H

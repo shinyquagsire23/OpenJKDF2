@@ -110,7 +110,7 @@ loop_escape:
     }
 
     hashtable->numBuckets = actualNumBuckets;
-    hashtable->buckets = (stdHashKey *)std_pHS->alloc(16 * actualNumBuckets);
+    hashtable->buckets = (stdHashKey *)std_pHS->alloc(sizeof(stdHashKey) * actualNumBuckets);
     if ( hashtable->buckets )
     {
       _memset(hashtable->buckets, 0, sizeof(stdHashKey) * hashtable->numBuckets);

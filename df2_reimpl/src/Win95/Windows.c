@@ -28,7 +28,9 @@ void Windows_Startup()
     Windows_bInitted = 1;
     WinIdk_SetDplayGuid(Windows_DplayGuid);
     WinIdk_detect_cpu(Windows_cpu_info);
+
     wuRegistry_GetString("CD Path", (LPBYTE)cdPath, 128, Windows_cdpath_default); // ????
+
     jkRes_LoadCd(cdPath);
     Windows_installType = wuRegistry_GetInt("InstallType", 9);
     Window_AddMsgHandler(Windows_DefaultHandler);

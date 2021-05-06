@@ -25,7 +25,9 @@ static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwi
 static void (*Window_gui_gets_vars)(int *a1, int *a2) = (void*)Window_gui_gets_vars_ADDR;
 static void (*Window_SetDrawHandlers)(int a1, int a2) = (void*)Window_SetDrawHandlers_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;
+#ifdef WIN32
 static int (*Window_AddMsgHandler)(WindowHandler_t handler) = (void*)Window_AddMsgHandler_ADDR;
 static int (*Window_RemoveMsgHandler)(WindowHandler_t handler) = (void*)Window_RemoveMsgHandler_ADDR;
+#endif
 
 #endif // _WINDOW_H

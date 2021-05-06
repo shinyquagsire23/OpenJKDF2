@@ -21,10 +21,10 @@
 #define stdGob_FileGets_ADDR (0x00436790)
 #define stdGob_FileGetws_ADDR (0x00436830)
 
-#define stdGob_fpath ((char*)0x5635F8)
-#define gobHS (*(common_functions*)0x563678)
-#define pGobHS (*(common_functions**)0x5636E8)
-#define stdGob_bInit (*(int*)0x5636EC)
+//#define stdGob_fpath ((char*)0x5635F8)
+//#define gobHS (*(common_functions*)0x563678)
+//#define pGobHS (*(common_functions**)0x5636E8)
+//#define stdGob_bInit (*(int*)0x5636EC)
 
 #define GOB_VERSION_LATEST (20)
 
@@ -56,7 +56,7 @@ typedef struct stdGobFile
 typedef struct stdGob
 {
     char fpath[128];
-    int fhand;
+    stdFile_t fhand;
     uint32_t numFiles;
     stdGobEntry* entries;
     stdHashTable* entriesHashtable;

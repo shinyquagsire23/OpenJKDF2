@@ -77,5 +77,9 @@ void jkMain_EscapeMenuTick(int a2);
 void jkMain_GameplayTick(int a2);
 static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
+static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
+static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;
+static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
+static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 
 #endif // _JKMAIN_H

@@ -15,6 +15,7 @@
 #include "General/stdMemory.h"
 #include "General/stdConffile.h"
 #include "General/stdFnames.h"
+#include "General/stdFileUtil.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
@@ -23,6 +24,7 @@
 #include "General/Darray.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIMain.h"
 #include "Gui/jkGUIGeneral.h"
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIEsc.h"
@@ -98,9 +100,23 @@
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGob.h"
+#include "Main/jkRes.h"
 #include "Main/jkStrings.h"
 #include "Main/jkControl.h"
 #include "Main/Main.h"
+#include "stdPlatform.h"
+
+#ifdef LINUX
+
+#include <sys/mman.h>
+
+int main(int argc, char** argv)
+{
+    mmap((void*)0x400000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    Window_Main_Linux(argc, argv);
+}
+
+#endif
 
 #ifdef WIN32
 __declspec(dllexport) void hook_init(void);
@@ -131,6 +147,10 @@ __declspec(dllexport) void hook_init(void)
     jk_init();
     
     hook_function(WinMain_ADDR, WinMain_);
+    
+    // stdPlatform
+    hook_function(stdPlatform_InitServices_ADDR, stdPlatform_InitServices);
+    hook_function(stdPlatform_Startup_ADDR, stdPlatform_Startup);
     
     // jkMain
     hook_function(jkMain_gui_loop_ADDR, jkMain_gui_loop);
@@ -316,6 +336,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(DirectX_DirectInputCreateA_ADDR, DirectX_DirectInputCreateA);*/
     
     // std
+    hook_function(stdStartup_ADDR, stdStartup);
+    hook_function(stdShutdown_ADDR, stdShutdown);
+    hook_function(stdInitServices_ADDR, stdInitServices);
     hook_function(stdCalcBitPos_ADDR, stdCalcBitPos);
     hook_function(stdReadRaw_ADDR, stdReadRaw);
     hook_function(stdFGetc_ADDR, stdFGetc);
@@ -351,6 +374,11 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdFnames_Concat_ADDR, stdFnames_Concat);
     hook_function(stdFnames_MakePath_ADDR, stdFnames_MakePath);
     hook_function(stdFnames_MakePath3_ADDR, stdFnames_MakePath3);
+    
+    // stdFileUtil
+    hook_function(stdFileUtil_NewFind_ADDR, stdFileUtil_NewFind);
+    hook_function(stdFileUtil_FindNext_ADDR, stdFileUtil_FindNext);
+    hook_function(stdFileUtil_DisposeFind_ADDR, stdFileUtil_DisposeFind);
     
     // stdGob
     hook_function(stdGob_Startup_ADDR, stdGob_Startup);
@@ -991,6 +1019,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGob_Startup_ADDR, jkGob_Startup);
     hook_function(jkGob_Shutdown_ADDR, jkGob_Shutdown);
     
+    // jkRes
+    hook_function(jkRes_Startup_ADDR, jkRes_Startup);
+    hook_function(jkRes_HookHS_ADDR, jkRes_HookHS);
+    hook_function(jkRes_UnhookHS_ADDR, jkRes_UnhookHS);
+    hook_function(jkRes_FileExists_ADDR, jkRes_FileExists);
+    hook_function(jkRes_ReadKey_ADDR, jkRes_ReadKey);
+    hook_function(jkRes_LoadNew_ADDR, jkRes_LoadNew);
+    
     // jkStrings
     hook_function(jkStrings_Initialize_ADDR, jkStrings_Initialize);
     hook_function(jkStrings_Shutdown_ADDR, jkStrings_Shutdown);
@@ -1215,6 +1251,14 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkGuiGeneral_Initialize_ADDR, jkGuiGeneral_Initialize);
     hook_function(jkGuiGeneral_Shutdown_ADDR, jkGuiGeneral_Shutdown);
     hook_function(jkGuiGeneral_Show_ADDR, jkGuiGeneral_Show);
+    
+    // jkGUIMain
+    hook_function(jkGuiMain_Show_ADDR, jkGuiMain_Show);
+    hook_function(jkGuiMain_ShowCutscenes_ADDR, jkGuiMain_ShowCutscenes);
+    hook_function(jkGuiMain_Initialize_ADDR, jkGuiMain_Initialize);
+    hook_function(jkGuiMain_Shutdown_ADDR, jkGuiMain_Shutdown);
+    hook_function(jkGuiMain_PopulateCutscenes_ADDR, jkGuiMain_PopulateCutscenes);
+    hook_function(jkGuiMain_FreeCutscenes_ADDR, jkGuiMain_FreeCutscenes);
     
     // jkGUIEsc
     hook_function(jkGuiEsc_Startup_ADDR, jkGuiEsc_Startup);

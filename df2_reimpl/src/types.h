@@ -3,7 +3,10 @@
 
 #ifdef WIN32
 #include <windows.h>
+#include <io.h>
 #endif
+
+#include <stdarg.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -16,6 +19,12 @@
 #define LPDIRECTINPUTA void*
 #define LPDIRECTPLAYLOBBYA void*
 #define LPDIRECTSOUND void*
+
+#ifdef WIN32
+typedef int stdFile_t;
+#else
+typedef void* stdFile_t;
+#endif
 
 typedef struct IDirectSoundBuffer IDirectSoundBuffer;
 typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
@@ -36,6 +45,8 @@ typedef struct stdStrTable stdStrTable;
 typedef struct stdConffileArg stdConffileArg;
 typedef struct stdHashTable stdHashTable;
 typedef struct stdVBuffer stdVBuffer;
+typedef struct stdGob stdGob;
+typedef struct stdGobFile stdGobFile;
 
 typedef struct rdColormap rdColormap;
 typedef struct rdSprite rdSprite;
@@ -54,6 +65,8 @@ typedef struct sithActor sithActor;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 
 typedef struct common_functions common_functions;
+
+typedef struct Darray Darray;
 
 #ifdef LINUX
 #define __stdcall
