@@ -323,3 +323,12 @@ const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
         f->seekOffs += _wcslen(ret);
     return ret;
 }
+
+// ADDED
+size_t stdGob_FileSize(stdGobFile *f)
+{
+    if (!f) return 0;
+    if (!f->entry) return 0;
+
+    return f->entry->fileSize;
+}

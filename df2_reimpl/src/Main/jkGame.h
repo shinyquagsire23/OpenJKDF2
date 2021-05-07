@@ -27,8 +27,11 @@ typedef struct sithThing sithThing;
 #define g_mapModeFlags (*(int*)0x8EE674)
 #define jkGame_gamma (*(int*)0x008606A4)
 #define jkGame_screenSize (*(int*)0x008605F0)
+#define jkGame_bInitted (*(int*)0x005528BC)
 
-static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
+int jkGame_Initialize();
+
+//static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
 static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;

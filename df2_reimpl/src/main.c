@@ -10,10 +10,12 @@
 #include "Cog/jkCog.h"
 #include "Cog/sithCogYACC.h"
 #include "Cog/y.tab.h"
+#include "General/stdBitmap.h"
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
 #include "General/stdMemory.h"
 #include "General/stdConffile.h"
+#include "General/stdFont.h"
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "General/stdHashTable.h"
@@ -74,6 +76,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdMath.h"
+#include "Raster/rdRaster.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
@@ -86,6 +89,7 @@
 #include "World/jkSaber.h"
 #include "World/sithUnk3.h"
 #include "Win95/DirectX.h"
+#include "Win95/sithDplay.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -173,6 +177,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogSound_Initialize_ADDR, sithCogSound_Initialize);
     hook_function(sithCogSector_Initialize_ADDR, sithCogSector_Initialize);
     hook_function(sithCogPlayer_Initialize_ADDR, sithCogPlayer_Initialize);
+    hook_function(sithCogScript_RegisterVerb_ADDR, sithCogScript_RegisterVerb);
+    hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
+    hook_function(sithCogScript_RegisterGlobalMessage_ADDR, sithCogScript_RegisterGlobalMessage);
     
     // sithCogVm
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
@@ -213,6 +220,12 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCogVm_Ret_ADDR, sithCogVm_Ret);
     hook_function(sithCogVm_PopStackVar_ADDR, sithCogVm_PopStackVar);
     hook_function(sithCogVm_AssignStackVar_ADDR, sithCogVm_AssignStackVar);
+    
+    // stdBitmap
+    hook_function(stdBitmap_Load_ADDR, stdBitmap_Load);
+    hook_function(stdBitmap_LoadFromFile_ADDR, stdBitmap_LoadFromFile);
+    hook_function(stdBitmap_LoadEntry_ADDR, stdBitmap_LoadEntry);
+    //hook_function(stdBitmap_LoadEntryFromFile_ADDR, stdBitmap_LoadEntryFromFile);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);
@@ -335,6 +348,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(DirectX_DirectPlayLobbyCreateA_ADDR, DirectX_DirectPlayLobbyCreateA);
     hook_function(DirectX_DirectInputCreateA_ADDR, DirectX_DirectInputCreateA);*/
     
+    // sithDplay
+    hook_function(sithDplay_Startup_ADDR, sithDplay_Startup);
+    
     // std
     hook_function(stdStartup_ADDR, stdStartup);
     hook_function(stdShutdown_ADDR, stdShutdown);
@@ -358,6 +374,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConffile_ReadArgs_ADDR, stdConffile_ReadArgs);
     hook_function(stdConffile_ReadLine_ADDR, stdConffile_ReadLine);
     hook_function(stdConffile_GetFileHandle_ADDR, stdConffile_GetFileHandle);
+    
+    // stdFont
+    hook_function(stdFont_Load_ADDR, stdFont_Load);
     
     // stdFnames
     hook_function(stdFnames_FindMedName_ADDR, stdFnames_FindMedName);
@@ -440,6 +459,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdString_CStrToLower_ADDR, stdString_CStrToLower);
     
     // stdStrTable
+    hook_function(stdStrTable_Load_ADDR, stdStrTable_Load);
     hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
     hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
     hook_function(stdStrTable_GetString_ADDR, stdStrTable_GetString);
@@ -636,6 +656,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(rdMath_DeltaAngleNormalized_ADDR, rdMath_DeltaAngleNormalized);
     hook_function(rdMath_ClampVector_ADDR, rdMath_ClampVector);
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
+    
+    // rdRaster
+    hook_function(rdRaster_Startup_ADDR, rdRaster_Startup);
     
     // rdCanvas
     hook_function(rdCanvas_New_ADDR, rdCanvas_New);
@@ -1026,6 +1049,13 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkRes_FileExists_ADDR, jkRes_FileExists);
     hook_function(jkRes_ReadKey_ADDR, jkRes_ReadKey);
     hook_function(jkRes_LoadNew_ADDR, jkRes_LoadNew);
+    hook_function(jkRes_FileOpen_ADDR, jkRes_FileOpen);
+    hook_function(jkRes_FileClose_ADDR, jkRes_FileClose);
+    hook_function(jkRes_FileRead_ADDR, jkRes_FileRead);
+    hook_function(jkRes_FileWrite_ADDR, jkRes_FileWrite);
+    hook_function(jkRes_FileGets_ADDR, jkRes_FileGets);
+    hook_function(jkRes_FileGetws_ADDR, jkRes_FileGetws);
+    hook_function(jkRes_FileSize_ADDR, jkRes_FileSize);
     
     // jkStrings
     hook_function(jkStrings_Initialize_ADDR, jkStrings_Initialize);
@@ -1143,6 +1173,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithSound_InitFromPath_ADDR, sithSound_InitFromPath);
     
     // sithAI
+    hook_function(sithAI_Startup_ADDR, sithAI_Startup);
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
     hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
 

@@ -7,6 +7,6 @@
 #define jkAI_ForcePowers_ADDR (0x0040FF40)
 #define jkAI_SaberMove_ADDR (0x004100E0)
 
-static void (*jkAI_Startup)() = (void*)jkAI_Startup_ADDR;
+void jkAI_Startup();
 
 #endif // _JKAI_H

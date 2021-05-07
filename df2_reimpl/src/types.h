@@ -32,6 +32,7 @@ typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
 
+typedef struct sithAdjoin sithAdjoin;
 typedef struct sithAIClass sithAIClass;
 typedef struct sithCog sithCog;
 typedef struct sithCogMsg sithCogMsg;
@@ -41,6 +42,7 @@ typedef struct sithSurface sithSurface;
 typedef struct sithThing sithThing;
 typedef struct sithWorld sithWorld;
 
+typedef struct stdBitmap stdBitmap;
 typedef struct stdStrTable stdStrTable;
 typedef struct stdConffileArg stdConffileArg;
 typedef struct stdHashTable stdHashTable;
@@ -48,14 +50,17 @@ typedef struct stdVBuffer stdVBuffer;
 typedef struct stdGob stdGob;
 typedef struct stdGobFile stdGobFile;
 
+typedef struct rdClipFrustum rdClipFrustum;
 typedef struct rdColormap rdColormap;
-typedef struct rdSprite rdSprite;
 typedef struct rdEdge rdEdge;
+typedef struct rdKeyframe rdKeyframe;
 typedef struct rdMaterial rdMaterial;
 typedef struct rdParticle rdParticle;
-typedef struct rdClipFrustum rdClipFrustum;
-typedef struct rdVertexIdxInfo rdVertexIdxInfo;
 typedef struct rdProcEntry rdProcEntry;
+typedef struct rdPuppet rdPuppet;
+typedef struct rdSprite rdSprite;
+typedef struct rdSurface rdSurface;
+typedef struct rdVertexIdxInfo rdVertexIdxInfo;
 typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;

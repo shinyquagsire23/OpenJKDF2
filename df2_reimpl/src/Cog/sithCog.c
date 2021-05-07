@@ -25,8 +25,6 @@
 
 void (*sithDebugConsole_CmdCogList)(void) = (void*)0x004EE2F0;
 static int (*sithCogScript_TimerTick)() = (void*)0x4E0640;
-void (*sithCogScript_RegisterGlobalMessage)(void* ctx, char* name, int id) = (void*)0x004E06C0;
-void (*sithCogScript_RegisterMessageSymbol)(void* ctx, int msg, char* name) = (void*)0x004E0600;
 
 static int sithCog_bInitted = 0;
 
@@ -246,4 +244,43 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
 {
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
+}
+
+void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3)
+{
+    struct cogSymbol a2a; // [esp+0h] [ebp-10h] BYREF
+
+    sithCogSymbol* symbol = sithCogParse_AddSymbol(a1, a3);
+    if ( symbol )
+    {
+        a2a.type = COG_TYPE_VERB;
+        a2a.val = a2;
+        sithCogParse_SetSymbolVal(symbol, &a2a);
+    }
+}
+
+void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3)
+{
+    cogSymbol a2a; // [esp+0h] [ebp-10h] BYREF
+
+    sithCogSymbol* v3 = sithCogParse_AddSymbol(a1, a3);
+    if ( v3 )
+    {
+        a2a.type = COG_TYPE_INT;
+        a2a.val = a2;
+        sithCogParse_SetSymbolVal(v3, &a2a);
+    }
+}
+
+void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3)
+{
+    struct cogSymbol a2a; // [esp+0h] [ebp-10h] BYREF
+
+    sithCogSymbol* v3 = sithCogParse_AddSymbol(a1, a2);
+    if ( v3 )
+    {
+        a2a.type = COG_TYPE_FLEX;
+        a2a.val = a3;
+        sithCogParse_SetSymbolVal(v3, &a2a);
+    }
 }

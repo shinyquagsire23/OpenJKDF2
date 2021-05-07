@@ -35,6 +35,15 @@ typedef struct stdFontEntry
   int field_4;
 } stdFontEntry;
 
+typedef struct stdFontCharset
+{
+  stdFontCharset *previous;
+  int16_t charFirst;
+  int16_t charLast;
+  stdFontEntry *pEntries;
+  stdFontEntry entries;
+} stdFontCharset;
+
 typedef struct stdFont
 {
   char name[32];
@@ -43,11 +52,7 @@ typedef struct stdFont
   int16_t field_28;
   int16_t field_2A;
   stdBitmap *bitmap;
-  int charsets;
-  uint16_t charFirst;
-  uint16_t charLast;
-  stdFontEntry *pEntries;
-  stdFontEntry entries;
+  stdFontCharset charsetHead;
 } stdFont;
 
 typedef struct stdFontHeader
@@ -70,18 +75,11 @@ typedef struct stdFontExtHeader
   uint16_t characterLast;
 } stdFontExtHeader;
 
-typedef struct stdFontCharset
-{
-  stdFontCharset *previous;
-  int16_t charFirst;
-  int16_t charLast;
-  stdFontEntry *pEntries;
-  stdFontEntry entries;
-} stdFontCharset;
+stdFont* stdFont_Load(char *fpath, int a2, int a3);
 
 static int (*stdFont_Draw4)(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, WCHAR *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;
 static void (*stdFont_Free)(stdFont *font) = (void*)stdFont_Free_ADDR;
-static stdFont* (*stdFont_Load)(char *fpath, int a2, int a3) = (void*)stdFont_Load_ADDR;
+//static stdFont* (*stdFont_Load)(char *fpath, int a2, int a3) = (void*)stdFont_Load_ADDR;
 static void (*stdFont_Draw3)(stdVBuffer *a1, stdFont* a2, int a3, rdRect *a4, int a5, wchar_t *a6, int a7) = (void*)stdFont_Draw3_ADDR;
 static int (*stdFont_sub_434EC0)(stdVBuffer* a1, int a2, int a3, int a4, int a5, int a6, wchar_t *a7, int a8) = (void*)stdFont_sub_434EC0_ADDR;
 static int (*stdFont_sub_4355B0)(stdFont* a1, uint16_t a2) = (void*)stdFont_sub_4355B0_ADDR;

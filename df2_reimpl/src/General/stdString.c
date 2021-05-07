@@ -245,18 +245,13 @@ wchar_t* stdString_CstrCopy(const char *a1)
     v2 = 0;
     v3 = v1;
     v4 = _strlen(a1);
-    if ( v4 > 0 )
+    for (v2 = 0; v2 < v4; v2++)
     {
-        do
-        {
-            v5 = a1[v2];
-            if ( !v5 )
-                break;
-            *v3 = v5;
-            ++v3;
-            ++v2;
-        }
-        while ( v2 < v4 );
+        v5 = a1[v2];
+        if ( !v5 )
+            break;
+        *v3 = v5;
+        ++v3;
     }
     if ( v2 < v4 )
         *v3 = 0;

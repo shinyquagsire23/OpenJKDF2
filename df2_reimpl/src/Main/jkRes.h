@@ -109,16 +109,24 @@ static void (*jkRes_LoadGob)(char *a1) = (void*)jkRes_LoadGob_ADDR;
 //static int (*jkRes_LoadCD)(int a1) = (void*)jkRes_LoadCD_ADDR;
 //static int (*jkRes_LoadNew)(jkResGob *a1, char *a2, int a3) = (void*)jkRes_LoadNew_ADDR;
 
-static int (*jkRes_FileOpen)() = (void*)jkRes_FileOpen_ADDR;
-static int (*jkRes_FileClose)() = (void*)jkRes_FileClose_ADDR;
-static int (*jkRes_FileRead)() = (void*)jkRes_FileRead_ADDR;
-static int (*jkRes_FileGets)() = (void*)jkRes_FileGets_ADDR;
-static int (*jkRes_FileGetws)() = (void*)jkRes_FileGetws_ADDR;
-static int (*jkRes_FileWrite)() = (void*)jkRes_FileWrite_ADDR;
+uint32_t jkRes_FileOpen(char *fpath, char *mode);
+int jkRes_FileClose(int fd);
+size_t jkRes_FileRead(int fd, void* out, size_t len);
+size_t jkRes_FileWrite(int fd, void* out, size_t len);
+char* jkRes_FileGets(int a1, char* a2, unsigned int a3);
+wchar_t* jkRes_FileGetws(int fd, wchar_t* a2, unsigned int a3);
+size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3);
+
+//static int (*jkRes_FileOpen)() = (void*)jkRes_FileOpen_ADDR;
+//static int (*jkRes_FileClose)() = (void*)jkRes_FileClose_ADDR;
+//static int (*jkRes_FileRead)() = (void*)jkRes_FileRead_ADDR;
+//static int (*jkRes_FileGets)() = (void*)jkRes_FileGets_ADDR;
+//static int (*jkRes_FileGetws)() = (void*)jkRes_FileGetws_ADDR;
+//static int (*jkRes_FileWrite)() = (void*)jkRes_FileWrite_ADDR;
 static int (*jkRes_FEof)() = (void*)jkRes_FEof_ADDR;
 static int (*jkRes_FTell)() = (void*)jkRes_FTell_ADDR;
 static int (*jkRes_FSeek)() = (void*)jkRes_FSeek_ADDR;
-static int (*jkRes_FileSize)() = (void*)jkRes_FileSize_ADDR;
+//static int (*jkRes_FileSize)() = (void*)jkRes_FileSize_ADDR;
 static int (*jkRes_FilePrintf)() = (void*)jkRes_FilePrintf_ADDR;
 
 #endif // _JKRES_H

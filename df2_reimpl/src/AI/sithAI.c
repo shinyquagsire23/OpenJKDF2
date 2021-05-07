@@ -1,6 +1,69 @@
 #include "sithAI.h"
 
 #include "jk.h"
+#include "World/sithThing.h"
+#include "AI/sithAICmd.h"
+
+int sithAI_Startup()
+{
+    int v0; // ebx
+    int v1; // edx
+    int *v2; // ebp
+    sithActor *v3; // esi
+    int v4; // eax
+    sithActor *v5; // ecx
+
+    if ( sithAI_bInit )
+        return 0;
+
+    sithAI_commandList = (sithAICommand *)pSithHS->alloc(sizeof(sithAICommand) * 32);
+    if ( sithAI_commandList )
+    {
+        sithAI_commandsHashmap = stdHashTable_New(64);
+        if ( !sithAI_commandsHashmap )
+            pSithHS->free(sithAI_commandList);
+    }
+
+    sithAICmd_Startup();
+
+    v0 = sithAI_inittedActors;
+    _memset(sithAI_actors, 0, sizeof(sithActor) * 256);
+
+    v1 = 255;
+    v2 = sithAI_actorInitted;
+    v3 = &sithAI_actors[255];
+    sithAI_maxActors = 256;
+
+    do
+    {
+        memset(v3, 0, sizeof(sithActor));
+        if ( v1 == v0 )
+        {
+            v4 = v1 - 1;
+            if ( v1 - 1 >= 0 )
+            {
+                v5 = &sithAI_actors[v4];
+                do
+                {
+                    if ( v5->thing )
+                        break;
+                    --v4;
+                    --v5;
+                }
+                while ( v4 >= 0 );
+            }
+            v0 = v4;
+            sithAI_inittedActors = v4;
+        }
+        *v2++ = v1;
+        v3--;
+        --v1;
+    }
+    while ( (int)v3 >= (int)sithAI_actors );
+
+    sithAI_bInit = 1;
+    return 1;
+}
 
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3)
 {

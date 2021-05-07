@@ -84,4 +84,7 @@ size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len);
 const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
 const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
 
+// ADDED
+size_t stdGob_FileSize(stdGobFile *f);
+
 #endif // _STDGOB_H

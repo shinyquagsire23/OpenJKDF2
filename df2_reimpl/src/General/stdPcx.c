@@ -35,8 +35,8 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->palFmt = 2;
     bitmap->numMips = 1;
     bitmap->field_68 = 0;
-    bitmap->field_28 = 0;
-    bitmap->bitDepth = pcxHeader.bitDepth;
+    bitmap->format.is16bit = 0;
+    bitmap->format.bpp = pcxHeader.bitDepth;
 
     bitmap->mipSurfaces = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer *) * 1);
     if ( !bitmap->mipSurfaces )

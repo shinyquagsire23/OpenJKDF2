@@ -21,10 +21,24 @@
 #define sithDplay_cogMsg_SendEnumPlayers_ADDR (0x004C99E0)
 #define sithDplay_cogMsg_HandleEnumPlayers_ADDR (0x004C9A40)
 
-static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
+#define DirectPlay_Initialize_ADDR (0x0042FA40)
+
+int sithDplay_Startup();
+
+//static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
+
 static int (*sithDplay_SendToPlayer)(sithCogMsg *msg, int a2) = (void*)sithDplay_SendToPlayer_ADDR;
 static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 
+static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
+
+#ifdef WIN32
+static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
+#else
+int sithDplay_EarlyInit();
+#endif
+
 #define sithDplay_idk (*(int*)0x008321F8)
+#define sithDplay_bInitted (*(int*)0x8321D8)
 
 #endif // _SITHDPLAY_H

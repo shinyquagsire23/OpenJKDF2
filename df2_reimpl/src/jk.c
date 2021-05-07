@@ -475,6 +475,8 @@ void jk_init()
 }
 
 #ifdef LINUX
+#include <ctype.h>
+
 int _sscanf(const char * s, const char * format, ...)
 {
     va_list args;
@@ -641,6 +643,25 @@ int __strcmpi(const char *a, const char *b)
     return strcmp(a,b); // TODO verify
 }
 
+int __strnicmp(const char *a, const char *b, size_t c)
+{
+    int ca, cb, n;
+
+    n = 0;
+    do 
+    {
+        if (n >= c) break;
+        ca = (unsigned char) *a++;
+        cb = (unsigned char) *b++;
+        ca = tolower(toupper(ca));
+        cb = tolower(toupper(cb));
+        n++;
+    }
+    while (ca == cb && ca != '\0');
+
+    return ca - cb;
+}
+
 char __tolower(char a)
 {
     return tolower(a);
@@ -656,9 +677,10 @@ int jk_MessageBoxW()
     assert(0);
 }
 
-void stdGdi_GetHwnd()
+int stdGdi_GetHwnd()
 {
     assert(0);
+    return 0;
 }
 
 void jk_PostMessageA()
@@ -671,9 +693,10 @@ void jk_GetCursorPos()
     assert(0);
 }
 
-void jk_GetUpdateRect()
+int jk_GetUpdateRect()
 {
     assert(0);
+    return 1;
 }
 
 void jk_BeginPaint()
@@ -691,14 +714,16 @@ void jk_EndPaint()
     assert(0);
 }
 
-void stdGdi_GetHInstance()
+int stdGdi_GetHInstance()
 {
     assert(0);
+    return 0;
 }
 
-void jk_LoadCursorA()
+int jk_LoadCursorA()
 {
     assert(0);
+    return 1;
 }
 
 void jk_SetCursor()
@@ -721,49 +746,58 @@ void stdConsole_Startup()
     assert(0);
 }
 
-void jk_DirectDrawEnumerateA()
+uint32_t jk_DirectDrawEnumerateA()
 {
     assert(0);
+    return 0;
 }
 
-void jk_DirectDrawCreate()
+uint32_t jk_DirectDrawCreate()
 {
     assert(0);
+    return 0;
 }
 
-void jk_DirectSoundCreate()
+uint32_t jk_DirectSoundCreate()
 {
     assert(0);
+    return 0;
 }
 
-void jk_DirectPlayLobbyCreateA()
+uint32_t jk_DirectPlayLobbyCreateA()
 {
     assert(0);
+    return 0;
 }
 
-void jk_DirectInputCreateA()
+uint32_t jk_DirectInputCreateA()
 {
     assert(0);
+    return 0;
 }
 
-void jk_CreateFileA()
+uint32_t jk_CreateFileA()
 {
     assert(0);
+    return 0;
 }
 
-void jk_CreateFileMappingA()
+uint32_t jk_CreateFileMappingA()
 {
     assert(0);
+    return 0;
 }
 
-void jk_LocalAlloc()
+uint32_t jk_LocalAlloc()
 {
     assert(0);
+    return 0;
 }
 
-void jk_MapViewOfFile()
+uint32_t jk_MapViewOfFile()
 {
     assert(0);
+    return 0;
 }
 
 void jk_UnmapViewOfFile()
@@ -776,29 +810,34 @@ void jk_CloseHandle()
     assert(0);
 }
 
-void jk_GetDesktopWindow()
+uint32_t jk_GetDesktopWindow()
 {
     assert(0);
+    return 0;
 }
 
-void jk_GetDC()
+uint32_t jk_GetDC()
 {
     assert(0);
+    return 0;
 }
 
-void jk_GetDeviceCaps()
+uint32_t jk_GetDeviceCaps()
 {
     assert(0);
+    return 0;
 }
 
-void jk_WinExec()
+uint32_t jk_WinExec()
 {
     assert(0);
+    return 0;
 }
 
-void _string_modify_idk()
+int _string_modify_idk()
 {
     assert(0);
+    return 1;
 }
 
 void jk_ReleaseDC()
@@ -824,6 +863,11 @@ void jk_ShowCursor()
 void jk_ValidateRect()
 {
     assert(0);
+}
+
+int __isspace(int a)
+{
+    return isspace(a);
 }
 
 #endif

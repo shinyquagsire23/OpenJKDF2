@@ -26,11 +26,12 @@ typedef struct stdStrTable
     uint32_t magic_sTbl;
 } stdStrTable;
 
+int stdStrTable_Load(stdStrTable *strtable, char *fpath);
 void stdStrTable_Free(stdStrTable *table);
 wchar_t* stdStrTable_GetUniString(stdStrTable *table, const char *key);
 wchar_t* stdStrTable_GetString(stdStrTable *table, char *key);
 
-static int (__cdecl *stdStrTable_Load)(stdStrTable *strtable, char *fpath) = (void*)stdStrTable_Load_ADDR;
+//static int (__cdecl *stdStrTable_Load)(stdStrTable *strtable, char *fpath) = (void*)stdStrTable_Load_ADDR;
 
 
 #endif // _STDSTRTABLE_H

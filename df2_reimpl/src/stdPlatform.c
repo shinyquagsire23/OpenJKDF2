@@ -9,14 +9,55 @@
 #endif
 
 #ifdef LINUX
+static int Linux_stdFileOpen(char* fpath, char* mode)
+{
+    char tmp[512];
+    size_t len = strlen(fpath);
+
+    if (len > 512) {
+        len = 512;
+    }
+    strncpy(tmp, fpath, sizeof(tmp));
+
+    for (int i = 0; i < len; i++)
+    {
+        if (tmp[i] == '\\') {
+            tmp[i] = '/';
+        }
+    }
+
+    printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
+    
+    return fopen(tmp, mode);
+}
+
+static int Linux_stdFileClose(void* fhand)
+{
+    return close(fhand);
+}
+
+
 static int Linux_stdFileRead(void* fhand, void* dst, size_t len)
 {
-    return fread(dst, len, 1, fhand);
+    size_t val =  fread(dst, 1, len, fhand);
+
+    return val;
 }
 
 static int Linux_stdFileWrite(void* fhand, void* dst, size_t len)
 {
     return fwrite(dst, len, 1, fhand);
+}
+
+static int Linux_stdFileGets(void* fhand, char* dst, size_t len)
+{
+    return fgets(dst, len, fhand);
+}
+
+static void* Linux_alloc(size_t len)
+{
+    //TODO figure out where we're having alloc issues?
+    return malloc(len + 0x100);
 }
 #endif
 
@@ -52,12 +93,13 @@ void stdPlatform_InitServices(common_functions *handlers)
     handlers->unlockHandle = stdPlatform_UnlockHandle;
     
 #ifdef LINUX
-    handlers->alloc = malloc;
+    handlers->alloc = Linux_alloc;
     handlers->free = free;
     handlers->realloc = realloc;
-    handlers->fileOpen = fopen;
+    handlers->fileOpen = Linux_stdFileOpen;
+    handlers->fileClose = Linux_stdFileClose;
     handlers->fileRead = Linux_stdFileRead;
-    handlers->fileGets = fgets;
+    handlers->fileGets = Linux_stdFileGets;
     handlers->fileWrite = Linux_stdFileWrite;
     handlers->fseek = fseek;
     handlers->ftell = ftell;
@@ -68,3 +110,24 @@ int stdPlatform_Startup()
 {
     return 1;
 }
+
+#ifdef LINUX
+int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    printf("(%x %s:%d) ", a1, a2, line);
+    int ret = vprintf(fmt, args);
+    va_end (args);
+    return ret;
+}
+
+int stdPlatform_Printf(char *fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    int ret = vprintf(fmt, args);
+    va_end (args);
+    return ret;
+}
+#endif

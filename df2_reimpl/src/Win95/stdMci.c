@@ -115,4 +115,44 @@ double stdMci_GetTrackLength(int track)
     return (double)((statusParms.dwReturn >> 16) & 0xFF) + (double)((statusParms.dwReturn >> 8) & 0xFF) * 60.0;
 }
 
+#else // LINUX
+
+int stdMci_Startup()
+{
+    stdMci_uDeviceID = 0;
+
+    stdMci_bInitted = 1;
+    return 1;
+}
+
+void stdMci_Shutdown()
+{
+    stdMci_bInitted = 0;
+}
+
+int stdMci_Play(uint8_t trackTo, uint8_t trackFrom)
+{
+    return 1;
+}
+
+void stdMci_SetVolume(float vol)
+{
+    
+}
+
+void stdMci_Stop()
+{
+    
+}
+
+int stdMci_CheckStatus()
+{
+    return 1;
+}
+
+double stdMci_GetTrackLength(int track)
+{
+    return 0.0;
+}
+
 #endif

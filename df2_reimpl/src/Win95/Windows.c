@@ -11,6 +11,7 @@
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "jk.h"
+#include "General/stdString.h"
 
 static int Windows_bInitted;
 static uint32_t Windows_DplayGuid[4] = {0x0BF0613C0, 0x11D0DE79, 0x0A000C999, 0x4BAD7624};
@@ -45,6 +46,9 @@ void Windows_Shutdown()
 
 int Windows_InitWindow()
 {
+#ifdef LINUX
+    return 1;
+#endif
     HDC v2; // esi
     unsigned int v3; // ebx
     HWND v4; // eax
@@ -211,14 +215,21 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     HWND v2; // eax
     wchar_t *v3; // [esp-8h] [ebp-408h]
     wchar_t Text[512]; // [esp+0h] [ebp-400h] BYREF
+    char tmp[256];
     va_list va; // [esp+408h] [ebp+8h] BYREF
 
     va_start(va, a1);
-    stdDisplay_ClearMode();
+
+#ifdef WIN32
     v1 = jkStrings_GetText(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
     v3 = jkStrings_GetText("ERROR");
+    stdDisplay_ClearMode();
     v2 = stdGdi_GetHwnd();
     jk_MessageBoxW(v2, Text, v3, 0x10u);
+#else
+    vsnprintf(tmp, 0x200u, a1, va);
+    jk_printf("FATAL ERROR: %s\n", tmp);
+#endif
     jk_exit(1);
 }

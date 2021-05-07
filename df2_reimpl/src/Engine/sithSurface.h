@@ -1,7 +1,7 @@
 #ifndef _SITHSURFACE_H
 #define _SITHSURFACE_H
 
-#include "Primitives/rdVector.h"
+#include "types.h"
 
 #define sithSurface_sub_4E5A10_ADDR (0x004E5A10)
 #define sithSurface_sub_4E5A30_ADDR (0x004E5A30)
@@ -39,10 +39,11 @@
 #define sithSurface_Sync_ADDR (0x004F0B50)
 #define sithSurface_ScrollSky_ADDR (0x004F0BC0)
 
-typedef struct sithSector sithSector;
-typedef struct sithAdjoin sithAdjoin;
-typedef struct rdMaterial rdMaterial;
-typedef struct rdSurface rdSurface;
+#define sithSurface_numAvail (*(int*)0x0084DF48)
+#define sithSurface_aAvail ((int*)0x0084DF4C) // 256
+#define sithSurface_numSurfaces (*(int*)0x0084E350)
+#define sithSurface_aSurfaces ((rdSurface*)0x0084E358) // 256
+#define sithSurface_bOpened (*(int*)0x00852F58)
 
 typedef struct sithSurfaceInfo
 {
@@ -128,6 +129,9 @@ typedef enum SURFACEFLAGS
     SURFACEFLAGS_8000000 = 0x8000000,
 } SURFACEFLAGS;
 
+int sithSurface_Startup();
+
+//static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;

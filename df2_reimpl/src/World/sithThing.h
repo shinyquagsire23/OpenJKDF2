@@ -703,7 +703,7 @@ typedef int (__cdecl *sithThing_handler_t)(sithThing*);
 #define sithThing_paramKeyToParamValMap (*(stdHashTable**)0x008326A8)
 #define sithThing_handler (*(sithThing_handler_t*)0x008330FC)
 
-void sithThing_Startup();
+int sithThing_Startup();
 int sithThing_Shutdown();
 void sithThing_SetHandler(sithThing_handler_t handler);
 void sithThing_TickAll(float deltaSeconds, int deltaMs);

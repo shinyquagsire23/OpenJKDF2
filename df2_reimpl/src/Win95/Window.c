@@ -259,4 +259,15 @@ int Window_RemoveMsgHandler(WindowHandler_t handler)
     return 1;
 }
 
+int Window_ShowCursorUnwindowed(int a1)
+{
+    return 1;
+}
+
 #endif
+
+void Window_SetDrawHandlers(void *a1, void *a2)
+{
+    Window_drawAndFlip = a1;
+    Window_setCooperativeLevel = a2;
+}

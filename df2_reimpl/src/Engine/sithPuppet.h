@@ -1,6 +1,8 @@
 #ifndef _SITHPUPPET_H
 #define _SITHPUPPET_H
 
+#include "types.h"
+
 #define sithPuppet_Startup_ADDR (0x004E3C00)
 #define sithPuppet_Shutdown_ADDR (0x004E3CA0)
 #define sithPuppet_NewEntry_ADDR (0x004E3D00)
@@ -32,6 +34,13 @@ struct sithPuppet
   int field_20;
 };
 
+#define sithPuppet_hashtable (*(stdHashTable**)0x00847E88)
+#define sithPuppet_keyframesHashtable (*(stdHashTable**)0x00847E8C)
+#define sithPuppet_animNamesToIdxHashtable (*(stdHashTable**)0x00847E90)
+
+int sithPuppet_Startup();
+
+//static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
 static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;
 static void (*sithPuppet_Tick)(sithThing *thing, float a2) = (void*)sithPuppet_Tick_ADDR;
 static int (__cdecl *sithPuppet_PlayMode)(sithThing *a1, signed int anim, int callback) = (void*)sithPuppet_PlayMode_ADDR;

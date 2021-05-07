@@ -1,6 +1,8 @@
 #ifndef _SITH__H
 #define _SITH__H
 
+#include "types.h"
+
 #define sith_Startup_ADDR (0x004C4630)
 #define sith_Shutdown_ADDR (0x004C4700)
 #define sith_Load_ADDR (0x004C4780)
@@ -19,9 +21,11 @@
 #define sith_set_some_text_jk1_ADDR (0x004C4DC0)
 
 #define dword_8EE678 (*(int*)0x008EE678)
+#define sith_bInitialized (*(int*)0x0082F0AC)
 
+int sith_Startup(struct common_functions *commonFuncs);
 void sith_UpdateCamera();
-static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
+//static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 
 static void (*sith_set_some_text_jk1)(char *text) = (void*)sith_set_some_text_jk1_ADDR;

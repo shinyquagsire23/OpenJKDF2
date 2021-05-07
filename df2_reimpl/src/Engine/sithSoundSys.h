@@ -41,6 +41,11 @@
 #define sithSoundSys_sub_4DD3F0_ADDR (0x004DD3F0)
 #define sithSoundSys_sub_4DD5D0_ADDR (0x004DD5D0)
 
+#define sithSoundSys_bInitted (*(int*)0x00835FD4)
+#define sithSoundSys_bIsMuted (*(int*)0x00835FDC)
+#define sithSoundSys_musicVolume (*(float*)0x0054A678)
+#define sithSoundSys_globalVolume (*(float*)0x0054A67C)
+
 enum SITHSOUNDFLAG
 {
     SITHSOUNDFLAG_LOOP = 0x1,
@@ -82,6 +87,9 @@ typedef struct sithPlayingSound
     int refid;
 } sithPlayingSound;
 
+int sithSoundSys_Startup();
+
+//static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
 static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
 static void (*sithSoundSys_UpdateMusicVolume)(float musicVolume) = (void*)sithSoundSys_UpdateMusicVolume_ADDR;
 static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;

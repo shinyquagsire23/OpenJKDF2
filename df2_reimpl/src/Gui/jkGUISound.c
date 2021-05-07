@@ -59,7 +59,7 @@ void jkGuiSound_Initialize()
     jkGuiSound_bLowResSound = wuRegistry_GetInt("bLowRes", jkGuiSound_bLowResSound);
     jkGuiSound_b3DSound = wuRegistry_GetInt("b3DSound", jkGuiSound_b3DSound);
     jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
-    sithSoundSys_UpdateMusicVolume(jkGuiSound_musicVolume);
+    sithSoundSys_UpdateMusicVolume(jkGuiSound_musicVolume); // TODO
 
     stdSound_SetMenuVolume(jkGuiSound_sfxVolume);
 }

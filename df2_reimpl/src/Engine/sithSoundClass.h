@@ -1,6 +1,8 @@
 #ifndef _SITHSOUNDCLASS_H
 #define _SITHSOUNDCLASS_H
 
+#include "types.h"
+
 #define sithSoundClass_sub_4DD080_ADDR (0x004DD080)
 #define sithSoundClass_Startup_ADDR (0x004E63E0)
 #define sithSoundClass_Shutdown_ADDR (0x004E6480)
@@ -18,6 +20,8 @@
 #define sithSoundClass_ThingPlaySoundclass2_ADDR (0x004E6CD0)
 #define sithSoundClass_sub_4E6D70_ADDR (0x004E6D70)
 
+#define sithSoundClass_hashtable (*(stdHashTable**)0x00847F1C)
+#define sithSoundClass_nameToKeyHashtable (*(stdHashTable**)0x00847F20)
 
 enum SITH_SC
 {
@@ -220,6 +224,9 @@ typedef struct sithSoundClass
     int field_19C;
 } sithSoundClass;
 
+int sithSoundClass_Startup();
+
+//static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;
 static int (*sithSoundClass_Load)(sithWorld* world, int a) = (void*)sithSoundClass_Load_ADDR;
 static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
 static void (*sithSoundClass_ThingPlaySoundclass4)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass4_ADDR;

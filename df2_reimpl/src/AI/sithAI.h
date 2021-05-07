@@ -53,13 +53,21 @@ typedef struct sithAICommand
     int param3;
 } sithAICommand;
 
+#define sithAI_commandsHashmap (*(stdHashTable**)0x0084DA40)
+#define sithAI_actorInitted ((int*)0x0084DA48)
+#define sithAI_maxActors (*(uint32_t*)0x0084DA44)
+#define sithAI_bOpen       (*(int*)0x84DE48)
 #define sithAI_bInit       (*(int*)0x84DE4C)
 #define sithAI_commandList (*(sithAICommand**)0x0084DE50)
 #define sithAI_numCommands (*(uint32_t*)0x84DE54)
+#define sithAI_actors ((sithActor*)0x0088AFE0)
+#define sithAI_inittedActors (*(int*)0x008B4BE0)
 
+int sithAI_Startup();
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
 
+//static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
 static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI_Tick_ADDR;
 static void (*sithAI_SetActorFireTarget)(void *a1, int a2, sithThing *a3) = (void*)sithAI_SetActorFireTarget_ADDR;

@@ -36,7 +36,6 @@ typedef struct IDirectSoundBuffer
 {
 } IDirectSoundBuffer;
 
-static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;
 static int (*stdSound_BufferReset)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferReset_ADDR;
@@ -48,5 +47,11 @@ static int (*stdSound_BufferUnlock)(LPDIRECTSOUNDBUFFER a1, void* buffer, int bu
 static void (*stdSound_BufferRelease)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferRelease_ADDR;
 static LPDIRECTSOUNDBUFFER (*stdSound_BufferDuplicate)(LPDIRECTSOUNDBUFFER buf) = (void*)stdSound_BufferDuplicate_ADDR;
 static int (*stdSound_IsPlaying)(LPDIRECTSOUNDBUFFER a1, int *pos) = (void*)stdSound_IsPlaying_ADDR;
+
+#ifdef WIN32
+static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
+#else
+int stdSound_Initialize();
+#endif
 
 #endif // _STDSOUND_H

@@ -17,17 +17,26 @@
 #define Window_gui_gets_vars_ADDR (0x0050EC90)
 #define Window_msg_main_handler_ADDR (0x0050ECB0)
 
+#define Window_drawAndFlip (*(void**)0x00855E9C)
+#define Window_setCooperativeLevel (*(void**)0x00855EA0)
+
 typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName);
+void Window_SetDrawHandlers(void *a1, void *a2);
 
-static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static void (*Window_gui_gets_vars)(int *a1, int *a2) = (void*)Window_gui_gets_vars_ADDR;
-static void (*Window_SetDrawHandlers)(int a1, int a2) = (void*)Window_SetDrawHandlers_ADDR;
+//static void (*Window_SetDrawHandlers)(int a1, int a2) = (void*)Window_SetDrawHandlers_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;
-#ifdef WIN32
+
+#ifdef LINUX
+int Window_AddMsgHandler(WindowHandler_t handler);
+int Window_RemoveMsgHandler(WindowHandler_t handler);
+int Window_ShowCursorUnwindowed(int a1);
+#else
 static int (*Window_AddMsgHandler)(WindowHandler_t handler) = (void*)Window_AddMsgHandler_ADDR;
 static int (*Window_RemoveMsgHandler)(WindowHandler_t handler) = (void*)Window_RemoveMsgHandler_ADDR;
+static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 #endif
 
 #endif // _WINDOW_H

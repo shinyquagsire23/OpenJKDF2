@@ -52,7 +52,7 @@ int jkRes_LoadCd(char *a1)
     stdGob **v2; // edi
     char v4[128]; // [esp+Ch] [ebp-80h] BYREF
 
-    strncpy(jkRes_curDir, a1, 0x7Fu);
+    _strncpy(jkRes_curDir, a1, 0x7Fu);
     v1 = 0;
     jkRes_curDir[127] = 0;
     if ( jkRes_gCtx.gobs[4].numGobs )
@@ -70,7 +70,7 @@ int jkRes_LoadCd(char *a1)
     jkRes_gCtx.gobs[4].numGobs = 0;
     if ( *a1 )
     {
-        __snprintf(v4, 0x80u, "%s\\gamedata\\resource", jkRes_curDir);
+        __snprintf(v4, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
         return jkRes_LoadNew(&jkRes_gCtx.gobs[4], v4, Windows_installType != 9);
     }
     return 0;
@@ -277,7 +277,7 @@ LABEL_11:
         {
             if ( v24 )
             {
-                strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
+                _strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
                 v10 = 0;
                 jkRes_curDir[127] = 0;
                 if ( jkRes_gCtx.gobs[4].numGobs )
@@ -324,7 +324,7 @@ LABEL_11:
                     while ( v14 < jkRes_gCtx.gobs[2].numGobs );
                 }
                 jkRes_gCtx.gobs[2].numGobs = 0;
-                strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
+                _strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
                 jkRes_episodeGobName[31] = 0;
                 if ( jkRes_episodeGobName[0] )
                 {
@@ -388,7 +388,7 @@ LABEL_39:
         if ( v23 )
             return 1;
     }
-    strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
+    _strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
     v16 = 0;
     jkRes_curDir[127] = 0;
     if ( jkRes_gCtx.gobs[4].numGobs )
@@ -435,7 +435,7 @@ LABEL_39:
         while ( v20 < jkRes_gCtx.gobs[2].numGobs );
     }
     jkRes_gCtx.gobs[2].numGobs = 0;
-    strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
+    _strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
     jkRes_episodeGobName[31] = 0;
     if ( jkRes_episodeGobName[0] )
     {
@@ -454,3 +454,171 @@ LABEL_39:
     }
     return 0;
 }
+
+uint32_t jkRes_FileOpen(char *fpath, char *mode)
+{
+    jkResFile *v2; // eax
+    unsigned int resIdx; // edi
+    int v6; // esi
+    int fhand; // eax
+    unsigned int v8; // esi
+    char v10; // cl
+    const char *v11; // eax
+    int v12; // eax
+    unsigned int v13; // esi
+    stdGobFile *v14; // eax
+    unsigned int v15; // esi
+    bool v16; // cf
+    stdGob **v17; // [esp+10h] [ebp-Ch]
+    unsigned int v18; // [esp+14h] [ebp-8h]
+    int v19; // [esp+18h] [ebp-4h]
+
+    v2 = jkRes_aFiles;
+    resIdx = 0;
+    do
+    {
+        if ( !v2->bOpened )
+            break;
+        ++v2;
+        ++resIdx;
+    }
+    while ( v2 < (jkResFile *)&jkRes_pHS );
+    if ( resIdx >= 0x20 )
+        return 0;
+    v6 = 0;
+    fhand = pLowLevelHS->fileOpen(fpath, mode);
+    if ( fhand )
+    {
+        v8 = resIdx;
+        jkRes_aFiles[v8].useLowLevel = 1;
+        jkRes_aFiles[v8].fsHandle = fhand;
+        _strncpy(jkRes_aFiles[resIdx].fpath, fpath, 0x7Fu);
+        jkRes_aFiles[resIdx].fpath[127] = 0;
+        jkRes_aFiles[resIdx].bOpened = 1;
+        v6 = 1;
+LABEL_21:
+        if ( !v6 )
+            return 0;
+    }
+    else
+    {
+        v19 = 0;
+        while ( !v6 )
+        {
+            v10 = jkRes_gCtx.gobs[v19].name;
+            v11 = jkRes_gCtx.gobs[v19].name;
+            if ( v10 )
+            {
+                __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
+                v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
+                if ( v12 )
+                {
+                    v13 = resIdx;
+                    jkRes_aFiles[v13].useLowLevel = 1;
+                    jkRes_aFiles[v13].fsHandle = v12;
+                    _strncpy(jkRes_aFiles[resIdx].fpath, jkRes_idkGobPath, 0x7Fu);
+                    jkRes_aFiles[resIdx].fpath[127] = 0;
+                    jkRes_aFiles[resIdx].bOpened = 1;
+                    v6 = 1;
+                }
+                if ( !v6 )
+                {
+                    v18 = 0;
+                    if (jkRes_gCtx.gobs[v19].numGobs)
+                    {
+                        v17 = jkRes_gCtx.gobs[v19].gobs;
+                        do
+                        {
+                            if ( v6 )
+                                break;
+                            v14 = stdGob_FileOpen(*v17, fpath);
+                            if ( v14 )
+                            {
+                                v15 = resIdx;
+                                jkRes_aFiles[v15].useLowLevel = 0;
+                                jkRes_aFiles[v15].gobHandle = v14;
+                                _strncpy(jkRes_aFiles[resIdx].fpath, fpath, 0x7Fu);
+                                jkRes_aFiles[resIdx].fpath[127] = 0;
+                                jkRes_aFiles[resIdx].bOpened = 1;
+                                v6 = 1;
+                            }
+                            ++v17;
+                            ++v18;
+                        }
+                        while ( v18 < jkRes_gCtx.gobs[v19].numGobs );
+                    }
+                }
+            }
+            v16 = (unsigned int)(v19 + 1) < 5;
+            ++v19;
+            if ( !v16 )
+                goto LABEL_21;
+        }
+    }
+    return resIdx + 1;
+}
+
+int jkRes_FileClose(int fd)
+{
+    jkResFile *resFile = &jkRes_aFiles[fd - 1];
+
+    if (resFile->useLowLevel)
+        pLowLevelHS->fileClose(resFile->fsHandle);
+    else
+        stdGob_FileClose(resFile->gobHandle);
+
+    resFile->bOpened = 0;
+    return 0;
+}
+
+size_t jkRes_FileRead(int fd, void* out, size_t len)
+{
+    jkResFile *resFile = &jkRes_aFiles[fd - 1];
+
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fileRead(resFile->fsHandle, out, len);
+    else
+        return stdGob_FileRead(resFile->gobHandle, out, len);
+}
+
+size_t jkRes_FileWrite(int fd, void* out, size_t len)
+{
+    jkResFile *resFile = &jkRes_aFiles[fd - 1];
+
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fileWrite(resFile->fsHandle, out, len);
+    else
+        return 0; // GOB has no write function
+}
+
+char* jkRes_FileGets(int fd, char* a2, unsigned int a3)
+{
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fileGets(resFile->fsHandle, a2, a3);
+    else
+        return stdGob_FileGets(resFile->gobHandle, a2, a3);
+}
+
+wchar_t* jkRes_FileGetws(int fd, wchar_t* a2, unsigned int a3)
+{
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fileGetws(resFile->fsHandle, a2, a3);
+    else
+        return stdGob_FileGetws(resFile->gobHandle, a2, a3);
+}
+
+size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3)
+{
+    // This is implemented wonky in the original? 
+    // It assumes GOB just doesn't exist and goes straight to pLowLevelHS...
+    // I'm just going to fix the impl for now.
+
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fileSize(resFile->fsHandle);
+    else
+        return stdGob_FileSize(resFile->gobHandle);
+}
+

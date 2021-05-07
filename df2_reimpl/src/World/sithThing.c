@@ -100,7 +100,7 @@ char* sithThing_aParams[NUM_THING_PARAMS] = {
     "fleshhit",
 };
 
-void sithThing_Startup()
+int sithThing_Startup()
 {
     int v1; // edi
     const char **v2; // esi
@@ -122,6 +122,7 @@ void sithThing_Startup()
             sithThing_bInitted = 1;
         }
     }
+    return 1;
 }
 
 int sithThing_Shutdown()

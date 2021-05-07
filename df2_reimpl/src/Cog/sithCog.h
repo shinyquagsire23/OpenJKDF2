@@ -102,7 +102,7 @@ enum SITH_MESSAGE_E
 
 static int (*sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
 static int (*sithCogScript_Load)(sithWorld *world, int a2) = (void*)sithCogScript_Load_ADDR;
-static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
+//static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
 static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
 static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
@@ -123,6 +123,10 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
 static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 static void (*sithCog_SendMessageFromSector)(sithSector *a1, sithThing *a2, SITH_MESSAGE message) = (void*)sithCog_SendMessageFromSector_ADDR;
+
+void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3);
+void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3);
+void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3);
 
 #define sithCog_masterCog (*(sithCog**)0x008B542C)
 

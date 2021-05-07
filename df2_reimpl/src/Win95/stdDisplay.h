@@ -127,10 +127,6 @@ static int (*stdDisplay_SetMode)(unsigned int modeIdx, const void *palette, int 
 static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_waitforvblank_ADDR;
 static void (__cdecl *stdDisplay_free_texture)(stdVBuffer *a1) = (void*)stdDisplay_free_texture_ADDR;
 
-static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(texture_format *a1, int create_ddraw_surface, int gpu_mem, int is_paletted) = (void*)stdDisplay_VBufferNew_ADDR;
-static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = (void*)stdDisplay_VBufferSetColorKey_ADDR;
-static int (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferLock_ADDR;
-static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferUnlock_ADDR;
 static int (*stdDisplay_VBufferCopy)(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe) = (void*)stdDisplay_VBufferCopy_ADDR;
 static int (*stdDisplay_SetMasterPalette)(uint8_t* pal) = (void*)stdDisplay_SetMasterPalette_ADDR;
 static int (*stdDisplay_streamidk)(stdVBuffer *buf, int fillColor, rdRect *rect) = (void*)stdDisplay_streamidk_ADDR;
@@ -139,6 +135,18 @@ static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperati
 static int (*stdDisplay_ddraw_surface_flip)() = (void*)stdDisplay_ddraw_surface_flip_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
+
+#ifdef WIN32
+static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(texture_format *a1, int create_ddraw_surface, int gpu_mem, int is_paletted) = (void*)stdDisplay_VBufferNew_ADDR;
+static int (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferLock_ADDR;
+static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferUnlock_ADDR;
+static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = (void*)stdDisplay_VBufferSetColorKey_ADDR;
+#else
+stdVBuffer* stdDisplay_VBufferNew(texture_format *a1, int create_ddraw_surface, int gpu_mem, int is_paletted);
+int stdDisplay_VBufferLock(stdVBuffer *a1);
+void stdDisplay_VBufferUnlock(stdVBuffer *a1);
+int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color);
+#endif
 
 #define stdDisplay_pCurDevice (*(stdVideoDevice**)0x0055B3E8)
 #define stdDisplay_pCurVideoMode (*(stdVideoMode **)0x0055B3F0)
