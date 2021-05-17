@@ -599,6 +599,11 @@ public:
         printf("STUB: User32.dll::GetTopWindow(%x)\n", hWnd);
         return 0;
     }
+    
+    Q_INVOKABLE uint32_t IsDialogMessageA(uint32_t a, uint32_t b)
+    {
+        return 0;
+    }
 //    Q_INVOKABLE uint32_t ();
 };
 

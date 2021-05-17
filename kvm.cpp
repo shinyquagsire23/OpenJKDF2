@@ -174,6 +174,8 @@ void kvm_print_regs(struct vm *vm)
     printf("edi %8.8" PRIx64 " ", regs.rdi);
     printf("\n");
     printf("eip %8.8" PRIx64 " ", regs.rip);
+    if (regs.rip > 0x9f6000)
+        printf(" (%8.8" PRIx64 ") ", (regs.rip - 0x9f6000l + 0x70380000l));
     printf("\n");
 }
 

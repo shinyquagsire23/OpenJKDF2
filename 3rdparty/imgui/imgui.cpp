@@ -1032,7 +1032,7 @@ ImGuiIO::ImGuiIO()
 #endif
     ConfigInputTextCursorBlink = true;
     ConfigWindowsResizeFromEdges = true;
-    ConfigWindowsMoveFromTitleBarOnly = false;
+    ConfigWindowsMoveFromTitleBarOnly = true;
     ConfigWindowsMemoryCompactTimer = 60.0f;
 
     // Platform Functions

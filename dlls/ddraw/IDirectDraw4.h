@@ -337,6 +337,19 @@ public:
         {
             vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
             memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1600;
+            desc->dwHeight = 900;
+            desc->lPitch = 1600*sizeof(uint8_t);
+            desc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
+
+            vm_call_func(callback, desc.raw_vm_ptr, 0);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+        
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
             desc->dwWidth = 1920;
             desc->dwHeight = 1080;
             desc->lPitch = 1920*sizeof(uint8_t);
@@ -432,6 +445,25 @@ public:
             desc->dwWidth = 1280;
             desc->dwHeight = 1024;
             desc->lPitch = 1280*sizeof(uint16_t);
+            desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
+            
+            desc->ddpfPixelFormat.dwRGBBitCount = 16;
+            desc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+            desc->ddpfPixelFormat.dwRBitMask = 0xF800;
+            desc->ddpfPixelFormat.dwGBitMask = 0x07E0;
+            desc->ddpfPixelFormat.dwBBitMask = 0x001F;
+            
+            vm_call_func(callback, desc.raw_vm_ptr, 0xabcdef);
+            
+            kernel32->VirtualFree(desc.raw_vm_ptr, 0, 0);
+        }
+        
+        {
+            vm_ptr<struct DDSURFACEDESC*> desc = {kernel32->VirtualAlloc(0, 0x1000, 0, 0)};
+            memset(desc.translated(), 0, sizeof(struct DDSURFACEDESC));
+            desc->dwWidth = 1600;
+            desc->dwHeight = 900;
+            desc->lPitch = 1600*sizeof(uint16_t);
             desc->ddpfPixelFormat.dwFlags |= DDPF_RGB;
             
             desc->ddpfPixelFormat.dwRGBBitCount = 16;
