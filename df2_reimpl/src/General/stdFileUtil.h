@@ -1,6 +1,8 @@
 #ifndef _STDFILEUTIL_H
 #define _STDFILEUTIL_H
 
+#include "types.h"
+
 #define stdFileUtil_NewFind_ADDR (0x00431740)
 #define stdFileUtil_DisposeFind_ADDR (0x004317E0)
 #define stdFileUtil_FindReset_ADDR (0x00431820)
@@ -37,6 +39,12 @@ typedef struct stdFileSearchResult
 stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension);
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2);
 void stdFileUtil_DisposeFind(stdFileSearch *search);
+
+#ifdef LINUX
+int stdFileUtil_Deltree(char* lpPathName);
+#else
+static int (*stdFileUtil_Deltree)(char* lpPathName) = (void*)stdFileUtil_Deltree_ADDR;
+#endif
 
 static int (*stdFileUtil_MkDir)(char* lpPathName) = (void*)stdFileUtil_MkDir_ADDR;
 //static stdFileSearch* (*stdFileUtil_NewFind)(char *path, int a2, char *extension) = (void*)stdFileUtil_NewFind_ADDR;

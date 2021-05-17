@@ -8,6 +8,6 @@
 #define util_unkcomparison3_ADDR (0x0042F7A0)
 #define util_Weirdchecksum_ADDR (0x0042F810)
 
-static int (*util_FileExists)(char *fpath) = (void*)util_FileExists_ADDR;
+int util_FileExists(char *fpath);
 
 #endif // _UTIL_H

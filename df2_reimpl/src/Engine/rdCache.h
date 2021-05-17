@@ -99,7 +99,7 @@ typedef struct rdTri
   int v2;
   int v3;
   int flags;
-  sith_tex_2 *texture; // DirectDrawSurface*
+  rdDDrawSurface *texture; // DirectDrawSurface*
 } rdTri;
 
 int rdCache_Startup();

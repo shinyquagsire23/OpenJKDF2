@@ -12,5 +12,6 @@
 #define jkHudInv_Shutdown_ADDR (0x0040A010)
 
 static int (*jkHudInv_Initialize)() = (void*)jkHudInv_Initialize_ADDR;
+static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
 
 #endif // _JKHUDINV_H

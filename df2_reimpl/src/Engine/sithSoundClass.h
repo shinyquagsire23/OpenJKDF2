@@ -231,5 +231,6 @@ static int (*sithSoundClass_Load)(sithWorld* world, int a) = (void*)sithSoundCla
 static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
 static void (*sithSoundClass_ThingPlaySoundclass4)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass4_ADDR;
 static void (*sithSoundClass_ThingPauseSoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPauseSoundclass_ADDR;
+static void (*sithSoundClass_Free2)(sithWorld* world) = (void*)sithSoundClass_Free2_ADDR;
 
 #endif // _SITHSOUNDCLASS_H

@@ -38,8 +38,8 @@ typedef struct stdFontEntry
 typedef struct stdFontCharset
 {
   stdFontCharset *previous;
-  int16_t charFirst;
-  int16_t charLast;
+  uint16_t charFirst;
+  uint16_t charLast;
   stdFontEntry *pEntries;
   stdFontEntry entries;
 } stdFontCharset;
@@ -47,8 +47,8 @@ typedef struct stdFontCharset
 typedef struct stdFont
 {
   char name[32];
-  int marginY;
-  int marginX;
+  int32_t marginY;
+  int32_t marginX;
   int16_t field_28;
   int16_t field_2A;
   stdBitmap *bitmap;
@@ -59,8 +59,8 @@ typedef struct stdFontHeader
 {
   int magic;
   int version;
-  int marginY;
-  int marginX;
+  int32_t marginY;
+  int32_t marginX;
   int field_10;
   int numCharsets;
   int field_18;
@@ -76,16 +76,22 @@ typedef struct stdFontExtHeader
 } stdFontExtHeader;
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3);
+unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe);
+void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7);
+void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, wchar_t *a6, int a7);
+wchar_t* stdFont_sub_4352C0(WCHAR *a1, stdFont *a2, int a3, rdRect *a4, int *a5);
+int stdFont_sub_435810(stdFont *a1, wchar_t *a2, int a3);
+int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, wchar_t *a7, int a8);
 
 static int (*stdFont_Draw4)(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, WCHAR *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;
 static void (*stdFont_Free)(stdFont *font) = (void*)stdFont_Free_ADDR;
 //static stdFont* (*stdFont_Load)(char *fpath, int a2, int a3) = (void*)stdFont_Load_ADDR;
-static void (*stdFont_Draw3)(stdVBuffer *a1, stdFont* a2, int a3, rdRect *a4, int a5, wchar_t *a6, int a7) = (void*)stdFont_Draw3_ADDR;
-static int (*stdFont_sub_434EC0)(stdVBuffer* a1, int a2, int a3, int a4, int a5, int a6, wchar_t *a7, int a8) = (void*)stdFont_sub_434EC0_ADDR;
+//static void (*stdFont_Draw3)(stdVBuffer *a1, stdFont* a2, int a3, rdRect *a4, int a5, wchar_t *a6, int a7) = (void*)stdFont_Draw3_ADDR;
+//static int (*stdFont_sub_434EC0)(stdVBuffer* a1, int a2, int a3, int a4, int a5, int a6, wchar_t *a7, int a8) = (void*)stdFont_sub_434EC0_ADDR;
 static int (*stdFont_sub_4355B0)(stdFont* a1, uint16_t a2) = (void*)stdFont_sub_4355B0_ADDR;
-static int (*stdFont_sub_435810)(stdFont* a1, WCHAR *a2, int a3) = (void*)stdFont_sub_435810_ADDR;
-static uint32_t (*stdFont_Draw1)(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, WCHAR *a6, int alpha_maybe) = (void*)stdFont_Draw1_ADDR;
+//static int (*stdFont_sub_435810)(stdFont* a1, WCHAR *a2, int a3) = (void*)stdFont_sub_435810_ADDR;
+//static uint32_t (*stdFont_Draw1)(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, WCHAR *a6, int alpha_maybe) = (void*)stdFont_Draw1_ADDR;
 static int (*stdFont_sub_4357C0)(stdFont *a1, wchar_t *text, rdRect *rect) = (void*)stdFont_sub_4357C0_ADDR;
-static void (*stdFont_Draw2)(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7) = (void*)stdFont_Draw2_ADDR;
+//static void (*stdFont_Draw2)(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7) = (void*)stdFont_Draw2_ADDR;
 
 #endif // _STDFONT_H

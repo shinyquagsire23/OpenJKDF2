@@ -22,7 +22,7 @@
 #define jkMain_SwitchTo12_ADDR (0x00403740)
 #define jkMain_SwitchTo4_ADDR (0x00403770)
 #define jkMain_SwitchTo13_ADDR (0x004037B0)
-#define jkMain_gui_loop_ADDR (0x004037E0)
+#define jkMain_GuiAdvance_ADDR (0x004037E0)
 #define jkMain_TitleShow_ADDR (0x00403A20)
 #define jkMain_TitleTick_ADDR (0x00403A40)
 #define jkMain_TitleLeave_ADDR (0x00403A70)
@@ -63,18 +63,25 @@
 #define dword_552B5C (*(int*)0x552B5C)
 #define sith_bEndLevel (*(int*)0x0082F0A8)
 #define game_updateMsecsTotal (*(int*)0x00552B58)
-#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
+//#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
 
 typedef struct jkGuiStateFuncs
 {
   void (*showFunc)(int, int);
-  int (*tickFunc)(int);
+  void (*tickFunc)(int);
   void (*leaveFunc)(int, int);
 } jkGuiStateFuncs;
 
-void jkMain_gui_loop();
+void jkMain_GuiAdvance();
 void jkMain_EscapeMenuTick(int a2);
 void jkMain_GameplayTick(int a2);
+int jkMain_TitleShow();
+void jkMain_TitleTick();
+void jkMain_TitleLeave();
+void jkMain_MainShow();
+void jkMain_MainTick();
+void jkMain_MainLeave();
+
 static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
 static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;

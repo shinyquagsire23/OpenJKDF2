@@ -40,9 +40,15 @@
 #define stdConffile_GetFileHandle_ADDR (0x00431730)
 #define stdControl_GetAxis2_ADDR (0x004D6D70)
 
-static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
-static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
+#ifdef WIN32
 static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;
+static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
+static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
+#else
+void stdControl_Flush();
+void stdControl_ToggleCursor(int a);
+int stdControl_ShowCursor(int a);
+#endif
 
 static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
 

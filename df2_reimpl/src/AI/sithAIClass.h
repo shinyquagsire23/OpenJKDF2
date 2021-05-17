@@ -23,5 +23,6 @@ int sithAIClass_Startup();
 //static int (*sithAIClass_Startup)() = (void*)sithAIClass_Startup_ADDR;
 static int (*sithAIClass_ParseSection)(sithWorld *world, int a2) = (void*)sithAIClass_ParseSection_ADDR;
 static sithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
+static void (*sithAIClass_Free)(sithWorld *a1) = (void*)sithAIClass_Free_ADDR;
 
 #endif // _SITHAICLASS_H

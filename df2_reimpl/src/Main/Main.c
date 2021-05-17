@@ -169,8 +169,8 @@ int Main_Startup(const char *cmdline)
 #endif
         jkGuiForce_Initialize();
         jkGuiMain_Initialize();
+        jkGuiPlayer_Initialize();
 #ifndef LINUX
-        jkGuiPlayer_Initialize(); //TODO
         jkGuiSound_Initialize(); //TODO~
 #endif
         jkGuiEsc_Startup();
@@ -209,8 +209,8 @@ int Main_Startup(const char *cmdline)
         jkDev_Startup(); // TODO
 #endif
         jkGame_Initialize();
+        Video_Startup();
 #ifndef LINUX
-        Video_Startup(); // TODO
         jkControl_Initialize(); // ~TODO
         jkHudInv_Initialize(); // TODO
         jkSaber_Startup(); // TODO

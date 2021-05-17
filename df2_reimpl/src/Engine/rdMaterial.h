@@ -2,6 +2,7 @@
 #define _RDMATERIAL_H
 
 #include "types.h"
+#include "Win95/stdVBuffer.h"
 
 #define rdMaterial_RegisterLoader_ADDR (0x0044A110)
 #define rdMaterial_RegisterUnloader_ADDR (0x0044A120)
@@ -13,66 +14,6 @@
 #define rdMaterial_AddToTextureCache_ADDR (0x0044AA70)
 #define rdMaterial_ResetCacheInfo_ADDR (0x0044AB20)
 
-typedef struct sith_tex_2 sith_tex_2;
-
-typedef struct sith_tex_2
-{
-    void* lpVtbl; // IDirectDrawSurfaceVtbl *lpVtbl
-    uint32_t direct3d_tex;
-    uint8_t surface_desc[0x6c];
-    uint32_t texture_id;
-    uint32_t texture_loaded;
-    uint32_t is_16bit;
-    uint32_t width;
-    uint32_t height;
-    uint32_t texture_area;
-    uint32_t gpu_accel_maybe;
-    sith_tex_2* tex_prev;
-    sith_tex_2* tex_next;
-} sith_tex_2;
-
-typedef struct rdTexformat
-{
-    uint32_t is16bit;
-    uint32_t bpp;
-    uint32_t r_bits;
-    uint32_t g_bits;
-    uint32_t b_bits;
-    uint32_t r_shift;
-    uint32_t g_shift;
-    uint32_t b_shift;
-    uint32_t r_bitdiff;
-    uint32_t g_bitdiff;
-    uint32_t b_bitdiff;
-    uint32_t unk_40;
-    uint32_t unk_44;
-    uint32_t unk_48;
-} rdTexformat;
-
-typedef struct texture_format
-{
-    uint32_t width;
-    uint32_t height;
-    uint32_t texture_size_in_bytes;
-    uint32_t width_in_bytes;
-    uint32_t width_in_pixels;
-    rdTexformat format;
-} texture_format;
-
-typedef struct stdVBuffer
-{
-    uint32_t surface_locked;
-    uint32_t lock_cnt;
-    uint32_t gap8;
-    texture_format format;
-    void* palette;
-    char* surface_lock_alloc;
-    uint32_t transparent_color;
-    sith_tex_2 *ddraw_surface;
-    void* ddraw_palette; // LPDIRECTDRAWPALETTE
-    uint8_t desc[0x6c];
-} stdVBuffer;
-
 typedef struct rdTexture
 {
     uint32_t alpha_en;
@@ -83,8 +24,8 @@ typedef struct rdTexture
     uint32_t height_minus_1;
     uint32_t num_mipmaps;
     stdVBuffer *texture_struct[4];
-    sith_tex_2 alphaMats[4];
-    sith_tex_2 opaqueMats[4];
+    rdDDrawSurface alphaMats[4];
+    rdDDrawSurface opaqueMats[4];
 } rdTexture;
 
 typedef struct rdColor24

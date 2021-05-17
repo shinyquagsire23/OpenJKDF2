@@ -113,10 +113,22 @@
 #ifdef LINUX
 
 #include <sys/mman.h>
+#include <stdio.h>
 
 int main(int argc, char** argv)
 {
     mmap((void*)0x400000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    
+    FILE* f = fopen("JK.EXE", "rb");
+    // rdata
+    fseek(f, 0x120600, SEEK_SET);
+    fread((void*)0x522000, 0x2200, 1, f);
+
+    // data
+    fseek(f, 0x122800, SEEK_SET);
+    fread((void*)0x525000, 0x2DA00, 1, f);
+    fclose(f);
+    
     Window_Main_Linux(argc, argv);
 }
 
@@ -157,9 +169,16 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdPlatform_Startup_ADDR, stdPlatform_Startup);
     
     // jkMain
-    hook_function(jkMain_gui_loop_ADDR, jkMain_gui_loop);
+    hook_function(jkMain_GuiAdvance_ADDR, jkMain_GuiAdvance);
     hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
     hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
+    hook_function(jkMain_TitleShow_ADDR, jkMain_TitleShow);
+    hook_function(jkMain_TitleTick_ADDR, jkMain_TitleTick);
+    hook_function(jkMain_TitleLeave_ADDR, jkMain_TitleLeave);
+    hook_function(jkMain_MainShow_ADDR, jkMain_MainShow);
+    hook_function(jkMain_MainTick_ADDR, jkMain_MainTick);
+    hook_function(jkMain_MainLeave_ADDR, jkMain_MainLeave);
+
     
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
@@ -377,6 +396,12 @@ __declspec(dllexport) void hook_init(void)
     
     // stdFont
     hook_function(stdFont_Load_ADDR, stdFont_Load);
+    hook_function(stdFont_Draw1_ADDR, stdFont_Draw1);
+    hook_function(stdFont_Draw2_ADDR, stdFont_Draw2);
+    hook_function(stdFont_Draw3_ADDR, stdFont_Draw3);
+    hook_function(stdFont_sub_4352C0_ADDR, stdFont_sub_4352C0);
+    hook_function(stdFont_sub_435810_ADDR, stdFont_sub_435810);
+    hook_function(stdFont_sub_434EC0_ADDR, stdFont_sub_434EC0);
     
     // stdFnames
     hook_function(stdFnames_FindMedName_ADDR, stdFnames_FindMedName);
@@ -495,6 +520,13 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConsole_WriteBorderMaybe2_ADDR, stdConsole_WriteBorderMaybe2);
     hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
+    
+    // Window
+    hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);
+    hook_function(Window_RemoveMsgHandler_ADDR, Window_RemoveMsgHandler); // TODO ???
+    //hook_function(Window_msg_main_handler_ADDR, Window_msg_main_handler);
+    hook_function(Window_SetDrawHandlers_ADDR, Window_SetDrawHandlers);
+    hook_function(Window_GetDrawHandlers_ADDR, Window_GetDrawHandlers);
     
     // Windows
     hook_function(Windows_Startup_ADDR, Windows_Startup);
@@ -811,6 +843,7 @@ __declspec(dllexport) void hook_init(void)
     
     // sith
     hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
+    hook_function(sith_Load_ADDR, sith_Load);
     
     // sithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+//#include <wchar.h>
 #endif
 
 // Imports
@@ -695,8 +696,7 @@ void jk_GetCursorPos()
 
 int jk_GetUpdateRect()
 {
-    assert(0);
-    return 1;
+    return 0;
 }
 
 void jk_BeginPaint()
@@ -870,4 +870,64 @@ int __isspace(int a)
     return isspace(a);
 }
 
+int _iswspace(int a)
+{
+    return isspace(a);
+}
+
+size_t __wcslen(wchar_t * strarg)
+{
+    if(!strarg)
+     return -1; //strarg is NULL pointer
+   wchar_t* str = strarg;
+   for(;*str;++str)
+     ; // empty body
+   return str-strarg;
+}
+
+wchar_t* __wcscat(wchar_t * a, const wchar_t * b)
+{
+    wchar_t* ret = a;
+    a += __wcslen(a);
+    memcpy(a, b, __wcslen(b) * sizeof(wchar_t));
+    return ret;
+}
+
+wchar_t* __wcschr(const wchar_t * s, wchar_t c)
+{
+    do {
+        if (*s == c)
+        {
+        return (wchar_t*)s;
+        }
+    } while (*s++);
+    return NULL;
+}
+
+wchar_t* __wcsncpy(wchar_t * a, const wchar_t * b, size_t c)
+{
+    wchar_t* ret = a;
+    size_t len = __wcslen(b) * sizeof(wchar_t);
+    if (len > c*2) {
+        len = c*2;
+    }
+    memcpy(a, b, len);
+    a[len] = 0;
+    return &a[len];
+}
+
+wchar_t* __wcsrchr(const wchar_t * s, wchar_t c)
+{
+    wchar_t *rtnval = 0;
+    do {
+        if (*s == c)
+            rtnval = (wchar_t*) s;
+        } while (*s++);
+    return (rtnval);
+}
+#else
+int _iswspace(int a)
+{
+    return msvc_sub_512D30(a, 8);
+}
 #endif

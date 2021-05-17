@@ -5,10 +5,10 @@
 
 typedef struct rdRect
 {
-    int x;
-    int y;
-    int width;
-    int height;
+    int32_t x;
+    int32_t y;
+    int32_t width;
+    int32_t height;
 } rdRect;
 
 #endif // _RDRECT_H

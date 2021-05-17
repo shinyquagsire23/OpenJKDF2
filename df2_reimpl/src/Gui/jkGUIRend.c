@@ -320,7 +320,7 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
         jkGuiRend_paletteChecksum = paletteChecksum;
         if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid)
         {
-            stdDisplay_streamidk(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
+            stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
             jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
         }
     }
@@ -366,7 +366,7 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     if ( !jkGuiRend_HandlerIsSet )
     {
         Window_AddMsgHandler(jkGuiRend_WindowHandler);
-        Window_gui_gets_vars(&jkGuiRend_idk, &jkGuiRend_idk2);
+        Window_GetDrawHandlers(&jkGuiRend_idk, &jkGuiRend_idk2);
         Window_SetDrawHandlers((int)jkGuiRend_DrawAndFlip, (int)jkGuiRend_Invalidate);
     }
     ++jkGuiRend_HandlerIsSet;
@@ -445,6 +445,9 @@ jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int id)
 
 void jkGuiRend_PlayWav(char *fpath)
 {
+#ifdef LINUX
+    return;
+#endif
     int bufferMaxSize, samplesPerSec, bStereo, bitsPerSample, seekOffset;
     char tmp[256];
 
@@ -558,7 +561,7 @@ void jkGuiRend_UpdateSurface()
     {
         if ( !jkGuiRend_bIsSurfaceValid )
         {
-            stdDisplay_streamidk(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
+            stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
             jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
         }
     }
@@ -1630,7 +1633,7 @@ void jkGuiRend_FlipAndDraw(jkGuiMenu *menu, rdRect *drawRect)
     }
     else
     {
-        stdDisplay_ddraw_surface_flip();
+        stdDisplay_DDrawGdiSurfaceFlip();
     }
 }
 
@@ -2132,20 +2135,20 @@ LABEL_23:
 
 void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    jkGuiStringEntry *v4; // edi
+    wchar_t *v4; // edi
     int v9; // ecx
     int v10; // ecx
-    WCHAR *v11; // edi
+    wchar_t *v11; // edi
     int v14; // edx
     int v15; // eax
     int v16; // edx
     int v17; // ecx
     int v18; // edi
     rdRect rect; // [esp+10h] [ebp-10h]
-
+    
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, (rdRect *)&element->texInfo.maxTextEntries);
-    v4 = element->unistr;
+    v4 = element->wstr;
     if ( menu->focusedElement == element )
         jkGuiRend_DrawRect(vbuf, (rdRect *)&element->texInfo.maxTextEntries, menu->fillColor);
     jkGuiRend_DrawRect(vbuf, &element->rect, menu->fillColor);
@@ -2156,7 +2159,7 @@ void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
     if (element->texInfo.numTextEntries > element->texInfo.textHeight)
         element->texInfo.numTextEntries = element->texInfo.textHeight;
     v10 = element->texInfo.numTextEntries;
-    v11 = (WCHAR *)((char *)v4 + 2 * v10);
+    v11 = &v4[v10];
     if ( stdFont_sub_435810(menu->fonts[element->field_8], v11, element->texInfo.textHeight - v10 + 1) > element->rect.width - 6 )
     {
         do

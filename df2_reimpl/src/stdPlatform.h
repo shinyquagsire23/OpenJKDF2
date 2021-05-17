@@ -24,7 +24,6 @@ void stdPlatform_InitServices(common_functions *handlers);
 int stdPlatform_Startup();
 
 static void (*stdPlatform_Assert)(int a1, char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;
-static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 
 static void* (*stdPlatform_AllocHandle)(size_t) = (void*)stdPlatform_AllocHandle_ADDR;
 static void (*stdPlatform_FreeHandle)(void*) = (void*)stdPlatform_FreeHandle_ADDR;
@@ -35,9 +34,11 @@ static void (*stdPlatform_UnlockHandle)(int) = (void*)stdPlatform_UnlockHandle_A
 #ifdef WIN32
 static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
+static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
 int stdPrintf(void* a1, char *a2, int line, char *fmt, ...);
 int stdPlatform_Printf(char *fmt, ...);
+uint32_t stdPlatform_GetTimeMsec();
 #endif
 
 #endif // _STDPLATFORM_H

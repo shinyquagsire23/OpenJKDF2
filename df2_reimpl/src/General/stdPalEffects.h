@@ -36,6 +36,7 @@ typedef struct stdPalEffect
     float fade;
 } stdPalEffect;
 
+static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
 static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;
 static void (*stdPalEffects_SetTint)(int a1, float a2, float a3, float a4) = (void*)stdPalEffects_SetTint_ADDR;
 static void (*stdPalEffects_SetAdd)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetAdd_ADDR;

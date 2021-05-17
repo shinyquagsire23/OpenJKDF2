@@ -29,6 +29,8 @@
 #define Video_pMenuBuffer (*(stdVBuffer**)0x0055288C)
 #define Video_bInitted (*(int*)0x005528B4)
 
-static int (*Video_Startup)() = (void*)Video_Startup_ADDR;
+int Video_Startup();
+
+//static int (*Video_Startup)() = (void*)Video_Startup_ADDR;
 
 #endif // _WIN95_VIDEO_H

@@ -68,7 +68,6 @@ sithKeyFrame                   0x44e      0.102%        100.000%        5 / 5
 stdPcx                         0x45e      0.104%        100.000%        2 / 2          
 rdMath                         0x47d      0.106%        100.000%        6 / 6          
 rdLight                        0x49f      0.110%        100.000%        8 / 8          
-jkGuiMain                      0x4b1      0.111%        100.000%        6 / 6          
 stdFnames                      0x4ee      0.117%        100.000%       14 / 14         
 sithSprite                     0x4f1      0.117%        100.000%        6 / 6          
 jkGui                          0x4fb      0.118%        100.000%       10 / 10         
@@ -78,6 +77,7 @@ wuRegistry                     0x5b2      0.135%        100.000%       12 / 12
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 sithExplosion                  0x61d      0.145%        100.000%        4 / 4          
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
+jkGuiPlayer                    0x73a      0.171%        100.000%        5 / 5          
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
 stdConffile                    0x78d      0.179%        100.000%       13 / 13         
 sithTemplate                   0x79d      0.180%        100.000%       10 / 10         
@@ -107,9 +107,10 @@ sithCogThing                   0x3a4c     1.382%        100.000%      142 / 142
 jkCutscene                     0x443      0.101%        0.000%          0 / 7          
 sithThingPlayer                0x460      0.104%        0.000%          0 / 4          
 smack                          0x466      0.104%        0.000%          0 / 6          
+jkGuiMain                      0x4b1      0.111%        77.352%         4 / 6          
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 sithActor                      0x559      0.127%        0.000%          0 / 5          
-Video                          0x5dc      0.139%        0.000%          0 / 5          
+Video                          0x5dc      0.139%        5.267%          1 / 5          
 DebugConsole                   0x5de      0.139%        0.000%          0 / 13         
 stdFileUtil                    0x687      0.155%        22.681%         3 / 11         
 sithAIClass                    0x689      0.155%        1.494%          1 / 7          
@@ -117,11 +118,10 @@ rdPrimit2                      0x69a      0.156%        0.000%          0 / 5
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithCogScript                  0x6ca      0.161%        10.184%         3 / 9          
 sithAnimClass                  0x6cc      0.161%        0.000%          0 / 5          
-Window                         0x6db      0.162%        35.954%         2 / 13         
+Window                         0x6db      0.162%        70.769%         6 / 13         
 jkAI                           0x6e7      0.164%        5.490%          1 / 5          
-sith                           0x72b      0.170%        14.714%         2 / 16         
+sith                           0x72b      0.170%        16.785%         3 / 16         
 jkGuiControlSaveLoad           0x732      0.171%        0.000%          0 / 6          
-jkGuiPlayer                    0x73a      0.171%        0.000%          0 / 5          
 jkGuiMultiplayer               0x749      0.173%        0.000%          0 / 3          
 jkGuiMap                       0x793      0.180%        0.000%          0 / 8          
 stdStrTable                    0x7b6      0.183%        82.877%         4 / 6          
@@ -167,10 +167,10 @@ jkGuiDisplay                   0x12ff     0.450%        0.000%          0 / 11
 stdControl                     0x1323     0.454%        0.000%          0 / 23         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
 jkRes                          0x15b6     0.515%        73.534%        17 / 23         
-jkMain                         0x16cd     0.540%        19.154%         3 / 53         
+jkMain                         0x16cd     0.540%        20.387%         9 / 53         
 rdPrimit3                      0x16e0     0.542%        0.017%          1 / 9          
-sithWorld                      0x1718     0.547%        21.262%         6 / 22         
-stdFont                        0x181a     0.571%        12.853%         1 / 20         
+sithWorld                      0x1718     0.547%        39.158%         9 / 22         
+stdFont                        0x181a     0.571%        59.968%         7 / 20         
 stdMath                        0x182a     0.573%        32.218%        13 / 23         
 rdActive                       0x1a55     0.624%        2.626%          3 / 8          
 sithSurface                    0x1c6a     0.673%        1.004%          1 / 35         
@@ -182,7 +182,7 @@ sithInventory                  0x2150     0.790%        97.878%        59 / 62
 sithMulti                      0x252a     0.881%        0.000%          0 / 35         
 jkGuiBuildMulti                0x258b     0.890%        0.000%          0 / 24         
 sithSoundSys                   0x2626     0.904%        0.645%          1 / 37         
-stdDisplay                     0x267b     0.912%        0.000%          0 / 37         
+stdDisplay                     0x267b     0.912%        0.203%          1 / 37         
 sithControl                    0x2723     0.928%        0.000%          0 / 32         
 sithAI                         0x2771     0.935%        4.516%          3 / 35         
 sithUnk3                       0x2827     0.952%        6.275%          4 / 22         
@@ -200,8 +200,8 @@ rdNRaster                      0x304d4    18.316%       0.000%          0 / 87
 
 Total completion:
 -----------------
-22.484% by weight
-37.940% by weight excluding rasterizer
-1361 / 3165 functions
-1361 / 2794 functions excluding rasterizer
+23.073% by weight
+38.934% by weight excluding rasterizer
+1386 / 3165 functions
+1386 / 2794 functions excluding rasterizer
 ```

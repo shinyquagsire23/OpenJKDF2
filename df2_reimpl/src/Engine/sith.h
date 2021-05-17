@@ -25,6 +25,7 @@
 
 int sith_Startup(struct common_functions *commonFuncs);
 void sith_UpdateCamera();
+int sith_Load(char *path);
 //static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 

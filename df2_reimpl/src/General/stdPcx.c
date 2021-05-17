@@ -15,7 +15,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     stdVBuffer *mipSurface;
     char *lockAlloc;
     void *paletteAlloc;
-    texture_format format;
+    stdVBufferTexFmt format;
     stdPcx_Header pcxHeader;
 
     int fhand = std_pHS->fileOpen(fpath, "rb");

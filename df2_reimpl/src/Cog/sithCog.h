@@ -123,6 +123,7 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
 static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 static void (*sithCog_SendMessageFromSector)(sithSector *a1, sithThing *a2, SITH_MESSAGE message) = (void*)sithCog_SendMessageFromSector_ADDR;
+static void (*sithCog_Free)(sithWorld* world) = (void*)sithCog_Free_ADDR;
 
 void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3);
 void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3);

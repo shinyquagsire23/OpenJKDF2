@@ -23,5 +23,6 @@
 int Main_Startup(const char *cmdline);
 void Main_ParseCmdLine(char *cmdline);
 static int (*Main_FPrintf)(const char* fmt, ...) = (void*)Main_FPrintf_ADDR;
+static int (*Main_Shutdown)() = (void*)Main_Shutdown_ADDR;
 
 #endif // _MAINMAIN_H

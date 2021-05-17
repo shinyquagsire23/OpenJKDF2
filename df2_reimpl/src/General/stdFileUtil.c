@@ -131,12 +131,23 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
         *strrchr(tmp,'.') = 0;
         *strrchr(tmp,'*') = 0;
         search_ext = strrchr(a1->path,'.');
+        
+        for (int i = 0; i < strlen(tmp); i++)
+        {
+            if (tmp[i] == '\\') {
+                tmp[i] = '/';
+            }
+        }
 
-        a1->num_found = scandir(tmp, &a1->namelist, parse_ext, alphasort);
-        iter = a1->namelist[0];
+        a1->num_found = scandir(tmp, &a1->namelist, NULL, alphasort);
+        
+        if (!a1->namelist) return 0;
+        
+        iter = a1->namelist[2];
+        a1->isNotFirst = 2;
     }
 
-    if (a1->num_found <= 0 || !iter)
+    if (a1->num_found <= 2 || !iter)
         return 0;
 
     strncpy(a2->fpath, iter->d_name, sizeof(a2->fpath));
@@ -159,5 +170,10 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
 
         std_pHS->free(search);
     }
+}
+
+int stdFileUtil_Deltree(char* lpPathName)
+{
+    return 0;
 }
 #endif

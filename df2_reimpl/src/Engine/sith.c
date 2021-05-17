@@ -98,3 +98,9 @@ void sith_UpdateCamera()
     }
 }
 
+int sith_Load(char *path)
+{
+    sithWorld_pStatic = sithWorld_New();
+    sithWorld_pStatic->level_type_maybe |= 1;
+    return sithWorld_Load(sithWorld_pStatic, path) != 0;
+}

@@ -6,9 +6,20 @@
 #ifdef LINUX
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
 #endif
 
 #ifdef LINUX
+uint32_t Linux_TimeMs()
+{
+    struct timespec _t;
+
+    clock_gettime(CLOCK_REALTIME, &_t);
+
+    return _t.tv_sec*1000 + lround(_t.tv_nsec/1.0e6);
+}
+
 static int Linux_stdFileOpen(char* fpath, char* mode)
 {
     char tmp[512];
@@ -59,6 +70,11 @@ static void* Linux_alloc(size_t len)
     //TODO figure out where we're having alloc issues?
     return malloc(len + 0x100);
 }
+
+uint32_t stdPlatform_GetTimeMsec()
+{
+    return Linux_TimeMs();
+}
 #endif
 
 void stdPlatform_InitServices(common_functions *handlers)
@@ -103,6 +119,7 @@ void stdPlatform_InitServices(common_functions *handlers)
     handlers->fileWrite = Linux_stdFileWrite;
     handlers->fseek = fseek;
     handlers->ftell = ftell;
+    handlers->getTimerTick = Linux_TimeMs;
 #endif
 }
 

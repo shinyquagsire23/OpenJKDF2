@@ -121,7 +121,7 @@ int stdString_CharToWchar(uint16_t *a1, char *a2, int a3)
         {
             if ( !*v4 )
                 break;
-            *v5 = (uint8_t)*v4;
+            *v5 = *v4;
             ++v5;
             ++v4;
             ++result;

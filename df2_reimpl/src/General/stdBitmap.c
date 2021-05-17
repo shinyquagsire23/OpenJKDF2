@@ -130,7 +130,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     int numMips; // [esp+14h] [ebp-D8h]
     unsigned int v21[2]; // [esp+18h] [ebp-D4h] BYREF
     bitmapHeader bmp_header; // [esp+20h] [ebp-CCh] BYREF
-    texture_format a1; // [esp+A0h] [ebp-4Ch] BYREF
+    stdVBufferTexFmt vbufTexFmt; // [esp+A0h] [ebp-4Ch] BYREF
 
     std_pHS->fileRead(fp, &bmp_header, 128);
     if ( _memcmp((const char *)&bmp_header, "BM  ", 4u) )
@@ -169,7 +169,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     v11 = bmp_header.xPos;
     out->yPos = bmp_header.yPos;
     out->colorkey = v10;
-    memset(&a1, 0, sizeof(a1));
+    memset(&vbufTexFmt, 0, sizeof(vbufTexFmt));
     mipCount = 0;
     v12 = out->numMips;
     out->xPos = v11;
@@ -178,17 +178,21 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         do
         {
             std_pHS->fileRead(fp, v21, 8);
-            a1.height = v21[1];
-            a1.width = v21[0];
-            _memcpy(&a1.format, &out->format, sizeof(a1.format));
-            surface = stdDisplay_VBufferNew(&a1, bCreateDDrawSurface, gpuMem, 0);
+            vbufTexFmt.height = v21[1];
+            vbufTexFmt.width = v21[0];
+
+            _memcpy(&vbufTexFmt.format, &out->format, sizeof(vbufTexFmt.format));
+
+            surface = stdDisplay_VBufferNew(&vbufTexFmt, bCreateDDrawSurface, gpuMem, 0);
             if ( !surface )
                 goto LABEL_17;
+
             v5->mipSurfaces[mipCount] = surface;
             stdDisplay_VBufferLock(surface);
             lockAlloc = surface->surface_lock_alloc;
+            
             v15 = surface->format.width * ((unsigned int)surface->format.format.bpp >> 3);
-            for ( i = 0; i < v21[1]; ++i )
+            for ( i = 0; i < vbufTexFmt.height; ++i )
             {
                 std_pHS->fileRead(fp, lockAlloc, v15);
                 lockAlloc += surface->format.width_in_bytes;

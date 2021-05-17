@@ -127,17 +127,24 @@ int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
 void sithWorld_UpdateLoadPercent(float percent);
+int sithWorld_Load(sithWorld *world, char *map_jkl_fname);
+sithWorld* sithWorld_New();
+void sithWorld_FreeEntry(sithWorld *world);
 int sithHeader_Load(sithWorld *world, int junk);
 int sithCopyright_Load(sithWorld *lvl, int junk);
 int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_FindSectionParser(char *a1);
 
+static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
 static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
+//static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)
 #define sithWorld_pLoading (*(sithWorld**)0x8339D0)
 #define sithWorld_numParsers (*(uint32_t*)0x8339D4)
 #define sithWorld_bInitted (*(uint32_t*)0x8339D8)
+#define sithWorld_bLoaded (*(int*)0x008339DC)
+#define sithWorld_some_text_jk1 ((char*)0x008EE620)
 
 #endif // _SITHWORLD_H

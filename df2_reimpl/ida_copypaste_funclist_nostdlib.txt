@@ -1,5 +1,5 @@
 Main_Startup	.text	00401000	0000036C	00000008	00000008	R	.	.	.	.	.	T	.
-Main_Shutdown	.text	00401370	0000010E	00000000	00000000	R	.	.	.	.	.	.	.
+Main_Shutdown	.text	00401370	0000010E	00000000	00000000	.	.	.	.	.	.	.	.
 jkGame_SetDefaultSettings	.text	00401480	00000028			R	.	.	.	.	.	T	.
 Main_ParseCmdLine	.text	004014B0	000003BD	00000010	00000004	R	.	.	.	.	.	T	.
 Main_FPrintf	.text	00401870	00000044	00000000	00000005	R	.	.	.	.	.	T	.
@@ -49,8 +49,8 @@ jkMain_SwitchTo5	.text	004036F0	00000049	00000000	00000004	R	.	.	.	.	.	.	.
 jkMain_SwitchTo12	.text	00403740	00000024			R	.	.	.	.	.	.	.
 jkMain_SwitchTo4	.text	00403770	0000003B	00000000	00000004	R	.	.	.	.	.	T	.
 jkMain_SwitchTo13	.text	004037B0	00000024			R	.	.	.	.	.	.	.
-jkMain_gui_loop	.text	004037E0	00000213	0000000C	00000000	R	.	.	.	.	.	.	.
-jkMain_TitleShow	.text	00403A20	00000017	00000000	00000000	R	.	.	.	.	.	.	.
+jkMain_GuiAdvance	.text	004037E0	00000213	0000000C	00000000	R	.	.	.	.	.	.	.
+jkMain_TitleShow	.text	00403A20	00000017	00000000	00000000	R	.	.	.	.	.	T	.
 jkMain_TitleTick	.text	00403A40	00000029			R	.	.	.	.	.	.	.
 jkMain_TitleLeave	.text	00403A70	00000001			R	.	.	.	.	.	.	.
 jkMain_MainShow	.text	00403A80	00000005			R	.	.	.	.	.	.	.
@@ -253,10 +253,10 @@ jkGob_Startup	.text	0040E330	00000019			R	.	.	.	.	.	.	.
 jkGob_Shutdown	.text	0040E350	00000010			R	.	.	.	.	.	T	.
 jkRes_Startup	.text	0040E360	0000012D	00000000	00000004	R	.	.	.	.	.	T	.
 jkRes_Shutdown	.text	0040E490	000000CE			R	.	.	.	.	.	.	.
-jkRes_New	.text	0040E560	00000050	00000008	00000004	R	.	.	.	.	.	.	.
+jkRes_New	.text	0040E560	00000050	00000008	00000004	R	.	.	.	.	.	T	.
 jkRes_LoadGob	.text	0040E5B0	000003CF	00000090	00000004	R	.	.	.	.	.	T	.
 jkRes_LoadCd	.text	0040E980	000000A7	0000008C	00000004	R	.	.	.	.	.	T	.
-jkRes_HookHS	.text	0040EA30	00000062			R	.	.	.	.	.	.	.
+jkRes_HookHS	.text	0040EA30	00000062			R	.	.	.	.	.	T	.
 jkRes_UnhookHS	.text	0040EAA0	00000078			R	.	.	.	.	.	T	.
 jkRes_FileExists	.text	0040EB20	0000008E	00000000	0000000C	R	.	.	.	.	.	T	.
 jkRes_LoadCD	.text	0040EBB0	00000556	0000019C	00000004	R	.	.	.	.	.	.	.
@@ -283,13 +283,13 @@ jkGuiMain_Show	.text	004100F0	000000FD	00000008	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_ShowCutscenes	.text	00410210	0000028F	0000016C	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_Initialize	.text	004104A0	00000014			R	.	.	.	.	.	.	.
 jkGuiMain_Shutdown	.text	004104C0	00000001			R	.	.	.	.	.	.	.
-jkGuiMain_PopulateCutscenes	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	T	.
-jkGuiMain_FreeCutscenes	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	T	.
+jkGuiMain_sub_4104D0	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.	.
+jkGuiMain_sub_4105B0	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.	.
 jkGuiPlayer_Initialize	.text	004105F0	00000032			R	.	.	.	.	.	.	.
 jkGuiPlayer_Shutdown	.text	00410630	0000000B			R	.	.	.	.	.	.	.
 jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	T	.
 jkGuiPlayer_ShowNewPlayer	.text	00410870	00000481	00000674	00000004	R	.	.	.	.	.	.	.
-jkGuiPlayer_NewPlayerIdk	.text	00410D10	0000005B	00000000	00000004	R	.	.	.	.	.	.	.
+jkGuiPlayer_DifficultyDraw	.text	00410D10	0000005B	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiSound_Initialize	.text	00410D70	000000B4			R	.	.	.	.	.	.	.
 jkGuiSound_Shutdown	.text	00410E30	0000003C			R	.	.	.	.	.	T	.
 jkGuiSound_Show	.text	00410E70	00000184	00000004	00000000	R	.	.	.	.	.	.	.
@@ -570,7 +570,7 @@ stdDisplay_422A50	.text	00422A50	000001D4	00000008	00000000	R	.	.	.	.	.	T	.
 stdDisplay_ClearMode	.text	00422C30	00000243	00000010	00000000	R	.	.	.	.	.	.	.
 stdDisplay_DrawAndFlipGdi	.text	00422E80	0000010F	00000004	00000000	R	.	.	.	.	.	T	.
 stdDisplay_SetCooperativeLevel	.text	00422F90	0000002F			R	.	.	.	.	.	.	.
-stdDisplay_ddraw_surface_flip	.text	00422FC0	0000008D			R	.	.	.	.	.	.	.
+stdDisplay_DDrawGdiSurfaceFlip	.text	00422FC0	0000008D			R	.	.	.	.	.	.	.
 stdDisplay_ddraw_surface_flip2	.text	00423050	00000042			R	.	.	.	.	.	.	.
 stdDisplay_ddraw_waitforvblank	.text	004230A0	0000001E			R	.	.	.	.	.	.	.
 stdDisplay_VBufferNew	.text	004230C0	00000221	00000418	00000010	R	.	.	.	.	.	T	.
@@ -579,7 +579,7 @@ stdDisplay_423360	.text	00423360	00000055	00000004	00000004	R	.	.	.	.	.	.	.
 stdDisplay_VBufferLock	.text	004233C0	0000008E	0000000C	00000004	R	.	.	.	.	.	T	.
 stdDisplay_VBufferUnlock	.text	00423450	00000085	00000008	00000004	R	.	.	.	.	.	T	.
 stdDisplay_VBufferFill	.text	004234E0	00000255	00000014	0000000C	R	.	.	.	.	B	T	.
-stdDisplay_streamidk	.text	00423740	00000061	00000000	0000000C	R	.	.	.	.	.	T	.
+stdDisplay_ClearRect	.text	00423740	00000061	00000000	0000000C	R	.	.	.	.	.	T	.
 stdDisplay_VBufferCopy	.text	004237B0	0000007C	00000000	00000015	R	.	.	.	.	.	T	.
 stdDisplay_VBufferSetColorKey	.text	00423830	00000046	00000008	00000008	R	.	.	.	.	.	T	.
 stdDisplay_VBufferConvertColorFormat	.text	00423880	000002F4	0000005C	00000008	R	.	.	.	.	.	.	.
@@ -587,7 +587,7 @@ stdDisplay_sub_423B80	.text	00423B80	0000002E	00000000	00000010	R	.	.	.	.	.	.	.
 stdDisplay_SetMasterPalette	.text	00423BB0	000000F9	00000404	00000004	R	.	.	.	.	.	T	.
 stdDisplay_GammaCorrect	.text	00423CB0	0000005C	00000008	00000004	R	.	.	.	.	.	.	.
 stdDisplay_GammaCorrect2	.text	00423D10	000000FD	00000010	0000000C	R	.	.	.	.	.	.	.
-stdDisplay_SetGammaTable	.text	00423E10	00000014	00000000	00000008	R	.	.	.	.	.	.	.
+stdDisplay_SetGammaTable	.text	00423E10	00000014	00000000	00000008	R	.	.	.	.	.	T	.
 stdDisplay_GammaCorrect3	.text	00423E30	00000143	0000040C	00000004	R	.	.	.	.	.	.	.
 stdDisplay_GammaCorrect4	.text	00423F80	00000068	00000008	00000010	R	.	.	.	.	.	.	.
 stdDisplay_GetPalette	.text	00423FF0	00000006			R	.	.	.	.	.	.	.
@@ -676,7 +676,7 @@ stdConsole_WriteBorderMaybe	.text	00427CB0	000006AB	00000132	00000004	R	.	.	.	.	
 stdConsole_WriteBorderMaybe2	.text	00428360	00000166	00000010	0000000C	R	.	.	.	.	.	T	.
 stdConsole_WriteBorderMaybe3	.text	004284D0	000001AB	00000090	00000004	R	.	.	.	.	.	T	.
 stdConsole_WriteBorderMaybe4	.text	00428680	000001A3	00000018	0000000E	R	.	.	.	.	.	T	.
-stdPalEffects_Open	.text	00428830	0000005F	00000004	00000004	R	.	.	.	.	.	.	.
+stdPalEffects_Open	.text	00428830	0000005F	00000004	00000004	R	.	.	.	.	.	T	.
 stdPalEffects_Close	.text	00428890	00000001			R	.	.	.	.	.	.	.
 stdPalEffects_NewRequest	.text	004288A0	0000006A	00000000	00000004	R	.	.	.	.	.	.	.
 stdPalEffects_FreeRequest	.text	00428910	0000002C	00000000	00000004	R	.	.	.	.	.	T	.
@@ -752,7 +752,7 @@ stdBmp_LoadEntryFromFile	.text	0042C3E0	00000420	000000A8	00000010	R	.	.	.	.	.	T
 stdBmp_Write	.text	0042C830	00000262	00000048	00000008	R	.	.	.	.	.	.	.
 stdBitmap_Load	.text	0042CAA0	000000DF	0000000C	0000000C	R	.	.	.	.	.	T	.
 stdBitmap_LoadFromFile	.text	0042CB80	00000112	00000008	0000000C	R	.	.	.	.	.	T	.
-stdBitmap_LoadEntry	.text	0042CCA0	0000008C	00000008	00000010	R	.	.	.	.	.	.	.
+stdBitmap_LoadEntry	.text	0042CCA0	0000008C	00000008	00000010	R	.	.	.	.	.	T	.
 stdBitmap_LoadEntryFromFile	.text	0042CD30	00000305	000000EC	00000010	R	.	.	.	.	.	T	.
 stdBitmap_Free	.text	0042D040	000000B5	00000008	00000004	R	.	.	.	.	.	T	.
 stdBitmap_FreeEntry	.text	0042D100	0000007A	00000008	00000004	.	.	.	.	.	.	.	.
@@ -770,7 +770,7 @@ stdControl_Startup	.text	0042DE60	000003D6	000001F4	00000000	R	.	.	.	.	.	.	.
 stdControl_Shutdown	.text	0042E240	00000038			R	.	.	.	.	.	.	.
 stdControl_Open	.text	0042E280	0000004A			R	.	.	.	.	.	.	.
 stdControl_Close	.text	0042E2D0	0000004C			R	.	.	.	.	.	.	.
-stdControl_Flush	.text	0042E320	0000011E	00000038	00000000	R	.	.	.	.	.	.	.
+stdControl_Flush	.text	0042E320	0000011E	00000038	00000000	R	.	.	.	.	.	T	.
 stdControl_input_keymap_idk2	.text	0042E440	00000041			R	.	.	.	.	.	.	.
 stdControl_EnableAxis	.text	0042E490	000000AA	00000004	00000004	R	.	.	.	.	.	.	.
 stdControl_ReadControls	.text	0042E560	00000449	00000368	00000000	R	.	.	.	.	.	.	.
@@ -782,7 +782,7 @@ stdControl_ReadKey	.text	0042EBA0	00000065	00000004	00000008	R	.	.	.	.	.	.	.
 stdControl_FinishRead	.text	0042EC10	00000001			R	.	.	.	.	.	.	.
 stdControl_MessageHandler	.text	0042EC20	00000026	00000000	0000000C	R	.	.	.	.	.	.	.
 stdControl_SetMouseSensitivity	.text	0042EC50	000000EA	00000008	00000008	R	.	.	.	.	.	.	.
-stdControl_ToggleCursor	.text	0042ED40	00000078	00000000	00000004	R	.	.	.	.	.	.	.
+stdControl_ToggleCursor	.text	0042ED40	00000078	00000000	00000004	R	.	.	.	.	.	T	.
 stdControl_ShowCursor	.text	0042EDC0	0000000C	00000000	00000004	R	.	.	.	.	.	T	.
 stdControl_ToggleMouse	.text	0042EDD0	00000050	00000000	00000000	R	.	.	.	.	.	.	.
 stdControl_keyidk	.text	0042EE20	00000094	00000000	0000000C	R	.	.	.	.	.	.	.
@@ -925,7 +925,7 @@ stdFont_sub_4355B0	.text	004355B0	00000038	00000000	00000006	R	.	.	.	.	.	.	.
 stdFont_sub_4355F0	.text	004355F0	000000B4	00000010	00000008	R	.	.	.	.	.	.	.
 stdFont_sub_4356B0	.text	004356B0	00000103	00000008	0000000C	R	.	.	.	.	.	.	.
 stdFont_sub_4357C0	.text	004357C0	00000042	00000008	0000000C	R	.	.	.	.	.	T	.
-stdFont_sub_435810	.text	00435810	000000B4	00000010	0000000C	R	.	.	.	.	.	.	.
+stdFont_sub_435810	.text	00435810	000000B4	00000010	0000000C	R	.	.	.	.	.	T	.
 stdFont_sub_4358D0	.text	004358D0	0000007C	00000010	0000000C	R	.	.	.	.	.	.	.
 stdFont_sub_435950	.text	00435950	0000005D	00000000	00000010	R	.	.	.	.	.	.	.
 stdStrTable_Load	.text	004359B0	00000579	00000260	00000008	R	.	.	.	.	.	T	.
@@ -958,8 +958,8 @@ stdGdi_SetHwnd	.text	00436D10	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 stdGdi_GetHwnd	.text	00436D20	00000006			R	.	.	.	.	.	.	.
 stdGdi_SetHInstance	.text	00436D30	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 stdGdi_GetHInstance	.text	00436D40	00000006			R	.	.	.	.	.	.	.
-WinIdk_SetDplayGuid	.text	00436D50	00000028	00000000	00000004	R	.	.	.	.	.	.	.
-WinIdk_GetDplayGuid	.text	00436D80	00000006			R	.	.	.	.	.	.	.
+WinIdk_SetDplayGuid	.text	00436D50	00000028	00000000	00000004	R	.	.	.	.	.	T	.
+WinIdk_GetDplayGuid	.text	00436D80	00000006			R	.	.	.	.	.	T	.
 WinIdk_PrintConsole	.text	00436D90	000000E3	0000006C	0000000C	R	.	.	.	.	.	T	.
 stdSound_Initialize	.text	00436E80	00000259	00000068	00000000	R	.	.	.	.	.	.	.
 stdSound_Shutdown	.text	004370E0	0000006B	00000004	00000000	R	.	.	.	.	.	T	.
@@ -1328,7 +1328,7 @@ rdLight_CalcVertexIntensities	.text	0044B710	00000169	00000018	00000024	R	.	.	.	
 rdLight_CalcDistVertexIntensities	.text	0044B880	000000E0	0000000C	00000024	R	.	.	.	.	.	T	.
 rdLight_CalcFaceIntensity	.text	0044B960	00000136	00000024	0000001C	R	.	.	.	.	.	T	.
 rdLight_CalcDistFaceIntensity	.text	0044BAA0	00000091	00000014	00000018	R	.	.	.	.	.	.	.
-rdRaster_Startup	.text	0044BB40	00000078	00000008	00000000	R	.	.	.	.	.	.	.
+rdRaster_Startup	.text	0044BB40	00000078	00000008	00000000	R	.	.	.	.	.	T	.
 rdActive_Startup	.text	0044BBC0	00000006			R	.	.	.	.	.	.	.
 rdActive_AdvanceFrame	.text	0044BBD0	000000A0	0000000C	00000000	R	.	.	.	.	.	T	.
 rdActive_ClearFrameCounters	.text	0044BC70	0000000B			R	.	.	.	.	.	.	.
@@ -3101,7 +3101,7 @@ Window_RemoveMsgHandler	.text	0050EB80	00000041	00000000	00000004	R	.	.	.	.	.	.	
 Window_gui_dialogidk	.text	0050EBD0	00000024	00000000	00000004	R	.	.	.	.	.	.	.
 Window_sub_50EC00	.text	0050EC00	00000064	00000008	00000004	R	.	.	.	.	.	.	.
 Window_SetDrawHandlers	.text	0050EC70	00000014	00000000	00000008	R	.	.	.	.	.	T	.
-Window_gui_gets_vars	.text	0050EC90	00000018	00000000	00000008	R	.	.	.	.	.	T	.
+Window_GetDrawHandlers	.text	0050EC90	00000018	00000000	00000008	R	.	.	.	.	.	T	.
 Window_msg_main_handler	.text	0050ECB0	000001CE	00000018	00000010	R	.	.	.	.	.	T	.
 wuRegistry_Startup	.text	0050EEB0	0000017D	000000E0	0000000C	R	.	.	.	.	.	T	.
 wuRegistry_Shutdown	.text	0050F030	0000000B			R	.	.	.	.	.	.	.

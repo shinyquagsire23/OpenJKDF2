@@ -217,6 +217,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
 static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
 static void (*sithSector_ThingSetLook)(sithThing *a1, rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
+static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 
 static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
 static void (*sithSector_StopPhysicsThing)(sithThing* thing) = (void*)sithSector_StopPhysicsThing_ADDR;

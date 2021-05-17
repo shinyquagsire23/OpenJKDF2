@@ -278,7 +278,9 @@ int jkPlayer_ReadConf(wchar_t *name)
         }
         jkPlayer_ReadOptionsConf();
         sithWeapon_ReadConf();
+#ifndef LINUX
         sithControl_ReadConf();
+#endif
         if ( stdConffile_ReadArgs() )
         {
             if ( stdConffile_entry.numArgs >= 1u
@@ -560,7 +562,7 @@ int jkPlayer_VerifyWcharName(wchar_t *name)
             }
             if ( v2 == '\\' || v2 == '/' || v2 == ':' || v2 == '*' || v2 == '?' || v2 == '"' || v2 == '<' || v2 == '.' || v2 == '>' || v2 == '|' )
                 break;
-            if ( msvc_sub_512D30(v2, 8) )
+            if ( _iswspace(v2) )
                 v4 = 1;
             else
                 v3 = 0;
@@ -982,7 +984,9 @@ LABEL_8:
             stdConffile_Printf("diff %d\n", jkPlayer_setDiff);
             jkPlayer_WriteOptionsConf();
             sithWeapon_WriteConf();
+#ifndef LINUX
             sithControl_WriteConf();
+#endif
             if ( stdConffile_Printf("numCutscenes %d\n", jkPlayer_setNumCutscenes) )
             {
                 v9 = 0;

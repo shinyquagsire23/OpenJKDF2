@@ -161,7 +161,7 @@ int rdCache_SendFaceListToHardware()
     int v14; // eax
     rdTexinfo *v15; // eax
     rdTexture *sith_tex_sel; // esi
-    sith_tex_2 *tex2_arr_sel; // eax
+    rdDDrawSurface *tex2_arr_sel; // eax
     float *vert_lights_iter; // ecx
     int vert_lights_iter_cnt; // edx
     double v21; // st7
@@ -217,7 +217,7 @@ int rdCache_SendFaceListToHardware()
     double v77; // st7
     double v78; // st7
     int v79; // eax
-    sith_tex_2 *v80; // edx
+    rdDDrawSurface *v80; // edx
     double v87; // st7
     double v88; // st7
     double v89; // st6
@@ -271,7 +271,7 @@ int rdCache_SendFaceListToHardware()
     rdVector3 *iterating_6c_vtxs; // [esp+68h] [ebp-38h]
     int mipmap_relatedb; // [esp+68h] [ebp-38h]
     unsigned int out_width; // [esp+6Ch] [ebp-34h] BYREF
-    sith_tex_2 *tex2_arr_sel_; // [esp+70h] [ebp-30h]
+    rdDDrawSurface *tex2_arr_sel_; // [esp+70h] [ebp-30h]
     unsigned int out_height; // [esp+74h] [ebp-2Ch] BYREF
     int flags_idk_; // [esp+78h] [ebp-28h]
     int a3; // [esp+7Ch] [ebp-24h]
@@ -1197,8 +1197,8 @@ void rdCache_DrawRenderList()
 
 int rdCache_TriCompare(rdTri *a, rdTri *b)
 {
-    sith_tex_2 *tex_b;
-    sith_tex_2 *tex_a;
+    rdDDrawSurface *tex_b;
+    rdDDrawSurface *tex_a;
 
     tex_b = b->texture;
     tex_a = a->texture;

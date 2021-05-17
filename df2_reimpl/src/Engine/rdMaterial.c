@@ -69,7 +69,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]
   rdTexinfoHeader texinfo_header; // [esp+38h] [ebp-100h]
   rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
-  texture_format format; // [esp+60h] [ebp-D8h]
+  stdVBufferTexFmt format; // [esp+60h] [ebp-D8h]
   rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
   int textures_idk[8]; // [esp+F8h] [ebp-40h]
   stdVBuffer *created_tex; // eax

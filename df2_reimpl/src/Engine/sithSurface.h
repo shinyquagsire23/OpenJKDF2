@@ -141,5 +141,6 @@ static rdSurface* (__cdecl *sithSurface_GetRdSurface)(sithSurface *a1) = (void*)
 static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
 static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
+static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
 
 #endif // _SITHSURFACE_H

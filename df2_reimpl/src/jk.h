@@ -273,6 +273,10 @@ static int (*__findnext)(__int32 hFindFile, struct _finddata_t *a2) = (void*)0x0
 static int (*__findfirst)(const char *lpFileName, struct _finddata_t *a2) = (void*)0x00514740;
 static int (*__findclose)(__int32 hFindFile) = (void*)0x00514990;
 static int (*__isspace)(int a) = (void*)0x51D8D0;
+static wchar_t* (*__wcscat)(wchar_t *a1, const wchar_t *a2) = (void*)0x513060;
+static wchar_t* (*__wcschr)(const wchar_t *, wchar_t) = (void*)0x005133B0;
+static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (void*)0x00512C70;
+static wchar_t* (*__wcsrchr)(const wchar_t *, wchar_t) = (void*)0x00514650;
 #else
 int _sscanf(const char * s, const char * format, ...);
 int _sprintf(const char * s, const char * format, ...);
@@ -342,8 +346,13 @@ void jk_SetActiveWindow();
 void jk_ShowCursor();
 void jk_ValidateRect();
 int __isspace(int a);
+int _iswspace(int a);
 void* _memset(void* ptr, int val, size_t num);
 void* _memset32(void* ptr, uint32_t val, size_t num);
+wchar_t* __wcscat(wchar_t *, const wchar_t *);
+wchar_t* __wcschr(const wchar_t *, wchar_t);
+wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
+wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 #endif
 
 int _strlen(const char *str);
@@ -375,18 +384,18 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 // JK globals
 #define g_hWnd *(g_hWnd_ptr)
 
-#define g_nShowCmd *(g_nShowCmd_ptr)
+#define g_nShowCmd (*(g_nShowCmd_ptr))
 #define g_hInstance (*(HINSTANCE*)0x00855DEC)
 
-#define g_app_suspended *(g_app_suspended_ptr)
-#define g_window_active *(g_window_active_ptr)
-#define g_app_active *(g_app_active_ptr)
-#define g_should_exit *(g_should_exit_ptr)
-#define g_thing_two_some_dialog_count *(g_thing_two_some_dialog_count_ptr)
-#define g_handler_count *(g_handler_count_ptr)
+#define g_app_suspended (*(g_app_suspended_ptr))
+#define g_window_active (*(g_window_active_ptr))
+#define g_app_active (*(g_app_active_ptr))
+#define g_should_exit (*(g_should_exit_ptr))
+#define g_thing_two_some_dialog_count (*(g_thing_two_some_dialog_count_ptr))
+#define g_handler_count (*(g_handler_count_ptr))
 
-#define g_855E8C *(g_855E8C_ptr)
-#define g_855E90 *(g_855E90_ptr)
+#define g_855E8C (*(g_855E8C_ptr))
+#define g_855E90 (*(g_855E90_ptr))
 #define g_window_not_destroyed *(g_window_not_destroyed_ptr)
 #define g_cog_symbolTable (*(sithCogSymboltable**)0x008B5428)
 
