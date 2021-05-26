@@ -35,14 +35,14 @@ jkMain_SetVideoModeGdi	.text	00402E40	00000023	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_InitPlayerThings	.text	00402E70	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_do_guistate6	.text	00402E80	0000002D			R	.	.	.	.	.	.	.
 jkMain_EndLevel	.text	00402EB0	000000DE	00000004	00000004	R	.	.	.	.	.	.	.
-jkMain_CdSwitch	.text	00402F90	00000190	00000004	00000008	R	.	.	.	.	.	.	.
-jkMain_cd_swap_reverify	.text	00403120	00000296	00000090	00000004	R	.	.	.	.	.	.	.
+jkMain_CdSwitch	.text	00402F90	00000190	00000004	00000008	R	.	.	.	.	.	T	.
+jkMain_cd_swap_reverify	.text	00403120	00000296	00000090	00000004	R	.	.	.	.	.	T	.
 jkMain_SetMap	.text	004033E0	00000029	00000000	00000004	R	.	.	.	.	.	.	.
 jkMain_MenuReturn	.text	00403410	00000024			R	.	.	.	.	.	.	.
 jkMain_MissionReload	.text	00403440	00000024			R	.	.	.	.	.	.	.
 jkMain_sub_403470	.text	00403470	00000053	00000000	00000004	R	.	.	.	.	.	T	.
 jkMain_sub_4034D0	.text	004034D0	0000009C	00000004	00000010	R	.	.	.	.	.	T	.
-jkMain_loadFile	.text	00403570	00000078	00000004	00000004	R	.	.	.	.	.	T	.
+jkMain_LoadFile	.text	00403570	00000078	00000004	00000004	R	.	.	.	.	.	T	.
 jkMain_loadFile2	.text	004035F0	000000B5	0000000C	00000008	R	.	.	.	.	.	T	.
 jkMain_SwitchTo5_2	.text	004036B0	00000033	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_SwitchTo5	.text	004036F0	00000049	00000000	00000004	R	.	.	.	.	.	.	.
@@ -75,7 +75,7 @@ jkMain_CutsceneLeave	.text	00404470	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_CreditsShow	.text	00404480	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_CreditsTick	.text	004044B0	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_CreditsLeave	.text	004044E0	00000005			R	.	.	.	.	.	.	.
-jkMain_ChoiceShow	.text	004044F0	00000057	00000004	00000000	R	.	.	.	.	.	.	.
+jkMain_ChoiceShow	.text	004044F0	00000057	00000004	00000004	R	.	.	.	.	.	T	.
 jkMain_ChoiceTick	.text	00404550	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_ChoiceLeave	.text	00404560	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_UnkShow	.text	00404570	00000001	00000000	00000000	R	.	.	.	.	.	.	.
@@ -243,8 +243,8 @@ jkEpisode_Startup	.text	0040D510	00000013			R	.	.	.	.	.	.	.
 jkEpisode_Shutdown	.text	0040D530	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkEpisode_UpdateExtra	.text	0040D540	00000017	00000000	00000004	R	.	.	.	.	.	T	.
 jkEpisode_Load	.text	0040D560	000006ED	00000158	00000004	R	.	.	.	.	.	T	.
-jkEpisode_idk1	.text	0040DC50	00000010	00000000	00000004	R	.	.	.	.	.	.	.
-jkEpisode_idk2	.text	0040DC60	00000069	00000010	00000008	R	.	.	.	.	.	.	.
+jkEpisode_idk1	.text	0040DC50	00000010	00000000	00000004	R	.	.	.	.	.	T	.
+jkEpisode_idk2	.text	0040DC60	00000069	00000010	00000008	R	.	.	.	.	.	T	.
 jkEpisode_EndLevel	.text	0040DCD0	0000003A	00000008	00000008	R	.	.	.	.	.	.	.
 jkEpisode_idk4	.text	0040DD10	00000052	00000010	00000008	R	.	.	.	.	.	T	.
 jkEpisode_LoadVerify	.text	0040DD70	0000053E	000001E0	00000000	R	.	.	.	.	.	.	.
@@ -480,13 +480,13 @@ jkGuiBuildMulti_sub_41D000	.text	0041D000	000000DB	00000014	00000008	R	.	.	.	.	.
 jkGuiBuildMulti_ShowLoad	.text	0041D0E0	00000513	0000041C	00000011	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_sub_41D680	.text	0041D680	000001AD	00000014	00000008	R	.	.	.	.	.	.	.
 jkGuiBuildMulti_sub_41D830	.text	0041D830	000000C1	0000000C	00000014	R	.	.	.	.	.	.	.
-jkGuiSaveLoad_sub_41D900	.text	0041D900	0000003B	00000004	00000014	R	.	.	.	.	.	T	.
-jkGuiSaveLoad_displayidk	.text	0041D940	00000316	00000020	00000004	R	.	.	.	.	.	.	.
-jkGuiSaveLoad_delete	.text	0041DC60	00000167	00000088	00000008	R	.	.	.	.	.	.	.
-jkGuiSaveLoad_listidk	.text	0041DDD0	00000205	000007D0	00000000	R	.	.	.	.	.	.	.
+jkGuiSaveLoad_ListClick	.text	0041D900	0000003B	00000004	00000014	R	.	.	.	.	.	T	.
+jkGuiSaveLoad_PopulateInfo	.text	0041D940	00000316	00000020	00000004	R	.	.	.	.	.	.	.
+jkGuiSaveLoad_DeleteOnClick	.text	0041DC60	00000167	00000088	00000008	R	.	.	.	.	.	.	.
+jkGuiSaveLoad_PopulateList	.text	0041DDD0	00000205	000007D0	00000000	R	.	.	.	.	.	.	.
 jkGuiSaveLoad_SaveSort	.text	0041DFE0	00000029	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_Show	.text	0041E010	00000419	00000294	00000004	R	.	.	.	.	.	.	.
-jkGuiSaveLoad_sub_41E430	.text	0041E430	0000000D	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiSaveLoad_PopulateInfoInit	.text	0041E430	0000000D	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiSaveLoad_Initialize	.text	0041E440	00000014			R	.	.	.	.	.	.	.
 jkGuiSaveLoad_Shutdown	.text	0041E460	00000001			R	.	.	.	.	.	.	.
 jkGuiControlSaveLoad_sub_41E470	.text	0041E470	0000007E	00000004	00000014	R	.	.	.	.	.	.	.
@@ -804,7 +804,7 @@ util_files_exists	.text	0042F550	000001AE	00000114	00000010	R	.	.	.	.	.	.	.
 util_unkcomparison1	.text	0042F700	0000004D	00000008	00000008	R	.	.	.	.	.	.	.
 util_unkcomparison2	.text	0042F750	0000004D	00000008	00000008	R	.	.	.	.	.	.	.
 util_unkcomparison3	.text	0042F7A0	00000065	0000000C	00000008	R	.	.	.	.	.	.	.
-util_Weirdchecksum	.text	0042F810	00000027	00000000	0000000C	R	.	.	.	.	.	.	.
+util_Weirdchecksum	.text	0042F810	00000027	00000000	0000000C	R	.	.	.	.	.	T	.
 DirectPlay_EarlyInit	.text	0042F840	000001F3	00000074	00000008	R	.	.	.	.	.	T	.
 DirectPlay_Initialize	.text	0042FA40	00000065	00000008	00000000	R	.	.	.	.	.	.	.
 DirectPlay_Destroy	.text	0042FAB0	00000051	00000008	00000000	R	.	.	.	.	.	.	.
@@ -816,7 +816,7 @@ DirectPlay_OpenIdk	.text	0042FC90	00000130	00000158	00000004	R	.	.	.	.	.	.	.
 DirectPlay_GetSession_passwordidk	.text	0042FDC0	00000111	00000118	00000004	R	.	.	.	.	.	.	.
 DirectPlay_IdkSessionDesc	.text	0042FEE0	00000063	00000014	00000004	R	.	.	.	.	.	.	.
 DirectPlay_SetSessionFlagidk	.text	0042FF50	00000091	00000014	00000004	R	.	.	.	.	.	.	.
-DirectPlay_SetSessionDesc	.text	0042FFF0	000000DF	00000118	00000008	R	.	.	.	.	.	.	.
+DirectPlay_SetSessionDesc	.text	0042FFF0	000000DF	00000118	00000008	R	.	.	.	.	.	T	.
 DirectPlay_Open	.text	004300D0	000000A7	00000058	00000008	R	.	.	.	.	.	T	.
 DirectPlay_Close	.text	00430180	0000001D			R	.	.	.	.	.	T	.
 DirectPlay_StartSession	.text	004301A0	00000135	00000198	00000008	R	.	.	.	.	.	.	.
@@ -835,7 +835,7 @@ DirectPlay_EnumConnectionsCallback	.text	004306E0	000000DA	00000000	00000010	R	.
 DirectPlay_EnumSessionsCallback	.text	004307C0	00000044	00000000	00000009	R	.	.	.	.	.	.	.
 DirectPlay_EnumPlayersCallback	.text	00430810	000000AD	00000004	0000000C	R	.	.	.	.	.	.	.
 DirectPlay_sub_4308C0	.text	004308C0	00000023	00000000	00000004	R	.	.	.	.	.	.	.
-DirectPlay_parseSessionDescidk	.text	004308F0	00000117	0000010C	00000008	R	.	.	.	.	.	.	.
+DirectPlay_parseSessionDescidk	.text	004308F0	00000117	0000010C	00000008	R	.	.	.	.	.	T	.
 stdFnames_FindMedName	.text	00430A10	00000028	00000004	00000004	R	.	.	.	.	.	T	.
 stdFnames_FindExt	.text	00430A40	0000003A	00000004	00000004	R	.	.	.	.	.	.	.
 stdFnames_AddDefaultExt	.text	00430A80	00000085	0000000C	00000008	R	.	.	.	.	.	T	.
@@ -1855,7 +1855,7 @@ sithDplay_DoReceive	.text	004C99B0	0000002B	00000008	00000000	R	.	.	.	.	.	.	.
 sithDplay_cogMsg_SendEnumPlayers	.text	004C99E0	00000060	00000000	00000004	R	.	.	.	.	.	.	.
 sithDplay_cogMsg_HandleEnumPlayers	.text	004C9A40	00000096	00000010	00000004	R	.	.	.	.	.	.	.
 sithMulti_Startup	.text	004C9AE0	000001CE	00000010	00000000	R	.	.	.	.	.	.	.
-sithMulti_Shutdown	.text	004C9CB0	00000044			R	.	.	.	.	.	.	.
+sithMulti_Shutdown	.text	004C9CB0	00000044			R	.	.	.	.	.	T	.
 sithMulti_ServerLeft	.text	004C9D00	000002BD	00000110	00000000	R	.	.	.	.	.	.	.
 sithMulti_CreatePlayer	.text	004C9FC0	0000017C	000000FC	00000024	R	.	.	.	.	.	T	.
 sithMulti_InitTick	.text	004CA140	00000062	00000000	00000004	R	.	.	.	.	.	.	.
@@ -1956,7 +1956,7 @@ sithWorld_CalcFaceNormals	.text	004D0930	000000ED	00000018	00000004	R	.	.	.	.	.	
 sithWorld_sub_4D0A20	.text	004D0A20	00000078	00000008	00000004	R	.	.	.	.	.	T	.
 sithWorld_sub_4D0AA0	.text	004D0AA0	0000005B	00000008	00000004	R	.	.	.	.	.	T	.
 sithWorld_Verify	.text	004D0B00	00000128	00000000	00000004	R	.	.	.	.	.	T	.
-sithWorld_CalcChecksumIdk	.text	004D0C30	000000DB	0000000C	00000008	R	.	.	.	.	.	.	.
+sithWorld_CalcChecksum	.text	004D0C30	000000DB	0000000C	00000008	R	.	.	.	.	.	T	.
 sithWorld_Initialize	.text	004D0D10	00000038	00000004	00000000	R	.	.	.	.	.	.	.
 sithWorld_TimeSectionParse	.text	004D0D50	000000C7	00000098	0000000C	R	.	.	.	.	.	.	.
 sithWorld_FindSectionParser	.text	004D0E20	00000046	0000000C	00000004	R	.	.	.	.	.	T	.
@@ -2125,7 +2125,7 @@ sithSoundSys_StopSong	.text	004DAF20	00000019			R	.	.	.	.	.	.	.
 sithSoundSys_UpdateMusicVolume	.text	004DAF40	00000139	00000004	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_SetMusicVol	.text	004DB080	00000065	00000004	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_ResumeMusic	.text	004DB0F0	00000086	00000000	00000004	R	.	.	.	.	.	.	.
-sithSoundSys_sub_4DB180	.text	004DB180	000000A6	00000010	00000000	R	.	.	.	.	.	.	.
+sithSoundSys_Open	.text	004DB180	000000A6	00000010	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DB230	.text	004DB230	0000010E	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DB340	.text	004DB340	0000007C	00000010	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_StopAll	.text	004DB3C0	00000048	00000004	00000000	R	.	.	.	.	.	.	.
