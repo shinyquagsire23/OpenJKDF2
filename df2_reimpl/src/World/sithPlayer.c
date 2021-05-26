@@ -6,8 +6,8 @@
 
 float sithPlayer_GetBinAmt(int idx)
 {
-    if (idx)
-        jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt);
+    //if (idx)
+    //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt);
 
     return jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt;
 }

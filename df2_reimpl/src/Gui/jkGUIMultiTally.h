@@ -9,6 +9,7 @@
 #define jkGuiMultiTally_Sortidk_ADDR (0x00418870)
 #define jkGuiMultiTally_sub_4188B0_ADDR (0x004188B0)
 
+static int (*jkGuiMultiTally_Show)() = (void*)jkGuiMultiTally_Show_ADDR;
 static int (*jkGuiMultiTally_Initialize)() = (void*)jkGuiMultiTally_Initialize_ADDR;
 
 #endif // _JKGUIMULTITALLY_H

@@ -26,9 +26,14 @@
 int sith_Startup(struct common_functions *commonFuncs);
 void sith_UpdateCamera();
 int sith_Load(char *path);
+void sith_set_some_text_jk1(char *text);
 //static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
+static void (*sith_AutoSave)() = (void*)sith_AutoSave_ADDR;
+static int (*sith_Mode1Init)(char*) = (void*)sith_Mode1Init_ADDR;
+static int (*sith_Mode1Init_3)(char*) = (void*)sith_Mode1Init_3_ADDR;
+static void (*sith_Close)() = (void*)sith_Close_ADDR;
 
-static void (*sith_set_some_text_jk1)(char *text) = (void*)sith_set_some_text_jk1_ADDR;
+//static void (*sith_set_some_text_jk1)(char *text) = (void*)sith_set_some_text_jk1_ADDR;
 
 #endif // _SITH__H

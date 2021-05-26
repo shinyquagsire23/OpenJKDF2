@@ -37,23 +37,41 @@ typedef struct jkEpisode
     int field_A0;
 } jkEpisode;
 
+typedef struct jkEpisodeEntry
+{
+    int lineNum;
+    int cdNum;
+    int level;
+    int type;
+    char fileName[32];
+    int lightpow;
+    int darkpow;
+    int gotoA;
+    int gotoB;
+} jkEpisodeEntry;
+
+
 typedef struct jkEpisodeLoad
 {
     int field_0;
-    int field_4;
+    int numSeq;
     int field_8;
-    int field_C;
+    jkEpisodeEntry* paEntries;
 } jkEpisodeLoad;
-
 #define jkEpisode_aEpisodes ((jkEpisode*)0x8568E0)
 #define jkEpisode_var4 ((char*)0x005540D8)
 #define jkEpisode_var5 ((char*)0x00554158)
 #define jkEpisode_var2 (*(int*)0x005541D8)
+#define jkEpisode_mLoad (*(jkEpisodeLoad*)0x00552B68)
 
 int jkEpisode_Startup();
+int jkEpisode_LoadVerify();
+int jkEpisode_Load(jkEpisodeLoad *a1);
+jkEpisodeEntry* jkEpisode_idk1(jkEpisodeLoad *a1);
+jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath);
 
 //static int (*jkEpisode_Startup)() = (void*)jkEpisode_Startup_ADDR;
-static int (*jkEpisode_Load)(jkEpisodeLoad *a1) = (void*)jkEpisode_Load_ADDR;
-static unsigned int (*jkEpisode_LoadVerify)() = (void*)jkEpisode_LoadVerify_ADDR;
+//static int (*jkEpisode_Load)(jkEpisodeLoad *a1) = (void*)jkEpisode_Load_ADDR;
+//static unsigned int (*jkEpisode_LoadVerify)() = (void*)jkEpisode_LoadVerify_ADDR;
 
 #endif // _JKEPISODE_H

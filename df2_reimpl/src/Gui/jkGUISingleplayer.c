@@ -88,7 +88,7 @@ int jkGuiSingleplayer_Show()
     int v5; // esi
     int v6; // edi
     int v7; // ebp
-    int v8; // ebx
+    jkEpisodeEntry* v8; // ebx
     const char *v9; // eax
     int i; // ebx
     jkGuiStringEntry *v11; // eax
@@ -161,7 +161,7 @@ int jkGuiSingleplayer_Show()
                         v24[127] = 0;
                     }
                     jkGuiRend_DarrayFree(&darray);
-                    if ( clicked == 1 && !jk_loadFile(v24) )
+                    if ( clicked == 1 && !jkMain_LoadFile(v24) )
                         clicked = -1;
                     break;
                 case JKGUI_LOAD:
@@ -202,9 +202,9 @@ int jkGuiSingleplayer_Show()
                         if ( clicked == 1 )
                         {
                             v5 = jkGui_episodeLoad.field_0;
-                            v6 = jkGui_episodeLoad.field_4;
+                            v6 = jkGui_episodeLoad.numSeq;
                             v7 = jkGui_episodeLoad.field_8;
-                            v8 = jkGui_episodeLoad.field_C;
+                            v8 = jkGui_episodeLoad.paEntries; //TODO
                             jkGui_sub_412E20(&jkGuiSingleplayer_menu3, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                             jkGuiRend_DarrayNewStr(&array2, 10, 1);
                             jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, v5, v6, v7, v8);
@@ -229,7 +229,7 @@ int jkGuiSingleplayer_Show()
                             }
                             jkGuiRend_DarrayFree(&array2);
                             if ( clicked == 1 )
-                                jk_sub_403470(v25);
+                                jkMain_sub_403470(v25);
                         }
                     }
                     break;
@@ -275,7 +275,7 @@ int jkGuiSingleplayer_sub_41A9B0(Darray *array, jkGuiElement *element, int a3, i
     return ret;
 }
 
-void __cdecl jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, char *episodeDir, int a5, int a6, int a7, int a8)
+void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, char *episodeDir, int a5, int a6, int a7, jkEpisodeEntry* a8)
 {
     int i; // edi
     jkGuiStringEntry *v9; // eax
@@ -336,8 +336,8 @@ void __cdecl jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, 
     if ( (!v13 || !v22) && a6 > 0 )
     {
         v23 = a6;
-        v17 = (char *)(a8 + 16);
-        a1a = (void *)(a8 + 16);
+        v17 = a8->fileName;
+        a1a = a8->fileName;
         do
         {
             if ( !*((int *)v17 - 1) )

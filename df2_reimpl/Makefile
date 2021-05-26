@@ -9,7 +9,7 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -Wuninitialized
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -DTARGET_HAS_DPLAY -Wuninitialized
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc

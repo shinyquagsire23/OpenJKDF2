@@ -29,6 +29,7 @@
 #define sithThing_DetachThing_ADDR (0x4CE380)
 #define sithThing_Release_ADDR (0x4E0740)
 #define sithThing_SyncThingPos_ADDR (0x4CF560)
+#define sithThing_Checksum_ADDR (0x004CF3C0)
 #define sithThing_AttachToSurface_ADDR (0x4CDE80)
 #define sithThing_AttachThing_ADDR (0x4CE2C0)
 #define sithThing_SetNewModel_ADDR (0x4CD830)
@@ -710,6 +711,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs);
 void sithThing_Remove(sithThing *thing);
 sithThing* sithThing_GetParent(sithThing *thing);
 sithThing* sithThing_GetThingByIdx(int idx);
+uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 
 static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
 static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;

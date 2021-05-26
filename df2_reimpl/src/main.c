@@ -107,6 +107,7 @@
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
 #include "Main/jkControl.h"
+#include "Main/jkEpisode.h"
 #include "Main/Main.h"
 #include "stdPlatform.h"
 
@@ -179,6 +180,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(jkMain_MainTick_ADDR, jkMain_MainTick);
     hook_function(jkMain_MainLeave_ADDR, jkMain_MainLeave);
 
+    // jkEpisode
+    hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
     
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
@@ -858,6 +861,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithThing_Remove_ADDR, sithThing_Remove);
     hook_function(sithThing_GetParent_ADDR, sithThing_GetParent);
     hook_function(sithThing_GetThingByIdx_ADDR, sithThing_GetThingByIdx);
+    hook_function(sithThing_Checksum_ADDR, sithThing_Checksum);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -933,6 +937,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
     hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
     hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
+    hook_function(sithWorld_CalcChecksum_ADDR, sithWorld_CalcChecksum);
 
     // sithInventory
     hook_function(sithInventory_NewEntry_ADDR, sithInventory_NewEntry);

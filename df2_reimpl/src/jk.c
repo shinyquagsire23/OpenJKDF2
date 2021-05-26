@@ -834,10 +834,9 @@ uint32_t jk_WinExec()
     return 0;
 }
 
-int _string_modify_idk()
+int _string_modify_idk(int c)
 {
-    assert(0);
-    return 1;
+    return toupper(c);
 }
 
 void jk_ReleaseDC()

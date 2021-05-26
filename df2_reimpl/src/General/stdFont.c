@@ -592,6 +592,90 @@ LABEL_51:
     }
 }
 
+int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe)
+{
+    int v9; // ebp
+    wchar_t *v10; // edi
+    int i; // ebx
+    uint16_t v12; // cx
+    stdFontCharset *v13; // eax
+    int v14; // ecx
+    int v15; // ecx
+    int v17; // [esp+10h] [ebp-8h]
+    int v18; // [esp+14h] [ebp-4h]
+
+    v9 = 0;
+    v17 = 0;
+    v18 = 0;
+    if ( a7 )
+    {
+        v10 = text;
+        for ( i = 0x7FFFFFFF; *v10; --i )
+        {
+            if ( i <= 0 )
+                break;
+            if ( _iswspace(*v10) )
+            {
+                v9 += font->marginX;
+            }
+            else
+            {
+                v12 = *v10;
+                v13 = &font->charsetHead;
+                if ( font != (stdFont *)-48 )
+                {
+                    do
+                    {
+                        if ( v12 >= v13->charFirst && v12 <= v13->charLast )
+                            break;
+                        v13 = v13->previous;
+                    }
+                    while ( v13 );
+                    if ( v13 )
+                        goto LABEL_17;
+                }
+                v12 = font->field_28;
+                v13 = &font->charsetHead;
+                if ( font == (stdFont *)-48 )
+                    goto LABEL_16;
+                do
+                {
+                    if ( v12 >= v13->charFirst && v12 <= v13->charLast )
+                        break;
+                    v13 = v13->previous;
+                }
+                while ( v13 );
+                if ( v13 )
+LABEL_17:
+                    v14 = v13->pEntries[v12 - v13->charFirst].field_4;
+                else
+LABEL_16:
+                    v14 = 0;
+                v9 += v14 + font->marginY;
+            }
+            ++v10;
+        }
+        v15 = a5;
+        if ( (a7 & 1) != 0 )
+        {
+            v17 = (a5 - v9) / 2;
+            if ( v17 < 0 )
+                v17 = 0;
+        }
+        if ( (a7 & 2) != 0 )
+        {
+            v18 = (a6 - (*font->bitmap->mipSurfaces)->format.height) / 2;
+            if ( v18 < 0 )
+                v18 = 0;
+        }
+    }
+    else
+    {
+        v15 = a5;
+    }
+    return stdFont_Draw1(a1, font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe);
+}
+
 WCHAR* stdFont_sub_4352C0(WCHAR *a1, stdFont *a2, int a3, rdRect *a4, int *a5)
 {
     WCHAR *v5; // ebp
@@ -774,6 +858,27 @@ LABEL_49:
     return 0;
 }
 
+int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4)
+{
+    wchar_t *v3; // eax
+    int v4; // edi
+    rdRect *v5; // esi
+
+    v3 = a2;
+    v4 = 0;
+    if ( a2 )
+    {
+        v5 = a4;
+        do
+        {
+            v3 = stdFont_sub_4352C0(v3, a1, v5->x, v5, (int *)&a2);
+            ++v4;
+        }
+        while ( v3 );
+    }
+    return v4 * ((*a1->bitmap->mipSurfaces)->format.height + a1->marginY);
+}
+
 int stdFont_sub_435810(stdFont *a1, wchar_t *a2, int a3)
 {
     wchar_t *v3; // edi
@@ -789,7 +894,7 @@ int stdFont_sub_435810(stdFont *a1, wchar_t *a2, int a3)
     {
         if ( a3 <= 0 )
             break;
-        if ( msvc_sub_512D30(i, 8) )
+        if ( _iswspace(i) )
         {
             v4 += a1->marginX;
         }

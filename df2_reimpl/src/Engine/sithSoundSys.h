@@ -10,7 +10,7 @@
 #define sithSoundSys_UpdateMusicVolume_ADDR (0x004DAF40)
 #define sithSoundSys_SetMusicVol_ADDR (0x004DB080)
 #define sithSoundSys_ResumeMusic_ADDR (0x004DB0F0)
-#define sithSoundSys_sub_4DB180_ADDR (0x004DB180)
+#define sithSoundSys_Open_ADDR (0x004DB180)
 #define sithSoundSys_sub_4DB230_ADDR (0x004DB230)
 #define sithSoundSys_sub_4DB340_ADDR (0x004DB340)
 #define sithSoundSys_StopAll_ADDR (0x004DB3C0)
@@ -90,6 +90,10 @@ typedef struct sithPlayingSound
 int sithSoundSys_Startup();
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
+static void (*sithSoundSys_ResumeMusic)(int a1) = (void*)sithSoundSys_ResumeMusic_ADDR;
+static void (*sithSoundSys_ResumeAll)() = (void*)sithSoundSys_ResumeAll_ADDR;
+static void (*sithSoundSys_StopAll)() = (void*)sithSoundSys_StopAll_ADDR;
+
 static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
 static void (*sithSoundSys_UpdateMusicVolume)(float musicVolume) = (void*)sithSoundSys_UpdateMusicVolume_ADDR;
 static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;

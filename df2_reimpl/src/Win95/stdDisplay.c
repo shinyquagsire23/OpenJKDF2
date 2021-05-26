@@ -113,6 +113,19 @@ int stdDisplay_DDrawGdiSurfaceFlip()
 
 int stdDisplay_SetMasterPalette(uint8_t* pal)
 {
+    rdColor24* pal24 = (rdColor24*)pal;
+    SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
+    for (int i = 0; i < 256; i++)
+    {
+        tmp[i].r = pal24[i].r;
+        tmp[i].g = pal24[i].g;
+        tmp[i].b = pal24[i].b;
+        tmp[i].a = 0xFF;
+    }
+    
+    SDL_SetPaletteColors(Video_otherBuf.sdlSurface->format->palette, tmp, 0, 256);
+    SDL_SetPaletteColors(Video_menuBuffer.sdlSurface->format->palette, tmp, 0, 256);
+    free(tmp);
     return 1;
 }
 

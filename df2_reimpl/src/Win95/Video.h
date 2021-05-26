@@ -31,6 +31,7 @@
 
 int Video_Startup();
 
+static void (*Video_SwitchToGDI)() = (void*)Video_SwitchToGDI_ADDR;
 //static int (*Video_Startup)() = (void*)Video_Startup_ADDR;
 
 #endif // _WIN95_VIDEO_H

@@ -10,8 +10,18 @@ void stdControl_ToggleCursor(int a)
     
 }
 
+static int _cursorState = 0;
+
 int stdControl_ShowCursor(int a)
 {
-    return 0;
+    if (a)
+    {
+        _cursorState++;
+    }
+    else
+    {
+        _cursorState--;
+    }
+    return _cursorState;
 }
 #endif

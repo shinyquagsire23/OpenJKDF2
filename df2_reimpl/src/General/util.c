@@ -12,3 +12,12 @@ int util_FileExists(char *fpath)
     }
     return 0;
 }
+
+uint32_t util_Weirdchecksum(uint8_t *data, int len, uint32_t last_hash)
+{
+    uint32_t result;
+
+    for ( result = last_hash; len; --len )
+        result = *data++ ^ ((result >> 31) + 2 * result);
+    return result;
+}

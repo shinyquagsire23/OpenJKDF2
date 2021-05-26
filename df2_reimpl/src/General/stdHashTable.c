@@ -139,8 +139,13 @@ void stdHashTable_FreeBuckets(stdHashKey *a1)
     {
         do
         {
+            // TODO verify possible regression, prevent double free?
+            stdHashKey* next_iter = iter->child;
+            iter->child = NULL; // added
+
             std_pHS->free(iter);
-            iter = iter->child;
+            
+            iter = next_iter;
         }
         while (iter);
     }
@@ -160,12 +165,15 @@ void stdHashTable_Free(stdHashTable *table)
         do
         {
             stdHashTable_FreeBuckets(&table->buckets[bucketIdx2]);
+            table->buckets[bucketIdx2].child = NULL; // added
             ++bucketIdx;
             ++bucketIdx2;
         }
         while ( bucketIdx < table->numBuckets );
     }
     std_pHS->free(table->buckets);
+    table->buckets = NULL; // added
+    
     std_pHS->free(table);
 }
 

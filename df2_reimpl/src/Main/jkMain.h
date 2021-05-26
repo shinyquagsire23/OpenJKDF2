@@ -1,6 +1,8 @@
 #ifndef _JKMAIN_H
 #define _JKMAIN_H
 
+#include "types.h"
+
 #define jkMain_Startup_ADDR (0x00402CC0)
 #define jkMain_Shutdown_ADDR (0x00402CE0)
 #define jkMain_SetVideoMode_ADDR (0x00402D00)
@@ -15,7 +17,7 @@
 #define jkMain_MissionReload_ADDR (0x00403440)
 #define jkMain_sub_403470_ADDR (0x00403470)
 #define jkMain_sub_4034D0_ADDR (0x004034D0)
-#define jkMain_loadFile_ADDR (0x00403570)
+#define jkMain_LoadFile_ADDR (0x00403570)
 #define jkMain_loadFile2_ADDR (0x004035F0)
 #define jkMain_SwitchTo5_2_ADDR (0x004036B0)
 #define jkMain_SwitchTo5_ADDR (0x004036F0)
@@ -57,12 +59,15 @@
 
 #define gamemode_0_2_str ((char*)0x005528D0)
 #define thing_nine (*(int*)0x0052552C)
+#define jkMain_bInit (*(int*)0x00552B80)
 #define thing_six (*(int*)0x00552B90)
 #define thing_eight (*(int*)0x00552B94)
 #define jkMain_lastTickMs (*(int*)0x552B9C)
 #define dword_552B5C (*(int*)0x552B5C)
 #define sith_bEndLevel (*(int*)0x0082F0A8)
 #define game_updateMsecsTotal (*(int*)0x00552B58)
+#define idx_13b4_related (*(int*)0x008C4BD8)
+#define gamemode_1_str ((char*)0x00552958) // 128
 //#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
 
 typedef struct jkGuiStateFuncs
@@ -74,13 +79,25 @@ typedef struct jkGuiStateFuncs
 
 void jkMain_GuiAdvance();
 void jkMain_EscapeMenuTick(int a2);
+void jkMain_GameplayShow(int a1, int a2);
 void jkMain_GameplayTick(int a2);
+void jkMain_GameplayLeave(int a2, int a3);
 int jkMain_TitleShow();
 void jkMain_TitleTick();
 void jkMain_TitleLeave();
 void jkMain_MainShow();
 void jkMain_MainTick();
 void jkMain_MainLeave();
+void jkMain_ChoiceShow();
+void jkMain_ChoiceTick();
+void jkMain_ChoiceLeave();
+int jkMain_LoadFile(char *a1);
+
+int jkMain_sub_403470(char *a1);
+int jkMain_CdSwitch(int a1, int bIsAPath);
+int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
+
+//static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
 static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
@@ -88,5 +105,7 @@ static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
 static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;
 static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
 static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
+static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
+//static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
 
 #endif // _JKMAIN_H

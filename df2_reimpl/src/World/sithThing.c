@@ -1,6 +1,7 @@
 #include "sithThing.h"
 
 #include "General/stdHashTable.h"
+#include "General/util.h"
 #include "World/sithWorld.h"
 #include "World/sithActor.h"
 #include "World/sithWeapon.h"
@@ -318,4 +319,42 @@ sithThing* sithThing_GetThingByIdx(int idx)
     if ( idx < 0 || idx >= sithWorld_pCurWorld->numThingsLoaded || (result = &sithWorld_pCurWorld->things[idx], result->thingType == THINGTYPE_FREE) )
         result = 0;
     return result;
+}
+
+uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
+{
+    uint32_t hash;
+
+    hash = util_Weirdchecksum((uint8_t *)&thing->thingflags, sizeof(uint32_t), last_hash);
+    hash = util_Weirdchecksum((uint8_t *)&thing->thingType, sizeof(uint32_t), hash);
+    hash = util_Weirdchecksum((uint8_t *)&thing->move_type, sizeof(uint32_t), hash);
+    hash = util_Weirdchecksum((uint8_t *)&thing->thingtype, sizeof(uint32_t), hash);
+
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.physflags, sizeof(uint32_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.airDrag, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.surfaceDrag, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.staticDrag, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.mass, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.height, sizeof(float), hash);
+    }
+    if ( thing->thingType == THINGTYPE_ACTOR )
+    {
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.typeflags, sizeof(uint32_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.health, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.maxHealth, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.jumpSpeed, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.maxThrust, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->actorParams.maxRotThrust, sizeof(float), hash);
+    }
+    else if ( thing->thingType == THINGTYPE_WEAPON )
+    {
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.typeflags, sizeof(uint32_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.damage, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.material, 4, hash); // ???
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.mindDamage, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.range, sizeof(float), hash);
+    }
+    return hash;
 }

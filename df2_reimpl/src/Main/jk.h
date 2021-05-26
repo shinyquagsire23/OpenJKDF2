@@ -46,7 +46,5 @@
 
 static int (*jk_MissionReload)() = (void*)jk_MissionReload_ADDR;
 static int (*jk_MenuReturn)() = (void*)jk_MenuReturn_ADDR;
-static int (*jk_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;
-static int (*jk_sub_403470)(char *a1) = (void*)jk_sub_403470_ADDR;
 
 #endif // _MAINJK_H

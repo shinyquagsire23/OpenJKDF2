@@ -99,9 +99,14 @@ static int parse_ext(const struct dirent *dir)
         }
         else 
         {
-            if(strcmp(ext, search_ext) == 0)
+            if(__strnicmp(ext, search_ext, 3) == 0)
                 return 1;
         }
+    }
+    else
+    {
+        if (!strncmp(dir->d_name, ".", 1)) return 1;
+        if (!strncmp(dir->d_name, "..", 1)) return 1;
     }
 
     return 0;
@@ -128,9 +133,18 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 
         // Clear out extension
         // TODO: ehhhh
-        *strrchr(tmp,'.') = 0;
-        *strrchr(tmp,'*') = 0;
-        search_ext = strrchr(a1->path,'.');
+        if (!strcmp(strrchr(tmp,'*'), "*")) {
+            *strrchr(tmp,'.') = 0;
+            *strrchr(tmp,'*') = 0;
+            search_ext = strrchr(a1->path,'.');
+            search_ext = NULL;
+        }
+        else
+        {
+            *strrchr(tmp,'.') = 0;
+            *strrchr(tmp,'*') = 0;
+            search_ext = strrchr(a1->path,'.');
+        }
         
         for (int i = 0; i < strlen(tmp); i++)
         {
@@ -139,7 +153,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
             }
         }
 
-        a1->num_found = scandir(tmp, &a1->namelist, NULL, alphasort);
+        a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
         
         if (!a1->namelist) return 0;
         

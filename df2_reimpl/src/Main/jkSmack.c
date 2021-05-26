@@ -9,6 +9,7 @@
 #include "Gui/jkGUIRend.h"
 #include "Win95/sithDplay.h"
 #include "World/jkPlayer.h"
+#include "Main/jkEpisode.h"
 
 void jkSmack_Initialize()
 {
@@ -20,10 +21,10 @@ void jkSmack_Initialize()
 void jkSmack_Shutdown()
 {
     jkSmack_bInit = 0;
-    if ( jkSmack_alloc )
+    if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkSmack_alloc);
-        jkSmack_alloc = 0;
+        pHS->free(jkEpisode_mLoad.paEntries);
+        jkEpisode_mLoad.paEntries = 0;
     }
 }
 

@@ -3,6 +3,7 @@
 #include "jk.h"
 #include "World/sithThing.h"
 #include "AI/sithAICmd.h"
+#include "General/stdHashTable.h"
 
 int sithAI_Startup()
 {

@@ -29,7 +29,7 @@
 #define sithWorld_sub_4D0A20_ADDR (0x004D0A20)
 #define sithWorld_sub_4D0AA0_ADDR (0x004D0AA0)
 #define sithWorld_Verify_ADDR (0x004D0B00)
-#define sithWorld_CalcChecksumIdk_ADDR (0x004D0C30)
+#define sithWorld_CalcChecksum_ADDR (0x004D0C30)
 #define sithWorld_Initialize_ADDR (0x004D0D10)
 #define sithWorld_TimeSectionParse_ADDR (0x004D0D50)
 #define sithWorld_FindSectionParser_ADDR (0x004D0E20)
@@ -134,6 +134,7 @@ int sithHeader_Load(sithWorld *world, int junk);
 int sithCopyright_Load(sithWorld *lvl, int junk);
 int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_FindSectionParser(char *a1);
+uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed);
 
 static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
 static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;

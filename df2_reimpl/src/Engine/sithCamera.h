@@ -77,6 +77,7 @@ static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
 //static void (*sithCamera_FollowFocus)(sithCamera *cam) = (void*)sithCamera_FollowFocus_ADDR;
 static void (*sithCamera_SetRdCameraAndRenderidk)() = (void*)sithCamera_SetRdCameraAndRenderidk_ADDR;
 static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14) = (void*)sithCamera_create_unk_struct_ADDR;
+static void (*sithCamera_SetsFocus)() = (void*)sithCamera_SetsFocus_ADDR;
 
 #define sithCamera_cameras ((sithCamera*)0x8EC380)
 #define sithCamera_dword_8EE5A0 (*(int*)0x8EE5A0)

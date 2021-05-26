@@ -31,6 +31,8 @@ typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
 
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
+typedef struct jkEpisode jkEpisode;
+typedef struct jkEpisodeEntry jkEpisodeEntry;
 
 typedef struct sithAdjoin sithAdjoin;
 typedef struct sithAIClass sithAIClass;

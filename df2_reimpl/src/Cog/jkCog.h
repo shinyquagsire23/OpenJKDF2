@@ -7,6 +7,7 @@
 
 void jkCog_RegisterVerbs();
 int jkCog_Initialize();
+int jkCog_StringsInit();
 
 #define jkCog_strings (*(stdStrTable*)0x0553FA0)
 

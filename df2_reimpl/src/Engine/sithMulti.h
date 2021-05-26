@@ -40,5 +40,7 @@
 static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
 static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
 static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
+static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
+static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
 
 #endif // _SITHMULTI_H

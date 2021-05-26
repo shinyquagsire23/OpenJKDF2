@@ -104,3 +104,9 @@ int sith_Load(char *path)
     sithWorld_pStatic->level_type_maybe |= 1;
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
 }
+
+void sith_set_some_text_jk1(char *text)
+{
+    _strncpy(sithWorld_some_text_jk1, text, 0x1Fu);
+    sithWorld_some_text_jk1[31] = 0;
+}

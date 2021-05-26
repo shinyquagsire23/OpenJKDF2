@@ -28,6 +28,7 @@ typedef struct sithThing sithThing;
 #define jkGame_gamma (*(int*)0x008606A4)
 #define jkGame_screenSize (*(int*)0x008605F0)
 #define jkGame_bInitted (*(int*)0x005528BC)
+#define jkGame_isDDraw (*(int*)0x00552B60)
 
 int jkGame_Initialize();
 

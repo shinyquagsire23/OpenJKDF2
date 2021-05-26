@@ -274,7 +274,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
     return 0;
 }
 
-int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIsLight, int bEnableIdk)
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, int a5, int *pbIsLight, int bEnableIdk)
 {
     int newStars;
     int spendStars;
@@ -293,7 +293,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
 
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
     jkGuiForce_buttons[2].wstr = jkStrings_GetText(std_genBuffer);
-    if ( a4 == 0.0 )
+    if ( a4 == 0 )
     {
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
         spendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
@@ -320,7 +320,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, float a4, int a5, int *pbIs
         jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
     }
 
-    if ( a4 != 0.0 )
+    if ( a4 != 0 )
     {
         if ( darklight_float >= 0.0 )
         {

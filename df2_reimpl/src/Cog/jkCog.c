@@ -1,5 +1,7 @@
 #include "jkCog.h"
 
+#include "General/stdStrTable.h"
+
 #include "jk.h"
 
 static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
@@ -87,4 +89,10 @@ int jkCog_Initialize()
     jkCog_RegisterVerbs();
     //cog_jk_initted = 1; //553FB0
     return 1;
+}
+
+int jkCog_StringsInit()
+{
+    stdStrTable_Free(&jkCog_strings);
+    return stdStrTable_Load(&jkCog_strings, "misc\\cogStrings.uni");
 }
