@@ -352,7 +352,7 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
     {
         hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.typeflags, sizeof(uint32_t), hash);
         hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.damage, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.material, 4, hash); // ???
+        hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.unk8, sizeof(uint32_t), hash); // ???
         hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.mindDamage, sizeof(float), hash);
         hash = util_Weirdchecksum((uint8_t *)&thing->weaponParams.range, sizeof(float), hash);
     }

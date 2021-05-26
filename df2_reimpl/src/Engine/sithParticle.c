@@ -109,7 +109,7 @@ int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int para
             return 1;
 
         case THINGPARAM_MATERIAL:
-            thing->weaponParams.material = sithMaterial_LoadEntry(arg->value, 0, 0);
+            thing->particleParams.material = sithMaterial_LoadEntry(arg->value, 0, 0);
             return 1;
 
         case THINGPARAM_RATE:
@@ -168,7 +168,7 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
     {
         i = 0;
         v5 = particle->rdthing.particlecloud;
-        v6 = particle->weaponParams.material->num_texinfo;
+        v6 = particle->particleParams.material->num_texinfo;
         v16 = v2 * 1000.0 / (double)(unsigned int)particle->lifeLeftMs * deltaMs;
         if ( v5->numVertices )
         {

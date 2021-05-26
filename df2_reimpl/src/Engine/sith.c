@@ -92,6 +92,7 @@ void sith_UpdateCamera()
         rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
 #endif
+
         //sithCamera_currentCamera->rdCam.screenAspectRatio += 0.01;
         sithCamera_FollowFocus(sithCamera_currentCamera);
         sithCamera_SetRdCameraAndRenderidk();
