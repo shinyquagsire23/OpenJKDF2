@@ -574,7 +574,7 @@ stdDisplay_DDrawGdiSurfaceFlip	.text	00422FC0	0000008D			R	.	.	.	.	.	.	.
 stdDisplay_ddraw_surface_flip2	.text	00423050	00000042			R	.	.	.	.	.	.	.
 stdDisplay_ddraw_waitforvblank	.text	004230A0	0000001E			R	.	.	.	.	.	.	.
 stdDisplay_VBufferNew	.text	004230C0	00000221	00000418	00000010	R	.	.	.	.	.	T	.
-stdDisplay_free_texture	.text	004232F0	0000006F	00000004	00000004	R	.	.	.	.	.	T	.
+stdDisplay_VBufferFree	.text	004232F0	0000006F	00000004	00000004	R	.	.	.	.	.	T	.
 stdDisplay_423360	.text	00423360	00000055	00000004	00000004	R	.	.	.	.	.	.	.
 stdDisplay_VBufferLock	.text	004233C0	0000008E	0000000C	00000004	R	.	.	.	.	.	T	.
 stdDisplay_VBufferUnlock	.text	00423450	00000085	00000008	00000004	R	.	.	.	.	.	T	.
@@ -1813,10 +1813,10 @@ sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 sithPlayer_Close	.text	004C8620	00000042			R	.	.	.	.	.	.	.
 sithPlayer_NewEntry	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
-sithPlayer_Initialize	.text	004C8750	00000068	00000004	00000004	R	.	.	.	.	.	.	.
+sithPlayer_Initialize	.text	004C8750	00000068	00000004	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C87C0	.text	004C87C0	0000004E	00000000	00000008	R	.	.	.	.	.	.	.
 sithPlayer_idk	.text	004C8810	000000B3	00000008	00000004	R	.	.	.	.	.	T	.
-sithPlayer_ResetPalEffects	.text	004C88D0	00000032			R	.	.	.	.	.	.	.
+sithPlayer_ResetPalEffects	.text	004C88D0	00000032			R	.	.	.	.	.	T	.
 sithPlayer_sub_4C8910	.text	004C8910	000000B9	00000004	00000004	R	.	.	.	.	.	.	.
 sithPlayer_Tick	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
 sithPlayer_AddDynamicTint	.text	004C8C10	000000BF	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -2126,8 +2126,8 @@ sithSoundSys_UpdateMusicVolume	.text	004DAF40	00000139	00000004	00000004	R	.	.	.
 sithSoundSys_SetMusicVol	.text	004DB080	00000065	00000004	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_ResumeMusic	.text	004DB0F0	00000086	00000000	00000004	R	.	.	.	.	.	.	.
 sithSoundSys_Open	.text	004DB180	000000A6	00000010	00000000	R	.	.	.	.	.	.	.
-sithSoundSys_sub_4DB230	.text	004DB230	0000010E	00000004	00000000	R	.	.	.	.	.	.	.
-sithSoundSys_sub_4DB340	.text	004DB340	0000007C	00000010	00000000	R	.	.	.	.	.	.	.
+sithSoundSys_Close	.text	004DB230	0000010E	00000004	00000000	R	.	.	.	.	.	.	.
+sithSoundSys_ClearAll	.text	004DB340	0000007C	00000010	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_StopAll	.text	004DB3C0	00000048	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_ResumeAll	.text	004DB410	0000004E	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_sub_4DB460	.text	004DB460	0000008C	00000000	00000008	R	.	.	.	.	.	.	.
@@ -2188,7 +2188,7 @@ sithCog_InitScripts	.text	004DEFF0	00000089	0000000C	00000008	R	.	.	.	.	.	.	.
 sithCog_InitCogs	.text	004DF080	00000088	0000000C	00000008	R	.	.	.	.	.	.	.
 sithCog_Load	.text	004DF110	000002FF	00000098	00000008	R	.	.	.	.	.	T	.
 sithCog_LoadEntry	.text	004DF410	000001CE	00000004	0000000C	R	.	.	.	.	.	T	.
-sithCog_ThingsSectorsRegSymbolIdk	.text	004DF610	000001B7	0000000C	0000000C	R	.	.	.	.	.	.	.
+sithCog_ThingsSectorsRegSymbolIdk	.text	004DF610	000001B7	0000000C	0000000C	R	.	.	.	.	.	T	.
 sithCog_LoadCogscript	.text	004DF7D0	0000015C	00000090	00000004	R	.	.	.	.	.	T	.
 sithCog_GetByIdx	.text	004DF930	00000043	00000000	00000004	R	.	.	.	.	.	.	.
 sithCog_ThingFromSymbolidk	.text	004DF980	00000072	00000008	00000010	R	.	.	.	.	.	T	.

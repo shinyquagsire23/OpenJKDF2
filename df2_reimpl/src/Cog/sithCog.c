@@ -20,6 +20,7 @@
 #include "Engine/sithTemplate.h"
 #include "AI/sithAIClass.h"
 #include "General/stdHashTable.h"
+#include "stdPlatform.h"
 
 #include "jk.h"
 
@@ -333,6 +334,68 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
 {
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
+}
+
+int sithCogScript_Load(sithWorld *lvl, int a2)
+{
+    int numCogScripts; // esi
+    signed int result; // eax
+    sithCogScript *cogScripts; // edi
+    char *v5; // esi
+    sithWorld *v6; // edi
+    unsigned int v7; // eax
+    sithCogScript *v8; // esi
+    char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
+
+    if ( a2 )
+        return 0;
+    stdConffile_ReadArgs();
+    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "scripts") )
+        return 0;
+    numCogScripts = _atoi(stdConffile_entry.args[2].value);
+    if ( !numCogScripts )
+        return 1;
+    cogScripts = (sithCogScript *)pSithHS->alloc(sizeof(sithCogScript) * numCogScripts);
+    lvl->cogScripts = cogScripts;
+    if ( cogScripts )
+    {
+        _memset(cogScripts, 0, sizeof(sithCogScript) * numCogScripts);
+        lvl->numCogScripts = numCogScripts;
+        lvl->numCogScriptsLoaded = 0;
+        while ( stdConffile_ReadArgs() )
+        {
+            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+                break;
+            if ( lvl->numCogScriptsLoaded < (unsigned int)lvl->numCogScripts )
+            {
+                if ( !stdConffile_entry.numArgs )
+                    return 0;
+                v5 = stdConffile_entry.args[1].value;
+                v6 = sithWorld_pLoading;
+                _sprintf(cog_fpath, "%s%c%s", "cog", '\\', stdConffile_entry.args[1].value);
+                if ( !stdHashTable_GetKeyVal((stdHashTable *)g_cog_hashtable, v5) )
+                {
+                    v7 = v6->numCogScriptsLoaded;
+                    if ( v7 < v6->numCogScripts )
+                    {
+                        v8 = &v6->cogScripts[v7];
+                        if ( sithCogParse_Load(cog_fpath, v8, 0) )
+                        {
+                            stdHashTable_SetKeyVal((stdHashTable *)g_cog_hashtable, v8->cog_fpath, v8);
+                            ++v6->numCogScriptsLoaded;
+                        }
+                    }
+                }
+            }
+        }
+        result = 1;
+    }
+    else
+    {
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 843, "Memory alloc failure initializing COG scripts.\n", 0, 0, 0, 0);
+        result = 0;
+    }
+    return result;
 }
 
 void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3)

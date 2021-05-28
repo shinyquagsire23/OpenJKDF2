@@ -40,7 +40,6 @@ static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;
 static int (*stdSound_BufferReset)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferReset_ADDR;
 static int (*stdSound_BufferPlay)(LPDIRECTSOUNDBUFFER a1, int a2) = (void*)stdSound_BufferPlay_ADDR;
-static uint32_t (*stdSound_ParseWav)(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset) = (void*)stdSound_ParseWav_ADDR;
 static IDirectSoundBuffer* (*stdSound_BufferCreate)(int bStereo, int a2, uint16_t bitsPerSample, int bufferLen) = (void*)stdSound_BufferCreate_ADDR;
 static void* (*stdSound_BufferSetData)(LPDIRECTSOUNDBUFFER a1, int bufferBytes, int *bufferMaxSize) = (void*)stdSound_BufferSetData_ADDR;
 static int (*stdSound_BufferUnlock)(LPDIRECTSOUNDBUFFER a1, void* buffer, int bufferReadLen) = (void*)stdSound_BufferUnlock_ADDR;
@@ -50,8 +49,10 @@ static int (*stdSound_IsPlaying)(LPDIRECTSOUNDBUFFER a1, int *pos) = (void*)stdS
 
 #ifdef WIN32
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
+static uint32_t (*stdSound_ParseWav)(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset) = (void*)stdSound_ParseWav_ADDR;
 #else
 int stdSound_Initialize();
+void* stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
 #endif
 
 #endif // _STDSOUND_H

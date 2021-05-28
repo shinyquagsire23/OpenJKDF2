@@ -71,6 +71,8 @@ typedef struct sithAI sithAI;
 typedef struct sithAICommand sithAICommand;
 typedef struct sithActor sithActor;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
+typedef struct sithSoundClass sithSoundClass;
+typedef struct sithSoundClassEntry sithSoundClassEntry;
 
 typedef struct common_functions common_functions;
 

@@ -170,6 +170,14 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath)
     _strncpy(stdGob_fpath, filepath, 127);
     stdGob_fpath[127] = 0;
     stdString_CStrToLower(stdGob_fpath);
+
+#ifdef LINUX
+    for (int i = 0; i < 128; i++)
+    {
+        if (stdGob_fpath[i] == '/')
+            stdGob_fpath[i] = '\\';
+    }
+#endif
     entry = (stdGobEntry*)stdHashTable_GetKeyVal(gob->entriesHashtable, stdGob_fpath);
     if (!entry)
         return 0;

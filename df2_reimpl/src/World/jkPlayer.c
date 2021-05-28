@@ -4,7 +4,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
-#include "Engine/sithAnimclass.h"
+#include "Engine/sithAnimClass.h"
 #include "Engine/sithSave.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithTime.h"

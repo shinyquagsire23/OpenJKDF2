@@ -98,7 +98,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
       texinfo = material->texinfos;
       do
       {
-        texinfo_alloc = (rdTexinfo *)rdroid_pHS->alloc(0x20u);
+        texinfo_alloc = (rdTexinfo *)rdroid_pHS->alloc(sizeof(rdTexinfo));
         *texinfo = texinfo_alloc;
         if ( !texinfo_alloc )
           goto LABEL_32;
@@ -279,7 +279,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
           v9 = (stdVBuffer **)(v7 + 1);
           do
           {
-            stdDisplay_free_texture(*v9);
+            stdDisplay_VBufferFree(*v9);
             ++v8;
             ++v9;
           }

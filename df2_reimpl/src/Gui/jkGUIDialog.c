@@ -77,7 +77,7 @@ int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiRend_MenuSetLastElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[2]);
     jkGuiRend_SetDisplayingStruct(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[3]);
     v5 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDialog_OkCancel_menu);
-    stdDisplay_free_texture(jkGuiDialog_OkCancel_menu.texture);
+    stdDisplay_VBufferFree(jkGuiDialog_OkCancel_menu.texture);
     jkGuiDialog_OkCancel_menu.texture = 0;
     if ( v2 )
         jkGui_SetModeGame();
@@ -102,7 +102,7 @@ void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiRend_MenuSetLastElement(&jkGuiDialog_Ok_menu, &jkGuiDialog_Ok_buttons[2]);
     jkGuiRend_SetDisplayingStruct(&jkGuiDialog_Ok_menu, &jkGuiDialog_Ok_buttons[2]);
     jkGuiRend_DisplayAndReturnClicked(&jkGuiDialog_Ok_menu);
-    stdDisplay_free_texture(jkGuiDialog_Ok_menu.texture);
+    stdDisplay_VBufferFree(jkGuiDialog_Ok_menu.texture);
     jkGuiDialog_Ok_menu.texture = 0;
     if ( v2 )
         jkGui_SetModeGame();
@@ -129,7 +129,7 @@ int jkGuiDialog_YesNoDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiRend_MenuSetLastElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[2]);
     jkGuiRend_SetDisplayingStruct(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[3]);
     v5 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDialog_OkCancel_menu);
-    stdDisplay_free_texture(jkGuiDialog_OkCancel_menu.texture);
+    stdDisplay_VBufferFree(jkGuiDialog_OkCancel_menu.texture);
     jkGuiDialog_OkCancel_menu.texture = 0;
     if ( v2 )
         jkGui_SetModeGame();

@@ -15,7 +15,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithTime.h"
-#include "Engine/sithAnimclass.h"
+#include "Engine/sithAnimClass.h"
 //#include "Engine/rdSurface.h"
 
 #include "General/stdConffile.h"

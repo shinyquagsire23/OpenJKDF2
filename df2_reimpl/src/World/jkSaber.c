@@ -4,7 +4,7 @@
 #include "Cog/sithCog.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdPuppet.h"
-#include "Engine/sithAnimclass.h"
+#include "Engine/sithAnimClass.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithSurface.h"

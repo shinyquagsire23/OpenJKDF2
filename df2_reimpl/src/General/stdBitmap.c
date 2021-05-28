@@ -67,7 +67,7 @@ stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int a3)
                 for ( i = 0; i < outAlloc->numMips; ++i )
                 {
                     if ( outAlloc->mipSurfaces[i] )
-                        stdDisplay_free_texture(outAlloc->mipSurfaces[i]);
+                        stdDisplay_VBufferFree(outAlloc->mipSurfaces[i]);
                 }
                 std_pHS->free(outAlloc->mipSurfaces);
             }

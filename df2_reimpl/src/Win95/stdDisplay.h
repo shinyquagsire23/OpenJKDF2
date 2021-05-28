@@ -20,7 +20,7 @@
 #define stdDisplay_ddraw_surface_flip2_ADDR (0x0423050)
 #define stdDisplay_ddraw_waitforvblank_ADDR (0x04230A0)
 #define stdDisplay_VBufferNew_ADDR (0x04230C0)
-#define stdDisplay_free_texture_ADDR (0x04232F0)
+#define stdDisplay_VBufferFree_ADDR (0x04232F0)
 #define stdDisplay_423360_ADDR (0x0423360)
 #define stdDisplay_VBufferLock_ADDR (0x04233C0)
 #define stdDisplay_VBufferUnlock_ADDR (0x0423450)
@@ -127,7 +127,6 @@ typedef struct render_pair
 void stdDisplay_SetGammaTable(int len, int *table);
 
 static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_waitforvblank_ADDR;
-static void (__cdecl *stdDisplay_free_texture)(stdVBuffer *a1) = (void*)stdDisplay_free_texture_ADDR;
 
 static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
 static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperativeLevel_ADDR;
@@ -150,6 +149,7 @@ static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(stdVBufferTexFmt *a1, int cr
 static int (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferLock_ADDR;
 static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferUnlock_ADDR;
 static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = (void*)stdDisplay_VBufferSetColorKey_ADDR;
+static void (__cdecl *stdDisplay_VBufferFree)(stdVBuffer *a1) = (void*)stdDisplay_VBufferFree_ADDR;
 #else
 int stdDisplay_Startup();
 int stdDisplay_VBufferFill(stdVBuffer *a2, int fillColor, rdRect *a4);
@@ -165,6 +165,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *a1, int create_ddraw_surface
 int stdDisplay_VBufferLock(stdVBuffer *a1);
 void stdDisplay_VBufferUnlock(stdVBuffer *a1);
 int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color);
+void stdDisplay_VBufferFree(stdVBuffer *vbuf);
 #endif
 
 #define stdDisplay_pCurDevice (*(stdVideoDevice**)0x0055B3E8)

@@ -298,12 +298,12 @@ void sithCogSound_PlaySoundClass(sithCog *ctx)
 
     if ( thing && thing->soundclass && (soundclass = sithSoundClass_ThingPlaySoundclass(thing, soundClassId)) != 0 )
     {
-        sithCogVm_PushInt(ctx, soundclass->field_58);
+        sithCogVm_PushInt(ctx, (intptr_t)soundclass->entries[14]);
         if (sithCogVm_multiplayerFlags
             && !(ctx->flags & 0x200))
         {
             if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSector_cogMsg_SoundClassPlay(thing, soundClassId, soundclass->field_58, -1.0);
+                sithSector_cogMsg_SoundClassPlay(thing, soundClassId, (intptr_t)soundclass->entries[14], -1.0);
         }
     }
     else

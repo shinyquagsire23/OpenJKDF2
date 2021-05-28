@@ -112,7 +112,7 @@ typedef struct sithWorld
     rdKeyframe* keyframes;
     int numAnimClassesLoaded;
     int numAnimClasses;
-    void* animclasses;
+    sithAnimclass* animclasses;
 } sithWorld;
 
 typedef int (*sithWorldSectionParser_t)(sithWorld*, int);

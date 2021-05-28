@@ -14,6 +14,7 @@ void stdDisplay_SetGammaTable(int len, int *table)
 
 #else
 #include <SDL2/SDL.h>
+#include <assert.h>
 
 int stdDisplay_Startup()
 {
@@ -145,10 +146,28 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     uint32_t rbitmask = ((1 << fmt->format.r_bits) - 1) << fmt->format.r_shift;
     uint32_t gbitmask = ((1 << fmt->format.g_bits) - 1) << fmt->format.g_shift;
     uint32_t bbitmask = ((1 << fmt->format.b_bits) - 1) << fmt->format.b_shift;
+    if (fmt->format.bpp == 8)
+    {
+        rbitmask = 0;
+        gbitmask = 0;
+        bbitmask = 0;
+    }
+
     SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, 0);
     
-    out->format.width_in_bytes = surface->pitch;
-    out->format.width_in_pixels = fmt->width;
+    if (surface)
+    {
+        static int num = 0;
+        //printf("Allocated VBuffer %u, w %u h %u bpp %u %x %x %x\n", num++, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask);
+        out->format.width_in_bytes = surface->pitch;
+        out->format.width_in_pixels = fmt->width;
+        out->format.texture_size_in_bytes = surface->pitch * fmt->height;
+    }
+    else
+    {
+        printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp);
+        assert(0);
+    }
     
     out->sdlSurface = surface;
     
@@ -176,12 +195,12 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 {
     if (!vbuf || !vbuf2) return 1;
     
-    rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
+    rdRect fallback = {0,0,vbuf2->format.width, vbuf2->format.height};
     if (!rect)
     {
         rect = &fallback;
-        memcpy(vbuf->sdlSurface->pixels, vbuf2->sdlSurface->pixels, 640*480);
-        return;
+        //memcpy(vbuf->sdlSurface->pixels, vbuf2->sdlSurface->pixels, 640*480);
+        //return;
     }
     
     if (vbuf->palette)
@@ -223,12 +242,15 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     uint8_t* dstPixels = vbuf->sdlSurface->pixels;
     uint32_t srcStride = vbuf2->format.width_in_bytes;
     uint32_t dstStride = vbuf->format.width_in_bytes;
+    
+    int has_alpha = !(rect->width == 640);
+    
     for (int i = 0; i < rect->width; i++)
     {
         for (int j = 0; j < rect->height; j++)
         {
-            uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];;
-            if (!pixel) continue;
+            uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
+            if (!pixel && has_alpha) continue;
 
             dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
         }
@@ -242,8 +264,19 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 {
     SDL_Rect dstRect = {rect->x, rect->y, rect->width, rect->height};
     
-    printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
-    SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
+    //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
+    
+    uint8_t* dstPixels = vbuf->sdlSurface->pixels;
+    uint32_t dstStride = vbuf->format.width_in_bytes;
+    for (int i = 0; i < rect->width; i++)
+    {
+        for (int j = 0; j < rect->height; j++)
+        {
+            dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = fillColor;
+        }
+    }
+    
+    //SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
 
     return 1;
 }
@@ -268,5 +301,12 @@ int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
         vbuf->transparent_color = color;
     }
     return 1;
+}
+
+void stdDisplay_VBufferFree(stdVBuffer *vbuf)
+{
+    stdDisplay_VBufferUnlock(vbuf);
+    SDL_FreeSurface(vbuf->sdlSurface);
+    std_pHS->free(vbuf);
 }
 #endif

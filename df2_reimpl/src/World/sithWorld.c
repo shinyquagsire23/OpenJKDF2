@@ -9,7 +9,7 @@
 #include "Cog/sithCog.h"
 #include "Cog/sithCogScript.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithAnimclass.h"
+#include "Engine/sithAnimClass.h"
 #include "AI/sithAIClass.h"
 #include "Engine/sithSoundClass.h"
 #include "stdPlatform.h"
@@ -30,7 +30,6 @@
 int (*sithThing_Load)(sithWorld* jkl, int b) = (void*)0x004CE710;
 int (*sithSector_Load)(sithWorld* jkl, int b) = (void*)0x004F8720;
 int (*sithWorld_LoadGeoresource)(sithWorld* jkl, int b) = (void*)0x004D0E70;
-int (*sithAnimClass_Load)(sithWorld* jkl, int b) = (void*)sithAnimClass_Load_ADDR;
 
 //#define jkl_read_copyright ((char*)0x833108)
 #define some_integer_4 (*(uint32_t*)0x8339E0)

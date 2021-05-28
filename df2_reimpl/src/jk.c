@@ -680,7 +680,7 @@ int jk_MessageBoxW()
 
 int stdGdi_GetHwnd()
 {
-    assert(0);
+    //assert(0);
     return 0;
 }
 
