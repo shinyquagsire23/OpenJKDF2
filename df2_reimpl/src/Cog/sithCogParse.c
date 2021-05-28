@@ -787,8 +787,8 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     {
         if ( stdConffile_entry.args[1].value != stdConffile_entry.args[1].key )
         {
-            _strncpy((char *)&cogScript->aIdk[cogScript->numIdk].field_18, stdConffile_entry.args[1].value, 0x1Fu);
-            cogScript->aIdk[cogScript->numIdk].field_34 &= 0xFFFFFF;
+            _strncpy(cogScript->aIdk[cogScript->numIdk].value, stdConffile_entry.args[1].value, 0x1Fu);
+            cogScript->aIdk[cogScript->numIdk].value[31] = 0;
         }
     }
     ++cogScript->numIdk;

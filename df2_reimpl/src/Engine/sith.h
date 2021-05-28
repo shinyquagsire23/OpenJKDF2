@@ -22,15 +22,18 @@
 
 #define dword_8EE678 (*(int*)0x008EE678)
 #define sith_bInitialized (*(int*)0x0082F0AC)
+#define sith_bOpened (*(int*)0x0082F0B0)
 
 int sith_Startup(struct common_functions *commonFuncs);
 void sith_UpdateCamera();
 int sith_Load(char *path);
+int sith_Mode1Init(char *a1);
 void sith_set_some_text_jk1(char *text);
+
 //static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 static void (*sith_AutoSave)() = (void*)sith_AutoSave_ADDR;
-static int (*sith_Mode1Init)(char*) = (void*)sith_Mode1Init_ADDR;
+//static int (*sith_Mode1Init)(char*) = (void*)sith_Mode1Init_ADDR;
 static int (*sith_Mode1Init_3)(char*) = (void*)sith_Mode1Init_3_ADDR;
 static void (*sith_Close)() = (void*)sith_Close_ADDR;
 

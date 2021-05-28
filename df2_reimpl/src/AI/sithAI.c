@@ -66,6 +66,18 @@ int sithAI_Startup()
     return 1;
 }
 
+int sithAI_Open()
+{
+    if (!sithAI_bInit)
+        return 0;
+
+    if (sithAI_bOpened)
+        return 0;
+
+    sithAI_bOpened = 1;
+    return 1;
+}
+
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3)
 {
     if ( sithAI_numCommands >= 0x20 )

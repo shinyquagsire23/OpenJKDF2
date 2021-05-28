@@ -58,14 +58,7 @@ typedef struct sithCogIdk
     int mask;
     int hash;
     char* desc;
-    int field_18;
-    int field_1C;
-    int field_20;
-    int field_24;
-    int field_28;
-    int field_2C;
-    int field_30;
-    int field_34;
+    char value[32];
 } sithCogIdk;
 
 typedef struct sithCogScript

@@ -130,6 +130,7 @@ typedef enum SURFACEFLAGS
 } SURFACEFLAGS;
 
 int sithSurface_Startup();
+int sithSurface_Open();
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;

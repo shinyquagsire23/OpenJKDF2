@@ -16,3 +16,9 @@ int sithSurface_Startup()
     sithSurface_numSurfaces = 0;
     return 1;
 }
+
+int sithSurface_Open()
+{
+    sithSurface_bOpened = 1;
+    return 1;
+}

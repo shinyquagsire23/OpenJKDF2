@@ -18,9 +18,11 @@
 #include "Engine/rdColormap.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
+#include "World/jkPlayer.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithSurface.h"
 #include "Cog/sithCog.h"
+#include "General/util.h"
 #include "jk.h"
 
 #define jkl_section_parsers ((sith_map_section_and_func*)0x833548)
@@ -210,7 +212,7 @@ sithWorld* sithWorld_New()
 
     result = (sithWorld *)pSithHS->alloc(sizeof(sithWorld));
     if ( result )
-        memset(result, 0, sizeof(sithWorld));
+        _memset(result, 0, sizeof(sithWorld));
     return result;
 }
 
@@ -444,4 +446,15 @@ uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
         }
     }
     return hash;
+}
+
+int sithWorld_Initialize()
+{
+    for (int i = 1; i < jkPlayer_maxPlayers; i++)
+    {
+        sithPlayer_Initialize(i);
+    }
+    sithPlayer_idk(0);
+    sithPlayer_ResetPalEffects();
+    return 1;
 }

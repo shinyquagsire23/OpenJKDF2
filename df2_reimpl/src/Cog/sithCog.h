@@ -53,6 +53,8 @@
 #define sithCogScript_RegisterGlobalMessage_ADDR (0x004E06C0)
 #define sithCogScript_RegisterVerb_ADDR (0x004E0700)
 
+#define sithCog_bOpened (*(int*)0x00836C2C)
+
 typedef int SITH_MESSAGE;
 
 enum SITH_MESSAGE_E
@@ -106,9 +108,11 @@ static int (*sithCogScript_Load)(sithWorld *world, int a2) = (void*)sithCogScrip
 static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
 static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
 static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
+static int (*sithCog_ThingsSectorsRegSymbolIdk)(sithCog *a1, sithCogIdk *a2, sithCogSymbol *a3) = (void*)sithCog_ThingsSectorsRegSymbolIdk_ADDR;
 
 int sithCog_Startup();
 void sithCog_Shutdown();
+int sithCog_Open();
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);
 
 void sithCogUtil_Initialize(void* a1);

@@ -56,7 +56,7 @@ typedef struct sithAICommand
 #define sithAI_commandsHashmap (*(stdHashTable**)0x0084DA40)
 #define sithAI_actorInitted ((int*)0x0084DA48)
 #define sithAI_maxActors (*(uint32_t*)0x0084DA44)
-#define sithAI_bOpen       (*(int*)0x84DE48)
+#define sithAI_bOpened     (*(int*)0x84DE48)
 #define sithAI_bInit       (*(int*)0x84DE4C)
 #define sithAI_commandList (*(sithAICommand**)0x0084DE50)
 #define sithAI_numCommands (*(uint32_t*)0x84DE54)

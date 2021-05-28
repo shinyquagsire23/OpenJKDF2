@@ -11,8 +11,8 @@
 #define sithSoundSys_SetMusicVol_ADDR (0x004DB080)
 #define sithSoundSys_ResumeMusic_ADDR (0x004DB0F0)
 #define sithSoundSys_Open_ADDR (0x004DB180)
-#define sithSoundSys_sub_4DB230_ADDR (0x004DB230)
-#define sithSoundSys_sub_4DB340_ADDR (0x004DB340)
+#define sithSoundSys_Close_ADDR (0x004DB230)
+#define sithSoundSys_ClearAll_ADDR (0x004DB340)
 #define sithSoundSys_StopAll_ADDR (0x004DB3C0)
 #define sithSoundSys_ResumeAll_ADDR (0x004DB410)
 #define sithSoundSys_sub_4DB460_ADDR (0x004DB460)
@@ -45,6 +45,14 @@
 #define sithSoundSys_bIsMuted (*(int*)0x00835FDC)
 #define sithSoundSys_musicVolume (*(float*)0x0054A678)
 #define sithSoundSys_globalVolume (*(float*)0x0054A67C)
+#define sithSoundSys_numSoundsAvailable2 (*(int*)0x00835FE0)
+#define sithSoundSys_numSoundsAvailable (*(int*)0x00835FE4)
+#define sithSoundSys_aPlayingSounds ((sithPlayingSound*)0x00835FE8)
+#define sithSoundSys_aIdk ((int*)0x00836B68)
+#define sithSoundSys_bOpened (*(int*)0x00836BEC)
+#define sithSoundSys_dword_836BF4 (*(int*)0x00836BF4)
+#define sithSoundSys_dword_836BF8 (*(int*)0x00836BF8)
+#define sithSoundSys_dword_836BFC (*(int*)0x00836BFC)
 
 enum SITHSOUNDFLAG
 {
@@ -66,7 +74,7 @@ typedef struct sithPlayingSound
     int anonymous_0;
     int vtable;
     int flags;
-    int anonymous_3;
+    int idx;
     float vol_2;
     int anonymous_5;
     int anonymous_6;

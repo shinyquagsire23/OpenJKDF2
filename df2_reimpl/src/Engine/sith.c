@@ -23,6 +23,7 @@
 #include "Engine/sithSoundSys.h"
 #include "World/sithWeapon.h"
 #include "Engine/sithRender.h"
+#include "Engine/sithControl.h"
 #include "jk.h"
 
 int sith_Startup(struct common_functions *commonFuncs)
@@ -77,6 +78,8 @@ int sith_Startup(struct common_functions *commonFuncs)
     return 1;
 }
 
+// sith_Shutdown
+
 void sith_UpdateCamera()
 {
     if ( (g_submodeFlags & 8) == 0 )
@@ -104,6 +107,35 @@ int sith_Load(char *path)
     sithWorld_pStatic = sithWorld_New();
     sithWorld_pStatic->level_type_maybe |= 1;
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
+}
+
+// sith_Free
+
+int sith_Mode1Init(char *a1)
+{
+    sithWorld_pCurWorld = sithWorld_New();
+
+    if ( !sithWorld_Load(sithWorld_pCurWorld, a1) )
+        return 0;
+
+    sithTime_Startup();
+    sithWorld_Initialize();
+    bShowInvisibleThings = 0;
+    sithRender_8EE678 = 1;
+    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithTimer_Open();
+    sithSurface_Open();
+    sithAI_Open();
+    sithSoundSys_Open();
+    sithCog_Open();
+    sithControl_Open();
+    sithSector_Startup();
+    sithRender_Open();
+    sithWeapon_InitializeEntry();
+    sithTime_Startup();
+    g_sithMode = 1;
+    sith_bOpened = 1;
+    return 1;
 }
 
 void sith_set_some_text_jk1(char *text)

@@ -132,6 +132,95 @@ void sithCog_Shutdown()
     sithCog_bInitted = 0;
 }
 
+int sithCog_Open()
+{
+    sithWorld *world; // ecx
+    signed int result; // eax
+    sithCog *v2; // ebx
+    sithCogIdk *v3; // ebp
+    sithCog *v5; // ebp
+    sithCogIdk *v6; // ebx
+    char *v7; // esi
+    sithCogSymbol *v8; // edx
+    int v10; // [esp+4h] [ebp-14h]
+    int v12; // [esp+8h] [ebp-10h]
+    char *v13; // [esp+Ch] [ebp-Ch]
+    sithCogSymbol *v14; // [esp+10h] [ebp-8h]
+    sithWorld *world_; // [esp+14h] [ebp-4h]
+
+    world = sithWorld_pCurWorld;
+    world_ = sithWorld_pCurWorld;
+    if ( sithCog_bOpened )
+        return 0;
+    if ( sithWorld_pStatic )
+    {
+        v2 = sithWorld_pStatic->cogs;
+        for (int i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
+        {
+            for (int j = 0; i < v2->cogscript->numIdk; j++)
+            {
+                v3 = &v2->cogscript->aIdk[j];
+                if ( strlen(v3->value) )
+                    sithCog_LoadEntry(&v2->symbolTable->buckets[v3->hash], v3, v3->value);
+            }
+            sithCog_SendMessage(v2++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
+            world = world_;
+        }
+    }
+    sithCog* cogs = world->cogs;
+    v12 = 0;
+    if ( world->numCogsLoaded )
+    {
+        while ( 1 )
+        {
+            v10 = 0;
+            v6 = cogs->cogscript->aIdk;
+            if ( cogs->cogscript->numIdk )
+                break;
+LABEL_25:
+            sithCog_SendMessage(cogs++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
+            if ( (unsigned int)++v12 >= world_->numCogsLoaded )
+                goto LABEL_26;
+        }
+
+        v13 = cogs->field_4BC;
+        while ( 1 )
+        {
+            sithCogIdk* idk = &cogs->cogscript->aIdk[v10];
+            v8 = &cogs->symbolTable->buckets[idk->hash];
+            v14 = v8;
+            if ( (idk->flags & 1) != 0 )
+            {
+                if ( _strlen(idk->value) )
+                    sithCog_LoadEntry(v8, v6, idk->value);
+                goto LABEL_24;
+            }
+            if ( strlen(v13) )
+                break;
+            if ( strlen(idk->value) )
+            {
+                sithCog_LoadEntry(v8, v6, idk->value);
+                goto LABEL_20;
+            }
+LABEL_21:
+            v13 += 32;
+            sithCog_ThingsSectorsRegSymbolIdk(cogs, v6, v8);
+LABEL_24:
+            ++v6;
+            if ( (unsigned int)++v10 >= cogs->cogscript->numIdk )
+                goto LABEL_25;
+        }
+        sithCog_LoadEntry(v8, v6, v13);
+LABEL_20:
+        v8 = v14;
+        goto LABEL_21;
+    }
+LABEL_26:
+    result = 1;
+    sithCog_bOpened = 1;
+    return result;
+}
+
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
 {
     sithCogSymbol *v5; // esi
