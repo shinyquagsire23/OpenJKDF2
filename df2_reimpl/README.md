@@ -1,9 +1,17 @@
 # DF2 Reimplementation
 
-This directory contains a WIP reimplementation of DF2 in C. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port. It also contains the original versions of `byacc` and `flex` for COG script parsing.
+This directory contains a function-by-function reimplementation of DF2 in C. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port. It also contains the original versions of `byacc` and `flex` for COG script parsing.
 
 ## Methodology
-Most functions are a copy-paste from IDA's Hex-Rays decompiler into the source material, with some cleanup and renaming. Most functions decompile fairly well as long as the structures are correct, though for loops often need reworking. If you'd like a copy of my IDB, let me know.
+The bulk of research and documentation occurs in IDA. Every function has been identified to a file prefix (ie `stdHashTable_`) with a corresponding .c/.h file. RenderDroid (`rd*`) and LEC stdlib (`std*`) functions are 90% canonically named, based on symbols from Grim Fandango Remastered.
+
+Reverse engineering is a parallel effort between structure documentation and function identification. Once structures are sufficiently documented, Hex-Rays can be used for decompilation. While most Hex-Rays output works outright, many loops and structures require manual intervention. Output is generally cleaned and tidied to remove redunant stack variables or too-deep nesting. `sizeof` and obvious inlining and macros should also be adjusted as appropriate.
+
+Engine variables and yet-to-be-decompiled functions are referenced using `define` macros and static function pointers, respectively. Once a file is decompiled enough that an engine variable is no longer referenced by non-decompiled code, the variables can be declared in their respective C files. For decompiled functions which are only referenced by non-decompiled functions, a `hook_function` call is added in `main.c` to redirect code execution to `df2_reimpl.dll` from `JK.EXE`.
+
+Progress is tracked using `analyze.py`, `output.map` and `ida_copypaste_funclist_nostdlib.txt`: After compiling `df2_reimpl.dll`, symbols can be compared against the `.idb` to determine how much of the original `.text` is actually in use, and how much has been hooked and replaced.
+
+If you'd like a copy of my IDB to examine functions which haven't been decompiled yet (or for any other use), let me know.
 
 ## Usage
 `df2_reimpl` supports both the KVM target from the directory above as well as WINE/Windows, though no guarantees are made for the addition of ie jkgfxmod, other patches nor other hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl_win.dll` is compiled without those linker flags.
@@ -25,9 +33,15 @@ TL;DR for Windows users
 - Compile df2_reimpl
 - Copy `df2_reimpl_win.dll` to the same folder as `JK.EXE`, renamed to `df2_reimpl.dll`
 
+## Linux Partial Compilation
+
+`openjkdf2` supports an experimental partial compilation for Linux/SDL2, using `make -f Makefile.linux`. `openjkdf2` can then be copied to the same directory as JK.EXE and run. It can currently access the player selection, singleplayer, options, and level loading screen before reaching unimplemented code.
+
+`mmap` is used to maintain all `.rodata`, `.data`, and `.bss` variables in the same addresses as `JK.EXE`, however if `openjkdf2` invokes an unimplemented function, it will segfault at the unimplemented function address.
+
 ## Current Progress
 
-Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (see `ida_copypaste_funclist.txt` for a full function name listing).
+Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (see `ida_copypaste_funclist_nostdlib.txt` for a full function name listing).
 
 ```
 [file]                         [size]     [% of text]   [% complete]  [decomp / total] 
