@@ -24,6 +24,7 @@ JK.asm
 JK_types.h
 build_run_dw.sh
 build_run_df2.sh
+build_run_openjkdf2.sh
 build_run_tpm.sh
 build_run_mots.sh
 *.txt

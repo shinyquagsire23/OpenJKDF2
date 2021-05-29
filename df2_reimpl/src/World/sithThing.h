@@ -262,7 +262,7 @@ typedef struct jkPlayerInfo jkPlayerInfo;
 typedef struct sithActor
 {
     sithThing *thing;
-    sithAI *sith_ai;
+    sithAIClass *aiclass;
     int mode;
     int field_C;
     int field_10;
@@ -360,7 +360,7 @@ typedef struct sithActor
     int field_180;
     int field_184;
     int field_188;
-    int field_18C;
+    uint32_t numAIClassEntries;
     int field_190;
     int field_194;
     float field_198;
@@ -693,7 +693,7 @@ typedef struct sithThing
     uint32_t field_260;
     float waggle;
     rdVector3 field_268;
-    void* ai;
+    sithAIClass* aiclass;
     sithActor* actor;
     char template_name[32];
     sithCog* class_cog;
@@ -718,9 +718,10 @@ sithThing* sithThing_GetThingByIdx(int idx);
 int sithThing_DoesRdThingInit(sithThing *thing);
 sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2);
 int sithThing_ParseArgs(stdConffileArg *arg, sithThing *thing);
+int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param);
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 
-static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
+//static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
 static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
 static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
 //static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;

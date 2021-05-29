@@ -7,7 +7,7 @@
 #define sithSoundClass_Startup_ADDR (0x004E63E0)
 #define sithSoundClass_Shutdown_ADDR (0x004E6480)
 #define sithSoundClass_Load_ADDR (0x004E64C0)
-#define sithSoundClass_sub_4E66E0_ADDR (0x004E66E0)
+#define sithSoundClass_LoadFile_ADDR (0x004E66E0)
 #define sithSoundClass_LoadEntry_ADDR (0x004E67D0)
 #define sithSoundClass_allocidk_ADDR (0x004E6980)
 #define sithSoundClass_Free_ADDR (0x004E69E0)
@@ -143,6 +143,7 @@ typedef struct sithSoundClass
 
 int sithSoundClass_Startup();
 int sithSoundClass_Load(sithWorld *world, int a2);
+sithSoundClass* sithSoundClass_LoadFile(char *fpath);
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
 
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;

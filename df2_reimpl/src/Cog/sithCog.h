@@ -109,6 +109,7 @@ static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderTyp
 static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
 static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
 static int (*sithCog_ThingsSectorsRegSymbolIdk)(sithCog *a1, sithCogIdk *a2, sithCogSymbol *a3) = (void*)sithCog_ThingsSectorsRegSymbolIdk_ADDR;
+static sithCog* (*sithCog_LoadCogscript)(const char *fpath) = (void*)sithCog_LoadCogscript_ADDR;
 
 int sithCog_Startup();
 void sithCog_Shutdown();

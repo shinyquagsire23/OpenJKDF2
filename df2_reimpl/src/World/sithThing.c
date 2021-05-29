@@ -11,22 +11,46 @@
 #include "World/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
+#include "World/sithExplosion.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithParticle.h"
+#include "Engine/sithSoundClass.h"
+#include "Engine/sithAnimClass.h"
+#include "Engine/sithModel.h"
+#include "Engine/sithSprite.h"
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
 #include "AI/sithAI.h"
+#include "AI/sithAIClass.h"
 #include "Cog/sithCog.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 #define NUM_THING_PARAMS (72)
+#define NUM_THING_TYPES (13)
 
 int sithThing_bInitted;
 int sithThing_bInitted2;
 
-char* sithThing_aParams[NUM_THING_PARAMS] = {
+const char* sithThing_aTypes[NUM_THING_TYPES] = {
+    "free",
+    "camera",
+    "actor",
+    "weapon",
+    "debris",
+    "item",
+    "explosion",
+    "cog",
+    "ghost",
+    "corpse",
+    "player",
+    "particle",
+    "--invalid--"
+};
+
+const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "type",
     "collide",
     "move",
@@ -443,13 +467,257 @@ LABEL_10:
     {
         if ( thing->move_type != MOVETYPE_PATH )
             goto LABEL_18;
-        v8 = sithTrackThing_LoadPathParams(&arg->key, thing, paramIdx);
+        v8 = sithTrackThing_LoadPathParams(arg, thing, paramIdx);
     }
     v2 = v8;
 LABEL_18:
     if ( v2 )
         return 1;
     return thing->thingtype == THINGTYPE_ACTOR && sithAI_LoadThingActorParams(arg, thing, paramIdx);
+}
+
+int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
+{
+    int v3; // ebp
+    const char **v4; // edi
+    int v5; // eax
+    int32_t v6; // eax
+    int32_t v7; // eax
+    int result; // eax
+    char *v9; // ecx
+    sithAIClass *v10; // eax
+    sithActor *v11; // esi
+    int v12; // eax
+    double v13; // st7
+    int v14; // eax
+    double v15; // st7
+    double v16; // st7
+    int v17; // ecx
+    double v18; // st7
+    void *v19; // eax
+    rdParticle *v20; // edi
+    rdSprite *v21; // eax
+    sithAnimclass *v22; // eax
+    sithCog *v23; // eax
+    int v24; // eax
+    rdVector3 a3a; // [esp+10h] [ebp-Ch] BYREF
+
+    switch ( param )
+    {
+        case THINGPARAM_TYPE:
+            v3 = THINGTYPE_FREE;
+            v4 = (const char **)sithThing_aTypes;
+            while ( _strcmp(arg->value, *v4) )
+            {
+                ++v4;
+                ++v3;
+                if ( (intptr_t)v4 >= (intptr_t)sithThing_aTypes[NUM_THING_TYPES-1])
+                {
+                    v5 = THINGTYPE_FREE;
+                    goto LABEL_6;
+                }
+            }
+            v5 = v3;
+LABEL_6:
+            thing->thingType = v5;
+            v6 = v5 - 2;
+            if ( v6 )
+            {
+                v7 = v6 - 4;
+                if ( v7 )
+                {
+                    if ( v7 != 5 )
+                        goto LABEL_58;
+                    thing->thingtype = THINGTYPE_COG;
+                    result = 1;
+                }
+                else
+                {
+                    thing->thingtype = THINGTYPE_EXPLOSION;
+                    result = 1;
+                }
+            }
+            else
+            {
+                thing->thingtype = THINGTYPE_ACTOR;
+                result = 1;
+            }
+            break;
+        case THINGPARAM_COLLIDE:
+            v12 = _atoi(arg->value);
+            if ( v12 < 0 || v12 > 3 )
+                goto LABEL_59;
+            thing->collide = v12;
+            result = 1;
+            break;
+        case THINGPARAM_MOVE:
+            if ( !_strcmp(arg->value, "physics") )
+            {
+                thing->move_type = MOVETYPE_PHYSICS;
+                result = 1;
+            }
+            else if ( !_strcmp(arg->value, "path") )
+            {
+                thing->move_type = MOVETYPE_PATH;
+                result = 1;
+            }
+            else
+            {
+                if ( _strcmp(arg->value, "none") )
+                    goto LABEL_59;
+                thing->move_type = MOVETYPE_NONE;
+                result = 1;
+            }
+            break;
+        case THINGPARAM_SIZE:
+            v13 = _atof(arg->value);
+            if ( v13 < 0.0 )
+                goto LABEL_56;
+            thing->moveSize = v13;
+            thing->collideSize = v13;
+            result = 1;
+            break;
+        case THINGPARAM_THINGFLAGS:
+            if ( _sscanf(arg->value, "%x", &param) != 1 )
+                goto LABEL_59;
+            thing->thingflags = param;
+            result = 1;
+            break;
+        case THINGPARAM_TIMER:
+            v18 = _atof(arg->value);
+            if ( v18 < 0.0 )
+                goto LABEL_56;
+            thing->lifeLeftMs = (__int64)(v18 * 1000.0);
+            result = 1;
+            break;
+        case THINGPARAM_LIGHT:
+            v16 = _atof(arg->value);
+            if ( v16 < 0.0 )
+                goto LABEL_56;
+            v17 = thing->thingflags;
+            thing->light = v16;
+            thing->lightMin = v16;
+            thing->thingflags = v17 | 1;
+            result = 1;
+            break;
+        case THINGPARAM_SOUNDCLASS:
+            thing->soundclass = sithSoundClass_LoadFile(arg->value);
+            result = 1;
+            break;
+        case THINGPARAM_MODEL3D:
+            rdThing_FreeEntry(&thing->rdthing);
+            v19 = sithModel_LoadEntry(arg->value, 0);
+            if ( v19 )
+            {
+                rdThing_SetModel3(&thing->rdthing, (rdModel3 *)v19);
+                if ( thing->collideSize == 0.0 )
+                    thing->collideSize = thing->rdthing.model3->radius;
+                if ( thing->moveSize != 0.0 )
+                    goto LABEL_58;
+                result = 1;
+                thing->moveSize = thing->rdthing.model3->radius;
+            }
+            else
+            {
+                stdPrintf(
+                    pSithHS->errorPrint,
+                    ".\\World\\sithThing.c",
+                    2540,
+                    "Could not load model '%s' specified on line %d.\n",
+                    arg->value,
+                    stdConffile_linenum);
+                result = 0;
+            }
+            break;
+        case THINGPARAM_SPRITE:
+            rdThing_FreeEntry(&thing->rdthing);
+            v21 = sithSprite_LoadEntry(arg->value);
+            if ( v21 )
+            {
+                rdThing_SetSprite3(&thing->rdthing, v21);
+                result = 1;
+            }
+            else
+            {
+                stdPrintf(pSithHS->errorPrint, ".\\World\\sithThing.c", 2573, "Could not create sprite %s, line %d.\n", arg->value, stdConffile_linenum);
+                result = 0;
+            }
+            break;
+        case THINGPARAM_PUPPET:
+            v22 = sithAnimClass_LoadEntry(arg->value);
+            thing->animclass = v22;
+            if ( !v22 || thing->rdthing.puppet )
+                goto LABEL_58;
+            rdPuppet_New(&thing->rdthing);
+            result = 1;
+            break;
+        case THINGPARAM_AICLASS:
+            v9 = arg->value;
+            thing->thingtype = 2;
+            v10 = sithAIClass_Load(v9);
+            thing->aiclass = v10;
+            v11 = thing->actor;
+            if ( !v11 || !v10 )
+                goto LABEL_58;
+            v11->aiclass = v10;
+            v11->numAIClassEntries = v10->numEntries;
+            result = 1;
+            break;
+        case THINGPARAM_COG:
+            v23 = sithCog_LoadCogscript(arg->value);
+            thing->class_cog = v23;
+            if ( !v23 )
+                goto LABEL_58;
+            v23->flags |= 0x60u;
+            thing->thingflags |= SITH_TF_CAPTURED;
+            result = 1;
+            break;
+        case THINGPARAM_PARTICLE:
+            v20 = sithParticle_LoadEntry(arg->value);
+            if ( !v20 )
+                goto LABEL_58;
+            rdThing_FreeEntry(&thing->rdthing);
+            rdThing_SetParticleCloud(&thing->rdthing, v20);
+            result = 1;
+            break;
+        case THINGPARAM_MOVESIZE:
+            v14 = thing->thingType;
+            if ( v14 == THINGTYPE_ACTOR || v14 == THINGTYPE_PLAYER )
+                goto LABEL_58;
+            v15 = _atof(arg->value);
+            if ( v15 < 0.0 )
+            {
+LABEL_56:
+                result = 0;
+            }
+            else
+            {
+                thing->moveSize = v15;
+                result = 1;
+            }
+            break;
+        case THINGPARAM_CREATETHING:
+            thing->template = sithTemplate_GetEntryByName(arg->value);
+            result = 1;
+            break;
+        case THINGPARAM_ORIENT:
+            if ( _sscanf(arg->value, "(%f/%f/%f)", &a3a, &a3a.y, &a3a.z) == 3 )
+            {
+                rdMatrix_BuildRotate34(&thing->lookOrientation, &a3a);
+LABEL_58:
+                result = 1;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+        default:
+LABEL_59:
+            result = 0;
+            break;
+    }
+    return result;
 }
 
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)

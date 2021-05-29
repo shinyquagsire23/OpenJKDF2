@@ -910,6 +910,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithExplosion_CreateThing_ADDR, sithExplosion_CreateThing);
     hook_function(sithExplosion_Tick_ADDR, sithExplosion_Tick);
     hook_function(sithExplosion_UpdateForce_ADDR, sithExplosion_UpdateForce);
+    hook_function(sithExplosion_LoadThingParams_ADDR, sithExplosion_LoadThingParams);
     
     // sithCorpse
     hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);

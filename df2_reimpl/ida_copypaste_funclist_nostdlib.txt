@@ -2325,7 +2325,7 @@ sithSurface_sub_4E5A10	.text	004E5A10	00000011	00000000	00000004	R	.	.	.	.	.	T	.
 sithSurface_sub_4E5A30	.text	004E5A30	00000011	00000000	00000004	R	.	.	.	.	.	.	.
 sithSurface_New	.text	004E5A50	00000078	0000000C	00000008	R	.	.	.	.	.	T	.
 sithSurface_sub_4E5AD0	.text	004E5AD0	0000006E	0000000C	00000008	R	.	.	.	.	.	.	.
-sithSurface_Free	.text	004E5B40	000000C0	00000010	00000004	R	.	.	.	.	.	.	.
+sithSurface_Free	.text	004E5B40	000000C0	00000010	00000004	R	.	.	.	.	.	T	.
 sithSurface_Load	.text	004E5C00	00000586	0000002C	00000004	R	.	.	.	.	.	T	.
 sithSurface_sub_4E6190	.text	004E6190	00000016	00000000	00000004	R	.	.	.	.	.	.	.
 sithSurface_Verify	.text	004E61B0	00000039	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2337,7 +2337,7 @@ sithSurface_sub_4E63B0	.text	004E63B0	0000002F	00000000	00000004	R	.	.	.	.	.	.	.
 sithSoundClass_Startup	.text	004E63E0	00000091	00000008	00000000	R	.	.	.	.	.	.	.
 sithSoundClass_Shutdown	.text	004E6480	00000039			R	.	.	.	.	.	.	.
 sithSoundClass_Load	.text	004E64C0	0000021E	00000090	00000008	R	.	.	.	.	.	T	.
-sithSoundClass_sub_4E66E0	.text	004E66E0	000000E3	00000090	00000004	R	.	.	.	.	.	T	.
+sithSoundClass_LoadFile	.text	004E66E0	000000E3	00000090	00000004	R	.	.	.	.	.	T	.
 sithSoundClass_LoadEntry	.text	004E67D0	000001A4	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_allocidk	.text	004E6980	0000005E	0000000C	00000008	R	.	.	.	.	.	.	.
 sithSoundClass_Free	.text	004E69E0	00000044	0000000C	00000004	R	.	.	.	.	.	.	.

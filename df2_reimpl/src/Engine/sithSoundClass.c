@@ -202,6 +202,36 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     return result;
 }
 
+sithSoundClass* sithSoundClass_LoadFile(char *fpath)
+{
+    sithWorld *v1; // ebx
+    sithSoundClass *result; // eax
+    int v3; // eax
+    sithSoundClass *v4; // esi
+    stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
+    char v6[128]; // [esp+10h] [ebp-80h] BYREF
+
+    v1 = sithWorld_pLoading;
+    if ( !_strcmp(fpath, "none") || !sithWorld_pLoading->soundclasses )
+        return 0;
+    _sprintf(v6, "%s%c%s", "misc\\snd", '\\', fpath);
+    result = (sithSoundClass *)stdHashTable_GetKeyVal(sithSoundClass_hashtable, fpath);
+    if ( result )
+        return result;
+    v3 = v1->numSoundClassesLoaded;
+    if ( v3 == v1->numSoundClasses )
+        return 0;
+    v4 = &v1->soundclasses[v3];
+    _strncpy(v4->snd_fname, fpath, 0x1Fu);
+    v4->snd_fname[31] = 0;
+    if ( !sithSoundClass_LoadEntry(v4, v6) )
+        return 0;
+    v5 = sithSoundClass_hashtable;
+    ++v1->numSoundClassesLoaded;
+    stdHashTable_SetKeyVal(v5, v4->snd_fname, v4);
+    return v4;
+}
+
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
 {
     uint32_t soundIdx; // ebp

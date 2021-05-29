@@ -53,6 +53,39 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     return 1;
 }
 
+sithAnimclass* sithAnimClass_LoadEntry(char *a1)
+{
+    sithAnimclass *result; // eax
+    int v3; // ecx
+    sithAnimclass *v4; // esi
+    stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
+    char v6[128]; // [esp+10h] [ebp-80h] BYREF
+
+    result = (sithAnimclass *)stdHashTable_GetKeyVal(sithPuppet_hashtable, a1);
+    if ( !result )
+    {
+        v3 = sithWorld_pLoading->numAnimClassesLoaded;
+        if ( v3 == sithWorld_pLoading->numAnimClasses
+          || (v4 = &sithWorld_pLoading->animclasses[v3],
+              memset(v4, 0, sizeof(sithAnimclass)),
+              _strncpy(v4->name, a1, 0x1Fu),
+              v4->name[31] = 0,
+              _sprintf(v6, "%s%c%s", "misc\\pup", 92, a1),
+              !sithAnimClass_LoadPupEntry(v4, v6)) )
+        {
+            result = 0;
+        }
+        else
+        {
+            v5 = sithPuppet_hashtable;
+            ++sithWorld_pLoading->numAnimClassesLoaded;
+            stdHashTable_SetKeyVal(v5, v4->name, v4);
+            result = v4;
+        }
+    }
+    return result;
+}
+
 int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
 {
     int mode; // ebx
