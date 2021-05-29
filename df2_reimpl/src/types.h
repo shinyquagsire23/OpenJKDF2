@@ -36,6 +36,7 @@ typedef struct jkEpisodeEntry jkEpisodeEntry;
 
 typedef struct sithAdjoin sithAdjoin;
 typedef struct sithAIClass sithAIClass;
+typedef struct sithAIClassEntry sithAIClassEntry;
 typedef struct sithCog sithCog;
 typedef struct sithCogMsg sithCogMsg;
 typedef struct sithSector sithSector;

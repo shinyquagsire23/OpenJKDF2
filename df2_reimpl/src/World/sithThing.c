@@ -321,6 +321,137 @@ sithThing* sithThing_GetThingByIdx(int idx)
     return result;
 }
 
+int sithThing_DoesRdThingInit(sithThing *thing)
+{
+    int v2; // ebp
+    int result; // eax
+    int thinga; // [esp+14h] [ebp+4h]
+
+    v2 = thing->thingIdx;
+    thinga = thing->signature;
+    _memset(thing, 0, sizeof(sithThing));
+    _memcpy(&thing->lookOrientation, &rdroid_identMatrix34, sizeof(thing->lookOrientation));
+    result = rdThing_NewEntry(&thing->rdthing, thing);
+    thing->thingIdx = v2;
+    thing->signature = thinga;
+    return result;
+}
+
+sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
+{
+    int v3; // ecx
+    int v4; // edx
+    sithThingFrame *v6; // eax
+    int v7; // ecx
+    sithThingFrame *v8; // esi
+    sithThing *result; // eax
+    int v10; // [esp+10h] [ebp-Ch]
+    int v11; // [esp+14h] [ebp-8h]
+    sithThing *v12; // [esp+18h] [ebp-4h]
+    sithThing *thinga; // [esp+20h] [ebp+4h]
+
+    v3 = thing->thing_id;
+    v4 = thing->signature;
+    thinga = (sithThing *)thing->thingIdx;
+    v11 = v3;
+    v10 = v4;
+    v12 = thing->rdthing.parentSithThing;
+    if ( a2 )
+    {
+        _memcpy(thing, a2, sizeof(sithThing));
+        if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
+        {
+            rdThing_SetModel3(&thing->rdthing, thing->rdthing.model3);
+        }
+        else if ( thing->rdthing.type == RD_THINGTYPE_PARTICLECLOUD )
+        {
+            rdThing_SetParticleCloud(&thing->rdthing, thing->rdthing.particlecloud);
+        }
+        if ( thing->animclass )
+            rdPuppet_New(&thing->rdthing);
+        if ( thing->move_type == MOVETYPE_PATH && thing->trackParams.frames )
+        {
+            v6 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
+            v7 = thing->trackParams.numFrames;
+            v8 = a2->trackParams.frames;
+            thing->trackParams.frames = v6;
+            _memcpy(v6, v8, sizeof(sithThingFrame) * v7);
+        }
+    }
+    else
+    {
+        _memset(thing, 0, sizeof(sithThing));
+        _memcpy(&thing->lookOrientation, &rdroid_identMatrix34, sizeof(thing->lookOrientation));
+        rdThing_NewEntry(&thing->rdthing, thing);
+        thing->thingIdx = (int)thinga;
+        thing->signature = v10;
+    }
+    thing->thingIdx = (int)thinga;
+    result = v12;
+    thing->templateBase = a2;
+    thing->thing_id = v11;
+    thing->signature = v10;
+    thing->rdthing.parentSithThing = v12;
+    return result;
+}
+
+int sithThing_ParseArgs(stdConffileArg *arg, sithThing *thing)
+{
+    int v2; // ebp
+    int param; // eax
+    int paramIdx; // edi
+    int v7; // eax
+    int v8; // eax
+
+    v2 = 0;
+    param = (int)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
+    paramIdx = param;
+    if ( !param )
+        return 0;
+    if ( sithThing_LoadThingParam(arg, thing, param) )
+        return 1;
+    switch ( thing->thingType )
+    {
+        case THINGTYPE_ACTOR:
+        case THINGTYPE_PLAYER:
+            v7 = sithThing_LoadActorPlayerParams(arg, thing, paramIdx);
+            goto LABEL_10;
+        case THINGTYPE_WEAPON:
+            v7 = sithWeapon_LoadParams(arg, thing, paramIdx);
+            goto LABEL_10;
+        case THINGTYPE_ITEM:
+            v7 = sithItem_LoadThingParams(arg, thing, paramIdx);
+            goto LABEL_10;
+        case THINGTYPE_EXPLOSION:
+            v7 = sithExplosion_LoadThingParams(arg, thing, paramIdx);
+            goto LABEL_10;
+        case THINGTYPE_PARTICLE:
+            v7 = sithParticle_LoadThingParams(arg, thing, paramIdx);
+LABEL_10:
+            v2 = v7;
+            break;
+        default:
+            break;
+    }
+    if ( v2 )
+        return 1;
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        v8 = sithSector_LoadThingPhysicsParams(arg, thing, paramIdx);
+    }
+    else
+    {
+        if ( thing->move_type != MOVETYPE_PATH )
+            goto LABEL_18;
+        v8 = sithTrackThing_LoadPathParams(&arg->key, thing, paramIdx);
+    }
+    v2 = v8;
+LABEL_18:
+    if ( v2 )
+        return 1;
+    return thing->thingtype == THINGTYPE_ACTOR && sithAI_LoadThingActorParams(arg, thing, paramIdx);
+}
+
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
 {
     uint32_t hash;

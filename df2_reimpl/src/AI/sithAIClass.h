@@ -13,16 +13,41 @@
 
 #define sithAIClass_hashmap (*(stdHashTable**)0x00852F88)
 
+typedef struct sithAIClassEntry
+{
+  int param1;
+  int param2;
+  int param3;
+  float argsAsFloat[16];
+  int argsAsInt[16];
+  int func;
+} sithAIClassEntry;
+
 typedef struct sithAIClass
 {
-    uint8_t unk[0x94c];
+  int index;
+  int field_4;
+  float alignment;
+  float rank;
+  float maxStep;
+  float sightDist;
+  float hearDist;
+  float fov;
+  float wakeupDist;
+  float accuracy;
+  int numEntries;
+  sithAIClassEntry entries[16];
+  char fpath[32];
 } sithAIClass;
 
 int sithAIClass_Startup();
+int sithAIClass_ParseSection(sithWorld *world, int a2);
+sithAIClass* sithAIClass_Load(char *fpath);
+int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass);
 
 //static int (*sithAIClass_Startup)() = (void*)sithAIClass_Startup_ADDR;
-static int (*sithAIClass_ParseSection)(sithWorld *world, int a2) = (void*)sithAIClass_ParseSection_ADDR;
-static sithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
+//static int (*sithAIClass_ParseSection)(sithWorld *world, int a2) = (void*)sithAIClass_ParseSection_ADDR;
+//static sithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
 static void (*sithAIClass_Free)(sithWorld *a1) = (void*)sithAIClass_Free_ADDR;
 
 #endif // _SITHAICLASS_H

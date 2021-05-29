@@ -22,18 +22,18 @@ typedef struct rdVertexIdxInfo
 
 typedef struct rdFace
 {
-    int num;
-    int type;
-    int geometryMode;
-    int lightingMode;
-    int textureMode;
-    int numVertices;
+    uint32_t num;
+    uint32_t type;
+    uint32_t geometryMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
+    uint32_t numVertices;
     int* vertexPosIdx;
     int* vertexUVIdx;
     rdMaterial* material;
-    int field_24;
-    rdVector2 field_28;
-    float extralight;
+    uint32_t wallCel;
+    rdVector2 clipIdk;
+    float extraLight;
     rdVector3 normal;
 } rdFace;
 

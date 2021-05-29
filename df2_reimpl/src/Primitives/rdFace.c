@@ -23,13 +23,13 @@ int rdFace_NewEntry(rdFace* out)
     out->vertexPosIdx = 0;
     out->vertexUVIdx = 0;
     out->material = 0;
-    out->field_24 = -1;
+    out->wallCel = -1;
     out->normal.x = 0.0;
     out->normal.y = 0.0;
     out->normal.z = 0.0;
-    out->field_28.x = 0.0;
-    out->field_28.y = 0.0;
-    out->extralight = 0.0;
+    out->clipIdk.x = 0.0;
+    out->clipIdk.y = 0.0;
+    out->extraLight = 0.0;
     return 1;
 }
 

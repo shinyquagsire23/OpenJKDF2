@@ -24,12 +24,12 @@
 #include "Engine/sithAdjoin.h"
 #include "Cog/sithCog.h"
 #include "General/util.h"
+#include "World/sithPlayer.h"
 #include "jk.h"
 
 #define jkl_section_parsers ((sith_map_section_and_func*)0x833548)
 
 int (*sithThing_Load)(sithWorld* jkl, int b) = (void*)0x004CE710;
-int (*sithSector_Load)(sithWorld* jkl, int b) = (void*)0x004F8720;
 
 //#define jkl_read_copyright ((char*)0x833108)
 #define some_integer_4 (*(uint32_t*)0x8339E0)

@@ -2,6 +2,7 @@
 #define _SITHSURFACE_H
 
 #include "types.h"
+#include "Primitives/rdFace.h"
 
 #define sithSurface_sub_4E5A10_ADDR (0x004E5A10)
 #define sithSurface_sub_4E5A30_ADDR (0x004E5A30)
@@ -44,23 +45,12 @@
 #define sithSurface_numSurfaces (*(int*)0x0084E350)
 #define sithSurface_aSurfaces ((rdSurface*)0x0084E358) // 256
 #define sithSurface_bOpened (*(int*)0x00852F58)
+#define sithSurface_byte_8EE668 (*(uint8_t*)0x008EE668)
 
 typedef struct sithSurfaceInfo
 {
-    uint32_t field_0;
-    uint32_t faceType;
-    uint32_t geoMode;
-    uint32_t lightMode;
-    uint32_t texMode;
-    uint32_t numVertices;
-    int* vertexIdxs;
-    int* vertexUVIdxs;
-    rdMaterial* material;
-    uint32_t wallCel;
-    rdVector2 clipIdk;
-    float extraLight;
-    rdVector3 surfaceNormal;
-    int* field_40;
+    rdFace face;
+    float* field_40;
     uint32_t lastTouchedMs;
 } sithSurfaceInfo;
 
@@ -132,9 +122,10 @@ typedef enum SURFACEFLAGS
 int sithSurface_Startup();
 int sithSurface_Open();
 int sithSurface_Verify(sithWorld *world);
+int sithSurface_Load(sithWorld *world);
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
-static int (*sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
+static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;

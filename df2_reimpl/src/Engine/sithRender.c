@@ -331,25 +331,25 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
 
         adjoinSurface = adjoinIter->surface;
-        adjoinMat = adjoinSurface->surfaceInfo.material;
+        adjoinMat = adjoinSurface->surfaceInfo.face.material;
         if ( adjoinMat )
         {
-            int v19 = adjoinSurface->surfaceInfo.wallCel;
+            int v19 = adjoinSurface->surfaceInfo.face.wallCel;
             if ( v19 == -1 )
                 v19 = adjoinMat->celIdx;
             v51 = adjoinMat->texinfos[v19];
         }
-        v20 = &sithWorld_pCurWorld->vertices[*adjoinSurface->surfaceInfo.vertexIdxs];
-        float dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.surfaceNormal.y
-            + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.surfaceNormal.z
-            + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.surfaceNormal.x;
+        v20 = &sithWorld_pCurWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
+        float dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
+            + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
+            + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
         if ( dist > 0.0 || (dist == 0.0 && sector == sithCamera_currentCamera->sector))
         {
             if ( adjoinSurface->field_4 != sithRender_8EE678 )
             {
-                for (int i = 0; i < adjoinSurface->surfaceInfo.numVertices; i++)
+                for (int i = 0; i < adjoinSurface->surfaceInfo.face.numVertices; i++)
                 {
-                    v25 = adjoinSurface->surfaceInfo.vertexIdxs[i];
+                    v25 = adjoinSurface->surfaceInfo.face.vertexPosIdx[i];
                     if ( sithWorld_pCurWorld->alloc_unk98[v25] != sithRender_8EE678 )
                     {
                         rdMatrix_TransformPoint34(&sithWorld_pCurWorld->verticesTransformed[v25], &sithWorld_pCurWorld->vertices[v25], &rdCamera_pCurCamera->view_matrix);
@@ -358,17 +358,17 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 }
                 adjoinSurface->field_4 = sithRender_8EE678;
             }
-            sithRender_idxInfo.numVertices = adjoinSurface->surfaceInfo.numVertices;
-            sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.vertexIdxs;
+            sithRender_idxInfo.numVertices = adjoinSurface->surfaceInfo.face.numVertices;
+            sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
             meshinfo_out.verticesProjected = vertices_tmp;
-            sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.vertexUVIdxs;
-            rdPrimit3_ClipFace(frustumArg, 2, 1, 0, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.clipIdk);
+            sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
+            rdPrimit3_ClipFace(frustumArg, 2, 1, 0, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
             if ( (meshinfo_out.numVertices >= 3u || (sithRender_cullingFlags & 0x40) != 0)
               && ((sithRender_cullingFlags & 0x41) != 0
                || (adjoinIter->flags & 1) != 0
-               && (!adjoinSurface->surfaceInfo.material
-                || !adjoinSurface->surfaceInfo.geoMode
-                || (adjoinSurface->surfaceInfo.faceType & 2) != 0
+               && (!adjoinSurface->surfaceInfo.face.material
+                || !adjoinSurface->surfaceInfo.face.geometryMode
+                || (adjoinSurface->surfaceInfo.face.type & 2) != 0
                 || (v51->header.texture_type & 8) != 0 && (v51->texture_ptr->alpha_en & 1) != 0)) )
             {
                 rdCamera_pCurCamera->projectLst(vertices_tmp_projected, vertices_tmp, meshinfo_out.numVertices);
@@ -487,7 +487,7 @@ void sithRender_RenderLevelGeometry()
     rdClipFrustum *v77; // [esp+3Ch] [ebp-28h]
     int v78[3]; // [esp+40h] [ebp-24h] BYREF
     int v79[3]; // [esp+4Ch] [ebp-18h] BYREF
-    int v80[3]; // [esp+58h] [ebp-Ch] BYREF
+    float v80[3]; // [esp+58h] [ebp-Ch] BYREF
 
     if ( rdroid_curAcceleration )
     {
@@ -572,20 +572,20 @@ LABEL_151:
         level = sithWorld_pCurWorld;
         while ( 1 )
         {
-            if ( !v65->surfaceInfo.geoMode )
+            if ( !v65->surfaceInfo.face.geometryMode )
                 goto LABEL_150;
             vertices_alloc = level->vertices;
-            if ( (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.vertexIdxs].z) * v65->surfaceInfo.surfaceNormal.z
-               + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.vertexIdxs].y) * v65->surfaceInfo.surfaceNormal.y
-               + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.vertexIdxs].x) * v65->surfaceInfo.surfaceNormal.x <= 0.0 )
+            if ( (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].z) * v65->surfaceInfo.face.normal.z
+               + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].y) * v65->surfaceInfo.face.normal.y
+               + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].x) * v65->surfaceInfo.face.normal.x <= 0.0 )
                 goto LABEL_150;
-            rdMaterial* surfaceMat = v65->surfaceInfo.material;
+            rdMaterial* surfaceMat = v65->surfaceInfo.face.material;
             if ( surfaceMat )
             {
-                if ( v65->surfaceInfo.wallCel == -1 )
+                if ( v65->surfaceInfo.face.wallCel == -1 )
                     v10 = surfaceMat->texinfos[surfaceMat->celIdx];
                 else
-                    v10 = surfaceMat->texinfos[v65->surfaceInfo.wallCel];
+                    v10 = surfaceMat->texinfos[v65->surfaceInfo.face.wallCel];
                 v73 = v10;
             }
             else
@@ -593,7 +593,7 @@ LABEL_151:
                 v10 = v73;
             }
 
-            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.faceType & 2) != 0 || (v10->header.texture_type & 8) != 0 && (v10->texture_ptr->alpha_en & 1) != 0) )
+            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10->header.texture_type & 8) != 0 && (v10->texture_ptr->alpha_en & 1) != 0) )
             {
                 if (sithRender_numSurfaces < 32)
                 {
@@ -603,9 +603,9 @@ LABEL_151:
             }
             if ( v65->field_4 != sithRender_8EE678 )
             {
-                for (int j = 0; j < v65->surfaceInfo.numVertices; j++)
+                for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
                 {
-                    int idx = v65->surfaceInfo.vertexIdxs[j];
+                    int idx = v65->surfaceInfo.face.vertexPosIdx[j];
                     if ( level->alloc_unk98[idx] != sithRender_8EE678 )
                     {
                         rdMatrix_TransformPoint34(&level->verticesTransformed[idx], &level->vertices[idx], &rdCamera_pCurCamera->view_matrix);
@@ -618,13 +618,13 @@ LABEL_151:
             if ( (sithRender_flag & 8) == 0 )
                 break;
 
-            if ( v65->surfaceInfo.numVertices <= 3 || (v65->surfaceFlags & (SURFACEFLAGS_400|SURFACEFLAGS_200)) != 0 || !v65->surfaceInfo.lightMode )
+            if ( v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SURFACEFLAGS_400|SURFACEFLAGS_200)) != 0 || !v65->surfaceInfo.face.lightingMode )
                 break;
             v74 = 0;
-            v76 = v65->surfaceInfo.numVertices - 2;
+            v76 = v65->surfaceInfo.face.numVertices - 2;
             if (v76 > 0)
             {
-                v18 = v65->surfaceInfo.numVertices - 1;
+                v18 = v65->surfaceInfo.face.numVertices - 1;
                 v71 = 1;
                 v19 = 0;
                 while ( 2 )
@@ -632,11 +632,11 @@ LABEL_151:
                     v20 = rdCache_GetProcEntry();
                     if ( !v20 )
                         goto LABEL_92;
-                    v21 = v65->surfaceInfo.geoMode;
+                    v21 = v65->surfaceInfo.face.geometryMode;
                     if ( v21 >= sithRender_geoMode )
                         v21 = sithRender_geoMode;
                     v20->geometryMode = v21;
-                    v22 = v65->surfaceInfo.lightMode;
+                    v22 = v65->surfaceInfo.face.lightingMode;
                     if ( sithRender_lightingIRMode )
                     {
                         if ( v22 >= 2 )
@@ -648,18 +648,18 @@ LABEL_151:
                     }
                     v23 = sithRender_texMode;
                     v20->lightingMode = v22;
-                    v24 = v65->surfaceInfo.texMode;
+                    v24 = v65->surfaceInfo.face.textureMode;
                     if ( v24 >= v23 )
                         v24 = v23;
                     v20->textureMode = v24;
-                    v78[0] = v65->surfaceInfo.vertexIdxs[v19];
-                    v78[1] = v65->surfaceInfo.vertexIdxs[v71];
-                    v78[2] = v65->surfaceInfo.vertexIdxs[v18];
+                    v78[0] = v65->surfaceInfo.face.vertexPosIdx[v19];
+                    v78[1] = v65->surfaceInfo.face.vertexPosIdx[v71];
+                    v78[2] = v65->surfaceInfo.face.vertexPosIdx[v18];
                     if ( v20->geometryMode >= 4 )
                     {
-                        v79[0] = v65->surfaceInfo.vertexUVIdxs[v19];
-                        v79[1] = v65->surfaceInfo.vertexUVIdxs[v71];
-                        v79[2] = v65->surfaceInfo.vertexUVIdxs[v18];
+                        v79[0] = v65->surfaceInfo.face.vertexUVIdx[v19];
+                        v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
+                        v79[2] = v65->surfaceInfo.face.vertexUVIdx[v18];
                     }
                     meshinfo_out.verticesProjected = vertices_tmp;
                     sithRender_idxInfo.numVertices = 3;
@@ -674,7 +674,7 @@ LABEL_151:
                     v26 = v20->textureMode;
                     v27 = v20->geometryMode;
                     sithRender_idxInfo.field_18 = v80;
-                    rdPrimit3_ClipFace(level_idk->clipFrustum, v27, v20->lightingMode, v26, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.clipIdk);
+                    rdPrimit3_ClipFace(level_idk->clipFrustum, v27, v20->lightingMode, v26, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
                     v28 = meshinfo_out.numVertices;
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
@@ -735,10 +735,10 @@ LABEL_151:
                         if ( v32 != v28 )
                         {
 LABEL_87:
-                            v35 = v65->surfaceInfo.extraLight;
-                            v36 = v65->surfaceInfo.faceType;
-                            v20->wallCel = v65->surfaceInfo.wallCel;
-                            v37 = v65->surfaceInfo.material;
+                            v35 = v65->surfaceInfo.face.extraLight;
+                            v36 = v65->surfaceInfo.face.type;
+                            v20->wallCel = v65->surfaceInfo.face.wallCel;
+                            v37 = v65->surfaceInfo.face.material;
                             v20->extralight = v35;
                             v20->material = v37;
                             v38 = v20->geometryMode;
@@ -811,12 +811,12 @@ LABEL_150:
         }
         else
         {
-            v41 = v65->surfaceInfo.geoMode;
+            v41 = v65->surfaceInfo.face.geometryMode;
             if ( v41 >= sithRender_geoMode )
                 v41 = sithRender_geoMode;
         }
         procEntry->geometryMode = v41;
-        v42 = v65->surfaceInfo.lightMode;
+        v42 = v65->surfaceInfo.face.lightingMode;
         if ( sithRender_lightingIRMode )
         {
             if ( v42 >= 2 )
@@ -828,7 +828,7 @@ LABEL_150:
         }
         v43 = sithRender_texMode;
         procEntry->lightingMode = v42;
-        v44 = v65->surfaceInfo.texMode;
+        v44 = v65->surfaceInfo.face.textureMode;
         if ( v44 >= v43 )
             v44 = v43;
         procEntry->textureMode = v44;
@@ -836,14 +836,14 @@ LABEL_150:
         v45 = procEntry->vertexUVs;
         sithRender_idxInfo.field_18 = v65->surfaceInfo.field_40;
         meshinfo_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
-        sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.vertexIdxs;
+        sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
         meshinfo_out.vertexUVs = v45;
         v46 = level_idk->clipFrustum;
-        sithRender_idxInfo.numVertices = v65->surfaceInfo.numVertices;
+        sithRender_idxInfo.numVertices = v65->surfaceInfo.face.numVertices;
         v64 = v44;
         v47 = procEntry->lightingMode;
-        sithRender_idxInfo.vertexUVIdx = v65->surfaceInfo.vertexUVIdxs;
-        rdPrimit3_ClipFace(v46, procEntry->geometryMode, v47, v64, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.clipIdk);
+        sithRender_idxInfo.vertexUVIdx = v65->surfaceInfo.face.vertexUVIdx;
+        rdPrimit3_ClipFace(v46, procEntry->geometryMode, v47, v64, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
         num_vertices = meshinfo_out.numVertices;
         if ( meshinfo_out.numVertices < 3u )
         {
@@ -940,10 +940,10 @@ LABEL_140:
         {
             sithSector_sub_4F2F60(procEntry, &v65->surfaceInfo, vertices_tmp, num_vertices);
         }
-        v56 = v65->surfaceInfo.extraLight;
-        v57 = v65->surfaceInfo.faceType;
-        procEntry->wallCel = v65->surfaceInfo.wallCel;
-        v58 = v65->surfaceInfo.material;
+        v56 = v65->surfaceInfo.face.extraLight;
+        v57 = v65->surfaceInfo.face.type;
+        procEntry->wallCel = v65->surfaceInfo.face.wallCel;
+        v58 = v65->surfaceInfo.face.material;
         procEntry->extralight = v56;
         procEntry->material = v58;
         v59 = procEntry->geometryMode;
@@ -1414,12 +1414,12 @@ void sithRender_RenderAlphaSurfaces()
         if ( v0->field_4 != sithRender_8EE678 )
         {
             v4 = 0;
-            if ( v0->surfaceInfo.numVertices )
+            if ( v0->surfaceInfo.face.numVertices )
             {
                 v5 = sithWorld_pCurWorld;
                 do
                 {
-                    v7 = v0->surfaceInfo.vertexIdxs[v4];
+                    v7 = v0->surfaceInfo.face.vertexPosIdx[v4];
                     if ( sithWorld_pCurWorld->alloc_unk98[v7] != v3 )
                     {
                         rdMatrix_TransformPoint34(&v5->verticesTransformed[v7], &v5->vertices[v7], &rdCamera_pCurCamera->view_matrix);
@@ -1429,7 +1429,7 @@ void sithRender_RenderAlphaSurfaces()
                     }
                     ++v4;
                 }
-                while ( v4 < v0->surfaceInfo.numVertices );
+                while ( v4 < v0->surfaceInfo.face.numVertices );
             }
             v0->field_4 = v3;
         }
@@ -1439,24 +1439,24 @@ void sithRender_RenderAlphaSurfaces()
             ++aSurfacesIter;
             continue;
         }
-        if ( v0->surfaceInfo.geoMode < sithRender_geoMode )
-            sithRender_geoMode = v0->surfaceInfo.geoMode;
+        if ( v0->surfaceInfo.face.geometryMode < sithRender_geoMode )
+            sithRender_geoMode = v0->surfaceInfo.face.geometryMode;
 
         v9->geometryMode = sithRender_geoMode;
-        if ( v0->surfaceInfo.lightMode < sithRender_lightMode )
-            sithRender_lightMode = v0->surfaceInfo.lightMode;
+        if ( v0->surfaceInfo.face.lightingMode < sithRender_lightMode )
+            sithRender_lightMode = v0->surfaceInfo.face.lightingMode;
         v9->lightingMode = sithRender_lightMode;
-        if (v0->surfaceInfo.texMode >= sithRender_texMode)
-            v0->surfaceInfo.texMode = sithRender_texMode;
-        v9->textureMode = v0->surfaceInfo.texMode;
+        if (v0->surfaceInfo.face.textureMode >= sithRender_texMode)
+            v0->surfaceInfo.face.textureMode = sithRender_texMode;
+        v9->textureMode = v0->surfaceInfo.face.textureMode;
         sithRender_idxInfo.field_18 = v0->surfaceInfo.field_40;
         meshinfo_out.vertexUVs = v9->vertexUVs;
         meshinfo_out.vertex_lights_maybe_ = v9->vertexIntensities;
-        sithRender_idxInfo.numVertices = v0->surfaceInfo.numVertices;
-        sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.vertexIdxs;
-        sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.vertexUVIdxs;
+        sithRender_idxInfo.numVertices = v0->surfaceInfo.face.numVertices;
+        sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
+        sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;
         meshinfo_out.verticesProjected = vertices_tmp;
-        rdPrimit3_ClipFace(surfaceSector->clipFrustum, sithRender_geoMode, sithRender_lightMode, v0->surfaceInfo.texMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.clipIdk);
+        rdPrimit3_ClipFace(surfaceSector->clipFrustum, sithRender_geoMode, sithRender_lightMode, v0->surfaceInfo.face.textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
         if ( meshinfo_out.numVertices < 3u )
         {
             ++aSurfacesIter;
@@ -1545,11 +1545,11 @@ LABEL_52:
         if ( v9->lightingMode >= 3 )
             v23 |= 4u;
 
-        v9->type = v0->surfaceInfo.faceType;
-        v9->extralight = v0->surfaceInfo.extraLight;
-        v9->wallCel = v0->surfaceInfo.wallCel;
+        v9->type = v0->surfaceInfo.face.type;
+        v9->extralight = v0->surfaceInfo.face.extraLight;
+        v9->wallCel = v0->surfaceInfo.face.wallCel;
         v9->light_flags = 0;
-        v9->material = v0->surfaceInfo.material;
+        v9->material = v0->surfaceInfo.face.material;
         rdSetProcFaceUserData(surfaceSector->id);
         rdCache_AddProcFace(0, meshinfo_out.numVertices, v23);
 

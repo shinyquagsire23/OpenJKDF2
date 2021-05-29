@@ -347,7 +347,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if ( _sscanf(tmpTxt, "%d", &face->textureMode) != 1 )
                     goto fail;
                 tmpTxt = _strtok(0, " \t");
-                if ( _sscanf(tmpTxt, "%f", &face->extralight) != 1 )
+                if ( _sscanf(tmpTxt, "%f", &face->extraLight) != 1 )
                     goto fail;
                 to_num_verts = _strtok(0, " \t");
                 face->numVertices = _atoi(to_num_verts);
@@ -611,7 +611,7 @@ int rdModel3_WriteText(char *fout, rdModel3 *model, char *createdfrom)
                     face->geometryMode,
                     face->lightingMode,
                     face->textureMode,
-                    face->extralight,
+                    face->extraLight,
                     face->numVertices);
 
                 if (face->material && face->material->tex_type & 2)
@@ -985,7 +985,7 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
                 }
                 if ( idx1 < face->numVertices )
                     rdMath_CalcSurfaceNormal(
-                        face->field_24,
+                        face->wallCel,
                         &mesh->vertices[face->vertexPosIdx[idx1]],
                         &mesh->vertices[face->vertexPosIdx[idx3]],
                         &mesh->vertices[face->vertexPosIdx[idx2]]);
@@ -1371,9 +1371,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
 
     if ( meshFrustrumCull )
-        rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->field_28);
+        rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
     else
-        rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->field_28);
+        rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
 
     if ( vertexDst.numVertices < 3u )
         return 0;
@@ -1411,7 +1411,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         procEntry->ambientLight = 0.0;
 
     int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
-    procEntry->wallCel = face->field_24;
+    procEntry->wallCel = face->wallCel;
     if ( procEntry->ambientLight < 1.0 )
     {
         if ( procEntry->lightingMode == 2 )
@@ -1480,7 +1480,7 @@ LABEL_44:
 
     procEntry->light_flags = lightFlags;
     procEntry->type = face->type;
-    procEntry->extralight = face->extralight;
+    procEntry->extralight = face->extraLight;
     procEntry->material = face->material;
     rdCache_AddProcFace(0, vertexDst.numVertices, flags);
     return 1;

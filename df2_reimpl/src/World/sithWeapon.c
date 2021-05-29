@@ -800,7 +800,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEn
         return 0;
     if ( (g_debugmodeFlags & 0x40) != 0 )
     {
-        v4 = surface->surfaceInfo.material;
+        v4 = surface->surfaceInfo.face.material;
         if ( v4 )
             v5 = v4->mat_fpath;
         else
@@ -877,7 +877,7 @@ LABEL_9:
             sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
             sithThing_AttachToSurface(thing, surface, 0);
-            sithSector_ThingSetLook(thing, &surface->surfaceInfo.surfaceNormal, 0.0);
+            sithSector_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);
             thing->physicsParams.physflags |= PHYSFLAGS_NOTHRUST;
             result = 1;
         }

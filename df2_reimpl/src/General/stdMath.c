@@ -76,6 +76,116 @@ float stdMath_NormalizeDeltaAngle(float a1, float a2)
     return result;
 }
 
+void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
+{
+    double normalized; // st7
+    double v4; // st7
+    double v5; // st7
+    float v6; // [esp+Ch] [ebp-20h]
+    float a1; // [esp+10h] [ebp-1Ch]
+    int v8; // [esp+14h] [ebp-18h]
+    float v9; // [esp+18h] [ebp-14h]
+    float v10; // [esp+18h] [ebp-14h]
+    float v11; // [esp+18h] [ebp-14h]
+    float v12; // [esp+18h] [ebp-14h]
+    float v13; // [esp+18h] [ebp-14h]
+    int quantized; // [esp+1Ch] [ebp-10h]
+    int quantized_plus1; // [esp+20h] [ebp-Ch]
+    float normalized_; // [esp+24h] [ebp-8h]
+    float v17; // [esp+28h] [ebp-4h]
+    float v18; // [esp+28h] [ebp-4h]
+    float v19; // [esp+28h] [ebp-4h]
+    float v20; // [esp+28h] [ebp-4h]
+    float v21; // [esp+28h] [ebp-4h]
+    float v22; // [esp+28h] [ebp-4h]
+    float v23; // [esp+28h] [ebp-4h]
+    float v24; // [esp+28h] [ebp-4h]
+
+    normalized = stdMath_NormalizeAngle(angle);
+    normalized_ = normalized;
+    if ( normalized >= 90.0 )
+    {
+        if ( normalized_ >= 180.0 )
+        {
+            if ( normalized_ >= 270.0 )
+                v8 = 3;
+            else
+                v8 = 2;
+        }
+        else
+        {
+            v8 = 1;
+        }
+    }
+    else
+    {
+        v8 = 0;
+    }
+    a1 = normalized_ * 45.511112;
+    v6 = a1 - stdMath_Floor(a1);
+    quantized = (int)a1;
+    quantized_plus1 = quantized + 1;
+    switch ( v8 )
+    {
+        case 0:
+            if ( quantized_plus1 < 4096 )
+                v17 = aSinTable[quantized_plus1];
+            else
+                v17 = aSinTable[4095 - (quantized - 4095)];
+            *pSinOut = (v17 - aSinTable[quantized]) * v6 + aSinTable[quantized];
+            if ( quantized_plus1 < 4096 )
+                v18 = aSinTable[4095 - quantized_plus1];
+            else
+                v18 = -aSinTable[quantized_plus1 - 0x1000];
+            *pCosOut = (v18 - aSinTable[4095 - quantized]) * v6 + aSinTable[4095 - quantized];
+            break;
+        case 1:
+            if ( quantized_plus1 < 0x2000 )
+                v19 = aSinTable[4095 - (quantized - 4095)];
+            else
+                v19 = -aSinTable[quantized_plus1 - 0x2000];
+            v9 = aSinTable[4095 - (quantized - 4096)];
+            *pSinOut = (v19 - v9) * v6 + v9;
+            if ( quantized_plus1 < 0x2000 )
+                v4 = -aSinTable[quantized_plus1 - 0x1000];
+            else
+                v4 = -aSinTable[4095 - (quantized - 0x1FFF)];
+            v20 = v4;
+            v10 = -aSinTable[quantized - 0x1000];
+            *pCosOut = (v20 - v10) * v6 + v10;
+            break;
+        case 2:
+            if ( quantized_plus1 < 0x3000 )
+                v5 = -aSinTable[quantized_plus1 - 0x2000];
+            else
+                v5 = -aSinTable[4095 - (quantized - 12287)];
+            v21 = v5;
+            v11 = -aSinTable[quantized - 0x2000];
+            *pSinOut = (v21 - v11) * v6 + v11;
+            if ( quantized_plus1 < 0x3000 )
+                v22 = -aSinTable[4095 - (quantized - 0x1FFF)];
+            else
+                v22 = aSinTable[quantized_plus1 - 0x3000];
+            v12 = -aSinTable[4095 - (quantized - 0x2000)];
+            *pCosOut = (v22 - v12) * v6 + v12;
+            break;
+        case 3:
+            if ( quantized_plus1 < 0x4000 )
+                v23 = -aSinTable[4095 - (quantized - 0x2FFF)];
+            else
+                v23 = aSinTable[quantized_plus1 - 0x4000];
+            v13 = -aSinTable[4095 - (quantized - 0x3000)];
+            *pSinOut = (v23 - v13) * v6 + v13;
+            if ( quantized_plus1 < 0x4000 )
+                v24 = aSinTable[quantized_plus1 - 0x3000];
+            else
+                v24 = aSinTable[4095 - (quantized - 0x3FFF)];
+            *pCosOut = (v24 - aSinTable[quantized - 0x3000]) * v6 + aSinTable[quantized - 0x3000];
+            break;
+        default:
+            return;
+    }
+}
 
 float stdMath_Dist2D1(float a1, float a2)
 {

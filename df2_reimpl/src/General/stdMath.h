@@ -31,8 +31,9 @@ float stdMath_FlexPower(float num, int exp);
 float stdMath_NormalizeAngle(float angle);
 float stdMath_NormalizeAngleAcute(float angle);
 float stdMath_NormalizeDeltaAngle(float a1, float a2);
+void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut);
 
-IMPORT_FUNC(stdMath_SinCos, void, (float, float*, float*), stdMath_SinCos_ADDR)
+//IMPORT_FUNC(stdMath_SinCos, void, (float, float*, float*), stdMath_SinCos_ADDR)
 IMPORT_FUNC(stdMath_Tan, float, (float), stdMath_Tan_ADDR)
 IMPORT_FUNC(stdMath_ArcSin1, float, (float), stdMath_ArcSin1_ADDR)
 IMPORT_FUNC(stdMath_ArcSin2, float, (float), stdMath_ArcSin2_ADDR)

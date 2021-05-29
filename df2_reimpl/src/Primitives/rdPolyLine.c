@@ -49,7 +49,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->edgeFace.geometryMode = edgeGeometryMode;
     polyline->edgeFace.lightingMode = edgeLightingMode;
     polyline->geometryMode = edgeGeometryMode;
-    polyline->edgeFace.extralight = extraLight;
+    polyline->edgeFace.extraLight = extraLight;
 
     polyline->edgeFace.material = rdMaterial_Load(material_side_fname, 0, 0);
     if ( !polyline->edgeFace.material )
@@ -91,7 +91,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->tipFace.geometryMode = edgeGeometryMode;
     polyline->tipFace.lightingMode = edgeLightingMode;
     polyline->geometryMode = edgeGeometryMode;
-    polyline->tipFace.extralight = extraLight;
+    polyline->tipFace.extraLight = extraLight;
     polyline->tipFace.material = rdMaterial_Load(material_tip_fname, 0, 0);
     if ( !polyline->tipFace.material )
         return 0;
@@ -326,7 +326,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     }
     
     procEntry->textureMode = textureMode;
-    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, procEntry->lightingMode, textureMode, idxInfo, &mesh_out, &face->field_28);
+    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, procEntry->lightingMode, textureMode, idxInfo, &mesh_out, &face->clipIdk);
     if ( mesh_out.numVertices < 3 )
         return;
 
@@ -409,7 +409,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     procEntry->light_flags = 0;
     procEntry->wallCel = thing->gap2C;
     procEntry->type = face->type;
-    procEntry->extralight = face->extralight;
+    procEntry->extralight = face->extraLight;
     procEntry->material = face->material;
     rdCache_AddProcFace(0, mesh_out.numVertices, procFaceFlags);
 }

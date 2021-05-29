@@ -205,6 +205,7 @@ typedef struct sithSectorAlloc
 int sithSector_Startup();
 void sithSector_Shutdown();
 void sithSector_Close();
+int sithSector_Load(sithWorld *world, int tmp);
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
 void sithSector_ThingPhysicsTick(sithThing *thing, float force);
@@ -212,6 +213,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds);
 void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 
 
+static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;

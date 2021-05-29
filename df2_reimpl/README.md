@@ -113,7 +113,7 @@ sithActor                      0x559      0.127%        0.000%          0 / 5
 Video                          0x5dc      0.139%        5.267%          1 / 5          
 DebugConsole                   0x5de      0.139%        0.000%          0 / 13         
 stdFileUtil                    0x687      0.155%        22.681%         3 / 11         
-sithAIClass                    0x689      0.155%        1.494%          1 / 7          
+sithAIClass                    0x689      0.155%        83.981%         4 / 7          
 rdPrimit2                      0x69a      0.157%        0.000%          0 / 5          
 stdBmp                         0x6b8      0.160%        0.000%          0 / 3          
 sithCogScript                  0x6ca      0.161%        39.586%         4 / 9          
@@ -171,9 +171,9 @@ jkMain                         0x16cd     0.542%        58.540%        18 / 53
 rdPrimit3                      0x16e0     0.543%        0.017%          1 / 9          
 sithWorld                      0x1718     0.548%        68.082%        14 / 22         
 stdFont                        0x181a     0.572%        66.434%         9 / 20         
-stdMath                        0x182a     0.574%        32.218%        13 / 23         
+stdMath                        0x182a     0.574%        47.882%        14 / 23         
 rdActive                       0x1a55     0.625%        2.626%          3 / 8          
-sithSurface                    0x1c6a     0.675%        1.938%          3 / 35         
+sithSurface                    0x1c6a     0.675%        21.378%         4 / 35         
 jkHud                          0x1c9b     0.679%        0.000%          0 / 17         
 jkDev                          0x1e60     0.721%        0.000%          0 / 39         
 sithCog                        0x1ed3     0.732%        39.843%         6 / 28         
@@ -189,8 +189,8 @@ sithUnk3                       0x2827     0.954%        6.275%          4 / 22
 std3D                          0x2c4a     1.052%        0.000%          0 / 39         
 sithAICmd                      0x2cc0     1.063%        4.958%          1 / 22         
 rdCache                        0x331c     1.214%        39.315%        12 / 16         
-sithThing                      0x3c2e     1.429%        5.005%          7 / 53         
-sithSector                     0x79f9     2.897%        11.215%         7 / 96         
+sithThing                      0x3c2e     1.429%        9.120%         10 / 53         
+sithSector                     0x79f9     2.897%        14.930%         8 / 96         
 rdClip                         0x81f2     3.086%        17.186%         7 / 17         
 rdRaster                       0xf04d     5.707%        0.195%          1 / 89         
 rdZRaster                      0x15fb4    8.353%        0.000%          0 / 73         
@@ -200,36 +200,36 @@ rdNRaster                      0x304d4    18.355%       0.000%          0 / 87
 
 Total completion:
 -----------------
-24.468% by weight
-41.347% by weight excluding rasterizer
-1427 / 3165 functions
-1427 / 2794 functions excluding rasterizer
+24.983% by weight
+42.219% by weight excluding rasterizer
+1436 / 3165 functions
+1436 / 2794 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           15.198%         643 / 1320
+sith           14.772%         635 / 1320
 stdPlatform    0.285%           33 / 43
-std            4.934%          208 / 360
+std            4.844%          207 / 360
 jkGui          3.931%          133 / 284
 rd             5.221%           59 / 345
 jk             3.568%          209 / 322
 Raster         40.813%         370 / 371
 other          1.582%           83 / 120
 -----------------------------------------
-total          75.532%        1738 / 3165
+total          75.017%        1729 / 3165
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           25.683%         643 / 1320
+sith           24.963%         635 / 1320
 stdPlatform    0.482%           33 / 43
-std            8.338%          208 / 360
+std            8.186%          207 / 360
 jkGui          6.643%          133 / 284
 rd             8.823%           59 / 345
 jk             6.029%          209 / 322
 other          2.674%           83 / 120
 -----------------------------------------
-total          58.671%        1368 / 2794
+total          57.800%        1359 / 2794
 
 ```

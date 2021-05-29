@@ -33,6 +33,10 @@
 #define sithThing_AttachToSurface_ADDR (0x4CDE80)
 #define sithThing_AttachThing_ADDR (0x4CE2C0)
 #define sithThing_SetNewModel_ADDR (0x4CD830)
+#define sithThing_LoadActorPlayerParams_ADDR (0x4ED7E0)
+#define sithThing_LoadThingParam_ADDR (0x4CECB0)
+#define sithThing_DoesRdThingInit_ADDR (0x4CD190)
+#define sithThing_sub_4CD8A0_ADDR (0x4CD8A0)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
@@ -711,12 +715,17 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs);
 void sithThing_Remove(sithThing *thing);
 sithThing* sithThing_GetParent(sithThing *thing);
 sithThing* sithThing_GetThingByIdx(int idx);
+int sithThing_DoesRdThingInit(sithThing *thing);
+sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2);
+int sithThing_ParseArgs(stdConffileArg *arg, sithThing *thing);
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 
+static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
+static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
 static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
-static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
-static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
-static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
+//static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
+//static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
+//static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
 static void (*sithThing_Free)(sithWorld* world) = (void*)sithThing_Free_ADDR;
 
 static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;

@@ -23,7 +23,7 @@ rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, float width, 
     return sprite;
 }
 
-int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extralight, rdVector3 *offset)
+int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extraLight, rdVector3 *offset)
 {
     if (spritepath)
     {
@@ -38,7 +38,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     sprite->face.geometryMode = geometryMode;
     sprite->face.lightingMode = lightMode;
     sprite->face.textureMode = textureMode;
-    sprite->face.extralight = extralight;
+    sprite->face.extraLight = extraLight;
     sprite->face.material = rdMaterial_Load(material, 0, 0);
     if ( sprite->face.material )
     {
@@ -219,9 +219,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
             procEntry->textureMode,
             (rdVertexIdxInfo *)&mesh_in,
             &mesh_out,
-            &sprite->face.field_28);
+            &sprite->face.clipIdk);
     else
-        rdPrimit3_NoClipFace(procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, &mesh_in, &mesh_out, &sprite->face.field_28);
+        rdPrimit3_NoClipFace(procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, &mesh_in, &mesh_out, &sprite->face.clipIdk);
     if ( mesh_out.numVertices < 3u )
         return 0;
 
@@ -298,7 +298,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     procEntry->light_flags = 0;
     procEntry->wallCel = thing->gap2C;
     procEntry->type = sprite->face.type;
-    procEntry->extralight = sprite->face.extralight;
+    procEntry->extralight = sprite->face.extraLight;
     procEntry->material = sprite->face.material;
 
     rdCache_AddProcFace(0, mesh_out.numVertices, procFlags);

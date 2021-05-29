@@ -254,7 +254,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdMath_NormalizeAngle_ADDR, stdMath_NormalizeAngle);
     hook_function(stdMath_NormalizeAngleAcute_ADDR, stdMath_NormalizeAngleAcute);
     hook_function(stdMath_NormalizeDeltaAngle_ADDR, stdMath_NormalizeDeltaAngle);
-    //hook_function(stdMath_SinCos_ADDR, stdMath_SinCos);
+    hook_function(stdMath_SinCos_ADDR, stdMath_SinCos);
     hook_function(stdMath_Dist2D1_ADDR, stdMath_Dist2D1);
     hook_function(stdMath_Dist2D2_ADDR, stdMath_Dist2D2);
     hook_function(stdMath_Dist2D3_ADDR, stdMath_Dist2D3);
@@ -861,6 +861,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithThing_Remove_ADDR, sithThing_Remove);
     hook_function(sithThing_GetParent_ADDR, sithThing_GetParent);
     hook_function(sithThing_GetThingByIdx_ADDR, sithThing_GetThingByIdx);
+    hook_function(sithThing_DoesRdThingInit_ADDR, sithThing_DoesRdThingInit);
+    hook_function(sithThing_sub_4CD8A0_ADDR, sithThing_sub_4CD8A0);
     hook_function(sithThing_Checksum_ADDR, sithThing_Checksum);
     
     // sithSector
