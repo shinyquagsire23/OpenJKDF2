@@ -54,14 +54,18 @@ typedef struct rdColormapHeader
 
 #define rdColormap_pCurMap (*(rdColormap**)0x0073A3C8)
 #define rdColormap_pIdentityMap (*(rdColormap**)0x0073A3CC)
+#define rdColormap_colorInfo (*(rdTexformat*)0x00548260)
 
 int rdColormap_SetCurrent(rdColormap *colormap);
 int rdColormap_SetIdentity(rdColormap *colormap);
 rdColormap* rdColormap_Load(char *colormap_fname);
+int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap);
 void rdColormap_Free(rdColormap *colormap);
 void rdColormap_FreeEntry(rdColormap *colormap);
 int rdColormap_Write(char *outpath, rdColormap *colormap);
 
-static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = (void*)rdColormap_LoadEntry_ADDR;
+static int (*rdColormap_BuildGrayRamp)(rdColormap *colormap) = (void*)rdColormap_BuildGrayRamp_ADDR;
+static int (*rdColormap_BuildRGB16)(uint16_t *a2, rdColor24 *a3, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format) = (void*)rdColormap_BuildRGB16_ADDR;
+//static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = (void*)rdColormap_LoadEntry_ADDR;
 
 #endif // _RDCOLORMAP_H

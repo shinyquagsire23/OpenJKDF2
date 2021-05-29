@@ -1,6 +1,7 @@
 #include "sithSurface.h"
 
 #include "General/stdHashTable.h"
+#include "World/sithWorld.h"
 #include "jk.h"
 
 int sithSurface_Startup()
@@ -20,5 +21,16 @@ int sithSurface_Startup()
 int sithSurface_Open()
 {
     sithSurface_bOpened = 1;
+    return 1;
+}
+
+int sithSurface_Verify(sithWorld *world)
+{
+    for (int i = 0; i < world->numSurfaces; i++)
+    {
+        if (world->surfaces[i].parent_sector == 8 || !world->surfaces[i].parent_sector)
+            return 0;
+    }
+    
     return 1;
 }

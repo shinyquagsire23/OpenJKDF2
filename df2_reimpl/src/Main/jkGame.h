@@ -31,6 +31,7 @@ typedef struct sithThing sithThing;
 #define jkGame_isDDraw (*(int*)0x00552B60)
 
 int jkGame_Initialize();
+int jkGame_ParseSection(int a1, int a2);
 
 //static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
 static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;

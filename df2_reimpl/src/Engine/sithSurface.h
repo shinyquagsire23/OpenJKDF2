@@ -131,8 +131,10 @@ typedef enum SURFACEFLAGS
 
 int sithSurface_Startup();
 int sithSurface_Open();
+int sithSurface_Verify(sithWorld *world);
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
+static int (*sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;

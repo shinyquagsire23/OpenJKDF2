@@ -102,7 +102,7 @@ enum SITH_MESSAGE_E
     SITH_MESSAGE_TRIGGER  = 40,
 };
 
-static int (*sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
+//static int (*sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
 //static int (*sithCogScript_Load)(sithWorld *world, int a2) = (void*)sithCogScript_Load_ADDR;
 //static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
 static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
@@ -113,6 +113,7 @@ static int (*sithCog_ThingsSectorsRegSymbolIdk)(sithCog *a1, sithCogIdk *a2, sit
 int sithCog_Startup();
 void sithCog_Shutdown();
 int sithCog_Open();
+int sithCog_Load(sithWorld *world, int a2);
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);
 
 void sithCogUtil_Initialize(void* a1);

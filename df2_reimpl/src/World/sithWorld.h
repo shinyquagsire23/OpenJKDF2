@@ -129,14 +129,18 @@ void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
 void sithWorld_UpdateLoadPercent(float percent);
 int sithWorld_Load(sithWorld *world, char *map_jkl_fname);
 sithWorld* sithWorld_New();
+int sithWorld_NewEntry(sithWorld *world);
 void sithWorld_FreeEntry(sithWorld *world);
 int sithHeader_Load(sithWorld *world, int junk);
 int sithCopyright_Load(sithWorld *lvl, int junk);
 int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_FindSectionParser(char *a1);
+int sithWorld_Verify(sithWorld *world);
 uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed);
+int sithWorld_Initialize();
+int sithWorld_LoadGeoresource(sithWorld *world, int a2);
 
-static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
+//static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
 static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 

@@ -132,7 +132,7 @@ sithCogSector                  0x93a      0.219%        22.820%         1 / 22
 sithCogAI                      0x943      0.220%        14.720%         1 / 20         
 jkGuiNet                       0x94e      0.221%        0.000%          0 / 10         
 stdColor                       0x97e      0.225%        0.000%          0 / 11         
-jkGame                         0x98f      0.227%        1.185%          1 / 13         
+jkGame                         0x98f      0.227%        1.676%          2 / 13         
 stdSound                       0x9bf      0.231%        0.000%          0 / 27         
 sithSave                       0x9bf      0.231%        0.000%          0 / 7          
 rdMaterial                     0xa2d      0.242%        68.599%         6 / 9          
@@ -143,7 +143,7 @@ jkGuiKeyboard                  0xb57      0.269%        0.000%          0 / 14
 jkGuiNetHost                   0xbc6      0.280%        0.000%          0 / 6          
 sithMapView                    0xbf8      0.284%        0.000%          0 / 9          
 stdLbm                         0xc24      0.288%        0.000%          0 / 3          
-rdColormap                     0xcf4      0.308%        26.327%         6 / 12         
+rdColormap                     0xcf4      0.308%        47.738%         7 / 12         
 sithTrackThing                 0xd6b      0.319%        0.000%          0 / 13         
 jkGuiMouse                     0xdb5      0.326%        0.000%          0 / 14         
 DirectDraw                     0xdd4      0.328%        0.000%          0 / 16         
@@ -151,7 +151,7 @@ jkEpisode                      0xdd9      0.329%        91.819%         5 / 10
 stdPlatform                    0xdde      0.329%        13.437%        10 / 43         
 sithUnk4                       0xdfd      0.332%        0.000%          0 / 12         
 jkHudInv                       0xe43      0.339%        0.000%          0 / 9          
-sithPlayer                     0xe72      0.343%        4.218%          3 / 27         
+sithPlayer                     0xe72      0.343%        10.005%         4 / 27         
 sithCogSurface                 0xe92      0.346%        21.582%         1 / 38         
 stdBitmap                      0xeb6      0.349%        37.440%         4 / 14         
 rdPuppet                       0x101f     0.383%        0.000%          0 / 19         
@@ -169,14 +169,14 @@ jkGuiJoystick                  0x13f0     0.474%        0.000%          0 / 19
 jkRes                          0x15b6     0.516%        92.191%        19 / 23         
 jkMain                         0x16cd     0.542%        58.540%        18 / 53         
 rdPrimit3                      0x16e0     0.543%        0.017%          1 / 9          
-sithWorld                      0x1718     0.548%        43.809%        11 / 22         
+sithWorld                      0x1718     0.548%        68.082%        14 / 22         
 stdFont                        0x181a     0.572%        66.434%         9 / 20         
 stdMath                        0x182a     0.574%        32.218%        13 / 23         
 rdActive                       0x1a55     0.625%        2.626%          3 / 8          
-sithSurface                    0x1c6a     0.675%        1.155%          2 / 35         
+sithSurface                    0x1c6a     0.675%        1.938%          3 / 35         
 jkHud                          0x1c9b     0.679%        0.000%          0 / 17         
 jkDev                          0x1e60     0.721%        0.000%          0 / 39         
-sithCog                        0x1ed3     0.732%        30.123%         5 / 28         
+sithCog                        0x1ed3     0.732%        39.843%         6 / 28         
 jkSaber                        0x1f4a     0.743%        33.296%         5 / 40         
 sithInventory                  0x2150     0.791%        97.878%        59 / 62         
 sithMulti                      0x252a     0.883%        0.000%          0 / 35         
@@ -200,36 +200,36 @@ rdNRaster                      0x304d4    18.355%       0.000%          0 / 87
 
 Total completion:
 -----------------
-24.171% by weight
-40.847% by weight excluding rasterizer
-1419 / 6330 functions
-1419 / 2794 functions excluding rasterizer
+24.468% by weight
+41.347% by weight excluding rasterizer
+1427 / 3165 functions
+1427 / 2794 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           15.427%         649 / 1320
+sith           15.198%         643 / 1320
 stdPlatform    0.285%           33 / 43
 std            4.934%          208 / 360
 jkGui          3.931%          133 / 284
-rd             5.287%           60 / 345
-jk             3.569%          210 / 322
+rd             5.221%           59 / 345
+jk             3.568%          209 / 322
 Raster         40.813%         370 / 371
 other          1.582%           83 / 120
 -----------------------------------------
-total          75.829%        1746 / 3165
+total          75.532%        1738 / 3165
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           26.070%         649 / 1320
+sith           25.683%         643 / 1320
 stdPlatform    0.482%           33 / 43
 std            8.338%          208 / 360
 jkGui          6.643%          133 / 284
-rd             8.934%           60 / 345
-jk             6.031%          210 / 322
+rd             8.823%           59 / 345
+jk             6.029%          209 / 322
 other          2.674%           83 / 120
 -----------------------------------------
-total          59.172%        1376 / 2794
+total          58.671%        1368 / 2794
 
 ```

@@ -2,11 +2,14 @@
 
 #include "World/sithWorld.h"
 
-#define jkGame_ParseSection ((void*)jkGame_ParseSection_ADDR)
-
 int jkGame_Initialize()
 {
     sithWorld_SetSectionParser("jk", jkGame_ParseSection);
     jkGame_bInitted = 1;
     return 1;
+}
+
+int jkGame_ParseSection(int a1, int a2)
+{
+    return a2 == 0;
 }

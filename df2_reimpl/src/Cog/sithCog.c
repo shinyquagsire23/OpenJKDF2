@@ -222,6 +222,134 @@ LABEL_26:
     return result;
 }
 
+int sithCog_Load(sithWorld *world, int a2)
+{
+    int num_cogs; // esi
+    signed int result; // eax
+    sithCog *cogs; // eax
+    char *v6; // esi
+    unsigned int v7; // eax
+    int *v8; // ebx
+    sithCog* v9; // eax
+    sithCog *v10; // edi
+    sithWorld *lvl; // ebp
+    sithCogScript *existing_cogscript; // eax
+    sithCogScript *cogscript; // esi
+    unsigned int v15; // eax
+    sithCogSymboltable *cogscript_symboltable; // edx
+    int v17; // ecx
+    sithCogScript *v18; // ebp
+    char **v19; // edi
+    unsigned int v23; // [esp+14h] [ebp-84h]
+    char cog_fpath[32]; // [esp+18h] [ebp-80h] BYREF
+
+    if ( a2 )
+        return 0;
+    stdConffile_ReadArgs();
+    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "cogs") )
+        return 0;
+    num_cogs = _atoi(stdConffile_entry.args[2].value);
+    if ( !num_cogs )
+        return 1;
+    cogs = (sithCog *)pSithHS->alloc(sizeof(sithCog) * num_cogs);
+    world->cogs = cogs;
+    if (!cogs)
+    {
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 883, "Memory alloc failure initializing COGs.\n", 0, 0, 0, 0);
+        return 0;
+    }
+    
+    _memset(cogs, 0, sizeof(sithCog) * num_cogs);
+    world->numCogs = num_cogs;
+    world->numCogsLoaded = 0;
+    while ( stdConffile_ReadArgs() )
+    {
+        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+            break;
+        if ( stdConffile_entry.numArgs < 2u )
+            return 0;
+
+        v6 = stdConffile_entry.args[1].value;
+        v7 = sithWorld_pLoading->numCogsLoaded;
+        v8 = &sithWorld_pLoading->numCogsLoaded;
+        if ( v7 < sithWorld_pLoading->numCogs )
+        {
+            v10 = &sithWorld_pLoading->cogs[v7];
+            v10->selfCog = v7;
+            if (sithWorld_pLoading->level_type_maybe & 1)
+            {
+                v10->selfCog |= 0x8000u;
+            }
+            lvl = sithWorld_pLoading;
+            _sprintf(cog_fpath, "%s%c%s", "cog", 92, v6);
+            existing_cogscript = (sithCogScript *)stdHashTable_GetKeyVal((stdHashTable *)g_cog_hashtable, v6);
+            if ( existing_cogscript )
+            {
+                cogscript = existing_cogscript;
+            }
+            else
+            {
+                v15 = lvl->numCogScriptsLoaded;
+                if ( v15 < lvl->numCogScripts && (cogscript = &lvl->cogScripts[v15], sithCogParse_Load(cog_fpath, cogscript, 0)) )
+                {
+                    stdHashTable_SetKeyVal((stdHashTable *)g_cog_hashtable, cogscript->cog_fpath, cogscript);
+                    ++lvl->numCogScriptsLoaded;
+                }
+                else
+                {
+                    cogscript = 0;
+                }
+            }
+            if ( cogscript )
+            {
+                _strncpy(v10->cogscript_fpath, cogscript->cog_fpath, 0x1Fu);
+                cogscript_symboltable = cogscript->symbolTable;
+                v17 = cogscript->debug_maybe;
+                v10->cogscript_fpath[31] = 0;
+                v10->cogscript = cogscript;
+                v10->flags = v17;
+                v10->symbolTable = sithCogParse_CopySymboltable(cogscript_symboltable);
+                if ( v10->symbolTable )
+                {
+                    ++*v8;
+                    v9 = &v10->cogscript;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                v9 = 0;
+            }
+        }
+        else
+        {
+            v9 = 0;
+        }
+        if ( v9 )
+        {
+            v18 = v9->cogscript;
+            char* v21 = &v9->field_4BC[0];
+            unsigned int v22 = 2;
+            for (int i = 0; i < v18->numIdk; i++)
+            {
+                stdConffileArg* entry = &stdConffile_entry.args[2+i];
+                
+                if ( !(v18->aIdk[i].flags & 1) && stdConffile_entry.numArgs > v22 )
+                {
+                    _strncpy(v21, entry->value, 0x1Fu);
+                    v21[31] = 0;
+                    v21 += 32;
+                    ++v22;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
 {
     sithCogSymbol *v5; // esi

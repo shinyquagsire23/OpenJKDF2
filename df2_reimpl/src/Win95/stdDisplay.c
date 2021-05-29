@@ -3,6 +3,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Win95/Video.h"
+#include "Win95/Window.h"
 
 void stdDisplay_SetGammaTable(int len, int *table)
 {
@@ -109,6 +110,7 @@ int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
 
 int stdDisplay_DDrawGdiSurfaceFlip()
 {
+    Window_SdlUpdate();
     return 1;
 }
 

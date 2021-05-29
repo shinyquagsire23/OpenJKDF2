@@ -185,7 +185,7 @@ for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     decomp_fraction = str(decomped_funcs[keyvalpair[0]]).rjust(3) + " / " + str(total_funcs[keyvalpair[0]])
     
     total_decompFuncs += decomped_funcs[keyvalpair[0]]
-    total_numFuncs += total_funcs[keyvalpair[0]]
+    #total_numFuncs += total_funcs[keyvalpair[0]]
     
     print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13), decomp_fraction.ljust(17))
 
@@ -205,7 +205,7 @@ for keyvalpair in sorted(file_sizes.items(), key=lambda item: item[1]):
     decomp_fraction = str(decomped_funcs[keyvalpair[0]]).rjust(3) + " / " + str(total_funcs[keyvalpair[0]])
     
     total_decompFuncs += decomped_funcs[keyvalpair[0]]
-    total_numFuncs += total_funcs[keyvalpair[0]]
+    #total_numFuncs += total_funcs[keyvalpair[0]]
     
     print (keyvalpair[0].ljust(30), hex(keyvalpair[1]).ljust(10), comp_percent.ljust(13), decomp_percent.ljust(13), decomp_fraction.ljust(17))
 

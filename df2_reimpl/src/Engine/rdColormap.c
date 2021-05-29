@@ -41,6 +41,124 @@ rdColormap* rdColormap_Load(char *colormap_fname)
     return NULL;
 }
 
+int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
+{
+    intptr_t colormap_fptr; // edi
+    const char *v4; // eax
+    struct common_functions *v5; // edx
+    int v6; // eax
+    float v7; // edx
+    float v8; // eax
+    uint16_t *rgb16Alloc; // eax
+    char *v10; // eax
+    void *v11; // eax
+    void *colorsLights; // eax
+    char *transparencyAlloc; // eax
+    rdColormapHeader header; // [esp+10h] [ebp-40h] BYREF
+
+    colormap_fptr = rdroid_pHS->fileOpen(colormap_fname, "rb");
+    if ( !colormap_fptr )
+    {
+        printf("failed to open colormap `%s`!\n", colormap_fname);
+        return 0;
+    }
+    v4 = stdFileFromPath(colormap_fname);
+    _strncpy(colormap->colormap_fname, v4, 0x1Fu);
+    v5 = rdroid_pHS;
+    colormap->colormap_fname[31] = 0;
+    v5->fileRead(colormap_fptr, &header, 0x40);
+    v6 = header.flags;
+    v7 = header.tint.y;
+    colormap->tint.x = header.tint.x;
+    colormap->flags = v6;
+    v8 = header.tint.z;
+    colormap->tint.y = v7;
+    colormap->tint.z = v8;
+    if ( _strncmp((const char *)&header.magic, "CMP ", 4u) )
+    {
+        jk_printf("CMP magic in `%s` is invalid!\n", colormap_fname);
+        goto safe_fallback;
+    }
+    rdroid_pHS->fileRead(colormap_fptr, colormap->colors, 0x300);
+    if ( (colormap->flags & 4) == 0 )
+    {
+        colorsLights = rdroid_pHS->alloc(0x4100);
+        colormap->lightlevelAlloc = colorsLights;
+        if (!colorsLights)
+        {
+            jk_printf("colorsLights alloc in `%s` failed!\n", colormap_fname);
+            goto safe_fallback;
+        }
+        colormap->lightlevel = colorsLights;
+        if ( (uint8_t)colorsLights )
+            colormap->lightlevel = (char *)colorsLights - (uint8_t)colorsLights + 256;
+        rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
+        if ( (colormap->flags & 1) != 0 )
+        {
+            transparencyAlloc = rdroid_pHS->alloc(0x10100);
+            colormap->transparencyAlloc = transparencyAlloc;
+            if ( !transparencyAlloc )
+            {
+                jk_printf("transparency alloc in `%s` failed!\n", colormap_fname);
+                goto safe_fallback;
+            }
+            colormap->transparency = transparencyAlloc;
+            if ( (uint8_t)transparencyAlloc )
+                colormap->transparency = (intptr_t)transparencyAlloc - (((intptr_t)transparencyAlloc) & 0xFF) + 256;
+            rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+        }
+        colormap->rgb16Alloc = 0;
+        colormap->dword34C = 0;
+        goto LABEL_26;
+    }
+    rgb16Alloc = (uint16_t *)rdroid_pHS->alloc(0x8000);
+    colormap->rgb16Alloc = rgb16Alloc;
+    if ( !rgb16Alloc )
+    {
+        jk_printf("rgb16Alloc alloc in `%s` failed!\n", colormap_fname);
+        goto safe_fallback;
+    }
+    rdColormap_BuildRGB16(rgb16Alloc, colormap->colors, 0, 0, 0, &rdColormap_colorInfo);
+    if ( (colormap->flags & 1) != 0 )
+    {
+        v10 = rdroid_pHS->alloc(0x10100);
+        colormap->transparencyAlloc = v10;
+        if (!v10)
+        {
+            jk_printf("transparencyAlloc alloc in `%s` failed!\n", colormap_fname);
+            goto safe_fallback;
+        }
+        
+        colormap->transparency = v10;
+        if ( (uint8_t)v10 )
+            colormap->transparency = (intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256;
+        rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+        v11 = rdroid_pHS->alloc(0x10000);
+        colormap->dword34C = v11;
+        if ( v11 )
+        {
+            if ( rdColormap_colorInfo.g_bits == 5 )
+                rdroid_pHS->fseek(colormap_fptr, 0x10000, 1);
+            rdroid_pHS->fileRead(colormap_fptr, colormap->dword34C, 0x10000);
+            goto LABEL_15;
+        }
+    }
+LABEL_15:
+    colormap->lightlevel = 0;
+    colormap->lightlevelAlloc = 0;
+    colormap->dword340 = 0;
+    colormap->dword344 = 0;
+LABEL_26:
+    rdroid_pHS->fileClose(colormap_fptr);
+    return 1;
+
+    // Generate a gray ramp if something fails
+safe_fallback:    
+    rdroid_pHS->fileClose(colormap_fptr);
+    rdColormap_BuildGrayRamp(colormap);
+    return 1;
+}
+
 void rdColormap_Free(rdColormap *colormap)
 {
     rdColormap_FreeEntry(colormap);

@@ -278,6 +278,10 @@ static wchar_t* (*__wcschr)(const wchar_t *, wchar_t) = (void*)0x005133B0;
 static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (void*)0x00512C70;
 static wchar_t* (*__wcsrchr)(const wchar_t *, wchar_t) = (void*)0x00514650;
 #else
+char* _strcpy(char *dst, const char *src);
+int _memcmp(const void* str1, const void* str2, size_t count);
+void* _memset(void* ptr, int val, size_t num);
+void* _memset32(void* ptr, uint32_t val, size_t num);
 int _sscanf(const char * s, const char * format, ...);
 int _sprintf(const char * s, const char * format, ...);
 int _rand();
@@ -358,6 +362,7 @@ wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);
+int _strncmp(const char *s1, const char *s2, size_t n);
 
 float _frand();
 

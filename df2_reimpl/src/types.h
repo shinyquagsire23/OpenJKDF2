@@ -21,9 +21,9 @@
 #define LPDIRECTSOUND void*
 
 #ifdef WIN32
-typedef int stdFile_t;
+typedef intptr_t stdFile_t;
 #else
-typedef void* stdFile_t;
+typedef intptr_t stdFile_t;
 #endif
 
 typedef struct IDirectSoundBuffer IDirectSoundBuffer;
