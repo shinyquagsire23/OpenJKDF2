@@ -38,22 +38,7 @@ typedef struct sithThing sithThing;
 typedef struct sithPlayerInfo
 {
     wchar_t player_name[32];
-    uint32_t field_40;
-    uint32_t field_44;
-    uint32_t field_48;
-    uint32_t field_4C;
-    uint32_t field_50;
-    uint32_t field_54;
-    uint32_t field_58;
-    uint32_t field_5C;
-    uint32_t field_60;
-    uint32_t field_64;
-    uint32_t field_68;
-    uint32_t field_6C;
-    uint32_t field_70;
-    uint32_t field_74;
-    uint32_t field_78;
-    uint32_t field_7C;
+    wchar_t multi_name[32];
     uint32_t flags;
     uint32_t net_id;
     sithItemInfo iteminfo[200];
@@ -65,8 +50,8 @@ typedef struct sithPlayerInfo
     rdMatrix34 field_135C;
     sithSector* field_138C;
     uint32_t respawnMask;
-    uint32_t field_1394;
-    uint32_t field_1398;
+    uint32_t palEffectsIdx1;
+    uint32_t palEffectsIdx2;
     uint32_t teamNum;
     uint32_t numKills;
     uint32_t numKilled;
@@ -78,6 +63,8 @@ typedef struct sithPlayerInfo
 float sithPlayer_GetBinAmt(int idx);
 void sithPlayer_SetBinAmt(int idx, float amt);
 int sithPlayer_GetNum(sithThing *player);
+void sithPlayer_ResetPalEffects();
+void sithPlayer_idk(int idx);
 
 static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
 static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
@@ -88,7 +75,7 @@ static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)
 static void (*sithPlayer_AddDyamicAdd)(int r, int g, int b) = (void*)sithPlayer_AddDyamicAdd_ADDR;
 static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlayer_ThingIdxToPlayerIdx_ADDR;
 static void (*sithPlayer_SetScreenTint)(float r, float g, float b) = (void*)sithPlayer_SetScreenTint_ADDR;
-static void (*sithPlayer_idk)(int) = (void*)sithPlayer_idk_ADDR;
-static void (*sithPlayer_ResetPalEffects)() = (void*)sithPlayer_ResetPalEffects_ADDR;
+//static void (*sithPlayer_idk)(int) = (void*)sithPlayer_idk_ADDR;
+//static void (*sithPlayer_ResetPalEffects)() = (void*)sithPlayer_ResetPalEffects_ADDR;
 
 #endif // _SITHPLAYER_H

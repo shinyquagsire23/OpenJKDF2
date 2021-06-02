@@ -20,23 +20,46 @@
 #define sithThing_Damage_ADDR (0x004CC7D0)
 #define sithThing_Create_ADDR (0x004CC8C0)
 #define sithThing_Free_ADDR (0x004CCA10)
-#define sithThing_SpawnThingInSector_ADDR (0x4CD9E0)
-#define sithThing_SpawnTemplate_ADDR (0x4CDCD0)
-#define sithThing_LeaveSector_ADDR (0x004CD220)
-#define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
+#define sithThing_freestuff_ADDR (0x004CCBC0)
+#define sithThing_idkjkl_ADDR (0x004CCD40)
+#define sithThing_sub_4CCE60_ADDR (0x004CCE60)
+#define sithThing_FreeEverythingNet_ADDR (0x004CCF20)
+#define sithThing_FreeEverything_ADDR (0x004CD050)
+#define sithThing_sub_4CD100_ADDR (0x004CD100)
+#define sithThing_DoesRdThingInit_ADDR (0x004CD190)
 #define sithThing_MoveToSector_ADDR (0x004CD1E0)
-#define sithThing_EnterSector_ADDR (0x4CD2C0)
-#define sithThing_DetachThing_ADDR (0x4CE380)
-#define sithThing_Release_ADDR (0x4E0740)
-#define sithThing_SyncThingPos_ADDR (0x4CF560)
+#define sithThing_LeaveSector_ADDR (0x004CD220)
+#define sithThing_EnterSector_ADDR (0x004CD2C0)
+#define sithThing_EnterWater_ADDR (0x004CD370)
+#define sithThing_ExitWater_ADDR (0x004CD480)
+#define sithThing_doesinitidk_ADDR (0x004CD570)
+#define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
+#define sithThing_SetNewModel_ADDR (0x004CD830)
+#define sithThing_sub_4CD8A0_ADDR (0x004CD8A0)
+#define sithThing_SpawnThingInSector_ADDR (0x004CD9E0)
+#define sithThing_SpawnTemplate_ADDR (0x004CDCD0)
+#define sithThing_AttachToSurface_ADDR (0x004CDE80)
+#define sithThing_LandThing_ADDR (0x004CE050)
+#define sithThing_AttachThing_ADDR (0x004CE2C0)
+#define sithThing_DetachThing_ADDR (0x004CE380)
+#define sithThing_detachallchildren_ADDR (0x004CE540)
+#define sithThing_IsAttachFlagsAnd6_ADDR (0x004CE560)
+#define sithThing_LotsOfFreeing_ADDR (0x004CE580)
+#define sithThing_Load_ADDR (0x004CE710)
+#define sithThing_ParseArgs_ADDR (0x004CEB90)
+#define sithThing_LoadThingParam_ADDR (0x004CECB0)
+#define sithThing_TypeIdxFromStr_ADDR (0x004CF320)
+#define sithThing_GetIdxFromThing_ADDR (0x004CF380)
 #define sithThing_Checksum_ADDR (0x004CF3C0)
-#define sithThing_AttachToSurface_ADDR (0x4CDE80)
-#define sithThing_AttachThing_ADDR (0x4CE2C0)
-#define sithThing_SetNewModel_ADDR (0x4CD830)
-#define sithThing_LoadActorPlayerParams_ADDR (0x4ED7E0)
-#define sithThing_LoadThingParam_ADDR (0x4CECB0)
-#define sithThing_DoesRdThingInit_ADDR (0x4CD190)
-#define sithThing_sub_4CD8A0_ADDR (0x4CD8A0)
+#define sithThing_SyncThingPos_ADDR (0x004CF560)
+#define sithThing_netidk_ADDR (0x004CF5D0)
+#define sithThing_HasAttachment_ADDR (0x004CF660)
+#define sithThing_netidk2_ADDR (0x004CF690)
+#define sithThing_Release_ADDR (0x004E0740)
+#define sithThing_Hit_ADDR (0x004ECC90)
+#define sithThing_HurtSound_ADDR (0x004ECE90)
+#define sithThing_SpawnDeadBodyMaybe_ADDR (0x004ECFE0)
+#define sithThing_LoadActorPlayerParams_ADDR (0x004ED7E0)
 
 typedef struct sithAnimclass sithAnimclass;
 typedef struct sithSector sithSector;
@@ -561,7 +584,7 @@ typedef struct sithThingActorParams
     rdVector3 eyeOffset;
     float minHeadPitch;
     float maxHeadPitch;
-    rdVector3 fire_offset;
+    rdVector3 fireOffset;
     rdVector3 lightOffset;
     float lightIntensity;
     rdVector3 saberBladePos;
@@ -654,7 +677,7 @@ typedef struct sithThing
     sithThing* parentThing;
     uint32_t signature;
     sithThing* templateBase;
-    uint32_t template;
+    sithThing* template;
     sithThing* prev_thing;
     uint32_t child_signature;
     rdMatrix34 lookOrientation;
@@ -715,14 +738,27 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs);
 void sithThing_Remove(sithThing *thing);
 sithThing* sithThing_GetParent(sithThing *thing);
 sithThing* sithThing_GetThingByIdx(int idx);
+void sithThing_sub_4CCE60();
+void sithThing_FreeEverything(sithThing *thing);
+void sithThing_sub_4CD100(sithThing *thing);
 int sithThing_DoesRdThingInit(sithThing *thing);
 sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2);
 int sithThing_ParseArgs(stdConffileArg *arg, sithThing *thing);
+int sithThing_Load(sithWorld *world, int a2);
 int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param);
+int sithThing_LoadActorPlayerParams(stdConffileArg *arg, sithThing *thing, unsigned int param);
+void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot);
+void sithThing_LeaveSector(sithThing *thing);
+void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4);
+void sithThing_EnterWater(sithThing *thing, int a2);
+void sithThing_ExitWater(sithThing *thing, int a2);
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
+int sithThing_netidk2(int a1);
 
+static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, void *a3, float a4, int a5) = (void*)sithThing_LandThing_ADDR;
+static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
-static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
+//static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
 static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
 //static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 //static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
@@ -733,10 +769,10 @@ static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, 
 static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
-static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
-static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
+//static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
+//static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
 static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;
-static void (*sithThing_EnterSector)(sithThing *a1, sithSector *a2, int a3, int a4) = (void*)sithThing_EnterSector_ADDR;
+//static void (*sithThing_EnterSector)(sithThing *a1, sithSector *a2, int a3, int a4) = (void*)sithThing_EnterSector_ADDR;
 static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThing_ADDR;
 static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 //static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;

@@ -206,14 +206,16 @@ int sithSector_Startup();
 void sithSector_Shutdown();
 void sithSector_Close();
 int sithSector_Load(sithWorld *world, int tmp);
+int sithSector_LoadThingPhysicsParams(stdConffileArg *arg, sithThing *thing, int param);
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float dragCoef);
 void sithSector_ThingPhysicsTick(sithThing *thing, float force);
 void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds);
 void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
+void sithSector_ThingLandIdk(sithThing *thing, int a3);
 
 
-static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
+//static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
@@ -237,7 +239,7 @@ static void (*sithSector_cogMsg_SendOpenDoor)(sithThing *a1, __int16 a2, int a3,
 static void (*sithSector_cogMsg_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithSector_cogMsg_SendPlayKey_ADDR;
 static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithSector_cogMsg_SendStopKey_ADDR;
 static void (*sithSector_cogMsg_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithSector_cogMsg_SendSetThingModel_ADDR;
-static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
+//static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
 static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithSector_cogMsg_SendFireProjectile_ADDR;
 static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
 static int (*sithSector_cogMsg_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithSector_cogMsg_SendStopSound_ADDR;

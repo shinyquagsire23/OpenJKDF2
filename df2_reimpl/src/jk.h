@@ -407,7 +407,6 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define wm_msg_main_handler ((WNDPROC)0x50ECB0)
 
 #define pSithHS (*((struct common_functions **)0x82F0A4))
-#define g_cog_hashtable (*(void**)0x836C3C)
 
 void jk_init();
 

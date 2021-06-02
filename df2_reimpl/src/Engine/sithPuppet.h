@@ -39,9 +39,12 @@ struct sithPuppet
 #define sithPuppet_animNamesToIdxHashtable (*(stdHashTable**)0x00847E90)
 
 int sithPuppet_Startup();
+sithPuppet* sithPuppet_NewEntry(sithThing *thing);
+void sithPuppet_FreeEntry(sithThing *puppet);
+void sithPuppet_sub_4E4760(sithThing *thing, int a2);
 
 //static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
-static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;
+//static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;
 static void (*sithPuppet_Tick)(sithThing *thing, float a2) = (void*)sithPuppet_Tick_ADDR;
 static int (__cdecl *sithPuppet_PlayMode)(sithThing *a1, signed int anim, int callback) = (void*)sithPuppet_PlayMode_ADDR;
 static int (*sithPuppet_StartKey)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, int callback) = (void*)sithPuppet_StartKey_ADDR;

@@ -2,14 +2,16 @@
 
 #include "World/jkPlayer.h"
 #include "Engine/sithNet.h"
+#include "Engine/sithMulti.h"
 #include "World/sithWorld.h"
+#include "General/stdPalEffects.h"
 #include "jk.h"
 
 void sithPlayer_NewEntry(sithWorld *world)
 {
     sithThing *v1; // eax
     int v2; // ecx
-    int v3; // ebx
+    uint32_t v3; // ebx
     int v5; // ebp
     int v7; // edi
     void *v8; // eax
@@ -20,10 +22,9 @@ void sithPlayer_NewEntry(sithWorld *world)
     if ( v2 >= 0 )
     {
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[0];
-        v5 = v2 + 1;
-        do
+        for (v5 = v2 + 1; v5 >= 0; v5--)
         {
-            if ( v1->thingType == THINGTYPE_PLAYER && (unsigned int)v3 < 0x20 )
+            if ( v1->thingType == THINGTYPE_PLAYER && v3 < 0x20 )
             {
                 playerInfo->playerThing = v1;
                 v1->thingflags |= SITH_TF_INVULN;
@@ -36,9 +37,7 @@ void sithPlayer_NewEntry(sithWorld *world)
                 ++v3;
             }
             ++v1;
-            --v5;
         }
-        while ( v5 );
     }
     jkPlayer_maxPlayers = v3;
     for (int i = jkPlayer_maxPlayers; i < 32; i++)
@@ -82,4 +81,40 @@ int sithPlayer_GetNum(sithThing *player)
         i++;
     }
     return -1;
+}
+
+void sithPlayer_idk(int idx)
+{
+    unsigned int v6; // eax
+
+    playerThingIdx = idx;
+    g_selfPlayerInfo = &jkPlayer_playerInfos[idx];
+    g_localPlayerThing = jkPlayer_playerInfos[idx].playerThing;
+
+    sithWorld_pCurWorld->playerThing = g_localPlayerThing;
+    sithWorld_pCurWorld->cameraFocus = g_localPlayerThing;
+
+    g_localPlayerThing->thingflags &= ~0x100u;
+
+    _wcsncpy(g_selfPlayerInfo->player_name, jkPlayer_playerShortName, 0x1Fu);
+    g_selfPlayerInfo->player_name[31] = 0;
+
+    _wcsncpy(g_selfPlayerInfo->multi_name, sithMulti_name, 0x1Fu);
+    g_selfPlayerInfo->multi_name[31] = 0;
+
+    for (v6 = 0; v6 < jkPlayer_maxPlayers; v6++)
+    {
+        if (jkPlayer_playerInfos[v6].playerThing)
+        {
+            if ( v6 != idx )
+                jkPlayer_playerInfos[v6].playerThing->thingflags |= 0x100u;
+        }
+    }
+}
+
+void sithPlayer_ResetPalEffects()
+{
+    stdPalEffects_FlushAllEffects();
+    g_selfPlayerInfo->palEffectsIdx1 = stdPalEffects_NewRequest(1);
+    g_selfPlayerInfo->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }

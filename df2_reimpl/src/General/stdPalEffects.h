@@ -28,6 +28,10 @@
 
 #define stdPalEffects_Close_idk_ADDR (0x004C8620)
 
+#define stdPalEffects_palette ((rdColor24*)0x0055BB80) // 256
+#define stdPalEffects_numEffectRequests (*(uint32_t*)0x0055BE80)
+#define stdPalEffects_aEffects ((stdPalEffectRequest*)0x00866260) // 32
+
 typedef struct stdPalEffect
 {
     rdVector3 filter;
@@ -36,13 +40,22 @@ typedef struct stdPalEffect
     float fade;
 } stdPalEffect;
 
+typedef struct stdPalEffectRequest
+{
+  int isValid;
+  int idx;
+  stdPalEffect effect;
+} stdPalEffectRequest;
+
+int stdPalEffects_NewRequest(int idx);
+void stdPalEffects_FlushAllEffects();
+
 static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
 static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;
 static void (*stdPalEffects_SetTint)(int a1, float a2, float a3, float a4) = (void*)stdPalEffects_SetTint_ADDR;
 static void (*stdPalEffects_SetAdd)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetAdd_ADDR;
 static void (*stdPalEffects_SetFade)(int a1, float a2) = (void*)stdPalEffects_SetFade_ADDR;
 static void (*stdPalEffects_FreeRequest)(int a1) = (void*)stdPalEffects_FreeRequest_ADDR;
-static int (*stdPalEffects_NewRequest)(int a1) = (void*)stdPalEffects_NewRequest_ADDR;
 static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
 
 #endif // _STDPALEFFECTS_H

@@ -1,6 +1,8 @@
 #ifndef _RDPUPPET_H
 #define _RDPUPPET_H
 
+#include "types.h"
+
 #define rdPuppet_New_ADDR (0x0043E640)
 #define rdPuppet_RemoveTrack_ADDR (0x0043E6D0)
 #define rdPuppet_Free_ADDR (0x0043E740)
@@ -21,9 +23,7 @@
 #define rdPuppet_unk_ADDR (0x0043EE60)
 #define rdPuppet_BuildJointMatrices_ADDR (0x0043EEB0)
 
-typedef struct rdKeyframe rdKeyframe;
-typedef struct rdHierarchyNode rdHierarchyNode;
-typedef struct rdThing rdThing;
+typedef void (*rdPuppetTrackCallback_t)(sithThing*, int, int);
 
 typedef struct rdPuppetTrack
 {
@@ -102,7 +102,7 @@ typedef struct rdPuppetTrack
     float field_120;
     float field_124;
     rdKeyframe *keyframe;
-    int callback;
+    rdPuppetTrackCallback_t callback;
     int field_130;
 } rdPuppetTrack;
 
@@ -113,9 +113,10 @@ typedef struct rdPuppet
     rdPuppetTrack tracks[4];
 } rdPuppet;
 
+rdPuppet* rdPuppet_New(rdThing *thing);
+void rdPuppet_Free(rdPuppet *puppet);
+
 static int (*rdPuppet_UpdateTracks)(rdPuppet *puppet, float a2) = (void*)rdPuppet_UpdateTracks_ADDR;
-static rdPuppet* (*rdPuppet_New)(rdThing *thing) = (void*)rdPuppet_New_ADDR;
-static void (__cdecl *rdPuppet_Free)(void* pup) = (void*)rdPuppet_Free_ADDR;
 static void (__cdecl *rdPuppet_BuildJointMatrices)(rdThing *thing_1, rdMatrix34 *matrix) = (void*)rdPuppet_BuildJointMatrices_ADDR;
 
 #endif // _RDPUPPET_H

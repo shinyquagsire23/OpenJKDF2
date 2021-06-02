@@ -1,6 +1,7 @@
 #include "sithSoundSys.h"
 
 #include "Engine/sithSound.h"
+#include "Win95/stdSound.h"
 #include "Win95/stdMci.h"
 #include "jk.h"
 
@@ -56,4 +57,64 @@ int sithSoundSys_Open()
 
     sithSoundSys_bOpened = 1;
     return 1;
+}
+
+void sithSoundSys_FreeThing(sithThing *thing)
+{
+    int *v1; // esi
+    int v2; // eax
+    int v3; // eax
+    int v5; // edx
+    int v6; // eax
+    IDirectSoundBuffer *v7; // [esp-10h] [ebp-18h]
+    unsigned int v8; // [esp+4h] [ebp-4h]
+
+    if (!sithSoundSys_bOpened)
+        return;
+
+    for (v8 = 0; v8 < sithSoundSys_numSoundsAvailable; v8++)
+    {
+        sithPlayingSound* playingSound = &sithSoundSys_aPlayingSounds[v8];
+        
+        if ( (playingSound->flags & 0x80u) != 0 && thing == playingSound->thing )
+        {
+            if ( (playingSound->flags & 1) != 0 )
+            {
+                if ( (playingSound->flags & 0x20000) != 0 )
+                {
+                    stdSound_BufferReset(playingSound->field_0);
+                    v3 = sithSoundSys_dword_836BE8;
+                    playingSound->flags &= ~0x20000u;
+                    v7 = (IDirectSoundBuffer *)playingSound->field_0;
+                    sithSoundSys_dword_836BE8 = v3 - 1;
+                    stdSound_BufferRelease(v7);
+                    playingSound->field_0 = 0;
+                    --*(uint32_t*)(playingSound->vtable + 64);
+                }
+
+                if ( playingSound->field_0 )
+                {
+                    stdSound_BufferRelease(playingSound->field_0);
+                    playingSound->field_0 = 0;
+                }
+                if ( playingSound->anonymous_0 )
+                {
+                    stdSound_BufferRelease_0(playingSound->anonymous_0);
+                    playingSound->anonymous_0 = 0;
+                }
+                v5 = playingSound->idx;
+                _memset(playingSound, 0, sizeof(sithPlayingSound));
+                v6 = sithSoundSys_numSoundsAvailable2;
+                playingSound->idx = v5;
+                sithSoundSys_aIdk[v6] = v5;
+                sithSoundSys_numSoundsAvailable2 = v6 + 1;
+            }
+            else
+            {
+                playingSound->idx &= ~0x80;
+                playingSound->idx |= 0x40;
+                rdVector_Copy3(&playingSound->pos, &thing->position);
+            }
+        }
+    }
 }

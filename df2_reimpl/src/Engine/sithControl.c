@@ -6,7 +6,16 @@ int sithControl_IsOpen()
 }
 
 #ifdef LINUX
+int sithControl_Initialize()
+{
+    return 1;
+}
+
 void sithControl_InputInit()
+{
+}
+
+void sithControl_AddInputHandler(void *a1)
 {
 }
 #endif

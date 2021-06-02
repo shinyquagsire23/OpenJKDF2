@@ -244,6 +244,7 @@ void jkMain_GameplayShow(int a1, int a2)
         sithSoundSys_ResumeMusic(1);
         goto LABEL_39;
     }
+
     if ( jkSmack_gameMode == 4 )
     {
         jkPlayer_Startup();
@@ -269,6 +270,7 @@ LABEL_39:
         }
         return;
     }
+
     if ( jkSmack_gameMode == 1 )
     {
         jkGui_copies_string(gamemode_1_str);
@@ -279,6 +281,7 @@ LABEL_39:
         jkGui_copies_string(gamemode_0_2_str);
         jkGuiTitle_ShowLoading(gamemode_0_2_str, 0);
     }
+
     if ( jkSmack_gameMode )
     {
         if ( jkSmack_gameMode == 1 )
@@ -296,6 +299,7 @@ LABEL_39:
     {
         v3 = sith_Mode1Init(gamemode_0_2_str);
     }
+
     level_loaded = v3;
 LABEL_15:
     jkGuiTitle_LoadingFinalize();
@@ -317,6 +321,7 @@ LABEL_15:
         jkGuiDialog_ErrorDialog(v4, v6);
         return;
     }
+
     if ( !net_isMulti )
     {
         jkPlayer_Startup();

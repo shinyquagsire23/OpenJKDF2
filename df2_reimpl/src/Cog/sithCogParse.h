@@ -53,7 +53,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt);
 int sithCogParse_ReallocSymboltable(sithCogSymboltable *table);
 void sithCogParse_FreeSymboltable(sithCogSymboltable *table);
 sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *symbolName);
-void sithCogParse_SetSymbolVal(sithCogSymbol *a1, struct cogSymbol *a2);
+void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2);
 sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2);
 sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int idx);
 int sithCogParse_GetSymbolScriptIdx(unsigned int idx);

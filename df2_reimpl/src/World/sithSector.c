@@ -5,10 +5,12 @@
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
 #include "World/sithUnk3.h"
+#include "Engine/sithAdjoin.h"
 #include "jk.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithTimer.h"
 #include "Engine/rdColormap.h"
+#include "Primitives/rdFace.h"
 
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
@@ -72,7 +74,7 @@ int sithSector_Load(sithWorld *world, int tmp)
     world->sectors = v5;
     if ( v5 )
     {
-        memset(v5, 0, alloc_size);
+        _memset(v5, 0, alloc_size);
         v6 = world->sectors;
         v7 = 0;
         for ( world->numSectors = sectors_amt_; v7 < sectors_amt_; ++v7 )
@@ -146,7 +148,7 @@ int sithSector_Load(sithWorld *world, int tmp)
             }
             if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &sectors->field_54) == 2 )
             {
-                sectors->field_50 = (int)sithSound_LoadEntry(sound_fname, 0);
+                sectors->field_50 = sithSound_LoadEntry(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }
@@ -191,6 +193,94 @@ LABEL_39:
         return 0;
     }
     return 1;
+}
+
+int sithSector_LoadThingPhysicsParams(stdConffileArg *arg, sithThing *thing, int param)
+{
+    float tmp;
+    int tmpInt;
+
+    switch ( param )
+    {
+        case THINGPARAM_SURFDRAG:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 )
+                return 0;
+            thing->physicsParams.surfaceDrag = tmp;
+            return 1;
+        case THINGPARAM_AIRDRAG:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 )
+                return 0;
+            thing->physicsParams.airDrag = tmp;
+            return 1;
+        case THINGPARAM_STATICDRAG:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 )
+                return 0;
+            thing->physicsParams.staticDrag = tmp;
+            return 1;
+        case THINGPARAM_MASS:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 )
+                return 0;
+            thing->physicsParams.mass = tmp;
+            return 1;
+        case THINGPARAM_HEIGHT:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 )
+                return 0;
+            thing->physicsParams.height = tmp;
+            return 1;
+        case THINGPARAM_PHYSFLAGS:
+            if ( _sscanf(arg->value, "%x", &tmpInt) != 1 )
+                return 0;
+            thing->physicsParams.physflags = tmpInt;
+            return 1;
+        case THINGPARAM_MAXROTVEL:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+                return 0;
+            thing->physicsParams.maxRotVel = tmp;
+            return 1;
+        case THINGPARAM_MAXVEL:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+                return 0;
+            thing->physicsParams.maxVel = tmp;
+            return 1;
+        case THINGPARAM_VEL:
+            if (_sscanf(
+                      arg->value,
+                      "(%f/%f/%f)",
+                      &thing->physicsParams.vel,
+                      &thing->physicsParams.vel.y,
+                      &thing->physicsParams.vel.z) != 3)
+                return 0;
+            return 1;
+        case THINGPARAM_ANGVEL:
+            if (_sscanf(
+                      arg->value,
+                      "(%f/%f/%f)",
+                      &thing->physicsParams.angVel,
+                      &thing->physicsParams.angVel.y,
+                      &thing->physicsParams.angVel.z) != 3)
+                return 0;
+
+            return 1;
+        case THINGPARAM_ORIENTSPEED:
+            tmp = _atof(arg->value);
+            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+                return 0;
+            thing->physicsParams.orientSpeed = tmp;
+            return 1;
+        case THINGPARAM_BUOYANCY:
+            tmp = _atof(arg->value);
+            thing->physicsParams.buoyancy = tmp;
+            return 1;
+        default:
+            return 0;
+    }
 }
 
 void sithSector_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs)
@@ -424,5 +514,146 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
         }
         rdVector_Add3Acc(&player->physicsParams.vel, &a1a);
         rdVector_MultAcc3(&player->velocityMaybe, &player->physicsParams.vel, DELTA_50FPS);
+    }
+}
+
+void sithSector_ThingLandIdk(sithThing *thing, int a3)
+{
+    sithSector *sector; // eax
+    int v4; // ecx
+    sithUnk3SearchEntry *v5; // eax
+    int32_t v6; // ecx
+    double v7; // st7
+    double v8; // st7
+    double v9; // st7
+    sithUnk3SearchEntry *i; // esi
+    sithThing *v11; // edi
+    rdFace *v12; // eax
+    int v14; // [esp+10h] [ebp-20h]
+    float range; // [esp+14h] [ebp-1Ch]
+    rdVector3 direction; // [esp+18h] [ebp-18h] BYREF
+    rdVector3 a1; // [esp+24h] [ebp-Ch] BYREF
+    float thinga; // [esp+34h] [ebp+4h]
+    float thingb; // [esp+34h] [ebp+4h]
+
+    range = 0.0;
+    sector = thing->sector;
+    v4 = thing->physicsParams.physflags;
+    v14 = 0;
+    if ( sector )
+    {
+        if ( (sector->flags & 2) != 0 )
+        {
+            if ( thing->thingType == THINGTYPE_PLAYER )
+            {
+                sithUnk3_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
+                v5 = sithUnk3_NextSearchResult();
+                if ( v5 )
+                {
+                    while ( (v5->collideType & 0x20) == 0 || (v5->surface->adjoin->sector->flags & 2) != 0 )
+                    {
+                        v5 = sithUnk3_NextSearchResult();
+                        if ( !v5 )
+                            goto LABEL_8;
+                    }
+                    v6 = thing->trackParams.numFrames | PHYSFLAGS_MIDAIR;
+                    thing->field_48 = v5->distance;
+                    thing->trackParams.numFrames = v6;
+                    sithUnk3_SearchClose();
+                }
+                else
+                {
+LABEL_8:
+                    sithUnk3_SearchClose();
+                    thing->trackParams.numFrames &= ~PHYSFLAGS_MIDAIR;
+                }
+            }
+        }
+        else
+        {
+            if ( (v4 & 0x80u) == 0 )
+            {
+                direction.x = -0.0;
+                direction.y = direction.x;
+                v7 = 1.0;
+                v14 = 16;
+            }
+            else
+            {
+                direction.x = -thing->lookOrientation.uvec.x;
+                direction.y = -thing->lookOrientation.uvec.y;
+                v7 = thing->lookOrientation.uvec.z;
+            }
+            direction.z = -v7;
+            if ( a3 || thing->attach_flags )
+            {
+                v9 = thing->physicsParams.height;
+                if ( v9 == 0.0 )
+                {
+                    if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
+                        v9 = thing->rdthing.model3->insertOffset.z;
+                    thinga = thing->moveSize - -0.0049999999;
+                    if ( v9 <= thinga )
+                        v9 = thinga;
+                }
+                if ( (v4 & 0xC0) != 0 )
+                    v8 = v9 + v9;
+                else
+                    v8 = v9 * 1.1;
+            }
+            else
+            {
+                v8 = thing->moveSize - -0.0049999999;
+            }
+            thingb = v8;
+            if ( v8 > 0.0 )
+            {
+                sithUnk3_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, 0.0, v14 | 0x2802);
+                while ( 1 )
+                {
+                    for ( i = sithUnk3_NextSearchResult(); i; i = sithUnk3_NextSearchResult() )
+                    {
+                        if ( (i->collideType & 2) != 0 )
+                        {
+                            sithThing_AttachToSurface(thing, i->surface, a3);
+                            sithUnk3_SearchClose();
+                            return;
+                        }
+                        if ( (i->collideType & 1) != 0 )
+                        {
+                            v11 = i->receiver;
+                            if ( v11 != thing )
+                            {
+                                v12 = i->face;
+                                if ( !v12 || !i->sender )
+                                {
+                                    sithUnk3_SearchClose();
+                                    return;
+                                }
+                                if ( (v14 & 0x10) == 0
+                                  || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), a1.x * 0.0 + a1.y * 0.0 + a1.z * 1.0 >= 0.60000002) )
+                                {
+                                    sithThing_LandThing(thing, v11, i->face, i->sender->collideSize, a3);
+                                    sithUnk3_SearchClose();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    sithUnk3_SearchClose();
+                    if ( range != 0.0 )
+                        break;
+
+                    if ( thing->thingType != THINGTYPE_ACTOR && thing->thingType != THINGTYPE_PLAYER )
+                        break;
+                    if ( thing->moveSize == 0.0 )
+                        break;
+                    range = thing->moveSize;
+                    sithUnk3_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, range, v14 | 0x2802);
+                }
+            }
+            if ( thing->attach_flags )
+                sithThing_DetachThing(thing);
+        }
     }
 }

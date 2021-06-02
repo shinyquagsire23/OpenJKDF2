@@ -61,7 +61,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     rdVector3 orientation;
     rdVector3 vel;
     rdVector3 angVel;
-    char entry_num;
+    int entry_num;
     char mesh_name[32];
     unsigned int nodes_read;
 

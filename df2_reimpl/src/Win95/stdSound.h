@@ -46,6 +46,7 @@ static int (*stdSound_BufferUnlock)(LPDIRECTSOUNDBUFFER a1, void* buffer, int bu
 static void (*stdSound_BufferRelease)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferRelease_ADDR;
 static LPDIRECTSOUNDBUFFER (*stdSound_BufferDuplicate)(LPDIRECTSOUNDBUFFER buf) = (void*)stdSound_BufferDuplicate_ADDR;
 static int (*stdSound_IsPlaying)(LPDIRECTSOUNDBUFFER a1, int *pos) = (void*)stdSound_IsPlaying_ADDR;
+static void (*stdSound_BufferRelease_0)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferRelease_0_ADDR;
 
 #ifdef WIN32
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;

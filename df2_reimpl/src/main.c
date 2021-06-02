@@ -59,6 +59,7 @@
 #include "Engine/sith.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
+#include "Engine/sithPuppet.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
@@ -66,7 +67,6 @@
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithMaterial.h"
-#include "Engine/sithParticle.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithSound.h"
 #include "Primitives/rdModel3.h"
@@ -118,9 +118,25 @@
 
 int main(int argc, char** argv)
 {
-    mmap((void*)0x400000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    
+    // Fill with illegal instructions
+    for (int i = 0; i < 0x500000; i += 2)
+    {
+        *(uint8_t*)(0x400000+i) = 0x0f;
+        *(uint8_t*)(0x400000+i+1) = 0x0b;
+    }
+    
+    // Zero .rodata, .data and .bss before loading
+    memset((void*)0x525000, 0, 0x3DE000);
     
     FILE* f = fopen("JK.EXE", "rb");
+    
+    // text
+    fseek(f, 0x400, SEEK_SET);
+    //fread((void*)0x401000, 0x120200, 1, f);
+    
     // rdata
     fseek(f, 0x120600, SEEK_SET);
     fread((void*)0x522000, 0x2200, 1, f);
@@ -130,6 +146,14 @@ int main(int argc, char** argv)
     fread((void*)0x525000, 0x2DA00, 1, f);
     fclose(f);
     
+    do_hooks();
+    
+    mprotect((void*)0x400000, 0x122000, PROT_READ | PROT_EXEC);
+    
+    //printf("%x\n", *(uint32_t*)0x401000);
+    
+    //while (1);
+    
     Window_Main_Linux(argc, argv);
 }
 
@@ -137,7 +161,6 @@ int main(int argc, char** argv)
 
 #ifdef WIN32
 __declspec(dllexport) void hook_init(void);
-int yyparse();
 
 __declspec(dllexport) int WinMain_(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd)
 {
@@ -158,12 +181,21 @@ __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInsta
 }
 
 void _pei386_runtime_relocator(){}
+void do_hooks();
 
 __declspec(dllexport) void hook_init(void)
 {
     jk_init();
-    
+    do_hooks();
+}
+#endif
+
+int yyparse();
+void do_hooks()
+{
+#ifndef LINUX
     hook_function(WinMain_ADDR, WinMain_);
+#endif
     
     // stdPlatform
     hook_function(stdPlatform_InitServices_ADDR, stdPlatform_InitServices);
@@ -192,6 +224,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithCog_Shutdown_ADDR, sithCog_Shutdown);
     hook_function(sithCog_LoadEntry_ADDR, sithCog_LoadEntry);
     hook_function(sithCog_SendMessageFromThing_ADDR, sithCog_SendMessageFromThing);
+    hook_function(sithCog_SendMessageFromSector_ADDR, sithCog_SendMessageFromSector);
+    hook_function(sithCog_SendMessageFromSectorEx_ADDR, sithCog_SendMessageFromSectorEx);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
@@ -501,7 +535,8 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithStrTable_Shutdown_ADDR, sithStrTable_Shutdown);
     hook_function(sithStrTable_GetUniString_ADDR, sithStrTable_GetUniString);
     hook_function(sithStrTable_GetString_ADDR, sithStrTable_GetString);
-    
+
+#ifndef LINUX
     // stdConsole
     hook_function(stdConsole_Startup_ADDR, stdConsole_Startup);
     hook_function(stdConsole_Shutdown_ADDR, stdConsole_Shutdown);
@@ -523,6 +558,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdConsole_WriteBorderMaybe2_ADDR, stdConsole_WriteBorderMaybe2);
     hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
+#endif
     
     // Window
     hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);
@@ -558,6 +594,7 @@ __declspec(dllexport) void hook_init(void)
     hook_function(wuRegistry_SetString_ADDR, wuRegistry_SetString);
     hook_function(wuRegistry_GetString_ADDR, wuRegistry_GetString);
     
+#ifndef LINUX
     // stdGdi
     hook_function(stdGdi_Create8bppPaletted_ADDR, stdGdi_Create8bppPaletted);
     hook_function(stdGdi_CreateRGB_ADDR, stdGdi_CreateRGB);
@@ -569,6 +606,10 @@ __declspec(dllexport) void hook_init(void)
     hook_function(stdGdi_GetHwnd_ADDR, stdGdi_GetHwnd);
     hook_function(stdGdi_SetHInstance_ADDR, stdGdi_SetHInstance);
     hook_function(stdGdi_GetHInstance_ADDR, stdGdi_GetHInstance);
+#else
+    hook_function(stdGdi_GetHInstance_ADDR, stdGdi_GetHInstance);
+    hook_function(stdGdi_GetHwnd_ADDR, stdGdi_GetHwnd);
+#endif
     
     // stdMemory
     hook_function(stdMemory_Startup_ADDR, stdMemory_Startup);
@@ -861,9 +902,18 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithThing_Remove_ADDR, sithThing_Remove);
     hook_function(sithThing_GetParent_ADDR, sithThing_GetParent);
     hook_function(sithThing_GetThingByIdx_ADDR, sithThing_GetThingByIdx);
+    hook_function(sithThing_sub_4CCE60_ADDR, sithThing_sub_4CCE60);
+    hook_function(sithThing_FreeEverything_ADDR, sithThing_FreeEverything);
+    hook_function(sithThing_sub_4CD100_ADDR, sithThing_sub_4CD100);
     hook_function(sithThing_DoesRdThingInit_ADDR, sithThing_DoesRdThingInit);
     hook_function(sithThing_sub_4CD8A0_ADDR, sithThing_sub_4CD8A0);
+    hook_function(sithThing_SetPosAndRot_ADDR, sithThing_SetPosAndRot);
+    hook_function(sithThing_LeaveSector_ADDR, sithThing_LeaveSector);
+    hook_function(sithThing_EnterSector_ADDR, sithThing_EnterSector);
+    hook_function(sithThing_EnterWater_ADDR, sithThing_EnterWater);
+    hook_function(sithThing_ExitWater_ADDR, sithThing_ExitWater);
     hook_function(sithThing_Checksum_ADDR, sithThing_Checksum);
+    hook_function(sithThing_netidk2_ADDR, sithThing_netidk2);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1006,6 +1056,8 @@ __declspec(dllexport) void hook_init(void)
     // sithPlayer
     hook_function(sithPlayer_GetBinAmt_ADDR, sithPlayer_GetBinAmt);
     hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
+    hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
+    hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1175,6 +1227,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithParticle_FreeEntry_ADDR, sithParticle_FreeEntry);
     hook_function(sithParticle_Free_ADDR, sithParticle_Free);
     
+    // sithPuppet
+    hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
+    
     // sithRender
     hook_function(sithRender_Startup_ADDR, sithRender_Startup);
     hook_function(sithRender_Open_ADDR, sithRender_Open);
@@ -1217,6 +1272,9 @@ __declspec(dllexport) void hook_init(void)
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
     hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
+    hook_function(sithAI_NewEntry_ADDR, sithAI_NewEntry);
+    hook_function(sithAI_FreeEntry_ADDR, sithAI_FreeEntry);
+    hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
 
     // sithAIClass
     
@@ -1413,5 +1471,11 @@ __declspec(dllexport) void hook_init(void)
     //*(float*)0x5220C4 = 0.01f;
     
     //hook_function();
-}
+    
+#ifdef LINUX
+    hook_function(Window_ShowCursorUnwindowed_ADDR, Window_ShowCursorUnwindowed);
+    //hook_function(Window_DefaultHandler_ADDR, Window_DefaultHandler);
+    hook_function(Window_MessageLoop_ADDR, Window_MessageLoop);
+    hook_function(Window_msg_main_handler_ADDR, Window_msg_main_handler);
 #endif
+}

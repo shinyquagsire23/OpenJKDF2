@@ -1,13 +1,7 @@
 #ifndef _SITHUNK3_H
 #define _SITHUNK3_H
 
-#include <stdint.h>
-#include "Primitives/rdVector.h"
-#include "Primitives/rdMatrix.h"
-
-typedef struct sithThing sithThing;
-typedef struct sithSurface sithSurface;
-typedef struct sithSector sithSector;
+#include "types.h"
 
 #define sithUnk3_Startup_ADDR (0x004E6D90)
 #define sithUnk3_Shutdown_ADDR (0x004E6F20)
@@ -44,7 +38,7 @@ typedef struct sithUnk3SearchEntry
     uint32_t collideType;
     sithThing* receiver;
     sithSurface* surface;
-    uint32_t field_C;
+    rdFace* face;
     sithThing* sender;
     rdVector3 field_14;
     float distance;

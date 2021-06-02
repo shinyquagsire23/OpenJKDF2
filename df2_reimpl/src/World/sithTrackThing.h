@@ -1,7 +1,7 @@
 #ifndef _SITHTRACKTHING_H
 #define _SITHTRACKTHING_H
 
-typedef struct sithThing sithThing;
+#include "types.h"
 
 #define sithTrackThing_SkipToFrame_ADDR (0x004FA770)
 #define sithTrackThing_MoveToFrame_ADDR (0x004FA840)
@@ -17,7 +17,9 @@ typedef struct sithThing sithThing;
 #define sithTrackThing_PathMoveResume_ADDR (0x004FB690)
 #define sithTrackThing_idkpathmove_ADDR (0x004FB6D0)
 
-static int (*sithTrackThing_LoadPathParams)(stdConffileArg *arg, sithThing *thing, int a3) = (void*)sithTrackThing_LoadPathParams_ADDR;
+int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param);
+
+//static int (*sithTrackThing_LoadPathParams)(stdConffileArg *arg, sithThing *thing, int a3) = (void*)sithTrackThing_LoadPathParams_ADDR;
 static void (*sithTrackThing_Tick)(sithThing *thing, float a2) = (void*)sithTrackThing_Tick_ADDR;
 static void (*sithTrackThing_Stop)(sithThing* thing) = (void*)sithTrackThing_Stop_ADDR;
 static void (*sithTrackThing_MoveToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_MoveToFrame_ADDR;

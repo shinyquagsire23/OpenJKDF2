@@ -71,7 +71,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
   stdVBufferTexFmt format; // [esp+60h] [ebp-D8h]
   rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
-  int textures_idk[8]; // [esp+F8h] [ebp-40h]
+  int textures_idk[16]; // [esp+F8h] [ebp-40h]
   stdVBuffer *created_tex; // eax
 
   material_ = material;

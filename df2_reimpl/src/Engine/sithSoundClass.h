@@ -148,9 +148,14 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
 
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;
 //static int (*sithSoundClass_Load)(sithWorld* world, int a) = (void*)sithSoundClass_Load_ADDR;
-static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
 static void (*sithSoundClass_ThingPlaySoundclass4)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass4_ADDR;
 static void (*sithSoundClass_ThingPauseSoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPauseSoundclass_ADDR;
 static void (*sithSoundClass_Free2)(sithWorld* world) = (void*)sithSoundClass_Free2_ADDR;
+
+#ifdef LINUX
+sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2);
+#else
+static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
+#endif
 
 #endif // _SITHSOUNDCLASS_H

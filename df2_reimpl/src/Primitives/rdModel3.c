@@ -96,8 +96,8 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     float pivot_z; // [esp+80h] [ebp-14h]
     float v_u; // [esp+84h] [ebp-10h]
     int child; // [esp+88h] [ebp-Ch]
-    char version_minor; // [esp+8Ch] [ebp-8h]
-    char version_major; // [esp+90h] [ebp-4h]
+    int version_minor; // [esp+8Ch] [ebp-8h]
+    int version_major; // [esp+90h] [ebp-4h]
     int geoset_num;
 
     rdModel3_NewEntry(model);

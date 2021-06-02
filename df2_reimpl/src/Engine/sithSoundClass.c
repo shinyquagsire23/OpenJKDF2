@@ -309,3 +309,10 @@ LABEL_9:
 
     return 1;
 }
+
+#ifdef LINUX
+sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
+{
+    return NULL;
+}
+#endif

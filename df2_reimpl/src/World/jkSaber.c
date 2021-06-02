@@ -14,9 +14,48 @@
 #include "World/sithUnk3.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
+#include "Gui/jkGUINet.h"
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)
+
+#define jkSaber_cogMsg_HandleJKEnableSaber ((void*)jkSaber_cogMsg_HandleJKEnableSaber_ADDR)
+#define jkSaber_cogMsg_HandleSetSaberInfo2 ((void*)jkSaber_cogMsg_HandleSetSaberInfo2_ADDR)
+#define jkSaber_cogMsg_HandleJKSetWeaponMesh ((void*)jkSaber_cogMsg_HandleJKSetWeaponMesh_ADDR)
+#define jkSaber_cogMsg_Handlex32 ((void*)jkSaber_cogMsg_Handlex32_ADDR)
+#define jkSaber_cogMsg_Handlex33 ((void*)jkSaber_cogMsg_Handlex33_ADDR)
+#define jkSaber_cogMsg_HandleHudTarget ((void*)jkSaber_cogMsg_HandleHudTarget_ADDR)
+#define jkSaber_cogMsg_Handlex36_setwaggle ((void*)jkSaber_cogMsg_Handlex36_setwaggle_ADDR)
+#define jkSaber_cogMsg_HandleJKPrintUniString ((void*)jkSaber_cogMsg_HandleJKPrintUniString_ADDR)
+#define jkSaber_cogMsg_HandleEndLevel ((void*)jkSaber_cogMsg_HandleEndLevel_ADDR)
+#define jkSaber_cogMsg_HandleSetSaberInfo ((void*)jkSaber_cogMsg_HandleSetSaberInfo_ADDR)
+#define jkSaber_cogMsg_HandleSetTeam ((void*)jkSaber_cogMsg_HandleSetTeam_ADDR)
+#define jkSaber_playerconfig_idksync ((void*)jkSaber_playerconfig_idksync_ADDR)
+#define jkSaber_player_thingsidkfunc ((void*)jkSaber_player_thingsidkfunc_ADDR)
+#define jkSaber_nullsub_2 ((void*)jkSaber_nullsub_2_ADDR)
+#define jkSaber_Write ((void*)jkSaber_Write_ADDR)
+#define jkSaber_Load ((void*)jkSaber_Load_ADDR)
+#define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
+
+int jkSaber_Startup()
+{
+    sithCogVm_SetMsgFunc(COGMSG_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
+    sithCogVm_SetMsgFunc(COGMSG_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
+    sithCogVm_SetMsgFunc(COGMSG_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
+    sithCogVm_SetMsgFunc(COGMSG_ID_32, jkSaber_cogMsg_Handlex32);
+    sithCogVm_SetMsgFunc(COGMSG_ID_33, jkSaber_cogMsg_Handlex33);
+    sithCogVm_SetMsgFunc(COGMSG_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
+    sithCogVm_SetMsgFunc(COGMSG_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
+    sithCogVm_SetMsgFunc(COGMSG_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
+    sithCogVm_SetMsgFunc(COGMSG_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
+    sithCogVm_SetMsgFunc(COGMSG_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithCogVm_SetMsgFunc(COGMSG_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithCogVm_SetMsgFunc(COGMSG_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
+    sithCogVm_SetMsgFunc(COGMSG_JOINING, jkGuiNet_CogMsgHandleJoining);
+    sithSave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
+    sithMulti_SetHandleridk(jkSaber_idk4);
+    return 1;
+}
 
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
 {

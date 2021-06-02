@@ -1,7 +1,7 @@
 #ifndef _JKSABER_H
 #define _JKSABER_H
 
-#include "Primitives/rdMatrix.h"
+#include "types.h"
 
 #define jkSaber_InitializeSaberInfo_ADDR (0x0040B4C0)
 #define jkSaber_PolylineRand_ADDR (0x0040B590)
@@ -44,9 +44,7 @@
 #define jkSaber_cogMsg_SendSetTeam_ADDR (0x0040D3E0)
 #define jkSaber_cogMsg_HandleSetTeam_ADDR (0x0040D450)
 
-typedef struct sithThing sithThing;
-typedef struct rdThing rdThing;
-
+int jkSaber_Startup();
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks);
 void jkSaber_PolylineRand(rdThing *thing);
 void jkSaber_Draw(rdMatrix34 *posRotMat);
@@ -54,7 +52,6 @@ void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint);
 
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
-static int (*jkSaber_Startup)() = (void*)jkSaber_Startup_ADDR;
 static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;
 

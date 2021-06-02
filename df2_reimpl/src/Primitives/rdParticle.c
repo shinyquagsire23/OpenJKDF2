@@ -138,9 +138,9 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
     rdVector3 v19; // [esp+10h] [ebp-20h]
     float size; // [esp+1Ch] [ebp-14h]
     int v21; // [esp+20h] [ebp-10h]
-    char versMinor; // [esp+24h] [ebp-Ch]
-    char versMajor; // [esp+28h] [ebp-8h]
-    char v24; // [esp+2Ch] [ebp-4h]
+    int versMinor; // [esp+24h] [ebp-Ch]
+    int versMajor; // [esp+28h] [ebp-8h]
+    int v24; // [esp+2Ch] [ebp-4h]
 
     v2 = fpath;
     v3 = stdFileFromPath(fpath);

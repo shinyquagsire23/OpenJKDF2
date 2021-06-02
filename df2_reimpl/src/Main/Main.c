@@ -210,10 +210,10 @@ int Main_Startup(const char *cmdline)
 #endif
         jkGame_Initialize();
         Video_Startup();
-#ifndef LINUX
         jkControl_Initialize(); // ~TODO
-        jkHudInv_Initialize(); // TODO
-        jkSaber_Startup(); // TODO
+        jkHudInv_Initialize();
+        jkSaber_Startup();
+#ifndef LINUX
         jkCutscene_Initialize("ui\\cutStrings.uni"); // TODO
         jkCredits_Initialize((int)"ui\\credits.uni"); // TODO
 #endif

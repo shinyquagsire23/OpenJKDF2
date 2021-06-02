@@ -120,8 +120,6 @@ enum INPUT_FUNC
 int sithControl_IsOpen();
 
 static int (*sithControl_ReadFunctionMap)(int a1, void *a2) = (void*)sithControl_ReadFunctionMap_ADDR;
-static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
-static int (*sithControl_AddInputHandler)(void *a1) = (void*)sithControl_AddInputHandler_ADDR;
 static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
@@ -131,9 +129,13 @@ static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 
 #ifdef LINUX
+int sithControl_Initialize();
 void sithControl_InputInit();
+void sithControl_AddInputHandler(void *a1);
 #else
+static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
 static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
+static void (*sithControl_AddInputHandler)(void *a1) = (void*)sithControl_AddInputHandler_ADDR;
 #endif
 
 #endif // _SITHCONTROL_H

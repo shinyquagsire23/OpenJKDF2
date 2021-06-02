@@ -49,6 +49,7 @@
 #define sithSoundSys_numSoundsAvailable (*(int*)0x00835FE4)
 #define sithSoundSys_aPlayingSounds ((sithPlayingSound*)0x00835FE8)
 #define sithSoundSys_aIdk ((int*)0x00836B68)
+#define sithSoundSys_dword_836BE8 (*(int*)0x00836BE8)
 #define sithSoundSys_bOpened (*(int*)0x00836BEC)
 #define sithSoundSys_dword_836BF4 (*(int*)0x00836BF4)
 #define sithSoundSys_dword_836BF8 (*(int*)0x00836BF8)
@@ -71,8 +72,8 @@ enum SITHSOUNDFLAG
 typedef struct sithPlayingSound
 {
     LPDIRECTSOUNDBUFFER field_0;
-    int anonymous_0;
-    int vtable;
+    LPDIRECTSOUNDBUFFER anonymous_0;
+    intptr_t vtable;
     int flags;
     int idx;
     float vol_2;
@@ -88,14 +89,13 @@ typedef struct sithPlayingSound
     int anonymous_14;
     int anonymous_15;
     int anonymous_16;
-    int anonymous_17;
-    int anonymous_18;
-    int anonymous_19;
-    int anonymous_20;
+    sithThing* thing;
+    rdVector3 pos;
     int refid;
 } sithPlayingSound;
 
 int sithSoundSys_Startup();
+void sithSoundSys_FreeThing(sithThing *thing);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
 static void (*sithSoundSys_ResumeMusic)(int a1) = (void*)sithSoundSys_ResumeMusic_ADDR;
@@ -104,7 +104,7 @@ static void (*sithSoundSys_StopAll)() = (void*)sithSoundSys_StopAll_ADDR;
 
 static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
 static void (*sithSoundSys_UpdateMusicVolume)(float musicVolume) = (void*)sithSoundSys_UpdateMusicVolume_ADDR;
-static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;
+//static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;
 static sithPlayingSound* (*sithSoundSys_PlaySoundPosAbsolute)(sithSound *a1, sithThing *a2, float a3, float a4, float a5, int a6) = (void*)sithSoundSys_PlaySoundPosAbsolute_ADDR;
 static sithPlayingSound* (*sithSoundSys_PlaySoundPosFollowsThing)(sithSound *a1, rdVector3 *a2, sithSector *a3, float a4, float a5, float a6, int a7) = (void*)sithSoundSys_PlaySoundPosFollowsThing_ADDR;
 static sithPlayingSound* (*sithSoundSys_cog_playsound_internal)(sithSound *a1, float a2, float a3, int a4) = (void*)sithSoundSys_cog_playsound_internal_ADDR;

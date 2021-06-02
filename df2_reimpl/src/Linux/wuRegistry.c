@@ -65,7 +65,7 @@ LSTATUS wuRegistry_SetString(LPCSTR lpValueName, BYTE *lpData)
 int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out)
 {
 
-    if (out)
+    if (out && out != lpData)
     {
         _strncpy((char *)lpData, out, outSize - 1);
         lpData[outSize - 1] = 0;

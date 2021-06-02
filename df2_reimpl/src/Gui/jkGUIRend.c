@@ -1648,8 +1648,11 @@ void jkGuiRend_GetMousePos(int *pX, int *pY)
     }
     else
     {
-        *pX = jkGuiRend_mouseX;
-        *pY = jkGuiRend_mouseY;
+        // Added: nullptr checks
+        if (pX)
+            *pX = jkGuiRend_mouseX;
+        if (pY)
+            *pY = jkGuiRend_mouseY;
     }
 }
 

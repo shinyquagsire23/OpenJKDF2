@@ -2086,7 +2086,7 @@ void sithCogThing_GetThingFireOffset(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithCogVm_PushVector3(ctx, &thing->actorParams.fire_offset);
+        sithCogVm_PushVector3(ctx, &thing->actorParams.fireOffset);
     else
         sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
@@ -2100,7 +2100,7 @@ void sithCogThing_SetThingFireOffset(sithCog *ctx)
 
     if (thing)
     {
-        rdVector_Copy3(&thing->actorParams.fire_offset, &poppedVec);
+        rdVector_Copy3(&thing->actorParams.fireOffset, &poppedVec);
     }
 }
 

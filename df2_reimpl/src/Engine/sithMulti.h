@@ -1,6 +1,8 @@
 #ifndef _SITHMULTI_H
 #define _SITHMULTI_H
 
+#include "types.h"
+
 #define sithMulti_Startup_ADDR (0x004C9AE0)
 #define sithMulti_Shutdown_ADDR (0x004C9CB0)
 #define sithMulti_ServerLeft_ADDR (0x004C9D00)
@@ -36,6 +38,13 @@
 #define sithMulti_EndLevel_ADDR (0x004CBF90)
 #define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
+
+typedef int (*sithMultiHandler_t)();
+
+#define sithMulti_name ((wchar_t*)0x008C4BE0)
+#define sithMulti_handlerIdk (*(sithMultiHandler_t*)0x0083264C)
+
+void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 
 static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
 static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;

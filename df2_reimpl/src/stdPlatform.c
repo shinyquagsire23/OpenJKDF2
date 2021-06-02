@@ -37,7 +37,7 @@ static int Linux_stdFileOpen(char* fpath, char* mode)
         }
     }
 
-    printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
+    //printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
     
     return fopen(tmp, mode);
 }

@@ -1,6 +1,7 @@
 #include "sithPuppet.h"
 
 #include "General/stdHashTable.h"
+#include "World/sithSector.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -71,3 +72,62 @@ int sithPuppet_Startup()
         return 0;
     }
 }
+
+sithPuppet* sithPuppet_NewEntry(sithThing *thing)
+{
+    sithPuppet *v1; // edi
+    sithSector *sector; // eax
+    sithPuppet *result; // eax
+
+    v1 = (sithPuppet *)pSithHS->alloc(sizeof(sithPuppet));
+    thing->puppet = v1;
+    if ( !v1 )
+        thing->animclass = 0;
+    _memset(v1, 0, sizeof(sithPuppet));
+    sector = thing->sector;
+    if ( sector && (sector->flags & SITH_SF_UNDERWATER) != 0 )
+    {
+        result = thing->puppet;
+        result->field_4 = 1;
+        result->field_14 = -1;
+        result->field_18 = -1;
+        result->field_1C = -1;
+    }
+    else
+    {
+        result = thing->puppet;
+        result->field_4 = 0;
+        result->field_14 = -1;
+        result->field_18 = -1;
+        result->field_1C = -1;
+    }
+    return result;
+}
+
+void sithPuppet_FreeEntry(sithThing *puppet)
+{
+    if ( puppet->puppet )
+    {
+        pSithHS->free(puppet->puppet);
+        puppet->puppet = 0;
+    }
+}
+
+void sithPuppet_sub_4E4760(sithThing *thing, int a2)
+{
+    sithPuppet *puppet; // eax
+
+    if ( thing->animclass )
+    {
+        puppet = thing->puppet;
+        if ( puppet )
+        {
+            if ( puppet->field_4 != a2 )
+            {
+                puppet->field_4 = a2;
+                puppet->majorMode = puppet->field_0 + 3 * a2;
+            }
+        }
+    }
+}
+
