@@ -702,6 +702,9 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
     if ( !g_app_suspended || jkGuiRend_bIsSurfaceValid )
         return;
 
+    // Added
+    if (!clickable) return;
+
     rdRect* drawRect = &clickable->rect;
     jkGuiRend_GetMousePos(&mousePos.x, &mousePos.y);
     if ( mousePos.x < clickable->rect.x - 16

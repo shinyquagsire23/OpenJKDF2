@@ -65,6 +65,7 @@ typedef struct rdFace rdFace;
 typedef struct rdHierarchyNode rdHierarchyNode;
 typedef struct rdKeyframe rdKeyframe;
 typedef struct rdMaterial rdMaterial;
+typedef struct rdMesh rdMesh;
 typedef struct rdParticle rdParticle;
 typedef struct rdProcEntry rdProcEntry;
 typedef struct rdPuppet rdPuppet;
@@ -81,7 +82,9 @@ typedef struct sithActor sithActor;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
+typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 
+typedef struct videoModeStruct videoModeStruct;
 typedef struct common_functions common_functions;
 
 typedef struct Darray Darray;

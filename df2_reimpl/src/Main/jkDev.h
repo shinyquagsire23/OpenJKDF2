@@ -43,5 +43,8 @@
 
 static int (*jkDev_Startup)(void) = (void*)jkDev_Startup_ADDR;
 static int (*jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
+static int (*jkDev_sub_41FC40)(int a1, char *a2) = (void*)jkDev_sub_41FC40_ADDR;
+static int (*jkDev_sub_41F950)() = (void*)jkDev_sub_41F950_ADDR;
+static int (*jkDev_DrawLog)() = (void*)jkDev_DrawLog_ADDR;
 
 #endif // _JKDEV_H

@@ -53,6 +53,11 @@
 #define DirectPlay_sub_4308C0_ADDR (0x004308C0)
 #define DirectPlay_parseSessionDescidk_ADDR (0x004308F0)
 
+#define sithDplay_idk (*(int*)0x008321F8)
+#define sithDplay_bInitted (*(int*)0x8321D8)
+#define sithDplay_dword_8321F0 (*(int*)0x008321F0)
+#define sithDplay_dword_8321F4 (*(int*)0x008321F4)
+
 int sithDplay_Startup();
 
 //static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
@@ -69,8 +74,5 @@ static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 #else
 int sithDplay_EarlyInit();
 #endif
-
-#define sithDplay_idk (*(int*)0x008321F8)
-#define sithDplay_bInitted (*(int*)0x8321D8)
 
 #endif // _SITHDPLAY_H

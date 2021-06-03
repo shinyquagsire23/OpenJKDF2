@@ -21,7 +21,9 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithSoundSys.h"
+#include "Engine/sithTime.h"
 #include "World/sithWeapon.h"
+#include "World/sithSector.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithControl.h"
 #include "jk.h"
@@ -127,8 +129,10 @@ int sith_Mode1Init(char *a1)
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
+#ifndef LINUX
     sithCog_Open();
     sithControl_Open();
+#endif
     sithSector_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();

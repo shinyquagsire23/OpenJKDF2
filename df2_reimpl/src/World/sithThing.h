@@ -748,6 +748,7 @@ int sithThing_Load(sithWorld *world, int a2);
 int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param);
 int sithThing_LoadActorPlayerParams(stdConffileArg *arg, sithThing *thing, unsigned int param);
 void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot);
+int sithThing_SetNewModel(sithThing *thing, rdModel3 *model);
 void sithThing_LeaveSector(sithThing *thing);
 void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4);
 void sithThing_EnterWater(sithThing *thing, int a2);
@@ -755,7 +756,7 @@ void sithThing_ExitWater(sithThing *thing, int a2);
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 int sithThing_netidk2(int a1);
 
-static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, void *a3, float a4, int a5) = (void*)sithThing_LandThing_ADDR;
+static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
 //static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
@@ -779,6 +780,6 @@ static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
 static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
 static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;
-static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;
+//static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;
 
 #endif // _SITHTHING_H

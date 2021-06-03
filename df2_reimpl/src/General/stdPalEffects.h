@@ -28,6 +28,7 @@
 
 #define stdPalEffects_Close_idk_ADDR (0x004C8620)
 
+#define stdPalEffects_state (*(stdPalEffectsState*)0x0000866200)
 #define stdPalEffects_palette ((rdColor24*)0x0055BB80) // 256
 #define stdPalEffects_numEffectRequests (*(uint32_t*)0x0055BE80)
 #define stdPalEffects_aEffects ((stdPalEffectRequest*)0x00866260) // 32
@@ -39,6 +40,16 @@ typedef struct stdPalEffect
     rdVector3 add;
     float fade;
 } stdPalEffect;
+
+typedef struct stdPalEffectsState
+{
+  int field_0;
+  int field_4;
+  int field_8;
+  int field_C;
+  int field_10;
+  stdPalEffect field_14;
+} stdPalEffectsState;
 
 typedef struct stdPalEffectRequest
 {
@@ -57,5 +68,6 @@ static void (*stdPalEffects_SetAdd)(int a1, int a2, int a3, int a4) = (void*)std
 static void (*stdPalEffects_SetFade)(int a1, float a2) = (void*)stdPalEffects_SetFade_ADDR;
 static void (*stdPalEffects_FreeRequest)(int a1) = (void*)stdPalEffects_FreeRequest_ADDR;
 static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
+static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
 
 #endif // _STDPALEFFECTS_H

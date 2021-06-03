@@ -103,6 +103,7 @@
 #include "AI/sithAICmd.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
+#include "Main/jkGame.h"
 #include "Main/jkGob.h"
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
@@ -891,6 +892,7 @@ void do_hooks()
     
     // sithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
+    hook_function(sithCamera_SetsFocus_ADDR, sithCamera_SetsFocus);
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
     hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
     
@@ -1054,6 +1056,7 @@ void do_hooks()
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
 
     // sithPlayer
+    hook_function(sithPlayer_Initialize_ADDR, sithPlayer_Initialize);
     hook_function(sithPlayer_GetBinAmt_ADDR, sithPlayer_GetBinAmt);
     hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
@@ -1131,6 +1134,11 @@ void do_hooks()
     hook_function(jkSmack_GetCurrentGuiState_ADDR, jkSmack_GetCurrentGuiState);
     hook_function(jkSmack_SmackPlay_ADDR, jkSmack_SmackPlay);
     
+    // jkGame
+    hook_function(jkGame_Initialize_ADDR, jkGame_Initialize);
+    hook_function(jkGame_ParseSection_ADDR, jkGame_ParseSection);
+    hook_function(jkGame_Update_ADDR, jkGame_Update);
+    
     // jkGob
     hook_function(jkGob_Startup_ADDR, jkGob_Startup);
     hook_function(jkGob_Shutdown_ADDR, jkGob_Shutdown);
@@ -1169,6 +1177,7 @@ void do_hooks()
     hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
     hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
     hook_function(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
+    hook_function(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
     
     // sithItem
     hook_function(sithItem_Collide_ADDR, sithItem_Collide);

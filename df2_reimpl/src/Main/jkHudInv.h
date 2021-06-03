@@ -15,6 +15,8 @@
 
 int jkHudInv_Initialize();
 
+static int (*jkHudInv_render_itemsmaybe)() = (void*)jkHudInv_render_itemsmaybe_ADDR;
+static int (*jkHudInv_render_textmaybe)() = (void*)jkHudInv_render_textmaybe_ADDR;
 static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
 
 #endif // _JKHUDINV_H

@@ -36,6 +36,44 @@ int sithCamera_Startup()
     return 1;
 }
 
+void sithCamera_SetsFocus()
+{
+    sithThing *v0; // eax
+    rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
+
+    v0 = sithWorld_pCurWorld->cameraFocus;
+    sithCamera_state &= ~1u;
+    sithCamera_cameras[0].primaryFocus = v0;
+    sithCamera_cameras[1].primaryFocus = v0;
+    sithCamera_cameras[2].primaryFocus = v0;
+    sithCamera_cameras[2].secondaryFocus = v0;
+    sithCamera_cameras[4].primaryFocus = v0;
+    sithCamera_cameras[4].secondaryFocus = v0;
+    sithCamera_cameras[5].primaryFocus = v0;
+    sithCamera_cameras[5].secondaryFocus = v0;
+    sithCamera_cameras[6].primaryFocus = v0;
+    sithCamera_cameras[6].secondaryFocus = v0;
+    sithCamera_dword_8EE5A0 = 0;
+    sithCamera_cameras[0].secondaryFocus = 0;
+    sithCamera_cameras[1].secondaryFocus = 0;
+    if ( !sithCamera_currentCamera || sithCamera_cameras[0].dword4 >= sithCamera_currentCamera->dword4 )
+    {
+        sithCamera_currentCamera = sithCamera_cameras;
+        sithCamera_dword_8EE5A0 = 1;
+        rdCamera_SetCurrent(&sithCamera_cameras[0].rdCam);
+        if ( sithCamera_cameras[0].cameraPerspective == 32 )
+        {
+            rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
+            rot.x = 0.0;
+            rot.z = 0.0;
+            rot.y = -45.0;
+            rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
+        }
+        sithCamera_FollowFocus(sithCamera_currentCamera);
+    }
+    sithCamera_curCameraIdx = 0;
+}
+
 int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near)
 {
     camera->cameraPerspective = a3;

@@ -139,9 +139,10 @@ int sithWorld_Verify(sithWorld *world);
 uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed);
 int sithWorld_Initialize();
 int sithWorld_LoadGeoresource(sithWorld *world, int a2);
+void sithWorld_sub_4D0A20(sithWorld *world);
 
 //static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
-static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
+//static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)

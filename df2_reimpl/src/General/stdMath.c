@@ -470,3 +470,42 @@ float stdMath_Sqrt(float a)
 {
     return sqrtf(a);
 }
+
+float stdMath_ArcSin3(float a1)
+{
+    double result; // st7
+    float v2; // [esp+0h] [ebp-24h]
+    float v3; // [esp+4h] [ebp-20h]
+    float v4; // [esp+8h] [ebp-1Ch]
+    float v5; // [esp+Ch] [ebp-18h]
+    float v6; // [esp+10h] [ebp-14h]
+    float v7; // [esp+14h] [ebp-10h]
+    int v8; // [esp+1Ch] [ebp-8h]
+    float v9; // [esp+20h] [ebp-4h]
+    float v10; // [esp+2Ch] [ebp+8h]
+
+    v8 = a1 < 0.0;
+    if ( a1 >= 0.0 )
+        v7 = a1;
+    else
+        v7 = -a1;
+    if ( v7 <= 0.70710677 )
+    {
+        v4 = stdMath_FlexPower(v7, 3) / 6.0 + v7;
+        v3 = stdMath_FlexPower(v7, 5) * 0.075000003 + v4;
+        v9 = (stdMath_FlexPower(v7, 7) * 0.066797003 + v3) * 57.295784;
+    }
+    else
+    {
+        v2 = 1.0 - v7 * v7;
+        v10 = stdMath_Sqrt(v2);
+        v6 = stdMath_FlexPower(v10, 3) / 6.0 + v10;
+        v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
+        v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * 57.295784;
+    }
+    if ( v8 )
+        result = -v9;
+    else
+        result = v9;
+    return result;
+}

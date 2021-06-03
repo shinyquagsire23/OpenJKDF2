@@ -1106,6 +1106,23 @@ void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot)
     rdVector_Zero3(&this->lookOrientation.scale);
 }
 
+int sithThing_SetNewModel(sithThing *thing, rdModel3 *model)
+{
+    rdThing *v2; // edi
+    rdPuppet *v4; // ebx
+
+    v2 = &thing->rdthing;
+    if ( thing->rdthing.type == RD_THINGTYPE_MODEL && thing->rdthing.model3 == model )
+        return 0;
+    v4 = thing->rdthing.puppet;
+    thing->rdthing.puppet = 0;
+    rdThing_FreeEntry(&thing->rdthing);
+    rdThing_NewEntry(v2, thing);
+    rdThing_SetModel3(v2, model);
+    thing->rdthing.puppet = v4;
+    return 1;
+}
+
 void sithThing_LeaveSector(sithThing *thing)
 {
     sithSector *sector; // eax

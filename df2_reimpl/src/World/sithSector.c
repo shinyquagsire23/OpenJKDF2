@@ -633,7 +633,7 @@ LABEL_8:
                                 if ( (v14 & 0x10) == 0
                                   || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), a1.x * 0.0 + a1.y * 0.0 + a1.z * 1.0 >= 0.60000002) )
                                 {
-                                    sithThing_LandThing(thing, v11, i->face, i->sender->collideSize, a3);
+                                    sithThing_LandThing(thing, v11, i->face, i->sender->vertices, a3);
                                     sithUnk3_SearchClose();
                                     return;
                                 }
@@ -656,4 +656,19 @@ LABEL_8:
                 sithThing_DetachThing(thing);
         }
     }
+}
+
+int sithSector_SetSkyParams(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky)
+{
+    sithSector_horizontalPixelsPerRev_idk = horizontalPixelsPerRev * 0.0027777778;
+    sithSector_horizontalDist = horizontalDist;
+    sithSector_ceilingSky = ceilingSky;
+    sithSector_zMaxVec.x = 0.0;
+    sithSector_zMaxVec.y = 0.0;
+    sithSector_zMaxVec.z = ceilingSky;
+    sithSector_horizontalPixelsPerRev = horizontalPixelsPerRev;
+    sithSector_zMinVec.x = 0.0;
+    sithSector_zMinVec.y = 0.0;
+    sithSector_zMinVec.z = -ceilingSky;
+    return 1;
 }

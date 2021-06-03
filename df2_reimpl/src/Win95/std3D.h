@@ -205,6 +205,7 @@ typedef struct __attribute__((aligned(16))) d3d_device
 
 typedef struct rdTri rdTri;
 
+static int (*std3D_DrawOverlay)() = (void*)std3D_DrawOverlay_ADDR;
 static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
 static int (*std3D_StartScene)() = (void*)std3D_StartScene_ADDR;
 static int (*std3D_EndScene)() = (void*)std3D_EndScene_ADDR;

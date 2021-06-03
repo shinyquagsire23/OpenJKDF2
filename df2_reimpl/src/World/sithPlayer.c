@@ -7,6 +7,25 @@
 #include "General/stdPalEffects.h"
 #include "jk.h"
 
+void sithPlayer_Initialize(int idx)
+{
+    sithPlayerInfo *v1; // esi
+    sithThing *v2; // eax
+
+    v1 = &jkPlayer_playerInfos[idx];
+    v1->flags = jkPlayer_playerInfos[idx].flags & ~1u;
+    v1->net_id = 0;
+    v2 = jkPlayer_playerInfos[idx].playerThing;
+    if ( v2 )
+    {
+        if ( sithWorld_pCurWorld )
+        {
+            sithThing_SetNewModel(v2, v2->templateBase->rdthing.model3);
+            jkPlayer_playerInfos[idx].playerThing->thingflags |= SITH_TF_DISABLED;
+        }
+    }
+}
+
 void sithPlayer_NewEntry(sithWorld *world)
 {
     sithThing *v1; // eax

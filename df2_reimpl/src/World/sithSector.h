@@ -213,7 +213,7 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float force);
 void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds);
 void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 void sithSector_ThingLandIdk(sithThing *thing, int a3);
-
+int sithSector_SetSkyParams(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -244,7 +244,7 @@ static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing 
 static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
 static int (*sithSector_cogMsg_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithSector_cogMsg_SendStopSound_ADDR;
 static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithSector_cogMsg_SoundClassPlay_ADDR;
-static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;
+//static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;
 static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
 static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;

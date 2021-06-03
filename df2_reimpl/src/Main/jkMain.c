@@ -22,8 +22,17 @@
 #include "Win95/sithDplay.h"
 #include "Gui/jkGUINet.h"
 #include "Gui/jkGUIMultiTally.h"
+#include "Gui/jkGUIForce.h"
+#include "Gui/jkGUIMain.h"
+#include "Gui/jkGUITitle.h"
+#include "Gui/jkGUIDialog.h"
 #include "Engine/sithMulti.h"
 #include "World/jkSaber.h"
+#include "World/sithWorld.h"
+#include "Win95/stdDisplay.h"
+#include "Main/jkRes.h"
+#include "Main/jkStrings.h"
+#include "General/util.h"
 
 #ifdef QOL_IMPROVEMENTS
 #define TICKRATE_MS (1) // no cap
@@ -331,7 +340,10 @@ LABEL_15:
         {
             sithCamera_SetsFocus();
             jkPlayer_InitSaber();
+#ifndef LINUX
+            //TODO later
             sith_AutoSave();
+#endif
         }
 
         goto LABEL_39;
@@ -781,3 +793,31 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     }
     return result;
 }
+
+#ifdef LINUX
+int jkMain_SetVideoMode()
+{
+    signed int result; // eax
+    wchar_t *v1; // eax
+    wchar_t *v2; // eax
+    wchar_t *v3; // [esp-4h] [ebp-10h]
+    wchar_t *v4; // [esp-4h] [ebp-10h]
+
+    if ( jkGame_isDDraw )
+        return 0;
+    
+    /*if ( !net_isMulti )
+    {
+        thing_six = 1;
+        //sithControl_Close();
+        v3 = jkStrings_GetText("ERR_CHANGING_VIDEO_DESC");
+        v1 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        jkGuiDialog_ErrorDialog(v1, v3);
+        //sithControl_Open();
+        thing_six = 0;
+    }*/
+
+    jkGame_isDDraw = 1;
+    return 1;
+}
+#endif

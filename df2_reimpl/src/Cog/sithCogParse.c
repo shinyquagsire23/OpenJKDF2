@@ -48,9 +48,9 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     result = stdConffile_OpenRead(cog_fpath);
     if ( result )
     {
-        memset(cogscript, 0, sizeof(sithCogScript));
+        _memset(cogscript, 0, sizeof(sithCogScript));
         _strncpy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 0x1Fu);
-        memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
+        _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
         cogscript->cog_fpath[31] = 0;
         cog_yacc_loop_depth = 1;
         if ( !stdConffile_ReadArgs() )
@@ -352,7 +352,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
           newTable->buckets)
       && newHashtable )
     {
-        memset(buckets, 0, sizeof(sithCogSymbol) * amt);
+        _memset(buckets, 0, sizeof(sithCogSymbol) * amt);
         newTable->max_entries = amt;
         newTable->entry_cnt = 0;
         newTable->unk_14 = 0;
@@ -750,7 +750,7 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     symbol->field_10 = 0; // aaaaaaaaaa undefined?
     
     cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    memset(cogIdk, 0, sizeof(sithCogIdk));
+    _memset(cogIdk, 0, sizeof(sithCogIdk));
     cogIdk->type = a2;
     cogIdk->mask = 0x401;
     cogIdk->hash = symbol->symbol_id;
@@ -825,7 +825,7 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
     }
     
     sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
     cogIdk->type = COG_TYPE_FLEX; // hmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
@@ -866,7 +866,7 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
     }
     
     sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
     cogIdk->type = COG_TYPE_INT; // hmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
@@ -907,7 +907,7 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
     }
     
     sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
     cogIdk->type = COG_TYPE_VECTOR; // TODO hmmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;

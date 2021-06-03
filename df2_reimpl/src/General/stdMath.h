@@ -37,7 +37,7 @@ void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut);
 IMPORT_FUNC(stdMath_Tan, float, (float), stdMath_Tan_ADDR)
 IMPORT_FUNC(stdMath_ArcSin1, float, (float), stdMath_ArcSin1_ADDR)
 IMPORT_FUNC(stdMath_ArcSin2, float, (float), stdMath_ArcSin2_ADDR)
-IMPORT_FUNC(stdMath_ArcSin3, float, (float), stdMath_ArcSin3_ADDR)
+//IMPORT_FUNC(stdMath_ArcSin3, float, (float), stdMath_ArcSin3_ADDR)
 IMPORT_FUNC(stdMath_ArcTan1, float, (float, float), stdMath_ArcTan1_ADDR)
 IMPORT_FUNC(stdMath_ArcTan2, float, (float, float), stdMath_ArcTan2_ADDR)
 IMPORT_FUNC(stdMath_ArcTan3, float, (float, float), stdMath_ArcTan3_ADDR)
@@ -53,6 +53,8 @@ float stdMath_Dist3D2(float a1, float a2, float a3);
 float stdMath_Dist3D3(float a1, float a2, float a3);
 float stdMath_Floor(float a);
 float stdMath_Sqrt(float a);
+
+float stdMath_ArcSin3(float a1);
 
 extern const float aSinTable[4096];
 extern const float aTanTable[4096];

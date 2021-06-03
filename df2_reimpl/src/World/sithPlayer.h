@@ -60,13 +60,15 @@ typedef struct sithPlayerInfo
     uint32_t field_13B0;
 } sithPlayerInfo;
 
+void sithPlayer_Initialize(int idx);
+void sithPlayer_NewEntry(sithWorld *world);
 float sithPlayer_GetBinAmt(int idx);
 void sithPlayer_SetBinAmt(int idx, float amt);
 int sithPlayer_GetNum(sithThing *player);
 void sithPlayer_ResetPalEffects();
 void sithPlayer_idk(int idx);
 
-static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
+//static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
 static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 //static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;

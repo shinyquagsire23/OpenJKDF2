@@ -95,6 +95,7 @@ typedef struct sithPlayingSound
 } sithPlayingSound;
 
 int sithSoundSys_Startup();
+int sithSoundSys_Open();
 void sithSoundSys_FreeThing(sithThing *thing);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;

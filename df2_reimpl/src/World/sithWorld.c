@@ -286,7 +286,10 @@ int sithWorld_NewEntry(sithWorld *world)
                   && v16->move_type == MOVETYPE_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {
+#ifndef LINUX
+                    // TODO later
                     sithSector_ThingLandIdk(&v15[i], 1);
+#endif
                 }
             }
             if ( !sithWorld_Verify(world) )
@@ -701,4 +704,22 @@ LABEL_28:
     }
 
     return 0;
+}
+
+void sithWorld_sub_4D0A20(sithWorld *world)
+{
+    _memset(world->alloc_unk98, 0, 4 * world->numVertices);
+    _memset(world->alloc_unk9c, 0, 4 * world->numVertices);
+
+    for (int i = 0; i < world->numSectors; i++)
+    {
+        sithSector* sector = &world->sectors[i];
+        
+        for (int j = 0; j < world->sectors[i].numSurfaces; j++)
+        {
+            sithSurface* surface = &world->sectors[i].surfaces[j];
+            surface->surfaceFlags = 0;
+        }
+        sector->field_8C = 0;
+    }
 }

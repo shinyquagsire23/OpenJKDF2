@@ -28,16 +28,19 @@ typedef struct sithThing sithThing;
 #define jkGame_gamma (*(int*)0x008606A4)
 #define jkGame_screenSize (*(int*)0x008605F0)
 #define jkGame_bInitted (*(int*)0x005528BC)
+#define jkGame_updateMsecsTotal (*(int*)0x00552B58)
+#define jkGame_dword_552B5C (*(int*)0x00552B5C)
 #define jkGame_isDDraw (*(int*)0x00552B60)
 
 int jkGame_Initialize();
 int jkGame_ParseSection(int a1, int a2);
+int jkGame_Update();
 
 //static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
 static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
-static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
+//static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
 static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
 static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
 static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
