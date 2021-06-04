@@ -1371,3 +1371,753 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
         _memcpy(vertices, pDestVert, 4 * ((unsigned int)(sizeof(rdVector3) * v5) >> 2));
     return v5;
 }
+
+int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices)
+{
+    float *v5; // ecx
+    rdVector2 *v6; // esi
+    rdVector3 *v7; // edi
+    rdVector3 *v8; // ebx
+    rdVector2 *v9; // edx
+    rdVector2 *v10; // ebp
+    rdVector3 *v11; // ecx
+    double v13; // st7
+    //char v14; // c0
+    double v16; // st6
+    //char v17; // c3
+    double v19; // st5
+    double v20; // st4
+    //char v21; // c0
+    double v23; // st3
+    //char v24; // c0
+    double v25; // st4
+    double v26; // st3
+    double v27; // st2
+    double v28; // st5
+    double v29; // rtt
+    double v30; // st3
+    double v31; // st5
+    double v32; // rt1
+    double v33; // st3
+    double v34; // st5
+    double v35; // rt2
+    rdVector3 *v37; // eax
+    signed int result; // eax
+    rdVector2 *v39; // esi
+    rdVector3 *v40; // ebp
+    rdVector2 *v41; // edx
+    rdVector3 *v42; // edi
+    rdVector2 *v43; // ebx
+    rdVector3 *v44; // ecx
+    double v46; // st7
+    //unsigned __int8 v47; // c0
+    //unsigned __int8 v48; // c3
+    double v50; // st6
+    //char v51; // c3
+    double v53; // st5
+    double v54; // st4
+    //char v55; // c0
+    double v57; // st3
+    //char v58; // c0
+    double v59; // st4
+    double v60; // st3
+    double v61; // st2
+    double v62; // st5
+    double v63; // rt0
+    double v64; // st3
+    double v65; // st5
+    double v66; // rt2
+    double v67; // st3
+    double v68; // st5
+    double v69; // rtt
+    rdVector3 *v71; // eax
+    int v72; // ebx
+    unsigned int v73; // eax
+    rdVector3 *v74; // eax
+    unsigned int v75; // esi
+    rdVector2 *v76; // esi
+    unsigned int v77; // ecx
+    //bool v78; // cc
+    rdVector3 *v79; // ebx
+    rdVector2 *v80; // edi
+    rdVector2 *v81; // ebp
+    rdVector3 *v82; // edx
+    rdVector3 *v83; // ecx
+    //unsigned __int8 v85; // c0
+    //unsigned __int8 v86; // c3
+    double v88; // st6
+    double v89; // st7
+    //char v90; // c3
+    double v92; // st6
+    double v93; // st5
+    //char v94; // c0
+    double v96; // st4
+    //char v97; // c0
+    double v98; // st5
+    double v99; // st4
+    double v100; // st3
+    double v101; // rt1
+    double v102; // st4
+    double v103; // rt2
+    rdVector3 *v105; // edi
+    unsigned int v106; // ebp
+    rdVector2 *v107; // ebp
+    rdVector3 *v108; // eax
+    unsigned int v109; // edx
+    rdVector3 *v110; // ecx
+    float *v111; // edx
+    int v112; // edi
+    rdVector3 *v113; // ebx
+    rdVector2 *v114; // edi
+    rdVector2 *v115; // esi
+    rdVector2 *v116; // ebp
+    rdVector3 *v117; // edx
+    rdVector3 *v118; // ecx
+    //char v120; // c0
+    double v122; // st6
+    double v123; // st7
+    //char v124; // c3
+    double v126; // st6
+    double v127; // st5
+    //char v128; // c0
+    double v130; // st4
+    //char v131; // c0
+    double v132; // st5
+    double v133; // st4
+    double v134; // st3
+    double v135; // rt2
+    double v136; // st4
+    double v137; // rtt
+    rdVector3 *v139; // edi
+    int v140; // esi
+    unsigned int v141; // ebp
+    rdVector2 *v142; // ebp
+    unsigned int v143; // edx
+    int v144; // eax
+    rdVector3 *v145; // ecx
+    rdVector2 *v146; // esi
+    rdVector3 *v147; // ebx
+    rdVector2 *v148; // edi
+    rdVector3 *v149; // edx
+    double v150; // st7
+    double v151; // st5
+    double v152; // st6
+    double v153; // st4
+    double v154; // st5
+    double v155; // rt1
+    double v156; // st5
+    double v157; // st6
+    rdVector3 *v159; // ecx
+    float *v160; // edx
+    rdVector2 *v161; // ebp
+    rdVector3 *v162; // esi
+    rdVector3 *v163; // ecx
+    unsigned int v165; // ebp
+    rdVector2 *v166; // ebp
+    unsigned int v167; // edx
+    int v168; // eax
+    rdVector3 *v169; // ecx
+    rdVector2 *v170; // esi
+    rdVector3 *v171; // ebx
+    rdVector2 *v172; // edi
+    rdVector3 *v173; // edx
+    double v174; // st7
+    double v175; // st5
+    double v176; // st6
+    double v177; // st4
+    double v178; // st5
+    double v179; // st4
+    double v180; // st6
+    double v181; // rt2
+    rdVector3 *v183; // ecx
+    int v184; // [esp+10h] [ebp-20h]
+    int v185; // [esp+10h] [ebp-20h]
+    int v186; // [esp+10h] [ebp-20h]
+    int v187; // [esp+10h] [ebp-20h]
+    int v188; // [esp+10h] [ebp-20h]
+    int v189; // [esp+10h] [ebp-20h]
+    float *v190; // [esp+14h] [ebp-1Ch]
+    float *v191; // [esp+14h] [ebp-1Ch]
+    float *v192; // [esp+14h] [ebp-1Ch]
+    float *v193; // [esp+14h] [ebp-1Ch]
+    float *v194; // [esp+14h] [ebp-1Ch]
+    float *v195; // [esp+14h] [ebp-1Ch]
+    float *v196; // [esp+18h] [ebp-18h]
+    float *v197; // [esp+18h] [ebp-18h]
+    float *v198; // [esp+18h] [ebp-18h]
+    float *v199; // [esp+18h] [ebp-18h]
+    float *v200; // [esp+18h] [ebp-18h]
+    float *v201; // [esp+18h] [ebp-18h]
+    float v202; // [esp+1Ch] [ebp-14h]
+    float v203; // [esp+1Ch] [ebp-14h]
+    float v204; // [esp+1Ch] [ebp-14h]
+    float v205; // [esp+1Ch] [ebp-14h]
+    float v206; // [esp+1Ch] [ebp-14h]
+    float v207; // [esp+1Ch] [ebp-14h]
+    float v208; // [esp+20h] [ebp-10h]
+    float v209; // [esp+20h] [ebp-10h]
+    float v210; // [esp+20h] [ebp-10h]
+    float v211; // [esp+20h] [ebp-10h]
+    float *v212; // [esp+24h] [ebp-Ch]
+    float *v213; // [esp+24h] [ebp-Ch]
+    float v214; // [esp+24h] [ebp-Ch]
+    float v215; // [esp+24h] [ebp-Ch]
+    int v216; // [esp+28h] [ebp-8h]
+    int v217; // [esp+28h] [ebp-8h]
+    float *v218; // [esp+28h] [ebp-8h]
+    float *v219; // [esp+28h] [ebp-8h]
+    int v220; // [esp+2Ch] [ebp-4h]
+    int v221; // [esp+2Ch] [ebp-4h]
+    int v222; // [esp+2Ch] [ebp-4h]
+    int v223; // [esp+2Ch] [ebp-4h]
+    float numVerticesa; // [esp+44h] [ebp+14h]
+    float numVerticesb; // [esp+44h] [ebp+14h]
+    int numVerticesc; // [esp+44h] [ebp+14h]
+    float numVerticesd; // [esp+44h] [ebp+14h]
+    float numVerticese; // [esp+44h] [ebp+14h]
+    int numVerticesf; // [esp+44h] [ebp+14h]
+    float numVerticesg; // [esp+44h] [ebp+14h]
+    int numVerticesh; // [esp+44h] [ebp+14h]
+    float numVerticesi; // [esp+44h] [ebp+14h]
+    float *numVerticesj; // [esp+44h] [ebp+14h]
+    float *numVerticesk; // [esp+44h] [ebp+14h]
+
+    v5 = a4;
+    rdClip_faceStatus = 0;
+    v184 = 0;
+    v6 = uvs;
+    v7 = vertices;
+    pSourceVert = vertices;
+    v8 = &vertices[numVertices - 1];
+    pDestVert = workVerts;
+    pSourceTVert = uvs;
+    pDestTVert = workTVerts;
+    pSourceIVert = a4;
+    pDestIVert = workIVerts;
+    v9 = &uvs[numVertices - 1];
+    v196 = &a4[numVertices - 1];
+    v190 = a4;
+    if ( numVertices > 0 )
+    {
+        v212 = workIVerts;
+        v10 = workTVerts;
+        v11 = workVerts;
+        v216 = numVertices;
+        do
+        {
+            numVerticesa = frustum->field_30 * v8->y;
+            v13 = frustum->field_30 * v7->y;
+            if ( numVerticesa <= v8->x || v13 <= v7->x )
+            {
+                if ( v8->x != numVerticesa && v13 != v7->x && (v8->x < (double)numVerticesa || v13 > v7->x) )
+                {
+                    numVerticesb = v7->y - v8->y;
+                    v208 = v7->x - v8->x;
+                    v16 = v7->y * v8->x - v8->y * v7->x;
+                    v202 = frustum->field_30 * numVerticesb - v208;
+                    if (v202 != 0.0)
+                    {
+                        v16 = v16 / v202;
+                    }
+                    v19 = frustum->field_30 * v16;
+                    v20 = numVerticesb;
+                    if (v20 < 0.0)
+                        v20 = -v20;
+                    v23 = v208;
+                    if (v23 < 0.0)
+                        v23 = -v23;
+                    if ( v20 <= v23 )
+                        v25 = (v19 - v8->x) / v208;
+                    else
+                        v25 = (v16 - v8->y) / numVerticesb;
+                    ++v11;
+                    ++v10;
+                    v26 = (v6->x - v9->x) * v25;
+                    v27 = v19;
+                    v28 = *v190;
+                    v11[-1].x = v27;
+                    v29 = v26 + v9->x;
+                    v11[-1].y = v16;
+                    v30 = v28;
+                    v31 = v7->z;
+                    v32 = v30 - *v196;
+                    v10[-1].x = v29;
+                    v33 = v31 - v8->z;
+                    v34 = (v6->y - v9->y) * v25 + v9->y;
+                    v35 = v32 * v25 + *v196;
+                    v11[-1].z = v33 * v25 + v8->z;
+                    v10[-1].y = v34;
+                    *v212++ = v35;
+                    ++v184;
+                    rdClip_faceStatus |= 0x10;
+                }
+                if ( v13 <= v7->x )
+                {
+                    v37 = v11++;
+                    ++v10;
+                    *v37 = *v7;
+                    v10[-1].x = v6->x;
+                    v10[-1].y = v6->y;
+                    ++v184;
+                    *v212++ = *v190;
+                }
+            }
+            v8 = v7;
+            v196 = v190++;
+            v9 = v6;
+            ++v7;
+            ++v6;
+            --v216;
+        }
+        while ( v216 );
+        v7 = vertices;
+        v5 = a4;
+    }
+    if ( v184 < 3 )
+        return v184;
+    pDestVert = v7;
+    numVerticesc = v184;
+    pDestTVert = uvs;
+    v39 = workTVerts;
+    pSourceVert = workVerts;
+    pSourceTVert = workTVerts;
+    pDestIVert = v5;
+    pSourceIVert = workIVerts;
+    v185 = 0;
+    v40 = &workVerts[numVerticesc - 1];
+    v41 = &workTVerts[numVerticesc - 1];
+    v191 = workIVerts;
+    v197 = &workIVerts[numVerticesc - 1];
+    v42 = workVerts;
+    v43 = pDestTVert;
+    v44 = pDestVert;
+    v213 = pDestIVert;
+    v217 = numVerticesc;
+    do
+    {
+        numVerticesd = frustum->field_28 * v40->y;
+        v46 = frustum->field_28 * v42->y;
+        if ( numVerticesd >= v40->x || v46 >= v42->x )
+        {
+            if ( v40->x != numVerticesd && v46 != v42->x && (v40->x > (double)numVerticesd || v46 < v42->x) )
+            {
+                numVerticese = v42->y - v40->y;
+                v209 = v42->x - v40->x;
+                v50 = v42->y * v40->x - v40->y * v42->x;
+                v203 = frustum->field_28 * numVerticese - v209;
+                if (v203 != 0.0)
+                {
+                    
+                    v50 = v50 / v203;
+                }
+                v53 = frustum->field_28 * v50;
+                v54 = numVerticese;
+                if ( v54 < 0.0 )
+                    v54 = -v54;
+                v57 = v209;
+                if ( v57 < 0.0 )
+                    v57 = -v57;
+                if ( v54 <= v57 )
+                    v59 = (v53 - v40->x) / v209;
+                else
+                    v59 = (v50 - v40->y) / numVerticese;
+                ++v44;
+                ++v43;
+                v60 = (v39->x - v41->x) * v59;
+                v61 = v53;
+                v62 = *v191;
+                v44[-1].x = v61;
+                v63 = v60 + v41->x;
+                v44[-1].y = v50;
+                v64 = v62;
+                v65 = v42->z;
+                v66 = v64 - *v197;
+                v43[-1].x = v63;
+                v67 = v65 - v40->z;
+                v68 = (v39->y - v41->y) * v59 + v41->y;
+                v69 = v66 * v59 + *v197;
+                v44[-1].z = v67 * v59 + v40->z;
+                v43[-1].y = v68;
+                *v213++ = v69;
+                ++v185;
+                rdClip_faceStatus |= 0x20;
+            }
+            if ( v46 >= v42->x )
+            {
+                v71 = v44++;
+                ++v43;
+                v71->x = v42->x;
+                v71->y = v42->y;
+                v71->z = v42->z;
+                v43[-1].x = v39->x;
+                v43[-1].y = v39->y;
+                ++v185;
+                *v213++ = *v191;
+            }
+        }
+        v40 = v42;
+        v197 = v191++;
+        v41 = v39;
+        ++v42;
+        ++v39;
+        --v217;
+    }
+    while ( v217 );
+    v72 = v185;
+    if ( v185 < 3 )
+        goto LABEL_127;
+    v186 = 0;
+    v73 = (unsigned int)pDestVert ^ (unsigned int)pSourceVert;
+    pDestVert = pSourceVert;
+    v74 = (rdVector3 *)((unsigned int)pSourceVert ^ v73);
+    pSourceVert = v74;
+    v75 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+    pDestTVert = pSourceTVert;
+    v76 = (rdVector2 *)((unsigned int)pSourceTVert ^ v75);
+    pSourceTVert = v76;
+    v77 = (unsigned int)pDestIVert ^ (unsigned int)pSourceIVert;
+    pDestIVert = pSourceIVert;
+    pSourceIVert = (float *)((unsigned int)pSourceIVert ^ v77);
+    numVerticesf = v72;
+    v198 = (float *)(((unsigned int)pDestIVert ^ v77) + 4 * v72 - 4);
+    v79 = &v74[v72 - 1];
+    v80 = &v76[numVerticesf - 1];
+    v192 = (float *)((unsigned int)pDestIVert ^ v77);
+    if ( v72 > 0 )
+    {
+        v81 = pDestTVert;
+        v82 = v74;
+        v218 = pDestIVert;
+        v83 = pDestVert;
+        v220 = numVerticesf;
+        do
+        {
+            v204 = frustum->field_2C * v79->y;
+            numVerticesg = v82->y * frustum->field_2C;
+            if ( v79->z <= v204 || v82->z <= (double)numVerticesg )
+            {
+                if ( v79->z != v204 && v82->z != numVerticesg && (v79->z > (double)v204 || v82->z > (double)numVerticesg) )
+                {
+                    v210 = v82->y - v79->y;
+                    v214 = v82->z - v79->z;
+                    v88 = v82->y * v79->z - v82->z * v79->y;
+                    v89 = v88;
+                    v205 = frustum->field_2C * v210 - v214;
+                    if (v205 != 0.0)
+                    {
+                        v89 = v88 / v205;
+                    }
+                    v92 = frustum->field_2C * v89;
+                    v93 = v210;
+                    if ( v93 < 0.0 )
+                        v93 = -v93;
+                    v96 = v214;
+                    if ( v96 < 0.0 )
+                        v96 = -v96;
+                    if ( v93 <= v96 )
+                        v98 = (v92 - v79->z) / v214;
+                    else
+                        v98 = (v89 - v79->y) / v210;
+                    v99 = v82->x - v79->x;
+                    ++v83;
+                    ++v81;
+                    v100 = *v192 - *v198;
+                    ++v186;
+                    v81[-1].x = (v76->x - v80->x) * v98 + v80->x;
+                    v101 = v99 * v98;
+                    v102 = (v76->y - v80->y) * v98 + v80->y;
+                    v103 = v100 * v98 + *v198;
+                    v83[-1].x = v101 + v79->x;
+                    v83[-1].y = v89;
+                    v83[-1].z = v92;
+                    v81[-1].y = v102;
+                    *v218++ = v103;
+                    rdClip_faceStatus |= 0x4;
+                }
+                if ( v82->z <= (double)numVerticesg )
+                {
+                    v105 = v83++;
+                    ++v81;
+                    v105->x = v82->x;
+                    v105->y = v82->y;
+                    v105->z = v82->z;
+                    v81[-1].x = v76->x;
+                    v81[-1].y = v76->y;
+                    ++v186;
+                    *v218++ = *v192;
+                }
+            }
+            v79 = v82++;
+            v198 = v192++;
+            v80 = v76++;
+            --v220;
+        }
+        while ( v220 );
+    }
+    result = v186;
+    if ( v186 >= 3 )
+    {
+        v106 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+        pDestTVert = pSourceTVert;
+        v107 = (rdVector2 *)((unsigned int)pSourceTVert ^ v106);
+        v108 = pSourceVert;
+        v109 = (unsigned int)pDestIVert ^ (unsigned int)pSourceIVert;
+        v110 = pDestVert;
+        pDestVert = pSourceVert;
+        pDestIVert = pSourceIVert;
+        v111 = (float *)((unsigned int)pSourceIVert ^ v109);
+        pSourceVert = v110;
+        numVerticesh = v186;
+        pSourceTVert = v107;
+        v112 = v186;
+        pSourceIVert = v111;
+        v187 = 0;
+        v113 = &v110[v112 - 1];
+        v114 = &v107[numVerticesh - 1];
+        v193 = v111;
+        v199 = &v111[numVerticesh - 1];
+        v115 = v107;
+        if (v186 > 0)
+        {
+            v116 = pDestTVert;
+            v117 = v110;
+            v219 = pDestIVert;
+            v118 = v108;
+            v221 = numVerticesh;
+            do
+            {
+                v206 = frustum->field_20 * v113->y;
+                numVerticesi = v117->y * frustum->field_20;
+                if ( v113->z >= v206 || v117->z >= (double)numVerticesi )
+                {
+                    if ( v113->z != v206 && v117->z != numVerticesi && (v113->z < (double)v206 || v117->z < (double)numVerticesi) )
+                    {
+                        v215 = v117->y - v113->y;
+                        v211 = v117->z - v113->z;
+                        v122 = v117->y * v113->z - v117->z * v113->y;
+                        v123 = v122;
+                        v207 = frustum->field_20 * v215 - v211;
+                        if (v207 != 0.0)
+                        {
+                            v123 = v122 / v207;
+                        }
+                        v126 = frustum->field_20 * v123;
+                        v127 = v215;
+                        if ( v127 < 0.0 )
+                            v127 = -v127;
+                        v130 = v211;
+                        if ( v130 < 0.0 )
+                            v130 = -v130;
+                        if ( v127 <= v130 )
+                            v132 = (v126 - v113->z) / v211;
+                        else
+                            v132 = (v123 - v113->y) / v215;
+                        v133 = v117->x - v113->x;
+                        ++v118;
+                        ++v116;
+                        v134 = *v193 - *v199;
+                        ++v187;
+                        v116[-1].x = (v115->x - v114->x) * v132 + v114->x;
+                        v135 = v133 * v132;
+                        v136 = (v115->y - v114->y) * v132 + v114->y;
+                        v137 = v134 * v132 + *v199;
+                        v118[-1].x = v135 + v113->x;
+                        v118[-1].y = v123;
+                        v118[-1].z = v126;
+                        v116[-1].y = v136;
+                        *v219++ = v137;
+                        rdClip_faceStatus |= 0x8;
+                    }
+                    if ( v117->z >= (double)numVerticesi )
+                    {
+                        v139 = v118++;
+                        ++v116;
+                        *v139 = *v117;
+                        v116[-1].x = v115->x;
+                        v116[-1].y = v115->y;
+                        ++v187;
+                        *v219++ = *v193;
+                    }
+                }
+                v113 = v117++;
+                v199 = v193++;
+                v114 = v115++;
+                --v221;
+            }
+            while ( v221 );
+            v110 = pSourceVert;
+            v108 = pDestVert;
+            v111 = pSourceIVert;
+            v107 = pSourceTVert;
+        }
+        v140 = v187;
+        if ( v187 < 3 )
+            return v187;
+        v72 = 0;
+        v188 = 0;
+        pDestVert = v110;
+        pSourceVert = v108;
+        v141 = (unsigned int)pDestTVert ^ (unsigned int)v107;
+        pDestTVert = (rdVector2 *)(v141 ^ (unsigned int)pDestTVert);
+        v142 = (rdVector2 *)((unsigned int)pDestTVert ^ v141);
+        pSourceTVert = v142;
+        v143 = (unsigned int)pDestIVert ^ (unsigned int)v111;
+        pDestIVert = (float *)(v143 ^ (unsigned int)pDestIVert);
+        v144 = v140;
+        pSourceIVert = (float *)((unsigned int)pDestIVert ^ v143);
+
+        v200 = (float *)(((unsigned int)pDestIVert ^ v143) + 4 * v140 - 4);
+        v194 = (float *)((unsigned int)pDestIVert ^ v143);
+        v145 = &pSourceVert[v140 - 1];
+        v146 = &v142[v140 - 1];
+        if ( v140 <= 0 )
+        {
+            v161 = pSourceTVert;
+            v163 = pSourceVert;
+            v162 = pDestVert;
+            v160 = pSourceIVert;
+        }
+        else
+        {
+            v147 = pDestVert;
+            numVerticesj = pDestIVert;
+            v148 = pDestTVert;
+            v149 = pSourceVert;
+            v222 = v144;
+            do
+            {
+                if ( v145->y >= (double)frustum->field_0.y || v149->y >= (double)frustum->field_0.y )
+                {
+                    if ( v145->y != frustum->field_0.y
+                      && v149->y != frustum->field_0.y
+                      && (v145->y < (double)frustum->field_0.y || v149->y < (double)frustum->field_0.y) )
+                    {
+                        ++v147;
+                        v150 = (frustum->field_0.y - v145->y) / (v149->y - v145->y);
+                        v147[-1].y = frustum->field_0.y;
+                        ++v148;
+                        ++v188;
+                        v151 = (v142->x - v146->x) * v150 + v146->x;
+                        v152 = *v194 - *v200;
+                        v147[-1].z = (v149->z - v145->z) * v150 + v145->z;
+                        v153 = v151;
+                        v154 = v149->x - v145->x;
+                        v148[-1].x = v153;
+                        v155 = v154 * v150;
+                        v156 = (v142->y - v146->y) * v150 + v146->y;
+                        v157 = v152 * v150 + *v200;
+                        v147[-1].x = v155 + v145->x;
+                        v148[-1].y = v156;
+                        *numVerticesj++ = v157;
+                        rdClip_faceStatus |= 1;
+                    }
+                    if ( v149->y >= (double)frustum->field_0.y )
+                    {
+                        v159 = v147++;
+                        ++v148;
+                        *v159 = *v149;
+                        v148[-1].x = v142->x;
+                        v148[-1].y = v142->y;
+                        ++v188;
+                        *numVerticesj++ = *v194;
+                    }
+                }
+                v145 = v149++;
+                v200 = v194++;
+                v146 = v142++;
+                --v222;
+            }
+            while ( v222 );
+            v160 = pSourceIVert;
+            v161 = pSourceTVert;
+            v162 = pDestVert;
+            v163 = pSourceVert;
+            v72 = v188;
+        }
+        if ( v72 < 3 )
+        {
+            rdClip_faceStatus |= 0x40;
+            return v72;
+        }
+        if (frustum->field_0.x)
+        {
+            v165 = (unsigned int)pDestTVert ^ (unsigned int)v161;
+            pDestVert = v163;
+            pDestTVert = (rdVector2 *)(v165 ^ (unsigned int)pDestTVert);
+            v166 = (rdVector2 *)((unsigned int)pDestTVert ^ v165);
+            v167 = (unsigned int)pDestIVert ^ (unsigned int)v160;
+            pSourceVert = v162;
+            pSourceTVert = v166;
+            pDestIVert = (float *)(v167 ^ (unsigned int)pDestIVert);
+            v168 = v72;
+            pSourceIVert = (float *)((unsigned int)pDestIVert ^ v167);
+            v189 = 0;
+            v201 = (float *)(((unsigned int)pDestIVert ^ v167) + 4 * v72 - 4);
+            v169 = &v162[v72 - 1];
+            v170 = &v166[v72 - 1];
+            v195 = (float *)((unsigned int)pDestIVert ^ v167);
+            v171 = pDestVert;
+            numVerticesk = pDestIVert;
+            v172 = pDestTVert;
+            v173 = pSourceVert;
+            v223 = v168;
+            do
+            {
+                if ( v169->y <= (double)frustum->field_0.z || v173->y <= (double)frustum->field_0.z )
+                {
+                    if ( v169->y != frustum->field_0.z
+                      && v173->y != frustum->field_0.z
+                      && (v169->y > (double)frustum->field_0.z || v173->y > (double)frustum->field_0.z) )
+                    {
+                        ++v171;
+                        v174 = (frustum->field_0.z - v169->y) / (v173->y - v169->y);
+                        v171[-1].y = frustum->field_0.z;
+                        ++v172;
+                        ++v189;
+                        v175 = (v166->x - v170->x) * v174 + v170->x;
+                        v176 = *v195;
+                        v171[-1].z = (v173->z - v169->z) * v174 + v169->z;
+                        v177 = v175;
+                        v178 = v173->x - v169->x;
+                        v172[-1].x = v177;
+                        v179 = (v176 - *v201) * v174;
+                        v180 = (v166->y - v170->y) * v174 + v170->y;
+                        v181 = v179 + *v201;
+                        v171[-1].x = v178 * v174 + v169->x;
+                        v172[-1].y = v180;
+                        *numVerticesk++ = v181;
+                        rdClip_faceStatus |= 0x2;
+                    }
+                    if ( v173->y <= (double)frustum->field_0.z )
+                    {
+                        v183 = v171++;
+                        ++v172;
+                        *v183 = *v173;
+                        v172[-1].x = v166->x;
+                        v172[-1].y = v166->y;
+                        ++v189;
+                        *numVerticesk++ = *v195;
+                    }
+                }
+                v169 = v173++;
+                v201 = v195++;
+                v170 = v166++;
+                --v223;
+            }
+            while ( v223 );
+            v72 = v189;
+            if ( v189 < 3 )
+                goto LABEL_127;
+            v162 = pDestVert;
+        }
+        if ( v162 != vertices )
+        {
+            _memcpy(vertices, v162, sizeof(rdVector3) * v72);
+            _memcpy(uvs, pDestTVert, sizeof(rdVector2) * v72);
+            _memcpy(a4, pDestIVert, sizeof(float) * v72);
+        }
+LABEL_127:
+        result = v72;
+    }
+    return result;
+}

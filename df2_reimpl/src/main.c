@@ -53,6 +53,7 @@
 #include "Engine/rdColormap.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdCanvas.h"
+#include "Engine/rdPuppet.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithControl.h"
@@ -726,6 +727,7 @@ void do_hooks()
     hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
     
     hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
+    hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);
     
     // rdFace
     hook_function(rdFace_New_ADDR, rdFace_New);
@@ -789,6 +791,9 @@ void do_hooks()
     hook_function(rdParticle_LoadEntry_ADDR, rdParticle_LoadEntry);
     hook_function(rdParticle_Write_ADDR, rdParticle_Write);
     hook_function(rdParticle_Draw_ADDR, rdParticle_Draw);
+    
+    // rdPuppet
+    hook_function(rdPuppet_BuildJointMatrices_ADDR, rdPuppet_BuildJointMatrices);
     
     // rdSprite
     hook_function(rdSprite_New_ADDR, rdSprite_New);

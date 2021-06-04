@@ -29,6 +29,7 @@
 #define pDestVert (*(rdVector3**)0x0082EB44)
 #define pDestIVert (*(float**)0x0082EB48)
 #define workTVerts ((rdVector2*)0x0082EB50)
+#define pSourceIVert (*(float**)0x0082EB38)
 #define pSourceTVert (*(rdVector2**)0x0082EB3C)
 #define pDestTVert (*(rdVector2**)0x0082EB40)
 
@@ -52,6 +53,7 @@ int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point
 int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad);
 
 int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
+int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices);
 
 //static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
 static int (*rdClip_Face3SOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3SOrtho_ADDR;
@@ -63,6 +65,6 @@ static int (*rdClip_Face3GS)(rdClipFrustum *frustum, rdVector3 *vertices, float 
 static int (*rdClip_Face3TOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3TOrtho_ADDR;
 static int (*rdClip_Face3T)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3T_ADDR;
 static int (*rdClip_Face3GTOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GTOrtho_ADDR;
-static int (*rdClip_Face3GT)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GT_ADDR;
+//static int (*rdClip_Face3GT)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GT_ADDR;
 
 #endif // _RDCLIP_H

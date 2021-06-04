@@ -114,6 +114,12 @@ int stdDisplay_DDrawGdiSurfaceFlip()
     return 1;
 }
 
+int stdDisplay_ddraw_waitforvblank()
+{
+    Window_SdlUpdate();
+    return 1;
+}
+
 int stdDisplay_SetMasterPalette(uint8_t* pal)
 {
     rdColor24* pal24 = (rdColor24*)pal;

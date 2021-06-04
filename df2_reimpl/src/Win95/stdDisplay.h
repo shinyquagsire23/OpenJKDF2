@@ -126,8 +126,6 @@ typedef struct render_pair
 
 void stdDisplay_SetGammaTable(int len, int *table);
 
-static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_waitforvblank_ADDR;
-
 static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
 static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperativeLevel_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
@@ -151,12 +149,14 @@ static int (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = (void*)stdDisplay
 static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferUnlock_ADDR;
 static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = (void*)stdDisplay_VBufferSetColorKey_ADDR;
 static void (__cdecl *stdDisplay_VBufferFree)(stdVBuffer *a1) = (void*)stdDisplay_VBufferFree_ADDR;
+static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_waitforvblank_ADDR;
 #else
 int stdDisplay_Startup();
 int stdDisplay_VBufferFill(stdVBuffer *a2, int fillColor, rdRect *a4);
 int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe);
 int stdDisplay_SetMasterPalette(uint8_t* pal);
 int stdDisplay_DDrawGdiSurfaceFlip();
+int stdDisplay_ddraw_waitforvblank();
 int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect);
 int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged);
 int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surface, unsigned int max_modes);
