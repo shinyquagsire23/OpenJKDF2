@@ -10,6 +10,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Engine/sithTime.h"
 #include "Engine/rdCamera.h"
+#include "Engine/sithRender.h"
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -348,4 +349,14 @@ LABEL_70:
         }
     }
     sithCamera_povShakeVector2.z = 0.0;
+}
+
+void sithCamera_SetRdCameraAndRenderidk()
+{
+    if ( sithCamera_currentCamera )
+    {
+        rdCamera_SetCurrent(&sithCamera_currentCamera->rdCam);
+        rdCamera_Update(&sithCamera_currentCamera->viewMat);
+        sithRender_Draw();
+    }
 }

@@ -15,6 +15,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/rdCache.h"
 #include "Engine/rdClip.h"
+#include "Engine/rdCamera.h"
 #include "General/stdMath.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdModel3.h"
@@ -163,7 +164,9 @@ void sithRender_Draw()
             rdSetLightingMode(sithRender_lightMode);
         rdSetTextureMode(sithRender_texMode);
         rdSetRenderOptions(rdGetRenderOptions() | 2);
+#ifndef LINUX
         sithPlayer_SetScreenTint(sithCamera_currentCamera->sector->tint.x, sithCamera_currentCamera->sector->tint.y, sithCamera_currentCamera->sector->tint.z);
+#endif
         if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
         {
             a2 = sithTime_curSeconds * 70.0;
@@ -363,8 +366,8 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             meshinfo_out.verticesProjected = vertices_tmp;
             sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
             rdPrimit3_ClipFace(frustumArg, 2, 1, 0, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
-            if ( (meshinfo_out.numVertices >= 3u || (sithRender_cullingFlags & 0x40) != 0)
-              && ((sithRender_cullingFlags & 0x41) != 0
+            if ( (meshinfo_out.numVertices >= 3u || (rdClip_faceStatus & 0x40) != 0)
+              && ((rdClip_faceStatus & 0x41) != 0
                || (adjoinIter->flags & 1) != 0
                && (!adjoinSurface->surfaceInfo.face.material
                 || !adjoinSurface->surfaceInfo.face.geometryMode
@@ -375,7 +378,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 
                 // no frustum culling
                 // TODO performance issue! figure out why this code doesn't work...
-                if (1 || (sithRender_cullingFlags & 0x41) != 0 )
+                if (1 || (rdClip_faceStatus & 0x41) != 0 )
                 {
                     v31 = frustumArg;
                 }

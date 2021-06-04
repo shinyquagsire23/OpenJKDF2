@@ -20,6 +20,7 @@
 #include "Engine/sithSave.h"
 #include "Engine/sithCamera.h"
 #include "Win95/sithDplay.h"
+#include "Gui/jkGUI.h"
 #include "Gui/jkGUINet.h"
 #include "Gui/jkGUIMultiTally.h"
 #include "Gui/jkGUIForce.h"

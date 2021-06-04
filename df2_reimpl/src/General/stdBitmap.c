@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/std.h"
 #include "jk.h"
 
 stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
@@ -147,14 +148,14 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     palFmt = bmp_header.palFmt;
     v18 = bmp_header.field_8;
     numMips_ = bmp_header.numMips;
-    memset(out, 0, sizeof(stdBitmap));
+    _memset(out, 0, sizeof(stdBitmap));
     vbufAllocSize = 4 * numMips_;
     numMips = numMips_;
     vbufAlloc = (stdVBuffer **)std_pHS->alloc(4 * numMips_);
     out->mipSurfaces = vbufAlloc;
     if ( vbufAlloc )
     {
-        memset(vbufAlloc, 0, vbufAllocSize);
+        _memset(vbufAlloc, 0, vbufAllocSize);
         out->field_20 = v18;
         _memcpy(&out->format, &bmp_header.format, sizeof(out->format));
         out->palFmt = palFmt;
@@ -169,7 +170,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     v11 = bmp_header.xPos;
     out->yPos = bmp_header.yPos;
     out->colorkey = v10;
-    memset(&vbufTexFmt, 0, sizeof(vbufTexFmt));
+    _memset(&vbufTexFmt, 0, sizeof(vbufTexFmt));
     mipCount = 0;
     v12 = out->numMips;
     out->xPos = v11;

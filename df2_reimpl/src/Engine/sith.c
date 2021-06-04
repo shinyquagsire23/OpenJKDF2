@@ -92,10 +92,13 @@ void sith_UpdateCamera()
             dword_8EE678 = 1;
         }
 #ifdef QOL_IMPROVEMENTS
-        // Set screen aspect ratio
-        float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
-        rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
-        rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+        if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
+        {
+            // Set screen aspect ratio
+            float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+        }
 #endif
 
         //sithCamera_currentCamera->rdCam.screenAspectRatio += 0.01;

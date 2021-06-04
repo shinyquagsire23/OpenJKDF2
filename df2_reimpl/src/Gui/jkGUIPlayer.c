@@ -5,14 +5,17 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
+#include "General/util.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIDialog.h"
 #include "Cog/jkCog.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/Windows.h"
 #include "World/sithWorld.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -99,7 +102,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                 stdString_snprintf(jkl_fname, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, searchRes.fpath, LEC_PATH_SEPARATOR_CHR, searchRes.fpath);
                 if ( searchRes.is_subdirectory && searchRes.fpath[0] != '.' && util_FileExists(jkl_fname) )
                 {
-                    memset(tmp, 0, sizeof(tmp));
+                    _memset(tmp, 0, sizeof(tmp));
                     stdString_CharToWchar(tmp, searchRes.fpath, 255);
                     tmp[255] = 0;
                     wchar_t tab[2] = {'\t', 0};

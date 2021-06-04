@@ -47,6 +47,7 @@ static int (*_Window_msg_main_handler)(HWND hWnd, UINT Msg, WPARAM wParam, LPARA
 int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 #ifdef LINUX
+int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
 //int Window_RemoveMsgHandler(WindowHandler_t a1);
 int Window_ShowCursorUnwindowed(int a1);

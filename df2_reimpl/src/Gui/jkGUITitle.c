@@ -80,7 +80,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
         retval = jkStrings_GetText(key);
 
     texts = jkGuiTitle_aTexts;
-    memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
+    _memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
 
     for (int i = 0; i < 20; i++)
     {
@@ -248,7 +248,7 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     if ( !v4 )
         v4 = jkStrings_GetText(key);
     v5 = jkGuiTitle_aTexts;
-    memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
+    _memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
     v6 = 0;
     do
     {

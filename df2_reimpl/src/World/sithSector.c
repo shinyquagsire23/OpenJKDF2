@@ -1,5 +1,6 @@
 #include "sithSector.h"
 
+#include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 #include "World/sithThing.h"
 #include "World/jkPlayer.h"
@@ -10,6 +11,8 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithTimer.h"
 #include "Engine/rdColormap.h"
+#include "Engine/sithCamera.h"
+#include "Engine/sithSound.h"
 #include "Primitives/rdFace.h"
 
 #define TARGET_FPS (50.0)
@@ -671,4 +674,17 @@ int sithSector_SetSkyParams(float horizontalPixelsPerRev, float horizontalDist, 
     sithSector_zMinVec.y = 0.0;
     sithSector_zMinVec.z = -ceilingSky;
     return 1;
+}
+
+void sithSector_UpdateSky()
+{
+    double v0; // st7
+    float v1; // [esp-Ch] [ebp-Ch]
+
+    v1 = sithCamera_currentCamera->vec3_2.z;
+    sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fov_y;
+    stdMath_SinCos(v1, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
+    v0 = -(sithCamera_currentCamera->vec3_2.x * sithSector_horizontalPixelsPerRev_idk);
+    sithSector_flt_8553B8 = -(sithCamera_currentCamera->vec3_2.y * sithSector_horizontalPixelsPerRev_idk);
+    sithSector_flt_8553C4 = v0;
 }

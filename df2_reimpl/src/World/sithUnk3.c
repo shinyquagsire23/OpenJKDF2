@@ -571,3 +571,83 @@ LABEL_56:
         }
     }
 }
+
+sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5)
+{
+    double v4; // st6
+    sithSector *result; // eax
+    int v7; // edi
+    sithUnk3SearchResult *v8; // ebx
+    sithUnk3SearchEntry *v9; // edx
+    double v10; // st7
+    sithUnk3SearchEntry *v11; // ecx
+    int v12; // esi
+    double v13; // st6
+    double v14; // st7
+    rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
+    float a3a; // [esp+1Ch] [ebp+8h]
+
+    if ( sithCollide_IsSphereInSector(a4, 0.0, sector) )
+        return sector;
+    a1.x = a4->x - a3->x;
+    a1.y = a4->y - a3->y;
+    a1.z = a4->z - a3->z;
+    rdVector_Normalize3Acc(&a1);
+    a3a = v4;
+    sithUnk3_SearchRadiusForThings(sector, 0, a3, &a1, a3a, a5, 1);
+    v7 = sithUnk3_searchStackIdx;
+    v8 = &sithUnk3_searchStack[sithUnk3_searchStackIdx];
+    while ( 1 )
+    {
+        v9 = 0;
+        v10 = 3.4e38;
+        v11 = (sithUnk3SearchEntry *)v8;
+        if ( sithUnk3_searchNumResults[v7] )
+        {
+            v12 = sithUnk3_searchNumResults[v7];
+            do
+            {
+                if ( !v11->hasBeenEnumerated )
+                {
+                    if ( v10 <= v11->distance )
+                    {
+                        if ( v10 == v11->distance && (v9->collideType & 0x18) != 0 && (v11->collideType & 4) != 0 )
+                            v9 = v11;
+                    }
+                    else
+                    {
+                        v10 = v11->distance;
+                        v9 = v11;
+                    }
+                }
+                ++v11;
+                --v12;
+            }
+            while ( v12 );
+        }
+        if ( v9 )
+        {
+            v9->hasBeenEnumerated = 1;
+        }
+        else
+        {
+            sithUnk3_searchNumResults[v7] = 0;
+            sithUnk3_stackIdk[v7] = 0;
+        }
+        if ( !v9 )
+            break;
+        if ( (v9->collideType & 0x20) == 0 )
+        {
+            v13 = v9->distance * a1.y + a3->y;
+            v14 = v9->distance * a1.z + a3->z;
+            a4->x = v9->distance * a1.x + a3->x;
+            a4->y = v13;
+            a4->z = v14;
+            break;
+        }
+        sector = v9->surface->adjoin->sector;
+    }
+    result = sector;
+    sithUnk3_searchStackIdx = v7 - 1;
+    return result;
+}

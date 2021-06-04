@@ -44,7 +44,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     v4->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * v5);
     if ( result )
     {
-        memset(v4->trackParams.frames, 0, v7);
+        _memset(v4->trackParams.frames, 0, v7);
         v4->trackParams.numFrames = v6;
         v4->trackParams.loadedFrames = 0;
         return 1;

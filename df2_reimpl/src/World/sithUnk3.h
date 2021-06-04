@@ -72,11 +72,12 @@ sithUnk3SearchEntry* sithUnk3_NextSearchResult();
 void sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags);
 float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags);
 void sithUnk3_sub_4E86D0(sithSector *a1, rdVector3 *a2, rdVector3 *a3, float a4, float a5, int unk3Flags);
+sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5);
 
 //static float (*sithUnk3_UpdateSectorThingCollision)(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags) = (void*)sithUnk3_UpdateSectorThingCollision_ADDR;
 //static void (*sithUnk3_sub_4E86D0)(sithSector *a1, rdVector3 *a2, rdVector3 *a3, float a4, float a5, int a6) = (void*)sithUnk3_sub_4E86D0_ADDR;
 static void (*sithUnk3_sub_4E7670)(sithThing *a1, rdMatrix34 *a2) = (void*)sithUnk3_sub_4E7670_ADDR;
-static sithSector* (*sithUnk3_GetSectorLookAt)(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5) = (void*)sithUnk3_GetSectorLookAt_ADDR;
+//static sithSector* (*sithUnk3_GetSectorLookAt)(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5) = (void*)sithUnk3_GetSectorLookAt_ADDR;
 static void (*sithUnk3_SearchClose)(void) = (void*)sithUnk3_SearchClose_ADDR;
 //static float (*sithUnk3_SearchRadiusForThings)(sithSector *sector, sithThing *a2, rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags) = (void*)sithUnk3_SearchRadiusForThings_ADDR;
 //static sithUnk3SearchEntry* (*sithUnk3_NextSearchResult)(void) = (void*)sithUnk3_NextSearchResult_ADDR;

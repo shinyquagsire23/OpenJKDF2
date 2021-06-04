@@ -2,6 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "Win95/std3D.h"
+#include "Win95/std.h"
 
 int rdColormap_SetCurrent(rdColormap *colormap)
 {
@@ -130,8 +131,8 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         }
         
         colormap->transparency = v10;
-        if ( (uint8_t)v10 )
-            colormap->transparency = (intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256;
+        if ( ((intptr_t)v10) & 0xFF )
+            colormap->transparency = (void*)((intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256);
         rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
         v11 = rdroid_pHS->alloc(0x10000);
         colormap->dword34C = v11;

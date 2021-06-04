@@ -153,7 +153,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     {
         world->numSoundClasses = num_soundclasses;
         world->numSoundClassesLoaded = 0;
-        memset(soundclasses, 0, sizeof(sithSoundClass) * num_soundclasses);
+        _memset(soundclasses, 0, sizeof(sithSoundClass) * num_soundclasses);
         v5 = 1;
     }
     else
@@ -261,7 +261,7 @@ LABEL_9:
                         newEntry = (sithSoundClassEntry *)pSithHS->alloc(sizeof(sithSoundClassEntry));
                         if ( newEntry )
                         {
-                            memset(newEntry, 0, sizeof(sithSoundClassEntry));
+                            _memset(newEntry, 0, sizeof(sithSoundClassEntry));
                             newEntry->sound = v5;
                             newEntry->playflags = 64;
                             newEntry->minRadius = 0.5;

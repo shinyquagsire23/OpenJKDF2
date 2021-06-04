@@ -36,6 +36,7 @@
 #define sithControl_FreeCam_ADDR (0x004D8C90)
 #define sithControl_PlayerLook_ADDR (0x004D8F40)
 
+#define sithControl_dword_835830 (*(int*)0x835830)
 #define sithControl_bOpened (*(int*)0x835838)
 
 enum INPUT_FUNC
@@ -118,6 +119,7 @@ enum INPUT_FUNC
 };
 
 int sithControl_IsOpen();
+int sithControl_Open();
 
 static int (*sithControl_ReadFunctionMap)(int a1, void *a2) = (void*)sithControl_ReadFunctionMap_ADDR;
 static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
@@ -125,7 +127,7 @@ static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithCon
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
 static int (*sithControl_Close)() = (void*)sithControl_Close_ADDR;
 static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
-static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
+//static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 
 #ifdef LINUX

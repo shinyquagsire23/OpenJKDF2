@@ -31,4 +31,9 @@ int stdControl_ShowCursor(int a)
     }
     return _cursorState;
 }
+
+int stdControl_Open()
+{
+    return 1;
+}
 #endif

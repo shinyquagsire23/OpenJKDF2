@@ -344,7 +344,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
 
     newTable = (sithCogSymboltable *)pSithHS->alloc(24);
     if ( newTable
-      && (memset(newTable, 0, sizeof(sithCogSymboltable)),
+      && (_memset(newTable, 0, sizeof(sithCogSymboltable)),
           newTable->buckets = (sithCogSymbol *)pSithHS->alloc(sizeof(sithCogSymbol) * amt),
           newHashtable = stdHashTable_New(2 * amt),
           buckets = newTable->buckets,

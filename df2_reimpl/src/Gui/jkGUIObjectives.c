@@ -108,7 +108,7 @@ int jkGuiObjectives_Show()
     wchar_t v10[32]; // [esp+Ch] [ebp-80h] BYREF
     char key[64]; // [esp+4Ch] [ebp-40h] BYREF
 
-    memset(jkGuiObjectives_aTexts, 0, sizeof(jkGuiObjectives_aTexts));
+    _memset(jkGuiObjectives_aTexts, 0, sizeof(jkGuiObjectives_aTexts));
     v0 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, 99);
     if ( v0 )
     {

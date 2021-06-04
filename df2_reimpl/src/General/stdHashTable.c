@@ -4,6 +4,7 @@
 
 #include "stdPlatform.h"
 #include <math.h>
+#include <stdlib.h>
 
 #define hashmapBucketSizes_MAX (32)
 

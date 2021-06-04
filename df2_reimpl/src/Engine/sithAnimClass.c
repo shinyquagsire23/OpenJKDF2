@@ -67,7 +67,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
         v3 = sithWorld_pLoading->numAnimClassesLoaded;
         if ( v3 == sithWorld_pLoading->numAnimClasses
           || (v4 = &sithWorld_pLoading->animclasses[v3],
-              memset(v4, 0, sizeof(sithAnimclass)),
+              _memset(v4, 0, sizeof(sithAnimclass)),
               _strncpy(v4->name, a1, 0x1Fu),
               v4->name[31] = 0,
               _sprintf(v6, "%s%c%s", "misc\\pup", 92, a1),

@@ -585,9 +585,12 @@ void _free(void* a)
     free(a);
 }
 
-wchar_t* _wcsncpy(wchar_t *a1, const wchar_t *a2, size_t a3)
+wchar_t* _wcsncpy(wchar_t *s1, const wchar_t *s2, size_t n)
 {
-    return wcsncpy(a1,a2,a3);
+    wchar_t *ret = s1;
+    for ( ; n; n--) if (!(*s1++ = *s2++)) break;
+    for ( ; n; n--) *s1++ = 0;
+    return ret;
 }
 
 void _strtolower(char* str)

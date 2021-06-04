@@ -16,6 +16,7 @@
 #define sithCollide_sub_508D20_ADDR (0x00508D20)
 #define sithCollide_sub_5090B0_ADDR (0x005090B0)
 
+int sithCollide_IsSphereInSector(rdVector3 *pos, float radius, sithSector *sector);
 int sithCollide_sub_5080D0(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11);
 int sithCollide_sub_508540(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9);
 

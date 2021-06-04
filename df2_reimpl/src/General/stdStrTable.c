@@ -71,7 +71,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     strtable->msgs = std_pHS->alloc(sizeof(stdStrMsg) * numMsgs);
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
-    memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);
+    _memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);
     strtable->hashtable = stdHashTable_New((__int64)((double)numMsgs * 1.5));
     if ( !strtable->hashtable )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
@@ -119,7 +119,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                 v20 = stdString_CopyBetweenDelimiter(v17, v34, 256, " \t");
                 if ( v20 )
                 {
-                    v19->field_8 = atoi(v34);
+                    v19->field_8 = _atoi(v34);
                     stdString_GetQuotedStringContents(v20, v34, 256);
                     v19->uniStr = stdString_CstrCopy(v34);
                     if ( !stdHashTable_SetKeyVal(strtable->hashtable, (const char *)v19->field_0, v19) )

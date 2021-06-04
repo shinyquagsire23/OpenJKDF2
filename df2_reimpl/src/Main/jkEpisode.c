@@ -4,7 +4,10 @@
 #include "stdPlatform.h"
 #include "Main/jkRes.h"
 #include "Main/Main.h"
+#include "Main/jkStrings.h"
 #include "General/stdFileUtil.h"
+#include "General/stdFnames.h"
+#include "General/stdString.h"
 #include "Win95/Windows.h"
 #include "Cog/jkCog.h"
 

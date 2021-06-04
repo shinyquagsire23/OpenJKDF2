@@ -202,7 +202,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     v3->framesAlloc = (rdVector3 *)result;
     if ( result )
     {
-        memset((void *)result, 0, sizeof(rdVector3) * v5);
+        _memset((void *)result, 0, sizeof(rdVector3) * v5);
         v3->numFrames = v5;
         v3->loadedFrames = 0;
         result = 1;

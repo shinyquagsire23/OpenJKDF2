@@ -70,7 +70,6 @@ int sithRender_SetRenderWeaponHandle(void *a1);
 #define sithRender_numSectors2 (*(uint32_t*)0x0082F640)
 #define sithRender_aSectors2 ((sithSector**)0x0082FC68)
 
-#define sithRender_cullingFlags (*(int*)0x0082EE5C)
 #define sithRender_82F4B4 (*(uint32_t*)0x0082F4B4)
 #define sithRender_surfacesDrawn (*(int*)0x0083197C)
 #define sithRender_numSurfaces (*(uint32_t*)0x0082F4B8)

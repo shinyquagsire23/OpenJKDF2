@@ -10,6 +10,8 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithMulti.h"
+#include "Engine/sithSave.h"
 #include "World/sithSector.h"
 #include "World/sithUnk3.h"
 #include "Main/jkMain.h"

@@ -9,6 +9,8 @@
 #include "Win95/Windows.h"
 #include "Engine/sith.h"
 #include "General/util.h"
+#include "Gui/jkGUIDialog.h"
+#include "Main/jkStrings.h"
 
 static int jkRes_bInit;
 

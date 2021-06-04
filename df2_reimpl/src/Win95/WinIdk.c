@@ -1,5 +1,7 @@
 #include "WinIdk.h"
 
+#include "jk.h"
+
 void WinIdk_SetDplayGuid(int *guid)
 {
     WinIdk_aDplayGuid[0] = *guid;
@@ -16,5 +18,5 @@ uint32_t* WinIdk_GetDplayGuid()
 //TODO this is move involved but it's never checked?
 int WinIdk_detect_cpu(char *a1)
 {
-    strcpy(a1, "AuthenticAMD");
+    _strcpy(a1, "AuthenticAMD");
 }

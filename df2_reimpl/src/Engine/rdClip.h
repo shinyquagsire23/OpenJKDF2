@@ -18,9 +18,19 @@
 #define rdClip_Face3GSOrtho_ADDR (0x004716F0)
 #define rdClip_Face3T_ADDR (0x00472090)
 #define rdClip_Face3TOrtho_ADDR (0x00472DC0)
-#define rdClip_Face3GT_ADDR (0x00473880	0000104C)
+#define rdClip_Face3GT_ADDR (0x00473880)
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
+
+#define rdClip_faceStatus (*(int*)0x0082EE5C)
+#define pSourceVert (*(rdVector3**)0x0082EC50)
+#define workIVerts ((float*)0x0082EC58) // 32
+#define workVerts ((rdVector3*)0x0082ECD8) // 32
+#define pDestVert (*(rdVector3**)0x0082EB44)
+#define pDestIVert (*(float**)0x0082EB48)
+#define workTVerts ((rdVector2*)0x0082EB50)
+#define pSourceTVert (*(rdVector2**)0x0082EB3C)
+#define pDestTVert (*(rdVector2**)0x0082EB40)
 
 typedef struct rdClipFrustum rdClipFrustum;
 
@@ -41,7 +51,18 @@ int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point
 
 int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad);
 
+int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
+
 //static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
-static int (__cdecl *rdClip_Face3S)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3S_ADDR;
+static int (*rdClip_Face3SOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3SOrtho_ADDR;
+static int (*rdClip_Face3S)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3S_ADDR;
+static int (*rdClip_Face3WOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3WOrtho_ADDR;
+//static int (*rdClip_Face3W)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3W_ADDR;
+static int (*rdClip_Face3GSOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices) = (void*)rdClip_Face3GSOrtho_ADDR;
+static int (*rdClip_Face3GS)(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices) = (void*)rdClip_Face3GS_ADDR;
+static int (*rdClip_Face3TOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3TOrtho_ADDR;
+static int (*rdClip_Face3T)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3T_ADDR;
+static int (*rdClip_Face3GTOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GTOrtho_ADDR;
+static int (*rdClip_Face3GT)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GT_ADDR;
 
 #endif // _RDCLIP_H

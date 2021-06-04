@@ -357,6 +357,7 @@ wchar_t* __wcscat(wchar_t *, const wchar_t *);
 wchar_t* __wcschr(const wchar_t *, wchar_t);
 wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
 wchar_t* __wcsrchr(const wchar_t *, wchar_t);
+static int __snprintf(char *, size_t, const char *, ...);
 #endif
 
 int _strlen(const char *str);

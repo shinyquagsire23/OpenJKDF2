@@ -55,6 +55,7 @@
 #include "Engine/rdCanvas.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithCamera.h"
+#include "Engine/sithControl.h"
 #include "Engine/sithTime.h"
 #include "Engine/sith.h"
 #include "Engine/sithModel.h"
@@ -76,6 +77,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdMath.h"
+#include "Primitives/rdPrimit3.h"
 #include "Raster/rdRaster.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
@@ -112,10 +114,14 @@
 #include "Main/Main.h"
 #include "stdPlatform.h"
 
+void do_hooks();
+
 #ifdef LINUX
 
 #include <sys/mman.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char** argv)
 {
@@ -182,7 +188,6 @@ __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInsta
 }
 
 void _pei386_runtime_relocator(){}
-void do_hooks();
 
 __declspec(dllexport) void hook_init(void)
 {
@@ -720,6 +725,8 @@ void do_hooks()
     
     hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
     
+    hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
+    
     // rdFace
     hook_function(rdFace_New_ADDR, rdFace_New);
     hook_function(rdFace_NewEntry_ADDR, rdFace_NewEntry);
@@ -733,6 +740,9 @@ void do_hooks()
     hook_function(rdMath_DeltaAngleNormalized_ADDR, rdMath_DeltaAngleNormalized);
     hook_function(rdMath_ClampVector_ADDR, rdMath_ClampVector);
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
+    
+    // rdPrimit3
+    hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
     
     // rdRaster
     hook_function(rdRaster_Startup_ADDR, rdRaster_Startup);
@@ -896,6 +906,9 @@ void do_hooks()
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
     hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
     
+    // sithControl
+    hook_function(sithControl_Open_ADDR, sithControl_Open);
+    
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);
     hook_function(sithThing_Shutdown_ADDR, sithThing_Shutdown);
@@ -924,6 +937,7 @@ void do_hooks()
     hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
     hook_function(sithSector_ThingPhysGeneral_ADDR, sithSector_ThingPhysGeneral);
     hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
+    hook_function(sithSector_UpdateSky_ADDR, sithSector_UpdateSky);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);

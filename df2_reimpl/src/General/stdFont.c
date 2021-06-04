@@ -3,6 +3,7 @@
 #include "stdPlatform.h"
 #include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/std.h"
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {

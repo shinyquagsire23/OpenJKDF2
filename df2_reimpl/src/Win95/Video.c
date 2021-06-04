@@ -1,5 +1,6 @@
 #include "Video.h"
 
+#include "Engine/sithCamera.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdPalEffects.h"
 #include "Main/jkHud.h"

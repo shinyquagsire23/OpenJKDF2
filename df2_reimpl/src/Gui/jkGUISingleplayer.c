@@ -16,6 +16,7 @@
 #include "Main/jkGame.h"
 #include "Main/jkRes.h"
 #include "Main/jkEpisode.h"
+#include "Main/jkMain.h"
 #include "Main/jk.h"
 #include "Win95/Windows.h"
 #include "Primitives/rdVector.h"

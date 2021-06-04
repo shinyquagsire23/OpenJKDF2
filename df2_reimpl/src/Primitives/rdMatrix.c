@@ -14,7 +14,7 @@ const rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
                                          {0.0, 0.0, 1.0, 0.0}, 
                                          {0.0, 0.0, 0.0, 1.0}};
 
-void rdMatrix_Build34(rdMatrix34 *out, rdVector3 *rot, rdVector3 *pos)
+void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos)
 {
     float x_rad_sin, x_rad_cos;
     float y_rad_sin, y_rad_cos;
@@ -40,7 +40,7 @@ void rdMatrix_Build34(rdMatrix34 *out, rdVector3 *rot, rdVector3 *pos)
     scale->z = pos->z;
 }
 
-void rdMatrix_BuildFromLook34(rdMatrix34 *out, rdVector3 *lookAt)
+void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt)
 {
     out->lvec.x = lookAt->x;
     out->lvec.y = lookAt->y;
@@ -66,7 +66,7 @@ void rdMatrix_BuildFromLook34(rdMatrix34 *out, rdVector3 *lookAt)
     }
 }
 
-void rdMatrix_BuildCamera34(rdMatrix34 *out, rdVector3 *rot, rdVector3 *pos)
+void rdMatrix_BuildCamera34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos)
 {
     rdVector3 a, b;
     rdVector_Neg3(&a, rot);
@@ -74,7 +74,7 @@ void rdMatrix_BuildCamera34(rdMatrix34 *out, rdVector3 *rot, rdVector3 *pos)
     rdMatrix_Build34(out, &a, &b);
 }
 
-void rdMatrix_InvertOrtho34(rdMatrix34 *out, rdMatrix34 *in)
+void rdMatrix_InvertOrtho34(rdMatrix34 *out, const rdMatrix34 *in)
 {
     out->rvec.y = in->lvec.x;
     out->lvec.z = in->uvec.y;
@@ -90,7 +90,7 @@ void rdMatrix_InvertOrtho34(rdMatrix34 *out, rdMatrix34 *in)
     out->scale.z = -((in->uvec.y * in->scale.y) + (in->uvec.x * in->scale.x) + (in->uvec.z * in->scale.z));
 }
 
-void rdMatrix_Build44(rdMatrix44 *out, rdVector3 *rot, rdVector3 *pos)
+void rdMatrix_Build44(rdMatrix44 *out, const rdVector3 *rot, const rdVector3 *pos)
 {
     float x_rad_sin, x_rad_cos;
     float y_rad_sin, y_rad_cos;
@@ -118,13 +118,13 @@ void rdMatrix_Build44(rdMatrix44 *out, rdVector3 *rot, rdVector3 *pos)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildRotate34(rdMatrix34 *out, rdVector3 *rot)
+void rdMatrix_BuildRotate34(rdMatrix34 *out, const rdVector3 *rot)
 {
     rdVector3 zeroVec = {0,0,0}; // TODO this is a global const
     rdMatrix_Build34(out, rot, &zeroVec);
 }
 
-void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, rdVector3 *rot)
+void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, const rdVector3 *rot)
 {
     float x_rad_sin, x_rad_cos;
     float y_rad_sin, y_rad_cos;
@@ -148,19 +148,19 @@ void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, rdVector3 *rot)
     out->scale.z = 0.0;
 }
 
-void rdMatrix_BuildRotate44(rdMatrix44 *out, rdVector3 *rot)
+void rdMatrix_BuildRotate44(rdMatrix44 *out, const rdVector3 *rot)
 {
     rdVector3 zeroVec = {0,0,0}; // TODO this is a global const
     rdMatrix_Build44(out, rot, &zeroVec);
 }
 
-void rdMatrix_BuildTranslate34(rdMatrix34 *out, rdVector3 *tV)
+void rdMatrix_BuildTranslate34(rdMatrix34 *out, const rdVector3 *tV)
 {
     _memcpy(out, &rdroid_identMatrix34, sizeof(rdMatrix34));
     rdVector_Copy3(&out->scale, tV);
 }
 
-void rdMatrix_BuildTranslate44(rdMatrix44 *out, rdVector3 *tV)
+void rdMatrix_BuildTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
     _memcpy(out, &rdroid_identMatrix44, sizeof(rdMatrix44));
     out->vD.x = tV->x;
@@ -169,7 +169,7 @@ void rdMatrix_BuildTranslate44(rdMatrix44 *out, rdVector3 *tV)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildScale34(rdMatrix34 *out, rdVector3 *scale)
+void rdMatrix_BuildScale34(rdMatrix34 *out, const rdVector3 *scale)
 {
     out->rvec.x = scale->x;
     out->rvec.y = 0.0;
@@ -188,7 +188,7 @@ void rdMatrix_BuildScale34(rdMatrix34 *out, rdVector3 *scale)
     out->scale.z = 0.0;
 }
 
-void rdMatrix_BuildScale44(rdMatrix44 *out, rdVector3 *scale)
+void rdMatrix_BuildScale44(rdMatrix44 *out, const rdVector3 *scale)
 {
     out->vA.x = scale->x;
     out->vA.y = 0.0;
@@ -211,7 +211,7 @@ void rdMatrix_BuildScale44(rdMatrix44 *out, rdVector3 *scale)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, rdVector3 *v, float angle)
+void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, float angle)
 {
     float v12;
     float v44;
@@ -268,7 +268,7 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, rdVector3 *v, float angle)
     out->scale.z = 0.0;
 }
 
-void rdMatrix_LookAt(rdMatrix34 *out, rdVector3 *v1, rdVector3 *v2, float angle)
+void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, float angle)
 {
     float v7;
     float v11;
@@ -319,7 +319,7 @@ void rdMatrix_LookAt(rdMatrix34 *out, rdVector3 *v1, rdVector3 *v2, float angle)
     out->scale.z = v1->z;
 }
 
-void rdMatrix_ExtractAngles34(rdMatrix34 *in, rdVector3 *out)
+void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
 {
     float v7; // ST08_4
     float v9; // ST24_4

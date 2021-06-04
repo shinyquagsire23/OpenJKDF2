@@ -2,8 +2,54 @@
 
 #include <math.h>
 
+#include "Engine/sithAdjoin.h"
+#include "Engine/sithSurface.h"
+#include "Primitives/rdFace.h"
+#include "World/sithSector.h"
+#include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "jk.h"
+
+int sithCollide_IsSphereInSector(rdVector3 *pos, float radius, sithSector *sector)
+{
+    rdVector3 *v7; // ebp
+    double v8; // st7
+    double v10; // st6
+    char v11; // c0
+
+    if ( (sector->flags & SITH_SF_COLLIDEBOX) != 0
+      && pos->z - radius > sector->collidebox_onecorner.z
+      && pos->y - radius > sector->collidebox_onecorner.y
+      && pos->x - radius > sector->collidebox_onecorner.x
+      && pos->x + radius < sector->collidebox_othercorner.x
+      && radius + pos->y < sector->collidebox_othercorner.y
+      && radius + pos->z < sector->collidebox_othercorner.z )
+    {
+        return 1;
+    }
+
+    for (int i = 0; i < sector->numSurfaces; i++)
+    {
+        sithSurface* surface = &sector->surfaces[i];
+        sithAdjoin* adjoin = surface->adjoin;
+        // i = &sector->surfaces->surfaceFlags; ; i += 23 
+        if ( (surface->surfaceFlags & 4) != 0 || adjoin && (adjoin->flags & 2) != 0 )
+        {
+            v7 = sithWorld_pCurWorld->vertices;
+            v8 = (pos->x - v7[*surface->surfaceInfo.face.vertexPosIdx].x) * surface->surfaceInfo.face.normal.x
+               + (pos->y - v7[*surface->surfaceInfo.face.vertexPosIdx].y) * surface->surfaceInfo.face.normal.y
+               + (pos->z - v7[*surface->surfaceInfo.face.vertexPosIdx].z) * surface->surfaceInfo.face.normal.z;
+            v10 = v8;
+            if ( v10 < 0.0 )
+                v10 = -v8;
+            if ( v10 <= 0.0000099999997 )
+                v8 = 0.0;
+            if ( v8 < radius )
+                return 0;
+        }
+    }
+    return 1;
+}
 
 int sithCollide_sub_5080D0(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
