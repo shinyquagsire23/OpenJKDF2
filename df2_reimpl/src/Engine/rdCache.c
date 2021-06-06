@@ -151,7 +151,6 @@ int rdCache_SendFaceListToHardware()
     double v2; // st7
     double v3; // st6
     double v4; // st5
-    int vertices_to_add; // eax
     rdClipFrustum *v7; // edx
     double v8; // st7
     int mipmap_level; // edi
@@ -325,7 +324,6 @@ int rdCache_SendFaceListToHardware()
         flags_idk |= 0x8000;
     }
     std3D_ResetRenderList();
-    vertices_to_add = 0;
     rdCache_totalNormalTris = 0;
     rdCache_totalSolidTris = 0;
     v7 = rdCamera_pCurCamera->cameraClipFrustum;
@@ -347,33 +345,14 @@ int rdCache_SendFaceListToHardware()
             else
                 v148 = 0.0;
 
-            if ( active_6c->numVertices + vertices_to_add >= d3d_maxVertices )
+            if ( active_6c->numVertices + rdCache_totalVerts >= d3d_maxVertices )
             {
-                if ( vertices_to_add )
-                {
-                    if ( !std3D_AddRenderListVertices(rdCache_aHWVertices, vertices_to_add) )
-                    {
-                        std3D_DrawRenderList();
-                        std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts);
-                    }
-                    std3D_RenderListVerticesFinish();
-                    if ( rdroid_curZBufferMethod == 2 )
-                        _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
-                    if ( rdCache_totalSolidTris )
-                        std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
-                    if ( rdCache_totalNormalTris )
-                        std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
-                    std3D_DrawRenderList();
-                }
-                std3D_ResetRenderList();
-                vertices_to_add = 0;
-                rdCache_totalNormalTris = 0;
-                rdCache_totalSolidTris = 0;
-                rdCache_totalVerts = 0;
+                rdCache_DrawRenderList();
+                rdCache_ResetRenderList();
             }
 
             v11.mipmap_related = rdroid_curGeometryMode;
-            tri_vert_idx = vertices_to_add;
+            tri_vert_idx = rdCache_totalVerts;
 
             if ( active_6c->geometryMode < rdroid_curGeometryMode )
                 v11.mipmap_related = active_6c->geometryMode;
@@ -396,7 +375,7 @@ int rdCache_SendFaceListToHardware()
                 red_and_alpha = 255;
             }
 
-            if ( expected_alpha != 255 && !d3d_device_ptr->hasModulateAlpha && !d3d_device_ptr->hasAlphaFlatStippled )
+            if ( expected_alpha != 255 && !std3D_HasModulateAlpha() && !std3D_HasAlphaFlatStippled() )
             {
                 red_and_alpha = 255;
                 alpha_is_opaque = 1;
@@ -409,11 +388,9 @@ LABEL_280:
             active_6c = ++iterating_6c;
             if ( ++rend_6c_current_idx >= rdCache_numProcFaces )
             {
-                vertices_to_add = rdCache_totalVerts;
                 goto LABEL_282;
             }
             mipmap_level = a3;
-            vertices_to_add = rdCache_totalVerts;
         }
         v14 = active_6c->wallCel;
         if ( v14 == -1 )
@@ -451,40 +428,15 @@ LABEL_56:
 LABEL_79:
                     a3 = mipmap_level;
 LABEL_80:
-                    if ( (sith_tex_sel->alpha_en & 1) != 0 && d3d_device_ptr->hasAlpha )
+                    if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
                     {
                         flags_idk_ |= 0x400;
                     }
 
                     if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
                     {
-                        if ( rdCache_totalVerts )
-                        {
-                            if ( !std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts) )
-                            {
-                                std3D_DrawRenderList();
-                                std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts);
-                            }
-                            std3D_RenderListVerticesFinish();
-                            if ( rdroid_curZBufferMethod == 2 )
-                                _qsort(
-                                    rdCache_aHWNormalTris,
-                                    rdCache_totalNormalTris,
-                                    sizeof(rdTri),
-                                    rdCache_TriCompare);
-
-                            if ( rdCache_totalSolidTris )
-                                std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
-
-                            if ( rdCache_totalNormalTris )
-                                std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
-
-                            std3D_DrawRenderList();
-                        }
-                        std3D_ResetRenderList();
-                        rdCache_totalNormalTris = 0;
-                        rdCache_totalSolidTris = 0;
-                        rdCache_totalVerts = 0;
+                        rdCache_DrawRenderList();
+                        rdCache_ResetRenderList();
                         if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
                             return 0;
                     }
@@ -622,10 +574,10 @@ LABEL_142:
                                             vertex_a = red_and_alpha << 8;
                                             do
                                             {
-                                                vert_x_int = round(iterating_6c_vtxs[iterating_6c_vtx_idx].x);
+                                                vert_x_int = ceilf(iterating_6c_vtxs[iterating_6c_vtx_idx].x);
                                                 v31 = iterating_6c;
                                                 rdCache_aHWVertices[rdCache_totalVerts].x = vert_x_int;
-                                                vert_y_int = round(v31->vertices[iterating_6c_vtx_idx].y);
+                                                vert_y_int = ceilf(v31->vertices[iterating_6c_vtx_idx].y);
                                                 iterating_6c_vtxs_ = v31->vertices;
                                                 rdCache_aHWVertices[rdCache_totalVerts].y = vert_y_int;
                                                 v36 = iterating_6c_vtxs_[iterating_6c_vtx_idx].z;
@@ -711,6 +663,7 @@ LABEL_142:
                                                     vertex_g = (__int64)((double)green * rdroid_curColorEffects.fade);
                                                     vertex_b_ = (__int64)((double)blue * rdroid_curColorEffects.fade);
                                                 }
+                                                
                                                 if ( vertex_r < 0 )
                                                 {
                                                     vertex_r = (vertex_r & ~0xFF) | 0;
@@ -926,8 +879,8 @@ LABEL_232:
                                         alpha_upshifta = red_and_alpha << 8;
                                         do
                                         {
-                                            rdCache_aHWVertices[rdCache_totalVerts].x = round(iterating_6c->vertices[tmpiter].x);
-                                            rdCache_aHWVertices[rdCache_totalVerts].y = round(iterating_6c->vertices[tmpiter].y);
+                                            rdCache_aHWVertices[rdCache_totalVerts].x = ceilf(iterating_6c->vertices[tmpiter].x);
+                                            rdCache_aHWVertices[rdCache_totalVerts].y = ceilf(iterating_6c->vertices[tmpiter].y);
                                             v87 = iterating_6c->vertices[tmpiter].z;
 
                                             if ( v87 == 0.0 )
@@ -1145,22 +1098,7 @@ LABEL_232:
         goto LABEL_56;
     }
 LABEL_282:
-    if ( vertices_to_add )
-    {
-        if ( !std3D_AddRenderListVertices(rdCache_aHWVertices, vertices_to_add) )
-        {
-            std3D_DrawRenderList();
-            std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts);
-        }
-        std3D_RenderListVerticesFinish();
-        if ( rdroid_curZBufferMethod == 2 )
-            _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
-        if ( rdCache_totalSolidTris )
-            std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
-        if ( rdCache_totalNormalTris )
-            std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
-        std3D_DrawRenderList();
-    }
+    rdCache_DrawRenderList();
     return 1;
 }
 
@@ -1217,5 +1155,117 @@ int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
     if ( a->z_min >= b->z_min )
         return -1;
 
+    return 1;
+}
+
+int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
+{
+    int v6; // edx
+    size_t current_rend_6c_idx; // eax
+    rdProcEntry *procFace; // esi
+    float v9; // ecx
+    rdVector3 *v10; // edx
+    float y_min_related; // ebx
+    double v12; // st7
+    double v13; // st7
+    double v14; // st7
+    unsigned int v23; // ecx
+    unsigned int v24; // eax
+    unsigned int v25; // esi
+    float y_max_related; // [esp+Ch] [ebp-18h]
+    float v27; // [esp+10h] [ebp-14h]
+    float z_max; // [esp+14h] [ebp-10h]
+    float z_min; // [esp+18h] [ebp-Ch]
+    float y_max; // [esp+1Ch] [ebp-8h]
+    float y_min; // [esp+20h] [ebp-4h]
+    float x_min; // [esp+2Ch] [ebp+8h]
+    float extdataa; // [esp+2Ch] [ebp+8h]
+    float extdatab; // [esp+2Ch] [ebp+8h]
+    float extdatac; // [esp+2Ch] [ebp+8h]
+    float x_max; // [esp+30h] [ebp+Ch]
+
+    if ( rdCache_numProcFaces >= 0x400 )
+        return 0;
+    v6 = rdroid_curProcFaceUserData;
+    current_rend_6c_idx = rdCache_numProcFaces;
+    x_min = 3.4e38;
+    x_max = -3.4e38;
+    y_min = 3.4e38;
+    procFace = &rdCache_aProcFaces[rdCache_numProcFaces];
+    y_max = -3.4e38;
+    z_min = 3.4e38;
+    z_max = -3.4e38;
+    procFace->extraData = a1;
+    v9 = 0.0;
+    procFace->numVertices = num_vertices;
+    procFace->vertexColorMode = v6;
+    if ( num_vertices )
+    {
+        v10 = rdCache_aProcFaces[current_rend_6c_idx].vertices;
+        y_min_related = 3.4e38;
+        do
+        {
+            v12 = v10->x;
+            if ( v12 < x_min )
+                x_min = v10->x;
+            if ( v12 > x_max )
+                x_max = v10->x;
+            v13 = v10->y;
+            if ( v13 < y_min )
+            {
+                y_min = v10->y;
+                y_min_related = v9;
+            }
+            if ( v13 > y_max )
+            {
+                y_max = v10->y;
+                y_max_related = v9;
+            }
+            v14 = v10->z;
+            if ( v14 < z_min )
+                z_min = v10->z;
+            if ( v14 > z_max )
+                z_max = v10->z;
+            (*(uint32_t*)&v9)++; // ??????? wtf is going on here
+            ++v10;
+        }
+        while ( (*(uint32_t*)&v9) < num_vertices );
+    }
+    else
+    {
+        y_min_related = 3.4e38;
+    }
+
+    procFace->x_min = ceilf(x_min);
+    procFace->x_max = ceilf(x_max);
+    procFace->y_min = ceilf(y_min);
+    procFace->y_max = ceilf(y_max);
+    procFace->z_min = z_min;
+    procFace->z_max = z_max;
+    if ( procFace->x_min >= (unsigned int)procFace->x_max )
+        return 0;
+    if ( procFace->y_min >= (unsigned int)procFace->y_max )
+        return 0;
+    procFace->y_min_related = y_min_related;
+    procFace->y_max_related = y_max_related;
+    if ( (flags & 1) != 0 )
+        rdCache_numUsedVertices += num_vertices;
+    if ( (flags & 2) != 0 )
+        rdCache_numUsedTexVertices += num_vertices;
+    if ( (flags & 4) != 0 )
+        rdCache_numUsedIntensities += num_vertices;
+    v23 = rdCache_ulcExtent.x;
+    procFace->colormap = (int)rdColormap_pCurMap;
+    v24 = procFace->x_min;
+    ++rdCache_numProcFaces;
+    if ( v24 < v23 )
+        rdCache_ulcExtent.x = v24;
+    if ( procFace->x_max > (unsigned int)rdCache_lrcExtent.x )
+        rdCache_lrcExtent.x = procFace->x_max;
+    if ( procFace->y_min < (unsigned int)rdCache_ulcExtent.y )
+        rdCache_ulcExtent.y = procFace->y_min;
+    v25 = procFace->y_max;
+    if ( v25 > rdCache_lrcExtent.y )
+        rdCache_lrcExtent.y = v25;
     return 1;
 }

@@ -48,7 +48,7 @@
 #define stdDisplay_aDevices ((stdVideoDevice*)0x00868280)
 #define stdDisplay_gammaTableLen (*(int*)0x055B410)
 #define stdDisplay_paGammaTable (*(int**)0x055B414)
-#define stdDisplay_gammaPalette (*(uint8_t*)0x0055ADB8)
+#define stdDisplay_gammaPalette ((rdColor24*)0x0055ADB8)
 
 typedef struct stdDeviceParams
 {
@@ -125,12 +125,13 @@ typedef struct render_pair
 } render_pair;
 
 void stdDisplay_SetGammaTable(int len, int *table);
+uint8_t* stdDisplay_GetPalette();
 
 static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
 static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperativeLevel_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
-static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;
+//static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;
 
 #ifdef WIN32
 static int (*stdDisplay_Startup)() = (void*)stdDisplay_Startup_ADDR;

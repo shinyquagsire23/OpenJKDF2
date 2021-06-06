@@ -61,6 +61,7 @@ typedef struct sithCamera
 #pragma pack(pop)
 
 int sithCamera_Startup();
+int sithCamera_Open(rdCanvas *canvas, float aspect);
 void sithCamera_SetsFocus();
 int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near);
 
@@ -93,5 +94,6 @@ static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2
 #define sithCamera_bInitted (*(int*)0x0082F108)
 #define sithCamera_viewMat (*(rdMatrix34*)0x8EE5E0)
 #define sithCamera_focusMat (*(rdMatrix34*)0x0082F0B8)
+#define sithCamera_bOpen (*(int*)0x0082F10C)
 
 #endif // _SITHCAMERA_H

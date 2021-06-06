@@ -296,6 +296,7 @@ void do_hooks()
     hook_function(stdMath_NormalizeAngleAcute_ADDR, stdMath_NormalizeAngleAcute);
     hook_function(stdMath_NormalizeDeltaAngle_ADDR, stdMath_NormalizeDeltaAngle);
     hook_function(stdMath_SinCos_ADDR, stdMath_SinCos);
+    hook_function(stdMath_Tan_ADDR, stdMath_Tan);
     hook_function(stdMath_Dist2D1_ADDR, stdMath_Dist2D1);
     hook_function(stdMath_Dist2D2_ADDR, stdMath_Dist2D2);
     hook_function(stdMath_Dist2D3_ADDR, stdMath_Dist2D3);
@@ -707,6 +708,7 @@ void do_hooks()
     hook_function(rdCache_ResetRenderList_ADDR, rdCache_ResetRenderList);
     hook_function(rdCache_DrawRenderList_ADDR, rdCache_DrawRenderList);
     hook_function(rdCache_TriCompare_ADDR, rdCache_TriCompare);
+    hook_function(rdCache_AddProcFace_ADDR, rdCache_AddProcFace);
     
     // rdColormap
     hook_function(rdColormap_SetCurrent_ADDR, rdColormap_SetCurrent);
@@ -745,6 +747,7 @@ void do_hooks()
     
     // rdPrimit3
     hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
+    hook_function(rdPrimit3_NoClipFace_ADDR, rdPrimit3_NoClipFace);
     
     // rdRaster
     hook_function(rdRaster_Startup_ADDR, rdRaster_Startup);

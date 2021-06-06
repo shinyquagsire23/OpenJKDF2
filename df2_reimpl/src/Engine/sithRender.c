@@ -402,10 +402,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                             maxY = v57;
                     }
 
-                    v49 = round(maxY);
-                    v48 = round(maxX);
-                    v47 = round(minY);
-                    v46 = round(minX);
+                    v49 = ceilf(maxY);
+                    v48 = ceilf(maxX);
+                    v47 = ceilf(minY);
+                    v46 = ceilf(minX);
                     //jk_printf("%f %f %f %f\n", v46, v47, v48, v49);
                     rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (v46 + 0.5), (v47 + 0.5), (__int64)v48, (__int64)v49);
                     //rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, -2000, -2000, 2000, 2000);
@@ -1332,8 +1332,10 @@ int sithRender_RenderPov(sithThing *povThing)
 
     if ( (povThing->thingflags & SITH_TF_INCAMFOV) == 0 )
     {
+#ifndef LINUX
         if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 )
             sithCog_SendMessageFromThing(povThing, 0, SITH_MESSAGE_SIGHTED);
+#endif
         if ( povThing->thingtype == THINGTYPE_ACTOR )
         {
             if ( povThing->actor )

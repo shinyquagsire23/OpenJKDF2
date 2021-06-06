@@ -37,6 +37,40 @@ int sithCamera_Startup()
     return 1;
 }
 
+int sithCamera_Open(rdCanvas *canvas, float aspect)
+{
+    if ( sithCamera_bOpen )
+        return 0;
+
+    sithCamera_cameras[0].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, canvas);
+    sithCamera_cameras[1].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[1].rdCam, sithCamera_cameras[1].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, canvas);
+    sithCamera_cameras[2].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[2].rdCam, sithCamera_cameras[2].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, canvas);
+    sithCamera_cameras[4].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[4].rdCam, sithCamera_cameras[4].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, canvas);
+    sithCamera_cameras[5].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[5].rdCam, sithCamera_cameras[5].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, canvas);
+    sithCamera_cameras[6].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_cameras[6].rdCam, sithCamera_cameras[6].rdCam.fov, 0.0, 0.015625, 64.0, aspect);
+    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, canvas);
+    sithCamera_FollowFocus(sithCamera_currentCamera);
+    sithCamera_bOpen = 1;
+    return 1;
+}
+
 void sithCamera_SetsFocus()
 {
     sithThing *v0; // eax

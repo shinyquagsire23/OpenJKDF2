@@ -3,6 +3,7 @@
 #include "Engine/rdroid.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
+#include "Win95/std3D.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -296,4 +297,42 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 
     if (material->tex_type & 1)
       rdroid_pHS->free(material->palette_alloc);
+}
+
+int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha)
+{
+    stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
+
+#ifdef LINUX
+    mipmap->palette = material->palette_alloc;
+#endif
+
+    if ( no_alpha )
+    {
+        rdDDrawSurface* surface = &texture->opaqueMats[mipmap_level];
+        if (surface->texture_loaded)
+        {
+            std3D_UpdateFrameCount(surface);
+            return 1;
+        }
+        else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
+        {
+            return 1;
+        }
+        return 0;
+    }
+    else
+    {
+        rdDDrawSurface* surface = &texture->alphaMats[mipmap_level];
+        if ( surface->texture_loaded )
+        {
+            std3D_UpdateFrameCount(surface);
+            return 1;
+        }
+        else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
+        {
+            return 1;
+        }
+        return 0;
+    }
 }

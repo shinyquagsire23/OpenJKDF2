@@ -1,6 +1,7 @@
 #include "jkMain.h"
 
 #include "../jk.h"
+#include "Engine/rdroid.h"
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
 #include "Main/jkSmack.h"
@@ -28,6 +29,8 @@
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
 #include "Engine/sithMulti.h"
+#include "Engine/sithRender.h"
+#include "Engine/sithCamera.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"
 #include "Win95/stdDisplay.h"
@@ -104,7 +107,9 @@ void jkMain_GuiAdvance()
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
+#ifndef LINUX
                     if (!sith_Tick()) return;
+#endif
                 }
                 
                 if ( g_sithMode == 5 )
@@ -204,7 +209,9 @@ void jkMain_EscapeMenuTick(int a2)
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
+#ifndef LINUX
                     if (sith_Tick()) return;
+#endif
                 }
                 
                 if ( g_sithMode == 5 )
@@ -412,7 +419,9 @@ void jkMain_GameplayTick(int a2)
             if (v1 > jkMain_lastTickMs + TICKRATE_MS)
             {
                 jkMain_lastTickMs = v1;
+#ifndef LINUX
                 if (sith_Tick()) return;
+#endif
             }
             
             if ( g_sithMode == 5 )
@@ -817,6 +826,14 @@ int jkMain_SetVideoMode()
         //sithControl_Open();
         thing_six = 0;
     }*/
+    
+    rdroid_curAcceleration = 1;
+    Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, 640, 480, 6);
+    sithRender_SetSomeRenderflag(0x2a);
+    sithRender_SetGeoMode(Video_modeStruct.geoMode);
+    sithRender_SetLightMode(Video_modeStruct.lightMode);
+    sithRender_SetTexMode(Video_modeStruct.texMode);
+    sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 
     jkGame_isDDraw = 1;
     return 1;

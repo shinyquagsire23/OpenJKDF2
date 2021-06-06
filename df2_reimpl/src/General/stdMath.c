@@ -509,3 +509,83 @@ float stdMath_ArcSin3(float a1)
         result = v9;
     return result;
 }
+
+float stdMath_Tan(float a1)
+{
+    double v1; // st7
+    float v3; // [esp+Ch] [ebp-20h]
+    float a1a; // [esp+10h] [ebp-1Ch]
+    int v5; // [esp+14h] [ebp-18h]
+    float v6; // [esp+18h] [ebp-14h]
+    float v7; // [esp+18h] [ebp-14h]
+    int v8; // [esp+1Ch] [ebp-10h]
+    float v9; // [esp+20h] [ebp-Ch]
+    int v10; // [esp+24h] [ebp-8h]
+    float v11; // [esp+28h] [ebp-4h]
+    float v12; // [esp+28h] [ebp-4h]
+    float v13; // [esp+28h] [ebp-4h]
+    float v14; // [esp+28h] [ebp-4h]
+    float v15; // [esp+34h] [ebp+8h]
+
+    v1 = stdMath_NormalizeAngle(a1);
+    v15 = v1;
+    if ( v1 >= 90.0 )
+    {
+        if ( v15 >= 180.0 )
+        {
+            if ( v15 >= 270.0 )
+                v5 = 3;
+            else
+                v5 = 2;
+        }
+        else
+        {
+            v5 = 1;
+        }
+    }
+    else
+    {
+        v5 = 0;
+    }
+    a1a = v15 / 360.0 * 16384.0;
+    v3 = a1a - stdMath_Floor(a1a);
+    v8 = (__int64)a1a;
+    v10 = v8 + 1;
+    switch ( v5 )
+    {
+        case 0:
+            if ( v10 < 0x1000 )
+                v11 = aTanTable[v10];
+            else
+                v11 = -aTanTable[0xFFF - (v8 - 0xFFF)];
+            v9 = (v11 - aTanTable[v8]) * v3 + aTanTable[v8];
+            break;
+        case 1:
+            if ( v10 < 0x2000 )
+                v12 = -aTanTable[0xFFF - (v8 - 0xFFF)];
+            else
+                v12 = aTanTable[v10 - 0x2000];
+            v6 = -aTanTable[0xFFF - (v8 - 0x1000)];
+            v9 = (v12 - v6) * v3 + v6;
+            break;
+        case 2:
+            if ( v10 < 0x3000 )
+                v13 = aTanTable[v10 - 0x3000];
+            else
+                v13 = -aTanTable[0xFFF - (v8 - 0x2FFF)];
+            v9 = (v13 - aTanTable[0xFFF - (v8 - 0x2000)]) * v3 + aTanTable[0xFFF - (v8 - 0x2000)];
+            break;
+        case 3:
+            if ( v10 < 0x4000 )
+                v14 = -aTanTable[0xFFF - (v8 - 0x2FFF)];
+            else
+                v14 = aTanTable[v10 - 0x4000];
+            v7 = -aTanTable[0xFFF - (v8 - 0x3000)];
+            v9 = (v14 - v7) * v3 + v7;
+            break;
+        default:
+            v9 = 0.0; // added
+            return v9;
+    }
+    return v9;
+}

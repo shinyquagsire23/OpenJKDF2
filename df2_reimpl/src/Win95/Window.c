@@ -3,6 +3,7 @@
 #include "Win95/stdGdi.h"
 #include "Main/Main.h"
 #include "Main/jkMain.h"
+#include "Main/jkGame.h"
 
 #include "jk.h"
 
@@ -345,9 +346,16 @@ void Window_SdlUpdate()
         SDL_UpdateTexture(menuTexture, NULL, menuSurface->pixels, menuSurface->pitch);
     }
 
-    SDL_RenderClear(displayRenderer);
-    SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
-    SDL_RenderPresent(displayRenderer);
+    if (!jkGame_isDDraw)
+    {
+        SDL_RenderClear(displayRenderer);
+        SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
+        SDL_RenderPresent(displayRenderer);
+    }
+    else
+    {
+        SDL_GL_SwapWindow(displayWindow);
+    }
 }
 
 int Window_Main_Linux(int argc, char** argv)
@@ -392,6 +400,7 @@ int Window_Main_Linux(int argc, char** argv)
                                             SDL_TEXTUREACCESS_STREAMING,
                                             640, 480);
     
+    glewInit();
     
     
     strcpy(cmdLine, "");

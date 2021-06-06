@@ -1370,10 +1370,17 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
 
 
+#ifdef LINUX
+    if ( meshFrustrumCull )
+        rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, 3, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
+    else
+        rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+#else
     if ( meshFrustrumCull )
         rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
     else
         rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+#endif
 
     if ( vertexDst.numVertices < 3u )
         return 0;

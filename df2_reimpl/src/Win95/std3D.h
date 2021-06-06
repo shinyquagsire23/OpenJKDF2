@@ -1,6 +1,8 @@
 #ifndef _STD3D_H
 #define _STD3D_H
 
+#include "types.h"
+
 #define std3D_Startup_ADDR (0x00429310)
 #define std3D_Shutdown_ADDR (0x00429390)
 #define std3D_FindClosestDevice_ADDR (0x004293B0)
@@ -205,18 +207,39 @@ typedef struct __attribute__((aligned(16))) d3d_device
 
 typedef struct rdTri rdTri;
 
-static int (*std3D_DrawOverlay)() = (void*)std3D_DrawOverlay_ADDR;
-static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
+// Added
+int std3D_HasAlpha();
+int std3D_HasModulateAlpha();
+int std3D_HasAlphaFlatStippled();
+
+#ifdef LINUX
+int std3D_StartScene();
+int std3D_EndScene();
+void std3D_ResetRenderList();
+int std3D_RenderListVerticesFinish();
+void std3D_DrawRenderList();
+int std3D_SetCurrentPalette(rdColor24 *a1, int a2);
+void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH);
+int std3D_DrawOverlay();
+void std3D_UnloadAllTextures();
+void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
+int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
+void std3D_UpdateFrameCount(rdDDrawSurface *surface);
+#else
 static int (*std3D_StartScene)() = (void*)std3D_StartScene_ADDR;
 static int (*std3D_EndScene)() = (void*)std3D_EndScene_ADDR;
 static void (*std3D_ResetRenderList)() = (void*)std3D_ResetRenderList_ADDR;
-static void (*std3D_DrawRenderList)() = (void*)std3D_DrawRenderList_ADDR;
 static int (*std3D_RenderListVerticesFinish)() = (void*)std3D_RenderListVerticesFinish_ADDR;
-static int (*std3D_AddRenderListVertices)(void *vertex_array, int count) = (void*)std3D_AddRenderListVertices_ADDR;
-static void (*std3D_AddRenderListTris)(rdTri *tris, unsigned int num_tris) = (void*)std3D_AddRenderListTris_ADDR;
-static signed int (__cdecl *std3D_SetCurrentPalette)(rdColor24 *a1, int a2) = (void*)std3D_SetCurrentPalette_ADDR;
+static void (*std3D_DrawRenderList)() = (void*)std3D_DrawRenderList_ADDR;
+static int (*std3D_SetCurrentPalette)(rdColor24 *a1, int a2) = (void*)std3D_SetCurrentPalette_ADDR;
+static unsigned int* (*std3D_GetValidDimension)(unsigned int a1, unsigned int a2, unsigned int *a3, unsigned int *a4) = (void*)std3D_GetValidDimension_ADDR;;
+static int (*std3D_DrawOverlay)() = (void*)std3D_DrawOverlay_ADDR;
 static void (*std3D_UnloadAllTextures)() = (void*)std3D_UnloadAllTextures_ADDR;
-
-static unsigned int* (*std3D_GetValidDimension)(unsigned int a1, unsigned int a2, unsigned int *a3, unsigned int *a4) = (void*)std3D_GetValidDimension_ADDR;
+static void (*std3D_AddRenderListTris)(rdTri *tris, unsigned int num_tris) = (void*)std3D_AddRenderListTris_ADDR;
+static int (*std3D_AddRenderListVertices)(D3DVERTEX *vertex_array, int count) = (void*)std3D_AddRenderListVertices_ADDR;
+static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
+static int (*std3D_AddToTextureCache)(stdVBuffer *a1, rdDDrawSurface *tex_2, int is_16bit_maybe, int no_alpha) = (void*)std3D_AddToTextureCache_ADDR;
+static void (*std3D_UpdateFrameCount)(rdDDrawSurface *surface) = (void*)std3D_UpdateFrameCount_ADDR;
+#endif
 
 #endif // _STD3D_H

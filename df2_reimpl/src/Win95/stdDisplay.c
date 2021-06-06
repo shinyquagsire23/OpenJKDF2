@@ -11,6 +11,11 @@ void stdDisplay_SetGammaTable(int len, int *table)
     stdDisplay_paGammaTable = table;
 }
 
+uint8_t* stdDisplay_GetPalette()
+{
+    return stdDisplay_gammaPalette;
+}
+
 #ifdef WIN32
 
 #else
@@ -67,6 +72,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
                                         0,
                                         0);
     
+    memcpy(stdDisplay_gammaPalette, palette, 0x300);
     rdColor24* pal24 = palette;
     SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
     for (int i = 0; i < 256; i++)

@@ -115,6 +115,7 @@ void rdCache_DrawRenderList();
 int rdCache_TriCompare(rdTri *a, rdTri *b);
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
+int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
 static void (*rdCache_DrawFaceUser)(rdProcEntry* face) = (void*)rdCache_DrawFaceUser_ADDR;
 static void (*rdCache_DrawFaceN)(rdProcEntry* face) = (void*)rdCache_DrawFaceN_ADDR;
@@ -126,6 +127,6 @@ static void (*rdCache_DrawFaceZ)(rdProcEntry* face) = (void*)rdCache_DrawFaceZ_A
 //static void (*rdCache_FinishFrame)(void) = (void*)rdCache_FinishFrame_ADDR;
 
 //static rdProcEntry* (*rdCache_GetProcEntry)(void) = (void*)rdCache_GetProcEntry_ADDR;
-static int (*__cdecl rdCache_AddProcFace)(int extdata, unsigned int numVertices, char flags) = (void*)rdCache_AddProcFace_ADDR;
+//static int (*__cdecl rdCache_AddProcFace)(int extdata, unsigned int numVertices, char flags) = (void*)rdCache_AddProcFace_ADDR;
 
 #endif // _RDCACHE_H

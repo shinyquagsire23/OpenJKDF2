@@ -59,6 +59,7 @@ typedef struct stdPalEffectRequest stdPalEffectRequest;
 
 typedef struct rdClipFrustum rdClipFrustum;
 typedef struct rdColormap rdColormap;
+typedef struct rdColor24 rdColor24;
 typedef struct rdDDrawSurface rdDDrawSurface;
 typedef struct rdEdge rdEdge;
 typedef struct rdFace rdFace;

@@ -146,6 +146,10 @@ int jkGame_Update()
     //jkDev_DrawLog();
     //jkHudInv_render_textmaybe();
     //jkHud_render_idktexs(0);
+    
+    // HACK
+    rdroid_curColorEffects.fade = 1.0;
+    
     //v1 = stdDisplay_GetPalette();
     //stdPalEffects_UpdatePalette(v1);
     //if ( Video_modeStruct.b3DAccel )

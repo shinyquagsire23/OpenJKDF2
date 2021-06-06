@@ -477,3 +477,443 @@ LABEL_25:
             return;
     }
 }
+
+void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk)
+{
+    rdMeshinfo *v6; // eax
+    int v7; // esi
+    rdVector3 *v8; // edi
+    rdVector3 *v9; // edx
+    int *v10; // ecx
+    int v11; // eax
+    rdVector3 *v12; // ebx
+    rdVector3 *v13; // eax
+    rdMeshinfo *v14; // eax
+    rdVector3 *v15; // edi
+    int *v16; // ecx
+    rdVector3 *v17; // edx
+    int v18; // eax
+    rdVector3 *v19; // ebx
+    rdVector3 *v20; // eax
+    rdMeshinfo *v21; // eax
+    rdVector3 *v22; // edi
+    int *v23; // ecx
+    rdVector3 *v24; // edx
+    int v25; // eax
+    rdVector3 *v26; // ebx
+    rdVector3 *v27; // eax
+    rdMeshinfo *v28; // eax
+    rdVector3 *v29; // edi
+    int *v30; // ecx
+    rdVector3 *v31; // edx
+    int v32; // eax
+    rdVector3 *v33; // ebx
+    rdVector3 *v34; // eax
+    rdMeshinfo *v35; // eax
+    rdMeshinfo *v36; // edi
+    int v37; // esi
+    int v38; // ebx
+    int *v39; // ecx
+    rdVector3 *v40; // edx
+    int v41; // esi
+    int v42; // edi
+    rdVector3 *v43; // eax
+    double v44; // st7
+    rdVector3 *v45; // esi
+    int *v46; // ecx
+    char *v47; // edi
+    rdVector3 *v48; // eax
+    float *v49; // edx
+    double v50; // st7
+    rdMeshinfo *v51; // eax
+    rdMeshinfo *v52; // ebp
+    int v53; // ebx
+    int v54; // ecx
+    rdVector2 *v55; // edi
+    int *v56; // edx
+    rdVector3 *v57; // esi
+    rdVector2 *v58; // ecx
+    rdVector3 *v59; // eax
+    int v60; // eax
+    double v61; // st7
+    rdVector2 *v62; // ebx
+    int *v63; // edx
+    rdVector3 *v64; // edi
+    rdVector2 *v65; // ecx
+    rdVector3 *v66; // eax
+    int v67; // eax
+    float *v68; // esi
+    double v69; // st7
+    rdMeshinfo *v71; // esi
+    int v72; // ebx
+    int *v73; // ecx
+    rdVector2 *v74; // edi
+    rdVector2 *v75; // eax
+    rdVector3 *v76; // esi
+    char *v77; // edx
+    int v78; // edx
+    rdVector3 *v79; // edx
+    rdVector3 *v80; // ebx
+    int v81; // edx
+    //bool v82; // zf
+    int v83; // [esp+10h] [ebp-10h]
+    int v84; // [esp+10h] [ebp-10h]
+    char *v85; // [esp+14h] [ebp-Ch]
+    int v86; // [esp+14h] [ebp-Ch]
+    int v87; // [esp+18h] [ebp-8h]
+    int v88; // [esp+18h] [ebp-8h]
+    int v89; // [esp+1Ch] [ebp-4h]
+    char *v90; // [esp+1Ch] [ebp-4h]
+    float *v91; // [esp+24h] [ebp+4h]
+    float *v92; // [esp+24h] [ebp+4h]
+    float *v93; // [esp+24h] [ebp+4h]
+    float *v94; // [esp+24h] [ebp+4h]
+    int v95; // [esp+24h] [ebp+4h]
+    rdVector3 *lightingModea; // [esp+28h] [ebp+8h]
+    rdVector3 *lightingModeb; // [esp+28h] [ebp+8h]
+    rdVector3 *lightingModec; // [esp+28h] [ebp+8h]
+    rdVector3 *lightingModed; // [esp+28h] [ebp+8h]
+    rdVector3 *lightingModee; // [esp+28h] [ebp+8h]
+    int v101; // [esp+30h] [ebp+10h]
+    int v102; // [esp+30h] [ebp+10h]
+    int v103; // [esp+30h] [ebp+10h]
+    int v104; // [esp+30h] [ebp+10h]
+    int v105; // [esp+30h] [ebp+10h]
+    int v106; // [esp+30h] [ebp+10h]
+    int v107; // [esp+30h] [ebp+10h]
+    int v108; // [esp+38h] [ebp+18h]
+
+    switch ( geometryMode )
+    {
+        case 0:
+            v14 = _vertexSrc;
+            v7 = _vertexSrc->numVertices;
+            v102 = _vertexSrc->numVertices;
+            if ( !v102 )
+                goto LABEL_19;
+            v15 = v14->verticesProjected;
+            v16 = v14->vertexPosIdx;
+            v17 = _vertexDst->verticesProjected;
+            do
+            {
+                v18 = *v16;
+                v19 = v17;
+                ++v16;
+                ++v17;
+                --v7;
+                v20 = &v15[v18];
+                v19->x = v20->x;
+                v19->y = v20->y;
+                v19->z = v20->z;
+            }
+            while ( v7 );
+            _vertexDst->numVertices = v102;
+            return;
+        case 1:
+        case 2:
+            v6 = _vertexSrc;
+            v7 = _vertexSrc->numVertices;
+            v101 = _vertexSrc->numVertices;
+            if ( v101 )
+            {
+                v8 = v6->verticesProjected;
+                v9 = _vertexDst->verticesProjected;
+                v10 = v6->vertexPosIdx;
+                do
+                {
+                    v11 = *v10;
+                    v12 = v9;
+                    ++v10;
+                    ++v9;
+                    --v7;
+                    v13 = &v8[v11];
+                    v12->x = v13->x;
+                    v12->y = v13->y;
+                    v12->z = v13->z;
+                }
+                while ( v7 );
+                _vertexDst->numVertices = v101;
+            }
+            else
+            {
+LABEL_19:
+                _vertexDst->numVertices = v7;
+            }
+            return;
+        case 3:
+            switch ( lightingMode )
+            {
+                case 0:
+                case 1:
+                    v21 = _vertexSrc;
+                    v7 = _vertexSrc->numVertices;
+                    v103 = _vertexSrc->numVertices;
+                    if ( !v103 )
+                        goto LABEL_19;
+                    v22 = v21->verticesProjected;
+                    v23 = v21->vertexPosIdx;
+                    v24 = _vertexDst->verticesProjected;
+                    do
+                    {
+                        v25 = *v23;
+                        v26 = v24;
+                        ++v23;
+                        ++v24;
+                        --v7;
+                        v27 = &v22[v25];
+                        v26->x = v27->x;
+                        v26->y = v27->y;
+                        v26->z = v27->z;
+                    }
+                    while ( v7 );
+                    _vertexDst->numVertices = v103;
+                    return;
+                case 2:
+                    v28 = _vertexSrc;
+                    v7 = _vertexSrc->numVertices;
+                    v104 = _vertexSrc->numVertices;
+                    if ( v104 )
+                    {
+                        v29 = v28->verticesProjected;
+                        v30 = v28->vertexPosIdx;
+                        v31 = _vertexDst->verticesProjected;
+                        do
+                        {
+                            v32 = *v30;
+                            v33 = v31;
+                            ++v30;
+                            ++v31;
+                            --v7;
+                            v34 = &v29[v32];
+                            v33->x = v34->x;
+                            v33->y = v34->y;
+                            v33->z = v34->z;
+                        }
+                        while ( v7 );
+                        v7 = v104;
+                    }
+                    goto LABEL_19;
+                case 3:
+                    v35 = _vertexSrc;
+                    v36 = _vertexDst;
+                    v37 = _vertexSrc->field_18;
+                    v38 = _vertexSrc->numVertices;
+                    v105 = _vertexSrc->numVertices;
+                    if ( v37 )
+                    {
+                        if ( v38 )
+                        {
+                            v39 = v35->vertexPosIdx;
+                            lightingModea = v35->verticesProjected;
+                            v40 = _vertexDst->verticesProjected;
+                            v41 = v37 - (intptr_t)v39;
+                            v91 = v35->vertex_lights_maybe_;
+                            v42 = (char *)_vertexDst->vertex_lights_maybe_ - (char *)v39;
+                            v108 = v38;
+                            do
+                            {
+                                v43 = &lightingModea[*v39];
+                                v40->x = v43->x;
+                                v40->y = v43->y;
+                                v40->z = v43->z;
+                                v44 = v91[*v39] + *(float *)((char *)v39 + v41);
+                                if ( v44 < 0.0 )
+                                {
+                                    v44 = 0.0;
+                                }
+                                else if ( v44 > 1.0 )
+                                {
+                                    v44 = 1.0;
+                                }
+                                *(float *)((char *)v39 + v42) = v44;
+                                ++v40;
+                                ++v39;
+                                --v108;
+                            }
+                            while ( v108 );
+                            _vertexDst->numVertices = v105;
+                            return;
+                        }
+                    }
+                    else if ( v38 )
+                    {
+                        v45 = _vertexDst->verticesProjected;
+                        lightingModeb = v35->verticesProjected;
+                        v46 = v35->vertexPosIdx;
+                        v92 = v35->vertex_lights_maybe_;
+                        v47 = (char *)((char *)_vertexDst->vertex_lights_maybe_ - (char *)v46);
+                        do
+                        {
+                            v48 = &lightingModeb[*v46];
+                            v45->x = v48->x;
+                            v45->y = v48->y;
+                            v45->z = v48->z;
+                            v49 = &v92[*v46];
+                            if ( *v49 < 0.0 )
+                            {
+                                v50 = 0.0;
+                            }
+                            else if ( *v49 > 1.0 )
+                            {
+                                v50 = 1.0;
+                            }
+                            else
+                            {
+                                v50 = *v49;
+                            }
+                            *(float *)&v47[(intptr_t)v46] = v50;
+                            ++v45;
+                            ++v46;
+                            --v38;
+                        }
+                        while ( v38 );
+                        v36 = _vertexDst;
+                        v38 = v105;
+                    }
+                    v36->numVertices = v38;
+                    return;
+                default:
+                    return;
+            }
+        case 4:
+            if ( lightingMode < 0 )
+                return;
+            if ( lightingMode > 2 )
+            {
+                if ( lightingMode != 3 )
+                    return;
+                v51 = _vertexSrc;
+                v52 = _vertexDst;
+                v53 = _vertexSrc->field_18;
+                v54 = _vertexSrc->numVertices;
+                v106 = _vertexSrc->numVertices;
+                if ( v53 )
+                {
+                    if ( v54 )
+                    {
+                        v55 = v51->vertexUVs;
+                        v56 = v51->vertexPosIdx;
+                        lightingModec = v51->verticesProjected;
+                        v57 = _vertexDst->verticesProjected;
+                        v83 = (char *)v51->vertexUVIdx - (char *)v56;
+                        v93 = v51->vertex_lights_maybe_;
+                        v58 = _vertexDst->vertexUVs;
+                        v89 = v53 - (intptr_t)v56;
+                        v87 = v106;
+                        v85 = (char *)((char *)_vertexDst->vertex_lights_maybe_ - (char *)v56);
+                        do
+                        {
+                            v59 = &lightingModec[*v56];
+                            v57->x = v59->x;
+                            v57->y = v59->y;
+                            v57->z = v59->z;
+                            v60 = *(int *)((char *)v56 + v83);
+                            v58->x = v55[v60].x;
+                            v58->y = v55[v60].y;
+                            v58->x = clipIdk->x + v58->x;
+                            v58->y = v58->y + clipIdk->y;
+                            v61 = v93[*v56] + *(float *)((char *)v56 + v89);
+                            if ( v61 < 0.0 )
+                            {
+                                v61 = 0.0;
+                            }
+                            else if ( v61 > 1.0 )
+                            {
+                                v61 = 1.0;
+                            }
+                            ++v57;
+                            ++v58;
+                            *(float *)&v85[(intptr_t)v56++] = v61;
+                            --v87;
+                        }
+                        while ( v87 );
+                        _vertexDst->numVertices = v106;
+                        return;
+                    }
+                }
+                else if ( v54 )
+                {
+                    v62 = v51->vertexUVs;
+                    v63 = v51->vertexPosIdx;
+                    v64 = _vertexDst->verticesProjected;
+                    lightingModed = v51->verticesProjected;
+                    v94 = v51->vertex_lights_maybe_;
+                    v65 = _vertexDst->vertexUVs;
+                    v84 = (char *)v51->vertexUVIdx - (char *)v63;
+                    v86 = (char *)_vertexDst->vertex_lights_maybe_ - (char *)v63;
+                    v88 = v106;
+                    do
+                    {
+                        v66 = &lightingModed[*v63];
+                        v64->x = v66->x;
+                        v64->y = v66->y;
+                        v64->z = v66->z;
+                        v67 = *(int *)((char *)v63 + v84);
+                        v65->x = v62[v67].x;
+                        v65->y = v62[v67].y;
+                        v65->x = clipIdk->x + v65->x;
+                        v65->y = v65->y + clipIdk->y;
+                        v68 = &v94[*v63];
+                        if ( *v68 < 0.0 )
+                        {
+                            v69 = 0.0;
+                        }
+                        else if ( *v68 > 1.0 )
+                        {
+                            v69 = 1.0;
+                        }
+                        else
+                        {
+                            v69 = *v68;
+                        }
+                        ++v64;
+                        ++v65;
+                        *(float *)((char *)v63++ + v86) = v69;
+                        --v88;
+                    }
+                    while ( v88 );
+                    v52 = _vertexDst;
+                }
+                v52->numVertices = v106;
+                return;
+            }
+            v71 = _vertexDst;
+            v72 = _vertexSrc->numVertices;
+            v107 = _vertexSrc->numVertices;
+            if ( v107 )
+            {
+                v73 = _vertexSrc->vertexUVIdx;
+                v74 = _vertexSrc->vertexUVs;
+                lightingModee = _vertexSrc->verticesProjected;
+                v75 = _vertexDst->vertexUVs;
+                v76 = _vertexDst->verticesProjected;
+                v77 = (char *)((char *)_vertexSrc->vertexPosIdx - (char *)v73);
+                v90 = v77;
+                v95 = v72;
+                while ( 1 )
+                {
+                    v78 = *(int *)((char *)v73++ + (intptr_t)v77);
+                    ++v75;
+                    v79 = &lightingModee[v78];
+                    v80 = v76++;
+                    v80->x = v79->x;
+                    v80->y = v79->y;
+                    v80->z = v79->z;
+                    v81 = *(v73 - 1);
+                    v75[-1].x = v74[v81].x;
+                    v75[-1].y = v74[v81].y;
+                    v75[-1].x = clipIdk->x + v75[-1].x;
+                    v75[-1].y = v75[-1].y + clipIdk->y;
+                    if ( v95-- == 1 )
+                        break;
+                    v77 = v90;
+                }
+                v71 = _vertexDst;
+                v72 = v107;
+            }
+            v71->numVertices = v72;
+            return;
+        default:
+            return;
+    }
+}
