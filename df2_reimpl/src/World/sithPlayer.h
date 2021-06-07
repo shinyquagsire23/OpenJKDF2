@@ -67,9 +67,10 @@ void sithPlayer_SetBinAmt(int idx, float amt);
 int sithPlayer_GetNum(sithThing *player);
 void sithPlayer_ResetPalEffects();
 void sithPlayer_idk(int idx);
+void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2);
 
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
-static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
+//static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 //static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;
 //static void (*sithPlayer_SetBinAmt)(int idx, float a2) =(void*)sithPlayer_SetBinAmt_ADDR;
@@ -79,5 +80,6 @@ static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlaye
 static void (*sithPlayer_SetScreenTint)(float r, float g, float b) = (void*)sithPlayer_SetScreenTint_ADDR;
 //static void (*sithPlayer_idk)(int) = (void*)sithPlayer_idk_ADDR;
 //static void (*sithPlayer_ResetPalEffects)() = (void*)sithPlayer_ResetPalEffects_ADDR;
+static void (*sithPlayer_HandleSentDeathPkt)(sithThing *thing) = (void*)sithPlayer_HandleSentDeathPkt_ADDR;
 
 #endif // _SITHPLAYER_H

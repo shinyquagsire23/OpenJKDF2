@@ -31,4 +31,8 @@ void sithControl_InputInit()
 void sithControl_AddInputHandler(void *a1)
 {
 }
+
+void sithControl_Tick()
+{
+}
 #endif

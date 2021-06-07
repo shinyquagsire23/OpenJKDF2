@@ -65,6 +65,13 @@ typedef struct rdVector2i
     int y;
 } rdVector2i;
 
+typedef struct rdVector3i
+{
+    int x;
+    int y;
+    int z;
+} rdVector3i;
+
 typedef struct rdVector2
 {
     float x;

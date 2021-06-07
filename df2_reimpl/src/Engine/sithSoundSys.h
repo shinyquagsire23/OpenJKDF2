@@ -25,7 +25,7 @@
 #define sithSoundSys_SetFrequency_ADDR (0x004DC110)
 #define sithSoundSys_FadeSound_ADDR (0x004DC170)
 #define sithSoundSys_sub_4DC280_ADDR (0x004DC280)
-#define sithSoundSys_sub_4DC2F0_ADDR (0x004DC2F0)
+#define sithSoundSys_Tick_ADDR (0x004DC2F0)
 #define sithSoundSys_sound_idk2_ADDR (0x004DC750)
 #define sithSoundSys_sub_4DC790_ADDR (0x004DC790)
 #define sithSoundSys_sub_4DCC00_ADDR (0x004DCC00)
@@ -99,7 +99,6 @@ int sithSoundSys_Open();
 void sithSoundSys_FreeThing(sithThing *thing);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
-static void (*sithSoundSys_ResumeMusic)(int a1) = (void*)sithSoundSys_ResumeMusic_ADDR;
 static void (*sithSoundSys_ResumeAll)() = (void*)sithSoundSys_ResumeAll_ADDR;
 static void (*sithSoundSys_StopAll)() = (void*)sithSoundSys_StopAll_ADDR;
 
@@ -116,5 +115,13 @@ static void (*sithSoundSys_FadeSound)(sithPlayingSound *sound, float vol_, float
 static void (*sithSoundSys_SetPitch)(sithPlayingSound *a1, float pitch, float changetime) = (void*)sithSoundSys_SetPitch_ADDR;
 static void (*sithSoundSys_SectorSound)(sithSector *a1, sithSound *a2, float a3) = (void*)sithSoundSys_SectorSound_ADDR;
 static void (*sithSoundSys_SetMusicVol)(float a1) = (void*)sithSoundSys_SetMusicVol_ADDR;
+
+#ifdef LINUX
+void sithSoundSys_Tick(float a1);
+void sithSoundSys_ResumeMusic(int a1);
+#else
+static void (*sithSoundSys_ResumeMusic)(int a1) = (void*)sithSoundSys_ResumeMusic_ADDR;
+static void (*sithSoundSys_Tick)(float) = (void*)sithSoundSys_Tick_ADDR;
+#endif
 
 #endif // _SITHSOUNDSYS_H

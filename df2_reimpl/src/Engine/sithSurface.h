@@ -32,7 +32,7 @@
 #define sithSurface_SurfaceLightAnim_ADDR (0x004F03F0)
 #define sithSurface_SetSectorLight_ADDR (0x004F04A0)
 #define sithSurface_SetThingLight_ADDR (0x004F0560)
-#define sithSurface_tick_ADDR (0x004F0630)
+#define sithSurface_Tick_ADDR (0x004F0630)
 #define sithSurface_GetRdSurface_ADDR (0x004F09F0)
 #define sithSurface_detachthing_ADDR (0x004F0A30)
 #define sithSurface_GetByIdx_ADDR (0x004F0AA0)
@@ -136,5 +136,6 @@ static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_G
 static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
 static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
+static void (*sithSurface_Tick)() = (void*)sithSurface_Tick_ADDR;
 
 #endif // _SITHSURFACE_H

@@ -175,7 +175,6 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
     int v7; // edx
     int v8; // eax
     int v9; // eax
-    int v11; // eax
 
     if ( sithWorld_pCurWorld->numThings < 0 )
         return;
@@ -209,7 +208,9 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             switch ( thingIter->thingtype )
             {
                 case THINGTYPE_ACTOR:
+#ifndef LINUX
                     sithAI_Tick(thingIter, deltaSeconds);
+#endif
                     break;
                 case THINGTYPE_EXPLOSION:
                     sithExplosion_Tick(thingIter);
@@ -234,14 +235,20 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithThing_handler(thingIter);
             if ( thingIter->move_type == MOVETYPE_PHYSICS )
             {
+#ifndef LINUX
                 sithSector_ThingPhysicsTick(thingIter, deltaSeconds);
+#endif
             }
             else if ( thingIter->move_type == MOVETYPE_PATH )
             {
+#ifndef LINUX
                 sithTrackThing_Tick(thingIter, deltaSeconds);
+#endif
             }
+#ifndef LINUX
             sithThing_TickPhysics(thingIter, deltaSeconds);
             sithPuppet_Tick(thingIter, deltaSeconds);
+#endif
             continue;
         }
 
@@ -276,22 +283,15 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
         thingIter->thing_id = -1;
         if ( v7 == v8 )
         {
-            v9 = v7 - 1;
-            if ( v7 - 1 >= 0 )
+            for (v9 = v7 - 1; v9 >= 0; --v9)
             {
-                do
-                {
-                    if (sithWorld_pCurWorld->things[v9].thingType)
-                        break;
-                    --v9;
-                }
-                while ( v9 >= 0 );
+                if (sithWorld_pCurWorld->things[v9].thingType)
+                    break;
+                --v9;
             }
             sithWorld_pCurWorld->numThings = v9;
         }
-        v11 = net_things_idx;
-        net_things[net_things_idx] = v7;
-        net_things_idx = v11 + 1;
+        net_things[net_things_idx++] = v7;
     }
 }
 

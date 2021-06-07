@@ -12,4 +12,8 @@ void DebugConsole_Print(char* s)
 {
     printf("%s", s);
 }
+
+void DebugConsole_AdvanceLogBuf()
+{
+}
 #endif

@@ -1,9 +1,11 @@
 #include "sithPlayer.h"
 
 #include "World/jkPlayer.h"
+#include "World/sithWorld.h"
+#include "World/sithSector.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
-#include "World/sithWorld.h"
+#include "Engine/sithCamera.h"
 #include "General/stdPalEffects.h"
 #include "jk.h"
 
@@ -136,4 +138,138 @@ void sithPlayer_ResetPalEffects()
     stdPalEffects_FlushAllEffects();
     g_selfPlayerInfo->palEffectsIdx1 = stdPalEffects_NewRequest(1);
     g_selfPlayerInfo->palEffectsIdx2 = stdPalEffects_NewRequest(2);
+}
+
+void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
+{
+    int v2; // edi
+    sithThing *v3; // esi
+    stdPalEffect *v4; // ebx
+    double v5; // st7
+    double v6; // st7
+    double v7; // st7
+    int v8; // eax
+    int v9; // eax
+    int v10; // eax
+    int v11; // eax
+    int v12; // eax
+    int v13; // eax
+    int v14; // ecx
+    sithSector *v15; // eax
+    float v20; // [esp+0h] [ebp-4h]
+
+    v20 = a2 * 0.40000001;
+    v2 = (__int64)(a2 * 256.0 - -0.5);
+    if ( playerInfo == g_selfPlayerInfo )
+    {
+        v3 = playerInfo->playerThing;
+        v4 = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
+        if ( v4->tint.x != 0.0 )
+        {
+            v5 = v4->tint.x - v20;
+            if ( v5 < 0.0 )
+            {
+                v5 = 0.0;
+            }
+            else if ( v5 > 1.0 )
+            {
+                v5 = 1.0;
+            }
+            v4->tint.x = v5;
+        }
+        if ( v4->tint.y != 0.0 )
+        {
+            v6 = v4->tint.y - v20;
+            if ( v6 < 0.0 )
+            {
+                v6 = 0.0;
+            }
+            else if ( v6 > 1.0 )
+            {
+                v6 = 1.0;
+            }
+            v4->tint.y = v6;
+        }
+        if ( v4->tint.z != 0.0 )
+        {
+            v7 = v4->tint.z - v20;
+            if ( v7 < 0.0 )
+            {
+                v7 = 0.0;
+            }
+            else if ( v7 > 1.0 )
+            {
+                v7 = 1.0;
+            }
+            v4->tint.z = v7;
+        }
+        v8 = v4->add.x;
+        if ( v8 )
+        {
+            v9 = v8 - v2;
+            if ( v9 < 0 )
+            {
+                v9 = 0;
+            }
+            else if ( v9 > 255 )
+            {
+                v9 = 255;
+            }
+            v4->add.x = v9;
+        }
+        v10 = v4->add.y;
+        if ( v10 )
+        {
+            v11 = v10 - v2;
+            if ( v11 < 0 )
+            {
+                v11 = 0;
+            }
+            else if ( v11 > 255 )
+            {
+                v11 = 255;
+            }
+            v4->add.y = v11;
+        }
+        v12 = v4->add.z;
+        if ( v12 )
+        {
+            v13 = v12 - v2;
+            if ( v13 < 0 )
+            {
+                v13 = 0;
+            }
+            else if ( v13 > 255 )
+            {
+                v13 = 255;
+            }
+            v4->add.z = v13;
+        }
+        sithWeapon_handle_inv_msgs(v3);
+        sithInventory_SendFire(v3);
+        if ( !v3->attach_flags )
+        {
+            v14 = v3->actorParams.typeflags;
+            if ( (v14 & THING_TYPEFLAGS_400000) == 0 && v3->move_type == MOVETYPE_PHYSICS && v3->physicsParams.vel.z < -3.0 )
+            {
+                v15 = v3->sector;
+                if ( v15 )
+                {
+                    if ( (v15->flags & 0x40) != 0 )
+                    {
+                        v3->thingflags |= 0x200;
+                        v3->actorParams.typeflags |= THING_TYPEFLAGS_400000;
+                        sithCamera_SetCameraFocus(&sithCamera_cameras[1], v3, 0);
+                        sithCamera_SetCurrentCamera(&sithCamera_cameras[1]);
+                    }
+                }
+            }
+        }
+        if ( (v3->actorParams.typeflags & THING_TYPEFLAGS_400000) != 0 )
+        {
+            v4->fade -= a2 * 0.69999999;
+            if (v4->fade <= 0.0)
+                sithPlayer_HandleSentDeathPkt(v3);
+        }
+    }
 }

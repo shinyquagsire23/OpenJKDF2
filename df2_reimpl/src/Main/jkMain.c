@@ -107,9 +107,7 @@ void jkMain_GuiAdvance()
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-#ifndef LINUX
                     if (!sith_Tick()) return;
-#endif
                 }
                 
                 if ( g_sithMode == 5 )
@@ -209,9 +207,7 @@ void jkMain_EscapeMenuTick(int a2)
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-#ifndef LINUX
                     if (sith_Tick()) return;
-#endif
                 }
                 
                 if ( g_sithMode == 5 )
@@ -419,9 +415,7 @@ void jkMain_GameplayTick(int a2)
             if (v1 > jkMain_lastTickMs + TICKRATE_MS)
             {
                 jkMain_lastTickMs = v1;
-#ifndef LINUX
                 if (sith_Tick()) return;
-#endif
             }
             
             if ( g_sithMode == 5 )

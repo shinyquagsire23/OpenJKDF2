@@ -118,3 +118,14 @@ void sithSoundSys_FreeThing(sithThing *thing)
         }
     }
 }
+
+#ifdef LINUX
+void sithSoundSys_Tick(float a1)
+{
+}
+
+void sithSoundSys_ResumeMusic(int a1)
+{
+    
+}
+#endif

@@ -572,7 +572,7 @@ typedef struct sithThingActorParams
     uint32_t typeflags;
     float health;
     float maxHealth;
-    float force;
+    uint32_t msUnderwater;
     float jumpSpeed;
     float extraSpeed;
     float maxThrust;

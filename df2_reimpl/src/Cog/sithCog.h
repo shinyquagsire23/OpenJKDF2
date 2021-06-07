@@ -144,6 +144,7 @@ static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *re
 //static void (*sithCog_SendMessageFromSectorEx)(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromSectorEx_ADDR;
 static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 static void (*sithCog_Free)(sithWorld* world) = (void*)sithCog_Free_ADDR;
+static void (*sithCogScript_TickAll)() = (void*)sithCogScript_TickAll_ADDR;
 
 int sithCogScript_Load(sithWorld *lvl, int a2);
 void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3);

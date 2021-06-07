@@ -35,9 +35,9 @@
 
 typedef struct stdPalEffect
 {
-    rdVector3 filter;
+    rdVector3i filter;
     rdVector3 tint;
-    rdVector3 add;
+    rdVector3i add;
     float fade;
 } stdPalEffect;
 
@@ -60,6 +60,7 @@ typedef struct stdPalEffectRequest
 
 int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FlushAllEffects();
+stdPalEffect* stdPalEffects_GetEffectPointer(int idx);
 
 static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
 static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;

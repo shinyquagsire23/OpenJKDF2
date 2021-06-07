@@ -75,6 +75,7 @@ sithAICommand* sithAI_FindCommand(const char *cmdName);
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;
 //static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
 static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI_Tick_ADDR;
+static void (*sithAI_TickAll)() = (void*)sithAI_TickAll_ADDR;
 static void (*sithAI_SetActorFireTarget)(void *a1, int a2, sithThing *a3) = (void*)sithAI_SetActorFireTarget_ADDR;
 static int (*sithAI_sub_4EB790)(sithSector *a1, rdMatrix34 *a2, float a3, float a4, int a5, sithThing **a6, int a7, float a8) = (void*)sithAI_sub_4EB790_ADDR;
 

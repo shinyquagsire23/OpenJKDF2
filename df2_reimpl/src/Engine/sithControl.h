@@ -134,10 +134,12 @@ static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 int sithControl_Initialize();
 void sithControl_InputInit();
 void sithControl_AddInputHandler(void *a1);
+void sithControl_Tick();
 #else
 static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
 static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
 static void (*sithControl_AddInputHandler)(void *a1) = (void*)sithControl_AddInputHandler_ADDR;
+static void (*sithControl_Tick)() = (void*)sithControl_Tick_ADDR;
 #endif
 
 #endif // _SITHCONTROL_H

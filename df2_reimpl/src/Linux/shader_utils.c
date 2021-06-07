@@ -46,10 +46,10 @@ GLuint create_shader(const char* shader, GLenum type) {
 	const char* version;
 	int profile;
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
-	if (profile == SDL_GL_CONTEXT_PROFILE_ES)
-		version = "#version 100\n";  // OpenGL ES 2.0
-	else
-		version = "#version 120\n";  // OpenGL 2.1
+	//if (profile == SDL_GL_CONTEXT_PROFILE_ES)
+	//	version = "#version 100\n";  // OpenGL ES 2.0
+	//else
+    version = "#version 330 core\n";  // OpenGL 3.3
 
 	// GLES2 precision specifiers
 	const char* precision;

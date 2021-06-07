@@ -20,9 +20,11 @@
 #ifdef LINUX
 void DebugConsole_Print(char* s);
 void DebugConsole_PrintUniStr(wchar_t* s);
+void DebugConsole_AdvanceLogBuf();
 #else
 static void (*DebugConsole_PrintUniStr)(wchar_t *a1) = (void*)DebugConsole_PrintUniStr_ADDR;
 static void (__cdecl *DebugConsole_Print)(char *str) = (void*)DebugConsole_Print_ADDR;
+static void (*DebugConsole_AdvanceLogBuf)() = (void*)DebugConsole_AdvanceLogBuf_ADDR;
 #endif
 
 #endif // _DEBUGCONSOLE_H

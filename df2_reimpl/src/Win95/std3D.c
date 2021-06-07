@@ -17,6 +17,7 @@
 #define TEX_MODE_RGB 1
 #define TEX_MODE_BGR_WHITETRANSPARENCY 2
 #define TEX_MODE_TEST 3
+#define TEX_MODE_WORLDPAL 4
 
 static bool has_initted = false;
 static GLuint fb;
@@ -38,10 +39,13 @@ static int activeFb;
 int init_once = 0;
 GLuint program;
 GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode;
+GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette;
+GLuint worldpal_texture;
+void* worldpal_data;
 
 const char* gl_frag = 
 "uniform sampler2D tex;\n"
+"uniform sampler1D worldPalette;\n"
 "uniform int tex_mode;\n"
 "uniform int blend_mode;\n"
 "varying vec4 f_color;\n"
@@ -51,6 +55,8 @@ const char* gl_frag =
 "  vec4 sampled = texture2D(tex, f_uv);\n"
 "  vec4 sampled_color = vec4(0.0, 0.0, 0.0, 0.0);\n"
 "  vec4 vertex_color = f_color;\n"
+"  float index = sampled.r;\n"
+"  vec4 palval = texture1D(worldPalette, index);\n"
 "  vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
 "  \n"
 "  if (tex_mode == 0)\n"
@@ -71,6 +77,10 @@ const char* gl_frag =
 "  else if (tex_mode == 3)\n"
 "  {\n"
 "    sampled_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+"  }\n"
+"  else if (tex_mode == 4)\n"
+"  {\n"
+"      sampled_color = vec4(palval.r, palval.g, palval.b, 1.0);\n"
 "  }\n"
 "  \n"
 "  if (blend_mode == 5)\n"
@@ -189,6 +199,20 @@ int init_resources()
         return false;
     }
     
+    // World palette
+    glGenTextures(1, &worldpal_texture);
+    worldpal_data = malloc(0x300);
+    
+    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
+    
+    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+    
     const char* attribute_name;
     attribute_name = "coord3d";
     attribute_coord3d = glGetAttribLocation(program, attribute_name);
@@ -218,7 +242,7 @@ int init_resources()
     uniform_mvp = glGetUniformLocation(program, uniform_name);
     if (uniform_mvp == -1) 
     {
-        printf("Could not bind attribute %s!\n", attribute_name);
+        printf("Could not bind uniform %s!\n", uniform_name);
         return false;
     }
     
@@ -226,7 +250,15 @@ int init_resources()
     uniform_tex = glGetUniformLocation(program, uniform_name);
     if (uniform_tex == -1) 
     {
-        printf("Could not bind attribute %s!\n", attribute_name);
+        printf("Could not bind uniform %s!\n", uniform_name);
+        return false;
+    }
+    
+    uniform_name = "worldPalette";
+    uniform_worldPalette = glGetUniformLocation(program, uniform_name);
+    if (uniform_worldPalette == -1) 
+    {
+        printf("Could not bind uniform %s!\n", uniform_name);
         return false;
     }
     
@@ -234,7 +266,7 @@ int init_resources()
     uniform_tex_mode = glGetUniformLocation(program, uniform_name);
     if (uniform_tex_mode == -1) 
     {
-        printf("Could not bind attribute %s!\n", attribute_name);
+        printf("Could not bind uniform %s!\n", uniform_name);
         return false;
     }
     
@@ -242,7 +274,7 @@ int init_resources()
     uniform_blend_mode = glGetUniformLocation(program, uniform_name);
     if (uniform_blend_mode == -1) 
     {
-        printf("Could not bind attribute %s!\n", attribute_name);
+        printf("Could not bind uniform %s!\n", uniform_name);
         return false;
     }
 
@@ -254,6 +286,8 @@ void free_resources()
     glDeleteProgram(program);
     deleteFramebuffer(fb1, fbTex1, fbRbo1);
     deleteFramebuffer(fb2, fbTex2, fbRbo2);
+    glDeleteTextures(1, &worldpal_texture);
+    free(worldpal_data);
     has_initted = false;
 }
 
@@ -504,10 +538,13 @@ void std3D_DrawRenderList()
             }
             
             int tex_id = tex->texture_id;
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE0 + 1);
+            glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+            glActiveTexture(GL_TEXTURE0 + 0);
             glBindTexture(GL_TEXTURE_2D, tex_id);
             glUniform1i(uniform_tex, 0);
-            glUniform1i(uniform_tex_mode, TEX_MODE_BGR);//TEX_MODE_BGR
+            glUniform1i(uniform_worldPalette, 1);
+            glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
             
             if (tex_id == 0)
                 glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
@@ -626,10 +663,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
 {
     //printf("Add to texture cache\n");
     
-    GLuint image_texture, pal_texture;
+    GLuint image_texture;
     glGenTextures(1, &image_texture);
-    //glGenTextures(1, &pal_texture);
-    //void* image_data = vbuf->sdlSurface->pixels;
     uint8_t* image_8bpp = vbuf->sdlSurface->pixels;
     uint16_t* image_16bpp = vbuf->sdlSurface->pixels;
     uint8_t* pal = vbuf->palette;
@@ -637,7 +672,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     uint32_t width, height;
     width = vbuf->format.width;
     height = vbuf->format.height;
-    
+
+#if 0    
     void* image_data = malloc(width*height*4);
     
     for (int j = 0; j < height; j++)
@@ -670,30 +706,18 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
         
     }
     
-    /*width = 2;
-    height = 2;
-    
-    *(uint32_t*)(image_data+0) = 0xFF0000FF;
-    *(uint32_t*)(image_data+4) = 0xFF0000FF;
-    *(uint32_t*)(image_data+8) = 0xFFFFFFFF;
-    *(uint32_t*)(image_data+12) = 0xFFFFFFFF;*/
-    
-    //memset(image_data, 0xFF, vbuf->format.width*vbuf->format.height);
-    
-    /*glBindTexture(GL_TEXTURE_1D, pal_texture);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);*/
-    
-
     glBindTexture(GL_TEXTURE_2D, image_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+#endif
+
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;

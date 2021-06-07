@@ -29,3 +29,8 @@ void stdPalEffects_FlushAllEffects()
     _memset(stdPalEffects_aEffects, 0, sizeof(stdPalEffectRequest) * 32); // sizeof(stdPalEffects_aEffects)
     stdPalEffects_numEffectRequests = 0;
 }
+
+stdPalEffect* stdPalEffects_GetEffectPointer(int idx)
+{
+    return &stdPalEffects_aEffects[idx].effect;
+}

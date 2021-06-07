@@ -22,10 +22,12 @@
 #include "Engine/sithSound.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithTime.h"
-#include "World/sithWeapon.h"
-#include "World/sithSector.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithControl.h"
+#include "Engine/sithMulti.h"
+#include "Engine/sithSave.h"
+#include "World/sithWeapon.h"
+#include "World/sithSector.h"
 #include "jk.h"
 
 int sith_Startup(struct common_functions *commonFuncs)
@@ -143,6 +145,56 @@ int sith_Mode1Init(char *a1)
     g_sithMode = 1;
     sith_bOpened = 1;
     return 1;
+}
+
+int sith_Tick()
+{
+    if ( (g_submodeFlags & 8) != 0 )
+    {
+        sithTime_Tick();
+        sithCogVm_Sync();
+        sithSurface_Tick(sithTime_deltaSeconds);
+        sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+        DebugConsole_AdvanceLogBuf();
+        return 1;
+    }
+    else
+    {
+        ++bShowInvisibleThings;
+        if (sithRender_8EE678++ == -1)
+        {
+            sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+            sithRender_8EE678 = 1;
+        }
+        sithSoundSys_ResumeMusic(0);
+        sithTime_Tick();
+        sithSoundSys_Tick(sithTime_deltaSeconds);
+        sithTimer_Advance();
+
+#ifndef LINUX
+        if ( sithCogVm_bSyncMultiplayer )
+            sithCogVm_Sync();
+
+        if ( (g_debugmodeFlags & 1) == 0 )
+            sithAI_TickAll();
+
+        sithSurface_Tick(sithTime_deltaSeconds);
+#endif
+
+        if ( g_sithMode != 2 )
+            sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+
+        sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+#ifndef LINUX
+        sithCogScript_TickAll();
+#endif
+        DebugConsole_AdvanceLogBuf();
+#ifndef LINUX
+        sithMulti_HandleTimeLimit(sithTime_deltaMs);
+        sithSave_WriteEntry();
+#endif
+        return 0;
+    }
 }
 
 void sith_set_some_text_jk1(char *text)
