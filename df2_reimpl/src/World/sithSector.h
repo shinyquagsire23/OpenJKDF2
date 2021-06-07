@@ -215,6 +215,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 void sithSector_ThingLandIdk(sithThing *thing, int a3);
 int sithSector_SetSkyParams(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky);
 void sithSector_UpdateSky();
+void sithSector_StopPhysicsThing(sithThing *thing);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -225,7 +226,6 @@ static void (*sithSector_ThingSetLook)(sithThing *a1, rdVector3 *a2, float a3) =
 static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 
 static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
-static void (*sithSector_StopPhysicsThing)(sithThing* thing) = (void*)sithSector_StopPhysicsThing_ADDR;
 static int (*sithSector_cogMsg_SendStopAnim)(sithSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;
 static int (*sithSector_cogMsg_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithSector_cogMsg_SendCreateThing_ADDR;
 static void (*sithSector_cogMsg_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithSector_cogMsg_SendTakeItem_ADDR;

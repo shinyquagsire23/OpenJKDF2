@@ -688,3 +688,13 @@ void sithSector_UpdateSky()
     sithSector_flt_8553B8 = -(sithCamera_currentCamera->vec3_2.y * sithSector_horizontalPixelsPerRev_idk);
     sithSector_flt_8553C4 = v0;
 }
+
+void sithSector_StopPhysicsThing(sithThing *thing)
+{
+    rdVector_Zero3(&thing->physicsParams.vel);
+    rdVector_Zero3(&thing->physicsParams.angVel);
+    rdVector_Zero3(&thing->physicsParams.field_1F8);
+    rdVector_Zero3(&thing->physicsParams.acceleration);
+    rdVector_Zero3(&thing->velocityMaybe);
+    rdVector_Zero3(&thing->field_268);
+}

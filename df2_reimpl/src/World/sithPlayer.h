@@ -68,7 +68,9 @@ int sithPlayer_GetNum(sithThing *player);
 void sithPlayer_ResetPalEffects();
 void sithPlayer_idk(int idx);
 void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2);
+void sithPlayer_debug_loadauto(sithThing *player);
 
+static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
 //static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;

@@ -1,8 +1,7 @@
 #ifndef _SITHCAMERA_H
 #define _SITHCAMERA_H
 
-#include "Primitives/rdVector.h"
-#include "Primitives/rdMatrix.h"
+#include "types.h"
 #include "Engine/rdCamera.h"
 
 #define sithCamera_Startup_ADDR (0x004C4DE0)
@@ -17,7 +16,7 @@
 #define sithCamera_SetCanvas_ADDR (0x004C53C0)
 #define sithCamera_SetCurrentCamera_ADDR (0x004C5420)
 #define sithCamera_CycleCamera_ADDR (0x004C54D0)
-#define sithCamera_idkdebug_ADDR (0x004C5590)
+#define sithCamera_DoIdleAnimation_ADDR (0x004C5590)
 #define sithCamera_IdkChecksDword4_ADDR (0x004C5640)
 #define sithCamera_SetCameraFocus_ADDR (0x004C5670)
 #define sithCamera_GetPrimaryFocus_ADDR (0x004C5690)
@@ -28,10 +27,6 @@
 #define sithCamera_create_unk_struct_ADDR (0x004C6050)
 #define sithCamera_SetState_ADDR (0x004C6160)
 #define sithCamera_GetState_ADDR (0x004C6170)
-
-typedef struct rdColormap rdColormap;
-typedef struct sithThing sithThing;
-typedef struct sithSector sithSector;
 
 typedef struct sithCameraRenderInfo
 {
@@ -67,6 +62,8 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
 
 void sithCamera_FollowFocus(sithCamera *cam);
 void sithCamera_SetRdCameraAndRenderidk();
+void sithCamera_DoIdleAnimation();
+int sithCamera_SetCurrentCamera(sithCamera *camera);
 
 static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
@@ -74,7 +71,7 @@ static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCa
 static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
 static void (*sithCamera_CycleCamera)(void) = (void*)sithCamera_CycleCamera_ADDR;
 static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, float a3, float a4) = (void*)sithCamera_SetPovShake_ADDR;
-static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
+//static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
 static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;
 static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
 //static void (*sithCamera_FollowFocus)(sithCamera *cam) = (void*)sithCamera_FollowFocus_ADDR;
@@ -95,5 +92,6 @@ static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2
 #define sithCamera_viewMat (*(rdMatrix34*)0x8EE5E0)
 #define sithCamera_focusMat (*(rdMatrix34*)0x0082F0B8)
 #define sithCamera_bOpen (*(int*)0x0082F10C)
+#define sithCamera_camIdxToGlobalIdx ((int*)0x00549088)
 
 #endif // _SITHCAMERA_H

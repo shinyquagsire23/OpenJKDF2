@@ -182,7 +182,9 @@ int sith_Tick()
 #endif
 
         if ( g_sithMode != 2 )
+        {
             sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+        }
 
         sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
 #ifndef LINUX

@@ -143,7 +143,7 @@ int main(int argc, char** argv)
     
     // text
     fseek(f, 0x400, SEEK_SET);
-    //fread((void*)0x401000, 0x120200, 1, f);
+    fread((void*)0x401000, 0x120200, 1, f);
     
     // rdata
     fseek(f, 0x120600, SEEK_SET);
@@ -913,9 +913,13 @@ void do_hooks()
     hook_function(sithCamera_SetsFocus_ADDR, sithCamera_SetsFocus);
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
     hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
+    hook_function(sithCamera_SetCurrentCamera_ADDR, sithCamera_SetCurrentCamera);
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
+    hook_function(sithControl_Tick_ADDR, sithControl_Tick);
+    hook_function(sithControl_AddInputHandler_ADDR, sithControl_AddInputHandler);
+    hook_function(sithControl_HandlePlayer_ADDR, sithControl_HandlePlayer);
     
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);

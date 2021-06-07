@@ -16,4 +16,8 @@ void DebugConsole_Print(char* s)
 void DebugConsole_AdvanceLogBuf()
 {
 }
+
+void DebugConsole_AlertSound()
+{
+}
 #endif

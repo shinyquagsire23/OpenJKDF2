@@ -18,6 +18,7 @@ typedef int (*sithSaveHandler_t)();
 #define sithSave_func3 (*(sithSaveHandler_t*)0x00835904)
 #define sithSave_funcWrite (*(sithSaveHandler_t*)0x00835F44)
 #define sithSave_funcRead (*(sithSaveHandler_t*)0x0083590C)
+#define sithSave_autosave_fname ((char*)0x008BBC80)
 
 void sithSave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5);
 

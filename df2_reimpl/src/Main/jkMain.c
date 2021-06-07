@@ -821,6 +821,8 @@ int jkMain_SetVideoMode()
         thing_six = 0;
     }*/
     
+    sithControl_Open();
+    
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, 640, 480, 6);
     sithRender_SetSomeRenderflag(0x2a);

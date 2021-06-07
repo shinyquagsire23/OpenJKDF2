@@ -110,6 +110,8 @@ const char* gl_vert =
 "  f_coord = coord3d;\n"
 "}";
 
+static int std3D_aLoadedTextures[1024];
+static size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[4096];
 static size_t GL_tmpTrisAmt = 0;
 static D3DVERTEX GL_tmpVertices[4096];
@@ -625,7 +627,8 @@ int std3D_DrawOverlay()
 
 void std3D_UnloadAllTextures()
 {
-    
+    glDeleteTextures(std3D_loadedTexturesAmt, std3D_aLoadedTextures);
+    std3D_loadedTexturesAmt = 0;
 }
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
@@ -719,6 +722,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     
+    
+    std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
     ext->surfacepaltex = pal_texture;*/

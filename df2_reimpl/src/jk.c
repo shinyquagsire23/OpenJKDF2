@@ -635,9 +635,11 @@ char* _strpbrk(const char* a, const char* b)
     return strpbrk(a,b);
 }
 
-size_t _wcslen(const wchar_t * a)
+size_t _wcslen(const wchar_t * str)
 {
-    return wcslen(a);
+    int len;
+    for (len = 0; str[len]; len++);
+    return len;
 }
 
 int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)

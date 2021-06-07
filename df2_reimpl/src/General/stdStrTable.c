@@ -72,7 +72,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     _memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);
-    strtable->hashtable = stdHashTable_New((__int64)((double)numMsgs * 1.5));
+    strtable->hashtable = stdHashTable_New(numMsgs + (numMsgs/2));
     if ( !strtable->hashtable )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
     v11 = 1;

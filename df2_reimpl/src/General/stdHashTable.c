@@ -64,7 +64,7 @@ stdHashTable* stdHashTable_New(int maxEntries)
     int sizeIterIdx;
     signed int calcedPrime;
     int *sizeIter;
-    int actualNumBuckets;
+    int actualNumBuckets = 1999;
     signed int v7;
 
     hashtable = (stdHashTable *)std_pHS->alloc(sizeof(stdHashKey));

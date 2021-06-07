@@ -36,4 +36,23 @@ int stdControl_Open()
 {
     return 1;
 }
+
+int stdControl_ReadControls()
+{
+    return 1;
+}
+
+int stdControl_FinishRead()
+{
+    return 1;
+}
+
+float stdControl_GetAxis2(int a)
+{
+    if (a == 0)
+    {
+        return -1.0;
+    }
+    return 0.0;
+}
 #endif

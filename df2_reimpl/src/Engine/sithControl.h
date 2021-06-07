@@ -36,8 +36,15 @@
 #define sithControl_FreeCam_ADDR (0x004D8C90)
 #define sithControl_PlayerLook_ADDR (0x004D8F40)
 
-#define sithControl_dword_835830 (*(int*)0x835830)
+#define sithControl_msIdle (*(uint32_t*)0x835830)
 #define sithControl_bOpened (*(int*)0x835838)
+#define sithControl_aHandlers ((sithControl_handler_t*)0x00833A00)
+#define sithControl_numHandlers (*(int*)0x008339F8)
+#define sithControl_death_msgtimer (*(int*)0x0083583C)
+#define sithControl_vec3_54A570 (*(rdVector3*)0x0054A570)
+#define sithControl_flt_54A57C (*(float*)0x0054A57C)
+
+typedef int (*sithControl_handler_t)(sithThing*, float);
 
 enum INPUT_FUNC
 {
@@ -120,9 +127,12 @@ enum INPUT_FUNC
 
 int sithControl_IsOpen();
 int sithControl_Open();
+void sithControl_Tick(float deltaSecs, int deltaMs);
+void sithControl_AddInputHandler(void *a1);
+int sithControl_HandlePlayer(sithThing *player_, float a2);
+void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 
-static int (*sithControl_ReadFunctionMap)(int a1, void *a2) = (void*)sithControl_ReadFunctionMap_ADDR;
-static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
+//static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
 static int (*sithControl_Close)() = (void*)sithControl_Close_ADDR;
@@ -130,16 +140,24 @@ static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
 //static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 
+//static void (*sithControl_PlayerLook)(sithThing *player, float a3) = (void*)sithControl_PlayerLook_ADDR;
+static void (*sithControl_PlayerMovement)(sithThing *player) = (void*)sithControl_PlayerMovement_ADDR;
+static int (*sithControl_FreeCam)(sithThing *player) = (void*)sithControl_FreeCam_ADDR;
+
 #ifdef LINUX
 int sithControl_Initialize();
 void sithControl_InputInit();
 void sithControl_AddInputHandler(void *a1);
-void sithControl_Tick();
+int sithControl_ReadFunctionMap(int func, int* out);
+float sithControl_GetAxis(int num);
+float sithControl_ReadAxisStuff(int num);
 #else
 static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
 static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
 static void (*sithControl_AddInputHandler)(void *a1) = (void*)sithControl_AddInputHandler_ADDR;
-static void (*sithControl_Tick)() = (void*)sithControl_Tick_ADDR;
+static int (*sithControl_ReadFunctionMap)(int func, int* out) = (void*)sithControl_ReadFunctionMap_ADDR;
+static float (*sithControl_GetAxis)(int num) = (void*)sithControl_GetAxis_ADDR;
+static float (*sithControl_ReadAxisStuff)(int num) = (void*)sithControl_ReadAxisStuff_ADDR;
 #endif
 
 #endif // _SITHCONTROL_H

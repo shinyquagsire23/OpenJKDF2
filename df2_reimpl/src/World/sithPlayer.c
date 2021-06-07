@@ -3,10 +3,16 @@
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
+#include "World/sithWeapon.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithCamera.h"
+#include "Engine/sithSave.h"
+#include "Engine/sithSoundSys.h"
+#include "Main/jkGame.h"
 #include "General/stdPalEffects.h"
+#include "General/stdString.h"
+#include "General/stdFnames.h"
 #include "jk.h"
 
 void sithPlayer_Initialize(int idx)
@@ -272,4 +278,23 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
                 sithPlayer_HandleSentDeathPkt(v3);
         }
     }
+}
+
+void sithPlayer_debug_loadauto(sithThing *player)
+{
+    char v1[128]; // [esp+4h] [ebp-80h] BYREF
+
+    if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & 0x100) != 0 )
+    {
+        sithPlayer_debug_ToNextCheckpoint(player);
+    }
+    else if ( !sithSave_Load(sithSave_autosave_fname, 0, 0) )
+    {
+        stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+        stdFnames_ChangeExt(v1, "jks");
+        sithSave_Load(v1, 0, 0);
+    }
+    sithSoundSys_ResumeMusic(1);
+    player->thingType = THINGTYPE_PLAYER;
+    player->lifeLeftMs = 0;
 }

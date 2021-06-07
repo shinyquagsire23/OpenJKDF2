@@ -394,3 +394,33 @@ void sithCamera_SetRdCameraAndRenderidk()
         sithRender_Draw();
     }
 }
+
+void sithCamera_DoIdleAnimation()
+{
+    sithCamera *v0; // esi
+
+    v0 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[sithCamera_curCameraIdx]];
+    sithCamera_SetCurrentCamera(v0);
+}
+
+int sithCamera_SetCurrentCamera(sithCamera *camera)
+{
+    rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
+
+    if ( sithCamera_currentCamera && camera->dword4 < sithCamera_currentCamera->dword4 )
+        return 0;
+    sithCamera_currentCamera = camera;
+    sithCamera_dword_8EE5A0 = 1;
+    rdCamera_SetCurrent(&camera->rdCam);
+    if ( camera->cameraPerspective == 32 )
+    {
+        
+        rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
+        rot.x = 0.0;
+        rot.y = -45.0;
+        rot.z = 0.0;
+        rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
+    }
+    sithCamera_FollowFocus(sithCamera_currentCamera);
+    return 1;
+}

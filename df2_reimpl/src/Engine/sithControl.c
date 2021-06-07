@@ -1,6 +1,23 @@
 #include "sithControl.h"
 
+#include "General/sithStrTable.h"
 #include "Win95/stdControl.h"
+#include "Win95/DebugConsole.h"
+#include "World/sithWorld.h"
+#include "World/jkPlayer.h"
+#include "World/sithPlayer.h"
+#include "World/sithActor.h"
+#include "World/sithSector.h"
+#include "World/sithThing.h"
+#include "World/sithWeapon.h"
+#include "World/sithUnk4.h"
+#include "Engine/sithCamera.h"
+#include "Engine/sithNet.h"
+#include "Engine/sithTime.h"
+#include "Engine/sithSave.h"
+#include "Engine/sithMapView.h"
+#include "Main/jkGame.h"
+#include "jk.h"
 
 int sithControl_IsOpen()
 {
@@ -11,11 +28,323 @@ int sithControl_Open()
 {
     if (stdControl_Open())
     {
-        sithControl_dword_835830 = 0;
+        sithControl_msIdle = 0;
         sithControl_bOpened = 1;
         return 1;
     }
     return 0;
+}
+
+void sithControl_Tick(float deltaSecs, int deltaMs)
+{
+    if ( !sithControl_bOpened )
+        return;
+
+    if ( !g_localPlayerThing
+      || (THING_TYPEFLAGS_800000 & g_localPlayerThing->actorParams.typeflags) != 0
+      || (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
+      || (sithCamera_state & 1) != 0 )
+    {
+        if ( sithCamera_currentCamera == &sithCamera_cameras[4] )
+        {
+LABEL_13:
+            sithCamera_DoIdleAnimation();
+            goto LABEL_14;
+        }
+    }
+    else
+    {
+        if ( stdControl_bControlsIdle )
+        {
+            sithControl_msIdle += deltaMs;
+            if ( sithControl_msIdle > 30000 && sithCamera_currentCamera != &sithCamera_cameras[4] )
+                sithCamera_SetCurrentCamera(&sithCamera_cameras[4]);
+            goto LABEL_14;
+        }
+        sithControl_msIdle = 0;
+        if ( sithCamera_currentCamera == &sithCamera_cameras[4] )
+            goto LABEL_13;
+    }
+LABEL_14:
+    if ( sithWorld_pCurWorld->playerThing && sithControl_numHandlers > 0 )
+    {
+        stdControl_ReadControls();
+        for (int i = 0; i < sithControl_numHandlers; i++)
+        {
+            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_pCurWorld->playerThing, deltaSecs) )
+                break;
+        }
+        stdControl_FinishRead();
+    }
+}
+
+void sithControl_AddInputHandler(void *a1)
+{
+    if ( sithControl_numHandlers <= 8 )
+    {
+        sithControl_aHandlers[sithControl_numHandlers++] = a1;
+    }
+}
+
+int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
+{
+    int v3; // esi
+    int result; // eax
+    double v7; // st7
+    double v8; // st6
+    double v9; // st7
+    double v10; // st5
+    double v11; // st4
+    double v12; // st3
+    double v13; // st4
+    double v14; // st3
+    double v15; // rt0
+    double v16; // st3
+    wchar_t *v17; // eax
+    float v18; // [esp+8h] [ebp-40h]
+    rdVector3 a3a; // [esp+Ch] [ebp-3Ch] BYREF
+    rdMatrix34 a; // [esp+18h] [ebp-30h] BYREF
+    int input_read;
+
+#ifdef LINUX
+    g_debugmodeFlags |= 0x100;
+#endif
+
+    if ( player->move_type != MOVETYPE_PHYSICS )
+        return 0;
+    if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
+    {
+        if ( (player->thingflags & SITH_TF_DEAD) != 0 )
+        {
+            if ( (player->actorParams.typeflags & THING_TYPEFLAGS_400000) == 0 )
+            {
+                if ( !sithControl_death_msgtimer )
+                    goto LABEL_39;
+                if ( sithControl_death_msgtimer <= sithTime_curMs )
+                {
+                    if ( net_isMulti )
+                    {
+                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESPAWN");
+                    }
+                    else if ( !__strnicmp(sithSave_autosave_fname, "_JKAUTO_", 8u) )
+                    {
+                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTART");
+                    }
+                    else
+                    {
+                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTORE");
+                    }
+                    DebugConsole_PrintUniStr(v17);
+                    DebugConsole_AlertSound();
+                    sithControl_death_msgtimer = 0;
+LABEL_39:
+                    sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
+                    if ( input_read != 0 || (sithControl_ReadFunctionMap(INPUT_FUNC_FIRE1, &input_read), input_read != 0) )
+                    {
+                        sithPlayer_debug_loadauto(player);
+                        return 0;
+                    }
+                    return 0;
+                }
+            }
+        }
+        else
+        {
+            sithControl_PlayerLook(player, deltaSecs);
+#ifndef LINUX
+            if ( player->thingType != THINGTYPE_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
+            {
+                if ( player->attach_flags )
+                    sithControl_PlayerMovement(player);
+                else
+                    sithControl_FreeCam(player);
+                sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
+                if ( input_read != 0 )
+                    sithActor_cogMsg_OpenDoor(player);
+                sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
+                if ( (input_read & 1) != 0 )
+                    sithMapView_ToggleMapDrawn();
+                if ( sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &input_read) )
+                    sithMapView_FuncIncrease();
+                if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
+                    sithMapView_FuncDecrease();
+            }
+#endif
+        }
+        return 0;
+    }
+    if ( player->move_type == MOVETYPE_PHYSICS )
+        sithSector_StopPhysicsThing(player);
+    v3 = INPUT_FUNC_SELECT1;
+    while ( 1 )
+    {
+        sithControl_ReadFunctionMap(v3, &input_read);
+        if ( input_read )
+            break;
+        if ( ++v3 > (unsigned int)INPUT_FUNC_SELECT0 )
+            goto LABEL_11;
+    }
+    sithActor_cogMsg_WarpThingToCheckpoint(player, v3 - INPUT_FUNC_SELECT1);
+LABEL_11:
+    sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &input_read);
+    if ( input_read )
+    {
+        sithThing_Hit(player, player, 200.0, 1);
+        result = 1;
+    }
+    else
+    {
+        sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
+        if ( input_read )
+        {
+            if ( sithCamera_currentCamera->cameraPerspective == 128 )
+                sithCamera_DoIdleAnimation();
+            else
+                sithCamera_SetCurrentCamera(&sithCamera_cameras[6]);
+        }
+        v18 = deltaSecs * 90.0;
+        a3a.y = sithControl_ReadAxisStuff(1);
+        a3a.x = sithControl_ReadAxisStuff(8);
+        a3a.z = 0.0;
+        a3a.x = v18 * a3a.x;
+        a3a.y = v18 * a3a.y;
+        if ( a3a.x != 0.0 || a3a.y != 0.0 || a3a.z != 0.0 )
+        {
+            rdMatrix_BuildRotate34(&a, &a3a);
+            rdMatrix_TransformVector34Acc(&sithControl_vec3_54A570, &a);
+            rdVector_Normalize3Acc(&sithControl_vec3_54A570);
+        }
+        v7 = -stdControl_GetAxis2(0) * (deltaSecs * 0.1);
+        if ( v7 != 0.0 )
+        {
+            v8 = v7 + sithControl_flt_54A57C;
+            v9 = player->collideSize;
+            sithControl_flt_54A57C = v8;
+            if ( v8 < v9 )
+            {
+                sithControl_flt_54A57C = player->collideSize;
+            }
+            else if ( sithControl_flt_54A57C > 3.0 )
+            {
+                sithControl_flt_54A57C = 3.0;
+            }
+        }
+        
+        v10 = -sithControl_vec3_54A570.x;
+        sithCamera_viewMat.lvec.x = v10;
+        v11 = -sithControl_vec3_54A570.y;
+        sithCamera_viewMat.lvec.y = v11;
+        v12 = -sithControl_vec3_54A570.z;
+        sithCamera_viewMat.lvec.z = v12;
+        v13 = v11 * 1.0 - v12 * 0.0;
+        sithCamera_viewMat.rvec.x = v13;
+        v14 = sithCamera_viewMat.lvec.z * 0.0 - v10 * 1.0;
+        sithCamera_viewMat.rvec.y = v14;
+        v15 = v14 * sithCamera_viewMat.lvec.z;
+        v16 = sithCamera_viewMat.lvec.x * 0.0 - sithCamera_viewMat.lvec.y * 0.0;
+        sithCamera_viewMat.rvec.z = v16;
+        sithCamera_viewMat.uvec.x = v15 - v16 * sithCamera_viewMat.lvec.y;
+        sithCamera_viewMat.uvec.y = sithCamera_viewMat.rvec.z * sithCamera_viewMat.lvec.x - v13 * sithCamera_viewMat.lvec.z;
+        sithCamera_viewMat.uvec.z = sithCamera_viewMat.rvec.x * sithCamera_viewMat.lvec.y - sithCamera_viewMat.rvec.y * sithCamera_viewMat.lvec.x;
+        rdMatrix_Normalize34(&sithCamera_viewMat);
+        sithCamera_viewMat.scale.x = sithControl_flt_54A57C * sithControl_vec3_54A570.x;
+        sithCamera_viewMat.scale.y = sithControl_flt_54A57C * sithControl_vec3_54A570.y;
+        sithCamera_viewMat.scale.z = sithControl_flt_54A57C * sithControl_vec3_54A570.z;
+        sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
+        if ( input_read )
+            g_mapModeFlags ^= 0x42u;
+        sithCamera_currentCamera->cameraPerspective = 128;
+        result = 1;
+    }
+    return result;
+}
+
+void sithControl_PlayerLook(sithThing *player, float deltaSecs)
+{
+    int v3; // edi
+    double v5; // st7
+    double v6; // st7
+    double v8; // st6
+    double v9; // st7
+    double v12; // st6
+    rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
+    float a1a; // [esp+18h] [ebp+4h]
+    float a3a; // [esp+1Ch] [ebp+8h]
+
+    v3 = 0;
+    if ( (player->thingType == THINGTYPE_ACTOR || player->thingType == THINGTYPE_PLAYER) && deltaSecs != 0.0 )
+    {
+        if ( (player->actorParams.typeflags & THING_TYPEFLAGS_1) != 0 )
+        {
+            if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_MLOOK, 0) )
+                goto LABEL_20;
+            a2 = player->actorParams.eyePYR;
+            v5 = sithControl_GetAxis(8);
+            if ( v5 != 0.0 )
+            {
+                v3 = 1;
+                a2.x = a2.x + v5;
+            }
+            v6 = sithControl_ReadAxisStuff(8);
+            if ( v6 != 0.0 )
+            {
+                v3 = 1;
+                a2.x = v6 * 90.0 * deltaSecs + a2.x;
+            }
+            if ( v3 )
+            {
+                if ( a2.x < (double)player->actorParams.minHeadPitch )
+                {
+                    a2.x = player->actorParams.minHeadPitch;
+                }
+                else if ( a2.x > (double)player->actorParams.maxHeadPitch )
+                {
+                    a2.x = player->actorParams.maxHeadPitch;
+                }
+                sithUnk4_MoveJointsForEyePYR(player, &a2);
+                player->actorParams.typeflags &= ~THING_TYPEFLAGS_FORCE;
+            }
+            else
+            {
+LABEL_20:
+                if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & 2) != 0 )
+                {
+                    v8 = deltaSecs * 180.0;
+                    a3a = v8;
+                    v9 = -player->actorParams.eyePYR.x;
+                    a1a = -v8;
+                    player->actorParams.typeflags |= THING_TYPEFLAGS_LIGHT;
+                    if ( v9 < a1a )
+                    {
+                        v9 = a1a;
+                    }
+                    else if ( v9 > a3a )
+                    {
+                        v9 = a3a;
+                    }
+                    v12 = v9;
+                    if ( v12 < 0.0 )
+                        v12 = -v9;
+                    if ( v12 <= 0.0000099999997 )
+                        v9 = 0.0;
+                    if ( v9 == 0.0 )
+                    {
+                        player->actorParams.typeflags &= ~THING_TYPEFLAGS_FORCE;
+                        player->actorParams.typeflags |= THING_TYPEFLAGS_LIGHT;
+                    }
+                    else
+                    {
+                        player->actorParams.eyePYR.x = v9 + player->actorParams.eyePYR.x;
+                        sithUnk4_MoveJointsForEyePYR(player, &player->actorParams.eyePYR);
+                    }
+                }
+            }
+        }
+        else if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) )
+        {
+            sithSector_ThingSetLook(player, &rdroid_zVector3, deltaSecs);
+        }
+    }
 }
 
 #ifdef LINUX
@@ -28,11 +357,29 @@ void sithControl_InputInit()
 {
 }
 
-void sithControl_AddInputHandler(void *a1)
+int sithControl_ReadFunctionMap(int func, int* out)
 {
+    int val = 0;
+    if (func == INPUT_FUNC_DEBUG)
+    {
+        val = 1;
+    }
+    if (out)
+        *out = val;
+    return val;
 }
 
-void sithControl_Tick()
+float sithControl_GetAxis(int num)
 {
+    return 0.0;
+}
+
+float sithControl_ReadAxisStuff(int num)
+{
+    if (num == 1)
+    {
+        return 1.0;
+    }
+    return 0.0;
 }
 #endif
