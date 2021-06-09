@@ -41,7 +41,7 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     rdVector3 *v35; // ebx
     rdVertexIdxInfo *v36; // eax
     rdMeshinfo *v37; // ebx
-    int *v38; // esi
+    float *v38; // esi
     int v39; // ebp
     int *v40; // ecx
     rdVector3 *v41; // edx
@@ -57,7 +57,7 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     double v51; // st7
     rdVertexIdxInfo *v52; // eax
     rdMeshinfo *v53; // ebx
-    int *v54; // edi
+    float *v54; // edi
     int v55; // ebp
     rdVector3 *v56; // esi
     int *v57; // edx

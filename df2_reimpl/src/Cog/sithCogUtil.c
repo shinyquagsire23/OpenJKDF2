@@ -138,7 +138,7 @@ void sithCogUtil_SurfaceAnim(sithCog *ctx)
     sithCog *ctx_;
     int popInt; // edi
     void *surface; // ecx
-    int *v4; // eax
+    rdSurface *v4; // eax
     float popFlex; // [esp+Ch] [ebp+4h]
 
     // TODO: is this inlined?
@@ -157,7 +157,7 @@ void sithCogUtil_SurfaceAnim(sithCog *ctx)
 
     v4 = sithSurface_SurfaceAnim(surface, popFlex, popInt);
     if ( v4 )
-        sithCogVm_PushInt(ctx_, *v4);
+        sithCogVm_PushInt(ctx_, v4->index);
     else
         sithCogVm_PushInt(ctx_, -1);
 }
