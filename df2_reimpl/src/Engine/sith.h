@@ -30,10 +30,11 @@ int sith_Load(char *path);
 int sith_Mode1Init(char *a1);
 int sith_Tick();
 void sith_set_some_text_jk1(char *text);
+void sith_AutoSave();
 
 //static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 //static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
-static void (*sith_AutoSave)() = (void*)sith_AutoSave_ADDR;
+//static void (*sith_AutoSave)() = (void*)sith_AutoSave_ADDR;
 //static int (*sith_Mode1Init)(char*) = (void*)sith_Mode1Init_ADDR;
 static int (*sith_Mode1Init_3)(char*) = (void*)sith_Mode1Init_3_ADDR;
 static void (*sith_Close)() = (void*)sith_Close_ADDR;

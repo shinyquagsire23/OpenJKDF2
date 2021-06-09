@@ -193,7 +193,6 @@ int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
 // JK functions
 void (*jk_exit)(int a) = (void*)0x512590;
 int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
-int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...) = (void*)0x426D80;
 #endif
 
 int _memcmp (const void* str1, const void* str2, size_t count)
@@ -287,7 +286,7 @@ int _strncmp(const char *s1, const char *s2, size_t n)
 
 float _frand()
 {
-    return (float)_rand() * 0.000030518509;
+    return (float)(_rand() & 0xFFFF) * 0.000030518509;
 }
 
 // JK globals
@@ -651,9 +650,14 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     return ret;
 }
 
-wchar_t* _wcscpy(wchar_t * a, const wchar_t *b)
+wchar_t* _wcscpy(wchar_t * dst, const wchar_t *src)
 {
-    return wcscpy(a,b);
+    if (!dst) return NULL;
+    if (!src) return NULL;
+
+    wchar_t *tmp = dst;
+    while(*dst++ = *src++);
+    return tmp;
 }
 
 int jk_MessageBeep(int a)
@@ -662,7 +666,21 @@ int jk_MessageBeep(int a)
 
 int __strcmpi(const char *a, const char *b)
 {
-    return strcmp(a,b); // TODO verify
+    int ca, cb, n;
+
+    n = 0;
+    do 
+    {
+        //if (n >= c) break;
+        ca = (unsigned char) *a++;
+        cb = (unsigned char) *b++;
+        ca = tolower(toupper(ca));
+        cb = tolower(toupper(cb));
+        n++;
+    }
+    while (ca == cb && ca != '\0');
+
+    return ca - cb;
 }
 
 int __strnicmp(const char *a, const char *b, size_t c)

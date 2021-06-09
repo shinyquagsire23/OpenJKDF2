@@ -2,8 +2,11 @@
 
 #include "General/stdHashTable.h"
 #include "World/sithWorld.h"
+#include "World/jkPlayer.h"
+#include "World/sithSector.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithMaterial.h"
+#include "Engine/sithTime.h"
 #include "jk.h"
 
 int sithSurface_Startup()
@@ -77,6 +80,7 @@ int sithSurface_Load(sithWorld *world)
             return 0;
         if ( _sscanf(stdConffile_entry.args[1].value, "%x", &world->adjoins[i].flags) != 1 )
             return 0;
+
         mirror = _atoi(stdConffile_entry.args[2].value);
         if ( mirror >= world->numAdjoinsLoaded )
             return 0;
@@ -244,6 +248,8 @@ LABEL_71:
         if (_sscanf(stdConffile_aLine, "%d: %f %f %f", &idx_unused, &norm_x, &norm_y, &norm_z) != 4)
             return 0;
         
+        //jk_printf("%u: %x\n", v50, &world->surfaces[0].surfaceFlags);
+        
         world->surfaces[v50].surfaceInfo.face.normal.x = norm_x;
         world->surfaces[v50].surfaceInfo.face.normal.y = norm_y;
         world->surfaces[v50].surfaceInfo.face.normal.z = norm_z;
@@ -265,3 +271,136 @@ int sithSurface_Verify(sithWorld *world)
     
     return 1;
 }
+
+int sithSurface_GetIdxFromPtr(sithSurface *surface)
+{
+    if ( surface )
+        return (surface->parent_sector != 0);
+
+    return 0;
+}
+
+void sithSurface_UnsetAdjoins(sithAdjoin *adjoin)
+{
+    if ( (adjoin->flags & 1) != 0 )
+    {
+        adjoin->flags &= ~0x1;
+        adjoin->flags |= 0x20;
+    }
+}
+
+void sithSurface_SetAdjoins(sithAdjoin *adjoin)
+{
+    if ( (adjoin->flags & 0x20) != 0 )
+    {
+        adjoin->flags &= ~0x20;
+        adjoin->flags |= 0x1;
+    }
+}
+
+void sithSurface_SetSectorLight(sithSector *sector, float extraLight, float a3, int a4)
+{
+    double v5; // st7
+    rdSurface *v6; // eax
+    int v7; // edx
+    rdSurface *v8; // esi
+    double v9; // st7
+    float a1a; // [esp+4h] [ebp+4h]
+
+    v5 = extraLight - sector->extraLight;
+    if ( v5 != 0.0 )
+    {
+        v6 = (rdSurface *)sithSurface_numAvail;
+        if ( sithSurface_numAvail )
+        {
+            v7 = sithSurface_aAvail[sithSurface_numAvail--];
+            if ( v7 > sithSurface_numSurfaces )
+                sithSurface_numSurfaces = v7;
+            v8 = &sithSurface_aSurfaces[v7];
+            _memset(v8, 0, sizeof(rdSurface));
+            v6 = v8;
+            v8->index = ((playerThingIdx + 1) << 16) | (uint16_t)v7;
+        }
+        if ( v6 )
+        {
+            v6->sector = sector;
+            v6->flags = a4 & 1 | 0x2400000;
+            a1a = v5;
+            v6->field_44 = a1a / a3;
+            v9 = sector->extraLight;
+            v6->field_3C = sector->extraLight;
+            v6->field_48 = v9;
+            v6->field_40 = extraLight;
+        }
+    }
+}
+
+rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, float a2, uint16_t flags)
+{
+    rdMaterial *material; // ebp
+    rdSurface *result; // eax
+    int v5; // ebx
+    rdSurface *rd_surf; // esi
+    int v7; // edx
+    int64_t v8; // rax
+    int v9; // edx
+    int v10; // eax
+    int v11; // eax
+    int v13; // ecx
+
+    material = parent->surfaceInfo.face.material;
+    if ( !material )
+        return 0;
+    v5 = sithSurface_numAvail;
+    if ( sithSurface_numAvail )
+    {
+        v7 = sithSurface_aAvail[sithSurface_numAvail];
+        v5 = --sithSurface_numAvail;
+        if ( v7 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v7;
+        rd_surf = &sithSurface_aSurfaces[v7];
+        _memset(rd_surf, 0, sizeof(rdSurface));
+        rd_surf->index = ((playerThingIdx + 1) << 16) | (uint16_t)v7;
+    }
+    else
+    {
+        rd_surf = 0;
+    }
+    if ( !rd_surf )
+        return 0;
+    if ( (flags & 4) != 0 )
+        rd_surf->wallCel = 2;
+    else
+        rd_surf->wallCel = (flags & 2) != 0;
+    rd_surf->flags = flags | 0x220000;
+    rd_surf->sithSurfaceParent = parent;
+    rd_surf->material = material;
+    v8 = (int64_t)(1000.0 / a2);
+    rd_surf->field_34 = v8;
+    if (v8)
+    {
+        v13 = v8 + sithTime_curMs;
+        result = rd_surf;
+        rd_surf->field_30 = v13;
+    }
+    else
+    {
+        rd_surf->flags = 0;
+        v9 = rd_surf - sithSurface_aSurfaces;
+        v10 = sithSurface_numSurfaces;
+        sithSurface_aAvail[v5 + 1] = v9;
+        sithSurface_numAvail = v5 + 1;
+        if ( v9 == v10 )
+        {
+            for (v11 = v9-1; v11 >= 0; v11--)
+            {
+                if (sithSurface_aSurfaces[v11].flags)
+                    break;
+            }
+            sithSurface_numSurfaces = v11;
+        }
+        result = 0;
+    }
+    return result;
+}
+

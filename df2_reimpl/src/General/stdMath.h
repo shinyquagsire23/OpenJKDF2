@@ -45,6 +45,8 @@ IMPORT_FUNC(stdMath_ArcTan3, float, (float, float), stdMath_ArcTan3_ADDR)
 IMPORT_FUNC(stdMath_ArcTan4, float, (float, float), stdMath_ArcTan4_ADDR)
 IMPORT_FUNC(stdMath_FloorDivMod, int, (int, int, int*, int*), stdMath_FloorDivMod_ADDR)
 
+static void (*_stdMath_SinCos)(float angle, float *pSinOut, float *pCosOut) = (void*)stdMath_SinCos_ADDR;
+
 float stdMath_Dist2D1(float a1, float a2);
 float stdMath_Dist2D2(float a1, float a2);
 float stdMath_Dist2D3(float a1, float a2);

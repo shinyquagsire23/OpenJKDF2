@@ -12,11 +12,17 @@
 #define jkHudInv_Shutdown_ADDR (0x0040A010)
 
 #define jkHudInv_idkItems ((int*)0x00553F28) // 14
+#define jkHudInv_numItems (*(int*)0x00553F98)
+#define jkHudInv_aItems (*(int**)0x00553F9C)
 
 int jkHudInv_Initialize();
+int jkHudInv_items_init();
+int jkHudInv_ItemDatLoad(char *fpath);
 
 static int (*jkHudInv_render_itemsmaybe)() = (void*)jkHudInv_render_itemsmaybe_ADDR;
 static int (*jkHudInv_render_textmaybe)() = (void*)jkHudInv_render_textmaybe_ADDR;
-static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
+static void (*jkHudInv_deinit_menu_graphics_maybe)() = (void*)jkHudInv_deinit_menu_graphics_maybe_ADDR;
+//static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
+//static int (*jkHudInv_ItemDatLoad)(char*) = (void*)jkHudInv_ItemDatLoad_ADDR;
 
 #endif // _JKHUDINV_H

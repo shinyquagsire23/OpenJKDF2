@@ -24,6 +24,18 @@ int stdPalEffects_NewRequest(int idx)
     return v2;
 }
 
+void stdPalEffects_FreeRequest(uint32_t idx)
+{
+    if (idx >= 32)
+        return;
+
+    if ( stdPalEffects_aEffects[idx].isValid )
+    {
+        stdPalEffects_aEffects[idx].isValid = 0;
+        --stdPalEffects_numEffectRequests;
+    }
+}
+
 void stdPalEffects_FlushAllEffects()
 {
     _memset(stdPalEffects_aEffects, 0, sizeof(stdPalEffectRequest) * 32); // sizeof(stdPalEffects_aEffects)

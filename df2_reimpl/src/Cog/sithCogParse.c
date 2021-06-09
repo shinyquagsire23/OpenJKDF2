@@ -327,7 +327,7 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
     newTable->buckets = buckets;
     if ( !buckets )
         return 0;
-    _memcpy(buckets, table->buckets, 4 * ((sizeof(sithCogSymbol) * entry_cnt) >> 2));
+    _memcpy(buckets, table->buckets, sizeof(sithCogSymbol) * entry_cnt);
     result = newTable;
     newTable->max_entries = entry_cnt;
     newTable->entry_cnt = entry_cnt;
@@ -848,7 +848,7 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
         return 0;
 
     symbol->symbol_type = COG_VARTYPE_INT;
-    symbol->as_float = _atoi(stdConffile_entry.args[1].value);
+    symbol->as_int = _atoi(stdConffile_entry.args[1].value);
     symbol->field_C = 0; // aaaaaaaa undef
     symbol->field_10 = 0; // aaaaaaaa undef
     

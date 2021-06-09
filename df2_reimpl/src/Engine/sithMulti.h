@@ -52,5 +52,6 @@ static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
 static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
 static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
 static void (*sithMulti_HandleTimeLimit)(int) = (void*)sithMulti_HandleTimeLimit_ADDR;
+static int (*sithMulti_sendmsgidk3)(int,int,int) = (void*)sithMulti_sendmsgidk3_ADDR;
 
 #endif // _SITHMULTI_H

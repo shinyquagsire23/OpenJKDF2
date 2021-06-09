@@ -276,6 +276,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
 int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 {
+    if (!rect)
+        return 1;
+
     SDL_Rect dstRect = {rect->x, rect->y, rect->width, rect->height};
     
     //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
@@ -322,5 +325,9 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
     stdDisplay_VBufferUnlock(vbuf);
     SDL_FreeSurface(vbuf->sdlSurface);
     std_pHS->free(vbuf);
+}
+
+void stdDisplay_ddraw_surface_flip2()
+{
 }
 #endif

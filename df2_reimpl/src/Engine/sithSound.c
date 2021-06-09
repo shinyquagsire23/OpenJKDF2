@@ -154,7 +154,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
     {
         sound = &sithWorld_pLoading->sounds[sithWorld_pLoading->numSoundsLoaded];
         sound->id = sithWorld_pLoading->numSoundsLoaded;
-        if ( !(sithWorld_pLoading->level_type_maybe & 1))
+        if ((sithWorld_pLoading->level_type_maybe & 1))
         {
             sound->id |= 0x8000;
         }

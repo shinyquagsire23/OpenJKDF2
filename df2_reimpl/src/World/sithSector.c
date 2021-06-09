@@ -698,3 +698,37 @@ void sithSector_StopPhysicsThing(sithThing *thing)
     rdVector_Zero3(&thing->velocityMaybe);
     rdVector_Zero3(&thing->field_268);
 }
+
+int sithSector_GetIdxFromPtr(sithSector *sector)
+{
+    return sector && sector->id == sector - sithWorld_pCurWorld->sectors && sector->id < (unsigned int)sithWorld_pCurWorld->numSectors;
+}
+
+void sithSector_SetAdjoins(sithSector *sector)
+{
+    sithAdjoin *i; // esi
+
+    for ( i = sector->adjoins; i; i = i->next )
+        sithSurface_SetAdjoins(&i->flags);
+    sector->flags &= ~0x80;
+}
+
+void sithSector_UnsetAdjoins(sithSector *sector)
+{
+    sithAdjoin *i; // esi
+
+    for ( i = sector->adjoins; i; i = i->next )
+        sithSurface_UnsetAdjoins(i);
+    sector->flags |= 0x80;
+}
+
+int sithSector_GetThingsCount(sithSector *sector)
+{
+    int result; // eax
+    sithThing *i; // ecx
+
+    result = 0;
+    for ( i = sector->thingsList; i; ++result )
+        i = i->nextThing;
+    return result;
+}

@@ -107,7 +107,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     int input_read;
 
 #ifdef LINUX
-    g_debugmodeFlags |= 0x100;
+    //g_debugmodeFlags |= 0x100;
 #endif
 
     if ( player->move_type != MOVETYPE_PHYSICS )
@@ -151,7 +151,7 @@ LABEL_39:
         else
         {
             sithControl_PlayerLook(player, deltaSecs);
-#ifndef LINUX
+#ifndef LINUX_TMP
             if ( player->thingType != THINGTYPE_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
             {
                 if ( player->attach_flags )
@@ -348,6 +348,7 @@ LABEL_20:
 }
 
 #ifdef LINUX
+#include <SDL2/SDL.h>
 int sithControl_Initialize()
 {
     return 1;
@@ -359,11 +360,46 @@ void sithControl_InputInit()
 
 int sithControl_ReadFunctionMap(int func, int* out)
 {
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
     int val = 0;
     if (func == INPUT_FUNC_DEBUG)
     {
         val = 1;
     }
+    else if (func == INPUT_FUNC_SLIDETOGGLE)
+    {
+        val = 0;
+    }
+    else if (func == INPUT_FUNC_ACTIVATE)
+    {
+        val = !!state[SDL_SCANCODE_SPACE];
+    }
+    else if (func == INPUT_FUNC_FAST)
+    {
+        val = !!state[SDL_SCANCODE_LSHIFT];
+    }
+    else if (func == INPUT_FUNC_JUMP)
+    {
+        val = !!state[SDL_SCANCODE_X];
+    }
+    else if (func == INPUT_FUNC_DUCK)
+    {
+        val = !!state[SDL_SCANCODE_C];
+    }
+    else if (func == INPUT_FUNC_FIRE1)
+    {
+        val = !!state[SDL_SCANCODE_Z];
+    }
+    else if (func == INPUT_FUNC_FIRE2)
+    {
+        val = !!state[SDL_SCANCODE_V];
+    }
+    
+    if (!!state[SDL_SCANCODE_ESCAPE])
+    {
+        jkMain_do_guistate6();
+    }
+    
     if (out)
         *out = val;
     return val;
@@ -371,15 +407,21 @@ int sithControl_ReadFunctionMap(int func, int* out)
 
 float sithControl_GetAxis(int num)
 {
-    return 0.0;
+    return stdControl_GetAxis2(num);
 }
 
 float sithControl_ReadAxisStuff(int num)
 {
-    if (num == 1)
-    {
-        return 1.0;
-    }
-    return 0.0;
+    return stdControl_GetAxis2(num);
+}
+
+int sithControl_ReadConf()
+{
+    return 1; 
+}
+
+int sithControl_WriteConf()
+{
+    return 1; 
 }
 #endif

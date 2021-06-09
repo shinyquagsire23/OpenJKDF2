@@ -1,6 +1,7 @@
 #ifndef _STDPLATFORM_H
 #define _STDPLATFORM_H
 
+#include "types.h"
 #include "jk.h"
 
 #define stdPlatform_Startup_ADDR (0x0042C080)
@@ -32,11 +33,11 @@ static int (*stdPlatform_LockHandle)(int) = (void*)stdPlatform_LockHandle_ADDR;
 static void (*stdPlatform_UnlockHandle)(int) = (void*)stdPlatform_UnlockHandle_ADDR;
 
 #ifdef WIN32
-static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
+static int (*stdPrintf)(intptr_t a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
-int stdPrintf(void* a1, char *a2, int line, char *fmt, ...);
+int stdPrintf(intptr_t a1, char *a2, int line, char *fmt, ...);
 int stdPlatform_Printf(char *fmt, ...);
 uint32_t stdPlatform_GetTimeMsec();
 #endif

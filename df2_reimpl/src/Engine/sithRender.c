@@ -1,6 +1,7 @@
 #include "sithRender.h"
 
 #include <math.h>
+#include <float.h>
 
 #include "Cog/sithCog.h"
 #include "Engine/sithMaterial.h"
@@ -234,6 +235,9 @@ void sithRender_Draw()
 
 void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 {
+    //sithRender_Clip_(sector, frustumArg, a3);
+    //return;    
+    
     int v5; // ecx
     rdClipFrustum *frustum; // edx
     sithThing *thing; // esi
@@ -245,17 +249,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     int v25; // eax
     unsigned int v27; // edi
     rdClipFrustum *v31; // ecx
-    double v34; // st7
     rdClipFrustum outClip; // [esp+Ch] [ebp-74h] BYREF
     rdVector3 vertex_out; // [esp+40h] [ebp-40h] BYREF
     int v45; // [esp+4Ch] [ebp-34h]
-    float v46; // [esp+50h] [ebp-30h]
-    float v47; // [esp+54h] [ebp-2Ch]
-    float v48; // [esp+58h] [ebp-28h]
-    float v49; // [esp+5Ch] [ebp-24h]
-    sithAdjoin *v50; // [esp+60h] [ebp-20h]
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
-    float v57; // [esp+7Ch] [ebp-4h]
 
     if ( sector->field_8C == sithRender_8EE678 )
     {
@@ -274,7 +271,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             if ( (sector->flags & SITH_SF_COGLINKED) != 0 )
                 sithCog_SendMessageFromSector(sector, 0, SITH_MESSAGE_SIGHTED);
         }
-        frustum = &sithRender_clipFrustums[sithRender_numClipFrustums];
+        frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
         thing = sector->thingsList;
         sector->clipFrustum = frustum;
@@ -344,8 +341,8 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
         v20 = &sithWorld_pCurWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
         float dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
-            + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
-            + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
+                   + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
+                   + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
         if ( dist > 0.0 || (dist == 0.0 && sector == sithCamera_currentCamera->sector))
         {
             if ( adjoinSurface->field_4 != sithRender_8EE678 )
@@ -365,8 +362,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
             meshinfo_out.verticesProjected = vertices_tmp;
             sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
+
             rdPrimit3_ClipFace(frustumArg, 2, 1, 0, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
-            if ( (meshinfo_out.numVertices >= 3u || (rdClip_faceStatus & 0x40) != 0)
+
+            if ( ((unsigned int)meshinfo_out.numVertices >= 3u || (rdClip_faceStatus & 0x40) != 0)
               && ((rdClip_faceStatus & 0x41) != 0
                || (adjoinIter->flags & 1) != 0
                && (!adjoinSurface->surfaceInfo.face.material
@@ -377,43 +376,42 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 rdCamera_pCurCamera->projectLst(vertices_tmp_projected, vertices_tmp, meshinfo_out.numVertices);
                 
                 // no frustum culling
-                // TODO performance issue! figure out why this code doesn't work...
-                if (1 || (rdClip_faceStatus & 0x41) != 0 )
+                if ((rdClip_faceStatus & 0x41) != 0 )
                 {
                     v31 = frustumArg;
                 }
                 else
                 {
-                    float minX = 3.4e38;
-                    float minY = 3.4e38;
-                    float maxX = -3.4e38;
-                    float maxY = -3.4e38;
+                    float minX = FLT_MAX;
+                    float minY = FLT_MAX;
+                    float maxX = -FLT_MAX;
+                    float maxY = -FLT_MAX;
                     for (int i = 0; i < meshinfo_out.numVertices; i++)
                     {
-                        v34 = vertices_tmp_projected[i].x;
-                        v57 = vertices_tmp_projected[i].y;
-                        if ( minX > v34)
+                        float v34 = vertices_tmp_projected[i].x;
+                        float v57 = vertices_tmp_projected[i].y;
+                        if (v34 < minX)
                             minX = v34;
-                        if ( maxX < v34 )
+                        if (v34 > maxX)
                             maxX = v34;
-                        if ( minY > v57 )
+
+                        if (v57 < minY)
                             minY = v57;
-                        if ( maxY < v57 )
+                        if (v57 > maxY)
                             maxY = v57;
                     }
 
-                    v49 = ceilf(maxY);
-                    v48 = ceilf(maxX);
-                    v47 = ceilf(minY);
-                    v46 = ceilf(minX);
-                    //jk_printf("%f %f %f %f\n", v46, v47, v48, v49);
-                    rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (v46 + 0.5), (v47 + 0.5), (__int64)v48, (__int64)v49);
-                    //rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, -2000, -2000, 2000, 2000);
+                    float v49 = ceilf(maxY);
+                    float v48 = ceilf(maxX);
+                    float v47 = ceilf(minY);
+                    float v46 = ceilf(minX);
+
+                    rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int)v49);
                     v31 = &outClip;
                 }
                 
                 float a3a = adjoinIter->dist + adjoinIter->mirror->dist + a3;
-                if (!(sithRender_flag & 4) /*|| a3a < (double)sithRender_f_82F4B0*/ ) // wtf is with this float?
+                if (!(sithRender_flag & 4) || a3a < sithRender_f_82F4B0 ) // wtf is with this float?
                     sithRender_Clip(adjoinIter->sector, v31, a3a);
             }
         }

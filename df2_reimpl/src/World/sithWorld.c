@@ -190,17 +190,17 @@ LABEL_19:
         }
         stdConffile_Close();
     }
+
     if ( sithWorld_NewEntry(world) )
     {
-        result = 1;
         sithWorld_bLoaded = 1;
+        return 1;
     }
     else
     {
         sithWorld_FreeEntry(world);
-        result = 0;
+        return 0;
     }
-    return result;
 }
 
 sithWorld* sithWorld_New()
@@ -241,16 +241,19 @@ int sithWorld_NewEntry(sithWorld *world)
             world->verticesTransformed = v4;
             if ( !v4 )
                 return 0;
+
             v5 = (float *)pSithHS->alloc(sizeof(float) * world->numVertices);
             world->alloc_unk94 = v5;
             if ( !v5 )
                 return 0;
             _memset(v5, 0, sizeof(float) * world->numVertices);
+
             v6 = (int *)pSithHS->alloc(sizeof(int) * world->numVertices);
             world->alloc_unk98 = v6;
             if ( !v6 )
                 return 0;
             _memset(v6, 0, sizeof(int) * world->numVertices);
+
             v7 = (int *)pSithHS->alloc(sizeof(int) * world->numVertices);
             world->alloc_unk9c = v7;
             if ( !v7 )
@@ -280,15 +283,14 @@ int sithWorld_NewEntry(sithWorld *world)
             sithPlayer_NewEntry(world);
             for (int i = 0; i < world->numThingsLoaded; i++)
             {
-                v15 = world->things;
-                v16 = &v15[i];
-                if ( v15[i].thingType
+                v16 = &world->things[i];
+                if ( v16->thingType
                   && v16->move_type == MOVETYPE_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {
-#ifndef LINUX
+#ifndef LINUX_TMP
                     // TODO later
-                    sithSector_ThingLandIdk(&v15[i], 1);
+                    sithSector_ThingLandIdk(v16, 1);
 #endif
                 }
             }
@@ -718,7 +720,7 @@ void sithWorld_sub_4D0A20(sithWorld *world)
         for (int j = 0; j < world->sectors[i].numSurfaces; j++)
         {
             sithSurface* surface = &world->sectors[i].surfaces[j];
-            surface->surfaceFlags = 0;
+            surface->field_4 = 0;
         }
         sector->field_8C = 0;
     }

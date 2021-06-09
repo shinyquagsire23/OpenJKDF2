@@ -29,5 +29,6 @@ static int (*jkHud_render_idktexs)() = (void*)jkHud_render_idktexs_ADDR;
 static void (*jkHud_idk_time)() = (void*)jkHud_idk_time_ADDR;
 static void (*jkHud_send_message)(char a1) = (void*)jkHud_send_message_ADDR;
 static void (*jkHud_gui_render)() = (void*)jkHud_gui_render_ADDR;
+static void (*jkHud_Deinit)() = (void*)jkHud_Deinit_ADDR;
 
 #endif // _JKHUD_H

@@ -215,7 +215,7 @@ int Main_Startup(const char *cmdline)
         jkSaber_Startup();
 #ifndef LINUX
         jkCutscene_Initialize("ui\\cutStrings.uni"); // TODO
-        jkCredits_Initialize((int)"ui\\credits.uni"); // TODO
+        jkCredits_Initialize("ui\\credits.uni"); // TODO
 #endif
         jkSmack_Initialize();
 

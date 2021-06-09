@@ -80,7 +80,10 @@ const char* gl_frag =
 "  }\n"
 "  else if (tex_mode == 4)\n"
 "  {\n"
-"      sampled_color = vec4(palval.r, palval.g, palval.b, 1.0);\n"
+"    float transparency = 1.0;\n"
+"    if (index == 0.0)\n"
+"      discard;\n"
+"    sampled_color = vec4(palval.r, palval.g, palval.b, transparency);\n"
 "  }\n"
 "  \n"
 "  if (blend_mode == 5)\n"
@@ -753,6 +756,9 @@ int std3D_HasAlphaFlatStippled()
 {
     return 1;
 }
+
+void std3D_PurgeTextureCache(){}
+void std3D_Shutdown(){}
 #else
 // Added helpers
 int std3D_HasAlpha()

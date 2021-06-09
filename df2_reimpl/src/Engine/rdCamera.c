@@ -227,7 +227,7 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     double v9; // st4
     double v11; // rt0
     
-    jk_printf("%u %u %u %u\n", height, width, height2, width2);
+    //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
     rdClipFrustum* cameraClip = camera->cameraClipFrustum;
     rdCanvas* canvas = camera->canvas;

@@ -74,7 +74,7 @@ typedef struct sithSurface sithSurface;
 #define sithSector_NewEntry_ADDR (0x004F8C70)
 #define sithSector_Free_ADDR (0x004F8CA0)
 #define sithSector_sub_4F8D00_ADDR (0x004F8D00)
-#define sithSector_setAdjoins2_ADDR (0x004F8DE0)
+#define sithSector_UnsetAdjoins_ADDR (0x004F8DE0)
 #define sithSector_SetAdjoins_ADDR (0x004F8E10)
 #define sithSector_GetThingsCount_ADDR (0x004F8E40)
 #define sithSector_GetNumPlayers_ADDR (0x004F8E60)
@@ -216,6 +216,10 @@ void sithSector_ThingLandIdk(sithThing *thing, int a3);
 int sithSector_SetSkyParams(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky);
 void sithSector_UpdateSky();
 void sithSector_StopPhysicsThing(sithThing *thing);
+int sithSector_GetIdxFromPtr(sithSector *sector);
+void sithSector_SetAdjoins(sithSector *sector);
+void sithSector_UnsetAdjoins(sithSector *sector);
+int sithSector_GetThingsCount(sithSector *sector);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -250,6 +254,7 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
+static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
 
 #define sithSector_aEntries ((sithSectorEntry*)0x00855028)
 #define sithSector_allocPerSector (*(sithSectorAlloc**)0x008553A8)

@@ -1,9 +1,14 @@
 #include "Video.h"
 
+#include "Engine/rdroid.h"
 #include "Engine/sithCamera.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/std3D.h"
 #include "General/stdPalEffects.h"
 #include "Main/jkHud.h"
+#include "Main/jkHudInv.h"
+#include "Main/jkDev.h"
+#include "Main/jkGame.h"
 
 static uint32_t aGammaTable[20] = {
     0x00000000,
@@ -27,6 +32,34 @@ static uint32_t aGammaTable[20] = {
     0x6F4DE9BE,
     0x3FDBD37A,
 };
+
+void Video_SwitchToGDI()
+{
+    jkDev_Close();
+    jkHud_Deinit();
+    jkHudInv_deinit_menu_graphics_maybe();
+    sithCamera_Close();
+#ifndef LINUX
+    rdCanvas_Free(Video_pCanvas);
+    rdClose();
+    if ( Video_modeStruct.b3DAccel )
+    {
+        std3D_PurgeTextureCache();
+        std3D_Shutdown();
+    }
+
+    stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
+    stdDisplay_DDrawGdiSurfaceFlip();
+    stdDisplay_ddraw_surface_flip2();
+    stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
+
+    if ( !Video_modeStruct.b3DAccel )
+        stdDisplay_VBufferFree(Video_pVbufIdk);
+#else
+    jkGame_isDDraw = 0;
+#endif
+    Video_bOpened = 0;
+}
 
 int Video_Startup()
 {

@@ -235,7 +235,6 @@ static int (*_printf)(const char *, ...) = (void*)0x005141D0;
 // JK functions
 extern void (*jk_exit)(int a);
 extern int (*jk_printf)(const char* fmt, ...);
-extern int (*jk_assert)(void* log_func, char* file, int line_num, char *fmt, ...);
 static char* (*_strncpy)(char *, const char *, size_t) = (void*)0x5126A0;
 static int (*__strcmpi)(const char *, const char *) = (void*)0x520D10;
 static int (*__strnicmp)(const char *, const char *, size_t) = (void*)0x00520DA0;

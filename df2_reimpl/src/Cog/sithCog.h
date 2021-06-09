@@ -57,6 +57,10 @@
 #define sithCog_pScriptHashtable (*(stdHashTable**)0x00836C3C)
 #define sithCog_aSectorLinks ((sithCogSectorLink*)0x008B5440)
 #define sithCog_numSectorLinks (*(int*)0x00836C38)
+#define sithCog_aThingLinks ((sithCogThingLink*)0x008B7460)
+#define sithCog_numThingLinks (*(int*)0x00836C30)
+#define sithCog_numSurfaceLinks (*(int*)0x00836C34)
+#define sithCog_aSurfaceLinks ((sithCogSurfaceLink*)0x8B9C60)
 
 typedef int SITH_MESSAGE;
 
@@ -113,13 +117,30 @@ typedef struct sithCogSectorLink
     int mask;
 } sithCogSectorLink;
 
-//static int (*sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
+typedef struct sithCogThingLink
+{
+    sithThing* thing;
+    int signature;
+    sithCog* cog;
+    int linkid;
+    int mask;
+} sithCogThingLink;
+
+typedef struct sithCogSurfaceLink
+{
+    sithSurface* surface;
+    sithCog* cog;
+    int linkid;
+    int mask;
+} sithCogSurfaceLink;
+
+static int (*_sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
 //static int (*sithCogScript_Load)(sithWorld *world, int a2) = (void*)sithCogScript_Load_ADDR;
 //static void (*sithCogScript_RegisterVerb)(void* a, intptr_t func, char* cmd) = (void*)0x4E0700;
-static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
-static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
+//static void (__cdecl *sithCog_SendMessage)(sithCog *a1, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId) = (void*)0x4DEBE0;
+//static float (__cdecl *sithCog_SendMessageEx)(sithCog *a1, SITH_MESSAGE message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3) = (void*)0x4DEDC0;
 static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_HandleThingTimerPulse_ADDR;
-static int (*sithCog_ThingsSectorsRegSymbolIdk)(sithCog *a1, sithCogIdk *a2, sithCogSymbol *a3) = (void*)sithCog_ThingsSectorsRegSymbolIdk_ADDR;
+//static int (*sithCog_ThingsSectorsRegSymbolIdk)(sithCog *a1, sithCogIdk *a2, sithCogSymbol *a3) = (void*)sithCog_ThingsSectorsRegSymbolIdk_ADDR;
 //static sithCog* (*sithCog_LoadCogscript)(const char *fpath) = (void*)sithCog_LoadCogscript_ADDR;
 
 int sithCog_Startup();
@@ -128,6 +149,7 @@ int sithCog_Open();
 int sithCog_Load(sithWorld *world, int a2);
 sithCog* sithCog_LoadCogscript(const char *fpath);
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);
+int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymbol *symbol);
 
 void sithCogUtil_Initialize(void* a1);
 void sithCogThing_Initialize(void* a1);
@@ -140,16 +162,24 @@ void sithCogSurface_Initialize(void* a1);
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message);
 float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3);
+void sithCog_SendSimpleMessageToAll(int a1, int a2, int a3, int a4, int a5);
+void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3);
+void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId);
+float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3);
+
+static int (*_sithCog_Open)() = (void*)sithCog_Open_ADDR;
 static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
 //static void (*sithCog_SendMessageFromSectorEx)(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromSectorEx_ADDR;
-static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
+//static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 static void (*sithCog_Free)(sithWorld* world) = (void*)sithCog_Free_ADDR;
-static void (*sithCogScript_TickAll)() = (void*)sithCogScript_TickAll_ADDR;
+//static void (*sithCogScript_Tick)(sithCog* cog) = (void*)sithCogScript_Tick_ADDR;
 
 int sithCogScript_Load(sithWorld *lvl, int a2);
 void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3);
 void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3);
 void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3);
+void sithCogScript_TickAll();
+void sithCogScript_Tick(sithCog *cog);
 
 #define sithCog_masterCog (*(sithCog**)0x008B542C)
 

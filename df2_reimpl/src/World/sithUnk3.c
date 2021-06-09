@@ -18,8 +18,8 @@ int sithUnk3_Startup()
     if ( sithUnk3_initted )
         return 0;
 
-    _memset(sithUnk3_collisionHandlers, 0, sizeof(sithUnk3_collisionHandlers));
-    _memset(sithUnk3_funcList, 0, sizeof(sithUnk3_funcList));
+    _memset(sithUnk3_collisionHandlers, 0, 144 * sizeof(sithUnk3Entry)); // sizeof(sithUnk3_collisionHandlers)
+    _memset(sithUnk3_funcList, 0, 12 * sizeof(int)); // sizeof(sithUnk3_funcList)
     sithUnk3_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_ACTOR, sithUnk4_ActorActorCollide, 0);
     sithUnk3_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_PLAYER, sithUnk4_ActorActorCollide, 0);
     sithUnk3_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_COG, sithUnk4_ActorActorCollide, 0);
@@ -97,7 +97,7 @@ sithUnk3SearchEntry* sithUnk3_NextSearchResult()
     }
 }
 
-void sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags)
+float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags)
 {
     int v7; // eax
     int16_t v8; // di
@@ -231,6 +231,7 @@ LABEL_27:
             ++v18;
         }
     }
+    return a5a;
 }
 
 float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags)

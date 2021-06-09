@@ -665,9 +665,7 @@ typedef struct sithThing
     rdVector3 field_38;
     uint32_t field_44;
     float field_48;
-    uint32_t field_4C;
-    uint32_t field_50;
-    uint32_t field_54;
+    rdVector3 field_4C;
     sithThing* attachedThing;
     sithSector* sector;
     sithThing* nextThing;
@@ -755,13 +753,15 @@ void sithThing_EnterWater(sithThing *thing, int a2);
 void sithThing_ExitWater(sithThing *thing, int a2);
 uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 int sithThing_netidk2(int a1);
+int sithThing_GetIdxFromThing(sithThing *thing);
+void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
 
 static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
 //static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing *thing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
-static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
+//static void (*sithThing_TickPhysics)(sithThing *thing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
 //static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 //static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
 //static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;

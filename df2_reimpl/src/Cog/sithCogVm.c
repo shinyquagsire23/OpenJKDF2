@@ -435,13 +435,15 @@ void sithCogVm_Exec(sithCog *cog_ctx)
     float fTmp;
     int iTmp;
     sithCogStackvar* tmpStackVar;
+    
+    //jk_printf("cog trace %s %x\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc);
 
     cog_ctx->script_running = 1;
     while ( 2 )
     {
         cogscript = cog_ctx->cogscript;
         op = sithCogVm_PopProgramVal(cog_ctx);
-        //jk_printf("cog trace %s %x op %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc, op);
+        //jk_printf("cog trace %s %x op %u stackpos %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc, op, cog_ctx->stackPos);
         switch ( op )
         {
             case COG_OPCODE_NOP:
@@ -637,6 +639,15 @@ int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
 
     if ( stackVar->type == COG_VARTYPE_SYMBOL )
         tmp = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, stackVar->data[0])->symbol_type;
+
+    // Added
+    if (!tmp)
+    {
+        type = COG_VARTYPE_INT;
+        d0 = 0;
+        d1 = 0;
+        d2 = 0;
+    }
 
     if ( tmp->type )
     {

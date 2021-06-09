@@ -421,7 +421,7 @@ void sithCogThing_ThingLightAnim(sithCog *ctx)
       && idk > 0.0
       && (idk_ = idk * 0.5, thing->light = light, (surface = sithSurface_SetThingLight(thing, light2, idk_, 1)) != 0) )
     {
-        sithCogVm_PushInt(ctx, surface->field_0);
+        sithCogVm_PushInt(ctx, surface->index);
     }
     else
     {

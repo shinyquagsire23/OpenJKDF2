@@ -19,6 +19,7 @@
 #define Video_pOtherBuf (*(stdVBuffer**)0x00552888)
 #define Video_pMenuBuffer (*(stdVBuffer**)0x0055288C)
 #define Video_bInitted (*(int*)0x005528B4)
+#define Video_bOpened (*(int*)0x005528B8)
 #define Video_flt_55289C (*(float*)0x0055289C)
 #define Video_dword_5528A0 (*(int*)0x005528A0)
 #define Video_dword_5528A4 (*(int*)0x005528A4)
@@ -63,8 +64,9 @@ typedef struct videoModeStruct
 } videoModeStruct;
 
 int Video_Startup();
+void Video_SwitchToGDI();
 
-static void (*Video_SwitchToGDI)() = (void*)Video_SwitchToGDI_ADDR;
+//static void (*Video_SwitchToGDI)() = (void*)Video_SwitchToGDI_ADDR;
 //static int (*Video_Startup)() = (void*)Video_Startup_ADDR;
 
 #endif // _WIN95_VIDEO_H

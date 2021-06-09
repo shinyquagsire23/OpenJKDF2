@@ -1,13 +1,14 @@
 #ifndef _SITHNET_H
 #define _SITHNET_H
 
-#define net_MultiModeFlags (*(int*)0x8C4BA0)
-#define net_scorelimit (*(int*)0x8C4BAC)
-#define net_teamScore ((int*)0x8C4BC0)
-#define multiplayer_timelimit (*(int*)0x8C4BD4)
-#define net_isMulti (*(int*)0x832624)
-#define net_isServer (*(int*)0x832628)
-#define net_dword_832638 (*(int*)0x832638)
+#define net_MultiModeFlags (*(int*)0x008C4BA0)
+#define net_scorelimit (*(int*)0x008C4BAC)
+#define net_teamScore ((int*)0x008C4BC0)
+#define multiplayer_timelimit (*(int*)0x008C4BD4)
+#define net_isMulti (*(int*)0x00832624)
+#define net_isServer (*(int*)0x00832628)
+#define net_dword_832638 (*(int*)0x00832638)
+#define net_dword_8C4BA4 (*(int*)0x008C4BA4)
 
 #define net_things_idx (*(int*)0x008330F0)
 #define net_things ((int*)0x008326B0)

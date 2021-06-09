@@ -1,19 +1,23 @@
 #include "sith.h"
 
 #include "Main/jkGame.h"
-#include "Engine/sithCamera.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
+#include "World/sithUnk3.h"
+#include "World/sithUnk4.h"
 #include "General/sithStrTable.h"
+#include "General/stdString.h"
+#include "General/stdFnames.h"
+#include "Win95/sithDplay.h"
+#include "Win95/DebugConsole.h"
+#include "AI/sithAI.h"
+#include "AI/sithAIClass.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithRender.h"
-#include "World/sithUnk3.h"
-#include "Win95/sithDplay.h"
-#include "AI/sithAI.h"
+#include "Engine/sithCamera.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
-#include "AI/sithAIClass.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTemplate.h"
@@ -26,58 +30,44 @@
 #include "Engine/sithControl.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithSave.h"
+#include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 #include "World/sithSector.h"
+#include "Cog/sithCog.h"
 #include "jk.h"
 
 int sith_Startup(struct common_functions *commonFuncs)
 {
-    int v1; // esi
-    int v2; // esi
-    int v3; // esi
-    int v4; // esi
-    int v5; // esi
-    int v6; // eax
-    int v7; // esi
-    int v8; // esi
-    int v9; // esi
-    int v10; // esi
-    int v11; // esi
-    int v12; // esi
-    int v13; // esi
-    int v14; // esi
-    int v15; // esi
-    int v16; // esi
-    int v17; // esi
-    int v18; // esi
-    int v19; // esi
+    int is_started; // esi
 
     pSithHS = commonFuncs;
-    v1 = sithStrTable_Startup() & 1;
-    v2 = sithTimer_Startup() & v1;
-    v3 = sithWorld_Startup() & v2;
-    v4 = sithRender_Startup() & v3;
-    v5 = sithUnk3_Startup() & v4;
-    v6 = sithThing_Startup() & v5;
-    v7 = sithCogVm_Startup() & v6;
-    v8 = sithDplay_Startup() & v7;
-    v9 = sithCog_Startup() & v8;
-    v10 = sithAI_Startup() & v9;
-    v11 = sithSprite_Startup() & v10;
-    v12 = sithParticle_Startup() & v11;
-    v13 = sithPuppet_Startup() & v12;
-    v14 = sithAIClass_Startup() & v13;
-    v15 = sithSoundClass_Startup() & v14;
-    v16 = sithMaterial_Startup() & v15;
-    v17 = sithTemplate_Startup() & v16;
-    v18 = sithModel_Startup() & v17;
-    v19 = sithSurface_Startup() & v18;
+    is_started = sithStrTable_Startup() & 1;
+    is_started = sithTimer_Startup() & is_started;
+    is_started = sithWorld_Startup() & is_started;
+    is_started = sithRender_Startup() & is_started;
+    is_started = sithUnk3_Startup() & is_started;
+    is_started = sithThing_Startup() & is_started;
+    is_started = sithCogVm_Startup() & is_started;
+    is_started = sithDplay_Startup() & is_started;
+    is_started = sithCog_Startup() & is_started;
+    is_started = sithAI_Startup() & is_started;
+    is_started = sithSprite_Startup() & is_started;
+    is_started = sithParticle_Startup() & is_started;
+    is_started = sithPuppet_Startup() & is_started;
+    is_started = sithAIClass_Startup() & is_started;
+    is_started = sithSoundClass_Startup() & is_started;
+    is_started = sithMaterial_Startup() & is_started;
+    is_started = sithTemplate_Startup() & is_started;
+    is_started = sithModel_Startup() & is_started;
+    is_started = sithSurface_Startup() & is_started;
     sithSound_Startup();
     sithSoundSys_Startup();
     sithWeapon_Startup();
     _memset(&g_sithMode, 0, 0x18u);
-    if ( !v19 )
+
+    if ( !is_started )
         return 0;
+
     sith_bInitialized = 1;
     return 1;
 }
@@ -134,10 +124,8 @@ int sith_Mode1Init(char *a1)
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
-#ifndef LINUX
     sithCog_Open();
     sithControl_Open();
-#endif
     sithSector_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
@@ -160,6 +148,11 @@ int sith_Tick()
     }
     else
     {
+        // TODO REMOVE
+        //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
+        //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
+        
+        
         ++bShowInvisibleThings;
         if (sithRender_8EE678++ == -1)
         {
@@ -171,10 +164,10 @@ int sith_Tick()
         sithSoundSys_Tick(sithTime_deltaSeconds);
         sithTimer_Advance();
 
-#ifndef LINUX
         if ( sithCogVm_bSyncMultiplayer )
             sithCogVm_Sync();
 
+#ifndef LINUX_TMP
         if ( (g_debugmodeFlags & 1) == 0 )
             sithAI_TickAll();
 
@@ -187,11 +180,11 @@ int sith_Tick()
         }
 
         sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-#ifndef LINUX
+#ifndef LINUX_TMP
         sithCogScript_TickAll();
 #endif
         DebugConsole_AdvanceLogBuf();
-#ifndef LINUX
+#ifndef LINUX_TMP
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
         sithSave_WriteEntry();
 #endif
@@ -203,4 +196,62 @@ void sith_set_some_text_jk1(char *text)
 {
     _strncpy(sithWorld_some_text_jk1, text, 0x1Fu);
     sithWorld_some_text_jk1[31] = 0;
+}
+
+void sith_AutoSave()
+{
+    sithWorld *v0; // ecx
+    unsigned int v1; // ebx
+    int v2; // edi
+    sithThing *v3; // esi
+    sithCog *v4; // eax
+    char v5[128]; // [esp+10h] [ebp-80h] BYREF
+
+
+    sithTime_Startup();
+    sithInventory_Reset(g_localPlayerThing);
+
+#ifdef LINUX_TMP
+    return;
+#endif
+
+    sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
+    v0 = sithWorld_pCurWorld;
+    v1 = 0;
+    if ( sithWorld_pCurWorld->numThingsLoaded )
+    {
+        v2 = 0;
+        do
+        {
+            v3 = &v0->things[v2];
+            v4 = v3->class_cog;
+            if ( v4 )
+            {
+                sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
+                v0 = sithWorld_pCurWorld;
+            }
+            if ( v3->thingType == THINGTYPE_ACTOR )
+            {
+                sithUnk4_SetMaxHeathForDifficulty(v3);
+                v0 = sithWorld_pCurWorld;
+            }
+            ++v1;
+            ++v2;
+        }
+        while ( v1 < v0->numThingsLoaded );
+    }
+    if ( net_isMulti )
+    {
+        sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
+        sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
+        sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
+        sithTime_Startup();
+    }
+    else
+    {
+        stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", v0->map_jkl_fname);
+        stdFnames_ChangeExt(v5, "jks");
+        sithSave_Write(v5, 1, 0, 0);
+        sithTime_Startup();
+    }
 }

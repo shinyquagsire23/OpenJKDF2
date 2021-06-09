@@ -57,6 +57,7 @@
 #define sithDplay_bInitted (*(int*)0x8321D8)
 #define sithDplay_dword_8321F0 (*(int*)0x008321F0)
 #define sithDplay_dword_8321F4 (*(int*)0x008321F4)
+#define sithDplay_dword_8321EC (*(int*)0x008321EC)
 
 int sithDplay_Startup();
 

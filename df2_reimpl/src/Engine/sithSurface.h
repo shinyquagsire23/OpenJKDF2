@@ -4,17 +4,17 @@
 #include "types.h"
 #include "Primitives/rdFace.h"
 
-#define sithSurface_sub_4E5A10_ADDR (0x004E5A10)
-#define sithSurface_sub_4E5A30_ADDR (0x004E5A30)
+#define sithSurface_UnsetAdjoins_ADDR (0x004E5A10)
+#define sithSurface_SetAdjoins_ADDR (0x004E5A30)
 #define sithSurface_New_ADDR (0x004E5A50)
 #define sithSurface_sub_4E5AD0_ADDR (0x004E5AD0)
 #define sithSurface_Free_ADDR (0x004E5B40)
 #define sithSurface_Load_ADDR (0x004E5C00)
-#define sithSurface_sub_4E6190_ADDR (0x004E6190)
+#define sithSurface_GetIdxFromPtr_ADDR (0x004E6190)
 #define sithSurface_Verify_ADDR (0x004E61B0)
 #define sithSurface_SendDamageToThing_ADDR (0x004E61F0)
 #define sithSurface_GetCenter_ADDR (0x004E6250)
-#define sithSurface_Sync_0_ADDR (0x004E6330)
+#define sithSurface_PushSurface_ADDR (0x004E6330)
 #define sithSurface_Syncidk_ADDR (0x004E6360)
 #define sithSurface_sub_4E63B0_ADDR (0x004E63B0)
 #define sithSurface_Startup_ADDR (0x004EF900)
@@ -34,7 +34,7 @@
 #define sithSurface_SetThingLight_ADDR (0x004F0560)
 #define sithSurface_Tick_ADDR (0x004F0630)
 #define sithSurface_GetRdSurface_ADDR (0x004F09F0)
-#define sithSurface_detachthing_ADDR (0x004F0A30)
+#define sithSurface_DetachThing_ADDR (0x004F0A30)
 #define sithSurface_GetByIdx_ADDR (0x004F0AA0)
 #define sithSurface_Alloc_ADDR (0x004F0AF0)
 #define sithSurface_Sync_ADDR (0x004F0B50)
@@ -56,25 +56,22 @@ typedef struct sithSurfaceInfo
 
 struct rdSurface
 {
-  int field_0;
-  int field_4;
+  int index;
+  int flags;
   sithSector *parent_sector;
   sithAdjoin *adjoin;
-  int surfaceFlags;
+  rdMaterial* material;
   sithSurface *sithSurfaceParent;
-  int faceType;
-  int geoMode;
-  int lightMode;
-  int texMode;
-  uint32_t numVertices;
-  int *vertexIdxs;
+  sithSector* sector;
+  rdVector2 field_1C;
+  rdVector3 field_24;
   int field_30;
-  rdMaterial *material;
+  int field_34;
   int wallCel;
-  int field_3C;
-  int field_40;
-  int field_44;
-  int field_48;
+  float field_3C;
+  float field_40;
+  float field_44;
+  float field_48;
 };
 
 typedef struct sithSurface
@@ -123,11 +120,15 @@ int sithSurface_Startup();
 int sithSurface_Open();
 int sithSurface_Verify(sithWorld *world);
 int sithSurface_Load(sithWorld *world);
+int sithSurface_GetIdxFromPtr(sithSurface *surface);
+void sithSurface_UnsetAdjoins(sithAdjoin *adjoin);
+void sithSurface_SetAdjoins(sithAdjoin *adjoin);
+rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, float a2, uint16_t flags);
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
-static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
+//static int* (*sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;
 static rdSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADDR;
 static int (*sithSurface_StopAnim)(rdSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
@@ -137,5 +138,10 @@ static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3
 static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
 static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
 static void (*sithSurface_Tick)() = (void*)sithSurface_Tick_ADDR;
+static rdSurface* (*sithSurface_SlideHorizonSky)(int a1, rdVector2 *a2) = (void*)sithSurface_SlideHorizonSky_ADDR;
+static rdSurface* (*sithSurface_SurfaceLightAnim)(sithSurface *surface, float a2, float a3) = (void*)sithSurface_SurfaceLightAnim_ADDR;
+static rdSurface* (*sithSurface_SlideWall)(sithSurface *surface, rdVector3 *a2) = (void*)sithSurface_SlideWall_ADDR;
+static uint32_t (*sithSurface_PushSurface)(sithSurface *a1) = (void*)sithSurface_PushSurface_ADDR;
+static void (*sithSurface_DetachThing)(sithSurface *a1, rdVector3 *out) = (void*)sithSurface_DetachThing_ADDR;
 
 #endif // _SITHSURFACE_H

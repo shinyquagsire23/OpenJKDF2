@@ -72,6 +72,17 @@ static void* Linux_alloc(size_t len)
     return malloc(len + 0x100);
 }
 
+static void Linux_free(void* ptr)
+{
+    return free(ptr);
+}
+
+static void* Linux_realloc(void* ptr, size_t len)
+{
+    //printf("%p %zx\n", ptr, len);
+    return realloc(ptr, len);
+}
+
 uint32_t stdPlatform_GetTimeMsec()
 {
     return Linux_TimeMs();
@@ -111,8 +122,8 @@ void stdPlatform_InitServices(common_functions *handlers)
     
 #ifdef LINUX
     handlers->alloc = Linux_alloc;
-    handlers->free = free;
-    handlers->realloc = realloc;
+    handlers->free = Linux_free;
+    handlers->realloc = Linux_realloc;
     handlers->fileOpen = Linux_stdFileOpen;
     handlers->fileClose = Linux_stdFileClose;
     handlers->fileRead = Linux_stdFileRead;
@@ -130,7 +141,7 @@ int stdPlatform_Startup()
 }
 
 #ifdef LINUX
-int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
+int stdPrintf(intptr_t a1, char *a2, int line, char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);

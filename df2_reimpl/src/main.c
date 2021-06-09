@@ -24,6 +24,7 @@
 #include "General/sithStrTable.h"
 #include "General/stdPcx.h"
 #include "General/Darray.h"
+#include "General/stdPalEffects.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIMain.h"
@@ -101,6 +102,8 @@
 #include "Win95/Windows.h"
 #include "Win95/wuRegistry.h"
 #include "Win95/stdGdi.h"
+#include "Win95/stdControl.h"
+#include "Win95/stdDisplay.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
@@ -143,7 +146,9 @@ int main(int argc, char** argv)
     
     // text
     fseek(f, 0x400, SEEK_SET);
+#ifndef LINUX_TMP
     fread((void*)0x401000, 0x120200, 1, f);
+#endif
     
     // rdata
     fseek(f, 0x120600, SEEK_SET);
@@ -447,6 +452,7 @@ void do_hooks()
     hook_function(stdFont_sub_4352C0_ADDR, stdFont_sub_4352C0);
     hook_function(stdFont_sub_435810_ADDR, stdFont_sub_435810);
     hook_function(stdFont_sub_434EC0_ADDR, stdFont_sub_434EC0);
+    hook_function(stdFont_Free_ADDR, stdFont_Free);
     
     // stdFnames
     hook_function(stdFnames_FindMedName_ADDR, stdFnames_FindMedName);
@@ -468,6 +474,7 @@ void do_hooks()
     hook_function(stdFileUtil_NewFind_ADDR, stdFileUtil_NewFind);
     hook_function(stdFileUtil_FindNext_ADDR, stdFileUtil_FindNext);
     hook_function(stdFileUtil_DisposeFind_ADDR, stdFileUtil_DisposeFind);
+    hook_function(stdFileUtil_MkDir_ADDR, stdFileUtil_MkDir);
     
     // stdGob
     hook_function(stdGob_Startup_ADDR, stdGob_Startup);
@@ -514,6 +521,9 @@ void do_hooks()
     hook_function(stdHashKey_OrphanAndDisown_ADDR, stdHashKey_OrphanAndDisown);
     hook_function(stdHashKey_GetNthChild_ADDR, stdHashKey_GetNthChild);
     hook_function(stdHashKey_GetFirstParent_ADDR, stdHashKey_GetFirstParent);
+
+    // stdPalEffects
+    hook_function(stdPalEffects_FreeRequest_ADDR, stdPalEffects_FreeRequest);
     
     // stdString
     hook_function(stdString_FastCopy_ADDR, stdString_FastCopy);
@@ -746,7 +756,7 @@ void do_hooks()
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
     
     // rdPrimit3
-    hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
+    //hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
     hook_function(rdPrimit3_NoClipFace_ADDR, rdPrimit3_NoClipFace);
     
     // rdRaster
@@ -1279,7 +1289,7 @@ void do_hooks()
     hook_function(sithRender_SetTexMode_ADDR, sithRender_SetTexMode);
     hook_function(sithRender_SetPalette_ADDR, sithRender_SetPalette);
     hook_function(sithRender_Draw_ADDR, sithRender_Draw);
-    hook_function(sithRender_Clip_ADDR, sithRender_Clip);
+    //hook_function(sithRender_Clip_ADDR, sithRender_Clip);
     hook_function(sithRender_RenderLevelGeometry_ADDR, sithRender_RenderLevelGeometry);
     hook_function(sithRender_UpdateAllLights_ADDR, sithRender_UpdateAllLights);
     hook_function(sithRender_UpdateLights_ADDR, sithRender_UpdateLights);
@@ -1512,5 +1522,31 @@ void do_hooks()
     //hook_function(Window_DefaultHandler_ADDR, Window_DefaultHandler);
     hook_function(Window_MessageLoop_ADDR, Window_MessageLoop);
     hook_function(Window_msg_main_handler_ADDR, Window_msg_main_handler);
+    hook_function(sithControl_GetAxis_ADDR, sithControl_GetAxis);
+    hook_function(sithControl_ReadAxisStuff_ADDR, sithControl_ReadAxisStuff);
+    hook_function(sithControl_ReadFunctionMap_ADDR, sithControl_ReadFunctionMap);
+    hook_function(stdControl_GetAxis2_ADDR, stdControl_GetAxis2);
+    
+    hook_function(stdDisplay_Startup_ADDR, stdDisplay_Startup);
+    hook_function(stdDisplay_VBufferFill_ADDR, stdDisplay_VBufferFill);
+    hook_function(stdDisplay_VBufferCopy_ADDR, stdDisplay_VBufferCopy);
+    hook_function(stdDisplay_SetMasterPalette_ADDR, stdDisplay_SetMasterPalette);
+    hook_function(stdDisplay_DDrawGdiSurfaceFlip_ADDR, stdDisplay_DDrawGdiSurfaceFlip);
+    hook_function(stdDisplay_ddraw_waitforvblank_ADDR, stdDisplay_ddraw_waitforvblank);
+    hook_function(stdDisplay_ClearRect_ADDR, stdDisplay_ClearRect);
+    hook_function(stdDisplay_SetMode_ADDR, stdDisplay_SetMode);
+    hook_function(stdDisplay_FindClosestMode_ADDR, stdDisplay_FindClosestMode);
+    hook_function(stdDisplay_FindClosestDevice_ADDR, stdDisplay_FindClosestDevice);
+    hook_function(stdDisplay_Open_ADDR, stdDisplay_Open);
+    hook_function(stdDisplay_Close_ADDR, stdDisplay_Close);
+    hook_function(stdDisplay_VBufferNew_ADDR, stdDisplay_VBufferNew);
+    hook_function(stdDisplay_VBufferLock_ADDR, stdDisplay_VBufferLock);
+    hook_function(stdDisplay_VBufferUnlock_ADDR, stdDisplay_VBufferUnlock);
+    hook_function(stdDisplay_VBufferSetColorKey_ADDR, stdDisplay_VBufferSetColorKey);
+    hook_function(stdDisplay_VBufferFree_ADDR, stdDisplay_VBufferFree);
+    
+    hook_function(stdPlatform_GetTimeMsec_ADDR, stdPlatform_GetTimeMsec);
+    
+    hook_function(Video_SwitchToGDI_ADDR, Video_SwitchToGDI);
 #endif
 }

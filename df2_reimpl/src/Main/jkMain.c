@@ -344,10 +344,7 @@ LABEL_15:
         {
             sithCamera_SetsFocus();
             jkPlayer_InitSaber();
-#ifndef LINUX
-            //TODO later
             sith_AutoSave();
-#endif
         }
 
         goto LABEL_39;
@@ -499,7 +496,7 @@ int jkMain_TitleShow()
 {
     jkGuiTitle_ShowLoadingStatic();
     sith_Load("static.jkl");
-#ifdef WIN32
+#ifndef LINUX_TMP
     return jkHudInv_items_init();
 #else
     return 1;
@@ -796,6 +793,17 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
             return 1;
     }
     return result;
+}
+
+void jkMain_do_guistate6()
+{
+    if ( !jkSmack_stopTick )
+    {
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 6;
+    }
 }
 
 #ifdef LINUX

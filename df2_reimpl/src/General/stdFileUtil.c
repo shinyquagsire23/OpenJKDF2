@@ -79,6 +79,11 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
         std_pHS->free(search);
     }
 }
+
+BOOL stdFileUtil_MkDir(LPCSTR lpPathName)
+{
+    return CreateDirectoryA(lpPathName, 0);
+}
 #endif
 
 #ifdef LINUX
@@ -187,6 +192,11 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
 }
 
 int stdFileUtil_Deltree(char* lpPathName)
+{
+    return 0;
+}
+
+int stdFileUtil_MkDir(char* path)
 {
     return 0;
 }

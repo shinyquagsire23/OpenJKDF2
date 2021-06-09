@@ -8,6 +8,7 @@ int stdControl_MessageHandler(int a1, int a2, int a3)
 }
 
 #ifdef LINUX
+#include <SDL2/SDL.h>
 void stdControl_Flush()
 {
 }
@@ -49,10 +50,26 @@ int stdControl_FinishRead()
 
 float stdControl_GetAxis2(int a)
 {
-    if (a == 0)
-    {
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_W] && a == 0) {
+        return 1.0;
+    }
+    else if (state[SDL_SCANCODE_S] && a == 0) {
         return -1.0;
     }
+    else if (state[SDL_SCANCODE_LEFT] && a == 1) {
+        return 1.0;
+    }
+    else if (state[SDL_SCANCODE_RIGHT] && a == 1) {
+        return -1.0;
+    }
+    else if (state[SDL_SCANCODE_A] && a == 2) {
+        return -1.0;
+    }
+    else if (state[SDL_SCANCODE_D] && a == 2) {
+        return 1.0;
+    }
+
     return 0.0;
 }
 #endif

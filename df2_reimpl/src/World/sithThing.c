@@ -13,6 +13,8 @@
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"
+#include "World/sithUnk3.h"
+#include "Engine/sithSurface.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithPuppet.h"
@@ -208,7 +210,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             switch ( thingIter->thingtype )
             {
                 case THINGTYPE_ACTOR:
-#ifndef LINUX
+#ifndef LINUX_TMP
                     sithAI_Tick(thingIter, deltaSeconds);
 #endif
                     break;
@@ -235,17 +237,17 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithThing_handler(thingIter);
             if ( thingIter->move_type == MOVETYPE_PHYSICS )
             {
-#ifndef LINUX
+#ifndef LINUX_TMP
                 sithSector_ThingPhysicsTick(thingIter, deltaSeconds);
 #endif
             }
             else if ( thingIter->move_type == MOVETYPE_PATH )
             {
-#ifndef LINUX
+#ifndef LINUX_TMP
                 sithTrackThing_Tick(thingIter, deltaSeconds);
 #endif
             }
-#ifndef LINUX
+#ifndef LINUX_TMP
             sithThing_TickPhysics(thingIter, deltaSeconds);
             sithPuppet_Tick(thingIter, deltaSeconds);
 #endif
@@ -424,6 +426,7 @@ void sithThing_sub_4CD100(sithThing *thing)
         sithAI_NewEntry(thing);
     if ( thing->soundclass )
         sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_CREATE);
+
     if ( (sithWorld_pCurWorld->level_type_maybe & 2) != 0
       && thing->move_type == MOVETYPE_PHYSICS
       && (thing->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
@@ -1338,4 +1341,76 @@ int sithThing_netidk2(int a1)
     }
     net_things[net_things_idx++] = a1;
     return net_things_idx;
+}
+
+int sithThing_GetIdxFromThing(sithThing *thing)
+{
+    unsigned int v1; // ecx
+    int result; // eax
+
+    result = 0;
+    if ( thing )
+    {
+        v1 = thing->thingIdx;
+        if ( v1 == thing - sithWorld_pCurWorld->things && v1 < 0x280 )
+            result = 1;
+    }
+    return result;
+}
+
+void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
+{
+    int v2; // ebp
+    sithSurface *v5; // eax
+    double v6; // st6
+    double v7; // st7
+    rdVector3 v8; // [esp+Ch] [ebp-18h] BYREF
+    rdVector3 v1; // [esp+18h] [ebp-Ch] BYREF
+    float arg4a; // [esp+2Ch] [ebp+8h]
+
+    v2 = 0;
+    if ((thing->attach_flags & 8))
+        return;
+        
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        thing->field_268.x = thing->velocityMaybe.x;
+        thing->field_268.y = thing->velocityMaybe.y;
+        thing->field_268.z = thing->velocityMaybe.z;
+    }
+    else
+    {
+        v2 = 4;
+        thing->field_268.x = 0.0;
+        thing->field_268.y = 0.0;
+        thing->field_268.z = 0.0;
+    }
+
+    if ( thing->attach_flags )
+    {
+        if ( (thing->attach_flags & 1) != 0 )
+        {
+            v5 = (sithSurface *)thing->attachedThing;
+            if ( (v5->surfaceFlags & 0x800) != 0 )
+            {
+                sithSurface_DetachThing(v5, &v8);
+                v6 = v8.y * deltaSecs + thing->field_268.y;
+                v7 = v8.z * deltaSecs + thing->field_268.z;
+                thing->field_268.x = v8.x * deltaSecs + thing->field_268.x;
+                thing->field_268.y = v6;
+                thing->field_268.z = v7;
+            }
+        }
+    }
+    
+    if ( thing->field_268.x == 0.0 && thing->field_268.y == 0.0 && thing->field_268.z == 0.0 )
+    {
+        if ( thing->move_type == MOVETYPE_PHYSICS && (thing->attach_flags & 6) != 0 && thing->attachedThing->move_type == MOVETYPE_PATH )
+            sithSector_ThingLandIdk(thing, 0);
+    }
+    else
+    {
+        arg4a = rdVector_Normalize3(&v1, &thing->field_268);
+        thing->waggle = sithUnk3_UpdateThingCollision(thing, &v1, arg4a, v2);
+    }
 }

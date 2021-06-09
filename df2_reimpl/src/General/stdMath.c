@@ -100,6 +100,9 @@ void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
     float v22; // [esp+28h] [ebp-4h]
     float v23; // [esp+28h] [ebp-4h]
     float v24; // [esp+28h] [ebp-4h]
+    
+    //_stdMath_SinCos(angle, pSinOut, pCosOut);
+    //return;
 
     normalized = stdMath_NormalizeAngle(angle);
     normalized_ = normalized;

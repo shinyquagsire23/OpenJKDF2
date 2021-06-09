@@ -119,8 +119,9 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     int a7a; // [esp+40h] [ebp+1Ch]
     int a7b; // [esp+40h] [ebp+1Ch]
 
+    //return _rdPrimit3_ClipFace(clipFrustum, clipType, clipSubtype, sortingMethod, idxInfo, mesh_out, idkIn);
 #ifdef LINUX
-    return rdPrimit3_NoClipFace(clipType, clipSubtype, sortingMethod, idxInfo, mesh_out, idkIn);
+    //return rdPrimit3_NoClipFace(clipType, clipSubtype, sortingMethod, idxInfo, mesh_out, idkIn);
 #endif
 
     switch ( clipType )

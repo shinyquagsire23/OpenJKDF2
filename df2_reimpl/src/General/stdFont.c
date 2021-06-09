@@ -1009,3 +1009,28 @@ int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int 
     }
     return v9;
 }
+
+void stdFont_Free(stdFont *font)
+{
+    stdFontCharset *v1; // esi
+    stdFontCharset *v2; // edi
+
+    // Added
+    if (!font)
+        return;
+
+    if ( font->bitmap )
+        stdBitmap_Free(font->bitmap);
+    v1 = font->charsetHead.previous;
+    std_pHS->free(font);
+    if ( v1 )
+    {
+        do
+        {
+            v2 = v1->previous;
+            std_pHS->free(v1);
+            v1 = v2;
+        }
+        while ( v2 );
+    }
+}

@@ -42,11 +42,13 @@ void stdFileUtil_DisposeFind(stdFileSearch *search);
 
 #ifdef LINUX
 int stdFileUtil_Deltree(char* lpPathName);
+int stdFileUtil_MkDir(char* path);
 #else
 static int (*stdFileUtil_Deltree)(char* lpPathName) = (void*)stdFileUtil_Deltree_ADDR;
+//static int (*stdFileUtil_MkDir)(char* lpPathName) = (void*)stdFileUtil_MkDir_ADDR;
+BOOL stdFileUtil_MkDir(LPCSTR lpPathName);
 #endif
 
-static int (*stdFileUtil_MkDir)(char* lpPathName) = (void*)stdFileUtil_MkDir_ADDR;
 //static stdFileSearch* (*stdFileUtil_NewFind)(char *path, int a2, char *extension) = (void*)stdFileUtil_NewFind_ADDR;
 //static int (*stdFileUtil_FindNext)(stdFileSearch *a1, stdFileSearchResult *a2) = (void*)stdFileUtil_FindNext_ADDR;
 //static void (*stdFileUtil_DisposeFind)(stdFileSearch *a1) = (void*)stdFileUtil_DisposeFind_ADDR;

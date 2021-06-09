@@ -60,17 +60,16 @@ void sithCogUtil_GetSourceType(sithCog *ctx)
 
 void sithCogUtil_Rand(sithCog *ctx)
 {
-    float rval = (double)_rand() * 0.000030518509;
-    sithCogVm_PushFlex(ctx, rval);
+    sithCogVm_PushFlex(ctx, _frand());
 }
 
 void sithCogUtil_RandVec(sithCog *ctx)
 {
     rdVector3 rvec;
 
-    rvec.x = (double)_rand() * 0.000030518509;
-    rvec.y = (double)_rand() * 0.000030518509;
-    rvec.z = (double)_rand() * 0.000030518509;
+    rvec.x = _frand();
+    rvec.y = _frand();
+    rvec.z = _frand();
     sithCogVm_PushVector3(ctx, &rvec);
 }
 
@@ -1003,9 +1002,13 @@ void sithCogUtil_ModifyColorEffect(sithCog *ctx)
 
 void sithCogUtil_FreeColorEffect(sithCog *ctx)
 {
-    int v1; // eax
+    uint32_t v1; // eax
 
     v1 = sithCogVm_PopInt(ctx);
+    jk_printf("cog freereq %x %s\n", v1, ctx->cogscript->cog_fpath);
+    if (v1 > 32 && v1 != 0xFFFFFFFF) {
+        while (1);
+    }
     stdPalEffects_FreeRequest(v1);
 }
 
