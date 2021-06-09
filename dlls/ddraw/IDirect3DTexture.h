@@ -19,19 +19,19 @@ public:
     Q_INVOKABLE uint32_t QueryInterface(struct d3dtex_ext* this_ptr, uint8_t* iid, uint32_t* lpInterface)
     {
         std::string iid_str = guid_to_string(iid);
-        printf("STUB: IDirect3DTexture::QueryInterface %s\n", iid_str.c_str());
+        //printf("STUB: IDirect3DTexture::QueryInterface %s\n", iid_str.c_str());
         
         return GlobalQueryInterface(iid_str, lpInterface);
     }
 
     Q_INVOKABLE void AddRef(struct d3dtex_ext* this_ptr)
     {
-        printf("STUB: IDirect3DTexture::AddRef\n");
+        //printf("STUB: IDirect3DTexture::AddRef\n");
     }
 
     Q_INVOKABLE void Release(struct d3dtex_ext* this_ptr)
     {
-        printf("STUB: IDirect3DTexture::Release\n");
+        //printf("STUB: IDirect3DTexture::Release\n");
         
         GlobalRelease(this_ptr);
         

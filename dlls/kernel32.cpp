@@ -405,12 +405,12 @@ uint32_t Kernel32::CreateFileA(uint32_t lpFileName, uint32_t dwDesiredAccess, ui
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     linux_path = std::regex_replace(linux_path, std::regex("//"), "");
     linux_path = std::regex_replace(linux_path, std::regex("[A-Z]:/"), "disk/");
-    printf("Stub: Create file %s %x %x\n", linux_path.c_str(), dwCreationDisposition, dwDesiredAccess);
+    //printf("Stub: Create file %s %x %x\n", linux_path.c_str(), dwCreationDisposition, dwDesiredAccess);
         
     FILE *f = fopen(linux_path.c_str(), dwCreationDisposition == 3 ? "rw" : "wb+");
     if (!f)
     {
-        printf("Failed to open file %s\n", linux_path.c_str());
+        //printf("Failed to open file %s\n", linux_path.c_str());
         last_error = ERROR_FILE_NOT_FOUND;
         return -1;
     }
@@ -426,12 +426,12 @@ uint32_t Kernel32::OpenFile(char* lpFileName, uint32_t lpReOpenBuff, uint32_t uS
     std::string fname = std::string(lpFileName);
     std::string linux_path = std::regex_replace(fname, std::regex("\\\\"), "/");
     linux_path = std::regex_replace(linux_path, std::regex("//"), "");
-    printf("STUB: Kernel32::OpenFile %s\n", linux_path.c_str());
+    //printf("STUB: Kernel32::OpenFile %s\n", linux_path.c_str());
         
     FILE *f = fopen(linux_path.c_str(), "rw");
     if (!f)
     {
-        printf("Failed to open file %s\n", linux_path.c_str());
+        //printf("Failed to open file %s\n", linux_path.c_str());
         last_error = ERROR_FILE_NOT_FOUND;
         return -1;
     }

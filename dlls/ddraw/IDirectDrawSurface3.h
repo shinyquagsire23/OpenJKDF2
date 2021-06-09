@@ -47,7 +47,7 @@ public:
     Q_INVOKABLE uint32_t QueryInterface(struct ddsurface_ext* this_ptr, uint8_t* iid, uint32_t* lpInterface)
     {
         std::string iid_str = guid_to_string(iid);
-        printf("STUB: IDirectDrawSurface3::QueryInterface %s\n", iid_str.c_str());
+        //printf("STUB: IDirectDrawSurface3::QueryInterface %s\n", iid_str.c_str());
         
         if (iid_str == "2cdcd9e0-25a0-11cf-a31a-00aa00b93356" && this_ptr->tex.translated() != nullptr) //D3D tex
         {
@@ -65,7 +65,7 @@ public:
 
     Q_INVOKABLE void Release(struct ddsurface_ext* this_ptr)
     {
-        printf("STUB: IDirectDrawSurface3::Release %x %x\n", real_ptr_to_vm_ptr(this_ptr), *(uint32_t*)this_ptr);
+        //printf("STUB: IDirectDrawSurface3::Release %x %x\n", real_ptr_to_vm_ptr(this_ptr), *(uint32_t*)this_ptr);
         
         if (this_ptr->alloc)
         {
@@ -351,9 +351,7 @@ public:
     }
 
     Q_INVOKABLE uint32_t GetSurfaceDesc(struct ddsurface_ext* this_ptr, vm_ptr<struct DDSURFACEDESC*> desc_out)
-    {
-        printf("STUB: IDirectDrawSurface3::GetSurfaceDesc\n");
-        
+    {   
         **desc_out = this_ptr->desc;
         
         return 0;

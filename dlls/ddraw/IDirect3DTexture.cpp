@@ -88,7 +88,7 @@ void IDirect3DTexture::PaletteChanged(struct d3dtex_ext* this_ptr, uint32_t a, u
 
 uint32_t IDirect3DTexture::Load(struct d3dtex_ext* this_ptr, struct d3dtex_ext* texture)
 {
-    printf("STUB: IDirect3DTexture::Load %x\n", real_ptr_to_vm_ptr(texture));
+    //printf("STUB: IDirect3DTexture::Load %x\n", real_ptr_to_vm_ptr(texture));
     
     //TODO actually copy the surfaces?
     
@@ -99,7 +99,7 @@ uint32_t IDirect3DTexture::Load(struct d3dtex_ext* this_ptr, struct d3dtex_ext* 
 
 uint32_t IDirect3DTexture::Unload(struct d3dtex_ext* this_ptr)
 {
-    printf("STUB: IDirect3DTexture::Unload\n");
+    //printf("STUB: IDirect3DTexture::Unload\n");
     
     return 0;
 }
