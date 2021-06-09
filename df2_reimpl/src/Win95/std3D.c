@@ -508,6 +508,8 @@ void std3D_DrawRenderList()
         0                  // offset of first element
     );*/
 
+    glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
+    
     rdDDrawSurface* last_tex = NULL;
     int last_tex_idx = 0;
     GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
@@ -541,7 +543,7 @@ void std3D_DrawRenderList()
                 glDisableVertexAttribArray(attribute_coord3d);
                 glDeleteBuffers(1, &ibo_triangle);
             }
-            
+
             int tex_id = tex->texture_id;
             glActiveTexture(GL_TEXTURE0 + 1);
             glBindTexture(GL_TEXTURE_1D, worldpal_texture);

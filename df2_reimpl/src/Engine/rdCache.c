@@ -324,10 +324,7 @@ int rdCache_SendFaceListToHardware()
         flags_idk |= 0x8000;
     }
     std3D_ResetRenderList();
-    rdCache_totalNormalTris = 0;
-    rdCache_totalSolidTris = 0;
     v7 = rdCamera_pCurCamera->cameraClipFrustum;
-    rdCache_totalVerts = 0;
     v8 = 1.0 / v7->field_0.z;
     iterating_6c = rdCache_aProcFaces;
     rend_6c_current_idx = 0;
