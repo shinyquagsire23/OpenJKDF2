@@ -10,7 +10,7 @@ void DebugConsole_PrintUniStr(wchar_t* s)
 
 void DebugConsole_Print(char* s)
 {
-    printf("%s", s);
+    printf("%s\n", s);
 }
 
 void DebugConsole_AdvanceLogBuf()

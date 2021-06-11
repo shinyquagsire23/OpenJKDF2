@@ -527,6 +527,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
         jkMain_GuiAdvance();
     }
 #endif
+    result = 1;
     return result;
 }
 

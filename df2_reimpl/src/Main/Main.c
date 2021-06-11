@@ -159,7 +159,7 @@ int Main_Startup(const char *cmdline)
         rdStartup(&hs);
         jkGuiRend_Initialize();
         jkGui_Initialize();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiMultiplayer_Initialize(); //TODO
         jkGuiNetHost_Initialize(); //TODO
 #endif
@@ -170,23 +170,23 @@ int Main_Startup(const char *cmdline)
         jkGuiForce_Initialize();
         jkGuiMain_Initialize();
         jkGuiPlayer_Initialize();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiSound_Initialize(); //TODO~
 #endif
         jkGuiEsc_Startup();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiMap_Initialize(); // TODO
         jkGuiKeyboard_Initialize(); // TODO
         jkGuiJoystick_Initialize(); // TODO
 #endif
         jkGuiDialog_Initialize();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiMouse_Initialize(); // TODO
         jkGuiControlOptions_Initialize(); // TODO
 #endif
         jkGuiObjectives_Initialize();
         jkGuiSingleTally_Initialize();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiMultiTally_Initialize(); // TODO
         jkGuiBuildMulti_InitializeEditCharacter(); // TODO
 #endif
@@ -195,9 +195,11 @@ int Main_Startup(const char *cmdline)
         jkGuiGameplay_Initialize();
         jkGuiDecision_Initialize();
         jkGuiSingleplayer_Initialize();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkGuiBuildMulti_Initialize(); // TODO
+#endif
         jkGuiSaveLoad_Initialize(); // TODO
+#ifndef LINUX_TMP
         jkGuiControlSaveLoad_Initialize(); // TODO
         smack_Initialize(); // TODO
 #endif
@@ -205,7 +207,7 @@ int Main_Startup(const char *cmdline)
         jkAI_Startup();
         jkCog_Initialize();
         jkEpisode_Startup();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkDev_Startup(); // TODO
 #endif
         jkGame_Initialize();
@@ -213,7 +215,7 @@ int Main_Startup(const char *cmdline)
         jkControl_Initialize(); // ~TODO
         jkHudInv_Initialize();
         jkSaber_Startup();
-#ifndef LINUX
+#ifndef LINUX_TMP
         jkCutscene_Initialize("ui\\cutStrings.uni"); // TODO
         jkCredits_Initialize("ui\\credits.uni"); // TODO
 #endif

@@ -41,7 +41,7 @@ typedef struct sithWorld
 {
     uint32_t level_type_maybe;
     char map_jkl_fname[32];
-    char some_text_jk1[32];
+    char episodeName[32];
     int numColormaps;
     rdColormap* colormaps;
     int numSectors;
@@ -145,12 +145,14 @@ void sithWorld_sub_4D0A20(sithWorld *world);
 //static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
+static void (*sithWorld_sub_4D0AA0)(sithWorld *world) = (void*)sithWorld_sub_4D0AA0_ADDR;
+
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)
 #define sithWorld_pLoading (*(sithWorld**)0x8339D0)
 #define sithWorld_numParsers (*(uint32_t*)0x8339D4)
 #define sithWorld_bInitted (*(uint32_t*)0x8339D8)
 #define sithWorld_bLoaded (*(int*)0x008339DC)
-#define sithWorld_some_text_jk1 ((char*)0x008EE620)
+#define sithWorld_episodeName ((char*)0x008EE620)
 
 #endif // _SITHWORLD_H

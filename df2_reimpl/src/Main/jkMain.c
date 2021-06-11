@@ -4,6 +4,7 @@
 #include "Engine/rdroid.h"
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
+#include "Engine/sithControl.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGame.h"
 #include "Main/jkCutscene.h"
@@ -53,9 +54,6 @@
 #define jkMain_CreditsShow ((void*)(0x00404480))
 #define jkMain_CreditsTick ((void*)(0x004044B0))
 #define jkMain_CreditsLeave ((void*)(0x004044E0))
-#define jkMain_UnkShow ((void*)(0x00404570))
-#define jkMain_UnkTick ((void*)(0x00404580))
-#define jkMain_UnkLeave ((void*)(0x004045F0))
 #define jkMain_EscapeMenuShow ((void*)(0x00403F40))
 #define jkMain_EscapeMenuLeave ((void*)(0x004040A0))
 #define jkMain_EndLevelScreenShow ((void*)(0x004041A0))
@@ -559,6 +557,34 @@ void jkMain_ChoiceLeave()
     ;
 }
 
+void jkMain_UnkShow()
+{
+    ;
+}
+
+int jkMain_UnkTick()
+{
+    jkRes_LoadGob(jkMain_strIdk);
+    if ( jkEpisode_mLoad.paEntries )
+    {
+        pHS->free(jkEpisode_mLoad.paEntries);
+        jkEpisode_mLoad.paEntries = 0;
+    }
+    jkEpisode_Load(&jkEpisode_mLoad);
+
+    jkSmack_gameMode = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 5;
+    return 1;
+}
+
+void jkMain_UnkLeave()
+{
+    ;
+}
+
 int jkMain_sub_403470(char *a1)
 {
     int result; // eax
@@ -804,6 +830,26 @@ void jkMain_do_guistate6()
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = 6;
     }
+}
+
+int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
+{
+    sithInventory_549FA0 = 0;
+    _strncpy(gamemode_0_2_str, a2, 0x7Fu);
+    gamemode_0_2_str[127] = 0;
+    _strncpy(jkMain_strIdk, a1, 0x7Fu);
+    jkMain_strIdk[127] = 0;
+    _strncpy(gamemode_1_str, a3, 0x7Fu);
+    gamemode_1_str[127] = 0;
+    _wcsncpy(jkMain_wstrIdk, a4, 0x7Fu);
+
+    jkMain_wstrIdk[127] = 0;
+    jkPlayer_dword_525470 = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 14;
+    return 1;
 }
 
 #ifdef LINUX

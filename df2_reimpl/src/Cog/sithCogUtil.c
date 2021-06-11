@@ -316,8 +316,8 @@ void sithCogUtil_SetPulse(sithCog *ctx)
             DebugConsole_Print(std_genBuffer);
         }
         ctx->flags |= 4;
-        ctx->field_18 = (int)(popFlex * 1000.0);
-        ctx->field_1C = (int)(popFlex * 1000.0) + sithTime_curMs;
+        ctx->pulsePeriodMs = (int)(popFlex * 1000.0);
+        ctx->nextPulseMs = (int)(popFlex * 1000.0) + sithTime_curMs;
     }
 }
 
@@ -483,7 +483,7 @@ void sithCogUtil_VectorDist(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &inA);
     sithCogVm_PopVector3(ctx, &inB);
-    rdVector_Sub3(&tmp, &inA, &inB);
+    rdVector_Sub3(&tmp, &inB, &inA);
     sithCogVm_PushFlex(ctx, rdVector_Len3(&tmp));
 }
 
@@ -1005,10 +1005,6 @@ void sithCogUtil_FreeColorEffect(sithCog *ctx)
     uint32_t v1; // eax
 
     v1 = sithCogVm_PopInt(ctx);
-    jk_printf("cog freereq %x %s\n", v1, ctx->cogscript->cog_fpath);
-    if (v1 > 32 && v1 != 0xFFFFFFFF) {
-        while (1);
-    }
     stdPalEffects_FreeRequest(v1);
 }
 

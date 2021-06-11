@@ -36,6 +36,8 @@
 #include "Cog/sithCog.h"
 #include "jk.h"
 
+float sith_lastAspect = 1.0;
+
 int sith_Startup(struct common_functions *commonFuncs)
 {
     int is_started; // esi
@@ -88,6 +90,7 @@ void sith_UpdateCamera()
         {
             // Set screen aspect ratio
             float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            sith_lastAspect = aspect;
             rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
             rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
         }
@@ -132,6 +135,31 @@ int sith_Mode1Init(char *a1)
     sithTime_Startup();
     g_sithMode = 1;
     sith_bOpened = 1;
+    return 1;
+}
+
+int sith_Mode1Init_2(char *path)
+{
+    sithWorld_pCurWorld = sithWorld_New();
+
+    if ( !sithWorld_Load(sithWorld_pCurWorld, path) )
+        return 0;
+
+    sithWorld_Initialize();
+    bShowInvisibleThings = 0;
+    sithRender_8EE678 = 1;
+    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithTimer_Open();
+    sithSurface_Open();
+    sithAI_Open();
+    sithSoundSys_Open();
+    sithCog_Open();
+    sithControl_Open();
+    sithSector_Startup();
+    sithRender_Open();
+    sithWeapon_InitializeEntry();
+    sith_bOpened = 1;
+    g_sithMode = 1;
     return 1;
 }
 
@@ -192,10 +220,10 @@ int sith_Tick()
     }
 }
 
-void sith_set_some_text_jk1(char *text)
+void sith_SetEpisodeName(char *text)
 {
-    _strncpy(sithWorld_some_text_jk1, text, 0x1Fu);
-    sithWorld_some_text_jk1[31] = 0;
+    _strncpy(sithWorld_episodeName, text, 0x1Fu);
+    sithWorld_episodeName[31] = 0;
 }
 
 void sith_AutoSave()

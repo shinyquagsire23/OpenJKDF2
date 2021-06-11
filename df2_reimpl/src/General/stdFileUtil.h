@@ -40,6 +40,8 @@ stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension);
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2);
 void stdFileUtil_DisposeFind(stdFileSearch *search);
 
+int stdFileUtil_DelFile(char* lpFileName);
+
 #ifdef LINUX
 int stdFileUtil_Deltree(char* lpPathName);
 int stdFileUtil_MkDir(char* path);

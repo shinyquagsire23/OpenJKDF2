@@ -4,6 +4,7 @@
 #include <float.h>
 
 #include "Cog/sithCog.h"
+#include "Engine/sith.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithKeyFrame.h"
@@ -147,9 +148,7 @@ void sithRender_Draw()
     sithAdjoin *i; // esi
     sithSector *v4; // eax
     float a2; // [esp+0h] [ebp-28h]
-    float a2a; // [esp+0h] [ebp-28h]
     float v7; // [esp+8h] [ebp-20h]
-    float v8; // [esp+8h] [ebp-20h]
     float v9; // [esp+8h] [ebp-20h]
     float a3; // [esp+1Ch] [ebp-Ch] BYREF
     unsigned int v11; // [esp+20h] [ebp-8h]
@@ -165,19 +164,22 @@ void sithRender_Draw()
             rdSetLightingMode(sithRender_lightMode);
         rdSetTextureMode(sithRender_texMode);
         rdSetRenderOptions(rdGetRenderOptions() | 2);
-#ifndef LINUX
+
         sithPlayer_SetScreenTint(sithCamera_currentCamera->sector->tint.x, sithCamera_currentCamera->sector->tint.y, sithCamera_currentCamera->sector->tint.z);
-#endif
+
         if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
         {
-            a2 = sithTime_curSeconds * 70.0;
-            stdMath_SinCos(a2, &a3, &a4);
-            v7 = a3 + sithCamera_currentCamera->fov;
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, v7);
-            a2a = sithTime_curSeconds * 100.0;
-            stdMath_SinCos(a2a, &a3, &a4);
-            v8 = a3 * 0.016666668 + sithCamera_currentCamera->aspectRatio;
-            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, v8);
+            float fov = sithCamera_currentCamera->fov;
+            float aspect = sithCamera_currentCamera->aspectRatio;
+
+#ifdef QOL_IMPROVEMENTS
+            fov = jkPlayer_fov;
+            aspect = sith_lastAspect;
+#endif
+            stdMath_SinCos(sithTime_curSeconds * 70.0, &a3, &a4);
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, a3 + fov);
+            stdMath_SinCos(sithTime_curSeconds * 100.0, &a3, &a4);
+            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, a3 * 0.016666668 + aspect);
             sithRender_needsAspectReset = 1;
         }
         else if ( sithRender_needsAspectReset )

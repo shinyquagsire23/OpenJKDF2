@@ -150,6 +150,7 @@ float sithControl_GetAxis(int num);
 float sithControl_ReadAxisStuff(int num);
 int sithControl_ReadConf();
 int sithControl_WriteConf();
+void sithControl_sub_4D6930(int a);
 #else
 static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
 static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
@@ -158,6 +159,7 @@ static float (*sithControl_GetAxis)(int num) = (void*)sithControl_GetAxis_ADDR;
 static float (*sithControl_ReadAxisStuff)(int num) = (void*)sithControl_ReadAxisStuff_ADDR;
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
+static void (*sithControl_sub_4D6930)(int a) = (void*)sithControl_sub_4D6930_ADDR;
 #endif
 
 #endif // _SITHCONTROL_H

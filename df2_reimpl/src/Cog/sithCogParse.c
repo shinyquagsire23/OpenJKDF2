@@ -815,8 +815,10 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
     {
         stdConffileArg* arg = &stdConffile_entry.args[i];
         
-        if ( _strcmp(arg->key, "local") )
-            break;
+        if ( !_strcmp(arg->key, "local") )
+        {
+            return 1;
+        }
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {
@@ -856,8 +858,10 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
     {
         stdConffileArg* arg = &stdConffile_entry.args[i];
         
-        if ( _strcmp(arg->key, "local") )
-            break;
+        if ( !_strcmp(arg->key, "local") )
+        {
+            return 1;
+        }
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {
@@ -897,8 +901,10 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
     {
         stdConffileArg* arg = &stdConffile_entry.args[i];
         
-        if ( _strcmp(arg->key, "local") )
-            break;
+        if ( !_strcmp(arg->key, "local") )
+        {
+            return 1;
+        }
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {

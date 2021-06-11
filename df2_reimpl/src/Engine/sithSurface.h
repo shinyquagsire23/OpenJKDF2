@@ -124,6 +124,9 @@ int sithSurface_GetIdxFromPtr(sithSurface *surface);
 void sithSurface_UnsetAdjoins(sithAdjoin *adjoin);
 void sithSurface_SetAdjoins(sithAdjoin *adjoin);
 rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, float a2, uint16_t flags);
+int sithSurface_Startup2();
+int sithSurface_Startup3();
+void sithSurface_SetSectorLight(sithSector *sector, float extraLight, float a3, int a4);
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;

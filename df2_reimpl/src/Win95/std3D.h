@@ -227,6 +227,8 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
 void std3D_UpdateFrameCount(rdDDrawSurface *surface);
 void std3D_PurgeTextureCache();
 void std3D_Shutdown();
+int std3D_ClearZBuffer();
+int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16bit_maybe, int no_alpha);
 #else
 static int (*std3D_StartScene)() = (void*)std3D_StartScene_ADDR;
 static int (*std3D_EndScene)() = (void*)std3D_EndScene_ADDR;

@@ -57,7 +57,7 @@ void stdConffile_CloseWrite();
 int stdConffile_WriteLine(const char *line);
 int stdConffile_Write(const char* line, int amt);
 int stdConffile_Printf(char *fmt, ...);
-int stdConffile_Read(char* out, int len);
+int stdConffile_Read(void* out, int len);
 int stdConffile_ReadArgsFromStr(char *str);
 int stdConffile_ReadArgs();
 int stdConffile_ReadLine();

@@ -29,6 +29,17 @@ int sithSurface_Open()
     return 1;
 }
 
+int sithSurface_Startup2()
+{
+    sithSurface_Startup();
+    return sithSurface_Open();
+}
+
+int sithSurface_Startup3()
+{
+    return sithSurface_Startup();
+}
+
 int sithSurface_Load(sithWorld *world)
 {
     unsigned int numAdjoins; // ebp

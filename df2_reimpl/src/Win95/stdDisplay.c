@@ -330,4 +330,9 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 void stdDisplay_ddraw_surface_flip2()
 {
 }
+
+void stdDisplay_RestoreDisplayMode()
+{
+
+}
 #endif

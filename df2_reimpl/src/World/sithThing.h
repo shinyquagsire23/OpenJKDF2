@@ -385,10 +385,8 @@ typedef struct sithActor
     int field_188;
     uint32_t numAIClassEntries;
     int field_190;
-    int field_194;
-    float field_198;
-    float field_19C;
-    rdVector3 field_1A0;
+    rdVector3 lookVector;
+    rdVector3 movePos;
     rdVector3 field_1AC;
     float field_1B8;
     float moveSpeed;
@@ -756,6 +754,7 @@ int sithThing_netidk2(int a1);
 int sithThing_GetIdxFromThing(sithThing *thing);
 void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
 
+static void (*sithThing_freestuff)(sithWorld *world) = (void*)sithThing_freestuff_ADDR;
 static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;

@@ -32,6 +32,7 @@
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUIDecision.h"
+#include "Gui/jkGUISaveLoad.h"
 #include "Gui/jkGUISingleplayer.h"
 #include "Gui/jkGUISingleTally.h"
 #include "Gui/jkGUIControlOptions.h"
@@ -63,12 +64,12 @@
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithSave.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithSprite.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithSound.h"
@@ -1087,6 +1088,7 @@ void do_hooks()
     hook_function(sithInventory_SendFire_ADDR, sithInventory_SendFire);
     hook_function(sithInventory_GetBin_ADDR, sithInventory_GetBin);
     hook_function(sithInventory_GetItemDesc_ADDR, sithInventory_GetItemDesc);
+    hook_function(sithInventory_KeybindInit_ADDR, sithInventory_KeybindInit);
     hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
     hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
@@ -1299,6 +1301,9 @@ void do_hooks()
     hook_function(sithRender_RenderAlphaSurfaces_ADDR, sithRender_RenderAlphaSurfaces);
     hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
     
+    // sithSave
+    hook_function(sithSave_Load_ADDR, sithSave_Load);
+    
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);
     hook_function(sithSound_Shutdown_ADDR, sithSound_Shutdown);
@@ -1445,6 +1450,17 @@ void do_hooks()
     hook_function(jkGuiDecision_Shutdown_ADDR, jkGuiDecision_Shutdown);
     hook_function(jkGuiDecision_Show_ADDR, jkGuiDecision_Show);
     
+    // jkGUISaveLoad
+    hook_function(jkGuiSaveLoad_ListClick_ADDR, jkGuiSaveLoad_ListClick);
+    hook_function(jkGuiSaveLoad_PopulateInfo_ADDR, jkGuiSaveLoad_PopulateInfo);
+    hook_function(jkGuiSaveLoad_DeleteOnClick_ADDR, jkGuiSaveLoad_DeleteOnClick);
+    hook_function(jkGuiSaveLoad_PopulateList_ADDR, jkGuiSaveLoad_PopulateList);
+    hook_function(jkGuiSaveLoad_SaveSort_ADDR, jkGuiSaveLoad_SaveSort);
+    hook_function(jkGuiSaveLoad_Show_ADDR, jkGuiSaveLoad_Show);
+    hook_function(jkGuiSaveLoad_PopulateInfoInit_ADDR, jkGuiSaveLoad_PopulateInfoInit);
+    hook_function(jkGuiSaveLoad_Initialize_ADDR, jkGuiSaveLoad_Initialize);
+    hook_function(jkGuiSaveLoad_Shutdown_ADDR, jkGuiSaveLoad_Shutdown);
+    
     // jkGUISingleplayer
     hook_function(jkGuiSingleplayer_Initialize_ADDR, jkGuiSingleplayer_Initialize);
     hook_function(jkGuiSingleplayer_Shutdown_ADDR, jkGuiSingleplayer_Shutdown);
@@ -1544,9 +1560,12 @@ void do_hooks()
     hook_function(stdDisplay_VBufferUnlock_ADDR, stdDisplay_VBufferUnlock);
     hook_function(stdDisplay_VBufferSetColorKey_ADDR, stdDisplay_VBufferSetColorKey);
     hook_function(stdDisplay_VBufferFree_ADDR, stdDisplay_VBufferFree);
+    hook_function(stdDisplay_RestoreDisplayMode_ADDR, stdDisplay_RestoreDisplayMode);
     
     hook_function(stdPlatform_GetTimeMsec_ADDR, stdPlatform_GetTimeMsec);
     
     hook_function(Video_SwitchToGDI_ADDR, Video_SwitchToGDI);
+    
+    hook_function(stdFileUtil_Deltree_ADDR, stdFileUtil_Deltree);
 #endif
 }

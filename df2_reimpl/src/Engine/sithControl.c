@@ -17,6 +17,7 @@
 #include "Engine/sithSave.h"
 #include "Engine/sithMapView.h"
 #include "Main/jkGame.h"
+#include "Main/jkMain.h"
 #include "jk.h"
 
 int sithControl_IsOpen()
@@ -424,4 +425,11 @@ int sithControl_WriteConf()
 {
     return 1; 
 }
+
+void sithControl_sub_4D6930(int a)
+{
+    
+}
+
 #endif
+

@@ -281,8 +281,8 @@ int sithInventory_HandleInvSkillKeys(sithThing *player);
 void sithInventory_SendFire(sithThing *player);
 sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx);
 sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx);
-// sithInventory_KeybindInit
-static void (*sithInventory_KeybindInit)() = (void*)sithInventory_KeybindInit_ADDR;
+int sithInventory_KeybindInit();
+//static void (*sithInventory_KeybindInit)() = (void*)sithInventory_KeybindInit_ADDR;
 // sithInventory_SetPowerKeybind
 // sithInventory_GetPowerKeybind
 void sithInventory_ClearInventory(sithThing *player);

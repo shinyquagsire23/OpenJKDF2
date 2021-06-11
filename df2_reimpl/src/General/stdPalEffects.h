@@ -43,12 +43,16 @@ typedef struct stdPalEffect
 
 typedef struct stdPalEffectsState
 {
-  int field_0;
+  int bEnabled;
   int field_4;
   int field_8;
   int field_C;
   int field_10;
-  stdPalEffect field_14;
+  stdPalEffect effect;
+  int field_3C;
+  int field_40;
+  int field_44;
+  int field_48;
 } stdPalEffectsState;
 
 typedef struct stdPalEffectRequest
@@ -62,6 +66,7 @@ int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);
 void stdPalEffects_FlushAllEffects();
 stdPalEffect* stdPalEffects_GetEffectPointer(int idx);
+void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState);
 
 static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
 static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;

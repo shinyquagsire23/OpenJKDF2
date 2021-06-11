@@ -264,8 +264,8 @@ typedef struct sithCog
     uint32_t script_running;
     uint32_t cogscript_pc;
     uint32_t wakeTimeMs;
-    uint32_t field_18;
-    uint32_t field_1C;
+    uint32_t pulsePeriodMs;
+    uint32_t nextPulseMs;
     uint32_t field_20;
     uint32_t senderId;
     uint32_t senderRef;

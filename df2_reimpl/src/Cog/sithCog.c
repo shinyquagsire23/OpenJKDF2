@@ -659,90 +659,84 @@ void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sour
 void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId)
 {
     sithCogScript *v7; // ebp
-    int v8; // edx
-    unsigned int v9; // ecx
     unsigned int v10; // edi
-    sithCogTrigger *v11; // eax
 
-    if ( cog )
+    if (!cog)
+        return;
+
+    v7 = cog->cogscript;
+    if (cog->flags & 1)
     {
-        v7 = cog->cogscript;
+        _sprintf(
+            std_genBuffer,
+            "Cog %s: Message %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d.\n",
+            cog->cogscript_fpath,
+            msgid,
+            senderType,
+            senderIndex,
+            sourceType,
+            sourceIndex,
+            linkId);
+        DebugConsole_Print(std_genBuffer);
+    }
+
+    if ( (cog->flags & 2) != 0 )
+    {
         if ( (cog->flags & 1) != 0 )
         {
-            _sprintf(
-                std_genBuffer,
-                "Cog %s: Message %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d.\n",
-                cog->cogscript_fpath,
-                msgid,
-                senderType,
-                senderIndex,
-                sourceType,
-                sourceIndex,
-                linkId);
+            _sprintf(std_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
         }
-        v8 = cog->flags;
-        if ( (v8 & 2) != 0 )
+        return;
+    }
+
+    for (v10 = 0; v10 < v7->num_triggers; v10++)
+    {
+        if ( msgid == v7->triggers[v10].trigId )
+            break;
+    }
+
+    if ( v10 == v7->num_triggers )
+    {
+        if (cog->flags & 1)
         {
-            if ( (v8 & 1) != 0 )
-            {
-                _sprintf(std_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
-                DebugConsole_Print(std_genBuffer);
-            }
-            return;
-        }
-        v9 = v7->num_triggers;
-        v10 = 0;
-        if ( v9 )
-        {
-            v11 = v7->triggers;
-            do
-            {
-                if ( msgid == v11->trigId )
-                    break;
-                ++v10;
-                ++v11;
-            }
-            while ( v10 < v9 );
-        }
-        if ( v10 == v9 )
-        {
-            if ( (v8 & 1) == 0 )
-                return;
             _sprintf(std_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->cogscript_fpath, msgid);
-LABEL_17:
             DebugConsole_Print(std_genBuffer);
-            return;
         }
-        if ( (v8 & 0x10) != 0 )
+        return;
+    }
+
+    if ( (cog->flags & 0x10) != 0 )
+    {
+        if (cog->flags & 1)
         {
-            if ( (v8 & 1) == 0 )
-                return;
             _sprintf(std_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->cogscript_fpath, msgid);
-            goto LABEL_17;
+            DebugConsole_Print(std_genBuffer);
         }
-        if ( msgid == COGMSG_SYNCSECTORALT || msgid == COGMSG_SYNCTHINGATTACHMENT || !net_isMulti || net_isServer || (v8 & 0x40) != 0 )
+        return;
+    }
+
+    if ( msgid == COGMSG_SYNCSECTORALT || msgid == COGMSG_SYNCTHINGATTACHMENT || !net_isMulti || net_isServer || (cog->flags & 0x40) != 0 )
+    {
+        cog->params[0] = 0.0;
+        cog->senderId = linkId;
+        cog->senderRef = senderIndex;
+        cog->senderType = senderType;
+        cog->sourceRef = sourceIndex;
+        cog->sourceType = sourceType;
+        cog->params[1] = 0.0;
+        cog->params[2] = 0.0;
+        cog->params[3] = 0.0;
+        if ( (cog->flags & 1) != 0 )
         {
-            cog->params[0] = 0.0;
-            cog->senderId = linkId;
-            cog->senderRef = senderIndex;
-            cog->senderType = senderType;
-            cog->sourceRef = sourceIndex;
-            cog->sourceType = sourceType;
-            cog->params[1] = 0.0;
-            cog->params[2] = 0.0;
-            cog->params[3] = 0.0;
-            if ( (v8 & 1) != 0 )
-            {
-                _sprintf(std_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
-                DebugConsole_Print(std_genBuffer);
-            }
-            sithCogVm_ExecCog(cog, v10);
+            _sprintf(std_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
+            DebugConsole_Print(std_genBuffer);
         }
-        else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
-        {
-            sithThingPlayer_cogMsg_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, net_dword_8C4BA4);
-        }
+        sithCogVm_ExecCog(cog, v10);
+    }
+    else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
+    {
+        sithThingPlayer_cogMsg_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, net_dword_8C4BA4);
     }
 }
 
@@ -988,13 +982,14 @@ void sithCogScript_Tick(sithCog *cog)
 {
     if (!(cog->flags & 2))
     {
-        if ( (cog->flags & 4) != 0 && sithTime_curMs >= cog->field_1C )
+        //printf("%x %x %x %s\n", cog->flags, sithTime_curMs, cog->nextPulseMs, cog->cogscript_fpath);
+        if ( (cog->flags & 4) && sithTime_curMs >= cog->nextPulseMs )
         {
-            cog->field_1C = sithTime_curMs + cog->field_18;
+            cog->nextPulseMs = sithTime_curMs + cog->pulsePeriodMs;
             sithCog_SendMessage(cog, SITH_MESSAGE_PULSE, 0, 0, 0, 0, 0);
         }
 
-        if ( (cog->flags & 8) != 0 && sithTime_curMs >= cog->field_20 )
+        if ( (cog->flags & 8) && sithTime_curMs >= cog->field_20 )
         {
             cog->flags &= ~0x8;
             cog->field_20 = 0;
@@ -1004,7 +999,7 @@ void sithCogScript_Tick(sithCog *cog)
         {
             if ( cog->wakeTimeMs >= sithTime_curMs )
                 return;
-            if (!(cog->flags & 1))
+            if ((cog->flags & 1))
             {
                 _sprintf(std_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->cogscript_fpath);
                 DebugConsole_Print(std_genBuffer);
@@ -1015,7 +1010,7 @@ void sithCogScript_Tick(sithCog *cog)
         }
         if ( cog->script_running == 3 && (sithWorld_pCurWorld->things[cog->wakeTimeMs].trackParams.field_C & 3) == 0 )
         {
-            if (!(cog->flags & 1))
+            if ((cog->flags & 1))
             {
                 _sprintf(std_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->cogscript_fpath);
                 DebugConsole_Print(std_genBuffer);

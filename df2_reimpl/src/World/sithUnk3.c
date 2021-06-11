@@ -593,8 +593,7 @@ sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, rdVector3 *a3, rdVector
     a1.x = a4->x - a3->x;
     a1.y = a4->y - a3->y;
     a1.z = a4->z - a3->z;
-    rdVector_Normalize3Acc(&a1);
-    a3a = v4;
+    a3a = rdVector_Normalize3Acc(&a1);
     sithUnk3_SearchRadiusForThings(sector, 0, a3, &a1, a3a, a5, 1);
     v7 = sithUnk3_searchStackIdx;
     v8 = &sithUnk3_searchStack[sithUnk3_searchStackIdx];

@@ -973,10 +973,10 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
                 rdFace* face = &mesh->faces[faceIdx];
                 for (idx1 = 0; idx1 < face->numVertices; idx1++)
                 {
-                    int idx2 = idx1 - 1;
+                    idx2 = idx1 - 1;
                     if ( idx1 - 1 < 0 )
                         idx2 = face->numVertices - 1;
-                    int idx3 = ((idx1 + 1) % face->numVertices);
+                    idx3 = ((idx1 + 1) % face->numVertices);
                     if ( !rdMath_PointsCollinear(
                               &mesh->vertices[face->vertexPosIdx[idx1]],
                               &mesh->vertices[face->vertexPosIdx[idx3]],

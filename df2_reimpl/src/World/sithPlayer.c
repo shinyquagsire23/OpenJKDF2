@@ -298,3 +298,56 @@ void sithPlayer_debug_loadauto(sithThing *player)
     player->thingType = THINGTYPE_PLAYER;
     player->lifeLeftMs = 0;
 }
+
+void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
+{
+    sithThing *focusThing; // eax
+    stdPalEffect *paleffect; // ecx
+    double v5; // st7
+    double v8; // st7
+
+    focusThing = sithWorld_pCurWorld->cameraFocus;
+    if ( (focusThing->thingType & THINGTYPE_PLAYER) != 0 ) // ???
+    {
+        paleffect = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
+        if ( tintR < 0.0 )
+        {
+            v5 = 0.0;
+        }
+        else if ( tintR > 1.0 )
+        {
+            v5 = 1.0;
+        }
+        else
+        {
+            v5 = tintR;
+        }
+        paleffect->tint.x = v5;
+        if ( tintG < 0.0 )
+        {
+            v8 = 0.0;
+        }
+        else if ( tintG > 1.0 )
+        {
+            v8 = 1.0;
+        }
+        else
+        {
+            v8 = tintG;
+        }
+        paleffect->tint.y = v8;
+        if ( tintB < 0.0 )
+        {
+            paleffect->tint.z = 0.0;
+        }
+        else if ( tintB > 1.0 )
+        {
+            paleffect->tint.z = 1.0;
+        }
+        else
+        {
+            paleffect->tint.z = tintB;
+        }
+    }
+}
+

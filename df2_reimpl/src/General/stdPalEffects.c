@@ -46,3 +46,11 @@ stdPalEffect* stdPalEffects_GetEffectPointer(int idx)
 {
     return &stdPalEffects_aEffects[idx].effect;
 }
+
+void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState)
+{
+    _memset(effectsState, 0, sizeof(stdPalEffectsState));
+    _memset(&effectsState->effect, 0, sizeof(effectsState->effect));
+    effectsState->effect.fade = 1.0;
+    effectsState->effect.fade = 1.0;
+}

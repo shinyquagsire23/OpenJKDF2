@@ -476,22 +476,21 @@ float stdMath_Sqrt(float a)
 
 float stdMath_ArcSin3(float a1)
 {
-    double result; // st7
     float v2; // [esp+0h] [ebp-24h]
     float v3; // [esp+4h] [ebp-20h]
     float v4; // [esp+8h] [ebp-1Ch]
     float v5; // [esp+Ch] [ebp-18h]
     float v6; // [esp+10h] [ebp-14h]
     float v7; // [esp+14h] [ebp-10h]
-    int v8; // [esp+1Ch] [ebp-8h]
     float v9; // [esp+20h] [ebp-4h]
     float v10; // [esp+2Ch] [ebp+8h]
 
-    v8 = a1 < 0.0;
+
     if ( a1 >= 0.0 )
         v7 = a1;
     else
         v7 = -a1;
+
     if ( v7 <= 0.70710677 )
     {
         v4 = stdMath_FlexPower(v7, 3) / 6.0 + v7;
@@ -506,11 +505,10 @@ float stdMath_ArcSin3(float a1)
         v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
         v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * 57.295784;
     }
-    if ( v8 )
-        result = -v9;
+    if ( a1 < 0.0 )
+        return -v9;
     else
-        result = v9;
-    return result;
+        return v9;
 }
 
 float stdMath_Tan(float a1)

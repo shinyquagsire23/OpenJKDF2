@@ -63,7 +63,7 @@ void jkRes_LoadGob(char *a1)
     common_functions *v29; // eax
     char v30[128]; // [esp+10h] [ebp-80h] BYREF
 
-    sith_set_some_text_jk1(a1);
+    sith_SetEpisodeName(a1);
     v1 = 0;
     
     if ( jkRes_gCtx.gobs[1].numGobs )
@@ -382,7 +382,7 @@ LABEL_11:
                     __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
                     jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
                 }
-                sith_set_some_text_jk1(jkRes_episodeGobName);
+                sith_SetEpisodeName(jkRes_episodeGobName);
                 v12 = 0;
                 if ( jkRes_gCtx.gobs[1].numGobs )
                 {
@@ -493,7 +493,7 @@ LABEL_39:
         __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
         jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
     }
-    sith_set_some_text_jk1(jkRes_episodeGobName);
+    sith_SetEpisodeName(jkRes_episodeGobName);
     v18 = 0;
     if ( jkRes_gCtx.gobs[1].numGobs )
     {

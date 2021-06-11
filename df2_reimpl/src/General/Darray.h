@@ -1,6 +1,8 @@
 #ifndef _DARRAY_H
 #define _DARRAY_H
 
+#include "types.h"
+
 #define Darray_New_ADDR (0x00520B50)
 #define Darray_Free_ADDR (0x00520BC0)
 #define Darray_NewEntry_ADDR (0x00520BE0)
@@ -11,9 +13,9 @@
 typedef struct Darray
 {
   void *alloc;
-  unsigned int entrySize;
-  unsigned int size;
-  unsigned int total;
+  uint32_t entrySize;
+  uint32_t size;
+  int32_t total;
   int dword10;
   int bInitialized;
 } Darray;

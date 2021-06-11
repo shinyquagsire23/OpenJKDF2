@@ -5,7 +5,6 @@
 
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param)
 {
-    int result; // eax
     sithThing *v4; // ebp
     int v5; // eax
     int v6; // ebx
@@ -42,7 +41,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
         return 0;
     v7 = sizeof(sithThingFrame) * v5;
     v4->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * v5);
-    if ( result )
+    if ( v4->trackParams.frames )
     {
         _memset(v4->trackParams.frames, 0, v7);
         v4->trackParams.numFrames = v6;

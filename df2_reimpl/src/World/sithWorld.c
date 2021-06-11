@@ -136,8 +136,8 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
         _strncpy(world->map_jkl_fname, map_jkl_fname, 0x7Fu);
         world->map_jkl_fname[0] = 0; // aaaaaa these sizes are wrong
         _strtolower(world->map_jkl_fname);
-        _strncpy(world->some_text_jk1, sithWorld_some_text_jk1, 0x1Fu);
-        world->some_text_jk1[0x1F] = 0;
+        _strncpy(world->episodeName, sithWorld_episodeName, 0x1Fu);
+        world->episodeName[0x1F] = 0;
         sithWorld_pLoading = world;
         stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
         some_integer_4 = 0;

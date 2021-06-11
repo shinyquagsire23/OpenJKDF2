@@ -602,9 +602,7 @@ void sithCogThing_GetThingParent(sithCog *ctx)
 
 void sithCogThing_GetThingPos(sithCog *ctx)
 {
-    sithThing *thing; // eax
-
-    thing = sithCogVm_PopThing(ctx);
+    sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
         sithCogVm_PushVector3(ctx, &thing->position);
     else

@@ -1077,6 +1077,36 @@ sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx)
     return &sithInventory_aDescriptors[idx];
 }
 
+int sithInventory_KeybindInit()
+{
+    int v0; // ebx
+    int *v3; // esi
+
+    v0 = 0;
+    for (int i = 0; i < 20; i++)
+    {
+        sithInventory_powerKeybinds[i].enabled = 0;
+    }
+    v3 = &sithInventory_powerKeybinds[0].binding;
+    for (int i = 0; i < 200; i++)
+    {
+        if ( (sithInventory_aDescriptors[i].flags & 0x100) != 0 )
+        {
+            sithControl_sub_4D6930(v0 + 42);
+            sithInventory_powerKeybinds[v0].enabled = 1;
+            sithInventory_powerKeybinds[v0].binding = i;
+            sithInventory_powerKeybinds[v0].idk = 0;
+            ++v0;
+            
+            if (v0 >= 20)
+            {
+                break;
+            }
+        }
+    }
+    return v0;
+}
+
 void sithInventory_ClearInventory(sithThing *player)
 {
     for (int i = 0; i < 200; i++)

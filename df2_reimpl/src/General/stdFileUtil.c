@@ -84,6 +84,11 @@ BOOL stdFileUtil_MkDir(LPCSTR lpPathName)
 {
     return CreateDirectoryA(lpPathName, 0);
 }
+
+int stdFileUtil_DelFile(char* lpFileName)
+{
+    return DeleteFileA(lpFileName);
+}
 #endif
 
 #ifdef LINUX
@@ -197,6 +202,11 @@ int stdFileUtil_Deltree(char* lpPathName)
 }
 
 int stdFileUtil_MkDir(char* path)
+{
+    return 0;
+}
+
+int stdFileUtil_DelFile(char* lpFileName)
 {
     return 0;
 }

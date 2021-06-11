@@ -68,6 +68,8 @@
 #define game_updateMsecsTotal (*(int*)0x00552B58)
 #define idx_13b4_related (*(int*)0x008C4BD8)
 #define gamemode_1_str ((char*)0x00552958) // 128
+#define jkMain_strIdk ((char*)0x005529D8) // 128
+#define jkMain_wstrIdk ((wchar_t*)0x00552A58) // 128
 //#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
 
 typedef struct jkGuiStateFuncs
@@ -91,12 +93,16 @@ void jkMain_MainLeave();
 void jkMain_ChoiceShow();
 void jkMain_ChoiceTick();
 void jkMain_ChoiceLeave();
+void jkMain_UnkShow();
+int jkMain_UnkTick();
+void jkMain_UnkLeave();
 int jkMain_LoadFile(char *a1);
 
 int jkMain_sub_403470(char *a1);
 int jkMain_CdSwitch(int a1, int bIsAPath);
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
 void jkMain_do_guistate6();
+int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 

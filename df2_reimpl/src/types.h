@@ -85,6 +85,9 @@ typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
 typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 
+typedef struct sithSave_Header sithSave_Header;
+typedef struct jkGuiStringEntry jkGuiStringEntry;
+
 typedef struct videoModeStruct videoModeStruct;
 typedef struct common_functions common_functions;
 

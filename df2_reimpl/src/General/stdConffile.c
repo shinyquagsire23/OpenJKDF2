@@ -141,12 +141,12 @@ int stdConffile_Printf(char *fmt, ...)
     return std_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 
-int stdConffile_Read(char* out, int len)
+int stdConffile_Read(void* out, int len)
 {
-  if (stdConffile_bOpen && openFile)
-    return std_pHS->fileRead(openFile, (void *)out, len) == len;
-  else
-    return 0;
+    if (stdConffile_bOpen && openFile)
+        return std_pHS->fileRead(openFile, out, len) == len;
+    else
+        return 0;
 }
 
 int stdConffile_ReadArgsFromStr(char *str)

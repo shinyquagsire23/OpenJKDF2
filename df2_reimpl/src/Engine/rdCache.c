@@ -868,7 +868,7 @@ LABEL_231:
                                     active_6c->light_level_static = v77 * 63.0;
 LABEL_232:
                                     v79 = active_6c->numVertices;
-                                    *(float *)&vtx_idx = 0.0;
+                                    vtx_idx = 0;
                                     if ( v79 )
                                     {
                                         int tmpiter = 0;

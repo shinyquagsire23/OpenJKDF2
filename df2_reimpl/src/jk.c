@@ -10,6 +10,8 @@
 //#include <wchar.h>
 #endif
 
+#include "General/stdString.h"
+
 // Imports
 #ifdef WIN32
 LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
@@ -287,6 +289,42 @@ int _strncmp(const char *s1, const char *s2, size_t n)
 float _frand()
 {
     return (float)(_rand() & 0xFFFF) * 0.000030518509;
+}
+
+int __wcscmp(const wchar_t *a, const wchar_t *b)
+{
+    int ca, cb, n;
+
+    n = 0;
+    do 
+    {
+        //if (n >= c) break;
+        ca = (uint16_t) *a++;
+        cb = (uint16_t) *b++;
+        n++;
+    }
+    while (ca == cb && ca != '\0');
+
+    return ca - cb;
+}
+
+int __wcsicmp(const wchar_t *a, const wchar_t *b)
+{
+    int ca, cb, n;
+
+    n = 0;
+    do 
+    {
+        //if (n >= c) break;
+        ca = (uint16_t) *a++;
+        cb = (uint16_t) *b++;
+        ca = __tolower(ca);
+        cb = __tolower(cb);
+        n++;
+    }
+    while (ca == cb && ca != '\0');
+
+    return ca - cb;
 }
 
 // JK globals
@@ -643,10 +681,19 @@ size_t _wcslen(const wchar_t * str)
 
 int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
 {
+    char* tmp_fmt = malloc(_wcslen(fmt)+1);
+    char* tmp_out = malloc(a2+1);
+    
+    stdString_WcharToChar(tmp_fmt, fmt, _wcslen(fmt)+1);
+    
     va_list args;
     va_start (args, fmt);
-    int ret = vswprintf(a1, fmt, args); // TODO ehh
+    int ret = vsprintf(tmp_out, tmp_fmt, args); // TODO ehh
     va_end (args);
+    
+    stdString_CharToWchar(a1, tmp_out, a2);
+    
+    free(tmp_fmt);
     return ret;
 }
 

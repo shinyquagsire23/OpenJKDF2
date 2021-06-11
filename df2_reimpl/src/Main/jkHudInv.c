@@ -14,7 +14,6 @@ int jkHudInv_Initialize()
 
 int jkHudInv_items_init()
 {
-    int result; // eax
     int v1; // ecx
     sithItemDescriptor *v2; // eax
     int *v3; // edx
@@ -43,7 +42,7 @@ int jkHudInv_items_init()
         if (!jkHudInv_aItems)
         {
             jkHudInv_numItems = 0;
-            return result;
+            return 0;
         }
         v3 = jkHudInv_aItems;
         v4 = 0;

@@ -115,6 +115,7 @@ static void (*sithSoundSys_FadeSound)(sithPlayingSound *sound, float vol_, float
 static void (*sithSoundSys_SetPitch)(sithPlayingSound *a1, float pitch, float changetime) = (void*)sithSoundSys_SetPitch_ADDR;
 static void (*sithSoundSys_SectorSound)(sithSector *a1, sithSound *a2, float a3) = (void*)sithSoundSys_SectorSound_ADDR;
 static void (*sithSoundSys_SetMusicVol)(float a1) = (void*)sithSoundSys_SetMusicVol_ADDR;
+static void (*sithSoundSys_sub_4DBF90)() = (void*)sithSoundSys_sub_4DBF90_ADDR;
 
 #ifdef LINUX
 void sithSoundSys_Tick(float a1);

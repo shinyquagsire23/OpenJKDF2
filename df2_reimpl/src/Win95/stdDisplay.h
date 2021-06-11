@@ -152,6 +152,7 @@ static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) =
 static void (__cdecl *stdDisplay_VBufferFree)(stdVBuffer *a1) = (void*)stdDisplay_VBufferFree_ADDR;
 static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_waitforvblank_ADDR;
 static void (*stdDisplay_ddraw_surface_flip2)() = (void*)stdDisplay_ddraw_surface_flip2_ADDR;
+static void (*stdDisplay_RestoreDisplayMode)() = (void*)stdDisplay_RestoreDisplayMode_ADDR;
 #else
 int stdDisplay_Startup();
 int stdDisplay_VBufferFill(stdVBuffer *a2, int fillColor, rdRect *a4);
@@ -171,6 +172,7 @@ void stdDisplay_VBufferUnlock(stdVBuffer *a1);
 int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color);
 void stdDisplay_VBufferFree(stdVBuffer *vbuf);
 void stdDisplay_ddraw_surface_flip2();
+void stdDisplay_RestoreDisplayMode();
 #endif
 
 #define stdDisplay_pCurDevice (*(stdVideoDevice**)0x0055B3E8)
