@@ -63,14 +63,14 @@ typedef struct rdProcEntry
     float extralight;
     uint32_t colormap;
     uint32_t light_flags;
-    float x_min;
-    float x_max;
-    float y_min;
-    float y_max;
+    int32_t x_min;
+    uint32_t x_max;
+    int32_t y_min;
+    uint32_t y_max;
     float z_min;
     float z_max;
-    float y_min_related;
-    float y_max_related;
+    int y_min_related;
+    int y_max_related;
     uint32_t vertexColorMode;
 } rdProcEntry;
 

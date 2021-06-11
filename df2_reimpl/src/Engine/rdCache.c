@@ -1160,16 +1160,16 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     int v6; // edx
     size_t current_rend_6c_idx; // eax
     rdProcEntry *procFace; // esi
-    float v9; // ecx
+    int v9; // ecx
     rdVector3 *v10; // edx
-    float y_min_related; // ebx
+    int y_min_related; // ebx
     double v12; // st7
     double v13; // st7
     double v14; // st7
     unsigned int v23; // ecx
     unsigned int v24; // eax
     unsigned int v25; // esi
-    float y_max_related; // [esp+Ch] [ebp-18h]
+    int y_max_related; // [esp+Ch] [ebp-18h]
     float v27; // [esp+10h] [ebp-14h]
     float z_max; // [esp+14h] [ebp-10h]
     float z_min; // [esp+18h] [ebp-Ch]
@@ -1193,13 +1193,18 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     z_min = 3.4e38;
     z_max = -3.4e38;
     procFace->extraData = a1;
-    v9 = 0.0;
+    v9 = 0;
     procFace->numVertices = num_vertices;
     procFace->vertexColorMode = v6;
+    
+    // Added
+    y_min_related = 0;
+    y_max_related = 0;
+    
     if ( num_vertices )
     {
         v10 = rdCache_aProcFaces[current_rend_6c_idx].vertices;
-        y_min_related = 3.4e38;
+
         do
         {
             v12 = v10->x;
@@ -1223,20 +1228,16 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
                 z_min = v10->z;
             if ( v14 > z_max )
                 z_max = v10->z;
-            (*(uint32_t*)&v9)++; // ??????? wtf is going on here
+            v9++; // There used to be some weird undefined behavior here with y_min_related
             ++v10;
         }
-        while ( (*(uint32_t*)&v9) < num_vertices );
-    }
-    else
-    {
-        y_min_related = 3.4e38;
+        while ( v9 < num_vertices );
     }
 
-    procFace->x_min = ceilf(x_min);
-    procFace->x_max = ceilf(x_max);
-    procFace->y_min = ceilf(y_min);
-    procFace->y_max = ceilf(y_max);
+    procFace->x_min = (int32_t)ceilf(x_min);
+    procFace->x_max = (int32_t)ceilf(x_max);
+    procFace->y_min = (int32_t)ceilf(y_min);
+    procFace->y_max = (int32_t)ceilf(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
     if ( procFace->x_min >= (unsigned int)procFace->x_max )
