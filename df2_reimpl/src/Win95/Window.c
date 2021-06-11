@@ -357,8 +357,13 @@ void Window_SdlUpdate()
     }
     else
     {
-        SDL_GL_SwapWindow(displayWindow);
+        
     }
+}
+
+void Window_SdlVblank()
+{
+    SDL_GL_SwapWindow(displayWindow);
 }
 
 int Window_Main_Linux(int argc, char** argv)
@@ -387,7 +392,7 @@ int Window_Main_Linux(int argc, char** argv)
 	displaySurface = SDL_GetWindowSurface(displayWindow);
 		
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
-    SDL_GL_SetSwapInterval(0); // Enable vsync
+    SDL_GL_SetSwapInterval(1); // Enable vsync
     
     menuSurface = SDL_CreateRGBSurface(0, 640, 480, 32,
                                         0x00FF0000,

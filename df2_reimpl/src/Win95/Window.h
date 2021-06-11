@@ -53,6 +53,7 @@ int Window_Main_Linux(int argc, char** argv);
 int Window_ShowCursorUnwindowed(int a1);
 int Window_MessageLoop();
 void Window_SdlUpdate();
+void Window_SdlVblank();
 #else
 static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;

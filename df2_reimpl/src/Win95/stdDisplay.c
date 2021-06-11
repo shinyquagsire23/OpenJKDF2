@@ -133,7 +133,7 @@ int stdDisplay_DDrawGdiSurfaceFlip()
 
 int stdDisplay_ddraw_waitforvblank()
 {
-    Window_SdlUpdate();
+    Window_SdlVblank();
     return 1;
 }
 

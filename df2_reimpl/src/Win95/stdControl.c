@@ -74,6 +74,12 @@ float stdControl_GetAxis2(int a)
     else if (state[SDL_SCANCODE_D] && a == 2) {
         return 1.0;
     }
+    else if (state[SDL_SCANCODE_UP] && a == 8) {
+        return 1.0;
+    }
+    else if (state[SDL_SCANCODE_DOWN] && a == 8) {
+        return -1.0;
+    }
 
     return 0.0;
 }
