@@ -38,6 +38,11 @@ int stdControl_Open()
     return 1;
 }
 
+int stdControl_Close()
+{
+    return 1;
+}
+
 int stdControl_ReadControls()
 {
     return 1;

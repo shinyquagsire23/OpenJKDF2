@@ -725,3 +725,13 @@ void sithWorld_sub_4D0A20(sithWorld *world)
         sector->field_8C = 0;
     }
 }
+
+void sithWorld_Free()
+{
+    if ( sithWorld_bLoaded )
+    {
+        sithWorld_FreeEntry(sithWorld_pCurWorld);
+        sithWorld_pCurWorld = 0;
+        sithWorld_bLoaded = 0;
+    }
+}

@@ -113,18 +113,29 @@ LABEL_11:
     sithTime_SetMs(curMs);
     stdConffile_Read(&g_sithMode, 24);
     sithThing_freestuff(sithWorld_pCurWorld);
+    
+    // Apparently this works by interpreting a bunch of netMsg packets from the
+    // savefile? Funky.
+#ifndef LINUX_TMP
     if ( stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
     {
-        while ( stdConffile_Read(&g_netMsgTmp.netMsg.msg_size, 4)
-             && (!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size))
-             && sithCogVm_InvokeMsgByIdx(&g_netMsgTmp.netMsg) )
+        while (1)
         {
+            if (!stdConffile_Read(&g_netMsgTmp.netMsg.msg_size, 4))
+                goto LABEL_25;
+            
+            if (!(!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size)))
+                goto LABEL_25;
+            
+            if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp.netMsg))
+                goto LABEL_25;
+
             if ( !stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
-                goto LABEL_20;
+                break;
         }
-        goto LABEL_25;
     }
-LABEL_20:
+#endif
+
     sithThing_sub_4CCE60();
     sithPlayer_idk(0);
     if ( sithSave_func3 )

@@ -79,6 +79,56 @@ int sithAI_Open()
     return 1;
 }
 
+void sithAI_Close()
+{
+    int v0; // ebx
+    int v1; // edx
+    int *v2; // ebp
+    sithActor *v3; // esi
+    int v4; // eax
+    sithActor *v5; // ecx
+    
+    if (sithAI_bOpened)
+        return;
+    
+    v0 = sithAI_inittedActors;
+    _memset(sithAI_actors, 0, sizeof(sithActor) * 256);
+
+    v1 = 255;
+    v2 = sithAI_actorInitted;
+    v3 = &sithAI_actors[255];
+    sithAI_maxActors = 256;
+
+    do
+    {
+        _memset(v3, 0, sizeof(sithActor));
+        if ( v1 == v0 )
+        {
+            v4 = v1 - 1;
+            if ( v1 - 1 >= 0 )
+            {
+                v5 = &sithAI_actors[v4];
+                do
+                {
+                    if ( v5->thing )
+                        break;
+                    --v4;
+                    --v5;
+                }
+                while ( v4 >= 0 );
+            }
+            v0 = v4;
+            sithAI_inittedActors = v4;
+        }
+        *v2++ = v1;
+        v3--;
+        --v1;
+    }
+    while ( (int)v3 >= (int)sithAI_actors );
+    
+    sithAI_bOpened = 0;
+}
+
 void sithAI_NewEntry(sithThing *thing)
 {
     sithAIClass *sith_ai; // edx

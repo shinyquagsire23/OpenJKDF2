@@ -51,7 +51,7 @@ int jkGame_Update()
     v1 = stdDisplay_GetPalette();
     stdPalEffects_UpdatePalette(v1);
     if ( Video_modeStruct.b3DAccel )
-        rdSetColorEffects(&stdPalEffects_state.field_14);
+        rdSetColorEffects(&stdPalEffects_state.effect);
     rdAdvanceFrame();
     if ( Video_modeStruct.b3DAccel )
     {

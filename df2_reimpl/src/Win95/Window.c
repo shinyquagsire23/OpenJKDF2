@@ -249,7 +249,6 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
-SDL_RendererInfo displayRendererInfo;
 SDL_Event event;
 SDL_GLContext glWindowContext;
 SDL_Surface* displaySurface;
@@ -348,9 +347,13 @@ void Window_SdlUpdate()
 
     if (!jkGame_isDDraw)
     {
-        SDL_RenderClear(displayRenderer);
-        SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
-        SDL_RenderPresent(displayRenderer);
+        std3D_StartScene();
+        std3D_DrawMenu();
+        std3D_EndScene();
+        SDL_GL_SwapWindow(displayWindow);
+        //SDL_RenderClear(displayRenderer);
+        //SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
+        //SDL_RenderPresent(displayRenderer);
     }
     else
     {
@@ -367,7 +370,6 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
     SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &displayWindow, &displayRenderer);
-    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
     
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -401,6 +403,9 @@ int Window_Main_Linux(int argc, char** argv)
                                             640, 480);
     
     glewInit();
+    
+    SDL_RenderClear(displayRenderer);
+    SDL_RenderPresent(displayRenderer);
     
     
     strcpy(cmdLine, "");

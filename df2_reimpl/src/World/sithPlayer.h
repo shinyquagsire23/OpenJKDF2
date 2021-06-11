@@ -61,6 +61,7 @@ typedef struct sithPlayerInfo
 } sithPlayerInfo;
 
 void sithPlayer_Initialize(int idx);
+void sithPlayer_Close();
 void sithPlayer_NewEntry(sithWorld *world);
 float sithPlayer_GetBinAmt(int idx);
 void sithPlayer_SetBinAmt(int idx, float amt);

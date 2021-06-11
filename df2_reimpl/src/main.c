@@ -73,6 +73,7 @@
 #include "Engine/sithMaterial.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithSound.h"
+#include "Engine/sithSoundSys.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -108,6 +109,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkDev.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGame.h"
@@ -224,6 +226,8 @@ void do_hooks()
     hook_function(jkMain_MainShow_ADDR, jkMain_MainShow);
     hook_function(jkMain_MainTick_ADDR, jkMain_MainTick);
     hook_function(jkMain_MainLeave_ADDR, jkMain_MainLeave);
+    hook_function(jkMain_MissionReload_ADDR, jkMain_MissionReload);
+    hook_function(jkMain_MenuReturn_ADDR, jkMain_MenuReturn);
 
     // jkEpisode
     hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
@@ -231,6 +235,9 @@ void do_hooks()
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
     hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
+    
+    // jkDev
+    hook_function(jkDev_Close_ADDR, jkDev_Close);
     
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
@@ -925,6 +932,8 @@ void do_hooks()
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
     hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
     hook_function(sithCamera_SetCurrentCamera_ADDR, sithCamera_SetCurrentCamera);
+    hook_function(sithCamera_Open_ADDR, sithCamera_Open);
+    hook_function(sithCamera_Close_ADDR, sithCamera_Close);
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
@@ -952,6 +961,7 @@ void do_hooks()
     hook_function(sithThing_ExitWater_ADDR, sithThing_ExitWater);
     hook_function(sithThing_Checksum_ADDR, sithThing_Checksum);
     hook_function(sithThing_netidk2_ADDR, sithThing_netidk2);
+    hook_function(sithThing_Free_ADDR, sithThing_Free);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -961,6 +971,7 @@ void do_hooks()
     hook_function(sithSector_ThingPhysGeneral_ADDR, sithSector_ThingPhysGeneral);
     hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
     hook_function(sithSector_UpdateSky_ADDR, sithSector_UpdateSky);
+    hook_function(sithSector_Free_ADDR, sithSector_Free);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1099,6 +1110,9 @@ void do_hooks()
     hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
     hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
+    
+    // sithSurface
+    hook_function(sithSurface_Free_ADDR, sithSurface_Free);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1165,6 +1179,8 @@ void do_hooks()
     hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
     hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
+    hook_function(jkSaber_Load_ADDR, jkSaber_Load);
+    hook_function(jkSaber_player_thingsidkfunc_ADDR, jkSaber_player_thingsidkfunc);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);
@@ -1564,8 +1580,14 @@ void do_hooks()
     
     hook_function(stdPlatform_GetTimeMsec_ADDR, stdPlatform_GetTimeMsec);
     
+    hook_function(sithControl_Close_ADDR, sithControl_Close);
+    
     hook_function(Video_SwitchToGDI_ADDR, Video_SwitchToGDI);
     
     hook_function(stdFileUtil_Deltree_ADDR, stdFileUtil_Deltree);
+    
+    hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
+    hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
+    hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
 #endif
 }

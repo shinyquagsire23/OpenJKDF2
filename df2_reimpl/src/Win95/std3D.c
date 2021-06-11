@@ -18,6 +18,7 @@
 #define TEX_MODE_BGR_WHITETRANSPARENCY 2
 #define TEX_MODE_TEST 3
 #define TEX_MODE_WORLDPAL 4
+#define TEX_MODE_DISPPAL 5
 
 static bool has_initted = false;
 static GLuint fb;
@@ -39,13 +40,16 @@ static int activeFb;
 int init_once = 0;
 GLuint program;
 GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette;
+GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_displayPalette;
 GLuint worldpal_texture;
 void* worldpal_data;
+GLuint displaypal_texture;
+void* displaypal_data;
 
 const char* gl_frag = 
 "uniform sampler2D tex;\n"
 "uniform sampler1D worldPalette;\n"
+"uniform sampler1D displayPalette;\n"
 "uniform int tex_mode;\n"
 "uniform int blend_mode;\n"
 "varying vec4 f_color;\n"
@@ -57,6 +61,7 @@ const char* gl_frag =
 "  vec4 vertex_color = f_color;\n"
 "  float index = sampled.r;\n"
 "  vec4 palval = texture1D(worldPalette, index);\n"
+"  vec4 palvald = texture1D(displayPalette, index);\n"
 "  vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
 "  \n"
 "  if (tex_mode == 0)\n"
@@ -84,6 +89,13 @@ const char* gl_frag =
 "    if (index == 0.0)\n"
 "      discard;\n"
 "    sampled_color = vec4(palval.r, palval.g, palval.b, transparency);\n"
+"  }\n"
+"  else if (tex_mode == 5)\n"
+"  {\n"
+"    float transparency = 1.0;\n"
+"    if (index == 0.0)\n"
+"      discard;\n"
+"    sampled_color = vec4(palvald.r, palvald.g, palvald.b, transparency);\n"
 "  }\n"
 "  \n"
 "  if (blend_mode == 5)\n"
@@ -207,8 +219,7 @@ int init_resources()
     // World palette
     glGenTextures(1, &worldpal_texture);
     worldpal_data = malloc(0x300);
-    
-    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
+    memset(worldpal_data, 0xFF, 0x300);
     
     glBindTexture(GL_TEXTURE_1D, worldpal_texture);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -218,12 +229,26 @@ int init_resources()
     
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     
+    
+    // Display palette
+    glGenTextures(1, &displaypal_texture);
+    displaypal_data = malloc(0x400);
+    memset(displaypal_data, 0xFF, 0x300);
+    
+    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+    
     const char* attribute_name;
     attribute_name = "coord3d";
     attribute_coord3d = glGetAttribLocation(program, attribute_name);
     if (attribute_coord3d == -1) {
         printf("Could not bind attribute %s!\n", attribute_name);
-        return false;
+        //return false;
     }
 
     attribute_name = "v_color";
@@ -231,7 +256,7 @@ int init_resources()
     if (attribute_v_color == -1) 
     {
         printf("Could not bind attribute %s!\n", attribute_name);
-        return false;
+        //return false;
     }
     
     attribute_name = "v_uv";
@@ -239,7 +264,7 @@ int init_resources()
     if (attribute_v_uv == -1) 
     {
         printf("Could not bind attribute %s!\n", attribute_name);
-        return false;
+        //return false;
     }
 
     const char* uniform_name;
@@ -248,7 +273,7 @@ int init_resources()
     if (uniform_mvp == -1) 
     {
         printf("Could not bind uniform %s!\n", uniform_name);
-        return false;
+        //return false;
     }
     
     uniform_name = "tex";
@@ -256,7 +281,7 @@ int init_resources()
     if (uniform_tex == -1) 
     {
         printf("Could not bind uniform %s!\n", uniform_name);
-        return false;
+        //return false;
     }
     
     uniform_name = "worldPalette";
@@ -264,7 +289,15 @@ int init_resources()
     if (uniform_worldPalette == -1) 
     {
         printf("Could not bind uniform %s!\n", uniform_name);
-        return false;
+        //return false;
+    }
+    
+    uniform_name = "displayPalette";
+    uniform_displayPalette = glGetUniformLocation(program, uniform_name);
+    if (uniform_displayPalette == -1) 
+    {
+        printf("Could not bind uniform %s!\n", uniform_name);
+        //return false;
     }
     
     uniform_name = "tex_mode";
@@ -272,7 +305,7 @@ int init_resources()
     if (uniform_tex_mode == -1) 
     {
         printf("Could not bind uniform %s!\n", uniform_name);
-        return false;
+        //return false;
     }
     
     uniform_name = "blend_mode";
@@ -280,7 +313,7 @@ int init_resources()
     if (uniform_blend_mode == -1) 
     {
         printf("Could not bind uniform %s!\n", uniform_name);
-        return false;
+        //return false;
     }
 
     has_initted = true;
@@ -292,7 +325,9 @@ void free_resources()
     deleteFramebuffer(fb1, fbTex1, fbRbo1);
     deleteFramebuffer(fb2, fbTex2, fbRbo2);
     glDeleteTextures(1, &worldpal_texture);
+    glDeleteTextures(1, &displaypal_texture);
     free(worldpal_data);
+    free(displaypal_data);
     has_initted = false;
 }
 
@@ -334,8 +369,21 @@ int std3D_StartScene()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	    
 	// Technically this should be from Clear2
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	
+	glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+	if (sithWorld_pCurWorld && sithWorld_pCurWorld->colormaps)
+	{
+	    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
+        glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+    }
+    
+    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
+    glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
 	
     return 1;
 }
@@ -355,6 +403,204 @@ void std3D_ResetRenderList()
 int std3D_RenderListVerticesFinish()
 {
     return 1;
+}
+
+static rdDDrawSurface* test_idk = NULL;
+
+void std3D_DrawMenu()
+{
+    GL_tmpVertices[0].x = 0.0;
+    GL_tmpVertices[0].y = 0.0;
+    GL_tmpVertices[0].z = 0.0;
+    GL_tmpVertices[0].tu = 0.0;
+    GL_tmpVertices[0].tv = 0.0;
+    *(uint32_t*)&GL_tmpVertices[0].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[0].nz = 0;
+    
+    GL_tmpVertices[1].x = 0.0;
+    GL_tmpVertices[1].y = 480.0;
+    GL_tmpVertices[1].z = 0.0;
+    GL_tmpVertices[1].tu = 0.0;
+    GL_tmpVertices[1].tv = 1.0;
+    *(uint32_t*)&GL_tmpVertices[1].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[1].nz = 0;
+    
+    GL_tmpVertices[2].x = 640.0;
+    GL_tmpVertices[2].y = 480.0;
+    GL_tmpVertices[2].z = 0.0;
+    GL_tmpVertices[2].tu = 1.0;
+    GL_tmpVertices[2].tv = 1.0;
+    *(uint32_t*)&GL_tmpVertices[2].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[2].nz = 0;
+    
+    GL_tmpVertices[3].x = 640.0;
+    GL_tmpVertices[3].y = 0.0;
+    GL_tmpVertices[3].z = 0.0;
+    GL_tmpVertices[3].tu = 1.0;
+    GL_tmpVertices[3].tv = 0.0;
+    *(uint32_t*)&GL_tmpVertices[3].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[3].nz = 0;
+    
+    GL_tmpTris[0].v1 = 1;
+    GL_tmpTris[0].v2 = 0;
+    GL_tmpTris[0].v3 = 2;
+    
+    GL_tmpTris[1].v1 = 2;
+    GL_tmpTris[1].v2 = 3;
+    GL_tmpTris[1].v3 = 0;
+    
+    GL_tmpVerticesAmt = 4;
+    GL_tmpTrisAmt = 2;
+    
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 640, 480, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+
+    // Generate vertices list
+    GLuint vbo_vertices, vbo_colors, vbo_uvs;
+    GLuint ibo_triangle;
+    GLfloat* data_vertices = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
+    GLfloat* data_colors = (GLfloat*)malloc(GL_tmpVerticesAmt * 4 * sizeof(GLfloat));
+    GLfloat* data_uvs = (GLfloat*)malloc(GL_tmpVerticesAmt * 2 * sizeof(GLfloat));
+    GLfloat* data_norms = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
+
+    D3DVERTEX* vertexes = GL_tmpVertices;
+
+    for (int i = 0; i < GL_tmpVerticesAmt; i++)
+    {
+        uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
+        uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
+        uint32_t v_unknz = *(uint32_t*)&vertexes[i].nz;
+        
+        /*printf("%f %f %f, %x %x %x, %f %f\n", vertexes[i].x, vertexes[i].y, vertexes[i].z,
+                                              v_unknx, v_color, v_unknz,
+                                              vertexes[i].tu, vertexes[i].tv);*/
+                                             
+        
+        uint8_t v_a = (v_color >> 24) & 0xFF;
+        uint8_t v_r = (v_color >> 16) & 0xFF;
+        uint8_t v_g = (v_color >> 8) & 0xFF;
+        uint8_t v_b = v_color & 0xFF;
+ 
+        data_vertices[(i*3)+0] = vertexes[i].x;
+        data_vertices[(i*3)+1] = vertexes[i].y;
+        data_vertices[(i*3)+2] = vertexes[i].z;
+        data_colors[(i*4)+0] = (float)v_r / 255.0f;
+        data_colors[(i*4)+1] = (float)v_g / 255.0f;
+        data_colors[(i*4)+2] = (float)v_b / 255.0f;
+        data_colors[(i*4)+3] = (float)v_a / 255.0f;
+        
+        data_uvs[(i*2)+0] = vertexes[i].tu;
+        data_uvs[(i*2)+1] = vertexes[i].tv;
+        
+        data_norms[(i*3)+0] = vertexes[i].nx;
+        data_norms[(i*3)+1] = vertexes[i].ny;
+        data_norms[(i*3)+2] = vertexes[i].nz;
+        //printf("nx, ny, nz %x %x %x, %f %f, %f\n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz, vertexes[i].z);
+    }
+    
+    glGenBuffers(1, &vbo_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STATIC_DRAW);
+    
+    
+    glGenBuffers(1, &vbo_colors);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLfloat), data_colors, GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &vbo_uvs);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
+    
+    glUniform1i(uniform_tex_mode, TEX_MODE_DISPPAL);
+    glUniform1i(uniform_blend_mode, 2);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+    glUniform1i(uniform_tex, 0);
+    glUniform1i(uniform_worldPalette, 1);
+    glUniform1i(uniform_displayPalette, 2);
+    
+    logic();
+    
+    rdTri* tris = GL_tmpTris;
+    glUseProgram(program);
+    glEnableVertexAttribArray(attribute_coord3d);
+    glEnableVertexAttribArray(attribute_v_color);
+    glEnableVertexAttribArray(attribute_v_uv);
+    
+    // Describe our vertices array to OpenGL (it can't guess its format automatically)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+    glVertexAttribPointer(
+        attribute_coord3d, // attribute
+        3,                 // number of elements per vertex, here (x,y,z)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+    glVertexAttribPointer(
+        attribute_v_color, // attribute
+        4,                 // number of elements per vertex, here (R,G,B,A)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
+    glVertexAttribPointer(
+        attribute_v_uv,    // attribute
+        2,                 // number of elements per vertex, here (U,V)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    rdDDrawSurface* last_tex = (void*)-1;
+    int last_tex_idx = 0;
+    GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
+    for (int j = 0; j < GL_tmpTrisAmt; j++)
+    {
+        data_elements[(j*3)+0] = tris[j].v1;
+        data_elements[(j*3)+1] = tris[j].v2;
+        data_elements[(j*3)+2] = tris[j].v3;
+    }
+
+    glGenBuffers(1, &ibo_triangle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
+
+    int tris_size;  
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
+    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(attribute_v_uv);
+    glDisableVertexAttribArray(attribute_v_color);
+    glDisableVertexAttribArray(attribute_coord3d);
+    glDeleteBuffers(1, &ibo_triangle);
+    
+    free(data_elements);
+        
+    glDeleteBuffers(1, &vbo_vertices);
+    glDeleteBuffers(1, &vbo_colors);
+    glDeleteBuffers(1, &vbo_uvs);
+    free(data_vertices);
+    free(data_colors);    
+    free(data_uvs);
+    free(data_norms);
+        
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void std3D_DrawRenderList()
@@ -453,8 +699,17 @@ void std3D_DrawRenderList()
     glBindBuffer(GL_ARRAY_BUFFER, vbo_norms);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_norms, GL_STATIC_DRAW);*/
     
-    glUniform1i(uniform_tex_mode, TEX_MODE_BGR);
+    glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glUniform1i(uniform_tex, 0);
+    glUniform1i(uniform_worldPalette, 1);
+    glUniform1i(uniform_displayPalette, 2);
     
     logic();
     
@@ -507,8 +762,6 @@ void std3D_DrawRenderList()
         0,                 // no extra data between each position
         0                  // offset of first element
     );*/
-
-    glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     
     rdDDrawSurface* last_tex = NULL;
     int last_tex_idx = 0;
@@ -526,6 +779,8 @@ void std3D_DrawRenderList()
         {
             int num_tris_batch = j - last_tex_idx;
             rdDDrawSurface* tex = tris[j].texture;
+            
+            test_idk = tex;
 
             if (num_tris_batch)
             {
@@ -545,12 +800,8 @@ void std3D_DrawRenderList()
             }
 
             int tex_id = tex->texture_id;
-            glActiveTexture(GL_TEXTURE0 + 1);
-            glBindTexture(GL_TEXTURE_1D, worldpal_texture);
             glActiveTexture(GL_TEXTURE0 + 0);
             glBindTexture(GL_TEXTURE_2D, tex_id);
-            glUniform1i(uniform_tex, 0);
-            glUniform1i(uniform_worldPalette, 1);
             glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
             
             if (tex_id == 0)

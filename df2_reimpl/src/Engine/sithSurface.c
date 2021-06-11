@@ -415,3 +415,32 @@ rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, float a2, uint16_t flags
     return result;
 }
 
+void sithSurface_Free(sithWorld *world)
+{
+    for (int i = 0; i < world->numSurfaces; i++)
+    {
+        sithSurface* surface = &world->surfaces[i];
+
+        surface->surfaceInfo.face.numVertices = 0;
+        if ( surface->surfaceInfo.face.vertexPosIdx )
+            pSithHS->free(surface->surfaceInfo.face.vertexPosIdx);
+        if ( surface->surfaceInfo.face.vertexUVIdx )
+            pSithHS->free(surface->surfaceInfo.face.vertexUVIdx);
+        if ( surface->surfaceInfo.field_40 )
+            pSithHS->free(surface->surfaceInfo.field_40);
+        surface->surfaceInfo.lastTouchedMs = 0;
+    }
+
+    pSithHS->free(world->surfaces);
+    world->surfaces = 0;
+    world->numSurfaces = 0;
+    sithSurface_numSurfaces_0 = 0;
+    if ( world->adjoins )
+    {
+        pSithHS->free(world->adjoins);
+        world->adjoins = 0;
+        world->numAdjoins = 0;
+        world->numAdjoinsLoaded = 0;
+    }
+}
+

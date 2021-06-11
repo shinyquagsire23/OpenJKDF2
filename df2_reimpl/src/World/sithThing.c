@@ -1414,3 +1414,78 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
         thing->waggle = sithUnk3_UpdateThingCollision(thing, &v1, arg4a, v2);
     }
 }
+
+void sithThing_freestuff(sithWorld *world)
+{
+    sithThing *thingIter; // esi
+    sithWorld *v3; // edx
+    int v4; // esi
+    int v5; // eax
+    int v7; // eax
+
+    if (!world->things)
+        return;
+
+    for (int v9 = 0; v9 < world->numThingsLoaded; v9++)
+    {
+        thingIter = &world->things[v9];
+        if (!thingIter->thingType)
+            continue;
+
+        if ( net_isMulti && net_isServer && (thingIter->thing_id & 0xFFFF0000) == 0 )
+            sithMulti_FreeThing(thingIter->thing_id);
+        if ( thingIter->attach_flags )
+            sithThing_DetachThing(thingIter);
+        if ( thingIter->sector )
+            sithThing_LeaveSector(thingIter);
+        if ( thingIter->move_type == MOVETYPE_PATH && thingIter->trackParams.frames )
+            pSithHS->free(thingIter->trackParams.frames);
+        if ( thingIter->thingtype == THINGTYPE_ACTOR )
+            sithAI_FreeEntry(thingIter);
+        if ( thingIter->thingType == THINGTYPE_PARTICLE )
+            sithParticle_FreeEntry(thingIter);
+        if ( thingIter->animclass )
+            sithPuppet_FreeEntry(thingIter);
+        rdThing_FreeEntry(&thingIter->rdthing);
+        sithSoundSys_FreeThing(thingIter);
+        v3 = sithWorld_pCurWorld;
+        thingIter->thingType = THINGTYPE_FREE;
+        thingIter->signature = 0;
+        thingIter->thing_id = -1;
+        v4 = thingIter->thingIdx;
+        if ( v4 == v3->numThings )
+        {
+            v5 = v4 - 1;
+            if ( v4 - 1 >= 0 )
+            {
+                do
+                {
+                    if (v3->things[v5].thingType)
+                        break;
+                    --v5;
+                }
+                while ( v5 >= 0 );
+            }
+            v3->numThings = v5;
+        }
+        v7 = net_things_idx;
+        net_things[net_things_idx] = v4;
+        net_things_idx = v7 + 1;
+    }
+}
+
+void sithThing_Free(sithWorld *world)
+{
+    // Added: !world check
+    if (!world || !world->things)
+    {
+        return;
+    }
+
+    sithThing_freestuff(world);
+
+    pSithHS->free(world->things);
+    world->things = 0;
+    world->numThingsLoaded = 0;
+    world->numThings = -1;
+}

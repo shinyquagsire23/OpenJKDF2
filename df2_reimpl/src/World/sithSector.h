@@ -220,6 +220,7 @@ int sithSector_GetIdxFromPtr(sithSector *sector);
 void sithSector_SetAdjoins(sithSector *sector);
 void sithSector_UnsetAdjoins(sithSector *sector);
 int sithSector_GetThingsCount(sithSector *sector);
+void sithSector_Free(sithWorld *world);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -227,7 +228,7 @@ int sithSector_GetThingsCount(sithSector *sector);
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
 static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
 static void (*sithSector_ThingSetLook)(sithThing *a1, rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
-static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
+//static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 
 static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
 static int (*sithSector_cogMsg_SendStopAnim)(sithSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;

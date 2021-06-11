@@ -80,11 +80,13 @@ typedef struct jkGuiStateFuncs
 } jkGuiStateFuncs;
 
 void jkMain_GuiAdvance();
+void jkMain_EscapeMenuShow();
 void jkMain_EscapeMenuTick(int a2);
+void jkMain_EscapeMenuLeave(int a2, int a3);
 void jkMain_GameplayShow(int a1, int a2);
 void jkMain_GameplayTick(int a2);
 void jkMain_GameplayLeave(int a2, int a3);
-int jkMain_TitleShow();
+void jkMain_TitleShow();
 void jkMain_TitleTick();
 void jkMain_TitleLeave();
 void jkMain_MainShow();
@@ -94,7 +96,7 @@ void jkMain_ChoiceShow();
 void jkMain_ChoiceTick();
 void jkMain_ChoiceLeave();
 void jkMain_UnkShow();
-int jkMain_UnkTick();
+void jkMain_UnkTick();
 void jkMain_UnkLeave();
 int jkMain_LoadFile(char *a1);
 
@@ -103,6 +105,8 @@ int jkMain_CdSwitch(int a1, int bIsAPath);
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
 void jkMain_do_guistate6();
 int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
+int jkMain_MissionReload();
+int jkMain_MenuReturn();
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
@@ -110,7 +114,7 @@ static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 //static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
 static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
 static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;
-static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
+//static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
 static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 //static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
 

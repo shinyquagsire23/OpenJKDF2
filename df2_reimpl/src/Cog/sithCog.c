@@ -230,6 +230,19 @@ LABEL_26:
     return result;
 }
 
+void sithCog_Close()
+{
+    if ( sithCog_bOpened )
+    {
+        sithCog_SendMessageToAll(COGMSG_SYNCTHINGATTACHMENT, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0);
+        sithCog_numSectorLinks = 0;
+        sithCog_numSurfaceLinks = 0;
+        sithCog_numThingLinks = 0;
+        sithCog_masterCog = 0;
+        sithCog_bOpened = 0;
+    }
+}
+
 int sithCog_Load(sithWorld *world, int a2)
 {
     int num_cogs; // esi

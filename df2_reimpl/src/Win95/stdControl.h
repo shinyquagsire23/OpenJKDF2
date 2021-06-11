@@ -46,6 +46,7 @@ int stdControl_MessageHandler(int a1, int a2, int a3);
 
 #ifdef WIN32
 static int (*stdControl_Open)() = (void*)stdControl_Open_ADDR;
+static int (*stdControl_Close)() = (void*)stdControl_Close_ADDR;
 static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;
 static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
 static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
@@ -54,6 +55,7 @@ static int (*stdControl_FinishRead)() = (void*)stdControl_FinishRead_ADDR;
 static float (*stdControl_GetAxis2)(int a1) = (void*)stdControl_GetAxis2_ADDR;
 #else
 int stdControl_Open();
+int stdControl_Close();
 void stdControl_Flush();
 void stdControl_ToggleCursor(int a);
 int stdControl_ShowCursor(int a);

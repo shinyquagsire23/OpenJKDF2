@@ -71,6 +71,12 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
     return 1;
 }
 
+void sithCamera_Close()
+{
+    if ( sithCamera_bOpen )
+        sithCamera_bOpen = 0;
+}
+
 void sithCamera_SetsFocus()
 {
     sithThing *v0; // eax

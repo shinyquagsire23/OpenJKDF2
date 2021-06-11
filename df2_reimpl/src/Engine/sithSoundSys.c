@@ -128,4 +128,25 @@ void sithSoundSys_ResumeMusic(int a1)
 {
     
 }
+
+void sithSoundSys_StopAll()
+{
+}
+
+void sithSoundSys_ResumeAll()
+{
+}
+
+void sithSoundSys_sub_4DBF90()
+{
+}
+
+void sithSoundSys_Close()
+{
+    sithSoundSys_bOpened = 0;
+}
+
+void sithSoundSys_StopSong()
+{
+}
 #endif

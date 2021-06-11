@@ -34,6 +34,17 @@ void sithPlayer_Initialize(int idx)
     }
 }
 
+void sithPlayer_Close()
+{
+    if ( g_selfPlayerInfo )
+    {
+        stdPalEffects_FreeRequest(g_selfPlayerInfo->palEffectsIdx1);
+        stdPalEffects_FreeRequest(g_selfPlayerInfo->palEffectsIdx2);
+    }
+    g_localPlayerThing = 0;
+    g_selfPlayerInfo = 0;
+}
+
 void sithPlayer_NewEntry(sithWorld *world)
 {
     sithThing *v1; // eax

@@ -753,8 +753,9 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash);
 int sithThing_netidk2(int a1);
 int sithThing_GetIdxFromThing(sithThing *thing);
 void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
+void sithThing_freestuff(sithWorld *world);
+void sithThing_Free(sithWorld *world);
 
-static void (*sithThing_freestuff)(sithWorld *world) = (void*)sithThing_freestuff_ADDR;
 static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;
@@ -764,7 +765,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static int (__cdecl *sithThing_DoesRdThingInit)(sithThing *thing) = (void*)0x4CD190;
 //static int (__cdecl *sithThing_sub_4CD8A0)(sithThing *thing, sithThing *a2) = (void*)0x4CD8A0;
 //static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
-static void (*sithThing_Free)(sithWorld* world) = (void*)sithThing_Free_ADDR;
+//static void (*sithThing_Free)(sithWorld* world) = (void*)sithThing_Free_ADDR;
 
 static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;

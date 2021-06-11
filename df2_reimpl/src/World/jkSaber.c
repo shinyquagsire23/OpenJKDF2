@@ -16,6 +16,8 @@
 #include "World/sithUnk3.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
+#include "Main/jkEpisode.h"
+#include "Main/jkRes.h"
 #include "Gui/jkGUINet.h"
 #include "jk.h"
 
@@ -33,10 +35,6 @@
 #define jkSaber_cogMsg_HandleSetSaberInfo ((void*)jkSaber_cogMsg_HandleSetSaberInfo_ADDR)
 #define jkSaber_cogMsg_HandleSetTeam ((void*)jkSaber_cogMsg_HandleSetTeam_ADDR)
 #define jkSaber_playerconfig_idksync ((void*)jkSaber_playerconfig_idksync_ADDR)
-#define jkSaber_player_thingsidkfunc ((void*)jkSaber_player_thingsidkfunc_ADDR)
-#define jkSaber_nullsub_2 ((void*)jkSaber_nullsub_2_ADDR)
-#define jkSaber_Write ((void*)jkSaber_Write_ADDR)
-#define jkSaber_Load ((void*)jkSaber_Load_ADDR)
 #define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
 
 int jkSaber_Startup()
@@ -381,4 +379,32 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
     
     sithUnk3_SearchClose();
     return;
+}
+
+int jkSaber_Load()
+{
+    char a1[32]; // [esp+0h] [ebp-20h] BYREF
+
+    stdConffile_Read(a1, 32);
+    jkRes_LoadGob(a1);
+    return stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
+}
+
+int jkSaber_Write()
+{
+    stdConffile_Write(jkRes_episodeGobName, 32);
+    return stdConffile_Write(&jkEpisode_mLoad.field_8, 4);
+}
+
+void jkSaber_player_thingsidkfunc()
+{
+    int v0; // eax
+
+    v0 = jkSmack_GetCurrentGuiState();
+    if ( v0 == 6 || v0 == 5 )
+        jkPlayer_Shutdown();
+}
+
+void jkSaber_nullsub_2()
+{
 }

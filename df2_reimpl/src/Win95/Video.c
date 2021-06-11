@@ -36,8 +36,10 @@ static uint32_t aGammaTable[20] = {
 void Video_SwitchToGDI()
 {
     jkDev_Close();
+#ifndef LINUX_TMP
     jkHud_Deinit();
     jkHudInv_deinit_menu_graphics_maybe();
+#endif
     sithCamera_Close();
 #ifndef LINUX
     rdCanvas_Free(Video_pCanvas);

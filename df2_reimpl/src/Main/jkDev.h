@@ -1,6 +1,8 @@
 #ifndef _JKDEV_H
 #define _JKDEV_H
 
+#include "types.h"
+
 #define jkDev_Startup_ADDR (0x0041F100)
 #define jkDev_Shutdown_ADDR (0x0041F6A0)
 #define jkDev_Open_ADDR (0x0041F6E0)
@@ -41,11 +43,16 @@
 #define jkDev_CmdTeam_ADDR (0x00420F80)
 #define jkDev_DialogFunc_ADDR (0x00420FD0)
 
+#define jkDev_bInitted (*(int*)0x0055A9B4)
+#define jkDev_bOpened (*(int*)0x0055A9B8)
+#define jkDev_vbuf (*(stdVBuffer**)0x0055A9C4)
+
+void jkDev_Close();
+
 static int (*jkDev_Startup)(void) = (void*)jkDev_Startup_ADDR;
 static int (*jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
 static int (*jkDev_sub_41FC40)(int a1, char *a2) = (void*)jkDev_sub_41FC40_ADDR;
 static int (*jkDev_sub_41F950)() = (void*)jkDev_sub_41F950_ADDR;
 static int (*jkDev_DrawLog)() = (void*)jkDev_DrawLog_ADDR;
-static void (*jkDev_Close)() = (void*)jkDev_Close_ADDR;
 
 #endif // _JKDEV_H

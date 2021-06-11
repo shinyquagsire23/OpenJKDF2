@@ -20,7 +20,11 @@ uint8_t* stdDisplay_GetPalette()
 
 #else
 #include <SDL2/SDL.h>
+#include <GL/gl.h>
 #include <assert.h>
+
+uint32_t Video_menuTexId;
+rdColor24 stdDisplay_masterPalette[256];
 
 int stdDisplay_Startup()
 {
@@ -106,6 +110,13 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
     
+    glGenTextures(1, &Video_menuTexId);
+    glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 640, 480, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    
     return 1;
 }
 
@@ -129,6 +140,9 @@ int stdDisplay_ddraw_waitforvblank()
 int stdDisplay_SetMasterPalette(uint8_t* pal)
 {
     rdColor24* pal24 = (rdColor24*)pal;
+    
+    memcpy(stdDisplay_masterPalette, pal24, sizeof(stdDisplay_masterPalette));
+    
     SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
     for (int i = 0; i < 256; i++)
     {

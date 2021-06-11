@@ -36,6 +36,15 @@ int sithControl_Open()
     return 0;
 }
 
+void sithControl_Close()
+{
+    if ( sithControl_bOpened )
+    {
+        if ( stdControl_Close() )
+            sithControl_bOpened = 0;
+    }
+}
+
 void sithControl_Tick(float deltaSecs, int deltaMs)
 {
     if ( !sithControl_bOpened )

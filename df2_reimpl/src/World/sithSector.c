@@ -732,3 +732,15 @@ int sithSector_GetThingsCount(sithSector *sector)
         i = i->nextThing;
     return result;
 }
+
+void sithSector_Free(sithWorld *world)
+{
+    for (uint32_t i = 0; i < world->numSectors; i++)
+    {
+        if ( world->sectors[i].verticeIdxs )
+            pSithHS->free(world->sectors[i].verticeIdxs);
+    }
+    pSithHS->free(world->sectors);
+    world->sectors = 0;
+    world->numSectors = 0;
+}

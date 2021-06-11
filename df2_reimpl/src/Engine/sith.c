@@ -163,6 +163,28 @@ int sith_Mode1Init_2(char *path)
     return 1;
 }
 
+void sith_Close()
+{
+    if ( sith_bOpened )
+    {
+        sithSoundSys_StopSong();
+        sithRender_Close();
+        sithSector_Shutdown();
+        sithControl_Close();
+        sithCog_Close();
+        sithSoundSys_Close();
+        sithWorld_Free();
+        sithAI_Close();
+        sithSurface_Startup2();
+        sithTimer_Close();
+        sithPlayer_Close();
+        sithWeapon_ShutdownEntry();
+        g_sithMode = 0;
+        g_submodeFlags = 0;
+        sith_bOpened = 0;
+    }
+}
+
 int sith_Tick()
 {
     if ( (g_submodeFlags & 8) != 0 )

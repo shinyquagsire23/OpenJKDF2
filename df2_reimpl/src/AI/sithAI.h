@@ -65,6 +65,7 @@ typedef struct sithAICommand
 
 int sithAI_Startup();
 int sithAI_Open();
+void sithAI_Close();
 void sithAI_NewEntry(sithThing *thing);
 void sithAI_FreeEntry(sithThing *thing);
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);

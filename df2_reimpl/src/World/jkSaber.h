@@ -50,6 +50,10 @@ void jkSaber_PolylineRand(rdThing *thing);
 void jkSaber_Draw(rdMatrix34 *posRotMat);
 void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint);
+int jkSaber_Load();
+int jkSaber_Write();
+void jkSaber_player_thingsidkfunc();
+void jkSaber_nullsub_2();
 
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
 static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;

@@ -127,6 +127,7 @@ enum INPUT_FUNC
 
 int sithControl_IsOpen();
 int sithControl_Open();
+void sithControl_Close();
 void sithControl_Tick(float deltaSecs, int deltaMs);
 void sithControl_AddInputHandler(void *a1);
 int sithControl_HandlePlayer(sithThing *player_, float a2);
@@ -135,7 +136,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 //static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
-static int (*sithControl_Close)() = (void*)sithControl_Close_ADDR;
+//static int (*sithControl_Close)() = (void*)sithControl_Close_ADDR;
 //static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 
 //static void (*sithControl_PlayerLook)(sithThing *player, float a3) = (void*)sithControl_PlayerLook_ADDR;

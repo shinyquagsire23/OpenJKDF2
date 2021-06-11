@@ -154,6 +154,9 @@ static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_wa
 static void (*stdDisplay_ddraw_surface_flip2)() = (void*)stdDisplay_ddraw_surface_flip2_ADDR;
 static void (*stdDisplay_RestoreDisplayMode)() = (void*)stdDisplay_RestoreDisplayMode_ADDR;
 #else
+extern uint32_t Video_menuTexId;
+extern rdColor24 stdDisplay_masterPalette[256];
+
 int stdDisplay_Startup();
 int stdDisplay_VBufferFill(stdVBuffer *a2, int fillColor, rdRect *a4);
 int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe);

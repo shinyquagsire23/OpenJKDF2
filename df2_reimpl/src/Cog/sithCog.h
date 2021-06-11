@@ -146,6 +146,7 @@ static void (*sithCog_HandleThingTimerPulse)(sithThing *a1) = (void*)sithCog_Han
 int sithCog_Startup();
 void sithCog_Shutdown();
 int sithCog_Open();
+void sithCog_Close();
 int sithCog_Load(sithWorld *world, int a2);
 sithCog* sithCog_LoadCogscript(const char *fpath);
 int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);

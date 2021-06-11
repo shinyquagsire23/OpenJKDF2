@@ -5,23 +5,21 @@
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
 #include "Engine/sithControl.h"
+#include "Engine/sithSoundSys.h"
+#include "Engine/sithSave.h"
+#include "Engine/sithCamera.h"
+#include "Engine/sithMulti.h"
+#include "Engine/sithRender.h"
+#include "Engine/sithCamera.h"
+#include "Engine/sithTime.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGame.h"
 #include "Main/jkCutscene.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkEpisode.h"
+#include "Main/jkRes.h"
+#include "Main/jkStrings.h"
 #include "Gui/jkGUIRend.h"
-#include "World/jkPlayer.h"
-#include "World/jkSaber.h"
-#include "Win95/stdControl.h"
-#include "Win95/Windows.h"
-#include "Win95/Video.h"
-#include "stdPlatform.h"
-#include "jkGame.h"
-#include "Engine/sithSoundSys.h"
-#include "Engine/sithSave.h"
-#include "Engine/sithCamera.h"
-#include "Win95/sithDplay.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUINet.h"
 #include "Gui/jkGUIMultiTally.h"
@@ -29,15 +27,18 @@
 #include "Gui/jkGUIMain.h"
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
-#include "Engine/sithMulti.h"
-#include "Engine/sithRender.h"
-#include "Engine/sithCamera.h"
+#include "Gui/jkGUIEsc.h"
+#include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"
+#include "Win95/stdControl.h"
+#include "Win95/Windows.h"
+#include "Win95/Video.h"
+#include "Win95/sithDplay.h"
 #include "Win95/stdDisplay.h"
-#include "Main/jkRes.h"
-#include "Main/jkStrings.h"
 #include "General/util.h"
+#include "General/stdBitmap.h"
+#include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
 #define TICKRATE_MS (1) // no cap
@@ -54,8 +55,6 @@
 #define jkMain_CreditsShow ((void*)(0x00404480))
 #define jkMain_CreditsTick ((void*)(0x004044B0))
 #define jkMain_CreditsLeave ((void*)(0x004044E0))
-#define jkMain_EscapeMenuShow ((void*)(0x00403F40))
-#define jkMain_EscapeMenuLeave ((void*)(0x004040A0))
 #define jkMain_EndLevelScreenShow ((void*)(0x004041A0))
 #define jkMain_EndLevelScreenTick ((void*)(0x00404240))
 #define jkMain_EndLevelScreenLeave ((void*)(0x00404250))
@@ -90,7 +89,7 @@ void jkMain_GuiAdvance()
     void (__cdecl *v5)(int, int); // ecx
     int v6; // eax
     void (__cdecl *v7)(int, int); // ecx
-    int (__cdecl *v8)(int); // ecx
+    void (__cdecl *v8)(int); // ecx
 
     if ( !g_app_suspended )
     {
@@ -189,6 +188,14 @@ LABEL_35:
     }
 }
 
+void jkMain_EscapeMenuShow()
+{
+    if ( !net_isMulti )
+        sithTime_Pause();
+    jkGui_SetModeMenu(jkGui_stdBitmaps[4]->palette);
+    jkGuiEsc_Show();
+}
+
 void jkMain_EscapeMenuTick(int a2)
 {
     unsigned int v1; // esi
@@ -238,6 +245,58 @@ void jkMain_EscapeMenuTick(int a2)
             }
         }
     }
+}
+
+void jkMain_EscapeMenuLeave(int a2, int a3)
+{
+    int v3; // eax
+
+    if ( !net_isMulti )
+        sithTime_Resume();
+    if ( a3 != 5 )
+    {
+        if ( a3 == 6 )
+        {
+            stdControl_ToggleCursor(0);
+            sithSoundSys_StopAll();
+        }
+        if ( jkGame_isDDraw )
+        {
+            Windows_ShutdownGdi();
+            Video_SwitchToGDI();
+            jkPlayer_nullsub_30();
+            jkGame_isDDraw = 0;
+        }
+        if ( a3 != 6 && jkMain_bInit )
+        {
+            jkPlayer_Shutdown();
+            sith_Close();
+            jkMain_bInit = 0;
+            thing_eight = 0;
+        }
+        if ( net_isMulti && a3 != 6 )
+        {
+            thing_eight = 0;
+            if ( a3 == 3 )
+                sithMulti_Shutdown();
+            else
+                sithMulti_LobbyMessage();
+            if ( net_isServer )
+                DirectPlay_SetSessionFlagidk(0);
+            thing_six = 1;
+            v3 = jkGuiMultiTally_Show(net_isMulti);
+            thing_six = 0;
+            if ( v3 == -1 )
+            {
+                sithMulti_Shutdown();
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = 3;
+            }
+        }
+    }
+    jkGui_SetModeGame();
 }
 
 void jkMain_GameplayShow(int a1, int a2)
@@ -490,14 +549,12 @@ void jkMain_GameplayLeave(int a2, int a3)
     }
 }
 
-int jkMain_TitleShow()
+void jkMain_TitleShow()
 {
     jkGuiTitle_ShowLoadingStatic();
     sith_Load("static.jkl");
 #ifndef LINUX_TMP
-    return jkHudInv_items_init();
-#else
-    return 1;
+    jkHudInv_items_init();
 #endif
 }
 
@@ -562,7 +619,7 @@ void jkMain_UnkShow()
     ;
 }
 
-int jkMain_UnkTick()
+void jkMain_UnkTick()
 {
     jkRes_LoadGob(jkMain_strIdk);
     if ( jkEpisode_mLoad.paEntries )
@@ -577,7 +634,6 @@ int jkMain_UnkTick()
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 5;
-    return 1;
 }
 
 void jkMain_UnkLeave()
@@ -850,6 +906,30 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 14;
     return 1;
+}
+
+int jkMain_MissionReload()
+{
+    signed int result; // eax
+
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 5;
+    return result;
+}
+
+int jkMain_MenuReturn()
+{
+    signed int result; // eax
+
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 3;
+    return result;
 }
 
 #ifdef LINUX
