@@ -189,8 +189,11 @@ int sithSurface_Load(sithWorld *world)
                     wallCel = face->material->celIdx;
                 v66 = face->material->texinfos[wallCel];
             }
-            if ( (world->adjoins[numAdjoins].flags & 1) == 0
-              || face->material && face->geometryMode && (face->type & 2) == 0 && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0) )
+            if ( (world->adjoins[adjoinIdx].flags & 1) == 0
+              || (face->material 
+                  && face->geometryMode 
+                  && (face->type & 2) == 0 
+                  && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0)))
             {
                 surfaceAdjoin->flags |= 0x80;
             }

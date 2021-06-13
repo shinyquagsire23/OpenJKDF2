@@ -16,6 +16,7 @@
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkDev.h"
+#include "Engine/rdColormap.h"
 
 #include "stdPlatform.h"
 #include "jk.h"
@@ -124,10 +125,12 @@ int jkGame_Update()
     jkHudInv_render_itemsmaybe();
     if ( Video_modeStruct.b3DAccel )
         std3D_DrawOverlay();
+
     if ( Video_modeStruct.b3DAccel )
         result = stdDisplay_DDrawGdiSurfaceFlip();
     else
         result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, 0, 0);
+
     return result;
 }
 #else
@@ -141,19 +144,26 @@ int jkGame_Update()
     int result; // eax
     int v6; // [esp+1Ch] [ebp-1Ch]
 
-    if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
-        stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
-    //jkDev_DrawLog();
-    //jkHudInv_render_textmaybe();
-    //jkHud_render_idktexs(0);
+    // HACK
+    Video_modeStruct.b3DAccel = 1;
     
+    //if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
+        stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
+#ifndef LINUX_TMP
+    jkDev_DrawLog();
+    jkHudInv_render_textmaybe();
+    jkHud_render_idktexs(0);
+#endif
     // HACK
     rdroid_curColorEffects.fade = 1.0;
-    
-    //v1 = stdDisplay_GetPalette();
-    //stdPalEffects_UpdatePalette(v1);
+
+#ifndef LINUX_TMP
+    v1 = stdDisplay_GetPalette();
+    stdPalEffects_UpdatePalette(v1);
     //if ( Video_modeStruct.b3DAccel )
-    //    rdSetColorEffects(&stdPalEffects_state.field_14);
+        rdSetColorEffects(&stdPalEffects_state.effect);
+#endif
+    memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )
     {
@@ -168,7 +178,6 @@ int jkGame_Update()
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
     }*/
     jkPlayer_DrawPov();
-    rdFinishFrame();
 
     /*if ( Main_bDispStats )
     {
@@ -220,13 +229,24 @@ int jkGame_Update()
             Video_lastTimeMsec = Video_dword_5528A8;
             Video_dword_5528A4 = Video_dword_5528A0;
         }
-    }
-    if ( (0x800000 & playerThings[playerThingIdx].actorThing->actorParams.typeflags) == 0 )
+    }*/
+#ifndef LINUX_TMP
+    //if ( (0x800000 & playerThings[playerThingIdx].actorThing->actorParams.typeflags) == 0 )
         jkHud_gui_render();
     jkDev_sub_41F950();
-    jkHudInv_render_itemsmaybe();*/
+    jkHudInv_render_itemsmaybe();
     //if ( Video_modeStruct.b3DAccel )
     //    std3D_DrawOverlay();
+#endif
+
+    for (int i = 0; i < 256; i++)
+    {
+        rdRect test = {i*2, 0, 2, 2};
+        //stdDisplay_VBufferFill(Video_pMenuBuffer, i, &test);
+    }
+    std3D_DrawMenu();
+    rdFinishFrame();
+
     if ( Video_modeStruct.b3DAccel )
         result = stdDisplay_DDrawGdiSurfaceFlip();
     else

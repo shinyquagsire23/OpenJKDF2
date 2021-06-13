@@ -24,5 +24,6 @@ static int (*jkHudInv_render_textmaybe)() = (void*)jkHudInv_render_textmaybe_ADD
 static void (*jkHudInv_deinit_menu_graphics_maybe)() = (void*)jkHudInv_deinit_menu_graphics_maybe_ADDR;
 //static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
 //static int (*jkHudInv_ItemDatLoad)(char*) = (void*)jkHudInv_ItemDatLoad_ADDR;
+static void (*jkHudInv_LoadItemRes)() = (void*)jkHudInv_LoadItemRes_ADDR;
 
 #endif // _JKHUDINV_H

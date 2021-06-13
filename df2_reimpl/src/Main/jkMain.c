@@ -16,6 +16,8 @@
 #include "Main/jkGame.h"
 #include "Main/jkCutscene.h"
 #include "Main/jkHudInv.h"
+#include "Main/jkHud.h"
+#include "Main/jkDev.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
@@ -38,6 +40,7 @@
 #include "Win95/stdDisplay.h"
 #include "General/util.h"
 #include "General/stdBitmap.h"
+#include "General/stdPalEffects.h"
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
@@ -957,6 +960,17 @@ int jkMain_SetVideoMode()
     
     sithControl_Open();
     sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
+#ifndef LINUX_TMP
+    stdDisplay_pCurVideoMode->format.width = 640;
+    stdDisplay_pCurVideoMode->format.height = 480;
+    _memcpy((void*)0x8600E0, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy((void*)0x85FF60, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    stdPalEffects_RefreshPalette();
+    sithRender_SetPalette(stdDisplay_GetPalette());
+    jkHudInv_LoadItemRes();
+    jkHud_InitRes();
+    jkDev_Open();
+#endif
     
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, 640, 480, 6);

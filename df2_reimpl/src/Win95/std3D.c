@@ -132,6 +132,9 @@ static size_t GL_tmpTrisAmt = 0;
 static D3DVERTEX GL_tmpVertices[4096];
 static size_t GL_tmpVerticesAmt = 0;
 
+rdDDrawSurface* last_tex = NULL;
+int last_flags = 0;
+
 void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
 {
 	// Generate the framebuffer
@@ -391,6 +394,8 @@ int std3D_StartScene()
 int std3D_EndScene()
 {
     //printf("End draw\n");
+    last_tex = NULL;
+    last_flags = 0;
     return 1;
 }
 
@@ -409,6 +414,8 @@ static rdDDrawSurface* test_idk = NULL;
 
 void std3D_DrawMenu()
 {
+    glDepthFunc(GL_ALWAYS);
+
     GL_tmpVertices[0].x = 0.0;
     GL_tmpVertices[0].y = 0.0;
     GL_tmpVertices[0].z = 0.0;
@@ -638,6 +645,8 @@ void std3D_DrawRenderList()
     
     GL_tmpVerticesAmt = 3;
     GL_tmpTrisAmt = 1;*/
+    
+    last_tex = NULL;
 
     // Generate vertices list
     GLuint vbo_vertices, vbo_colors, vbo_uvs;
@@ -763,7 +772,6 @@ void std3D_DrawRenderList()
         0                  // offset of first element
     );*/
     
-    rdDDrawSurface* last_tex = NULL;
     int last_tex_idx = 0;
     GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -773,9 +781,19 @@ void std3D_DrawRenderList()
         data_elements[(j*3)+2] = tris[j].v3;
     }
     
+    int do_batch = 0;
+    
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
+    
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
-        if (tris[j].texture != last_tex)
+        if (tris[j].texture != last_tex || tris[j].flags != last_flags)
+        {
+            do_batch = 1;
+        }
+        
+        if (do_batch)
         {
             int num_tris_batch = j - last_tex_idx;
             rdDDrawSurface* tex = tris[j].texture;
@@ -799,16 +817,60 @@ void std3D_DrawRenderList()
                 glDeleteBuffers(1, &ibo_triangle);
             }
 
-            int tex_id = tex->texture_id;
-            glActiveTexture(GL_TEXTURE0 + 0);
-            glBindTexture(GL_TEXTURE_2D, tex_id);
-            glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
-            
-            if (tex_id == 0)
+            if (tex)
+            {
+                int tex_id = tex->texture_id;
+                glActiveTexture(GL_TEXTURE0 + 0);
+                glBindTexture(GL_TEXTURE_2D, tex_id);
+                glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
+                
+                if (tex_id == 0)
+                    glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
+            }
+            else
+            {
+                glActiveTexture(GL_TEXTURE0 + 0);
+                glBindTexture(GL_TEXTURE_2D, 0);
                 glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
+            }
+            
+            int changed_flags = (last_flags ^ tris[j].flags);
+
+            if (changed_flags & 0x600)
+            {
+                if (tris[j].flags & 0x600)
+                    glUniform1i(uniform_blend_mode, 5);
+                else
+                    glUniform1i(uniform_blend_mode, 2);
+            }
+            
+            if (changed_flags & 0x1800)
+            {
+                if (tris[j].flags & 0x800)
+                {
+                    glDepthFunc(GL_LESS);
+                }
+                else
+                {
+                    glDepthFunc(GL_LESS);
+                    glClear(GL_DEPTH_BUFFER_BIT);
+                }
+                
+                if (changed_flags & 0x1000)
+                {
+                    glDepthMask(GL_TRUE);
+                }
+                else
+                {
+                    //glDepthMask(GL_FALSE);
+                }
+            }
             
             last_tex = tris[j].texture;
+            last_flags = tris[j].flags;
             last_tex_idx = j;
+
+            do_batch = 0;
         }
         //printf("tri %u,%u,%u, flags %x\n", tris[j].v1, tris[j].v2, tris[j].v3, tris[j].flags);
         

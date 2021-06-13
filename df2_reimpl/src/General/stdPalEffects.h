@@ -76,5 +76,6 @@ static void (*stdPalEffects_SetFade)(int a1, float a2) = (void*)stdPalEffects_Se
 //static void (*stdPalEffects_FreeRequest)(int a1) = (void*)stdPalEffects_FreeRequest_ADDR;
 static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
 static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
+static void (*stdPalEffects_RefreshPalette)() = (void*)stdPalEffects_RefreshPalette_ADDR;
 
 #endif // _STDPALEFFECTS_H

@@ -62,6 +62,8 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
 {
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
+    stdDisplay_pCurVideoMode->format.format.bpp = 8;
+    
     _memcpy(&Video_otherBuf.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_otherBuf.format));
     _memcpy(&Video_menuBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_menuBuffer.format));
     
@@ -231,6 +233,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
         //return;
     }
     
+    //if (vbuf == &Video_menuBuffer)
+    //    printf("Vbuffer copy to menu %u,%u %ux%u %u,%u\n", rect->x, rect->y, rect->width, rect->height, blit_x, blit_y);
+    
     if (vbuf->palette)
     {
         rdColor24* pal24 = vbuf->palette;
@@ -271,6 +276,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     uint32_t srcStride = vbuf2->format.width_in_bytes;
     uint32_t dstStride = vbuf->format.width_in_bytes;
     
+    int once = 0;
     int has_alpha = !(rect->width == 640);
     
     for (int i = 0; i < rect->width; i++)
@@ -278,7 +284,10 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
         for (int j = 0; j < rect->height; j++)
         {
             uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
+
             if (!pixel && has_alpha) continue;
+            if ((uint32_t)(i + dstRect.x) > (uint32_t)vbuf->format.width) continue;
+            if ((uint32_t)(j + dstRect.y) > (uint32_t)vbuf->format.height) continue;
 
             dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
         }
@@ -289,9 +298,15 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 }
 
 int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
-{
+{    
+    rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
-        return 1;
+    {
+        rect = &fallback;
+    }
+    
+    //if (vbuf == &Video_menuBuffer)
+    //    printf("Vbuffer fill to menu %u,%u %ux%u\n", rect->x, rect->y, rect->width, rect->height);
 
     SDL_Rect dstRect = {rect->x, rect->y, rect->width, rect->height};
     
@@ -348,5 +363,10 @@ void stdDisplay_ddraw_surface_flip2()
 void stdDisplay_RestoreDisplayMode()
 {
 
+}
+
+stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b)
+{
+    return b;
 }
 #endif

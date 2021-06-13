@@ -404,6 +404,54 @@ int sithControl_ReadFunctionMap(int func, int* out)
     {
         val = !!state[SDL_SCANCODE_V];
     }
+    else if (func == INPUT_FUNC_PREVINV)
+    {
+        val = !!state[SDL_SCANCODE_LEFTBRACKET];
+    }
+    else if (func == INPUT_FUNC_NEXTINV)
+    {
+        val = !!state[SDL_SCANCODE_RIGHTBRACKET];
+    }
+    else if (func == INPUT_FUNC_SELECT0)
+    {
+        val = !!state[SDL_SCANCODE_0];
+    }
+    else if (func == INPUT_FUNC_SELECT1)
+    {
+        val = !!state[SDL_SCANCODE_1];
+    }
+    else if (func == INPUT_FUNC_SELECT2)
+    {
+        val = !!state[SDL_SCANCODE_2];
+    }
+    else if (func == INPUT_FUNC_SELECT3)
+    {
+        val = !!state[SDL_SCANCODE_3];
+    }
+    else if (func == INPUT_FUNC_SELECT4)
+    {
+        val = !!state[SDL_SCANCODE_4];
+    }
+    else if (func == INPUT_FUNC_SELECT5)
+    {
+        val = !!state[SDL_SCANCODE_5];
+    }
+    else if (func == INPUT_FUNC_SELECT6)
+    {
+        val = !!state[SDL_SCANCODE_6];
+    }
+    else if (func == INPUT_FUNC_SELECT7)
+    {
+        val = !!state[SDL_SCANCODE_7];
+    }
+    else if (func == INPUT_FUNC_SELECT8)
+    {
+        val = !!state[SDL_SCANCODE_8];
+    }
+    else if (func == INPUT_FUNC_SELECT9)
+    {
+        val = !!state[SDL_SCANCODE_9];
+    }
     
     if (!!state[SDL_SCANCODE_ESCAPE])
     {

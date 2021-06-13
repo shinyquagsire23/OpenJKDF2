@@ -1585,6 +1585,7 @@ void do_hooks()
     hook_function(stdDisplay_VBufferSetColorKey_ADDR, stdDisplay_VBufferSetColorKey);
     hook_function(stdDisplay_VBufferFree_ADDR, stdDisplay_VBufferFree);
     hook_function(stdDisplay_RestoreDisplayMode_ADDR, stdDisplay_RestoreDisplayMode);
+    hook_function(stdDisplay_VBufferConvertColorFormat_ADDR, stdDisplay_VBufferConvertColorFormat);
     
     hook_function(stdPlatform_GetTimeMsec_ADDR, stdPlatform_GetTimeMsec);
     
