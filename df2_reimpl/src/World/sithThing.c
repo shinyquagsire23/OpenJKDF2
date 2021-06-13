@@ -752,7 +752,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
                 }
             }
             v5 = v3;
-LABEL_6:
+
             thing->thingType = v5;
             v6 = v5 - 2;
             if ( v6 )

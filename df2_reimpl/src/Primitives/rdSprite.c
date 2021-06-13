@@ -58,7 +58,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 sprite->face.vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
                 if ( !sprite->face.vertexUVIdx )
                     return 0;
-                sprite->face.numVertices;
+
                 for (int i = 0; i < sprite->face.numVertices; i++)
                 {
                    sprite->face.vertexPosIdx[i] = i;
@@ -296,7 +296,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         procFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->wallCel = thing->gap2C;
+    procEntry->wallCel = thing->wallCel;
     procEntry->type = sprite->face.type;
     procEntry->extralight = sprite->face.extraLight;
     procEntry->material = sprite->face.material;

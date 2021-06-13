@@ -21,7 +21,7 @@ uint32_t Linux_TimeMs()
     return _t.tv_sec*1000 + lround(_t.tv_nsec/1.0e6);
 }
 
-static int Linux_stdFileOpen(char* fpath, char* mode)
+static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
 {
     char tmp[512];
     size_t len = strlen(fpath);
@@ -29,7 +29,7 @@ static int Linux_stdFileOpen(char* fpath, char* mode)
     if (len > 512) {
         len = 512;
     }
-    strncpy(tmp, fpath, sizeof(tmp));
+    _strncpy(tmp, fpath, sizeof(tmp));
 
     for (int i = 0; i < len; i++)
     {
@@ -40,36 +40,48 @@ static int Linux_stdFileOpen(char* fpath, char* mode)
 
     //printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
     
-    return fopen(tmp, mode);
+    return (stdFile_t)fopen(tmp, mode);
 }
 
-static int Linux_stdFileClose(void* fhand)
+static int Linux_stdFileClose(stdFile_t fhand)
 {
-    return close(fhand);
+    return fclose((void*)fhand);
 }
 
 
-static int Linux_stdFileRead(void* fhand, void* dst, size_t len)
+static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
 {
-    size_t val =  fread(dst, 1, len, fhand);
+    size_t val =  fread(dst, 1, len, (void*)fhand);
 
     return val;
 }
 
-static int Linux_stdFileWrite(void* fhand, void* dst, size_t len)
+static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 {
-    return fwrite(dst, len, 1, fhand);
+    return fwrite(dst, len, 1, (void*)fhand);
 }
 
-static int Linux_stdFileGets(void* fhand, char* dst, size_t len)
+static char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
-    return fgets(dst, len, fhand);
+    char* out = dst;
+    fgets(dst, len, (void*)fhand);
+    return out;
+}
+
+static int Linux_stdFseek(stdFile_t fhand, int a, int b)
+{
+    return fseek((void*)fhand, a, b);
+}
+
+static int Linux_stdFtell(stdFile_t fhand)
+{
+    return ftell((void*)fhand);
 }
 
 static void* Linux_alloc(size_t len)
 {
     //TODO figure out where we're having alloc issues?
-    return malloc(len + 0x100);
+    return malloc(len);
 }
 
 static void Linux_free(void* ptr)
@@ -129,8 +141,8 @@ void stdPlatform_InitServices(common_functions *handlers)
     handlers->fileRead = Linux_stdFileRead;
     handlers->fileGets = Linux_stdFileGets;
     handlers->fileWrite = Linux_stdFileWrite;
-    handlers->fseek = fseek;
-    handlers->ftell = ftell;
+    handlers->fseek = Linux_stdFseek;
+    handlers->ftell = Linux_stdFtell;
     handlers->getTimerTick = Linux_TimeMs;
 #endif
 }
@@ -141,17 +153,17 @@ int stdPlatform_Startup()
 }
 
 #ifdef LINUX
-int stdPrintf(intptr_t a1, char *a2, int line, char *fmt, ...)
+int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);
-    printf("(%x %s:%d) ", a1, a2, line);
+    printf("(%p %s:%d) ", a1, a2, line);
     int ret = vprintf(fmt, args);
     va_end (args);
     return ret;
 }
 
-int stdPlatform_Printf(char *fmt, ...)
+int stdPlatform_Printf(const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);

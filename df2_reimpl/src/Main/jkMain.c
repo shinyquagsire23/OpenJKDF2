@@ -956,6 +956,7 @@ int jkMain_SetVideoMode()
     }*/
     
     sithControl_Open();
+    sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
     
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, 640, 480, 6);
@@ -965,6 +966,7 @@ int jkMain_SetVideoMode()
     sithRender_SetTexMode(Video_modeStruct.texMode);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 
+    Video_bOpened = 1;
     jkGame_isDDraw = 1;
     return 1;
 }

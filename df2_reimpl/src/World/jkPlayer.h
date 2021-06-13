@@ -184,7 +184,7 @@ void jkPlayer_InitForceBins();
 int jkPlayer_GetAlignment();
 void jkPlayer_SetAccessiblePowers(int rank);
 void jkPlayer_ResetPowers();
-int jkPlayer_WriteConfSwap(int unk, int a2, char *a3);
+int jkPlayer_WriteConfSwap(jkPlayerInfo* unk, int a2, char *a3);
 int jkPlayer_WriteCutsceneConf();
 int jkPlayer_ReadCutsceneConf();
 void jkPlayer_FixStars();

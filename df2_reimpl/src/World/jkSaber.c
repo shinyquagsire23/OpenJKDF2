@@ -393,7 +393,7 @@ int jkSaber_Load()
 int jkSaber_Write()
 {
     stdConffile_Write(jkRes_episodeGobName, 32);
-    return stdConffile_Write(&jkEpisode_mLoad.field_8, 4);
+    return stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
 }
 
 void jkSaber_player_thingsidkfunc()

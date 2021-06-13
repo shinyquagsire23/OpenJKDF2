@@ -24,15 +24,12 @@ int jkEpisode_Startup()
 int jkEpisode_LoadVerify()
 {
     stdFileSearch *v0; // ebp
-    int v1; // eax
     unsigned int v2; // esi
     jkEpisode *v3; // edi
     stdFileSearch *v5; // ebp
-    int v6; // eax
     unsigned int v7; // esi
     jkEpisode *v8; // edi
     stdFileSearch *v10; // ebp
-    int v11; // eax
     unsigned int v12; // esi
     jkEpisode *v13; // edi
     int v14; // ecx
@@ -66,8 +63,7 @@ int jkEpisode_LoadVerify()
         {
             if ( v30.is_subdirectory )
             {
-                v1 = jkEpisode_var2;
-                if ( (unsigned int)jkEpisode_var2 < 0x40 )
+                if ( jkEpisode_var2 < 0x40 )
                 {
                     v2 = 0;
                     if ( jkEpisode_var2 )
@@ -75,7 +71,6 @@ int jkEpisode_LoadVerify()
                         v3 = jkEpisode_aEpisodes;
                         while ( __strnicmp(v30.fpath, v3->name, 0x20u) )
                         {
-                            v1 = jkEpisode_var2;
                             ++v2;
                             ++v3;
                             if ( v2 >= jkEpisode_var2 )
@@ -100,8 +95,7 @@ LABEL_11:
         if ( v30.fpath[0] != '.' )
         {
             stdFnames_StripExtAndDot(v30.fpath);
-            v6 = jkEpisode_var2;
-            if ( (unsigned int)jkEpisode_var2 < 0x40 )
+            if ( jkEpisode_var2 < 0x40 )
             {
                 v7 = 0;
                 if ( jkEpisode_var2 )
@@ -109,7 +103,6 @@ LABEL_11:
                     v8 = jkEpisode_aEpisodes;
                     while ( __strnicmp(v30.fpath, v8->name, 0x20u) )
                     {
-                        v6 = jkEpisode_var2;
                         ++v7;
                         ++v8;
                         if ( v7 >= jkEpisode_var2 )
@@ -136,8 +129,7 @@ LABEL_20:
             if ( v30.fpath[0] != '.' )
             {
                 stdFnames_StripExtAndDot(v30.fpath);
-                v11 = jkEpisode_var2;
-                if ( (unsigned int)jkEpisode_var2 < 0x40 )
+                if ( jkEpisode_var2 < 0x40 )
                 {
                     v12 = 0;
                     if ( jkEpisode_var2 )
@@ -145,7 +137,6 @@ LABEL_20:
                         v13 = jkEpisode_aEpisodes;
                         while ( __strnicmp(v30.fpath, v13->name, 0x20u) )
                         {
-                            v11 = jkEpisode_var2;
                             ++v12;
                             ++v13;
                             if ( v12 >= jkEpisode_var2 )

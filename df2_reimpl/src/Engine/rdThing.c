@@ -23,7 +23,7 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->field_18 = 0;
     thing->frameTrue = 0;
     thing->geosetSelect = -1;
-    thing->gap2C = -1;
+    thing->wallCel = -1;
     thing->hierarchyNodeMatrices = 0;
     thing->geoMode = 4;
     thing->lightMode = 3;
@@ -126,7 +126,7 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
 {
     thing->type = RD_THINGTYPE_SPRITE3;
     thing->sprite3 = sprite;
-    thing->gap2C = -1;
+    thing->wallCel = -1;
     return 1;
 }
 
@@ -134,7 +134,7 @@ int rdThing_SetPolyline(rdThing *thing, rdPolyLine *polyline)
 {
     thing->type = RD_THINGTYPE_POLYLINE;
     thing->polyline = polyline;
-    thing->gap2C = -1;
+    thing->wallCel = -1;
     return 1;
 }
 

@@ -1080,14 +1080,13 @@ sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx)
 int sithInventory_KeybindInit()
 {
     int v0; // ebx
-    int *v3; // esi
 
     v0 = 0;
     for (int i = 0; i < 20; i++)
     {
         sithInventory_powerKeybinds[i].enabled = 0;
     }
-    v3 = &sithInventory_powerKeybinds[0].binding;
+
     for (int i = 0; i < 200; i++)
     {
         if ( (sithInventory_aDescriptors[i].flags & 0x100) != 0 )

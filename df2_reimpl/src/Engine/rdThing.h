@@ -58,7 +58,7 @@ typedef struct rdThing
     rdMatrix34 *hierarchyNodeMatrices;
     rdVector3* hierarchyNodes2;
     int* amputatedJoints;
-    uint32_t gap2C;
+    uint32_t wallCel;
     uint32_t geosetSelect;
     uint32_t geometryMode;
     uint32_t lightingMode;

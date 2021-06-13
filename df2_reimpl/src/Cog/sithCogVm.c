@@ -1144,6 +1144,8 @@ char* sithCogVm_PopString(sithCog *ctx)
       || (v2 = v1 - 1, ctx->stackPos = v2, v3 = ctx->stack[v2].data[1], v4 = ctx->stack[v2].data[2], ctx->stack[v2].type != 1)
       || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->symbol_type != COG_VARTYPE_STR) )
     {
+        v3;
+        v4;
         result = 0;
     }
     else
@@ -1187,7 +1189,7 @@ void sithCogVm_PushFlex(sithCog *ctx, float val)
     sithCogVm_PushVar(ctx, &v);
 }
 
-void sithCogVm_PushVector3(sithCog *ctx, rdVector3* val)
+void sithCogVm_PushVector3(sithCog *ctx, const rdVector3* val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_VECTOR;

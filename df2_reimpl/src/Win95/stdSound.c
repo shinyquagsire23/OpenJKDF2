@@ -8,8 +8,8 @@ int stdSound_Initialize()
     return 1;
 }
 
-void* stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
+uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
 {
-    return NULL;
+    return 0;
 }
 #endif

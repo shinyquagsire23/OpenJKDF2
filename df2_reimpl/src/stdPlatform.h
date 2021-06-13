@@ -24,21 +24,21 @@
 void stdPlatform_InitServices(common_functions *handlers);
 int stdPlatform_Startup();
 
-static void (*stdPlatform_Assert)(int a1, char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;
+static void (*stdPlatform_Assert)(const char* a1, const char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;
 
 static void* (*stdPlatform_AllocHandle)(size_t) = (void*)stdPlatform_AllocHandle_ADDR;
 static void (*stdPlatform_FreeHandle)(void*) = (void*)stdPlatform_FreeHandle_ADDR;
 static void* (*stdPlatform_ReallocHandle)(void*, size_t) = (void*)stdPlatform_ReallocHandle_ADDR;
-static int (*stdPlatform_LockHandle)(int) = (void*)stdPlatform_LockHandle_ADDR;
-static void (*stdPlatform_UnlockHandle)(int) = (void*)stdPlatform_UnlockHandle_ADDR;
+static uint32_t (*stdPlatform_LockHandle)(uint32_t) = (void*)stdPlatform_LockHandle_ADDR;
+static void (*stdPlatform_UnlockHandle)(uint32_t) = (void*)stdPlatform_UnlockHandle_ADDR;
 
 #ifdef WIN32
-static int (*stdPrintf)(intptr_t a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
+static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
-int stdPrintf(intptr_t a1, char *a2, int line, char *fmt, ...);
-int stdPlatform_Printf(char *fmt, ...);
+int stdPrintf(void* a1, char *a2, int line, char *fmt, ...);
+int stdPlatform_Printf(const char *fmt, ...);
 uint32_t stdPlatform_GetTimeMsec();
 #endif
 

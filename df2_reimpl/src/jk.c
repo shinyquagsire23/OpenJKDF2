@@ -223,7 +223,7 @@ char* _strcpy(char *dst, const char *src)
     if (!src) return NULL;
 
     char *tmp = dst;
-    while(*dst++ = *src++);
+    while((*(dst++) = *(src++)));
     return tmp;
 }
 
@@ -540,7 +540,7 @@ int _sscanf(const char * s, const char * format, ...)
     return ret;
 }
 
-int _sprintf(const char * s, const char * format, ...)
+int _sprintf(char * s, const char * format, ...)
 {
     va_list args;
     va_start (args, format);
@@ -605,11 +605,6 @@ int _printf(const char* fmt, ...)
     int ret = vprintf(fmt, args);
     va_end (args);
     return ret;
-}
-
-int jk_assert(void* log_func, char* file, int line_num, char *fmt, ...)
-{
-    
 }
 
 void* _malloc(size_t a)
@@ -697,18 +692,29 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     return ret;
 }
 
+int __snprintf(char *a1, size_t a2, const char *fmt, ...)
+{
+    va_list args;
+    va_start (args, fmt);
+    int ret = vsnprintf(a1, a2, fmt, args); // TODO ehh
+    va_end (args);
+
+    return ret;
+}
+
 wchar_t* _wcscpy(wchar_t * dst, const wchar_t *src)
 {
     if (!dst) return NULL;
     if (!src) return NULL;
 
     wchar_t *tmp = dst;
-    while(*dst++ = *src++);
+    while((*(dst++) = *(src++)));
     return tmp;
 }
 
 int jk_MessageBeep(int a)
 {
+    return 0;
 }
 
 int __strcmpi(const char *a, const char *b)
@@ -960,11 +966,11 @@ int _iswspace(int a)
     return isspace(a);
 }
 
-size_t __wcslen(wchar_t * strarg)
+size_t __wcslen(const wchar_t * strarg)
 {
     if(!strarg)
      return -1; //strarg is NULL pointer
-   wchar_t* str = strarg;
+   const wchar_t* str = strarg;
    for(;*str;++str)
      ; // empty body
    return str-strarg;

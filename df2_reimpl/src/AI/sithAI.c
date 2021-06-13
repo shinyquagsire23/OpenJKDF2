@@ -4,6 +4,7 @@
 #include "World/sithThing.h"
 #include "AI/sithAICmd.h"
 #include "AI/sithAIClass.h"
+#include "Engine/sithTime.h"
 #include "General/stdHashTable.h"
 
 int sithAI_Startup()
@@ -289,4 +290,65 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     }
 
     return NULL;
+}
+
+void sithAI_TickAll()
+{
+    int v0; // edi
+    sithActor *actor; // esi
+
+    v0 = 0;
+    for ( actor = sithAI_actors; v0 <= sithAI_inittedActors; ++actor )
+    {
+        if ( actor->aiclass
+          && (actor->thing->thingflags & 0x202) == 0
+          && actor->thing->actorParams.health > 0.0
+          && (actor->mode & 0x3000) == 0
+          && actor->field_190 <= sithTime_curMs )
+        {
+            sithAI_TickActor(actor);
+        }
+        ++v0;
+    }
+}
+
+void sithAI_TickActor(sithActor *actor)
+{
+    unsigned int v1; // ebp
+    int v3; // ebx
+    int *v4; // edi
+    int v5; // ecx
+    unsigned int v7; // [esp+10h] [ebp-8h]
+    int a3; // [esp+14h] [ebp-4h]
+    int a1a; // [esp+1Ch] [ebp+4h]
+
+    v1 = sithTime_curMs;
+    v7 = sithTime_curMs + 5000;
+    a3 = actor->mode;
+LABEL_2:
+    for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
+    {
+        if ( (actor->entries[a1a].field_0 & 1) == 0 )
+        {
+            v5 = actor->mode;
+            if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
+            {
+                if ( actor->entries[a1a].field_4 <= v1 )
+                {
+                    actor->entries[a1a].field_4 = v1 + 1000;
+                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->entries[a1a], 0, 0) && a3 != actor->mode )
+                    {
+                        sithAI_SetActorFireTarget(actor, 256, a3);
+                        v1 = sithTime_curMs;
+                        a3 = actor->mode;
+                        goto LABEL_2;
+                    }
+                    v1 = sithTime_curMs;
+                }
+                if ( actor->entries[a1a].field_4 < v7 )
+                    v7 = actor->entries[a1a].field_4;
+            }
+        }
+    }
+    actor->field_190 = v7;
 }

@@ -5,7 +5,7 @@
 #include "Win95/Video.h"
 #include "Win95/Window.h"
 
-void stdDisplay_SetGammaTable(int len, int *table)
+void stdDisplay_SetGammaTable(int len, uint32_t *table)
 {
     stdDisplay_gammaTableLen = len;
     stdDisplay_paGammaTable = table;
@@ -77,7 +77,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
                                         0);
     
     memcpy(stdDisplay_gammaPalette, palette, 0x300);
-    rdColor24* pal24 = palette;
+    const rdColor24* pal24 = palette;
     SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
     for (int i = 0; i < 256; i++)
     {

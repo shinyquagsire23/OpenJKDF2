@@ -19,7 +19,7 @@ int sithParticle_Startup()
     if ( sithParticle_alloc )
         return 1;
 
-    stdPrintf((int)pSithHS->errorPrint, ".\\Engine\\sithParticle.c", 66, "Failed to allocate memory for particless.\n", 0, 0, 0, 0);
+    stdPrintf(pSithHS->errorPrint, ".\\Engine\\sithParticle.c", 66, "Failed to allocate memory for particless.\n", 0, 0, 0, 0);
     return 0;
 }
 
@@ -150,7 +150,6 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
     int v6; // ebp
     unsigned int v7; // esi
     int *v8; // eax
-    char v10; // c0
     double v11; // st7
     double v12; // st7
     double v13; // st6

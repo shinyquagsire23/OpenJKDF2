@@ -41,7 +41,7 @@ typedef struct common_functions_basic
     void (__cdecl *free)(void *);
     int realloc;
     int getTimerTick;
-    int (__cdecl *fileOpen)(char *, char *);
+    int (__cdecl *fileOpen)(const char *, const char *);
     int (__cdecl *fileClose)(int);
     size_t (__cdecl *fileRead)(int, void *, size_t);
     char *(__cdecl *fileGets)(int, char *, int);
@@ -95,7 +95,7 @@ void jkRes_LoadGob(char *a1);
 int jkRes_LoadCd(char *a1);
 void jkRes_HookHS();
 void jkRes_UnhookHS();
-int jkRes_FileExists(char *fpath, char *a2, int len);
+int jkRes_FileExists(const char *fpath, char *a2, int len);
 
 int jkRes_ReadKey();
 int jkRes_LoadNew(jkResGob *resGob, char *name, int a3);
@@ -109,7 +109,7 @@ int jkRes_LoadCD(int a1);
 //static int (*jkRes_LoadCD)(int a1) = (void*)jkRes_LoadCD_ADDR;
 //static int (*jkRes_LoadNew)(jkResGob *a1, char *a2, int a3) = (void*)jkRes_LoadNew_ADDR;
 
-uint32_t jkRes_FileOpen(char *fpath, char *mode);
+uint32_t jkRes_FileOpen(const char *fpath, const char *mode);
 int jkRes_FileClose(int fd);
 size_t jkRes_FileRead(int fd, void* out, size_t len);
 size_t jkRes_FileWrite(int fd, void* out, size_t len);

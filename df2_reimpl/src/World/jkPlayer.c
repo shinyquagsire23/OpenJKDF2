@@ -345,71 +345,71 @@ void jkPlayer_DrawPov()
     if (!playerThings[playerThingIdx].povModel.model3)
         return;
 
-        if ( playerThings[playerThingIdx].povModel.puppet )
-        {
-            rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_deltaSeconds);
-        }
+    if ( playerThings[playerThingIdx].povModel.puppet )
+    {
+        rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_deltaSeconds);
+    }
 
-        if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurWorld->cameraFocus )
-        {
-            sithThing* player = playerThings[playerThingIdx].actorThing;
+    if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurWorld->cameraFocus )
+    {
+        sithThing* player = playerThings[playerThingIdx].actorThing;
 
-            // TODO: I think this explains some weird duplication
+        // TODO: I think this explains some weird duplication
 #ifndef QOL_IMPROVEMENTS
-            float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
+        float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
-            float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag * (sithTime_deltaSeconds / 0.02); // scale animation to be in line w/ 50fps og limit
+        float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag * (sithTime_deltaSeconds / 0.02); // scale animation to be in line w/ 50fps og limit
 #endif
-            if ( waggleAmt == 0.0 )
-                jkPlayer_waggleAngle = 0.0;
-            else
-                jkPlayer_waggleAngle = waggleAmt + jkPlayer_waggleAngle;
+        if ( waggleAmt == 0.0 )
+            jkPlayer_waggleAngle = 0.0;
+        else
+            jkPlayer_waggleAngle = waggleAmt + jkPlayer_waggleAngle;
 
-            // TODO is this a macro/func?
-            float angleSin, angleCos;
-            stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
-            float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel;
-            if (angleCos > 0) // verify?
-                angleCos = -angleCos;
+        // TODO is this a macro/func?
+        float angleSin, angleCos;
+        stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
+        float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel;
+        if (angleCos > 0) // verify?
+            angleCos = -angleCos;
 
-            jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
-            jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
-            jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
-            rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
+        jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
+        jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
+        jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
+        rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
-            // Force weapon to draw in front of scene
-            rdSetZBufferMethod(0); // set 2 to have guns clip through walls
-            rdSetSortingMethod(2);
-            rdSetOcclusionMethod(0);
+        // Force weapon to draw in front of scene
+        rdSetZBufferMethod(0); // set 2 to have guns clip through walls
+        rdSetSortingMethod(2);
+        rdSetOcclusionMethod(0);
 
-            float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
-            if ( ambLight < 0.0 )
-            {
-                ambLight = 0.0;
-            }
-            else if ( ambLight > 1.0 )
-            {
-                ambLight = 1.0;
-            }
-
-            rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
-            rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
-
-            rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
-            rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
-            rdVector_Neg3Acc(&trans);
-            rdMatrix_PreTranslate34(&viewMat, &trans);
-            rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
-
-            // Render saber if applicable
-            if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
-            {
-                jkSaber_Draw(&viewMat);
-            }
-
-            rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
-            rdCache_Flush();
+        float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
+        if ( ambLight < 0.0 )
+        {
+            ambLight = 0.0;
         }
+        else if ( ambLight > 1.0 )
+        {
+            ambLight = 1.0;
+        }
+
+        rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
+        rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
+
+        rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
+        rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
+        rdVector_Neg3Acc(&trans);
+        rdMatrix_PreTranslate34(&viewMat, &trans);
+        rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
+
+        // Render saber if applicable
+        if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
+        {
+            jkSaber_Draw(&viewMat);
+        }
+
+        rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
+        rdCache_Flush();
+    }
 }
 
 void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
@@ -942,7 +942,7 @@ void jkPlayer_ResetPowers()
     }
 }
 
-int jkPlayer_WriteConfSwap(int unk, int a2, char *a3)
+int jkPlayer_WriteConfSwap(jkPlayerInfo* unk, int a2, char *a3)
 {
     int v3; // ebx
     int v4; // edx

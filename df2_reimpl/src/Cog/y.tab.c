@@ -409,7 +409,7 @@ extern char yytext[];
 
 void yyerror(char* s)
 {
-    stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
+    stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
 }
 #line 415 "y.tab.c"
 #define YYABORT goto yyabort

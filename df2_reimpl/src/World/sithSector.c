@@ -178,7 +178,7 @@ int sithSector_Load(sithWorld *world, int tmp)
                     return 0;
                 sectors->verticeIdxs[v13] = vtx_idx;
             }
-LABEL_39:
+
             sectors->numVertices = num_vertices;
             if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " surfaces %d %d", &amount_1, &amount_2) != 2 )
                 return 0;
@@ -709,7 +709,7 @@ void sithSector_SetAdjoins(sithSector *sector)
     sithAdjoin *i; // esi
 
     for ( i = sector->adjoins; i; i = i->next )
-        sithSurface_SetAdjoins(&i->flags);
+        sithSurface_SetAdjoins(i);
     sector->flags &= ~0x80;
 }
 

@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-void WinIdk_SetDplayGuid(int *guid)
+void WinIdk_SetDplayGuid(uint32_t *guid)
 {
     WinIdk_aDplayGuid[0] = *guid;
     WinIdk_aDplayGuid[1] = guid[1];
@@ -19,4 +19,5 @@ uint32_t* WinIdk_GetDplayGuid()
 int WinIdk_detect_cpu(char *a1)
 {
     _strcpy(a1, "AuthenticAMD");
+    return 1;
 }

@@ -124,7 +124,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                     v19->uniStr = stdString_CstrCopy(v34);
                     if ( !stdHashTable_SetKeyVal(strtable->hashtable, (const char *)v19->field_0, v19) )
                         stdPrintf(
-                            (int)std_pHS->errorPrint,
+                            std_pHS->errorPrint,
                             ".\\General\\stdStrTable.c",
                             177,
                             "The key '%s' is in the string table '%s' more than once.\n   >>>%s\n",
@@ -135,7 +135,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                 else
                 {
                     stdPrintf(
-                        (int)std_pHS->errorPrint,
+                        std_pHS->errorPrint,
                         ".\\General\\stdStrTable.c",
                         164,
                         "Cannot understand this line in string table '%s'.\n   >>> %s\n",
@@ -146,7 +146,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             else
             {
                 stdPrintf(
-                    (int)std_pHS->errorPrint,
+                    std_pHS->errorPrint,
                     ".\\General\\stdStrTable.c",
                     155,
                     "Cannot understand this line in string table '%s'.\n   >>> %s\n",

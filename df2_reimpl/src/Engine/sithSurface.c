@@ -1,5 +1,7 @@
 #include "sithSurface.h"
 
+#include <math.h>
+
 #include "General/stdHashTable.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
@@ -62,7 +64,6 @@ int sithSurface_Load(sithWorld *world)
     rdTexinfo *v53; // eax
     char *distStr; // [esp-4h] [ebp-30h]
     unsigned int numSurfaces; // [esp+18h] [ebp-14h] BYREF
-    sithSurface *surfaceIter; // [esp+20h] [ebp-Ch] BYREF
     rdTexinfo *v66; // [esp+24h] [ebp-8h] BYREF
     int v61;
 
@@ -123,7 +124,7 @@ int sithSurface_Load(sithWorld *world)
         world->surfaces[v14].field_0 = v14;
     }
     surfaces = world->surfaces;
-    surfaceIter = surfaces;
+
     for (int v67 = 0; v67 < numSurfaces; v67++)
     {
         sithSurface* surfaceIter = &surfaces[v67];
@@ -245,9 +246,7 @@ int sithSurface_Load(sithWorld *world)
         }
         face->numVertices = v35;
         face->num = v67;
-        surfaceIter++;
     }
-LABEL_71:
 
     for (int v50 = 0; v50 < numSurfaces; v50++)
     {
@@ -441,6 +440,241 @@ void sithSurface_Free(sithWorld *world)
         world->adjoins = 0;
         world->numAdjoins = 0;
         world->numAdjoinsLoaded = 0;
+    }
+}
+
+void sithSurface_Tick(float deltaSecs)
+{
+    int v2; // ebx
+    int flags; // ecx
+    int v7; // edx
+    int v8; // eax
+    rdSurface *v9; // ecx
+    sithSurface *v10; // edi
+    unsigned int v13; // eax
+    unsigned int v14; // edi
+    int v15; // ebx
+    unsigned int v16; // ecx
+    unsigned int v17; // ecx
+    int v19; // edi
+    unsigned int v20; // eax
+    int v22; // eax
+    int v24; // ecx
+    int v25; // edx
+    int v27; // eax
+    rdSurface *v28; // ecx
+    int v29; // edx
+    double v31; // st7
+    int v33; // ecx
+    sithSurface* v34; // eax
+    sithThing* v35; // eax
+    double v37; // st7
+
+    v2 = 0;
+    for (v2 = 0; v2 <= sithSurface_numSurfaces; v2++)
+    {
+        rdSurface* surface = &sithSurface_aSurfaces[v2];
+        flags = surface->flags;
+        if (!flags)
+            continue;
+
+        sithThing* parent_thing = surface->parent_thing;
+        if ( !parent_thing || parent_thing->thingType && parent_thing->signature == surface->signature )
+        {
+            if ( (flags & 0x100000) != 0 )
+            {
+                if ( (flags & 0x20000) != 0 )
+                {
+                    v10 = surface->sithSurfaceParent;
+                    if ( v10 )
+                    {
+                        float scroll_x = surface->field_1C.x * deltaSecs;
+                        float scroll_y = surface->field_1C.y * deltaSecs;
+
+                        v10->surfaceInfo.face.clipIdk.x = scroll_x + v10->surfaceInfo.face.clipIdk.x;
+                        v10->surfaceInfo.face.clipIdk.y = scroll_y + v10->surfaceInfo.face.clipIdk.y;
+
+                        if ( ((v2 + bShowInvisibleThings) & 0xF) == 0 )
+                        {
+                            v10->surfaceInfo.face.clipIdk.x = fmod(v10->surfaceInfo.face.clipIdk.x, 1024.0);
+                            v10->surfaceInfo.face.clipIdk.y = fmod(v10->surfaceInfo.face.clipIdk.y, 1024.0);
+                        }
+                    }
+                }
+                else if ( (flags & 0x800000) != 0 )
+                {
+                    sithSurface_ScrollSky(surface, 512, deltaSecs, v2);
+                }
+                else if ( (flags & 0x1000000) != 0 )
+                {
+                    sithSurface_ScrollSky(surface, 1024, deltaSecs, v2);
+                }
+            }
+            else if ( (flags & 0x200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
+            {
+                v14 = surface->field_34;
+                v15 = 0;
+                v16 = sithTime_curMs - v13;
+                if ( v14 && surface->material )
+                {
+                    surface->wallCel += v16 / v14 + 1;
+                    surface->field_30 = surface->field_34 + sithTime_curMs - v16 % surface->field_34;
+                    v17 = surface->material->num_texinfo;
+                    if ( surface->wallCel >= v17 )
+                    {
+                        if ( (flags & 1) != 0 )
+                        {
+                            v19 = 0;
+                            if ( (flags & 2) != 0 )
+                            {
+                                v19 = 1;
+                            }
+                            else if ( (flags & 4) != 0 )
+                            {
+                                v19 = 2;
+                            }
+                            v20 = (surface->wallCel - v19) % (v17 - v19) + v19;
+                            surface->wallCel = v20;
+                            rdMaterial* v21 = surface->material;
+                            if ( v20 > v21->num_texinfo - 1 )
+                                v20 = v21->num_texinfo - 1;
+                            surface->wallCel = v20;
+                        }
+                        else
+                        {
+                            if ( (flags & 8) != 0 )
+                                surface->wallCel = 0;
+                            else
+                                surface->wallCel = v17 - 1;
+                            v15 = 1;
+                        }
+                    }
+                    v22 = surface->flags;
+                    if ( (v22 & 0x80000) != 0 )
+                    {
+                        surface->parent_thing->rdthing.wallCel = surface->wallCel;
+                    }
+                    else if ( (v22 & 0x20000) != 0 )
+                    {
+                        sithSurface* v23 = surface->sithSurfaceParent;
+                        v23->surfaceInfo.face.wallCel = surface->wallCel;
+                        v23->surfaceFlags |= 0x8000;
+                    }
+                    else if ( (v22 & 0x10000) != 0 )
+                    {
+                        surface->material->celIdx = surface->wallCel;
+                    }
+                    if ( v15 )
+                    {
+                        // TODO inlined?
+                        surface->flags = 0;
+                        v25 = ((intptr_t)surface - (intptr_t)sithSurface_aSurfaces) / sizeof(rdSurface);
+                        sithSurface_aAvail[++sithSurface_numAvail] = v25;
+                        if ( v25 == sithSurface_numSurfaces )
+                        {
+                            for (v27 = v25 - 1; v27 >= 0; v27--)
+                            {
+                                v28 = &sithSurface_aSurfaces[v27];
+                                if ( v28->flags )
+                                    break;
+                            }
+                            sithSurface_numSurfaces = v27;
+                        }
+                    }
+                }
+            }
+            else if ( (flags & 0x400000) != 0 )
+            {
+                v29 = 0;
+                v31 = surface->field_44 * deltaSecs + surface->field_3C;
+                if ( surface->field_44 < 0.0 && v31 < surface->field_40 || surface->field_44 > 0.0 && v31 > surface->field_40 ) // TODO verify `surface->field_44 < 0.0`
+                {
+                    v31 = surface->field_40;
+                    v29 = 1;
+                }
+                surface->field_3C = v31;
+                v33 = surface->flags;
+                if ( (v33 & 0x20000) != 0 && (v34 = surface->sithSurfaceParent) != 0 )
+                {
+                    v34->surfaceInfo.face.extraLight = v31;
+                }
+                else if ( (v33 & 0x40000) != 0 && (v35 = surface->parent_thing) != 0 )
+                {
+                    v35->light = v31;
+                }
+                else if ( (v33 & 0x2000000) != 0 )
+                {
+                    if ( surface->sector )
+                        surface->sector->extraLight = v31;
+                }
+                if ( v29 )
+                {
+                    if ( (v33 & 1) != 0 )
+                    {
+                        surface->field_44 = -surface->field_44;
+                        v37 = surface->field_40;
+                        surface->field_40 = surface->field_48;
+                        surface->field_48 = v37;
+                    }
+                    else
+                    {
+                        sithSurface_StopAnim(surface);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // TODO inlined?
+            surface->flags = 0;
+            v7 = ((intptr_t)surface - (intptr_t)sithSurface_aSurfaces) / sizeof(rdSurface);
+            sithSurface_aAvail[++sithSurface_numAvail] = v7;
+            if ( v7 == sithSurface_numSurfaces )
+            {
+                for (v8 = v7 - 1; v8 >= 0; v8--)
+                {
+                    v9 = &sithSurface_aSurfaces[v8];
+                    if ( v9->flags )
+                        break;
+                }
+                sithSurface_numSurfaces = v8;
+            }
+        }
+    }
+}
+
+void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8_t a4)
+{
+    float scroll_x = surface->field_1C.x * deltaSecs;
+    float scroll_y = surface->field_1C.y * deltaSecs;
+
+    if ( flags == 0x200 )
+    {
+        float offs_x = scroll_x + sithWorld_pCurWorld->horizontalSkyOffs.x;
+        float offs_y = scroll_y + sithWorld_pCurWorld->horizontalSkyOffs.y;
+
+        sithWorld_pCurWorld->horizontalSkyOffs.x = offs_x;
+        sithWorld_pCurWorld->horizontalSkyOffs.y = offs_y;
+
+        if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
+        {
+            sithWorld_pCurWorld->horizontalSkyOffs.x = fmod(offs_x, 1024.0);
+            sithWorld_pCurWorld->horizontalSkyOffs.y = fmod(offs_y, 1024.0);
+        }
+    }
+    else
+    {
+        float offs_x = scroll_x + sithWorld_pCurWorld->ceilingSkyOffs.x;
+        float offs_y = scroll_y + sithWorld_pCurWorld->ceilingSkyOffs.y;
+
+        sithWorld_pCurWorld->ceilingSkyOffs.x = offs_x;
+        sithWorld_pCurWorld->ceilingSkyOffs.y = offs_y;
+
+        if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
+        {
+            sithWorld_pCurWorld->ceilingSkyOffs.x = fmod(offs_x, 1024.0);
+            sithWorld_pCurWorld->ceilingSkyOffs.y = fmod(offs_y, 1024.0);
+        }
     }
 }
 

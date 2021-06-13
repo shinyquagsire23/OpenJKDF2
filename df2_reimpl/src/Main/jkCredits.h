@@ -8,6 +8,13 @@
 #define jkCredits_sub_421B50_ADDR (0x00421B50)
 #define jkCredits_Handler_ADDR (0x00421F60)
 
-static void (*jkCredits_Initialize)() = (void*)jkCredits_Initialize_ADDR;
+#define jkCredits_table (*(stdStrTable*)0x0055AD70)
+#define jkCredits_fontLarge (*(stdFont**)0x0055AD98)
+#define jkCredits_fontSmall (*(stdFont**)0x0055AD9C)
+#define jkCredits_bInitted (*(int*)0x0055ADA4)
+
+void jkCredits_Initialize(char *fpath);
+
+//static void (*jkCredits_Initialize)() = (void*)jkCredits_Initialize_ADDR;
 
 #endif // _JKCREDITS_H

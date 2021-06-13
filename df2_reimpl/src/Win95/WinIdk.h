@@ -8,7 +8,7 @@
 #define WinIdk_PrintConsole_ADDR (0x00436D90)
 #define WinIdk_detect_cpu_ADDR (0x00437930)
 
-void WinIdk_SetDplayGuid(int *guid);
+void WinIdk_SetDplayGuid(uint32_t *guid);
 uint32_t *__cdecl WinIdk_GetDplayGuid();
 int WinIdk_detect_cpu(char *a1);
 

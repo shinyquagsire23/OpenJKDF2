@@ -53,7 +53,7 @@ static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
 static uint32_t (*stdSound_ParseWav)(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset) = (void*)stdSound_ParseWav_ADDR;
 #else
 int stdSound_Initialize();
-void* stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
+uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
 #endif
 
 #endif // _STDSOUND_H

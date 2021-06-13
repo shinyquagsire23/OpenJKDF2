@@ -762,7 +762,7 @@ void rdMatrix_GetRowVector44(rdMatrix44 *m, int row, rdVector4 *out)
     rdVector_Copy4(out, v3);
 }
 
-void rdMatrix_TransformVector34(rdVector3 *out, rdVector3 *v, rdMatrix34 *m)
+void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m)
 {
     double v3; // st5
     double v4; // st4
@@ -788,7 +788,7 @@ void rdMatrix_TransformVector34(rdVector3 *out, rdVector3 *v, rdMatrix34 *m)
     out->z = v8 * v9 + v6 * v11 + m->rvec.z * v->x;
 }
 
-void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, rdVector3 *a2, rdMatrix34 *a3)
+void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3)
 {
     double v3; // st5
     double v4; // st4
@@ -814,7 +814,7 @@ void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, rdVector3 *a2, rdMatrix34 *a
     a1->z = v8 * v9 + v6 * v11 + a3->uvec.x * a2->x;
 }
 
-void rdMatrix_TransformVector34Acc(rdVector3 *a1, rdMatrix34 *a2)
+void rdMatrix_TransformVector34Acc(rdVector3 *a1, const rdMatrix34 *a2)
 {
     float v2; // ST08_4
     float v3; // ST0C_4
@@ -830,7 +830,7 @@ void rdMatrix_TransformVector34Acc(rdVector3 *a1, rdMatrix34 *a2)
     a1->z = v5;
 }
 
-void rdMatrix_TransformVector44(rdMatrix44 *a1, rdVector4 *a2, rdMatrix44 *a3)
+void rdMatrix_TransformVector44(rdMatrix44 *a1, const rdVector4 *a2, const rdMatrix44 *a3)
 {
     double v3; // st5
     double v4; // st4
@@ -861,7 +861,7 @@ void rdMatrix_TransformVector44(rdMatrix44 *a1, rdVector4 *a2, rdMatrix44 *a3)
     a1->vA.w = a3->vD.w * a2->w + a3->vC.w * a2->z + a3->vB.w * a2->y + a3->vA.w * a2->x;
 }
 
-void rdMatrix_TransformVector44Acc(rdVector4 *a1, rdMatrix44 *a2)
+void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
 {
     float v2; // ST00_4
     float v3; // ST04_4
@@ -882,14 +882,14 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, rdMatrix44 *a2)
     a1->w = v7;
 }
 
-void rdMatrix_TransformPoint34(rdVector3 *vOut, rdVector3 *vIn, rdMatrix34 *camera)
+void rdMatrix_TransformPoint34(rdVector3 *vOut, const rdVector3 *vIn, const rdMatrix34 *camera)
 {
     vOut->x = camera->lvec.x * vIn->y + camera->uvec.x * vIn->z + camera->rvec.x * vIn->x + camera->scale.x;
     vOut->y = (camera->lvec.y * vIn->y + camera->uvec.y * vIn->z + camera->rvec.y * vIn->x) + camera->scale.y;
     vOut->z = camera->uvec.z * vIn->z + camera->lvec.z * vIn->y + camera->rvec.z * vIn->x + camera->scale.z;
 }
 
-void rdMatrix_TransformPoint34Acc(rdVector3 *a1, rdMatrix34 *a2)
+void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2)
 {
     rdVector3 tmp;
     _memcpy(&tmp, a1, sizeof(tmp));
@@ -897,7 +897,7 @@ void rdMatrix_TransformPoint34Acc(rdVector3 *a1, rdMatrix34 *a2)
     rdMatrix_TransformPoint34(a1, &tmp, a2);
 }
 
-void rdMatrix_TransformPoint44(rdVector4 *a1, rdVector4 *a2, rdMatrix44 *a3)
+void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatrix44 *a3)
 {
     a1->x = a3->vB.x * a2->y + a3->vC.x * a2->z + a3->vA.x * a2->x + a3->vD.x;
     a1->y = (a3->vB.y * a2->y) + (a3->vC.y * a2->z) + (a3->vA.y * a2->x) + a3->vD.y;
@@ -905,7 +905,7 @@ void rdMatrix_TransformPoint44(rdVector4 *a1, rdVector4 *a2, rdMatrix44 *a3)
     a1->w = a3->vB.w * a2->y + a3->vC.w * a2->z + a3->vA.w * a2->x + a3->vD.z;
 }
 
-void rdMatrix_TransformPoint44Acc(rdVector4 *a1, rdMatrix44 *a2)
+void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
 {
     rdVector4 tmp;
     _memcpy(&tmp, a1, sizeof(tmp));
@@ -913,7 +913,7 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, rdMatrix44 *a2)
     rdMatrix_TransformPoint44(a1, &tmp, a2);
 }
 
-void rdMatrix_TransformPointLst34(rdMatrix34 *m, rdVector3 *in, rdVector3 *out, int num)
+void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num)
 {
     for (int i = 0; i < num; i++)
     {
@@ -921,7 +921,7 @@ void rdMatrix_TransformPointLst34(rdMatrix34 *m, rdVector3 *in, rdVector3 *out, 
     }
 }
 
-void rdMatrix_TransformPointLst44(rdMatrix44 *m, rdVector4 *in, rdVector4 *out, int num)
+void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVector4 *out, int num)
 {
     for (int i = 0; i < num; i++)
     {

@@ -109,6 +109,8 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkCredits.h"
+#include "Main/jkCutscene.h"
 #include "Main/jkDev.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
@@ -235,6 +237,12 @@ void do_hooks()
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
     hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
+    
+    // jkCredits
+    hook_function(jkCredits_Initialize_ADDR, jkCredits_Initialize);
+    
+    // jkCutscene
+    hook_function(jkCutscene_Initialize_ADDR, jkCutscene_Initialize);
     
     // jkDev
     hook_function(jkDev_Close_ADDR, jkDev_Close);

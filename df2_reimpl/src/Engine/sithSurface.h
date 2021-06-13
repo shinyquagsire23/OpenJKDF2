@@ -57,18 +57,18 @@ typedef struct sithSurfaceInfo
 
 struct rdSurface
 {
-  int index;
-  int flags;
-  sithSector *parent_sector;
-  sithAdjoin *adjoin;
-  rdMaterial* material;
-  sithSurface *sithSurfaceParent;
-  sithSector* sector;
+  uint32_t index; // -14
+  uint32_t flags; // -13
+  sithThing *parent_thing; // -12
+  uint32_t signature; // -11
+  rdMaterial* material; // -10
+  sithSurface *sithSurfaceParent; // -9
+  sithSector* sector; // -8
   rdVector2 field_1C;
   rdVector3 field_24;
-  int field_30;
-  int field_34;
-  int wallCel;
+  uint32_t field_30;
+  uint32_t field_34;
+  uint32_t wallCel;
   float field_3C;
   float field_40;
   float field_44;
@@ -129,6 +129,8 @@ int sithSurface_Startup2();
 int sithSurface_Startup3();
 void sithSurface_SetSectorLight(sithSector *sector, float extraLight, float a3, int a4);
 void sithSurface_Free(sithWorld *world);
+void sithSurface_Tick(float deltaSecs);
+void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8_t a4);
 
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
@@ -142,11 +144,12 @@ static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_G
 static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
 //static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
-static void (*sithSurface_Tick)(float time) = (void*)sithSurface_Tick_ADDR;
+static void (*_sithSurface_Tick)(float time) = (void*)sithSurface_Tick_ADDR;
 static rdSurface* (*sithSurface_SlideHorizonSky)(int a1, rdVector2 *a2) = (void*)sithSurface_SlideHorizonSky_ADDR;
 static rdSurface* (*sithSurface_SurfaceLightAnim)(sithSurface *surface, float a2, float a3) = (void*)sithSurface_SurfaceLightAnim_ADDR;
 static rdSurface* (*sithSurface_SlideWall)(sithSurface *surface, rdVector3 *a2) = (void*)sithSurface_SlideWall_ADDR;
 static uint32_t (*sithSurface_PushSurface)(sithSurface *a1) = (void*)sithSurface_PushSurface_ADDR;
 static void (*sithSurface_DetachThing)(sithSurface *a1, rdVector3 *out) = (void*)sithSurface_DetachThing_ADDR;
+//static void (*sithSurface_ScrollSky)(rdSurface *surface, int a2, float a3, int a4) = (void*)sithSurface_ScrollSky_ADDR;
 
 #endif // _SITHSURFACE_H

@@ -125,7 +125,7 @@ const char* gl_vert =
 "  f_coord = coord3d;\n"
 "}";
 
-static int std3D_aLoadedTextures[1024];
+static GLuint std3D_aLoadedTextures[1024];
 static size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[4096];
 static size_t GL_tmpTrisAmt = 0;
@@ -891,7 +891,7 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 {
     if (GL_tmpTrisAmt + num_tris > 4096)
     {
-        return 0;
+        return;
     }
     
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);

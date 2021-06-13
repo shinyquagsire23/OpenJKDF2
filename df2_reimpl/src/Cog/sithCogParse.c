@@ -39,134 +39,129 @@ void sithCogParse_Reset()
 
 int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
 {
-    int result; // eax
     sithCogSymboltable *symboltable; // eax
     unsigned int v6; // ecx
-    int *v7; // eax
     int v8; // edx
 
-    result = stdConffile_OpenRead(cog_fpath);
-    if ( result )
+    if (!stdConffile_OpenRead(cog_fpath))
+        return 0;
+
+    _memset(cogscript, 0, sizeof(sithCogScript));
+    _strncpy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 0x1Fu);
+    _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
+    cogscript->cog_fpath[31] = 0;
+    cog_yacc_loop_depth = 1;
+
+    if ( !stdConffile_ReadArgs() )
+        goto fail_cleanup;
+
+    if ( !_strcmp(stdConffile_entry.args[0].key, "flags") )
     {
-        _memset(cogscript, 0, sizeof(sithCogScript));
-        _strncpy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 0x1Fu);
-        _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
-        cogscript->cog_fpath[31] = 0;
-        cog_yacc_loop_depth = 1;
+        _sscanf(stdConffile_entry.args[0].value, "%x", cogscript);
         if ( !stdConffile_ReadArgs() )
-            goto LABEL_54;
-        if ( !_strcmp(stdConffile_entry.args[0].key, "flags") )
+            goto fail_cleanup;
+    }
+
+    if ( _strcmp(stdConffile_entry.args[0].value, "symbols") )
+        goto fail_cleanup;
+
+    symboltable = sithCogParse_NewSymboltable(256);
+    cogscript->symbolTable = symboltable;
+    if ( !symboltable )
+        goto fail_cleanup;
+
+    while ( stdConffile_ReadArgs() )
+    {
+        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+            break;
+        if ( cogscript->symbolTable->entry_cnt < (unsigned int)cogscript->symbolTable->max_entries )
         {
-            _sscanf(stdConffile_entry.args[0].value, "%x", cogscript);
-            if ( !stdConffile_ReadArgs() )
-                goto LABEL_54;
-        }
-        if ( _strcmp(stdConffile_entry.args[0].value, "symbols") )
-            goto LABEL_54;
-        symboltable = sithCogParse_NewSymboltable(256);
-        cogscript->symbolTable = symboltable;
-        if ( !symboltable )
-            goto LABEL_54;
-        while ( stdConffile_ReadArgs() )
-        {
-            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
-                break;
-            if ( cogscript->symbolTable->entry_cnt < (unsigned int)cogscript->symbolTable->max_entries )
+            if ( !_strcmp(stdConffile_entry.args[0].value, "thing") )
             {
-                if ( !_strcmp(stdConffile_entry.args[0].value, "thing") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 3, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "surface") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 6, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "sector") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 5, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "sound") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 8, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "template") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 4, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "model") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 12, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "keyframe") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 7, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "cog") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 9, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "message") )
-                {
-                    sithCogParse_ParseMessage(cogscript);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "material") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 10, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "flex") || !_strcmp(stdConffile_entry.args[0].value, "float") )
-                {
-                    sithCogParse_ParseFlex(cogscript, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "int") )
-                {
-                    sithCogParse_ParseInt(cogscript, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "vector") )
-                {
-                    sithCogParse_ParseVector(cogscript, unk);
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "ai") )
-                {
-                    sithCogParse_ParseSymbol(cogscript, 13, unk);
-                }
+                sithCogParse_ParseSymbol(cogscript, 3, unk);
             }
-        }
-        if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_entry.args[0].value, "code") && sithCogParse_LoadEntry(cogscript) )
-        {
-            v6 = 0;
-            if ( cogscript->num_triggers )
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "surface") )
             {
-                v7 = &cogscript->triggers[0].trigPc;
-                do
-                {
-                    v8 = v7[1];
-                    ++v6;
-                    v7 += 3;
-                    *(v7 - 3) = cog_parser_node_stackpos[v8];
-                }
-                while ( v6 < cogscript->num_triggers );
+                sithCogParse_ParseSymbol(cogscript, 6, unk);
             }
-            stdConffile_Close();
-            result = 1;
-        }
-        else
-        {
-LABEL_54:
-            if ( cogscript->symbolTable )
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "sector") )
             {
-                sithCogParse_FreeSymboltable(cogscript->symbolTable);
-                cogscript->symbolTable = 0;
+                sithCogParse_ParseSymbol(cogscript, 5, unk);
             }
-            if ( cogparser_topnode )
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "sound") )
             {
-                cogparser_current_nodeidx = 0;
-                cogparser_topnode = 0;
+                sithCogParse_ParseSymbol(cogscript, 8, unk);
             }
-            stdConffile_Close();
-            result = 0;
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "template") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 4, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "model") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 12, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "keyframe") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 7, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "cog") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 9, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "message") )
+            {
+                sithCogParse_ParseMessage(cogscript);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "material") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 10, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "flex") || !_strcmp(stdConffile_entry.args[0].value, "float") )
+            {
+                sithCogParse_ParseFlex(cogscript, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "int") )
+            {
+                sithCogParse_ParseInt(cogscript, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "vector") )
+            {
+                sithCogParse_ParseVector(cogscript, unk);
+            }
+            else if ( !_strcmp(stdConffile_entry.args[0].value, "ai") )
+            {
+                sithCogParse_ParseSymbol(cogscript, 13, unk);
+            }
         }
     }
-    return result;
+    if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_entry.args[0].value, "code") && sithCogParse_LoadEntry(cogscript) )
+    {
+        for (v6 = 0; v6 < cogscript->num_triggers; v6++)
+        {
+            v8 = cogscript->triggers[v6].field_8;
+            cogscript->triggers[v6].trigPc = cog_parser_node_stackpos[v8];
+        }
+        stdConffile_Close();
+        return 1;
+    }
+    else
+    {
+        goto fail_cleanup;
+    }
+
+fail_cleanup:
+    if ( cogscript->symbolTable )
+    {
+        sithCogParse_FreeSymboltable(cogscript->symbolTable);
+        cogscript->symbolTable = 0;
+    }
+    if ( cogparser_topnode )
+    {
+        cogparser_current_nodeidx = 0;
+        cogparser_topnode = 0;
+    }
+    stdConffile_Close();
+    return 0;
 }
 
 int sithCogParse_LoadEntry(sithCogScript *script)
@@ -360,7 +355,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
     }
     else
     {
-        stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 421, "Failed to create memory for symbol table.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 421, "Failed to create memory for symbol table.\n", 0, 0, 0, 0);
         if ( newTable )
         {
             if ( newTable->buckets )
@@ -486,7 +481,7 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
     }
     else
     {
-        stdPrintf((int)pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", symbolName);
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", symbolName);
         return NULL;
     }
 }

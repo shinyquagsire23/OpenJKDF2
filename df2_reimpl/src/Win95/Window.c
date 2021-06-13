@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include "Win95/stdGdi.h"
+#include "Win95/std3D.h"
 #include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkGame.h"
@@ -244,6 +245,7 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 #include <string.h>
 #include <SDL2/SDL.h>
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include "Win95/Video.h"
 

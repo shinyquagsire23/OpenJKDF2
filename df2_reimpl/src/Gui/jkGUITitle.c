@@ -232,7 +232,6 @@ void jkGuiTitle_ShowLoadingStatic()
 void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
 {
     wchar_t *v4; // ebx
-    jkGuiStringEntry *v5; // esi
     int v6; // edi
     char key[64]; // [esp+Ch] [ebp-80h] BYREF
     char v8[64]; // [esp+4Ch] [ebp-40h] BYREF
@@ -247,17 +246,15 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     v4 = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !v4 )
         v4 = jkStrings_GetText(key);
-    v5 = jkGuiTitle_aTexts;
+
     _memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
-    v6 = 0;
-    do
+
+    for (v6 = 0; v6 < 20; v6++)
     {
         stdString_snprintf(v8, 64, "%s_TEXT_%02d", key, v6);
-        v5->str = stdStrTable_GetUniString(&jkCog_strings, v8);
-        ++v5;
-        ++v6;
+        jkGuiTitle_aTexts[v6].str = stdStrTable_GetUniString(&jkCog_strings, v8);
     }
-    while ( (int)v5 < (int)&jkGuiTitle_whichLoading );
+
     jkGuiTitle_elementsLoad[0].wstr = a2;
     if ( !a2 )
         jkGuiTitle_elementsLoad[0].wstr = v4;

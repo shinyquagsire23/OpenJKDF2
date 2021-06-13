@@ -80,6 +80,7 @@ typedef struct sithSoundClass sithSoundClass;
 typedef struct sithAI sithAI;
 typedef struct sithAICommand sithAICommand;
 typedef struct sithActor sithActor;
+typedef struct sithActorEntry sithActorEntry;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;

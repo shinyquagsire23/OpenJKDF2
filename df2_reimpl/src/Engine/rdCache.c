@@ -180,15 +180,13 @@ int rdCache_SendFaceListToHardware()
     int v39; // eax
     int normals_related; // zf
     double light_level; // st7
-    int vertex_b_; // esi
     int vertex_g; // ebx
     int vertex_r; // edi
     rdColormap *v45; // eax
-    int v46; // esi
     double v47; // st7
     __int64 v48; // rax
     double v49; // st7
-    uint8_t vertex_b; // cl
+    int vertex_b; // cl
     rdProcEntry *v52; // esi
     int final_vertex_color; // eax
     rdVector2 *uvs_in_pixels; // eax
@@ -234,7 +232,6 @@ int rdCache_SendFaceListToHardware()
     double v101; // st7
     uint8_t v103; // cl
     int v104; // eax
-    float v105; // ecx
     int v106; // edi
     int v107; // eax
     unsigned int v108; // edi
@@ -242,7 +239,6 @@ int rdCache_SendFaceListToHardware()
     int v110; // edx
     unsigned int v111; // edi
     int v112; // esi
-    unsigned int v113; // eax
     rdTri *v114; // eax
     int v115; // ebx
     unsigned int v116; // edx
@@ -268,9 +264,7 @@ int rdCache_SendFaceListToHardware()
     int iterating_6c_vtx_idx; // [esp+64h] [ebp-3Ch]
     int mipmap_related; // [esp+68h] [ebp-38h]
     rdVector3 *iterating_6c_vtxs; // [esp+68h] [ebp-38h]
-    int mipmap_relatedb; // [esp+68h] [ebp-38h]
     unsigned int out_width; // [esp+6Ch] [ebp-34h] BYREF
-    rdDDrawSurface *tex2_arr_sel_; // [esp+70h] [ebp-30h]
     unsigned int out_height; // [esp+74h] [ebp-2Ch] BYREF
     int flags_idk_; // [esp+78h] [ebp-28h]
     int a3; // [esp+7Ch] [ebp-24h]
@@ -414,7 +408,7 @@ LABEL_56:
             }
             if ( !v15 || (v15->header.texture_type & 8) == 0 )
             {
-                tex2_arr_sel_ = 0;
+                tex2_arr_sel = 0;
                 goto LABEL_99;
             }
             sith_tex_sel = v15->texture_ptr;
@@ -593,7 +587,7 @@ LABEL_142:
                                                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
                                                 if ( normals_related )
                                                 {
-                                                    vertex_b_ = 255;
+                                                    vertex_b = 255;
                                                     vertex_g = 255;
                                                     blue = 255;
                                                     green = 255;
@@ -605,27 +599,26 @@ LABEL_142:
                                                         light_level = iterating_6c->vertexIntensities[vtx_idx];
                                                     else
                                                         light_level = iterating_6c->light_level_static;
-                                                    vertex_b_ = (__int64)light_level;
-                                                    vertex_g = vertex_b_;
-                                                    blue = vertex_b_;
-                                                    green = vertex_b_;
-                                                    vertex_r = vertex_b_;
+                                                    vertex_b = (__int64)light_level;
+                                                    vertex_g = vertex_b;
+                                                    blue = vertex_b;
+                                                    green = vertex_b;
+                                                    vertex_r = vertex_b;
                                                 }
                                                 red_and_alpha = vertex_r;
-                                                v45 = (rdColormap *)iterating_6c->colormap;
+                                                v45 = iterating_6c->colormap;
                                                 if ( v45 != rdColormap_pIdentityMap )
                                                 {
-                                                    v46 = iterating_6c->colormap;
                                                     v47 = v45->tint.y * (double)green;
                                                     vertex_r = (uint8_t)(__int64)(v45->tint.x * (double)red_and_alpha);
                                                     red_and_alpha = vertex_r;
                                                     v48 = (__int64)v47;
-                                                    v49 = *(float *)(v46 + 44) * (double)blue;
+                                                    v49 = v45->tint.z * (double)blue;
                                                     vertex_g = (uint8_t)v48;
                                                     green = (uint8_t)v48;
-                                                    vertex_b_ = (uint8_t)(__int64)v49;
+                                                    vertex_b = (uint8_t)(__int64)v49;
                                                     flags_idk_ |= 0x8000;
-                                                    blue = vertex_b_;
+                                                    blue = vertex_b;
                                                 }
                                                 if ( v129 )
                                                 {
@@ -641,7 +634,7 @@ LABEL_142:
                                                     }
                                                     if ( !rdroid_curColorEffects.filter.z )
                                                     {
-                                                        vertex_b_ = 0;
+                                                        vertex_b = 0;
                                                         blue = 0;
                                                     }
                                                 }
@@ -651,14 +644,14 @@ LABEL_142:
                                                     red_and_alpha = vertex_r;
                                                     vertex_g += (__int64)((double)green * green_scalar);
                                                     green = vertex_g;
-                                                    vertex_b_ += (__int64)((double)blue * blue_scalar);
-                                                    blue = vertex_b_;
+                                                    vertex_b += (__int64)((double)blue * blue_scalar);
+                                                    blue = vertex_b;
                                                 }
                                                 if ( rdroid_curColorEffects.fade < 1.0 )
                                                 {
                                                     vertex_r = (__int64)((double)red_and_alpha * rdroid_curColorEffects.fade);
                                                     vertex_g = (__int64)((double)green * rdroid_curColorEffects.fade);
-                                                    vertex_b_ = (__int64)((double)blue * rdroid_curColorEffects.fade);
+                                                    vertex_b = (__int64)((double)blue * rdroid_curColorEffects.fade);
                                                 }
                                                 
                                                 if ( vertex_r < 0 )
@@ -677,18 +670,15 @@ LABEL_142:
                                                 {
                                                     vertex_g = (vertex_g & ~0xFF) | 0xFF;
                                                 }
-                                                if ( vertex_b_ < 0 )
+                                                if ( vertex_b < 0 )
                                                 {
                                                     vertex_b = (vertex_b & ~0xFF) | 0;
                                                 }
-                                                else if ( vertex_b_ > 255 )
+                                                else if ( vertex_b > 255 )
                                                 {
                                                     vertex_b = (vertex_b & ~0xFF) | 0xFF;
                                                 }
-                                                else
-                                                {
-                                                    vertex_b = vertex_b_;
-                                                }
+
                                                 v52 = iterating_6c;
                                                 final_vertex_color = vertex_b | (((uint8_t)vertex_g | ((vertex_a | (uint8_t)vertex_r) << 8)) << 8);
                                                 
@@ -872,7 +862,6 @@ LABEL_232:
                                     if ( v79 )
                                     {
                                         int tmpiter = 0;
-                                        mipmap_relatedb = (int)iterating_6c->vertices;
                                         alpha_upshifta = red_and_alpha << 8;
                                         do
                                         {
@@ -985,7 +974,6 @@ LABEL_232:
                                                 v103 = -1;
                                             }
                                             v104 = v103 | (((uint8_t)v94 | ((alpha_upshifta | (uint8_t)v96) << 8)) << 8);
-                                            v105 = tris_to_push;
                                             v106 = rdCache_totalVerts + 1;
                                             *(uint32_t *)&rdCache_aHWVertices[rdCache_totalVerts].ny = v104;
                                             rdCache_aHWVertices[rdCache_totalVerts].tu = 0.0;
@@ -1014,33 +1002,26 @@ LABEL_232:
                                         v109 = v108 - 2;
                                         v110 = 0;
                                         v111 = v108 - 1;
-                                        v112 = 0;
                                         lighting_capability = 1;
-                                        if ( v109 > 0 )
+                                        for (v112 = 0; v112 < v109; v112++)
                                         {
-                                            v113 = rdCache_totalSolidTris;
-                                            rdCache_totalSolidTris += v109;
-                                            do
+                                            v115 = lighting_capability;
+                                            rdCache_aHWSolidTris[rdCache_totalSolidTris+v112].v3 = tri_vert_idx + v110;
+                                            rdCache_aHWSolidTris[rdCache_totalSolidTris+v112].v2 = v115 + tri_vert_idx;
+                                            rdCache_aHWSolidTris[rdCache_totalSolidTris+v112].v1 = v111 + tri_vert_idx;
+                                            rdCache_aHWSolidTris[rdCache_totalSolidTris+v112].flags = flags_idk_;
+                                            rdCache_aHWSolidTris[rdCache_totalSolidTris+v112].texture = 0;
+                                            if ( (v112 & 1) != 0 )
                                             {
-                                                v115 = lighting_capability;
-                                                rdCache_aHWSolidTris[v113+v112].v3 = tri_vert_idx + v110;
-                                                rdCache_aHWSolidTris[v113+v112].v2 = v115 + tri_vert_idx;
-                                                rdCache_aHWSolidTris[v113+v112].v1 = v111 + tri_vert_idx;
-                                                rdCache_aHWSolidTris[v113+v112].flags = flags_idk_;
-                                                rdCache_aHWSolidTris[v113+v112].texture = 0;
-                                                if ( (v112 & 1) != 0 )
-                                                {
-                                                    v110 = v111--;
-                                                }
-                                                else
-                                                {
-                                                    v110 = v115;
-                                                    lighting_capability = v115 + 1;
-                                                }
-                                                ++v112;
+                                                v110 = v111--;
                                             }
-                                            while ( v112 < v109 );
+                                            else
+                                            {
+                                                v110 = v115;
+                                                lighting_capability = v115 + 1;
+                                            }
                                         }
+                                        rdCache_totalSolidTris += v109;
                                     }
                                     goto LABEL_280;
                                 }
@@ -1130,8 +1111,11 @@ void rdCache_DrawRenderList()
     }
 }
 
-int rdCache_TriCompare(rdTri *a, rdTri *b)
+int rdCache_TriCompare(const void* a_, const void* b_)
 {
+    const rdTri* a = (const rdTri*)a_;
+    const rdTri* b = (const rdTri*)b_;
+
     rdDDrawSurface *tex_b;
     rdDDrawSurface *tex_a;
 
@@ -1253,7 +1237,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     if ( (flags & 4) != 0 )
         rdCache_numUsedIntensities += num_vertices;
     v23 = rdCache_ulcExtent.x;
-    procFace->colormap = (int)rdColormap_pCurMap;
+    procFace->colormap = rdColormap_pCurMap;
     v24 = procFace->x_min;
     ++rdCache_numProcFaces;
     if ( v24 < v23 )

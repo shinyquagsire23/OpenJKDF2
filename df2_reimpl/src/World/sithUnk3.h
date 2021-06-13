@@ -70,10 +70,10 @@ void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4)
 void sithUnk3_RegisterHitHandler(int thingType, void* a2);
 #if 1
 sithUnk3SearchEntry* sithUnk3_NextSearchResult();
-float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags);
-float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags);
-void sithUnk3_sub_4E86D0(sithSector *a1, rdVector3 *a2, rdVector3 *a3, float a4, float a5, int unk3Flags);
-sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5);
+float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags);
+float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags);
+void sithUnk3_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, int unk3Flags);
+sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rdVector3 *a4, float a5);
 #endif
 
 #if 0

@@ -51,44 +51,27 @@ void jkRes_New(char *path)
 void jkRes_LoadGob(char *a1)
 {
     unsigned int v1; // esi
-    stdGob **v2; // edi
     unsigned int v3; // esi
-    stdGob **v4; // edi
     int v12; // ecx
     int v13; // edx
     int v15; // edx
     int v24; // ecx
     int v25; // edx
     int v27; // edx
-    common_functions *v29; // eax
     char v30[128]; // [esp+10h] [ebp-80h] BYREF
 
     sith_SetEpisodeName(a1);
     v1 = 0;
     
-    if ( jkRes_gCtx.gobs[1].numGobs )
+    for (v1 = 0; v1 < jkRes_gCtx.gobs[1].numGobs; v1++)
     {
-        v2 = jkRes_gCtx.gobs[1].gobs;
-        do
-        {
-            stdGob_Free(*v2);
-            ++v1;
-            ++v2;
-        }
-        while ( v1 < jkRes_gCtx.gobs[1].numGobs );
+        stdGob_Free(jkRes_gCtx.gobs[1].gobs[v1]);
     }
     v3 = 0;
     jkRes_gCtx.gobs[1].numGobs = 0;
-    if ( jkRes_gCtx.gobs[2].numGobs )
+    for (v3 = 0; v3 < jkRes_gCtx.gobs[2].numGobs; v3++)
     {
-        v4 = jkRes_gCtx.gobs[2].gobs;
-        do
-        {
-            stdGob_Free(*v4);
-            ++v3;
-            ++v4;
-        }
-        while ( v3 < jkRes_gCtx.gobs[2].numGobs );
+        stdGob_Free(jkRes_gCtx.gobs[2].gobs[v3]);
     }
     jkRes_gCtx.gobs[2].numGobs = 0;
     _strncpy(jkRes_episodeGobName, a1, 0x1Fu);
@@ -134,22 +117,14 @@ void jkRes_LoadGob(char *a1)
 int jkRes_LoadCd(char *a1)
 {
     unsigned int v1; // esi
-    stdGob **v2; // edi
     char v4[128]; // [esp+Ch] [ebp-80h] BYREF
 
     _strncpy(jkRes_curDir, a1, 0x7Fu);
     v1 = 0;
     jkRes_curDir[127] = 0;
-    if ( jkRes_gCtx.gobs[4].numGobs )
+    for (v1 = 0; v1 < jkRes_gCtx.gobs[4].numGobs; v1++)
     {
-        v2 = jkRes_gCtx.gobs[4].gobs;
-        do
-        {
-            stdGob_Free(*v2);
-            ++v1;
-            ++v2;
-        }
-        while ( v1 < jkRes_gCtx.gobs[4].numGobs );
+        stdGob_Free(jkRes_gCtx.gobs[4].gobs[v1]);
     }
 
     jkRes_gCtx.gobs[4].numGobs = 0;
@@ -199,7 +174,7 @@ void jkRes_UnhookHS()
     }
 }
 
-int jkRes_FileExists(char *fpath, char *a2, int len)
+int jkRes_FileExists(const char *fpath, char *a2, int len)
 {
     jkResFile *resFile;
 
@@ -248,12 +223,10 @@ int jkRes_ReadKey()
 
 int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
 {
-    int result; // eax
     stdFileSearch *v15; // ebp
     stdFileSearchResult v18; // [esp+8h] [ebp-10Ch] BYREF
 
     _strncpy(resGob->name, name, 0x7Fu);
-    result = a3;
     resGob->name[127] = 0;
     resGob->numGobs = 0;
     if (!a3)
@@ -322,9 +295,7 @@ int jkRes_LoadCD(int a1)
     unsigned int v14; // edi
     stdGob **v15; // esi
     unsigned int v16; // esi
-    stdGob **v17; // edi
     unsigned int v18; // esi
-    stdGob **v19; // edi
     unsigned int v20; // edi
     stdGob **v21; // esi
     int v23; // [esp+10h] [ebp-18Ch]
@@ -474,18 +445,10 @@ LABEL_39:
             return 1;
     }
     _strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
-    v16 = 0;
     jkRes_curDir[127] = 0;
-    if ( jkRes_gCtx.gobs[4].numGobs )
+    for (v16 = 0; v16 < jkRes_gCtx.gobs[4].numGobs; v16++)
     {
-        v17 = jkRes_gCtx.gobs[4].gobs;
-        do
-        {
-            stdGob_Free(*v17);
-            ++v16;
-            ++v17;
-        }
-        while ( v16 < jkRes_gCtx.gobs[4].numGobs );
+        stdGob_Free(jkRes_gCtx.gobs[4].gobs[v16]);
     }
     jkRes_gCtx.gobs[4].numGobs = 0;
     if ( jkRes_curDir[0] )
@@ -495,16 +458,9 @@ LABEL_39:
     }
     sith_SetEpisodeName(jkRes_episodeGobName);
     v18 = 0;
-    if ( jkRes_gCtx.gobs[1].numGobs )
+    for (v18 = 0; v18 < jkRes_gCtx.gobs[1].numGobs; v18++)
     {
-        v19 = jkRes_gCtx.gobs[1].gobs;
-        do
-        {
-            stdGob_Free(*v19);
-            ++v18;
-            ++v19;
-        }
-        while ( v18 < jkRes_gCtx.gobs[1].numGobs );
+        stdGob_Free(jkRes_gCtx.gobs[1].gobs[v18]);
     }
     v20 = 0;
     jkRes_gCtx.gobs[1].numGobs = 0;
@@ -540,14 +496,12 @@ LABEL_39:
     return 0;
 }
 
-uint32_t jkRes_FileOpen(char *fpath, char *mode)
+uint32_t jkRes_FileOpen(const char *fpath, const char *mode)
 {
-    jkResFile *v2; // eax
     unsigned int resIdx; // edi
     int v6; // esi
     int fhand; // eax
     unsigned int v8; // esi
-    char v10; // cl
     const char *v11; // eax
     int v12; // eax
     unsigned int v13; // esi
@@ -558,16 +512,12 @@ uint32_t jkRes_FileOpen(char *fpath, char *mode)
     unsigned int v18; // [esp+14h] [ebp-8h]
     int v19; // [esp+18h] [ebp-4h]
 
-    v2 = jkRes_aFiles;
     resIdx = 0;
-    do
+    for (resIdx = 0; resIdx < 32; resIdx++)
     {
-        if ( !v2->bOpened )
+        if ( !jkRes_aFiles[resIdx].bOpened )
             break;
-        ++v2;
-        ++resIdx;
     }
-    while ( v2 < (jkResFile *)&jkRes_pHS );
     if ( resIdx >= 0x20 )
         return 0;
     v6 = 0;
@@ -590,9 +540,8 @@ LABEL_21:
         v19 = 0;
         while ( !v6 )
         {
-            v10 = jkRes_gCtx.gobs[v19].name;
             v11 = jkRes_gCtx.gobs[v19].name;
-            if ( v10 )
+            if ( v11 )
             {
                 __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
                 v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);

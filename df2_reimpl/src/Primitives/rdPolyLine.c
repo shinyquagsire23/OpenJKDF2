@@ -32,7 +32,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     rdVector2 *extraUVTipMaybe;
     int *vertexUVIdx;
     rdVector2 *extraUVFaceMaybe;
-    int *v22; // TODO
+    stdVBuffer *v22;
 
     if ( polyline_fname )
     {
@@ -75,14 +75,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVTipMaybe )
             return 0;
         v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVTipMaybe[0].x = (double)(v22[3]) - 0.0099999998;
+        extraUVTipMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
         extraUVTipMaybe[0].y = 0.0;
         extraUVTipMaybe[1].x = 0.0;
         extraUVTipMaybe[1].y = 0.0;
         extraUVTipMaybe[2].x = 0.0;
-        extraUVTipMaybe[2].y = (double)((unsigned int)v22[4]) - 0.0099999998;
-        extraUVTipMaybe[3].x = (double)(v22[3]) - 0.0099999998;
-        extraUVTipMaybe[3].y = (double)((unsigned int)v22[4]) - 0.0099999998;
+        extraUVTipMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
+        extraUVTipMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
+        extraUVTipMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
     }
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
@@ -115,14 +115,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVFaceMaybe )
             return 0;
         v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVFaceMaybe[0].x = (double)(v22[3]) - 0.0099999998;
+        extraUVFaceMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
         extraUVFaceMaybe[0].y = 0.0;
         extraUVFaceMaybe[1].x = 0.0;
         extraUVFaceMaybe[1].y = 0.0;
         extraUVFaceMaybe[2].x = 0.0;
-        extraUVFaceMaybe[2].y = (double)((unsigned int)v22[4]) - 0.0099999998;
-        extraUVFaceMaybe[3].x = (double)(v22[3]) - 0.0099999998;
-        extraUVFaceMaybe[3].y = (double)((unsigned int)v22[4]) - 0.0099999998;
+        extraUVFaceMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
+        extraUVFaceMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
+        extraUVFaceMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
     }
     return 1;
 }
@@ -407,7 +407,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
         procFaceFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->wallCel = thing->gap2C;
+    procEntry->wallCel = thing->wallCel;
     procEntry->type = face->type;
     procEntry->extralight = face->extraLight;
     procEntry->material = face->material;

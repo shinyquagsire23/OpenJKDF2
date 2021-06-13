@@ -222,7 +222,7 @@ int jkGui_SetModeMenu(const void *palette)
     }
     if ( !stdDisplay_bOpen && !stdDisplay_Open(v2) )
     {
-        stdPrintf((int)pHS->errorPrint, ".\\Gui\\jkGUI.c", 400, "Error opening display device.\n", 0, 0, 0, 0);
+        stdPrintf(pHS->errorPrint, ".\\Gui\\jkGUI.c", 400, "Error opening display device.\n", 0, 0, 0, 0);
         return 0;
     }
 
@@ -241,7 +241,7 @@ int jkGui_SetModeMenu(const void *palette)
     else
     {
         stdPrintf(
-            (int)pHS->errorPrint,
+            pHS->errorPrint,
             ".\\Gui\\jkGUI.c",
             426,
             "Unable to set video mode to %d x %d, %d bits-per-pixel.\n",

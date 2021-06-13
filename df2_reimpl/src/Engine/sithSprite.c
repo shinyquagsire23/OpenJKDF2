@@ -12,7 +12,7 @@ int sithSprite_Startup()
     sithSprite_hashmap = stdHashTable_New(128);
     if (sithSprite_hashmap)
         return 1;
-    stdPrintf((int)pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
     return 0;
 }
 
@@ -41,7 +41,7 @@ int sithSprite_Load(sithWorld *world, int a2)
 
     if ( !sithSprite_New(world, sprites_amt) )
     {
-        stdPrintf((int)pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
     
@@ -55,7 +55,7 @@ int sithSprite_Load(sithWorld *world, int a2)
             if ( !sithSprite_LoadEntry(stdConffile_entry.args[1].value) )
             {
                 stdPrintf(
-                    (int)pSithHS->errorPrint,
+                    pSithHS->errorPrint,
                     ".\\World\\sithSprite.c",
                     159,
                     "Parse error while reading sprites, line %d.\n",

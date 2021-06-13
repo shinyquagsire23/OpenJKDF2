@@ -13,6 +13,8 @@
 
 #define sithAIClass_hashmap (*(stdHashTable**)0x00852F88)
 
+typedef int (*sithAIClassEntryFunc_t)(sithActor*, sithAIClassEntry*, sithActorEntry*, int, int);
+
 typedef struct sithAIClassEntry
 {
   int param1;
@@ -20,7 +22,7 @@ typedef struct sithAIClassEntry
   int param3;
   float argsAsFloat[16];
   int argsAsInt[16];
-  int func;
+  sithAIClassEntryFunc_t func;
 } sithAIClassEntry;
 
 typedef struct sithAIClass

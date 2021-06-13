@@ -27,7 +27,7 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
     percent_delta = 15.0 / (double)numKeyframes;
     if ( !sithKeyFrame_New(world, numKeyframes) )
     {
-        stdPrintf((int)pSithHS->errorPrint, ".\\Engine\\sithPuppet.c", 1538, "Memory error while reading keyframes, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\Engine\\sithPuppet.c", 1538, "Memory error while reading keyframes, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
 
@@ -40,7 +40,7 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
         if ( !sithKeyFrame_LoadEntry(stdConffile_entry.args[1].value) )
         {
             stdPrintf(
-                (int)pSithHS->errorPrint,
+                pSithHS->errorPrint,
                 ".\\Engine\\sithPuppet.c",
                 1534,
                 "Parse error while reading keyframes, line %d.\n",

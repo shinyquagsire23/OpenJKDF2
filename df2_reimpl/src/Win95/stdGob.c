@@ -41,7 +41,6 @@ stdGob* stdGob_Load(char *fpath, int a2, int a3)
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 {
     unsigned int v4; // ebx
-    signed int v5; // edi
     HANDLE v6; // eax
     HANDLE v7; // eax
     int v8; // edx
@@ -51,7 +50,6 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
     v4 = 0;
-    v5 = 0;
     _strncpy(gob->fpath, fname, 0x7Fu);
     gob->fpath[127] = 0;
     gob->numFilesOpen = a3;
@@ -96,12 +94,12 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     pGobHS->fileRead(gob->fhand, &header, sizeof(stdGobHeader));
     if ( _memcmp((const char *)&header, "GOB ", 4u) )
     {
-      stdPrintf((int)std_pHS->errorPrint, ".\\Win95\\stdGob.c", 270, "Error: Bad signature in header of gob file.\n", 0, 0, 0, 0);
+      stdPrintf(std_pHS->errorPrint, ".\\Win95\\stdGob.c", 270, "Error: Bad signature in header of gob file.\n", 0, 0, 0, 0);
       return 0;
     }
     if ( header.version != 20 )
     {
-      stdPrintf((int)std_pHS->errorPrint, ".\\Win95\\stdGob.c", 277, "Error: Bad version %d for gob file\n", header.version, 0, 0, 0);
+      stdPrintf(std_pHS->errorPrint, ".\\Win95\\stdGob.c", 277, "Error: Bad version %d for gob file\n", header.version, 0, 0, 0);
       return 0;
     }
     pGobHS->fseek(gob->fhand, header.entryTable_offs, 0);

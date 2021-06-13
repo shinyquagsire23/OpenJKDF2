@@ -61,7 +61,7 @@ typedef struct rdProcEntry
     float ambientLight;
     float light_level_static;
     float extralight;
-    uint32_t colormap;
+    rdColormap* colormap;
     uint32_t light_flags;
     int32_t x_min;
     uint32_t x_max;
@@ -112,7 +112,7 @@ void rdCache_Flush();
 int rdCache_SendFaceListToHardware();
 void rdCache_ResetRenderList();
 void rdCache_DrawRenderList();
-int rdCache_TriCompare(rdTri *a, rdTri *b);
+int rdCache_TriCompare(const void* a_, const void* b_);
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);

@@ -61,7 +61,7 @@ typedef struct jkEpisodeLoad
 #define jkEpisode_aEpisodes ((jkEpisode*)0x8568E0)
 #define jkEpisode_var4 ((char*)0x005540D8)
 #define jkEpisode_var5 ((char*)0x00554158)
-#define jkEpisode_var2 (*(int*)0x005541D8)
+#define jkEpisode_var2 (*(uint32_t*)0x005541D8)
 #define jkEpisode_mLoad (*(jkEpisodeLoad*)0x00552B68)
 
 int jkEpisode_Startup();

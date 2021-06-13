@@ -25,7 +25,7 @@ typedef struct stdBitmap
     int field_68;
     int xPos;
     int yPos;
-    void* colorkey;
+    uint32_t colorkey;
     stdVBuffer **mipSurfaces;
 } stdBitmap;
 

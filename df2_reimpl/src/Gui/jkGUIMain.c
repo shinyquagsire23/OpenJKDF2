@@ -159,7 +159,7 @@ void jkGuiMain_ShowCutscenes()
                     goto LABEL_17;
                 }
                 v6 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
-                stdPrintf((int)pHS->errorPrint, ".\\Gui\\jkGUIMain.c", 297, "Cannot find cutscene '%s'.\n", v6);
+                stdPrintf(pHS->errorPrint, ".\\Gui\\jkGUIMain.c", 297, "Cannot find cutscene '%s'.\n", v6);
             }
         }
     }

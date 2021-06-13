@@ -27,7 +27,7 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
         }
         else
         {
-            stdPrintf((int)std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
+            stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
             v6 = 0;
         }
         if ( v6 )
@@ -42,7 +42,7 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
     }
     else
     {
-        stdPrintf((int)std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
+        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
         result = 0;
     }
     return result;

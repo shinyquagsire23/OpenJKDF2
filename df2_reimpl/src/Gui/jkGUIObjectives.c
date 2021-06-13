@@ -43,7 +43,6 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
     int v15; // [esp+14h] [ebp-18h]
     WCHAR *v16; // [esp+18h] [ebp-14h]
     rdRect drawRect; // [esp+1Ch] [ebp-10h] BYREF
-    int elementa; // [esp+30h] [ebp+4h]
     jkGuiStringEntry *a4a; // [esp+3Ch] [ebp+10h]
 
     if ( a4 )
@@ -51,11 +50,11 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
     v6 = element->rect.y;
     v14 = 0;
     v7 = stdFont_sub_4357C0(menu->fonts[8], jkGuiObjectives_aTexts[0].str, &element->rect);
-    elementa = 0;
-    a4a = jkGuiObjectives_aTexts;
-    do
+    
+    for (int i = 0; i < 50; i++)
     {
-        v15 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, elementa + SITHBIN_GOAL00);
+        a4a = &jkGuiObjectives_aTexts[i];
+        v15 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, i + SITHBIN_GOAL00);
         if ( (v15 & 1) != 0 )
         {
             v16 = a4a->str;
@@ -83,10 +82,8 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                 v6 += v7;
             }
         }
-        ++elementa;
-        ++a4a;
     }
-    while ( (intptr_t)a4a < (intptr_t)&jkGuiObjectives_aTexts[50] );
+
     if ( !v14 )
     {
         v13 = jkStrings_GetText("GUI_NO_OBJECTIVES");
@@ -112,18 +109,14 @@ int jkGuiObjectives_Show()
     v0 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, 99);
     if ( v0 )
     {
-        v1 = 0;
-        v2 = jkGuiObjectives_aTexts;
-        do
+        for (v1 = 0; v1 < 50; v1++)
         {
+            v2 = &jkGuiObjectives_aTexts[v1];
             stdString_snprintf(key, 64, "GOAL_%05d", v0 + v1);
             v3 = stdStrTable_GetUniString(&jkCog_strings, key);
             if ( v3 )
                 v2->str = v3;
-            ++v2;
-            ++v1;
         }
-        while ( (intptr_t)v2 < (intptr_t)&jkGuiObjectives_aTexts[50] );
     }
     v4 = (__int64)sithPlayer_GetBinAmt(SITHBIN_SECRETS);
     v5 = sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS);

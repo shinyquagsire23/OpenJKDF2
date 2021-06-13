@@ -332,7 +332,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
             while ( stdFileUtil_FindNext(a1, &a2) );
             v13 = a1;
         }
-        stdFileUtil_DisposeFind((int)v13);
+        stdFileUtil_DisposeFind(v13);
     }
     if ( (!v13 || !v22) && a6 > 0 )
     {

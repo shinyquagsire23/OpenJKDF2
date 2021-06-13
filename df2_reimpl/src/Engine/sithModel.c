@@ -42,7 +42,7 @@ int sithModel_Load(sithWorld *world, int a2)
     world->models = (rdModel3 *)pSithHS->alloc(sizeof(rdModel3) * world->numModels);
     if ( !world->models )
     {
-        stdPrintf((int)pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading models, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading models, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
     world->numModelsLoaded = 0;

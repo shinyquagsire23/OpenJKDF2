@@ -220,9 +220,8 @@ int sith_Tick()
 #ifndef LINUX_TMP
         if ( (g_debugmodeFlags & 1) == 0 )
             sithAI_TickAll();
-
-        sithSurface_Tick(sithTime_deltaSeconds);
 #endif
+        sithSurface_Tick(sithTime_deltaSeconds);
 
         if ( g_sithMode != 2 )
         {

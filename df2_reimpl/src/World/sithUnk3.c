@@ -97,7 +97,7 @@ sithUnk3SearchEntry* sithUnk3_NextSearchResult()
     }
 }
 
-float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, rdVector3 *position, rdVector3 *direction, float a5, float range, int flags)
+float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags)
 {
     int v7; // eax
     int16_t v8; // di
@@ -234,7 +234,7 @@ LABEL_27:
     return a5a;
 }
 
-float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags)
+float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags)
 {
     sithThing *v7; // esi
     sithThing *v8; // ebp
@@ -347,10 +347,8 @@ LABEL_41:
     return a4;
 }
 
-void sithUnk3_sub_4E86D0(sithSector *sector, rdVector3 *vec1, rdVector3 *vec2, float a4, float a5, int unk3Flags)
+void sithUnk3_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int unk3Flags)
 {
-    rdVector3 *v6; // edi
-    rdVector3 *v7; // edx
     double v8; // st6
     double v9; // st7
     int v11; // eax
@@ -393,8 +391,6 @@ void sithUnk3_sub_4E86D0(sithSector *sector, rdVector3 *vec1, rdVector3 *vec2, f
     float v51; // [esp+30h] [ebp-10h]
     rdVector3 v52; // [esp+34h] [ebp-Ch] BYREF
 
-    v6 = vec2;
-    v7 = vec1;
     v8 = vec2->y * a4 + vec1->y;
     v9 = vec2->z * a4 + vec1->z;
     v49 = vec2->x * a4 + vec1->x;
@@ -432,10 +428,10 @@ LABEL_46:
                            + (v50 - v35[*v12->surfaceInfo.face.vertexPosIdx].y) * v12->surfaceInfo.face.normal.y
                            + (v49 - v35[*v12->surfaceInfo.face.vertexPosIdx].x) * v12->surfaceInfo.face.normal.x <= a5 )
                         {
-                            v36 = sithCollide_sub_508D20(v7, v6, a4, a5, &v12->surfaceInfo.face, v35, &a7, &v52, unk3Flags_);
+                            v36 = sithCollide_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &v52, unk3Flags_);
                             if ( v36 )
                             {
-                                if ( (unk3Flags_ & 0x400) != 0 || v6->y * v52.y + v6->z * v52.z + v6->x * v52.x < 0.0 )
+                                if ( (unk3Flags_ & 0x400) != 0 || vec2->y * v52.y + vec2->z * v52.z + vec2->x * v52.x < 0.0 )
                                 {
                                     v37 = a7;
                                     v38 = sithUnk3_searchNumResults[sithUnk3_searchStackIdx];
@@ -474,7 +470,7 @@ LABEL_46:
                         goto LABEL_46;
                 }
 LABEL_22:
-                if ( sithCollide_sub_5090B0(v7, v6, a4, a5, &v12->surfaceInfo, v44->vertices, &a7, unk3Flags_) )
+                if ( sithCollide_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, v44->vertices, &a7, unk3Flags_) )
                 {
                     if ( !v45 || (unk3Flags_ & 1) == 0 )
                     {
@@ -566,14 +562,12 @@ LABEL_56:
                 v41 = sector->numSurfaces;
                 if ( ++v47 >= v41 )
                     return;
-                v6 = vec2;
-                v7 = vec1;
             }
         }
     }
 }
 
-sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5)
+sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rdVector3 *a4, float a5)
 {
     double v4; // st6
     sithSector *result; // eax

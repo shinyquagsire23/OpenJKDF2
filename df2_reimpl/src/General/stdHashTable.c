@@ -311,7 +311,6 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
 
 void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
 {
-    stdHashTable *hashtable_; // esi
     int maxLookups; // edi
     int bucketIdx2; // ebp
     int bucketIdx; // ebx
@@ -321,7 +320,6 @@ void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
 
     std_pHS->debugPrint("HASHTABLE Diagnostics\n");
     std_pHS->debugPrint("---------------------\n");
-    hashtable_ = hashtable;
     maxLookups = 0;
     bucketIdx2 = 0;
     numFilled = 0;

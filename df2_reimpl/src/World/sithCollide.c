@@ -10,7 +10,7 @@
 #include "World/sithThing.h"
 #include "jk.h"
 
-int sithCollide_IsSphereInSector(rdVector3 *pos, float radius, sithSector *sector)
+int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
     double v8; // st7
@@ -51,7 +51,7 @@ int sithCollide_IsSphereInSector(rdVector3 *pos, float radius, sithSector *secto
     return 1;
 }
 
-int sithCollide_sub_5080D0(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
+int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
     sithThing *v11; // edi
     rdVector3 *v13; // ebx
@@ -187,7 +187,7 @@ int sithCollide_sub_5080D0(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float
     return result;
 }
 
-int sithCollide_sub_508540(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9)
+int sithCollide_sub_508540(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9)
 {
     double v10; // st6
     double v11; // st5

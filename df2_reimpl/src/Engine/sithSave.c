@@ -127,7 +127,7 @@ LABEL_11:
             if (!(!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size)))
                 goto LABEL_25;
             
-            if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp.netMsg))
+            if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp))
                 goto LABEL_25;
 
             if ( !stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )

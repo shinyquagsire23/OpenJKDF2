@@ -124,7 +124,7 @@ typedef struct render_pair
   uint32_t field_50;
 } render_pair;
 
-void stdDisplay_SetGammaTable(int len, int *table);
+void stdDisplay_SetGammaTable(int len, uint32_t *table);
 uint8_t* stdDisplay_GetPalette();
 
 static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_ADDR;

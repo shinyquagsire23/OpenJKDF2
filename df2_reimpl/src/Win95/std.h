@@ -43,23 +43,23 @@ void stdInitServices(common_functions *a1);
 char* stdFileFromPath(char *fpath);
 int stdCalcBitPos(signed int val);
 int stdReadRaw(char *fpath, void *out, signed int len);
-char stdFGetc(int fd);
-void stdFPutc(char c, int fd);
+char stdFGetc(stdFile_t fd);
+void stdFPutc(char c, stdFile_t fd);
 
 //static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
 static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
-static int (*stdFileOpen)(char*,char*) = (void*)stdFileOpen_ADDR;
-static int (*stdFileClose)(int) = (void*)stdFileClose_ADDR;
-static size_t (*stdFileRead)(int,void*,size_t) = (void*)stdFileRead_ADDR;
-static size_t (*stdFileWrite)(int,void*,size_t) = (void*)stdFileWrite_ADDR;
-static char* (*stdFileGets)(int,void*,size_t) = (void*)stdFileGets_ADDR;
-static int (*stdFeof)(char*) = (void*)stdFeof_ADDR;
-static int (*stdFtell)(char*) = (void*)stdFtell_ADDR;
-static int (*stdFseek)(int,int,int) = (void*)stdFseek_ADDR;
-static int (*stdFileSize)(char*) = (void*)stdFileSize_ADDR;
-static int (*stdFilePrintf)(int, const char *a1, ...) = (void*)stdFilePrintf_ADDR;
-static wchar_t* (*stdFileGetws)(int,void*,size_t) = (void*)stdFileGetws_ADDR;
+static stdFile_t (*stdFileOpen)(char*,char*) = (void*)stdFileOpen_ADDR;
+static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;
+static size_t (*stdFileRead)(stdFile_t,void*,size_t) = (void*)stdFileRead_ADDR;
+static size_t (*stdFileWrite)(stdFile_t,void*,size_t) = (void*)stdFileWrite_ADDR;
+static char* (*stdFileGets)(stdFile_t,char*,size_t) = (void*)stdFileGets_ADDR;
+static int (*stdFeof)(stdFile_t) = (void*)stdFeof_ADDR;
+static int (*stdFtell)(stdFile_t) = (void*)stdFtell_ADDR;
+static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
+static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
+static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
+static wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
 
 #define word_860800 (*(uint16_t*)0x860800)
 #define word_860802 (*(uint16_t*)0x860802)

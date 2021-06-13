@@ -186,10 +186,6 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     double v9; // st6
     double v10; // st5
     double v11; // st7
-    double v12; // rt0
-    double v13; // st5
-    double v14; // st7
-    double v16; // st6
     uint8_t v17; // c0
     uint8_t v18; // c3
     double v19; // st6
@@ -267,10 +263,6 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         break;
                     rdVector_Copy3(&a3, &weapon->position);
                     rdVector_MultAcc3(&a3, &lookOrient, elementSize_);
-                    v12 = a3.x - weaponPos.x;
-                    v13 = a3.z - weaponPos.z;
-                    v14 = v12;
-                    v16 = a3.y - weaponPos.y;
                     if (rdVector_Len3(&a3) <= 0.0) // TODO verify this
                     {
                         rot.x = _frand()
@@ -565,7 +557,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 {
                     v20 = v19->receiver;
                     if ( v20->thingtype == THINGTYPE_ACTOR )
-                        sithAI_SetActorFireTarget(v20->actor, 0x1000, v9);
+                        sithAI_SetActorFireTarget(v20->actor, 0x1000, (int)v9); // aaaaaaaaa undefined
                 }
             }
         }
@@ -1175,7 +1167,6 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
     int v25; // [esp+10h] [ebp-8h]
     int v26; // [esp+14h] [ebp-4h]
     int readInput;
-    int i;
     
     //return sithWeapon_HandleWeaponKeys_(player, a2);
 
@@ -1219,7 +1210,6 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                     while ( sithCog_SendMessageEx(v13->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
                 }
                 sithWeapon_SelectWeapon(player, v11, 0);
-                i = readInput == 0;
             }
 
             sithControl_ReadFunctionMap(INPUT_FUNC_PREVWEAPON, &readInput);
@@ -1244,7 +1234,6 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                     while ( sithCog_SendMessageEx(v17->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
                 }
                 sithWeapon_SelectWeapon(player, v15, 0);
-                i = readInput == 0;
             }
 
             if ( sithWeapon_8BD024 != -1 )

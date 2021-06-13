@@ -146,7 +146,7 @@ int rdCamera_SetOrthoScale(rdCamera *camera, float scale)
 int rdCamera_SetAspectRatio(rdCamera *camera, float ratio)
 {
     camera->screenAspectRatio = ratio;
-    rdCamera_SetProjectType(camera, camera->projectType);
+    return rdCamera_SetProjectType(camera, camera->projectType);
 }
 
 int rdCamera_BuildFOV(rdCamera *camera)
