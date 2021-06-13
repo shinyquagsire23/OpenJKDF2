@@ -183,7 +183,7 @@ int sithSector_Load(sithWorld *world, int tmp)
             if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " surfaces %d %d", &amount_1, &amount_2) != 2 )
                 return 0;
             sectors->numSurfaces = amount_2;
-            v15 = 0;
+
             sectors->surfaces = &world->surfaces[amount_1];
             for (v15 = 0; v15 < amount_2; v15++)
             {

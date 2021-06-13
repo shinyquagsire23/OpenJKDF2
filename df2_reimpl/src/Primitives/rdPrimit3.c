@@ -60,7 +60,6 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     float *v54; // edi
     int v55; // ebp
     rdVector3 *v56; // esi
-    int *v57; // edx
     rdVector2 *v58; // ecx
     int v59; // eax
     rdVector3 *v60; // edi
@@ -91,17 +90,13 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     float *v87; // [esp+10h] [ebp-14h]
     float *v88; // [esp+10h] [ebp-14h]
     float *v89; // [esp+10h] [ebp-14h]
-    int v90; // [esp+14h] [ebp-10h]
     int v91; // [esp+14h] [ebp-10h]
     rdVector2 *v92; // [esp+18h] [ebp-Ch]
     rdVector2 *v93; // [esp+18h] [ebp-Ch]
-    int v94; // [esp+1Ch] [ebp-8h]
     int v95; // [esp+1Ch] [ebp-8h]
-    int v96; // [esp+20h] [ebp-4h]
     char *v97; // [esp+20h] [ebp-4h]
     signed int a2a; // [esp+2Ch] [ebp+8h]
     char *a2b; // [esp+2Ch] [ebp+8h]
-    signed int a2c; // [esp+2Ch] [ebp+8h]
     signed int a2d; // [esp+2Ch] [ebp+8h]
     signed int a2e; // [esp+2Ch] [ebp+8h]
     rdVector3 *a3a; // [esp+30h] [ebp+Ch]
@@ -389,26 +384,22 @@ LABEL_25:
                             v56 = mesh_out->verticesProjected;
                             a3c = v52->vertices;
                             v92 = v52->extraUV;
-                            v57 = v52->vertexPosIdx;
                             v88 = v52->field_14;
                             v58 = mesh_out->vertexUVs;
-                            v90 = (char *)v52->vertexUVIdx - (char *)v57;
-                            v96 = (char *)v54 - (char *)v57;
-                            a2c = (char *)mesh_out->vertex_lights_maybe_ - (char *)v57;
-                            v94 = v55;
-                            do
+                            //printf("%x %x\n", v52->vertexUVIdx, &v52->vertexUVIdx);
+                            for (int i = 0; i < idxInfo->numVertices; i++)
                             {
-                                v59 = *v57;
-                                v60 = &a3c[*v57];
+                                v59 = v52->vertexPosIdx[i];
+                                v60 = &a3c[v59];
                                 v56->x = v60->x;
                                 v56->y = v60->y;
                                 v56->z = v60->z;
-                                v61 = *(int *)((char *)v57 + v90);
+                                v61 = v52->vertexUVIdx[i];
                                 v58->x = v92[v61].x;
                                 v58->y = v92[v61].y;
                                 v58->x = idkIn->x + v58->x;
                                 v58->y = v58->y + idkIn->y;
-                                v62 = v88[v59] + *(float *)((char *)v57 + v96);
+                                v62 = v88[v59] + idxInfo->field_18[i];
                                 if ( v62 < 0.0 )
                                 {
                                     v62 = 0.0;
@@ -419,33 +410,28 @@ LABEL_25:
                                 }
                                 ++v56;
                                 ++v58;
-                                *(float *)((char *)v57++ + a2c) = v62;
-                                --v94;
+                                mesh_out->vertex_lights_maybe_[i] = v62;
                             }
-                            while ( v94 );
                             v55 = idxInfof;
                             v53 = mesh_out;
                         }
                     }
                     else if ( v55 )
                     {
-                        v63 = v52->vertexPosIdx;
                         v64 = mesh_out->verticesProjected;
                         a3d = v52->vertices;
                         v89 = v52->field_14;
                         v65 = mesh_out->vertexUVs;
                         v93 = v52->extraUV;
-                        v91 = (char *)v52->vertexUVIdx - (char *)v63;
-                        a2d = (char *)mesh_out->vertex_lights_maybe_ - (char *)v63;
                         v95 = v55;
-                        do
+                        for (int i = 0; i < idxInfo->numVertices; i++)
                         {
-                            v66 = *v63;
-                            v67 = &a3d[*v63];
+                            v66 = v52->vertexPosIdx[i];
+                            v67 = &a3d[v66];
                             v64->x = v67->x;
                             v64->y = v67->y;
                             v64->z = v67->z;
-                            v68 = *(int *)((char *)v63 + v91);
+                            v68 = v52->vertexUVIdx[i];
                             v65->x = v93[v68].x;
                             v65->y = v93[v68].y;
                             v65->x = idkIn->x + v65->x;
@@ -464,10 +450,9 @@ LABEL_25:
                             }
                             ++v64;
                             ++v65;
-                            *(float *)((char *)v63++ + a2d) = v69;
+                            mesh_out->vertex_lights_maybe_[i] = v69;
                             --v95;
                         }
-                        while ( v95 );
                         v53 = mesh_out;
                         v55 = idxInfof;
                     }

@@ -337,12 +337,12 @@ void sithCogVm_SetNeedsSync()
 
 int sithCogVm_InvokeMsgByIdx(sithCogMsg *a1)
 {
-    int v1; // eax
     int result; // eax
 
-    v1 = a1->netMsg.cogMsgId;
-    if ( (signed int)(uint16_t)v1 < 65 && sithCogVm_msgFuncs[v1])
-        result = sithCogVm_msgFuncs[v1](a1);
+    int msgId = a1->netMsg.cogMsgId;
+
+    if ( (signed int)(uint16_t)msgId < 65 && sithCogVm_msgFuncs[msgId])
+        result = sithCogVm_msgFuncs[msgId](a1);
     else
         result = 1;
     return result;

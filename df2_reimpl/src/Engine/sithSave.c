@@ -75,10 +75,10 @@ int sithSave_LoadEntry(char *fpath)
     sithSave_Header header; // [esp+30h] [ebp-62Ch] BYREF
 
     if ( !stdConffile_OpenMode(fpath, "rb") )
-        goto LABEL_25;
+        goto load_fail;
     stdConffile_Read(&header, 1580);
     if ( header.version != 6 )
-        goto LABEL_25;
+        goto load_fail;
     if ( sithSave_funcRead )
         sithSave_funcRead();
     stdConffile_Read(SrcStr, 32);
@@ -94,11 +94,7 @@ int sithSave_LoadEntry(char *fpath)
     }
     if ( !sith_Mode1Init_2(SrcStr) )
     {
-LABEL_25:
-        stdConffile_Close();
-        sithThing_sub_4CCE60();
-        sith_Close();
-        return 0;
+        goto load_fail;
     }
 LABEL_11:
     sithSoundSys_sub_4DBF90();
@@ -109,7 +105,7 @@ LABEL_11:
     if ( sithSave_func2 )
         sithSave_func2();
     if ( !stdConffile_Read(&curMs, 4) )
-        goto LABEL_25;
+        goto load_fail;
     sithTime_SetMs(curMs);
     stdConffile_Read(&g_sithMode, 24);
     sithThing_freestuff(sithWorld_pCurWorld);
@@ -117,22 +113,33 @@ LABEL_11:
     // Apparently this works by interpreting a bunch of netMsg packets from the
     // savefile? Funky.
 #ifndef LINUX_TMP
-    if ( stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
+    while (1)
     {
-        while (1)
+        if ( !stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
         {
-            if (!stdConffile_Read(&g_netMsgTmp.netMsg.msg_size, 4))
-                goto LABEL_25;
-            
-            if (!(!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size)))
-                goto LABEL_25;
-            
-            if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp))
-                goto LABEL_25;
-
-            if ( !stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
-                break;
+            break;
         }
+        
+        if (!stdConffile_Read(&g_netMsgTmp.netMsg.msg_size, 4))
+        {
+            jk_printf("OpenJKDF2: Save load failed to read msg_size\n");
+            goto load_fail;
+        }
+        
+        if (!(!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size)))
+        {
+            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", g_netMsgTmp.netMsg.msg_size);
+            goto load_fail;
+        }
+        
+        if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp))
+        {
+            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", g_netMsgTmp.netMsg.cogMsgId);
+#ifndef LINUX
+            // Linux fails on SyncSound only
+            goto load_fail;
+#endif
+        }   
     }
 #endif
 
@@ -156,4 +163,10 @@ LABEL_11:
     sithTime_SetMs(curMs);
     sithCamera_SetCurrentCamera(sithCamera_currentCamera);
     return 1;
+
+load_fail:
+    stdConffile_Close();
+    sithThing_sub_4CCE60();
+    sith_Close();
+    return 0;
 }
