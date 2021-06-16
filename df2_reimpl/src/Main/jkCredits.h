@@ -15,6 +15,8 @@
 
 void jkCredits_Initialize(char *fpath);
 
+static void (*jkCredits_Shutdown)() = (void*)jkCredits_Shutdown_ADDR;
+
 //static void (*jkCredits_Initialize)() = (void*)jkCredits_Initialize_ADDR;
 
 #endif // _JKCREDITS_H

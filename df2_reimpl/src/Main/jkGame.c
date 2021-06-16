@@ -33,6 +33,17 @@ int jkGame_ParseSection(int a1, int a2)
     return a2 == 0;
 }
 
+void jkGame_ForceRefresh()
+{
+    sithCamera_Close();
+    rdCanvas_Free(Video_pCanvas);
+}
+
+void jkGame_Shutdown()
+{
+    jkGame_bInitted = 0;
+}
+
 #ifndef LINUX
 int jkGame_Update()
 {

@@ -16,10 +16,13 @@
 #define jkCutscene_strings (*(stdStrTable*)0x0055AA28)
 #define jkCutscene_subtitlefont (*(stdFont**)0x0055AA4C)
 #define jkCutscene_bInitted (*(int*)0x0055AA58)
+#define jkCutscene_smack_loaded (*(int*)0x0055AA48)
 
 void jkCutscene_Initialize(char *fpath);
 
+static void (*jkCutscene_Shutdown)() = (void*)jkCutscene_Shutdown_ADDR;
 //static void (*jkCutscene_Initialize)() = (void*)jkCutscene_Initialize_ADDR;
 static void (*jkCutscene_PauseShow)() = (void*)jkCutscene_PauseShow_ADDR;
+static void (*jkCutscene_sub_421410)() = (void*)jkCutscene_sub_421410_ADDR;
 
 #endif // _JK_CUTSCENE_H

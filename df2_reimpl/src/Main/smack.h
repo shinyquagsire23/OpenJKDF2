@@ -9,5 +9,6 @@
 #define smack_off_ADDR (0x00426B80)
 
 static int (*smack_Initialize)() = (void*)smack_Initialize_ADDR;
+static void (*smack_Shutdown)() = (void*)smack_Shutdown_ADDR;
 
 #endif // _MAIN_SMACK_H

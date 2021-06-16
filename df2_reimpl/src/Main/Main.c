@@ -232,7 +232,66 @@ int Main_Startup(const char *cmdline)
     return 0;
 }
 
-// Main_Shutdown
+void Main_Shutdown()
+{
+    jkSmack_Shutdown();
+    jkGuiControlSaveLoad_Shutdown();
+    jkGuiSaveLoad_Shutdown();
+    jkGuiBuildMulti_Shutdown();
+    jkGuiSingleplayer_Shutdown();
+    jkGuiDecision_Shutdown();
+    jkGuiGameplay_Shutdown();
+    jkGuiGeneral_Shutdown();
+    jkGuiTitle_Shutdown();
+    jkGuiControlOptions_Shutdown();
+    jkGuiMouse_Shutdown();
+    jkGuiDialog_Shutdown();
+    jkGuiJoystick_Shutdown();
+    jkGuiKeyboard_Shutdown();
+    jkGuiMap_Shutdown();
+    jkGuiEsc_Shutdown();
+    jkGuiForce_Shutdown();
+    jkGuiDisplay_Shutdown();
+    jkGuiSetup_Shutdown();
+    jkGuiNetHost_Shutdown();
+    jkGuiMultiplayer_Shutdown();
+    jkGuiMain_Shutdown();
+    jkGuiPlayer_Shutdown();
+    jkGuiSound_Shutdown();
+    jkGuiObjectives_Shutdown();
+    jkGuiSingleTally_Shutdown();
+    jkGuiRend_Shutdown();
+    jkCog_Shutdown();
+    sith_Free();
+    jkCredits_Shutdown();
+    jkCutscene_Shutdown();
+    jkSaber_Shutdown();
+    jkHudInv_Shutdown();
+    if ( jkCutscene_smack_loaded )
+        jkCutscene_sub_421410();
+    Video_Shutdown();
+    jkGame_Shutdown();
+    jkDev_Shutdown();
+    sith_Shutdown();
+    smack_Shutdown();
+    jkGui_Shutdown();
+    rdShutdown();
+    jkStrings_Shutdown();
+    Windows_Shutdown();
+    jkRes_Shutdown();
+    jkGob_Shutdown();
+    stdShutdown();
+    if ( Main_logLevel == 1 )
+    {
+        stdConsole_Shutdown();
+    }
+    else if ( Main_logLevel == 2 )
+    {
+        fclose(debug_log_fp);
+    }
+    
+    while (1);
+}
 
 void Main_ParseCmdLine(char *cmdline)
 {

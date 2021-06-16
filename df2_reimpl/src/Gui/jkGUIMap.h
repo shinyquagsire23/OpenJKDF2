@@ -11,6 +11,7 @@
 #define jkGuiMap_Show_ADDR (0x00415C50)
 
 static int (*jkGuiMap_Initialize)() = (void*)jkGuiMap_Initialize_ADDR;
+static void (*jkGuiMap_Shutdown)() = (void*)jkGuiMap_Shutdown_ADDR;
 static int (*jkGuiMap_Show)() = (void*)jkGuiMap_Show_ADDR;
 
 #endif // _JKGUIMAP_H

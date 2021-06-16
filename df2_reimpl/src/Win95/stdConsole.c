@@ -38,7 +38,7 @@ int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
     return 1;
 }
 
-BOOL stdConsole_Shutdown()
+int stdConsole_Shutdown()
 {
     return jk_FreeConsole();
 }
@@ -790,5 +790,15 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
             jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
         }
     }
+}
+#else
+int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
+{
+    return 1;
+}
+
+int stdConsole_Shutdown()
+{
+    return 0;
 }
 #endif

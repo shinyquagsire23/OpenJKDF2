@@ -83,3 +83,13 @@ int Video_Startup()
     }
     return 0;
 }
+
+void Video_Shutdown()
+{
+    sithCamera_Shutdown();
+    jkHud_Shutdown();
+    stdPalEffects_Close();
+    stdDisplay_Close();
+    stdDisplay_RestoreDisplayMode();
+    Video_bInitted = 0;
+}

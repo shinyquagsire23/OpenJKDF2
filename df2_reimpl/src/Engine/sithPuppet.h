@@ -39,6 +39,7 @@ struct sithPuppet
 #define sithPuppet_animNamesToIdxHashtable (*(stdHashTable**)0x00847E90)
 
 int sithPuppet_Startup();
+static void (*sithPuppet_Shutdown)() = (void*)sithPuppet_Shutdown_ADDR;
 sithPuppet* sithPuppet_NewEntry(sithThing *thing);
 void sithPuppet_FreeEntry(sithThing *puppet);
 void sithPuppet_sub_4E4760(sithThing *thing, int a2);

@@ -55,6 +55,7 @@ int jkSaber_Write();
 void jkSaber_player_thingsidkfunc();
 void jkSaber_nullsub_2();
 
+static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
 static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;

@@ -18,5 +18,6 @@
 
 static int (*jkGuiMouse_Initialize)() = (void*)jkGuiMouse_Initialize_ADDR;
 static int (*jkGuiMouse_Show)() = (void*)jkGuiMouse_Show_ADDR;
+static void (*jkGuiMouse_Shutdown)() = (void*)jkGuiMouse_Shutdown_ADDR;
 
 #endif // _JKGUI_MOUSE_H

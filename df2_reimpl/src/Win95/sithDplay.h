@@ -60,6 +60,7 @@
 #define sithDplay_dword_8321EC (*(int*)0x008321EC)
 
 int sithDplay_Startup();
+static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
 //static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
 

@@ -87,8 +87,14 @@ void jkCog_RegisterVerbs()
 int jkCog_Initialize()
 {
     jkCog_RegisterVerbs();
-    //cog_jk_initted = 1; //553FB0
+    jkCog_bInitted = 1;
     return 1;
+}
+
+void jkCog_Shutdown()
+{
+    stdStrTable_Free(&jkCog_strings);
+    jkCog_bInitted = 0;
 }
 
 int jkCog_StringsInit()

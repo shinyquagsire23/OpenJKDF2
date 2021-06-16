@@ -833,11 +833,6 @@ void jk_ChangeDisplaySettingsA()
     assert(0);
 }
 
-void stdConsole_Startup()
-{
-    assert(0);
-}
-
 uint32_t jk_DirectDrawEnumerateA()
 {
     assert(0);

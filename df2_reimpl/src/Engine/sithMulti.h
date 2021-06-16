@@ -46,6 +46,7 @@ typedef int (*sithMultiHandler_t)();
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 
+static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
 static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
 static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;

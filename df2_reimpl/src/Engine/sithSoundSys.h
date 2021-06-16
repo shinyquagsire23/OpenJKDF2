@@ -99,6 +99,7 @@ int sithSoundSys_Open();
 void sithSoundSys_FreeThing(sithThing *thing);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
+static void (*sithSoundSys_Shutdown)() = (void*)sithSoundSys_Shutdown_ADDR;
 
 static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
 static void (*sithSoundSys_UpdateMusicVolume)(float musicVolume) = (void*)sithSoundSys_UpdateMusicVolume_ADDR;

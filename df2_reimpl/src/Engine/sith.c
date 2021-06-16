@@ -74,32 +74,30 @@ int sith_Startup(struct common_functions *commonFuncs)
     return 1;
 }
 
-// sith_Shutdown
-
-void sith_UpdateCamera()
+void sith_Shutdown()
 {
-    if ( (g_submodeFlags & 8) == 0 )
-    {
-        if ( !++dword_8EE678 )
-        {
-            sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-            dword_8EE678 = 1;
-        }
-#ifdef QOL_IMPROVEMENTS
-        if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
-        {
-            // Set screen aspect ratio
-            float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
-            sith_lastAspect = aspect;
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
-            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
-        }
-#endif
-
-        //sithCamera_currentCamera->rdCam.screenAspectRatio += 0.01;
-        sithCamera_FollowFocus(sithCamera_currentCamera);
-        sithCamera_SetRdCameraAndRenderidk();
-    }
+    sithSoundSys_Shutdown();
+    sithSound_Shutdown();
+    sithSurface_Shutdown();
+    sithModel_Shutdown();
+    sithTemplate_Shutdown();
+    sithMaterial_Shutdown();
+    sithSoundClass_Shutdown();
+    sithAIClass_Shutdown();
+    sithPuppet_Shutdown();
+    sithParticle_Shutdown();
+    sithSprite_Shutdown();
+    sithAI_Shutdown();
+    sithCog_Shutdown();
+    sithDplay_Shutdown();
+    sithCogVm_Shutdown();
+    sithThing_Shutdown();
+    sithUnk3_Shutdown();
+    sithRender_Shutdown();
+    sithWorld_Shutdown();
+    sithTimer_Shutdown();
+    sithStrTable_Shutdown();
+    sith_bInitialized = 0;
 }
 
 int sith_Load(char *path)
@@ -109,7 +107,14 @@ int sith_Load(char *path)
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
 }
 
-// sith_Free
+void sith_Free()
+{
+    if ( sithWorld_pStatic )
+    {
+        sithWorld_FreeEntry(sithWorld_pStatic);
+        sithWorld_pStatic = 0;
+    }
+}
 
 int sith_Mode1Init(char *a1)
 {
@@ -163,6 +168,48 @@ int sith_Mode1Init_2(char *path)
     return 1;
 }
 
+int sith_Mode1Init_3(char *fpath)
+{
+    sithWorld_pCurWorld = sithWorld_New();
+    if ( !sithWorld_Load(sithWorld_pCurWorld, fpath) )
+        return 0;
+    bShowInvisibleThings = 0;
+    sithRender_8EE678 = 1;
+    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithTimer_Open();
+    sithSurface_Open();
+    sithAI_Open();
+    sithSoundSys_Open();
+    sithCog_Open();
+    sithControl_Open();
+    sithSector_Startup();
+    sithRender_Open();
+    sithWeapon_InitializeEntry();
+    sith_bOpened = 1;
+    sithTime_Startup();
+    sithMulti_Startup();
+    g_sithMode = 1;
+    return 1;
+}
+
+int sith_Open()
+{
+    bShowInvisibleThings = 0;
+    sithRender_8EE678 = 1;
+    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithTimer_Open();
+    sithSurface_Open();
+    sithAI_Open();
+    sithSoundSys_Open();
+    sithCog_Open();
+    sithControl_Open();
+    sithSector_Startup();
+    sithRender_Open();
+    sithWeapon_InitializeEntry();
+    sith_bOpened = 1;
+    return 1;
+}
+
 void sith_Close()
 {
     if ( sith_bOpened )
@@ -183,6 +230,11 @@ void sith_Close()
         g_submodeFlags = 0;
         sith_bOpened = 0;
     }
+}
+
+void sith_SetEndLevel()
+{
+    sith_bEndLevel = 1;
 }
 
 int sith_Tick()
@@ -239,6 +291,46 @@ int sith_Tick()
 #endif
         return 0;
     }
+}
+
+void sith_UpdateCamera()
+{
+    if ( (g_submodeFlags & 8) == 0 )
+    {
+        if ( !++dword_8EE678 )
+        {
+            sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+            dword_8EE678 = 1;
+        }
+#ifdef QOL_IMPROVEMENTS
+        if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
+        {
+            // Set screen aspect ratio
+            float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            sith_lastAspect = aspect;
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+        }
+#endif
+
+        //sithCamera_currentCamera->rdCam.screenAspectRatio += 0.01;
+        sithCamera_FollowFocus(sithCamera_currentCamera);
+        sithCamera_SetRdCameraAndRenderidk();
+    }
+}
+
+void sith_sub_4C4D80()
+{
+    if ( !++sithRender_8EE678 )
+    {
+        sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+        sithRender_8EE678 = 1;
+    }
+}
+
+void sith_set_sithmode_5()
+{
+    g_sithMode = 5;
 }
 
 void sith_SetEpisodeName(char *text)

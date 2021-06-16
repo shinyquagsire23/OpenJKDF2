@@ -23,5 +23,6 @@
 
 static int (*jkGuiJoystick_Initialize)() = (void*)jkGuiJoystick_Initialize_ADDR;
 static int (*jkGuiJoystick_Show)() = (void*)jkGuiJoystick_Show_ADDR;
+static void (*jkGuiJoystick_Shutdown)() = (void*)jkGuiJoystick_Shutdown_ADDR;
 
 #endif // _JKGUI_JOYSTICK_H

@@ -18,5 +18,6 @@
 
 static int (*jkGuiKeyboard_Initialize)() = (void*)jkGuiKeyboard_Initialize_ADDR;
 static int (*jkGuiKeyboard_Show)() = (void*)jkGuiKeyboard_Show_ADDR;
+static void (*jkGuiKeyboard_Shutdown)() = (void*)jkGuiKeyboard_Shutdown_ADDR;
 
 #endif // _JKGUI_KEYBOARD_H

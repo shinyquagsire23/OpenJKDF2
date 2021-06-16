@@ -132,6 +132,7 @@ void sithSurface_Free(sithWorld *world);
 void sithSurface_Tick(float deltaSecs);
 void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8_t a4);
 
+static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;

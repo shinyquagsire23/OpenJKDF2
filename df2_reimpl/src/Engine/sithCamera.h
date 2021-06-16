@@ -66,6 +66,7 @@ void sithCamera_SetRdCameraAndRenderidk();
 void sithCamera_DoIdleAnimation();
 int sithCamera_SetCurrentCamera(sithCamera *camera);
 
+static void (*sithCamera_Shutdown)() = (void*)sithCamera_Shutdown_ADDR;
 static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
 static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCamera_GetPrimaryFocus_ADDR;

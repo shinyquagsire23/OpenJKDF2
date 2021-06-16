@@ -25,5 +25,6 @@ static void (*jkHudInv_deinit_menu_graphics_maybe)() = (void*)jkHudInv_deinit_me
 //static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
 //static int (*jkHudInv_ItemDatLoad)(char*) = (void*)jkHudInv_ItemDatLoad_ADDR;
 static void (*jkHudInv_LoadItemRes)() = (void*)jkHudInv_LoadItemRes_ADDR;
+static void (*jkHudInv_Shutdown)() = (void*)jkHudInv_Shutdown_ADDR;
 
 #endif // _JKHUDINV_H

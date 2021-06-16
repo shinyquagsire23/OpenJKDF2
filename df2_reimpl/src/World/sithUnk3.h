@@ -66,6 +66,7 @@ typedef struct sithUnk3SearchResult
 } sithUnk3SearchResult;
 
 int sithUnk3_Startup();
+static void (*sithUnk3_Shutdown)() = (void*)sithUnk3_Shutdown_ADDR;
 void sithUnk3_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);
 void sithUnk3_RegisterHitHandler(int thingType, void* a2);
 #if 1

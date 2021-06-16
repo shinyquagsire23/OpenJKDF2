@@ -14,6 +14,7 @@
 #define jkGuiDisplay_sub_415620_ADDR (0x00415620)
 
 static int (*jkGuiDisplay_Initialize)() = (void*)jkGuiDisplay_Initialize_ADDR;
+static void (*jkGuiDisplay_Shutdown)() = (void*)jkGuiDisplay_Shutdown_ADDR;
 static int (*jkGuiDisplay_Show)() = (void*)jkGuiDisplay_Show_ADDR;
 
 #endif // _JKGUI_DISPLAY_H

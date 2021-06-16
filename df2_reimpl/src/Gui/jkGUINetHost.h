@@ -18,5 +18,6 @@
 #define jkGuiNetHost_gameName ((wchar_t*)0x0086047C)
 
 static int (*jkGuiNetHost_Initialize)() = (void*)jkGuiNetHost_Initialize_ADDR;
+static void (*jkGuiNetHost_Shutdown)() = (void*)jkGuiNetHost_Shutdown_ADDR;
 
 #endif // _JKGUINETHOST_H

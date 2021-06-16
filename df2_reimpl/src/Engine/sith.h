@@ -21,18 +21,26 @@
 #define sith_SetEpisodeName_ADDR (0x004C4DC0)
 
 #define dword_8EE678 (*(int*)0x008EE678)
+#define sith_bEndLevel (*(int*)0x0082F0A8)
 #define sith_bInitialized (*(int*)0x0082F0AC)
 #define sith_bOpened (*(int*)0x0082F0B0)
 
 extern float sith_lastAspect;
 
 int sith_Startup(struct common_functions *commonFuncs);
-void sith_UpdateCamera();
+void sith_Shutdown();
 int sith_Load(char *path);
+void sith_Free();
 int sith_Mode1Init(char *a1);
 int sith_Mode1Init_2(char *path);
+int sith_Mode1Init_3(char *fpath);
+int sith_Open();
 void sith_Close();
+void sith_SetEndLevel();
 int sith_Tick();
+void sith_UpdateCamera();
+void sith_sub_4C4D80();
+void sith_set_sithmode_5();
 void sith_SetEpisodeName(char *text);
 void sith_AutoSave();
 
@@ -40,7 +48,7 @@ void sith_AutoSave();
 //static int (*sith_Tick)() = (void*)sith_Tick_ADDR;
 //static void (*sith_AutoSave)() = (void*)sith_AutoSave_ADDR;
 //static int (*sith_Mode1Init)(char*) = (void*)sith_Mode1Init_ADDR;
-static int (*sith_Mode1Init_3)(char*) = (void*)sith_Mode1Init_3_ADDR;
+//static int (*sith_Mode1Init_3)(char*) = (void*)sith_Mode1Init_3_ADDR;
 //static void (*sith_Close)() = (void*)sith_Close_ADDR;
 
 //static void (*sith_SetEpisodeName)(char *text) = (void*)sith_SetEpisodeName_ADDR;

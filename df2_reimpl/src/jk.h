@@ -326,7 +326,6 @@ int jk_LoadCursorA();
 void jk_SetCursor();
 void jk_InvalidateRect();
 void jk_ChangeDisplaySettingsA();
-void stdConsole_Startup();
 uint32_t jk_DirectDrawEnumerateA();
 uint32_t jk_DirectDrawCreate();
 uint32_t jk_DirectSoundCreate();

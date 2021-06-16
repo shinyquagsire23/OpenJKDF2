@@ -30,5 +30,6 @@
 static int (*jkGuiBuildMulti_InitializeEditCharacter)() = (void*)jkGuiBuildMulti_InitializeEditCharacter_ADDR;
 
 static int (*jkGuiBuildMulti_Initialize)() = (void*)jkGuiBuildMulti_Initialize_ADDR;
+static void (*jkGuiBuildMulti_Shutdown)() = (void*)jkGuiBuildMulti_Shutdown_ADDR;
 
 #endif // _JKGUIBUILDMULTI_H

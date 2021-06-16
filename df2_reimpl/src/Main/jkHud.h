@@ -22,6 +22,7 @@
 #define jkHud_dword_553E94 (*(int*)0x00553E94)
 
 static int (*jkHud_Startup)() = (void*)jkHud_Startup_ADDR;
+static void (*jkHud_Shutdown)() = (void*)jkHud_Shutdown_ADDR;
 static void (*jkHud_Chat)() = (void*)jkHud_Chat_ADDR;
 static void (*jkHud_Tally)() = (void*)jkHud_Tally_ADDR;
 

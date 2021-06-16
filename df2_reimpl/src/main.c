@@ -931,8 +931,22 @@ void do_hooks()
     hook_function(rdCamera_AdvanceFrame_ADDR, rdCamera_AdvanceFrame);
     
     // sith
-    hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
+    hook_function(sith_Startup_ADDR, sith_Startup);
+    hook_function(sith_Shutdown_ADDR, sith_Shutdown);
     hook_function(sith_Load_ADDR, sith_Load);
+    hook_function(sith_Free_ADDR, sith_Free);
+    hook_function(sith_Mode1Init_ADDR, sith_Mode1Init);
+    hook_function(sith_Mode1Init_2_ADDR, sith_Mode1Init_2);
+    hook_function(sith_Mode1Init_3_ADDR, sith_Mode1Init_3);
+    hook_function(sith_Open_ADDR, sith_Open);
+    hook_function(sith_Close_ADDR, sith_Close);
+    hook_function(sith_SetEndLevel_ADDR, sith_SetEndLevel);
+    hook_function(sith_Tick_ADDR, sith_Tick);
+    hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
+    hook_function(sith_sub_4C4D80_ADDR, sith_sub_4C4D80);
+    hook_function(sith_set_sithmode_5_ADDR, sith_set_sithmode_5);
+    hook_function(sith_SetEpisodeName_ADDR, sith_SetEpisodeName);
+    hook_function(sith_AutoSave_ADDR, sith_AutoSave);
     
     // sithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
