@@ -95,7 +95,7 @@ void sithCogSurface_Initialize(void* ctx)
 void sithCogSurface_GetSurfaceAdjoin(sithCog *ctx)
 {
     sithSurface *surface; // eax
-    int *v2; // eax
+    uint32_t *v2; // eax
 
     surface = sithCogVm_PopSurface(ctx);
     if ( surface && (v2 = &surface->adjoin->mirror->surface->field_0) != 0 )

@@ -125,6 +125,7 @@ const char* gl_vert =
 "  f_coord = coord3d;\n"
 "}";
 
+static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 static GLuint std3D_aLoadedTextures[1024];
 static size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[4096];
@@ -1040,7 +1041,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     
-    
+    std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
     std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
@@ -1072,7 +1073,25 @@ int std3D_HasAlphaFlatStippled()
     return 1;
 }
 
-void std3D_PurgeTextureCache(){}
+void std3D_PurgeTextureCache()
+{
+    for (int i = 0; i < 1024; i++)
+    {
+        rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+        if (!tex) continue;
+
+        if (std3D_aLoadedTextures[i])
+            glDeleteTextures(1, &std3D_aLoadedTextures[i]);
+
+        std3D_aLoadedTextures[i] = 0;
+
+        tex->texture_loaded = 0;
+        tex->texture_id = 0;
+
+        std3D_aLoadedSurfaces[i] = NULL;
+    }
+    std3D_loadedTexturesAmt = 0;
+}
 void std3D_Shutdown(){}
 #else
 // Added helpers

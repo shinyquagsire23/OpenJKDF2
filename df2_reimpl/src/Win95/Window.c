@@ -257,9 +257,19 @@ SDL_Surface* displaySurface;
 SDL_Texture *menuTexture;
 SDL_Surface *menuSurface;
 
+int Window_lastXRel = 0;
+int Window_lastYRel = 0;
+int Window_lastSampleMs = 0;
+int Window_bMouseLeft = 0;
+int Window_bMouseRight = 0;
+
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
     uint32_t pos = ((event->x) & 0xFFFF) | (((event->y) << 16) & 0xFFFF0000);
+    
+    Window_lastSampleMs = event->timestamp;
+    Window_lastXRel = event->xrel;
+    Window_lastYRel = event->yrel;
 
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
 }
@@ -313,6 +323,11 @@ void Window_SdlUpdate()
                     if (!right)
                         hasRight = 1;
                 }
+                
+                if (hasLeft)
+                    Window_bMouseLeft = left;
+                if (hasRight)
+                    Window_bMouseRight = right;
 
                 pos = ((mevent->x) & 0xFFFF) | (((mevent->y) << 16) & 0xFFFF0000);
                 msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);

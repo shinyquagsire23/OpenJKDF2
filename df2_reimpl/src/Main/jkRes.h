@@ -89,7 +89,7 @@ typedef struct jkResFile
 #define jkRes_idkGobPath ((char*)0x005549E8)
 
 int jkRes_Startup(common_functions *a1);
-
+int jkRes_Shutdown();
 void jkRes_New(char *path);
 void jkRes_LoadGob(char *a1);
 int jkRes_LoadCd(char *a1);
@@ -116,7 +116,10 @@ size_t jkRes_FileWrite(int fd, void* out, size_t len);
 char* jkRes_FileGets(int a1, char* a2, unsigned int a3);
 wchar_t* jkRes_FileGetws(int fd, wchar_t* a2, unsigned int a3);
 int jkRes_FEof(int fd);
+int jkRes_FTell(int fd);
+int jkRes_FSeek(int fd, int offs, int whence);
 size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3);
+int jkRes_FilePrintf(int fd, const char* fmt, ...);
 
 //static int (*jkRes_FileOpen)() = (void*)jkRes_FileOpen_ADDR;
 //static int (*jkRes_FileClose)() = (void*)jkRes_FileClose_ADDR;
@@ -125,9 +128,9 @@ size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3);
 //static int (*jkRes_FileGetws)() = (void*)jkRes_FileGetws_ADDR;
 //static int (*jkRes_FileWrite)() = (void*)jkRes_FileWrite_ADDR;
 //static int (*jkRes_FEof)() = (void*)jkRes_FEof_ADDR;
-static int (*jkRes_FTell)() = (void*)jkRes_FTell_ADDR;
-static int (*jkRes_FSeek)() = (void*)jkRes_FSeek_ADDR;
+//static int (*jkRes_FTell)() = (void*)jkRes_FTell_ADDR;
+//static int (*jkRes_FSeek)() = (void*)jkRes_FSeek_ADDR;
 //static int (*jkRes_FileSize)() = (void*)jkRes_FileSize_ADDR;
-static int (*jkRes_FilePrintf)() = (void*)jkRes_FilePrintf_ADDR;
+//static int (*jkRes_FilePrintf)() = (void*)jkRes_FilePrintf_ADDR;
 
 #endif // _JKRES_H

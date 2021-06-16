@@ -87,12 +87,14 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         colormap->lightlevelAlloc = colorsLights;
         if (!colorsLights)
         {
-            jk_printf("colorsLights alloc in `%s` failed!\n", colormap_fname);
+            jk_printf("OpenJKDF2: colorsLights alloc in `%s` failed!\n", colormap_fname);
             goto safe_fallback;
         }
+
         colormap->lightlevel = colorsLights;
-        if ( (uint8_t)colorsLights )
-            colormap->lightlevel = (char *)colorsLights - (uint8_t)colorsLights + 256;
+        if ( (intptr_t)colorsLights & 0xFF )
+            colormap->lightlevel = (void*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
+
         rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
         if ( (colormap->flags & 1) != 0 )
         {
@@ -100,7 +102,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
             colormap->transparencyAlloc = transparencyAlloc;
             if ( !transparencyAlloc )
             {
-                jk_printf("transparency alloc in `%s` failed!\n", colormap_fname);
+                jk_printf("OpenJKDF2: transparency alloc in `%s` failed!\n", colormap_fname);
                 goto safe_fallback;
             }
             colormap->transparency = transparencyAlloc;
@@ -116,7 +118,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     colormap->rgb16Alloc = rgb16Alloc;
     if ( !rgb16Alloc )
     {
-        jk_printf("rgb16Alloc alloc in `%s` failed!\n", colormap_fname);
+        jk_printf("OpenJKDF2: rgb16Alloc alloc in `%s` failed!\n", colormap_fname);
         goto safe_fallback;
     }
     rdColormap_BuildRGB16(rgb16Alloc, colormap->colors, 0, 0, 0, &rdColormap_colorInfo);
@@ -126,7 +128,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         colormap->transparencyAlloc = v10;
         if (!v10)
         {
-            jk_printf("transparencyAlloc alloc in `%s` failed!\n", colormap_fname);
+            jk_printf("OpenJKDF2: transparencyAlloc alloc in `%s` failed!\n", colormap_fname);
             goto safe_fallback;
         }
         

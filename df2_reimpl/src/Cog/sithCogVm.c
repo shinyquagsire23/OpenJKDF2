@@ -253,7 +253,7 @@ int sithCogVm_Sync()
 {
     int v1; // eax
     uint16_t v2; // dx
-    int *v3; // ecx
+    uint32_t *v3; // ecx
     int v4; // eax
     unsigned int v5; // ecx
     int v12; // ecx
@@ -282,12 +282,13 @@ LABEL_14:
                     sithCogVm_MsgTmpBuf2.netMsg.cogMsgId = COGMSG_RESET;
                     sithCogVm_MsgTmpBuf2.netMsg.msg_size = 2;
                     sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, g_netMsgTmp.netMsg.thingIdx);
-                    v3 = &sithCogVm_aMsgPairs[0].msgId;
+                    
+                    int i = 0;
                     v4 = (uint16_t)g_netMsgTmp.netMsg.msgId;
-                    while ( g_netMsgTmp.netMsg.thingIdx != *(v3 - 1) || (uint16_t)g_netMsgTmp.netMsg.msgId != *v3 )
+                    while ( g_netMsgTmp.netMsg.thingIdx != sithCogVm_aMsgPairs[i].thingIdx || (uint16_t)g_netMsgTmp.netMsg.msgId != sithCogVm_aMsgPairs[i].msgId )
                     {
-                        v3 += 2;
-                        if ( v3 >= (int *)&sithCogVm_msgFuncs[1] )
+                        i++;
+                        if ( i >= 128 )
                         {
                             v5 = sithCogVm_dword_847E84;
                             sithCogVm_aMsgPairs[sithCogVm_dword_847E84].thingIdx = g_netMsgTmp.netMsg.thingIdx;

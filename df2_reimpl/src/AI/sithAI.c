@@ -6,6 +6,9 @@
 #include "AI/sithAIClass.h"
 #include "Engine/sithTime.h"
 #include "General/stdHashTable.h"
+#include "Main/jkGame.h"
+#include "Cog/sithCogVm.h"
+#include "Cog/sithCog.h"
 
 int sithAI_Startup()
 {
@@ -66,6 +69,16 @@ int sithAI_Startup()
 
     sithAI_bInit = 1;
     return 1;
+}
+
+void sithAI_Shutdown()
+{
+    if ( sithAI_bInit )
+    {
+        pSithHS->free(sithAI_commandList);
+        stdHashTable_Free(sithAI_commandsHashmap);
+        sithAI_bInit = 0;
+    }
 }
 
 int sithAI_Open()
@@ -216,6 +229,114 @@ void sithAI_FreeEntry(sithThing *thing)
     }
 }
 
+void sithAI_TickAll()
+{
+    int v0; // edi
+    sithActor *actor; // esi
+
+    v0 = 0;
+    for ( actor = sithAI_actors; v0 <= sithAI_inittedActors; ++actor )
+    {
+        if ( actor->aiclass
+          && (actor->thing->thingflags & 0x202) == 0
+          && actor->thing->actorParams.health > 0.0
+          && (actor->mode & 0x3000) == 0
+          && actor->field_190 <= sithTime_curMs )
+        {
+            sithAI_TickActor(actor);
+        }
+        ++v0;
+    }
+}
+
+void sithAI_TickActor(sithActor *actor)
+{
+    int v3; // ebx
+    int *v4; // edi
+    int v5; // ecx
+    int a1a; // [esp+1Ch] [ebp+4h]
+
+    uint32_t nextMs = sithTime_curMs + 5000;
+    int a3 = actor->mode;
+LABEL_2:
+    for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
+    {
+        if ( (actor->entries[a1a].field_0 & 1) == 0 )
+        {
+            v5 = actor->mode;
+            if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
+            {
+                if ( actor->entries[a1a].field_4 <= sithTime_curMs )
+                {
+                    actor->entries[a1a].field_4 = sithTime_curMs + 1000;
+                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->entries[a1a], 0, 0) && a3 != actor->mode )
+                    {
+                        sithAI_SetActorFireTarget(actor, 256, a3);
+                        a3 = actor->mode;
+                        goto LABEL_2;
+                    }
+                }
+                if ( actor->entries[a1a].field_4 < nextMs )
+                    nextMs = actor->entries[a1a].field_4;
+            }
+        }
+    }
+    actor->field_190 = nextMs;
+}
+
+void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
+{
+    sithThing *v4; // ecx
+    int v5; // edi
+    int v6; // eax
+    uint32_t v7; // ebx
+    int actora; // [esp+14h] [ebp+4h]
+
+    for ( ; actor->aiclass; a2 = 256 )
+    {
+        v4 = actor->thing;
+        if ( !actor->thing )
+            break;
+        if ( (v4->thingflags & 0x202) != 0 )
+            break;
+        if ( (g_debugmodeFlags & 1) != 0 )
+            break;
+        if ( v4->actorParams.health <= 0.0 )
+            break;
+        v5 = actor->mode;
+        actora = v5;
+        if ( (v5 & 0x2000) != 0 )
+            break;
+        if ( (v5 & 0x1000) != 0 )
+        {
+            if ( a2 != 2 )
+                return;
+            actor->mode &= ~0x1000;
+        }
+
+        if ( a2 == 256 )
+            sithCog_SendMessageFromThingEx(v4, 0, SITH_MESSAGE_AIEVENT, 256.0, 0.0, 0.0, 0.0);
+
+        v7 = 0;
+        for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
+        {
+            sithActorEntry* entry = &actor->entries[v7];
+            if ( (entry->field_0 & 1) == 0 )
+            {
+                if ( (actor->aiclass->entries[v7].param3 & a2) != 0 )
+                {
+                    if ( actor->aiclass->entries[v7].func(actor, &actor->aiclass->entries[v7], entry, a2, a3) )
+                        break;
+                }
+            }
+        }
+        v5 = actora;
+        if ( actor->mode == v5 )
+            break;
+        a3 = v5;
+    }
+}
+
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)
 {
     sithActor *v3; // esi
@@ -292,63 +413,3 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     return NULL;
 }
 
-void sithAI_TickAll()
-{
-    int v0; // edi
-    sithActor *actor; // esi
-
-    v0 = 0;
-    for ( actor = sithAI_actors; v0 <= sithAI_inittedActors; ++actor )
-    {
-        if ( actor->aiclass
-          && (actor->thing->thingflags & 0x202) == 0
-          && actor->thing->actorParams.health > 0.0
-          && (actor->mode & 0x3000) == 0
-          && actor->field_190 <= sithTime_curMs )
-        {
-            sithAI_TickActor(actor);
-        }
-        ++v0;
-    }
-}
-
-void sithAI_TickActor(sithActor *actor)
-{
-    unsigned int v1; // ebp
-    int v3; // ebx
-    int *v4; // edi
-    int v5; // ecx
-    unsigned int v7; // [esp+10h] [ebp-8h]
-    int a3; // [esp+14h] [ebp-4h]
-    int a1a; // [esp+1Ch] [ebp+4h]
-
-    v1 = sithTime_curMs;
-    v7 = sithTime_curMs + 5000;
-    a3 = actor->mode;
-LABEL_2:
-    for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
-    {
-        if ( (actor->entries[a1a].field_0 & 1) == 0 )
-        {
-            v5 = actor->mode;
-            if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
-            {
-                if ( actor->entries[a1a].field_4 <= v1 )
-                {
-                    actor->entries[a1a].field_4 = v1 + 1000;
-                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->entries[a1a], 0, 0) && a3 != actor->mode )
-                    {
-                        sithAI_SetActorFireTarget(actor, 256, a3);
-                        v1 = sithTime_curMs;
-                        a3 = actor->mode;
-                        goto LABEL_2;
-                    }
-                    v1 = sithTime_curMs;
-                }
-                if ( actor->entries[a1a].field_4 < v7 )
-                    v7 = actor->entries[a1a].field_4;
-            }
-        }
-    }
-    actor->field_190 = v7;
-}

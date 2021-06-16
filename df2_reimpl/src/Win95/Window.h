@@ -47,6 +47,12 @@ static int (*_Window_msg_main_handler)(HWND hWnd, UINT Msg, WPARAM wParam, LPARA
 int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 #ifdef LINUX
+extern int Window_lastXRel;
+extern int Window_lastYRel;
+extern int Window_lastSampleMs;
+extern int Window_bMouseLeft;
+extern int Window_bMouseRight;
+
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
 //int Window_RemoveMsgHandler(WindowHandler_t a1);

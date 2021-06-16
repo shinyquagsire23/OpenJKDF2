@@ -3,6 +3,7 @@
 #include "General/sithStrTable.h"
 #include "Win95/stdControl.h"
 #include "Win95/DebugConsole.h"
+#include "Win95/Window.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithPlayer.h"
@@ -390,7 +391,7 @@ int sithControl_ReadFunctionMap(int func, int* out)
     }
     else if (func == INPUT_FUNC_JUMP)
     {
-        val = !!state[SDL_SCANCODE_X];
+        val = !!state[SDL_SCANCODE_X] | Window_bMouseRight;
     }
     else if (func == INPUT_FUNC_DUCK)
     {
@@ -398,7 +399,7 @@ int sithControl_ReadFunctionMap(int func, int* out)
     }
     else if (func == INPUT_FUNC_FIRE1)
     {
-        val = !!state[SDL_SCANCODE_Z];
+        val = !!state[SDL_SCANCODE_Z] | Window_bMouseLeft;
     }
     else if (func == INPUT_FUNC_FIRE2)
     {
@@ -451,6 +452,14 @@ int sithControl_ReadFunctionMap(int func, int* out)
     else if (func == INPUT_FUNC_SELECT9)
     {
         val = !!state[SDL_SCANCODE_9];
+    }
+    else if (func == INPUT_FUNC_MLOOK)
+    {
+        val = 1;
+    }
+    else if (func == INPUT_FUNC_CAMERAMODE)
+    {
+        val = !!state[SDL_SCANCODE_P];
     }
     
     if (!!state[SDL_SCANCODE_ESCAPE])

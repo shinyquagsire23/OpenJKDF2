@@ -928,3 +928,13 @@ void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVe
         rdMatrix_TransformPoint44(&out[i], &in[i], m);
     }
 }
+
+// Added
+void rdMatrix_Print34(const rdMatrix34 *m)
+{
+    jk_printf("%f %f %f\n", m->rvec.x, m->rvec.y, m->rvec.z);
+    jk_printf("%f %f %f\n", m->lvec.x, m->lvec.y, m->lvec.z);
+    jk_printf("%f %f %f\n", m->uvec.x, m->uvec.y, m->uvec.z);
+    jk_printf("%f %f %f\n", m->scale.x, m->scale.y, m->scale.z);
+    jk_printf("--------\n");
+}

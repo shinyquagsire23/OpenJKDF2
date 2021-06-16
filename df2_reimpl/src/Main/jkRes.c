@@ -35,6 +35,24 @@ int jkRes_Startup(common_functions *a1)
     return 1;
 }
 
+int jkRes_Shutdown()
+{
+    if (!jkRes_bInit)
+        return 0;
+
+    jkRes_UnhookHS();
+    
+    for (int i = 0; i < 5; i++)
+    {
+        for (int v1 = 0; v1 < jkRes_gCtx.gobs[i].numGobs; v1++)
+        {
+            stdGob_Free(jkRes_gCtx.gobs[i].gobs[v1]);
+        }
+    }
+    jkRes_bInit = 0;
+    return 1;
+}
+
 void jkRes_New(char *path)
 {
     for (int v1 = 0; v1 < jkRes_gCtx.gobs[0].numGobs; v1++)
@@ -652,6 +670,24 @@ int jkRes_FEof(int fd)
         return stdGob_FEof(resFile->gobHandle);
 }
 
+int jkRes_FTell(int fd)
+{
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->ftell(resFile->fsHandle);
+    else
+        return stdGob_FTell(resFile->gobHandle);
+}
+
+int jkRes_FSeek(int fd, int offs, int whence)
+{
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->fseek(resFile->fsHandle, offs, whence);
+    else
+        return stdGob_FSeek(resFile->gobHandle, offs, whence);
+}
+
 size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3)
 {
     // This is implemented wonky in the original? 
@@ -663,5 +699,20 @@ size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3)
         return pLowLevelHS->fileSize(resFile->fsHandle);
     else
         return stdGob_FileSize(resFile->gobHandle);
+}
+
+int jkRes_FilePrintf(int fd, const char* fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+    
+    jkResFile* resFile = &jkRes_aFiles[fd - 1];
+    
+    int v3 = __vsnprintf(std_genBuffer, 0x400u, fmt, va);
+    
+    // No GOB impl
+    if ( resFile->useLowLevel )
+        return pLowLevelHS->filePrintf(resFile->fsHandle, std_genBuffer, v3);
+    
 }
 

@@ -41,7 +41,7 @@ void Video_SwitchToGDI()
     jkHudInv_deinit_menu_graphics_maybe();
 #endif
     sithCamera_Close();
-#ifndef LINUX
+
     rdCanvas_Free(Video_pCanvas);
     rdClose();
     if ( Video_modeStruct.b3DAccel )
@@ -50,6 +50,7 @@ void Video_SwitchToGDI()
         std3D_Shutdown();
     }
 
+#ifndef LINUX
     stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
     stdDisplay_DDrawGdiSurfaceFlip();
     stdDisplay_ddraw_surface_flip2();

@@ -72,6 +72,25 @@
 #define jkMain_wstrIdk ((wchar_t*)0x00552A58) // 128
 //#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
 
+enum JK_GAMEMODE
+{
+    JK_GAMEMODE_NONE = 0,
+    JK_GAMEMODE_VIDEO = 1,
+    JK_GAMEMODE_TITLE = 2,
+    JK_GAMEMODE_MAIN = 3,
+    JK_GAMEMODE_VIDEO2 = 4,
+    JK_GAMEMODE_GAMEPLAY = 5,
+    JK_GAMEMODE_ESCAPE = 6,
+    JK_GAMEMODE_CD_SWITCH = 7,
+    JK_GAMEMODE_VIDEO3 = 8,
+    JK_GAMEMODE_ENDLEVEL = 9,
+    JK_GAMEMODE_VIDEO4 = 10,
+    JK_GAMEMODE_CHOICE = 11,
+    JK_GAMEMODE_CUTSCENE = 12,
+    JK_GAMEMODE_CREDITS = 13,
+    JK_GAMEMODE_UNK = 14,
+};
+
 typedef struct jkGuiStateFuncs
 {
   void (*showFunc)(int, int);

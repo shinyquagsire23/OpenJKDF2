@@ -115,7 +115,7 @@ void jkMain_GuiAdvance()
                     if ( jkGuiRend_thing_five )
                         jkGuiRend_thing_four = 1;
                     jkSmack_stopTick = 1;
-                    jkSmack_nextGuiState = 3;
+                    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
                     thing_nine = 0;
                     return;
                 }
@@ -223,7 +223,7 @@ void jkMain_EscapeMenuTick(int a2)
                     if ( jkGuiRend_thing_five )
                         jkGuiRend_thing_four = 1;
                     jkSmack_stopTick = 1;
-                    jkSmack_nextGuiState = 3;
+                    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
                 }
                 else
                 {
@@ -256,9 +256,9 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 
     if ( !net_isMulti )
         sithTime_Resume();
-    if ( a3 != 5 )
+    if ( a3 != JK_GAMEMODE_GAMEPLAY )
     {
-        if ( a3 == 6 )
+        if ( a3 == JK_GAMEMODE_ESCAPE )
         {
             stdControl_ToggleCursor(0);
             sithSoundSys_StopAll();
@@ -270,14 +270,14 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
             jkPlayer_nullsub_30();
             jkGame_isDDraw = 0;
         }
-        if ( a3 != 6 && jkMain_bInit )
+        if ( a3 != JK_GAMEMODE_ESCAPE && jkMain_bInit )
         {
             jkPlayer_Shutdown();
             sith_Close();
             jkMain_bInit = 0;
             thing_eight = 0;
         }
-        if ( net_isMulti && a3 != 6 )
+        if ( net_isMulti && a3 != JK_GAMEMODE_ESCAPE )
         {
             thing_eight = 0;
             if ( a3 == 3 )
@@ -295,7 +295,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
                 if ( jkGuiRend_thing_five )
                     jkGuiRend_thing_four = 1;
                 jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = 3;
+                jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
             }
         }
     }
@@ -311,14 +311,17 @@ void jkMain_GameplayShow(int a1, int a2)
     wchar_t *v6; // [esp-4h] [ebp-Ch]
 
     level_loaded = 0;
-    if ( a2 == 6 )
+    if ( a2 == JK_GAMEMODE_ESCAPE )
     {
         sithSoundSys_ResumeAll();
         sithSoundSys_ResumeMusic(1);
+#ifdef LINUX
+        jkGame_isDDraw = 0;
+#endif
         goto LABEL_39;
     }
 
-    if ( jkSmack_gameMode == 4 )
+    if ( jkSmack_gameMode == JK_GAMEMODE_VIDEO2 )
     {
         jkPlayer_Startup();
         jkPlayer_InitForceBins();
@@ -339,7 +342,7 @@ LABEL_39:
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
             thing_eight = 1;
-            jkSmack_nextGuiState = 3;
+            jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         }
         return;
     }
@@ -388,7 +391,7 @@ LABEL_15:
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         v6 = jkStrings_GetText("ERR_CANNOT_LOAD_LEVEL");
         v4 = jkStrings_GetText("ERROR");
         jkGuiDialog_ErrorDialog(v4, v6);
@@ -454,7 +457,7 @@ LABEL_28:
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 3;
+    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     thing_six = 0;
 }
 
@@ -480,7 +483,7 @@ void jkMain_GameplayTick(int a2)
                 if ( jkGuiRend_thing_five )
                     jkGuiRend_thing_four = 1;
                 jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = 3;
+                jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
             }
             else
             {
@@ -510,7 +513,7 @@ void jkMain_GameplayLeave(int a2, int a3)
 {
     int v3; // eax
 
-    if ( a3 == 6 )
+    if ( a3 == JK_GAMEMODE_ESCAPE )
     {
         stdControl_ToggleCursor(0);
         sithSoundSys_StopAll();
@@ -547,7 +550,7 @@ void jkMain_GameplayLeave(int a2, int a3)
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 3;
+            jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         }
     }
 }
@@ -567,7 +570,7 @@ void jkMain_TitleTick()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 3;
+    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
 }
 
 void jkMain_TitleLeave()
@@ -599,7 +602,7 @@ void jkMain_ChoiceShow()
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
     else
     {
@@ -636,7 +639,7 @@ void jkMain_UnkTick()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 5;
+    jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
 }
 
 void jkMain_UnkLeave()
@@ -656,7 +659,7 @@ int jkMain_sub_403470(char *a1)
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 5;
+    jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
     return result;
 }
 
@@ -698,7 +701,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
             jkGuiRend_thing_four = 1;
         }
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
     if ( a1 )
@@ -730,14 +733,14 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 13;
+            jkSmack_nextGuiState = JK_GAMEMODE_CREDITS;
             return 1;
         }
         if ( v4 )
             jkGuiRend_thing_four = 1;
 
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
     if ( net_isMulti && (net_MultiModeFlags & 0x80u) != 0 )
@@ -747,17 +750,17 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         if ( v4 )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
-    if ( v3->level == v2->level || jkSmack_currentGuiState == 9 )
+    if ( v3->level == v2->level || jkSmack_currentGuiState == JK_GAMEMODE_ENDLEVEL )
     {
-        if ( v2->type == 1 && jkSmack_currentGuiState == 5 )
+        if ( v2->type == 1 && jkSmack_currentGuiState == JK_GAMEMODE_GAMEPLAY )
         {
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 7;
+            jkSmack_nextGuiState = JK_GAMEMODE_CD_SWITCH;
             result = 1;
         }
         else
@@ -772,7 +775,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 9;
+        jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
         result = 1;
     }
     return result;
@@ -815,7 +818,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
                     if ( jkGuiRend_thing_five )
                         jkGuiRend_thing_four = 1;
                     jkSmack_stopTick = 1;
-                    jkSmack_nextGuiState = 3;
+                    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
                     return 1;
                 }
                 break;
@@ -827,7 +830,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 5;
+        jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
         return 1;
     }
     v2 = v1 - 1;
@@ -887,7 +890,7 @@ void jkMain_do_guistate6()
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 6;
+        jkSmack_nextGuiState = JK_GAMEMODE_ESCAPE;
     }
 }
 
@@ -907,7 +910,7 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 14;
+    jkSmack_nextGuiState = JK_GAMEMODE_UNK;
     return 1;
 }
 
@@ -919,7 +922,7 @@ int jkMain_MissionReload()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 5;
+    jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
     return result;
 }
 
@@ -931,7 +934,7 @@ int jkMain_MenuReturn()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 3;
+    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     return result;
 }
 

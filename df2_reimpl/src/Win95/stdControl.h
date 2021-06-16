@@ -52,6 +52,7 @@ static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_
 static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
 static int (*stdControl_ReadControls)() = (void*)stdControl_ReadControls_ADDR;
 static int (*stdControl_FinishRead)() = (void*)stdControl_FinishRead_ADDR;
+static float (*stdControl_ReadAxis)(int a) = (void*)stdControl_ReadAxis_ADDR;
 static float (*stdControl_GetAxis2)(int a1) = (void*)stdControl_GetAxis2_ADDR;
 #else
 int stdControl_Open();
@@ -61,6 +62,7 @@ void stdControl_ToggleCursor(int a);
 int stdControl_ShowCursor(int a);
 int stdControl_ReadControls();
 int stdControl_FinishRead();
+float stdControl_ReadAxis(int a);
 float stdControl_GetAxis2(int a);
 #endif
 

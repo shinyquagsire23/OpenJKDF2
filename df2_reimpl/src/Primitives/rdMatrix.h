@@ -142,6 +142,9 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2);
 void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num);
 void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVector4 *out, int num);
 
+// Added
+void rdMatrix_Print34(const rdMatrix34 *viewMat);
+
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;
 

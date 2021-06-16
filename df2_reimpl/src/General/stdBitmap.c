@@ -133,7 +133,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     bitmapHeader bmp_header; // [esp+20h] [ebp-CCh] BYREF
     stdVBufferTexFmt vbufTexFmt; // [esp+A0h] [ebp-4Ch] BYREF
 
-    std_pHS->fileRead(fp, &bmp_header, 128);
+    std_pHS->fileRead(fp, &bmp_header, sizeof(bitmapHeader));
     if ( _memcmp((const char *)&bmp_header, "BM  ", 4u) )
     {
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 213, "Error: Bad signature in header of bitmap file.\n", 0, 0, 0, 0);
