@@ -10,6 +10,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
+#include "Engine/sithTime.h"
 #include "jk.h"
 
 static int sithUnk3_initted = 0;
@@ -260,7 +261,7 @@ float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, con
     float v23; // st7
     sithUnk3SearchEntry *v24; // ecx
     rdMesh *senderMesh; // edx
-    sithUnk3_collisionHandler_t handler;
+    sithUnk3_searchHandler_t handler;
     int v27; // eax
     rdFace *a10; // [esp+4h] [ebp-18h] BYREF
     int i; // [esp+Ch] [ebp-10h]
@@ -700,11 +701,668 @@ void sithUnk3_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
             if ( a1a.x != 0.0 || a1a.y != 0.0 || a1a.z != 0.0 )
             {
                 mat2 = rdVector_Normalize3Acc(&a1a);
-                sithUnk3_UpdateThingCollision(i, (rdVector2 *)&a1a, mat2, 0);
+                sithUnk3_UpdateThingCollision(i, &a1a, mat2, 0);
             }
         }
         *v4 = 0.0;
         i->lookOrientation.scale.y = 0.0;
         i->lookOrientation.scale.z = 0.0;
     }
+}
+
+float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int a8)
+{
+    sithThing *v5; // ebp
+    sithThing *v10; // esi
+    double v11; // st7
+    double v12; // st7
+    double v14; // st6
+    //char v15; // c0
+    int v16; // edi
+    float v17; // edx
+    int v18; // edx
+    sithUnk3SearchEntry *v19; // esi
+    double v20; // st7
+    sithUnk3SearchEntry *v21; // ecx
+    int v22; // ebx
+    double v23; // st6
+    double v24; // st7
+    double v25; // st7
+    double v26; // st6
+    double v27; // st5
+    float *v28; // ebx
+    double v30; // st5
+    double v31; // rtt
+    double v32; // rt0
+    double v33; // st5
+    sithThing *v34; // ecx
+    int v35; // eax
+    int v36; // eax
+    sithSurface *v37; // eax
+    int (__cdecl *v38)(sithThing *, sithSurface *, sithUnk3SearchEntry *); // eax
+    double v39; // st7
+    double v40; // st6
+    double v41; // st4
+    double v42; // st6
+    double v43; // st5
+    double v44; // st7
+    //char v46; // c3
+    double v48; // st7
+    //char v49; // c0
+    double v51; // st7
+    //char v52; // c0
+    float v53; // edx
+    float v54; // eax
+    float v55; // ecx
+    float v56; // edx
+    sithThing *i; // esi
+    sithSector *v58; // eax
+    sithSector *v59; // ecx
+    int v60; // eax
+    int v61; // eax
+    float amounta; // [esp+0h] [ebp-54h]
+    sithSurface *amount; // [esp+0h] [ebp-54h]
+    float v64; // [esp+18h] [ebp-3Ch]
+    float v65; // [esp+1Ch] [ebp-38h]
+    unsigned int v66; // [esp+20h] [ebp-34h]
+    rdVector3 direction; // [esp+24h] [ebp-30h] BYREF
+    float v68; // [esp+30h] [ebp-24h]
+    float v69; // [esp+34h] [ebp-20h]
+    float v70; // [esp+38h] [ebp-1Ch]
+    rdVector3 out; // [esp+3Ch] [ebp-18h] BYREF
+    rdVector3 v72; // [esp+48h] [ebp-Ch] BYREF
+    sithSector* sectTmp;
+
+    v64 = 0.0;
+    v65 = 0.0;
+    v66 = 0;
+    if ( a6 <= 0.0 )
+        return 0.0;
+    v5 = a3;
+    if ( !a3->collide )
+    {
+        a8 |= 0x5;
+    }
+    if ( a3->move_type == MOVETYPE_PATH )
+    {
+        a8 |= 0x4;
+    }
+    if ( a3->thingType == THINGTYPE_PLAYER )
+    {
+        a8 |= 0x200;
+    }
+    if ( (a8 & 1) == 0 )
+    {
+        a8 |= 0x800;
+    }
+    v10 = a3->attachedParentMaybe;
+    for ( direction = *a2; v10; v10 = v10->childThing )
+    {
+        if ( (v10->attach_flags & 8) == 0 )
+        {
+            v11 = sithUnk3_UpdateThingCollision(v10, a2, a6, 64);
+            if ( v11 < a6 )
+            {
+                if ( (v10->attach_flags & 2) == 0 )
+                    goto LABEL_20;
+                rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
+                v12 = a2->z * out.z + a2->y * out.y + out.x * a2->x;
+                v14 = v12;
+                if ( v14 < 0.0 )
+                    v14 = -v12;
+                if ( v14 <= 0.0000099999997 )
+                    v12 = 0.0;
+                if ( v12 > 0.0 )
+                {
+LABEL_20:
+                    if ( (v5->thingflags & 0x800) == 0 )
+                    {
+                        amounta = (a6 - v11) * 100.0;
+                        sithThing_Damage(v10, v5, amounta, 1);
+                    }
+                    a6 = v11;
+                }
+            }
+        }
+    }
+    sithUnk3_dword_8B4BE4 = 0;
+    if ( a6 == 0.0 )
+    {
+LABEL_78:
+        if ( v66 < 4 )
+            goto LABEL_81;
+    }
+    else
+    {
+        while ( v66 < 4 )
+        {
+            v16 = 0;
+            v68 = v5->position.x;
+            v69 = v5->position.y;
+            out = direction;
+            v17 = v5->moveSize;
+            v70 = v5->position.z;
+            sectTmp = v5->sector;
+            sithUnk3_SearchRadiusForThings(sectTmp, v5, &v5->position, &direction, a6, v17, a8);
+            while ( 1 )
+            {
+                v18 = sithUnk3_searchStackIdx;
+                v19 = 0;
+                v20 = 3.4e38;
+                v21 = sithUnk3_searchStack[sithUnk3_searchStackIdx].collisions;
+                if ( sithUnk3_searchNumResults[sithUnk3_searchStackIdx] )
+                {
+                    v22 = sithUnk3_searchNumResults[sithUnk3_searchStackIdx];
+                    do
+                    {
+                        if ( !v21->hasBeenEnumerated )
+                        {
+                            if ( v20 <= v21->distance )
+                            {
+                                if ( v20 == v21->distance && (v19->collideType & 0x18) != 0 && (v21->collideType & 4) != 0 )
+                                    v19 = v21;
+                            }
+                            else
+                            {
+                                v20 = v21->distance;
+                                v19 = v21;
+                            }
+                        }
+                        ++v21;
+                        --v22;
+                    }
+                    while ( v22 );
+                }
+                if ( v19 )
+                {
+                    v19->hasBeenEnumerated = 1;
+                }
+                else
+                {
+                    sithUnk3_searchNumResults[sithUnk3_searchStackIdx] = 0;
+                    sithUnk3_stackIdk[v18] = 0;
+                }
+                if ( !v19 )
+                    break;
+
+                if ( v19->distance != 0.0 )
+                {
+                    v23 = v19->distance * direction.y + v69;
+                    v24 = v19->distance * direction.z + v70;
+                    v5->position.x = v19->distance * direction.x + v68;
+                    v5->position.y = v23;
+                    v5->position.z = v24;
+                }
+                if ( v19->distance >= (double)a6 )
+                {
+                    v28 = &v5->field_268.x;
+                    v5->field_268.x = 0.0;
+                    v5->field_268.y = 0.0;
+                    v5->field_268.z = 0.0;
+                }
+                else
+                {
+                    v25 = a6 - v19->distance;
+                    v26 = direction.y * v25;
+                    v27 = direction.z * v25;
+                    v28 = &v5->field_268.x;
+                    v5->field_268.x = direction.x * v25;
+                    v5->field_268.y = v26;
+                    v5->field_268.z = v27;
+                    if ( v5->move_type == MOVETYPE_PHYSICS
+                      && (v5->physicsParams.physflags & 0x20) != 0
+                      && (v5->addedVelocity.x != 0.0 || v5->addedVelocity.y != 0.0 || v5->addedVelocity.z != 0.0) )
+                    {
+                        v30 = 1.0 - v19->distance / a6;
+                        v65 = v30;
+                        v31 = -v30;
+                        v32 = v5->addedVelocity.y * v31 + v5->physicsParams.vel.y;
+                        v33 = v5->addedVelocity.z * v31 + v5->physicsParams.vel.z;
+                        v5->physicsParams.vel.x = v5->addedVelocity.x * v31 + v5->physicsParams.vel.x;
+                        v5->physicsParams.vel.y = v32;
+                        v5->physicsParams.vel.z = v33;
+                    }
+                }
+                if ( (v19->collideType & 1) != 0 )
+                {
+                    v34 = v19->receiver;
+                    v35 = v34->thingType + 12 * v5->thingType;
+                    if ( sithUnk3_collisionHandlers[v35].inverse )
+                        v36 = sithUnk3_collisionHandlers[v35].handler(v34, v5, v19, 1);
+                    else
+                        v36 = sithUnk3_collisionHandlers[v35].handler(
+                                  v5,
+                                  v34,
+                                  v19,
+                                  0);
+                }
+                else if ( (v19->collideType & 0x20) != 0 )
+                {
+                    v72.x = v5->position.x;
+                    v72.y = v5->position.y;
+                    v37 = v19->surface;
+                    v72.z = v5->position.z;
+                    if ( (v37->surfaceFlags & 2) != 0 )
+                        sithCog_SendMessageFromSurface(v37, v5, 8);
+                    sithThing_MoveToSector(v5, v19->surface->adjoin->sector, 0);
+                    v36 = _memcmp(&v72, &v5->position, sizeof(rdVector3)) != 0;
+                }
+                else
+                {
+                    amount = v19->surface;
+                    v38 = (int (__cdecl *)(sithThing *, sithSurface *, sithUnk3SearchEntry *))sithUnk3_funcList[v5->thingType];
+                    if ( v38 )
+                        v36 = v38(v5, amount, v19);
+                    else
+                        v36 = sithUnk3_DefaultHitHandler(v5, amount, v19);
+                }
+                v16 = v36;
+                if ( v65 != 0.0 )
+                {
+                    v39 = v65 * sithTime_deltaSeconds;
+                    v40 = v5->physicsParams.vel.y * v39;
+                    v41 = v5->physicsParams.vel.z * v39;
+                    *v28 = v5->physicsParams.vel.x * v39;
+                    v5->field_268.y = v40;
+                    v5->field_268.z = v41;
+                    v65 = 0.0;
+                }
+                if ( v36 )
+                {
+                    v18 = sithUnk3_searchStackIdx;
+                    break;
+                }
+            }
+            sithUnk3_searchStackIdx = v18 - 1;
+            if ( v16 )
+            {
+                v64 = v19->distance + v64;
+                if ( v5->field_268.x == 0.0 && v5->field_268.y == 0.0 && v5->field_268.z == 0.0 )
+                    goto LABEL_74;
+                a6 = rdVector_Normalize3(&direction, &v5->field_268);
+                v48 = a6;
+                if ( v48 < 0.0 )
+                    v48 = -v48;
+                if ( v48 <= 0.0000099999997 )
+LABEL_74:
+                    a6 = 0.0;
+                ++v66;
+            }
+            else
+            {
+                v42 = direction.y * a6 + v69;
+                v43 = direction.z * a6 + v70;
+                v44 = v64 + a6;
+                v5->position.x = direction.x * a6 + v68;
+                v5->position.y = v42;
+                v5->position.z = v43;
+                a6 = 0.0;
+                v5->field_268.x = 0.0;
+                v64 = v44;
+                v5->field_268.y = 0.0;
+                v5->field_268.z = 0.0;
+            }
+            if ( (v5->thingflags & 2) != 0 )
+                return v64;
+            if ( a6 == 0.0 )
+                goto LABEL_78;
+        }
+    }
+    if ( v5->move_type == MOVETYPE_PHYSICS )
+        sithSector_StopPhysicsThing(v5);
+LABEL_81:
+    v51 = v64;
+    if ( v51 < 0.0 )
+        v51 = -v51;
+    if ( v51 <= 0.0000099999997 )
+        v64 = 0.0;
+    if ( v5->collide )
+    {
+        if ( v5->move_type == MOVETYPE_PHYSICS && !sithCollide_IsSphereInSector(&v5->position, 0.0, v5->sector) )
+        {
+            v53 = v69;
+            v54 = v70;
+            v5->position.x = v68;
+            v55 = out.x;
+            v5->position.y = v53;
+            v56 = out.y;
+            direction.x = v55;
+            v5->position.z = v54;
+            direction.y = v56;
+            direction.z = out.z;
+            sithThing_MoveToSector(v5, sectTmp, 0);
+            if ( v5->lifeLeftMs )
+                sithThing_Destroy(v5);
+        }
+    }
+    for ( i = v5->attachedParentMaybe; i; i = i->childThing )
+    {
+        if ( (i->attach_flags & 8) != 0 )
+        {
+            rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
+            v58 = v5->sector;
+            v59 = i->sector;
+            i->position.x = v5->position.x + i->position.x;
+            i->position.y = v5->position.y + i->position.y;
+            i->position.z = v5->position.z + i->position.z;
+            if ( v59 != v58 )
+                sithThing_MoveToSector(i, v58, 0);
+        }
+    }
+    if ( v5->move_type == MOVETYPE_PHYSICS )
+    {
+        if ( v64 == 0.0 )
+            return 0.0;
+        if ( (a8 & 0x40) == 0 )
+        {
+            if ( (v60 = v5->attach_flags) != 0 && (v60 & 8) == 0
+              || (v5->physicsParams.physflags & 0x40) != 0
+              && (v5->physicsParams.vel.z < -2.0 || v5->physicsParams.vel.z > 0.2 ? (v61 = 0) : (v61 = 1), v61) )
+            {
+                sithSector_ThingLandIdk(v5, 0);
+            }
+        }
+    }
+    return v64;
+}
+
+int sithUnk3_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3)
+{
+    sithThing *v3; // esi
+    float a1a; // [esp+Ch] [ebp+4h]
+
+    v3 = thing;
+    if ( thing->move_type != MOVETYPE_PHYSICS )
+        return 0;
+    a1a = -(a3->field_14.y * thing->physicsParams.vel.y
+          + a3->field_14.z * thing->physicsParams.vel.z
+          + thing->physicsParams.vel.x * a3->field_14.x);
+
+    if ( !sithUnk3_CollideHurt(thing, &a3->field_14, a3->distance, surface->surfaceFlags & 0x80) )
+        return 0;
+
+    if ( (surface->surfaceFlags & SURFACEFLAGS_2) != 0 && (v3->thingflags & 0x100) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_curMsAbsolute )
+    {
+        surface->surfaceInfo.lastTouchedMs = sithTime_curMsAbsolute;
+        sithCog_SendMessageFromSurface(surface, v3, SITH_MESSAGE_TOUCHED);
+    }
+    if ( a1a > 0.15000001 )
+    {
+        if ( a1a > 1.0 )
+            a1a = 1.0;
+        if ( (surface->surfaceFlags & SURFACEFLAGS_METAL) != 0 )
+        {
+            sithSoundClass_PlayThingSoundclass(v3, SITH_SC_HITMETAL, a1a);
+            return 1;
+        }
+        sithSoundClass_PlayThingSoundclass(v3, SITH_SC_HITHARD, a1a);
+    }
+    return 1;
+}
+
+int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3SearchEntry *a3, int isInverse)
+{
+    sithThing *v4; // esi
+    sithThing *v5; // edi
+    double v6; // st6
+    double v8; // st5
+    //char v9; // c0
+    double v11; // st7
+    double v13; // st6
+    //char v14; // c0
+    double v15; // st7
+    float a3a; // [esp+0h] [ebp-38h]
+    rdVector3 a2; // [esp+14h] [ebp-24h] BYREF
+    rdVector3 forceVec; // [esp+20h] [ebp-18h] BYREF
+    rdVector3 v19; // [esp+2Ch] [ebp-Ch] BYREF
+    float senderb; // [esp+3Ch] [ebp+4h]
+    float sender; // [esp+3Ch] [ebp+4h]
+    float sendera; // [esp+3Ch] [ebp+4h]
+    float a1a; // [esp+40h] [ebp+8h]
+
+    if ( isInverse )
+    {
+        v4 = thing2;
+        v5 = thing1;
+    }
+    else
+    {
+        v4 = thing1;
+        v5 = thing2;
+    }
+    a2 = a3->field_14;
+
+    if ( (v4->thingflags & SITH_TF_CAPTURED) != 0 && (v4->thingflags & SITH_TF_INVULN) == 0 )
+        sithCog_SendMessageFromThing(v4, v5, SITH_MESSAGE_TOUCHED);
+    if ( (v5->thingflags & SITH_TF_CAPTURED) != 0 && (v4->thingflags & SITH_TF_INVULN) == 0 )
+        sithCog_SendMessageFromThing(v5, v4, SITH_MESSAGE_TOUCHED);
+
+    if ( v4->move_type != MOVETYPE_PHYSICS || v4->physicsParams.mass == 0.0 )
+    {
+        if ( v5->move_type != MOVETYPE_PHYSICS || v5->physicsParams.mass == 0.0 )
+            return 1;
+        v11 = v4->field_268.x * a2.x + v4->field_268.z * a2.z + v4->field_268.y * a2.y;
+        v13 = v11;
+        if ( v13 < 0.0 )
+            v13 = -v11;
+        if ( v13 <= 0.0000099999997 )
+            v11 = 0.0;
+        if ( v11 < 0.0 )
+        {
+            sendera = -v11 * 1.0001;
+            v19.x = -a2.x;
+            v19.y = -a2.y;
+            v19.z = -a2.z;
+            v15 = sithUnk3_UpdateThingCollision(v5, &v19, sendera, 0);
+            if ( v15 < sendera )
+            {
+                if ( (v4->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
+                {
+                    a1a = v15;
+                    a3a = (sendera - a1a) * 100.0;
+                    sithThing_Damage(v5, v4, a3a, 1);
+                }
+                v4->field_268.x = 0.0;
+                v4->field_268.y = 0.0;
+                v4->field_268.z = 0.0;
+            }
+            return 1;
+        }
+        return 0;
+    }
+    if ( v5->move_type == MOVETYPE_PHYSICS && v5->physicsParams.mass != 0.0 )
+    {
+        v6 = v5->physicsParams.vel.z * a2.z
+           + v5->physicsParams.vel.y * a2.y
+           + v5->physicsParams.vel.x * a2.x
+           - (v4->physicsParams.vel.z * a2.z
+            + v4->physicsParams.vel.y * a2.y
+            + v4->physicsParams.vel.x * a2.x);
+        v8 = v6;
+        if ( v8 < 0.0 )
+            v8 = -v6;
+        if ( v8 <= 0.0000099999997 )
+            v6 = 0.0;
+        if ( v6 <= 0.0 )
+            return 0;
+        if ( (v4->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+            v6 = v6 * 0.5;
+        if ( (v5->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+            v6 = v6 * 0.5;
+        senderb = (v5->physicsParams.mass * v4->physicsParams.mass + v5->physicsParams.mass * v4->physicsParams.mass)
+                / (v5->physicsParams.mass + v4->physicsParams.mass);
+        forceVec.x = v6 * a2.x * senderb;
+        forceVec.y = v6 * a2.y * senderb;
+        forceVec.z = v6 * a2.z * senderb;
+        sithSector_ThingApplyForce(v4, &forceVec);
+        forceVec.x = -forceVec.x;
+        forceVec.y = -forceVec.y;
+        forceVec.z = -forceVec.z;
+        sithSector_ThingApplyForce(v5, &forceVec);
+        return sithUnk3_CollideHurt(v4, &a2, a3->distance, 0);
+    }
+    sender = -(v4->physicsParams.vel.z * a2.z + v4->physicsParams.vel.y * a2.y + v4->physicsParams.vel.x * a2.x);
+    if ( !sithUnk3_CollideHurt(v4, &a2, a3->distance, 0) )
+        return 0;
+    if ( sender <= 0.15000001 )
+        return 1;
+    if ( sender > 1.0 )
+        sender = 1.0;
+    if ( (v5->thingflags & SITH_TF_METAL) != 0 )
+        sithSoundClass_PlayThingSoundclass(v4, SITH_SC_HITMETAL, sender);
+    else
+        sithSoundClass_PlayThingSoundclass(v4, SITH_SC_HITHARD, sender);
+    return 1;
+}
+
+int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
+{
+    int result; // eax
+    double v8; // st7
+    double v10; // st6
+    double v11; // st7
+    double v12; // st5
+    double v14; // st7
+    double v17; // st6
+    double v18; // st5
+    double v19; // st7
+    double v20; // st6
+    double v21; // st5
+    double v22; // st7
+    double v23; // st6
+    double v24; // st5
+    double v25; // st7
+    double v26; // st7
+    double v27; // st6
+    double v28; // st5
+    double v29; // st7
+    double v30; // st4
+    double v31; // st6
+    double v32; // st7
+    double v33; // st5
+    float v34; // edx
+    double v35; // st7
+    double v36; // st7
+    double v37; // st6
+    double v38; // st5
+    double v39; // st7
+    double v40; // st7
+    double v41; // st6
+    double v42; // st5
+    float v43; // [esp+8h] [ebp-4h]
+    float a1a; // [esp+10h] [ebp+4h]
+    float amount; // [esp+14h] [ebp+8h]
+    float amounta; // [esp+14h] [ebp+8h]
+    float amountb; // [esp+14h] [ebp+8h]
+
+    if ( a1->move_type != MOVETYPE_PHYSICS )
+        return 0;
+    amount = -(a1->field_268.x * a2->x + a2->z * a1->field_268.z + a1->field_268.y * a2->y);
+    a1a = amount;
+    v8 = amount;
+    if ( v8 < 0.0 )
+        v8 = -v8;
+    if ( v8 <= 0.0000099999997 )
+        a1a = 0.0;
+    if ( a1a <= 0.0 )
+        return 0;
+    v43 = 1.9;
+    if ( (a1->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+        v43 = 1.0001;
+    if ( a3 == 0.0 && sithUnk3_dword_8B4BE4 )
+    {
+        if ( amount <= 0.0 )
+        {
+            result = 0;
+        }
+        else
+        {
+            v10 = -(a1->physicsParams.vel.x * a2->x + a1->physicsParams.vel.z * a2->z + a1->physicsParams.vel.y * a2->y);
+            v11 = a2->y * amount + a1->field_268.y;
+            v12 = a2->z * amount + a1->field_268.z;
+            a1->field_268.x = a2->x * amount + a1->field_268.x;
+            a1->field_268.y = v11;
+            v14 = v10;
+            a1->field_268.z = v12;
+            if ( v10 > 0.0 )
+            {
+                v17 = a2->y * v10 + a1->physicsParams.vel.y;
+                v18 = a2->z * v14 + a1->physicsParams.vel.z;
+                a1->physicsParams.vel.x = a2->x * v14 + a1->physicsParams.vel.x;
+                a1->physicsParams.vel.y = v17;
+                a1->physicsParams.vel.z = v18;
+            }
+            v19 = -(a2->y * sithUnk3_collideHurtIdk.y + a2->z * sithUnk3_collideHurtIdk.z + a2->x * sithUnk3_collideHurtIdk.x);
+            v20 = a2->y * v19 + sithUnk3_collideHurtIdk.y;
+            v21 = a2->z * v19 + sithUnk3_collideHurtIdk.z;
+            sithUnk3_collideHurtIdk.x = a2->x * v19 + sithUnk3_collideHurtIdk.x;
+            sithUnk3_collideHurtIdk.y = v20;
+            sithUnk3_collideHurtIdk.z = v21;
+            rdVector_Normalize3Acc(&sithUnk3_collideHurtIdk);
+            v22 = -(a1->physicsParams.vel.z * sithUnk3_collideHurtIdk.z
+                  + a1->physicsParams.vel.x * sithUnk3_collideHurtIdk.x
+                  + a1->physicsParams.vel.y * sithUnk3_collideHurtIdk.y);
+            if ( v22 > 0.0 )
+            {
+                v23 = v22 * sithUnk3_collideHurtIdk.y + a1->physicsParams.vel.y;
+                v24 = v22 * sithUnk3_collideHurtIdk.x + a1->physicsParams.vel.x;
+                v25 = v22 * sithUnk3_collideHurtIdk.z + a1->physicsParams.vel.z;
+                a1->physicsParams.vel.x = v24;
+                a1->physicsParams.vel.y = v23;
+                a1->physicsParams.vel.z = v25;
+            }
+            v26 = -(a1->field_268.x * sithUnk3_collideHurtIdk.x + a1->field_268.y * sithUnk3_collideHurtIdk.y + a1->field_268.z * sithUnk3_collideHurtIdk.z);
+            if ( v26 > 0.0 )
+            {
+                v27 = v26 * sithUnk3_collideHurtIdk.y + a1->field_268.y;
+                v28 = v26 * sithUnk3_collideHurtIdk.x + a1->field_268.x;
+                v29 = v26 * sithUnk3_collideHurtIdk.z + a1->field_268.z;
+                a1->field_268.x = v28;
+                a1->field_268.y = v27;
+                a1->field_268.z = v29;
+            }
+            result = 1;
+        }
+    }
+    else
+    {
+        v30 = a2->y;
+        v31 = a1->physicsParams.vel.y;
+        v32 = a1->physicsParams.vel.x * a2->x;
+        v33 = a1->physicsParams.vel.z * a2->z;
+        sithUnk3_dword_8B4BE4 = 1;
+        sithUnk3_collideHurtIdk.x = a2->x;
+        v34 = a2->z;
+        sithUnk3_collideHurtIdk.y = a2->y;
+        sithUnk3_collideHurtIdk.z = v34;
+        v35 = -(v32 + v33 + v31 * v30);
+        amounta = v35;
+        if ( v35 > 0.0 )
+        {
+            v36 = v43 * amounta;
+            v37 = a2->y * v36 + a1->physicsParams.vel.y;
+            v38 = a2->z * v36 + a1->physicsParams.vel.z;
+            a1->physicsParams.vel.x = a2->x * v36 + a1->physicsParams.vel.x;
+            a1->physicsParams.vel.y = v37;
+            a1->physicsParams.vel.z = v38;
+            if ( !a4 && amounta > 2.5 )
+            {
+                v39 = (amounta - 2.5) * (amounta - 2.5) * 45.0;
+                if ( v39 > 1.0 )
+                {
+                    sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_HITDAMAGED);
+                    amountb = v39;
+                    sithThing_Damage(a1, a1, amountb, 0x40);
+                }
+            }
+        }
+        v40 = v43 * a1a;
+        v41 = a2->y * v40 + a1->field_268.y;
+        v42 = a2->z * v40 + a1->field_268.z;
+        a1->field_268.x = a2->x * v40 + a1->field_268.x;
+        a1->field_268.y = v41;
+        a1->field_268.z = v42;
+        result = 1;
+    }
+    return result;
 }

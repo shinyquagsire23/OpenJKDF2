@@ -147,6 +147,7 @@ int sithSoundClass_Load(sithWorld *world, int a2);
 sithSoundClass* sithSoundClass_LoadFile(char *fpath);
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
 void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundclass_id);
+void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3);
 
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;

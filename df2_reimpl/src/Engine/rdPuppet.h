@@ -116,6 +116,7 @@ typedef struct rdPuppet
 rdPuppet* rdPuppet_New(rdThing *thing);
 void rdPuppet_Free(rdPuppet *puppet);
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix);
+int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum);
 
 static int (*rdPuppet_UpdateTracks)(rdPuppet *puppet, float a2) = (void*)rdPuppet_UpdateTracks_ADDR;
 //static void (__cdecl *rdPuppet_BuildJointMatrices)(rdThing *thing_1, rdMatrix34 *matrix) = (void*)rdPuppet_BuildJointMatrices_ADDR;

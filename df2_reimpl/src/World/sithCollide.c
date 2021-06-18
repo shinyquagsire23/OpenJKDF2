@@ -653,3 +653,170 @@ int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     }
     return result;
 }
+
+int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8)
+{
+    int v9; // ebx
+    float *v10; // ebp
+    int v11; // ecx
+    rdFace *v12; // edx
+    double v13; // st6
+    double v14; // st4
+    double v15; // st5
+    double v16; // st7
+    rdFace *v17; // eax
+    float v18; // ebx
+    float v19; // ebp
+    float v20; // ebp
+    double v21; // st7
+    int v24; // [esp+8h] [ebp-18h]
+    float v25; // [esp+Ch] [ebp-14h]
+    int v26; // [esp+10h] [ebp-10h]
+    rdVector3 a8a; // [esp+14h] [ebp-Ch] BYREF
+    int mesha; // [esp+34h] [ebp+14h]
+
+    v9 = 0;
+    v24 = 0;
+    v25 = 1.0;
+    v26 = 0;
+    if ( mesh->numFaces )
+    {
+        v10 = a6;
+        mesha = 0;
+        do
+        {
+            v11 = sithCollide_sub_508D20(a1, a2, a3, a4, (rdFace *)((char *)mesh->faces + v9), mesh->vertices, v10, &a8a, 0);
+            if ( v11
+              && (*v10 < (double)a3
+               || v24 != 4 && v11 == 4
+               || a2->z * *(float *)((char *)&mesh->faces->normal.z + v9)
+                + a2->y * *(float *)((char *)&mesh->faces->normal.y + v9)
+                + *(float *)((char *)&mesh->faces->normal.x + v9) * a2->x < v25) )
+            {
+                v12 = mesh->faces;
+                v13 = a2->y;
+                v14 = *(float *)((char *)&v12->normal.y + v9);
+                v15 = *(float *)((char *)&v12->normal.x + v9);
+                v16 = a2->z * *(float *)((char *)&v12->normal.z + v9);
+                v17 = (rdFace *)((char *)v12 + v9);
+                v18 = a8a.y;
+                v24 = v11;
+                a8->x = a8a.x;
+                v19 = *a6;
+                a8->y = v18;
+                a3 = v19;
+                v20 = a8a.z;
+                v21 = v16 + v13 * v14 + v15 * a2->x;
+                *faceOut = v17;
+                v9 = mesha;
+                a8->z = v20;
+                v10 = a6;
+                v25 = v21;
+            }
+            v9 += sizeof(rdFace);
+            mesha = v9;
+        }
+        while ( ++v26 < mesh->numFaces );
+    }
+    return v24;
+}
+
+int sithCollide_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6)
+{
+    rdFace *v6; // ecx
+    unsigned int v7; // edi
+    unsigned int v8; // ebx
+    int *v10; // ecx
+    int v11; // eax
+    double v12; // st7
+    double v13; // st6
+    rdVector3 *v14; // esi
+    rdVector3 *v15; // edi
+    long double v16; // st7
+    //char v18; // c0
+    int v19; // ecx
+    double v20; // st6
+    double v21; // st5
+    double v22; // st7
+    double v23; // rt0
+    long double v24; // st6
+    float v26; // [esp+0h] [ebp-30h]
+    float v27; // [esp+4h] [ebp-2Ch]
+    int i; // [esp+8h] [ebp-28h]
+    rdVector3 v29; // [esp+Ch] [ebp-24h]
+    rdVector3 a1a; // [esp+18h] [ebp-18h] BYREF
+    float v31; // [esp+24h] [ebp-Ch]
+    float v32; // [esp+28h] [ebp-8h]
+    float v33; // [esp+2Ch] [ebp-4h]
+    float v34; // [esp+34h] [ebp+4h]
+    float v35; // [esp+34h] [ebp+4h]
+    float v36; // [esp+34h] [ebp+4h]
+
+    v6 = a3;
+    v7 = a3->numVertices;
+    v8 = 0;
+    v27 = a2 - -1.0;
+    for ( i = 0; v8 < v7; v7 = a3->numVertices )
+    {
+        if ( !a5 )
+            break;
+        if ( (a5 & 1) != 0 )
+        {
+            v10 = v6->vertexPosIdx;
+            v11 = v10[v8];
+            v12 = a1->y - a4[v10[v8]].y;
+            v13 = a1->z - a4[v10[v8]].z;
+            v31 = a1->x - a4[v10[v8]].x;
+            v14 = &a4[v11];
+            v32 = v12;
+            v33 = v13;
+            v15 = &a4[v10[(v8 + 1) % v7]];
+            a1a.x = v15->x - v14->x;
+            a1a.y = v15->y - v14->y;
+            a1a.z = v15->z - v14->z;
+            v16 = rdVector_Normalize3Acc(&a1a);
+            v34 = a1a.x * v31 + a1a.y * v32 + a1a.z * v33;
+            v26 = v16;
+            if ( v34 > a2 && v34 - a2 <= v26 )
+            {
+                v19 = 16;
+                if ( v34 >= 0.0 )
+                {
+                    if ( v34 <= (double)v26 )
+                    {
+                        v29.x = v34 * a1a.x + v14->x;
+                        v29.y = v34 * a1a.y + v14->y;
+                        v19 = 8;
+                        v29.z = v34 * a1a.z + v14->z;
+                    }
+                    else
+                    {
+                        v29 = *v15;
+                    }
+                }
+                else
+                {
+                    v29 = *v14;
+                }
+                v20 = a1->y - v29.y;
+                v21 = a1->x - v29.x;
+                v22 = a1->z - v29.z;
+                v35 = v21;
+                v23 = v21 * v35;
+                v36 = v22;
+                v24 = stdMath_Sqrt(v23 + v20 * v20 + v22 * v36);
+                if ( v24 <= a2 && v24 < v27 )
+                {
+                    i = v19;
+                    v27 = v24;
+                    if ( a6 )
+                        *a6 = v29;
+                }
+            }
+        }
+        ++v8;
+        a5 = (unsigned int)a5 >> 1;
+        v6 = a3;
+    }
+    return i;
+}

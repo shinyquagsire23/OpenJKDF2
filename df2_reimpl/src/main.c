@@ -993,6 +993,9 @@ void do_hooks()
     hook_function(sithThing_Free_ADDR, sithThing_Free);
     hook_function(sithThing_SpawnTemplate_ADDR, sithThing_SpawnTemplate);
     hook_function(sithThing_AttachToSurface_ADDR, sithThing_AttachToSurface);
+    hook_function(sithThing_LandThing_ADDR, sithThing_LandThing);
+    hook_function(sithThing_MoveToSector_ADDR, sithThing_MoveToSector);
+    hook_function(sithThing_DetachThing_ADDR, sithThing_DetachThing);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1055,6 +1058,8 @@ void do_hooks()
     hook_function(sithCollide_sub_508BE0_ADDR, sithCollide_sub_508BE0);
     hook_function(sithCollide_sub_508750_ADDR, sithCollide_sub_508750);
     hook_function(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
+    hook_function(sithCollide_sub_508400_ADDR, sithCollide_sub_508400);
+    hook_function(sithCollide_sub_508990_ADDR, sithCollide_sub_508990);
 
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
@@ -1275,11 +1280,16 @@ void do_hooks()
     hook_function(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
     hook_function(sithUnk3_SearchClose_ADDR, sithUnk3_SearchClose);
     hook_function(sithUnk3_sub_4E7670_ADDR, sithUnk3_sub_4E7670);
+    hook_function(sithUnk3_UpdateThingCollision_ADDR, sithUnk3_UpdateThingCollision);
+    hook_function(sithUnk3_DefaultHitHandler_ADDR, sithUnk3_DefaultHitHandler);
+    hook_function(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
+    hook_function(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
     
     // sithUnk4
     hook_function(sithUnk4_SetMaxHeathForDifficulty_ADDR, sithUnk4_SetMaxHeathForDifficulty);
     hook_function(sithUnk4_sub_4ED1D0_ADDR, sithUnk4_sub_4ED1D0);
     hook_function(sithUnk4_MoveJointsForEyePYR_ADDR, sithUnk4_MoveJointsForEyePYR);
+    hook_function(sithUnk4_ActorActorCollide_ADDR, sithUnk4_ActorActorCollide);
     
     // sithItem
     hook_function(sithItem_Collide_ADDR, sithItem_Collide);
@@ -1344,6 +1354,7 @@ void do_hooks()
     
     // sithPuppet
     hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
+    hook_function(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
     
     // sithRender
     hook_function(sithRender_Startup_ADDR, sithRender_Startup);

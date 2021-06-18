@@ -103,3 +103,31 @@ void sithUnk4_MoveJointsForEyePYR(sithThing *actor, rdVector3 *eyePYR)
         }
     }
 }
+
+int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithUnk3SearchEntry *a3, int a4)
+{
+    int result; // eax
+    int v5; // ebx
+    sithActor *v6; // eax
+    sithActor *v7; // eax
+
+    result = sithUnk3_DebrisDebrisCollide(thing, thing2, a3, a4);
+    v5 = result;
+    if ( result )
+    {
+        if ( thing->thingtype == THINGTYPE_ACTOR )
+        {
+            v6 = thing->actor;
+            if ( v6 )
+                sithAI_SetActorFireTarget(v6, 4, thing2);
+        }
+        if ( thing2->thingtype == THINGTYPE_ACTOR )
+        {
+            v7 = thing2->actor;
+            if ( v7 )
+                sithAI_SetActorFireTarget(v7, 4, thing);
+        }
+        result = v5;
+    }
+    return result;
+}

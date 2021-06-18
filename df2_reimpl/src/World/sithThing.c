@@ -237,9 +237,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithThing_handler(thingIter);
             if ( thingIter->move_type == MOVETYPE_PHYSICS )
             {
-#ifndef LINUX_TMP
                 sithSector_ThingPhysicsTick(thingIter, deltaSeconds);
-#endif
             }
             else if ( thingIter->move_type == MOVETYPE_PATH )
             {
@@ -1855,4 +1853,212 @@ LABEL_26:
         }
         goto LABEL_26;
     }
+}
+
+void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5)
+{
+    int v6; // eax
+    int *v7; // eax
+    int v8; // eax
+    sithThing *v9; // eax
+    double v12; // st6
+    double v13; // st7
+    double v14; // st6
+    double v15; // st5
+    double v16; // st7
+    double downward_velocity; // st7
+    int v18; // [esp+10h] [ebp-1Ch]
+    rdVector3 a2a; // [esp+14h] [ebp-18h] BYREF
+    rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
+    float a1a; // [esp+30h] [ebp+4h]
+
+    v6 = a1->attach_flags;
+    v18 = 1;
+    if ( v6 )
+    {
+        if ( (v6 & 2) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
+            return;
+        v18 = 0;
+        sithThing_DetachThing(a1);
+    }
+    v7 = a3->vertexPosIdx;
+    a1->attach_flags = 2;
+    a1->attachedSufaceInfo = (sithSurfaceInfo *)a3;
+    v8 = *v7;
+    a1->attachedThing = a2;
+    a1->field_38 = a4[v8];
+    v9 = a2->attachedParentMaybe;
+    a1->childThing = v9;
+    if ( v9 )
+        v9->parentThing = a1;
+    a1->parentThing = 0;
+    a2->attachedParentMaybe = a1;
+    a1->physicsParams.physflags &= ~PHYSFLAGS_100;
+    if ( a2->move_type == MOVETYPE_PHYSICS )
+    {
+        v12 = a1->physicsParams.vel.y - a2->physicsParams.vel.y;
+        v13 = a1->physicsParams.vel.z - a2->physicsParams.vel.z;
+        a1->physicsParams.vel.x = a1->physicsParams.vel.x - a2->physicsParams.vel.x;
+        a1->physicsParams.vel.y = v12;
+        a1->physicsParams.vel.z = v13;
+    }
+    else if ( a2->move_type == MOVETYPE_PATH )
+    {
+        v14 = -a2->physicsParams.acceleration.y;
+        v15 = a2->physicsParams.angVel.y * v14 + a1->physicsParams.vel.y;
+        v16 = a2->physicsParams.angVel.z * v14 + a1->physicsParams.vel.z;
+        a1->physicsParams.vel.x = a2->physicsParams.angVel.x * v14 + a1->physicsParams.vel.x;
+        a1->physicsParams.vel.y = v15;
+        a1->physicsParams.vel.z = v16;
+    }
+    a2a.x = a1->position.x - a2->position.x;
+    a2a.y = a1->position.y - a2->position.y;
+    a2a.z = a1->position.z - a2->position.z;
+    rdMatrix_TransformVector34Acc_0(&a1->field_4C, &a2a, &a2->lookOrientation);
+    if ( (a2->thingflags & SITH_TF_CAPTURED) != 0 && (a1->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+        sithCog_SendMessageFromThing(a2, a1, SITH_MESSAGE_ENTERED);
+    if ( v18 && !a5 )
+    {
+        rdMatrix_TransformVector34(&out, &a3->normal, &a2->lookOrientation);
+        downward_velocity = -(a1->physicsParams.vel.x * out.x
+                            + a1->physicsParams.vel.z * out.z
+                            + a1->physicsParams.vel.y * out.y);
+        if ( downward_velocity > 2.5 )
+        {
+            a1a = downward_velocity;
+            sithUnk3_FallHurt(a1, a1a);
+            sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDHURT);
+        }
+        if ( a1->soundclass )
+        {
+            if ( (a2->thingflags & SITH_TF_METAL) != 0 )
+            {
+                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDMETAL);
+            }
+            else if ( (SITH_TF_EARTH & a2->thingflags) != 0 )
+            {
+                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDEARTH);
+            }
+            else
+            {
+                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDHARD);
+            }
+        }
+    }
+}
+
+void sithThing_MoveToSector(sithThing *thing, sithSector *sector, int a4)
+{
+    sithSector *v3; // eax
+
+    v3 = thing->sector;
+    if ( v3 )
+    {
+        if ( v3 == sector )
+            return;
+        sithThing_LeaveSector(thing);
+    }
+    sithThing_EnterSector(thing, sector, 0, a4);
+}
+
+int sithThing_DetachThing(sithThing *thing)
+{
+    int v1; // eax
+    int *v2; // edi
+    sithThing *v3; // ebx
+    double v5; // st7
+    double v6; // st6
+    double v7; // rt0
+    double v8; // st6
+    double v9; // st7
+    double v10; // st6
+    double v11; // st7
+    double v12; // rt2
+    sithThing *v13; // ecx
+    sithThing *v14; // eax
+    int result; // eax
+    sithSurface *attached; // ebx
+    double v17; // st7
+    double v18; // st6
+    rdVector3 a2; // [esp+Ch] [ebp-Ch] BYREF
+
+    v1 = thing->attach_flags;
+    v2 = &thing->attach_flags;
+    if ( (v1 & 6) == 0 )
+    {
+        if ( (v1 & 1) != 0 )
+        {
+            attached = thing->attachedSurface;
+            if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->move_type == MOVETYPE_PHYSICS )
+            {
+                sithSurface_DetachThing(attached, &a2);
+                v17 = a2.y + thing->physicsParams.vel.y;
+                v18 = a2.z + thing->physicsParams.vel.z;
+                thing->physicsParams.vel.x = a2.x + thing->physicsParams.vel.x;
+                thing->physicsParams.vel.y = v17;
+                thing->physicsParams.vel.z = v18;
+            }
+            if ( (attached->surfaceFlags & SURFACEFLAGS_2) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+                sithCog_SendMessageFromSurface(attached, thing, SITH_MESSAGE_EXITED);
+        }
+        result = 0;
+        _memset(v2, 0, 0x28u); // TODO
+        return result;
+    }
+    v3 = thing->attachedThing;
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        if ( v3->move_type == MOVETYPE_PHYSICS )
+        {
+            v5 = v3->physicsParams.vel.y + thing->physicsParams.vel.y;
+            v6 = v3->physicsParams.vel.z + thing->physicsParams.vel.z;
+            thing->physicsParams.vel.x = v3->physicsParams.vel.x + thing->physicsParams.vel.x;
+            v7 = v6;
+            v8 = v5;
+            v9 = v7;
+            thing->physicsParams.vel.y = v8;
+        }
+        else
+        {
+            if ( v3->move_type != MOVETYPE_PATH )
+                goto LABEL_8;
+            v10 = v3->physicsParams.angVel.y * v3->physicsParams.acceleration.y;
+            v11 = v3->physicsParams.angVel.z;
+            thing->physicsParams.vel.x = v3->physicsParams.angVel.x * v3->physicsParams.acceleration.y
+                                                  + thing->physicsParams.vel.x;
+            v12 = v11 * v3->physicsParams.acceleration.y;
+            thing->physicsParams.vel.y = v10 + thing->physicsParams.vel.y;
+            v9 = v12 + thing->physicsParams.vel.z;
+        }
+        thing->physicsParams.vel.z = v9;
+    }
+LABEL_8:
+    if ( (v3->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+        sithCog_SendMessageFromThing(v3, thing, SITH_MESSAGE_EXITED);
+    v13 = thing->parentThing;
+    v14 = thing->childThing;
+    if ( v13 )
+    {
+        v13->childThing = v14;
+        if ( v14 )
+        {
+            v14->parentThing = v13;
+            result = 0;
+            thing->parentThing = 0;
+            thing->childThing = 0;
+            _memset(v2, 0, 0x28u);// TODO
+            return result;
+        }
+    }
+    else
+    {
+        v3->attachedParentMaybe = v14;
+        if ( v14 )
+            v14->parentThing = 0;
+    }
+    result = 0;
+    thing->parentThing = 0;
+    thing->childThing = 0;
+    _memset(v2, 0, 0x28u);// TODO
+    return result;
 }

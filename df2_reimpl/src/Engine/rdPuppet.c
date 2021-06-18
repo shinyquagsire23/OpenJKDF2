@@ -441,3 +441,13 @@ LABEL_58:
         thing->frameTrue = rdroid_frameTrue;
     }
 }
+
+int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
+{
+    if ( puppet->tracks[trackNum].callback )
+        puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, 0);
+    puppet->tracks[trackNum].status = 0;
+    puppet->tracks[trackNum].keyframe = 0;
+    puppet->tracks[trackNum].callback = 0;
+    return 1;
+}

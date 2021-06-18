@@ -162,13 +162,13 @@ LABEL_39:
         else
         {
             sithControl_PlayerLook(player, deltaSecs);
-#ifndef LINUX_TMP
             if ( player->thingType != THINGTYPE_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
             {
                 if ( player->attach_flags )
                     sithControl_PlayerMovement(player);
                 else
                     sithControl_FreeCam(player);
+#ifndef LINUX_TMP
                 sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
                 if ( input_read != 0 )
                     sithActor_cogMsg_OpenDoor(player);
@@ -179,8 +179,8 @@ LABEL_39:
                     sithMapView_FuncIncrease();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
                     sithMapView_FuncDecrease();
-            }
 #endif
+            }
         }
         return 0;
     }
@@ -354,6 +354,193 @@ LABEL_20:
         else if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) )
         {
             sithSector_ThingSetLook(player, &rdroid_zVector3, deltaSecs);
+        }
+    }
+}
+
+void sithControl_PlayerMovement(sithThing *player)
+{
+    int new_state; // eax
+    double v6; // st7
+    double v7; // st6
+    double v8; // st7
+    double v11; // st7
+    double y_vel; // st6
+    int v16; // eax
+    double v17; // st7
+    float move_multiplier_a; // [esp+4h] [ebp-8h]
+    float move_multiplier_; // [esp+4h] [ebp-8h]
+    int v20; // [esp+8h] [ebp-4h] BYREF
+    float move_multiplier; // [esp+10h] [ebp+4h]
+
+    move_multiplier = 1.0;
+    if ( (sithWeapon_controlOptions & 2) != 0 || sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0) )
+        move_multiplier = 2.0;
+    if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0) )
+        move_multiplier = move_multiplier * 0.5;
+    int old_state = player->physicsParams.physflags;
+    if ( !sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, 0) )
+    {
+        new_state = old_state & ~PHYSFLAGS_CROUCHING;
+    }
+    else
+    {
+        new_state = old_state | PHYSFLAGS_CROUCHING;
+        move_multiplier = 0.5;
+    }
+    player->physicsParams.physflags = new_state;
+    if ( (player->physicsParams.physflags & THINGSTATE_200000) != 0 )
+    {
+        move_multiplier = 0.5;
+    }
+
+    if ( (player->attach_flags & ATTACHFLAGS_WORLDSURFACE)
+         && (player->attachedSurface->surfaceFlags & (SURFACEFLAGS_100000|SURFACEFLAGS_WATER)) )
+    {
+        move_multiplier *= 0.5;
+    }
+
+    if ( player->thingType == THINGTYPE_ACTOR || player->thingType == THINGTYPE_PLAYER )
+    {
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
+        {
+            move_multiplier_a = stdControl_GetAxis2(2);
+            v6 = move_multiplier_a - stdControl_GetAxis2(1);
+            if ( v6 < -1.0 )
+            {
+                v6 = -1.0;
+            }
+            else if ( v6 > 1.0 )
+            {
+                v6 = 1.0;
+            }
+            v7 = player->actorParams.maxThrust + player->actorParams.extraSpeed;
+            player->physicsParams.angVel.y = 0.0;
+            player->physicsParams.acceleration.x = v7 * v6 * 0.69999999;
+        }
+        else
+        {
+            v8 = sithControl_GetAxis(1);
+            player->physicsParams.angVel.y = v8 * sithTime_TickHz;
+            if ( move_multiplier > 1.0 )
+                move_multiplier_ = move_multiplier;
+            else
+                move_multiplier_ = 1.0;
+            
+            player->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_
+                                                      + player->physicsParams.angVel.y;
+            player->physicsParams.acceleration.x = stdControl_GetAxis2(2)
+                                                            * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
+                                                            * 0.69999999;
+        }
+        v11 = stdControl_GetAxis2(0);
+        y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
+        if ( v11 < 0.0 )
+            y_vel = y_vel * 0.5;
+        player->physicsParams.acceleration.y = y_vel;
+        if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
+        {
+            if ( (player->actorParams.typeflags & THING_TYPEFLAGS_LIGHT) == 0 )
+            {
+                player->actorParams.typeflags |= THING_TYPEFLAGS_FORCE;
+            }
+        }
+        player->physicsParams.acceleration.z = 0;
+        if ( move_multiplier != 1.0 )
+        {
+            player->physicsParams.acceleration.y = player->physicsParams.acceleration.y * move_multiplier;
+            player->physicsParams.acceleration.x = player->physicsParams.acceleration.x * move_multiplier;
+        }
+        sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &v20);
+        if ( v20 )
+            sithActor_JumpWithVel(player, 1.0);
+    }
+}
+
+void sithControl_FreeCam(sithThing *player)
+{
+    sithThing *v1; // esi
+    int v2; // ebp
+    sithSector *v3; // eax
+    double v5; // st7
+    double v6; // st6
+    rdVector3 *v7; // edi
+    double v9; // st7
+    double v11; // st7
+    double v12; // st6
+    float v15; // [esp+Ch] [ebp-34h]
+    rdMatrix34 a; // [esp+10h] [ebp-30h] BYREF
+    int tmp;
+
+    v1 = player;
+    v2 = 0;
+    if ( (player->physicsParams.physflags & 0x2000) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SF_UNDERWATER) != 0 )
+        v2 = 1;
+    if ( (sithWeapon_controlOptions & 2) == 0 )
+        sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0);
+    sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0);
+    if ( v1->thingType == THINGTYPE_ACTOR || v1->thingType == THINGTYPE_PLAYER )
+    {
+        v5 = stdControl_GetAxis2(0);
+        v6 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
+        v7 = &v1->physicsParams.acceleration;
+        v1->physicsParams.acceleration.z = 0.0;
+        v9 = v5 * v6;
+        v1->physicsParams.acceleration.y = v9;
+        if ( (v6 != 0.0 || v9 != 0.0) // TODO verify first comparison?
+          && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
+          && v2
+          && (v1->physicsParams.physflags & PHYSFLAGS_MIDAIR) == 0 )
+        {
+            rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+            rdMatrix_TransformVector34Acc(&v1->physicsParams.acceleration, &a);
+        }
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &tmp) )
+        {
+            v15 = stdControl_GetAxis2(2);
+            v11 = v15 - stdControl_GetAxis2(1);
+            if ( v11 < -1.0 )
+            {
+                v11 = -1.0;
+            }
+            else if ( v11 > 1.0 )
+            {
+                v11 = 1.0;
+            }
+            v12 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
+            v1->physicsParams.angVel.y = 0.0;
+            v7->x = v12 * v11 * 0.69999999;
+        }
+        else
+        {
+            v7->x = stdControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
+            v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
+            v1->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust
+                                                  + v1->physicsParams.angVel.y;
+        }
+        if ( v2 )
+        {
+            if ( sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp) )
+            {
+                if ( (v1->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+                {
+                    if ( tmp )
+                        sithActor_JumpWithVel(v1, 1.0);
+                }
+                else
+                {
+                    v1->physicsParams.acceleration.z = v1->actorParams.maxThrust * 0.5 + v1->physicsParams.acceleration.z;
+                }
+            }
+            if ( sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp) )
+                v1->physicsParams.acceleration.z = v1->physicsParams.acceleration.z - v1->actorParams.maxThrust * 0.5;
+        }
+        else
+        {
+            if ( !sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp) )
+                v1->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+            else
+                v1->physicsParams.physflags |= PHYSFLAGS_CROUCHING;
         }
     }
 }

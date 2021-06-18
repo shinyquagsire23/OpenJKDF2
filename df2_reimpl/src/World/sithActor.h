@@ -10,6 +10,7 @@
 #define sithActor_cogMsg_WarpThingToCheckpoint_ADDR (0x004FC450)
 
 void sithActor_Tick(sithThing *thing, int deltaMs);
+void sithActor_JumpWithVel(sithThing *thing, float vel);
 
 //static void (*sithActor_Tick)(sithThing *thing, int deltaMs) = (void*)sithActor_Tick_ADDR;
 static void (*sithActor_Remove)(sithThing *thing) = (void*)sithActor_Remove_ADDR;

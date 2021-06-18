@@ -1,6 +1,8 @@
 #include "sithPuppet.h"
 
 #include "General/stdHashTable.h"
+#include "Engine/sithAnimClass.h"
+#include "Engine/sithTime.h"
 #include "World/sithSector.h"
 #include "stdPlatform.h"
 #include "jk.h"
@@ -129,5 +131,56 @@ void sithPuppet_sub_4E4760(sithThing *thing, int a2)
             }
         }
     }
+}
+
+int sithPuppet_PlayMode(sithThing *thing, signed int anim, int callback)
+{
+    sithAnimclass *v4; // ebx
+    sithPuppet *v6; // edx
+    sithAnimclassEntry *v7; // eax
+    rdKeyframe *keyframe; // ebx
+    int flags; // ebp
+    int v10; // eax
+    rdPuppet *v11; // ecx
+    signed int result; // eax
+    int highPri; // [esp+14h] [ebp+4h]
+    int lowPri; // [esp+18h] [ebp+8h]
+
+    v4 = thing->animclass;
+    if ( !v4 )
+        return -1;
+    if ( anim < 0 )
+        return -1;
+    if ( anim >= 43 )
+        return -1;
+    v6 = thing->puppet;
+    v7 = &v4->modes[v6->majorMode].keyframe[anim];
+    keyframe = v7->keyframe;
+    if ( !v7->keyframe )
+        return -1;
+    flags = v7->flags;
+    lowPri = v7->lowPri;
+    highPri = v7->highPri;
+    if ( anim != SITH_ANIM_FIDGET && anim != SITH_ANIM_FIDGET2 )
+    {
+        v6->field_20 = sithTime_curMs;
+        v10 = v6->field_1C;
+        if ( v10 >= 0 )
+        {
+            v11 = thing->rdthing.puppet;
+            if ( v11->tracks[v10].keyframe )
+                rdPuppet_ResetTrack(v11, v10);
+            thing->puppet->field_1C = -1;
+        }
+    }
+
+#ifndef LINUX_TMP    
+    result = sithPuppet_StartKey(thing->rdthing.puppet, keyframe, lowPri, highPri, flags, callback);
+    if ( result < 0 )
+        return -1;
+    return result;
+#else
+    return -1;
+#endif
 }
 

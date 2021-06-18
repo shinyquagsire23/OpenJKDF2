@@ -569,7 +569,120 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-// ex
+double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3)
+{
+    int v7; // ebx
+    int v8; // ebp
+    sithCog *v9; // eax
+    double v10; // st7
+    double v11; // st7
+    sithCog *v12; // eax
+    double v13; // st7
+    double v14; // st7
+    double v16; // st7
+    double v17; // st7
+    float v19; // [esp+10h] [ebp-8h]
+    int receivera; // [esp+20h] [ebp+8h]
+
+    v19 = 0.0;
+    if ( message == SITH_MESSAGE_DAMAGED )
+        v19 = param0;
+    if ( receiver )
+    {
+        v7 = receiver->thingIdx;
+        v8 = 3;
+        receivera = 1 << receiver->thingType;
+    }
+    else
+    {
+        v7 = -1;
+        v8 = 0;
+        receivera = 1;
+    }
+    v9 = sender->class_cog;
+    if ( v9 )
+    {
+        if ( message == SITH_MESSAGE_DAMAGED )
+        {
+            v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            if ( v10 != -9999.9873 )
+            {
+                v19 = v10;
+                param0 = v10;
+            }
+        }
+        else
+        {
+            v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            if ( v11 != -9999.9873 )
+                v19 = v11 + v19;
+        }
+    }
+    v12 = sender->capture_cog;
+    if ( v12 )
+    {
+        if ( message == SITH_MESSAGE_DAMAGED )
+        {
+            v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            if ( v13 != -9999.9873 )
+            {
+                v19 = v13;
+                param0 = v13;
+            }
+        }
+        else
+        {
+            v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            if ( v14 != -9999.9873 )
+                v19 = v14 + v19;
+        }
+    }
+    for (int i = 0; i < sithCog_numThingLinks; i++)
+    {
+        sithCogThingLink* v15 = &sithCog_aThingLinks[i];
+        if ( v15->thing == sender && v15->signature == sender->signature && (receivera & v15->mask) != 0 )
+        {
+            if ( message == SITH_MESSAGE_DAMAGED )
+            {
+                v16 = sithCog_SendMessageEx(
+                          v15->cog,
+                          SITH_MESSAGE_DAMAGED,
+                          SENDERTYPE_THING,
+                          sender->thingIdx,
+                          v8,
+                          v7,
+                          0,
+                          param0,
+                          param1,
+                          param2,
+                          param3);
+                if ( v16 != -9999.9873 )
+                {
+                    v19 = v16;
+                    param0 = v16;
+                }
+            }
+            else
+            {
+                v17 = sithCog_SendMessageEx(
+                          v15->cog,
+                          message,
+                          SENDERTYPE_THING,
+                          sender->thingIdx,
+                          v8,
+                          v7,
+                          v15->linkid,
+                          param0,
+                          param1,
+                          param2,
+                          param3);
+                if ( v17 != -9999.9873 )
+                    v19 = v17 + v19;
+            }
+        }
+    }
+    return v19;
+}
 
 void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg)
 {

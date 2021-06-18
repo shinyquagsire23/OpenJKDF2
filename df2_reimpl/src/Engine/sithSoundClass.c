@@ -338,6 +338,20 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     }
 }
 
+void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
+{
+    sithSoundClass *v3; // eax
+    sithSoundClassEntry *entry; // eax
+
+    v3 = thing->soundclass;
+    if ( v3 && (unsigned int)sc_id < 0x60 )
+    {
+        entry = v3->entries[sc_id];
+        if ( entry )
+            sithSoundClass_ThingPlaySoundclass2(thing, entry, a3);
+    }
+}
+
 #ifdef LINUX
 sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
 {

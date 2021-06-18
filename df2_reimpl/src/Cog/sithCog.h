@@ -161,6 +161,7 @@ void sithCogSector_Initialize(void* a1);
 void sithCogSurface_Initialize(void* a1);
 
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
+double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3);
 void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg);
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message);
 float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3);
@@ -171,7 +172,7 @@ float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int sende
 
 static int (*_sithCog_Open)() = (void*)sithCog_Open_ADDR;
 static double (*sithCog_SendMessageFromSurfaceEx)(sithSurface *a1, sithThing *a2, int a3, float a4, float a5, float a6, float a7) = (void*)sithCog_SendMessageFromSurfaceEx_ADDR;
-static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
+//static double (*sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
 //static void (*sithCog_SendMessageFromSectorEx)(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3) = (void*)sithCog_SendMessageFromSectorEx_ADDR;
 //static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 static void (*sithCog_Free)(sithWorld* world) = (void*)sithCog_Free_ADDR;

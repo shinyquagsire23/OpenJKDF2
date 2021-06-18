@@ -325,11 +325,15 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
 
     if (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE | ATTACHFLAGS_WORLDSURFACE))
     {
+#ifndef LINUX_TMP
         sithSector_ThingPhysAttached(thing, deltaSecs);
+#endif
     }
     else if (thing->sector->flags & SITH_SF_UNDERWATER)
     {
+#ifndef LINUX_TMP
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
+#endif
     }
 #ifdef QOL_IMPROVEMENTS
     else if ( thing->thingType == THINGTYPE_PLAYER && net_isMulti)
