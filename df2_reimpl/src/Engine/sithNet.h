@@ -11,6 +11,6 @@
 #define net_dword_8C4BA4 (*(int*)0x008C4BA4)
 
 #define net_things_idx (*(int*)0x008330F0)
-#define net_things ((int*)0x008326B0)
+#define net_things ((int*)0x008326AC)
 
 #endif // _SITHNET_H

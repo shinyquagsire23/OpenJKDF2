@@ -9,6 +9,7 @@
 #include "World/sithWorld.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithSurface.h"
+#include "Engine/sithSoundClass.h"
 #include "jk.h"
 
 static int sithUnk3_initted = 0;
@@ -232,6 +233,11 @@ LABEL_27:
         }
     }
     return a5a;
+}
+
+void sithUnk3_SearchClose()
+{
+    --sithUnk3_searchStackIdx;
 }
 
 float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags)
@@ -644,4 +650,61 @@ sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rd
     result = sector;
     sithUnk3_searchStackIdx = v7 - 1;
     return result;
+}
+
+void sithUnk3_FallHurt(sithThing *thing, float vel)
+{
+    double v2; // st7
+    float vela; // [esp+8h] [ebp+8h]
+
+    v2 = (vel - 2.5) * (vel - 2.5) * 45.0;
+    if ( v2 > 1.0 )
+    {
+        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_HITDAMAGED);
+        vela = v2;
+        sithThing_Damage(thing, thing, vela, 64);
+    }
+}
+
+void sithUnk3_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
+{
+    sithThing *i; // esi
+    float *v4; // edi
+    double v5; // st7
+    double v6; // st7
+    char v8; // c3
+    float v9; // [esp+Ch] [ebp-18h]
+    float v10; // [esp+10h] [ebp-14h]
+    float v11; // [esp+14h] [ebp-10h]
+    rdVector3 a1a; // [esp+18h] [ebp-Ch] BYREF
+    float mat2; // [esp+2Ch] [ebp+8h]
+
+    rdMatrix_PreMultiply34(&thing->lookOrientation, orient);
+    for ( i = thing->attachedParentMaybe; i; i = i->childThing )
+    {
+        v4 = &i->lookOrientation.scale.x;
+        v9 = i->position.x - thing->position.x;
+        v5 = i->position.y - thing->position.y;
+        i->lookOrientation.scale.x = v9;
+        v10 = v5;
+        v6 = i->position.z - thing->position.z;
+        i->lookOrientation.scale.y = v10;
+        v11 = v6;
+        i->lookOrientation.scale.z = v11;
+        sithUnk3_sub_4E7670(i, orient);
+        if ( (i->attach_flags & 8) == 0 )
+        {
+            a1a.x = *v4 - v9;
+            a1a.y = i->lookOrientation.scale.y - v10;
+            a1a.z = i->lookOrientation.scale.z - v11;
+            if ( a1a.x != 0.0 || a1a.y != 0.0 || a1a.z != 0.0 )
+            {
+                mat2 = rdVector_Normalize3Acc(&a1a);
+                sithUnk3_UpdateThingCollision(i, (rdVector2 *)&a1a, mat2, 0);
+            }
+        }
+        *v4 = 0.0;
+        i->lookOrientation.scale.y = 0.0;
+        i->lookOrientation.scale.z = 0.0;
+    }
 }

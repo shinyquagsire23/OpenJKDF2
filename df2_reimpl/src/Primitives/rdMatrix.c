@@ -337,13 +337,13 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
     float v34; // [esp+30h] [ebp+8h]
     float v35; // [esp+30h] [ebp+8h]
 
-    v33 = sqrt((in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x));
-    if ( v33 == 0.0 )
+    v33 = stdMath_Sqrt((in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x));
+    if ( v33 < 0.001 )
     {
         v13 = 90.0 - stdMath_ArcSin3(in->rvec.x);
         
         // TODO ?? some floating point comparison, ah 41h
-        if ( in->lvec.z < 0.0 && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
+        if ( -in->lvec.y > 0.0 && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
             v13 = -v13;
         out->z = v13;
         out->y = 0.0;
@@ -351,7 +351,7 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
     else
     {
         out->y = 90.0 - stdMath_ArcSin3(in->lvec.y / v33);
-        if (out->y < 0.0) // TODO ?? some floating point comparison, ah 41h
+        if (in->lvec.x > 0.0) // TODO ?? some floating point comparison, ah 41h
             out->y = -out->y;
     }
     if ( v33 >= 0.001 )
@@ -375,8 +375,8 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
     if ( in->lvec.z < 0.0 )
         out->x = -out->x;
     v23 = -in->lvec.y;
-    v25 = sqrt(v23 * v23 + (in->lvec.x * in->lvec.x));
-    if (v25 != 0.0) // TODO verify
+    v25 = stdMath_Sqrt(v23 * v23 + (in->lvec.x * in->lvec.x));
+    if (v25 >= 0.001) // TODO verify
     {
         v35 = (v23 * -in->rvec.x + -in->rvec.y * in->lvec.x) / v25;
         if ( v35 < 1.0 )

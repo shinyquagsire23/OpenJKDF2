@@ -124,6 +124,20 @@ int sithSoundClass_Startup()
     }
 }
 
+void sithSoundClass_Shutdown()
+{
+    if ( sithSoundClass_hashtable )
+    {
+        stdHashTable_Free(sithSoundClass_hashtable);
+        sithSoundClass_hashtable = 0;
+    }
+    if ( sithSoundClass_nameToKeyHashtable )
+    {
+        stdHashTable_Free(sithSoundClass_nameToKeyHashtable);
+        sithSoundClass_nameToKeyHashtable = 0;
+    }
+}
+
 int sithSoundClass_Load(sithWorld *world, int a2)
 {
     int num_soundclasses; // ebx
@@ -310,9 +324,27 @@ LABEL_9:
     return 1;
 }
 
+void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundclass_id)
+{
+    sithSoundClass *soundclass; // eax
+    sithSoundClassEntry *v3; // eax
+
+    soundclass = thing->soundclass;
+    if ( soundclass && soundclass_id < 0x60 )
+    {
+        v3 = soundclass->entries[soundclass_id];
+        if ( v3 )
+            sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
+    }
+}
+
 #ifdef LINUX
 sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
 {
     return NULL;
+}
+
+void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3)
+{
 }
 #endif

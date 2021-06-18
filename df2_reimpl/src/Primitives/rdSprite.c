@@ -1,5 +1,6 @@
 #include "rdSprite.h"
 
+#include "General/stdMath.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdCache.h"
 #include "Engine/rdClip.h"
@@ -80,7 +81,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
             }
             sprite->halfWidth = sprite->width * 0.5;
             sprite->halfHeight = sprite->height * 0.5;
-            sprite->radius = sqrt(sprite->halfWidth * sprite->halfWidth + sprite->halfHeight * sprite->halfHeight);
+            sprite->radius = stdMath_Sqrt(sprite->halfWidth * sprite->halfWidth + sprite->halfHeight * sprite->halfHeight);
             return 1;
         }
     }

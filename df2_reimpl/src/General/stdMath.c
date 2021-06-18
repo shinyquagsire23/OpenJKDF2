@@ -471,6 +471,9 @@ float stdMath_Floor(float a)
 
 float stdMath_Sqrt(float a)
 {
+    if (a < 0.0)
+        return 0.0;
+
     return sqrtf(a);
 }
 

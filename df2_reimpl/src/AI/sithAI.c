@@ -1,10 +1,13 @@
 #include "sithAI.h"
 
 #include "jk.h"
+#include "General/stdMath.h"
 #include "World/sithThing.h"
+#include "World/sithUnk4.h"
 #include "AI/sithAICmd.h"
 #include "AI/sithAIClass.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithSoundClass.h"
 #include "General/stdHashTable.h"
 #include "Main/jkGame.h"
 #include "Cog/sithCogVm.h"
@@ -413,3 +416,68 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     return NULL;
 }
 
+void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
+{
+    sithThing *v2; // eax
+    double v3; // rt2
+    double v4; // rtt
+    sithThingActorParams *v5; // edi
+    double v6; // st7
+    float v7; // eax
+    float v8; // ecx
+    sithThing *v9; // eax
+    rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
+
+    v2 = actor->thing;
+    v3 = lookPos->y - actor->thing->position.y;
+    v4 = lookPos->z - actor->thing->position.z;
+    actor->lookVector.x = lookPos->x - actor->thing->position.x;
+    actor->lookVector.y = v3;
+    v5 = &v2->actorParams;
+    actor->lookVector.z = v4;
+    if ( rdVector_Normalize3Acc(&actor->lookVector) != 0.0 )
+    {
+        if ( (v5->typeflags & 1) != 0 )
+        {
+            v6 = stdMath_ArcSin3(actor->lookVector.z);
+            if ( v6 < v5->minHeadPitch )
+            {
+                v6 = v5->minHeadPitch;
+            }
+            else if ( v6 > v5->maxHeadPitch )
+            {
+                v6 = v5->maxHeadPitch;
+            }
+            if ( v6 != v5->eyePYR.x )
+            {
+                v7 = v5->eyePYR.y;
+                v8 = v5->eyePYR.z;
+                a2a.x = v6;
+                a2a.y = v7;
+                v9 = actor->thing;
+                a2a.z = v8;
+                sithUnk4_MoveJointsForEyePYR(v9, &a2a);
+            }
+        }
+        actor->lookVector.z = 0.0;
+        rdVector_Normalize3Acc(&actor->lookVector);
+        actor->mode |= 0x8;
+    }
+}
+
+void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
+{
+    int v3; // eax
+    sithThing *v4; // [esp-8h] [ebp-Ch]
+
+    if ( sithTime_curMs >= actor->field_28C || (actor->mode & 1) == 0 )
+    {
+        actor->moveSpeed = moveSpeed;
+        actor->movePos.x = movePos->x;
+        actor->movePos.y = movePos->y;
+        v4 = actor->thing;
+        actor->movePos.z = movePos->z;
+        sithSoundClass_ThingPlaySoundclass4(v4, SITH_SC_MOVING);
+        actor->mode |= 0x1;
+    }
+}

@@ -20,16 +20,24 @@
 int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector);
 int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11);
 int sithCollide_sub_508540(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9);
+int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9);
+int sithCollide_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *surfaceNormal, rdVector3 *a6, float *a7, int a8);
+int sithCollide_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5);
+int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8);
 #endif
 
 #if 0
 static int (*sithCollide_IsSphereInSector)(rdVector3 *pos, float radius, sithSector *sector) = (void*)sithCollide_IsSphereInSector_ADDR;
 static int (*sithCollide_sub_508540)(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9) = (void*)sithCollide_sub_508540_ADDR;
 static int (*sithCollide_sub_5080D0)(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11) = (void*)sithCollide_sub_5080D0_ADDR;
+static int (*sithCollide_sub_508750)(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5) = (void*)sithCollide_sub_508750_ADDR;
+static int (*sithCollide_sub_5090B0)(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8) = (void*)sithCollide_sub_5090B0_ADDR;
 #endif
 
-static int (*sithCollide_sub_5090B0)(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8) = (void*)sithCollide_sub_5090B0_ADDR;
-static int (*sithCollide_sub_508D20)(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9) = (void*)sithCollide_sub_508D20_ADDR;
+static int (*_sithCollide_sub_508D20)(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9) = (void*)sithCollide_sub_508D20_ADDR;
+static int (*_sithCollide_sub_508BE0)(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdVector3 *surfaceNormal, rdVector3 *a6, float *a7, int a8) = (void*)sithCollide_sub_508BE0_ADDR;
+
+static int (*sithCollide_sub_508990)(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6) = (void*)sithCollide_sub_508990_ADDR;
 static int (*sithCollide_sub_508400)(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8) = (void*)sithCollide_sub_508400_ADDR;
 
 #endif // _SITHCOLLIDE_H

@@ -20,6 +20,10 @@
 #define jkHud_Tally_ADDR (0x004091C0)
 
 #define jkHud_dword_553E94 (*(int*)0x00553E94)
+#define jkHud_bHasTarget (*(int*)0x00553E7C)
+#define jkHud_target (*(int*)0x00553E80)
+
+void jkHud_EndTarget();
 
 static int (*jkHud_Startup)() = (void*)jkHud_Startup_ADDR;
 static void (*jkHud_Shutdown)() = (void*)jkHud_Shutdown_ADDR;

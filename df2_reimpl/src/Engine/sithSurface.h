@@ -118,6 +118,7 @@ typedef enum SURFACEFLAGS
 } SURFACEFLAGS;
 
 int sithSurface_Startup();
+void sithSurface_Shutdown();
 int sithSurface_Open();
 int sithSurface_Verify(sithWorld *world);
 int sithSurface_Load(sithWorld *world);
@@ -131,17 +132,19 @@ void sithSurface_SetSectorLight(sithSector *sector, float extraLight, float a3, 
 void sithSurface_Free(sithWorld *world);
 void sithSurface_Tick(float deltaSecs);
 void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8_t a4);
+int sithSurface_StopAnim(rdSurface *surface);
+uint32_t sithSurface_GetSurfaceAnim(sithSurface *surface);
 
-static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
+//static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
 static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, float damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
 static int* (*_sithSurface_SurfaceAnim)(void*, float, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 static int* (*sithSurface_MaterialAnim)(void*, float, int) = (void*)sithSurface_MaterialAnim_ADDR;
 static rdSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADDR;
-static int (*sithSurface_StopAnim)(rdSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
+//static int (*sithSurface_StopAnim)(rdSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
 static rdSurface* (__cdecl *sithSurface_GetRdSurface)(sithSurface *a1) = (void*)sithSurface_GetRdSurface_ADDR;
-static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
+//static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
 static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
 //static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
@@ -152,5 +155,6 @@ static rdSurface* (*sithSurface_SlideWall)(sithSurface *surface, rdVector3 *a2) 
 static uint32_t (*sithSurface_PushSurface)(sithSurface *a1) = (void*)sithSurface_PushSurface_ADDR;
 static void (*sithSurface_DetachThing)(sithSurface *a1, rdVector3 *out) = (void*)sithSurface_DetachThing_ADDR;
 //static void (*sithSurface_ScrollSky)(rdSurface *surface, int a2, float a3, int a4) = (void*)sithSurface_ScrollSky_ADDR;
+static int (*sithSurface_GetCenter)(sithSurface *a1, rdVector3 *a2) = (void*)sithSurface_GetCenter_ADDR;
 
 #endif // _SITHSURFACE_H

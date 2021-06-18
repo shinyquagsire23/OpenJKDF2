@@ -1,8 +1,11 @@
 #include "jkCog.h"
 
 #include "General/stdStrTable.h"
+#include "Main/jkHud.h"
 
 #include "jk.h"
+
+void jkCog_EndTarget(sithCog *ctx);
 
 static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
 
@@ -27,7 +30,6 @@ static void (*jkCog_SetWaggle)(sithCog* ctx) = (void*)0x0040AB50;
 static void (*jkCog_SetSaberInfo)(sithCog* ctx) = (void*)0x0040ABA0;
 static void (*jkCog_SetPersuasionInfo)(sithCog* ctx) = (void*)0x0040AC90;
 static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
-static void (*jkCog_EndTarget)(sithCog* ctx) = (void*)0x0040AD20;
 static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
 static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
 static void (*jkCog_StringConcatUnistring)(sithCog* ctx) = (void*)0x0040ADA0;
@@ -101,4 +103,9 @@ int jkCog_StringsInit()
 {
     stdStrTable_Free(&jkCog_strings);
     return stdStrTable_Load(&jkCog_strings, "misc\\cogStrings.uni");
+}
+
+void jkCog_EndTarget(sithCog *ctx)
+{
+    jkHud_EndTarget();
 }

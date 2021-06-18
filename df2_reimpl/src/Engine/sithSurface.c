@@ -25,6 +25,11 @@ int sithSurface_Startup()
     return 1;
 }
 
+void sithSurface_Shutdown()
+{
+    ;
+}
+
 int sithSurface_Open()
 {
     sithSurface_bOpened = 1;
@@ -278,7 +283,7 @@ int sithSurface_Verify(sithWorld *world)
 {
     for (int i = 0; i < world->numSurfaces; i++)
     {
-        if (world->surfaces[i].parent_sector == 8 || !world->surfaces[i].parent_sector)
+        if (world->surfaces[i].parent_sector == (sithSector*)8 || !world->surfaces[i].parent_sector)
             return 0;
     }
     
@@ -679,5 +684,60 @@ void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8
             sithWorld_pCurWorld->ceilingSkyOffs.y = fmod(offs_y, 1024.0);
         }
     }
+}
+
+int sithSurface_StopAnim(rdSurface *surface)
+{
+    sithSurface *v2; // eax
+    int v4; // eax
+    int v5; // edx
+    int v6; // eax
+
+    if ( (surface->flags & SURFACEFLAGS_WATER) != 0 && (surface->flags & SURFACEFLAGS_100000) != 0 )
+    {
+        v2 = surface->sithSurfaceParent;
+        v2->surfaceFlags &= 0x800;
+        surface->field_24.x = 0.0;
+        surface->field_24.y = 0.0;
+        surface->field_24.z = 0.0;
+        surface->field_1C.x = 0.0;
+        surface->field_1C.y = 0.0;
+    }
+    surface->flags = 0;
+    v4 = sithSurface_numAvail;
+    v5 = surface - sithSurface_aSurfaces;
+    sithSurface_aAvail[sithSurface_numAvail + 1] = v5;
+    sithSurface_numAvail = v4 + 1;
+    if ( v5 == sithSurface_numSurfaces )
+    {
+        for (v6 = v5 - 1; v6 >= 0; v6--)
+        {
+            if (sithSurface_aSurfaces[v6].flags)
+                break;
+        }
+        sithSurface_numSurfaces = v6;
+    }
+    return 1;
+}
+
+uint32_t sithSurface_GetSurfaceAnim(sithSurface *surface)
+{
+    int v1; // ecx
+    rdSurface *i; // eax
+    rdSurface* v3; // eax
+
+    v1 = 0;
+    for ( i = sithSurface_aSurfaces; v1 <= sithSurface_numSurfaces; ++i )
+    {
+        if ( (i->flags & SURFACEFLAGS_WATER) != 0 && i->sithSurfaceParent == surface )
+            break;
+        ++v1;
+    }
+    v3 = v1 > sithSurface_numSurfaces ? 0 : i;
+    if ( !v3 )
+        return -1;
+
+    // div 19 div 4?
+    return ((intptr_t)v3 - (intptr_t)sithSurface_aSurfaces) / sizeof(rdSurface);
 }
 

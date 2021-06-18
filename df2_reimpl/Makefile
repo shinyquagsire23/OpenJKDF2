@@ -9,7 +9,7 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -DTARGET_HAS_DPLAY -Wuninitialized
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc
@@ -52,7 +52,7 @@ $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 $(TARGET_WIN): $(OBJECTS)
-	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -static-libgcc
+	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -static-libgcc -fno-trapping-math
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++
+	$(CC) -o $@ -g -shared $^ -Wl,--subsystem,windows -Wl,-Map=output.map -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++ -fno-trapping-math

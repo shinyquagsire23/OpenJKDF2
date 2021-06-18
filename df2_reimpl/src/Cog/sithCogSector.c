@@ -18,15 +18,14 @@ void sithCogSector_SetSectorFlags(sithCog *ctx);
 void sithCogSector_ClearSectorFlags(sithCog *ctx);
 void sithCogSector_GetSectorFlags(sithCog *ctx);
 void sithCogSector_GetThingCount(sithCog *ctx);
-
-static void (*sithCogSector_GetPlayerCount)(sithCog* ctx) = (void*)0x004FEE90;
-static void (*sithCogSector_GetSectorCount)(sithCog* ctx) = (void*)0x004FEED0;
-static void (*sithCogSector_GetSectorCenter)(sithCog* ctx) = (void*)0x004FEEF0;
-static void (*sithCogSector_GetNumSectorVertices)(sithCog* ctx) = (void*)0x004FEF30;
-static void (*sithCogSector_GetNumSectorSurfaces)(sithCog* ctx) = (void*)0x004FEF60;
-static void (*sithCogSector_GetSectorVertexPos)(sithCog* ctx) = (void*)0x004FEF90;
-static void (*sithCogSector_GetSectorSurfaceRef)(sithCog* ctx) = (void*)0x004FEFF0;
-static void (*sithCogSector_SyncSector)(sithCog* ctx) = (void*)0x004FF040;
+void sithCogSector_GetPlayerCount(sithCog *ctx);
+void sithCogSector_GetSectorCount(sithCog *ctx);
+void sithCogSector_GetSectorCenter(sithCog *ctx);
+void sithCogSector_GetNumSectorVertices(sithCog *ctx);
+void sithCogSector_GetNumSectorSurfaces(sithCog *ctx);
+void sithCogSector_GetSectorVertexPos(sithCog *ctx);
+void sithCogSector_GetSectorSurfaceRef(sithCog *ctx);
+void sithCogSector_SyncSector(sithCog *ctx);
 
 void sithCogSector_Initialize(void* ctx)
 {
@@ -357,4 +356,96 @@ void sithCogSector_GetThingCount(sithCog *ctx)
     {
         sithCogVm_PushInt(ctx, -1);
     }
+}
+
+void sithCogSector_GetPlayerCount(sithCog *ctx)
+{
+    sithSector *v1; // eax
+    int v2; // eax
+
+    v1 = sithCogVm_PopSector(ctx);
+    if ( v1 )
+    {
+        v2 = sithSector_GetNumPlayers(v1);
+        sithCogVm_PushInt(ctx, v2);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogSector_GetSectorCount(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSectors);
+}
+
+void sithCogSector_GetSectorCenter(sithCog *ctx)
+{
+    sithSector *v1; // eax
+
+    v1 = sithCogVm_PopSector(ctx);
+    if ( v1 )
+        sithCogVm_PushVector3(ctx, &v1->center);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogSector_GetNumSectorVertices(sithCog *ctx)
+{
+    sithSector *v1; // eax
+
+    v1 = sithCogVm_PopSector(ctx);
+    if ( v1 )
+        sithCogVm_PushInt(ctx, v1->numVertices);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSector_GetNumSectorSurfaces(sithCog *ctx)
+{
+    sithSector *v1; // eax
+
+    v1 = sithCogVm_PopSector(ctx);
+    if ( v1 )
+        sithCogVm_PushInt(ctx, v1->numSurfaces);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSector_GetSectorVertexPos(sithCog *ctx)
+{
+    sithWorld *active_jkl; // ebx
+    int vertex_idx; // edi
+    sithSector *sector; // eax
+
+    active_jkl = sithWorld_pCurWorld;
+    vertex_idx = sithCogVm_PopInt(ctx);
+    sector = sithCogVm_PopSector(ctx);
+    if ( sector && (unsigned int)vertex_idx < sector->numVertices && vertex_idx >= 0 )
+        sithCogVm_PushVector3(ctx, &active_jkl->vertices[sector->verticeIdxs[vertex_idx]]);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogSector_GetSectorSurfaceRef(sithCog *ctx)
+{
+    int v1; // esi
+    sithSector *v2; // eax
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopSector(ctx);
+    if ( v2 && (unsigned int)v1 < v2->numSurfaces && v1 >= 0 )
+        sithCogVm_PushInt(ctx, v2->surfaces[v1].field_0);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSector_SyncSector(sithCog *ctx)
+{
+    sithSector *v1; // eax
+
+    v1 = sithCogVm_PopSector(ctx);
+    if ( v1 )
+        sithSector_Sync(v1, 1);
 }

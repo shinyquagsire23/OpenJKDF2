@@ -281,9 +281,8 @@ int sith_Tick()
         }
 
         sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-#ifndef LINUX_TMP
         sithCogScript_TickAll();
-#endif
+        
         DebugConsole_AdvanceLogBuf();
 #ifndef LINUX_TMP
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
@@ -352,10 +351,6 @@ void sith_AutoSave()
     sithTime_Startup();
     sithInventory_Reset(g_localPlayerThing);
 
-#ifdef LINUX_TMP
-    return;
-#endif
-
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     v0 = sithWorld_pCurWorld;
     v1 = 0;
@@ -381,6 +376,12 @@ void sith_AutoSave()
         }
         while ( v1 < v0->numThingsLoaded );
     }
+
+#ifdef LINUX_TMP
+    sithTime_Startup();
+    return;
+#endif
+
     if ( net_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);

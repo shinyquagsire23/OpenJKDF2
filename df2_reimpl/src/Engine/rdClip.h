@@ -1,6 +1,7 @@
 #ifndef _RDCLIP_H
 #define _RDCLIP_H
 
+#include "types.h"
 #include "rdCanvas.h"
 #include "Primitives/rdVector.h"
 
@@ -33,8 +34,6 @@
 #define pSourceTVert (*(rdVector2**)0x0082EB3C)
 #define pDestTVert (*(rdVector2**)0x0082EB40)
 
-typedef struct rdClipFrustum rdClipFrustum;
-
 enum CLIP_OUTCODE
 {
     CLIP_LEFT = 0x1,
@@ -54,14 +53,16 @@ int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad);
 
 int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
 int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices);
+int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
+int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices);
 
 //static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
 static int (*rdClip_Face3SOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3SOrtho_ADDR;
-static int (*rdClip_Face3S)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3S_ADDR;
+static int (*_rdClip_Face3S)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3S_ADDR;
 static int (*rdClip_Face3WOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3WOrtho_ADDR;
 //static int (*rdClip_Face3W)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3W_ADDR;
 static int (*rdClip_Face3GSOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices) = (void*)rdClip_Face3GSOrtho_ADDR;
-static int (*rdClip_Face3GS)(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices) = (void*)rdClip_Face3GS_ADDR;
+static int (*_rdClip_Face3GS)(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices) = (void*)rdClip_Face3GS_ADDR;
 static int (*rdClip_Face3TOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3TOrtho_ADDR;
 static int (*rdClip_Face3T)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices) = (void*)rdClip_Face3T_ADDR;
 static int (*rdClip_Face3GTOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices) = (void*)rdClip_Face3GTOrtho_ADDR;

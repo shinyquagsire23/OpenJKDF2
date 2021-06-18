@@ -247,8 +247,8 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithTrackThing_Tick(thingIter, deltaSeconds);
 #endif
             }
-#ifndef LINUX_TMP
             sithThing_TickPhysics(thingIter, deltaSeconds);
+#ifndef LINUX_TMP
             sithPuppet_Tick(thingIter, deltaSeconds);
 #endif
             continue;
@@ -293,7 +293,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             }
             sithWorld_pCurWorld->numThings = v9;
         }
-        net_things[net_things_idx++] = v7;
+        net_things[1 + net_things_idx++] = v7;
     }
 }
 
@@ -359,7 +359,7 @@ void sithThing_sub_4CCE60()
 
     net_things_idx = 0;
     sithWorld_pCurWorld->numThings = -1;
-    v2 = net_things;
+    v2 = net_things + 1;
     for (v1 = sithWorld_pCurWorld->numThingsLoaded - 1; v1 >= 0; v1--)
     {
         if ( sithWorld_pCurWorld->things[v1].thingType )
@@ -614,7 +614,7 @@ int sithThing_Load(sithWorld *world, int a2)
                     }
                     sithWorld_pCurWorld->numThings = v6;
                 }
-                net_things[net_things_idx++] = v5;
+                net_things[1 + net_things_idx++] = v5;
             }
         }
         pSithHS->free(world->things);
@@ -1339,7 +1339,7 @@ int sithThing_netidk2(int a1)
         }
         sithWorld_pCurWorld->numThings = v1;
     }
-    net_things[net_things_idx++] = a1;
+    net_things[1 + net_things_idx++] = a1;
     return net_things_idx;
 }
 
@@ -1469,7 +1469,7 @@ void sithThing_freestuff(sithWorld *world)
             v3->numThings = v5;
         }
         v7 = net_things_idx;
-        net_things[net_things_idx] = v4;
+        net_things[1 + net_things_idx] = v4;
         net_things_idx = v7 + 1;
     }
 }
@@ -1488,4 +1488,371 @@ void sithThing_Free(sithWorld *world)
     world->things = 0;
     world->numThingsLoaded = 0;
     world->numThings = -1;
+}
+
+sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThing)
+{
+    sithSector *v2; // eax
+    sithThing *result; // eax
+    sithThing *v4; // edi
+    sithSector *v5; // [esp-10h] [ebp-40h]
+    rdVector3 diffVec; // [esp+Ch] [ebp-24h] BYREF
+    rdVector3 v7; // [esp+18h] [ebp-18h] BYREF
+    rdVector3 dstVec; // [esp+24h] [ebp-Ch] BYREF
+
+    if ( templateThing->rdthing.type == RD_THINGTYPE_MODEL )
+    {
+        diffVec = templateThing->rdthing.model3->insertOffset;
+    }
+    else if ( templateThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    {
+        diffVec = templateThing->rdthing.sprite3->offset;
+    }
+    else
+    {
+        diffVec.x = 0.0;
+        diffVec.y = 0.0;
+        diffVec.z = 0.0;
+    }
+    if ( spawnThing->rdthing.type == RD_THINGTYPE_MODEL )
+    {
+        v7 = spawnThing->rdthing.model3->insertOffset;
+    }
+    else if ( spawnThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    {
+        v7 = spawnThing->rdthing.sprite3->offset;
+    }
+    else
+    {
+        v7.x = 0.0;
+        v7.y = 0.0;
+        v7.z = 0.0;
+    }
+    diffVec.x = diffVec.x - v7.x;
+    diffVec.y = diffVec.y - v7.y;
+    diffVec.z = diffVec.z - v7.z;
+    rdMatrix_TransformVector34(&dstVec, &diffVec, &spawnThing->lookOrientation);
+    v7.x = dstVec.x + spawnThing->position.x;
+    v5 = spawnThing->sector;
+    v7.y = spawnThing->position.y + dstVec.y;
+    v7.z = spawnThing->position.z + dstVec.z;
+    v2 = sithUnk3_GetSectorLookAt(v5, &spawnThing->position, &v7, 0.0);
+    result = sithThing_SpawnThingInSector(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
+    v4 = result;
+    if ( result )
+    {
+        if ( result->move_type == MOVETYPE_PATH
+          && spawnThing->move_type == MOVETYPE_PATH
+          && spawnThing->trackParams.frames
+          && !result->trackParams.frames )
+        {
+            sithTrackThing_idkpathmove(result, spawnThing, &diffVec);
+        }
+        result = v4;
+    }
+    return result;
+}
+
+sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *position, rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
+{
+    int v5; // edx
+    sithWorld *v6; // ecx
+    int v8; // esi
+    int v9; // edi
+    sithThing *v10; // esi
+    int *v11; // ebx
+    unsigned int v12; // ebp
+    unsigned int v13; // edi
+    unsigned int v15; // edx
+    int v16; // eax
+    sithThing *v17; // ebx
+    int v19; // eax
+    int v20; // ecx
+    int v21; // edx
+    int v23; // eax
+    sithCog *v24; // eax
+    sithThing *v25; // eax
+    sithThing *v26; // eax
+
+    v5 = net_things_idx;
+    v6 = sithWorld_pCurWorld;
+    if ( net_things_idx )
+    {
+        v8 = net_things[net_things_idx];
+        v9 = sithWorld_pCurWorld->numThings;
+        v5 = --net_things_idx;
+        if ( v8 > v9 )
+            sithWorld_pCurWorld->numThings = v8;
+    }
+    else
+    {
+        v8 = -1;
+    }
+    if ( v8 >= 0 )
+        goto LABEL_24;
+    if ( templateThing->thingType != THINGTYPE_EXPLOSION && templateThing->thingType != THINGTYPE_DEBRIS && templateThing->thingType != THINGTYPE_PARTICLE )
+    {
+        v10 = v6->things;
+        v11 = &v6->numThingsLoaded;
+        v12 = 0;
+        v13 = 0;
+        if ( v6->numThingsLoaded )
+        {
+            do
+            {
+                if ( (v10->thingflags & SITH_TF_WILLBEREMOVED) != 0
+                  || ((v10->thingType == THINGTYPE_DEBRIS) || v10->thingType == THINGTYPE_PARTICLE) && v10->lifeLeftMs )
+                {
+                    sithThing_FreeEverythingNet(v10);
+                    v6 = sithWorld_pCurWorld;
+                }
+                v15 = v12++;
+                if ( v15 > 0xA )
+                    break;
+                ++v13;
+                ++v10;
+            }
+            while ( v13 < *v11 );
+            v5 = net_things_idx;
+        }
+        if ( v5 )
+        {
+            v8 = net_things[v5];
+            v16 = v6->numThings;
+            net_things_idx = v5 - 1;
+            if ( v8 > v16 )
+                v6->numThings = v8;
+        }
+        else
+        {
+            v8 = -1;
+        }
+    }
+    if ( v8 >= 0 )
+    {
+LABEL_24:
+        v17 = &v6->things[v8];
+        sithThing_DoesRdThingInit(v17);
+        v17->thingIdx = v8;
+        if ( !sithThing_inittedThings )
+            sithThing_inittedThings = 1;
+        v19 = sithThing_bInitted2;
+        v20 = (playerThingIdx + 1) << 16;
+        v21 = sithThing_inittedThings;
+        v17->signature = sithThing_bInitted2;
+        ++sithThing_inittedThings;
+        v17->thing_id = v21 | v20;
+        sithThing_bInitted2 = v19 + 1;
+        if ( v19 == -1 )
+            sithThing_bInitted2 = 1;
+    }
+    else
+    {
+        v17 = 0;
+    }
+    if ( !v17 )
+        return 0;
+    sithThing_sub_4CD8A0(v17, templateThing);
+    v17->position = *position;
+    _memcpy(&v17->lookOrientation, lookOrientation, sizeof(v17->lookOrientation));
+    v17->lookOrientation.scale.x = 0.0;
+    v17->lookOrientation.scale.y = 0.0;
+    v17->lookOrientation.scale.z = 0.0;
+    rdMatrix_PreMultiply34(&v17->lookOrientation, &templateThing->lookOrientation);
+    sithThing_EnterSector(v17, sector, 1, 0);
+    if ( prevThing )
+    {
+        v23 = prevThing->signature;
+        v17->prev_thing = prevThing;
+        v17->child_signature = v23;
+    }
+    switch ( v17->thingType )
+    {
+        case THINGTYPE_ITEM:
+            sithItem_New(v17);
+            break;
+        case THINGTYPE_EXPLOSION:
+            sithExplosion_CreateThing(v17);
+            break;
+        case THINGTYPE_PARTICLE:
+            sithParticle_CreateThing(v17);
+            break;
+    }
+    if ( v17->rdthing.puppet )
+        sithPuppet_NewEntry(v17);
+    if ( v17->thingtype == THINGTYPE_ACTOR )
+        sithAI_NewEntry(v17);
+    if ( v17->soundclass )
+        sithSoundClass_ThingPlaySoundclass(v17, SITH_SC_CREATE);
+    if ( (sithWorld_pCurWorld->level_type_maybe & 2) == 0 )
+        goto LABEL_48;
+    if ( v17->move_type == MOVETYPE_PHYSICS )
+    {
+        if ( (v17->physicsParams.physflags & 0xC0) != 0 )
+            sithSector_ThingLandIdk(v17, 1);
+LABEL_48:
+        if ( v17->move_type == MOVETYPE_PHYSICS && (v17->trackParams.numFrames & THINGSTATE_20000) == 0 )
+            rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
+    }
+    v24 = v17->class_cog;
+    if ( v24 )
+        sithCog_SendMessage(v24, SITH_MESSAGE_CREATED, 3, v17->thingIdx, 0, 0, 0);
+    v25 = v17->template;
+    if ( v25 )
+    {
+        v26 = sithThing_SpawnThingInSector(v25, position, lookOrientation, sector, prevThing);
+        if ( v26 )
+        {
+            if ( (v17->thingflags & SITH_TF_INVULN) != 0 )
+            {
+                v26->thingflags |= SITH_TF_INVULN;
+            }
+        }
+    }
+    return v17;
+}
+
+void sithThing_FreeEverythingNet(sithThing *thing)
+{
+    sithWorld *v1; // edx
+    int v2; // esi
+    int v3; // eax
+    int v5; // eax
+
+    if ( net_isMulti && net_isServer && (thing->thing_id & 0xFFFF0000) == 0 )
+        sithMulti_FreeThing(thing->thing_id);
+    if ( thing->attach_flags )
+        sithThing_DetachThing(thing);
+    if ( thing->sector )
+        sithThing_LeaveSector(thing);
+    if ( thing->move_type == MOVETYPE_PATH && thing->trackParams.frames )
+        pSithHS->free(thing->trackParams.frames);
+    if ( thing->thingtype == THINGTYPE_ACTOR )
+        sithAI_FreeEntry(thing);
+    if ( thing->thingType == THINGTYPE_PARTICLE )
+        sithParticle_FreeEntry(thing);
+    if ( thing->animclass )
+        sithPuppet_FreeEntry(thing);
+    rdThing_FreeEntry(&thing->rdthing);
+    sithSoundSys_FreeThing(thing);
+    v1 = sithWorld_pCurWorld;
+    thing->thingType = THINGTYPE_FREE;
+    thing->signature = 0;
+    thing->thing_id = -1;
+    v2 = thing->thingIdx;
+    if ( v2 == v1->numThings )
+    {
+        v3 = v2 - 1;
+        if ( v2 - 1 >= 0 )
+        {
+            do
+            {
+                if (v1->things[v3].thingType)
+                    break;
+                --v3;
+            }
+            while ( v3 >= 0 );
+        }
+        v1->numThings = v3;
+    }
+    v5 = net_things_idx;
+    net_things[net_things_idx + 1] = v2;
+    net_things_idx = v5 + 1;
+}
+
+void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
+{
+    int v4; // ebp
+    int v5; // eax
+    int *v6; // eax
+    sithWorld *v7; // edx
+    rdVector3 *v8; // ecx
+    int v9; // eax
+    float v10; // ecx
+    double v12; // st6
+    double v13; // st7
+    double v14; // st7
+    int v15; // edi
+    rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
+    float a1a; // [esp+1Ch] [ebp+4h]
+
+    v4 = 1;
+    v5 = thing->attach_flags;
+    if ( v5 )
+    {
+        if ( (v5 & 1) != 0 && thing->attachedSurface == surface )
+            return;
+        v4 = 0;
+        sithThing_DetachThing(thing);
+    }
+    v6 = surface->surfaceInfo.face.vertexPosIdx;
+    v7 = sithWorld_pCurWorld;
+    thing->attach_flags = 1;
+    v8 = &v7->vertices[*v6];
+    thing->field_38.x = v8->x;
+    thing->field_38.y = v8->y;
+    v9 = surface->surfaceFlags;
+    v10 = v8->z;
+    thing->attachedSurface = surface;
+    thing->field_38.z = v10;
+    thing->attachedSufaceInfo = &surface->surfaceInfo;
+    thing->physicsParams.physflags &= ~PHYSFLAGS_100;
+    if ( (v9 & 0x800) != 0 && thing->move_type == MOVETYPE_PHYSICS )
+    {
+        sithSurface_DetachThing(surface, &a2a);
+        v12 = thing->physicsParams.vel.y - a2a.y;
+        v13 = thing->physicsParams.vel.z - a2a.z;
+        thing->physicsParams.vel.x = thing->physicsParams.vel.x - a2a.x;
+        thing->physicsParams.vel.y = v12;
+        thing->physicsParams.vel.z = v13;
+    }
+    if ( (surface->surfaceFlags & SITH_SF_UNDERWATER) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+        sithCog_SendMessageFromSurface(surface, thing, SITH_MESSAGE_ENTERED);
+    if ( !a3 && v4 )
+    {
+        v14 = -(thing->physicsParams.vel.x * surface->surfaceInfo.face.normal.x
+              + thing->physicsParams.vel.y * surface->surfaceInfo.face.normal.y
+              + thing->physicsParams.vel.z * surface->surfaceInfo.face.normal.z);
+        if ( v14 > 2.5 )
+        {
+            a1a = v14;
+            sithUnk3_FallHurt(thing, a1a);
+            if ( !thing->soundclass )
+            {
+LABEL_26:
+                if ( thing->animclass && thing->move_type == MOVETYPE_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
+                    sithPuppet_PlayMode(thing, SITH_ANIM_LAND, 0);
+                return;
+            }
+            sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHURT);
+        }
+        if ( thing->soundclass )
+        {
+            v15 = surface->surfaceFlags;
+            if ( (v15 & (SURFACEFLAGS_100000|SURFACEFLAGS_EARTH|SURFACEFLAGS_PUDDLE|SURFACEFLAGS_WATER|SURFACEFLAGS_METAL)) != 0 )
+            {
+                if ( (v15 & SURFACEFLAGS_METAL) != 0 )
+                {
+                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDMETAL);
+                }
+                else if ( (v15 & SURFACEFLAGS_WATER) != 0 )
+                {
+                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDWATER);
+                }
+                else if ( (v15 & SURFACEFLAGS_PUDDLE) != 0 )
+                {
+                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDPUDDLE);
+                }
+                else
+                {
+                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDEARTH);
+                }
+            }
+            else
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHARD);
+            }
+        }
+        goto LABEL_26;
+    }
 }

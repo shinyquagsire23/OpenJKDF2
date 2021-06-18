@@ -101,7 +101,6 @@ void sithSoundSys_FreeThing(sithThing *thing);
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
 static void (*sithSoundSys_Shutdown)() = (void*)sithSoundSys_Shutdown_ADDR;
 
-static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
 static void (*sithSoundSys_UpdateMusicVolume)(float musicVolume) = (void*)sithSoundSys_UpdateMusicVolume_ADDR;
 //static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;
 static sithPlayingSound* (*sithSoundSys_PlaySoundPosAbsolute)(sithSound *a1, sithThing *a2, float a3, float a4, float a5, int a6) = (void*)sithSoundSys_PlaySoundPosAbsolute_ADDR;
@@ -112,7 +111,6 @@ static sithPlayingSound* (*sithSoundSys_GetSoundFromRef)(int a1) = (void*)sithSo
 static void (*sithSoundSys_FadeSound)(sithPlayingSound *sound, float vol_, float fadeintime_) = (void*)sithSoundSys_FadeSound_ADDR;
 static void (*sithSoundSys_SetPitch)(sithPlayingSound *a1, float pitch, float changetime) = (void*)sithSoundSys_SetPitch_ADDR;
 static void (*sithSoundSys_SectorSound)(sithSector *a1, sithSound *a2, float a3) = (void*)sithSoundSys_SectorSound_ADDR;
-static void (*sithSoundSys_SetMusicVol)(float a1) = (void*)sithSoundSys_SetMusicVol_ADDR;
 
 #ifdef LINUX
 void sithSoundSys_Tick(float a1);
@@ -122,6 +120,8 @@ void sithSoundSys_ResumeAll();
 void sithSoundSys_sub_4DBF90();
 void sithSoundSys_Close();
 void sithSoundSys_StopSong();
+int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4);
+void sithSoundSys_SetMusicVol(float a1);
 #else
 static void (*sithSoundSys_ResumeMusic)(int a1) = (void*)sithSoundSys_ResumeMusic_ADDR;
 static void (*sithSoundSys_Tick)(float) = (void*)sithSoundSys_Tick_ADDR;
@@ -130,6 +130,8 @@ static void (*sithSoundSys_ResumeAll)() = (void*)sithSoundSys_ResumeAll_ADDR;
 static void (*sithSoundSys_sub_4DBF90)() = (void*)sithSoundSys_sub_4DBF90_ADDR;
 static void (*sithSoundSys_Close)() = (void*)sithSoundSys_Close_ADDR;
 static void (*sithSoundSys_StopSong)() = (void*)sithSoundSys_StopSong_ADDR;
+static int (*sithSoundSys_PlaySong)(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4) = (void*)sithSoundSys_PlaySong_ADDR;
+static void (*sithSoundSys_SetMusicVol)(float a1) = (void*)sithSoundSys_SetMusicVol_ADDR;;
 #endif
 
 #endif // _SITHSOUNDSYS_H

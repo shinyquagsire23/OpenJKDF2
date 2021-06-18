@@ -148,6 +148,8 @@ void rdMatrix_Print34(const rdMatrix34 *viewMat);
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;
 
+static void (*_rdMatrix_ExtractAngles34)(const rdMatrix34 *in, rdVector3 *out) = (void*)rdMatrix_ExtractAngles34_ADDR;
+
 //IMPORT_FUNC(rdMatrix_BuildRotate34, void, (rdMatrix34*, rdVector3*), rdMatrix_BuildRotate34_ADDR)
 //IMPORT_FUNC(rdMatrix_BuildRotate44, void, (rdMatrix44*, rdVector3*), rdMatrix_BuildRotate44_ADDR)
 //IMPORT_FUNC(rdMatrix_TransformVector34, void, (rdVector3*, rdVector3*, rdMatrix34*), rdMatrix_TransformVector34_ADDR)

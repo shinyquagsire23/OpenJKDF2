@@ -8,7 +8,7 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces #-fsanitize=address -DLINUX_TMP
+CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -fsanitize=address -DLINUX_TMP
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc
@@ -51,4 +51,4 @@ $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -m32 -o $@ -g $^ -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -fshort-wchar #-fsanitize=address -DLINUX_TMP
+	$(CC) -m32 -o $@ -g $^ -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -fshort-wchar -fsanitize=address -DLINUX_TMP

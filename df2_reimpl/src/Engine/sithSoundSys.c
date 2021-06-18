@@ -149,4 +149,13 @@ void sithSoundSys_Close()
 void sithSoundSys_StopSong()
 {
 }
+
+int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4)
+{
+    return 1;
+}
+
+void sithSoundSys_SetMusicVol(float a1)
+{
+}
 #endif

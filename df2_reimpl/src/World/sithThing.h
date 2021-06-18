@@ -82,7 +82,7 @@ enum THING_PHYSFLAGS
   PHYSFLAGS_SURFACEBOUNCE = 0x20,
   PHYSFLAGS_FLOORSTICK = 0x40,
   PHYSFLAGS_WALLSTICK = 0x80,
-  THINGSTATE_100 = 0x100,
+  PHYSFLAGS_100 = 0x100,
   PHYSFLAGS_ROTVEL = 0x200,
   PHYSFLAGS_BANKEDTURNS = 0x400,
   THINGSTATE_800 = 0x800,
@@ -576,10 +576,14 @@ typedef struct sithThing
     float collideSize;
     uint32_t attach_flags;
     rdVector3 field_38;
-    uint32_t field_44;
+    sithSurfaceInfo* attachedSufaceInfo;
     float field_48;
     rdVector3 field_4C;
-    sithThing* attachedThing;
+    union
+    {
+        sithThing* attachedThing;
+        sithSurface* attachedSurface;
+    };
     sithSector* sector;
     sithThing* nextThing;
     sithThing* prevThing;
@@ -641,6 +645,7 @@ typedef int (__cdecl *sithThing_handler_t)(sithThing*);
 
 #define sithThing_paramKeyToParamValMap (*(stdHashTable**)0x008326A8)
 #define sithThing_handler (*(sithThing_handler_t*)0x008330FC)
+#define sithThing_inittedThings (*(uint16_t*)0x00549358)
 
 int sithThing_Startup();
 int sithThing_Shutdown();
@@ -670,6 +675,10 @@ int sithThing_GetIdxFromThing(sithThing *thing);
 void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
 void sithThing_freestuff(sithWorld *world);
 void sithThing_Free(sithWorld *world);
+sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThing);
+sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *position, rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing);
+void sithThing_FreeEverythingNet(sithThing *thing);
+void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3);
 
 static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
@@ -682,8 +691,8 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
 //static void (*sithThing_Free)(sithWorld* world) = (void*)sithThing_Free_ADDR;
 
-static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
-static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
+//static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
+//static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
 //static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
@@ -694,7 +703,7 @@ static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThin
 static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 //static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
 static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
-static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
+//static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
 static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;
 //static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;
 

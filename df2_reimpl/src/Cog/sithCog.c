@@ -33,7 +33,6 @@
 #include "jk.h"
 
 void (*sithDebugConsole_CmdCogList)(void) = (void*)0x004EE2F0;
-static int (*sithCogScript_TimerTick)() = (void*)0x4E0640;
 
 static int sithCog_bInitted = 0;
 
@@ -572,6 +571,13 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
 
 // ex
 
+void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg)
+{
+    sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
+}
+
+// ex
+
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message)
 {
     sithCog_SendMessageFromSectorEx(sector, thing, message, 0.0, 0.0, 0.0, 0.0);
@@ -1033,4 +1039,26 @@ void sithCogScript_Tick(sithCog *cog)
             return;
         }
     }
+}
+
+int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info)
+{
+    sithWorld *v2; // ecx
+    int v3; // eax
+    sithCog *v4; // eax
+
+    v2 = sithWorld_pCurWorld;
+    v3 = info->cogIdx;
+    if ( (v3 & 0x8000u) != 0 )
+    {
+        v2 = sithWorld_pStatic;
+        v3 &= ~0x8000u;
+    }
+    if ( v2 && v3 >= 0 && v3 < v2->numCogsLoaded )
+        v4 = &v2->cogs[v3];
+    else
+        v4 = 0;
+    if ( v4 )
+        sithCog_SendMessageEx(v4, SITH_MESSAGE_TIMER, SENDERTYPE_COG, v4->selfCog, 0, 0, info->timerIdx, info->field_10, info->field_14, 0.0, 0.0);
+    return 1;
 }

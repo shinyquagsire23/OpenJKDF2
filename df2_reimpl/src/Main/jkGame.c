@@ -17,6 +17,7 @@
 #include "Main/jkHudInv.h"
 #include "Main/jkDev.h"
 #include "Engine/rdColormap.h"
+#include "Engine/sithCamera.h"
 
 #include "stdPlatform.h"
 #include "jk.h"
@@ -174,7 +175,7 @@ int jkGame_Update()
     //if ( Video_modeStruct.b3DAccel )
         rdSetColorEffects(&stdPalEffects_state.effect);
 #endif
-    memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
+    _memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )
     {

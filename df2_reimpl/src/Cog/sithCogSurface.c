@@ -31,20 +31,18 @@ void sithCogSurface_GetAdjoinFlags(sithCog *ctx);
 void sithCogSurface_SetFaceType(sithCog *ctx);
 void sithCogSurface_ClearFaceType(sithCog *ctx);
 void sithCogSurface_GetFaceType(sithCog *ctx);
-
-static void (*sithCogSurface_SetFaceGeoMode)(sithCog* ctx) = (void*)0x00500790;
-static void (*sithCogSurface_GetFaceGeoMode)(sithCog* ctx) = (void*)0x00500820;
-static void (*sithCogSurface_SetFaceLightMode)(sithCog* ctx) = (void*)0x00500850;
-static void (*sithCogSurface_GetFaceLightMode)(sithCog* ctx) = (void*)0x005008A0;
-static void (*sithCogSurface_SetFaceTexMode)(sithCog* ctx) = (void*)0x005008D0;
-static void (*sithCogSurface_GetFaceTexMode)(sithCog* ctx) = (void*)0x00500920;
-static void (*sithCogSurface_SetSurfaceLight)(sithCog* ctx) = (void*)0x00500950;
-static void (*sithCogSurface_GetSurfaceLight)(sithCog* ctx) = (void*)0x005009F0;
-static void (*sithCogSurface_GetSurfaceCenter)(sithCog* ctx) = (void*)0x00500A20;
-static void (*sithCogSurface_GetSurfaceCount)(sithCog* ctx) = (void*)0x00500A70;
-static void (*sithCogSurface_GetSurfaceNormal)(sithCog* ctx) = (void*)0x00500AA0;
-static void (*sithCogSurface_SyncSurface)(sithCog* ctx) = (void*)0x00500AE0;
-
+void sithCogSurface_SetFaceGeoMode(sithCog *ctx);
+void sithCogSurface_GetFaceGeoMode(sithCog *ctx);
+void sithCogSurface_SetFaceLightMode(sithCog *ctx);
+void sithCogSurface_GetFaceLightMode(sithCog *ctx);
+void sithCogSurface_SetFaceTexMode(sithCog *ctx);
+void sithCogSurface_GetFaceTexMode(sithCog *ctx);
+void sithCogSurface_SetSurfaceLight(sithCog *ctx);
+void sithCogSurface_GetSurfaceLight(sithCog *ctx);
+void sithCogSurface_GetSurfaceCenter(sithCog *ctx);
+void sithCogSurface_GetSurfaceCount(sithCog *ctx);
+void sithCogSurface_GetSurfaceNormal(sithCog *ctx);
+void sithCogSurface_SyncSurface(sithCog *ctx);
 
 void sithCogSurface_Initialize(void* ctx)
 {
@@ -480,4 +478,221 @@ void sithCogSurface_GetFaceType(sithCog *ctx)
         sithCogVm_PushInt(ctx, surface->surfaceInfo.face.type);
     else
         sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSurface_SetFaceGeoMode(sithCog *ctx)
+{
+    signed int v1; // edi
+    sithSurface *v2; // eax
+    int v3; // ecx
+    int v4; // esi
+    int v5; // ecx
+    int v6; // esi
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopSurface(ctx);
+    if ( v2 )
+    {
+        if ( v2->surfaceInfo.face.material )
+        {
+            v3 = sithCogVm_multiplayerFlags;
+            v2->surfaceInfo.face.geometryMode = v1;
+            if ( v3 )
+            {
+                if ( (ctx->flags & 0x200) == 0 )
+                {
+                    v4 = ctx->trigId;
+                    if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
+                    {
+LABEL_12:
+                        sithSurface_PushSurface(v2);
+                        return;
+                    }
+                }
+            }
+        }
+        else
+        {
+            v5 = sithCogVm_multiplayerFlags;
+            v2->surfaceInfo.face.geometryMode = 0;
+            if ( v5 )
+            {
+                if ( (ctx->flags & 0x200) == 0 )
+                {
+                    v6 = ctx->trigId;
+                    if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
+                        goto LABEL_12;
+                }
+            }
+        }
+    }
+}
+
+void sithCogSurface_GetFaceGeoMode(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.geometryMode);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSurface_SetFaceLightMode(sithCog *ctx)
+{
+    signed int v1; // edi
+    sithSurface *v2; // eax
+    int v3; // ecx
+    int v4; // esi
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopSurface(ctx);
+    if ( v2 )
+    {
+        v3 = sithCogVm_multiplayerFlags;
+        v2->surfaceInfo.face.lightingMode = v1;
+        if ( v3 )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v4 = ctx->trigId;
+                if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
+                    sithSurface_PushSurface(v2);
+            }
+        }
+    }
+}
+
+void sithCogSurface_GetFaceLightMode(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.lightingMode);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSurface_SetFaceTexMode(sithCog *ctx)
+{
+    signed int v1; // edi
+    sithSurface *v2; // eax
+    int v3; // ecx
+    int v4; // esi
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopSurface(ctx);
+    if ( v2 )
+    {
+        v3 = sithCogVm_multiplayerFlags;
+        v2->surfaceInfo.face.textureMode = v1;
+        if ( v3 )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v4 = ctx->trigId;
+                if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
+                    sithSurface_PushSurface(v2);
+            }
+        }
+    }
+}
+
+void sithCogSurface_GetFaceTexMode(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.textureMode);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSurface_SetSurfaceLight(sithCog *ctx)
+{
+    sithSurface *v2; // ecx
+    int v3; // esi
+    float v4; // [esp+4h] [ebp-4h]
+    float a1; // [esp+Ch] [ebp+4h]
+
+    v4 = sithCogVm_PopFlex(ctx);
+    a1 = sithCogVm_PopFlex(ctx);
+    v2 = sithCogVm_PopSurface(ctx);
+    if ( v2 && a1 >= 0.0 )
+    {
+        if ( v4 == 0.0 )
+        {
+            v2->surfaceInfo.face.extraLight = a1;
+            if ( sithCogVm_multiplayerFlags )
+            {
+                if ( (ctx->flags & 0x200) == 0 )
+                {
+                    v3 = ctx->trigId;
+                    if ( v3 != 3 && v3 != 22 )
+                        sithSurface_PushSurface(v2);
+                }
+            }
+        }
+        else
+        {
+            sithSurface_SurfaceLightAnim(v2, a1, v4);
+        }
+    }
+}
+
+void sithCogSurface_GetSurfaceLight(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithCogVm_PushFlex(ctx, v1->surfaceInfo.face.extraLight);
+}
+
+void sithCogSurface_GetSurfaceCenter(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+    rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+    {
+        sithSurface_GetCenter(v1, &a2);
+        sithCogVm_PushVector3(ctx, &a2);
+    }
+    else
+    {
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+    }
+}
+
+void sithCogSurface_GetSurfaceCount(sithCog *ctx)
+{
+    if ( sithWorld_pCurWorld )
+        sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSurfaces);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogSurface_GetSurfaceNormal(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithCogVm_PushVector3(ctx, &v1->surfaceInfo.face.normal);
+    else
+        sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
+}
+
+void sithCogSurface_SyncSurface(sithCog *ctx)
+{
+    sithSurface *v1; // eax
+
+    v1 = sithCogVm_PopSurface(ctx);
+    if ( v1 )
+        sithSurface_PushSurface(v1);
 }

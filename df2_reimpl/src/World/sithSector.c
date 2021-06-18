@@ -14,6 +14,8 @@
 #include "Engine/sithCamera.h"
 #include "Engine/sithSound.h"
 #include "Primitives/rdFace.h"
+#include "Engine/sithRender.h"
+#include "Engine/rdCache.h"
 
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
@@ -743,4 +745,71 @@ void sithSector_Free(sithWorld *world)
     pSithHS->free(world->sectors);
     world->sectors = 0;
     world->numSectors = 0;
+}
+
+int sithSector_GetNumPlayers(sithSector *sector)
+{
+    int result; // eax
+    sithThing *i; // ecx
+
+    result = 0;
+    for ( i = sector->thingsList; i; i = i->nextThing )
+    {
+        if ( i->thingType == THINGTYPE_PLAYER )
+            ++result;
+    }
+    return result;
+}
+
+void sithSector_sub_4F2E30(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertices)
+{
+    int v3; // eax
+    int v4; // eax
+    sithWorld *v5; // edi
+    rdCanvas *v6; // esi
+    rdVector2 *v7; // eax
+    rdVector3 *v8; // edx
+    float *v9; // ecx
+    double v10; // st7
+    double v12; // st5
+    double v13; // st6
+    double v14; // st7
+    rdClipFrustum *v15; // [esp+10h] [ebp-4h]
+    float a1a; // [esp+18h] [ebp+4h]
+
+    v3 = sithRender_geoMode;
+    if ( sithRender_geoMode > 4 )
+        v3 = 4;
+    a1->geometryMode = v3;
+    v4 = sithRender_texMode;
+    a1->lightingMode = sithRender_lightMode > 0 ? 0 : sithRender_lightMode;
+    a1->textureMode = v4 > 0 ? 0 : v4;
+    if ( num_vertices )
+    {
+        v5 = sithWorld_pCurWorld;
+        v6 = rdCamera_pCurCamera->canvas;
+        v7 = a1->vertexUVs;
+        v15 = rdCamera_pCurCamera->cameraClipFrustum;
+        v8 = a1->vertices;
+        do
+        {
+            ++v8;
+            v9 = &v7->y;
+            v8[-1].z = v15->field_0.z;
+            v10 = (v8[-1].x - v6->screen_height_half) * sithSector_flt_8553C0;
+            ++v7;
+            v12 = (v8[-1].y - v6->screen_width_half) * sithSector_flt_8553C0;
+            a1a = v12;
+            --num_vertices;
+            v13 = v10 * sithSector_flt_8553C8 - v12 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
+            v14 = a1a * sithSector_flt_8553C8 + v10 * sithSector_flt_8553F4 + sithSector_flt_8553C4;
+            v7[-1].x = v13;
+            *v9 = v14;
+            v7[-1].x = v7[-1].x + v5->horizontalSkyOffs.x;
+            *v9 = *v9 + v5->horizontalSkyOffs.y;
+            v7[-1].x = v7[-1].x + a2->face.clipIdk.x;
+            *v9 = *v9 + a2->face.clipIdk.y;
+        }
+        while (num_vertices != 0);
+    }
 }

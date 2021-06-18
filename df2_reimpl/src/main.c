@@ -74,6 +74,7 @@
 #include "Engine/sithRender.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundClass.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -94,6 +95,9 @@
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithUnk3.h"
+#include "World/sithUnk4.h"
+#include "World/sithMap.h"
+#include "World/sithCollide.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -264,6 +268,7 @@ void do_hooks()
     hook_function(sithCogScript_RegisterVerb_ADDR, sithCogScript_RegisterVerb);
     hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
     hook_function(sithCogScript_RegisterGlobalMessage_ADDR, sithCogScript_RegisterGlobalMessage);
+    hook_function(sithCogScript_TimerTick_ADDR, sithCogScript_TimerTick);
     
     // sithCogVm
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
@@ -756,6 +761,8 @@ void do_hooks()
     
     hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
     hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);
+    //hook_function(rdClip_Face3S_ADDR, rdClip_Face3S);
+    //hook_function(rdClip_Face3GS_ADDR, rdClip_Face3GS);
     
     // rdFace
     hook_function(rdFace_New_ADDR, rdFace_New);
@@ -859,7 +866,7 @@ void do_hooks()
     hook_function(rdMatrix_BuildScale44_ADDR, rdMatrix_BuildScale44);
     hook_function(rdMatrix_BuildFromVectorAngle34_ADDR, rdMatrix_BuildFromVectorAngle34);
     hook_function(rdMatrix_LookAt_ADDR, rdMatrix_LookAt);
-    //hook_function(rdMatrix_ExtractAngles34_ADDR, rdMatrix_ExtractAngles34); // TODO fix
+    hook_function(rdMatrix_ExtractAngles34_ADDR, rdMatrix_ExtractAngles34);
     hook_function(rdMatrix_Normalize34_ADDR, rdMatrix_Normalize34);
     hook_function(rdMatrix_Identity34_ADDR, rdMatrix_Identity34);
     hook_function(rdMatrix_Identity44_ADDR, rdMatrix_Identity44);
@@ -984,6 +991,8 @@ void do_hooks()
     hook_function(sithThing_Checksum_ADDR, sithThing_Checksum);
     hook_function(sithThing_netidk2_ADDR, sithThing_netidk2);
     hook_function(sithThing_Free_ADDR, sithThing_Free);
+    hook_function(sithThing_SpawnTemplate_ADDR, sithThing_SpawnTemplate);
+    hook_function(sithThing_AttachToSurface_ADDR, sithThing_AttachToSurface);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -994,6 +1003,7 @@ void do_hooks()
     hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
     hook_function(sithSector_UpdateSky_ADDR, sithSector_UpdateSky);
     hook_function(sithSector_Free_ADDR, sithSector_Free);
+    hook_function(sithSector_sub_4F2E30_ADDR, sithSector_sub_4F2E30);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1036,6 +1046,15 @@ void do_hooks()
     
     // sithCorpse
     hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);
+    
+    // sithCollide
+    hook_function(sithCollide_IsSphereInSector_ADDR, sithCollide_IsSphereInSector);
+    hook_function(sithCollide_sub_5080D0_ADDR, sithCollide_sub_5080D0);
+    hook_function(sithCollide_sub_508540_ADDR, sithCollide_sub_508540);
+    hook_function(sithCollide_sub_508D20_ADDR, sithCollide_sub_508D20);
+    hook_function(sithCollide_sub_508BE0_ADDR, sithCollide_sub_508BE0);
+    hook_function(sithCollide_sub_508750_ADDR, sithCollide_sub_508750);
+    hook_function(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
 
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
@@ -1254,6 +1273,13 @@ void do_hooks()
     hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
     hook_function(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
     hook_function(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
+    hook_function(sithUnk3_SearchClose_ADDR, sithUnk3_SearchClose);
+    hook_function(sithUnk3_sub_4E7670_ADDR, sithUnk3_sub_4E7670);
+    
+    // sithUnk4
+    hook_function(sithUnk4_SetMaxHeathForDifficulty_ADDR, sithUnk4_SetMaxHeathForDifficulty);
+    hook_function(sithUnk4_sub_4ED1D0_ADDR, sithUnk4_sub_4ED1D0);
+    hook_function(sithUnk4_MoveJointsForEyePYR_ADDR, sithUnk4_MoveJointsForEyePYR);
     
     // sithItem
     hook_function(sithItem_Collide_ADDR, sithItem_Collide);
@@ -1262,6 +1288,10 @@ void do_hooks()
     hook_function(sithItem_Remove_ADDR, sithItem_Remove);
     hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
     hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
+    
+    // sithMap
+    hook_function(sithMap_Initialize_ADDR, sithMap_Initialize);
+    hook_function(sithMap_Shutdown_ADDR, sithMap_Shutdown);
     
     // sithTimer
     hook_function(sithTimer_Startup_ADDR, sithTimer_Startup);
@@ -1356,6 +1386,14 @@ void do_hooks()
     hook_function(sithSound_StopAll_ADDR, sithSound_StopAll);
     hook_function(sithSound_InitFromPath_ADDR, sithSound_InitFromPath);
     
+    // sithSoundClass
+    hook_function(sithSoundClass_Startup_ADDR, sithSoundClass_Startup);
+    hook_function(sithSoundClass_Shutdown_ADDR, sithSoundClass_Shutdown);
+    hook_function(sithSoundClass_Load_ADDR, sithSoundClass_Load);
+    hook_function(sithSoundClass_LoadFile_ADDR, sithSoundClass_LoadFile);
+    hook_function(sithSoundClass_LoadEntry_ADDR, sithSoundClass_LoadEntry);
+    hook_function(sithSoundClass_ThingPlaySoundclass4_ADDR, sithSoundClass_ThingPlaySoundclass4);
+    
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
@@ -1363,6 +1401,8 @@ void do_hooks()
     hook_function(sithAI_NewEntry_ADDR, sithAI_NewEntry);
     hook_function(sithAI_FreeEntry_ADDR, sithAI_FreeEntry);
     hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
+    hook_function(sithAI_SetLookFrame_ADDR, sithAI_SetLookFrame);
+    hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);
 
     // sithAIClass
     
@@ -1621,5 +1661,7 @@ void do_hooks()
     hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
     hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
     hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
+    hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
+    hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
 #endif
 }

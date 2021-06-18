@@ -28,5 +28,6 @@ static int (*sithTrackThing_RotatePivot)(sithThing *a1, rdVector3 *a2, rdVector3
 static void (*sithTrackThing_Rotate)(sithThing *a1, rdVector3 *a2) = (void*)sithTrackThing_Rotate_ADDR;
 static int (*sithTrackThing_PathMovePause)(sithThing *a1) = (void*)sithTrackThing_PathMovePause_ADDR;
 static int (*sithTrackThing_PathMoveResume)(sithThing *a1) = (void*)sithTrackThing_PathMoveResume_ADDR;
+static void (*sithTrackThing_idkpathmove)(sithThing *a1, sithThing *a2, rdVector3 *a3) = (void*)sithTrackThing_idkpathmove_ADDR;
 
 #endif // _SITHTRACKTHING_H
