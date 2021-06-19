@@ -689,7 +689,71 @@ void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int 
     sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-// ex
+double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, float a4, float a5, float a6, float a7)
+{
+    int v8; // ebp
+    float v9; // ebx
+    double v11; // st7
+    double v12; // st7
+    float v14; // [esp+10h] [ebp-Ch]
+    int v15; // [esp+14h] [ebp-8h]
+    int sourceType; // [esp+24h] [ebp+8h]
+
+    v14 = 0.0;
+    if ( thing )
+    {
+        v8 = thing->thingIdx;
+        sourceType = SENDERTYPE_THING;
+        v15 = 1 << thing->thingType;
+    }
+    else
+    {
+        v8 = -1;
+        sourceType = 0;
+        v15 = 1;
+    }
+    
+    v9 = a4;
+    for (int i = 0; i < sithCog_numSurfaceLinks; i++)
+    {
+        sithCogSurfaceLink* surfaceLink = &sithCog_aSurfaceLinks[i];
+        if ( surfaceLink->surface == sender && (surfaceLink->mask & v15) != 0 )
+        {
+            if ( msg == SITH_MESSAGE_DAMAGED )
+            {
+                v11 = sithCog_SendMessageEx(
+                          surfaceLink->cog,
+                          SITH_MESSAGE_DAMAGED,
+                          SENDERTYPE_SURFACE,
+                          sender->field_0,
+                          sourceType,
+                          v8,
+                          surfaceLink->linkid,
+                          v9,
+                          a5,
+                          a6,
+                          a7);
+                if ( v11 == -9999.9873 )
+                {
+                    v14 = a4;
+                }
+                else
+                {
+                    v14 = v11;
+                    a4 = v11;
+                    v9 = a4;
+                }
+            }
+            else
+            {
+                v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, sender->field_0, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
+                if ( v12 != -9999.9873 )
+                    v14 = v12 + v14;
+            }
+        }
+    }
+    return v14;
+}
 
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message)
 {

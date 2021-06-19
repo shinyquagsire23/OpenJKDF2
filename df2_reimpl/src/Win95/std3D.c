@@ -371,6 +371,7 @@ int std3D_StartScene()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
 	    
 	// Technically this should be from Clear2
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -395,15 +396,19 @@ int std3D_StartScene()
 int std3D_EndScene()
 {
     //printf("End draw\n");
-    last_tex = NULL;
-    last_flags = 0;
+    std3D_ResetRenderList();
     return 1;
 }
 
 void std3D_ResetRenderList()
 {
+    last_tex = NULL;
+    last_flags = 0;
     GL_tmpVerticesAmt = 0;
     GL_tmpTrisAmt = 0;
+    
+    //memset(GL_tmpTris, 0, sizeof(GL_tmpTris));
+    //memset(GL_tmpVertices, 0, sizeof(GL_tmpVertices));
 }
 
 int std3D_RenderListVerticesFinish()
@@ -925,6 +930,8 @@ void std3D_DrawRenderList()
     free(data_norms);
         
     glBindTexture(GL_TEXTURE_2D, 0);
+    
+    std3D_ResetRenderList();
 }
 
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
@@ -964,7 +971,7 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 {
-    if (GL_tmpVerticesAmt + count > 4096)
+    if (GL_tmpVerticesAmt + count >= 4096)
     {
         return 0;
     }

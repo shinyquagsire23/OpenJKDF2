@@ -4,6 +4,8 @@
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithTime.h"
 #include "World/sithSector.h"
+#include "World/jkPlayer.h"
+#include "Engine/rdPuppet.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -173,14 +175,70 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, int callback)
             thing->puppet->field_1C = -1;
         }
     }
-
-#ifndef LINUX_TMP    
+    
     result = sithPuppet_StartKey(thing->rdthing.puppet, keyframe, lowPri, highPri, flags, callback);
     if ( result < 0 )
         return -1;
     return result;
-#else
-    return -1;
-#endif
 }
 
+int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, int callback)
+{
+    int v6; // ecx
+    int trackNum; // esi
+    signed int result; // eax
+    
+#ifdef LINUX_TMP
+    return -1;
+#endif
+
+    v6 = 1;
+    if ( (a5 & 8) != 0 )
+    {
+        trackNum = 0;
+        while ( puppet->tracks[trackNum].keyframe != keyframe )
+        {
+            ++trackNum;
+            if ( trackNum >= 4 )
+                goto LABEL_8;
+        }
+        rdPuppet_unk(puppet, trackNum);
+        v6 = 0;
+    }
+    else
+    {
+        trackNum = a5;
+    }
+LABEL_8:
+    if ( v6 )
+    {
+        trackNum = rdPuppet_AddTrack(puppet, keyframe, a3, a4);
+        if ( trackNum < 0 )
+            return -1;
+    }
+    if ( callback )
+        rdPuppet_SetCallback(puppet, trackNum, callback);
+    else
+        rdPuppet_SetCallback(puppet, trackNum, (int)sithPuppet_DefaultCallback);
+    if ( (a5 & 2) != 0 )
+    {
+        rdPuppet_SetStatus(puppet, trackNum, 32);
+    }
+    else if ( (a5 & 0x20) != 0 )
+    {
+        rdPuppet_SetStatus(puppet, trackNum, 128);
+    }
+    else if ( (a5 & 4) != 0 )
+    {
+        rdPuppet_SetStatus(puppet, trackNum, 64);
+    }
+    if ( (a5 & 1) != 0 )
+        rdPuppet_SetTrackSpeed(puppet, trackNum, 0.0);
+    if ( (a5 & 0x10) != 0 )
+        rdPuppet_PlayTrack(puppet, trackNum);
+    else
+        rdPuppet_FadeInTrack(puppet, trackNum, 0.1);
+    result = trackNum;
+    puppet->tracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
+    return result;
+}

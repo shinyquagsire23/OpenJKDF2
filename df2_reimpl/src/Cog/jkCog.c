@@ -2,10 +2,18 @@
 
 #include "General/stdStrTable.h"
 #include "Main/jkHud.h"
+#include "Main/jkDev.h"
+#include "Main/jkStrings.h"
+#include "World/jkPlayer.h"
+#include "World/jkSaber.h"
+#include "World/sithPlayer.h"
+#include "General/stdString.h"
 
 #include "jk.h"
 
 void jkCog_EndTarget(sithCog *ctx);
+void jkCog_ClearSuperFlags(sithCog *ctx);
+void jkCog_PrintUniString(sithCog *ctx);
 
 static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
 
@@ -20,9 +28,9 @@ static void (*jkCog_StopPovKey)(sithCog* ctx) = (void*)0x0040A6B0;
 static void (*jkCog_SetForceSpeed)(sithCog* ctx) = (void*)0x0040A710;
 static void (*jkCog_SetInvis)(sithCog* ctx) = (void*)0x0040A730;
 static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
-static void (*jkCog_PrintUniString)(sithCog* ctx) = (void*)0x0040A800;
+//jkCog_PrintUniString
 static void (*jkCog_SetSuperFlags)(sithCog* ctx) = (void*)0x0040A970;
-static void (*jkCog_ClearSuperFlags)(sithCog* ctx) = (void*)0x0040A9E0;
+//jkCog_ClearSuperFlags
 static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
 static void (*jkCog_EnableSaber)(sithCog* ctx) = (void*)0x0040AAA0;
 static void (*jkCog_DisableSaber)(sithCog* ctx) = (void*)0x0040AB20;
@@ -108,4 +116,82 @@ int jkCog_StringsInit()
 void jkCog_EndTarget(sithCog *ctx)
 {
     jkHud_EndTarget();
+}
+
+void jkCog_ClearSuperFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+
+    if ( (flags & 1) != 0 )
+        playerThings[playerThingIdx].field_21C = 0;
+    if ( (flags & 2) != 0 )
+        playerThings[playerThingIdx].shields = 0;
+    if ( (flags & 4) != 0 )
+        playerThings[playerThingIdx].field_224 = 0;
+}
+
+void jkCog_PrintUniString(sithCog *ctx)
+{
+    int v1; // ebp
+    int v2; // eax
+    int v3; // esi
+    wchar_t *v4; // edi
+    int v5; // ebx
+    int v6; // ebx
+    char key[64]; // [esp+10h] [ebp-C0h] BYREF
+    char v8[128]; // [esp+50h] [ebp-80h] BYREF
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+
+#ifdef LINUX_TMP
+    return;
+#endif
+
+    v3 = v2;
+    if ( v2 >= 0 )
+        v3 = sithPlayer_GetNumidk(v2);
+    stdString_snprintf(key, 64, "COG_%05d", v1);
+    v4 = stdStrTable_GetUniString(&jkCog_strings, key);
+    if ( !v4 )
+        v4 = jkStrings_GetText(key);
+    stdString_WcharToChar(v8, v4, 127);
+    v8[127] = 0;
+    if ( v3 >= 0 )
+    {
+        if ( v3 == playerThingIdx )
+        {
+LABEL_8:
+            jkDev_PrintUniString(v4);
+            return;
+        }
+        if ( sithCogVm_multiplayerFlags )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v6 = ctx->trigId;
+                if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN && v3 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v3].flags & 1) != 0 )
+                    jkSaber_cogMsg_SendJKPrintUniString(v1, v3);
+            }
+        }
+    }
+    else
+    {
+        if ( v3 != -3 )
+        {
+            if ( v3 != -1 )
+                return;
+            goto LABEL_8;
+        }
+        jkDev_PrintUniString(v4);
+        if ( sithCogVm_multiplayerFlags )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v5 = ctx->trigId;
+                if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
+                    jkSaber_cogMsg_SendJKPrintUniString(v1, 0xFFFFFFFF);
+            }
+        }
+    }
 }

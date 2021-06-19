@@ -22,6 +22,10 @@ int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector 
     rdVector3 *v7; // ebp
     double v8; // st7
     double v10; // st6
+    
+    // Added
+    if (!sector)
+        return 0;
 
     if ( (sector->flags & SITH_SF_COLLIDEBOX) != 0
       && pos->z - radius > sector->collidebox_onecorner.z

@@ -1,7 +1,21 @@
 #include "sithTrackThing.h"
 
 #include "General/stdConffile.h"
+#include "Engine/sithSoundClass.h"
 #include "jk.h"
+
+void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, float a3)
+{
+    if ( goalFrame < thing->trackParams.loadedFrames )
+    {
+        thing->trackParams.field_C |= 4u;
+        thing->trackParams.field_20 = a3;
+        thing->goalframe = goalFrame;
+        sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_STARTMOVE);
+        sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_MOVING);
+        sithTrackThing_Arrivedidk(thing);
+    }
+}
 
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param)
 {

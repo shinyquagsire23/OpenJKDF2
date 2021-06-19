@@ -1366,3 +1366,88 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     }
     return result;
 }
+
+int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag)
+{
+    int v3; // edi
+    int v4; // edi
+    sithUnk3SearchEntry *v5; // ebp
+    double v6; // st7
+    sithUnk3SearchEntry *v7; // edx
+    sithUnk3SearchEntry *v8; // ecx
+    int v9; // esi
+    sithThing *v10; // edx
+    int result; // eax
+    int v12; // [esp+10h] [ebp-10h]
+    rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
+    float a6; // [esp+2Ch] [ebp+Ch]
+
+    v12 = 1;
+    v3 = 0x2122;
+    if ( flag )
+        v3 = 0x2022;
+    a1a.x = thing2->position.x - thing1->position.x;
+    a1a.y = thing2->position.y - thing1->position.y;
+    a1a.z = thing2->position.z - thing1->position.z;
+    a6 = rdVector_Normalize3Acc(&a1a);
+    sithUnk3_SearchRadiusForThings(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, v3);
+    v4 = sithUnk3_searchStackIdx;
+    v5 = sithUnk3_searchStack[sithUnk3_searchStackIdx].collisions;
+    while ( 1 )
+    {
+        v6 = 3.4e38;
+        v7 = 0;
+        v8 = v5;
+        if ( sithUnk3_searchNumResults[v4] )
+        {
+            v9 = sithUnk3_searchNumResults[v4];
+            do
+            {
+                if ( !v8->hasBeenEnumerated )
+                {
+                    if ( v6 <= v8->distance )
+                    {
+                        if ( v6 == v8->distance && (v7->collideType & 0x18) != 0 && (v8->collideType & 4) != 0 )
+                            v7 = v8;
+                    }
+                    else
+                    {
+                        v6 = v8->distance;
+                        v7 = v8;
+                    }
+                }
+                ++v8;
+                --v9;
+            }
+            while ( v9 );
+        }
+        if ( v7 )
+        {
+            v7->hasBeenEnumerated = 1;
+        }
+        else
+        {
+            sithUnk3_searchNumResults[v4] = 0;
+            sithUnk3_stackIdk[v4] = 0;
+        }
+        if ( !v7 )
+            break;
+        if ( (v7->collideType & 1) != 0 )
+        {
+            v10 = v7->receiver;
+            if ( v10 == thing2 )
+            {
+                result = 1;
+                sithUnk3_searchStackIdx = v4 - 1;
+                return result;
+            }
+            if ( v10 == thing1 )
+                continue;
+        }
+        v12 = 0;
+        break;
+    }
+    result = v12;
+    sithUnk3_searchStackIdx = v4 - 1;
+    return result;
+}

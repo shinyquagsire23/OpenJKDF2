@@ -759,8 +759,8 @@ void do_hooks()
     
     hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
     
-    hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
-    hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);
+    //hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
+    //hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);
     //hook_function(rdClip_Face3S_ADDR, rdClip_Face3S);
     //hook_function(rdClip_Face3GS_ADDR, rdClip_Face3GS);
     
@@ -996,6 +996,7 @@ void do_hooks()
     hook_function(sithThing_LandThing_ADDR, sithThing_LandThing);
     hook_function(sithThing_MoveToSector_ADDR, sithThing_MoveToSector);
     hook_function(sithThing_DetachThing_ADDR, sithThing_DetachThing);
+    hook_function(sithThing_Destroy_ADDR, sithThing_Destroy);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1007,6 +1008,9 @@ void do_hooks()
     hook_function(sithSector_UpdateSky_ADDR, sithSector_UpdateSky);
     hook_function(sithSector_Free_ADDR, sithSector_Free);
     hook_function(sithSector_sub_4F2E30_ADDR, sithSector_sub_4F2E30);
+    hook_function(sithSector_ThingSetLook_ADDR, sithSector_ThingSetLook);
+    hook_function(sithSector_ThingApplyForce_ADDR, sithSector_ThingApplyForce);
+    hook_function(sithSector_sub_4F2F60_ADDR, sithSector_sub_4F2F60);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1156,9 +1160,17 @@ void do_hooks()
     hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
     hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
+    hook_function(sithPlayer_AddDynamicTint_ADDR, sithPlayer_AddDynamicTint);
     
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
+    hook_function(sithSurface_SurfaceLightAnim_ADDR, sithSurface_SurfaceLightAnim);
+    hook_function(sithSurface_SlideWall_ADDR, sithSurface_SlideWall);
+    hook_function(sithSurface_MaterialAnim_ADDR, sithSurface_MaterialAnim);
+    hook_function(sithSurface_DetachThing_ADDR, sithSurface_DetachThing);
+    hook_function(sithSurface_GetCenter_ADDR, sithSurface_GetCenter);
+    hook_function(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
+    hook_function(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1284,6 +1296,7 @@ void do_hooks()
     hook_function(sithUnk3_DefaultHitHandler_ADDR, sithUnk3_DefaultHitHandler);
     hook_function(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
     hook_function(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
+    hook_function(sithUnk3_HasLos_ADDR, sithUnk3_HasLos);
     
     // sithUnk4
     hook_function(sithUnk4_SetMaxHeathForDifficulty_ADDR, sithUnk4_SetMaxHeathForDifficulty);
@@ -1355,6 +1368,7 @@ void do_hooks()
     // sithPuppet
     hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
     hook_function(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
+    hook_function(sithPuppet_StartKey_ADDR, sithPuppet_StartKey);
     
     // sithRender
     hook_function(sithRender_Startup_ADDR, sithRender_Startup);

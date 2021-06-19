@@ -1689,7 +1689,7 @@ LABEL_24:
         if ( (v17->physicsParams.physflags & 0xC0) != 0 )
             sithSector_ThingLandIdk(v17, 1);
 LABEL_48:
-        if ( v17->move_type == MOVETYPE_PHYSICS && (v17->trackParams.numFrames & THINGSTATE_20000) == 0 )
+        if ( v17->move_type == MOVETYPE_PHYSICS && (v17->trackParams.numFrames & PHYSFLAGS_20000) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
     }
     v24 = v17->class_cog;
@@ -2061,4 +2061,11 @@ LABEL_8:
     thing->childThing = 0;
     _memset(v2, 0, 0x28u);// TODO
     return result;
+}
+
+void sithThing_Destroy(sithThing *thing)
+{
+    thing->thingflags |= SITH_TF_WILLBEREMOVED;
+    if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+        sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_REMOVED);
 }

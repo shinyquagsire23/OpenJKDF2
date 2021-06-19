@@ -228,11 +228,15 @@ void sithRender_Draw()
         }
         if ( (sithRender_flag & 2) != 0 )
             sithRender_RenderDynamicLights();
+        
         sithRender_RenderLevelGeometry();
+
         if ( sithRender_numSectors2 )
             sithRender_RenderThings();
+
         if ( sithRender_numSurfaces )
             sithRender_RenderAlphaSurfaces();
+
         rdSetCullFlags(3);
     }
 }
@@ -427,7 +431,6 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 void sithRender_RenderLevelGeometry()
 {
     rdVector2 *vertices_uvs; // edx
-    sithWorld *level; // edx
     rdVector3 *vertices_alloc; // esi
     rdTexinfo *v10; // ecx
     int v18; // ebx
@@ -437,7 +440,6 @@ void sithRender_RenderLevelGeometry()
     int v22; // eax
     int v23; // ecx
     int v24; // eax
-    float *v25; // ecx
     int v26; // eax
     signed int v27; // edx
     unsigned int v28; // ebp
@@ -462,7 +464,6 @@ void sithRender_RenderLevelGeometry()
     signed int v47; // eax
     unsigned int num_vertices; // ebp
     float v49; // edx
-    int v50; // eax
     float *v51; // eax
     unsigned int v52; // ecx
     float *v53; // edx
@@ -473,7 +474,6 @@ void sithRender_RenderLevelGeometry()
     rdMaterial *v58; // ecx
     int v59; // ecx
     char rend_flags; // al
-    unsigned int v61; // esi
     sithThing *i; // esi
     int v63; // eax
     int v64; // [esp-10h] [ebp-74h]
@@ -575,12 +575,13 @@ LABEL_151:
             if ( ++v72 >= sithRender_numSectors )
                 goto LABEL_164;
         }
-        level = sithWorld_pCurWorld;
-        while ( 1 )
+        
+        
+        while ( v75 < level_idk->numSurfaces)
         {
             if ( !v65->surfaceInfo.face.geometryMode )
                 goto LABEL_150;
-            vertices_alloc = level->vertices;
+            vertices_alloc = sithWorld_pCurWorld->vertices;
             if ( (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].z) * v65->surfaceInfo.face.normal.z
                + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].y) * v65->surfaceInfo.face.normal.y
                + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].x) * v65->surfaceInfo.face.normal.x <= 0.0 )
@@ -607,25 +608,25 @@ LABEL_151:
                 }
                 goto LABEL_150;
             }
+
             if ( v65->field_4 != sithRender_8EE678 )
             {
                 for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
                 {
                     int idx = v65->surfaceInfo.face.vertexPosIdx[j];
-                    if ( level->alloc_unk98[idx] != sithRender_8EE678 )
+                    if ( sithWorld_pCurWorld->alloc_unk98[idx] != sithRender_8EE678 )
                     {
-                        rdMatrix_TransformPoint34(&level->verticesTransformed[idx], &level->vertices[idx], &rdCamera_pCurCamera->view_matrix);
-                        level = sithWorld_pCurWorld;
-                        level->alloc_unk98[idx] = sithRender_8EE678;
+                        rdMatrix_TransformPoint34(&sithWorld_pCurWorld->verticesTransformed[idx], &sithWorld_pCurWorld->vertices[idx], &rdCamera_pCurCamera->view_matrix);
+                        sithWorld_pCurWorld->alloc_unk98[idx] = sithRender_8EE678;
                     }
                 }
                 v65->field_4 = sithRender_8EE678;
             }
             if ( (sithRender_flag & 8) == 0 )
-                break;
+                goto handle_face;
 
             if ( v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SURFACEFLAGS_400|SURFACEFLAGS_200)) != 0 || !v65->surfaceInfo.face.lightingMode )
-                break;
+                goto handle_face;
             v74 = 0;
             v76 = v65->surfaceInfo.face.numVertices - 2;
             if (v76 > 0)
@@ -672,10 +673,9 @@ LABEL_151:
                     v80[0] = v65->surfaceInfo.field_40[v19];
                     v80[1] = v65->surfaceInfo.field_40[v71];
                     v80[2] = v65->surfaceInfo.field_40[v18];
-                    v25 = v20->vertexIntensities;
                     meshinfo_out.vertexUVs = v20->vertexUVs;
                     sithRender_idxInfo.vertexPosIdx = v78;
-                    meshinfo_out.vertex_lights_maybe_ = v25;
+                    meshinfo_out.vertex_lights_maybe_ = v20->vertexIntensities;
                     sithRender_idxInfo.vertexUVIdx = v79;
                     v26 = v20->textureMode;
                     v27 = v20->geometryMode;
@@ -768,7 +768,7 @@ LABEL_92:
                                 ++v71;
                             }
                             if ( ++v74 >= v76 )
-                                goto LABEL_149;
+                                goto LABEL_150;
                             continue;
                         }
                         if ( v66 != 1.0 )
@@ -800,15 +800,16 @@ LABEL_92:
                 goto LABEL_87;
             }
 LABEL_150:
-            v61 = level_idk->numSurfaces;
             v65->field_4 = sithRender_8EE678;
             ++v65;
-            if ( ++v75 >= v61 )
-                goto LABEL_151;
+            ++v75;
         }
+        goto LABEL_151;
+        
+handle_face:
         procEntry = rdCache_GetProcEntry();
         if ( !procEntry )
-            goto LABEL_149;
+            goto LABEL_150;
         if ( (v65->surfaceFlags & (SURFACEFLAGS_200|SURFACEFLAGS_400)) != 0 )
         {
             v41 = sithRender_geoMode;
@@ -853,8 +854,6 @@ LABEL_150:
         num_vertices = meshinfo_out.numVertices;
         if ( meshinfo_out.numVertices < 3u )
         {
-LABEL_149:
-            level = sithWorld_pCurWorld;
             goto LABEL_150;
         }
         rdCamera_pCurCamera->projectLst(procEntry->vertices, vertices_tmp, meshinfo_out.numVertices);
@@ -877,45 +876,7 @@ LABEL_149:
             procEntry->ambientLight = level_idk->extraLight;
         }
         if ( procEntry->ambientLight >= 1.0 )
-            goto LABEL_134;
-        v50 = procEntry->lightingMode;
-        if ( v50 == 2 )
         {
-            if ( procEntry->light_level_static >= 1.0 && v68 )
-            {
-                procEntry->lightingMode = 0;
-            }
-            else if ( procEntry->light_level_static <= 0.0 )
-            {
-                procEntry->lightingMode = 1;
-            }
-            goto LABEL_140;
-        }
-        if ( v50 != 3 )
-            goto LABEL_140;
-        v51 = procEntry->vertexIntensities;
-        v67 = *v51;
-        v52 = 1;
-        if ( num_vertices > 1 )
-        {
-            v53 = v51 + 1;
-            do
-            {
-                v54 = *v53 - v67;
-                if ( v54 < 0.0 )
-                    v54 = -v54;
-                if ( v54 > 0.015625 )
-                    break;
-                ++v52;
-                ++v53;
-            }
-            while ( v52 < num_vertices );
-        }
-        if ( v52 != num_vertices )
-            goto LABEL_140;
-        if ( v67 == 1.0 )
-        {
-LABEL_134:
             if ( v68 )
             {
                 procEntry->lightingMode = 0;
@@ -926,17 +887,65 @@ LABEL_134:
                 procEntry->light_level_static = 1.0;
             }
         }
-        else if ( v67 == 0.0 )
+        else if ( procEntry->lightingMode == 2 )
         {
-            procEntry->lightingMode = 1;
-            procEntry->light_level_static = 0.0;
+            if ( procEntry->light_level_static >= 1.0 && v68 )
+            {
+                procEntry->lightingMode = 0;
+            }
+            else if ( procEntry->light_level_static <= 0.0 )
+            {
+                procEntry->lightingMode = 1;
+            }
         }
-        else
+        else if ( procEntry->lightingMode == 3 )
         {
-            procEntry->lightingMode = 2;
-            procEntry->light_level_static = v67;
+            v51 = procEntry->vertexIntensities;
+            v67 = *v51;
+            v52 = 1;
+            if ( num_vertices > 1 )
+            {
+                v53 = v51 + 1;
+                do
+                {
+                    v54 = *v53 - v67;
+                    if ( v54 < 0.0 )
+                        v54 = -v54;
+                    if ( v54 > 0.015625 )
+                        break;
+                    ++v52;
+                    ++v53;
+                }
+                while ( v52 < num_vertices );
+            }
+            if ( v52 != num_vertices )
+            {
+                
+            }
+            else if ( v67 == 1.0 )
+            {
+                if ( v68 )
+                {
+                    procEntry->lightingMode = 0;
+                }
+                else
+                {
+                    procEntry->lightingMode = 2;
+                    procEntry->light_level_static = 1.0;
+                }
+            }
+            else if ( v67 == 0.0 )
+            {
+                procEntry->lightingMode = 1;
+                procEntry->light_level_static = 0.0;
+            }
+            else
+            {
+                procEntry->lightingMode = 2;
+                procEntry->light_level_static = v67;
+            }
         }
-LABEL_140:
+
         surfaceFlags = v65->surfaceFlags;
         if ( (surfaceFlags & SURFACEFLAGS_200) != 0 )
         {
@@ -961,7 +970,7 @@ LABEL_140:
         if ( procEntry->lightingMode >= 3 )
             rend_flags |= 4u;
         rdCache_AddProcFace(0, num_vertices, rend_flags);
-        goto LABEL_149;
+        goto LABEL_150;
     }
 LABEL_164:
     rdCache_Flush();
@@ -1375,9 +1384,7 @@ void sithRender_RenderAlphaSurfaces()
     sithSurface *v0; // edi
     sithSector *v1; // esi
     double v2; // st7
-    int v3; // ebx
     unsigned int v4; // ebp
-    sithWorld *v5; // edx
     int v7; // eax
     rdProcEntry *v9; // esi
     float *v20; // eax
@@ -1417,29 +1424,21 @@ void sithRender_RenderAlphaSurfaces()
             }
         }
         rdColormap_SetCurrent(v1->colormap);
-        v3 = sithRender_8EE678;
+
         if ( v0->field_4 != sithRender_8EE678 )
         {
-            v4 = 0;
-            if ( v0->surfaceInfo.face.numVertices )
+            for (v4 = 0; v4 < v0->surfaceInfo.face.numVertices; v4++)
             {
-                v5 = sithWorld_pCurWorld;
-                do
+                v7 = v0->surfaceInfo.face.vertexPosIdx[v4];
+                if ( sithWorld_pCurWorld->alloc_unk98[v7] != sithRender_8EE678 )
                 {
-                    v7 = v0->surfaceInfo.face.vertexPosIdx[v4];
-                    if ( sithWorld_pCurWorld->alloc_unk98[v7] != v3 )
-                    {
-                        rdMatrix_TransformPoint34(&v5->verticesTransformed[v7], &v5->vertices[v7], &rdCamera_pCurCamera->view_matrix);
-                        v5 = sithWorld_pCurWorld;
-                        v3 = sithRender_8EE678;
-                        sithWorld_pCurWorld->alloc_unk98[v7] = sithRender_8EE678;
-                    }
-                    ++v4;
+                    rdMatrix_TransformPoint34(&sithWorld_pCurWorld->verticesTransformed[v7], &sithWorld_pCurWorld->vertices[v7], &rdCamera_pCurCamera->view_matrix);
+                    sithWorld_pCurWorld->alloc_unk98[v7] = sithRender_8EE678;
                 }
-                while ( v4 < v0->surfaceInfo.face.numVertices );
             }
-            v0->field_4 = v3;
+            v0->field_4 = sithRender_8EE678;
         }
+        
         v9 = rdCache_GetProcEntry();
         if ( !v9 )
         {
@@ -1500,57 +1499,65 @@ void sithRender_RenderAlphaSurfaces()
                 {
                     v9->lightingMode = 1;
                 }
-                goto LABEL_52;
             }
-            if ( v9->lightingMode != 3 )
-                goto LABEL_52;
-            v20 = v9->vertexIntensities;
-            v21 = 1;
-            v31 = *v20;
-            if ( meshinfo_out.numVertices > 1 )
+            else if ( v9->lightingMode == 3 )
             {
-                v22 = v20 + 1;
-                do
+                v20 = v9->vertexIntensities;
+                v21 = 1;
+                v31 = *v20;
+                if ( meshinfo_out.numVertices > 1 )
                 {
-                    if ( *v22 != v31 )
-                        break;
-                    ++v21;
-                    ++v22;
+                    v22 = v20 + 1;
+                    do
+                    {
+                        if ( *v22 != v31 )
+                            break;
+                        ++v21;
+                        ++v22;
+                    }
+                    while ( v21 < meshinfo_out.numVertices );
                 }
-                while ( v21 < meshinfo_out.numVertices );
-            }
-            if ( v21 != meshinfo_out.numVertices )
-                goto LABEL_52;
-            if ( v31 != 1.0 )
-            {
-                if ( v31 == 0.0 )
+                if ( v21 != meshinfo_out.numVertices )
                 {
-                    v9->lightingMode = 1;
-                    v9->light_level_static = 0.0;
+
+                }
+                else if ( v31 != 1.0 )
+                {
+                    if ( v31 == 0.0 )
+                    {
+                        v9->lightingMode = 1;
+                        v9->light_level_static = 0.0;
+                    }
+                    else
+                    {
+                        v9->lightingMode = 2;
+                        v9->light_level_static = v31;
+                    }
+                }
+                else if ( surfaceSector->colormap != sithWorld_pCurWorld->colormaps )
+                {
+                    v9->lightingMode = 2;
+                    v9->light_level_static = 1.0;
                 }
                 else
                 {
-                    v9->lightingMode = 2;
-                    v9->light_level_static = v31;
+                    v9->lightingMode = 0;
                 }
-                goto LABEL_52;
             }
-            if ( surfaceSector->colormap != sithWorld_pCurWorld->colormaps )
-            {
-LABEL_48:
-                v9->lightingMode = 2;
-                v9->light_level_static = 1.0;
-                goto LABEL_52;
-            }
-            v9->lightingMode = 0;
         }
         else
         {
             if ( surfaceSector->colormap != sithWorld_pCurWorld->colormaps )
-                goto LABEL_48;
-            v9->lightingMode = 0;
+            {
+                v9->lightingMode = 2;
+                v9->light_level_static = 1.0;
+            }
+            else
+            {
+                v9->lightingMode = 0;
+            }
         }
-LABEL_52:
+
         v23 = 1;
         if ( v9->geometryMode >= 4 )
             v23 = 3;

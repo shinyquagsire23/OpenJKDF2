@@ -17,17 +17,19 @@
 #define sithTrackThing_PathMoveResume_ADDR (0x004FB690)
 #define sithTrackThing_idkpathmove_ADDR (0x004FB6D0)
 
+void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, float a3);
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param);
 
 //static int (*sithTrackThing_LoadPathParams)(stdConffileArg *arg, sithThing *thing, int a3) = (void*)sithTrackThing_LoadPathParams_ADDR;
 static void (*sithTrackThing_Tick)(sithThing *thing, float a2) = (void*)sithTrackThing_Tick_ADDR;
 static void (*sithTrackThing_Stop)(sithThing* thing) = (void*)sithTrackThing_Stop_ADDR;
-static void (*sithTrackThing_MoveToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_MoveToFrame_ADDR;
+//static void (*sithTrackThing_MoveToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_MoveToFrame_ADDR;
 static void (*sithTrackThing_SkipToFrame)(sithThing *a1, int a2, float a3) = (void*)sithTrackThing_SkipToFrame_ADDR;
 static int (*sithTrackThing_RotatePivot)(sithThing *a1, rdVector3 *a2, rdVector3 *a3, float a4) = (void*)sithTrackThing_RotatePivot_ADDR;
 static void (*sithTrackThing_Rotate)(sithThing *a1, rdVector3 *a2) = (void*)sithTrackThing_Rotate_ADDR;
 static int (*sithTrackThing_PathMovePause)(sithThing *a1) = (void*)sithTrackThing_PathMovePause_ADDR;
 static int (*sithTrackThing_PathMoveResume)(sithThing *a1) = (void*)sithTrackThing_PathMoveResume_ADDR;
 static void (*sithTrackThing_idkpathmove)(sithThing *a1, sithThing *a2, rdVector3 *a3) = (void*)sithTrackThing_idkpathmove_ADDR;
+static void (*sithTrackThing_Arrivedidk)(sithThing *thing) = (void*)sithTrackThing_Arrivedidk_ADDR;
 
 #endif // _SITHTRACKTHING_H

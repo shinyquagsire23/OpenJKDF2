@@ -104,6 +104,8 @@ typedef struct sithSurface sithSurface;
 #define sithSector_cogmsg_send31_ADDR (0x004FA420)
 #define sithSector_cogmsg_31_ADDR (0x004FA5D0)
 
+#define sithSector_surfaceNormal (*(rdVector3*)0x0054C6E8)
+
 typedef enum ATTACHFLAGS
 {
   ATTACHFLAGS_WORLDSURFACE = 0x1,
@@ -223,13 +225,17 @@ int sithSector_GetThingsCount(sithSector *sector);
 void sithSector_Free(sithWorld *world);
 int sithSector_GetNumPlayers(sithSector *sector);
 void sithSector_sub_4F2E30(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertices);
+void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds);
+void sithSector_ThingSetLook(sithThing *thing, rdVector3 *look, float a3);
+void sithSector_ThingApplyForce(sithThing *thing, rdVector3 *forceVec);
+void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
-static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
-static void (*sithSector_ThingSetLook)(sithThing *a1, const rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
+//static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
+//static void (*sithSector_ThingSetLook)(sithThing *a1, const rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
 //static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 
 static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
@@ -241,7 +247,7 @@ static void (*sithSector_cogMsg_SendTeleportThing)(sithThing *a1, int a2, int a3
 static void (*sithSector_cogMsg_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithSector_cogMsg_SendDamage_ADDR;
 static void (*sithSector_cogMsg_SendDestroyThing)(int a1, int a2) = (void*)sithSector_cogMsg_SendDestroyThing_ADDR;
 static void (*sithSector_cogMsg_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithSector_cogMsg_SendSyncThingFrame_ADDR;
-static void (*sithSector_ThingApplyForce)(sithThing *a1, rdVector3 *a2) = (void*)sithSector_ThingApplyForce_ADDR;
+//static void (*sithSector_ThingApplyForce)(sithThing *a1, rdVector3 *a2) = (void*)sithSector_ThingApplyForce_ADDR;
 static void (*sithSector_cogMsg_SendSyncThingAttachment)(sithThing *a1, int a2, int a3, int a4) = (void*)sithSector_cogMsg_SendSyncThingAttachment_ADDR;
 static void (*sithSector_cogMsg_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithSector_cogMsg_SendOpenDoor_ADDR;
 static void (*sithSector_cogMsg_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithSector_cogMsg_SendPlayKey_ADDR;
@@ -255,7 +261,7 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 //static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;
 //static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
 //static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
-static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
+//static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
 static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
 

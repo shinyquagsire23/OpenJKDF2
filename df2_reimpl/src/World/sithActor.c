@@ -2,9 +2,19 @@
 
 #include "World/sithThing.h"
 #include "World/sithSector.h"
+#include "World/sithUnk3.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
+#include "Engine/sithTime.h"
+#include "Engine/sithAnimClass.h"
+#include "Engine/sithPuppet.h"
+#include "Engine/sithNet.h"
 #include "Cog/sithCogVm.h"
+#include "Cog/sithCog.h"
+
+#include "jk.h"
+
+static int lastDoorOpenTime = 0;
 
 void sithActor_Tick(sithThing *thing, int deltaMs)
 {
@@ -126,5 +136,67 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
         }
         if ( sithCogVm_multiplayerFlags )
             sithThing_SyncThingPos(thing, 1);
+    }
+}
+
+void sithActor_cogMsg_OpenDoor(sithThing *thing)
+{
+    double v2; // st7
+    double v3; // st6
+    sithSector *v4; // esi
+    int v5; // eax
+    sithUnk3SearchEntry *searchResult; // eax
+    sithThing *v7; // edx
+    float a6; // [esp+0h] [ebp-58h]
+    rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
+    rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
+
+    if ( !net_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
+    {
+        lastDoorOpenTime = sithTime_curMsAbsolute;
+        _memcpy(&out, &thing->lookOrientation, sizeof(out));
+        thingPos.x = thing->position.x;
+        thingPos.y = thing->position.y;
+        thingPos.z = thing->position.z;
+        if ( thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
+        {
+            rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
+            v2 = thing->actorParams.eyeOffset.y + thingPos.y;
+            v3 = thing->actorParams.eyeOffset.z + thingPos.z;
+            thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
+            thingPos.y = v2;
+            thingPos.z = v3;
+        }
+        v4 = sithUnk3_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
+        if ( v4 )
+        {
+            v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
+            if ( sithCogVm_multiplayerFlags && v5 >= 0 )
+                sithSector_cogMsg_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
+            a6 = thing->moveSize - -0.1;
+            sithUnk3_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, THINGTYPE_ACTOR);
+            for ( searchResult = sithUnk3_NextSearchResult(); searchResult; searchResult = sithUnk3_NextSearchResult() )
+            {
+                if ( (searchResult->collideType & THINGTYPE_ACTOR) != 0 )
+                {
+                    if ( (searchResult->surface->surfaceFlags & THINGTYPE_ACTOR) != 0 )
+                    {
+                        sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
+                        sithUnk3_SearchClose();
+                        return;
+                    }
+                }
+                else if ( (searchResult->collideType & 1) != 0 )
+                {
+                    v7 = searchResult->receiver;
+                    if ( v7->thingType != THINGTYPE_ITEM && v7->thingType != THINGTYPE_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
+                    {
+                        sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
+                        break;
+                    }
+                }
+            }
+            sithUnk3_SearchClose();
+        }
     }
 }

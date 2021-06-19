@@ -86,6 +86,7 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
 int sithUnk3_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3);
 int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3SearchEntry *a3, int isInverse);
 int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4);
+int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag);
 
 #if 0
 static int (*_sithUnk3_Startup)() = (void*)sithUnk3_Startup_ADDR;
@@ -100,7 +101,7 @@ static sithSector* (*sithUnk3_GetSectorLookAt)(sithSector *sector, rdVector3 *a3
 //static void (*sithUnk3_SearchClose)(void) = (void*)sithUnk3_SearchClose_ADDR;
 //static int (*sithUnk3_DebrisDebrisCollide)(sithThing *arg0, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisDebrisCollide_ADDR;
 static int (*sithUnk3_DebrisPlayerCollide)(sithThing *thing, sithThing *a1, rdMatrix34 *a3, int a4) = (void*)sithUnk3_DebrisPlayerCollide_ADDR;
-static int (*sithUnk3_HasLos)(sithThing *a1, sithThing *a2, int flag) = (void*)sithUnk3_HasLos_ADDR;
+//static int (*sithUnk3_HasLos)(sithThing *a1, sithThing *a2, int flag) = (void*)sithUnk3_HasLos_ADDR;
 //static float (*sithUnk3_UpdateThingCollision)(sithThing *a3, rdVector3 *a2, float a6, int a8) = (void*)sithUnk3_UpdateThingCollision_ADDR;
 //static int (*sithUnk3_DefaultHitHandler)(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3) = (void*)sithUnk3_DefaultHitHandler_ADDR;
 //static int (*sithUnk3_CollideHurt)(sithThing *a1, rdVector3 *a2, float a3, int a4) = (void*)sithUnk3_CollideHurt_ADDR;

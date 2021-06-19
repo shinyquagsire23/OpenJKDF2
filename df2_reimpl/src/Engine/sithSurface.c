@@ -6,6 +6,7 @@
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
+#include "World/sithCollide.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTime.h"
@@ -741,3 +742,401 @@ uint32_t sithSurface_GetSurfaceAnim(sithSurface *surface)
     return ((intptr_t)v3 - (intptr_t)sithSurface_aSurfaces) / sizeof(rdSurface);
 }
 
+rdSurface* sithSurface_SurfaceLightAnim(sithSurface *surface, float a2, float a3)
+{
+    double v3; // st7
+    rdSurface *result; // eax
+    int v5; // edx
+    rdSurface *v6; // esi
+    float v7; // edx
+    float surfacea; // [esp+4h] [ebp+4h]
+
+    v3 = a2 - surface->surfaceInfo.face.extraLight;
+    if ( v3 == 0.0 )
+        return 0;
+    result = (rdSurface *)sithSurface_numAvail;
+    if ( sithSurface_numAvail )
+    {
+        v5 = sithSurface_aAvail[sithSurface_numAvail--];
+        if ( v5 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v5;
+        v6 = &sithSurface_aSurfaces[v5];
+        _memset(v6, 0, sizeof(rdSurface));
+        result = v6;
+        v6->index = ((playerThingIdx + 1) << 16) | (uint16_t)v5;
+    }
+    if ( result )
+    {
+        v7 = surface->surfaceInfo.face.extraLight;
+        result->sithSurfaceParent = surface;
+        result->flags = SURFACEFLAGS_400000|SURFACEFLAGS_WATER;
+        surfacea = v3;
+        result->field_44 = surfacea / a3;
+        result->field_3C = v7;
+        result->field_40 = a2;
+    }
+    return result;
+}
+
+rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
+{
+    rdMaterial *v2; // eax
+    rdSurface *v3; // eax
+    int v4; // edx
+    rdSurface *v5; // ebx
+    sithWorld *v6; // edi
+    int v7; // ebp
+    float v8; // edx
+    int *v9; // eax
+    rdVector3 *v10; // ecx
+    rdVector2 *v11; // eax
+    int *v12; // ecx
+    int v13; // edx
+    int v14; // ecx
+    float v15; // eax
+    int v16; // ecx
+    rdVector2 *v17; // edx
+    double v18; // st7
+//    char v20; // c3
+//    char v22; // c0
+    rdSurface *result; // eax
+    float v25; // [esp+10h] [ebp-BCh]
+    float v26; // [esp+10h] [ebp-BCh]
+    float v27; // [esp+10h] [ebp-BCh]
+    float v28; // [esp+14h] [ebp-B8h]
+    float v29; // [esp+14h] [ebp-B8h]
+    rdVector3 v30; // [esp+18h] [ebp-B4h]
+    rdVector3 v31; // [esp+24h] [ebp-A8h]
+    rdSurface *v32; // [esp+30h] [ebp-9Ch]
+    rdMatrix34 in; // [esp+34h] [ebp-98h] BYREF
+    int v34; // [esp+64h] [ebp-68h]
+    rdVector2 v35; // [esp+68h] [ebp-64h]
+    rdVector3 a1; // [esp+70h] [ebp-5Ch] BYREF
+    rdVector3 a1a; // [esp+7Ch] [ebp-50h] BYREF
+    rdVector3 rot; // [esp+90h] [ebp-3Ch] BYREF
+    rdMatrix34 a3; // [esp+9Ch] [ebp-30h] BYREF
+
+    v2 = surface->surfaceInfo.face.material;
+    if ( !v2 || (v2->tex_type & 2) == 0 )
+        return 0;
+    v3 = NULL;
+    if ( sithSurface_numAvail )
+    {
+        v4 = sithSurface_aAvail[sithSurface_numAvail--];
+        if ( v4 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v4;
+        v5 = &sithSurface_aSurfaces[v4];
+        _memset(v5, 0, sizeof(rdSurface));
+        v3 = v5;
+        v5->index = ((playerThingIdx + 1) << 16) | (uint16_t)v4;
+    }
+    v32 = v3;
+    if ( !v3 )
+        return 0;
+    v3->flags = SURFACEFLAGS_100000|SURFACEFLAGS_WATER;
+    v3->sithSurfaceParent = surface;
+    v6 = sithWorld_pCurWorld;
+    v3->field_24 = *a2;
+    v7 = 1;
+    v8 = surface->surfaceInfo.face.normal.x;
+    v34 = surface->surfaceFlags;
+    in.uvec.x = v8;
+    in.uvec.y = surface->surfaceInfo.face.normal.y;
+    v9 = surface->surfaceInfo.face.vertexPosIdx;
+    in.uvec.z = surface->surfaceInfo.face.normal.z;
+    v10 = v6->vertices;
+    v31 = v10[*v9];
+    v30 = v10[v9[1]];
+    v11 = v6->vertexUVs;
+    v12 = surface->surfaceInfo.face.vertexUVIdx;
+    v13 = *v12;
+    v14 = v12[1];
+    v35 = v11[v13];
+    v25 = v11[v14].x;
+    v15 = v11[v14].y;
+    a1.x = v31.x - v30.x;
+    v28 = v15;
+    a1.y = v31.y - v30.y;
+    for ( a1.z = v31.z - v30.z; rdVector_Len3(&a1) < 0.000099999997; v28 = v17[v16].y )
+    {
+        if ( ++v7 == surface->surfaceInfo.face.numVertices )
+            v7 = 0;
+        v30 = v6->vertices[surface->surfaceInfo.face.vertexPosIdx[v7]];
+        v16 = surface->surfaceInfo.face.vertexUVIdx[v7];
+        v17 = v6->vertexUVs;
+        v25 = v17[v16].x;
+    }
+    v30.x = v30.x - v31.x;
+    v30.y = v30.y - v31.y;
+    v30.z = v30.z - v31.z;
+    v26 = v25 - v35.x;
+    in.rvec = v30;
+    v29 = v28 - v35.y;
+    rdVector_Normalize3Acc(&in.uvec);
+    rdVector_Normalize3Acc(&in.rvec);
+    in.scale = v31;
+    in.lvec.x = in.uvec.y * in.rvec.z - in.uvec.z * in.rvec.y;
+    in.lvec.y = in.uvec.z * in.rvec.x - in.uvec.x * in.rvec.z;
+    in.lvec.z = in.uvec.x * in.rvec.y - in.uvec.y * in.rvec.x;
+    rdMatrix_InvertOrtho34(&a3, &in);
+    if ( v26 == 0.0 && v29 == 0.0 )
+    {
+        v18 = 0.0;
+    }
+    else if ( v26 == 0.0 )
+    {
+        if ( v29 <= 0.0 )
+            v18 = -90.0;
+        else
+            v18 = 90.0;
+    }
+    else if ( v29 == 0.0 )
+    {
+        if ( v26 <= 0.0 )
+            v18 = 180.0;
+        else
+            v18 = 0.0;
+    }
+    else
+    {
+        v18 = atan2(v29 / v26, 1.0) * 57.295784;
+        if ( v26 > 0.0 && v29 > 0.0 )
+            v18 = v18 - -180.0;
+        if ( v26 < 0.0 && v29 < 0.0 )
+            v18 = v18 - 180.0;
+    }
+    v27 = 320.0;
+    if ( (v34 & SURFACEFLAGS_20) != 0 )
+    {
+        v27 = 160.0;
+    }
+    else if ( (v34 & SURFACEFLAGS_10) != 0 )
+    {
+        v27 = 640.0;
+    }
+    else if ( (v34 & SURFACEFLAGS_40) != 0 )
+    {
+        v27 = 40.0;
+    }
+    rot.y = v18;
+    rot.x = 0.0;
+    rot.z = 0.0;
+    rdMatrix_PostRotate34(&a3, &rot);
+    
+    rdVector3 a1a_2;
+    a1a_2.x = v27;
+    a1a_2.y = v27;
+    a1a_2.z = 1.0;
+    rdMatrix_PostScale34(&a3, &a1a_2);
+    rdMatrix_TransformVector34(&a1a, a2, &a3);
+    result = v32;
+    v32->field_1C.x = -a1a.x;
+    v32->field_1C.y = -a1a.y;
+    surface->surfaceFlags |= 0x800;
+    return result;
+}
+
+rdSurface* sithSurface_MaterialAnim(rdMaterial *material, float a2, int a3)
+{
+    int v3; // ebx
+    rdSurface *v4; // esi
+    int v5; // edx
+    rdSurface *result; // eax
+    int64_t v7; // rax
+    int v8; // edx
+    int v9; // eax
+    int v10; // eax
+    int v12; // ecx
+
+    v3 = sithSurface_numAvail;
+    if ( sithSurface_numAvail )
+    {
+        v5 = sithSurface_aAvail[sithSurface_numAvail];
+        v3 = --sithSurface_numAvail;
+        if ( v5 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v5;
+        v4 = &sithSurface_aSurfaces[v5];
+        _memset(v4, 0, sizeof(rdSurface));
+        v4->index = ((playerThingIdx + 1) << 16) | (uint16_t)v5;
+    }
+    else
+    {
+        v4 = 0;
+    }
+    if ( !v4 )
+        return 0;
+    if ( (a3 & 4) != 0 )
+        v4->wallCel = 2;
+    else
+        v4->wallCel = (a3 & 2) != 0;
+    v4->material = material;
+    v4->flags = (uint16_t)a3 | SURFACEFLAGS_200000|SURFACEFLAGS_METAL;
+    v7 = (int64_t)(1000.0 / a2);
+    v4->field_34 = v7;
+    if (v7)
+    {
+        v12 = v7 + sithTime_curMs;
+        result = v4;
+        v4->field_30 = v12;
+    }
+    else
+    {
+        v4->flags = 0;
+        v8 = v4 - sithSurface_aSurfaces;
+        v9 = sithSurface_numSurfaces;
+        sithSurface_aAvail[v3 + 1] = v8;
+        sithSurface_numAvail = v3 + 1;
+        if ( v8 == v9 )
+        {
+            v10 = v8 - 1;
+            if ( v8 - 1 >= 0 )
+            {
+                do
+                {
+                    if ( sithSurface_aSurfaces[v10].flags )
+                        break;
+                    --v10;
+                }
+                while ( v10 >= 0 );
+            }
+            sithSurface_numSurfaces = v10;
+        }
+        result = 0;
+    }
+    return result;
+}
+
+void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out)
+{
+    int v2; // ecx
+    rdSurface *i; // eax
+    rdSurface *v4; // eax
+
+    v2 = 0;
+    for ( i = sithSurface_aSurfaces; v2 <= sithSurface_numSurfaces; ++i )
+    {
+        if ( (i->flags & SURFACEFLAGS_WATER) != 0 && i->sithSurfaceParent == a1 )
+            break;
+        ++v2;
+    }
+    v4 = (v2 > sithSurface_numSurfaces ? NULL : i);
+    if ( v4 )
+    {
+        *out = v4->field_24;
+    }
+    else
+    {
+        out->x = 0.0;
+        out->y = 0.0;
+        out->z = 0.0;
+    }
+}
+
+int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
+{
+    float v6; // [esp+0h] [ebp-2Ch]
+    rdVector3 a1a; // [esp+14h] [ebp-18h] BYREF
+    rdVector3 a2a; // [esp+20h] [ebp-Ch] BYREF
+
+    a1a.x = 0.0;
+    a1a.y = 0.0;
+    a1a.z = 0.0;
+    for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i )
+        rdVector_Add3Acc(&a1a, &sithWorld_pCurWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
+
+    v6 = (float)(unsigned int)surface->surfaceInfo.face.numVertices;
+    rdVector_InvScale3(out, &a1a, v6);
+
+    if ( !sithCollide_IsSphereInSector(out, 0.0, surface->parent_sector) )
+    {
+        a2a.x = surface->surfaceInfo.face.normal.x * 0.00019999999;
+        a2a.y = surface->surfaceInfo.face.normal.y * 0.00019999999;
+        a2a.z = surface->surfaceInfo.face.normal.z * 0.00019999999;
+        rdVector_Add3Acc(out, &a2a);
+    }
+    return sithCollide_IsSphereInSector(out, 0.0, surface->parent_sector);
+}
+
+rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)
+{
+    rdSurface *result; // eax
+    int v3; // edx
+    rdSurface *v4; // esi
+    float v5; // ecx
+    float v6; // ecx
+
+    result = (rdSurface *)sithSurface_numAvail;
+    if ( sithSurface_numAvail )
+    {
+        v3 = sithSurface_aAvail[sithSurface_numAvail--];
+        if ( v3 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v3;
+        v4 = &sithSurface_aSurfaces[v3];
+        _memset(v4, 0, sizeof(rdSurface));
+        result = v4;
+        v4->index = ((playerThingIdx + 1) << 16) | (uint16_t)v3;
+    }
+    if ( result )
+    {
+        if ( flags == 512 )
+        {
+            result->flags = 0x900000;
+            v5 = a2->y;
+            result->field_1C.x = a2->x;
+            result->field_1C.y = v5;
+        }
+        else
+        {
+            if ( flags == 1024 )
+                result->flags = 0x1100000;
+            v6 = a2->y;
+            result->field_1C.x = a2->x;
+            result->field_1C.y = v6;
+        }
+    }
+    return result;
+}
+
+rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint16_t a3)
+{
+    rdSurface *v3; // esi
+    int v4; // edx
+    rdSurface *result; // eax
+    int v6; // edx
+    rdSprite *v7; // eax
+    uint32_t v8; // rax
+
+    if ( sithSurface_numAvail )
+    {
+        v4 = sithSurface_aAvail[sithSurface_numAvail--];
+        if ( v4 > sithSurface_numSurfaces )
+            sithSurface_numSurfaces = v4;
+        v3 = &sithSurface_aSurfaces[v4];
+        _memset(v3, 0, sizeof(rdSurface));
+        v3->index = ((playerThingIdx + 1) << 16) | (uint16_t)v4;
+    }
+    else
+    {
+        v3 = 0;
+    }
+    if ( !v3 )
+        return 0;
+    thing->rdthing.wallCel = 0;
+    if ( (a3 & 4) != 0 )
+        v3->wallCel = 2;
+    else
+        v3->wallCel = (a3 & 2) != 0;
+    v6 = thing->signature;
+    v3->flags = a3 | SURFACEFLAGS_200000|SURFACEFLAGS_EARTH;
+    v7 = thing->rdthing.sprite3;
+    v3->parent_thing = thing;
+    v3->signature = v6;
+    v3->material = v7->face.material;
+    v8 = (uint32_t)(1000.0 / a2);
+    uint32_t v8_hi = sithTime_curMs;
+    v3->field_34 = v8;
+    v8_hi += v8;
+    result = v3;
+    v3->field_30 = v8_hi;
+    return result;
+}

@@ -318,6 +318,7 @@ int rdCache_SendFaceListToHardware()
         flags_idk |= 0x8000;
     }
     std3D_ResetRenderList();
+    rdCache_ResetRenderList();
     v7 = rdCamera_pCurCamera->cameraClipFrustum;
     v8 = 1.0 / v7->field_0.z;
     iterating_6c = rdCache_aProcFaces;
@@ -336,6 +337,9 @@ int rdCache_SendFaceListToHardware()
             else
                 v148 = 0.0;
 
+#ifdef LINUX
+            d3d_maxVertices = 3;
+#endif
             if ( active_6c->numVertices + rdCache_totalVerts >= d3d_maxVertices )
             {
                 rdCache_DrawRenderList();
@@ -557,7 +561,7 @@ LABEL_141:
                                         active_6c->light_level_static = v26 * 255.0;
 LABEL_142:
                                         vertex_cnt = active_6c->numVertices;
-                                        *(float *)&vtx_idx = 0.0;
+                                        vtx_idx = 0;
                                         if ( vertex_cnt )
                                         {
                                             iterating_6c_vtx_idx = 0;
@@ -1149,7 +1153,6 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     int y_min_related; // ebx
     double v12; // st7
     double v13; // st7
-    double v14; // st7
     unsigned int v23; // ecx
     unsigned int v24; // eax
     unsigned int v25; // esi
@@ -1207,10 +1210,9 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
                 y_max = v10->y;
                 y_max_related = v9;
             }
-            v14 = v10->z;
-            if ( v14 < z_min )
+            if ( v10->z < z_min )
                 z_min = v10->z;
-            if ( v14 > z_max )
+            if ( v10->z > z_max )
                 z_max = v10->z;
             v9++; // There used to be some weird undefined behavior here with y_min_related
             ++v10;

@@ -71,6 +71,7 @@ void sithPlayer_idk(int idx);
 void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2);
 void sithPlayer_debug_loadauto(sithThing *player);
 void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB);
+void sithPlayer_AddDynamicTint(float fR, float fG, float fB);
 
 static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
@@ -78,12 +79,13 @@ static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sit
 static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 //static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;
 //static void (*sithPlayer_SetBinAmt)(int idx, float a2) =(void*)sithPlayer_SetBinAmt_ADDR;
-static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)sithPlayer_AddDynamicTint_ADDR;
+//static void (*sithPlayer_AddDynamicTint)(float fR, float fG, float fB) = (void*)sithPlayer_AddDynamicTint_ADDR;
 static void (*sithPlayer_AddDyamicAdd)(int r, int g, int b) = (void*)sithPlayer_AddDyamicAdd_ADDR;
 static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlayer_ThingIdxToPlayerIdx_ADDR;
 //static void (*sithPlayer_SetScreenTint)(float r, float g, float b) = (void*)sithPlayer_SetScreenTint_ADDR;
 //static void (*sithPlayer_idk)(int) = (void*)sithPlayer_idk_ADDR;
 //static void (*sithPlayer_ResetPalEffects)() = (void*)sithPlayer_ResetPalEffects_ADDR;
 static void (*sithPlayer_HandleSentDeathPkt)(sithThing *thing) = (void*)sithPlayer_HandleSentDeathPkt_ADDR;
+static int (*sithPlayer_GetNumidk)(int a1) = (void*)sithPlayer_GetNumidk_ADDR;
 
 #endif // _SITHPLAYER_H

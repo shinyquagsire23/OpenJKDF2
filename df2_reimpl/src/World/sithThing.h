@@ -76,8 +76,8 @@ enum THING_PHYSFLAGS
 {
   PHYSFLAGS_GRAVITY = 0x1,
   PHYSFLAGS_USESTHRUST = 0x2,
-  THINGSTATE_4 = 0x4,
-  THINGSTATE_8 = 0x8,
+  PHYSFLAGS_4 = 0x4,
+  PHYSFLAGS_8 = 0x8,
   PHYSFLAGS_SURFACEALIGN = 0x10,
   PHYSFLAGS_SURFACEBOUNCE = 0x20,
   PHYSFLAGS_FLOORSTICK = 0x40,
@@ -85,23 +85,23 @@ enum THING_PHYSFLAGS
   PHYSFLAGS_100 = 0x100,
   PHYSFLAGS_ROTVEL = 0x200,
   PHYSFLAGS_BANKEDTURNS = 0x400,
-  THINGSTATE_800 = 0x800,
+  PHYSFLAGS_800 = 0x800,
   PHYSFLAGS_ANGTHRUST = 0x1000,
   PHYSFLAGS_FLYING = 0x2000,
   PHYSFLAGS_FEELBLASTFORCE = 0x4000,
-  THINGSTATE_8000 = 0x8000,
+  PHYSFLAGS_8000 = 0x8000,
   PHYSFLAGS_CROUCHING = 0x10000,
-  THINGSTATE_20000 = 0x20000,
+  PHYSFLAGS_20000 = 0x20000,
   PHYSFLAGS_PARTIALGRAVITY = 0x40000,
-  THINGSTATE_80000 = 0x80000,
+  PHYSFLAGS_80000 = 0x80000,
   PHYSFLAGS_MIDAIR = 0x100000,
-  THINGSTATE_200000 = 0x200000,
+  PHYSFLAGS_200000 = 0x200000,
   PHYSFLAGS_NOTHRUST = 0x400000,
-  THINGSTATE_800000 = 0x800000,
-  THINGSTATE_1000000 = 0x1000000,
-  THINGSTATE_2000000 = 0x2000000,
-  THINGSTATE_4000000 = 0x4000000,
-  THINGSTATE_8000000 = 0x8000000,
+  PHYSFLAGS_800000 = 0x800000,
+  PHYSFLAGS_1000000 = 0x1000000,
+  PHYSFLAGS_2000000 = 0x2000000,
+  PHYSFLAGS_4000000 = 0x4000000,
+  PHYSFLAGS_8000000 = 0x8000000,
 };
 
 enum THINGPARAM
@@ -286,7 +286,7 @@ typedef struct sithActorEntry
 {
     int field_0;
     int field_4;
-    int field_8;
+    float field_8;
     int field_C;
     int field_10;
     int field_14;
@@ -305,11 +305,11 @@ typedef struct sithActor
     rdVector3 field_1AC;
     float field_1B8;
     float moveSpeed;
-    int field_1C0;
+    sithThing* field_1C0;
     int field_1C4;
     int field_1C8;
     int field_1CC;
-    int field_1D0;
+    sithThing* field_1D0;
     int field_1D4;
     int field_1D8;
     int field_1DC;
@@ -545,7 +545,7 @@ typedef struct sithThingTrackParams
     sithThingFrame *frames;
     uint32_t field_C;
     rdVector3 vel;
-    uint32_t field_1C;
+    float field_1C;
     float field_20;
     uint32_t field_24;
     uint32_t field_28;
@@ -557,6 +557,7 @@ typedef struct sithThingTrackParams
     uint32_t field_40;
     uint32_t field_44;
     rdVector3 field_48;
+    float field_54;
 } sithThingTrackParams;
 
 typedef struct sithThing
@@ -621,9 +622,9 @@ typedef struct sithThing
     rdVector3 addedVelocity;
     rdVector3 velocityMaybe;
     float physicsRolloverFrames;
-    uint32_t field_244;
-    uint32_t field_248;
-    uint32_t field_24C;
+    float field_244;
+    float field_248;
+    float field_24C;
     uint32_t field_250;
     uint32_t curframe;
     uint32_t field_258;
@@ -682,6 +683,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3);
 void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5);
 void sithThing_MoveToSector(sithThing *thing, sithSector *sector, int a4);
 int sithThing_DetachThing(sithThing *thing);
+void sithThing_Destroy(sithThing *thing);
 
 static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
@@ -697,7 +699,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 //static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
-static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
+//static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
 //static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
 //static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;
 //static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;

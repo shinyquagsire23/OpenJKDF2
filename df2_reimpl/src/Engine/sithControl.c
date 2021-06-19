@@ -168,10 +168,11 @@ LABEL_39:
                     sithControl_PlayerMovement(player);
                 else
                     sithControl_FreeCam(player);
-#ifndef LINUX_TMP
+
                 sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
                 if ( input_read != 0 )
                     sithActor_cogMsg_OpenDoor(player);
+#ifndef LINUX_TMP
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )
                     sithMapView_ToggleMapDrawn();
@@ -389,7 +390,7 @@ void sithControl_PlayerMovement(sithThing *player)
         move_multiplier = 0.5;
     }
     player->physicsParams.physflags = new_state;
-    if ( (player->physicsParams.physflags & THINGSTATE_200000) != 0 )
+    if ( (player->physicsParams.physflags & PHYSFLAGS_200000) != 0 )
     {
         move_multiplier = 0.5;
     }

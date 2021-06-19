@@ -928,6 +928,7 @@ int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad)
 
 int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 {
+    //return _rdClip_Face3W(frustum, vertices, numVertices);
     rdVector3 *v3; // edx
     int v5; // ebp
     rdVector3 *v6; // esi
@@ -1371,6 +1372,7 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 
 int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *a4, int numVertices)
 {
+    //return _rdClip_Face3GT(frustum, vertices, uvs, a4, numVertices);
     float *v5; // ecx
     rdVector2 *v6; // esi
     rdVector3 *v7; // edi
@@ -2121,6 +2123,7 @@ LABEL_127:
 
 int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 {
+    //return _rdClip_Face3S(frustum, vertices, numVertices);
     rdVector3 *v3; // edx
     int v5; // ebp
     rdVector3 *v6; // esi
@@ -2535,6 +2538,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 
 int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices)
 {
+    //return _rdClip_Face3GS(frustum, vertices, a3, numVertices);
     rdVector3 *v4; // edx
     float *v5; // edi
     float *v6; // ebx
@@ -2645,30 +2649,30 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
     int v154; // [esp+10h] [ebp-10h]
     float *v155; // [esp+10h] [ebp-10h]
     float *v156; // [esp+10h] [ebp-10h]
-    float v157; // [esp+14h] [ebp-Ch]
-    float v158; // [esp+14h] [ebp-Ch]
-    float v159; // [esp+14h] [ebp-Ch]
-    float v160; // [esp+14h] [ebp-Ch]
-    float v161; // [esp+18h] [ebp-8h]
-    float v162; // [esp+18h] [ebp-8h]
-    float v163; // [esp+18h] [ebp-8h]
-    float v164; // [esp+18h] [ebp-8h]
+    double v157; // [esp+14h] [ebp-Ch]
+    double v158; // [esp+14h] [ebp-Ch]
+    double v159; // [esp+14h] [ebp-Ch]
+    double v160; // [esp+14h] [ebp-Ch]
+    double v161; // [esp+18h] [ebp-8h]
+    double v162; // [esp+18h] [ebp-8h]
+    double v163; // [esp+18h] [ebp-8h]
+    double v164; // [esp+18h] [ebp-8h]
     float *v165; // [esp+18h] [ebp-8h]
     float *v166; // [esp+18h] [ebp-8h]
     int v167; // [esp+1Ch] [ebp-4h]
     int v168; // [esp+1Ch] [ebp-4h]
     int v169; // [esp+1Ch] [ebp-4h]
     signed int v170; // [esp+1Ch] [ebp-4h]
-    float numVerticesa; // [esp+30h] [ebp+10h]
-    float numVerticesi; // [esp+30h] [ebp+10h]
+    double numVerticesa; // [esp+30h] [ebp+10h]
+    double numVerticesi; // [esp+30h] [ebp+10h]
     int numVerticesb; // [esp+30h] [ebp+10h]
-    float numVerticesc; // [esp+30h] [ebp+10h]
-    float numVerticesj; // [esp+30h] [ebp+10h]
+    double numVerticesc; // [esp+30h] [ebp+10h]
+    double numVerticesj; // [esp+30h] [ebp+10h]
     int numVerticesd; // [esp+30h] [ebp+10h]
-    float numVerticese; // [esp+30h] [ebp+10h]
-    float numVerticesk; // [esp+30h] [ebp+10h]
-    float numVerticesf; // [esp+30h] [ebp+10h]
-    float numVerticesl; // [esp+30h] [ebp+10h]
+    double numVerticese; // [esp+30h] [ebp+10h]
+    double numVerticesk; // [esp+30h] [ebp+10h]
+    double numVerticesf; // [esp+30h] [ebp+10h]
+    double numVerticesl; // [esp+30h] [ebp+10h]
     int numVerticesg; // [esp+30h] [ebp+10h]
     int numVerticesh; // [esp+30h] [ebp+10h]
 
@@ -2771,7 +2775,7 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
             {
                 numVerticesc = frustum->field_28 * v39->y;
                 v43 = frustum->field_28 * v40->y;
-                if ( numVerticesc <= v39->x || v43 >= v40->x )
+                if ( numVerticesc >= v39->x || v43 >= v40->x )
                 {
                     if ( v39->x != numVerticesc && v43 != v40->x && (v39->x > (double)numVerticesc || v43 < v40->x) )
                     {

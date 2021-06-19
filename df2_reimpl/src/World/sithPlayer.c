@@ -362,3 +362,48 @@ void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
     }
 }
 
+void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
+{
+    stdPalEffect *v3; // ecx
+    double v4; // st7
+    double v5; // st6
+    double v6; // st7
+    double v7; // st6
+    double v8; // st7
+
+    v3 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
+    v4 = fR + v3->tint.x;
+    if ( v4 < 0.0 )
+    {
+        v4 = 0.0;
+    }
+    else if ( v4 > 1.0 )
+    {
+        v4 = 1.0;
+    }
+    v5 = v4;
+    v6 = fG + v3->tint.y;
+    v3->tint.x = v5;
+    if ( v6 < 0.0 )
+    {
+        v6 = 0.0;
+    }
+    else if ( v6 > 1.0 )
+    {
+        v6 = 1.0;
+    }
+    v7 = v6;
+    v8 = fB + v3->tint.z;
+    v3->tint.y = v7;
+    if ( v8 < 0.0 )
+    {
+        v8 = 0.0;
+    }
+    else if ( v8 > 0.5 )
+    {
+        v3->tint.z = 0.5;
+        return;
+    }
+    v3->tint.z = v8;
+}
+

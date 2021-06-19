@@ -253,7 +253,10 @@ int sith_Tick()
         // TODO REMOVE
         //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
         //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
-        
+
+#ifdef LINUX_TMP
+        g_debugmodeFlags |= 1;
+#endif
         
         ++bShowInvisibleThings;
         if (sithRender_8EE678++ == -1)

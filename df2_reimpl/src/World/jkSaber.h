@@ -58,6 +58,7 @@ void jkSaber_nullsub_2();
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
 static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
+static int (*jkSaber_cogMsg_SendJKPrintUniString)(int a1, unsigned int a2) = (void*)jkSaber_cogMsg_SendJKPrintUniString_ADDR;
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;
 
 #endif // _JKSABER_H
