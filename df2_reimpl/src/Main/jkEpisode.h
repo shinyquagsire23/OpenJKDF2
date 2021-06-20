@@ -69,6 +69,7 @@ int jkEpisode_LoadVerify();
 int jkEpisode_Load(jkEpisodeLoad *a1);
 jkEpisodeEntry* jkEpisode_idk1(jkEpisodeLoad *a1);
 jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath);
+void jkEpisode_UpdateExtra(sithThing *thing);
 
 //static int (*jkEpisode_Startup)() = (void*)jkEpisode_Startup_ADDR;
 //static int (*jkEpisode_Load)(jkEpisodeLoad *a1) = (void*)jkEpisode_Load_ADDR;

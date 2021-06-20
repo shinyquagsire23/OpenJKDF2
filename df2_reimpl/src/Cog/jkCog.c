@@ -11,14 +11,17 @@
 
 #include "jk.h"
 
+void jkCog_SetFlags(sithCog *ctx);
 void jkCog_EndTarget(sithCog *ctx);
 void jkCog_SetSuperFlags(sithCog *ctx);
 void jkCog_ClearSuperFlags(sithCog *ctx);
 void jkCog_PrintUniString(sithCog *ctx);
+void jkCog_SetPersuasionInfo(sithCog *ctx);
+void jkCog_SetSaberInfo(sithCog *ctx);
 
 static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
 
-static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
+//static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
 static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;
 static void (*jkCog_GetFlags)(sithCog* ctx) = (void*)0x0040A4C0;
 static void (*jkCog_SetWeaponMesh)(sithCog* ctx) = (void*)0x0040A4F0;
@@ -36,8 +39,8 @@ static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
 static void (*jkCog_EnableSaber)(sithCog* ctx) = (void*)0x0040AAA0;
 static void (*jkCog_DisableSaber)(sithCog* ctx) = (void*)0x0040AB20;
 static void (*jkCog_SetWaggle)(sithCog* ctx) = (void*)0x0040AB50;
-static void (*jkCog_SetSaberInfo)(sithCog* ctx) = (void*)0x0040ABA0;
-static void (*jkCog_SetPersuasionInfo)(sithCog* ctx) = (void*)0x0040AC90;
+//static void (*jkCog_SetSaberInfo)(sithCog* ctx) = (void*)0x0040ABA0;
+//static void (*jkCog_SetPersuasionInfo)(sithCog* ctx) = (void*)0x0040AC90;
 static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
 static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
 static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
@@ -112,6 +115,31 @@ int jkCog_StringsInit()
 {
     stdStrTable_Free(&jkCog_strings);
     return stdStrTable_Load(&jkCog_strings, "misc\\cogStrings.uni");
+}
+
+void jkCog_SetFlags(sithCog *ctx)
+{
+    signed int flags; // esi
+    sithThing *thing; // eax
+    int v3; // edx
+    int v5; // edi
+
+    flags = sithCogVm_PopInt(ctx);
+    thing = sithCogVm_PopThing(ctx);
+    if ( thing )
+    {
+        if ( flags )
+        {
+            v3 = thing->jkFlags;
+            thing->jkFlags = v3 | flags;
+            if ( sithCogVm_multiplayerFlags != 0 && (ctx->flags & 0x200) == 0 )
+            {
+                v5 = ctx->trigId;
+                if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN && v3 != (v3 | flags) )
+                    sithThing_SyncThingPos(thing, 2);
+            }
+        }
+    }
 }
 
 void jkCog_EndTarget(sithCog *ctx)
@@ -204,6 +232,71 @@ LABEL_8:
                 v5 = ctx->trigId;
                 if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
                     jkSaber_cogMsg_SendJKPrintUniString(v1, 0xFFFFFFFF);
+            }
+        }
+    }
+}
+
+void jkCog_SetPersuasionInfo(sithCog *ctx)
+{
+    signed int v1; // edi
+    signed int v2; // ebx
+    sithThing *v3; // eax
+    jkPlayerInfo *v4; // ecx
+    int v5; // esi
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    v3 = sithCogVm_PopThing(ctx);
+    v4 = v3->playerInfo;
+    v4->maxTwinkles = v2;
+    v4->twinkleSpawnRate = v1;
+    if ( sithCogVm_multiplayerFlags )
+    {
+        if ( (ctx->flags & 0x200) == 0 )
+        {
+            v5 = ctx->trigId;
+            if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
+                jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
+        }
+    }
+}
+
+void jkCog_SetSaberInfo(sithCog *ctx)
+{
+    sithThing *saber_sparks; // ebx
+    sithThing *blood_sparks; // ebp
+    sithThing *v4; // edi
+    int v5; // esi
+    float len; // [esp+10h] [ebp-14h]
+    float tip_rad; // [esp+14h] [ebp-10h]
+    float base_rad; // [esp+18h] [ebp-Ch]
+    rdMaterial *v9; // [esp+1Ch] [ebp-8h]
+    rdMaterial *v10; // [esp+20h] [ebp-4h]
+    sithThing *wall_sparks; // [esp+28h] [ebp+4h]
+
+    saber_sparks = sithCogVm_PopTemplate(ctx);
+    blood_sparks = sithCogVm_PopTemplate(ctx);
+    wall_sparks = sithCogVm_PopTemplate(ctx);
+    len = sithCogVm_PopFlex(ctx);
+    tip_rad = sithCogVm_PopFlex(ctx);
+    base_rad = sithCogVm_PopFlex(ctx);
+    v9 = sithCogVm_PopMaterial(ctx);
+    v10 = sithCogVm_PopMaterial(ctx);
+    v4 = sithCogVm_PopThing(ctx);
+    if ( v4->playerInfo )
+    {
+        jkSaber_InitializeSaberInfo(v4, v10->mat_fpath, v9->mat_fpath, base_rad, tip_rad, len, wall_sparks, blood_sparks, saber_sparks);
+        if ( sithCogVm_multiplayerFlags )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v5 = ctx->trigId;
+                if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
+                {
+                    jkSaber_cogMsg_SendSetSaberInfo(v4);
+                    jkSaber_cogMsg_SendSetSaberInfo2(v4);
+                }
             }
         }
     }

@@ -1521,3 +1521,33 @@ int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
     _memcpy(&v2->lookOrientation, a2, sizeof(v2->lookOrientation));
     return result;
 }
+
+int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3SearchEntry *searchEnt, int isSolid)
+{
+    int result; // eax
+    float amount; // [esp+0h] [ebp-10h]
+    float mass; // [esp+14h] [ebp+4h]
+
+    float tmp = 0.0; // Added 0.0, original game overwrite &searchEnt...
+
+    mass = thing->physicsParams.mass;
+
+    if ( isSolid )
+        return sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, isSolid);
+
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+        tmp = -(searchEnt->field_14.x * thing->physicsParams.vel.x
+                               + searchEnt->field_14.y * thing->physicsParams.vel.y
+                               + searchEnt->field_14.z * thing->physicsParams.vel.z);
+
+    if (sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, 0))
+    {
+        if ( tmp > 0.25 )
+        {
+            amount = mass * 0.30000001 * tmp;
+            sithThing_Damage(thing2, thing, amount, 1);
+        }
+        return 1;
+    }
+    return 0;
+}

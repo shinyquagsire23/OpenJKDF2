@@ -2313,3 +2313,34 @@ void sithThing_detachallchildren(sithThing *thing)
         while ( v2 );
     }
 }
+
+void sithThing_AttachThing(sithThing *parent, sithThing *child)
+{
+    int v2; // eax
+    sithThing *v3; // eax
+    double v4; // st7
+    rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
+
+    v2 = parent->attach_flags;
+    if ( v2 )
+    {
+        if ( (v2 & ATTACHFLAGS_THING) != 0 && parent->attachedThing == child )
+            return;
+        sithThing_DetachThing(parent);
+    }
+    v3 = child->attachedParentMaybe;
+    parent->attach_flags = ATTACHFLAGS_THING;
+    parent->attachedThing = child;
+    parent->childThing = v3;
+    if ( v3 )
+        v3->parentThing = parent;
+    a2.x = parent->position.x - child->position.x;
+    v4 = parent->position.y - child->position.y;
+    parent->parentThing = 0;
+    child->attachedParentMaybe = parent;
+    a2.y = v4;
+    a2.z = parent->position.z - child->position.z;
+    rdMatrix_TransformVector34Acc_0(&parent->field_4C, &a2, &child->lookOrientation);
+    if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+        sithCog_SendMessageFromThing(child, parent, SITH_MESSAGE_ENTERED);
+}

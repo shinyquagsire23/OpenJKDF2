@@ -141,6 +141,7 @@ void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out);
 int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out);
 rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2);
 rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint16_t a3);
+rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a4);
 
 //static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
@@ -152,7 +153,7 @@ static rdSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADD
 //static int (*sithSurface_StopAnim)(rdSurface *a1) = (void*)sithSurface_StopAnim_ADDR;
 static rdSurface* (__cdecl *sithSurface_GetRdSurface)(sithSurface *a1) = (void*)sithSurface_GetRdSurface_ADDR;
 //static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
-static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
+//static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, float a2, float a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 //static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, float a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
 //static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
 static void (*_sithSurface_Tick)(float time) = (void*)sithSurface_Tick_ADDR;

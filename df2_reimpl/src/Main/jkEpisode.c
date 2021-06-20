@@ -1,6 +1,7 @@
 #include "jkEpisode.h"
 
 #include "World/sithThing.h"
+#include "World/jkSaber.h"
 #include "stdPlatform.h"
 #include "Main/jkRes.h"
 #include "Main/Main.h"
@@ -12,8 +13,6 @@
 #include "Cog/jkCog.h"
 
 #include "../jk.h"
-
-#define jkEpisode_UpdateExtra ((void*)jkEpisode_UpdateExtra_ADDR)
 
 int jkEpisode_Startup()
 {
@@ -511,4 +510,10 @@ LABEL_9:
     }
     pLoad->field_8 = v6;
     return &v3[v6];
+}
+
+void jkEpisode_UpdateExtra(sithThing *thing)
+{
+    if ( (thing->jkFlags & 1) != 0 )
+        jkSaber_UpdateLength(thing);
 }

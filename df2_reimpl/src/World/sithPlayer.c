@@ -12,6 +12,8 @@
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMulti.h"
+#include "Engine/sithTime.h"
+#include "Engine/sithControl.h"
 #include "Main/jkGame.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
@@ -483,5 +485,23 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
             thing->lifeLeftMs = 0;
         }
     }
+}
+
+void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
+{
+    sithPlayerInfo *v5; // edi
+
+    v5 = player->actorParams.playerinfo;
+    player->physicsParams.physflags &= ~(PHYSFLAGS_800|PHYSFLAGS_100);
+    player->physicsParams.physflags |= PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY;
+    player->thingflags |= SITH_TF_DEAD;
+    player->actorParams.typeflags &= ~THING_TYPEFLAGS_ISBLOCKING;
+    sithSector_StopPhysicsThing(player);
+    sithWeapon_SyncPuppet(player);
+    sithInventory_SendKilledMessageToAll(player, killedBy);
+    if ( net_isMulti )
+        sithMulti_HandleDeath(v5, player, killedBy);
+    if ( player == g_localPlayerThing )
+        sithControl_death_msgtimer = sithTime_curMs + 3000;
 }
 

@@ -420,3 +420,43 @@ void sithTrackThing_Stop(sithThing *thing)
     if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_ARRIVED);
 }
+
+void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *a3)
+{
+    sithThingFrame *v3; // eax
+    sithThingFrame *v4; // esi
+    uint32_t v5; // ecx
+    uint32_t v6; // ebp
+    uint32_t v7; // edi
+    int v8; // ebp
+    sithThingFrame *v9; // esi
+    uint32_t v10; // eax
+    rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
+
+    v3 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.numFrames);
+    v4 = thing2->trackParams.frames;
+    v5 = 3 * thing2->trackParams.numFrames;
+    thing->trackParams.frames = v3;
+    _memcpy(v3, v4, 8 * v5);
+    v6 = thing2->trackParams.loadedFrames;
+    v7 = 0;
+    thing->trackParams.numFrames = thing2->trackParams.numFrames;
+    thing->trackParams.loadedFrames = v6;
+    if ( v6 )
+    {
+        v8 = 0;
+        do
+        {
+            v9 = &thing->trackParams.frames[v8];
+            rdVector_Rotate3(&a1a, a3, &v9->rot);
+            v10 = thing->trackParams.loadedFrames;
+            ++v7;
+            ++v8;
+            v9->pos.x = a1a.x + v9->pos.x;
+            v9->pos.y = a1a.y + v9->pos.y;
+            v9->pos.z = a1a.z + v9->pos.z;
+        }
+        while ( v7 < v10 );
+    }
+}
+

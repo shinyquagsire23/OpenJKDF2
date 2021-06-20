@@ -999,6 +999,7 @@ void do_hooks()
     hook_function(sithThing_DetachThing_ADDR, sithThing_DetachThing);
     hook_function(sithThing_Destroy_ADDR, sithThing_Destroy);
     hook_function(sithThing_Damage_ADDR, sithThing_Damage);
+    hook_function(sithThing_AttachThing_ADDR, sithThing_AttachThing);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1013,6 +1014,7 @@ void do_hooks()
     hook_function(sithSector_ThingSetLook_ADDR, sithSector_ThingSetLook);
     hook_function(sithSector_ThingApplyForce_ADDR, sithSector_ThingApplyForce);
     hook_function(sithSector_sub_4F2F60_ADDR, sithSector_sub_4F2F60);
+    hook_function(sithSector_AddEntry_ADDR, sithSector_AddEntry);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1164,6 +1166,7 @@ void do_hooks()
     hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
     hook_function(sithPlayer_AddDynamicTint_ADDR, sithPlayer_AddDynamicTint);
     hook_function(sithPlayer_HandleSentDeathPkt_ADDR, sithPlayer_HandleSentDeathPkt);
+    hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
     
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
@@ -1174,6 +1177,7 @@ void do_hooks()
     hook_function(sithSurface_GetCenter_ADDR, sithSurface_GetCenter);
     hook_function(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
     hook_function(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
+    hook_function(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1300,6 +1304,7 @@ void do_hooks()
     hook_function(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
     hook_function(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
     hook_function(sithUnk3_HasLos_ADDR, sithUnk3_HasLos);
+    hook_function(sithUnk3_DebrisPlayerCollide_ADDR, sithUnk3_DebrisPlayerCollide);
     
     // sithUnk4
     hook_function(sithUnk4_SetMaxHeathForDifficulty_ADDR, sithUnk4_SetMaxHeathForDifficulty);

@@ -17,6 +17,7 @@
 #include "Engine/sithSound.h"
 #include "Engine/sithRender.h"
 #include "Engine/rdCache.h"
+#include "AI/sithAI.h"
 
 #define TARGET_FPS (50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
@@ -1680,4 +1681,28 @@ void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, 
         }
         while ( v6 < v16 );
     }
+}
+
+int sithSector_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing)
+{
+    int v6; // ecx
+    int v7; // eax
+    rdVector3 *v8; // edx
+
+    if ( !sithAI_bOpened )
+        return 0;
+    v6 = sithSector_numEntries;
+    if ( sithSector_numEntries == 32 )
+        return 0;
+    v7 = sithSector_numEntries;
+    sithSector_aEntries[v7].sector = sector;
+    v8 = &sithSector_aEntries[v6].pos;
+    v8->x = pos->x;
+    sithSector_numEntries = v6 + 1;
+    v8->y = pos->y;
+    v8->z = pos->z;
+    sithSector_aEntries[v7].field_14 = a3;
+    sithSector_aEntries[v7].field_18 = a4;
+    sithSector_aEntries[v7].thing = thing;
+    return 1;
 }
