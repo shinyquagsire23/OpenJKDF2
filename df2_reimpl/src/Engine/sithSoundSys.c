@@ -158,4 +158,9 @@ int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned
 void sithSoundSys_SetMusicVol(float a1)
 {
 }
+
+sithPlayingSound* sithSoundSys_GetSoundFromRef(int a1)
+{
+    return NULL;
+}
 #endif

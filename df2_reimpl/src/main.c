@@ -963,6 +963,7 @@ void do_hooks()
     hook_function(sithCamera_SetCurrentCamera_ADDR, sithCamera_SetCurrentCamera);
     hook_function(sithCamera_Open_ADDR, sithCamera_Open);
     hook_function(sithCamera_Close_ADDR, sithCamera_Close);
+    hook_function(sithCamera_SetCameraFocus_ADDR, sithCamera_SetCameraFocus);
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
@@ -997,6 +998,7 @@ void do_hooks()
     hook_function(sithThing_MoveToSector_ADDR, sithThing_MoveToSector);
     hook_function(sithThing_DetachThing_ADDR, sithThing_DetachThing);
     hook_function(sithThing_Destroy_ADDR, sithThing_Destroy);
+    hook_function(sithThing_Damage_ADDR, sithThing_Damage);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1161,6 +1163,7 @@ void do_hooks()
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
     hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
     hook_function(sithPlayer_AddDynamicTint_ADDR, sithPlayer_AddDynamicTint);
+    hook_function(sithPlayer_HandleSentDeathPkt_ADDR, sithPlayer_HandleSentDeathPkt);
     
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
@@ -1418,6 +1421,9 @@ void do_hooks()
     hook_function(sithSoundClass_LoadFile_ADDR, sithSoundClass_LoadFile);
     hook_function(sithSoundClass_LoadEntry_ADDR, sithSoundClass_LoadEntry);
     hook_function(sithSoundClass_ThingPlaySoundclass4_ADDR, sithSoundClass_ThingPlaySoundclass4);
+    hook_function(sithSoundClass_ThingPlaySoundclass5_ADDR, sithSoundClass_ThingPlaySoundclass5);
+    hook_function(sithSoundClass_PlayThingSoundclass_ADDR, sithSoundClass_PlayThingSoundclass);
+    hook_function(sithSoundClass_ThingPauseSoundclass_ADDR, sithSoundClass_ThingPauseSoundclass);
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);

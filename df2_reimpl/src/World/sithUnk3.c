@@ -7,6 +7,7 @@
 #include "World/sithSector.h"
 #include "World/sithCollide.h"
 #include "World/sithWorld.h"
+#include "World/jkPlayer.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
@@ -911,14 +912,14 @@ LABEL_78:
                     v5->field_268.z = v27;
                     if ( v5->move_type == MOVETYPE_PHYSICS
                       && (v5->physicsParams.physflags & 0x20) != 0
-                      && (v5->addedVelocity.x != 0.0 || v5->addedVelocity.y != 0.0 || v5->addedVelocity.z != 0.0) )
+                      && (v5->physicsParams.addedVelocity.x != 0.0 || v5->physicsParams.addedVelocity.y != 0.0 || v5->physicsParams.addedVelocity.z != 0.0) )
                     {
                         v30 = 1.0 - v19->distance / a6;
                         v65 = v30;
                         v31 = -v30;
-                        v32 = v5->addedVelocity.y * v31 + v5->physicsParams.vel.y;
-                        v33 = v5->addedVelocity.z * v31 + v5->physicsParams.vel.z;
-                        v5->physicsParams.vel.x = v5->addedVelocity.x * v31 + v5->physicsParams.vel.x;
+                        v32 = v5->physicsParams.addedVelocity.y * v31 + v5->physicsParams.vel.y;
+                        v33 = v5->physicsParams.addedVelocity.z * v31 + v5->physicsParams.vel.z;
+                        v5->physicsParams.vel.x = v5->physicsParams.addedVelocity.x * v31 + v5->physicsParams.vel.x;
                         v5->physicsParams.vel.y = v32;
                         v5->physicsParams.vel.z = v33;
                     }
@@ -1449,5 +1450,74 @@ int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     }
     result = v12;
     sithUnk3_searchStackIdx = v4 - 1;
+    return result;
+}
+
+int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
+{
+    sithThing *v2; // ebx
+    float v4; // eax
+    sithThing *v5; // edi
+    sithThing *v6; // ebp
+    long double v7; // st7
+    int result; // eax
+    rdVector3 a2a; // [esp+10h] [ebp-6Ch] BYREF
+    rdMatrix34 out; // [esp+1Ch] [ebp-60h] BYREF
+    rdMatrix34 mat1; // [esp+4Ch] [ebp-30h] BYREF
+    float a1a; // [esp+84h] [ebp+8h]
+
+    v2 = thing;
+    if ( thing->attachedParentMaybe )
+    {
+        rdMatrix_Normalize34(a2);
+        a2->scale = thing->position;
+        thing->lookOrientation.scale.x = thing->position.x;
+        v4 = thing->position.z;
+        thing->lookOrientation.scale.y = thing->position.y;
+        thing->lookOrientation.scale.z = v4;
+        rdMatrix_InvertOrtho34(&mat1, &thing->lookOrientation);
+        v5 = thing->attachedParentMaybe;
+        if ( v5 )
+        {
+            do
+            {
+                v6 = v5->childThing;
+                v5->lookOrientation.scale.x = v5->position.x;
+                v5->lookOrientation.scale.y = v5->position.y;
+                v5->lookOrientation.scale.z = v5->position.z;
+                rdMatrix_Multiply34(&out, &mat1, &v5->lookOrientation);
+                rdMatrix_PostMultiply34(&out, a2);
+                a2a.x = out.scale.x - v5->position.x;
+                a2a.y = out.scale.y - v5->position.y;
+                a2a.z = out.scale.z - v5->position.z;
+                v7 = rdVector_Normalize3Acc(&a2a);
+                out.scale.x = 0.0;
+                out.scale.y = 0.0;
+                out.scale.z = 0.0;
+                if ( v7 != 0.0 )
+                {
+                    a1a = v7;
+                    sithUnk3_UpdateThingCollision(v5, &a2a, a1a, 64);
+                }
+                sithUnk3_sub_4E77A0(v5, &out);
+                if ( v5->move_type == MOVETYPE_PHYSICS )
+                {
+                    v5->physicsParams.physflags &= ~1;
+                }
+                v5 = v6;
+            }
+            while ( v6 );
+            v2 = thing;
+        }
+    }
+    else if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
+    {
+        rdMatrix_Normalize34(a2);
+    }
+    result = 0;
+    a2->scale.x = 0.0;
+    a2->scale.y = 0.0;
+    a2->scale.z = 0.0;
+    _memcpy(&v2->lookOrientation, a2, sizeof(v2->lookOrientation));
     return result;
 }

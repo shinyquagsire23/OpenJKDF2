@@ -530,6 +530,11 @@ typedef struct sithThingPhysParams
     float maxVel;
     float orientSpeed;
     float buoyancy;
+    rdVector3 addedVelocity;
+    rdVector3 velocityMaybe;
+    float physicsRolloverFrames;
+    float field_74;
+    float field_78;
 } sithThingPhysParams;
 
 typedef struct sithThingFrame
@@ -547,17 +552,11 @@ typedef struct sithThingTrackParams
     rdVector3 vel;
     float field_1C;
     float field_20;
-    uint32_t field_24;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t field_44;
-    rdVector3 field_48;
+    rdMatrix34 field_24;
     float field_54;
+    rdVector3 field_58;
+    rdVector3 field_64;
+    rdVector3 orientation;
 } sithThingTrackParams;
 
 typedef struct sithThing
@@ -619,16 +618,11 @@ typedef struct sithThing
         sithThingPhysParams physicsParams;
         sithThingTrackParams trackParams;
     };
-    rdVector3 addedVelocity;
-    rdVector3 velocityMaybe;
-    float physicsRolloverFrames;
-    float field_244;
-    float field_248;
     float field_24C;
     uint32_t field_250;
-    uint32_t curframe;
+    int curframe;
     uint32_t field_258;
-    uint32_t goalframe;
+    int goalframe;
     uint32_t field_260;
     float waggle;
     rdVector3 field_268;
@@ -684,8 +678,13 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
 void sithThing_MoveToSector(sithThing *thing, sithSector *sector, int a4);
 int sithThing_DetachThing(sithThing *thing);
 void sithThing_Destroy(sithThing *thing);
+float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
+float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int flags);
+void sithThing_HurtSound(sithThing *thing, float amount, int hurtType);
+void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
+void sithThing_detachallchildren(sithThing *thing);
 
-static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
+//static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithThing_LoadThingParam_ADDR;
@@ -698,7 +697,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 
 //static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
 //static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
-static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
+//static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 //static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
 //static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
 //static void (*sithThing_SetPosAndRot)(sithThing *thing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;

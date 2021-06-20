@@ -315,8 +315,8 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     if (!thing->sector)
         return;
 
-    rdVector_Zero3(&thing->velocityMaybe);
-    rdVector_Zero3(&thing->addedVelocity);
+    rdVector_Zero3(&thing->physicsParams.velocityMaybe);
+    rdVector_Zero3(&thing->physicsParams.addedVelocity);
 
     if ((thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) 
         && (thing->actorParams.typeflags & SITH_TF_TIMER))
@@ -357,7 +357,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     rdVector3 a3;
     rdMatrix34 a;
 
-    rdVector_Zero3(&thing->addedVelocity);
+    rdVector_Zero3(&thing->physicsParams.addedVelocity);
     rdVector_Zero3(&a1a);
 
     if (thing->physicsParams.physflags & PHYSFLAGS_ANGTHRUST)
@@ -422,7 +422,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
         if ( (thing->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
             gravity *= 0.5;
         a1a.z = a1a.z - gravity;
-        thing->addedVelocity.z = -gravity;
+        thing->physicsParams.addedVelocity.z = -gravity;
     }
 
     rdVector_Add3Acc(&thing->physicsParams.vel, &a1a);
@@ -430,7 +430,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
 
     if (!rdVector_IsZero3(&thing->physicsParams.vel))
     {
-        rdVector_Scale3(&thing->velocityMaybe, &thing->physicsParams.vel, deltaSeconds);
+        rdVector_Scale3(&thing->physicsParams.velocityMaybe, &thing->physicsParams.vel, deltaSeconds);
     }
 }
 
@@ -440,7 +440,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     rdVector3 a3;
     rdVector3 a1a;
 
-    rdVector_Zero3(&player->addedVelocity);
+    rdVector_Zero3(&player->physicsParams.addedVelocity);
     if (player->physicsParams.physflags & PHYSFLAGS_ANGTHRUST)
     {
         if (!rdVector_IsZero3(&player->physicsParams.angVel))
@@ -482,10 +482,10 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
     // I think all of this is specifically for multiplayer, so that player things
     // sync better between clients.
-    float rolloverCombine = deltaSeconds + player->physicsRolloverFrames;
+    float rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
     float framesToApply = rolloverCombine * TARGET_FPS; // get number of 50FPS steps passed
-    player->physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * DELTA_50FPS;
+    player->physicsParams.physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * DELTA_50FPS;
 
     for (int i = (int)framesToApply; i > 0; i--)
     {
@@ -518,10 +518,10 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
             if ( (player->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
                 gravity = gravity * 0.5;
             a1a.z = a1a.z - gravity;
-            player->addedVelocity.z = -gravity;
+            player->physicsParams.addedVelocity.z = -gravity;
         }
         rdVector_Add3Acc(&player->physicsParams.vel, &a1a);
-        rdVector_MultAcc3(&player->velocityMaybe, &player->physicsParams.vel, DELTA_50FPS);
+        rdVector_MultAcc3(&player->physicsParams.velocityMaybe, &player->physicsParams.vel, DELTA_50FPS);
     }
 }
 
@@ -700,7 +700,7 @@ void sithSector_StopPhysicsThing(sithThing *thing)
     rdVector_Zero3(&thing->physicsParams.angVel);
     rdVector_Zero3(&thing->physicsParams.field_1F8);
     rdVector_Zero3(&thing->physicsParams.acceleration);
-    rdVector_Zero3(&thing->velocityMaybe);
+    rdVector_Zero3(&thing->physicsParams.velocityMaybe);
     rdVector_Zero3(&thing->field_268);
 }
 
@@ -1176,12 +1176,12 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             if ( v57->thrust.z > sithWorld_pCurWorld->worldGravity * thing->physicsParams.mass )
             {
                 sithThing_DetachThing(thing);
-                thing->addedVelocity.x = 0.0;
+                thing->physicsParams.addedVelocity.x = 0.0;
                 out.x = 0.0;
                 out.y = 0.0;
-                thing->addedVelocity.y = 0.0;
+                thing->physicsParams.addedVelocity.y = 0.0;
                 out.z = 0.0;
-                thing->addedVelocity.z = 0.0;
+                thing->physicsParams.addedVelocity.z = 0.0;
                 if ( (thing->physicsParams.physflags & PHYSFLAGS_ANGTHRUST) != 0 )
                 {
                     v59 = &thing->physicsParams.angVel;
@@ -1320,7 +1320,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
                     if ( (thing->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
                         v91 = v91 * 0.5;
                     v90 = v90 - v91;
-                    thing->addedVelocity.z = -v91;
+                    thing->physicsParams.addedVelocity.z = -v91;
                 }
                 v92 = v90;
                 v93 = out.x + thing->physicsParams.vel.x;
@@ -1353,9 +1353,9 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
                 thing->physicsParams.vel.z = v104;
                 if ( v93 != 0.0 || v100 != 0.0 || v104 != 0.0 )
                 {
-                    thing->velocityMaybe.x = v93 * deltaSeconds;
-                    thing->velocityMaybe.y = v100 * deltaSeconds;
-                    thing->velocityMaybe.z = v104 * deltaSeconds;
+                    thing->physicsParams.velocityMaybe.x = v93 * deltaSeconds;
+                    thing->physicsParams.velocityMaybe.y = v100 * deltaSeconds;
+                    thing->physicsParams.velocityMaybe.z = v104 * deltaSeconds;
                 }
                 return;
             }
@@ -1431,9 +1431,9 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     thing->physicsParams.vel.z = v127;
     if ( v119 != 0.0 || v123 != 0.0 || v127 != 0.0 )
     {
-        thing->velocityMaybe.x = v119 * deltaSeconds;
-        thing->velocityMaybe.y = v123 * deltaSeconds;
-        thing->velocityMaybe.z = v127 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.x = v119 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.y = v123 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.z = v127 * deltaSeconds;
     }
     if ( (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) != 0 )
     {
@@ -1473,19 +1473,19 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         v137 = -v131;
         if ( (thing->physicsParams.physflags & PHYSFLAGS_800) != 0 )
         {
-            v138 = 0.0 * v137 + thing->velocityMaybe.y;
-            v139 = 0.0 * v137 + thing->velocityMaybe.x;
-            v140 = 1.0 * v137 + thing->velocityMaybe.z;
+            v138 = 0.0 * v137 + thing->physicsParams.velocityMaybe.y;
+            v139 = 0.0 * v137 + thing->physicsParams.velocityMaybe.x;
+            v140 = 1.0 * v137 + thing->physicsParams.velocityMaybe.z;
         }
         else
         {
-            v138 = a1a.y * v137 + thing->velocityMaybe.y;
-            v139 = a1a.x * v137 + thing->velocityMaybe.x;
-            v140 = a1a.z * v137 + thing->velocityMaybe.z;
+            v138 = a1a.y * v137 + thing->physicsParams.velocityMaybe.y;
+            v139 = a1a.x * v137 + thing->physicsParams.velocityMaybe.x;
+            v140 = a1a.z * v137 + thing->physicsParams.velocityMaybe.z;
         }
-        thing->velocityMaybe.x = v139;
-        thing->velocityMaybe.y = v138;
-        thing->velocityMaybe.z = v140;
+        thing->physicsParams.velocityMaybe.x = v139;
+        thing->physicsParams.velocityMaybe.y = v138;
+        thing->physicsParams.velocityMaybe.z = v140;
     }
 }
 

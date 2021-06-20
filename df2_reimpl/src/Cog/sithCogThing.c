@@ -969,7 +969,7 @@ void sithCogThing_PlayKey(sithCog *ctx)
         {
             if ( thing->trackParams.field_C )
                 sithTrackThing_Stop(thing);
-            rdVector_Copy3(&thing->trackParams.field_48, &thing->position);
+            rdVector_Copy3(&thing->trackParams.field_24.scale, &thing->position);
         }
         if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200)

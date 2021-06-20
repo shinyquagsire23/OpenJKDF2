@@ -242,3 +242,17 @@ LABEL_8:
     puppet->tracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
     return result;
 }
+
+void sithPuppet_ResetTrack(sithThing *puppet)
+{
+    unsigned int trackNum; // esi
+    sithPuppet *v2; // eax
+
+    for ( trackNum = 0; trackNum < 4; ++trackNum )
+        rdPuppet_ResetTrack(puppet->rdthing.puppet, trackNum);
+    v2 = puppet->puppet;
+    v2->field_10 = 0;
+    v2->field_14 = -1;
+    v2->field_18 = -1;
+    v2->field_1C = -1;
+}

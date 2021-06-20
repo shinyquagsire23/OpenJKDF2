@@ -4,11 +4,14 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
+#include "World/sithUnk4.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithSave.h"
 #include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundClass.h"
+#include "Engine/sithMulti.h"
 #include "Main/jkGame.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
@@ -405,5 +408,80 @@ void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
         return;
     }
     v3->tint.z = v8;
+}
+
+int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
+{
+    sithPlayerInfo *v2; // ecx
+    sithPlayerInfo *v3; // eax
+    int v4; // ecx
+    int v5; // eax
+
+    if ( (net_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->thingType == THINGTYPE_PLAYER && thing2->thingType == THINGTYPE_PLAYER )
+    {
+        v2 = thing1->actorParams.playerinfo;
+        if ( v2 )
+        {
+            v3 = thing2->actorParams.playerinfo;
+            if ( v3 )
+            {
+                v4 = v2->teamNum;
+                if ( v4 )
+                {
+                    v5 = v3->teamNum;
+                    if ( v5 )
+                    {
+                        if ( v4 == v5 )
+                            return 1;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void sithPlayer_HandleSentDeathPkt(sithThing *thing)
+{
+    sithPlayerInfo *v1; // edi
+    char v4[128]; // [esp+8h] [ebp-80h] BYREF
+
+    v1 = thing->actorParams.playerinfo;
+
+#ifndef LINUX_TMP
+    if ( thing == g_localPlayerThing)
+        sithSector_cogMsg_SendDeath(thing, thing, 1, -1, 255);
+#endif
+
+    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
+      || (sithCog_SendMessageFromThing(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
+    {
+        sithSoundClass_StopSound(thing, 0);
+        sithThing_detachallchildren(thing);
+        sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
+        thing->physicsParams.physflags &= ~(PHYSFLAGS_CROUCHING|PHYSFLAGS_800|PHYSFLAGS_100);
+        thing->physicsParams.physflags |= (PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+        thing->actorParams.typeflags &= ~0x2000;
+        sithSector_StopPhysicsThing(thing);
+        sithWeapon_SyncPuppet(thing);
+        if ( net_isMulti )
+            sithMulti_HandleDeath(v1, thing, thing);
+        if ( thing == g_localPlayerThing )
+        {
+            if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & 0x100) != 0 )
+            {
+                sithPlayer_debug_ToNextCheckpoint(thing);
+            }
+            else if ( !sithSave_Load(sithSave_autosave_fname, 0, 0) )
+            {
+                stdString_snprintf(v4, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+                stdFnames_ChangeExt(v4, "jks");
+                sithSave_Load(v4, 0, 0);
+            }
+            sithSoundSys_ResumeMusic(1);
+            thing->thingType = THINGTYPE_PLAYER;
+            thing->lifeLeftMs = 0;
+        }
+    }
 }
 

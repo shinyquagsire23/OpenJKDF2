@@ -338,6 +338,45 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     }
 }
 
+void sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
+{
+    sithSoundClass *v3; // eax
+    sithSoundClassEntry *v4; // esi
+    unsigned int v5; // edi
+    uint32_t v6; // eax
+    int v7; // eax
+
+    v3 = thing->soundclass;
+    if ( v3 )
+    {
+        if ( (unsigned int)sc_id < 0x60 )
+        {
+            v4 = v3->entries[sc_id];
+            if ( v4 )
+            {
+                v5 = v4->listIdx;
+                if ( v5 > 1 )
+                {
+                    v6 = (uint32_t)((double)v5 * a3);
+                    if ( v6 > v5 - 1 )
+                        v6 = v5 - 1;
+                    if ( v6 > 1 )
+                    {
+                        v7 = v6 - 1;
+                        do
+                        {
+                            v4 = v4->nextSound;
+                            --v7;
+                        }
+                        while ( v7 );
+                    }
+                }
+                sithSoundClass_ThingPlaySoundclass2(thing, v4, 1.0);
+            }
+        }
+    }
+}
+
 void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
 {
     sithSoundClass *v3; // eax
@@ -352,6 +391,20 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
     }
 }
 
+void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id)
+{
+    sithSoundClass *v2; // eax
+    sithSoundClassEntry *v3; // eax
+
+    v2 = thing->soundclass;
+    if ( v2 && sc_id < 0x60 )
+    {
+        v3 = v2->entries[sc_id];
+        if ( v3 )
+            sithSoundClass_StopSound(thing, v3->sound);
+    }
+}
+
 #ifdef LINUX
 sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
 {
@@ -359,6 +412,10 @@ sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
 }
 
 void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3)
+{
+}
+
+void sithSoundClass_StopSound(sithThing *thing, sithSound* a2)
 {
 }
 #endif

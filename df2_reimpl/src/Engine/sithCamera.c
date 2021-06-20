@@ -11,6 +11,7 @@
 #include "Engine/sithTime.h"
 #include "Engine/rdCamera.h"
 #include "Engine/sithRender.h"
+#include "Engine/sithAdjoin.h"
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -429,4 +430,50 @@ int sithCamera_SetCurrentCamera(sithCamera *camera)
     }
     sithCamera_FollowFocus(sithCamera_currentCamera);
     return 1;
+}
+
+void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing *secondary)
+{
+    camera->primaryFocus = primary;
+    camera->secondaryFocus = secondary;
+}
+
+sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14)
+{
+    double v7; // st7
+    int v8; // ecx
+    sithSector *v9; // ebx
+    sithUnk3SearchEntry *i; // ecx
+    double v12; // st6
+    double v13; // st7
+    rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
+    float a6a; // [esp+28h] [ebp+10h]
+
+    a5.x = a6->x - a4->x;
+    a5.y = a6->y - a4->y;
+    a5.z = a6->z - a4->z;
+    v7 = rdVector_Normalize3Acc(&a5);
+    v8 = arg14;
+    a6a = v7;
+    v8 |= 0x800;
+    v9 = a2;
+    sithUnk3_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, v8);
+    for ( i = sithUnk3_NextSearchResult(); i; i = sithUnk3_NextSearchResult() )
+    {
+        if ( (i->collideType & 0x20) != 0 )
+        {
+            v9 = i->surface->adjoin->sector;
+        }
+        else if ( (i->collideType & 1) == 0 || (i->receiver->thingType != THINGTYPE_ITEM) && i->distance != 0.0 && i->receiver->thingType != THINGTYPE_WEAPON )
+        {
+            v12 = i->distance * a5.y + a4->y;
+            v13 = i->distance * a5.z + a4->z;
+            a6->x = i->distance * a5.x + a4->x;
+            a6->y = v12;
+            a6->z = v13;
+            break;
+        }
+    }
+    sithUnk3_SearchClose();
+    return v9;
 }

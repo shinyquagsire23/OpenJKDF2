@@ -45,6 +45,7 @@ void sithPuppet_FreeEntry(sithThing *puppet);
 void sithPuppet_sub_4E4760(sithThing *thing, int a2);
 int sithPuppet_PlayMode(sithThing *thing, signed int anim, int callback);
 int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, int callback);
+void sithPuppet_ResetTrack(sithThing *puppet);
 
 //static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
 //static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;

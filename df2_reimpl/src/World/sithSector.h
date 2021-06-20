@@ -264,6 +264,7 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
 static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
+static int (*sithSector_cogMsg_SendDeath)(sithThing *sender, sithThing *receiver, char a3, int a4, int a5) = (void*)sithSector_cogMsg_SendDeath_ADDR;
 
 #define sithSector_aEntries ((sithSectorEntry*)0x00855028)
 #define sithSector_allocPerSector (*(sithSectorAlloc**)0x008553A8)

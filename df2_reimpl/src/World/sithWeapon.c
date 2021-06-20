@@ -537,7 +537,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         if ( a9 > 0.02 )
         {
             sithSector_ThingPhysicsTick(v9, a9);
-            v17 = rdVector_Normalize3(&a5a, &v9->velocityMaybe);
+            v17 = rdVector_Normalize3(&a5a, &v9->physicsParams.velocityMaybe);
             if ( v17 > 0.0 )
             {
                 a6c = v17;
@@ -576,7 +576,7 @@ LABEL_31:
     return v9;
 }
 
-void sithWeapon_SetTimeLeft(sithThing *weapon, int a2, float timeLeft)
+void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
 {
     unsigned int v3; // eax
     

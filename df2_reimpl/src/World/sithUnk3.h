@@ -87,6 +87,7 @@ int sithUnk3_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithUnk3S
 int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3SearchEntry *a3, int isInverse);
 int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4);
 int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag);
+int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2);
 
 #if 0
 static int (*_sithUnk3_Startup)() = (void*)sithUnk3_Startup_ADDR;

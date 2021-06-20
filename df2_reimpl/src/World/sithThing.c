@@ -14,6 +14,7 @@
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"
 #include "World/sithUnk3.h"
+#include "World/sithUnk4.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithMulti.h"
@@ -26,6 +27,7 @@
 #include "Engine/sithSprite.h"
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
+#include "Engine/sithCamera.h"
 #include "Main/jkGame.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
@@ -241,9 +243,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             }
             else if ( thingIter->move_type == MOVETYPE_PATH )
             {
-#ifndef LINUX_TMP
                 sithTrackThing_Tick(thingIter, deltaSeconds);
-#endif
             }
             sithThing_TickPhysics(thingIter, deltaSeconds);
 #ifndef LINUX_TMP
@@ -1372,9 +1372,9 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
         
     if ( thing->move_type == MOVETYPE_PHYSICS )
     {
-        thing->field_268.x = thing->velocityMaybe.x;
-        thing->field_268.y = thing->velocityMaybe.y;
-        thing->field_268.z = thing->velocityMaybe.z;
+        thing->field_268.x = thing->physicsParams.velocityMaybe.x;
+        thing->field_268.y = thing->physicsParams.velocityMaybe.y;
+        thing->field_268.z = thing->physicsParams.velocityMaybe.z;
     }
     else
     {
@@ -2068,4 +2068,248 @@ void sithThing_Destroy(sithThing *thing)
     thing->thingflags |= SITH_TF_WILLBEREMOVED;
     if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_REMOVED);
+}
+
+float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass)
+{
+    float param1; // [esp+0h] [ebp-20h]
+
+    if ( amount <= 0.0 )
+        return 0.0;
+    if ( (sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+        return 0.0;
+    if ( (sender->thingflags & 0x400) != 0 && (sender->thingflags & 0x100) == 0 )
+    {
+        param1 = (float)(unsigned int)damageClass;
+        amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
+    }
+    if ( amount > 0.0 )
+    {
+        if ( sender->thingType != THINGTYPE_ACTOR )
+        {
+            if ( sender->thingType == THINGTYPE_WEAPON )
+            {
+                sithWeapon_SetTimeLeft(sender, reciever, amount);
+                return amount;
+            }
+            if ( sender->thingType != THINGTYPE_PLAYER )
+                return amount;
+        }
+        amount = amount - sithThing_Hit(sender, reciever, amount, damageClass);
+    }
+    return amount;
+}
+
+float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int flags)
+{
+    sithThing *receiver_; // edi
+    double v6; // st7
+    sithThing *v7; // eax
+    float fR; // [esp+0h] [ebp-1Ch]
+
+    if ( net_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
+    {
+        receiver_ = receiver;
+        goto LABEL_32;
+    }
+    if ( (sender->actorParams.typeflags & THING_TYPEFLAGS_8) != 0 && flags != 0x40 )
+        return 0.0;
+    if ( sender->actorParams.health <= 0.0 )
+        return amount;
+    receiver_ = receiver;
+    if ( sender->thingType == THINGTYPE_PLAYER )
+    {
+        v6 = sithInventory_SendMessageToAllWithFlag(
+                 sender,
+                 SENDERTYPE_THING,
+                 receiver->thingIdx,
+                 SITH_MESSAGE_DAMAGED,
+                 0x10,
+                 amount,
+                 *(float *)&flags,
+                 0.0,
+                 0.0);
+        amount = v6;
+        if ( v6 == 0.0 )
+            return 0.0;
+    }
+    if ( receiver )
+    {
+        if ( receiver != sender && sender->thingtype == THINGTYPE_ACTOR )
+            sithAI_SetActorFireTarget(sender->actor, 1, receiver);
+        v7 = sithThing_GetParent(receiver);
+        receiver_ = v7;
+        if ( v7
+          && flags != 0x20
+          && flags != 0x40
+          && v7->thingType == THINGTYPE_ACTOR
+          && (v7->actorParams.typeflags & THING_TYPEFLAGS_1000000) == 0
+          && sender->thingType == THINGTYPE_ACTOR )
+        {
+            amount = amount * 0.1;
+        }
+        if ( net_isMulti && (net_MultiModeFlags & 2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
+            return 0.0;
+    }
+
+    sender->actorParams.health = sender->actorParams.health - amount;
+    if ( sender == g_localPlayerThing )
+    {
+        fR = amount * 0.039999999;
+        sithPlayer_AddDynamicTint(fR, 0.0, 0.0);
+    }
+    if ( sender->actorParams.health >= 1.0 )
+    {
+LABEL_32:
+        if ( sender->animclass && sender != receiver_ && amount * 0.050000001 > _frand() )
+            sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
+        sithThing_HurtSound(sender, amount, flags);
+        return amount;
+    }
+    if ( sithCogVm_multiplayerFlags )
+        sithSector_cogMsg_SendDeath(sender, receiver_, 0, -1, 255);
+    sithThing_SpawnDeadBodyMaybe(sender, receiver_, flags);
+    return amount - sender->actorParams.health;
+}
+
+void sithThing_HurtSound(sithThing *thing, float amount, int hurtType)
+{
+    double v3; // st7
+    float v4; // [esp+8h] [ebp+8h]
+
+    if ( thing->actorParams.health > 0.0 && amount >= 3.0 )
+    {
+        v3 = amount / thing->actorParams.health * 1.5;
+        v4 = v3;
+        if ( v3 >= 0.0099999998 )
+        {
+            if ( v4 < 0.0 )
+            {
+                v4 = 0.0;
+            }
+            else if ( v4 > 1.0 )
+            {
+                v4 = 1.0;
+            }
+            switch ( hurtType )
+            {
+                case 2:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTENERGY, v4);
+                    break;
+                case 4:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTFIRE, v4);
+                    break;
+                case 8:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTMAGIC, v4);
+                    break;
+                case 16:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTSPECIAL, v4);
+                    break;
+                case 32:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_DROWNING, v4);
+                    break;
+                default:
+                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTIMPACT, v4);
+                    break;
+            }
+        }
+    }
+}
+
+void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
+{
+    int v7; // ecx
+    sithThing *v8; // eax
+    uint32_t v10; // edx
+
+    if ( (thing->thingflags & SITH_TF_DEAD) == 0 )
+    {
+        thing->actorParams.health = 0.0;
+        if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_SendMessageFromThing(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
+        {
+            sithSoundClass_StopSound(thing, 0);
+            if ( a4 == 0x20 )
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DROWNED);
+            }
+            else if ( a4 == 0x40 )
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_SPLATTERED);
+            }
+            else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATHUNDER);
+            }
+            else if ( thing->actorParams.health >= -10.0 )
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATH1);
+            }
+            else
+            {
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATH2);
+            }
+            sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
+            sithSector_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
+            if ( thing->thingType == THINGTYPE_PLAYER )
+                sithPlayer_sub_4C9150(thing, a3);
+            if ( thing == sithWorld_pCurWorld->cameraFocus )
+                sithCamera_SetCurrentCamera(&sithCamera_cameras[5]);
+            if ( thing->animclass )
+            {
+                sithPuppet_ResetTrack(thing);
+                if ( thing->actorParams.health >= -10.0 )
+                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH, 0);
+                else
+                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH2, 0);
+            }
+
+            thing->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+            if ( thing->thingType != THINGTYPE_PLAYER )
+            {
+                v7 = thing->actorParams.typeflags;
+                if ( (v7 & THING_TYPEFLAGS_20) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
+                {
+                    sithThing_SpawnThingInSector(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
+                    sithThing_Destroy(thing);
+                }
+                else
+                {
+                    if ( (v7 & THING_TYPEFLAGS_40) != 0 )
+                        thing->physicsParams.buoyancy = 0.30000001;
+                    if ( (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                    {
+                        thing->thingflags |= SITH_TF_DEAD;
+                        sithThing_detachallchildren(thing);
+                        v10 = thing->trackParams.numFrames & ~0x2980u;
+                        thing->thingType = THINGTYPE_CORPSE;
+                        thing->trackParams.numFrames = v10 | 0x51;
+                        thing->lifeLeftMs = 20000;
+                        sithSector_ThingLandIdk(thing, 0);
+                    }
+                    else
+                    {
+                        thing->lifeLeftMs = 1000;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void sithThing_detachallchildren(sithThing *thing)
+{
+    sithThing *v1; // eax
+    sithThing *v2; // esi
+
+    v1 = thing->attachedParentMaybe;
+    if ( v1 )
+    {
+        do
+        {
+            v2 = v1->childThing;
+            sithThing_DetachThing(v1);
+            v1 = v2;
+        }
+        while ( v2 );
+    }
 }

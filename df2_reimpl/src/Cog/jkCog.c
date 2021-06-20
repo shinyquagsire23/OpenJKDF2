@@ -12,6 +12,7 @@
 #include "jk.h"
 
 void jkCog_EndTarget(sithCog *ctx);
+void jkCog_SetSuperFlags(sithCog *ctx);
 void jkCog_ClearSuperFlags(sithCog *ctx);
 void jkCog_PrintUniString(sithCog *ctx);
 
@@ -29,7 +30,7 @@ static void (*jkCog_SetForceSpeed)(sithCog* ctx) = (void*)0x0040A710;
 static void (*jkCog_SetInvis)(sithCog* ctx) = (void*)0x0040A730;
 static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
 //jkCog_PrintUniString
-static void (*jkCog_SetSuperFlags)(sithCog* ctx) = (void*)0x0040A970;
+//jkCog_SetSuperFlags 
 //jkCog_ClearSuperFlags
 static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
 static void (*jkCog_EnableSaber)(sithCog* ctx) = (void*)0x0040AAA0;
@@ -116,6 +117,18 @@ int jkCog_StringsInit()
 void jkCog_EndTarget(sithCog *ctx)
 {
     jkHud_EndTarget();
+}
+
+void jkCog_SetSuperFlags(sithCog *ctx)
+{
+    int flags = sithCogVm_PopInt(ctx);
+
+    if ( (flags & 1) != 0 )
+        playerThings[playerThingIdx].field_21C = 1;
+    if ( (flags & 2) != 0 )
+        playerThings[playerThingIdx].shields = 1;
+    if ( (flags & 4) != 0 )
+        playerThings[playerThingIdx].field_224 = 1;
 }
 
 void jkCog_ClearSuperFlags(sithCog *ctx)
