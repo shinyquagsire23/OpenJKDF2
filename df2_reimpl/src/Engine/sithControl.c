@@ -557,6 +557,8 @@ void sithControl_InputInit()
 {
 }
 
+static last_use = 0;
+
 int sithControl_ReadFunctionMap(int func, int* out)
 {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
@@ -571,7 +573,10 @@ int sithControl_ReadFunctionMap(int func, int* out)
     }
     else if (func == INPUT_FUNC_ACTIVATE)
     {
-        val = !!state[SDL_SCANCODE_SPACE];
+        int cur_val = !!state[SDL_SCANCODE_SPACE];
+        if (!last_use)
+            val = cur_val;
+        last_use = !!state[SDL_SCANCODE_SPACE];
     }
     else if (func == INPUT_FUNC_FAST)
     {

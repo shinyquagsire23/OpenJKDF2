@@ -331,9 +331,7 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     }
     else if (thing->sector->flags & SITH_SF_UNDERWATER)
     {
-#ifndef LINUX_TMP
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
-#endif
     }
 #ifdef QOL_IMPROVEMENTS
     else if ( thing->thingType == THINGTYPE_PLAYER && net_isMulti)
@@ -1227,7 +1225,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
                     }
                     v150 = v64;
                     thing->physicsParams.angVel.y = v64;
-                    if ( v65 < thing->physicsParams.maxRotVel )
+                    if ( v65 < thing->physicsParams.maxRotVel ) // TODO verify
                     {
                         if ( v159 > (double)thing->physicsParams.maxRotVel )
                             v65 = thing->physicsParams.maxRotVel;
@@ -1705,4 +1703,246 @@ int sithSector_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, si
     sithSector_aEntries[v7].field_18 = a4;
     sithSector_aEntries[v7].thing = thing;
     return 1;
+}
+
+void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
+{
+    rdVector3 *v4; // edi
+    double v5; // st6
+    double v6; // st7
+    double v8; // rtt
+    double v9; // st6
+    double v10; // st7
+    double v12; // st5
+    double v18; // st6
+    double v20; // st6
+    double v22; // st6
+    double v24; // st6
+    double v26; // st6
+    double v28; // st7
+    double v29; // st6
+    double v30; // st7
+    double v31; // st5
+    double v32; // st1
+    sithSector *v33; // eax
+    double v34; // st7
+    double v35; // st6
+    double v36; // st5
+    double v37; // st7
+    double v39; // st6
+    double v42; // st6
+    double v44; // st6
+    double v46; // st5
+    double v48; // st5
+    double v51; // st7
+    double v55; // st5
+    double v56; // st6
+    double v57; // st7
+    float v58; // [esp+0h] [ebp-6Ch]
+    float v59; // [esp+0h] [ebp-6Ch]
+    float v60; // [esp+1Ch] [ebp-50h]
+    float v61; // [esp+1Ch] [ebp-50h]
+    float v62; // [esp+20h] [ebp-4Ch]
+    float v63; // [esp+20h] [ebp-4Ch]
+    rdVector3 a1a; // [esp+24h] [ebp-48h] BYREF
+    rdVector3 a3; // [esp+30h] [ebp-3Ch] BYREF
+    rdMatrix34 a; // [esp+3Ch] [ebp-30h] BYREF
+    float thinga; // [esp+70h] [ebp+4h]
+    float thingb; // [esp+70h] [ebp+4h]
+    float thingd; // [esp+70h] [ebp+4h]
+    float thingc; // [esp+70h] [ebp+4h]
+    float deltaSecondsa; // [esp+74h] [ebp+8h]
+
+    thing->physicsParams.addedVelocity.x = 0.0;
+    a1a.x = 0.0;
+    a1a.y = 0.0;
+    thing->physicsParams.addedVelocity.y = 0.0;
+    a1a.z = 0.0;
+    thing->physicsParams.addedVelocity.z = 0.0;
+    if ( (thing->physicsParams.physflags & PHYSFLAGS_ANGTHRUST) != 0 )
+    {
+        v4 = &thing->physicsParams.angVel;
+        if ( thing->physicsParams.angVel.x != 0.0
+          || thing->physicsParams.angVel.y != 0.0
+          || thing->physicsParams.angVel.z != 0.0 )
+        {
+            v58 = thing->physicsParams.airDrag - -0.2;
+            sithSector_ApplyDrag(&thing->physicsParams.angVel, v58, 0.0, deltaSeconds);
+        }
+        v5 = thing->physicsParams.maxRotVel;
+        thinga = thing->physicsParams.field_1F8.x * deltaSeconds + v4->x;
+        v6 = thing->physicsParams.field_1F8.y * deltaSeconds + thing->physicsParams.angVel.y;
+        v62 = thing->physicsParams.field_1F8.z * deltaSeconds + thing->physicsParams.angVel.z;
+        v4->x = thinga;
+        thing->physicsParams.angVel.y = v6;
+        thing->physicsParams.angVel.z = v62;
+        v8 = -v5;
+        v9 = v6;
+        v10 = v8;
+        if ( thinga < v10 )
+        {
+            v12 = v10;
+        }
+        else if ( thinga > (double)thing->physicsParams.maxRotVel )
+        {
+            v12 = thing->physicsParams.maxRotVel;
+        }
+        else
+        {
+            v12 = thinga;
+        }
+        thingb = v12;
+        v4->x = v12;
+        if ( v9 < v10 )
+        {
+            v9 = v10;
+        }
+        else if ( v9 > thing->physicsParams.maxRotVel )
+        {
+            v9 = thing->physicsParams.maxRotVel;
+        }
+        v60 = v9;
+        thing->physicsParams.angVel.y = v9;
+        if ( v62 < thing->physicsParams.maxRotVel ) // TODO verify
+        {
+            if ( v62 > (double)thing->physicsParams.maxRotVel )
+                v10 = thing->physicsParams.maxRotVel;
+            else
+                v10 = v62;
+        }
+        thing->physicsParams.angVel.z = v10;
+        v18 = thingb;
+        if ( v18 < 0.0 )
+            v18 = -v18;
+        if ( v18 <= 0.0000099999997 )
+            v20 = 0.0;
+        else
+            v20 = thingb;
+        v4->x = v20;
+        v22 = v60;
+        if ( v22 < 0.0 )
+            v22 = -v22;
+        if ( v22 <= 0.0000099999997 )
+            v24 = 0.0;
+        else
+            v24 = v60;
+        thing->physicsParams.angVel.y = v24;
+        v26 = v10;
+        if ( v26 < 0.0 )
+            v26 = -v10;
+        if ( v26 <= 0.0000099999997 )
+            v10 = 0.0;
+        thing->physicsParams.angVel.z = v10;
+    }
+    if ( thing->physicsParams.angVel.x == 0.0 && thing->physicsParams.angVel.y == 0.0 && thing->physicsParams.angVel.z == 0.0 )
+    {
+        a3.x = 0.0;
+        a3.y = 0.0;
+        a3.z = 0.0;
+    }
+    else
+    {
+        v28 = thing->physicsParams.angVel.y * deltaSeconds;
+        v29 = thing->physicsParams.angVel.z * deltaSeconds;
+        a3.x = thing->physicsParams.angVel.x * deltaSeconds;
+        a3.y = v28;
+        a3.z = v29;
+    }
+    if ( a3.x != 0.0 || a3.y != 0.0 || a3.z != 0.0 )
+    {
+        rdMatrix_BuildRotate34(&a, &a3);
+        sithUnk3_sub_4E7670(thing, &a);
+        if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
+            rdMatrix_Normalize34(&thing->lookOrientation);
+    }
+    if ( thing->physicsParams.airDrag != 0.0 )
+    {
+        v59 = thing->physicsParams.airDrag * 4.0;
+        sithSector_ApplyDrag(&thing->physicsParams.vel, v59, 0.0, deltaSeconds);
+    }
+    if ( (thing->physicsParams.physflags & PHYSFLAGS_USESTHRUST) != 0 )
+    {
+        v30 = thing->physicsParams.acceleration.y * 0.60000002;
+        v31 = thing->physicsParams.acceleration.z * 0.60000002;
+        v32 = thing->physicsParams.acceleration.x * 0.60000002;
+        thing->physicsParams.acceleration.x = v32;
+        thingd = v30;
+        v63 = v31;
+        thing->physicsParams.acceleration.y = thingd;
+        thing->physicsParams.acceleration.z = v63;
+        a1a.x = deltaSeconds * v32;
+        a1a.y = deltaSeconds * thingd;
+        a1a.z = deltaSeconds * v63;
+        rdMatrix_TransformVector34Acc(&a1a, &thing->lookOrientation);
+    }
+    if ( thing->physicsParams.mass == 0.0 || (v33 = thing->sector, (v33->flags & 8) == 0) || (thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST) != 0 )
+    {
+        v34 = a1a.z;
+    }
+    else
+    {
+        a1a.x = v33->thrust.x * deltaSeconds + a1a.x;
+        a1a.y = v33->thrust.y * deltaSeconds + a1a.y;
+        v34 = v33->thrust.z * deltaSeconds + a1a.z;
+        a1a.z = v34;
+    }
+    if ( ((thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) == 0 || (thing->thingflags & SITH_TF_DEAD) != 0) && (thing->physicsParams.physflags & PHYSFLAGS_GRAVITY) != 0 )
+    {
+        v35 = sithWorld_pCurWorld->worldGravity * deltaSeconds * thing->physicsParams.buoyancy;
+        v34 = v34 - v35;
+        thing->physicsParams.addedVelocity.z = thing->physicsParams.addedVelocity.z - v35;
+    }
+    v36 = v34;
+    v37 = a1a.x + thing->physicsParams.vel.x;
+    thingc = a1a.y + thing->physicsParams.vel.y;
+    v61 = v36 + thing->physicsParams.vel.z;
+    thing->physicsParams.vel.x = v37;
+    thing->physicsParams.vel.y = thingc;
+    thing->physicsParams.vel.z = v61;
+    v39 = v37;
+    if ( v39 < 0.0 )
+        v39 = -v37;
+    if ( v39 <= 0.0000099999997 )
+        v37 = 0.0;
+    thing->physicsParams.vel.x = v37;
+    v42 = thingc;
+    if ( v42 < 0.0 )
+        v42 = -v42;
+    if ( v42 <= 0.0000099999997 )
+        v44 = 0.0;
+    else
+        v44 = thingc;
+    thing->physicsParams.vel.y = v44;
+    v46 = v61;
+    if ( v46 < 0.0 )
+        v46 = -v46;
+    if ( v46 <= 0.0000099999997 )
+        v48 = 0.0;
+    else
+        v48 = v61;
+    thing->physicsParams.vel.z = v48;
+    if ( v37 != 0.0 || v44 != 0.0 || v48 != 0.0 )
+    {
+        thing->physicsParams.velocityMaybe.x = v37 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.y = v44 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.z = v48 * deltaSeconds;
+    }
+    if ( (thing->trackParams.numFrames & PHYSFLAGS_MIDAIR) != 0 && thing->physicsParams.acceleration.z >= 0.0 )
+    {
+        v51 = thing->field_48 - 0.0099999998;
+        deltaSecondsa = deltaSeconds * 0.2;
+        if ( thing->physicsParams.velocityMaybe.z > 0.0 && thing->physicsParams.velocityMaybe.z < (double)deltaSecondsa ) // verify first
+            thing->physicsParams.velocityMaybe.z = 0.0;
+        if ( v51 > 0.0 )
+        {
+            if ( v51 >= deltaSecondsa )
+                v51 = deltaSecondsa;
+            v55 = v51 * 0.0;
+            v56 = v55 + thing->physicsParams.velocityMaybe.y;
+            v57 = v51 * 1.0 + thing->physicsParams.velocityMaybe.z;
+            thing->physicsParams.velocityMaybe.x = v55 + thing->physicsParams.velocityMaybe.x;
+            thing->physicsParams.velocityMaybe.y = v56;
+            thing->physicsParams.velocityMaybe.z = v57;
+        }
+    }
 }

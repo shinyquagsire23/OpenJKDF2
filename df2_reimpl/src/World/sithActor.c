@@ -200,3 +200,14 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
         }
     }
 }
+
+void sithActor_Remove(sithThing *thing)
+{
+    thing->thingflags |= SITH_TF_DEAD;
+    sithThing_detachallchildren(thing);
+    thing->thingType = THINGTYPE_CORPSE;
+    thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
+    thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+    thing->lifeLeftMs = 20000;
+    sithSector_ThingLandIdk(thing, 0);
+}

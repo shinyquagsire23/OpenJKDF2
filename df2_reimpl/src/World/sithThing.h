@@ -310,9 +310,7 @@ typedef struct sithActor
     int field_1C8;
     int field_1CC;
     sithThing* field_1D0;
-    int field_1D4;
-    int field_1D8;
-    int field_1DC;
+    rdVector3 field_1D4;
     int field_1E0;
     int field_1E4;
     int field_1E8;

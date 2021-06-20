@@ -12,9 +12,10 @@
 void sithActor_Tick(sithThing *thing, int deltaMs);
 void sithActor_JumpWithVel(sithThing *thing, float vel);
 void sithActor_cogMsg_OpenDoor(sithThing *thing);
+void sithActor_Remove(sithThing *thing);
 
 //static void (*sithActor_Tick)(sithThing *thing, int deltaMs) = (void*)sithActor_Tick_ADDR;
-static void (*sithActor_Remove)(sithThing *thing) = (void*)sithActor_Remove_ADDR;
+//static void (*sithActor_Remove)(sithThing *thing) = (void*)sithActor_Remove_ADDR;
 //static void (*sithActor_cogMsg_OpenDoor)(sithThing*) = (void*)sithActor_cogMsg_OpenDoor_ADDR;
 static void (*sithActor_cogMsg_WarpThingToCheckpoint)(sithThing *a1, int a2) = (void*)sithActor_cogMsg_WarpThingToCheckpoint_ADDR;
 

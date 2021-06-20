@@ -247,70 +247,71 @@ int sithCog_Load(sithWorld *world, int a2)
     int num_cogs; // esi
     signed int result; // eax
     sithCog *cogs; // eax
-    char *v6; // esi
     unsigned int v7; // eax
     int *v8; // ebx
-    sithCog* v9; // eax
-    sithCog *v10; // edi
-    sithWorld *lvl; // ebp
-    sithCogScript *existing_cogscript; // eax
-    sithCogScript *cogscript; // esi
+    sithCog *v9; // eax
     unsigned int v15; // eax
     sithCogSymboltable *cogscript_symboltable; // edx
     int v17; // ecx
     sithCogScript *v18; // ebp
     char **v19; // edi
-    unsigned int v23; // [esp+14h] [ebp-84h]
+    void *v20; // ebx
+    char *v21; // esi
+    unsigned int v22; // [esp+10h] [ebp-88h]
+    uint32_t v23; // [esp+14h] [ebp-84h]
     char cog_fpath[32]; // [esp+18h] [ebp-80h] BYREF
 
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "cogs") )
+    if ( strcmp(stdConffile_entry.args[0].value, "world") || strcmp(stdConffile_entry.args[1].value, "cogs") )
         return 0;
     num_cogs = _atoi(stdConffile_entry.args[2].value);
     if ( !num_cogs )
         return 1;
     cogs = (sithCog *)pSithHS->alloc(sizeof(sithCog) * num_cogs);
     world->cogs = cogs;
-    if (!cogs)
+    if ( cogs )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 883, "Memory alloc failure initializing COGs.\n", 0, 0, 0, 0);
-        return 0;
-    }
-    
-    _memset(cogs, 0, sizeof(sithCog) * num_cogs);
-    world->numCogs = num_cogs;
-    world->numCogsLoaded = 0;
-    while ( stdConffile_ReadArgs() )
-    {
-        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
-            break;
-        if ( stdConffile_entry.numArgs < 2u )
-            return 0;
-
-        v9 = sithCog_LoadCogscript(stdConffile_entry.args[1].value);
-        
-        if ( v9 )
+        memset(cogs, 0, sizeof(sithCog) * num_cogs);
+        world->numCogs = num_cogs;
+        world->numCogsLoaded = 0;
+        while ( stdConffile_ReadArgs() )
         {
-            v18 = v9->cogscript;
-            char* v21 = &v9->field_4BC[0];
-            unsigned int v22 = 2;
-            for (int i = 0; i < v18->numIdk; i++)
+            if ( !strcmp(stdConffile_entry.args[0].value, "end") )
+                break;
+            if ( stdConffile_entry.numArgs < 2u )
+                return 0;
+            v9 = sithCog_LoadCogscript(stdConffile_entry.args[1].value);
+
+            if ( v9 )
             {
-                stdConffileArg* entry = &stdConffile_entry.args[2+i];
-                
-                if ( !(v18->aIdk[i].flags & 1) && stdConffile_entry.numArgs > v22 )
+                v18 = v9->cogscript;
+                v23 = 0;
+                v21 = &v9->field_4BC[0];
+                v22 = 2;
+                for (v23 = 0; v23 < v9->cogscript->numIdk; v23++)
                 {
-                    _strncpy(v21, entry->value, 0x1Fu);
-                    v21[31] = 0;
-                    v21 += 32;
-                    ++v22;
+                    v20 = &v18->aIdk[v23].flags;
+                    if ( (*(uint8_t*)v20 & 1) == 0 && stdConffile_entry.numArgs > v22 )
+                    {
+                        _strncpy(v21, stdConffile_entry.args[v22].value, 0x1Fu);
+                        v21[31] = 0;
+                        v21 += 32;
+                        ++v22;
+                    }
+                    v20 = (char *)v20 + sizeof(sithCogIdk);
                 }
             }
         }
+        result = 1;
     }
-    return 1;
+    else
+    {
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 883, "Memory alloc failure initializing COGs.\n", 0, 0, 0, 0);
+        result = 0;
+    }
+    return result;
 }
 
 sithCog* sithCog_LoadCogscript(const char *fpath)

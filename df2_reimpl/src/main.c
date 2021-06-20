@@ -98,6 +98,7 @@
 #include "World/sithUnk4.h"
 #include "World/sithMap.h"
 #include "World/sithCollide.h"
+#include "World/sithActor.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -970,6 +971,9 @@ void do_hooks()
     hook_function(sithControl_Tick_ADDR, sithControl_Tick);
     hook_function(sithControl_AddInputHandler_ADDR, sithControl_AddInputHandler);
     hook_function(sithControl_HandlePlayer_ADDR, sithControl_HandlePlayer);
+    
+    // sithActor
+    hook_function(sithActor_Remove_ADDR, sithActor_Remove);
     
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);

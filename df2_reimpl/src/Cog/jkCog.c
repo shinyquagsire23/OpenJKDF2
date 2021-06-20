@@ -8,6 +8,7 @@
 #include "World/jkSaber.h"
 #include "World/sithPlayer.h"
 #include "General/stdString.h"
+#include "Cog/sithCogPlayer.h"
 
 #include "jk.h"
 
@@ -19,7 +20,6 @@ void jkCog_PrintUniString(sithCog *ctx);
 void jkCog_SetPersuasionInfo(sithCog *ctx);
 void jkCog_SetSaberInfo(sithCog *ctx);
 
-static void (*sithCogPlayer_GetLocalPlayerThing)(sithCog* ctx) = (void*)0x004E0DA0;
 
 //static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
 static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;

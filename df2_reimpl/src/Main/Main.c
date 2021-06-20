@@ -215,10 +215,8 @@ int Main_Startup(const char *cmdline)
         jkControl_Initialize(); // ~TODO
         jkHudInv_Initialize();
         jkSaber_Startup();
-#ifndef LINUX_TMP
         jkCutscene_Initialize("ui\\cutStrings.uni"); // TODO
         jkCredits_Initialize("ui\\credits.uni"); // TODO
-#endif
         jkSmack_Initialize();
 
         if (jkRes_LoadCD(0))

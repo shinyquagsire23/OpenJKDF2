@@ -288,10 +288,7 @@ int sithWorld_NewEntry(sithWorld *world)
                   && v16->move_type == MOVETYPE_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {
-#ifndef LINUX_TMP
-                    // TODO later
                     sithSector_ThingLandIdk(v16, 1);
-#endif
                 }
             }
             if ( !sithWorld_Verify(world) )

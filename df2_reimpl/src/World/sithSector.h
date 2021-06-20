@@ -230,11 +230,12 @@ void sithSector_ThingSetLook(sithThing *thing, rdVector3 *look, float a3);
 void sithSector_ThingApplyForce(sithThing *thing, rdVector3 *forceVec);
 void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4);
 int sithSector_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing);
+void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
-static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
+//static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
 //static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
 //static void (*sithSector_ThingSetLook)(sithThing *a1, const rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
 //static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
