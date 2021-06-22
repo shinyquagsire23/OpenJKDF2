@@ -1343,7 +1343,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
     v8 = fireOffset->z;
     out->scale.y = fireOffset->y;
     out->scale.z = v8;
-    v9 = sithAI_sub_4EB790(sender->sector, out, autoaimFov, autoaimMaxDist, 16, thingList, 1028, g_flt_8BD044);
+    v9 = sithAI_FirstThingInView(sender->sector, out, autoaimFov, autoaimMaxDist, 16, thingList, 1028, g_flt_8BD044);
     if ( v9 )
     {
         v10 = 0;
@@ -1419,9 +1419,11 @@ sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTem
         fireOffset->y = v13;
         fireOffset->z = v14;
     }
+#ifndef LINUX_TMP
     if ( (sithWeapon_bAutoAim & 1) != 0 && (scaleFlags & 0x20) != 0 && (!net_isMulti || (scaleFlags & 0x40) != 0) )
         sithWeapon_ProjectileAutoAim(&v20, sender, &out, fireOffset, autoaimFov, autoaimMaxDist);
     else
+#endif
         _memcpy(&v20, &out, sizeof(v20));
     if ( aimError->x != 0.0 || aimError->y != 0.0 || aimError->z != 0.0 )
         rdMatrix_PreRotate34(&v20, aimError);

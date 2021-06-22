@@ -334,7 +334,7 @@ typedef struct sithActor
     int field_248;
     rdVector3 position;
     rdVector3 lookOrientation;
-    int field_264;
+    float field_264;
     int field_268;
     int field_26C;
     int field_270;

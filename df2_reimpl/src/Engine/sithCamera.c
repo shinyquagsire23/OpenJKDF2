@@ -477,3 +477,27 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     sithUnk3_SearchClose();
     return v9;
 }
+
+void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4)
+{
+    float v4; // eax
+    float v5; // eax
+    float v6; // ecx
+
+    sithCamera_povShakeVector1.x = a1->x;
+    sithCamera_povShakeVector1.y = a1->y;
+    v4 = a1->z;
+    sithCamera_povShakeVector2.x = a2->x;
+    sithCamera_povShakeVector1.z = v4;
+    v5 = a2->y;
+    sithCamera_povShakeF1 = a3;
+    sithCamera_povShakeVector2.y = v5;
+    v6 = a2->z;
+    sithCamera_povShakeF2 = a4;
+    sithCamera_povShakeVector2.z = v6;
+}
+
+sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam)
+{
+    return cam->primaryFocus;
+}

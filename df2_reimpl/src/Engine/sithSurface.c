@@ -10,6 +10,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithNet.h"
 #include "jk.h"
 
 int sithSurface_Startup()
@@ -1180,4 +1181,30 @@ rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a
         result->field_40 = a2;
     }
     return result;
+}
+
+void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, float damage, int damageType)
+{
+    float v4; // [esp+0h] [ebp-14h]
+
+    if ( (!net_isMulti || !receiver || (receiver->thingflags & 0x100) == 0) && (sender->surfaceFlags & 2) != 0 )
+    {
+        v4 = (float)(unsigned int)damageType;
+        sithCog_SendMessageFromSurfaceEx(sender, receiver, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
+    }
+}
+
+rdSurface* sithSurface_GetRdSurface(sithSurface *surface)
+{
+    int v1; // ecx
+    rdSurface *i; // eax
+
+    v1 = 0;
+    for ( i = sithSurface_aSurfaces; v1 <= sithSurface_numSurfaces; ++i )
+    {
+        if ( (i->flags & 0x20000) != 0 && i->sithSurfaceParent == surface )
+            break;
+        ++v1;
+    }
+    return (rdSurface *)(v1 > sithSurface_numSurfaces ? 0 : (unsigned int)i);
 }

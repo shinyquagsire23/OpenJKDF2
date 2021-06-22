@@ -1,6 +1,9 @@
 #include "sithCogAI.h"
 
+#include "Engine/sithTime.h"
 #include "AI/sithAI.h"
+#include "AI/sithAIClass.h"
+#include "jk.h"
 
 void sithCogAI_AISetMoveSpeed(sithCog *ctx);
 void sithCogAI_SetMovePos(sithCog *ctx);
@@ -13,14 +16,13 @@ void sithCogAI_GetMovePos(sithCog *ctx);
 void sithCogAI_AISetMode(sithCog *ctx);
 void sithCogAI_AIGetMode(sithCog *ctx);
 void sithCogAI_AIClearMode(sithCog *ctx);
-
-static void (*sithCogAI_FirstThingInView)(sithCog* ctx) = (void*)0x00501030;
-static void (*sithCogAI_NextThingInView)(sithCog* ctx) = (void*)0x00501150;
-static void (*sithCogAI_ThingVieweDot)(sithCog* ctx) = (void*)0x005011A0;
-static void (*sithCogAI_AISetFireTarget)(sithCog* ctx) = (void*)0x005012C0;
-static void (*sithCogAI_IsAITargetInSight)(sithCog* ctx) = (void*)0x005013C0;
-static void (*sithCogAI_AIFlee)(sithCog* ctx) = (void*)0x00501420;
-static void (*sithCogAI_AISetClass)(sithCog* ctx) = (void*)0x00501490;
+void sithCogAI_FirstThingInView(sithCog *ctx);
+void sithCogAI_NextThingInView(sithCog *ctx);
+void sithCogAI_ThingViewDot(sithCog *ctx);
+void sithCogAI_AISetFireTarget(sithCog *ctx);
+void sithCogAI_IsAITargetInSight(sithCog *ctx);
+void sithCogAI_AIFlee(sithCog *ctx);
+void sithCogAI_AISetClass(sithCog *ctx);
 
 void sithCogAI_Initialize(void* ctx)
 {
@@ -31,7 +33,7 @@ void sithCogAI_Initialize(void* ctx)
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_SetMovePos, "aisetmovepos");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_FirstThingInView, "firstthinginview");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_NextThingInView, "nextthinginview");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_ThingVieweDot, "thingviewdot");
+    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_ThingViewDot, "thingviewdot");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetFireTarget, "aisetfiretarget");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetMoveThing, "aisetmovething");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetLookPos, "aisetlookpos");
@@ -278,6 +280,186 @@ void sithCogAI_AIClearMode(sithCog *ctx)
                 if ( v4 != (v4 & mode_inv) )
                     sithAI_SetActorFireTarget(v3, 256, v4);
             }
+        }
+    }
+}
+
+void sithCogAI_FirstThingInView(sithCog *ctx)
+{
+    sithThing *v2; // eax
+    sithThing *v3; // ebx
+    int v4; // eax
+    signed int v5; // [esp+10h] [ebp-38h]
+    float v6; // [esp+14h] [ebp-34h]
+    rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
+    float a1; // [esp+4Ch] [ebp+4h]
+
+    v5 = sithCogVm_PopInt(ctx);
+    a1 = sithCogVm_PopFlex(ctx);
+    v6 = sithCogVm_PopFlex(ctx);
+    v2 = sithCogVm_PopThing(ctx);
+    v3 = v2;
+    if ( v2
+      && ((_memcpy(&v7, &v2->lookOrientation, sizeof(v7)), v4 = v2->thingType, v4 == THINGTYPE_ACTOR) || v4 == THINGTYPE_PLAYER ? (rdMatrix_PreRotate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->actorParams.eyePYR),
+                                                                                                                                   rdMatrix_PostTranslate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->position),
+                                                                                                                                   rdMatrix_PreTranslate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->actorParams.eyeOffset)) : rdMatrix_PostTranslate34(&v7, &v3->position),
+          (sithCogAI_unk1 = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogAI_apViewThings, v5, a1), sithCogAI_viewThingIdx = 0, sithCogAI_unk1 > 0)
+       && sithCogAI_apViewThings[0]) )
+    {
+        sithCogVm_PushInt(ctx, sithCogAI_apViewThings[0]->thingIdx);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void sithCogAI_NextThingInView(sithCog *ctx)
+{
+    int v1; // eax
+    sithThing *v2; // eax
+
+    v1 = ++sithCogAI_viewThingIdx;
+    if ( sithCogAI_viewThingIdx < sithCogAI_unk1 && (v2 = sithCogAI_apViewThings[v1]) != 0 )
+        sithCogVm_PushInt(ctx, v2->thingIdx);
+    else
+        sithCogVm_PushInt(ctx, -1);
+}
+
+void sithCogAI_ThingViewDot(sithCog *ctx)
+{
+    sithThing *v1; // ebp
+    sithThing *v2; // eax
+    sithThing *v3; // ebx
+    float a2; // [esp+0h] [ebp-5Ch]
+    rdVector3 v6; // [esp+14h] [ebp-48h] BYREF
+    rdVector3 v7; // [esp+20h] [ebp-3Ch] BYREF
+    rdMatrix34 v8; // [esp+2Ch] [ebp-30h] BYREF
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopThing(ctx);
+    v3 = v2;
+    if ( v1 && v2 )
+    {
+        _memcpy(&v8, &v2->lookOrientation, sizeof(v8));
+        if ( v2->thingType == THINGTYPE_ACTOR || v2->thingType == THINGTYPE_PLAYER )
+            rdMatrix_PreRotate34(&v8, &v3->actorParams.eyePYR);
+        v6 = v8.lvec;
+        v7.x = v1->position.x - v3->position.x;
+        v7.y = v1->position.y - v3->position.y;
+        v7.z = v1->position.z - v3->position.z;
+        rdVector_Normalize3Acc(&v6);
+        rdVector_Normalize3Acc(&v7);
+        a2 = v6.x * v7.x + v6.y * v7.y + v6.z * v7.z;
+        sithCogVm_PushFlex(ctx, a2);
+    }
+    else
+    {
+        sithCogVm_PushFlex(ctx, -1000.0);
+    }
+}
+
+void sithCogAI_AISetFireTarget(sithCog *ctx)
+{
+    sithThing *v1; // esi
+    sithThing *v2; // eax
+    sithActor *v3; // eax
+    unsigned int v4; // ecx
+    int v5; // ecx
+    unsigned int v6; // edx
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopThing(ctx);
+    if ( v2 )
+    {
+        if ( v2->thingtype == THINGTYPE_ACTOR )
+        {
+            v3 = v2->actor;
+            if ( v3 )
+            {
+                v4 = sithTime_curMs;
+                v3->field_1D0 = v1;
+                v3->field_204 = v4;
+                v5 = v3->mode;
+                if ( v1 )
+                    v6 = v5 | 0x20;
+                else
+                    v6 = v5 & ~0x20u;
+                v3->mode = v6;
+                if ( v6 != v5 )
+                    sithAI_SetActorFireTarget(v3, 256, v5);
+            }
+        }
+    }
+}
+
+void sithCogAI_IsAITargetInSight(sithCog *ctx)
+{
+    sithThing *v1; // eax
+    sithActor *v2; // eax
+
+    v1 = sithCogVm_PopThing(ctx);
+    if ( v1 && v1->thingType == THINGTYPE_ACTOR && v1->thingtype == THINGTYPE_ACTOR && (v2 = v1->actor) != 0 && !v2->field_1F4 )
+        sithCogVm_PushInt(ctx, 1);
+    else
+        sithCogVm_PushInt(ctx, 0);
+}
+
+void sithCogAI_AIFlee(sithCog *ctx)
+{
+    sithThing *v1; // edi
+    sithThing *v2; // eax
+    sithActor *v3; // eax
+    int v4; // ecx
+
+    v1 = sithCogVm_PopThing(ctx);
+    v2 = sithCogVm_PopThing(ctx);
+    if ( v1 )
+    {
+        if ( v2 )
+        {
+            if ( v2->thingType == THINGTYPE_ACTOR && v2->thingtype == THINGTYPE_ACTOR )
+            {
+                v3 = v2->actor;
+                if ( v3 )
+                {
+                    v4 = v3->mode;
+                    v3->field_1C0 = v1;
+                    if ( (v4 & 0x800) == 0 )
+                    {
+                        v3->mode |= 0x800;
+                        sithAI_SetActorFireTarget(v3, 256, v4);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void sithCogAI_AISetClass(sithCog *ctx)
+{
+    sithAIClass *aiclass; // esi
+    sithThing *thing; // eax
+    sithActor *v3; // ecx
+    int v4; // eax
+
+    aiclass = sithCogVm_PopAIClass(ctx);
+    thing = sithCogVm_PopThing(ctx);
+    if ( aiclass && thing && thing->thingtype == THINGTYPE_ACTOR )
+    {
+        v3 = thing->actor;
+        if ( v3 )
+        {
+            thing->aiclass = aiclass;
+            v4 = aiclass->numEntries;
+            v3->aiclass = aiclass;
+            v3->numAIClassEntries = v4;
         }
     }
 }

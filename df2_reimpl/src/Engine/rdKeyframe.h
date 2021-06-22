@@ -26,8 +26,8 @@ typedef struct rdMarkers
 
 typedef struct rdAnimEntry
 {
-    uint32_t frameNum;
-    uint32_t flags;
+    int32_t frameNum;
+    int32_t flags;
     rdVector3 pos;
     rdVector3 orientation;
     rdVector3 vel;
@@ -37,8 +37,8 @@ typedef struct rdAnimEntry
 typedef struct rdJoint
 {
     char mesh_name[32];
-    uint32_t nodeIdx;
-    uint32_t numAnimEntries;
+    int32_t nodeIdx;
+    int32_t numAnimEntries;
     rdAnimEntry* animEntries;
 } rdJoint;
 
@@ -46,14 +46,14 @@ typedef struct rdKeyframe
 {
     char name[32];
     uint32_t id;
-    uint32_t flags;
-    uint32_t numJoints;
-    uint32_t type;
+    int32_t flags;
+    int32_t numJoints;
+    int32_t type;
     float fps;
     uint32_t numFrames;
-    uint32_t numJoints2;
+    int32_t numJoints2;
     rdJoint* joints;
-    uint32_t numMarkers;
+    int32_t numMarkers;
     rdMarkers markers;
 } rdKeyframe;
 

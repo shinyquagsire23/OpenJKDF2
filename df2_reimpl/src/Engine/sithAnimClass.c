@@ -203,3 +203,30 @@ LABEL_40:
     }
     return result;
 }
+
+void sithAnimClass_Free(sithWorld *world)
+{
+    unsigned int v1; // edi
+    int v2; // ebx
+
+    if ( world->numAnimClasses )
+    {
+        v1 = 0;
+        if ( world->numAnimClassesLoaded )
+        {
+            v2 = 0;
+            do
+            {
+                stdHashTable_FreeKey(sithPuppet_hashtable, world->animclasses[v2].name);
+                ++v1;
+                ++v2;
+            }
+            while ( v1 < world->numAnimClassesLoaded );
+        }
+        pSithHS->free(world->animclasses);
+        world->animclasses = 0;
+        world->numAnimClassesLoaded = 0;
+        world->numAnimClasses = 0;
+    }
+}
+

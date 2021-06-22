@@ -94,9 +94,10 @@ enum JOINTTYPE
 int sithAnimClass_Load(sithWorld *world, int a2);
 int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath);
 sithAnimclass* sithAnimClass_LoadEntry(char *a1);
+void sithAnimClass_Free(sithWorld *world);
 
 //static int (*sithAnimClass_LoadPupEntry)(sithAnimclass *animclass, char *jkl_fname) = (void*)sithAnimClass_LoadPupEntry_ADDR;
 static int (*_sithAnimClass_Load)(sithWorld* jkl, int b) = (void*)sithAnimClass_Load_ADDR;
-static void (*sithAnimClass_Free)(sithWorld* world) = (void*)sithAnimClass_Free_ADDR;
+//static void (*sithAnimClass_Free)(sithWorld* world) = (void*)sithAnimClass_Free_ADDR;
 
 #endif // _SITHANIMCLASS_H

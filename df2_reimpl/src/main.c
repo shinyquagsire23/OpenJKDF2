@@ -75,6 +75,7 @@
 #include "Engine/sithSound.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
+#include "Engine/sithAnimClass.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -99,6 +100,7 @@
 #include "World/sithMap.h"
 #include "World/sithCollide.h"
 #include "World/sithActor.h"
+#include "World/sithTrackThing.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -259,6 +261,8 @@ void do_hooks()
     hook_function(sithCog_SendMessageFromThing_ADDR, sithCog_SendMessageFromThing);
     hook_function(sithCog_SendMessageFromSector_ADDR, sithCog_SendMessageFromSector);
     hook_function(sithCog_SendMessageFromSectorEx_ADDR, sithCog_SendMessageFromSectorEx);
+    hook_function(sithCog_SendMessageEx_ADDR, sithCog_SendMessageEx);
+    hook_function(sithCog_Free_ADDR, sithCog_Free);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
@@ -831,6 +835,16 @@ void do_hooks()
     
     // rdPuppet
     hook_function(rdPuppet_BuildJointMatrices_ADDR, rdPuppet_BuildJointMatrices);
+    //hook_function(rdPuppet_UpdateTracks_ADDR, rdPuppet_UpdateTracks);
+    hook_function(rdPuppet_AddTrack_ADDR, rdPuppet_AddTrack);
+    hook_function(rdPuppet_SetCallback_ADDR, rdPuppet_SetCallback);
+    hook_function(rdPuppet_FadeInTrack_ADDR, rdPuppet_FadeInTrack);
+    hook_function(rdPuppet_FadeOutTrack_ADDR, rdPuppet_FadeOutTrack);
+    hook_function(rdPuppet_SetTrackSpeed_ADDR, rdPuppet_SetTrackSpeed);
+    hook_function(rdPuppet_SetStatus_ADDR, rdPuppet_SetStatus);
+    hook_function(rdPuppet_PlayTrack_ADDR, rdPuppet_PlayTrack);
+    hook_function(rdPuppet_unk_ADDR, rdPuppet_unk);
+    //hook_function(rdPuppet_AdvanceTrack_ADDR, rdPuppet_AdvanceTrack);
     
     // rdSprite
     hook_function(rdSprite_New_ADDR, rdSprite_New);
@@ -956,6 +970,9 @@ void do_hooks()
     hook_function(sith_SetEpisodeName_ADDR, sith_SetEpisodeName);
     hook_function(sith_AutoSave_ADDR, sith_AutoSave);
     
+    // sithAnimClass
+    hook_function(sithAnimClass_Free_ADDR, sithAnimClass_Free);
+    
     // sithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
     hook_function(sithCamera_SetsFocus_ADDR, sithCamera_SetsFocus);
@@ -965,6 +982,8 @@ void do_hooks()
     hook_function(sithCamera_Open_ADDR, sithCamera_Open);
     hook_function(sithCamera_Close_ADDR, sithCamera_Close);
     hook_function(sithCamera_SetCameraFocus_ADDR, sithCamera_SetCameraFocus);
+    hook_function(sithCamera_SetPovShake_ADDR, sithCamera_SetPovShake);
+    hook_function(sithCamera_GetPrimaryFocus_ADDR, sithCamera_GetPrimaryFocus);
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
@@ -1171,6 +1190,7 @@ void do_hooks()
     hook_function(sithPlayer_AddDynamicTint_ADDR, sithPlayer_AddDynamicTint);
     hook_function(sithPlayer_HandleSentDeathPkt_ADDR, sithPlayer_HandleSentDeathPkt);
     hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
+    hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
     
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
@@ -1182,6 +1202,8 @@ void do_hooks()
     hook_function(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
     hook_function(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
     hook_function(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
+    hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
+    hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1194,6 +1216,10 @@ void do_hooks()
     hook_function(sithTemplate_FreeWorld_ADDR, sithTemplate_FreeWorld);
     hook_function(sithTemplate_GetEntryByName_ADDR, sithTemplate_GetEntryByName);
     hook_function(sithTemplate_CreateEntry_ADDR, sithTemplate_CreateEntry);
+    
+    // sithTrackThing
+    hook_function(sithTrackThing_RotatePivot_ADDR, sithTrackThing_RotatePivot);
+    hook_function(sithTrackThing_Rotate_ADDR, sithTrackThing_Rotate);
     
     // jkPlayer
     hook_function(jkPlayer_LoadAutosave_ADDR, jkPlayer_LoadAutosave);
@@ -1250,6 +1276,7 @@ void do_hooks()
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
     hook_function(jkSaber_Load_ADDR, jkSaber_Load);
     hook_function(jkSaber_player_thingsidkfunc_ADDR, jkSaber_player_thingsidkfunc);
+    hook_function(jkSaber_Enable_ADDR, jkSaber_Enable);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);
@@ -1381,6 +1408,9 @@ void do_hooks()
     hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
     hook_function(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
     hook_function(sithPuppet_StartKey_ADDR, sithPuppet_StartKey);
+    hook_function(sithPuppet_DefaultCallback_ADDR, sithPuppet_DefaultCallback);
+    hook_function(sithPuppet_StopKey_ADDR, sithPuppet_StopKey);
+    hook_function(sithPuppet_SetArmedMode_ADDR, sithPuppet_SetArmedMode);
     
     // sithRender
     hook_function(sithRender_Startup_ADDR, sithRender_Startup);
@@ -1433,6 +1463,7 @@ void do_hooks()
     hook_function(sithSoundClass_ThingPlaySoundclass5_ADDR, sithSoundClass_ThingPlaySoundclass5);
     hook_function(sithSoundClass_PlayThingSoundclass_ADDR, sithSoundClass_PlayThingSoundclass);
     hook_function(sithSoundClass_ThingPauseSoundclass_ADDR, sithSoundClass_ThingPauseSoundclass);
+    hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
@@ -1445,6 +1476,7 @@ void do_hooks()
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);
 
     // sithAIClass
+    hook_function(sithAIClass_Free_ADDR, sithAIClass_Free);
     
     // sithAICmd
     hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);

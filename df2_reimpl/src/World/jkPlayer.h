@@ -74,10 +74,10 @@ typedef struct jkPlayerInfo
     uint32_t field_98;
     rdPolyLine polyline;
     rdThing polylineThing;
-    uint32_t field_1A4;
+    int32_t field_1A4;
     float damage;
-    uint32_t field_1AC;
-    uint32_t field_1B0;
+    float field_1AC;
+    float field_1B0;
     uint32_t field_1B4;
     uint32_t numDamagedThings;
     sithThing* damagedThings[6];

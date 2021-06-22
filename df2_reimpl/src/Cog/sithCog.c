@@ -264,7 +264,7 @@ int sithCog_Load(sithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( strcmp(stdConffile_entry.args[0].value, "world") || strcmp(stdConffile_entry.args[1].value, "cogs") )
+    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "cogs") )
         return 0;
     num_cogs = _atoi(stdConffile_entry.args[2].value);
     if ( !num_cogs )
@@ -273,12 +273,12 @@ int sithCog_Load(sithWorld *world, int a2)
     world->cogs = cogs;
     if ( cogs )
     {
-        memset(cogs, 0, sizeof(sithCog) * num_cogs);
+        _memset(cogs, 0, sizeof(sithCog) * num_cogs);
         world->numCogs = num_cogs;
         world->numCogsLoaded = 0;
         while ( stdConffile_ReadArgs() )
         {
-            if ( !strcmp(stdConffile_entry.args[0].value, "end") )
+            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
                 break;
             if ( stdConffile_entry.numArgs < 2u )
                 return 0;
@@ -570,18 +570,19 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3)
+float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3)
 {
+    //return _sithCog_SendMessageFromThingEx(sender, receiver, message, param0, param1, param2, param3);
     int v7; // ebx
     int v8; // ebp
     sithCog *v9; // eax
-    double v10; // st7
-    double v11; // st7
+    float v10; // st7
+    float v11; // st7
     sithCog *v12; // eax
-    double v13; // st7
-    double v14; // st7
-    double v16; // st7
-    double v17; // st7
+    float v13; // st7
+    float v14; // st7
+    float v16; // st7
+    float v17; // st7
     float v19; // [esp+10h] [ebp-8h]
     int receivera; // [esp+20h] [ebp+8h]
 
@@ -606,7 +607,7 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
         if ( message == SITH_MESSAGE_DAMAGED )
         {
             v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
-            if ( v10 != -9999.9873 )
+            if ( v10 != -9999.9873046875 )
             {
                 v19 = v10;
                 param0 = v10;
@@ -615,8 +616,10 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
         else
         {
             v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
-            if ( v11 != -9999.9873 )
+            if ( v11 != -9999.9873046875 )
+            {
                 v19 = v11 + v19;
+            }
         }
     }
     v12 = sender->capture_cog;
@@ -625,7 +628,7 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
         if ( message == SITH_MESSAGE_DAMAGED )
         {
             v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
-            if ( v13 != -9999.9873 )
+            if ( v13 != -9999.9873046875 )
             {
                 v19 = v13;
                 param0 = v13;
@@ -634,7 +637,7 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
         else
         {
             v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
-            if ( v14 != -9999.9873 )
+            if ( v14 != -9999.9873046875 )
                 v19 = v14 + v19;
         }
     }
@@ -657,7 +660,7 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
                           param1,
                           param2,
                           param3);
-                if ( v16 != -9999.9873 )
+                if ( v16 != -9999.9873046875 )
                 {
                     v19 = v16;
                     param0 = v16;
@@ -677,7 +680,7 @@ double sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SI
                           param1,
                           param2,
                           param3);
-                if ( v17 != -9999.9873 )
+                if ( v17 != -9999.9873046875 )
                     v19 = v17 + v19;
             }
         }
@@ -734,7 +737,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
                           a5,
                           a6,
                           a7);
-                if ( v11 == -9999.9873 )
+                if ( v11 == -9999.9873046875 )
                 {
                     v14 = a4;
                 }
@@ -748,7 +751,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
             else
             {
                 v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, sender->field_0, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
-                if ( v12 != -9999.9873 )
+                if ( v12 != -9999.9873046875 )
                     v14 = v12 + v14;
             }
         }
@@ -804,7 +807,7 @@ float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SIT
                               param1,
                               param2,
                               param3);
-                    if ( v11 == -9999.9873 )
+                    if ( v11 == -9999.9873046875 )
                     {
                         v13 = param0;
                     }
@@ -817,7 +820,7 @@ float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SIT
                 else
                 {
                     v12 = sithCog_SendMessageEx(link->cog, message, SENDERTYPE_SECTOR, a1->id, sourceTypea, v8, link->linkid, param0, param1, param2, param3);
-                    if ( v12 != -9999.9873 )
+                    if ( v12 != -9999.9873046875 )
                         v13 = v12 + v13;
                 }
             }
@@ -947,7 +950,7 @@ float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int sende
     sithCogTrigger *trig; // eax
 
     if ( !cog )
-        return -9999.9873;
+        return -9999.9873046875;
     v12 = cog->cogscript;
     if ( (cog->flags & 1) != 0 )
     {
@@ -975,9 +978,9 @@ float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int sende
             _sprintf(std_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->cogscript_fpath);
 LABEL_18:
             DebugConsole_Print(std_genBuffer);
-            return -9999.9873;
+            return -9999.9873046875;
         }
-        return -9999.9873;
+        return -9999.9873046875;
     }
     trigIdxMax = v12->num_triggers;
     trigIdx = 0;
@@ -1000,7 +1003,7 @@ LABEL_18:
             _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received but ignored.  No handler.\n", cog->cogscript_fpath, message);
             goto LABEL_18;
         }
-        return -9999.9873;
+        return -9999.9873046875;
     }
     if ( (v13 & 0x10) != 0 )
     {
@@ -1009,7 +1012,7 @@ LABEL_18:
             _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->cogscript_fpath, message);
             goto LABEL_18;
         }
-        return -9999.9873;
+        return -9999.9873046875;
     }
     if ( message == SITH_MESSAGE_STARTUP || message == SITH_MESSAGE_SHUTDOWN || !net_isMulti || net_isServer || (v13 & 0x40) != 0 )
     {
@@ -1022,7 +1025,7 @@ LABEL_18:
         cog->params[1] = param1;
         cog->params[2] = param2;
         cog->params[3] = param3;
-        cog->returnEx = -9999.9873;
+        cog->returnEx = -9999.9873046875;
         if ( (v13 & 1) != 0 )
         {
             _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
@@ -1053,6 +1056,59 @@ LABEL_18:
         result = 0.0;
     }
     return result;
+}
+
+void sithCog_Free(sithWorld *world)
+{
+    int v2; // edi
+    sithCogScript *v4; // esi
+    uint32_t v5; // ebx
+    unsigned int i; // ebx
+    sithCog *v9; // esi
+
+    if ( world->cogScripts )
+    {
+        for (int i = 0; i < world->numCogScriptsLoaded; i++)
+        {
+            v4 = &world->cogScripts[i];
+            sithCogParse_FreeSymboltable(v4->symbolTable);
+            for (v5 = 0; v5 < v4->numIdk; v5++)
+            {
+                if (v4->aIdk[v5].desc)
+                {
+                    pSithHS->free(v4->aIdk[v5].desc);
+                    v4->aIdk[v5].desc = NULL;
+                }
+            }
+            if ( v4->script_program )
+            {
+                pSithHS->free(v4->script_program);
+                v4->script_program = 0;
+            }
+            stdHashTable_FreeKey(sithCog_pScriptHashtable, v4->cog_fpath);
+        }
+        pSithHS->free(world->cogScripts);
+        world->cogScripts = 0;
+        world->numCogScripts = 0;
+        world->numCogScriptsLoaded = 0;
+    }
+    if ( world->cogs )
+    {
+        for (int i = 0; i < world->numCogsLoaded; i++ )
+        {
+            v9 = &world->cogs[i];
+            sithCogParse_FreeSymboltable(v9->symbolTable);
+            if ( v9->heap )
+            {
+                pSithHS->free(v9->heap);
+                v9->numHeapVars = 0;
+            }
+        }
+        pSithHS->free(world->cogs);
+        world->cogs = 0;
+        world->numCogs = 0;
+        world->numCogsLoaded = 0;
+    }
 }
 
 int sithCogScript_Load(sithWorld *lvl, int a2)

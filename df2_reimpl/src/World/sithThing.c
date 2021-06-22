@@ -246,9 +246,8 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithTrackThing_Tick(thingIter, deltaSeconds);
             }
             sithThing_TickPhysics(thingIter, deltaSeconds);
-#ifndef LINUX_TMP
+
             sithPuppet_Tick(thingIter, deltaSeconds);
-#endif
             continue;
         }
 
@@ -1028,6 +1027,7 @@ int sithThing_LoadActorPlayerParams(stdConffileArg *arg, sithThing *thing, unsig
                 return 0;
             result = 1;
             thing->actorParams.maxHealth = v9;
+            thing->actorParams.health = v9;
             return result;
         case THINGPARAM_EYEOFFSET:
             v13 = _sscanf(
@@ -2152,7 +2152,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
             return 0.0;
     }
 
-    sender->actorParams.health = sender->actorParams.health - amount;
+    sender->actorParams.health -= amount;
     if ( sender == g_localPlayerThing )
     {
         fR = amount * 0.039999999;

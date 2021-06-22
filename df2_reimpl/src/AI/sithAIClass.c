@@ -204,3 +204,29 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
     }
     return result;
 }
+
+void sithAIClass_Free(sithWorld *world)
+{
+    unsigned int v1; // edi
+    int v2; // ebx
+
+    if ( world->aiclasses )
+    {
+        v1 = 0;
+        if ( world->numAIClassesLoaded )
+        {
+            v2 = 0;
+            do
+            {
+                stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[v2].fpath);
+                ++v1;
+                ++v2;
+            }
+            while ( v1 < world->numAIClassesLoaded );
+        }
+        pSithHS->free(world->aiclasses);
+        world->aiclasses = 0;
+    }
+    world->numAIClasses = 0;
+    world->numAIClassesLoaded = 0;
+}

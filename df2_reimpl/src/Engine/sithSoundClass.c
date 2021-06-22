@@ -405,6 +405,48 @@ void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id)
     }
 }
 
+void sithSoundClass_Free2(sithWorld *world)
+{
+    sithSoundClass *v2; // esi
+    sithSoundClassEntry **v3; // edi
+    int v4; // ebx
+    sithSoundClassEntry *v5; // eax
+    sithSoundClassEntry *v6; // esi
+    int v8; // [esp+8h] [ebp-4h]
+
+    if ( world->numSoundClasses )
+    {
+        for (v8 = 0; v8 < world->numSoundClassesLoaded; v8++)
+        {
+            v2 = &world->soundclasses[v8];
+            stdHashTable_FreeKey(sithSoundClass_hashtable, v2->snd_fname);
+            v3 = v2->entries;
+            v4 = 96;
+            do
+            {
+                v5 = *v3;
+                if ( *v3 )
+                {
+                    do
+                    {
+                        v6 = v5->nextSound;
+                        pSithHS->free(v5);
+                        v5 = v6;
+                    }
+                    while ( v6 );
+                }
+                ++v3;
+                --v4;
+            }
+            while ( v4 );
+        }
+        pSithHS->free(world->soundclasses);
+        world->soundclasses = 0;
+        world->numSoundClasses = 0;
+        world->numSoundClassesLoaded = 0;
+    }
+}
+
 #ifdef LINUX
 sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
 {

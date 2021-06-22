@@ -677,7 +677,6 @@ int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdM
     float v25; // [esp+Ch] [ebp-14h]
     int v26; // [esp+10h] [ebp-10h]
     rdVector3 a8a; // [esp+14h] [ebp-Ch] BYREF
-    int mesha; // [esp+34h] [ebp+14h]
 
     v9 = 0;
     v24 = 0;
@@ -686,23 +685,22 @@ int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdM
     if ( mesh->numFaces )
     {
         v10 = a6;
-        mesha = 0;
         do
         {
-            v11 = sithCollide_sub_508D20(a1, a2, a3, a4, (rdFace *)((char *)mesh->faces + v9), mesh->vertices, v10, &a8a, 0);
+            v11 = sithCollide_sub_508D20(a1, a2, a3, a4, &mesh->faces[v26], mesh->vertices, v10, &a8a, 0);
             if ( v11
               && (*v10 < (double)a3
                || v24 != 4 && v11 == 4
-               || a2->z * *(float *)((char *)&mesh->faces->normal.z + v9)
-                + a2->y * *(float *)((char *)&mesh->faces->normal.y + v9)
-                + *(float *)((char *)&mesh->faces->normal.x + v9) * a2->x < v25) )
+               || a2->z * mesh->faces[v26].normal.z
+                + a2->y * mesh->faces[v26].normal.y
+                + mesh->faces[v26].normal.x * a2->x < v25) )
             {
-                v12 = mesh->faces;
+                v12 = &mesh->faces[v26];
                 v13 = a2->y;
-                v14 = *(float *)((char *)&v12->normal.y + v9);
-                v15 = *(float *)((char *)&v12->normal.x + v9);
-                v16 = a2->z * *(float *)((char *)&v12->normal.z + v9);
-                v17 = (rdFace *)((char *)v12 + v9);
+                v14 = v12->normal.y;
+                v15 = v12->normal.x;
+                v16 = a2->z * v12->normal.z;
+                v17 = v12;
                 v18 = a8a.y;
                 v24 = v11;
                 a8->x = a8a.x;
@@ -712,13 +710,10 @@ int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdM
                 v20 = a8a.z;
                 v21 = v16 + v13 * v14 + v15 * a2->x;
                 *faceOut = v17;
-                v9 = mesha;
                 a8->z = v20;
                 v10 = a6;
                 v25 = v21;
             }
-            v9 += sizeof(rdFace);
-            mesha = v9;
         }
         while ( ++v26 < mesh->numFaces );
     }

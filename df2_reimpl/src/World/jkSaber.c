@@ -408,3 +408,23 @@ void jkSaber_player_thingsidkfunc()
 void jkSaber_nullsub_2()
 {
 }
+
+void jkSaber_Disable(sithThing *player)
+{
+    player->playerInfo->field_1A4 = 0;
+}
+
+void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
+{
+    a1->playerInfo->damage = a2;
+    a1->playerInfo->field_1AC = a3;
+    a1->playerInfo->field_1B0 = a4;
+    a1->playerInfo->field_1A4 = 1;
+    a1->playerInfo->numDamagedThings = 0;
+    a1->playerInfo->numDamagedSurfaces = 0;
+
+    _memset(a1->playerInfo->damagedThings, 0, sizeof(a1->playerInfo->damagedThings));
+    _memset(a1->playerInfo->damagedSurfaces, 0, sizeof(a1->playerInfo->damagedSurfaces));
+    
+    a1->playerInfo->lastSparkSpawnMs = 0;
+}

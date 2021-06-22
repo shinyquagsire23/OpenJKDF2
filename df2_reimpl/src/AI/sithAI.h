@@ -31,7 +31,7 @@
 #define sithAI_sub_4EB300_ADDR (0x004EB300)
 #define sithAI_physidk_ADDR (0x004EB4B0)
 #define sithAI_sub_4EB640_ADDR (0x004EB640)
-#define sithAI_sub_4EB790_ADDR (0x004EB790)
+#define sithAI_FirstThingInView_ADDR (0x004EB790)
 #define sithAI_sub_4EB860_ADDR (0x004EB860)
 #define sithAI_sub_4EB880_ADDR (0x004EB880)
 #define sithAI_RandomFireVector_ADDR (0x004EB920)
@@ -85,8 +85,9 @@ static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI
 //static void (*sithAI_TickActor)(sithActor *actor) = (void*)sithAI_TickActor_ADDR;
 //static void (*sithAI_TickAll)() = (void*)sithAI_TickAll_ADDR;
 //static void (*sithAI_SetActorFireTarget)(sithActor *a1, int a2, int a3) = (void*)sithAI_SetActorFireTarget_ADDR;
-static int (*sithAI_sub_4EB790)(sithSector *a1, rdMatrix34 *a2, float a3, float a4, int a5, sithThing **a6, int a7, float a8) = (void*)sithAI_sub_4EB790_ADDR;
+static int (*sithAI_FirstThingInView)(sithSector *a1, rdMatrix34 *a2, float a3, float a4, int a5, sithThing **a6, int a7, float a8) = (void*)sithAI_FirstThingInView_ADDR;
 
+static int (*sithAI_weapon_fire)(sithActor *a1, float a2, float a3, float a4, float a5, int a6, int a7) = (void*)sithAI_weapon_fire_ADDR;
 //static int (*sithAI_SetMoveThing)(sithActor *actor, rdVector3 *movePos, float moveSpeed) = (void*)sithAI_SetMoveThing_ADDR;
 static void (*sithAI_Jump)(sithActor *actor, rdVector3 *a2, float a3) = (void*)sithAI_Jump_ADDR;
 //static void (*sithAI_SetLookFrame)(sithActor *actor, rdVector3 *lookPos) = (void*)sithAI_SetLookFrame_ADDR;

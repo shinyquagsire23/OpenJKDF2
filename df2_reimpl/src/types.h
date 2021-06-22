@@ -88,6 +88,7 @@ typedef struct sithTimerInfo sithTimerInfo;
 typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 typedef struct sithMap sithMap;
 typedef struct sithPlayerInfo sithPlayerInfo;
+typedef struct sithAnimclassEntry sithAnimclassEntry;
 
 typedef struct sithSave_Header sithSave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;

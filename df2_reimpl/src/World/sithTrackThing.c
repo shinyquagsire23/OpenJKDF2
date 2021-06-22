@@ -460,3 +460,89 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
     }
 }
 
+void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, float a4)
+{
+    double v4; // st7
+    float v5; // esi
+    float v6; // ecx
+    double v7; // st7
+
+    thing->trackParams.field_C |= 0x12u;
+    sithSoundClass_ThingPlaySoundclass4(thing, 3u);
+    sithSoundClass_ThingPlaySoundclass4(thing, 5u);
+    v4 = thing->position.x;
+    thing->trackParams.field_58.x = a2->x;
+    v5 = a2->y;
+    thing->curframe = -1;
+    v6 = a2->z;
+    thing->trackParams.field_58.y = v5;
+    thing->trackParams.field_58.z = v6;
+    v7 = v4 - thing->trackParams.field_58.x;
+    _memcpy(&thing->trackParams.field_24, &thing->lookOrientation, sizeof(thing->trackParams.field_24));
+    thing->trackParams.field_24.scale.x = v7;
+    thing->trackParams.field_24.scale.y = thing->position.y - thing->trackParams.field_58.y;
+    thing->trackParams.field_24.scale.z = thing->position.z - thing->trackParams.field_58.z;
+    thing->trackParams.field_64 = *a3;
+    thing->field_24C = 0.0;
+    thing->field_250 = 0;
+    thing->trackParams.field_54 = 1.0 / a4;
+}
+
+void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
+{
+    double v2; // st7
+    double v4; // st6
+    double v5; // st6
+    double v6; // st6
+    double v7; // st4
+    double v8; // st5
+    float v9; // [esp+14h] [ebp+4h]
+    float v10; // [esp+14h] [ebp+4h]
+    float v11; // [esp+14h] [ebp+4h]
+
+    v2 = 0.0;
+    if ( rot->x != 0.0 )
+    {
+        v4 = 360.0 / rot->x;
+        if ( v4 > 0.0 )
+        {
+            v9 = v4;
+            v2 = v9;
+        }
+    }
+    if ( rot->y != 0.0 )
+    {
+        v5 = 360.0 / rot->y;
+        if ( v5 > v2 )
+        {
+            v10 = v5;
+            v2 = v10;
+        }
+    }
+    if ( rot->z != 0.0 )
+    {
+        v6 = 360.0 / rot->z;
+        if ( v6 > v2 )
+        {
+            v11 = v6;
+            v2 = v11;
+        }
+    }
+    if ( v2 != 0.0 )
+    {
+        trackThing->trackParams.field_C |= 0x42u;
+        _memcpy(&trackThing->trackParams.field_24, &trackThing->lookOrientation, sizeof(trackThing->trackParams.field_24));
+        v7 = rot->y * v2;
+        v8 = rot->z * v2;
+        trackThing->trackParams.field_64.x = v2 * rot->x;
+        trackThing->trackParams.field_64.y = v7;
+        trackThing->trackParams.field_64.z = v8;
+        trackThing->trackParams.field_54 = 1.0 / v2;
+        trackThing->trackParams.field_24.scale.x = 0.0;
+        trackThing->trackParams.field_24.scale.y = 0.0;
+        trackThing->trackParams.field_24.scale.z = 0.0;
+        trackThing->field_24C = 0.0;
+        trackThing->field_250 = 0;
+        trackThing->curframe = -1;
+    }
+}

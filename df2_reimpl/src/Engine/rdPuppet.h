@@ -23,7 +23,7 @@
 #define rdPuppet_unk_ADDR (0x0043EE60)
 #define rdPuppet_BuildJointMatrices_ADDR (0x0043EEB0)
 
-typedef void (*rdPuppetTrackCallback_t)(sithThing*, int, int);
+typedef void (*rdPuppetTrackCallback_t)(sithThing*, uint32_t, uint32_t);
 
 typedef struct rdPuppetTrack
 {
@@ -44,22 +44,8 @@ typedef struct rdPuppetTrack
     int field_38;
     int field_3C;
     int field_40;
-    int field_44;
-    int field_48;
-    int field_4C;
-    int field_50;
-    int field_54;
-    int field_58;
-    int field_5C;
-    int field_60;
-    int field_64;
-    int field_68;
-    int field_6C;
-    int field_70;
-    int field_74;
-    int field_78;
-    int field_7C;
-    int field_80;
+    float field_44[8];
+    int field_64[8];
     int field_84;
     int field_88;
     int field_8C;
@@ -117,15 +103,27 @@ rdPuppet* rdPuppet_New(rdThing *thing);
 void rdPuppet_Free(rdPuppet *puppet);
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix);
 int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum);
+int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2);
+int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int highPri);
+void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, void *callback);
+int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, float speed);
+void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3);
+int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, float speed);
+void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, float speed);
+int rdPuppet_SetStatus(rdPuppet *puppet, int trackNum, int status);
+int rdPuppet_PlayTrack(rdPuppet *puppet, int trackNum);
+void rdPuppet_unk(rdPuppet *puppet, int trackNum);
 
-static void (*rdPuppet_unk)(rdPuppet *a1, int a2) = (void*)rdPuppet_unk_ADDR;
-static int (*rdPuppet_AddTrack)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4) = (void*)rdPuppet_AddTrack_ADDR;
-static void (*rdPuppet_SetCallback)(rdPuppet *a1, int trackNum, int callback) = (void*)rdPuppet_SetCallback_ADDR;
-static int (*rdPuppet_UpdateTracks)(rdPuppet *puppet, float a2) = (void*)rdPuppet_UpdateTracks_ADDR;
-static int (*rdPuppet_SetStatus)(rdPuppet *a1, int a2, int a3) = (void*)rdPuppet_SetStatus_ADDR;
-static void (*rdPuppet_SetTrackSpeed)(rdPuppet *a1, int a2, float a3) = (void*)rdPuppet_SetTrackSpeed_ADDR;
-static int (*rdPuppet_PlayTrack)(rdPuppet *a1, int a2) = (void*)rdPuppet_PlayTrack_ADDR;
-static int (*rdPuppet_FadeInTrack)(rdPuppet *a1, int a2, float a3) = (void*)rdPuppet_FadeInTrack_ADDR;
+//static void (*rdPuppet_unk)(rdPuppet *a1, int a2) = (void*)rdPuppet_unk_ADDR;
+//static int (*rdPuppet_AddTrack)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4) = (void*)rdPuppet_AddTrack_ADDR;
+//static void (*rdPuppet_SetCallback)(rdPuppet *a1, int trackNum, int callback) = (void*)rdPuppet_SetCallback_ADDR;
+static int (*_rdPuppet_UpdateTracks)(rdPuppet *puppet, float a2) = (void*)rdPuppet_UpdateTracks_ADDR;
+//static int (*rdPuppet_SetStatus)(rdPuppet *a1, int a2, int a3) = (void*)rdPuppet_SetStatus_ADDR;
+//static void (*rdPuppet_SetTrackSpeed)(rdPuppet *a1, int a2, float a3) = (void*)rdPuppet_SetTrackSpeed_ADDR;
+//static int (*rdPuppet_PlayTrack)(rdPuppet *a1, int a2) = (void*)rdPuppet_PlayTrack_ADDR;
+//static int (*rdPuppet_FadeInTrack)(rdPuppet *a1, int a2, float a3) = (void*)rdPuppet_FadeInTrack_ADDR;
+static void (*_rdPuppet_AdvanceTrack)(rdPuppet *puppet, int trackNum, float a3) = (void*)rdPuppet_AdvanceTrack_ADDR;
+//static int (*rdPuppet_FadeOutTrack)(rdPuppet *a1, int a2, float a3) = (void*)rdPuppet_FadeOutTrack_ADDR;
 //static void (__cdecl *rdPuppet_BuildJointMatrices)(rdThing *thing_1, rdMatrix34 *matrix) = (void*)rdPuppet_BuildJointMatrices_ADDR;
 
 #endif // _RDPUPPET_H
