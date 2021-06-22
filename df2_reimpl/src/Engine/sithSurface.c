@@ -901,7 +901,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     else
     {
         v18 = atan2(v29 / v26, 1.0) * 57.295784;
-        if ( v26 > 0.0 && v29 > 0.0 )
+        if ( v26 < 0.0 && v29 > 0.0 )
             v18 = v18 - -180.0;
         if ( v26 < 0.0 && v29 < 0.0 )
             v18 = v18 - 180.0;

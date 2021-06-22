@@ -1082,6 +1082,7 @@ void do_hooks()
     hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);
     
     // sithCollide
+#if 0
     hook_function(sithCollide_IsSphereInSector_ADDR, sithCollide_IsSphereInSector);
     hook_function(sithCollide_sub_5080D0_ADDR, sithCollide_sub_5080D0);
     hook_function(sithCollide_sub_508540_ADDR, sithCollide_sub_508540);
@@ -1091,6 +1092,7 @@ void do_hooks()
     hook_function(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
     hook_function(sithCollide_sub_508400_ADDR, sithCollide_sub_508400);
     hook_function(sithCollide_sub_508990_ADDR, sithCollide_sub_508990);
+#endif
 
     // sithTime
     hook_function(sithTime_Tick_ADDR, sithTime_Tick);
@@ -1192,6 +1194,7 @@ void do_hooks()
     hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
     hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
     
+#if 0
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
     hook_function(sithSurface_SurfaceLightAnim_ADDR, sithSurface_SurfaceLightAnim);
@@ -1204,6 +1207,7 @@ void do_hooks()
     hook_function(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
     hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
+#endif
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1220,6 +1224,9 @@ void do_hooks()
     // sithTrackThing
     hook_function(sithTrackThing_RotatePivot_ADDR, sithTrackThing_RotatePivot);
     hook_function(sithTrackThing_Rotate_ADDR, sithTrackThing_Rotate);
+    hook_function(sithTrackThing_SkipToFrame_ADDR, sithTrackThing_SkipToFrame);
+    hook_function(sithTrackThing_PathMovePause_ADDR, sithTrackThing_PathMovePause);
+    hook_function(sithTrackThing_PathMoveResume_ADDR, sithTrackThing_PathMoveResume);
     
     // jkPlayer
     hook_function(jkPlayer_LoadAutosave_ADDR, jkPlayer_LoadAutosave);
@@ -1464,6 +1471,9 @@ void do_hooks()
     hook_function(sithSoundClass_PlayThingSoundclass_ADDR, sithSoundClass_PlayThingSoundclass);
     hook_function(sithSoundClass_ThingPauseSoundclass_ADDR, sithSoundClass_ThingPauseSoundclass);
     hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
+    
+    // sithSoundSys
+    hook_function(sithSoundSys_SectorSound_ADDR, sithSoundSys_SectorSound);
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
@@ -1735,5 +1745,64 @@ void do_hooks()
     hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
     hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
     hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
+
+    //hook_function_inv(sithSurface_Startup_ADDR, sithSurface_Startup);
+    //hook_function_inv(sithSurface_Shutdown_ADDR, sithSurface_Shutdown);
+    //hook_function_inv(sithSurface_Open_ADDR, sithSurface_Open);
+    //hook_function_inv(sithSurface_Verify_ADDR, sithSurface_Verify);
+    //hook_function_inv(sithSurface_Load_ADDR, sithSurface_Load);
+    //hook_function_inv(sithSurface_GetIdxFromPtr_ADDR, sithSurface_GetIdxFromPtr);
+    //hook_function_inv(sithSurface_UnsetAdjoins_ADDR, sithSurface_UnsetAdjoins);
+    //hook_function_inv(sithSurface_SetAdjoins_ADDR, sithSurface_SetAdjoins);
+    //hook_function_inv(sithSurface_SurfaceAnim_ADDR, sithSurface_SurfaceAnim);
+    //hook_function_inv(sithSurface_Startup2_ADDR, sithSurface_Startup2);
+    //hook_function_inv(sithSurface_Startup3_ADDR, sithSurface_Startup3);
+    //hook_function_inv(sithSurface_SetSectorLight_ADDR, sithSurface_SetSectorLight);
+    //hook_function_inv(sithSurface_Free_ADDR, sithSurface_Free);
+    //hook_function_inv(sithSurface_Tick_ADDR, sithSurface_Tick);
+    //hook_function_inv(sithSurface_ScrollSky_ADDR, sithSurface_ScrollSky);
+    //hook_function_inv(sithSurface_StopAnim_ADDR, sithSurface_StopAnim);
+    //hook_function_inv(sithSurface_GetSurfaceAnim_ADDR, sithSurface_GetSurfaceAnim);
+    //hook_function_inv(sithSurface_SurfaceLightAnim_ADDR, sithSurface_SurfaceLightAnim);
+    //hook_function_inv(sithSurface_SlideWall_ADDR, sithSurface_SlideWall);
+    //hook_function_inv(sithSurface_MaterialAnim_ADDR, sithSurface_MaterialAnim);
+    //hook_function_inv(sithSurface_DetachThing_ADDR, sithSurface_DetachThing);
+    //hook_function_inv(sithSurface_GetCenter_ADDR, sithSurface_GetCenter);
+    //hook_function_inv(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
+    //hook_function_inv(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
+    //hook_function_inv(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
+    //hook_function_inv(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
+    //hook_function_inv(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
+
+    //hook_function_inv(sithCollide_IsSphereInSector_ADDR, sithCollide_IsSphereInSector);
+    //hook_function_inv(sithCollide_sub_5080D0_ADDR, sithCollide_sub_5080D0);
+    //hook_function_inv(sithCollide_sub_508540_ADDR, sithCollide_sub_508540);
+    //hook_function_inv(sithCollide_sub_508D20_ADDR, sithCollide_sub_508D20);
+    //hook_function_inv(sithCollide_sub_508BE0_ADDR, sithCollide_sub_508BE0); // regressed
+    //hook_function_inv(sithCollide_sub_508750_ADDR, sithCollide_sub_508750);
+    //hook_function_inv(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
+    //hook_function_inv(sithCollide_sub_508400_ADDR, sithCollide_sub_508400);
+    //hook_function_inv(sithCollide_sub_508990_ADDR, sithCollide_sub_508990);
+
+#if 0
+    hook_function_inv(sithUnk3_Startup_ADDR, sithUnk3_Startup);
+    hook_function_inv(sithUnk3_Shutdown_ADDR, sithUnk3_Shutdown);
+    hook_function_inv(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
+    hook_function_inv(sithUnk3_RegisterHitHandler_ADDR, sithUnk3_RegisterHitHandler);
+    hook_function_inv(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
+    hook_function_inv(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
+    hook_function_inv(sithUnk3_SearchClose_ADDR, sithUnk3_SearchClose);
+    hook_function_inv(sithUnk3_GetSectorLookAt_ADDR, sithUnk3_GetSectorLookAt);
+    hook_function_inv(sithUnk3_FallHurt_ADDR, sithUnk3_FallHurt);
+    hook_function_inv(sithUnk3_sub_4E7670_ADDR, sithUnk3_sub_4E7670);
+    hook_function_inv(sithUnk3_UpdateThingCollision_ADDR, sithUnk3_UpdateThingCollision);
+    hook_function_inv(sithUnk3_DefaultHitHandler_ADDR, sithUnk3_DefaultHitHandler);
+    hook_function_inv(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
+    hook_function_inv(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
+    hook_function_inv(sithUnk3_HasLos_ADDR, sithUnk3_HasLos);
+    hook_function_inv(sithUnk3_sub_4E77A0_ADDR, sithUnk3_sub_4E77A0);
+    hook_function_inv(sithUnk3_DebrisPlayerCollide_ADDR, sithUnk3_DebrisPlayerCollide);
+#endif
+    
 #endif
 }

@@ -3,6 +3,7 @@
 #include "Engine/sithSound.h"
 #include "Win95/stdSound.h"
 #include "Win95/stdMci.h"
+#include "World/sithSector.h"
 #include "jk.h"
 
 int sithSoundSys_Startup()
@@ -53,7 +54,7 @@ int sithSoundSys_Open()
 
     sithSoundSys_dword_836BF8 = 0;
     sithSoundSys_dword_836BFC = 0;
-    sithSoundSys_dword_836BF4 = 0;
+    sithSoundSys_pLastSectorSoundSector = 0;
 
     sithSoundSys_bOpened = 1;
     return 1;
@@ -117,6 +118,14 @@ void sithSoundSys_FreeThing(sithThing *thing)
             }
         }
     }
+}
+
+void sithSoundSys_SectorSound(sithSector *sector, sithSound *sound, float vol)
+{
+    sector->sectorSound = sound;
+    sector->sectorSoundVol = vol;
+    if ( sithSoundSys_pLastSectorSoundSector == sector )
+        sithSoundSys_pLastSectorSoundSector = 0;
 }
 
 #ifdef LINUX

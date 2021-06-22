@@ -472,7 +472,7 @@ int sithCollide_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     if ( v13 > a3 )
         return 0;
     v18 = -(a2->y * surfaceNormal->y + a2->z * surfaceNormal->z + a2->x * surfaceNormal->x);
-    if ( v17 <= 0.0 )
+    if ( v17 < 0.0 )
     {
         if ( (a8 & 0x400) != 0 )
             *a7 = *a7 + a4;

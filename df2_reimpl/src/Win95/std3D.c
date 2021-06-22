@@ -858,8 +858,8 @@ void std3D_DrawRenderList()
                 }
                 else
                 {
-                    glDepthFunc(GL_LESS);
-                    glClear(GL_DEPTH_BUFFER_BIT);
+                    glDepthFunc(GL_ALWAYS);
+                    //glClear(GL_DEPTH_BUFFER_BIT);
                 }
                 
                 if (changed_flags & 0x1000)

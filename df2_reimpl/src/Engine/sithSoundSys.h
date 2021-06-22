@@ -51,7 +51,7 @@
 #define sithSoundSys_aIdk ((int*)0x00836B68)
 #define sithSoundSys_dword_836BE8 (*(int*)0x00836BE8)
 #define sithSoundSys_bOpened (*(int*)0x00836BEC)
-#define sithSoundSys_dword_836BF4 (*(int*)0x00836BF4)
+#define sithSoundSys_pLastSectorSoundSector (*(sithSector**)0x00836BF4)
 #define sithSoundSys_dword_836BF8 (*(int*)0x00836BF8)
 #define sithSoundSys_dword_836BFC (*(int*)0x00836BFC)
 
@@ -97,6 +97,7 @@ typedef struct sithPlayingSound
 int sithSoundSys_Startup();
 int sithSoundSys_Open();
 void sithSoundSys_FreeThing(sithThing *thing);
+void sithSoundSys_SectorSound(sithSector *sector, sithSound *sound, float vol);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
 static void (*sithSoundSys_Shutdown)() = (void*)sithSoundSys_Shutdown_ADDR;
@@ -110,7 +111,7 @@ static int (*sithSoundSys_StopSound)(sithPlayingSound *a1) = (void*)sithSoundSys
 //static sithPlayingSound* (*sithSoundSys_GetSoundFromRef)(int a1) = (void*)sithSoundSys_GetSoundFromRef_ADDR;
 static void (*sithSoundSys_FadeSound)(sithPlayingSound *sound, float vol_, float fadeintime_) = (void*)sithSoundSys_FadeSound_ADDR;
 static void (*sithSoundSys_SetPitch)(sithPlayingSound *a1, float pitch, float changetime) = (void*)sithSoundSys_SetPitch_ADDR;
-static void (*sithSoundSys_SectorSound)(sithSector *a1, sithSound *a2, float a3) = (void*)sithSoundSys_SectorSound_ADDR;
+//static void (*sithSoundSys_SectorSound)(sithSector *a1, sithSound *a2, float a3) = (void*)sithSoundSys_SectorSound_ADDR;
 
 #ifdef LINUX
 void sithSoundSys_Tick(float a1);

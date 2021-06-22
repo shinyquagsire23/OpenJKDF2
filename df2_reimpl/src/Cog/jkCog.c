@@ -29,6 +29,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx);
 void jkCog_PlayPovKey(sithCog *ctx);
 void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_SetWaggle(sithCog *ctx);
+void jkCog_GetChoice(sithCog *ctx);
 
 //static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
 //static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;
@@ -64,7 +65,7 @@ static void (*jkCog_StringConcatFormattedFlex)(sithCog* ctx) = (void*)0x0040B100
 static void (*jkCog_StringConcatVector)(sithCog* ctx) = (void*)0x0040B1C0;
 static void (*jkCog_StringOutput)(sithCog* ctx) = (void*)0x0040B270;
 //static void (*jkCog_GetSaberCam)(sithCog* ctx) = (void*)0x0040B3B0;
-static void (*jkCog_GetChoice)(sithCog* ctx) = (void*)0x0040B3D0;
+//static void (*jkCog_GetChoice)(sithCog* ctx) = (void*)0x0040B3D0;
 
 void jkCog_RegisterVerbs()
 {
@@ -495,4 +496,9 @@ void jkCog_SetWaggle(sithCog *ctx)
         if ( v2->thingType == THINGTYPE_PLAYER )
             jkPlayer_SetWaggle(v2, &a2, a1a);
     }
+}
+
+void jkCog_GetChoice(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, jkPlayer_GetChoice());
 }

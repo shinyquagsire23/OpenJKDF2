@@ -546,3 +546,54 @@ void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
         trackThing->curframe = -1;
     }
 }
+
+void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, float a3)
+{
+    sithThingFrame *goalFrame; // eax
+    float v5; // st7
+
+    if ( goalframeNum < trackThing->trackParams.loadedFrames )
+    {
+        trackThing->goalframe = goalframeNum;
+        trackThing->trackParams.field_C &= ~0x4;
+        trackThing->trackParams.field_20 = a3;
+        sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_STARTMOVE);
+        sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
+
+        goalFrame = &trackThing->trackParams.frames[trackThing->goalframe];
+
+        trackThing->trackParams.vel.x = goalFrame->pos.x - trackThing->position.x;
+        trackThing->trackParams.vel.y = goalFrame->pos.y - trackThing->position.y;
+        trackThing->trackParams.vel.z = goalFrame->pos.z - trackThing->position.z;
+        
+        v5 = rdVector_Normalize3Acc(&trackThing->trackParams.vel);
+        if ( v5 != 0.0 )
+        {
+            trackThing->field_250 = 0;
+            trackThing->trackParams.field_C |= 1;
+            trackThing->trackParams.field_1C = v5 / trackThing->trackParams.field_20;
+        }
+    }
+}
+
+int sithTrackThing_PathMovePause(sithThing *trackThing)
+{
+    if ( (trackThing->trackParams.field_C & 3) == 0 )
+        return 0;
+
+    sithSoundClass_ThingPauseSoundclass(trackThing, SITH_SC_MOVING);
+
+    trackThing->trackParams.field_C |= 0x80;
+    return 1;
+}
+
+int sithTrackThing_PathMoveResume(sithThing *trackThing)
+{
+    if (!(trackThing->trackParams.field_C & 0x80))
+        return 0;
+
+    sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
+
+    trackThing->trackParams.field_C &= ~0x80;
+    return 1;
+}

@@ -3,6 +3,7 @@
 #include "Engine/sithTime.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
+#include "Main/jkGame.h"
 #include "jk.h"
 
 void sithCogAI_AISetMoveSpeed(sithCog *ctx);
@@ -81,6 +82,10 @@ void sithCogAI_SetMovePos(sithCog *ctx)
     if ( sithCogVm_PopVector3(ctx, &v3) )
     {
         v1 = sithCogVm_PopThing(ctx);
+        
+        // Added
+        if (g_debugmodeFlags & 1) return;
+        
         if ( v1 )
         {
             if ( v1->thingtype == THINGTYPE_ACTOR )
@@ -104,6 +109,10 @@ void sithCogAI_AIJump(sithCog *ctx)
     a1 = sithCogVm_PopFlex(ctx);
     v2 = sithCogVm_PopVector3(ctx, &v5);
     v3 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v3 && v2 && v3->attach_flags && v3->thingtype == THINGTYPE_ACTOR )
     {
         v4 = v3->actor;
@@ -121,6 +130,10 @@ void sithCogAI_AISetMoveFrame(sithCog *ctx)
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v2 )
     {
         if ( v2->thingtype == THINGTYPE_ACTOR )
@@ -147,6 +160,10 @@ void sithCogAI_AISetMoveThing(sithCog *ctx)
 
     v1 = sithCogVm_PopThing(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v2 && v1 && v2->thingtype == THINGTYPE_ACTOR )
     {
         v3 = v2->actor;
@@ -167,6 +184,10 @@ void sithCogAI_AISetLookPos(sithCog *ctx)
     if ( sithCogVm_PopVector3(ctx, &v3) )
     {
         v1 = sithCogVm_PopThing(ctx);
+        
+        // Added
+        if (g_debugmodeFlags & 1) return;
+        
         if ( v1 )
         {
             if ( v1->thingtype == THINGTYPE_ACTOR )
@@ -188,6 +209,10 @@ void sithCogAI_AISetLookFrame(sithCog *ctx)
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v2 )
     {
         if ( v2->thingtype == THINGTYPE_ACTOR )
@@ -229,6 +254,10 @@ void sithCogAI_AISetMode(sithCog *ctx)
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v2 )
     {
         if ( v2->thingtype == THINGTYPE_ACTOR )
@@ -267,6 +296,10 @@ void sithCogAI_AIClearMode(sithCog *ctx)
 
     mode = sithCogVm_PopInt(ctx);
     thing = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( thing )
     {
         if ( thing->thingtype == THINGTYPE_ACTOR )
@@ -298,6 +331,14 @@ void sithCogAI_FirstThingInView(sithCog *ctx)
     a1 = sithCogVm_PopFlex(ctx);
     v6 = sithCogVm_PopFlex(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1)
+    {
+        sithCogVm_PushInt(ctx, -1);
+        return;
+    }
+    
     v3 = v2;
     if ( v2
       && ((_memcpy(&v7, &v2->lookOrientation, sizeof(v7)), v4 = v2->thingType, v4 == THINGTYPE_ACTOR) || v4 == THINGTYPE_PLAYER ? (rdMatrix_PreRotate34(
@@ -344,6 +385,14 @@ void sithCogAI_ThingViewDot(sithCog *ctx)
 
     v1 = sithCogVm_PopThing(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1)
+    {
+        sithCogVm_PushFlex(ctx, -1000.0);
+        return;
+    }
+    
     v3 = v2;
     if ( v1 && v2 )
     {
@@ -376,6 +425,10 @@ void sithCogAI_AISetFireTarget(sithCog *ctx)
 
     v1 = sithCogVm_PopThing(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v2 )
     {
         if ( v2->thingtype == THINGTYPE_ACTOR )
@@ -420,6 +473,10 @@ void sithCogAI_AIFlee(sithCog *ctx)
 
     v1 = sithCogVm_PopThing(ctx);
     v2 = sithCogVm_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1) return;
+    
     if ( v1 )
     {
         if ( v2 )

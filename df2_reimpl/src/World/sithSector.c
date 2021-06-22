@@ -153,9 +153,9 @@ int sithSector_Load(sithWorld *world, int tmp)
                 if ( !stdConffile_ReadLine() )
                     break;
             }
-            if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &sectors->field_54) == 2 )
+            if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &sectors->sectorSoundVol) == 2 )
             {
-                sectors->field_50 = sithSound_LoadEntry(sound_fname, 0);
+                sectors->sectorSound = sithSound_LoadEntry(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }
@@ -817,7 +817,7 @@ void sithSector_sub_4F2E30(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertice
 }
 
 void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
-{
+{   
     int v3; // eax
     double v4; // st6
     sithSurface* v5; // eax
@@ -1036,7 +1036,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         }
         v153 = v16;
         thing->physicsParams.angVel.y = v16;
-        if ( v15 < thing->physicsParams.maxRotVel )
+        if ( v14->z >= v15)  // TODO verify
         {
             if ( thing->physicsParams.maxRotVel < (double)thing->physicsParams.angVel.z )
                 v15 = thing->physicsParams.maxRotVel;
@@ -1225,7 +1225,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
                     }
                     v150 = v64;
                     thing->physicsParams.angVel.y = v64;
-                    if ( v65 < thing->physicsParams.maxRotVel ) // TODO verify
+                    if ( v59->z >= v65 ) // TODO verify
                     {
                         if ( v159 > (double)thing->physicsParams.maxRotVel )
                             v65 = thing->physicsParams.maxRotVel;

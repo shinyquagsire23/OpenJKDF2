@@ -154,8 +154,8 @@ typedef struct sithSector
     uint32_t flags;
     rdVector3 center;
     rdVector3 thrust;
-    sithSound* field_50;
-    float field_54;
+    sithSound* sectorSound;
+    float sectorSoundVol;
     rdVector3 collidebox_onecorner;
     rdVector3 collidebox_othercorner;
     rdVector3 boundingbox_onecorner;
@@ -236,7 +236,7 @@ void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds);
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(sithThing *player, float deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 //static void (*sithSector_ThingPhysUnderwater)(sithThing *a1, float a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;
-//static void (*sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
+static void (*_sithSector_ThingPhysAttached)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysAttached_ADDR;
 //static void (*sithSector_ThingSetLook)(sithThing *a1, const rdVector3 *a2, float a3) = (void*)sithSector_ThingSetLook_ADDR;
 //static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 

@@ -253,10 +253,6 @@ int sith_Tick()
         // TODO REMOVE
         //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
         //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
-
-#ifdef LINUX_TMP
-        g_debugmodeFlags |= 1;
-#endif
         
         ++bShowInvisibleThings;
         if (sithRender_8EE678++ == -1)
@@ -349,6 +345,10 @@ void sith_AutoSave()
     sithCog *v4; // eax
     char v5[128]; // [esp+10h] [ebp-80h] BYREF
 
+
+#ifdef LINUX_TMP
+    g_debugmodeFlags |= 1;
+#endif
 
     sithTime_Startup();
     sithInventory_Reset(g_localPlayerThing);
