@@ -139,6 +139,7 @@ static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 
 #ifdef LINUX
 int jkMain_SetVideoMode();
+void jkMain_FixRes();
 #else
 static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
 #endif

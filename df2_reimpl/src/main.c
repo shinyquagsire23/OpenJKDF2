@@ -46,6 +46,7 @@
 #include "Gui/jkGUIJoystick.h"
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
+#include "Gui/jkGUIMultiplayer.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdActive.h"
 #include "Engine/rdKeyframe.h"
@@ -1679,6 +1680,10 @@ void do_hooks()
     hook_function(jkGuiDialog_ErrorDialog_ADDR, jkGuiDialog_ErrorDialog);
     hook_function(jkGuiDialog_YesNoDialog_ADDR, jkGuiDialog_YesNoDialog);
     
+    // jkGUIMultiplayer
+    hook_function(jkGuiMultiplayer_Initialize_ADDR, jkGuiMultiplayer_Initialize);
+    hook_function(jkGuiMultiplayer_Shutdown_ADDR, jkGuiMultiplayer_Shutdown);
+    
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
     hook_function(Darray_Free_ADDR, Darray_Free);
@@ -1745,6 +1750,10 @@ void do_hooks()
     hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
     hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
     hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
+    
+    hook_function(sithDplay_OpenConnection_ADDR, sithDplay_OpenConnection);
+    hook_function(sithDplay_CloseConnection_ADDR, sithDplay_CloseConnection);
+    hook_function(sithDplay_Open_ADDR, sithDplay_Open);
 
     //hook_function_inv(sithSurface_Startup_ADDR, sithSurface_Startup);
     //hook_function_inv(sithSurface_Shutdown_ADDR, sithSurface_Shutdown);

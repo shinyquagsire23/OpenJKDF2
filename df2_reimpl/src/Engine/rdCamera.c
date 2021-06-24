@@ -41,7 +41,7 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5,
         camera->attenuationMin = 0.2;
         camera->attenuationMax = 0.1;
         
-        rdCamera_SetProjectType(camera, rdCameraProjectType_Ortho);
+        rdCamera_SetProjectType(camera, rdCameraProjectType_Perspective);
 
         return 1;
     }
@@ -99,23 +99,9 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
     
     switch (type)
     {
-        case rdCameraProjectType_Perspective:
-        {
-            if (camera->screenAspectRatio == 1.0 )
-            {
-                camera->project = rdCamera_PerspProjectSquare;
-                camera->projectLst = rdCamera_PerspProjectSquareLst;
-            }
-            else
-            {
-                camera->project = rdCamera_PerspProject;
-                camera->projectLst = rdCamera_PerspProjectLst;
-            }
-            break;
-        }
         case rdCameraProjectType_Ortho:
         {
-            if (camera->screenAspectRatio == 1.0)
+            if (camera->screenAspectRatio == 1.0 )
             {
                 camera->project = rdCamera_OrthoProjectSquare;
                 camera->projectLst = rdCamera_OrthoProjectSquareLst;
@@ -124,6 +110,20 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
             {
                 camera->project = rdCamera_OrthoProject;
                 camera->projectLst = rdCamera_OrthoProjectLst;
+            }
+            break;
+        }
+        case rdCameraProjectType_Perspective:
+        {
+            if (camera->screenAspectRatio == 1.0)
+            {
+                camera->project = rdCamera_PerspProjectSquare;
+                camera->projectLst = rdCamera_PerspProjectSquareLst;
+            }
+            else
+            {
+                camera->project = rdCamera_PerspProject;
+                camera->projectLst = rdCamera_PerspProjectLst;
             }
             break;
         }
@@ -151,20 +151,10 @@ int rdCamera_SetAspectRatio(rdCamera *camera, float ratio)
 
 int rdCamera_BuildFOV(rdCamera *camera)
 {
-    double v5; // st6
-    double v6; // st5
-    double v7; // st7
-    double v8; // rtt
-    double v9; // st5
     double v10; // st3
     double v14; // st7
     double v15; // st4
     double v16; // st5
-    float v17; // [esp+0h] [ebp-18h]
-    float v18; // [esp+10h] [ebp-8h]
-    float v20; // [esp+14h] [ebp-4h]
-    float cameraa; // [esp+1Ch] [ebp+4h]
-    float camerab; // [esp+1Ch] [ebp+4h]
     float camerac; // [esp+1Ch] [ebp+4h]
     float camerad; // [esp+1Ch] [ebp+4h]
 
@@ -175,7 +165,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
 
     switch (camera->projectType)
     {
-        case rdCameraProjectType_Perspective:
+        case rdCameraProjectType_Ortho:
         {
             camera->fov_y = 0.0;
             camerac = ((double)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
@@ -183,37 +173,38 @@ int rdCamera_BuildFOV(rdCamera *camera)
             v15 = ((double)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
             v16 = camerac / camera->screenAspectRatio;
             camerad = v15;
-            clipFrustum->field_C = -v15;
-            clipFrustum->field_10 = v16;
-            clipFrustum->field_14 = camerad;
-            clipFrustum->field_18 = v14;
-            clipFrustum->field_1C = 0.0;
-            clipFrustum->field_20 = 0.0;
-            clipFrustum->field_24 = 0.0;
-            clipFrustum->field_28 = 0.0;
+            clipFrustum->orthoLeft = -v15;
+            clipFrustum->orthoTop = v16;
+            clipFrustum->orthoRight = camerad;
+            clipFrustum->orthoBottom = v14;
+            clipFrustum->farTop = 0.0;
+            clipFrustum->bottom = 0.0;
+            clipFrustum->farLeft = 0.0;
+            clipFrustum->right = 0.0;
             return 1;
         }
         
-        case rdCameraProjectType_Ortho:
+        case rdCameraProjectType_Perspective:
         {
-            v18 = (double)(canvas->widthMinusOne - canvas->xStart) * 0.5;
-            cameraa = (double)(canvas->heightMinusOne - canvas->yStart) * 0.5;
-            v17 = camera->fov * 0.5;
-            v20 = stdMath_Tan(v17);
-            v5 = cameraa;
-            v6 = cameraa;
-            v7 = cameraa - -1.0;
-            camerab = v18 / v20;
-            v8 = v6 / camerab;
-            camera->fov_y = camerab;
-            v9 = -v5 / camerab / camera->screenAspectRatio;
-            clipFrustum->field_1C = v8 / camera->screenAspectRatio;
-            v10 = camera->screenAspectRatio;
-            clipFrustum->field_24 = -v18 / camerab;
-            clipFrustum->field_20 = v9;
-            clipFrustum->field_28 = v18 / camerab;
-            clipFrustum->field_2C = v7 / camerab / v10;
-            clipFrustum->field_30 = -(v18 - -1.0) / camerab;
+            float width = canvas->xStart;
+            float height = canvas->yStart;
+            float project_width_half = (canvas->widthMinusOne - (double)width) * 0.5;
+            float project_height_half = (canvas->heightMinusOne - (double)height) * 0.5;
+            
+            float project_width_half_2 = project_width_half;
+            float project_height_half_2 = project_height_half;
+            
+            camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
+
+            float fov_calc = camera->fov_y;
+            float fov_calc_height = fov_calc * camera->screenAspectRatio;
+
+            clipFrustum->farTop = project_height_half / fov_calc_height; // far top
+            clipFrustum->farLeft = -project_width_half / fov_calc; // far left
+            clipFrustum->bottom = -project_height_half_2 / fov_calc_height; // bottom
+            clipFrustum->right = project_width_half_2 / fov_calc; // right
+            clipFrustum->nearTop = (project_height_half - -1.0) / fov_calc_height; // near top
+            clipFrustum->nearLeft = -(project_width_half - -1.0) / fov_calc; // near left
             return 1;
         }
     }
@@ -222,11 +213,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
 }
 
 int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2)
-{
-    double v8; // st7
-    double v9; // st4
-    double v11; // rt0
-    
+{   
     //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
     rdClipFrustum* cameraClip = camera->cameraClipFrustum;
@@ -234,20 +221,23 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     if ( !canvas )
         return 0;
 
-    v8 = canvas->screen_width_half - ((double)width - 0.5);
-    v9 = -((double)width2 - 0.5 - canvas->screen_width_half) / camera->fov_y;
-    v11 = canvas->screen_height_half - ((double)height - 0.5);
+    float project_width_half = canvas->screen_width_half - ((double)width - 0.5);
+    float project_height_half = canvas->screen_height_half - ((double)height - 0.5);
+    
+    float project_width_half_2 = -canvas->screen_width_half + ((double)width2 - 0.5);
+    float project_height_half_2 = -canvas->screen_height_half + ((double)height2 - 0.5);
 
-    outClip->field_1C = v8 / camera->fov_y / camera->screenAspectRatio;
-    outClip->field_24 = -v11 / camera->fov_y;
-    outClip->field_20 = v9 / camera->screenAspectRatio;
+    rdVector_Copy3(&outClip->field_0, &cameraClip->field_0);
+    
+    float fov_calc = camera->fov_y;
+    float fov_calc_height = fov_calc * camera->screenAspectRatio;
 
-    outClip->field_0.x = cameraClip->field_0.x;
-    outClip->field_0.y = cameraClip->field_0.y;
-    outClip->field_0.z = cameraClip->field_0.z;
-    outClip->field_28 = ((double)height2 - 0.5 - canvas->screen_height_half) / camera->fov_y;
-    outClip->field_2C = ((v8 - -1.0) / camera->fov_y) / camera->screenAspectRatio;
-    outClip->field_30 = -(v11 - -1.0) / camera->fov_y;
+    outClip->farTop = project_width_half / fov_calc_height;
+    outClip->farLeft = -project_height_half / fov_calc;
+    outClip->bottom = -project_width_half_2 / fov_calc_height;
+    outClip->right = project_height_half_2 / fov_calc;
+    outClip->nearTop = (project_width_half - -1.0) / fov_calc_height;
+    outClip->nearLeft = -(project_height_half - -1.0) / fov_calc;
 
     return 1;
 }
@@ -259,44 +249,10 @@ void rdCamera_Update(rdMatrix34 *orthoProj)
     rdMatrix_ExtractAngles34(&rdCamera_camMatrix, &rdCamera_camRotation);
 }
 
-void rdCamera_PerspProject(rdVector3* out, rdVector3* v)
+void rdCamera_OrthoProject(rdVector3* out, rdVector3* v)
 {
     out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
     out->y = -(v->z * rdCamera_pCurCamera->orthoScale) * rdCamera_pCurCamera->screenAspectRatio + rdCamera_pCurCamera->canvas->screen_width_half;
-    out->z = v->y;
-}
-
-void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
-{
-    for (int i = 0; i < num_vertices; i++)
-    {
-        rdCamera_PerspProject(vertices_out, vertices_in);
-        ++vertices_in;
-        ++vertices_out;
-    }
-}
-
-void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v)
-{
-    out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * rdCamera_pCurCamera->orthoScale;
-    out->z = v->y;
-}
-
-void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
-{
-    for (int i = 0; i < num_vertices; i++)
-    {
-        rdCamera_PerspProjectSquare(vertices_out, vertices_in);
-        ++vertices_in;
-        ++vertices_out;
-    }
-}
-
-void rdCamera_OrthoProject(rdVector3 *out, rdVector3 *v)
-{
-    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - rdCamera_pCurCamera->screenAspectRatio * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
     out->z = v->y;
 }
 
@@ -312,8 +268,8 @@ void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, u
 
 void rdCamera_OrthoProjectSquare(rdVector3 *out, rdVector3 *v)
 {
-    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
+    out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * rdCamera_pCurCamera->orthoScale;
     out->z = v->y;
 }
 
@@ -322,6 +278,40 @@ void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
     for (int i = 0; i < num_vertices; i++)
     {
         rdCamera_OrthoProjectSquare(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
+void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
+{
+    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - rdCamera_pCurCamera->screenAspectRatio * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    out->z = v->y;
+}
+
+void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_PerspProject(vertices_out, vertices_in);
+        ++vertices_in;
+        ++vertices_out;
+    }
+}
+
+void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v)
+{
+    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
+    out->z = v->y;
+}
+
+void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
+{
+    for (int i = 0; i < num_vertices; i++)
+    {
+        rdCamera_PerspProjectSquare(vertices_out, vertices_in);
         ++vertices_in;
         ++vertices_out;
     }

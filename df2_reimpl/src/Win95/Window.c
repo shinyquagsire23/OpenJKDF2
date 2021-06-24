@@ -5,6 +5,7 @@
 #include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkGame.h"
+#include "Gui/jkGUI.h"
 
 #include "jk.h"
 
@@ -254,24 +255,91 @@ SDL_Renderer* displayRenderer;
 SDL_Event event;
 SDL_GLContext glWindowContext;
 SDL_Surface* displaySurface;
-SDL_Texture *menuTexture;
-SDL_Surface *menuSurface;
 
 int Window_lastXRel = 0;
 int Window_lastYRel = 0;
+int Window_lastSampleTime = 0;
 int Window_lastSampleMs = 0;
 int Window_bMouseLeft = 0;
 int Window_bMouseRight = 0;
+int Window_resized = 0;
+int Window_xSize = 640;
+int Window_ySize = 480;
+int Window_mouseX = 0;
+int Window_mouseY = 0;
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
-    uint32_t pos = ((event->x) & 0xFFFF) | (((event->y) << 16) & 0xFFFF0000);
+    Window_mouseX = event->x;
+    Window_mouseY = event->y;// - (Window_ySize - 480);
+                
+    uint32_t pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
     
-    Window_lastSampleMs = event->timestamp;
+    Window_lastSampleMs = event->timestamp - Window_lastSampleTime;
+    //Window_lastSampleTime = event->timestamp;
     Window_lastXRel = event->xrel;
     Window_lastYRel = event->yrel;
 
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
+}
+
+void Window_HandleWindowEvent(SDL_Event* event)
+{
+    switch (event->window.event) 
+    {
+        case SDL_WINDOWEVENT_SHOWN:
+            //printf("Window %d shown", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            //printf("Window %d hidden", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            //printf("Window %d exposed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            /*printf("Window %d moved to %d,%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);*/
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            if (Window_xSize != event->window.data1 || Window_ySize != event->window.data2)
+                Window_resized = 1;
+
+            Window_xSize = event->window.data1;
+            Window_ySize = event->window.data2;
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            //printf("Window %d minimized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            //printf("Window %d maximized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            //printf("Window %d restored", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            //printf("Mouse entered window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            //printf("Mouse left window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            //printf("Window %d gained keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            //printf("Window %d lost keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            //printf("Window %d closed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_TAKE_FOCUS:
+            //printf("Window %d is offered a focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIT_TEST:
+            //printf("Window %d has a special hit test", event->window.windowID);
+            break;
+    }
 }
 
 void Window_SdlUpdate()
@@ -286,6 +354,9 @@ void Window_SdlUpdate()
     {
         switch (event.type)
         {
+            case SDL_WINDOWEVENT:
+                Window_HandleWindowEvent(&event);
+                break;
             case SDL_KEYDOWN:
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
                 break;
@@ -329,7 +400,10 @@ void Window_SdlUpdate()
                 if (hasRight)
                     Window_bMouseRight = right;
 
-                pos = ((mevent->x) & 0xFFFF) | (((mevent->y) << 16) & 0xFFFF0000);
+                Window_mouseX = mevent->x;
+                Window_mouseY = mevent->y;// - (Window_ySize - 480);
+
+                pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
                 msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
                 msgr = (event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
                 
@@ -347,20 +421,20 @@ void Window_SdlUpdate()
                 break;
         }
     }
-
-    if (Video_bInitted)
+    
+    if (Window_resized)
     {
-        SDL_Rect srcRect = {0, 0, 640, 480};
-        SDL_Rect dstRect = {0, 0, 640, 480};
+        jkMain_FixRes();
+        if (!jkGui_SetModeMenu(0))
+        {
+            stdDisplay_SetMode(0, 0, 0);
+        }
         
-        SDL_BlitSurface(Video_menuBuffer.sdlSurface, 0, menuSurface, 0); //TODO error check
-        
-        SDL_UpdateTexture(menuTexture, NULL, menuSurface->pixels, menuSurface->pitch);
+        Window_resized = 0;
     }
-    else
-    {
-        SDL_UpdateTexture(menuTexture, NULL, menuSurface->pixels, menuSurface->pitch);
-    }
+    
+    //printf("%u\n", SDL_GetTicks() - Window_lastSampleTime);
+    Window_lastSampleTime = SDL_GetTicks();
 
     if (!jkGame_isDDraw)
     {
@@ -411,19 +485,6 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(1); // Enable vsync
     
-    menuSurface = SDL_CreateRGBSurface(0, 640, 480, 32,
-                                        0x00FF0000,
-                                        0x0000FF00,
-                                        0x000000FF,
-                                        0xFF000000);
-    
-	SDL_FillRect(menuSurface, NULL, 0xFFFFFFFF);
-    
-    menuTexture = SDL_CreateTexture(displayRenderer,
-                                            SDL_PIXELFORMAT_ARGB8888,
-                                            SDL_TEXTUREACCESS_STREAMING,
-                                            640, 480);
-    
     glewInit();
     
     SDL_RenderClear(displayRenderer);
@@ -462,7 +523,7 @@ int Window_Main_Linux(int argc, char** argv)
         jkMain_GuiAdvance();
         Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
         
-        Window_SdlUpdate();
+        //Window_SdlUpdate();
     }
 }
 
@@ -573,7 +634,7 @@ int Window_MessageLoop()
     jkMain_GuiAdvance();
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
-    Window_SdlUpdate();
+    //Window_SdlUpdate();
     return 0;
 }
 

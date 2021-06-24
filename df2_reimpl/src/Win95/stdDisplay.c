@@ -23,8 +23,9 @@ uint8_t* stdDisplay_GetPalette()
 #include <GL/gl.h>
 #include <assert.h>
 
-uint32_t Video_menuTexId;
+uint32_t Video_menuTexId = 0;
 rdColor24 stdDisplay_masterPalette[256];
+int Video_bModeSet = 0;
 
 int stdDisplay_Startup()
 {
@@ -63,35 +64,53 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
     stdDisplay_pCurVideoMode->format.format.bpp = 8;
+    stdDisplay_pCurVideoMode->format.width_in_pixels = Window_xSize;
+    stdDisplay_pCurVideoMode->format.width = Window_xSize;
+    stdDisplay_pCurVideoMode->format.height = Window_ySize;
     
     _memcpy(&Video_otherBuf.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_otherBuf.format));
     _memcpy(&Video_menuBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_menuBuffer.format));
     
-    SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, 640, 480, 8,
-                                        0,
-                                        0,
-                                        0,
-                                        0);
-    SDL_Surface* menuSurface = SDL_CreateRGBSurface(0, 640, 480, 8,
-                                        0,
-                                        0,
-                                        0,
-                                        0);
-    
-    memcpy(stdDisplay_gammaPalette, palette, 0x300);
-    const rdColor24* pal24 = palette;
-    SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
-    for (int i = 0; i < 256; i++)
+    if (Video_bModeSet)
     {
-        tmp[i].r = pal24[i].r;
-        tmp[i].g = pal24[i].g;
-        tmp[i].b = pal24[i].b;
-        tmp[i].a = 0xFF;
+        glDeleteTextures(1, &Video_menuTexId);
+        if (Video_otherBuf.sdlSurface)
+            SDL_FreeSurface(Video_otherBuf.sdlSurface);
+        if (Video_menuBuffer.sdlSurface)
+            SDL_FreeSurface(Video_menuBuffer.sdlSurface);
+        
+        Video_otherBuf.sdlSurface = 0;
+        Video_menuBuffer.sdlSurface = 0;
     }
     
-    SDL_SetPaletteColors(otherSurface->format->palette, tmp, 0, 256);
-    SDL_SetPaletteColors(menuSurface->format->palette, tmp, 0, 256);
-    free(tmp);
+    SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, Window_xSize, Window_ySize, 8,
+                                        0,
+                                        0,
+                                        0,
+                                        0);
+    SDL_Surface* menuSurface = SDL_CreateRGBSurface(0, Window_xSize, Window_ySize, 8,
+                                        0,
+                                        0,
+                                        0,
+                                        0);
+    
+    if (palette)
+    {
+        memcpy(stdDisplay_gammaPalette, palette, 0x300);
+        const rdColor24* pal24 = palette;
+        SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
+        for (int i = 0; i < 256; i++)
+        {
+            tmp[i].r = pal24[i].r;
+            tmp[i].g = pal24[i].g;
+            tmp[i].b = pal24[i].b;
+            tmp[i].a = 0xFF;
+        }
+        
+        SDL_SetPaletteColors(otherSurface->format->palette, tmp, 0, 256);
+        SDL_SetPaletteColors(menuSurface->format->palette, tmp, 0, 256);
+        free(tmp);
+    }
     
     //SDL_SetSurfacePalette(otherSurface, palette);
     //SDL_SetSurfacePalette(menuSurface, palette);
@@ -102,12 +121,12 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_menuBuffer.format.width_in_bytes = menuSurface->pitch;
     Video_otherBuf.format.width_in_bytes = otherSurface->pitch;
     
-    Video_menuBuffer.format.width_in_pixels = 640;
-    Video_otherBuf.format.width_in_pixels = 640;
-    Video_menuBuffer.format.width = 640;
-    Video_otherBuf.format.width = 640;
-    Video_menuBuffer.format.height = 480;
-    Video_otherBuf.format.height = 480;
+    Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
+    Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
+    Video_menuBuffer.format.width = Window_xSize;
+    Video_otherBuf.format.width = Window_xSize;
+    Video_menuBuffer.format.height = Window_ySize;
+    Video_otherBuf.format.height = Window_ySize;
     
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
@@ -117,7 +136,9 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 640, 480, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Window_xSize, Window_ySize, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    
+    Video_bModeSet = 1;
     
     return 1;
 }
@@ -283,6 +304,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     {
         for (int j = 0; j < rect->height; j++)
         {
+            if ((uint32_t)(i + srcRect.x) > (uint32_t)vbuf2->format.width) continue;
+            if ((uint32_t)(j + srcRect.y) > (uint32_t)vbuf2->format.height) continue;
+            
             uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
 
             if (!pixel && has_alpha) continue;
@@ -314,11 +338,16 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     
     uint8_t* dstPixels = vbuf->sdlSurface->pixels;
     uint32_t dstStride = vbuf->format.width_in_bytes;
+    uint32_t max_idx = dstStride * vbuf->format.height;
     for (int i = 0; i < rect->width; i++)
     {
         for (int j = 0; j < rect->height; j++)
         {
-            dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = fillColor;
+            uint32_t idx = (i + dstRect.x) + ((j + dstRect.y)*dstStride);
+            if (idx > max_idx)
+                continue;
+            
+            dstPixels[idx] = fillColor;
         }
     }
     

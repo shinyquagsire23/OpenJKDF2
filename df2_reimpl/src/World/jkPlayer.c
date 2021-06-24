@@ -397,6 +397,11 @@ void jkPlayer_DrawPov()
 
         rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
+#ifdef QOL_IMPROVEMENTS
+        // Shift gun down slightly at higher aspect ratios
+        // TODO just make a cvar-alike for this
+        trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+#endif
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);

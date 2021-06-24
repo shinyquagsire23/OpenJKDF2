@@ -10,6 +10,7 @@
 #include "General/stdFnames.h"
 #include "Win95/sithDplay.h"
 #include "Win95/DebugConsole.h"
+#include "Win95/Window.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Engine/sithTimer.h"
@@ -300,13 +301,34 @@ void sith_UpdateCamera()
             dword_8EE678 = 1;
         }
 #ifdef QOL_IMPROVEMENTS
+#ifdef LINUX
+        if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
+        {
+            //printf("%u\n", sithCamera_currentCamera->rdCam.canvas->heightMinusOne);
+            if (sithCamera_currentCamera->rdCam.canvas->widthMinusOne != Window_xSize-1
+               || sithCamera_currentCamera->rdCam.canvas->heightMinusOne != Window_ySize-1)
+            {
+                //sithCamera_currentCamera->rdCam.canvas->screen_width_half = Window_ySize / 2;
+                //sithCamera_currentCamera->rdCam.canvas->screen_height_half = Window_xSize / 2;
+                //sithCamera_currentCamera->rdCam.canvas->widthMinusOne = Window_xSize-1;
+                //sithCamera_currentCamera->rdCam.canvas->heightMinusOne = Window_ySize-1;
+                //jkMain_FixRes();
+            }
+        }
+#endif
+
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             // Set screen aspect ratio
             float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            
+            //if (aspect != sith_lastAspect)
+            {
+                rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+                rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+            }
+            
             sith_lastAspect = aspect;
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
-            rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
         }
 #endif
 

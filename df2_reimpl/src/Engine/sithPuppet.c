@@ -737,7 +737,7 @@ LABEL_14:
             {
                 v12 = thing->actor;
                 if ( v12 )
-                    sithAI_weapon_fire(v12, 0.0, 0.0, 0.0, v12->field_264, v12->field_26C, v12->field_268);
+                    sithAI_FireWeapon(v12, 0.0, 0.0, 0.0, v12->field_264, v12->field_26C, v12->field_268);
             }
             return;
         case 4u:

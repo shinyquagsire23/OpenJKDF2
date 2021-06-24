@@ -282,24 +282,24 @@ typedef struct sithCog sithCog;
 typedef struct sithPuppet sithPuppet;
 typedef struct jkPlayerInfo jkPlayerInfo;
 
-typedef struct sithActorEntry
+typedef struct sithActorInstinct
 {
     int field_0;
-    int field_4;
-    float field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-} sithActorEntry;
+    int nextUpdate;
+    float param0;
+    float param1;
+    float param2;
+    float param3;
+} sithActorInstinct;
 
 typedef struct sithActor
 {
     sithThing *thing;
     sithAIClass *aiclass;
     int mode;
-    sithActorEntry entries[16];
+    sithActorInstinct instincts[16];
     uint32_t numAIClassEntries;
-    int field_190;
+    int nextUpdate;
     rdVector3 lookVector;
     rdVector3 movePos;
     rdVector3 field_1AC;
@@ -312,18 +312,12 @@ typedef struct sithActor
     sithThing* field_1D0;
     rdVector3 field_1D4;
     int field_1E0;
-    int field_1E4;
-    int field_1E8;
-    int field_1EC;
-    int field_1F0;
+    rdVector3 field_1E4;
+    float field_1F0;
     int field_1F4;
-    int field_1F8;
-    int field_1FC;
-    int field_200;
+    rdVector3 field_1F8;
     int field_204;
-    int field_208;
-    int field_20C;
-    int field_210;
+    rdVector3 field_208;
     sithThing *thingidk;
     rdVector3 movepos;
     int field_224;
@@ -337,9 +331,9 @@ typedef struct sithActor
     float field_264;
     int field_268;
     int field_26C;
-    int field_270;
-    int field_274;
-    int field_278;
+    int mood0;
+    int mood1;
+    int mood2;
     int field_27C;
     int field_280;
     int field_284;

@@ -2,8 +2,10 @@
 
 #include "Engine/rdCache.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/Window.h"
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
+#include "Main/jkGame.h"
 
 #ifdef LINUX
 #include <stdbool.h>
@@ -339,12 +341,12 @@ void logic()
 {
     float maxX, maxY, scaleX, scaleY, width, height;
     
-    scaleX = 1.0/320.0;
-    scaleY = 1.0/240.0;
+    scaleX = 1.0/((double)Window_xSize / 2.0);
+    scaleY = 1.0/((double)Window_ySize / 2.0);
     maxX = 1.0;
     maxY = 1.0;
-    width = 640.0;
-    height = 480.0;
+    width = Window_xSize;
+    height = Window_ySize;
     
     float d3dmat[16] = {
        maxX*scaleX,      0,                                          0,      0, // right
@@ -396,14 +398,15 @@ int std3D_StartScene()
 int std3D_EndScene()
 {
     //printf("End draw\n");
+    last_tex = NULL;
+    last_flags = 0;
     std3D_ResetRenderList();
     return 1;
 }
 
 void std3D_ResetRenderList()
 {
-    last_tex = NULL;
-    last_flags = 0;
+    
     GL_tmpVerticesAmt = 0;
     GL_tmpTrisAmt = 0;
     
@@ -421,6 +424,16 @@ static rdDDrawSurface* test_idk = NULL;
 void std3D_DrawMenu()
 {
     glDepthFunc(GL_ALWAYS);
+    
+    float menu_w, menu_h;
+    menu_w = (double)Window_xSize;
+    menu_h = (double)Window_ySize;
+    
+    if (!jkGame_isDDraw)
+    {
+        //menu_w = 640.0;
+        //menu_h = 480.0;
+    }
 
     GL_tmpVertices[0].x = 0.0;
     GL_tmpVertices[0].y = 0.0;
@@ -432,7 +445,7 @@ void std3D_DrawMenu()
     *(uint32_t*)&GL_tmpVertices[0].nz = 0;
     
     GL_tmpVertices[1].x = 0.0;
-    GL_tmpVertices[1].y = 480.0;
+    GL_tmpVertices[1].y = menu_h;
     GL_tmpVertices[1].z = 0.0;
     GL_tmpVertices[1].tu = 0.0;
     GL_tmpVertices[1].tv = 1.0;
@@ -440,8 +453,8 @@ void std3D_DrawMenu()
     *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[1].nz = 0;
     
-    GL_tmpVertices[2].x = 640.0;
-    GL_tmpVertices[2].y = 480.0;
+    GL_tmpVertices[2].x = menu_w;
+    GL_tmpVertices[2].y = menu_h;
     GL_tmpVertices[2].z = 0.0;
     GL_tmpVertices[2].tu = 1.0;
     GL_tmpVertices[2].tv = 1.0;
@@ -449,7 +462,7 @@ void std3D_DrawMenu()
     *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[2].nz = 0;
     
-    GL_tmpVertices[3].x = 640.0;
+    GL_tmpVertices[3].x = menu_w;
     GL_tmpVertices[3].y = 0.0;
     GL_tmpVertices[3].z = 0.0;
     GL_tmpVertices[3].tu = 1.0;
@@ -471,7 +484,7 @@ void std3D_DrawMenu()
     
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 640, 480, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Video_menuBuffer.format.width, Video_menuBuffer.format.height, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
 
     // Generate vertices list
     GLuint vbo_vertices, vbo_colors, vbo_uvs;
@@ -859,7 +872,7 @@ void std3D_DrawRenderList()
                 else
                 {
                     glDepthFunc(GL_ALWAYS);
-                    //glClear(GL_DEPTH_BUFFER_BIT);
+                    glClear(GL_DEPTH_BUFFER_BIT);
                 }
                 
                 if (changed_flags & 0x1000)

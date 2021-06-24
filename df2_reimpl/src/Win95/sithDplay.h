@@ -75,6 +75,9 @@ static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPl
 static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 #else
 int sithDplay_EarlyInit();
+int sithDplay_OpenConnection(void* a);
+void sithDplay_CloseConnection();
+int sithDplay_Open(int a, void* b);
 #endif
 
 #endif // _SITHDPLAY_H

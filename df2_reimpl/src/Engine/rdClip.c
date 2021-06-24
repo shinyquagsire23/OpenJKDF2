@@ -111,19 +111,19 @@ int rdClip_Point3(rdClipFrustum *clipFrustum, rdVector3 *point)
     if (clipFrustum->field_0.x && point->y > (double)clipFrustum->field_0.z )
         return 0;
 
-    float v4 = (rdCamera_pCurCamera->projectType == 1) ? (clipFrustum->field_24 * point->y) : (clipFrustum->field_C);
+    float v4 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farLeft * point->y) : (clipFrustum->orthoLeft);
     if ( v4 > point->x )
         return 0;
 
-    float v5 = (rdCamera_pCurCamera->projectType == 1) ? (clipFrustum->field_28 * point->y) : (clipFrustum->field_14);
+    float v5 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->right * point->y) : (clipFrustum->orthoRight);
     if ( v5 < point->x )
         return 0;
 
-    float v6 = (rdCamera_pCurCamera->projectType == 1) ? (clipFrustum->field_1C * point->y) : (clipFrustum->field_10);
+    float v6 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farTop * point->y) : (clipFrustum->orthoTop);
     if ( v6 < point->z )
         return 0;
 
-    float v7 = (rdCamera_pCurCamera->projectType == 1) ? (clipFrustum->field_20 * point->y) : (clipFrustum->field_18);
+    float v7 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->bottom * point->y) : (clipFrustum->orthoBottom);
     return v7 <= point->z;
 }
 
@@ -301,21 +301,21 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         }
     }
 
-    if (point1->x < clipFrustum->field_24 * point1->y && point2->x < clipFrustum->field_24 * point2->y)
+    if (point1->x < clipFrustum->farLeft * point1->y && point2->x < clipFrustum->farLeft * point2->y)
         return 0;
-    if (point1->x >= clipFrustum->field_24 * point1->y)
+    if (point1->x >= clipFrustum->farLeft * point1->y)
     {
-        if ( point2->x < clipFrustum->field_24 * point2->y)
+        if ( point2->x < clipFrustum->farLeft * point2->y)
         {
             point1c = point2->y - point1->y;
             frustumb = point2->x - point1->x;
             v46 = point2->y * point1->x - point1->y * point2->x;
-            point2b = clipFrustum->field_24 * point1c - frustumb;
+            point2b = clipFrustum->farLeft * point1c - frustumb;
             if (point2b != 0.0)
             {
                 v46 = v46 / point2b;
             }
-            v49 = clipFrustum->field_24 * v46;
+            v49 = clipFrustum->farLeft * v46;
             v50 = point1c;
             if (v50 < 0.0)
                 v50 = -v50;
@@ -341,12 +341,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         point1b = point2->y - point1->y;
         frustuma = point2->x - point1->x;
         v33 = point2->y * point1->x - point1->y * point2->x;
-        point2a = clipFrustum->field_24 * point1b - frustuma;
+        point2a = clipFrustum->farLeft * point1b - frustuma;
         if (point2a != 0.0)
         {
             v33 = v33 / point2a;
         }
-        v36 = clipFrustum->field_24 * v33;
+        v36 = clipFrustum->farLeft * v33;
         v37 = point1b;
         if (v37 < 0.0)
             v37 = -v37;
@@ -365,22 +365,22 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         if ( out1 )
             *out1 = 1;
     }
-    point1d = clipFrustum->field_28 * point2->y;
-    if (point1->x > clipFrustum->field_28 * point1->y && point2->x > (double)point1d )
+    point1d = clipFrustum->right * point2->y;
+    if (point1->x > clipFrustum->right * point1->y && point2->x > (double)point1d )
         return 0;
-    if (point1->x <= clipFrustum->field_28 * point1->y)
+    if (point1->x <= clipFrustum->right * point1->y)
     {
         if ( point2->x > (double)point1d )
         {
             point1f = point2->y - point1->y;
             frustumd = point2->x - point1->x;
             v76 = point2->y * point1->x - point1->y * point2->x;
-            point2d = clipFrustum->field_28 * point1f - frustumd;
+            point2d = clipFrustum->right * point1f - frustumd;
             if (point2d != 0.0)
             {
                 v76 = v76 / point2d;
             }
-            v79 = clipFrustum->field_28 * v76;
+            v79 = clipFrustum->right * v76;
             v80 = point1f;
             if (v80 < 0.0)
                 v80 = -v80;
@@ -406,12 +406,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         point1e = point2->y - point1->y;
         frustumc = point2->x - point1->x;
         v63 = point2->y * point1->x - point1->y * point2->x;
-        point2c = clipFrustum->field_28 * point1e - frustumc;
+        point2c = clipFrustum->right * point1e - frustumc;
         if (point2c != 0.0)
         {
             v63 = v63 / point2c;
         }
-        v66 = clipFrustum->field_28 * v63;
+        v66 = clipFrustum->right * v63;
         v67 = point1e;
         if (v67 < 0.0)
             v67 = -v67;
@@ -430,10 +430,10 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         if ( out1 )
             *out1 = 1;
     }
-    point1g = clipFrustum->field_1C * point2->y;
-    if (point1->z > clipFrustum->field_1C * point1->y && point2->z > (double)point1g )
+    point1g = clipFrustum->farTop * point2->y;
+    if (point1->z > clipFrustum->farTop * point1->y && point2->z > (double)point1g )
         return 0;
-    if (point1->z <= clipFrustum->field_1C * point1->y)
+    if (point1->z <= clipFrustum->farTop * point1->y)
     {
         if ( point2->z > (double)point1g )
         {
@@ -441,12 +441,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
             frustumf = point2->z - point1->z;
             v108 = point2->y * point1->z - point1->y * point2->z;
             v109 = v108;
-            point2f = clipFrustum->field_1C * point1i - frustumf;
+            point2f = clipFrustum->farTop * point1i - frustumf;
             if (point2f != 0.0)
             {
                 v109 = v108 / point2f;
             }
-            v112 = clipFrustum->field_1C * v109;
+            v112 = clipFrustum->farTop * v109;
             v113 = point1i;
             if (v113 < 0.0)
                 v113 = -v113;
@@ -473,12 +473,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         frustume = point2->z - point1->z;
         v93 = point2->y * point1->z - point1->y * point2->z;
         v94 = v93;
-        point2e = clipFrustum->field_1C * point1h - frustume;
+        point2e = clipFrustum->farTop * point1h - frustume;
         if (point2e != 0.0)
         {
             v94 = v93 / point2e;
         }
-        v97 = clipFrustum->field_1C * v94;
+        v97 = clipFrustum->farTop * v94;
         v98 = point1h;
         if (v98 < 0.0)
             v98 = -v98;
@@ -499,10 +499,10 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         if ( out1 )
             *out1 = 1;
     }
-    point1j = clipFrustum->field_20 * point2->y;
-    if (point1->z < clipFrustum->field_20 * point1->y && point2->z < (double)point1j )
+    point1j = clipFrustum->bottom * point2->y;
+    if (point1->z < clipFrustum->bottom * point1->y && point2->z < (double)point1j )
         return 0;
-    if (point1->z >= clipFrustum->field_20 * point1->y )
+    if (point1->z >= clipFrustum->bottom * point1->y )
     {
         if ( point2->z < (double)point1j )
         {
@@ -510,12 +510,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
             frustumh = point2->z - point1->z;
             v140 = point2->y * point1->z - point1->y * point2->z;
             v141 = v140;
-            point2h = clipFrustum->field_20 * point1l - frustumh;
+            point2h = clipFrustum->bottom * point1l - frustumh;
             if (point2h != 0.0)
             {
                 v141 = v140 / point2h;
             }
-            v144 = clipFrustum->field_20 * v141;
+            v144 = clipFrustum->bottom * v141;
             v145 = point1l;
             if (v145 < 0.0)
                 v145 = -v145;
@@ -542,12 +542,12 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
         frustumg = point2->z - point1->z;
         v125 = point2->y * point1->z - point1->y * point2->z;
         v126 = v125;
-        point2g = clipFrustum->field_20 * point1k - frustumg;
+        point2g = clipFrustum->bottom * point1k - frustumg;
         if (point2g != 0.0)
         {
             v126 = v125 / point2g;
         }
-        v129 = clipFrustum->field_20 * v126;
+        v129 = clipFrustum->bottom * v126;
         v130 = point1k;
         if (v130 < 0.0)
             v130 = -v130;
@@ -681,7 +681,7 @@ int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *
                 *out1 = 1;
         }
     }
-    point1a = clipFrustum->field_C;
+    point1a = clipFrustum->orthoLeft;
     if ( point1->x < (double)point1a && point2->x < (double)point1a )
         return 0;
     v29 = point2->x;
@@ -707,7 +707,7 @@ int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *
         if ( out2 )
             *out2 = 1;
     }
-    point1b = clipFrustum->field_14;
+    point1b = clipFrustum->orthoRight;
     if ( point1->x > (double)point1b && point2->x > (double)point1b )
         return 0;
     v38 = point2->x;
@@ -736,7 +736,7 @@ int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *
         if ( out1 )
             *out1 = 1;
     }
-    point1c = clipFrustum->field_10;
+    point1c = clipFrustum->orthoTop;
     if ( point1->z > (double)point1c && point2->z > (double)point1c )
         return 0;
     if ( point1->z <= (double)point1c )
@@ -764,7 +764,7 @@ int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *
         if ( out1 )
             *out1 = 1;
     }
-    point1d = clipFrustum->field_18;
+    point1d = clipFrustum->orthoBottom;
     if ( point1->z < (double)point1d && point2->z < (double)point1d )
         return 0;
     v54 = point2->z;
@@ -806,7 +806,7 @@ int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point
 
     rdMatrix_TransformPoint34(&vertex_out, point1, &rdCamera_pCurCamera->view_matrix);
     rdMatrix_TransformPoint34(&vertex_out2, point2, &rdCamera_pCurCamera->view_matrix);
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Ortho)
+    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
         ret = rdClip_Line3Project(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
     else
         ret = rdClip_Line3Ortho(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
@@ -865,29 +865,29 @@ int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad)
 
     v15 = rad + pos->z;
     v16 = pos->z - rad;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Ortho)
+    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v10 = frust->field_1C * frusta;
-        posa = frust->field_1C * v14;
+        v10 = frust->farTop * frusta;
+        posa = frust->farTop * v14;
     }
     else
     {
-        v10 = frust->field_10;
-        posa = frust->field_10;
+        v10 = frust->orthoTop;
+        posa = frust->orthoTop;
     }
     if ( v16 > v10 && v16 > (double)posa )
         return 2;
     if ( v15 > v10 || v15 > (double)posa )
         v5 = 0;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Ortho)
+    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v11 = frust->field_20 * frusta;
-        posb = frust->field_20 * v14;
+        v11 = frust->bottom * frusta;
+        posb = frust->bottom * v14;
     }
     else
     {
-        v11 = frust->field_18;
-        posb = frust->field_18;
+        v11 = frust->orthoBottom;
+        posb = frust->orthoBottom;
     }
     if ( v15 < v11 && v15 < (double)posb )
         return 2;
@@ -895,29 +895,29 @@ int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, float rad)
         v5 = 0;
     v17 = pos->x + rad;
     posc = pos->x - rad;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Ortho)
+    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v12 = frust->field_24 * frusta;
-        rada = frust->field_24 * v14;
+        v12 = frust->farLeft * frusta;
+        rada = frust->farLeft * v14;
     }
     else
     {
-        v12 = frust->field_C;
-        rada = frust->field_C;
+        v12 = frust->orthoLeft;
+        rada = frust->orthoLeft;
     }
     if ( v17 < v12 && v17 < (double)rada )
         return 2;
     if ( posc < v12 || posc < (double)rada )
         v5 = 0;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Ortho)
+    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v13 = frust->field_28 * frusta;
-        radb = frust->field_28 * v14;
+        v13 = frust->right * frusta;
+        radb = frust->right * v14;
     }
     else
     {
-        v13 = frust->field_14;
-        radb = frust->field_14;
+        v13 = frust->orthoRight;
+        radb = frust->orthoRight;
     }
     if ( posc > v13 && posc > (double)radb )
         return 2;
@@ -1047,8 +1047,8 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v7 = &vertices[numVertices - 1];
     for (v116 = numVertices; v116 > 0; v116--)
     {
-        numVerticesa = frustum->field_24 * v7->y;
-        v9 = frustum->field_24 * v3->y;
+        numVerticesa = frustum->farLeft * v7->y;
+        v9 = frustum->farLeft * v3->y;
         if ( numVerticesa <= v7->x || v9 <= v3->x )
         {
             if ( v7->x != numVerticesa && v9 != v3->x && (v7->x < (double)numVerticesa || v9 > v3->x) )
@@ -1056,12 +1056,12 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 frustuma = v3->y - v7->y;
                 v112 = v3->x - v7->x;
                 v12 = v3->y * v7->x - v7->y * v3->x;
-                numVerticesi = frustum->field_24 * frustuma - v112;
+                numVerticesi = frustum->farLeft * frustuma - v112;
                 if (numVerticesi != 0.0)
                 {
                     v12 = v12 / numVerticesi;
                 }
-                numVerticesb = frustum->field_24 * v12;
+                numVerticesb = frustum->farLeft * v12;
                 v15 = frustuma;
                 if (v15 < 0.0)
                     v15 = -v15;
@@ -1103,8 +1103,8 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     
     for (v117 = v24; v117 > 0; v117--)
     {
-        numVerticesc = frustum->field_28 * v27->y;
-        v30 = frustum->field_28 * v28->y;
+        numVerticesc = frustum->right * v27->y;
+        v30 = frustum->right * v28->y;
         if ( numVerticesc >= v27->x || v30 >= v28->x )
         {
             if ( v27->x != numVerticesc && v30 != v28->x && (v27->x > (double)numVerticesc || v30 < v28->x) )
@@ -1112,12 +1112,12 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 frustumb = v28->y - v27->y;
                 v113 = v28->x - v27->x;
                 v34 = v28->y * v27->x - v27->y * v28->x;
-                numVerticesj = frustum->field_28 * frustumb - v113;
+                numVerticesj = frustum->right * frustumb - v113;
                 if ( numVerticesj != 0 )
                 {
                     v34 = v34 / numVerticesj;
                 }
-                numVerticesd = frustum->field_28 * v34;
+                numVerticesd = frustum->right * v34;
                 v37 = frustumb;
                 if ( v37 < 0.0 )
                     v37 = -v37;
@@ -1164,8 +1164,8 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v118 = v46;
     do
     {
-        numVerticese = frustum->field_1C * v49->y;
-        v52 = v50->y * frustum->field_1C;
+        numVerticese = frustum->farTop * v49->y;
+        v52 = v50->y * frustum->farTop;
         if ( numVerticese >= v49->z || v52 >= v50->z )
         {
             if ( v49->z != numVerticese && v52 != v50->z && (v49->z > (double)numVerticese || v52 < v50->z) )
@@ -1174,13 +1174,13 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 v114 = v50->z - v49->z;
                 v56 = v50->y * v49->z - v50->z * v49->y;
                 v57 = v56;
-                numVerticesk = frustum->field_1C * frustumc - v114;
+                numVerticesk = frustum->farTop * frustumc - v114;
                 if (numVerticesk != 0.0)
                 {
                     
                     v57 = v56 / numVerticesk;
                 }
-                v60 = frustum->field_1C * v57;
+                v60 = frustum->farTop * v57;
                 v61 = frustumc;
                 if (v61 < 0.0)
                     v61 = -v61;
@@ -1227,8 +1227,8 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v119 = v70;
     do
     {
-        numVerticesf = frustum->field_20 * v73->y;
-        v76 = v74->y * frustum->field_20;
+        numVerticesf = frustum->bottom * v73->y;
+        v76 = v74->y * frustum->bottom;
         if ( numVerticesf <= v73->z || v76 <= v74->z )
         {
             if ( v73->z != numVerticesf && v76 != v74->z && (v73->z < (double)numVerticesf || v76 > v74->z) )
@@ -1237,12 +1237,12 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 v115 = v74->z - v73->z;
                 v79 = v74->y * v73->z - v74->z * v73->y;
                 v80 = v79;
-                numVerticesl = frustum->field_20 * frustumd - v115;
+                numVerticesl = frustum->bottom * frustumd - v115;
                 if ( numVerticesl != 0.0 )
                 {
                     v80 = v79 / numVerticesl;
                 }
-                v83 = frustum->field_20 * v80;
+                v83 = frustum->bottom * v80;
                 v84 = frustumd;
                 if ( v84 < 0.0 )
                     v84 = -v84;
@@ -1604,8 +1604,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         v216 = numVertices;
         do
         {
-            numVerticesa = frustum->field_30 * v8->y;
-            v13 = frustum->field_30 * v7->y;
+            numVerticesa = frustum->nearLeft * v8->y;
+            v13 = frustum->nearLeft * v7->y;
             if ( numVerticesa <= v8->x || v13 <= v7->x )
             {
                 if ( v8->x != numVerticesa && v13 != v7->x && (v8->x < (double)numVerticesa || v13 > v7->x) )
@@ -1613,12 +1613,12 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                     numVerticesb = v7->y - v8->y;
                     v208 = v7->x - v8->x;
                     v16 = v7->y * v8->x - v8->y * v7->x;
-                    v202 = frustum->field_30 * numVerticesb - v208;
+                    v202 = frustum->nearLeft * numVerticesb - v208;
                     if (v202 != 0.0)
                     {
                         v16 = v16 / v202;
                     }
-                    v19 = frustum->field_30 * v16;
+                    v19 = frustum->nearLeft * v16;
                     v20 = numVerticesb;
                     if (v20 < 0.0)
                         v20 = -v20;
@@ -1694,8 +1694,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     v217 = numVerticesc;
     do
     {
-        numVerticesd = frustum->field_28 * v40->y;
-        v46 = frustum->field_28 * v42->y;
+        numVerticesd = frustum->right * v40->y;
+        v46 = frustum->right * v42->y;
         if ( numVerticesd >= v40->x || v46 >= v42->x )
         {
             if ( v40->x != numVerticesd && v46 != v42->x && (v40->x > (double)numVerticesd || v46 < v42->x) )
@@ -1703,13 +1703,13 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                 numVerticese = v42->y - v40->y;
                 v209 = v42->x - v40->x;
                 v50 = v42->y * v40->x - v40->y * v42->x;
-                v203 = frustum->field_28 * numVerticese - v209;
+                v203 = frustum->right * numVerticese - v209;
                 if (v203 != 0.0)
                 {
                     
                     v50 = v50 / v203;
                 }
-                v53 = frustum->field_28 * v50;
+                v53 = frustum->right * v50;
                 v54 = numVerticese;
                 if ( v54 < 0.0 )
                     v54 = -v54;
@@ -1791,8 +1791,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         v220 = numVerticesf;
         do
         {
-            v204 = frustum->field_2C * v79->y;
-            numVerticesg = v82->y * frustum->field_2C;
+            v204 = frustum->nearTop * v79->y;
+            numVerticesg = v82->y * frustum->nearTop;
             if ( v79->z <= v204 || v82->z <= (double)numVerticesg )
             {
                 if ( v79->z != v204 && v82->z != numVerticesg && (v79->z > (double)v204 || v82->z > (double)numVerticesg) )
@@ -1801,12 +1801,12 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                     v214 = v82->z - v79->z;
                     v88 = v82->y * v79->z - v82->z * v79->y;
                     v89 = v88;
-                    v205 = frustum->field_2C * v210 - v214;
+                    v205 = frustum->nearTop * v210 - v214;
                     if (v205 != 0.0)
                     {
                         v89 = v88 / v205;
                     }
-                    v92 = frustum->field_2C * v89;
+                    v92 = frustum->nearTop * v89;
                     v93 = v210;
                     if ( v93 < 0.0 )
                         v93 = -v93;
@@ -1885,8 +1885,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
             v221 = numVerticesh;
             do
             {
-                v206 = frustum->field_20 * v113->y;
-                numVerticesi = v117->y * frustum->field_20;
+                v206 = frustum->bottom * v113->y;
+                numVerticesi = v117->y * frustum->bottom;
                 if ( v113->z >= v206 || v117->z >= (double)numVerticesi )
                 {
                     if ( v113->z != v206 && v117->z != numVerticesi && (v113->z < (double)v206 || v117->z < (double)numVerticesi) )
@@ -1895,12 +1895,12 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                         v211 = v117->z - v113->z;
                         v122 = v117->y * v113->z - v117->z * v113->y;
                         v123 = v122;
-                        v207 = frustum->field_20 * v215 - v211;
+                        v207 = frustum->bottom * v215 - v211;
                         if (v207 != 0.0)
                         {
                             v123 = v122 / v207;
                         }
-                        v126 = frustum->field_20 * v123;
+                        v126 = frustum->bottom * v123;
                         v127 = v215;
                         if ( v127 < 0.0 )
                             v127 = -v127;
@@ -2226,8 +2226,8 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v7 = &vertices[numVertices - 1];
     for (v116 = numVertices; v116 > 0; v116-- )
     {
-        numVerticesa = v7->y * frustum->field_30;
-        v9 = v3->y * frustum->field_30;
+        numVerticesa = v7->y * frustum->nearLeft;
+        v9 = v3->y * frustum->nearLeft;
         if ( numVerticesa <= v7->x || v9 <= v3->x )
         {
             if ( v7->x != numVerticesa && v9 != v3->x && (v7->x < numVerticesa || v9 > v3->x) )
@@ -2235,12 +2235,12 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 frustuma = v3->y - v7->y;
                 v112 = v3->x - v7->x;
                 v12 = v3->y * v7->x - v7->y * v3->x;
-                numVerticesi = frustum->field_30 * frustuma - v112;
+                numVerticesi = frustum->nearLeft * frustuma - v112;
                 if ( numVerticesi != 0.0)
                 {
                     v12 = v12 / numVerticesi;
                 }
-                numVerticesb = frustum->field_30 * v12;
+                numVerticesb = frustum->nearLeft * v12;
 
                 if ( fabs(frustuma) <= fabs(v112) )
                     v20 = (numVerticesb - v7->x) / v112;
@@ -2280,8 +2280,8 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v28 = workVerts;
     for (v117 = v24; v117 > 0; v117--)
     {
-        numVerticesc = frustum->field_28 * v27->y;
-        v30 = frustum->field_28 * v28->y;
+        numVerticesc = frustum->right * v27->y;
+        v30 = frustum->right * v28->y;
         if ( numVerticesc >= v27->x || v30 >= v28->x )
         {
             if ( v27->x != numVerticesc && v30 != v28->x && (v27->x > numVerticesc || v30 < v28->x) )
@@ -2289,12 +2289,12 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 frustumb = v28->y - v27->y;
                 v113 = v28->x - v27->x;
                 v34 = v28->y * v27->x - v27->y * v28->x;
-                numVerticesj = frustum->field_28 * frustumb - v113;
+                numVerticesj = frustum->right * frustumb - v113;
                 if ( numVerticesj != 0.0 )
                 {
                     v34 = v34 / numVerticesj;
                 }
-                numVerticesd = frustum->field_28 * v34;
+                numVerticesd = frustum->right * v34;
                 v37 = frustumb;
                 if ( v37 < 0.0 )
                     v37 = -v37;
@@ -2339,8 +2339,8 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     v50 = v48;
     for (v118 = v46; v118 > 0; v118--)
     {
-        numVerticese = frustum->field_2C * v49->y;
-        v52 = v50->y * frustum->field_2C;
+        numVerticese = frustum->nearTop * v49->y;
+        v52 = v50->y * frustum->nearTop;
         if ( numVerticese >= v49->z || v52 >= v50->z )
         {
             if ( v49->z != numVerticese && v52 != v50->z && (v49->z > numVerticese || v52 < v50->z) )
@@ -2349,12 +2349,12 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 v114 = v50->z - v49->z;
                 v56 = v50->y * v49->z - v50->z * v49->y;
                 v57 = v56;
-                numVerticesk = frustum->field_2C * frustumc - v114;
+                numVerticesk = frustum->nearTop * frustumc - v114;
                 if ( numVerticesk != 0.0 )
                 {
                     v57 = v56 / numVerticesk;
                 }
-                v60 = frustum->field_2C * v57;
+                v60 = frustum->nearTop * v57;
 
                 if ( fabs(frustumc) <= fabs(v114) )
                     v66 = (v60 - v49->z) / v114;
@@ -2395,8 +2395,8 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 
     for (v119 = v70; v119 > 0; v119--)
     {
-        numVerticesf = frustum->field_20 * v73->y;
-        v76 = v74->y * frustum->field_20;
+        numVerticesf = frustum->bottom * v73->y;
+        v76 = v74->y * frustum->bottom;
         if ( numVerticesf <= v73->z || v76 <= v74->z )
         {
             if ( v73->z != numVerticesf && v76 != v74->z && (v73->z < numVerticesf || v76 > v74->z) )
@@ -2405,12 +2405,12 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 v115 = v74->z - v73->z;
                 v79 = v74->y * v73->z - v74->z * v73->y;
                 v80 = v79;
-                numVerticesl = frustum->field_20 * frustumd - v115;
+                numVerticesl = frustum->bottom * frustumd - v115;
                 if ( numVerticesl != 0.0)
                 {
                     v80 = v79 / numVerticesl;
                 }
-                v83 = frustum->field_20 * v80;
+                v83 = frustum->bottom * v80;
                 v84 = frustumd;
                 if ( v84 < 0.0 )
                     v84 = -v84;
@@ -2693,8 +2693,8 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
         v167 = numVertices;
         do
         {
-            numVerticesa = v7->y * frustum->field_30;
-            v11 = frustum->field_30 * v4->y;
+            numVerticesa = v7->y * frustum->nearLeft;
+            v11 = frustum->nearLeft * v4->y;
             if ( numVerticesa <= v7->x || v11 <= v4->x )
             {
                 if ( v7->x != numVerticesa && v11 != v4->x && (v7->x < (double)numVerticesa || v11 > v4->x) )
@@ -2702,12 +2702,12 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                     v157 = v4->y - v7->y;
                     v161 = v4->x - v7->x;
                     v14 = v4->y * v7->x - v7->y * v4->x;
-                    numVerticesi = frustum->field_30 * v157 - v161;
+                    numVerticesi = frustum->nearLeft * v157 - v161;
                     if ( numVerticesi != 0.0 )
                     {
                         v14 = v14 / numVerticesi;
                     }
-                    v17 = frustum->field_30 * v14;
+                    v17 = frustum->nearLeft * v14;
                     v18 = v157;
                     if ( v18 < 0.0 )
                         v18 = -v18;
@@ -2773,8 +2773,8 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
             v168 = numVerticesb;
             do
             {
-                numVerticesc = frustum->field_28 * v39->y;
-                v43 = frustum->field_28 * v40->y;
+                numVerticesc = frustum->right * v39->y;
+                v43 = frustum->right * v40->y;
                 if ( numVerticesc >= v39->x || v43 >= v40->x )
                 {
                     if ( v39->x != numVerticesc && v43 != v40->x && (v39->x > (double)numVerticesc || v43 < v40->x) )
@@ -2782,12 +2782,12 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                         v162 = v40->y - v39->y;
                         v158 = v40->x - v39->x;
                         v47 = v40->y * v39->x - v39->y * v40->x;
-                        numVerticesj = frustum->field_28 * v162 - v158;
+                        numVerticesj = frustum->right * v162 - v158;
                         if ( numVerticesj != 0.0 )
                         {
                             v47 = v47 / numVerticesj;
                         }
-                        v50 = frustum->field_28 * v47;
+                        v50 = frustum->right * v47;
                         v51 = v162;
                         if ( v51 < 0.0 )
                             v51 = -v51;
@@ -2858,8 +2858,8 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
             v169 = numVerticesd;
             do
             {
-                numVerticese = frustum->field_2C * v71->y;
-                v76 = *(v73 - 1) * frustum->field_2C;
+                numVerticese = frustum->nearTop * v71->y;
+                v76 = *(v73 - 1) * frustum->nearTop;
                 if ( numVerticese >= v71->z || v76 >= *v73 )
                 {
                     if ( v71->z != numVerticese && v76 != *v73 && (v71->z > (double)numVerticese || v76 < *v73) )
@@ -2868,12 +2868,12 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                         v159 = *v73 - v71->z;
                         v80 = *(v73 - 1) * v71->z - *v73 * v71->y;
                         v81 = v80;
-                        numVerticesk = frustum->field_2C * v163 - v159;
+                        numVerticesk = frustum->nearTop * v163 - v159;
                         if ( numVerticesk != 0.0 )
                         {
                             v81 = v80 / numVerticesk;
                         }
-                        v84 = frustum->field_2C * v81;
+                        v84 = frustum->nearTop * v81;
                         v85 = v163;
                         if ( v85 < 0.0 )
                             v85 = -v85;
@@ -2932,8 +2932,8 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                 v170 = result;
                 do
                 {
-                    numVerticesf = frustum->field_20 * v98->y;
-                    v102 = *(v100 - 1) * frustum->field_20;
+                    numVerticesf = frustum->bottom * v98->y;
+                    v102 = *(v100 - 1) * frustum->bottom;
                     if ( numVerticesf <= v98->z || v102 <= *v100 )
                     {
                         if ( v98->z != numVerticesf && v102 != *v100 && (v98->z < (double)numVerticesf || v102 > *v100) )
@@ -2942,12 +2942,12 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                             v160 = *v100 - v98->z;
                             v105 = *(v100 - 1) * v98->z - *v100 * v98->y;
                             v106 = v105;
-                            numVerticesl = frustum->field_20 * v164 - v160;
+                            numVerticesl = frustum->bottom * v164 - v160;
                             if ( numVerticesl != 0.0 )
                             {
                                 v106 = v105 / numVerticesl;
                             }
-                            v109 = frustum->field_20 * v106;
+                            v109 = frustum->bottom * v106;
                             v110 = v164;
                             if ( v110 < 0.0 )
                                 v110 = -v110;
@@ -3335,8 +3335,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
         v183 = numVertices;
         do
         {
-            numVerticesa = v6->y * frustum->field_30;
-            v12 = frustum->field_30 * v4->y;
+            numVerticesa = v6->y * frustum->nearLeft;
+            v12 = frustum->nearLeft * v4->y;
             if ( numVerticesa <= v6->x|| v12 <= v4->x )
             {
                 if ( v6->x != numVerticesa && v12 != v4->x && (v6->x < (double)numVerticesa || v12 > v4->x) )
@@ -3344,12 +3344,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
                     v175 = v4->y - v6->y;
                     v179 = v4->x - v6->x;
                     v15 = v4->y * v6->x - v6->y * v4->x;
-                    numVerticesj = frustum->field_30 * v175 - v179;
+                    numVerticesj = frustum->nearLeft * v175 - v179;
                     if ( numVerticesj != 0 )
                     {
                         v15 = v15 / numVerticesj;
                     }
-                    v18 = frustum->field_30 * v15;
+                    v18 = frustum->nearLeft * v15;
                     v19 = v175;
                     if ( v19 < 0.0 )
                         v19 = -v19;
@@ -3423,8 +3423,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
             v184 = numVerticesb;
             do
             {
-                numVerticesc = frustum->field_28 * v41->y;
-                v47 = frustum->field_28 * v42->y;
+                numVerticesc = frustum->right * v41->y;
+                v47 = frustum->right * v42->y;
                 if ( numVerticesc >= v41->x|| v47 >= v42->x )
                 {
                     if ( v41->x != numVerticesc && v47 != v42->x && (v41->x > (double)numVerticesc || v47 < v42->x) )
@@ -3432,12 +3432,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
                         v180 = v42->y - v41->y;
                         v176 = v42->x - v41->x;
                         v51 = v42->y * v41->x - v41->y * v42->x;
-                        numVerticesk = frustum->field_28 * v180 - v176;
+                        numVerticesk = frustum->right * v180 - v176;
                         if ( numVerticesk != 0.0 )
                         {
                             v51 = v51 / numVerticesk;
                         }
-                        v54 = frustum->field_28 * v51;
+                        v54 = frustum->right * v51;
                         v55 = v180;
                         if ( v55 < 0.0 )
                             v55 = -v55;
@@ -3513,8 +3513,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
             v185 = numVerticesd;
             do
             {
-                numVerticese = frustum->field_2C * v77->y;
-                v83 = *(v80 - 1) * frustum->field_2C;
+                numVerticese = frustum->nearTop * v77->y;
+                v83 = *(v80 - 1) * frustum->nearTop;
                 if ( numVerticese >= v77->z || v83 >= *v80 )
                 {
                     if ( v77->z != numVerticese && v83 != *v80 && (v77->z > (double)numVerticese || v83 < *v80) )
@@ -3523,12 +3523,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
                         v177 = *v80 - v77->z;
                         v87 = *(v80 - 1) * v77->z - *v80 * v77->y;
                         v88 = v87;
-                        numVerticesl = frustum->field_2C * v181 - v177;
+                        numVerticesl = frustum->nearTop * v181 - v177;
                         if ( numVerticesl != 0.0 )
                         {
                             v88 = v87 / numVerticesl;
                         }
-                        v91 = frustum->field_2C * v88;
+                        v91 = frustum->nearTop * v88;
                         v92 = v181;
                         if ( v92 < 0.0 )
                             v92 = -v92;
@@ -3600,8 +3600,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
             v186 = numVerticesf;
             do
             {
-                numVerticesg = frustum->field_20 * v109->y;
-                v115 = *(v112 - 1) * frustum->field_20;
+                numVerticesg = frustum->bottom * v109->y;
+                v115 = *(v112 - 1) * frustum->bottom;
                 if ( numVerticesg <= v109->z || v115 <= *v112 )
                 {
                     if ( v109->z != numVerticesg && v115 != *v112 && (v109->z < (double)numVerticesg || v115 > *v112) )
@@ -3610,12 +3610,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
                         v178 = *v112 - v109->z;
                         v118 = *(v112 - 1) * v109->z - *v112 * v109->y;
                         v119 = v118;
-                        numVerticesm = frustum->field_20 * v182 - v178;
+                        numVerticesm = frustum->bottom * v182 - v178;
                         if ( numVerticesm != 0.0 )
                         {
                             v119 = v118 / numVerticesm;
                         }
-                        v122 = frustum->field_20 * v119;
+                        v122 = frustum->bottom * v119;
                         v123 = v182;
                         if ( v123 < 0.0 )
                             v123 = -v123;
@@ -3685,21 +3685,21 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
                   && *v142 != frustum->field_0.y
                   && (v138->y < (double)frustum->field_0.y || *v142 < (double)frustum->field_0.y) )
                 {
-                    ++v141;
-                    ++v140;
                     v143 = (frustum->field_0.y - v138->y) / (*v142 - v138->y);
-                    v141[-1].y = frustum->field_0.y;
+                    v141->y = frustum->field_0.y;
                     ++v173;
                     rdClip_faceStatus |= 0x1;
                     v145 = (v136->x - v139->x) * v143 + v139->x;
-                    v141[-1].z = (v142[1] - v138->z) * v143 + v138->z;
+                    v141->z = (v142[1] - v138->z) * v143 + v138->z;
                     v146 = v145;
                     v147 = *(v142 - 1) - v138->x;
-                    v140[-1].x = v146;
+                    v140->x = v146;
                     v148 = v147 * v143 + v138->x;
                     v149 = (v136->y - v139->y) * v143 + v139->y;
-                    v141[-1].x = v148;
-                    v140[-1].y = v149;
+                    v141->x = v148;
+                    v140->y = v149;
+                    ++v140;
+                    ++v141;
                 }
                 if ( *v142 >= (double)frustum->field_0.y )
                 {

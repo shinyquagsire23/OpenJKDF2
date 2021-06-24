@@ -18,4 +18,18 @@ int sithDplay_EarlyInit()
 {
     return 1;
 }
+
+int sithDplay_OpenConnection(void* a)
+{
+    return 0;
+}
+
+void sithDplay_CloseConnection()
+{
+}
+
+int sithDplay_Open(int a, void* b)
+{
+    return 0;
+}
 #endif

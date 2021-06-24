@@ -52,6 +52,8 @@ extern int Window_lastYRel;
 extern int Window_lastSampleMs;
 extern int Window_bMouseLeft;
 extern int Window_bMouseRight;
+extern int Window_xSize;
+extern int Window_ySize;
 
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);

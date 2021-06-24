@@ -244,7 +244,7 @@ void sithAI_TickAll()
           && (actor->thing->thingflags & 0x202) == 0
           && actor->thing->actorParams.health > 0.0
           && (actor->mode & 0x3000) == 0
-          && actor->field_190 <= sithTime_curMs )
+          && actor->nextUpdate <= sithTime_curMs )
         {
             sithAI_TickActor(actor);
         }
@@ -264,27 +264,27 @@ void sithAI_TickActor(sithActor *actor)
 LABEL_2:
     for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
     {
-        if ( (actor->entries[a1a].field_0 & 1) == 0 )
+        if ( (actor->instincts[a1a].field_0 & 1) == 0 )
         {
             v5 = actor->mode;
             if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
             {
-                if ( actor->entries[a1a].field_4 <= sithTime_curMs )
+                if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                 {
-                    actor->entries[a1a].field_4 = sithTime_curMs + 1000;
-                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->entries[a1a], 0, 0) && a3 != actor->mode )
+                    actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
+                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->mode )
                     {
                         sithAI_SetActorFireTarget(actor, 256, a3);
                         a3 = actor->mode;
                         goto LABEL_2;
                     }
                 }
-                if ( actor->entries[a1a].field_4 < nextMs )
-                    nextMs = actor->entries[a1a].field_4;
+                if ( actor->instincts[a1a].nextUpdate < nextMs )
+                    nextMs = actor->instincts[a1a].nextUpdate;
             }
         }
     }
-    actor->field_190 = nextMs;
+    actor->nextUpdate = nextMs;
 }
 
 void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
@@ -323,7 +323,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
         {
-            sithActorEntry* entry = &actor->entries[v7];
+            sithActorInstinct* entry = &actor->instincts[v7];
             if ( (entry->field_0 & 1) == 0 )
             {
                 if ( (actor->aiclass->entries[v7].param3 & a2) != 0 )

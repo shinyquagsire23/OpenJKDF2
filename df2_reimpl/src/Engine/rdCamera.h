@@ -18,22 +18,23 @@
 #define rdCamera_BuildFOV_ADDR (0x00443670)
 #define rdCamera_BuildClipFrustum_ADDR (0x00443830)
 #define rdCamera_Update_ADDR (0x00443900)
-#define rdCamera_PerspProject_ADDR (0x00443940)
-#define rdCamera_PerspProjectLst_ADDR (0x00443980)
-#define rdCamera_PerspProjectSquare_ADDR (0x00443A00)
-#define rdCamera_PerspProjectSquareLst_ADDR (0x00443A40)
-#define rdCamera_OrthoProject_ADDR (0x00443AB0)
-#define rdCamera_OrthoProjectLst_ADDR (0x00443B00)
-#define rdCamera_OrthoProjectSquare_ADDR (0x00443B80)
-#define rdCamera_OrthoProjectSquareLst_ADDR (0x00443BC0)
+#define rdCamera_OrthoProject_ADDR (0x00443940)
+#define rdCamera_OrthoProjectLst_ADDR (0x00443980)
+#define rdCamera_OrthoProjectSquare_ADDR (0x00443A00)
+#define rdCamera_OrthoProjectSquareLst_ADDR (0x00443A40)
+#define rdCamera_PerspProject_ADDR (0x00443AB0)
+#define rdCamera_PerspProjectLst_ADDR (0x00443B00)
+#define rdCamera_PerspProjectSquare_ADDR (0x00443B80)
+#define rdCamera_PerspProjectSquareLst_ADDR (0x00443BC0)
 #define rdCamera_SetAmbientLight_ADDR (0x00443C30)
 #define rdCamera_SetAttenuation_ADDR (0x00443C40)
 #define rdCamera_AddLight_ADDR (0x00443C80)
 #define rdCamera_ClearLights_ADDR (0x00443CF0)
 #define rdCamera_AdvanceFrame_ADDR (0x00443D10)
 
-#define rdCameraProjectType_Perspective (0)
-#define rdCameraProjectType_Ortho       (1)
+#define rdCameraProjectType_Ortho (0)
+#define rdCameraProjectType_Perspective       (1)
+#define rdCameraProjectType_PerspMVP (2)
 
 typedef struct rdCanvas rdCanvas;
 typedef struct rdLight rdLight;
@@ -41,16 +42,16 @@ typedef struct rdLight rdLight;
 typedef struct rdClipFrustum
 {
   rdVector3 field_0;
-  float field_C;
-  float field_10;
-  float field_14;
-  float field_18;
-  float field_1C;
-  float field_20;
-  float field_24;
-  float field_28;
-  float field_2C;
-  float field_30;
+  float orthoLeft;
+  float orthoTop;
+  float orthoRight;
+  float orthoBottom;
+  float farTop;
+  float bottom;
+  float farLeft;
+  float right;
+  float nearTop;
+  float nearLeft;
 } rdClipFrustum;
 
 typedef struct rdCamera
@@ -86,14 +87,14 @@ int rdCamera_SetAspectRatio(rdCamera *camera, float ratio);
 int rdCamera_BuildFOV(rdCamera *camera);
 int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
 void rdCamera_Update(rdMatrix34 *orthoProj);
-void rdCamera_PerspProject(rdVector3* out, rdVector3* v);
-void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
-void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-void rdCamera_OrthoProject(rdVector3 *out, rdVector3 *v);
+void rdCamera_OrthoProject(rdVector3* out, rdVector3* v);
 void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_OrthoProjectSquare(rdVector3 *out, rdVector3 *v);
 void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v);
+void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
+void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt);
 void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal);
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);

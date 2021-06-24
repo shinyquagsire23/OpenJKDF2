@@ -186,8 +186,8 @@ int jkGui_SetModeMenu(const void *palette)
     params.field_10 = 1;
     mode.render_8bpp.bpp = 0;
     mode.render_8bpp.rBpp = 0x3F800000;
-    mode.render_8bpp.width = 640;
-    mode.render_8bpp.height = 480;
+    mode.render_8bpp.width = Window_xSize;
+    mode.render_8bpp.height = Window_ySize;
     mode.render_8bpp.rShift = 0;
     mode.render_8bpp.gShift = 0;
     mode.render_8bpp.bShift = 0;

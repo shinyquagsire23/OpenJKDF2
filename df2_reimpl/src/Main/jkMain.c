@@ -38,6 +38,7 @@
 #include "Win95/Video.h"
 #include "Win95/sithDplay.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/Window.h"
 #include "General/util.h"
 #include "General/stdBitmap.h"
 #include "General/stdPalEffects.h"
@@ -939,6 +940,44 @@ int jkMain_MenuReturn()
 }
 
 #ifdef LINUX
+void jkMain_FixRes()
+{
+    if (!jkGame_isDDraw)
+        return;
+        
+    stdDisplay_pCurVideoMode->format.width = Window_xSize;
+    stdDisplay_pCurVideoMode->format.height = Window_ySize;
+    
+    stdDisplay_pCurVideoMode->format.width = Window_xSize;
+    stdDisplay_pCurVideoMode->format.height = Window_ySize;
+    stdDisplay_pCurVideoMode->widthMaybe = Window_xSize;
+    
+    Video_menuBuffer.format.width_in_pixels = Window_xSize;
+    Video_otherBuf.format.width_in_pixels = Window_xSize;
+    Video_menuBuffer.format.width = Window_xSize;
+    Video_otherBuf.format.width = Window_xSize;
+    Video_menuBuffer.format.height = Window_ySize;
+    Video_otherBuf.format.height = Window_ySize;
+    
+    _memcpy((void*)0x8600E0, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy((void*)0x85FF60, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    
+    jkDev_Close();
+#ifndef LINUX_TMP
+    jkHud_Deinit();
+    jkHudInv_deinit_menu_graphics_maybe();
+#endif
+    sithCamera_Close();
+    rdCanvas_Free(Video_pCanvas);
+    
+    jkHudInv_LoadItemRes();
+    jkHud_InitRes();
+    jkDev_Open();
+    
+    Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, Window_xSize, Window_ySize, 6);
+    sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
+}
+
 int jkMain_SetVideoMode()
 {
     signed int result; // eax
@@ -964,8 +1003,20 @@ int jkMain_SetVideoMode()
     sithControl_Open();
     sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
 #ifndef LINUX_TMP
-    stdDisplay_pCurVideoMode->format.width = 640;
-    stdDisplay_pCurVideoMode->format.height = 480;
+    stdDisplay_pCurVideoMode->format.width = Window_xSize;
+    stdDisplay_pCurVideoMode->format.height = Window_ySize;
+    
+    stdDisplay_pCurVideoMode->format.width = Window_xSize;
+    stdDisplay_pCurVideoMode->format.height = Window_ySize;
+    stdDisplay_pCurVideoMode->widthMaybe = Window_xSize;
+    
+    Video_menuBuffer.format.width_in_pixels = Window_xSize;
+    Video_otherBuf.format.width_in_pixels = Window_xSize;
+    Video_menuBuffer.format.width = Window_xSize;
+    Video_otherBuf.format.width = Window_xSize;
+    Video_menuBuffer.format.height = Window_ySize;
+    Video_otherBuf.format.height = Window_ySize;
+    
     _memcpy((void*)0x8600E0, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     _memcpy((void*)0x85FF60, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     stdPalEffects_RefreshPalette();
@@ -976,7 +1027,7 @@ int jkMain_SetVideoMode()
 #endif
     
     rdroid_curAcceleration = 1;
-    Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, 640, 480, 6);
+    Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, Window_xSize, Window_ySize, 6);
     sithRender_SetSomeRenderflag(0x2a);
     sithRender_SetGeoMode(Video_modeStruct.geoMode);
     sithRender_SetLightMode(Video_modeStruct.lightMode);
