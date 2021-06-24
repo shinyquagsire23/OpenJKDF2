@@ -326,6 +326,7 @@ void sith_UpdateCamera()
             {
                 rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
                 rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+                rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
             }
             
             sith_lastAspect = aspect;

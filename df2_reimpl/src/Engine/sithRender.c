@@ -384,7 +384,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 rdCamera_pCurCamera->projectLst(vertices_tmp_projected, vertices_tmp, meshinfo_out.numVertices);
                 
                 // no frustum culling
-                if ((rdClip_faceStatus & 0x41) != 0 )
+                if (1 || (rdClip_faceStatus & 0x41) != 0 )
                 {
                     v31 = frustumArg;
                 }

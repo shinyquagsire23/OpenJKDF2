@@ -152,11 +152,8 @@ int rdCamera_SetAspectRatio(rdCamera *camera, float ratio)
 int rdCamera_BuildFOV(rdCamera *camera)
 {
     double v10; // st3
-    double v14; // st7
     double v15; // st4
-    double v16; // st5
     float camerac; // [esp+1Ch] [ebp+4h]
-    float camerad; // [esp+1Ch] [ebp+4h]
 
     rdClipFrustum* clipFrustum = camera->cameraClipFrustum;
     rdCanvas* canvas = camera->canvas;
@@ -169,14 +166,11 @@ int rdCamera_BuildFOV(rdCamera *camera)
         {
             camera->fov_y = 0.0;
             camerac = ((double)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
-            v14 = -camerac / camera->screenAspectRatio;
             v15 = ((double)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
-            v16 = camerac / camera->screenAspectRatio;
-            camerad = v15;
             clipFrustum->orthoLeft = -v15;
-            clipFrustum->orthoTop = v16;
-            clipFrustum->orthoRight = camerad;
-            clipFrustum->orthoBottom = v14;
+            clipFrustum->orthoTop = camerac / camera->screenAspectRatio;
+            clipFrustum->orthoRight = v15;
+            clipFrustum->orthoBottom = -camerac / camera->screenAspectRatio;
             clipFrustum->farTop = 0.0;
             clipFrustum->bottom = 0.0;
             clipFrustum->farLeft = 0.0;
@@ -251,9 +245,13 @@ void rdCamera_Update(rdMatrix34 *orthoProj)
 
 void rdCamera_OrthoProject(rdVector3* out, rdVector3* v)
 {
+    //rdCamera_pCurCamera->orthoScale = 200.0;
+
     out->x = rdCamera_pCurCamera->orthoScale * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
     out->y = -(v->z * rdCamera_pCurCamera->orthoScale) * rdCamera_pCurCamera->screenAspectRatio + rdCamera_pCurCamera->canvas->screen_width_half;
-    out->z = v->y;
+    out->z = v->y * rdCamera_pCurCamera->orthoScale;
+
+    //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);
 }
 
 void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)
@@ -288,6 +286,8 @@ void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
     out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
     out->y = rdCamera_pCurCamera->canvas->screen_width_half - rdCamera_pCurCamera->screenAspectRatio * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
     out->z = v->y;
+
+    //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);
 }
 
 void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)

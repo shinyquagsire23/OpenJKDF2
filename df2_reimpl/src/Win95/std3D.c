@@ -352,7 +352,7 @@ void logic()
        maxX*scaleX,      0,                                          0,      0, // right
        0,                                       -maxY*scaleY,               0,      0, // up
        0,                                       0,                                          1,     0, // forward
-       -(width/2)*scaleX,  (height/2)*scaleY,     -1,      1  // pos
+       -(width/2)*scaleX,  (height/2)*scaleY,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
     };
     
     glUseProgram(program);
@@ -695,7 +695,7 @@ void std3D_DrawRenderList()
  
         data_vertices[(i*3)+0] = vertexes[i].x;
         data_vertices[(i*3)+1] = vertexes[i].y;
-        data_vertices[(i*3)+2] = vertexes[i].z;
+        data_vertices[(i*3)+2] = (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? vertexes[i].z : -(1.0-vertexes[i].z);
         data_colors[(i*4)+0] = (float)v_r / 255.0f;
         data_colors[(i*4)+1] = (float)v_g / 255.0f;
         data_colors[(i*4)+2] = (float)v_b / 255.0f;
