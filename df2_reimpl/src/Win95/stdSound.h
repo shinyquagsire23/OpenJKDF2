@@ -14,8 +14,8 @@
 #define stdSound_BufferSetVolume_ADDR (0x0437390)
 #define stdSound_BufferSetFrequency_ADDR (0x0437410)
 #define stdSound_BufferSetFrequency2_ADDR (0x0437430)
-#define stdSound_BufferUnlock_0_ADDR (0x0437450)
-#define stdSound_BufferRestore_ADDR (0x0437480)
+#define stdSound_SetPosition_ADDR (0x0437450)
+#define stdSound_SetVelocity_ADDR (0x0437480)
 #define stdSound_SetPositionOrientation_ADDR (0x04374B0)
 #define stdSound_CommitDeferredSettings_ADDR (0x0437510)
 #define stdSound_sub_437520_ADDR (0x0437520)
@@ -23,7 +23,7 @@
 #define stdSound_BufferReset_ADDR (0x0437560)
 #define stdSound_BufferStop_ADDR (0x0437590)
 #define stdSound_BufferRelease_ADDR (0x04375B0)
-#define stdSound_BufferRelease_0_ADDR (0x04375D0)
+#define stdSound_3DBufferRelease_ADDR (0x04375D0)
 #define stdSound_IsPlaying_ADDR (0x04375F0)
 #define stdSound_BufferSetData_ADDR (0x0437640)
 #define stdSound_BufferUnlock_ADDR (0x04376A0)
@@ -46,14 +46,18 @@ static int (*stdSound_BufferUnlock)(LPDIRECTSOUNDBUFFER a1, void* buffer, int bu
 static void (*stdSound_BufferRelease)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferRelease_ADDR;
 static LPDIRECTSOUNDBUFFER (*stdSound_BufferDuplicate)(LPDIRECTSOUNDBUFFER buf) = (void*)stdSound_BufferDuplicate_ADDR;
 static int (*stdSound_IsPlaying)(LPDIRECTSOUNDBUFFER a1, int *pos) = (void*)stdSound_IsPlaying_ADDR;
-static void (*stdSound_BufferRelease_0)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferRelease_0_ADDR;
+static void (*stdSound_3DBufferRelease)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_3DBufferRelease_ADDR;
 
 #ifdef WIN32
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
 static uint32_t (*stdSound_ParseWav)(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset) = (void*)stdSound_ParseWav_ADDR;
+static void (*stdSound_IA3D_idk)(float a) = (void*)stdSound_IA3D_idk_ADDR;
+static int (*stdSound_BufferStop)(LPDIRECTSOUNDBUFFER a1) = (void*)stdSound_BufferStop_ADDR;
 #else
 int stdSound_Initialize();
 uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
+void stdSound_IA3D_idk(float a);
+int stdSound_BufferStop(LPDIRECTSOUNDBUFFER a1);
 #endif
 
 #endif // _STDSOUND_H

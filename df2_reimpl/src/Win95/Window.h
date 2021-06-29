@@ -18,12 +18,14 @@
 #define Window_msg_main_handler_ADDR (0x0050ECB0)
 
 typedef int (*WindowDrawHandler_t)(uint32_t);
+typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
 
 #define Window_drawAndFlip (*(WindowDrawHandler_t*)0x00855E9C)
 #define Window_setCooperativeLevel (*(WindowDrawHandler_t*)0x00855EA0)
 #define Window_ext_handlers ((wm_handler*)0x00855DF0) // 16
 
-typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
+extern int Window_xSize;
+extern int Window_ySize;
 
 typedef struct wm_handler
 {
@@ -52,8 +54,6 @@ extern int Window_lastYRel;
 extern int Window_lastSampleMs;
 extern int Window_bMouseLeft;
 extern int Window_bMouseRight;
-extern int Window_xSize;
-extern int Window_ySize;
 
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);

@@ -1474,6 +1474,20 @@ void do_hooks()
     hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
     
     // sithSoundSys
+    hook_function(sithSoundSys_Startup_ADDR, sithSoundSys_Startup);
+    hook_function(sithSoundSys_Shutdown_ADDR, sithSoundSys_Shutdown);
+    hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
+    hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
+    hook_function(sithSoundSys_UpdateMusicVolume_ADDR, sithSoundSys_UpdateMusicVolume);
+    hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
+    hook_function(sithSoundSys_ResumeMusic_ADDR, sithSoundSys_ResumeMusic);
+    hook_function(sithSoundSys_Open_ADDR, sithSoundSys_Open);
+    hook_function(sithSoundSys_Close_ADDR, sithSoundSys_Close);
+    hook_function(sithSoundSys_ClearAll_ADDR, sithSoundSys_ClearAll);
+    hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
+    hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
+    hook_function(sithSoundSys_PlayingSoundFromSound_ADDR, sithSoundSys_PlayingSoundFromSound);
+    hook_function(sithSoundSys_FreeThing_ADDR, sithSoundSys_FreeThing);
     hook_function(sithSoundSys_SectorSound_ADDR, sithSoundSys_SectorSound);
     
     // sithAI

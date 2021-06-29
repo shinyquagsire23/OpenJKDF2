@@ -566,7 +566,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
 
 LABEL_31:
     if ( fireSound )
-        sithSoundSys_PlaySoundPosAbsolute(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
+        sithSoundSys_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
     if ( anim >= 0 )
     {
         if ( sender->animclass )

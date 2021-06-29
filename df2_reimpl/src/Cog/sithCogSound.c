@@ -65,12 +65,12 @@ void sithCogSound_PlaySoundThing(sithCog *ctx)
         if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
         {
             flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundSys_PlaySoundPosFollowsThing(sound, &thing->position, thing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundSys_PlaySoundPosAbsolute(sound, &thing->position, thing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         else
         {
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundSys_PlaySoundPosAbsolute(sound, thing, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundSys_PlaySoundPosThing(sound, thing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         if (sithCogVm_multiplayerFlags 
             && !(ctx->flags & 0x200))
@@ -145,7 +145,7 @@ void sithCogSound_PlaySoundPos(sithCog *ctx)
     if ( minDist_act > (double)maxDist_act )
         maxDist_act = minDist_act;
     flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-    playingSound = sithSoundSys_PlaySoundPosFollowsThing(sound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
+    playingSound = sithSoundSys_PlaySoundPosAbsolute(sound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
     if (sithCogVm_multiplayerFlags 
         && !(ctx->flags & 0x200))
     {
@@ -258,7 +258,7 @@ void sithCogSound_StopSound(sithCog *ctx)
     int refId = sithCogVm_PopInt(ctx);
     sithPlayingSound* playingSound = sithSoundSys_GetSoundFromRef(refId);
 
-    if ( playingSound && (playingSound->vtable || playingSound->field_0) )
+    if ( playingSound && (playingSound->sound || playingSound->pSoundBuf) )
     {
         if (sithCogVm_multiplayerFlags
             && !(ctx->flags & 0x200))

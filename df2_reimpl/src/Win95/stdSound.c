@@ -12,4 +12,13 @@ uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSamp
 {
     return 0;
 }
+
+void stdSound_IA3D_idk(float a)
+{
+}
+
+int stdSound_BufferStop(LPDIRECTSOUNDBUFFER a1)
+{
+    return 1;
+}
 #endif

@@ -23,7 +23,7 @@ typedef struct sithSound
     int id;
     int isLoaded;
     uint32_t bufferBytes;
-    int sampleRateHz;
+    uint32_t sampleRateHz;
     int bitsPerSample;
     int bStereo; // LPDIRECTSOUNDBUFFER
     uint32_t sound_len;

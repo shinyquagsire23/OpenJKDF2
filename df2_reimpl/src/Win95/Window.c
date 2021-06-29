@@ -9,6 +9,9 @@
 
 #include "jk.h"
 
+int Window_xSize = 640;
+int Window_ySize = 480;
+
 //static wm_handler Window_ext_handlers[16] = {0};
 
 int Window_AddMsgHandler(WindowHandler_t a1)
@@ -263,8 +266,6 @@ int Window_lastSampleMs = 0;
 int Window_bMouseLeft = 0;
 int Window_bMouseRight = 0;
 int Window_resized = 0;
-int Window_xSize = 640;
-int Window_ySize = 480;
 int Window_mouseX = 0;
 int Window_mouseY = 0;
 
