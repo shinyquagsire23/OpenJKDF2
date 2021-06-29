@@ -97,7 +97,7 @@ int sithSave_LoadEntry(char *fpath)
         goto load_fail;
     }
 LABEL_11:
-    sithSoundSys_sub_4DBF90();
+    sithSoundSys_Reset();
     sithSurface_Startup3();
     sithTimer_Reset();
     stdPalEffects_FlushAllEffects();

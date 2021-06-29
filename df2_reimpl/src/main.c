@@ -107,13 +107,14 @@
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
-#include "Win95/stdConsole.h"
-#include "Win95/Window.h"
-#include "Win95/Windows.h"
-#include "Win95/wuRegistry.h"
 #include "Win95/stdGdi.h"
 #include "Win95/stdControl.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/stdConsole.h"
+#include "Win95/stdSound.h"
+#include "Win95/Window.h"
+#include "Win95/Windows.h"
+#include "Win95/wuRegistry.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
@@ -1758,6 +1759,16 @@ void do_hooks()
     hook_function(Video_SwitchToGDI_ADDR, Video_SwitchToGDI);
     
     hook_function(stdFileUtil_Deltree_ADDR, stdFileUtil_Deltree);
+    
+    hook_function(stdSound_Initialize_ADDR, stdSound_Initialize);
+    hook_function(stdSound_Shutdown_ADDR, stdSound_Shutdown);
+    hook_function(stdSound_SetMenuVolume_ADDR, stdSound_SetMenuVolume);
+    hook_function(stdSound_BufferCreate_ADDR, stdSound_BufferCreate);
+    hook_function(stdSound_BufferSetData_ADDR, stdSound_BufferSetData);
+    hook_function(stdSound_BufferUnlock_ADDR, stdSound_BufferUnlock);
+    hook_function(stdSound_BufferPlay_ADDR, stdSound_BufferPlay);
+    hook_function(stdSound_BufferStop_ADDR, stdSound_BufferStop);
+    hook_function(stdSound_BufferReset_ADDR, stdSound_BufferReset);
     
     hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
     hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);

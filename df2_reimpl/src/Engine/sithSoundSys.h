@@ -19,16 +19,16 @@
 #define sithSoundSys_cog_playsound_internal_ADDR (0x004DB4F0)
 #define sithSoundSys_PlaySoundPosAbsolute_ADDR (0x004DB880)
 #define sithSoundSys_PlaySoundPosThing_ADDR (0x004DBA60)
-#define sithSoundSys_sub_4DBF40_ADDR (0x004DBF40)
-#define sithSoundSys_sub_4DBF90_ADDR (0x004DBF90)
+#define sithSoundSys_PlayingSoundReset_ADDR (0x004DBF40)
+#define sithSoundSys_Reset_ADDR (0x004DBF90)
 #define sithSoundSys_SetPitch_ADDR (0x004DC070)
 #define sithSoundSys_SetFrequency_ADDR (0x004DC110)
 #define sithSoundSys_FadeSound_ADDR (0x004DC170)
-#define sithSoundSys_sub_4DC280_ADDR (0x004DC280)
+#define sithSoundSys_SetVolume_ADDR (0x004DC280)
 #define sithSoundSys_Tick_ADDR (0x004DC2F0)
-#define sithSoundSys_sound_idk2_ADDR (0x004DC750)
-#define sithSoundSys_sub_4DC790_ADDR (0x004DC790)
-#define sithSoundSys_sub_4DCC00_ADDR (0x004DCC00)
+#define sithSoundSys_GetThingSoundIdx_ADDR (0x004DC750)
+#define sithSoundSys_TickPlayingSound_ADDR (0x004DC790)
+#define sithSoundSys_UpdateSoundPos_ADDR (0x004DCC00)
 #define sithSoundSys_sub_4DCE10_ADDR (0x004DCE10)
 #define sithSoundSys_StopSound_ADDR (0x004DCE80)
 #define sithSoundSys_FreeThing_ADDR (0x004DCF20)
@@ -37,7 +37,7 @@
 #define sithSoundSys_sub_4DD310_ADDR (0x004DD310)
 #define sithSoundSys_SectorSound_ADDR (0x004DD330)
 #define sithSoundSys_SyncSounds_ADDR (0x004DD360)
-#define sithSoundSys_sub_4DD3C0_ADDR (0x004DD3C0)
+#define sithSoundSys_FreePlayingSound_ADDR (0x004DD3C0)
 #define sithSoundSys_sub_4DD3F0_ADDR (0x004DD3F0)
 #define sithSoundSys_sub_4DD5D0_ADDR (0x004DD5D0)
 
@@ -62,6 +62,7 @@
 #define sithSoundSys_pPlayingSoundIdk (*(sithPlayingSound**)0x00836BF8)
 #define sithSoundSys_dword_836C00 (*(int*)0x00836C00)
 #define sithSoundSys_nextSoundIdx (*(int*)0x0054A684)
+#define sithSoundSys_dword_836C04 (*(int*)0x00836C04)
 
 enum SITHSOUNDFLAG
 {
@@ -74,15 +75,23 @@ enum SITHSOUNDFLAG
     SITHSOUNDFLAG_ABSOLUTE = 0x40,
     SITHSOUNDFLAG_FOLLOWSTHING = 0x80,
     SITHSOUNDFLAG_HIGHPRIO = 0x100,
+    SITHSOUNDFLAG_200 = 0x200,
+    SITHSOUNDFLAG_400 = 0x400,
+    SITHSOUNDFLAG_800 = 0x800,
+    SITHSOUNDFLAG_1000 = 0x1000,
+    SITHSOUNDFLAG_UNDERWATER = 0x2000,
+    SITHSOUNDFLAG_4000 = 0x4000,
+    SITHSOUNDFLAG_8000 = 0x8000,
     SITHSOUNDFLAG_NOOVERRIDE = 0x10000,
     SITHSOUNDFLAG_PLAYING = 0x20000,
     SITHSOUNDFLAG_40000 = 0x40000,
+    SITHSOUNDFLAG_80000 = 0x80000,
 };
 
 typedef struct sithPlayingSound
 {
-    LPDIRECTSOUNDBUFFER pSoundBuf;
-    LPDIRECTSOUNDBUFFER p3DSoundObj;
+    stdSound_buffer_t* pSoundBuf;
+    stdSound_buffer_t* p3DSoundObj;
     sithSound* sound;
     int flags;
     int idx;
@@ -115,7 +124,15 @@ void sithSoundSys_ClearAll();
 void sithSoundSys_StopAll();
 void sithSoundSys_ResumeAll();
 sithPlayingSound* sithSoundSys_PlayingSoundFromSound(sithSound *sound, int flags);
+sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float volume, float pan, int flags);
+
+void sithSoundSys_PlayingSoundReset(sithPlayingSound *sound);
+void sithSoundSys_Reset();
+
+void sithSoundSys_FreePlayingSound(sithPlayingSound *sound);
+
 void sithSoundSys_FreeThing(sithThing *thing);
+sithPlayingSound* sithSoundSys_GetSoundFromRef(int refid);
 void sithSoundSys_SectorSound(sithSector *sector, sithSound *sound, float vol);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
@@ -124,7 +141,6 @@ void sithSoundSys_SectorSound(sithSector *sector, sithSound *sound, float vol);
 //static void (*sithSoundSys_FreeThing)(sithThing *thing) = (void*)sithSoundSys_FreeThing_ADDR;
 static sithPlayingSound* (*sithSoundSys_PlaySoundPosThing)(sithSound *a1, sithThing *a2, float a3, float a4, float a5, int a6) = (void*)sithSoundSys_PlaySoundPosThing_ADDR;
 static sithPlayingSound* (*sithSoundSys_PlaySoundPosAbsolute)(sithSound *a1, rdVector3 *a2, sithSector *a3, float a4, float a5, float a6, int a7) = (void*)sithSoundSys_PlaySoundPosAbsolute_ADDR;
-static sithPlayingSound* (*sithSoundSys_cog_playsound_internal)(sithSound *a1, float a2, float a3, int a4) = (void*)sithSoundSys_cog_playsound_internal_ADDR;
 static int (*sithSoundSys_StopSound)(sithPlayingSound *a1) = (void*)sithSoundSys_StopSound_ADDR;
 //static sithPlayingSound* (*sithSoundSys_GetSoundFromRef)(int a1) = (void*)sithSoundSys_GetSoundFromRef_ADDR;
 static void (*sithSoundSys_FadeSound)(sithPlayingSound *sound, float vol_, float fadeintime_) = (void*)sithSoundSys_FadeSound_ADDR;
@@ -133,11 +149,8 @@ static void (*sithSoundSys_SetPitch)(sithPlayingSound *a1, float pitch, float ch
 
 #ifdef LINUX
 void sithSoundSys_Tick(float a1);
-void sithSoundSys_sub_4DBF90();
 #else
 static void (*sithSoundSys_Tick)(float) = (void*)sithSoundSys_Tick_ADDR;
-static void (*sithSoundSys_sub_4DBF90)() = (void*)sithSoundSys_sub_4DBF90_ADDR;
-static sithPlayingSound* (*sithSoundSys_GetSoundFromRef)(int a1) = (void*)sithSoundSys_GetSoundFromRef_ADDR;
 #endif
 
 #endif // _SITHSOUNDSYS_H

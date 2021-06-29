@@ -89,6 +89,7 @@ typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 typedef struct sithMap sithMap;
 typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
+typedef struct stdALBuffer stdALBuffer;
 
 typedef struct sithSave_Header sithSave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
@@ -97,6 +98,12 @@ typedef struct videoModeStruct videoModeStruct;
 typedef struct common_functions common_functions;
 
 typedef struct Darray Darray;
+
+#ifdef WIN32
+typedef IDirectSoundBuffer stdSound_buffer_t;
+#else
+typedef stdALBuffer stdSound_buffer_t;
+#endif
 
 #ifdef LINUX
 #define __stdcall

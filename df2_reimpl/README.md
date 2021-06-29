@@ -39,6 +39,11 @@ TL;DR for Windows users
 
 `mmap` is used to maintain all `.rodata`, `.data`, and `.bss` variables in the same addresses as `JK.EXE`, however if `openjkdf2` invokes an unimplemented function, it will segfault at the unimplemented function address.
 
+The current dependency list (for Arch) is as follows:
+```
+lib32-sdl2 lib32-glew lib32-openal lib32-freealut 
+```
+
 ## Current Progress
 
 Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (see `ida_copypaste_funclist_nostdlib.txt` for a full function name listing).
@@ -196,7 +201,7 @@ jkSaber                        0x1f4a     0.743%        38.989%        12 / 40
 sithInventory                  0x2150     0.791%        99.179%        60 / 62         
 sithMulti                      0x252a     0.882%        0.105%          1 / 35         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
-sithSoundSys                   0x2626     0.906%        20.541%        15 / 37         
+sithSoundSys                   0x2626     0.906%        30.483%        17 / 37         
 stdDisplay                     0x267b     0.913%        0.264%          2 / 37         
 sithControl                    0x2723     0.929%        34.944%         9 / 32         
 sithAI                         0x2771     0.936%        23.027%        14 / 35         
@@ -215,15 +220,15 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-35.010% by weight
-59.142% by weight excluding rasterizer
-1838 / 3167 functions
-1838 / 2796 functions excluding rasterizer
+35.100% by weight
+59.294% by weight excluding rasterizer
+1840 / 3167 functions
+1840 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           7.831%          333 / 1322
+sith           7.741%          331 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.718%          195 / 360
 jkGui          3.655%          122 / 284
@@ -232,12 +237,12 @@ jk             3.097%          160 / 322
 Raster         40.792%         370 / 371
 other          1.536%           80 / 120
 -----------------------------------------
-total          64.990%        1329 / 3167
+total          64.900%        1327 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           13.229%         333 / 1322
+sith           13.077%         331 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.971%          195 / 360
 jkGui          6.175%          122 / 284
@@ -245,6 +250,6 @@ rd             5.194%           36 / 345
 jk             5.231%          160 / 322
 other          2.595%           80 / 120
 -----------------------------------------
-total          40.877%         959 / 2796
+total          40.725%         957 / 2796
 
 ```

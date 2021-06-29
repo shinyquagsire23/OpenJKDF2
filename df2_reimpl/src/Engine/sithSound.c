@@ -213,7 +213,7 @@ int sithSound_LoadFileData(sithSound *sound)
 
     if ( sound->bufferBytes + sithSound_curDataLoaded > sithSound_maxDataLoaded )
         sithSound_StopAll(sound->bufferBytes + 0x19000);
-    IDirectSoundBuffer* dsoundBuf = stdSound_BufferCreate(sound->bStereo, sound->sampleRateHz, sound->bitsPerSample, sound->bufferBytes);
+    stdSound_buffer_t* dsoundBuf = stdSound_BufferCreate(sound->bStereo, sound->sampleRateHz, sound->bitsPerSample, sound->bufferBytes);
     if ( dsoundBuf )
     {
         sound->dsoundBuffer2 = dsoundBuf;
@@ -275,7 +275,7 @@ int sithSound_UnloadData(sithSound *sound)
     return 1;
 }
 
-LPDIRECTSOUND sithSound_LoadData(sithSound *sound)
+stdSound_buffer_t* sithSound_LoadData(sithSound *sound)
 {
     if (!(sound->isLoaded & 1))
     {
@@ -366,12 +366,12 @@ int sithSound_StopAll(uint32_t idk)
     }
 }
 
-LPDIRECTSOUNDBUFFER sithSound_InitFromPath(char *path)
+stdSound_buffer_t* sithSound_InitFromPath(char *path)
 {
     int fd; // ebx
     int bufferLen; // edi
-    IDirectSoundBuffer *createdBuf; // eax
-    IDirectSoundBuffer *dsoundBuf; // esi
+    stdSound_buffer_t *createdBuf; // eax
+    stdSound_buffer_t *dsoundBuf; // esi
     int bStereo; // [esp+Ch] [ebp-94h] BYREF
     size_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
     int nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
@@ -406,7 +406,7 @@ LPDIRECTSOUNDBUFFER sithSound_InitFromPath(char *path)
         }
         else
         {
-            dsoundBuf = (IDirectSoundBuffer *)seekOffs;
+            dsoundBuf = (stdSound_buffer_t *)seekOffs;
         }
         pSithHS->fileClose(fd);
         if ( dsoundBuf )

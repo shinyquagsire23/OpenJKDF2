@@ -25,12 +25,12 @@ typedef struct sithSound
     uint32_t bufferBytes;
     uint32_t sampleRateHz;
     int bitsPerSample;
-    int bStereo; // LPDIRECTSOUNDBUFFER
+    int bStereo; // stdSound_buffer_t*
     uint32_t sound_len;
     int seekOffset;
     int field_40;
     int infoLoaded;
-    void* dsoundBuffer2; // LPDIRECTSOUNDBUFFER
+    void* dsoundBuffer2; // stdSound_buffer_t*
 } sithSound;
 
 int sithSound_Startup();
@@ -42,9 +42,9 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2);
 sithSound* sithSound_GetFromIdx(int idx);
 int sithSound_LoadFileData(sithSound *sound);
 int sithSound_UnloadData(sithSound *sound);
-LPDIRECTSOUND sithSound_LoadData(sithSound *sound);
+stdSound_buffer_t* sithSound_LoadData(sithSound *sound);
 int sithSound_StopAll(uint32_t idk);
-LPDIRECTSOUNDBUFFER sithSound_InitFromPath(char *path);
+stdSound_buffer_t* sithSound_InitFromPath(char *path);
 
 //static int (*sithSound_Load)(sithWorld *world, int a2) = (void*)sithSound_Load_ADDR;
 //static sithSound* (*sithSound_LoadEntry)(char *sound_fname, int a2) = (void*)sithSound_LoadEntry_ADDR;

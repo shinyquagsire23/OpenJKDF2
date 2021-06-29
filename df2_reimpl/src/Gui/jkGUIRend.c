@@ -4,6 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/sithSound.h"
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/stdControl.h"
@@ -18,7 +19,7 @@ static char *jkGuiRend_LoadedSounds[4];
 static uint8_t jkGuiRend_palette[0x300];
 static int jkGuiRend_idk2;
 static int jkGuiRend_idk;
-static LPDIRECTSOUNDBUFFER jkGuiRend_DsoundHandles[4];
+static stdSound_buffer_t* jkGuiRend_DsoundHandles[4];
 static jkGuiMenu *jkGuiRend_activeMenu;
 static stdVBuffer* jkGuiRend_menuBuffer;
 static stdVBuffer *jkGuiRend_texture_dword_8561E8;
@@ -445,11 +446,7 @@ jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int id)
 
 void jkGuiRend_PlayWav(char *fpath)
 {
-#ifdef LINUX
-    return;
-#endif
     int bufferMaxSize, samplesPerSec, bStereo, bitsPerSample, seekOffset;
-    char tmp[256];
 
     if ( !fpath )
         return;
@@ -464,40 +461,7 @@ void jkGuiRend_PlayWav(char *fpath)
         }
     }
 
-    IDirectSoundBuffer* newHandle = 0;
-    _sprintf(tmp, "sound%c%s", 92, fpath);
-
-    int fd = std_pHS->fileOpen(tmp, "rb");
-    if ( fd )
-    {
-        uint32_t bufferLen = stdSound_ParseWav(fd, &samplesPerSec, &bitsPerSample, &bStereo, &seekOffset);
-        if ( bufferLen )
-        {
-            newHandle = stdSound_BufferCreate(bStereo, samplesPerSec, bitsPerSample, bufferLen);
-            if ( newHandle )
-            {
-                void* bufferData = stdSound_BufferSetData(newHandle, bufferLen, &bufferMaxSize);
-                if ( bufferData && bufferMaxSize == bufferLen )
-                {
-                    std_pHS->fileRead(fd, bufferData, bufferLen);
-                    stdSound_BufferUnlock(newHandle, bufferData, bufferMaxSize);
-                    std_pHS->fileClose(fd);
-                }
-                else
-                {
-                    if ( bufferData )
-                        stdSound_BufferUnlock(newHandle, bufferData, bufferMaxSize);
-                    stdSound_BufferRelease(newHandle);
-                    newHandle = 0;
-                    return;
-                }
-            }
-        }
-        else
-        {
-            std_pHS->fileClose(fd);
-        }
-    }
+    stdSound_buffer_t* newHandle = sithSound_InitFromPath(fpath);
 
     if ( newHandle )
     {
@@ -507,8 +471,12 @@ void jkGuiRend_PlayWav(char *fpath)
         if ( jkGuiRend_LoadedSounds[3] )
             std_pHS->free(jkGuiRend_LoadedSounds[3]);
 
-        _memcpy(&jkGuiRend_DsoundHandles[1], jkGuiRend_DsoundHandles, 0xCu);
-        _memcpy(&jkGuiRend_LoadedSounds[1], jkGuiRend_LoadedSounds, 0xCu);
+        for (int i = 3; i >= 1; i--)
+        {
+            jkGuiRend_DsoundHandles[i-1] = jkGuiRend_DsoundHandles[i];
+            jkGuiRend_LoadedSounds[i-1] = jkGuiRend_LoadedSounds[i];
+        }
+
         jkGuiRend_DsoundHandles[0] = newHandle;
         char* soundPath = (char *)std_pHS->alloc(_strlen(fpath) + 1);
         _strcpy(soundPath, fpath);
@@ -1400,7 +1368,6 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     int v9; // edx
     int v10; // ebx
     int v11; // eax
-    stdVBuffer **v12; // eax
     jkGuiElement *v14; // ebp
     int v15; // eax
     int v17; // ebx
@@ -1423,7 +1390,6 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
         v11 = element->rect.height;
         drawRect.x = v9;
         drawRect.height = v11;
-        v12 = v4->mipSurfaces;
         drawRect.width = v10;
         v14 = menu->lastMouseOverClickable;
         v15 = v6->format.width + 4;

@@ -61,7 +61,6 @@ void jkGuiMain_Show()
 {
     int v1; // esi
     wchar_t *v2; // eax
-    HWND v3; // eax
     wchar_t *v4; // [esp-4h] [ebp-Ch]
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
@@ -84,8 +83,13 @@ void jkGuiMain_Show()
                     v2 = jkStrings_GetText("GUI_QUITCONFIRM");
                     if ( !jkGuiDialog_YesNoDialog(v2, v4) )
                         goto LABEL_12;
-                    v3 = stdGdi_GetHwnd();
-                    jk_PostMessageA(v3, 16, 0, 0);
+
+                    // TODO proper shutdown?
+#ifdef WIN32
+                    jk_PostMessageA(stdGdi_GetHwnd(), 16, 0, 0);
+#else
+                    exit(0);
+#endif
                     break;
                 case 13:
                     jkGuiSetup_Show();

@@ -51,4 +51,4 @@ $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -m32 -o $@ -g $^ -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -fshort-wchar -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+	$(CC) -m32 -o $@ -g $^ -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
