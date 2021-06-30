@@ -12,7 +12,6 @@ DroidWorks.*
 .qmake.stash
 player
 openjkdf2
-resource
 moc*.h
 DF2
 MOTS

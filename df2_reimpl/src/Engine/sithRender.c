@@ -143,7 +143,6 @@ void sithRender_SetPalette(const void *palette)
 
 void sithRender_Draw()
 {
-    sithSector **v1; // ebx
     sithSector *v2; // edi
     sithAdjoin *i; // esi
     sithSector *v4; // eax
@@ -204,27 +203,20 @@ void sithRender_Draw()
         sithRender_831980 = 0;
         rdCamera_ClearLights(rdCamera_pCurCamera);
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
-        v11 = 0;
-        if ( sithRender_numSectors )
+
+        for (v11 = 0; v11 < sithRender_numSectors; v11++)
         {
-            v1 = sithRender_aSectors;
-            do
+            v2 = sithRender_aSectors[v11];
+            for ( i = v2->adjoins; i; i = i->next )
             {
-                v2 = *v1;
-                for ( i = (*v1)->adjoins; i; i = i->next )
+                v4 = i->sector;
+                if ( v4->field_8C != sithRender_8EE678 && (i->flags & 1) != 0 )
                 {
-                    v4 = i->sector;
-                    if ( v4->field_8C != sithRender_8EE678 && (i->flags & 1) != 0 )
-                    {
-                        v9 = i->dist;
-                        v4->clipFrustum = v2->clipFrustum;
-                        sithRender_UpdateLights(v4, 0.0, v9);
-                    }
+                    v9 = i->dist;
+                    v4->clipFrustum = v2->clipFrustum;
+                    sithRender_UpdateLights(v4, 0.0, v9);
                 }
-                ++v1;
-                ++v11;
             }
-            while ( v11 < sithRender_numSectors );
         }
         if ( (sithRender_flag & 2) != 0 )
             sithRender_RenderDynamicLights();

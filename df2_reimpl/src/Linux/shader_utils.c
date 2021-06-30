@@ -6,6 +6,8 @@
 
 #ifdef LINUX
 
+#include "shader_utils.h"
+
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 
@@ -33,6 +35,36 @@ void print_log(GLuint object) {
 	
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s\n", log);
 	free(log);
+}
+
+GLuint load_shader_file(const char* filepath, GLenum type)
+{
+    FILE* f = fopen(filepath, "r");
+    if (!f)
+    {
+        printf("Failed to load shader file `%s`!\n", filepath);
+        return -1;
+    }
+    
+    fseek(f, 0, SEEK_END);
+    size_t len = ftell(f);
+    rewind(f);
+    
+    char* shader_contents = malloc(len+1);
+    
+    if (fread(shader_contents, 1, len, f) != len)
+    {
+        printf("Failed to read shader file `%s`!\n", filepath);
+        return -1;
+    }
+    shader_contents[len] = 0;
+    
+    fclose(f);
+    
+    GLuint ret = create_shader(shader_contents, type);
+    free(shader_contents);
+    
+    return ret;
 }
 
 /**

@@ -40,92 +40,17 @@ static void* last_overlay = NULL;
 static int activeFb;
 
 int init_once = 0;
-GLuint program;
+GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
 GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_displayPalette;
+
+GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
+GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
+
 GLuint worldpal_texture;
 void* worldpal_data;
 GLuint displaypal_texture;
 void* displaypal_data;
-
-const char* gl_frag = 
-"uniform sampler2D tex;\n"
-"uniform sampler1D worldPalette;\n"
-"uniform sampler1D displayPalette;\n"
-"uniform int tex_mode;\n"
-"uniform int blend_mode;\n"
-"varying vec4 f_color;\n"
-"varying vec2 f_uv;\n"
-"varying vec3 f_coord;\n"
-"void main(void) {\n"
-"  vec4 sampled = texture2D(tex, f_uv);\n"
-"  vec4 sampled_color = vec4(0.0, 0.0, 0.0, 0.0);\n"
-"  vec4 vertex_color = f_color;\n"
-"  float index = sampled.r;\n"
-"  vec4 palval = texture1D(worldPalette, index);\n"
-"  vec4 palvald = texture1D(displayPalette, index);\n"
-"  vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
-"  \n"
-"  if (tex_mode == 0)\n"
-"  {\n"
-"    sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);\n"
-"  }\n"
-"  else if (tex_mode == 1)\n"
-"  {\n"
-"    sampled_color = vec4(sampled.r, sampled.g, sampled.b, sampled.a);\n"
-"  }\n"
-"  else if (tex_mode == 2)\n"
-"  {\n"
-"    float transparency = sampled.a;\n"
-"    if (sampled.r == 1.0 && sampled.g == 0.0 && sampled.b == 1.0)\n"
-"      transparency = 0.0;\n"
-"    sampled_color = vec4(sampled.b, sampled.g, sampled.r, transparency);\n"
-"  }\n"
-"  else if (tex_mode == 3)\n"
-"  {\n"
-"    sampled_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-"  }\n"
-"  else if (tex_mode == 4)\n"
-"  {\n"
-"    float transparency = 1.0;\n"
-"    if (index == 0.0)\n"
-"      discard;\n"
-"    sampled_color = vec4(palval.r, palval.g, palval.b, transparency);\n"
-"  }\n"
-"  else if (tex_mode == 5)\n"
-"  {\n"
-"    float transparency = 1.0;\n"
-"    if (index == 0.0)\n"
-"      discard;\n"
-"    sampled_color = vec4(palvald.r, palvald.g, palvald.b, transparency);\n"
-"  }\n"
-"  \n"
-"  if (blend_mode == 5)\n"
-"  {\n"
-"    blend = vec4(1.0, 1.0, 1.0, 1.0);\n"
-"    if (sampled_color.a < 0.1)\n"
-"      discard;\n"
-"  }\n"
-"  gl_FragColor = sampled_color * vertex_color * blend;\n"
-"}";
-
-const char* gl_vert = 
-"attribute vec3 coord3d;\n"
-"attribute vec4 v_color;\n"
-"attribute vec2 v_uv;\n"
-"uniform mat4 mvp;\n"
-"varying vec4 f_color;\n"
-"varying vec2 f_uv;\n"
-"varying vec3 f_coord;\n"
-"void main(void) {\n"
-"  vec4 pos = mvp * vec4(coord3d, 1.0);\n"
-"  pos.w = 1/(1.0-coord3d.z);\n"
-"  pos.xyz *= pos.w;\n"
-"  gl_Position = pos;\n"
-"  f_color = v_color;\n"
-"  f_uv = v_uv;\n"
-"  f_coord = coord3d;\n"
-"}";
 
 static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 static GLuint std3D_aLoadedTextures[1024];
@@ -194,6 +119,59 @@ void swap_framebuffers()
 	}
 }
 
+GLuint std3D_loadProgram(const char* fpath_base)
+{
+    GLuint out;
+    GLint link_ok = GL_FALSE;
+    
+    char* tmp_vert = malloc(strlen(fpath_base) + 32);
+    char* tmp_frag = malloc(strlen(fpath_base) + 32);
+    
+    strcpy(tmp_vert, fpath_base);
+    strcat(tmp_vert, "_v.glsl");
+    
+    strcpy(tmp_frag, fpath_base);
+    strcat(tmp_frag, "_f.glsl");
+    
+    GLuint vs, fs;
+    if ((vs = load_shader_file(tmp_vert, GL_VERTEX_SHADER))   == 0) return 0;
+    if ((fs = load_shader_file(tmp_frag, GL_FRAGMENT_SHADER)) == 0) return 0;
+    
+    free(tmp_vert);
+    free(tmp_frag);
+    
+    out = glCreateProgram();
+    glAttachShader(out, vs);
+    glAttachShader(out, fs);
+    glLinkProgram(out);
+    glGetProgramiv(out, GL_LINK_STATUS, &link_ok);
+    if (!link_ok) 
+    {
+        print_log(out);
+        return 0;
+    }
+    
+    return out;
+}
+
+GLint std3D_tryFindAttribute(GLuint program, const char* attribute_name)
+{
+    GLint out = glGetAttribLocation(program, attribute_name);
+    if (out == -1) {
+        printf("Could not bind attribute %s!\n", out);
+    }
+    return out;
+}
+
+GLint std3D_tryFindUniform(GLuint program, const char* uniform_name)
+{
+    GLint out = glGetUniformLocation(program, uniform_name);
+    if (out == -1) {
+        printf("Could not bind uniform %s!\n", out);
+    }
+    return out;
+}
+
 int init_resources()
 {
     printf("OpenGL init...\n");
@@ -205,22 +183,26 @@ int init_resources()
     fbTex = fbTex1;
     fbRbo = fbRbo1;
     
-    GLint link_ok = GL_FALSE;
+    if ((programDefault = std3D_loadProgram("resource/shaders/default")) == 0) return false;
+    if ((programMenu = std3D_loadProgram("resource/shaders/menu")) == 0) return false;
     
-    GLuint vs, fs;
-    if ((vs = create_shader(gl_vert, GL_VERTEX_SHADER))   == 0) return false;
-    if ((fs = create_shader(gl_frag, GL_FRAGMENT_SHADER)) == 0) return false;
+    // Attributes/uniforms
+    attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
+    attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
+    attribute_v_uv = std3D_tryFindAttribute(programDefault, "v_uv");
+    uniform_mvp = std3D_tryFindUniform(programDefault, "mvp");
+    uniform_tex = std3D_tryFindUniform(programDefault, "tex");
+    uniform_worldPalette = std3D_tryFindUniform(programDefault, "worldPalette");
+    uniform_displayPalette = std3D_tryFindUniform(programDefault, "displayPalette");
+    uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
+    uniform_blend_mode = std3D_tryFindUniform(programDefault, "blend_mode");
     
-    program = glCreateProgram();
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
-    if (!link_ok) 
-    {
-        print_log(program);
-        return false;
-    }
+    programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
+    programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
+    programMenu_attribute_v_uv = std3D_tryFindAttribute(programMenu, "v_uv");
+    programMenu_uniform_mvp = std3D_tryFindUniform(programMenu, "mvp");
+    programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
+    programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
     
     // World palette
     glGenTextures(1, &worldpal_texture);
@@ -248,86 +230,14 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
-    
-    const char* attribute_name;
-    attribute_name = "coord3d";
-    attribute_coord3d = glGetAttribLocation(program, attribute_name);
-    if (attribute_coord3d == -1) {
-        printf("Could not bind attribute %s!\n", attribute_name);
-        //return false;
-    }
-
-    attribute_name = "v_color";
-    attribute_v_color = glGetAttribLocation(program, attribute_name);
-    if (attribute_v_color == -1) 
-    {
-        printf("Could not bind attribute %s!\n", attribute_name);
-        //return false;
-    }
-    
-    attribute_name = "v_uv";
-    attribute_v_uv = glGetAttribLocation(program, attribute_name);
-    if (attribute_v_uv == -1) 
-    {
-        printf("Could not bind attribute %s!\n", attribute_name);
-        //return false;
-    }
-
-    const char* uniform_name;
-    uniform_name = "mvp";
-    uniform_mvp = glGetUniformLocation(program, uniform_name);
-    if (uniform_mvp == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
-    
-    uniform_name = "tex";
-    uniform_tex = glGetUniformLocation(program, uniform_name);
-    if (uniform_tex == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
-    
-    uniform_name = "worldPalette";
-    uniform_worldPalette = glGetUniformLocation(program, uniform_name);
-    if (uniform_worldPalette == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
-    
-    uniform_name = "displayPalette";
-    uniform_displayPalette = glGetUniformLocation(program, uniform_name);
-    if (uniform_displayPalette == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
-    
-    uniform_name = "tex_mode";
-    uniform_tex_mode = glGetUniformLocation(program, uniform_name);
-    if (uniform_tex_mode == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
-    
-    uniform_name = "blend_mode";
-    uniform_blend_mode = glGetUniformLocation(program, uniform_name);
-    if (uniform_blend_mode == -1) 
-    {
-        printf("Could not bind uniform %s!\n", uniform_name);
-        //return false;
-    }
 
     has_initted = true;
 }
 
 void free_resources()
 {
-    glDeleteProgram(program);
+    glDeleteProgram(programDefault);
+    glDeleteProgram(programMenu);
     deleteFramebuffer(fb1, fbTex1, fbRbo1);
     deleteFramebuffer(fb2, fbTex2, fbRbo2);
     glDeleteTextures(1, &worldpal_texture);
@@ -335,29 +245,6 @@ void free_resources()
     free(worldpal_data);
     free(displaypal_data);
     has_initted = false;
-}
-
-void logic()
-{
-    float maxX, maxY, scaleX, scaleY, width, height;
-    
-    scaleX = 1.0/((double)Window_xSize / 2.0);
-    scaleY = 1.0/((double)Window_ySize / 2.0);
-    maxX = 1.0;
-    maxY = 1.0;
-    width = Window_xSize;
-    height = Window_ySize;
-    
-    float d3dmat[16] = {
-       maxX*scaleX,      0,                                          0,      0, // right
-       0,                                       -maxY*scaleY,               0,      0, // up
-       0,                                       0,                                          1,     0, // forward
-       -(width/2)*scaleX,  (height/2)*scaleY,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
-    };
-    
-    glUseProgram(program);
-    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);
-    glViewport(0, 0, width, height);
 }
 
 int std3D_StartScene()
@@ -424,6 +311,7 @@ static rdDDrawSurface* test_idk = NULL;
 void std3D_DrawMenu()
 {
     glDepthFunc(GL_ALWAYS);
+    glUseProgram(programMenu);
     
     float menu_w, menu_h;
     menu_w = (double)Window_xSize;
@@ -542,28 +430,43 @@ void std3D_DrawMenu()
     glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
     
-    glUniform1i(uniform_tex_mode, TEX_MODE_DISPPAL);
-    glUniform1i(uniform_blend_mode, 2);
-    glActiveTexture(GL_TEXTURE0 + 2);
-    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
-    glUniform1i(uniform_tex, 0);
-    glUniform1i(uniform_worldPalette, 1);
-    glUniform1i(uniform_displayPalette, 2);
+    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glUniform1i(programMenu_uniform_tex, 0);
+    glUniform1i(programMenu_uniform_displayPalette, 1);
     
-    logic();
+    {
+
+    float maxX, maxY, scaleX, scaleY, width, height;
+    
+    scaleX = 1.0/((double)Window_xSize / 2.0);
+    scaleY = 1.0/((double)Window_ySize / 2.0);
+    maxX = 1.0;
+    maxY = 1.0;
+    width = Window_xSize;
+    height = Window_ySize;
+    
+    float d3dmat[16] = {
+       maxX*scaleX,      0,                                          0,      0, // right
+       0,                                       -maxY*scaleY,               0,      0, // up
+       0,                                       0,                                          1,     0, // forward
+       -(width/2)*scaleX,  (height/2)*scaleY,     -1,      1  // pos
+    };
+    
+    glUniformMatrix4fv(programMenu_uniform_mvp, 1, GL_FALSE, d3dmat);
+    glViewport(0, 0, width, height);
+
+    }
     
     rdTri* tris = GL_tmpTris;
-    glUseProgram(program);
-    glEnableVertexAttribArray(attribute_coord3d);
-    glEnableVertexAttribArray(attribute_v_color);
-    glEnableVertexAttribArray(attribute_v_uv);
+    glEnableVertexAttribArray(programMenu_attribute_coord3d);
+    glEnableVertexAttribArray(programMenu_attribute_v_color);
+    glEnableVertexAttribArray(programMenu_attribute_v_uv);
     
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
     glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
     glVertexAttribPointer(
-        attribute_coord3d, // attribute
+        programMenu_attribute_coord3d, // attribute
         3,                 // number of elements per vertex, here (x,y,z)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // take our values as-is
@@ -574,7 +477,7 @@ void std3D_DrawMenu()
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
     glVertexAttribPointer(
-        attribute_v_color, // attribute
+        programMenu_attribute_v_color, // attribute
         4,                 // number of elements per vertex, here (R,G,B,A)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // take our values as-is
@@ -585,7 +488,7 @@ void std3D_DrawMenu()
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
     glVertexAttribPointer(
-        attribute_v_uv,    // attribute
+        programMenu_attribute_v_uv,    // attribute
         2,                 // number of elements per vertex, here (U,V)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // take our values as-is
@@ -611,9 +514,9 @@ void std3D_DrawMenu()
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
     glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(attribute_v_uv);
-    glDisableVertexAttribArray(attribute_v_color);
-    glDisableVertexAttribArray(attribute_coord3d);
+    glDisableVertexAttribArray(programMenu_attribute_v_uv);
+    glDisableVertexAttribArray(programMenu_attribute_v_color);
+    glDisableVertexAttribArray(programMenu_attribute_coord3d);
     glDeleteBuffers(1, &ibo_triangle);
     
     free(data_elements);
@@ -631,39 +534,7 @@ void std3D_DrawMenu()
 
 void std3D_DrawRenderList()
 {
-    /*GL_tmpVertices[0].x = 0.0;
-    GL_tmpVertices[0].y = 0.0;
-    GL_tmpVertices[0].z = 1.0;
-    GL_tmpVertices[0].tu = 0.0;
-    GL_tmpVertices[0].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[0].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[0].ny = 0xFF0000FF;
-    *(uint32_t*)&GL_tmpVertices[0].nz = 0;
-    
-    GL_tmpVertices[1].x = 0.0;
-    GL_tmpVertices[1].y = 480.0;
-    GL_tmpVertices[1].z = 1.0;
-    GL_tmpVertices[1].tu = 0.0;
-    GL_tmpVertices[1].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[1].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[1].ny = 0xFF00FF00;
-    *(uint32_t*)&GL_tmpVertices[1].nz = 0;
-    
-    GL_tmpVertices[2].x = 640.0;
-    GL_tmpVertices[2].y = 480.0;
-    GL_tmpVertices[2].z = 1.0;
-    GL_tmpVertices[2].tu = 0.0;
-    GL_tmpVertices[2].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[2].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFF0000;
-    *(uint32_t*)&GL_tmpVertices[2].nz = 0;
-    
-    GL_tmpTris[0].v1 = 1;
-    GL_tmpTris[0].v2 = 0;
-    GL_tmpTris[0].v3 = 2;
-    
-    GL_tmpVerticesAmt = 3;
-    GL_tmpTrisAmt = 1;*/
+    glUseProgram(programDefault);
     
     last_tex = NULL;
 
@@ -739,10 +610,30 @@ void std3D_DrawRenderList()
     glUniform1i(uniform_worldPalette, 1);
     glUniform1i(uniform_displayPalette, 2);
     
-    logic();
+    {
+    
+    float maxX, maxY, scaleX, scaleY, width, height;
+    
+    scaleX = 1.0/((double)Window_xSize / 2.0);
+    scaleY = 1.0/((double)Window_ySize / 2.0);
+    maxX = 1.0;
+    maxY = 1.0;
+    width = Window_xSize;
+    height = Window_ySize;
+    
+    float d3dmat[16] = {
+       maxX*scaleX,      0,                                          0,      0, // right
+       0,                                       -maxY*scaleY,               0,      0, // up
+       0,                                       0,                                          1,     0, // forward
+       -(width/2)*scaleX,  (height/2)*scaleY,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+    };
+    
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);
+    glViewport(0, 0, width, height);
+    
+    }
     
     rdTri* tris = GL_tmpTris;
-    glUseProgram(program);
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
     glEnableVertexAttribArray(attribute_v_uv);

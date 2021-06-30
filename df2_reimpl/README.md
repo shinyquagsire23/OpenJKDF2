@@ -44,6 +44,8 @@ The current dependency list (for Arch) is as follows:
 lib32-sdl2 lib32-glew lib32-openal lib32-freealut 
 ```
 
+When running on Linux, be sure to have copied the GLSL shaders from `df2_reimpl/resource/shaders/*` to `<JK.EXE base folder>/resource/shaders/*`.
+
 ## Current Progress
 
 Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (see `ida_copypaste_funclist_nostdlib.txt` for a full function name listing).

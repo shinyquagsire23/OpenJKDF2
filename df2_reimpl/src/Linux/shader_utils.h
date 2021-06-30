@@ -10,6 +10,7 @@
 #include <GL/glew.h>
 
 extern void print_log(GLuint object);
+GLuint load_shader_file(const char* filepath, GLenum type);
 extern GLuint create_shader(const char* filename, GLenum type);
 
 #endif
