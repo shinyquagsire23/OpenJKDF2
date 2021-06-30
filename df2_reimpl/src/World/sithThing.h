@@ -676,6 +676,7 @@ void sithThing_HurtSound(sithThing *thing, float amount, int hurtType);
 void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
 void sithThing_detachallchildren(sithThing *thing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
+void sithThing_SyncThingPos(sithThing *thing, int a2);
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
@@ -699,7 +700,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThing_ADDR;
 static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 //static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
-static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
+//static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
 //static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
 //static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;
 //static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;

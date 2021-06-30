@@ -10,10 +10,14 @@
 #include "World/sithPlayer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"
+#include "Engine/sithMulti.h"
 #include "General/stdString.h"
 #include "Cog/sithCogPlayer.h"
 
 #include "jk.h"
+
+#define jkCog_emptystring ((wchar_t*)0x005540BC)
+#define jkCog_jkstring ((wchar_t*)0x00553FB8) // 130
 
 void jkCog_SetFlags(sithCog *ctx);
 void jkCog_ClearFlags(sithCog *ctx);
@@ -33,6 +37,9 @@ void jkCog_PlayPovKey(sithCog *ctx);
 void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_SetWaggle(sithCog *ctx);
 void jkCog_GetChoice(sithCog *ctx);
+void jkCog_StringClear();
+void jkCog_StringConcatFormattedInt(sithCog *ctx);
+void jkCog_StringOutput(sithCog *ctx);
 
 //static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
 //static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;
@@ -56,17 +63,17 @@ static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
 //static void (*jkCog_SetPersuasionInfo)(sithCog* ctx) = (void*)0x0040AC90;
 static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
 static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
-static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
+//static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
 static void (*jkCog_StringConcatUnistring)(sithCog* ctx) = (void*)0x0040ADA0;
 static void (*jkCog_StringConcatAsciiString)(sithCog* ctx) = (void*)0x0040AE30;
 static void (*jkCog_StringConcatPlayerName)(sithCog* ctx) = (void*)0x0040AEB0;
 static void (*jkCog_StringConcatSpace)(sithCog* ctx) = (void*)0x0040AF10;
 static void (*jkCog_StringConcatInt)(sithCog* ctx) = (void*)0x0040AF70;
-static void (*jkCog_StringConcatFormattedInt)(sithCog* ctx) = (void*)0x0040AFE0;
+//static void (*jkCog_StringConcatFormattedInt)(sithCog* ctx) = (void*)0x0040AFE0;
 static void (*jkCog_StringConcatFlex)(sithCog* ctx) = (void*)0x0040B090;
 static void (*jkCog_StringConcatFormattedFlex)(sithCog* ctx) = (void*)0x0040B100;
 static void (*jkCog_StringConcatVector)(sithCog* ctx) = (void*)0x0040B1C0;
-static void (*jkCog_StringOutput)(sithCog* ctx) = (void*)0x0040B270;
+//static void (*jkCog_StringOutput)(sithCog* ctx) = (void*)0x0040B270;
 //static void (*jkCog_GetSaberCam)(sithCog* ctx) = (void*)0x0040B3B0;
 //static void (*jkCog_GetChoice)(sithCog* ctx) = (void*)0x0040B3D0;
 
@@ -520,4 +527,90 @@ void jkCog_SetWaggle(sithCog *ctx)
 void jkCog_GetChoice(sithCog *ctx)
 {
     sithCogVm_PushInt(ctx, jkPlayer_GetChoice());
+}
+
+void jkCog_StringClear()
+{
+    wcscpy(jkCog_jkstring, jkCog_emptystring);
+}
+
+void jkCog_StringConcatFormattedInt(sithCog *ctx)
+{
+    char *v1; // esi
+    signed int v2; // eax
+    signed int v3; // ebx
+    size_t v4; // esi
+    wchar_t v5[130]; // [esp+Ch] [ebp-208h] BYREF
+    wchar_t v6[130]; // [esp+110h] [ebp-104h] BYREF
+
+    v1 = sithCogVm_PopString(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    v3 = v2;
+    if ( v1 )
+    {
+        stdString_CharToWchar(v6, v1, _strlen(v1) + 1);
+        jk_snwprintf(v5, 130, v6, v3); // added bounds
+    }
+    else
+    {
+        jk_snwprintf(v5, 130, L"%d", v2);
+    }
+    v4 = __wcslen(v5);
+    if ( __wcslen(jkCog_jkstring) + v4 < 0x81 )
+        __wcscat(jkCog_jkstring, v5);
+}
+
+void jkCog_StringOutput(sithCog *ctx)
+{
+    int v1; // ebx
+    int v2; // esi
+    int v3; // edi
+    int v4; // edi
+    char v5[128]; // [esp+Ch] [ebp-80h] BYREF
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    if ( v1 >= 0 )
+        v1 = sithPlayer_GetNumidk(v1);
+    if ( v2 >= 0 )
+        v2 = sithPlayer_GetNumidk(v2);
+    stdString_WcharToChar(v5, jkCog_jkstring, 127);
+    v5[127] = 0;
+    if ( v2 >= 0 )
+    {
+        if ( v2 == playerThingIdx )
+        {
+LABEL_8:
+            jkDev_PrintUniString(jkCog_jkstring);
+            return;
+        }
+        if ( sithCogVm_multiplayerFlags )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v4 = ctx->trigId;
+                if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN && v2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v2].flags & 1) != 0 )
+                    sithMulti_SendChat(v5, v2, v1);
+            }
+        }
+    }
+    else
+    {
+        if ( v2 != -3 )
+        {
+            if ( v2 != -1 )
+                return;
+            goto LABEL_8;
+        }
+        jkDev_PrintUniString(jkCog_jkstring);
+        if ( sithCogVm_multiplayerFlags )
+        {
+            if ( (ctx->flags & 0x200) == 0 )
+            {
+                v3 = ctx->trigId;
+                if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
+                    sithMulti_SendChat(v5, -1, v1);
+            }
+        }
+    }
 }

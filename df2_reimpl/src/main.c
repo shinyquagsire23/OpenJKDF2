@@ -102,6 +102,7 @@
 #include "World/sithCollide.h"
 #include "World/sithActor.h"
 #include "World/sithTrackThing.h"
+#include "World/sithThingPlayer.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -612,6 +613,9 @@ void do_hooks()
     hook_function(stdConsole_WriteBorderMaybe3_ADDR, stdConsole_WriteBorderMaybe3);
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
 #endif
+
+    // sithThingPlayer
+    hook_function(sithThingPlayer_cogMsg_SendSendTrigger_ADDR, sithThingPlayer_cogMsg_SendSendTrigger);
     
     // Window
     hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);
@@ -1032,6 +1036,7 @@ void do_hooks()
     hook_function(sithThing_Destroy_ADDR, sithThing_Destroy);
     hook_function(sithThing_Damage_ADDR, sithThing_Damage);
     hook_function(sithThing_AttachThing_ADDR, sithThing_AttachThing);
+    hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1202,6 +1207,7 @@ void do_hooks()
     hook_function(sithPlayer_HandleSentDeathPkt_ADDR, sithPlayer_HandleSentDeathPkt);
     hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
     hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
+    hook_function(sithPlayer_GetNumidk_ADDR, sithPlayer_GetNumidk);
     
 #if 0
     // sithSurface

@@ -76,6 +76,7 @@ void sithPlayer_AddDyamicAdd(int r, int g, int b);
 int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2);
 void sithPlayer_HandleSentDeathPkt(sithThing *thing);
 void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy);
+int sithPlayer_GetNumidk(int a1);
 
 static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
@@ -90,7 +91,7 @@ static unsigned int (*sithPlayer_ThingIdxToPlayerIdx)(int id) = (void*)sithPlaye
 //static void (*sithPlayer_idk)(int) = (void*)sithPlayer_idk_ADDR;
 //static void (*sithPlayer_ResetPalEffects)() = (void*)sithPlayer_ResetPalEffects_ADDR;
 //static void (*sithPlayer_HandleSentDeathPkt)(sithThing *thing) = (void*)sithPlayer_HandleSentDeathPkt_ADDR;
-static int (*sithPlayer_GetNumidk)(int a1) = (void*)sithPlayer_GetNumidk_ADDR;
+//static int (*sithPlayer_GetNumidk)(int a1) = (void*)sithPlayer_GetNumidk_ADDR;
 //static void (*sithPlayer_sub_4C9150)(sithThing *a1, sithThing *a2) = (void*)sithPlayer_sub_4C9150_ADDR;
 
 #endif // _SITHPLAYER_H

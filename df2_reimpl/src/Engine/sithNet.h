@@ -13,4 +13,10 @@
 #define net_things_idx (*(int*)0x008330F0)
 #define net_things ((int*)0x008326AC)
 
+#define sithNet_thingsIdx (*(int*)0x008330F0)
+
+#define sithNet_syncIdx (*(int*)0x008330F4)
+#define sithNet_aSyncFlags ((int*)0x008330B0)
+#define sithNet_aSyncThings ((sithThing**)0x00832668)
+
 #endif // _SITHNET_H

@@ -527,3 +527,20 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
         sithControl_death_msgtimer = sithTime_curMs + 3000;
 }
 
+int sithPlayer_GetNumidk(int a1)
+{
+    int result; // eax
+    sithPlayerInfo* i;
+
+    if ( !net_isMulti )
+        return 0;
+    result = 0;
+    if ( jkPlayer_maxPlayers <= 0 )
+        return -1;
+    for ( i = &jkPlayer_playerInfos[0]; (i->flags & 1) == 0 || i->playerThing->thingIdx != a1; i++ )
+    {
+        if ( ++result >= jkPlayer_maxPlayers )
+            return -1;
+    }
+    return result;
+}

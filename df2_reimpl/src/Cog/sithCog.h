@@ -62,6 +62,17 @@
 #define sithCog_numSurfaceLinks (*(int*)0x00836C34)
 #define sithCog_aSurfaceLinks ((sithCogSurfaceLink*)0x8B9C60)
 
+#define NETMSG_START void* craftingPacket = &g_netMsgTmp.pktData[0]
+#define NETMSG_PUSHU8(x) { *(uint8_t*)craftingPacket = x; craftingPacket += sizeof(uint8_t); }
+#define NETMSG_PUSHU16(x) { *(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t); }
+#define NETMSG_PUSHU32(x) { *(uint32_t*)craftingPacket = x; craftingPacket += sizeof(uint32_t); }
+#define NETMSG_PUSHF32(x) { *(float*)craftingPacket = x; craftingPacket += sizeof(float); }
+#define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&g_netMsgTmp.pktData[0]; \
+                            g_netMsgTmp.netMsg.flag_maybe = 0; \
+                            g_netMsgTmp.netMsg.cogMsgId = msgid; \
+                            g_netMsgTmp.netMsg.msg_size = len; \
+                          }
+
 typedef int SITH_MESSAGE;
 
 enum SITH_MESSAGE_E

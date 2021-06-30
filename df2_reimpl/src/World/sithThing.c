@@ -2344,3 +2344,38 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
     if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromThing(child, parent, SITH_MESSAGE_ENTERED);
 }
+
+void sithThing_SyncThingPos(sithThing *thing, int a2)
+{
+    int v2; // edx
+    unsigned int v3; // eax
+    sithThing **v4; // ecx
+
+    if ( sithCogVm_multiplayerFlags )
+    {
+        v2 = sithNet_syncIdx;
+        v3 = 0;
+        if ( sithNet_syncIdx )
+        {
+            v4 = sithNet_aSyncThings;
+            while ( *v4 != thing )
+            {
+                ++v3;
+                ++v4;
+                if ( v3 >= sithNet_syncIdx )
+                    goto LABEL_6;
+            }
+            sithNet_aSyncFlags[v3] |= a2;
+        }
+        else
+        {
+LABEL_6:
+            if ( sithNet_syncIdx != 16 )
+            {
+                sithNet_aSyncThings[sithNet_syncIdx] = thing;
+                sithNet_aSyncFlags[v2] = a2;
+                sithNet_syncIdx = v2 + 1;
+            }
+        }
+    }
+}

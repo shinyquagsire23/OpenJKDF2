@@ -23,7 +23,6 @@
 
 void jkCutscene_Initialize(char *fpath);
 void jkCutscene_Shutdown();
-
 int jkCutscene_sub_421310(int a1);
 int jkCutscene_sub_421410();
 int jkCutscene_smack_related_loops();

@@ -46,6 +46,12 @@ typedef int (*sithMultiHandler_t)();
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 
+#ifdef WIN32
+static int (*sithMulti_SendChat)(char *a1, int a2, int a3) = (void*)sithMulti_SendChat_ADDR;
+#else
+int sithMulti_SendChat(char *a1, int a2, int a3);
+#endif
+
 static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
 static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
