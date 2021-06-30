@@ -42,7 +42,7 @@ static int activeFb;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_displayPalette;
+GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -193,7 +193,6 @@ int init_resources()
     uniform_mvp = std3D_tryFindUniform(programDefault, "mvp");
     uniform_tex = std3D_tryFindUniform(programDefault, "tex");
     uniform_worldPalette = std3D_tryFindUniform(programDefault, "worldPalette");
-    uniform_displayPalette = std3D_tryFindUniform(programDefault, "displayPalette");
     uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
     uniform_blend_mode = std3D_tryFindUniform(programDefault, "blend_mode");
     
@@ -600,15 +599,12 @@ void std3D_DrawRenderList()
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
-    glActiveTexture(GL_TEXTURE0 + 2);
-    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_1D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(uniform_tex, 0);
     glUniform1i(uniform_worldPalette, 1);
-    glUniform1i(uniform_displayPalette, 2);
     
     {
     
