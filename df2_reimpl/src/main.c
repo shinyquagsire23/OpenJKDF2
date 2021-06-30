@@ -252,6 +252,12 @@ void do_hooks()
     
     // jkCutscene
     hook_function(jkCutscene_Initialize_ADDR, jkCutscene_Initialize);
+    hook_function(jkCutscene_Shutdown_ADDR, jkCutscene_Shutdown);
+    hook_function(jkCutscene_sub_421310_ADDR, jkCutscene_sub_421310);
+    hook_function(jkCutscene_sub_421410_ADDR, jkCutscene_sub_421410);
+    hook_function(jkCutscene_smack_related_loops_ADDR, jkCutscene_smack_related_loops);
+    hook_function(jkCutscene_PauseShow_ADDR, jkCutscene_PauseShow);
+    hook_function(jkCutscene_Handler_ADDR, jkCutscene_Handler);
     
     // jkDev
     hook_function(jkDev_Close_ADDR, jkDev_Close);
