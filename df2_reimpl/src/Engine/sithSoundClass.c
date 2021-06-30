@@ -4,6 +4,8 @@
 #include "General/stdHashTable.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithSound.h"
+#include "Engine/sithSoundSys.h"
+#include "Win95/stdSound.h"
 #include "World/sithWorld.h"
 
 static const char* sithSoundClass_aKeys[96] = {
@@ -447,17 +449,119 @@ void sithSoundClass_Free2(sithWorld *world)
     }
 }
 
-#ifdef LINUX
-sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2)
+sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2)
 {
-    return NULL;
+    sithSoundClass *v2; // eax
+    sithSoundClassEntry *v3; // esi
+    uint32_t v5; // rax
+
+    v2 = thing->soundclass;
+    if ( v2 )
+    {
+        if ( a2 < SITH_SC_MAX )
+        {
+            v3 = v2->entries[a2];
+            if ( v3 )
+            {
+                if ( v3->listIdx > 1u )
+                {
+                    v5 = (uint32_t)(_frand() * (double)v3->listIdx);
+                    if ( v5 > v3->listIdx - 1 )
+                        v5 = v3->listIdx - 1;
+                    for ( ; v5; v5-- )
+                        v3 = v3->nextSound;
+                }
+                sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
+                return v2;
+            }
+        }
+    }
+    return 0;
 }
 
-void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3)
+void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3)
 {
+    sithSound *v3; // edi
+    int v4; // ebx
+    int v5; // eax
+    float a3a; // [esp+1Ch] [ebp+Ch]
+
+    v3 = entry->sound;
+    if ( entry->sound )
+    {
+        v4 = entry->playflags;
+        a3a = entry->maxVolume * a3;
+        if ( (v4 & 0x400) != 0 )
+        {
+            v5 = sithSoundSys_GetThingSoundIdx(0, v3);
+        }
+        else
+        {
+            if ( (v4 & 0x800) == 0 )
+            {
+LABEL_7:
+                if ( (v4 & 0x40) != 0 )
+                    sithSoundSys_PlaySoundPosAbsolute(v3, &thing->position, thing->sector, a3a, entry->minRadius, entry->maxRadius, v4);
+                else
+                    sithSoundSys_PlaySoundPosThing(v3, thing, a3a, entry->minRadius, entry->maxRadius, v4);
+                return;
+            }
+            v5 = sithSoundSys_GetThingSoundIdx(thing, v3);
+        }
+        if ( v5 >= 0 )
+            return;
+        goto LABEL_7;
+    }
 }
 
-void sithSoundClass_StopSound(sithThing *thing, sithSound* a2)
+void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
 {
+    unsigned int v2; // ebp
+    sithPlayingSound* v3; // esi
+    int v4; // eax
+    sithPlayingSound *v5; // edi
+    int v6; // edx
+    int v7; // eax
+    IDirectSoundBuffer *v8; // [esp-4h] [ebp-14h]
+
+    if ( sithSoundSys_bOpened )
+    {
+        v2 = 0;
+        if ( sithSoundSys_numSoundsAvailable )
+        {
+            v3 = &sithSoundSys_aPlayingSounds[0].flags;
+            do
+            {
+                if ( v3->flags < 0 && thing == v3->thing && (!sound || v3->sound == sound) )
+                {
+                    if ( (v3->flags & SITHSOUNDFLAG_PLAYING) != 0 )
+                    {
+                        sithSoundSys_PlayingSoundReset(v3);
+                    }
+                    v5 = v3;
+                    if ( v3->pSoundBuf )
+                    {
+                        stdSound_BufferRelease(v3->pSoundBuf);
+                        v5->pSoundBuf = 0;
+                    }
+                    if ( v3->p3DSoundObj )
+                    {
+                        stdSound_3DBufferRelease(v3->p3DSoundObj);
+                        v3->p3DSoundObj = 0;
+                    }
+                    v6 = v3->idx;
+                    _memset(v5, 0, sizeof(sithPlayingSound));
+                    v7 = sithSoundSys_numSoundsAvailable2;
+                    v3->idx = v6;
+                    sithSoundSys_aIdk[v7] = v6;
+                    sithSoundSys_numSoundsAvailable2 = v7 + 1;
+                }
+                ++v2;
+                v3++;
+            }
+            while ( v2 < sithSoundSys_numSoundsAvailable );
+        }
+        if ( !sound && thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
+            thing->actorParams.field_1BC = 0;
+    }
 }
-#endif

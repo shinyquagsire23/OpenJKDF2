@@ -471,10 +471,10 @@ void jkGuiRend_PlayWav(char *fpath)
         if ( jkGuiRend_LoadedSounds[3] )
             std_pHS->free(jkGuiRend_LoadedSounds[3]);
 
-        for (int i = 3; i >= 1; i--)
+        for (int i = 0; i < 3; i++)
         {
-            jkGuiRend_DsoundHandles[i-1] = jkGuiRend_DsoundHandles[i];
-            jkGuiRend_LoadedSounds[i-1] = jkGuiRend_LoadedSounds[i];
+            jkGuiRend_DsoundHandles[i+1] = jkGuiRend_DsoundHandles[i];
+            jkGuiRend_LoadedSounds[i+1] = jkGuiRend_LoadedSounds[i];
         }
 
         jkGuiRend_DsoundHandles[0] = newHandle;

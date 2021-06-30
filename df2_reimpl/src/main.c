@@ -265,6 +265,7 @@ void do_hooks()
     hook_function(sithCog_SendMessageFromSectorEx_ADDR, sithCog_SendMessageFromSectorEx);
     hook_function(sithCog_SendMessageEx_ADDR, sithCog_SendMessageEx);
     hook_function(sithCog_Free_ADDR, sithCog_Free);
+    hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
@@ -1488,6 +1489,10 @@ void do_hooks()
     hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
     hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
     hook_function(sithSoundSys_PlayingSoundFromSound_ADDR, sithSoundSys_PlayingSoundFromSound);
+    hook_function(sithSoundSys_cog_playsound_internal_ADDR, sithSoundSys_cog_playsound_internal);
+    hook_function(sithSoundSys_PlaySoundPosAbsolute_ADDR, sithSoundSys_PlaySoundPosAbsolute);
+    hook_function(sithSoundSys_PlaySoundPosThing_ADDR, sithSoundSys_PlaySoundPosThing);
+    hook_function(sithSoundSys_SetPitch_ADDR, sithSoundSys_SetPitch);
     hook_function(sithSoundSys_FreeThing_ADDR, sithSoundSys_FreeThing);
     hook_function(sithSoundSys_SectorSound_ADDR, sithSoundSys_SectorSound);
     
@@ -1769,6 +1774,11 @@ void do_hooks()
     hook_function(stdSound_BufferPlay_ADDR, stdSound_BufferPlay);
     hook_function(stdSound_BufferStop_ADDR, stdSound_BufferStop);
     hook_function(stdSound_BufferReset_ADDR, stdSound_BufferReset);
+    hook_function(stdSound_BufferDuplicate_ADDR, stdSound_BufferDuplicate);
+    hook_function(stdSound_SetPositionOrientation_ADDR, stdSound_SetPositionOrientation);
+    hook_function(stdSound_SetPosition_ADDR, stdSound_SetPosition);
+    hook_function(stdSound_SetVelocity_ADDR, stdSound_SetVelocity);
+    hook_function(stdSound_IsPlaying_ADDR, stdSound_IsPlaying);
     
     hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
     hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);

@@ -106,21 +106,18 @@ void stdSound_SetMenuVolume(float a1)
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
     stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    if (!out)
+        return NULL;
     
     _memset(out, 0, sizeof(*out));
     
-    alGenSources((ALuint)1, &out->source);
-
-	alSourcef(out->source, AL_PITCH, 1);
-	alSourcef(out->source, AL_GAIN, 1);
-	alSource3f(out->source, AL_POSITION, 0, 0, 0);
-	alSource3f(out->source, AL_VELOCITY, 0, 0, 0);
-	alSourcei(out->source, AL_LOOPING, AL_FALSE);
-    
     out->data = NULL;
+    out->bStereo = bStereo;
     out->bufferLen = bufferLen;
     out->nSamplesPerSec = nSamplesPerSec;
     out->bitsPerSample = bitsPerSample;
+    out->refcnt = 1;
+    out->vol = 1.0;
     
     alGenBuffers(1, &out->buffer);
     
@@ -146,7 +143,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
     if (bufferMaxSize)
         *bufferMaxSize = bufferBytes;
     
-    if (sound->data)
+    if (sound->data && !sound->bIsCopy)
         std_pHS->free(sound->data);
 
     sound->data = std_pHS->alloc(bufferBytes);
@@ -156,18 +153,35 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
     
     alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
     
+    
     return sound->data;
 }
 
 int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead)
 {
     alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
+
     return 1;
 }
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
+    //alSourceStop(buf->source);
+    
+    if (!buf->source)
+    {
+        alGenSources((ALuint)1, &buf->source);
+
+	    alSourcef(buf->source, AL_PITCH, 1.0);
+	    alSource3f(buf->source, AL_POSITION, 0, 0, 0);
+	    alSource3f(buf->source, AL_VELOCITY, 0, 0, 0);
+	    
+	    //printf("%u %u\n", buf->source, buf->buffer);
+	}
+
     alSourcei(buf->source, AL_BUFFER, buf->buffer);
+    alSourcei(buf->source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+    alSourcef(buf->source, AL_GAIN, buf->vol);
 
 	alSourcePlay(buf->source);
     return 1;
@@ -177,21 +191,54 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     ALint source_state;
     
-    alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
+    //sound->refcnt--;
+    //if (sound->refcnt > 0)
+    //    return;
+    
+    if (sound->source)
+        alSourcei(sound->source, AL_LOOPING, AL_FALSE);
+    //alSourceStop(sound->source);
+    
+    /*alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
     while (source_state == AL_PLAYING) {
 		alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
-	}
+	}*/
 	
-	alDeleteSources(1, &sound->source);
-	alDeleteBuffers(1, &sound->buffer);
+	if (sound->source)
+	{
+	    //printf("del %u\n", sound->source);
+    	alDeleteSources(1, &sound->source);
+    }
 	
-	if (sound->data)
+	if (!sound->bIsCopy && sound->buffer)
+	    alDeleteBuffers(1, &sound->buffer);
+	
+	sound->source = 0;
+	sound->buffer = 0;
+	
+	if (sound->data && !sound->bIsCopy)
 	    std_pHS->free(sound->data);
 	std_pHS->free(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
 {
+    //alSourcef(sound->source, AL_PITCH, 1.0);
+	//alSourcef(sound->source, AL_GAIN, 1.0);
+	//alSource3f(sound->source, AL_POSITION, 0, 0, 0);
+	//alSource3f(sound->source, AL_VELOCITY, 0, 0, 0);
+	
+	if (sound->source)
+	{
+	    alSourcei(sound->source, AL_LOOPING, AL_FALSE);
+	
+	    alSourceStop(sound->source);
+	    
+	    //printf("del %u\n", sound->source);
+	    alDeleteSources(1, &sound->source);
+	    sound->source = 0;
+	}
+	
     return 1;
 }
 
@@ -200,22 +247,82 @@ void stdSound_BufferSetPan(stdSound_buffer_t* a1, float a2)
     
 }
 
-void stdSound_BufferSetFrequency(stdSound_buffer_t* a1, int a2)
+void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 {
+    float pitch = (double)freq / (double)sound->nSamplesPerSec;
     
+    if (sound->source)
+        alSourcef(sound->source, AL_PITCH, pitch);
+}
+
+stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
+{
+#if 1
+    stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    if (!out)
+        return NULL;
+    
+    _memset(out, 0, sizeof(*out));
+    
+    out->data = sound->data;
+    out->bStereo = sound->bStereo;
+    out->bufferLen = sound->bufferLen;
+    out->nSamplesPerSec = sound->nSamplesPerSec;
+    out->bitsPerSample = sound->bitsPerSample;
+    out->refcnt = 1;
+    out->vol = sound->vol;
+    out->format = sound->format;
+    out->bufferBytes = sound->bufferBytes;
+    out->bIsCopy = 1;
+    out->buffer = sound->buffer;
+    
+    //stdSound_BufferSetData(out, sound->bufferBytes, NULL);
+    
+    //_memcpy(out->data, sound->data, out->bufferBytes);
+    
+    stdSound_BufferUnlock(out, out->data, out->bufferBytes);
+    
+    //printf("%u %u\n", out->source, out->buffer);
+    
+    return out;
+#endif
+#if 0
+    sound->refcnt++;
+    return sound;
+#endif
 }
 
 void stdSound_IA3D_idk(float a)
 {
 }
 
-int stdSound_BufferStop(stdSound_buffer_t* a1)
+int stdSound_BufferStop(stdSound_buffer_t* buf)
 {
+    if (buf->source)
+    {
+        alSourcei(buf->source, AL_LOOPING, AL_FALSE);
+        alSourceStop(buf->source);
+        
+        stdSound_BufferReset(buf);
+    }
     return 1;
 }
 
-void stdSound_BufferSetVolume(stdSound_buffer_t* a1, float a2)
+void stdSound_BufferSetVolume(stdSound_buffer_t* sound, float vol)
 {
+    if (!sound) return;
+    
+    sound->vol = vol;
+    if (!sound->source)
+        return;
+
+    alSourcef(sound->source, AL_GAIN, sound->vol);
+    
+    if (vol == 0.0)
+    {
+        alSourcei(sound->source, AL_LOOPING, AL_FALSE);
+        alSourceStop(sound->source);
+    }
 }
 
 int stdSound_3DBufferIdk(stdSound_buffer_t* a1, int a2)
@@ -230,5 +337,34 @@ void* stdSound_BufferQueryInterface(stdSound_buffer_t* a1)
 
 void stdSound_CommitDeferredSettings()
 {
+}
+
+void stdSound_SetPositionOrientation(rdVector3 *pos, rdVector3 *lvec, rdVector3 *uvec)
+{
+}
+
+void stdSound_SetPosition(stdSound_buffer_t* sound, rdVector3 *pos)
+{
+
+}
+
+void stdSound_SetVelocity(stdSound_buffer_t* sound, rdVector3 *vel)
+{
+    
+}
+
+int stdSound_IsPlaying(stdSound_buffer_t* sound, rdVector3 *pos)
+{
+    if (pos)
+        rdVector_Zero3(pos);
+    
+    if (!sound->source)
+        return 0;
+    
+    ALint source_state;
+    
+    alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
+    
+    return (source_state == AL_PLAYING);
 }
 #endif

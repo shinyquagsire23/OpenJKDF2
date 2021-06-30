@@ -251,7 +251,7 @@ typedef struct sithCogStackvar
     uint32_t type;
     union
     {
-        uint32_t data[3];
+        int32_t data[3];
         float dataAsFloat[3];
     };
 } sithCogStackvar;

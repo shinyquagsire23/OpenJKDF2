@@ -939,6 +939,34 @@ int jkMain_MenuReturn()
     return result;
 }
 
+int jkMain_EndLevel(int a1)
+{
+    jkEpisodeEntry *v1; // esi
+    int v2; // eax
+    int v4; // eax
+
+    if ( jkEpisode_mLoad.numSeq )
+    {
+        v1 = jkEpisode_idk1(&jkEpisode_mLoad);
+        if ( v1->darkpow || v1->lightpow )
+        {
+            v2 = v1->lightpow;
+            if ( v2 )
+            {
+                if ( v2 >= 20 && v2 <= 34 && jkPlayer_GetChoice() != 2 )
+                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->lightpow, 1);
+            }
+            v4 = v1->darkpow;
+            if ( v4 )
+            {
+                if ( v4 >= 20 && v4 <= 34 && jkPlayer_GetChoice() != 1 )
+                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->darkpow, 1);
+            }
+        }
+    }
+    return jkMain_CdSwitch(0, a1);
+}
+
 #ifdef LINUX
 void jkMain_FixRes()
 {

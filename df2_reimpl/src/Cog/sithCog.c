@@ -1111,6 +1111,20 @@ void sithCog_Free(sithWorld *world)
     }
 }
 
+void sithCog_HandleThingTimerPulse(sithThing *thing)
+{
+    if ( (thing->thingflags & SITH_TF_PULSE) != 0 && thing->pulse_end_ms <= sithTime_curMs )
+    {
+        thing->pulse_end_ms = sithTime_curMs + thing->pulse_ms;
+        sithCog_SendMessageFromThingEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
+    }
+    if ( (thing->thingflags & SITH_TF_TIMER) != 0 && thing->timer <= sithTime_curMs )
+    {
+        thing->thingflags &= ~SITH_TF_TIMER;
+        sithCog_SendMessageFromThingEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
+    }
+}
+
 int sithCogScript_Load(sithWorld *lvl, int a2)
 {
     int numCogScripts; // esi

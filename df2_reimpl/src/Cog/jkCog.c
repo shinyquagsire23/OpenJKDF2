@@ -4,10 +4,12 @@
 #include "Main/jkHud.h"
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
+#include "Main/jkMain.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithPlayer.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithNet.h"
 #include "General/stdString.h"
 #include "Cog/sithCogPlayer.h"
 
@@ -26,6 +28,7 @@ void jkCog_EnableSaber(sithCog *ctx);
 void jkCog_DisableSaber(sithCog *ctx);
 void jkCog_SetPovModel(sithCog *ctx);
 void jkCog_SetWeaponMesh(sithCog *ctx);
+void jkCog_EndLevel(sithCog *ctx);
 void jkCog_PlayPovKey(sithCog *ctx);
 void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_SetWaggle(sithCog *ctx);
@@ -35,7 +38,7 @@ void jkCog_GetChoice(sithCog *ctx);
 //static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;
 static void (*jkCog_GetFlags)(sithCog* ctx) = (void*)0x0040A4C0;
 //static void (*jkCog_SetWeaponMesh)(sithCog* ctx) = (void*)0x0040A4F0;
-static void (*jkCog_EndLevel)(sithCog* ctx) = (void*)0x0040A580;
+//static void (*jkCog_EndLevel)(sithCog* ctx) = (void*)0x0040A580;
 //static void (*jkCog_SetPovModel)(sithCog* ctx) = (void*)0x0040A5D0;
 //static void (*jkCog_PlayPovKey)(sithCog* ctx) = (void*)0x0040A620;
 //static void (*jkCog_StopPovKey)(sithCog* ctx) = (void*)0x0040A6B0;
@@ -430,6 +433,22 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                 }
             }
         }
+    }
+}
+
+void jkCog_EndLevel(sithCog *ctx)
+{
+    int v1; // esi
+
+    v1 = sithCogVm_PopInt(ctx) != 0;
+    if ( net_isMulti )
+    {
+        if ( net_isServer )
+            jkSaber_cogMsg_SendEndLevel();
+    }
+    else
+    {
+        jkMain_EndLevel(v1);
     }
 }
 

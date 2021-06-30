@@ -131,7 +131,7 @@ typedef struct sithSoundClassEntry
   float maxVolume;
   float minRadius;
   float maxRadius;
-  int listIdx;
+  uint32_t listIdx;
   sithSoundClassEntry *nextSound;
 } sithSoundClassEntry;
 
@@ -152,6 +152,10 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id);
 void sithSoundClass_Free2(sithWorld *world);
 
+sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2);
+void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3);
+void sithSoundClass_StopSound(sithThing *thing, sithSound *sound);
+
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;
 //static int (*sithSoundClass_Load)(sithWorld* world, int a) = (void*)sithSoundClass_Load_ADDR;
@@ -160,13 +164,13 @@ void sithSoundClass_Free2(sithWorld *world);
 //static void (*sithSoundClass_Free2)(sithWorld* world) = (void*)sithSoundClass_Free2_ADDR;
 
 #ifdef LINUX
-sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2);
-void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3);
-void sithSoundClass_StopSound(sithThing *thing, sithSound *a2);
+//sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2);
+//void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3);
+//void sithSoundClass_StopSound(sithThing *thing, sithSound *a2);
 #else
-static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
-static void (*sithSoundClass_ThingPlaySoundclass2)(sithThing *a1, sithSoundClassEntry *a2, float a3) = (void*)sithSoundClass_ThingPlaySoundclass2_ADDR;
-static void (*sithSoundClass_StopSound)(sithThing *thing, sithSound *a2) = (void*)sithSoundClass_StopSound_ADDR;
+//static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
+//static void (*sithSoundClass_ThingPlaySoundclass2)(sithThing *a1, sithSoundClassEntry *a2, float a3) = (void*)sithSoundClass_ThingPlaySoundclass2_ADDR;
+//static void (*sithSoundClass_StopSound)(sithThing *thing, sithSound *a2) = (void*)sithSoundClass_StopSound_ADDR;
 #endif
 
 #endif // _SITHSOUNDCLASS_H

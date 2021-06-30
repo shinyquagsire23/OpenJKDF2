@@ -127,9 +127,11 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
 int jkMain_MissionReload();
 int jkMain_MenuReturn();
 
+int jkMain_EndLevel(int a1);
+
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
-static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
+//static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 //static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
 static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
 static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;

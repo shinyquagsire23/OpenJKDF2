@@ -681,7 +681,7 @@ float sithCogVm_PopFlex(sithCog *ctx)
     if ( tmp.type == COG_VARTYPE_INT )
         return (float)tmp.data[0];
     if ( tmp.type == COG_VARTYPE_FLEX )
-        return *(float*)&tmp.data[0];
+        return tmp.dataAsFloat[0];
     return 0.0;
 }
 
@@ -694,7 +694,7 @@ int sithCogVm_PopInt(sithCog *ctx)
     if ( tmp.type == COG_VARTYPE_INT )
         return tmp.data[0];
     if ( tmp.type == COG_VARTYPE_FLEX )
-        return (int)*(float*)&tmp.data[0];
+        return (int)tmp.dataAsFloat[0];
 
     return -1;
 }
