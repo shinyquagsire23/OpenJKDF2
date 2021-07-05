@@ -598,3 +598,11 @@ int rdVector_IsZero3(rdVector3* v)
 {
     return (v->x == 0.0 && v->y == 0.0 && v->z == 0.0);
 }
+
+float rdVector_NormalDot(rdVector3* v1, rdVector3* v2, rdVector3* norm)
+{
+    rdVector3 tmp;
+    
+    rdVector_Sub3(&tmp, v1, v2);
+    return rdVector_Dot3(&tmp, norm);
+}

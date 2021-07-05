@@ -252,8 +252,8 @@ int sith_Tick()
     else
     {
         // TODO REMOVE
-        sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
-        sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
+        //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
+        //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
         
         ++bShowInvisibleThings;
         if (sithRender_lastRenderTick++ == -1)

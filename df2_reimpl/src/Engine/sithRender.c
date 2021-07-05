@@ -547,7 +547,6 @@ void sithRender_RenderLevelGeometry()
     int v24; // eax
     unsigned int v28; // ebp
     float v29; // ecx
-    int v30; // eax
     float *v31; // eax
     unsigned int v32; // ecx
     float *v33; // edx
@@ -604,85 +603,57 @@ void sithRender_RenderLevelGeometry()
             rdSetOcclusionMethod(1);
     }
     rdSetSortingMethod(0);
-    v72 = 0;
+
     vertices_uvs = sithWorld_pCurWorld->vertexUVs;
     sithRender_idxInfo.vertices = sithWorld_pCurWorld->verticesTransformed;
     sithRender_idxInfo.field_14 = sithWorld_pCurWorld->verticesDynamicLight;
     sithRender_idxInfo.extraUV = vertices_uvs;
     v77 = rdCamera_pCurCamera->cameraClipFrustum;
 
-    if ( sithRender_numSectors )
+    for (v72 = 0; v72 < sithRender_numSectors; v72++)
     {
-        while ( 1 )
+        level_idk = sithRender_aSectors[v72];
+        if ( sithRender_lightingIRMode )
         {
-            level_idk = sithRender_aSectors[v72];
-            if ( sithRender_lightingIRMode )
+            a2 = sithRender_f_83198C;
+            rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
+        }
+        else
+        {
+            float baseLight = level_idk->ambientLight + level_idk->extraLight;
+            if ( baseLight < 0.0 )
             {
-                a2 = sithRender_f_83198C;
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
+                a2 = 0.0;
+                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 0.0);
+            }
+            else if ( baseLight > 1.0 )
+            {
+                a2 = 1.0;
+                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 1.0);
             }
             else
             {
-                float baseLight = level_idk->ambientLight + level_idk->extraLight;
-                if ( baseLight < 0.0 )
-                {
-                    a2 = 0.0;
-                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, 0.0);
-                }
-                else if ( baseLight > 1.0 )
-                {
-                    a2 = 1.0;
-                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, 1.0);
-                }
-                else
-                {
-                    a2 = baseLight;
-                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
-                }
+                a2 = baseLight;
+                rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
             }
-            rdColormap_SetCurrent(level_idk->colormap);
-            v68 = level_idk->colormap == sithWorld_pCurWorld->colormaps;
-            rdSetProcFaceUserData(level_idk->id);
-            v65 = level_idk->surfaces;
-            v75 = 0;
-            if ( level_idk->numSurfaces )
-                break;
-LABEL_151:
-            rdSetProcFaceUserData(level_idk->id | 0x10000);
-            for ( i = level_idk->thingsList; i; i = i->nextThing )
-            {
-                if ( (i->thingflags & SITH_TF_LEVELGEO) != 0
-                  && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
-                  && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)
-                  && i->rdthing.type == RD_THINGTYPE_MODEL )
-                {
-                    rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
-                    v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
-                    i->rdthing.clippingIdk = v63;
-                    if ( v63 != 2 )
-                    {
-                        if ( a2 >= 1.0 )
-                            i->rdthing.lightMode = 0;
-                        if ( sithRender_RenderPov(i) )
-                            ++sithRender_831980;
-                    }
-                }
-            }
-            ++sithRender_surfacesDrawn;
-            if ( ++v72 >= sithRender_numSectors )
-                goto LABEL_164;
         }
-        
-        
-        while ( v75 < level_idk->numSurfaces)
+        rdColormap_SetCurrent(level_idk->colormap);
+        v68 = level_idk->colormap == sithWorld_pCurWorld->colormaps;
+        rdSetProcFaceUserData(level_idk->id);
+        v65 = level_idk->surfaces;
+
+        for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
         {
             if ( !v65->surfaceInfo.face.geometryMode )
-                goto LABEL_150;
+                continue;
             vertices_alloc = sithWorld_pCurWorld->vertices;
+
+            // TODO macro/vector func?
             if ( (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].z) * v65->surfaceInfo.face.normal.z
                + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].y) * v65->surfaceInfo.face.normal.y
                + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].x) * v65->surfaceInfo.face.normal.x <= 0.0 )
-                goto LABEL_150;
+                continue;
+
             rdMaterial* surfaceMat = v65->surfaceInfo.face.material;
             if ( surfaceMat )
             {
@@ -703,7 +674,7 @@ LABEL_151:
                 {
                     sithRender_aSurfaces[sithRender_numSurfaces++] = v65;
                 }
-                goto LABEL_150;
+                continue;
             }
 
             if ( v65->field_4 != sithRender_lastRenderTick )
@@ -724,7 +695,7 @@ LABEL_151:
             {
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
-                    goto LABEL_150;
+                    continue;
                 if ( (v65->surfaceFlags & (SURFACEFLAGS_200|SURFACEFLAGS_400)) != 0 )
                 {
                     v41 = sithRender_geoMode;
@@ -767,7 +738,7 @@ LABEL_151:
                 num_vertices = meshinfo_out.numVertices;
                 if ( meshinfo_out.numVertices < 3u )
                 {
-                    goto LABEL_150;
+                    continue;
                 }
                 rdCamera_pCurCamera->projectLst(procEntry->vertices, vertices_tmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
@@ -882,7 +853,7 @@ LABEL_151:
                 if ( procEntry->lightingMode >= 3 )
                     rend_flags |= 4u;
                 rdCache_AddProcFace(0, num_vertices, rend_flags);
-                goto LABEL_150;
+                continue;
             }
 
             v74 = 0;
@@ -963,8 +934,7 @@ LABEL_151:
                     }
                     if ( v20->ambientLight < 1.0 )
                     {
-                        v30 = v20->lightingMode;
-                        if ( v30 == 2 )
+                        if ( v20->lightingMode == 2 )
                         {
                             if ( v20->light_level_static >= 1.0 && v68 )
                             {
@@ -976,7 +946,7 @@ LABEL_151:
                             }
                             goto LABEL_87;
                         }
-                        if ( v30 != 3 )
+                        if ( v20->lightingMode != 3 )
                             goto LABEL_87;
                         v31 = v20->vertexIntensities;
                         v32 = 1;
@@ -1055,13 +1025,32 @@ LABEL_92:
                 goto LABEL_87;
             }
 LABEL_150:
-            v65->field_4 = sithRender_lastRenderTick;
-            ++v65;
-            ++v75;
+            
         }
-        goto LABEL_151;
+
+        rdSetProcFaceUserData(level_idk->id | 0x10000);
+        for ( i = level_idk->thingsList; i; i = i->nextThing )
+        {
+            if ( (i->thingflags & SITH_TF_LEVELGEO) != 0
+              && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
+              && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)
+              && i->rdthing.type == RD_THINGTYPE_MODEL )
+            {
+                rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
+                v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
+                i->rdthing.clippingIdk = v63;
+                if ( v63 != 2 )
+                {
+                    if ( a2 >= 1.0 )
+                        i->rdthing.lightMode = 0;
+                    if ( sithRender_RenderPov(i) )
+                        ++sithRender_831980;
+                }
+            }
+        }
+        ++sithRender_surfacesDrawn;
     }
-LABEL_164:
+
     rdCache_Flush();
     rdCamera_pCurCamera->cameraClipFrustum = v77;
 }
