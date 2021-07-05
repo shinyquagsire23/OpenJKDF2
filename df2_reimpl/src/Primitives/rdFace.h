@@ -17,7 +17,7 @@ typedef struct rdVertexIdxInfo
     rdVector3* vertices;
     rdVector2* extraUV;
     float* field_14;
-    float* field_18;
+    float* intensities;
 } rdVertexIdxInfo;
 
 typedef struct rdFace

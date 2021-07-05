@@ -733,9 +733,6 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
     double v27; // st5
     float *v28; // ebx
     double v30; // st5
-    double v31; // rtt
-    double v32; // rt0
-    double v33; // st5
     sithThing *v34; // ecx
     int v35; // eax
     int v36; // eax
@@ -916,12 +913,9 @@ LABEL_78:
                     {
                         v30 = 1.0 - v19->distance / a6;
                         v65 = v30;
-                        v31 = -v30;
-                        v32 = v5->physicsParams.addedVelocity.y * v31 + v5->physicsParams.vel.y;
-                        v33 = v5->physicsParams.addedVelocity.z * v31 + v5->physicsParams.vel.z;
-                        v5->physicsParams.vel.x = v5->physicsParams.addedVelocity.x * v31 + v5->physicsParams.vel.x;
-                        v5->physicsParams.vel.y = v32;
-                        v5->physicsParams.vel.z = v33;
+                        v5->physicsParams.vel.x += v5->physicsParams.addedVelocity.x * -v30;
+                        v5->physicsParams.vel.y += v5->physicsParams.addedVelocity.y * -v30;
+                        v5->physicsParams.vel.z += v5->physicsParams.addedVelocity.z * -v30;
                     }
                 }
                 if ( (v19->collideType & 1) != 0 )

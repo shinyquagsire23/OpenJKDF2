@@ -6,6 +6,7 @@
 #include "General/stdMath.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std3D.h"
+#include "Engine/sithRender.h"
 
 static rdVector3 rdCamera_camRotation;
 
@@ -347,6 +348,7 @@ void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal)
 
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos)
 {
+    sithRender_RenderDebugLight(light->intensity, lightPos);
     if ( camera->numLights > 0x40 )
         return 0;
 

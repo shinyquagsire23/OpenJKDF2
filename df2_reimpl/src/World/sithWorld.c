@@ -243,7 +243,7 @@ int sithWorld_NewEntry(sithWorld *world)
                 return 0;
 
             v5 = (float *)pSithHS->alloc(sizeof(float) * world->numVertices);
-            world->alloc_unk94 = v5;
+            world->verticesDynamicLight = v5;
             if ( !v5 )
                 return 0;
             _memset(v5, 0, sizeof(float) * world->numVertices);
@@ -346,10 +346,10 @@ void sithWorld_FreeEntry(sithWorld *world)
         pSithHS->free(world->verticesTransformed);
         world->verticesTransformed = 0;
     }
-    if ( world->alloc_unk94 )
+    if ( world->verticesDynamicLight )
     {
-        pSithHS->free(world->alloc_unk94);
-        world->alloc_unk94 = 0;
+        pSithHS->free(world->verticesDynamicLight);
+        world->verticesDynamicLight = 0;
     }
     if ( world->alloc_unk9c )
     {
@@ -457,12 +457,14 @@ int sithCopyright_Load(sithWorld *lvl, int junk)
     }
     while (iter < &jkl_read_copyright[0x440]);
 
-    
+    // QOL improvement: don't check copyright header.
+#ifndef QOL_IMPROVEMENTS
     if (_memcmp(jkl_read_copyright, g_level_header, 0x440))
     {
         some_integer_4 = 0;
         return 0;
     }
+#endif
 
     some_integer_4 = 1;
     return 1;

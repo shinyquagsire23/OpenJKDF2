@@ -339,13 +339,12 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     float v25; // ST24_4
     unsigned int v26; // eax
     unsigned int v27; // ebp
-    rdMaterial *v28; // edx
     int *v29; // ecx
     int v30; // ecx
     int v32; // [esp+10h] [ebp-44h]
     rdVector3 vertex_out; // [esp+18h] [ebp-3Ch]
     rdMatrix34 out; // [esp+24h] [ebp-30h]
-    rdThing *v35; // [esp+58h] [ebp+4h]
+    int v35; // [esp+58h] [ebp+4h]
     float matrix_4_3a; // [esp+5Ch] [ebp+8h]
 
     particle = thing->particlecloud;
@@ -364,16 +363,16 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         if ( matrix_4_3a < 1.0 )
         {
             if ( matrix_4_3a > 0.0 )
-                v35 = (rdThing *)particle->lightingMode;
+                v35 = particle->lightingMode;
             else
-                v35 = (rdThing *)1;
+                v35 = 1;
         }
         else
         {
             v35 = 0;
         }
-        if ( (signed int)v35 >= particle->lightingMode )
-            v35 = (rdThing *)particle->lightingMode;
+        if ( v35 >= particle->lightingMode )
+            v35 = particle->lightingMode;
         rdMatrix_TransformPointLst34(&out, particle->vertices, &aParticleVertices[0], particle->numVertices);
         v32 = 0;
         if ( !particle->numVertices )
@@ -421,10 +420,9 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             if ( v26 >= 3 )
             {
                 rdCamera_pCurCamera->projectLst(v5->vertices, aParticleVerticesTmp, v26);
-                v28 = particle->material;
-                v5->lightingMode = (int)v35;
+                v5->lightingMode = v35;
                 v29 = particle->vertexCel;
-                v5->material = v28;
+                v5->material = particle->material;
                 v5->ambientLight = matrix_4_3a;
                 v30 = v29[v32];
                 v5->geometryMode = 3;

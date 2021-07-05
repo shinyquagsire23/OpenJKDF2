@@ -69,13 +69,14 @@ void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing
 sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14);
 void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4);
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam);
+void sithCamera_CycleCamera();
 
 static void (*sithCamera_Shutdown)() = (void*)sithCamera_Shutdown_ADDR;
 static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 //static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
 //static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCamera_GetPrimaryFocus_ADDR;
 static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
-static void (*sithCamera_CycleCamera)(void) = (void*)sithCamera_CycleCamera_ADDR;
+//static void (*sithCamera_CycleCamera)(void) = (void*)sithCamera_CycleCamera_ADDR;
 //static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, float a3, float a4) = (void*)sithCamera_SetPovShake_ADDR;
 //static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
 static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;

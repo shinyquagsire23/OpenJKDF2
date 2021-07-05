@@ -337,7 +337,7 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
     stdSound_buffer_t *a2d; // [esp+0h] [ebp-10h]
 
 #ifdef LINUX
-    printf("STUBBED: play %s absolute 2\n", sound->sound_fname);
+    //printf("STUBBED: play %s absolute 2 flags %x\n", sound->sound_fname, flags);
     //return NULL;
 #endif
 
@@ -449,7 +449,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *a2
     rdVector3 v16; // [esp+8h] [ebp-Ch] BYREF
 
 #ifdef LINUX
-    printf("play %s absolute\n", a1->sound_fname);
+    //printf("play %s absolute\n", a1->sound_fname);
 #endif
 
     if ( sithSoundSys_bOpened )
@@ -526,10 +526,6 @@ sithPlayingSound* sithSoundSys_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *a2
 
 sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2, float a3, float a4, float a5, int flags)
 {
-    int flags_; // ebx
-    double v7; // st6
-    double v8; // st7
-    double v9; // st7
     sithPlayingSound *v11; // esi
     int v12; // eax
     int v14; // eax
@@ -553,13 +549,13 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
     rdVector3 a1; // [esp+1Ch] [ebp-Ch] BYREF
 
 #ifdef LINUX
-    printf("play %s at thing\n", sound->sound_fname);
+    //printf("play %s at thing flags %x\n", sound->sound_fname, flags);
 #endif
 
     v34 = 50.0;
     if ( sithSoundSys_bOpened )
     {
-        flags_ = flags & ~SITHSOUNDFLAG_PLAYING;
+        flags = flags & ~SITHSOUNDFLAG_PLAYING;
         if ( a3 < 0.0 )
         {
             a3 = 0.0;
@@ -568,19 +564,16 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
         {
             a3 = 1.5;
         }
-        flags_ = flags | SITHSOUNDFLAG_FOLLOWSTHING;
-        if ( ((flags | SITHSOUNDFLAG_FOLLOWSTHING) & SITHSOUNDFLAG_LOOP) != 0
+        flags = flags | SITHSOUNDFLAG_FOLLOWSTHING;
+        if ( (flags & SITHSOUNDFLAG_LOOP) != 0
           || sithCamera_currentCamera
-          && (v7 = a2->position.y,
-              v8 = a2->position.z,
-              a1.x = a2->position.x - sithCamera_currentCamera->vec3_1.x,
-              a1.y = v7 - sithCamera_currentCamera->vec3_1.y,
-              a1.z = v8 - sithCamera_currentCamera->vec3_1.z,
-              v9 = rdVector_Normalize3QuickAcc(&a1),
-              v34 = v9,
-              v9 <= a5) )
+          && (a1.x = a2->position.x - sithCamera_currentCamera->vec3_1.x,
+              a1.y = a2->position.y - sithCamera_currentCamera->vec3_1.y,
+              a1.z = a2->position.z - sithCamera_currentCamera->vec3_1.z,
+              v34 = rdVector_Normalize3QuickAcc(&a1),
+              v34 <= a5) )
         {
-            if ( (a2->thingType == THINGTYPE_ACTOR || a2->thingType == THINGTYPE_PLAYER) && (flags_ & SITHSOUNDFLAG_NOOVERRIDE) != 0 && (flags_ & 0x300) == 0 )
+            if ( (a2->thingType == THINGTYPE_ACTOR || a2->thingType == THINGTYPE_PLAYER) && (flags & SITHSOUNDFLAG_NOOVERRIDE) != 0 && (flags & SITHSOUNDFLAG_200|SITHSOUNDFLAG_HIGHPRIO) == 0 )
             {
                 if ( a2->actorParams.field_1BC > sithTime_curMs )
                     return 0;
@@ -601,7 +594,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
                 {
                     v11 = &sithSoundSys_aPlayingSounds[v12];
                     v11->sound = sound;
-                    v11->flags = flags_;
+                    v11->flags = flags;
                     v11->volumeVelocity = 1.0;
                     v11->pitch = 1.0;
                     if ( sithSoundSys_nextSoundIdx == 0 )
@@ -696,7 +689,7 @@ LABEL_51:
                             sithSoundSys_activeChannels++;
                             return v11;
                         }
-                        if ( (flags_ & SITHSOUNDFLAG_LOOP) != 0 )
+                        if ( (flags & SITHSOUNDFLAG_LOOP) != 0 )
                             return v11;
                         if ( (v11->flags & SITHSOUNDFLAG_PLAYING) == 0 )
                             goto LABEL_59;
@@ -706,7 +699,7 @@ LABEL_51:
                     {
                         if ( (v11->flags & SITHSOUNDFLAG_PLAYING) == 0 )
                             goto LABEL_59;
-                        //stdSound_BufferReset(0); ???
+                        //stdSound_BufferReset(0); //???
                     }
                     sithSoundSys_PlayingSoundReset(v11);
 LABEL_59:
@@ -826,7 +819,7 @@ void sithSoundSys_FadeSound(sithPlayingSound *sound, float vol_, float fadeintim
     double v7; // st6
     float a2; // [esp+0h] [ebp-4h]
     
-    //printf("fade actual %s\n", sound->sound->sound_fname);
+    //printf("fade actual %s %f\n", sound->sound->sound_fname, fadeintime_);
 
     if ( vol_ < 0.0 )
     {
@@ -866,11 +859,11 @@ void sithSoundSys_FadeSound(sithPlayingSound *sound, float vol_, float fadeintim
         else
         {
             v7 = v3;
-            if ( v7 < 0.0 )
+            if ( v7 < 0.0 ) // TODO verify? fadeintime_ < 0.0?
                 v7 = -v3;
             sound->volumeVelocity = v7 / fadeintime_;
             sound->volume = vol_;
-            if ( v7 > 0.0 ) // TODO verify? sound->volumeVelocity < 0.0?
+            if ( v7 > 0.0 ) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
                 sound->flags = v4 | SITHSOUNDFLAG_20;
             else
                 sound->flags = v4 | SITHSOUNDFLAG_10;
@@ -973,8 +966,9 @@ LABEL_12:
         v4 = -sithSoundSys_pPlayingSoundIdk->vol_2;
         if ( v4 == 0.0 )
         {
+            sithSoundSys_pPlayingSoundIdk->flags |= SITHSOUNDFLAG_FADING;
             sithSoundSys_pPlayingSoundIdk = 0;
-            v3->flags |= SITHSOUNDFLAG_FADING;
+            
         }
         else
         {
@@ -984,7 +978,7 @@ LABEL_12:
                 v7 = -v4;
             v3->volume = 0.0;
             v3->volumeVelocity = v7 + v7;
-            if ( v7 < 0.0 ) // TODO verify
+            if ( v7 < 0.0 ) // TODO verify? v4
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1028,7 +1022,7 @@ LABEL_12:
                         v23 = -v20;
                     v3->volume = 0.0;
                     v3->volumeVelocity = v23 + v23;
-                    if ( v23 > 0.0 ) // TODO verify
+                    if ( v23 > 0.0 ) // TODO verify? v20 <
                         v3->flags |= SITHSOUNDFLAG_20;
                     else
                         v3->flags |= SITHSOUNDFLAG_10;
@@ -1091,7 +1085,7 @@ LABEL_49:
             }
             v3->volumeVelocity = v17 + v17;
             v3->volume = v13;
-            if ( v17 < 0.0 ) // TODO verify
+            if ( v17 < 0.0 ) // TODO verify? v43 > 0.0
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1211,6 +1205,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
             sithSoundSys_StopSound(sound);
         }
     }
+
     if ( (sound->flags & SITHSOUNDFLAG_10) != 0 )
     {
         v11 = sound->volumeVelocity * deltaSecs + sound->vol_2;

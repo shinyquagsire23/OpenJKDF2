@@ -530,7 +530,6 @@ void sithSector_ThingLandIdk(sithThing *thing, int a3)
     int v4; // ecx
     sithUnk3SearchEntry *v5; // eax
     int32_t v6; // ecx
-    double v7; // st7
     double v8; // st7
     double v9; // st7
     sithUnk3SearchEntry *i; // esi
@@ -582,16 +581,16 @@ LABEL_8:
             {
                 direction.x = -0.0;
                 direction.y = direction.x;
-                v7 = 1.0;
+                direction.z = -1.0;
                 v14 = 16;
             }
             else
             {
                 direction.x = -thing->lookOrientation.uvec.x;
                 direction.y = -thing->lookOrientation.uvec.y;
-                v7 = thing->lookOrientation.uvec.z;
+                direction.z = -thing->lookOrientation.uvec.z;
             }
-            direction.z = -v7;
+
             if ( a3 || thing->attach_flags )
             {
                 v9 = thing->physicsParams.height;

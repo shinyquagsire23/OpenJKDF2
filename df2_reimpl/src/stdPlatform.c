@@ -63,9 +63,7 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 
 static char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
-    char* out = dst;
-    fgets(dst, len, (void*)fhand);
-    return out;
+    return fgets(dst, len, (void*)fhand);
 }
 
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
@@ -93,6 +91,11 @@ static void* Linux_realloc(void* ptr, size_t len)
 {
     //printf("%p %zx\n", ptr, len);
     return realloc(ptr, len);
+}
+
+static int Linux_stdFeof(stdFile_t fhand)
+{
+    return feof((void*)fhand);
 }
 
 uint32_t stdPlatform_GetTimeMsec()
@@ -144,6 +147,7 @@ void stdPlatform_InitServices(common_functions *handlers)
     handlers->fseek = Linux_stdFseek;
     handlers->ftell = Linux_stdFtell;
     handlers->getTimerTick = Linux_TimeMs;
+    handlers->feof = Linux_stdFeof;
 #endif
 }
 

@@ -240,6 +240,7 @@ void do_hooks()
     hook_function(jkMain_MainLeave_ADDR, jkMain_MainLeave);
     hook_function(jkMain_MissionReload_ADDR, jkMain_MissionReload);
     hook_function(jkMain_MenuReturn_ADDR, jkMain_MenuReturn);
+    hook_function(jkMain_CdSwitchShow_ADDR, jkMain_CdSwitchShow);
 
     // jkEpisode
     hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
@@ -262,6 +263,7 @@ void do_hooks()
     
     // jkDev
     hook_function(jkDev_Close_ADDR, jkDev_Close);
+    hook_function(jkDev_PrintUniString_ADDR, jkDev_PrintUniString);
     
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
@@ -997,6 +999,7 @@ void do_hooks()
     hook_function(sithCamera_SetCameraFocus_ADDR, sithCamera_SetCameraFocus);
     hook_function(sithCamera_SetPovShake_ADDR, sithCamera_SetPovShake);
     hook_function(sithCamera_GetPrimaryFocus_ADDR, sithCamera_GetPrimaryFocus);
+    hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
@@ -1209,7 +1212,6 @@ void do_hooks()
     hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
     hook_function(sithPlayer_GetNumidk_ADDR, sithPlayer_GetNumidk);
     
-#if 0
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);
     hook_function(sithSurface_SurfaceLightAnim_ADDR, sithSurface_SurfaceLightAnim);
@@ -1222,7 +1224,7 @@ void do_hooks()
     hook_function(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
     hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
-#endif
+    hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);

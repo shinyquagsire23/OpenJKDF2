@@ -221,8 +221,8 @@ int sithSurface_Load(sithWorld *world)
         if ( !face->vertexPosIdx )
             return 0;
 
-        surfaceInfo->field_40 = pSithHS->alloc(sizeof(float) * v35);
-        if ( !surfaceInfo->field_40 )
+        surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35);
+        if ( !surfaceInfo->intensities )
             return 0;
 
         if (face->material && (face->material->tex_type & 2))
@@ -252,7 +252,7 @@ int sithSurface_Load(sithWorld *world)
 
         for (int v45 = 0; v45 < v35; v45++)
         {
-            surfaceInfo->field_40[v45] = _atof(stdConffile_entry.args[v61+v45].value);
+            surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
         }
         face->numVertices = v35;
         face->num = v67;
@@ -435,8 +435,8 @@ void sithSurface_Free(sithWorld *world)
             pSithHS->free(surface->surfaceInfo.face.vertexPosIdx);
         if ( surface->surfaceInfo.face.vertexUVIdx )
             pSithHS->free(surface->surfaceInfo.face.vertexUVIdx);
-        if ( surface->surfaceInfo.field_40 )
-            pSithHS->free(surface->surfaceInfo.field_40);
+        if ( surface->surfaceInfo.intensities )
+            pSithHS->free(surface->surfaceInfo.intensities);
         surface->surfaceInfo.lastTouchedMs = 0;
     }
 
@@ -1207,4 +1207,20 @@ rdSurface* sithSurface_GetRdSurface(sithSurface *surface)
         ++v1;
     }
     return (rdSurface *)(v1 > sithSurface_numSurfaces ? 0 : (unsigned int)i);
+}
+
+rdSurface* sithSurface_GetByIdx(int idx)
+{
+    int v1; // ecx
+    rdSurface *i; // eax
+
+    v1 = 0;
+    if ( sithSurface_numSurfaces < 0 )
+        return 0;
+    for ( i = sithSurface_aSurfaces; !i->flags || i->index != idx; ++i )
+    {
+        if ( ++v1 > sithSurface_numSurfaces )
+            return 0;
+    }
+    return &sithSurface_aSurfaces[v1];
 }

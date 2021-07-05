@@ -27,8 +27,6 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     int v3; // edi
     sithThingFrame *v4; // edx
     int v5; // eax
-    double v6; // st7
-    double v7; // st6
     long double v8; // st7
     long double v9; // st6
     sithThingFrame *v12; // eax
@@ -44,11 +42,9 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     {
         v4 = thing->trackParams.frames;
         v5 = v2;
-        v6 = v4[v5].pos.y - thing->position.y;
-        v7 = v4[v5].pos.z - thing->position.z;
         thing->trackParams.vel.x = v4[v5].pos.x - thing->position.x;
-        thing->trackParams.vel.y = v6;
-        thing->trackParams.vel.z = v7;
+        thing->trackParams.vel.y = v4[v5].pos.y - thing->position.y;
+        thing->trackParams.vel.z = v4[v5].pos.z - thing->position.z;
         v8 = rdVector_Normalize3Acc(&thing->trackParams.vel);
         if ( v8 != 0.0 )
         {

@@ -62,7 +62,6 @@
 #define jkMain_EndLevelScreenShow ((void*)(0x004041A0))
 #define jkMain_EndLevelScreenTick ((void*)(0x00404240))
 #define jkMain_EndLevelScreenLeave ((void*)(0x00404250))
-#define jkMain_CdSwitchShow ((void*)(0x00404260))
 
 static jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 static jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
@@ -965,6 +964,11 @@ int jkMain_EndLevel(int a1)
         }
     }
     return jkMain_CdSwitch(0, a1);
+}
+
+int jkMain_CdSwitchShow()
+{
+    return jkMain_CdSwitch(0, 1);
 }
 
 #ifdef LINUX

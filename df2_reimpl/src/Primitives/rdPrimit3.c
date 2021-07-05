@@ -243,7 +243,7 @@ LABEL_25:
                 case 3:
                     v36 = idxInfo;
                     v37 = mesh_out;
-                    v38 = idxInfo->field_18;
+                    v38 = idxInfo->intensities;
                     v39 = idxInfo->numVertices;
                     idxInfoe = idxInfo->numVertices;
                     if ( v38 )
@@ -375,7 +375,7 @@ LABEL_25:
                 {
                     v52 = idxInfo;
                     v53 = mesh_out;
-                    v54 = idxInfo->field_18;
+                    v54 = idxInfo->intensities;
                     v55 = idxInfo->numVertices;
                     idxInfof = idxInfo->numVertices;
                     if ( v54 )
@@ -400,7 +400,7 @@ LABEL_25:
                                 v58->y = v92[v61].y;
                                 v58->x = idkIn->x + v58->x;
                                 v58->y = v58->y + idkIn->y;
-                                v62 = v88[v59] + idxInfo->field_18[i];
+                                v62 = v88[v59] + idxInfo->intensities[i];
                                 if ( v62 < 0.0 )
                                 {
                                     v62 = 0.0;

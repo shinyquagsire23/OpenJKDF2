@@ -21,6 +21,12 @@
 
 void jkCog_SetFlags(sithCog *ctx);
 void jkCog_ClearFlags(sithCog *ctx);
+void jkCog_GetFlags(sithCog *ctx);
+void jkCog_SetWeaponMesh(sithCog *ctx);
+void jkCog_EndLevel(sithCog *ctx);
+void jkCog_SetPovModel(sithCog *ctx);
+void jkCog_PlayPovKey(sithCog *ctx);
+void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_EndTarget(sithCog *ctx);
 void jkCog_SetSuperFlags(sithCog *ctx);
 void jkCog_ClearSuperFlags(sithCog *ctx);
@@ -30,11 +36,6 @@ void jkCog_SetSaberInfo(sithCog *ctx);
 void jkCog_GetSaberCam(sithCog *ctx);
 void jkCog_EnableSaber(sithCog *ctx);
 void jkCog_DisableSaber(sithCog *ctx);
-void jkCog_SetPovModel(sithCog *ctx);
-void jkCog_SetWeaponMesh(sithCog *ctx);
-void jkCog_EndLevel(sithCog *ctx);
-void jkCog_PlayPovKey(sithCog *ctx);
-void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_SetWaggle(sithCog *ctx);
 void jkCog_GetChoice(sithCog *ctx);
 void jkCog_StringClear();
@@ -43,7 +44,7 @@ void jkCog_StringOutput(sithCog *ctx);
 
 //static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
 //static void (*jkCog_ClearFlags)(sithCog* ctx) = (void*)0x0040A450;
-static void (*jkCog_GetFlags)(sithCog* ctx) = (void*)0x0040A4C0;
+//static void (*jkCog_GetFlags)(sithCog* ctx) = (void*)0x0040A4C0;
 //static void (*jkCog_SetWeaponMesh)(sithCog* ctx) = (void*)0x0040A4F0;
 //static void (*jkCog_EndLevel)(sithCog* ctx) = (void*)0x0040A580;
 //static void (*jkCog_SetPovModel)(sithCog* ctx) = (void*)0x0040A5D0;
@@ -76,6 +77,108 @@ static void (*jkCog_StringConcatVector)(sithCog* ctx) = (void*)0x0040B1C0;
 //static void (*jkCog_StringOutput)(sithCog* ctx) = (void*)0x0040B270;
 //static void (*jkCog_GetSaberCam)(sithCog* ctx) = (void*)0x0040B3B0;
 //static void (*jkCog_GetChoice)(sithCog* ctx) = (void*)0x0040B3D0;
+
+#ifdef QOL_IMPROVEMENTS
+void jkCog_stub0Args(sithCog *ctx)
+{
+
+}
+
+void jkCog_stub1Args(sithCog *ctx)
+{
+    sithCogVm_PopInt(ctx);
+}
+
+void jkCog_stub2Args(sithCog *ctx)
+{
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+}
+
+void jkCog_stub3Args(sithCog *ctx)
+{
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+}
+
+void jkCog_stub4Args(sithCog *ctx)
+{
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+}
+
+void jkCog_stub4ArgsRet1(sithCog *ctx)
+{
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PopInt(ctx);
+    sithCogVm_PushInt(ctx, 0);
+}
+
+void jkCog_addLaser(sithCog *ctx)
+{
+    float a = sithCogVm_PopFlex(ctx);
+    int b = sithCogVm_PopInt(ctx);
+    sithThing* c = sithCogVm_PopThing(ctx);
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void jkCog_removeLaser(sithCog *ctx)
+{
+    int a = sithCogVm_PopInt(ctx);
+}
+
+void jkCog_getLaserId(sithCog *ctx)
+{
+    sithThing* a = sithCogVm_PopThing(ctx);
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void jkCog_addBeam(sithCog *ctx)
+{
+    float a = sithCogVm_PopFlex(ctx);
+    int b = sithCogVm_PopInt(ctx);
+    sithThing* c = sithCogVm_PopThing(ctx);
+    sithThing* d = sithCogVm_PopThing(ctx);
+    sithCogVm_PushInt(ctx, -1);
+}
+
+void jkCog_computeCatapaultVelocity(sithCog *ctx)
+{
+    rdVector3 ret;
+    float a = sithCogVm_PopFlex(ctx);
+    sithThing* b = sithCogVm_PopThing(ctx);
+    sithThing* c = sithCogVm_PopThing(ctx);
+    float d = sithCogVm_PopFlex(ctx);
+    
+    ret.x = b->position.x - c->position.x;
+    ret.y = b->position.y - c->position.y;
+    ret.z = b->position.z - c->position.z;
+    float v4 = rdVector_Normalize3Acc(&ret);
+    float ctxb = sqrt(v4 * v4 * a / d);
+    ret.x = ret.x * ctxb;
+    ret.y = ret.y * ctxb;
+    ret.z = ret.z * ctxb;
+    sithCogVm_PushVector3(ctx, &ret);
+}
+
+void jkCog_dwPlayCammySpeech(sithCog* ctx)
+{
+    int a = sithCogVm_PopInt(ctx);
+    int b = sithCogVm_PopFlex(ctx);
+    char* c = sithCogVm_PopString(ctx);
+    int d = sithCogVm_PopInt(ctx);
+}
+
+void jkCog_dwGetActivateBin(sithCog *ctx)
+{
+    sithCogVm_PushInt(ctx, sithInventory_GetCurItem(g_localPlayerThing));
+}
+#endif
 
 void jkCog_RegisterVerbs()
 {
@@ -116,6 +219,22 @@ void jkCog_RegisterVerbs()
     sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringOutput, "jkstringoutput");
     sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetSaberCam, "jkgetsabercam");
     sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetChoice, "jkgetchoice");
+    
+#ifdef QOL_IMPROVEMENTS
+    // Added for droidwork tests
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_dwGetActivateBin, "dwGetActivateBin");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub1Args, "dwsetreftopic");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_addBeam, "addbeam");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_addLaser, "addlaser");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_removeLaser, "removelaser");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_getLaserId, "getlaserid");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwFlashInventory");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwfreezeplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwunfreezeplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub2Args, "dwplaycharacterspeech");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwcleardialog");
+#endif
 }
 
 int jkCog_Initialize()
@@ -185,6 +304,139 @@ void jkCog_ClearFlags(sithCog *ctx)
                 if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN && v3 != v4 )
                     sithThing_SyncThingPos(v2, 2);
             }
+        }
+    }
+}
+
+void jkCog_GetFlags(sithCog *ctx)
+{
+    int v1; // esi
+    sithThing *v2; // eax
+
+    v1 = 0;
+    v2 = sithCogVm_PopThing(ctx);
+    if ( v2 )
+        v1 = v2->jkFlags;
+    sithCogVm_PushInt(ctx, v1);
+}
+
+void jkCog_SetWeaponMesh(sithCog *ctx)
+{
+    rdModel3 *model3; // edi
+    sithThing *actorThing; // eax
+    sithThing *v3; // ebx
+    jkPlayerInfo *v4; // eax
+    rdThing *v5; // esi
+    int v6; // eax
+
+    model3 = sithCogVm_PopModel3(ctx);
+    actorThing = sithCogVm_PopThing(ctx);
+    v3 = actorThing;
+    if ( actorThing )
+    {
+        v4 = actorThing->playerInfo;
+        if ( v4 )
+        {
+            if ( model3 )
+            {
+                if ( model3->numGeosets == 1 && model3->geosets[0].numMeshes == 1 )
+                {
+                    v5 = &v4->rd_thing;
+                    rdThing_NewEntry(&v4->rd_thing, v3);
+                    rdThing_SetModel3(v5, model3);
+                    if ( sithCogVm_multiplayerFlags )
+                    {
+                        if ( (ctx->flags & 0x200) == 0 )
+                        {
+                            v6 = ctx->trigId;
+                            if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
+                                jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void jkCog_EndLevel(sithCog *ctx)
+{
+    int v1; // esi
+
+    v1 = sithCogVm_PopInt(ctx) != 0;
+    if ( net_isMulti )
+    {
+        if ( net_isServer )
+            jkSaber_cogMsg_SendEndLevel();
+    }
+    else
+    {
+        jkMain_EndLevel(v1);
+    }
+}
+
+void jkCog_SetPovModel(sithCog *ctx)
+{
+    rdModel3 *model3; // edi
+    sithThing *actorThing; // eax
+
+    model3 = sithCogVm_PopModel3(ctx);
+    actorThing = sithCogVm_PopThing(ctx);
+    if ( actorThing )
+    {
+        if ( model3 )
+        {
+            if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
+                jkPlayer_SetPovModel(actorThing->playerInfo, model3);
+        }
+    }
+}
+
+void jkCog_PlayPovKey(sithCog *ctx)
+{
+    int v1; // ebp
+    int v2; // edi
+    rdKeyframe *keyframe; // ebx
+    sithThing *actorThing; // eax
+    int v5; // ecx
+    rdPuppet *v6; // eax
+    int v7; // eax
+
+    v1 = sithCogVm_PopInt(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    keyframe = sithCogVm_PopKeyframe(ctx);
+    actorThing = sithCogVm_PopThing(ctx);
+    if ( actorThing
+      && keyframe
+      && ((v5 = actorThing->thingType, v5 == THINGTYPE_ACTOR) || v5 == THINGTYPE_PLAYER)
+      && (v6 = actorThing->playerInfo->povModel.puppet) != 0 )
+    {
+        v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, 0);
+        sithCogVm_PushInt(ctx, v7);
+    }
+    else
+    {
+        sithCogVm_PushInt(ctx, -1);
+    }
+}
+
+void jkCog_StopPovKey(sithCog *ctx)
+{
+    int v2; // edi
+    sithThing *actorThing; // eax
+    rdPuppet *v5; // eax
+    float a1a; // [esp+Ch] [ebp+4h]
+
+    a1a = sithCogVm_PopFlex(ctx);
+    v2 = sithCogVm_PopInt(ctx);
+    actorThing = sithCogVm_PopThing(ctx);
+    if ( actorThing )
+    {
+        if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
+        {
+            v5 = actorThing->playerInfo->povModel.puppet;
+            if ( v5 && v2 >= 0 && v2 < 4 )
+                sithPuppet_StopKey(v5, v2, a1a);
         }
     }
 }
@@ -387,127 +639,6 @@ void jkCog_DisableSaber(sithCog *ctx)
     }
 }
 
-void jkCog_SetPovModel(sithCog *ctx)
-{
-    rdModel3 *model3; // edi
-    sithThing *actorThing; // eax
-
-    model3 = sithCogVm_PopModel3(ctx);
-    actorThing = sithCogVm_PopThing(ctx);
-    if ( actorThing )
-    {
-        if ( model3 )
-        {
-            if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
-                jkPlayer_SetPovModel(actorThing->playerInfo, model3);
-        }
-    }
-}
-
-void jkCog_SetWeaponMesh(sithCog *ctx)
-{
-    rdModel3 *model3; // edi
-    sithThing *actorThing; // eax
-    sithThing *v3; // ebx
-    jkPlayerInfo *v4; // eax
-    rdThing *v5; // esi
-    int v6; // eax
-
-    model3 = sithCogVm_PopModel3(ctx);
-    actorThing = sithCogVm_PopThing(ctx);
-    v3 = actorThing;
-    if ( actorThing )
-    {
-        v4 = actorThing->playerInfo;
-        if ( v4 )
-        {
-            if ( model3 )
-            {
-                if ( model3->numGeosets == 1 && model3->geosets[0].numMeshes == 1 )
-                {
-                    v5 = &v4->rd_thing;
-                    rdThing_NewEntry(&v4->rd_thing, v3);
-                    rdThing_SetModel3(v5, model3);
-                    if ( sithCogVm_multiplayerFlags )
-                    {
-                        if ( (ctx->flags & 0x200) == 0 )
-                        {
-                            v6 = ctx->trigId;
-                            if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
-                                jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void jkCog_EndLevel(sithCog *ctx)
-{
-    int v1; // esi
-
-    v1 = sithCogVm_PopInt(ctx) != 0;
-    if ( net_isMulti )
-    {
-        if ( net_isServer )
-            jkSaber_cogMsg_SendEndLevel();
-    }
-    else
-    {
-        jkMain_EndLevel(v1);
-    }
-}
-
-void jkCog_PlayPovKey(sithCog *ctx)
-{
-    int v1; // ebp
-    int v2; // edi
-    rdKeyframe *keyframe; // ebx
-    sithThing *actorThing; // eax
-    int v5; // ecx
-    rdPuppet *v6; // eax
-    int v7; // eax
-
-    v1 = sithCogVm_PopInt(ctx);
-    v2 = sithCogVm_PopInt(ctx);
-    keyframe = sithCogVm_PopKeyframe(ctx);
-    actorThing = sithCogVm_PopThing(ctx);
-    if ( actorThing
-      && keyframe
-      && ((v5 = actorThing->thingType, v5 == THINGTYPE_ACTOR) || v5 == THINGTYPE_PLAYER)
-      && (v6 = actorThing->playerInfo->povModel.puppet) != 0 )
-    {
-        v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, 0);
-        sithCogVm_PushInt(ctx, v7);
-    }
-    else
-    {
-        sithCogVm_PushInt(ctx, -1);
-    }
-}
-
-void jkCog_StopPovKey(sithCog *ctx)
-{
-    int v2; // edi
-    sithThing *actorThing; // eax
-    rdPuppet *v5; // eax
-    float a1a; // [esp+Ch] [ebp+4h]
-
-    a1a = sithCogVm_PopFlex(ctx);
-    v2 = sithCogVm_PopInt(ctx);
-    actorThing = sithCogVm_PopThing(ctx);
-    if ( actorThing )
-    {
-        if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
-        {
-            v5 = actorThing->playerInfo->povModel.puppet;
-            if ( v5 && v2 >= 0 && v2 < 4 )
-                sithPuppet_StopKey(v5, v2, a1a);
-        }
-    }
-}
-
 void jkCog_SetWaggle(sithCog *ctx)
 {
     sithThing *v2; // eax
@@ -555,8 +686,8 @@ void jkCog_StringConcatFormattedInt(sithCog *ctx)
     {
         jk_snwprintf(v5, 130, L"%d", v2);
     }
-    v4 = __wcslen(v5);
-    if ( __wcslen(jkCog_jkstring) + v4 < 0x81 )
+    v4 = _wcslen(v5);
+    if ( _wcslen(jkCog_jkstring) + v4 < 0x81 )
         __wcscat(jkCog_jkstring, v5);
 }
 

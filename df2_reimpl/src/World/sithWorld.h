@@ -63,7 +63,7 @@ typedef struct sithWorld
     rdVector3* vertices;
     rdVector3* verticesTransformed;
     int* alloc_unk98;
-    float* alloc_unk94;
+    float* verticesDynamicLight;
     int* alloc_unk9c;
     int numVertexUVs;
     rdVector2* vertexUVs;

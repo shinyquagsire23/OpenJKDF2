@@ -501,3 +501,33 @@ sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam)
 {
     return cam->primaryFocus;
 }
+
+void sithCamera_CycleCamera()
+{
+    int cam_id; // eax
+    sithCamera *v1; // esi
+    rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
+
+    cam_id = ++sithCamera_curCameraIdx;
+    if ( (unsigned int)sithCamera_curCameraIdx >= 2 )
+    {
+        cam_id = 0;
+        sithCamera_curCameraIdx = 0;
+    }
+    v1 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
+    if ( !sithCamera_currentCamera || v1->dword4 >= sithCamera_currentCamera->dword4 )
+    {
+        sithCamera_currentCamera = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
+        sithCamera_dword_8EE5A0 = 1;
+        rdCamera_SetCurrent(&v1->rdCam);
+        if ( v1->cameraPerspective == 32 )
+        {
+            rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
+            rot.x = 0.0;
+            rot.y = -45.0;
+            rot.z = 0.0;
+            rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
+        }
+        sithCamera_FollowFocus(sithCamera_currentCamera);
+    }
+}

@@ -190,7 +190,7 @@ int sithCogParse_LoadEntry(sithCogScript *script)
     if ( parsing_script_idk )
         parsing_script_idk = 0;
     else
-        sithCogYACC_yyrestart(fhand);
+        yyrestart(fhand);
     yacc_linenum = 1;
     if (yyparse())
     {

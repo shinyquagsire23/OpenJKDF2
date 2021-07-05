@@ -558,6 +558,7 @@ void sithControl_InputInit()
 }
 
 static last_use = 0;
+static last_cam = 0;
 
 int sithControl_ReadFunctionMap(int func, int* out)
 {
@@ -652,7 +653,10 @@ int sithControl_ReadFunctionMap(int func, int* out)
     }
     else if (func == INPUT_FUNC_CAMERAMODE)
     {
-        val = !!state[SDL_SCANCODE_P];
+        int cur_val = !!state[SDL_SCANCODE_P];
+        if (!last_cam)
+            val = cur_val;
+        last_cam = !!state[SDL_SCANCODE_P];
     }
     
     if (!!state[SDL_SCANCODE_ESCAPE])

@@ -128,6 +128,7 @@ int jkMain_MissionReload();
 int jkMain_MenuReturn();
 
 int jkMain_EndLevel(int a1);
+int jkMain_CdSwitchShow();
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 

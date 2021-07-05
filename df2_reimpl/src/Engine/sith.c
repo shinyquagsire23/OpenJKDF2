@@ -127,7 +127,7 @@ int sith_Mode1Init(char *a1)
     sithTime_Startup();
     sithWorld_Initialize();
     bShowInvisibleThings = 0;
-    sithRender_8EE678 = 1;
+    sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
     sithTimer_Open();
     sithSurface_Open();
@@ -153,7 +153,7 @@ int sith_Mode1Init_2(char *path)
 
     sithWorld_Initialize();
     bShowInvisibleThings = 0;
-    sithRender_8EE678 = 1;
+    sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
     sithTimer_Open();
     sithSurface_Open();
@@ -175,7 +175,7 @@ int sith_Mode1Init_3(char *fpath)
     if ( !sithWorld_Load(sithWorld_pCurWorld, fpath) )
         return 0;
     bShowInvisibleThings = 0;
-    sithRender_8EE678 = 1;
+    sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
     sithTimer_Open();
     sithSurface_Open();
@@ -196,7 +196,7 @@ int sith_Mode1Init_3(char *fpath)
 int sith_Open()
 {
     bShowInvisibleThings = 0;
-    sithRender_8EE678 = 1;
+    sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
     sithTimer_Open();
     sithSurface_Open();
@@ -252,14 +252,14 @@ int sith_Tick()
     else
     {
         // TODO REMOVE
-        //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
-        //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
+        sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
+        sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
         
         ++bShowInvisibleThings;
-        if (sithRender_8EE678++ == -1)
+        if (sithRender_lastRenderTick++ == -1)
         {
             sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-            sithRender_8EE678 = 1;
+            sithRender_lastRenderTick = 1;
         }
         sithSoundSys_ResumeMusic(0);
         sithTime_Tick();
@@ -341,10 +341,10 @@ void sith_UpdateCamera()
 
 void sith_sub_4C4D80()
 {
-    if ( !++sithRender_8EE678 )
+    if ( !++sithRender_lastRenderTick )
     {
         sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-        sithRender_8EE678 = 1;
+        sithRender_lastRenderTick = 1;
     }
 }
 

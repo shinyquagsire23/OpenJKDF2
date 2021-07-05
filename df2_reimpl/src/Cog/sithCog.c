@@ -45,7 +45,7 @@ int sithCog_Startup()
     hashmap_entry *v7; // eax
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    g_cog_symbolTable = sithCogParse_NewSymboltable(512);
+    g_cog_symbolTable = sithCogParse_NewSymboltable(1024); // changed from 512 to 1024
     if (!g_cog_symbolTable )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");

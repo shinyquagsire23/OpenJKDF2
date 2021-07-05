@@ -51,6 +51,9 @@ int sithRender_RenderPov(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
 int sithRender_SetRenderWeaponHandle(void *a1);
 
+// Added
+void sithRender_RenderDebugLight(float intensity, rdVector3* pos);
+
 #define SITHREND_NUM_LIGHTS (32)
 
 #define sithRender_texMode (*(int*)0x008EC360)
@@ -75,7 +78,7 @@ int sithRender_SetRenderWeaponHandle(void *a1);
 #define sithRender_numSurfaces (*(uint32_t*)0x0082F4B8)
 #define sithRender_831980 (*(int*)0x00831980)
 #define sithRender_831984 (*(int*)0x00831984)
-#define sithRender_8EE678 (*(int*)0x008EE678)
+#define sithRender_lastRenderTick (*(int*)0x008EE678)
 #define sithRender_f_82F4B0 (*(float*)0x0082F4B0)
 #define sithRender_idxInfo (*(rdVertexIdxInfo*)0x0082F648)
 #define vertices_tmp ((rdVector3*)0x0082F310)
@@ -84,6 +87,8 @@ int sithRender_SetRenderWeaponHandle(void *a1);
 #define sithRender_aSurfaces ((sithSurface**)0x008318F8)
 
 #define sithRender_weaponRenderHandle (*(sithRender_weapRendFunc_t*)0x00831998)
+
+
 
 static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, float a3) = (void*)sithRender_Clip_ADDR;
 static void (*sithRender_UpdateLights_)(sithSector *sector, float a2, float dist) = (void*)sithRender_UpdateLights_ADDR;

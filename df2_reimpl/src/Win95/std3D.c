@@ -158,7 +158,7 @@ GLint std3D_tryFindAttribute(GLuint program, const char* attribute_name)
 {
     GLint out = glGetAttribLocation(program, attribute_name);
     if (out == -1) {
-        printf("Could not bind attribute %s!\n", out);
+        printf("Could not bind attribute %s!\n", attribute_name);
     }
     return out;
 }
@@ -167,7 +167,7 @@ GLint std3D_tryFindUniform(GLuint program, const char* uniform_name)
 {
     GLint out = glGetUniformLocation(program, uniform_name);
     if (out == -1) {
-        printf("Could not bind uniform %s!\n", out);
+        printf("Could not bind uniform %s!\n", uniform_name);
     }
     return out;
 }
@@ -231,6 +231,7 @@ int init_resources()
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
     has_initted = true;
+    return true;
 }
 
 void free_resources()
@@ -945,6 +946,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     glBindTexture(GL_TEXTURE_2D, image_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     

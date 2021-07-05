@@ -227,7 +227,7 @@ int stdConffile_ReadLine()
       stdString_CStrToLower(line_iter);
 
       line_len = _strlen(stdConffile_aLine);
-      if ( stdConffile_aLine[line_len - 2] == '\\' )
+      if (line_len >= 2 && stdConffile_aLine[line_len - 2] == '\\' ) // added: line_len >= 2
       {
         line_iter = &stdConffile_aLine[line_len - 2];
         buf_left = 1024 - line_len;
@@ -235,7 +235,7 @@ int stdConffile_ReadLine()
       else
       {
         is_eol = 1;
-        if ( stdConffile_aLine[line_len - 1] == '\r' || stdConffile_aLine[line_len - 1] == '\n' )
+        if (line_len >= 1 && (stdConffile_aLine[line_len - 1] == '\r' || stdConffile_aLine[line_len - 1] == '\n') ) // added: line_len >= 1
           stdConffile_aLine[line_len - 1] = 0;
       }
     }

@@ -14,3 +14,9 @@ void jkDev_Close()
         jkDev_bOpened = 0;
     }
 }
+
+#ifdef LINUX
+void jkDev_PrintUniString(wchar_t* str)
+{
+}
+#endif

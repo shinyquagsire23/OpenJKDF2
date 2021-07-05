@@ -192,7 +192,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     idxInfo.numVertices = 4;
     idxInfo.vertices = polylineVerts;
     idxInfo.field_14 = 0;
-    idxInfo.field_18 = 0;
+    idxInfo.intensities = 0;
 
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix);
     vertex.x = 0.0;

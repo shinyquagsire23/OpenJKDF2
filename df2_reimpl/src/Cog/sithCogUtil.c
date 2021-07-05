@@ -772,6 +772,13 @@ void sithCogUtil_SetCameraFocus(sithCog *ctx)
 
     focusThing = sithCogVm_PopThing(ctx);
     camIdx = sithCogVm_PopInt(ctx);
+
+#ifdef QOL_IMPROVEMENTS
+    // Droidworks tmp
+    if (camIdx == 7)
+        camIdx = 0;
+#endif
+
     if ( camIdx > -1 && camIdx < 7 )
     {
         if ( focusThing )
@@ -785,6 +792,13 @@ void sithCogUtil_GetPrimaryFocus(sithCog *ctx)
     sithThing *v2; // eax
 
     camIdx = sithCogVm_PopInt(ctx);
+
+#ifdef QOL_IMPROVEMENTS
+    // Droidworks tmp
+    if (camIdx == 7)
+        camIdx = 0;
+#endif
+
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_cameras[camIdx])) != 0 )
         sithCogVm_PushInt(ctx, v2->thingIdx);
     else
@@ -797,6 +811,13 @@ void sithCogUtil_GetSecondaryFocus(sithCog *ctx)
     sithThing *v2; // eax
 
     camIdx = sithCogVm_PopInt(ctx);
+    
+#ifdef QOL_IMPROVEMENTS
+    // Droidworks tmp
+    if (camIdx == 7)
+        camIdx = 0;
+#endif
+    
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_cameras[camIdx])) != 0 )
         sithCogVm_PushInt(ctx, v2->thingIdx);
     else
@@ -808,6 +829,18 @@ void sithCogUtil_SetCurrentCamera(sithCog *ctx)
     signed int camIdx; // eax
 
     camIdx = sithCogVm_PopInt(ctx);
+
+#ifdef QOL_IMPROVEMENTS
+    // Droidworks tmp
+    if (camIdx == 7)
+    {
+        camIdx = 0;
+        sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], g_localPlayerThing, 0);
+    }
+#endif
+
+    printf("%u -> %u\n", sithCamera_currentCamera - sithCamera_cameras, camIdx);
+    
     if ( camIdx > -1 && camIdx < 7 )
         sithCamera_SetCurrentCamera(&sithCamera_cameras[camIdx]);
 }
@@ -1413,6 +1446,25 @@ void sithCogUtil_AutoSaveGame()
 #endif
 }
 
+void sithCogUtil_SetCameraFocii(sithCog *ctx)
+{
+    sithThing* focusThing2 = sithCogVm_PopThing(ctx);
+    sithThing* focusThing = sithCogVm_PopThing(ctx);
+    int camIdx = sithCogVm_PopInt(ctx);
+
+#ifdef QOL_IMPROVEMENTS
+    // Droidworks tmp
+    if (camIdx == 7)
+        camIdx = 0;
+#endif
+
+    if ( camIdx > -1 && camIdx < 7 ) // TODO macro this 7?
+    {
+        if ( focusThing )
+            sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], focusThing, focusThing2);
+    }
+}
+
 void sithCogUtil_Initialize(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogUtil_Sleep, "sleep");
@@ -1531,4 +1583,7 @@ void sithCogUtil_Initialize(void* ctx)
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogUtil_GetScoreLimit, "getscorelimit");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogUtil_SendTrigger, "sendtrigger");
     sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogUtil_AutoSaveGame, "autosavegame");
+    
+    // Droidworks
+    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogUtil_SetCameraFocii, "setcamerafocii");
 }

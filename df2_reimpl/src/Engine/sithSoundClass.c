@@ -529,32 +529,12 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
         v2 = 0;
         if ( sithSoundSys_numSoundsAvailable )
         {
-            v3 = &sithSoundSys_aPlayingSounds[0].flags;
+            v3 = &sithSoundSys_aPlayingSounds[0];
             do
             {
-                if ( v3->flags < 0 && thing == v3->thing && (!sound || v3->sound == sound) )
+                if ( v3->flags & 0x80 && thing == v3->thing && (!sound || v3->sound == sound) )
                 {
-                    if ( (v3->flags & SITHSOUNDFLAG_PLAYING) != 0 )
-                    {
-                        sithSoundSys_PlayingSoundReset(v3);
-                    }
-                    v5 = v3;
-                    if ( v3->pSoundBuf )
-                    {
-                        stdSound_BufferRelease(v3->pSoundBuf);
-                        v5->pSoundBuf = 0;
-                    }
-                    if ( v3->p3DSoundObj )
-                    {
-                        stdSound_3DBufferRelease(v3->p3DSoundObj);
-                        v3->p3DSoundObj = 0;
-                    }
-                    v6 = v3->idx;
-                    _memset(v5, 0, sizeof(sithPlayingSound));
-                    v7 = sithSoundSys_numSoundsAvailable2;
-                    v3->idx = v6;
-                    sithSoundSys_aIdk[v7] = v6;
-                    sithSoundSys_numSoundsAvailable2 = v7 + 1;
+                    sithSoundSys_StopSound(v3);
                 }
                 ++v2;
                 v3++;
