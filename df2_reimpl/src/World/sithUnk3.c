@@ -255,8 +255,6 @@ float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, con
     sithThing *v14; // eax
     sithThing *v15; // ecx
     sithThing *v16; // eax
-    int v17; // eax
-    int v18; // eax
     int v19; // eax
     rdFace *v21; // ebx
     int v22; // edx
@@ -304,11 +302,9 @@ float sithUnk3_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, con
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
                         {
-                            v17 = v8->attach_flags;
-                            if ( (v17 & 6) == 0 || v8->attachedThing != v7 || (v17 & 8) == 0 && (v9 & 0x40) == 0 )
+                            if ( (v8->attach_flags & 6) == 0 || v8->attachedThing != v7 || (v8->attach_flags & 8) == 0 && (v9 & 0x40) == 0 )
                             {
-                                v18 = v7->attach_flags;
-                                if ( (v18 & 6) == 0 || v7->attachedThing != v8 || (v18 & 8) == 0 && (v9 & 0x40) == 0 )
+                                if ( (v7->attach_flags & 6) == 0 || v7->attachedThing != v8 || (v7->attach_flags & 8) == 0 && (v9 & 0x40) == 0 )
                                 {
 LABEL_41:
                                     v19 = sithCollide_sub_5080D0(v8, a2, a3, a4, range, v7, v9, &v23, &senderMesh, &a10, &a11);
@@ -569,9 +565,7 @@ sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rd
 
     if ( sithCollide_IsSphereInSector(a4, 0.0, sector) )
         return sector;
-    a1.x = a4->x - a3->x;
-    a1.y = a4->y - a3->y;
-    a1.z = a4->z - a3->z;
+    rdVector_Sub3(&a1, a4, a3);
     a3a = rdVector_Normalize3Acc(&a1);
     sithUnk3_SearchRadiusForThings(sector, 0, a3, &a1, a3a, a5, 1);
     v7 = sithUnk3_searchStackIdx;
@@ -682,7 +676,6 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
     double v23; // st6
     double v24; // st7
     double v25; // st7
-    float *v28; // ebx
     double v30; // st5
     sithThing *v34; // ecx
     int v35; // eax
@@ -820,25 +813,19 @@ LABEL_78:
                 }
                 if ( v19->distance >= (double)a6 )
                 {
-                    v28 = &v5->field_268.x;
                     rdVector_Zero3(&v5->field_268);
                 }
                 else
                 {
                     v25 = a6 - v19->distance;
-                    v28 = &v5->field_268.x;
-                    v5->field_268.x = direction.x * v25;
-                    v5->field_268.y = direction.y * v25;
-                    v5->field_268.z = direction.z * v25;
+                    rdVector_Scale3(&v5->field_268, &direction, v25);
                     if ( v5->move_type == MOVETYPE_PHYSICS
                       && (v5->physicsParams.physflags & 0x20) != 0
                       && (v5->physicsParams.addedVelocity.x != 0.0 || v5->physicsParams.addedVelocity.y != 0.0 || v5->physicsParams.addedVelocity.z != 0.0) )
                     {
                         v30 = 1.0 - v19->distance / a6;
                         v65 = v30;
-                        v5->physicsParams.vel.x += v5->physicsParams.addedVelocity.x * -v30;
-                        v5->physicsParams.vel.y += v5->physicsParams.addedVelocity.y * -v30;
-                        v5->physicsParams.vel.z += v5->physicsParams.addedVelocity.z * -v30;
+                        rdVector_MultAcc3(&v5->physicsParams.vel, &v5->physicsParams.addedVelocity, -v30);
                     }
                 }
                 if ( (v19->collideType & 1) != 0 )
@@ -856,10 +843,8 @@ LABEL_78:
                 }
                 else if ( (v19->collideType & 0x20) != 0 )
                 {
-                    v72.x = v5->position.x;
-                    v72.y = v5->position.y;
                     v37 = v19->surface;
-                    v72.z = v5->position.z;
+                    rdVector_Copy3(&v72, &v5->position);
                     if ( (v37->surfaceFlags & 2) != 0 )
                         sithCog_SendMessageFromSurface(v37, v5, 8);
                     sithThing_MoveToSector(v5, v19->surface->adjoin->sector, 0);
@@ -960,9 +945,7 @@ int sithUnk3_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithUnk3S
     v3 = thing;
     if ( thing->move_type != MOVETYPE_PHYSICS )
         return 0;
-    a1a = -(a3->field_14.y * thing->physicsParams.vel.y
-          + a3->field_14.z * thing->physicsParams.vel.z
-          + thing->physicsParams.vel.x * a3->field_14.x);
+    a1a = -rdVector_Dot3(&a3->field_14, &thing->physicsParams.vel);
 
     if ( !sithUnk3_CollideHurt(thing, &a3->field_14, a3->distance, surface->surfaceFlags & 0x80) )
         return 0;
@@ -991,10 +974,8 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
     sithThing *v4; // esi
     sithThing *v5; // edi
     double v6; // st6
-    double v8; // st5
     //char v9; // c0
     double v11; // st7
-    double v13; // st6
     //char v14; // c0
     double v15; // st7
     float a3a; // [esp+0h] [ebp-38h]
@@ -1027,18 +1008,12 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
     {
         if ( v5->move_type != MOVETYPE_PHYSICS || v5->physicsParams.mass == 0.0 )
             return 1;
-        v11 = v4->field_268.x * a2.x + v4->field_268.z * a2.z + v4->field_268.y * a2.y;
-        v13 = v11;
-        if ( v13 < 0.0 )
-            v13 = -v11;
-        if ( v13 <= 0.0000099999997 )
-            v11 = 0.0;
+        v11 = rdVector_Dot3(&v4->field_268, &a2);
+        v11 = stdMath_ClipPrecision(v11);
         if ( v11 < 0.0 )
         {
             sendera = -v11 * 1.0001;
-            v19.x = -a2.x;
-            v19.y = -a2.y;
-            v19.z = -a2.z;
+            rdVector_Neg3(&v19, &a2);
             v15 = sithUnk3_UpdateThingCollision(v5, &v19, sendera, 0);
             if ( v15 < sendera )
             {
@@ -1048,9 +1023,7 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
                     a3a = (sendera - a1a) * 100.0;
                     sithThing_Damage(v5, v4, a3a, 1);
                 }
-                v4->field_268.x = 0.0;
-                v4->field_268.y = 0.0;
-                v4->field_268.z = 0.0;
+                rdVector_Zero3(&v4->field_268);
             }
             return 1;
         }
@@ -1058,17 +1031,8 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
     }
     if ( v5->move_type == MOVETYPE_PHYSICS && v5->physicsParams.mass != 0.0 )
     {
-        v6 = v5->physicsParams.vel.z * a2.z
-           + v5->physicsParams.vel.y * a2.y
-           + v5->physicsParams.vel.x * a2.x
-           - (v4->physicsParams.vel.z * a2.z
-            + v4->physicsParams.vel.y * a2.y
-            + v4->physicsParams.vel.x * a2.x);
-        v8 = v6;
-        if ( v8 < 0.0 )
-            v8 = -v6;
-        if ( v8 <= 0.0000099999997 )
-            v6 = 0.0;
+        v6 = rdVector_Dot3(&v5->physicsParams.vel, &a2) - rdVector_Dot3(&v4->physicsParams.vel, &a2);
+        v6 = stdMath_ClipPrecision(v6);
         if ( v6 <= 0.0 )
             return 0;
         if ( (v4->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
@@ -1081,9 +1045,7 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
         forceVec.y = v6 * a2.y * senderb;
         forceVec.z = v6 * a2.z * senderb;
         sithSector_ThingApplyForce(v4, &forceVec);
-        forceVec.x = -forceVec.x;
-        forceVec.y = -forceVec.y;
-        forceVec.z = -forceVec.z;
+        rdVector_Neg3Acc(&forceVec);
         sithSector_ThingApplyForce(v5, &forceVec);
         return sithUnk3_CollideHurt(v4, &a2, a3->distance, 0);
     }
@@ -1104,13 +1066,8 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
 int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
 {
     int result; // eax
-    double v8; // st7
     double v10; // st6
-    double v11; // st7
-    double v12; // st5
     double v14; // st7
-    double v17; // st6
-    double v18; // st5
     double v19; // st7
     double v20; // st6
     double v21; // st5
@@ -1129,12 +1086,8 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     float v34; // edx
     double v35; // st7
     double v36; // st7
-    double v37; // st6
-    double v38; // st5
     double v39; // st7
     double v40; // st7
-    double v41; // st6
-    double v42; // st5
     float v43; // [esp+8h] [ebp-4h]
     float a1a; // [esp+10h] [ebp+4h]
     float amount; // [esp+14h] [ebp+8h]
@@ -1144,12 +1097,7 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     if ( a1->move_type != MOVETYPE_PHYSICS )
         return 0;
     amount = -(a1->field_268.x * a2->x + a2->z * a1->field_268.z + a1->field_268.y * a2->y);
-    a1a = amount;
-    v8 = amount;
-    if ( v8 < 0.0 )
-        v8 = -v8;
-    if ( v8 <= 0.0000099999997 )
-        a1a = 0.0;
+    a1a = stdMath_ClipPrecision(amount);
     if ( a1a <= 0.0 )
         return 0;
     v43 = 1.9;
@@ -1164,19 +1112,15 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
         else
         {
             v10 = -(a1->physicsParams.vel.x * a2->x + a1->physicsParams.vel.z * a2->z + a1->physicsParams.vel.y * a2->y);
-            v11 = a2->y * amount + a1->field_268.y;
-            v12 = a2->z * amount + a1->field_268.z;
             a1->field_268.x = a2->x * amount + a1->field_268.x;
-            a1->field_268.y = v11;
+            a1->field_268.y = a2->y * amount + a1->field_268.y;
             v14 = v10;
-            a1->field_268.z = v12;
+            a1->field_268.z = a2->z * amount + a1->field_268.z;
             if ( v10 > 0.0 )
             {
-                v17 = a2->y * v10 + a1->physicsParams.vel.y;
-                v18 = a2->z * v14 + a1->physicsParams.vel.z;
                 a1->physicsParams.vel.x = a2->x * v14 + a1->physicsParams.vel.x;
-                a1->physicsParams.vel.y = v17;
-                a1->physicsParams.vel.z = v18;
+                a1->physicsParams.vel.y = a2->y * v10 + a1->physicsParams.vel.y;
+                a1->physicsParams.vel.z = a2->z * v14 + a1->physicsParams.vel.z;
             }
             v19 = -(a2->y * sithUnk3_collideHurtIdk.y + a2->z * sithUnk3_collideHurtIdk.z + a2->x * sithUnk3_collideHurtIdk.x);
             v20 = a2->y * v19 + sithUnk3_collideHurtIdk.y;
@@ -1226,11 +1170,9 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
         if ( v35 > 0.0 )
         {
             v36 = v43 * amounta;
-            v37 = a2->y * v36 + a1->physicsParams.vel.y;
-            v38 = a2->z * v36 + a1->physicsParams.vel.z;
             a1->physicsParams.vel.x = a2->x * v36 + a1->physicsParams.vel.x;
-            a1->physicsParams.vel.y = v37;
-            a1->physicsParams.vel.z = v38;
+            a1->physicsParams.vel.y = a2->y * v36 + a1->physicsParams.vel.y;
+            a1->physicsParams.vel.z = a2->z * v36 + a1->physicsParams.vel.z;
             if ( !a4 && amounta > 2.5 )
             {
                 v39 = (amounta - 2.5) * (amounta - 2.5) * 45.0;
@@ -1243,11 +1185,7 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
             }
         }
         v40 = v43 * a1a;
-        v41 = a2->y * v40 + a1->field_268.y;
-        v42 = a2->z * v40 + a1->field_268.z;
-        a1->field_268.x = a2->x * v40 + a1->field_268.x;
-        a1->field_268.y = v41;
-        a1->field_268.z = v42;
+        rdVector_MultAcc3(&a1->field_268, a2, v40);
         result = 1;
     }
     return result;
@@ -1272,9 +1210,7 @@ int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     v3 = 0x2122;
     if ( flag )
         v3 = 0x2022;
-    a1a.x = thing2->position.x - thing1->position.x;
-    a1a.y = thing2->position.y - thing1->position.y;
-    a1a.z = thing2->position.z - thing1->position.z;
+    rdVector_Sub3(&a1a, &thing2->position, &thing1->position);
     a6 = rdVector_Normalize3Acc(&a1a);
     sithUnk3_SearchRadiusForThings(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, v3);
     v4 = sithUnk3_searchStackIdx;
@@ -1341,7 +1277,6 @@ int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag)
 int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
 {
     sithThing *v2; // ebx
-    float v4; // eax
     sithThing *v5; // edi
     sithThing *v6; // ebp
     long double v7; // st7
@@ -1356,10 +1291,7 @@ int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
     {
         rdMatrix_Normalize34(a2);
         a2->scale = thing->position;
-        thing->lookOrientation.scale.x = thing->position.x;
-        v4 = thing->position.z;
-        thing->lookOrientation.scale.y = thing->position.y;
-        thing->lookOrientation.scale.z = v4;
+        rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
         rdMatrix_InvertOrtho34(&mat1, &thing->lookOrientation);
         v5 = thing->attachedParentMaybe;
         if ( v5 )
@@ -1367,18 +1299,12 @@ int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
             do
             {
                 v6 = v5->childThing;
-                v5->lookOrientation.scale.x = v5->position.x;
-                v5->lookOrientation.scale.y = v5->position.y;
-                v5->lookOrientation.scale.z = v5->position.z;
+                rdVector_Copy3(&v5->lookOrientation.scale, &v5->position);
                 rdMatrix_Multiply34(&out, &mat1, &v5->lookOrientation);
                 rdMatrix_PostMultiply34(&out, a2);
-                a2a.x = out.scale.x - v5->position.x;
-                a2a.y = out.scale.y - v5->position.y;
-                a2a.z = out.scale.z - v5->position.z;
+                rdVector_Sub3(&a2a, &out.scale, &v5->position);
                 v7 = rdVector_Normalize3Acc(&a2a);
-                out.scale.x = 0.0;
-                out.scale.y = 0.0;
-                out.scale.z = 0.0;
+                rdVector_Zero3(&out.scale);
                 if ( v7 != 0.0 )
                 {
                     a1a = v7;
@@ -1400,9 +1326,7 @@ int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
         rdMatrix_Normalize34(a2);
     }
     result = 0;
-    a2->scale.x = 0.0;
-    a2->scale.y = 0.0;
-    a2->scale.z = 0.0;
+    rdVector_Zero3(&a2->scale);
     _memcpy(&v2->lookOrientation, a2, sizeof(v2->lookOrientation));
     return result;
 }
@@ -1413,7 +1337,7 @@ int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3Se
     float amount; // [esp+0h] [ebp-10h]
     float mass; // [esp+14h] [ebp+4h]
 
-    float tmp = 0.0; // Added 0.0, original game overwrite &searchEnt...
+    float tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
 
     mass = thing->physicsParams.mass;
 
