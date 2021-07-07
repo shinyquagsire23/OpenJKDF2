@@ -1360,8 +1360,6 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
 {
     int v2; // ebp
     sithSurface *v5; // eax
-    double v6; // st6
-    double v7; // st7
     rdVector3 v8; // [esp+Ch] [ebp-18h] BYREF
     rdVector3 v1; // [esp+18h] [ebp-Ch] BYREF
     float arg4a; // [esp+2Ch] [ebp+8h]
@@ -1372,36 +1370,25 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
         
     if ( thing->move_type == MOVETYPE_PHYSICS )
     {
-        thing->field_268.x = thing->physicsParams.velocityMaybe.x;
-        thing->field_268.y = thing->physicsParams.velocityMaybe.y;
-        thing->field_268.z = thing->physicsParams.velocityMaybe.z;
+        rdVector_Copy3(&thing->field_268, &thing->physicsParams.velocityMaybe);
     }
     else
     {
         v2 = 4;
-        thing->field_268.x = 0.0;
-        thing->field_268.y = 0.0;
-        thing->field_268.z = 0.0;
+        rdVector_Zero3(&thing->field_268);
     }
 
-    if ( thing->attach_flags )
+    if (thing->attach_flags && thing->attach_flags & ATTACHFLAGS_WORLDSURFACE)
     {
-        if ( (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 )
+        v5 = thing->attachedSurface;
+        if ( (v5->surfaceFlags & SURFACEFLAGS_800) != 0 )
         {
-            v5 = (sithSurface *)thing->attachedThing;
-            if ( (v5->surfaceFlags & 0x800) != 0 )
-            {
-                sithSurface_DetachThing(v5, &v8);
-                v6 = v8.y * deltaSecs + thing->field_268.y;
-                v7 = v8.z * deltaSecs + thing->field_268.z;
-                thing->field_268.x = v8.x * deltaSecs + thing->field_268.x;
-                thing->field_268.y = v6;
-                thing->field_268.z = v7;
-            }
+            sithSurface_DetachThing(v5, &v8);
+            rdVector_MultAcc3(&thing->field_268, &v8, deltaSecs);
         }
     }
     
-    if ( thing->field_268.x == 0.0 && thing->field_268.y == 0.0 && thing->field_268.z == 0.0 )
+    if (rdVector_IsZero3(&thing->field_268))
     {
         if ( thing->move_type == MOVETYPE_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->move_type == MOVETYPE_PATH )
             sithSector_ThingLandIdk(thing, 0);
@@ -1765,14 +1752,9 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
     int *v6; // eax
     sithWorld *v7; // edx
     rdVector3 *v8; // ecx
-    int v9; // eax
-    float v10; // ecx
-    double v12; // st6
-    double v13; // st7
     double v14; // st7
     int v15; // edi
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
-    float a1a; // [esp+1Ch] [ebp+4h]
 
     v4 = 1;
     v5 = thing->attach_flags;
@@ -1789,40 +1771,28 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
     v8 = &v7->vertices[*v6];
     thing->field_38.x = v8->x;
     thing->field_38.y = v8->y;
-    v9 = surface->surfaceFlags;
-    v10 = v8->z;
     thing->attachedSurface = surface;
-    thing->field_38.z = v10;
+    thing->field_38.z = v8->z;
     thing->attachedSufaceInfo = &surface->surfaceInfo;
     thing->physicsParams.physflags &= ~PHYSFLAGS_100;
-    if ( (v9 & 0x800) != 0 && thing->move_type == MOVETYPE_PHYSICS )
+    if ( (surface->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->move_type == MOVETYPE_PHYSICS )
     {
         sithSurface_DetachThing(surface, &a2a);
-        v12 = thing->physicsParams.vel.y - a2a.y;
-        v13 = thing->physicsParams.vel.z - a2a.z;
-        thing->physicsParams.vel.x = thing->physicsParams.vel.x - a2a.x;
-        thing->physicsParams.vel.y = v12;
-        thing->physicsParams.vel.z = v13;
+        rdVector_Sub3Acc(&thing->physicsParams.vel, &a2a);
     }
     if ( (surface->surfaceFlags & SITH_SF_UNDERWATER) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromSurface(surface, thing, SITH_MESSAGE_ENTERED);
     if ( !a3 && v4 )
     {
-        v14 = -(thing->physicsParams.vel.x * surface->surfaceInfo.face.normal.x
-              + thing->physicsParams.vel.y * surface->surfaceInfo.face.normal.y
-              + thing->physicsParams.vel.z * surface->surfaceInfo.face.normal.z);
+        v14 = -rdVector_Dot3(&thing->physicsParams.vel, &surface->surfaceInfo.face.normal);
         if ( v14 > 2.5 )
         {
-            a1a = v14;
-            sithUnk3_FallHurt(thing, a1a);
-            if ( !thing->soundclass )
+            sithUnk3_FallHurt(thing, v14);
+            if ( thing->soundclass )
             {
-LABEL_26:
-                if ( thing->animclass && thing->move_type == MOVETYPE_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
-                    sithPuppet_PlayMode(thing, SITH_ANIM_LAND, 0);
-                return;
+                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHURT);
             }
-            sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHURT);
+            
         }
         if ( thing->soundclass )
         {
@@ -1851,32 +1821,28 @@ LABEL_26:
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHARD);
             }
         }
-        goto LABEL_26;
+        if ( thing->animclass && thing->move_type == MOVETYPE_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
+            sithPuppet_PlayMode(thing, SITH_ANIM_LAND, 0);
+        return;
     }
 }
 
 void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5)
 {
-    int v6; // eax
     int *v7; // eax
     int v8; // eax
     sithThing *v9; // eax
-    double v12; // st6
-    double v13; // st7
     double v14; // st6
-    double v15; // st5
-    double v16; // st7
     double downward_velocity; // st7
     int v18; // [esp+10h] [ebp-1Ch]
     rdVector3 a2a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
     float a1a; // [esp+30h] [ebp+4h]
 
-    v6 = a1->attach_flags;
     v18 = 1;
-    if ( v6 )
+    if ( a1->attach_flags )
     {
-        if ( (v6 & 2) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
+        if ( (a1->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
             return;
         v18 = 0;
         sithThing_DetachThing(a1);
@@ -1896,33 +1862,20 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     a1->physicsParams.physflags &= ~PHYSFLAGS_100;
     if ( a2->move_type == MOVETYPE_PHYSICS )
     {
-        v12 = a1->physicsParams.vel.y - a2->physicsParams.vel.y;
-        v13 = a1->physicsParams.vel.z - a2->physicsParams.vel.z;
-        a1->physicsParams.vel.x = a1->physicsParams.vel.x - a2->physicsParams.vel.x;
-        a1->physicsParams.vel.y = v12;
-        a1->physicsParams.vel.z = v13;
+        rdVector_Sub3Acc(&a1->physicsParams.vel, &a2->physicsParams.vel);
     }
     else if ( a2->move_type == MOVETYPE_PATH )
     {
-        v14 = -a2->physicsParams.acceleration.y;
-        v15 = a2->physicsParams.angVel.y * v14 + a1->physicsParams.vel.y;
-        v16 = a2->physicsParams.angVel.z * v14 + a1->physicsParams.vel.z;
-        a1->physicsParams.vel.x = a2->physicsParams.angVel.x * v14 + a1->physicsParams.vel.x;
-        a1->physicsParams.vel.y = v15;
-        a1->physicsParams.vel.z = v16;
+        rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.field_20);
     }
-    a2a.x = a1->position.x - a2->position.x;
-    a2a.y = a1->position.y - a2->position.y;
-    a2a.z = a1->position.z - a2->position.z;
+    rdVector_Sub3(&a2a, &a1->position, &a2->position);
     rdMatrix_TransformVector34Acc_0(&a1->field_4C, &a2a, &a2->lookOrientation);
     if ( (a2->thingflags & SITH_TF_CAPTURED) != 0 && (a1->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromThing(a2, a1, SITH_MESSAGE_ENTERED);
     if ( v18 && !a5 )
     {
         rdMatrix_TransformVector34(&out, &a3->normal, &a2->lookOrientation);
-        downward_velocity = -(a1->physicsParams.vel.x * out.x
-                            + a1->physicsParams.vel.z * out.z
-                            + a1->physicsParams.vel.y * out.y);
+        downward_velocity = -rdVector_Dot3(&a1->physicsParams.vel, &out);
         if ( downward_velocity > 2.5 )
         {
             a1a = downward_velocity;
@@ -1963,7 +1916,6 @@ void sithThing_MoveToSector(sithThing *thing, sithSector *sector, int a4)
 
 int sithThing_DetachThing(sithThing *thing)
 {
-    int v1; // eax
     int *v2; // edi
     sithThing *v3; // ebx
     double v5; // st7
@@ -1978,25 +1930,18 @@ int sithThing_DetachThing(sithThing *thing)
     sithThing *v14; // eax
     int result; // eax
     sithSurface *attached; // ebx
-    double v17; // st7
-    double v18; // st6
     rdVector3 a2; // [esp+Ch] [ebp-Ch] BYREF
 
-    v1 = thing->attach_flags;
     v2 = &thing->attach_flags;
-    if ( (v1 & 6) == 0 )
+    if ( (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE)) == 0 )
     {
-        if ( (v1 & 1) != 0 )
+        if ( (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 )
         {
             attached = thing->attachedSurface;
             if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->move_type == MOVETYPE_PHYSICS )
             {
                 sithSurface_DetachThing(attached, &a2);
-                v17 = a2.y + thing->physicsParams.vel.y;
-                v18 = a2.z + thing->physicsParams.vel.z;
-                thing->physicsParams.vel.x = a2.x + thing->physicsParams.vel.x;
-                thing->physicsParams.vel.y = v17;
-                thing->physicsParams.vel.z = v18;
+                rdVector_Add3Acc(&thing->physicsParams.vel, &a2);
             }
             if ( (attached->surfaceFlags & SURFACEFLAGS_2) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
                 sithCog_SendMessageFromSurface(attached, thing, SITH_MESSAGE_EXITED);

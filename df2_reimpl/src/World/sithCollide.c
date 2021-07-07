@@ -42,18 +42,10 @@ int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector 
     {
         sithSurface* surface = &sector->surfaces[i];
         sithAdjoin* adjoin = surface->adjoin;
-        // i = &sector->surfaces->surfaceFlags; ; i += 23 
-        if ( (surface->surfaceFlags & 4) != 0 || adjoin && (adjoin->flags & 2) != 0 )
+        if ( (surface->surfaceFlags & SURFACEFLAGS_4) != 0 || adjoin && (adjoin->flags & 2) != 0 )
         {
             v7 = sithWorld_pCurWorld->vertices;
-            v8 = (pos->x - v7[*surface->surfaceInfo.face.vertexPosIdx].x) * surface->surfaceInfo.face.normal.x
-               + (pos->y - v7[*surface->surfaceInfo.face.vertexPosIdx].y) * surface->surfaceInfo.face.normal.y
-               + (pos->z - v7[*surface->surfaceInfo.face.vertexPosIdx].z) * surface->surfaceInfo.face.normal.z;
-            v10 = v8;
-            if ( v10 < 0.0 )
-                v10 = -v8;
-            if ( v10 <= 0.0000099999997 )
-                v8 = 0.0;
+            v8 = stdMath_ClipPrecision(rdVector_NormalDot(pos, &v7[*surface->surfaceInfo.face.vertexPosIdx], &surface->surfaceInfo.face.normal));
             if ( v8 < radius )
                 return 0;
         }
@@ -135,9 +127,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
                 v35.y = v24;
                 v35.z = v25;
             }
-            v11->lookOrientation.scale.x = v11->position.x;
-            v11->lookOrientation.scale.y = v11->position.y;
-            v11->lookOrientation.scale.z = v11->position.z;
+            rdVector_Copy3(&v11->lookOrientation.scale, &v11->position);
             a2a = &v11->lookOrientation;
             rdMatrix_InvertOrtho34(&out, &v11->lookOrientation);
             rdMatrix_TransformPoint34Acc(&v35, &out);
@@ -172,9 +162,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
                 rdMatrix_TransformVector34Acc(v26, a2a);
                 if ( v39 )
                 {
-                    v26->x = -v26->x;
-                    v26->y = -v26->y;
-                    v26->z = -v26->z;
+                    rdVector_Neg3Acc(v26);
                 }
                 v28 |= 1u;
             }
@@ -304,7 +292,6 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     double v19; // rtt
     double v20; // rt0
     double v21; // st7
-    double v23; // st6
     double v25; // st7
     double v26; // st5
     double v27; // st6
@@ -318,7 +305,6 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     float v35; // edi
     int *v36; // edx
     double v37; // st7
-    double v39; // st6
     double v41; // st7
     double v42; // st5
     double v43; // st6
@@ -340,11 +326,7 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
                 v36 = v9->vertexPosIdx;
                 v45 = *a1;
                 v37 = (v45.z - v10[*v36].z) * v9->normal.z + (v45.y - v10[*v36].y) * v9->normal.y + (v45.x - v10[*v36].x) * v12->x;
-                v39 = v37;
-                if ( v39 < 0.0 )
-                    v39 = -v37;
-                if ( v39 <= 0.0000099999997 )
-                    v37 = 0.0;
+                v37 = stdMath_ClipPrecision(v37);
                 if ( v37 == 0.0 )
                 {
                     v17 = a1;
@@ -373,11 +355,7 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
                 v45.y = v19;
                 v45.z = v20;
                 v21 = (v45.z - v10[*v18].z) * v9->normal.z + (v45.y - v10[*v18].y) * v9->normal.y + (v45.x - v10[*v18].x) * v12->x;
-                v23 = v21;
-                if ( v23 < 0.0 )
-                    v23 = -v23;
-                if ( v23 <= 0.0000099999997 )
-                    v21 = 0.0;
+                v21 = stdMath_ClipPrecision(v21);
                 if ( v21 != 0.0 )
                 {
                     v25 = -v21;
@@ -453,18 +431,13 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
 int sithCollide_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *surfaceNormal, rdVector3 *a6, float *a7, int a8)
 {
     double v8; // st7
-    double v10; // st6
     double v13; // st7
     double v16; // st7
     float v17; // [esp+4h] [ebp+4h]
     float v18; // [esp+18h] [ebp+18h]
 
     v8 = (a1->y - a6->y) * surfaceNormal->y + (a1->z - a6->z) * surfaceNormal->z + (a1->x - a6->x) * surfaceNormal->x;
-    v10 = v8;
-    if ( v10 < 0.0 )
-        v10 = -v8;
-    if ( v10 <= 0.0000099999997 )
-        v8 = 0.0;
+    v8 = stdMath_ClipPrecision(v8);
     if ( v8 < 0.0 )
         return 0;
     v13 = v8 - a4;
