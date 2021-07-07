@@ -583,9 +583,9 @@ float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
 
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale)
 {
-    v1->x = v2->x * scale + v1->x;
-    v1->y = v2->y * scale + v1->y;
-    v1->z = v2->z * scale + v1->z;
+    v1->x += v2->x * scale;
+    v1->y += v2->y * scale;
+    v1->z += v2->z * scale;
     return v1;
 }
 
@@ -605,4 +605,62 @@ float rdVector_NormalDot(rdVector3* v1, rdVector3* v2, rdVector3* norm)
     
     rdVector_Sub3(&tmp, v1, v2);
     return rdVector_Dot3(&tmp, norm);
+}
+
+void rdVector_AbsRound3(rdVector3* v)
+{
+    v->x = stdMath_ClipPrecision(fabs(v->x));
+    v->y = stdMath_ClipPrecision(fabs(v->y));
+    v->z = stdMath_ClipPrecision(fabs(v->z));
+}
+
+void rdVector_ClipPrecision3(rdVector3* v)
+{
+    v->x = stdMath_ClipPrecision(v->x);
+    v->y = stdMath_ClipPrecision(v->y);
+    v->z = stdMath_ClipPrecision(v->z);
+}
+
+void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal)
+{
+    if (v->x < minVal)
+    {
+        v->x = minVal;
+    }
+    
+    if (v->x > maxVal)
+    {
+        v->x = maxVal;
+    }
+    
+    if (v->y < minVal)
+    {
+        v->y = minVal;
+    }
+    
+    if (v->y > maxVal)
+    {
+        v->y = maxVal;
+    }
+    
+    if (v->z < minVal)
+    {
+        v->z = minVal;
+    }
+    
+    if (v->z > maxVal)
+    {
+        v->z = maxVal;
+    }
+}
+
+void rdVector_ClampValue3(rdVector3* v, float val)
+{
+    float valAbs = val;
+    if (valAbs < 0.0)
+    {
+        valAbs = -valAbs;
+    }
+
+    rdVector_ClampRange3(v, -valAbs, valAbs);
 }

@@ -694,7 +694,7 @@ void sithUnk3_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
         v11 = v6;
         i->lookOrientation.scale.z = v11;
         sithUnk3_sub_4E7670(i, orient);
-        if ( (i->attach_flags & 8) == 0 )
+        if ( (i->attach_flags & ATTACHFLAGS_THING_RELATIVE) == 0 )
         {
             a1a.x = *v4 - v9;
             a1a.y = i->lookOrientation.scale.y - v10;
@@ -796,12 +796,12 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
     v10 = a3->attachedParentMaybe;
     for ( direction = *a2; v10; v10 = v10->childThing )
     {
-        if ( (v10->attach_flags & 8) == 0 )
+        if ( (v10->attach_flags & ATTACHFLAGS_THING_RELATIVE) == 0 )
         {
             v11 = sithUnk3_UpdateThingCollision(v10, a2, a6, 64);
             if ( v11 < a6 )
             {
-                if ( (v10->attach_flags & 2) == 0 )
+                if ( (v10->attach_flags & ATTACHFLAGS_THINGSURFACE) == 0 )
                     goto LABEL_20;
                 rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
                 v12 = a2->z * out.z + a2->y * out.y + out.x * a2->x;
@@ -813,7 +813,7 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
                 if ( v12 > 0.0 )
                 {
 LABEL_20:
-                    if ( (v5->thingflags & 0x800) == 0 )
+                    if ( (v5->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
                     {
                         amounta = (a6 - v11) * 100.0;
                         sithThing_Damage(v10, v5, amounta, 1);
@@ -1032,7 +1032,7 @@ LABEL_81:
     }
     for ( i = v5->attachedParentMaybe; i; i = i->childThing )
     {
-        if ( (i->attach_flags & 8) != 0 )
+        if ( (i->attach_flags & ATTACHFLAGS_THING_RELATIVE) != 0 )
         {
             rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
             v58 = v5->sector;

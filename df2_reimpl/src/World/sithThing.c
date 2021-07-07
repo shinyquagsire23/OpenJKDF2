@@ -1367,7 +1367,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     float arg4a; // [esp+2Ch] [ebp+8h]
 
     v2 = 0;
-    if ((thing->attach_flags & 8))
+    if ((thing->attach_flags & ATTACHFLAGS_THING_RELATIVE))
         return;
         
     if ( thing->move_type == MOVETYPE_PHYSICS )
@@ -1386,7 +1386,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
 
     if ( thing->attach_flags )
     {
-        if ( (thing->attach_flags & 1) != 0 )
+        if ( (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 )
         {
             v5 = (sithSurface *)thing->attachedThing;
             if ( (v5->surfaceFlags & 0x800) != 0 )
@@ -1403,7 +1403,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     
     if ( thing->field_268.x == 0.0 && thing->field_268.y == 0.0 && thing->field_268.z == 0.0 )
     {
-        if ( thing->move_type == MOVETYPE_PHYSICS && (thing->attach_flags & 6) != 0 && thing->attachedThing->move_type == MOVETYPE_PATH )
+        if ( thing->move_type == MOVETYPE_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->move_type == MOVETYPE_PATH )
             sithSector_ThingLandIdk(thing, 0);
     }
     else
@@ -1882,7 +1882,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
         sithThing_DetachThing(a1);
     }
     v7 = a3->vertexPosIdx;
-    a1->attach_flags = 2;
+    a1->attach_flags = ATTACHFLAGS_THINGSURFACE;
     a1->attachedSufaceInfo = (sithSurfaceInfo *)a3;
     v8 = *v7;
     a1->attachedThing = a2;

@@ -59,6 +59,11 @@ float stdMath_Sqrt(float a);
 
 float stdMath_ArcSin3(float a1);
 
+// Added
+float stdMath_ClipPrecision(float val);
+float stdMath_Clamp(float val, float valMin, float valMax);
+float stdMath_ClampValue(float val, float valAbsMax);
+
 extern const float aSinTable[4096];
 extern const float aTanTable[4096];
 

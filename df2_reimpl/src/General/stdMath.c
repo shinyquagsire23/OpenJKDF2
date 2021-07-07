@@ -593,3 +593,34 @@ float stdMath_Tan(float a1)
     }
     return v9;
 }
+
+float stdMath_ClipPrecision(float val)
+{
+    if (fabs(val) <= 0.0000099999997)
+        return 0.0;
+    return val;
+}
+
+float stdMath_Clamp(float val, float valMin, float valMax)
+{
+    if (val < valMin)
+        return valMin;
+    
+    if (val > valMax)
+        return valMax;
+
+    return val;
+}
+
+float stdMath_ClampValue(float val, float valAbsMax)
+{
+    valAbsMax = fabs(valAbsMax);
+    
+    if (val < -valAbsMax)
+        return -valAbsMax;
+    
+    if (val > valAbsMax)
+        return valAbsMax;
+
+    return val;
+}
