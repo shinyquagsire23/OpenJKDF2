@@ -103,8 +103,6 @@ sithUnk3SearchEntry* sithUnk3_NextSearchResult()
 
 float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags)
 {
-    int v7; // eax
-    int16_t v8; // di
     int v9; // ecx
     float v10; // eax
     int v11; // ebx
@@ -112,7 +110,6 @@ float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rd
     sithSector *v13; // esi
     unsigned int v14; // eax
     unsigned int v15; // edi
-    sithSector **v16; // edx
     unsigned int v17; // edx
     unsigned int v18; // ebp
     sithSector *j; // eax
@@ -120,23 +117,22 @@ float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rd
     sithSector *v21; // esi
     unsigned int v22; // eax
     unsigned int v23; // edi
-    sithSector **v24; // edx
+    sithSector *v24; // edx
     float v25; // [esp+10h] [ebp-8h]
     unsigned int v26; // [esp+10h] [ebp-8h]
     float a1a; // [esp+1Ch] [ebp+4h]
-    unsigned int a1b; // [esp+1Ch] [ebp+4h]
     float a5a; // [esp+2Ch] [ebp+14h]
 
-    v7 = sithUnk3_searchStackIdx + 1;
-    v8 = flags;
-    sithUnk3_searchStackIdx = v7;
-    sithUnk3_searchNumResults[v7] = 0;
-    sithUnk3_stackIdk[v7] = 1;
+    sithUnk3_searchStackIdx++;
+    sithUnk3_searchNumResults[sithUnk3_searchStackIdx] = 0;
+    sithUnk3_stackIdk[sithUnk3_searchStackIdx] = 1;
     v25 = a5;
-    sithUnk3_stackSectors[v7].sectors[0] = sector;
+    sithUnk3_stackSectors[sithUnk3_searchStackIdx].sectors[0] = sector;
+
     if ( (flags & 1) == 0 )
         v25 = sithUnk3_UpdateSectorThingCollision(sector, a2, position, direction, a5, range, flags);
     sithUnk3_sub_4E86D0(sector, position, direction, v25, range, flags);
+
     v9 = sithUnk3_searchStackIdx;
     v10 = v25;
     v26 = 0;
@@ -146,26 +142,19 @@ float sithUnk3_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rd
     {
         if ( i->collideType == 64 )
         {
-            if ( (v8 & 0x400) != 0 || i->distance <= (double)a5a )
+            if ( (flags & 0x400) != 0 || i->distance <= (double)a5a )
             {
                 v13 = i->surface->adjoin->sector;
                 a1a = a5a;
                 v14 = sithUnk3_stackIdk[v11];
-                v15 = 0;
-                if ( v14 )
+                for (v15 = 0; v15 < v14; v15++)
                 {
-                    v16 = sithUnk3_stackSectors[v9].sectors;
-                    while ( *v16 != v13 )
-                    {
-                        ++v15;
-                        ++v16;
-                        if ( v15 >= v14 )
-                            goto LABEL_11;
-                    }
+                    if ( sithUnk3_stackSectors[v9].sectors[v15] == v13 )
+                        break;
                 }
-                else
+                
+                if ( v15 >= v14 )
                 {
-LABEL_11:
                     if ( v14 != 64 )
                     {
                         sithUnk3_stackIdk[v11] = v14 + 1;
@@ -178,61 +167,47 @@ LABEL_11:
                     }
                 }
             }
-            v8 = flags;
             i->hasBeenEnumerated = 1;
         }
         v11 = v9;
         ++i;
     }
-    if ( a5a != 0.0 && (v8 & 0x800) != 0 )
+    if ( a5a != 0.0 && (flags & 0x800) != 0 )
     {
         v17 = sithUnk3_stackIdk[v9];
-        v18 = 0;
-        a1b = v17;
-        for ( j = sithUnk3_stackSectors[v9].sectors[0]; v18 < v17; j = sithUnk3_stackSectors[v9].sectors[v18] )
+        for (v18 = 0; v18 < v17; v18++)
         {
+            j = sithUnk3_stackSectors[v9].sectors[v18];
             v20 = j->adjoins;
-            if ( v20 )
+            while ( v20 )
             {
-                do
+                if ( (v20->flags & 2) != 0 )
                 {
-                    if ( (v20->flags & 2) != 0 )
+                    v21 = v20->sector;
+                    if ( v21->thingsList )
                     {
-                        v21 = v20->sector;
-                        if ( v21->thingsList )
+                        v22 = sithUnk3_stackIdk[v9];
+                        for (v23 = 0; v23 < v22; v23++)
                         {
-                            v22 = sithUnk3_stackIdk[v9];
-                            v23 = 0;
-                            if ( v22 )
+                            v24 = sithUnk3_stackSectors[v9].sectors[v23];
+                            if ( v24 == v21 )
+                                break;
+                        }
+
+                        if ( v23 >= v22 )
+                        {
+                            if ( v22 != 64 )
                             {
-                                v24 = sithUnk3_stackSectors[v9].sectors;
-                                while ( *v24 != v21 )
-                                {
-                                    ++v23;
-                                    ++v24;
-                                    if ( v23 >= v22 )
-                                        goto LABEL_27;
-                                }
-                            }
-                            else
-                            {
-LABEL_27:
-                                if ( v22 != 64 )
-                                {
-                                    sithUnk3_stackIdk[v9] = v22 + 1;
-                                    sithUnk3_stackSectors[v9].sectors[v22] = v21;
-                                    a5a = sithUnk3_UpdateSectorThingCollision(v21, a2, position, direction, a5a, range, flags);
-                                    v9 = sithUnk3_searchStackIdx;
-                                }
+                                sithUnk3_stackIdk[v9] = v22 + 1;
+                                sithUnk3_stackSectors[v9].sectors[v22] = v21;
+                                a5a = sithUnk3_UpdateSectorThingCollision(v21, a2, position, direction, a5a, range, flags);
+                                v9 = sithUnk3_searchStackIdx;
                             }
                         }
                     }
-                    v20 = v20->next;
                 }
-                while ( v20 );
-                v17 = a1b;
+                v20 = v20->next;
             }
-            ++v18;
         }
     }
     return a5a;
@@ -381,7 +356,6 @@ void sithUnk3_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVect
     int v42; // [esp+0h] [ebp-40h] BYREF
     float a7; // [esp+10h] [ebp-30h] BYREF
     int v45; // [esp+18h] [ebp-28h]
-    sithAdjoin *v46; // [esp+1Ch] [ebp-24h]
     int v47; // [esp+20h] [ebp-20h]
     float v48; // [esp+24h] [ebp-1Ch] BYREF
     rdVector3 v52; // [esp+34h] [ebp-Ch] BYREF
@@ -401,7 +375,6 @@ void sithUnk3_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVect
         {
             v12 = &sector->surfaces[v47];
             v15 = v12->adjoin;
-            v46 = v15;
             if ( (v12->surfaceFlags & SURFACEFLAGS_4) == 0 && !v15 )
                 continue;
             if ( !v15 )
@@ -467,7 +440,7 @@ LABEL_22:
                     if ( v18 )
                     {
                         v19 = sithUnk3_stackSectors[sithUnk3_searchStackIdx].sectors;
-                        while ( *v19 != v46->sector )
+                        while ( *v19 != v15->sector )
                         {
                             ++v17;
                             ++v19;
@@ -507,7 +480,7 @@ LABEL_30:
                         if ( v25 )
                         {
                             v27 = sithUnk3_stackSectors[sithUnk3_searchStackIdx].sectors;
-                            while ( *v27 != v46->sector )
+                            while ( *v27 != v15->sector )
                             {
                                 ++v26;
                                 ++v27;
@@ -611,9 +584,8 @@ sithSector* sithUnk3_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rd
             break;
         if ( (v9->collideType & 0x20) == 0 )
         {
-            a4->x = v9->distance * a1.x + a3->x;
-            a4->y = v9->distance * a1.y + a3->y;
-            a4->z = v9->distance * a1.z + a3->z;
+            rdVector_Copy3(a4, a3);
+            rdVector_MultAcc3(a4, &a1, v9->distance);
             break;
         }
         sector = v9->surface->adjoin->sector;
@@ -734,7 +706,7 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
                 if ( (v10->attach_flags & ATTACHFLAGS_THINGSURFACE) == 0 )
                     goto LABEL_20;
                 rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
-                v12 = stdMath_ClipPrecision(rdVector_Dot3(&a2, &out));
+                v12 = stdMath_ClipPrecision(rdVector_Dot3(a2, &out));
                 if ( v12 > 0.0 )
                 {
 LABEL_20:
@@ -1041,9 +1013,7 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
             v6 = v6 * 0.5;
         senderb = (v5->physicsParams.mass * v4->physicsParams.mass + v5->physicsParams.mass * v4->physicsParams.mass)
                 / (v5->physicsParams.mass + v4->physicsParams.mass);
-        forceVec.x = v6 * a2.x * senderb;
-        forceVec.y = v6 * a2.y * senderb;
-        forceVec.z = v6 * a2.z * senderb;
+        rdVector_Scale3(&forceVec, &a2, v6 * senderb);
         sithSector_ThingApplyForce(v4, &forceVec);
         rdVector_Neg3Acc(&forceVec);
         sithSector_ThingApplyForce(v5, &forceVec);
@@ -1067,23 +1037,16 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
 {
     int result; // eax
     double v10; // st6
-    double v14; // st7
     double v19; // st7
-    double v20; // st6
-    double v21; // st5
     double v22; // st7
     double v23; // st6
     double v24; // st5
     double v25; // st7
     double v26; // st7
-    double v27; // st6
-    double v28; // st5
-    double v29; // st7
     double v30; // st4
     double v31; // st6
     double v32; // st7
     double v33; // st5
-    float v34; // edx
     double v35; // st7
     double v36; // st7
     double v39; // st7
@@ -1096,7 +1059,7 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
 
     if ( a1->move_type != MOVETYPE_PHYSICS )
         return 0;
-    amount = -(a1->field_268.x * a2->x + a2->z * a1->field_268.z + a1->field_268.y * a2->y);
+    amount = -rdVector_Dot3(&a1->field_268, a2);
     a1a = stdMath_ClipPrecision(amount);
     if ( a1a <= 0.0 )
         return 0;
@@ -1111,23 +1074,16 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
         }
         else
         {
-            v10 = -(a1->physicsParams.vel.x * a2->x + a1->physicsParams.vel.z * a2->z + a1->physicsParams.vel.y * a2->y);
-            a1->field_268.x = a2->x * amount + a1->field_268.x;
-            a1->field_268.y = a2->y * amount + a1->field_268.y;
-            v14 = v10;
-            a1->field_268.z = a2->z * amount + a1->field_268.z;
+            v10 = -rdVector_Dot3(&a1->physicsParams.vel, a2);
+            rdVector_MultAcc3(&a1->field_268, a2, amount);
             if ( v10 > 0.0 )
             {
-                a1->physicsParams.vel.x = a2->x * v14 + a1->physicsParams.vel.x;
-                a1->physicsParams.vel.y = a2->y * v10 + a1->physicsParams.vel.y;
-                a1->physicsParams.vel.z = a2->z * v14 + a1->physicsParams.vel.z;
+                rdVector_MultAcc3(&a1->physicsParams.vel, a2, v10);
             }
-            v19 = -(a2->y * sithUnk3_collideHurtIdk.y + a2->z * sithUnk3_collideHurtIdk.z + a2->x * sithUnk3_collideHurtIdk.x);
-            v20 = a2->y * v19 + sithUnk3_collideHurtIdk.y;
-            v21 = a2->z * v19 + sithUnk3_collideHurtIdk.z;
+            v19 = -rdVector_Dot3(a2, &sithUnk3_collideHurtIdk);
             sithUnk3_collideHurtIdk.x = a2->x * v19 + sithUnk3_collideHurtIdk.x;
-            sithUnk3_collideHurtIdk.y = v20;
-            sithUnk3_collideHurtIdk.z = v21;
+            sithUnk3_collideHurtIdk.y = a2->y * v19 + sithUnk3_collideHurtIdk.y;
+            sithUnk3_collideHurtIdk.z = a2->z * v19 + sithUnk3_collideHurtIdk.z;
             rdVector_Normalize3Acc(&sithUnk3_collideHurtIdk);
             v22 = -(a1->physicsParams.vel.z * sithUnk3_collideHurtIdk.z
                   + a1->physicsParams.vel.x * sithUnk3_collideHurtIdk.x
@@ -1144,12 +1100,9 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
             v26 = -(a1->field_268.x * sithUnk3_collideHurtIdk.x + a1->field_268.y * sithUnk3_collideHurtIdk.y + a1->field_268.z * sithUnk3_collideHurtIdk.z);
             if ( v26 > 0.0 )
             {
-                v27 = v26 * sithUnk3_collideHurtIdk.y + a1->field_268.y;
-                v28 = v26 * sithUnk3_collideHurtIdk.x + a1->field_268.x;
-                v29 = v26 * sithUnk3_collideHurtIdk.z + a1->field_268.z;
-                a1->field_268.x = v28;
-                a1->field_268.y = v27;
-                a1->field_268.z = v29;
+                a1->field_268.x = v26 * sithUnk3_collideHurtIdk.x + a1->field_268.x;
+                a1->field_268.y = v26 * sithUnk3_collideHurtIdk.y + a1->field_268.y;
+                a1->field_268.z = v26 * sithUnk3_collideHurtIdk.z + a1->field_268.z;
             }
             result = 1;
         }
@@ -1162,17 +1115,14 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
         v33 = a1->physicsParams.vel.z * a2->z;
         sithUnk3_dword_8B4BE4 = 1;
         sithUnk3_collideHurtIdk.x = a2->x;
-        v34 = a2->z;
         sithUnk3_collideHurtIdk.y = a2->y;
-        sithUnk3_collideHurtIdk.z = v34;
+        sithUnk3_collideHurtIdk.z = a2->z;
         v35 = -(v32 + v33 + v31 * v30);
         amounta = v35;
         if ( v35 > 0.0 )
         {
             v36 = v43 * amounta;
-            a1->physicsParams.vel.x = a2->x * v36 + a1->physicsParams.vel.x;
-            a1->physicsParams.vel.y = a2->y * v36 + a1->physicsParams.vel.y;
-            a1->physicsParams.vel.z = a2->z * v36 + a1->physicsParams.vel.z;
+            rdVector_MultAcc3(&a1->physicsParams.vel, a2, v36);
             if ( !a4 && amounta > 2.5 )
             {
                 v39 = (amounta - 2.5) * (amounta - 2.5) * 45.0;
@@ -1274,67 +1224,52 @@ int sithUnk3_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     return result;
 }
 
-int sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
+void sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
 {
-    sithThing *v2; // ebx
     sithThing *v5; // edi
-    sithThing *v6; // ebp
-    long double v7; // st7
-    int result; // eax
     rdVector3 a2a; // [esp+10h] [ebp-6Ch] BYREF
     rdMatrix34 out; // [esp+1Ch] [ebp-60h] BYREF
     rdMatrix34 mat1; // [esp+4Ch] [ebp-30h] BYREF
     float a1a; // [esp+84h] [ebp+8h]
 
-    v2 = thing;
     if ( thing->attachedParentMaybe )
     {
         rdMatrix_Normalize34(a2);
-        a2->scale = thing->position;
+        rdVector_Copy3(&a2->scale, &thing->position);
         rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
         rdMatrix_InvertOrtho34(&mat1, &thing->lookOrientation);
         v5 = thing->attachedParentMaybe;
-        if ( v5 )
+        while ( v5 )
         {
-            do
+            rdVector_Copy3(&v5->lookOrientation.scale, &v5->position);
+            rdMatrix_Multiply34(&out, &mat1, &v5->lookOrientation);
+            rdMatrix_PostMultiply34(&out, a2);
+            rdVector_Sub3(&a2a, &out.scale, &v5->position);
+            a1a = rdVector_Normalize3Acc(&a2a);
+            rdVector_Zero3(&out.scale);
+            if ( a1a != 0.0 )
             {
-                v6 = v5->childThing;
-                rdVector_Copy3(&v5->lookOrientation.scale, &v5->position);
-                rdMatrix_Multiply34(&out, &mat1, &v5->lookOrientation);
-                rdMatrix_PostMultiply34(&out, a2);
-                rdVector_Sub3(&a2a, &out.scale, &v5->position);
-                v7 = rdVector_Normalize3Acc(&a2a);
-                rdVector_Zero3(&out.scale);
-                if ( v7 != 0.0 )
-                {
-                    a1a = v7;
-                    sithUnk3_UpdateThingCollision(v5, &a2a, a1a, 64);
-                }
-                sithUnk3_sub_4E77A0(v5, &out);
-                if ( v5->move_type == MOVETYPE_PHYSICS )
-                {
-                    v5->physicsParams.physflags &= ~1;
-                }
-                v5 = v6;
+                sithUnk3_UpdateThingCollision(v5, &a2a, a1a, 64);
             }
-            while ( v6 );
-            v2 = thing;
+            sithUnk3_sub_4E77A0(v5, &out);
+            if ( v5->move_type == MOVETYPE_PHYSICS )
+            {
+                v5->physicsParams.physflags &= ~PHYSFLAGS_100;
+            }
+            v5 = v5->childThing;
         }
     }
     else if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
     {
         rdMatrix_Normalize34(a2);
     }
-    result = 0;
     rdVector_Zero3(&a2->scale);
-    _memcpy(&v2->lookOrientation, a2, sizeof(v2->lookOrientation));
-    return result;
+    _memcpy(&thing->lookOrientation, a2, sizeof(thing->lookOrientation));
 }
 
 int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3SearchEntry *searchEnt, int isSolid)
 {
     int result; // eax
-    float amount; // [esp+0h] [ebp-10h]
     float mass; // [esp+14h] [ebp+4h]
 
     float tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
@@ -1345,16 +1280,13 @@ int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3Se
         return sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, isSolid);
 
     if ( thing->move_type == MOVETYPE_PHYSICS )
-        tmp = -(searchEnt->field_14.x * thing->physicsParams.vel.x
-                               + searchEnt->field_14.y * thing->physicsParams.vel.y
-                               + searchEnt->field_14.z * thing->physicsParams.vel.z);
+        tmp = -rdVector_Dot3(&searchEnt->field_14, &thing->physicsParams.vel);
 
     if (sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, 0))
     {
         if ( tmp > 0.25 )
         {
-            amount = mass * 0.30000001 * tmp;
-            sithThing_Damage(thing2, thing, amount, 1);
+            sithThing_Damage(thing2, thing, mass * 0.30000001 * tmp, 1);
         }
         return 1;
     }

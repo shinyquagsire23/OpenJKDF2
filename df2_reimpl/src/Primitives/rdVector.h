@@ -159,7 +159,7 @@ float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2);
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale);
 void rdVector_Zero3(rdVector3 *v);
 int rdVector_IsZero3(rdVector3* v);
-float rdVector_NormalDot(rdVector3* v1, rdVector3* v2, rdVector3* norm);
+float rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm);
 void rdVector_AbsRound3(rdVector3* v);
 void rdVector_ClipPrecision3(rdVector3* v);
 void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal);
