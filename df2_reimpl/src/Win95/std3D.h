@@ -223,6 +223,7 @@ void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *o
 int std3D_DrawOverlay();
 void std3D_UnloadAllTextures();
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
+void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
 int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
 void std3D_UpdateFrameCount(rdDDrawSurface *surface);
 void std3D_PurgeTextureCache();

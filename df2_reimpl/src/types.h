@@ -90,6 +90,8 @@ typedef struct sithMap sithMap;
 typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
 typedef struct stdALBuffer stdALBuffer;
+typedef struct rdTri rdTri;
+typedef struct rdLine rdLine;
 
 typedef struct sithSave_Header sithSave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;

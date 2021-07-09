@@ -102,6 +102,13 @@ typedef struct rdTri
   rdDDrawSurface *texture; // DirectDrawSurface*
 } rdTri;
 
+typedef struct rdLine
+{
+    int v1;
+    int v2;
+    int flags;
+} rdLine;
+
 int rdCache_Startup();
 void rdCache_AdvanceFrame();
 void rdCache_FinishFrame();

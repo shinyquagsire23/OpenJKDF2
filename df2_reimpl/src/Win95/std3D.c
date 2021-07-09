@@ -57,6 +57,8 @@ static GLuint std3D_aLoadedTextures[1024];
 static size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[4096];
 static size_t GL_tmpTrisAmt = 0;
+static rdLine GL_tmpLines[4096];
+static size_t GL_tmpLinesAmt = 0;
 static D3DVERTEX GL_tmpVertices[4096];
 static size_t GL_tmpVerticesAmt = 0;
 
@@ -631,6 +633,7 @@ void std3D_DrawRenderList()
     }
     
     rdTri* tris = GL_tmpTris;
+    rdLine* lines = GL_tmpLines;
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
     glEnableVertexAttribArray(attribute_v_uv);
@@ -817,10 +820,32 @@ void std3D_DrawRenderList()
         glDeleteBuffers(1, &ibo_triangle);
     }
     
-
+    
     
     free(data_elements);
+    
+    // Draw all lines
+    data_elements = malloc(sizeof(GLushort) * 2 * GL_tmpLinesAmt);
+    for (int j = 0; j < GL_tmpLinesAmt; j++)
+    {
+        data_elements[(j*2)+0] = lines[j].v1;
+        data_elements[(j*2)+1] = lines[j].v2;
+    }
+    
+    glGenBuffers(1, &ibo_triangle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
+
+    int lines_size;
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
+    glDrawElements(GL_LINES, lines_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(attribute_v_uv);
+    glDisableVertexAttribArray(attribute_v_color);
+    glDisableVertexAttribArray(attribute_coord3d);
+    glDeleteBuffers(1, &ibo_triangle);
         
+    // Done drawing
     glDeleteBuffers(1, &vbo_vertices);
     glDeleteBuffers(1, &vbo_colors);
     glDeleteBuffers(1, &vbo_uvs);
@@ -868,6 +893,17 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
     
     GL_tmpTrisAmt += num_tris;
+}
+
+void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
+{
+    if (GL_tmpLinesAmt + num_lines > 4096)
+    {
+        return;
+    }
+    
+    memcpy(&GL_tmpLines[GL_tmpLinesAmt], lines, sizeof(rdLine) * num_lines);
+    GL_tmpLinesAmt += num_lines;
 }
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)

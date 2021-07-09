@@ -141,7 +141,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
         }
         else
         {
-            rdVector_Sub3(a11, a2, a6);
+            rdVector_Sub3(a11, a2, &a6->position);
             rdVector_MultAcc3(a11, a3, unkOut);
             rdVector_Normalize3Acc(a11);
             *a8 = unkOut;
