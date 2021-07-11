@@ -6,6 +6,7 @@
 #include "Engine/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
+#include "Primitives/rdDebug.h"
 #include <math.h>
 
 static rdVector3 polylineVerts[32]; // idk the size on this

@@ -12,6 +12,7 @@
 #include "Engine/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
+#include "Primitives/rdDebug.h"
 
 void rdModel3_RegisterLoader(model3Loader_t loader)
 {
@@ -1194,6 +1195,9 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         }
         node = node->nextSibling;
     }
+#if 0
+    rdDebug_DrawBoundingBox(matrix_4_3, pCurModel3->radius, 0xFF0000FF);
+#endif
     ++rdModel3_numDrawnModels;
     return 1;
 }

@@ -218,7 +218,7 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 	
 	if (sound->data && !sound->bIsCopy)
 	    std_pHS->free(sound->data);
-	std_pHS->free(sound);
+	//std_pHS->free(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)

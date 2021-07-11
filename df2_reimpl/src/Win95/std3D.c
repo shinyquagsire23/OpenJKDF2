@@ -298,6 +298,7 @@ void std3D_ResetRenderList()
     
     GL_tmpVerticesAmt = 0;
     GL_tmpTrisAmt = 0;
+    GL_tmpLinesAmt = 0;
     
     //memset(GL_tmpTris, 0, sizeof(GL_tmpTris));
     //memset(GL_tmpVertices, 0, sizeof(GL_tmpVertices));

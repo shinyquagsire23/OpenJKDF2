@@ -257,7 +257,6 @@ int rdCache_SendFaceListToHardware()
     int a3; // [esp+7Ch] [ebp-24h]
     int lighting_capability; // [esp+80h] [ebp-20h]
     float v148; // [esp+84h] [ebp-1Ch]
-    float tris_to_push; // [esp+88h] [ebp-18h]
     int blue; // [esp+8Ch] [ebp-14h]
     int vtx_idx; // [esp+94h] [ebp-Ch]
     int red_and_alpha; // [esp+98h] [ebp-8h]
@@ -290,9 +289,8 @@ int rdCache_SendFaceListToHardware()
         v130 = 1;
         red_scalar = rdroid_curColorEffects.tint.x - (v3 + v2);
         v4 = rdroid_curColorEffects.tint.x * 0.5;
-        tris_to_push = v4;
         green_scalar = rdroid_curColorEffects.tint.y - (v4 + v3);
-        blue_scalar = rdroid_curColorEffects.tint.z - (tris_to_push + v2);
+        blue_scalar = rdroid_curColorEffects.tint.z - (v4 + v2);
     }
     if ( rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z )
     {
@@ -360,9 +358,16 @@ int rdCache_SendFaceListToHardware()
             alpha_is_opaque = 1;
         }
 
+        tex2_arr_sel = 0;
+
         v11.material = active_6c->material;
         if (!v11.material)
+        {
+#ifdef QOL_IMPROVEMENTS
+            goto solid_tri;
+#endif
             continue;
+        }
 
         v14 = active_6c->wallCel;
         if ( v14 == -1 )
@@ -396,76 +401,78 @@ LABEL_56:
         if ( !v15 || (v15->header.texture_type & 8) == 0 )
         {
             tex2_arr_sel = 0;
-            goto LABEL_99;
         }
-        sith_tex_sel = v15->texture_ptr;
-        
-        mipmap_level = 1;
-        if (sith_tex_sel->num_mipmaps == 2)
+        else
         {
-            if ( active_6c->z_min <= (double)rdroid_aMipDistances.y )
+            sith_tex_sel = v15->texture_ptr;
+            
+            mipmap_level = 1;
+            if (sith_tex_sel->num_mipmaps == 2)
             {
-                mipmap_level = 0;
+                if ( active_6c->z_min <= (double)rdroid_aMipDistances.y )
+                {
+                    mipmap_level = 0;
+                }
             }
-        }
-        else if (sith_tex_sel->num_mipmaps == 3)
-        {
-            if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
+            else if (sith_tex_sel->num_mipmaps == 3)
             {
-                mipmap_level = 0;
-            }
-            else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
-            {
-                mipmap_level = 2;
-            }
-        }
-        else if (sith_tex_sel->num_mipmaps == 4)
-        {
-            if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
-            {
-                mipmap_level = 0;
-            }
-            else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
-            {
-                if ( active_6c->z_min > (double)rdroid_aMipDistances.z )
-                    mipmap_level = 3;
-                else
+                if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
+                {
+                    mipmap_level = 0;
+                }
+                else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
+                {
                     mipmap_level = 2;
+                }
             }
-        }
-        else if (sith_tex_sel->num_mipmaps == 1)
-        {
-            mipmap_level = 0;
-        }
-        a3 = mipmap_level;
+            else if (sith_tex_sel->num_mipmaps == 4)
+            {
+                if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
+                {
+                    mipmap_level = 0;
+                }
+                else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
+                {
+                    if ( active_6c->z_min > (double)rdroid_aMipDistances.z )
+                        mipmap_level = 3;
+                    else
+                        mipmap_level = 2;
+                }
+            }
+            else if (sith_tex_sel->num_mipmaps == 1)
+            {
+                mipmap_level = 0;
+            }
+            a3 = mipmap_level;
 
-        if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
-        {
-            flags_idk_ |= 0x400;
-        }
+            if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
+            {
+                flags_idk_ |= 0x400;
+            }
 
-        if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
-        {
-            rdCache_DrawRenderList();
-            rdCache_ResetRenderList();
             if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
-                return 0;
+            {
+                rdCache_DrawRenderList();
+                rdCache_ResetRenderList();
+                if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
+                    return 0;
+            }
+
+            tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];
+
+            if ( alpha_is_opaque )
+                tex2_arr_sel = &sith_tex_sel->opaqueMats[mipmap_level];
+
+            std3D_GetValidDimension(
+                sith_tex_sel->texture_struct[mipmap_level]->format.width,
+                sith_tex_sel->texture_struct[mipmap_level]->format.height,
+                &out_width,
+                &out_height);
+            v11.mipmap_related = mipmap_related;
+            actual_width = (float)(out_width << mipmap_level);
+            actual_height = (float)(out_height << mipmap_level);
         }
 
-        tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];
-
-        if ( alpha_is_opaque )
-            tex2_arr_sel = &sith_tex_sel->opaqueMats[mipmap_level];
-
-        std3D_GetValidDimension(
-            sith_tex_sel->texture_struct[mipmap_level]->format.width,
-            sith_tex_sel->texture_struct[mipmap_level]->format.height,
-            &out_width,
-            &out_height);
-        v11.mipmap_related = mipmap_related;
-        actual_width = (float)(out_width << mipmap_level);
-        actual_height = (float)(out_height << mipmap_level);
-LABEL_99:
         if ( v11.mipmap_related != 3 )
         {
             if ( v11.mipmap_related != 4 )
@@ -723,6 +730,21 @@ LABEL_142:
                 ++iterating_6c_vtx_idx;
             }
             iter_6c_vtx_num = active_6c->numVertices;
+#ifdef QOL_IMPROVEMENTS
+            if ( iter_6c_vtx_num <= 2 )
+            {
+                tri_idx = rdCache_totalLines;
+                rdCache_aHWLines[tri_idx].v2 = tri_vert_idx;
+                rdCache_aHWLines[tri_idx].v1 = tri_vert_idx + 1;
+                rdCache_aHWLines[tri_idx].flags = flags_idk_;
+                
+                *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].ny = active_6c->extraData;
+                *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].ny = active_6c->extraData;
+                
+                rdCache_totalLines++;
+            }
+            else 
+#endif
             if ( iter_6c_vtx_num <= 3 )
             {
                 tri_idx = rdCache_totalNormalTris;
@@ -764,6 +786,7 @@ LABEL_142:
             continue;
         }
 
+solid_tri:
         if ( lighting_capability == 1 )
         {
             if ( active_6c->extralight < 0.0 )
@@ -941,17 +964,17 @@ LABEL_232:
             flags_idk_ |= 0x8000;
             if ( v129 )
             {
-                if ( !(*(uint32_t*)&rdroid_curColorEffects.filter.x) )
+                if ( !(rdroid_curColorEffects.filter.x) )
                 {
                     v96 = 0;
                     red_and_alpha = 0;
                 }
-                if ( !(*(uint32_t*)&rdroid_curColorEffects.filter.y) )
+                if ( !(rdroid_curColorEffects.filter.y) )
                 {
                     v94 = 0;
                     green = 0;
                 }
-                if ( !(*(uint32_t*)&rdroid_curColorEffects.filter.z) )
+                if ( !(rdroid_curColorEffects.filter.z) )
                     blue = 0;
             }
             if ( v130 )
@@ -1003,6 +1026,21 @@ LABEL_232:
             tmpiter++;
         }
         v108 = active_6c->numVertices;
+#ifdef QOL_IMPROVEMENTS
+        if ( v108 <= 2 )
+        {
+            v117 = rdCache_totalLines;
+            rdCache_aHWLines[v117].v2 = tri_vert_idx;
+            rdCache_aHWLines[v117].v1 = tri_vert_idx + 1;
+            rdCache_aHWLines[v117].flags = flags_idk_;
+            
+            *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[v117].v1].ny = active_6c->extraData;
+            *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[v117].v2].ny = active_6c->extraData;
+            
+            rdCache_totalLines++;
+        }
+        else 
+#endif
         if ( v108 <= 3 )
         {
             v117 = rdCache_totalSolidTris;
@@ -1054,6 +1092,9 @@ void rdCache_ResetRenderList()
     rdCache_totalNormalTris = 0;
     rdCache_totalSolidTris = 0;
     rdCache_totalVerts = 0;
+#ifdef QOL_IMPROVEMENTS
+    rdCache_totalLines = 0;
+#endif
 }
 
 void rdCache_DrawRenderList()
