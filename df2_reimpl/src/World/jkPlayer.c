@@ -77,6 +77,7 @@ void jkPlayer_Shutdown()
     }
     _memset(jkPlayer_otherThings, 0, sizeof(jkPlayer_otherThings));
     //nullsub_28_free();
+    
 }
 
 void jkPlayer_nullsub_29()
@@ -123,6 +124,8 @@ void jkPlayer_InitThings()
         playerInfoJk->actorThing = playerInfo->playerThing;
         playerInfo->playerThing->playerInfo = playerInfoJk;
         playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        
+        jkPlayer_SetPovModel(playerInfoJk, NULL);
     }
 
     int num = 0;
@@ -332,8 +335,16 @@ void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
     {
         rdThing_FreeEntry(&info->povModel);
         rdThing_NewEntry(thing, info->actorThing);
-        rdThing_SetModel3(thing, model);
-        info->povModel.puppet = rdPuppet_New(thing);
+
+        // Added: nullptr check, for fixing UAF on second world load
+        if (model) {
+            rdThing_SetModel3(thing, model);
+            info->povModel.puppet = rdPuppet_New(thing);
+        }
+        else
+        {
+            info->povModel.puppet = NULL;
+        }
     }
 }
 

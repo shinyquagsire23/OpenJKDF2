@@ -18,6 +18,4 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath);
 int sithKeyFrame_New(sithWorld *world, int numKeyframes);
 void sithKeyFrame_Free(sithWorld *world);
 
-#define keyframes_hashmap (*(stdHashTable**)0x847E8C)
-
 #endif // _SITHKEYFRAME_H

@@ -38,8 +38,18 @@ rdPuppet* rdPuppet_New(rdThing *thing)
 
 void rdPuppet_Free(rdPuppet *puppet)
 {
-    if ( puppet )
-        rdroid_pHS->free(puppet);
+    // Moved: no nullptr deref
+    if (!puppet) return;
+
+    // Added: prevent UAFs
+    for (int i = 0; i < 4; i++)
+    {
+        puppet->tracks[i].field_4 = 0;
+        puppet->tracks[i].keyframe = NULL;
+        puppet->tracks[i].callback = NULL;
+    }
+    
+    rdroid_pHS->free(puppet);
 }
 
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)

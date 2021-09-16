@@ -2,6 +2,7 @@
 
 #include "World/sithWorld.h"
 #include "Engine/rdKeyframe.h"
+#include "Engine/sithPuppet.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
 #include "jk.h"
@@ -88,7 +89,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
         return NULL;
 
     _sprintf(key_fpath, "%s%c%s", "3do\\key", 92, fpath);
-    keyframe = (rdKeyframe *)stdHashTable_GetKeyVal(keyframes_hashmap, fpath);
+    keyframe = (rdKeyframe *)stdHashTable_GetKeyVal(sithPuppet_keyframesHashtable, fpath);
 
     // Keyframe already loaded
     if (keyframe)
@@ -108,7 +109,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     {
         keyframe->id |= 0x8000;
     }
-    stdHashTable_SetKeyVal(keyframes_hashmap, keyframe->name, keyframe);
+    stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
     ++world->numKeyframesLoaded;
     return keyframe;
 }
@@ -131,7 +132,7 @@ void sithKeyFrame_Free(sithWorld *world)
 
     for (int idx = 0; idx < world->numKeyframesLoaded; idx++)
     {
-        stdHashTable_FreeKey(keyframes_hashmap, world->keyframes[idx].name);
+        stdHashTable_FreeKey(sithPuppet_keyframesHashtable, world->keyframes[idx].name);
         rdKeyframe_FreeJoints(&world->keyframes[idx]);
     }
     

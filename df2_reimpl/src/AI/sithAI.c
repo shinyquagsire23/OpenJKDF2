@@ -12,6 +12,7 @@
 #include "Main/jkGame.h"
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCog.h"
+#include "stdPlatform.h"
 
 int sithAI_Startup()
 {
@@ -340,6 +341,76 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
     }
 }
 
+void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3)
+{
+    if ( sithAI_numCommands >= 0x20 )
+        return;
+
+    sithAICommand* aiCmd = &sithAI_commandList[sithAI_numCommands];
+
+    _strncpy(aiCmd->name, cmdName, 0x1Fu);
+    aiCmd->name[31] = 0;
+    
+    aiCmd->func = func;
+    aiCmd->param1 = param1;
+    aiCmd->param2 = param2;
+    aiCmd->param3 = param3;
+    sithAI_numCommands++;
+}
+
+sithAICommand* sithAI_FindCommand(const char *cmdName)
+{
+    if ( !sithAI_numCommands )
+        return NULL;
+
+    for (uint32_t i = 0; i < sithAI_numCommands; i++)
+    {
+        if (!_strcmp(cmdName, sithAI_commandList[i].name))
+            return &sithAI_commandList[i];
+    }
+
+    return NULL;
+}
+
+int sithAI_PrintThings()
+{
+    int v1; // edi
+    sithActor *i; // esi
+    sithAIClass *v3; // ecx
+
+    if ( sithAI_bOpened )
+    {
+        DebugConsole_Print("Active AI things:\n");
+        v1 = 0;
+        for ( i = sithAI_actors; v1 <= sithAI_inittedActors; ++i )
+        {
+            v3 = i->aiclass;
+            if ( v3 )
+            {
+                if ( i->thing )
+                {
+                    _sprintf(
+                        std_genBuffer,
+                        "Block %2d: Class '%s', Owner '%s' (%d), Flags 0x%x\n",
+                        v1,
+                        v3->fpath,
+                        i->thing->template_name,
+                        i->thing->thingIdx,
+                        i->mode);
+                    DebugConsole_Print(std_genBuffer);
+                }
+            }
+            ++v1;
+        }
+        return 1;
+    }
+    else
+    {
+        DebugConsole_Print("AI system not open.\n");
+        return 0;
+    }
+}
+
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)
 {
     sithActor *v3; // esi
@@ -383,37 +454,6 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
         result = 1;
     }
     return result;
-}
-
-void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3)
-{
-    if ( sithAI_numCommands >= 0x20 )
-        return;
-
-    sithAICommand* aiCmd = &sithAI_commandList[sithAI_numCommands];
-
-    _strncpy(aiCmd->name, cmdName, 0x1Fu);
-    aiCmd->name[31] = 0;
-    
-    aiCmd->func = func;
-    aiCmd->param1 = param1;
-    aiCmd->param2 = param2;
-    aiCmd->param3 = param3;
-    sithAI_numCommands++;
-}
-
-sithAICommand* sithAI_FindCommand(const char *cmdName)
-{
-    if ( !sithAI_numCommands )
-        return NULL;
-
-    for (uint32_t i = 0; i < sithAI_numCommands; i++)
-    {
-        if (!_strcmp(cmdName, sithAI_commandList[i].name))
-            return &sithAI_commandList[i];
-    }
-
-    return NULL;
 }
 
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)

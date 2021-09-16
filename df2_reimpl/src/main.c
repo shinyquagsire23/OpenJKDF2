@@ -162,9 +162,10 @@ int main(int argc, char** argv)
     // text
     fseek(f, 0x400, SEEK_SET);
 #ifndef LINUX_TMP
+    printf("Using JK.EXE blob...\n");
     fread((void*)0x401000, 0x120200, 1, f);
 #endif
-    
+
     // rdata
     fseek(f, 0x120600, SEEK_SET);
     fread((void*)0x522000, 0x2200, 1, f);
@@ -1514,10 +1515,12 @@ void do_hooks()
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
-    hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
-    hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
+    hook_function(sithAI_Shutdown_ADDR, sithAI_Shutdown);
     hook_function(sithAI_NewEntry_ADDR, sithAI_NewEntry);
     hook_function(sithAI_FreeEntry_ADDR, sithAI_FreeEntry);
+    hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
+    hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
+    hook_function(sithAI_PrintThings_ADDR, sithAI_PrintThings);
     hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
     hook_function(sithAI_SetLookFrame_ADDR, sithAI_SetLookFrame);
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);

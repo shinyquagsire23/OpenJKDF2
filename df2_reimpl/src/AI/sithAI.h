@@ -72,9 +72,10 @@ void sithAI_FreeEntry(sithThing *thing);
 void sithAI_TickAll();
 void sithAI_TickActor(sithActor *actor);
 void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3);
-int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
+int sithAI_PrintThings();
+int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos);
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed);
 

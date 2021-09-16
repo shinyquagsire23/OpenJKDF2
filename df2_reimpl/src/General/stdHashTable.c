@@ -84,12 +84,11 @@ stdHashTable* stdHashTable_New(int maxEntries)
         if ( sizeIter >= &hashmapBucketSizes[hashmapBucketSizes_MAX] )
         {
             actualNumBuckets = maxEntries;
-        }
-        else
-        {
-            actualNumBuckets = hashmapBucketSizes[sizeIterIdx];
+            sizeIterIdx = hashmapBucketSizes_MAX-1;
+            break;
         }
     }
+    actualNumBuckets = hashmapBucketSizes[sizeIterIdx];
 
     // Calculate a prime number?
     if ( maxEntries > 1999 )
