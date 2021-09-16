@@ -13,6 +13,7 @@
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
+#include "Win95/DebugConsole.h"
 
 int sithAI_Startup()
 {

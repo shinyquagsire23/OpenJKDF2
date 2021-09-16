@@ -44,6 +44,7 @@ df2_reimpl/flex/parse.c
 df2_reimpl/flex/parse.h
 df2_reimpl/flex/flexlib.a
 df2_reimpl/output.map
+df2_reimpl/output-linux.map
 df2_reimpl/find_noxrefs.py
 df2_reimpl/imports_conv.py
 df2_reimpl/cogidk.py

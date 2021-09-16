@@ -1114,8 +1114,10 @@ void rdCache_DrawRenderList()
         if ( rdCache_totalNormalTris )
             std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
 #ifdef QOL_IMPROVEMENTS
+#ifdef LINUX
         if ( rdCache_totalLines )
             std3D_AddRenderListLines(rdCache_aHWLines, rdCache_totalLines);
+#endif
 #endif
 
         std3D_DrawRenderList();

@@ -477,43 +477,6 @@ float stdMath_Sqrt(float a)
     return sqrtf(a);
 }
 
-float stdMath_ArcSin3(float a1)
-{
-    float v2; // [esp+0h] [ebp-24h]
-    float v3; // [esp+4h] [ebp-20h]
-    float v4; // [esp+8h] [ebp-1Ch]
-    float v5; // [esp+Ch] [ebp-18h]
-    float v6; // [esp+10h] [ebp-14h]
-    float v7; // [esp+14h] [ebp-10h]
-    float v9; // [esp+20h] [ebp-4h]
-    float v10; // [esp+2Ch] [ebp+8h]
-
-
-    if ( a1 >= 0.0 )
-        v7 = a1;
-    else
-        v7 = -a1;
-
-    if ( v7 <= 0.70710677 )
-    {
-        v4 = stdMath_FlexPower(v7, 3) / 6.0 + v7;
-        v3 = stdMath_FlexPower(v7, 5) * 0.075000003 + v4;
-        v9 = (stdMath_FlexPower(v7, 7) * 0.066797003 + v3) * 57.295784;
-    }
-    else
-    {
-        v2 = 1.0 - v7 * v7;
-        v10 = stdMath_Sqrt(v2);
-        v6 = stdMath_FlexPower(v10, 3) / 6.0 + v10;
-        v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
-        v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * 57.295784;
-    }
-    if ( a1 < 0.0 )
-        return -v9;
-    else
-        return v9;
-}
-
 float stdMath_Tan(float a1)
 {
     double v1; // st7
@@ -592,6 +555,313 @@ float stdMath_Tan(float a1)
             return v9;
     }
     return v9;
+}
+
+float stdMath_ArcSin1(float val)
+{
+    double angle; // st7
+    float v2; // [esp+0h] [ebp-14h]
+    float v3; // [esp+4h] [ebp-10h]
+    float v5; // [esp+10h] [ebp-4h]
+    float v6; // [esp+1Ch] [ebp+8h]
+
+    if ( val >= 0.0 )
+        v3 = val;
+    else
+        v3 = -val;
+
+    // TODO: verify all these constants are expanded properly to the og values
+    if ( v3 <= 0.70710677 )
+    {
+        v5 = (stdMath_FlexPower(v3, 3) * 0.212749 + v3) * 57.295784;
+    }
+    else
+    {
+        v2 = 1.0 - v3 * v3;
+        v6 = stdMath_Sqrt(v2);
+        v5 = 90.0 - (stdMath_FlexPower(v6, 3) * 0.212749 + v6) * 57.295784;
+    }
+
+    if ( val < 0.0 )
+        angle = -v5;
+    else
+        angle = v5;
+
+    return angle;
+}
+
+float stdMath_ArcSin2(float val)
+{
+    double angle; // st7
+    float v2; // [esp+0h] [ebp-1Ch]
+    float v3; // [esp+4h] [ebp-18h]
+    float v4; // [esp+8h] [ebp-14h]
+    float v5; // [esp+Ch] [ebp-10h]
+
+    float v7; // [esp+18h] [ebp-4h]
+    float v8; // [esp+24h] [ebp+8h]
+
+    if ( val >= 0.0 )
+        v5 = val;
+    else
+        v5 = -val;
+
+    // TODO: verify all these constants are expanded properly to the og values
+    if ( v5 <= 0.70710677 )
+    {
+        v3 = stdMath_FlexPower(v5, 3) / 6.0 + v5;
+        v7 = (stdMath_FlexPower(v5, 5) * 0.105502 + v3) * 57.295784;
+    }
+    else
+    {
+        v2 = 1.0 - v5 * v5;
+        v8 = stdMath_Sqrt(v2);
+        v4 = stdMath_FlexPower(v8, 3) / 6.0 + v8;
+        v7 = 90.0 - (stdMath_FlexPower(v8, 5) * 0.105502 + v4) * 57.295784;
+    }
+
+    if ( val < 0.0 )
+        angle = -v7;
+    else
+        angle = v7;
+
+    return angle;
+}
+
+float stdMath_ArcSin3(float a1)
+{
+    float v2; // [esp+0h] [ebp-24h]
+    float v3; // [esp+4h] [ebp-20h]
+    float v4; // [esp+8h] [ebp-1Ch]
+    float v5; // [esp+Ch] [ebp-18h]
+    float v6; // [esp+10h] [ebp-14h]
+    float v7; // [esp+14h] [ebp-10h]
+    float v9; // [esp+20h] [ebp-4h]
+    float v10; // [esp+2Ch] [ebp+8h]
+
+
+    if ( a1 >= 0.0 )
+        v7 = a1;
+    else
+        v7 = -a1;
+
+    if ( v7 <= 0.70710677 )
+    {
+        v4 = stdMath_FlexPower(v7, 3) / 6.0 + v7;
+        v3 = stdMath_FlexPower(v7, 5) * 0.075000003 + v4;
+        v9 = (stdMath_FlexPower(v7, 7) * 0.066797003 + v3) * 57.295784;
+    }
+    else
+    {
+        v2 = 1.0 - v7 * v7;
+        v10 = stdMath_Sqrt(v2);
+        v6 = stdMath_FlexPower(v10, 3) / 6.0 + v10;
+        v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
+        v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * 57.295784;
+    }
+    if ( a1 < 0.0 )
+        return -v9;
+    else
+        return v9;
+}
+
+float stdMath_ArcTan1(float a1, float a2)
+{
+    double v3; // st7
+    float v4; // [esp+0h] [ebp-24h]
+    float v5; // [esp+4h] [ebp-20h]
+    float v6; // [esp+Ch] [ebp-18h]
+    float v7; // [esp+1Ch] [ebp-8h]
+    float v8; // [esp+1Ch] [ebp-8h]
+    float v9; // [esp+20h] [ebp-4h]
+
+    if ( a2 == 0.0 && a1 == 0.0 )
+        return 0.0;
+    if ( a1 >= 0.0 )
+        v6 = a1;
+    else
+        v6 = -a1;
+    if ( a2 >= 0.0 )
+        v5 = a2;
+    else
+        v5 = -a2;
+    if ( v5 <= (double)v6 )
+        v3 = v5 / v6;
+    else
+        v3 = v6 / v5;
+    v9 = v3;
+    if ( v9 >= 0.0 )
+        v4 = v3;
+    else
+        v4 = -v9;
+    v7 = (v4 - stdMath_FlexPower(v4, 3) * 0.22629) * 57.295784;
+    if ( v6 >= (double)v5 )
+        v7 = 90.0 - v7;
+    v8 = 90.0 - v7;
+    if ( a1 < 0.0 )
+        v8 = 180.0 - v8;
+    if ( a2 >= 0.0 )
+        v8 = -v8;
+    return v8;
+}
+
+float stdMath_ArcTan2(float a1, float a2)
+{
+    double v3; // st7
+    float v4; // [esp+0h] [ebp-28h]
+    float v5; // [esp+4h] [ebp-24h]
+    float v6; // [esp+8h] [ebp-20h]
+    float v7; // [esp+10h] [ebp-18h]
+    float v8; // [esp+20h] [ebp-8h]
+    float v9; // [esp+20h] [ebp-8h]
+    float v10; // [esp+24h] [ebp-4h]
+
+    if ( a2 == 0.0 && a1 == 0.0 )
+        return 0.0;
+    if ( a1 >= 0.0 )
+        v7 = a1;
+    else
+        v7 = -a1;
+    if ( a2 >= 0.0 )
+        v6 = a2;
+    else
+        v6 = -a2;
+    if ( v6 <= (double)v7 )
+        v3 = v6 / v7;
+    else
+        v3 = v7 / v6;
+    v10 = v3;
+    if ( v10 >= 0.0 )
+        v5 = v3;
+    else
+        v5 = -v10;
+    v4 = v5 - stdMath_FlexPower(v5, 3) / 3.0;
+    v8 = (stdMath_FlexPower(v5, 5) * 0.12366 + v4) * 57.295784;
+    if ( v7 >= (double)v6 )
+        v8 = 90.0 - v8;
+    v9 = 90.0 - v8;
+    if ( a1 < 0.0 )
+        v9 = 180.0 - v9;
+    if ( a2 >= 0.0 )
+        v9 = -v9;
+    return v9;
+}
+
+float stdMath_ArcTan3(float a1, float a2)
+{
+    double v3; // st7
+    float v4; // [esp+0h] [ebp-2Ch]
+    float v5; // [esp+4h] [ebp-28h]
+    float v6; // [esp+8h] [ebp-24h]
+    float v7; // [esp+Ch] [ebp-20h]
+    float v8; // [esp+14h] [ebp-18h]
+    float v9; // [esp+24h] [ebp-8h]
+    float v10; // [esp+24h] [ebp-8h]
+    float v11; // [esp+28h] [ebp-4h]
+
+    if ( a2 == 0.0 && a1 == 0.0 )
+        return 0.0;
+    if ( a1 >= 0.0 )
+        v8 = a1;
+    else
+        v8 = -a1;
+    if ( a2 >= 0.0 )
+        v7 = a2;
+    else
+        v7 = -a2;
+    if ( v7 <= (double)v8 )
+        v3 = v7 / v8;
+    else
+        v3 = v8 / v7;
+    v11 = v3;
+    if ( v11 >= 0.0 )
+        v6 = v3;
+    else
+        v6 = -v11;
+    v5 = v6 - stdMath_FlexPower(v6, 3) / 3.0;
+    v4 = stdMath_FlexPower(v6, 5) / 5.0 + v5;
+    v9 = (v4 - stdMath_FlexPower(v6, 7) * 0.083920002) * 57.295784;
+    if ( v8 >= (double)v7 )
+        v9 = 90.0 - v9;
+    v10 = 90.0 - v9;
+    if ( a1 < 0.0 )
+        v10 = 180.0 - v10;
+    if ( a2 >= 0.0 )
+        v10 = -v10;
+    return v10;
+}
+
+float stdMath_ArcTan4(float a1, float a2)
+{
+    double v3; // st7
+    float v4; // [esp+0h] [ebp-30h]
+    float v5; // [esp+4h] [ebp-2Ch]
+    float v6; // [esp+8h] [ebp-28h]
+    float v7; // [esp+Ch] [ebp-24h]
+    float v8; // [esp+10h] [ebp-20h]
+    float v9; // [esp+18h] [ebp-18h]
+    float v10; // [esp+28h] [ebp-8h]
+    float v11; // [esp+28h] [ebp-8h]
+    float v12; // [esp+2Ch] [ebp-4h]
+
+    if ( a2 == 0.0 && a1 == 0.0 )
+        return 0.0;
+    if ( a1 >= 0.0 )
+        v9 = a1;
+    else
+        v9 = -a1;
+    if ( a2 >= 0.0 )
+        v8 = a2;
+    else
+        v8 = -a2;
+    if ( v8 <= (double)v9 )
+        v3 = v8 / v9;
+    else
+        v3 = v9 / v8;
+    v12 = v3;
+    if ( v12 >= 0.0 )
+        v7 = v3;
+    else
+        v7 = -v12;
+    v6 = v7 - stdMath_FlexPower(v7, 3) / 3.0;
+    v5 = stdMath_FlexPower(v7, 5) / 5.0 + v6;
+    v4 = v5 - stdMath_FlexPower(v7, 7) / 7.0;
+    v10 = (stdMath_FlexPower(v7, 9) * 0.063235 + v4) * 57.295784;
+    if ( v9 >= (double)v8 )
+        v10 = 90.0 - v10;
+    v11 = 90.0 - v10;
+    if ( a1 < 0.0 )
+        v11 = 180.0 - v11;
+    if ( a2 >= 0.0 )
+        v11 = -v11;
+    return v11;
+}
+
+int stdMath_FloorDivMod(int in1, int in2, int *out1, int *out2)
+{
+    int result; // eax
+    int v5; // [esp+0h] [ebp-8h]
+    int v6; // [esp+4h] [ebp-4h]
+
+    if ( in1 < 0 )
+    {
+        v6 = -(-in1 / in2);
+        v5 = -in1 % in2;
+        if ( v5 )
+        {
+            --v6;
+            v5 = in2 - v5;
+        }
+    }
+    else
+    {
+        v6 = in1 / in2;
+        v5 = in1 % in2;
+    }
+    result = v6;
+    *out1 = v6;
+    *out2 = v5;
+    return result;
 }
 
 float stdMath_ClipPrecision(float val)

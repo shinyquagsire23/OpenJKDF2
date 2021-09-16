@@ -341,6 +341,14 @@ void do_hooks()
     hook_function(stdMath_NormalizeDeltaAngle_ADDR, stdMath_NormalizeDeltaAngle);
     hook_function(stdMath_SinCos_ADDR, stdMath_SinCos);
     hook_function(stdMath_Tan_ADDR, stdMath_Tan);
+    hook_function(stdMath_ArcSin1_ADDR, stdMath_ArcSin1);
+    hook_function(stdMath_ArcSin2_ADDR, stdMath_ArcSin2);
+    hook_function(stdMath_ArcSin3_ADDR, stdMath_ArcSin3);
+    hook_function(stdMath_ArcTan1_ADDR, stdMath_ArcTan1);
+    hook_function(stdMath_ArcTan2_ADDR, stdMath_ArcTan2);
+    hook_function(stdMath_ArcTan3_ADDR, stdMath_ArcTan3);
+    hook_function(stdMath_ArcTan4_ADDR, stdMath_ArcTan4);
+    hook_function(stdMath_FloorDivMod_ADDR, stdMath_FloorDivMod);
     hook_function(stdMath_Dist2D1_ADDR, stdMath_Dist2D1);
     hook_function(stdMath_Dist2D2_ADDR, stdMath_Dist2D2);
     hook_function(stdMath_Dist2D3_ADDR, stdMath_Dist2D3);
