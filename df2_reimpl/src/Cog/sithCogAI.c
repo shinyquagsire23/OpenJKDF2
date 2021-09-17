@@ -452,6 +452,51 @@ void sithCogAI_AISetFireTarget(sithCog *ctx)
     }
 }
 
+// Unused?
+void sithCogAI_sub_501330(sithCog *ctx)
+{
+    char *v1; // edi
+    sithThing *v2; // eax
+    sithActor *v3; // esi
+    sithAICommand *v4; // eax
+    unsigned int v5; // edx
+    unsigned int v6; // ecx
+    void *v7; // edi
+
+    v1 = sithCogVm_PopString(ctx);
+    v2 = sithCogVm_PopThing(ctx);
+    if ( !v2 )
+        goto LABEL_12;
+    if ( !v1 )
+        goto LABEL_12;
+    if ( v2->thingtype != THINGTYPE_ACTOR )
+        goto LABEL_12;
+    v3 = v2->actor;
+    if ( !v3 )
+        goto LABEL_12;
+    v4 = sithAI_FindCommand(v1);
+    if ( !v4 )
+        goto LABEL_12;
+    v5 = v3->numAIClassEntries;
+    v6 = 0;
+    if ( v5 )
+    {
+        v7 = (void *)v4->func;
+        do
+        {
+            if ( v3->aiclass->entries[v6].func == v7 )
+                break;
+            ++v6;
+        }
+        while ( v6 < v5 );
+    }
+    if ( v6 < v5 )
+        sithCogVm_PushInt(ctx, v6);
+    else
+LABEL_12:
+        sithCogVm_PushInt(ctx, -1);
+}
+
 void sithCogAI_IsAITargetInSight(sithCog *ctx)
 {
     sithThing *v1; // eax
