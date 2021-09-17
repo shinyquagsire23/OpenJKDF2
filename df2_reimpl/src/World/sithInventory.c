@@ -1135,6 +1135,21 @@ void sithInventory_ClearInventory(sithThing *player)
     }
 }
 
+void sithInventory_SetPowerKeybind(int idx, int binding)
+{
+    sithInventory_powerKeybinds[idx].enabled = 1;
+    sithInventory_powerKeybinds[idx].binding = binding;
+    sithInventory_powerKeybinds[idx].idk = 0;
+}
+
+int sithInventory_GetPowerKeybind(int idx)
+{
+    if ( sithInventory_powerKeybinds[idx].enabled == 1 )
+        return sithInventory_powerKeybinds[idx].binding;
+    else
+        return -1;
+}
+
 void sithInventory_SendKilledMessageToAll(sithThing *player, sithThing *sender)
 {
     for (int i = 0; i < 200; i++)

@@ -1205,6 +1205,8 @@ void do_hooks()
     hook_function(sithInventory_GetBin_ADDR, sithInventory_GetBin);
     hook_function(sithInventory_GetItemDesc_ADDR, sithInventory_GetItemDesc);
     hook_function(sithInventory_KeybindInit_ADDR, sithInventory_KeybindInit);
+    hook_function(sithInventory_SetPowerKeybind_ADDR, sithInventory_SetPowerKeybind);
+    hook_function(sithInventory_GetPowerKeybind_ADDR, sithInventory_GetPowerKeybind);
     hook_function(sithInventory_ClearInventory_ADDR, sithInventory_ClearInventory);
     hook_function(sithInventory_SendKilledMessageToAll_ADDR, sithInventory_SendKilledMessageToAll);
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
