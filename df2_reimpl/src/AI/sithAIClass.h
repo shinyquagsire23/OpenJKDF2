@@ -43,7 +43,8 @@ typedef struct sithAIClass
 } sithAIClass;
 
 int sithAIClass_Startup();
-static void (*sithAIClass_Shutdown)() = (void*)sithAIClass_Shutdown_ADDR;
+void sithAIClass_Shutdown();
+int sithAIClass_New(sithWorld *world, int a2);
 int sithAIClass_ParseSection(sithWorld *world, int a2);
 sithAIClass* sithAIClass_Load(char *fpath);
 int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass);

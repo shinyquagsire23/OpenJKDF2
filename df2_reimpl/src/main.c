@@ -1536,7 +1536,13 @@ void do_hooks()
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);
 
     // sithAIClass
+    hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);
+    hook_function(sithAIClass_Shutdown_ADDR, sithAIClass_Shutdown);
+    hook_function(sithAIClass_ParseSection_ADDR, sithAIClass_ParseSection);
+    hook_function(sithAIClass_New_ADDR, sithAIClass_New);
     hook_function(sithAIClass_Free_ADDR, sithAIClass_Free);
+    hook_function(sithAIClass_Load_ADDR, sithAIClass_Load);
+    hook_function(sithAIClass_LoadEntry_ADDR, sithAIClass_LoadEntry);
     
     // sithAICmd
     hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);

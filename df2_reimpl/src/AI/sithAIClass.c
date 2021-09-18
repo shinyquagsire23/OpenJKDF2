@@ -14,6 +14,37 @@ int sithAIClass_Startup()
     return sithAIClass_hashmap != 0;
 }
 
+void sithAIClass_Shutdown()
+{
+    if ( sithAIClass_hashmap )
+    {
+        stdHashTable_Free(sithAIClass_hashmap);
+        sithAIClass_hashmap = 0;
+    }
+}
+
+// Unused
+int sithAIClass_New(sithWorld *world, int a2)
+{
+    int result; // eax
+
+    result = (int)pSithHS->alloc(0x94C * a2);
+    world->aiclasses = (sithAIClass *)result;
+    if ( result )
+    {
+        _memset((void *)result, 0, 0x94C * a2);
+        world->numAIClasses = a2;
+        world->numAIClassesLoaded = 0;
+        result = 1;
+    }
+    else
+    {
+        world->numAIClasses = 0;
+        world->numAIClassesLoaded = 0;
+    }
+    return result;
+}
+
 int sithAIClass_ParseSection(sithWorld *world, int a2)
 {
     int numAIClasses; // ebx

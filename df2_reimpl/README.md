@@ -99,6 +99,7 @@ sithMaterial                   0x4fd      0.118%        100.000%        9 / 9
 wuRegistry                     0x5b2      0.135%        100.000%       12 / 12         
 stdHashTable                   0x5d6      0.139%        100.000%       10 / 10         
 sithExplosion                  0x61d      0.145%        100.000%        4 / 4          
+sithAIClass                    0x689      0.155%        100.000%        7 / 7          
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
 sith                           0x72b      0.170%        100.000%       16 / 16         
 jkGuiPlayer                    0x73a      0.172%        100.000%        5 / 5          
@@ -144,7 +145,6 @@ Video                          0x5dc      0.139%        19.800%         3 / 5
 DebugConsole                   0x5de      0.139%        0.000%          0 / 13         
 sithUnk4                       0x5e9      0.140%        37.013%         4 / 6          
 stdFileUtil                    0x687      0.155%        24.237%         5 / 11         
-sithAIClass                    0x689      0.155%        91.751%         5 / 7          
 rdPrimit2                      0x69a      0.157%        0.000%          0 / 5          
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithCogScript                  0x6ca      0.161%        67.837%         7 / 9          
@@ -223,15 +223,15 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-36.194% by weight
-61.142% by weight excluding rasterizer
-1887 / 3167 functions
-1887 / 2796 functions excluding rasterizer
+36.207% by weight
+61.164% by weight excluding rasterizer
+1889 / 3167 functions
+1889 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           7.050%          305 / 1322
+sith           7.038%          303 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.482%          187 / 360
 jkGui          3.655%          122 / 284
@@ -240,12 +240,12 @@ jk             2.930%          147 / 322
 Raster         40.792%         370 / 371
 other          1.536%           80 / 120
 -----------------------------------------
-total          63.806%        1280 / 3167
+total          63.793%        1278 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           11.910%         305 / 1322
+sith           11.888%         303 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.572%          187 / 360
 jkGui          6.175%          122 / 284
@@ -253,6 +253,6 @@ rd             5.194%           36 / 345
 jk             4.949%          147 / 322
 other          2.595%           80 / 120
 -----------------------------------------
-total          38.877%         910 / 2796
+total          38.855%         908 / 2796
 
 ```
