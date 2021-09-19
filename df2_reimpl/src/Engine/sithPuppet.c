@@ -518,7 +518,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         if ( thing->thingtype == SITH_ANIM_WALK && (v17 = thing->actor) != 0 )
         {
             thinga = 0.2;
-            anim = (v17->mode & 8) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
+            anim = (v17->flags & 8) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
         }
         else
         {
@@ -783,7 +783,7 @@ LABEL_14:
                 sithActor_JumpWithVel(thing, 2.0);
 LABEL_50:
                 if ( v11->thingtype == THINGTYPE_ACTOR )
-                    v11->actor->mode |= 1u;
+                    v11->actor->flags |= 1u;
             }
             return;
         case 0xDu:

@@ -747,6 +747,8 @@ void do_hooks()
     hook_function(rdMaterial_LoadEntry_ADDR, rdMaterial_LoadEntry);
     hook_function(rdMaterial_Free_ADDR, rdMaterial_Free);
     hook_function(rdMaterial_FreeEntry_ADDR, rdMaterial_FreeEntry);
+    hook_function(rdMaterial_AddToTextureCache_ADDR, rdMaterial_AddToTextureCache);
+    hook_function(rdMaterial_ResetCacheInfo_ADDR, rdMaterial_ResetCacheInfo);
     
     // rdPolyLine
     hook_function(rdPolyLine_New_ADDR, rdPolyLine_New);
@@ -1531,9 +1533,13 @@ void do_hooks()
     hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
     hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
     hook_function(sithAI_PrintThings_ADDR, sithAI_PrintThings);
+    hook_function(sithAI_PrintThingStatus_ADDR, sithAI_PrintThingStatus);
     hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
+    hook_function(sithAI_Tick_ADDR, sithAI_Tick);
     hook_function(sithAI_SetLookFrame_ADDR, sithAI_SetLookFrame);
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);
+    hook_function(sithAI_Jump_ADDR, sithAI_Jump);
+    hook_function(sithAI_RandomFireVector_ADDR, sithAI_RandomFireVector);
 
     // sithAIClass
     hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);
@@ -1546,6 +1552,27 @@ void do_hooks()
     
     // sithAICmd
     hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);
+    // sithAICmd_Follow
+    hook_function(sithAICmd_CircleStrafe_ADDR, sithAICmd_CircleStrafe);
+    hook_function(sithAICmd_Crouch_ADDR, sithAICmd_Crouch);
+    hook_function(sithAICmd_BlindFire_ADDR, sithAICmd_BlindFire);
+    hook_function(sithAICmd_LobFire_ADDR, sithAICmd_LobFire);
+    // sithAICmd_PrimaryFire
+    // sithAICmd_TurretFire
+    // sithAICmd_Listen
+    // sithAICmd_LookForTarget
+    // sithAICmd_OpenDoors
+    // sithAICmd_Jump
+    // sithAICmd_Flee
+    // sithAICmd_Withdraw
+    // sithAICmd_Dodge
+    // sithAICmd_RandomTurn
+    // sithAICmd_Roam
+    // sithAICmd_SenseDanger
+    // sithAICmd_HitAndRun
+    // sithAICmd_Retreat
+    // sithAICmd_ReturnHome
+    // sithAICmd_Talk
 
     // jkGUIRend
     hook_function(jkGuiRend_CopyVBuffer_ADDR, jkGuiRend_CopyVBuffer);

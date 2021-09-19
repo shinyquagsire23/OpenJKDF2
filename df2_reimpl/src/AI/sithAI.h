@@ -75,14 +75,19 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3);
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
 int sithAI_PrintThings();
+int sithAI_PrintThingStatus(int a1, char *idxStr);
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
+void sithAI_Tick(sithThing *thing, float deltaSeconds);
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos);
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed);
+void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel);
+
+void sithAI_RandomFireVector(rdVector3 *out, float magnitude);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;
 //static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
-static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI_Tick_ADDR;
+//static void (*sithAI_Tick)(sithThing *thing, float deltaSeconds) = (void*)sithAI_Tick_ADDR;
 //static void (*sithAI_TickActor)(sithActor *actor) = (void*)sithAI_TickActor_ADDR;
 //static void (*sithAI_TickAll)() = (void*)sithAI_TickAll_ADDR;
 //static void (*sithAI_SetActorFireTarget)(sithActor *a1, int a2, int a3) = (void*)sithAI_SetActorFireTarget_ADDR;
@@ -90,7 +95,12 @@ static int (*sithAI_FirstThingInView)(sithSector *a1, rdMatrix34 *a2, float a3, 
 
 static int (*sithAI_FireWeapon)(sithActor *a1, float a2, float a3, float a4, float a5, int a6, int a7) = (void*)sithAI_FireWeapon_ADDR;
 //static int (*sithAI_SetMoveThing)(sithActor *actor, rdVector3 *movePos, float moveSpeed) = (void*)sithAI_SetMoveThing_ADDR;
-static void (*sithAI_Jump)(sithActor *actor, rdVector3 *a2, float a3) = (void*)sithAI_Jump_ADDR;
+//static void (*sithAI_Jump)(sithActor *actor, rdVector3 *a2, float a3) = (void*)sithAI_Jump_ADDR;
 //static void (*sithAI_SetLookFrame)(sithActor *actor, rdVector3 *lookPos) = (void*)sithAI_SetLookFrame_ADDR;
+
+static void (*sithAI_sub_4EA630)(sithActor *actor, float deltaSeconds) = (void*)sithAI_sub_4EA630_ADDR;
+static void (*sithAI_sub_4EAF40)(sithActor *a1) = (void*)sithAI_sub_4EAF40_ADDR;
+static int (*sithAI_sub_4EB300)(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB300_ADDR;
+static void (*sithAI_idk_msgarrived_target)(sithActor *actor, float deltaSeconds) = (void*)sithAI_idk_msgarrived_target_ADDR;
 
 #endif // _SITHAI_H

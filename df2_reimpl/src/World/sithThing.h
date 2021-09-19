@@ -296,7 +296,7 @@ typedef struct sithActor
 {
     sithThing *thing;
     sithAIClass *aiclass;
-    int mode;
+    int flags;
     sithActorInstinct instincts[16];
     uint32_t numAIClassEntries;
     int nextUpdate;
@@ -317,7 +317,7 @@ typedef struct sithActor
     int field_1F4;
     rdVector3 field_1F8;
     int field_204;
-    rdVector3 field_208;
+    rdVector3 blindAimError;
     sithThing *thingidk;
     rdVector3 movepos;
     int field_224;

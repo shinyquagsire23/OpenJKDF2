@@ -13,8 +13,8 @@ LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fsh
 CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # Comment out these lines to use JK.EXE as a binary blob
-CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
-LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+#CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+#LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc

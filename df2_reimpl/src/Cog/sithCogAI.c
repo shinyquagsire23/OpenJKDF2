@@ -265,8 +265,8 @@ void sithCogAI_AISetMode(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = v3->mode;
-                v3->mode = v4 | v1;
+                v4 = v3->flags;
+                v3->flags = v4 | v1;
                 if ( v4 != (v4 | v1) )
                     sithAI_SetActorFireTarget(v3, 256, v4);
             }
@@ -281,7 +281,7 @@ void sithCogAI_AIGetMode(sithCog *ctx)
 
     v1 = sithCogVm_PopThing(ctx);
     if ( v1 && v1->thingtype == THINGTYPE_ACTOR && (v2 = v1->actor) != 0 )
-        sithCogVm_PushInt(ctx, v2->mode);
+        sithCogVm_PushInt(ctx, v2->flags);
     else
         sithCogVm_PushInt(ctx, -1);
 }
@@ -307,9 +307,9 @@ void sithCogAI_AIClearMode(sithCog *ctx)
             v3 = thing->actor;
             if ( v3 )
             {
-                v4 = v3->mode;
+                v4 = v3->flags;
                 mode_inv = ~mode;
-                v3->mode = v4 & mode_inv;
+                v3->flags = v4 & mode_inv;
                 if ( v4 != (v4 & mode_inv) )
                     sithAI_SetActorFireTarget(v3, 256, v4);
             }
@@ -439,12 +439,12 @@ void sithCogAI_AISetFireTarget(sithCog *ctx)
                 v4 = sithTime_curMs;
                 v3->field_1D0 = v1;
                 v3->field_204 = v4;
-                v5 = v3->mode;
+                v5 = v3->flags;
                 if ( v1 )
                     v6 = v5 | 0x20;
                 else
                     v6 = v5 & ~0x20u;
-                v3->mode = v6;
+                v3->flags = v6;
                 if ( v6 != v5 )
                     sithAI_SetActorFireTarget(v3, 256, v5);
             }
@@ -531,11 +531,11 @@ void sithCogAI_AIFlee(sithCog *ctx)
                 v3 = v2->actor;
                 if ( v3 )
                 {
-                    v4 = v3->mode;
+                    v4 = v3->flags;
                     v3->field_1C0 = v1;
                     if ( (v4 & 0x800) == 0 )
                     {
-                        v3->mode |= 0x800;
+                        v3->flags |= 0x800;
                         sithAI_SetActorFireTarget(v3, 256, v4);
                     }
                 }

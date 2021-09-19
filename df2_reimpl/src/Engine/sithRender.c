@@ -1425,15 +1425,14 @@ int sithRender_RenderPov(sithThing *povThing)
 
     if ( (povThing->thingflags & SITH_TF_INCAMFOV) == 0 )
     {
-#ifndef LINUX
         if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 )
             sithCog_SendMessageFromThing(povThing, 0, SITH_MESSAGE_SIGHTED);
-#endif
+
         if ( povThing->thingtype == THINGTYPE_ACTOR )
         {
             if ( povThing->actor )
             {
-                povThing->actor->mode &= ~0x1000u;
+                povThing->actor->flags &= ~0x1000u;
             }
         }
         povThing->thingflags |= SITH_TF_INCAMFOV;

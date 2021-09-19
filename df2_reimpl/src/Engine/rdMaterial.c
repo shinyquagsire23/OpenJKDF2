@@ -299,6 +299,8 @@ void rdMaterial_FreeEntry(rdMaterial* material)
       rdroid_pHS->free(material->palette_alloc);
 }
 
+// rdMaterial_Write
+
 int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha)
 {
     stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
@@ -334,5 +336,21 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             return 1;
         }
         return 0;
+    }
+}
+
+void rdMaterial_ResetCacheInfo(rdMaterial *material)
+{
+    for (int i = 0; i < material->num_textures; i++)
+    {
+        rdTexture* texIter = &material->textures[i];
+        for (int j = 0; j < texIter->num_mipmaps; j++)
+        {
+            rdDDrawSurface* matIter = &texIter->alphaMats[j];
+            matIter->texture_loaded = 0;
+            matIter->gpu_accel_maybe = 0;
+            matIter[4].texture_loaded = 0;
+            matIter[4].gpu_accel_maybe = 0;
+        }
     }
 }

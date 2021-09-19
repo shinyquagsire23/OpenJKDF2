@@ -13,7 +13,7 @@
 
 #define sithAIClass_hashmap (*(stdHashTable**)0x00852F88)
 
-typedef int (*sithAIClassEntryFunc_t)(sithActor*, sithAIClassEntry*, sithActorEntry*, int, int);
+typedef int (*sithAIClassEntryFunc_t)(sithActor*, sithAIClassEntry*, sithActorInstinct*, int, int);
 
 typedef struct sithAIClassEntry
 {

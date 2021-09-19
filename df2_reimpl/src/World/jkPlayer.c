@@ -124,8 +124,6 @@ void jkPlayer_InitThings()
         playerInfoJk->actorThing = playerInfo->playerThing;
         playerInfo->playerThing->playerInfo = playerInfoJk;
         playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
-        
-        jkPlayer_SetPovModel(playerInfoJk, NULL);
     }
 
     int num = 0;

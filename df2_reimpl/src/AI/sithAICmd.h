@@ -1,6 +1,8 @@
 #ifndef _SITHAICMD_H
 #define _SITHAICMD_H
 
+#include "types.h"
+
 #define sithAICmd_Startup_ADDR (0x005091B0)
 #define sithAICmd_Follow_ADDR (0x005093F0)
 #define sithAICmd_CircleStrafe_ADDR (0x00509890)
@@ -25,5 +27,26 @@
 #define sithAICmd_Talk_ADDR (0x0050BE20)
 
 void sithAICmd_Startup();
+// sithAICmd_Follow
+int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
+int sithAICmd_Crouch(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
+int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
+int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
+// sithAICmd_PrimaryFire
+// sithAICmd_TurretFire
+// sithAICmd_Listen
+// sithAICmd_LookForTarget
+// sithAICmd_OpenDoors
+// sithAICmd_Jump
+// sithAICmd_Flee
+// sithAICmd_Withdraw
+// sithAICmd_Dodge
+// sithAICmd_RandomTurn
+// sithAICmd_Roam
+// sithAICmd_SenseDanger
+// sithAICmd_HitAndRun
+// sithAICmd_Retreat
+// sithAICmd_ReturnHome
+// sithAICmd_Talk
 
 #endif // _SITHAICMD_H

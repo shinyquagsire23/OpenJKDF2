@@ -380,6 +380,13 @@ void sithWorld_FreeEntry(sithWorld *world)
         sithAIClass_Free(world);
     if ( world->soundclasses )
         sithSoundClass_Free2(world);
+        
+    // Added: Fix UAF from previous world's viewmodel anims
+    for (int i = 0; i < jkPlayer_maxPlayers; i++)
+    {
+        jkPlayerInfo* playerInfoJk = &playerThings[i];
+        jkPlayer_SetPovModel(playerInfoJk, NULL);
+    }
 }
 
 int sithHeader_Load(sithWorld *world, int junk)

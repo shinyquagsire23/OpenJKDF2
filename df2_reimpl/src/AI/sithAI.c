@@ -4,10 +4,13 @@
 #include "General/stdMath.h"
 #include "World/sithThing.h"
 #include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "AI/sithAICmd.h"
 #include "AI/sithAIClass.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithSoundClass.h"
+#include "Engine/sithPuppet.h"
+#include "Engine/sithAnimClass.h"
 #include "General/stdHashTable.h"
 #include "Main/jkGame.h"
 #include "Cog/sithCogVm.h"
@@ -183,7 +186,7 @@ void sithAI_NewEntry(sithThing *thing)
             actor->aiclass = sith_ai;
             actor->thing = thing;
             actor->numAIClassEntries = sith_ai->numEntries;
-            actor->mode = 0x1004;
+            actor->flags = 0x1004;
             actor->moveSpeed = 1.5;
         }
         else
@@ -245,7 +248,7 @@ void sithAI_TickAll()
         if ( actor->aiclass
           && (actor->thing->thingflags & 0x202) == 0
           && actor->thing->actorParams.health > 0.0
-          && (actor->mode & 0x3000) == 0
+          && (actor->flags & 0x3000) == 0
           && actor->nextUpdate <= sithTime_curMs )
         {
             sithAI_TickActor(actor);
@@ -262,22 +265,22 @@ void sithAI_TickActor(sithActor *actor)
     int a1a; // [esp+1Ch] [ebp+4h]
 
     uint32_t nextMs = sithTime_curMs + 5000;
-    int a3 = actor->mode;
+    int a3 = actor->flags;
 LABEL_2:
     for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
     {
         if ( (actor->instincts[a1a].field_0 & 1) == 0 )
         {
-            v5 = actor->mode;
+            v5 = actor->flags;
             if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
             {
                 if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                 {
                     actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
-                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->mode )
+                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                     {
                         sithAI_SetActorFireTarget(actor, 256, a3);
-                        a3 = actor->mode;
+                        a3 = actor->flags;
                         goto LABEL_2;
                     }
                 }
@@ -308,7 +311,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
             break;
         if ( v4->actorParams.health <= 0.0 )
             break;
-        v5 = actor->mode;
+        v5 = actor->flags;
         actora = v5;
         if ( (v5 & 0x2000) != 0 )
             break;
@@ -316,7 +319,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
         {
             if ( a2 != 2 )
                 return;
-            actor->mode &= ~0x1000;
+            actor->flags &= ~0x1000;
         }
 
         if ( a2 == 256 )
@@ -336,7 +339,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
             }
         }
         v5 = actora;
-        if ( actor->mode == v5 )
+        if ( actor->flags == v5 )
             break;
         a3 = v5;
     }
@@ -397,7 +400,7 @@ int sithAI_PrintThings()
                         v3->fpath,
                         i->thing->template_name,
                         i->thing->thingIdx,
-                        i->mode);
+                        i->flags);
                     DebugConsole_Print(std_genBuffer);
                 }
             }
@@ -410,6 +413,75 @@ int sithAI_PrintThings()
         DebugConsole_Print("AI system not open.\n");
         return 0;
     }
+}
+
+int sithAI_PrintThingStatus(int a1, char *idxStr)
+{
+    uint32_t v2; // ebx
+    sithThing *v3; // eax
+    sithActor *v4; // edi
+    int result; // eax
+    int v7; // [esp+3Ch] [ebp-8h]
+    int actorIdx; // [esp+40h] [ebp-4h] BYREF
+
+    v2 = 0;
+    if ( idxStr && sithAI_bOpened && _sscanf(idxStr, "%d", &actorIdx) == 1 && actorIdx <= sithAI_inittedActors )
+    {
+        v3 = sithAI_actors[actorIdx].thing;
+        v4 = &sithAI_actors[actorIdx];
+        if ( v3 )
+        {
+            _sprintf(std_genBuffer, "AI Status dump for thing %d (%s).\n", v3->thingIdx, v3->template_name);
+            DebugConsole_Print(std_genBuffer);
+            _sprintf(
+                std_genBuffer,
+                "Class '%s', Flags=0x%x, Moods %d/%d/%d, NextUpdate=%d\n",
+                v4->aiclass->fpath,
+                v4->flags,
+                v4->mood0,
+                v4->mood1,
+                v4->mood2,
+                v4->nextUpdate);
+            DebugConsole_Print(std_genBuffer);
+            DebugConsole_Print("Current instincts:\n");
+            if ( v4->numAIClassEntries )
+            {
+                v7 = 0;
+                sithActorInstinct* v6 = &v4->instincts[0];
+                do
+                {
+                    _sprintf(
+                        std_genBuffer,
+                        "Instinct %d: Params: %f/%f/%f/%f, nextUpdate=%d, mask=0x%x, mode=0x%x.\n",
+                        v2,
+                        v6->param0,
+                        v6->param1,
+                        v6->param2,
+                        v6->param3,
+                        v6->nextUpdate,
+                        v4->aiclass->entries[v7].param3,
+                        v4->aiclass->entries[v7].param1);
+                    DebugConsole_Print(std_genBuffer);
+                    ++v2;
+                    ++v6;
+                    ++v7;
+                }
+                while ( v2 < v4->numAIClassEntries );
+            }
+            result = 1;
+        }
+        else
+        {
+            DebugConsole_Print("That AI block is not currently active.\n");
+            result = 1;
+        }
+    }
+    else
+    {
+        DebugConsole_Print("cannot process AIStatus command.\n");
+        result = 0;
+    }
+    return result;
 }
 
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)
@@ -457,6 +529,20 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     return result;
 }
 
+void sithAI_Tick(sithThing *thing, float deltaSeconds)
+{
+    sithActor *v2; // esi
+
+    if ( thing->thingType == THINGTYPE_ACTOR && thing->actorParams.health > 0.0 )
+    {
+        v2 = thing->actor;
+        if ( (v2->flags & 8) != 0 )
+            sithAI_sub_4EA630(v2, deltaSeconds);
+        if ( (v2->flags & 1) != 0 )
+            sithAI_idk_msgarrived_target(v2, deltaSeconds);
+    }
+}
+
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
 {
     sithThing *v2; // eax
@@ -502,23 +588,41 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
         }
         actor->lookVector.z = 0.0;
         rdVector_Normalize3Acc(&actor->lookVector);
-        actor->mode |= 0x8;
+        actor->flags |= 0x8;
     }
 }
 
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
 {
-    int v3; // eax
-    sithThing *v4; // [esp-8h] [ebp-Ch]
-
-    if ( sithTime_curMs >= actor->field_28C || (actor->mode & 1) == 0 )
+    if ( sithTime_curMs >= actor->field_28C || (actor->flags & 1) == 0 )
     {
         actor->moveSpeed = moveSpeed;
         actor->movePos.x = movePos->x;
         actor->movePos.y = movePos->y;
-        v4 = actor->thing;
         actor->movePos.z = movePos->z;
-        sithSoundClass_ThingPlaySoundclass4(v4, SITH_SC_MOVING);
-        actor->mode |= 0x1;
+        sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_MOVING);
+        actor->flags |= 0x1;
     }
+}
+
+void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel)
+{
+    actor->moveSpeed = 2.0;
+    actor->movePos.x = pos->x;
+    actor->movePos.y = pos->y;
+    actor->movePos.z = pos->z;
+
+    if ( sithPuppet_PlayMode(actor->thing, SITH_ANIM_JUMP, 0) < 0 )
+        sithActor_JumpWithVel(actor->thing, vel);
+
+    actor->field_28C = sithTime_curMs + 2000;
+    actor->flags |= 1;
+}
+
+void sithAI_RandomFireVector(rdVector3 *out, float magnitude)
+{
+    out->x = ((double)_frand() - 0.5) * magnitude + out->x;
+    out->y = ((double)_frand() - 0.5) * magnitude + out->y;
+    out->z = ((double)_frand() - 0.5) * magnitude + out->z;
+    rdVector_Normalize3Acc(out);
 }
