@@ -4,6 +4,7 @@
 #include "Engine/sithAnimClass.h"
 #include "World/sithUnk3.h"
 #include "World/jkPlayer.h"
+#include "AI/sithAI.h"
 
 void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing)
 {
@@ -37,7 +38,7 @@ int sithUnk4_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithUnk3SearchEn
     return v3;
 }
 
-void sithUnk4_MoveJointsForEyePYR(sithThing *actor, rdVector3 *eyePYR)
+void sithUnk4_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
 {
     sithAnimclass *v3; // eax
     rdVector3 *v4; // ebx

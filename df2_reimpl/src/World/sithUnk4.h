@@ -12,7 +12,7 @@
 
 void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing);
 int sithUnk4_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *searchEnt);
-void sithUnk4_MoveJointsForEyePYR(sithThing *actor, rdVector3 *eyePYR);
+void sithUnk4_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR);
 int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithUnk3SearchEntry *a3, int a4);
 
 //static int (__cdecl *sithUnk4_ActorActorCollide)(sithThing *thing, sithThing *a2, rdMatrix34 *a3, int a4) = (void*)sithUnk4_ActorActorCollide_ADDR;

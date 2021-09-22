@@ -102,5 +102,8 @@ static void (*sithAI_sub_4EA630)(sithActor *actor, float deltaSeconds) = (void*)
 static void (*sithAI_sub_4EAF40)(sithActor *a1) = (void*)sithAI_sub_4EAF40_ADDR;
 static int (*sithAI_sub_4EB300)(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB300_ADDR;
 static void (*sithAI_idk_msgarrived_target)(sithActor *actor, float deltaSeconds) = (void*)sithAI_idk_msgarrived_target_ADDR;
+static void (*sithAI_sub_4EAD60)(sithActor *actor) = (void*)sithAI_sub_4EAD60_ADDR;
+static int (*sithAI_physidk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_physidk_ADDR;
+static int (*sithAI_sub_4EB640)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_sub_4EB640_ADDR;
 
 #endif // _SITHAI_H

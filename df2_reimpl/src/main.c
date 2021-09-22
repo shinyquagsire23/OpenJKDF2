@@ -1557,12 +1557,12 @@ void do_hooks()
     hook_function(sithAICmd_Crouch_ADDR, sithAICmd_Crouch);
     hook_function(sithAICmd_BlindFire_ADDR, sithAICmd_BlindFire);
     hook_function(sithAICmd_LobFire_ADDR, sithAICmd_LobFire);
-    // sithAICmd_PrimaryFire
+    hook_function(sithAICmd_PrimaryFire_ADDR, sithAICmd_PrimaryFire);
     // sithAICmd_TurretFire
     // sithAICmd_Listen
-    // sithAICmd_LookForTarget
-    // sithAICmd_OpenDoors
-    // sithAICmd_Jump
+    hook_function(sithAICmd_LookForTarget_ADDR, sithAICmd_LookForTarget);
+    hook_function(sithAICmd_OpenDoors_ADDR, sithAICmd_OpenDoors);
+    hook_function(sithAICmd_Jump_ADDR, sithAICmd_Jump);
     // sithAICmd_Flee
     // sithAICmd_Withdraw
     // sithAICmd_Dodge
