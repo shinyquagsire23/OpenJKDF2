@@ -265,7 +265,8 @@ LABEL_2:
     {
         if ( (actor->instincts[a1a].field_0 & 1) == 0 )
         {
-            if ( (actor->flags & actor->aiclass->entries[a1a].param1) != 0 && (actor->flags & actor->aiclass->entries[a1a].param2) == 0 )
+            if ((actor->flags & actor->aiclass->entries[a1a].param1) 
+                && !(actor->flags & actor->aiclass->entries[a1a].param2))
             {
                 if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                 {

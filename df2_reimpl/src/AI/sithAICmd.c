@@ -33,27 +33,90 @@
 
 void sithAICmd_Startup()
 {
-    sithAI_RegisterCommand("listen", sithAICmd_Listen, 0, 0, 7);
-    sithAI_RegisterCommand("lookfortarget", sithAICmd_LookForTarget, 0x204, 0, 0);
-    sithAI_RegisterCommand("primaryfire", sithAICmd_PrimaryFire, 2, 0, 0x100);
-    sithAI_RegisterCommand("follow", sithAICmd_Follow, 2, 0x800, 0xE00);
-    sithAI_RegisterCommand("turretfire", sithAICmd_TurretFire, 2, 0x800, 0x100);
-    sithAI_RegisterCommand("opendoors", sithAICmd_OpenDoors, 2, 0, 0);
-    sithAI_RegisterCommand("jump", sithAICmd_Jump, 0, 0, 0x604);
-    sithAI_RegisterCommand("randomturn", sithAICmd_RandomTurn, 4, 0, 0);
-    sithAI_RegisterCommand("roam", sithAICmd_Roam, 4, 0, 0);
-    sithAI_RegisterCommand("flee", sithAICmd_Flee, 0x800, 0, 0xF05);
-    sithAI_RegisterCommand("sensedanger", sithAICmd_SenseDanger, 4, 0x800, 7);
-    sithAI_RegisterCommand("hitandrun", sithAICmd_HitAndRun, 0xC00, 0, 0);
-    sithAI_RegisterCommand("retreat", sithAICmd_Retreat, 2, 0x800, 0);
-    sithAI_RegisterCommand("circlestrafe", sithAICmd_CircleStrafe, 2, 0x800, 0);
-    sithAI_RegisterCommand("blindfire", sithAICmd_BlindFire, 2, 0xC00, 0);
-    sithAI_RegisterCommand("returnhome", sithAICmd_ReturnHome, 0, 0, 0x900);
-    sithAI_RegisterCommand("lobfire", sithAICmd_LobFire, 2, 0, 0x100);
-    sithAI_RegisterCommand("talk", sithAICmd_Talk, 0xFFFF, 0, 0);
-    sithAI_RegisterCommand("crouch", sithAICmd_Crouch, 2, 0, 0x100);
-    sithAI_RegisterCommand("withdraw", sithAICmd_Withdraw, 0x800, 0, 0xF05);
-    sithAI_RegisterCommand("dodge", sithAICmd_Dodge, 0, 0, 0x1003);
+    sithAI_RegisterCommand("listen", sithAICmd_Listen, 
+        0, // allowed flags...?
+        0, // disallowed flags
+        SITHAIFLAGS_SEARCHING|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST);
+    sithAI_RegisterCommand("lookfortarget", sithAICmd_LookForTarget, 
+        SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_SEARCHING, // allowed flags
+        0,                              // disallowed flags
+        0);
+    sithAI_RegisterCommand("primaryfire", sithAICmd_PrimaryFire, 
+        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        0,                              // disallowed flags
+        SITHAIFLAGS_UNK100);
+    sithAI_RegisterCommand("follow", sithAICmd_Follow,
+        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        SITHAIFLAGS_FLEEING,            // disallowed flags
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE);
+    sithAI_RegisterCommand("turretfire", sithAICmd_TurretFire, 
+        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        SITHAIFLAGS_FLEEING,            // disallowed flags
+        SITHAIFLAGS_UNK100);
+    sithAI_RegisterCommand("opendoors", sithAICmd_OpenDoors, 
+        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        0,                              // disallowed flags
+        0);
+    sithAI_RegisterCommand("jump", sithAICmd_Jump, 
+        0,                      // allowed flags
+        0,                      // disallowed flags
+        SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_SEARCHING);
+    sithAI_RegisterCommand("randomturn", sithAICmd_RandomTurn, 
+        SITHAIFLAGS_SEARCHING,  // allowed flags
+        0,                      // disallowed flags
+        0);
+    sithAI_RegisterCommand("roam", sithAICmd_Roam, 
+        SITHAIFLAGS_SEARCHING,  // allowed flags
+        0,                      // disallowed flags
+        0);
+    sithAI_RegisterCommand("flee", sithAICmd_Flee,
+        SITHAIFLAGS_FLEEING,    // allowed flags
+        0,                      // disallowed flags
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_UNK100|SITHAIFLAGS_SEARCHING|SITHAIFLAGS_MOVING_TO_DEST);
+    sithAI_RegisterCommand("sensedanger", sithAICmd_SenseDanger,
+        SITHAIFLAGS_SEARCHING, // SenseDanger allowed flags
+        SITHAIFLAGS_FLEEING,   // SenseDanger disallowed flags
+        SITHAIFLAGS_SEARCHING|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST); // SenseDanger idk?
+    sithAI_RegisterCommand("hitandrun", sithAICmd_HitAndRun, 
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE, // HitAndRun allowed flags
+        0,                            // HitAndRun disallowed flags
+        0);                           // HitAndRun idk?
+    sithAI_RegisterCommand("retreat", sithAICmd_Retreat, 
+        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
+        SITHAIFLAGS_FLEEING,          // disallowed flags
+        0);
+    sithAI_RegisterCommand("circlestrafe", sithAICmd_CircleStrafe, 
+        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
+        SITHAIFLAGS_FLEEING,          // disallowed flags
+        0);
+    sithAI_RegisterCommand("blindfire", sithAICmd_BlindFire, 
+        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE, // disallowed flags
+        0);
+    sithAI_RegisterCommand("returnhome", sithAICmd_ReturnHome, 
+        0, // allowed flags
+        0, // disallowed flags
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_UNK100);
+    sithAI_RegisterCommand("lobfire", sithAICmd_LobFire, 
+        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        0,                              // disallowed flags
+        SITHAIFLAGS_UNK100);
+    sithAI_RegisterCommand("talk", sithAICmd_Talk, 
+        0xFFFF, // allowed flags (any)
+        0,      // disallowed flags
+        0);
+    sithAI_RegisterCommand("crouch", sithAICmd_Crouch, 
+        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
+        0, // disallowed flags
+        SITHAIFLAGS_UNK100);
+    sithAI_RegisterCommand("withdraw", sithAICmd_Withdraw,
+        SITHAIFLAGS_FLEEING, // allowed flags
+        0, // disallowed flags
+        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_UNK100|SITHAIFLAGS_SEARCHING|SITHAIFLAGS_MOVING_TO_DEST);
+    sithAI_RegisterCommand("dodge", sithAICmd_Dodge, 
+        0, // allowed flags
+        0, // disallowed flags
+        SITHAIFLAGS_AT_EASE|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST);
 }
 
 // sithAICmd_Follow
@@ -226,14 +289,14 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
             v5 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[2], aiclass->argsAsFloat[3], aiclass->argsAsFloat[1], aiclass->argsAsFloat[4], v5, 2) )
         {
-            actor->flags |= SITHAIFLAGS_SEARCHING;
+            actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
             v11 = sithTime_curMs + aiclass->argsAsInt[0];
             instinct->nextUpdate = v11;
             actor->field_288 = v11;
             return 0;
         }
         sithAI_SetLookFrame(actor, &v7->position);
-        actor->flags |= SITHAIFLAGS_SEARCHING;
+        actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
         instinct->nextUpdate = sithTime_curMs + 500;
         return 0;
     }
@@ -291,7 +354,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             v6 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
-            actor->flags |= SITHAIFLAGS_SEARCHING;
+            actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
             if ( instinct->param0 == 0.0 )
             {
                 instinct->param0 = aiclass->argsAsFloat[8];
@@ -324,7 +387,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         }
         if ( actor->field_1F4 == 3 )
         {
-            actor->flags &= ~SITHAIFLAGS_SEARCHING;
+            actor->flags &= ~SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
         }
         instinct->nextUpdate = sithTime_curMs + 250;
         return 0;
