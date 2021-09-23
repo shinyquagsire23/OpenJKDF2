@@ -95,9 +95,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
                     else
                         instinct->param0 = -1.0;
                 }
-                a4.x = 0.0;
-                a4.y = 0.0;
-                a4.z = 0.0;
+                rdVector_Zero3(&a4);
                 if ( v8 )
                 {
                     v13 = (_frand() - -0.5) * instinct->param0 * aiclass->argsAsFloat[1];
@@ -127,24 +125,19 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
 
 int sithAICmd_Crouch(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags)
 {
-    sithThing *v5; // ecx
-    int v6; // eax
-    signed int result; // eax
-
-    v5 = actor->thing;
-    v6 = actor->flags;
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
-    if ( (v6 & 1) == 0 && (v6 & 2) != 0 && (v6 & 0x400) != 0 )
+    if (!(actor->flags & SITHAIFLAGS_MOVING_TO_DEST) 
+        && (actor->flags & SITHAIFLAGS_ATTACKING_TARGET)
+        && (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE))
     {
-        v5->physicsParams.physflags |= PHYSFLAGS_CROUCHING;
-        result = 0;
+        actor->thing->physicsParams.physflags |= PHYSFLAGS_CROUCHING;
+        return 0;
     }
     else
     {
-        v5->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
-        result = 0;
+        actor->thing->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+        return 0;
     }
-    return result;
 }
 
 int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags)
@@ -177,7 +170,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             projectile = weapon->actorParams.templateWeapon;
         if ( !v15 || !projectile )
         {
-            actor->flags &= ~2;
+            actor->flags &= ~SITHAIFLAGS_ATTACKING_TARGET;
             return 1;
         }
         if ( !sithAI_sub_4EB300(weapon, &weapon->position, &actor->field_1F8, aiclass->argsAsFloat[3], 10.0, projectile->moveSize, &fireOffs, &fOut)
@@ -216,9 +209,9 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     v7 = actor->field_1D0;
     if ( flags )
     {
-        if ( flags == 256 )
+        if ( flags == 0x100 )
         {
-            if ( (actor->flags & 0x200) != 0 )
+            if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
                 sithPuppet_SetArmedMode(v6, 1);
             else
                 sithPuppet_SetArmedMode(v6, 0);
@@ -227,30 +220,31 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
         }
         return 0;
     }
-    if ( (v7->thingflags & 0x202) == 0 )
+    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
         if ( aiclass->argsAsFloat[5] > _frand() )
             v5 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[2], aiclass->argsAsFloat[3], aiclass->argsAsFloat[1], aiclass->argsAsFloat[4], v5, 2) )
         {
-            actor->flags |= 4;
+            actor->flags |= SITHAIFLAGS_SEARCHING;
             v11 = sithTime_curMs + aiclass->argsAsInt[0];
             instinct->nextUpdate = v11;
             actor->field_288 = v11;
             return 0;
         }
         sithAI_SetLookFrame(actor, &v7->position);
-        actor->flags |= 4;
+        actor->flags |= SITHAIFLAGS_SEARCHING;
         instinct->nextUpdate = sithTime_curMs + 500;
         return 0;
     }
-    if ( (actor->flags & 0x400) != 0 )
+    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
     {
         sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
     result = 1;
-    actor->flags = actor->flags & ~0x622u | 4;
+    actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
+    actor->flags |= SITHAIFLAGS_SEARCHING;
     return result;
 }
 
@@ -261,7 +255,6 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     sithThing *v7; // eax
     int v9; // edx
     int result; // eax
-    int v11; // ecx
     double v14; // st7
     int v15; // eax
     rdVector3 v18; // [esp+28h] [ebp-Ch] BYREF
@@ -273,7 +266,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     {
         if ( flags == 0x100 )
         {
-            if ( (actor->flags & 0x200) != 0 )
+            if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
             {
                 sithPuppet_SetArmedMode(v7, 1);
                 v9 = sithTime_curMs + aiclass->argsAsInt[5];
@@ -290,7 +283,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     }
     if ( !actor->field_1D0 )
         return 0;
-    if ( (actor->field_1D0->thingflags & 0x202) == 0 )
+    if ( (actor->field_1D0->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
         if ( aiclass->argsAsFloat[6] != 0.0 && aiclass->argsAsFloat[6] >= _frand() )
             v5 = 1;
@@ -298,7 +291,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             v6 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
-            actor->flags |= 4;
+            actor->flags |= SITHAIFLAGS_SEARCHING;
             if ( instinct->param0 == 0.0 )
             {
                 instinct->param0 = aiclass->argsAsFloat[8];
@@ -331,19 +324,20 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         }
         if ( actor->field_1F4 == 3 )
         {
-            actor->flags &= ~4;
+            actor->flags &= ~SITHAIFLAGS_SEARCHING;
         }
         instinct->nextUpdate = sithTime_curMs + 250;
         return 0;
     }
-    if ( (actor->flags & 0x400) != 0 )
+    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
     {
         sithSoundClass_ThingPlaySoundclass(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
-    v11 = actor->flags & ~0x622u | 4;
+
     instinct->param0 = aiclass->argsAsFloat[8];
-    actor->flags = v11;
+    actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
+    actor->flags |= SITHAIFLAGS_SEARCHING;
     return 1;
 }
 
@@ -360,33 +354,34 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
 
     if ( !flags && (g_debugmodeFlags & 0x200) == 0 )
     {
-        if ( (actor->flags & 0x200) != 0 )
+        if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
         {
             v6 = aiclass->argsAsInt[1];
             if ( v6 && v6 + actor->field_204 < sithTime_curMs )
             {
-                actor->flags &= ~0x622;
-                actor->flags |= 4;
+                actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
+                actor->flags |= SITHAIFLAGS_SEARCHING;
                 sithUnk4_MoveJointsForEyePYR(actor->thing, &rdroid_zeroVector3);
                 return 1;
             }
         }
-        else if ( (actor->flags & 4) != 0 )
+        else if ( (actor->flags & SITHAIFLAGS_SEARCHING) != 0 )
         {
             v9 = sithTime_curMs;
             v10 = g_localPlayerThing;
             v11 = aiclass->argsAsInt[0];
             actor->field_1D0 = g_localPlayerThing;
             instinct->nextUpdate = v9 + v11;
-            if ( (v10->thingflags & 0x202) == 0 )
+            if ( (v10->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 sithAI_sub_4EAD60(actor);
                 if ( !actor->field_1F4 )
                 {
                     v12 = actor->thing;
-                    actor->flags = actor->flags & ~4u | 0x232;
+                    actor->flags &= ~SITHAIFLAGS_SEARCHING;
+                    actor->flags |= (SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET);
                     sithSoundClass_ThingPlaySoundclass(v12, SITH_SC_ALERT);
-                    sithSoundClass_ThingPlaySoundclass4(actor->thing, 2u);
+                    sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithSector_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
                     actor->thingidk = actor->field_1D0;
                     return 1;
@@ -401,7 +396,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
 
 int sithAICmd_OpenDoors(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    if ( (actor->flags & 1) != 0 )
+    if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) != 0 )
     {
         sithActor_cogMsg_OpenDoor(actor->thing);
         instinct->nextUpdate = sithTime_curMs + 1000;
@@ -430,7 +425,7 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     v7 = actor->thing->sector;
     if ( !actor->thing->attach_flags )
         return 0;
-    if ( (actor->flags & 1) == 0 )
+    if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
         return 0;
     if ( actor->field_228.x * v6->physicsParams.vel.x
        + actor->field_228.y * v6->physicsParams.vel.y

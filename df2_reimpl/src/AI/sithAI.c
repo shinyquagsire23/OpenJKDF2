@@ -41,12 +41,12 @@ int sithAI_Startup()
     sithAICmd_Startup();
 
     v0 = sithAI_inittedActors;
-    _memset(sithAI_actors, 0, sizeof(sithActor) * 256);
+    _memset(sithAI_actors, 0, sizeof(sithActor) * 0x100);
 
     v1 = 255;
     v2 = sithAI_actorInitted;
     v3 = &sithAI_actors[255];
-    sithAI_maxActors = 256;
+    sithAI_maxActors = 0x100;
 
     do
     {
@@ -114,12 +114,12 @@ void sithAI_Close()
         return;
     
     v0 = sithAI_inittedActors;
-    _memset(sithAI_actors, 0, sizeof(sithActor) * 256);
+    _memset(sithAI_actors, 0, sizeof(sithActor) * 0x100);
 
     v1 = 255;
     v2 = sithAI_actorInitted;
     v3 = &sithAI_actors[255];
-    sithAI_maxActors = 256;
+    sithAI_maxActors = 0x100;
 
     do
     {
@@ -157,7 +157,6 @@ void sithAI_NewEntry(sithThing *thing)
     int v2; // eax
     int v3; // eax
     sithActor *actor; // eax
-    float v5; // esi
 
     sith_ai = thing->aiclass;
     if ( sith_ai )
@@ -179,14 +178,13 @@ void sithAI_NewEntry(sithThing *thing)
             actor = &sithAI_actors[v3];
             thing->actor = actor;
             actor->position.x = thing->position.x;
-            v5 = thing->position.z;
             actor->position.y = thing->position.y;
-            actor->position.z = v5;
+            actor->position.z = thing->position.z;
             actor->lookOrientation = thing->lookOrientation.lvec;
             actor->aiclass = sith_ai;
             actor->thing = thing;
             actor->numAIClassEntries = sith_ai->numEntries;
-            actor->flags = 0x1004;
+            actor->flags = (SITHAIFLAGS_AT_EASE|SITHAIFLAGS_SEARCHING);
             actor->moveSpeed = 1.5;
         }
         else
@@ -206,7 +204,6 @@ void sithAI_FreeEntry(sithThing *thing)
     int v2; // edx
     int v3; // eax
     sithActor *v4; // ecx
-    int v5; // eax
 
     v1 = thing->actor;
     if ( v1 )
@@ -230,10 +227,8 @@ void sithAI_FreeEntry(sithThing *thing)
             }
             sithAI_inittedActors = v3;
         }
-        v5 = sithAI_maxActors;
         thing->actor = 0;
-        sithAI_actorInitted[v5] = v2;
-        sithAI_maxActors = v5 + 1;
+        sithAI_actorInitted[sithAI_maxActors++] = v2;
     }
 }
 
@@ -246,9 +241,9 @@ void sithAI_TickAll()
     for ( actor = sithAI_actors; v0 <= sithAI_inittedActors; ++actor )
     {
         if ( actor->aiclass
-          && (actor->thing->thingflags & 0x202) == 0
+          && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
           && actor->thing->actorParams.health > 0.0
-          && (actor->flags & 0x3000) == 0
+          && (actor->flags & (SITHAIFLAGS_DISABLED|SITHAIFLAGS_AT_EASE)) == 0
           && actor->nextUpdate <= sithTime_curMs )
         {
             sithAI_TickActor(actor);
@@ -261,7 +256,6 @@ void sithAI_TickActor(sithActor *actor)
 {
     int v3; // ebx
     int *v4; // edi
-    int v5; // ecx
     int a1a; // [esp+1Ch] [ebp+4h]
 
     uint32_t nextMs = sithTime_curMs + 5000;
@@ -271,15 +265,14 @@ LABEL_2:
     {
         if ( (actor->instincts[a1a].field_0 & 1) == 0 )
         {
-            v5 = actor->flags;
-            if ( (v5 & actor->aiclass->entries[a1a].param1) != 0 && (v5 & actor->aiclass->entries[a1a].param2) == 0 )
+            if ( (actor->flags & actor->aiclass->entries[a1a].param1) != 0 && (actor->flags & actor->aiclass->entries[a1a].param2) == 0 )
             {
                 if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                 {
                     actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
                     if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                     {
-                        sithAI_SetActorFireTarget(actor, 256, a3);
+                        sithAI_SetActorFireTarget(actor, 0x100, a3);
                         a3 = actor->flags;
                         goto LABEL_2;
                     }
@@ -295,34 +288,34 @@ LABEL_2:
 void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
 {
     sithThing *v4; // ecx
-    int v5; // edi
+    int flags; // edi
     int v6; // eax
     uint32_t v7; // ebx
-    int actora; // [esp+14h] [ebp+4h]
+    int old_flags; // [esp+14h] [ebp+4h]
 
-    for ( ; actor->aiclass; a2 = 256 )
+    for ( ; actor->aiclass; a2 = 0x100 )
     {
         v4 = actor->thing;
         if ( !actor->thing )
             break;
-        if ( (v4->thingflags & 0x202) != 0 )
+        if ( (v4->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
             break;
         if ( (g_debugmodeFlags & 1) != 0 )
             break;
         if ( v4->actorParams.health <= 0.0 )
             break;
-        v5 = actor->flags;
-        actora = v5;
-        if ( (v5 & 0x2000) != 0 )
+        flags = actor->flags;
+        old_flags = flags;
+        if ( (flags & SITHAIFLAGS_DISABLED) != 0 )
             break;
-        if ( (v5 & 0x1000) != 0 )
+        if ( (flags & SITHAIFLAGS_AT_EASE) != 0 )
         {
             if ( a2 != 2 )
                 return;
-            actor->flags &= ~0x1000;
+            actor->flags &= ~SITHAIFLAGS_AT_EASE;
         }
 
-        if ( a2 == 256 )
+        if ( a2 == 0x100 )
             sithCog_SendMessageFromThingEx(v4, 0, SITH_MESSAGE_AIEVENT, 256.0, 0.0, 0.0, 0.0);
 
         v7 = 0;
@@ -338,10 +331,10 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
                 }
             }
         }
-        v5 = actora;
-        if ( actor->flags == v5 )
+        flags = old_flags;
+        if ( actor->flags == flags )
             break;
-        a3 = v5;
+        a3 = flags;
     }
 }
 
@@ -531,15 +524,12 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
 
 void sithAI_Tick(sithThing *thing, float deltaSeconds)
 {
-    sithActor *v2; // esi
-
     if ( thing->thingType == THINGTYPE_ACTOR && thing->actorParams.health > 0.0 )
     {
-        v2 = thing->actor;
-        if ( (v2->flags & 8) != 0 )
-            sithAI_sub_4EA630(v2, deltaSeconds);
-        if ( (v2->flags & 1) != 0 )
-            sithAI_idk_msgarrived_target(v2, deltaSeconds);
+        if ( (thing->actor->flags & SITHAIFLAGS_TURNING_TO_DEST) != 0 )
+            sithAI_sub_4EA630(thing->actor, deltaSeconds);
+        if ( (thing->actor->flags & SITHAIFLAGS_MOVING_TO_DEST) != 0 )
+            sithAI_idk_msgarrived_target(thing->actor, deltaSeconds);
     }
 }
 
@@ -588,35 +578,31 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
         }
         actor->lookVector.z = 0.0;
         rdVector_Normalize3Acc(&actor->lookVector);
-        actor->flags |= 0x8;
+        actor->flags |= SITHAIFLAGS_TURNING_TO_DEST;
     }
 }
 
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
 {
-    if ( sithTime_curMs >= actor->field_28C || (actor->flags & 1) == 0 )
+    if ( sithTime_curMs >= actor->field_28C || (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
     {
         actor->moveSpeed = moveSpeed;
-        actor->movePos.x = movePos->x;
-        actor->movePos.y = movePos->y;
-        actor->movePos.z = movePos->z;
+        rdVector_Copy3(&actor->movePos, movePos);
         sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_MOVING);
-        actor->flags |= 0x1;
+        actor->flags |= SITHAIFLAGS_MOVING_TO_DEST;
     }
 }
 
 void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel)
 {
     actor->moveSpeed = 2.0;
-    actor->movePos.x = pos->x;
-    actor->movePos.y = pos->y;
-    actor->movePos.z = pos->z;
+    rdVector_Copy3(&actor->movePos, pos);
 
     if ( sithPuppet_PlayMode(actor->thing, SITH_ANIM_JUMP, 0) < 0 )
         sithActor_JumpWithVel(actor->thing, vel);
 
     actor->field_28C = sithTime_curMs + 2000;
-    actor->flags |= 1;
+    actor->flags |= SITHAIFLAGS_MOVING_TO_DEST;
 }
 
 void sithAI_RandomFireVector(rdVector3 *out, float magnitude)
