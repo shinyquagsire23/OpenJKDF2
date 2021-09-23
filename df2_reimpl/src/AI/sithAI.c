@@ -273,7 +273,7 @@ LABEL_2:
                     actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
                     if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                     {
-                        sithAI_SetActorFireTarget(actor, 0x100, a3);
+                        sithAI_SetActorFireTarget(actor, SITHAIFLAGS_UNK100, a3);
                         a3 = actor->flags;
                         goto LABEL_2;
                     }
@@ -286,38 +286,34 @@ LABEL_2:
     actor->nextUpdate = nextMs;
 }
 
-void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
+void sithAI_SetActorFireTarget(sithActor *actor, int a2, int actorFlags)
 {
-    sithThing *v4; // ecx
-    int flags; // edi
     int v6; // eax
     uint32_t v7; // ebx
     int old_flags; // [esp+14h] [ebp+4h]
 
-    for ( ; actor->aiclass; a2 = 0x100 )
+    for ( ; actor->aiclass; a2 = SITHAIFLAGS_UNK100 )
     {
-        v4 = actor->thing;
         if ( !actor->thing )
             break;
-        if ( (v4->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+        if (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
             break;
         if ( (g_debugmodeFlags & 1) != 0 )
             break;
-        if ( v4->actorParams.health <= 0.0 )
+        if ( actor->thing->actorParams.health <= 0.0 )
             break;
-        flags = actor->flags;
-        old_flags = flags;
-        if ( (flags & SITHAIFLAGS_DISABLED) != 0 )
+        old_flags = actor->flags;
+        if ( (actor->flags & SITHAIFLAGS_DISABLED) != 0 )
             break;
-        if ( (flags & SITHAIFLAGS_AT_EASE) != 0 )
+        if ( (actor->flags & SITHAIFLAGS_AT_EASE) != 0 )
         {
-            if ( a2 != 2 )
+            if ( a2 != SITHAIFLAGS_ATTACKING_TARGET )
                 return;
             actor->flags &= ~SITHAIFLAGS_AT_EASE;
         }
 
-        if ( a2 == 0x100 )
-            sithCog_SendMessageFromThingEx(v4, 0, SITH_MESSAGE_AIEVENT, 256.0, 0.0, 0.0, 0.0);
+        if ( a2 == SITHAIFLAGS_UNK100 )
+            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, 256.0, 0.0, 0.0, 0.0);
 
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
@@ -327,15 +323,14 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3)
             {
                 if ( (actor->aiclass->entries[v7].param3 & a2) != 0 )
                 {
-                    if ( actor->aiclass->entries[v7].func(actor, &actor->aiclass->entries[v7], entry, a2, a3) )
+                    if ( actor->aiclass->entries[v7].func(actor, &actor->aiclass->entries[v7], entry, a2, actorFlags) )
                         break;
                 }
             }
         }
-        flags = old_flags;
-        if ( actor->flags == flags )
+        if ( actor->flags == old_flags )
             break;
-        a3 = flags;
+        actorFlags = old_flags;
     }
 }
 
