@@ -179,7 +179,7 @@ typedef struct sithSectorAlloc
 {
     int field_0;
     float field_4;
-    int field_8;
+    float field_8;
     int field_C;
     int field_10;
     int field_14;
@@ -200,8 +200,8 @@ typedef struct sithSectorAlloc
     int field_50;
     int field_54;
     int field_58;
-    int field_5C;
-    int field_60;
+    sithThing* field_5C;
+    sithThing* field_60;
 } sithSectorAlloc;
 
 int sithSector_Startup();

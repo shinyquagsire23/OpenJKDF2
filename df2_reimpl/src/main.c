@@ -1563,11 +1563,11 @@ void do_hooks()
     hook_function(sithAICmd_LookForTarget_ADDR, sithAICmd_LookForTarget);
     hook_function(sithAICmd_OpenDoors_ADDR, sithAICmd_OpenDoors);
     hook_function(sithAICmd_Jump_ADDR, sithAICmd_Jump);
-    // sithAICmd_Flee
-    // sithAICmd_Withdraw
-    // sithAICmd_Dodge
-    // sithAICmd_RandomTurn
-    // sithAICmd_Roam
+    hook_function(sithAICmd_Flee_ADDR, sithAICmd_Flee);
+    hook_function(sithAICmd_Withdraw_ADDR, sithAICmd_Withdraw);
+    hook_function(sithAICmd_Dodge_ADDR, sithAICmd_Dodge);
+    hook_function(sithAICmd_RandomTurn_ADDR, sithAICmd_RandomTurn);
+    hook_function(sithAICmd_Roam_ADDR, sithAICmd_Roam);
     // sithAICmd_SenseDanger
     // sithAICmd_HitAndRun
     // sithAICmd_Retreat
