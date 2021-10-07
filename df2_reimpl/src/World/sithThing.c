@@ -212,9 +212,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             switch ( thingIter->thingtype )
             {
                 case THINGTYPE_ACTOR:
-#ifndef LINUX_TMP
                     sithAI_Tick(thingIter, deltaSeconds);
-#endif
                     break;
                 case THINGTYPE_EXPLOSION:
                     sithExplosion_Tick(thingIter);

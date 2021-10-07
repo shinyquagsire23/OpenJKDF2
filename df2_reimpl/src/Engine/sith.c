@@ -370,7 +370,7 @@ void sith_AutoSave()
 
 
 #ifdef LINUX_TMP
-    g_debugmodeFlags |= 1;
+    //g_debugmodeFlags |= 1;
 #endif
 
     sithTime_Startup();

@@ -306,9 +306,7 @@ typedef struct sithActor
     float field_1B8;
     float moveSpeed;
     sithThing* field_1C0;
-    int field_1C4;
-    int field_1C8;
-    int field_1CC;
+    rdVector3 field_1C4;
     sithThing* field_1D0;
     rdVector3 field_1D4;
     int field_1E0;

@@ -80,6 +80,14 @@ enum SITHAIFLAGS_E
 #define sithAI_numCommands (*(uint32_t*)0x84DE54)
 #define sithAI_actors ((sithActor*)0x0088AFE0)
 #define sithAI_inittedActors (*(int*)0x008B4BE0)
+#define sithAI_flt_84DE58   (*(float*)0x0084DE58)
+#define sithAI_dword_84DE5C (*(uint32_t*)0x0084DE5C)
+#define sithAI_dword_84DE60 (*(int*)0x0084DE60)
+#define sithAI_flt_84DE64   (*(float*)0x0084DE64)
+#define sithAI_pThing_84DE68 (*(sithThing***)0x0084DE68)
+#define sithAI_dword_84DE6C (*(int*)0x0084DE6C)
+#define sithAI_flt_84DE70   (*(float*)0x0084DE70)
+#define sithAI_dword_84DE74 (*(int*)0x0084DE74)
 
 int sithAI_Startup();
 void sithAI_Shutdown();
@@ -89,7 +97,7 @@ void sithAI_NewEntry(sithThing *thing);
 void sithAI_FreeEntry(sithThing *thing);
 void sithAI_TickAll();
 void sithAI_TickActor(sithActor *actor);
-void sithAI_SetActorFireTarget(sithActor *actor, int a2, int a3);
+void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t a3);
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
 int sithAI_PrintThings();
@@ -102,6 +110,19 @@ void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel);
 
 void sithAI_RandomFireVector(rdVector3 *out, float magnitude);
 
+void sithAI_sub_4EAD60(sithActor *actor);
+int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3);
+int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8);
+void sithAI_sub_4EAF40(sithActor *actor);
+int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, int bAltFire, int a7);
+int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8);
+int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out);
+void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds);
+int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8);
+void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3);
+int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8);
+void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds);
+
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;
 //static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
@@ -109,20 +130,20 @@ void sithAI_RandomFireVector(rdVector3 *out, float magnitude);
 //static void (*sithAI_TickActor)(sithActor *actor) = (void*)sithAI_TickActor_ADDR;
 //static void (*sithAI_TickAll)() = (void*)sithAI_TickAll_ADDR;
 //static void (*sithAI_SetActorFireTarget)(sithActor *a1, int a2, int a3) = (void*)sithAI_SetActorFireTarget_ADDR;
-static int (*sithAI_FirstThingInView)(sithSector *a1, rdMatrix34 *a2, float a3, float a4, int a5, sithThing **a6, int a7, float a8) = (void*)sithAI_FirstThingInView_ADDR;
+//static int (*sithAI_FirstThingInView)(sithSector *a1, rdMatrix34 *a2, float a3, float a4, int a5, sithThing **a6, int a7, float a8) = (void*)sithAI_FirstThingInView_ADDR;
 
-static int (*sithAI_FireWeapon)(sithActor *a1, float a2, float a3, float a4, float a5, int a6, int a7) = (void*)sithAI_FireWeapon_ADDR;
+//static int (*sithAI_FireWeapon)(sithActor *a1, float a2, float a3, float a4, float a5, int a6, int a7) = (void*)sithAI_FireWeapon_ADDR;
 //static int (*sithAI_SetMoveThing)(sithActor *actor, rdVector3 *movePos, float moveSpeed) = (void*)sithAI_SetMoveThing_ADDR;
 //static void (*sithAI_Jump)(sithActor *actor, rdVector3 *a2, float a3) = (void*)sithAI_Jump_ADDR;
 //static void (*sithAI_SetLookFrame)(sithActor *actor, rdVector3 *lookPos) = (void*)sithAI_SetLookFrame_ADDR;
 
-static void (*sithAI_sub_4EA630)(sithActor *actor, float deltaSeconds) = (void*)sithAI_sub_4EA630_ADDR;
-static void (*sithAI_sub_4EAF40)(sithActor *a1) = (void*)sithAI_sub_4EAF40_ADDR;
-static int (*sithAI_sub_4EB300)(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB300_ADDR;
-static void (*sithAI_idk_msgarrived_target)(sithActor *actor, float deltaSeconds) = (void*)sithAI_idk_msgarrived_target_ADDR;
-static void (*sithAI_sub_4EAD60)(sithActor *actor) = (void*)sithAI_sub_4EAD60_ADDR;
-static int (*sithAI_physidk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_physidk_ADDR;
-static int (*sithAI_sub_4EB640)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_sub_4EB640_ADDR;
-static int (*sithAI_sub_4EB090)(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB090_ADDR;
+//static void (*sithAI_sub_4EA630)(sithActor *actor, float deltaSeconds) = (void*)sithAI_sub_4EA630_ADDR;
+//static void (*sithAI_sub_4EAF40)(sithActor *a1) = (void*)sithAI_sub_4EAF40_ADDR;
+//static int (*sithAI_sub_4EB300)(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB300_ADDR;
+//static void (*sithAI_idk_msgarrived_target)(sithActor *actor, float deltaSeconds) = (void*)sithAI_idk_msgarrived_target_ADDR;
+//static void (*sithAI_sub_4EAD60)(sithActor *actor) = (void*)sithAI_sub_4EAD60_ADDR;
+//static int (*sithAI_physidk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_physidk_ADDR;
+//static int (*sithAI_sub_4EB640)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_sub_4EB640_ADDR;
+//static int (*sithAI_sub_4EB090)(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB090_ADDR;
 
 #endif // _SITHAI_H

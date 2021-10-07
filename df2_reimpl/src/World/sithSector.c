@@ -1532,3 +1532,20 @@ void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
         }
     }
 }
+
+float sithSector_ThingGetInsertOffsetZ(sithThing *thing)
+{
+    double result; // st7
+    float v2; // [esp+4h] [ebp+4h]
+
+    result = thing->physicsParams.height;
+    if ( result == 0.0 )
+    {
+        if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
+            result = thing->rdthing.model3->insertOffset.z;
+        v2 = thing->moveSize - -0.0049999999;
+        if ( result <= v2 )
+            result = v2;
+    }
+    return result;
+}

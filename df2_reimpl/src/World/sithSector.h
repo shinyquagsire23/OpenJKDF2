@@ -178,18 +178,8 @@ typedef struct sithSectorEntry
 typedef struct sithSectorAlloc
 {
     int field_0;
-    float field_4;
-    float field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-    int field_18;
-    int field_1C;
-    int field_20;
-    int field_24;
-    int field_28;
-    int field_2C;
-    int field_30;
+    float field_4[3];
+    rdVector3 field_10[3];
     int field_34;
     int field_38;
     int field_3C;
@@ -199,9 +189,7 @@ typedef struct sithSectorAlloc
     int field_4C;
     int field_50;
     int field_54;
-    int field_58;
-    sithThing* field_5C;
-    sithThing* field_60;
+    sithThing* field_58[3];
 } sithSectorAlloc;
 
 int sithSector_Startup();
@@ -231,6 +219,7 @@ void sithSector_ThingApplyForce(sithThing *thing, rdVector3 *forceVec);
 void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4);
 int sithSector_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing);
 void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds);
+float sithSector_ThingGetInsertOffsetZ(sithThing *thing);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;

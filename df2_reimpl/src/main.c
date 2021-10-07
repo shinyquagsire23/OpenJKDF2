@@ -119,6 +119,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "Main/jkAI.h"
 #include "Main/jkCredits.h"
 #include "Main/jkCutscene.h"
 #include "Main/jkDev.h"
@@ -1066,6 +1067,7 @@ void do_hooks()
     hook_function(sithSector_ThingApplyForce_ADDR, sithSector_ThingApplyForce);
     hook_function(sithSector_sub_4F2F60_ADDR, sithSector_sub_4F2F60);
     hook_function(sithSector_AddEntry_ADDR, sithSector_AddEntry);
+    hook_function(sithSector_ThingGetInsertOffsetZ_ADDR, sithSector_ThingGetInsertOffsetZ);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1540,6 +1542,18 @@ void do_hooks()
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);
     hook_function(sithAI_Jump_ADDR, sithAI_Jump);
     hook_function(sithAI_RandomFireVector_ADDR, sithAI_RandomFireVector);
+    hook_function(sithAI_sub_4EAD60_ADDR, sithAI_sub_4EAD60);
+    hook_function(sithAI_sub_4EC140_ADDR, sithAI_sub_4EC140);
+    hook_function(sithAI_sub_4EB090_ADDR, sithAI_sub_4EB090);
+    hook_function(sithAI_sub_4EAF40_ADDR, sithAI_sub_4EAF40);
+    hook_function(sithAI_FireWeapon_ADDR, sithAI_FireWeapon);
+    hook_function(sithAI_sub_4EB300_ADDR, sithAI_sub_4EB300);
+    hook_function(sithAI_sub_4EB640_ADDR, sithAI_sub_4EB640);
+    hook_function(sithAI_sub_4EA630_ADDR, sithAI_sub_4EA630);
+    hook_function(sithAI_FirstThingInView_ADDR, sithAI_FirstThingInView);
+    hook_function(sithAI_GetThingsInView_ADDR, sithAI_GetThingsInView);
+    hook_function(sithAI_physidk_ADDR, sithAI_physidk);
+    hook_function(sithAI_idk_msgarrived_target_ADDR, sithAI_idk_msgarrived_target);
 
     // sithAIClass
     hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);
@@ -1552,14 +1566,14 @@ void do_hooks()
     
     // sithAICmd
     hook_function(sithAICmd_Startup_ADDR, sithAICmd_Startup);
-    // sithAICmd_Follow
+    hook_function(sithAICmd_Follow_ADDR, sithAICmd_Follow);
     hook_function(sithAICmd_CircleStrafe_ADDR, sithAICmd_CircleStrafe);
     hook_function(sithAICmd_Crouch_ADDR, sithAICmd_Crouch);
     hook_function(sithAICmd_BlindFire_ADDR, sithAICmd_BlindFire);
     hook_function(sithAICmd_LobFire_ADDR, sithAICmd_LobFire);
     hook_function(sithAICmd_PrimaryFire_ADDR, sithAICmd_PrimaryFire);
-    // sithAICmd_TurretFire
-    // sithAICmd_Listen
+    hook_function(sithAICmd_TurretFire_ADDR, sithAICmd_TurretFire);
+    hook_function(sithAICmd_Listen_ADDR, sithAICmd_Listen);
     hook_function(sithAICmd_LookForTarget_ADDR, sithAICmd_LookForTarget);
     hook_function(sithAICmd_OpenDoors_ADDR, sithAICmd_OpenDoors);
     hook_function(sithAICmd_Jump_ADDR, sithAICmd_Jump);
@@ -1568,11 +1582,18 @@ void do_hooks()
     hook_function(sithAICmd_Dodge_ADDR, sithAICmd_Dodge);
     hook_function(sithAICmd_RandomTurn_ADDR, sithAICmd_RandomTurn);
     hook_function(sithAICmd_Roam_ADDR, sithAICmd_Roam);
-    // sithAICmd_SenseDanger
-    // sithAICmd_HitAndRun
-    // sithAICmd_Retreat
-    // sithAICmd_ReturnHome
-    // sithAICmd_Talk
+    hook_function(sithAICmd_SenseDanger_ADDR, sithAICmd_SenseDanger);
+    hook_function(sithAICmd_HitAndRun_ADDR, sithAICmd_HitAndRun);
+    hook_function(sithAICmd_Retreat_ADDR, sithAICmd_Retreat);
+    hook_function(sithAICmd_ReturnHome_ADDR, sithAICmd_ReturnHome);
+    hook_function(sithAICmd_Talk_ADDR, sithAICmd_Talk);
+    
+    // jkAI
+    hook_function(jkAI_Startup_ADDR, jkAI_Startup);
+    hook_function(jkAI_SaberFighting_ADDR, jkAI_SaberFighting);
+    hook_function(jkAI_SpecialAttack_ADDR, jkAI_SpecialAttack);
+    hook_function(jkAI_ForcePowers_ADDR, jkAI_ForcePowers);
+    hook_function(jkAI_SaberMove_ADDR, jkAI_SaberMove);
 
     // jkGUIRend
     hook_function(jkGuiRend_CopyVBuffer_ADDR, jkGuiRend_CopyVBuffer);

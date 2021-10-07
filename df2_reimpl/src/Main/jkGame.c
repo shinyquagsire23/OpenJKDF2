@@ -131,7 +131,7 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
         }
     }*/
-    if ( (0x800000 & playerThings[playerThingIdx].actorThing->actorParams.typeflags) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
         jkHud_gui_render();
     jkDev_sub_41F950();
     jkHudInv_render_itemsmaybe();
@@ -243,7 +243,7 @@ int jkGame_Update()
         }
     }*/
 #ifndef LINUX_TMP
-    //if ( (0x800000 & playerThings[playerThingIdx].actorThing->actorParams.typeflags) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
         jkHud_gui_render();
     jkDev_sub_41F950();
     jkHudInv_render_itemsmaybe();
@@ -251,11 +251,6 @@ int jkGame_Update()
     //    std3D_DrawOverlay();
 #endif
 
-    for (int i = 0; i < 256; i++)
-    {
-        rdRect test = {i*2, 0, 2, 2};
-        //stdDisplay_VBufferFill(Video_pMenuBuffer, i, &test);
-    }
     std3D_DrawMenu();
     rdFinishFrame();
 

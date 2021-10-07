@@ -1,5 +1,6 @@
 #include "sithAICmd.h"
 
+#include "General/stdMath.h"
 #include "AI/sithAI.h"
 #include "World/sithThing.h"
 #include "World/sithActor.h"
@@ -16,15 +17,6 @@
 #include "World/sithUnk4.h"
 #include "World/sithUnk3.h"
 #include "jk.h"
-
-#define sithAICmd_Follow ((void*)sithAICmd_Follow_ADDR)
-#define sithAICmd_TurretFire ((void*)sithAICmd_TurretFire_ADDR)
-#define sithAICmd_Listen ((void*)sithAICmd_Listen_ADDR)
-#define sithAICmd_SenseDanger ((void*)sithAICmd_SenseDanger_ADDR)
-#define sithAICmd_HitAndRun ((void*)sithAICmd_HitAndRun_ADDR)
-#define sithAICmd_Retreat ((void*)sithAICmd_Retreat_ADDR)
-#define sithAICmd_ReturnHome ((void*)sithAICmd_ReturnHome_ADDR)
-#define sithAICmd_Talk ((void*)sithAICmd_Talk_ADDR)
 
 void sithAICmd_Startup()
 {
@@ -114,7 +106,151 @@ void sithAICmd_Startup()
         SITHAIFLAGS_AT_EASE|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST);
 }
 
-// sithAICmd_Follow
+int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags)
+{
+    sithThing *v7; // ebp
+    sithAIClassEntry *v8; // ebx
+    sithActorInstinct *v9; // edi
+    int v10; // eax
+    double v13; // st7
+    double v16; // st7
+    double v18; // st7
+    rdVector3 a4a; // [esp+10h] [ebp-3Ch] BYREF
+    rdVector3 arg8a; // [esp+1Ch] [ebp-30h] BYREF
+    rdVector3 a1; // [esp+28h] [ebp-24h] BYREF
+    rdVector3 a2; // [esp+34h] [ebp-18h] BYREF
+    rdVector3 a5; // [esp+40h] [ebp-Ch] BYREF
+    float a1a; // [esp+50h] [ebp+4h]
+    float tmp1;
+    float tmp2;
+    float tmp;
+
+    if ( flags > SITHAIFLAGS_AWAKE_AND_ACTIVE )
+    {
+        if ( flags != SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE )
+        {
+            if ( flags != SITHAIFLAGS_FLEEING || (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 || instinct->param0 == 0.0 )
+                return 0;
+            a4a.x = 0.0;
+            a4a.z = 0.0;
+            a4a.y = (_frand() - 0.5) * 90.0;
+            if ( _frand() >= 0.5 )
+            {
+                sithAI_sub_4EAF40(actor);
+                rdVector_Rotate3(&a1, &actor->field_228, &a4a);
+            }
+            else
+            {
+                rdVector_Rotate3(&a1, &actor->thing->lookOrientation.lvec, &a4a);
+            }
+            a2.x = a1.x * 0.69999999 + actor->thing->position.x;
+            a2.y = a1.y * 0.69999999 + actor->thing->position.y;
+            a2.z = a1.z * 0.69999999 + actor->thing->position.z;
+            sithAI_SetLookFrame(actor, &a2);
+            sithAI_SetMoveThing(actor, &a2, 2.0);
+            return 0;
+        }
+    }
+    else if ( flags != SITHAIFLAGS_AWAKE_AND_ACTIVE )
+    {
+        if ( !flags)
+        {
+            v7 = actor->thingidk;
+            if ( v7 )
+            {
+                v8 = aiclass;
+                v9 = instinct;
+                tmp2 = aiclass->argsAsFloat[0];
+                a1a = aiclass->argsAsFloat[1];
+                tmp1 = aiclass->argsAsFloat[2];
+                v9->nextUpdate = sithTime_curMs + 1000;
+                sithAI_sub_4EAF40(actor);
+                v10 = actor->field_238;
+                if ( v10 && v10 != 2 )
+                {
+                    if ( (actor->thing->actorParams.typeflags & THING_TYPEFLAGS_BLIND) == 0 && v9->param0 == 0.0 )
+                    {
+                        v9->param0 = 1.0;
+                        sithAI_SetMoveThing(actor, &actor->field_23C, 2.0);
+                        sithAI_SetLookFrame(actor, &actor->field_23C);
+                        return 0;
+                    }
+                    return 0;
+                }
+                v9->param0 = 0.0;
+                sithAI_SetLookFrame(actor, &v7->position);
+                v13 = actor->field_234;
+                // TODO verify
+                if ( v13 > tmp1 )
+                {
+                    v16 = v13 - a1a;
+LABEL_16:
+                    arg8a.x = actor->field_228.x * v16 + actor->thing->position.x;
+                    arg8a.y = actor->field_228.y * v16 + actor->thing->position.y;
+                    arg8a.z = actor->field_228.z * v16 + actor->thing->position.z;
+                    if ( (actor->thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                    {
+                        arg8a.z = v7->position.z - -0.02;
+                    }
+                    else if ( (actor->thing->thingflags & SITH_TF_WATER) != 0 )
+                    {
+                        arg8a.z = v7->position.z;
+                    }
+                    else
+                    {
+                        arg8a.z = actor->thing->position.z;
+                    }
+                    if ( v8->argsAsFloat[3] != 0.0
+                      || !sithAI_sub_4EB300(v7, &v7->position, &arg8a, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
+                    {
+                        sithAI_SetMoveThing(actor, &arg8a, 1.5);
+                        return 0;
+                    }
+                    return 0;
+                }
+                if ( v13 < tmp2 )
+                {
+                    v18 = actor->field_234;
+                    // TODO verify
+                    if ( tmp1 == 0.0 )
+                        v16 = v18 - tmp2;
+                    else
+                        v16 = v18 - tmp1;
+                    goto LABEL_16;
+                }
+            }
+        }
+        return 0;
+    }
+
+    if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+        return 0;
+    if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 )
+        return 0;
+    _rand(); // TODO wat? did something get optimized out?
+    if ( flags == SITHAIFLAGS_AWAKE_AND_ACTIVE
+      && actor->field_228.z * actor->thing->physicsParams.vel.z
+       + actor->field_228.x * actor->thing->physicsParams.vel.x
+       + actor->field_228.y * actor->thing->physicsParams.vel.y > 0.029999999 )
+    {
+        return 0;
+    }
+    a1.x = 0.0;
+    a1.z = 0.0;
+    a1.y = 45.0;
+    if ( _frand() <= 0.5 )
+        a1.y = -45.0;
+    rdVector_Rotate3(&a4a, &actor->field_1AC, &a1);
+    a4a.x = actor->field_1B8 * a4a.x;
+    a4a.y = actor->field_1B8 * a4a.y;
+    a4a.z = actor->field_1B8 * a4a.z;
+    a4a.x = actor->thing->position.x + a4a.x;
+    a4a.y = actor->thing->position.y + a4a.y;
+    a4a.z = actor->thing->position.z + a4a.z;
+    sithAI_SetMoveThing(actor, &a4a, actor->moveSpeed);
+    instinct->nextUpdate = sithTime_curMs + 1000;
+    return 1;
+}
 
 int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags)
 {
@@ -381,8 +517,327 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     return 1;
 }
 
-// sithAICmd_TurretFire
-// sithAICmd_Listen
+int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags)
+{
+    sithThing *v7; // eax
+    sithThing *v8; // edi
+    int result; // eax
+    sithActorInstinct *v13; // edi
+    sithThing *v15; // eax
+    sithThing *v16; // ecx
+    rdMatrix34 *v20; // esi
+    double v23; // st7
+    double v24; // st7
+    double v25; // st7
+    double v28; // st7
+    sithThing *v29; // eax
+    float v31; // [esp+10h] [ebp-60h]
+    float v32; // [esp+14h] [ebp-5Ch]
+    rdVector3 a3; // [esp+1Ch] [ebp-54h] BYREF
+    rdVector3 v35; // [esp+28h] [ebp-48h] BYREF
+    rdVector3 a1; // [esp+34h] [ebp-3Ch] BYREF
+    rdMatrix34 v37; // [esp+40h] [ebp-30h] BYREF
+    float actora; // [esp+74h] [ebp+4h]
+    float actorb; // [esp+74h] [ebp+4h]
+    float actorc; // [esp+74h] [ebp+4h]
+    float actord; // [esp+74h] [ebp+4h]
+    float flagsa; // [esp+80h] [ebp+10h]
+
+    v7 = actor->field_1D0;
+    v8 = actor->thing->actorParams.templateWeapon;
+    if ( flags )
+        return 0;
+    if ( !v7 || !v8 )
+    {
+        actor->flags &= ~SITHAIFLAGS_ATTACKING_TARGET;
+        return 1;
+    }
+    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+    {
+        actor->flags &= ~(SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
+        actor->flags |= SITHAIFLAGS_SEARCHING;
+        return 1;
+    }
+    sithPuppet_SetArmedMode(actor->thing, 1);
+    flagsa = aiclass->argsAsFloat[2];
+    actora = aiclass->argsAsFloat[3];
+    // TODO verify (aiclass->argsAsFloat[5] == 0.0)
+    if ( aiclass->argsAsFloat[5] == 0.0 || actor->thing->actorParams.health >= actor->thing->actorParams.maxHealth * aiclass->argsAsFloat[5] )
+    {
+        sithAI_sub_4EAD60(actor);
+        if ( actor->field_1F4 )
+        {
+            actor->flags = actor->flags & ~(SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET) | SITHAIFLAGS_SEARCHING;
+            return 1;
+        }
+        v31 = aiclass->argsAsFloat[1] * sithTime_deltaSeconds;
+        if ( aiclass->argsAsFloat[8] <= _frand()
+          || (v16 = actor->field_1D0) == 0
+          || v16->move_type != MOVETYPE_PHYSICS
+          || rdVector_IsZero3(&v16->physicsParams.vel) )
+        {
+            v20 = &actor->thing->lookOrientation;
+            rdMatrix_TransformVector34Acc_0(&a1, &actor->field_1E4, &actor->thing->lookOrientation);
+        }
+        else
+        {
+            v35.x = actor->field_1E4.x * v8->physicsParams.vel.y;
+            v35.y = actor->field_1E4.y * v8->physicsParams.vel.y;
+            v35.z = actor->field_1E4.z * v8->physicsParams.vel.y;
+            v35.x += v16->physicsParams.vel.x;
+            v35.y += v16->physicsParams.vel.y;
+            v35.z += v16->physicsParams.vel.z;
+            rdVector_Normalize3Acc(&v35);
+            v20 = &actor->thing->lookOrientation;
+            rdMatrix_TransformVector34Acc_0(&a1, &v35, &actor->thing->lookOrientation);
+        }
+        rdVector_ExtractAngle(&a1, &a3);
+        if ( a3.y < -flagsa )
+        {
+            a3.y = -flagsa;
+        }
+        else if ( a3.y > (double)flagsa )
+        {
+            a3.y = flagsa;
+        }
+        if ( a3.x < -actora )
+        {
+            a3.x = -actora;
+        }
+        else if ( a3.x > (double)actora )
+        {
+            a3.x = actora;
+        }
+        actorb = actor->thing->actorParams.eyePYR.y;
+        v32 = actor->thing->actorParams.eyePYR.x;
+        if ( actorb == a3.y && v32 == a3.x )
+            goto LABEL_50;
+        if ( flagsa >= 180.0 )
+        {
+            v23 = actorb - a3.y;
+            if ( v23 <= 180.0 )
+            {
+                if ( v23 >= -180.0 )
+                    goto LABEL_41;
+                v24 = a3.y - 360.0;
+            }
+            else
+            {
+                v24 = a3.y - -360.0;
+            }
+            a3.y = v24;
+        }
+LABEL_41:
+        v25 = actorb - v31;
+        if ( a3.y < v25 || (v25 = v31 + actorb, a3.y > v25) )
+            actorc = v25;
+        else
+            actorc = a3.y;
+        actor->thing->actorParams.eyePYR.y = stdMath_NormalizeAngleAcute(actorc);
+        actord = v32 - v31;
+        if ( a3.x < actord )
+        {
+            v28 = actord;
+        }
+        else
+        {
+            v28 = v31 + v32;
+            if ( a3.x <= v28 )
+                v28 = a3.x;
+        }
+        actor->thing->actorParams.eyePYR.x = v28;
+        sithUnk4_RotateTurretToEyePYR(actor->thing);
+LABEL_50:
+        if ( sithTime_curSeconds > (double)instinct->param0 && (g_debugmodeFlags & 0x80u) == 0 )
+        {
+            rdMatrix_Copy34(&v37, v20);
+            rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
+            sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_FIRE1);
+            v29 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->blindAimError, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
+            if ( v29 )
+                sithCog_SendMessageFromThing(actor->thing, v29, SITH_MESSAGE_FIRE);
+            instinct->param0 = aiclass->argsAsFloat[0] * 0.001 + sithTime_curSeconds;
+        }
+        instinct->nextUpdate = sithTime_curMs + 1;
+        return instinct->nextUpdate;
+    }
+    v13 = instinct;
+    if ( instinct->param1 == 0.0 )
+    {
+        instinct->param0 = sithTime_curSeconds - 1.0;
+        instinct->param1 = aiclass->argsAsFloat[7] * 0.001 + sithTime_curSeconds;
+    }
+    else if ( sithTime_curSeconds > (double)instinct->param1 )
+    {
+        sithThing_SpawnDeadBodyMaybe(actor->thing, actor->thing, 2);
+        return 0;
+    }
+    actor->thing->actorParams.eyePYR.y = _frand() * (flagsa + flagsa) - flagsa;
+    actor->thing->actorParams.eyePYR.x = _frand() * (actora + actora) - actora;
+    sithUnk4_RotateTurretToEyePYR(actor->thing);
+    if ( sithTime_curSeconds > (double)instinct->param0 )
+    {
+        _memcpy(&v37, &actor->thing->lookOrientation, sizeof(v37));
+        rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
+        sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_FIRE1);
+        v15 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->thing->position, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
+        if ( v15 )
+            sithCog_SendMessageFromThing(actor->thing, v15, SITH_MESSAGE_FIRE);
+        v13 = instinct;
+        instinct->param0 = aiclass->argsAsFloat[6] * 0.001 + sithTime_curSeconds;
+    }
+    v13->nextUpdate = sithTime_curMs + 50;
+    return 0;
+}
+
+int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+{
+    sithActor *actor_; // esi
+    sithThing *v6; // ebx
+    sithSectorAlloc *v8; // ecx
+    int result; // eax
+    rdVector3 *v10; // ebp
+    float *v11; // ecx
+    int v12; // edi
+    int v13; // ecx
+    double v14; // st7
+    sithThing *v15; // ebp
+    sithActorInstinct *instinct_; // edi
+    sithThing *v17; // ebx
+    sithAIClassEntry *v18; // edi
+    sithThing *v19; // eax
+    double v20; // st6
+    double v21; // st5
+    sithThing *v22; // eax
+    int v24; // edx
+    sithSectorAlloc *v25; // [esp+10h] [ebp-28h]
+    rdVector3 movePos; // [esp+14h] [ebp-24h] BYREF
+    rdVector3 lookPos; // [esp+20h] [ebp-18h] BYREF
+    rdVector3 a5; // [esp+2Ch] [ebp-Ch] BYREF
+    float tmp;
+
+    actor_ = actor;
+    if ( (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
+        return 0;
+    v6 = actor->thing;
+    v8 = &sithSector_allocPerSector[actor->thing->sector->id];
+    v25 = v8;
+    if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
+    {
+LABEL_26:
+        instinct_ = instinct;
+        if ( instinct->param0 == 0.0 )
+        {
+            if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
+                sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_SURPRISE);
+            else
+                sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_CURIOUS);
+            instinct_->param0 = 0.1;
+        }
+        v17 = extra;
+        if ( extra )
+        {
+            lookPos = extra->position;
+            sithAI_SetLookFrame(actor_, &lookPos);
+            if ( (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+            {
+                v18 = aiclass;
+                if ( aiclass->argsAsFloat[1] != 0.0 )
+                {
+                    v19 = actor_->thing;
+                    movePos.x = lookPos.x - actor_->thing->position.x;
+                    movePos.y = lookPos.y - v19->position.y;
+                    movePos.z = lookPos.z - v19->position.z;
+                    rdVector_Normalize3Acc(&movePos);
+                    v20 = v18->argsAsFloat[1] * movePos.y;
+                    v21 = v18->argsAsFloat[1] * movePos.z;
+                    v22 = actor_->thing;
+                    movePos.x = v18->argsAsFloat[1] * movePos.x;
+                    movePos.y = v20;
+                    movePos.z = v21;
+                    movePos.x = v22->position.x + movePos.x;
+                    movePos.y = v22->position.y + movePos.y;
+                    movePos.z = v22->position.z + movePos.z;
+                    sithAI_SetMoveThing(actor_, &movePos, 2.5);
+                }
+            }
+            if ( _frand() < 0.1 && flags == SITHAIFLAGS_MOVING_TO_DEST )
+            {
+                if ( v17->thingType == THINGTYPE_ACTOR || v17->thingType == THINGTYPE_PLAYER )
+                {
+                    v24 = actor_->flags;
+                    actor_->field_1D0 = v17;
+                    actor_->thingidk = v17;
+                    actor_->flags = v24 & ~SITHAIFLAGS_SEARCHING | SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET;
+                }
+            }
+        }
+        return 0;
+    }
+    if ( flags != SITHAIFLAGS_ATTACKING_TARGET )
+    {
+        if ( flags != SITHAIFLAGS_SEARCHING )
+            return 0;
+        goto LABEL_26;
+    }
+    v10 = &v8->field_10[2];
+    v11 = &v8->field_4[2];
+    v12 = 2;
+    while ( 1 )
+    {
+        if ( *v11 != 0.0 )
+        {
+            v13 = sithAI_sub_4EB300(v6, &v6->position, v10, -1.0, actor_->aiclass->sightDist, 0.0, &a5, &tmp);
+            if ( tmp <= (double)actor_->aiclass->hearDist
+              && (!v13
+               || tmp < 1.0 && v6->lookOrientation.lvec.y * a5.y + v6->lookOrientation.lvec.z * a5.z + v6->lookOrientation.lvec.x * a5.x > 0.5) )
+            {
+                break;
+            }
+        }
+        --v12;
+        --v10;
+        --v11;
+        if ( v12 < 0 )
+        {
+            // TODO ??????
+            //v14 = *(float *)&instinct;
+            //v15 = (sithThing *)instinct;
+            
+            v14 = 0.0;
+            v15 = NULL;
+            
+            goto LABEL_15;
+        }
+    }
+    v14 = v25->field_4[v12];
+    actor_->field_1C4.x = v25->field_10[v12].x;
+    actor_->field_1C4.y = v25->field_10[v12].y;
+    v15 = v25->field_58[v12];
+    actor_->field_1C4.z = v25->field_10[v12].z;
+LABEL_15:
+    if ( v12 < 0 )
+        return 0;
+    if ( v14 > instinct->param0 )
+        instinct->param0 = v14;
+
+    if ( aiclass->argsAsFloat[0] > _frand() && (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+    {
+        sithAI_SetMoveThing(actor_, &actor_->field_1C4, 1.0);
+        sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_CURIOUS);
+    }
+    if ( v15 && v15->thingType )
+    {
+        sithAI_SetLookFrame(actor_, &v15->position);
+        result = 0;
+    }
+    else
+    {
+        sithAI_SetLookFrame(actor_, &actor_->field_1C4);
+        result = 0;
+    }
+    return result;
+}
 
 int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
@@ -689,14 +1144,14 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
         if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 && flags == SITHAIFLAGS_ATTACKING_TARGET && aiclass->argsAsFloat[0] != 0.0 )
         {
             v16 = &sithSector_allocPerSector[actor->thing->sector->id];
-            if (v16->field_C)
+            if (v16->field_4[2])
             {
-                if ( v16->field_60 )
+                if ( v16->field_58[2] )
                 {
-                    if ( sithThing_GetParent(v16->field_60) != actor->thing
-                      && v16->field_60->thingType == THINGTYPE_WEAPON
-                      && v16->field_60->move_type == MOVETYPE_PHYSICS
-                      && !sithAI_sub_4EB090(actor->thing, &actor->thing->position, v16->field_60, actor->aiclass->fov, 1.0, 0.0, &a5, &tmp) )
+                    if ( sithThing_GetParent(v16->field_58[2]) != actor->thing
+                      && v16->field_58[2]->thingType == THINGTYPE_WEAPON
+                      && v16->field_58[2]->move_type == MOVETYPE_PHYSICS
+                      && !sithAI_sub_4EB090(actor->thing, &actor->thing->position, v16->field_58[2], actor->aiclass->fov, 1.0, 0.0, &a5, &tmp) )
                     {
                         movePos.x = a5.x * -aiclass->argsAsFloat[0] + actor->thing->position.x;
                         movePos.y = a5.y * -aiclass->argsAsFloat[0] + actor->thing->position.y;
@@ -795,9 +1250,207 @@ int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     return 0;
 }
 
-// sithAICmd_SenseDanger
-// sithAICmd_HitAndRun
-// sithAICmd_Retreat
-// sithAICmd_ReturnHome
-// sithAICmd_Talk
+int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+{
+    sithSectorAlloc *v7; // ecx
+    sithThing *v8; // ebx
+    int v9; // eax
+    int result; // eax
+    rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
+    float tmp;
+
+    v7 = &sithSector_allocPerSector[actor->thing->sector->id];
+    if ( (actor->flags & SITHAIFLAGS_FLEEING) != 0 || (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
+        return 0;
+    if ( !flags )
+    {
+        if ( aiclass->argsAsFloat[1] != 0.0 )
+        {
+            actor->field_1D0 = g_localPlayerThing;
+            if ( (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+                return 0;
+            sithAI_sub_4EAD60(actor);
+            if ( !actor->field_1F4 )
+            {
+                actor->flags &= ~SITHAIFLAGS_SEARCHING;
+                actor->flags |= SITHAIFLAGS_FLEEING;
+                sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+                sithSector_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
+                actor->field_1C0 = actor->field_1D0;
+                return 1;
+            }
+        }
+        instinct->nextUpdate = sithTime_curMs + 1000;
+        return 0;
+    }
+    if ( flags != 1 )
+    {
+        if ( flags == 2 && v7->field_4[1] > (double)aiclass->argsAsFloat[0] )
+        {
+            v8 = v7->field_58[1];
+            if ( v8 )
+            {
+                v9 = sithAI_sub_4EB090(actor->thing, &actor->thing->position, v8, -1.0, actor->aiclass->hearDist, 0.0, &a5, &tmp);
+                if ( v9 != 1 && v9 != 3 )
+                {
+                    actor->field_1C0 = v8;
+                    if ( (actor->flags & SITHAIFLAGS_FLEEING) == 0 )
+                    {
+                        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+                        sithSector_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
+                    }
+                    actor->flags &= ~SITHAIFLAGS_SEARCHING;
+                    actor->flags |= SITHAIFLAGS_FLEEING;
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_SURPRISE);
+    if ( extra )
+        actor->field_1C0 = sithThing_GetParent(extra);
+    result = 1;
+    actor->flags &= ~SITHAIFLAGS_SEARCHING;
+    actor->flags |= SITHAIFLAGS_FLEEING;
+    return result;
+}
+
+int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+{
+    int result; // eax
+    double v8; // st7
+
+    if ( flags )
+        return 0;
+
+    if ( (actor->flags & SITHAIFLAGS_FLEEING) != 0 )
+    {
+        actor->flags &= ~SITHAIFLAGS_FLEEING;
+        return 1;
+    }
+    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) == 0 )
+    {
+        instinct->param0 = 0.0;
+        instinct->nextUpdate = sithTime_curMs + 1000;
+        return 0;
+    }
+    v8 = instinct->param0 - -1000.0;
+    if ( v8 <= aiclass->argsAsFloat[0] )
+    {
+        instinct->param0 = v8;
+        result = sithTime_curMs + 1000;
+        instinct->nextUpdate = result;
+    }
+    else
+    {
+        instinct->param0 = 0.0;
+        actor->flags |= SITHAIFLAGS_FLEEING;
+        actor->field_1C0 = actor->field_1D0;
+        instinct->nextUpdate = sithTime_curMs + (int)aiclass->argsAsFloat[1];
+        return 1;
+    }
+    return result;
+}
+
+int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+{
+    int result; // eax
+
+    if ( flags )
+        return 0;
+
+    if ( (actor->flags & SITHAIFLAGS_ATTACKING_TARGET) == 0 )
+        return 0;
+
+    if ( aiclass->argsAsFloat[3] != 0.0 && aiclass->argsAsFloat[3] < (double)instinct->param0 )
+    {
+        instinct->field_0 |= 1;
+        return 0;
+    }
+
+    if ( actor->thing->actorParams.health < aiclass->argsAsFloat[0] * actor->thing->actorParams.maxHealth )
+    {
+        if ( aiclass->argsAsFloat[1] > _frand() )
+        {
+            instinct->param0 = instinct->param0 - -1.0;
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FLEE);
+            actor->flags |= SITHAIFLAGS_FLEEING;
+            actor->field_1C0 = actor->field_1D0;
+            return 1;
+        }
+
+        if ( _frand() < 0.1 )
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+    }
+
+    result = sithTime_curMs + aiclass->argsAsInt[2];
+    instinct->nextUpdate = result;
+    return result;
+}
+
+int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
+{
+    rdVector3 a2;
+
+    if ( flags == SITHAIFLAGS_UNK100 )
+    {
+        if ( (actor->flags & SITHAIFLAGS_SEARCHING) && (extra & SITHAIFLAGS_SEARCHING) == 0 )
+        {
+            sithAI_SetMoveThing(actor, &actor->position, 1.0);
+            sithAI_SetLookFrame(actor, &actor->position);
+        }
+    }
+    else if ( flags == SITHAIFLAGS_FLEEING && (actor->flags & SITHAIFLAGS_SEARCHING) != 0 )
+    {
+        rdVector_Add3(&a2, &actor->lookOrientation, &actor->thing->position);
+        sithAI_SetLookFrame(actor, &a2);
+        return 0;
+    }
+    return 0;
+}
+
+int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+{
+    double healthPercent; // st7
+
+    instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
+    if ( aiclass->argsAsFloat[1] <= _frand() )
+        return 0;
+    healthPercent = actor->thing->actorParams.health / actor->thing->actorParams.maxHealth;
+
+    if (!(actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE))
+        return 0;
+
+    if (actor->flags & SITHAIFLAGS_FLEEING )
+    {
+        if ( healthPercent > 0.5 )
+        {
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_GLOAT);
+            return 0;
+        }
+        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+        return 0;
+    }
+
+    if (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE)
+    {
+        if ( healthPercent < 0.25 )
+        {
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+            return 0;
+        }
+        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_BOAST);
+        return 0;
+    }
+    else
+    {
+        if ( healthPercent >= 0.5 )
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_HAPPY);
+        else
+            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_SEARCH);
+        return 0;
+    }
+    return 0;
+}
 

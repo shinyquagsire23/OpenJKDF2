@@ -27,14 +27,14 @@
 #define sithAICmd_Talk_ADDR (0x0050BE20)
 
 void sithAICmd_Startup();
-// sithAICmd_Follow
+int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
 int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
 int sithAICmd_Crouch(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
 int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
 int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
 int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
-// sithAICmd_TurretFire
-// sithAICmd_Listen
+int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int otherFlags);
+int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
 int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
 int sithAICmd_OpenDoors(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
 int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
@@ -43,10 +43,10 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
 int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
 int sithAICmd_RandomTurn(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
 int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
-// sithAICmd_SenseDanger
-// sithAICmd_HitAndRun
-// sithAICmd_Retreat
-// sithAICmd_ReturnHome
-// sithAICmd_Talk
+int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
+int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
+int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
+int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra);
+int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
 
 #endif // _SITHAICMD_H

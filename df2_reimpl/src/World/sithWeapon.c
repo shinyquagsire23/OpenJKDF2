@@ -1419,11 +1419,11 @@ sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTem
         fireOffset->y = v13;
         fireOffset->z = v14;
     }
-#ifndef LINUX_TMP
+
     if ( (sithWeapon_bAutoAim & 1) != 0 && (scaleFlags & 0x20) != 0 && (!net_isMulti || (scaleFlags & 0x40) != 0) )
         sithWeapon_ProjectileAutoAim(&v20, sender, &out, fireOffset, autoaimFov, autoaimMaxDist);
     else
-#endif
+
         _memcpy(&v20, &out, sizeof(v20));
     if ( aimError->x != 0.0 || aimError->y != 0.0 || aimError->z != 0.0 )
         rdMatrix_PreRotate34(&v20, aimError);

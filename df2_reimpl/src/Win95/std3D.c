@@ -61,6 +61,7 @@ static rdLine GL_tmpLines[4096];
 static size_t GL_tmpLinesAmt = 0;
 static D3DVERTEX GL_tmpVertices[4096];
 static size_t GL_tmpVerticesAmt = 0;
+static size_t rendered_tris = 0;
 
 rdDDrawSurface* last_tex = NULL;
 int last_flags = 0;
@@ -257,6 +258,8 @@ int std3D_StartScene()
         init_resources();
     }
     
+    rendered_tris = 0;
+    
     //glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
     glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -290,12 +293,14 @@ int std3D_EndScene()
     last_tex = NULL;
     last_flags = 0;
     std3D_ResetRenderList();
+    //printf("%u tris\n", rendered_tris);
     return 1;
 }
 
 void std3D_ResetRenderList()
 {
-    
+    rendered_tris += GL_tmpTrisAmt;
+
     GL_tmpVerticesAmt = 0;
     GL_tmpTrisAmt = 0;
     GL_tmpLinesAmt = 0;

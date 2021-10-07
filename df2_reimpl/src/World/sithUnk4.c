@@ -132,3 +132,21 @@ int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithUnk3Sear
     }
     return result;
 }
+
+void sithUnk4_RotateTurretToEyePYR(sithThing *a1)
+{
+    sithAnimclass *v1; // eax
+    int v2; // ecx
+    int v3; // eax
+
+    v1 = a1->animclass;
+    if ( v1 )
+    {
+        v2 = v1->bodypart_to_joint[7];
+        v3 = v1->bodypart_to_joint[8];
+        if ( v2 >= 0 )
+            a1->rdthing.hierarchyNodes2[v2].x = a1->actorParams.eyePYR.x;
+        if ( v3 >= 0 )
+            a1->rdthing.hierarchyNodes2[v3].y = a1->actorParams.eyePYR.y;
+    }
+}
