@@ -1052,6 +1052,7 @@ void do_hooks()
     hook_function(sithThing_Damage_ADDR, sithThing_Damage);
     hook_function(sithThing_AttachThing_ADDR, sithThing_AttachThing);
     hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
+    hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);
@@ -1554,6 +1555,8 @@ void do_hooks()
     hook_function(sithAI_GetThingsInView_ADDR, sithAI_GetThingsInView);
     hook_function(sithAI_physidk_ADDR, sithAI_physidk);
     hook_function(sithAI_idk_msgarrived_target_ADDR, sithAI_idk_msgarrived_target);
+    hook_function(sithAI_RandomRotationVector_ADDR, sithAI_RandomRotationVector);
+    hook_function(sithAI_sub_4EB860_ADDR, sithAI_sub_4EB860);
 
     // sithAIClass
     hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);

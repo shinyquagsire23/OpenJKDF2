@@ -1430,6 +1430,33 @@ void sithSoundSys_SetVelocity(sithPlayingSound *sound)
     }
 }
 
+void sithSoundSys_SyncSounds()
+{
+    for (int i = 0; i < SITHSOUNDSYS_NUMPLAYINGSOUNDS; i++)
+    {
+        sithPlayingSound* iter = &sithSoundSys_aPlayingSounds[i];
+        if (iter != sithSoundSys_pPlayingSoundIdk)
+        {
+            sithSound* sound = iter->sound;
+            if ( sound )
+            {
+                if ( (iter->flags & 1) != 0 )
+                    sithSector_cogmsg_SendPlaySoundPos(
+                        iter->thing,
+                        &iter->pos,
+                        sound,
+                        iter->anonymous_5,
+                        iter->maxPosition,
+                        iter->flags,
+                        iter->refid,
+                        -1,
+                        255);
+            }
+        }
+        ++iter;
+    }
+}
+
 void sithSoundSys_FreePlayingSound(sithPlayingSound *sound)
 {
     int v1; // esi

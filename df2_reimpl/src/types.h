@@ -85,6 +85,7 @@ typedef struct sithActorInstinct sithActorInstinct;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
+typedef struct sithTimer sithTimer;
 typedef struct sithTimerInfo sithTimerInfo;
 typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 typedef struct sithMap sithMap;

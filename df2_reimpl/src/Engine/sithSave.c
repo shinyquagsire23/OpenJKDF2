@@ -1,8 +1,11 @@
 #include "sithSave.h"
 
+#include "AI/sithAI.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
+#include "World/sithSector.h"
+#include "World/sithThingPlayer.h"
 #include "Main/jkGame.h"
 #include "Engine/sith.h"
 #include "Engine/sithCamera.h"
@@ -10,6 +13,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithNet.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -169,4 +173,140 @@ load_fail:
     sithThing_sub_4CCE60();
     sith_Close();
     return 0;
+}
+
+int sithSave_SerializeAllThings(int mpFlags)
+{
+    unsigned int v3; // ebp
+    sithThing *v4; // ebx
+    unsigned int v5; // ebp
+    int v6; // ebx
+    sithThing *v7; // eax
+    int v8; // ecx
+    unsigned int v10; // ebp
+    int v11; // ebx
+    sithWorld *v12; // eax
+    unsigned int v13; // ebp
+    int v14; // ebx
+    unsigned int v15; // ebx
+    int v16; // ebp
+    unsigned int v17; // ebx
+    int v18; // ebp
+    int v19; // ebx
+    sithItemDescriptor *v20; // esi
+
+    if ( (sithCogVm_multiplayerFlags & mpFlags) == 0 )
+        return 0;
+    v3 = 0;
+    v4 = sithWorld_pCurWorld->things;
+    if ( sithWorld_pCurWorld->numThingsLoaded )
+    {
+        do
+        {
+            if ( sithThing_ShouldSync(v4) )
+            {
+                sithSector_cogMsg_SendSyncThingFull(v4, 0, mpFlags);
+                if ( v4->rdthing.puppet )
+                    sithSector_cogMsg_SendSyncPuppet(v4, 0, mpFlags);
+            }
+            ++v3;
+            ++v4;
+        }
+        while ( v3 < sithWorld_pCurWorld->numThingsLoaded );
+    }
+    v5 = 0;
+    if ( sithWorld_pCurWorld->numThingsLoaded )
+    {
+        v6 = 0;
+        do
+        {
+            if ( sithThing_ShouldSync(&sithWorld_pCurWorld->things[v6]) )
+            {
+                v7 = &sithWorld_pCurWorld->things[v6];
+                v8 = v7->attach_flags;
+                if ( v8 )
+                {
+                    if ( (v8 & 8) != 0 || v7->move_type != MOVETYPE_PHYSICS )
+                        sithSector_cogMsg_SendSyncThingAttachment(v7, 0, mpFlags, 1);
+                }
+            }
+            ++v5;
+            ++v6;
+        }
+        while ( v5 < sithWorld_pCurWorld->numThingsLoaded );
+    }
+    for (int i = 0; i < 256; i++) // TODO define this maximum
+    {
+        if ( sithAI_actors[i].aiclass )
+            sithSector_cogMsg_SendSyncAI(&sithAI_actors[i], 0, mpFlags);
+    }
+    v10 = 0;
+    if ( sithWorld_pCurWorld->numCogsLoaded )
+    {
+        v11 = 0;
+        do
+        {
+            sithThingPlayer_cogMsg_SendSyncCog(&sithWorld_pCurWorld->cogs[v11], 0, mpFlags);
+            ++v10;
+            ++v11;
+        }
+        while ( v10 < sithWorld_pCurWorld->numCogsLoaded );
+    }
+    v12 = sithWorld_pStatic;
+    if ( sithWorld_pStatic )
+    {
+        v13 = 0;
+        if ( sithWorld_pStatic->numCogsLoaded )
+        {
+            v14 = 0;
+            do
+            {
+                sithThingPlayer_cogMsg_SendSyncCog(&v12->cogs[v14], 0, mpFlags);
+                v12 = sithWorld_pStatic;
+                ++v13;
+                ++v14;
+            }
+            while ( v13 < sithWorld_pStatic->numCogsLoaded );
+        }
+    }
+    v15 = 0;
+    if ( sithWorld_pCurWorld->numSurfaces )
+    {
+        v16 = 0;
+        do
+        {
+            sithSector_cogMsg_SendSyncSurface(&sithWorld_pCurWorld->surfaces[v16], 0, mpFlags);
+            ++v15;
+            ++v16;
+        }
+        while ( v15 < sithWorld_pCurWorld->numSurfaces );
+    }
+    v17 = 0;
+    if ( sithWorld_pCurWorld->numSectors )
+    {
+        v18 = 0;
+        do
+        {
+            sithSector_cogMsg_SendSyncSector(&sithWorld_pCurWorld->sectors[v18], 0, mpFlags);
+            ++v17;
+            ++v18;
+        }
+        while ( v17 < sithWorld_pCurWorld->numSectors );
+    }
+
+    v20 = sithInventory_aDescriptors;
+    for (v19 = 0; v19 < 200; v19++) // TODO define this maximum
+    {
+        if ( (v20->flags & 1) != 0 )
+            sithSector_cogMsg_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
+        ++v20;
+    }
+    sithSurface_Sync(mpFlags);
+    for (sithTimer* timerIter = sithTimer_list; timerIter; timerIter = timerIter->nextTimer )
+        sithSector_cogMsg_SendSyncTimers(timerIter, 0, mpFlags);
+    sithSector_cogMsg_SendSyncPalEffects(0, mpFlags);
+    sithSector_cogMsg_SendSyncCameras(0, mpFlags);
+    sithSoundSys_SyncSounds();
+    sithSector_cogmsg_send31(0, mpFlags);
+    return 1;
 }

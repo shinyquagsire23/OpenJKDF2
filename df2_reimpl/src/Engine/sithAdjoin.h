@@ -12,9 +12,7 @@ typedef struct sithAdjoin
     sithAdjoin *next;
     uint32_t field_14;
     float dist;
-    uint32_t field_1C;
-    uint32_t field_20;
-    uint32_t field_24;
+    rdVector3 field_1C;
 } sithAdjoin;
 
 #endif // _SITHADJOIN_H

@@ -53,7 +53,7 @@
 #define sithThing_Checksum_ADDR (0x004CF3C0)
 #define sithThing_SyncThingPos_ADDR (0x004CF560)
 #define sithThing_netidk_ADDR (0x004CF5D0)
-#define sithThing_HasAttachment_ADDR (0x004CF660)
+#define sithThing_ShouldSync_ADDR (0x004CF660)
 #define sithThing_netidk2_ADDR (0x004CF690)
 #define sithThing_Release_ADDR (0x004E0740)
 #define sithThing_Hit_ADDR (0x004ECC90)
@@ -675,6 +675,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
 void sithThing_detachallchildren(sithThing *thing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
 void sithThing_SyncThingPos(sithThing *thing, int a2);
+int sithThing_ShouldSync(sithThing *thing);
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;

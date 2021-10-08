@@ -1099,7 +1099,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     }
 }
 
-void sithSector_ThingSetLook(sithThing *thing, rdVector3 *look, float a3)
+void sithSector_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3)
 {
     rdVector3 *v3; // edi
     double v4; // st7
@@ -1548,4 +1548,85 @@ float sithSector_ThingGetInsertOffsetZ(sithThing *thing)
             result = v2;
     }
     return result;
+}
+
+int sithSector_TimerTick()
+{
+    unsigned int v1; // edi
+    sithSectorEntry* v2; // esi
+    int v3; // edi
+    sithActor *i; // esi
+    sithThing *v5; // eax
+    sithSector *v6; // eax
+
+    ++sithSector_timerTicks;
+    if ( !sithSector_numEntries )
+        return 1;
+    v1 = 0;
+    for (v1 = 0; v1 < sithSector_numEntries; v1++)
+    {
+        v2 = (sithSectorEntry *)&sithSector_aEntries[v1];
+        sithSector_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
+    }
+    v3 = 0;
+    for ( i = sithAI_actors; v3 <= sithAI_inittedActors; ++i )
+    {
+        if ( i->aiclass )
+        {
+            v5 = i->thing;
+            if ( i->thing )
+            {
+                if ( (v5->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                {
+                    v6 = v5->sector;
+                    if ( v6 )
+                    {
+                        if ( sithSector_allocPerSector[v6->id].field_0 == sithSector_timerTicks )
+                            sithAI_SetActorFireTarget(i, SITHAIFLAGS_ATTACKING_TARGET, 0);
+                    }
+                }
+            }
+        }
+        ++v3;
+    }
+    sithSector_numEntries = 0;
+    return 1;
+}
+
+void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing)
+{
+    int v7; // esi
+    sithSectorAlloc *v8; // edx
+    int v9; // ecx
+    sithAdjoin *i; // esi
+    sithAdjoin *v13; // ecx
+    float a6a; // [esp+24h] [ebp+14h]
+
+    v7 = sithSector_timerTicks;
+    v8 = &sithSector_allocPerSector[sector->id];
+    if ( v8->field_0 != sithSector_timerTicks )
+    {
+        _memset(v8, 0, sizeof(sithSectorAlloc));
+        v8->field_0 = v7;
+    }
+    v9 = sectorEntry->field_14;
+    if ( v8->field_4[v9] < (double)a5 )
+    {
+        v8->field_4[v9] = a5;
+        v8->field_10[v9] = *pos1;
+        v8->field_34[v9] = *pos2;
+        v8->field_58[v9] = thing;
+        if ( a6 > 0.0 )
+        {
+            for ( i = sector->adjoins; i; i = i->next )
+            {
+                v13 = i->mirror;
+                if ( v13 )
+                    a6a = a6 - v13->dist;
+                else
+                    a6a = a6;
+                sithSector_sub_4F2C30(sectorEntry, i->sector, pos1, &i->field_1C, a6, a6a, thing);
+            }
+        }
+    }
 }

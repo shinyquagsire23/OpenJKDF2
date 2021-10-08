@@ -180,15 +180,7 @@ typedef struct sithSectorAlloc
     int field_0;
     float field_4[3];
     rdVector3 field_10[3];
-    int field_34;
-    int field_38;
-    int field_3C;
-    int field_40;
-    int field_44;
-    int field_48;
-    int field_4C;
-    int field_50;
-    int field_54;
+    rdVector3 field_34[3];
     sithThing* field_58[3];
 } sithSectorAlloc;
 
@@ -214,12 +206,14 @@ void sithSector_Free(sithWorld *world);
 int sithSector_GetNumPlayers(sithSector *sector);
 void sithSector_sub_4F2E30(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertices);
 void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds);
-void sithSector_ThingSetLook(sithThing *thing, rdVector3 *look, float a3);
+void sithSector_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3);
 void sithSector_ThingApplyForce(sithThing *thing, rdVector3 *forceVec);
 void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4);
 int sithSector_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing);
 void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds);
 float sithSector_ThingGetInsertOffsetZ(sithThing *thing);
+int sithSector_TimerTick();
+void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -253,9 +247,20 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 //static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
 //static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
-static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
+//static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
 static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
 static int (*sithSector_cogMsg_SendDeath)(sithThing *sender, sithThing *receiver, char a3, int a4, int a5) = (void*)sithSector_cogMsg_SendDeath_ADDR;
+static int (*sithSector_cogMsg_SendSyncAI)(sithActor *actor, int sendto_id, int idx) = (void*)sithSector_cogMsg_SendSyncAI_ADDR;
+static int (*sithSector_cogMsg_SendSyncThingFull)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncThingFull_ADDR;
+static int (*sithSector_cogMsg_SendSyncPuppet)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPuppet_ADDR;
+static int (*sithSector_cogMsg_SendSyncSurface)(sithSurface *surface, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSurface_ADDR;
+static int (*sithSector_cogMsg_SendSyncSector)(sithSector *sector, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSector_ADDR;
+static void (*sithSector_cogMsg_SendSyncItemDesc)(sithThing *thing, int binIdx, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncItemDesc_ADDR;
+static void (*sithSector_cogMsg_SendSyncTimers)(sithTimer *a1, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncTimers_ADDR;
+static int (*sithSector_cogMsg_SendSyncPalEffects)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPalEffects_ADDR;
+static int (*sithSector_cogMsg_SendSyncCameras)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncCameras_ADDR;
+static int (*sithSector_cogmsg_send31)(int sendto_id, int mpFlags) = (void*)sithSector_cogmsg_send31_ADDR;
+//static void (*sithSector_sub_4F2C30)(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing) = (void*)sithSector_sub_4F2C30_ADDR;
 
 #define sithSector_aEntries ((sithSectorEntry*)0x00855028)
 #define sithSector_allocPerSector (*(sithSectorAlloc**)0x008553A8)

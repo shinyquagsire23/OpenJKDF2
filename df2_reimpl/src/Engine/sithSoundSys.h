@@ -65,6 +65,8 @@
 #define sithSoundSys_dword_836C04 (*(int*)0x00836C04)
 #define sithSoundSys_pFocusedThing (*(sithThing**)0x00836BF0)
 
+#define SITHSOUNDSYS_NUMPLAYINGSOUNDS (32)
+
 enum SITHSOUNDFLAG
 {
     SITHSOUNDFLAG_LOOP = 0x1,
@@ -140,6 +142,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs);
 void sithSoundSys_UpdateSoundPos(sithPlayingSound *sound);
 void sithSoundSys_SetVelocity(sithPlayingSound *sound);
 
+void sithSoundSys_SyncSounds();
 void sithSoundSys_FreePlayingSound(sithPlayingSound *sound);
 
 void sithSoundSys_FreeThing(sithThing *thing);

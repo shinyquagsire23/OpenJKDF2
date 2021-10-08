@@ -168,4 +168,6 @@ static uint32_t (*sithSurface_PushSurface)(sithSurface *a1) = (void*)sithSurface
 //static void (*sithSurface_ScrollSky)(rdSurface *surface, int a2, float a3, int a4) = (void*)sithSurface_ScrollSky_ADDR;
 //static int (*sithSurface_GetCenter)(sithSurface *a1, rdVector3 *a2) = (void*)sithSurface_GetCenter_ADDR;
 
+static void (*sithSurface_Sync)(int mpFlags) = (void*)sithSurface_Sync_ADDR;
+
 #endif // _SITHSURFACE_H

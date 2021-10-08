@@ -2322,3 +2322,13 @@ LABEL_6:
         }
     }
 }
+
+int sithThing_ShouldSync(sithThing *thing)
+{
+    int result; // eax
+
+    result = thing->thingType;
+    if ( result )
+        result = !thing->lifeLeftMs || result != THINGTYPE_DEBRIS && result != THINGTYPE_PARTICLE;
+    return result;
+}

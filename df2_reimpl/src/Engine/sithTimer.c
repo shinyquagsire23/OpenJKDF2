@@ -119,7 +119,7 @@ void sithTimer_Advance()
 
     for (int idx = 1; idx < 5; idx++)
     {
-        sithTimerFunc* timerFunc = &sithTimer_timerFuncs[1];
+        sithTimerFunc* timerFunc = &sithTimer_timerFuncs[idx];
         if ( timerFunc->field_4 == 1 )
         {
             uint32_t delta = (sithTime_curMs - timerFunc->creationMs);
