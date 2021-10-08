@@ -507,11 +507,14 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
             rdThing* rdthing = &playerInfo->actorThing->rdthing;
             playerInfo->nextTwinkleSpawnMs += 40;
             rdModel3* model = rdthing->model3;
-            uint32_t meshIdx = model->hierarchyNodes[(uint64_t)(int64_t)(_frand() * (double)(unsigned int)model->numHierarchyNodes)].meshIdx;
+            
+            // Added: Changed both of these from `_frand() * max` to `_rand() % max`
+            // to prevent an off-by-one heap buffer overflow.
+            uint32_t meshIdx = model->hierarchyNodes[_rand() % model->numHierarchyNodes].meshIdx;
 
             if ( meshIdx != -1 && model->geosets[0].meshes[meshIdx].numVertices)
             {
-                int vtxIdx = (int64_t)(_frand() * (double)model->geosets[0].meshes[meshIdx].numVertices);
+                uint32_t vtxIdx = (_rand() % model->geosets[0].meshes[meshIdx].numVertices);
 
                 rdModel3_GetMeshMatrix(rdthing, &playerInfo->actorThing->lookOrientation, meshIdx, &matTmp);
                 rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].vertices[vtxIdx], &matTmp);

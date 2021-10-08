@@ -81,7 +81,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 {
                     if ( v12 != 3 )
                         sithAI_SetLookFrame(actor, &actor->field_1D0->position);
-                    if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > (double)rand() * 0.000030518509 )
+                    if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
                     {
 LABEL_27:
                         if ( (actor->thing->actorParams.typeflags & SITHAIFLAGS_DISABLED) == 0 )
