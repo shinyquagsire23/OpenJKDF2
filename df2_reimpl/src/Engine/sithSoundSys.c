@@ -1736,3 +1736,14 @@ void sithSoundSys_StopSound(sithPlayingSound *sound)
 
     sithSoundSys_FreePlayingSound(sound);
 }
+
+sithPlayingSound* sithSoundSys_GetSoundFromIdx(signed int idx)
+{
+    sithPlayingSound *result; // eax
+
+    if ( idx < 0 || idx >= 32 )
+        result = 0;
+    else
+        result = &sithSoundSys_aPlayingSounds[idx];
+    return result;
+}

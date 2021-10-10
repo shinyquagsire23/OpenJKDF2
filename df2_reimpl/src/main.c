@@ -1546,6 +1546,7 @@ void do_hooks()
     hook_function(sithSoundSys_SetPitch_ADDR, sithSoundSys_SetPitch);
     hook_function(sithSoundSys_FreeThing_ADDR, sithSoundSys_FreeThing);
     hook_function(sithSoundSys_SectorSound_ADDR, sithSoundSys_SectorSound);
+    hook_function(sithSoundSys_SetVelocity_ADDR, sithSoundSys_SetVelocity);
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);

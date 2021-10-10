@@ -29,12 +29,12 @@
 #define sithSoundSys_GetThingSoundIdx_ADDR (0x004DC750)
 #define sithSoundSys_TickPlayingSound_ADDR (0x004DC790)
 #define sithSoundSys_UpdateSoundPos_ADDR (0x004DCC00)
-#define sithSoundSys_sub_4DCE10_ADDR (0x004DCE10)
+#define sithSoundSys_SetVelocity_ADDR (0x004DCE10)
 #define sithSoundSys_StopSound_ADDR (0x004DCE80)
 #define sithSoundSys_FreeThing_ADDR (0x004DCF20)
 #define sithSoundSys_GetSoundFromRef_ADDR (0x004DD040)
-#define sithSoundSys_sub_4DD190_ADDR (0x004DD190)
-#define sithSoundSys_sub_4DD310_ADDR (0x004DD310)
+#define sithSoundSys_UpdatePlayingSoundPosition_ADDR (0x004DD190)
+#define sithSoundSys_GetSoundFromIdx_ADDR (0x004DD310)
 #define sithSoundSys_SectorSound_ADDR (0x004DD330)
 #define sithSoundSys_SyncSounds_ADDR (0x004DD360)
 #define sithSoundSys_FreePlayingSound_ADDR (0x004DD3C0)
@@ -153,6 +153,7 @@ int sithSoundSys_sub_4DD3F0(sithPlayingSound *sound);
 int sithSoundSys_sub_4DD5D0(sithPlayingSound *sound);
 uint32_t sithSoundSys_GetThingSoundIdx(sithThing *thing, sithSound *sound);
 void sithSoundSys_StopSound(sithPlayingSound *sound);
+sithPlayingSound* sithSoundSys_GetSoundFromIdx(signed int idx);
 
 //static int (*sithSoundSys_Startup)() = (void*)sithSoundSys_Startup_ADDR;
 //static void (*sithSoundSys_Shutdown)() = (void*)sithSoundSys_Shutdown_ADDR;
