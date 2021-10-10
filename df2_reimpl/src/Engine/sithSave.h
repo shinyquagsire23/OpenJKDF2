@@ -41,10 +41,12 @@ void sithSave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler
 int sithSave_GetProfilePath(char *out, int outSize, char *a3);
 int sithSave_Load(char *saveFname, int a2, int a3);
 int sithSave_LoadEntry(char *fpath);
+int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName);
+int sithSave_WriteEntry();
 
 //static int (*sithSave_Load)(char *a1, int a2, int a3) = (void*)sithSave_Load_ADDR;
 //static int (*sithSave_LoadEntry)(char *fpath) = (void*)sithSave_LoadEntry_ADDR;
-static int (*sithSave_Write)(char *a1, int a2, int a3, wchar_t *a4) = (void*)sithSave_Write_ADDR;
-static int (*sithSave_WriteEntry)() = (void*)sithSave_WriteEntry_ADDR;
+//static int (*sithSave_Write)(char *a1, int a2, int a3, wchar_t *a4) = (void*)sithSave_Write_ADDR;
+//static int (*sithSave_WriteEntry)() = (void*)sithSave_WriteEntry_ADDR;
 
 #endif // _SITHSAVE_H

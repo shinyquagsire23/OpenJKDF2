@@ -67,6 +67,8 @@ int Video_Startup();
 void Video_Shutdown();
 void Video_SwitchToGDI();
 
+static void (*Video_camera_related)() = (void*)Video_camera_related_ADDR;
+
 //static void (*Video_Shutdown)() = (void*)Video_Shutdown_ADDR;
 //static void (*Video_SwitchToGDI)() = (void*)Video_SwitchToGDI_ADDR;
 //static int (*Video_Startup)() = (void*)Video_Startup_ADDR;

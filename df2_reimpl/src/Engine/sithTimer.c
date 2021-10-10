@@ -131,7 +131,8 @@ void sithTimer_Advance()
         }
     }
 
-    for ( i = sithTimer_list; i; sithTimer_numFree )
+    i = sithTimer_list;
+    while (i)
     {
         if ( i->endMs >= sithTime_curMs )
             break;

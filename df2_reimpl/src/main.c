@@ -71,6 +71,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithKeyFrame.h"
+#include "Engine/sithMapView.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithSound.h"
@@ -1328,6 +1329,8 @@ void do_hooks()
     hook_function(jkGame_Initialize_ADDR, jkGame_Initialize);
     hook_function(jkGame_ParseSection_ADDR, jkGame_ParseSection);
     hook_function(jkGame_Update_ADDR, jkGame_Update);
+    hook_function(jkGame_ScreensizeIncrease_ADDR, jkGame_ScreensizeIncrease);
+    hook_function(jkGame_ScreensizeDecrease_ADDR, jkGame_ScreensizeDecrease);
     
     // jkGob
     hook_function(jkGob_Startup_ADDR, jkGob_Startup);
@@ -1423,6 +1426,17 @@ void do_hooks()
     hook_function(sithSprite_LoadEntry_ADDR, sithSprite_LoadEntry);
     hook_function(sithSprite_New_ADDR, sithSprite_New);
     
+    // sithMapView
+    hook_function(sithMapView_Initialize_ADDR, sithMapView_Initialize);
+    hook_function(sithMapView_Shutdown_ADDR, sithMapView_Shutdown);
+    hook_function(sithMapView_ToggleMapDrawn_ADDR, sithMapView_ToggleMapDrawn);
+    hook_function(sithMapView_FuncIncrease_ADDR, sithMapView_FuncIncrease);
+    hook_function(sithMapView_FuncDecrease_ADDR, sithMapView_FuncDecrease);
+    // sithMapView_Render1
+    // sithMapView_Render2
+    // sithMapView_Render3
+    hook_function(sithMapView_Render4_ADDR, sithMapView_Render4);
+    
     // sithMaterial
     hook_function(sithMaterial_Startup_ADDR, sithMaterial_Startup);
     hook_function(sithMaterial_Shutdown_ADDR, sithMaterial_Shutdown);
@@ -1479,8 +1493,13 @@ void do_hooks()
     hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
     
     // sithSave
+    hook_function(sithSave_Setidk_ADDR, sithSave_Setidk);
+    hook_function(sithSave_GetProfilePath_ADDR, sithSave_GetProfilePath);
     hook_function(sithSave_Load_ADDR, sithSave_Load);
-    
+    hook_function(sithSave_LoadEntry_ADDR, sithSave_LoadEntry);
+    hook_function(sithSave_Write_ADDR, sithSave_Write);
+    hook_function(sithSave_WriteEntry_ADDR, sithSave_WriteEntry);
+
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);
     hook_function(sithSound_Shutdown_ADDR, sithSound_Shutdown);
@@ -1538,6 +1557,7 @@ void do_hooks()
     hook_function(sithAI_PrintThings_ADDR, sithAI_PrintThings);
     hook_function(sithAI_PrintThingStatus_ADDR, sithAI_PrintThingStatus);
     hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
+    hook_function(sithAI_idkframesalloc_ADDR, sithAI_idkframesalloc);
     hook_function(sithAI_Tick_ADDR, sithAI_Tick);
     hook_function(sithAI_SetLookFrame_ADDR, sithAI_SetLookFrame);
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);

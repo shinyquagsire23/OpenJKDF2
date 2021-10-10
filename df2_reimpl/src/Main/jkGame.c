@@ -45,6 +45,32 @@ void jkGame_Shutdown()
     jkGame_bInitted = 0;
 }
 
+void jkGame_ScreensizeIncrease()
+{
+    if ( Video_modeStruct.viewSizeIdx < 0xAu )
+    {
+#ifndef LINUX_TMP
+        sithCamera_Close();
+        rdCanvas_Free(Video_pCanvas);
+        ++Video_modeStruct.viewSizeIdx;
+        Video_camera_related();
+#endif
+    }
+}
+
+void jkGame_ScreensizeDecrease()
+{
+    if ( Video_modeStruct.viewSizeIdx )
+    {
+#ifndef LINUX_TMP
+        sithCamera_Close();
+        rdCanvas_Free(Video_pCanvas);
+        --Video_modeStruct.viewSizeIdx;
+        Video_camera_related();
+#endif
+    }
+}
+
 #ifndef LINUX
 int jkGame_Update()
 {

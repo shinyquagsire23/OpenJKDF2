@@ -1552,33 +1552,27 @@ float sithSector_ThingGetInsertOffsetZ(sithThing *thing)
 
 int sithSector_TimerTick()
 {
-    unsigned int v1; // edi
-    sithSectorEntry* v2; // esi
-    int v3; // edi
-    sithActor *i; // esi
-    sithThing *v5; // eax
-    sithSector *v6; // eax
-
     ++sithSector_timerTicks;
     if ( !sithSector_numEntries )
         return 1;
-    v1 = 0;
-    for (v1 = 0; v1 < sithSector_numEntries; v1++)
+
+    for (size_t v1 = 0; v1 < sithSector_numEntries; v1++)
     {
-        v2 = (sithSectorEntry *)&sithSector_aEntries[v1];
+        sithSectorEntry* v2 = (sithSectorEntry *)&sithSector_aEntries[v1];
         sithSector_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
     }
-    v3 = 0;
-    for ( i = sithAI_actors; v3 <= sithAI_inittedActors; ++i )
+    
+    for (size_t v3 = 0; v3 <= sithAI_inittedActors; ++v3 )
     {
+        sithActor* i = &sithAI_actors[v3];
+
         if ( i->aiclass )
         {
-            v5 = i->thing;
             if ( i->thing )
             {
-                if ( (v5->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                if ( (i->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
                 {
-                    v6 = v5->sector;
+                    sithSector* v6 = i->thing->sector;
                     if ( v6 )
                     {
                         if ( sithSector_allocPerSector[v6->id].field_0 == sithSector_timerTicks )
@@ -1587,7 +1581,6 @@ int sithSector_TimerTick()
                 }
             }
         }
-        ++v3;
     }
     sithSector_numEntries = 0;
     return 1;

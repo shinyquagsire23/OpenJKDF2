@@ -172,7 +172,7 @@ LABEL_39:
                 sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
                 if ( input_read != 0 )
                     sithActor_cogMsg_OpenDoor(player);
-#ifndef LINUX_TMP
+
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )
                     sithMapView_ToggleMapDrawn();
@@ -180,7 +180,6 @@ LABEL_39:
                     sithMapView_FuncIncrease();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
                     sithMapView_FuncDecrease();
-#endif
             }
         }
         return 0;
@@ -657,6 +656,18 @@ int sithControl_ReadFunctionMap(int func, int* out)
         if (!last_cam)
             val = cur_val;
         last_cam = !!state[SDL_SCANCODE_P];
+    }
+    else if (func == INPUT_FUNC_MAP)
+    {
+        val = !!state[SDL_SCANCODE_TAB];
+    }
+    else if (func == INPUT_FUNC_INCREASE)
+    {
+        val = !!state[SDL_SCANCODE_EQUALS];
+    }
+    else if (func == INPUT_FUNC_DECREASE)
+    {
+        val = !!state[SDL_SCANCODE_MINUS];
     }
     
     if (!!state[SDL_SCANCODE_ESCAPE])

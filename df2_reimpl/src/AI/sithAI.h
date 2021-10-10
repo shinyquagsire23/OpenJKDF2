@@ -91,6 +91,7 @@ sithAICommand* sithAI_FindCommand(const char *cmdName);
 int sithAI_PrintThings();
 int sithAI_PrintThingStatus(int a1, char *idxStr);
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
+void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4);
 void sithAI_Tick(sithThing *thing, float deltaSeconds);
 void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds);
 void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds);

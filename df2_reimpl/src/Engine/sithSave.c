@@ -14,10 +14,12 @@
 #include "Engine/sithTimer.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithNet.h"
+#include "General/sithStrTable.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/stdConffile.h"
+#include "Win95/DebugConsole.h"
 #include "Cog/sithCogVm.h"
 #include "jk.h"
 
@@ -309,4 +311,137 @@ int sithSave_SerializeAllThings(int mpFlags)
     sithSoundSys_SyncSounds();
     sithSector_cogmsg_send31(0, mpFlags);
     return 1;
+}
+
+int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
+{
+    int result; // eax
+    wchar_t *v5; // esi
+    float v6; // edx
+    float *v7; // eax
+    sithItemInfo *v8; // ecx
+    float v9; // edx
+    char tmp_playerName[31]; // [esp+Ch] [ebp-2A0h] BYREF
+    char v11; // [esp+2Bh] [ebp-281h]
+    char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF
+    wchar_t v13[256]; // [esp+ACh] [ebp-200h] BYREF
+
+    if ( (g_submodeFlags & 1) != 0 )
+        return 0;
+    if ( (g_localPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
+        return 0;
+    v5 = saveName;
+    if ( !saveName )
+    {
+        v5 = v13;
+        stdString_CharToWchar(v13, saveFname, 255);
+        v13[255] = 0;
+    }
+    sithSave_dword_835914 = a3;
+    stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
+    v11 = 0;
+    stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, &sithSave_fpath[128]);
+    stdFileUtil_MkDir(PathName);
+    stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
+    v11 = 0;
+    stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, saveFname);
+    if ( a2 || !stdConffile_OpenRead(PathName) )
+    {
+        memset(&sithSave_headerTmp, 0, sizeof(sithSave_headerTmp));
+        sithSave_headerTmp.version = 6;
+        _strncpy(sithSave_headerTmp.episodeName, sithWorld_pCurWorld->episodeName, 0x7Fu);
+        sithSave_headerTmp.episodeName[127] = 0;
+        _strncpy(sithSave_headerTmp.jklName, sithWorld_pCurWorld->map_jkl_fname, 0x7Fu);
+        sithSave_headerTmp.jklName[127] = 0;
+        _wcsncpy(sithSave_headerTmp.saveName, v5, 0xFFu);
+        sithSave_headerTmp.saveName[255] = 0;
+        v6 = g_localPlayerThing->actorParams.maxHealth;
+        sithSave_headerTmp.playerHealth = g_localPlayerThing->actorParams.health;
+        sithSave_headerTmp.playerMaxHealth = v6;
+        v7 = sithSave_headerTmp.binAmts;
+        v8 = g_selfPlayerInfo->iteminfo;
+        do
+        {
+            v9 = v8->ammoAmt;
+            ++v8;
+            *v7++ = v9;
+        }
+        while ( (int)v7 < (int)sithSave_headerTmp.saveName );
+        sithSave_dword_835900 = 2;
+        _strncpy(sithSave_fpath, PathName, 0x7Fu);
+        sithSave_fpath[127] = 0;
+        result = 1;
+    }
+    else
+    {
+        stdConffile_Close();
+        result = 0;
+    }
+    return result;
+}
+
+int sithSave_WriteEntry()
+{
+    int result; // eax
+    int v1; // esi
+    char *v2; // eax
+    char *v3; // eax
+    wchar_t *v4; // eax
+
+    if ( sithSave_dword_835900 == 1 )
+    {
+        if ( sithSave_LoadEntry(sithSave_fpath) )
+        {
+LABEL_18:
+            sithSave_dword_835900 = 0;
+            return 1;
+        }
+LABEL_17:
+        sith_set_sithmode_5();
+        goto LABEL_18;
+    }
+    if ( sithSave_dword_835900 != 2 )
+    {
+        result = sithSave_dword_835900 - 3;
+        if ( sithSave_dword_835900 != 3 )
+            return result;
+        if ( sithSave_LoadEntry(sithSave_fpath) )
+        {
+            sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
+            sithSave_dword_835900 = 0;
+            return 1;
+        }
+        goto LABEL_17;
+    }
+    if ( (g_localPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithSave_fpath) )
+    {
+        v1 = sithCogVm_multiplayerFlags;
+        sithCogVm_multiplayerFlags = 4;
+        stdConffile_Write(&sithSave_headerTmp, sizeof(sithSave_Header));
+        if ( sithSave_funcWrite )
+            sithSave_funcWrite();
+        stdConffile_Write(sithWorld_pCurWorld->map_jkl_fname, 32);
+        stdConffile_Write(&sithTime_curMs, 4);
+        stdConffile_Write(&g_sithMode, 24);
+        sithSave_SerializeAllThings(4);
+        if ( sithSave_func1 )
+            sithSave_func1();
+        stdConffile_CloseWrite();
+        v2 = stdFnames_FindMedName(sithSave_fpath);
+        _strncpy(sithSave_autosave_fname, v2, 0x7Fu);
+        sithSave_autosave_fname[127] = 0;
+        if ( sithSave_dword_835914 )
+        {
+            v3 = stdFnames_FindMedName(sithSave_fpath);
+            _strncpy(sithSave_saveName, v3, 0x7Fu);
+            sithSave_saveName[127] = 0;
+            _wcsncpy(sithSave_wsaveName, sithSave_headerTmp.saveName, 0xFFu);
+            sithSave_wsaveName[255] = 0;
+            v4 = sithStrTable_GetString("GAME_SAVED");
+            DebugConsole_PrintUniStr(v4);
+        }
+        sithCogVm_multiplayerFlags = v1;
+    }
+    sithSave_dword_835900 = 0;
+    return 0;
 }

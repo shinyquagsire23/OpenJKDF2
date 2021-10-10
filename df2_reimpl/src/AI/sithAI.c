@@ -546,6 +546,45 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     return result;
 }
 
+// Unused
+void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
+{
+    sithThing *v3; // esi
+    sithActor *v4; // edi
+    uint32_t v5; // eax
+    int v6; // ebp
+    unsigned int v7; // ebx
+    rdVector3 *v8; // esi
+    rdVector3 *v9; // eax
+    rdVector3 a1; // [esp+10h] [ebp-Ch] BYREF
+
+    v3 = a3;
+    v4 = a2->actor;
+    v4->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.numFrames);
+    v4->numFrames = a3->trackParams.numFrames;
+    v5 = a3->trackParams.loadedFrames;
+    v6 = 0;
+    v7 = 0;
+    v4->loadedFrames = v5;
+    if ( v5 )
+    {
+        while ( 1 )
+        {
+            v8 = &v3->trackParams.frames[v6].pos;
+            rdVector_Rotate3(&a1, a4, v8 + 1);
+            v9 = &v4->framesAlloc[v7];
+            ++v7;
+            ++v6;
+            v9->x = v8->x + a1.x;
+            v9->y = v8->y + a1.y;
+            v9->z = v8->z + a1.z;
+            if ( v7 >= v4->loadedFrames )
+                break;
+            v3 = a3;
+        }
+    }
+}
+
 void sithAI_Tick(sithThing *thing, float deltaSeconds)
 {
     if ( thing->thingType == THINGTYPE_ACTOR && thing->actorParams.health > 0.0 )

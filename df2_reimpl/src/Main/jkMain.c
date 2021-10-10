@@ -559,9 +559,7 @@ void jkMain_TitleShow()
 {
     jkGuiTitle_ShowLoadingStatic();
     sith_Load("static.jkl");
-//#ifndef LINUX_TMP
     jkHudInv_items_init();
-//#endif
 }
 
 void jkMain_TitleTick()

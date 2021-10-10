@@ -89,6 +89,7 @@ typedef struct sithTimer sithTimer;
 typedef struct sithTimerInfo sithTimerInfo;
 typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 typedef struct sithMap sithMap;
+typedef struct sithMapView sithMapView;
 typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
 typedef struct stdALBuffer stdALBuffer;
