@@ -545,3 +545,11 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
             thing->actorParams.field_1BC = 0;
     }
 }
+
+int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass)
+{
+    if ( thing->soundclass == soundclass )
+        return 0;
+    thing->soundclass = soundclass;
+    return 1;
+}

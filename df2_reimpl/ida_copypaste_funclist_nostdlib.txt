@@ -2348,7 +2348,7 @@ sithSoundClass_ThingPlaySoundclass	.text	004E6B70	0000009F	00000014	00000008	R	.
 sithSoundClass_ThingPlaySoundclass5	.text	004E6C10	0000008A	00000014	0000000C	R	.	.	.	.	.	T	.
 sithSoundClass_ThingPauseSoundclass	.text	004E6CA0	0000002C	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_ThingPlaySoundclass2	.text	004E6CD0	00000093	00000010	0000000C	R	.	.	.	.	.	T	.
-sithSoundClass_sub_4E6D70	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	.	.
+sithSoundClass_SetThingSoundClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	.	.
 sithUnk3_Startup	.text	004E6D90	0000018C	00000004	00000000	R	.	.	.	.	.	.	.
 sithUnk3_Shutdown	.text	004E6F20	00000014			R	.	.	.	.	.	.	.
 sithUnk3_RegisterCollisionHandler	.text	004E6F40	0000005D	00000008	00000010	R	.	.	.	.	.	T	.

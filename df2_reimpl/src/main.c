@@ -1530,6 +1530,7 @@ void do_hooks()
     hook_function(sithSoundClass_PlayThingSoundclass_ADDR, sithSoundClass_PlayThingSoundclass);
     hook_function(sithSoundClass_ThingPauseSoundclass_ADDR, sithSoundClass_ThingPauseSoundclass);
     hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
+    hook_function(sithSoundClass_SetThingSoundClass_ADDR, sithSoundClass_SetThingSoundClass);
     
     // sithSoundSys
     hook_function(sithSoundSys_Startup_ADDR, sithSoundSys_Startup);

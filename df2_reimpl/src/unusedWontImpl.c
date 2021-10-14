@@ -4,3 +4,5 @@ void sithWorld_Parse(){} // editor leftover?
 void sithWorld_RemoveSectionParser(){} // ?? useless
 void sithWorld_CalcFaceNormals(){} // editor leftover
 void sithWorld_TimeSectionParse(){} // inlined?
+void sithSoundClass_allocidk(){} // inlined?
+void sithSoundClass_Free(){} // weird unused hashtable?

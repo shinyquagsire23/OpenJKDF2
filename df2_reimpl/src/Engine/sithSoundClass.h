@@ -18,7 +18,7 @@
 #define sithSoundClass_ThingPlaySoundclass5_ADDR (0x004E6C10)
 #define sithSoundClass_ThingPauseSoundclass_ADDR (0x004E6CA0)
 #define sithSoundClass_ThingPlaySoundclass2_ADDR (0x004E6CD0)
-#define sithSoundClass_sub_4E6D70_ADDR (0x004E6D70)
+#define sithSoundClass_SetThingSoundClass_ADDR (0x004E6D70)
 
 #define sithSoundClass_hashtable (*(stdHashTable**)0x00847F1C)
 #define sithSoundClass_nameToKeyHashtable (*(stdHashTable**)0x00847F20)
@@ -155,6 +155,7 @@ void sithSoundClass_Free2(sithWorld *world);
 sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2);
 void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3);
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound);
+int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass);
 
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;
