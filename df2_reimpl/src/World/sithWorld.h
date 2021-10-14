@@ -27,7 +27,7 @@
 #define sithWorld_sub_4D08B0_ADDR (0x004D08B0)
 #define sithWorld_sub_4D0930_ADDR (0x004D0930)
 #define sithWorld_sub_4D0A20_ADDR (0x004D0A20)
-#define sithWorld_sub_4D0AA0_ADDR (0x004D0AA0)
+#define sithWorld_ResetSectorRuntimeAlteredVars_ADDR (0x004D0AA0)
 #define sithWorld_Verify_ADDR (0x004D0B00)
 #define sithWorld_CalcChecksum_ADDR (0x004D0C30)
 #define sithWorld_Initialize_ADDR (0x004D0D10)
@@ -141,12 +141,17 @@ int sithWorld_Initialize();
 int sithWorld_LoadGeoresource(sithWorld *world, int a2);
 void sithWorld_sub_4D0A20(sithWorld *world);
 void sithWorld_Free();
+void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world);
+
+//TODO list
+// sithWorld_GetMemorySize
+
 
 //static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
 //static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
-static void (*sithWorld_sub_4D0AA0)(sithWorld *world) = (void*)sithWorld_sub_4D0AA0_ADDR;
+//static void (*sithWorld_ResetSectorRuntimeAlteredVars)(sithWorld *world) = (void*)sithWorld_ResetSectorRuntimeAlteredVars_ADDR;
 
 #define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
 #define sithWorld_pStatic (*(sithWorld**)0x8339CC)

@@ -6,6 +6,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithSound.h"
+#include "Engine/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
 #include "Cog/sithCogScript.h"
 #include "Engine/sithKeyFrame.h"
@@ -740,4 +741,89 @@ void sithWorld_Free()
         sithWorld_pCurWorld = 0;
         sithWorld_bLoaded = 0;
     }
+}
+
+void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world)
+{
+    for (int i = 0; i < world->numMaterialsLoaded; i++)
+    {
+        world->materials[i].celIdx = 0;;
+    }
+
+    for (int i = 0; i < world->numSectors; i++)
+    {
+        rdVector_Zero3(&world->sectors[i].thrust);
+        world->sectors[i].id = 0;
+        world->sectors[i].ambientLight = 0.0;
+        world->sectors[i].extraLight = 0.0;
+    }
+    sithPlayer_ResetPalEffects();
+}
+
+void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuantity)
+{
+    _memset(outAllocated, 0, sizeof(int) * 0x11);
+    _memset(outQuantity, 0, sizeof(int) * 0x11);
+    outQuantity[0] = world->numMaterialsLoaded;
+    for (int i = 0; i < world->numMaterialsLoaded; i++)
+    {
+        outAllocated[0] += sithMaterial_GetMemorySize(&world->materials[i]);
+    }
+    outQuantity[1] = world->numVertices;
+    outAllocated[1] = 0x34 * world->numVertices;               // TODO: what is this size?
+    outQuantity[2] = world->numVertexUVs;
+    outAllocated[2] = sizeof(rdVector2) * world->numVertexUVs;
+    outQuantity[3] = world->numSurfaces;
+    for (int i = 0; i < world->numSurfaces; i++)
+    {
+        outAllocated[3] += sizeof(rdVector3) * world->surfaces[i].surfaceInfo.face.numVertices + sizeof(sithSurface);
+    }
+    outQuantity[4] = world->numAdjoinsLoaded;
+    outAllocated[4] = sizeof(sithAdjoin) * world->numAdjoinsLoaded;
+    outQuantity[5] = world->numSectors;
+    for (int i = 0; i < world->numSectors; i++)
+    {
+        outAllocated[5] += 4 * world->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
+    }
+    outQuantity[6] = world->numSoundsLoaded;
+    for (int i = 0; i < world->numSoundsLoaded; i++)
+    {
+        outAllocated[6] += world->sounds[i].bufferBytes + sizeof(sithSound);
+    }
+    outQuantity[8] = world->numCogScriptsLoaded;
+    for (int i = 0; i < world->numCogScriptsLoaded; i++)
+    {
+        outAllocated[8] += 4 * (7 * world->cogScripts[i].symbolTable->entry_cnt + world->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
+    }
+    outQuantity[7] = world->numCogsLoaded;
+    for (int i = 0; i < world->numCogsLoaded; i++)
+    {
+        outAllocated[7] += 28 * world->cogs[i].symbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
+    }
+    outQuantity[10] = world->numModelsLoaded;
+    for (int i = 0; i < world->numModelsLoaded; i++)
+    {
+        outAllocated[10] += sithModel_GetMemorySize(&world->models[i]);
+    }
+    outQuantity[11] = world->numKeyframesLoaded;
+    for (int i = 0; i < world->numKeyframesLoaded; i++)
+    {
+        outAllocated[11] += sizeof(rdJoint) * (world->keyframes[i].numJoints2 + 3);
+        for (int j = 0; j < world->keyframes[i].numJoints2; j++)
+        {
+            outAllocated[11] += sizeof(rdAnimEntry) * world->keyframes[i].joints[j].numAnimEntries;
+        }
+    }
+    outQuantity[12] = world->numAnimClassesLoaded;
+    outAllocated[12] = sizeof(sithAnimclass) * world->numAnimClassesLoaded;
+    outQuantity[13] = world->numSpritesLoaded;
+    outAllocated[13] = sizeof(rdSprite) * world->numSpritesLoaded;
+    for (int i = 0; i < world->numSpritesLoaded; i++)
+    {
+        outAllocated[13] += sizeof(rdTri) * world->sprites[i].face.numVertices;
+    }
+    outQuantity[14] = world->numTemplatesLoaded;
+    outQuantity[15] = world->numThingsLoaded;
+    outAllocated[14] = sizeof(sithThing) * world->numTemplatesLoaded;
+    outAllocated[15] = sizeof(sithThing) * world->numThingsLoaded;
 }

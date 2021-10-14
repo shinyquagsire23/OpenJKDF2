@@ -1021,7 +1021,11 @@ void do_hooks()
     hook_function(sithControl_HandlePlayer_ADDR, sithControl_HandlePlayer);
     
     // sithActor
+    hook_function(sithActor_Tick_ADDR, sithActor_Tick);
     hook_function(sithActor_Remove_ADDR, sithActor_Remove);
+    hook_function(sithActor_cogMsg_OpenDoor_ADDR, sithActor_cogMsg_OpenDoor);
+    hook_function(sithActor_JumpWithVel_ADDR, sithActor_JumpWithVel);
+    hook_function(sithActor_cogMsg_WarpThingToCheckpoint_ADDR, sithActor_cogMsg_WarpThingToCheckpoint);
     
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);
@@ -1152,6 +1156,7 @@ void do_hooks()
     hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
     hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
     hook_function(sithWorld_CalcChecksum_ADDR, sithWorld_CalcChecksum);
+    hook_function(sithWorld_ResetSectorRuntimeAlteredVars_ADDR, sithWorld_ResetSectorRuntimeAlteredVars);
 
     // sithInventory
     hook_function(sithInventory_NewEntry_ADDR, sithInventory_NewEntry);

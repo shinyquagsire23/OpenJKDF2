@@ -3,6 +3,7 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithUnk3.h"
+#include "World/jkPlayer.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithTime.h"
@@ -210,4 +211,31 @@ void sithActor_Remove(sithThing *thing)
     thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
     thing->lifeLeftMs = 20000;
     sithSector_ThingLandIdk(thing, 0);
+}
+
+void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
+{
+    sithPlayerInfo *v2; // eax
+    sithSector *v3; // [esp-8h] [ebp-14h]
+
+    if ( idx < (unsigned int)jkPlayer_maxPlayers )
+    {
+        v2 = &jkPlayer_playerInfos[idx];
+        if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
+        {
+            _memcpy(&thing->lookOrientation, &v2->field_135C, sizeof(thing->lookOrientation));
+            v3 = v2->field_138C;
+            thing->position = thing->lookOrientation.scale;
+            thing->lookOrientation.scale.x = rdroid_zeroVector3.x;
+            thing->lookOrientation.scale.y = 0.0;
+            thing->lookOrientation.scale.z = 0.0;
+            sithThing_MoveToSector(thing, v3, 0);
+        }
+        if ( thing->move_type == MOVETYPE_PHYSICS )
+        {
+            sithSector_StopPhysicsThing(thing);
+            thing->physicsParams.physflags &= ~PHYSFLAGS_100;
+            sithSector_ThingLandIdk(thing, 1);
+        }
+    }
 }

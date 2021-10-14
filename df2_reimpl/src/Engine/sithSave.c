@@ -93,7 +93,7 @@ int sithSave_LoadEntry(char *fpath)
     {
         if ( !_strcmp(SrcStr, sithWorld_pCurWorld->map_jkl_fname) )
         {
-            sithWorld_sub_4D0AA0(sithWorld_pCurWorld);
+            sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurWorld);
             goto LABEL_11;
         }
         sith_Close();

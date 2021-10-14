@@ -1954,7 +1954,7 @@ sithWorld_SetSectionParser	.text	004D0820	00000086	0000000C	00000008	R	.	.	.	.	.
 sithWorld_RemoveSectionParser	.text	004D08B0	0000007C	0000000C	00000004	R	.	.	.	.	.	.	.
 sithWorld_CalcFaceNormals	.text	004D0930	000000ED	00000018	00000004	R	.	.	.	.	.	T	.
 sithWorld_sub_4D0A20	.text	004D0A20	00000078	00000008	00000004	R	.	.	.	.	.	T	.
-sithWorld_sub_4D0AA0	.text	004D0AA0	0000005B	00000008	00000004	R	.	.	.	.	.	T	.
+sithWorld_ResetSectorRuntimeAlteredVars	.text	004D0AA0	0000005B	00000008	00000004	R	.	.	.	.	.	T	.
 sithWorld_Verify	.text	004D0B00	00000128	00000000	00000004	R	.	.	.	.	.	T	.
 sithWorld_CalcChecksum	.text	004D0C30	000000DB	0000000C	00000008	R	.	.	.	.	.	T	.
 sithWorld_Initialize	.text	004D0D10	00000038	00000004	00000000	R	.	.	.	.	.	.	.
