@@ -278,6 +278,7 @@ void do_hooks()
     hook_function(sithCog_SendMessageEx_ADDR, sithCog_SendMessageEx);
     hook_function(sithCog_Free_ADDR, sithCog_Free);
     hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
+    hook_function(sithCog_GetByIdx_ADDR, sithCog_GetByIdx);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
     hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
@@ -629,6 +630,8 @@ void do_hooks()
 
     // sithThingPlayer
     hook_function(sithThingPlayer_cogMsg_SendSendTrigger_ADDR, sithThingPlayer_cogMsg_SendSendTrigger);
+    hook_function(sithThingPlayer_cogMsg_HandleSendTrigger_ADDR, sithThingPlayer_cogMsg_HandleSendTrigger);
+    hook_function(sithThingPlayer_cogMsg_SendSyncCog_ADDR, sithThingPlayer_cogMsg_SendSyncCog);
     
     // Window
     hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);
@@ -1058,6 +1061,7 @@ void do_hooks()
     hook_function(sithThing_AttachThing_ADDR, sithThing_AttachThing);
     hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
     hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
+    hook_function(sithThing_GetById_ADDR, sithThing_GetById);
     
     // sithSector
     hook_function(sithSector_Startup_ADDR, sithSector_Startup);

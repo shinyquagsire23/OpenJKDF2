@@ -63,6 +63,8 @@ enum COGFLAGS
 {
     COGFLAGS_TRACE = 1,
     COGFLAGS_PAUSED = 2,
+    COGFLAGS_PULSE = 4,
+    COGFLAGS_8 = 8,
 };
 
 enum COGMSG_ID

@@ -145,7 +145,7 @@ jkGuiRend                      0x2cd7     1.064%        100.000%       68 / 68
 jkPlayer                       0x2da2     1.083%        100.000%       45 / 45         
 sithWeapon                     0x32a8     1.202%        100.000%       33 / 33         
 sithCogThing                   0x3a4c     1.384%        100.000%      142 / 142        
-sithThingPlayer                0x460      0.104%        23.214%         1 / 4          
+sithThingPlayer                0x460      0.104%        77.232%         3 / 4          
 smack                          0x466      0.104%        0.000%          0 / 6          
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 Video                          0x5dc      0.139%        19.800%         3 / 5          
@@ -203,7 +203,7 @@ rdActive                       0x1a55     0.625%        2.626%          3 / 8
 sithSurface                    0x1c6a     0.674%        92.095%        28 / 35         
 jkHud                          0x1c9b     0.679%        0.178%          1 / 17         
 jkDev                          0x1e60     0.721%        0.617%          1 / 39         
-sithCog                        0x1ed3     0.732%        89.837%        20 / 28         
+sithCog                        0x1ed3     0.732%        90.686%        21 / 28         
 jkSaber                        0x1f4a     0.743%        38.989%        12 / 40         
 sithMulti                      0x252a     0.882%        0.105%          1 / 35         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
@@ -212,7 +212,7 @@ sithControl                    0x2723     0.929%        34.944%         9 / 32
 sithUnk3                       0x2827     0.953%        91.760%        18 / 22         
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
 rdCache                        0x331c     1.213%        43.557%        13 / 16         
-sithThing                      0x3c2e     1.429%        86.317%        43 / 53         
+sithThing                      0x3c2e     1.429%        87.200%        44 / 53         
 sithSector                     0x79f9     2.895%        49.800%        29 / 96         
 rdClip                         0x81f2     3.085%        63.242%        12 / 17         
 rdRaster                       0xf04d     5.704%        0.195%          1 / 89         
@@ -223,15 +223,15 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-38.665% by weight
-65.315% by weight excluding rasterizer
-1967 / 3167 functions
-1967 / 2796 functions excluding rasterizer
+38.740% by weight
+65.442% by weight excluding rasterizer
+1971 / 3167 functions
+1971 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           4.768%          232 / 1322
+sith           4.693%          228 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.482%          187 / 360
 jkGui          3.630%          120 / 284
@@ -240,12 +240,12 @@ jk             2.775%          143 / 322
 Raster         40.792%         370 / 371
 other          1.536%           80 / 120
 -----------------------------------------
-total          61.335%        1200 / 3167
+total          61.260%        1196 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           8.055%          232 / 1322
+sith           7.928%          228 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.572%          187 / 360
 jkGui          6.132%          120 / 284
@@ -253,6 +253,6 @@ rd             5.180%           35 / 345
 jk             4.688%          143 / 322
 other          2.595%           80 / 120
 -----------------------------------------
-total          34.704%         830 / 2796
+total          34.577%         826 / 2796
 
 ```

@@ -481,32 +481,28 @@ sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2
 
 void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3)
 {
-    sithSound *v3; // edi
-    int v4; // ebx
     int v5; // eax
     float a3a; // [esp+1Ch] [ebp+Ch]
 
-    v3 = entry->sound;
     if ( entry->sound )
     {
-        v4 = entry->playflags;
         a3a = entry->maxVolume * a3;
-        if ( (v4 & 0x400) != 0 )
+        if ( (entry->playflags & 0x400) != 0 )
         {
-            v5 = sithSoundSys_GetThingSoundIdx(0, v3);
+            v5 = sithSoundSys_GetThingSoundIdx(0, entry->sound);
         }
         else
         {
-            if ( (v4 & 0x800) == 0 )
+            if ( (entry->playflags & 0x800) == 0 )
             {
 LABEL_7:
-                if ( (v4 & 0x40) != 0 )
-                    sithSoundSys_PlaySoundPosAbsolute(v3, &thing->position, thing->sector, a3a, entry->minRadius, entry->maxRadius, v4);
+                if ( (entry->playflags & 0x40) != 0 )
+                    sithSoundSys_PlaySoundPosAbsolute(entry->sound, &thing->position, thing->sector, a3a, entry->minRadius, entry->maxRadius, entry->playflags);
                 else
-                    sithSoundSys_PlaySoundPosThing(v3, thing, a3a, entry->minRadius, entry->maxRadius, v4);
+                    sithSoundSys_PlaySoundPosThing(entry->sound, thing, a3a, entry->minRadius, entry->maxRadius, entry->playflags);
                 return;
             }
-            v5 = sithSoundSys_GetThingSoundIdx(thing, v3);
+            v5 = sithSoundSys_GetThingSoundIdx(thing, entry->sound);
         }
         if ( v5 >= 0 )
             return;
@@ -516,34 +512,23 @@ LABEL_7:
 
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
 {
-    unsigned int v2; // ebp
     sithPlayingSound* v3; // esi
-    int v4; // eax
     sithPlayingSound *v5; // edi
-    int v6; // edx
-    int v7; // eax
-    IDirectSoundBuffer *v8; // [esp-4h] [ebp-14h]
 
-    if ( sithSoundSys_bOpened )
+    if (!sithSoundSys_bOpened)
+        return;
+
+    for (int i = 0; i < sithSoundSys_numSoundsAvailable; i++)
     {
-        v2 = 0;
-        if ( sithSoundSys_numSoundsAvailable )
+        v3 = &sithSoundSys_aPlayingSounds[i];
+        if ( v3->flags & 0x80 && thing == v3->thing && (!sound || v3->sound == sound) )
         {
-            v3 = &sithSoundSys_aPlayingSounds[0];
-            do
-            {
-                if ( v3->flags & 0x80 && thing == v3->thing && (!sound || v3->sound == sound) )
-                {
-                    sithSoundSys_StopSound(v3);
-                }
-                ++v2;
-                v3++;
-            }
-            while ( v2 < sithSoundSys_numSoundsAvailable );
+            sithSoundSys_StopSound(v3);
         }
-        if ( !sound && thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
-            thing->actorParams.field_1BC = 0;
     }
+
+    if ( !sound && thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
+        thing->actorParams.field_1BC = 0;
 }
 
 int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass)

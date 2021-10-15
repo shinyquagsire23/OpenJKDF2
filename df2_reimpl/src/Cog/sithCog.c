@@ -1310,3 +1310,23 @@ int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info)
         sithCog_SendMessageEx(v4, SITH_MESSAGE_TIMER, SENDERTYPE_COG, v4->selfCog, 0, 0, info->timerIdx, info->field_10, info->field_14, 0.0, 0.0);
     return 1;
 }
+
+sithCog* sithCog_GetByIdx(int idx)
+{
+    sithWorld *world; // ecx
+    sithCog *result; // eax
+
+    world = sithWorld_pCurWorld;
+    if ( (idx & 0x8000) != 0 )
+    {
+        world = sithWorld_pStatic;
+        idx &= ~0x8000u;
+    }
+
+    if ( world && idx >= 0 && idx < world->numCogsLoaded )
+        result = &world->cogs[idx];
+    else
+        result = NULL;
+
+    return result;
+}

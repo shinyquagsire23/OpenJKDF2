@@ -2332,3 +2332,29 @@ int sithThing_ShouldSync(sithThing *thing)
         result = !thing->lifeLeftMs || result != THINGTYPE_DEBRIS && result != THINGTYPE_PARTICLE;
     return result;
 }
+
+sithThing* sithThing_GetById(int thing_id)
+{
+    sithThing *result; // eax
+
+    if ( thing_id < 0 )
+        return 0;
+    if ( (thing_id & 0xFFFF0000) == 0 && thing_id < sithWorld_pCurWorld->numThingsLoaded )
+    {
+        result = &sithWorld_pCurWorld->things[thing_id];
+        if ( result->thingType )
+            return result;
+    }
+
+    if ( sithWorld_pCurWorld->numThings < 0 )
+        return 0;
+    
+    for (int i = 0; i < sithWorld_pCurWorld->numThings; i++)
+    {
+        sithThing* iter = &sithWorld_pCurWorld->things[i];
+        if (iter->thing_id == thing_id && iter->thingType != THINGTYPE_FREE)
+            return iter;
+    }
+
+    return NULL;
+}

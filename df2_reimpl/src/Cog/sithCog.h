@@ -62,7 +62,7 @@
 #define sithCog_numSurfaceLinks (*(int*)0x00836C34)
 #define sithCog_aSurfaceLinks ((sithCogSurfaceLink*)0x8B9C60)
 
-#define NETMSG_START void* craftingPacket = &g_netMsgTmp.pktData[0]
+#define NETMSG_START void* craftingPacket = &g_netMsgTmp.pktData[0];
 #define NETMSG_PUSHU8(x) { *(uint8_t*)craftingPacket = x; craftingPacket += sizeof(uint8_t); }
 #define NETMSG_PUSHU16(x) { *(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t); }
 #define NETMSG_PUSHU32(x) { *(uint32_t*)craftingPacket = x; craftingPacket += sizeof(uint32_t); }
@@ -72,6 +72,13 @@
                             g_netMsgTmp.netMsg.cogMsgId = msgid; \
                             g_netMsgTmp.netMsg.msg_size = len; \
                           }
+
+#define NETMSG_IN_START(x) void* _readingPacket = &x->pktData[0]
+#define NETMSG_POPU8() ({ uint8_t _readingOut = *(uint8_t*)_readingPacket; _readingPacket += sizeof(uint8_t); _readingOut; })
+#define NETMSG_POPU16() ({ uint16_t _readingOut = *(uint16_t*)_readingPacket; _readingPacket += sizeof(uint16_t); _readingOut; })
+#define NETMSG_POPU32() ({ uint32_t _readingOut = *(uint32_t*)_readingPacket; _readingPacket += sizeof(uint32_t); _readingOut; })
+#define NETMSG_POPF32() ({ float _readingOut = *(float*)_readingPacket; _readingPacket += sizeof(float); _readingOut; })
+#define NETMSG_IN_END {}
 
 typedef int SITH_MESSAGE;
 
@@ -199,6 +206,7 @@ void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2,
 void sithCogScript_TickAll();
 void sithCogScript_Tick(sithCog *cog);
 int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info);
+sithCog* sithCog_GetByIdx(int idx);
 
 #define sithCog_masterCog (*(sithCog**)0x008B542C)
 
