@@ -206,6 +206,7 @@ void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2,
 void sithCogScript_TickAll();
 void sithCogScript_Tick(sithCog *cog);
 int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info);
+void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra);
 sithCog* sithCog_GetByIdx(int idx);
 
 #define sithCog_masterCog (*(sithCog**)0x008B542C)

@@ -63,7 +63,11 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     if ( v4 == -1 )
         return 0;
-    _strcpy(a2->fpath, v6.name);
+
+    // Added: strcpy -> strncpy
+    _strncpy(a2->fpath, v6.name, sizeof(a2->fpath)-1);
+
+    jk_printf("%s\n", a2->fpath);
 
     a2->time_write = v6.time_write;
     a2->is_subdirectory = v6.attrib & 0x10;

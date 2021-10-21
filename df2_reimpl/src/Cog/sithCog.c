@@ -1311,6 +1311,54 @@ int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info)
     return 1;
 }
 
+void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
+{
+    sithWorld *world; // esi
+    sithCog *v3; // ebp
+    sithCogSymboltable *v4; // eax
+    unsigned int v5; // ebx
+    sithCogSymbol *v6; // esi
+    const char *v7; // eax
+    uint32_t tmp;
+
+    world = sithWorld_pCurWorld;
+    if ( sithWorld_pCurWorld
+      && extra
+      && _sscanf(extra, "%d", &tmp) == 1
+      && tmp <= world->numCogsLoaded
+      && (v3 = &world->cogs[tmp], v3->cogscript)
+      && v3->symbolTable )
+    {
+        _sprintf(std_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
+        DebugConsole_Print(std_genBuffer);
+        v4 = v3->symbolTable;
+        v5 = 0;
+        v6 = v4->buckets;
+        if ( v4->entry_cnt )
+        {
+            do
+            {
+                v7 = v6->field_18;
+                if ( !v7 )
+                    v7 = "<null>";
+                _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
+                if ( v6->symbol_type == 2 )
+                    _sprintf(&std_genBuffer[strlen(std_genBuffer)], " = %f\n", *(float *)&v6->symbol_name);
+                else
+                    _sprintf(&std_genBuffer[strlen(std_genBuffer)], " = %d\n", v6->symbol_name);
+                DebugConsole_Print(std_genBuffer);
+                ++v5;
+                ++v6;
+            }
+            while ( v5 < v3->symbolTable->entry_cnt );
+        }
+    }
+    else
+    {
+        DebugConsole_Print("Error, bad parameters.\n");
+    }
+}
+
 sithCog* sithCog_GetByIdx(int idx)
 {
     sithWorld *world; // ecx

@@ -319,20 +319,15 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     a1 = search;
     if ( search )
     {
-        if ( stdFileUtil_FindNext(search, &a2) )
+        while ( stdFileUtil_FindNext(search, &a2) )
         {
-            do
-            {
-                v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1);
-                v15 = _strcpy(v14, a2.fpath);
-                v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
-                jkGuiRend_DarrayReallocStr(array, v16, (int)v15);
-                ++v22;
-            }
-            while ( stdFileUtil_FindNext(a1, &a2) );
-            v13 = a1;
+            v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1);
+            v15 = _strcpy(v14, a2.fpath);
+            v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
+            jkGuiRend_DarrayReallocStr(array, v16, (int)v15);
+            ++v22;
         }
-        stdFileUtil_DisposeFind(v13);
+        stdFileUtil_DisposeFind(search);
     }
     if ( (!v13 || !v22) && a6 > 0 )
     {

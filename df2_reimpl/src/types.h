@@ -101,6 +101,7 @@ typedef struct jkGuiStringEntry jkGuiStringEntry;
 
 typedef struct videoModeStruct videoModeStruct;
 typedef struct common_functions common_functions;
+typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
 
 typedef struct Darray Darray;
 

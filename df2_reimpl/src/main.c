@@ -62,6 +62,7 @@
 #include "Engine/sithControl.h"
 #include "Engine/sithTime.h"
 #include "Engine/sith.h"
+#include "Engine/sithDebugConsole.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
@@ -104,6 +105,7 @@
 #include "World/sithActor.h"
 #include "World/sithTrackThing.h"
 #include "World/sithThingPlayer.h"
+#include "Win95/DebugConsole.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -266,7 +268,10 @@ void do_hooks()
     
     // jkDev
     hook_function(jkDev_Close_ADDR, jkDev_Close);
+
+#ifdef LINUX
     hook_function(jkDev_PrintUniString_ADDR, jkDev_PrintUniString);
+#endif
     
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
@@ -290,6 +295,7 @@ void do_hooks()
     hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
     hook_function(sithCogScript_RegisterGlobalMessage_ADDR, sithCogScript_RegisterGlobalMessage);
     hook_function(sithCogScript_TimerTick_ADDR, sithCogScript_TimerTick);
+    hook_function(sithCogScript_DevCmdCogStatus_ADDR, sithCogScript_DevCmdCogStatus);
     
     // sithCogVm
     hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
@@ -1828,6 +1834,24 @@ void do_hooks()
     hook_function(Darray_GetIndex_ADDR, Darray_GetIndex);
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
+    
+    // DebugConsole
+    hook_function(DebugConsole_Initialize_ADDR, DebugConsole_Initialize);
+    hook_function(DebugConsole_Shutdown_ADDR, DebugConsole_Shutdown);
+    hook_function(DebugConsole_Open_ADDR, DebugConsole_Open);
+    hook_function(DebugConsole_Close_ADDR, DebugConsole_Close);
+    hook_function(DebugConsole_Print_ADDR, DebugConsole_Print);
+    hook_function(DebugConsole_PrintUniStr_ADDR, DebugConsole_PrintUniStr);
+    hook_function(DebugConsole_TryCommand_ADDR, DebugConsole_TryCommand);
+    hook_function(DebugConsole_sub_4DA100_ADDR, DebugConsole_sub_4DA100);
+    hook_function(DebugConsole_AdvanceLogBuf_ADDR, DebugConsole_AdvanceLogBuf);
+    hook_function(DebugConsole_RegisterDevCmd_ADDR, DebugConsole_RegisterDevCmd);
+    hook_function(DebugConsole_SetPrintFuncs_ADDR, DebugConsole_SetPrintFuncs);
+    hook_function(DebugConsole_PrintHelp_ADDR, DebugConsole_PrintHelp);
+    hook_function(DebugConsole_AlertSound_ADDR, DebugConsole_AlertSound);
+
+    // sithDebugConsole
+    hook_function(sithDebugConsole_Initialize_ADDR, sithDebugConsole_Initialize);
 
     //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time

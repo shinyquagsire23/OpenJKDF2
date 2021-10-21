@@ -35,7 +35,6 @@ int jkEpisode_LoadVerify()
     int result; // eax
     jkEpisode *v16; // ebx
     int v17; // eax
-    char *v18; // esi
     int v19; // edi
     char *i; // ecx
     char v21; // al
@@ -164,19 +163,18 @@ LABEL_30:
         {
             jkRes_LoadGob(v16->name);
             v17 = pHS->fileOpen("episode.jk", "rt");
-            v18 = (char *)v17;
             if ( v17 )
             {
                 v19 = 0;
                 pHS->fileGets(v17, v29, 64);
-                if ( !pHS->feof(v18) )
+                if ( !pHS->feof(v17) )
                 {
                     while ( 1 )
                     {
                         if ( !_strchr(v29, '\n') )
                         {
                             do
-                                pHS->fileGets((int)v18, v31, 64);
+                                pHS->fileGets(v17, v31, 64);
                             while ( !_strchr(v31, '\n') );
                         }
                         for ( i = v29; *i == ' ' || *i == '\t'; ++i )
@@ -186,8 +184,8 @@ LABEL_30:
                             v19 = 1;
                         if ( v19 )
                             break;
-                        pHS->fileGets((int)v18, v29, 64);
-                        if ( pHS->feof(v18) )
+                        pHS->fileGets(v17, v29, 64);
+                        if ( pHS->feof(v17) )
                             goto LABEL_50;
                     }
                     stdString_GetQuotedStringContents(v29, jkEpisode_var4, 128);
@@ -196,15 +194,15 @@ LABEL_30:
                     v23 = pHS;
                     v16->field_A0 = 1;
                     v24 = 0;
-                    v23->fileGets((int)v18, v29, 64);
-                    if ( !pHS->feof(v18) )
+                    v23->fileGets(v17, v29, 64);
+                    if ( !pHS->feof(v17) )
                     {
                         while ( 1 )
                         {
                             if ( !_strchr(v29, '\n') )
                             {
                                 do
-                                    pHS->fileGets((int)v18, v32, 64);
+                                    pHS->fileGets(v17, v32, 64);
                                 while ( !_strchr(v32, '\n') );
                             }
                             for ( j = v29; *j == ' ' || *j == '\t'; ++j )
@@ -214,15 +212,15 @@ LABEL_30:
                                 v24 = 1;
                             if ( v24 )
                                 break;
-                            pHS->fileGets((int)v18, v29, 64);
-                            if ( pHS->feof(v18) )
+                            pHS->fileGets(v17, v29, 64);
+                            if ( pHS->feof(v17) )
                                 goto LABEL_50;
                         }
                         _sscanf(v29, "TYPE %d", &v16->field_A0);
                     }
                 }
 LABEL_50:
-                pHS->fileClose((intptr_t)v18);
+                pHS->fileClose((intptr_t)v17);
             }
             else
             {
