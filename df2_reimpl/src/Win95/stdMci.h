@@ -2,6 +2,7 @@
 #define _STDMCI_H
 
 #include "types.h"
+#include "globals.h"
 
 #ifdef WIN32
 #include <mmsystem.h>
@@ -14,11 +15,6 @@
 #define stdMci_Stop_ADDR (0x004382E0)
 #define stdMci_CheckStatus_ADDR (0x00438300)
 #define stdMci_GetTrackLength_ADDR (0x00438360)
-
-#define stdMci_mciId (*(MCIDEVICEID*)0x00563720)
-#define stdMci_dwVolume (*(int*)0x00563724)
-#define stdMci_bInitted (*(int*)0x00563728)
-#define stdMci_uDeviceID (*(int*)0x548118)
 
 int stdMci_Startup();
 void stdMci_Shutdown();

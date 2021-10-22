@@ -152,7 +152,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
 
-    if ( !net_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
+    if ( !sithNet_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
     {
         lastDoorOpenTime = sithTime_curMsAbsolute;
         _memcpy(&out, &thing->lookOrientation, sizeof(out));

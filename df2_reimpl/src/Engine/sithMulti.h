@@ -2,6 +2,7 @@
 #define _SITHMULTI_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithMulti_Startup_ADDR (0x004C9AE0)
 #define sithMulti_Shutdown_ADDR (0x004C9CB0)
@@ -38,11 +39,6 @@
 #define sithMulti_EndLevel_ADDR (0x004CBF90)
 #define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
-
-typedef int (*sithMultiHandler_t)();
-
-#define sithMulti_name ((wchar_t*)0x008C4BE0)
-#define sithMulti_handlerIdk (*(sithMultiHandler_t*)0x0083264C)
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 

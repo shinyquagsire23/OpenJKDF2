@@ -2,6 +2,7 @@
 #define _DEBUGCONSOLE_H
 
 #include "types.h"
+#include "globals.h"
 
 #define DebugConsole_Initialize_ADDR (0x004D9DB0)
 #define DebugConsole_Shutdown_ADDR (0x004D9E90)
@@ -16,36 +17,6 @@
 #define DebugConsole_SetPrintFuncs_ADDR (0x004DA1B0)
 #define DebugConsole_PrintHelp_ADDR (0x004DA1D0)
 #define DebugConsole_AlertSound_ADDR (0x004DA3D0)
-
-#define DebugGui_aIdk ((int*)0x008BBF80) // int[32]
-#define DebugGui_idk (*(int*)0x008BC000)
-#define DebugGui_some_line_amt (*(int*)0x008BC004)
-#define DebugGui_some_num_lines (*(int*)0x008BC008)
-#define DebugLog_buffer ((char*)0x008BC020)
-
-#define DebugConsole_aCmds (*(stdDebugConsoleCmd**)0x008358D0)
-#define DebugConsole_pCmdHashtable (*(stdHashTable**)0x008358D4)
-#define DebugConsole_bOpened (*(int*)0x008358D8)
-#define DebugConsole_bInitted (*(int*)0x008358DC)
-
-#define DebugConsole_maxCmds (*(int*)0x008358E4)
-#define DebugConsole_numRegisteredCmds (*(int*)0x008358E8)
-#define DebugGui_maxLines (*(uint32_t*)0x008358EC)
-#define DebugGui_fnPrint (*(DebugConsolePrintFunc_t*)0x008358F0)
-#define DebugGui_fnPrintUniStr (*(DebugConsolePrintUniStrFunc_t*)0x008358F4)
-#define DebugConsole_alertSound (*(stdSound_buffer_t**)0x008358F8)
-#define DebugConsole_idk2 (*(int16_t*)0x008358FC)
-
-typedef int (*DebugConsolePrintFunc_t)(const char*);
-typedef int (*DebugConsolePrintUniStrFunc_t)(const wchar_t*);
-typedef int (*DebugConsoleCmd_t)(stdDebugConsoleCmd* cmd, uint32_t extra);
-
-typedef struct stdDebugConsoleCmd
-{
-    char cmdStr[32];
-    DebugConsoleCmd_t cmdFunc;
-    uint32_t extra;
-} stdDebugConsoleCmd;
 
 int DebugConsole_Initialize(int maxCmds);
 void DebugConsole_Shutdown();

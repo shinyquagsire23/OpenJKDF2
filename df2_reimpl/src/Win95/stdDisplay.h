@@ -4,6 +4,7 @@
 #include "Engine/rdMaterial.h"
 #include "Primitives/rdRect.h"
 #include "types.h"
+#include "globals.h"
 #include "Win95/Video.h"
 #include "Win95/stdVBuffer.h"
 
@@ -44,85 +45,6 @@
 #define stdDisplay_GetModeInfo_ADDR (0x04243F0)
 #define stdDisplay_sub_424440_ADDR (0x0424440)
 #define stdDisplay_SortVideoModes_ADDR (0x04246E0)
-
-#define stdDisplay_aDevices ((stdVideoDevice*)0x00868280)
-#define stdDisplay_gammaTableLen (*(int*)0x055B410)
-#define stdDisplay_paGammaTable (*(int**)0x055B414)
-#define stdDisplay_gammaPalette ((rdColor24*)0x0055ADB8)
-
-typedef struct stdDeviceParams
-{
-  int field_0;
-  int field_4;
-  int field_8;
-  int field_C;
-  int field_10;
-} stdDeviceParams;
-
-typedef struct video_device
-{
-  int device_active;
-  int hasGUID;
-  int has3DAccel;
-  int hasNoGuid;
-  int windowedMaybe;
-  int dwVidMemTotal;
-  int dwVidMemFree;
-} video_device;
-
-typedef struct stdVideoMode
-{
-  int field_0;
-  float widthMaybe;
-  stdVBufferTexFmt format;
-} stdVideoMode;
-
-typedef struct stdVideoDevice
-{
-  char driverDesc[128];
-  char driverName[128];
-  video_device video_device[14];
-  GUID guid;
-  int max_modes;
-  stdVideoMode *stdVideoMode;
-  uint32_t gap2A0;
-  int field_2A4;
-} stdVideoDevice;
-
-typedef struct render_8bpp
-{
-  int bpp;
-  int rBpp;
-  int width;
-  int height;
-  int rShift;
-  int gShift;
-  int bShift;
-  int palBytes;
-} render_8bpp;
-
-typedef struct render_rgb
-{
-  int bpp;
-  int rBpp;
-  int gBpp;
-  int bBpp;
-  int rShift;
-  int gShift;
-  int bShift;
-  int rBytes;
-  int gBytes;
-  int bBytes;
-} render_rgb;
-
-typedef struct render_pair
-{
-  render_8bpp render_8bpp;
-  render_rgb render_rgb;
-  uint32_t field_48;
-  uint32_t field_4C;
-  uint32_t field_50;
-} render_pair;
 
 void stdDisplay_SetGammaTable(int len, uint32_t *table);
 uint8_t* stdDisplay_GetPalette();
@@ -179,13 +101,5 @@ void stdDisplay_ddraw_surface_flip2();
 void stdDisplay_RestoreDisplayMode();
 stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b);
 #endif
-
-#define stdDisplay_pCurDevice (*(stdVideoDevice**)0x0055B3E8)
-#define stdDisplay_pCurVideoMode (*(stdVideoMode **)0x0055B3F0)
-#define stdDisplay_bStartup (*(int*)0x55B3D8)
-#define stdDisplay_bOpen (*(int*)0x55B3DC)
-#define stdDisplay_bModeSet (*(int*)0x55B3E0)
-#define stdDisplay_numVideoModes (*(int*)0x055B3EC)
-#define stdDisplay_bPaged (*(int*)0x55B3F4)
 
 #endif // _STDDISPLAY_H

@@ -614,7 +614,7 @@ LABEL_142:
                 else
                     d3dvtx_zval = 1.0 / iterating_6c_vtxs_[iterating_6c_vtx_idx].z;
                 v38 = d3dvtx_zval * v134;
-                if ( dword_865258 != 16 )
+                if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
                 v39 = lighting_capability;
@@ -917,7 +917,7 @@ LABEL_232:
             else
                 v88 = 1.0 / active_6c->vertices[tmpiter].z;
             v89 = v88 * v134;
-            if ( dword_865258 != 16 )
+            if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
             v90 = lighting_capability;

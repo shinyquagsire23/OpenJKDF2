@@ -43,7 +43,7 @@ int sithThingPlayer_cogMsg_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, 
 
     if ( a2 == SITH_MESSAGE_TOUCHED )
         v12 = 0;
-    return sithCogVm_SendMsgToPlayer(&g_netMsgTmp, a11, 1, v12);
+    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a11, 1, v12);
 }
 
 int sithThingPlayer_cogMsg_HandleSendTrigger(sithCogMsg *in_netMsg)
@@ -158,5 +158,5 @@ int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     }
 
     NETMSG_END(COGMSG_SYNCCOG);
-    return sithCogVm_SendMsgToPlayer(&g_netMsgTmp, sendto_id, mpFlags, 1);
+    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }

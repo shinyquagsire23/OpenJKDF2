@@ -2,6 +2,7 @@
 #define _STDLEC_H
 
 #include "types.h"
+#include "globals.h"
 
 #define stdStartup_ADDR (0x00426BB0)
 #define stdShutdown_ADDR (0x00426C10)
@@ -60,10 +61,5 @@ static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
 static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
 static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
 static wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
-
-#define word_860800 (*(uint16_t*)0x860800)
-#define word_860802 (*(uint16_t*)0x860802)
-#define word_860804 (*(uint16_t*)0x860804)
-#define word_860806 (*(uint16_t*)0x860806)
 
 #endif // _STDLEC_H

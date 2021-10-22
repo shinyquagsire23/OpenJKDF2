@@ -100,7 +100,7 @@ void jkMain_GuiAdvance()
             stdControl_ToggleCursor(0);
         if ( thing_eight )
         {
-            if ( net_isMulti && !thing_six)
+            if ( sithNet_isMulti && !thing_six)
             {
                 v1 = stdPlatform_GetTimeMsec();
                 
@@ -119,10 +119,10 @@ void jkMain_GuiAdvance()
                     thing_nine = 0;
                     return;
                 }
-                if ( net_dword_832638 )
+                if ( sithNet_dword_832638 )
                 {
-                    net_dword_832638 = 0;
-                    if ( net_isServer )
+                    sithNet_dword_832638 = 0;
+                    if ( sithNet_isServer )
                         jkSaber_cogMsg_SendEndLevel();
                 }
                 if ( sith_bEndLevel )
@@ -193,7 +193,7 @@ LABEL_35:
 
 void jkMain_EscapeMenuShow()
 {
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
         sithTime_Pause();
     jkGui_SetModeMenu(jkGui_stdBitmaps[4]->palette);
     jkGuiEsc_Show();
@@ -204,7 +204,7 @@ void jkMain_EscapeMenuTick(int a2)
     unsigned int v1; // esi
     int v3; // esi
 
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
     {
         if ( !thing_six )
         {
@@ -227,10 +227,10 @@ void jkMain_EscapeMenuTick(int a2)
                 }
                 else
                 {
-                    if ( net_dword_832638 )
+                    if ( sithNet_dword_832638 )
                     {
-                        net_dword_832638 = 0;
-                        if ( net_isServer )
+                        sithNet_dword_832638 = 0;
+                        if ( sithNet_isServer )
                             jkSaber_cogMsg_SendEndLevel();
                     }
                     if ( sith_bEndLevel )
@@ -254,7 +254,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 {
     int v3; // eax
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
         sithTime_Resume();
     if ( a3 != JK_GAMEMODE_GAMEPLAY )
     {
@@ -277,17 +277,17 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
             jkMain_bInit = 0;
             thing_eight = 0;
         }
-        if ( net_isMulti && a3 != JK_GAMEMODE_ESCAPE )
+        if ( sithNet_isMulti && a3 != JK_GAMEMODE_ESCAPE )
         {
             thing_eight = 0;
             if ( a3 == 3 )
                 sithMulti_Shutdown();
             else
                 sithMulti_LobbyMessage();
-            if ( net_isServer )
+            if ( sithNet_isServer )
                 DirectPlay_SetSessionFlagidk(0);
             thing_six = 1;
-            v3 = jkGuiMultiTally_Show(net_isMulti);
+            v3 = jkGuiMultiTally_Show(sithNet_isMulti);
             thing_six = 0;
             if ( v3 == -1 )
             {
@@ -398,7 +398,7 @@ LABEL_15:
         return;
     }
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
     {
         jkPlayer_Startup();
         jkPlayer_InitForceBins();
@@ -412,7 +412,7 @@ LABEL_15:
 
         goto LABEL_39;
     }
-    if ( net_isServer )
+    if ( sithNet_isServer )
     {
 LABEL_28:
         sithInventory_ClearInventory(g_localPlayerThing);
@@ -427,10 +427,10 @@ LABEL_28:
             jkPlayer_InitSaber();
             sith_AutoSave();
         }
-        if ( net_isMulti )
+        if ( sithNet_isMulti )
         {
 //#ifdef TARGET_HAS_DPLAY
-            if ( net_isServer )
+            if ( sithNet_isServer )
             {
                 DirectPlay_SetSessionFlagidk(1);
                 v5 = idx_13b4_related;
@@ -438,7 +438,7 @@ LABEL_28:
                     v5 = jkPlayer_maxPlayers;
                 DirectPlay_SetSessionDesc((int)gamemode_0_2_str, v5);
             }
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 jkSaber_cogMsg_wrap_SendSaberInfo_alt();
 //#endif
         }
@@ -487,10 +487,10 @@ void jkMain_GameplayTick(int a2)
             }
             else
             {
-                if ( net_dword_832638 )
+                if ( sithNet_dword_832638 )
                 {
-                    net_dword_832638 = 0;
-                    if ( net_isServer )
+                    sithNet_dword_832638 = 0;
+                    if ( sithNet_isServer )
                         jkSaber_cogMsg_SendEndLevel();
                 }
                 if ( sith_bEndLevel )
@@ -532,17 +532,17 @@ void jkMain_GameplayLeave(int a2, int a3)
         jkMain_bInit = 0;
         thing_eight = 0;
     }
-    if ( net_isMulti && a3 != 6 )
+    if ( sithNet_isMulti && a3 != 6 )
     {
         thing_eight = 0;
         if ( a3 == 3 )
             sithMulti_Shutdown();
         else
             sithMulti_LobbyMessage();
-        if ( net_isServer )
+        if ( sithNet_isServer )
             DirectPlay_SetSessionFlagidk(0);
         thing_six = 1;
-        v3 = jkGuiMultiTally_Show(net_isMulti);
+        v3 = jkGuiMultiTally_Show(sithNet_isMulti);
         thing_six = 0;
         if ( v3 == -1 )
         {
@@ -741,7 +741,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
-    if ( net_isMulti && (net_MultiModeFlags & 0x80u) != 0 )
+    if ( sithNet_isMulti && (sithNet_MultiModeFlags & 0x80u) != 0 )
     {
         v4 = jkGuiRend_thing_five;
         
@@ -824,7 +824,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         }
         _strncpy(gamemode_0_2_str, ent->fileName, 0x7Fu);
         gamemode_0_2_str[127] = 0;
-        jkSmack_gameMode = net_isMulti != 0 ? 2 : 0;
+        jkSmack_gameMode = sithNet_isMulti != 0 ? 2 : 0;
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
@@ -1019,7 +1019,7 @@ int jkMain_SetVideoMode()
     if ( jkGame_isDDraw )
         return 0;
     
-    /*if ( !net_isMulti )
+    /*if ( !sithNet_isMulti )
     {
         thing_six = 1;
         //sithControl_Close();

@@ -1,9 +1,9 @@
 #ifndef _RDCAMERA_H
 #define _RDCAMERA_H
 
-#include "Primitives/rdVector.h"
-#include "Primitives/rdMatrix.h"
+#include "types.h"
 #include "Engine/rdCanvas.h"
+#include "globals.h"
 
 #define rdCamera_New_ADDR (0x00443260)
 #define rdCamera_NewEntry_ADDR (0x00443360)
@@ -36,44 +36,6 @@
 #define rdCameraProjectType_Perspective       (1)
 #define rdCameraProjectType_PerspMVP (2)
 
-typedef struct rdCanvas rdCanvas;
-typedef struct rdLight rdLight;
-
-typedef struct rdClipFrustum
-{
-  rdVector3 field_0;
-  float orthoLeft;
-  float orthoTop;
-  float orthoRight;
-  float orthoBottom;
-  float farTop;
-  float bottom;
-  float farLeft;
-  float right;
-  float nearTop;
-  float nearLeft;
-} rdClipFrustum;
-
-typedef struct rdCamera
-{
-    int projectType;
-    rdCanvas* canvas;
-    rdMatrix34 view_matrix;
-    float fov;
-    float fov_y;
-    float screenAspectRatio;
-    float orthoScale;
-    rdClipFrustum *cameraClipFrustum;
-    void (__cdecl *project)(rdVector3 *, rdVector3 *);
-    void (__cdecl *projectLst)(rdVector3 *, rdVector3 *, unsigned int);
-    float ambientLight;
-    int numLights;
-    rdLight* lights[64];
-    rdVector3 lightPositions[64];
-    float attenuationMin;
-    float attenuationMax;
-} rdCamera;
-
 rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio);
 int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5, float aspectRatio);
 void rdCamera_Free(rdCamera *camera);
@@ -100,8 +62,5 @@ void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal);
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
 int rdCamera_ClearLights(rdCamera *camera);
 void rdCamera_AdvanceFrame();
-
-#define rdCamera_pCurCamera (*(rdCamera**)0x73A3D0)
-#define rdCamera_camMatrix  (*(rdMatrix34*)0x86EE40)
 
 #endif // _RDCAMERA_H

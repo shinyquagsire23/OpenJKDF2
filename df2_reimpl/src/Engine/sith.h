@@ -2,6 +2,7 @@
 #define _SITH__H
 
 #include "types.h"
+#include "globals.h"
 
 #define sith_Startup_ADDR (0x004C4630)
 #define sith_Shutdown_ADDR (0x004C4700)
@@ -19,11 +20,6 @@
 #define sith_sub_4C4D80_ADDR (0x004C4D80)
 #define sith_set_sithmode_5_ADDR (0x004C4DB0)
 #define sith_SetEpisodeName_ADDR (0x004C4DC0)
-
-#define dword_8EE678 (*(int*)0x008EE678)
-#define sith_bEndLevel (*(int*)0x0082F0A8)
-#define sith_bInitialized (*(int*)0x0082F0AC)
-#define sith_bOpened (*(int*)0x0082F0B0)
 
 extern float sith_lastAspect;
 

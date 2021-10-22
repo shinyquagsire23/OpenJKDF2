@@ -1,12 +1,12 @@
 #ifndef _SITHCOGVM_H
 #define _SITHCOGVM_H
 
-#include "Primitives/rdVector.h"
+#include "types.h"
+#include "globals.h"
 #include "Engine/rdKeyframe.h"
 #include "Cog/sithCogScript.h"
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
-#include <stdint.h>
 
 #define sithCogVm_Startup_ADDR (0x004E1700)
 #define sithCogVm_Shutdown_ADDR (0x004E18E0)
@@ -55,9 +55,6 @@
 
 #define COGVM_FLAG_TRACE (1)
 #define COGVM_FLAG_IDK   (2)
-
-typedef struct sithSurface sithSurface;
-typedef struct sithSound sithSound;
 
 enum COGFLAGS
 {
@@ -210,96 +207,6 @@ enum COG_OPCODE
     COG_OPCODE_UNK30  = 30,
     COG_OPCODE_CALL  = 31
 };
-
-typedef struct net_msg
-{
-    uint32_t timeMs;
-    uint32_t flag_maybe;
-    uint32_t field_8;
-    uint32_t field_C;
-    uint32_t timeMs2;
-    uint32_t field_14;
-    uint32_t field_18;
-    uint32_t thingIdx;
-    uint32_t msg_size;
-    uint16_t cogMsgId;
-    uint16_t msgId;
-} net_msg;
-
-typedef struct sithCogMsg_Pair
-{
-    uint32_t thingIdx;
-    uint32_t msgId;
-} sithCogMsg_Pair;
-
-typedef struct sithCogMsg
-{
-    net_msg netMsg;
-    uint32_t pktData[512];
-} sithCogMsg;
-
-typedef int (__cdecl *cogMsg_Handler)(sithCogMsg*);
-
-typedef struct sithCogCallstack
-{
-    uint32_t pc;
-    uint32_t script_running;
-    uint32_t waketimeMs;
-    uint32_t trigId;
-} sithCogCallstack;
-
-typedef struct sithCogStackvar
-{
-    uint32_t type;
-    union
-    {
-        int32_t data[3];
-        float dataAsFloat[3];
-    };
-} sithCogStackvar;
-
-typedef struct sithCog
-{
-    sithCogScript* cogscript;
-    uint32_t flags;
-    int selfCog;
-    uint32_t script_running;
-    uint32_t cogscript_pc;
-    uint32_t wakeTimeMs;
-    uint32_t pulsePeriodMs;
-    uint32_t nextPulseMs;
-    uint32_t field_20;
-    uint32_t senderId;
-    uint32_t senderRef;
-    uint32_t senderType;
-    uint32_t sourceRef;
-    uint32_t sourceType;
-    uint32_t trigId;
-    float params[4];
-    float returnEx;
-    sithCogCallstack callstack[4];
-    uint32_t calldepth;
-    sithCogSymboltable* symbolTable;
-    sithCogStackvar stack[64];
-    uint32_t stackPos;
-    char cogscript_fpath[32];
-    char field_4BC[4096];
-    sithCogStackvar* heap;
-    int numHeapVars;
-} sithCog;
-
-#define sithCogVm_MsgTmpBuf ((sithCogMsg*)0x837468)
-#define sithCogVm_aMsgPairs ((sithCogMsg_Pair*)0x00847968)
-#define sithCogVm_msgFuncs ((cogMsg_Handler*)0x00847D68)
-#define sithCogVm_needsSync (*(int*)0x00847E6C)
-#define sithCogVm_multiplayerFlags (*(int*)0x847E70)
-#define sithCogVm_bSyncMultiplayer (*(int*)0x847E74)
-#define sithCogVm_idk2 (*(int*)0x00847E7C)
-#define sithCogVm_bInit (*(int*)0x00847E80)
-#define sithCogVm_dword_847E84 (*(uint32_t*)0x00847E84)
-#define sithCogVm_msgId (*(int*)0x54B004)
-#define sithCogVm_MsgTmpBuf2 (*(sithCogMsg*)0x00836C40)
-#define g_netMsgTmp (*(sithCogMsg*)0x008B4C00)
 
 int sithCogVm_Startup();
 void sithCogVm_Shutdown();

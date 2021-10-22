@@ -2,6 +2,7 @@
 #define _JKMAIN_H
 
 #include "types.h"
+#include "globals.h"
 
 #define jkMain_Startup_ADDR (0x00402CC0)
 #define jkMain_Shutdown_ADDR (0x00402CE0)
@@ -64,7 +65,6 @@
 #define thing_eight (*(int*)0x00552B94)
 #define jkMain_lastTickMs (*(int*)0x552B9C)
 #define dword_552B5C (*(int*)0x552B5C)
-#define sith_bEndLevel (*(int*)0x0082F0A8)
 #define game_updateMsecsTotal (*(int*)0x00552B58)
 #define idx_13b4_related (*(int*)0x008C4BD8)
 #define gamemode_1_str ((char*)0x00552958) // 128

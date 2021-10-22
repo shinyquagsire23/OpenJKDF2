@@ -2,6 +2,7 @@
 #define _SITHSOUNDSYS_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithSoundSys_Startup_ADDR (0x004DAE00)
 #define sithSoundSys_Shutdown_ADDR (0x004DAE40)
@@ -41,30 +42,6 @@
 #define sithSoundSys_sub_4DD3F0_ADDR (0x004DD3F0)
 #define sithSoundSys_sub_4DD5D0_ADDR (0x004DD5D0)
 
-#define sithSoundSys_dword_835FCC (*(int*)0x00835FCC)
-#define sithSoundSys_bPlayingMci (*(int*)0x00835FD0)
-#define sithSoundSys_bInitted (*(int*)0x00835FD4)
-#define sithSoundSys_flt_835FD8 (*(float*)0x00835FD8)
-#define sithSoundSys_bIsMuted (*(int*)0x00835FDC)
-#define sithSoundSys_musicVolume (*(float*)0x0054A678)
-#define sithSoundSys_globalVolume (*(float*)0x0054A67C)
-#define sithSoundSys_numSoundsAvailable2 (*(int*)0x00835FE0)
-#define sithSoundSys_numSoundsAvailable (*(int*)0x00835FE4)
-#define sithSoundSys_aPlayingSounds ((sithPlayingSound*)0x00835FE8)
-#define sithSoundSys_aIdk ((int*)0x00836B68)
-#define sithSoundSys_activeChannels (*(int*)0x00836BE8)
-#define sithSoundSys_bOpened (*(int*)0x00836BEC)
-#define sithSoundSys_pLastSectorSoundSector (*(sithSector**)0x00836BF4)
-#define sithSoundSys_dword_836BF8 (*(int*)0x00836BF8)
-#define sithSoundSys_dword_836BFC (*(int*)0x00836BFC)
-#define sithSoundSys_trackTo (*(int*)0x008BBC74)
-#define sithSoundSys_trackFrom (*(int*)0x008BBC70)
-#define sithSoundSys_pPlayingSoundIdk (*(sithPlayingSound**)0x00836BF8)
-#define sithSoundSys_dword_836C00 (*(int*)0x00836C00)
-#define sithSoundSys_nextSoundIdx (*(int*)0x0054A684)
-#define sithSoundSys_dword_836C04 (*(int*)0x00836C04)
-#define sithSoundSys_pFocusedThing (*(sithThing**)0x00836BF0)
-
 #define SITHSOUNDSYS_NUMPLAYINGSOUNDS (32)
 
 enum SITHSOUNDFLAG
@@ -90,29 +67,6 @@ enum SITHSOUNDFLAG
     SITHSOUNDFLAG_40000 = 0x40000,
     SITHSOUNDFLAG_80000 = 0x80000,
 };
-
-typedef struct sithPlayingSound
-{
-    stdSound_buffer_t* pSoundBuf;
-    stdSound_buffer_t* p3DSoundObj;
-    sithSound* sound;
-    int flags;
-    int idx;
-    float vol_2;
-    float anonymous_5;
-    float maxPosition;
-    float anonymous_7;
-    float volumeVelocity;
-    float volume;
-    float pitch;
-    float pitchVel;
-    float nextPitch;
-    float anonymous_13;
-    rdVector3 posRelative;
-    sithThing* thing;
-    rdVector3 pos;
-    int refid;
-} sithPlayingSound;
 
 int sithSoundSys_Startup();
 void sithSoundSys_Shutdown();

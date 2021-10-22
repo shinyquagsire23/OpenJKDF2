@@ -325,9 +325,11 @@ int sithSound_StopAll(uint32_t idk)
                 v8 = 0;
         }
 
-        uint32_t v3 = sithSound_var4;
-        for (v3 = sithSound_var4; v3 < world->numSoundsLoaded; v3++)
+        printf("%x %x\n", sithSound_var4, world);
+        printf("%x %x\n", sithSound_var4, world->numSoundsLoaded);
+        for (uint32_t v3 = sithSound_var4; v3 < world->numSoundsLoaded; v3++)
         {
+            printf("%x %x\n", v3, world->numSoundsLoaded);
             if ((world->sounds[v3].isLoaded & 1) 
                 && !world->sounds[v3].field_40
                 && !stdSound_IsPlaying(world->sounds[v3].dsoundBuffer2, 0))

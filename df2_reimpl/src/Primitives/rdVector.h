@@ -1,7 +1,7 @@
 #ifndef _RDVECTOR_H
 #define _RDVECTOR_H
 
-//#define _ADDR (0x)
+#include "types.h"
 
 #define rdVector_Set2_ADDR    (0x00449280)
 #define rdVector_Set3_ADDR    (0x004492A0)
@@ -58,40 +58,6 @@
 #define rdVector_Rotate3_ADDR (0x0044A06E)
 #define rdVector_Rotate3Acc_ADDR (0x0044A09E)
 #define rdVector_ExtractAngle_ADDR (0x0044A0CE)
-
-typedef struct rdVector2i
-{
-    int x;
-    int y;
-} rdVector2i;
-
-typedef struct rdVector3i
-{
-    int x;
-    int y;
-    int z;
-} rdVector3i;
-
-typedef struct rdVector2
-{
-    float x;
-    float y;
-} rdVector2;
-
-typedef struct rdVector3
-{
-    float x;
-    float y;
-    float z;
-} rdVector3;
-
-typedef struct rdVector4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-} rdVector4;
 
 extern const rdVector3 rdroid_zeroVector3;
 extern const rdVector3 rdroid_xVector3;

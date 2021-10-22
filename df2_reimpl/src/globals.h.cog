@@ -1,0 +1,119 @@
+#ifndef _OPENJKDF2_GLOBALS_H
+#define _OPENJKDF2_GLOBALS_H
+
+#include "types.h"
+
+#include "Engine/rdLight.h"
+#include "Engine/rdCamera.h"
+#include "Engine/sithCamera.h"
+#include "General/stdPalEffects.h"
+
+// Addrs
+[[[cog
+    import cog
+    
+    f = open(symbols_fpath, "r")
+    for line in f.readlines():
+        if "//" in line:
+            line = line.split("//")[0]
+        if "#" in line:
+            line = line.split("#")[0]
+        parts = line.replace("\n", "").replace("\r", "").split(" ")
+        if len(parts) < 3:
+            continue
+        
+        name = parts[0]
+        addr = parts[1]
+        c_type = " ".join(parts[2:])
+        c_val = "";
+        
+        if "=" in c_type:
+            c_val = c_type.split("=")[1]
+            c_type = c_type.split("=")[0]
+
+        cog.outl("#define %s_ADDR (%s)" % (name, addr))
+
+]]]
+[[[end]]]
+
+#ifdef NO_JK_MMAP
+
+// Vars
+[[[cog
+    import cog
+    
+    f = open(symbols_fpath, "r")
+    for line in f.readlines():
+        if "//" in line:
+            line = line.split("//")[0]
+        if "#" in line:
+            line = line.split("#")[0]
+        parts = line.replace("\n", "").replace("\r", "").split(" ")
+        if len(parts) < 3:
+            continue
+        
+        name = parts[0]
+        addr = parts[1]
+        c_type = " ".join(parts[2:])
+        c_type_post = ""
+        c_val = "";
+        
+        if "=" in c_type:
+            c_val = c_type.split("=")[1]
+            c_type = c_type.split("=")[0]
+        
+        if c_type == "func":
+            continue
+        
+        if "[" in c_type:
+            s = c_type.split("[")
+            c_type = s[0]
+            c_type_post = "[" + s[1] 
+        
+        cog.outl("extern %s %s%s;" % (c_type, name, c_type_post))
+
+]]]
+[[[end]]]
+
+#else
+
+// Vars
+[[[cog
+    import cog
+    
+    f = open(symbols_fpath, "r")
+    for line in f.readlines():
+        if "//" in line:
+            line = line.split("//")[0]
+        if "#" in line:
+            line = line.split("#")[0]
+        parts = line.replace("\n", "").replace("\r", "").split(" ")
+        if len(parts) < 3:
+            continue
+        
+        name = parts[0]
+        addr = parts[1]
+        c_type = " ".join(parts[2:])
+        c_type_post = ""
+        c_val = "";
+        
+        if "=" in c_type:
+            c_val = c_type.split("=")[1]
+            c_type = c_type.split("=")[0]
+        
+        if c_type == "func":
+            continue
+        
+        if "[" in c_type:
+            s = c_type.split("[")
+            c_type = s[0] + "*"
+            cog.outl("#define %s ((%s)%s_ADDR)" % (name, c_type, name))
+        else:
+            cog.outl("#define %s (*(%s*)%s_ADDR)" % (name, c_type, name))
+
+]]]
+[[[end]]]
+
+#endif
+
+#endif // _OPENJKDF2_GLOBALS_H

@@ -1,7 +1,8 @@
 #ifndef _SITHCOG_H
 #define _SITHCOG_H
 
-#include <stdint.h>
+#include "types.h"
+#include "globals.h"
 #include "sithCogVm.h"
 #include "sithCogScript.h"
 
@@ -53,24 +54,15 @@
 #define sithCogScript_RegisterGlobalMessage_ADDR (0x004E06C0)
 #define sithCogScript_RegisterVerb_ADDR (0x004E0700)
 
-#define sithCog_bOpened (*(int*)0x00836C2C)
-#define sithCog_pScriptHashtable (*(stdHashTable**)0x00836C3C)
-#define sithCog_aSectorLinks ((sithCogSectorLink*)0x008B5440)
-#define sithCog_numSectorLinks (*(int*)0x00836C38)
-#define sithCog_aThingLinks ((sithCogThingLink*)0x008B7460)
-#define sithCog_numThingLinks (*(int*)0x00836C30)
-#define sithCog_numSurfaceLinks (*(int*)0x00836C34)
-#define sithCog_aSurfaceLinks ((sithCogSurfaceLink*)0x8B9C60)
-
-#define NETMSG_START void* craftingPacket = &g_netMsgTmp.pktData[0];
+#define NETMSG_START void* craftingPacket = &sithCogVm_netMsgTmp.pktData[0];
 #define NETMSG_PUSHU8(x) { *(uint8_t*)craftingPacket = x; craftingPacket += sizeof(uint8_t); }
 #define NETMSG_PUSHU16(x) { *(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t); }
 #define NETMSG_PUSHU32(x) { *(uint32_t*)craftingPacket = x; craftingPacket += sizeof(uint32_t); }
 #define NETMSG_PUSHF32(x) { *(float*)craftingPacket = x; craftingPacket += sizeof(float); }
-#define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&g_netMsgTmp.pktData[0]; \
-                            g_netMsgTmp.netMsg.flag_maybe = 0; \
-                            g_netMsgTmp.netMsg.cogMsgId = msgid; \
-                            g_netMsgTmp.netMsg.msg_size = len; \
+#define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
+                            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
+                            sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
+                            sithCogVm_netMsgTmp.netMsg.msg_size = len; \
                           }
 
 #define NETMSG_IN_START(x) void* _readingPacket = &x->pktData[0]
@@ -126,31 +118,6 @@ enum SITH_MESSAGE_E
     SITH_MESSAGE_SPLASH  = 39,
     SITH_MESSAGE_TRIGGER  = 40,
 };
-
-typedef struct sithCogSectorLink
-{
-    sithSector* sector;
-    sithCog* cog;
-    int linkid;
-    int mask;
-} sithCogSectorLink;
-
-typedef struct sithCogThingLink
-{
-    sithThing* thing;
-    int signature;
-    sithCog* cog;
-    int linkid;
-    int mask;
-} sithCogThingLink;
-
-typedef struct sithCogSurfaceLink
-{
-    sithSurface* surface;
-    sithCog* cog;
-    int linkid;
-    int mask;
-} sithCogSurfaceLink;
 
 static int (*_sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;
 //static int (*sithCogScript_Load)(sithWorld *world, int a2) = (void*)sithCogScript_Load_ADDR;
@@ -208,7 +175,5 @@ void sithCogScript_Tick(sithCog *cog);
 int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info);
 void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra);
 sithCog* sithCog_GetByIdx(int idx);
-
-#define sithCog_masterCog (*(sithCog**)0x008B542C)
 
 #endif // _SITHCOG_H

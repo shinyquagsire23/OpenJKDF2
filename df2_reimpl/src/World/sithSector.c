@@ -334,7 +334,7 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
     }
 #ifdef QOL_IMPROVEMENTS
-    else if ( thing->thingType == THINGTYPE_PLAYER && net_isMulti)
+    else if ( thing->thingType == THINGTYPE_PLAYER && sithNet_isMulti)
     {
         sithSector_ThingPhysPlayer(thing, deltaSecs);
     }

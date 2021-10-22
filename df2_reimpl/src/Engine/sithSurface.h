@@ -2,6 +2,7 @@
 #define _SITHSURFACE_H
 
 #include "types.h"
+#include "globals.h"
 #include "Primitives/rdFace.h"
 
 #define sithSurface_UnsetAdjoins_ADDR (0x004E5A10)
@@ -39,51 +40,6 @@
 #define sithSurface_Alloc_ADDR (0x004F0AF0)
 #define sithSurface_Sync_ADDR (0x004F0B50)
 #define sithSurface_ScrollSky_ADDR (0x004F0BC0)
-
-#define sithSurface_numAvail (*(int*)0x0084DF48)
-#define sithSurface_aAvail ((int*)0x0084DF4C) // 256
-#define sithSurface_numSurfaces (*(int*)0x0084E350)
-#define sithSurface_aSurfaces ((rdSurface*)0x0084E358) // 256
-#define sithSurface_bOpened (*(int*)0x00852F58)
-#define sithSurface_byte_8EE668 (*(uint8_t*)0x008EE668)
-#define sithSurface_numSurfaces_0 (*(int*)0x00847F18)
-
-typedef struct sithSurfaceInfo
-{
-    rdFace face;
-    float* intensities;
-    uint32_t lastTouchedMs;
-} sithSurfaceInfo;
-
-struct rdSurface
-{
-  uint32_t index; // -14
-  uint32_t flags; // -13
-  sithThing *parent_thing; // -12
-  uint32_t signature; // -11
-  rdMaterial* material; // -10
-  sithSurface *sithSurfaceParent; // -9
-  sithSector* sector; // -8
-  rdVector2 field_1C;
-  rdVector3 field_24;
-  uint32_t field_30;
-  uint32_t field_34;
-  uint32_t wallCel;
-  float field_3C;
-  float field_40;
-  float field_44;
-  float field_48;
-};
-
-typedef struct sithSurface
-{
-    uint32_t field_0;
-    uint32_t field_4;
-    sithSector* parent_sector;
-    sithAdjoin* adjoin;
-    uint32_t surfaceFlags;
-    sithSurfaceInfo surfaceInfo;
-} sithSurface;
 
 typedef enum SURFACEFLAGS
 {

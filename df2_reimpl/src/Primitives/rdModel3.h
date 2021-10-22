@@ -1,6 +1,9 @@
 #ifndef _RDMODEL3_H
 #define _RDMODEL3_H
 
+#include "types.h"
+#include "globals.h"
+
 #include "Primitives/rdVector.h"
 #include "Primitives/rdFace.h"
 #include "Engine/rdMaterial.h"
@@ -111,47 +114,6 @@ typedef struct rdMesh
     int field_68;
     int field_6C;
 } rdMesh;
-
-typedef rdModel3* (*model3Loader_t)(const char *, int);
-typedef int (*model3Unloader_t)(rdModel3*);
-
-#define rdModel3_pCurGeoset (*(rdGeoset**)0x0073A3D8)
-#define localCamera (*(rdVector3*)0x0073A3E0)
-// rdVector3[32]
-#define aFaceVerts ((rdVector3*)0x0073A3F0)
-#define vertexDst (*(rdMeshinfo*)0x0073A570)
-#define curGeometryMode (*(int*)0x0073A590)
-// rdLight* apGeoLights[64]
-#define apGeoLights ((rdLight**)0x0073A598)
-
-//rdVector3 [64]
-#define aLocalLightPos ((rdVector3*)0x0073A698)
-#define meshFrustrumCull (*(int*)0x0073A998)
-#define curTextureMode (*(int*)0x0073A99C)
-
-// rdVector3[?]
-#define aView ((rdVector3*)0x0073A9A0)
-
-// rdMesh *pCurMesh
-#define pCurMesh (*(rdMesh**)0x0073C1A0)
-#define thingFrustrumCull (*(int*)0x0073C1A4)
-#define vertexSrc (*(rdMeshinfo*)0x0073C1A8)
-
-#define pCurModel3 (*(rdModel3**)0x0073C1C8)
-#define rdModel3_textureMode (*(int*)0x0073C1CC)
-#define curLightingMode (*(int*)0x0073C1D0)
-
-// rdLight*[64]
-#define apMeshLights ((rdLight**)0x0073C1D8)
-#define pCurThing (*(rdThing**)0x0073C2D8)
-#define rdModel3_lightingMode (*(int*)0x0073C2DC)
-#define rdModel3_geometryMode (*(int*)0x0073C2E0)
-#define rdModel3_numDrawnModels (*(int*)0x0073C2E4)
-#define pModel3Loader (*(model3Loader_t*)0x0073C2E8)
-#define pModel3Unloader (*(model3Unloader_t*)0x0073C2EC)
-#define rdModel3_numGeoLights (*(unsigned int*)0x0073C2F0)
-#define rdModel3_numMeshLights (*(int*)0x0073C2F4)
-#define rdModel3_fRadius (*(float*)0x0073C2F8)
 
 void rdModel3_RegisterLoader(model3Loader_t loader);
 void rdModel3_RegisterUnloader(model3Unloader_t unloader);

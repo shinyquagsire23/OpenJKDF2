@@ -249,7 +249,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             continue;
         }
 
-        if ( net_isMulti && net_isServer && (thingIter->thing_id & 0xFFFF0000) == 0 )
+        if ( sithNet_isMulti && sithNet_isServer && (thingIter->thing_id & 0xFFFF0000) == 0 )
             sithMulti_FreeThing(thingIter->thing_id);
 
         if ( thingIter->attach_flags )
@@ -288,7 +288,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             }
             sithWorld_pCurWorld->numThings = v9;
         }
-        net_things[1 + net_things_idx++] = v7;
+        sithNet_things[1 + sithNet_things_idx++] = v7;
     }
 }
 
@@ -352,9 +352,9 @@ void sithThing_sub_4CCE60()
     int v6; // eax
     int v8; // ecx
 
-    net_things_idx = 0;
+    sithNet_things_idx = 0;
     sithWorld_pCurWorld->numThings = -1;
-    v2 = net_things + 1;
+    v2 = sithNet_things + 1;
     for (v1 = sithWorld_pCurWorld->numThingsLoaded - 1; v1 >= 0; v1--)
     {
         if ( sithWorld_pCurWorld->things[v1].thingType )
@@ -375,7 +375,7 @@ void sithThing_sub_4CCE60()
                 sithWorld_pCurWorld->numThings = v6;
             }
             *v2++ = v1;
-            net_things_idx++;
+            sithNet_things_idx++;
         }
     }
 }
@@ -596,7 +596,7 @@ int sithThing_Load(sithWorld *world, int a2)
             v4 = &world->things[v36];
             if ( v4->thingType )
             {
-                if ( net_isMulti && net_isServer && (v4->thing_id & 0xFFFF0000) == 0 )
+                if ( sithNet_isMulti && sithNet_isServer && (v4->thing_id & 0xFFFF0000) == 0 )
                     sithMulti_FreeThing(v4->thing_id);
                 sithThing_FreeEverything(v4);
                 v5 = v4->thingIdx;
@@ -609,7 +609,7 @@ int sithThing_Load(sithWorld *world, int a2)
                     }
                     sithWorld_pCurWorld->numThings = v6;
                 }
-                net_things[1 + net_things_idx++] = v5;
+                sithNet_things[1 + sithNet_things_idx++] = v5;
             }
         }
         pSithHS->free(world->things);
@@ -629,7 +629,7 @@ int sithThing_Load(sithWorld *world, int a2)
     if ( !things )
         return 0;
     sithWorld_pCurWorld->numThingsLoaded = v10;
-    net_things_idx = 0;
+    sithNet_things_idx = 0;
     for ( v13 = v10 - 1; v13 >= 0; v13--)
     {
         v17 = &sithWorld_pCurWorld->things[v13];
@@ -1335,8 +1335,8 @@ int sithThing_netidk2(int a1)
         }
         sithWorld_pCurWorld->numThings = v1;
     }
-    net_things[1 + net_things_idx++] = a1;
-    return net_things_idx;
+    sithNet_things[1 + sithNet_things_idx++] = a1;
+    return sithNet_things_idx;
 }
 
 int sithThing_GetIdxFromThing(sithThing *thing)
@@ -1415,7 +1415,7 @@ void sithThing_freestuff(sithWorld *world)
         if (!thingIter->thingType)
             continue;
 
-        if ( net_isMulti && net_isServer && (thingIter->thing_id & 0xFFFF0000) == 0 )
+        if ( sithNet_isMulti && sithNet_isServer && (thingIter->thing_id & 0xFFFF0000) == 0 )
             sithMulti_FreeThing(thingIter->thing_id);
         if ( thingIter->attach_flags )
             sithThing_DetachThing(thingIter);
@@ -1451,9 +1451,9 @@ void sithThing_freestuff(sithWorld *world)
             }
             v3->numThings = v5;
         }
-        v7 = net_things_idx;
-        net_things[1 + net_things_idx] = v4;
-        net_things_idx = v7 + 1;
+        v7 = sithNet_things_idx;
+        sithNet_things[1 + sithNet_things_idx] = v4;
+        sithNet_things_idx = v7 + 1;
     }
 }
 
@@ -1557,13 +1557,13 @@ sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *pos
     sithThing *v25; // eax
     sithThing *v26; // eax
 
-    v5 = net_things_idx;
+    v5 = sithNet_things_idx;
     v6 = sithWorld_pCurWorld;
-    if ( net_things_idx )
+    if ( sithNet_things_idx )
     {
-        v8 = net_things[net_things_idx];
+        v8 = sithNet_things[sithNet_things_idx];
         v9 = sithWorld_pCurWorld->numThings;
-        v5 = --net_things_idx;
+        v5 = --sithNet_things_idx;
         if ( v8 > v9 )
             sithWorld_pCurWorld->numThings = v8;
     }
@@ -1596,13 +1596,13 @@ sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *pos
                 ++v10;
             }
             while ( v13 < *v11 );
-            v5 = net_things_idx;
+            v5 = sithNet_things_idx;
         }
         if ( v5 )
         {
-            v8 = net_things[v5];
+            v8 = sithNet_things[v5];
             v16 = v6->numThings;
-            net_things_idx = v5 - 1;
+            sithNet_things_idx = v5 - 1;
             if ( v8 > v16 )
                 v6->numThings = v8;
         }
@@ -1702,7 +1702,7 @@ void sithThing_FreeEverythingNet(sithThing *thing)
     int v3; // eax
     int v5; // eax
 
-    if ( net_isMulti && net_isServer && (thing->thing_id & 0xFFFF0000) == 0 )
+    if ( sithNet_isMulti && sithNet_isServer && (thing->thing_id & 0xFFFF0000) == 0 )
         sithMulti_FreeThing(thing->thing_id);
     if ( thing->attach_flags )
         sithThing_DetachThing(thing);
@@ -1738,9 +1738,9 @@ void sithThing_FreeEverythingNet(sithThing *thing)
         }
         v1->numThings = v3;
     }
-    v5 = net_things_idx;
-    net_things[net_things_idx + 1] = v2;
-    net_things_idx = v5 + 1;
+    v5 = sithNet_things_idx;
+    sithNet_things[sithNet_things_idx + 1] = v2;
+    sithNet_things_idx = v5 + 1;
 }
 
 void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
@@ -2050,7 +2050,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     sithThing *v7; // eax
     float fR; // [esp+0h] [ebp-1Ch]
 
-    if ( net_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
+    if ( sithNet_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
     {
         receiver_ = receiver;
         goto LABEL_32;
@@ -2091,7 +2091,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
         {
             amount = amount * 0.1;
         }
-        if ( net_isMulti && (net_MultiModeFlags & 2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
+        if ( sithNet_isMulti && (sithNet_MultiModeFlags & 2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
             return 0.0;
     }
 

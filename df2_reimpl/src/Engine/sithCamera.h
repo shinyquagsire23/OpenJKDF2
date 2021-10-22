@@ -2,6 +2,7 @@
 #define _SITHCAMERA_H
 
 #include "types.h"
+#include "globals.h"
 #include "Engine/rdCamera.h"
 
 #define sithCamera_Startup_ADDR (0x004C4DE0)
@@ -27,33 +28,6 @@
 #define sithCamera_create_unk_struct_ADDR (0x004C6050)
 #define sithCamera_SetState_ADDR (0x004C6160)
 #define sithCamera_GetState_ADDR (0x004C6170)
-
-typedef struct sithCameraRenderInfo
-{
-    uint32_t field_0;
-    float field_4;
-    float field_8;
-    rdColormap* colormap;
-} sithCameraRenderInfo;
-
-#pragma pack(push, 4)
-typedef struct sithCamera
-{
-    uint32_t cameraPerspective;
-    uint32_t dword4;
-    float fov;
-    float aspectRatio;
-    sithThing* primaryFocus;
-    sithThing* secondaryFocus;
-    sithSector* sector;
-    rdVector3 vec3_3;
-    rdVector3 vec3_4;
-    rdMatrix34 viewMat;
-    rdVector3 vec3_1;
-    rdVector3 vec3_2;
-    rdCamera rdCam;
-} sithCamera;
-#pragma pack(pop)
 
 int sithCamera_Startup();
 int sithCamera_Open(rdCanvas *canvas, float aspect);
@@ -86,20 +60,5 @@ static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
 //static void (*sithCamera_SetRdCameraAndRenderidk)() = (void*)sithCamera_SetRdCameraAndRenderidk_ADDR;
 //static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14) = (void*)sithCamera_create_unk_struct_ADDR;
 //static void (*sithCamera_SetsFocus)() = (void*)sithCamera_SetsFocus_ADDR;
-
-#define sithCamera_cameras ((sithCamera*)0x8EC380)
-#define sithCamera_dword_8EE5A0 (*(int*)0x8EE5A0)
-#define sithCamera_state (*(int*)0x8EE5A4)
-#define sithCamera_curCameraIdx (*(int*)0x8EE5A8)
-#define sithCamera_povShakeVector1 (*(rdVector3*)0x008EE5AC)
-#define sithCamera_povShakeVector2 (*(rdVector3*)0x008EE5B8)
-#define sithCamera_povShakeF1 (*(float*)0x008EE5C4)
-#define sithCamera_povShakeF2 (*(float*)0x008EE5C8)
-#define sithCamera_currentCamera (*(sithCamera**)0x82F104)
-#define sithCamera_bInitted (*(int*)0x0082F108)
-#define sithCamera_viewMat (*(rdMatrix34*)0x8EE5E0)
-#define sithCamera_focusMat (*(rdMatrix34*)0x0082F0B8)
-#define sithCamera_bOpen (*(int*)0x0082F10C)
-#define sithCamera_camIdxToGlobalIdx ((int*)0x00549088)
 
 #endif // _SITHCAMERA_H

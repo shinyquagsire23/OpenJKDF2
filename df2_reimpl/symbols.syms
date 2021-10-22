@@ -1,0 +1,427 @@
+sithAIClass_hashmap 0x00852F88 stdHashTable*
+
+std_genBuffer 0x866880 char[1024]
+std_pHS 0x866C80 struct common_functions*
+
+rdModel3_pCurGeoset 0x0073A3D8 rdGeoset*
+localCamera 0x0073A3E0 rdVector3
+
+aFaceVerts 0x0073A3F0 rdVector3[32]
+vertexDst 0x0073A570 rdMeshinfo
+curGeometryMode 0x0073A590 int
+apGeoLights 0x0073A598 rdLight*[64]
+aLocalLightPos 0x0073A698 rdVector3[64]
+meshFrustrumCull 0x0073A998 int
+curTextureMode 0x0073A99C int
+aView 0x0073A9A0 rdVector3[512]
+pCurMesh 0x0073C1A0 rdMesh*
+thingFrustrumCull 0x0073C1A4 int
+vertexSrc 0x0073C1A8 rdMeshinfo
+pCurModel3 0x0073C1C8 rdModel3*
+rdModel3_textureMode 0x0073C1CC int
+curLightingMode 0x0073C1D0 int
+apMeshLights 0x0073C1D8 rdLight*[64]
+pCurThing 0x0073C2D8 rdThing*
+rdModel3_lightingMode 0x0073C2DC int
+rdModel3_geometryMode 0x0073C2E0 int
+rdModel3_numDrawnModels 0x0073C2E4 int
+pModel3Loader 0x0073C2E8 model3Loader_t
+pModel3Unloader 0x0073C2EC model3Unloader_t
+rdModel3_numGeoLights 0x0073C2F0 uint32_t
+rdModel3_numMeshLights 0x0073C2F4 int
+rdModel3_fRadius 0x0073C2F8 float
+
+sithPuppet_hashtable 0x00847E88 stdHashTable*
+sithPuppet_keyframesHashtable 0x00847E8C stdHashTable*
+sithPuppet_animNamesToIdxHashtable 0x00847E90 stdHashTable*
+
+pKeyframeLoader 0x73D608 keyframeLoader_t
+pKeyframeUnloader 0x73D60C keyframeUnloader_t
+
+sithTime_deltaMs 0x00836C08 uint32_t
+sithTime_deltaSeconds 0x00836C0C float
+sithTime_TickHz 0x00836C10 float 
+sithTime_curMs 0x00836C14 uint32_t
+sithTime_curSeconds 0x00836C18 float
+sithTime_curMsAbsolute 0x00836C1C uint32_t
+sithTime_pauseTimeMs 0x00836C20 uint32_t
+sithTime_bRunning 0x00836C24 int
+
+sithRender_texMode 0x008EC360 int
+sithRender_flag 0x008EC364 int
+sithRender_geoMode 0x008EC368 int
+sithRender_lightMode 0x008EC36C int
+sithRender_lightingIRMode 0x00831988 int
+sithRender_f_83198C 0x0083198C float
+sithRender_f_831990 0x00831990 float
+sithRender_needsAspectReset 0x00831994 int
+sithRender_numSectors 0x008318F0 uint32_t
+sithRender_numClipFrustums 0x0082FEE8 uint32_t
+sithRender_numLights 0x00831978 uint32_t
+sithRender_numSectors2 0x0082F640 uint32_t
+sithRender_82F4B4 0x0082F4B4 uint32_t
+sithRender_surfacesDrawn 0x0083197C int
+sithRender_numSurfaces 0x0082F4B8 uint32_t
+sithRender_831980 0x00831980 int
+sithRender_831984 0x00831984 int
+sithRender_f_82F4B0 0x0082F4B0 float
+sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
+meshinfo_out 0x0082F490 rdMeshinfo
+sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
+sithRender_aLights 0x0082F668 rdLight[32]
+sithRender_aSectors 0x0082F110 sithSector*[128]
+sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[128]
+sithRender_aSectors2 0x0082FC68 sithSector*[128]
+vertices_tmp 0x0082F310 rdVector3[32]
+vertices_tmp_projected 0x0082F310 rdVector3[32]
+sithRender_aSurfaces 0x008318F8 sithSurface*[32]
+sithRender_lastRenderTick 0x008EE678 int
+
+sithCamera_cameras 0x008EC380 sithCamera[7]
+sithCamera_dword_8EE5A0 0x008EE5A0 int
+sithCamera_state 0x008EE5A4 int
+sithCamera_curCameraIdx 0x008EE5A8 int
+sithCamera_povShakeVector1 0x008EE5AC rdVector3
+sithCamera_povShakeVector2 0x008EE5B8 rdVector3
+sithCamera_povShakeF1 0x008EE5C4 float
+sithCamera_povShakeF2 0x008EE5C8 float
+sithCamera_currentCamera 0x0082F104 sithCamera*
+sithCamera_bInitted 0x0082F108 int
+sithCamera_viewMat 0x008EE5E0 rdMatrix34
+sithCamera_focusMat 0x0082F0B8 rdMatrix34
+sithCamera_bOpen 0x0082F10C int
+//sithCamera_camIdxToGlobalIdx 0x00549088 int[2]
+
+rdroid_aMipDistances 0x00548250 rdVector4 = {10.0, 20.0, 40.0, 80.0}
+rdroid_frameTrue 0x00570390 int
+bRDroidStartup 0x00570394 int
+bRDroidOpen 0x00570398 int
+rdroid_curLightingMode 0x00889EA0 int
+rdroid_pHS 0x00889EA4 struct common_functions*
+rdroid_curGeometryMode 0x00889EA8 int
+rdroid_curColorEffects 0x00889EC0 stdPalEffect
+rdroid_curOcclusionMethod 0x00889EE8 int
+rdroid_curZBufferMethod 0x00889EEC int
+rdroid_curProcFaceUserData 0x00889EF0 int
+rdroid_curSortingMethod 0x00889EF4 int
+rdroid_curAcceleration 0x00889EF8 int
+rdroid_curTextureMode 0x00889EFC int
+rdroid_curRenderOptions 0x00889F00 int
+rdroid_curCullFlags 0x00889F04 int
+
+sithMaterial_hashmap 0x00852F84 stdHashTable*
+sithMaterial_aMaterials 0x0088AFD0 rdMaterial**
+sithMaterial_numMaterials 0x00852F80 int
+
+rdCache_aHWSolidTris 0x005703A0 rdTri[0x400]
+rdCache_totalNormalTris 0x005753A0 int
+rdCache_aIntensities 0x005753A8 float[0x8000]
+rdCache_aVertices 0x005953A8 rdVector3[0x8000]
+rdCache_totalVerts 0x005F53A8 int
+rdCache_aTexVertices 0x005F53B0 rdVector2[0x8000]
+rdCache_aHWNormalTris 0x006353B0 rdTri[0x400]
+rdCache_totalSolidTris 0x0063A3B0 int
+rdCache_aHWVertices 0x0063A3B8 D3DVERTEX[0x8000]
+rdCache_drawnFaces 0x0073A3B8 int
+rdCache_numUsedVertices 0x0073A3BC int
+rdCache_numUsedTexVertices 0x0073A3C0 int
+rdCache_numUsedIntensities 0x0073A3C4 int
+rdCache_ulcExtent 0x0086EE70 rdVector2i
+rdCache_lrcExtent 0x0086EE78 rdVector2i
+rdCache_numProcFaces 0x0086EE80 int
+rdCache_aProcFaces 0x0086EEA0 rdProcEntry[0x400]
+rdCache_dword_865258 0x00865258 int
+
+sithMulti_name 0x008C4BE0 wchar_t[32]
+sithMulti_handlerIdk 0x0083264C sithMultiHandler_t
+
+rdColormap_pCurMap 0x0073A3C8 rdColormap*
+rdColormap_pIdentityMap 0x0073A3CC rdColormap*
+//rdColormap_colorInfo 0x00548260 rdTexformat
+
+sithTimer_timers 0x00852F98 sithTimer[256]
+sithTimer_list 0x00855000 sithTimer*
+sithTimer_arrLut 0x00854B98 int[256]
+sithTimer_timerFuncs 0x00854F98 sithTimerFunc[5]
+sithTimer_numFree 0x00854FFC int
+sithTimer_bInit 0x855004 int
+sithTimer_bOpen 0x855008 int
+
+rdClip_faceStatus 0x0082EE5C int
+pSourceVert 0x0082EC50 rdVector3*
+workIVerts 0x0082EC58 float[32]
+workVerts 0x0082ECD8 rdVector3[32]
+pDestVert 0x0082EB44 rdVector3*
+pDestIVert 0x0082EB48 float*
+workTVerts 0x0082EB50 rdVector2[32]
+pSourceIVert 0x0082EB38 float*
+pSourceTVert 0x0082EB3C rdVector2*
+pDestTVert 0x0082EB40 rdVector2*
+
+sithSoundSys_dword_835FCC 0x00835FCC int
+sithSoundSys_bPlayingMci 0x00835FD0 int
+sithSoundSys_bInitted 0x00835FD4 int
+sithSoundSys_flt_835FD8 0x00835FD8 float
+sithSoundSys_bIsMuted 0x00835FDC int
+sithSoundSys_musicVolume 0x0054A678 float = 1.0f
+sithSoundSys_globalVolume 0x0054A67C float = 1.0f
+sithSoundSys_numSoundsAvailable2 0x00835FE0 int
+sithSoundSys_numSoundsAvailable 0x00835FE4 int
+sithSoundSys_aPlayingSounds 0x00835FE8 sithPlayingSound[32]
+sithSoundSys_aIdk 0x00836B68 int[32]
+sithSoundSys_activeChannels 0x00836BE8 int
+sithSoundSys_bOpened 0x00836BEC int
+sithSoundSys_pLastSectorSoundSector 0x00836BF4 sithSector*
+sithSoundSys_dword_836BF8 0x00836BF8 int
+sithSoundSys_dword_836BFC 0x00836BFC int
+sithSoundSys_trackTo 0x008BBC74 int
+sithSoundSys_trackFrom 0x008BBC70 int
+sithSoundSys_pPlayingSoundIdk 0x00836BF8 sithPlayingSound*
+sithSoundSys_dword_836C00 0x00836C00 int
+sithSoundSys_nextSoundIdx 0x0054A684 int = 1
+sithSoundSys_dword_836C04 0x00836C04 int
+sithSoundSys_pFocusedThing 0x00836BF0 sithThing*
+
+sithSound_maxDataLoaded 0x0054C390 int = 0x400000
+sithSound_var3 0x0054C394 int = 1
+sithSound_curDataLoaded 0x0084DF30 int
+sithSound_bInit 0x0084DF34 int
+sithSound_hashtable 0x0084DF38 stdHashTable*
+sithSound_var4 0x0084DF40 int
+sithSound_var5 0x0084DF44 int
+
+sithControl_msIdle 0x00835830 uint32_t
+sithControl_bOpened 0x00835838 int
+sithControl_aHandlers 0x00833A00 sithControl_handler_t[5]
+sithControl_numHandlers 0x008339F8 int
+sithControl_death_msgtimer 0x0083583C int
+sithControl_vec3_54A570 0x0054A570 rdVector3 = {0.0, -1.0, 0.0}
+sithControl_flt_54A57C 0x0054A57C float = 0.2f
+
+sithSave_func1 0x00835910 sithSaveHandler_t
+sithSave_func2 0x00835908 sithSaveHandler_t
+sithSave_func3 0x00835904 sithSaveHandler_t
+sithSave_funcWrite 0x00835F44 sithSaveHandler_t
+sithSave_funcRead 0x0083590C sithSaveHandler_t
+sithSave_autosave_fname 0x008BBC80 char[128]
+sithSave_dword_835900 0x00835900 int
+sithSave_dword_835914 0x00835914 int
+sithSave_fpath 0x00835F48 char[128]
+sithSave_wsaveName 0x008BBD00 wchar_t[256]
+sithSave_saveName 0x008BBF00 char[128]
+sithSave_headerTmp 0x00835918 sithSave_Header
+
+rdCamera_pCurCamera 0x0073A3D0 rdCamera*
+rdCamera_camMatrix 0x0086EE40 rdMatrix34
+
+sithNet_MultiModeFlags 0x008C4BA0 int
+sithNet_scorelimit 0x008C4BAC int
+sithNet_teamScore 0x008C4BC0 int[5]
+sithNet_multiplayer_timelimit 0x008C4BD4 int
+sithNet_isMulti 0x00832624 int
+sithNet_isServer 0x00832628 int
+sithNet_dword_832638 0x00832638 int
+sithNet_dword_8C4BA4 0x008C4BA4 int
+sithNet_things_idx 0x008330F0 int
+sithNet_things 0x008326AC int[641]
+sithNet_thingsIdx 0x008330F0 int
+sithNet_syncIdx 0x008330F4 int
+sithNet_aSyncFlags 0x008330B0 int[16]
+sithNet_aSyncThings 0x00832668 sithThing*[16]
+
+sithMapView_flMapSize 0x0054A5E0 float
+sithMapView_matrix 0x00835840 rdMatrix34
+sithMapView_pPlayer 0x00835870 sithThing*
+sithMapView_pCanvas 0x00835874 rdCanvas*
+sithMapView_x1 0x00835878 int
+sithMapView_y1 0x0083587C int
+sithMapView_inst 0x00835880 sithMapView
+sithMapView_bShowMap 0x008358C4 int
+sithMapView_bInitted 0x008358C8 int
+
+sithSoundClass_hashtable 0x00847F1C stdHashTable*
+sithSoundClass_nameToKeyHashtable 0x00847F20 stdHashTable*
+
+sithTemplate_alloc 0x8BBC60 void*
+sithTemplate_hashmap 0x008BBC64 stdHashTable*
+sithTemplate_count 0x8BBC68 int
+sithTemplate_oldHashtable 0x8BBC6C stdHashTable*
+
+// rdActive
+activeEdgeTail 0x0082D688 rdEdge
+activeEdgeHead 0x0073E618 rdEdge
+apNewActiveEdges 0x0073D610 rdEdge*[1024]
+apRemoveActiveEdges 0x00754680 rdEdge*[1024]
+yMinEdge 0x0073E610 int
+yMaxEdge 0x0073E670 int
+numActiveSpans 0x0073E674 int
+numActiveFaces 0x0082D684 int
+numActiveEdges 0x0082D680 int
+aActiveEdges 0x00755680 rdEdge[1024] // TODO verify
+rdActive_drawnFaces 0x0082D6E0 int
+
+sith_bEndLevel 0x0082F0A8 int
+sith_bInitialized 0x0082F0AC int
+sith_bOpened 0x0082F0B0 int
+
+sithSurface_numAvail 0x0084DF48 int
+sithSurface_aAvail 0x0084DF4C int[256+1]
+sithSurface_numSurfaces 0x0084E350 int
+sithSurface_aSurfaces 0x0084E358 rdSurface[256]
+sithSurface_bOpened 0x00852F58 int
+sithSurface_byte_8EE668 0x008EE668 uint8_t
+sithSurface_numSurfaces_0 0x00847F18 int
+
+// rdMaterial
+pMaterialsLoader 0x73D600 rdMaterialLoader_t
+pMaterialsUnloader 0x73D604 rdMaterialUnloader_t
+
+sithSprite_hashmap 0x00852F90 stdHashTable*
+
+Window_drawAndFlip 0x00855E9C WindowDrawHandler_t
+Window_setCooperativeLevel 0x00855EA0 WindowDrawHandler_t
+Window_ext_handlers 0x00855DF0 wm_handler[16]
+
+DebugGui_aIdk 0x008BBF80 int[32]
+DebugGui_idk 0x008BC000 int
+DebugGui_some_line_amt 0x008BC004 int
+DebugGui_some_num_lines 0x008BC008 int
+DebugLog_buffer 0x008BC020 char[4072]
+DebugConsole_aCmds 0x008358D0 stdDebugConsoleCmd*
+DebugConsole_pCmdHashtable 0x008358D4 stdHashTable*
+DebugConsole_bOpened 0x008358D8 int
+DebugConsole_bInitted 0x008358DC int
+DebugConsole_maxCmds 0x008358E4 int
+DebugConsole_numRegisteredCmds 0x008358E8 int
+DebugGui_maxLines 0x008358EC uint32_t
+DebugGui_fnPrint 0x008358F0 DebugConsolePrintFunc_t
+DebugGui_fnPrintUniStr 0x008358F4 DebugConsolePrintUniStrFunc_t
+DebugConsole_alertSound 0x008358F8 stdSound_buffer_t*
+DebugConsole_idk2 0x008358FC int16_t
+
+// std3D
+d3d_maxVertices 0x0055C7F0 uint32_t
+d3d_device_ptr 0x0055C7DC d3d_device*
+
+sithDplay_idk 0x008321F8 int
+sithDplay_bInitted 0x008321D8 int
+sithDplay_dword_8321F0 0x008321F0 int
+sithDplay_dword_8321F4 0x008321F4 int
+sithDplay_dword_8321EC 0x008321EC int
+
+stdMci_mciId 0x00563720 MCIDEVICEID
+stdMci_dwVolume 0x00563724 int
+stdMci_bInitted 0x00563728 int
+stdMci_uDeviceID 0x00548118 int
+
+wuRegistry_bInitted 0x00855EA4 int
+wuRegistry_lpClass 0x00855EB0 uint8_t[4]
+wuRegistry_byte_855EB4 0x00855EB4 uint8_t[4]
+wuRegistry_hKey 0x00855EAC HKEY
+wuRegistry_lpSubKey 0x00855EA8 LPCSTR
+
+WinIdk_aDplayGuid 0x008607F0 uint32_t[4]
+
+stdDisplay_aDevices 0x00868280 stdVideoDevice[16]
+stdDisplay_gammaTableLen 0x055B410 int
+stdDisplay_paGammaTable 0x055B414 int*
+stdDisplay_gammaPalette 0x0055ADB8 rdColor24[256]
+stdDisplay_pCurDevice 0x0055B3E8 stdVideoDevice*
+stdDisplay_pCurVideoMode 0x0055B3F0 stdVideoMode*
+stdDisplay_bStartup 0x0055B3D8 int
+stdDisplay_bOpen 0x0055B3DC int
+stdDisplay_bModeSet 0x0055B3E0 int
+stdDisplay_numVideoModes 0x055B3EC int
+stdDisplay_bPaged 0x55B3F4 int
+
+// std
+word_860800 0x860800 uint16_t
+word_860802 0x860802 uint16_t
+word_860804 0x860804 uint16_t
+word_860806 0x860806 uint16_t
+
+stdControl_bControlsIdle 0x0055D5D4 int
+
+Windows_installType 0x008606E0 int
+
+Video_fillColor 0x00552898 int
+Video_modeStruct 0x008605C0 videoModeStruct
+Video_otherBuf 0x00866CA0 stdVBuffer
+Video_dword_866D78 0x00866D78 int
+Video_curMode 0x00866D7C int
+Video_renderSurface 0x00866D80 stdVideoMode[9] // TODO verify
+Video_menuBuffer 0x0086AC00 stdVBuffer
+Video_pOtherBuf 0x00552888 stdVBuffer*
+Video_pMenuBuffer 0x0055288C stdVBuffer*
+Video_bInitted 0x005528B4 int
+Video_bOpened 0x005528B8 int
+Video_flt_55289C 0x0055289C float
+Video_dword_5528A0 0x005528A0 int
+Video_dword_5528A4 0x005528A4 int
+Video_dword_5528A8 0x005528A8 int
+Video_lastTimeMsec 0x005528AC int
+Video_dword_5528B0 0x005528B0 int
+Video_pVbufIdk 0x00552890 stdVBuffer*
+Video_pCanvas 0x00552894 rdCanvas*
+
+stdConsole_foregroundAttr 0x0055BB68 uint16_t
+stdConsole_wAttributes 0x0055BB6C uint16_t
+stdConsole_cursorHidden 0x0055BB70 int
+stdConsole_ConsoleCursorInfo 0x0055BB78 CONSOLE_CURSOR_INFO
+stdConsole_hConsoleOutput 0x00866860 HANDLE
+stdConsole_hConsoleInput 0x00866864 HANDLE
+
+rdRaster_aOneDivXQuantLUT 0x0086ADE0 int[2048]
+rdRaster_aOtherLUT 0x86CDDC float[16]
+rdRaster_aOneDivXLUT 0x0086CE20 float[2048]
+rdRaster_fixedScale 0x00548E28 float = 65536.0f
+
+sithCogAI_apViewThings 0x00855CE8 sithThing*[32]
+sithCogAI_unk1 0x00855D68 int
+sithCogAI_viewThingIdx 0x00855D6C int
+
+sithCogVm_MsgTmpBuf 0x00837468 sithCogMsg[32]
+sithCogVm_aMsgPairs 0x00847968 sithCogMsg_Pair[128]
+sithCogVm_msgFuncs 0x00847D68 cogMsg_Handler[65]
+sithCogVm_needsSync 0x00847E6C int
+sithCogVm_multiplayerFlags 0x00847E70 int
+sithCogVm_bSyncMultiplayer 0x00847E74 int
+sithCogVm_idk2 0x00847E7C int
+sithCogVm_bInit 0x00847E80 int
+sithCogVm_dword_847E84 0x00847E84 uint32_t
+sithCogVm_msgId 0x0054B004 int = 1
+sithCogVm_MsgTmpBuf2 0x00836C40 sithCogMsg
+sithCogVm_netMsgTmp 0x008B4C00 sithCogMsg
+
+jkCog_emptystring 0x005540BC wchar_t[2]
+jkCog_jkstring 0x00553FB8 wchar_t[130]
+jkCog_bInitted 0x00553FB0 int
+jkCog_strings 0x0553FA0 stdStrTable
+
+sithCog_bOpened 0x00836C2C int
+sithCog_pScriptHashtable 0x00836C3C stdHashTable*
+sithCog_aSectorLinks 0x008B5440 sithCogSectorLink[512]
+sithCog_numSectorLinks 0x00836C38 int
+sithCog_aThingLinks 0x008B7460 sithCogThingLink[512]
+sithCog_numThingLinks 0x00836C30 int
+sithCog_numSurfaceLinks 0x00836C34 int
+sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[512]
+sithCog_masterCog 0x008B542C sithCog*
+
+jkDev_bInitted 0x0055A9B4 int
+jkDev_bOpened 0x0055A9B8 int
+jkDev_vbuf 0x0055A9C4 stdVBuffer*
+
+jkSmack_gameMode 0x00552B78 int
+jkSmack_bInit 0x00552B7C int
+jkSmack_stopTick 0x00552B84 int
+jkSmack_currentGuiState 0x00552B88 int
+jkSmack_nextGuiState 0x00552B8C int
+jkSmack_alloc 0x00552B74 void*
+
+jkEpisode_aEpisodes 0x8568E0 jkEpisode[64]
+jkEpisode_var4 0x005540D8 char[128]
+jkEpisode_var5 0x00554158 char[128]
+jkEpisode_var2 0x005541D8 uint32_t
+jkEpisode_mLoad 0x00552B68 jkEpisodeLoad
+

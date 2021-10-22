@@ -2,6 +2,7 @@
 #define _SITHAICLASS_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithAIClass_Startup_ADDR (0x004F11F0)
 #define sithAIClass_Shutdown_ADDR (0x004F1210)
@@ -10,8 +11,6 @@
 #define sithAIClass_Free_ADDR (0x004F1410)
 #define sithAIClass_Load_ADDR (0x004F14A0)
 #define sithAIClass_LoadEntry_ADDR (0x004F15C0)
-
-#define sithAIClass_hashmap (*(stdHashTable**)0x00852F88)
 
 typedef int (*sithAIClassEntryFunc_t)(sithActor*, sithAIClassEntry*, sithActorInstinct*, int, int);
 

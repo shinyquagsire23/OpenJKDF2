@@ -550,7 +550,7 @@ void sithInventory_Reset(sithThing *player)
 
     v2 = player->actorParams.playerinfo->iteminfo;
     v14 = v2;
-    if ( !sithInventory_549FA0 || net_isMulti )
+    if ( !sithInventory_549FA0 || sithNet_isMulti )
         goto LABEL_16;
     v4 = 0;
     
@@ -645,7 +645,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
     sithThing *templateThing;
     sithThing *backpack;
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
         return 0;
 
     templateThing = sithTemplate_GetEntryByName("+backpack");

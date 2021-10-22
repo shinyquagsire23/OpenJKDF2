@@ -220,7 +220,7 @@ LABEL_8:
     if ( callback )
         rdPuppet_SetCallback(puppet, trackNum, callback);
     else
-        rdPuppet_SetCallback(puppet, trackNum, (int)sithPuppet_DefaultCallback);
+        rdPuppet_SetCallback(puppet, trackNum, sithPuppet_DefaultCallback);
     if ( (a5 & 2) != 0 )
     {
         rdPuppet_SetStatus(puppet, trackNum, 32);

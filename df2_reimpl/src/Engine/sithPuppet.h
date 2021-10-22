@@ -2,6 +2,7 @@
 #define _SITHPUPPET_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithPuppet_Startup_ADDR (0x004E3C00)
 #define sithPuppet_Shutdown_ADDR (0x004E3CA0)
@@ -33,10 +34,6 @@ struct sithPuppet
   int currentTrack;
   int animStartedMs;
 };
-
-#define sithPuppet_hashtable (*(stdHashTable**)0x00847E88)
-#define sithPuppet_keyframesHashtable (*(stdHashTable**)0x00847E8C)
-#define sithPuppet_animNamesToIdxHashtable (*(stdHashTable**)0x00847E90)
 
 int sithPuppet_Startup();
 static void (*sithPuppet_Shutdown)() = (void*)sithPuppet_Shutdown_ADDR;

@@ -109,7 +109,7 @@ int sithPlayer_GetNum(sithThing *player)
 
     if ( !player || player->thingType != THINGTYPE_PLAYER )
         return -1;
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
         return 0;
 
     if ( jkPlayer_maxPlayers <= 0 )
@@ -441,7 +441,7 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
     int v4; // ecx
     int v5; // eax
 
-    if ( (net_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->thingType == THINGTYPE_PLAYER && thing2->thingType == THINGTYPE_PLAYER )
+    if ( (sithNet_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->thingType == THINGTYPE_PLAYER && thing2->thingType == THINGTYPE_PLAYER )
     {
         v2 = thing1->actorParams.playerinfo;
         if ( v2 )
@@ -488,7 +488,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         thing->actorParams.typeflags &= ~0x2000;
         sithSector_StopPhysicsThing(thing);
         sithWeapon_SyncPuppet(thing);
-        if ( net_isMulti )
+        if ( sithNet_isMulti )
             sithMulti_HandleDeath(v1, thing, thing);
         if ( thing == g_localPlayerThing )
         {
@@ -521,7 +521,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     sithSector_StopPhysicsThing(player);
     sithWeapon_SyncPuppet(player);
     sithInventory_SendKilledMessageToAll(player, killedBy);
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithMulti_HandleDeath(v5, player, killedBy);
     if ( player == g_localPlayerThing )
         sithControl_death_msgtimer = sithTime_curMs + 3000;
@@ -532,7 +532,7 @@ int sithPlayer_GetNumidk(int a1)
     int result; // eax
     sithPlayerInfo* i;
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
         return 0;
     result = 0;
     if ( jkPlayer_maxPlayers <= 0 )

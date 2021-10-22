@@ -161,7 +161,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     num_soundclasses = _atoi(stdConffile_entry.args[2].value);
     if ( num_soundclasses <= 0 )
         return 1;
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         num_soundclasses += 32;
     soundclasses = (sithSoundClass *)pSithHS->alloc(sizeof(sithSoundClass) * num_soundclasses);
     world->soundclasses = soundclasses;

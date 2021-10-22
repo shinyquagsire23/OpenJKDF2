@@ -3,7 +3,7 @@
 
 #include "jk.h"
 #include "types.h"
-#include "General/stdPalEffects.h"
+#include "globals.h"
 
 #define rdStartup_ADDR (0x0043A950)
 #define rdShutdown_ADDR (0x0043A990)
@@ -32,26 +32,6 @@
 #define rdAdvanceFrame_ADDR (0x0043ABD0)
 #define rdFinishFrame_ADDR (0x0043ABF0)
 #define rdClearPostStatistics_ADDR (0x0043AC10)
-
-#define rdroid_aMipDistances (*(rdVector4*)0x548250)
-
-#define rdroid_frameTrue (*(int*)0x570390)
-#define bRDroidStartup (*(int*)0x570394)
-#define bRDroidOpen (*(int*)0x570398)
-
-#define rdroid_curLightingMode (*(int*)0x889EA0)
-#define rdroid_pHS (*(struct common_functions**)0x889EA4)
-#define rdroid_curGeometryMode (*(int*)0x889EA8)
-
-#define rdroid_curColorEffects  (*(stdPalEffect*)0x889EC0)
-#define rdroid_curOcclusionMethod (*(int*)0x00889EE8)
-#define rdroid_curZBufferMethod (*(int*)0x00889EEC)
-#define rdroid_curProcFaceUserData (*(int*)0x00889EF0)
-#define rdroid_curSortingMethod (*(int*)0x00889EF4)
-#define rdroid_curAcceleration (*(int*)0x00889EF8)
-#define rdroid_curTextureMode (*(int*)0x00889EFC)
-#define rdroid_curRenderOptions (*(int*)0x00889F00)
-#define rdroid_curCullFlags (*(int*)0x00889F04)
 
 int rdStartup(struct common_functions *p_hs);
 void rdShutdown();

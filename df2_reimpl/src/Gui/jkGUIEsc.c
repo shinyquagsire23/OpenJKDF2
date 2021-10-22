@@ -78,7 +78,7 @@ void jkGuiEsc_Show()
 {
     signed int v3; // eax
 
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
     {
         jkGuiEsc_aElements[JKGUIESC_ELMT_LOAD].bIsVisible = 0;
         jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;

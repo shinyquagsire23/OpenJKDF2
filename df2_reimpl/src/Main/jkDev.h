@@ -2,6 +2,7 @@
 #define _JKDEV_H
 
 #include "types.h"
+#include "globals.h"
 
 #define jkDev_Startup_ADDR (0x0041F100)
 #define jkDev_Shutdown_ADDR (0x0041F6A0)
@@ -42,10 +43,6 @@
 #define jkDev_CmdMana_ADDR (0x00420F40)
 #define jkDev_CmdTeam_ADDR (0x00420F80)
 #define jkDev_DialogFunc_ADDR (0x00420FD0)
-
-#define jkDev_bInitted (*(int*)0x0055A9B4)
-#define jkDev_bOpened (*(int*)0x0055A9B8)
-#define jkDev_vbuf (*(stdVBuffer**)0x0055A9C4)
 
 void jkDev_Close();
 

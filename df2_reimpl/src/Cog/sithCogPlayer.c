@@ -158,7 +158,7 @@ void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
 {
     int teamNum = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ((!net_isMulti || net_isServer)
+    if ((!sithNet_isMulti || sithNet_isServer)
         && player
         && player->thingType == THINGTYPE_PLAYER)
     {
@@ -166,7 +166,7 @@ void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
         if ( playerInfo )
         {
             playerInfo->teamNum = teamNum;
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 sithMulti_SyncScores();
         }
     }
@@ -189,7 +189,7 @@ void sithCogPlayer_SetPlayerScore(sithCog *ctx)
 {
     int score = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ((!net_isMulti || net_isServer)
+    if ((!sithNet_isMulti || sithNet_isServer)
         && player
         && player->thingType == THINGTYPE_PLAYER)
     {
@@ -197,7 +197,7 @@ void sithCogPlayer_SetPlayerScore(sithCog *ctx)
         if ( playerInfo )
         {
             playerInfo->score = score;
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 sithMulti_SyncScores();
         }
     }
@@ -220,7 +220,7 @@ void sithCogPlayer_SetPlayerKills(sithCog *ctx)
 {
     int numKills = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ((!net_isMulti || net_isServer)
+    if ((!sithNet_isMulti || sithNet_isServer)
         && player
         && player->thingType == THINGTYPE_PLAYER)
     {
@@ -228,7 +228,7 @@ void sithCogPlayer_SetPlayerKills(sithCog *ctx)
         if ( playerInfo )
         {
             playerInfo->numKills = numKills;
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 sithMulti_SyncScores();
         }
     }
@@ -251,7 +251,7 @@ void sithCogPlayer_SetPlayerKilled(sithCog *ctx)
 {
     int numKilled = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ((!net_isMulti || net_isServer)
+    if ((!sithNet_isMulti || sithNet_isServer)
         && player
         && player->thingType == THINGTYPE_PLAYER)
     {
@@ -259,7 +259,7 @@ void sithCogPlayer_SetPlayerKilled(sithCog *ctx)
         if ( playerInfo )
         {
             playerInfo->numKilled = numKilled;
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 sithMulti_SyncScores();
         }
     }
@@ -282,7 +282,7 @@ void sithCogPlayer_SetPlayerSuicides(sithCog *ctx)
 {
     int numSuicides = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ((!net_isMulti || net_isServer)
+    if ((!sithNet_isMulti || sithNet_isServer)
         && player
         && player->thingType == THINGTYPE_PLAYER)
     {
@@ -290,7 +290,7 @@ void sithCogPlayer_SetPlayerSuicides(sithCog *ctx)
         if ( playerInfo )
         {
             playerInfo->numSuicides = numSuicides;
-            if ( net_isMulti )
+            if ( sithNet_isMulti )
                 sithMulti_SyncScores();
         }
     }
@@ -374,7 +374,7 @@ void sithCogPlayer_CreateBackpack(sithCog *ctx)
 
 void sithCogPlayer_GetAutoSwitch(sithCog *ctx)
 {
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiplayerAutoSwitch);
     else
         sithCogVm_PushInt(ctx, sithWeapon_bAutoSwitch);
@@ -383,7 +383,7 @@ void sithCogPlayer_GetAutoSwitch(sithCog *ctx)
 void sithCogPlayer_SetAutoSwitch(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithWeapon_bMultiplayerAutoSwitch = bVal;
     else
         sithWeapon_bAutoSwitch = bVal;
@@ -391,7 +391,7 @@ void sithCogPlayer_SetAutoSwitch(sithCog *ctx)
 
 void sithCogPlayer_GetAutoPickup(sithCog *ctx)
 {
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiAutoPickup);
     else
         sithCogVm_PushInt(ctx, sithWeapon_bAutoPickup);
@@ -400,7 +400,7 @@ void sithCogPlayer_GetAutoPickup(sithCog *ctx)
 void sithCogPlayer_SetAutoPickup(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithWeapon_bMultiplayerAutoSwitch = bVal;
     else
         sithWeapon_bAutoSwitch = bVal;
@@ -408,7 +408,7 @@ void sithCogPlayer_SetAutoPickup(sithCog *ctx)
 
 void sithCogPlayer_GetAutoReload(sithCog *ctx)
 {
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiAutoReload);
     else
         sithCogVm_PushInt(ctx, sithWeapon_bAutoReload);
@@ -417,7 +417,7 @@ void sithCogPlayer_GetAutoReload(sithCog *ctx)
 void sithCogPlayer_SetAutoReload(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithWeapon_bMultiAutoPickup = bVal;
     else
         sithWeapon_bAutoPickup = bVal;
@@ -521,7 +521,7 @@ void sithCogPlayer_SetBinWait(sithCog *ctx)
 
 void sithCogPlayer_SyncScores(sithCog *ctx)
 {
-    if (net_isMulti)
+    if (sithNet_isMulti)
         sithMulti_SyncScores();
 }
 

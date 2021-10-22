@@ -1,6 +1,7 @@
 #ifndef _RDMATRIX_H
 #define _RDMATRIX_H
 
+#include "types.h"
 #include "rdVector.h"
 #include "hook.h"
 
@@ -60,30 +61,6 @@
 #define rdMatrix_TransformPoint44Acc_ADDR (0x00442310)
 #define rdMatrix_TransformPointLst34_ADDR (0x004423D0)
 #define rdMatrix_TransformPointLst44_ADDR (0x00442470)
-
-
-typedef struct rdMatrix33
-{
-    rdVector3 rvec;
-    rdVector3 lvec;
-    rdVector3 uvec;
-} rdMatrix33;
-
-typedef struct rdMatrix34
-{
-    rdVector3 rvec;
-    rdVector3 lvec;
-    rdVector3 uvec;
-    rdVector3 scale;
-} rdMatrix34;
-
-typedef struct rdMatrix44
-{
-    rdVector4 vA;
-    rdVector4 vB;
-    rdVector4 vC;
-    rdVector4 vD;
-} rdMatrix44;
 
 void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
 void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt);

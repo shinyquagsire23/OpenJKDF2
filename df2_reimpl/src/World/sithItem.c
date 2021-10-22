@@ -11,7 +11,7 @@
 
 int sithItem_Collide(sithThing *a1, sithThing *a2)
 {
-    if ( !net_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
+    if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
     {
         if ( sithUnk3_HasLos(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
         {
@@ -31,15 +31,15 @@ void sithItem_New(sithThing *out)
 
 void sithItem_Take(sithThing *item, sithThing *actor, int a3)
 {
-    if ( !net_isMulti || a3 )
+    if ( !sithNet_isMulti || a3 )
     {
         if ( actor == g_localPlayerThing )
         {
             sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
         }
 
-        if ( item->itemParams.typeflags & THING_TYPEFLAGS_FORCE && !net_isMulti 
-             || item->itemParams.typeflags & THING_TYPEFLAGS_1 && net_isMulti )
+        if ( item->itemParams.typeflags & THING_TYPEFLAGS_FORCE && !sithNet_isMulti 
+             || item->itemParams.typeflags & THING_TYPEFLAGS_1 && sithNet_isMulti )
         {
             item->thingflags |= SITH_TF_DISABLED;
             item->lifeLeftMs = (int)(item->itemParams.respawn * 1000.0);
@@ -57,7 +57,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
 
 void sithItem_Remove(sithThing *item)
 {
-    if ( net_isMulti && !net_isServer )
+    if ( sithNet_isMulti && !sithNet_isServer )
     {
         item->lifeLeftMs = 0;
         return;
@@ -65,8 +65,8 @@ void sithItem_Remove(sithThing *item)
 
     // TODO verify this, it was kinda weird
     if ( !item->itemParams.sector
-         || !net_isMulti && !(item->itemParams.typeflags & THING_TYPEFLAGS_FORCE)
-         || net_isMulti && !(item->itemParams.typeflags & THING_TYPEFLAGS_1))
+         || !sithNet_isMulti && !(item->itemParams.typeflags & THING_TYPEFLAGS_FORCE)
+         || sithNet_isMulti && !(item->itemParams.typeflags & THING_TYPEFLAGS_1))
     {
         if ( item->isVisible + 1 == bShowInvisibleThings )
             item->lifeLeftMs = 3000;

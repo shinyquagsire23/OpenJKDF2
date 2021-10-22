@@ -2,6 +2,7 @@
 #define _SITHDPLAY_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithDplay_Startup_ADDR (0x004C9530)
 #define sithDplay_Shutdown_ADDR (0x004C9550)
@@ -52,12 +53,6 @@
 #define DirectPlay_EnumPlayersCallback_ADDR (0x00430810)
 #define DirectPlay_sub_4308C0_ADDR (0x004308C0)
 #define DirectPlay_parseSessionDescidk_ADDR (0x004308F0)
-
-#define sithDplay_idk (*(int*)0x008321F8)
-#define sithDplay_bInitted (*(int*)0x8321D8)
-#define sithDplay_dword_8321F0 (*(int*)0x008321F0)
-#define sithDplay_dword_8321F4 (*(int*)0x008321F4)
-#define sithDplay_dword_8321EC (*(int*)0x008321EC)
 
 int sithDplay_Startup();
 static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;

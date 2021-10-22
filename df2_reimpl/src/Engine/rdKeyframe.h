@@ -2,6 +2,7 @@
 #define _RDKEYFRAME_H
 
 #include "types.h"
+#include "globals.h"
 #include "Primitives/rdVector.h"
 
 #define rdKeyframe_RegisterLoader_ADDR (0x0044AB80)
@@ -12,11 +13,6 @@
 #define rdKeyframe_Write_ADDR (0x0044B1F0)
 #define rdKeyframe_FreeEntry_ADDR (0x0044B570)
 #define rdKeyframe_FreeJoints_ADDR (0x0044B5F0)
-
-typedef struct rdKeyframe rdKeyframe; 
-
-typedef rdKeyframe* (__cdecl *keyframeLoader_t)(const char*);
-typedef int (__cdecl *keyframeUnloader_t)(rdKeyframe*);
 
 typedef struct rdMarkers
 {
@@ -56,9 +52,6 @@ typedef struct rdKeyframe
     int32_t numMarkers;
     rdMarkers markers;
 } rdKeyframe;
-
-#define pKeyframeLoader (*(keyframeLoader_t*)0x73D608)
-#define pKeyframeUnloader (*(keyframeUnloader_t*)0x73D60C)
 
 void rdKeyframe_RegisterLoader(keyframeLoader_t loader);
 void rdKeyframe_RegisterUnloader(keyframeUnloader_t loader);

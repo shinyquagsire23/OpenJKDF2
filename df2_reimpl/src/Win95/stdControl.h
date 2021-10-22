@@ -2,6 +2,7 @@
 #define _STDCONTROL_H
 
 #include "types.h"
+#include "globals.h"
 
 #define stdControl_Startup_ADDR (0x0042DE60)
 #define stdControl_Shutdown_ADDR (0x0042E240)
@@ -39,8 +40,6 @@
 #define stdConffile_ReadLine_ADDR (0x00431650)
 #define stdConffile_GetFileHandle_ADDR (0x00431730)
 #define stdControl_GetAxis2_ADDR (0x004D6D70)
-
-#define stdControl_bControlsIdle (*(int*)0x0055D5D4)
 
 int stdControl_MessageHandler(int a1, int a2, int a3);
 

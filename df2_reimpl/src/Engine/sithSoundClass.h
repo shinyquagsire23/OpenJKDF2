@@ -2,6 +2,7 @@
 #define _SITHSOUNDCLASS_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithSoundClass_StopSound_ADDR (0x004DD080)
 #define sithSoundClass_Startup_ADDR (0x004E63E0)
@@ -19,9 +20,6 @@
 #define sithSoundClass_ThingPauseSoundclass_ADDR (0x004E6CA0)
 #define sithSoundClass_ThingPlaySoundclass2_ADDR (0x004E6CD0)
 #define sithSoundClass_SetThingSoundClass_ADDR (0x004E6D70)
-
-#define sithSoundClass_hashtable (*(stdHashTable**)0x00847F1C)
-#define sithSoundClass_nameToKeyHashtable (*(stdHashTable**)0x00847F20)
 
 enum SITH_SC
 {

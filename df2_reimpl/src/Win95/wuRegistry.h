@@ -2,6 +2,7 @@
 #define _WUREGISTRY_H
 
 #include "types.h"
+#include "globals.h"
 
 #define wuRegistry_Startup_ADDR (0x0050EEB0)
 #define wuRegistry_Shutdown_ADDR (0x0050F030)
@@ -38,12 +39,5 @@ int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *o
 //static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
 
 //static void (*wuRegistry_Shutdown)() = (void*)wuRegistry_Shutdown_ADDR;
-
-
-#define wuRegistry_bInitted (*(int*)0x00855EA4)
-#define wuRegistry_lpClass ((uint8_t*)0x00855EB0)
-#define wuRegistry_byte_855EB4 ((uint8_t*)0x00855EB4)
-#define wuRegistry_hKey (*(HKEY*)0x00855EAC)
-#define wuRegistry_lpSubKey (*(LPCSTR*)0x00855EA8)
 
 #endif // _WUREGISTRY_H

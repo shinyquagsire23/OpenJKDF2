@@ -2,6 +2,7 @@
 
 #include "Engine/sithDebugConsole.h"
 #include "Win95/stdSound.h"
+#include "Engine/sithSound.h"
 #include "General/stdHashTable.h"
 #include "stdPlatform.h"
 #include "jk.h"
@@ -184,7 +185,7 @@ int DebugConsole_RegisterDevCmd(void *fn, char *cmd, int extra)
     _strncpy(DebugConsole_aCmds[DebugConsole_numRegisteredCmds].cmdStr, cmd, 0x1Fu);
     v4 = &DebugConsole_aCmds[DebugConsole_numRegisteredCmds];
     v4->cmdStr[31] = 0;
-    v4->cmdFunc = (int)fn;
+    v4->cmdFunc = fn;
     v4->extra = extra;
     stdHashTable_SetKeyVal(DebugConsole_pCmdHashtable, v4->cmdStr, v4);
     ++DebugConsole_numRegisteredCmds;

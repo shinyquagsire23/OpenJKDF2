@@ -279,6 +279,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         }
         jkPlayer_ReadOptionsConf();
         sithWeapon_ReadConf();
+        //jk_printf("%s\n", stdConffile_aLine);
         sithControl_ReadConf();
         if ( stdConffile_ReadArgs() )
         {

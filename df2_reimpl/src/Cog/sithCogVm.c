@@ -263,40 +263,40 @@ int sithCogVm_Sync()
     sithCogVm_needsSync = 0;
     if ( !sithCogVm_bSyncMultiplayer )
         return 0;
-    while ( sithDplay_Recv(&g_netMsgTmp) == 1 )
+    while ( sithDplay_Recv(&sithCogVm_netMsgTmp) == 1 )
     {
         ++v13;
-        if ( g_netMsgTmp.netMsg.thingIdx )
+        if ( sithCogVm_netMsgTmp.netMsg.thingIdx )
         {
-            v1 = sithPlayer_ThingIdxToPlayerIdx(g_netMsgTmp.netMsg.thingIdx);
-            v2 = g_netMsgTmp.netMsg.cogMsgId;
+            v1 = sithPlayer_ThingIdxToPlayerIdx(sithCogVm_netMsgTmp.netMsg.thingIdx);
+            v2 = sithCogVm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
                 jkPlayer_playerInfos[v1].field_13B0 = sithTime_curMs;
 LABEL_14:
-                if ( g_netMsgTmp.netMsg.msgId )
+                if ( sithCogVm_netMsgTmp.netMsg.msgId )
                 {
                     sithCogVm_MsgTmpBuf2.netMsg.msgId = 0;
-                    *(uint16_t*)sithCogVm_MsgTmpBuf2.pktData = g_netMsgTmp.netMsg.msgId;
-                    sithCogVm_MsgTmpBuf2.netMsg.field_C = g_netMsgTmp.netMsg.thingIdx;
+                    *(uint16_t*)sithCogVm_MsgTmpBuf2.pktData = sithCogVm_netMsgTmp.netMsg.msgId;
+                    sithCogVm_MsgTmpBuf2.netMsg.field_C = sithCogVm_netMsgTmp.netMsg.thingIdx;
                     sithCogVm_MsgTmpBuf2.netMsg.cogMsgId = COGMSG_RESET;
                     sithCogVm_MsgTmpBuf2.netMsg.msg_size = 2;
-                    sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, g_netMsgTmp.netMsg.thingIdx);
+                    sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, sithCogVm_netMsgTmp.netMsg.thingIdx);
                     
                     int i = 0;
-                    v4 = (uint16_t)g_netMsgTmp.netMsg.msgId;
-                    while ( g_netMsgTmp.netMsg.thingIdx != sithCogVm_aMsgPairs[i].thingIdx || (uint16_t)g_netMsgTmp.netMsg.msgId != sithCogVm_aMsgPairs[i].msgId )
+                    v4 = (uint16_t)sithCogVm_netMsgTmp.netMsg.msgId;
+                    while ( sithCogVm_netMsgTmp.netMsg.thingIdx != sithCogVm_aMsgPairs[i].thingIdx || (uint16_t)sithCogVm_netMsgTmp.netMsg.msgId != sithCogVm_aMsgPairs[i].msgId )
                     {
                         i++;
                         if ( i >= 128 )
                         {
                             v5 = sithCogVm_dword_847E84;
-                            sithCogVm_aMsgPairs[sithCogVm_dword_847E84].thingIdx = g_netMsgTmp.netMsg.thingIdx;
+                            sithCogVm_aMsgPairs[sithCogVm_dword_847E84].thingIdx = sithCogVm_netMsgTmp.netMsg.thingIdx;
                             sithCogVm_aMsgPairs[v5].msgId = v4;
                             sithCogVm_dword_847E84 = v5 + 1;
                             if ( v5 + 1 >= 0x80 )
                                 sithCogVm_dword_847E84 = 0;
-                            v2 = g_netMsgTmp.netMsg.cogMsgId;
+                            v2 = sithCogVm_netMsgTmp.netMsg.cogMsgId;
                             goto LABEL_22;
                         }
                     }
@@ -307,21 +307,21 @@ LABEL_22:
                     if ( v2 < (unsigned int)COGMSG_MAX )
                     {
                         if ( sithCogVm_msgFuncs[v2] )
-                            sithCogVm_msgFuncs[v2](&g_netMsgTmp);
+                            sithCogVm_msgFuncs[v2](&sithCogVm_netMsgTmp);
                     }
                 }
                 goto LABEL_25;
             }
-            if ( g_netMsgTmp.netMsg.cogMsgId == COGMSG_JOINLEAVE
-              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_REQUESTCONNECT
-              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_RESET
-              || g_netMsgTmp.netMsg.cogMsgId == COGMSG_LEAVEJOIN
+            if ( sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_JOINLEAVE
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_REQUESTCONNECT
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_RESET
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_LEAVEJOIN
               || (g_submodeFlags & 8) != 0 )
             {
                 goto LABEL_14;
             }
-            if ( net_isServer )
-                sithMulti_SendKickPlayer(g_netMsgTmp.netMsg.thingIdx);
+            if ( sithNet_isServer )
+                sithMulti_SendKickPlayer(sithCogVm_netMsgTmp.netMsg.thingIdx);
         }
 LABEL_25:
         if ( sithCogVm_needsSync )

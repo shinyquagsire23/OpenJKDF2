@@ -295,10 +295,10 @@ void sith_UpdateCamera()
 {
     if ( (g_submodeFlags & 8) == 0 )
     {
-        if ( !++dword_8EE678 )
+        if ( !++sithRender_lastRenderTick )
         {
             sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-            dword_8EE678 = 1;
+            sithRender_lastRenderTick = 1;
         }
 #ifdef QOL_IMPROVEMENTS
 #ifdef LINUX
@@ -407,7 +407,7 @@ void sith_AutoSave()
     return;
 #endif
 
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
         sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);

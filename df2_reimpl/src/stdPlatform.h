@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "jk.h"
+#include "globals.h"
 
 #define stdPlatform_Startup_ADDR (0x0042C080)
 #define stdPlatform_Assert_ADDR (0x0042C090)
@@ -15,9 +16,6 @@
 #define stdPlatform_InitServices_ADDR (0x0042C1F0)
 #define stdPlatform_GetTimeMsec_ADDR (0x0042C2B0)
 #define stdPlatform_GetDateTime_ADDR (0x0042C2C0)
-
-#define std_genBuffer ((char*)0x866880)
-#define std_pHS (*((struct common_functions **)0x866C80))
 
 #define stdPlatform_GetTimeMsec_ADDR (0x0042C2B0)
 

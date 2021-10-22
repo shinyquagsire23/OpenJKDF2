@@ -1344,22 +1344,22 @@ void sithCogUtil_SetCameraStateFlags(sithCog *ctx)
 
 void sithCogUtil_SetMultiModeFlags(sithCog *ctx)
 {
-    net_MultiModeFlags |= sithCogVm_PopInt(ctx);
+    sithNet_MultiModeFlags |= sithCogVm_PopInt(ctx);
 }
 
 void sithCogUtil_GetMultiModeFlags(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, net_MultiModeFlags);
+    sithCogVm_PushInt(ctx, sithNet_MultiModeFlags);
 }
 
 void sithCogUtil_ClearMultiModeFlags(sithCog *ctx)
 {
-    net_MultiModeFlags &= ~sithCogVm_PopInt(ctx);
+    sithNet_MultiModeFlags &= ~sithCogVm_PopInt(ctx);
 }
 
 void sithCogUtil_IsMulti(sithCog *ctx)
 {
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, 1);
     else
         sithCogVm_PushInt(ctx, 0);
@@ -1367,7 +1367,7 @@ void sithCogUtil_IsMulti(sithCog *ctx)
 
 void sithCogUtil_IsServer(sithCog *ctx)
 {
-    sithCogUtil_ReturnBool(net_isServer, ctx);
+    sithCogUtil_ReturnBool(sithNet_isServer, ctx);
 }
 
 // unused
@@ -1387,7 +1387,7 @@ void sithCogUtil_GetTeamScore(sithCog *ctx)
     if ( idx <= 0 || idx >= 5 )
         sithCogVm_PushInt(ctx, -999999);
     else
-        sithCogVm_PushInt(ctx, net_teamScore[idx]);
+        sithCogVm_PushInt(ctx, sithNet_teamScore[idx]);
 }
 
 void sithCogUtil_SetTeamScore(sithCog *ctx)
@@ -1398,14 +1398,14 @@ void sithCogUtil_SetTeamScore(sithCog *ctx)
     score = sithCogVm_PopInt(ctx);
     idx = sithCogVm_PopInt(ctx);
     if ( idx > 0 && idx < 5 )
-        net_teamScore[idx] = score;
+        sithNet_teamScore[idx] = score;
 }
 
 void sithCogUtil_GetTimeLimit(sithCog *a1)
 {
     float a2; // ST04_4
 
-    a2 = (double)(unsigned int)multiplayer_timelimit * 0.000016666667;
+    a2 = (double)(unsigned int)sithNet_multiplayer_timelimit * 0.000016666667;
     sithCogVm_PushFlex(a1, a2);
 }
 
@@ -1413,17 +1413,17 @@ void sithCogUtil_SetTimeLimit(sithCog *ctx)
 {
     float v1 = sithCogVm_PopFlex(ctx);
     if ( v1 >= 0.0 )
-        multiplayer_timelimit = (int)(v1 * 60000.0);
+        sithNet_multiplayer_timelimit = (int)(v1 * 60000.0);
 }
 
 void sithCogUtil_GetScoreLimit(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, net_scorelimit);
+    sithCogVm_PushInt(ctx, sithNet_scorelimit);
 }
 
 void sithCogUtil_SetScoreLimit(sithCog *ctx)
 {
-    net_scorelimit = sithCogVm_PopInt(ctx);
+    sithNet_scorelimit = sithCogVm_PopInt(ctx);
 }
 
 void sithCogUtil_ChangeFireRate(sithCog *ctx)

@@ -1,7 +1,8 @@
 #ifndef _SITHTEMPLATE_H
 #define _SITHTEMPLATE_H
 
-#include "General/stdHashTable.h"
+#include "types.h"
+#include "globals.h"
 
 #define sithTemplate_Startup_ADDR (0x004DD880)
 #define sithTemplate_Shutdown_ADDR (0x004DD8A0)
@@ -14,9 +15,6 @@
 #define sithTemplate_GetEntryByName_ADDR (0x004DDE50)
 #define sithTemplate_CreateEntry_ADDR (0x004DDF30)
 
-typedef struct sithThing sithThing;
-typedef struct sithWorld sithWorld;
-
 int sithTemplate_Startup();
 void sithTemplate_Shutdown();
 int sithTemplate_New(sithWorld *world, unsigned int numTemplates);
@@ -27,10 +25,5 @@ void sithTemplate_OldFree();
 void sithTemplate_FreeWorld(sithWorld *world);
 sithThing* sithTemplate_GetEntryByName(const char *name);
 sithThing* sithTemplate_CreateEntry(sithWorld *world);
-
-#define sithTemplate_alloc (*(void**)0x8BBC60)
-#define sithTemplate_hashmap (*(stdHashTable**)0x008BBC64)
-#define sithTemplate_count (*(int*)0x8BBC68)
-#define sithTemplate_oldHashtable (*(stdHashTable**)0x8BBC6C)
 
 #endif // _SITHTEMPLATE_H

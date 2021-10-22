@@ -113,27 +113,6 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
 void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3);
 int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3);
 
-#if 0
-#define sithAI_commandsHashmap (*(stdHashTable**)0x0084DA40)
-#define sithAI_actorInitted ((int*)0x0084DA48)
-#define sithAI_maxActors (*(uint32_t*)0x0084DA44)
-#define sithAI_bOpened     (*(int*)0x84DE48)
-#define sithAI_bInit       (*(int*)0x84DE4C)
-#define sithAI_commandList (*(sithAICommand**)0x0084DE50)
-#define sithAI_numCommands (*(uint32_t*)0x84DE54)
-#define sithAI_flt_84DE58   (*(float*)0x0084DE58)
-#define sithAI_dword_84DE5C (*(uint32_t*)0x0084DE5C)
-#define sithAI_dword_84DE60 (*(int*)0x0084DE60)
-#define sithAI_flt_84DE64   (*(float*)0x0084DE64)
-#define sithAI_pThing_84DE68 (*(sithThing***)0x0084DE68)
-#define sithAI_dword_84DE6C (*(int*)0x0084DE6C)
-#define sithAI_flt_84DE70   (*(float*)0x0084DE70)
-#define sithAI_dword_84DE74 (*(int*)0x0084DE74)
-
-#define sithAI_actors ((sithActor*)0x0088AFE0)
-#define sithAI_inittedActors (*(int*)0x008B4BE0)
-#endif
-
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;
 //static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;

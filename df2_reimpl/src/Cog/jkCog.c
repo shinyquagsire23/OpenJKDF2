@@ -16,9 +16,6 @@
 
 #include "jk.h"
 
-#define jkCog_emptystring ((wchar_t*)0x005540BC)
-#define jkCog_jkstring ((wchar_t*)0x00553FB8) // 130
-
 void jkCog_SetFlags(sithCog *ctx);
 void jkCog_ClearFlags(sithCog *ctx);
 void jkCog_GetFlags(sithCog *ctx);
@@ -364,9 +361,9 @@ void jkCog_EndLevel(sithCog *ctx)
     int v1; // esi
 
     v1 = sithCogVm_PopInt(ctx) != 0;
-    if ( net_isMulti )
+    if ( sithNet_isMulti )
     {
-        if ( net_isServer )
+        if ( sithNet_isServer )
             jkSaber_cogMsg_SendEndLevel();
     }
     else
@@ -662,7 +659,7 @@ void jkCog_GetChoice(sithCog *ctx)
 
 void jkCog_StringClear()
 {
-    wcscpy(jkCog_jkstring, jkCog_emptystring);
+    _wcscpy(jkCog_jkstring, jkCog_emptystring);
 }
 
 void jkCog_StringConcatFormattedInt(sithCog *ctx)

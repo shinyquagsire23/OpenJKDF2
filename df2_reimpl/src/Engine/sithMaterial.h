@@ -2,6 +2,7 @@
 #define _SITHMATERIAL_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithMaterial_Startup_ADDR (0x004F0CC0)
 #define sithMaterial_Shutdown_ADDR (0x004F0CE0)
@@ -22,9 +23,5 @@ rdMaterial* sithMaterial_GetByIdx(int idx);
 int sithMaterial_GetMemorySize(rdMaterial *mat);
 rdVector2* sithMaterial_New(sithWorld *world, int num);
 void sithMaterial_UnloadAll();
-
-#define sithMaterial_hashmap (*(stdHashTable**)0x00852F84)
-#define sithMaterial_aMaterials (*(rdMaterial***)0x0088AFD0)
-#define sithMaterial_numMaterials (*(int*)0x00852F80)
 
 #endif // _SITHMATERIAL_H

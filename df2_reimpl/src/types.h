@@ -10,8 +10,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "Primitives/rdVector.h"
-#include "Primitives/rdMatrix.h"
 
 // TODO find some headers for these
 #define LPDDENUMCALLBACKA void*
@@ -19,97 +17,6 @@
 #define LPDIRECTINPUTA void*
 #define LPDIRECTPLAYLOBBYA void*
 #define LPDIRECTSOUND void*
-
-#ifdef WIN32
-typedef intptr_t stdFile_t;
-#else
-typedef intptr_t stdFile_t;
-#endif
-
-typedef struct IDirectSoundBuffer IDirectSoundBuffer;
-typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
-
-typedef struct jkGuiElement jkGuiElement;
-typedef struct jkGuiMenu jkGuiMenu;
-typedef struct jkEpisode jkEpisode;
-typedef struct jkEpisodeEntry jkEpisodeEntry;
-
-typedef struct sithAdjoin sithAdjoin;
-typedef struct sithAIClass sithAIClass;
-typedef struct sithAIClassEntry sithAIClassEntry;
-typedef struct sithCog sithCog;
-typedef struct sithCogMsg sithCogMsg;
-typedef struct sithCogSectorLink sithCogSectorLink;
-typedef struct sithPuppet sithPuppet;
-typedef struct sithSector sithSector;
-typedef struct sithSound sithSound;
-typedef struct sithSurface sithSurface;
-typedef struct sithThing sithThing;
-typedef struct sithWorld sithWorld;
-
-typedef struct stdBitmap stdBitmap;
-typedef struct stdStrTable stdStrTable;
-typedef struct stdConffileArg stdConffileArg;
-typedef struct stdHashTable stdHashTable;
-typedef struct stdVBuffer stdVBuffer;
-typedef struct stdGob stdGob;
-typedef struct stdGobFile stdGobFile;
-typedef struct stdPalEffect stdPalEffect;
-typedef struct stdPalEffectRequest stdPalEffectRequest;
-
-typedef struct rdClipFrustum rdClipFrustum;
-typedef struct rdColormap rdColormap;
-typedef struct rdColor24 rdColor24;
-typedef struct rdDDrawSurface rdDDrawSurface;
-typedef struct rdEdge rdEdge;
-typedef struct rdFace rdFace;
-typedef struct rdHierarchyNode rdHierarchyNode;
-typedef struct rdKeyframe rdKeyframe;
-typedef struct rdMaterial rdMaterial;
-typedef struct rdMesh rdMesh;
-typedef struct rdParticle rdParticle;
-typedef struct rdProcEntry rdProcEntry;
-typedef struct rdPuppet rdPuppet;
-typedef struct rdSprite rdSprite;
-typedef struct rdSurface rdSurface;
-typedef struct rdThing rdThing;
-typedef struct rdVertexIdxInfo rdVertexIdxInfo;
-typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
-typedef struct sithPlayingSound sithPlayingSound;
-typedef struct sithSoundClass sithSoundClass;
-typedef struct sithAI sithAI;
-typedef struct sithAICommand sithAICommand;
-typedef struct sithActor sithActor;
-typedef struct sithActorEntry sithActorEntry;
-typedef struct sithActorInstinct sithActorInstinct;
-typedef struct sithSurfaceInfo sithSurfaceInfo;
-typedef struct sithSoundClass sithSoundClass;
-typedef struct sithSoundClassEntry sithSoundClassEntry;
-typedef struct sithTimer sithTimer;
-typedef struct sithTimerInfo sithTimerInfo;
-typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
-typedef struct sithMap sithMap;
-typedef struct sithMapView sithMapView;
-typedef struct sithPlayerInfo sithPlayerInfo;
-typedef struct sithAnimclassEntry sithAnimclassEntry;
-typedef struct stdALBuffer stdALBuffer;
-typedef struct rdTri rdTri;
-typedef struct rdLine rdLine;
-
-typedef struct sithSave_Header sithSave_Header;
-typedef struct jkGuiStringEntry jkGuiStringEntry;
-
-typedef struct videoModeStruct videoModeStruct;
-typedef struct common_functions common_functions;
-typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
-
-typedef struct Darray Darray;
-
-#ifdef WIN32
-typedef IDirectSoundBuffer stdSound_buffer_t;
-#else
-typedef stdALBuffer stdSound_buffer_t;
-#endif
 
 #ifdef LINUX
 #define __stdcall
@@ -163,6 +70,8 @@ typedef uint16_t WPARAM;
 typedef uint32_t LRESULT;
 typedef int HCURSOR;
 typedef int* LPARAM;
+
+typedef int CONSOLE_CURSOR_INFO;
 
 #define WM_NULL             0x00
 #define WM_CREATE           0x01
@@ -425,5 +334,1196 @@ typedef struct tagPAINTSTRUCT
 
 typedef RECT* LPRECT;
 #endif
+
+#ifdef WIN32
+typedef intptr_t stdFile_t;
+#else
+typedef intptr_t stdFile_t;
+#endif
+
+typedef struct IDirectSoundBuffer IDirectSoundBuffer;
+typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
+
+typedef struct jkGuiElement jkGuiElement;
+typedef struct jkGuiMenu jkGuiMenu;
+typedef struct jkEpisode jkEpisode;
+typedef struct jkEpisodeEntry jkEpisodeEntry;
+
+typedef struct sithAdjoin sithAdjoin;
+typedef struct sithAIClass sithAIClass;
+typedef struct sithAIClassEntry sithAIClassEntry;
+typedef struct sithCog sithCog;
+typedef struct sithCogMsg sithCogMsg;
+typedef struct sithCogSectorLink sithCogSectorLink;
+typedef struct sithPuppet sithPuppet;
+typedef struct sithSector sithSector;
+typedef struct sithSound sithSound;
+typedef struct sithSurface sithSurface;
+typedef struct sithThing sithThing;
+typedef struct sithWorld sithWorld;
+
+typedef struct stdBitmap stdBitmap;
+typedef struct stdStrTable stdStrTable;
+typedef struct stdConffileArg stdConffileArg;
+typedef struct stdHashTable stdHashTable;
+typedef struct stdVBuffer stdVBuffer;
+typedef struct stdGob stdGob;
+typedef struct stdGobFile stdGobFile;
+typedef struct stdPalEffect stdPalEffect;
+typedef struct stdPalEffectRequest stdPalEffectRequest;
+
+typedef struct rdClipFrustum rdClipFrustum;
+typedef struct rdColormap rdColormap;
+typedef struct rdColor24 rdColor24;
+typedef struct rdDDrawSurface rdDDrawSurface;
+typedef struct rdEdge rdEdge;
+typedef struct rdFace rdFace;
+typedef struct rdHierarchyNode rdHierarchyNode;
+typedef struct rdKeyframe rdKeyframe;
+typedef struct rdMaterial rdMaterial;
+typedef struct rdMesh rdMesh;
+typedef struct rdParticle rdParticle;
+typedef struct rdProcEntry rdProcEntry;
+typedef struct rdPuppet rdPuppet;
+typedef struct rdSprite rdSprite;
+typedef struct rdSurface rdSurface;
+typedef struct rdThing rdThing;
+typedef struct rdVertexIdxInfo rdVertexIdxInfo;
+typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
+typedef struct sithPlayingSound sithPlayingSound;
+typedef struct sithSoundClass sithSoundClass;
+typedef struct sithAI sithAI;
+typedef struct sithAICommand sithAICommand;
+typedef struct sithActor sithActor;
+typedef struct sithActorEntry sithActorEntry;
+typedef struct sithActorInstinct sithActorInstinct;
+typedef struct sithCamera sithCamera;
+typedef struct sithCogScript sithCogScript;
+typedef struct sithCogSymboltable sithCogSymboltable;
+typedef struct sithSurfaceInfo sithSurfaceInfo;
+typedef struct sithSoundClass sithSoundClass;
+typedef struct sithSoundClassEntry sithSoundClassEntry;
+typedef struct sithTimer sithTimer;
+typedef struct sithTimerInfo sithTimerInfo;
+typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
+typedef struct sithMap sithMap;
+typedef struct sithMapView sithMapView;
+typedef struct sithPlayerInfo sithPlayerInfo;
+typedef struct sithAnimclassEntry sithAnimclassEntry;
+typedef struct stdALBuffer stdALBuffer;
+typedef struct rdTri rdTri;
+typedef struct rdLine rdLine;
+typedef struct rdGeoset rdGeoset;
+typedef struct rdMeshinfo rdMeshinfo;
+typedef struct rdLight rdLight;
+typedef struct rdModel3 rdModel3;
+typedef struct rdCanvas rdCanvas;
+
+typedef struct sithSave_Header sithSave_Header;
+typedef struct jkGuiStringEntry jkGuiStringEntry;
+
+typedef struct videoModeStruct videoModeStruct;
+typedef struct common_functions common_functions;
+typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
+
+typedef struct Darray Darray;
+
+#ifdef WIN32
+typedef IDirectSoundBuffer stdSound_buffer_t;
+#else
+typedef stdALBuffer stdSound_buffer_t;
+#endif
+
+typedef rdModel3* (*model3Loader_t)(const char *, int);
+typedef int (*model3Unloader_t)(rdModel3*);
+typedef rdKeyframe* (*keyframeLoader_t)(const char*);
+typedef int (*keyframeUnloader_t)(rdKeyframe*);
+typedef void (*sithRender_weapRendFunc_t)(sithThing*);
+typedef int (*sithMultiHandler_t)();
+
+// All the typedefs
+typedef struct rdVector2i
+{
+    int x;
+    int y;
+} rdVector2i;
+
+typedef struct rdVector3i
+{
+    int x;
+    int y;
+    int z;
+} rdVector3i;
+
+typedef struct rdVector2
+{
+    float x;
+    float y;
+} rdVector2;
+
+typedef struct rdVector3
+{
+    float x;
+    float y;
+    float z;
+} rdVector3;
+
+typedef struct rdVector4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+} rdVector4;
+
+typedef struct rdMatrix33
+{
+    rdVector3 rvec;
+    rdVector3 lvec;
+    rdVector3 uvec;
+} rdMatrix33;
+
+typedef struct rdMatrix34
+{
+    rdVector3 rvec;
+    rdVector3 lvec;
+    rdVector3 uvec;
+    rdVector3 scale;
+} rdMatrix34;
+
+typedef struct rdMatrix44
+{
+    rdVector4 vA;
+    rdVector4 vB;
+    rdVector4 vC;
+    rdVector4 vD;
+} rdMatrix44;
+
+typedef struct rdLight
+{
+    uint32_t id;
+    uint32_t dword4;
+    uint32_t active;
+    rdVector3 direction;
+    float intensity;
+    uint32_t color;
+    uint32_t dword20;
+    uint32_t dword24;
+    float falloffMin;
+    float falloffMax;
+} rdLight;
+
+
+typedef struct sithCameraRenderInfo
+{
+    uint32_t field_0;
+    float field_4;
+    float field_8;
+    rdColormap* colormap;
+} sithCameraRenderInfo;
+
+typedef struct rdCamera
+{
+    int projectType;
+    rdCanvas* canvas;
+    rdMatrix34 view_matrix;
+    float fov;
+    float fov_y;
+    float screenAspectRatio;
+    float orthoScale;
+    rdClipFrustum *cameraClipFrustum;
+    void (*project)(rdVector3 *, rdVector3 *);
+    void (*projectLst)(rdVector3 *, rdVector3 *, unsigned int);
+    float ambientLight;
+    int numLights;
+    rdLight* lights[64];
+    rdVector3 lightPositions[64];
+    float attenuationMin;
+    float attenuationMax;
+} rdCamera;
+
+#pragma pack(push, 4)
+typedef struct sithCamera
+{
+    uint32_t cameraPerspective;
+    uint32_t dword4;
+    float fov;
+    float aspectRatio;
+    sithThing* primaryFocus;
+    sithThing* secondaryFocus;
+    sithSector* sector;
+    rdVector3 vec3_3;
+    rdVector3 vec3_4;
+    rdMatrix34 viewMat;
+    rdVector3 vec3_1;
+    rdVector3 vec3_2;
+    rdCamera rdCam;
+} sithCamera;
+#pragma pack(pop)
+
+
+typedef struct rdClipFrustum
+{
+  rdVector3 field_0;
+  float orthoLeft;
+  float orthoTop;
+  float orthoRight;
+  float orthoBottom;
+  float farTop;
+  float bottom;
+  float farLeft;
+  float right;
+  float nearTop;
+  float nearLeft;
+} rdClipFrustum;
+
+
+typedef struct rdProcEntry
+{
+    uint32_t extraData;
+    int type;
+    uint32_t geometryMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
+    uint32_t anonymous_4;
+    uint32_t anonymous_5;
+    uint32_t numVertices;
+    rdVector3* vertices;
+    rdVector2* vertexUVs;
+    float* vertexIntensities;
+    rdMaterial* material;
+    uint32_t wallCel;
+    float ambientLight;
+    float light_level_static;
+    float extralight;
+    rdColormap* colormap;
+    uint32_t light_flags;
+    int32_t x_min;
+    uint32_t x_max;
+    int32_t y_min;
+    uint32_t y_max;
+    float z_min;
+    float z_max;
+    int y_min_related;
+    int y_max_related;
+    uint32_t vertexColorMode;
+} rdProcEntry;
+
+typedef struct rdMeshinfo
+{
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
+    rdVector3* verticesProjected;
+    rdVector2* vertexUVs;
+    float* vertex_lights_maybe_;
+    uint32_t field_18;
+    rdVector3* verticesOrig;
+} rdMeshinfo;
+
+typedef struct v11_struct
+{
+  int mipmap_related;
+  int field_4;
+  rdMaterial *material;
+} v11_struct;
+
+typedef struct rdTri
+{
+  int v1;
+  int v2;
+  int v3;
+  int flags;
+  rdDDrawSurface *texture; // DirectDrawSurface*
+} rdTri;
+
+typedef struct rdLine
+{
+    int v1;
+    int v2;
+    int flags;
+} rdLine;
+
+typedef float D3DVALUE;
+
+#pragma pack(push, 4)
+typedef struct D3DVERTEX
+{
+  union __attribute__((aligned(4)))
+  {
+    D3DVALUE x;
+    float dvX;
+  };
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE y;
+    D3DVALUE dvY;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE z;
+    D3DVALUE dvZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE nx;
+    D3DVALUE dvNX;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE ny;
+    D3DVALUE dvNY;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE nz;
+    D3DVALUE dvNZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE tu;
+    D3DVALUE dvTU;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE tv;
+    D3DVALUE dvTV;
+  };
+  #pragma pack(pop)
+} D3DVERTEX;
+#pragma pack(pop)
+
+/* 174 */
+typedef DWORD D3DCOLORMODEL;
+
+/* 176 */
+#pragma pack(push, 4)
+typedef struct D3DTRANSFORMCAPS
+{
+  DWORD dwSize;
+  DWORD dwCaps;
+} D3DTRANSFORMCAPS;
+#pragma pack(pop)
+
+/* 178 */
+#pragma pack(push, 4)
+typedef struct D3DLIGHTINGCAPS
+{
+  DWORD dwSize;
+  DWORD dwCaps;
+  DWORD dwLightingModel;
+  DWORD dwNumLights;
+} D3DLIGHTINGCAPS;
+#pragma pack(pop)
+
+/* 180 */
+#pragma pack(push, 4)
+typedef struct D3DPrimCaps
+{
+  DWORD dwSize;
+  DWORD dwMiscCaps;
+  DWORD dwRasterCaps;
+  DWORD dwZCmpCaps;
+  DWORD dwSrcBlendCaps;
+  DWORD dwDestBlendCaps;
+  DWORD dwAlphaCmpCaps;
+  DWORD dwShadeCaps;
+  DWORD dwTextureCaps;
+  DWORD dwTextureFilterCaps;
+  DWORD dwTextureBlendCaps;
+  DWORD dwTextureAddressCaps;
+  DWORD dwStippleWidth;
+  DWORD dwStippleHeight;
+} D3DPrimCaps;
+#pragma pack(pop)
+
+#pragma pack(push, 4)
+typedef struct D3DDeviceDesc
+{
+  DWORD dwSize;
+  DWORD dwFlags;
+  D3DCOLORMODEL dcmColorModel;
+  DWORD dwDevCaps;
+  D3DTRANSFORMCAPS dtcTransformCaps;
+  BOOL bClipping;
+  D3DLIGHTINGCAPS dlcLightingCaps;
+  D3DPrimCaps dpcLineCaps;
+  D3DPrimCaps dpcTriCaps;
+  DWORD dwDeviceRenderBitDepth;
+  DWORD dwDeviceZBufferBitDepth;
+  DWORD dwMaxBufferSize;
+  DWORD dwMaxVertexCount;
+  DWORD dwMinTextureWidth;
+  DWORD dwMinTextureHeight;
+  DWORD dwMaxTextureWidth;
+  DWORD dwMaxTextureHeight;
+  DWORD dwMinStippleWidth;
+  DWORD dwMaxStippleWidth;
+  DWORD dwMinStippleHeight;
+  DWORD dwMaxStippleHeight;
+} D3DDeviceDesc;
+#pragma pack(pop)
+
+typedef struct __attribute__((aligned(16))) d3d_device
+{
+  uint32_t hasColorModel;
+  uint32_t dpcTri_hasperspectivecorrectttexturing;
+  uint32_t hasZBuffer;
+  uint32_t supportsColorKeyedTransparency;
+  uint32_t hasAlpha;
+  uint32_t hasAlphaFlatStippled;
+  uint32_t hasModulateAlpha;
+  uint32_t hasOnlySquareTexs;
+  char gap20[4];
+  uint32_t dcmColorModel;
+  uint32_t availableBitDepths;
+  uint32_t zCaps;
+  uint32_t dword30;
+  uint32_t dword34;
+  uint32_t dword38;
+  uint32_t dword3C;
+  uint32_t dwMaxBufferSize;
+  uint32_t dwMaxVertexCount;
+  char deviceName[128];
+  char deviceDescription[128];
+  __attribute__((aligned(16))) D3DDeviceDesc device_desc;
+  DWORD d3d_this;
+} d3d_device;
+
+
+typedef struct rdDDrawSurface
+{
+    void* lpVtbl; // IDirectDrawSurfaceVtbl *lpVtbl
+    uint32_t direct3d_tex;
+    uint8_t surface_desc[0x6c];
+    uint32_t texture_id;
+    uint32_t texture_loaded;
+    uint32_t is_16bit;
+    uint32_t width;
+    uint32_t height;
+    uint32_t texture_area;
+    uint32_t gpu_accel_maybe;
+    rdDDrawSurface* tex_prev;
+    rdDDrawSurface* tex_next;
+} rdDDrawSurface;
+
+typedef struct rdTexformat
+{
+    uint32_t is16bit;
+    uint32_t bpp;
+    uint32_t r_bits;
+    uint32_t g_bits;
+    uint32_t b_bits;
+    uint32_t r_shift;
+    uint32_t g_shift;
+    uint32_t b_shift;
+    uint32_t r_bitdiff;
+    uint32_t g_bitdiff;
+    uint32_t b_bitdiff;
+    uint32_t unk_40;
+    uint32_t unk_44;
+    uint32_t unk_48;
+} rdTexformat;
+
+typedef struct stdVBufferTexFmt
+{
+    int32_t width;
+    int32_t height;
+    uint32_t texture_size_in_bytes;
+    uint32_t width_in_bytes;
+    uint32_t width_in_pixels;
+    rdTexformat format;
+} stdVBufferTexFmt;
+
+#ifdef LINUX
+typedef struct SDL_Surface SDL_Surface;
+#endif
+
+typedef struct stdVBuffer
+{
+    uint32_t bSurfaceLocked;
+    uint32_t lock_cnt;
+    uint32_t gap8;
+    stdVBufferTexFmt format;
+    void* palette;
+    char* surface_lock_alloc;
+    uint32_t transparent_color;
+    union
+    {
+    rdDDrawSurface *ddraw_surface;
+#ifdef LINUX
+    SDL_Surface* sdlSurface;
+#endif
+    };
+    void* ddraw_palette; // LPDIRECTDRAWPALETTE
+    uint8_t desc[0x6c];
+} stdVBuffer;
+
+typedef struct rdColor24
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} rdColor24;
+
+typedef struct rdColormap
+{
+    char colormap_fname[32];
+    uint32_t flags;
+    rdVector3 tint;
+    rdColor24 colors[256];
+    void* lightlevel;
+    void* lightlevelAlloc;
+    void* transparency;
+    void* transparencyAlloc;
+    void* dword340;
+    void* dword344;
+    void* rgb16Alloc;
+    void* dword34C;
+} rdColormap;
+
+typedef struct rdColormapHeader
+{
+    uint32_t magic;
+    uint32_t version;
+    uint32_t flags;
+    rdVector3 tint;
+    uint32_t field_18;
+    uint32_t field_1C;
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+} rdColormapHeader;
+
+
+typedef struct rdTexture
+{
+    uint32_t alpha_en;
+    uint32_t unk_0c;
+    uint32_t color_transparent;
+    uint32_t width_bitcnt;
+    uint32_t width_minus_1;
+    uint32_t height_minus_1;
+    uint32_t num_mipmaps;
+    stdVBuffer *texture_struct[4];
+    rdDDrawSurface alphaMats[4];
+    rdDDrawSurface opaqueMats[4];
+} rdTexture;
+
+typedef struct rdTextureHeader
+{
+    uint32_t width;
+    uint32_t height;
+    uint32_t alpha_en;
+    uint32_t unk_0c;
+    uint32_t unk_10;
+    uint32_t num_mipmaps;
+} rdTextureHeader;
+
+typedef struct rdTexinfoExtHeader
+{
+    uint32_t unk_00;
+    uint32_t height;
+    uint32_t alpha_en;
+    uint32_t unk_0c;
+} rdTexinfoExtHeader;
+
+typedef struct rdTexinfoHeader
+{
+    uint32_t texture_type;
+    uint32_t field_4;
+    uint32_t field_8;
+    uint32_t field_C;
+    uint32_t field_10;
+    uint32_t field_14;
+} rdTexinfoHeader;
+
+typedef struct rdTexinfo
+{
+    rdTexinfoHeader header;
+    uint32_t texext_unk00;
+    rdTexture *texture_ptr;
+} rdTexinfo;
+
+typedef struct rdMaterialHeader
+{
+    uint8_t magic[4];
+    uint32_t revision;
+    uint32_t type;
+    uint32_t num_texinfo;
+    uint32_t num_textures;
+    rdTexformat tex_format;
+} rdMaterialHeader;
+
+typedef struct rdMaterial
+{
+    uint32_t tex_type;
+    char mat_fpath[32];
+    uint32_t id;
+    rdTexformat tex_format;
+    rdColor24 *palette_alloc;
+    uint32_t num_texinfo;
+    uint32_t celIdx;
+    rdTexinfo *texinfos[8];
+    uint32_t field_8C;
+    uint32_t field_90;
+    uint32_t field_94;
+    uint32_t field_98;
+    uint32_t field_9C;
+    uint32_t field_A0;
+    uint32_t field_A4;
+    uint32_t field_A8;
+    uint32_t num_textures;
+    rdTexture* textures;
+} rdMaterial;
+
+typedef struct sithTimerInfo sithTimerInfo; 
+typedef struct sithTimer sithTimer;
+
+typedef int (*sithTimerHandler_t)(int, sithTimerInfo*);
+
+typedef struct sithTimerInfo
+{
+    int cogIdx;
+    int timerIdx;
+    float field_10;
+    float field_14;
+} sithTimerInfo;
+
+typedef struct sithTimer
+{
+    uint32_t endMs;
+    int field_4;
+    sithTimerInfo timerInfo;
+    sithTimer* nextTimer;
+} sithTimer;
+
+typedef struct sithTimerFunc
+{
+    sithTimerHandler_t handler;
+    uint32_t field_4;
+    uint32_t rate;
+    uint32_t creationMs;
+    uint32_t field_10;
+} sithTimerFunc;
+
+
+typedef struct sithPlayingSound
+{
+    stdSound_buffer_t* pSoundBuf;
+    stdSound_buffer_t* p3DSoundObj;
+    sithSound* sound;
+    int flags;
+    int idx;
+    float vol_2;
+    float anonymous_5;
+    float maxPosition;
+    float anonymous_7;
+    float volumeVelocity;
+    float volume;
+    float pitch;
+    float pitchVel;
+    float nextPitch;
+    float anonymous_13;
+    rdVector3 posRelative;
+    sithThing* thing;
+    rdVector3 pos;
+    int refid;
+} sithPlayingSound;
+
+typedef struct sithSound
+{
+    char sound_fname[32];
+    int id;
+    int isLoaded;
+    uint32_t bufferBytes;
+    uint32_t sampleRateHz;
+    int bitsPerSample;
+    int bStereo; // stdSound_buffer_t*
+    uint32_t sound_len;
+    int seekOffset;
+    int field_40;
+    int infoLoaded;
+    void* dsoundBuffer2; // stdSound_buffer_t*
+} sithSound;
+
+typedef int (*sithControl_handler_t)(sithThing*, float);
+
+typedef int (*sithSaveHandler_t)();
+
+typedef struct sithSave_Header
+{
+    int version;
+    char episodeName[128];
+    char jklName[128];
+    float playerHealth;
+    float playerMaxHealth;
+    float binAmts[200];
+    wchar_t saveName[256];
+} sithSave_Header;
+
+typedef struct sithMapView
+{
+    int numArr;
+    float *unkArr;
+    int *anonymous_2;
+    int anonymous_3;
+    int anonymous_4;
+    int anonymous_5;
+    int anonymous_6;
+    int anonymous_7;
+    int anonymous_8;
+    int anonymous_9;
+    int anonymous_10;
+    int anonymous_11;
+    char anonymous_12[16];
+    sithWorld *world;
+} sithMapView;
+
+typedef struct rdEdge
+{
+    uint32_t field_0;
+    uint32_t field_4;
+    uint32_t field_8;
+    uint32_t field_C;
+    uint32_t field_10;
+    uint32_t field_14;
+    uint32_t field_18;
+    uint32_t field_1C;
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    rdEdge* prev;
+    rdEdge* next;
+} rdEdge;
+
+typedef struct rdVertexIdxInfo
+{
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
+    rdVector3* vertices;
+    rdVector2* extraUV;
+    float* field_14;
+    float* intensities;
+} rdVertexIdxInfo;
+
+typedef struct rdFace
+{
+    uint32_t num;
+    uint32_t type;
+    uint32_t geometryMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
+    rdMaterial* material;
+    uint32_t wallCel;
+    rdVector2 clipIdk;
+    float extraLight;
+    rdVector3 normal;
+} rdFace;
+
+typedef struct sithSurfaceInfo
+{
+    rdFace face;
+    float* intensities;
+    uint32_t lastTouchedMs;
+} sithSurfaceInfo;
+
+struct rdSurface
+{
+  uint32_t index; // -14
+  uint32_t flags; // -13
+  sithThing *parent_thing; // -12
+  uint32_t signature; // -11
+  rdMaterial* material; // -10
+  sithSurface *sithSurfaceParent; // -9
+  sithSector* sector; // -8
+  rdVector2 field_1C;
+  rdVector3 field_24;
+  uint32_t field_30;
+  uint32_t field_34;
+  uint32_t wallCel;
+  float field_3C;
+  float field_40;
+  float field_44;
+  float field_48;
+};
+
+typedef struct sithSurface
+{
+    uint32_t field_0;
+    uint32_t field_4;
+    sithSector* parent_sector;
+    sithAdjoin* adjoin;
+    uint32_t surfaceFlags;
+    sithSurfaceInfo surfaceInfo;
+} sithSurface;
+
+typedef int (*rdMaterialUnloader_t)(rdMaterial*);
+typedef rdMaterial* (*rdMaterialLoader_t)(const char*, int, int);
+
+typedef int (*WindowDrawHandler_t)(uint32_t);
+typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
+
+typedef struct wm_handler
+{
+  WindowHandler_t handler;
+  int32_t exists;
+} wm_handler;
+
+typedef int (*DebugConsolePrintFunc_t)(const char*);
+typedef int (*DebugConsolePrintUniStrFunc_t)(const wchar_t*);
+typedef int (*DebugConsoleCmd_t)(stdDebugConsoleCmd* cmd, uint32_t extra);
+
+typedef struct stdDebugConsoleCmd
+{
+    char cmdStr[32];
+    DebugConsoleCmd_t cmdFunc;
+    uint32_t extra;
+} stdDebugConsoleCmd;
+
+#ifdef LINUX
+typedef uint32_t MCIDEVICEID;
+#endif
+
+
+typedef struct stdDeviceParams
+{
+  int field_0;
+  int field_4;
+  int field_8;
+  int field_C;
+  int field_10;
+} stdDeviceParams;
+
+typedef struct video_device
+{
+  int device_active;
+  int hasGUID;
+  int has3DAccel;
+  int hasNoGuid;
+  int windowedMaybe;
+  int dwVidMemTotal;
+  int dwVidMemFree;
+} video_device;
+
+typedef struct stdVideoMode
+{
+  int field_0;
+  float widthMaybe;
+  stdVBufferTexFmt format;
+} stdVideoMode;
+
+typedef struct stdVideoDevice
+{
+  char driverDesc[128];
+  char driverName[128];
+  video_device video_device[14];
+  GUID guid;
+  int max_modes;
+  stdVideoMode *stdVideoMode;
+  uint32_t gap2A0;
+  int field_2A4;
+} stdVideoDevice;
+
+typedef struct render_8bpp
+{
+  int bpp;
+  int rBpp;
+  int width;
+  int height;
+  int rShift;
+  int gShift;
+  int bShift;
+  int palBytes;
+} render_8bpp;
+
+typedef struct render_rgb
+{
+  int bpp;
+  int rBpp;
+  int gBpp;
+  int bBpp;
+  int rShift;
+  int gShift;
+  int bShift;
+  int rBytes;
+  int gBytes;
+  int bBytes;
+} render_rgb;
+
+typedef struct render_pair
+{
+  render_8bpp render_8bpp;
+  render_rgb render_rgb;
+  uint32_t field_48;
+  uint32_t field_4C;
+  uint32_t field_50;
+} render_pair;
+
+typedef struct jkViewSize
+{
+  int xMin;
+  int yMin;
+  float xMax;
+  float yMax;
+} jkViewSize;
+
+typedef struct videoModeStruct
+{
+  int modeIdx;
+  int descIdx;
+  int Video_8605C8;
+  int field_C;
+  int field_10;
+  int field_14;
+  int field_18;
+  int field_1C;
+  int field_20;
+  int field_24;
+  int field_28;
+  HKEY b3DAccel;
+  uint32_t viewSizeIdx;
+  jkViewSize aViewSizes[11];
+  int Video_8606A4;
+  int Video_8606A8;
+  int geoMode;
+  int lightMode;
+  int texMode;
+  HKEY Video_8606B8;
+  HKEY Video_8606BC;
+  int Video_8606C0;
+} videoModeStruct;
+
+typedef struct stdConsole
+{
+    uint32_t dword0;
+    uint32_t dword4;
+    uint32_t dword8;
+    uint32_t dwordC;
+    uint32_t dword10;
+    uint32_t dword14;
+    uint32_t dword18;
+    char char1C;
+    char gap1D;
+    char field_1E;
+    char field_1F;
+    uint32_t field_20;
+    uint32_t field_24;
+    uint32_t field_28;
+    uint32_t field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    uint32_t field_38;
+    uint32_t field_3C;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint8_t byte6C;
+    uint8_t byte6D;
+    uint8_t byte6E;
+    uint8_t byte6F;
+    uint16_t word70;
+    uint16_t word72;
+    uint16_t word74;
+    uint8_t byte76;
+    uint8_t field_77;
+    void* buffer;
+    uint32_t field_7C;
+    uint32_t bufferLen;
+    uint32_t dword84;
+    uint32_t dword88;
+    uint32_t dword8C;
+} stdConsole;
+
+// sithCogVM
+
+typedef struct net_msg
+{
+    uint32_t timeMs;
+    uint32_t flag_maybe;
+    uint32_t field_8;
+    uint32_t field_C;
+    uint32_t timeMs2;
+    uint32_t field_14;
+    uint32_t field_18;
+    uint32_t thingIdx;
+    uint32_t msg_size;
+    uint16_t cogMsgId;
+    uint16_t msgId;
+} net_msg;
+
+typedef struct sithCogMsg_Pair
+{
+    uint32_t thingIdx;
+    uint32_t msgId;
+} sithCogMsg_Pair;
+
+typedef struct sithCogMsg
+{
+    net_msg netMsg;
+    uint32_t pktData[512];
+} sithCogMsg;
+
+typedef int (__cdecl *cogMsg_Handler)(sithCogMsg*);
+
+typedef struct sithCogCallstack
+{
+    uint32_t pc;
+    uint32_t script_running;
+    uint32_t waketimeMs;
+    uint32_t trigId;
+} sithCogCallstack;
+
+typedef struct sithCogStackvar
+{
+    uint32_t type;
+    union
+    {
+        int32_t data[3];
+        float dataAsFloat[3];
+    };
+} sithCogStackvar;
+
+typedef struct sithCog
+{
+    sithCogScript* cogscript;
+    uint32_t flags;
+    int selfCog;
+    uint32_t script_running;
+    uint32_t cogscript_pc;
+    uint32_t wakeTimeMs;
+    uint32_t pulsePeriodMs;
+    uint32_t nextPulseMs;
+    uint32_t field_20;
+    uint32_t senderId;
+    uint32_t senderRef;
+    uint32_t senderType;
+    uint32_t sourceRef;
+    uint32_t sourceType;
+    uint32_t trigId;
+    float params[4];
+    float returnEx;
+    sithCogCallstack callstack[4];
+    uint32_t calldepth;
+    sithCogSymboltable* symbolTable;
+    sithCogStackvar stack[64];
+    uint32_t stackPos;
+    char cogscript_fpath[32];
+    char field_4BC[4096];
+    sithCogStackvar* heap;
+    int numHeapVars;
+} sithCog;
+
+// end sithCogVm
+
+typedef struct sithCogSectorLink
+{
+    sithSector* sector;
+    sithCog* cog;
+    int linkid;
+    int mask;
+} sithCogSectorLink;
+
+typedef struct sithCogThingLink
+{
+    sithThing* thing;
+    int signature;
+    sithCog* cog;
+    int linkid;
+    int mask;
+} sithCogThingLink;
+
+typedef struct sithCogSurfaceLink
+{
+    sithSurface* surface;
+    sithCog* cog;
+    int linkid;
+    int mask;
+} sithCogSurfaceLink;
+
+// jkEpisode
+typedef struct jkEpisode
+{
+    char name[32];
+    wchar_t unistr[32];
+    int field_60;
+    int field_64;
+    int field_68;
+    int field_6C;
+    int field_70;
+    int field_74;
+    int field_78;
+    int field_7C;
+    int field_80;
+    int field_84;
+    int field_88;
+    int field_8C;
+    int field_90;
+    int field_94;
+    int field_98;
+    int field_9C;
+    int field_A0;
+} jkEpisode;
+
+typedef struct jkEpisodeEntry
+{
+    int lineNum;
+    int cdNum;
+    int level;
+    int type;
+    char fileName[32];
+    int lightpow;
+    int darkpow;
+    int gotoA;
+    int gotoB;
+} jkEpisodeEntry;
+
+
+typedef struct jkEpisodeLoad
+{
+    int field_0;
+    int numSeq;
+    int field_8;
+    jkEpisodeEntry* paEntries;
+} jkEpisodeLoad;
+//end jkEpisode
 
 #endif // TYPES_H

@@ -45,10 +45,13 @@ int Window_RemoveMsgHandler(WindowHandler_t a1)
     return 1;
 }
 
-//static int dword_855E98 = 0;
-//static int dword_855DE4 = 0;
+#ifdef LINUX
+static int dword_855E98 = 0;
+static int dword_855DE4 = 0;
+#else
 #define dword_855E98 (*(int*)0x855E98)
 #define dword_855DE4 (*(int*)0x855DE4)
+#endif
 
 int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {

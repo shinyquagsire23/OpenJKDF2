@@ -2,6 +2,7 @@
 #define _SITHRENDER_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithRender_Startup_ADDR (0x004C6180)
 #define sithRender_Open_ADDR (0x004C61C0)
@@ -25,8 +26,6 @@
 #define sithRender_RenderPov_ADDR (0x004C8070)
 #define sithRender_RenderAlphaSurfaces_ADDR (0x004C8220)
 #define sithRender_SetRenderWeaponHandle_ADDR (0x004C8600)
-
-typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 
 int sithRender_Startup();
 int sithRender_Open();
@@ -55,40 +54,6 @@ int sithRender_SetRenderWeaponHandle(void *a1);
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos);
 
 #define SITHREND_NUM_LIGHTS (32)
-
-#define sithRender_texMode (*(int*)0x008EC360)
-#define sithRender_flag (*(int*)0x008EC364)
-#define sithRender_geoMode (*(int*)0x008EC368)
-#define sithRender_lightMode (*(int*)0x008EC36C)
-#define sithRender_lightingIRMode (*(int*)0x00831988)
-#define sithRender_f_83198C (*(float*)0x0083198C)
-#define sithRender_f_831990 (*(float*)0x00831990)
-#define sithRender_needsAspectReset (*(int*)0x00831994)
-#define sithRender_aLights ((rdLight*)0x0082F668)
-#define sithRender_aSectors ((sithSector**)0x0082F110)
-#define sithRender_numSectors (*(uint32_t*)0x008318F0)
-#define sithRender_numClipFrustums (*(uint32_t*)0x0082FEE8)
-#define sithRender_clipFrustums ((rdClipFrustum*)0x0082FEF0)
-#define sithRender_numLights (*(uint32_t*)0x00831978)
-#define sithRender_numSectors2 (*(uint32_t*)0x0082F640)
-#define sithRender_aSectors2 ((sithSector**)0x0082FC68)
-
-#define sithRender_82F4B4 (*(uint32_t*)0x0082F4B4)
-#define sithRender_surfacesDrawn (*(int*)0x0083197C)
-#define sithRender_numSurfaces (*(uint32_t*)0x0082F4B8)
-#define sithRender_831980 (*(int*)0x00831980)
-#define sithRender_831984 (*(int*)0x00831984)
-#define sithRender_lastRenderTick (*(int*)0x008EE678)
-#define sithRender_f_82F4B0 (*(float*)0x0082F4B0)
-#define sithRender_idxInfo (*(rdVertexIdxInfo*)0x0082F648)
-#define vertices_tmp ((rdVector3*)0x0082F310)
-#define vertices_tmp_projected ((rdVector3*)0x0082F4C0)
-#define meshinfo_out (*(rdMeshinfo*)0x0082F490)
-#define sithRender_aSurfaces ((sithSurface**)0x008318F8)
-
-#define sithRender_weaponRenderHandle (*(sithRender_weapRendFunc_t*)0x00831998)
-
-
 
 static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, float a3) = (void*)sithRender_Clip_ADDR;
 static void (*sithRender_UpdateLights_)(sithSector *sector, float a2, float dist) = (void*)sithRender_UpdateLights_ADDR;

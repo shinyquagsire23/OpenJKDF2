@@ -2,6 +2,7 @@
 #define _WINDOW_H
 
 #include "types.h"
+#include "globals.h"
 
 #define Window_Main_ADDR (0x0050E750)
 #define Window_MessageLoop_ADDR (0x0050E9C0)
@@ -17,21 +18,8 @@
 #define Window_GetDrawHandlers_ADDR (0x0050EC90)
 #define Window_msg_main_handler_ADDR (0x0050ECB0)
 
-typedef int (*WindowDrawHandler_t)(uint32_t);
-typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
-
-#define Window_drawAndFlip (*(WindowDrawHandler_t*)0x00855E9C)
-#define Window_setCooperativeLevel (*(WindowDrawHandler_t*)0x00855EA0)
-#define Window_ext_handlers ((wm_handler*)0x00855DF0) // 16
-
 extern int Window_xSize;
 extern int Window_ySize;
-
-typedef struct wm_handler
-{
-  WindowHandler_t handler;
-  int32_t exists;
-} wm_handler;
 
 int Window_AddMsgHandler(WindowHandler_t a1);
 int Window_RemoveMsgHandler(WindowHandler_t a1);

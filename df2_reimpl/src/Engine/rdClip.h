@@ -2,6 +2,7 @@
 #define _RDCLIP_H
 
 #include "types.h"
+#include "globals.h"
 #include "rdCanvas.h"
 #include "Primitives/rdVector.h"
 
@@ -22,17 +23,6 @@
 #define rdClip_Face3GT_ADDR (0x00473880)
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
-
-#define rdClip_faceStatus (*(int*)0x0082EE5C)
-#define pSourceVert (*(rdVector3**)0x0082EC50)
-#define workIVerts ((float*)0x0082EC58) // 32
-#define workVerts ((rdVector3*)0x0082ECD8) // 32
-#define pDestVert (*(rdVector3**)0x0082EB44)
-#define pDestIVert (*(float**)0x0082EB48)
-#define workTVerts ((rdVector2*)0x0082EB50)
-#define pSourceIVert (*(float**)0x0082EB38)
-#define pSourceTVert (*(rdVector2**)0x0082EB3C)
-#define pDestTVert (*(rdVector2**)0x0082EB40)
 
 enum CLIP_OUTCODE
 {

@@ -255,7 +255,7 @@ void sithSoundSys_StopAll()
 {
     unsigned int v0; // edi
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
     {
         for (v0 = 0; v0 < sithSoundSys_numSoundsAvailable; v0++)
         {
@@ -272,7 +272,7 @@ void sithSoundSys_ResumeAll()
 {
     unsigned int v0; // edi
 
-    if ( !net_isMulti )
+    if ( !sithNet_isMulti )
     {
         for (v0 = 0; v0 < sithSoundSys_numSoundsAvailable; v0++)
         {

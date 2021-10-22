@@ -206,7 +206,7 @@ void sithCogThing_DamageThing(sithCog *ctx)
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
                 {
-                    if ( net_isServer )
+                    if ( sithNet_isServer )
                         sithSector_cogMsg_SendDamage(thing2, thing, a5, a4, -1, 1);
                 }
             }
@@ -1673,7 +1673,7 @@ void sithCogThing_SkillTarget(sithCog *ctx)
 
     if ( thing && otherThing && (classCog = thing->class_cog) != 0 )
     {
-        if ( net_isMulti && thing->thingType == THINGTYPE_PLAYER )
+        if ( sithNet_isMulti && thing->thingType == THINGTYPE_PLAYER )
         {
             sithThingPlayer_cogMsg_SendSendTrigger(
                 classCog,

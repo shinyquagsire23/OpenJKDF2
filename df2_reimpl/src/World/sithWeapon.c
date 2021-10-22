@@ -544,7 +544,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 sithUnk3_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
             }
         }
-        if ( !net_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? 5.0 : (float)v18;
@@ -1420,7 +1420,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTem
         fireOffset->z = v14;
     }
 
-    if ( (sithWeapon_bAutoAim & 1) != 0 && (scaleFlags & 0x20) != 0 && (!net_isMulti || (scaleFlags & 0x40) != 0) )
+    if ( (sithWeapon_bAutoAim & 1) != 0 && (scaleFlags & 0x20) != 0 && (!sithNet_isMulti || (scaleFlags & 0x40) != 0) )
         sithWeapon_ProjectileAutoAim(&v20, sender, &out, fireOffset, autoaimFov, autoaimMaxDist);
     else
 

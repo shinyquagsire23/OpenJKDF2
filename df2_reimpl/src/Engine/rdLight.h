@@ -15,21 +15,6 @@
 #define rdLight_CalcFaceIntensity_ADDR (0x0044B960)
 #define rdLight_CalcDistFaceIntensity_ADDR (0x0044BAA0) // inlined/unused
 
-
-typedef struct rdLight
-{
-    uint32_t id;
-    uint32_t dword4;
-    uint32_t active;
-    rdVector3 direction;
-    float intensity;
-    uint32_t color;
-    uint32_t dword20;
-    uint32_t dword24;
-    float falloffMin;
-    float falloffMax;
-} rdLight;
-
 rdLight *rdLight_New();
 int rdLight_NewEntry(rdLight *light);
 void rdLight_Free(rdLight *light);

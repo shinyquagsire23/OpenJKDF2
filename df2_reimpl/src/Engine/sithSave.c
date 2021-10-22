@@ -121,26 +121,26 @@ LABEL_11:
 #ifndef LINUX_TMP
     while (1)
     {
-        if ( !stdConffile_Read(&g_netMsgTmp.netMsg.cogMsgId, 4) )
+        if ( !stdConffile_Read(&sithCogVm_netMsgTmp.netMsg.cogMsgId, 4) )
         {
             break;
         }
         
-        if (!stdConffile_Read(&g_netMsgTmp.netMsg.msg_size, 4))
+        if (!stdConffile_Read(&sithCogVm_netMsgTmp.netMsg.msg_size, 4))
         {
             jk_printf("OpenJKDF2: Save load failed to read msg_size\n");
             goto load_fail;
         }
         
-        if (!(!g_netMsgTmp.netMsg.msg_size || stdConffile_Read(g_netMsgTmp.pktData, g_netMsgTmp.netMsg.msg_size)))
+        if (!(!sithCogVm_netMsgTmp.netMsg.msg_size || stdConffile_Read(sithCogVm_netMsgTmp.pktData, sithCogVm_netMsgTmp.netMsg.msg_size)))
         {
-            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", g_netMsgTmp.netMsg.msg_size);
+            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithCogVm_netMsgTmp.netMsg.msg_size);
             goto load_fail;
         }
         
-        if (!sithCogVm_InvokeMsgByIdx(&g_netMsgTmp))
+        if (!sithCogVm_InvokeMsgByIdx(&sithCogVm_netMsgTmp))
         {
-            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", g_netMsgTmp.netMsg.cogMsgId);
+            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithCogVm_netMsgTmp.netMsg.cogMsgId);
 #ifndef LINUX
             // Linux fails on SyncSound only
             goto load_fail;

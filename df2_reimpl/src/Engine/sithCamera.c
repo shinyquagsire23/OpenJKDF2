@@ -17,6 +17,7 @@
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
 static rdVector3 sithCamera_trans2 = {0.0, 0.2, 0.0};
 static rdVector3 sithCamera_trans3 = {0.0, 1.0, 1.0};
+static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
 #define SITHCAMERA_FOV (90.0)
 #define SITHCAMERA_ASPECT (1.0)

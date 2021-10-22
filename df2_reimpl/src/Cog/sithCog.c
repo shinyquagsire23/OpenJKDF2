@@ -916,7 +916,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         return;
     }
 
-    if ( msgid == COGMSG_SYNCSECTORALT || msgid == COGMSG_SYNCTHINGATTACHMENT || !net_isMulti || net_isServer || (cog->flags & 0x40) != 0 )
+    if ( msgid == COGMSG_SYNCSECTORALT || msgid == COGMSG_SYNCTHINGATTACHMENT || !sithNet_isMulti || sithNet_isServer || (cog->flags & 0x40) != 0 )
     {
         cog->params[0] = 0.0;
         cog->senderId = linkId;
@@ -936,7 +936,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
     }
     else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
     {
-        sithThingPlayer_cogMsg_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, net_dword_8C4BA4);
+        sithThingPlayer_cogMsg_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_dword_8C4BA4);
     }
 }
 
@@ -1014,7 +1014,7 @@ LABEL_18:
         }
         return -9999.9873046875;
     }
-    if ( message == SITH_MESSAGE_STARTUP || message == SITH_MESSAGE_SHUTDOWN || !net_isMulti || net_isServer || (v13 & 0x40) != 0 )
+    if ( message == SITH_MESSAGE_STARTUP || message == SITH_MESSAGE_SHUTDOWN || !sithNet_isMulti || sithNet_isServer || (v13 & 0x40) != 0 )
     {
         cog->senderId = linkId;
         cog->senderRef = senderIndex;
@@ -1052,7 +1052,7 @@ LABEL_18:
             param1,
             param2,
             param3,
-            net_dword_8C4BA4);
+            sithNet_dword_8C4BA4);
         result = 0.0;
     }
     return result;
@@ -1343,9 +1343,9 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
                     v7 = "<null>";
                 _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
                 if ( v6->symbol_type == 2 )
-                    _sprintf(&std_genBuffer[strlen(std_genBuffer)], " = %f\n", *(float *)&v6->symbol_name);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", *(float *)&v6->symbol_name);
                 else
-                    _sprintf(&std_genBuffer[strlen(std_genBuffer)], " = %d\n", v6->symbol_name);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->symbol_name);
                 DebugConsole_Print(std_genBuffer);
                 ++v5;
                 ++v6;

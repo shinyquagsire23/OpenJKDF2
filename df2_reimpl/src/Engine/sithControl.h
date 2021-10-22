@@ -2,6 +2,7 @@
 #define _SITHCONTROL_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithControl_Initialize_ADDR (0x004D6840)
 #define sithControl_Shutdown_ADDR (0x004D6880)
@@ -35,16 +36,6 @@
 #define sithControl_PlayerMovement_ADDR (0x004D8A00)
 #define sithControl_FreeCam_ADDR (0x004D8C90)
 #define sithControl_PlayerLook_ADDR (0x004D8F40)
-
-#define sithControl_msIdle (*(uint32_t*)0x835830)
-#define sithControl_bOpened (*(int*)0x835838)
-#define sithControl_aHandlers ((sithControl_handler_t*)0x00833A00)
-#define sithControl_numHandlers (*(int*)0x008339F8)
-#define sithControl_death_msgtimer (*(int*)0x0083583C)
-#define sithControl_vec3_54A570 (*(rdVector3*)0x0054A570)
-#define sithControl_flt_54A57C (*(float*)0x0054A57C)
-
-typedef int (*sithControl_handler_t)(sithThing*, float);
 
 enum INPUT_FUNC
 {

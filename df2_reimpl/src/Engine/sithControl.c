@@ -133,7 +133,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
                     goto LABEL_39;
                 if ( sithControl_death_msgtimer <= sithTime_curMs )
                 {
-                    if ( net_isMulti )
+                    if ( sithNet_isMulti )
                     {
                         v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESPAWN");
                     }
@@ -556,8 +556,8 @@ void sithControl_InputInit()
 {
 }
 
-static last_use = 0;
-static last_cam = 0;
+static int last_use = 0;
+static int last_cam = 0;
 
 int sithControl_ReadFunctionMap(int func, int* out)
 {
