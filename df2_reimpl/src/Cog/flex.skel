@@ -6,6 +6,8 @@
 
 #define FLEX_SCANNER
 
+#include "globals.h"
+
 #include <stdio.h>
 
 
@@ -242,14 +244,15 @@ static int yy_n_chars;		/* number of characters read into yy_ch_buf */
 
 extern YY_CHAR *yytext;
 extern int yyleng;
-extern FILE *yyin, *yyout;
+//extern FILE *yyin, *yyout;
 
 YY_CHAR *yytext;
 int yyleng;
+//extern stdFile_t yyin, yyout;
 
 //FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
-#define yyin (*(int*)0x00855D90)
-#define yyout (*(int*)0x00855D94)
+//#define yyin (*(int*)0x00855D90)
+//#define yyout (*(int*)0x00855D94)
 
 %% data tables for the DFA go here
 

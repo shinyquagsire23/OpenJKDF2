@@ -425,3 +425,279 @@ jkEpisode_var5 0x00554158 char[128]
 jkEpisode_var2 0x005541D8 uint32_t
 jkEpisode_mLoad 0x00552B68 jkEpisodeLoad
 
+jkHud_bChatOpen 0x00553E94 int
+jkHud_bHasTarget 0x00553E7C int
+jkHud_target 0x00553E80 int
+
+jkHudInv_idkItems 0x00553F28 rdTexformat
+jkHudInv_numItems 0x00553F98 int
+jkHudInv_aItems 0x00553F9C int*
+
+Main_bDevMode 0x00860780 int
+Main_bDisplayConfig 0x00860784 int
+Main_bWindowGUI 0x00860788 int
+Main_dword_86078C 0x86078C int
+Main_bFrameRate 0x00860790 int
+Main_bDispStats 0x00860794 int
+Main_bNoHUD 0x00860798 int
+Main_logLevel 0x0086079C int
+Main_verboseLevel 0x008607A0 int
+Main_path 0x008606E4 char[128]
+debug_log_fp 0x00552880 stdFile_t
+pHS 0x860440 common_functions*
+
+jkCredits_table 0x0055AD70 stdStrTable
+jkCredits_fontLarge 0x0055AD98 stdFont*
+jkCredits_fontSmall 0x0055AD9C stdFont*
+jkCredits_bInitted 0x0055ADA4 int
+
+g_sithMode 0x8EE660 int
+g_submodeFlags 0x8EE664 int
+g_debugmodeFlags 0x8EE66C int
+g_mapModeFlags 0x8EE674 int
+jkGame_gamma 0x008606A4 int
+jkGame_screenSize 0x008605F0 int
+jkGame_bInitted 0x005528BC int
+jkGame_updateMsecsTotal 0x00552B58 int
+jkGame_dword_552B5C 0x00552B5C int
+jkGame_isDDraw 0x00552B60 int
+
+jkRes_pHS 0x00555C68 common_functions*
+jkRes_episodeGobName 0x00555C70 char[32]
+jkRes_curDir 0x00555C90 char[128]
+jkRes_bHookedHS 0x00555D18 int
+jkRes_aFiles 0x00554A68 jkResFile[32]
+jkRes_gCtx 0x005541E0 jkRes
+pLowLevelHS 0x00554974 common_functions*
+lowLevelHS 0x00554978 common_functions
+jkRes_idkGobPath 0x005549E8 char[128]
+
+jkCutscene_rect1 0x0055AA18 rdRect
+jkCutscene_rect2 0x0055AA38 rdRect
+jkCutscene_strings 0x0055AA28 stdStrTable
+jkCutscene_subtitlefont 0x0055AA4C stdFont*
+jkCutscene_bInitted 0x0055AA58 int
+jkCutscene_smack_loaded 0x0055AA48 int
+jkCutscene_dword_55B750 0x0055B750 int
+jkCutscene_dword_55AA50 0x0055AA50 int
+jkCutscene_55AA54 0x0055AA54 int
+
+gamemode_0_2_str 0x005528D0 char[128]
+thing_nine 0x0052552C int
+jkMain_bInit 0x00552B80 int
+thing_six 0x00552B90 int
+thing_eight 0x00552B94 int
+jkMain_lastTickMs 0x00552B9C int
+game_updateMsecsTotal 0x00552B58 int
+idx_13b4_related 0x008C4BD8 int
+gamemode_1_str 0x00552958 char[128]
+jkMain_strIdk 0x005529D8 char[128]
+jkMain_wstrIdk 0x00552A58 wchar_t[128]
+
+sithWorld_aSectionParsers 0x00833548 sithWorldParser[32]
+sithWorld_some_integer_4 0x008339E0 uint32_t
+sithWorld_pCurWorld 0x8339C8 sithWorld*
+sithWorld_pStatic 0x8339CC sithWorld*
+sithWorld_pLoading 0x8339D0 sithWorld*
+sithWorld_numParsers 0x8339D4 uint32_t
+sithWorld_bInitted 0x8339D8 uint32_t
+sithWorld_bLoaded 0x008339DC int
+sithWorld_episodeName 0x008EE620 char[32]
+
+sithInventory_powerKeybinds 0x008BD0C0 sithKeybind[21]
+sithInventory_549FA0 0x00549FA0 int
+sithInventory_aDescriptors 0x008BD1C0 sithItemDescriptor[200]
+sithInventory_bUnk 0x008339E4 int
+sithInventory_bUnkPower 0x008339E8 int
+sithInventory_8339EC 0x008339EC int
+sithInventory_bRendIsHidden 0x008339F0 int
+sithInventory_8339F4 0x008339F4 int
+
+sithWeapon_controlOptions 0x008BD020 int
+g_flt_8BD040 0x008BD040 float
+g_flt_8BD044 0x008BD044 float
+g_flt_8BD048 0x008BD048 float
+g_flt_8BD04C 0x008BD04C float
+g_flt_8BD050 0x008BD050 float
+g_flt_8BD054 0x008BD054 float
+g_flt_8BD058 0x008BD058 float
+sithWeapon_CurWeaponMode 0x008BD064 int
+sithWeapon_bAutoPickup 0x008BD080 int
+sithWeapon_bAutoSwitch 0x008BD084 int
+sithWeapon_bAutoReload 0x008BD088 int
+sithWeapon_bMultiAutoPickup 0x008BD08C int
+sithWeapon_bMultiplayerAutoSwitch 0x008BD090 int
+sithWeapon_bMultiAutoReload 0x008BD094 int
+sithWeapon_bAutoAim 0x008BD098 int
+sithWeapon_mountWait 0x008BD09C float
+sithWeapon_8BD0A0 0x008BD0A0 float[2]
+sithWeapon_fireWait 0x008BD0A8 float
+sithWeapon_fireRate 0x008BD0AC float
+sithWeapon_LastFireTimeSecs 0x008BD0B0 float
+sithWeapon_a8BD030 0x008BD030 float[2]
+sithWeapon_a8BD038 0x008BD030 int[2]
+sithWeapon_8BD05C 0x008BD05C float[2]
+sithWeapon_8BD008 0x008BD008 int[6]
+sithWeapon_8BD024 0x008BD024 int
+sithWeapon_senderIndex 0x008BD028 int
+
+sithMap_bInitted 0x0084DF1C int
+sithMap_ctx 0x0084DEB0 sithMap
+
+jkPlayer_playerInfos 0x008C4CA0 sithPlayerInfo[32]
+jkPlayer_playerShortName 0x08EC320 wchar_t[32]
+jkPlayer_numOtherThings 0x0085FF44 int
+jkPlayer_numThings 0x0085B560 int
+jkPlayer_otherThings 0x008592E0 jkPlayerInfo[16]
+jkPlayer_dword_525470 0x525470 int
+bShowInvisibleThings 0x8EE640 int
+playerThingIdx 0x83199C int
+jkPlayer_maxPlayers 0x8319A0 int
+g_localPlayerThing 0x8319A4 sithThing*
+g_selfPlayerInfo 0x8319A8 sithPlayerInfo*
+playerThings 0x85B580 jkPlayerInfo[32]
+jkSaber_rotateMat 0x85FA80 rdMatrix34
+jkPlayer_setRotateOverlayMap 0x00860764 int
+jkPlayer_setDrawStatus 0x00860768 int
+jkPlayer_setCrosshair 0x0086076C int
+jkPlayer_setSaberCam 0x00860770 int
+jkPlayer_setFullSubtitles 0x00860774 int
+jkPlayer_setDisableCutscenes 0x00860778 int
+jkPlayer_aCutsceneVal 0x0085FAC0 int[32]
+jkPlayer_cutscenePath 0x0085FB40 char[1024]
+jkPlayer_setNumCutscenes 0x0085FF40 int
+jkPlayer_setDiff 0x008EE670 int
+jkPlayer_waggleVec 0x00552BA0 rdVector3
+jkPlayer_waggleMag 0x00552BAC float
+jkPlayer_mpcInfoSet 0x552BB0 int
+jkPlayer_waggleAngle 0x00552BB4 float
+jkSaber_rotateVec 0x00552BB8 rdVector3
+jkPlayer_name 0x008604C0 wchar_t[32]
+jkPlayer_model 0x00860500 char[32]
+jkPlayer_soundClass 0x00860520 char[32]
+jkPlayer_sideMat 0x00860560 char[32]
+jkPlayer_tipMat 0x00860580 char[32]
+
+sithUnk3_stackIdk 0x847F28 int[4]
+sithUnk3_collisionHandlers 0x00847F38 sithUnk3Entry[144]
+sithUnk3_funcList 0x8485F8 void*[12]
+sithUnk3_searchStack 0x00848628 sithUnk3SearchResult[4]
+sithUnk3_searchNumResults 0x84DA28 int[4]
+sithUnk3_searchStackIdx 0x54BA90 int = -1
+sithUnk3_stackSectors 0x0084D628 sithUnk3SectorEntry[4]
+sithUnk3_dword_8B4BE4 0x008B4BE4 int
+sithUnk3_collideHurtIdk 0x008B4BF0 rdVector3
+
+sithSector_surfaceNormal 0x0054C6E8 rdVector3
+sithSector_aEntries 0x00855028 sithSectorEntry[32]
+sithSector_allocPerSector 0x008553A8 sithSectorAlloc*
+sithSector_numEntries 0x008553AC int
+sithSector_bInitted 0x008553B0 int
+sithSector_timerTicks 0x008553B4 int
+sithSector_flt_8553B8 0x008553B8 float
+sithSector_horizontalPixelsPerRev 0x008553BC float
+sithSector_flt_8553C0 0x008553C0 float
+sithSector_flt_8553C4 0x008553C4 float
+sithSector_flt_8553C8 0x008553C8 float
+sithSector_zMaxVec 0x008553D0 rdVector3
+sithSector_ceilingSky 0x008553DC float
+sithSector_zMinVec 0x008553E0 rdVector3
+sithSector_horizontalPixelsPerRev_idk 0x008553EC float
+sithSector_horizontalDist 0x008553F0 float
+sithSector_flt_8553F4 0x008553F4 float
+sithSector_aSyncIdk 0x00855438 sithSector*[16]
+sithSector_aSyncIdk2 0x00855478 int
+sithSector_numSync 0x008554B8 int
+
+sithThing_paramKeyToParamValMap 0x008326A8 stdHashTable*
+sithThing_handler 0x008330FC sithThing_handler_t
+sithThing_inittedThings 0x00549358 uint16_t
+
+jkGuiSaveLoad_wtextEpisode 0x00559528 wchar_t[256]
+jkGuiSaveLoad_wtextHealth 0x00559728 wchar_t[64]
+jkGuiSaveLoad_numEntries 0x005597A8 int
+jkGuiSaveLoad_wtextShields 0x005597B0 wchar_t[64]
+jkGuiSaveLoad_word_559830 0x00559830 wchar_t[256]
+jkGuiSaveLoad_bIsSaveMenu 0x00559A30 int
+jkGuiSaveLoad_wtextSaveName 0x00559A38 wchar_t[256]
+jkGuiSaveLoad_DarrayEntries 0x00559C38 Darray
+jkGuiSaveLoad_word_559C54 0x00559C54 wchar_t[10]
+jkGuiSaveLoad_byte_559C50 0x00559C50 char[4]
+
+jkGuiTitle_verMajor 0x00525030 int = 1
+jkGuiTitle_verMinor 0x00552884 int = 0
+jkGuiTitle_verRevision 0x00525034 int = 0
+jkGuiTitle_aTexts 0x005568E0 jkGuiStringEntry[20]
+jkGuiTitle_whichLoading 0x00556980 int
+
+jkGuiSound_sfxVolume 0x00547DD0 float
+jkGuiSound_numChannels 0x0054A680 int
+jkGuiSound_bLowResSound 0x00563700 int
+jkGuiSound_b3DSound 0x00563704 int
+jkGuiSound_b3DSound_2 0x00563708 int
+jkGuiSound_b3DSound_3 0x0056370C int
+jkGuiSound_musicVolume 0x0086077C float
+
+jkGui_unkstr 0x856880 char[32]
+jkGui_GdiMode 0x00556020 int
+jkGui_modesets 0x0055603c int
+jkGui_stdBitmaps 0x008567E0 stdBitmap*[0x27]
+jkGui_stdFonts 0x008568A0 stdFont*[16]
+jkGui_episodeLoad 0x00556028 jkEpisodeLoad
+
+jkGuiSingleTally_foStars 0x00556880 stdBitmap*
+
+jkGuiNetHost_maxRank 0x00860460 int
+jkGuiNetHost_timeLimit 0x00860464 int
+jkGuiNetHost_scoreLimit 0x00860468 int
+jkGuiNetHost_maxPlayers 0x0086046C int
+jkGuiNetHost_sessionFlags 0x00860470 int
+jkGuiNetHost_gameFlags 0x00860474 int
+jkGuiNetHost_tickRate 0x00860478 int
+jkGuiNetHost_gameName 0x0086047C wchar_t[32]
+
+g_hInstance 0x00855DEC HINSTANCE
+g_cog_symbolTable 0x008B5428 sithCogSymboltable*
+wm_msg_main_handler 0x50ECB0 WNDPROC
+pSithHS 0x82F0A4 struct common_functions*
+
+stdPalEffects_state 0x00866200 stdPalEffectsState
+stdPalEffects_palette 0x0055BB80 rdColor24[256]
+stdPalEffects_numEffectRequests 0x0055BE80 uint32_t
+stdPalEffects_aEffects 0x00866260 stdPalEffectRequest[32]
+
+aFilenameStack 0x0055D620 char[2560]
+apBufferStack 0x55E020 char*[20]
+linenumStack 0x55E070 int[20]
+aEntryStack 0x0055E0C0 char[0x5050]
+openFileStack 0x563110 int[20]
+printfBuffer 0x00563160 char[1024]
+stdConffile_linenum 0x00563560 int
+stdConffile_bOpen 0x00563564 int
+openFile 0x00563568 stdFile_t
+writeFile 0x0056356C stdFile_t
+stackLevel 0x00563570 uint32_t
+stdConffile_aWriteFilename 0x860820 char[128]
+stdConffile_entry 0x8608A0 stdConffileEntry
+stdConffile_pFilename 0x860CC0 char[128]
+stdConffile_aLine 0x860D40 char*
+
+stdMemory_bInitted 0x00570384 int
+stdMemory_bOpened 0x00570388 int
+stdMemory_info 0x008607C0 stdMemoryInfo
+
+yyin 0x00855D90 stdFile_t
+yyout 0x00855D94 stdFile_t
+
+sithCogParse_symbolTable 0x008554C0 sithCogSymboltable*
+yacc_linenum 0x00889F0C int
+cog_yacc_loop_depth 0x0054C850 int = 1
+cog_parser_node_stackpos 0x008554C8 int[512]
+cogvm_stackpos 0x00855CD8 int
+cogparser_nodes_alloc 0x00855CD0 sith_cog_parser_node*
+cogparser_topnode 0x00855CCC sith_cog_parser_node*
+cogvm_stack 0x00855CC8 int*
+cogparser_num_nodes 0x00855CE0 int
+cogparser_current_nodeidx 0x00855CDC int
+parsing_script 0x00855CD4 sithCogScript*
+parsing_script_idk 0x0054C854 int = 1

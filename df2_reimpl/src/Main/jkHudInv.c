@@ -8,7 +8,7 @@
 
 int jkHudInv_Initialize()
 {
-    _memset(jkHudInv_idkItems, 0, 14 * sizeof(int)); // sizeof(jkHudInv_idkItems)
+    _memset(&jkHudInv_idkItems, 0, sizeof(rdTexformat)); // sizeof(jkHudInv_idkItems)
     return 1;
 }
 

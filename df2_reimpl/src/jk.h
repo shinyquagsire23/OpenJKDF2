@@ -12,43 +12,6 @@
     type* name ## _ptr = (type*)ptr;
 #define VM_VAR_DECL(name, type) extern type* name ## _ptr;
 
-typedef struct common_functions
-{
-    uint32_t some_float;
-    int (*messagePrint)(const char *, ...);
-    int (*statusPrint)(const char *, ...);
-    int (*warningPrint)(const char *, ...);
-    int (*errorPrint)(const char *, ...);
-    int (*debugPrint)(const char *, ...);
-    void (*assert)(const char *, const char *, int);
-    uint32_t unk_0;
-    void *(*alloc)(unsigned int);
-    void (*free)(void *);
-    void *(*realloc)(void *, unsigned int);
-    uint32_t (*getTimerTick)();
-    stdFile_t (*fileOpen)(const char *, const char *);
-    int (*fileClose)(stdFile_t);
-    size_t (*fileRead)(stdFile_t, void *, size_t);
-    char *(*fileGets)(stdFile_t, char *, size_t);
-    size_t (*fileWrite)(stdFile_t, void *, size_t);
-    int (*feof)(stdFile_t);
-    int (*ftell)(stdFile_t);
-    int (*fseek)(stdFile_t, int, int);
-    int (*fileSize)(stdFile_t);
-    int (*filePrintf)(stdFile_t, const char*, ...);
-    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
-    void* (*allocHandle)(size_t);
-    void (*freeHandle)(void*);
-    void* (*reallocHandle)(void*, size_t);
-    uint32_t (*lockHandle)(uint32_t);
-    void (*unlockHandle)(uint32_t);
-} common_functions;
-
-typedef struct hashmap_entry
-{
-    
-} hashmap_entry;
-
 //static void (*jk_main)(uint32_t a, uint32_t b, char* c, int d, char* e) = (void*)0x50E750;
 
 #ifdef WIN32
@@ -391,7 +354,6 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define g_hWnd *(g_hWnd_ptr)
 
 #define g_nShowCmd (*(g_nShowCmd_ptr))
-#define g_hInstance (*(HINSTANCE*)0x00855DEC)
 
 #define g_app_suspended (*(g_app_suspended_ptr))
 #define g_window_active (*(g_window_active_ptr))
@@ -403,11 +365,6 @@ VM_VAR_DECL(g_window_not_destroyed, uint32_t);
 #define g_855E8C (*(g_855E8C_ptr))
 #define g_855E90 (*(g_855E90_ptr))
 #define g_window_not_destroyed *(g_window_not_destroyed_ptr)
-#define g_cog_symbolTable (*(sithCogSymboltable**)0x008B5428)
-
-#define wm_msg_main_handler ((WNDPROC)0x50ECB0)
-
-#define pSithHS (*((struct common_functions **)0x82F0A4))
 
 void jk_init();
 

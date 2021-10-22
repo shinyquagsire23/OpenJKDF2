@@ -2,6 +2,7 @@
 #define _SITHUNK3_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithUnk3_Startup_ADDR (0x004E6D90)
 #define sithUnk3_Shutdown_ADDR (0x004E6F20)
@@ -25,48 +26,6 @@
 #define sithUnk3_CollideHurt_ADDR (0x004E9090)
 #define sithUnk3_FallHurt_ADDR (0x004E9550)
 #define sithUnk3_DebrisPlayerCollide_ADDR (0x004E95A0)
-
-#define sithUnk3_stackIdk ((int*)0x847F28)
-#define sithUnk3_collisionHandlers ((sithUnk3Entry*)0x00847F38)
-#define sithUnk3_funcList ((void**)0x8485F8)
-#define sithUnk3_searchStack ((sithUnk3SearchResult*)0x00848628)
-#define sithUnk3_searchNumResults ((int*)0x84DA28)
-#define sithUnk3_searchStackIdx (*(int*)0x54BA90)
-#define sithUnk3_stackSectors ((sithUnk3SectorEntry*)0x0084D628) // 4
-#define sithUnk3_dword_8B4BE4 (*(int*)0x008B4BE4)
-#define sithUnk3_collideHurtIdk (*(rdVector3*)0x008B4BF0)
-
-typedef int (*sithUnk3_collisionHandler_t)(sithThing*, sithThing*, sithUnk3SearchEntry*, int);
-typedef int (*sithUnk3_searchHandler_t)(sithThing*, sithThing*);
-
-typedef struct sithUnk3Entry
-{
-    sithUnk3_collisionHandler_t handler;
-    sithUnk3_searchHandler_t search_handler;
-    uint32_t inverse;
-} sithUnk3Entry;
-
-typedef struct sithUnk3SearchEntry
-{
-    uint32_t collideType;
-    sithThing* receiver;
-    sithSurface* surface;
-    rdFace* face;
-    rdMesh* sender;
-    rdVector3 field_14;
-    float distance;
-    uint32_t hasBeenEnumerated;
-} sithUnk3SearchEntry;
-
-typedef struct sithUnk3SectorEntry
-{
-    sithSector* sectors[64];
-} sithUnk3SectorEntry;
-
-typedef struct sithUnk3SearchResult
-{
-    sithUnk3SearchEntry collisions[128];
-} sithUnk3SearchResult;
 
 int sithUnk3_Startup();
 static void (*sithUnk3_Shutdown)() = (void*)sithUnk3_Shutdown_ADDR;

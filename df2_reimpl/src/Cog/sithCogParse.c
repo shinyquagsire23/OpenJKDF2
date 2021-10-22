@@ -24,8 +24,6 @@ void sithCogYACC_yy_delete_buffer(){}
 void sithCogYACC_yy_init_buffer(){}
 
 extern int yyparse();
-#define yyin (*(int*)0x00855D90)
-#define yyout (*(int*)0x00855D94)
 
 void sithCogParse_Reset()
 {

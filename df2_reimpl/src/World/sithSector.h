@@ -1,11 +1,8 @@
 #ifndef _SITHSECTOR_H
 #define _SITHSECTOR_H
 
-#include "Primitives/rdVector.h"
 #include "types.h"
-
-typedef struct rdKeyframe rdKeyframe;
-typedef struct sithSurface sithSurface;
+#include "globals.h"
 
 #define sithSector_Startup_ADDR (0x004F29F0)
 #define sithSector_Shutdown_ADDR (0x004F2A50)
@@ -104,8 +101,6 @@ typedef struct sithSurface sithSurface;
 #define sithSector_cogmsg_send31_ADDR (0x004FA420)
 #define sithSector_cogmsg_31_ADDR (0x004FA5D0)
 
-#define sithSector_surfaceNormal (*(rdVector3*)0x0054C6E8)
-
 typedef enum ATTACHFLAGS
 {
   ATTACHFLAGS_WORLDSURFACE = 0x1,
@@ -132,57 +127,6 @@ typedef enum SITH_SF
   SITH_SF_2000 = 0x2000,
   SITH_SF_AUTOMAPVISIBLE = 0x4000,
 } SITH_SF;
-
-typedef struct rdClipFrustum rdClipFrustum;
-typedef struct sithThing sithThing;
-typedef struct sithAdjoin sithAdjoin;
-typedef struct rdColormap rdColormap;
-
-typedef struct sithSector
-{
-    uint32_t id;
-    float ambientLight;
-    float extraLight;
-    rdColormap* colormap;
-    rdVector3 tint;
-    uint32_t numVertices;
-    int* verticeIdxs;
-    uint32_t numSurfaces;
-    sithSurface* surfaces;
-    sithAdjoin* adjoins;
-    sithThing* thingsList;
-    uint32_t flags;
-    rdVector3 center;
-    rdVector3 thrust;
-    sithSound* sectorSound;
-    float sectorSoundVol;
-    rdVector3 collidebox_onecorner;
-    rdVector3 collidebox_othercorner;
-    rdVector3 boundingbox_onecorner;
-    rdVector3 boundingbox_othercorner;
-    float radius;
-    uint32_t field_8C;
-    uint32_t field_90;
-    rdClipFrustum* clipFrustum;
-} sithSector;
-
-typedef struct sithSectorEntry
-{
-    sithSector *sector;
-    sithThing *thing;
-    rdVector3 pos;
-    int field_14;
-    float field_18;
-} sithSectorEntry;
-
-typedef struct sithSectorAlloc
-{
-    int field_0;
-    float field_4[3];
-    rdVector3 field_10[3];
-    rdVector3 field_34[3];
-    sithThing* field_58[3];
-} sithSectorAlloc;
 
 int sithSector_Startup();
 void sithSector_Shutdown();
@@ -261,25 +205,5 @@ static int (*sithSector_cogMsg_SendSyncPalEffects)(int sendto_id, int mpFlags) =
 static int (*sithSector_cogMsg_SendSyncCameras)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncCameras_ADDR;
 static int (*sithSector_cogmsg_send31)(int sendto_id, int mpFlags) = (void*)sithSector_cogmsg_send31_ADDR;
 //static void (*sithSector_sub_4F2C30)(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing) = (void*)sithSector_sub_4F2C30_ADDR;
-
-#define sithSector_aEntries ((sithSectorEntry*)0x00855028)
-#define sithSector_allocPerSector (*(sithSectorAlloc**)0x008553A8)
-#define sithSector_numEntries (*(int*)0x008553AC)
-#define sithSector_bInitted (*(int*)0x008553B0)
-#define sithSector_timerTicks (*(int*)0x008553B4)
-#define sithSector_flt_8553B8 (*(float*)0x008553B8)
-#define sithSector_horizontalPixelsPerRev (*(float*)0x008553BC)
-#define sithSector_flt_8553C0 (*(float*)0x008553C0)
-#define sithSector_flt_8553C4 (*(float*)0x008553C4)
-#define sithSector_flt_8553C8 (*(float*)0x008553C8)
-#define sithSector_zMaxVec (*(rdVector3*)0x008553D0)
-#define sithSector_ceilingSky (*(float*)0x008553DC)
-#define sithSector_zMinVec (*(rdVector3*)0x008553E0)
-#define sithSector_horizontalPixelsPerRev_idk (*(float*)0x008553EC)
-#define sithSector_horizontalDist (*(float*)0x008553F0)
-#define sithSector_flt_8553F4 (*(float*)0x008553F4)
-#define sithSector_aSyncIdk ((sithSector**)0x00855438)
-#define sithSector_aSyncIdk2 (*(int*)0x00855478)
-#define sithSector_numSync (*(int*)0x008554B8)
 
 #endif // _SITHSECTOR_H

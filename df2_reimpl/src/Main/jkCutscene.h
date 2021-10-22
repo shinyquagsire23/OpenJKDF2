@@ -2,6 +2,7 @@
 #define _JK_CUTSCENE_H
 
 #include "types.h"
+#include "globals.h"
 
 #define jkCutscene_Initialize_ADDR (0x00421250)
 #define jkCutscene_Shutdown_ADDR (0x004212D0)
@@ -10,16 +11,6 @@
 #define jkCutscene_smack_related_loops_ADDR (0x00421450)
 #define jkCutscene_PauseShow_ADDR (0x00421560)
 #define jkCutscene_Handler_ADDR (0x004215C0)
-
-#define jkCutscene_rect1 (*(rdRect*)0x0055AA18)
-#define jkCutscene_rect2 (*(rdRect*)0x0055AA38)
-#define jkCutscene_strings (*(stdStrTable*)0x0055AA28)
-#define jkCutscene_subtitlefont (*(stdFont**)0x0055AA4C)
-#define jkCutscene_bInitted (*(int*)0x0055AA58)
-#define jkCutscene_smack_loaded (*(int*)0x0055AA48)
-#define jkCutscene_dword_55B750 (*(int*)0x0055B750)
-#define jkCutscene_dword_55AA50 (*(int*)0x0055AA50)
-#define jkCutscene_55AA54 (*(int*)0x0055AA54)
 
 void jkCutscene_Initialize(char *fpath);
 void jkCutscene_Shutdown();

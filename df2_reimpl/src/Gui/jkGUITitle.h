@@ -33,10 +33,4 @@ void jkGuiTitle_LoadingFinalize();
 static int (*jkGuiTitle_UnkDraw_)(jkGuiElement *a1, jkGuiMenu *a2, stdVBuffer *a3, int a4) = (void*)jkGuiTitle_UnkDraw_ADDR;
 static int (*jkGuiTitle_LoadBarDraw_)(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4) = (void*)jkGuiTitle_LoadBarDraw_ADDR;
 
-#define jkGuiTitle_verMinor    (*(int*)0x00552884)
-#define jkGuiTitle_verMajor    (*(int*)0x00525030)
-#define jkGuiTitle_verRevision (*(int*)0x00525034)
-#define jkGuiTitle_aTexts ((jkGuiStringEntry*)0x005568E0)
-#define jkGuiTitle_whichLoading (*(int*)0x00556980)
-
 #endif // _JKGUITITLE_H

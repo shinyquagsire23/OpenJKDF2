@@ -66,7 +66,10 @@ int sith_Startup(struct common_functions *commonFuncs)
     sithSound_Startup();
     sithSoundSys_Startup();
     sithWeapon_Startup();
+
+#ifndef NO_JK_MMAP
     _memset(&g_sithMode, 0, 0x18u);
+#endif
 
     if ( !is_started )
         return 0;

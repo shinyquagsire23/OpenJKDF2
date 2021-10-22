@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "types.h"
+#include "globals.h"
 
 #include "World/sithThing.h" // sithActor struct def
 

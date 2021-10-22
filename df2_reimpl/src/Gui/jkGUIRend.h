@@ -84,10 +84,6 @@ typedef struct stdBitmap stdBitmap;
 typedef struct stdVBuffer stdVBuffer;
 typedef struct Darray Darray;
 
-typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, stdVBuffer*, int);
-typedef int (*jkGuiButtonDownFunc_t)(jkGuiElement*, jkGuiMenu*, int, int);
-typedef int (*jkGuiButtonUpFunc_t)(jkGuiElement*, jkGuiMenu*, int, int, int);
-
 enum jkGuiElementType_t
 {
     ELEMENT_TEXTBUTTON = 0,
@@ -100,84 +96,6 @@ enum jkGuiElementType_t
     ELEMENT_CUSTOM = 7,
     ELEMENT_8 = 8,
     ELEMENT_END = 9,
-};
-
-typedef struct jkGuiElementHandlers
-{
-  jkGuiButtonDownFunc_t buttonDown;
-  jkGuiDrawFunc_t draw;
-  jkGuiButtonUpFunc_t buttonUp;
-} jkGuiElementHandlers;
-
-struct jkGuiTexInfo
-{
-  int textHeight;
-  int numTextEntries;
-  int maxTextEntries;
-  int textScrollY;
-  int anonymous_18;
-  rdRect rect;
-};
-
-struct jkGuiElement
-{
-    int type;
-    int hoverId;
-    int field_8;
-    union
-    {
-      const char* str;
-      jkGuiStringEntry *unistr;
-      wchar_t* wstr;
-      int extraInt;
-    };
-    union
-    {
-        int selectedTextEntry;
-        int boxChecked;
-    };
-    rdRect rect;
-    int bIsVisible;
-    int anonymous_9;
-    union
-    {
-        const char* hintText;
-        wchar_t* wHintText;
-    };
-    jkGuiDrawFunc_t drawFuncOverride;
-    jkGuiButtonUpFunc_t func;
-    void *anonymous_13;
-    jkGuiTexInfo texInfo;
-    int elementIdk;
-};
-
-struct jkGuiStringEntry
-{
-  wchar_t *str;
-  int id;
-};
-
-struct jkGuiMenu
-{
-  jkGuiElement *clickables;
-  int clickableIdxIdk;
-  int anonymous_1;
-  int fillColor;
-  int anonymous_3;
-  stdVBuffer *texture;
-  uint8_t* palette;
-  stdBitmap **ui_structs;
-  stdFont** fonts;
-  int anonymous_7;
-  void (__cdecl *idkFunc)(jkGuiMenu *);
-  char *soundHover;
-  char *soundClick;
-  jkGuiElement *focusedElement;
-  jkGuiElement *lastMouseDownClickable;
-  jkGuiElement *lastMouseOverClickable;
-  int lastButtonUp;
-  jkGuiElement* clickables_end;
-  jkGuiElement* field_48;
 };
 
 //#define jkGuiRend_palette ((uint8_t*)0x855EC8)

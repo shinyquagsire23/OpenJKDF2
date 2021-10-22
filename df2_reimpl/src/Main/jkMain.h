@@ -58,20 +58,6 @@
 #define jkMain_UnkTick_ADDR (0x00404580)
 #define jkMain_UnkLeave_ADDR (0x004045F0)
 
-#define gamemode_0_2_str ((char*)0x005528D0)
-#define thing_nine (*(int*)0x0052552C)
-#define jkMain_bInit (*(int*)0x00552B80)
-#define thing_six (*(int*)0x00552B90)
-#define thing_eight (*(int*)0x00552B94)
-#define jkMain_lastTickMs (*(int*)0x552B9C)
-#define dword_552B5C (*(int*)0x552B5C)
-#define game_updateMsecsTotal (*(int*)0x00552B58)
-#define idx_13b4_related (*(int*)0x008C4BD8)
-#define gamemode_1_str ((char*)0x00552958) // 128
-#define jkMain_strIdk ((char*)0x005529D8) // 128
-#define jkMain_wstrIdk ((wchar_t*)0x00552A58) // 128
-//#define guiStateFuncs ((jkGuiStateFuncs*)0x00525478)
-
 enum JK_GAMEMODE
 {
     JK_GAMEMODE_NONE = 0,

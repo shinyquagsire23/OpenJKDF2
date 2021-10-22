@@ -1,7 +1,9 @@
 #ifndef _SITHCOGPARSE_H
 #define _SITHCOGPARSE_H
 
-#include "Primitives/rdVector.h"
+#include "types.h"
+#include "globals.h"
+
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCogYACC.h"
 
@@ -31,19 +33,6 @@
 #define sithCogParse_ParseInt_ADDR (0x004FE040)
 #define sithCogParse_ParseVector_ADDR (0x004FE280)
 #define sithCogParse_ParseMessage_ADDR (0x004FE4D0)
-
-typedef struct sith_cog_parser_node sith_cog_parser_node;
-
-typedef struct sith_cog_parser_node 
-{
-    int child_loop_depth;
-    int parent_loop_depth;
-    sith_cog_parser_node *parent;
-    sith_cog_parser_node *child;
-    int opcode;
-    int value;
-    rdVector3 vector;
-} sith_cog_parser_node;
 
 void sithCogParse_Reset();
 int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk);
@@ -78,19 +67,6 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript);
 
 static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
 //static int (*sithCogParse_RecurseWrite)(sith_cog_parser_node *node) = (void*)sithCogParse_RecurseWrite_ADDR;
-
-#define sithCogParse_symbolTable (*(sithCogSymboltable**)0x008554C0)
-#define yacc_linenum (*(int*)0x00889F0C)
-#define cog_yacc_loop_depth (*(int*)0x0054C850)
-#define cog_parser_node_stackpos ((int*)0x008554C8)
-#define cogvm_stackpos (*(int*)0x00855CD8)
-#define cogparser_nodes_alloc (*(sith_cog_parser_node**)0x00855CD0)
-#define cogparser_topnode (*(sith_cog_parser_node**)0x00855CCC)
-#define cogvm_stack (*(int**)0x00855CC8)
-#define cogparser_num_nodes (*(int*)0x00855CE0)
-#define cogparser_current_nodeidx (*(int*)0x00855CDC)
-#define parsing_script (*(sithCogScript**)0x00855CD4)
-#define parsing_script_idk (*(int*)0x0054C854)
 
 int cog_parsescript();
 

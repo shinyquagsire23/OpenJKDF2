@@ -1,7 +1,8 @@
 #ifndef _SITHINVENTORY_H
 #define _SITHINVENTORY_H
 
-#include <stdint.h>
+#include "types.h"
+#include "globals.h"
 
 #define sithInventory_NewEntry_ADDR (0x004D1120)
 #define sithInventory_GetNumBinsWithFlag_ADDR (0x004D1180)
@@ -183,46 +184,6 @@ enum ITEMSTATE
     ITEMSTATE_AVAILABLE  = 4,
     ITEMSTATE_CARRIES = 8
 };
-
-typedef struct sithCog sithCog;
-typedef struct sithThing sithThing;
-
-typedef struct sithItemDescriptor
-{
-    uint32_t flags;
-    char fpath[128];
-    float ammoMin;
-    float ammoMax;
-    sithCog* cog;
-    uint32_t field_90;
-    uint32_t field_94;
-    stdBitmap* hudBitmap;
-} sithItemDescriptor;
-
-typedef struct sithItemInfo
-{
-    float ammoAmt;
-    int field_4;
-    int state;
-    float activatedTimeSecs;
-    float activationDelaySecs;
-    float binWait;
-} sithItemInfo;
-
-typedef struct sithKeybind {
-    int enabled;
-    int binding;
-    int idk;
-} sithKeybind;
-
-#define sithInventory_powerKeybinds ((sithKeybind*)0x008BD0C0)
-#define sithInventory_549FA0 (*(int*)0x00549FA0)
-#define sithInventory_aDescriptors ((sithItemDescriptor*)0x008BD1C0)
-#define sithInventory_bUnk (*(int*)0x008339E4)
-#define sithInventory_bUnkPower (*(int*)0x008339E8)
-#define sithInventory_8339EC (*(int*)0x008339EC)
-#define sithInventory_bRendIsHidden (*(int*)0x008339F0)
-#define sithInventory_8339F4 (*(int*)0x008339F4)
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags);
 int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags);

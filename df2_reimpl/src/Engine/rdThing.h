@@ -1,7 +1,9 @@
 #ifndef _RDTHING_H
 #define _RDTHING_H
 
-#include "Primitives/rdMatrix.h"
+#include "types.h"
+#include "globals.h"
+
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"
 #include "Primitives/rdParticle.h"
@@ -9,7 +11,6 @@
 #include "Engine/rdPuppet.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdLight.h"
-#include "types.h"
 
 #define rdThing_New_ADDR (0x0043E1A0)
 #define rdThing_NewEntry_ADDR (0x0043E200)
@@ -34,38 +35,6 @@ enum RD_THINGTYPE
     RD_THINGTYPE_PARTICLECLOUD  = 5,
     RD_THINGTYPE_POLYLINE  = 6
 };
-
-typedef struct sithThing sithThing;
-
-typedef struct rdThing
-{
-    int type;
-    union
-    {
-        rdModel3* model3;
-        rdCamera* camera;
-        rdLight* light;
-        rdSprite* sprite3;
-        rdParticle* particlecloud;
-        rdPolyLine* polyline;
-    };
-    uint32_t geoMode;
-    uint32_t lightMode;
-    uint32_t texMode;
-    rdPuppet* puppet;
-    uint32_t field_18;
-    uint32_t frameTrue;
-    rdMatrix34 *hierarchyNodeMatrices;
-    rdVector3* hierarchyNodes2;
-    int* amputatedJoints;
-    uint32_t wallCel;
-    uint32_t geosetSelect;
-    uint32_t geometryMode;
-    uint32_t lightingMode;
-    uint32_t textureMode;
-    uint32_t clippingIdk;
-    sithThing* parentSithThing;
-} rdThing;
 
 rdThing* rdThing_New(sithThing *parent);
 int rdThing_NewEntry(rdThing *thing, sithThing *parent);

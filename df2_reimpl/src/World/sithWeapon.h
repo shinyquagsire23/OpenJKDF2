@@ -2,8 +2,7 @@
 #define _SITHWEAPON_H
 
 #include "types.h"
-
-#include "Primitives/rdMatrix.h"
+#include "globals.h"
 
 #define sithWeapon_InitDefaults_ADDR (0x004D3430)
 #define sithWeapon_Startup_ADDR (0x004D34B0)
@@ -38,34 +37,6 @@
 #define sithWeapon_Syncunused1_ADDR (0x004D6670)
 #define sithWeapon_Syncunused2_ADDR (0x004D6750)
 #define sithWeapon_SetFireRate_ADDR (0x004D6830)
-
-#define sithWeapon_controlOptions (*(int*)0x008BD020)
-#define g_flt_8BD040 (*(float*)0x008BD040)
-#define g_flt_8BD044 (*(float*)0x008BD044)
-#define g_flt_8BD048 (*(float*)0x008BD048)
-#define g_flt_8BD04C (*(float*)0x008BD04C)
-#define g_flt_8BD050 (*(float*)0x008BD050)
-#define g_flt_8BD054 (*(float*)0x008BD054)
-#define g_flt_8BD058 (*(float*)0x008BD058)
-#define dword_8BD060 (*(float*)0x008BD060)
-#define sithWeapon_CurWeaponMode (*(int*)0x008BD064)
-#define sithWeapon_bAutoPickup (*(int*)0x008BD080)
-#define sithWeapon_bAutoSwitch (*(int*)0x008BD084)
-#define sithWeapon_bAutoReload (*(int*)0x008BD088)
-#define sithWeapon_bMultiAutoPickup (*(int*)0x008BD08C)
-#define sithWeapon_bMultiplayerAutoSwitch (*(int*)0x008BD090)
-#define sithWeapon_bMultiAutoReload (*(int*)0x008BD094)
-#define sithWeapon_bAutoAim (*(int*)0x008BD098)
-#define sithWeapon_mountWait (*(float*)0x008BD09C)
-#define sithWeapon_8BD0A0 ((float*)0x008BD0A0)
-#define sithWeapon_fireWait (*(float*)0x008BD0A8)
-#define sithWeapon_fireRate (*(float*)0x008BD0AC)
-#define sithWeapon_LastFireTimeSecs (*(float*)0x008BD0B0)
-#define sithWeapon_a8BD030 ((float*)0x008BD030)
-#define sithWeapon_8BD05C ((float*)0x008BD05C)
-#define sithWeapon_8BD008 ((int*)0x008BD008)
-#define sithWeapon_8BD024 (*(int*)0x008BD024)
-#define sithWeapon_senderIndex (*(int*)0x008BD028)
 
 void sithWeapon_InitDefaults();
 void sithWeapon_Startup();

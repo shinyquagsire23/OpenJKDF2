@@ -1,9 +1,8 @@
 #ifndef _SITHWORLD_H
 #define _SITHWORLD_H
 
-#include <stdint.h>
-
 #include "types.h"
+#include "globals.h"
 
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
@@ -35,94 +34,6 @@
 #define sithWorld_FindSectionParser_ADDR (0x004D0E20)
 #define sithWorld_LoadGeoresource_ADDR (0x004D0E70)
 
-typedef void (__cdecl *sithWorldProgressCallback_t)(float);
-
-typedef struct sithWorld
-{
-    uint32_t level_type_maybe;
-    char map_jkl_fname[32];
-    char episodeName[32];
-    int numColormaps;
-    rdColormap* colormaps;
-    int numSectors;
-    sithSector* sectors;
-    int numMaterialsLoaded;
-    int numMaterials;
-    rdMaterial* materials;
-    rdVector2* materials2;
-    uint32_t numModelsLoaded;
-    uint32_t numModels;
-    rdModel3* models;
-    int numSpritesLoaded;
-    int numSprites;
-    rdSprite* sprites;
-    int numParticlesLoaded;
-    int numParticles;
-    rdParticle* particles;
-    int numVertices;
-    rdVector3* vertices;
-    rdVector3* verticesTransformed;
-    int* alloc_unk98;
-    float* verticesDynamicLight;
-    int* alloc_unk9c;
-    int numVertexUVs;
-    rdVector2* vertexUVs;
-    int numSurfaces;
-    sithSurface* surfaces;
-    int numAdjoinsLoaded;
-    int numAdjoins;
-    sithAdjoin* adjoins;
-    int numThingsLoaded;
-    int numThings;
-    sithThing* things;
-    int numTemplatesLoaded;
-    int numTemplates;
-    sithThing* templates;
-    float worldGravity;
-    uint32_t field_D8;
-    float ceilingSky;
-    float horizontalDistance;
-    float horizontalPixelsPerRev;
-    rdVector2 horizontalSkyOffs;
-    rdVector2 ceilingSkyOffs;
-    rdVector4 mipmapDistance;
-    rdVector4 loadDistance;
-    float perspectiveDistance;
-    float gouradDistance;
-    sithThing* cameraFocus;
-    sithThing* playerThing;
-    uint32_t field_128;
-    int numSoundsLoaded;
-    int numSounds;
-    sithSound* sounds;
-    int numSoundClassesLoaded;
-    int numSoundClasses;
-    sithSoundClass* soundclasses;
-    int numCogScriptsLoaded;
-    int numCogScripts;
-    sithCogScript* cogScripts;
-    int numCogsLoaded;
-    int numCogs;
-    sithCog* cogs;
-    int numAIClassesLoaded;
-    int numAIClasses;
-    sithAIClass* aiclasses;
-    int numKeyframesLoaded;
-    int numKeyframes;
-    rdKeyframe* keyframes;
-    int numAnimClassesLoaded;
-    int numAnimClasses;
-    sithAnimclass* animclasses;
-} sithWorld;
-
-typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
-
-typedef struct sith_map_section_and_func
-{
-    char section_name[32];
-    sithWorldSectionParser_t funcptr;
-} sith_map_section_and_func;
-
 int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
@@ -152,13 +63,5 @@ void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world);
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
 //static void (*sithWorld_ResetSectorRuntimeAlteredVars)(sithWorld *world) = (void*)sithWorld_ResetSectorRuntimeAlteredVars_ADDR;
-
-#define sithWorld_pCurWorld (*(sithWorld**)0x8339C8)
-#define sithWorld_pStatic (*(sithWorld**)0x8339CC)
-#define sithWorld_pLoading (*(sithWorld**)0x8339D0)
-#define sithWorld_numParsers (*(uint32_t*)0x8339D4)
-#define sithWorld_bInitted (*(uint32_t*)0x8339D8)
-#define sithWorld_bLoaded (*(int*)0x008339DC)
-#define sithWorld_episodeName ((char*)0x008EE620)
 
 #endif // _SITHWORLD_H

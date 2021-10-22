@@ -38,11 +38,6 @@ static int sithCog_bInitted = 0;
 
 int sithCog_Startup()
 {
-    struct hashmap_entry *v3; // eax
-    hashmap_entry *v4; // eax
-    hashmap_entry *v5; // eax
-    hashmap_entry *v6; // eax
-    hashmap_entry *v7; // eax
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
     g_cog_symbolTable = sithCogParse_NewSymboltable(1024); // changed from 512 to 1024

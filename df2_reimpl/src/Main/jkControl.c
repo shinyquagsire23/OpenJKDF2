@@ -54,7 +54,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
 
     if ( (player->actorParams.typeflags & SITH_TF_RENDERWEAPON) == 0 )
     {
-        if ( !jkHud_dword_553E94 )
+        if ( !jkHud_bChatOpen )
         {
             sithControl_ReadFunctionMap(INPUT_FUNC_TALK, &v15);
             if ( v15 )

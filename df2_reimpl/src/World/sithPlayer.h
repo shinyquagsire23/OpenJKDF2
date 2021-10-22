@@ -2,6 +2,7 @@
 #define _SITHPLAYER_H
 
 #include "types.h"
+#include "globals.h"
 #include "World/sithInventory.h"
 
 #define sithPlayer_Open_ADDR (0x004C8610)
@@ -31,34 +32,6 @@
 #define sithPlayer_GetNumidk_ADDR (0x004C9470)
 #define sithPlayer_SetBinCarries_ADDR (0x004C94C0)
 #define sithPlayer_idk2_ADDR (0x004C9500)
-
-
-typedef struct sithThing sithThing;
-
-typedef struct sithPlayerInfo
-{
-    wchar_t player_name[32];
-    wchar_t multi_name[32];
-    uint32_t flags;
-    uint32_t net_id;
-    sithItemInfo iteminfo[200];
-    int curItem;
-    int curWeapon;
-    int curPower;
-    int field_1354;
-    sithThing* playerThing;
-    rdMatrix34 field_135C;
-    sithSector* field_138C;
-    uint32_t respawnMask;
-    uint32_t palEffectsIdx1;
-    uint32_t palEffectsIdx2;
-    uint32_t teamNum;
-    uint32_t numKills;
-    uint32_t numKilled;
-    uint32_t numSuicides;
-    uint32_t score;
-    uint32_t field_13B0;
-} sithPlayerInfo;
 
 void sithPlayer_Initialize(int idx);
 void sithPlayer_Close();

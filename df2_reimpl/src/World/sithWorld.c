@@ -28,11 +28,6 @@
 #include "World/sithPlayer.h"
 #include "jk.h"
 
-#define jkl_section_parsers ((sith_map_section_and_func*)0x833548)
-
-//#define jkl_read_copyright ((char*)0x833108)
-#define some_integer_4 (*(uint32_t*)0x8339E0)
-
 static char jkl_read_copyright[1088];
 
 const char* g_level_header =
@@ -123,7 +118,7 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
 {
     int result; // eax
     int v3; // esi
-    sith_map_section_and_func *parser; // edi
+    sithWorldParser *parser; // edi
     int startMsecs; // edi
     __int64 v6; // [esp+1Ch] [ebp-120h]
     char section[32]; // [esp+24h] [ebp-118h] BYREF
@@ -141,7 +136,7 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
         world->episodeName[0x1F] = 0;
         sithWorld_pLoading = world;
         stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
-        some_integer_4 = 0;
+        sithWorld_some_integer_4 = 0;
         if ( !stdConffile_OpenRead(v8) )
         {
 LABEL_20:
@@ -161,7 +156,7 @@ LABEL_11:
                 }
                 else
                 {
-                    parser = jkl_section_parsers;
+                    parser = sithWorld_aSectionParsers;
                     while ( __strcmpi(parser->section_name, section) )
                     {
                         ++v3;
@@ -173,7 +168,7 @@ LABEL_11:
                 if ( v3 != -1 )
                 {
                     startMsecs = stdPlatform_GetTimeMsec();
-                    if ( !jkl_section_parsers[v3].funcptr(world, 0) )
+                    if ( !sithWorld_aSectionParsers[v3].funcptr(world, 0) )
                         goto LABEL_19;
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (double)v6 * 0.001, section);
@@ -183,7 +178,7 @@ LABEL_11:
         }
         if ( sithWorld_LoadPercentCallback )
             sithWorld_LoadPercentCallback(100.0);
-        if ( !some_integer_4 )
+        if ( !sithWorld_some_integer_4 )
         {
 LABEL_19:
             stdConffile_Close();
@@ -469,12 +464,12 @@ int sithCopyright_Load(sithWorld *lvl, int junk)
 #ifndef QOL_IMPROVEMENTS
     if (_memcmp(jkl_read_copyright, g_level_header, 0x440))
     {
-        some_integer_4 = 0;
+        sithWorld_some_integer_4 = 0;
         return 0;
     }
 #endif
 
-    some_integer_4 = 1;
+    sithWorld_some_integer_4 = 1;
     return 1;
 }
 
@@ -487,9 +482,9 @@ int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t func
             return 0;
         idx = sithWorld_numParsers++;
     }
-    _strncpy(jkl_section_parsers[idx].section_name, section_name, 0x1Fu);
-    jkl_section_parsers[idx].section_name[31] = 0;
-    jkl_section_parsers[idx].funcptr = funcptr;
+    _strncpy(sithWorld_aSectionParsers[idx].section_name, section_name, 0x1Fu);
+    sithWorld_aSectionParsers[idx].section_name[31] = 0;
+    sithWorld_aSectionParsers[idx].funcptr = funcptr;
     return 1;
 }
 
@@ -499,7 +494,7 @@ int sithWorld_FindSectionParser(char *a1)
         return -1;
 
     int i = 0;
-    sith_map_section_and_func *iter = jkl_section_parsers;
+    sithWorldParser *iter = sithWorld_aSectionParsers;
     while ( __strcmpi(iter->section_name, a1) )
     {
         ++i;

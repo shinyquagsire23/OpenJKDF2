@@ -1,8 +1,10 @@
 #ifndef _JK_PLAYER_H
 #define _JK_PLAYER_H
 
+#include "types.h"
+#include "globals.h"
+
 #include "Primitives/rdPolyLine.h"
-#include "Primitives/rdMatrix.h"
 #include "Engine/rdThing.h"
 #include "World/sithPlayer.h"
 
@@ -64,91 +66,6 @@ enum JKFLAG
     JKFLAG_PERSUASION = 0x20,
     JKFLAG_SABERFORCEON = 0x80
 };
-
-typedef struct jkPlayerInfo
-{
-    uint32_t field_0;
-    rdThing rd_thing;
-    rdThing povModel;
-    float length;
-    uint32_t field_98;
-    rdPolyLine polyline;
-    rdThing polylineThing;
-    int32_t field_1A4;
-    float damage;
-    float field_1AC;
-    float field_1B0;
-    uint32_t field_1B4;
-    uint32_t numDamagedThings;
-    sithThing* damagedThings[6];
-    uint32_t numDamagedSurfaces;
-    sithSurface* damagedSurfaces[6];
-    uint32_t lastSparkSpawnMs;
-    sithThing* wall_sparks;
-    sithThing* blood_sparks;
-    sithThing* saber_sparks;
-    sithThing* actorThing;
-    uint32_t maxTwinkles;
-    uint32_t twinkleSpawnRate;
-    uint32_t bRenderTwinkleParticle;
-    uint32_t nextTwinkleRandMs;
-    uint32_t nextTwinkleSpawnMs;
-    uint32_t numTwinkles;
-    uint32_t field_21C;
-    int shields;
-    uint32_t field_224;
-} jkPlayerInfo;
-
-typedef struct jkPlayerMpcInfo
-{
-  wchar_t name[32];
-  char model[32];
-  char soundClass[32];
-  uint8_t gap80[32];
-  char sideMat[32];
-  char tipMat[32];
-  int jediRank;
-} jkPlayerMpcInfo;
-
-#define jkPlayer_playerInfos ((sithPlayerInfo*)0x008C4CA0)
-#define jkPlayer_playerShortName ((wchar_t*)0x08EC320)
-
-#define jkPlayer_numOtherThings (*(int*)0x0085FF44)
-#define jkPlayer_numThings (*(int*)0x0085B560)
-#define jkPlayer_otherThings ((jkPlayerInfo*)0x008592E0)
-#define jkPlayer_dword_525470 (*(int*)0x525470)
-#define bShowInvisibleThings (*(int*)0x8EE640)
-#define playerThingIdx (*(int*)0x83199C)
-#define jkPlayer_maxPlayers (*(int*)0x8319A0)
-#define g_localPlayerThing (*(sithThing**)0x8319A4)
-#define g_selfPlayerInfo (*(sithPlayerInfo **)0x8319A8)
-#define playerThings ((jkPlayerInfo*)0x85B580)
-#define jkSaber_rotateMat (*(rdMatrix34*)0x85FA80)
-
-
-#define jkPlayer_setRotateOverlayMap (*(int*)0x00860764)
-#define jkPlayer_setDrawStatus (*(int*)0x00860768)
-#define jkPlayer_setCrosshair (*(int*)0x0086076C)
-#define jkPlayer_setSaberCam (*(int*)0x00860770)
-#define jkPlayer_setFullSubtitles (*(int*)0x00860774)
-#define jkPlayer_setDisableCutscenes (*(int*)0x00860778)
-#define jkPlayer_aCutsceneVal ((int*)0x0085FAC0)
-#define jkPlayer_cutscenePath ((char*)0x0085FB40)
-#define jkPlayer_setNumCutscenes (*(int*)0x0085FF40)
-#define jkPlayer_numOtherThings (*(int*)0x0085FF44)
-#define jkPlayer_setDiff (*(int*)0x008EE670)
-
-#define jkPlayer_waggleVec (*(rdVector3*)0x00552BA0)
-#define jkPlayer_waggleMag (*(float*)0x00552BAC)
-#define jkPlayer_mpcInfoSet (*(int*)0x552BB0)
-#define jkPlayer_waggleAngle (*(float*)0x00552BB4)
-#define jkSaber_rotateVec (*(rdVector3*)0x00552BB8)
-
-#define jkPlayer_name ((wchar_t*)0x008604C0)
-#define jkPlayer_model ((char*)0x00860500)
-#define jkPlayer_soundClass ((char*)0x00860520)
-#define jkPlayer_sideMat ((char*)0x00860560)
-#define jkPlayer_tipMat ((char*)0x00860580)
 
 int jkPlayer_LoadAutosave();
 int jkPlayer_LoadSave(char *path);

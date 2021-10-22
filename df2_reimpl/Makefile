@@ -31,6 +31,11 @@ clean:
 	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 	rm -f $(GLOBALS_C)
 	rm -f $(GLOBALS_H)
+	touch $(GLOBALS_C)
+	touch $(GLOBALS_H)
+	touch -m $(SYMBOLS_FILE)
+	touch -m $(GLOBALS_H_COG)
+	touch -m $(GLOBALS_C_COG)
 	touch $(SRC)/Cog/lex.yy.c
 	touch $(SRC)/Cog/y.tab.c
 

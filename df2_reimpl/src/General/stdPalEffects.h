@@ -1,8 +1,8 @@
 #ifndef _STDPALEFFECTS_H
 #define _STDPALEFFECTS_H
 
-#include "Primitives/rdVector.h"
 #include "types.h"
+#include "globals.h"
 
 #define stdPalEffects_Open_ADDR (0x00428830)
 #define stdPalEffects_Close_ADDR (0x00428890)
@@ -27,40 +27,6 @@
 #define stdPalEffects_ApplyFade_ADDR (0x00429290)
 
 #define stdPalEffects_Close_idk_ADDR (0x004C8620)
-
-#define stdPalEffects_state (*(stdPalEffectsState*)0x0000866200)
-#define stdPalEffects_palette ((rdColor24*)0x0055BB80) // 256
-#define stdPalEffects_numEffectRequests (*(uint32_t*)0x0055BE80)
-#define stdPalEffects_aEffects ((stdPalEffectRequest*)0x00866260) // 32
-
-typedef struct stdPalEffect
-{
-    rdVector3i filter;
-    rdVector3 tint;
-    rdVector3i add;
-    float fade;
-} stdPalEffect;
-
-typedef struct stdPalEffectsState
-{
-  int bEnabled;
-  int field_4;
-  int field_8;
-  int field_C;
-  int field_10;
-  stdPalEffect effect;
-  int field_3C;
-  int field_40;
-  int field_44;
-  int field_48;
-} stdPalEffectsState;
-
-typedef struct stdPalEffectRequest
-{
-  int isValid;
-  int idx;
-  stdPalEffect effect;
-} stdPalEffectRequest;
 
 int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);

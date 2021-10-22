@@ -2,6 +2,7 @@
 #define _JKRES_H
 
 #include "types.h"
+#include "globals.h"
 
 #define jkRes_Startup_ADDR (0x0040E360)
 #define jkRes_Shutdown_ADDR (0x0040E490)
@@ -26,67 +27,6 @@
 #define jkRes_FSeek_ADDR (0x0040F8F0)
 #define jkRes_FileSize_ADDR (0x0040F950)
 #define jkRes_FilePrintf_ADDR (0x0040F970)
-
-typedef struct common_functions_basic
-{
-    float some_float;
-    int (*messagePrint)(const char *, ...);
-    int (*statusPrint)(const char *, ...);
-    int (*warningPrint)(const char *, ...);
-    int (*errorPrint)(const char *, ...);
-    int (*debugPrint)(const char *, ...);
-    int assert;
-    int unk_0;
-    void *(__cdecl *alloc)(unsigned int);
-    void (__cdecl *free)(void *);
-    int realloc;
-    int getTimerTick;
-    int (__cdecl *fileOpen)(const char *, const char *);
-    int (__cdecl *fileClose)(int);
-    size_t (__cdecl *fileRead)(int, void *, size_t);
-    char *(__cdecl *fileGets)(int, char *, int);
-    size_t (__cdecl *fileWrite)(int, void *, size_t);
-    int feof;
-    int ftell;
-    int (__cdecl *fseek)(int, int, int);
-    int fileSize;
-    void (*filePrintf)(int, const char *, ...);
-    wchar_t *(__cdecl *fileGetws)(int, wchar_t *, unsigned int);
-} common_functions_basic;
-
-typedef struct jkResGob
-{
-  char name[128];
-  int numGobs;
-  stdGob *gobs[64];
-} jkResGob;
-
-typedef struct jkRes
-{
-    jkResGob gobs[5];
-} jkRes;
-
-typedef struct jkResFile
-{
-  int bOpened;
-  char fpath[128];
-  int useLowLevel;
-  int fsHandle;
-  stdGobFile *gobHandle;
-} jkResFile;
-
-#define jkRes_pHS (*(common_functions**)0x00555C68)
-#define jkRes_episodeGobName ((char*)0x00555C70)
-#define jkRes_curDir ((char*)0x00555C90)
-
-#define jkRes_bHookedHS (*(int*)0x00555D18)
-#define jkRes_aFiles ((jkResFile*)0x00554A68)
-
-#define jkRes_gCtx (*(jkRes*)0x005541E0)
-#define pLowLevelHS (*(common_functions**)0x00554974)
-#define lowLevelHS (*(common_functions_basic*)0x00554978)
-
-#define jkRes_idkGobPath ((char*)0x005549E8)
 
 int jkRes_Startup(common_functions *a1);
 int jkRes_Shutdown();

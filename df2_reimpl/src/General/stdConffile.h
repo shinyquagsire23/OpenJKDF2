@@ -3,36 +3,7 @@
 
 #include <stdio.h>
 #include "types.h"
-
-typedef struct stdConffileArg
-{
-    char* key;
-    char* value;
-} stdConffileArg;
-
-typedef struct stdConffileEntry
-{
-    int numArgs;
-    stdConffileArg args[128];
-} stdConffileEntry;
-
-#define aFilenameStack  ((char*)0x0055D620)
-#define apBufferStack ((char**)0x55E020)
-#define linenumStack  ((int*)0x55E070)
-#define aEntryStack   ((char*)0x0055E0C0)
-#define openFileStack ((int*)0x563110)
-#define printfBuffer  ((char*)0x00563160)
-#define stdConffile_linenum (*(int*)0x00563560)
-#define stdConffile_bOpen (*(int*)0x00563564)
-#define openFile (*(int*)0x00563568)
-#define writeFile      (*(int*)0x0056356C)
-#define stackLevel	  (*(unsigned int*)0x00563570)
-
-#define stdConffile_aWriteFilename ((char*)0x860820)
-#define stdConffile_entry (*(stdConffileEntry*)0x8608A0)
-#define stdConffile_pFilename ((char*)0x860CC0)
-#define stdConffile_aLine (*(char**)0x860D40)
-
+#include "globals.h"
 
 #define stdConffile_OpenRead_ADDR (0x00430F50)
 #define stdConffile_OpenWrite_ADDR (0x00431100)

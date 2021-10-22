@@ -43,6 +43,11 @@ clean:
 	rm -f $(GLOBALS_C)
 	rm -f $(GLOBALS_H)
 	rm -f $(LINKER_SCRIPT_SYMS)
+	touch $(GLOBALS_C)
+	touch $(GLOBALS_H)
+	touch -m $(SYMBOLS_FILE)
+	touch -m $(GLOBALS_H_COG)
+	touch -m $(GLOBALS_C_COG)
 	touch $(SRC)/Cog/lex.yy.c
 	touch $(SRC)/Cog/y.tab.c
 

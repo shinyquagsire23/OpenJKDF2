@@ -1,6 +1,9 @@
 #ifndef _JKHUD_H
 #define _JKHUD_H
 
+#include "types.h"
+#include "globals.h"
+
 #define jkHud_Startup_ADDR (0x00407500)
 #define jkHud_Shutdown_ADDR (0x00407540)
 #define jkHud_InitRes_ADDR (0x00407560)
@@ -18,10 +21,6 @@
 #define jkHud_sortcallback1_ADDR (0x00409180)
 #define jkHud_sortcallback2_ADDR (0x004091A0)
 #define jkHud_Tally_ADDR (0x004091C0)
-
-#define jkHud_dword_553E94 (*(int*)0x00553E94)
-#define jkHud_bHasTarget (*(int*)0x00553E7C)
-#define jkHud_target (*(int*)0x00553E80)
 
 void jkHud_EndTarget();
 

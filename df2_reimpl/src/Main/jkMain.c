@@ -131,7 +131,7 @@ void jkMain_GuiAdvance()
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && jkSmack_currentGuiState != 6 )
                     jkGame_Update();
@@ -239,7 +239,7 @@ void jkMain_EscapeMenuTick(int a2)
                         jkMain_EndLevel(1);
                     }
                     jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                    dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                    jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                     v3 = stdPlatform_GetTimeMsec();
                     if ( g_app_suspended && a2 != 6 )
                         jkGame_Update();
@@ -499,7 +499,7 @@ void jkMain_GameplayTick(int a2)
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && a2 != 6 )
                     jkGame_Update();

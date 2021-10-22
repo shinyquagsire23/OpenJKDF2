@@ -10,16 +10,6 @@
 #define Darray_ClearAll_ADDR (0x00520C80)
 #define Darray_sub_520CB0_ADDR (0x00520CB0)
 
-typedef struct Darray
-{
-  void *alloc;
-  uint32_t entrySize;
-  uint32_t size;
-  int32_t total;
-  int dword10;
-  int bInitialized;
-} Darray;
-
 int Darray_New(Darray *array, int entrySize, int num);
 void Darray_Free(Darray *array);
 void* Darray_NewEntry(Darray *array);

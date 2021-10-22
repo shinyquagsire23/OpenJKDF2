@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "Primitives/rdRect.h"
+
 // TODO find some headers for these
 #define LPDDENUMCALLBACKA void*
 #define LPDIRECTDRAW void*
@@ -70,6 +72,7 @@ typedef uint16_t WPARAM;
 typedef uint32_t LRESULT;
 typedef int HCURSOR;
 typedef int* LPARAM;
+typedef int WNDPROC;
 
 typedef int CONSOLE_CURSOR_INFO;
 
@@ -361,6 +364,7 @@ typedef struct sithSound sithSound;
 typedef struct sithSurface sithSurface;
 typedef struct sithThing sithThing;
 typedef struct sithWorld sithWorld;
+typedef struct sithAnimclass sithAnimclass;
 
 typedef struct stdBitmap stdBitmap;
 typedef struct stdStrTable stdStrTable;
@@ -371,6 +375,7 @@ typedef struct stdGob stdGob;
 typedef struct stdGobFile stdGobFile;
 typedef struct stdPalEffect stdPalEffect;
 typedef struct stdPalEffectRequest stdPalEffectRequest;
+typedef struct stdFont stdFont;
 
 typedef struct rdClipFrustum rdClipFrustum;
 typedef struct rdColormap rdColormap;
@@ -405,6 +410,7 @@ typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
 typedef struct sithTimer sithTimer;
 typedef struct sithTimerInfo sithTimerInfo;
+typedef struct sithUnk3Entry sithUnk3Entry;
 typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
 typedef struct sithMap sithMap;
 typedef struct sithMapView sithMapView;
@@ -1525,5 +1531,938 @@ typedef struct jkEpisodeLoad
     jkEpisodeEntry* paEntries;
 } jkEpisodeLoad;
 //end jkEpisode
+
+// jkRes
+typedef struct common_functions_basic
+{
+    float some_float;
+    int (*messagePrint)(const char *, ...);
+    int (*statusPrint)(const char *, ...);
+    int (*warningPrint)(const char *, ...);
+    int (*errorPrint)(const char *, ...);
+    int (*debugPrint)(const char *, ...);
+    int assert;
+    int unk_0;
+    void *(__cdecl *alloc)(unsigned int);
+    void (__cdecl *free)(void *);
+    int realloc;
+    int getTimerTick;
+    int (__cdecl *fileOpen)(const char *, const char *);
+    int (__cdecl *fileClose)(int);
+    size_t (__cdecl *fileRead)(int, void *, size_t);
+    char *(__cdecl *fileGets)(int, char *, int);
+    size_t (__cdecl *fileWrite)(int, void *, size_t);
+    int feof;
+    int ftell;
+    int (__cdecl *fseek)(int, int, int);
+    int fileSize;
+    void (*filePrintf)(int, const char *, ...);
+    wchar_t *(__cdecl *fileGetws)(int, wchar_t *, unsigned int);
+} common_functions_basic;
+
+typedef struct common_functions
+{
+    uint32_t some_float;
+    int (*messagePrint)(const char *, ...);
+    int (*statusPrint)(const char *, ...);
+    int (*warningPrint)(const char *, ...);
+    int (*errorPrint)(const char *, ...);
+    int (*debugPrint)(const char *, ...);
+    void (*assert)(const char *, const char *, int);
+    uint32_t unk_0;
+    void *(*alloc)(unsigned int);
+    void (*free)(void *);
+    void *(*realloc)(void *, unsigned int);
+    uint32_t (*getTimerTick)();
+    stdFile_t (*fileOpen)(const char *, const char *);
+    int (*fileClose)(stdFile_t);
+    size_t (*fileRead)(stdFile_t, void *, size_t);
+    char *(*fileGets)(stdFile_t, char *, size_t);
+    size_t (*fileWrite)(stdFile_t, void *, size_t);
+    int (*feof)(stdFile_t);
+    int (*ftell)(stdFile_t);
+    int (*fseek)(stdFile_t, int, int);
+    int (*fileSize)(stdFile_t);
+    int (*filePrintf)(stdFile_t, const char*, ...);
+    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    void* (*allocHandle)(size_t);
+    void (*freeHandle)(void*);
+    void* (*reallocHandle)(void*, size_t);
+    uint32_t (*lockHandle)(uint32_t);
+    void (*unlockHandle)(uint32_t);
+} common_functions;
+
+typedef struct jkResGob
+{
+  char name[128];
+  int numGobs;
+  stdGob *gobs[64];
+} jkResGob;
+
+typedef struct jkRes
+{
+    jkResGob gobs[5];
+} jkRes;
+
+typedef struct jkResFile
+{
+  int bOpened;
+  char fpath[128];
+  int useLowLevel;
+  int fsHandle;
+  stdGobFile *gobHandle;
+} jkResFile;
+
+// end jkRes
+
+
+typedef void (__cdecl *sithWorldProgressCallback_t)(float);
+
+typedef struct sithWorld
+{
+    uint32_t level_type_maybe;
+    char map_jkl_fname[32];
+    char episodeName[32];
+    int numColormaps;
+    rdColormap* colormaps;
+    int numSectors;
+    sithSector* sectors;
+    int numMaterialsLoaded;
+    int numMaterials;
+    rdMaterial* materials;
+    rdVector2* materials2;
+    uint32_t numModelsLoaded;
+    uint32_t numModels;
+    rdModel3* models;
+    int numSpritesLoaded;
+    int numSprites;
+    rdSprite* sprites;
+    int numParticlesLoaded;
+    int numParticles;
+    rdParticle* particles;
+    int numVertices;
+    rdVector3* vertices;
+    rdVector3* verticesTransformed;
+    int* alloc_unk98;
+    float* verticesDynamicLight;
+    int* alloc_unk9c;
+    int numVertexUVs;
+    rdVector2* vertexUVs;
+    int numSurfaces;
+    sithSurface* surfaces;
+    int numAdjoinsLoaded;
+    int numAdjoins;
+    sithAdjoin* adjoins;
+    int numThingsLoaded;
+    int numThings;
+    sithThing* things;
+    int numTemplatesLoaded;
+    int numTemplates;
+    sithThing* templates;
+    float worldGravity;
+    uint32_t field_D8;
+    float ceilingSky;
+    float horizontalDistance;
+    float horizontalPixelsPerRev;
+    rdVector2 horizontalSkyOffs;
+    rdVector2 ceilingSkyOffs;
+    rdVector4 mipmapDistance;
+    rdVector4 loadDistance;
+    float perspectiveDistance;
+    float gouradDistance;
+    sithThing* cameraFocus;
+    sithThing* playerThing;
+    uint32_t field_128;
+    int numSoundsLoaded;
+    int numSounds;
+    sithSound* sounds;
+    int numSoundClassesLoaded;
+    int numSoundClasses;
+    sithSoundClass* soundclasses;
+    int numCogScriptsLoaded;
+    int numCogScripts;
+    sithCogScript* cogScripts;
+    int numCogsLoaded;
+    int numCogs;
+    sithCog* cogs;
+    int numAIClassesLoaded;
+    int numAIClasses;
+    sithAIClass* aiclasses;
+    int numKeyframesLoaded;
+    int numKeyframes;
+    rdKeyframe* keyframes;
+    int numAnimClassesLoaded;
+    int numAnimClasses;
+    sithAnimclass* animclasses;
+} sithWorld;
+
+typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
+
+typedef struct sithWorldParser
+{
+    char section_name[32];
+    sithWorldSectionParser_t funcptr;
+} sithWorldParser;
+
+
+typedef struct sithItemDescriptor
+{
+    uint32_t flags;
+    char fpath[128];
+    float ammoMin;
+    float ammoMax;
+    sithCog* cog;
+    uint32_t field_90;
+    uint32_t field_94;
+    stdBitmap* hudBitmap;
+} sithItemDescriptor;
+
+typedef struct sithItemInfo
+{
+    float ammoAmt;
+    int field_4;
+    int state;
+    float activatedTimeSecs;
+    float activationDelaySecs;
+    float binWait;
+} sithItemInfo;
+
+typedef struct sithKeybind {
+    int enabled;
+    int binding;
+    int idk;
+} sithKeybind;
+
+typedef struct sithMap
+{
+  int numArr;
+  float* unkArr;
+  int* anonymous_1;
+  int playerColor;
+  int actorColor;
+  int itemColor;
+  int weaponColor;
+  int otherColor;
+  int teamColors[5];
+} sithMap;
+
+typedef struct rdPolyLine 
+{
+    char fname[32];
+    float length;
+    float baseRadius;
+    float tipRadius;
+    uint32_t geometryMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
+    rdFace edgeFace;
+    rdFace tipFace;
+    rdVector2* extraUVTipMaybe;
+    rdVector2* extraUVFaceMaybe;
+}
+rdPolyLine;
+
+typedef struct rdThing
+{
+    int type;
+    union
+    {
+        rdModel3* model3;
+        rdCamera* camera;
+        rdLight* light;
+        rdSprite* sprite3;
+        rdParticle* particlecloud;
+        rdPolyLine* polyline;
+    };
+    uint32_t geoMode;
+    uint32_t lightMode;
+    uint32_t texMode;
+    rdPuppet* puppet;
+    uint32_t field_18;
+    uint32_t frameTrue;
+    rdMatrix34 *hierarchyNodeMatrices;
+    rdVector3* hierarchyNodes2;
+    int* amputatedJoints;
+    uint32_t wallCel;
+    uint32_t geosetSelect;
+    uint32_t geometryMode;
+    uint32_t lightingMode;
+    uint32_t textureMode;
+    uint32_t clippingIdk;
+    sithThing* parentSithThing;
+} rdThing;
+
+typedef struct sithPlayerInfo
+{
+    wchar_t player_name[32];
+    wchar_t multi_name[32];
+    uint32_t flags;
+    uint32_t net_id;
+    sithItemInfo iteminfo[200];
+    int curItem;
+    int curWeapon;
+    int curPower;
+    int field_1354;
+    sithThing* playerThing;
+    rdMatrix34 field_135C;
+    sithSector* field_138C;
+    uint32_t respawnMask;
+    uint32_t palEffectsIdx1;
+    uint32_t palEffectsIdx2;
+    uint32_t teamNum;
+    uint32_t numKills;
+    uint32_t numKilled;
+    uint32_t numSuicides;
+    uint32_t score;
+    uint32_t field_13B0;
+} sithPlayerInfo;
+
+
+typedef struct jkPlayerInfo
+{
+    uint32_t field_0;
+    rdThing rd_thing;
+    rdThing povModel;
+    float length;
+    uint32_t field_98;
+    rdPolyLine polyline;
+    rdThing polylineThing;
+    int32_t field_1A4;
+    float damage;
+    float field_1AC;
+    float field_1B0;
+    uint32_t field_1B4;
+    uint32_t numDamagedThings;
+    sithThing* damagedThings[6];
+    uint32_t numDamagedSurfaces;
+    sithSurface* damagedSurfaces[6];
+    uint32_t lastSparkSpawnMs;
+    sithThing* wall_sparks;
+    sithThing* blood_sparks;
+    sithThing* saber_sparks;
+    sithThing* actorThing;
+    uint32_t maxTwinkles;
+    uint32_t twinkleSpawnRate;
+    uint32_t bRenderTwinkleParticle;
+    uint32_t nextTwinkleRandMs;
+    uint32_t nextTwinkleSpawnMs;
+    uint32_t numTwinkles;
+    uint32_t field_21C;
+    int shields;
+    uint32_t field_224;
+} jkPlayerInfo;
+
+typedef struct jkPlayerMpcInfo
+{
+  wchar_t name[32];
+  char model[32];
+  char soundClass[32];
+  uint8_t gap80[32];
+  char sideMat[32];
+  char tipMat[32];
+  int jediRank;
+} jkPlayerMpcInfo;
+
+typedef int (*sithUnk3_collisionHandler_t)(sithThing*, sithThing*, sithUnk3SearchEntry*, int);
+typedef int (*sithUnk3_searchHandler_t)(sithThing*, sithThing*);
+
+typedef struct sithUnk3Entry
+{
+    sithUnk3_collisionHandler_t handler;
+    sithUnk3_searchHandler_t search_handler;
+    uint32_t inverse;
+} sithUnk3Entry;
+
+typedef struct sithUnk3SearchEntry
+{
+    uint32_t collideType;
+    sithThing* receiver;
+    sithSurface* surface;
+    rdFace* face;
+    rdMesh* sender;
+    rdVector3 field_14;
+    float distance;
+    uint32_t hasBeenEnumerated;
+} sithUnk3SearchEntry;
+
+typedef struct sithUnk3SectorEntry
+{
+    sithSector* sectors[64];
+} sithUnk3SectorEntry;
+
+typedef struct sithUnk3SearchResult
+{
+    sithUnk3SearchEntry collisions[128];
+} sithUnk3SearchResult;
+
+
+typedef struct sithSector
+{
+    uint32_t id;
+    float ambientLight;
+    float extraLight;
+    rdColormap* colormap;
+    rdVector3 tint;
+    uint32_t numVertices;
+    int* verticeIdxs;
+    uint32_t numSurfaces;
+    sithSurface* surfaces;
+    sithAdjoin* adjoins;
+    sithThing* thingsList;
+    uint32_t flags;
+    rdVector3 center;
+    rdVector3 thrust;
+    sithSound* sectorSound;
+    float sectorSoundVol;
+    rdVector3 collidebox_onecorner;
+    rdVector3 collidebox_othercorner;
+    rdVector3 boundingbox_onecorner;
+    rdVector3 boundingbox_othercorner;
+    float radius;
+    uint32_t field_8C;
+    uint32_t field_90;
+    rdClipFrustum* clipFrustum;
+} sithSector;
+
+typedef struct sithSectorEntry
+{
+    sithSector *sector;
+    sithThing *thing;
+    rdVector3 pos;
+    int field_14;
+    float field_18;
+} sithSectorEntry;
+
+typedef struct sithSectorAlloc
+{
+    int field_0;
+    float field_4[3];
+    rdVector3 field_10[3];
+    rdVector3 field_34[3];
+    sithThing* field_58[3];
+} sithSectorAlloc;
+
+// sithThing start
+
+typedef struct sithActorInstinct
+{
+    int field_0;
+    int nextUpdate;
+    float param0;
+    float param1;
+    float param2;
+    float param3;
+} sithActorInstinct;
+
+typedef struct sithActor
+{
+    sithThing *thing;
+    sithAIClass *aiclass;
+    int flags;
+    sithActorInstinct instincts[16];
+    uint32_t numAIClassEntries;
+    int nextUpdate;
+    rdVector3 lookVector;
+    rdVector3 movePos;
+    rdVector3 field_1AC;
+    float field_1B8;
+    float moveSpeed;
+    sithThing* field_1C0;
+    rdVector3 field_1C4;
+    sithThing* field_1D0;
+    rdVector3 field_1D4;
+    int field_1E0;
+    rdVector3 field_1E4;
+    float field_1F0;
+    int field_1F4;
+    rdVector3 field_1F8;
+    int field_204;
+    rdVector3 blindAimError;
+    sithThing *thingidk;
+    rdVector3 movepos;
+    int field_224;
+    rdVector3 field_228;
+    float field_234;
+    int field_238;
+    rdVector3 field_23C;
+    int field_248;
+    rdVector3 position;
+    rdVector3 lookOrientation;
+    float field_264;
+    int field_268;
+    int field_26C;
+    int mood0;
+    int mood1;
+    int mood2;
+    int field_27C;
+    int field_280;
+    int field_284;
+    int field_288;
+    int field_28C;
+    rdVector3 *framesAlloc;
+    int loadedFrames;
+    int numFrames;
+} sithActor;
+
+typedef struct sithThingParticleParams
+{
+    uint32_t typeFlags;
+    uint32_t count;
+    rdMaterial* material;
+    float elementSize;
+    float growthSpeed;
+    float minSize;
+    float range;
+    float pitchRange;
+    float yawRange;
+    float rate;
+    float field_28;
+    float field_2C;
+    uint32_t field_30;
+    uint32_t field_34;
+    rdVector3 field_38;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+} sithThingParticleParams;
+
+typedef struct sithThingExplosionParams
+{
+    uint32_t typeflags;
+    uint32_t lifeLeftMs;
+    float range;
+    float force;
+    uint32_t blastTime;
+    float maxLight;
+    uint32_t field_18;
+    float damage;
+    uint32_t damageClass;
+    int flashR;
+    int flashG;
+    int flashB;
+    sithThing* debrisTemplates[4];
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+    uint32_t field_80;
+} sithThingExplosionParams;
+
+typedef struct sithBackpackItem
+{
+    int16_t binIdx;
+    int16_t field_2;
+    float value;
+} sithBackpackItem;
+
+typedef struct sithThingItemParams
+{
+    uint32_t typeflags;
+    rdVector3 position;
+    sithSector* sector;
+    uint32_t respawn;
+    uint32_t respawnTime;
+    int16_t numBins;
+    int16_t field_1E;
+    sithBackpackItem contents[12];
+    uint32_t field_80;
+} sithThingItemParams;
+
+typedef struct sithThingWeaponParams
+{
+    uint32_t typeflags;
+    uint32_t damageClass;
+    uint32_t unk8;
+    float damage;
+    sithThing* explodeTemplate;
+    sithThing* fleshHitTemplate;
+    uint32_t field_18;
+    float rate;
+    float mindDamage;
+    sithThing* trailThing;
+    float elementSize;
+    float trailCylRadius;
+    float trainRandAngle;
+    uint32_t field_34;
+    float range;
+    float force;
+    uint32_t field_40;
+    uint32_t field_44;
+    uint32_t field_48;
+    uint32_t field_4C;
+    uint32_t field_50;
+    uint32_t field_54;
+    uint32_t field_58;
+    uint32_t field_5C;
+    uint32_t field_60;
+    uint32_t field_64;
+    uint32_t field_68;
+    uint32_t field_6C;
+    uint32_t field_70;
+    uint32_t field_74;
+    uint32_t field_78;
+    uint32_t field_7C;
+    uint32_t field_80;
+    uint32_t field_84;
+    uint32_t field_88;
+    uint32_t field_8C;
+} sithThingWeaponParams;
+
+typedef struct sithThingActorParams
+{
+    uint32_t typeflags;
+    float health;
+    float maxHealth;
+    uint32_t msUnderwater;
+    float jumpSpeed;
+    float extraSpeed;
+    float maxThrust;
+    float maxRotThrust;
+    sithThing* templateWeapon;
+    sithThing* templateWeapon2;
+    sithThing* templateExplode;
+    rdVector3 eyePYR;
+    rdVector3 eyeOffset;
+    float minHeadPitch;
+    float maxHeadPitch;
+    rdVector3 fireOffset;
+    rdVector3 lightOffset;
+    float lightIntensity;
+    rdVector3 saberBladePos;
+    float timeLeftLengthChange;
+    uint32_t field_1A8;
+    uint32_t field_1AC;
+    float chance;
+    float fov;
+    float error;
+    uint32_t field_1BC;
+    sithPlayerInfo *playerinfo;
+    uint32_t field_1C4;
+    uint32_t field_1C8;
+    uint32_t field_1CC;
+} sithThingActorParams;
+
+typedef struct sithThingPhysParams
+{
+    uint32_t physflags;
+    rdVector3 vel;
+    rdVector3 angVel;
+    rdVector3 acceleration;
+    rdVector3 field_1F8;
+    float mass;
+    float height;
+    float airDrag;
+    float surfaceDrag;
+    float staticDrag;
+    float maxRotVel;
+    float maxVel;
+    float orientSpeed;
+    float buoyancy;
+    rdVector3 addedVelocity;
+    rdVector3 velocityMaybe;
+    float physicsRolloverFrames;
+    float field_74;
+    float field_78;
+} sithThingPhysParams;
+
+typedef struct sithThingFrame
+{
+    rdVector3 pos;
+    rdVector3 rot;
+} sithThingFrame;
+
+typedef struct sithThingTrackParams
+{
+    uint32_t numFrames;
+    uint32_t loadedFrames;
+    sithThingFrame *frames;
+    uint32_t field_C;
+    rdVector3 vel;
+    float field_1C;
+    float field_20;
+    rdMatrix34 field_24;
+    float field_54;
+    rdVector3 field_58;
+    rdVector3 field_64;
+    rdVector3 orientation;
+} sithThingTrackParams;
+
+typedef struct sithThing
+{
+    uint32_t thingflags;
+    uint32_t thingIdx;
+    uint32_t thing_id;
+    uint32_t thingType;
+    uint32_t move_type;
+    uint32_t thingtype;
+    int lifeLeftMs;
+    uint32_t timer;
+    uint32_t pulse_end_ms;
+    uint32_t pulse_ms;
+    uint32_t collide;
+    float moveSize;
+    float collideSize;
+    uint32_t attach_flags;
+    rdVector3 field_38;
+    sithSurfaceInfo* attachedSufaceInfo;
+    float field_48;
+    rdVector3 field_4C;
+    union
+    {
+        sithThing* attachedThing;
+        sithSurface* attachedSurface;
+    };
+    sithSector* sector;
+    sithThing* nextThing;
+    sithThing* prevThing;
+    sithThing* attachedParentMaybe;
+    sithThing* childThing;
+    sithThing* parentThing;
+    uint32_t signature;
+    sithThing* templateBase;
+    sithThing* template;
+    sithThing* prev_thing;
+    uint32_t child_signature;
+    rdMatrix34 lookOrientation;
+    rdVector3 position;
+    rdThing rdthing;
+    rdVector3 screenPos;
+    float light;
+    float lightMin;
+    int isVisible;
+    sithSoundClass* soundclass;
+    sithAnimclass* animclass;
+    sithPuppet* puppet;
+    union
+    {
+        sithThingActorParams actorParams;
+        sithThingWeaponParams weaponParams;
+        sithThingItemParams itemParams;
+        sithThingExplosionParams explosionParams;
+        sithThingParticleParams particleParams;
+    };
+    union
+    {
+        sithThingPhysParams physicsParams;
+        sithThingTrackParams trackParams;
+    };
+    float field_24C;
+    uint32_t field_250;
+    int curframe;
+    uint32_t field_258;
+    int goalframe;
+    uint32_t field_260;
+    float waggle;
+    rdVector3 field_268;
+    sithAIClass* aiclass;
+    sithActor* actor;
+    char template_name[32];
+    sithCog* class_cog;
+    sithCog* capture_cog;
+    jkPlayerInfo* playerInfo;
+    uint32_t jkFlags;
+    float userdata;
+} sithThing;
+
+typedef int (__cdecl *sithThing_handler_t)(sithThing*);
+// end sithThing
+
+typedef struct jkGuiSaveLoad_Entry
+{
+  sithSave_Header saveHeader;
+  char fpath[128];
+} jkGuiSaveLoad_Entry;
+
+typedef struct Darray
+{
+  void *alloc;
+  uint32_t entrySize;
+  uint32_t size;
+  int32_t total;
+  int dword10;
+  int bInitialized;
+} Darray;
+
+typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, stdVBuffer*, int);
+typedef int (*jkGuiButtonDownFunc_t)(jkGuiElement*, jkGuiMenu*, int, int);
+typedef int (*jkGuiButtonUpFunc_t)(jkGuiElement*, jkGuiMenu*, int, int, int);
+
+typedef struct jkGuiElementHandlers
+{
+  jkGuiButtonDownFunc_t buttonDown;
+  jkGuiDrawFunc_t draw;
+  jkGuiButtonUpFunc_t buttonUp;
+} jkGuiElementHandlers;
+
+typedef struct jkGuiTexInfo
+{
+  int textHeight;
+  int numTextEntries;
+  int maxTextEntries;
+  int textScrollY;
+  int anonymous_18;
+  rdRect rect;
+} jkGuiTexInfo;
+
+typedef struct jkGuiElement
+{
+    int type;
+    int hoverId;
+    int field_8;
+    union
+    {
+      const char* str;
+      jkGuiStringEntry *unistr;
+      wchar_t* wstr;
+      int extraInt;
+    };
+    union
+    {
+        int selectedTextEntry;
+        int boxChecked;
+    };
+    rdRect rect;
+    int bIsVisible;
+    int anonymous_9;
+    union
+    {
+        const char* hintText;
+        wchar_t* wHintText;
+    };
+    jkGuiDrawFunc_t drawFuncOverride;
+    jkGuiButtonUpFunc_t func;
+    void *anonymous_13;
+    jkGuiTexInfo texInfo;
+    int elementIdk;
+} jkGuiElement;
+
+typedef struct jkGuiStringEntry
+{
+  wchar_t *str;
+  int id;
+} jkGuiStringEntry;
+
+typedef struct jkGuiMenu
+{
+  jkGuiElement *clickables;
+  int clickableIdxIdk;
+  int anonymous_1;
+  int fillColor;
+  int anonymous_3;
+  stdVBuffer *texture;
+  uint8_t* palette;
+  stdBitmap **ui_structs;
+  stdFont** fonts;
+  int anonymous_7;
+  void (__cdecl *idkFunc)(jkGuiMenu *);
+  char *soundHover;
+  char *soundClick;
+  jkGuiElement *focusedElement;
+  jkGuiElement *lastMouseDownClickable;
+  jkGuiElement *lastMouseOverClickable;
+  int lastButtonUp;
+  jkGuiElement* clickables_end;
+  jkGuiElement* field_48;
+} jkGuiMenu;
+
+typedef struct stdPalEffect
+{
+    rdVector3i filter;
+    rdVector3 tint;
+    rdVector3i add;
+    float fade;
+} stdPalEffect;
+
+typedef struct stdPalEffectsState
+{
+  int bEnabled;
+  int field_4;
+  int field_8;
+  int field_C;
+  int field_10;
+  stdPalEffect effect;
+  int field_3C;
+  int field_40;
+  int field_44;
+  int field_48;
+} stdPalEffectsState;
+
+typedef struct stdPalEffectRequest
+{
+  int isValid;
+  int idx;
+  stdPalEffect effect;
+} stdPalEffectRequest;
+
+typedef struct stdConffileArg
+{
+    char* key;
+    char* value;
+} stdConffileArg;
+
+typedef struct stdConffileEntry
+{
+    int numArgs;
+    stdConffileArg args[128];
+} stdConffileEntry;
+
+typedef struct stdMemoryAlloc stdMemoryAlloc;
+
+typedef struct stdMemoryAlloc
+{
+    uint32_t num;
+    void* alloc;
+    uint32_t size;
+    char* filePath;
+    uint32_t lineNum;
+    stdMemoryAlloc* next;
+    stdMemoryAlloc* prev;
+    uint32_t magic;
+} stdMemoryAlloc;
+
+typedef struct stdMemoryInfo
+{
+    uint32_t allocCur;
+    uint32_t nextNum;
+    uint32_t allocMax;
+    stdMemoryAlloc allocTop;
+} stdMemoryInfo;
+
+typedef struct sith_cog_parser_node sith_cog_parser_node;
+
+typedef struct sith_cog_parser_node 
+{
+    int child_loop_depth;
+    int parent_loop_depth;
+    sith_cog_parser_node *parent;
+    sith_cog_parser_node *child;
+    int opcode;
+    int value;
+    rdVector3 vector;
+} sith_cog_parser_node;
 
 #endif // TYPES_H

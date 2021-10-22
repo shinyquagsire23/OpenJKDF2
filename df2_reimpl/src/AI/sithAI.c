@@ -1,6 +1,5 @@
 #include "sithAI.h"
 
-#include "jk.h"
 #include "General/stdMath.h"
 #include "World/sithThing.h"
 #include "World/sithUnk3.h"
@@ -25,6 +24,7 @@
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
+#include "jk.h"
 
 stdHashTable* sithAI_commandsHashmap;
 uint32_t sithAI_maxActors;

@@ -135,7 +135,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
         case 0x100u:
             if ( wParam == 0x1B )               // ESC
             {
-                if ( jkHud_dword_553E94 )
+                if ( jkHud_bChatOpen )
                     jkHud_idk_time();
                 else
                     jkMain_do_guistate6();
@@ -147,7 +147,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
             }
             break;
         case 0x102u:
-            if ( jkHud_dword_553E94 )
+            if ( jkHud_bChatOpen )
             {
                 jkHud_send_message(wParam);
                 v5 = 1;
