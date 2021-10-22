@@ -170,6 +170,7 @@ int main(int argc, char** argv)
     fread((void*)0x401000, 0x120200, 1, f);
 #endif
 
+#ifndef NO_JK_MMAP
     // rdata
     fseek(f, 0x120600, SEEK_SET);
     fread((void*)0x522000, 0x2200, 1, f);
@@ -177,6 +178,7 @@ int main(int argc, char** argv)
     // data
     fseek(f, 0x122800, SEEK_SET);
     fread((void*)0x525000, 0x2DA00, 1, f);
+#endif
     fclose(f);
     
     do_hooks();
