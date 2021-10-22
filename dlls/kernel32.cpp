@@ -18,7 +18,7 @@ std::deque<fs::path> file_search(fs::path dir, std::regex pattern)
 
     try
     {
-        for (const auto& p : fs::recursive_directory_iterator(dir))
+        for (const auto& p : fs::directory_iterator(dir))
         {
             if (/*fs::is_regular_file(p) && */std::regex_match(p.path().string(), pattern))
             {
