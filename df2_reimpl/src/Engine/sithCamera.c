@@ -190,7 +190,10 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 }
                 rdMatrix_Normalize34(&cam->viewMat);
             }
-            cam->sector = sithUnk3_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+            // Added: nullptr check
+            //printf("%p %p\n", focusThing, &focusThing->thingflags);
+            if (focusThing->sector)
+                cam->sector = sithUnk3_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         case 4:
             if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )

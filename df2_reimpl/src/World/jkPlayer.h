@@ -92,9 +92,9 @@ int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *soundclass, char *side
 void jkPlayer_SetChoice(int amt);
 int jkPlayer_GetChoice();
 float jkPlayer_CalcAlignment(int isMp);
-void jkPlayer_MpcInitBins(int unk);
-int jkPlayer_MPCParse(jkPlayerMpcInfo *info, int unk, wchar_t *fname, wchar_t *name, int hasBins);
-int jkPlayer_MPCWrite(int unk, wchar_t *mpcName, wchar_t *playerName);
+void jkPlayer_MpcInitBins(sithPlayerInfo* unk);
+int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins);
+int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName);
 int jkPlayer_MPCBinWrite();
 int jkPlayer_MPCBinRead();
 void jkPlayer_InitForceBins();

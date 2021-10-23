@@ -141,13 +141,17 @@ void do_hooks();
 
 #ifdef LINUX
 
+#ifndef ARCH_WASM
 #include <sys/mman.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char** argv)
 {
+#ifndef ARCH_64BIT
+#ifndef ARCH_WASM
     mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     
@@ -184,7 +188,9 @@ int main(int argc, char** argv)
     do_hooks();
     
     mprotect((void*)0x400000, 0x122000, PROT_READ | PROT_EXEC);
-    
+#endif // ARCH_WASM
+#endif // ARCH_64BIT
+
     //printf("%x\n", *(uint32_t*)0x401000);
     
     //while (1);

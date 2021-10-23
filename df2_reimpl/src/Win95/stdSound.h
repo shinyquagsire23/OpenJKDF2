@@ -35,7 +35,7 @@ typedef struct IDirectSoundBuffer
 {
 } IDirectSoundBuffer;
 
-#ifdef LINUX
+#ifdef OPENAL_SOUND
 #include <AL/al.h>
 typedef struct stdALBuffer
 {
@@ -53,6 +53,20 @@ typedef struct stdALBuffer
     int bIsCopy;
 } stdALBuffer;
 #endif
+
+typedef struct stdNullSoundBuffer
+{
+    void* data;
+    int format;
+    int bStereo;
+    int bitsPerSample;
+    int nSamplesPerSec;
+    int bufferBytes;
+    int bufferLen;
+    int refcnt;
+    float vol;
+    int bIsCopy;
+} stdNullSoundBuffer;
 
 typedef struct stdWaveFormat
 {

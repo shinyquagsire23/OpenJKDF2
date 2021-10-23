@@ -26,9 +26,9 @@ void sithAIClass_Shutdown()
 // Unused
 int sithAIClass_New(sithWorld *world, int a2)
 {
-    int result; // eax
+    intptr_t result; // eax
 
-    result = (int)pSithHS->alloc(0x94C * a2);
+    result = (intptr_t)pSithHS->alloc(0x94C * a2); //TODO real struct sizes
     world->aiclasses = (sithAIClass *)result;
     if ( result )
     {

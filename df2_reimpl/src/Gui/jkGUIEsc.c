@@ -19,6 +19,7 @@
 #include "Engine/sithNet.h"
 #include "Main/jk.h"
 #include "Main/jkStrings.h"
+#include "Main/jkMain.h"
 
 static int jkGuiEsc_bInitialized;
 
@@ -120,7 +121,7 @@ void jkGuiEsc_Show()
                 v3 = jkGuiSaveLoad_Show(0);
                 if ( v3 == 1 )
                 {
-                    jk_MissionReload();
+                    jkMain_MissionReload();
                     jkGuiRend_UpdateSurface();
                     return;
                 }
@@ -133,7 +134,7 @@ void jkGuiEsc_Show()
                 if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_RESTART_MISSION"), jkStrings_GetText("GUI_CONFIRM_RESTART")) )
                     continue;
                 jkPlayer_LoadAutosave();
-                jk_MissionReload();
+                jkMain_MissionReload();
                 jkGuiRend_UpdateSurface();
                 return;
 
@@ -142,7 +143,7 @@ void jkGuiEsc_Show()
                     continue;
 
             case JKGUIESC_RETURNTOGAME:
-                jk_MissionReload();
+                jkMain_MissionReload();
                 jkGuiRend_UpdateSurface();
                 return;
 

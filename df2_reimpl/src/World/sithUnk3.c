@@ -38,7 +38,7 @@ int sithUnk3_Startup()
     sithUnk3_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_COG, sithWeapon_Collide, 0);
     sithUnk3_RegisterCollisionHandler(THINGTYPE_ITEM, THINGTYPE_PLAYER, sithItem_Collide, 0);
 
-    sithUnk3_RegisterHitHandler(THINGTYPE_ACTOR, (void*)sithUnk4_sub_4ED1D0_ADDR);
+    sithUnk3_RegisterHitHandler(THINGTYPE_ACTOR, (void*)sithUnk4_sub_4ED1D0);
     sithUnk3_RegisterHitHandler(THINGTYPE_WEAPON, sithWeapon_HitDebug);
 
     sithUnk3_initted = 1;
@@ -360,6 +360,9 @@ void sithUnk3_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVect
     float v48; // [esp+24h] [ebp-1Ch] BYREF
     rdVector3 v52; // [esp+34h] [ebp-Ch] BYREF
     rdVector3 tmp;
+    
+    // Added: nullptr check
+    //if (!sector) return;
 
     rdVector_Copy3(&tmp, vec1);
     rdVector_MultAcc3(&tmp, vec2, a4);

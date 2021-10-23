@@ -6,6 +6,7 @@
 #include "Main/jkMain.h"
 #include "Main/jkGame.h"
 #include "Gui/jkGUI.h"
+#include "Win95/stdDisplay.h"
 
 #include "jk.h"
 
@@ -312,6 +313,10 @@ void Window_HandleWindowEvent(SDL_Event* event)
 
             Window_xSize = event->window.data1;
             Window_ySize = event->window.data2;
+            
+            if (Window_xSize < 640) Window_xSize = 640;
+            if (Window_ySize < 480) Window_ySize = 480;
+            //printf("%u %u\n", Window_xSize, Window_ySize);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
             //printf("Window %d minimized", event->window.windowID);

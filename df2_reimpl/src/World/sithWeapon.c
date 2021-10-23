@@ -557,7 +557,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 {
                     v20 = v19->receiver;
                     if ( v20->thingtype == THINGTYPE_ACTOR )
-                        sithAI_SetActorFireTarget(v20->actor, 0x1000, (int)v9); // aaaaaaaaa undefined
+                        sithAI_SetActorFireTarget(v20->actor, 0x1000, v9); // aaaaaaaaa undefined
                 }
             }
         }

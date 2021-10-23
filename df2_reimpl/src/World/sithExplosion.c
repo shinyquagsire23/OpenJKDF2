@@ -156,14 +156,15 @@ int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int par
 {
     int v15; // esi
     sithThing **i; // eax
+    int tmp;
 
     switch ( param )
     {
         case THINGPARAM_TYPEFLAGS:
-            if (_sscanf(arg->value, "%x", &arg) != 1)
+            if (_sscanf(arg->value, "%x", &tmp) != 1)
                 return 0;
 
-            thing->explosionParams.typeflags = (int)arg;
+            thing->explosionParams.typeflags = tmp;
             return 1;
 
         case THINGPARAM_DAMAGE:
@@ -172,9 +173,9 @@ int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int par
             return 1;
 
         case THINGPARAM_DAMAGECLASS:
-            if (_sscanf(arg->value, "%x", &arg) != 1)
+            if (_sscanf(arg->value, "%x", &tmp) != 1)
                 return 0;
-            thing->explosionParams.damageClass = (int)arg;
+            thing->explosionParams.damageClass = tmp;
             return 1;
 
         case THINGPARAM_BLASTTIME:

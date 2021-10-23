@@ -3,6 +3,7 @@
 #include "World/sithThing.h"
 #include "World/sithWorld.h"
 #include "General/stdConffile.h"
+#include "General/stdHashTable.h"
 
 #include "jk.h"
 

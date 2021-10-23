@@ -17,8 +17,8 @@
 
 static char *jkGuiRend_LoadedSounds[4];
 static uint8_t jkGuiRend_palette[0x300];
-static int jkGuiRend_idk2;
-static int jkGuiRend_idk;
+static intptr_t jkGuiRend_idk2;
+static intptr_t jkGuiRend_idk;
 static stdSound_buffer_t* jkGuiRend_DsoundHandles[4];
 static jkGuiMenu *jkGuiRend_activeMenu;
 static stdVBuffer* jkGuiRend_menuBuffer;
@@ -368,7 +368,7 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     {
         Window_AddMsgHandler(jkGuiRend_WindowHandler);
         Window_GetDrawHandlers(&jkGuiRend_idk, &jkGuiRend_idk2);
-        Window_SetDrawHandlers((int)jkGuiRend_DrawAndFlip, (int)jkGuiRend_Invalidate);
+        Window_SetDrawHandlers(jkGuiRend_DrawAndFlip, jkGuiRend_Invalidate);
     }
     ++jkGuiRend_HandlerIsSet;
     
@@ -557,7 +557,7 @@ int jkGuiRend_DarrayNewStr(Darray *array, int num, int initVal)
     return result;
 }
 
-int jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, int id)
+int jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, intptr_t id)
 {
     jkGuiStringEntry *entry; // eax
     wchar_t *v7; // eax
@@ -579,7 +579,7 @@ int jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, int id)
     return 1;
 }
 
-int jkGuiRend_AddStringEntry(Darray *a1, const char *str, int id)
+int jkGuiRend_AddStringEntry(Darray *a1, const char *str, intptr_t id)
 {
     jkGuiStringEntry *entry;
 
@@ -606,7 +606,7 @@ wchar_t* jkGuiRend_GetString(Darray *array, int idx)
     return ((jkGuiStringEntry*)Darray_GetIndex(array, idx))->str;
 }
 
-int jkGuiRend_GetId(Darray *array, int idx)
+intptr_t jkGuiRend_GetId(Darray *array, int idx)
 {
     return ((jkGuiStringEntry*)Darray_GetIndex(array, idx))->id;
 }
@@ -971,7 +971,7 @@ void jkGuiRend_ClickableHover(jkGuiMenu *menu, jkGuiElement *element, int a3)
     int v5; // ebx
     int v6; // edx
     int v7; // ebx
-    int v8; // ebp
+    intptr_t v8; // ebp
     int v9; // eax
     int v10; // [esp+8h] [ebp-4h]
     int a1a; // [esp+14h] [ebp+8h]
@@ -1008,7 +1008,7 @@ void jkGuiRend_ClickableHover(jkGuiMenu *menu, jkGuiElement *element, int a3)
         }
         else
         {
-            v8 = (int)menu;
+            v8 = menu;
         }
 LABEL_10:
         if ( !v10 )
@@ -1650,7 +1650,7 @@ int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, s
     stdBitmap *v17; // edx
     unsigned int v18; // ecx
     int v19; // eax
-    int v20; // ecx
+    intptr_t v20; // ecx
     int v21; // eax
     signed int v22; // edx
     jkGuiElement *v23; // eax
@@ -1712,12 +1712,12 @@ LABEL_5:
                     v12 -= v18;
                     if ( v33 != (uint8_t*)-44 )
                     {
-                        v19 = element->rect.x + v11 + element->selectedTextEntry * v12 / (uint32_t)element->unistr;
+                        v19 = element->rect.x + v11 + element->selectedTextEntry * v12 / (uint32_t)element->extraInt;
                         if ( pX >= v19 - 4 && pX < (signed int)(v19 + v18 + 4) )
                             a4 = 1;
                     }
                 }
-                v20 = (int)element->unistr;
+                v20 = element->unistr;
                 v21 = v20 * (pX - v11 - element->rect.x) / v12;
                 if ( v21 < 0 )
                 {
@@ -1758,7 +1758,7 @@ LABEL_24:
                     if ( v31 <= (signed int)v32 )
                         v32 = (jkGuiStringEntry *)v31;
                 }
-                v29->selectedTextEntry = (int)v32;
+                v29->otherDataPtr = v32;
                 jkGuiRend_UpdateAndDrawClickable(v29, menu, 1);
                 return 0;
             }
@@ -1782,7 +1782,7 @@ LABEL_24:
                     return 0;
                 }
             }
-            v23->selectedTextEntry = (int)v26;
+            v23->otherDataPtr = v26;
             jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
             return 0;
         default:
@@ -1929,11 +1929,11 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
         {
             elementb = 0;
         }
-        else if ( (signed int)elementb > (uint32_t)element->unistr )
+        else if ( (signed int)elementb > (uint32_t)element->extraInt )
         {
             elementb = element->unistr;
         }
-        v35 = element->rect.x + v32 + v33 * (signed int)elementb / (uint32_t)element->unistr;
+        v35 = element->rect.x + v32 + v33 * (signed int)elementb / (uint32_t)element->extraInt;
         blitX2 = blit_x;
         blitY2 = blit_y;
         v38 = v44->mipSurfaces[v43];

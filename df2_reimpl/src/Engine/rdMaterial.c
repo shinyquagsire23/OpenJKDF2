@@ -41,17 +41,14 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
 
 int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem)
 {
-  rdMaterial *material_; // ebp
   int mat_file; // eax
   int mat_file_; // ebx
   int num_texinfo; // eax
   int tex_type; // edx
   int *texture_idk; // edi
-  rdTexinfo **texinfo; // esi
   rdTexinfo *texinfo_alloc; // eax
   int num_textures; // ecx
   rdTexture *textures; // eax
-  int v14; // esi
   rdTexture *texture; // esi
   unsigned int mipmap_num; // ebx
   int bpp; // eax
@@ -66,7 +63,6 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   int mat_file__; // [esp+10h] [ebp-128h]
   int tex_num; // [esp+14h] [ebp-124h]
   int tex_numa; // [esp+14h] [ebp-124h]
-  int v31; // [esp+18h] [ebp-120h]
   rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]
   rdTexinfoHeader texinfo_header; // [esp+38h] [ebp-100h]
   rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
@@ -75,16 +71,18 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   int textures_idk[16]; // [esp+F8h] [ebp-40h]
   stdVBuffer *created_tex; // eax
 
-  material_ = material;
   _memset(material, 0, sizeof(rdMaterial));
   mat_file = rdroid_pHS->fileOpen(mat_fpath, "rb");
   mat_file_ = mat_file;
   mat_file__ = mat_file;
   if ( mat_file )
   {
-    rdroid_pHS->fileRead(mat_file, &mat_header, 0x4C);
+    rdroid_pHS->fileRead(mat_file, &mat_header, sizeof(rdMaterialHeader));
     if ( _memcmp(mat_header.magic, "MAT ", 4u) || mat_header.revision != '2' )
-      goto LABEL_32;
+    {
+        rdroid_pHS->fileClose(mat_file_);
+        return 0;
+    }
     num_texinfo = mat_header.num_texinfo;
     tex_type = mat_header.type;
     material->num_textures = mat_header.num_textures;
@@ -93,28 +91,25 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     material->celIdx = 0;
     tex_num = 0;
     _memcpy(&material->tex_format, &mat_header.tex_format, sizeof(material->tex_format));
-    if ( num_texinfo )
+    texture_idk = textures_idk;
+    for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
     {
-      texture_idk = textures_idk;
-      texinfo = material->texinfos;
-      do
-      {
         texinfo_alloc = (rdTexinfo *)rdroid_pHS->alloc(sizeof(rdTexinfo));
-        *texinfo = texinfo_alloc;
+        material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
-          goto LABEL_32;
+        {
+            rdroid_pHS->fileClose(mat_file_);
+            return 0;
+        }
         rdroid_pHS->fileRead(mat_file_, &texinfo_header, sizeof(rdTexinfoHeader));
-        (*texinfo)->header = texinfo_header;
+        texinfo_alloc->header = texinfo_header;
         if ( texinfo_header.texture_type & 8 )  // bitflag for texture, not color
         {
-          rdroid_pHS->fileRead(mat_file_, &tex_ext, 0x10);
-          (*texinfo)->texext_unk00 = tex_ext.unk_00;
-          *texture_idk = tex_ext.unk_0c;
+              rdroid_pHS->fileRead(mat_file_, &tex_ext, sizeof(rdTexinfoExtHeader));
+              texinfo_alloc->texext_unk00 = tex_ext.unk_00;
+              *texture_idk = tex_ext.unk_0c;
         }
-        ++texinfo;
         ++texture_idk;
-      }
-      while ( (unsigned int)++tex_num < material->num_texinfo );
     }
     num_textures = material->num_textures;
     material->textures = 0;
@@ -124,20 +119,18 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
       material->textures = textures;
       if ( !textures )
       {
-LABEL_32:
         rdroid_pHS->fileClose(mat_file_);
         return 0;
       }
     }
-    v14 = 0;
     tex_numa = 0;
     if ( material->num_textures )
     {
-      v31 = 0;
       while ( 1 )
       {
+        //printf("asdf %x %x\n", tex_numa, material->num_textures);
         rdroid_pHS->fileRead(mat_file_, &tex_header_1, sizeof(rdTextureHeader));
-        texture = (rdTexture *)((char *)material_->textures + v14);
+        texture = &material->textures[tex_numa];
         texture->alpha_en = tex_header_1.alpha_en;
         texture->unk_0c = tex_header_1.unk_0c;
         texture->width_bitcnt = stdCalcBitPos(tex_header_1.width);
@@ -148,16 +141,14 @@ LABEL_32:
         texture->color_transparent = tex_header_1.unk_10;
         format.width = tex_header_1.width;
         format.height = tex_header_1.height;
-        bpp = material_->tex_format.bpp;
+        bpp = material->tex_format.bpp;
         format.format.is16bit = material->tex_format.is16bit;
         format.format.bpp = bpp;
         if ( texture->num_mipmaps )
           break;
 LABEL_21:
         mat_file_ = mat_file__;
-        v14 = v31 + sizeof(rdTexture);
-        v21 = (unsigned int)(tex_numa++ + 1) < material_->num_textures;
-        v31 += sizeof(rdTexture);
+        v21 = (unsigned int)(tex_numa++ + 1) < material->num_textures;
         if ( !v21 )
           goto LABEL_22;
       }
@@ -186,34 +177,34 @@ LABEL_21:
         ++texture_struct;
         if ( mipmap_num >= texture->num_mipmaps )
         {
-          material_ = material;
           goto LABEL_21;
         }
       }
       mat_file_ = mat_file__;
-      goto LABEL_32;
+      rdroid_pHS->fileClose(mat_file_);
+      return 0;
     }
 LABEL_22:
     v22 = 0;
-    if ( material_->num_texinfo )
+    if ( material->num_texinfo )
     {
       v23 = textures_idk;
-      v24 = material_->texinfos;
+      v24 = material->texinfos;
       do
       {
         if ( (*v24)->header.texture_type & 8 )
-          (*v24)->texture_ptr = &material_->textures[*v23];
+          (*v24)->texture_ptr = &material->textures[*v23];
         ++v22;
         ++v23;
         ++v24;
       }
-      while ( v22 < material_->num_texinfo );
+      while ( v22 < material->num_texinfo );
       mat_file_ = mat_file__;
     }
-    if ( material_->tex_type & 1 )
+    if ( material->tex_type & 1 )
     {
       colors = (rdColor24 *)rdroid_pHS->alloc(0x300u);
-      material_->palette_alloc = colors;
+      material->palette_alloc = colors;
       if ( !colors )
       {
         rdroid_pHS->fileClose(mat_file_);
@@ -222,9 +213,9 @@ LABEL_22:
       rdroid_pHS->fileRead(mat_file_, colors, 0x300);
     }
     v26 = stdFileFromPath(mat_fpath);
-    _strncpy(material_->mat_fpath, v26, 0x1Fu);
+    _strncpy(material->mat_fpath, v26, 0x1Fu);
     v27 = rdroid_pHS;
-    material_->mat_fpath[31] = 0;
+    material->mat_fpath[31] = 0;
     v27->fileClose(mat_file_);
     mat_file = 1;
   }
@@ -251,7 +242,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 {
     unsigned int v5;
     void **v6;
-    int *v7;
+    rdTexture *v7;
     unsigned int v8;
     stdVBuffer **v9;
     unsigned int gpu_mem;
@@ -271,22 +262,22 @@ void rdMaterial_FreeEntry(rdMaterial* material)
     gpu_mem = 0;
     if ( material->num_textures )
     {
-      v7 = &material->textures->num_mipmaps;
+      v7 = &material->textures[0];
       do
       {
         v8 = 0;
-        if ( *v7 )
+        if ( v7->num_mipmaps )
         {
-          v9 = (stdVBuffer **)(v7 + 1);
+          v9 = v7->texture_struct;
           do
           {
             stdDisplay_VBufferFree(*v9);
             ++v8;
             ++v9;
           }
-          while ( v8 < *v7 );
+          while ( v8 < v7->num_mipmaps );
         }
-        v7 += 315;
+        v7++;
         ++gpu_mem;
       }
       while ( gpu_mem < material->num_textures );

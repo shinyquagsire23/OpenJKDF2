@@ -179,7 +179,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     uint32_t v14; // ecx
     sithThing *v15; // edx
     int v16; // eax
-    sithAIClassEntry *aiclassa; // [esp+24h] [ebp+8h]
+    int aiclassa; // [esp+24h] [ebp+8h]
 
     if ( flags != SITHAIFLAGS_SEARCHING || instinct->param0 == 0.0 )
     {
@@ -214,11 +214,11 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                         {
                             v13->actorParams.typeflags &= ~SITHAIFLAGS_DISABLED;
                         }
-                        aiclassa = (sithAIClassEntry *)sithPuppet_PlayMode(v13, aiclass->argsAsInt[5], 0);
-                        if ( (int)aiclassa >= 0 )
+                        aiclassa = sithPuppet_PlayMode(v13, aiclass->argsAsInt[5], 0);
+                        if ( aiclassa >= 0 )
                         {
                             v15 = actor->thing;
-                            instinct->param0 = (float)(int)aiclassa;
+                            instinct->param0 = (float)aiclassa;
                             jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.30000001, 0.0);
                             sithAI_SetMoveThing(actor, &actor->field_1D4, 4.0);
                             v16 = aiclass->argsAsInt[4] + sithTime_curMs;

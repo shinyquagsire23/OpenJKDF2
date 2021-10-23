@@ -108,7 +108,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
                 goto safe_fallback;
             }
             colormap->transparency = transparencyAlloc;
-            if ( (uint8_t)transparencyAlloc )
+            if ( (intptr_t)transparencyAlloc & 0xFF )
                 colormap->transparency = (intptr_t)transparencyAlloc - (((intptr_t)transparencyAlloc) & 0xFF) + 256;
             rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
         }

@@ -11,6 +11,7 @@ void stdStartup(common_functions *a1)
     std_pHS = a1;
     if ( stdPlatform_Startup() )
     {
+#ifdef ARCH_X86
         asm volatile ("fnstcw\t%0" : "=m" (word_860800));
         v1 = (0xB00 | word_860800 & 0xFF);
         word_860806 = v1;
@@ -18,13 +19,16 @@ void stdStartup(common_functions *a1)
         word_860802 = v1;
         v1 = (0xC00 | word_860800 & 0xFF);
         word_860804 = v1;
+#endif
         std_bInitialized = 1;
     }
 }
 
 void stdShutdown()
 {
+#ifdef ARCH_X86
     asm volatile ("fldcw\t%0" : "=m" (word_860800));
+#endif
     std_bInitialized = 1;
 }
 
@@ -67,14 +71,14 @@ int stdReadRaw(char *fpath, void *out, signed int len)
     return 0;
 }
 
-char stdFGetc(int fd)
+char stdFGetc(stdFile_t fd)
 {
     char tmp;
     std_pHS->fileRead(fd, &tmp, 1);
     return tmp;
 }
 
-void stdFPutc(char c, int fd)
+void stdFPutc(char c, stdFile_t fd)
 {
     std_pHS->fileWrite(fd, &c, 1);
 }

@@ -137,22 +137,23 @@ int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
             NETMSG_PUSHU8(v13->buckets[i].symbol_type & 0xFF);
         }
 
+        // TODO: figure out how to handle this in 64-bit
         for (int i = 0; i < v13->entry_cnt; i++)
         {
             sithCogSymbol* sym = &v13->buckets[i];
             if (sym->symbol_type == COG_VARTYPE_FLEX)
             {
-                NETMSG_PUSHU32((uint32_t)sym->symbol_name);
+                NETMSG_PUSHU32((uint32_t)sym->as_int);
             }
             else if ( sym->symbol_type == COG_VARTYPE_VECTOR )
             {
-                NETMSG_PUSHU32((uint32_t)sym->symbol_name);
-                NETMSG_PUSHU32(sym->field_C);
-                NETMSG_PUSHU32(sym->field_10);
+                NETMSG_PUSHF32(sym->as_vec3.x);
+                NETMSG_PUSHF32(sym->as_vec3.y);
+                NETMSG_PUSHF32(sym->as_vec3.z);
             }
             else
             {
-                NETMSG_PUSHU32((uint32_t)sym->symbol_name); // TODO ??? this is a pointer?
+                NETMSG_PUSHU32((uint32_t)sym->as_int); // TODO ??? this is a pointer?
             }
         }
     }

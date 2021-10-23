@@ -1,0 +1,81 @@
+CC := emcc
+TARGET := openjkdf2.wasm
+
+SRC := src
+OBJ := build_emcc
+
+SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+FLEX_BIN := $(ROOT_DIR)/flex/flex
+YACC_BIN := $(ROOT_DIR)/byacc/yacc
+
+GLOBALS_C := $(ROOT_DIR)/$(SRC)/globals.c
+GLOBALS_C_COG := $(ROOT_DIR)/$(SRC)/globals.c.cog
+
+GLOBALS_H := $(ROOT_DIR)/$(SRC)/globals.h
+GLOBALS_H_COG := $(ROOT_DIR)/$(SRC)/globals.h.cog
+
+LINKER_SCRIPT_SYMS := $(ROOT_DIR)/symbols.ld
+LINKER_SCRIPT_SYMS_COG := $(ROOT_DIR)/symbols.ld.cog
+
+SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
+
+#-Wl,-T$(LINKER_SCRIPT_SYMS)
+LDFLAGS := -s USE_SDL=2 -s WASM=1
+CFLAGS := -s USE_SDL=2 -s WASM=1
+
+LDFLAGS += -Wl,-Map=output-emcc.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
+CFLAGS += -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -DNULL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+
+# Comment out these lines to use JK.EXE as a binary blob
+CFLAGS += -DLINUX_TMP -fno-exceptions -DARCH_WASM
+LDFLAGS += -DLINUX_TMP -fno-exceptions -DARCH_WASM
+
+# Comment out to use JK.EXE for .data/.rodata
+CFLAGS += -DNO_JK_MMAP
+LDFLAGS += -DNO_JK_MMAP
+
+all: initial $(OBJ) $(TARGET)
+clean:
+	rm -rf $(OBJ)
+	rm -f $(TARGET)
+	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+	rm -f $(GLOBALS_C)
+	rm -f $(GLOBALS_H)
+	rm -f $(LINKER_SCRIPT_SYMS)
+	touch $(GLOBALS_C)
+	touch $(GLOBALS_H)
+	touch -m $(SYMBOLS_FILE)
+	touch -m $(GLOBALS_H_COG)
+	touch -m $(GLOBALS_C_COG)
+	touch $(SRC)/Cog/lex.yy.c
+	touch $(SRC)/Cog/y.tab.c
+
+clean_cog:
+	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+
+initial: clean_cog $(FLEX_BIN) $(YACC_BIN)
+	@echo Generating COG lex/yacc...
+	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
+	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
+	@echo Generating globals...
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
+
+$(OBJ):
+	@mkdir -p $(OBJ)
+
+$(FLEX_BIN):
+	cd $(ROOT_DIR)/flex && make
+
+$(YACC_BIN):
+	cd $(ROOT_DIR)/byacc && make
+
+$(OBJ)/%.o: $(SRC)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -o $@ $< $(CFLAGS)
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ -g $^ $(LDFLAGS)

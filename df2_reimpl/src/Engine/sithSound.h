@@ -30,6 +30,7 @@ int sithSound_UnloadData(sithSound *sound);
 stdSound_buffer_t* sithSound_LoadData(sithSound *sound);
 int sithSound_StopAll(uint32_t idk);
 stdSound_buffer_t* sithSound_InitFromPath(char *path);
+int sithSound_ReadDataFromFd(int fd, sithSound *sound);
 
 //static int (*sithSound_Load)(sithWorld *world, int a2) = (void*)sithSound_Load_ADDR;
 //static sithSound* (*sithSound_LoadEntry)(char *sound_fname, int a2) = (void*)sithSound_LoadEntry_ADDR;

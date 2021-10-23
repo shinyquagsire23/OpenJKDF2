@@ -134,7 +134,7 @@ int jkGuiSingleplayer_Show()
                         {
                             if ( v17->field_A0 & 1 )
                             {
-                                jkGuiRend_DarrayReallocStr(&darray, v17->unistr, (int)v17);
+                                jkGuiRend_DarrayReallocStr(&darray, v17->unistr, v17);
                                 ++v15;
                             }
                             ++v16;
@@ -266,7 +266,7 @@ int jkGuiSingleplayer_sub_41A9B0(Darray *array, jkGuiElement *element, int a3, i
     {
         if ( jkEpisode_aEpisodes[i].field_A0 & a4 )
         {
-            jkGuiRend_DarrayReallocStr(array, jkEpisode_aEpisodes[i].unistr, (int)&jkEpisode_aEpisodes[i]);
+            jkGuiRend_DarrayReallocStr(array, jkEpisode_aEpisodes[i].unistr, &jkEpisode_aEpisodes[i]);
             ++ret;
         }
     }
@@ -324,7 +324,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
             v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1);
             v15 = _strcpy(v14, a2.fpath);
             v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
-            jkGuiRend_DarrayReallocStr(array, v16, (int)v15);
+            jkGuiRend_DarrayReallocStr(array, v16, v15);
             ++v22;
         }
         stdFileUtil_DisposeFind(search);
@@ -341,7 +341,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
                 v18 = (char *)pHS->alloc(_strlen(v17) + 1);
                 v19 = _strcpy(v18, v17);
                 v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18);
-                jkGuiRend_DarrayReallocStr(array, v20, (int)v19);
+                jkGuiRend_DarrayReallocStr(array, v20, v19);
                 v17 = (char *)a1a;
             }
             v17 += 0x40;

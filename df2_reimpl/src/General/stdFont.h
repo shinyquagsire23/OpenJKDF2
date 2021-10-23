@@ -31,8 +31,8 @@ typedef struct stdFontCharset stdFontCharset;
 
 typedef struct stdFontEntry
 {
-  int field_0;
-  int field_4;
+  int32_t field_0;
+  int32_t field_4;
 } stdFontEntry;
 
 typedef struct stdFontCharset
@@ -57,16 +57,16 @@ typedef struct stdFont
 
 typedef struct stdFontHeader
 {
-  int magic;
-  int version;
+  int32_t magic;
+  int32_t version;
   int32_t marginY;
   int32_t marginX;
-  int field_10;
-  int numCharsets;
-  int field_18;
-  int field_1C;
-  int field_20;
-  int field_24;
+  int32_t field_10;
+  int32_t numCharsets;
+  int32_t field_18;
+  int32_t field_1C;
+  int32_t field_20;
+  int32_t field_24;
 } stdFontHeader;
 
 typedef struct stdFontExtHeader

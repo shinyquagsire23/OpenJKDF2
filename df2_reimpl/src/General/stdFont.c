@@ -8,7 +8,7 @@
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {
     stdFont *result; // eax
-    stdFont *fd; // ebx
+    stdFile_t fd; // ebx
     int16_t charLast; // bp
     unsigned int totalAlloc; // esi
     stdFont *fontAlloc; // edx
@@ -47,13 +47,13 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
         return 0;
     if ( header.version != 10 )
         return 0;
-    if ( std_pHS->fileRead((int)fd, &extHeader, 4) != 4 )
+    if ( std_pHS->fileRead(fd, &extHeader, 4) != 4 )
         goto LABEL_28;
     charLast = extHeader.characterLast;
     charFirst = extHeader.characterFirst;
     header_field_10 = header.field_10;
     marginX = header.marginX;
-    totalAlloc = 8 * (extHeader.characterLast - extHeader.characterFirst) + 0x44;
+    totalAlloc = sizeof(stdFontEntry) * (extHeader.characterLast - extHeader.characterFirst) + sizeof(stdFont);
     marginY = header.marginY;
     fontAlloc = (stdFont *)std_pHS->alloc(totalAlloc);
     if ( fontAlloc )
@@ -77,20 +77,20 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     charMin = fontAlloc_->charsetHead.charFirst;
     charMax = fontAlloc_->charsetHead.charLast;
     fontAlloc_->name[31] = 0;
-    if ( std_pHS->fileRead((int)fd, pEntries, 8 * (charMax - charMin + 1)) != 8 * (charMax - charMin + 1) )
+    if ( std_pHS->fileRead(fd, pEntries, sizeof(stdFontEntry) * (charMax - charMin + 1)) != sizeof(stdFontEntry) * (charMax - charMin + 1) )
         goto LABEL_28;
     fpatha = 1;
     if ( header.numCharsets > 1 )
     {
-        while ( std_pHS->fileRead((int)fd, &extHeader, 4) == 4 )
+        while ( std_pHS->fileRead(fd, &extHeader, 4) == 4 )
         {
             charLast_1 = extHeader.characterLast;
             charFirsta = extHeader.characterFirst;
             lastCharset = &fontAlloc_->charsetHead;
             for ( i = fontAlloc_->charsetHead.previous; i; i = i->previous )
                 lastCharset = i;
-            v16 = 8 * (extHeader.characterLast - extHeader.characterFirst + 1) + 0xC;
-            charset = (stdFontCharset *)std_pHS->alloc(v16);
+            v16 = sizeof(stdFontEntry) * (extHeader.characterLast - extHeader.characterFirst + 1) + (sizeof(stdFontCharset*) + sizeof(uint16_t)*2 + sizeof(stdFontEntry*));
+            charset = (stdFontCharset *)std_pHS->alloc(v16*2);
             if ( charset )
             {
                 lastCharset->previous = charset;
@@ -104,7 +104,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
                 std_pHS->fileClose(fd);
                 return 0;
             }
-            entries_readsize = 8 * (charset->charLast - charset->charFirst + 1);
+            entries_readsize = sizeof(stdFontEntry) * (charset->charLast - charset->charFirst + 1);
             if ( std_pHS->fileRead(fd, charset->pEntries, entries_readsize) != entries_readsize )
             {
                 break;
@@ -113,18 +113,18 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
                 goto LABEL_21;
         }
 LABEL_28:
-        std_pHS->fileClose((int)fd);
+        std_pHS->fileClose(fd);
         return 0;
     }
 LABEL_21:
-    bitmap = stdBitmap_LoadFromFile((int)fd, a2, a3);
+    bitmap = stdBitmap_LoadFromFile(fd, a2, a3);
     fontAlloc_->bitmap = bitmap;
     if ( bitmap )
     {
         _strncpy((char *)bitmap, "FONTSTRIP", 0x1Fu);
         v22 = std_pHS;
         fontAlloc_->bitmap->field_1F = 0;
-        v22->fileClose((int)fd);
+        v22->fileClose(fd);
         result = fontAlloc_;
     }
     else

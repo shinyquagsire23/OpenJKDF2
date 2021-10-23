@@ -190,7 +190,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     signed int v6; // eax
     wchar_t *v7; // edx
     int v8; // ebx
-    int v9; // edi
+    intptr_t v9; // edi
     int v10; // ebx
     wchar_t *v11; // ecx
     int v12; // edx
@@ -204,7 +204,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     v7 = &a1[a3];
     v8 = v5 - a3 + 1;
     v15 = &a1[a3];
-    v9 = (int)&v4[v6 + a3];
+    v9 = &v4[v6 + a3];
     if ( v8 >= a2 - a3 - v6 )
         v8 = a2 - a3 - v6;
     if ( v8 > 0 )

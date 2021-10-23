@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "General/stdString.h"
+#include "jk.h"
 
 static wchar_t stdStrTable_tmpBuf[64];
 

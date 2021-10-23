@@ -1,6 +1,8 @@
 #ifndef _JKGUIFORCE_H
 #define _JKGUIFORCE_H
 
+#include "types.h"
+
 #define jkGuiForce_ChoiceRemoveStar_ADDR (0x00415E90)
 #define jkGuiForce_ChoiceRemoveStars_ADDR (0x00415F70)
 #define jkGuiForce_ForceStarsDraw_ADDR (0x004160F0)
@@ -23,7 +25,7 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
 int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
-int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, int a5, int *pbIsLight, int bEnableIdk);
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, intptr_t a5, int *pbIsLight, int bEnableIdk);
 void jkGuiForce_Initialize();
 void jkGuiForce_Shutdown();
 void jkGuiForce_UpdateViewForRank();

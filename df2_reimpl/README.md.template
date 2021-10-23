@@ -2,16 +2,61 @@
 
 This directory contains a function-by-function reimplementation of DF2 in C. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port. It also contains the original versions of `byacc` and `flex` for COG script parsing.
 
-## Methodology
-The bulk of research and documentation occurs in IDA. Every function has been identified to a file prefix (ie `stdHashTable_`) with a corresponding .c/.h file. RenderDroid (`rd*`) and LEC stdlib (`std*`) functions are 90% canonically named, based on symbols from Grim Fandango Remastered.
+## Platforms
+OpenJKDF2 supports the following configurations:
 
-Reverse engineering is a parallel effort between structure documentation and function identification. Once structures are sufficiently documented, Hex-Rays can be used for decompilation. While most Hex-Rays output works outright, many loops and structures require manual intervention. Output is generally cleaned and tidied to remove redunant stack variables or too-deep nesting. `sizeof` and obvious inlining and macros should also be adjusted as appropriate.
+| Configuration | Renderer | Description |
+| --- | --- | --- |
+| x86 Win32/MinGW DLL | Software/DirectX | Win32 hooked build, JK.EXE is patched to load `df2_reimpl_win.dll` execute `hook_init_win` before JK.EXE's `main` function. Unimplemented functions will fall back to JK.EXE implementations. `df2_reimpl.dll` is used for the KVM target! |
+| x86 Linux/SDL2, mmap blobs | OpenGL 3.3 | Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
+| 32-bit Linux/SDL2, blobless | OpenGL 3.3 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
 
-Engine variables and yet-to-be-decompiled functions are referenced using `define` macros and static function pointers, respectively. Once a file is decompiled enough that an engine variable is no longer referenced by non-decompiled code, the variables can be declared in their respective C files. For decompiled functions which are only referenced by non-decompiled functions, a `hook_function` call is added in `main.c` to redirect code execution to `df2_reimpl.dll` from `JK.EXE`.
+The following implementations are in-progress or planned:
 
-Progress is tracked using `analyze.py`, `output.map` and `ida_copypaste_funclist_nostdlib.txt`: After compiling `df2_reimpl.dll`, symbols can be compared against the `.idb` to determine how much of the original `.text` is actually in use, and how much has been hooked and replaced.
+| Configuration | Renderer | Description |
+| --- | --- | --- |
+| 64-bit Linux/SDL2 | OpenGL 3.3 | 64-bit Linux compilation with SDL2 and OpenAL. Currently buggy, particularly with COG scripts. |
+| Emscripten/WebAssembly | WebGL/OpenGL ES | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit. |
+| MacOS AArch64 | OpenGL 3.3? Metal? | 64-bit MacOS compilation with SDL2 and OpenAL. Rendering backend is currently undecided. |
+| 32-bit/64-bit Windows/SDL2 | OpenGL 3.3 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
 
-If you'd like a copy of my IDB to examine functions which haven't been decompiled yet (or for any other use), let me know.
+## Building
+
+Building is currently only supported on Arch Linux, but probably works fine on Ubuntu with the right dependencies.
+
+Dependencies:
+```
+# All
+pacman -S base-devel make python python-pip
+pip3 install cogapp
+
+# Win32/MinGW
+pacman -S mingw-w64
+
+# Linux 32-bit
+pacman -S multilib-devel lib32-sdl2 lib32-glew lib32-openal lib32-freealut
+
+# Linux 64-bit
+pacman -S sdl2 glew openal freealut
+
+# WebAssembly
+pacaur -S emscripten
+```
+
+### x86 Win32/MinGW DLL
+`make`
+
+### x86 Linux/SDL2, mmap blobs
+`OPENJKDF2_USE_BLOBS=1 make -f Makefile.linux`
+
+### x86 Linux/SDL2, blobless
+`make -f Makefile.linux`
+
+### 64-bit Linux/SDL2
+`make -f Makefile.linux64`
+
+### Emscripten/WebAssembly
+`make -f Makefile.emcc`
 
 ## Usage
 `df2_reimpl` supports both the KVM target from the directory above as well as WINE/Windows, though no guarantees are made for the addition of ie jkgfxmod, other patches nor other hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl_win.dll` is compiled without those linker flags.
@@ -33,7 +78,18 @@ TL;DR for Windows users
 - Compile df2_reimpl
 - Copy `df2_reimpl_win.dll` to the same folder as `JK.EXE`, renamed to `df2_reimpl.dll`
 
-## Linux Partial Compilation
+## Methodology
+The bulk of research and documentation occurs in IDA. Every function has been identified to a file prefix (ie `stdHashTable_`) with a corresponding .c/.h file. RenderDroid (`rd*`) and LEC stdlib (`std*`) functions are 90% canonically named, based on symbols from Grim Fandango Remastered.
+
+Reverse engineering is a parallel effort between structure documentation and function identification. Once structures are sufficiently documented, Hex-Rays can be used for decompilation. While most Hex-Rays output works outright, many loops and structures require manual intervention. Output is generally cleaned and tidied to remove redunant stack variables or too-deep nesting. `sizeof` and obvious inlining and macros should also be adjusted as appropriate.
+
+Engine variables and yet-to-be-decompiled functions are referenced using `define` macros and static function pointers, respectively. Once a file is decompiled enough that an engine variable is no longer referenced by non-decompiled code, the variables can be declared in their respective C files. For decompiled functions which are only referenced by non-decompiled functions, a `hook_function` call is added in `main.c` to redirect code execution to `df2_reimpl.dll` from `JK.EXE`.
+
+Progress is tracked using `analyze.py`, `output.map` and `ida_copypaste_funclist_nostdlib.txt`: After compiling `df2_reimpl.dll`, symbols can be compared against the `.idb` to determine how much of the original `.text` is actually in use, and how much has been hooked and replaced.
+
+If you'd like a copy of my IDB to examine functions which haven't been decompiled yet (or for any other use), let me know.
+
+## Linux Partial Compilation (mmap blobs)
 
 `openjkdf2` supports an experimental partial compilation for Linux/SDL2, using `make -f Makefile.linux`. `openjkdf2` can then be copied to the same directory as JK.EXE and run. It can currently access the player selection, singleplayer, options, and level loading screen before reaching unimplemented code.
 

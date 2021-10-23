@@ -101,7 +101,7 @@ int sithAI_Startup()
         v3--;
         --v1;
     }
-    while ( (int)v3 >= (int)sithAI_actors );
+    while ( (intptr_t)v3 >= (intptr_t)sithAI_actors );
 
     sithAI_bInit = 1;
     return 1;
@@ -174,7 +174,7 @@ void sithAI_Close()
         v3--;
         --v1;
     }
-    while ( (int)v3 >= (int)sithAI_actors );
+    while ( (intptr_t)v3 >= (intptr_t)sithAI_actors );
     
     sithAI_bOpened = 0;
 }
@@ -504,7 +504,7 @@ int sithAI_PrintThingStatus(int a1, char *idxStr)
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)
 {
     sithActor *v3; // esi
-    int result; // eax
+    intptr_t result; // eax
     int v5; // ebp
     unsigned int v6; // edi
     rdVector3 *v7; // ecx
@@ -534,7 +534,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     v5 = _atoi(arg->value);
     if ( !v5 )
         return 0;
-    result = (int)pSithHS->alloc(sizeof(rdVector3) * v5);
+    result = (intptr_t)pSithHS->alloc(sizeof(rdVector3) * v5);
     v3->framesAlloc = (rdVector3 *)result;
     if ( result )
     {
@@ -1115,7 +1115,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
 int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
 {
     sithThing *v4; // esi
-    int result; // eax
+    intptr_t result; // eax
     sithSector *v6; // edi
     sithUnk3SearchEntry *v7; // eax
     sithSurface *v8; // ecx
@@ -1132,7 +1132,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     a5.z = -1.0;
     a7a = v4->moveSize * 0.25;
     v12 = 0;
-    result = (int)sithUnk3_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
+    result = (intptr_t)sithUnk3_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
     v6 = (sithSector *)result;
     if ( !result )
         return result;

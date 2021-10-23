@@ -288,7 +288,7 @@ stdSound_buffer_t* sithSound_LoadData(sithSound *sound)
     return stdSound_BufferDuplicate(sound->dsoundBuffer2);
 }
 
-void* sithSound_ReadDataFromFd(int fd, sithSound *sound)
+int sithSound_ReadDataFromFd(int fd, sithSound *sound)
 {
     void *data;
 
@@ -297,9 +297,9 @@ void* sithSound_ReadDataFromFd(int fd, sithSound *sound)
     if ( data )
     {
         int amt = pSithHS->fileRead(fd, data, bufferBytes);
-        return (void *)stdSound_BufferUnlock(sound->dsoundBuffer2, data, amt);
+        return stdSound_BufferUnlock(sound->dsoundBuffer2, data, amt);
     }
-    return NULL;
+    return 0;
 }
 
 int sithSound_StopAll(uint32_t idk)
@@ -325,11 +325,8 @@ int sithSound_StopAll(uint32_t idk)
                 v8 = 0;
         }
 
-        printf("%x %x\n", sithSound_var4, world);
-        printf("%x %x\n", sithSound_var4, world->numSoundsLoaded);
         for (uint32_t v3 = sithSound_var4; v3 < world->numSoundsLoaded; v3++)
         {
-            printf("%x %x\n", v3, world->numSoundsLoaded);
             if ((world->sounds[v3].isLoaded & 1) 
                 && !world->sounds[v3].field_40
                 && !stdSound_IsPlaying(world->sounds[v3].dsoundBuffer2, 0))
@@ -408,7 +405,9 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
         }
         else
         {
-            dsoundBuf = (stdSound_buffer_t *)seekOffs;
+            //dsoundBuf = (stdSound_buffer_t *)seekOffs;
+            // Added: fix undefined behavior?
+            dsoundBuf = NULL;
         }
         pSithHS->fileClose(fd);
         if ( dsoundBuf )

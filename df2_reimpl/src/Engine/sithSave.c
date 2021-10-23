@@ -19,6 +19,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/stdConffile.h"
+#include "General/stdFileUtil.h"
 #include "Win95/DebugConsole.h"
 #include "Cog/sithCogVm.h"
 #include "jk.h"
@@ -347,7 +348,7 @@ int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, saveFname);
     if ( a2 || !stdConffile_OpenRead(PathName) )
     {
-        memset(&sithSave_headerTmp, 0, sizeof(sithSave_headerTmp));
+        _memset(&sithSave_headerTmp, 0, sizeof(sithSave_headerTmp));
         sithSave_headerTmp.version = 6;
         _strncpy(sithSave_headerTmp.episodeName, sithWorld_pCurWorld->episodeName, 0x7Fu);
         sithSave_headerTmp.episodeName[127] = 0;
@@ -366,7 +367,7 @@ int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
             ++v8;
             *v7++ = v9;
         }
-        while ( (int)v7 < (int)sithSave_headerTmp.saveName );
+        while ( (intptr_t)v7 < (intptr_t)sithSave_headerTmp.saveName );
         sithSave_dword_835900 = 2;
         _strncpy(sithSave_fpath, PathName, 0x7Fu);
         sithSave_fpath[127] = 0;
@@ -417,12 +418,12 @@ LABEL_17:
     {
         v1 = sithCogVm_multiplayerFlags;
         sithCogVm_multiplayerFlags = 4;
-        stdConffile_Write(&sithSave_headerTmp, sizeof(sithSave_Header));
+        stdConffile_Write((const char*)&sithSave_headerTmp, sizeof(sithSave_Header));
         if ( sithSave_funcWrite )
             sithSave_funcWrite();
-        stdConffile_Write(sithWorld_pCurWorld->map_jkl_fname, 32);
-        stdConffile_Write(&sithTime_curMs, 4);
-        stdConffile_Write(&g_sithMode, 24);
+        stdConffile_Write((const char*)sithWorld_pCurWorld->map_jkl_fname, 32);
+        stdConffile_Write((const char*)&sithTime_curMs, 4);
+        stdConffile_Write((const char*)&g_sithMode, 24);
         sithSave_SerializeAllThings(4);
         if ( sithSave_func1 )
             sithSave_func1();

@@ -79,18 +79,18 @@ int sithMaterial_Load(sithWorld *world, int a2)
         {
             v4 = a2;
             v12 = 45.0 / (double)(unsigned int)a2;
-            v5 = (rdMaterial *)pSithHS->alloc(180 * a2);
+            v5 = (rdMaterial *)pSithHS->alloc(sizeof(rdMaterial) * a2);
             world->materials = v5;
             if ( v5 )
             {
                 v6 = sithMaterial_hashmap;
                 world->numMaterials = v4;
                 if ( v6 || (sithMaterial_hashmap = stdHashTable_New(1024)) != 0 )
-                    world->materials2 = (rdVector2 *)pSithHS->alloc(8 * v4);
+                    world->materials2 = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * v4);
                 else
                     pSithHS->free(world->materials);
             }
-            sithMaterial_aMaterials = (rdMaterial **)pSithHS->alloc(4 * a2);
+            sithMaterial_aMaterials = (rdMaterial **)pSithHS->alloc(sizeof(rdMaterial*) * a2);
             if ( stdConffile_ReadArgs() )
             {
                 while ( _strcmp(stdConffile_entry.args[0].value, "end") )
@@ -238,7 +238,7 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
             return 0;
         }
     }
-    result = (rdVector2 *)pSithHS->alloc(8 * num);
+    result = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * num);
     world->materials2 = result;
     if ( !result )
         return 0;

@@ -4,6 +4,15 @@
 #include "types.h"
 #include <stdio.h>
 
+#ifdef ARCH_WASM
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
+#endif
+
 #include "Cog/sithCogParse.h"
 
 #define WinMain_ADDR (0x41EBD0)
@@ -78,7 +87,7 @@ extern BOOL (__stdcall *jk_AllocConsole)();
 extern BOOL (__stdcall *jk_SetConsoleTitleA)(LPCSTR lpConsoleTitle);
 extern HANDLE (__stdcall *jk_GetStdHandle)(DWORD nStdHandle);
 extern BOOL (__stdcall *jk_SetConsoleTextAttribute)(HANDLE hConsoleOutput, WORD wAttributes);
-extern HLOCAL (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
+extern void* (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
 extern LPVOID (__stdcall *jk_MapViewOfFile)(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap);
 extern UINT (__stdcall *jk_WinExec)(LPCSTR lpCmdLine, UINT uCmdShow);
 extern BOOL (__stdcall *jk_SetStdHandle)(DWORD nStdHandle, HANDLE hHandle);
@@ -296,7 +305,7 @@ uint32_t jk_DirectPlayLobbyCreateA();
 uint32_t jk_DirectInputCreateA();
 uint32_t jk_CreateFileA();
 uint32_t jk_CreateFileMappingA();
-uint32_t jk_LocalAlloc();
+void* jk_LocalAlloc();
 uint32_t jk_MapViewOfFile();
 void jk_UnmapViewOfFile();
 void jk_CloseHandle();
@@ -310,7 +319,9 @@ void jk_SetFocus();
 void jk_SetActiveWindow();
 void jk_ShowCursor();
 void jk_ValidateRect();
+#ifndef ARCH_WASM
 int __isspace(int a);
+#endif
 int _iswspace(int a);
 void* _memset(void* ptr, int val, size_t num);
 void* _memset32(void* ptr, uint32_t val, size_t num);
@@ -319,6 +330,7 @@ wchar_t* __wcschr(const wchar_t *, wchar_t);
 wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
 wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int __snprintf(char *, size_t, const char *, ...);
+int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
 #endif
 
 int _strlen(const char *str);
@@ -329,42 +341,6 @@ int __wcscmp(const wchar_t *a, const wchar_t *b);
 int __wcsicmp(const wchar_t *a, const wchar_t *b);
 
 float _frand();
-
-// JK globals
-VM_VAR_DECL(g_hWnd, HWND);
-
-VM_VAR_DECL(g_nShowCmd, uint32_t);
-
-VM_VAR_DECL(g_app_suspended, uint32_t);
-VM_VAR_DECL(g_window_active, uint32_t);
-VM_VAR_DECL(g_app_active, uint32_t);
-VM_VAR_DECL(g_should_exit, uint32_t);
-VM_VAR_DECL(g_thing_two_some_dialog_count, uint32_t);
-VM_VAR_DECL(g_handler_count, uint32_t);
-
-VM_VAR_DECL(g_855E8C, uint32_t);
-VM_VAR_DECL(g_855E90, uint32_t);
-VM_VAR_DECL(g_window_not_destroyed, uint32_t);
-
-//VM_VAR_DECL(g_cog_symbolTable, void*);
-
-// TODO: defsym?
-
-// JK globals
-#define g_hWnd *(g_hWnd_ptr)
-
-#define g_nShowCmd (*(g_nShowCmd_ptr))
-
-#define g_app_suspended (*(g_app_suspended_ptr))
-#define g_window_active (*(g_window_active_ptr))
-#define g_app_active (*(g_app_active_ptr))
-#define g_should_exit (*(g_should_exit_ptr))
-#define g_thing_two_some_dialog_count (*(g_thing_two_some_dialog_count_ptr))
-#define g_handler_count (*(g_handler_count_ptr))
-
-#define g_855E8C (*(g_855E8C_ptr))
-#define g_855E90 (*(g_855E90_ptr))
-#define g_window_not_destroyed *(g_window_not_destroyed_ptr)
 
 void jk_init();
 

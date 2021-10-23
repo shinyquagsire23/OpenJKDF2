@@ -93,7 +93,7 @@ int read();
  * is returned in "result".
  */
 #define YY_INPUT(buf,result,max_size) \
-	if ( (result = pSithHS->fileRead((int)yyin, (char *) buf, max_size )) < 0 ) \
+	if ( (result = pSithHS->fileRead((stdFile_t)yyin, (char *) buf, max_size )) < 0 ) \
 	    YY_FATAL_ERROR( "read() in flex scanner failed" );
 #define YY_NULL 0
 
@@ -308,10 +308,10 @@ YY_DECL
 	    yy_start = 1;	/* first start state */
 
 	if ( ! yyin )
-	    yyin = (int)stdin;
+	    yyin = (stdFile_t)stdin;
 
 	if ( ! yyout )
-	    yyout = (int)stdout;
+	    yyout = (stdFile_t)stdout;
 
 	if ( yy_current_buffer )
 	    yy_init_buffer( yy_current_buffer, (FILE*)yyin );
@@ -763,7 +763,7 @@ void yy_load_buffer_state()
     {
     yy_n_chars = yy_current_buffer->yy_n_chars;
     yytext = yy_c_buf_p = yy_current_buffer->yy_buf_pos;
-    yyin = (int)yy_current_buffer->yy_input_file;
+    yyin = (stdFile_t)yy_current_buffer->yy_input_file;
     yy_hold_char = *yy_c_buf_p;
     }
 

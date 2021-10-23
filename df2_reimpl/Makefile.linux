@@ -22,20 +22,19 @@ LINKER_SCRIPT_SYMS_COG := $(ROOT_DIR)/symbols.ld.cog
 
 SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
-#-Wl,-T$(LINKER_SCRIPT_SYMS)
+CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -DARCH_X86 -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
 
-CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
-
-# Comment out these lines to use JK.EXE as a binary blob
-CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
-LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
-
-# Comment out to use JK.EXE for .data/.rodata
-CFLAGS += -DNO_JK_MMAP
-LDFLAGS += -DNO_JK_MMAP
+# Optional: Use JK.EXE as a binary blob for unimplemented functions
+ifneq ($(OPENJKDF2_USE_BLOBS), 1)
+	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+	CFLAGS += -DNO_JK_MMAP
+	LDFLAGS += -DNO_JK_MMAP
+endif
 
 all: initial $(OBJ) $(TARGET)
+
 clean:
 	rm -rf $(OBJ)
 	rm -f $(TARGET)
@@ -54,10 +53,13 @@ clean:
 clean_cog:
 	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 
-initial: clean_cog $(FLEX_BIN) $(YACC_BIN) $(GLOBALS_H) $(GLOBALS_C)
+initial: clean_cog $(FLEX_BIN) $(YACC_BIN)
 	@echo Generating COG lex/yacc...
 	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
 	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
+	@echo Generating globals...
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
 
 $(OBJ):
 	@mkdir -p $(OBJ)
@@ -67,21 +69,6 @@ $(FLEX_BIN):
 
 $(YACC_BIN):
 	cd $(ROOT_DIR)/byacc && make
-
-#$(LINKER_SCRIPT_SYMS): $(LINKER_SCRIPT_SYMS_COG) $(SYMBOLS_FILE)
-#	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(LINKER_SCRIPT_SYMS_COG) > $(LINKER_SCRIPT_SYMS)
-
-$(GLOBALS_H): $(GLOBALS_H_COG) $(SYMBOLS_FILE)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
-
-$(GLOBALS_C): $(GLOBALS_C_COG) $(SYMBOLS_FILE)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
-
-#$(SRC)/Cog/lex.yy.c : $(FLEX_BIN) $(SRC)/Cog/cog.l
-#	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
-
-#$(SRC)/Cog/y.tab.c : $(YACC_BIN) $(SRC)/Cog/cog.y
-#	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
 
 $(OBJ)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)

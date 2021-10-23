@@ -15,15 +15,15 @@ typedef void (__cdecl *cogSymbolFunc_t)(sithCog *);
 
 typedef struct cogSymbol
 {
-    int type;
-    int val;
+    int32_t type;
+    int32_t val;
     cogSymbolFunc_t func;
 } cogSymbol;
 
 typedef struct sithCogSymbol
 {
-  int symbol_id;
-  int symbol_type;
+  int32_t symbol_id;
+  int32_t symbol_type;
   union
   {
     char *symbol_name;
@@ -33,10 +33,10 @@ typedef struct sithCogSymbol
     int as_int;
     void* as_data;
     sithAIClass* as_aiclass;
+    rdVector3 as_vec3;
+    intptr_t as_intptrs[3];
   };
-  int field_C;
-  int field_10;
-  int field_14;
+  int32_t field_14;
   char* field_18;
 } sithCogSymbol;
 

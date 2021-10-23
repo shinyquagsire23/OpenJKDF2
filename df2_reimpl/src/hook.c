@@ -1,12 +1,14 @@
 #include "hook.h"
 
+#ifndef ARCH_WASM
+
 #ifdef LINUX
 #include <sys/mman.h>
 #endif
 
 #include "jk.h"
 
-void hook_function(uint32_t hook_addr, void* hook_dst)
+void hook_function(intptr_t hook_addr, void* hook_dst)
 {
     if (hook_addr == (intptr_t)hook_dst) {
         jk_printf("Attempted to hook addr %x to itself!\n", hook_addr);
@@ -17,9 +19,9 @@ void hook_function(uint32_t hook_addr, void* hook_dst)
     *(uint32_t*)(hook_addr+1) = ((uintptr_t)hook_dst - hook_addr - 5);
 }
 
-void hook_function_inv(uint32_t hook_addr, void* hook_dst)
+void hook_function_inv(intptr_t hook_addr, void* hook_dst)
 {
-    uint32_t hook_int_addr = (intptr_t)hook_dst;
+    intptr_t hook_int_addr = (intptr_t)hook_dst;
     intptr_t hook_addr_ptr = (intptr_t)hook_addr;
 
 #ifdef LINUX
@@ -34,8 +36,10 @@ void hook_function_inv(uint32_t hook_addr, void* hook_dst)
 #endif
 }
 
-void hook_abort(uint32_t hook_addr)
+void hook_abort(intptr_t hook_addr)
 {
     *(uint8_t*)(hook_addr) = 0x0f; // und
     *(uint8_t*)(hook_addr+1) = 0x0b;
 }
+
+#endif

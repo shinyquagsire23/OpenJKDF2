@@ -48,7 +48,7 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
     return result;
 }
 
-stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int a3)
+stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int a3)
 {
     stdBitmap *outAlloc; // esi
     stdBitmap *result; // eax
@@ -90,7 +90,7 @@ stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int a3)
 
 int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem)
 {
-    intptr_t fd; // esi
+    stdFile_t fd; // esi
     const char *v6; // eax
     signed int v7; // edi
 
@@ -151,7 +151,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     _memset(out, 0, sizeof(stdBitmap));
     vbufAllocSize = 4 * numMips_;
     numMips = numMips_;
-    vbufAlloc = (stdVBuffer **)std_pHS->alloc(4 * numMips_);
+    vbufAlloc = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer*) * numMips_);
     out->mipSurfaces = vbufAlloc;
     if ( vbufAlloc )
     {

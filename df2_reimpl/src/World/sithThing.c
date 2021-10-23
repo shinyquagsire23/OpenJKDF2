@@ -147,7 +147,7 @@ int sithThing_Startup()
             while ( 1 )
             {
                 stdHashTable_SetKeyVal(sithThing_paramKeyToParamValMap, *v2++, (void *)v1++);
-                if ( (int)v2 >= (int)&sithThing_aParams[NUM_THING_PARAMS] )
+                if ( (intptr_t)v2 >= (intptr_t)&sithThing_aParams[NUM_THING_PARAMS] )
                     break;
             }
             sithThing_bInitted2 = 1;
@@ -284,7 +284,6 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             {
                 if (sithWorld_pCurWorld->things[v9].thingType)
                     break;
-                --v9;
             }
             sithWorld_pCurWorld->numThings = v9;
         }
@@ -370,7 +369,6 @@ void sithThing_sub_4CCE60()
                 {
                     if (sithWorld_pCurWorld->things[v6].thingType)
                         break;
-                    --v6;
                 }
                 sithWorld_pCurWorld->numThings = v6;
             }
@@ -457,11 +455,11 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
     int v10; // [esp+10h] [ebp-Ch]
     int v11; // [esp+14h] [ebp-8h]
     sithThing *v12; // [esp+18h] [ebp-4h]
-    sithThing *thinga; // [esp+20h] [ebp+4h]
+    int thinga; // [esp+20h] [ebp+4h]
 
     v3 = thing->thing_id;
     v4 = thing->signature;
-    thinga = (sithThing *)thing->thingIdx;
+    thinga = thing->thingIdx;
     v11 = v3;
     v10 = v4;
     v12 = thing->rdthing.parentSithThing;
@@ -492,10 +490,10 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         _memset(thing, 0, sizeof(sithThing));
         _memcpy(&thing->lookOrientation, &rdroid_identMatrix34, sizeof(thing->lookOrientation));
         rdThing_NewEntry(&thing->rdthing, thing);
-        thing->thingIdx = (int)thinga;
+        thing->thingIdx = thinga;
         thing->signature = v10;
     }
-    thing->thingIdx = (int)thinga;
+    thing->thingIdx = thinga;
     result = v12;
     thing->templateBase = a2;
     thing->thing_id = v11;
@@ -980,7 +978,7 @@ int sithThing_LoadActorPlayerParams(stdConffileArg *arg, sithThing *thing, unsig
             if ( tmp < 0.0 )
                 goto LABEL_38;
 
-            thing->weaponParams.damageClass = (int)arg;
+            thing->actorParams.health = tmp;
             if ( tmp < (double)thing->actorParams.maxHealth )
                 thing->actorParams.maxHealth = thing->actorParams.maxHealth;
             else
@@ -1536,7 +1534,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     return result;
 }
 
-sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *position, rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
+sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
 {
     int v5; // edx
     sithWorld *v6; // ecx
@@ -1945,7 +1943,8 @@ int sithThing_DetachThing(sithThing *thing)
                 sithCog_SendMessageFromSurface(attached, thing, SITH_MESSAGE_EXITED);
         }
         result = 0;
-        _memset(v2, 0, 0x28u); // TODO
+
+        _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*)); // TODO
         return result;
     }
     v3 = thing->attachedThing;
@@ -1989,7 +1988,7 @@ LABEL_8:
             result = 0;
             thing->parentThing = 0;
             thing->childThing = 0;
-            _memset(v2, 0, 0x28u);// TODO
+            _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*));// TODO
             return result;
         }
     }
@@ -2002,7 +2001,7 @@ LABEL_8:
     result = 0;
     thing->parentThing = 0;
     thing->childThing = 0;
-    _memset(v2, 0, 0x28u);// TODO
+    _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*));// TODO
     return result;
 }
 

@@ -550,7 +550,7 @@ void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int texture
     int v83; // [esp+10h] [ebp-10h]
     int v84; // [esp+10h] [ebp-10h]
     char *v85; // [esp+14h] [ebp-Ch]
-    int v86; // [esp+14h] [ebp-Ch]
+    intptr_t v86; // [esp+14h] [ebp-Ch]
     int v87; // [esp+18h] [ebp-8h]
     int v88; // [esp+18h] [ebp-8h]
     int v89; // [esp+1Ch] [ebp-4h]

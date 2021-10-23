@@ -7,7 +7,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 //#include <wchar.h>
+#endif
+
+#ifdef ARCH_WASM
+#include <wchar.h>
 #endif
 
 #include "General/stdString.h"
@@ -76,7 +81,7 @@ BOOL (__stdcall *jk_AllocConsole)();
 BOOL (__stdcall *jk_SetConsoleTitleA)(LPCSTR lpConsoleTitle);
 HANDLE (__stdcall *jk_GetStdHandle)(DWORD nStdHandle);
 BOOL (__stdcall *jk_SetConsoleTextAttribute)(HANDLE hConsoleOutput, WORD wAttributes);
-HLOCAL (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
+void* (__stdcall *jk_LocalAlloc)(UINT uFlags, SIZE_T uBytes);
 LPVOID (__stdcall *jk_MapViewOfFile)(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh, DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap);
 UINT (__stdcall *jk_WinExec)(LPCSTR lpCmdLine, UINT uCmdShow);
 BOOL (__stdcall *jk_SetStdHandle)(DWORD nStdHandle, HANDLE hHandle);
@@ -326,24 +331,6 @@ int __wcsicmp(const wchar_t *a, const wchar_t *b)
 
     return ca - cb;
 }
-
-// JK globals
-VM_VAR(g_hWnd, HWND, 0x855DE0);
-
-VM_VAR(g_nShowCmd, uint32_t, 0x855DE8);
-
-VM_VAR(g_app_suspended, uint32_t, 0x855E70);
-VM_VAR(g_window_active, uint32_t, 0x855E74);
-VM_VAR(g_app_active, uint32_t, 0x855E78);
-VM_VAR(g_should_exit, uint32_t, 0x855E7C);
-VM_VAR(g_thing_two_some_dialog_count, uint32_t, 0x855E80);
-VM_VAR(g_handler_count, uint32_t, 0x855E84);
-
-VM_VAR(g_855E8C, uint32_t, 0x855E8C);
-VM_VAR(g_855E90, uint32_t, 0x855E90);
-VM_VAR(g_window_not_destroyed, uint32_t, 0x855E94);
-
-VM_VAR(g_cog_symboltable_hashmap, void*, 0x8B5428);
 
 void jk_init()
 {
@@ -702,6 +689,11 @@ int __snprintf(char *a1, size_t a2, const char *fmt, ...)
     return ret;
 }
 
+int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args)
+{
+    return vsnprintf(a1, a2, fmt, args); // TODO ehh
+}
+
 wchar_t* _wcscpy(wchar_t * dst, const wchar_t *src)
 {
     if (!dst) return NULL;
@@ -798,7 +790,11 @@ void jk_BeginPaint()
 
 int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
 {
+#ifdef ARCH_WASM
+    return vswprintf(a, b, fmt, list);
+#else
     return vswprintf(a, fmt, list);
+#endif
 }
 
 void jk_EndPaint()
@@ -875,7 +871,7 @@ uint32_t jk_CreateFileMappingA()
     return 0;
 }
 
-uint32_t jk_LocalAlloc()
+void* jk_LocalAlloc()
 {
     assert(0);
     return 0;
@@ -951,10 +947,12 @@ void jk_ValidateRect()
     assert(0);
 }
 
+#ifndef ARCH_WASM
 int __isspace(int a)
 {
     return isspace(a);
 }
+#endif
 
 int _iswspace(int a)
 {

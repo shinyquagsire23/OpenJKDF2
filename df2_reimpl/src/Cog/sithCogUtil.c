@@ -167,7 +167,7 @@ void sithCogUtil_MaterialAnim(sithCog *ctx)
     sithCog *ctx_; // esi
     int popInt; // edi
     void *material; // ecx
-    int *v4; // eax
+    rdSurface *v4; // eax
     float popFlex; // [esp+Ch] [ebp+4h]
 
     // TODO is this inlined
@@ -185,7 +185,7 @@ void sithCogUtil_MaterialAnim(sithCog *ctx)
         popFlex = 15.0;
     v4 = sithSurface_MaterialAnim(material, popFlex, popInt);
     if ( v4 )
-        sithCogVm_PushInt(ctx_, *v4);
+        sithCogVm_PushInt(ctx_, v4->index);
     else
         sithCogVm_PushInt(ctx_, -1);
 }
@@ -839,7 +839,7 @@ void sithCogUtil_SetCurrentCamera(sithCog *ctx)
     }
 #endif
 
-    printf("%u -> %u\n", sithCamera_currentCamera - sithCamera_cameras, camIdx);
+    //printf("%u -> %u\n", sithCamera_currentCamera - sithCamera_cameras, camIdx);
     
     if ( camIdx > -1 && camIdx < 7 )
         sithCamera_SetCurrentCamera(&sithCamera_cameras[camIdx]);

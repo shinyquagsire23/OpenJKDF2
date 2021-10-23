@@ -685,7 +685,7 @@ float jkPlayer_CalcAlignment(int isMp)
     return alignment;
 }
 
-void jkPlayer_MpcInitBins(int unk)
+void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
 {
     float alignment; // [esp+8h] [ebp-E8h]
     jkPlayerMpcInfo info; // [esp+Ch] [ebp-E4h] BYREF
@@ -703,7 +703,7 @@ void jkPlayer_MpcInitBins(int unk)
     }
 }
 
-int jkPlayer_MPCParse(jkPlayerMpcInfo *info, int unk, wchar_t *fname, wchar_t *name, int hasBins)
+int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins)
 {
     int v6; // edi
     float a2; // [esp+Ch] [ebp-CCh] BYREF
@@ -764,7 +764,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, int unk, wchar_t *fname, wchar_t *n
     return 0;
 }
 
-int jkPlayer_MPCWrite(int unk, wchar_t *mpcName, wchar_t *playerName)
+int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName)
 {
     int v4; // esi
     char mpcNameChar[32]; // [esp+10h] [ebp-C0h] BYREF

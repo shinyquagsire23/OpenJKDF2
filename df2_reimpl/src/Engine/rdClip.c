@@ -1431,11 +1431,11 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     double v69; // rtt
     rdVector3 *v71; // eax
     int v72; // ebx
-    unsigned int v73; // eax
+    intptr_t v73; // eax
     rdVector3 *v74; // eax
-    unsigned int v75; // esi
+    intptr_t v75; // esi
     rdVector2 *v76; // esi
-    unsigned int v77; // ecx
+    intptr_t v77; // ecx
     //bool v78; // cc
     rdVector3 *v79; // ebx
     rdVector2 *v80; // edi
@@ -1459,10 +1459,10 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     double v102; // st4
     double v103; // rt2
     rdVector3 *v105; // edi
-    unsigned int v106; // ebp
+    intptr_t v106; // ebp
     rdVector2 *v107; // ebp
     rdVector3 *v108; // eax
-    unsigned int v109; // edx
+    intptr_t v109; // edx
     rdVector3 *v110; // ecx
     float *v111; // edx
     int v112; // edi
@@ -1489,9 +1489,9 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     double v137; // rtt
     rdVector3 *v139; // edi
     int v140; // esi
-    unsigned int v141; // ebp
+    intptr_t v141; // ebp
     rdVector2 *v142; // ebp
-    unsigned int v143; // edx
+    intptr_t v143; // edx
     int v144; // eax
     rdVector3 *v145; // ecx
     rdVector2 *v146; // esi
@@ -1511,9 +1511,9 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     rdVector2 *v161; // ebp
     rdVector3 *v162; // esi
     rdVector3 *v163; // ecx
-    unsigned int v165; // ebp
+    intptr_t v165; // ebp
     rdVector2 *v166; // ebp
-    unsigned int v167; // edx
+    intptr_t v167; // edx
     int v168; // eax
     rdVector3 *v169; // ecx
     rdVector2 *v170; // esi
@@ -1766,22 +1766,22 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     if ( v185 < 3 )
         goto LABEL_127;
     v186 = 0;
-    v73 = (unsigned int)pDestVert ^ (unsigned int)pSourceVert;
+    v73 = (intptr_t)pDestVert ^ (intptr_t)pSourceVert;
     pDestVert = pSourceVert;
-    v74 = (rdVector3 *)((unsigned int)pSourceVert ^ v73);
+    v74 = (rdVector3 *)((intptr_t)pSourceVert ^ v73);
     pSourceVert = v74;
-    v75 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+    v75 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
     pDestTVert = pSourceTVert;
-    v76 = (rdVector2 *)((unsigned int)pSourceTVert ^ v75);
+    v76 = (rdVector2 *)((intptr_t)pSourceTVert ^ v75);
     pSourceTVert = v76;
-    v77 = (unsigned int)pDestIVert ^ (unsigned int)pSourceIVert;
+    v77 = (intptr_t)pDestIVert ^ (intptr_t)pSourceIVert;
     pDestIVert = pSourceIVert;
-    pSourceIVert = (float *)((unsigned int)pSourceIVert ^ v77);
+    pSourceIVert = (float *)((intptr_t)pSourceIVert ^ v77);
     numVerticesf = v72;
-    v198 = (float *)(((unsigned int)pDestIVert ^ v77) + 4 * v72 - 4);
+    v198 = (float *)(((intptr_t)pDestIVert ^ v77) + 4 * v72 - 4);
     v79 = &v74[v72 - 1];
     v80 = &v76[numVerticesf - 1];
-    v192 = (float *)((unsigned int)pDestIVert ^ v77);
+    v192 = (float *)((intptr_t)pDestIVert ^ v77);
     if ( v72 > 0 )
     {
         v81 = pDestTVert;
@@ -1856,15 +1856,15 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     result = v186;
     if ( v186 >= 3 )
     {
-        v106 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+        v106 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
         pDestTVert = pSourceTVert;
-        v107 = (rdVector2 *)((unsigned int)pSourceTVert ^ v106);
+        v107 = (rdVector2 *)((intptr_t)pSourceTVert ^ v106);
         v108 = pSourceVert;
-        v109 = (unsigned int)pDestIVert ^ (unsigned int)pSourceIVert;
+        v109 = (intptr_t)pDestIVert ^ (intptr_t)pSourceIVert;
         v110 = pDestVert;
         pDestVert = pSourceVert;
         pDestIVert = pSourceIVert;
-        v111 = (float *)((unsigned int)pSourceIVert ^ v109);
+        v111 = (float *)((intptr_t)pSourceIVert ^ v109);
         pSourceVert = v110;
         numVerticesh = v186;
         pSourceTVert = v107;
@@ -1956,17 +1956,17 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         v188 = 0;
         pDestVert = v110;
         pSourceVert = v108;
-        v141 = (unsigned int)pDestTVert ^ (unsigned int)v107;
-        pDestTVert = (rdVector2 *)(v141 ^ (unsigned int)pDestTVert);
-        v142 = (rdVector2 *)((unsigned int)pDestTVert ^ v141);
+        v141 = (intptr_t)pDestTVert ^ (intptr_t)v107;
+        pDestTVert = (rdVector2 *)(v141 ^ (intptr_t)pDestTVert);
+        v142 = (rdVector2 *)((intptr_t)pDestTVert ^ v141);
         pSourceTVert = v142;
-        v143 = (unsigned int)pDestIVert ^ (unsigned int)v111;
-        pDestIVert = (float *)(v143 ^ (unsigned int)pDestIVert);
+        v143 = (intptr_t)pDestIVert ^ (intptr_t)v111;
+        pDestIVert = (float *)(v143 ^ (intptr_t)pDestIVert);
         v144 = v140;
-        pSourceIVert = (float *)((unsigned int)pDestIVert ^ v143);
+        pSourceIVert = (float *)((intptr_t)pDestIVert ^ v143);
 
-        v200 = (float *)(((unsigned int)pDestIVert ^ v143) + 4 * v140 - 4);
-        v194 = (float *)((unsigned int)pDestIVert ^ v143);
+        v200 = (float *)(((intptr_t)pDestIVert ^ v143) + 4 * v140 - 4);
+        v194 = (float *)((intptr_t)pDestIVert ^ v143);
         v145 = &pSourceVert[v140 - 1];
         v146 = &v142[v140 - 1];
         if ( v140 <= 0 )
@@ -2040,21 +2040,21 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         }
         if (frustum->field_0.x)
         {
-            v165 = (unsigned int)pDestTVert ^ (unsigned int)v161;
+            v165 = (intptr_t)pDestTVert ^ (intptr_t)v161;
             pDestVert = v163;
-            pDestTVert = (rdVector2 *)(v165 ^ (unsigned int)pDestTVert);
-            v166 = (rdVector2 *)((unsigned int)pDestTVert ^ v165);
-            v167 = (unsigned int)pDestIVert ^ (unsigned int)v160;
+            pDestTVert = (rdVector2 *)(v165 ^ (intptr_t)pDestTVert);
+            v166 = (rdVector2 *)((intptr_t)pDestTVert ^ v165);
+            v167 = (intptr_t)pDestIVert ^ (intptr_t)v160;
             pSourceVert = v162;
             pSourceTVert = v166;
-            pDestIVert = (float *)(v167 ^ (unsigned int)pDestIVert);
+            pDestIVert = (float *)(v167 ^ (intptr_t)pDestIVert);
             v168 = v72;
-            pSourceIVert = (float *)((unsigned int)pDestIVert ^ v167);
+            pSourceIVert = (float *)((intptr_t)pDestIVert ^ v167);
             v189 = 0;
-            v201 = (float *)(((unsigned int)pDestIVert ^ v167) + 4 * v72 - 4);
+            v201 = (float *)(((intptr_t)pDestIVert ^ v167) + 4 * v72 - 4);
             v169 = &v162[v72 - 1];
             v170 = &v166[v72 - 1];
-            v195 = (float *)((unsigned int)pDestIVert ^ v167);
+            v195 = (float *)((intptr_t)pDestIVert ^ v167);
             v171 = pDestVert;
             numVerticesk = pDestIVert;
             v172 = pDestTVert;
@@ -2837,12 +2837,12 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
         v64 = v152;
         if ( v152 < 3 )
             return v152;
-        v65 = (unsigned int)copy_pDestVert ^ (unsigned int)copy_pSourceVert;
-        v66 = (unsigned int)copy_pDestIVert ^ (unsigned int)copy_pSourceIVert;
-        v67 = (rdVector3 *)(v65 ^ (unsigned int)copy_pDestVert);
-        v68 = (float *)(v66 ^ (unsigned int)copy_pDestIVert);
-        v69 = (rdVector3 *)((unsigned int)v67 ^ v65);
-        v70 = (float *)((unsigned int)v68 ^ v66);
+        v65 = (intptr_t)copy_pDestVert ^ (intptr_t)copy_pSourceVert;
+        v66 = (intptr_t)copy_pDestIVert ^ (intptr_t)copy_pSourceIVert;
+        v67 = (rdVector3 *)(v65 ^ (intptr_t)copy_pDestVert);
+        v68 = (float *)(v66 ^ (intptr_t)copy_pDestIVert);
+        v69 = (rdVector3 *)((intptr_t)v67 ^ v65);
+        v70 = (float *)((intptr_t)v68 ^ v66);
         pDestVert = v67;
         pSourceVert = v69;
         pDestIVert = v68;
@@ -3060,13 +3060,13 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int n
                 }
                 if (frustum->field_0.x)
                 {
-                    v135 = (unsigned int)v119 ^ (unsigned int)v120;
-                    v136 = (float*)(v135 ^ (unsigned int)v119);
-                    v137 = (unsigned int)v121 ^ (unsigned int)v122;
-                    v138 = (float *)((unsigned int)v136 ^ v135);
+                    v135 = (intptr_t)v119 ^ (intptr_t)v120;
+                    v136 = (float*)(v135 ^ (intptr_t)v119);
+                    v137 = (intptr_t)v121 ^ (intptr_t)v122;
+                    v138 = (float *)((intptr_t)v136 ^ v135);
                     v139 = v124;
-                    v140 = (rdVector3 *)(v137 ^ (unsigned int)v121);
-                    v141 = (rdVector3 *)((unsigned int)v140 ^ v137);
+                    v140 = (rdVector3 *)(v137 ^ (intptr_t)v121);
+                    v141 = (rdVector3 *)((intptr_t)v140 ^ v137);
                     v166 = &v138[v124 - 1];
                     v142 = v124;
                     v124 = 0;
@@ -3196,7 +3196,7 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     rdVector3 *v69; // eax
     int v70; // edx
     int v71; // esi
-    unsigned int v72; // ebx
+    intptr_t v72; // ebx
     rdVector3 *v73; // eax
     rdVector3 *v74; // esi
     rdVector2 *v75; // ebx
@@ -3224,7 +3224,7 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     double v101; // st3
     rdVector3 *v102; // eax
     int v103; // esi
-    unsigned int v104; // ebx
+    intptr_t v104; // ebx
     rdVector3 *v105; // eax
     rdVector3 *v106; // esi
     rdVector2 *v107; // ebx
@@ -3250,8 +3250,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     double v131; // st2
     double v132; // st3
     rdVector3 *v133; // eax
-    unsigned int v134; // ecx
-    unsigned int v135; // ebp
+    intptr_t v134; // ecx
+    intptr_t v135; // ebp
     rdVector2 *v136; // ebp
     int v137; // eax
     rdVector3 *v138; // ecx
@@ -3269,7 +3269,7 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     rdVector3 *v150; // ecx
     rdVector3 *v151; // esi
     int v152; // eax
-    unsigned int v153; // ebp
+    intptr_t v153; // ebp
     rdVector2 *v154; // ebp
     int v155; // eax
     rdVector3 *v156; // ecx
@@ -3491,12 +3491,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
         v70 = v170;
         if ( v170 < 3 )
             goto LABEL_124;
-        v71 = (unsigned int)v35 ^ (unsigned int)v37;
-        v72 = (unsigned int)pDestTVert ^ (unsigned int)v36;
-        v73 = (rdVector3 *)(v71 ^ (unsigned int)v35);
-        v74 = (rdVector3 *)((unsigned int)v73 ^ v71);
-        pDestTVert = (rdVector2 *)(v72 ^ (unsigned int)pDestTVert);
-        v75 = (rdVector2 *)((unsigned int)pDestTVert ^ v72);
+        v71 = (intptr_t)v35 ^ (intptr_t)v37;
+        v72 = (intptr_t)pDestTVert ^ (intptr_t)v36;
+        v73 = (rdVector3 *)(v71 ^ (intptr_t)v35);
+        v74 = (rdVector3 *)((intptr_t)v73 ^ v71);
+        pDestTVert = (rdVector2 *)(v72 ^ (intptr_t)pDestTVert);
+        v75 = (rdVector2 *)((intptr_t)pDestTVert ^ v72);
         v76 = 0;
         pDestVert = v73;
         pSourceVert = v74;
@@ -3578,12 +3578,12 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
         }
         if ( v76 < 3 )
             return v171;
-        v103 = (unsigned int)v73 ^ (unsigned int)v74;
-        v104 = (unsigned int)pDestTVert ^ (unsigned int)v75;
-        v105 = (rdVector3 *)(v103 ^ (unsigned int)v73);
-        v106 = (rdVector3 *)((unsigned int)v105 ^ v103);
-        pDestTVert = (rdVector2 *)(v104 ^ (unsigned int)pDestTVert);
-        v107 = (rdVector2 *)((unsigned int)pDestTVert ^ v104);
+        v103 = (intptr_t)v73 ^ (intptr_t)v74;
+        v104 = (intptr_t)pDestTVert ^ (intptr_t)v75;
+        v105 = (rdVector3 *)(v103 ^ (intptr_t)v73);
+        v106 = (rdVector3 *)((intptr_t)v105 ^ v103);
+        pDestTVert = (rdVector2 *)(v104 ^ (intptr_t)pDestTVert);
+        v107 = (rdVector2 *)((intptr_t)pDestTVert ^ v104);
         v108 = 0;
         pDestVert = v105;
         pSourceVert = v106;
@@ -3662,13 +3662,13 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
         }
         if ( v108 < 3 )
             return v172;
-        v134 = (unsigned int)pDestVert ^ (unsigned int)pSourceVert;
+        v134 = (intptr_t)pDestVert ^ (intptr_t)pSourceVert;
         pDestVert = pSourceVert;
-        pSourceVert = (rdVector3 *)((unsigned int)pSourceVert ^ v134);
-        v135 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+        pSourceVert = (rdVector3 *)((intptr_t)pSourceVert ^ v134);
+        v135 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
         v173 = 0;
         pDestTVert = pSourceTVert;
-        v136 = (rdVector2 *)((unsigned int)pSourceTVert ^ v135);
+        v136 = (rdVector2 *)((intptr_t)pSourceTVert ^ v135);
         v137 = v108;
         pSourceTVert = v136;
         v138 = &pSourceVert[v108 - 1];
@@ -3729,9 +3729,9 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
         }
         if ( frustum->field_0.x != 0.0 )
         {
-            v153 = (unsigned int)pDestTVert ^ (unsigned int)pSourceTVert;
+            v153 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
             pDestTVert = pSourceTVert;
-            v154 = (rdVector2 *)((unsigned int)pSourceTVert ^ v153);
+            v154 = (rdVector2 *)((intptr_t)pSourceTVert ^ v153);
             v155 = v173;
             pDestVert = pSourceVert;
             pSourceVert = v151;

@@ -1,5 +1,7 @@
 #include "jkCog.h"
 
+#include <math.h>
+
 #include "General/stdStrTable.h"
 #include "Main/jkHud.h"
 #include "Main/jkDev.h"

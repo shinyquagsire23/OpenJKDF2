@@ -303,7 +303,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
 void sithThing_freestuff(sithWorld *world);
 void sithThing_Free(sithWorld *world);
 sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThing);
-sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, rdVector3 *position, rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing);
+sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing);
 void sithThing_FreeEverythingNet(sithThing *thing);
 void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3);
 void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5);

@@ -9,7 +9,7 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DWIN32 -DARCH_X86 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
 
 FLEX_BIN := $(ROOT_DIR)/flex/flex
 YACC_BIN := $(ROOT_DIR)/byacc/yacc
@@ -42,10 +42,13 @@ clean:
 clean_cog:
 	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 
-initial: clean_cog $(FLEX_BIN) $(YACC_BIN) $(GLOBALS_H) $(GLOBALS_C)
+initial: clean_cog $(FLEX_BIN) $(YACC_BIN)
 	@echo Generating COG lex/yacc...
 	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
 	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
+	@echo Generating globals...
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
 
 $(OBJ):
 	@mkdir -p $(OBJ)
@@ -55,18 +58,6 @@ $(FLEX_BIN):
 
 $(YACC_BIN):
 	cd $(ROOT_DIR)/byacc && make
-
-$(GLOBALS_H): $(GLOBALS_H_COG) $(SYMBOLS_FILE)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
-
-$(GLOBALS_C): $(GLOBALS_C_COG) $(SYMBOLS_FILE)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
-
-#$(SRC)/Cog/lex.yy.c : $(FLEX_BIN) $(SRC)/Cog/cog.l
-#	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
-
-#$(SRC)/Cog/y.tab.c : $(YACC_BIN) $(SRC)/Cog/cog.y
-#	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
 
 $(OBJ)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)

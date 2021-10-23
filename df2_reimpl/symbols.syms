@@ -660,6 +660,17 @@ g_hInstance 0x00855DEC HINSTANCE
 g_cog_symbolTable 0x008B5428 sithCogSymboltable*
 wm_msg_main_handler 0x50ECB0 WNDPROC
 pSithHS 0x82F0A4 struct common_functions*
+g_hWnd 0x855DE0 HWND
+g_nShowCmd 0x855DE8 uint32_t
+g_app_suspended 0x855E70 uint32_t
+g_window_active 0x855E74 uint32_t
+g_app_active 0x855E78 uint32_t
+g_should_exit 0x855E7C uint32_t
+g_thing_two_some_dialog_count 0x855E80 uint32_t
+g_handler_count 0x855E84 uint32_t
+g_855E8C 0x855E8C uint32_t
+g_855E90 0x855E90 uint32_t
+g_window_not_destroyed 0x855E94 uint32_t
 
 stdPalEffects_state 0x00866200 stdPalEffectsState
 stdPalEffects_palette 0x0055BB80 rdColor24[256]

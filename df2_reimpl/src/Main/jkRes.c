@@ -19,7 +19,7 @@ int jkRes_Startup(common_functions *a1)
     if ( jkRes_bInit )
         return 0;
 
-    _memcpy(&lowLevelHS, a1, 0x70u);
+    _memcpy(&lowLevelHS, a1, sizeof(common_functions));
     pLowLevelHS = (common_functions *)&lowLevelHS;
     _memset(&jkRes_gCtx, 0, sizeof(jkRes_gCtx));
     jkRes_pHS = a1;
@@ -196,7 +196,7 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
 {
     jkResFile *resFile;
 
-    int fd = jkRes_FileOpen(fpath, "r");
+    stdFile_t fd = jkRes_FileOpen(fpath, "r");
 
     if (!fd)
         return 0;
@@ -218,7 +218,7 @@ int jkRes_ReadKey()
 {
     int keyval;
 
-    int fd = pHS->fileOpen("jk_.cd", "rb");
+    stdFile_t fd = pHS->fileOpen("jk_.cd", "rb");
     if (!fd)
         return 0;
 
@@ -518,10 +518,10 @@ uint32_t jkRes_FileOpen(const char *fpath, const char *mode)
 {
     unsigned int resIdx; // edi
     int v6; // esi
-    int fhand; // eax
+    stdFile_t fhand; // eax
     unsigned int v8; // esi
     const char *v11; // eax
-    int v12; // eax
+    stdFile_t v12; // eax
     unsigned int v13; // esi
     stdGobFile *v14; // eax
     unsigned int v15; // esi
@@ -610,7 +610,7 @@ LABEL_21:
     return resIdx + 1;
 }
 
-int jkRes_FileClose(int fd)
+int jkRes_FileClose(stdFile_t fd)
 {
     jkResFile *resFile = &jkRes_aFiles[fd - 1];
 
@@ -623,7 +623,7 @@ int jkRes_FileClose(int fd)
     return 0;
 }
 
-size_t jkRes_FileRead(int fd, void* out, size_t len)
+size_t jkRes_FileRead(stdFile_t fd, void* out, size_t len)
 {
     jkResFile *resFile = &jkRes_aFiles[fd - 1];
 
@@ -633,7 +633,7 @@ size_t jkRes_FileRead(int fd, void* out, size_t len)
         return stdGob_FileRead(resFile->gobHandle, out, len);
 }
 
-size_t jkRes_FileWrite(int fd, void* out, size_t len)
+size_t jkRes_FileWrite(stdFile_t fd, void* out, size_t len)
 {
     jkResFile *resFile = &jkRes_aFiles[fd - 1];
 
@@ -643,7 +643,7 @@ size_t jkRes_FileWrite(int fd, void* out, size_t len)
         return 0; // GOB has no write function
 }
 
-char* jkRes_FileGets(int fd, char* a2, unsigned int a3)
+char* jkRes_FileGets(stdFile_t fd, char* a2, unsigned int a3)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -652,7 +652,7 @@ char* jkRes_FileGets(int fd, char* a2, unsigned int a3)
         return stdGob_FileGets(resFile->gobHandle, a2, a3);
 }
 
-wchar_t* jkRes_FileGetws(int fd, wchar_t* a2, unsigned int a3)
+wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2, unsigned int a3)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -661,7 +661,7 @@ wchar_t* jkRes_FileGetws(int fd, wchar_t* a2, unsigned int a3)
         return stdGob_FileGetws(resFile->gobHandle, a2, a3);
 }
 
-int jkRes_FEof(int fd)
+int jkRes_FEof(stdFile_t fd)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -670,7 +670,7 @@ int jkRes_FEof(int fd)
         return stdGob_FEof(resFile->gobHandle);
 }
 
-int jkRes_FTell(int fd)
+int jkRes_FTell(stdFile_t fd)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -679,7 +679,7 @@ int jkRes_FTell(int fd)
         return stdGob_FTell(resFile->gobHandle);
 }
 
-int jkRes_FSeek(int fd, int offs, int whence)
+int jkRes_FSeek(stdFile_t fd, int offs, int whence)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -688,7 +688,7 @@ int jkRes_FSeek(int fd, int offs, int whence)
         return stdGob_FSeek(resFile->gobHandle, offs, whence);
 }
 
-size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3)
+size_t jkRes_FileSize(stdFile_t fd, wchar_t* a2, unsigned int a3)
 {
     // This is implemented wonky in the original? 
     // It assumes GOB just doesn't exist and goes straight to pLowLevelHS...
@@ -701,7 +701,7 @@ size_t jkRes_FileSize(int fd, wchar_t* a2, unsigned int a3)
         return stdGob_FileSize(resFile->gobHandle);
 }
 
-int jkRes_FilePrintf(int fd, const char* fmt, ...)
+int jkRes_FilePrintf(stdFile_t fd, const char* fmt, ...)
 {
     va_list va;
     va_start(va, fmt);

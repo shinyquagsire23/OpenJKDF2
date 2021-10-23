@@ -417,6 +417,7 @@ typedef struct sithMapView sithMapView;
 typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
 typedef struct stdALBuffer stdALBuffer;
+typedef struct stdNullSoundBuffer stdNullSoundBuffer;
 typedef struct rdTri rdTri;
 typedef struct rdLine rdLine;
 typedef struct rdGeoset rdGeoset;
@@ -437,7 +438,12 @@ typedef struct Darray Darray;
 #ifdef WIN32
 typedef IDirectSoundBuffer stdSound_buffer_t;
 #else
+#ifdef OPENAL_SOUND
 typedef stdALBuffer stdSound_buffer_t;
+#endif
+#ifdef NULL_SOUND
+typedef stdNullSoundBuffer stdSound_buffer_t;
+#endif
 #endif
 
 typedef rdModel3* (*model3Loader_t)(const char *, int);
@@ -988,15 +994,7 @@ typedef struct rdMaterial
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;
     uint32_t celIdx;
-    rdTexinfo *texinfos[8];
-    uint32_t field_8C;
-    uint32_t field_90;
-    uint32_t field_94;
-    uint32_t field_98;
-    uint32_t field_9C;
-    uint32_t field_A0;
-    uint32_t field_A4;
-    uint32_t field_A8;
+    rdTexinfo *texinfos[16];
     uint32_t num_textures;
     rdTexture* textures;
 } rdMaterial;
@@ -1425,6 +1423,7 @@ typedef struct sithCogStackvar
     {
         int32_t data[3];
         float dataAsFloat[3];
+        intptr_t dataAsPtrs[3];
     };
 } sithCogStackvar;
 
@@ -1547,17 +1546,17 @@ typedef struct common_functions_basic
     void (__cdecl *free)(void *);
     int realloc;
     int getTimerTick;
-    int (__cdecl *fileOpen)(const char *, const char *);
-    int (__cdecl *fileClose)(int);
-    size_t (__cdecl *fileRead)(int, void *, size_t);
-    char *(__cdecl *fileGets)(int, char *, int);
-    size_t (__cdecl *fileWrite)(int, void *, size_t);
-    int feof;
-    int ftell;
-    int (__cdecl *fseek)(int, int, int);
-    int fileSize;
-    void (*filePrintf)(int, const char *, ...);
-    wchar_t *(__cdecl *fileGetws)(int, wchar_t *, unsigned int);
+    stdFile_t (__cdecl *fileOpen)(const char *, const char *);
+    int (__cdecl *fileClose)(stdFile_t);
+    size_t (__cdecl *fileRead)(stdFile_t, void *, size_t);
+    char *(__cdecl *fileGets)(stdFile_t, char *, int);
+    size_t (__cdecl *fileWrite)(stdFile_t, void *, size_t);
+    int (*feof)(stdFile_t);
+    int (*ftell)(stdFile_t);
+    int (__cdecl *fseek)(stdFile_t, int, int);
+    int (*fileSize)(stdFile_t);
+    void (*filePrintf)(stdFile_t, const char *, ...);
+    wchar_t *(__cdecl *fileGetws)(stdFile_t, wchar_t *, unsigned int);
 } common_functions_basic;
 
 typedef struct common_functions
@@ -1609,7 +1608,7 @@ typedef struct jkResFile
   int bOpened;
   char fpath[128];
   int useLowLevel;
-  int fsHandle;
+  stdFile_t fsHandle;
   stdGobFile *gobHandle;
 } jkResFile;
 
@@ -2344,6 +2343,7 @@ typedef struct jkGuiElement
     {
         int selectedTextEntry;
         int boxChecked;
+        intptr_t otherDataPtr;
     };
     rdRect rect;
     int bIsVisible;
@@ -2363,7 +2363,7 @@ typedef struct jkGuiElement
 typedef struct jkGuiStringEntry
 {
   wchar_t *str;
-  int id;
+  intptr_t id;
 } jkGuiStringEntry;
 
 typedef struct jkGuiMenu
@@ -2377,7 +2377,7 @@ typedef struct jkGuiMenu
   uint8_t* palette;
   stdBitmap **ui_structs;
   stdFont** fonts;
-  int anonymous_7;
+  intptr_t anonymous_7;
   void (__cdecl *idkFunc)(jkGuiMenu *);
   char *soundHover;
   char *soundClick;

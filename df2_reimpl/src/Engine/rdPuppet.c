@@ -60,19 +60,19 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     rdKeyframe *v5; // ecx
     rdJoint *v6; // edx
     int v7; // ecx
-    int *v8; // esi
+    rdJoint *v8; // esi
     int v9; // edi
-    int v10; // eax
-    int v11; // edx
-    int v12; // ecx
-    float *v13; // edx
-    int *v15; // edi
+    uint32_t v10; // eax
+    rdAnimEntry* v11; // edx
+    intptr_t v12; // ecx
+    rdAnimEntry *v13;
+    rdHierarchyNode *v15; // edi
     rdPuppetTrack *v16; // esi
     rdKeyframe *v17; // ebp
     int v18; // ebx
     unsigned int v19; // ecx
     rdJoint *v20; // edx
-    int v21; // eax
+    uint32_t v21; // eax
     rdAnimEntry *v22; // ecx
     double v23; // st7
     rdAnimEntry *v24; // eax
@@ -114,7 +114,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     float v69; // [esp+0h] [ebp-84h]
     float v70; // [esp+14h] [ebp-70h]
     float v71; // [esp+18h] [ebp-6Ch]
-    rdHierarchyNode **v72; // [esp+1Ch] [ebp-68h]
+    uint32_t* v72; // [esp+1Ch] [ebp-68h]
     int v73; // [esp+1Ch] [ebp-68h]
     int v74; // [esp+20h] [ebp-64h]
     int v75; // [esp+20h] [ebp-64h]
@@ -137,293 +137,295 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     model_ = thing->model3;
     puppet = thing->puppet;
     model = model_;
-    if ( !thing->field_18 )
+    if ( thing->field_18 )
     {
-        if ( !puppet || puppet->paused )
+        return;
+    }
+
+    if ( !puppet || puppet->paused )
+    {
+        for (int i = 0; i < model_->numHierarchyNodes; i++)
         {
-            for (int i = 0; i < model_->numHierarchyNodes; i++)
-            {
-                _memcpy(&thing->hierarchyNodeMatrices[i], &model_->hierarchyNodes[i].posRotMatrix, sizeof(rdMatrix34));
-            }
+            _memcpy(&thing->hierarchyNodeMatrices[i], &model_->hierarchyNodes[i].posRotMatrix, sizeof(rdMatrix34));
         }
-        else
+    }
+    else
+    {
+        v74 = 4;
+        v83 = puppet->tracks;
+        v4 = puppet->tracks;
+        do
         {
-            v74 = 4;
-            v83 = puppet->tracks;
-            v4 = puppet->tracks;
-            do
+            if ( v4->status )
             {
-                if ( v4->status )
+                v5 = v4->keyframe;
+                v6 = v5->joints;
+                v7 = v5->numJoints2;
+                if ( v7 )
                 {
-                    v5 = v4->keyframe;
-                    v6 = v5->joints;
-                    v7 = v5->numJoints2;
-                    if ( v7 )
+                    v8 = v6;
+                    v72 = &v4->nodes;
+                    v76 = v7;
+                    do
                     {
-                        v8 = &v6->numAnimEntries;
-                        v72 = &v4->nodes;
-                        v76 = v7;
-                        do
+                        v9 = 0;
+                        if ( v8->numAnimEntries )
                         {
-                            v9 = 0;
-                            if ( *v8 )
+                            v81 = v8->numAnimEntries - 1;
+                            v10 = v4->nodes[v8->nodeIdx];// nodeIdx
+                            if ( v10 != v81 )
                             {
-                                v81 = *v8 - 1;
-                                v10 = *((uint32_t *)&v4->nodes + *(v8 - 1));// nodeIdx
-                                if ( v10 != v81 )
+                                v11 = v8->animEntries;
+                                v12 = v10 + 1;
+                                if ( v4->field_120 >= (double)*(float *)&v11[v10 + 1].frameNum )
                                 {
-                                    v11 = v8[1];
-                                    v12 = v10 + 1;
-                                    if ( v4->field_120 >= (double)*(float *)(v11 + 56 * (v10 + 1)) )
+                                    v13 = &v11[v10 + 2];
+                                    do
                                     {
-                                        v13 = (float *)(v11 + 56 * (v10 + 2));
-                                        do
+                                        if ( v12 == v81 )
                                         {
-                                            if ( v12 == v81 )
-                                            {
-                                                v9 = 1;
-                                            }
-                                            else if ( v4->field_120 >= (double)*v13 )
-                                            {
-                                                ++v12;
-                                                v13 += 14;
-                                            }
-                                            else
-                                            {
-                                                v9 = 1;
-                                            }
+                                            v9 = 1;
                                         }
-                                        while ( !v9 );
-                                        *v72 = (rdHierarchyNode *)v12;
-                                    }
-                                }
-                            }
-                            v8 += 11;
-                            ++v72;
-                        }
-                        while (v76-- != 1);
-                    }
-                }
-                ++v4;
-                --v74;
-            }
-            while ( v74 );
-            v82 = 0;
-            v77 = 0;
-            for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
-            {
-                v15 = &model->hierarchyNodes[v80].idx;
-                v16 = v83;
-                v75 = 0;
-                v73 = 0;
-                v70 = 0.0;
-                v71 = 0.0;
-                a4.x = 0.0;
-                a4.y = 0.0;
-                a4.z = 0.0;
-                a3.x = 0.0;
-                v90.x = 0.0;
-                v91.x = 0.0;
-                a3.y = 0.0;
-                v90.y = 0.0;
-                v91.y = 0.0;
-                a3.z = 0.0;
-                v90.z = 0.0;
-                v91.z = 0.0;
-                for (int j = 0; j < 4; j++)
-                {
-                    v17 = v16->keyframe;
-                    if ( v17 )
-                    {
-                        v18 = (v17->type & v15[1]) != 0 ? v16->highPri : v16->lowPri;
-                        if ( (v16->status & 2) != 0 )
-                        {
-                            v19 = *v15;
-                            v20 = &v17->joints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
-                            if ( v19 < v17->numJoints2 && v20->numAnimEntries )
-                            {
-                                if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
-                                {
-                                    v21 = *((uint32_t *)&v16->nodes + v19);
-                                    v22 = v20->animEntries;
-                                    v23 = v16->field_120 - *(float *)&v22[v21].frameNum;
-                                    v24 = &v22[v21];
-                                    v25 = v24->flags;
-                                    if ( (v25 & 1) != 0 )
-                                    {
-                                        v26 = v24->vel.y * v23 + v24->pos.y;
-                                        v27 = v24->vel.z * v23 + v24->pos.z;
-                                        v89.x = v24->vel.x * v23 + v24->pos.x;
-                                        v89.y = v26;
-                                        v89.z = v27;
-                                    }
-                                    else
-                                    {
-                                        v89 = v24->pos;
-                                    }
-                                    if ( (v25 & 2) != 0 )
-                                    {
-                                        v28 = v24->angVel.y * v23 + v24->orientation.y;
-                                        v29 = v24->angVel.z * v23 + v24->orientation.z;
-                                        v86 = v24->angVel.x * v23 + v24->orientation.x;
-                                        v30 = v28;
-                                    }
-                                    else
-                                    {
-                                        v31 = &v24->orientation.x;
-                                        v86 = *v31;
-                                        v87 = v31[1];
-                                        v30 = v87;
-                                        v88 = v31[2];
-                                        v29 = v88;
-                                    }
-                                    v89.x = v89.x - *((float *)v15 + 10);
-                                    v32 = v30;
-                                    v33 = v89.z - *((float *)v15 + 12);
-                                    v34 = v32 - *((float *)v15 + 14);
-                                    v35 = v29 - *((float *)v15 + 15);
-                                    v36 = v86 - *((float *)v15 + 13);
-                                    v89.y = v89.y - *((float *)v15 + 11);
-                                    v89.z = v33;
-                                    v87 = v34;
-                                    v88 = v35;
-                                    v69 = v36;
-                                    v86 = stdMath_NormalizeAngleAcute(v69);
-                                    v87 = stdMath_NormalizeAngleAcute(v87);
-                                    v37 = stdMath_NormalizeAngleAcute(v88);
-                                    v88 = v37;
-                                    if ( v18 > v75 ) // TODO verify
-                                    {
-                                        v40 = v16->playSpeed;
-                                        v89.x = v40 * v89.x;
-                                        v89.y = v40 * v89.y;
-                                        v89.z = v40 * v89.z;
-                                        v86 = v40 * v86;
-                                        v87 = v40 * v87;
-                                        v88 = v40 * v88;
-                                    }
-                                    if ( v18 == v75 )
-                                    {
-                                        a4.x = a4.x + v89.x;
-                                        a4.y = a4.y + v89.y;
-                                        v41 = v70 + v16->playSpeed;
-                                        a4.z = a4.z + v89.z;
-                                        a3.x = a3.x + v86;
-                                        a3.y = a3.y + v87;
-                                        a3.z = a3.z + v88;
-                                        v70 = v41;
-                                    }
-                                    else if ( v18 <= v75 )
-                                    {
-                                        if ( v18 <= v73 )
+                                        else if ( v4->field_120 >= (double)*(float*)&v13->frameNum )
                                         {
-                                            v90.x = v90.x + v89.x;
-                                            v90.y = v90.y + v89.y;
-                                            v44 = v71 + v16->playSpeed;
-                                            v90.z = v90.z + v89.z;
-                                            v91.x = v91.x + v86;
-                                            v91.y = v91.y + v87;
-                                            v91.z = v91.z + v88;
-                                            v71 = v44;
+                                            ++v12;
+                                            v13++;
                                         }
                                         else
                                         {
-                                            v90 = v89;
-                                            v91.x = v86;
-                                            v43 = v16->playSpeed;
-                                            v91.y = v87;
-                                            v91.z = v88;
-                                            v71 = v43;
-                                            v73 = v18;
+                                            v9 = 1;
                                         }
+                                    }
+                                    while ( !v9 );
+                                    *v72 = v12;
+                                }
+                            }
+                        }
+                        v8++;
+                        ++v72;
+                    }
+                    while (v76-- != 1);
+                }
+            }
+            ++v4;
+            --v74;
+        }
+        while ( v74 );
+        v82 = 0;
+        v77 = 0;
+        for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
+        {
+            v15 = &model->hierarchyNodes[v80];
+            v16 = v83;
+            v75 = 0;
+            v73 = 0;
+            v70 = 0.0;
+            v71 = 0.0;
+            a4.x = 0.0;
+            a4.y = 0.0;
+            a4.z = 0.0;
+            a3.x = 0.0;
+            v90.x = 0.0;
+            v91.x = 0.0;
+            a3.y = 0.0;
+            v90.y = 0.0;
+            v91.y = 0.0;
+            a3.z = 0.0;
+            v90.z = 0.0;
+            v91.z = 0.0;
+            for (int j = 0; j < 4; j++)
+            {
+                v17 = v16->keyframe;
+                if ( v17 )
+                {
+                    v18 = (v17->type & v15->type) != 0 ? v16->highPri : v16->lowPri;
+                    if ( (v16->status & 2) != 0 )
+                    {
+                        v19 = v15->idx;
+                        v20 = &v17->joints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
+                        if ( v19 < v17->numJoints2 && v20->numAnimEntries )
+                        {
+                            if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
+                            {
+                                v21 = v16->nodes[v19];
+                                v22 = v20->animEntries;
+                                v23 = v16->field_120 - *(float *)&v22[v21].frameNum;
+                                v24 = &v22[v21];
+                                v25 = v24->flags;
+                                if ( (v25 & 1) != 0 )
+                                {
+                                    v26 = v24->vel.y * v23 + v24->pos.y;
+                                    v27 = v24->vel.z * v23 + v24->pos.z;
+                                    v89.x = v24->vel.x * v23 + v24->pos.x;
+                                    v89.y = v26;
+                                    v89.z = v27;
+                                }
+                                else
+                                {
+                                    v89 = v24->pos;
+                                }
+                                if ( (v25 & 2) != 0 )
+                                {
+                                    v28 = v24->angVel.y * v23 + v24->orientation.y;
+                                    v29 = v24->angVel.z * v23 + v24->orientation.z;
+                                    v86 = v24->angVel.x * v23 + v24->orientation.x;
+                                    v30 = v28;
+                                }
+                                else
+                                {
+                                    v31 = &v24->orientation.x;
+                                    v86 = *v31;
+                                    v87 = v31[1];
+                                    v30 = v87;
+                                    v88 = v31[2];
+                                    v29 = v88;
+                                }
+                                v89.x = v89.x - v15->pos.x;
+                                v32 = v30;
+                                v33 = v89.z - v15->pos.z;
+                                v34 = v32 - v15->rot.y;
+                                v35 = v29 - v15->rot.z;
+                                v36 = v86 - v15->rot.x;
+                                v89.y = v89.y - v15->pos.y;
+                                v89.z = v33;
+                                v87 = v34;
+                                v88 = v35;
+                                v69 = v36;
+                                v86 = stdMath_NormalizeAngleAcute(v69);
+                                v87 = stdMath_NormalizeAngleAcute(v87);
+                                v37 = stdMath_NormalizeAngleAcute(v88);
+                                v88 = v37;
+                                if ( v18 > v75 ) // TODO verify
+                                {
+                                    v40 = v16->playSpeed;
+                                    v89.x = v40 * v89.x;
+                                    v89.y = v40 * v89.y;
+                                    v89.z = v40 * v89.z;
+                                    v86 = v40 * v86;
+                                    v87 = v40 * v87;
+                                    v88 = v40 * v88;
+                                }
+                                if ( v18 == v75 )
+                                {
+                                    a4.x = a4.x + v89.x;
+                                    a4.y = a4.y + v89.y;
+                                    v41 = v70 + v16->playSpeed;
+                                    a4.z = a4.z + v89.z;
+                                    a3.x = a3.x + v86;
+                                    a3.y = a3.y + v87;
+                                    a3.z = a3.z + v88;
+                                    v70 = v41;
+                                }
+                                else if ( v18 <= v75 )
+                                {
+                                    if ( v18 <= v73 )
+                                    {
+                                        v90.x = v90.x + v89.x;
+                                        v90.y = v90.y + v89.y;
+                                        v44 = v71 + v16->playSpeed;
+                                        v90.z = v90.z + v89.z;
+                                        v91.x = v91.x + v86;
+                                        v91.y = v91.y + v87;
+                                        v91.z = v91.z + v88;
+                                        v71 = v44;
                                     }
                                     else
                                     {
-                                        v90 = a4;
-                                        v91 = a3;
-                                        v71 = v70;
-                                        v73 = v75;
-                                        a4 = v89;
-                                        a3.x = v86;
-                                        v42 = v16->playSpeed;
-                                        v75 = v18;
-                                        a3.y = v87;
-                                        a3.z = v88;
-                                        v70 = v42;
+                                        v90 = v89;
+                                        v91.x = v86;
+                                        v43 = v16->playSpeed;
+                                        v91.y = v87;
+                                        v91.z = v88;
+                                        v71 = v43;
+                                        v73 = v18;
                                     }
+                                }
+                                else
+                                {
+                                    v90 = a4;
+                                    v91 = a3;
+                                    v71 = v70;
+                                    v73 = v75;
+                                    a4 = v89;
+                                    a3.x = v86;
+                                    v42 = v16->playSpeed;
+                                    v75 = v18;
+                                    a3.y = v87;
+                                    a3.z = v88;
+                                    v70 = v42;
                                 }
                             }
                         }
                     }
-                    ++v16;
                 }
-                if ( v70 >= 1.0 || v71 <= 0.0 )
-                {
-                    if ( v70 <= 1.0 )
-                        goto LABEL_58;
-                    v50 = 1.0 / v70;
-                    a4.x = v50 * a4.x;
-                    a4.y = v50 * a4.y;
-                    a4.z = v50 * a4.z;
-                    a3.x = v50 * a3.x;
-                    v47 = v50 * a3.y;
-                    v49 = v50 * a3.z;
-                }
-                else
-                {
-                    if ( v71 > 1.0 )
-                    {
-                        v45 = 1.0 / v71;
-                        v90.x = v45 * v90.x;
-                        v90.y = v45 * v90.y;
-                        v90.z = v45 * v90.z;
-                        v91.x = v45 * v91.x;
-                        v91.y = v45 * v91.y;
-                        v91.z = v45 * v91.z;
-                    }
-                    v46 = 1.0 - v70;
-                    a4.x = v46 * v90.x + a4.x;
-                    a4.y = v46 * v90.y + a4.y;
-                    v47 = v46 * v91.y + a3.y;
-                    a4.z = v46 * v90.z + a4.z;
-                    v48 = v46 * v91.x + a3.x;
-                    v49 = v46 * v91.z + a3.z;
-                    a3.x = v48;
-                }
-                a3.y = v47;
-                a3.z = v49;
-LABEL_58:
-                a3.x = stdMath_NormalizeAngleAcute(a3.x);
-                a3.y = stdMath_NormalizeAngleAcute(a3.y);
-                v51 = stdMath_NormalizeAngleAcute(a3.z);
-                v52 = *((float *)v15 + 10);
-                v53 = *((float *)v15 + 11);
-                v54 = *((float *)v15 + 12);
-                v55 = *((float *)v15 + 13);
-                v56 = v51;
-                v57 = *((float *)v15 + 14);
-                a3.z = v56;
-                v58 = v52;
-                v59 = *((float *)v15 + 15);
-                v60 = thing->hierarchyNodeMatrices;
-                a4.x = v58 + a4.x;
-                a4.y = v53 + a4.y;
-                a4.z = v54 + a4.z;
-                a3.x = v55 + a3.x;
-                a3.y = v57 + a3.y;
-                a3.z = v59 + a3.z;
-                rdMatrix_Build34(&v60[v82], &a3, &a4);
-                v61 = &thing->hierarchyNodes2[v77];
-                if ( v61->x != 0.0 || v61->y != 0.0 || v61->z != 0.0 )
-                    rdMatrix_PreRotate34(&thing->hierarchyNodeMatrices[v82], &thing->hierarchyNodes2[v77]);
-                v15 += 45;
-                ++v77;
-                ++v82;
+                ++v16;
             }
+            if ( v70 >= 1.0 || v71 <= 0.0 )
+            {
+                if ( v70 <= 1.0 )
+                    goto LABEL_58;
+                v50 = 1.0 / v70;
+                a4.x = v50 * a4.x;
+                a4.y = v50 * a4.y;
+                a4.z = v50 * a4.z;
+                a3.x = v50 * a3.x;
+                v47 = v50 * a3.y;
+                v49 = v50 * a3.z;
+            }
+            else
+            {
+                if ( v71 > 1.0 )
+                {
+                    v45 = 1.0 / v71;
+                    v90.x = v45 * v90.x;
+                    v90.y = v45 * v90.y;
+                    v90.z = v45 * v90.z;
+                    v91.x = v45 * v91.x;
+                    v91.y = v45 * v91.y;
+                    v91.z = v45 * v91.z;
+                }
+                v46 = 1.0 - v70;
+                a4.x = v46 * v90.x + a4.x;
+                a4.y = v46 * v90.y + a4.y;
+                v47 = v46 * v91.y + a3.y;
+                a4.z = v46 * v90.z + a4.z;
+                v48 = v46 * v91.x + a3.x;
+                v49 = v46 * v91.z + a3.z;
+                a3.x = v48;
+            }
+            a3.y = v47;
+            a3.z = v49;
+LABEL_58:
+            a3.x = stdMath_NormalizeAngleAcute(a3.x);
+            a3.y = stdMath_NormalizeAngleAcute(a3.y);
+            v51 = stdMath_NormalizeAngleAcute(a3.z);
+            v52 = v15->pos.x;
+            v53 = v15->pos.y;
+            v54 = v15->pos.z;
+            v55 = v15->rot.x;
+            v56 = v51;
+            v57 = v15->rot.y;
+            a3.z = v56;
+            v58 = v52;
+            v59 = v15->rot.z;
+            v60 = thing->hierarchyNodeMatrices;
+            a4.x = v58 + a4.x;
+            a4.y = v53 + a4.y;
+            a4.z = v54 + a4.z;
+            a3.x = v55 + a3.x;
+            a3.y = v57 + a3.y;
+            a3.z = v59 + a3.z;
+            rdMatrix_Build34(&v60[v82], &a3, &a4);
+            v61 = &thing->hierarchyNodes2[v77];
+            if ( v61->x != 0.0 || v61->y != 0.0 || v61->z != 0.0 )
+                rdMatrix_PreRotate34(&thing->hierarchyNodeMatrices[v82], &thing->hierarchyNodes2[v77]);
+            v15++;
+            ++v77;
+            ++v82;
         }
-        rdThing_AccumulateMatrices(thing, model->hierarchyNodes, matrix);
-        thing->frameTrue = rdroid_frameTrue;
     }
+    rdThing_AccumulateMatrices(thing, model->hierarchyNodes, matrix);
+    thing->frameTrue = rdroid_frameTrue;
 }
 
 int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
@@ -546,7 +548,12 @@ LABEL_13:
     v11 = puppet->rdthing;
     newTrack->status = v10 | 1;
     newTrack->playSpeed = 0.0;
-    _memset(&puppet->tracks[newTrackIdx].nodes, 0, 4 * v11->model3->numHierarchyNodes);
+    
+    // Added: Added in Grim Fandango, bounds checking
+    if (v11->model3->numHierarchyNodes < 0x40)
+        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(int) * v11->model3->numHierarchyNodes);
+    else
+        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(puppet->tracks[newTrackIdx].nodes));
     result = newTrackIdx;
     newTrack->field_120 = 0.0;
     newTrack->field_124 = 0.0;
@@ -660,7 +667,6 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
                 for (uint32_t v15 = 0; v15 < v4->numMarkers; v15++)
                 {
                     puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v15]);
-                    ++v15;
                 }
             }
         }

@@ -330,7 +330,9 @@ void sithSurface_SetSectorLight(sithSector *sector, float extraLight, float a3, 
     v5 = extraLight - sector->extraLight;
     if ( v5 != 0.0 )
     {
-        v6 = (rdSurface *)sithSurface_numAvail;
+        //v6 = (rdSurface *)sithSurface_numAvail;
+        // Added: fix undef behavior?
+        v6 = NULL;
         if ( sithSurface_numAvail )
         {
             v7 = sithSurface_aAvail[sithSurface_numAvail--];
@@ -755,7 +757,9 @@ rdSurface* sithSurface_SurfaceLightAnim(sithSurface *surface, float a2, float a3
     v3 = a2 - surface->surfaceInfo.face.extraLight;
     if ( v3 == 0.0 )
         return 0;
-    result = (rdSurface *)sithSurface_numAvail;
+    //result = (rdSurface *)sithSurface_numAvail;
+    // Added: fix undef behavior?
+    result = NULL;
     if ( sithSurface_numAvail )
     {
         v5 = sithSurface_aAvail[sithSurface_numAvail--];
@@ -1066,7 +1070,9 @@ rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)
     float v5; // ecx
     float v6; // ecx
 
-    result = (rdSurface *)sithSurface_numAvail;
+    //result = (rdSurface *)sithSurface_numAvail;
+    // Added: fix undef behavior?
+    result = NULL;
     if ( sithSurface_numAvail )
     {
         v3 = sithSurface_aAvail[sithSurface_numAvail--];
@@ -1206,7 +1212,7 @@ rdSurface* sithSurface_GetRdSurface(sithSurface *surface)
             break;
         ++v1;
     }
-    return (rdSurface *)(v1 > sithSurface_numSurfaces ? 0 : (unsigned int)i);
+    return (rdSurface *)(v1 > sithSurface_numSurfaces ? 0 : (intptr_t)i);
 }
 
 rdSurface* sithSurface_GetByIdx(int idx)

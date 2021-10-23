@@ -120,13 +120,13 @@ int sithModel_GetMemorySize(rdModel3 *model)
     int v5; // esi
     int *v6; // ecx
     int v7; // ebp
-    rdModel3 *modela; // [esp+8h] [ebp+4h]
+    int modela; // [esp+8h] [ebp+4h]
 
     result = 4 * (model->numMaterials + 45 * model->numHierarchyNodes) + 132;
     if ( model->numGeosets )
     {
         v2 = model->geosets;
-        modela = (rdModel3 *)model->numGeosets;
+        modela = model->numGeosets;
         do
         {
             result += 8;
@@ -156,7 +156,7 @@ int sithModel_GetMemorySize(rdModel3 *model)
                 while ( v3 );
             }
             ++v2;
-            modela = (rdModel3 *)((char *)modela - 1);
+            modela--;
         }
         while ( modela );
     }

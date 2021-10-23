@@ -390,7 +390,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
                 cogSymbol->as_int = -1;
                 return 0;
             }
-            cogSymbol->symbol_name = (char *)v14->thingIdx;
+            cogSymbol->as_int = v14->thingIdx;
             return 1;
 
         case COG_TYPE_KEYFRAME:
@@ -425,15 +425,15 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
             return 1;
         case COG_TYPE_VECTOR:
             cogSymbol->symbol_type = COG_VARTYPE_VECTOR;
-            if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->as_flex, &cogSymbol->field_C, &cogSymbol->field_10) == 3 )
+            if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->as_vec3.x, &cogSymbol->as_vec3.y, &cogSymbol->as_vec3.z) == 3 )
             {
                 return 1;
             }
             else
             {
-                cogSymbol->as_int = 0;
-                cogSymbol->field_C = 0;
-                cogSymbol->field_10 = 0;
+                cogSymbol->as_intptrs[0] = 0;
+                cogSymbol->as_intptrs[1] = 0;
+                cogSymbol->as_intptrs[2] = 0;
                 return 0;
             }
             break;
@@ -491,7 +491,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymb
     int v22; // eax
     int v23; // edx
 
-    v3 = (int)symbol->symbol_name;
+    v3 = symbol->as_int;
     if ( v3 < 0 )
         return 0;
     switch ( idk->type )
@@ -1190,7 +1190,7 @@ void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3)
     if ( symbol )
     {
         a2a.type = COG_TYPE_VERB;
-        a2a.data[0] = a2;
+        a2a.dataAsPtrs[0] = a2;
         sithCogParse_SetSymbolVal(symbol, &a2a);
     }
 }
