@@ -12,6 +12,7 @@ DroidWorks.*
 .qmake.stash
 player
 openjkdf2
+openjkdf2-64
 moc*.h
 DF2
 MOTS
@@ -24,6 +25,7 @@ JK_types.h
 build_run_dw.sh
 build_run_df2.sh
 build_run_openjkdf2.sh
+build_run_openjkdf2_64.sh
 build_run_tpm.sh
 build_run_mots.sh
 *.txt
@@ -45,6 +47,7 @@ df2_reimpl/flex/parse.c
 df2_reimpl/flex/parse.h
 df2_reimpl/flex/flexlib.a
 df2_reimpl/output.map
+df2_reimpl/output-linux64.map
 df2_reimpl/output-linux.map
 df2_reimpl/find_noxrefs.py
 df2_reimpl/imports_conv.py
