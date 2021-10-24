@@ -428,7 +428,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
     sithCogSymbol *v12; // eax
     cogSymbolFunc_t func; // eax
     int *vec; // ecx
-    intptr_t v19; // eax
+    int32_t v19; // eax
     sithCogStackvar val; // [esp+20h] [ebp-80h]
     sithCogStackvar var; // [esp+70h] [ebp-30h]
     sithCogStackvar outVar; // [esp+90h] [ebp-10h]
@@ -452,21 +452,21 @@ void sithCogVm_Exec(sithCog *cog_ctx)
             case COG_OPCODE_PUSHINT:
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
                 val.type = COG_VARTYPE_INT;
-                val.dataAsPtrs[0] = iTmp;
+                val.data[0] = iTmp;
                 sithCogVm_PushVar(cog_ctx, &val);
                 break;
 
             case COG_OPCODE_PUSHFLOAT:
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
                 val.type = COG_VARTYPE_FLEX;
-                val.dataAsPtrs[0] = iTmp;
+                val.dataAsFloat[0] = *(float*)&iTmp;
                 sithCogVm_PushVar(cog_ctx, &val);
                 break;
 
             case COG_OPCODE_PUSHSYMBOL:
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
                 val.type = COG_VARTYPE_SYMBOL;
-                val.dataAsPtrs[0] = iTmp;
+                val.data[0] = iTmp;
                 sithCogVm_PushVar(cog_ctx, &val);
                 break;
 
@@ -481,9 +481,9 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 iTmp = sithCogVm_PopInt(cog_ctx);
                 v19 = sithCogVm_PopStackVar(cog_ctx, &var);
                 if ( v19 )
-                    v19 = var.type == 1 ? var.dataAsPtrs[0] : 0;
+                    v19 = var.type == 1 ? var.data[0] : 0;
                 val.type = COG_VARTYPE_SYMBOL;
-                val.dataAsPtrs[0] = iTmp + v19;
+                val.data[0] = iTmp + v19;
                 sithCogVm_PushVar(cog_ctx, &val);
                 break;
 
@@ -493,14 +493,14 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 tmpStackVar = &var;
                 if ( tmpStackVar->type != COG_VARTYPE_SYMBOL )
                     break;
-                v12 = sithCogParse_GetSymbol(cog_ctx->symbolTable, tmpStackVar->dataAsPtrs[0]);
+                v12 = sithCogParse_GetSymbol(cog_ctx->symbolTable, tmpStackVar->data[0]);
 
                 if (!v12 )
                     break;
-                if (v12->symbol_type)
+                if (v12->val.type)
                     break;
-                if ( v12->func )
-                    v12->func(cog_ctx); 
+                if ( v12->val.dataAsFunc )
+                    v12->val.dataAsFunc(cog_ctx); 
                 //func = sithCogVm_PopSymbolFunc(cog_ctx); // this function is slightly different?
                 break;
 
@@ -520,7 +520,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 if (var.type != COG_VARTYPE_SYMBOL)
                     break;
                 
-                tmpStackVar = (sithCogStackvar *)&sithCogParse_GetSymbol(cog_ctx->symbolTable, var.dataAsPtrs[0])->symbol_type;
+                tmpStackVar = (sithCogStackvar *)&sithCogParse_GetSymbol(cog_ctx->symbolTable, var.data[0])->val.type;
                 *tmpStackVar = val;
                 break;
             case COG_OPCODE_CMPFALSE:
@@ -638,7 +638,7 @@ int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
     tmp = stackVar;
 
     if ( stackVar->type == COG_VARTYPE_SYMBOL )
-        tmp = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, stackVar->dataAsPtrs[0])->symbol_type;
+        tmp = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, stackVar->data[0])->val.type;
 
     // Added
     if (!tmp)
@@ -1113,11 +1113,11 @@ cogSymbolFunc_t sithCogVm_PopSymbolFunc(sithCog *cog_ctx)
 
     if ( v3->type == COG_VARTYPE_SYMBOL )
     {
-        sym = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].dataAsPtrs[0]);
-        if ( sym->symbol_type )
-            return (cogSymbolFunc_t)&sym->func;
+        sym = sithCogParse_GetSymbol(cog_ctx->symbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
+        if ( sym->val.type )
+            return (cogSymbolFunc_t)&sym->val.dataAsFunc;
         else
-            return sym->func;
+            return sym->val.dataAsFunc;
     }
     else if ( v3->type )
     {
@@ -1140,13 +1140,13 @@ char* sithCogVm_PopString(sithCog *ctx)
     v1 = ctx->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, ctx->stackPos = v2, ctx->stack[v2].type != COG_VARTYPE_SYMBOL)
-      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].dataAsPtrs[0]), v5->symbol_type != COG_VARTYPE_STR) )
+      || (v5 = sithCogParse_GetSymbol(ctx->symbolTable, ctx->stack[v2].data[0]), v5->val.type != COG_VARTYPE_STR) )
     {
         result = 0;
     }
     else
     {
-        result = v5->symbol_name;
+        result = v5->val.dataAsName;
     }
     return result;
 }
@@ -1173,7 +1173,7 @@ void sithCogVm_PushInt(sithCog *ctx, int val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_INT;
-    v.dataAsPtrs[0] = val;
+    v.data[0] = val;
     sithCogVm_PushVar(ctx, &v);
 }
 
@@ -1325,7 +1325,7 @@ void sithCogVm_MathOperation(sithCog *cog_ctx, int op)
 sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in)
 {
     if ( in->type == COG_VARTYPE_SYMBOL )
-        in = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, in->dataAsPtrs[0])->symbol_type;
+        in = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, in->dataAsPtrs[0])->val.type;
     if ( in->type != COG_VARTYPE_VERB)
     {
         out->type = in->type;
@@ -1337,7 +1337,7 @@ sithCogStackvar* sithCogVm_AssignStackVar(sithCogStackvar *out, sithCog *ctx, si
     else
     {
         out->type = COG_VARTYPE_INT;
-        out->dataAsPtrs[0] = *(intptr_t*)in->dataAsPtrs[0];
+        out->dataAsPtrs[0] = *(int32_t*)in->dataAsPtrs[0];
         out->dataAsPtrs[1] = in->dataAsPtrs[1]; // these are undefined in the original
         out->dataAsPtrs[2] = in->dataAsPtrs[2];
         return out;

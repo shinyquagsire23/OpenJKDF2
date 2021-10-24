@@ -1,10 +1,15 @@
 #include "sithUnk4.h"
 
+#include "Cog/sithCog.h"
 #include "World/sithThing.h"
 #include "Engine/sithAnimClass.h"
+#include "Engine/sithSoundClass.h"
+#include "Engine/sithPuppet.h"
 #include "World/sithUnk3.h"
 #include "World/jkPlayer.h"
+#include "World/sithThing.h"
 #include "AI/sithAI.h"
+#include "jk.h"
 
 void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing)
 {
@@ -149,4 +154,89 @@ void sithUnk4_RotateTurretToEyePYR(sithThing *a1)
         if ( v3 >= 0 )
             a1->rdthing.hierarchyNodes2[v3].y = a1->actorParams.eyePYR.y;
     }
+}
+
+int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithUnk3SearchEntry *a3)
+{
+    int result; // eax
+    float v4; // ecx
+    double v5; // st7
+    float v6; // edx
+    float v7; // eax
+    double v8; // st7
+    double v10; // st7
+    double v11; // st6
+    double v12; // st6
+    double v13; // st4
+    double v14; // st7
+    double v15; // st7
+    int v16; // ecx
+    rdVector3 a1a; // [esp+10h] [ebp-54h] BYREF
+    rdVector3 v18; // [esp+1Ch] [ebp-48h] BYREF
+    rdVector3 vAngs; // [esp+28h] [ebp-3Ch] BYREF
+    rdMatrix34 out; // [esp+34h] [ebp-30h] BYREF
+
+    if ( _frand() > thing2->actorParams.chance )
+        return 0;
+    v4 = a1->physicsParams.vel.x;
+    a1a.x = a1->position.x - thing2->position.x;
+    v5 = a1->position.y - thing2->position.y;
+    v6 = a1->physicsParams.vel.y;
+    vAngs.x = v4;
+    vAngs.y = v6;
+    v7 = a1->physicsParams.vel.z;
+    a1a.y = v5;
+    v8 = a1->position.z - thing2->position.z;
+    vAngs.z = v7;
+    a1a.z = v8;
+    rdVector_Normalize3Acc(&a1a);
+    _memcpy(&out, &thing2->lookOrientation, sizeof(out));
+    if ( thing2->thingType == THINGTYPE_ACTOR || thing2->thingType == THINGTYPE_PLAYER )
+        rdMatrix_PreRotate34(&out, &thing2->actorParams.eyePYR);
+    v18 = out.lvec;
+    rdVector_Normalize3Acc(&v18);
+    if ( v18.x * a1a.x + v18.y * a1a.y + v18.z * a1a.z < thing2->actorParams.fov )
+        return 0;
+    result = sithUnk3_DebrisDebrisCollide(a1, thing2, a3, 0);
+    if ( result )
+    {
+        v10 = -vAngs.y;
+        v11 = -vAngs.z;
+        a1->physicsParams.vel.x = -vAngs.x;
+        a1->physicsParams.vel.y = v10;
+        a1->physicsParams.vel.z = v11;
+        if ( _frand() < thing2->actorParams.error )
+        {
+            vAngs.x = 0.0;
+            vAngs.y = 0.0;
+            vAngs.z = 0.0;
+            vAngs.x = (_frand() - 0.5) * 90.0;
+            vAngs.y = (_frand() - 0.5) * 90.0;
+            rdVector_Rotate3Acc(&a1->physicsParams.vel, &vAngs);
+        }
+        rdVector_Normalize3(&a1->lookOrientation.lvec, &a1->physicsParams.vel);
+        v12 = a1->lookOrientation.lvec.x;
+        v13 = a1->lookOrientation.lvec.y;
+        v14 = a1->lookOrientation.lvec.z * 0.0;
+        a1->lookOrientation.rvec.x = v13 * 1.0 - v14;
+        a1->lookOrientation.rvec.y = v14 - v12 * 1.0;
+        a1->lookOrientation.rvec.z = v12 * 0.0 - v13 * 0.0;
+        rdVector_Normalize3Acc(&a1->lookOrientation.rvec);
+        v15 = a1->lookOrientation.rvec.z * a1->lookOrientation.lvec.x;
+        a1->lookOrientation.uvec.x = a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.z - a1->lookOrientation.rvec.z * a1->lookOrientation.lvec.y;
+        a1->lookOrientation.uvec.y = v15 - a1->lookOrientation.lvec.z * a1->lookOrientation.rvec.x;
+        a1->lookOrientation.uvec.z = a1->lookOrientation.lvec.y * a1->lookOrientation.rvec.x - a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.x;
+        sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_DEFLECTED);
+        if ( thing2->lookOrientation.uvec.x * a1a.x + thing2->lookOrientation.uvec.y * a1a.y + thing2->lookOrientation.uvec.z * a1a.z <= 0.0 )
+            sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK2, 0);
+        else
+            sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK, 0);
+        v16 = thing2->signature;
+        a1->actorParams.typeflags &= ~1u;
+        a1->prev_thing = thing2;
+        a1->child_signature = v16;
+        sithCog_SendMessageFromThing(thing2, 0, SITH_MESSAGE_BLOCKED);
+        result = 1;
+    }
+    return result;
 }

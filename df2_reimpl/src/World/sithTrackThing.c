@@ -156,18 +156,18 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         a3 = 1.0;
                         v41 = 1.0 - thing->field_24C;
                     }
-                    v6 = thing->physicsParams.velocityMaybe.y * a3;
-                    v7 = thing->physicsParams.velocityMaybe.z * a3;
-                    rot.x = thing->physicsParams.velocityMaybe.x * a3;
+                    v6 = thing->trackParams.field_64.y * a3;
+                    v7 = thing->trackParams.field_64.z * a3;
+                    rot.x = thing->trackParams.field_64.x * a3;
                     rot.y = v6;
                     rot.z = v7;
                     _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
                     rdMatrix_PostRotate34(&a, &rot);
                     if ( (thing->trackParams.field_C & 0x10) != 0 )
                     {
-                        v8 = thing->physicsParams.addedVelocity.y + a.scale.y;
-                        v9 = thing->physicsParams.addedVelocity.z + a.scale.z;
-                        a1a.x = thing->physicsParams.addedVelocity.x + a.scale.x - thing->position.x;
+                        v8 = thing->trackParams.field_58.y + a.scale.y;
+                        v9 = thing->trackParams.field_58.z + a.scale.z;
+                        a1a.x = thing->trackParams.field_58.x + a.scale.x - thing->position.x;
                         v10 = v9;
                         v11 = v8 - thing->position.y;
                         v12 = v10 - thing->position.z;
@@ -188,9 +188,9 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 {
                                     _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
                                     a3 = v18 / a6 * v41 + thing->field_24C;
-                                    v19 = thing->physicsParams.velocityMaybe.y * a3;
-                                    v20 = thing->physicsParams.velocityMaybe.z * a3;
-                                    rot.x = thing->physicsParams.velocityMaybe.x * a3;
+                                    v19 = thing->trackParams.field_64.y * a3;
+                                    v20 = thing->trackParams.field_64.z * a3;
+                                    rot.x = thing->trackParams.field_64.x * a3;
                                     rot.y = v19;
                                     rot.z = v20;
                                     rdMatrix_PreRotate34(&a, &rot);
@@ -231,7 +231,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         deltaSecondsa = 0.0;
                     if ( deltaSecondsa != 0.0 )
                     {
-                        v26 = sithUnk3_UpdateThingCollision(thing, &thing->physicsParams.angVel, deltaSecondsa, 68);
+                        v26 = sithUnk3_UpdateThingCollision(thing, &thing->trackParams.vel, deltaSecondsa, 68);
                         a3a = v26;
                         if ( v26 >= deltaSecondsa )
                         {

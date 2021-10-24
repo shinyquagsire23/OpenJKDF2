@@ -378,102 +378,102 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
     switch ( cogIdk->type )
     {
         case COG_TYPE_FLEX:
-            cogSymbol->symbol_type = COG_VARTYPE_FLEX;
-            cogSymbol->as_flex = _atof(val);
+            cogSymbol->val.type = COG_VARTYPE_FLEX;
+            cogSymbol->val.dataAsFloat[0] = _atof(val);
             return 1;
 
         case COG_TYPE_TEMPLATE:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v14 = sithTemplate_GetEntryByName(val);
             if ( !v14 )
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->as_int = v14->thingIdx;
+            cogSymbol->val.data[0] = v14->thingIdx;
             return 1;
 
         case COG_TYPE_KEYFRAME:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v17 = sithKeyFrame_LoadEntry(val);
             if ( !v17 )
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->as_int = v17->id;
+            cogSymbol->val.data[0] = v17->id;
             return 1;
         case COG_TYPE_SOUND:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v12 = sithSound_LoadEntry(val, 0);
             if ( !v12 )
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->as_int = v12->id;
+            cogSymbol->val.data[0] = v12->id;
             return 1;
         case COG_TYPE_MATERIAL:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v10 = sithMaterial_LoadEntry(val, 0, 0);
             if ( !v10 )
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->as_int = v10->id;
+            cogSymbol->val.data[0] = v10->id;
             return 1;
         case COG_TYPE_VECTOR:
-            cogSymbol->symbol_type = COG_VARTYPE_VECTOR;
-            if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->as_vec3.x, &cogSymbol->as_vec3.y, &cogSymbol->as_vec3.z) == 3 )
+            cogSymbol->val.type = COG_VARTYPE_VECTOR;
+            if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->val.dataAsFloat[0], &cogSymbol->val.dataAsFloat[1], &cogSymbol->val.dataAsFloat[2]) == 3 )
             {
                 return 1;
             }
             else
             {
-                cogSymbol->as_intptrs[0] = 0;
-                cogSymbol->as_intptrs[1] = 0;
-                cogSymbol->as_intptrs[2] = 0;
+                cogSymbol->val.dataAsFloat[0] = 0.0;
+                cogSymbol->val.dataAsFloat[1] = 0.0;
+                cogSymbol->val.dataAsFloat[2] = 0.0;
                 return 0;
             }
             break;
 
         case COG_TYPE_MODEL:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v15 = sithModel_LoadEntry(val, 1);
             if ( !v15 )
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->as_int = v15->id;
+            cogSymbol->val.data[0] = v15->id;
             return 1;
 
         case COG_TYPE_AICLASS:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
+            cogSymbol->val.type = COG_VARTYPE_INT;
             v19 = sithAIClass_Load(val);
             if ( v19 )
             {
-                cogSymbol->as_aiclass = v19;
+                cogSymbol->val.dataAsPtrs[0] = v19;
                 return 1;
             }
             else
             {
-                cogSymbol->as_int = -1;
+                cogSymbol->val.data[0] = -1;
                 return 0;
             }
             break;
 
         default:
-            cogSymbol->symbol_type = COG_VARTYPE_INT;
-            cogSymbol->as_int = _atoi(val);
+            cogSymbol->val.type = COG_VARTYPE_INT;
+            cogSymbol->val.data[0] = _atoi(val);
             return 1;
     }
 }
 
 int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymbol *symbol)
 {
-    int v3; // eax
+    cog_int_t v3; // eax
     int v5; // ebx
     int v6; // edi
     sithSurface *v7; // esi
@@ -491,7 +491,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymb
     int v22; // eax
     int v23; // edx
 
-    v3 = symbol->as_int;
+    v3 = symbol->val.data[0];
     if ( v3 < 0 )
         return 0;
     switch ( idk->type )
@@ -1337,10 +1337,10 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
                 if ( !v7 )
                     v7 = "<null>";
                 _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
-                if ( v6->symbol_type == 2 )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", *(float *)&v6->symbol_name);
+                if ( v6->val.type == 2 )
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", &v6->val.dataAsFloat[0]);
                 else
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->symbol_name);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->val.data[0]);
                 DebugConsole_Print(std_genBuffer);
                 ++v5;
                 ++v6;

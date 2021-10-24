@@ -256,6 +256,8 @@ void sithCogThing_DestroyThing(sithCog *ctx)
     if (!thing)
         return;
 
+    //printf("destroy %x %s\n", thing->thing_id, ctx->cogscript_fpath);
+
     if (sithCogVm_multiplayerFlags 
         && !(ctx->flags & 0x200) 
         && ctx->trigId != SITH_MESSAGE_STARTUP 

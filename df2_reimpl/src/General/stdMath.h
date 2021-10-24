@@ -27,7 +27,7 @@
 #define stdMath_Floor_ADDR (0x00433650)
 #define stdMath_Sqrt_ADDR (0x00433670)
 
-float stdMath_FlexPower(float num, int exp);
+float stdMath_FlexPower(float num, int32_t exp);
 float stdMath_NormalizeAngle(float angle);
 float stdMath_NormalizeAngleAcute(float angle);
 float stdMath_NormalizeDeltaAngle(float a1, float a2);
@@ -40,7 +40,7 @@ float stdMath_ArcTan1(float a1, float a2);
 float stdMath_ArcTan2(float a1, float a2);
 float stdMath_ArcTan3(float a1, float a2);
 float stdMath_ArcTan4(float a1, float a2);
-int stdMath_FloorDivMod(int in1, int in2, int *out1, int *out2);
+int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *out2);
 
 //IMPORT_FUNC(stdMath_SinCos, void, (float, float*, float*), stdMath_SinCos_ADDR)
 //IMPORT_FUNC(stdMath_Tan, float, (float), stdMath_Tan_ADDR)

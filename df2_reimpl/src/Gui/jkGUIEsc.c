@@ -154,7 +154,7 @@ void jkGuiEsc_Show()
             case JKGUIESC_ABORT:
                 if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_ABORT_GAME"), jkStrings_GetText("GUI_CONFIRM_ABORT")) )
                     continue;
-                jk_MenuReturn();
+                jkMain_MenuReturn();
                 jkGuiRend_UpdateSurface();
                 return;
 

@@ -344,6 +344,16 @@ typedef intptr_t stdFile_t;
 typedef intptr_t stdFile_t;
 #endif
 
+#ifdef ARCH_64BIT
+//typedef int64_t cog_int_t;
+//typedef double cog_flex_t;
+typedef int32_t cog_int_t;
+typedef float cog_flex_t;
+#else
+typedef int32_t cog_int_t;
+typedef float cog_flex_t;
+#endif
+
 typedef struct IDirectSoundBuffer IDirectSoundBuffer;
 typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
 
@@ -1407,6 +1417,7 @@ typedef struct sithCogMsg
 } sithCogMsg;
 
 typedef int (__cdecl *cogMsg_Handler)(sithCogMsg*);
+typedef void (*cogSymbolFunc_t)(sithCog *);
 
 typedef struct sithCogCallstack
 {
@@ -1421,9 +1432,11 @@ typedef struct sithCogStackvar
     uint32_t type;
     union
     {
-        int32_t data[3];
-        float dataAsFloat[3];
+        cog_int_t data[3];
+        cog_flex_t dataAsFloat[3];
         intptr_t dataAsPtrs[3];
+        char* dataAsName;
+        cogSymbolFunc_t dataAsFunc;
     };
 } sithCogStackvar;
 

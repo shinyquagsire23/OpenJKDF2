@@ -438,11 +438,11 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                     if ( v1[v3].field_18 )
                         pSithHS->free(v1[v3].field_18);
                     v1 = table->buckets;
-                    if ( table->buckets[v3].symbol_type == 4 )
+                    if ( table->buckets[v3].val.type == 4 )
                     {
-                        pSithHS->free(v1[v3].symbol_name);
+                        pSithHS->free(v1[v3].val.dataAsName);
                         v1 = table->buckets;
-                        table->buckets[v3].symbol_name = 0;
+                        table->buckets[v3].val.dataAsName = 0;
                     }
                     ++v2;
                     ++v3;
@@ -487,9 +487,9 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
 void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2)
 {
     // TODO ehhhhhh
-    //*(sithCogStackvar *)&a1->symbol_type = *a2;
-    a1->symbol_type = a2->type;
-    memcpy(a1->as_intptrs, a2->dataAsPtrs, sizeof(a1->as_intptrs));
+    //*(sithCogStackvar *)&a1->val.type = *a2;
+    a1->val.type = a2->type;
+    _memcpy(a1->val.dataAsPtrs, a2->dataAsPtrs, sizeof(a1->val.dataAsPtrs));
 }
 
 sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *symbolTable, char *a2)
@@ -610,11 +610,11 @@ void sithCogParse_LexGetSym(char *symName)
 
         if ( v6 )
         {
-            v6->symbol_type = 2;
-            v6->symbol_name = 0;
-            v6->as_intptrs[0] = 0;
-            v6->as_intptrs[1] = 0;
-            v6->as_intptrs[2] = 0;
+            v6->val.type = 2;
+            v6->val.dataAsPtrs[0] = 0;
+            v6->val.dataAsPtrs[1] = 0;
+            v6->val.dataAsPtrs[2] = 0;
+            v6->val.dataAsName = 0;
             yylval.as_int = v6->symbol_id;
         }
     }
@@ -628,10 +628,10 @@ void sithCogParse_LexAddSymbol(const char *symName)
     
     if ( symbol )
     {
-        symbol->symbol_type = COG_VARTYPE_STR;
-        symbol->symbol_name = (char *)pSithHS->alloc(_strlen(symName) - 1);
-        _strncpy(symbol->symbol_name, symName + 1, _strlen(symName) - 2);
-        symbol->symbol_name[_strlen(symName) - 2] = 0;
+        symbol->val.type = COG_VARTYPE_STR;
+        symbol->val.dataAsName = (char *)pSithHS->alloc(_strlen(symName) - 1);
+        _strncpy(symbol->val.dataAsName, symName + 1, _strlen(symName) - 2);
+        symbol->val.dataAsName[_strlen(symName) - 2] = 0;
         yylval.as_int = symbol->symbol_id;
     }
 }
@@ -741,11 +741,11 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
         return 0;
 
     // Added: remove undef stuff
-    symbol->symbol_type = COG_VARTYPE_INT;
-    symbol->as_intptrs[0] = 0;
-    symbol->as_intptrs[1] = 0;
-    symbol->as_intptrs[2] = 0;
-    symbol->symbol_name = 0;
+    symbol->val.type = COG_VARTYPE_INT;
+    symbol->val.dataAsPtrs[0] = 0;
+    symbol->val.dataAsPtrs[1] = 0;
+    symbol->val.dataAsPtrs[2] = 0;
+    symbol->val.dataAsName = 0;
     
     cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(sithCogIdk));
@@ -805,11 +805,11 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->symbol_type = COG_VARTYPE_FLEX;
-    symbol->as_intptrs[0] = 0;
-    symbol->as_intptrs[1] = 0;
-    symbol->as_intptrs[2] = 0;
-    symbol->as_float = _atof(stdConffile_entry.args[1].value);
+    symbol->val.type = COG_VARTYPE_FLEX;
+    symbol->val.dataAsPtrs[0] = 0;
+    symbol->val.dataAsPtrs[1] = 0;
+    symbol->val.dataAsPtrs[2] = 0;
+    symbol->val.dataAsFloat[0] = _atof(stdConffile_entry.args[1].value);
     
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {
@@ -850,11 +850,11 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->symbol_type = COG_VARTYPE_INT;
-    symbol->as_intptrs[0] = 0;
-    symbol->as_intptrs[1] = 0;
-    symbol->as_intptrs[2] = 0;
-    symbol->as_int = _atoi(stdConffile_entry.args[1].value);
+    symbol->val.type = COG_VARTYPE_INT;
+    symbol->val.dataAsPtrs[0] = 0;
+    symbol->val.dataAsPtrs[1] = 0;
+    symbol->val.dataAsPtrs[2] = 0;
+    symbol->val.data[0] = _atoi(stdConffile_entry.args[1].value);
     
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {
@@ -895,11 +895,11 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->symbol_type = COG_VARTYPE_VECTOR;
-    symbol->as_intptrs[0] = 0;
-    symbol->as_intptrs[1] = 0;
-    symbol->as_intptrs[2] = 0;
-    symbol->as_int = 0;
+    symbol->val.type = COG_VARTYPE_VECTOR;
+    symbol->val.dataAsPtrs[0] = 0;
+    symbol->val.dataAsPtrs[1] = 0;
+    symbol->val.dataAsPtrs[2] = 0;
+    symbol->val.data[0] = 0;
     
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {
@@ -938,11 +938,11 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     sithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->symbolTable, stdConffile_entry.args[1].key);
     if (!symbol) return 0;
     
-    //printf("Add message? %x %x %s\n", symbolGet->as_int, symbol->field_14, stdConffile_entry.args[1].value);
+    //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_entry.args[1].value);
     
-    symbol->symbol_name = symbolGet->symbol_name;
-    symbol->symbol_type = COG_TYPE_INT;
-    cogScript->triggers[cogScript->num_triggers].trigId = symbolGet->as_int;
+    symbol->val.dataAsName = symbolGet->val.dataAsName;
+    symbol->val.type = COG_TYPE_INT;
+    cogScript->triggers[cogScript->num_triggers].trigId = symbolGet->val.data[0];
     cogScript->triggers[cogScript->num_triggers].field_8 = symbol->field_14;
     
     cogScript->num_triggers++;

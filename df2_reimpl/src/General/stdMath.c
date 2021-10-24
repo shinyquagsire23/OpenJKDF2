@@ -4,11 +4,11 @@
 
 #include "stdMathTables.h"
 
-float stdMath_FlexPower(float num, int exp)
+float stdMath_FlexPower(float num, int32_t exp)
 {
     float retval = num;
 
-    for (int i = 0; i < exp - 1; ++i)
+    for (int32_t i = 0; i < exp - 1; ++i)
     {
         retval = retval * num;
     }
@@ -78,19 +78,19 @@ float stdMath_NormalizeDeltaAngle(float a1, float a2)
 
 void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
 {
-    double normalized; // st7
-    double v4; // st7
-    double v5; // st7
+    float normalized; // st7
+    float v4; // st7
+    float v5; // st7
     float v6; // [esp+Ch] [ebp-20h]
     float a1; // [esp+10h] [ebp-1Ch]
-    int v8; // [esp+14h] [ebp-18h]
+    int32_t v8; // [esp+14h] [ebp-18h]
     float v9; // [esp+18h] [ebp-14h]
     float v10; // [esp+18h] [ebp-14h]
     float v11; // [esp+18h] [ebp-14h]
     float v12; // [esp+18h] [ebp-14h]
     float v13; // [esp+18h] [ebp-14h]
-    int quantized; // [esp+1Ch] [ebp-10h]
-    int quantized_plus1; // [esp+20h] [ebp-Ch]
+    int32_t quantized; // [esp+1Ch] [ebp-10h]
+    int32_t quantized_plus1; // [esp+20h] [ebp-Ch]
     float normalized_; // [esp+24h] [ebp-8h]
     float v17; // [esp+28h] [ebp-4h]
     float v18; // [esp+28h] [ebp-4h]
@@ -126,7 +126,17 @@ void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
     }
     a1 = normalized_ * 45.511112;
     v6 = a1 - stdMath_Floor(a1);
-    quantized = (int)a1;
+    quantized = (int32_t)a1;
+    // TODO quantized is set to -0x800000000??
+#ifdef ARCH_64BIT
+    if (quantized > 0x8000 || quantized < -0x8000)
+    {
+        quantized = 0;
+        *pSinOut = (v17 - aSinTable[quantized]) * v6 + aSinTable[quantized];
+        *pCosOut = (v18 - aSinTable[4095 - quantized]) * v6 + aSinTable[4095 - quantized];
+        return;
+    }
+#endif
     quantized_plus1 = quantized + 1;
     switch ( v8 )
     {
@@ -482,12 +492,12 @@ float stdMath_Tan(float a1)
     double v1; // st7
     float v3; // [esp+Ch] [ebp-20h]
     float a1a; // [esp+10h] [ebp-1Ch]
-    int v5; // [esp+14h] [ebp-18h]
+    int32_t v5; // [esp+14h] [ebp-18h]
     float v6; // [esp+18h] [ebp-14h]
     float v7; // [esp+18h] [ebp-14h]
-    int v8; // [esp+1Ch] [ebp-10h]
+    int32_t v8; // [esp+1Ch] [ebp-10h]
     float v9; // [esp+20h] [ebp-Ch]
-    int v10; // [esp+24h] [ebp-8h]
+    int32_t v10; // [esp+24h] [ebp-8h]
     float v11; // [esp+28h] [ebp-4h]
     float v12; // [esp+28h] [ebp-4h]
     float v13; // [esp+28h] [ebp-4h]
@@ -837,11 +847,11 @@ float stdMath_ArcTan4(float a1, float a2)
     return v11;
 }
 
-int stdMath_FloorDivMod(int in1, int in2, int *out1, int *out2)
+int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *out2)
 {
-    int result; // eax
-    int v5; // [esp+0h] [ebp-8h]
-    int v6; // [esp+4h] [ebp-4h]
+    int32_t result; // eax
+    int32_t v5; // [esp+0h] [ebp-8h]
+    int32_t v6; // [esp+4h] [ebp-4h]
 
     if ( in1 < 0 )
     {

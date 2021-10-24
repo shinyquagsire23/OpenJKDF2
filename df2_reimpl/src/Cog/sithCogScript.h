@@ -10,32 +10,32 @@ typedef struct sithCogTrigger
     uint32_t field_8;
 } sithCogTrigger;
 
-typedef struct sithCog sithCog;
-typedef void (__cdecl *cogSymbolFunc_t)(sithCog *);
-
 typedef struct cogSymbol
 {
     int32_t type;
-    int32_t val;
+    cog_int_t val;
     cogSymbolFunc_t func;
 } cogSymbol;
 
 typedef struct sithCogSymbol
 {
   int32_t symbol_id;
+  sithCogStackvar val;
+#if 0
   int32_t symbol_type;
   union
   {
     char *symbol_name;
     cogSymbolFunc_t func;
-    float as_float;
-    float as_flex;
-    int as_int;
+    cog_flex_t as_float;
+    cog_flex_t as_flex;
+    cog_int_t as_int;
     void* as_data;
     sithAIClass* as_aiclass;
     rdVector3 as_vec3;
     intptr_t as_intptrs[3];
   };
+#endif
   int32_t field_14;
   char* field_18;
 } sithCogSymbol;
