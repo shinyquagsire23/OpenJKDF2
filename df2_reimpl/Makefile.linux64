@@ -24,7 +24,7 @@ SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 # Flags
 LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -DARCH_X86 -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # 64-bit cannot use JK.EXE as a binary blob
 CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero

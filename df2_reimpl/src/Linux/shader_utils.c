@@ -61,6 +61,8 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     
     fclose(f);
     
+    printf("Parse shader `%s`\n", filepath);
+    
     GLuint ret = create_shader(shader_contents, type);
     free(shader_contents);
     
@@ -81,7 +83,8 @@ GLuint create_shader(const char* shader, GLenum type) {
 	//if (profile == SDL_GL_CONTEXT_PROFILE_ES)
 	//	version = "#version 100\n";  // OpenGL ES 2.0
 	//else
-    version = "#version 330 core\n";  // OpenGL 3.3
+    //version = "#version 330 core\n";  // OpenGL 3.3
+    version = "#version 300 es\n";  // OpenGL ES 2.0
 
 	// GLES2 precision specifiers
 	const char* precision;

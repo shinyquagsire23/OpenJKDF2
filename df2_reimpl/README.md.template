@@ -27,7 +27,7 @@ Building is currently only supported on Arch Linux, but probably works fine on U
 Dependencies:
 ```
 # All
-pacman -S base-devel make python python-pip
+pacman -S base-devel make python python-pip bison
 pip3 install cogapp
 
 # Win32/MinGW
@@ -37,10 +37,34 @@ pacman -S mingw-w64
 pacman -S multilib-devel lib32-sdl2 lib32-glew lib32-openal lib32-freealut
 
 # Linux 64-bit
-pacman -S sdl2 glew openal freealut
+pacman -S clang sdl2 glew openal freealut
 
 # WebAssembly
 pacaur -S emscripten
+```
+
+WIP Ubuntu list:
+```
+# All
+apt install build-essential make python3 python3-pip bison
+pip3 install cogapp
+
+# Win32/MinGW
+apt install mingw-w64
+
+# Linux 32-bit
+#multilib-devel lib32-sdl2 lib32-glew lib32-openal lib32-freealut
+
+# Linux 64-bit
+apt install clang libsdl2-dev libopenal-dev libglew-dev libalut-dev
+
+# WebAssembly
+#emscripten
+```
+
+Add the following to the end of ~/.bashrc:
+```
+export PATH=$PATH:~/.local/bin
 ```
 
 ### x86 Win32/MinGW DLL

@@ -1669,10 +1669,10 @@ LABEL_24:
         goto LABEL_48;
     if ( v17->move_type == MOVETYPE_PHYSICS )
     {
-        if ( (v17->physicsParams.physflags & 0xC0) != 0 )
+        if ( (v17->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
             sithSector_ThingLandIdk(v17, 1);
 LABEL_48:
-        if ( v17->move_type == MOVETYPE_PHYSICS && (v17->trackParams.numFrames & PHYSFLAGS_20000) == 0 )
+        if ( v17->move_type == MOVETYPE_PHYSICS && (v17->physicsParams.physflags & PHYSFLAGS_20000) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
     }
     v24 = v17->class_cog;
@@ -1914,13 +1914,6 @@ int sithThing_DetachThing(sithThing *thing)
 {
     int *v2; // edi
     sithThing *v3; // ebx
-    double v5; // st7
-    double v6; // st6
-    double v7; // rt0
-    double v8; // st6
-    double v9; // st7
-    double v10; // st6
-    double v11; // st7
     double v12; // rt2
     sithThing *v13; // ecx
     sithThing *v14; // eax
@@ -1952,27 +1945,18 @@ int sithThing_DetachThing(sithThing *thing)
     {
         if ( v3->move_type == MOVETYPE_PHYSICS )
         {
-            v5 = v3->physicsParams.vel.y + thing->physicsParams.vel.y;
-            v6 = v3->physicsParams.vel.z + thing->physicsParams.vel.z;
             thing->physicsParams.vel.x = v3->physicsParams.vel.x + thing->physicsParams.vel.x;
-            v7 = v6;
-            v8 = v5;
-            v9 = v7;
-            thing->physicsParams.vel.y = v8;
+            thing->physicsParams.vel.y = v3->physicsParams.vel.y + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = v3->physicsParams.vel.z + thing->physicsParams.vel.z;
         }
         else
         {
             if ( v3->move_type != MOVETYPE_PATH )
                 goto LABEL_8;
-            v10 = v3->physicsParams.angVel.y * v3->physicsParams.acceleration.y;
-            v11 = v3->physicsParams.angVel.z;
-            thing->physicsParams.vel.x = v3->physicsParams.angVel.x * v3->physicsParams.acceleration.y
-                                                  + thing->physicsParams.vel.x;
-            v12 = v11 * v3->physicsParams.acceleration.y;
-            thing->physicsParams.vel.y = v10 + thing->physicsParams.vel.y;
-            v9 = v12 + thing->physicsParams.vel.z;
+            thing->physicsParams.vel.x = (v3->physicsParams.angVel.x * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.x;
+            thing->physicsParams.vel.y = (v3->physicsParams.angVel.y * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = (v3->physicsParams.angVel.z * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.z;
         }
-        thing->physicsParams.vel.z = v9;
     }
 LABEL_8:
     if ( (v3->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
@@ -2222,9 +2206,9 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                     {
                         thing->thingflags |= SITH_TF_DEAD;
                         sithThing_detachallchildren(thing);
-                        v10 = thing->trackParams.numFrames & ~0x2980u;
+                        v10 = thing->physicsParams.physflags & ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
                         thing->thingType = THINGTYPE_CORPSE;
-                        thing->trackParams.numFrames = v10 | 0x51;
+                        thing->physicsParams.physflags = v10 | (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
                         thing->lifeLeftMs = 20000;
                         sithSector_ThingLandIdk(thing, 0);
                     }
@@ -2260,7 +2244,6 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
 {
     int v2; // eax
     sithThing *v3; // eax
-    double v4; // st7
     rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
 
     v2 = parent->attach_flags;
@@ -2276,11 +2259,11 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
     parent->childThing = v3;
     if ( v3 )
         v3->parentThing = parent;
-    a2.x = parent->position.x - child->position.x;
-    v4 = parent->position.y - child->position.y;
+
     parent->parentThing = 0;
     child->attachedParentMaybe = parent;
-    a2.y = v4;
+    a2.x = parent->position.x - child->position.x;
+    a2.y = parent->position.y - child->position.y;
     a2.z = parent->position.z - child->position.z;
     rdMatrix_TransformVector34Acc_0(&parent->field_4C, &a2, &child->lookOrientation);
     if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )

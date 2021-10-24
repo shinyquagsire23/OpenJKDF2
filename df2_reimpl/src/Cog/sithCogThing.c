@@ -273,7 +273,7 @@ void sithCogThing_JumpToFrame(sithCog *ctx)
     uint32_t frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && sector && thing->move_type == 2 && frame < thing->trackParams.loadedFrames )
+    if ( thing && sector && thing->move_type == MOVETYPE_PATH && frame < thing->trackParams.loadedFrames )
     {
         if ( thing->sector && sector != thing->sector )
             sithThing_LeaveSector(thing);

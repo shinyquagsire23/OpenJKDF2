@@ -211,13 +211,13 @@ int init_resources()
     worldpal_data = malloc(0x300);
     memset(worldpal_data, 0xFF, 0x300);
     
-    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     
     
     // Display palette
@@ -225,13 +225,13 @@ int init_resources()
     displaypal_data = malloc(0x400);
     memset(displaypal_data, 0xFF, 0x300);
     
-    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
     has_initted = true;
     return true;
@@ -271,16 +271,16 @@ int std3D_StartScene()
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	
-	glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
 	if (sithWorld_pCurWorld && sithWorld_pCurWorld->colormaps)
 	{
 	    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
-        glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     }
     
-    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
     memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
-    glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
@@ -439,7 +439,7 @@ void std3D_DrawMenu()
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
     
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_1D, displaypal_texture);
+    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
     glUniform1i(programMenu_uniform_tex, 0);
     glUniform1i(programMenu_uniform_displayPalette, 1);
     
@@ -609,7 +609,7 @@ void std3D_DrawRenderList()
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_1D, worldpal_texture);
+    glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(uniform_tex, 0);
