@@ -79,12 +79,12 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
 
 void jkSaber_PolylineRand(rdThing *thing)
 {
-    rdModel3* model = thing->model3;
-    if ( model )
+    rdPolyLine* line = thing->polyline;
+    if ( line )
     {
         if ( !(bShowInvisibleThings & 0xF) )
-            model->field_64 = 0.0;
-        model->field_64 = (_frand() - 0.80000001) * 80.0 + model->field_64;
+            line->edgeFace.clipIdk.y = 0.0;
+        line->edgeFace.clipIdk.y = (_frand() - 0.80000001) * 80.0 + line->edgeFace.clipIdk.y;
     }
 }
 
