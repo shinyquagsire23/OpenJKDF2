@@ -331,8 +331,8 @@ stdDisplay_pCurVideoMode 0x0055B3F0 stdVideoMode*
 stdDisplay_bStartup 0x0055B3D8 int
 stdDisplay_bOpen 0x0055B3DC int
 stdDisplay_bModeSet 0x0055B3E0 int
-stdDisplay_numVideoModes 0x055B3EC int
-stdDisplay_bPaged 0x55B3F4 int
+stdDisplay_numVideoModes 0x0055B3EC int
+stdDisplay_bPaged 0x0055B3F4 int
 
 // std
 word_860800 0x860800 uint16_t
@@ -344,7 +344,7 @@ stdControl_bControlsIdle 0x0055D5D4 int
 
 Windows_installType 0x008606E0 int
 
-Video_fillColor 0x00552898 int
+Video_fillColor 0x00552898 int = 0
 Video_modeStruct 0x008605C0 videoModeStruct
 Video_otherBuf 0x00866CA0 stdVBuffer
 Video_dword_866D78 0x00866D78 int
@@ -443,7 +443,7 @@ Main_bNoHUD 0x00860798 int
 Main_logLevel 0x0086079C int
 Main_verboseLevel 0x008607A0 int
 Main_path 0x008606E4 char[128]
-debug_log_fp 0x00552880 stdFile_t
+debug_log_fp 0x00552880 stdFile_t = 0
 pHS 0x860440 common_functions*
 
 jkCredits_table 0x0055AD70 stdStrTable
@@ -483,7 +483,7 @@ jkCutscene_dword_55AA50 0x0055AA50 int
 jkCutscene_55AA54 0x0055AA54 int
 
 gamemode_0_2_str 0x005528D0 char[128]
-thing_nine 0x0052552C int
+thing_nine 0x0052552C int = 1
 jkMain_bInit 0x00552B80 int
 thing_six 0x00552B90 int
 thing_eight 0x00552B94 int
@@ -549,7 +549,7 @@ jkPlayer_playerShortName 0x08EC320 wchar_t[32]
 jkPlayer_numOtherThings 0x0085FF44 int
 jkPlayer_numThings 0x0085B560 int
 jkPlayer_otherThings 0x008592E0 jkPlayerInfo[16]
-jkPlayer_dword_525470 0x525470 int
+jkPlayer_dword_525470 0x00525470 int = 1
 bShowInvisibleThings 0x8EE640 int
 playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 int
@@ -569,7 +569,7 @@ jkPlayer_setNumCutscenes 0x0085FF40 int
 jkPlayer_setDiff 0x008EE670 int
 jkPlayer_waggleVec 0x00552BA0 rdVector3
 jkPlayer_waggleMag 0x00552BAC float
-jkPlayer_mpcInfoSet 0x552BB0 int
+jkPlayer_mpcInfoSet 0x00552BB0 int
 jkPlayer_waggleAngle 0x00552BB4 float
 jkSaber_rotateVec 0x00552BB8 rdVector3
 jkPlayer_name 0x008604C0 wchar_t[32]
@@ -583,12 +583,12 @@ sithUnk3_collisionHandlers 0x00847F38 sithUnk3Entry[144]
 sithUnk3_funcList 0x8485F8 void*[12]
 sithUnk3_searchStack 0x00848628 sithUnk3SearchResult[4]
 sithUnk3_searchNumResults 0x84DA28 int[4]
-sithUnk3_searchStackIdx 0x54BA90 int = -1
+sithUnk3_searchStackIdx 0x0054BA90 int = -1
 sithUnk3_stackSectors 0x0084D628 sithUnk3SectorEntry[4]
 sithUnk3_dword_8B4BE4 0x008B4BE4 int
 sithUnk3_collideHurtIdk 0x008B4BF0 rdVector3
 
-sithSector_surfaceNormal 0x0054C6E8 rdVector3
+sithSector_surfaceNormal 0x0054C6E8 rdVector3 = {0.0, 0.0, -1.0}
 sithSector_aEntries 0x00855028 sithSectorEntry[32]
 sithSector_allocPerSector 0x008553A8 sithSectorAlloc*
 sithSector_numEntries 0x008553AC int
@@ -611,7 +611,7 @@ sithSector_numSync 0x008554B8 int
 
 sithThing_paramKeyToParamValMap 0x008326A8 stdHashTable*
 sithThing_handler 0x008330FC sithThing_handler_t
-sithThing_inittedThings 0x00549358 uint16_t
+sithThing_inittedThings 0x00549358 uint16_t = 1
 
 jkGuiSaveLoad_wtextEpisode 0x00559528 wchar_t[256]
 jkGuiSaveLoad_wtextHealth 0x00559728 wchar_t[64]
@@ -630,8 +630,8 @@ jkGuiTitle_verRevision 0x00525034 int = 0
 jkGuiTitle_aTexts 0x005568E0 jkGuiStringEntry[20]
 jkGuiTitle_whichLoading 0x00556980 int
 
-jkGuiSound_sfxVolume 0x00547DD0 float
-jkGuiSound_numChannels 0x0054A680 int
+jkGuiSound_sfxVolume 0x00547DD0 float = 0.8
+jkGuiSound_numChannels 0x0054A680 int = 16
 jkGuiSound_bLowResSound 0x00563700 int
 jkGuiSound_b3DSound 0x00563704 int
 jkGuiSound_b3DSound_2 0x00563708 int
@@ -658,7 +658,6 @@ jkGuiNetHost_gameName 0x0086047C wchar_t[32]
 
 g_hInstance 0x00855DEC HINSTANCE
 g_cog_symbolTable 0x008B5428 sithCogSymboltable*
-wm_msg_main_handler 0x50ECB0 WNDPROC
 pSithHS 0x82F0A4 struct common_functions*
 g_hWnd 0x855DE0 HWND
 g_nShowCmd 0x855DE8 uint32_t
@@ -678,10 +677,10 @@ stdPalEffects_numEffectRequests 0x0055BE80 uint32_t
 stdPalEffects_aEffects 0x00866260 stdPalEffectRequest[32]
 
 aFilenameStack 0x0055D620 char[2560]
-apBufferStack 0x55E020 char*[20]
-linenumStack 0x55E070 int[20]
+apBufferStack 0x0055E020 char*[20]
+linenumStack 0x0055E070 int[20]
 aEntryStack 0x0055E0C0 char[0x5050]
-openFileStack 0x563110 int[20]
+openFileStack 0x00563110 int[20]
 printfBuffer 0x00563160 char[1024]
 stdConffile_linenum 0x00563560 int
 stdConffile_bOpen 0x00563564 int
