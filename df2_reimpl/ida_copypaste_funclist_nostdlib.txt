@@ -11,8 +11,8 @@ Video_camera_related	.text	00401CD0	000001EB	00000030	00000000	R	.	.	.	.	.	.	.
 jkGame_ForceRefresh	.text	00401EC0	00000014	00000000	00000000	R	.	.	.	.	.	T	.
 jkGame_Update	.text	00401EE0	0000034B	00000038	00000000	R	.	.	.	.	.	T	.
 jkGame_PrecalcViewSizes	.text	00402230	0000030C	00000010	0000000C	R	.	.	.	.	.	T	.
-jkGame_Screensize2	.text	00402540	0000002D			R	.	.	.	.	.	.	.
-jkGame_Screensize	.text	00402570	0000002D			R	.	.	.	.	.	.	.
+jkGame_ScreensizeIncrease	.text	00402540	0000002D			R	.	.	.	.	.	T	.
+jkGame_ScreensizeDecrease	.text	00402570	0000002D			R	.	.	.	.	.	T	.
 jkGame_Gamma	.text	004025A0	0000003D			R	.	.	.	.	.	.	.
 jkGame_Screenshot	.text	004025E0	000001E0	000000C8	00000000	R	.	.	.	.	.	.	.
 jkGame_ddraw_idk_palettes	.text	004027C0	00000050			R	.	.	.	.	.	.	.
@@ -127,29 +127,29 @@ jkPlayer_ReadOptionsConf	.text	004073C0	00000105	00000000	00000000	R	.	.	.	.	.	.
 jkPlayer_GetJediRank	.text	004074D0	0000000F			R	.	.	.	.	.	T	.
 jkPlayer_SetRank	.text	004074E0	00000013	00000004	00000004	R	.	.	.	.	.	T	.
 jkHud_Startup	.text	00407500	00000040			R	.	.	.	.	.	.	.
-jkHud_Shutdown	.text	00407540	00000017			R	.	.	.	.	.	.	.
-jkHud_InitRes	.text	00407560	0000041A	0000008C	00000000	R	.	.	.	.	.	.	.
-jkHud_Deinit	.text	00407980	00000096	00000008	00000000	R	.	.	.	.	.	.	.
-jkHud_render_idktexs	.text	00407A20	000001EA	0000001C	00000000	R	.	.	.	.	.	.	.
-jkHud_gui_render	.text	00407C10	0000109D	00000168	00000000	R	.	.	.	.	.	.	.
-jkHud_sub_408CC0	.text	00408CC0	000000B3	00000030	00000004	R	.	.	.	.	.	.	.
-jkHud_chat	.text	00408D80	000000C8	00000100	00000000	R	.	.	.	.	.	.	.
-jkHud_send_message	.text	00408E50	000001A1	00000104	00000001	R	.	.	.	.	.	.	.
+jkHud_Shutdown	.text	00407540	00000017			R	.	.	.	.	.	T	.
+jkHud_Open	.text	00407560	0000041A	0000008C	00000000	R	.	.	.	.	.	.	.
+jkHud_Close	.text	00407980	00000096	00000008	00000000	R	.	.	.	.	.	.	.
+jkHud_ClearRects	.text	00407A20	000001EA	0000001C	00000000	R	.	.	.	.	.	.	.
+jkHud_Draw	.text	00407C10	0000109D	00000168	00000000	R	.	.	.	.	.	.	.
+jkHud_GetWeaponAmmo	.text	00408CC0	000000B3	00000030	00000004	R	.	.	.	.	.	T	.
+jkHud_Chat	.text	00408D80	000000C8	00000100	00000000	R	.	.	.	.	.	.	.
+jkHud_SendChat	.text	00408E50	000001A1	00000104	00000001	R	.	.	.	.	.	.	.
 jkHud_chat2	.text	00409000	00000096	00000100	00000000	R	.	.	.	.	.	.	.
 jkHud_idk_time	.text	004090A0	0000002E			R	.	.	.	.	.	.	.
-jkHud_SetTargetColors	.text	004090D0	00000072	00000004	00000004	R	.	.	.	.	.	.	.
-jkHud_SetTarget	.text	00409150	00000018	00000000	00000004	R	.	.	.	.	.	.	.
+jkHud_SetTargetColors	.text	004090D0	00000072	00000004	00000004	R	.	.	.	.	.	T	.
+jkHud_SetTarget	.text	00409150	00000018	00000000	00000004	R	.	.	.	.	.	T	.
 jkHud_EndTarget	.text	00409170	0000000D	00000000	00000000	R	.	.	.	.	.	T	.
-jkHud_sortcallback1	.text	00409180	00000017	00000000	00000008	R	.	.	.	.	.	T	.
-jkHud_sortcallback2	.text	004091A0	00000011	00000000	00000008	R	.	.	.	.	.	T	.
-jkHud_Tally	.text	004091C0	0000006E			R	.	.	.	.	.	.	.
+jkHud_SortPlayerScore	.text	00409180	00000017	00000000	00000008	R	.	.	.	.	.	T	.
+jkHud_SortTeamScore	.text	004091A0	00000011	00000000	00000008	R	.	.	.	.	.	T	.
+jkHud_Tally	.text	004091C0	0000006E			R	.	.	.	.	.	T	.
 jkHudInv_ItemDatLoad	.text	00409230	0000016F	00000020	00000004	R	.	.	.	.	.	T	.
 jkHudInv_render_textmaybe	.text	004093A0	000000F2	00000018	00000000	R	.	.	.	.	.	.	.
 jkHudInv_render_itemsmaybe	.text	004094A0	000006EB	00000040	00000000	R	.	.	.	.	.	.	.
 jkHudInv_InputInit	.text	00409B90	00000071			R	.	.	.	.	.	T	.
 jkHudInv_items_init	.text	00409C10	000000A0	00000000	00000000	R	.	.	.	.	.	.	.
 jkHudInv_LoadItemRes	.text	00409CB0	00000312	000000B0	00000000	R	.	.	.	.	.	.	.
-jkHudInv_deinit_menu_graphics_maybe	.text	00409FD0	00000019			R	.	.	.	.	.	.	.
+jkHudInv_Close	.text	00409FD0	00000019			R	.	.	.	.	.	.	.
 jkHudInv_Initialize	.text	00409FF0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
 jkHudInv_Shutdown	.text	0040A010	000000A5	00000008	00000000	R	.	.	.	.	.	.	.
 jkCog_Initialize	.text	0040A0C0	00000010			R	.	.	.	.	.	.	.
@@ -905,8 +905,8 @@ stdColor_HSVtoRGB	.text	00433A50	0000015E	00000008	00000018	R	.	.	.	.	.	.	.
 stdColor_BuildRGB16LUT	.text	00433BD0	0000009F	00000020	0000000C	R	.	.	.	.	.	T	.
 stdColor_BuildRGBAKEY16LUT	.text	00433C70	000000C6	00000028	0000000C	R	.	.	.	.	.	.	.
 stdColor_BuildRGBA16LUT	.text	00433D40	000000CB	00000028	00000010	R	.	.	.	.	.	T	.
-stdColor_ColorConvertOneRow	.text	00433E10	000001C6	00000024	00000014	R	.	.	.	.	.	.	.
-stdColor_ColorConvertOnePixel	.text	00434040	00000023	00000000	0000000C	R	.	.	.	.	.	.	.
+stdColor_ColorConvertOneRow	.text	00433E10	000001C6	00000024	00000014	R	.	.	.	.	.	T	.
+stdColor_ColorConvertOnePixel	.text	00434040	00000023	00000000	0000000C	R	.	.	.	.	.	T	.
 stdColor_Indexed8ToRGB16	.text	00434070	00000063	00000004	0000000C	R	.	.	.	.	.	T	.
 stdFont_New	.text	004340E0	00000079	0000000C	00000014	R	.	.	.	.	.	T	.
 stdFont_Load	.text	00434160	00000319	00000054	0000000C	R	.	.	.	.	.	T	.
@@ -1234,7 +1234,7 @@ rdPrimit2_DrawCircle	.text	00446D10	0000014A	0000000C	0000001C	R	.	.	.	.	.	T	.
 rdPrimit2_DrawRectangle	.text	00446E60	00000079	00000010	0000001C	R	.	.	.	.	.	.	.
 rdPrimit2_DrawTriangle	.text	00446EE0	0000006E	00000010	00000024	R	.	.	.	.	.	.	.
 rdPrimit3_ClearFrameCounters	.text	00446F50	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-rdPrimit3_GetScreenCoord	.text	00446F60	00000086	00000018	00000008	R	.	.	.	.	.	.	.
+rdPrimit3_GetScreenCoord	.text	00446F60	00000086	00000018	00000008	R	.	.	.	.	.	T	.
 rdPrimit3_DrawPoint	.text	00446FF0	000000CE	00000018	0000000A	R	.	.	.	.	.	.	.
 rdPrimit3_DrawLine	.text	004470C0	00000119	00000030	00000020	R	.	.	.	.	.	.	.
 rdPrimit3_DrawCircle	.text	004471E0	000000C8	00000040	00000014	R	.	.	.	.	.	T	.
@@ -1897,7 +1897,7 @@ sithThing_TickPhysics	.text	004CC4C0	00000144	00000024	00000008	R	.	.	.	.	.	T	.
 sithThing_Remove	.text	004CC610	00000067	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_GetParent	.text	004CC6A0	0000002A	00000004	00000004	R	.	.	.	.	.	T	.
 sithThing_GetThingByIdx	.text	004CC6D0	0000003A	00000000	00000004	R	.	.	.	.	.	T	.
-sithThing_GetById	.text	004CC710	00000088	00000008	00000004	R	.	.	.	.	.	.	.
+sithThing_GetById	.text	004CC710	00000088	00000008	00000004	R	.	.	.	.	.	T	.
 sithThing_Destroy	.text	004CC7A0	00000023	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_Damage	.text	004CC7D0	000000E1	00000020	00000010	R	.	.	.	.	.	T	.
 sithThing_Create	.text	004CC8C0	00000150	0000000C	00000004	R	.	.	.	.	.	.	.
@@ -2089,28 +2089,28 @@ sithControl_HandlePlayer	.text	004D8520	000004DB	00000048	00000008	R	.	.	.	.	.	T
 sithControl_PlayerMovement	.text	004D8A00	0000028C	0000000C	00000004	R	.	.	.	.	.	T	.
 sithControl_FreeCam	.text	004D8C90	000002AF	00000040	00000004	R	.	.	.	.	.	T	.
 sithControl_PlayerLook	.text	004D8F40	00000232	00000014	00000008	R	.	.	.	.	.	T	.
-sithMapView_Initialize	.text	004D9180	0000002B	00000000	00000004	R	.	.	.	.	.	.	.
+sithMapView_Initialize	.text	004D9180	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithMapView_Shutdown	.text	004D91B0	00000017			R	.	.	.	.	.	.	.
-sithMapView_ToggleMapDrawn	.text	004D91D0	00000013			R	.	.	.	.	.	.	.
+sithMapView_ToggleMapDrawn	.text	004D91D0	00000013			R	.	.	.	.	.	T	.
 sithMapView_FuncIncrease	.text	004D91F0	00000064			R	.	.	.	.	.	.	.
 sithMapView_FuncDecrease	.text	004D9260	0000005A			R	.	.	.	.	.	.	.
 sithMapView_Render1	.text	004D92C0	0000023F	00000024	00000004	R	.	.	.	.	B	T	.
 sithMapView_Render2	.text	004D9500	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
 sithMapView_Render3	.text	004D9560	000006DE	00000068	00000004	R	.	.	.	.	B	T	.
 sithMapView_Render4	.text	004D9C40	0000016A	00000024	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	.	.
+DebugConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
 DebugConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
-DebugConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	.	.
+DebugConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
 DebugConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
 DebugConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
 DebugConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 DebugConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
 DebugConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	.	.
+DebugConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
 DebugConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	.	.
+DebugConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
 DebugConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	.	.
+DebugConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
 sithSave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
 sithSave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
 sithSave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.
@@ -2190,7 +2190,7 @@ sithCog_Load	.text	004DF110	000002FF	00000098	00000008	R	.	.	.	.	.	T	.
 sithCog_LoadEntry	.text	004DF410	000001CE	00000004	0000000C	R	.	.	.	.	.	T	.
 sithCog_ThingsSectorsRegSymbolIdk	.text	004DF610	000001B7	0000000C	0000000C	R	.	.	.	.	.	T	.
 sithCog_LoadCogscript	.text	004DF7D0	0000015C	00000090	00000004	R	.	.	.	.	.	T	.
-sithCog_GetByIdx	.text	004DF930	00000043	00000000	00000004	R	.	.	.	.	.	.	.
+sithCog_GetByIdx	.text	004DF930	00000043	00000000	00000004	R	.	.	.	.	.	T	.
 sithCog_ThingFromSymbolidk	.text	004DF980	00000072	00000008	00000010	R	.	.	.	.	.	T	.
 sithCog_Thingidk	.text	004DFA00	0000005D	00000004	00000010	R	.	.	.	.	.	.	.
 sithCog_Sectoridk	.text	004DFA60	0000005D	00000004	00000010	R	.	.	.	.	.	.	.
@@ -2348,7 +2348,7 @@ sithSoundClass_ThingPlaySoundclass	.text	004E6B70	0000009F	00000014	00000008	R	.
 sithSoundClass_ThingPlaySoundclass5	.text	004E6C10	0000008A	00000014	0000000C	R	.	.	.	.	.	T	.
 sithSoundClass_ThingPauseSoundclass	.text	004E6CA0	0000002C	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_ThingPlaySoundclass2	.text	004E6CD0	00000093	00000010	0000000C	R	.	.	.	.	.	T	.
-sithSoundClass_SetThingSoundClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	.	.
+sithSoundClass_SetThingSoundClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	T	.
 sithUnk3_Startup	.text	004E6D90	0000018C	00000004	00000000	R	.	.	.	.	.	.	.
 sithUnk3_Shutdown	.text	004E6F20	00000014			R	.	.	.	.	.	.	.
 sithUnk3_RegisterCollisionHandler	.text	004E6F40	0000005D	00000008	00000010	R	.	.	.	.	.	T	.
@@ -2433,7 +2433,7 @@ sithUnk4_thing_anim_blocked	.text	004ED3F0	0000036D	00000064	0000000C	R	.	.	.	.	
 sithActor_Remove	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	T	.
 sithCorpse_Remove	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_LoadActorPlayerParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
-sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	.	.
+sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
 sithDebugConsole_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdSession	.text	004EDF10	000000A7	00000000	00000000	R	.	.	.	.	.	.	.
 sithDebugConsole_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	00000008	R	.	.	.	.	.	T	.

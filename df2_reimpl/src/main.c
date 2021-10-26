@@ -14,6 +14,7 @@
 #include "General/stdMath.h"
 #include "Primitives/rdVector.h"
 #include "General/stdMemory.h"
+#include "General/stdColor.h"
 #include "General/stdConffile.h"
 #include "General/stdFont.h"
 #include "General/stdFnames.h"
@@ -134,6 +135,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkControl.h"
 #include "Main/jkEpisode.h"
+#include "Main/jkHud.h"
 #include "Main/Main.h"
 #include "stdPlatform.h"
 
@@ -258,6 +260,23 @@ void do_hooks()
     // jkEpisode
     hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
     
+    // jkHud
+    hook_function(jkHud_Startup_ADDR, jkHud_Startup);
+    hook_function(jkHud_Shutdown_ADDR, jkHud_Shutdown);
+    hook_function(jkHud_Open_ADDR, jkHud_Open);
+    hook_function(jkHud_Close_ADDR, jkHud_Close);
+    hook_function(jkHud_ClearRects_ADDR, jkHud_ClearRects);
+    hook_function(jkHud_Draw_ADDR, jkHud_Draw);
+    hook_function(jkHud_GetWeaponAmmo_ADDR, jkHud_GetWeaponAmmo);
+    hook_function(jkHud_Chat_ADDR, jkHud_Chat);
+    hook_function(jkHud_SendChat_ADDR, jkHud_SendChat);
+    hook_function(jkHud_SetTargetColors_ADDR, jkHud_SetTargetColors);
+    hook_function(jkHud_SetTarget_ADDR, jkHud_SetTarget);
+    hook_function(jkHud_EndTarget_ADDR, jkHud_EndTarget);
+    hook_function(jkHud_SortPlayerScore_ADDR, jkHud_SortPlayerScore);
+    hook_function(jkHud_SortTeamScore_ADDR, jkHud_SortTeamScore);
+    hook_function(jkHud_Tally_ADDR, jkHud_Tally);
+    
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
     hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
@@ -278,7 +297,7 @@ void do_hooks()
     hook_function(jkDev_Close_ADDR, jkDev_Close);
 
 #ifdef LINUX
-    hook_function(jkDev_PrintUniString_ADDR, jkDev_PrintUniString);
+    //hook_function(jkDev_PrintUniString_ADDR, jkDev_PrintUniString);
 #endif
     
     // sithCog
@@ -492,6 +511,9 @@ void do_hooks()
     hook_function(stdReadRaw_ADDR, stdReadRaw);
     hook_function(stdFGetc_ADDR, stdFGetc);
     hook_function(stdFPutc_ADDR, stdFPutc);
+    
+    // stdColor
+    hook_function(stdColor_Indexed8ToRGB16_ADDR, stdColor_Indexed8ToRGB16);
     
     // stdConffile
     hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);

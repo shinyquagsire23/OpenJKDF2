@@ -18,5 +18,8 @@ void jkDev_Close()
 #ifdef LINUX
 void jkDev_PrintUniString(wchar_t* str)
 {
+#ifndef LINUX_TMP
+    _jkDev_PrintUniString(str);
+#endif
 }
 #endif

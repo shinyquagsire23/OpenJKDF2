@@ -340,6 +340,7 @@ word_860802 0x860802 uint16_t
 word_860804 0x860804 uint16_t
 word_860806 0x860806 uint16_t
 
+stdControl_bDisableKeyboard 0x0055D5D0 int
 stdControl_bControlsIdle 0x0055D5D4 int
 
 Windows_installType 0x008606E0 int
@@ -363,6 +364,9 @@ Video_lastTimeMsec 0x005528AC int
 Video_dword_5528B0 0x005528B0 int
 Video_pVbufIdk 0x00552890 stdVBuffer*
 Video_pCanvas 0x00552894 rdCanvas*
+Video_aPalette 0x00860140 rdColor24[0x100]
+Video_format 0x008600E0 stdVBufferTexFmt
+Video_format2 0x0085FF60 stdVBufferTexFmt
 
 stdConsole_foregroundAttr 0x0055BB68 uint16_t
 stdConsole_wAttributes 0x0055BB6C uint16_t
@@ -425,9 +429,66 @@ jkEpisode_var5 0x00554158 char[128]
 jkEpisode_var2 0x005541D8 uint32_t
 jkEpisode_mLoad 0x00552B68 jkEpisodeLoad
 
-jkHud_bChatOpen 0x00553E94 int
+jkHud_targetRed 0x00525960 uint32_t = 1
+jkHud_targetBlue 0x00525964 uint32_t = 2
+jkHud_targetGreen 0x00525968 uint32_t = 3
+jkHud_aFltIdk 0x00525970 float[6] = {0.2, 0.40000001, 0.80000001, 1.0, 2.0, 0.0}
+jkHud_aColors8bpp 0x00525988 int[6] = {1,2,3,4,5,0}
+//jkHud_aFonts 0x005259A0 
+//jkHud_aBitmaps 0x005259E8 
+jkHud_aTeamColors8bpp 0x00525A48 int[5] = {0x0, 0x6, 0x69, 0x1F, 0x2}
+
+jkHud_chatStr 0x00552BD8 char[128]
+jkHud_aTeamColors16bpp 0x00552C58 int[5]
+jkHud_rightBlitX 0x00552C6C uint32_t
+jkHud_leftBlitX 0x00552C70 uint32_t
+jkHud_mapRendConfig 0x00552C78 sithMapViewConfig
+jkHud_chatStrPos 0x00552CB8 int
+jkHud_rightBlitY 0x00552CBC int
+jkHud_aTeamScores 0x00552CC0 jkHudTeamScore[5]
+jkHud_dword_552D10 0x00552D10 int
+jkHud_aColors16bpp 0x00552D18 int[6]
+jkHud_aPlayerScores 0x00552D30 jkHudPlayerScore[32]
+jkHud_idk7 0x00553E30 int
+jkHud_idk14 0x00553E34 int
+jkHud_idk8 0x00553E38 int
+jkHud_idk9 0x00553E3C int
+jkHud_idk10 0x00553E40 int
+jkHud_idk11 0x00553E44 int
+jkHud_isSuper 0x00553E48 int
+jkHud_idk15 0x00553E4C int
+jkHud_idk12 0x00553E50 int
+jkHud_idk16 0x00553E54 int
+jkHud_leftBlitY 0x00553E58 int
+jkHud_rectViewScores 0x00553E60 rdRect
+jkHud_pMsgFontSft 0x00553E70 stdFont*
+jkHud_pStatusLeftBm 0x00553E74 stdBitmap*
+jkHud_pStatusRightBm 0x00553E78 stdBitmap*
 jkHud_bHasTarget 0x00553E7C int
-jkHud_target 0x00553E80 int
+jkHud_pTargetThing 0x00553E80 sithThing*
+jkHud_targetRed16 0x00553E88 uint32_t
+jkHud_targetGreen16 0x00553E8C uint32_t
+jkHud_targetBlue16 0x00553E90 uint32_t
+jkHud_bChatOpen 0x00553E94 int
+jkHud_pHelthNumSft 0x00553E98 stdFont*
+jkHud_pAmoNumsSft 0x00553E9C stdFont*
+jkHud_pAmoNumsSuperSft 0x00553EA0 stdFont*
+jkHud_pArmorNumSft 0x00553EA4 stdFont*
+jkHud_pArmorNumsSuperSft 0x00553EA8 stdFont*
+jkHud_bInitted 0x00553EAC int
+jkHud_bOpened 0x00553EB0 int
+jkHud_pFieldlightBm 0x00553EB4 stdBitmap*
+jkHud_pStBatBm 0x00553EB8 stdBitmap*
+jkHud_pStHealthBm 0x00553EBC stdBitmap*
+jkHud_pStShieldBm 0x00553EC0 stdBitmap*
+jkHud_pStFrcBm 0x00553EC4 stdBitmap*
+jkHud_pStFrcSuperBm 0x00553EC8 stdBitmap*
+jkHud_bViewScores 0x00553ECC int
+jkHud_dword_553ED0 0x00553ED0 int
+jkHud_tallyWhich 0x00553ED4 int
+jkHud_numPlayers 0x00553ED8 uint32_t
+jkHud_dword_553EDC 0x00553EDC int
+jkHud_dword_553EE0 0x00553EE0 int
 
 jkHudInv_idkItems 0x00553F28 rdTexformat
 jkHudInv_numItems 0x00553F98 int

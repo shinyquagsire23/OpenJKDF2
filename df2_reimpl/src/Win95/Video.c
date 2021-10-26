@@ -37,8 +37,8 @@ void Video_SwitchToGDI()
 {
     jkDev_Close();
 #ifndef LINUX_TMP
-    jkHud_Deinit();
-    jkHudInv_deinit_menu_graphics_maybe();
+    jkHud_Close();
+    jkHudInv_Close();
 #endif
     sithCamera_Close();
 
@@ -69,9 +69,7 @@ int Video_Startup()
     if (stdDisplay_Startup())
     {
         stdDisplay_SetGammaTable(10, aGammaTable);
-#ifndef LINUX_TMP
         jkHud_Startup();
-#endif
         Video_pOtherBuf = &Video_otherBuf;
         Video_pMenuBuffer = &Video_menuBuffer;
 #ifndef LINUX_TMP

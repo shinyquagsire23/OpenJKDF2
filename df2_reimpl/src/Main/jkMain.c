@@ -559,7 +559,7 @@ void jkMain_TitleShow()
 {
     jkGuiTitle_ShowLoadingStatic();
     sith_Load("static.jkl");
-    jkHudInv_items_init();
+    jkHudInv_InitItems();
 }
 
 void jkMain_TitleTick()
@@ -974,7 +974,13 @@ void jkMain_FixRes()
 {
     if (!jkGame_isDDraw)
         return;
-        
+    
+    Video_modeStruct.viewSizeIdx = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMin = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax = Window_xSize / 2;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax = Window_ySize / 2;
+    
     stdDisplay_pCurVideoMode->format.width = Window_xSize;
     stdDisplay_pCurVideoMode->format.height = Window_ySize;
     
@@ -989,19 +995,19 @@ void jkMain_FixRes()
     Video_menuBuffer.format.height = Window_ySize;
     Video_otherBuf.format.height = Window_ySize;
     
-    _memcpy((void*)0x8600E0, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
-    _memcpy((void*)0x85FF60, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     
     jkDev_Close();
 #ifndef LINUX_TMP
-    jkHud_Deinit();
-    jkHudInv_deinit_menu_graphics_maybe();
+    jkHud_Close();
+    jkHudInv_Close();
 #endif
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
     
     jkHudInv_LoadItemRes();
-    jkHud_InitRes();
+    jkHud_Open();
     jkDev_Open();
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, Window_xSize, Window_ySize, 6);
@@ -1033,6 +1039,12 @@ int jkMain_SetVideoMode()
     sithControl_Open();
     sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
 #ifndef LINUX_TMP
+    Video_modeStruct.viewSizeIdx = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax = 0;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax = Window_xSize / 2;
+    Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax = Window_ySize / 2;
+
     stdDisplay_pCurVideoMode->format.width = Window_xSize;
     stdDisplay_pCurVideoMode->format.height = Window_ySize;
     
@@ -1047,12 +1059,12 @@ int jkMain_SetVideoMode()
     Video_menuBuffer.format.height = Window_ySize;
     Video_otherBuf.format.height = Window_ySize;
     
-    _memcpy((void*)0x8600E0, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
-    _memcpy((void*)0x85FF60, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     stdPalEffects_RefreshPalette();
     sithRender_SetPalette(stdDisplay_GetPalette());
     jkHudInv_LoadItemRes();
-    jkHud_InitRes();
+    jkHud_Open();
     jkDev_Open();
 #endif
     

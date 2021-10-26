@@ -14,7 +14,7 @@
 #define sithMapView_Render3_ADDR (0x004D9560)
 #define sithMapView_Render4_ADDR (0x004D9C40)
 
-int sithMapView_Initialize(const void *a1);
+int sithMapView_Initialize(const sithMapViewConfig *config);
 int sithMapView_Shutdown();
 void sithMapView_ToggleMapDrawn();
 void sithMapView_FuncIncrease();
@@ -22,6 +22,7 @@ void sithMapView_FuncDecrease();
 
 int sithMapView_Render4(sithSurface *a1, int a2, int a3);
 
+static int (*sithMapView_Render1)(rdCanvas* canvas) = (void*)sithMapView_Render1_ADDR;
 //static int (*sithMapView_ToggleMapDrawn)() = (void*)sithMapView_ToggleMapDrawn_ADDR;
 //static void (*sithMapView_FuncIncrease)() = (void*)sithMapView_FuncIncrease_ADDR;
 //static void (*sithMapView_FuncDecrease)() = (void*)sithMapView_FuncDecrease_ADDR;

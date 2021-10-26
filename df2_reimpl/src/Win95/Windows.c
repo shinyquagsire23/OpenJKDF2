@@ -149,7 +149,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
         case 0x102u:
             if ( jkHud_bChatOpen )
             {
-                jkHud_send_message(wParam);
+                jkHud_SendChat(wParam);
                 v5 = 1;
                 *a5 = 1;
             }

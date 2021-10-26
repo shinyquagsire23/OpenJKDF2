@@ -5,12 +5,12 @@
 #include "Engine/sithAdjoin.h"
 #include "jk.h"
 
-int sithMapView_Initialize(const void *a1)
+int sithMapView_Initialize(const sithMapViewConfig *config)
 {
     if (sithMapView_bInitted)
         return 0;
 
-    _memcpy(&sithMapView_inst, a1, 0x40u);
+    _memcpy(&sithMapView_inst.config, config, sizeof(sithMapViewConfig));
     sithMapView_bInitted = 1;
     return 1;
 }

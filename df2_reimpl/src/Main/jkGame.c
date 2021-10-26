@@ -86,7 +86,7 @@ int jkGame_Update()
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
     jkDev_DrawLog();
     jkHudInv_render_textmaybe();
-    jkHud_render_idktexs(0);
+    jkHud_ClearRects(0);
     v1 = stdDisplay_GetPalette();
     stdPalEffects_UpdatePalette(v1);
     if ( Video_modeStruct.b3DAccel )
@@ -158,7 +158,7 @@ int jkGame_Update()
         }
     }*/
     if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
-        jkHud_gui_render();
+        jkHud_Draw();
     jkDev_sub_41F950();
     jkHudInv_render_itemsmaybe();
     if ( Video_modeStruct.b3DAccel )
@@ -190,7 +190,7 @@ int jkGame_Update()
 #ifndef LINUX_TMP
     jkDev_DrawLog();
     jkHudInv_render_textmaybe();
-    jkHud_render_idktexs(0);
+    jkHud_ClearRects(0);
 #endif
     // HACK
     rdroid_curColorEffects.fade = 1.0;
@@ -270,7 +270,7 @@ int jkGame_Update()
     }*/
 #ifndef LINUX_TMP
     if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
-        jkHud_gui_render();
+        jkHud_Draw();
     jkDev_sub_41F950();
     jkHudInv_render_itemsmaybe();
     //if ( Video_modeStruct.b3DAccel )

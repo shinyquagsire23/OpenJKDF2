@@ -1094,21 +1094,25 @@ typedef struct sithSave_Header
     wchar_t saveName[256];
 } sithSave_Header;
 
-typedef struct sithMapView
+typedef struct sithMapViewConfig
 {
     int numArr;
     float *unkArr;
-    int *anonymous_2;
-    int anonymous_3;
-    int anonymous_4;
-    int anonymous_5;
-    int anonymous_6;
-    int anonymous_7;
-    int anonymous_8;
-    int anonymous_9;
-    int anonymous_10;
-    int anonymous_11;
-    char anonymous_12[16];
+    int *paColors;
+    int playerColor;
+    int playerLineColor;
+    int actorColor;
+    int actorLineColor;
+    int itemColor;
+    int weaponColor;
+    int otherColor;
+    int bRotateOverlayMap;
+    int aTeamColors[5];
+} sithMapViewConfig;
+
+typedef struct sithMapView
+{
+    sithMapViewConfig config;
     sithWorld *world;
 } sithMapView;
 
@@ -2477,5 +2481,44 @@ typedef struct sith_cog_parser_node
     int value;
     rdVector3 vector;
 } sith_cog_parser_node;
+
+// jkHud
+
+typedef struct jkHudBitmap
+{
+    stdBitmap **pBitmap;
+    char *path8bpp;
+    char *path16bpp;
+} jkHudBitmap;
+
+typedef struct jkHudFont
+{
+    stdFont **pFont;
+    char *path8bpp;
+    char *path16bpp;
+} jkHudFont;
+
+typedef struct jkHudTeamScore
+{
+    int field_0;
+    int score;
+    int field_8;
+    int field_C;
+} jkHudTeamScore;
+
+typedef struct jkHudPlayerScore
+{
+    wchar_t playerName[32];
+    wchar_t modelName[32];
+    int score;
+    int teamNum;
+} jkHudPlayerScore;
+
+typedef struct rdScreenPoint
+{
+    uint32_t x;
+    uint32_t y;
+    float z;
+} rdScreenPoint;
 
 #endif // TYPES_H

@@ -142,6 +142,9 @@ for line in funclist:
     #if not found_func_subsys:
         #print (filefrom, subsys_ident)
     
+    #if "cogMsg" in funcname and funcname not in decompiled_funcs:
+    #    print (funcname)
+    
     if funcname not in decompiled_funcs:
         total_notdecomp_bySubsys[subsys_ident] += size
         total_notdecomp_funcs_bySubsys[subsys_ident] += 1
@@ -161,7 +164,7 @@ for line in funclist:
 
     total_numFuncs += 1
     
-    if "Raster" in filefrom:
+    if subsys_ident == "Raster":
         total_raster += size
     else:
         total_numFuncsNoRaster += 1

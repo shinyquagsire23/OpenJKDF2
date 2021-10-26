@@ -1381,8 +1381,10 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
             ++v11;
         }
         while ( v10 < v9 );
-        if ( a4a >= 0 )
+        if ( a4a >= 0 ) {
             rdMatrix_LookAt(out, fireOffset, &thingList[a4a]->position, 0.0);
+            //jkHud_SetTarget(thingList[a4a]);
+        }
     }
 }
 

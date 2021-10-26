@@ -26,6 +26,7 @@ build_run_dw.sh
 build_run_df2.sh
 build_run_openjkdf2.sh
 build_run_openjkdf2_64.sh
+build_run_openjkdf2_blobs.sh
 build_run_tpm.sh
 build_run_mots.sh
 *.txt
@@ -57,3 +58,4 @@ df2_reimpl/src/globals.h
 df2_reimpl/symbols-tmp.syms
 df2_reimpl/symbols.ld
 df2_reimpl/symbols.ld.cog
+df2_reimpl/Makefile.wasm

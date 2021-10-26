@@ -12,7 +12,7 @@ int jkHudInv_Initialize()
     return 1;
 }
 
-int jkHudInv_items_init()
+int jkHudInv_InitItems()
 {
     int v1; // ecx
     sithItemDescriptor *v2; // eax

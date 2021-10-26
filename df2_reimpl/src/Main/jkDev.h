@@ -52,9 +52,14 @@ static int (*jkDev_sub_41F950)() = (void*)jkDev_sub_41F950_ADDR;
 static int (*jkDev_DrawLog)() = (void*)jkDev_DrawLog_ADDR;
 static void (*jkDev_Open)() = (void*)jkDev_Open_ADDR;
 static void (*jkDev_Shutdown)() = (void*)jkDev_Shutdown_ADDR;
+static int (*jkDev_sub_41FC90)(int a1) = (void*)jkDev_sub_41FC90_ADDR;
+static int (*jkDev_sub_41FB80)(int a1, const wchar_t *a2) = (void*)jkDev_sub_41FB80_ADDR;
+static int (*jkDev_DebugLog)(char *lParam) = (void*)jkDev_DebugLog_ADDR;
+static int (*jkDev_TryCommand)(char *cmd) = (void*)jkDev_TryCommand_ADDR;
 
 #ifdef LINUX
 void jkDev_PrintUniString(wchar_t* str);
+static int (*_jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
 #else
 static int (*jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
 #endif

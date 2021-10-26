@@ -8,20 +8,21 @@
 #define jkHudInv_render_textmaybe_ADDR (0x004093A0)
 #define jkHudInv_render_itemsmaybe_ADDR (0x004094A0)
 #define jkHudInv_InputInit_ADDR (0x00409B90)
-#define jkHudInv_items_init_ADDR (0x00409C10)
+#define jkHudInv_InitItems_ADDR (0x00409C10)
 #define jkHudInv_LoadItemRes_ADDR (0x00409CB0)
-#define jkHudInv_deinit_menu_graphics_maybe_ADDR (0x00409FD0)
+#define jkHudInv_Close_ADDR (0x00409FD0)
 #define jkHudInv_Initialize_ADDR (0x00409FF0)
 #define jkHudInv_Shutdown_ADDR (0x0040A010)
 
 int jkHudInv_Initialize();
-int jkHudInv_items_init();
+int jkHudInv_InitItems();
 int jkHudInv_ItemDatLoad(char *fpath);
 
+static void (*jkHudInv_InputInit)() = (void*)jkHudInv_InputInit_ADDR;
 static int (*jkHudInv_render_itemsmaybe)() = (void*)jkHudInv_render_itemsmaybe_ADDR;
 static int (*jkHudInv_render_textmaybe)() = (void*)jkHudInv_render_textmaybe_ADDR;
-static void (*jkHudInv_deinit_menu_graphics_maybe)() = (void*)jkHudInv_deinit_menu_graphics_maybe_ADDR;
-//static int (*jkHudInv_items_init)() = (void*)jkHudInv_items_init_ADDR;
+static void (*jkHudInv_Close)() = (void*)jkHudInv_Close_ADDR;
+//static int (*jkHudInv_InitItems)() = (void*)jkHudInv_InitItems_ADDR;
 //static int (*jkHudInv_ItemDatLoad)(char*) = (void*)jkHudInv_ItemDatLoad_ADDR;
 static void (*jkHudInv_LoadItemRes)() = (void*)jkHudInv_LoadItemRes_ADDR;
 static void (*jkHudInv_Shutdown)() = (void*)jkHudInv_Shutdown_ADDR;
