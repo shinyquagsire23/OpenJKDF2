@@ -219,3 +219,42 @@ LABEL_17:
     }
     return 1;
 }
+
+void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
+{
+    rdTexformat *formatFrom_; // eax
+    int v4; // esi
+    stdVBuffer *v5; // eax
+    rdTexformat *formatFrom; // [esp+18h] [ebp+8h]
+
+    formatFrom_ = &bitmap->format;
+    formatFrom = &bitmap->format;
+    if ( _memcmp(formatTo, formatFrom, sizeof(rdTexformat)) && (formatFrom_->is16bit || formatTo->is16bit) )
+    {
+        v4 = 0;
+        if ( bitmap->numMips > 0 )
+        {
+            do
+            {
+                v5 = stdDisplay_VBufferConvertColorFormat(formatTo, bitmap->mipSurfaces[v4]);
+                bitmap->mipSurfaces[v4] = v5;
+                if ( !v5 )
+                    ((void (__cdecl *)(const char *, const char *, int))std_pHS->assert)(
+                        "Unable to allocate a new frame when converting image from 24 to 16bpp.",
+                        ".\\General\\stdBitmap.c",
+                        570);
+                if ( (bitmap->palFmt & 1) != 0 )
+                    stdDisplay_VBufferSetColorKey(bitmap->mipSurfaces[v4], bitmap->mipSurfaces[v4]->transparent_color);
+                ++v4;
+            }
+            while ( v4 < bitmap->numMips );
+            formatFrom_ = formatFrom;
+        }
+        if ( (bitmap->palFmt & 1) != 0 )
+        {
+            bitmap->colorkey = stdColor_ColorConvertOnePixel(formatTo, bitmap->colorkey, formatFrom_);
+            formatFrom_ = formatFrom;
+        }
+        _memcpy(formatFrom_, formatTo, sizeof(rdTexformat));
+    }
+}

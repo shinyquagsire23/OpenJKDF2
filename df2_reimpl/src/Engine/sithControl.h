@@ -126,6 +126,8 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 void sithControl_PlayerMovement(sithThing *player);
 void sithControl_FreeCam(sithThing *player);
 
+
+static void (*sithControl_MapFunc)(int funcIdx, int a2, int a3) = (void*)sithControl_MapFunc_ADDR;
 //static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;

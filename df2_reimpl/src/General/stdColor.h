@@ -17,5 +17,9 @@
 #define stdColor_Indexed8ToRGB16_ADDR (0x00434070)
 
 int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexformat *fmt);
+uint32_t stdColor_ColorConvertOnePixel(rdTexformat *formatTo, int color, rdTexformat *formatFrom);
+int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8_t *inPixels, rdTexformat *formatFrom, int numPixels);
+
+//static int (*stdColor_ColorConvertOneRow)(uint8_t *outPixels, rdTexformat *formatTo, uint8_t *inPixels, rdTexformat *formatFrom, int numPixels) = (void*)stdColor_ColorConvertOneRow_ADDR;
 
 #endif // _STDCOLOR_H

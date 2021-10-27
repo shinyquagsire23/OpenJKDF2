@@ -1034,3 +1034,106 @@ void stdFont_Free(stdFont *font)
         while ( v2 );
     }
 }
+
+uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe)
+{
+    unsigned int v8; // ebp
+    unsigned int v9; // esi
+    stdVBuffer *v10; // eax
+    char v11; // al
+    int v12; // ecx
+    int v14; // eax
+    uint16_t v15; // cx
+    stdFontCharset *v16; // eax
+    signed int v17; // ecx
+    int v19; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *v21; // [esp+2Ch] [ebp+8h]
+
+    v8 = blit_x;
+    v9 = blit_x;
+    v19 = 0;
+    v10 = *a2->bitmap->mipSurfaces;
+    a5a.y = 0;
+    v21 = v10;
+    a5a.height = v10->format.height;
+    if ( x_max >= (int)(a1->format.width - blit_x) )
+        x_max = a1->format.width - blit_x;
+    v11 = *str;
+    if ( *str )
+    {
+        while ( 1 )
+        {
+            if ( v19 )
+                return v9 - v8;
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * a2->marginX >= 16 )
+                    v12 = 8 * a2->marginX;
+                v9 = v8 + v12 * ((int)(v9 + v12 - v8) / v12);
+                goto LABEL_30;
+            }
+            if ( __isspace(v11) )
+                break;
+            v15 = *str;
+            v16 = &a2->charsetHead;
+            if ( a2 != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v15 >= v16->charFirst && v15 <= v16->charLast )
+                        break;
+                    v16 = v16->previous;
+                }
+                while ( v16 );
+                if ( v16 )
+                    goto LABEL_25;
+            }
+            v15 = a2->field_28;
+            v16 = &a2->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( a2 == (stdFont *)-48 )
+                goto LABEL_24;
+            do
+            {
+                if ( v15 >= v16->charFirst && v15 <= v16->charLast )
+                    break;
+                v16 = v16->previous;
+            }
+            while ( v16 );
+            if ( v16 )
+            {
+LABEL_25:
+                v8 = blit_x;
+                a5a.x = v16->pEntries[v15 - v16->charFirst].field_0;
+                v17 = v16->pEntries[v15 - v16->charFirst].field_4;
+                a5a.width = v17;
+            }
+            else
+            {
+LABEL_24:
+                v17 = 0;
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+            if ( (int)(v9 + v17) < (int)(v8 + x_max) )
+            {
+                stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
+                v14 = a5a.width + a2->marginY;
+                goto LABEL_29;
+            }
+            v19 = 1;
+LABEL_30:
+            v11 = *++str;
+            if ( !*str )
+                return v9 - v8;
+        }
+        v14 = a2->marginX;
+LABEL_29:
+        v9 += v14;
+        goto LABEL_30;
+    }
+    return v9 - v8;
+}

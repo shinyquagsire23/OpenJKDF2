@@ -32,6 +32,7 @@ int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);
 void stdPalEffects_FlushAllEffects();
 stdPalEffect* stdPalEffects_GetEffectPointer(int idx);
+int stdPalEffects_RefreshPalette();
 void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState);
 
 static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
@@ -43,6 +44,6 @@ static void (*stdPalEffects_SetFade)(int a1, float a2) = (void*)stdPalEffects_Se
 //static void (*stdPalEffects_FreeRequest)(int a1) = (void*)stdPalEffects_FreeRequest_ADDR;
 static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
 static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
-static void (*stdPalEffects_RefreshPalette)() = (void*)stdPalEffects_RefreshPalette_ADDR;
+//static void (*stdPalEffects_RefreshPalette)() = (void*)stdPalEffects_RefreshPalette_ADDR;
 
 #endif // _STDPALEFFECTS_H

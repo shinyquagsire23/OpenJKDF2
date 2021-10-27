@@ -490,7 +490,15 @@ jkHud_numPlayers 0x00553ED8 uint32_t
 jkHud_dword_553EDC 0x00553EDC int
 jkHud_dword_553EE0 0x00553EE0 int
 
-jkHudInv_idkItems 0x00553F28 rdTexformat
+jkHudInv_info 0x00553EE8 jkHudInvInfo
+jkHudInv_itemTexfmt 0x00553F28 rdTexformat
+jkHudInv_flags 0x00553F60 int
+jkHudInv_dword_553F64 0x00553F64 int
+jkHudInv_scroll 0x00553F68 jkHudInvScroll
+jkHudInv_aBitmaps 0x00553F80 stdBitmap*[3]
+jkHudInv_font 0x00553F8C stdFont*
+jkHudInv_rend_isshowing_maybe 0x00553F90 int
+jkHudInv_dword_553F94 0x00553F94 int
 jkHudInv_numItems 0x00553F98 int
 jkHudInv_aItems 0x00553F9C int*
 

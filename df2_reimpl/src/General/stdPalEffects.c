@@ -47,6 +47,16 @@ stdPalEffect* stdPalEffects_GetEffectPointer(int idx)
     return &stdPalEffects_aEffects[idx].effect;
 }
 
+int stdPalEffects_RefreshPalette()
+{
+    stdPalEffects_state.field_3C = 1;
+    stdPalEffects_state.field_40 = 1;
+    stdPalEffects_state.field_48 = 1;
+    stdPalEffects_state.field_44 = 1;
+    stdPalEffects_state.bEnabled = 1;
+    return 1;
+}
+
 void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState)
 {
     _memset(effectsState, 0, sizeof(stdPalEffectsState));

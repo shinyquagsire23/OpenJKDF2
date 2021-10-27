@@ -85,8 +85,10 @@ int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4);
 int stdFont_sub_435810(stdFont *a1, wchar_t *a2, int a3);
 int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, wchar_t *a7, int a8);
 void stdFont_Free(stdFont *font);
+uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe);
 
-static int (*stdFont_DrawAscii)(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe) = (void*)stdFont_DrawAscii_ADDR;
+
+//static int (*stdFont_DrawAscii)(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe) = (void*)stdFont_DrawAscii_ADDR;
 
 //static int (*stdFont_Draw4)(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, WCHAR *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;
 //static void (*stdFont_Free)(stdFont *font) = (void*)stdFont_Free_ADDR;

@@ -6,3 +6,8 @@ void sithWorld_CalcFaceNormals(){} // editor leftover
 void sithWorld_TimeSectionParse(){} // inlined?
 void sithSoundClass_allocidk(){} // inlined?
 void sithSoundClass_Free(){} // weird unused hashtable?
+void sithCamera_New(){}
+void sithCamera_FreeEntry(){}
+void sithCamera_Free(){}
+void sithCamera_SetCanvas(){}
+void sithCamera_IdkChecksDword4(){}

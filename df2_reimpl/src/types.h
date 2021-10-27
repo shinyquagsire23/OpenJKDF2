@@ -2521,4 +2521,29 @@ typedef struct rdScreenPoint
     float z;
 } rdScreenPoint;
 
+typedef struct jkHudInvInfo
+{
+  uint32_t field_0;
+  int field_4;
+  int field_8[2];
+  int field_10[2];
+  int field_18;
+  int field_1C;
+  int rend_timeout_5secs;
+  int field_24;
+  int field_28;
+  rdRect drawRect;
+  int field_3C;
+} jkHudInvInfo;
+
+typedef struct jkHudInvScroll
+{
+    uint32_t blitX;
+    int scroll;
+    int maxItemRend;
+    int field_C;
+    int field_10;
+    int rendIdx;
+} jkHudInvScroll;
+
 #endif // TYPES_H

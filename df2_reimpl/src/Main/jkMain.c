@@ -999,16 +999,16 @@ void jkMain_FixRes()
     _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     
     jkDev_Close();
-#ifndef LINUX_TMP
     jkHud_Close();
     jkHudInv_Close();
-#endif
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
-    
+
     jkHudInv_LoadItemRes();
     jkHud_Open();
+#ifndef LINUX_TMP
     jkDev_Open();
+#endif
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, Window_xSize, Window_ySize, 6);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
@@ -1038,7 +1038,7 @@ int jkMain_SetVideoMode()
     
     sithControl_Open();
     sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
-#ifndef LINUX_TMP
+
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax = 0;
@@ -1063,8 +1063,10 @@ int jkMain_SetVideoMode()
     _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     stdPalEffects_RefreshPalette();
     sithRender_SetPalette(stdDisplay_GetPalette());
+
     jkHudInv_LoadItemRes();
     jkHud_Open();
+#ifndef LINUX_TMP
     jkDev_Open();
 #endif
     

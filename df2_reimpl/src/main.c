@@ -136,6 +136,7 @@
 #include "Main/jkControl.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkHud.h"
+#include "Main/jkHudInv.h"
 #include "Main/Main.h"
 #include "stdPlatform.h"
 
@@ -277,6 +278,17 @@ void do_hooks()
     hook_function(jkHud_SortTeamScore_ADDR, jkHud_SortTeamScore);
     hook_function(jkHud_Tally_ADDR, jkHud_Tally);
     
+    // jkHudInv
+    hook_function(jkHudInv_ItemDatLoad_ADDR, jkHudInv_ItemDatLoad);
+    hook_function(jkHudInv_ClearRects_ADDR, jkHudInv_ClearRects);
+    hook_function(jkHudInv_Draw_ADDR, jkHudInv_Draw);
+    hook_function(jkHudInv_InputInit_ADDR, jkHudInv_InputInit);
+    hook_function(jkHudInv_InitItems_ADDR, jkHudInv_InitItems);
+    hook_function(jkHudInv_LoadItemRes_ADDR, jkHudInv_LoadItemRes);
+    hook_function(jkHudInv_Close_ADDR, jkHudInv_Close);
+    hook_function(jkHudInv_Initialize_ADDR, jkHudInv_Initialize);
+    hook_function(jkHudInv_Shutdown_ADDR, jkHudInv_Shutdown);
+    
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
     hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
@@ -369,6 +381,7 @@ void do_hooks()
     hook_function(stdBitmap_LoadFromFile_ADDR, stdBitmap_LoadFromFile);
     hook_function(stdBitmap_LoadEntry_ADDR, stdBitmap_LoadEntry);
     //hook_function(stdBitmap_LoadEntryFromFile_ADDR, stdBitmap_LoadEntryFromFile);
+    hook_function(stdBitmap_ConvertColorFormat_ADDR, stdBitmap_ConvertColorFormat);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);
@@ -514,6 +527,8 @@ void do_hooks()
     
     // stdColor
     hook_function(stdColor_Indexed8ToRGB16_ADDR, stdColor_Indexed8ToRGB16);
+    hook_function(stdColor_ColorConvertOnePixel_ADDR, stdColor_ColorConvertOnePixel);
+    hook_function(stdColor_ColorConvertOneRow_ADDR, stdColor_ColorConvertOneRow);
     
     // stdConffile
     hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
@@ -539,6 +554,7 @@ void do_hooks()
     hook_function(stdFont_sub_435810_ADDR, stdFont_sub_435810);
     hook_function(stdFont_sub_434EC0_ADDR, stdFont_sub_434EC0);
     hook_function(stdFont_Free_ADDR, stdFont_Free);
+    hook_function(stdFont_DrawAscii_ADDR, stdFont_DrawAscii);
     
     // stdFnames
     hook_function(stdFnames_FindMedName_ADDR, stdFnames_FindMedName);

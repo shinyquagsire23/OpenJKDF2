@@ -402,7 +402,9 @@ void jkHud_Draw()
     v4 = sithWorld_pCurWorld->playerThing;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
+#ifndef LINUX_TMP
     sithMapView_Render1(Video_pCanvas);
+#endif
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
