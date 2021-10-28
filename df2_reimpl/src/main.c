@@ -1130,6 +1130,7 @@ void do_hooks()
     hook_function(sithSector_sub_4F2F60_ADDR, sithSector_sub_4F2F60);
     hook_function(sithSector_AddEntry_ADDR, sithSector_AddEntry);
     hook_function(sithSector_ThingGetInsertOffsetZ_ADDR, sithSector_ThingGetInsertOffsetZ);
+    hook_function(sithSector_cogMsg_SendSyncThingFull_ADDR, sithSector_cogMsg_SendSyncThingFull);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);

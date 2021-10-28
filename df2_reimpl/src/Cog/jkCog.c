@@ -483,10 +483,6 @@ void jkCog_PrintUniString(sithCog *ctx)
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopInt(ctx);
 
-#ifdef LINUX_TMP
-    return;
-#endif
-
     v3 = v2;
     if ( v2 >= 0 )
         v3 = sithPlayer_GetNumidk(v2);

@@ -2112,7 +2112,7 @@ typedef struct sithThingWeaponParams
 {
     uint32_t typeflags;
     uint32_t damageClass;
-    uint32_t unk8;
+    float unk8;
     float damage;
     sithThing* explodeTemplate;
     sithThing* fleshHitTemplate;

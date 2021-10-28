@@ -206,7 +206,7 @@ sithSave_funcRead 0x0083590C sithSaveHandler_t
 sithSave_autosave_fname 0x008BBC80 char[128]
 sithSave_dword_835900 0x00835900 int
 sithSave_dword_835914 0x00835914 int
-sithSave_fpath 0x00835F48 char[128]
+sithSave_fpath 0x00835F48 char[132]
 sithSave_wsaveName 0x008BBD00 wchar_t[256]
 sithSave_saveName 0x008BBF00 char[128]
 sithSave_headerTmp 0x00835918 sithSave_Header

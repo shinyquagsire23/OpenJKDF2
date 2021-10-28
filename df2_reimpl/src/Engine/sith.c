@@ -288,8 +288,8 @@ int sith_Tick()
         DebugConsole_AdvanceLogBuf();
 #ifndef LINUX_TMP
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
-        sithSave_WriteEntry();
 #endif
+        sithSave_WriteEntry();
         return 0;
     }
 }

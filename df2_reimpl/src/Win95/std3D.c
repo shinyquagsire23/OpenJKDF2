@@ -1037,8 +1037,8 @@ void std3D_PurgeTextureCache()
 
         std3D_aLoadedTextures[i] = 0;
 
-        tex->texture_loaded = 0;
-        tex->texture_id = 0;
+        //tex->texture_loaded = 0;
+        //tex->texture_id = 0;
 
         std3D_aLoadedSurfaces[i] = NULL;
     }

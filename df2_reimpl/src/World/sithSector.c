@@ -1623,3 +1623,122 @@ void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdV
         }
     }
 }
+
+void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHU16(thing->thingIdx);
+    NETMSG_PUSHU16(thing->thingType);
+    if ( thing->thingType )
+    {
+        NETMSG_PUSHU16(thing->templateBase->thingIdx);
+        NETMSG_PUSHU32(thing->signature);
+        NETMSG_PUSHU32(thing->thing_id);
+        NETMSG_PUSHVEC3(thing->position);
+        NETMSG_PUSHVEC3(thing->lookOrientation.rvec);
+        NETMSG_PUSHVEC3(thing->lookOrientation.lvec);
+        NETMSG_PUSHVEC3(thing->lookOrientation.uvec);
+        if ( thing->sector ) {
+            NETMSG_PUSHU16(thing->sector->id);
+        }
+        else {
+            NETMSG_PUSHU16(-1);
+        }
+        NETMSG_PUSHU32(thing->thingflags);
+        NETMSG_PUSHU32(thing->lifeLeftMs);
+        NETMSG_PUSHU32(thing->timer);
+        NETMSG_PUSHU32(thing->pulse_end_ms);
+        NETMSG_PUSHU32(thing->pulse_ms);
+        NETMSG_PUSHF32(thing->userdata);
+        NETMSG_PUSHU8(thing->rdthing.geometryMode);
+        NETMSG_PUSHU16(thing->collide);
+        NETMSG_PUSHF32(thing->collideSize);
+        NETMSG_PUSHF32(thing->light);
+        NETMSG_PUSHU32(thing->jkFlags);
+        if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 )
+        {
+            if ( thing->class_cog ) {
+                NETMSG_PUSHU16(thing->class_cog->selfCog);
+            }
+            else {
+                NETMSG_PUSHU16(-1);
+            }
+            if ( thing->capture_cog ) {
+                NETMSG_PUSHU16(thing->capture_cog->selfCog);
+            }
+            else {
+                NETMSG_PUSHU16(-1);
+            }
+        }
+        switch ( thing->thingType )
+        {
+            case THINGTYPE_ACTOR:
+            case THINGTYPE_CORPSE:
+            case THINGTYPE_PLAYER:
+                NETMSG_PUSHU32(thing->actorParams.typeflags);
+                NETMSG_PUSHF32(thing->actorParams.health);
+                NETMSG_PUSHF32(thing->actorParams.extraSpeed);
+                NETMSG_PUSHVEC3(thing->actorParams.eyePYR);
+                
+                NETMSG_PUSHF32(thing->actorParams.timeLeftLengthChange);
+                NETMSG_PUSHF32(thing->actorParams.lightIntensity);
+                NETMSG_PUSHU32(thing->actorParams.field_1BC);
+                if ( thing->actorParams.playerinfo )
+                {
+                    NETMSG_PUSHU32(thing->actorParams.playerinfo - jkPlayer_playerInfos);
+                    NETMSG_PUSHU32(thing->actorParams.playerinfo->palEffectsIdx1);
+                    NETMSG_PUSHU32(thing->actorParams.playerinfo->palEffectsIdx2);
+                }
+                else
+                {
+                    NETMSG_PUSHU32(-1);
+                }
+                break;
+            case THINGTYPE_WEAPON:
+                NETMSG_PUSHU32(thing->weaponParams.typeflags);
+                NETMSG_PUSHF32(thing->weaponParams.unk8);
+                NETMSG_PUSHU16(thing->weaponParams.field_18);
+                break;
+            case THINGTYPE_EXPLOSION:
+                NETMSG_PUSHU32(thing->explosionParams.typeflags);
+                break;
+            default:
+                break;
+        }
+        if ( thing->move_type == MOVETYPE_PHYSICS )
+        {
+            NETMSG_PUSHU32(thing->physicsParams.physflags);
+            NETMSG_PUSHVEC3(thing->physicsParams.vel);
+            NETMSG_PUSHVEC3(thing->physicsParams.angVel);
+        }
+        else if ( thing->move_type == MOVETYPE_PATH )
+        {
+            NETMSG_PUSHU16(thing->trackParams.field_C);
+            NETMSG_PUSHVEC3(thing->trackParams.vel);
+            NETMSG_PUSHF32(thing->trackParams.field_1C);
+            NETMSG_PUSHF32(thing->trackParams.field_20);
+            NETMSG_PUSHF32(thing->trackParams.field_54);
+            NETMSG_PUSHVEC3(thing->trackParams.field_58);
+            NETMSG_PUSHVEC3(thing->trackParams.field_64);
+            NETMSG_PUSHF32(thing->field_24C);
+            NETMSG_PUSHU16(thing->field_250);
+            NETMSG_PUSHU16(thing->curframe);
+            NETMSG_PUSHU16(thing->field_258);
+            NETMSG_PUSHU16(thing->goalframe);
+            NETMSG_PUSHMAT34(thing->trackParams.field_24);
+            NETMSG_PUSHVEC3(thing->trackParams.orientation);
+            NETMSG_PUSHU16(thing->trackParams.loadedFrames);
+
+            for (int i = 0; i < thing->trackParams.loadedFrames; i++)
+            {
+                NETMSG_PUSHVEC3(thing->trackParams.frames[i].pos);
+                NETMSG_PUSHVEC3(thing->trackParams.frames[i].rot);
+            }
+        }
+    }
+    
+    NETMSG_END(COGMSG_SYNCTHINGFULL);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}

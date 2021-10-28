@@ -59,6 +59,8 @@
 #define NETMSG_PUSHU16(x) { *(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t); }
 #define NETMSG_PUSHU32(x) { *(uint32_t*)craftingPacket = x; craftingPacket += sizeof(uint32_t); }
 #define NETMSG_PUSHF32(x) { *(float*)craftingPacket = x; craftingPacket += sizeof(float); }
+#define NETMSG_PUSHVEC3(x) { *(rdVector3*)craftingPacket = x; craftingPacket += sizeof(rdVector3); }
+#define NETMSG_PUSHMAT34(x) { *(rdMatrix34*)craftingPacket = x; craftingPacket += sizeof(rdMatrix34); }
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
                             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
