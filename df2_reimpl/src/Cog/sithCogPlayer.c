@@ -12,7 +12,7 @@ void sithCogPlayer_SetInvActivate(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( bActivate )
             sithInventory_SetActivate(player, binIdx, 1);
@@ -27,7 +27,7 @@ void sithCogPlayer_SetInvAvailable(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( bAvailable )
             sithInventory_SetAvailable(player, binIdx, 1);
@@ -41,7 +41,7 @@ void sithCogPlayer_IsInvActivated(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( sithInventory_GetActivate(player, binIdx) )
             sithCogVm_PushInt(ctx, 1);
@@ -55,7 +55,7 @@ void sithCogPlayer_IsInvAvailable(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( sithInventory_GetAvailable(player, binIdx) )
             sithCogVm_PushInt(ctx, 1);
@@ -69,7 +69,7 @@ void sithCogPlayer_SetGoalFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) | flags);
         sithInventory_SetBinAmount(player, binIdx, amt);
@@ -81,7 +81,7 @@ void sithCogPlayer_ClearGoalFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags);
         sithInventory_SetBinAmount(player, binIdx, amt);

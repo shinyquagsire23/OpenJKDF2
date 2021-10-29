@@ -2307,12 +2307,10 @@ LABEL_6:
 
 int sithThing_ShouldSync(sithThing *thing)
 {
-    int result; // eax
+    if ( thing->thingType )
+        return !thing->lifeLeftMs || thing->thingType != THINGTYPE_DEBRIS && thing->thingType != THINGTYPE_PARTICLE;
 
-    result = thing->thingType;
-    if ( result )
-        result = !thing->lifeLeftMs || result != THINGTYPE_DEBRIS && result != THINGTYPE_PARTICLE;
-    return result;
+    return 0;
 }
 
 sithThing* sithThing_GetById(int thing_id)

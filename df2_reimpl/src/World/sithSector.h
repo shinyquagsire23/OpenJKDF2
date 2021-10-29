@@ -160,6 +160,16 @@ int sithSector_TimerTick();
 void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing);
 
 void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx);
+void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncTimers(sithTimer *timer, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncPalEffects(int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncCameras(int sendto_id, int mpFlags);
+void sithSector_cogmsg_send31(int sendto_id, int mpFlags);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -170,7 +180,7 @@ static void (*_sithSector_ThingPhysAttached)(sithThing *thing, float deltaSecond
 //static void (*sithSector_Free)(sithWorld* world) = (void*)sithSector_Free_ADDR;
 
 //static signed int (*sithSector_AddEntry)(sithSector *sector, rdVector3 *a2, int a3, float a4, sithThing *a5) = (void*)sithSector_AddEntry_ADDR;
-static int (*sithSector_cogMsg_SendStopAnim)(sithSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;
+//static int (*sithSector_cogMsg_SendStopAnim)(rdSurface*, int, int) = (void*)sithSector_cogMsg_SendStopAnim_ADDR;
 static int (*sithSector_cogMsg_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithSector_cogMsg_SendCreateThing_ADDR;
 static void (*sithSector_cogMsg_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithSector_cogMsg_SendTakeItem_ADDR;
 static void (*sithSector_cogMsg_SendSyncThing)(sithThing *a1, int a2, int a3) = (void*)sithSector_cogMsg_SendSyncThing_ADDR;
@@ -196,16 +206,16 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 //static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
 static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
 static int (*sithSector_cogMsg_SendDeath)(sithThing *sender, sithThing *receiver, char a3, int a4, int a5) = (void*)sithSector_cogMsg_SendDeath_ADDR;
-static int (*sithSector_cogMsg_SendSyncAI)(sithActor *actor, int sendto_id, int idx) = (void*)sithSector_cogMsg_SendSyncAI_ADDR;
-static int (*_sithSector_cogMsg_SendSyncThingFull)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncThingFull_ADDR;
-static int (*sithSector_cogMsg_SendSyncPuppet)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPuppet_ADDR;
-static int (*sithSector_cogMsg_SendSyncSurface)(sithSurface *surface, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSurface_ADDR;
-static int (*sithSector_cogMsg_SendSyncSector)(sithSector *sector, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSector_ADDR;
-static void (*sithSector_cogMsg_SendSyncItemDesc)(sithThing *thing, int binIdx, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncItemDesc_ADDR;
-static void (*sithSector_cogMsg_SendSyncTimers)(sithTimer *a1, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncTimers_ADDR;
-static int (*sithSector_cogMsg_SendSyncPalEffects)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPalEffects_ADDR;
-static int (*sithSector_cogMsg_SendSyncCameras)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncCameras_ADDR;
-static int (*sithSector_cogmsg_send31)(int sendto_id, int mpFlags) = (void*)sithSector_cogmsg_send31_ADDR;
+//static int (*sithSector_cogMsg_SendSyncAI)(sithActor *actor, int sendto_id, int idx) = (void*)sithSector_cogMsg_SendSyncAI_ADDR;
+//static int (*_sithSector_cogMsg_SendSyncThingFull)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncThingFull_ADDR;
+//static int (*sithSector_cogMsg_SendSyncPuppet)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPuppet_ADDR;
+//static int (*sithSector_cogMsg_SendSyncSurface)(sithSurface *surface, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSurface_ADDR;
+//static int (*sithSector_cogMsg_SendSyncSector)(sithSector *sector, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncSector_ADDR;
+//static void (*sithSector_cogMsg_SendSyncItemDesc)(sithThing *thing, int binIdx, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncItemDesc_ADDR;
+//static void (*sithSector_cogMsg_SendSyncTimers)(sithTimer *a1, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncTimers_ADDR;
+//static int (*sithSector_cogMsg_SendSyncPalEffects)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPalEffects_ADDR;
+//static int (*sithSector_cogMsg_SendSyncCameras)(int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncCameras_ADDR;
+//static int (*sithSector_cogmsg_send31)(int sendto_id, int mpFlags) = (void*)sithSector_cogmsg_send31_ADDR;
 //static void (*sithSector_sub_4F2C30)(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing) = (void*)sithSector_sub_4F2C30_ADDR;
 
 #endif // _SITHSECTOR_H

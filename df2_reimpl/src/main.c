@@ -1131,6 +1131,16 @@ void do_hooks()
     hook_function(sithSector_AddEntry_ADDR, sithSector_AddEntry);
     hook_function(sithSector_ThingGetInsertOffsetZ_ADDR, sithSector_ThingGetInsertOffsetZ);
     hook_function(sithSector_cogMsg_SendSyncThingFull_ADDR, sithSector_cogMsg_SendSyncThingFull);
+    hook_function(sithSector_cogMsg_SendSyncPuppet_ADDR, sithSector_cogMsg_SendSyncPuppet);
+    hook_function(sithSector_cogMsg_SendSyncAI_ADDR, sithSector_cogMsg_SendSyncAI);
+    hook_function(sithSector_cogMsg_SendSyncSurface_ADDR, sithSector_cogMsg_SendSyncSurface);
+    hook_function(sithSector_cogMsg_SendSyncSector_ADDR, sithSector_cogMsg_SendSyncSector);
+    hook_function(sithSector_cogMsg_SendSyncItemDesc_ADDR, sithSector_cogMsg_SendSyncItemDesc);
+    hook_function(sithSector_cogMsg_SendStopAnim_ADDR, sithSector_cogMsg_SendStopAnim);
+    hook_function(sithSector_cogMsg_SendSyncTimers_ADDR, sithSector_cogMsg_SendSyncTimers);
+    hook_function(sithSector_cogMsg_SendSyncPalEffects_ADDR, sithSector_cogMsg_SendSyncPalEffects);
+    hook_function(sithSector_cogMsg_SendSyncCameras_ADDR, sithSector_cogMsg_SendSyncCameras);
+    hook_function(sithSector_cogmsg_send31_ADDR, sithSector_cogmsg_send31);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1304,6 +1314,7 @@ void do_hooks()
     hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
     hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
+    hook_function(sithSurface_Sync_ADDR, sithSurface_Sync);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1380,6 +1391,7 @@ void do_hooks()
     hook_function(jkSaber_Load_ADDR, jkSaber_Load);
     hook_function(jkSaber_player_thingsidkfunc_ADDR, jkSaber_player_thingsidkfunc);
     hook_function(jkSaber_Enable_ADDR, jkSaber_Enable);
+    hook_function(jkSaber_playerconfig_idksync_ADDR, jkSaber_playerconfig_idksync);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);

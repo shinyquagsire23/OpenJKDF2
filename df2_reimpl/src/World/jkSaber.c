@@ -34,7 +34,6 @@
 #define jkSaber_cogMsg_HandleEndLevel ((void*)jkSaber_cogMsg_HandleEndLevel_ADDR)
 #define jkSaber_cogMsg_HandleSetSaberInfo ((void*)jkSaber_cogMsg_HandleSetSaberInfo_ADDR)
 #define jkSaber_cogMsg_HandleSetTeam ((void*)jkSaber_cogMsg_HandleSetTeam_ADDR)
-#define jkSaber_playerconfig_idksync ((void*)jkSaber_playerconfig_idksync_ADDR)
 #define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
 
 int jkSaber_Startup()
@@ -427,4 +426,49 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
     _memset(a1->playerInfo->damagedSurfaces, 0, sizeof(a1->playerInfo->damagedSurfaces));
     
     a1->playerInfo->lastSparkSpawnMs = 0;
+}
+
+void jkSaber_playerconfig_idksync()
+{
+    jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
+    jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+    jkSaber_cogMsg_Sendx32(&playerThings[playerThingIdx]);
+
+
+    {
+        NETMSG_START;
+
+        NETMSG_PUSHVEC3(jkPlayer_waggleVec);
+        NETMSG_PUSHF32(jkPlayer_waggleMag);
+
+        NETMSG_END(COGMSG_ID_36);
+
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
+    }
+
+    for (int i = 0; i < jkPlayer_numOtherThings; i++)
+    {
+        jkSaber_cogMsg_SendSetSaberInfo2(jkPlayer_otherThings[i].actorThing);
+    }
+    
+    {
+        NETMSG_START;
+
+        NETMSG_PUSHU16(jkHud_bHasTarget);
+
+        if ( jkHud_pTargetThing ) {
+            NETMSG_PUSHU16(jkHud_pTargetThing->thingIdx);
+        }
+        else {
+            NETMSG_PUSHU16(-1);
+        }
+
+        NETMSG_PUSHU16(jkHud_targetRed);
+        NETMSG_PUSHU16(jkHud_targetBlue);
+        NETMSG_PUSHU16(jkHud_targetGreen);
+        
+        NETMSG_END(COGMSG_HUDTARGET);
+        
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
+    }
 }

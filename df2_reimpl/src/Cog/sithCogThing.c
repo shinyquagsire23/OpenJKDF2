@@ -645,7 +645,7 @@ void sithCogThing_GetInv(sithCog *ctx)
     if ( playerThing 
          && playerThing->thingType == THINGTYPE_PLAYER 
          && playerThing->actorParams.playerinfo 
-         && binIdx < 200 )
+         && binIdx < SITHBIN_NUMBINS )
     {
         sithCogVm_PushFlex(ctx, sithInventory_GetBinAmount(playerThing, binIdx));
     }
@@ -664,7 +664,7 @@ void sithCogThing_SetInv(sithCog *ctx)
     if ( playerThing 
          && playerThing->thingType == THINGTYPE_PLAYER 
          && playerThing->actorParams.playerinfo 
-         && binIdx < 200 )
+         && binIdx < SITHBIN_NUMBINS )
         sithInventory_SetBinAmount(playerThing, binIdx, amt);
 }
 
@@ -677,7 +677,7 @@ void sithCogThing_ChangeInv(sithCog *ctx)
     if ( playerThing 
          && playerThing->thingType == THINGTYPE_PLAYER 
          && playerThing->actorParams.playerinfo 
-         && binIdx < 200 )
+         && binIdx < SITHBIN_NUMBINS )
     {
         sithCogVm_PushFlex(ctx, sithInventory_ChangeInv(playerThing, binIdx, amt));
     }
@@ -699,7 +699,7 @@ void sithCogThing_GetInvCog(sithCog *ctx)
     if ( playerThing
       && playerThing->thingType == THINGTYPE_PLAYER
       && playerThing->actorParams.playerinfo
-      && (desc = sithInventory_GetItemDesc(playerThing, binIdx), binIdx < 200)
+      && (desc = sithInventory_GetItemDesc(playerThing, binIdx), binIdx < SITHBIN_NUMBINS)
       && desc
       && (descCog = desc->cog) != 0 )
     {

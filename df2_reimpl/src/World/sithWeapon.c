@@ -1125,7 +1125,7 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
     sithInventory_GetCurWeapon(player);
     v7 = -1;
     a1a = -1.0;
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
         if (desc->flags & ITEMINFO_WEAPON)

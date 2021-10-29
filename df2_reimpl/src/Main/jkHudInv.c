@@ -143,13 +143,9 @@ void jkHudInv_Draw()
     int idx; // [esp+18h] [ebp-28h]
     int v43; // [esp+1Ch] [ebp-24h] BYREF
     char v44[4]; // [esp+20h] [ebp-20h] BYREF
-    int v45; // [esp+24h] [ebp-1Ch]
     wchar_t a6[3]; // [esp+28h] [ebp-18h] BYREF
-    int16_t v47; // [esp+2Eh] [ebp-12h]
     wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
-    int16_t v49; // [esp+36h] [ebp-Ah]
     wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
-    int16_t v51; // [esp+3Eh] [ebp-2h]
 
     player = sithWorld_pCurWorld->playerThing;
     if ( player->thingType == THINGTYPE_PLAYER )
@@ -171,7 +167,7 @@ void jkHudInv_Draw()
                 }
             }
         }
-        for ( j = 0; j < 200; ++j )
+        for ( j = 0; j < SITHBIN_NUMBINS; ++j )
         {
             if ( v1 >= jkHudInv_scroll.scroll )
                 break;
@@ -294,7 +290,6 @@ void jkHudInv_Draw()
                     v21 = Video_pMenuBuffer;
                     stdString_snprintf(tmpChars, 4, "%d", v18);
                     stdString_CharToWchar(a6, tmpChars, 3);
-                    v47 = 0;
                     v22 = 99;
                     if ( v18 <= 99 )
                         v22 = v18;
@@ -334,10 +329,8 @@ void jkHudInv_Draw()
                             v28 = jkHudInv_info.field_4;
                             v29 = jkHudInv_info.field_0 - v24;
                             v30 = Video_pMenuBuffer;
-                            v45 = v27;
                             stdString_snprintf(v44, 4, "%d", v27);
                             stdString_CharToWchar(v48, v44, 3);
-                            v49 = 0;
                             v31 = 99;
                             if ( v27 <= 99 )
                                 v31 = v27;
@@ -379,10 +372,8 @@ LABEL_84:
                             v36 = jkHudInv_info.field_4;
                             v37 = Video_pMenuBuffer;
                             v38 = jkHudInv_info.field_0 + v35;
-                            v45 = v34;
                             stdString_snprintf(tmpChars, 4, "%d", v34);
                             stdString_CharToWchar(v50, tmpChars, 3);
-                            v51 = 0;
                             v39 = 99;
                             if ( v34 <= 99 )
                                 v39 = v34;
@@ -437,9 +428,9 @@ int jkHudInv_InitItems()
     v1 = 0;
     v2 = sithInventory_aDescriptors;
     jkHudInv_numItems = 0;
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
-        if ( (v2->flags & 8) != 0 )
+        if ( (v2->flags & ITEMINFO_POWER) != 0 )
             ++v1;
         ++v2;
     }
@@ -456,9 +447,9 @@ int jkHudInv_InitItems()
         v3 = jkHudInv_aItems;
         v4 = 0;
         v5 = sithInventory_aDescriptors;
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < SITHBIN_NUMBINS; i++)
         {
-            if ( (v5->flags & 8) != 0 )
+            if ( (v5->flags & ITEMINFO_POWER) != 0 )
                 *v3++ = v4;
             ++v5;
             ++v4;
@@ -527,9 +518,9 @@ void jkHudInv_LoadItemRes()
             stdString_snprintf(std_genBuffer, 1024, "ui\\bm\\%s", "IcDefau16.bm");
         jkHudInv_aBitmaps[2] = stdBitmap_Load(std_genBuffer, 0, 0);
         stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_aBitmaps[2]);
-        for (int j = 0; j < 200; j++)
+        for (int j = 0; j < SITHBIN_NUMBINS; j++)
         {
-            if ( (sithInventory_aDescriptors[j].flags & 0xA) != 0 )
+            if ( (sithInventory_aDescriptors[j].flags & (ITEMINFO_POWER|ITEMINFO_ITEM)) != 0 )
             {
                 if ( sithInventory_aDescriptors[j].hudBitmap )
                     stdBitmap_Free(sithInventory_aDescriptors[j].hudBitmap);

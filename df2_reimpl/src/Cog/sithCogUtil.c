@@ -746,7 +746,7 @@ void sithCogUtil_SetInvFlags(sithCog *ctx)
     flags = sithCogVm_PopInt(ctx);
     binIdx = sithCogVm_PopInt(ctx);
     player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < 200 )
+    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
         sithInventory_SetFlags(player, binIdx, flags);
 }
 
@@ -1298,7 +1298,7 @@ void sithCogUtil_GetWeaponPriority(sithCog *ctx)
             sithCogVm_PushInt(ctx, -1);
             return;
         }
-        if ( binIdx >= 0 && binIdx < 200 )
+        if ( binIdx >= 0 && binIdx < SITHBIN_NUMBINS )
         {
             sithCogVm_PushFlex(ctx, sithWeapon_GetPriority(player, binIdx, mode));
             return;

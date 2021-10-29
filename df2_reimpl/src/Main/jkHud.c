@@ -419,9 +419,9 @@ void jkHud_Draw()
         {
             v5 = 0;
         }
-        else if ( v5 > 200 )
+        else if ( v5 > SITHBIN_NUMBINS )
         {
-            v5 = 200;
+            v5 = SITHBIN_NUMBINS;
         }
         if ( jkHud_idk9 != v5 )
         {
@@ -487,9 +487,9 @@ void jkHud_Draw()
         {
             v10 = 0;
         }
-        else if ( (int)v9 > 200 )
+        else if ( (int)v9 > SITHBIN_NUMBINS )
         {
-            v10 = 200;
+            v10 = SITHBIN_NUMBINS;
         }
         v11 = playerThingIdx;
         if ( jkHud_idk11 != v10 || jkHud_isSuper != playerThings[playerThingIdx].shields )
@@ -502,7 +502,7 @@ void jkHud_Draw()
             stdFont_DrawAscii(*jkHud_pStatusLeftBm->mipSurfaces, v12, 23u, 43, 999, tmp, 0);
             stdDisplay_VBufferCopy(
                 *jkHud_pStatusLeftBm->mipSurfaces,
-                jkHud_pStShieldBm->mipSurfaces[(jkHud_pStShieldBm->numMips - 1) * (200 - v10) / 0xC8u],
+                jkHud_pStShieldBm->mipSurfaces[(jkHud_pStShieldBm->numMips - 1) * (SITHBIN_NUMBINS - v10) / SITHBIN_NUMBINS],
                 jkHud_pStShieldBm->xPos,
                 jkHud_pStShieldBm->yPos,
                 0,

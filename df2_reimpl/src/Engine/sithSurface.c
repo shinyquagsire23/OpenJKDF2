@@ -7,6 +7,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithCollide.h"
+#include "World/sithThing.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTime.h"
@@ -1229,4 +1230,17 @@ rdSurface* sithSurface_GetByIdx(int idx)
             return 0;
     }
     return &sithSurface_aSurfaces[v1];
+}
+
+void sithSurface_Sync(int mpFlags)
+{
+    if ( (sithCogVm_multiplayerFlags & mpFlags) != 0 )
+    {
+        for (int i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
+        {
+            int flags = sithSurface_aSurfaces[i].flags;
+            if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
+                sithSector_cogMsg_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
+        }
+    }
 }

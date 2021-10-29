@@ -463,6 +463,9 @@ typedef int (*keyframeUnloader_t)(rdKeyframe*);
 typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
 
+// Define some maximums here
+#define SITHBIN_NUMBINS (200)
+
 // All the typedefs
 typedef struct rdVector2i
 {

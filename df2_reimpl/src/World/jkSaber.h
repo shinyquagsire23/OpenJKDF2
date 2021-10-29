@@ -56,6 +56,7 @@ void jkSaber_player_thingsidkfunc();
 void jkSaber_nullsub_2();
 void jkSaber_Disable(sithThing *player);
 void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4);
+void jkSaber_playerconfig_idksync();
 
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
@@ -66,5 +67,6 @@ static int (*jkSaber_cogMsg_SendSetSaberInfo)(sithThing *a1) = (void*)jkSaber_co
 static int (*jkSaber_cogMsg_SendSetSaberInfo2)(sithThing *a1) = (void*)jkSaber_cogMsg_SendSetSaberInfo2_ADDR;
 static int (*jkSaber_cogMsg_SendJKEnableSaber)(sithThing *player) = (void*)jkSaber_cogMsg_SendJKEnableSaber_ADDR;
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;
+static void (*jkSaber_cogMsg_Sendx32)(jkPlayerInfo *playerInfo) = (void*)jkSaber_cogMsg_Sendx32_ADDR;
 
 #endif // _JKSABER_H
