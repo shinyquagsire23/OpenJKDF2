@@ -66,9 +66,9 @@ void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     jk_snwprintf(slider_val_text, 5, L"%u", jkPlayer_fov);
     jkGuiGeneral_aElements[14].wstr = slider_val_text;
     
-    jkGuiRend_UpdateAndDrawClickable(&jkGuiGeneral_aElements[14], menu, 1);
-    
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
+    
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiGeneral_aElements[14], menu, 1);
 }
 #endif
 
