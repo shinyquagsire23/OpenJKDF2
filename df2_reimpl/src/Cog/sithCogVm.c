@@ -45,7 +45,6 @@
 #define cogMsg_HandleFireProjectile ((void*)0x004F3F60)
 #define cogMsg_HandleDeath ((void*)0x004F40B0)
 #define cogMsg_HandleDamage ((void*)0x004F41A0)
-#define cogMsg_HandleSyncThingFull ((void*)0x004F46F0)
 #define cogmsg_HandleSyncThingFrame ((void*)0x004F4D60)
 #define cogMsg_HandleSyncThingAttachment ((void*)0x004F4F50)
 #define cogMsg_HandleTakeItem ((void*)0x004F5150)
@@ -54,10 +53,8 @@
 #define cogMsg_HandleSyncSurface ((void*)0x004F9050)
 #define cogMsg_HandleSyncSector ((void*)0x004F91F0)
 #define cogMsg_HandleSyncSectorAlt ((void*)0x004F9350)
-#define cogMsg_HandleSyncAI ((void*)0x004F9640)
 #define cogMsg_HandleSyncItemDesc ((void*)0x004F99C0)
 #define cogMsg_HandleStopAnim ((void*)0x004F9BA0)
-#define cogMsg_HandleSyncPuppet ((void*)0x004F9E10)
 #define cogMsg_HandleSyncTimers ((void*)0x004F9FA0)
 #define cogMsg_HandleSyncCameras ((void*)0x004FA130)
 #define cogMsg_HandleSyncPalEffects ((void*)0x004FA350)
@@ -85,15 +82,15 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
     sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = cogMsg_HandlePlaySoundPos;
     sithCogVm_msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = cogMsg_HandleSyncThingFull;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithSector_cogMsg_HandleSyncThingFull;
     sithCogVm_msgFuncs[COGMSG_SYNCCOG] = cogMsg_HandleSyncCog;
     sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = cogMsg_HandleSyncSurface;
-    sithCogVm_msgFuncs[COGMSG_SYNCAI] = cogMsg_HandleSyncAI;
+    sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithSector_cogMsg_HandleSyncAI;
     sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = cogMsg_HandleSyncItemDesc;
     sithCogVm_msgFuncs[COGMSG_STOPANIM] = cogMsg_HandleStopAnim;
     sithCogVm_msgFuncs[COGMSG_SYNCSECTOR] = cogMsg_HandleSyncSector;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGFRAME] = cogmsg_HandleSyncThingFrame;
-    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = cogMsg_HandleSyncPuppet;
+    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithSector_cogMsg_HandleSyncPuppet;
     sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = cogMsg_HandleSyncThingAttachment;
     sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = cogMsg_HandleSyncTimers;
@@ -758,7 +755,7 @@ sithCog* sithCogVm_PopCog(sithCog *ctx)
     if ( (uint16_t)cogIdx & 0x8000 )
     {
         world = sithWorld_pStatic;
-        cogIdx &= 0xFFFF7FFF;
+        cogIdx &= ~0x8000;
     }
     if ( world && cogIdx >= 0 && (unsigned int)cogIdx < world->numCogsLoaded )
         return &world->cogs[cogIdx];
@@ -863,7 +860,7 @@ sithSound* sithCogVm_PopSound(sithCog *ctx)
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF; // ?
+        idx &= ~0x8000; // ?
     }
     
     if ( world && idx >= 0 && idx < world->numSoundsLoaded )
@@ -975,7 +972,7 @@ rdMaterial* sithCogVm_PopMaterial(sithCog *ctx)
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF; // ?
+        idx &= ~0x8000; // ?
     }
     
     if ( world && idx >= 0 && idx < world->numMaterialsLoaded )
@@ -1016,7 +1013,7 @@ rdModel3* sithCogVm_PopModel3(sithCog *ctx)
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF; // ?
+        idx &= ~0x8000; // ?
     }
     
     if ( world && idx >= 0 && idx < world->numModelsLoaded )
@@ -1057,7 +1054,7 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF; // ?
+        idx &= ~0x8000; // ?
     }
     
     if ( world && idx >= 0 && idx < world->numKeyframesLoaded )

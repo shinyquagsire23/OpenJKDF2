@@ -58,7 +58,7 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     wchar_t *v4; // eax
     float playerHealth; // eax
     float playerMaxHealth; // ecx
-    int v7; // eax
+    jkGuiSaveLoad_Entry* v7; // eax
     int v8; // esi
     jkEpisode *episodeIter; // edi
     wchar_t *v10; // eax
@@ -106,7 +106,7 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     if ( jkGuiSaveLoad_numEntries > 0 )
     {
         v7 = jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, jkGuiSaveLoad_aElements[4].selectedTextEntry);
-        jkGuiSaveLoad_aElements[13].bIsVisible = __strcmpi((const char *)(v7 + 1580), "quicksave.jks") != 0;
+        jkGuiSaveLoad_aElements[13].bIsVisible = __strcmpi(v7->fpath, "quicksave.jks") != 0;
     }
     v8 = 0;
     if ( jkEpisode_var2 > 0 )
@@ -119,7 +119,7 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
             if ( v8 >= jkEpisode_var2 )
                 goto LABEL_15;
         }
-        _wcsncpy(jkGuiSaveLoad_wtextEpisode, (const wchar_t *)(164 * v8 + 0x856900), 0xFFu);
+        _wcsncpy(jkGuiSaveLoad_wtextEpisode, jkEpisode_aEpisodes[v8].unistr, 0xFFu);
         jkGuiSaveLoad_wtextEpisode[255] = 0;
     }
 LABEL_15:
@@ -229,7 +229,7 @@ void jkGuiSaveLoad_PopulateList()
                             _strncpy(v6->fpath, a2.fpath, 0x7Fu);
                             v6->fpath[127] = 0;
                             _strtolower(v6->fpath);
-                            jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, v4 + 1, (int)v6);
+                            jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, v4 + 1, v6);
                             v1 = v7;
                             ++jkGuiSaveLoad_numEntries;
                         }

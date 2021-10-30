@@ -472,3 +472,125 @@ void jkSaber_playerconfig_idksync()
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
     }
 }
+
+void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
+{
+    if ( thing->playerInfo )
+    {
+        NETMSG_START;
+
+        NETMSG_PUSHU16(thing->thingType != THINGTYPE_PLAYER);
+        NETMSG_PUSHU16((thing->thingType != THINGTYPE_PLAYER) ? thing->playerInfo - jkPlayer_otherThings : thing->playerInfo - playerThings);
+        NETMSG_PUSHU32(thing->thing_id);
+        if ( thing->playerInfo->rd_thing.model3 ) {
+            NETMSG_PUSHU32(thing->playerInfo->rd_thing.model3->id);
+        }
+        else {
+            NETMSG_PUSHU32(-1);
+        }
+        
+        NETMSG_PUSHU16(thing->playerInfo->maxTwinkles);
+        NETMSG_PUSHU16(thing->playerInfo->twinkleSpawnRate);
+        NETMSG_PUSHF32(thing->playerInfo->length);
+        if ( thing->playerInfo->polylineThing.polyline )
+        {
+            NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->baseRadius);
+            NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->tipRadius);
+            NETMSG_PUSHSTR(thing->playerInfo->polylineThing.polyline->edgeFace.material->mat_fpath, 0x20);
+            NETMSG_PUSHSTR(thing->playerInfo->polylineThing.polyline->tipFace.material->mat_fpath, 0x20);
+            NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->length);
+        }
+        else
+        {
+            NETMSG_PUSHU32(0);
+        }
+
+        if ( thing->playerInfo->wall_sparks ) {
+            NETMSG_PUSHU32(thing->playerInfo->wall_sparks->thingIdx);
+        }
+        else {
+            NETMSG_PUSHU32(-1);
+        }
+
+        if ( thing->playerInfo->blood_sparks ) {
+            NETMSG_PUSHU32(thing->playerInfo->blood_sparks->thingIdx);
+        }
+        else {
+            NETMSG_PUSHU32(-1);
+        }
+
+        if ( thing->playerInfo->saber_sparks ) {
+            NETMSG_PUSHU32(thing->playerInfo->saber_sparks->thingIdx);
+        }
+        else {
+            NETMSG_PUSHU32(-1);
+        }
+
+        NETMSG_PUSHU32(thing->playerInfo->field_21C);
+        NETMSG_PUSHU32(thing->playerInfo->shields);
+        NETMSG_PUSHU32(thing->playerInfo->field_224);
+        
+        NETMSG_END(COGMSG_SABERINFO3);
+        
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    }
+}
+
+void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHU32(thing->thing_id);
+    NETMSG_PUSHSTR(thing->rdthing.model3->filename, 0x20);
+    NETMSG_PUSHSTR(thing->soundclass->snd_fname, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
+
+    NETMSG_END(COGMSG_SABERINFO2);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+}
+
+void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
+{
+    rdPuppetTrack *trackIter; // ecx
+    
+    NETMSG_START;
+
+    NETMSG_PUSHU32(playerInfo - playerThings);
+
+    rdModel3* model3 = playerInfo->povModel.model3;
+    if ( model3 ) {
+        NETMSG_PUSHU32(model3->id);
+    }
+    else {
+        NETMSG_PUSHU32(-1);
+    }
+
+    rdPuppet* puppet = playerInfo->povModel.puppet;
+    if ( puppet )
+    {
+        trackIter = puppet->tracks;
+
+        for (int i = 0; i < 4; i++)
+        {
+            NETMSG_PUSHU32(trackIter->status);
+            if ( trackIter->status )
+            {
+                NETMSG_PUSHU32(trackIter->keyframe->id);
+                NETMSG_PUSHU32(trackIter->field_4);
+                NETMSG_PUSHU16(trackIter->lowPri);
+                NETMSG_PUSHU16(trackIter->highPri);
+                NETMSG_PUSHF32(trackIter->speed);
+                NETMSG_PUSHF32(trackIter->playSpeed);
+                NETMSG_PUSHF32(trackIter->field_120);
+                NETMSG_PUSHF32(trackIter->field_124);
+            }
+            ++trackIter;
+        }
+    }
+
+    NETMSG_END(COGMSG_ID_32);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+}

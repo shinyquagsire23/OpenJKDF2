@@ -156,7 +156,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
         v4 = puppet->tracks;
         do
         {
-            if ( v4->status )
+            // Added: joints check
+            if ( v4->status && v4->keyframe && v4->keyframe->joints)
             {
                 v5 = v4->keyframe;
                 v6 = v5->joints;
@@ -171,6 +172,11 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                         v9 = 0;
                         if ( v8->numAnimEntries )
                         {
+                            // Added: this spot keeps crashing, add bounds checks
+                            if (v8->nodeIdx < 0 || v8->nodeIdx > 64)
+                            {
+                                v8->nodeIdx = 0;
+                            }
                             v81 = v8->numAnimEntries - 1;
                             v10 = v4->nodes[v8->nodeIdx];// nodeIdx
                             if ( v10 != v81 )
@@ -731,4 +737,24 @@ void rdPuppet_unk(rdPuppet *puppet, int trackNum)
     v2->field_120 = 0.0;
     v2->field_124 = 0.0;
     v2->status = 3;
+}
+
+int rdPuppet_RemoveTrack(rdPuppet *puppet, rdThing *rdthing)
+{
+    puppet->paused = 0;
+    puppet->rdthing = rdthing;
+    for (int i = 0; i < 4; i++)
+    {
+        puppet->tracks[i].field_120 = 0.0;
+        puppet->tracks[i].field_124 = 0.0;
+        if ( puppet->tracks[i].callback )
+        {
+            puppet->tracks[i].callback(puppet->rdthing->parentSithThing, i, 0);
+        }
+        puppet->tracks[i].status = 0;
+        puppet->tracks[i].keyframe = 0;
+        puppet->tracks[i].callback = 0;
+    }
+
+    return 1;
 }

@@ -158,10 +158,13 @@ void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds);
 float sithSector_ThingGetInsertOffsetZ(sithThing *thing);
 int sithSector_TimerTick();
 void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing);
-
+sithSector* sithSector_GetPtrFromIdx(int idx);
 void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
+int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags);
+int sithSector_cogMsg_HandleSyncPuppet(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx);
+int sithSector_cogMsg_HandleSyncAI(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags);
 void sithSector_cogMsg_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
 void sithSector_cogMsg_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags);
@@ -170,6 +173,9 @@ void sithSector_cogMsg_SendSyncTimers(sithTimer *timer, int sendto_id, int mpFla
 void sithSector_cogMsg_SendSyncPalEffects(int sendto_id, int mpFlags);
 void sithSector_cogMsg_SendSyncCameras(int sendto_id, int mpFlags);
 void sithSector_cogmsg_send31(int sendto_id, int mpFlags);
+void sithSector_cogmsg_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
+
+static int (*_sithSector_cogMsg_HandleSyncPuppet)(sithCogMsg *msg) = (void*)sithSector_cogMsg_HandleSyncPuppet_ADDR;
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -196,7 +202,7 @@ static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, in
 static void (*sithSector_cogMsg_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithSector_cogMsg_SendSetThingModel_ADDR;
 //static void (*sithSector_ThingLandIdk)(sithThing *thing, int a3) = (void*)sithSector_ThingLandIdk_ADDR;
 static int (*sithSector_cogMsg_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithSector_cogMsg_SendFireProjectile_ADDR;
-static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
+//static int (*sithSector_cogmsg_SendPlaySoundPos)(sithThing *a1, rdVector3 *a2, sithSound *a3, float a4, float a5, int a6, int a7, int a8, int a9) = (void*)sithSector_cogmsg_SendPlaySoundPos_ADDR;
 static int (*sithSector_cogMsg_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithSector_cogMsg_SendStopSound_ADDR;
 static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithSector_cogMsg_SoundClassPlay_ADDR;
 //static int (*sithSector_SetSkyParams)(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;

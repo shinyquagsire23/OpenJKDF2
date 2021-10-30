@@ -83,7 +83,7 @@ int sithSave_LoadEntry(char *fpath)
 
     if ( !stdConffile_OpenMode(fpath, "rb") )
         goto load_fail;
-    stdConffile_Read(&header, 1580);
+    stdConffile_Read(&header, sizeof(sithSave_Header));
     if ( header.version != 6 )
         goto load_fail;
     if ( sithSave_funcRead )
@@ -114,12 +114,20 @@ LABEL_11:
     if ( !stdConffile_Read(&curMs, 4) )
         goto load_fail;
     sithTime_SetMs(curMs);
-    stdConffile_Read(&g_sithMode, 24);
+    
+    // Added: split this apart, g_sithMode is a struct...
+    stdConffile_Read((char*)&g_sithMode, sizeof(g_sithMode));
+    stdConffile_Read((char*)&g_submodeFlags, sizeof(g_submodeFlags));
+    stdConffile_Read((char*)&sithSurface_byte_8EE668, sizeof(sithSurface_byte_8EE668));
+    stdConffile_Read((char*)&g_debugmodeFlags, sizeof(g_debugmodeFlags));
+    stdConffile_Read((char*)&jkPlayer_setDiff, sizeof(jkPlayer_setDiff));
+    stdConffile_Read((char*)&g_mapModeFlags, sizeof(g_mapModeFlags));
+
     sithThing_freestuff(sithWorld_pCurWorld);
     
     // Apparently this works by interpreting a bunch of netMsg packets from the
     // savefile? Funky.
-#ifndef LINUX_TMP
+//#ifndef LINUX_TMP
     while (1)
     {
         if ( !stdConffile_Read(&sithCogVm_netMsgTmp.netMsg.cogMsgId, 4) )
@@ -148,7 +156,7 @@ LABEL_11:
 #endif
         }   
     }
-#endif
+//#endif
 
     sithThing_sub_4CCE60();
     sithPlayer_idk(0);
@@ -269,8 +277,7 @@ int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     float *v7; // eax
     sithItemInfo *v8; // ecx
     float v9; // edx
-    char tmp_playerName[31]; // [esp+Ch] [ebp-2A0h] BYREF
-    char v11; // [esp+2Bh] [ebp-281h]
+    char tmp_playerName[32]; // [esp+Ch] [ebp-2A0h] BYREF
     char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF
     wchar_t v13[256]; // [esp+ACh] [ebp-200h] BYREF
 
@@ -287,11 +294,11 @@ int sithSave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     }
     sithSave_dword_835914 = a3;
     stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
-    v11 = 0;
+    tmp_playerName[31] = 0;
     stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, &sithSave_fpath[128]);
     stdFileUtil_MkDir(PathName);
     stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
-    v11 = 0;
+    tmp_playerName[31] = 0;
     stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, saveFname);
     if ( a2 || !stdConffile_OpenRead(PathName) )
     {
@@ -369,8 +376,16 @@ LABEL_17:
         if ( sithSave_funcWrite )
             sithSave_funcWrite();
         stdConffile_Write((const char*)sithWorld_pCurWorld->map_jkl_fname, 32);
-        stdConffile_Write((const char*)&sithTime_curMs, 4);
-        stdConffile_Write((const char*)&g_sithMode, 24);
+        stdConffile_Write((const char*)&sithTime_curMs, sizeof(sithTime_curMs));
+        
+        // Added: split this apart, g_sithMode is a struct...
+        stdConffile_Write((const char*)&g_sithMode, sizeof(g_sithMode));
+        stdConffile_Write((const char*)&g_submodeFlags, sizeof(g_submodeFlags));
+        stdConffile_Write((const char*)&sithSurface_byte_8EE668, sizeof(sithSurface_byte_8EE668));
+        stdConffile_Write((const char*)&g_debugmodeFlags, sizeof(g_debugmodeFlags));
+        stdConffile_Write((const char*)&jkPlayer_setDiff, sizeof(jkPlayer_setDiff));
+        stdConffile_Write((const char*)&g_mapModeFlags, sizeof(g_mapModeFlags));
+        
         sithSave_SerializeAllThings(4);
         if ( sithSave_func1 )
             sithSave_func1();

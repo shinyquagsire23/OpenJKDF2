@@ -928,6 +928,7 @@ void do_hooks()
     hook_function(rdPuppet_PlayTrack_ADDR, rdPuppet_PlayTrack);
     hook_function(rdPuppet_unk_ADDR, rdPuppet_unk);
     //hook_function(rdPuppet_AdvanceTrack_ADDR, rdPuppet_AdvanceTrack);
+    hook_function(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
     
     // rdSprite
     hook_function(rdSprite_New_ADDR, rdSprite_New);
@@ -1141,6 +1142,11 @@ void do_hooks()
     hook_function(sithSector_cogMsg_SendSyncPalEffects_ADDR, sithSector_cogMsg_SendSyncPalEffects);
     hook_function(sithSector_cogMsg_SendSyncCameras_ADDR, sithSector_cogMsg_SendSyncCameras);
     hook_function(sithSector_cogmsg_send31_ADDR, sithSector_cogmsg_send31);
+    hook_function(sithSector_cogmsg_SendPlaySoundPos_ADDR, sithSector_cogmsg_SendPlaySoundPos);
+    hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
+    hook_function(sithSector_cogMsg_HandleSyncThingFull_ADDR, sithSector_cogMsg_HandleSyncThingFull);
+    //hook_function(sithSector_cogMsg_HandleSyncPuppet_ADDR, sithSector_cogMsg_HandleSyncPuppet);
+    hook_function(sithSector_cogMsg_HandleSyncAI_ADDR, sithSector_cogMsg_HandleSyncAI);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1392,6 +1398,9 @@ void do_hooks()
     hook_function(jkSaber_player_thingsidkfunc_ADDR, jkSaber_player_thingsidkfunc);
     hook_function(jkSaber_Enable_ADDR, jkSaber_Enable);
     hook_function(jkSaber_playerconfig_idksync_ADDR, jkSaber_playerconfig_idksync);
+    hook_function(jkSaber_cogMsg_SendSetSaberInfo2_ADDR, jkSaber_cogMsg_SendSetSaberInfo2);
+    hook_function(jkSaber_cogMsg_SendSetSaberInfo_ADDR, jkSaber_cogMsg_SendSetSaberInfo);
+    hook_function(jkSaber_cogMsg_Sendx32_ADDR, jkSaber_cogMsg_Sendx32);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);

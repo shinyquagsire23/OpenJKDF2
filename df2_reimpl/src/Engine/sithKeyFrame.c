@@ -68,7 +68,7 @@ rdKeyframe* sithKeyFrame_GetByIdx(int idx)
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;
-        idx &= 0xFFFF7FFF;
+        idx &= ~0x8000;
     }
 
     if ( idx < 0 || idx >= world->numKeyframesLoaded )

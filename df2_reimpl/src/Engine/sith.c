@@ -407,8 +407,8 @@ void sith_AutoSave()
 
 // Comment out to work on saving func decomp
 #ifdef LINUX_TMP
-    sithTime_Startup();
-    return;
+    //sithTime_Startup();
+    //return;
 #endif
 
     if ( sithNet_isMulti )

@@ -414,17 +414,17 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     char missing_1; // c0
     double v8; // st5
     char missing_2; // c0
-    sithSector *v10; // eax
-    sithAnimclass *v11; // ebp
-    sithPuppet *v12; // eax
+    sithSector *v10 = NULL; // eax
+    sithAnimclass *v11 = NULL; // ebp
+    sithPuppet *v12 = NULL; // eax
     double v14; // st6
     char missing_3; // c0
     int anim; // ecx
-    sithActor *v17; // eax
-    sithPuppet *v18; // edx
-    sithAnimclassEntry *v19; // edi
+    sithActor *v17 = NULL; // eax
+    sithPuppet *v18 = NULL; // edx
+    sithAnimclassEntry *v19 = NULL; // edi
     int v20; // eax
-    sithPuppet *v22; // eax
+    sithPuppet *v22 = NULL; // eax
     float v23; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
     float thinga; // [esp+24h] [ebp+4h]

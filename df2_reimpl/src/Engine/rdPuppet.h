@@ -64,6 +64,7 @@ void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, float speed);
 int rdPuppet_SetStatus(rdPuppet *puppet, int trackNum, int status);
 int rdPuppet_PlayTrack(rdPuppet *puppet, int trackNum);
 void rdPuppet_unk(rdPuppet *puppet, int trackNum);
+int rdPuppet_RemoveTrack(rdPuppet *puppet, rdThing *rdthing);
 
 //static void (*rdPuppet_unk)(rdPuppet *a1, int a2) = (void*)rdPuppet_unk_ADDR;
 //static int (*rdPuppet_AddTrack)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4) = (void*)rdPuppet_AddTrack_ADDR;

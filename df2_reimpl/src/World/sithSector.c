@@ -15,9 +15,11 @@
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithSound.h"
+#include "Engine/sithSoundSys.h"
 #include "Engine/sithRender.h"
 #include "Engine/rdCache.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithKeyFrame.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 
@@ -1626,6 +1628,17 @@ void sithSector_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector, rdV
     }
 }
 
+sithSector* sithSector_GetPtrFromIdx(int idx)
+{
+    sithSector *result; // eax
+
+    if ( sithWorld_pCurWorld && idx >= 0 && idx < sithWorld_pCurWorld->numSectors )
+        result = &sithWorld_pCurWorld->sectors[idx];
+    else
+        result = 0;
+    return result;
+}
+
 void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
@@ -1745,6 +1758,148 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
+{
+    int16_t thingIdx; // ebp
+    uint32_t v8; // ecx
+    sithThing* thing;
+    sithSector* v11;
+    int thingType;
+
+
+    NETMSG_IN_START(msg);
+
+    if ( sithNet_isMulti && (g_submodeFlags & 8) == 0 )
+        return 0;
+
+    thingIdx = NETMSG_POPU16();
+    if ( thingIdx >= sithWorld_pCurWorld->numThingsLoaded )
+        return 0;
+
+    if ( sithWorld_pCurWorld->things[thingIdx].thingType )
+        sithThing_FreeEverythingNet(&sithWorld_pCurWorld->things[thingIdx]);
+
+    if ( sithWorld_pCurWorld->numThings > thingIdx )
+        thingIdx = sithWorld_pCurWorld->numThings;
+
+    sithWorld_pCurWorld->numThings = thingIdx;
+
+    thingType = NETMSG_POPU16();
+    if ( !thingType )
+        return 1;
+
+    thing = &sithWorld_pCurWorld->things[thingIdx];
+    sithThing_DoesRdThingInit(thing);
+    v8 = NETMSG_POPU16();
+
+    if ( v8 >= sithWorld_pCurWorld->numTemplatesLoaded )
+        return 0;
+
+    sithThing_sub_4CD8A0(thing, &sithWorld_pCurWorld->templates[v8]);
+
+    thing->signature = NETMSG_POPU32();
+    thing->thing_id = NETMSG_POPU32();
+    thing->thingType = thingType;
+    thing->position = NETMSG_POPVEC3();
+    thing->lookOrientation.rvec = NETMSG_POPVEC3();
+    thing->lookOrientation.lvec = NETMSG_POPVEC3();
+    thing->lookOrientation.uvec = NETMSG_POPVEC3();
+    v11 = sithSector_GetPtrFromIdx(NETMSG_POPS16());
+    if ( v11 )
+        sithThing_MoveToSector(thing, v11, 1);
+
+    thing->thingflags = NETMSG_POPU32();
+    thing->lifeLeftMs = NETMSG_POPU32();
+    thing->timer = NETMSG_POPU32();
+    thing->pulse_end_ms = NETMSG_POPU32();
+    thing->pulse_ms = NETMSG_POPU32();
+    thing->userdata = NETMSG_POPF32();
+    thing->rdthing.geometryMode = NETMSG_POPU8();
+    thing->collide = NETMSG_POPU16();
+    thing->collideSize = NETMSG_POPF32();
+    thing->light = NETMSG_POPF32();
+    thing->jkFlags = NETMSG_POPU32();
+
+    if ( thing->thingflags & SITH_TF_CAPTURED )
+    {
+        thing->class_cog = sithCog_GetByIdx(NETMSG_POPU16());
+        thing->capture_cog = sithCog_GetByIdx(NETMSG_POPU16());
+    }
+    switch ( thing->thingType )
+    {
+        case THINGTYPE_ACTOR:
+        case THINGTYPE_CORPSE:
+        case THINGTYPE_PLAYER:
+            thing->actorParams.typeflags = NETMSG_POPU32();
+            thing->actorParams.health = NETMSG_POPF32();
+            thing->actorParams.extraSpeed = NETMSG_POPF32();
+            thing->actorParams.eyePYR = NETMSG_POPVEC3();
+            
+            thing->actorParams.timeLeftLengthChange = NETMSG_POPF32();
+            thing->actorParams.lightIntensity = NETMSG_POPF32();
+            thing->actorParams.field_1BC = NETMSG_POPU32();
+            
+            int playerInfo_idx = NETMSG_POPU32();
+            
+            if ( playerInfo_idx >= 0 && playerInfo_idx < 32 )
+            {
+                thing->actorParams.playerinfo = &jkPlayer_playerInfos[playerInfo_idx];
+                thing->actorParams.playerinfo->palEffectsIdx1 = NETMSG_POPU32();
+                thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPU32();
+            }
+            break;
+        case THINGTYPE_WEAPON:
+            thing->weaponParams.typeflags = NETMSG_POPU32();
+            thing->weaponParams.unk8 = NETMSG_POPF32();
+            thing->weaponParams.field_18 = NETMSG_POPU16();
+            break;
+        case THINGTYPE_EXPLOSION:
+            thing->explosionParams.typeflags = NETMSG_POPU32();
+            break;
+        default:
+            break;
+    }
+    if ( thing->move_type == MOVETYPE_PHYSICS )
+    {
+        thing->physicsParams.physflags = NETMSG_POPU32();
+        thing->physicsParams.vel = NETMSG_POPVEC3();
+        thing->physicsParams.angVel = NETMSG_POPVEC3();
+    }
+    else if ( thing->move_type == MOVETYPE_PATH )
+    {
+        thing->trackParams.field_C = NETMSG_POPU16();
+        thing->trackParams.vel = NETMSG_POPVEC3();
+        thing->trackParams.field_1C = NETMSG_POPF32();
+        thing->trackParams.field_20 = NETMSG_POPF32();
+        thing->trackParams.field_54 = NETMSG_POPF32();
+        thing->trackParams.field_58 = NETMSG_POPVEC3();
+        thing->trackParams.field_64 = NETMSG_POPVEC3();
+        thing->field_24C = NETMSG_POPF32();
+        thing->field_250 = NETMSG_POPU16();
+        thing->curframe = NETMSG_POPU16();
+        thing->field_258 = NETMSG_POPU16();
+        thing->goalframe = NETMSG_POPU16();
+        thing->trackParams.field_24 = NETMSG_POPMAT34();
+        thing->trackParams.orientation = NETMSG_POPVEC3();
+        thing->trackParams.loadedFrames = NETMSG_POPU16();
+
+        if ( thing->trackParams.loadedFrames )
+        {
+            // TODO: verify this doesn't leak memory
+            thing->trackParams.numFrames = thing->trackParams.loadedFrames;
+            thing->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
+        }
+
+        for (int i = 0; i < thing->trackParams.loadedFrames; i++)
+        {
+            thing->trackParams.frames[i].pos = NETMSG_POPVEC3();
+            thing->trackParams.frames[i].rot = NETMSG_POPVEC3();
+        }
+    }
+    sithThing_sub_4CD100(thing);
+    return 1;
+}
+
 void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
@@ -1757,10 +1912,10 @@ void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFla
         NETMSG_PUSHU32(puppet->tracks[i].status);
         if ( puppet->tracks[i].status )
         {
-            NETMSG_PUSHU32(puppet->tracks[i].keyframe->id);
-            NETMSG_PUSHU32(puppet->tracks[i].field_4);
-            NETMSG_PUSHU16(puppet->tracks[i].lowPri);
-            NETMSG_PUSHU16(puppet->tracks[i].highPri);
+            NETMSG_PUSHS32(puppet->tracks[i].keyframe->id);
+            NETMSG_PUSHS32(puppet->tracks[i].field_4);
+            NETMSG_PUSHS16(puppet->tracks[i].lowPri);
+            NETMSG_PUSHS16(puppet->tracks[i].highPri);
             NETMSG_PUSHF32(puppet->tracks[i].speed);
             NETMSG_PUSHF32(puppet->tracks[i].playSpeed);
             NETMSG_PUSHF32(puppet->tracks[i].field_120);
@@ -1769,9 +1924,9 @@ void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFla
     }
     if ( thing->puppet )
     {
-        NETMSG_PUSHU32(thing->puppet->otherTrack);
-        NETMSG_PUSHU16(thing->puppet->field_0);
-        NETMSG_PUSHU16(thing->puppet->field_4);
+        NETMSG_PUSHS32(thing->puppet->otherTrack);
+        NETMSG_PUSHS16(thing->puppet->field_0);
+        NETMSG_PUSHS16(thing->puppet->field_4);
     }
     
     NETMSG_END(COGMSG_SYNCPUPPET);
@@ -1779,28 +1934,78 @@ void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFla
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+int sithSector_cogMsg_HandleSyncPuppet(sithCogMsg *msg)
+{
+    sithThing *thing; // eax
+    rdPuppet *rdpuppet; // edi
+
+    NETMSG_IN_START(msg);
+
+    thing = sithThing_GetThingByIdx(NETMSG_POPS32());
+
+    if ( !thing )
+        return 0;
+
+    if ( !thing->animclass )
+        return 0;
+
+    if ( !thing->puppet )
+        return 0;
+
+    rdpuppet = thing->rdthing.puppet;
+    if ( !rdpuppet )
+        return 0;
+
+    rdPuppet_RemoveTrack(rdpuppet, &thing->rdthing);
+
+    for (int i = 0; i < 4; i++)
+    {
+        rdpuppet->tracks[i].status = NETMSG_POPS32();
+        if ( rdpuppet->tracks[i].status )
+        {
+            rdpuppet->tracks[i].keyframe = sithKeyFrame_GetByIdx(NETMSG_POPS32());
+            rdpuppet->tracks[i].field_4 = NETMSG_POPS32();
+            rdpuppet->tracks[i].lowPri = (int)NETMSG_POPS16();
+            rdpuppet->tracks[i].highPri = (int)NETMSG_POPS16();
+            rdpuppet->tracks[i].speed = NETMSG_POPF32();
+            rdpuppet->tracks[i].playSpeed = NETMSG_POPF32();
+            rdpuppet->tracks[i].field_120 = NETMSG_POPF32();
+            rdpuppet->tracks[i].field_124 = NETMSG_POPF32();
+        }
+    }
+
+    if ( thing->puppet )
+    {
+        thing->puppet->otherTrack = NETMSG_POPS32();
+        
+        sithPuppet_SetArmedMode(thing, NETMSG_POPS16());
+        sithPuppet_sub_4E4760(thing, NETMSG_POPS16());
+    }
+    return 1;
+}
+
 void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx)
 {    
     NETMSG_START;
 
-    NETMSG_PUSHU16(actor->thing->thingIdx);
+    NETMSG_PUSHS16(actor->thing->thingIdx);
     NETMSG_PUSHU16((uint16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurWorld->aiclasses) / sizeof(sithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->thingidk ) {
-        NETMSG_PUSHU16(actor->thingidk->thingIdx);
+        NETMSG_PUSHS16(actor->thingidk->thingIdx);
     }
     else {
-        NETMSG_PUSHU16(-1);
+        NETMSG_PUSHS16(-1);
     }
     NETMSG_PUSHVEC3(actor->movepos);
     NETMSG_PUSHVEC3(actor->field_23C);
     NETMSG_PUSHU32(actor->field_248);
     if ( actor->field_1D0 ) {
-        NETMSG_PUSHU16(actor->field_1D0->thingIdx);
+        NETMSG_PUSHS16(actor->field_1D0->thingIdx);
     }
     else {
-        NETMSG_PUSHU16(-1);
+        NETMSG_PUSHS16(-1);
     }
     NETMSG_PUSHVEC3(actor->field_1D4);
     NETMSG_PUSHVEC3(actor->field_1F8);
@@ -1818,10 +2023,10 @@ void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx)
     if (actor->flags & SITHAIFLAGS_FLEEING)
     {
         if ( actor->field_1C0 ) {
-            NETMSG_PUSHU16(actor->field_1C0->thingIdx);
+            NETMSG_PUSHS16(actor->field_1C0->thingIdx);
         }
         else {
-            NETMSG_PUSHU16(-1);
+            NETMSG_PUSHS16(-1);
         }
     }
     NETMSG_PUSHVEC3(actor->position);
@@ -1845,6 +2050,95 @@ void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx)
     NETMSG_END(COGMSG_SYNCAI);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, idx, 1);
+}
+
+int sithSector_cogMsg_HandleSyncAI(sithCogMsg *msg)
+{
+    sithThing *thing;
+    sithActor *actor;
+    
+    NETMSG_IN_START(msg);
+
+    thing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    if ( !thing )
+        return 0;
+    if ( thing->thingtype != THINGTYPE_ACTOR )
+        return 0;
+    actor = thing->actor;
+    if ( !actor )
+        return 0;
+    
+    int16_t idx = NETMSG_POPU16();
+    if ( idx >= sithWorld_pCurWorld->numAIClassesLoaded )
+        return 0;
+
+    actor->aiclass = &sithWorld_pCurWorld->aiclasses[idx];
+    actor->numAIClassEntries = sithWorld_pCurWorld->aiclasses[idx].numEntries;
+    actor->flags = NETMSG_POPU32();
+    actor->nextUpdate = NETMSG_POPU32();
+    actor->thingidk = sithThing_GetThingByIdx(NETMSG_POPS16());
+    actor->field_224 = 0; // interesting?
+    
+    actor->movepos = NETMSG_POPVEC3();
+    actor->field_23C = NETMSG_POPVEC3();
+    actor->field_248 = NETMSG_POPU32();
+
+    actor->field_1D0 = sithThing_GetThingByIdx(NETMSG_POPS16());
+    
+    actor->field_1D4 = NETMSG_POPVEC3();
+    actor->field_1E0 = 0; // interesting?
+    actor->field_1F8 = NETMSG_POPVEC3();
+    actor->field_204 = NETMSG_POPU32();
+    actor->moveSpeed = NETMSG_POPF32();
+
+    if (actor->flags & SITHAIFLAGS_MOVING_TO_DEST)
+    {
+        actor->movePos = NETMSG_POPVEC3();
+    }
+    if (actor->flags & SITHAIFLAGS_TURNING_TO_DEST)
+    {
+        actor->lookVector = NETMSG_POPVEC3();
+    }
+    if (actor->flags & SITHAIFLAGS_FLEEING)
+    {
+        actor->field_1C0 = sithThing_GetThingByIdx(NETMSG_POPS16());
+    }
+    actor->position = NETMSG_POPVEC3();
+    actor->lookOrientation = NETMSG_POPVEC3();
+
+    for (int i = 0; i < actor->numAIClassEntries; i++)
+    {
+        actor->instincts[i].nextUpdate = NETMSG_POPU32();
+        actor->instincts[i].param0 = NETMSG_POPF32();
+        actor->instincts[i].param1 = NETMSG_POPF32();
+        actor->instincts[i].param2 = NETMSG_POPF32();
+        actor->instincts[i].param3 = NETMSG_POPF32();
+    }
+    
+    actor->field_288 = NETMSG_POPU32();
+    actor->field_28C = NETMSG_POPU32();
+    actor->loadedFrames = NETMSG_POPU32();
+    
+    if ( actor->loadedFrames)
+    {
+        actor->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * actor->loadedFrames);
+        actor->numFrames = actor->loadedFrames;
+        if ( actor->framesAlloc )
+        {
+            for (int i = 0; i < actor->loadedFrames; i++)
+            {
+                actor->framesAlloc[i] = NETMSG_POPVEC3();
+            }
+            return 1;
+        }
+    }
+    else
+    {
+        actor->numFrames = 0;
+        actor->loadedFrames = 0;
+        actor->framesAlloc = NULL; // Added
+    }
+    return 1;
 }
 
 void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags)
@@ -2113,4 +2407,30 @@ void sithSector_cogmsg_send31(int sendto_id, int mpFlags)
     NETMSG_END(COGMSG_ID_1F);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+void sithSector_cogmsg_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHU32(flags);
+    NETMSG_PUSHF32(volume);
+    NETMSG_PUSHF32(a5);
+    NETMSG_PUSHU16(sound->id);
+    if ( (flags & SITHSOUNDFLAG_FOLLOWSTHING) == 0 )
+    {
+        if ( (flags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
+        {
+            NETMSG_PUSHVEC3(*pos);
+        }
+    }
+    else
+    {
+        NETMSG_PUSHU32(followThing->thing_id);
+    }
+    NETMSG_PUSHU32(refid);
+    
+    NETMSG_END(COGMSG_PLAYSOUNDPOS);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 0);
 }
