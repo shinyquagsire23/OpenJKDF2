@@ -20,6 +20,7 @@
 #include "Engine/rdCache.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithKeyFrame.h"
+#include "Engine/sithMaterial.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 
@@ -2145,15 +2146,15 @@ void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int 
 {
     NETMSG_START;
 
-    NETMSG_PUSHU16(surface->field_0);
+    NETMSG_PUSHS16(surface->field_0);
     NETMSG_PUSHU32(surface->surfaceFlags);
     if ( surface->surfaceInfo.face.material ) {
-        NETMSG_PUSHU32(surface->surfaceInfo.face.material->id);
+        NETMSG_PUSHS32(surface->surfaceInfo.face.material->id);
     }
     else {
-        NETMSG_PUSHU32(-1);
+        NETMSG_PUSHS32(-1);
     }
-    NETMSG_PUSHU16(surface->surfaceInfo.face.wallCel);
+    NETMSG_PUSHS16(surface->surfaceInfo.face.wallCel);
     NETMSG_PUSHVEC2(surface->surfaceInfo.face.clipIdk);
     NETMSG_PUSHF32(surface->surfaceInfo.face.extraLight);
     NETMSG_PUSHU32(surface->surfaceInfo.face.type);
@@ -2168,6 +2169,42 @@ void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int 
     NETMSG_END(COGMSG_SYNCSURFACE);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+int sithSector_cogMsg_HandleSyncSurface(sithCogMsg *msg)
+{
+    unsigned int v1; // eax
+    sithSurface *surface; // edi
+    signed int v4; // ecx
+    
+    NETMSG_IN_START(msg);
+
+    v1 = NETMSG_POPS16();
+    if ( v1 >= sithWorld_pCurWorld->numSurfaces )
+        return 0;
+
+    surface = &sithWorld_pCurWorld->surfaces[v1];
+
+    surface->surfaceFlags = NETMSG_POPU32();
+    surface->surfaceInfo.face.material = sithMaterial_GetByIdx(NETMSG_POPS32());;
+
+    v4 = NETMSG_POPS16();
+    if ( v4 == -1 || !surface->surfaceInfo.face.material || v4 >= surface->surfaceInfo.face.material->num_texinfo )
+        surface->surfaceInfo.face.wallCel = -1;
+    else
+        surface->surfaceInfo.face.wallCel = v4;
+
+    surface->surfaceInfo.face.clipIdk = NETMSG_POPVEC2();
+    surface->surfaceInfo.face.extraLight = NETMSG_POPF32();
+    surface->surfaceInfo.face.type = NETMSG_POPU32();
+    surface->surfaceInfo.face.geometryMode = NETMSG_POPU32();
+    surface->surfaceInfo.face.lightingMode = NETMSG_POPU32();
+    surface->surfaceInfo.face.textureMode = NETMSG_POPU32();
+
+    if ( surface->adjoin )
+        surface->adjoin->flags = NETMSG_POPU32();
+
+    return 1;
 }
 
 void sithSector_cogMsg_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)

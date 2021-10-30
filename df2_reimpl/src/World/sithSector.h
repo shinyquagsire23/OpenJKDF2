@@ -166,6 +166,7 @@ int sithSector_cogMsg_HandleSyncPuppet(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx);
 int sithSector_cogMsg_HandleSyncAI(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags);
+int sithSector_cogMsg_HandleSyncSurface(sithCogMsg *msg);
 void sithSector_cogMsg_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
 void sithSector_cogMsg_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags);
 void sithSector_cogMsg_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags);

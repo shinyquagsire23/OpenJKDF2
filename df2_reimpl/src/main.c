@@ -1145,8 +1145,9 @@ void do_hooks()
     hook_function(sithSector_cogmsg_SendPlaySoundPos_ADDR, sithSector_cogmsg_SendPlaySoundPos);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
     hook_function(sithSector_cogMsg_HandleSyncThingFull_ADDR, sithSector_cogMsg_HandleSyncThingFull);
-    //hook_function(sithSector_cogMsg_HandleSyncPuppet_ADDR, sithSector_cogMsg_HandleSyncPuppet);
+    hook_function(sithSector_cogMsg_HandleSyncPuppet_ADDR, sithSector_cogMsg_HandleSyncPuppet);
     hook_function(sithSector_cogMsg_HandleSyncAI_ADDR, sithSector_cogMsg_HandleSyncAI);
+    hook_function(sithSector_cogMsg_HandleSyncSurface_ADDR, sithSector_cogMsg_HandleSyncSurface);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);

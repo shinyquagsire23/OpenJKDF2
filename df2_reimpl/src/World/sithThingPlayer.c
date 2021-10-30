@@ -148,8 +148,8 @@ int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
             else if ( sym->val.type == COG_VARTYPE_VECTOR )
             {
                 NETMSG_PUSHF32(sym->val.dataAsFloat[0]);
-                NETMSG_PUSHF32(sym->val.dataAsFloat[0]);
-                NETMSG_PUSHF32(sym->val.dataAsFloat[0]);
+                NETMSG_PUSHF32(sym->val.dataAsFloat[1]);
+                NETMSG_PUSHF32(sym->val.dataAsFloat[2]);
             }
             else
             {
@@ -160,4 +160,71 @@ int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
 
     NETMSG_END(COGMSG_SYNCCOG);
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+int sithThingPlayer_cogMsg_HandleSyncCog(sithCogMsg *msg)
+{
+    sithCog *cog; // eax
+    sithCogSymboltable *v13; // ebp
+    
+    NETMSG_IN_START(msg);
+
+    cog = sithCog_GetByIdx(NETMSG_POPU32());
+    if (!cog)
+        return 0;
+
+    cog->script_running = NETMSG_POPU32();
+    cog->flags = NETMSG_POPU32();
+    if (cog->script_running)
+    {
+        cog->wakeTimeMs = NETMSG_POPU32();
+        cog->cogscript_pc = NETMSG_POPU32();
+        cog->senderId = NETMSG_POPU32();
+        cog->senderRef = NETMSG_POPU32();
+        cog->senderType = NETMSG_POPU32();
+        cog->sourceRef = NETMSG_POPU32();
+        cog->sourceType = NETMSG_POPU32();
+    }
+
+    if (cog->flags & COGFLAGS_PULSE)
+    {
+        cog->pulsePeriodMs = NETMSG_POPU32();
+        cog->nextPulseMs = NETMSG_POPU32();
+    }
+
+    if (cog->flags & COGFLAGS_8)
+    {
+        cog->field_20 = NETMSG_POPU32();
+    }
+    
+    v13 = cog->symbolTable;
+    if ( v13->entry_cnt )
+    {
+        for (int i = 0; i < v13->entry_cnt; i++)
+        {
+            v13->buckets[i].val.type = NETMSG_POPU8();
+        }
+
+        // TODO: verify in 64-bit, particularly with AICLASS
+        for (int i = 0; i < v13->entry_cnt; i++)
+        {
+            sithCogSymbol* sym = &v13->buckets[i];
+            if (sym->val.type == COG_VARTYPE_FLEX)
+            {
+                sym->val.data[0] = NETMSG_POPU32();
+            }
+            else if ( sym->val.type == COG_VARTYPE_VECTOR )
+            {
+                sym->val.dataAsFloat[0] = NETMSG_POPF32();
+                sym->val.dataAsFloat[1] = NETMSG_POPF32();
+                sym->val.dataAsFloat[2] = NETMSG_POPF32();
+            }
+            else
+            {
+                sym->val.data[0] = NETMSG_POPU32();
+            }
+        }
+    }
+
+    return 1;
 }

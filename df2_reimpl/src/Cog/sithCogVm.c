@@ -8,11 +8,12 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithPlayer.h"
+#include "World/sithThingPlayer.h"
+#include "World/jkPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithTime.h"
-#include "World/jkPlayer.h"
 #include "Win95/sithDplay.h"
 #include "Main/jkGame.h"
 #include "Engine/sithNet.h"
@@ -50,7 +51,6 @@
 #define cogMsg_HandleTakeItem ((void*)0x004F5150)
 #define cogMsg_HandleCreateThing ((void*)0x004F52E0)
 #define cogMsg_HandleDestroyThing ((void*)0x004F5410)
-#define cogMsg_HandleSyncSurface ((void*)0x004F9050)
 #define cogMsg_HandleSyncSector ((void*)0x004F91F0)
 #define cogMsg_HandleSyncSectorAlt ((void*)0x004F9350)
 #define cogMsg_HandleSyncItemDesc ((void*)0x004F99C0)
@@ -58,8 +58,6 @@
 #define cogMsg_HandleSyncTimers ((void*)0x004F9FA0)
 #define cogMsg_HandleSyncCameras ((void*)0x004FA130)
 #define cogMsg_HandleSyncPalEffects ((void*)0x004FA350)
-#define cogMsg_HandleSendTrigger ((void*)0x004FC630)
-#define cogMsg_HandleSyncCog ((void*)0x004FC8A0)
 #define cogmsg_31 ((void*)0x4FA5D0)
 #define sithDplay_cogMsg_HandleEnumPlayers ((void*)0x004C9A40)
 
@@ -78,13 +76,13 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;
     sithCogVm_msgFuncs[COGMSG_DEATH] = cogMsg_HandleDeath;
     sithCogVm_msgFuncs[COGMSG_DAMAGE] = cogMsg_HandleDamage;
-    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = cogMsg_HandleSendTrigger;
+    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = sithThingPlayer_cogMsg_HandleSendTrigger;
     sithCogVm_msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
     sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = cogMsg_HandlePlaySoundPos;
     sithCogVm_msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithSector_cogMsg_HandleSyncThingFull;
-    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = cogMsg_HandleSyncCog;
-    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = cogMsg_HandleSyncSurface;
+    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = sithThingPlayer_cogMsg_HandleSyncCog;
+    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = sithSector_cogMsg_HandleSyncSurface;
     sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithSector_cogMsg_HandleSyncAI;
     sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = cogMsg_HandleSyncItemDesc;
     sithCogVm_msgFuncs[COGMSG_STOPANIM] = cogMsg_HandleStopAnim;

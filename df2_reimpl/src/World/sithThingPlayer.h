@@ -13,6 +13,7 @@ typedef struct sithCog sithCog;
 int sithThingPlayer_cogMsg_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float a8_, float a8, float a9, float a10, int a11);
 int sithThingPlayer_cogMsg_HandleSendTrigger(sithCogMsg *in_netMsg);
 int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags);
+int sithThingPlayer_cogMsg_HandleSyncCog(sithCogMsg *msg);
 
 //static int (*sithThingPlayer_cogMsg_SendSendTrigger)(sithCog* a1, int a2, int a3, int a4, int a5, int a6, int a7, float a8_, float a8, float a9, float a10, int a11) = (void*)sithThingPlayer_cogMsg_SendSendTrigger_ADDR;
 //static int (*sithThingPlayer_cogMsg_SendSyncCog)(sithCog *cog, int sendto_id, int mpFlags) = (void*)sithThingPlayer_cogMsg_SendSyncCog_ADDR;
