@@ -1244,3 +1244,21 @@ void sithSurface_Sync(int mpFlags)
         }
     }
 }
+
+rdSurface* sithSurface_Alloc()
+{
+    int v1; // edx
+    rdSurface *v2; // esi
+
+    if (!sithSurface_numAvail)
+        return NULL;
+
+    v1 = sithSurface_aAvail[sithSurface_numAvail--];
+    if ( v1 > sithSurface_numSurfaces )
+        sithSurface_numSurfaces = v1;
+
+    v2 = &sithSurface_aSurfaces[v1];
+    _memset(v2, 0, sizeof(rdSurface));
+    v2->index = ((playerThingIdx + 1) << 16) | (uint16_t)v1;
+    return v2;
+}

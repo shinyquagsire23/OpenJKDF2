@@ -1141,13 +1141,21 @@ void do_hooks()
     hook_function(sithSector_cogMsg_SendSyncTimers_ADDR, sithSector_cogMsg_SendSyncTimers);
     hook_function(sithSector_cogMsg_SendSyncPalEffects_ADDR, sithSector_cogMsg_SendSyncPalEffects);
     hook_function(sithSector_cogMsg_SendSyncCameras_ADDR, sithSector_cogMsg_SendSyncCameras);
-    hook_function(sithSector_cogmsg_send31_ADDR, sithSector_cogmsg_send31);
-    hook_function(sithSector_cogmsg_SendPlaySoundPos_ADDR, sithSector_cogmsg_SendPlaySoundPos);
+    hook_function(sithSector_cogMsg_SendMisc_ADDR, sithSector_cogMsg_SendMisc);
+    hook_function(sithSector_cogMsg_SendPlaySoundPos_ADDR, sithSector_cogMsg_SendPlaySoundPos);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
     hook_function(sithSector_cogMsg_HandleSyncThingFull_ADDR, sithSector_cogMsg_HandleSyncThingFull);
     hook_function(sithSector_cogMsg_HandleSyncPuppet_ADDR, sithSector_cogMsg_HandleSyncPuppet);
     hook_function(sithSector_cogMsg_HandleSyncAI_ADDR, sithSector_cogMsg_HandleSyncAI);
     hook_function(sithSector_cogMsg_HandleSyncSurface_ADDR, sithSector_cogMsg_HandleSyncSurface);
+    hook_function(sithSector_cogMsg_HandleSyncSector_ADDR, sithSector_cogMsg_HandleSyncSector);
+    hook_function(sithSector_cogMsg_HandleSyncItemDesc_ADDR, sithSector_cogMsg_HandleSyncItemDesc);
+    hook_function(sithSector_cogMsg_HandleStopAnim_ADDR, sithSector_cogMsg_HandleStopAnim);
+    hook_function(sithSector_cogMsg_HandleSyncTimers_ADDR, sithSector_cogMsg_HandleSyncTimers);
+    hook_function(sithSector_cogMsg_HandleSyncPalEffects_ADDR, sithSector_cogMsg_HandleSyncPalEffects);
+    hook_function(sithSector_cogMsg_HandleSyncCameras_ADDR, sithSector_cogMsg_HandleSyncCameras);
+    hook_function(sithSector_cogMsg_HandlePlaySoundPos_ADDR, sithSector_cogMsg_HandlePlaySoundPos);
+    hook_function(sithSector_cogMsg_HandleMisc_ADDR, sithSector_cogMsg_HandleMisc);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1322,6 +1330,7 @@ void do_hooks()
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
     hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
     hook_function(sithSurface_Sync_ADDR, sithSurface_Sync);
+    hook_function(sithSurface_Alloc_ADDR, sithSurface_Alloc);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
@@ -1402,6 +1411,11 @@ void do_hooks()
     hook_function(jkSaber_cogMsg_SendSetSaberInfo2_ADDR, jkSaber_cogMsg_SendSetSaberInfo2);
     hook_function(jkSaber_cogMsg_SendSetSaberInfo_ADDR, jkSaber_cogMsg_SendSetSaberInfo);
     hook_function(jkSaber_cogMsg_Sendx32_ADDR, jkSaber_cogMsg_Sendx32);
+    hook_function(jkSaber_cogMsg_HandleSetSaberInfo_ADDR, jkSaber_cogMsg_HandleSetSaberInfo);
+    hook_function(jkSaber_cogMsg_HandleSetSaberInfo2_ADDR, jkSaber_cogMsg_HandleSetSaberInfo2);
+    hook_function(jkSaber_cogMsg_Handlex32_ADDR, jkSaber_cogMsg_Handlex32);
+    hook_function(jkSaber_cogMsg_Handlex36_setwaggle_ADDR, jkSaber_cogMsg_Handlex36_setwaggle);
+    hook_function(jkSaber_cogMsg_HandleHudTarget_ADDR, jkSaber_cogMsg_HandleHudTarget);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);

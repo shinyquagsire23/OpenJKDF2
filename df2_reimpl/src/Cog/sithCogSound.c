@@ -81,7 +81,7 @@ void sithCogSound_PlaySoundThing(sithCog *ctx)
                     refid_ = playingSound->refid;
                 else
                     refid_ = -1;
-                sithSector_cogmsg_SendPlaySoundPos(thing, &thing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+                sithSector_cogMsg_SendPlaySoundPos(thing, &thing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
             }
         }
     }
@@ -98,7 +98,7 @@ void sithCogSound_PlaySoundThing(sithCog *ctx)
                     refid = playingSound->refid;
                 else
                     refid = -1;
-                sithSector_cogmsg_SendPlaySoundPos(0, 0, sound, volume, 0.0, flags, refid, -1, 255);
+                sithSector_cogMsg_SendPlaySoundPos(0, 0, sound, volume, 0.0, flags, refid, -1, 255);
             }
         }
     }
@@ -156,7 +156,7 @@ void sithCogSound_PlaySoundPos(sithCog *ctx)
             else
                 refId = -1;
 
-            sithSector_cogmsg_SendPlaySoundPos(0, &pos, sound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
+            sithSector_cogMsg_SendPlaySoundPos(0, &pos, sound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
         }
     }
 
@@ -242,7 +242,7 @@ void sithCogSound_PlaySoundGlobal(sithCog *ctx)
             && !(ctx->flags & 0x200))
         {
             if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSector_cogmsg_SendPlaySoundPos(0, 0, sound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
+                sithSector_cogMsg_SendPlaySoundPos(0, 0, sound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
         }
         sithCogVm_PushInt(ctx, playingSound->refid);
     }

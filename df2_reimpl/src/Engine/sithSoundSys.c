@@ -1441,7 +1441,7 @@ void sithSoundSys_SyncSounds()
             if ( sound )
             {
                 if ( (iter->flags & 1) != 0 )
-                    sithSector_cogmsg_SendPlaySoundPos(
+                    sithSector_cogMsg_SendPlaySoundPos(
                         iter->thing,
                         &iter->pos,
                         sound,

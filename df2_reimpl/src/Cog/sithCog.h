@@ -65,7 +65,7 @@
 #define NETMSG_PUSHVEC3(x) { *(rdVector3*)craftingPacket = x; craftingPacket += sizeof(rdVector3); }
 #define NETMSG_PUSHVEC3I(x) { *(rdVector3i*)craftingPacket = x; craftingPacket += sizeof(rdVector3i); }
 #define NETMSG_PUSHMAT34(x) { *(rdMatrix34*)craftingPacket = x; craftingPacket += sizeof(rdMatrix34); }
-#define NETMSG_PUSHSTR(x,l) { _strncpy((char*)craftingPacket, x, l-1); ((char*)craftingPacket)[l-1] = 0; craftingPacket += l; }
+#define NETMSG_PUSHSTR(x,l) { _strncpy((char*)craftingPacket, x, (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l); }
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
                             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
@@ -83,6 +83,7 @@
 #define NETMSG_POPVEC3() ({ rdVector3 _readingOut = *(rdVector3*)_readingPacket; _readingPacket += sizeof(rdVector3); _readingOut; })
 #define NETMSG_POPVEC3I() ({ rdVector3i _readingOut = *(rdVector3i*)_readingPacket; _readingPacket += sizeof(rdVector3i); _readingOut; })
 #define NETMSG_POPMAT34() ({ rdMatrix34 _readingOut = *(rdMatrix34*)_readingPacket; _readingPacket += sizeof(rdMatrix34); _readingOut; })
+#define NETMSG_POPSTR(x,l) { _strncpy((x), (char*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l); }
 #define NETMSG_IN_END {}
 
 typedef int SITH_MESSAGE;

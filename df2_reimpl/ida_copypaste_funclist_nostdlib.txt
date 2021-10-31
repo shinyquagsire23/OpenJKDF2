@@ -2548,7 +2548,7 @@ sithSector_cogMsg_SendTeleportThing	.text	004F3120	0000014F	00000010	0000000C	R	
 sithSector_cogMsg_HandleTeleportThing	.text	004F3270	000001A2	00000028	00000004	R	.	.	.	.	.	T	.
 sithSector_cogMsg_SendSyncThing	.text	004F3420	0000018F	00000004	0000000C	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandleSyncThing	.text	004F35E0	000001A6	0000000C	00000004	R	.	.	.	.	.	.	.
-sithSector_cogmsg_SendPlaySoundPos	.text	004F37B0	000000B1	00000000	00000024	R	.	.	.	.	.	T	.
+sithSector_cogMsg_SendPlaySoundPos	.text	004F37B0	000000B1	00000000	00000024	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandlePlaySoundPos	.text	004F3870	000000E5	0000001C	00000004	R	.	.	.	.	.	T	.
 sithSector_cogMsg_SoundClassPlay	.text	004F3960	00000060	00000000	00000010	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandleSoundClassPlay	.text	004F39C0	00000067	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2627,8 +2627,8 @@ sithSector_cogMsg_SendSyncCameras	.text	004F9FF0	0000013E	00000000	00000008	R	.	
 sithSector_cogMsg_HandleSyncCameras	.text	004FA130	0000010E	0000000C	00000004	R	.	.	.	.	.	.	.
 sithSector_cogMsg_SendSyncPalEffects	.text	004FA240	00000104	00000008	00000008	R	.	.	.	.	.	T	.
 sithSector_cogMsg_HandleSyncPalEffects	.text	004FA350	000000CB	00000008	00000004	R	.	.	.	.	.	.	.
-sithSector_cogmsg_send31	.text	004FA420	000001B0	00000000	00000008	R	.	.	.	.	.	T	.
-sithSector_cogmsg_31	.text	004FA5D0	0000019C	00000004	00000004	R	.	.	.	.	.	T	.
+sithSector_cogMsg_SendMisc	.text	004FA420	000001B0	00000000	00000008	R	.	.	.	.	.	T	.
+sithSector_cogMsg_HandleMisc	.text	004FA5D0	0000019C	00000004	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_SkipToFrame	.text	004FA770	000000CB	00000004	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_MoveToFrame	.text	004FA840	00000051	00000004	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_RotatePivot	.text	004FA8A0	000000D3	0000000C	00000010	R	.	.	.	.	.	T	.

@@ -102,6 +102,7 @@ void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, flo
 rdSurface* sithSurface_GetRdSurface(sithSurface *surface);
 rdSurface* sithSurface_GetByIdx(int idx);
 void sithSurface_Sync(int mpFlags);
+rdSurface* sithSurface_Alloc();
 
 //static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;

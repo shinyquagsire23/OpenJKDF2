@@ -12,6 +12,9 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithSave.h"
+#include "Engine/sithTemplate.h"
+#include "Engine/sithModel.h"
+#include "Engine/sithKeyFrame.h"
 #include "World/sithSector.h"
 #include "World/sithUnk3.h"
 #include "Main/jkMain.h"
@@ -24,17 +27,21 @@
 #define JKSABER_EXTENDTIME (0.3000000)
 
 #define jkSaber_cogMsg_HandleJKEnableSaber ((void*)jkSaber_cogMsg_HandleJKEnableSaber_ADDR)
-#define jkSaber_cogMsg_HandleSetSaberInfo2 ((void*)jkSaber_cogMsg_HandleSetSaberInfo2_ADDR)
 #define jkSaber_cogMsg_HandleJKSetWeaponMesh ((void*)jkSaber_cogMsg_HandleJKSetWeaponMesh_ADDR)
-#define jkSaber_cogMsg_Handlex32 ((void*)jkSaber_cogMsg_Handlex32_ADDR)
 #define jkSaber_cogMsg_Handlex33 ((void*)jkSaber_cogMsg_Handlex33_ADDR)
-#define jkSaber_cogMsg_HandleHudTarget ((void*)jkSaber_cogMsg_HandleHudTarget_ADDR)
-#define jkSaber_cogMsg_Handlex36_setwaggle ((void*)jkSaber_cogMsg_Handlex36_setwaggle_ADDR)
 #define jkSaber_cogMsg_HandleJKPrintUniString ((void*)jkSaber_cogMsg_HandleJKPrintUniString_ADDR)
 #define jkSaber_cogMsg_HandleEndLevel ((void*)jkSaber_cogMsg_HandleEndLevel_ADDR)
-#define jkSaber_cogMsg_HandleSetSaberInfo ((void*)jkSaber_cogMsg_HandleSetSaberInfo_ADDR)
 #define jkSaber_cogMsg_HandleSetTeam ((void*)jkSaber_cogMsg_HandleSetTeam_ADDR)
 #define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
+
+const char* jkSaber_aKyTeamModels[5] = {
+    "ky.3do",
+    "kyX0.3do",
+    "kyU0.3do",
+    "kyV0.3do",
+    "kyT0.3do",
+};
+
 
 int jkSaber_Startup()
 {
@@ -483,10 +490,10 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
         NETMSG_PUSHU16((thing->thingType != THINGTYPE_PLAYER) ? thing->playerInfo - jkPlayer_otherThings : thing->playerInfo - playerThings);
         NETMSG_PUSHU32(thing->thing_id);
         if ( thing->playerInfo->rd_thing.model3 ) {
-            NETMSG_PUSHU32(thing->playerInfo->rd_thing.model3->id);
+            NETMSG_PUSHS32(thing->playerInfo->rd_thing.model3->id);
         }
         else {
-            NETMSG_PUSHU32(-1);
+            NETMSG_PUSHS32(-1);
         }
         
         NETMSG_PUSHU16(thing->playerInfo->maxTwinkles);
@@ -502,28 +509,28 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
         }
         else
         {
-            NETMSG_PUSHU32(0);
+            NETMSG_PUSHF32(0.0);
         }
 
         if ( thing->playerInfo->wall_sparks ) {
-            NETMSG_PUSHU32(thing->playerInfo->wall_sparks->thingIdx);
+            NETMSG_PUSHS32(thing->playerInfo->wall_sparks->thingIdx);
         }
         else {
-            NETMSG_PUSHU32(-1);
+            NETMSG_PUSHS32(-1);
         }
 
         if ( thing->playerInfo->blood_sparks ) {
-            NETMSG_PUSHU32(thing->playerInfo->blood_sparks->thingIdx);
+            NETMSG_PUSHS32(thing->playerInfo->blood_sparks->thingIdx);
         }
         else {
-            NETMSG_PUSHU32(-1);
+            NETMSG_PUSHS32(-1);
         }
 
         if ( thing->playerInfo->saber_sparks ) {
-            NETMSG_PUSHU32(thing->playerInfo->saber_sparks->thingIdx);
+            NETMSG_PUSHS32(thing->playerInfo->saber_sparks->thingIdx);
         }
         else {
-            NETMSG_PUSHU32(-1);
+            NETMSG_PUSHS32(-1);
         }
 
         NETMSG_PUSHU32(thing->playerInfo->field_21C);
@@ -536,11 +543,65 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
     }
 }
 
+int jkSaber_cogMsg_HandleSetSaberInfo2(sithCogMsg *msg)
+{
+    char material_tip_fname[32];
+    char material_side_fname[32];
+    
+    jkPlayerInfo *playerInfo = NULL;
+    
+    NETMSG_IN_START(msg);
+
+    int isNotPlayer = NETMSG_POPU16();
+    int playerInfoIdx = NETMSG_POPS16();
+    if ( isNotPlayer )
+        playerInfo = &jkPlayer_otherThings[playerInfoIdx];
+    else
+        playerInfo = &playerThings[playerInfoIdx];
+
+    sithThing* thing = sithThing_GetById(NETMSG_POPS32());
+    if (!thing)
+        return 0;
+
+    int modelIdx = NETMSG_POPS32();
+    thing->playerInfo = playerInfo;
+    playerInfo->actorThing = thing;
+    rdModel3* model = sithModel_GetByIdx(modelIdx);
+    if (model)
+    {
+        rdThing_NewEntry(&playerInfo->rd_thing, 0);
+        rdThing_SetModel3(&playerInfo->rd_thing, model);
+    }
+
+    playerInfo->maxTwinkles = NETMSG_POPS16();
+    playerInfo->twinkleSpawnRate = NETMSG_POPS16();
+    playerInfo->length = NETMSG_POPF32();
+    float baseRadius = NETMSG_POPF32();
+    if ( baseRadius != 0.0 )
+    {
+        float tipRadius = NETMSG_POPF32();
+        
+        NETMSG_POPSTR(material_side_fname, 0x20);
+        NETMSG_POPSTR(material_tip_fname, 0x20);
+
+        jkSaber_InitializeSaberInfo(thing, material_side_fname, material_tip_fname, baseRadius, tipRadius, playerInfo->length, 0, 0, 0);
+        thing->playerInfo->polylineThing.polyline->length = NETMSG_POPF32();
+    }
+    playerInfo->wall_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
+    playerInfo->blood_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
+    playerInfo->saber_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
+    playerInfo->field_21C = NETMSG_POPU32();
+    playerInfo->shields = NETMSG_POPU32();
+    playerInfo->field_224 = NETMSG_POPU32();
+
+    return 1;
+}
+
 void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
 {
     NETMSG_START;
 
-    NETMSG_PUSHU32(thing->thing_id);
+    NETMSG_PUSHS32(thing->thing_id);
     NETMSG_PUSHSTR(thing->rdthing.model3->filename, 0x20);
     NETMSG_PUSHSTR(thing->soundclass->snd_fname, 0x20);
     NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
@@ -549,6 +610,65 @@ void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
     NETMSG_END(COGMSG_SABERINFO2);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+}
+
+int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
+{
+    sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
+    char model_3do_fname[32]; // [esp+18h] [ebp-80h] BYREF
+    char v14[32]; // [esp+38h] [ebp-60h] BYREF
+    
+    char material_side_fname[32]; // [esp+58h] [ebp-40h] BYREF
+    char material_tip_fname[32]; // [esp+78h] [ebp-20h] BYREF
+
+    NETMSG_IN_START(msg);
+
+    if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 && !sithNet_isServer )
+        return 1;
+
+    sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
+    if ( !v2 )
+        return 0;
+    v11 = v2->actorParams.playerinfo;
+    if ( !v11 || !v2->playerInfo )
+        return 0;
+    NETMSG_POPSTR(model_3do_fname, 0x20);
+    NETMSG_POPSTR(v14, 0x20);
+    NETMSG_POPSTR(material_side_fname, 0x20);
+    NETMSG_POPSTR(material_tip_fname, 0x20);
+
+    if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 )
+    {
+        if ( (sithNet_MultiModeFlags & 0x20) != 0 )
+            return 1;
+        if ( (sithNet_MultiModeFlags & 0x100) != 0 )
+        {
+            _strncpy(model_3do_fname, jkSaber_aKyTeamModels[v11->teamNum], 0x1Fu);
+            model_3do_fname[31] = 0;
+            _strncpy(v14, "ky.snd", 0x1Fu);
+            v14[31] = 0;
+        }
+    }
+    rdModel3* v5 = sithModel_LoadEntry(model_3do_fname, 1);
+    if ( !v5 )
+        return 1;
+    sithThing_SetNewModel(v2, v5);
+    sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
+    if ( v6 )
+        sithSoundClass_SetThingSoundClass(v2, v6);
+    sithThing* v10 = sithTemplate_GetEntryByName("+ssparks_saber");
+    sithThing* v9 = sithTemplate_GetEntryByName("+ssparks_blood");
+    sithThing* v7 = sithTemplate_GetEntryByName("+ssparks_wall");
+    jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
+
+    if ( sithNet_isServer )
+    {
+        if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 )
+        {
+            jkSaber_cogMsg_SendSetSaberInfo(v2);
+        }
+    }
+    return 1;
 }
 
 void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
@@ -577,10 +697,10 @@ void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
             NETMSG_PUSHU32(trackIter->status);
             if ( trackIter->status )
             {
-                NETMSG_PUSHU32(trackIter->keyframe->id);
+                NETMSG_PUSHS32(trackIter->keyframe->id);
                 NETMSG_PUSHU32(trackIter->field_4);
-                NETMSG_PUSHU16(trackIter->lowPri);
-                NETMSG_PUSHU16(trackIter->highPri);
+                NETMSG_PUSHS16(trackIter->lowPri);
+                NETMSG_PUSHS16(trackIter->highPri);
                 NETMSG_PUSHF32(trackIter->speed);
                 NETMSG_PUSHF32(trackIter->playSpeed);
                 NETMSG_PUSHF32(trackIter->field_120);
@@ -593,4 +713,72 @@ void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
     NETMSG_END(COGMSG_ID_32);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+}
+
+int jkSaber_cogMsg_Handlex32(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    int v1 = NETMSG_POPS32();
+    if ( v1 > jkPlayer_numThings )
+        return 0;
+
+    jkPlayerInfo* playerInfo = &playerThings[v1];
+    rdModel3* model3 = sithModel_GetByIdx(NETMSG_POPS32());
+    if (!model3)
+        return 1;
+
+
+    jkPlayer_SetPovModel(playerInfo, model3);
+    
+    // Added: puppet nullptr check
+    rdPuppet* puppet = playerInfo->povModel.puppet;
+    if ( puppet )
+    {
+        rdPuppetTrack* trackIter = puppet->tracks;
+
+        for (int i = 0; i < 4; i++)
+        {
+            trackIter->status = NETMSG_POPS32();
+            if ( trackIter->status )
+            {
+                trackIter->keyframe = sithKeyFrame_GetByIdx(NETMSG_POPS32());
+                trackIter->field_4 = NETMSG_POPS32();
+                trackIter->lowPri = (int)NETMSG_POPS16();
+                trackIter->highPri = (int)NETMSG_POPS16();
+                trackIter->speed = NETMSG_POPF32();
+                trackIter->playSpeed = NETMSG_POPF32();
+                trackIter->field_120 = NETMSG_POPF32();
+                trackIter->field_124 = NETMSG_POPF32();
+            }
+            ++trackIter;
+        }
+    }
+
+    return 1;
+}
+
+int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    jkPlayer_waggleVec = NETMSG_POPVEC3();
+    jkPlayer_waggleMag = NETMSG_POPF32();
+    return 1;
+}
+
+int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    jkHud_bHasTarget = NETMSG_POPS16();
+    sithThing* v1 = sithThing_GetThingByIdx(NETMSG_POPS16());
+    jkHud_pTargetThing = v1;
+    if ( !v1 )
+        jkHud_bHasTarget = 0;
+
+    jkHud_targetRed = NETMSG_POPS16();
+    jkHud_targetBlue = NETMSG_POPS16();
+    jkHud_targetGreen = NETMSG_POPS16();
+    return 1;
 }

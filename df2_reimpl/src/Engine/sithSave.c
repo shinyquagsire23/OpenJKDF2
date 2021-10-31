@@ -264,7 +264,7 @@ int sithSave_SerializeAllThings(int mpFlags)
     sithSector_cogMsg_SendSyncPalEffects(0, mpFlags);
     sithSector_cogMsg_SendSyncCameras(0, mpFlags);
     sithSoundSys_SyncSounds();
-    sithSector_cogmsg_send31(0, mpFlags);
+    sithSector_cogMsg_SendMisc(0, mpFlags);
 
     return 1;
 }

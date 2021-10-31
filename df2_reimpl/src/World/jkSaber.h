@@ -58,8 +58,13 @@ void jkSaber_Disable(sithThing *player);
 void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4);
 void jkSaber_playerconfig_idksync();
 void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing);
+int jkSaber_cogMsg_HandleSetSaberInfo2(sithCogMsg *msg);
 void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing);
+int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg);
 void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo);
+int jkSaber_cogMsg_Handlex32(sithCogMsg *msg);
+int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg);
+int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg);
 
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
