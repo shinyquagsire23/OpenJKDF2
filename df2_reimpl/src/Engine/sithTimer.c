@@ -94,11 +94,9 @@ void sithTimer_Kill(sithTimer *timer)
 {
     _memset(timer, 0, sizeof(sithTimer));
     
-    uint32_t timerOffs = (uint32_t)((char *)timer - (char *)sithTimer_timers);
+    intptr_t timerOffs = ((intptr_t)timer - (intptr_t)sithTimer_timers);
     
-    // ????
-    uint32_t v1 = (signed int)(timerOffs + ((uint64_t)(0xFFFFFFFF92492493ull * timerOffs) >> 32)) >> 4;
-    sithTimer_arrLut[sithTimer_numFree] = (v1 >> 31) + v1;
+    sithTimer_arrLut[sithTimer_numFree] = timerOffs / sizeof(sithTimer);
 
     sithTimer_numFree++;
 }
