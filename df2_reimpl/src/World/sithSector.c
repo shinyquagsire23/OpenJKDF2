@@ -1568,8 +1568,13 @@ int sithSector_TimerTick()
         sithSector_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
     }
     
-    for (size_t v3 = 0; v3 <= sithAI_inittedActors; ++v3 )
+    // Added: fixed off-by-one in loop comparison
+    for (size_t v3 = 0; v3 < sithAI_inittedActors; ++v3 )
     {
+        // Added: prevent OOB access
+        // TODO: define this maximum
+        if (v3 >= 256) break;
+
         sithActor* i = &sithAI_actors[v3];
 
         if ( i->aiclass )

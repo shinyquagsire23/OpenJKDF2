@@ -26,25 +26,25 @@
 #include "Win95/DebugConsole.h"
 #include "jk.h"
 
-stdHashTable* sithAI_commandsHashmap;
-uint32_t sithAI_maxActors;
-int sithAI_actorInitted[256];
-int sithAI_bOpened;
-int sithAI_bInit;
-sithAICommand* sithAI_commandList;
-uint32_t sithAI_numCommands;
-float sithAI_flt_84DE58;
-uint32_t sithAI_dword_84DE5C;
-int sithAI_dword_84DE60;
-float sithAI_flt_84DE64;
-sithThing** sithAI_pThing_84DE68;
-int sithAI_dword_84DE6C;
-float sithAI_flt_84DE70;
-int sithAI_dword_84DE74;
+stdHashTable* sithAI_commandsHashmap = NULL;
+uint32_t sithAI_maxActors = 0;
+int sithAI_actorInitted[256] = {0};
+int sithAI_bOpened = 0;
+int sithAI_bInit = 0;
+sithAICommand* sithAI_commandList = NULL;
+uint32_t sithAI_numCommands = 0;
+float sithAI_flt_84DE58 = 0.0f;
+uint32_t sithAI_dword_84DE5C = 0;
+int sithAI_dword_84DE60 = 0;
+float sithAI_flt_84DE64 = 0.0f;
+sithThing** sithAI_pThing_84DE68 = NULL;
+int sithAI_dword_84DE6C = 0;
+float sithAI_flt_84DE70 = 0.0f;
+int sithAI_dword_84DE74 = 0;
 
 // These are located in a different part of .data?
-sithActor sithAI_actors[256];
-int sithAI_inittedActors;
+sithActor sithAI_actors[256] = {0};
+int sithAI_inittedActors = 0;
 
 int sithAI_Startup()
 {

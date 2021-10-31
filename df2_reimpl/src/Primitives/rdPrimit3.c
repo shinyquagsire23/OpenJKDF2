@@ -45,7 +45,6 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     int v39; // ebp
     int *v40; // ecx
     rdVector3 *v41; // edx
-    int v42; // esi
     int v43; // eax
     rdVector3 *v44; // edi
     double v45; // st7
@@ -95,7 +94,6 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     rdVector2 *v93; // [esp+18h] [ebp-Ch]
     int v95; // [esp+1Ch] [ebp-8h]
     char *v97; // [esp+20h] [ebp-4h]
-    signed int a2a; // [esp+2Ch] [ebp+8h]
     char *a2b; // [esp+2Ch] [ebp+8h]
     signed int a2d; // [esp+2Ch] [ebp+8h]
     signed int a2e; // [esp+2Ch] [ebp+8h]
@@ -254,9 +252,9 @@ LABEL_25:
                             v40 = v36->vertexPosIdx;
                             v87 = v36->field_14;
                             v41 = mesh_out->verticesProjected;
-                            v42 = (char *)v38 - (char *)v40;
+                            float* intenseIter = v38;
                             a7a = v39;
-                            a2a = (char *)mesh_out->vertex_lights_maybe_ - (char *)v40;
+                            float* lightIter = mesh_out->vertex_lights_maybe_;
                             do
                             {
                                 v43 = *v40;
@@ -264,7 +262,7 @@ LABEL_25:
                                 v41->x = v44->x;
                                 v41->y = v44->y;
                                 v41->z = v44->z;
-                                v45 = v87[v43] + *(float *)((char *)v40 + v42);
+                                v45 = v87[v43] + *intenseIter;
                                 if ( v45 < 0.0 )
                                 {
                                     v45 = 0.0;
@@ -274,7 +272,10 @@ LABEL_25:
                                     v45 = 1.0;
                                 }
                                 ++v41;
-                                *(float *)((char *)v40++ + a2a) = v45;
+                                *lightIter = v45;
+                                lightIter++;
+                                intenseIter++;
+                                v40++;
                                 --a7a;
                             }
                             while ( a7a );
