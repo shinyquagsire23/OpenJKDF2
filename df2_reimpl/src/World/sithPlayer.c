@@ -472,10 +472,8 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
 
     v1 = thing->actorParams.playerinfo;
 
-#ifndef LINUX_TMP
     if ( thing == g_localPlayerThing)
         sithSector_cogMsg_SendDeath(thing, thing, 1, -1, 255);
-#endif
 
     if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
       || (sithCog_SendMessageFromThing(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )

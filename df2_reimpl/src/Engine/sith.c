@@ -405,12 +405,6 @@ void sith_AutoSave()
         while ( v1 < v0->numThingsLoaded );
     }
 
-// Comment out to work on saving func decomp
-#ifdef LINUX_TMP
-    //sithTime_Startup();
-    //return;
-#endif
-
     if ( sithNet_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);

@@ -556,6 +556,7 @@ thing_nine 0x0052552C int = 1
 jkMain_bInit 0x00552B80 int
 thing_six 0x00552B90 int
 thing_eight 0x00552B94 int
+jkMain_dword_552B98 0x00552B98 int
 jkMain_lastTickMs 0x00552B9C int
 game_updateMsecsTotal 0x00552B58 int
 idx_13b4_related 0x008C4BD8 int

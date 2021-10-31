@@ -1441,9 +1441,7 @@ void sithCogUtil_AutoSaveGame()
 
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
-#ifndef LINUX_TMP
     sithSave_Write(tmp, 1, 0, 0);
-#endif
 }
 
 void sithCogUtil_SetCameraFocii(sithCog *ctx)

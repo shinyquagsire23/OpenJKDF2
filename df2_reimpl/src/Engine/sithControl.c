@@ -121,6 +121,11 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     //g_debugmodeFlags |= 0x100;
 #endif
 
+    // TODO: fix this?
+#ifdef ARCH_64BIT
+    g_debugmodeFlags &= ~0x100;
+#endif
+
     if ( player->move_type != MOVETYPE_PHYSICS )
         return 0;
     if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )

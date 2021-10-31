@@ -46,7 +46,6 @@
 #define cogMsg_HandleDeath ((void*)0x004F40B0)
 #define cogMsg_HandleDamage ((void*)0x004F41A0)
 #define cogmsg_HandleSyncThingFrame ((void*)0x004F4D60)
-#define cogMsg_HandleSyncThingAttachment ((void*)0x004F4F50)
 #define cogMsg_HandleTakeItem ((void*)0x004F5150)
 #define cogMsg_HandleCreateThing ((void*)0x004F52E0)
 #define cogMsg_HandleDestroyThing ((void*)0x004F5410)
@@ -83,7 +82,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGFRAME] = cogmsg_HandleSyncThingFrame;
     sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithSector_cogMsg_HandleSyncPuppet;
     sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = cogMsg_HandleSyncThingAttachment;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = sithSector_cogMsg_HandleSyncThingAttachment;
     sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = sithSector_cogMsg_HandleSyncTimers;
     sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = sithSector_cogMsg_HandleSyncCameras;
     sithCogVm_msgFuncs[COGMSG_TAKEITEM1] = cogMsg_HandleTakeItem;

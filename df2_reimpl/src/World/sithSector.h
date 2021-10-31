@@ -183,6 +183,9 @@ void sithSector_cogMsg_SendMisc(int sendto_id, int mpFlags);
 int sithSector_cogMsg_HandleMisc(sithCogMsg *msg);
 void sithSector_cogMsg_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
 int sithSector_cogMsg_HandlePlaySoundPos(sithCogMsg *msg);
+void sithSector_cogMsg_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
+void sithSector_cogMsg_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
+int sithSector_cogMsg_HandleSyncThingAttachment(sithCogMsg *msg);
 
 static int (*_sithSector_cogMsg_HandleSyncPuppet)(sithCogMsg *msg) = (void*)sithSector_cogMsg_HandleSyncPuppet_ADDR;
 
@@ -204,7 +207,7 @@ static void (*sithSector_cogMsg_SendDamage)(sithThing *a1, sithThing *a2, float 
 static void (*sithSector_cogMsg_SendDestroyThing)(int a1, int a2) = (void*)sithSector_cogMsg_SendDestroyThing_ADDR;
 static void (*sithSector_cogMsg_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithSector_cogMsg_SendSyncThingFrame_ADDR;
 //static void (*sithSector_ThingApplyForce)(sithThing *a1, rdVector3 *a2) = (void*)sithSector_ThingApplyForce_ADDR;
-static void (*sithSector_cogMsg_SendSyncThingAttachment)(sithThing *a1, int a2, int a3, int a4) = (void*)sithSector_cogMsg_SendSyncThingAttachment_ADDR;
+//static void (*sithSector_cogMsg_SendSyncThingAttachment)(sithThing *a1, int a2, int a3, int a4) = (void*)sithSector_cogMsg_SendSyncThingAttachment_ADDR;
 static void (*sithSector_cogMsg_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithSector_cogMsg_SendOpenDoor_ADDR;
 static void (*sithSector_cogMsg_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithSector_cogMsg_SendPlayKey_ADDR;
 static void (*sithSector_cogMsg_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithSector_cogMsg_SendStopKey_ADDR;
@@ -220,7 +223,7 @@ static int (*sithSector_cogMsg_SoundClassPlay)(sithThing *a1, int16_t a2, int a3
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 //static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
 static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
-static int (*sithSector_cogMsg_SendDeath)(sithThing *sender, sithThing *receiver, char a3, int a4, int a5) = (void*)sithSector_cogMsg_SendDeath_ADDR;
+//static int (*sithSector_cogMsg_SendDeath)(sithThing *sender, sithThing *receiver, char a3, int a4, int a5) = (void*)sithSector_cogMsg_SendDeath_ADDR;
 //static int (*sithSector_cogMsg_SendSyncAI)(sithActor *actor, int sendto_id, int idx) = (void*)sithSector_cogMsg_SendSyncAI_ADDR;
 //static int (*_sithSector_cogMsg_SendSyncThingFull)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncThingFull_ADDR;
 //static int (*sithSector_cogMsg_SendSyncPuppet)(sithThing *thing, int sendto_id, int mpFlags) = (void*)sithSector_cogMsg_SendSyncPuppet_ADDR;

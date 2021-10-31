@@ -64,3 +64,29 @@ void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState)
     effectsState->effect.fade = 1.0;
     effectsState->effect.fade = 1.0;
 }
+
+void stdPalEffects_SetFilter(int idx, int a2, int a3, int a4)
+{
+    stdPalEffects_aEffects[idx].effect.filter.x = a2;
+    stdPalEffects_aEffects[idx].effect.filter.y = a3;
+    stdPalEffects_aEffects[idx].effect.filter.z = a4;
+}
+
+void stdPalEffects_SetTint(int idx, float a2, float a3, float a4)
+{
+    stdPalEffects_aEffects[idx].effect.tint.x = a2;
+    stdPalEffects_aEffects[idx].effect.tint.y = a3;
+    stdPalEffects_aEffects[idx].effect.tint.z = a4;
+}
+
+void stdPalEffects_SetAdd(int idx, int a2, int a3, int a4)
+{
+    stdPalEffects_aEffects[idx].effect.add.x = a2;
+    stdPalEffects_aEffects[idx].effect.add.y = a3;
+    stdPalEffects_aEffects[idx].effect.add.z = a4;
+}
+
+void stdPalEffects_SetFade(int idx, float fade)
+{
+    stdPalEffects_aEffects[idx].effect.fade = fade;
+}

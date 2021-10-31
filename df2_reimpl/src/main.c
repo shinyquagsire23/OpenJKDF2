@@ -257,6 +257,9 @@ void do_hooks()
     hook_function(jkMain_MissionReload_ADDR, jkMain_MissionReload);
     hook_function(jkMain_MenuReturn_ADDR, jkMain_MenuReturn);
     hook_function(jkMain_CdSwitchShow_ADDR, jkMain_CdSwitchShow);
+    hook_function(jkMain_EndLevelScreenShow_ADDR, jkMain_EndLevelScreenShow);
+    hook_function(jkMain_EndLevelScreenTick_ADDR, jkMain_EndLevelScreenTick);
+    hook_function(jkMain_EndLevelScreenLeave_ADDR, jkMain_EndLevelScreenLeave);
 
     // jkEpisode
     hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
@@ -382,6 +385,7 @@ void do_hooks()
     hook_function(stdBitmap_LoadEntry_ADDR, stdBitmap_LoadEntry);
     //hook_function(stdBitmap_LoadEntryFromFile_ADDR, stdBitmap_LoadEntryFromFile);
     hook_function(stdBitmap_ConvertColorFormat_ADDR, stdBitmap_ConvertColorFormat);
+    hook_function(stdBitmap_Free_ADDR, stdBitmap_Free);
     
     // stdMath
     hook_function(stdMath_FlexPower_ADDR, stdMath_FlexPower);
@@ -626,6 +630,10 @@ void do_hooks()
 
     // stdPalEffects
     hook_function(stdPalEffects_FreeRequest_ADDR, stdPalEffects_FreeRequest);
+    hook_function(stdPalEffects_SetFilter_ADDR, stdPalEffects_SetFilter);
+    hook_function(stdPalEffects_SetTint_ADDR, stdPalEffects_SetTint);
+    hook_function(stdPalEffects_SetAdd_ADDR, stdPalEffects_SetAdd);
+    hook_function(stdPalEffects_SetFade_ADDR, stdPalEffects_SetFade);
     
     // stdString
     hook_function(stdString_FastCopy_ADDR, stdString_FastCopy);
@@ -1156,6 +1164,7 @@ void do_hooks()
     hook_function(sithSector_cogMsg_HandleSyncCameras_ADDR, sithSector_cogMsg_HandleSyncCameras);
     hook_function(sithSector_cogMsg_HandlePlaySoundPos_ADDR, sithSector_cogMsg_HandlePlaySoundPos);
     hook_function(sithSector_cogMsg_HandleMisc_ADDR, sithSector_cogMsg_HandleMisc);
+    hook_function(sithSector_cogMsg_SendSyncThingAttachment_ADDR, sithSector_cogMsg_SendSyncThingAttachment);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1331,6 +1340,7 @@ void do_hooks()
     hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
     hook_function(sithSurface_Sync_ADDR, sithSurface_Sync);
     hook_function(sithSurface_Alloc_ADDR, sithSurface_Alloc);
+    hook_function(sithSurface_sub_4E63B0_ADDR, sithSurface_sub_4E63B0);
 
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);

@@ -59,9 +59,6 @@
 #define jkMain_CreditsShow ((void*)(0x00404480))
 #define jkMain_CreditsTick ((void*)(0x004044B0))
 #define jkMain_CreditsLeave ((void*)(0x004044E0))
-#define jkMain_EndLevelScreenShow ((void*)(0x004041A0))
-#define jkMain_EndLevelScreenTick ((void*)(0x00404240))
-#define jkMain_EndLevelScreenLeave ((void*)(0x00404250))
 
 static jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 static jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
@@ -146,13 +143,13 @@ void jkMain_GuiAdvance()
     {
         switch ( jkSmack_currentGuiState )
         {
-            case 1:
-            case 4:
-            case 8:
-            case 10:
+            case JK_GAMEMODE_VIDEO:
+            case JK_GAMEMODE_VIDEO2:
+            case JK_GAMEMODE_VIDEO3:
+            case JK_GAMEMODE_VIDEO4:
                 jkCutscene_PauseShow(0);
                 break;
-            case 5:
+            case JK_GAMEMODE_GAMEPLAY:
                 stdControl_ToggleCursor(1);
                 jkGame_ddraw_idk_palettes(0);
                 break;
@@ -300,6 +297,35 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         }
     }
     jkGui_SetModeGame();
+}
+
+void jkMain_EndLevelScreenShow()
+{
+    stdControl_ToggleCursor(0); // Added
+    if ( jkEpisode_mLoad.field_0 != 1 && jkSmack_gameMode == 2
+      || jkGuiSingleTally_Show() != -1
+      && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
+       || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )
+    {
+        jkMain_CdSwitch(0, 1);
+        return;
+    }
+
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 3;
+    return;
+}
+
+void jkMain_EndLevelScreenTick()
+{
+    ;
+}
+
+void jkMain_EndLevelScreenLeave()
+{
+    ;
 }
 
 void jkMain_GameplayShow(int a1, int a2)
@@ -999,6 +1025,9 @@ void jkMain_FixRes()
     _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     
+    Video_format.width = Window_xSize;
+    Video_format.height = Window_ySize;
+    
     jkDev_Close();
     jkHud_Close();
     jkHudInv_Close();
@@ -1062,10 +1091,16 @@ int jkMain_SetVideoMode()
     
     _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
     _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    
+    Video_format.width = Window_xSize;
+    Video_format.height = Window_ySize;
+    
     stdPalEffects_RefreshPalette();
     sithRender_SetPalette(stdDisplay_GetPalette());
 
     jkHudInv_LoadItemRes();
+    // Added close
+    jkHud_Close();
     jkHud_Open();
 #ifndef LINUX_TMP
     jkDev_Open();

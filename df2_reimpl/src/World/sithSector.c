@@ -2814,3 +2814,103 @@ int sithSector_cogMsg_HandlePlaySoundPos(sithCogMsg *msg)
 
     return 1;
 }
+
+void sithSector_cogMsg_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags)
+{
+    NETMSG_START;
+    
+    NETMSG_PUSHS32(sender->thing_id);
+    if ( receiver ) {
+        NETMSG_PUSHS32(receiver->thing_id);
+    }
+    else {
+        NETMSG_PUSHS32(-1);
+    }
+    NETMSG_PUSHU8(cause);
+    
+    NETMSG_END(COGMSG_DEATH);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+void sithSector_cogMsg_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4)
+{
+    NETMSG_START;
+    
+    NETMSG_PUSHS32(thing->thing_id);
+    NETMSG_PUSHU16(thing->attach_flags);
+
+    if (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE)
+    {
+        NETMSG_PUSHU16(thing->attachedSurface->field_0);
+    }
+    else if (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE))
+    {
+        sithThing* v7 = (sithThing *)thing->attachedThing;
+        NETMSG_PUSHS32(v7->thing_id)
+        if ( (thing->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 )
+        {
+            NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->rdthing.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
+        }
+        else
+        {
+           NETMSG_PUSHVEC3(thing->field_4C);
+        }
+    }
+    
+    NETMSG_END(COGMSG_SYNCTHINGATTACHMENT);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, a4);
+}
+
+int sithSector_cogMsg_HandleSyncThingAttachment(sithCogMsg *msg)
+{    
+    NETMSG_IN_START(msg);
+
+    sithThing* v1 = sithThing_GetById(NETMSG_POPS32());
+    if ( !v1 )
+        return 0;
+    int v3 = NETMSG_POPS16();
+    if (v3 & ATTACHFLAGS_WORLDSURFACE)
+    {
+        sithSurface* v5 = sithSurface_sub_4E63B0(NETMSG_POPS16());
+        if ( v5 )
+        {
+            sithThing_AttachToSurface(v1, v5, 1);
+            v1->attach_flags = v3;
+            return 1;
+        }
+        return 0;
+    }
+    if (v3 & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE))
+    {
+        sithThing* v9 = sithThing_GetById(NETMSG_POPS32());
+        if ( !v9 )
+            return 0;
+        if (v3 & ATTACHFLAGS_THINGSURFACE)
+        {
+            sithThing_LandThing(
+                v1,
+                v9,
+                &v9->rdthing.model3->geosets[0].meshes->faces[NETMSG_POPS16()],
+                v9->rdthing.model3->geosets[0].meshes->vertices,
+                1);
+            v1->attach_flags = v3;
+            return 1;
+        }
+        else
+        {
+            sithThing_AttachThing(v1, v9);
+            v1->attach_flags = v3;
+            v1->field_4C = NETMSG_POPVEC3();
+            return 1;
+        }
+    }
+    else
+    {
+        if ( v1->attach_flags )
+            sithThing_DetachThing(v1);
+        return 1;
+    }
+    return 0;
+}

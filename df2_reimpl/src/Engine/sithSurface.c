@@ -1262,3 +1262,14 @@ rdSurface* sithSurface_Alloc()
     v2->index = ((playerThingIdx + 1) << 16) | (uint16_t)v1;
     return v2;
 }
+
+sithSurface* sithSurface_sub_4E63B0(int idx)
+{
+    sithSurface *result; // eax
+
+    if ( sithWorld_pCurWorld && idx >= 0 && idx < sithWorld_pCurWorld->numSurfaces )
+        result = &sithWorld_pCurWorld->surfaces[idx];
+    else
+        result = 0;
+    return result;
+}

@@ -82,6 +82,21 @@ export PATH=$PATH:~/.local/bin
 ### Emscripten/WebAssembly
 `make -f Makefile.emcc`
 
+## TL;DR: What Isn't Implemented, Yet
+ - Color overlays (blue on getting items, red on getting hit, blue underwater, etc)
+ - Input mapping (for blobless/SDL2, input maps are hardcoded)
+ - Cutscenes, subtitles and credits
+ - HUD/chat text (top-center)
+ - Multiplayer menu and all submenus
+   - Multiplayer tally screen
+   - Multiplayer character builder
+ - Sound menu in Options
+ - Display menu in Options
+ - Input menu in Options
+ - Map view in ESC menu
+ - Map view with TAB
+ - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
+
 ## Usage
 `df2_reimpl` supports both the KVM target from the directory above as well as WINE/Windows, though no guarantees are made for the addition of ie jkgfxmod, other patches nor other hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl_win.dll` is compiled without those linker flags.
 

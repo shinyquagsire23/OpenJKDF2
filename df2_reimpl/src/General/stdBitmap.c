@@ -1,6 +1,7 @@
 #include "stdBitmap.h"
 
 #include "stdPlatform.h"
+#include "General/stdColor.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
 #include "jk.h"
@@ -257,4 +258,27 @@ void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
         }
         _memcpy(formatFrom_, formatTo, sizeof(rdTexformat));
     }
+}
+
+void stdBitmap_Free(stdBitmap *bitmap)
+{
+    unsigned int i; // esi
+    
+    // Added: nullptr check
+    if (!bitmap) return;
+
+    if ( bitmap->mipSurfaces )
+    {
+        for ( i = 0; i < bitmap->numMips; ++i )
+        {
+            if ( bitmap->mipSurfaces[i] )
+                stdDisplay_VBufferFree(bitmap->mipSurfaces[i]);
+        }
+        std_pHS->free(bitmap->mipSurfaces);
+    }
+    if ( bitmap->palette )
+        std_pHS->free(bitmap->palette);
+    stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
+    std_pHS->free(bitmap);
+    stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
 }

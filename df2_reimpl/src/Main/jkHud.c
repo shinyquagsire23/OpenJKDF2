@@ -201,11 +201,10 @@ void jkHud_Close()
                 stdFont_Free(*jkHud_aFonts[i].pFont);
                 *jkHud_aFonts[i].pFont = NULL;
             }
-        }
-
-        if ( jkHud_bOpened )
-            jkHud_bOpened = 0;
+        }        
     }
+    if ( jkHud_bOpened )
+        jkHud_bOpened = 0;
 }
 
 int jkHud_ClearRects()

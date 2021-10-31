@@ -29,6 +29,7 @@ void jkCog_StopPovKey(sithCog *ctx);
 void jkCog_EndTarget(sithCog *ctx);
 void jkCog_SetSuperFlags(sithCog *ctx);
 void jkCog_ClearSuperFlags(sithCog *ctx);
+void jkCog_GetSuperFlags(sithCog *ctx);
 void jkCog_PrintUniString(sithCog *ctx);
 void jkCog_SetPersuasionInfo(sithCog *ctx);
 void jkCog_SetSaberInfo(sithCog *ctx);
@@ -55,7 +56,7 @@ static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
 //jkCog_PrintUniString
 //jkCog_SetSuperFlags 
 //jkCog_ClearSuperFlags
-static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
+//static void (*jkCog_GetSuperFlags)(sithCog* ctx) = (void*)0x0040AA50;
 //static void (*jkCog_EnableSaber)(sithCog* ctx) = (void*)0x0040AAA0;
 //static void (*jkCog_DisableSaber)(sithCog* ctx) = (void*)0x0040AB20;
 //static void (*jkCog_SetWaggle)(sithCog* ctx) = (void*)0x0040AB50;
@@ -467,6 +468,20 @@ void jkCog_ClearSuperFlags(sithCog *ctx)
         playerThings[playerThingIdx].shields = 0;
     if ( (flags & 4) != 0 )
         playerThings[playerThingIdx].field_224 = 0;
+}
+
+void jkCog_GetSuperFlags(sithCog *cog)
+{
+    int flags = 0;
+
+    // Added: Original used +, not |
+    if (playerThings[playerThingIdx].field_21C)
+        flags |= 1;
+    if ( playerThings[playerThingIdx].shields )
+        flags |= 2;
+    if ( playerThings[playerThingIdx].field_224 )
+        flags |= 4;
+    sithCogVm_PushInt(cog, flags);
 }
 
 void jkCog_PrintUniString(sithCog *ctx)

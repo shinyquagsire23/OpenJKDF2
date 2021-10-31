@@ -72,11 +72,12 @@ stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int a3);
 int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
 int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
 void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap);
+void stdBitmap_Free(stdBitmap *bitmap);
 
 //static rdTexformat* (*stdBitmap_ConvertColorFormat)(rdTexformat *formatTo, stdBitmap *bitmap) = (void*)stdBitmap_ConvertColorFormat_ADDR;
 
 //static stdBitmap* (*stdBitmap_Load)(char *fpath, int create_ddraw_surface, int a3) = (void*)stdBitmap_Load_ADDR;
-static void (*stdBitmap_Free)(stdBitmap *bitmap) = (void*)stdBitmap_Free_ADDR;
+//static void (*stdBitmap_Free)(stdBitmap *bitmap) = (void*)stdBitmap_Free_ADDR;
 //static stdBitmap* (*stdBitmap_LoadFromFile)(int a1, int a2, int a3) = (void*)stdBitmap_LoadFromFile_ADDR;
 //static int (*stdBitmap_LoadEntryFromFile)(intptr_t fp, stdBitmap *a2, int bCreateDDrawSurface, int gpuMem) = (void*)stdBitmap_LoadEntryFromFile_ADDR;
 

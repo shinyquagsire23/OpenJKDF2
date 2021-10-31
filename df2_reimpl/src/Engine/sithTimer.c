@@ -138,7 +138,10 @@ void sithTimer_Advance()
             break;
 
         sithTimer_list = i->nextTimer;
-        sithTimer_timerFuncs[i->field_4].handler(0, &i->timerInfo);
+
+        // Added: nullptr check
+        if (sithTimer_timerFuncs[i->field_4].handler)
+            sithTimer_timerFuncs[i->field_4].handler(0, &i->timerInfo);
         
         sithTimer_Kill(i);
         i = sithTimer_list;
