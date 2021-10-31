@@ -379,6 +379,7 @@ void sith_AutoSave()
     sithTime_Startup();
     sithInventory_Reset(g_localPlayerThing);
 
+    printf("startup\n");
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     v0 = sithWorld_pCurWorld;
     v1 = 0;

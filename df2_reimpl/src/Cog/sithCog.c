@@ -250,7 +250,6 @@ int sithCog_Load(sithWorld *world, int a2)
     int v17; // ecx
     sithCogScript *v18; // ebp
     char **v19; // edi
-    void *v20; // ebx
     char *v21; // esi
     unsigned int v22; // [esp+10h] [ebp-88h]
     uint32_t v23; // [esp+14h] [ebp-84h]
@@ -279,6 +278,8 @@ int sithCog_Load(sithWorld *world, int a2)
                 return 0;
             v9 = sithCog_LoadCogscript(stdConffile_entry.args[1].value);
 
+            //printf("%s\n", stdConffile_entry.args[1].value);
+
             if ( v9 )
             {
                 v18 = v9->cogscript;
@@ -287,15 +288,14 @@ int sithCog_Load(sithWorld *world, int a2)
                 v22 = 2;
                 for (v23 = 0; v23 < v9->cogscript->numIdk; v23++)
                 {
-                    v20 = &v18->aIdk[v23].flags;
-                    if ( (*(uint8_t*)v20 & 1) == 0 && stdConffile_entry.numArgs > v22 )
+                    //printf("%s\n", stdConffile_entry.args[v22].value);
+                    if ( (v18->aIdk[v23].flags & 1) == 0 && stdConffile_entry.numArgs > v22 )
                     {
                         _strncpy(v21, stdConffile_entry.args[v22].value, 0x1Fu);
                         v21[31] = 0;
                         v21 += 32;
                         ++v22;
                     }
-                    v20 = (char *)v20 + sizeof(sithCogIdk);
                 }
             }
         }

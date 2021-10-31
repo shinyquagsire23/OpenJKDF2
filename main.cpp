@@ -339,7 +339,7 @@ int main(int argc, char **argv, char **envp)
     uint32_t start_addr = exe.load_executable(&exe_addr, &exe_mem, &exe_size, &stack_addr, &stack_size);
     vm_register_image(exe_mem, exe_addr, exe_size+stack_size);
 #if 1    
-    PortableExecutable replace = PortableExecutable("df2_reimpl.dll", stack_addr + stack_size); // "SMACKW32.DLL"
+    PortableExecutable replace = PortableExecutable("df2_reimpl_kvm.dll", stack_addr + stack_size); // "SMACKW32.DLL"
 #endif
     uint32_t dll_addr,dll_size,dll_stackaddr,dll_stacksize;
     void* dll_mem;

@@ -23,7 +23,7 @@ LINKER_SCRIPT_SYMS_COG := $(ROOT_DIR)/symbols.ld.cog
 SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -DQOL_IMPROVEMENTS -DLINUX -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
-LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
+LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lalut -fshort-wchar
 
 # Optional: Use JK.EXE as a binary blob for unimplemented functions
 ifneq ($(OPENJKDF2_USE_BLOBS), 1)

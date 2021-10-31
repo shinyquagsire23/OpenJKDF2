@@ -131,6 +131,7 @@ void sithSoundSys_UpdateMusicVolume(float musicVolume)
         }
     }
     
+    // inlined
     sithSoundSys_SetMusicVol(sithSoundSys_musicVolume);
 }
 

@@ -221,7 +221,7 @@ __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInsta
     
     VirtualProtect((void*)0x401000, 0x522000-0x401000, old, NULL);
     
-    Window_Main(hInstance, hPrevInstance, "-windowGUI", nShowCmd, "Jedi Knight");
+    Window_Main(hInstance, hPrevInstance, lpCmdLine, nShowCmd, "Jedi Knight");
 }
 
 void _pei386_runtime_relocator(){}

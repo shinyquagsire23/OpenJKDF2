@@ -1,6 +1,6 @@
 CC := i686-w64-mingw32-gcc
-TARGET := df2_reimpl.dll
-TARGET_WIN := df2_reimpl_win.dll
+TARGET := df2_reimpl_kvm.dll
+TARGET_WIN := df2_reimpl.dll
 
 SRC := src
 OBJ := build

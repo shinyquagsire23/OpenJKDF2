@@ -41,7 +41,7 @@ int jkSmack_SmackPlay(const char *fname)
             jkGuiRend_thing_four = 1;
 
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 2;
+        jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
     _sprintf(std_genBuffer, "video%c%s", '\\', fname);
@@ -51,7 +51,7 @@ int jkSmack_SmackPlay(const char *fname)
             jkGuiRend_thing_four = 1;
 
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 2;
+        jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
     jkRes_FileExists(std_genBuffer, gamemode_0_2_str, 128);
@@ -60,6 +60,6 @@ int jkSmack_SmackPlay(const char *fname)
         jkGuiRend_thing_four = 1;
 
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 1;
+    jkSmack_nextGuiState = JK_GAMEMODE_VIDEO;
     return 1;
 }

@@ -10,6 +10,8 @@ void sithCogSound_PlaySong(sithCog *ctx)
     int trackTo = sithCogVm_PopInt(ctx);
     int trackFrom = sithCogVm_PopInt(ctx);
     int trackNum = sithCogVm_PopInt(ctx);
+    
+    printf("sithCogSound_PlaySong %u %u %u\n", trackTo, trackFrom, trackNum);
 
     if ( trackNum <= 0 )
         sithSoundSys_StopSong();

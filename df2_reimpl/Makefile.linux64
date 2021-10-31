@@ -23,12 +23,15 @@ LINKER_SCRIPT_SYMS_COG := $(ROOT_DIR)/symbols.ld.cog
 SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 # Flags
-LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lalut -fshort-wchar
+CFLAGS := -O2 -march=native -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # 64-bit cannot use JK.EXE as a binary blob
-CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero
-LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
+ifneq ($(OPENJKDF2_NO_ASAN), 1)
+	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero
+	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
+endif
+
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 

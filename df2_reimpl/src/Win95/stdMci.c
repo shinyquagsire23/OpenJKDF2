@@ -117,37 +117,94 @@ double stdMci_GetTrackLength(int track)
 
 #else // LINUX
 
+#include <SDL2/SDL_mixer.h>
+
+int stdMci_trackTo;
+int stdMci_trackFrom;
+int stdMci_trackCurrent;
+Mix_Music* stdMci_music;
+
 int stdMci_Startup()
 {
     stdMci_uDeviceID = 0;
 
     stdMci_bInitted = 1;
+    
+    if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
+	    return 1;
+
+	Mix_AllocateChannels(2);
+    
     return 1;
 }
 
 void stdMci_Shutdown()
 {
     stdMci_bInitted = 0;
+    Mix_CloseAudio();
+}
+
+void stdMci_trackFinished();
+void stdMci_trackStart(int track)
+{
+    char tmp[256];
+    
+    snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+    if (stdMci_music)
+        Mix_FreeMusic(stdMci_music);
+
+    stdMci_music = Mix_LoadMUS(tmp);
+            
+    if (!stdMci_music) {
+        printf("WARN: Failed to play music `%s'\n", tmp);
+        return;
+    }
+
+    Mix_PlayMusic(stdMci_music, 0);
+    Mix_HookMusicFinished(stdMci_trackFinished);
+    printf("INFO: Playing music `%s'\n", tmp);
+}
+
+void stdMci_trackFinished()
+{
+    stdMci_trackCurrent++;
+    if (stdMci_trackCurrent >= stdMci_trackTo)
+        stdMci_trackCurrent = stdMci_trackFrom;
+    
+    stdMci_trackStart(stdMci_trackCurrent);
 }
 
 int stdMci_Play(uint8_t trackTo, uint8_t trackFrom)
 {
-    return 1;
+    char tmp[256];
+    
+    printf("stdMci: play track %d to %d\n", trackTo, trackFrom);
+    
+    stdMci_trackTo = trackTo;
+    stdMci_trackFrom = trackFrom;
+    
+    stdMci_trackStart(stdMci_trackTo);
 }
 
 void stdMci_SetVolume(float vol)
 {
-    
+    printf("Set vol %f\n", vol);
+    uint8_t volQuantized = (uint16_t)(vol * (double)MIX_MAX_VOLUME);
+    Mix_VolumeMusic(volQuantized);
 }
 
 void stdMci_Stop()
 {
+    printf("stdMci: stop music\n");
     
+    Mix_HaltMusic();
+    Mix_FreeMusic(stdMci_music);
+    stdMci_music = NULL;
 }
 
 int stdMci_CheckStatus()
 {
-    return 1;
+    return (stdMci_music != NULL);
 }
 
 double stdMci_GetTrackLength(int track)

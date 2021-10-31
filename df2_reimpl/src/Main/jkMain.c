@@ -604,6 +604,7 @@ void jkMain_TitleLeave()
 
 void jkMain_MainShow()
 {
+    stdControl_ShowCursor(1);
     stdControl_ToggleCursor(0); // Added
     jkGuiMain_Show();
 }
