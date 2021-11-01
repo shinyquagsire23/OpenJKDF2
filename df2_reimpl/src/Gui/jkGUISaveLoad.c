@@ -286,7 +286,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
     signed int result; // eax
     wchar_t *v26; // [esp-4h] [ebp-298h]
     wchar_t *v27; // [esp-4h] [ebp-298h]
-    char *v28; // [esp-4h] [ebp-298h]
+    wchar_t *v28; // [esp-4h] [ebp-298h]
     int v29; // [esp+10h] [ebp-284h] BYREF
     char v30[128]; // [esp+14h] [ebp-280h] BYREF
     wchar_t v31[256]; // [esp+94h] [ebp-200h] BYREF
@@ -391,9 +391,22 @@ LABEL_24:
             _sprintf(v30, "save%04d.jks", i);
             pHS->free(v15);
 LABEL_44:
-            v28 = jkGuiSaveLoad_aElements[2].unistr;
+            v28 = jkGuiSaveLoad_aElements[2].wstr;
             v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurWorld->map_jkl_fname);
-            jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
+            //jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
+            int i = 0;
+            for (i = 0; i < 256; i++)
+            {
+                v31[i] = v22[i];
+                if (!v22[i]) break;
+            }
+            v31[i++] = '~';
+            int i_shift = i;
+            for (i; i < 256; i++)
+            {
+                v31[i] = v28[i-i_shift];
+                if (!v28[i-i_shift]) break;
+            }
             sithSave_Write(v30, 1, 1, v31);
             sithSave_WriteEntry();
             goto LABEL_45;

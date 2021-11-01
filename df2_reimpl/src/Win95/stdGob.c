@@ -49,11 +49,15 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     const char *ent_fname; // ebp
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
+
     v4 = 0;
     _strncpy(gob->fpath, fname, 0x7Fu);
     gob->fpath[127] = 0;
     gob->numFilesOpen = a3;
     gob->lastReadFile = 0;
+
+    //TODO fix this? WINE/df2_reimpl.dll keeps corrupting the gobs? Might be something else idk.
+#if 0
     if ( a4 )
     {
         v6 = jk_CreateFileA(gob->fpath, 0x80000000, 1u, 0, 3u, 0x10000000u, 0);
@@ -82,6 +86,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
             jk_CloseHandle(gob->viewHandle2);
         }
     }
+#endif
 
     gob->viewMapped = 0;
     gob->fhand = pGobHS->fileOpen(gob->fpath, "r+b");

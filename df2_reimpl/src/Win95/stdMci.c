@@ -197,9 +197,11 @@ void stdMci_Stop()
 {
     printf("stdMci: stop music\n");
     
-    Mix_HaltMusic();
-    Mix_FreeMusic(stdMci_music);
-    stdMci_music = NULL;
+    if (stdMci_music) {
+        Mix_HaltMusic();
+        Mix_FreeMusic(stdMci_music);
+        stdMci_music = NULL;
+    }
 }
 
 int stdMci_CheckStatus()

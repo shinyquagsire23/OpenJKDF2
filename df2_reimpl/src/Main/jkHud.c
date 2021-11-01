@@ -875,7 +875,7 @@ int jkHud_Chat()
     size_t v0; // eax
     wchar_t *v2; // [esp-8h] [ebp-108h]
     wchar_t *v3; // [esp-8h] [ebp-108h]
-    wchar_t tmp[128]; // [esp+0h] [ebp-100h] BYREF
+    wchar_t tmp[256]; // [esp+0h] [ebp-100h] BYREF
 
     jkHud_bChatOpen = 1;
     jkHud_chatStr[0] = 0;
@@ -907,7 +907,7 @@ void jkHud_SendChat(char a1)
     size_t v2; // eax
     wchar_t *v3; // [esp-8h] [ebp-10Ch]
     wchar_t *v4; // [esp-8h] [ebp-10Ch]
-    wchar_t tmp[128]; // [esp+4h] [ebp-100h] BYREF
+    wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
 
     if ( a1 == 13 )
     {

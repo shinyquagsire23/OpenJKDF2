@@ -17,13 +17,17 @@ int Window_ySize = 480;
 
 int Window_AddMsgHandler(WindowHandler_t a1)
 {
-    int i; // ecx
+    int i = 0;
 
     for (i = 0; i < 16; i++)
     {
         if ( !Window_ext_handlers[i].exists )
             break;
     }
+    
+    // Added: no OOB
+    if (i >= 16) return 1;
+
     Window_ext_handlers[i].handler = a1;
     Window_ext_handlers[i].exists = 1;
     ++g_handler_count;
@@ -32,17 +36,20 @@ int Window_AddMsgHandler(WindowHandler_t a1)
 
 int Window_RemoveMsgHandler(WindowHandler_t a1)
 {
-    int i;
+    int i = 0;
 
+    // Added: the original would still decrement on missing handlers
     for (i = 0; i < 16; i++)
     {
         if ( Window_ext_handlers[i].handler == a1 )
-            break;
+        {
+            Window_ext_handlers[i].handler = 0;
+            Window_ext_handlers[i].exists = 0;
+            g_handler_count -= 1; // doing g_handler_count-- changes behavior???
+            return 1;
+        }
     }
 
-    Window_ext_handlers[i].handler = 0;
-    Window_ext_handlers[i].exists = 0;
-    g_handler_count -= 1; // doing g_handler_count-- changes behavior???
     return 1;
 }
 
@@ -363,13 +370,76 @@ void Window_SdlUpdate()
     {
         switch (event.type)
         {
+            case SDL_TEXTINPUT:
+                for (int i = 0; i < _strlen(event.text.text); i++)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, event.text.text[i], 0);
+                }
+                break;
             case SDL_WINDOWEVENT:
                 Window_HandleWindowEvent(&event);
                 break;
             case SDL_KEYDOWN:
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x1B, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x1B, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_LEFT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x25, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RIGHT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x27, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_UP)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x26, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_DOWN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x28, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x8, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RETURN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0xD, 0);
+                }
                 break;
             case SDL_KEYUP:
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x1B, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_LEFT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x25, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RIGHT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x27, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_UP)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x26, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_DOWN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x28, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x8, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RETURN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xB, 0);
+                }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
                 break;
             case SDL_MOUSEMOTION:
@@ -493,6 +563,7 @@ int Window_Main_Linux(int argc, char** argv)
 		
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_StartTextInput();
     
     glewInit();
     

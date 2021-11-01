@@ -5,6 +5,7 @@ SRC := src
 OBJ := build_linux64
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -24,7 +25,7 @@ SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 # Flags
 LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lalut -fshort-wchar
-CFLAGS := -O2 -march=native -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+CFLAGS := -O2 -march=native -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # 64-bit cannot use JK.EXE as a binary blob
 ifneq ($(OPENJKDF2_NO_ASAN), 1)

@@ -1137,3 +1137,23 @@ LABEL_29:
     }
     return v9 - v8;
 }
+
+int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
+{
+    stdFontCharset *v3; // eax
+
+    if ( a2 == 32 )
+        return 1;
+    v3 = &font->charsetHead;
+    if ( font != (stdFont *)-48 )
+    {
+        do
+        {
+            if ( a2 >= v3->charFirst && a2 <= v3->charLast )
+                break;
+            v3 = v3->previous;
+        }
+        while ( v3 );
+    }
+    return v3 != 0;
+}

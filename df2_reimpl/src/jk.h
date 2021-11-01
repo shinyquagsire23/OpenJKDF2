@@ -317,7 +317,7 @@ int _string_modify_idk();
 void jk_ReleaseDC();
 void jk_SetFocus();
 void jk_SetActiveWindow();
-void jk_ShowCursor();
+void jk_ShowCursor(int a);
 void jk_ValidateRect();
 #ifndef ARCH_WASM
 int __isspace(int a);

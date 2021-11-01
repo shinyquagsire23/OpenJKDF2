@@ -118,6 +118,9 @@ int jkMain_MenuReturn();
 
 int jkMain_EndLevel(int a1);
 int jkMain_CdSwitchShow();
+int jkMain_VideoShow(int a1);
+int jkMain_VideoTick(int a2);
+void jkMain_VideoLeave(int a1);
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 

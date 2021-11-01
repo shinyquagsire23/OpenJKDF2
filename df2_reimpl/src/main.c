@@ -140,6 +140,8 @@
 #include "Main/Main.h"
 #include "stdPlatform.h"
 
+int openjkdf2_bIsKVM = 1;
+
 void do_hooks();
 
 #ifdef LINUX
@@ -214,6 +216,8 @@ __declspec(dllexport) int WinMain_(uint32_t hInstance, uint32_t hPrevInstance, c
 
 __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInstance, char* lpCmdLine, int nShowCmd)
 {
+    openjkdf2_bIsKVM = 0;
+
     DWORD old;
     VirtualProtect((void*)0x401000, 0x522000-0x401000, PAGE_EXECUTE_READWRITE, &old);
     
@@ -260,6 +264,7 @@ void do_hooks()
     hook_function(jkMain_EndLevelScreenShow_ADDR, jkMain_EndLevelScreenShow);
     hook_function(jkMain_EndLevelScreenTick_ADDR, jkMain_EndLevelScreenTick);
     hook_function(jkMain_EndLevelScreenLeave_ADDR, jkMain_EndLevelScreenLeave);
+    hook_function(jkMain_VideoShow_ADDR, jkMain_VideoShow);
 
     // jkEpisode
     hook_function(jkEpisode_LoadVerify_ADDR, jkEpisode_LoadVerify);
@@ -302,7 +307,7 @@ void do_hooks()
     // jkCutscene
     hook_function(jkCutscene_Initialize_ADDR, jkCutscene_Initialize);
     hook_function(jkCutscene_Shutdown_ADDR, jkCutscene_Shutdown);
-    hook_function(jkCutscene_sub_421310_ADDR, jkCutscene_sub_421310);
+    //hook_function(jkCutscene_sub_421310_ADDR, jkCutscene_sub_421310);
     hook_function(jkCutscene_sub_421410_ADDR, jkCutscene_sub_421410);
     hook_function(jkCutscene_smack_related_loops_ADDR, jkCutscene_smack_related_loops);
     hook_function(jkCutscene_PauseShow_ADDR, jkCutscene_PauseShow);

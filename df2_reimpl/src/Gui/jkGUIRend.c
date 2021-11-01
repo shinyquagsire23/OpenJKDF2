@@ -223,6 +223,9 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
 {
     int ret;
     
+    jkGuiElement* lastFocused = menu->focusedElement;
+    jkGuiElement* lastDown = menu->lastMouseDownClickable;
+    
     if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
     {
         stdControl_ShowCursor(0);
@@ -237,10 +240,18 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
             jkGuiRend_UpdateAndDrawClickable(clickable, menu, 0);
             clickable = &menu->clickables[++clickableIdx];
         }
+        
+#ifdef LINUX
+        menu->focusedElement = lastFocused;
+        menu->lastMouseDownClickable = lastDown;
+#endif
+        
         jkGuiRend_FlipAndDraw(menu, 0);
 
         jkGuiRend_UpdateCursor();
     }
+    
+    
 }
 
 void jkGuiRend_SetElementIdk(jkGuiElement *element, int idk)
@@ -698,16 +709,18 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
             menu->lastMouseOverClickable = 0;
         drawFunc(clickable, menu, jkGuiRend_menuBuffer, forceRedraw);
         menu->lastMouseOverClickable = lastSave;
-        
+#ifndef LINUX
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
+#endif
     }
     else if ( forceRedraw )
     {
         jkGuiRend_CopyVBuffer(menu, drawRect);
-
+#ifndef LINUX
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
+#endif
     }
 
     
@@ -1530,7 +1543,9 @@ LABEL_47:
             break;
 
         case WM_CHAR:
+#ifndef LINUX
             if ( (jkGuiRend_lastKeyScancode != 0xFF0000) & (uint8_t)lParam )
+#endif
                 jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, 5, wParam);
             jkGuiRend_lastKeyScancode = 0;
             return 0;

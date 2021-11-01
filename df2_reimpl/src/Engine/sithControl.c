@@ -566,6 +566,8 @@ static int last_cam = 0;
 
 int sithControl_ReadFunctionMap(int func, int* out)
 {
+    //if (jkHud_bChatOpen) return 0;
+
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     int val = 0;
     if (func == INPUT_FUNC_DEBUG)
@@ -605,11 +607,59 @@ int sithControl_ReadFunctionMap(int func, int* out)
     }
     else if (func == INPUT_FUNC_PREVINV)
     {
-        val = !!state[SDL_SCANCODE_LEFTBRACKET];
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_LEFTBRACKET];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_LEFTBRACKET];
     }
     else if (func == INPUT_FUNC_NEXTINV)
     {
-        val = !!state[SDL_SCANCODE_RIGHTBRACKET];
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_RIGHTBRACKET];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_RIGHTBRACKET];
+    }
+    else if (func == INPUT_FUNC_USEINV)
+    {
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_RETURN];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_RETURN];
+    }
+    else if (func == INPUT_FUNC_PREVSKILL)
+    {
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_Q];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_Q];
+    }
+    else if (func == INPUT_FUNC_NEXTSKILL)
+    {
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_E];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_E];
+    }
+    else if (func == INPUT_FUNC_USESKILL)
+    {
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_F];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_F];
+    }
+    else if (func == INPUT_FUNC_TALK)
+    {
+        static int lastval = 0;
+        int cur_val = !!state[SDL_SCANCODE_T];
+        if (!lastval)
+            val = cur_val;
+        lastval = !!state[SDL_SCANCODE_T];
     }
     else if (func == INPUT_FUNC_SELECT0)
     {

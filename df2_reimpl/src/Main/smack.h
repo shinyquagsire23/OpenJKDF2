@@ -11,4 +11,8 @@
 static int (*smack_Initialize)() = (void*)smack_Initialize_ADDR;
 static void (*smack_Shutdown)() = (void*)smack_Shutdown_ADDR;
 
+static int (*smack_process)(void) = (void*)smack_process_ADDR;
+static int (*smack_off)(int) = (void*)smack_off_ADDR;
+static void (*smack_sub_426940)() = (void*)smack_sub_426940_ADDR;
+
 #endif // _MAIN_SMACK_H

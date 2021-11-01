@@ -132,7 +132,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
                 *a5 = 1;
             }
             break;
-        case 0x100u:
+        case WM_KEYFIRST:
             if ( wParam == 0x1B )               // ESC
             {
                 if ( jkHud_bChatOpen )
@@ -146,7 +146,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
                 *a5 = 1;
             }
             break;
-        case 0x102u:
+        case WM_CHAR:
             if ( jkHud_bChatOpen )
             {
                 jkHud_SendChat(wParam);

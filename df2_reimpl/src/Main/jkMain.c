@@ -50,9 +50,6 @@
 #define TICKRATE_MS (20) // 50fps
 #endif
 
-#define jkMain_VideoShow ((void*)(0x00404270))
-#define jkMain_VideoTick ((void*)(0x00404350))
-#define jkMain_VideoLeave ((void*)(0x00404430))
 #define jkMain_CutsceneShow ((void*)(0x00404450))
 #define jkMain_CutsceneTick ((void*)(0x00404460))
 #define jkMain_CutsceneLeave ((void*)(0x00404470))
@@ -442,7 +439,7 @@ LABEL_15:
     {
 LABEL_28:
         sithInventory_ClearInventory(g_localPlayerThing);
-        jkPlayer_MpcInitBins((int)g_selfPlayerInfo);
+        jkPlayer_MpcInitBins(g_selfPlayerInfo);
         
         jkPlayer_Startup();
         jkPlayer_InitForceBins();
@@ -462,7 +459,7 @@ LABEL_28:
                 v5 = idx_13b4_related;
                 if ( idx_13b4_related >= (unsigned int)jkPlayer_maxPlayers )
                     v5 = jkPlayer_maxPlayers;
-                DirectPlay_SetSessionDesc((int)gamemode_0_2_str, v5);
+                DirectPlay_SetSessionDesc(gamemode_0_2_str, v5);
             }
             if ( sithNet_isMulti )
                 jkSaber_cogMsg_wrap_SendSaberInfo_alt();
@@ -997,6 +994,98 @@ int jkMain_CdSwitchShow()
     return jkMain_CdSwitch(0, 1);
 }
 
+int jkMain_VideoShow(int a1)
+{
+    signed int result; // eax
+
+    result = jkCutscene_sub_421310(gamemode_0_2_str);
+    if ( !result )
+    {
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", gamemode_0_2_str);
+        switch ( a1 )
+        {
+            case JK_GAMEMODE_VIDEO:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
+                break;
+            case JK_GAMEMODE_VIDEO2:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
+                break;
+            case JK_GAMEMODE_VIDEO3:
+            case JK_GAMEMODE_VIDEO4:
+                result = jkMain_CdSwitch(0, 1);
+                break;
+            default:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+                break;
+        }
+    }
+    return result;
+}
+
+int jkMain_VideoTick(int a2)
+{
+    signed int result; // eax
+
+    result = jkCutscene_smack_related_loops();
+    if ( result )
+    {
+        result = a2 - 1;
+        switch ( a2 )
+        {
+            case JK_GAMEMODE_VIDEO:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
+                break;
+            case JK_GAMEMODE_VIDEO2:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
+                break;
+            case JK_GAMEMODE_VIDEO3:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
+                break;
+            case JK_GAMEMODE_VIDEO4:
+                result = 1;
+                if ( jkGuiRend_thing_five )
+                    jkGuiRend_thing_four = 1;
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
+                break;
+            default:
+                return result;
+        }
+    }
+    return result;
+}
+
+void jkMain_VideoLeave(int a1)
+{
+    jkCutscene_sub_421410();
+    if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )
+        jkMain_CdSwitch(0, 1);
+}
+
 #ifdef LINUX
 void jkMain_FixRes()
 {
@@ -1095,6 +1184,8 @@ int jkMain_SetVideoMode()
     
     Video_format.width = Window_xSize;
     Video_format.height = Window_ySize;
+    
+    Window_AddMsgHandler(Windows_GdiHandler);
     
     stdPalEffects_RefreshPalette();
     sithRender_SetPalette(stdDisplay_GetPalette());

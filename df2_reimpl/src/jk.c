@@ -937,9 +937,10 @@ void jk_SetActiveWindow()
     assert(0);
 }
 
-void jk_ShowCursor()
+void jk_ShowCursor(int a)
 {
-    assert(0);
+    //assert(0);
+    stdControl_ShowCursor(a);
 }
 
 void jk_ValidateRect()

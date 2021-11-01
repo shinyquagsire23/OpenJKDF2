@@ -16,7 +16,7 @@ int sithDplay_Startup()
 #ifdef LINUX
 int sithDplay_EarlyInit()
 {
-    return 1;
+    return 0;
 }
 
 int sithDplay_OpenConnection(void* a)
