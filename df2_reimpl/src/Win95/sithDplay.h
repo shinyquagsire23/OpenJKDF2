@@ -65,9 +65,13 @@ static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
 static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFlagidk_ADDR;
 static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPlay_SetSessionDesc_ADDR;
+static void (*sithDplay_EnumSessions2)() = (void*)sithDplay_EnumSessions2_ADDR;
 
 #ifdef WIN32
 static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
+static int (*sithDplay_Open)(int a, void* b) = (void*)sithDplay_Open_ADDR;
+static int (*sithDplay_OpenConnection)(void* a) = (void*)sithDplay_OpenConnection_ADDR;
+static void (*sithDplay_CloseConnection)() = (void*)sithDplay_CloseConnection_ADDR;
 #else
 int sithDplay_EarlyInit();
 int sithDplay_OpenConnection(void* a);

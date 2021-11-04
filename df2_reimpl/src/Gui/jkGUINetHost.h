@@ -13,5 +13,6 @@
 
 static int (*jkGuiNetHost_Initialize)() = (void*)jkGuiNetHost_Initialize_ADDR;
 static void (*jkGuiNetHost_Shutdown)() = (void*)jkGuiNetHost_Shutdown_ADDR;
+static int (*jkGuiNetHost_Show)(jkMultiEntry3* a) = (void*)jkGuiNetHost_Show_ADDR;
 
 #endif // _JKGUINETHOST_H

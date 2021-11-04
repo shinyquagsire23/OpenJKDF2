@@ -166,8 +166,8 @@ int Main_Startup(const char *cmdline)
         rdStartup(&hs);
         jkGuiRend_Initialize();
         jkGui_Initialize();
-#ifndef LINUX_TMP
         jkGuiMultiplayer_Initialize();
+#ifndef LINUX_TMP
         jkGuiNetHost_Initialize(); //TODO
 #endif
         jkGuiSetup_Initialize();

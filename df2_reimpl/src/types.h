@@ -2549,4 +2549,120 @@ typedef struct jkHudInvScroll
     int rendIdx;
 } jkHudInvScroll;
 
+typedef void* DPLCONNECTION;
+
+typedef struct sith_dplay_connection
+{
+  int16_t name[128];
+  GUID guid;
+  DPLCONNECTION *connection;
+  int connectionSize;
+} sith_dplay_connection;
+
+typedef struct jkMultiEntry
+{
+    int field_0;
+    int field_4;
+    int field_8;
+    int field_C;
+    int field_10;
+    int field_14;
+    int field_18;
+    int field_1C;
+    int field_20;
+    int field_24;
+    int field_28;
+    int field_2C;
+    int field_30;
+    int field_34;
+    int field_38;
+    int field_3C;
+    int field_40;
+    int field_44;
+    int field_48;
+    int field_4C;
+    int field_50;
+    int field_54;
+    char field_58[32];
+    char field_78[32];
+    int field_98;
+    int field_9C;
+    int field_A0;
+    int field_A4;
+    int field_A8;
+    int field_AC;
+    int field_B0;
+    int field_B4;
+    int field_B8;
+    int field_BC;
+    int field_C0;
+    int field_C4;
+    int field_C8;
+    int field_CC;
+    int field_D0;
+    int field_D4;
+    int field_D8;
+    int field_DC;
+    int field_E0;
+    int field_E4;
+    int field_E8;
+    int field_EC;
+} jkMultiEntry;
+
+typedef struct jkMultiEntry2
+{
+    char field_0[256];
+    char field_100[64];
+    char field_140[256];
+    char field_240[256];
+} jkMultiEntry2;
+
+typedef struct jkMultiEntry3
+{
+    int field_0;
+    wchar_t playerName[32];
+    char field_44[32];
+    char field_64[128];
+    int field_E4;
+    wchar_t field_E8[32];
+    int field_128;
+    int field_12C;
+    int field_130;
+    int field_134;
+    int field_138;
+    int field_13C;
+} jkMultiEntry3;
+
+typedef struct jkMultiEntry4
+{
+    char field_0[32];
+    char field_20[32];
+    int field_40;
+    int field_44;
+    int field_48;
+    int field_4C;
+    int field_50;
+    int field_54;
+    int field_58;
+    int field_5C;
+    int field_60;
+    int field_64;
+    int field_68;
+    int field_6C;
+    int field_70;
+    int field_74;
+    int field_78;
+    int field_7C;
+    int field_80;
+    int field_84;
+    int field_88;
+    int field_8C;
+    int field_90;
+    int field_94;
+    int field_98;
+    int field_9C;
+    wchar_t field_A0[32];
+    int field_E0;
+} jkMultiEntry4;
+
 #endif // TYPES_H

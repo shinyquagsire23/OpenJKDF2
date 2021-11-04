@@ -1924,6 +1924,7 @@ void do_hooks()
     // jkGUIMultiplayer
     hook_function(jkGuiMultiplayer_Initialize_ADDR, jkGuiMultiplayer_Initialize);
     hook_function(jkGuiMultiplayer_Shutdown_ADDR, jkGuiMultiplayer_Shutdown);
+    hook_function(jkGuiMultiplayer_Show_ADDR, jkGuiMultiplayer_Show);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);

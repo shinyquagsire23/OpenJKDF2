@@ -781,3 +781,17 @@ cogparser_num_nodes 0x00855CE0 int
 cogparser_current_nodeidx 0x00855CDC int
 parsing_script 0x00855CD4 sithCogScript*
 parsing_script_idk 0x0054C854 int = 1
+
+dplay_dword_55D618 0x0055D618 int
+dplay_dword_55D61C 0x0055D61C int
+
+jkGui_dword_556040 0x00556040 int
+jkGui_dword_556044 0x00556044 int
+jkGui_dword_556048 0x00556048 int
+jkGui_dword_55604C 0x0055604C int
+jkGuiMultiplayer_unk_865020 0x00865020 int
+jkGuiMultiplayer_aConnections 0x008620A0 sith_dplay_connection[32]
+jkGuiMultiplayer_aEntries 0x00863220 jkMultiEntry[32]
+jkGuiMultiplayer_stru_556168 0x00556168 jkMultiEntry2
+jkGuiMultiplayer_mpcInfo 0x008591E0 jkPlayerMpcInfo
+jkGuiMultiplayer_stru_5564A8 0x005564A8 Darray

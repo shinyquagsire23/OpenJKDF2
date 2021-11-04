@@ -131,6 +131,7 @@ static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;
 //static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
 static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 //static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
+static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
 
 #ifdef LINUX
 int jkMain_SetVideoMode();

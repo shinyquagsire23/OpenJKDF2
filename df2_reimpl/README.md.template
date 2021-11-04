@@ -85,7 +85,7 @@ export PATH=$PATH:~/.local/bin
 ## TL;DR: What Isn't Implemented, Yet
  - Color overlays (blue on getting items, red on getting hit, blue underwater, etc)
  - Input mapping (for blobless/SDL2, input maps are hardcoded)
- - Cutscenes, subtitles and credits
+ - Subtitles and credits
  - HUD/chat text (top-center)
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
