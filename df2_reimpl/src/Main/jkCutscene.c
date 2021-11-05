@@ -336,7 +336,11 @@ int jkCutscene_smacker_process()
 
     static int every_third = 0;
 
+#ifdef MACOS
+    if (every_third++ != 14) return 0;
+#else
     if (every_third++ != 3) return 0;
+#endif
 
     every_third = 0;
     _memcpy(stdDisplay_masterPalette, smk_get_palette(jkCutscene_smk), 0x300);

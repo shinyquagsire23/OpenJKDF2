@@ -13,7 +13,10 @@
 #include <stdlib.h>
 #include "Linux/shader_utils.h"
 #include <SDL2/SDL.h>
+#ifdef MACOS
+#else
 #include <GL/gl.h>
+#endif
 
 #define TEX_MODE_BGR 0
 #define TEX_MODE_RGB 1
@@ -255,7 +258,10 @@ int std3D_StartScene()
     //printf("Begin draw\n");
     if (!has_initted)
     {
-        init_resources();
+        if (!init_resources()) {
+            printf("Failed to init resources, exiting...");
+            exit(-1);
+        }
     }
     
     rendered_tris = 0;
@@ -465,6 +471,10 @@ void std3D_DrawMenu()
     glViewport(0, 0, width, height);
 
     }
+
+    unsigned int vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao ); 
     
     rdTri* tris = GL_tmpTris;
     glEnableVertexAttribArray(programMenu_attribute_coord3d);

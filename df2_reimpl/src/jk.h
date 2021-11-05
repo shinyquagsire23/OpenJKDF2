@@ -13,6 +13,13 @@
 #include <ctype.h>
 #endif
 
+#ifdef MACOS
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#endif
+
 #include "Cog/sithCogParse.h"
 
 #define WinMain_ADDR (0x41EBD0)
@@ -283,7 +290,9 @@ wchar_t* _wcscpy(wchar_t * a, const wchar_t *b);
 int jk_MessageBeep(int a);
 int __strcmpi(const char *a, const char *b);
 int __strnicmp(const char *a, const char *b, size_t c);
+#ifndef MACOS
 char __tolower(char a);
+#endif
 int msvc_sub_512D30(int a, int b);
 int jk_MessageBoxW();
 int stdGdi_GetHwnd();

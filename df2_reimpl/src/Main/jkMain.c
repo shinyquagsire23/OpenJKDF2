@@ -30,6 +30,7 @@
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIEsc.h"
+#include "Gui/jkGUISingleTally.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"

@@ -67,6 +67,20 @@ Add the following to the end of ~/.bashrc:
 export PATH=$PATH:~/.local/bin
 ```
 
+MacOS:
+Before starting, install Xcode. This is required for OpenGL headers, among other things.
+```
+# All
+brew install make python3
+pip3 install cogapp
+
+# After installing cogapp, make sure the following is in your ~/.zshrc:
+# export PATH=$PATH:$HOME/Library/Python/3.8/bin
+
+# MacOS 64-bit
+brew install openal-soft freealut sdl2 sdl2_mixer glew
+```
+
 ### x86 Win32/MinGW DLL
 `make`
 
@@ -78,6 +92,12 @@ export PATH=$PATH:~/.local/bin
 
 ### 64-bit Linux/SDL2
 `make -f Makefile.linux64`
+
+### MacOS SDL2
+```
+make -f Makefile.macos
+codesign -s - openjkdf2-64
+```
 
 ### Emscripten/WebAssembly
 `make -f Makefile.emcc`

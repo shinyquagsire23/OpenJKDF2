@@ -11,11 +11,16 @@
 //#include <wchar.h>
 #endif
 
+#ifdef MACOS
+#include <wchar.h>
+#endif
+
 #ifdef ARCH_WASM
 #include <wchar.h>
 #endif
 
 #include "General/stdString.h"
+#include "Win95/stdControl.h"
 
 // Imports
 #ifdef WIN32
@@ -747,10 +752,12 @@ int __strnicmp(const char *a, const char *b, size_t c)
     return ca - cb;
 }
 
+#ifndef MACOS
 char __tolower(char a)
 {
     return tolower(a);
 }
+#endif
 
 int msvc_sub_512D30(int a, int b)
 {
@@ -792,6 +799,8 @@ int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
 {
 #ifdef ARCH_WASM
     return vswprintf(a, b, fmt, list);
+#elif defined(MACOS)
+    return 0;//vswprintf(a,b,fmt,list);
 #else
     return vswprintf(a, fmt, list);
 #endif

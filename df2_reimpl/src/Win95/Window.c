@@ -261,14 +261,15 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#ifdef MACOS
+#else
 #include <GL/gl.h>
+#endif
 #include "Win95/Video.h"
 
 SDL_Window* displayWindow;
-SDL_Renderer* displayRenderer;
 SDL_Event event;
 SDL_GLContext glWindowContext;
-SDL_Surface* displaySurface;
 
 int Window_lastXRel = 0;
 int Window_lastYRel = 0;
@@ -494,7 +495,7 @@ void Window_SdlUpdate()
                 break;
             case SDL_QUIT:
                 printf("Quit!\n");
-                while(1);
+                exit(-1);
                 break;
             default:
                 break;
@@ -544,22 +545,31 @@ int Window_Main_Linux(int argc, char** argv)
     // Init SDL
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
-    SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &displayWindow, &displayRenderer);
-    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
-    
+#ifdef MACOS
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	
-	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+#else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+#endif
+
+    displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!displayWindow) {
+        printf("!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+        exit (-1);
+    }
+    //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+
 	glWindowContext = SDL_GL_CreateContext(displayWindow);
 	if (glWindowContext == NULL)
 	{
-	    jk_printf("!! Failed to initialize SDL OpenGL context !!\n");
-	    while (1);
+	    jk_printf("!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
+	    exit (-1);
 	}
-	
-	displaySurface = SDL_GetWindowSurface(displayWindow);
 		
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -567,8 +577,8 @@ int Window_Main_Linux(int argc, char** argv)
     
     glewInit();
     
-    SDL_RenderClear(displayRenderer);
-    SDL_RenderPresent(displayRenderer);
+    //SDL_RenderClear(displayRenderer);
+    //SDL_RenderPresent(displayRenderer);
     
     
     strcpy(cmdLine, "");

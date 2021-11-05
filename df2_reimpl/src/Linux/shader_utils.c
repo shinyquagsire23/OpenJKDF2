@@ -84,7 +84,11 @@ GLuint create_shader(const char* shader, GLenum type) {
 	//	version = "#version 100\n";  // OpenGL ES 2.0
 	//else
     //version = "#version 330 core\n";  // OpenGL 3.3
+#ifdef MACOS
+	version = "#version 330\n";
+#else
     version = "#version 300 es\n";  // OpenGL ES 2.0
+#endif
 
 	// GLES2 precision specifiers
 	const char* precision;

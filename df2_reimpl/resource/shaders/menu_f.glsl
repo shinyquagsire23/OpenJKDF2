@@ -8,12 +8,12 @@ out vec4 fragColor;
 
 void main(void)
 {
-    vec4 sampled = texture2D(tex, f_uv);
+    vec4 sampled = texture(tex, f_uv);
     vec4 sampled_color = vec4(0.0, 0.0, 0.0, 0.0);
     vec4 vertex_color = f_color;
     float index = sampled.r;
-    vec4 palval = texture2D(worldPalette, vec2(index, 0.5));
-    vec4 palvald = texture2D(displayPalette, vec2(index, 0.5));
+    vec4 palval = texture(worldPalette, vec2(index, 0.5));
+    vec4 palvald = texture(displayPalette, vec2(index, 0.5));
     vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);
 
     float transparency = 1.0;

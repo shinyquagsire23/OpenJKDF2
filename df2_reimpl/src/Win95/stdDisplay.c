@@ -20,7 +20,11 @@ uint8_t* stdDisplay_GetPalette()
 
 #else
 #include <SDL2/SDL.h>
+#ifdef MACOS
+#include "OpenGL/gl.h"
+#else
 #include <GL/gl.h>
+#endif
 #include <assert.h>
 
 uint32_t Video_menuTexId = 0;
