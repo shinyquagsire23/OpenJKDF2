@@ -17,7 +17,7 @@ static int lowzero;
 static int high;
 
 
-output()
+void output()
 {
     free_itemsets();
     free_shifts();
@@ -38,7 +38,7 @@ output()
 }
 
 
-output_rule_data()
+void output_rule_data()
 {
     register int i;
     register int j;
@@ -85,7 +85,7 @@ output_rule_data()
 }
 
 
-output_yydefred()
+void output_yydefred()
 {
     register int i, j;
 
@@ -112,7 +112,7 @@ output_yydefred()
 }
 
 
-output_actions()
+void output_actions()
 {
     nvectors = 2*nstates + nvars;
 
@@ -140,7 +140,7 @@ output_actions()
 }
 
 
-token_actions()
+void token_actions()
 {
     register int i, j;
     register int shiftcount, reducecount;
@@ -224,7 +224,7 @@ token_actions()
     FREE(actionrow);
 }
 
-goto_actions()
+void goto_actions()
 {
     register int i, j, k;
 
@@ -293,7 +293,7 @@ int symbol;
 
 
 
-save_column(symbol, default_state)
+void save_column(symbol, default_state)
 int symbol;
 int default_state;
 {
@@ -335,7 +335,7 @@ int default_state;
     width[symno] = sp1[-1] - sp[0] + 1;
 }
 
-sort_actions()
+void sort_actions()
 {
   register int i;
   register int j;
@@ -370,7 +370,7 @@ sort_actions()
 }
 
 
-pack_table()
+void pack_table()
 {
     register int i;
     register int place;
@@ -551,7 +551,7 @@ int vector;
 
 
 
-output_base()
+void output_base()
 {
     register int i, j;
 
@@ -617,7 +617,7 @@ output_base()
 
 
 
-output_table()
+void output_table()
 {
     register int i;
     register int j;
@@ -648,7 +648,7 @@ output_table()
 
 
 
-output_check()
+void output_check()
 {
     register int i;
     register int j;
@@ -709,7 +709,7 @@ char *name;
 }
 
 
-output_defines()
+void output_defines()
 {
     register int c, i;
     register char *s;
@@ -760,7 +760,7 @@ output_defines()
 }
 
 
-output_stored_text()
+void output_stored_text()
 {
     register int c;
     register FILE *in, *out;
@@ -787,7 +787,7 @@ output_stored_text()
 }
 
 
-output_debug()
+void output_debug()
 {
     register int i, j, k, max;
     char **symnam, *s;
@@ -1002,7 +1002,7 @@ output_debug()
 }
 
 
-output_stype()
+void output_stype()
 {
     if (!unionized && ntags == 0)
     {
@@ -1012,7 +1012,7 @@ output_stype()
 }
 
 
-output_trailing_text()
+void output_trailing_text()
 {
     register int c, last;
 
@@ -1067,7 +1067,7 @@ output_trailing_text()
 }
 
 
-output_semantic_actions()
+void output_semantic_actions()
 {
     register int c, last;
 
@@ -1100,7 +1100,7 @@ output_semantic_actions()
 }
 
 
-free_itemsets()
+void free_itemsets()
 {
     register core *cp, *next;
 
@@ -1113,7 +1113,7 @@ free_itemsets()
 }
 
 
-free_shifts()
+void free_shifts()
 {
     register shifts *sp, *next;
 
@@ -1127,7 +1127,7 @@ free_shifts()
 
 
 
-free_reductions()
+void free_reductions()
 {
     register reductions *rp, *next;
 

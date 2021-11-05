@@ -32,6 +32,10 @@
 #include <stdio.h>
 #endif
 
+#ifdef __APPLE__
+#include <stdlib.h>
+#endif
+
 /* always be prepared to generate an 8-bit scanner */
 #define FLEX_8_BIT_CHARS
 
@@ -72,7 +76,9 @@ char *sprintf(); /* keep lint happy */
 #ifdef SCO_UNIX
 void *memset();
 #else
+#ifndef __APPLE__
 char *memset();
+#endif
 #endif
 #endif
 
@@ -82,7 +88,9 @@ char *memset();
 #define abs(x) ((x) < 0 ? -(x) : (x))
 #endif
 #else
+#ifndef __APPLE__
 #define bzero(s, n) (void) memset((char *)(s), '\0', n)
+#endif
 #endif
 
 #ifdef VMS

@@ -3,7 +3,7 @@
 
 static short *null_rules;
 
-verbose()
+void verbose()
 {
     register int i;
 
@@ -27,7 +27,7 @@ verbose()
 }
 
 
-log_unused()
+void log_unused()
 {
     register int i;
     register short *p;
@@ -46,7 +46,7 @@ log_unused()
 }
 
 
-log_conflicts()
+void log_conflicts()
 {
     register int i;
 
@@ -74,7 +74,7 @@ log_conflicts()
 }
 
 
-print_state(state)
+void print_state(state)
 int state;
 {
     if (state)
@@ -88,7 +88,7 @@ int state;
 }
 
 
-print_conflicts(state)
+void print_conflicts(state)
 int state;
 {
     register int symbol;
@@ -146,7 +146,7 @@ int state;
 }
 
 
-print_core(state)
+void print_core(state)
 int state;
 {
     register int i;
@@ -182,7 +182,7 @@ int state;
 }
 
 
-print_nulls(state)
+void print_nulls(state)
 int state;
 {
     register action *p;
@@ -226,7 +226,7 @@ int state;
 }
 
 
-print_actions(stateno)
+void print_actions(stateno)
 int stateno;
 {
     register action *p;
@@ -253,7 +253,7 @@ int stateno;
 }
 
 
-print_shifts(p)
+void print_shifts(p)
 register action *p;
 {
     register int count;
@@ -278,7 +278,7 @@ register action *p;
 }
 
 
-print_reductions(p, defred)
+void print_reductions(p, defred)
 register action *p;
 register int defred;
 {
@@ -316,7 +316,7 @@ register int defred;
 }
 
 
-print_gotos(stateno)
+void print_gotos(stateno)
 int stateno;
 {
     register int i, k;

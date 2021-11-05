@@ -11,6 +11,15 @@ reductions *first_reduction;
 
 int get_state();
 core *new_state();
+void initialize_states();
+void save_reductions();
+void new_itemsets();
+void finalize_closure();
+void no_space();
+void fatal(char* msg);
+void set_first_derives();
+void save_shifts();
+void closure(short* nucleus, int n);
 
 static core *this_state;
 static core *last_state;
@@ -30,7 +39,7 @@ static short *kernel_items;
 core **state_table;
 
 
-allocate_itemsets()
+void allocate_itemsets()
 {
   register short *itemp;
   register short *item_end;
@@ -73,7 +82,7 @@ allocate_itemsets()
 
 
 
-allocate_storage()
+void allocate_storage()
 {
   allocate_itemsets();
 
@@ -84,7 +93,7 @@ allocate_storage()
 
 
 
-append_states()
+void append_states()
 {
   register int i;
   register int j;
@@ -114,7 +123,7 @@ append_states()
 }
 
 
-free_storage()
+void free_storage()
 {
   FREE(shift_symbol);
   FREE(redset);
@@ -127,7 +136,7 @@ free_storage()
 
 
 
-generate_states()
+void generate_states()
 {
   allocate_storage();
   itemset = NEW2(nitems, short);
@@ -220,7 +229,7 @@ int symbol;
 
 
 
-initialize_states()
+void initialize_states()
 {
     register int i;
     register short *start_derives;
@@ -247,7 +256,7 @@ initialize_states()
 }
 
 
-new_itemsets()
+void new_itemsets()
 {
   register int i;
   register int shiftcount;
@@ -325,7 +334,7 @@ int symbol;
 
 /* show_cores is used for debugging */
 
-show_cores()
+void show_cores()
 {
     core *p;
     int i, j, k, n;
@@ -360,7 +369,7 @@ show_cores()
 
 /* show_ritems is used for debugging */
 
-show_ritems()
+void show_ritems()
 {
     int i;
 
@@ -370,7 +379,7 @@ show_ritems()
 
 
 /* show_rrhs is used for debugging */
-show_rrhs()
+void show_rrhs()
 {
     int i;
 
@@ -381,7 +390,7 @@ show_rrhs()
 
 /* show_shifts is used for debugging */
 
-show_shifts()
+void show_shifts()
 {
     shifts *p;
     int i, j, k;
@@ -399,7 +408,7 @@ show_shifts()
 }
 
 
-save_shifts()
+void save_shifts()
 {
   register shifts *p;
   register short *sp1;
@@ -433,7 +442,7 @@ save_shifts()
 
 
 
-save_reductions()
+void save_reductions()
 {
   register short *isp;
   register short *rp1;

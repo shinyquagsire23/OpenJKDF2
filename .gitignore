@@ -59,3 +59,4 @@ df2_reimpl/symbols-tmp.syms
 df2_reimpl/symbols.ld
 df2_reimpl/symbols.ld.cog
 df2_reimpl/Makefile.wasm
+.DS_Store

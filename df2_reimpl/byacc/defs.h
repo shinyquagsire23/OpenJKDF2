@@ -3,6 +3,11 @@
 #include <stdio.h>
 
 
+#ifdef __APPLE__
+#include <stdlib.h>
+#include <string.h>
+#endif
+
 /*  machine dependent definitions			*/
 /*  the following definitions are for the VAX		*/
 /*  they might have to be changed for other machines	*/
@@ -275,9 +280,100 @@ extern int errno;
 
 
 /* system functions */
-
+#ifndef __APPLE__
 extern void free();
 extern char *calloc();
 extern char *malloc();
 extern char *realloc();
 extern char *strcpy();
+#endif
+
+void free_itemsets();
+void free_itemsets();
+void free_shifts();
+void free_reductions();
+void output_stored_text();
+void output_defines();
+void output_rule_data();
+void output_yydefred();
+void output_actions();
+void free_parser();
+void output_debug();
+void output_stype();
+void output_table();
+void write_section(char* section[]);
+void output_trailing_text();
+void output_semantic_actions();
+void output_rule_data();
+void traverse(int i);
+void digraph(short** relation);
+void fatal(char* msg);
+void add_lookback_edge(int stateno, int ruleno, int gotono);
+void set_state_table();
+void set_accessing_symbol();
+void set_shift_table();
+void set_reduction_table();
+void set_maxrhs();
+void initialize_LA();
+void initialize_F();
+void build_relations();
+void compute_FOLLOWS();
+void compute_lookaheads();
+void set_goto_map();
+void open_error(char*);
+void no_space();
+void token_actions();
+void goto_actions();
+void sort_actions();
+void pack_table();
+void output_check();
+void output_base();
+void save_column(int symbol, int default_state);
+int default_goto(int symbol);
+int matching_vector(int vector);
+int pack_vector(int vector);
+void unexpected_EOF();
+void tokenized_start(char* c);
+void retyped_warning(char* c);
+void reprec_warning(char* c);
+void syntax_error(int,char*,char*);
+void no_grammar();
+void terminal_start(char*);
+void default_action_warning();
+void start_rule(bucket*, int);
+void dollar_warning(int,int);
+void dollar_error(int,char*,char*);
+void untyped_lhs();
+void untyped_rhs(int, char*);
+void unknown_rhs(int);
+void restarted_warning();
+void prec_redeclared();
+void undefined_goal(char*);
+void unterminated_action(int,char*,char*);
+void undefined_symbol_warning(char*);
+void create_symbol_table();
+void free_symbol_table();
+void free_symbols();
+void unterminated_comment(int,char*,char*);
+void unterminated_string(int,char*,char*);
+void terminal_lhs(int);
+void revalued_warning(char*);
+int is_reserved(char*);
+void unterminated_union(int,char*,char*);
+void unterminated_text(int,char*,char*);
+void over_unionized(char*);
+void illegal_character(char*);
+void used_reserved(char*);
+void illegal_tag(int, char*, char*);
+
+void write_section(char* section[]);
+void print_gotos(int);
+void print_reductions(action*,int);
+void print_shifts(action*);
+void print_actions(int);
+void print_core(int);
+void print_nulls(int);
+void print_conflicts(int);
+void print_state(int);
+void log_conflicts();
+void log_unused();

@@ -1,5 +1,15 @@
 #include <signal.h>
+#include <unistd.h>
 #include "defs.h"
+
+void no_space();
+void open_error(char* msg);
+void reader();
+void lr0();
+void lalr();
+void make_parser();
+void verbose();
+void output();
 
 char dflag;
 char lflag;
@@ -97,7 +107,7 @@ usage()
 }
 
 
-getargs(argc, argv)
+void getargs(argc, argv)
 int argc;
 char *argv[];
 {
@@ -193,7 +203,7 @@ unsigned n;
 }
 
 
-create_file_names()
+void create_file_names()
 {
     int i, len;
     char *tmpdir;
@@ -263,7 +273,7 @@ create_file_names()
 }
 
 
-open_files()
+void open_files()
 {
     create_file_names();
 

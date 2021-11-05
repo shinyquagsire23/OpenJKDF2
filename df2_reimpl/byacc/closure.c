@@ -1,5 +1,9 @@
 #include "defs.h"
 
+#ifdef __APPLE__
+void reflexive_transitive_closure(unsigned* R, int n);
+#endif
+
 short *itemset;
 short *itemsetend;
 unsigned *ruleset;
