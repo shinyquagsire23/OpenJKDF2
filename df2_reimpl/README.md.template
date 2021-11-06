@@ -77,6 +77,9 @@ pip3 install cogapp
 # After installing cogapp, make sure the following is in your ~/.zshrc:
 # export PATH=$PATH:$HOME/Library/Python/3.8/bin
 
+# Win32/MinGW building
+brew install mingw-w64
+
 # MacOS 64-bit
 brew install openal-soft freealut sdl2 sdl2_mixer glew
 ```

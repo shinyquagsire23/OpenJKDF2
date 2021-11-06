@@ -11,13 +11,13 @@ OpenJKDF2 supports the following configurations:
 | x86 Linux/SDL2, mmap blobs | OpenGL ES 3.0 | Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
 | 32-bit Linux/SDL2, blobless | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
 | 64-bit Linux/SDL2 | OpenGL ES 3.0 | 64-bit Linux compilation with SDL2 and OpenAL. Currently buggy, particularly with COG scripts. Works on AArch64/RPi4 with llvmpipe, but V3D has trouble with palettes. |
-| MacOS AArch64 | OpenGL 3.3 | 64-bit MacOS compilation with SDL2 and OpenAL. |
 
 The following implementations are in-progress or planned:
 
 | Configuration | Renderer | Description |
 | --- | --- | --- |
 | Emscripten/WebAssembly | WebGL/OpenGL ES | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit. |
+| MacOS AArch64 | OpenGL ES 3.0? Metal? | 64-bit MacOS compilation with SDL2 and OpenAL. Rendering backend is currently undecided. |
 | 32-bit/64-bit Windows/SDL2 | OpenGL ES 3.0 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
 
 ## Building
@@ -77,6 +77,9 @@ pip3 install cogapp
 # After installing cogapp, make sure the following is in your ~/.zshrc:
 # export PATH=$PATH:$HOME/Library/Python/3.8/bin
 
+# Win32/MinGW building
+brew install mingw-w64
+
 # MacOS 64-bit
 brew install openal-soft freealut sdl2 sdl2_mixer glew
 ```
@@ -96,8 +99,6 @@ brew install openal-soft freealut sdl2 sdl2_mixer glew
 ### MacOS SDL2
 ```
 make -f Makefile.macos
-
-# Required, otherwise launching will just immediately SIGKILL with a signature check error.
 codesign -s - openjkdf2-64
 ```
 

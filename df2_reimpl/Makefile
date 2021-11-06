@@ -24,7 +24,9 @@ SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 #CFLAGS=
 
-all: initial $(OBJ) $(TARGET) $(TARGET_WIN)
+.PHONY: initial all
+
+all: $(TARGET) $(TARGET_WIN)
 clean:
 	rm -rf $(OBJ)
 	rm -f $(TARGET)
@@ -42,7 +44,7 @@ clean:
 clean_cog:
 	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 
-initial: clean_cog $(FLEX_BIN) $(YACC_BIN)
+initial: $(FLEX_BIN) $(YACC_BIN)
 	@echo Generating COG lex/yacc...
 	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
 	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
@@ -50,16 +52,16 @@ initial: clean_cog $(FLEX_BIN) $(YACC_BIN)
 	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
 	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
 
-$(OBJ):
+$(OBJ): | initial $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 	@mkdir -p $(OBJ)
 
-$(FLEX_BIN):
+$(FLEX_BIN): | clean_cog
 	cd $(ROOT_DIR)/flex && make
 
-$(YACC_BIN):
+$(YACC_BIN): | clean_cog
 	cd $(ROOT_DIR)/byacc && make
 
-$(OBJ)/%.o: $(SRC)/%.c
+$(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
