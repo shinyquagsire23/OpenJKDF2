@@ -21,6 +21,15 @@ uint32_t Linux_TimeMs()
     return _t.tv_sec*1000 + lround(_t.tv_nsec/1.0e6);
 }
 
+uint64_t Linux_TimeUs()
+{
+    struct timespec _t;
+
+    clock_gettime(CLOCK_REALTIME, &_t);
+
+    return _t.tv_sec*1000000 + lround(_t.tv_nsec/1.0e3);
+}
+
 static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
 {
     char tmp[512];

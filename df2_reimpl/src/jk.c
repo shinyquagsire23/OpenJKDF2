@@ -253,6 +253,7 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
+#ifndef MACOS
 void* memset(void* ptr, int val, size_t num)
 {
     int i;
@@ -262,6 +263,7 @@ void* memset(void* ptr, int val, size_t num)
     }
     return ptr;
 }
+#endif
 
 void* _memset32(void* ptr, uint32_t val, size_t num)
 {

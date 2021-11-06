@@ -236,6 +236,10 @@ int init_resources()
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
+    unsigned int vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao ); 
+
     has_initted = true;
     return true;
 }
@@ -327,17 +331,28 @@ void std3D_DrawMenu()
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
-    float menu_w, menu_h;
+    float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)Window_xSize;
     menu_h = (double)Window_ySize;
+    menu_u = 1.0;
+    menu_v = 1.0;
+    menu_x = 0.0;
     
     if (!jkGame_isDDraw)
     {
         //menu_w = 640.0;
         //menu_h = 480.0;
+
+        // Stretch screen
+        menu_u = (1.0 / menu_w) * 640.0;
+        menu_v = (1.0 / menu_h) * 480.0;
+
+        // Keep 4:3 aspect
+        menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+        menu_w = (menu_h * (640.0 / 480.0));
     }
 
-    GL_tmpVertices[0].x = 0.0;
+    GL_tmpVertices[0].x = menu_x;
     GL_tmpVertices[0].y = 0.0;
     GL_tmpVertices[0].z = 0.0;
     GL_tmpVertices[0].tu = 0.0;
@@ -346,28 +361,28 @@ void std3D_DrawMenu()
     *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[0].nz = 0;
     
-    GL_tmpVertices[1].x = 0.0;
+    GL_tmpVertices[1].x = menu_x;
     GL_tmpVertices[1].y = menu_h;
     GL_tmpVertices[1].z = 0.0;
     GL_tmpVertices[1].tu = 0.0;
-    GL_tmpVertices[1].tv = 1.0;
+    GL_tmpVertices[1].tv = menu_v;
     *(uint32_t*)&GL_tmpVertices[1].nx = 0;
     *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[1].nz = 0;
     
-    GL_tmpVertices[2].x = menu_w;
+    GL_tmpVertices[2].x = menu_x + menu_w;
     GL_tmpVertices[2].y = menu_h;
     GL_tmpVertices[2].z = 0.0;
-    GL_tmpVertices[2].tu = 1.0;
-    GL_tmpVertices[2].tv = 1.0;
+    GL_tmpVertices[2].tu = menu_u;
+    GL_tmpVertices[2].tv = menu_v;
     *(uint32_t*)&GL_tmpVertices[2].nx = 0;
     *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[2].nz = 0;
     
-    GL_tmpVertices[3].x = menu_w;
+    GL_tmpVertices[3].x = menu_x + menu_w;
     GL_tmpVertices[3].y = 0.0;
     GL_tmpVertices[3].z = 0.0;
-    GL_tmpVertices[3].tu = 1.0;
+    GL_tmpVertices[3].tu = menu_u;
     GL_tmpVertices[3].tv = 0.0;
     *(uint32_t*)&GL_tmpVertices[3].nx = 0;
     *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
@@ -471,10 +486,6 @@ void std3D_DrawMenu()
     glViewport(0, 0, width, height);
 
     }
-
-    unsigned int vao;
-    glGenVertexArrays( 1, &vao );
-    glBindVertexArray( vao ); 
     
     rdTri* tris = GL_tmpTris;
     glEnableVertexAttribArray(programMenu_attribute_coord3d);

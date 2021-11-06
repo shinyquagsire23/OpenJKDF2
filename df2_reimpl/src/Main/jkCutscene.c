@@ -14,6 +14,7 @@
 #include "Gui/jkGUI.h"
 #include "Win95/stdSound.h"
 #include "Engine/sithSoundSys.h"
+#include "stdPlatform.h"
 
 #include "smacker.h"
 
@@ -32,6 +33,7 @@ static stdSound_buffer_t* jkCutscene_audioFull = NULL;
 
 // TODO actually fill this in with an alternative Smack decoder
 
+static double last_displayFrame = 0;
 extern int openjkdf2_bIsKVM;
 
 void jkCutscene_Initialize(char *fpath)
@@ -192,6 +194,8 @@ int jkCutscene_sub_421410()
     smk_close(jkCutscene_smk);
 #endif
 
+    last_displayFrame = 0;
+
     jkCutscene_smack_loaded = 0;
     jk_ShowCursor(1);
     return 1;
@@ -334,13 +338,15 @@ int jkCutscene_smacker_process()
     if ( !jkCutscene_smack_loaded )
         return 0;
 
-    static int every_third = 0;
+    double cur_displayFrame = (double)Linux_TimeUs();
 
-#ifdef MACOS
-    if (every_third++ != 14) return 0;
-#else
-    if (every_third++ != 3) return 0;
-#endif
+    double usPerFrame = jkCutscene_smk_usf;
+    double delta = cur_displayFrame - last_displayFrame;
+    if (delta <= usPerFrame) return 0;
+    //printf("%f %f %f\n", delta, usPerFrame, extraUs);
+
+    // Get the video to catch up, if it misses frames
+    last_displayFrame = cur_displayFrame - (last_displayFrame) ? (delta - usPerFrame) : 0.0;
 
     every_third = 0;
     _memcpy(stdDisplay_masterPalette, smk_get_palette(jkCutscene_smk), 0x300);
@@ -368,9 +374,11 @@ int jkCutscene_smacker_process()
     stdSound_BufferPlay(buf, 0);
 #endif	
 	
-	if (smk_next(jkCutscene_smk) == SMK_DONE)
+	if (smk_next(jkCutscene_smk) == SMK_DONE) {
+        last_displayFrame = 0;
 	    return 1;
-    
+    }
+
     return 0;
 }
 #endif

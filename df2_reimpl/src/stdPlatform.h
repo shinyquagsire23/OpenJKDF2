@@ -35,6 +35,7 @@ static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
+uint64_t Linux_TimeUs();
 int stdPrintf(void* a1, char *a2, int line, char *fmt, ...);
 int stdPlatform_Printf(const char *fmt, ...);
 uint32_t stdPlatform_GetTimeMsec();

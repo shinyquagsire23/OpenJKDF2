@@ -283,9 +283,31 @@ int Window_mouseY = 0;
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
-    Window_mouseX = event->x;
-    Window_mouseY = event->y;// - (Window_ySize - 480);
-                
+    int x = event->x;
+    int y = event->y;
+
+    if (!jkGame_isDDraw)
+    {
+        float fX = (float)x;
+        float fY = (float)y;
+
+        // Keep 4:3 aspect
+        float menu_x = ((float)Window_xSize - ((float)Window_ySize * (640.0 / 480.0))) / 2.0;
+        float menu_w = ((float)Window_ySize * (640.0 / 480.0));
+
+        Window_mouseX = (int)(((fX - menu_x) / (float)menu_w) * 640.0);
+        Window_mouseY = (int)((fY / (float)Window_ySize) * 480.0);
+        //printf("%d %d\n", Window_mouseX, Window_mouseY);
+    }
+    else
+    {
+        Window_mouseX = x;
+        Window_mouseY = y;// - (Window_ySize - 480);
+    }
+
+    if (Window_mouseX < 0)
+        Window_mouseX = 0;
+
     uint32_t pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
     
     Window_lastSampleMs = event->timestamp - Window_lastSampleTime;
@@ -572,7 +594,7 @@ int Window_Main_Linux(int argc, char** argv)
 	}
 		
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+    //SDL_GL_SetSwapInterval(1); // Enable vsync
     SDL_StartTextInput();
     
     glewInit();
