@@ -12,6 +12,8 @@
 
 int Window_xSize = 640;
 int Window_ySize = 480;
+int Window_screenXSize = 640;
+int Window_screenYSize = 480;
 
 //static wm_handler Window_ext_handlers[16] = {0};
 
@@ -292,11 +294,11 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
         float fY = (float)y;
 
         // Keep 4:3 aspect
-        float menu_x = ((float)Window_xSize - ((float)Window_ySize * (640.0 / 480.0))) / 2.0;
-        float menu_w = ((float)Window_ySize * (640.0 / 480.0));
+        float menu_x = ((float)Window_screenXSize - ((float)Window_screenYSize * (640.0 / 480.0))) / 2.0;
+        float menu_w = ((float)Window_screenYSize * (640.0 / 480.0));
 
         Window_mouseX = (int)(((fX - menu_x) / (float)menu_w) * 640.0);
-        Window_mouseY = (int)((fY / (float)Window_ySize) * 480.0);
+        Window_mouseY = (int)((fY / (float)Window_screenYSize) * 480.0);
         //printf("%d %d\n", Window_mouseX, Window_mouseY);
     }
     else
@@ -341,9 +343,11 @@ void Window_HandleWindowEvent(SDL_Event* event)
             if (Window_xSize != event->window.data1 || Window_ySize != event->window.data2)
                 Window_resized = 1;
 
-            Window_xSize = event->window.data1;
-            Window_ySize = event->window.data2;
-            
+            //Window_xSize = event->window.data1;
+            //Window_ySize = event->window.data2;
+            SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
+            SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
+
             if (Window_xSize < 640) Window_xSize = 640;
             if (Window_ySize < 480) Window_ySize = 480;
             //printf("%u %u\n", Window_xSize, Window_ySize);
@@ -579,7 +583,7 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 #endif
 
-    displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!displayWindow) {
         printf("!! Failed to create SDL2 window !!\n%s", SDL_GetError());
         exit (-1);
@@ -598,6 +602,9 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_StartTextInput();
     
     glewInit();
+
+    SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
+    SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
     
     //SDL_RenderClear(displayRenderer);
     //SDL_RenderPresent(displayRenderer);

@@ -324,6 +324,64 @@ int std3D_RenderListVerticesFinish()
     return 1;
 }
 
+void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float dstY, float scale)
+{
+    double tex_w = (double)Window_xSize;
+    double tex_h = (double)Window_ySize;
+
+    double u1 = (x / tex_w);
+    double u2 = ((x+w) / tex_w);
+    double v1 = (y / tex_h);
+    double v2 = ((y+h) / tex_h);
+
+    GL_tmpVertices[GL_tmpVerticesAmt+0].x = dstX;
+    GL_tmpVertices[GL_tmpVerticesAmt+0].y = dstY;
+    GL_tmpVertices[GL_tmpVerticesAmt+0].z = 0.0;
+    GL_tmpVertices[GL_tmpVerticesAmt+0].tu = u1;
+    GL_tmpVertices[GL_tmpVerticesAmt+0].tv = v1;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].nz = 0;
+    
+    GL_tmpVertices[GL_tmpVerticesAmt+1].x = dstX;
+    GL_tmpVertices[GL_tmpVerticesAmt+1].y = dstY + (scale * h);
+    GL_tmpVertices[GL_tmpVerticesAmt+1].z = 0.0;
+    GL_tmpVertices[GL_tmpVerticesAmt+1].tu = u1;
+    GL_tmpVertices[GL_tmpVerticesAmt+1].tv = v2;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].nz = 0;
+    
+    GL_tmpVertices[GL_tmpVerticesAmt+2].x = dstX + (scale * w);
+    GL_tmpVertices[GL_tmpVerticesAmt+2].y = dstY + (scale * h);
+    GL_tmpVertices[GL_tmpVerticesAmt+2].z = 0.0;
+    GL_tmpVertices[GL_tmpVerticesAmt+2].tu = u2;
+    GL_tmpVertices[GL_tmpVerticesAmt+2].tv = v2;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].nz = 0;
+    
+    GL_tmpVertices[GL_tmpVerticesAmt+3].x = dstX + (scale * w);
+    GL_tmpVertices[GL_tmpVerticesAmt+3].y = dstY;
+    GL_tmpVertices[GL_tmpVerticesAmt+3].z = 0.0;
+    GL_tmpVertices[GL_tmpVerticesAmt+3].tu = u2;
+    GL_tmpVertices[GL_tmpVerticesAmt+3].tv = v1;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].nz = 0;
+    
+    GL_tmpTris[GL_tmpTrisAmt+0].v1 = GL_tmpVerticesAmt+1;
+    GL_tmpTris[GL_tmpTrisAmt+0].v2 = GL_tmpVerticesAmt+0;
+    GL_tmpTris[GL_tmpTrisAmt+0].v3 = GL_tmpVerticesAmt+2;
+    
+    GL_tmpTris[GL_tmpTrisAmt+1].v1 = GL_tmpVerticesAmt+2;
+    GL_tmpTris[GL_tmpTrisAmt+1].v2 = GL_tmpVerticesAmt+3;
+    GL_tmpTris[GL_tmpTrisAmt+1].v3 = GL_tmpVerticesAmt+0;
+    
+    GL_tmpVerticesAmt += 4;
+    GL_tmpTrisAmt += 2;
+}
+
 static rdDDrawSurface* test_idk = NULL;
 
 void std3D_DrawMenu()
@@ -338,6 +396,8 @@ void std3D_DrawMenu()
     menu_v = 1.0;
     menu_x = 0.0;
     
+    int bFixHudScale = 0;
+
     if (!jkGame_isDDraw)
     {
         //menu_w = 640.0;
@@ -351,53 +411,86 @@ void std3D_DrawMenu()
         menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
         menu_w = (menu_h * (640.0 / 480.0));
     }
+    else
+    {
+        bFixHudScale = 1;
+    }
 
-    GL_tmpVertices[0].x = menu_x;
-    GL_tmpVertices[0].y = 0.0;
-    GL_tmpVertices[0].z = 0.0;
-    GL_tmpVertices[0].tu = 0.0;
-    GL_tmpVertices[0].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[0].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[0].nz = 0;
-    
-    GL_tmpVertices[1].x = menu_x;
-    GL_tmpVertices[1].y = menu_h;
-    GL_tmpVertices[1].z = 0.0;
-    GL_tmpVertices[1].tu = 0.0;
-    GL_tmpVertices[1].tv = menu_v;
-    *(uint32_t*)&GL_tmpVertices[1].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[1].nz = 0;
-    
-    GL_tmpVertices[2].x = menu_x + menu_w;
-    GL_tmpVertices[2].y = menu_h;
-    GL_tmpVertices[2].z = 0.0;
-    GL_tmpVertices[2].tu = menu_u;
-    GL_tmpVertices[2].tv = menu_v;
-    *(uint32_t*)&GL_tmpVertices[2].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[2].nz = 0;
-    
-    GL_tmpVertices[3].x = menu_x + menu_w;
-    GL_tmpVertices[3].y = 0.0;
-    GL_tmpVertices[3].z = 0.0;
-    GL_tmpVertices[3].tu = menu_u;
-    GL_tmpVertices[3].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[3].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[3].nz = 0;
-    
-    GL_tmpTris[0].v1 = 1;
-    GL_tmpTris[0].v2 = 0;
-    GL_tmpTris[0].v3 = 2;
-    
-    GL_tmpTris[1].v1 = 2;
-    GL_tmpTris[1].v2 = 3;
-    GL_tmpTris[1].v3 = 0;
-    
-    GL_tmpVerticesAmt = 4;
-    GL_tmpTrisAmt = 2;
+    if (!bFixHudScale)
+    {
+        GL_tmpVertices[0].x = menu_x;
+        GL_tmpVertices[0].y = 0.0;
+        GL_tmpVertices[0].z = 0.0;
+        GL_tmpVertices[0].tu = 0.0;
+        GL_tmpVertices[0].tv = 0.0;
+        *(uint32_t*)&GL_tmpVertices[0].nx = 0;
+        *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
+        *(uint32_t*)&GL_tmpVertices[0].nz = 0;
+        
+        GL_tmpVertices[1].x = menu_x;
+        GL_tmpVertices[1].y = menu_h;
+        GL_tmpVertices[1].z = 0.0;
+        GL_tmpVertices[1].tu = 0.0;
+        GL_tmpVertices[1].tv = menu_v;
+        *(uint32_t*)&GL_tmpVertices[1].nx = 0;
+        *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
+        *(uint32_t*)&GL_tmpVertices[1].nz = 0;
+        
+        GL_tmpVertices[2].x = menu_x + menu_w;
+        GL_tmpVertices[2].y = menu_h;
+        GL_tmpVertices[2].z = 0.0;
+        GL_tmpVertices[2].tu = menu_u;
+        GL_tmpVertices[2].tv = menu_v;
+        *(uint32_t*)&GL_tmpVertices[2].nx = 0;
+        *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
+        *(uint32_t*)&GL_tmpVertices[2].nz = 0;
+        
+        GL_tmpVertices[3].x = menu_x + menu_w;
+        GL_tmpVertices[3].y = 0.0;
+        GL_tmpVertices[3].z = 0.0;
+        GL_tmpVertices[3].tu = menu_u;
+        GL_tmpVertices[3].tv = 0.0;
+        *(uint32_t*)&GL_tmpVertices[3].nx = 0;
+        *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
+        *(uint32_t*)&GL_tmpVertices[3].nz = 0;
+        
+        GL_tmpTris[0].v1 = 1;
+        GL_tmpTris[0].v2 = 0;
+        GL_tmpTris[0].v3 = 2;
+        
+        GL_tmpTris[1].v1 = 2;
+        GL_tmpTris[1].v2 = 3;
+        GL_tmpTris[1].v3 = 0;
+        
+        GL_tmpVerticesAmt = 4;
+        GL_tmpTrisAmt = 2;
+    }
+    else
+    {
+        GL_tmpVerticesAmt = 0;
+        GL_tmpTrisAmt = 0;
+
+        //std3D_DrawMenuSubrect(menu_x, 0, menu_w, menu_h, menu_x, 0, 1);
+
+        float hudScale = menu_h / 480.0;
+
+        /*if (menu_w >= 3600)
+            hudScale = 4;
+        else if (menu_w >= 1800)
+            hudScale = 3;
+        else if (menu_w >= 1200)
+            hudScale = 2;*/
+
+        // Left and Right HUD
+        std3D_DrawMenuSubrect(0, menu_h - 64, 64, 64, 0, menu_h - 64*hudScale, hudScale);
+        std3D_DrawMenuSubrect(menu_w - 64, menu_h - 64, 64, 64, menu_w - 64*hudScale, menu_h - 64*hudScale, hudScale);
+
+        // Items
+        std3D_DrawMenuSubrect((menu_w / 2) - 128, menu_h - 64, 256, 64, (menu_w / 2) - (128*hudScale), menu_h - 64*hudScale, hudScale);
+
+        // Text
+        std3D_DrawMenuSubrect((menu_w / 2) - 128, 0, 256, 128, (menu_w / 2) - (128*hudScale), 0, hudScale);
+    }
     
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
