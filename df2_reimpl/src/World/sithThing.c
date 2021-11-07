@@ -446,22 +446,15 @@ int sithThing_DoesRdThingInit(sithThing *thing)
 
 sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
 {
-    int v3; // ecx
-    int v4; // edx
-    sithThingFrame *v6; // eax
-    int v7; // ecx
-    sithThingFrame *v8; // esi
     sithThing *result; // eax
     int v10; // [esp+10h] [ebp-Ch]
     int v11; // [esp+14h] [ebp-8h]
     sithThing *v12; // [esp+18h] [ebp-4h]
     int thinga; // [esp+20h] [ebp+4h]
 
-    v3 = thing->thing_id;
-    v4 = thing->signature;
     thinga = thing->thingIdx;
-    v11 = v3;
-    v10 = v4;
+    v11 = thing->thing_id;
+    v10 = thing->signature;
     v12 = thing->rdthing.parentSithThing;
     if ( a2 )
     {
@@ -478,11 +471,8 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
             rdPuppet_New(&thing->rdthing);
         if ( thing->move_type == MOVETYPE_PATH && thing->trackParams.frames )
         {
-            v6 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
-            v7 = thing->trackParams.numFrames;
-            v8 = a2->trackParams.frames;
-            thing->trackParams.frames = v6;
-            _memcpy(v6, v8, sizeof(sithThingFrame) * v7);
+            thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
+            _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
         }
     }
     else
@@ -1945,9 +1935,7 @@ int sithThing_DetachThing(sithThing *thing)
     {
         if ( v3->move_type == MOVETYPE_PHYSICS )
         {
-            thing->physicsParams.vel.x = v3->physicsParams.vel.x + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = v3->physicsParams.vel.y + thing->physicsParams.vel.y;
-            thing->physicsParams.vel.z = v3->physicsParams.vel.z + thing->physicsParams.vel.z;
+            rdVector_Add3Acc(&thing->physicsParams.vel, &v3->physicsParams.vel);
         }
         else
         {

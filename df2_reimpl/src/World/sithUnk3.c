@@ -1046,7 +1046,6 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     double v24; // st5
     double v25; // st7
     double v26; // st7
-    double v30; // st4
     double v31; // st6
     double v32; // st7
     double v33; // st5
@@ -1057,8 +1056,6 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     float v43; // [esp+8h] [ebp-4h]
     float a1a; // [esp+10h] [ebp+4h]
     float amount; // [esp+14h] [ebp+8h]
-    float amounta; // [esp+14h] [ebp+8h]
-    float amountb; // [esp+14h] [ebp+8h]
 
     if ( a1->move_type != MOVETYPE_PHYSICS )
         return 0;
@@ -1112,28 +1109,26 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     }
     else
     {
-        v30 = a2->y;
-        v31 = a1->physicsParams.vel.y;
+        v31 = a1->physicsParams.vel.y * a2->y;
         v32 = a1->physicsParams.vel.x * a2->x;
         v33 = a1->physicsParams.vel.z * a2->z;
         sithUnk3_dword_8B4BE4 = 1;
         sithUnk3_collideHurtIdk.x = a2->x;
         sithUnk3_collideHurtIdk.y = a2->y;
         sithUnk3_collideHurtIdk.z = a2->z;
-        v35 = -(v32 + v33 + v31 * v30);
-        amounta = v35;
+        v35 = -(v32 + v33 + v31);
         if ( v35 > 0.0 )
         {
-            v36 = v43 * amounta;
+            v36 = v43 * v35;
             rdVector_MultAcc3(&a1->physicsParams.vel, a2, v36);
-            if ( !a4 && amounta > 2.5 )
+            if ( !a4 && v35 > 2.5 )
             {
-                v39 = (amounta - 2.5) * (amounta - 2.5) * 45.0;
+                v39 = (v35 - 2.5) * (v35 - 2.5) * 45.0;
+                //printf("%f %f, %f %f %f\n", v39, v35, a1->physicsParams.vel.x, a1->physicsParams.vel.y, a1->physicsParams.vel.z);
                 if ( v39 > 1.0 )
                 {
                     sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_HITDAMAGED);
-                    amountb = v39;
-                    sithThing_Damage(a1, a1, amountb, 0x40);
+                    sithThing_Damage(a1, a1, v39, 0x40);
                 }
             }
         }
@@ -1277,7 +1272,8 @@ int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3Se
 
     float tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
 
-    mass = thing->physicsParams.mass;
+    // Added: check move type
+    mass = (thing->move_type == MOVETYPE_PHYSICS) ? thing->physicsParams.mass : 0.0;
 
     if ( isSolid )
         return sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, isSolid);

@@ -2219,7 +2219,12 @@ typedef struct sithThingTrackParams
     uint32_t numFrames;
     uint32_t loadedFrames;
     sithThingFrame *frames;
+
+    // TODO HACK HACK HACK adjust this variable's position 
+    // to fix some union confusion that I missed somewhere
+#ifndef ARCH_64BIT
     uint32_t field_C;
+#endif
     rdVector3 vel;
     float field_1C;
     float field_20;
@@ -2228,6 +2233,9 @@ typedef struct sithThingTrackParams
     rdVector3 field_58;
     rdVector3 field_64;
     rdVector3 orientation;
+#ifdef ARCH_64BIT
+    uint32_t field_C;
+#endif
 } sithThingTrackParams;
 
 typedef struct sithThing

@@ -373,11 +373,11 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
             thing->rdthing.field_18 = 0;
             rdPuppet_BuildJointMatrices(&thing->rdthing, &thing->lookOrientation);
             v20 = thing->rdthing.hierarchyNodeMatrices;
-            v21 = thing->physicsParams.maxRotVel + v20->scale.x;
+            v21 = thing->trackParams.field_24.scale.x + v20->scale.x;
             thing->rdthing.field_18 = 1;
             a1a.x = v21;
-            a1a.y = thing->physicsParams.maxVel + v20->scale.y;
-            v22 = thing->physicsParams.orientSpeed + v20->scale.z;
+            a1a.y = thing->trackParams.field_24.scale.y + v20->scale.y;
+            v22 = thing->trackParams.field_24.scale.z + v20->scale.z;
             a1a.x = a1a.x - thing->position.x;
             a1a.y = a1a.y - thing->position.y;
             a1a.z = v22 - thing->position.z;

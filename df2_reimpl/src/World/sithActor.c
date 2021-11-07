@@ -24,7 +24,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 
     if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_40) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
-        if ( (thing->trackParams.numFrames & PHYSFLAGS_MIDAIR) != 0 || (thing->sector->flags & SITH_SF_UNDERWATER) == 0 )
+        if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 || (thing->sector->flags & SITH_SF_UNDERWATER) == 0 )
         {
             v3 = thing->actorParams.msUnderwater;
             if ( v3 )
@@ -56,12 +56,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 
 void sithActor_JumpWithVel(sithThing *thing, float vel)
 {
-    double final_vel; // st7
-    double v5; // st5
-    double v6; // st6
-    int v7; // eax
-    double v8; // st5
-    double v9; // st6
+    double final_vel;
     int isAttached; // zf
     sithSurface *attachedSurface; // eax
     int v12; // eax
@@ -76,25 +71,20 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
             final_vel = final_vel * 0.69999999;
         if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
         {
-            v5 = 0.0 * final_vel + thing->physicsParams.vel.y;
-            v6 = 1.0 * final_vel + thing->physicsParams.vel.z;
             thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = v5;
-            thing->physicsParams.vel.z = v6;
+            thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = 1.0 * final_vel + thing->physicsParams.vel.z;
             thing->physicsParams.physflags &= ~PHYSFLAGS_MIDAIR;
         }
         else
         {
-            v7 = thing->attach_flags;
-            if ( !v7 )
+            if ( !thing->attach_flags )
                 return;
-            v8 = 0.0 * final_vel + thing->physicsParams.vel.y;
-            v9 = 1.0 * final_vel + thing->physicsParams.vel.z;
-            thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
-            isAttached = (v7 & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE)) == 0;
-            thing->physicsParams.vel.y = v8;
+            isAttached = (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE)) == 0;
             attachedSurface = thing->attachedSurface;
-            thing->physicsParams.vel.z = v9;
+            thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
+            thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = 1.0 * final_vel + thing->physicsParams.vel.z;
             if ( isAttached )
             {
                 v14 = attachedSurface->surfaceFlags;
@@ -142,8 +132,6 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
 
 void sithActor_cogMsg_OpenDoor(sithThing *thing)
 {
-    double v2; // st7
-    double v3; // st6
     sithSector *v4; // esi
     int v5; // eax
     sithUnk3SearchEntry *searchResult; // eax
@@ -162,11 +150,9 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
         if ( thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
         {
             rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
-            v2 = thing->actorParams.eyeOffset.y + thingPos.y;
-            v3 = thing->actorParams.eyeOffset.z + thingPos.z;
             thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
-            thingPos.y = v2;
-            thingPos.z = v3;
+            thingPos.y = thing->actorParams.eyeOffset.y + thingPos.y;;
+            thingPos.z = thing->actorParams.eyeOffset.z + thingPos.z;
         }
         v4 = sithUnk3_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
         if ( v4 )
@@ -215,21 +201,16 @@ void sithActor_Remove(sithThing *thing)
 
 void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
 {
-    sithPlayerInfo *v2; // eax
-    sithSector *v3; // [esp-8h] [ebp-14h]
-
     if ( idx < (unsigned int)jkPlayer_maxPlayers )
     {
-        v2 = &jkPlayer_playerInfos[idx];
         if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
         {
-            _memcpy(&thing->lookOrientation, &v2->field_135C, sizeof(thing->lookOrientation));
-            v3 = v2->field_138C;
+            _memcpy(&thing->lookOrientation, &jkPlayer_playerInfos[idx].field_135C, sizeof(thing->lookOrientation));
             thing->position = thing->lookOrientation.scale;
             thing->lookOrientation.scale.x = rdroid_zeroVector3.x;
             thing->lookOrientation.scale.y = 0.0;
             thing->lookOrientation.scale.z = 0.0;
-            sithThing_MoveToSector(thing, v3, 0);
+            sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].field_138C, 0);
         }
         if ( thing->move_type == MOVETYPE_PHYSICS )
         {

@@ -34,6 +34,7 @@ static stdSound_buffer_t* jkCutscene_audioFull = NULL;
 // TODO actually fill this in with an alternative Smack decoder
 
 static double last_displayFrame = 0;
+static double extraUs = 0;
 extern int openjkdf2_bIsKVM;
 
 void jkCutscene_Initialize(char *fpath)
@@ -195,6 +196,7 @@ int jkCutscene_sub_421410()
 #endif
 
     last_displayFrame = 0;
+    extraUs = 0;
 
     jkCutscene_smack_loaded = 0;
     jk_ShowCursor(1);
@@ -345,10 +347,15 @@ int jkCutscene_smacker_process()
     if (delta <= usPerFrame) return 0;
     //printf("%f %f %f\n", delta, usPerFrame, extraUs);
 
-    // Get the video to catch up, if it misses frames
-    last_displayFrame = cur_displayFrame - (last_displayFrame) ? (delta - usPerFrame) : 0.0;
+    if (last_displayFrame)
+        extraUs += (delta - usPerFrame);
 
-    every_third = 0;
+    last_displayFrame = cur_displayFrame;
+
+    // Get the video to catch up, if it misses frames
+    last_displayFrame -= extraUs;
+    extraUs = 0.0;
+
     _memcpy(stdDisplay_masterPalette, smk_get_palette(jkCutscene_smk), 0x300);
     
     stdDisplay_VBufferLock(jkCutscene_frameBuf);
@@ -376,6 +383,7 @@ int jkCutscene_smacker_process()
 	
 	if (smk_next(jkCutscene_smk) == SMK_DONE) {
         last_displayFrame = 0;
+        extraUs = 0;
 	    return 1;
     }
 

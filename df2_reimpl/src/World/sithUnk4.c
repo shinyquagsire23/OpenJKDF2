@@ -13,23 +13,18 @@
 
 void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing)
 {
-    double v1; // st7
-    double v2; // st7
-
     if ( jkPlayer_setDiff )
     {
         if ( jkPlayer_setDiff == 2 )
         {
-            v1 = thing->actorParams.health * 1.2;
             thing->actorParams.maxHealth = thing->actorParams.maxHealth * 1.2;
-            thing->actorParams.health = v1;
+            thing->actorParams.health = thing->actorParams.health * 1.2;
         }
     }
     else
     {
-        v2 = thing->actorParams.health * 0.80000001;
         thing->actorParams.maxHealth = thing->actorParams.maxHealth * 0.80000001;
-        thing->actorParams.health = v2;
+        thing->actorParams.health = thing->actorParams.health * 0.80000001;
     }
 }
 
@@ -164,8 +159,6 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithUnk3Search
     float v6; // edx
     float v7; // eax
     double v8; // st7
-    double v10; // st7
-    double v11; // st6
     double v12; // st6
     double v13; // st4
     double v14; // st7
@@ -200,11 +193,9 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithUnk3Search
     result = sithUnk3_DebrisDebrisCollide(a1, thing2, a3, 0);
     if ( result )
     {
-        v10 = -vAngs.y;
-        v11 = -vAngs.z;
         a1->physicsParams.vel.x = -vAngs.x;
-        a1->physicsParams.vel.y = v10;
-        a1->physicsParams.vel.z = v11;
+        a1->physicsParams.vel.y = -vAngs.y;
+        a1->physicsParams.vel.z = -vAngs.z;
         if ( _frand() < thing2->actorParams.error )
         {
             vAngs.x = 0.0;

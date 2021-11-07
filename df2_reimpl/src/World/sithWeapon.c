@@ -636,7 +636,7 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
         physicsThing->weaponParams.field_18 = v6 + 1;
         if ( (unsigned int)v6 < 6 )
         {
-            v30 = *(rdVector3 *)&physicsThing->trackParams.loadedFrames;
+            v30 = physicsThing->physicsParams.vel;
             if ( sithUnk3_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0) )
             {
                 v7 = (a4->lvec.z * v30.x + a4->uvec.x * v30.y + a4->uvec.y * v30.z) * -2.0;
