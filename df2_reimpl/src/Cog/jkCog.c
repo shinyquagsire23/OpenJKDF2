@@ -32,6 +32,8 @@ void jkCog_ClearSuperFlags(sithCog *ctx);
 void jkCog_GetSuperFlags(sithCog *ctx);
 void jkCog_PrintUniString(sithCog *ctx);
 void jkCog_SetPersuasionInfo(sithCog *ctx);
+void jkCog_SetTarget(sithCog *ctx);
+void jkCog_SetTargetColors(sithCog *ctx);
 void jkCog_SetSaberInfo(sithCog *ctx);
 void jkCog_GetSaberCam(sithCog *ctx);
 void jkCog_EnableSaber(sithCog *ctx);
@@ -62,8 +64,8 @@ static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
 //static void (*jkCog_SetWaggle)(sithCog* ctx) = (void*)0x0040AB50;
 //static void (*jkCog_SetSaberInfo)(sithCog* ctx) = (void*)0x0040ABA0;
 //static void (*jkCog_SetPersuasionInfo)(sithCog* ctx) = (void*)0x0040AC90;
-static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
-static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
+//static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
+//static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
 //static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
 static void (*jkCog_StringConcatUnistring)(sithCog* ctx) = (void*)0x0040ADA0;
 static void (*jkCog_StringConcatAsciiString)(sithCog* ctx) = (void*)0x0040AE30;
@@ -569,6 +571,24 @@ void jkCog_SetPersuasionInfo(sithCog *ctx)
                 jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
         }
     }
+}
+
+void jkCog_SetTarget(sithCog *ctx)
+{
+    sithThing *v1; // eax
+
+    v1 = sithCogVm_PopThing(ctx);
+    jkHud_SetTarget(v1);
+}
+
+void jkCog_SetTargetColors(sithCog *ctx)
+{
+    int tmp[3]; // [esp+4h] [ebp-Ch] BYREF
+
+    tmp[0] = sithCogVm_PopInt(ctx);
+    tmp[1] = sithCogVm_PopInt(ctx);
+    tmp[2] = sithCogVm_PopInt(ctx);
+    jkHud_SetTargetColors(tmp);
 }
 
 void jkCog_SetSaberInfo(sithCog *ctx)

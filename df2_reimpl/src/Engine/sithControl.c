@@ -645,13 +645,17 @@ int sithControl_ReadFunctionMap(int func, int* out)
             val = cur_val;
         lastval = !!state[SDL_SCANCODE_E];
     }
-    else if (func == INPUT_FUNC_USESKILL)
+    /*else if (func == INPUT_FUNC_USESKILL)
     {
         static int lastval = 0;
         int cur_val = !!state[SDL_SCANCODE_F];
         if (!lastval)
             val = cur_val;
         lastval = !!state[SDL_SCANCODE_F];
+    }*/
+    else if (func == INPUT_FUNC_USESKILL)
+    {
+        val = !!state[SDL_SCANCODE_F];
     }
     else if (func == INPUT_FUNC_TALK)
     {

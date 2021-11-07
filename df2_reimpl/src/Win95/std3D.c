@@ -470,7 +470,8 @@ void std3D_DrawMenu()
         GL_tmpVerticesAmt = 0;
         GL_tmpTrisAmt = 0;
 
-        //std3D_DrawMenuSubrect(menu_x, 0, menu_w, menu_h, menu_x, 0, 1);
+        // Main View
+        std3D_DrawMenuSubrect(0, 128, menu_w, menu_h-256, 0, 128, 1);
 
         float hudScale = menu_h / 480.0;
 

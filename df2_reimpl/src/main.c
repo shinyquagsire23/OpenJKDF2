@@ -87,6 +87,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdMath.h"
+#include "Primitives/rdPrimit2.h"
 #include "Primitives/rdPrimit3.h"
 #include "Raster/rdRaster.h"
 #include "World/sithThing.h"
@@ -879,9 +880,14 @@ void do_hooks()
     hook_function(rdMath_ClampVector_ADDR, rdMath_ClampVector);
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
     
+    // rdPrimit2
+    hook_function(rdPrimit2_DrawCircle_ADDR, rdPrimit2_DrawCircle);
+    hook_function(rdPrimit2_DrawClippedLine_ADDR, rdPrimit2_DrawClippedLine);
+
     // rdPrimit3
     //hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
     hook_function(rdPrimit3_NoClipFace_ADDR, rdPrimit3_NoClipFace);
+    hook_function(rdPrimit3_GetScreenCoord_ADDR, rdPrimit3_GetScreenCoord);
     
     // rdRaster
     hook_function(rdRaster_Startup_ADDR, rdRaster_Startup);

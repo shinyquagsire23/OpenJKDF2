@@ -74,6 +74,14 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
         rdPolyLine_FreeEntry(&saberinfo->polyline);
         saberinfo->polylineThing.polyline = 0;
     }
+
+#ifdef DEBUG_QOL_CHEATS
+    if (thing == g_localPlayerThing) {
+        material_tip_fname = "saberpurple0.mat";
+        material_side_fname = "saberpurple1.mat";
+    }
+#endif
+
     rdPolyLine_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, 4, 0, 0, 0.0);
     rdThing_NewEntry(&saberinfo->polylineThing, thing);
     rdThing_SetPolyline(&saberinfo->polylineThing, &saberinfo->polyline);

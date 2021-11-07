@@ -273,7 +273,7 @@ smack                          0x466      0.104%        0.000%          0 / 6
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 Video                          0x5dc      0.139%        19.800%         3 / 5          
 stdFileUtil                    0x687      0.155%        24.237%         5 / 11         
-rdPrimit2                      0x69a      0.157%        0.000%          0 / 5          
+rdPrimit2                      0x69a      0.157%        53.787%         2 / 5          
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithCogScript                  0x6ca      0.161%        89.241%         8 / 9          
 sithAnimClass                  0x6cc      0.161%        94.080%         4 / 5          
@@ -308,7 +308,7 @@ DirectPlay                     0x10cc     0.399%        0.000%          0 / 31
 VBuffer                        0x10dc     0.400%        0.000%          0 / 4          
 stdGif                         0x1162     0.413%        0.000%          0 / 4          
 sithDebugConsole               0x11b2     0.420%        13.135%         1 / 20         
-jkCog                          0x11b8     0.421%        71.583%        27 / 40         
+jkCog                          0x11b8     0.421%        73.523%        29 / 40         
 sithPuppet                     0x1222     0.430%        86.579%        13 / 17         
 sithCamera                     0x124b     0.434%        98.612%        19 / 23         
 sithCollide                    0x12a8     0.443%        92.588%         9 / 12         
@@ -316,7 +316,7 @@ jkGuiDisplay                   0x12ff     0.451%        0.000%          0 / 11
 stdControl                     0x1323     0.454%        0.776%          1 / 23         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
 jkMain                         0x16cd     0.541%        83.348%        35 / 53         
-rdPrimit3                      0x16e0     0.543%        54.013%         3 / 9          
+rdPrimit3                      0x16e0     0.543%        56.301%         4 / 9          
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
 rdActive                       0x1a55     0.625%        2.626%          3 / 8          
 sithSurface                    0x1c6a     0.674%        95.298%        31 / 35         
@@ -342,10 +342,10 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-41.569% by weight
-70.222% by weight excluding rasterizer
-2076 / 3167 functions
-2076 / 2796 functions excluding rasterizer
+41.674% by weight
+70.399% by weight excluding rasterizer
+2081 / 3167 functions
+2081 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
@@ -354,12 +354,12 @@ sith           3.588%          188 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.332%          175 / 360
 jkGui          3.467%          119 / 284
-rd             3.057%           34 / 345
-jk             1.513%          105 / 322
+rd             2.961%           31 / 345
+jk             1.504%          103 / 322
 Raster         40.792%         370 / 371
 other          1.397%           67 / 120
 -----------------------------------------
-total          58.431%        1091 / 3167
+total          58.326%        1086 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
@@ -368,10 +368,10 @@ sith           6.061%          188 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.318%          175 / 360
 jkGui          5.856%          119 / 284
-rd             5.165%           34 / 345
-jk             2.555%          105 / 322
+rd             5.001%           31 / 345
+jk             2.541%          103 / 322
 other          2.360%           67 / 120
 -----------------------------------------
-total          29.797%         721 / 2796
+total          29.620%         716 / 2796
 
 ```

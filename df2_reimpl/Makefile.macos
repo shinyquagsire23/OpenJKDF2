@@ -33,6 +33,10 @@ ifneq ($(OPENJKDF2_NO_ASAN), 1)
 	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
 endif
 
+ifeq ($(DEBUG_QOL_CHEATS), 1)
+	CFLAGS += -DDEBUG_QOL_CHEATS
+endif
+
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 
