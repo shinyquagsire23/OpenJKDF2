@@ -9,74 +9,15 @@ SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_b
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-FLEX_BIN := $(ROOT_DIR)/flex/flex
-YACC_BIN := $(ROOT_DIR)/byacc/yacc
-
-GLOBALS_C := $(ROOT_DIR)/$(SRC)/globals.c
-GLOBALS_C_COG := $(ROOT_DIR)/$(SRC)/globals.c.cog
-
-GLOBALS_H := $(ROOT_DIR)/$(SRC)/globals.h
-GLOBALS_H_COG := $(ROOT_DIR)/$(SRC)/globals.h.cog
-
-LINKER_SCRIPT_SYMS := $(ROOT_DIR)/symbols.ld
-LINKER_SCRIPT_SYMS_COG := $(ROOT_DIR)/symbols.ld.cog
-
-SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
-
 # Flags
 LDFLAGS := -fshort-wchar -lm -framework OpenGL $(shell pkg-config --libs sdl2) $(shell pkg-config --libs sdl2_mixer) $(shell pkg-config --libs glew) -lopenal -lalut -L$(HOMEBREW_PREFIX)/opt/openal-soft/lib -L$(HOMEBREW_PREFIX)/opt/freealut/lib
 CFLAGS := -O2 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DMACOS -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -I$(HOMEBREW_PREFIX)/opt/openal-soft/include -I$(HOMEBREW_PREFIX)/opt/freealut/include $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags sdl2_mixer) $(shell pkg-config --cflags glew) -I$(HOMEBREW_PREFIX)/include
 
-# 64-bit cannot use JK.EXE as a binary blob
-ifneq ($(OPENJKDF2_NO_ASAN), 1)
-	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero
-	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
-endif
-
-ifeq ($(DEBUG_QOL_CHEATS), 1)
-	CFLAGS += -DDEBUG_QOL_CHEATS
-endif
-
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 
-.PHONY: initial all
-
 all: $(TARGET)
-clean:
-	rm -rf $(OBJ)
-	rm -f $(TARGET)
-	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-	rm -f $(GLOBALS_C)
-	rm -f $(GLOBALS_H)
-	rm -f $(LINKER_SCRIPT_SYMS)
-	touch $(GLOBALS_C)
-	touch $(GLOBALS_H)
-	touch -m $(SYMBOLS_FILE)
-	touch -m $(GLOBALS_H_COG)
-	touch -m $(GLOBALS_C_COG)
-	touch $(SRC)/Cog/lex.yy.c
-	touch $(SRC)/Cog/y.tab.c
-
-clean_cog:
-	rm -f $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-
-initial: $(FLEX_BIN) $(YACC_BIN)
-	@echo Generating COG lex/yacc...
-	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
-	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
-	@echo Generating globals...
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
-
-$(OBJ): | initial $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-	@mkdir -p $(OBJ)
-
-$(FLEX_BIN): | clean_cog
-	cd $(ROOT_DIR)/flex && make
-
-$(YACC_BIN): | clean_cog
-	cd $(ROOT_DIR)/byacc && make
+include common.mk
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
