@@ -1650,47 +1650,47 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
 {
     NETMSG_START;
 
-    NETMSG_PUSHU16(thing->thingIdx);
-    NETMSG_PUSHU16(thing->thingType);
+    NETMSG_PUSHS16(thing->thingIdx);
+    NETMSG_PUSHS16(thing->thingType);
     if ( thing->thingType )
     {
-        NETMSG_PUSHU16(thing->templateBase->thingIdx);
-        NETMSG_PUSHU32(thing->signature);
-        NETMSG_PUSHU32(thing->thing_id);
+        NETMSG_PUSHS16(thing->templateBase->thingIdx);
+        NETMSG_PUSHS32(thing->signature);
+        NETMSG_PUSHS32(thing->thing_id);
         NETMSG_PUSHVEC3(thing->position);
         NETMSG_PUSHVEC3(thing->lookOrientation.rvec);
         NETMSG_PUSHVEC3(thing->lookOrientation.lvec);
         NETMSG_PUSHVEC3(thing->lookOrientation.uvec);
         if ( thing->sector ) {
-            NETMSG_PUSHU16(thing->sector->id);
+            NETMSG_PUSHS16(thing->sector->id);
         }
         else {
-            NETMSG_PUSHU16(-1);
+            NETMSG_PUSHS16(-1);
         }
         NETMSG_PUSHU32(thing->thingflags);
-        NETMSG_PUSHU32(thing->lifeLeftMs);
-        NETMSG_PUSHU32(thing->timer);
-        NETMSG_PUSHU32(thing->pulse_end_ms);
-        NETMSG_PUSHU32(thing->pulse_ms);
+        NETMSG_PUSHS32(thing->lifeLeftMs);
+        NETMSG_PUSHS32(thing->timer);
+        NETMSG_PUSHS32(thing->pulse_end_ms);
+        NETMSG_PUSHS32(thing->pulse_ms);
         NETMSG_PUSHF32(thing->userdata);
         NETMSG_PUSHU8(thing->rdthing.geometryMode);
-        NETMSG_PUSHU16(thing->collide);
+        NETMSG_PUSHS16(thing->collide);
         NETMSG_PUSHF32(thing->collideSize);
         NETMSG_PUSHF32(thing->light);
         NETMSG_PUSHU32(thing->jkFlags);
         if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 )
         {
             if ( thing->class_cog ) {
-                NETMSG_PUSHU16(thing->class_cog->selfCog);
+                NETMSG_PUSHS16(thing->class_cog->selfCog);
             }
             else {
-                NETMSG_PUSHU16(-1);
+                NETMSG_PUSHS16(-1);
             }
             if ( thing->capture_cog ) {
-                NETMSG_PUSHU16(thing->capture_cog->selfCog);
+                NETMSG_PUSHS16(thing->capture_cog->selfCog);
             }
             else {
-                NETMSG_PUSHU16(-1);
+                NETMSG_PUSHS16(-1);
             }
         }
         switch ( thing->thingType )
@@ -1705,22 +1705,22 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
                 
                 NETMSG_PUSHF32(thing->actorParams.timeLeftLengthChange);
                 NETMSG_PUSHF32(thing->actorParams.lightIntensity);
-                NETMSG_PUSHU32(thing->actorParams.field_1BC);
+                NETMSG_PUSHS32(thing->actorParams.field_1BC);
                 if ( thing->actorParams.playerinfo )
                 {
-                    NETMSG_PUSHU32(thing->actorParams.playerinfo - jkPlayer_playerInfos);
-                    NETMSG_PUSHU32(thing->actorParams.playerinfo->palEffectsIdx1);
-                    NETMSG_PUSHU32(thing->actorParams.playerinfo->palEffectsIdx2);
+                    NETMSG_PUSHS32(thing->actorParams.playerinfo - jkPlayer_playerInfos);
+                    NETMSG_PUSHS32(thing->actorParams.playerinfo->palEffectsIdx1);
+                    NETMSG_PUSHS32(thing->actorParams.playerinfo->palEffectsIdx2);
                 }
                 else
                 {
-                    NETMSG_PUSHU32(-1);
+                    NETMSG_PUSHS32(-1);
                 }
                 break;
             case THINGTYPE_WEAPON:
                 NETMSG_PUSHU32(thing->weaponParams.typeflags);
                 NETMSG_PUSHF32(thing->weaponParams.unk8);
-                NETMSG_PUSHU16(thing->weaponParams.field_18);
+                NETMSG_PUSHS16(thing->weaponParams.field_18);
                 break;
             case THINGTYPE_EXPLOSION:
                 NETMSG_PUSHU32(thing->explosionParams.typeflags);
@@ -1736,7 +1736,7 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
         }
         else if ( thing->move_type == MOVETYPE_PATH )
         {
-            NETMSG_PUSHU16(thing->trackParams.field_C);
+            NETMSG_PUSHS16(thing->trackParams.field_C);
             NETMSG_PUSHVEC3(thing->trackParams.vel);
             NETMSG_PUSHF32(thing->trackParams.field_1C);
             NETMSG_PUSHF32(thing->trackParams.field_20);
@@ -1744,13 +1744,13 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
             NETMSG_PUSHVEC3(thing->trackParams.field_58);
             NETMSG_PUSHVEC3(thing->trackParams.field_64);
             NETMSG_PUSHF32(thing->field_24C);
-            NETMSG_PUSHU16(thing->field_250);
-            NETMSG_PUSHU16(thing->curframe);
-            NETMSG_PUSHU16(thing->field_258);
-            NETMSG_PUSHU16(thing->goalframe);
+            NETMSG_PUSHS16(thing->field_250);
+            NETMSG_PUSHS16(thing->curframe);
+            NETMSG_PUSHS16(thing->field_258);
+            NETMSG_PUSHS16(thing->goalframe);
             NETMSG_PUSHMAT34(thing->trackParams.field_24);
             NETMSG_PUSHVEC3(thing->trackParams.orientation);
-            NETMSG_PUSHU16(thing->trackParams.loadedFrames);
+            NETMSG_PUSHS16(thing->trackParams.loadedFrames);
 
             for (int i = 0; i < thing->trackParams.loadedFrames; i++)
             {
@@ -1768,7 +1768,7 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
 int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
 {
     int16_t thingIdx; // ebp
-    uint32_t v8; // ecx
+    int32_t v8; // ecx
     sithThing* thing;
     sithSector* v11;
     int thingType;
@@ -1779,7 +1779,7 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
     if ( sithNet_isMulti && (g_submodeFlags & 8) == 0 )
         return 0;
 
-    thingIdx = NETMSG_POPU16();
+    thingIdx = NETMSG_POPS16();
     if ( thingIdx >= sithWorld_pCurWorld->numThingsLoaded )
         return 0;
 
@@ -1791,46 +1791,47 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
 
     sithWorld_pCurWorld->numThings = thingIdx;
 
-    thingType = NETMSG_POPU16();
+    thingType = NETMSG_POPS16();
     if ( !thingType )
         return 1;
 
     thing = &sithWorld_pCurWorld->things[thingIdx];
     sithThing_DoesRdThingInit(thing);
-    v8 = NETMSG_POPU16();
+    v8 = NETMSG_POPS16();
 
     if ( v8 >= sithWorld_pCurWorld->numTemplatesLoaded )
         return 0;
 
     sithThing_sub_4CD8A0(thing, &sithWorld_pCurWorld->templates[v8]);
 
-    thing->signature = NETMSG_POPU32();
-    thing->thing_id = NETMSG_POPU32();
+    thing->signature = NETMSG_POPS32();
+    thing->thing_id = NETMSG_POPS32();
     thing->thingType = thingType;
     thing->position = NETMSG_POPVEC3();
     thing->lookOrientation.rvec = NETMSG_POPVEC3();
     thing->lookOrientation.lvec = NETMSG_POPVEC3();
     thing->lookOrientation.uvec = NETMSG_POPVEC3();
-    v11 = sithSector_GetPtrFromIdx(NETMSG_POPS16());
+    int sectorIdx = NETMSG_POPS16();
+    v11 = sithSector_GetPtrFromIdx(sectorIdx);
     if ( v11 )
         sithThing_MoveToSector(thing, v11, 1);
 
     thing->thingflags = NETMSG_POPU32();
-    thing->lifeLeftMs = NETMSG_POPU32();
-    thing->timer = NETMSG_POPU32();
-    thing->pulse_end_ms = NETMSG_POPU32();
-    thing->pulse_ms = NETMSG_POPU32();
+    thing->lifeLeftMs = NETMSG_POPS32();
+    thing->timer = NETMSG_POPS32();
+    thing->pulse_end_ms = NETMSG_POPS32();
+    thing->pulse_ms = NETMSG_POPS32();
     thing->userdata = NETMSG_POPF32();
     thing->rdthing.geometryMode = NETMSG_POPU8();
-    thing->collide = NETMSG_POPU16();
+    thing->collide = NETMSG_POPS16();
     thing->collideSize = NETMSG_POPF32();
     thing->light = NETMSG_POPF32();
     thing->jkFlags = NETMSG_POPU32();
 
     if ( thing->thingflags & SITH_TF_CAPTURED )
     {
-        thing->class_cog = sithCog_GetByIdx(NETMSG_POPU16());
-        thing->capture_cog = sithCog_GetByIdx(NETMSG_POPU16());
+        thing->class_cog = sithCog_GetByIdx(NETMSG_POPS16());
+        thing->capture_cog = sithCog_GetByIdx(NETMSG_POPS16());
     }
     switch ( thing->thingType )
     {
@@ -1844,21 +1845,21 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
             
             thing->actorParams.timeLeftLengthChange = NETMSG_POPF32();
             thing->actorParams.lightIntensity = NETMSG_POPF32();
-            thing->actorParams.field_1BC = NETMSG_POPU32();
+            thing->actorParams.field_1BC = NETMSG_POPS32();
             
-            int playerInfo_idx = NETMSG_POPU32();
+            int playerInfo_idx = NETMSG_POPS32();
             
             if ( playerInfo_idx >= 0 && playerInfo_idx < 32 )
             {
                 thing->actorParams.playerinfo = &jkPlayer_playerInfos[playerInfo_idx];
-                thing->actorParams.playerinfo->palEffectsIdx1 = NETMSG_POPU32();
-                thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPU32();
+                thing->actorParams.playerinfo->palEffectsIdx1 = NETMSG_POPS32();
+                thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPS32();
             }
             break;
         case THINGTYPE_WEAPON:
             thing->weaponParams.typeflags = NETMSG_POPU32();
             thing->weaponParams.unk8 = NETMSG_POPF32();
-            thing->weaponParams.field_18 = NETMSG_POPU16();
+            thing->weaponParams.field_18 = NETMSG_POPS16();
             break;
         case THINGTYPE_EXPLOSION:
             thing->explosionParams.typeflags = NETMSG_POPU32();
@@ -1874,7 +1875,7 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
     }
     else if ( thing->move_type == MOVETYPE_PATH )
     {
-        thing->trackParams.field_C = NETMSG_POPU16();
+        thing->trackParams.field_C = NETMSG_POPS16();
         thing->trackParams.vel = NETMSG_POPVEC3();
         thing->trackParams.field_1C = NETMSG_POPF32();
         thing->trackParams.field_20 = NETMSG_POPF32();
@@ -1882,13 +1883,13 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
         thing->trackParams.field_58 = NETMSG_POPVEC3();
         thing->trackParams.field_64 = NETMSG_POPVEC3();
         thing->field_24C = NETMSG_POPF32();
-        thing->field_250 = NETMSG_POPU16();
-        thing->curframe = NETMSG_POPU16();
-        thing->field_258 = NETMSG_POPU16();
-        thing->goalframe = NETMSG_POPU16();
+        thing->field_250 = NETMSG_POPS16();
+        thing->curframe = NETMSG_POPS16();
+        thing->field_258 = NETMSG_POPS16();
+        thing->goalframe = NETMSG_POPS16();
         thing->trackParams.field_24 = NETMSG_POPMAT34();
         thing->trackParams.orientation = NETMSG_POPVEC3();
-        thing->trackParams.loadedFrames = NETMSG_POPU16();
+        thing->trackParams.loadedFrames = NETMSG_POPS16();
 
         if ( thing->trackParams.loadedFrames )
         {
@@ -2247,6 +2248,7 @@ int sithSector_cogMsg_HandleSyncSector(sithCogMsg *msg)
     if ( idx >= sithWorld_pCurWorld->numSectors )
         return 0;
     sector = &sithWorld_pCurWorld->sectors[idx];
+    sector->id = idx; // Not in original?
 
     colormapIdx = NETMSG_POPS16();
     if ( colormapIdx >= sithWorld_pCurWorld->numColormaps )
@@ -2274,7 +2276,7 @@ LABEL_11:
     sector->ambientLight = NETMSG_POPF32();
     sector->extraLight = NETMSG_POPF32();
 
-    if ( (sector->flags & SITH_SF_HASTHRUST) != 0 )
+    if (sector->flags & SITH_SF_HASTHRUST)
     {
         sector->thrust = NETMSG_POPVEC3();
     }
@@ -2411,7 +2413,7 @@ int sithSector_cogMsg_HandleStopAnim(sithCogMsg *msg)
             return 1;
         }
         
-        if ( (rdsurface->flags & 0xC0000) != 0 )
+        if (rdsurface->flags & 0xC0000)
         {
             rdsurface->parent_thing = sithThing_GetThingByIdx(NETMSG_POPS32());
             if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THINGTYPE_SPRITE3 )
@@ -2419,7 +2421,7 @@ int sithSector_cogMsg_HandleStopAnim(sithCogMsg *msg)
             rdsurface->signature = NETMSG_POPU32();
         }
 
-        if ( (rdsurface->flags & 0x20000) != 0 )
+        if (rdsurface->flags & 0x20000)
         {
             v7 = NETMSG_POPS32();
             if ( v7 >= 0 && v7 < sithWorld_pCurWorld->numSurfaces )
@@ -2429,20 +2431,20 @@ int sithSector_cogMsg_HandleStopAnim(sithCogMsg *msg)
             }
         }
 
-        if ( (rdsurface->flags & 0x100000) != 0 )
+        if (rdsurface->flags & 0x100000)
         {
             rdsurface->field_24 = NETMSG_POPVEC3();
             rdsurface->field_1C = NETMSG_POPVEC2();
         }
 
-        if ( (rdsurface->flags & 0x200000) != 0 )
+        if (rdsurface->flags & 0x200000)
         {
             rdsurface->field_30 = NETMSG_POPU32();
             rdsurface->field_34 = NETMSG_POPU32();
             rdsurface->wallCel = NETMSG_POPU32();
         }
 
-        if ( (rdsurface->flags & 0x400000) != 0 )
+        if (rdsurface->flags & 0x400000)
         {
             rdsurface->field_44 = NETMSG_POPF32();
             rdsurface->field_48 = NETMSG_POPF32();
@@ -2450,12 +2452,12 @@ int sithSector_cogMsg_HandleStopAnim(sithCogMsg *msg)
             rdsurface->field_3C = NETMSG_POPF32();
         }
 
-        if ( (rdsurface->flags & 0x10000) != 0 )
+        if (rdsurface->flags & 0x10000)
         {
             rdsurface->material = sithMaterial_GetByIdx(NETMSG_POPS32());
         }
 
-        if ( (rdsurface->flags & 0x2000000) != 0 )
+        if (rdsurface->flags & 0x2000000)
             rdsurface->sector = sithSector_GetPtrFromIdx(NETMSG_POPS32());
 
         return 1;
@@ -2472,7 +2474,7 @@ void sithSector_cogMsg_SendSyncTimers(sithTimer *timer, int sendto_id, int mpFla
     NETMSG_PUSHU32(timer->timerInfo.timerIdx);
     NETMSG_PUSHF32(timer->timerInfo.field_10);
     NETMSG_PUSHF32(timer->timerInfo.field_14);
-    NETMSG_PUSHU16(timer->field_4);
+    NETMSG_PUSHS16(timer->field_4);
     
     NETMSG_END(COGMSG_SYNCTIMERS);
     
