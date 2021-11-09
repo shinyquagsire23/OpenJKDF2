@@ -18,8 +18,10 @@ SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 
 # 64-bit cannot use JK.EXE as a binary blob
 ifneq ($(OPENJKDF2_NO_ASAN), 1)
+ifneq ($(OPENJKDF2_USE_BLOBS), 1)
 	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero
 	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
+endif
 endif
 
 ifeq ($(DEBUG_QOL_CHEATS), 1)

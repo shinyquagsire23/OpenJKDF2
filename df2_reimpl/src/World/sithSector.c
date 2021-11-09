@@ -1914,10 +1914,10 @@ void sithSector_cogMsg_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFla
 
     rdPuppet* puppet = thing->rdthing.puppet;
 
-    NETMSG_PUSHU32(thing->thingIdx);
+    NETMSG_PUSHS32(thing->thingIdx);
     for (int i = 0; i < 4; i++)
     {
-        NETMSG_PUSHU32(puppet->tracks[i].status);
+        NETMSG_PUSHS32(puppet->tracks[i].status);
         if ( puppet->tracks[i].status )
         {
             NETMSG_PUSHS32(puppet->tracks[i].keyframe->id);
@@ -1971,7 +1971,10 @@ int sithSector_cogMsg_HandleSyncPuppet(sithCogMsg *msg)
         rdpuppet->tracks[i].status = NETMSG_POPS32();
         if ( rdpuppet->tracks[i].status )
         {
-            rdpuppet->tracks[i].keyframe = sithKeyFrame_GetByIdx(NETMSG_POPS32());
+            int idx = NETMSG_POPS32();
+            rdpuppet->tracks[i].keyframe = sithKeyFrame_GetByIdx(idx);
+            if (rdpuppet->tracks[i].keyframe)
+                rdpuppet->tracks[i].keyframe->id = idx;
             rdpuppet->tracks[i].field_4 = NETMSG_POPS32();
             rdpuppet->tracks[i].lowPri = (int)NETMSG_POPS16();
             rdpuppet->tracks[i].highPri = (int)NETMSG_POPS16();
@@ -1997,7 +2000,7 @@ void sithSector_cogMsg_SendSyncAI(sithActor *actor, int sendto_id, int idx)
     NETMSG_START;
 
     NETMSG_PUSHS16(actor->thing->thingIdx);
-    NETMSG_PUSHU16((uint16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurWorld->aiclasses) / sizeof(sithAIClass)));
+    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurWorld->aiclasses) / sizeof(sithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->thingidk ) {
@@ -2076,7 +2079,7 @@ int sithSector_cogMsg_HandleSyncAI(sithCogMsg *msg)
     if ( !actor )
         return 0;
     
-    int16_t idx = NETMSG_POPU16();
+    int16_t idx = NETMSG_POPS16();
     if ( idx >= sithWorld_pCurWorld->numAIClassesLoaded )
         return 0;
 
