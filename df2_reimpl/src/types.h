@@ -445,7 +445,7 @@ typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
 
 typedef struct Darray Darray;
 
-#ifdef WIN32
+#ifndef OPENAL_SOUND
 typedef IDirectSoundBuffer stdSound_buffer_t;
 #else
 #ifdef OPENAL_SOUND
@@ -873,7 +873,7 @@ typedef struct stdVBufferTexFmt
     rdTexformat format;
 } stdVBufferTexFmt;
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 typedef struct SDL_Surface SDL_Surface;
 #endif
 
@@ -889,7 +889,7 @@ typedef struct stdVBuffer
     union
     {
     rdDDrawSurface *ddraw_surface;
-#ifdef LINUX
+#ifdef SDL2_RENDER
     SDL_Surface* sdlSurface;
 #endif
     };

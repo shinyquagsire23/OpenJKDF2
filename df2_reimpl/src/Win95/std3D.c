@@ -7,7 +7,7 @@
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

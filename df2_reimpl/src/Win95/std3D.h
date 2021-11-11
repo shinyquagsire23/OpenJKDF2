@@ -49,7 +49,7 @@ int std3D_HasAlpha();
 int std3D_HasModulateAlpha();
 int std3D_HasAlphaFlatStippled();
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 int std3D_StartScene();
 int std3D_EndScene();
 void std3D_ResetRenderList();

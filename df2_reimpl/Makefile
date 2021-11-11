@@ -9,7 +9,9 @@ SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DWIN32 -DARCH_X86 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DWIN32 -DWIN32_BLOBS -DARCH_X86 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
+
+OPENJKDF2_NO_ASAN := 1
 
 all: $(TARGET) $(TARGET_WIN)
 include common.mk

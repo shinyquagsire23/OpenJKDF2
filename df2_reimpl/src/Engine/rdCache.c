@@ -319,7 +319,7 @@ int rdCache_SendFaceListToHardware()
         else
             v148 = 0.0;
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
         d3d_maxVertices = 3;
 #endif
         if ( active_6c->numVertices + rdCache_totalVerts >= d3d_maxVertices )
@@ -1114,7 +1114,7 @@ void rdCache_DrawRenderList()
         if ( rdCache_totalNormalTris )
             std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
 #ifdef QOL_IMPROVEMENTS
-#ifdef LINUX
+#ifdef SDL2_RENDER
         if ( rdCache_totalLines )
             std3D_AddRenderListLines(rdCache_aHWLines, rdCache_totalLines);
 #endif

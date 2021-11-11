@@ -241,7 +241,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
             clickable = &menu->clickables[++clickableIdx];
         }
         
-#ifdef LINUX
+#ifdef SDL2_RENDER
         menu->focusedElement = lastFocused;
         menu->lastMouseDownClickable = lastDown;
 #endif
@@ -709,7 +709,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
             menu->lastMouseOverClickable = 0;
         drawFunc(clickable, menu, jkGuiRend_menuBuffer, forceRedraw);
         menu->lastMouseOverClickable = lastSave;
-#ifndef LINUX
+#ifndef SDL2_RENDER
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif
@@ -717,7 +717,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
     else if ( forceRedraw )
     {
         jkGuiRend_CopyVBuffer(menu, drawRect);
-#ifndef LINUX
+#ifndef SDL2_RENDER
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif
@@ -1543,7 +1543,7 @@ LABEL_47:
             break;
 
         case WM_CHAR:
-#ifndef LINUX
+#ifndef SDL2_RENDER
             if ( (jkGuiRend_lastKeyScancode != 0xFF0000) & (uint8_t)lParam )
 #endif
                 jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, 5, wParam);

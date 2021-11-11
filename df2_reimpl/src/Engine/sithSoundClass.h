@@ -162,14 +162,4 @@ int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundcla
 //static void (*sithSoundClass_ThingPauseSoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPauseSoundclass_ADDR;
 //static void (*sithSoundClass_Free2)(sithWorld* world) = (void*)sithSoundClass_Free2_ADDR;
 
-#ifdef LINUX
-//sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, int a2);
-//void sithSoundClass_ThingPlaySoundclass2(sithThing *a1, sithSoundClassEntry *a2, float a3);
-//void sithSoundClass_StopSound(sithThing *thing, sithSound *a2);
-#else
-//static sithSoundClass* (*sithSoundClass_ThingPlaySoundclass)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_ThingPlaySoundclass_ADDR;
-//static void (*sithSoundClass_ThingPlaySoundclass2)(sithThing *a1, sithSoundClassEntry *a2, float a3) = (void*)sithSoundClass_ThingPlaySoundclass2_ADDR;
-//static void (*sithSoundClass_StopSound)(sithThing *thing, sithSound *a2) = (void*)sithSoundClass_StopSound_ADDR;
-#endif
-
 #endif // _SITHSOUNDCLASS_H

@@ -55,7 +55,7 @@ static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 //static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 static int (*stdDisplay_Startup)() = (void*)stdDisplay_Startup_ADDR;
 static int (*stdDisplay_VBufferFill)(stdVBuffer *a2, int fillColor, rdRect *a4) = (void*)stdDisplay_VBufferFill_ADDR;
 static int (*stdDisplay_VBufferCopy)(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe) = (void*)stdDisplay_VBufferCopy_ADDR;

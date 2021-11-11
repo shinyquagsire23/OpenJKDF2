@@ -20,7 +20,7 @@ int jkCutscene_smack_related_loops();
 int jkCutscene_PauseShow();
 int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5);
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 int jkCutscene_smacker_process();
 #endif
 

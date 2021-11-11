@@ -42,7 +42,7 @@
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 
-#ifdef WIN32
+#ifdef WIN32_BLOBS
 static int (*sithMulti_SendChat)(char *a1, int a2, int a3) = (void*)sithMulti_SendChat_ADDR;
 #else
 int sithMulti_SendChat(char *a1, int a2, int a3);

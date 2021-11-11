@@ -339,7 +339,7 @@ void jkMain_GameplayShow(int a1, int a2)
     {
         sithSoundSys_ResumeAll();
         sithSoundSys_ResumeMusic(1);
-#ifdef LINUX
+#ifdef SDL2_RENDER
         jkGame_isDDraw = 0;
 #endif
         goto LABEL_39;
@@ -1087,7 +1087,7 @@ void jkMain_VideoLeave(int a1)
         jkMain_CdSwitch(0, 1);
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 void jkMain_FixRes()
 {
     if (!jkGame_isDDraw)

@@ -43,7 +43,7 @@
 
 int stdControl_MessageHandler(int a1, int a2, int a3);
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 static int (*stdControl_Open)() = (void*)stdControl_Open_ADDR;
 static int (*stdControl_Close)() = (void*)stdControl_Close_ADDR;
 static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;

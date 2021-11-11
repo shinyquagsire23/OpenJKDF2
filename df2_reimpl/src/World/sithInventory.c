@@ -624,8 +624,8 @@ LABEL_16:
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    sithInventory_SetBinAmount(player, SITHBIN_JEDI_RANK, 2.0);
-    jkPlayer_SetRank(2);
+    sithInventory_SetBinAmount(player, SITHBIN_JEDI_RANK, 7.0);
+    jkPlayer_SetRank(7);
     sithInventory_SetBinAmount(player, SITHBIN_FISTS, 1.0);
     sithInventory_SetBinAmount(player, SITHBIN_LIGHTSABER, 1.0);
     sithInventory_SetBinAmount(player, SITHBIN_F_JUMP, 4.0);

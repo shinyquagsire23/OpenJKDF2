@@ -150,7 +150,7 @@ LABEL_11:
         if (!sithCogVm_InvokeMsgByIdx(&sithCogVm_netMsgTmp))
         {
             jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithCogVm_netMsgTmp.netMsg.cogMsgId);
-#ifndef LINUX
+#ifndef SDL2_RENDER
             // Linux fails on SyncSound only
             goto load_fail;
 #endif

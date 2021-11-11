@@ -138,7 +138,7 @@ static void (*sithControl_MapFunc)(int funcIdx, int a2, int a3) = (void*)sithCon
 //static void (*sithControl_PlayerMovement)(sithThing *player) = (void*)sithControl_PlayerMovement_ADDR;
 //static int (*sithControl_FreeCam)(sithThing *player) = (void*)sithControl_FreeCam_ADDR;
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 int sithControl_Initialize();
 void sithControl_InputInit();
 int sithControl_ReadFunctionMap(int func, int* out);

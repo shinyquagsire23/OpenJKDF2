@@ -296,7 +296,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
 {
     stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
     mipmap->palette = material->palette_alloc;
 #endif
 

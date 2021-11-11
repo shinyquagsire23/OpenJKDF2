@@ -46,7 +46,7 @@ void Windows_Shutdown()
 
 int Windows_InitWindow()
 {
-#ifdef LINUX
+#ifdef SDL2_RENDER
     return 1;
 #endif
     HDC v2; // esi
@@ -220,7 +220,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 
     va_start(va, a1);
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
     v1 = jkStrings_GetText(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
     v3 = jkStrings_GetText("ERROR");

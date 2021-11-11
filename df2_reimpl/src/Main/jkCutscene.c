@@ -85,12 +85,12 @@ int jkCutscene_sub_421310(char* fpath)
     }
 #endif
     
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
     if (!openjkdf2_bIsKVM)
         return _jkCutscene_sub_421310(tmp);
 #endif
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
     sithSoundSys_StopSong();
     stdMci_Stop();
     jkCutscene_palette = malloc(0x300);
@@ -183,12 +183,12 @@ int jkCutscene_sub_421410()
         return 0;
     Window_RemoveMsgHandler(jkCutscene_Handler);
 
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
     if (!openjkdf2_bIsKVM)
         smack_sub_426940();
 #endif
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
     //stdSound_BufferRelease(jkCutscene_audio);
     //stdSound_BufferRelease(jkCutscene_audio2);
     stdSound_BufferRelease(jkCutscene_audioFull);
@@ -213,7 +213,7 @@ int jkCutscene_smack_related_loops()
         return 1;
     if ( !jkCutscene_55AA54 && g_app_suspended )
     {
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
         if (!openjkdf2_bIsKVM)
             smack_finished = smack_process();
         else
@@ -226,7 +226,7 @@ int jkCutscene_smack_related_loops()
             if ( jkCutscene_smack_loaded )
             {
                 Window_RemoveMsgHandler(jkCutscene_Handler);
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
                 if (!openjkdf2_bIsKVM)
                     smack_sub_426940();
 #endif
@@ -289,7 +289,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
     switch ( a2 )
     {
         case WM_CLOSE:
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
             if (!openjkdf2_bIsKVM)
                 smack_sub_426940();
 #endif
@@ -304,7 +304,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
                 {
                     v7 = jkCutscene_55AA54 == 0;
                     jkCutscene_55AA54 = v7;
-#if defined(WIN32)
+#if !defined(SDL2_RENDER)
                     if (!openjkdf2_bIsKVM)
                         smack_off(v7);
 #endif
@@ -334,7 +334,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
     return 0;
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 int jkCutscene_smacker_process()
 {
     if ( !jkCutscene_smack_loaded )

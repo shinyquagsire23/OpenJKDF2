@@ -304,7 +304,7 @@ void sith_UpdateCamera()
             sithRender_lastRenderTick = 1;
         }
 #ifdef QOL_IMPROVEMENTS
-#ifdef LINUX
+#ifdef SDL2_RENDER
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             //printf("%u\n", sithCamera_currentCamera->rdCam.canvas->heightMinusOne);

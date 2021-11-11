@@ -920,7 +920,7 @@ void sithSoundSys_Tick(float deltaSecs)
     float v43; // [esp+4h] [ebp-10h]
     rdVector3 v44; // [esp+8h] [ebp-Ch] BYREF
 
-#ifdef LINUX
+#ifdef OPENAL_SOUND
     jkGuiSound_numChannels = 256;
 #endif
 

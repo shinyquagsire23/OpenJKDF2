@@ -57,7 +57,7 @@ static int (*jkDev_sub_41FB80)(int a1, const wchar_t *a2) = (void*)jkDev_sub_41F
 static int (*jkDev_DebugLog)(char *lParam) = (void*)jkDev_DebugLog_ADDR;
 static int (*jkDev_TryCommand)(char *cmd) = (void*)jkDev_TryCommand_ADDR;
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 void jkDev_PrintUniString(wchar_t* str);
 static int (*_jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
 #else

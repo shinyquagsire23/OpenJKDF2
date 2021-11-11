@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifdef WIN32
+#ifdef WIN32_BLOBS
 
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
 {

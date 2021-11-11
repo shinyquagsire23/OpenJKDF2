@@ -5,7 +5,7 @@ int sithDplay_Startup()
     if ( sithDplay_bInitted )
         return 0;
 
-#ifdef WIN32
+#ifdef TARGET_HAS_DPLAY
     DirectPlay_Initialize();
 #endif
     sithDplay_bInitted = 1;
@@ -13,7 +13,7 @@ int sithDplay_Startup()
     return 1;
 }
 
-#ifdef LINUX
+#ifndef WIN32_BLOBS
 int sithDplay_EarlyInit()
 {
     return 0;

@@ -15,7 +15,7 @@ void jkDev_Close()
     }
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 void jkDev_PrintUniString(wchar_t* str)
 {
 #ifndef LINUX_TMP

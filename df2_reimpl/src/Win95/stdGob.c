@@ -174,7 +174,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath)
     stdGob_fpath[127] = 0;
     stdString_CStrToLower(stdGob_fpath);
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
     for (int i = 0; i < 128; i++)
     {
         if (stdGob_fpath[i] == '/')

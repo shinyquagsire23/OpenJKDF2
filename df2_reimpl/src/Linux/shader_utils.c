@@ -4,12 +4,13 @@
  * Contributors: Sylvain Beucler
  */
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 
 #include "shader_utils.h"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#include <stdio.h>
 
 /**
  * Display compilation errors from the OpenGL shader compiler
@@ -88,6 +89,10 @@ GLuint create_shader(const char* shader, GLenum type) {
 	version = "#version 330\n";
 #else
     version = "#version 300 es\n";  // OpenGL ES 2.0
+#endif
+
+#if defined(WIN64_STANDALONE)
+    version = "#version 330\n";
 #endif
 
 	// GLES2 precision specifiers

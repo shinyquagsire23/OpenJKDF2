@@ -117,9 +117,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     rdMatrix34 a; // [esp+18h] [ebp-30h] BYREF
     int input_read;
 
-#ifdef LINUX
     //g_debugmodeFlags |= 0x100;
-#endif
 
     // TODO: fix this?
 #ifdef ARCH_64BIT
@@ -550,7 +548,7 @@ void sithControl_FreeCam(sithThing *player)
     }
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 #include <SDL2/SDL.h>
 int sithControl_Initialize()
 {

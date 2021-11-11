@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 
 int stdMci_Startup()
 {

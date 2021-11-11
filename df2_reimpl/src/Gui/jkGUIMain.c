@@ -85,7 +85,7 @@ void jkGuiMain_Show()
                         goto LABEL_12;
 
                     // TODO proper shutdown?
-#ifdef WIN32
+#ifdef WIN32_BLOBS
                     jk_PostMessageA(stdGdi_GetHwnd(), 16, 0, 0);
 #else
                     exit(0);

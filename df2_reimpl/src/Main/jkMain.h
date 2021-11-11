@@ -133,7 +133,7 @@ static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 //static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
 static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 int jkMain_SetVideoMode();
 void jkMain_FixRes();
 #else

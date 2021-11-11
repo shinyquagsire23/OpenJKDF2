@@ -392,7 +392,7 @@ void jkHud_Draw()
     }
 
     if (Main_bNoHUD) {
-#ifdef LINUX
+#ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
 #endif
         return;
@@ -407,7 +407,7 @@ void jkHud_Draw()
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
     stdDisplay_VBufferLock(Video_pCanvas->vbuffer);
 #endif
 
@@ -824,7 +824,7 @@ LABEL_116:
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusLeftBm->mipSurfaces, jkHud_leftBlitX, jkHud_leftBlitY, 0, 1);
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusRightBm->mipSurfaces, jkHud_rightBlitX, jkHud_rightBlitY, 0, 1);
     }
-#ifdef LINUX
+#ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
 #endif
 }

@@ -55,7 +55,7 @@ int Window_RemoveMsgHandler(WindowHandler_t a1)
     return 1;
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 static int dword_855E98 = 0;
 static int dword_855DE4 = 0;
 #else
@@ -90,7 +90,7 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                     if ( Window_setCooperativeLevel )
                         Window_setCooperativeLevel(0);
                 }
-#ifdef WIN32
+#ifdef WIN32_BLOBS
                 jk_SetFocus(g_hWnd);
 #endif
             }
@@ -102,7 +102,7 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                     lParam = 1;
                     if ( lParam )
                     {
-#ifdef WIN32
+#ifdef WIN32_BLOBS
                         jk_GetWindowThreadProcessId((HWND)lParam, (LPDWORD)&lParam);
                         jk_GetWindowThreadProcessId(hWnd, &dwProcessId);
 #endif
@@ -139,7 +139,7 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     return v10;
 }
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)
 {
@@ -258,7 +258,7 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 #endif
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 
 #include <string.h>
 #include <SDL2/SDL.h>
@@ -571,16 +571,26 @@ int Window_Main_Linux(int argc, char** argv)
     // Init SDL
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
-#ifdef MACOS
+#if defined(MACOS)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 #else
+
+#if defined(WIN64_STANDALONE)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+#endif
+
 #endif
 
     displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);

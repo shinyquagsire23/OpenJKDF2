@@ -145,6 +145,13 @@ int openjkdf2_bIsKVM = 1;
 
 void do_hooks();
 
+#ifdef WIN64_STANDALONE
+int main(int argc, char** argv)
+{   
+    Window_Main_Linux(argc, argv);
+}
+#endif
+
 #ifdef LINUX
 
 #ifndef ARCH_WASM
@@ -206,6 +213,7 @@ int main(int argc, char** argv)
 
 #endif
 
+#ifndef WIN64_STANDALONE
 #ifdef WIN32
 __declspec(dllexport) void hook_init(void);
 
@@ -2098,3 +2106,4 @@ void do_hooks()
     
 #endif
 }
+#endif // WIN64_STANDALONE

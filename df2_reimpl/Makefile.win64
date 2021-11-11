@@ -1,0 +1,31 @@
+CC := x86_64-w64-mingw32-gcc
+TARGET := openjkdf2-64.exe
+
+SRC := src
+OBJ := build_win64
+
+SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
+OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+THIRDPARTY := $(ROOT_DIR)/3rdparty
+
+OPENJKDF2_NO_ASAN := 1
+
+# -DWIN32 -DARCH_X86 -DTARGET_HAS_DPLAY
+
+LDFLAGS := -Wl,-Map=output-win64.map -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic -fno-trapping-math -L$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/lib -L$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/lib $(THIRDPARTY)/openal-soft/libs/Win64/OpenAL32.lib -L$(THIRDPARTY)/alut/lib -L$(THIRDPARTY)/glew/lib/Release/x64 -L$(THIRDPARTY)/freeglut/lib/x64 -lm -lfreeglut -lopengl32 -Dmain=SDL_main -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lalut -lglew32 -mwindows -Wl,--subsystem,windows -fshort-wchar
+CFLAGS := -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include/SDL2 -I$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/include -I$(THIRDPARTY)/openal-soft/include -I$(THIRDPARTY)/alut/include -I$(THIRDPARTY)/glew/include -I$(THIRDPARTY)/freeglut/include -DQOL_IMPROVEMENTS -DSDL2_RENDER -DWIN64 -DPLATFORM_POSIX -DARCH_64BIT -DOPENAL_SOUND -DWIN64_STANDALONE -Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main
+
+CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
+LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
+
+all: $(TARGET)
+include common.mk
+
+$(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -o $@ $< $(CFLAGS)
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ -g $^ $(LDFLAGS)

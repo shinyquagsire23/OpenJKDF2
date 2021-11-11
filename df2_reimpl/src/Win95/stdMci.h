@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#ifdef WIN32
+#ifdef WIN32_BLOBS
 #include <mmsystem.h>
 #endif
 

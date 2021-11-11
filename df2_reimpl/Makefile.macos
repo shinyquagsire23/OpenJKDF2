@@ -11,7 +11,7 @@ ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Flags
 LDFLAGS := -fshort-wchar -lm -framework OpenGL $(shell pkg-config --libs sdl2) $(shell pkg-config --libs sdl2_mixer) $(shell pkg-config --libs glew) -lopenal -lalut -L$(HOMEBREW_PREFIX)/opt/openal-soft/lib -L$(HOMEBREW_PREFIX)/opt/freealut/lib
-CFLAGS := -O2 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DARCH_64BIT -DMACOS -DOPENAL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -I$(HOMEBREW_PREFIX)/opt/openal-soft/include -I$(HOMEBREW_PREFIX)/opt/freealut/include $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags sdl2_mixer) $(shell pkg-config --cflags glew) -I$(HOMEBREW_PREFIX)/include
+CFLAGS := -g -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DARCH_64BIT -DMACOS -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -I$(HOMEBREW_PREFIX)/opt/openal-soft/include -I$(HOMEBREW_PREFIX)/opt/freealut/include $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags sdl2_mixer) $(shell pkg-config --cflags glew) -I$(HOMEBREW_PREFIX)/include
 
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP

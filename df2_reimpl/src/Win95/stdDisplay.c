@@ -16,7 +16,7 @@ uint8_t* stdDisplay_GetPalette()
     return stdDisplay_gammaPalette;
 }
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 
 #else
 #include <SDL2/SDL.h>

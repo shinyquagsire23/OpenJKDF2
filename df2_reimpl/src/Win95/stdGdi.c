@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifdef WIN32
+#ifndef SDL2_RENDER
 
 typedef struct BITMAPINFO_stack
 {
@@ -210,4 +210,4 @@ HINSTANCE stdGdi_GetHInstance()
     return stdGdi_HInstance;
 }
 
-#endif // WIN32
+#endif // SDL2_RENDER

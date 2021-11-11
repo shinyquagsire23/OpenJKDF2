@@ -19,11 +19,19 @@
 #include <wchar.h>
 #endif
 
+#ifdef WIN64_STANDALONE
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#endif
+
 #include "General/stdString.h"
 #include "Win95/stdControl.h"
 
 // Imports
-#ifdef WIN32
+#ifdef WIN32_BLOBS
 LSTATUS (__stdcall *jk_RegSetValueExA)(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
 LSTATUS (__stdcall *jk_RegDeleteKeyA)(HKEY hKey, LPCSTR lpSubKey);
 LSTATUS (__stdcall *jk_RegQueryValueExA)(HKEY hKey, LPCSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
@@ -341,7 +349,7 @@ int __wcsicmp(const wchar_t *a, const wchar_t *b)
 
 void jk_init()
 {
-#ifdef WIN32
+#ifdef WIN32_BLOBS
     jk_RegSetValueExA = *(void**)0x008F03D8;
     jk_RegDeleteKeyA = *(void**)0x008F03DC;
     jk_RegQueryValueExA = *(void**)0x008F03E0;
@@ -522,7 +530,7 @@ void jk_init()
 #endif
 }
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
 #include <ctype.h>
 
 int _sscanf(const char * s, const char * format, ...)
@@ -801,7 +809,7 @@ int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
 {
 #ifdef ARCH_WASM
     return vswprintf(a, b, fmt, list);
-#elif defined(MACOS)
+#elif defined(MACOS) || defined(WIN64_STANDALONE)
     return 0;//vswprintf(a,b,fmt,list);
 #else
     return vswprintf(a, fmt, list);

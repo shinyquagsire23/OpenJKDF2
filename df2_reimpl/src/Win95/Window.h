@@ -36,7 +36,7 @@ static int (*_Window_msg_main_handler)(HWND hWnd, UINT Msg, WPARAM wParam, LPARA
 // Added
 int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 extern int Window_lastXRel;
 extern int Window_lastYRel;
 extern int Window_lastSampleMs;

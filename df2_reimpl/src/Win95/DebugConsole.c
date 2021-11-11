@@ -90,7 +90,7 @@ void DebugConsole_Close()
 
 void DebugConsole_Print(char *str)
 {
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
     printf("%s\n", str);
     return;
 #endif
@@ -116,7 +116,7 @@ void DebugConsole_Print(char *str)
 
 void DebugConsole_PrintUniStr(wchar_t *a1)
 {
-#ifdef LINUX
+#ifdef LINUX_TMP
     printf("STUB: DebugConsole_PrintUniStr\n");
     return;
 #endif

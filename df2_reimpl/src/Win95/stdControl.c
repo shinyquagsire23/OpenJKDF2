@@ -9,7 +9,7 @@ int stdControl_MessageHandler(int a1, int a2, int a3)
     return a3 == 0xF100 || a3 == 0xF140;
 }
 
-#ifdef LINUX
+#ifdef SDL2_RENDER
 #include <SDL2/SDL.h>
 void stdControl_Flush()
 {

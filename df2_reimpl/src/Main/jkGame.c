@@ -71,7 +71,7 @@ void jkGame_ScreensizeDecrease()
     }
 }
 
-#ifndef LINUX
+#ifndef SDL2_RENDER
 int jkGame_Update()
 {
     int64_t v0; // rcx

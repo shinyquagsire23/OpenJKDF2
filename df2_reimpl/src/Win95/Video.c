@@ -55,7 +55,7 @@ void Video_SwitchToGDI()
     stdDisplay_ddraw_surface_flip2();
     stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
 
-#ifndef LINUX
+#ifndef SDL2_RENDER
     if ( !Video_modeStruct.b3DAccel )
         stdDisplay_VBufferFree(Video_pVbufIdk);
 #else

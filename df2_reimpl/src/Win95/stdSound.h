@@ -31,10 +31,6 @@
 #define stdSound_ParseWav_ADDR (0x0437770)
 #define stdSound_SetMenuSoundFormat_ADDR (0x0437890)
 
-typedef struct IDirectSoundBuffer
-{
-} IDirectSoundBuffer;
-
 #ifdef OPENAL_SOUND
 #include <AL/al.h>
 typedef struct stdALBuffer
@@ -52,6 +48,10 @@ typedef struct stdALBuffer
     float vol;
     int bIsCopy;
 } stdALBuffer;
+#else
+typedef struct IDirectSoundBuffer
+{
+} IDirectSoundBuffer;
 #endif
 
 typedef struct stdNullSoundBuffer
@@ -83,7 +83,7 @@ uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSamp
 
 static void (*stdSound_3DBufferRelease)(stdSound_buffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 
-#ifdef WIN32
+#ifndef OPENAL_SOUND
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;

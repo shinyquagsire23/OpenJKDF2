@@ -67,7 +67,7 @@ static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFl
 static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPlay_SetSessionDesc_ADDR;
 static void (*sithDplay_EnumSessions2)() = (void*)sithDplay_EnumSessions2_ADDR;
 
-#ifdef WIN32
+#ifdef WIN32_BLOBS
 static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 static int (*sithDplay_Open)(int a, void* b) = (void*)sithDplay_Open_ADDR;
 static int (*sithDplay_OpenConnection)(void* a) = (void*)sithDplay_OpenConnection_ADDR;

@@ -3,7 +3,7 @@
 #include "Win95/std.h"
 #include "General/stdMemory.h"
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -11,7 +11,7 @@
 #include <string.h>
 #endif
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
 {
     struct timespec _t;
@@ -144,7 +144,7 @@ void stdPlatform_InitServices(common_functions *handlers)
     handlers->lockHandle = stdPlatform_LockHandle;
     handlers->unlockHandle = stdPlatform_UnlockHandle;
     
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
     handlers->alloc = Linux_alloc;
     handlers->free = Linux_free;
     handlers->realloc = Linux_realloc;
@@ -165,7 +165,7 @@ int stdPlatform_Startup()
     return 1;
 }
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
 int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
 {
     va_list args;

@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifdef WIN32
+#ifndef PLATFORM_POSIX
 
 int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
 {
