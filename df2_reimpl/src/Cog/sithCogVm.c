@@ -618,14 +618,21 @@ int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
     intptr_t d1;
     intptr_t d2;
 
+
     if ( ctx->stackPos < 1 )
         return 0;
 
     *stackVar = ctx->stack[--ctx->stackPos];
     tmp = stackVar;
 
-    if ( stackVar->type == COG_VARTYPE_SYMBOL )
-        tmp = (sithCogStackvar *)&sithCogParse_GetSymbol(ctx->symbolTable, stackVar->data[0])->val.type;
+    if ( stackVar->type == COG_VARTYPE_SYMBOL ) {
+        // Added: nullptr check here
+        sithCogSymbol* sym = sithCogParse_GetSymbol(ctx->symbolTable, stackVar->data[0]);
+        if (sym)
+            tmp = (sithCogStackvar *)&sym->val.type;
+        else
+            tmp = NULL;
+    }
 
     // Added
     if (!tmp)
@@ -635,8 +642,7 @@ int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
         d1 = 0;
         d2 = 0;
     }
-
-    if ( tmp->type )
+    else if ( tmp->type )
     {
         type = tmp->type;
         d0 = tmp->dataAsPtrs[0];

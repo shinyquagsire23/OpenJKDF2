@@ -237,6 +237,13 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     float zdist = vertex_out.z - out.scale.z;
     float xdist = vertex_out.x - out.scale.x;
     float mag = stdMath_Sqrt(xdist * xdist + zdist * zdist);
+
+    // Added: prevent div 0
+    if (mag == 0)
+    {
+        mag = 0.000001f;
+    }
+
     ang = stdMath_ArcSin3((-xdist) / mag);
     if ( zdist < 0.0 )
     {

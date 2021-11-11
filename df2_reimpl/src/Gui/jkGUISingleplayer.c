@@ -228,11 +228,13 @@ int jkGuiSingleplayer_Show()
                                 jkEpisode_mLoad = jkGui_episodeLoad;
                                 for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
                                 {
-                                    if (!strcmp(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
+                                    //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
+                                    if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
                                         jkEpisode_mLoad.field_8 = j;
                                         break;
                                     }
                                 }
+                                //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.field_0, jkEpisode_mLoad.field_8);
                             }
                         }
                     }

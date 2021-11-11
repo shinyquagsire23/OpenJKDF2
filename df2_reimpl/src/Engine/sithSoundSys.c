@@ -319,11 +319,8 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
     sithPlayingSound *result; // eax
     sithPlayingSound *v6; // ebx
     int v8; // ecx
-    stdSound_buffer_t *v9; // eax
-    stdSound_buffer_t *v11; // eax
     double v12; // st7
     int v13; // ecx
-    unsigned int v14; // ecx
     int v15; // esi
     sithPlayingSound* v16;
     sithPlayingSound *v17; // esi
@@ -346,9 +343,9 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
     
     if ( !v6 )
         return 0;
-    v9 = sithSound_LoadData(v6->sound);
-    v6->pSoundBuf = v9;
-    if ( !v9 )
+
+    v6->pSoundBuf = sithSound_LoadData(v6->sound);
+    if ( !v6->pSoundBuf )
         goto LABEL_50;
     ++v6->sound->field_40;
     a2 = v6->vol_2 * 0.75;
@@ -359,9 +356,8 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
         if ( v6->p3DSoundObj )
             stdSound_BufferSetVolume(v6->pSoundBuf, v6->vol_2);
     }
-    v11 = v6->p3DSoundObj;
-    if ( v11 )
-        stdSound_3DBufferIdk(v11, 2);
+    if ( v6->p3DSoundObj )
+        stdSound_3DBufferIdk(v6->p3DSoundObj, 2);
     if ( volume < 0.0 )
     {
         v12 = 0.0;
@@ -387,28 +383,26 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
     stdSound_BufferSetPan(v6->pSoundBuf, pan);
     if ( sithSoundSys_activeChannels >= (unsigned int)jkGuiSound_numChannels )
     {
-        v14 = sithSoundSys_dword_836C04;
         v15 = 0;
-        while ( v14 >= 0x20 )
+        while ( sithSoundSys_dword_836C04 >= 0x20 )
         {
 LABEL_35:
             if ( v15 )
                 goto LABEL_46;
-            v14 = 0;
-            v15 = 1;
             sithSoundSys_dword_836C04 = 0;
+            v15 = 1;
         }
 
-        v16 = &sithSoundSys_aPlayingSounds[v14];
+        v16 = &sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04];
         while ( (v16->flags & SITHSOUNDFLAG_PLAYING) == 0 || (v16->flags & (SITHSOUNDFLAG_200|SITHSOUNDFLAG_HIGHPRIO|SITHSOUNDFLAG_LOOP)) != 0 )
         {
             v16++;
-            sithSoundSys_dword_836C04 = ++v14;
+            sithSoundSys_dword_836C04++;
             if ( v16 >= &sithSoundSys_aPlayingSounds[32] )
                 goto LABEL_35;
         }
 
-        v17 = &sithSoundSys_aPlayingSounds[v14];
+        v17 = &sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04];
         sithSoundSys_PlayingSoundReset(v17);
 
         if ( (sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04].flags & SITHSOUNDFLAG_LOOP) == 0 )
@@ -1125,7 +1119,7 @@ LABEL_72:
         soundIter = &sithSoundSys_aPlayingSounds[v40];
         if ( soundIter->sound )
         {
-            //jk_printf("tick %u: %s %x, %f %f\n", v40, soundIter->sound->sound_fname, soundIter->flags, soundIter->anonymous_13, soundIter->maxPosition);
+            //jk_printf("tick %u: %s %x, %f %f vol %f\n", v40, soundIter->sound->sound_fname, soundIter->flags, soundIter->anonymous_13, soundIter->maxPosition, soundIter->vol_2);
             sithSoundSys_TickPlayingSound(soundIter, deltaSecs);
         }
     }
@@ -1247,12 +1241,12 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
         sithSoundSys_SetFrequency(sound, deltaSecsa);
     }
 
-    if ( (sound->flags & SITHSOUNDFLAG_PLAYING) != 0 && (sound->flags & SITHSOUNDFLAG_LOOP) == 0 && !stdSound_IsPlaying(sound->pSoundBuf, 0) )
+    if ( (sound->flags & SITHSOUNDFLAG_PLAYING) && !(sound->flags & SITHSOUNDFLAG_LOOP) && !stdSound_IsPlaying(sound->pSoundBuf, 0) )
     {
         sithSoundSys_StopSound(sound);
     }
 
-    if ( (sound->flags & SITHSOUNDFLAG_80000) == 0
+    if ( !(sound->flags & SITHSOUNDFLAG_80000)
       && (sound->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)) != 0 )
     {
         sithSoundSys_UpdatePlayingSoundPosition(sound);
@@ -1289,14 +1283,14 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
         }
         else
         {
-            if ( (sound->flags & SITHSOUNDFLAG_PLAYING) != 0 )
+            if (sound->flags & SITHSOUNDFLAG_PLAYING)
             {
                 sithSoundSys_PlayingSoundReset(sound);
             }
             
-            // Added: commented out this so that sounds actually free?
+            // Added: adjusted this so that sounds actually free?
             // TODO figure out why this needed to be changed
-            if ( (sound->flags & SITHSOUNDFLAG_LOOP) == 0 )
+            if (!(sound->flags & SITHSOUNDFLAG_LOOP) || !sound->pSoundBuf)
             {
                 sithSoundSys_StopSound(sound);
             }
@@ -1630,16 +1624,14 @@ int sithSoundSys_sub_4DD3F0(sithPlayingSound *sound)
 
     if ( sithSoundSys_activeChannels >= (unsigned int)jkGuiSound_numChannels )
     {
-        v1 = sithSoundSys_dword_836C04;
         v2 = 0;
-        while ( v1 >= 0x20 )
+        while ( sithSoundSys_dword_836C04 >= 0x20 )
         {
 LABEL_8:
             if ( v2 )
                 goto LABEL_19;
-            v1 = 0;
-            v2 = 1;
             sithSoundSys_dword_836C04 = 0;
+            v2 = 1;
         }
         v3 = &sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04];
         while ( (v3->flags & SITHSOUNDFLAG_PLAYING) == 0 || (v3->flags & (SITHSOUNDFLAG_200|SITHSOUNDFLAG_HIGHPRIO|SITHSOUNDFLAG_LOOP)) != 0 )
@@ -1652,7 +1644,7 @@ LABEL_8:
 
         v4 = &sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04];
         sithSoundSys_PlayingSoundReset(v4);
-        
+
         if ( (sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04].flags & SITHSOUNDFLAG_LOOP) == 0 )
         {
             v7 = &sithSoundSys_aPlayingSounds[sithSoundSys_dword_836C04];

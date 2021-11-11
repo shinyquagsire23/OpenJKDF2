@@ -361,6 +361,10 @@ int stdSound_IsPlaying(stdSound_buffer_t* sound, rdVector3 *pos)
     if (!sound->source)
         return 0;
     
+    // Added
+    if (sound->vol == 0.0)
+        return 0;
+
     ALint source_state;
     
     alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);

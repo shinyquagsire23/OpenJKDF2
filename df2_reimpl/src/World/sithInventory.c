@@ -509,6 +509,7 @@ float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, 
 
         if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136
           && desc->flags & ITEMINFO_VALID
+          && player->actorParams.playerinfo // added
           && player->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE
           && desc->flags & flags )
         {

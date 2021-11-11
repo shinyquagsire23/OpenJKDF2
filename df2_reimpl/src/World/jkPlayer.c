@@ -667,6 +667,11 @@ float jkPlayer_CalcAlignment(int isMp)
     {
         float pedsKilled = sithPlayer_GetBinAmt(SITHBIN_PEDS_KILLED);
         float totalPeds = sithPlayer_GetBinAmt(SITHBIN_PEDS_TOTAL);
+
+        // Added: prevent div 0
+        if (totalPeds == 0.0)
+            totalPeds = 1.0;
+
         float pedRatio = pedsKilled / totalPeds * 100.0;
         if (pedRatio) // ??
             alignment -= -20.0;
