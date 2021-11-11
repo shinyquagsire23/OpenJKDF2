@@ -86,10 +86,6 @@ void jkGuiSingleplayer_Shutdown()
 int jkGuiSingleplayer_Show()
 {
     const char *v4; // eax
-    int v5; // esi
-    int v6; // edi
-    int v7; // ebp
-    jkEpisodeEntry* v8; // ebx
     const char *v9; // eax
     int i; // ebx
     jkGuiStringEntry *v11; // eax
@@ -202,13 +198,9 @@ int jkGuiSingleplayer_Show()
                         }
                         if ( clicked == 1 )
                         {
-                            v5 = jkGui_episodeLoad.field_0;
-                            v6 = jkGui_episodeLoad.numSeq;
-                            v7 = jkGui_episodeLoad.field_8;
-                            v8 = jkGui_episodeLoad.paEntries; //TODO
                             jkGui_sub_412E20(&jkGuiSingleplayer_menu3, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                             jkGuiRend_DarrayNewStr(&array2, 10, 1);
-                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, v5, v6, v7, v8);
+                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.field_0, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.field_8, jkGui_episodeLoad.paEntries);
                             jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[7]);
                             jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[8]);
                             clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu3);
@@ -229,8 +221,19 @@ int jkGuiSingleplayer_Show()
                                 }
                             }
                             jkGuiRend_DarrayFree(&array2);
-                            if ( clicked == 1 )
+                            if ( clicked == 1 ) {
                                 jkMain_sub_403470(v25);
+                                
+                                // Added: progress end of level normally from debug menu, instead of exiting to main menu
+                                jkEpisode_mLoad = jkGui_episodeLoad;
+                                for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
+                                {
+                                    if (!strcmp(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
+                                        jkEpisode_mLoad.field_8 = j;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                     break;

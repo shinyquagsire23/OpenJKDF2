@@ -478,26 +478,22 @@ jkEpisodeEntry* jkEpisode_idk1(jkEpisodeLoad *a1)
 
 jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath)
 {
-    int v2; // ebp
-    jkEpisodeEntry *v3; // ebx
     int v4; // edi
     int v5; // edx
     int v6; // eax
     jkEpisodeEntry *v7; // ecx
 
-    v2 = pLoad->field_8;
-    v3 = pLoad->paEntries;
     if ( bIsAPath )
-        v4 = v3[v2].gotoA;
+        v4 = pLoad->paEntries[pLoad->field_8].gotoA;
     else
-        v4 = v3[v2].gotoB;
+        v4 = pLoad->paEntries[pLoad->field_8].gotoB;
     if ( v4 == -1 )
         return 0;
     v5 = pLoad->numSeq;
     v6 = 0;
     if ( v5 <= 0 )
 LABEL_9:
-        Windows_GameErrorMsgbox("ERR_BAD_EPISODE_FILE %d %d", v2, v4);
+        Windows_GameErrorMsgbox("ERR_BAD_EPISODE_FILE %d %d", pLoad->field_8, v4);
     v7 = pLoad->paEntries;
     while ( v7->lineNum != v4 )
     {
@@ -507,7 +503,7 @@ LABEL_9:
             goto LABEL_9;
     }
     pLoad->field_8 = v6;
-    return &v3[v6];
+    return &pLoad->paEntries[v6];
 }
 
 void jkEpisode_UpdateExtra(sithThing *thing)
