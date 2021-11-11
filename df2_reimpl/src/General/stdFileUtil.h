@@ -22,7 +22,7 @@ typedef struct stdFileSearch
     char path[128];
     union
     {
-        int field_88;
+        intptr_t field_88;
         struct dirent **namelist;
     };
     int num_found;

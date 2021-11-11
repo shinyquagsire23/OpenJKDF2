@@ -148,6 +148,12 @@ void do_hooks();
 #ifdef WIN64_STANDALONE
 int main(int argc, char** argv)
 {   
+    FILE* fp;
+    AllocConsole();
+    freopen_s(&fp, "CONIN$", "r", stdin);
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    
     Window_Main_Linux(argc, argv);
 }
 #endif

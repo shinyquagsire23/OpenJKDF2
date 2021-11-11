@@ -264,6 +264,7 @@ int std3D_StartScene()
     {
         if (!init_resources()) {
             printf("Failed to init resources, exiting...");
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to init resources, exiting...", NULL);
             exit(-1);
         }
     }

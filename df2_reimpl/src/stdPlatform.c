@@ -40,12 +40,23 @@ static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
     }
     _strncpy(tmp, fpath, sizeof(tmp));
 
+#ifndef WIN64_STANDALONE
     for (int i = 0; i < len; i++)
     {
         if (tmp[i] == '\\') {
             tmp[i] = '/';
         }
     }
+#endif
+
+#ifdef WIN32
+for (int i = 0; i < len; i++)
+{
+    if (tmp[i] == '/') {
+        tmp[i] = '\\';
+    }
+}
+#endif
 
     //printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
     

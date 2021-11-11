@@ -16,7 +16,7 @@
 #define stdFnames_MakePath_ADDR (0x00430E40)
 #define stdFnames_MakePath3_ADDR (0x00430EB0)
 
-#ifndef PLATFORM_POSIX
+#ifdef WIN32
 #define LEC_PATH_SEPARATOR_CHR ('\\')
 #define LEC_PATH_SEPARATOR "\\"
 #else

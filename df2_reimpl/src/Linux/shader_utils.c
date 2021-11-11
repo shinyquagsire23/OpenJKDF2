@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <stdio.h>
+#include <string.h>
 
 /**
  * Display compilation errors from the OpenGL shader compiler
@@ -35,15 +36,32 @@ void print_log(GLuint object) {
 		glGetProgramInfoLog(object, log_length, NULL, log);
 	
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s\n", log);
+	
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", log, NULL);
+	
 	free(log);
 }
 
 GLuint load_shader_file(const char* filepath, GLenum type)
 {
+    char tmp_filepath[256];
+    strncpy(tmp_filepath, filepath, 256);
+    
+#ifdef WIN32
+for (int i = 0; i < strlen(tmp_filepath); i++)
+{
+    if (tmp_filepath[i] == '/') {
+        tmp_filepath[i] = '\\';
+    }
+}
+#endif
+
     FILE* f = fopen(filepath, "r");
     if (!f)
     {
-        printf("Failed to load shader file `%s`!\n", filepath);
+        char errtmp[256];
+        snprintf(errtmp, 256, "Failed to load shader file `%s`!\n", filepath);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         return -1;
     }
     
@@ -55,7 +73,9 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     
     if (fread(shader_contents, 1, len, f) != len)
     {
-        printf("Failed to read shader file `%s`!\n", filepath);
+        char errtmp[256];
+        snprintf(errtmp, 256, "Failed to read shader file `%s`!\n", filepath);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         return -1;
     }
     shader_contents[len] = 0;

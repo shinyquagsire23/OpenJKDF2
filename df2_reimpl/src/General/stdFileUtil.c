@@ -52,7 +52,7 @@ stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension)
 #ifdef WIN32
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 {
-    int v4; // eax
+    intptr_t v4; // eax
     struct _finddata_t v6; // [esp+8h] [ebp-118h] BYREF
 
     if ( !a1 )

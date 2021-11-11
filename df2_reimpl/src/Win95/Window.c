@@ -520,6 +520,7 @@ void Window_SdlUpdate()
 
                 break;
             case SDL_QUIT:
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Quit!", NULL);
                 printf("Quit!\n");
                 exit(-1);
                 break;
@@ -595,18 +596,34 @@ int Window_Main_Linux(int argc, char** argv)
 
     displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!displayWindow) {
-        printf("!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+        char errtmp[256];
+        snprintf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit (-1);
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
-	glWindowContext = SDL_GL_CreateContext(displayWindow);
-	if (glWindowContext == NULL)
-	{
-	    jk_printf("!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
-	    exit (-1);
-	}
-		
+    glWindowContext = SDL_GL_CreateContext(displayWindow);
+    
+    // Retry with 3.30 instead
+    if (glWindowContext == NULL)
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+        glWindowContext = SDL_GL_CreateContext(displayWindow);
+    }
+    
+    if (glWindowContext == NULL)
+    {
+        char errtmp[256];
+        snprintf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+        exit(-1);
+    }
+
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     //SDL_GL_SetSwapInterval(1); // Enable vsync
     SDL_StartTextInput();

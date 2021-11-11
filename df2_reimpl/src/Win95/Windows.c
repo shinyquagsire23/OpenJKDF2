@@ -13,6 +13,10 @@
 #include "jk.h"
 #include "General/stdString.h"
 
+#ifdef SDL2_RENDER
+#include <SDL2/SDL.h>
+#endif
+
 static int Windows_bInitted;
 static uint32_t Windows_DplayGuid[4] = {0x0BF0613C0, 0x11D0DE79, 0x0A000C999, 0x4BAD7624};
 static char Windows_cpu_info[0x4c];
@@ -230,6 +234,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 #else
     vsnprintf(tmp, 0x200u, a1, va);
     jk_printf("FATAL ERROR: %s\n", tmp);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 #endif
     jk_exit(1);
 }
