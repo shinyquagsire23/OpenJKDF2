@@ -3,7 +3,7 @@
 #include "General/stdConffile.h"
 #include "General/stdMath.h"
 #include "Engine/sithSoundClass.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "Cog/sithCog.h"
 #include "jk.h"
@@ -183,7 +183,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 a6 = 0.0;
                             if ( a6 != 0.0 )
                             {
-                                v18 = sithUnk3_UpdateThingCollision(thing, &a1a, a6, 0x44);
+                                v18 = sithCollision_UpdateThingCollision(thing, &a1a, a6, 0x44);
                                 if ( v18 < a6 )
                                 {
                                     _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
@@ -202,7 +202,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                     thing->lookOrientation.scale.x = 0.0;
                     thing->lookOrientation.scale.y = 0.0;
                     thing->lookOrientation.scale.z = 0.0;
-                    sithUnk3_sub_4E77A0(thing, &a);
+                    sithCollision_sub_4E77A0(thing, &a);
                     if ( thing->field_24C >= 1.0 )
                     {
                         if ( (thing->trackParams.field_C & 0x10) == 0 )
@@ -211,7 +211,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                             thing->lookOrientation.scale.x = 0.0;
                             thing->lookOrientation.scale.y = 0.0;
                             thing->lookOrientation.scale.z = 0.0;
-                            sithUnk3_sub_4E77A0(thing, &a);
+                            sithCollision_sub_4E77A0(thing, &a);
                         }
                         thing->trackParams.field_C &= ~0x12;
                     }
@@ -231,7 +231,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         deltaSecondsa = 0.0;
                     if ( deltaSecondsa != 0.0 )
                     {
-                        v26 = sithUnk3_UpdateThingCollision(thing, &thing->trackParams.vel, deltaSecondsa, 68);
+                        v26 = sithCollision_UpdateThingCollision(thing, &thing->trackParams.vel, deltaSecondsa, 68);
                         a3a = v26;
                         if ( v26 >= deltaSecondsa )
                         {

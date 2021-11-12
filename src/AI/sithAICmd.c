@@ -15,7 +15,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithUnk4.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "jk.h"
 
 void sithAICmd_Startup()
@@ -941,13 +941,13 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     }
     rdVector_Copy3(&a3, &v6->position);
     rdVector_MultAcc3(&a3, &rdroid_zVector3, aiclass->argsAsFloat[1]);
-    sithSector* result = sithUnk3_GetSectorLookAt(v7, &v6->position, &a3, 0.0);
+    sithSector* result = sithCollision_GetSectorLookAt(v7, &v6->position, &a3, 0.0);
     if ( result )
     {
         a2.x = v5->field_1AC.x * 0.1 + a3.x;
         a2.y = v5->field_1AC.y * 0.1 + a3.y;
         a2.z = a3.z;
-        result = sithUnk3_GetSectorLookAt(result, &a3, &a2, 0.0);
+        result = sithCollision_GetSectorLookAt(result, &a3, &a2, 0.0);
         if ( result )
         {
             int tmp;

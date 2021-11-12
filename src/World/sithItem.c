@@ -4,7 +4,7 @@
 #include "World/sithThing.h"
 #include "Cog/sithCog.h"
 #include "Engine/sithNet.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "jk.h"
@@ -13,7 +13,7 @@ int sithItem_Collide(sithThing *a1, sithThing *a2)
 {
     if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
     {
-        if ( sithUnk3_HasLos(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
+        if ( sithCollision_HasLos(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
         {
             sithCog_SendMessageFromThing(a1, a2, SITH_MESSAGE_TOUCHED);
             a1->itemParams.respawnTime = sithTime_curMs + 500;

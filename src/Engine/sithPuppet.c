@@ -5,7 +5,7 @@
 #include "Engine/sithTime.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithActor.h"
 #include "Main/jkGame.h"
 #include "Engine/rdPuppet.h"
@@ -384,7 +384,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
             if ( a1a.x != 0.0 || a1a.y != 0.0 || a1a.z != 0.0 )
             {
                 a2a = rdVector_Normalize3Acc(&a1a);
-                sithUnk3_UpdateThingCollision(thing, &a1a, a2a, 0);
+                sithCollision_UpdateThingCollision(thing, &a1a, a2a, 0);
             }
             v23 = thing->rdthing.hierarchyNodeMatrices;
             v25 = thing->position.y;

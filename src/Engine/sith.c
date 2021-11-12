@@ -3,7 +3,7 @@
 #include "Main/jkGame.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "General/sithStrTable.h"
 #include "General/stdString.h"
@@ -48,7 +48,7 @@ int sith_Startup(struct common_functions *commonFuncs)
     is_started = sithTimer_Startup() & is_started;
     is_started = sithWorld_Startup() & is_started;
     is_started = sithRender_Startup() & is_started;
-    is_started = sithUnk3_Startup() & is_started;
+    is_started = sithCollision_Startup() & is_started;
     is_started = sithThing_Startup() & is_started;
     is_started = sithCogVm_Startup() & is_started;
     is_started = sithDplay_Startup() & is_started;
@@ -96,7 +96,7 @@ void sith_Shutdown()
     sithDplay_Shutdown();
     sithCogVm_Shutdown();
     sithThing_Shutdown();
-    sithUnk3_Shutdown();
+    sithCollision_Shutdown();
     sithRender_Shutdown();
     sithWorld_Shutdown();
     sithTimer_Shutdown();

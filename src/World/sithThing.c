@@ -13,7 +13,7 @@
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundSys.h"
@@ -1382,7 +1382,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     else
     {
         arg4a = rdVector_Normalize3(&v1, &thing->field_268);
-        thing->waggle = sithUnk3_UpdateThingCollision(thing, &v1, arg4a, v2);
+        thing->waggle = sithCollision_UpdateThingCollision(thing, &v1, arg4a, v2);
     }
 }
 
@@ -1507,7 +1507,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     v5 = spawnThing->sector;
     v7.y = spawnThing->position.y + dstVec.y;
     v7.z = spawnThing->position.z + dstVec.z;
-    v2 = sithUnk3_GetSectorLookAt(v5, &spawnThing->position, &v7, 0.0);
+    v2 = sithCollision_GetSectorLookAt(v5, &spawnThing->position, &v7, 0.0);
     result = sithThing_Create(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )
@@ -1773,7 +1773,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
         v14 = -rdVector_Dot3(&thing->physicsParams.vel, &surface->surfaceInfo.face.normal);
         if ( v14 > 2.5 )
         {
-            sithUnk3_FallHurt(thing, v14);
+            sithCollision_FallHurt(thing, v14);
             if ( thing->soundclass )
             {
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHURT);
@@ -1865,7 +1865,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
         if ( downward_velocity > 2.5 )
         {
             a1a = downward_velocity;
-            sithUnk3_FallHurt(a1, a1a);
+            sithCollision_FallHurt(a1, a1a);
             sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDHURT);
         }
         if ( a1->soundclass )

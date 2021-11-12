@@ -48,7 +48,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
 sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9);
 void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft);
 void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMatrix34 *a4, int a5);
-int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3);
+int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
 void sithWeapon_Remove(sithThing *weapon);
 void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate);
 void sithWeapon_InitializeEntry();

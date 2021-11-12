@@ -2,7 +2,7 @@
 
 #include "General/stdMath.h"
 #include "World/sithThing.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "World/sithActor.h"
 #include "World/jkPlayer.h"
@@ -747,7 +747,7 @@ LABEL_15:
                         a4.x = deltaSeconds * actora + *v6;
                         a4.y = v3->physicsParams.vel.y * deltaSeconds + v3->position.y;
                         a4.z = v3->physicsParams.vel.z * deltaSeconds + v3->position.z;
-                        v18 = sithUnk3_GetSectorLookAt(v3->sector, &v3->position, &a4, 0.0);
+                        v18 = sithCollision_GetSectorLookAt(v3->sector, &v3->position, &a4, 0.0);
                         if ( !v18 || (v18->flags & SITH_SF_UNDERWATER) == 0 )
                             goto LABEL_22;
                         v16->x = 0.0;
@@ -1000,7 +1000,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     long double v12; // st7
     double v18; // st7
     sithSector *v21; // eax
-    sithUnk3SearchEntry *v22; // esi
+    sithCollisionSearchEntry *v22; // esi
     sithThing *v23; // eax
     float a4a; // [esp+18h] [ebp+8h]
     float a5a; // [esp+2Ch] [ebp+1Ch]
@@ -1045,9 +1045,9 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
         if ( argC < 0.0 && a5a < 0.0 && a4a < argC - -1.0 )
             return 2;
     }
-    v21 = sithUnk3_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithUnk3_SearchRadiusForThings(v21, a3, a4, a5, *a8, 0.0, 0x102);
-    v22 = sithUnk3_NextSearchResult();
+    v21 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
+    sithCollision_SearchRadiusForThings(v21, a3, a4, a5, *a8, 0.0, 0x102);
+    v22 = sithCollision_NextSearchResult();
     if ( v22 )
     {
         while ( (v22->collideType & 1) != 0 )
@@ -1057,15 +1057,15 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
             {
                 if ( v23->thingType == THINGTYPE_ACTOR || v23->thingType == THINGTYPE_COG )
                     break;
-                v22 = sithUnk3_NextSearchResult();
+                v22 = sithCollision_NextSearchResult();
                 if ( v22 )
                     continue;
             }
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
             return 0;
         }
     }
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     return v22 != 0 ? 3 : 0;
 }
 
@@ -1074,7 +1074,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     float v11; // st7
     double v16; // st7
     sithSector *v19; // eax
-    sithUnk3SearchEntry *v20; // esi
+    sithCollisionSearchEntry *v20; // esi
     float a4a; // [esp+18h] [ebp+8h]
     float arg8a; // [esp+1Ch] [ebp+Ch]
  
@@ -1104,10 +1104,10 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
         if ( argC < 0.0 && a4a < 0.0 && arg8a < argC - -1.0 )
             return 2;
     }
-    v19 = sithUnk3_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithUnk3_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, 0x2102);
-    v20 = sithUnk3_NextSearchResult();
-    sithUnk3_SearchClose();
+    v19 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
+    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, 0x2102);
+    v20 = sithCollision_NextSearchResult();
+    sithCollision_SearchClose();
     return v20 != 0 ? 3 : 0;
 }
 
@@ -1117,7 +1117,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     sithThing *v4; // esi
     intptr_t result; // eax
     sithSector *v6; // edi
-    sithUnk3SearchEntry *v7; // eax
+    sithCollisionSearchEntry *v7; // eax
     sithSurface *v8; // ecx
     int v9; // eax
     sithThing *v10; // eax
@@ -1132,13 +1132,13 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     a5.z = -1.0;
     a7a = v4->moveSize * 0.25;
     v12 = 0;
-    result = (intptr_t)sithUnk3_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
+    result = (intptr_t)sithCollision_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
     v6 = (sithSector *)result;
     if ( !result )
         return result;
     a6 = sithSector_ThingGetInsertOffsetZ(v4) + a7->aiclass->maxStep;
-    sithUnk3_SearchRadiusForThings(v6, v4, a4, &a5, a6, a7a, 0x2002);
-    v7 = sithUnk3_NextSearchResult();
+    sithCollision_SearchRadiusForThings(v6, v4, a4, &a5, a6, a7a, 0x2002);
+    v7 = sithCollision_NextSearchResult();
     if ( !v7 )
         goto LABEL_20;
     while ( (v7->collideType & 2) == 0 )
@@ -1154,20 +1154,20 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
                     if ( (v4->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && v4->attachedThing == v10 )
                     {
                         *arg8 = 0;
-                        sithUnk3_SearchClose();
+                        sithCollision_SearchClose();
                         return 1;
                     }
                     *arg8 = 1;
                 }
 LABEL_20:
-                sithUnk3_SearchClose();
+                sithCollision_SearchClose();
                 return v12;
             }
 LABEL_8:
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
             return 0;
         }
-        v7 = sithUnk3_NextSearchResult();
+        v7 = sithCollision_NextSearchResult();
         if ( !v7 )
             goto LABEL_20;
     }
@@ -1181,13 +1181,13 @@ LABEL_8:
     if ( (v4->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
     {
         *arg8 = 0;
-        sithUnk3_SearchClose();
+        sithCollision_SearchClose();
         result = v12;
     }
     else
     {
         *arg8 = 1;
-        sithUnk3_SearchClose();
+        sithCollision_SearchClose();
         result = v12;
     }
     return result;
@@ -1197,7 +1197,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
 {
     sithThing *v4; // edi
     int v5; // ebx
-    sithUnk3SearchEntry *v6; // eax
+    sithCollisionSearchEntry *v6; // eax
     sithSurface *v7; // ecx
     int v8; // eax
     int result; // eax
@@ -1213,8 +1213,8 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     v5 = 0;
     a7 = v4->moveSize * 0.25;
     a6 = sithSector_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
-    sithUnk3_SearchRadiusForThings(a2, v4, a4, &a5, a6, a7, 0x2002);
-    v6 = sithUnk3_NextSearchResult();
+    sithCollision_SearchRadiusForThings(a2, v4, a4, &a5, a6, a7, 0x2002);
+    v6 = sithCollision_NextSearchResult();
     if ( v6 )
     {
         while ( 1 )
@@ -1231,20 +1231,20 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
                 if ( (v4->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 && v4->attachedSurface == v7 )
                 {
                     *out = 0;
-                    sithUnk3_SearchClose();
+                    sithCollision_SearchClose();
                     result = v5;
                 }
                 else
                 {
                     *out = 1;
-                    sithUnk3_SearchClose();
+                    sithCollision_SearchClose();
                     result = v5;
                 }
                 return result;
             }
             if ( (v6->collideType & 1) != 0 )
                 break;
-            v6 = sithUnk3_NextSearchResult();
+            v6 = sithCollision_NextSearchResult();
             if ( !v6 )
                 goto LABEL_13;
         }
@@ -1252,7 +1252,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
         if ( (v10->thingflags & SITH_TF_STANDABLE) == 0 )
         {
 LABEL_13:
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
             return 0;
         }
         v5 = 1;
@@ -1261,14 +1261,14 @@ LABEL_13:
             if ( (v4->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && v4->attachedThing == v10 )
             {
                 *out = 0;
-                sithUnk3_SearchClose();
+                sithCollision_SearchClose();
                 return 1;
             }
             *out = 1;
         }
     }
 LABEL_19:
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     return v5;
 }
 

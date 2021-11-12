@@ -8,7 +8,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithThingPlayer.h"
 #include "World/sithItem.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "Engine/sithCamera.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithNet.h"
@@ -2070,7 +2070,7 @@ void sithCogThing_HasLos(sithCog *ctx)
 
     if ( thingA && thingB )
     {
-        if (sithUnk3_HasLos(thingA, thingB, 0))
+        if (sithCollision_HasLos(thingA, thingB, 0))
             sithCogVm_PushInt(ctx, 1);
         else
             sithCogVm_PushInt(ctx, 0);

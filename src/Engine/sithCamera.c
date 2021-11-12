@@ -4,7 +4,7 @@
 #include "World/sithThing.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "Primitives/rdMath.h"
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
@@ -192,7 +192,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             }
             // Added: nullptr check
             if (focusThing->sector)
-                cam->sector = sithUnk3_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+                cam->sector = sithCollision_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         case 4:
             if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )
@@ -252,7 +252,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
         case 128:
             rdMatrix_Copy34(&cam->viewMat, &sithCamera_viewMat);
             rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-            cam->sector = sithUnk3_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+            cam->sector = sithCollision_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         default:
             break;
@@ -446,7 +446,7 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     double v7; // st7
     int v8; // ecx
     sithSector *v9; // ebx
-    sithUnk3SearchEntry *i; // ecx
+    sithCollisionSearchEntry *i; // ecx
     double v12; // st6
     double v13; // st7
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
@@ -460,8 +460,8 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     a6a = v7;
     v8 |= 0x800;
     v9 = a2;
-    sithUnk3_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, v8);
-    for ( i = sithUnk3_NextSearchResult(); i; i = sithUnk3_NextSearchResult() )
+    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, v8);
+    for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
     {
         if ( (i->collideType & 0x20) != 0 )
         {
@@ -477,7 +477,7 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
             break;
         }
     }
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     return v9;
 }
 

@@ -3,7 +3,7 @@
 #include "World/sithThing.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
@@ -79,7 +79,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     float damage; // ecx
     rdVector3 *weaponPos; // edx
     sithSector *sector; // ebx
-    sithUnk3SearchEntry *searchRes; // edi
+    sithCollisionSearchEntry *searchRes; // edi
     sithThing *damageReceiver; // eax
     sithThing *explodeTemplate; // eax
     sithThing *trailThing; // eax
@@ -98,8 +98,8 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     sector = weapon->sector;
     rdVector_Copy3(&weaponPos_, weaponPos);
     moveSize = weapon->moveSize;
-    sithUnk3_SearchRadiusForThings(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
-    searchRes = sithUnk3_NextSearchResult();
+    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
+    searchRes = sithCollision_NextSearchResult();
     if ( searchRes )
     {
         while ( 1 )
@@ -120,7 +120,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
             if ( (searchRes->collideType & 0x20) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
-            searchRes = sithUnk3_NextSearchResult();
+            searchRes = sithCollision_NextSearchResult();
             if ( !searchRes )
                 goto LABEL_20;
         }
@@ -156,7 +156,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     }
 
 LABEL_20:
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     if ( !searchRes
       && (weapon->weaponParams.typeflags & THING_TYPEFLAGS_8000) != 0
       && weapon->weaponParams.trailThing
@@ -178,7 +178,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
 {
     float elementSize; // eax
     float elementSize__; // edx
-    sithUnk3SearchEntry *searchRes; // ebp
+    sithCollisionSearchEntry *searchRes; // ebp
     double v5; // st6
     double v6; // st5
     double v7; // st7
@@ -240,13 +240,13 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     range = weapon->weaponParams.range;
     elementSize_ = elementSize;
     sector = weapon->sector;
-    sithUnk3_SearchRadiusForThings(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0);
+    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0);
     elementSize__ = weapon->weaponParams.elementSize;
     _memcpy(&camera, &weapon->lookOrientation, sizeof(camera));
     vertex.x = 0.0;
     vertex.y = elementSize__;
     vertex.z = 0.0;
-    searchRes = sithUnk3_NextSearchResult();
+    searchRes = sithCollision_NextSearchResult();
     if ( searchRes )
     {
         while ( 1 )
@@ -293,7 +293,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         rdVector_ExtractAngle(&tmp, &rot);
                         rdMatrix_BuildRotate34(&camera, &rot);
                     }
-                    sectorLook = sithUnk3_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
+                    sectorLook = sithCollision_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
                     sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
                     rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
                     rdVector_Add3Acc(&weaponPos, &vertex_out);
@@ -303,7 +303,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             if ( (searchRes->collideType & 0x20) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
-            searchRes = sithUnk3_NextSearchResult();
+            searchRes = sithCollision_NextSearchResult();
             if ( !searchRes )
                 goto LABEL_25;
         }
@@ -343,7 +343,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
         }
     }
 LABEL_25:
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     if ( !searchRes
       && (weapon->weaponParams.typeflags & 0x8000u) != 0
       && weapon->weaponParams.trailThing
@@ -384,7 +384,7 @@ LABEL_25:
                 rdVector_ExtractAngle(&tmp, &rot);
                 rdMatrix_BuildRotate34(&camera, &rot);
             }
-            sectorLook_ = sithUnk3_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
+            sectorLook_ = sithCollision_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
             sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
             rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
             rdVector_Add3Acc(&weaponPos, &vertex_out);
@@ -486,7 +486,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
     double v14; // rt2
     double v17; // st7
     double v18; // st7
-    sithUnk3SearchEntry *v19; // ebx
+    sithCollisionSearchEntry *v19; // ebx
     sithThing *v20; // ebx
     rdVector3 a1; // [esp+10h] [ebp-48h] BYREF
     rdVector3 a5a; // [esp+1Ch] [ebp-3Ch] BYREF
@@ -532,7 +532,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         if ( a1.x != 0.0 || a1.y != 0.0 || a1.z != 0.0 )
         {
             a6a = rdVector_Normalize3Acc(&a1);
-            sithUnk3_UpdateThingCollision(v9, &a1, a6a, 0);
+            sithCollision_UpdateThingCollision(v9, &a1, a6a, 0);
         }
         if ( a9 > 0.02 )
         {
@@ -541,16 +541,16 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             if ( v17 > 0.0 )
             {
                 a6c = v17;
-                sithUnk3_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
+                sithCollision_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
             }
         }
         if ( !sithNet_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? 5.0 : (float)v18;
-            sithUnk3_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, 2);
-            v19 = sithUnk3_NextSearchResult();
-            sithUnk3_SearchClose();
+            sithCollision_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, 2);
+            v19 = sithCollision_NextSearchResult();
+            sithCollision_SearchClose();
             if ( v19 )
             {
                 if ( (v19->collideType & 1) != 0 )
@@ -637,7 +637,7 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
         if ( (unsigned int)v6 < 6 )
         {
             v30 = physicsThing->physicsParams.vel;
-            if ( sithUnk3_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0) )
+            if ( sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0) )
             {
                 v7 = (a4->lvec.z * v30.x + a4->uvec.x * v30.y + a4->uvec.y * v30.z) * -2.0;
                 if ( a5 )
@@ -702,7 +702,7 @@ LABEL_43:
         }
         if ( (v16 & 0x80u) == 0 )
         {
-            sithUnk3_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
+            sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
             return;
         }
         sithSector_StopPhysicsThing(physicsThing);
@@ -719,7 +719,7 @@ LABEL_43:
        || collidedThing == g_localPlayerThing && sithTime_curSeconds < (double)sithWeapon_fireWait
        || !sithUnk4_thing_anim_blocked(physicsThing, collidedThing, a4))
       && (physicsThing->weaponParams.damage != 0.0 || (physicsThing->weaponParams.typeflags & 0x808) != 0)
-      && sithUnk3_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5) )
+      && sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5) )
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
@@ -765,7 +765,7 @@ LABEL_54:
     }
 }
 
-int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *a3)
+int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)
 {
     int result; // eax
     rdMaterial *v4; // eax
@@ -808,7 +808,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEn
       && (v8 = thing->weaponParams.field_18, thing->weaponParams.field_18 = v8 + 1, v8 < 6) )
     {
         thing->physicsParams.physflags |= PHYSFLAGS_SURFACEBOUNCE;
-        sithUnk3_DefaultHitHandler(thing, surface, a3);
+        sithCollision_DefaultHitHandler(thing, surface, a3);
         if ( (thing->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
         {
             thing->physicsParams.physflags &= ~PHYSFLAGS_SURFACEBOUNCE;
@@ -860,11 +860,11 @@ LABEL_9:
         }
         if ( (v17 & 0x80u) == 0 )
         {
-            result = sithUnk3_DefaultHitHandler(thing, surface, a3);
+            result = sithCollision_DefaultHitHandler(thing, surface, a3);
         }
         else
         {
-            sithUnk3_DefaultHitHandler(thing, surface, a3);
+            sithCollision_DefaultHitHandler(thing, surface, a3);
             sithSector_StopPhysicsThing(thing);
             sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
@@ -1355,7 +1355,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
             v12 = *v11;
             if ( *v11 != sender && (v12->actorParams.typeflags & THING_TYPEFLAGS_100000) == 0 )
             {
-                if ( sithUnk3_HasLos(sender, v12, 0) )
+                if ( sithCollision_HasLos(sender, v12, 0) )
                 {
                     v13 = *v11;
                     v16.x = v13->position.x - sender->position.x;

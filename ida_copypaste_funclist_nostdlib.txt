@@ -2349,28 +2349,28 @@ sithSoundClass_ThingPlaySoundclass5	.text	004E6C10	0000008A	00000014	0000000C	R	
 sithSoundClass_ThingPauseSoundclass	.text	004E6CA0	0000002C	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_ThingPlaySoundclass2	.text	004E6CD0	00000093	00000010	0000000C	R	.	.	.	.	.	T	.
 sithSoundClass_SetThingSoundClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	T	.
-sithUnk3_Startup	.text	004E6D90	0000018C	00000004	00000000	R	.	.	.	.	.	.	.
-sithUnk3_Shutdown	.text	004E6F20	00000014			R	.	.	.	.	.	.	.
-sithUnk3_RegisterCollisionHandler	.text	004E6F40	0000005D	00000008	00000010	R	.	.	.	.	.	T	.
-sithUnk3_RegisterHitHandler	.text	004E6FA0	00000010	00000000	00000008	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E6FB0	.text	004E6FB0	00000165	00000018	00000004	R	.	.	.	.	.	T	.
-sithUnk3_NextSearchResult	.text	004E7120	0000008C	00000008	00000000	R	.	.	.	.	.	T	.
-sithUnk3_GetSectorLookAt	.text	004E71B0	00000160	00000014	00000010	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E7310	.text	004E7310	000000D3	00000008	00000018	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E73F0	.text	004E73F0	00000103	00000014	00000010	R	.	.	.	.	.	T	.
-sithUnk3_HasLos	.text	004E7500	00000165	00000020	0000000C	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E7670	.text	004E7670	00000123	00000024	00000008	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E77A0	.text	004E77A0	000001A4	0000007C	00000008	R	.	.	.	.	.	T	.
-sithUnk3_UpdateThingCollision	.text	004E7950	0000080E	00000054	00000010	R	.	.	.	.	.	T	.
-sithUnk3_SearchRadiusForThings	.text	004E8160	000002C0	00000018	0000001C	R	.	.	.	.	.	T	.
-sithUnk3_SearchClose	.text	004E8420	00000007			R	.	.	.	.	.	.	.
-sithUnk3_UpdateSectorThingCollision	.text	004E8430	0000029D	0000001C	0000001C	R	.	.	.	.	.	T	.
-sithUnk3_sub_4E86D0	.text	004E86D0	00000462	00000040	00000018	R	.	.	.	.	.	T	.
-sithUnk3_DefaultHitHandler	.text	004E8B40	00000107	00000008	0000000C	R	.	.	.	.	.	T	.
-sithUnk3_DebrisDebrisCollide	.text	004E8C50	00000435	00000038	00000010	R	.	.	.	.	.	T	.
-sithUnk3_CollideHurt	.text	004E9090	000004B6	0000000C	00000010	R	.	.	.	.	.	T	.
-sithUnk3_FallHurt	.text	004E9550	0000004A	00000000	00000008	R	.	.	.	.	.	T	.
-sithUnk3_DebrisPlayerCollide	.text	004E95A0	000000B7	00000010	00000010	R	.	.	.	.	.	T	.
+sithCollision_Startup	.text	004E6D90	0000018C	00000004	00000000	R	.	.	.	.	.	.	.
+sithCollision_Shutdown	.text	004E6F20	00000014			R	.	.	.	.	.	.	.
+sithCollision_RegisterCollisionHandler	.text	004E6F40	0000005D	00000008	00000010	R	.	.	.	.	.	T	.
+sithCollision_RegisterHitHandler	.text	004E6FA0	00000010	00000000	00000008	R	.	.	.	.	.	T	.
+sithCollision_sub_4E6FB0	.text	004E6FB0	00000165	00000018	00000004	R	.	.	.	.	.	T	.
+sithCollision_NextSearchResult	.text	004E7120	0000008C	00000008	00000000	R	.	.	.	.	.	T	.
+sithCollision_GetSectorLookAt	.text	004E71B0	00000160	00000014	00000010	R	.	.	.	.	.	T	.
+sithCollision_sub_4E7310	.text	004E7310	000000D3	00000008	00000018	R	.	.	.	.	.	T	.
+sithCollision_sub_4E73F0	.text	004E73F0	00000103	00000014	00000010	R	.	.	.	.	.	T	.
+sithCollision_HasLos	.text	004E7500	00000165	00000020	0000000C	R	.	.	.	.	.	T	.
+sithCollision_sub_4E7670	.text	004E7670	00000123	00000024	00000008	R	.	.	.	.	.	T	.
+sithCollision_sub_4E77A0	.text	004E77A0	000001A4	0000007C	00000008	R	.	.	.	.	.	T	.
+sithCollision_UpdateThingCollision	.text	004E7950	0000080E	00000054	00000010	R	.	.	.	.	.	T	.
+sithCollision_SearchRadiusForThings	.text	004E8160	000002C0	00000018	0000001C	R	.	.	.	.	.	T	.
+sithCollision_SearchClose	.text	004E8420	00000007			R	.	.	.	.	.	.	.
+sithCollision_UpdateSectorThingCollision	.text	004E8430	0000029D	0000001C	0000001C	R	.	.	.	.	.	T	.
+sithCollision_sub_4E86D0	.text	004E86D0	00000462	00000040	00000018	R	.	.	.	.	.	T	.
+sithCollision_DefaultHitHandler	.text	004E8B40	00000107	00000008	0000000C	R	.	.	.	.	.	T	.
+sithCollision_DebrisDebrisCollide	.text	004E8C50	00000435	00000038	00000010	R	.	.	.	.	.	T	.
+sithCollision_CollideHurt	.text	004E9090	000004B6	0000000C	00000010	R	.	.	.	.	.	T	.
+sithCollision_FallHurt	.text	004E9550	0000004A	00000000	00000008	R	.	.	.	.	.	T	.
+sithCollision_DebrisPlayerCollide	.text	004E95A0	000000B7	00000010	00000010	R	.	.	.	.	.	T	.
 sithModel_Startup	.text	004E9660	0000001C			R	.	.	.	.	.	.	.
 sithModel_Shutdown	.text	004E9680	0000001D			R	.	.	.	.	.	.	.
 sithModel_Load	.text	004E96A0	00000169	0000000C	00000008	R	.	.	.	.	.	T	.

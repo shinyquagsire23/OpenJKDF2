@@ -6,7 +6,7 @@
 #include "World/sithThing.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithCollide.h"
 #include "jk.h"
 #include "Engine/sithAdjoin.h"
@@ -390,7 +390,7 @@ void sithSector_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
-        sithUnk3_sub_4E7670(thing, &a);
+        sithCollision_sub_4E7670(thing, &a);
 
         if ( (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
             rdMatrix_TransformVector34Acc(&thing->physicsParams.vel, &a);
@@ -471,7 +471,7 @@ void sithSector_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
-        sithUnk3_sub_4E7670(player, &a);
+        sithCollision_sub_4E7670(player, &a);
 
         if (player->physicsParams.physflags & PHYSFLAGS_FLYING)
             rdMatrix_TransformVector34Acc(&player->physicsParams.vel, &a);
@@ -534,10 +534,10 @@ void sithSector_ThingLandIdk(sithThing *thing, int a3)
 {
     sithSector *sector; // eax
     int v4; // ecx
-    sithUnk3SearchEntry *v5; // eax
+    sithCollisionSearchEntry *v5; // eax
     double v8; // st7
     double v9; // st7
-    sithUnk3SearchEntry *i; // esi
+    sithCollisionSearchEntry *i; // esi
     sithThing *v11; // edi
     rdFace *v12; // eax
     int v14; // [esp+10h] [ebp-20h]
@@ -555,24 +555,24 @@ void sithSector_ThingLandIdk(sithThing *thing, int a3)
 
     if (sector->flags & SITH_SF_UNDERWATER && thing->thingType == THINGTYPE_PLAYER)
     {
-        sithUnk3_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
-        v5 = sithUnk3_NextSearchResult();
+        sithCollision_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
+        v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
             while ( (v5->collideType & 0x20) == 0 || (v5->surface->adjoin->sector->flags & SITH_SF_UNDERWATER) != 0 )
             {
-                v5 = sithUnk3_NextSearchResult();
+                v5 = sithCollision_NextSearchResult();
                 if ( !v5 )
                     goto LABEL_8;
             }
             thing->field_48 = v5->distance;
             thing->physicsParams.physflags |= PHYSFLAGS_MIDAIR;
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
         }
         else
         {
 LABEL_8:
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
             thing->physicsParams.physflags &= ~PHYSFLAGS_MIDAIR;
         }
     }
@@ -613,16 +613,16 @@ LABEL_8:
         thingb = v8;
         if ( v8 > 0.0 )
         {
-            sithUnk3_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, 0.0, v14 | 0x2802);
+            sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, 0.0, v14 | 0x2802);
             while ( 1 )
             {
-                for ( i = sithUnk3_NextSearchResult(); i; i = sithUnk3_NextSearchResult() )
+                for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
                 {
                     if ( (i->collideType & 2) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
                         sithThing_AttachToSurface(thing, i->surface, a3);
-                        sithUnk3_SearchClose();
+                        sithCollision_SearchClose();
                         return;
                     }
                     if ( (i->collideType & 1) != 0 )
@@ -633,7 +633,7 @@ LABEL_8:
                             v12 = i->face;
                             if ( !v12 || !i->sender )
                             {
-                                sithUnk3_SearchClose();
+                                sithCollision_SearchClose();
                                 return;
                             }
                             
@@ -642,13 +642,13 @@ LABEL_8:
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.60000002) )
                             {
                                 sithThing_LandThing(thing, v11, i->face, i->sender->vertices, a3);
-                                sithUnk3_SearchClose();
+                                sithCollision_SearchClose();
                                 return;
                             }
                         }
                     }
                 }
-                sithUnk3_SearchClose();
+                sithCollision_SearchClose();
                 if ( range != 0.0 )
                     break;
 
@@ -657,7 +657,7 @@ LABEL_8:
                 if ( thing->moveSize == 0.0 )
                     break;
                 range = thing->moveSize;
-                sithUnk3_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, range, v14 | 0x2802);
+                sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, range, v14 | 0x2802);
             }
         }
         if ( thing->attach_flags )
@@ -902,7 +902,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     {
         rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
         rdMatrix_BuildRotate34(&a, &a3);
-        sithUnk3_sub_4E7670(thing, &a);
+        sithCollision_sub_4E7670(thing, &a);
         if ( possibly_undef_2 >= 1.0 )
         {
             rdMatrix_TransformVector34Acc(&thing->physicsParams.vel, &a);
@@ -990,7 +990,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             if ( !rdVector_IsZero3(&a3) )
             {
                 rdMatrix_BuildRotate34(&a, &a3);
-                sithUnk3_sub_4E7670(thing, &a);
+                sithCollision_sub_4E7670(thing, &a);
                 if ( (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
                     rdMatrix_TransformVector34Acc(&thing->physicsParams.vel, &a);
                 if ( ((bShowInvisibleThings + (thing->thingIdx & 0xFF)) & 7) == 0 )
@@ -1444,7 +1444,7 @@ void sithSector_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
-        sithUnk3_sub_4E7670(thing, &a);
+        sithCollision_sub_4E7670(thing, &a);
         if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&thing->lookOrientation);
     }

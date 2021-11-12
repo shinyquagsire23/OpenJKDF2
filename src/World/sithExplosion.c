@@ -1,7 +1,7 @@
 #include "sithExplosion.h"
 
 #include "World/sithThing.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithSector.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithSurface.h"
@@ -65,7 +65,7 @@ void sithExplosion_Tick(sithThing *explosion)
 
 void sithExplosion_UpdateForce(sithThing *explosion)
 {
-    sithUnk3SearchEntry *i; // ebp
+    sithCollisionSearchEntry *i; // ebp
     double v3; // st6
     sithThing *v4; // edi
     double v5; // st6
@@ -88,8 +88,8 @@ void sithExplosion_UpdateForce(sithThing *explosion)
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
         sithSector_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
-        sithUnk3_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, 0x482);
-        for ( i = sithUnk3_NextSearchResult(); i; i = sithUnk3_NextSearchResult() )
+        sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, 0x482);
+        for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
             v3 = i->distance / range;
             a1a = 1.0 - v3 * v3;
@@ -112,7 +112,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                 if ( ((explosion->actorParams.typeflags & THING_TYPEFLAGS_40) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
-                  && sithUnk3_HasLos(explosion, v4, 1) )
+                  && sithCollision_HasLos(explosion, v4, 1) )
                 {
                     if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
                     {
@@ -132,7 +132,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                 }
             }
         }
-        sithUnk3_SearchClose();
+        sithCollision_SearchClose();
     }
     debrisTemplates = explosion->explosionParams.debrisTemplates;
     v9 = 4;

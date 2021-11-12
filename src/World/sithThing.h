@@ -19,7 +19,7 @@
 #define sithThing_GetById_ADDR (0x004CC710)
 #define sithThing_Destroy_ADDR (0x004CC7A0)
 #define sithThing_Damage_ADDR (0x004CC7D0)
-#define sithThing_Create_ADDR (0x004CC8C0)
+#define sithThing_Create_idk_ADDR (0x004CC8C0)
 #define sithThing_Free_ADDR (0x004CCA10)
 #define sithThing_freestuff_ADDR (0x004CCBC0)
 #define sithThing_idkjkl_ADDR (0x004CCD40)

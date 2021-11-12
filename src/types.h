@@ -404,7 +404,7 @@ typedef struct rdSprite rdSprite;
 typedef struct rdSurface rdSurface;
 typedef struct rdThing rdThing;
 typedef struct rdVertexIdxInfo rdVertexIdxInfo;
-typedef struct sithUnk3SearchEntry sithUnk3SearchEntry;
+typedef struct sithCollisionSearchEntry sithCollisionSearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithAI sithAI;
@@ -420,8 +420,8 @@ typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
 typedef struct sithTimer sithTimer;
 typedef struct sithTimerInfo sithTimerInfo;
-typedef struct sithUnk3Entry sithUnk3Entry;
-typedef struct sithUnk3SectorEntry sithUnk3SectorEntry;
+typedef struct sithCollisionEntry sithCollisionEntry;
+typedef struct sithCollisionSectorEntry sithCollisionSectorEntry;
 typedef struct sithMap sithMap;
 typedef struct sithMapView sithMapView;
 typedef struct sithPlayerInfo sithPlayerInfo;
@@ -1882,17 +1882,17 @@ typedef struct jkPlayerMpcInfo
   int jediRank;
 } jkPlayerMpcInfo;
 
-typedef int (*sithUnk3_collisionHandler_t)(sithThing*, sithThing*, sithUnk3SearchEntry*, int);
-typedef int (*sithUnk3_searchHandler_t)(sithThing*, sithThing*);
+typedef int (*sithCollision_collisionHandler_t)(sithThing*, sithThing*, sithCollisionSearchEntry*, int);
+typedef int (*sithCollision_searchHandler_t)(sithThing*, sithThing*);
 
-typedef struct sithUnk3Entry
+typedef struct sithCollisionEntry
 {
-    sithUnk3_collisionHandler_t handler;
-    sithUnk3_searchHandler_t search_handler;
+    sithCollision_collisionHandler_t handler;
+    sithCollision_searchHandler_t search_handler;
     uint32_t inverse;
-} sithUnk3Entry;
+} sithCollisionEntry;
 
-typedef struct sithUnk3SearchEntry
+typedef struct sithCollisionSearchEntry
 {
     uint32_t collideType;
     sithThing* receiver;
@@ -1902,17 +1902,17 @@ typedef struct sithUnk3SearchEntry
     rdVector3 field_14;
     float distance;
     uint32_t hasBeenEnumerated;
-} sithUnk3SearchEntry;
+} sithCollisionSearchEntry;
 
-typedef struct sithUnk3SectorEntry
+typedef struct sithCollisionSectorEntry
 {
     sithSector* sectors[64];
-} sithUnk3SectorEntry;
+} sithCollisionSectorEntry;
 
-typedef struct sithUnk3SearchResult
+typedef struct sithCollisionSearchResult
 {
-    sithUnk3SearchEntry collisions[128];
-} sithUnk3SearchResult;
+    sithCollisionSearchEntry collisions[128];
+} sithCollisionSearchResult;
 
 
 typedef struct sithSector

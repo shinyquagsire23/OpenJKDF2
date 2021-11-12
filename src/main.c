@@ -100,7 +100,7 @@
 #include "World/sithInventory.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "World/sithMap.h"
 #include "World/sithCollide.h"
@@ -1499,20 +1499,20 @@ void do_hooks()
     // Main
     hook_function(Main_Startup_ADDR, Main_Startup);
     
-    // sithUnk3
+    // sithCollision
 #if 0
-    hook_function(sithUnk3_Startup_ADDR, sithUnk3_Startup);
-    hook_function(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
-    hook_function(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
-    hook_function(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
-    hook_function(sithUnk3_SearchClose_ADDR, sithUnk3_SearchClose);
-    hook_function(sithUnk3_sub_4E7670_ADDR, sithUnk3_sub_4E7670);
-    hook_function(sithUnk3_UpdateThingCollision_ADDR, sithUnk3_UpdateThingCollision);
-    hook_function(sithUnk3_DefaultHitHandler_ADDR, sithUnk3_DefaultHitHandler);
-    hook_function(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
-    hook_function(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
-    hook_function(sithUnk3_HasLos_ADDR, sithUnk3_HasLos);
-    hook_function(sithUnk3_DebrisPlayerCollide_ADDR, sithUnk3_DebrisPlayerCollide);
+    hook_function(sithCollision_Startup_ADDR, sithCollision_Startup);
+    hook_function(sithCollision_RegisterCollisionHandler_ADDR, sithCollision_RegisterCollisionHandler);
+    hook_function(sithCollision_NextSearchResult_ADDR, sithCollision_NextSearchResult);
+    hook_function(sithCollision_SearchRadiusForThings_ADDR, sithCollision_SearchRadiusForThings);
+    hook_function(sithCollision_SearchClose_ADDR, sithCollision_SearchClose);
+    hook_function(sithCollision_sub_4E7670_ADDR, sithCollision_sub_4E7670);
+    hook_function(sithCollision_UpdateThingCollision_ADDR, sithCollision_UpdateThingCollision);
+    hook_function(sithCollision_DefaultHitHandler_ADDR, sithCollision_DefaultHitHandler);
+    hook_function(sithCollision_DebrisDebrisCollide_ADDR, sithCollision_DebrisDebrisCollide);
+    hook_function(sithCollision_CollideHurt_ADDR, sithCollision_CollideHurt);
+    hook_function(sithCollision_HasLos_ADDR, sithCollision_HasLos);
+    hook_function(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
 #endif
     
     // sithUnk4
@@ -2091,23 +2091,23 @@ void do_hooks()
 #endif
 
 #if 0
-    hook_function_inv(sithUnk3_Startup_ADDR, sithUnk3_Startup);
-    hook_function_inv(sithUnk3_Shutdown_ADDR, sithUnk3_Shutdown);
-    hook_function_inv(sithUnk3_RegisterCollisionHandler_ADDR, sithUnk3_RegisterCollisionHandler);
-    hook_function_inv(sithUnk3_RegisterHitHandler_ADDR, sithUnk3_RegisterHitHandler);
-    hook_function_inv(sithUnk3_NextSearchResult_ADDR, sithUnk3_NextSearchResult);
-    hook_function_inv(sithUnk3_SearchRadiusForThings_ADDR, sithUnk3_SearchRadiusForThings);
-    hook_function_inv(sithUnk3_SearchClose_ADDR, sithUnk3_SearchClose);
-    hook_function_inv(sithUnk3_GetSectorLookAt_ADDR, sithUnk3_GetSectorLookAt);
-    hook_function_inv(sithUnk3_FallHurt_ADDR, sithUnk3_FallHurt);
-    hook_function_inv(sithUnk3_sub_4E7670_ADDR, sithUnk3_sub_4E7670);*/
-    hook_function_inv(sithUnk3_UpdateThingCollision_ADDR, sithUnk3_UpdateThingCollision);
-    hook_function_inv(sithUnk3_DefaultHitHandler_ADDR, sithUnk3_DefaultHitHandler);
-    hook_function_inv(sithUnk3_DebrisDebrisCollide_ADDR, sithUnk3_DebrisDebrisCollide);
-    hook_function_inv(sithUnk3_CollideHurt_ADDR, sithUnk3_CollideHurt);
-    hook_function_inv(sithUnk3_HasLos_ADDR, sithUnk3_HasLos);
-    hook_function_inv(sithUnk3_sub_4E77A0_ADDR, sithUnk3_sub_4E77A0);
-    hook_function_inv(sithUnk3_DebrisPlayerCollide_ADDR, sithUnk3_DebrisPlayerCollide);
+    hook_function_inv(sithCollision_Startup_ADDR, sithCollision_Startup);
+    hook_function_inv(sithCollision_Shutdown_ADDR, sithCollision_Shutdown);
+    hook_function_inv(sithCollision_RegisterCollisionHandler_ADDR, sithCollision_RegisterCollisionHandler);
+    hook_function_inv(sithCollision_RegisterHitHandler_ADDR, sithCollision_RegisterHitHandler);
+    hook_function_inv(sithCollision_NextSearchResult_ADDR, sithCollision_NextSearchResult);
+    hook_function_inv(sithCollision_SearchRadiusForThings_ADDR, sithCollision_SearchRadiusForThings);
+    hook_function_inv(sithCollision_SearchClose_ADDR, sithCollision_SearchClose);
+    hook_function_inv(sithCollision_GetSectorLookAt_ADDR, sithCollision_GetSectorLookAt);
+    hook_function_inv(sithCollision_FallHurt_ADDR, sithCollision_FallHurt);
+    hook_function_inv(sithCollision_sub_4E7670_ADDR, sithCollision_sub_4E7670);*/
+    hook_function_inv(sithCollision_UpdateThingCollision_ADDR, sithCollision_UpdateThingCollision);
+    hook_function_inv(sithCollision_DefaultHitHandler_ADDR, sithCollision_DefaultHitHandler);
+    hook_function_inv(sithCollision_DebrisDebrisCollide_ADDR, sithCollision_DebrisDebrisCollide);
+    hook_function_inv(sithCollision_CollideHurt_ADDR, sithCollision_CollideHurt);
+    hook_function_inv(sithCollision_HasLos_ADDR, sithCollision_HasLos);
+    hook_function_inv(sithCollision_sub_4E77A0_ADDR, sithCollision_sub_4E77A0);
+    hook_function_inv(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
 #endif
     
 #endif

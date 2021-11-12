@@ -2,7 +2,7 @@
 
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
@@ -134,7 +134,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
 {
     sithSector *v4; // esi
     int v5; // eax
-    sithUnk3SearchEntry *searchResult; // eax
+    sithCollisionSearchEntry *searchResult; // eax
     sithThing *v7; // edx
     float a6; // [esp+0h] [ebp-58h]
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
@@ -154,22 +154,22 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
             thingPos.y = thing->actorParams.eyeOffset.y + thingPos.y;;
             thingPos.z = thing->actorParams.eyeOffset.z + thingPos.z;
         }
-        v4 = sithUnk3_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
+        v4 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
         if ( v4 )
         {
             v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
             if ( sithCogVm_multiplayerFlags && v5 >= 0 )
                 sithSector_cogMsg_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
-            sithUnk3_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, THINGTYPE_ACTOR);
-            for ( searchResult = sithUnk3_NextSearchResult(); searchResult; searchResult = sithUnk3_NextSearchResult() )
+            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, THINGTYPE_ACTOR);
+            for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
                 if ( (searchResult->collideType & THINGTYPE_ACTOR) != 0 )
                 {
                     if ( (searchResult->surface->surfaceFlags & THINGTYPE_ACTOR) != 0 )
                     {
                         sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
-                        sithUnk3_SearchClose();
+                        sithCollision_SearchClose();
                         return;
                     }
                 }
@@ -183,7 +183,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
                     }
                 }
             }
-            sithUnk3_SearchClose();
+            sithCollision_SearchClose();
         }
     }
 }

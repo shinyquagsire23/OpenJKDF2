@@ -5,7 +5,7 @@
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "AI/sithAI.h"
@@ -28,11 +28,11 @@ void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing)
     }
 }
 
-int sithUnk4_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithUnk3SearchEntry *searchEnt)
+int sithUnk4_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
 {
     int v3; // edi
 
-    v3 = sithUnk3_DefaultHitHandler(thing, surface, searchEnt);
+    v3 = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
     if ( v3 && thing->thingtype == THINGTYPE_ACTOR )
         sithAI_SetActorFireTarget(thing->actor, 512, 0);
     return v3;
@@ -105,14 +105,14 @@ void sithUnk4_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
     }
 }
 
-int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithUnk3SearchEntry *a3, int a4)
+int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
 {
     int result; // eax
     int v5; // ebx
     sithActor *v6; // eax
     sithActor *v7; // eax
 
-    result = sithUnk3_DebrisDebrisCollide(thing, thing2, a3, a4);
+    result = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
     v5 = result;
     if ( result )
     {
@@ -151,7 +151,7 @@ void sithUnk4_RotateTurretToEyePYR(sithThing *a1)
     }
 }
 
-int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithUnk3SearchEntry *a3)
+int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3)
 {
     int result; // eax
     float v4; // ecx
@@ -190,7 +190,7 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithUnk3Search
     rdVector_Normalize3Acc(&v18);
     if ( v18.x * a1a.x + v18.y * a1a.y + v18.z * a1a.z < thing2->actorParams.fov )
         return 0;
-    result = sithUnk3_DebrisDebrisCollide(a1, thing2, a3, 0);
+    result = sithCollision_DebrisDebrisCollide(a1, thing2, a3, 0);
     if ( result )
     {
         a1->physicsParams.vel.x = -vAngs.x;

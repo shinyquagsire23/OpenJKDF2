@@ -648,15 +648,15 @@ jkPlayer_soundClass 0x00860520 char[32]
 jkPlayer_sideMat 0x00860560 char[32]
 jkPlayer_tipMat 0x00860580 char[32]
 
-sithUnk3_stackIdk 0x847F28 int[4]
-sithUnk3_collisionHandlers 0x00847F38 sithUnk3Entry[144]
-sithUnk3_funcList 0x8485F8 void*[12]
-sithUnk3_searchStack 0x00848628 sithUnk3SearchResult[4]
-sithUnk3_searchNumResults 0x84DA28 int[4]
-sithUnk3_searchStackIdx 0x0054BA90 int = -1
-sithUnk3_stackSectors 0x0084D628 sithUnk3SectorEntry[4]
-sithUnk3_dword_8B4BE4 0x008B4BE4 int
-sithUnk3_collideHurtIdk 0x008B4BF0 rdVector3
+sithCollision_stackIdk 0x847F28 int[4]
+sithCollision_collisionHandlers 0x00847F38 sithCollisionEntry[144]
+sithCollision_funcList 0x8485F8 void*[12]
+sithCollision_searchStack 0x00848628 sithCollisionSearchResult[4]
+sithCollision_searchNumResults 0x84DA28 int[4]
+sithCollision_searchStackIdx 0x0054BA90 int = -1
+sithCollision_stackSectors 0x0084D628 sithCollisionSectorEntry[4]
+sithCollision_dword_8B4BE4 0x008B4BE4 int
+sithCollision_collideHurtIdk 0x008B4BF0 rdVector3
 
 sithSector_surfaceNormal 0x0054C6E8 rdVector3 = {0.0, 0.0, -1.0}
 sithSector_aEntries 0x00855028 sithSectorEntry[32]

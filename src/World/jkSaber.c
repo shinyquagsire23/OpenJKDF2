@@ -16,7 +16,7 @@
 #include "Engine/sithModel.h"
 #include "Engine/sithKeyFrame.h"
 #include "World/sithSector.h"
-#include "World/sithUnk3.h"
+#include "Engine/sithCollision.h"
 #include "Main/jkMain.h"
 #include "Main/jkSmack.h"
 #include "Main/jkEpisode.h"
@@ -188,7 +188,7 @@ void jkSaber_UpdateLength(sithThing *thing)
 void jkSaber_UpdateCollision(sithThing *player, int joint)
 {
     jkPlayerInfo *playerInfo; // ebx
-    sithUnk3SearchEntry *searchResult; // edi
+    sithCollisionSearchEntry *searchResult; // edi
     sithThing *resultThing; // ebp
 
     sithSector *sector;
@@ -221,14 +221,14 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
         return;
     if ( !playerInfo->field_1A4 )
         return;
-    sector = sithUnk3_GetSectorLookAt(player->sector, &player->position, &jointMat.scale, 0.0);
+    sector = sithCollision_GetSectorLookAt(player->sector, &player->position, &jointMat.scale, 0.0);
     if ( !sector )
         return;
-    sithUnk3_SearchRadiusForThings(sector, player, &jointMat.scale, &jointMat.lvec, playerInfo->field_1AC, 0.0, 0);
+    sithCollision_SearchRadiusForThings(sector, player, &jointMat.scale, &jointMat.lvec, playerInfo->field_1AC, 0.0, 0);
 
     while ( 1 )
     {
-        searchResult = sithUnk3_NextSearchResult();
+        searchResult = sithCollision_NextSearchResult();
         if ( !searchResult )
             break;
     
@@ -391,7 +391,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
         }
     }
     
-    sithUnk3_SearchClose();
+    sithCollision_SearchClose();
     return;
 }
 
