@@ -6,7 +6,7 @@
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
-#include "World/sithCollide.h"
+#include "Engine/sithIntersect.h"
 #include "World/sithThing.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithMaterial.h"
@@ -1053,14 +1053,14 @@ int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
     v6 = (float)(unsigned int)surface->surfaceInfo.face.numVertices;
     rdVector_InvScale3(out, &a1a, v6);
 
-    if ( !sithCollide_IsSphereInSector(out, 0.0, surface->parent_sector) )
+    if ( !sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector) )
     {
         a2a.x = surface->surfaceInfo.face.normal.x * 0.00019999999;
         a2a.y = surface->surfaceInfo.face.normal.y * 0.00019999999;
         a2a.z = surface->surfaceInfo.face.normal.z * 0.00019999999;
         rdVector_Add3Acc(out, &a2a);
     }
-    return sithCollide_IsSphereInSector(out, 0.0, surface->parent_sector);
+    return sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector);
 }
 
 rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)

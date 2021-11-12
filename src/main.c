@@ -103,7 +103,7 @@
 #include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "World/sithMap.h"
-#include "World/sithCollide.h"
+#include "Engine/sithIntersect.h"
 #include "World/sithActor.h"
 #include "World/sithTrackThing.h"
 #include "World/sithThingPlayer.h"
@@ -1233,17 +1233,17 @@ void do_hooks()
     // sithCorpse
     hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);
     
-    // sithCollide
+    // sithIntersect
 #if 0
-    hook_function(sithCollide_IsSphereInSector_ADDR, sithCollide_IsSphereInSector);
-    hook_function(sithCollide_sub_5080D0_ADDR, sithCollide_sub_5080D0);
-    hook_function(sithCollide_sub_508540_ADDR, sithCollide_sub_508540);
-    hook_function(sithCollide_sub_508D20_ADDR, sithCollide_sub_508D20);
-    hook_function(sithCollide_sub_508BE0_ADDR, sithCollide_sub_508BE0);
-    hook_function(sithCollide_sub_508750_ADDR, sithCollide_sub_508750);
-    hook_function(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
-    hook_function(sithCollide_sub_508400_ADDR, sithCollide_sub_508400);
-    hook_function(sithCollide_sub_508990_ADDR, sithCollide_sub_508990);
+    hook_function(sithIntersect_IsSphereInSector_ADDR, sithIntersect_IsSphereInSector);
+    hook_function(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
+    hook_function(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
+    hook_function(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
+    hook_function(sithIntersect_sub_508BE0_ADDR, sithIntersect_sub_508BE0);
+    hook_function(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
+    hook_function(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
+    hook_function(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);
+    hook_function(sithIntersect_sub_508990_ADDR, sithIntersect_sub_508990);
 #endif
 
     // sithTime
@@ -2079,15 +2079,15 @@ void do_hooks()
     //hook_function_inv(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
 
 #if 0
-    hook_function_inv(sithCollide_IsSphereInSector_ADDR, sithCollide_IsSphereInSector);
-    hook_function_inv(sithCollide_sub_5080D0_ADDR, sithCollide_sub_5080D0);
-    hook_function_inv(sithCollide_sub_508540_ADDR, sithCollide_sub_508540);
-    hook_function_inv(sithCollide_sub_508D20_ADDR, sithCollide_sub_508D20);
-    hook_function_inv(sithCollide_sub_508BE0_ADDR, sithCollide_sub_508BE0); // regressed
-    hook_function_inv(sithCollide_sub_508750_ADDR, sithCollide_sub_508750);
-    hook_function_inv(sithCollide_sub_5090B0_ADDR, sithCollide_sub_5090B0);
-    hook_function_inv(sithCollide_sub_508400_ADDR, sithCollide_sub_508400);
-    hook_function_inv(sithCollide_sub_508990_ADDR, sithCollide_sub_508990);
+    hook_function_inv(sithIntersect_IsSphereInSector_ADDR, sithIntersect_IsSphereInSector);
+    hook_function_inv(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
+    hook_function_inv(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
+    hook_function_inv(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
+    hook_function_inv(sithIntersect_sub_508BE0_ADDR, sithIntersect_sub_508BE0); // regressed
+    hook_function_inv(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
+    hook_function_inv(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
+    hook_function_inv(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);
+    hook_function_inv(sithIntersect_sub_508990_ADDR, sithIntersect_sub_508990);
 #endif
 
 #if 0

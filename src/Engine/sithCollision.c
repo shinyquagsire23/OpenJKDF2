@@ -5,7 +5,7 @@
 #include "World/sithItem.h"
 #include "World/sithUnk4.h"
 #include "World/sithSector.h"
-#include "World/sithCollide.h"
+#include "Engine/sithIntersect.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithAdjoin.h"
@@ -282,7 +282,7 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
                                 if ( (v7->attach_flags & 6) == 0 || v7->attachedThing != v8 || (v7->attach_flags & 8) == 0 && (v9 & 0x40) == 0 )
                                 {
 LABEL_41:
-                                    v19 = sithCollide_sub_5080D0(v8, a2, a3, a4, range, v7, v9, &v23, &senderMesh, &a10, &a11);
+                                    v19 = sithIntersect_sub_5080D0(v8, a2, a3, a4, range, v7, v9, &v23, &senderMesh, &a10, &a11);
                                     if ( v19 )
                                     {
                                         v21 = a10;
@@ -391,7 +391,7 @@ LABEL_46:
                     
                     if ( rdVector_Dot3(&dist, &v12->surfaceInfo.face.normal) <= a5 )
                     {
-                        v36 = sithCollide_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &v52, unk3Flags);
+                        v36 = sithIntersect_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &v52, unk3Flags);
                         if ( v36 )
                         {
                             if ( (unk3Flags & 0x400) != 0 || vec2->y * v52.y + vec2->z * v52.z + vec2->x * v52.x < 0.0 )
@@ -434,7 +434,7 @@ LABEL_46:
             }
 LABEL_22:
             // Standing?
-            if ( sithCollide_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &a7, unk3Flags) )
+            if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &a7, unk3Flags) )
             {
                 if ( !v45 || (unk3Flags & 1) == 0 )
                 {;
@@ -473,7 +473,7 @@ LABEL_30:
                 }
                 
                 // Falling?
-                if ( (unk3Flags & 2) == 0 && sithCollide_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &v48, unk3Flags) )
+                if ( (unk3Flags & 2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &v48, unk3Flags) )
                 {
                     v24 = sithCollision_searchStackIdx;
                     if ( v45 && (unk3Flags & 1) != 0 )
@@ -539,7 +539,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *sector, const rdVector3 *a
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
     float a3a; // [esp+1Ch] [ebp+8h]
 
-    if ( sithCollide_IsSphereInSector(a4, 0.0, sector) )
+    if ( sithIntersect_IsSphereInSector(a4, 0.0, sector) )
         return sector;
     rdVector_Sub3(&a1, a4, a3);
     a3a = rdVector_Normalize3Acc(&a1);
@@ -875,7 +875,7 @@ LABEL_78:
 LABEL_81:
     
     v64 = stdMath_ClipPrecision(v64);
-    if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithCollide_IsSphereInSector(&v5->position, 0.0, v5->sector) )
+    if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithIntersect_IsSphereInSector(&v5->position, 0.0, v5->sector) )
     {
         rdVector_Copy3(&v5->position, &posCopy);
         rdVector_Copy3(&direction, &out);

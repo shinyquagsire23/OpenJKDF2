@@ -1,4 +1,4 @@
-#include "sithCollide.h"
+#include "sithIntersect.h"
 
 #include <math.h>
 
@@ -11,13 +11,13 @@
 #include "World/sithThing.h"
 #include "jk.h"
 
-static rdVector2i sithCollide_unkArr[3] = {
+static rdVector2i sithIntersect_unkArr[3] = {
     {2, 1},
     {0, 2},
     {1, 0},
 };
 
-int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector)
+int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
     double v8; // st7
@@ -53,7 +53,7 @@ int sithCollide_IsSphereInSector(const rdVector3 *pos, float radius, sithSector 
     return 1;
 }
 
-int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
+int sithIntersect_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, sithThing *a6, int a7, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
     sithThing *v11; // edi
     int result; // eax
@@ -79,7 +79,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
         a8a = 1;
 
     float unkOut;
-    result = sithCollide_sub_508540(a2, a3, a4, a5, &a6->position, a6->collideSize, &unkOut, a8a, a7);
+    result = sithIntersect_sub_508540(a2, a3, a4, a5, &a6->position, a6->collideSize, &unkOut, a8a, a7);
     if ( result )
     {
         if ( a8a )
@@ -115,7 +115,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
                 v30 = 0;
                 do
                 {
-                    v31 = sithCollide_sub_508400(&v35, &a1, v41, a5, &v27->meshes[v30], v29, a10, v26);
+                    v31 = sithIntersect_sub_508400(&v35, &a1, v41, a5, &v27->meshes[v30], v29, a10, v26);
                     if ( v31 )
                     {
                         a3a = v31;
@@ -151,7 +151,7 @@ int sithCollide_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVector
     return result;
 }
 
-int sithCollide_sub_508540(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9)
+int sithIntersect_sub_508540(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9)
 {
     double v15; // st7
     double v16; // rtt
@@ -221,7 +221,7 @@ LABEL_11:
     return result;
 }
 
-int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9)
+int sithIntersect_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9)
 {
     const rdVector3 *v11; // edi
     int result; // eax
@@ -236,7 +236,7 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     rdVector3 a6a; // [esp+1Ch] [ebp-Ch] BYREF
 
     v11 = a2;
-    result = sithCollide_sub_508BE0(a1, a2, a3, a4, &a5->normal, &a6[*a5->vertexPosIdx], a7, a9);
+    result = sithIntersect_sub_508BE0(a1, a2, a3, a4, &a5->normal, &a6[*a5->vertexPosIdx], a7, a9);
     if ( result )
     {
         if ( (a9 & 0x400) != 0 || rdVector_Dot3(v11, &a5->normal) < 0.0 )
@@ -268,10 +268,10 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
             if ( a8 )
             {
                 int tmp;
-                if ( sithCollide_sub_508750(&v45, a4, a5, a6, &tmp) )
+                if ( sithIntersect_sub_508750(&v45, a4, a5, a6, &tmp) )
                 {
                     if ( tmp )
-                        v28 = sithCollide_sub_508990(&v45, a4, a5, a6, tmp, &a6a);
+                        v28 = sithIntersect_sub_508990(&v45, a4, a5, a6, tmp, &a6a);
                     else
                         v28 = 4;
                 }
@@ -295,10 +295,10 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
             {
                 v35 = a4;
                 int tmp;
-                if ( sithCollide_sub_508750(&v45, a4, a5, a6, &tmp) )
+                if ( sithIntersect_sub_508750(&v45, a4, a5, a6, &tmp) )
                 {
                     if ( tmp )
-                        result = sithCollide_sub_508990(&v45, v35, a5, a6, tmp, 0);
+                        result = sithIntersect_sub_508990(&v45, v35, a5, a6, tmp, 0);
                     else
                         result = 4;
                 }
@@ -316,7 +316,7 @@ int sithCollide_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     return result;
 }
 
-int sithCollide_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *surfaceNormal, rdVector3 *a6, float *a7, int a8)
+int sithIntersect_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *surfaceNormal, rdVector3 *a6, float *a7, int a8)
 {
     double v8; // st7
     double v13; // st7
@@ -363,7 +363,7 @@ int sithCollide_sub_508BE0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     }
 }
 
-int sithCollide_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5)
+int sithIntersect_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5)
 {
     rdFace *v5; // ecx
     double v7; // st7
@@ -424,13 +424,13 @@ int sithCollide_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, i
 
     if ( *(&a3->normal.x + v12) <= 0.0 )
     {
-        v13 = sithCollide_unkArr[v12].y;
-        v14 = sithCollide_unkArr[v12].x;
+        v13 = sithIntersect_unkArr[v12].y;
+        v14 = sithIntersect_unkArr[v12].x;
     }
     else
     {
-        v13 = sithCollide_unkArr[v12].x;
-        v14 = sithCollide_unkArr[v12].y;
+        v13 = sithIntersect_unkArr[v12].x;
+        v14 = sithIntersect_unkArr[v12].y;
     }
     v16 = 0;
     v28 = v14;
@@ -476,7 +476,7 @@ int sithCollide_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, i
     return 1;
 }
 
-int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8)
+int sithIntersect_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8)
 {
     sithSurfaceInfo *v8; // edi
     float *v9; // esi
@@ -485,7 +485,7 @@ int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
 
     v8 = a5;
     v9 = a7;
-    result = sithCollide_sub_508BE0(a1, a2, a3, a4, &a5->face.normal, &a6[*a5->face.vertexPosIdx], a7, a8);
+    result = sithIntersect_sub_508BE0(a1, a2, a3, a4, &a5->face.normal, &a6[*a5->face.vertexPosIdx], a7, a8);
     if ( result )
     {
         if ( a4 == 0.0 )
@@ -494,13 +494,13 @@ int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
             rdVector_MultAcc3(&v15, a2, *v9);
             
             int tmp;
-            result = sithCollide_sub_508750(&v15, a4, &v8->face, a6, &tmp);
+            result = sithIntersect_sub_508750(&v15, a4, &v8->face, a6, &tmp);
             if ( result )
             {
                 if ( !tmp)
                     return 4;
                 else
-                    return sithCollide_sub_508990(&v15, a4, &v8->face, a6, tmp, 0);
+                    return sithIntersect_sub_508990(&v15, a4, &v8->face, a6, tmp, 0);
             }
         }
         else
@@ -511,7 +511,7 @@ int sithCollide_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, f
     return 0;
 }
 
-int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8)
+int sithIntersect_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8)
 {
     float *v10; // ebp
     int v11; // ecx
@@ -530,7 +530,7 @@ int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdM
         v10 = a6;
         do
         {
-            v11 = sithCollide_sub_508D20(a1, a2, a3, a4, &mesh->faces[v26], mesh->vertices, v10, &a8a, 0);
+            v11 = sithIntersect_sub_508D20(a1, a2, a3, a4, &mesh->faces[v26], mesh->vertices, v10, &a8a, 0);
             if ( v11
               && (*v10 < (double)a3
                || v24 != 4 && v11 == 4
@@ -552,7 +552,7 @@ int sithCollide_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdM
     return v24;
 }
 
-int sithCollide_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6)
+int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6)
 {
     rdFace *v6; // ecx
     unsigned int v7; // edi

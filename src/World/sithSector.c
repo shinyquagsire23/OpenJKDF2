@@ -7,7 +7,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
 #include "Engine/sithCollision.h"
-#include "World/sithCollide.h"
+#include "Engine/sithIntersect.h"
 #include "jk.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithNet.h"
@@ -1254,7 +1254,7 @@ void sithSector_sub_4F2F60(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, 
             rdVector_Normalize3(&a1a, &a2a);
             
             float tmp = 0.0;
-            if ( !sithCollide_sub_508BE0(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0) )
+            if ( !sithIntersect_sub_508BE0(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0) )
                 tmp = 1000.0;
             v9 = v5->vertexUVs;
             a1a.x = tmp * a1a.x;
