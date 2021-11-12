@@ -1,19 +1,20 @@
-# DF2 Reimplementation
+# OpenJKDF2
 
 This directory contains a function-by-function reimplementation of DF2 in C. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port. It also contains the original versions of `byacc` and `flex` for COG script parsing.
+
+![MacOS Screenshot](docs/images/screenshot.png)
 
 ## Platforms
 OpenJKDF2 supports the following configurations:
 
 | Configuration | Renderer | Description |
 | --- | --- | --- |
-| x86 Win32/MinGW DLL | Software/DirectX | Win32 hooked build, JK.EXE is patched to load `df2_reimpl.dll` execute `hook_init_win` before JK.EXE's `main` function. Unimplemented functions will fall back to JK.EXE implementations. `df2_reimpl_kvm.dll` is used for the KVM target |
-| x86 Linux/SDL2, mmap blobs | OpenGL ES 3.0 | Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
-| 32-bit Linux/SDL2, blobless | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
-| 64-bit Linux/SDL2 | OpenGL ES 3.0 | 64-bit Linux compilation with SDL2 and OpenAL. Currently buggy, particularly with COG scripts. Works on AArch64/RPi4 with llvmpipe, but V3D has trouble with palettes. |
 | MacOS AArch64 | OpenGL 3.3 | 64-bit MacOS compilation with SDL2 and OpenAL. |
 | 64-bit Windows/SDL2 | OpenGL 3.3 | 64-bit Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
-
+| 64-bit Linux/SDL2 | OpenGL ES 3.0 | 64-bit Linux compilation with SDL2 and OpenAL. |
+| x86 Linux/SDL2, mmap blobs | OpenGL ES 3.0 | Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
+| 32-bit Linux/SDL2, blobless | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
+| x86 Win32/MinGW DLL | Software/DirectX | Win32 hooked build, JK.EXE is patched to load `df2_reimpl.dll` execute `hook_init_win` before JK.EXE's `main` function. Unimplemented functions will fall back to JK.EXE implementations. `df2_reimpl_kvm.dll` is used for the KVM target |
 
 The following implementations are in-progress or planned:
 
@@ -22,90 +23,88 @@ The following implementations are in-progress or planned:
 | Emscripten/WebAssembly | WebGL/OpenGL ES | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit. |
 | 32-bit Windows/SDL2 | OpenGL ES 3.0 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Unimplemented functions use JK.EXE as a binary blob? |
 
+64-bit builds are currently buggy/crash somewhat often, particularly in the COG scripting subsystem. Linux building works on AArch64/RPi4 with llvmpipe, but V3D GLES has trouble with palettes.
+
+OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II in order to run; No game assets are provided by OpenJKDF2. On Linux, paths and filenames are case-sensitive. Your directory structure should look something like this:
+```
+.
+├── JK.EXE
+├── MUSIC
+│   ├── Track12.ogg
+│   ├── Track13.ogg
+│   ├── Track14.ogg
+│   ├── Track15.ogg
+│   ├── Track16.ogg
+│   ├── Track17.ogg
+│   ├── Track18.ogg
+│   ├── Track22.ogg
+│   ├── Track23.ogg
+│   ├── Track24.ogg
+│   ├── Track25.ogg
+│   ├── Track26.ogg
+│   ├── Track27.ogg
+│   ├── Track28.ogg
+│   ├── Track29.ogg
+│   ├── Track30.ogg
+│   ├── Track31.ogg
+│   └── Track32.ogg
+├── OpenAL32.dll
+├── SDL2.dll
+├── SDL2_mixer.dll
+├── SMACKW32.DLL
+├── __nmm.dll
+├── episode
+│   ├── JK1.gob
+│   ├── JK1CTF.gob
+│   └── JK1MP.gob
+├── freeglut.dll
+├── glew32.dll
+├── libogg-0.dll
+├── libvorbis-0.dll
+├── libvorbisfile-3.dll
+├── openjkdf2-64
+├── openjkdf2-64.exe
+├── player
+└── resource
+    ├── Res1hi.gob
+    ├── Res2.gob
+    ├── jk_.cd
+    ├── shaders
+    │   ├── default_f.glsl
+    │   ├── default_v.glsl
+    │   ├── menu_f.glsl
+    │   └── menu_v.glsl
+    └── video
+        ├── 01-02A.SMK
+        ├── 03-04A.SMK
+        ├── 06A.SMK
+        ├── 08-10A.SMK
+        ├── 12A.SMK
+        ├── 16A.SMK
+        ├── 18-19A.SMK
+        ├── 21A.SMK
+        ├── 23A.SMK
+        ├── 25A.SMK
+        ├── 27A.SMK
+        ├── 33-34A.SMK
+        ├── 36A.SMK
+        ├── 38A.SMK
+        ├── 39A.SMK
+        ├── 41-42A.SMK
+        ├── 41DA.SMK
+        ├── 41DSA.SMK
+        ├── 44A.SMK
+        ├── 46A.SMK
+        ├── 48A.SMK
+        ├── 50A.SMK
+        ├── 52-53A.SMK
+        ├── 54A.SMK
+        └── 57A.SMK
+```
+
 ## Building
 
-Building is currently only supported on Arch Linux, but probably works fine on Ubuntu with the right dependencies.
-
-Dependencies:
-```
-# All
-pacman -S base-devel make python python-pip bison
-pip3 install cogapp
-
-# Win32/MinGW
-pacman -S mingw-w64
-
-# Linux 32-bit
-pacman -S multilib-devel lib32-sdl2 lib32-sdl2_mixer lib32-glew lib32-openal lib32-freealut
-
-# Linux 64-bit
-pacman -S clang sdl2 sdl2_mixer glew openal freealut
-
-# WebAssembly
-pacaur -S emscripten
-```
-
-WIP Ubuntu list:
-```
-# All
-apt install build-essential make python3 python3-pip bison
-pip3 install cogapp
-
-# Win32/MinGW
-apt install mingw-w64
-
-# Linux 32-bit
-#multilib-devel lib32-sdl2 lib32-glew lib32-openal lib32-freealut
-
-# Linux 64-bit
-apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libalut-dev
-
-# WebAssembly
-#emscripten
-```
-
-Add the following to the end of ~/.bashrc:
-```
-export PATH=$PATH:~/.local/bin
-```
-
-MacOS:
-Before starting, install Xcode. This is required for OpenGL headers, among other things.
-```
-# All
-brew install make python3
-pip3 install cogapp
-
-# After installing cogapp, make sure the following is in your ~/.zshrc:
-# export PATH=$PATH:$HOME/Library/Python/3.8/bin
-
-# Win32/MinGW building
-brew install mingw-w64
-
-# MacOS 64-bit
-brew install openal-soft freealut sdl2 sdl2_mixer glew
-```
-
-### x86 Win32/MinGW DLL
-`make`
-
-### x86 Linux/SDL2, mmap blobs
-`OPENJKDF2_USE_BLOBS=1 make -f Makefile.linux`
-
-### x86 Linux/SDL2, blobless
-`make -f Makefile.linux`
-
-### 64-bit Linux/SDL2
-`make -f Makefile.linux64`
-
-### MacOS SDL2
-```
-make -f Makefile.macos
-codesign -s - openjkdf2-64
-```
-
-### Emscripten/WebAssembly
-`make -f Makefile.emcc`
+See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
  - Color overlays (blue on getting items, red on getting hit, blue underwater, etc)

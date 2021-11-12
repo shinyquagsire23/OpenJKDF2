@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+
+#include "external/fcaseopen/fcaseopen.h"
 #endif
 
 stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension)

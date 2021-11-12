@@ -9,6 +9,8 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
+
+#include "external/fcaseopen/fcaseopen.h"
 #endif
 
 #ifdef PLATFORM_POSIX
@@ -60,7 +62,7 @@ for (int i = 0; i < len; i++)
 
     //printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
     
-    return (stdFile_t)fopen(tmp, mode);
+    return (stdFile_t)fcaseopen(tmp, mode);
 }
 
 static int Linux_stdFileClose(stdFile_t fhand)
