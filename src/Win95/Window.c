@@ -520,7 +520,6 @@ void Window_SdlUpdate()
 
                 break;
             case SDL_QUIT:
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Quit!", NULL);
                 printf("Quit!\n");
                 exit(-1);
                 break;
