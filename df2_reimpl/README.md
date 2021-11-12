@@ -12,6 +12,7 @@ OpenJKDF2 supports the following configurations:
 | 32-bit Linux/SDL2, blobless | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
 | 64-bit Linux/SDL2 | OpenGL ES 3.0 | 64-bit Linux compilation with SDL2 and OpenAL. Currently buggy, particularly with COG scripts. Works on AArch64/RPi4 with llvmpipe, but V3D has trouble with palettes. |
 | MacOS AArch64 | OpenGL 3.3 | 64-bit MacOS compilation with SDL2 and OpenAL. |
+| 64-bit Windows/SDL2 | OpenGL 3.3 | 64-bit Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
 
 
 The following implementations are in-progress or planned:
@@ -19,7 +20,7 @@ The following implementations are in-progress or planned:
 | Configuration | Renderer | Description |
 | --- | --- | --- |
 | Emscripten/WebAssembly | WebGL/OpenGL ES | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit. |
-| 32-bit/64-bit Windows/SDL2 | OpenGL ES 3.0 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
+| 32-bit Windows/SDL2 | OpenGL ES 3.0 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Unimplemented functions use JK.EXE as a binary blob? |
 
 ## Building
 
