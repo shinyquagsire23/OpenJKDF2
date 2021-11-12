@@ -136,7 +136,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
             if ( weapon->weaponParams.force != 0.0 )
             {
                 damageReceiver = searchRes->receiver;
-                if ( damageReceiver->move_type == SITH_MT_PHYSICS )
+                if ( damageReceiver->moveType == SITH_MT_PHYSICS )
                 {
                     rdVector_Scale3(&tmp2, &weaponPos_, weapon->weaponParams.force);
                     sithSector_ThingApplyForce(damageReceiver, &tmp2);
@@ -320,7 +320,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             if ( weapon->weaponParams.force != 0.0 )
             {
                 receiveThing = searchRes->receiver;
-                if ( receiveThing->move_type == SITH_MT_PHYSICS )
+                if ( receiveThing->moveType == SITH_MT_PHYSICS )
                 {
                     tmp2.x = weapon->weaponParams.force * lookOrient.x;
                     tmp2.y = weapon->weaponParams.force * lookOrient.y;
@@ -788,7 +788,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEn
     sithThing *v21; // edi
     int v22; // eax
 
-    if ( thing->move_type != SITH_MT_PHYSICS )
+    if ( thing->moveType != SITH_MT_PHYSICS )
         return 0;
     if ( (g_debugmodeFlags & 0x40) != 0 )
     {

@@ -1018,7 +1018,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     *a8 = v12;
     if ( !(a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER) != 0 )
     {
-        if ( arg8->move_type != SITH_MT_PHYSICS )
+        if ( arg8->moveType != SITH_MT_PHYSICS )
             return 3;
         if ( (arg8->physicsParams.physflags & PHYSFLAGS_MIDAIR) == 0 )
             return 3;
@@ -1409,7 +1409,7 @@ LABEL_12:
     if ( (a7 & 1) != 0 )
     {
         v11 = actor->field_1D0;
-        if ( v11->move_type == SITH_MT_PHYSICS
+        if ( v11->moveType == SITH_MT_PHYSICS
           && (v11->physicsParams.vel.x != 0.0 || v11->physicsParams.vel.y != 0.0 || v11->physicsParams.vel.z != 0.0) )
         {
             a1a.x = v8->physicsParams.vel.y * v1.x;
@@ -1590,7 +1590,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
                 if ( v6->ambientLight < 0.5 )
                     v8 = (v6->ambientLight - -0.2) * v8;
             }
-            if ( a2->move_type == SITH_MT_PHYSICS )
+            if ( a2->moveType == SITH_MT_PHYSICS )
             {
                 if ( (a2->physicsParams.physflags & PHYSFLAGS_CROUCHING) != 0 )
                     v8 = v8 * 0.75;

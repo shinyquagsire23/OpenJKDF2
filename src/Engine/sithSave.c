@@ -215,7 +215,7 @@ int sithSave_SerializeAllThings(int mpFlags)
         {
             if ( v7->attach_flags )
             {
-                if ( (v7->attach_flags & 8) != 0 || v7->move_type != SITH_MT_PHYSICS )
+                if ( (v7->attach_flags & 8) != 0 || v7->moveType != SITH_MT_PHYSICS )
                     sithSector_cogMsg_SendSyncThingAttachment(v7, 0, mpFlags, 1);
             }
         }

@@ -686,7 +686,7 @@ float sithUnk3_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int 
     {
         a8 |= 0x5;
     }
-    if ( a3->move_type == SITH_MT_PATH )
+    if ( a3->moveType == SITH_MT_PATH )
     {
         a8 |= 0x4;
     }
@@ -794,7 +794,7 @@ LABEL_78:
                 {
                     v25 = a6 - v19->distance;
                     rdVector_Scale3(&v5->field_268, &direction, v25);
-                    if ( v5->move_type == SITH_MT_PHYSICS
+                    if ( v5->moveType == SITH_MT_PHYSICS
                       && (v5->physicsParams.physflags & 0x20) != 0
                       && (v5->physicsParams.addedVelocity.x != 0.0 || v5->physicsParams.addedVelocity.y != 0.0 || v5->physicsParams.addedVelocity.z != 0.0) )
                     {
@@ -870,12 +870,12 @@ LABEL_78:
                 goto LABEL_78;
         }
     }
-    if ( v5->move_type == SITH_MT_PHYSICS )
+    if ( v5->moveType == SITH_MT_PHYSICS )
         sithSector_StopPhysicsThing(v5);
 LABEL_81:
     
     v64 = stdMath_ClipPrecision(v64);
-    if ( v5->collide && v5->move_type == SITH_MT_PHYSICS && !sithCollide_IsSphereInSector(&v5->position, 0.0, v5->sector) )
+    if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithCollide_IsSphereInSector(&v5->position, 0.0, v5->sector) )
     {
         rdVector_Copy3(&v5->position, &posCopy);
         rdVector_Copy3(&direction, &out);
@@ -895,7 +895,7 @@ LABEL_81:
                 sithThing_MoveToSector(i, v58, 0);
         }
     }
-    if ( v5->move_type == SITH_MT_PHYSICS )
+    if ( v5->moveType == SITH_MT_PHYSICS )
     {
         if ( v64 == 0.0 )
             return 0.0;
@@ -918,7 +918,7 @@ int sithUnk3_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithUnk3S
     float a1a; // [esp+Ch] [ebp+4h]
 
     v3 = thing;
-    if ( thing->move_type != SITH_MT_PHYSICS )
+    if ( thing->moveType != SITH_MT_PHYSICS )
         return 0;
     a1a = -rdVector_Dot3(&a3->field_14, &thing->physicsParams.vel);
 
@@ -979,9 +979,9 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
     if ( (v5->thingflags & SITH_TF_CAPTURED) != 0 && (v4->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_SendMessageFromThing(v5, v4, SITH_MESSAGE_TOUCHED);
 
-    if ( v4->move_type != SITH_MT_PHYSICS || v4->physicsParams.mass == 0.0 )
+    if ( v4->moveType != SITH_MT_PHYSICS || v4->physicsParams.mass == 0.0 )
     {
-        if ( v5->move_type != SITH_MT_PHYSICS || v5->physicsParams.mass == 0.0 )
+        if ( v5->moveType != SITH_MT_PHYSICS || v5->physicsParams.mass == 0.0 )
             return 1;
         v11 = rdVector_Dot3(&v4->field_268, &a2);
         v11 = stdMath_ClipPrecision(v11);
@@ -1004,7 +1004,7 @@ int sithUnk3_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithUnk3S
         }
         return 0;
     }
-    if ( v5->move_type == SITH_MT_PHYSICS && v5->physicsParams.mass != 0.0 )
+    if ( v5->moveType == SITH_MT_PHYSICS && v5->physicsParams.mass != 0.0 )
     {
         v6 = rdVector_Dot3(&v5->physicsParams.vel, &a2) - rdVector_Dot3(&v4->physicsParams.vel, &a2);
         v6 = stdMath_ClipPrecision(v6);
@@ -1057,7 +1057,7 @@ int sithUnk3_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     float a1a; // [esp+10h] [ebp+4h]
     float amount; // [esp+14h] [ebp+8h]
 
-    if ( a1->move_type != SITH_MT_PHYSICS )
+    if ( a1->moveType != SITH_MT_PHYSICS )
         return 0;
     amount = -rdVector_Dot3(&a1->field_268, a2);
     a1a = stdMath_ClipPrecision(amount);
@@ -1250,7 +1250,7 @@ void sithUnk3_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
                 sithUnk3_UpdateThingCollision(v5, &a2a, a1a, 64);
             }
             sithUnk3_sub_4E77A0(v5, &out);
-            if ( v5->move_type == SITH_MT_PHYSICS )
+            if ( v5->moveType == SITH_MT_PHYSICS )
             {
                 v5->physicsParams.physflags &= ~PHYSFLAGS_100;
             }
@@ -1273,12 +1273,12 @@ int sithUnk3_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithUnk3Se
     float tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
 
     // Added: check move type
-    mass = (thing->move_type == SITH_MT_PHYSICS) ? thing->physicsParams.mass : 0.0;
+    mass = (thing->moveType == SITH_MT_PHYSICS) ? thing->physicsParams.mass : 0.0;
 
     if ( isSolid )
         return sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, isSolid);
 
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
         tmp = -rdVector_Dot3(&searchEnt->field_14, &thing->physicsParams.vel);
 
     if (sithUnk3_DebrisDebrisCollide(thing, thing2, searchEnt, 0))

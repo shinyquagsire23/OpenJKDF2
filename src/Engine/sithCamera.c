@@ -157,7 +157,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
     {
         case 1:
             rdMatrix_Copy34(&cam->viewMat, &focusThing->lookOrientation);
-            if ( focusThing->move_type == SITH_MT_PATH && focusThing->rdthing.hierarchyNodeMatrices)
+            if ( focusThing->moveType == SITH_MT_PATH && focusThing->rdthing.hierarchyNodeMatrices)
             {
                 rdMatrix_Copy34(&cam->viewMat, focusThing->rdthing.hierarchyNodeMatrices);
             }
@@ -172,7 +172,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
                     rdVector_Zero3(&v76);
                 }
 
-                if ( focusThing->move_type == SITH_MT_PHYSICS )
+                if ( focusThing->moveType == SITH_MT_PHYSICS )
                 {
                     v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->lookOrientation.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
                 }

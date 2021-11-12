@@ -235,11 +235,11 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             }
             if ( sithThing_handler && thingIter->jkFlags )
                 sithThing_handler(thingIter);
-            if ( thingIter->move_type == SITH_MT_PHYSICS )
+            if ( thingIter->moveType == SITH_MT_PHYSICS )
             {
                 sithSector_ThingPhysicsTick(thingIter, deltaSeconds);
             }
-            else if ( thingIter->move_type == SITH_MT_PATH )
+            else if ( thingIter->moveType == SITH_MT_PATH )
             {
                 sithTrackThing_Tick(thingIter, deltaSeconds);
             }
@@ -258,7 +258,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
         if ( thingIter->sector )
             sithThing_LeaveSector(thingIter);
 
-        if ( thingIter->move_type == SITH_MT_PATH && thingIter->trackParams.frames )
+        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.frames )
             pSithHS->free(thingIter->trackParams.frames);
 
         if ( thingIter->thingtype == THINGTYPE_ACTOR )
@@ -384,7 +384,7 @@ void sithThing_FreeEverything(sithThing *thing)
         sithThing_DetachThing(thing);
     if ( thing->sector )
         sithThing_LeaveSector(thing);
-    if ( thing->move_type == SITH_MT_PATH && thing->trackParams.frames )
+    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
         pSithHS->free(thing->trackParams.frames);
     if ( thing->thingtype == THINGTYPE_ACTOR )
         sithAI_FreeEntry(thing);
@@ -421,7 +421,7 @@ void sithThing_sub_4CD100(sithThing *thing)
         sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_CREATE);
 
     if ( (sithWorld_pCurWorld->level_type_maybe & 2) != 0
-      && thing->move_type == SITH_MT_PHYSICS
+      && thing->moveType == SITH_MT_PHYSICS
       && (thing->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
     {
         sithSector_ThingLandIdk(thing, 1);
@@ -469,7 +469,7 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         }
         if ( thing->animclass )
             rdPuppet_New(&thing->rdthing);
-        if ( thing->move_type == SITH_MT_PATH && thing->trackParams.frames )
+        if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
         {
             thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
             _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
@@ -532,13 +532,13 @@ LABEL_10:
     }
     if ( v2 )
         return 1;
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
     {
         v8 = sithSector_LoadThingPhysicsParams(arg, thing, paramIdx);
     }
     else
     {
-        if ( thing->move_type != SITH_MT_PATH )
+        if ( thing->moveType != SITH_MT_PATH )
             goto LABEL_18;
         v8 = sithTrackThing_LoadPathParams(arg, thing, paramIdx);
     }
@@ -770,19 +770,19 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
         case THINGPARAM_MOVE:
             if ( !_strcmp(arg->value, "physics") )
             {
-                thing->move_type = SITH_MT_PHYSICS;
+                thing->moveType = SITH_MT_PHYSICS;
                 result = 1;
             }
             else if ( !_strcmp(arg->value, "path") )
             {
-                thing->move_type = SITH_MT_PATH;
+                thing->moveType = SITH_MT_PATH;
                 result = 1;
             }
             else
             {
                 if ( _strcmp(arg->value, "none") )
                     goto LABEL_59;
-                thing->move_type = SITH_MT_NONE;
+                thing->moveType = SITH_MT_NONE;
                 result = 1;
             }
             break;
@@ -1170,7 +1170,7 @@ void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
     if ( (v5 & SITH_SF_UNDERWATER) != 0 )
     {
         v6 = thing->attach_flags;
-        if ( v6 && (v6 & 8) == 0 && thing->move_type == SITH_MT_PHYSICS )
+        if ( v6 && (v6 & 8) == 0 && thing->moveType == SITH_MT_PHYSICS )
             sithThing_DetachThing(thing);
         if ( (thing->thingflags & SITH_TF_WATER) == 0 )
             sithThing_EnterWater(thing, a3 | a4);
@@ -1208,7 +1208,7 @@ void sithThing_EnterWater(sithThing *thing, int a2)
     {
         if ( thing->soundclass )
         {
-            if ( thing->move_type == SITH_MT_PHYSICS && thing->physicsParams.vel.z > -1.0 )
+            if ( thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.vel.z > -1.0 )
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_ENTERWATERSLOW);
             else
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_ENTERWATER);
@@ -1226,7 +1226,7 @@ void sithThing_EnterWater(sithThing *thing, int a2)
             if ( v6 )
                 sithCog_SendMessage(v6, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, thing->thingIdx, 0, 1, 0);
         }
-        if ( thing->move_type == SITH_MT_PHYSICS )
+        if ( thing->moveType == SITH_MT_PHYSICS )
             thing->physicsParams.vel.z = thing->physicsParams.vel.z * 0.25;
     }
 }
@@ -1239,7 +1239,7 @@ void sithThing_ExitWater(sithThing *thing, int a2)
 
     if ( thing->soundclass )
     {
-        if ( thing->move_type == SITH_MT_PHYSICS && rdVector_Len3(&thing->physicsParams.vel) < 1.0 )
+        if ( thing->moveType == SITH_MT_PHYSICS && rdVector_Len3(&thing->physicsParams.vel) < 1.0 )
             sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_EXITWATERSLOW);
         else
             sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_EXITWATER);
@@ -1277,10 +1277,10 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
 
     hash = util_Weirdchecksum((uint8_t *)&thing->thingflags, sizeof(uint32_t), last_hash);
     hash = util_Weirdchecksum((uint8_t *)&thing->thingType, sizeof(uint32_t), hash);
-    hash = util_Weirdchecksum((uint8_t *)&thing->move_type, sizeof(uint32_t), hash);
+    hash = util_Weirdchecksum((uint8_t *)&thing->moveType, sizeof(uint32_t), hash);
     hash = util_Weirdchecksum((uint8_t *)&thing->thingtype, sizeof(uint32_t), hash);
 
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
     {
         hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.physflags, sizeof(uint32_t), hash);
         hash = util_Weirdchecksum((uint8_t *)&thing->physicsParams.airDrag, sizeof(float), hash);
@@ -1354,7 +1354,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     if ((thing->attach_flags & ATTACHFLAGS_THING_RELATIVE))
         return;
         
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
     {
         rdVector_Copy3(&thing->field_268, &thing->physicsParams.velocityMaybe);
     }
@@ -1376,7 +1376,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     
     if (rdVector_IsZero3(&thing->field_268))
     {
-        if ( thing->move_type == SITH_MT_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->move_type == SITH_MT_PATH )
+        if ( thing->moveType == SITH_MT_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->moveType == SITH_MT_PATH )
             sithSector_ThingLandIdk(thing, 0);
     }
     else
@@ -1409,7 +1409,7 @@ void sithThing_freestuff(sithWorld *world)
             sithThing_DetachThing(thingIter);
         if ( thingIter->sector )
             sithThing_LeaveSector(thingIter);
-        if ( thingIter->move_type == SITH_MT_PATH && thingIter->trackParams.frames )
+        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.frames )
             pSithHS->free(thingIter->trackParams.frames);
         if ( thingIter->thingtype == THINGTYPE_ACTOR )
             sithAI_FreeEntry(thingIter);
@@ -1512,8 +1512,8 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     v4 = result;
     if ( result )
     {
-        if ( result->move_type == SITH_MT_PATH
-          && spawnThing->move_type == SITH_MT_PATH
+        if ( result->moveType == SITH_MT_PATH
+          && spawnThing->moveType == SITH_MT_PATH
           && spawnThing->trackParams.frames
           && !result->trackParams.frames )
         {
@@ -1657,12 +1657,12 @@ LABEL_24:
         sithSoundClass_ThingPlaySoundclass(v17, SITH_SC_CREATE);
     if ( (sithWorld_pCurWorld->level_type_maybe & 2) == 0 )
         goto LABEL_48;
-    if ( v17->move_type == SITH_MT_PHYSICS )
+    if ( v17->moveType == SITH_MT_PHYSICS )
     {
         if ( (v17->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
             sithSector_ThingLandIdk(v17, 1);
 LABEL_48:
-        if ( v17->move_type == SITH_MT_PHYSICS && (v17->physicsParams.physflags & PHYSFLAGS_20000) == 0 )
+        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & PHYSFLAGS_20000) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
     }
     v24 = v17->class_cog;
@@ -1696,7 +1696,7 @@ void sithThing_FreeEverythingNet(sithThing *thing)
         sithThing_DetachThing(thing);
     if ( thing->sector )
         sithThing_LeaveSector(thing);
-    if ( thing->move_type == SITH_MT_PATH && thing->trackParams.frames )
+    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
         pSithHS->free(thing->trackParams.frames);
     if ( thing->thingtype == THINGTYPE_ACTOR )
         sithAI_FreeEntry(thing);
@@ -1761,7 +1761,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
     thing->field_38.z = v8->z;
     thing->attachedSufaceInfo = &surface->surfaceInfo;
     thing->physicsParams.physflags &= ~PHYSFLAGS_100;
-    if ( (surface->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->move_type == SITH_MT_PHYSICS )
+    if ( (surface->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
     {
         sithSurface_DetachThing(surface, &a2a);
         rdVector_Sub3Acc(&thing->physicsParams.vel, &a2a);
@@ -1807,7 +1807,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHARD);
             }
         }
-        if ( thing->animclass && thing->move_type == SITH_MT_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
+        if ( thing->animclass && thing->moveType == SITH_MT_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
             sithPuppet_PlayMode(thing, SITH_ANIM_LAND, 0);
         return;
     }
@@ -1846,11 +1846,11 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     a1->parentThing = 0;
     a2->attachedParentMaybe = a1;
     a1->physicsParams.physflags &= ~PHYSFLAGS_100;
-    if ( a2->move_type == SITH_MT_PHYSICS )
+    if ( a2->moveType == SITH_MT_PHYSICS )
     {
         rdVector_Sub3Acc(&a1->physicsParams.vel, &a2->physicsParams.vel);
     }
-    else if ( a2->move_type == SITH_MT_PATH )
+    else if ( a2->moveType == SITH_MT_PATH )
     {
         rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.field_20);
     }
@@ -1917,7 +1917,7 @@ int sithThing_DetachThing(sithThing *thing)
         if ( (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 )
         {
             attached = thing->attachedSurface;
-            if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->move_type == SITH_MT_PHYSICS )
+            if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
             {
                 sithSurface_DetachThing(attached, &a2);
                 rdVector_Add3Acc(&thing->physicsParams.vel, &a2);
@@ -1931,15 +1931,15 @@ int sithThing_DetachThing(sithThing *thing)
         return result;
     }
     v3 = thing->attachedThing;
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
     {
-        if ( v3->move_type == SITH_MT_PHYSICS )
+        if ( v3->moveType == SITH_MT_PHYSICS )
         {
             rdVector_Add3Acc(&thing->physicsParams.vel, &v3->physicsParams.vel);
         }
         else
         {
-            if ( v3->move_type != SITH_MT_PATH )
+            if ( v3->moveType != SITH_MT_PATH )
                 goto LABEL_8;
             thing->physicsParams.vel.x = (v3->physicsParams.angVel.x * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.x;
             thing->physicsParams.vel.y = (v3->physicsParams.angVel.y * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.y;

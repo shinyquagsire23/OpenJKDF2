@@ -273,7 +273,7 @@ void sithCogThing_JumpToFrame(sithCog *ctx)
     uint32_t frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && sector && thing->move_type == SITH_MT_PATH && frame < thing->trackParams.loadedFrames )
+    if ( thing && sector && thing->moveType == SITH_MT_PATH && frame < thing->trackParams.loadedFrames )
     {
         if ( thing->sector && sector != thing->sector )
             sithThing_LeaveSector(thing);
@@ -294,7 +294,7 @@ void sithCogThing_MoveToFrame(sithCog *ctx)
     float speed = sithCogVm_PopFlex(ctx) * 0.1;
     int frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
+    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
     {
         if ( speed == 0.0 )
             speed = 0.5;
@@ -314,7 +314,7 @@ void sithCogThing_SkipToFrame(sithCog *ctx)
     float speed = sithCogVm_PopFlex(ctx) * 0.1;
     int frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
+    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
     {
         if ( speed == 0.0 )
             speed = 0.5;
@@ -338,7 +338,7 @@ void sithCogThing_RotatePivot(sithCog *ctx)
     if ( speed == 0.0 )
         speed = 1.0;
 
-    if ( thing && thing->move_type == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
+    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
     {
         rdVector3* pos = &thing->trackParams.frames[frame].pos;
         rdVector3* rot = &thing->trackParams.frames[frame].rot;
@@ -366,7 +366,7 @@ void sithCogThing_Rotate(sithCog *ctx)
 
     if (thing)
     {
-        if ( thing->move_type == SITH_MT_PATH )
+        if ( thing->moveType == SITH_MT_PATH )
             sithTrackThing_Rotate(thing, &rot);
     }
 }
@@ -435,7 +435,7 @@ void sithCogThing_WaitForStop(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PATH && thing->trackParams.field_C & 3 )
+    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.field_C & 3 )
     {
         int idx = thing->thingIdx;
         ctx->script_running = 3;
@@ -465,7 +465,7 @@ void sithCogThing_GetCurFrame(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PATH )
+    if ( thing && thing->moveType == SITH_MT_PATH )
         sithCogVm_PushInt(ctx, thing->curframe);
     else
         sithCogVm_PushInt(ctx, 0);
@@ -475,7 +475,7 @@ void sithCogThing_GetGoalFrame(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PATH )
+    if ( thing && thing->moveType == SITH_MT_PATH )
         sithCogVm_PushInt(ctx, thing->goalframe);
     else
         sithCogVm_PushInt(ctx, 0);
@@ -488,13 +488,13 @@ void sithCogThing_StopThing(sithCog *ctx)
     if (!thing)
         return;
 
-    if ( thing->move_type == SITH_MT_PATH )
+    if ( thing->moveType == SITH_MT_PATH )
     {
         sithTrackThing_Stop(thing);
         if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
             sithSector_cogMsg_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
     }
-    else if (thing->move_type == SITH_MT_PHYSICS)
+    else if (thing->moveType == SITH_MT_PHYSICS)
     {
         sithSector_StopPhysicsThing(thing);
     }
@@ -509,7 +509,7 @@ void sithCogThing_IsMoving(sithCog *ctx)
         return;
     }
 
-    if ( thing->move_type == SITH_MT_PHYSICS )
+    if ( thing->moveType == SITH_MT_PHYSICS )
     {
         if ( thing->physicsParams.vel.x != 0.0 || thing->physicsParams.vel.y != 0.0 || thing->physicsParams.vel.z != 0.0 )
         {
@@ -517,7 +517,7 @@ void sithCogThing_IsMoving(sithCog *ctx)
             return;
         }
     }
-    else if ( thing->move_type == SITH_MT_PATH )
+    else if ( thing->moveType == SITH_MT_PATH )
     {
         sithCogVm_PushInt(ctx, thing->trackParams.field_C & 3);
         return;
@@ -719,11 +719,11 @@ void sithCogThing_GetThingVel(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
     {
-        if ( thing->move_type == SITH_MT_PHYSICS)
+        if ( thing->moveType == SITH_MT_PHYSICS)
         {
             rdVector_Copy3(&retval, &thing->physicsParams.vel);
         }
-        else if ( thing->move_type == SITH_MT_PATH )
+        else if ( thing->moveType == SITH_MT_PATH )
         {
             rdVector_Scale3(&retval, &thing->trackParams.vel, thing->trackParams.field_20);
         }
@@ -741,7 +741,7 @@ void sithCogThing_SetThingVel(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &poppedVec);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS)
+    if ( thing && thing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Copy3(&thing->physicsParams.vel, &poppedVec);
         if ( sithCogVm_multiplayerFlags 
@@ -760,7 +760,7 @@ void sithCogThing_ApplyForce(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &poppedVec);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS)
+    if ( thing && thing->moveType == SITH_MT_PHYSICS)
     {
         sithSector_ThingApplyForce(thing, &poppedVec);
         if ( sithCogVm_multiplayerFlags 
@@ -779,7 +779,7 @@ void sithCogThing_AddThingVel(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &poppedVec);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS)
+    if ( thing && thing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Add3Acc(&thing->physicsParams.vel, &poppedVec);
         if ( sithCogVm_multiplayerFlags 
@@ -967,7 +967,7 @@ void sithCogThing_PlayKey(sithCog *ctx)
     if ( track >= 0 )
     {
         sithCogVm_PushInt(ctx, track);
-        if ( thing->move_type == SITH_MT_PATH )
+        if ( thing->moveType == SITH_MT_PATH )
         {
             if ( thing->trackParams.field_C )
                 sithTrackThing_Stop(thing);
@@ -1139,7 +1139,7 @@ void sithCogThing_TeleportThing(sithCog *ctx)
         rdMatrix_Copy34(&thing->lookOrientation, &thingTo->lookOrientation);
         rdVector_Copy3(&thing->position, &thingTo->position);
         sithThing_MoveToSector(thing, thingTo->sector, 0);
-        if (thing->move_type == SITH_MT_PHYSICS && thing->physicsParams.physflags & PHYSFLAGS_FLOORSTICK)
+        if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & PHYSFLAGS_FLOORSTICK)
             sithSector_ThingLandIdk(thing, 1);
 
         if ( thing == g_localPlayerThing )
@@ -1271,7 +1271,7 @@ void sithCogThing_GetLoadedFrames(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if (thing && thing->move_type == SITH_MT_PATH)
+    if (thing && thing->moveType == SITH_MT_PATH)
         sithCogVm_PushInt(ctx, thing->trackParams.loadedFrames);
     else
         sithCogVm_PushInt(ctx, -1);
@@ -1283,7 +1283,7 @@ void sithCogThing_GetFramePos(sithCog *ctx)
     uint32_t frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PATH && frame < thing->trackParams.loadedFrames )
+    if ( thing && thing->moveType == SITH_MT_PATH && frame < thing->trackParams.loadedFrames )
         sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].pos);
     sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
@@ -1294,7 +1294,7 @@ void sithCogThing_GetFrameRot(sithCog *ctx)
     uint32_t frame = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if (thing && thing->move_type == SITH_MT_PATH && frame < thing->trackParams.loadedFrames)
+    if (thing && thing->moveType == SITH_MT_PATH && frame < thing->trackParams.loadedFrames)
         sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].rot);
     sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
@@ -1304,7 +1304,7 @@ void sithCogThing_PathMovePause(sithCog *ctx)
     int ret = 0;
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PATH )
+    if ( thing && thing->moveType == SITH_MT_PATH )
         ret = sithTrackThing_PathMovePause(thing);
 
     if ( ret == 1 )
@@ -1355,7 +1355,7 @@ void sithCogThing_PathMoveResume(sithCog *ctx)
     int ret = 0;
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == THINGTYPE_ACTOR )
+    if ( thing && thing->moveType == THINGTYPE_ACTOR )
         ret = sithTrackThing_PathMoveResume(thing);
     if ( ret == 1 )
         sithCogVm_PushInt(ctx, thing->thingIdx);
@@ -1537,7 +1537,7 @@ void sithCogThing_SetThingThrust(sithCog *ctx)
     int couldPopVec = sithCogVm_PopVector3(ctx, &poppedVec);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->move_type == SITH_MT_PHYSICS && couldPopVec)
+    if ( thing && thing->moveType == SITH_MT_PHYSICS && couldPopVec)
     {
         sithCogVm_PushVector3(ctx, &thing->physicsParams.acceleration);
         rdVector_Copy3(&thing->physicsParams.acceleration, &poppedVec);
@@ -1550,7 +1550,7 @@ void sithCogThing_GetThingThrust(sithCog *ctx)
 
     if ( thing )
     {
-        if ( thing->move_type == SITH_MT_PHYSICS )
+        if ( thing->moveType == SITH_MT_PHYSICS )
             sithCogVm_PushVector3(ctx, &thing->physicsParams.acceleration);
     }
 }
@@ -1631,7 +1631,7 @@ void sithCogThing_GetActorWeapon(sithCog *ctx)
 void sithCogThing_GetPhysicsFlags(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS )
+    if ( thing && thing->moveType == SITH_MT_PHYSICS )
         sithCogVm_PushInt(ctx, thing->physicsParams.physflags);
     else
         sithCogVm_PushInt(ctx, -1);
@@ -1642,7 +1642,7 @@ void sithCogThing_SetPhysicsFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if (thing && flags && thing->move_type == SITH_MT_PHYSICS)
+    if (thing && flags && thing->moveType == SITH_MT_PHYSICS)
     {
         thing->physicsParams.physflags |= flags;
         if (sithCogVm_multiplayerFlags 
@@ -1660,7 +1660,7 @@ void sithCogThing_ClearPhysicsFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if (thing && flags && thing->move_type == SITH_MT_PHYSICS)
+    if (thing && flags && thing->moveType == SITH_MT_PHYSICS)
         thing->physicsParams.physflags &= ~flags;
 }
 
@@ -1740,7 +1740,7 @@ void sithCogThing_SetThingRotVel(sithCog *ctx)
 
     sithCogVm_PopVector3(ctx, &popped_vector3);
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS)
+    if ( thing && thing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Copy3(&thing->physicsParams.angVel, &popped_vector3);
         if (sithCogVm_multiplayerFlags 
@@ -1756,7 +1756,7 @@ void sithCogThing_SetThingRotVel(sithCog *ctx)
 void sithCogThing_GetThingRotVel(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( thing && thing->move_type == SITH_MT_PHYSICS )
+    if ( thing && thing->moveType == SITH_MT_PHYSICS )
         sithCogVm_PushVector3(ctx, &thing->physicsParams.angVel);
     else
         sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
@@ -1787,7 +1787,7 @@ void sithCogThing_SetThingLook(sithCog *ctx)
 void sithCogThing_IsCrouching(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
-    if ( !thing || thing->move_type != SITH_MT_PHYSICS )
+    if ( !thing || thing->moveType != SITH_MT_PHYSICS )
         sithCogVm_PushInt(ctx, -1);
 
     if (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING)
@@ -2166,7 +2166,7 @@ void sithCogThing_GetThingMass(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
     {
-        if (thing->move_type == SITH_MT_PHYSICS)
+        if (thing->moveType == SITH_MT_PHYSICS)
             sithCogVm_PushFlex(ctx, thing->physicsParams.mass);
         else
             sithCogVm_PushFlex(ctx, 0.0);
@@ -2178,7 +2178,7 @@ void sithCogThing_SetThingMass(sithCog *ctx)
     float mass = sithCogVm_PopFlex(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if (thing && thing->move_type == SITH_MT_PHYSICS)
+    if (thing && thing->moveType == SITH_MT_PHYSICS)
     {
         thing->physicsParams.mass = mass;
         if (sithCogVm_multiplayerFlags 

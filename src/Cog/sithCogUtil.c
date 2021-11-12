@@ -197,11 +197,11 @@ void sithCogUtil_StopThing(sithCog *ctx) // unused
     v1 = sithCogVm_PopThing(ctx);
     if ( v1 )
     {
-        if ( v1->move_type == 1 )
+        if ( v1->moveType == SITH_MT_PHYSICS )
         {
             sithSector_StopPhysicsThing(v1);
         }
-        else if ( v1->move_type == 2 )
+        else if ( v1->moveType == SITH_MT_PATH )
         {
             sithTrackThing_Stop(v1);
         }

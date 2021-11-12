@@ -293,7 +293,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
 
     if ( thing->animclass && thing->puppet && thing->rdthing.puppet && (g_debugmodeFlags & 2) == 0 )
     {
-        if ( thing->move_type == SITH_MT_PHYSICS )
+        if ( thing->moveType == SITH_MT_PHYSICS )
         {
             v3 = sithPuppet_sub_4E4380(thing);
             v4 = thing->puppet;
@@ -365,7 +365,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
                 }
             }
         }
-        if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->move_type == SITH_MT_PATH )
+        if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->moveType == SITH_MT_PATH )
         {
             thing->lookOrientation.scale.x = 0.0;
             thing->lookOrientation.scale.y = 0.0;
@@ -501,7 +501,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
                 }
             }
         }
-        if ( thing->move_type == SITH_ANIM_STAND && thing->attach_flags && (thing->physicsParams.physflags & (PHYSFLAGS_200000|PHYSFLAGS_CROUCHING)) )
+        if ( thing->moveType == SITH_ANIM_STAND && thing->attach_flags && (thing->physicsParams.physflags & (PHYSFLAGS_200000|PHYSFLAGS_CROUCHING)) )
         {
             if ( v3 == SITH_ANIM_STAND && thinga < 0.0 )
                 anim = SITH_ANIM_CROUCHBACK;
@@ -698,7 +698,7 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
             v8 = thing->attachedThing;
             if ( !(v5 & 2) )
             {
-                v10 = v8->move_type;
+                v10 = v8->moveType;
                 if ( (v10 & 0x1F0000) != 0 )
                 {
                     if ( (v10 & 0x10000) != 0 )

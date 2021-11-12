@@ -272,7 +272,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
         if ( !v3->attach_flags )
         {
             v14 = v3->actorParams.typeflags;
-            if ( (v14 & THING_TYPEFLAGS_400000) == 0 && v3->move_type == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
+            if ( (v14 & THING_TYPEFLAGS_400000) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
             {
                 v15 = v3->sector;
                 if ( v15 )
