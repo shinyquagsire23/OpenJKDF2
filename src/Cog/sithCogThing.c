@@ -170,7 +170,7 @@ void sithCogThing_createThingAtPos_nr(sithCog *ctx)
     rdMatrix_BuildRotate34(&a3, &rot);
     rdMatrix_TransformVector34Acc(&a1, &a3);
     rdVector_Add3Acc(&pos, &a1);
-    v7 = sithThing_SpawnThingInSector(popTemplate, &pos, &a3, popSector, 0);
+    v7 = sithThing_Create(popTemplate, &pos, &a3, popSector, 0);
     if ( v7 )
     {
         if ( sithCogVm_multiplayerFlags )

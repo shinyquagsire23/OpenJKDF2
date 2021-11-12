@@ -112,7 +112,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 {
                     rdVector_Copy3(&tmp, &weapon->position);
                     rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
-                    sithThing_SpawnThingInSector(weapon->actorParams.templateWeapon2, &tmp, &weapon->lookOrientation, sector, 0);
+                    sithThing_Create(weapon->actorParams.templateWeapon2, &tmp, &weapon->lookOrientation, sector, 0);
                     elementSize += weapon->weaponParams.elementSize;
                 }
                 while ( elementSize < searchRes->distance );
@@ -151,7 +151,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
         {
             rdVector_Copy3(&tmp2, &weapon->position);
             rdVector_MultAcc3(&tmp2, &weaponPos_, searchRes->distance);
-            sithThing_SpawnThingInSector(weapon->weaponParams.explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
+            sithThing_Create(weapon->weaponParams.explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
 
@@ -166,7 +166,7 @@ LABEL_20:
         {
             rdVector_Copy3(&tmp, &weapon->position);
             rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
-            sithThing_SpawnThingInSector(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
+            sithThing_Create(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
             elementSize += weapon->weaponParams.elementSize;
         }
         while ( elementSize < weapon->weaponParams.range );
@@ -294,7 +294,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         rdMatrix_BuildRotate34(&camera, &rot);
                     }
                     sectorLook = sithUnk3_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
-                    sithThing_SpawnThingInSector(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
+                    sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
                     rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
                     rdVector_Add3Acc(&weaponPos, &vertex_out);
                 }
@@ -339,7 +339,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             tmp2.x = searchRes->distance * lookOrient.x + weapon->position.x;
             tmp2.y = searchRes->distance * lookOrient.y + weapon->position.y;
             tmp2.z = searchRes->distance * lookOrient.z + weapon->position.z;
-            sithThing_SpawnThingInSector(explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
+            sithThing_Create(explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
 LABEL_25:
@@ -385,7 +385,7 @@ LABEL_25:
                 rdMatrix_BuildRotate34(&camera, &rot);
             }
             sectorLook_ = sithUnk3_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
-            sithThing_SpawnThingInSector(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
+            sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
             rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
             rdVector_Add3Acc(&weaponPos, &vertex_out);
         }
@@ -504,7 +504,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
     if ( projectileTemplate )
     {
         rdMatrix_BuildFromLook34(&a3a, fireOffset);
-        v9 = sithThing_SpawnThingInSector(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
+        v9 = sithThing_Create(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
 
         if (!v9 )
             return 0;
@@ -679,7 +679,7 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
             if ( !v17 )
                 goto LABEL_51;
             v18 = sithThing_GetParent(physicsThing);
-            v19 = sithThing_SpawnThingInSector(v17, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v18);
+            v19 = sithThing_Create(v17, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v18);
             v20 = v19;
             if ( !v19 )
                 goto LABEL_51;
@@ -732,7 +732,7 @@ LABEL_43:
                 if ( !explodeTemplate )
                     goto LABEL_51;
                 v26 = sithThing_GetParent(physicsThing);
-                v27 = sithThing_SpawnThingInSector(explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v26);
+                v27 = sithThing_Create(explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v26);
                 v20 = v27;
                 if ( !v27 )
                     goto LABEL_51;
@@ -746,7 +746,7 @@ LABEL_43:
             if ( !fleshHitTemplate )
                 goto LABEL_51;
             v23 = sithThing_GetParent(physicsThing);
-            v24 = sithThing_SpawnThingInSector(fleshHitTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v23);
+            v24 = sithThing_Create(fleshHitTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v23);
             v20 = v24;
             if ( !v24 )
                 goto LABEL_51;
@@ -842,7 +842,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithUnk3SearchEn
             if ( v18 )
             {
                 v19 = sithThing_GetParent(thing);
-                v20 = sithThing_SpawnThingInSector(v18, &thing->position, &rdroid_identMatrix34, thing->sector, v19);
+                v20 = sithThing_Create(v18, &thing->position, &rdroid_identMatrix34, thing->sector, v19);
                 v21 = v20;
                 if ( v20 )
                 {
@@ -894,7 +894,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
     if ( explodeTemplate )
     {
         sithThing* player = sithThing_GetParent(weapon);
-        sithThing* spawned = sithThing_SpawnThingInSector(explodeTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
+        sithThing* spawned = sithThing_Create(explodeTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
         if ( spawned )
         {
             if ( player == g_localPlayerThing )

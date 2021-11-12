@@ -520,7 +520,7 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
                 rdModel3_GetMeshMatrix(rdthing, &playerInfo->actorThing->lookOrientation, meshIdx, &matTmp);
                 rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].vertices[vtxIdx], &matTmp);
 
-                sithThing_SpawnThingInSector(sithTemplate_GetEntryByName("+twinkle"), &vTmp, &matTmp, player->sector, 0);
+                sithThing_Create(sithTemplate_GetEntryByName("+twinkle"), &vTmp, &matTmp, player->sector, 0);
 
                 playerInfo->numTwinkles--;
                 if ( !playerInfo->numTwinkles )

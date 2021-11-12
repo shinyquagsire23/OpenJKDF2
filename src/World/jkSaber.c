@@ -254,7 +254,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->wall_sparks)
                 {
                     // TODO is this inlined?
-                    sithThing* actorThing = sithThing_SpawnThingInSector(playerInfo->wall_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
+                    sithThing* actorThing = sithThing_Create(playerInfo->wall_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
                     if ( actorThing )
                     {
                         actorThing->prev_thing = playerInfo->actorThing;
@@ -286,7 +286,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             {
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->blood_sparks)
                 {
-                    sithThing* actorThing = sithThing_SpawnThingInSector(playerInfo->blood_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
+                    sithThing* actorThing = sithThing_Create(playerInfo->blood_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
                     if ( actorThing )
                     {
                         actorThing->prev_thing = playerInfo->actorThing;
@@ -324,7 +324,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
 
                     if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->saber_sparks)
                     {
-                        sithThing* actorThing = sithThing_SpawnThingInSector(playerInfo->saber_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
+                        sithThing* actorThing = sithThing_Create(playerInfo->saber_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
                         if ( actorThing )
                         {
                             actorThing->prev_thing = playerInfo->actorThing;
@@ -341,7 +341,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
 
             if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->blood_sparks)
             {
-                sithThing* actorThing = sithThing_SpawnThingInSector(playerInfo->blood_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
+                sithThing* actorThing = sithThing_Create(playerInfo->blood_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
                 if ( actorThing )
                 {
                     actorThing->prev_thing = playerInfo->actorThing;
@@ -363,7 +363,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             {
                 if ( playerInfo->wall_sparks )
                 {
-                    sithThing* actorThing = sithThing_SpawnThingInSector(playerInfo->wall_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
+                    sithThing* actorThing = sithThing_Create(playerInfo->wall_sparks, &a2a, &rdroid_identMatrix34, sector, 0);
                     if ( actorThing )
                     {
                         actorThing->prev_thing = playerInfo->actorThing;

@@ -37,7 +37,7 @@
 #define sithThing_SetPosAndRot_ADDR (0x004CD7E0)
 #define sithThing_SetNewModel_ADDR (0x004CD830)
 #define sithThing_sub_4CD8A0_ADDR (0x004CD8A0)
-#define sithThing_SpawnThingInSector_ADDR (0x004CD9E0)
+#define sithThing_Create_ADDR (0x004CD9E0)
 #define sithThing_SpawnTemplate_ADDR (0x004CDCD0)
 #define sithThing_AttachToSurface_ADDR (0x004CDE80)
 #define sithThing_LandThing_ADDR (0x004CE050)
@@ -303,7 +303,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs);
 void sithThing_freestuff(sithWorld *world);
 void sithThing_Free(sithWorld *world);
 sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThing);
-sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing);
+sithThing* sithThing_Create(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing);
 void sithThing_FreeEverythingNet(sithThing *thing);
 void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3);
 void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5);
@@ -332,7 +332,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing *thing) = (void*)0x004CEB90;
 //static void (*sithThing_Free)(sithWorld* world) = (void*)sithThing_Free_ADDR;
 
-//static sithThing* (*sithThing_SpawnThingInSector)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_SpawnThingInSector_ADDR;
+//static sithThing* (*sithThing_Create)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_Create_ADDR;
 //static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
 //static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 //static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;

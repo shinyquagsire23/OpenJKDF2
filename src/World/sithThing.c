@@ -1508,7 +1508,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     v7.y = spawnThing->position.y + dstVec.y;
     v7.z = spawnThing->position.z + dstVec.z;
     v2 = sithUnk3_GetSectorLookAt(v5, &spawnThing->position, &v7, 0.0);
-    result = sithThing_SpawnThingInSector(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
+    result = sithThing_Create(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )
     {
@@ -1524,7 +1524,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     return result;
 }
 
-sithThing* sithThing_SpawnThingInSector(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
+sithThing* sithThing_Create(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
 {
     int v5; // edx
     sithWorld *v6; // ecx
@@ -1671,7 +1671,7 @@ LABEL_48:
     v25 = v17->template;
     if ( v25 )
     {
-        v26 = sithThing_SpawnThingInSector(v25, position, lookOrientation, sector, prevThing);
+        v26 = sithThing_Create(v25, position, lookOrientation, sector, prevThing);
         if ( v26 )
         {
             if ( (v17->thingflags & SITH_TF_INVULN) != 0 )
@@ -2183,7 +2183,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 v7 = thing->actorParams.typeflags;
                 if ( (v7 & THING_TYPEFLAGS_20) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
                 {
-                    sithThing_SpawnThingInSector(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
+                    sithThing_Create(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
                     sithThing_Destroy(thing);
                 }
                 else

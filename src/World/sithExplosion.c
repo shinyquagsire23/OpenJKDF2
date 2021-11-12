@@ -144,7 +144,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
             a2.y = _frand() * 360.0;
             a2.z = _frand() * 360.0;
             rdMatrix_BuildRotate34(&a3, &a2);
-            sithThing_SpawnThingInSector(*debrisTemplates, &explosion->position, &a3, explosion->sector, 0);
+            sithThing_Create(*debrisTemplates, &explosion->position, &a3, explosion->sector, 0);
         }
         ++debrisTemplates;
         --v9;

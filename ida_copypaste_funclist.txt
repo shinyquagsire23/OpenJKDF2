@@ -1919,7 +1919,7 @@ sithThing_doesinitidk	.text	004CD570	00000263	00000010	00000004	R	.	.	.	.	.	.
 sithThing_SetPosAndRot	.text	004CD7E0	00000043	00000008	0000000C	R	.	.	.	.	T	.
 sithThing_SetNewModel	.text	004CD830	00000069	00000010	00000008	R	.	.	.	.	T	.
 sithThing_sub_4CD8A0	.text	004CD8A0	00000140	0000001C	00000008	R	.	.	.	.	T	.
-sithThing_SpawnThingInSector	.text	004CD9E0	000002F0	00000010	00000014	R	.	.	.	.	T	.
+sithThing_Create	.text	004CD9E0	000002F0	00000010	00000014	R	.	.	.	.	T	.
 sithThing_modelidk	.text	004CDCD0	000001A5	00000030	00000008	R	.	.	.	.	T	.
 sithThing_LandSurface	.text	004CDE80	000001CC	00000018	0000000C	R	.	.	.	.	T	.
 sithThing_LandThing	.text	004CE050	0000026F	0000002C	00000014	R	.	.	.	.	T	.
