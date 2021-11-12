@@ -283,7 +283,7 @@ int sithWorld_NewEntry(sithWorld *world)
             {
                 v16 = &world->things[i];
                 if ( v16->thingType
-                  && v16->move_type == MOVETYPE_PHYSICS
+                  && v16->move_type == SITH_MT_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {
                     sithSector_ThingLandIdk(v16, 1);

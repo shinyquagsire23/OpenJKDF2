@@ -212,7 +212,7 @@ void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
             thing->lookOrientation.scale.z = 0.0;
             sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].field_138C, 0);
         }
-        if ( thing->move_type == MOVETYPE_PHYSICS )
+        if ( thing->move_type == SITH_MT_PHYSICS )
         {
             sithSector_StopPhysicsThing(thing);
             thing->physicsParams.physflags &= ~PHYSFLAGS_100;

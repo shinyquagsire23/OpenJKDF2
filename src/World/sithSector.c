@@ -252,13 +252,13 @@ int sithSector_LoadThingPhysicsParams(stdConffileArg *arg, sithThing *thing, int
             return 1;
         case THINGPARAM_MAXROTVEL:
             tmp = _atof(arg->value);
-            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+            if ( tmp < 0.0 || thing->move_type != SITH_MT_PHYSICS )
                 return 0;
             thing->physicsParams.maxRotVel = tmp;
             return 1;
         case THINGPARAM_MAXVEL:
             tmp = _atof(arg->value);
-            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+            if ( tmp < 0.0 || thing->move_type != SITH_MT_PHYSICS )
                 return 0;
             thing->physicsParams.maxVel = tmp;
             return 1;
@@ -283,7 +283,7 @@ int sithSector_LoadThingPhysicsParams(stdConffileArg *arg, sithThing *thing, int
             return 1;
         case THINGPARAM_ORIENTSPEED:
             tmp = _atof(arg->value);
-            if ( tmp < 0.0 || thing->move_type != MOVETYPE_PHYSICS )
+            if ( tmp < 0.0 || thing->move_type != SITH_MT_PHYSICS )
                 return 0;
             thing->physicsParams.orientSpeed = tmp;
             return 1;
@@ -1204,7 +1204,7 @@ void sithSector_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3)
 
 void sithSector_ThingApplyForce(sithThing *thing, rdVector3 *forceVec)
 {
-    if ( thing->move_type == MOVETYPE_PHYSICS && thing->physicsParams.mass > 0.0 )
+    if ( thing->move_type == SITH_MT_PHYSICS && thing->physicsParams.mass > 0.0 )
     {
         float invMass = 1.0 / thing->physicsParams.mass;
 
@@ -1728,13 +1728,13 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
             default:
                 break;
         }
-        if ( thing->move_type == MOVETYPE_PHYSICS )
+        if ( thing->move_type == SITH_MT_PHYSICS )
         {
             NETMSG_PUSHU32(thing->physicsParams.physflags);
             NETMSG_PUSHVEC3(thing->physicsParams.vel);
             NETMSG_PUSHVEC3(thing->physicsParams.angVel);
         }
-        else if ( thing->move_type == MOVETYPE_PATH )
+        else if ( thing->move_type == SITH_MT_PATH )
         {
             NETMSG_PUSHS16(thing->trackParams.field_C);
             NETMSG_PUSHVEC3(thing->trackParams.vel);
@@ -1867,13 +1867,13 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
         default:
             break;
     }
-    if ( thing->move_type == MOVETYPE_PHYSICS )
+    if ( thing->move_type == SITH_MT_PHYSICS )
     {
         thing->physicsParams.physflags = NETMSG_POPU32();
         thing->physicsParams.vel = NETMSG_POPVEC3();
         thing->physicsParams.angVel = NETMSG_POPVEC3();
     }
-    else if ( thing->move_type == MOVETYPE_PATH )
+    else if ( thing->move_type == SITH_MT_PATH )
     {
         thing->trackParams.field_C = NETMSG_POPS16();
         thing->trackParams.vel = NETMSG_POPVEC3();

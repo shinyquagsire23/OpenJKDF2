@@ -293,7 +293,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
 
     if ( thing->animclass && thing->puppet && thing->rdthing.puppet && (g_debugmodeFlags & 2) == 0 )
     {
-        if ( thing->move_type == MOVETYPE_PHYSICS )
+        if ( thing->move_type == SITH_MT_PHYSICS )
         {
             v3 = sithPuppet_sub_4E4380(thing);
             v4 = thing->puppet;
@@ -365,7 +365,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
                 }
             }
         }
-        if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->move_type == MOVETYPE_PATH )
+        if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->move_type == SITH_MT_PATH )
         {
             thing->lookOrientation.scale.x = 0.0;
             thing->lookOrientation.scale.y = 0.0;

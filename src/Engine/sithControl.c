@@ -124,7 +124,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     g_debugmodeFlags &= ~0x100;
 #endif
 
-    if ( player->move_type != MOVETYPE_PHYSICS )
+    if ( player->move_type != SITH_MT_PHYSICS )
         return 0;
     if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
     {
@@ -187,7 +187,7 @@ LABEL_39:
         }
         return 0;
     }
-    if ( player->move_type == MOVETYPE_PHYSICS )
+    if ( player->move_type == SITH_MT_PHYSICS )
         sithSector_StopPhysicsThing(player);
     v3 = INPUT_FUNC_SELECT1;
     while ( 1 )

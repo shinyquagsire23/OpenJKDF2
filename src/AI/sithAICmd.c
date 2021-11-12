@@ -491,7 +491,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         }
         else if ( !actor->field_1F4 )
         {
-            if (actor->field_1D0 && actor->field_1D0->move_type == MOVETYPE_PHYSICS )
+            if (actor->field_1D0 && actor->field_1D0->move_type == SITH_MT_PHYSICS )
             {
                 rdVector_Copy3(&v18, &actor->field_1D0->position);
                 rdVector_MultAcc3(&v18, &actor->field_1D0->physicsParams.vel, 0.5);
@@ -573,7 +573,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         v31 = aiclass->argsAsFloat[1] * sithTime_deltaSeconds;
         if ( aiclass->argsAsFloat[8] <= _frand()
           || (v16 = actor->field_1D0) == 0
-          || v16->move_type != MOVETYPE_PHYSICS
+          || v16->move_type != SITH_MT_PHYSICS
           || rdVector_IsZero3(&v16->physicsParams.vel) )
         {
             v20 = &actor->thing->lookOrientation;
@@ -1150,7 +1150,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
                 {
                     if ( sithThing_GetParent(v16->field_58[2]) != actor->thing
                       && v16->field_58[2]->thingType == THINGTYPE_WEAPON
-                      && v16->field_58[2]->move_type == MOVETYPE_PHYSICS
+                      && v16->field_58[2]->move_type == SITH_MT_PHYSICS
                       && !sithAI_sub_4EB090(actor->thing, &actor->thing->position, v16->field_58[2], actor->aiclass->fov, 1.0, 0.0, &a5, &tmp) )
                     {
                         movePos.x = a5.x * -aiclass->argsAsFloat[0] + actor->thing->position.x;

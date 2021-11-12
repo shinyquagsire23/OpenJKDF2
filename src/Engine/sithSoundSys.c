@@ -574,7 +574,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
                     return 0;
                 a2->actorParams.field_1BC = sithTime_curMs + sound->sound_len;
             }
-            if ( a2 == g_localPlayerThing || a2->move_type == MOVETYPE_PATH )
+            if ( a2 == g_localPlayerThing || a2->move_type == SITH_MT_PATH )
             {
                 a4a = a5 * 0.60000002;
                 sithSector_AddEntry(a2->sector, &a2->position, 0, a4a, a2);
@@ -1410,7 +1410,7 @@ void sithSoundSys_SetVelocity(sithPlayingSound *sound)
     {
         if ( sound->p3DSoundObj )
         {
-            if ( v1->move_type == MOVETYPE_PHYSICS )
+            if ( v1->move_type == SITH_MT_PHYSICS )
             {
                 a2.x = v1->physicsParams.vel.x * 10.0;
                 a2.y = v1->physicsParams.vel.y * 10.0;

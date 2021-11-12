@@ -114,7 +114,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                    || v4->signature != explosion->child_signature)
                   && sithUnk3_HasLos(explosion, v4, 1) )
                 {
-                    if ( force != 0.0 && v4->move_type == MOVETYPE_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
+                    if ( force != 0.0 && v4->move_type == SITH_MT_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
                     {
                         v5 = -(a1a * force);
                         v6 = i->field_14.y * v5;
