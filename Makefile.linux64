@@ -22,7 +22,7 @@ include common.mk
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
-	$(CC) -c -g -o $@ $< $(CFLAGS)
+	$(CC) -c -g -rdynamic -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -g $^ $(LDFLAGS)
+	$(CC) -o $@ -g -rdynamic $^ $(LDFLAGS)

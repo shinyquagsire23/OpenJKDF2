@@ -167,9 +167,91 @@ int main(int argc, char** argv)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
+#include <errno.h>
+
+//#include "external/libbacktrace/backtrace.h"
+
+static char* executable_path;
+
+#if 0
+static int
+full_callback(void *data __attribute__((unused)), uintptr_t pc, 
+              const char *filename, int lineno, const char *function)
+{  
+   printf("0x%lx %s \t%s:%d\n", (unsigned long) pc, 
+          function == NULL ? "???" : function,
+          filename == NULL ? "???" : filename, lineno);
+
+   return strcmp(function, "main") == 0 ? 1 : 0;
+}
+
+
+static void
+error_callback(void *data, const char *msg, int errnum)
+{
+   printf("Something went wrong in libbacktrace: %s\n", msg);
+}
+#endif
+
+static void full_write(int fd, const char *buf, size_t len)
+{
+    while (len > 0) {
+        ssize_t ret = write(fd, buf, len);
+
+        if ((ret == -1) && (errno != EINTR))
+                break;
+
+        buf += (size_t) ret;
+        len -= (size_t) ret;
+    }
+}
+
+void print_backtrace(void)
+{
+    static const char start[] = "BACKTRACE:\n----------------------\n";
+    static const char end[] = "----------------------\n";
+
+    void *bt[1024];
+    int bt_size;
+    char **bt_syms;
+    int i;
+
+    bt_size = backtrace(bt, 1024);
+    bt_syms = backtrace_symbols(bt, bt_size);
+    full_write(STDERR_FILENO, start, strlen(start));
+    for (i = 1; i < bt_size; i++) {
+            size_t len = strlen(bt_syms[i]);
+            full_write(STDERR_FILENO, bt_syms[i], len);
+            full_write(STDERR_FILENO, "\n", 1);
+    }
+    full_write(STDERR_FILENO, end, strlen(end));
+    free(bt_syms);
+}
+
+void crash_handler_basic(int sig) 
+{
+    print_backtrace();
+    exit(1);
+}
+
+void crash_handler_full(int sig) 
+{
+    //struct backtrace_state *lbstate;
+
+    //printf ("Backtrace:\n");
+    //lbstate = backtrace_create_state (executable_path, 1, error_callback, NULL);      
+    //backtrace_full(lbstate, 0, full_callback, error_callback, 0);
+    exit(1);
+}
 
 int main(int argc, char** argv)
 {
+    executable_path = argv[0];
+    signal(SIGSEGV, crash_handler_basic);
+
 #ifndef ARCH_64BIT
 #ifndef ARCH_WASM
     mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);

@@ -14,6 +14,7 @@ openjkdf2
 openjkdf2-64
 moc*.h
 DF2
+DF2_res
 MOTS
 TPM
 DW
@@ -49,6 +50,8 @@ flex/flexlib.a
 output.map
 output-linux64.map
 output-linux.map
+output-win64.map
+openjkdf2-64.dsym/
 find_noxrefs.py
 imports_conv.py
 cogidk.py
@@ -59,3 +62,4 @@ symbols.ld
 symbols.ld.cog
 Makefile.wasm
 .DS_Store
+*.cxlog
