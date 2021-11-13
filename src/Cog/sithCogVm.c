@@ -788,7 +788,7 @@ sithThing* sithCogVm_PopThing(sithCog *ctx)
     
     if ( world && idx >= 0 && idx < world->numThings )
     {
-        if (world->things[idx].thingType == THINGTYPE_FREE)
+        if (world->things[idx].type == SITH_THING_FREE)
             return NULL;
 
         return &world->things[idx];

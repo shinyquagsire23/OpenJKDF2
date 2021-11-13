@@ -67,7 +67,7 @@ void sithPlayer_NewEntry(sithWorld *world)
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[0];
         for (v5 = v2 + 1; v5 >= 0; v5--)
         {
-            if ( v1->thingType == THINGTYPE_PLAYER && v3 < 0x20 )
+            if ( v1->type == SITH_THING_PLAYER && v3 < 0x20 )
             {
                 playerInfo->playerThing = v1;
                 v1->thingflags |= SITH_TF_INVULN;
@@ -107,7 +107,7 @@ int sithPlayer_GetNum(sithThing *player)
 {
     int i;
 
-    if ( !player || player->thingType != THINGTYPE_PLAYER )
+    if ( !player || player->type != SITH_THING_PLAYER )
         return -1;
     if ( !sithNet_isMulti )
         return 0;
@@ -311,7 +311,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
         sithSave_Load(v1, 0, 0);
     }
     sithSoundSys_ResumeMusic(1);
-    player->thingType = THINGTYPE_PLAYER;
+    player->type = SITH_THING_PLAYER;
     player->lifeLeftMs = 0;
 }
 
@@ -323,7 +323,7 @@ void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
     double v8; // st7
 
     focusThing = sithWorld_pCurWorld->cameraFocus;
-    if ( (focusThing->thingType & THINGTYPE_PLAYER) != 0 ) // ???
+    if ( (focusThing->type & SITH_THING_PLAYER) != 0 ) // ???
     {
         paleffect = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
         if ( tintR < 0.0 )
@@ -441,7 +441,7 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
     int v4; // ecx
     int v5; // eax
 
-    if ( (sithNet_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->thingType == THINGTYPE_PLAYER && thing2->thingType == THINGTYPE_PLAYER )
+    if ( (sithNet_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->type == SITH_THING_PLAYER && thing2->type == SITH_THING_PLAYER )
     {
         v2 = thing1->actorParams.playerinfo;
         if ( v2 )
@@ -501,7 +501,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
                 sithSave_Load(v4, 0, 0);
             }
             sithSoundSys_ResumeMusic(1);
-            thing->thingType = THINGTYPE_PLAYER;
+            thing->type = SITH_THING_PLAYER;
             thing->lifeLeftMs = 0;
         }
     }

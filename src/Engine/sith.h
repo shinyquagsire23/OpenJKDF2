@@ -10,7 +10,7 @@
 #define sith_Free_ADDR (0x004C47B0)
 #define sith_Mode1Init_ADDR (0x004C47D0)
 #define sith_AutoSave_ADDR (0x004C4880)
-#define sith_Mode1Init_2_ADDR (0x004C49D0)
+#define sithOpenNormal_ADDR (0x004C49D0)
 #define sith_Mode1Init_3_ADDR (0x004C4A70)
 #define sith_Open_ADDR (0x004C4B10)
 #define sith_Close_ADDR (0x004C4B80)
@@ -28,7 +28,7 @@ void sith_Shutdown();
 int sith_Load(char *path);
 void sith_Free();
 int sith_Mode1Init(char *a1);
-int sith_Mode1Init_2(char *path);
+int sithOpenNormal(char *path);
 int sith_Mode1Init_3(char *fpath);
 int sith_Open();
 void sith_Close();

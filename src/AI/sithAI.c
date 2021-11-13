@@ -217,12 +217,12 @@ void sithAI_NewEntry(sithThing *thing)
         }
         else
         {
-            thing->thingtype = THINGTYPE_FREE;
+            thing->thingtype = SITH_THING_FREE;
         }
     }
     else
     {
-        thing->thingtype = THINGTYPE_FREE;
+        thing->thingtype = SITH_THING_FREE;
     }
 }
 
@@ -587,7 +587,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
 
 void sithAI_Tick(sithThing *thing, float deltaSeconds)
 {
-    if ( thing->thingType == THINGTYPE_ACTOR && thing->actorParams.health > 0.0 )
+    if ( thing->type == SITH_THING_ACTOR && thing->actorParams.health > 0.0 )
     {
         if ( (thing->actor->flags & SITHAIFLAGS_TURNING_TO_DEST) != 0 )
             sithAI_sub_4EA630(thing->actor, deltaSeconds);
@@ -1055,7 +1055,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
             v23 = v22->receiver;
             if ( v23 != arg8 )
             {
-                if ( v23->thingType == THINGTYPE_ACTOR || v23->thingType == THINGTYPE_COG )
+                if ( v23->type == SITH_THING_ACTOR || v23->type == SITH_THING_COG )
                     break;
                 v22 = sithCollision_NextSearchResult();
                 if ( v22 )
@@ -1485,7 +1485,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
                 {
                     if ( v6 >= sithAI_dword_84DE6C )
                         break;
-                    if ( ((1 << v4->thingType) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                    if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
                     {
                         v13.x = v4->position.x - a2->scale.x;
                         v13.y = v4->position.y - a2->scale.y;
@@ -1566,7 +1566,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
     v3 = a1->thing;
     if ( !a2 )
         goto LABEL_34;
-    if ( a2->thingType != THINGTYPE_ACTOR && a2->thingType != THINGTYPE_PLAYER )
+    if ( a2->type != SITH_THING_ACTOR && a2->type != SITH_THING_PLAYER )
         goto LABEL_34;
     if ( a3 >= 2.0 )
     {

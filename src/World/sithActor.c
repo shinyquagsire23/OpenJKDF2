@@ -64,7 +64,7 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
     int v14; // eax
     sithSoundClass *v15; // eax
 
-    if ( (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) && (thing->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
+    if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
     {
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) != 0 )
@@ -147,7 +147,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
         thingPos.x = thing->position.x;
         thingPos.y = thing->position.y;
         thingPos.z = thing->position.z;
-        if ( thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
+        if ( thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )
         {
             rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
             thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
@@ -161,12 +161,12 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
             if ( sithCogVm_multiplayerFlags && v5 >= 0 )
                 sithSector_cogMsg_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
-            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, THINGTYPE_ACTOR);
+            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
             for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
-                if ( (searchResult->collideType & THINGTYPE_ACTOR) != 0 )
+                if ( (searchResult->collideType & SITH_THING_ACTOR) != 0 )
                 {
-                    if ( (searchResult->surface->surfaceFlags & THINGTYPE_ACTOR) != 0 )
+                    if ( (searchResult->surface->surfaceFlags & SITH_THING_ACTOR) != 0 )
                     {
                         sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
                         sithCollision_SearchClose();
@@ -176,7 +176,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
                 else if ( (searchResult->collideType & 1) != 0 )
                 {
                     v7 = searchResult->receiver;
-                    if ( v7->thingType != THINGTYPE_ITEM && v7->thingType != THINGTYPE_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
+                    if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
                     {
                         sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
                         break;
@@ -192,7 +192,7 @@ void sithActor_Remove(sithThing *thing)
 {
     thing->thingflags |= SITH_TF_DEAD;
     sithThing_detachallchildren(thing);
-    thing->thingType = THINGTYPE_CORPSE;
+    thing->type = SITH_THING_CORPSE;
     thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
     thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
     thing->lifeLeftMs = 20000;

@@ -568,7 +568,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
               v34 = rdVector_Normalize3QuickAcc(&a1),
               v34 <= a5) )
         {
-            if ( (a2->thingType == THINGTYPE_ACTOR || a2->thingType == THINGTYPE_PLAYER) && (flags & SITHSOUNDFLAG_NOOVERRIDE) != 0 && (flags & SITHSOUNDFLAG_200|SITHSOUNDFLAG_HIGHPRIO) == 0 )
+            if ( (a2->type == SITH_THING_ACTOR || a2->type == SITH_THING_PLAYER) && (flags & SITHSOUNDFLAG_NOOVERRIDE) != 0 && (flags & SITHSOUNDFLAG_200|SITHSOUNDFLAG_HIGHPRIO) == 0 )
             {
                 if ( a2->actorParams.field_1BC > sithTime_curMs )
                     return 0;

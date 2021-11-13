@@ -147,7 +147,7 @@ int sith_Mode1Init(char *a1)
     return 1;
 }
 
-int sith_Mode1Init_2(char *path)
+int sithOpenNormal(char *path)
 {
     sithWorld_pCurWorld = sithWorld_New();
 
@@ -394,7 +394,7 @@ void sith_AutoSave()
                 sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
                 v0 = sithWorld_pCurWorld;
             }
-            if ( v3->thingType == THINGTYPE_ACTOR )
+            if ( v3->type == SITH_THING_ACTOR )
             {
                 sithUnk4_SetMaxHeathForDifficulty(v3);
                 v0 = sithWorld_pCurWorld;

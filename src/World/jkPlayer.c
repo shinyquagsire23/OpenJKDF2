@@ -134,7 +134,7 @@ void jkPlayer_InitThings()
     {
         sithThing* thingIter = &sithWorld_pCurWorld->things[i];
 
-        if (thingIter->thingType == THINGTYPE_ACTOR 
+        if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & THING_TYPEFLAGS_BOSS 
             && playerInfoIter < &jkPlayer_otherThings[16] ) // off by one?
         {

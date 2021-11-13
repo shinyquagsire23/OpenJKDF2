@@ -282,7 +282,7 @@ int sithWorld_NewEntry(sithWorld *world)
             for (int i = 0; i < world->numThingsLoaded; i++)
             {
                 v16 = &world->things[i];
-                if ( v16->thingType
+                if ( v16->type
                   && v16->moveType == SITH_MT_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {

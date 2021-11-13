@@ -354,7 +354,7 @@ void jkHud_Draw()
     if ( Main_bDispStats )
     {
         playerThing = sithWorld_pCurWorld->playerThing;
-        if ( playerThing->thingType == THINGTYPE_PLAYER )
+        if ( playerThing->type == SITH_THING_PLAYER )
         {
             v1 = sithInventory_GetBin(playerThing, SITHBIN_FORCEMANA);
             if ( v1 )
@@ -367,7 +367,7 @@ void jkHud_Draw()
             }
             stdString_snprintf(std_genBuffer, 1024, "force: %3.0f, ", tmpFloat1);
             jkHud_GetWeaponAmmo(playerThing);
-            if ( playerThing->thingType == THINGTYPE_PLAYER )
+            if ( playerThing->type == SITH_THING_PLAYER )
             {
                 v2 = playerThing->actorParams.playerinfo->curItem;
                 if ( v2 >= 0 )
@@ -376,7 +376,7 @@ void jkHud_Draw()
                         1024 - _strlen(std_genBuffer),
                         " item: %s,",
                         sithInventory_aDescriptors[v2].fpath);
-                if ( playerThing->thingType == THINGTYPE_PLAYER )
+                if ( playerThing->type == SITH_THING_PLAYER )
                 {
                     v3 = playerThing->actorParams.playerinfo->curPower;
                     if ( v3 >= 0 )
@@ -411,7 +411,7 @@ void jkHud_Draw()
     stdDisplay_VBufferLock(Video_pCanvas->vbuffer);
 #endif
 
-    if ( v4->thingType == THINGTYPE_PLAYER )
+    if ( v4->type == SITH_THING_PLAYER )
     {
         v5 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_BATTERY);
         if ( v5 < 0 )

@@ -24,22 +24,22 @@ int sithCollision_Startup()
 
     _memset(sithCollision_collisionHandlers, 0, 144 * sizeof(sithCollisionEntry)); // sizeof(sithCollision_collisionHandlers)
     _memset(sithCollision_funcList, 0, 12 * sizeof(int)); // sizeof(sithCollision_funcList)
-    sithCollision_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_ACTOR, sithUnk4_ActorActorCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_PLAYER, sithUnk4_ActorActorCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_ACTOR, THINGTYPE_COG, sithUnk4_ActorActorCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_PLAYER, THINGTYPE_PLAYER, sithCollision_DebrisDebrisCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_PLAYER, THINGTYPE_COG, sithCollision_DebrisDebrisCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_DEBRIS, THINGTYPE_ACTOR, sithCollision_DebrisPlayerCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_DEBRIS, THINGTYPE_PLAYER, sithCollision_DebrisPlayerCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_DEBRIS, THINGTYPE_DEBRIS, sithCollision_DebrisDebrisCollide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_ACTOR, sithWeapon_Collide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_PLAYER, sithWeapon_Collide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_DEBRIS, sithWeapon_Collide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_WEAPON, THINGTYPE_COG, sithWeapon_Collide, 0);
-    sithCollision_RegisterCollisionHandler(THINGTYPE_ITEM, THINGTYPE_PLAYER, sithItem_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_ACTOR, sithUnk4_ActorActorCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_PLAYER, sithUnk4_ActorActorCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_COG, sithUnk4_ActorActorCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_PLAYER, SITH_THING_PLAYER, sithCollision_DebrisDebrisCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_PLAYER, SITH_THING_COG, sithCollision_DebrisDebrisCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_DEBRIS, SITH_THING_ACTOR, sithCollision_DebrisPlayerCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_DEBRIS, SITH_THING_PLAYER, sithCollision_DebrisPlayerCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_DEBRIS, SITH_THING_DEBRIS, sithCollision_DebrisDebrisCollide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_ACTOR, sithWeapon_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_PLAYER, sithWeapon_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_DEBRIS, sithWeapon_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_COG, sithWeapon_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_ITEM, SITH_THING_PLAYER, sithItem_Collide, 0);
 
-    sithCollision_RegisterHitHandler(THINGTYPE_ACTOR, (void*)sithUnk4_sub_4ED1D0);
-    sithCollision_RegisterHitHandler(THINGTYPE_WEAPON, sithWeapon_HitDebug);
+    sithCollision_RegisterHitHandler(SITH_THING_ACTOR, (void*)sithUnk4_sub_4ED1D0);
+    sithCollision_RegisterHitHandler(SITH_THING_WEAPON, sithWeapon_HitDebug);
 
     sithCollision_initted = 1;
     return 1;
@@ -60,9 +60,9 @@ void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void
     }
 }
 
-void sithCollision_RegisterHitHandler(int thingType, void* a2)
+void sithCollision_RegisterHitHandler(int type, void* a2)
 {
-    sithCollision_funcList[thingType] = a2;
+    sithCollision_funcList[type] = a2;
 }
 
 sithCollisionSearchEntry* sithCollision_NextSearchResult()
@@ -256,23 +256,23 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
               && ((v9 & 0x10) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
               && v7->collide
               && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0
-              && ((v9 & 0x2000) == 0 || v7->thingType == THINGTYPE_COG) )
+              && ((v9 & 0x2000) == 0 || v7->type == SITH_THING_COG) )
             {
                 if ( !v8 )
                     goto LABEL_41;
                 if ( v8 != v7 )
                 {
-                    v11 = v8->thingType;
-                    v12 = v7->thingType;
+                    v11 = v8->type;
+                    v12 = v7->type;
                     if ( sithCollision_collisionHandlers[12 * v11 + v12].handler )
                     {
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
-                          && (v11 != THINGTYPE_WEAPON
+                          && (v11 != SITH_THING_WEAPON
                            || (v8->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
                            && (v13 != v7 || v8->child_signature != v7->signature))
-                          && (v12 != THINGTYPE_WEAPON
+                          && (v12 != SITH_THING_WEAPON
                            || (v7->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
@@ -303,7 +303,7 @@ LABEL_41:
                                         }
                                         if ( v8 )
                                         {
-                                            handler = sithCollision_collisionHandlers[12 * v8->thingType + v7->thingType].search_handler;
+                                            handler = sithCollision_collisionHandlers[12 * v8->type + v7->type].search_handler;
                                             if ( handler )
                                                 v27 = handler(v8, v7);
                                             else
@@ -690,7 +690,7 @@ float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6,
     {
         a8 |= 0x4;
     }
-    if ( a3->thingType == THINGTYPE_PLAYER )
+    if ( a3->type == SITH_THING_PLAYER )
     {
         a8 |= 0x200;
     }
@@ -806,7 +806,7 @@ LABEL_78:
                 if ( (v19->collideType & 1) != 0 )
                 {
                     v34 = v19->receiver;
-                    v35 = v34->thingType + 12 * v5->thingType;
+                    v35 = v34->type + 12 * v5->type;
                     if ( sithCollision_collisionHandlers[v35].inverse )
                         v36 = sithCollision_collisionHandlers[v35].handler(v34, v5, v19, 1);
                     else
@@ -828,7 +828,7 @@ LABEL_78:
                 else
                 {
                     amount = v19->surface;
-                    v38 = (int (__cdecl *)(sithThing *, sithSurface *, sithCollisionSearchEntry *))sithCollision_funcList[v5->thingType];
+                    v38 = (int (__cdecl *)(sithThing *, sithSurface *, sithCollisionSearchEntry *))sithCollision_funcList[v5->type];
                     if ( v38 )
                         v36 = v38(v5, amount, v19);
                     else

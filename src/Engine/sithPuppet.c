@@ -486,7 +486,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     }
     else
     {
-        if ( thing->thingType == THINGTYPE_PLAYER )
+        if ( thing->type == SITH_THING_PLAYER )
             v23 = 1.0;
         v11 = thing->animclass;
         if ( v11 )
@@ -687,7 +687,7 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
                 return;
             if ( (thing->thingflags & SITH_TF_DEAD) != 0 )
                 return;
-            if ( thing->thingType == THINGTYPE_CORPSE )
+            if ( thing->type == SITH_THING_CORPSE )
                 return;
             v5 = thing->attach_flags;
             if ( !v5 || !thing->soundclass )
@@ -733,7 +733,7 @@ LABEL_14:
             sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + 4 * v3 + 6));
             return;
         case 3u:
-            if ( thing->thingtype == THINGTYPE_ACTOR )
+            if ( thing->thingtype == SITH_THING_ACTOR )
             {
                 v12 = thing->actor;
                 if ( v12 )
@@ -782,7 +782,7 @@ LABEL_14:
             {
                 sithActor_JumpWithVel(thing, 2.0);
 LABEL_50:
-                if ( v11->thingtype == THINGTYPE_ACTOR )
+                if ( v11->thingtype == SITH_THING_ACTOR )
                     v11->actor->flags |= 1u;
             }
             return;

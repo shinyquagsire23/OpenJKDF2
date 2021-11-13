@@ -99,7 +99,7 @@ int sithSave_LoadEntry(char *fpath)
         }
         sith_Close();
     }
-    if ( !sith_Mode1Init_2(SrcStr) )
+    if ( !sithOpenNormal(SrcStr) )
     {
         goto load_fail;
     }

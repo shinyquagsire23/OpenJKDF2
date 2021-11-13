@@ -172,7 +172,7 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
         sithThing_ParseArgs(&stdConffile_entry.args[i], &tmp);
     }
 
-    if (!tmp.thingType )
+    if (!tmp.type )
         return 0;
 
     if ( world->numTemplatesLoaded >= world->numTemplates )

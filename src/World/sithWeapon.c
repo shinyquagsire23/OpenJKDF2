@@ -556,7 +556,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 if ( (v19->collideType & 1) != 0 )
                 {
                     v20 = v19->receiver;
-                    if ( v20->thingtype == THINGTYPE_ACTOR )
+                    if ( v20->thingtype == SITH_THING_ACTOR )
                         sithAI_SetActorFireTarget(v20->actor, 0x1000, v9); // aaaaaaaaa undefined
                 }
             }
@@ -630,7 +630,7 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
     }
     v5 = physicsThing->weaponParams.typeflags & 0x400;
     if ( (v4 & 0x400) != 0 && (collidedThing->thingflags & SITH_TF_4) != 0
-      || collidedThing->thingType == THINGTYPE_COG && (v4 & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 && physicsThing->weaponParams.field_18 < 2u )
+      || collidedThing->type == SITH_THING_COG && (v4 & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 && physicsThing->weaponParams.field_18 < 2u )
     {
         v6 = physicsThing->weaponParams.field_18;
         physicsThing->weaponParams.field_18 = v6 + 1;
@@ -667,8 +667,8 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
             return;
         }
     }
-    v15 = collidedThing->thingType;
-    if ( v15 != THINGTYPE_ACTOR && v15 != THINGTYPE_PLAYER )
+    v15 = collidedThing->type;
+    if ( v15 != SITH_THING_ACTOR && v15 != SITH_THING_PLAYER )
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
@@ -1170,7 +1170,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
     
     //return sithWeapon_HandleWeaponKeys_(player, a2);
 
-    if ( player->thingType != THINGTYPE_PLAYER || (player->thingflags & SITH_TF_DEAD) != 0 )
+    if ( player->type != SITH_THING_PLAYER || (player->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
 
     if ( (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
@@ -1404,9 +1404,9 @@ sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTem
     sithThing *a1b; // [esp+80h] [ebp+4h]
     float a5a; // [esp+90h] [ebp+14h]
 
-    thingtype = sender->thingType;
+    thingtype = sender->type;
     _memcpy(&out, &sender->lookOrientation, sizeof(out));
-    if ( thingtype == THINGTYPE_ACTOR || thingtype == THINGTYPE_PLAYER )
+    if ( thingtype == SITH_THING_ACTOR || thingtype == SITH_THING_PLAYER )
         rdMatrix_PreRotate34(&out, &sender->actorParams.eyePYR);
     if ( fireOffset->x == 0.0 && fireOffset->y == 0.0 && fireOffset->z == 0.0 )
     {

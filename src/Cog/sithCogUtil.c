@@ -626,7 +626,7 @@ void sithCogUtil_GetThingTemplateCount(sithCog *ctx)
         for (int i = 0; i < v1->numThings; i++ )
         {
             sithThing* thing = &v1->things[i];
-            if ( thing->thingType && thing->thingType != THINGTYPE_CORPSE && thing->templateBase == v2 )
+            if ( thing->type && thing->type != SITH_THING_CORPSE && thing->templateBase == v2 )
                 ++template_count;
         }
         sithCogVm_PushInt(ctx, template_count);
@@ -746,7 +746,7 @@ void sithCogUtil_SetInvFlags(sithCog *ctx)
     flags = sithCogVm_PopInt(ctx);
     binIdx = sithCogVm_PopInt(ctx);
     player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
         sithInventory_SetFlags(player, binIdx, flags);
 }
 
@@ -1054,7 +1054,7 @@ void sithCogUtil_AddDynamicTint(sithCog *ctx)
     fG = sithCogVm_PopFlex(v1);
     fR = sithCogVm_PopFlex(v1);
     player = sithCogVm_PopThing(v1);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player == g_localPlayerThing )
+    if ( player && player->type == SITH_THING_PLAYER && player == g_localPlayerThing )
         sithPlayer_AddDynamicTint(fR, fG, fB);
 }
 
@@ -1069,7 +1069,7 @@ void sithCogUtil_AddDynamicAdd(sithCog *ctx)
     g = sithCogVm_PopInt(ctx);
     r = sithCogVm_PopInt(ctx);
     playerThing = sithCogVm_PopThing(ctx);
-    if ( playerThing && playerThing->thingType == THINGTYPE_PLAYER && playerThing == g_localPlayerThing )
+    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == g_localPlayerThing )
         sithPlayer_AddDyamicAdd(r, g, b);
 }
 
@@ -1138,7 +1138,7 @@ void sithCogUtil_SendTrigger(sithCog *ctx)
     sourceThing = sithCogVm_PopThing(ctx);
     if ( sourceThing )
     {
-        if ( sourceThing->thingType == THINGTYPE_PLAYER )
+        if ( sourceThing->type == SITH_THING_PLAYER )
         {
             playerinfo = sourceThing->actorParams.playerinfo;
             if ( playerinfo )
@@ -1277,7 +1277,7 @@ void sithCogUtil_SetCurWeapon(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ( player )
     {
-        if ( player->thingType == THINGTYPE_PLAYER )
+        if ( player->type == SITH_THING_PLAYER )
         {
             v4 = sithInventory_SelectWeaponFollowing(idx);
             sithInventory_SetCurWeapon(player, v4);
@@ -1291,7 +1291,7 @@ void sithCogUtil_GetWeaponPriority(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER )
+    if ( player && player->type == SITH_THING_PLAYER )
     {
         if ( mode < 0 || mode > 2 )
         {
@@ -1316,7 +1316,7 @@ void sithCogUtil_GetCurWeapon(sithCog *ctx)
 {
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER )
+    if ( player && player->type == SITH_THING_PLAYER )
     {
         sithCogVm_PushInt(ctx, sithInventory_GetCurWeapon(player));
     }

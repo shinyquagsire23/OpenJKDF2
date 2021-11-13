@@ -51,7 +51,7 @@ for line in mapread:
     
     if funcname == "":
         continue
-    
+
     filefrom = funcname.split("_")[0]
     
     if (len(funcname.split("_")) < 2 and filefrom[:2] == "rd"):
@@ -60,6 +60,9 @@ for line in mapread:
     if (len(funcname.split("_")) < 2 and filefrom[:3] == "std"):
         filefrom = "stdPlatform"
     
+    if "_" not in funcname and funcname.startswith("sith"):
+        filefrom = "sith"
+
     is_excluded = False
     for exclude in exclude_filefrom:
         if (filefrom == exclude) or filefrom == "":
@@ -96,6 +99,9 @@ for line in funclist:
     
     if (len(funcname.split("_")) < 2 and filefrom[:3] == "std"):
         filefrom = "stdPlatform"
+    
+    if "_" not in funcname and funcname.startswith("sith"):
+        filefrom = "sith"
     
     is_excluded = False
     for exclude in exclude_filefrom:

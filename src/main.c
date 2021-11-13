@@ -9,6 +9,7 @@
 #include "Cog/sithCogVm.h"
 #include "Cog/jkCog.h"
 #include "Cog/sithCogYACC.h"
+#include "Cog/sithCogFunctionThing.h"
 #include "Cog/y.tab.h"
 #include "General/stdBitmap.h"
 #include "General/stdMath.h"
@@ -347,7 +348,7 @@ void do_hooks()
     hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
     hook_function(sithCog_GetByIdx_ADDR, sithCog_GetByIdx);
     hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
-    hook_function(sithCogThing_Initialize_ADDR, sithCogThing_Initialize);
+    hook_function(sithCogFunctionThing_Initialize_ADDR, sithCogFunctionThing_Initialize);
     hook_function(sithCogAI_Initialize_ADDR, sithCogAI_Initialize);
     hook_function(sithCogSurface_Initialize_ADDR, sithCogSurface_Initialize);
     hook_function(sithCogSound_Initialize_ADDR, sithCogSound_Initialize);
@@ -1075,7 +1076,7 @@ void do_hooks()
     hook_function(sith_Load_ADDR, sith_Load);
     hook_function(sith_Free_ADDR, sith_Free);
     hook_function(sith_Mode1Init_ADDR, sith_Mode1Init);
-    hook_function(sith_Mode1Init_2_ADDR, sith_Mode1Init_2);
+    hook_function(sithOpenNormal_ADDR, sithOpenNormal);
     hook_function(sith_Mode1Init_3_ADDR, sith_Mode1Init_3);
     hook_function(sith_Open_ADDR, sith_Open);
     hook_function(sith_Close_ADDR, sith_Close);

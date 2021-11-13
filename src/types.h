@@ -2243,7 +2243,7 @@ typedef struct sithThing
     uint32_t thingflags;
     uint32_t thingIdx;
     uint32_t thing_id;
-    uint32_t thingType;
+    uint32_t type;
     uint32_t moveType;
     uint32_t thingtype;
     int lifeLeftMs;

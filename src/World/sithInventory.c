@@ -799,7 +799,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player)
     int keyRead;
 
     v1 = player;
-    if ( player->thingType == THINGTYPE_PLAYER )
+    if ( player->type == SITH_THING_PLAYER )
     {
         v39 = player->actorParams.playerinfo->iteminfo;
         if ( (player->thingflags & 0x200) == 0 )

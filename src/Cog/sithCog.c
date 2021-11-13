@@ -4,7 +4,7 @@
 #include "types.h"
 #include "Win95/DebugConsole.h"
 #include "Cog/sithCogUtil.h"
-#include "Cog/sithCogThing.h"
+#include "Cog/sithCogFunctionThing.h"
 #include "Cog/sithCogPlayer.h"
 #include "Cog/sithCogAI.h"
 #include "Cog/sithCogSurface.h"
@@ -55,7 +55,7 @@ int sithCog_Startup()
     }
     g_cog_symbolTable->bucket_idx = 0x100;
     sithCogUtil_Initialize(g_cog_symbolTable);
-    sithCogThing_Initialize(g_cog_symbolTable);
+    sithCogFunctionThing_Initialize(g_cog_symbolTable);
     sithCogAI_Initialize(g_cog_symbolTable);
     sithCogSurface_Initialize(g_cog_symbolTable);
     sithCogSound_Initialize(g_cog_symbolTable);
@@ -502,7 +502,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymb
             v17 = idk->mask;
             v18 = idk->linkid;
             v19 = &sithWorld_pCurWorld->things[v3];
-            if ( sithThing_GetIdxFromThing(v19) && v19->thingType && v18 >= 0 )
+            if ( sithThing_GetIdxFromThing(v19) && v19->type && v18 >= 0 )
             {
                 v21 = sithCog_numThingLinks;
                 v19->thingflags |= SITH_TF_CAPTURED;
@@ -588,7 +588,7 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
     {
         v7 = receiver->thingIdx;
         v8 = 3;
-        receivera = 1 << receiver->thingType;
+        receivera = 1 << receiver->type;
     }
     else
     {
@@ -703,7 +703,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
     {
         v8 = thing->thingIdx;
         sourceType = SENDERTYPE_THING;
-        v15 = 1 << thing->thingType;
+        v15 = 1 << thing->type;
     }
     else
     {
@@ -773,7 +773,7 @@ float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SIT
     {
         v8 = sourceType->thingIdx;
         sourceTypea = SENDERTYPE_THING;
-        v14 = 1 << sourceType->thingType;
+        v14 = 1 << sourceType->type;
     }
     else
     {

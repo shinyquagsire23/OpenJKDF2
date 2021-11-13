@@ -763,7 +763,7 @@ LABEL_26:
             }
             if ( _frand() < 0.1 && flags == SITHAIFLAGS_MOVING_TO_DEST )
             {
-                if ( v17->thingType == THINGTYPE_ACTOR || v17->thingType == THINGTYPE_PLAYER )
+                if ( v17->type == SITH_THING_ACTOR || v17->type == SITH_THING_PLAYER )
                 {
                     v24 = actor_->flags;
                     actor_->field_1D0 = v17;
@@ -826,7 +826,7 @@ LABEL_15:
         sithAI_SetMoveThing(actor_, &actor_->field_1C4, 1.0);
         sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_CURIOUS);
     }
-    if ( v15 && v15->thingType )
+    if ( v15 && v15->type )
     {
         sithAI_SetLookFrame(actor_, &v15->position);
         result = 0;
@@ -1149,7 +1149,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
                 if ( v16->field_58[2] )
                 {
                     if ( sithThing_GetParent(v16->field_58[2]) != actor->thing
-                      && v16->field_58[2]->thingType == THINGTYPE_WEAPON
+                      && v16->field_58[2]->type == SITH_THING_WEAPON
                       && v16->field_58[2]->moveType == SITH_MT_PHYSICS
                       && !sithAI_sub_4EB090(actor->thing, &actor->thing->position, v16->field_58[2], actor->aiclass->fov, 1.0, 0.0, &a5, &tmp) )
                     {

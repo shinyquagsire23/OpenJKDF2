@@ -325,7 +325,7 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
     rdVector_Zero3(&thing->physicsParams.velocityMaybe);
     rdVector_Zero3(&thing->physicsParams.addedVelocity);
 
-    if ((thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) 
+    if ((thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) 
         && (thing->actorParams.typeflags & SITH_TF_TIMER))
     {
         rdVector_Zero3(&thing->physicsParams.acceleration);
@@ -340,12 +340,12 @@ void sithSector_ThingPhysicsTick(sithThing *thing, float deltaSecs)
         sithSector_ThingPhysUnderwater(thing, deltaSecs);
     }
 #ifdef QOL_IMPROVEMENTS
-    else if ( thing->thingType == THINGTYPE_PLAYER && sithNet_isMulti)
+    else if ( thing->type == SITH_THING_PLAYER && sithNet_isMulti)
     {
         sithSector_ThingPhysPlayer(thing, deltaSecs);
     }
 #else
-    else if ( thing->thingType == THINGTYPE_PLAYER )
+    else if ( thing->type == SITH_THING_PLAYER )
     {
         sithSector_ThingPhysPlayer(thing, deltaSecs);
     }
@@ -553,7 +553,7 @@ void sithSector_ThingLandIdk(sithThing *thing, int a3)
     if (!sector)
         return;
 
-    if (sector->flags & SITH_SF_UNDERWATER && thing->thingType == THINGTYPE_PLAYER)
+    if (sector->flags & SITH_SF_UNDERWATER && thing->type == SITH_THING_PLAYER)
     {
         sithCollision_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
         v5 = sithCollision_NextSearchResult();
@@ -652,7 +652,7 @@ LABEL_8:
                 if ( range != 0.0 )
                     break;
 
-                if ( thing->thingType != THINGTYPE_ACTOR && thing->thingType != THINGTYPE_PLAYER )
+                if ( thing->type != SITH_THING_ACTOR && thing->type != SITH_THING_PLAYER )
                     break;
                 if ( thing->moveSize == 0.0 )
                     break;
@@ -757,7 +757,7 @@ int sithSector_GetNumPlayers(sithSector *sector)
     result = 0;
     for ( i = sector->thingsList; i; i = i->nextThing )
     {
-        if ( i->thingType == THINGTYPE_PLAYER )
+        if ( i->type == SITH_THING_PLAYER )
             ++result;
     }
     return result;
@@ -1037,7 +1037,7 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     rdVector_Add3Acc(&thing->physicsParams.vel, &vel_change);
     
     // Is the player climbing up/down a slope?
-    if ( thing->thingType == THINGTYPE_PLAYER
+    if ( thing->type == SITH_THING_PLAYER
       && (thing->physicsParams.physflags & PHYSFLAGS_GRAVITY) != 0
       && v158 < 1.0
       && (possibly_undef_2 < 0.80000001 || !rdVector_IsZero3(&thing->physicsParams.vel)) )
@@ -1084,21 +1084,21 @@ void sithSector_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     v131 = stdMath_ClipPrecision(v131);
     if ( v131 != 0.0 )
     {
-        //if (thing->thingType == THINGTYPE_PLAYER)
+        //if (thing->type == SITH_THING_PLAYER)
         //    printf("%f before\n", v131);
         v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
-        //if (thing->thingType == THINGTYPE_PLAYER)
+        //if (thing->type == SITH_THING_PLAYER)
         //    printf("%f after\n", v131);
 
         if ( (thing->physicsParams.physflags & PHYSFLAGS_800) != 0 )
         {
-            //if (thing->thingType == THINGTYPE_PLAYER)
+            //if (thing->type == SITH_THING_PLAYER)
             //    printf("a\n");
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
         else
         {
-            //if (thing->thingType == THINGTYPE_PLAYER)
+            //if (thing->type == SITH_THING_PLAYER)
             //    printf("b\n");
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
@@ -1651,8 +1651,8 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
     NETMSG_START;
 
     NETMSG_PUSHS16(thing->thingIdx);
-    NETMSG_PUSHS16(thing->thingType);
-    if ( thing->thingType )
+    NETMSG_PUSHS16(thing->type);
+    if ( thing->type )
     {
         NETMSG_PUSHS16(thing->templateBase->thingIdx);
         NETMSG_PUSHS32(thing->signature);
@@ -1693,11 +1693,11 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
                 NETMSG_PUSHS16(-1);
             }
         }
-        switch ( thing->thingType )
+        switch ( thing->type )
         {
-            case THINGTYPE_ACTOR:
-            case THINGTYPE_CORPSE:
-            case THINGTYPE_PLAYER:
+            case SITH_THING_ACTOR:
+            case SITH_THING_CORPSE:
+            case SITH_THING_PLAYER:
                 NETMSG_PUSHU32(thing->actorParams.typeflags);
                 NETMSG_PUSHF32(thing->actorParams.health);
                 NETMSG_PUSHF32(thing->actorParams.extraSpeed);
@@ -1717,12 +1717,12 @@ void sithSector_cogMsg_SendSyncThingFull(sithThing *thing, int sendto_id, int mp
                     NETMSG_PUSHS32(-1);
                 }
                 break;
-            case THINGTYPE_WEAPON:
+            case SITH_THING_WEAPON:
                 NETMSG_PUSHU32(thing->weaponParams.typeflags);
                 NETMSG_PUSHF32(thing->weaponParams.unk8);
                 NETMSG_PUSHS16(thing->weaponParams.field_18);
                 break;
-            case THINGTYPE_EXPLOSION:
+            case SITH_THING_EXPLOSION:
                 NETMSG_PUSHU32(thing->explosionParams.typeflags);
                 break;
             default:
@@ -1771,7 +1771,7 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
     int32_t v8; // ecx
     sithThing* thing;
     sithSector* v11;
-    int thingType;
+    int type;
 
 
     NETMSG_IN_START(msg);
@@ -1783,7 +1783,7 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
     if ( thingIdx >= sithWorld_pCurWorld->numThingsLoaded )
         return 0;
 
-    if ( sithWorld_pCurWorld->things[thingIdx].thingType )
+    if ( sithWorld_pCurWorld->things[thingIdx].type )
         sithThing_FreeEverythingNet(&sithWorld_pCurWorld->things[thingIdx]);
 
     if ( sithWorld_pCurWorld->numThings > thingIdx )
@@ -1791,8 +1791,8 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
 
     sithWorld_pCurWorld->numThings = thingIdx;
 
-    thingType = NETMSG_POPS16();
-    if ( !thingType )
+    type = NETMSG_POPS16();
+    if ( !type )
         return 1;
 
     thing = &sithWorld_pCurWorld->things[thingIdx];
@@ -1806,7 +1806,7 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
 
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
-    thing->thingType = thingType;
+    thing->type = type;
     thing->position = NETMSG_POPVEC3();
     thing->lookOrientation.rvec = NETMSG_POPVEC3();
     thing->lookOrientation.lvec = NETMSG_POPVEC3();
@@ -1833,11 +1833,11 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
         thing->class_cog = sithCog_GetByIdx(NETMSG_POPS16());
         thing->capture_cog = sithCog_GetByIdx(NETMSG_POPS16());
     }
-    switch ( thing->thingType )
+    switch ( thing->type )
     {
-        case THINGTYPE_ACTOR:
-        case THINGTYPE_CORPSE:
-        case THINGTYPE_PLAYER:
+        case SITH_THING_ACTOR:
+        case SITH_THING_CORPSE:
+        case SITH_THING_PLAYER:
             thing->actorParams.typeflags = NETMSG_POPU32();
             thing->actorParams.health = NETMSG_POPF32();
             thing->actorParams.extraSpeed = NETMSG_POPF32();
@@ -1856,12 +1856,12 @@ int sithSector_cogMsg_HandleSyncThingFull(sithCogMsg *msg)
                 thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPS32();
             }
             break;
-        case THINGTYPE_WEAPON:
+        case SITH_THING_WEAPON:
             thing->weaponParams.typeflags = NETMSG_POPU32();
             thing->weaponParams.unk8 = NETMSG_POPF32();
             thing->weaponParams.field_18 = NETMSG_POPS16();
             break;
-        case THINGTYPE_EXPLOSION:
+        case SITH_THING_EXPLOSION:
             thing->explosionParams.typeflags = NETMSG_POPU32();
             break;
         default:
@@ -2073,7 +2073,7 @@ int sithSector_cogMsg_HandleSyncAI(sithCogMsg *msg)
     thing = sithThing_GetThingByIdx(NETMSG_POPS16());
     if ( !thing )
         return 0;
-    if ( thing->thingtype != THINGTYPE_ACTOR )
+    if ( thing->thingtype != SITH_THING_ACTOR )
         return 0;
     actor = thing->actor;
     if ( !actor )
@@ -2295,7 +2295,7 @@ LABEL_11:
 
 void sithSector_cogMsg_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags)
 {
-    if ( thing->thingType == THINGTYPE_PLAYER || thing->thingType == THINGTYPE_ACTOR )
+    if ( thing->type == SITH_THING_PLAYER || thing->type == SITH_THING_ACTOR )
     {
         sithPlayerInfo* v5 = thing->actorParams.playerinfo;
         if ( v5 )
@@ -2335,7 +2335,7 @@ int sithSector_cogMsg_HandleSyncItemDesc(sithCogMsg *msg)
         return 0;
 
     thing = &sithWorld_pCurWorld->things[thingIdx];
-    if ( thing->thingType != THINGTYPE_ACTOR && thing->thingType != THINGTYPE_PLAYER )
+    if ( thing->type != SITH_THING_ACTOR && thing->type != SITH_THING_PLAYER )
         return 0;
 
     playerInfo = thing->actorParams.playerinfo;

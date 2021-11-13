@@ -1,6 +1,6 @@
 # OpenJKDF2
 
-This directory contains a function-by-function reimplementation of DF2 in C. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port. It also contains the original versions of `byacc` and `flex` for COG script parsing.
+OpenJKDF2 is a function-by-function reimplementation of DF2 in C, with 64-bit ports to MacOS and Linux. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port, as well as scattered assertions from various other games. It also contains the original versions of `byacc` and `flex` used for COG script parsing.
 
 ![MacOS Screenshot](docs/images/screenshot.png)
 
@@ -102,6 +102,8 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
         └── 57A.SMK
 ```
 
+When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied the GLSL shaders from `resource/shaders/*` to `<JK.EXE base folder>/resource/shaders/*`, as shown above.
+
 ## Building
 
 See [here](BUILDING.md) for instructions.
@@ -121,8 +123,10 @@ See [here](BUILDING.md) for instructions.
  - Map view with TAB
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
 
-## Usage
-`df2_reimpl` supports both the KVM target from the directory above as well as WINE/Windows, though no guarantees are made for the addition of ie jkgfxmod, other patches nor other hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl_kvm.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl.dll` is compiled without those linker flags.
+## Usage with original JK.EXE and DirectX
+OpenJKDF2 is usable as a hook-and-replace DLL with the original JK.EXE (v1.0) to allow for quality-of-life improvements and multiplayer, since the SDL2 and 64-bit versions do not currently have DirectPlay functions implemented.
+
+`df2_reimpl` supports both the KVM target (OpenJKDF2-KVM) as well as WINE/Windows, though no guarantees are made for the addition of jkgfxmod, nor other patches and hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl_kvm.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl.dll` is compiled without those linker flags.
 
 Hooking is done by patching JK.EXE with `JK-hook.ips` (using Lunar IPS or similar). This patch replaces `Window_Main` at offset 0x10db50 with the following:
 ```
@@ -138,7 +142,7 @@ OpenJKDF2 then calls the necessary `VirtualProtect` functions from `hook_init_wi
 
 TL;DR for Windows users
 - Patch JK.EXE with `JK-hook.ips`
-- Compile df2_reimpl
+- Compile df2_reimpl with `make`
 - Copy `df2_reimpl.dll` to the same folder as `JK.EXE`
 
 ## Methodology
@@ -154,16 +158,9 @@ If you'd like a copy of my IDB to examine functions which haven't been decompile
 
 ## Linux Partial Compilation (mmap blobs)
 
-`openjkdf2` supports an experimental partial compilation for Linux/SDL2, using `make -f Makefile.linux`. `openjkdf2` can then be copied to the same directory as JK.EXE and run. It can currently access the player selection, singleplayer, options, and level loading screen before reaching unimplemented code.
+OpenJKDF2 supports an experimental partial compilation for Linux/SDL2, using `make -f Makefile.linux`. `openjkdf2` can then be copied to the same directory as JK.EXE and run.
 
 `mmap` is used to maintain all `.rodata`, `.data`, and `.bss` variables in the same addresses as `JK.EXE`, however if `openjkdf2` invokes an unimplemented function, it will segfault at the unimplemented function address.
-
-The current dependency list (for Arch) is as follows:
-```
-lib32-sdl2 lib32-glew lib32-openal lib32-freealut 
-```
-
-When running on Linux, be sure to have copied the GLSL shaders from `df2_reimpl/resource/shaders/*` to `<JK.EXE base folder>/resource/shaders/*`.
 
 ## Current Progress
 
@@ -268,7 +265,7 @@ sithAICmd                      0x2cc0     1.062%        100.000%       22 / 22
 jkGuiRend                      0x2cd7     1.064%        100.000%       68 / 68         
 jkPlayer                       0x2da2     1.083%        100.000%       45 / 45         
 sithWeapon                     0x32a8     1.202%        100.000%       33 / 33         
-sithCogThing                   0x3a4c     1.384%        100.000%      142 / 142        
+sithCogFunctionThing           0x3a4c     1.384%        100.000%      142 / 142        
 smack                          0x466      0.104%        0.000%          0 / 6          
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 Video                          0x5dc      0.139%        19.800%         3 / 5          
@@ -311,7 +308,7 @@ sithDebugConsole               0x11b2     0.420%        13.135%         1 / 20
 jkCog                          0x11b8     0.421%        73.523%        29 / 40         
 sithPuppet                     0x1222     0.430%        86.579%        13 / 17         
 sithCamera                     0x124b     0.434%        98.612%        19 / 23         
-sithCollide                    0x12a8     0.443%        92.588%         9 / 12         
+sithIntersect                  0x12a8     0.443%        92.588%         9 / 12         
 jkGuiDisplay                   0x12ff     0.451%        0.000%          0 / 11         
 stdControl                     0x1323     0.454%        0.776%          1 / 23         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
@@ -328,10 +325,10 @@ sithMulti                      0x252a     0.882%        0.105%          1 / 35
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
 stdDisplay                     0x267b     0.913%        0.264%          2 / 37         
 sithControl                    0x2723     0.929%        34.944%         9 / 32         
-sithUnk3                       0x2827     0.953%        91.760%        18 / 22         
+sithCollision                  0x2827     0.953%        91.760%        18 / 22         
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
 rdCache                        0x331c     1.213%        43.557%        13 / 16         
-sithThing                      0x3c2e     1.429%        87.200%        44 / 53         
+sithThing                      0x3c2e     1.429%        89.381%        45 / 53         
 sithSector                     0x79f9     2.895%        79.680%        57 / 96         
 rdClip                         0x81f2     3.085%        63.242%        12 / 17         
 rdRaster                       0xf04d     5.704%        0.195%          1 / 89         
@@ -342,15 +339,15 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-41.674% by weight
-70.399% by weight excluding rasterizer
-2081 / 3167 functions
-2081 / 2796 functions excluding rasterizer
+41.705% by weight
+70.452% by weight excluding rasterizer
+2082 / 3167 functions
+2082 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           3.588%          188 / 1322
+sith           3.557%          187 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.332%          175 / 360
 jkGui          3.467%          119 / 284
@@ -359,12 +356,12 @@ jk             1.504%          103 / 322
 Raster         40.792%         370 / 371
 other          1.397%           67 / 120
 -----------------------------------------
-total          58.326%        1086 / 3167
+total          58.295%        1085 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           6.061%          188 / 1322
+sith           6.009%          187 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.318%          175 / 360
 jkGui          5.856%          119 / 284
@@ -372,6 +369,6 @@ rd             5.001%           31 / 345
 jk             2.541%          103 / 322
 other          2.360%           67 / 120
 -----------------------------------------
-total          29.620%         716 / 2796
+total          29.567%         715 / 2796
 
 ```

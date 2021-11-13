@@ -165,7 +165,7 @@ LABEL_39:
         else
         {
             sithControl_PlayerLook(player, deltaSecs);
-            if ( player->thingType != THINGTYPE_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
+            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
             {
                 if ( player->attach_flags )
                     sithControl_PlayerMovement(player);
@@ -286,7 +286,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
     float a3a; // [esp+1Ch] [ebp+8h]
 
     v3 = 0;
-    if ( (player->thingType == THINGTYPE_ACTOR || player->thingType == THINGTYPE_PLAYER) && deltaSecs != 0.0 )
+    if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
         if ( (player->actorParams.typeflags & THING_TYPEFLAGS_1) != 0 )
         {
@@ -403,7 +403,7 @@ void sithControl_PlayerMovement(sithThing *player)
         move_multiplier *= 0.5;
     }
 
-    if ( player->thingType == THINGTYPE_ACTOR || player->thingType == THINGTYPE_PLAYER )
+    if ( player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER )
     {
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
         {
@@ -482,7 +482,7 @@ void sithControl_FreeCam(sithThing *player)
     if ( (sithWeapon_controlOptions & 2) == 0 )
         sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0);
     sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0);
-    if ( v1->thingType == THINGTYPE_ACTOR || v1->thingType == THINGTYPE_PLAYER )
+    if ( v1->type == SITH_THING_ACTOR || v1->type == SITH_THING_PLAYER )
     {
         v5 = stdControl_GetAxis2(0);
         v6 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;

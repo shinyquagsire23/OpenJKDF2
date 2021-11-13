@@ -30,7 +30,7 @@
 int sithCollision_Startup();
 static void (*sithCollision_Shutdown)() = (void*)sithCollision_Shutdown_ADDR;
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);
-void sithCollision_RegisterHitHandler(int thingType, void* a2);
+void sithCollision_RegisterHitHandler(int type, void* a2);
 #if 1
 sithCollisionSearchEntry* sithCollision_NextSearchResult();
 float sithCollision_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags);

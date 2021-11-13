@@ -9,7 +9,7 @@
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Initialize_ADDR (0x40A0C0)
 #define sithCogUtil_Initialize_ADDR (0x00505400)
-#define sithCogThing_Initialize_ADDR (0x005014E0)
+#define sithCogFunctionThing_Initialize_ADDR (0x005014E0)
 #define sithCogAI_Initialize_ADDR (0x00500B00)
 #define sithCogSound_Initialize_ADDR (0x004FF060)
 #define sithCogPlayer_Initialize_ADDR (0x004E0780)

@@ -388,7 +388,7 @@ void jkCog_SetPovModel(sithCog *ctx)
     {
         if ( model3 )
         {
-            if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
+            if ( actorThing->type == SITH_THING_ACTOR || actorThing->type == SITH_THING_PLAYER )
                 jkPlayer_SetPovModel(actorThing->playerInfo, model3);
         }
     }
@@ -410,7 +410,7 @@ void jkCog_PlayPovKey(sithCog *ctx)
     actorThing = sithCogVm_PopThing(ctx);
     if ( actorThing
       && keyframe
-      && ((v5 = actorThing->thingType, v5 == THINGTYPE_ACTOR) || v5 == THINGTYPE_PLAYER)
+      && ((v5 = actorThing->type, v5 == SITH_THING_ACTOR) || v5 == SITH_THING_PLAYER)
       && (v6 = actorThing->playerInfo->povModel.puppet) != 0 )
     {
         v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, 0);
@@ -434,7 +434,7 @@ void jkCog_StopPovKey(sithCog *ctx)
     actorThing = sithCogVm_PopThing(ctx);
     if ( actorThing )
     {
-        if ( actorThing->thingType == THINGTYPE_ACTOR || actorThing->thingType == THINGTYPE_PLAYER )
+        if ( actorThing->type == SITH_THING_ACTOR || actorThing->type == SITH_THING_PLAYER )
         {
             v5 = actorThing->playerInfo->povModel.puppet;
             if ( v5 && v2 >= 0 && v2 < 4 )
@@ -649,7 +649,7 @@ void jkCog_EnableSaber(sithCog *ctx)
     a2 = sithCogVm_PopFlex(ctx);
     v2 = sithCogVm_PopThing(ctx);
     v3 = v2;
-    if ( v2 && v2->thingType == THINGTYPE_PLAYER )
+    if ( v2 && v2->type == SITH_THING_PLAYER )
     {
         jkSaber_Enable(v2, a2, a3, a1a);
         if ( sithCogVm_multiplayerFlags )
@@ -664,7 +664,7 @@ void jkCog_DisableSaber(sithCog *ctx)
     v1 = sithCogVm_PopThing(ctx);
     if ( v1 )
     {
-        if ( v1->thingType == THINGTYPE_PLAYER )
+        if ( v1->type == SITH_THING_PLAYER )
             jkSaber_Disable(v1);
     }
 }
@@ -680,7 +680,7 @@ void jkCog_SetWaggle(sithCog *ctx)
     v2 = sithCogVm_PopThing(ctx);
     if ( v2 )
     {
-        if ( v2->thingType == THINGTYPE_PLAYER )
+        if ( v2->type == SITH_THING_PLAYER )
             jkPlayer_SetWaggle(v2, &a2, a1a);
     }
 }

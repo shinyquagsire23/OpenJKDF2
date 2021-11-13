@@ -527,7 +527,7 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
         }
     }
 
-    if ( !sound && thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER )
+    if ( !sound && thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )
         thing->actorParams.field_1BC = 0;
 }
 

@@ -12,7 +12,7 @@ void sithCogPlayer_SetInvActivate(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( bActivate )
             sithInventory_SetActivate(player, binIdx, 1);
@@ -27,7 +27,7 @@ void sithCogPlayer_SetInvAvailable(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( bAvailable )
             sithInventory_SetAvailable(player, binIdx, 1);
@@ -41,7 +41,7 @@ void sithCogPlayer_IsInvActivated(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( sithInventory_GetActivate(player, binIdx) )
             sithCogVm_PushInt(ctx, 1);
@@ -55,7 +55,7 @@ void sithCogPlayer_IsInvAvailable(sithCog *ctx)
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         if ( sithInventory_GetAvailable(player, binIdx) )
             sithCogVm_PushInt(ctx, 1);
@@ -69,7 +69,7 @@ void sithCogPlayer_SetGoalFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) | flags);
         sithInventory_SetBinAmount(player, binIdx, amt);
@@ -81,7 +81,7 @@ void sithCogPlayer_ClearGoalFlags(sithCog *ctx)
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
     sithThing* player = sithCogVm_PopThing(ctx);
-    if ( player && player->thingType == THINGTYPE_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
         float amt = (float)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags);
         sithInventory_SetBinAmount(player, binIdx, amt);
@@ -134,7 +134,7 @@ void sithCogPlayer_GetPlayerNum(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerIdx = sithPlayer_GetNum(player), playerIdx != -1))
         sithCogVm_PushInt(ctx, playerIdx);
     else
@@ -147,7 +147,7 @@ void sithCogPlayer_GetPlayerTeam(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerInfo = player->actorParams.playerinfo) != 0 )
         sithCogVm_PushInt(ctx, playerInfo->teamNum);
     else
@@ -160,7 +160,7 @@ void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ((!sithNet_isMulti || sithNet_isServer)
         && player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if ( playerInfo )
@@ -178,7 +178,7 @@ void sithCogPlayer_GetPlayerScore(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerInfo = player->actorParams.playerinfo) != 0 )
         sithCogVm_PushInt(ctx, playerInfo->score);
     else
@@ -191,7 +191,7 @@ void sithCogPlayer_SetPlayerScore(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ((!sithNet_isMulti || sithNet_isServer)
         && player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if ( playerInfo )
@@ -209,7 +209,7 @@ void sithCogPlayer_GetPlayerKills(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerInfo = player->actorParams.playerinfo) != 0 )
         sithCogVm_PushInt(ctx, playerInfo->numKills);
     else
@@ -222,7 +222,7 @@ void sithCogPlayer_SetPlayerKills(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ((!sithNet_isMulti || sithNet_isServer)
         && player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if ( playerInfo )
@@ -240,7 +240,7 @@ void sithCogPlayer_GetPlayerKilled(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerInfo = player->actorParams.playerinfo) != 0 )
         sithCogVm_PushInt(ctx, playerInfo->numKilled);
     else
@@ -253,7 +253,7 @@ void sithCogPlayer_SetPlayerKilled(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ((!sithNet_isMulti || sithNet_isServer)
         && player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if ( playerInfo )
@@ -271,7 +271,7 @@ void sithCogPlayer_GetPlayerSuicides(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player 
-        && player->thingType == THINGTYPE_PLAYER 
+        && player->type == SITH_THING_PLAYER 
         && (playerInfo = player->actorParams.playerinfo) != 0 )
         sithCogVm_PushInt(ctx, playerInfo->numSuicides);
     else
@@ -284,7 +284,7 @@ void sithCogPlayer_SetPlayerSuicides(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
     if ((!sithNet_isMulti || sithNet_isServer)
         && player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if ( playerInfo )
@@ -302,10 +302,10 @@ void sithCogPlayer_PickupBackpack(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if ( player
-      && player->thingType == THINGTYPE_PLAYER
+      && player->type == SITH_THING_PLAYER
       && player->actorParams.playerinfo
       && backpack
-      && backpack->thingType == THINGTYPE_ITEM
+      && backpack->type == SITH_THING_ITEM
       && (backpack->actorParams.typeflags & 4) != 0 )
     {
         sithInventory_PickupBackpack(player, backpack);
@@ -319,7 +319,7 @@ void sithCogPlayer_NthBackpackBin(sithCog *ctx)
     int n = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing
-        && thing->thingType == THINGTYPE_ITEM
+        && thing->type == SITH_THING_ITEM
         && (thing->actorParams.typeflags & SITH_TF_4))
     {
         ret = sithInventory_NthBackpackBin(thing, n);
@@ -334,7 +334,7 @@ void sithCogPlayer_NthBackpackValue(sithCog *ctx)
     int n = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing
-        && thing->thingType == THINGTYPE_ITEM
+        && thing->type == SITH_THING_ITEM
         && (thing->actorParams.typeflags & SITH_TF_4))
     {
         ret = sithInventory_NthBackpackValue(thing, n);
@@ -348,7 +348,7 @@ void sithCogPlayer_NumBackpackItems(sithCog *ctx)
 
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing
-        && thing->thingType == THINGTYPE_ITEM
+        && thing->type == SITH_THING_ITEM
         && (thing->actorParams.typeflags & SITH_TF_4))
     {
         ret = sithInventory_NumBackpackItems(thing);
@@ -361,7 +361,7 @@ void sithCogPlayer_CreateBackpack(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if (player
-        && player->thingType == THINGTYPE_PLAYER
+        && player->type == SITH_THING_PLAYER
         && player->actorParams.playerinfo)
     {
         sithThing* backpack = sithInventory_CreateBackpack(player);
@@ -429,7 +429,7 @@ void sithCogPlayer_GetRespawnMask(sithCog *ctx)
 
     sithThing* player = sithCogVm_PopThing(ctx);
     if (player
-        && player->thingType == THINGTYPE_PLAYER
+        && player->type == SITH_THING_PLAYER
         && (playerInfo = player->actorParams.playerinfo))
         sithCogVm_PushInt(ctx, playerInfo->respawnMask);
     else
@@ -442,7 +442,7 @@ void sithCogPlayer_SetRespawnMask(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if (player
-        && player->thingType == THINGTYPE_PLAYER)
+        && player->type == SITH_THING_PLAYER)
     {
         sithPlayerInfo* playerInfo = player->actorParams.playerinfo;
         if (playerInfo)
@@ -457,7 +457,7 @@ void sithCogPlayer_ActivateBin(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if (player
-        && player->thingType == THINGTYPE_PLAYER
+        && player->type == SITH_THING_PLAYER
         && delay >= 0.0 )
     {
         if (player->actorParams.playerinfo)
@@ -471,7 +471,7 @@ void sithCogPlayer_DeactivateBin(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if (player
-        && player->thingType == THINGTYPE_PLAYER
+        && player->type == SITH_THING_PLAYER
         && player->actorParams.playerinfo)
     {
         float ret = sithInventory_DeactivateBin(player, ctx, binIdx);
@@ -514,7 +514,7 @@ void sithCogPlayer_SetBinWait(sithCog *ctx)
     sithThing* player = sithCogVm_PopThing(ctx);
 
     if (player
-        && player->thingType == THINGTYPE_PLAYER
+        && player->type == SITH_THING_PLAYER
         && wait >= -1.0)
         sithInventory_SetBinWait(player, binIdx, wait);
 }

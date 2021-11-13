@@ -163,7 +163,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             }
             else
             {
-                if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )
+                if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
                     rdVector_Copy3(&v76, &focusThing->actorParams.eyePYR);
                 }
@@ -182,7 +182,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 }
                 rdMatrix_PreRotate34(&cam->viewMat, &v76);
                 rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-                if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )
+                if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
                     rdMatrix_PreTranslate34(&cam->viewMat, &focusThing->actorParams.eyeOffset);
                     if ( focusThing == g_localPlayerThing )
@@ -195,7 +195,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 cam->sector = sithCollision_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         case 4:
-            if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )
+            if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
             {
                 rdVector_Copy3(&v76, &focusThing->actorParams.eyePYR);
             }
@@ -206,7 +206,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdMatrix_Copy34(&out, &focusThing->lookOrientation);
             rdMatrix_PreRotate34(&out, &v76);
             rdMatrix_PostTranslate34(&out, &focusThing->position);
-            if ( focusThing->thingType == THINGTYPE_ACTOR || focusThing->thingType == THINGTYPE_PLAYER )
+            if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 rdMatrix_PostTranslate34(&out, &focusThing->actorParams.eyeOffset);
             cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, 8704);
             rdVector_Copy3(&v84, &out.scale);
@@ -447,8 +447,6 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     int v8; // ecx
     sithSector *v9; // ebx
     sithCollisionSearchEntry *i; // ecx
-    double v12; // st6
-    double v13; // st7
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     float a6a; // [esp+28h] [ebp+10h]
 
@@ -467,13 +465,11 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
         {
             v9 = i->surface->adjoin->sector;
         }
-        else if ( (i->collideType & 1) == 0 || (i->receiver->thingType != THINGTYPE_ITEM) && i->distance != 0.0 && i->receiver->thingType != THINGTYPE_WEAPON )
+        else if ( (i->collideType & 1) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
         {
-            v12 = i->distance * a5.y + a4->y;
-            v13 = i->distance * a5.z + a4->z;
             a6->x = i->distance * a5.x + a4->x;
-            a6->y = v12;
-            a6->z = v13;
+            a6->y = i->distance * a5.y + a4->y;
+            a6->z = i->distance * a5.z + a4->z;
             break;
         }
     }
@@ -483,21 +479,14 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
 
 void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4)
 {
-    float v4; // eax
-    float v5; // eax
-    float v6; // ecx
-
     sithCamera_povShakeVector1.x = a1->x;
     sithCamera_povShakeVector1.y = a1->y;
-    v4 = a1->z;
+    sithCamera_povShakeVector1.z = a1->z;
     sithCamera_povShakeVector2.x = a2->x;
-    sithCamera_povShakeVector1.z = v4;
-    v5 = a2->y;
+    sithCamera_povShakeVector2.y = a2->y;
+    sithCamera_povShakeVector2.z = a2->z;
     sithCamera_povShakeF1 = a3;
-    sithCamera_povShakeVector2.y = v5;
-    v6 = a2->z;
     sithCamera_povShakeF2 = a4;
-    sithCamera_povShakeVector2.z = v6;
 }
 
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam)

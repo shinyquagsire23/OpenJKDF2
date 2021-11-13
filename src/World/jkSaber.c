@@ -129,7 +129,7 @@ void jkSaber_UpdateLength(sithThing *thing)
         return;
     }
     
-    if (thing->thingflags & SITH_TF_DEAD || thing->thingType == THINGTYPE_CORPSE)
+    if (thing->thingflags & SITH_TF_DEAD || thing->type == SITH_THING_CORPSE)
     {
         thing->jkFlags |= JKFLAG_SABERRETRACT;
     }
@@ -244,12 +244,12 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             a2a.x = searchResult->distance * jointMat.lvec.x + jointMat.scale.x;
             a2a.y = searchResult->distance * jointMat.lvec.y + jointMat.scale.y;
             a2a.z = searchResult->distance * jointMat.lvec.z + jointMat.scale.z;
-            if ( resultThing->thingType == THINGTYPE_ITEM || resultThing->thingType == THINGTYPE_EXPLOSION || resultThing->thingType == THINGTYPE_PARTICLE )
+            if ( resultThing->type == SITH_THING_ITEM || resultThing->type == SITH_THING_EXPLOSION || resultThing->type == SITH_THING_PARTICLE )
             {
                 continue;
             }
             if (resultThing->actorParams.typeflags & 0x100 
-                || resultThing->thingType != THINGTYPE_ACTOR && resultThing->thingType != THINGTYPE_PLAYER )
+                || resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER )
             {
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->wall_sparks)
                 {
@@ -280,8 +280,8 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
                 break;
             }
             
-            if ( resultThing->thingType != THINGTYPE_ACTOR 
-                 && resultThing->thingType != THINGTYPE_PLAYER 
+            if ( resultThing->type != SITH_THING_ACTOR 
+                 && resultThing->type != SITH_THING_PLAYER 
                  || !(resultThing->actorParams.typeflags & 0x2000) )
             {
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->blood_sparks)
@@ -304,7 +304,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             rdVector_Sub3(&a1, &a2a, &resultThing->position);
             rdVector_Normalize3Acc(&a1);
             rdMatrix_Copy34(&tmpMat, &resultThing->lookOrientation);
-            if ( resultThing->thingType == THINGTYPE_ACTOR || resultThing->thingType == THINGTYPE_PLAYER )
+            if ( resultThing->type == SITH_THING_ACTOR || resultThing->type == SITH_THING_PLAYER )
                 rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.eyePYR);
                 
             // TODO: is this a vector func?
@@ -494,8 +494,8 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
     {
         NETMSG_START;
 
-        NETMSG_PUSHU16(thing->thingType != THINGTYPE_PLAYER);
-        NETMSG_PUSHU16((thing->thingType != THINGTYPE_PLAYER) ? thing->playerInfo - jkPlayer_otherThings : thing->playerInfo - playerThings);
+        NETMSG_PUSHU16(thing->type != SITH_THING_PLAYER);
+        NETMSG_PUSHU16((thing->type != SITH_THING_PLAYER) ? thing->playerInfo - jkPlayer_otherThings : thing->playerInfo - playerThings);
         NETMSG_PUSHU32(thing->thing_id);
         if ( thing->playerInfo->rd_thing.model3 ) {
             NETMSG_PUSHS32(thing->playerInfo->rd_thing.model3->id);

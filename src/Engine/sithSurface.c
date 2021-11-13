@@ -492,11 +492,11 @@ void sithSurface_Tick(float deltaSecs)
             continue;
 
         sithThing* parent_thing = surface->parent_thing;
-        if ( !parent_thing || parent_thing->thingType && parent_thing->signature == surface->signature )
+        if ( !parent_thing || parent_thing->type && parent_thing->signature == surface->signature )
         {
-            if ( (flags & 0x100000) != 0 )
+            if ( (flags & SURFACEFLAGS_100000) != 0 )
             {
-                if ( (flags & 0x20000) != 0 )
+                if ( (flags & SURFACEFLAGS_WATER) != 0 )
                 {
                     v10 = surface->sithSurfaceParent;
                     if ( v10 )
@@ -514,16 +514,16 @@ void sithSurface_Tick(float deltaSecs)
                         }
                     }
                 }
-                else if ( (flags & 0x800000) != 0 )
+                else if ( (flags & SURFACEFLAGS_800000) != 0 )
                 {
-                    sithSurface_ScrollSky(surface, 512, deltaSecs, v2);
+                    sithSurface_ScrollSky(surface, SITH_SURFACE_HORIZONSKY, deltaSecs, v2);
                 }
-                else if ( (flags & 0x1000000) != 0 )
+                else if ( (flags & SURFACEFLAGS_1000000) != 0 )
                 {
-                    sithSurface_ScrollSky(surface, 1024, deltaSecs, v2);
+                    sithSurface_ScrollSky(surface, SITH_SURFACE_CEILINGSKY, deltaSecs, v2);
                 }
             }
-            else if ( (flags & 0x200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
+            else if ( (flags & SURFACEFLAGS_200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
             {
                 v14 = surface->field_34;
                 v15 = 0;
@@ -656,12 +656,12 @@ void sithSurface_Tick(float deltaSecs)
     }
 }
 
-void sithSurface_ScrollSky(rdSurface *surface, int flags, float deltaSecs, uint8_t a4)
+void sithSurface_ScrollSky(rdSurface *surface, int skyType, float deltaSecs, uint8_t a4)
 {
     float scroll_x = surface->field_1C.x * deltaSecs;
     float scroll_y = surface->field_1C.y * deltaSecs;
 
-    if ( flags == 0x200 )
+    if ( skyType == SITH_SURFACE_HORIZONSKY )
     {
         float offs_x = scroll_x + sithWorld_pCurWorld->horizontalSkyOffs.x;
         float offs_y = scroll_y + sithWorld_pCurWorld->horizontalSkyOffs.y;
@@ -1063,7 +1063,7 @@ int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
     return sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector);
 }
 
-rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)
+rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
 {
     rdSurface *result; // eax
     int v3; // edx
@@ -1086,7 +1086,7 @@ rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)
     }
     if ( result )
     {
-        if ( flags == 512 )
+        if ( skyType == SITH_SURFACE_HORIZONSKY )
         {
             result->flags = 0x900000;
             v5 = a2->y;
@@ -1095,7 +1095,7 @@ rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2)
         }
         else
         {
-            if ( flags == 1024 )
+            if ( skyType == SITH_SURFACE_CEILINGSKY )
                 result->flags = 0x1100000;
             v6 = a2->y;
             result->field_1C.x = a2->x;

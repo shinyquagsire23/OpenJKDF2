@@ -386,7 +386,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
             // Debug, add extra light from player
 #if 0
-            if (thing->thingType == THINGTYPE_PLAYER)
+            if (thing->type == SITH_THING_PLAYER)
             {
                 rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                 rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -406,7 +406,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     lightIdx = ++sithRender_numLights;
                 }
 
-                if ( (thing->thingType == THINGTYPE_ACTOR || thing->thingType == THINGTYPE_PLAYER) && lightIdx < 0x20 )
+                if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
                     if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
@@ -1099,7 +1099,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
                     ++sithRender_numLights;
                 }
 
-                if ( (i->thingType == THINGTYPE_ACTOR || i->thingType == THINGTYPE_PLAYER) && sithRender_numLights < 0x20 )
+                if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numLights < 0x20 )
                 {
                     // Actors all have a small amount of light
                     if ( (i->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) && i->actorParams.lightIntensity > 0.0 )
@@ -1428,7 +1428,7 @@ int sithRender_RenderPov(sithThing *povThing)
         if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 )
             sithCog_SendMessageFromThing(povThing, 0, SITH_MESSAGE_SIGHTED);
 
-        if ( povThing->thingtype == THINGTYPE_ACTOR )
+        if ( povThing->thingtype == SITH_THING_ACTOR )
         {
             if ( povThing->actor )
             {
@@ -1445,7 +1445,7 @@ int sithRender_RenderPov(sithThing *povThing)
     povThing->lookOrientation.scale.z = 0.0;
     if ( sithRender_weaponRenderHandle && (povThing->thingflags & SITH_TF_RENDERWEAPON) != 0 )
         sithRender_weaponRenderHandle(povThing);
-    if ( povThing->thingType == THINGTYPE_EXPLOSION && (povThing->explosionParams.typeflags & 0x100) != 0 )
+    if ( povThing->type == SITH_THING_EXPLOSION && (povThing->explosionParams.typeflags & 0x100) != 0 )
     {
         float v5 = stdMath_Dist3D1(povThing->screenPos.x, povThing->screenPos.y, povThing->screenPos.z);
         uint32_t v6 = povThing->explosionParams.flashB;

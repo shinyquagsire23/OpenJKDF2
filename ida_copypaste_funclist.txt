@@ -1756,7 +1756,7 @@ sith_Load	.text	004C4780	00000026	00000000	00000004	R	.	.	.	.	T	.
 sith_Free	.text	004C47B0	0000001D			R	.	.	.	.	.	.
 sith_Mode1Init	.text	004C47D0	000000AA	00000000	00000004	R	.	.	.	.	.	.
 sith_AutoSave	.text	004C4880	00000147	00000090	00000000	R	.	.	.	.	T	.
-sith_Mode1Init_2	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	.
+sithOpenNormal	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	.
 sith_Mode1Init_3	.text	004C4A70	00000098	00000000	00000004	R	.	.	.	.	.	.
 sith_Open	.text	004C4B10	00000064	00000000	00000000	R	.	.	.	.	.	.
 sith_Close	.text	004C4B80	00000064			R	.	.	.	.	.	.

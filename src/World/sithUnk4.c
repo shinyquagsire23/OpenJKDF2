@@ -33,7 +33,7 @@ int sithUnk4_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSea
     int v3; // edi
 
     v3 = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
-    if ( v3 && thing->thingtype == THINGTYPE_ACTOR )
+    if ( v3 && thing->thingtype == SITH_THING_ACTOR )
         sithAI_SetActorFireTarget(thing->actor, 512, 0);
     return v3;
 }
@@ -116,13 +116,13 @@ int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisio
     v5 = result;
     if ( result )
     {
-        if ( thing->thingtype == THINGTYPE_ACTOR )
+        if ( thing->thingtype == SITH_THING_ACTOR )
         {
             v6 = thing->actor;
             if ( v6 )
                 sithAI_SetActorFireTarget(v6, 4, thing2);
         }
-        if ( thing2->thingtype == THINGTYPE_ACTOR )
+        if ( thing2->thingtype == SITH_THING_ACTOR )
         {
             v7 = thing2->actor;
             if ( v7 )
@@ -184,7 +184,7 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionS
     a1a.z = v8;
     rdVector_Normalize3Acc(&a1a);
     _memcpy(&out, &thing2->lookOrientation, sizeof(out));
-    if ( thing2->thingType == THINGTYPE_ACTOR || thing2->thingType == THINGTYPE_PLAYER )
+    if ( thing2->type == SITH_THING_ACTOR || thing2->type == SITH_THING_PLAYER )
         rdMatrix_PreRotate34(&out, &thing2->actorParams.eyePYR);
     v18 = out.lvec;
     rdVector_Normalize3Acc(&v18);

@@ -65,7 +65,7 @@ void sithCogAI_AISetMoveSpeed(sithCog *ctx)
         a1a = 2.0;
     }
     v3 = sithCogVm_PopThing(ctx);
-    if ( v3 && v3->thingtype == THINGTYPE_ACTOR )
+    if ( v3 && v3->thingtype == SITH_THING_ACTOR )
     {
         v4 = v3->actor;
         if ( v4 )
@@ -88,7 +88,7 @@ void sithCogAI_SetMovePos(sithCog *ctx)
         
         if ( v1 )
         {
-            if ( v1->thingtype == THINGTYPE_ACTOR )
+            if ( v1->thingtype == SITH_THING_ACTOR )
             {
                 v2 = v1->actor;
                 if ( v2 )
@@ -113,7 +113,7 @@ void sithCogAI_AIJump(sithCog *ctx)
     // Added
     if (g_debugmodeFlags & 1) return;
     
-    if ( v3 && v2 && v3->attach_flags && v3->thingtype == THINGTYPE_ACTOR )
+    if ( v3 && v2 && v3->attach_flags && v3->thingtype == SITH_THING_ACTOR )
     {
         v4 = v3->actor;
         if ( v4 )
@@ -136,7 +136,7 @@ void sithCogAI_AISetMoveFrame(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == THINGTYPE_ACTOR )
+        if ( v2->thingtype == SITH_THING_ACTOR )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -164,7 +164,7 @@ void sithCogAI_AISetMoveThing(sithCog *ctx)
     // Added
     if (g_debugmodeFlags & 1) return;
     
-    if ( v2 && v1 && v2->thingtype == THINGTYPE_ACTOR )
+    if ( v2 && v1 && v2->thingtype == SITH_THING_ACTOR )
     {
         v3 = v2->actor;
         if ( v3 )
@@ -190,7 +190,7 @@ void sithCogAI_AISetLookPos(sithCog *ctx)
         
         if ( v1 )
         {
-            if ( v1->thingtype == THINGTYPE_ACTOR )
+            if ( v1->thingtype == SITH_THING_ACTOR )
             {
                 v2 = v1->actor;
                 if ( v2 )
@@ -215,7 +215,7 @@ void sithCogAI_AISetLookFrame(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == THINGTYPE_ACTOR )
+        if ( v2->thingtype == SITH_THING_ACTOR )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -237,7 +237,7 @@ void sithCogAI_GetMovePos(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogVm_PopThing(ctx);
-    if ( v1 && v1->thingtype == THINGTYPE_ACTOR )
+    if ( v1 && v1->thingtype == SITH_THING_ACTOR )
     {
         v2 = v1->actor;
         if ( v2 )
@@ -260,7 +260,7 @@ void sithCogAI_AISetMode(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == THINGTYPE_ACTOR )
+        if ( v2->thingtype == SITH_THING_ACTOR )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -280,7 +280,7 @@ void sithCogAI_AIGetMode(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogVm_PopThing(ctx);
-    if ( v1 && v1->thingtype == THINGTYPE_ACTOR && (v2 = v1->actor) != 0 )
+    if ( v1 && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 )
         sithCogVm_PushInt(ctx, v2->flags);
     else
         sithCogVm_PushInt(ctx, -1);
@@ -302,7 +302,7 @@ void sithCogAI_AIClearMode(sithCog *ctx)
     
     if ( thing )
     {
-        if ( thing->thingtype == THINGTYPE_ACTOR )
+        if ( thing->thingtype == SITH_THING_ACTOR )
         {
             v3 = thing->actor;
             if ( v3 )
@@ -341,7 +341,7 @@ void sithCogAI_FirstThingInView(sithCog *ctx)
     
     v3 = v2;
     if ( v2
-      && ((_memcpy(&v7, &v2->lookOrientation, sizeof(v7)), v4 = v2->thingType, v4 == THINGTYPE_ACTOR) || v4 == THINGTYPE_PLAYER ? (rdMatrix_PreRotate34(
+      && ((_memcpy(&v7, &v2->lookOrientation, sizeof(v7)), v4 = v2->type, v4 == SITH_THING_ACTOR) || v4 == SITH_THING_PLAYER ? (rdMatrix_PreRotate34(
                                                                                                                                        &v7,
                                                                                                                                        &v3->actorParams.eyePYR),
                                                                                                                                    rdMatrix_PostTranslate34(
@@ -397,7 +397,7 @@ void sithCogAI_ThingViewDot(sithCog *ctx)
     if ( v1 && v2 )
     {
         _memcpy(&v8, &v2->lookOrientation, sizeof(v8));
-        if ( v2->thingType == THINGTYPE_ACTOR || v2->thingType == THINGTYPE_PLAYER )
+        if ( v2->type == SITH_THING_ACTOR || v2->type == SITH_THING_PLAYER )
             rdMatrix_PreRotate34(&v8, &v3->actorParams.eyePYR);
         v6 = v8.lvec;
         v7.x = v1->position.x - v3->position.x;
@@ -431,7 +431,7 @@ void sithCogAI_AISetFireTarget(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == THINGTYPE_ACTOR )
+        if ( v2->thingtype == SITH_THING_ACTOR )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -469,7 +469,7 @@ void sithCogAI_sub_501330(sithCog *ctx)
         goto LABEL_12;
     if ( !v1 )
         goto LABEL_12;
-    if ( v2->thingtype != THINGTYPE_ACTOR )
+    if ( v2->thingtype != SITH_THING_ACTOR )
         goto LABEL_12;
     v3 = v2->actor;
     if ( !v3 )
@@ -503,7 +503,7 @@ void sithCogAI_IsAITargetInSight(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogVm_PopThing(ctx);
-    if ( v1 && v1->thingType == THINGTYPE_ACTOR && v1->thingtype == THINGTYPE_ACTOR && (v2 = v1->actor) != 0 && !v2->field_1F4 )
+    if ( v1 && v1->type == SITH_THING_ACTOR && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 && !v2->field_1F4 )
         sithCogVm_PushInt(ctx, 1);
     else
         sithCogVm_PushInt(ctx, 0);
@@ -526,7 +526,7 @@ void sithCogAI_AIFlee(sithCog *ctx)
     {
         if ( v2 )
         {
-            if ( v2->thingType == THINGTYPE_ACTOR && v2->thingtype == THINGTYPE_ACTOR )
+            if ( v2->type == SITH_THING_ACTOR && v2->thingtype == SITH_THING_ACTOR )
             {
                 v3 = v2->actor;
                 if ( v3 )
@@ -553,7 +553,7 @@ void sithCogAI_AISetClass(sithCog *ctx)
 
     aiclass = sithCogVm_PopAIClass(ctx);
     thing = sithCogVm_PopThing(ctx);
-    if ( aiclass && thing && thing->thingtype == THINGTYPE_ACTOR )
+    if ( aiclass && thing && thing->thingtype == SITH_THING_ACTOR )
     {
         v3 = thing->actor;
         if ( v3 )

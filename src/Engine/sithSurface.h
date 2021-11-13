@@ -41,6 +41,9 @@
 #define sithSurface_Sync_ADDR (0x004F0B50)
 #define sithSurface_ScrollSky_ADDR (0x004F0BC0)
 
+#define SITH_SURFACE_HORIZONSKY (0x200)
+#define SITH_SURFACE_CEILINGSKY (0x400)
+
 typedef enum SURFACEFLAGS
 {
     SURFACEFLAGS_1 = 0x1,
