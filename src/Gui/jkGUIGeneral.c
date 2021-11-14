@@ -42,7 +42,9 @@ static jkGuiElement jkGuiGeneral_aElements[19] = {
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+#ifdef SDL2_RENDER
     {ELEMENT_CHECKBOX,     0,            0, L"Enable HiDPI",    0, {20, 320, 300, 40}, 1,  0, "GUI_ROTATEOVERLAY_HINT", 0, 0, 0, {0}, 0},
+#endif
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -88,7 +90,9 @@ int jkGuiGeneral_Show()
 
 #ifdef QOL_IMPROVEMENTS
     jkGuiGeneral_aElements[13].selectedTextEntry = jkPlayer_fov - FOV_MIN;
+#ifdef SDL2_RENDER
     jkGuiGeneral_aElements[15].selectedTextEntry = Window_isHiDpi;
+#endif
 #endif
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);
@@ -99,7 +103,9 @@ int jkGuiGeneral_Show()
         jkPlayer_setDisableCutscenes = jkGuiGeneral_aElements[9].selectedTextEntry;
 
 #ifdef QOL_IMPROVEMENTS
+#ifdef SDL2_RENDER
         Window_SetHiDpi(jkGuiGeneral_aElements[15].selectedTextEntry);
+#endif
 #endif
 
         jkPlayer_WriteConf(jkPlayer_playerShortName);

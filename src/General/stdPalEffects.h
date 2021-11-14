@@ -28,6 +28,8 @@
 
 #define stdPalEffects_Close_idk_ADDR (0x004C8620)
 
+int stdPalEffects_Open(void *a1);
+void stdPalEffects_Close();
 int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);
 void stdPalEffects_FlushAllEffects();
@@ -38,16 +40,20 @@ void stdPalEffects_SetFilter(int idx, int a2, int a3, int a4);
 void stdPalEffects_SetTint(int idx, float a2, float a3, float a4);
 void stdPalEffects_SetAdd(int idx, int a2, int a3, int a4);
 void stdPalEffects_SetFade(int idx, float fade);
+void stdPalEffects_UpdatePalette(const void *palette);
+void stdPalEffects_GatherEffects();
+void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, float tintB);
+void stdPalEffects_ResetEffect(stdPalEffect *effect);
 
-static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
-static void (*stdPalEffects_Close)() = (void*)stdPalEffects_Close_ADDR;
+//static int (*stdPalEffects_Open)(void *a1) = (void*)stdPalEffects_Open_ADDR;
+//static void (*stdPalEffects_Close)() = (void*)stdPalEffects_Close_ADDR;
 //static void (*stdPalEffects_SetFilter)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetFilter_ADDR;
 //static void (*stdPalEffects_SetTint)(int a1, float a2, float a3, float a4) = (void*)stdPalEffects_SetTint_ADDR;
 //static void (*stdPalEffects_SetAdd)(int a1, int a2, int a3, int a4) = (void*)stdPalEffects_SetAdd_ADDR;
 //static void (*stdPalEffects_SetFade)(int a1, float a2) = (void*)stdPalEffects_SetFade_ADDR;
 //static void (*stdPalEffects_FreeRequest)(int a1) = (void*)stdPalEffects_FreeRequest_ADDR;
-static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
-static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
+//static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
+//static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
 //static void (*stdPalEffects_RefreshPalette)() = (void*)stdPalEffects_RefreshPalette_ADDR;
 
 #endif // _STDPALEFFECTS_H

@@ -72,9 +72,7 @@ int Video_Startup()
         jkHud_Startup();
         Video_pOtherBuf = &Video_otherBuf;
         Video_pMenuBuffer = &Video_menuBuffer;
-#ifndef LINUX_TMP
         stdPalEffects_Open(stdDisplay_SetMasterPalette);
-#endif
         sithCamera_Startup();
         Video_bInitted = 1;
         return 1;

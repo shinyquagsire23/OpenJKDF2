@@ -745,6 +745,8 @@ stdPalEffects_state 0x00866200 stdPalEffectsState
 stdPalEffects_palette 0x0055BB80 rdColor24[256]
 stdPalEffects_numEffectRequests 0x0055BE80 uint32_t
 stdPalEffects_aEffects 0x00866260 stdPalEffectRequest[32]
+stdPalEffects_setPalette 0x0055BE84 stdPalEffectSetPaletteFunc_t
+stdPalEffects_aPalette 0x0055BE88 uint16_t[256]
 
 aFilenameStack 0x0055D620 char[2560]
 apBufferStack 0x0055E020 char*[20]

@@ -196,12 +196,12 @@ int jkGame_Update()
     // HACK
     rdroid_curColorEffects.fade = 1.0;
 
-#ifndef LINUX_TMP
+//#ifndef LINUX_TMP
     v1 = stdDisplay_GetPalette();
     stdPalEffects_UpdatePalette(v1);
     //if ( Video_modeStruct.b3DAccel )
         rdSetColorEffects(&stdPalEffects_state.effect);
-#endif
+//#endif
     _memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )

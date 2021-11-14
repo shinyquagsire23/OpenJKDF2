@@ -480,6 +480,7 @@ typedef rdKeyframe* (*keyframeLoader_t)(const char*);
 typedef int (*keyframeUnloader_t)(rdKeyframe*);
 typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
+typedef void (*stdPalEffectSetPaletteFunc_t)(const void*);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)

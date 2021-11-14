@@ -109,7 +109,6 @@ When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied th
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Color overlays (blue on getting items, red on getting hit, blue underwater, etc)
  - Input mapping (for blobless/SDL2, input maps are hardcoded)
  - Subtitles and credits
  - HUD/chat text (top-center)

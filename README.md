@@ -109,7 +109,6 @@ When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied th
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Color overlays (blue on getting items, red on getting hit, blue underwater, etc)
  - Input mapping (for blobless/SDL2, input maps are hardcoded)
  - Subtitles and credits
  - HUD/chat text (top-center)
@@ -287,7 +286,7 @@ stdColor                       0x97e      0.225%        24.198%         3 / 11
 jkGame                         0x98f      0.227%        41.071%         7 / 13         
 stdSound                       0x9bf      0.231%        11.222%         1 / 27         
 rdMaterial                     0xa2d      0.242%        78.081%         8 / 9          
-stdPalEffects                  0xa66      0.247%        15.440%        10 / 21         
+stdPalEffects                  0xa66      0.247%        85.875%        16 / 21         
 jkGuiKeyboard                  0xb57      0.269%        0.000%          0 / 14         
 jkGuiNetHost                   0xbc6      0.279%        0.000%          0 / 6          
 sithMapView                    0xbf8      0.284%        20.790%         6 / 9          
@@ -339,36 +338,36 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-41.705% by weight
-70.452% by weight excluding rasterizer
-2082 / 3167 functions
-2082 / 2796 functions excluding rasterizer
+41.879% by weight
+70.746% by weight excluding rasterizer
+2088 / 3167 functions
+2088 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
 sith           3.557%          187 / 1322
 stdPlatform    0.285%           33 / 43
-std            4.332%          175 / 360
+std            4.158%          169 / 360
 jkGui          3.467%          119 / 284
 rd             2.961%           31 / 345
 jk             1.504%          103 / 322
 Raster         40.792%         370 / 371
 other          1.397%           67 / 120
 -----------------------------------------
-total          58.295%        1085 / 3167
+total          58.121%        1079 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
 sith           6.009%          187 / 1322
 stdPlatform    0.481%           33 / 43
-std            7.318%          175 / 360
+std            7.025%          169 / 360
 jkGui          5.856%          119 / 284
 rd             5.001%           31 / 345
 jk             2.541%          103 / 322
 other          2.360%           67 / 120
 -----------------------------------------
-total          29.567%         715 / 2796
+total          29.273%         709 / 2796
 
 ```
