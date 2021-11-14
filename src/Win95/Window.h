@@ -42,6 +42,7 @@ extern int Window_lastYRel;
 extern int Window_lastSampleMs;
 extern int Window_bMouseLeft;
 extern int Window_bMouseRight;
+extern int Window_isHiDpi;
 
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
@@ -50,6 +51,8 @@ int Window_ShowCursorUnwindowed(int a1);
 int Window_MessageLoop();
 void Window_SdlUpdate();
 void Window_SdlVblank();
+void Window_RecreateSDL2Window();
+void Window_SetHiDpi(int val);
 #else
 static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;

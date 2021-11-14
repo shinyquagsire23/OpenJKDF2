@@ -269,7 +269,7 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 #endif
 #include "Win95/Video.h"
 
-SDL_Window* displayWindow;
+SDL_Window* displayWindow = NULL;
 SDL_Event event;
 SDL_GLContext glWindowContext;
 
@@ -282,6 +282,19 @@ int Window_bMouseRight = 0;
 int Window_resized = 0;
 int Window_mouseX = 0;
 int Window_mouseY = 0;
+
+int Window_needsRecreate = 0;
+int Window_isHiDpi = 0;
+
+void Window_SetHiDpi(int val)
+{
+    if (Window_isHiDpi != val)
+    {
+        Window_isHiDpi = val;
+
+        Window_needsRecreate = 1;
+    }
+}
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
@@ -548,6 +561,9 @@ void Window_SdlUpdate()
         std3D_DrawMenu();
         std3D_EndScene();
         SDL_GL_SwapWindow(displayWindow);
+
+        if (Window_needsRecreate)
+            Window_RecreateSDL2Window();
         //SDL_RenderClear(displayRenderer);
         //SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
         //SDL_RenderPresent(displayRenderer);
@@ -561,6 +577,80 @@ void Window_SdlUpdate()
 void Window_SdlVblank()
 {
     SDL_GL_SwapWindow(displayWindow);
+
+    if (Window_needsRecreate)
+        Window_RecreateSDL2Window();
+}
+
+void Window_RecreateSDL2Window()
+{
+    printf("Recreating SDL2 Window!\n");
+    Window_needsRecreate = 0;
+
+    if (displayWindow) {
+        std3D_FreeResources();
+        SDL_GL_DeleteContext(glWindowContext);
+        SDL_DestroyWindow(displayWindow);
+    }
+
+    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+
+    if (displayWindow) {
+        flags = SDL_GetWindowFlags(displayWindow);
+        std3D_FreeResources();
+        //SDL_GL_DeleteContext(glWindowContext);
+        SDL_DestroyWindow(displayWindow);
+
+        flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    }
+
+    if (Window_isHiDpi)
+        flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    else
+        flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
+
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, flags);
+    if (!displayWindow) {
+        char errtmp[256];
+        snprintf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+        exit (-1);
+    }
+    //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+
+    if (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+        SDL_SetWindowFullscreen(displayWindow, flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+    }
+
+    glWindowContext = SDL_GL_CreateContext(displayWindow);
+    
+    // Retry with 3.30 instead
+    if (glWindowContext == NULL)
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+        glWindowContext = SDL_GL_CreateContext(displayWindow);
+    }
+    
+    if (glWindowContext == NULL)
+    {
+        char errtmp[256];
+        snprintf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+        exit(-1);
+    }
+
+    SDL_GL_MakeCurrent(displayWindow, glWindowContext);
+    //SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_StartTextInput();
+
+    SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
+    SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
+
+    Window_resized = 1;
 }
 
 int Window_Main_Linux(int argc, char** argv)
@@ -593,44 +683,9 @@ int Window_Main_Linux(int argc, char** argv)
 
 #endif
 
-    displayWindow = SDL_CreateWindow("OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    if (!displayWindow) {
-        char errtmp[256];
-        snprintf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
-        exit (-1);
-    }
-    //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
-
-    glWindowContext = SDL_GL_CreateContext(displayWindow);
-    
-    // Retry with 3.30 instead
-    if (glWindowContext == NULL)
-    {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-        glWindowContext = SDL_GL_CreateContext(displayWindow);
-    }
-    
-    if (glWindowContext == NULL)
-    {
-        char errtmp[256];
-        snprintf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
-        exit(-1);
-    }
-
-    SDL_GL_MakeCurrent(displayWindow, glWindowContext);
-    //SDL_GL_SetSwapInterval(1); // Enable vsync
-    SDL_StartTextInput();
+    Window_RecreateSDL2Window();
     
     glewInit();
-
-    SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
-    SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
     
     //SDL_RenderClear(displayRenderer);
     //SDL_RenderPresent(displayRenderer);

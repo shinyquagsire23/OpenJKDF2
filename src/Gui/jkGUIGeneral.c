@@ -9,6 +9,7 @@
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUISetup.h"
 #include "World/jkPlayer.h"
+#include "Win95/Window.h"
 
 enum jkGuiDecisionButton_t
 {
@@ -23,7 +24,7 @@ static wchar_t slider_val_text[5] = {0};
 static int slider_1[2] = {18, 17};
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiGeneral_aElements[18] = { 
+static jkGuiElement jkGuiGeneral_aElements[19] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -41,6 +42,7 @@ static jkGuiElement jkGuiGeneral_aElements[18] = {
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, L"Enable HiDPI",    0, {20, 320, 300, 40}, 1,  0, "GUI_ROTATEOVERLAY_HINT", 0, 0, 0, {0}, 0},
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -86,6 +88,7 @@ int jkGuiGeneral_Show()
 
 #ifdef QOL_IMPROVEMENTS
     jkGuiGeneral_aElements[13].selectedTextEntry = jkPlayer_fov - FOV_MIN;
+    jkGuiGeneral_aElements[15].selectedTextEntry = Window_isHiDpi;
 #endif
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);
@@ -94,6 +97,11 @@ int jkGuiGeneral_Show()
         jkPlayer_setFullSubtitles = jkGuiGeneral_aElements[7].selectedTextEntry;
         jkPlayer_setRotateOverlayMap = jkGuiGeneral_aElements[8].selectedTextEntry;
         jkPlayer_setDisableCutscenes = jkGuiGeneral_aElements[9].selectedTextEntry;
+
+#ifdef QOL_IMPROVEMENTS
+        Window_SetHiDpi(jkGuiGeneral_aElements[15].selectedTextEntry);
+#endif
+
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }
     return v0;

@@ -18,12 +18,8 @@
 #include <GL/gl.h>
 #endif
 
-#define TEX_MODE_BGR 0
-#define TEX_MODE_RGB 1
-#define TEX_MODE_BGR_WHITETRANSPARENCY 2
-#define TEX_MODE_TEST 3
-#define TEX_MODE_WORLDPAL 4
-#define TEX_MODE_DISPPAL 5
+#define TEX_MODE_TEST 0
+#define TEX_MODE_WORLDPAL 1
 
 static bool has_initted = false;
 static GLuint fb;
@@ -58,16 +54,25 @@ void* displaypal_data;
 static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 static GLuint std3D_aLoadedTextures[1024];
 static size_t std3D_loadedTexturesAmt = 0;
-static rdTri GL_tmpTris[4096];
+static rdTri GL_tmpTris[STD3D_MAX_VERTICES];
 static size_t GL_tmpTrisAmt = 0;
-static rdLine GL_tmpLines[4096];
+static rdLine GL_tmpLines[STD3D_MAX_VERTICES];
 static size_t GL_tmpLinesAmt = 0;
-static D3DVERTEX GL_tmpVertices[4096];
+static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES];
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
 rdDDrawSurface* last_tex = NULL;
 int last_flags = 0;
+
+GLfloat* world_data_vertices = NULL;
+GLfloat* world_data_colors = NULL;
+GLfloat* world_data_uvs = NULL;
+GLuint world_vbo_vertices, world_vbo_colors, world_vbo_uvs;
+GLuint world_ibo_triangle;
+
+GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
+GLuint menu_ibo_triangle;
 
 void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
 {
@@ -240,11 +245,25 @@ int init_resources()
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao ); 
 
+    world_data_vertices = (GLfloat*)malloc(STD3D_MAX_VERTICES * 3 * sizeof(GLfloat));
+    world_data_colors = (GLfloat*)malloc(STD3D_MAX_VERTICES * 4 * sizeof(GLfloat));
+    world_data_uvs = (GLfloat*)malloc(STD3D_MAX_VERTICES * 2 * sizeof(GLfloat));
+
+    glGenBuffers(1, &world_vbo_vertices);
+    glGenBuffers(1, &world_vbo_colors);
+    glGenBuffers(1, &world_vbo_uvs);
+    glGenBuffers(1, &world_ibo_triangle);
+
+    glGenBuffers(1, &menu_vbo_vertices);
+    glGenBuffers(1, &menu_vbo_colors);
+    glGenBuffers(1, &menu_vbo_uvs);
+    glGenBuffers(1, &menu_ibo_triangle);
+
     has_initted = true;
     return true;
 }
 
-void free_resources()
+void std3D_FreeResources()
 {
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
@@ -252,8 +271,29 @@ void free_resources()
     deleteFramebuffer(fb2, fbTex2, fbRbo2);
     glDeleteTextures(1, &worldpal_texture);
     glDeleteTextures(1, &displaypal_texture);
-    free(worldpal_data);
-    free(displaypal_data);
+    if (worldpal_data)
+        free(worldpal_data);
+    if (displaypal_data)
+        free(displaypal_data);
+
+    worldpal_data = NULL;
+    displaypal_data = NULL;
+
+    if (world_data_vertices)
+        free(world_data_vertices);
+    if (world_data_colors)
+        free(world_data_colors);
+    if (world_data_uvs) 
+        free(world_data_uvs);
+    world_data_vertices = NULL;
+    world_data_colors = NULL;
+    world_data_uvs = NULL;
+
+    glDeleteBuffers(1, &world_vbo_vertices);
+    glDeleteBuffers(1, &world_vbo_colors);
+    glDeleteBuffers(1, &world_vbo_uvs);
+    glDeleteBuffers(1, &world_ibo_triangle);
+
     has_initted = false;
 }
 
@@ -282,16 +322,19 @@ int std3D_StartScene()
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	
-	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-	if (sithWorld_pCurWorld && sithWorld_pCurWorld->colormaps)
-	{
+    if (sithWorld_pCurWorld && sithWorld_pCurWorld->colormaps && memcmp(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300))
+    {
+        glBindTexture(GL_TEXTURE_2D, worldpal_texture);
 	    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     }
     
-    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
-    memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+    if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
+    {
+        glBindTexture(GL_TEXTURE_2D, displaypal_texture);
+        memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+    }
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
@@ -499,12 +542,9 @@ void std3D_DrawMenu()
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Video_menuBuffer.format.width, Video_menuBuffer.format.height, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
 
     // Generate vertices list
-    GLuint vbo_vertices, vbo_colors, vbo_uvs;
-    GLuint ibo_triangle;
     GLfloat* data_vertices = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
     GLfloat* data_colors = (GLfloat*)malloc(GL_tmpVerticesAmt * 4 * sizeof(GLfloat));
     GLfloat* data_uvs = (GLfloat*)malloc(GL_tmpVerticesAmt * 2 * sizeof(GLfloat));
-    GLfloat* data_norms = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
 
     D3DVERTEX* vertexes = GL_tmpVertices;
 
@@ -535,24 +575,17 @@ void std3D_DrawMenu()
         data_uvs[(i*2)+0] = vertexes[i].tu;
         data_uvs[(i*2)+1] = vertexes[i].tv;
         
-        data_norms[(i*3)+0] = vertexes[i].nx;
-        data_norms[(i*3)+1] = vertexes[i].ny;
-        data_norms[(i*3)+2] = vertexes[i].nz;
         //printf("nx, ny, nz %x %x %x, %f %f, %f\n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz, vertexes[i].z);
     }
     
-    glGenBuffers(1, &vbo_vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STREAM_DRAW);
     
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLfloat), data_colors, GL_STREAM_DRAW);
     
-    glGenBuffers(1, &vbo_colors);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLfloat), data_colors, GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &vbo_uvs);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STREAM_DRAW);
     
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, displaypal_texture);
@@ -588,7 +621,7 @@ void std3D_DrawMenu()
     glEnableVertexAttribArray(programMenu_attribute_v_uv);
     
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
     glVertexAttribPointer(
         programMenu_attribute_coord3d, // attribute
         3,                 // number of elements per vertex, here (x,y,z)
@@ -599,7 +632,7 @@ void std3D_DrawMenu()
     );
     
     
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
     glVertexAttribPointer(
         programMenu_attribute_v_color, // attribute
         4,                 // number of elements per vertex, here (R,G,B,A)
@@ -610,7 +643,7 @@ void std3D_DrawMenu()
     );
     
     
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
     glVertexAttribPointer(
         programMenu_attribute_v_uv,    // attribute
         2,                 // number of elements per vertex, here (U,V)
@@ -630,9 +663,8 @@ void std3D_DrawMenu()
         data_elements[(j*3)+2] = tris[j].v3;
     }
 
-    glGenBuffers(1, &ibo_triangle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
     int tris_size;  
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
@@ -641,17 +673,12 @@ void std3D_DrawMenu()
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
     glDisableVertexAttribArray(programMenu_attribute_coord3d);
-    glDeleteBuffers(1, &ibo_triangle);
     
     free(data_elements);
         
-    glDeleteBuffers(1, &vbo_vertices);
-    glDeleteBuffers(1, &vbo_colors);
-    glDeleteBuffers(1, &vbo_uvs);
     free(data_vertices);
     free(data_colors);    
     free(data_uvs);
-    free(data_norms);
         
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -663,13 +690,6 @@ void std3D_DrawRenderList()
     last_tex = NULL;
 
     // Generate vertices list
-    GLuint vbo_vertices, vbo_colors, vbo_uvs;
-    GLuint ibo_triangle;
-    GLfloat* data_vertices = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
-    GLfloat* data_colors = (GLfloat*)malloc(GL_tmpVerticesAmt * 4 * sizeof(GLfloat));
-    GLfloat* data_uvs = (GLfloat*)malloc(GL_tmpVerticesAmt * 2 * sizeof(GLfloat));
-    GLfloat* data_norms = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
-
     D3DVERTEX* vertexes = GL_tmpVertices;
 
     for (int i = 0; i < GL_tmpVerticesAmt; i++)
@@ -688,39 +708,28 @@ void std3D_DrawRenderList()
         uint8_t v_g = (v_color >> 8) & 0xFF;
         uint8_t v_b = v_color & 0xFF;
  
-        data_vertices[(i*3)+0] = vertexes[i].x;
-        data_vertices[(i*3)+1] = vertexes[i].y;
-        data_vertices[(i*3)+2] = (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? vertexes[i].z : -(1.0-vertexes[i].z);
-        data_colors[(i*4)+0] = (float)v_r / 255.0f;
-        data_colors[(i*4)+1] = (float)v_g / 255.0f;
-        data_colors[(i*4)+2] = (float)v_b / 255.0f;
-        data_colors[(i*4)+3] = (float)v_a / 255.0f;
+        world_data_vertices[(i*3)+0] = vertexes[i].x;
+        world_data_vertices[(i*3)+1] = vertexes[i].y;
+        world_data_vertices[(i*3)+2] = (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? vertexes[i].z : -(1.0-vertexes[i].z);
+        world_data_colors[(i*4)+0] = (float)v_r / 255.0f;
+        world_data_colors[(i*4)+1] = (float)v_g / 255.0f;
+        world_data_colors[(i*4)+2] = (float)v_b / 255.0f;
+        world_data_colors[(i*4)+3] = (float)v_a / 255.0f;
         
-        data_uvs[(i*2)+0] = vertexes[i].tu;
-        data_uvs[(i*2)+1] = vertexes[i].tv;
+        world_data_uvs[(i*2)+0] = vertexes[i].tu;
+        world_data_uvs[(i*2)+1] = vertexes[i].tv;
         
-        data_norms[(i*3)+0] = vertexes[i].nx;
-        data_norms[(i*3)+1] = vertexes[i].ny;
-        data_norms[(i*3)+2] = vertexes[i].nz;
         //printf("nx, ny, nz %x %x %x, %f %f, %f\n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz, vertexes[i].z);
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_vertices);
+    glBufferData(GL_ARRAY_BUFFER, STD3D_MAX_VERTICES * 3 * sizeof(GLfloat), world_data_vertices, GL_STREAM_DRAW);
     
-    glGenBuffers(1, &vbo_vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_colors);
+    glBufferData(GL_ARRAY_BUFFER, STD3D_MAX_VERTICES * 4 * sizeof(GLfloat), world_data_colors, GL_STREAM_DRAW);
     
-    
-    glGenBuffers(1, &vbo_colors);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLfloat), data_colors, GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &vbo_uvs);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STATIC_DRAW);
-    
-    /*glGenBuffers(1, &vbo_norms);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_norms);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_norms, GL_STATIC_DRAW);*/
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_uvs);
+    glBufferData(GL_ARRAY_BUFFER, STD3D_MAX_VERTICES * 2 * sizeof(GLfloat), world_data_uvs, GL_STREAM_DRAW);
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
@@ -762,7 +771,7 @@ void std3D_DrawRenderList()
     //glEnableVertexAttribArray(attribute_v_norm);
     
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_vertices);
     glVertexAttribPointer(
         attribute_coord3d, // attribute
         3,                 // number of elements per vertex, here (x,y,z)
@@ -773,7 +782,7 @@ void std3D_DrawRenderList()
     );
     
     
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_colors);
     glVertexAttribPointer(
         attribute_v_color, // attribute
         4,                 // number of elements per vertex, here (R,G,B,A)
@@ -784,7 +793,7 @@ void std3D_DrawRenderList()
     );
     
     
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_uvs);
+    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_uvs);
     glVertexAttribPointer(
         attribute_v_uv,    // attribute
         2,                 // number of elements per vertex, here (U,V)
@@ -794,23 +803,13 @@ void std3D_DrawRenderList()
         0                  // offset of first element
     );
     
-    /*glBindBuffer(GL_ARRAY_BUFFER, vbo_norms);
-    glVertexAttribPointer(
-        attribute_v_uv,    // attribute
-        3,                 // number of elements per vertex, here (nX, nY, nZ)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );*/
-    
     int last_tex_idx = 0;
-    GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
+    GLushort* world_data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
-        data_elements[(j*3)+0] = tris[j].v1;
-        data_elements[(j*3)+1] = tris[j].v2;
-        data_elements[(j*3)+2] = tris[j].v3;
+        world_data_elements[(j*3)+0] = tris[j].v1;
+        world_data_elements[(j*3)+1] = tris[j].v2;
+        world_data_elements[(j*3)+2] = tris[j].v3;
     }
     
     int do_batch = 0;
@@ -834,19 +833,14 @@ void std3D_DrawRenderList()
 
             if (num_tris_batch)
             {
-                glGenBuffers(1, &ibo_triangle);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_tris_batch * 3 * sizeof(GLushort), &data_elements[last_tex_idx * 3], GL_STATIC_DRAW);
+                //printf("batch %u~%u\n", last_tex_idx, j);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_tris_batch * 3 * sizeof(GLushort), &world_data_elements[last_tex_idx * 3], GL_STREAM_DRAW);
 
                 int tris_size;  
                 glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
                 glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
-                //glDisableVertexAttribArray(attribute_v_norm);
-                glDisableVertexAttribArray(attribute_v_uv);
-                glDisableVertexAttribArray(attribute_v_color);
-                glDisableVertexAttribArray(attribute_coord3d);
-                glDeleteBuffers(1, &ibo_triangle);
             }
 
             if (tex)
@@ -904,7 +898,7 @@ void std3D_DrawRenderList()
 
             do_batch = 0;
         }
-        //printf("tri %u,%u,%u, flags %x\n", tris[j].v1, tris[j].v2, tris[j].v3, tris[j].flags);
+        //printf("tri %u: %u,%u,%u, flags %x\n", j, tris[j].v1, tris[j].v2, tris[j].v3, tris[j].flags);
         
         
         /*int vert = tris[j].v1;
@@ -927,36 +921,30 @@ void std3D_DrawRenderList()
 
     if (remaining_batch)
     {
-        glGenBuffers(1, &ibo_triangle);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, remaining_batch * 3 * sizeof(GLushort), &data_elements[last_tex_idx * 3], GL_STATIC_DRAW);
+        //printf("last batch %u~%u\n", last_tex_idx, GL_tmpTrisAmt);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, remaining_batch * 3 * sizeof(GLushort), &world_data_elements[last_tex_idx * 3], GL_STREAM_DRAW);
 
         int tris_size;  
         glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
         glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
-        //glDisableVertexAttribArray(attribute_v_norm);
-        glDisableVertexAttribArray(attribute_v_uv);
-        glDisableVertexAttribArray(attribute_v_color);
-        glDisableVertexAttribArray(attribute_coord3d);
-        glDeleteBuffers(1, &ibo_triangle);
     }
     
     
     
-    free(data_elements);
+    free(world_data_elements);
     
     // Draw all lines
-    data_elements = malloc(sizeof(GLushort) * 2 * GL_tmpLinesAmt);
+    world_data_elements = malloc(sizeof(GLushort) * 2 * GL_tmpLinesAmt);
     for (int j = 0; j < GL_tmpLinesAmt; j++)
     {
-        data_elements[(j*2)+0] = lines[j].v1;
-        data_elements[(j*2)+1] = lines[j].v2;
+        world_data_elements[(j*2)+0] = lines[j].v1;
+        world_data_elements[(j*2)+1] = lines[j].v2;
     }
     
-    glGenBuffers(1, &ibo_triangle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangle);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
 
     int lines_size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
@@ -965,18 +953,8 @@ void std3D_DrawRenderList()
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
-    glDeleteBuffers(1, &ibo_triangle);
         
-    // Done drawing
-    glDeleteBuffers(1, &vbo_vertices);
-    glDeleteBuffers(1, &vbo_colors);
-    glDeleteBuffers(1, &vbo_uvs);
-    //glDeleteBuffers(1, &vbo_norms);
-    free(data_vertices);
-    free(data_colors);    
-    free(data_uvs);
-    free(data_norms);
-        
+    // Done drawing    
     glBindTexture(GL_TEXTURE_2D, 0);
     
     std3D_ResetRenderList();
@@ -1007,7 +985,7 @@ void std3D_UnloadAllTextures()
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 {
-    if (GL_tmpTrisAmt + num_tris > 4096)
+    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_VERTICES)
     {
         return;
     }
@@ -1019,7 +997,7 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
 {
-    if (GL_tmpLinesAmt + num_lines > 4096)
+    if (GL_tmpLinesAmt + num_lines > STD3D_MAX_VERTICES)
     {
         return;
     }
@@ -1030,7 +1008,7 @@ void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 {
-    if (GL_tmpVerticesAmt + count >= 4096)
+    if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
     {
         return 0;
     }

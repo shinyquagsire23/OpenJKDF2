@@ -110,7 +110,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
-    joints = (rdJoint *)rdroid_pHS->alloc(sizeof(rdJoint) * keyframe->numJoints);
+    joints = (rdJoint *)rdroid_pHS->alloc(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
     keyframe->joints = joints;
     if (!joints)
       goto read_fail;

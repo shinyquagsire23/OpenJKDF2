@@ -113,15 +113,15 @@ sithMaterial_hashmap 0x00852F84 stdHashTable*
 sithMaterial_aMaterials 0x0088AFD0 rdMaterial**
 sithMaterial_numMaterials 0x00852F80 int
 
-rdCache_aHWSolidTris 0x005703A0 rdTri[0x400]
+rdCache_aHWSolidTris 0x005703A0 rdTri[RDCACHE_MAX_TRIS]
 rdCache_totalNormalTris 0x005753A0 int
-rdCache_aIntensities 0x005753A8 float[0x8000]
-rdCache_aVertices 0x005953A8 rdVector3[0x8000]
+rdCache_aIntensities 0x005753A8 float[RDCACHE_MAX_VERTICES]
+rdCache_aVertices 0x005953A8 rdVector3[RDCACHE_MAX_VERTICES]
 rdCache_totalVerts 0x005F53A8 int
-rdCache_aTexVertices 0x005F53B0 rdVector2[0x8000]
-rdCache_aHWNormalTris 0x006353B0 rdTri[0x400]
+rdCache_aTexVertices 0x005F53B0 rdVector2[RDCACHE_MAX_VERTICES]
+rdCache_aHWNormalTris 0x006353B0 rdTri[RDCACHE_MAX_TRIS]
 rdCache_totalSolidTris 0x0063A3B0 int
-rdCache_aHWVertices 0x0063A3B8 D3DVERTEX[0x8000]
+rdCache_aHWVertices 0x0063A3B8 D3DVERTEX[RDCACHE_MAX_VERTICES]
 rdCache_drawnFaces 0x0073A3B8 int
 rdCache_numUsedVertices 0x0073A3BC int
 rdCache_numUsedTexVertices 0x0073A3C0 int
@@ -129,7 +129,7 @@ rdCache_numUsedIntensities 0x0073A3C4 int
 rdCache_ulcExtent 0x0086EE70 rdVector2i
 rdCache_lrcExtent 0x0086EE78 rdVector2i
 rdCache_numProcFaces 0x0086EE80 int
-rdCache_aProcFaces 0x0086EEA0 rdProcEntry[0x400]
+rdCache_aProcFaces 0x0086EEA0 rdProcEntry[RDCACHE_MAX_TRIS]
 rdCache_dword_865258 0x00865258 int
 
 sithMulti_name 0x008C4BE0 wchar_t[32]

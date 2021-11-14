@@ -497,7 +497,7 @@ void jkHud_Draw()
             v12 = jkHud_pArmorNumsSuperSft;
             if ( !playerThings[playerThingIdx].shields )
                 v12 = jkHud_pArmorNumSft;
-            stdString_snprintf(tmp, 32, "%03d", v10);
+            stdString_snprintf(tmp, 32, "%03d", v10); // v10
             stdFont_DrawAscii(*jkHud_pStatusLeftBm->mipSurfaces, v12, 23u, 43, 999, tmp, 0);
             stdDisplay_VBufferCopy(
                 *jkHud_pStatusLeftBm->mipSurfaces,
@@ -824,6 +824,18 @@ LABEL_116:
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusLeftBm->mipSurfaces, jkHud_leftBlitX, jkHud_leftBlitY, 0, 1);
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusRightBm->mipSurfaces, jkHud_rightBlitX, jkHud_rightBlitY, 0, 1);
     }
+
+#ifdef DEBUG_QOL_CHEATS
+    int fps = (int)sithTime_TickHz;
+    if (fps > 999)
+        fps = 999;
+    if (fps < 0)
+        fps = 0;
+    memset(tmp, 0, 32);
+    stdString_snprintf(tmp, 32, "%03d", fps);
+    stdFont_DrawAscii(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 0);
+#endif
+
 #ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
 #endif
