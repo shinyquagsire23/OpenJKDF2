@@ -1150,7 +1150,7 @@ void sithCogVm_PushVar(sithCog *ctx, sithCogStackvar *val)
 
     if ( ctx->stackPos == SITHCOGVM_MAX_STACKSIZE )
     {
-        _memmove(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
+        memmove(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
         --ctx->stackPos;
     }
     

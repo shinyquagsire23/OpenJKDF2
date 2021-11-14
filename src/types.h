@@ -1487,7 +1487,7 @@ typedef struct sithCog
     sithCogCallstack callstack[4];
     uint32_t calldepth;
     sithCogSymboltable* symbolTable;
-    sithCogStackvar stack[64];
+    sithCogStackvar stack[SITHCOGVM_MAX_STACKSIZE];
     uint32_t stackPos;
     char cogscript_fpath[32];
     char field_4BC[4096];
