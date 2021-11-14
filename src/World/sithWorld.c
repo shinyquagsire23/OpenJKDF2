@@ -431,7 +431,9 @@ int sithHeader_Load(sithWorld *world, int junk)
         return 0;
     _sscanf(stdConffile_aLine, "gouraud distance %f", &world->gouradDistance);
 
-#ifdef QOL_IMPROVEMENTS
+// Old-style mipmap/LOD removal
+//#ifdef QOL_IMPROVEMENTS
+#if 0
     world->mipmapDistance.x = 200.0;
     world->mipmapDistance.y = 200.0;
     world->mipmapDistance.z = 200.0;

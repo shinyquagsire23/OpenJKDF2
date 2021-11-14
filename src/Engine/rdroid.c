@@ -154,6 +154,27 @@ int rdGetProcFaceUserData(void)
 int rdSetMipDistances(rdVector4 *dists)
 {
     rdVector_Copy4(&rdroid_aMipDistances, dists);
+
+#ifdef QOL_IMPROVEMENTS
+    static rdVector4 origLoad;
+    static int once = 0;
+    if (!once) {
+        origLoad = sithWorld_pCurWorld->loadDistance;
+        once = 1;
+    }
+
+    float scale_factor = (Video_format.width / 640.0) * 2.0;
+    rdroid_aMipDistances.x *= scale_factor;
+    rdroid_aMipDistances.y *= scale_factor;
+    rdroid_aMipDistances.z *= scale_factor;
+    rdroid_aMipDistances.w *= scale_factor;
+
+    sithWorld_pCurWorld->loadDistance.x = origLoad.x * scale_factor;
+    sithWorld_pCurWorld->loadDistance.y = origLoad.y * scale_factor;
+    sithWorld_pCurWorld->loadDistance.z = origLoad.z * scale_factor;
+    sithWorld_pCurWorld->loadDistance.w = origLoad.w * scale_factor;
+#endif
+
     return 1;
 }
 

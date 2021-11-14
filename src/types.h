@@ -13,6 +13,8 @@
 
 #include "Primitives/rdRect.h"
 
+#define SITHCOGVM_MAX_STACKSIZE (64)
+
 #define RDCACHE_MAX_TRIS (0x400)
 #define RDCACHE_MAX_VERTICES (0x8000)
 

@@ -557,6 +557,8 @@ void Window_SdlUpdate()
 
     if (!jkGame_isDDraw)
     {
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+
         std3D_StartScene();
         std3D_DrawMenu();
         std3D_EndScene();
@@ -570,7 +572,7 @@ void Window_SdlUpdate()
     }
     else
     {
-        
+        SDL_SetRelativeMouseMode(SDL_TRUE);
     }
 }
 
