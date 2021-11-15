@@ -704,12 +704,6 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     sithThing *v15; // ebp
     sithActorInstinct *instinct_; // edi
     sithThing *v17; // ebx
-    sithAIClassEntry *v18; // edi
-    sithThing *v19; // eax
-    double v20; // st6
-    double v21; // st5
-    sithThing *v22; // eax
-    int v24; // edx
     sithSectorAlloc *v25; // [esp+10h] [ebp-28h]
     rdVector3 movePos; // [esp+14h] [ebp-24h] BYREF
     rdVector3 lookPos; // [esp+20h] [ebp-18h] BYREF
@@ -741,23 +735,18 @@ LABEL_26:
             sithAI_SetLookFrame(actor_, &lookPos);
             if ( (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
             {
-                v18 = aiclass;
                 if ( aiclass->argsAsFloat[1] != 0.0 )
                 {
-                    v19 = actor_->thing;
                     movePos.x = lookPos.x - actor_->thing->position.x;
-                    movePos.y = lookPos.y - v19->position.y;
-                    movePos.z = lookPos.z - v19->position.z;
+                    movePos.y = lookPos.y - actor_->thing->position.y;
+                    movePos.z = lookPos.z - actor_->thing->position.z;
                     rdVector_Normalize3Acc(&movePos);
-                    v20 = v18->argsAsFloat[1] * movePos.y;
-                    v21 = v18->argsAsFloat[1] * movePos.z;
-                    v22 = actor_->thing;
-                    movePos.x = v18->argsAsFloat[1] * movePos.x;
-                    movePos.y = v20;
-                    movePos.z = v21;
-                    movePos.x = v22->position.x + movePos.x;
-                    movePos.y = v22->position.y + movePos.y;
-                    movePos.z = v22->position.z + movePos.z;
+                    movePos.x *= aiclass->argsAsFloat[1];
+                    movePos.y *= aiclass->argsAsFloat[1];
+                    movePos.z *= aiclass->argsAsFloat[1];
+                    movePos.x += actor_->thing->position.x;
+                    movePos.y += actor_->thing->position.y;
+                    movePos.z += actor_->thing->position.z;
                     sithAI_SetMoveThing(actor_, &movePos, 2.5);
                 }
             }
@@ -765,10 +754,10 @@ LABEL_26:
             {
                 if ( v17->type == SITH_THING_ACTOR || v17->type == SITH_THING_PLAYER )
                 {
-                    v24 = actor_->flags;
                     actor_->field_1D0 = v17;
                     actor_->thingidk = v17;
-                    actor_->flags = v24 & ~SITHAIFLAGS_SEARCHING | SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET;
+                    actor_->flags &= ~SITHAIFLAGS_SEARCHING;
+                    actor_->flags |= SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET;
                 }
             }
         }

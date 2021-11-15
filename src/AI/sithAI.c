@@ -1084,7 +1084,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     v11 = rdVector_Normalize3Acc(a5);
     *a8 = v11;
     // TODO verify
-    if ( v11 > a5->x )
+    if ( v11 > arg10 )
         return 1;
     if ( argC > -1.0 )
     {
