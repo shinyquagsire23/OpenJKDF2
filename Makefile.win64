@@ -34,3 +34,13 @@ $(TARGET): $(OBJECTS)
 	@x86_64-w64-mingw32-windres $(ROOT_DIR)/packaging/win32/openjkdf2.rc -O coff -o $(OBJ)/openjkdf2.res
 	$(CC) -o $@ -g $^ $(OBJ)/openjkdf2.res $(LDFLAGS)
 	@rm -rf $(ROOT_DIR)/packaging/icon-256.png $(ROOT_DIR)/packaging/openjkdf2.ico
+	@mkdir -p win64-package
+	@cp $@ win64-package
+	@cp 3rdparty/SDL2/x86_64-w64-mingw32/bin/SDL2.dll win64-package/
+	@cp 3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/SDL2_mixer.dll win64-package/
+	@cp 3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libogg-0.dll win64-package/
+	@cp 3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbis-0.dll win64-package/
+	@cp 3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll win64-package/
+	@cp 3rdparty/alut/bin/libalut-0.dll win64-package/
+	@cp 3rdparty/glew/bin/Release/x64/glew32.dll win64-package/
+	@cp 3rdparty/openal-soft/bin/Win64/soft_oal.dll win64-package/OpenAL32.dll
