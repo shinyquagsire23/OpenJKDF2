@@ -17,7 +17,7 @@ jobs:
       run: |
           set -e
           brew update
-          brew install make python3
+          brew install make python3 imagemagick
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft freealut sdl2 sdl2_mixer glew
     - name: make

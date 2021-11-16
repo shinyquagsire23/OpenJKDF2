@@ -5,7 +5,7 @@ Building is currently only tested on Arch Linux, Ubuntu, and MacOS. Windows buil
 Arch Linux Dependencies:
 ```
 # All
-pacman -S base-devel make python python-pip bison
+pacman -S base-devel make python python-pip bison imagemagick
 pip3 install cogapp
 
 # Win32/MinGW
@@ -24,7 +24,7 @@ pacaur -S emscripten
 WIP Ubuntu Dependencies:
 ```
 # All
-apt install build-essential make python3 python3-pip bison
+apt install build-essential make python3 python3-pip bison imagemagick
 pip3 install cogapp
 
 # Win32/MinGW
@@ -49,7 +49,7 @@ MacOS:
 Before starting, install Xcode. This is required for OpenGL headers, among other things.
 ```
 # All
-brew install make python3
+brew install make python3 imagemagick
 pip3 install cogapp generate-iconset
 
 # After installing cogapp, make sure the following is in your ~/.zshrc:
