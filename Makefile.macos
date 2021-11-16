@@ -43,4 +43,7 @@ $(BUNDLE): $(TARGET)
 	@cp packaging/icon.icns $(BUNDLE)/Contents/Resources/OpenJKDF2.icns
 	@rm -rf packaging/icon.iconset
 	@rm -rf packaging/icon.icns
-	@codesign -s - $(BUNDLE) --force --deep --verbose
+	@mkdir -p macos-package
+	@cp -r $(BUNDLE) macos-package
+
+#@codesign -s - $(BUNDLE) --force --deep --verbose
