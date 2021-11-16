@@ -814,8 +814,13 @@ void std3D_DrawRenderList()
     
     int do_batch = 0;
     
-    glDepthFunc(GL_LESS);
+    //glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
+
+    if (!(tris[0].flags & 0x800)) {
+        //glDepthFunc(GL_ALWAYS);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
     
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
@@ -878,7 +883,7 @@ void std3D_DrawRenderList()
                 }
                 else
                 {
-                    glDepthFunc(GL_ALWAYS);
+                    //glDepthFunc(GL_ALWAYS);
                     glClear(GL_DEPTH_BUFFER_BIT);
                 }
                 
