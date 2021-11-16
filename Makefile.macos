@@ -36,6 +36,17 @@ $(BUNDLE): $(TARGET)
 	@cp -r packaging/macos/* $(BUNDLE)/
 	@mkdir -p $(BUNDLE)/Contents/MacOS/
 	@cp $(TARGET) $(BUNDLE)/Contents/MacOS
+	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib @executable_path/libSDL2_mixer-2.0.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/sdl2/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/glew/lib/libGLEW.2.2.dylib @executable_path/libGLEW.2.2.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/openal-soft/lib/libopenal.1.dylib @executable_path/libopenal.1.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.0.dylib @executable_path/libalut.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@cp $(HOMEBREW_PREFIX)/opt/sdl2/lib/libSDL2-2.0.0.dylib $(BUNDLE)/Contents/MacOS
+	@cp $(HOMEBREW_PREFIX)/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib $(BUNDLE)/Contents/MacOS
+	@cp $(HOMEBREW_PREFIX)/opt/glew/lib/libGLEW.2.2.dylib $(BUNDLE)/Contents/MacOS
+	@cp $(HOMEBREW_PREFIX)/opt/openal-soft/lib/libopenal.1.dylib $(BUNDLE)/Contents/MacOS
+	@cp $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.0.dylib $(BUNDLE)/Contents/MacOS
+	@chmod 774 $(BUNDLE)/Contents/MacOS/*.dylib
 	@cp -r openjkdf2-64.dsym $(BUNDLE)/Contents/MacOS/openjkdf2-64.dsym
 	@chmod 774 $(BUNDLE)/Contents/MacOS/$(TARGET)
 	@generate-iconset packaging/icon.png
@@ -43,6 +54,7 @@ $(BUNDLE): $(TARGET)
 	@cp packaging/icon.icns $(BUNDLE)/Contents/Resources/OpenJKDF2.icns
 	@rm -rf packaging/icon.iconset
 	@rm -rf packaging/icon.icns
+	@rm -rf macos-package
 	@mkdir -p macos-package
 	@cp -r $(BUNDLE) macos-package
 
