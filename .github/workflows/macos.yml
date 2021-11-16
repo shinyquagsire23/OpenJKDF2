@@ -20,9 +20,8 @@ jobs:
           brew install make python3
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft freealut sdl2 sdl2_mixer glew
-          export HOMEBREW_PREFIX=/usr/local
     - name: make
-      run: make clean && make -f Makefile.macos
+      run: make clean && HOMEBREW_PREFIX=/usr/local make -f Makefile.macos
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
