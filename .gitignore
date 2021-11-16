@@ -63,3 +63,4 @@ symbols.ld.cog
 Makefile.wasm
 .DS_Store
 *.cxlog
+OpenJKDF2.app

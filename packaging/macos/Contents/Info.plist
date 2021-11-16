@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>OpenJKDF2</string>
+	<key>CFBundleExecutable</key>
+	<string>openjkdf2-64</string>
+	<key>CFBundleIconFile</key>
+	<string>OpenJKDF2.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.openjkdf2.openjkdf2</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>12.0.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>SDL_FILESYSTEM_BASE_DIR_TYPE</key>
+	<string>parent</string>
+</dict>
+</plist>

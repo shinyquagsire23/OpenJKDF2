@@ -56,11 +56,20 @@
 #include "Engine/rdroid.h"
 #include "Engine/sith.h"
 
+#if defined(MACOS) && defined(SDL2_RENDER)
+#include <SDL2/SDL.h>
+#include <unistd.h>
+#endif
+
 static common_functions hs;
 
 int Main_Startup(const char *cmdline)
 {
     int result; // eax
+
+#if defined(MACOS) && defined(SDL2_RENDER)
+    chdir(SDL_GetBasePath());
+#endif
 
     stdInitServices(&hs);    
     jkGuiNetHost_maxRank = 4;
@@ -150,11 +159,13 @@ int Main_Startup(const char *cmdline)
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     stdStartup(&hs);
 
+#ifndef __APPLE__
     stdFile_t tf = std_pHS->fileOpen("is_alive.txt", "w");
     const char* msg = "OpenJKDF2 is hooked and alive! \nCmdline: \n";
     std_pHS->fileWrite(tf, msg, _strlen(msg));
     std_pHS->fileWrite(tf, cmdline, _strlen(cmdline));
     std_pHS->fileClose(tf);
+#endif
 
     jkGob_Startup();
     jkRes_Startup(pHS);

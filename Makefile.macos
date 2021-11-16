@@ -1,5 +1,6 @@
 CC := clang
 TARGET := openjkdf2-64
+BUNDLE := OpenJKDF2.app
 
 SRC := src
 OBJ := build_darwin64
@@ -11,12 +12,12 @@ OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Flags
-LDFLAGS := -glldb -fshort-wchar -lm -framework OpenGL $(shell pkg-config --libs sdl2) $(shell pkg-config --libs sdl2_mixer) $(shell pkg-config --libs glew) -lopenal -lalut -L$(HOMEBREW_PREFIX)/opt/openal-soft/lib -L$(HOMEBREW_PREFIX)/opt/freealut/lib
+LDFLAGS := -glldb -fshort-wchar -lm -framework OpenGL $(shell pkg-config --static --libs sdl2) $(shell pkg-config --static --libs sdl2_mixer) $(shell pkg-config --static --libs glew) -lopenal -lalut -L$(HOMEBREW_PREFIX)/opt/openal-soft/lib $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.a
 CFLAGS := -glldb -O2 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DARCH_64BIT -DMACOS -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -I$(HOMEBREW_PREFIX)/opt/openal-soft/include -I$(HOMEBREW_PREFIX)/opt/freealut/include $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags sdl2_mixer) $(shell pkg-config --cflags glew) -I$(HOMEBREW_PREFIX)/include
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 
-all: $(TARGET)
+all: $(TARGET) $(BUNDLE)
 include common.mk
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
@@ -26,3 +27,19 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 $(TARGET): $(OBJECTS)
 	$(CC) -o $@ -g $^ $(LDFLAGS)
 	dsymutil $@ -o $@.dsym
+
+$(BUNDLE): $(TARGET)
+	@rm -rf $(BUNDLE)
+	@rm -rf packaging/icon.iconset
+	@rm -rf packaging/icon.icns
+	@mkdir -p $(BUNDLE)
+	@cp -r packaging/macos/* $(BUNDLE)/
+	@mkdir -p $(BUNDLE)/Contents/MacOS/
+	@cp $(TARGET) $(BUNDLE)/Contents/MacOS
+	@chmod 774 $(BUNDLE)/Contents/MacOS/$(TARGET)
+	@generate-iconset packaging/icon.png
+	@mkdir -p $(BUNDLE)/Contents/Resources/
+	@cp packaging/icon.icns $(BUNDLE)/Contents/Resources/OpenJKDF2.icns
+	@rm -rf packaging/icon.iconset
+	@rm -rf packaging/icon.icns
+	@codesign -s - $(BUNDLE) --force --deep --verbose

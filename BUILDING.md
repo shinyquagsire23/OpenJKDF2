@@ -50,7 +50,7 @@ Before starting, install Xcode. This is required for OpenGL headers, among other
 ```
 # All
 brew install make python3
-pip3 install cogapp
+pip3 install cogapp generate-iconset
 
 # After installing cogapp, make sure the following is in your ~/.zshrc:
 # export PATH=$PATH:$HOME/Library/Python/3.8/bin
