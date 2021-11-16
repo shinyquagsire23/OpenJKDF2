@@ -36,6 +36,7 @@ $(BUNDLE): $(TARGET)
 	@cp -r packaging/macos/* $(BUNDLE)/
 	@mkdir -p $(BUNDLE)/Contents/MacOS/
 	@cp $(TARGET) $(BUNDLE)/Contents/MacOS
+	@cp -r openjkdf2-64.dsym $(BUNDLE)/Contents/MacOS/openjkdf2-64.dsym
 	@chmod 774 $(BUNDLE)/Contents/MacOS/$(TARGET)
 	@generate-iconset packaging/icon.png
 	@mkdir -p $(BUNDLE)/Contents/Resources/

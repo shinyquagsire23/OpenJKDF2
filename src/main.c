@@ -171,6 +171,12 @@ int main(int argc, char** argv)
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#ifdef SDL2_RENDER
+#include <SDL2/SDL.h>
+#endif
 
 //#include "external/libbacktrace/backtrace.h"
 
@@ -212,7 +218,9 @@ static void full_write(int fd, const char *buf, size_t len)
 void print_backtrace(void)
 {
     static const char start[] = "BACKTRACE:\n----------------------\n";
-    static const char end[] = "----------------------\n";
+    static const char end[] = "\n\nPlease report this bug to https://github.com/shinyquagsire23/OpenJKDF2/issues\n"
+                              "or email me at mtinc2@gmail.com, thanks!\n"
+                              "----------------------\n";
 
     void *bt[1024];
     int bt_size;
@@ -228,13 +236,37 @@ void print_backtrace(void)
             full_write(STDERR_FILENO, "\n", 1);
     }
     full_write(STDERR_FILENO, end, strlen(end));
+
+    char* crash_print = malloc(1024);
+    strcpy(crash_print, start);
+    for (i = 1; i < bt_size; i++) {
+        strcat(crash_print, bt_syms[i]);
+        strcat(crash_print, "\n");
+    }
+    strcat(crash_print, end);
+
+    FILE* f = fopen("crash.log", "a");
+    if (f)
+    {
+        fwrite(crash_print, 1, strlen(crash_print), f);
+        fclose(f);
+    }
+
+#if 0
+#ifdef SDL2_RENDER
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Crash!", crash_print, NULL);
+#endif
+#endif
+
+    free(crash_print);
+
     free(bt_syms);
 }
 
 void crash_handler_basic(int sig) 
 {
     print_backtrace();
-    exit(1);
+    signal(SIGSEGV, SIG_DFL); // Pass error to OS; MacOS has nicer crash diagnostics
 }
 
 void crash_handler_full(int sig) 

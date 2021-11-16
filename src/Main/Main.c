@@ -59,6 +59,8 @@
 #if defined(MACOS) && defined(SDL2_RENDER)
 #include <SDL2/SDL.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 #endif
 
 static common_functions hs;
@@ -67,8 +69,29 @@ int Main_Startup(const char *cmdline)
 {
     int result; // eax
 
+    // TODO bring this to Windows (%appdata%) and Linux
 #if defined(MACOS) && defined(SDL2_RENDER)
+    const char *homedir;
+    char fname[256];
+
+    // Default working directory to the folder the .app bundle is in
     chdir(SDL_GetBasePath());
+
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+
+    if (homedir) {
+        strcpy(fname, homedir);
+        strcat(fname, "/.local/share/openjkdf2/resource/jk_.cd");
+
+        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
+        if( access( fname, F_OK ) == 0 ) {
+            strcpy(fname, homedir);
+            strcat(fname, "/.local/share/openjkdf2");
+            chdir(fname);
+        }
+    }    
 #endif
 
     stdInitServices(&hs);    
