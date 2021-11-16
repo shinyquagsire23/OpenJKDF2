@@ -29,4 +29,8 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ -g $^ $(LDFLAGS)
+	@convert $(ROOT_DIR)/packaging/icon.png -resize 25% $(ROOT_DIR)/packaging/icon-256.png
+	@convert $(ROOT_DIR)/packaging/icon-256.png $(ROOT_DIR)/packaging/openjkdf2.ico
+	@x86_64-w64-mingw32-windres $(ROOT_DIR)/packaging/win32/openjkdf2.rc -O coff -o $(OBJ)/openjkdf2.res
+	$(CC) -o $@ -g $^ $(OBJ)/openjkdf2.res $(LDFLAGS)
+	@rm -rf $(ROOT_DIR)/packaging/icon-256.png $(ROOT_DIR)/packaging/openjkdf2.ico

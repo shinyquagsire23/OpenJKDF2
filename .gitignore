@@ -64,3 +64,5 @@ Makefile.wasm
 .DS_Store
 *.cxlog
 OpenJKDF2.app
+build_win64
+*.ico
