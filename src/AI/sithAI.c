@@ -18,6 +18,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithRender.h"
+#include "Engine/sithPhysics.h"
 #include "General/stdHashTable.h"
 #include "Main/jkGame.h"
 #include "Cog/sithCogVm.h"
@@ -1136,7 +1137,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     v6 = (sithSector *)result;
     if ( !result )
         return result;
-    a6 = sithSector_ThingGetInsertOffsetZ(v4) + a7->aiclass->maxStep;
+    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + a7->aiclass->maxStep;
     sithCollision_SearchRadiusForThings(v6, v4, a4, &a5, a6, a7a, 0x2002);
     v7 = sithCollision_NextSearchResult();
     if ( !v7 )
@@ -1212,7 +1213,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     a5.z = -1.0;
     v5 = 0;
     a7 = v4->moveSize * 0.25;
-    a6 = sithSector_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
+    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
     sithCollision_SearchRadiusForThings(a2, v4, a4, &a5, a6, a7, 0x2002);
     v6 = sithCollision_NextSearchResult();
     if ( v6 )

@@ -67,6 +67,7 @@
 #include "Engine/sithDebugConsole.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
+#include "Engine/sithPhysics.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithSave.h"
 #include "Engine/sithSprite.h"
@@ -77,6 +78,7 @@
 #include "Engine/sithMapView.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithRender.h"
+#include "Engine/sithRenderSky.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
@@ -125,6 +127,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"
+#include "AI/sithAIAwareness.h"
 #include "Main/jkAI.h"
 #include "Main/jkCredits.h"
 #include "Main/jkCutscene.h"
@@ -140,6 +143,8 @@
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"
 #include "Main/Main.h"
+#include "Dss/sithDSSThing.h"
+#include "Dss/sithDSS.h"
 #include "stdPlatform.h"
 
 int openjkdf2_bIsKVM = 1;
@@ -1265,46 +1270,45 @@ void do_hooks()
     hook_function(sithThing_GetById_ADDR, sithThing_GetById);
     
     // sithSector
-    hook_function(sithSector_Startup_ADDR, sithSector_Startup);
-    hook_function(sithSector_Shutdown_ADDR, sithSector_Shutdown);
-    hook_function(sithSector_ApplyDrag_ADDR, sithSector_ApplyDrag);
-    hook_function(sithSector_ThingPhysicsTick_ADDR, sithSector_ThingPhysicsTick);
-    hook_function(sithSector_ThingPhysGeneral_ADDR, sithSector_ThingPhysGeneral);
-    hook_function(sithSector_ThingPhysPlayer_ADDR, sithSector_ThingPhysPlayer);
-    hook_function(sithSector_UpdateSky_ADDR, sithSector_UpdateSky);
+    hook_function(sithAIAwareness_Startup_ADDR, sithAIAwareness_Startup);
+    hook_function(sithAIAwareness_Shutdown_ADDR, sithAIAwareness_Shutdown);
+    hook_function(sithPhysics_ApplyDrag_ADDR, sithPhysics_ApplyDrag);
+    hook_function(sithPhysics_ThingPhysGeneral_ADDR, sithPhysics_ThingPhysGeneral);
+    hook_function(sithPhysics_ThingPhysPlayer_ADDR, sithPhysics_ThingPhysPlayer);
+    hook_function(sithRenderSky_Update_ADDR, sithRenderSky_Update);
     hook_function(sithSector_Free_ADDR, sithSector_Free);
-    hook_function(sithSector_sub_4F2E30_ADDR, sithSector_sub_4F2E30);
-    hook_function(sithSector_ThingSetLook_ADDR, sithSector_ThingSetLook);
-    hook_function(sithSector_ThingApplyForce_ADDR, sithSector_ThingApplyForce);
-    hook_function(sithSector_sub_4F2F60_ADDR, sithSector_sub_4F2F60);
-    hook_function(sithSector_AddEntry_ADDR, sithSector_AddEntry);
-    hook_function(sithSector_ThingGetInsertOffsetZ_ADDR, sithSector_ThingGetInsertOffsetZ);
-    hook_function(sithSector_cogMsg_SendSyncThingFull_ADDR, sithSector_cogMsg_SendSyncThingFull);
-    hook_function(sithSector_cogMsg_SendSyncPuppet_ADDR, sithSector_cogMsg_SendSyncPuppet);
-    hook_function(sithSector_cogMsg_SendSyncAI_ADDR, sithSector_cogMsg_SendSyncAI);
-    hook_function(sithSector_cogMsg_SendSyncSurface_ADDR, sithSector_cogMsg_SendSyncSurface);
-    hook_function(sithSector_cogMsg_SendSyncSector_ADDR, sithSector_cogMsg_SendSyncSector);
-    hook_function(sithSector_cogMsg_SendSyncItemDesc_ADDR, sithSector_cogMsg_SendSyncItemDesc);
-    hook_function(sithSector_cogMsg_SendStopAnim_ADDR, sithSector_cogMsg_SendStopAnim);
-    hook_function(sithSector_cogMsg_SendSyncTimers_ADDR, sithSector_cogMsg_SendSyncTimers);
-    hook_function(sithSector_cogMsg_SendSyncPalEffects_ADDR, sithSector_cogMsg_SendSyncPalEffects);
-    hook_function(sithSector_cogMsg_SendSyncCameras_ADDR, sithSector_cogMsg_SendSyncCameras);
-    hook_function(sithSector_cogMsg_SendMisc_ADDR, sithSector_cogMsg_SendMisc);
-    hook_function(sithSector_cogMsg_SendPlaySoundPos_ADDR, sithSector_cogMsg_SendPlaySoundPos);
+    hook_function(sithRenderSky_TransformHorizontal_ADDR, sithRenderSky_TransformHorizontal);
+    hook_function(sithPhysics_ThingSetLook_ADDR, sithPhysics_ThingSetLook);
+    hook_function(sithPhysics_ThingApplyForce_ADDR, sithPhysics_ThingApplyForce);
+    hook_function(sithRenderSky_TransformVertical_ADDR, sithRenderSky_TransformVertical);
+    hook_function(sithAIAwareness_AddEntry_ADDR, sithAIAwareness_AddEntry);
+    hook_function(sithPhysics_ThingGetInsertOffsetZ_ADDR, sithPhysics_ThingGetInsertOffsetZ);
+    hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
+    hook_function(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
+    hook_function(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI);
+    hook_function(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface);
+    hook_function(sithDSS_SendSyncSector_ADDR, sithDSS_SendSyncSector);
+    hook_function(sithDSS_SendSyncItemDesc_ADDR, sithDSS_SendSyncItemDesc);
+    hook_function(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim);
+    hook_function(sithDSS_SendSyncTimers_ADDR, sithDSS_SendSyncTimers);
+    hook_function(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
+    hook_function(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
+    hook_function(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
+    hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
-    hook_function(sithSector_cogMsg_HandleSyncThingFull_ADDR, sithSector_cogMsg_HandleSyncThingFull);
-    hook_function(sithSector_cogMsg_HandleSyncPuppet_ADDR, sithSector_cogMsg_HandleSyncPuppet);
-    hook_function(sithSector_cogMsg_HandleSyncAI_ADDR, sithSector_cogMsg_HandleSyncAI);
-    hook_function(sithSector_cogMsg_HandleSyncSurface_ADDR, sithSector_cogMsg_HandleSyncSurface);
-    hook_function(sithSector_cogMsg_HandleSyncSector_ADDR, sithSector_cogMsg_HandleSyncSector);
-    hook_function(sithSector_cogMsg_HandleSyncItemDesc_ADDR, sithSector_cogMsg_HandleSyncItemDesc);
-    hook_function(sithSector_cogMsg_HandleStopAnim_ADDR, sithSector_cogMsg_HandleStopAnim);
-    hook_function(sithSector_cogMsg_HandleSyncTimers_ADDR, sithSector_cogMsg_HandleSyncTimers);
-    hook_function(sithSector_cogMsg_HandleSyncPalEffects_ADDR, sithSector_cogMsg_HandleSyncPalEffects);
-    hook_function(sithSector_cogMsg_HandleSyncCameras_ADDR, sithSector_cogMsg_HandleSyncCameras);
-    hook_function(sithSector_cogMsg_HandlePlaySoundPos_ADDR, sithSector_cogMsg_HandlePlaySoundPos);
-    hook_function(sithSector_cogMsg_HandleMisc_ADDR, sithSector_cogMsg_HandleMisc);
-    hook_function(sithSector_cogMsg_SendSyncThingAttachment_ADDR, sithSector_cogMsg_SendSyncThingAttachment);
+    hook_function(sithDSSThing_HandleSyncThingFull_ADDR, sithDSSThing_HandleSyncThingFull);
+    hook_function(sithDSS_HandleSyncPuppet_ADDR, sithDSS_HandleSyncPuppet);
+    hook_function(sithDSS_HandleSyncAI_ADDR, sithDSS_HandleSyncAI);
+    hook_function(sithDSS_HandleSyncSurface_ADDR, sithDSS_HandleSyncSurface);
+    hook_function(sithDSS_HandleSyncSector_ADDR, sithDSS_HandleSyncSector);
+    hook_function(sithDSS_HandleSyncItemDesc_ADDR, sithDSS_HandleSyncItemDesc);
+    hook_function(sithDSS_HandleStopAnim_ADDR, sithDSS_HandleStopAnim);
+    hook_function(sithDSS_HandleSyncTimers_ADDR, sithDSS_HandleSyncTimers);
+    hook_function(sithDSS_HandleSyncPalEffects_ADDR, sithDSS_HandleSyncPalEffects);
+    hook_function(sithDSS_HandleSyncCameras_ADDR, sithDSS_HandleSyncCameras);
+    hook_function(sithDSSThing_HandlePlaySoundPos_ADDR, sithDSSThing_HandlePlaySoundPos);
+    hook_function(sithDSS_HandleMisc_ADDR, sithDSS_HandleMisc);
+    hook_function(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1464,6 +1468,10 @@ void do_hooks()
     hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
     hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
     hook_function(sithPlayer_GetNumidk_ADDR, sithPlayer_GetNumidk);
+
+    // sithPhysics
+    hook_function(sithPhysics_FindFloor_ADDR, sithPhysics_FindFloor);
+    hook_function(sithPhysics_ThingTick_ADDR, sithPhysics_ThingTick);
     
     // sithSurface
     hook_function(sithSurface_Free_ADDR, sithSurface_Free);

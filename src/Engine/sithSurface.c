@@ -12,6 +12,7 @@
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithNet.h"
+#include "Dss/sithDSS.h"
 #include "jk.h"
 
 int sithSurface_Startup()
@@ -1240,7 +1241,7 @@ void sithSurface_Sync(int mpFlags)
         {
             int flags = sithSurface_aSurfaces[i].flags;
             if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
-                sithSector_cogMsg_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
+                sithDSS_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
         }
     }
 }

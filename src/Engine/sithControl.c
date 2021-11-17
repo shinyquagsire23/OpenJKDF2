@@ -17,6 +17,7 @@
 #include "Engine/sithTime.h"
 #include "Engine/sithSave.h"
 #include "Engine/sithMapView.h"
+#include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "Main/jkMain.h"
 #include "jk.h"
@@ -188,7 +189,7 @@ LABEL_39:
         return 0;
     }
     if ( player->moveType == SITH_MT_PHYSICS )
-        sithSector_StopPhysicsThing(player);
+        sithPhysics_ThingStop(player);
     v3 = INPUT_FUNC_SELECT1;
     while ( 1 )
     {
@@ -356,7 +357,7 @@ LABEL_20:
         }
         else if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) )
         {
-            sithSector_ThingSetLook(player, &rdroid_zVector3, deltaSecs);
+            sithPhysics_ThingSetLook(player, &rdroid_zVector3, deltaSecs);
         }
     }
 }

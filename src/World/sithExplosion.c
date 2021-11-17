@@ -1,10 +1,12 @@
 #include "sithExplosion.h"
 
+#include "AI/sithAIAwareness.h"
 #include "World/sithThing.h"
 #include "Engine/sithCollision.h"
 #include "World/sithSector.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithSurface.h"
+#include "Engine/sithPhysics.h"
 #include "jk.h"
 
 void sithExplosion_CreateThing(sithThing *explosion)
@@ -87,7 +89,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
     damage = explosion->explosionParams.damage;
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
-        sithSector_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
+        sithAIAwareness_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
         sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, 0x482);
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
@@ -122,7 +124,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                         a2.x = i->field_14.x * v5;
                         a2.y = v6;
                         a2.z = v7;
-                        sithSector_ThingApplyForce(v4, &a2);
+                        sithPhysics_ThingApplyForce(v4, &a2);
                     }
                     if ( damage != 0.0 )
                     {

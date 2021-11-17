@@ -10,9 +10,10 @@
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"
+#include "Engine/sithPhysics.h"
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCog.h"
-
+#include "Dss/sithDSSThing.h"
 #include "jk.h"
 
 static int lastDoorOpenTime = 0;
@@ -122,7 +123,7 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
             }
             v15 = sithSoundClass_ThingPlaySoundclass(thing, jumpSound);
             if ( v15 && sithCogVm_multiplayerFlags )
-                sithSector_cogMsg_SoundClassPlay(thing, jumpSound, (int)v15->entries[14], -1.0);
+                sithDSSThing_SoundClassPlay(thing, jumpSound, (int)v15->entries[14], -1.0);
             sithThing_DetachThing(thing);
         }
         if ( sithCogVm_multiplayerFlags )
@@ -159,7 +160,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
         {
             v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
             if ( sithCogVm_multiplayerFlags && v5 >= 0 )
-                sithSector_cogMsg_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
+                sithDSSThing_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
             sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
             for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
@@ -196,7 +197,7 @@ void sithActor_Remove(sithThing *thing)
     thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
     thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
     thing->lifeLeftMs = 20000;
-    sithSector_ThingLandIdk(thing, 0);
+    sithPhysics_FindFloor(thing, 0);
 }
 
 void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
@@ -214,9 +215,9 @@ void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
-            sithSector_StopPhysicsThing(thing);
+            sithPhysics_ThingStop(thing);
             thing->physicsParams.physflags &= ~PHYSFLAGS_100;
-            sithSector_ThingLandIdk(thing, 1);
+            sithPhysics_FindFloor(thing, 1);
         }
     }
 }

@@ -10,6 +10,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithControl.h"
 #include "World/jkPlayer.h"
+#include "Dss/sithDSSThing.h"
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
 {
@@ -717,8 +718,8 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
         }
     }
 
-    sithSector_cogMsg_SendCreateThing(templateThing, backpack, player, 0, 0, 0, 255, 1);
-    sithSector_cogMsg_SendSyncThing(backpack, -1, 255);
+    sithDSSThing_SendCreateThing(templateThing, backpack, player, 0, 0, 0, 255, 1);
+    sithDSSThing_SendSyncThing(backpack, -1, 255);
     return backpack;
 }
 

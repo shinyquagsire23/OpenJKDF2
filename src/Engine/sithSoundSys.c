@@ -1,5 +1,6 @@
 #include "sithSoundSys.h"
 
+#include "AI/sithAIAwareness.h"
 #include "Engine/sithControl.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithTime.h"
@@ -11,6 +12,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
+#include "Dss/sithDSSThing.h"
 #include "jk.h"
 
 int sithSoundSys_Startup()
@@ -577,7 +579,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
             if ( a2 == g_localPlayerThing || a2->moveType == SITH_MT_PATH )
             {
                 a4a = a5 * 0.60000002;
-                sithSector_AddEntry(a2->sector, &a2->position, 0, a4a, a2);
+                sithAIAwareness_AddEntry(a2->sector, &a2->position, 0, a4a, a2);
             }
             if ( sithSoundSys_bOpened )
             {
@@ -1436,7 +1438,7 @@ void sithSoundSys_SyncSounds()
             if ( sound )
             {
                 if ( (iter->flags & 1) != 0 )
-                    sithSector_cogMsg_SendPlaySoundPos(
+                    sithDSSThing_SendPlaySoundPos(
                         iter->thing,
                         &iter->pos,
                         sound,

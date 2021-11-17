@@ -18,6 +18,7 @@
 #include "Engine/rdCache.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdCamera.h"
+#include "Engine/sithRenderSky.h"
 #include "General/stdMath.h"
 #include "Primitives/rdFace.h"
 #include "Primitives/rdModel3.h"
@@ -147,7 +148,7 @@ int sithRender_Open()
     rdColormap_SetCurrent(sithWorld_pCurWorld->colormaps);
     rdColormap_SetIdentity(sithWorld_pCurWorld->colormaps);
 
-    sithSector_SetSkyParams(sithWorld_pCurWorld->horizontalPixelsPerRev, sithWorld_pCurWorld->horizontalDistance, sithWorld_pCurWorld->ceilingSky);
+    sithRenderSky_Open(sithWorld_pCurWorld->horizontalPixelsPerRev, sithWorld_pCurWorld->horizontalDistance, sithWorld_pCurWorld->ceilingSky);
 
     sithRender_lightingIRMode = 0; 
     sithRender_needsAspectReset = 0;
@@ -170,7 +171,7 @@ void sithRender_Close()
     //rdModel3_Free(lightDebugThing_model3); // TODO figure out weird free issues
     rdThing_Free(lightDebugThing);
 
-    sithSector_Close();
+    sithRenderSky_Close();
 }
 
 void sithRender_Shutdown()
@@ -263,7 +264,7 @@ void sithRender_Draw()
 
     lightDebugNum = 0;
 
-    sithSector_UpdateSky();
+    sithRenderSky_Update();
     if ( sithRender_geoMode )
     {
         rdSetGeometryMode(sithRender_geoMode);
@@ -833,11 +834,11 @@ void sithRender_RenderLevelGeometry()
                 surfaceFlags = v65->surfaceFlags;
                 if ( (surfaceFlags & SURFACEFLAGS_200) != 0 )
                 {
-                    sithSector_sub_4F2E30(procEntry, &v65->surfaceInfo, num_vertices);
+                    sithRenderSky_TransformHorizontal(procEntry, &v65->surfaceInfo, num_vertices);
                 }
                 else if ( (surfaceFlags & SURFACEFLAGS_400) != 0 )
                 {
-                    sithSector_sub_4F2F60(procEntry, &v65->surfaceInfo, vertices_tmp, num_vertices);
+                    sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, vertices_tmp, num_vertices);
                 }
                 v57 = v65->surfaceInfo.face.type;
                 procEntry->wallCel = v65->surfaceInfo.face.wallCel;

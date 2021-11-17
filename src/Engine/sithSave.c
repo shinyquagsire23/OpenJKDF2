@@ -22,6 +22,8 @@
 #include "General/stdFileUtil.h"
 #include "Win95/DebugConsole.h"
 #include "Cog/sithCogVm.h"
+#include "Dss/sithDSSThing.h"
+#include "Dss/sithDSS.h"
 #include "jk.h"
 
 void sithSave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -202,9 +204,9 @@ int sithSave_SerializeAllThings(int mpFlags)
         sithThing* v4 = &sithWorld_pCurWorld->things[i];
         if ( sithThing_ShouldSync(v4) )
         {
-            sithSector_cogMsg_SendSyncThingFull(v4, 0, mpFlags);
+            sithDSSThing_SendSyncThingFull(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
-                sithSector_cogMsg_SendSyncPuppet(v4, 0, mpFlags);
+                sithDSS_SendSyncPuppet(v4, 0, mpFlags);
         }
     }
 
@@ -216,7 +218,7 @@ int sithSave_SerializeAllThings(int mpFlags)
             if ( v7->attach_flags )
             {
                 if ( (v7->attach_flags & 8) != 0 || v7->moveType != SITH_MT_PHYSICS )
-                    sithSector_cogMsg_SendSyncThingAttachment(v7, 0, mpFlags, 1);
+                    sithDSSThing_SendSyncThingAttachment(v7, 0, mpFlags, 1);
             }
         }
     }
@@ -224,7 +226,7 @@ int sithSave_SerializeAllThings(int mpFlags)
     for (uint32_t i = 0; i < 256; i++) // TODO define this maximum
     {
         if ( sithAI_actors[i].aiclass )
-            sithSector_cogMsg_SendSyncAI(&sithAI_actors[i], 0, mpFlags);
+            sithDSS_SendSyncAI(&sithAI_actors[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurWorld->numCogsLoaded; i++)
@@ -242,29 +244,29 @@ int sithSave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurWorld->numSurfaces; i++)
     {
-        sithSector_cogMsg_SendSyncSurface(&sithWorld_pCurWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SendSyncSurface(&sithWorld_pCurWorld->surfaces[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurWorld->numSectors; i++)
     {
-        sithSector_cogMsg_SendSyncSector(&sithWorld_pCurWorld->sectors[i], 0, mpFlags);
+        sithDSS_SendSyncSector(&sithWorld_pCurWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
         if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
-            sithSector_cogMsg_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
+            sithDSS_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
     }
 
     sithSurface_Sync(mpFlags);
 
     for (sithTimer* timerIter = sithTimer_list; timerIter; timerIter = timerIter->nextTimer )
-        sithSector_cogMsg_SendSyncTimers(timerIter, 0, mpFlags);
+        sithDSS_SendSyncTimers(timerIter, 0, mpFlags);
 
-    sithSector_cogMsg_SendSyncPalEffects(0, mpFlags);
-    sithSector_cogMsg_SendSyncCameras(0, mpFlags);
+    sithDSS_SendSyncPalEffects(0, mpFlags);
+    sithDSS_SendSyncCameras(0, mpFlags);
     sithSoundSys_SyncSounds();
-    sithSector_cogMsg_SendMisc(0, mpFlags);
+    sithDSS_SendMisc(0, mpFlags);
 
     return 1;
 }

@@ -197,6 +197,7 @@ jkGuiObjectives                0x308      0.072%        100.000%        4 / 4
 jkControl                      0x331      0.076%        100.000%        4 / 4          
 Windows                        0x39a      0.085%        100.000%       11 / 11         
 stdString                      0x3b3      0.088%        100.000%       11 / 11         
+sithRenderSky                  0x3c2      0.089%        100.000%        5 / 5          
 jkGuiDialog                    0x3e0      0.092%        100.000%        6 / 6          
 sithModel                      0x3f1      0.094%        100.000%        8 / 8          
 rdThing                        0x42f      0.099%        100.000%       12 / 12         
@@ -265,6 +266,7 @@ jkGuiRend                      0x2cd7     1.064%        100.000%       68 / 68
 jkPlayer                       0x2da2     1.083%        100.000%       45 / 45         
 sithWeapon                     0x32a8     1.202%        100.000%       33 / 33         
 sithCogFunctionThing           0x3a4c     1.384%        100.000%      142 / 142        
+sithAIAwareness                0x31f      0.074%        90.488%         5 / 6          
 smack                          0x466      0.104%        0.000%          0 / 6          
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 Video                          0x5dc      0.139%        19.800%         3 / 5          
@@ -277,6 +279,7 @@ Window                         0x6db      0.163%        70.769%         6 / 13
 jkGuiControlSaveLoad           0x732      0.171%        0.000%          0 / 6          
 jkGuiMap                       0x793      0.180%        0.000%          0 / 8          
 stdStrTable                    0x7b6      0.183%        82.877%         4 / 6          
+sithSector                     0x806      0.190%        72.055%         8 / 13         
 sithMap                        0x814      0.192%        3.046%          2 / 6          
 Main                           0x87b      0.201%        96.868%         3 / 4          
 jkGuiMultiTally                0x8aa      0.206%        0.000%          0 / 7          
@@ -313,6 +316,7 @@ stdControl                     0x1323     0.454%        0.776%          1 / 23
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
 jkMain                         0x16cd     0.541%        83.348%        35 / 53         
 rdPrimit3                      0x16e0     0.543%        56.301%         4 / 9          
+sithDSS                        0x175d     0.555%        96.673%        20 / 22         
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
 rdActive                       0x1a55     0.625%        2.626%          3 / 8          
 sithSurface                    0x1c6a     0.674%        95.298%        31 / 35         
@@ -320,15 +324,16 @@ jkHud                          0x1c9b     0.679%        97.324%        15 / 17
 jkDev                          0x1e60     0.721%        0.617%          1 / 39         
 sithCog                        0x1ed3     0.732%        90.686%        21 / 28         
 jkSaber                        0x1f4a     0.743%        72.347%        21 / 40         
+sithDSSThing                   0x22aa     0.823%        39.542%         7 / 37         
 sithMulti                      0x252a     0.882%        0.105%          1 / 35         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
 stdDisplay                     0x267b     0.913%        0.264%          2 / 37         
 sithControl                    0x2723     0.929%        34.944%         9 / 32         
 sithCollision                  0x2827     0.953%        91.760%        18 / 22         
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
+sithPhysics                    0x310b     1.164%        98.957%        12 / 13         
 rdCache                        0x331c     1.213%        43.557%        13 / 16         
-sithThing                      0x3c2e     1.429%        89.381%        45 / 53         
-sithSector                     0x79f9     2.895%        79.680%        57 / 96         
+sithThing                      0x3c2e     1.429%        87.446%        45 / 53         
 rdClip                         0x81f2     3.085%        63.242%        12 / 17         
 rdRaster                       0xf04d     5.704%        0.195%          1 / 89         
 rdZRaster                      0x15fb4    8.349%        0.000%          0 / 73         
@@ -338,15 +343,15 @@ rdNRaster                      0x304d4    18.345%       0.000%          0 / 87
 
 Total completion:
 -----------------
-41.879% by weight
-70.746% by weight excluding rasterizer
+41.852% by weight
+70.699% by weight excluding rasterizer
 2088 / 3167 functions
 2088 / 2796 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           3.557%          187 / 1322
+sith           3.585%          187 / 1322
 stdPlatform    0.285%           33 / 43
 std            4.158%          169 / 360
 jkGui          3.467%          119 / 284
@@ -355,12 +360,12 @@ jk             1.504%          103 / 322
 Raster         40.792%         370 / 371
 other          1.397%           67 / 120
 -----------------------------------------
-total          58.121%        1079 / 3167
+total          58.148%        1079 / 3167
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           6.009%          187 / 1322
+sith           6.055%          187 / 1322
 stdPlatform    0.481%           33 / 43
 std            7.025%          169 / 360
 jkGui          5.856%          119 / 284
@@ -368,6 +373,6 @@ rd             5.001%           31 / 345
 jk             2.541%          103 / 322
 other          2.360%           67 / 120
 -----------------------------------------
-total          29.273%         709 / 2796
+total          29.320%         709 / 2796
 
 ```

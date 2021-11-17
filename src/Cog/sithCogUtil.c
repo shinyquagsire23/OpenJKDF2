@@ -22,6 +22,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithSave.h"
 #include "Engine/sithTimer.h"
+#include "Engine/sithPhysics.h"
 #include "World/sithPlayer.h"
 #include "World/sithThingPlayer.h"
 #include "World/sithWorld.h"
@@ -30,6 +31,7 @@
 #include "Main/jkGame.h"
 #include "General/stdFnames.h"
 #include "General/stdPalEffects.h"
+#include "Dss/sithDSS.h"
 
 void sithCogUtil_ReturnBool(int a1, sithCog *a2);
 
@@ -199,7 +201,7 @@ void sithCogUtil_StopThing(sithCog *ctx) // unused
     {
         if ( v1->moveType == SITH_MT_PHYSICS )
         {
-            sithSector_StopPhysicsThing(v1);
+            sithPhysics_ThingStop(v1);
         }
         else if ( v1->moveType == SITH_MT_PATH )
         {
@@ -219,7 +221,7 @@ void sithCogUtil_StopAnim(sithCog *ctx)
     {
         sithSurface_StopAnim(v2);
         if ( sithCogVm_multiplayerFlags )
-            sithSector_cogMsg_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
+            sithDSS_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
     }
 }
 
@@ -236,7 +238,7 @@ void sithCogUtil_StopSurfaceAnim(sithCog *ctx)
         {
             sithSurface_StopAnim(v2);
             if ( sithCogVm_multiplayerFlags )
-                sithSector_cogMsg_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
+                sithDSS_SendStopAnim((sithSurface *)v2, -1, 255); // TODO ??
         }
     }
 }

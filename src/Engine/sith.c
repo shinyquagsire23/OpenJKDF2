@@ -13,6 +13,7 @@
 #include "Win95/Window.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
+#include "AI/sithAIAwareness.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
@@ -138,7 +139,7 @@ int sith_Mode1Init(char *a1)
     sithSoundSys_Open();
     sithCog_Open();
     sithControl_Open();
-    sithSector_Startup();
+    sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
     sithTime_Startup();
@@ -164,7 +165,7 @@ int sithOpenNormal(char *path)
     sithSoundSys_Open();
     sithCog_Open();
     sithControl_Open();
-    sithSector_Startup();
+    sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
     sith_bOpened = 1;
@@ -186,7 +187,7 @@ int sith_Mode1Init_3(char *fpath)
     sithSoundSys_Open();
     sithCog_Open();
     sithControl_Open();
-    sithSector_Startup();
+    sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
     sith_bOpened = 1;
@@ -207,7 +208,7 @@ int sith_Open()
     sithSoundSys_Open();
     sithCog_Open();
     sithControl_Open();
-    sithSector_Startup();
+    sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
     sith_bOpened = 1;
@@ -220,7 +221,7 @@ void sith_Close()
     {
         sithSoundSys_StopSong();
         sithRender_Close();
-        sithSector_Shutdown();
+        sithAIAwareness_Shutdown();
         sithControl_Close();
         sithCog_Close();
         sithSoundSys_Close();

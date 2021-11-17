@@ -23,6 +23,7 @@
 #include "Engine/sithParticle.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
+#include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "General/util.h"
 #include "World/sithPlayer.h"
@@ -286,7 +287,7 @@ int sithWorld_NewEntry(sithWorld *world)
                   && v16->moveType == SITH_MT_PHYSICS
                   && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
                 {
-                    sithSector_ThingLandIdk(v16, 1);
+                    sithPhysics_FindFloor(v16, 1);
                 }
             }
             if ( !sithWorld_Verify(world) )

@@ -19,6 +19,8 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
 #include "AI/sithAIClass.h"
+#include "Dss/sithDSSThing.h"
+#include "Dss/sithDSS.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -70,28 +72,28 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_DAMAGE] = cogMsg_HandleDamage;
     sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = sithThingPlayer_cogMsg_HandleSendTrigger;
     sithCogVm_msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
-    sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = sithSector_cogMsg_HandlePlaySoundPos;
+    sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = sithDSSThing_HandlePlaySoundPos;
     sithCogVm_msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithSector_cogMsg_HandleSyncThingFull;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithDSSThing_HandleSyncThingFull;
     sithCogVm_msgFuncs[COGMSG_SYNCCOG] = sithThingPlayer_cogMsg_HandleSyncCog;
-    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = sithSector_cogMsg_HandleSyncSurface;
-    sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithSector_cogMsg_HandleSyncAI;
-    sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = sithSector_cogMsg_HandleSyncItemDesc;
-    sithCogVm_msgFuncs[COGMSG_STOPANIM] = sithSector_cogMsg_HandleStopAnim;
-    sithCogVm_msgFuncs[COGMSG_SYNCSECTOR] = sithSector_cogMsg_HandleSyncSector;
+    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = sithDSS_HandleSyncSurface;
+    sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithDSS_HandleSyncAI;
+    sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = sithDSS_HandleSyncItemDesc;
+    sithCogVm_msgFuncs[COGMSG_STOPANIM] = sithDSS_HandleStopAnim;
+    sithCogVm_msgFuncs[COGMSG_SYNCSECTOR] = sithDSS_HandleSyncSector;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGFRAME] = cogmsg_HandleSyncThingFrame;
-    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithSector_cogMsg_HandleSyncPuppet;
+    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithDSS_HandleSyncPuppet;
     sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = sithSector_cogMsg_HandleSyncThingAttachment;
-    sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = sithSector_cogMsg_HandleSyncTimers;
-    sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = sithSector_cogMsg_HandleSyncCameras;
+    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = sithDSSThing_HandleSyncThingAttachment;
+    sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = sithDSS_HandleSyncTimers;
+    sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = sithDSS_HandleSyncCameras;
     sithCogVm_msgFuncs[COGMSG_TAKEITEM1] = cogMsg_HandleTakeItem;
     sithCogVm_msgFuncs[COGMSG_TAKEITEM2] = cogMsg_HandleTakeItem;
     sithCogVm_msgFuncs[COGMSG_STOPKEY] = cogMsg_HandleStopKey;
     sithCogVm_msgFuncs[COGMSG_STOPSOUND] = cogMsg_HandleStopSound;
     sithCogVm_msgFuncs[COGMSG_CREATETHING] = cogMsg_HandleCreateThing;
-    sithCogVm_msgFuncs[COGMSG_SYNCPALEFFECTS] = sithSector_cogMsg_HandleSyncPalEffects;
-    sithCogVm_msgFuncs[COGMSG_ID_1F] = sithSector_cogMsg_HandleMisc;
+    sithCogVm_msgFuncs[COGMSG_SYNCPALEFFECTS] = sithDSS_HandleSyncPalEffects;
+    sithCogVm_msgFuncs[COGMSG_ID_1F] = sithDSS_HandleMisc;
     sithCogVm_msgFuncs[COGMSG_CHAT] = sithMulti_HandleChat;
     sithCogVm_msgFuncs[COGMSG_DESTROYTHING] = cogMsg_HandleDestroyThing;
     sithCogVm_msgFuncs[COGMSG_SYNCSECTORALT] = cogMsg_HandleSyncSectorAlt;

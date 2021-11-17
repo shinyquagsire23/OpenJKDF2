@@ -28,10 +28,13 @@
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
 #include "Engine/sithCamera.h"
+#include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
+#include "AI/sithAIAwareness.h"
 #include "Cog/sithCog.h"
+#include "Dss/sithDSSThing.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -237,7 +240,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 sithThing_handler(thingIter);
             if ( thingIter->moveType == SITH_MT_PHYSICS )
             {
-                sithSector_ThingPhysicsTick(thingIter, deltaSeconds);
+                sithPhysics_ThingTick(thingIter, deltaSeconds);
             }
             else if ( thingIter->moveType == SITH_MT_PATH )
             {
@@ -424,7 +427,7 @@ void sithThing_sub_4CD100(sithThing *thing)
       && thing->moveType == SITH_MT_PHYSICS
       && (thing->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
     {
-        sithSector_ThingLandIdk(thing, 1);
+        sithPhysics_FindFloor(thing, 1);
     }
 }
 
@@ -534,7 +537,7 @@ LABEL_10:
         return 1;
     if ( thing->moveType == SITH_MT_PHYSICS )
     {
-        v8 = sithSector_LoadThingPhysicsParams(arg, thing, paramIdx);
+        v8 = sithPhysics_LoadThingParams(arg, thing, paramIdx);
     }
     else
     {
@@ -1377,7 +1380,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     if (rdVector_IsZero3(&thing->field_268))
     {
         if ( thing->moveType == SITH_MT_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->moveType == SITH_MT_PATH )
-            sithSector_ThingLandIdk(thing, 0);
+            sithPhysics_FindFloor(thing, 0);
     }
     else
     {
@@ -1660,7 +1663,7 @@ LABEL_24:
     if ( v17->moveType == SITH_MT_PHYSICS )
     {
         if ( (v17->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
-            sithSector_ThingLandIdk(v17, 1);
+            sithPhysics_FindFloor(v17, 1);
 LABEL_48:
         if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & PHYSFLAGS_20000) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
@@ -2081,7 +2084,7 @@ LABEL_32:
         return amount;
     }
     if ( sithCogVm_multiplayerFlags )
-        sithSector_cogMsg_SendDeath(sender, receiver_, 0, -1, 255);
+        sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
     sithThing_SpawnDeadBodyMaybe(sender, receiver_, flags);
     return amount - sender->actorParams.health;
 }
@@ -2163,7 +2166,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATH2);
             }
             sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
-            sithSector_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
+            sithAIAwareness_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
             if ( thing->type == SITH_THING_PLAYER )
                 sithPlayer_sub_4C9150(thing, a3);
             if ( thing == sithWorld_pCurWorld->cameraFocus )
@@ -2198,7 +2201,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                         thing->type = SITH_THING_CORPSE;
                         thing->physicsParams.physflags = v10 | (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
                         thing->lifeLeftMs = 20000;
-                        sithSector_ThingLandIdk(thing, 0);
+                        sithPhysics_FindFloor(thing, 0);
                     }
                     else
                     {

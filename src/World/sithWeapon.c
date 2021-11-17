@@ -13,13 +13,16 @@
 #include "Engine/sithControl.h"
 #include "Engine/sithCamera.h"
 #include "AI/sithAI.h"
+#include "AI/sithAIAwareness.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Main/jkGame.h"
 #include "Win95/DebugConsole.h"
+#include "Dss/sithDSSThing.h"
 #include "jk.h"
 
 void sithWeapon_InitDefaults()
@@ -70,7 +73,7 @@ void sithWeapon_Tick(sithThing *weapon, float deltaSeconds)
             weapon->weaponParams.damage = v3;
         }
         if ( (typeFlags & SITH_TF_TIMER) != 0 && (((uint8_t)bShowInvisibleThings + (weapon->thingIdx & 0xFF)) & 7) == 0 )
-            sithSector_AddEntry(weapon->sector, &weapon->position, 2, 2.0, weapon);
+            sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 2, 2.0, weapon);
     }
 }
 
@@ -139,7 +142,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 if ( damageReceiver->moveType == SITH_MT_PHYSICS )
                 {
                     rdVector_Scale3(&tmp2, &weaponPos_, weapon->weaponParams.force);
-                    sithSector_ThingApplyForce(damageReceiver, &tmp2);
+                    sithPhysics_ThingApplyForce(damageReceiver, &tmp2);
                 }
             }
         }
@@ -325,7 +328,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                     tmp2.x = weapon->weaponParams.force * lookOrient.x;
                     tmp2.y = weapon->weaponParams.force * lookOrient.y;
                     tmp2.z = weapon->weaponParams.force * lookOrient.z;
-                    sithSector_ThingApplyForce(receiveThing, &tmp2);
+                    sithPhysics_ThingApplyForce(receiveThing, &tmp2);
                 }
             }
         }
@@ -466,12 +469,12 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     sithThing *spawned; // esi
 
     if ( fireSound )
-        sithSector_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
+        sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
 
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
     if ( spawned && sithCogVm_multiplayerFlags )
-        sithSector_cogMsg_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
+        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
 
     return spawned;
 }
@@ -536,7 +539,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         }
         if ( a9 > 0.02 )
         {
-            sithSector_ThingPhysicsTick(v9, a9);
+            sithPhysics_ThingTick(v9, a9);
             v17 = rdVector_Normalize3(&a5a, &v9->physicsParams.velocityMaybe);
             if ( v17 > 0.0 )
             {
@@ -685,7 +688,7 @@ void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMat
                 goto LABEL_51;
             if ( v18 == g_localPlayerThing )
             {
-                sithSector_AddEntry(v19->sector, &v19->position, 0, 2.0, v18);
+                sithAIAwareness_AddEntry(v19->sector, &v19->position, 0, 2.0, v18);
                 if ( (physicsThing->thingflags & 0x100) != 0 )
                 {
 LABEL_50:
@@ -705,12 +708,12 @@ LABEL_43:
             sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
             return;
         }
-        sithSector_StopPhysicsThing(physicsThing);
+        sithPhysics_ThingStop(physicsThing);
         sithSoundClass_ThingPauseSoundclass(physicsThing, PHYSFLAGS_GRAVITY);
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
-        sithSector_ThingSetLook(physicsThing, (rdVector3 *)&a4->lvec.z, 0.0);
+        sithPhysics_ThingSetLook(physicsThing, (rdVector3 *)&a4->lvec.z, 0.0);
         goto LABEL_54;
     }
     if ( ((collidedThing->weaponParams.typeflags & THING_TYPEFLAGS_ISBLOCKING) == 0
@@ -737,7 +740,7 @@ LABEL_43:
                 if ( !v27 )
                     goto LABEL_51;
                 if ( v26 == g_localPlayerThing )
-                    sithSector_AddEntry(v27->sector, &v27->position, 0, 2.0, v26);
+                    sithAIAwareness_AddEntry(v27->sector, &v27->position, 0, 2.0, v26);
                 if ( (physicsThing->thingflags & 0x100) == 0 )
                     goto LABEL_51;
                 goto LABEL_50;
@@ -751,12 +754,12 @@ LABEL_43:
             if ( !v24 )
                 goto LABEL_51;
             if ( v23 == g_localPlayerThing )
-                sithSector_AddEntry(v24->sector, &v24->position, 0, 2.0, v23);
+                sithAIAwareness_AddEntry(v24->sector, &v24->position, 0, 2.0, v23);
             goto LABEL_43;
         }
         if ( (v21 & THING_TYPEFLAGS_BLIND) == 0 )
             return;
-        sithSector_StopPhysicsThing(physicsThing);
+        sithPhysics_ThingStop(physicsThing);
         sithThing_AttachThing(physicsThing, collidedThing);
 LABEL_54:
         v29 = physicsThing->physicsParams.physflags | PHYSFLAGS_GRAVITY;
@@ -847,7 +850,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
                 if ( v20 )
                 {
                     if ( v19 == g_localPlayerThing )
-                        sithSector_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
+                        sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
                     if ( (thing->thingflags & SITH_TF_INVULN) != 0 )
                     {
                         v21->thingflags |= 0x100;
@@ -865,11 +868,11 @@ LABEL_9:
         else
         {
             sithCollision_DefaultHitHandler(thing, surface, a3);
-            sithSector_StopPhysicsThing(thing);
+            sithPhysics_ThingStop(thing);
             sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
             sithThing_AttachToSurface(thing, surface, 0);
-            sithSector_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);
+            sithPhysics_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);
             thing->physicsParams.physflags |= PHYSFLAGS_NOTHRUST;
             result = 1;
         }
@@ -898,7 +901,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         if ( spawned )
         {
             if ( player == g_localPlayerThing )
-                sithSector_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
+                sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
             if ( (weapon->thingflags & 0x100) != 0 )
             {
                 spawned->thingflags |= 0x100;
@@ -1451,19 +1454,19 @@ LABEL_30:
         v16 = a5a;
         v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a);
         if ( v17 && sithCogVm_multiplayerFlags )
-            sithSector_cogMsg_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
+            sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
     }
     while ( a1a > 1.0 );
 LABEL_31:
     if ( fireSound )
-        sithSector_AddEntry(sender->sector, &sender->position, 1, 4.0, sender);
+        sithAIAwareness_AddEntry(sender->sector, &sender->position, 1, 4.0, sender);
     result = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, fireSound, mode, scale, scaleFlags, v16);
     a1b = result;
     if ( result )
     {
         if ( sithCogVm_multiplayerFlags )
         {
-            sithSector_cogMsg_SendFireProjectile(
+            sithDSSThing_SendFireProjectile(
                 sender,
                 projectileTemplate,
                 &v19,

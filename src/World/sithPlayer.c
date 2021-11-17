@@ -14,10 +14,12 @@
 #include "Engine/sithMulti.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithControl.h"
+#include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
+#include "Dss/sithDSSThing.h"
 #include "jk.h"
 
 void sithPlayer_Initialize(int idx)
@@ -473,7 +475,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
     v1 = thing->actorParams.playerinfo;
 
     if ( thing == g_localPlayerThing)
-        sithSector_cogMsg_SendDeath(thing, thing, 1, -1, 255);
+        sithDSSThing_SendDeath(thing, thing, 1, -1, 255);
 
     if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
       || (sithCog_SendMessageFromThing(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
@@ -484,7 +486,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         thing->physicsParams.physflags &= ~(PHYSFLAGS_CROUCHING|PHYSFLAGS_800|PHYSFLAGS_100);
         thing->physicsParams.physflags |= (PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
         thing->actorParams.typeflags &= ~0x2000;
-        sithSector_StopPhysicsThing(thing);
+        sithPhysics_ThingStop(thing);
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
             sithMulti_HandleDeath(v1, thing, thing);
@@ -516,7 +518,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     player->physicsParams.physflags |= PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY;
     player->thingflags |= SITH_TF_DEAD;
     player->actorParams.typeflags &= ~THING_TYPEFLAGS_ISBLOCKING;
-    sithSector_StopPhysicsThing(player);
+    sithPhysics_ThingStop(player);
     sithWeapon_SyncPuppet(player);
     sithInventory_SendKilledMessageToAll(player, killedBy);
     if ( sithNet_isMulti )

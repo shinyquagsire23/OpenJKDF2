@@ -7,6 +7,7 @@
 #include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
+#include "Dss/sithDSSThing.h"
 #include "jk.h"
 
 int sithItem_Collide(sithThing *a1, sithThing *a2)
@@ -51,7 +52,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
     }
     else
     {
-        sithSector_cogMsg_SendTakeItem(item, actor, 255);
+        sithDSSThing_SendTakeItem(item, actor, 255);
     }
 }
 
@@ -88,8 +89,8 @@ void sithItem_Remove(sithThing *item)
 
     if ( sithCogVm_multiplayerFlags )
     {
-        sithSector_cogMsg_SendSyncThing(item, -1, 255);
-        sithSector_cogMsg_SendTeleportThing(item, -1, 1);
+        sithDSSThing_SendSyncThing(item, -1, 255);
+        sithDSSThing_SendTeleportThing(item, -1, 1);
     }
 }
 

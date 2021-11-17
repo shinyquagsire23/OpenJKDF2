@@ -12,6 +12,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithTime.h"
+#include "Engine/sithPhysics.h"
 #include "General/stdMath.h"
 #include "jk.h"
 
@@ -871,7 +872,7 @@ LABEL_78:
         }
     }
     if ( v5->moveType == SITH_MT_PHYSICS )
-        sithSector_StopPhysicsThing(v5);
+        sithPhysics_ThingStop(v5);
 LABEL_81:
     
     v64 = stdMath_ClipPrecision(v64);
@@ -905,7 +906,7 @@ LABEL_81:
               || (v5->physicsParams.physflags & PHYSFLAGS_FLOORSTICK) != 0
               && (v5->physicsParams.vel.z < -2.0 || v5->physicsParams.vel.z <= 0.2) )
             {
-                sithSector_ThingLandIdk(v5, 0);
+                sithPhysics_FindFloor(v5, 0);
             }
         }
     }
@@ -1017,9 +1018,9 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
         senderb = (v5->physicsParams.mass * v4->physicsParams.mass + v5->physicsParams.mass * v4->physicsParams.mass)
                 / (v5->physicsParams.mass + v4->physicsParams.mass);
         rdVector_Scale3(&forceVec, &a2, v6 * senderb);
-        sithSector_ThingApplyForce(v4, &forceVec);
+        sithPhysics_ThingApplyForce(v4, &forceVec);
         rdVector_Neg3Acc(&forceVec);
-        sithSector_ThingApplyForce(v5, &forceVec);
+        sithPhysics_ThingApplyForce(v5, &forceVec);
         return sithCollision_CollideHurt(v4, &a2, a3->distance, 0);
     }
     sender = -(v4->physicsParams.vel.z * a2.z + v4->physicsParams.vel.y * a2.y + v4->physicsParams.vel.x * a2.x);

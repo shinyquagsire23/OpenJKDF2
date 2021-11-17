@@ -16,8 +16,9 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithAnimClass.h"
+#include "Engine/sithPhysics.h"
 //#include "Engine/rdSurface.h"
-
+#include "Dss/sithDSSThing.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
@@ -51,7 +52,7 @@ void sithCogFunctionThing_CreateThing(sithCog *ctx)
             if ( !(ctx->flags & 0x200) )
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+                    sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
             }
         }
         sithCogVm_PushInt(ctx, v3->thingIdx);
@@ -78,7 +79,7 @@ void sithCogFunctionThing_CreateThingNr(sithCog *ctx)
             if ( !(ctx->flags & 0x200) )
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+                    sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
             }
         }
         sithCogVm_PushInt(ctx, v3->thingIdx);
@@ -107,7 +108,7 @@ void sithCogFunctionThing_createThingUnused(sithCog *ctx)
             if ( !(ctx->flags & 0x200) )
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_cogMsg_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, v6);
+                    sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, v6);
             }
         }
         sithCogVm_PushInt(ctx, v3->thingIdx);
@@ -178,7 +179,7 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx)
             if ( !(ctx->flags & 0x200) )
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_cogMsg_SendCreateThing(popTemplate, v7, 0, popSector, (int *)&pos, (int *)&rot, 255, a8);
+                    sithDSSThing_SendCreateThing(popTemplate, v7, 0, popSector, (int *)&pos, (int *)&rot, 255, a8);
             }
         }
         sithCogVm_PushInt(ctx, v7->thingIdx);
@@ -207,7 +208,7 @@ void sithCogFunctionThing_DamageThing(sithCog *ctx)
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
                 {
                     if ( sithNet_isServer )
-                        sithSector_cogMsg_SendDamage(thing2, thing, a5, a4, -1, 1);
+                        sithDSSThing_SendDamage(thing2, thing, a5, a4, -1, 1);
                 }
             }
         }
@@ -262,7 +263,7 @@ void sithCogFunctionThing_DestroyThing(sithCog *ctx)
         && !(ctx->flags & 0x200) 
         && ctx->trigId != SITH_MESSAGE_STARTUP 
         && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-        sithSector_cogMsg_SendDestroyThing(thing->thing_id, -1);
+        sithDSSThing_SendDestroyThing(thing->thing_id, -1);
 
     sithThing_Destroy(thing);
 }
@@ -305,7 +306,7 @@ void sithCogFunctionThing_MoveToFrame(sithCog *ctx)
             && !(ctx->flags & 0x200) 
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-            sithSector_cogMsg_SendSyncThingFrame(thing, frame, speed, 0, -1, 255);
+            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 0, -1, 255);
     }
 }
 
@@ -325,7 +326,7 @@ void sithCogFunctionThing_SkipToFrame(sithCog *ctx)
             && !(ctx->flags & 0x200) 
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-            sithSector_cogMsg_SendSyncThingFrame(thing, frame, speed, 1, -1, 255);
+            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 1, -1, 255);
     }
 }
 
@@ -492,11 +493,11 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
     {
         sithTrackThing_Stop(thing);
         if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
-            sithSector_cogMsg_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
+            sithDSSThing_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
     }
     else if (thing->moveType == SITH_MT_PHYSICS)
     {
-        sithSector_StopPhysicsThing(thing);
+        sithPhysics_ThingStop(thing);
     }
 }
 
@@ -625,7 +626,7 @@ void sithCogFunctionThing_SetThingPos(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendTeleportThing(thing, -1, 1);
         }
         sithCogVm_PushInt(ctx, 1);
     }
@@ -762,7 +763,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
     if ( thing && thing->moveType == SITH_MT_PHYSICS)
     {
-        sithSector_ThingApplyForce(thing, &poppedVec);
+        sithPhysics_ThingApplyForce(thing, &poppedVec);
         if ( sithCogVm_multiplayerFlags 
              && !(ctx->flags & 0x200)
              && ctx->trigId != SITH_MESSAGE_STARTUP 
@@ -845,7 +846,7 @@ void sithCogFunctionThing_DetachThing(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -874,7 +875,7 @@ void sithCogFunctionThing_AttachThingToSurf(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -892,7 +893,7 @@ void sithCogFunctionThing_AttachThingToThing(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -913,7 +914,7 @@ void sithCogFunctionThing_AttachThingToThingEx(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -933,7 +934,7 @@ void sithCogFunctionThing_PlayMode(sithCog *ctx)
                 && ctx->trigId != SITH_MESSAGE_STARTUP 
                 && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
             {
-                sithSector_cogMsg_SendOpenDoor(thing, mode, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
+                sithDSSThing_SendOpenDoor(thing, mode, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
             }
         }
     }
@@ -978,7 +979,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendPlayKey(thing, keyframe, trackNum, popInt, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
+            sithDSSThing_SendPlayKey(thing, keyframe, trackNum, popInt, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
         }
     }
 
@@ -1010,7 +1011,7 @@ void sithCogFunctionThing_StopKey(sithCog *ctx)
                 && ctx->trigId != SITH_MESSAGE_STARTUP 
                 && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
             {
-                sithSector_cogMsg_SendStopKey(thing, v6, poppedFlex, -1, 255);
+                sithDSSThing_SendStopKey(thing, v6, poppedFlex, -1, 255);
             }
         }
     }
@@ -1041,7 +1042,7 @@ void sithCogFunctionThing_SetThingModel(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSetThingModel(thing, -1);
+            sithDSSThing_SendSetThingModel(thing, -1);
         }
     }
     else
@@ -1074,7 +1075,7 @@ void sithCogFunctionThing_SetArmedMode(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThing(thing, -1, 255);
+            sithDSSThing_SendSyncThing(thing, -1, 255);
         }
     }
 }
@@ -1140,7 +1141,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
         rdVector_Copy3(&thing->position, &thingTo->position);
         sithThing_MoveToSector(thing, thingTo->sector, 0);
         if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & PHYSFLAGS_FLOORSTICK)
-            sithSector_ThingLandIdk(thing, 1);
+            sithPhysics_FindFloor(thing, 1);
 
         if ( thing == g_localPlayerThing )
             sithCamera_FollowFocus(sithCamera_currentCamera);
@@ -1150,7 +1151,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendTeleportThing(thing, -1, 1);
         }
     }
 }
@@ -1881,7 +1882,7 @@ void sithCogFunctionThing_SetThingAttachFlags(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -1900,7 +1901,7 @@ void sithCogFunctionThing_ClearThingAttachFlags(sithCog *ctx)
             && ctx->trigId != SITH_MESSAGE_STARTUP 
             && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
         {
-            sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 1);
+            sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 1);
         }
     }
 }
@@ -2204,7 +2205,7 @@ void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithSector_cogMsg_SendSyncThingAttachment(thing, -1, 255, 0);
+        sithDSSThing_SendSyncThingAttachment(thing, -1, 255, 0);
 }
 
 void sithCogFunctionThing_SyncThingState(sithCog *ctx)

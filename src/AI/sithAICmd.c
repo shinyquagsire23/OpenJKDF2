@@ -2,6 +2,7 @@
 
 #include "General/stdMath.h"
 #include "AI/sithAI.h"
+#include "AI/sithAIAwareness.h"
 #include "World/sithThing.h"
 #include "World/sithActor.h"
 #include "Cog/sithCog.h"
@@ -866,7 +867,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags |= (SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET);
                     sithSoundClass_ThingPlaySoundclass(v12, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
-                    sithSector_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
+                    sithAIAwareness_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
                     actor->thingidk = actor->field_1D0;
                     return 1;
                 }
@@ -1264,7 +1265,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                 actor->flags &= ~SITHAIFLAGS_SEARCHING;
                 actor->flags |= SITHAIFLAGS_FLEEING;
                 sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
-                sithSector_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
+                sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
                 actor->field_1C0 = actor->field_1D0;
                 return 1;
             }
@@ -1286,7 +1287,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                     if ( (actor->flags & SITHAIFLAGS_FLEEING) == 0 )
                     {
                         sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
-                        sithSector_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
+                        sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
                     }
                     actor->flags &= ~SITHAIFLAGS_SEARCHING;
                     actor->flags |= SITHAIFLAGS_FLEEING;
