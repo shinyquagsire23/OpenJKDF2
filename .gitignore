@@ -64,5 +64,8 @@ Makefile.wasm
 .DS_Store
 *.cxlog
 OpenJKDF2.app
+OpenJKDF2_x86_64.app
+OpenJKDF2_universal.app
 build_win64
 *.ico
+macos-debug.tar.gz
