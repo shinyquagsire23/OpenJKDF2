@@ -11,7 +11,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMulti.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithKeyFrame.h"
@@ -58,7 +58,7 @@ int jkSaber_Startup()
     sithCogVm_SetMsgFunc(COGMSG_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
     sithCogVm_SetMsgFunc(COGMSG_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
     sithCogVm_SetMsgFunc(COGMSG_JOINING, jkGuiNet_CogMsgHandleJoining);
-    sithSave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
+    sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
     sithMulti_SetHandleridk(jkSaber_idk4);
     return 1;
 }

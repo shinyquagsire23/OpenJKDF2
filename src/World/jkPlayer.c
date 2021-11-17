@@ -5,7 +5,7 @@
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithCamera.h"
@@ -40,13 +40,13 @@ int jkPlayer_LoadAutosave()
     jkPlayer_dword_525470 = 1;
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
-    return sithSave_Load(tmp, 0, 0);
+    return sithGamesave_Load(tmp, 0, 0);
 }
 
 int jkPlayer_LoadSave(char *path)
 {
     jkPlayer_dword_525470 = 1;
-    return sithSave_Load(path, 0, 1);
+    return sithGamesave_Load(path, 0, 1);
 }
 
 void jkPlayer_Startup()

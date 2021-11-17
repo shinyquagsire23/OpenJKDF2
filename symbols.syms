@@ -198,18 +198,18 @@ sithControl_death_msgtimer 0x0083583C int
 sithControl_vec3_54A570 0x0054A570 rdVector3 = {0.0, -1.0, 0.0}
 sithControl_flt_54A57C 0x0054A57C float = 0.2f
 
-sithSave_func1 0x00835910 sithSaveHandler_t
-sithSave_func2 0x00835908 sithSaveHandler_t
-sithSave_func3 0x00835904 sithSaveHandler_t
-sithSave_funcWrite 0x00835F44 sithSaveHandler_t
-sithSave_funcRead 0x0083590C sithSaveHandler_t
-sithSave_autosave_fname 0x008BBC80 char[128]
-sithSave_dword_835900 0x00835900 int
-sithSave_dword_835914 0x00835914 int
-sithSave_fpath 0x00835F48 char[132]
-sithSave_wsaveName 0x008BBD00 wchar_t[256]
-sithSave_saveName 0x008BBF00 char[128]
-sithSave_headerTmp 0x00835918 sithSave_Header
+sithGamesave_func1 0x00835910 sithSaveHandler_t
+sithGamesave_func2 0x00835908 sithSaveHandler_t
+sithGamesave_func3 0x00835904 sithSaveHandler_t
+sithGamesave_funcWrite 0x00835F44 sithSaveHandler_t
+sithGamesave_funcRead 0x0083590C sithSaveHandler_t
+sithGamesave_autosave_fname 0x008BBC80 char[128]
+sithGamesave_dword_835900 0x00835900 int
+sithGamesave_dword_835914 0x00835914 int
+sithGamesave_fpath 0x00835F48 char[132]
+sithGamesave_wsaveName 0x008BBD00 wchar_t[256]
+sithGamesave_saveName 0x008BBF00 char[128]
+sithGamesave_headerTmp 0x00835918 sithGamesave_Header
 
 rdCamera_pCurCamera 0x0073A3D0 rdCamera*
 rdCamera_camMatrix 0x0086EE40 rdMatrix34

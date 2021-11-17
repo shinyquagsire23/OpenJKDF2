@@ -8,7 +8,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMulti.h"
@@ -306,11 +306,11 @@ void sithPlayer_debug_loadauto(sithThing *player)
     {
         sithPlayer_debug_ToNextCheckpoint(player);
     }
-    else if ( !sithSave_Load(sithSave_autosave_fname, 0, 0) )
+    else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
     {
         stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
         stdFnames_ChangeExt(v1, "jks");
-        sithSave_Load(v1, 0, 0);
+        sithGamesave_Load(v1, 0, 0);
     }
     sithSoundSys_ResumeMusic(1);
     player->type = SITH_THING_PLAYER;
@@ -496,11 +496,11 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
             {
                 sithPlayer_debug_ToNextCheckpoint(thing);
             }
-            else if ( !sithSave_Load(sithSave_autosave_fname, 0, 0) )
+            else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
             {
                 stdString_snprintf(v4, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
                 stdFnames_ChangeExt(v4, "jks");
-                sithSave_Load(v4, 0, 0);
+                sithGamesave_Load(v4, 0, 0);
             }
             sithSoundSys_ResumeMusic(1);
             thing->type = SITH_THING_PLAYER;

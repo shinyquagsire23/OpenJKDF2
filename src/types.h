@@ -454,7 +454,7 @@ typedef struct rdLight rdLight;
 typedef struct rdModel3 rdModel3;
 typedef struct rdCanvas rdCanvas;
 
-typedef struct sithSave_Header sithSave_Header;
+typedef struct sithGamesave_Header sithGamesave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
 
 typedef struct videoModeStruct videoModeStruct;
@@ -1105,7 +1105,7 @@ typedef int (*sithControl_handler_t)(sithThing*, float);
 
 typedef int (*sithSaveHandler_t)();
 
-typedef struct sithSave_Header
+typedef struct sithGamesave_Header
 {
     int version;
     char episodeName[128];
@@ -1114,7 +1114,7 @@ typedef struct sithSave_Header
     float playerMaxHealth;
     float binAmts[200];
     wchar_t saveName[256];
-} sithSave_Header;
+} sithGamesave_Header;
 
 typedef struct sithMapViewConfig
 {
@@ -2339,7 +2339,7 @@ typedef int (__cdecl *sithThing_handler_t)(sithThing*);
 
 typedef struct jkGuiSaveLoad_Entry
 {
-  sithSave_Header saveHeader;
+  sithGamesave_Header saveHeader;
   char fpath[128];
 } jkGuiSaveLoad_Entry;
 

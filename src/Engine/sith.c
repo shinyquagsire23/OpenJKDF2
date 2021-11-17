@@ -31,7 +31,7 @@
 #include "Engine/sithRender.h"
 #include "Engine/sithControl.h"
 #include "Engine/sithMulti.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 #include "World/sithSector.h"
@@ -290,7 +290,7 @@ int sith_Tick()
 #ifndef LINUX_TMP
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
 #endif
-        sithSave_WriteEntry();
+        sithGamesave_WriteEntry();
         return 0;
     }
 }
@@ -417,7 +417,7 @@ void sith_AutoSave()
     {
         stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", v0->map_jkl_fname);
         stdFnames_ChangeExt(v5, "jks");
-        sithSave_Write(v5, 1, 0, 0);
+        sithGamesave_Write(v5, 1, 0, 0);
         sithTime_Startup();
     }
 }

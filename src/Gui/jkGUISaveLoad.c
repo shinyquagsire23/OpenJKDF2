@@ -4,7 +4,7 @@
 #include "General/stdFileUtil.h"
 #include "General/Darray.h"
 #include "General/stdString.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
@@ -164,7 +164,7 @@ int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu)
             wstr_del = jkStrings_GetText("GUI_SLDELETE");
             if ( jkGuiDialog_YesNoDialog(wstr_del, wstr_confirmDel) )
             {
-                sithSave_GetProfilePath(FileName, 128, (char *)v2);
+                sithGamesave_GetProfilePath(FileName, 128, (char *)v2);
                 stdFileUtil_DelFile(FileName);
                 for ( i = 0; i < jkGuiSaveLoad_numEntries; ++i )
                 {
@@ -199,11 +199,11 @@ void jkGuiSaveLoad_PopulateList()
     stdFileSearch *v7; // [esp+10h] [ebp-7C0h]
     char path[128]; // [esp+18h] [ebp-7B8h] BYREF
     stdFileSearchResult a2; // [esp+98h] [ebp-738h] BYREF
-    sithSave_Header saveHeader; // [esp+1A4h] [ebp-62Ch] BYREF
+    sithGamesave_Header saveHeader; // [esp+1A4h] [ebp-62Ch] BYREF
 
     jkGuiRend_DarrayNewStr(&jkGuiSaveLoad_DarrayEntries, 50, 1);
     jkGuiSaveLoad_numEntries = 0;
-    sithSave_GetProfilePath(path, 128, jkGuiSaveLoad_byte_559C50);
+    sithGamesave_GetProfilePath(path, 128, jkGuiSaveLoad_byte_559C50);
     v0 = stdFileUtil_NewFind(path, 3, "jks");
     v1 = v0;
     v7 = v0;
@@ -213,11 +213,11 @@ void jkGuiSaveLoad_PopulateList()
         {
             if ( __strnicmp("_JKAUTO_", a2.fpath, 8u) )
             {
-                sithSave_GetProfilePath(path, 128, a2.fpath);
+                sithGamesave_GetProfilePath(path, 128, a2.fpath);
                 v2 = pHS->fileOpen(path, "rb");
                 if ( v2 )
                 {
-                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithSave_Header)) == sizeof(sithSave_Header) && saveHeader.version == 6 )
+                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header) && saveHeader.version == 6 )
                     {
                         v3 = __wcschr(saveHeader.saveName, U'~');
                         v4 = v3;
@@ -225,7 +225,7 @@ void jkGuiSaveLoad_PopulateList()
                         {
                             *v3 = 0;
                             v6 = (jkGuiSaveLoad_Entry *)pHS->alloc(sizeof(jkGuiSaveLoad_Entry));
-                            _memcpy(v6, &saveHeader, sizeof(sithSave_Header));
+                            _memcpy(v6, &saveHeader, sizeof(sithGamesave_Header));
                             _strncpy(v6->fpath, a2.fpath, 0x7Fu);
                             v6->fpath[127] = 0;
                             _strtolower(v6->fpath);
@@ -407,8 +407,8 @@ LABEL_44:
                 v31[i] = v28[i-i_shift];
                 if (!v28[i-i_shift]) break;
             }
-            sithSave_Write(v30, 1, 1, v31);
-            sithSave_WriteEntry();
+            sithGamesave_Write(v30, 1, 1, v31);
+            sithGamesave_WriteEntry();
             goto LABEL_45;
         }
         v27 = jkStrings_GetText("GUI_SLCONFIRM_OVERWRITE");

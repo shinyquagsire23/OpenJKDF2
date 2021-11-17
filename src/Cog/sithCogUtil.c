@@ -20,7 +20,7 @@
 #include "Engine/sithCamera.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithTimer.h"
 #include "Engine/sithPhysics.h"
 #include "World/sithPlayer.h"
@@ -1443,7 +1443,7 @@ void sithCogUtil_AutoSaveGame()
 
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
-    sithSave_Write(tmp, 1, 0, 0);
+    sithGamesave_Write(tmp, 1, 0, 0);
 }
 
 void sithCogUtil_SetCameraFocii(sithCog *ctx)

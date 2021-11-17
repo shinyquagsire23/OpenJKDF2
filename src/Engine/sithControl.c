@@ -15,7 +15,7 @@
 #include "Engine/sithCamera.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithTime.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithMapView.h"
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
@@ -141,7 +141,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
                     {
                         v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESPAWN");
                     }
-                    else if ( !__strnicmp(sithSave_autosave_fname, "_JKAUTO_", 8u) )
+                    else if ( !__strnicmp(sithGamesave_autosave_fname, "_JKAUTO_", 8u) )
                     {
                         v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTART");
                     }

@@ -6,7 +6,7 @@
 #include "Engine/sith.h"
 #include "Engine/sithControl.h"
 #include "Engine/sithSoundSys.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithRender.h"
@@ -386,7 +386,7 @@ LABEL_39:
     {
         if ( jkSmack_gameMode == 1 )
         {
-            v3 = sithSave_Load(gamemode_0_2_str, 0, 1);
+            v3 = sithGamesave_Load(gamemode_0_2_str, 0, 1);
         }
         else
         {

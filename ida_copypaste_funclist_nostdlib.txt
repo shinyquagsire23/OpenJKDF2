@@ -2111,13 +2111,13 @@ DebugConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	
 DebugConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
 DebugConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
 DebugConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
-sithSave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
-sithSave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
-sithSave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.
-sithSave_Load	.text	004DA6A0	000000CA	000000A0	0000000C	R	.	.	.	.	.	T	.
-sithSave_SerializeAllThings	.text	004DA770	00000249	00000008	00000004	R	.	.	.	.	.	.	.
-sithSave_WriteEntry	.text	004DA9C0	000001AA	00000008	00000000	R	.	.	.	.	.	.	.
-sithSave_LoadEntry	.text	004DAB70	0000028B	0000065C	00000004	R	.	.	.	.	.	T	.
+sithGamesave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
+sithGamesave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
+sithGamesave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.
+sithGamesave_Load	.text	004DA6A0	000000CA	000000A0	0000000C	R	.	.	.	.	.	T	.
+sithGamesave_SerializeAllThings	.text	004DA770	00000249	00000008	00000004	R	.	.	.	.	.	.	.
+sithGamesave_WriteEntry	.text	004DA9C0	000001AA	00000008	00000000	R	.	.	.	.	.	.	.
+sithGamesave_LoadEntry	.text	004DAB70	0000028B	0000065C	00000004	R	.	.	.	.	.	T	.
 sithSoundSys_Startup	.text	004DAE00	0000003F	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundSys_Shutdown	.text	004DAE40	00000019			R	.	.	.	.	.	T	.
 sithSoundSys_PlaySong	.text	004DAE60	000000B4	00000010	00000010	R	.	.	.	.	.	T	.

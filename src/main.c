@@ -69,7 +69,7 @@
 #include "Engine/sithParticle.h"
 #include "Engine/sithPhysics.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
@@ -1749,12 +1749,12 @@ void do_hooks()
     hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
     
     // sithSave
-    hook_function(sithSave_Setidk_ADDR, sithSave_Setidk);
-    hook_function(sithSave_GetProfilePath_ADDR, sithSave_GetProfilePath);
-    hook_function(sithSave_Load_ADDR, sithSave_Load);
-    hook_function(sithSave_LoadEntry_ADDR, sithSave_LoadEntry);
-    hook_function(sithSave_Write_ADDR, sithSave_Write);
-    hook_function(sithSave_WriteEntry_ADDR, sithSave_WriteEntry);
+    hook_function(sithGamesave_Setidk_ADDR, sithGamesave_Setidk);
+    hook_function(sithGamesave_GetProfilePath_ADDR, sithGamesave_GetProfilePath);
+    hook_function(sithGamesave_Load_ADDR, sithGamesave_Load);
+    hook_function(sithGamesave_LoadEntry_ADDR, sithGamesave_LoadEntry);
+    hook_function(sithGamesave_Write_ADDR, sithGamesave_Write);
+    hook_function(sithGamesave_WriteEntry_ADDR, sithGamesave_WriteEntry);
 
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);

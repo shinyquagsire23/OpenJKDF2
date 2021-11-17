@@ -3,7 +3,7 @@
 #include "Engine/sithControl.h"
 #include "Engine/sithMapView.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSave.h"
+#include "Dss/sithGamesave.h"
 #include "Cog/jkCog.h"
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
@@ -84,7 +84,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
                     if (!other[i-i_shift]) break;
                 }
                 
-                sithSave_Write("quicksave.jks", 1, 0, a4);
+                sithGamesave_Write("quicksave.jks", 1, 0, a4);
                 DebugConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
             }
         }

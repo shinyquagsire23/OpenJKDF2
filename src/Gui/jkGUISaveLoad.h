@@ -3,7 +3,6 @@
 
 #include "types.h"
 #include "globals.h"
-#include "Engine/sithSave.h"
 
 #define jkGuiSaveLoad_ListClick_ADDR (0x0041D900)
 #define jkGuiSaveLoad_PopulateInfo_ADDR (0x0041D940)
