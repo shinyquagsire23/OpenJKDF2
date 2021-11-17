@@ -6,7 +6,6 @@
 #include "World/sithTrackThing.h"
 #include "World/sithInventory.h"
 #include "World/jkPlayer.h"
-#include "World/sithThingPlayer.h"
 #include "World/sithItem.h"
 #include "Engine/sithCollision.h"
 #include "Engine/sithCamera.h"
@@ -19,6 +18,7 @@
 #include "Engine/sithPhysics.h"
 //#include "Engine/rdSurface.h"
 #include "Dss/sithDSSThing.h"
+#include "Dss/sithDSSCog.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
@@ -1678,7 +1678,7 @@ void sithCogFunctionThing_SkillTarget(sithCog *ctx)
     {
         if ( sithNet_isMulti && thing->type == SITH_THING_PLAYER )
         {
-            sithThingPlayer_cogMsg_SendSendTrigger(
+            sithDSSCog_SendSendTrigger(
                 classCog,
                 SITH_MESSAGE_SKILL,
                 SENDERTYPE_THING,

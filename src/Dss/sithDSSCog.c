@@ -1,10 +1,10 @@
-#include "sithThingPlayer.h"
+#include "sithDSSCog.h"
 
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
 #include "World/sithThing.h"
 
-int sithThingPlayer_cogMsg_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float param0, float param1, float param2, float param3, int a11)
+int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float param0, float param1, float param2, float param3, int a11)
 {
     int v12; // edi
     sithThing *v13; // eax
@@ -46,7 +46,7 @@ int sithThingPlayer_cogMsg_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, 
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a11, 1, v12);
 }
 
-int sithThingPlayer_cogMsg_HandleSendTrigger(sithCogMsg *in_netMsg)
+int sithDSSCog_HandleSendTrigger(sithCogMsg *in_netMsg)
 {
     int senderType; // edi
     int senderIdx; // ebx
@@ -103,7 +103,7 @@ int sithThingPlayer_cogMsg_HandleSendTrigger(sithCogMsg *in_netMsg)
     return 1;
 }
 
-int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
+int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
 {
     sithCogSymboltable *v13; // ebp
     
@@ -162,7 +162,7 @@ int sithThingPlayer_cogMsg_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithThingPlayer_cogMsg_HandleSyncCog(sithCogMsg *msg)
+int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
 {
     sithCog *cog; // eax
     sithCogSymboltable *v13; // ebp

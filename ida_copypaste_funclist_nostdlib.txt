@@ -2656,10 +2656,10 @@ sithItem_LoadThingParams	.text	004FC030	00000067	00000000	0000000C	R	.	.	.	.	.	T
 sithActor_cogMsg_OpenDoor	.text	004FC0A0	000001C6	00000058	00000004	R	.	.	.	.	.	T	.
 sithActor_JumpWithVel	.text	004FC270	000001DE	00000014	00000008	R	.	.	.	.	.	T	.
 sithActor_cogMsg_WarpThingToCheckpoint	.text	004FC450	000000CB	0000000C	00000008	R	.	.	.	.	.	T	.
-sithThingPlayer_cogMsg_SendSendTrigger	.text	004FC520	00000104	0000000C	00000030	R	.	.	.	.	.	T	.
-sithThingPlayer_cogMsg_HandleSendTrigger	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
-sithThingPlayer_cogMsg_SendSyncCog	.text	004FC770	0000012C	00000010	0000000C	R	.	.	.	.	.	T	.
-sithThingPlayer_cogMsg_HandleSyncCog	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSSCog_SendSendTrigger	.text	004FC520	00000104	0000000C	00000030	R	.	.	.	.	.	T	.
+sithDSSCog_HandleSendTrigger	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
+sithDSSCog_SendSyncCog	.text	004FC770	0000012C	00000010	0000000C	R	.	.	.	.	.	T	.
+sithDSSCog_HandleSyncCog	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogParse_Reset	.text	004FC9A0	0000002A			R	.	.	.	.	.	T	.
 sithCogParse_Load	.text	004FC9D0	00000391	00000010	0000000C	R	.	.	.	.	.	T	.
 sithCogParse_LoadEntry	.text	004FCD70	000001F3	00000010	00000004	R	.	.	.	.	.	T	.

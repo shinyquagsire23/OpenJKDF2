@@ -5,7 +5,6 @@
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "World/sithThingPlayer.h"
 #include "Main/jkGame.h"
 #include "Engine/sith.h"
 #include "Engine/sithCamera.h"
@@ -24,6 +23,7 @@
 #include "Cog/sithCogVm.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
+#include "Dss/sithDSSCog.h"
 #include "jk.h"
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -231,14 +231,14 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurWorld->numCogsLoaded; i++)
     {
-        sithThingPlayer_cogMsg_SendSyncCog(&sithWorld_pCurWorld->cogs[i], 0, mpFlags);
+        sithDSSCog_SendSyncCog(&sithWorld_pCurWorld->cogs[i], 0, mpFlags);
     }
 
     if ( sithWorld_pStatic )
     {
         for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
         {
-            sithThingPlayer_cogMsg_SendSyncCog(&sithWorld_pStatic->cogs[i], 0, mpFlags);
+            sithDSSCog_SendSyncCog(&sithWorld_pStatic->cogs[i], 0, mpFlags);
         }
     }
 

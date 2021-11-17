@@ -109,7 +109,6 @@
 #include "Engine/sithIntersect.h"
 #include "World/sithActor.h"
 #include "World/sithTrackThing.h"
-#include "World/sithThingPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
@@ -145,6 +144,7 @@
 #include "Main/Main.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
+#include "Dss/sithDSSCog.h"
 #include "stdPlatform.h"
 
 int openjkdf2_bIsKVM = 1;
@@ -828,10 +828,10 @@ void do_hooks()
     hook_function(stdConsole_WriteBorderMaybe4_ADDR, stdConsole_WriteBorderMaybe4);
 #endif
 
-    // sithThingPlayer
-    hook_function(sithThingPlayer_cogMsg_SendSendTrigger_ADDR, sithThingPlayer_cogMsg_SendSendTrigger);
-    hook_function(sithThingPlayer_cogMsg_HandleSendTrigger_ADDR, sithThingPlayer_cogMsg_HandleSendTrigger);
-    hook_function(sithThingPlayer_cogMsg_SendSyncCog_ADDR, sithThingPlayer_cogMsg_SendSyncCog);
+    // sithDSSCog
+    hook_function(sithDSSCog_SendSendTrigger_ADDR, sithDSSCog_SendSendTrigger);
+    hook_function(sithDSSCog_HandleSendTrigger_ADDR, sithDSSCog_HandleSendTrigger);
+    hook_function(sithDSSCog_SendSyncCog_ADDR, sithDSSCog_SendSyncCog);
     
     // Window
     hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);

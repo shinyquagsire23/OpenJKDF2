@@ -8,7 +8,6 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithPlayer.h"
-#include "World/sithThingPlayer.h"
 #include "World/jkPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
@@ -21,6 +20,7 @@
 #include "AI/sithAIClass.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
+#include "Dss/sithDSSCog.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -70,12 +70,12 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;
     sithCogVm_msgFuncs[COGMSG_DEATH] = cogMsg_HandleDeath;
     sithCogVm_msgFuncs[COGMSG_DAMAGE] = cogMsg_HandleDamage;
-    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = sithThingPlayer_cogMsg_HandleSendTrigger;
+    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = sithDSSCog_HandleSendTrigger;
     sithCogVm_msgFuncs[COGMSG_SYNCTHING] = cogMsg_HandleSyncThing;
     sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = sithDSSThing_HandlePlaySoundPos;
     sithCogVm_msgFuncs[COGMSG_PLAYKEY] = cogMsg_HandlePlayKey;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithDSSThing_HandleSyncThingFull;
-    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = sithThingPlayer_cogMsg_HandleSyncCog;
+    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = sithDSSCog_HandleSyncCog;
     sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = sithDSS_HandleSyncSurface;
     sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithDSS_HandleSyncAI;
     sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = sithDSS_HandleSyncItemDesc;

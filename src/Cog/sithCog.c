@@ -26,9 +26,9 @@
 #include "General/stdHashTable.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
-#include "World/sithThingPlayer.h"
 #include "Main/jkGame.h"
 #include "stdPlatform.h"
+#include "Dss/sithDSSCog.h"
 
 #include "jk.h"
 
@@ -931,7 +931,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
     }
     else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
     {
-        sithThingPlayer_cogMsg_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_dword_8C4BA4);
+        sithDSSCog_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_dword_8C4BA4);
     }
 }
 
@@ -1035,7 +1035,7 @@ LABEL_18:
     }
     else
     {
-        sithThingPlayer_cogMsg_SendSendTrigger(
+        sithDSSCog_SendSendTrigger(
             cog,
             message,
             senderType,

@@ -205,7 +205,7 @@ stdGdi                         0x430      0.099%        100.000%       10 / 10
 jkCutscene                     0x443      0.101%        100.000%        7 / 7          
 sithKeyFrame                   0x44e      0.102%        100.000%        5 / 5          
 stdPcx                         0x45e      0.104%        100.000%        2 / 2          
-sithThingPlayer                0x460      0.104%        100.000%        4 / 4          
+sithDSSCog                     0x460      0.104%        100.000%        4 / 4          
 rdMath                         0x47d      0.107%        100.000%        6 / 6          
 rdLight                        0x49f      0.110%        100.000%        8 / 8          
 jkGuiMain                      0x4b1      0.111%        100.000%        6 / 6          
@@ -233,7 +233,7 @@ sithParticle                   0x7f5      0.189%        100.000%       10 / 10
 jkGuiSingleplayer              0x8d8      0.210%        100.000%        7 / 7          
 sithCogSector                  0x93a      0.219%        100.000%       22 / 22         
 sithCogAI                      0x943      0.220%        100.000%       20 / 20         
-sithSave                       0x9bf      0.231%        100.000%        7 / 7          
+sithGamesave                   0x9bf      0.231%        100.000%        7 / 7          
 jkGuiForce                     0x9dd      0.234%        100.000%       11 / 11         
 sithSound                      0xa00      0.237%        100.000%       13 / 13         
 rdParticle                     0xa0d      0.239%        100.000%       10 / 10         

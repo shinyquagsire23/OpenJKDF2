@@ -24,7 +24,6 @@
 #include "Engine/sithTimer.h"
 #include "Engine/sithPhysics.h"
 #include "World/sithPlayer.h"
-#include "World/sithThingPlayer.h"
 #include "World/sithWorld.h"
 #include "World/sithWeapon.h"
 #include "World/jkPlayer.h"
@@ -32,6 +31,7 @@
 #include "General/stdFnames.h"
 #include "General/stdPalEffects.h"
 #include "Dss/sithDSS.h"
+#include "Dss/sithDSSCog.h"
 
 void sithCogUtil_ReturnBool(int a1, sithCog *a2);
 
@@ -1150,7 +1150,7 @@ void sithCogUtil_SendTrigger(sithCog *ctx)
                     if ( sourceThing == g_localPlayerThing )
                         sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, g_localPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
                     else
-                        sithThingPlayer_cogMsg_SendSendTrigger(
+                        sithDSSCog_SendSendTrigger(
                             0,
                             SITH_MESSAGE_TRIGGER,
                             SENDERTYPE_THING,
@@ -1169,7 +1169,7 @@ void sithCogUtil_SendTrigger(sithCog *ctx)
     }
     else
     {
-        sithThingPlayer_cogMsg_SendSendTrigger(
+        sithDSSCog_SendSendTrigger(
             0,
             SITH_MESSAGE_TRIGGER,
             SENDERTYPE_THING,
