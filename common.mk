@@ -64,5 +64,5 @@ $(OBJ): | initial $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 $(FLEX_BIN): | clean_cog
 	cd $(ROOT_DIR)/flex && make
 
-$(YACC_BIN): | clean_cog
+$(YACC_BIN): | clean_cog $(FLEX_BIN)
 	cd $(ROOT_DIR)/byacc && make
