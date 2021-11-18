@@ -55,6 +55,18 @@ int Window_RemoveMsgHandler(WindowHandler_t a1)
     return 1;
 }
 
+int Window_AddDialogHwnd(HWND a1)
+{
+    int v1; // eax
+
+    v1 = g_thing_two_some_dialog_count;
+    if ( (unsigned int)g_thing_two_some_dialog_count >= 0x10 )
+        return 0;
+    Window_aDialogHwnds[g_thing_two_some_dialog_count] = a1;
+    g_thing_two_some_dialog_count = v1 + 1;
+    return 1;
+}
+
 #ifdef SDL2_RENDER
 static int dword_855E98 = 0;
 static int dword_855DE4 = 0;

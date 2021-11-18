@@ -12,7 +12,7 @@
 #define Window_sub_50EB30_ADDR (0x0050EB30)
 #define Window_AddMsgHandler_ADDR (0x0050EB40)
 #define Window_RemoveMsgHandler_ADDR (0x0050EB80)
-#define Window_gui_dialogidk_ADDR (0x0050EBD0)
+#define Window_AddDialogHwnd_ADDR (0x0050EBD0)
 #define Window_sub_50EC00_ADDR (0x0050EC00)
 #define Window_SetDrawHandlers_ADDR (0x0050EC70)
 #define Window_GetDrawHandlers_ADDR (0x0050EC90)
@@ -23,6 +23,7 @@ extern int Window_ySize;
 
 int Window_AddMsgHandler(WindowHandler_t a1);
 int Window_RemoveMsgHandler(WindowHandler_t a1);
+int Window_AddDialogHwnd(HWND a1);
 int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName);
 void Window_SetDrawHandlers(WindowDrawHandler_t a1, WindowDrawHandler_t a2);

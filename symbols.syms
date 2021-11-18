@@ -281,6 +281,7 @@ sithSprite_hashmap 0x00852F90 stdHashTable*
 Window_drawAndFlip 0x00855E9C WindowDrawHandler_t
 Window_setCooperativeLevel 0x00855EA0 WindowDrawHandler_t
 Window_ext_handlers 0x00855DF0 wm_handler[16]
+Window_aDialogHwnds 0x00855DA0 HWND[16]
 
 DebugGui_aIdk 0x008BBF80 int[32]
 DebugGui_idk 0x008BC000 int
@@ -412,9 +413,21 @@ sithCog_numSurfaceLinks 0x00836C34 int
 sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[512]
 sithCog_masterCog 0x008B542C sithCog*
 
+jkDev_aEntryPositions 0x00559EF0 rdVector2i[10]
+jkDev_aEntries 0x00559F40 jkDevLogEnt[5]
+jkDev_log_55A4A4 0x0055A4A4 int
+jkDev_log_55A4A8 0x0055A4A8 int
+jkDev_aCheatCmds 0x0055A4B0 stdDebugConsoleCmd[32]
+jkDev_numCheats 0x0055A9B0 uint32_t
 jkDev_bInitted 0x0055A9B4 int
 jkDev_bOpened 0x0055A9B8 int
+jkDev_cheatHashtable 0x0055A9BC stdHashTable*
+jkDev_hDlg 0x0055A9C0 HWND
 jkDev_vbuf 0x0055A9C4 stdVBuffer*
+jkDev_dword_55A9C8 0x0055A9C8 int
+jkDev_ColorKey 0x0055A9CC int
+jkDev_dword_55A9D0 0x0055A9D0 int
+jkDev_amt 0x0055A9D4 float
 
 jkSmack_gameMode 0x00552B78 int
 jkSmack_bInit 0x00552B7C int

@@ -31,7 +31,6 @@
 #define jkSaber_cogMsg_Handlex33 ((void*)jkSaber_cogMsg_Handlex33_ADDR)
 #define jkSaber_cogMsg_HandleJKPrintUniString ((void*)jkSaber_cogMsg_HandleJKPrintUniString_ADDR)
 #define jkSaber_cogMsg_HandleEndLevel ((void*)jkSaber_cogMsg_HandleEndLevel_ADDR)
-#define jkSaber_cogMsg_HandleSetTeam ((void*)jkSaber_cogMsg_HandleSetTeam_ADDR)
 #define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
 
 const char* jkSaber_aKyTeamModels[5] = {
@@ -788,5 +787,57 @@ int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg)
     jkHud_targetRed = NETMSG_POPS16();
     jkHud_targetBlue = NETMSG_POPS16();
     jkHud_targetGreen = NETMSG_POPS16();
+    return 1;
+}
+
+
+void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS16(playerThingIdx);
+    NETMSG_PUSHS16(teamNum);
+
+    NETMSG_END(COGMSG_SETTEAM);
+    
+    if ( sithNet_isServer )
+        jkSaber_cogMsg_HandleSetTeam(&sithCogVm_netMsgTmp);
+    else
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, 255, 1);
+}
+
+int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
+{
+    unsigned int playerIdx; // edx
+    unsigned int teamNum; // ecx
+    unsigned int v4; // esi
+    rdModel3 *v5; // eax
+
+    NETMSG_IN_START(pMsg);
+
+    playerIdx = NETMSG_POPS16();
+    teamNum = NETMSG_POPS16();
+
+    if ( !sithNet_isServer || playerIdx > jkPlayer_maxPlayers - 1 )
+        return 0;
+
+    if ( !teamNum || teamNum > 4 )
+        return 0;
+
+    if ( (sithNet_MultiModeFlags & 1) == 0 || (sithNet_MultiModeFlags & 0x100) == 0 )
+        return 1;
+
+    jkPlayer_playerInfos[playerIdx].teamNum = teamNum;
+    if ( jkPlayer_playerInfos[playerIdx].playerThing )
+    {
+        v5 = sithModel_LoadEntry(&jkSaber_aKyTeamModels[32 * teamNum], 1);
+        if ( v5 )
+        {
+            sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
+            jkSaber_cogMsg_SendSetSaberInfo(jkPlayer_playerInfos[playerIdx].playerThing);
+        }
+    }
+
+    sithMulti_SyncScores();
     return 1;
 }

@@ -11,3 +11,4 @@ void sithCamera_FreeEntry(){}
 void sithCamera_Free(){}
 void sithCamera_SetCanvas(){}
 void sithCamera_IdkChecksDword4(){}
+void sithPhysics_ThingPhysIdk_inlined(){}

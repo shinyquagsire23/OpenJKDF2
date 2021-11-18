@@ -111,6 +111,7 @@ int jkMain_LoadFile(char *a1);
 int jkMain_sub_403470(char *a1);
 int jkMain_CdSwitch(int a1, int bIsAPath);
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
+int jkMain_SetMap(int levelNum);
 void jkMain_do_guistate6();
 int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
 int jkMain_MissionReload();

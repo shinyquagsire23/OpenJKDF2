@@ -1242,7 +1242,7 @@ typedef struct wm_handler
 
 typedef int (*DebugConsolePrintFunc_t)(const char*);
 typedef int (*DebugConsolePrintUniStrFunc_t)(const wchar_t*);
-typedef int (*DebugConsoleCmd_t)(stdDebugConsoleCmd* cmd, uint32_t extra);
+typedef int (*DebugConsoleCmd_t)(stdDebugConsoleCmd* cmd, const char* extra);
 
 typedef struct stdDebugConsoleCmd
 {
@@ -1250,6 +1250,16 @@ typedef struct stdDebugConsoleCmd
     DebugConsoleCmd_t cmdFunc;
     uint32_t extra;
 } stdDebugConsoleCmd;
+
+typedef struct jkDevLogEnt
+{
+    wchar_t text[128];
+    int timeMsExpiration;
+    int field_104;
+    int drawWidth;
+    int field_10C;
+    int bDrawEntry;
+} jkDevLogEnt;
 
 #ifdef LINUX
 typedef uint32_t MCIDEVICEID;

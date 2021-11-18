@@ -907,6 +907,12 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     return result;
 }
 
+int jkMain_SetMap(int levelNum)
+{
+    jkEpisode_EndLevel(&jkEpisode_mLoad, levelNum);
+    return jkMain_cd_swap_reverify(jkEpisode_idk1(&jkEpisode_mLoad));
+}
+
 void jkMain_do_guistate6()
 {
     if ( !jkSmack_stopTick )
@@ -1130,9 +1136,7 @@ void jkMain_FixRes()
 
     jkHudInv_LoadItemRes();
     jkHud_Open();
-#ifndef LINUX_TMP
     jkDev_Open();
-#endif
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
@@ -1201,9 +1205,7 @@ int jkMain_SetVideoMode()
     // Added close
     jkHud_Close();
     jkHud_Open();
-#ifndef LINUX_TMP
     jkDev_Open();
-#endif
     
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);

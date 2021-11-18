@@ -576,6 +576,11 @@ int _atoi(const char* str)
     return atoi(str);
 }
 
+uint32_t _atol(const char* s)
+{
+    return atol(s);
+}
+
 size_t _fwrite(const void * a, size_t b, size_t c, FILE * d)
 {
     return fwrite(a,b,c,d);

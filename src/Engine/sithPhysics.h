@@ -5,7 +5,7 @@
 #include "globals.h"
 
 #define sithPhysics_FindFloor_ADDR (0x004F5550)
-#define sithSector_ThingPhysIdk_inlined_ADDR (0x004F5870)
+#define sithPhysics_ThingPhysIdk_inlined_ADDR (0x004F5870)
 #define sithPhysics_ThingTick_ADDR (0x004F5900)
 #define sithPhysics_ThingApplyForce_ADDR (0x004F59B0)
 #define sithPhysics_ThingSetLook_ADDR (0x004F5A80)

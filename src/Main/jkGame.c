@@ -187,21 +187,15 @@ int jkGame_Update()
     
     //if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
-#ifndef LINUX_TMP
     jkDev_DrawLog();
-#endif
     jkHudInv_ClearRects();
     jkHud_ClearRects(0);
 
-    // HACK
-    rdroid_curColorEffects.fade = 1.0;
-
-//#ifndef LINUX_TMP
     v1 = stdDisplay_GetPalette();
     stdPalEffects_UpdatePalette(v1);
     //if ( Video_modeStruct.b3DAccel )
         rdSetColorEffects(&stdPalEffects_state.effect);
-//#endif
+
     _memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )
@@ -272,9 +266,7 @@ int jkGame_Update()
 
     if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
         jkHud_Draw();
-#ifndef LINUX_TMP
     jkDev_sub_41F950();
-#endif
     jkHudInv_Draw();
     //if ( Video_modeStruct.b3DAccel )
     //    std3D_DrawOverlay();

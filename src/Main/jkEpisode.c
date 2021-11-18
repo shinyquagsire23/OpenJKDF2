@@ -506,6 +506,25 @@ LABEL_9:
     return &pLoad->paEntries[v6];
 }
 
+int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
+{
+    int v2; // eax
+    int v3; // edx
+    int *i; // ecx
+
+    v2 = 0;
+    v3 = pEpisode->numSeq;
+    if ( v3 <= 0 )
+        return 0;
+    for ( i = &pEpisode->paEntries->level; *i != levelNum; i += 16 )
+    {
+        if ( ++v2 >= v3 )
+            return 0;
+    }
+    pEpisode->field_8 = v2;
+    return 1;
+}
+
 void jkEpisode_UpdateExtra(sithThing *thing)
 {
     if ( (thing->jkFlags & 1) != 0 )

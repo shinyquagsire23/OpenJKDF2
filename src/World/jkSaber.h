@@ -66,6 +66,9 @@ int jkSaber_cogMsg_Handlex32(sithCogMsg *msg);
 int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg);
 int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg);
 
+void jkSaber_cogMsg_SendSetTeam(int16_t teamNum);
+int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg);
+
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
 static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;

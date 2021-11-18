@@ -43,25 +43,51 @@
 #define jkDev_CmdMana_ADDR (0x00420F40)
 #define jkDev_CmdTeam_ADDR (0x00420F80)
 #define jkDev_DialogFunc_ADDR (0x00420FD0)
+#define jkDev_UpdateEntries_ADDR (0x004210D0)
+#define jkDev_DrawEntries_ADDR (0x00421190)
 
+void jkDev_Startup();
+void jkDev_Shutdown();
+int jkDev_Open();
 void jkDev_Close();
+void jkDev_DrawLog();
+void jkDev_sub_41F950();
+int jkDev_PrintUniString(const wchar_t *str);
+void jkDev_DebugLog(char *lParam);
+int jkDev_sub_41FB80(int a1, const wchar_t *a2);
+int jkDev_sub_41FC40(int a1, const char *a2);
+void jkDev_sub_41FC90(int a1);
 
-static int (*jkDev_Startup)(void) = (void*)jkDev_Startup_ADDR;
-static int (*jkDev_sub_41FC40)(int a1, char *a2) = (void*)jkDev_sub_41FC40_ADDR;
-static int (*jkDev_sub_41F950)() = (void*)jkDev_sub_41F950_ADDR;
-static int (*jkDev_DrawLog)() = (void*)jkDev_DrawLog_ADDR;
-static void (*jkDev_Open)() = (void*)jkDev_Open_ADDR;
-static void (*jkDev_Shutdown)() = (void*)jkDev_Shutdown_ADDR;
-static int (*jkDev_sub_41FC90)(int a1) = (void*)jkDev_sub_41FC90_ADDR;
-static int (*jkDev_sub_41FB80)(int a1, const wchar_t *a2) = (void*)jkDev_sub_41FB80_ADDR;
-static int (*jkDev_DebugLog)(char *lParam) = (void*)jkDev_DebugLog_ADDR;
-static int (*jkDev_TryCommand)(char *cmd) = (void*)jkDev_TryCommand_ADDR;
+int jkDev_RegisterCmd(void *pfCheatFunc, const char *pCryptCheatStr, const char *pCheatFlavortext, int extra);
+int jkDev_TryCommand(const char *cmd);
+char* jkDev_Decrypt(char *cheatStr);
+int jkDev_CmdVersion(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdFramerate(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdDispStats(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdKill(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdEndLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdDebugFlags3(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdEndLevel2(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdLightMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
-#ifdef SDL2_RENDER
-void jkDev_PrintUniString(wchar_t* str);
-static int (*_jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
-#else
-static int (*jkDev_PrintUniString)(wchar_t *a1) = (void*)jkDev_PrintUniString_ADDR;
-#endif
+int jkDev_UpdateEntries();
+
+static int (*jkDev_DialogFunc)(HWND, UINT, WPARAM, LPARAM) = (void*)jkDev_DialogFunc_ADDR;
 
 #endif // _JKDEV_H

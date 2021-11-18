@@ -2,6 +2,7 @@
 #define _SITHDEBUGCONSOLE_H
 
 #include "types.h"
+#include "globals.h"
 
 #define sithDebugConsole_Initialize_ADDR (0x004EDC10)
 #define sithDebugConsole_CmdTick_ADDR (0x004EDE70)
@@ -25,5 +26,10 @@
 #define sithDebugConsole_matlist_sort_ADDR (0x004EEE70)
 
 void sithDebugConsole_Initialize();
+int sithDebugConsole_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdFly();
+int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
 #endif // _SITHDEBUGCONSOLE_H

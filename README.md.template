@@ -111,16 +111,15 @@ See [here](BUILDING.md) for instructions.
 ## TL;DR: What Isn't Implemented, Yet
  - Input mapping (for blobless/SDL2, input maps are hardcoded)
  - Subtitles and credits
- - HUD/chat text (top-center)
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
    - Multiplayer character builder
- - Sound menu in Options
  - Display menu in Options
  - Input menu in Options
  - Map view in ESC menu
  - Map view with TAB
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
+ - In-game screenshots
 
 ## Usage with original JK.EXE and DirectX
 OpenJKDF2 is usable as a hook-and-replace DLL with the original JK.EXE (v1.0) to allow for quality-of-life improvements and multiplayer, since the SDL2 and 64-bit versions do not currently have DirectPlay functions implemented.
