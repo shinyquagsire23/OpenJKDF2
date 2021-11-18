@@ -75,7 +75,7 @@ void Windows_InitGdi(int windowed)
 
     Windows_bWindowed = windowed;
     if ( windowed )
-        jk_ShowCursor(0);
+        stdControl_ShowCursor(0);
     else
         Window_ShowCursorUnwindowed(0);
 
@@ -91,7 +91,7 @@ void Windows_ShutdownGdi()
         Windows_bInittedGdi = 0;
         Window_RemoveMsgHandler(Windows_GdiHandler);
         if ( Windows_bWindowed )
-            jk_ShowCursor(1);
+            stdControl_ShowCursor(1);
         Windows_bUnk = 0;
     }
 }

@@ -660,6 +660,8 @@ LABEL_16:
     sithInventory_SetAvailable(player, SITHBIN_F_DESTRUCTION, 1);
     sithInventory_SetAvailable(player, SITHBIN_F_DEADLYSIGHT, 1);
     sithInventory_SetAvailable(player, SITHBIN_F_PROTECTION, 1);
+
+    jkPlayer_SetAccessiblePowers(7);
     //jkSaber_InitializeSaberInfo(player, "sabergreen1.mat", "sabergreen0.mat", 0.003, 0.001, 0.100, );
 #endif
 

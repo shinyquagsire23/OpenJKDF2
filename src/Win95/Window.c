@@ -7,6 +7,7 @@
 #include "Main/jkGame.h"
 #include "Gui/jkGUI.h"
 #include "Win95/stdDisplay.h"
+#include "Win95/stdControl.h"
 
 #include "jk.h"
 
@@ -584,7 +585,15 @@ void Window_SdlUpdate()
     }
     else
     {
-        SDL_SetRelativeMouseMode(SDL_TRUE);
+        
+        if (SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+            SDL_WarpMouseInWindow(displayWindow, 100, 100);
+        }
+        else
+        {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+        }
     }
 }
 
@@ -835,7 +844,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
 
 int Window_ShowCursorUnwindowed(int a1)
 {
-    return 1;
+    return stdControl_ShowCursor(a1);
 }
 
 int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

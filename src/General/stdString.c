@@ -178,7 +178,8 @@ int stdString_wstrncpy(wchar_t *a1, int a2, int a3)
         if ( a3 >= v5 )
             v4 = v5;
         result = 2 * (v5 - v4) + 2;
-        _memcpy(&a1[a2], &a1[a2 + v4], result);
+        // Added: memcpy -> memmove
+        memmove(&a1[a2], &a1[a2 + v4], result);
     }
     return result;
 }

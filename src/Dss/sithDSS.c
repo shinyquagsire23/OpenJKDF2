@@ -373,6 +373,9 @@ int sithDSS_HandleSyncItemDesc(sithCogMsg *msg)
     iteminfo->activationDelaySecs = NETMSG_POPF32();
     iteminfo->binWait = NETMSG_POPF32();
 
+    // Added: idk if this is necessary
+    sithInventory_aDescriptors[binIdx].flags |= ITEMINFO_VALID;
+
     return 1;
 }
 

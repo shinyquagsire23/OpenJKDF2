@@ -933,8 +933,8 @@ void jkPlayer_SetAccessiblePowers(int rank)
 
         if ( rank > 3 )
         {
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state = jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state | ITEMSTATE_CARRIES;
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state = jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state | ITEMSTATE_CARRIES;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state |= ITEMSTATE_CARRIES;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state |= ITEMSTATE_CARRIES;
             
             if ( rank > 4 )
             {
