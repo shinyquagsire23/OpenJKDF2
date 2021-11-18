@@ -15,32 +15,32 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-static char *jkGuiRend_LoadedSounds[4];
-static uint8_t jkGuiRend_palette[0x300];
-static intptr_t jkGuiRend_idk2;
-static intptr_t jkGuiRend_idk;
-static stdSound_buffer_t* jkGuiRend_DsoundHandles[4];
-static jkGuiMenu *jkGuiRend_activeMenu;
-static stdVBuffer* jkGuiRend_menuBuffer;
-static stdVBuffer *jkGuiRend_texture_dword_8561E8;
+static char *jkGuiRend_LoadedSounds[4] = {0};
+static uint8_t jkGuiRend_palette[0x300] = {0};
+static intptr_t jkGuiRend_idk2 = 0;
+static intptr_t jkGuiRend_idk = 0;
+static stdSound_buffer_t* jkGuiRend_DsoundHandles[4] = {0};
+static jkGuiMenu *jkGuiRend_activeMenu = NULL;
+static stdVBuffer* jkGuiRend_menuBuffer = NULL;
+static stdVBuffer *jkGuiRend_texture_dword_8561E8 = NULL;
 
-int jkGuiRend_thing_five;
-int jkGuiRend_thing_four;
-static int jkGuiRend_bIsSurfaceValid;
-static int jkGuiRend_bInitted;
-static int jkGuiRend_bOpen;
-static int jkGuiRend_HandlerIsSet;
-static int jkGuiRend_fillColor;
-static int jkGuiRend_paletteChecksum;
-static int jkGuiRend_dword_85620C;
-static int jkGuiRend_lastKeyScancode;
-static int jkGuiRend_mouseX;
-static int jkGuiRend_mouseY;
-static int jkGuiRend_bShiftDown;
-static int jkGuiRend_mouseXLatest;
-static int jkGuiRend_mouseYLatest;
-static int jkGuiRend_mouseLatestMs;
-static HCURSOR jkGuiRend_hCursor;
+int jkGuiRend_thing_five = 0;
+int jkGuiRend_thing_four = 0;
+static int jkGuiRend_bIsSurfaceValid = 0;
+static int jkGuiRend_bInitted = 0;
+static int jkGuiRend_bOpen = 0;
+static int jkGuiRend_HandlerIsSet = 0;
+static int jkGuiRend_fillColor = 0;
+static int jkGuiRend_paletteChecksum = 0;
+static int jkGuiRend_dword_85620C = 0;
+static int jkGuiRend_lastKeyScancode = 0;
+static int jkGuiRend_mouseX = 0;
+static int jkGuiRend_mouseY = 0;
+static int jkGuiRend_bShiftDown = 0;
+static int jkGuiRend_mouseXLatest = 0;
+static int jkGuiRend_mouseYLatest = 0;
+static int jkGuiRend_mouseLatestMs = 0;
+static HCURSOR jkGuiRend_hCursor = 0;
 
 static int jkGuiRend_CursorVisible = 1;
 static jkGuiElementHandlers jkGuiRend_elementHandlers[8] = 
@@ -283,8 +283,12 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
     {
         msgret = Window_MessageLoop();
         if ( jkGuiRend_thing_four && jkGuiRend_thing_five )
-        {
+        { 
+            // Added: this makes the menu that appears when pressing ESC in jkGUISingleTally flicker,
+            //        I think due to how we handle window message emulation.
+#ifndef SDL2_RENDER
             menu->lastButtonUp = -1;
+#endif
         }
         else
         {

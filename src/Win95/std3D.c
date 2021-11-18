@@ -535,6 +535,9 @@ void std3D_DrawMenu()
 
         // Text
         std3D_DrawMenuSubrect((menu_w / 2) - 128, 0, 256, 128, (menu_w / 2) - (128*hudScale), 0, hudScale);
+
+        // Active forcepowers/items
+        std3D_DrawMenuSubrect(menu_w - 64, 0, 64, 128, menu_w - (64*hudScale), 0, hudScale);
     }
     
     glActiveTexture(GL_TEXTURE0 + 0);
