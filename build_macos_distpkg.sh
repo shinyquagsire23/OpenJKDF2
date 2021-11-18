@@ -13,6 +13,8 @@ OPENJKDF2_NO_ASAN=1 make -f Makefile.macos -j10
 
 ./combine_macos_appbundles.sh
 
+zip -r macos-debug.zip OpenJKDF2_universal.app resource
+
 OPENJKDF2_x86_64=1 make -f Makefile.macos clean
 make -f Makefile.macos clean
 
