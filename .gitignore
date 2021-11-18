@@ -69,3 +69,5 @@ OpenJKDF2_universal.app
 build_win64
 *.ico
 macos-debug.tar.gz
+macos-debug.zip
+win64-debug.zip

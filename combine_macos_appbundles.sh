@@ -19,4 +19,5 @@ chmod 774 OpenJKDF2_universal.app/Contents/MacOS/*.dylib
 
 codesign -s - OpenJKDF2_universal.app --force --deep --verbose
 
-tar czf macos-debug.tar.gz OpenJKDF2_universal.app
+#tar czf macos-debug.tar.gz OpenJKDF2_universal.app
+zip -r macos-debug.zip OpenJKDF2_universal.app
