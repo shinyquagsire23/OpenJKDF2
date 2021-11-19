@@ -728,11 +728,6 @@ int sithControl_ReadFunctionMap(int func, int* out)
         val = !!state[SDL_SCANCODE_MINUS];
     }
     
-    if (!!state[SDL_SCANCODE_ESCAPE])
-    {
-        jkMain_do_guistate6();
-    }
-    
     if (out)
         *out = val;
     return val;

@@ -22,6 +22,13 @@ int Window_AddMsgHandler(WindowHandler_t a1)
 {
     int i = 0;
 
+    // Added: no duplicates
+    for (i = 0; i < 16; i++)
+    {
+        if (Window_ext_handlers[i].exists && Window_ext_handlers[i].handler == a1)
+            return 1;
+    }
+
     for (i = 0; i < 16; i++)
     {
         if ( !Window_ext_handlers[i].exists )
@@ -436,7 +443,8 @@ void Window_SdlUpdate()
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x1B, 0);
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x1B, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x1B, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
