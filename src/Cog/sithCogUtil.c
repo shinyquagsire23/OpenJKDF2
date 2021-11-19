@@ -62,7 +62,8 @@ void sithCogUtil_GetSourceType(sithCog *ctx)
 
 void sithCogUtil_Rand(sithCog *ctx)
 {
-    sithCogVm_PushFlex(ctx, _frand());
+    float val = _frand();
+    sithCogVm_PushFlex(ctx, val);
 }
 
 void sithCogUtil_RandVec(sithCog *ctx)

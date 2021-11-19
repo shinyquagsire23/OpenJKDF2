@@ -308,7 +308,7 @@ int _strncmp(const char *s1, const char *s2, size_t n)
 
 float _frand()
 {
-    return (float)(_rand() & 0xFFFF) * 0.000030518509;
+    return (float)(_rand() & 0x7FFF) * 0.000030518509;
 }
 
 int __wcscmp(const wchar_t *a, const wchar_t *b)

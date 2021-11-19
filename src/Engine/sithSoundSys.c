@@ -341,6 +341,10 @@ sithPlayingSound* sithSoundSys_cog_playsound_internal(sithSound *sound, float vo
     //return NULL;
 #endif
 
+#ifdef OPENAL_SOUND
+    jkGuiSound_numChannels = 256;
+#endif
+
     v6 = sithSoundSys_PlayingSoundFromSound(sound, flags);
     
     if ( !v6 )
@@ -547,6 +551,10 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
 
 #ifdef LINUX
     //printf("play %s at thing flags %x\n", sound->sound_fname, flags);
+#endif
+
+#ifdef OPENAL_SOUND
+    jkGuiSound_numChannels = 256;
 #endif
 
     v34 = 50.0;
@@ -860,7 +868,7 @@ void sithSoundSys_FadeSound(sithPlayingSound *sound, float vol_, float fadeintim
                 v7 = -v3;
             sound->volumeVelocity = v7 / fadeintime_;
             sound->volume = vol_;
-            if ( v7 > 0.0 ) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
+            if ( v3 <= 0.0 ) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
                 sound->flags = v4 | SITHSOUNDFLAG_20;
             else
                 sound->flags = v4 | SITHSOUNDFLAG_10;
@@ -975,7 +983,7 @@ LABEL_12:
                 v7 = -v4;
             v3->volume = 0.0;
             v3->volumeVelocity = v7 + v7;
-            if ( v7 < 0.0 ) // TODO verify? v4
+            if ( v4 <= 0.0 ) // TODO verify? v4
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1019,7 +1027,7 @@ LABEL_12:
                         v23 = -v20;
                     v3->volume = 0.0;
                     v3->volumeVelocity = v23 + v23;
-                    if ( v23 > 0.0 ) // TODO verify? v20 <
+                    if ( v20 <= 0.0 ) // TODO verify? v20 <
                         v3->flags |= SITHSOUNDFLAG_20;
                     else
                         v3->flags |= SITHSOUNDFLAG_10;
@@ -1082,7 +1090,7 @@ LABEL_49:
             }
             v3->volumeVelocity = v17 + v17;
             v3->volume = v13;
-            if ( v17 < 0.0 ) // TODO verify? v43 > 0.0
+            if ( v17 <= 0.0 ) // TODO verify? v43 > 0.0
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1149,7 +1157,6 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
     sithSound *v24; // eax
     int v26; // edx
     int v27; // eax
-    stdSound_buffer_t *v28; // eax
     stdSound_buffer_t *v29; // eax
     stdSound_buffer_t *v30; // eax
     float a2; // [esp+0h] [ebp-18h]
@@ -1256,16 +1263,15 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
         {
             if ( !sound->pSoundBuf )
             {
-                v28 = sithSound_LoadData(sound->sound);
-                sound->pSoundBuf = v28;
-                if ( !v28 )
+                sound->pSoundBuf = sithSound_LoadData(sound->sound);
+                if ( !sound->pSoundBuf )
                 {
                     sithSoundSys_StopSound(sound);
                     return;
                 }
                 a2e = sound->vol_2 * 0.75;
                 ++sound->sound->field_40;
-                stdSound_BufferSetVolume(v28, a2e);
+                stdSound_BufferSetVolume(sound->pSoundBuf, a2e);
                 if ( jkGuiSound_b3DSound )
                 {
                     v29 = (stdSound_buffer_t *)stdSound_BufferQueryInterface(sound->pSoundBuf);
@@ -1292,7 +1298,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
             
             // Added: adjusted this so that sounds actually free?
             // TODO figure out why this needed to be changed
-            if (!(sound->flags & SITHSOUNDFLAG_LOOP) || !sound->pSoundBuf)
+            if (!(sound->flags & SITHSOUNDFLAG_LOOP) || !sound->pSoundBuf) // 
             {
                 sithSoundSys_StopSound(sound);
             }
@@ -1623,6 +1629,10 @@ int sithSoundSys_sub_4DD3F0(sithPlayingSound *sound)
     int v9; // edx
     stdSound_buffer_t *v13; // [esp-4h] [ebp-Ch]
     stdSound_buffer_t *v14; // [esp-4h] [ebp-Ch]
+
+#ifdef OPENAL_SOUND
+    jkGuiSound_numChannels = 256;
+#endif
 
     if ( sithSoundSys_activeChannels >= (unsigned int)jkGuiSound_numChannels )
     {
