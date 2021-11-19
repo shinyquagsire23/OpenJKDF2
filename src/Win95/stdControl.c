@@ -88,6 +88,7 @@ float stdControl_GetAxis2(int a)
             axisAmt += -1.0;
         }
         
+        Window_lastSampleMs = 6;
         axisAmt += (float)Window_lastXRel * -((double)Window_lastSampleMs / 44.0);
         
         Window_lastXRel = 0;
@@ -118,6 +119,7 @@ float stdControl_GetAxis2(int a)
             axisAmt += -1.0;
         }
         
+        Window_lastSampleMs = 6;
         axisAmt += (float)Window_lastYRel * -((double)Window_lastSampleMs / 44.0);
         
         Window_lastYRel = 0;
