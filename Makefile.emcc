@@ -1,5 +1,5 @@
 CC := emcc
-TARGET := openjkdf2.html
+TARGET := openjkdf2.js
 
 SRC := src
 OBJ := build_emcc
@@ -42,7 +42,7 @@ $(TARGET): $(OBJECTS)
 	cp resource/shaders/* wasm_out/resource/shaders/
 	$(CC) -o $@ -g $^ $(LDFLAGS)
 	mkdir -p wasm_out
-	mv openjkdf2.html wasm_out/index.html
+	cp packaging/wasm/index.html wasm_out/index.html
 	mv openjkdf2.js wasm_out
 	mv openjkdf2.wasm wasm_out
 	mv openjkdf2.data wasm_out
