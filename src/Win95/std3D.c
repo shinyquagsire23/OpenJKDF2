@@ -100,7 +100,7 @@ void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
     
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *fbTexOut, 0); 
@@ -348,8 +348,6 @@ int std3D_StartScene()
         memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
     }
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
 	
     return 1;
 }
@@ -696,7 +694,7 @@ void std3D_DrawMenu()
     free(data_colors);    
     free(data_uvs);
         
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void std3D_DrawRenderList()
@@ -752,7 +750,7 @@ void std3D_DrawRenderList()
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    
     glUniform1i(uniform_tex, 0);
     glUniform1i(uniform_worldPalette, 1);
     
@@ -866,7 +864,10 @@ void std3D_DrawRenderList()
             {
                 int tex_id = tex->texture_id;
                 glActiveTexture(GL_TEXTURE0 + 0);
-                glBindTexture(GL_TEXTURE_2D, tex_id);
+                if (tex_id == 0)
+                    glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+                else
+                    glBindTexture(GL_TEXTURE_2D, tex_id);
                 glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
                 
                 if (tex_id == 0)
@@ -875,7 +876,7 @@ void std3D_DrawRenderList()
             else
             {
                 glActiveTexture(GL_TEXTURE0 + 0);
-                glBindTexture(GL_TEXTURE_2D, 0);
+                glBindTexture(GL_TEXTURE_2D, worldpal_texture);
                 glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
             }
             
@@ -974,7 +975,7 @@ void std3D_DrawRenderList()
     glDisableVertexAttribArray(attribute_coord3d);
         
     // Done drawing    
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     
     std3D_ResetRenderList();
 }
