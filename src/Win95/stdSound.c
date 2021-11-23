@@ -39,7 +39,6 @@ uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSamp
 #ifdef OPENAL_SOUND
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/alut.h>
 
 ALCdevice *device;
 ALCcontext *context;

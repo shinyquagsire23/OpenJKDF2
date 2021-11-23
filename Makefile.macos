@@ -8,7 +8,7 @@ OBJ := build_darwin64
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Flags
-LDFLAGS := -glldb -fshort-wchar -lm -framework OpenGL -framework OpenAL -lalut
+LDFLAGS := -glldb -fshort-wchar -lm -framework OpenGL -framework OpenAL
 CFLAGS := -glldb -O2 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DARCH_64BIT -DMACOS -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -I$(HOMEBREW_PREFIX)/opt/openal-soft/include -I$(HOMEBREW_PREFIX)/opt/freealut/include $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags sdl2_mixer) $(shell pkg-config --cflags glew) -I$(HOMEBREW_PREFIX)/include
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
@@ -19,10 +19,10 @@ BUNDLE := OpenJKDF2_x86_64.app
 OBJ := build_darwin_x86_64
 HOMEBREW_PREFIX := $(OTHER_HOMEBREW_PREFIX)
 
-LDFLAGS += -arch x86_64 $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs sdl2) $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs sdl2_mixer) $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs glew) $(OTHER_HOMEBREW_PREFIX)/opt/freealut/lib/libalut.a
+LDFLAGS += -arch x86_64 $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs sdl2) $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs sdl2_mixer) $(shell arch -x86_64 ${OTHER_HOMEBREW_PREFIX}/bin/pkg-config --static --libs glew)
 CFLAGS += -arch x86_64
 else
-LDFLAGS += $(shell pkg-config --static --libs sdl2) $(shell pkg-config --static --libs sdl2_mixer) $(shell pkg-config --static --libs glew) $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.a
+LDFLAGS += $(shell pkg-config --static --libs sdl2) $(shell pkg-config --static --libs sdl2_mixer) $(shell pkg-config --static --libs glew)
 endif
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
@@ -52,13 +52,9 @@ $(BUNDLE): $(TARGET)
 	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib @executable_path/libSDL2_mixer-2.0.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
 	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/sdl2/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
 	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/glew/lib/libGLEW.2.2.dylib @executable_path/libGLEW.2.2.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/openal-soft/lib/libopenal.1.dylib @executable_path/libopenal.1.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	@install_name_tool -change $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.0.dylib @executable_path/libalut.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
 	@cp $(HOMEBREW_PREFIX)/opt/sdl2/lib/libSDL2-2.0.0.dylib $(BUNDLE)/Contents/MacOS
 	@cp $(HOMEBREW_PREFIX)/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib $(BUNDLE)/Contents/MacOS
 	@cp $(HOMEBREW_PREFIX)/opt/glew/lib/libGLEW.2.2.dylib $(BUNDLE)/Contents/MacOS
-	@cp $(HOMEBREW_PREFIX)/opt/openal-soft/lib/libopenal.1.dylib $(BUNDLE)/Contents/MacOS
-	@cp $(HOMEBREW_PREFIX)/opt/freealut/lib/libalut.0.dylib $(BUNDLE)/Contents/MacOS
 	@chmod 774 $(BUNDLE)/Contents/MacOS/*.dylib
 	@cp -r openjkdf2-64.dsym $(BUNDLE)/Contents/MacOS/openjkdf2-64.dsym
 	@chmod 774 $(BUNDLE)/Contents/MacOS/$(TARGET)

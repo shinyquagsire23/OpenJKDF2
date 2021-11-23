@@ -11,7 +11,6 @@ lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/openjkdf2-64 OpenJKD
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libGLEW.2.2.dylib OpenJKDF2.app/Contents/MacOS/libGLEW.2.2.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libGLEW.2.2.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2-2.0.0.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
-lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libalut.0.dylib OpenJKDF2.app/Contents/MacOS/libalut.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libalut.0.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libopenal.1.dylib OpenJKDF2.app/Contents/MacOS/libopenal.1.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libopenal.1.dylib
 
 chmod 774 OpenJKDF2_universal.app/Contents/MacOS/openjkdf2-64

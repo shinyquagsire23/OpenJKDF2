@@ -11,7 +11,7 @@ OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Flags
-LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lalut -fshort-wchar
+LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar
 CFLAGS := -O2 -march=native -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX  -DARCH_64BIT -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP

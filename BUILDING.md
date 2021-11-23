@@ -12,10 +12,10 @@ pip3 install cogapp
 pacman -S mingw-w64
 
 # Linux 32-bit
-pacman -S multilib-devel lib32-sdl2 lib32-sdl2_mixer lib32-glew lib32-openal lib32-freealut
+pacman -S multilib-devel lib32-sdl2 lib32-sdl2_mixer lib32-glew lib32-openal
 
 # Linux 64-bit
-pacman -S clang sdl2 sdl2_mixer glew openal freealut
+pacman -S clang sdl2 sdl2_mixer glew openal
 
 # WebAssembly
 pacaur -S emscripten
@@ -31,10 +31,10 @@ pip3 install cogapp
 apt install mingw-w64
 
 # Linux 32-bit
-#multilib-devel lib32-sdl2 lib32-glew lib32-openal lib32-freealut
+#multilib-devel lib32-sdl2 lib32-glew lib32-openal
 
 # Linux 64-bit
-apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libalut-dev
+apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
 
 # WebAssembly
 #emscripten
@@ -59,7 +59,7 @@ pip3 install cogapp generate-iconset
 brew install mingw-w64
 
 # MacOS 64-bit
-brew install openal-soft freealut sdl2 sdl2_mixer glew
+brew install openal-soft sdl2 sdl2_mixer glew
 
 # WebAssembly
 brew install emscripten
