@@ -35,7 +35,9 @@ int jkSmack_GetCurrentGuiState()
 
 int jkSmack_SmackPlay(const char *fname)
 {
+#ifndef ARCH_WASM
     if ( sithDplay_EarlyInit() || jkPlayer_setDisableCutscenes )
+#endif
     {
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;

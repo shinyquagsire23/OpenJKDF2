@@ -116,6 +116,72 @@ double stdMci_GetTrackLength(int track)
 }
 
 #else // LINUX
+#ifdef NULL_SOUND
+
+int stdMci_trackTo;
+int stdMci_trackFrom;
+int stdMci_trackCurrent;
+int stdMci_music;
+
+int stdMci_Startup()
+{
+    stdMci_uDeviceID = 0;
+
+    stdMci_bInitted = 1;
+    
+    return 1;
+}
+
+void stdMci_Shutdown()
+{
+    stdMci_bInitted = 0;
+}
+
+void stdMci_trackFinished();
+void stdMci_trackStart(int track)
+{
+    stdMci_music = 1;
+}
+
+void stdMci_trackFinished()
+{
+    stdMci_trackCurrent++;
+    if (stdMci_trackCurrent >= stdMci_trackTo)
+        stdMci_trackCurrent = stdMci_trackFrom;
+    
+    stdMci_trackStart(stdMci_trackCurrent);
+}
+
+int stdMci_Play(uint8_t trackTo, uint8_t trackFrom)
+{
+    stdMci_trackTo = trackTo;
+    stdMci_trackFrom = trackFrom;
+}
+
+void stdMci_SetVolume(float vol)
+{
+}
+
+void stdMci_Stop()
+{
+    printf("stdMci: stop music\n");
+    
+    if (stdMci_music) {
+        stdMci_music = 0;
+    }
+}
+
+int stdMci_CheckStatus()
+{
+    return stdMci_music;
+}
+
+double stdMci_GetTrackLength(int track)
+{
+    return 0.0;
+}
+
+#else // !NULL_SOUND
 
 #include <SDL2/SDL_mixer.h>
 
@@ -214,4 +280,5 @@ double stdMci_GetTrackLength(int track)
     return 0.0;
 }
 
-#endif
+#endif // else SDL2_RENDER
+#endif // else NULL_SOUND

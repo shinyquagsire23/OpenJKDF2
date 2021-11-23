@@ -67,7 +67,12 @@ int jkCutscene_sub_421310(char* fpath)
 {
     // STUB
     if (!fpath) return 1;
-    
+
+#ifdef ARCH_WASM
+    printf("vid skip %s\n", fpath);
+    return 1;
+#endif
+
     char tmp[512];
     size_t len = _strlen(fpath);
 
@@ -261,7 +266,7 @@ int jkCutscene_smack_related_loops()
     return smack_finished;
 }
 
-int jkCutscene_PauseShow()
+int jkCutscene_PauseShow(int unk)
 {
     wchar_t *v0; // eax
     int result; // eax

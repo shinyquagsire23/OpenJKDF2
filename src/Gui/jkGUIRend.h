@@ -182,7 +182,7 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
 void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *vbuf, int a4);
 void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
-int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam);
+int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam, void* unused);
 void jkGuiRend_UpdateMouse();
 void jkGuiRend_FlipAndDraw(jkGuiMenu *menu, rdRect *drawRect);
 void jkGuiRend_GetMousePos(int *pX, int *pY);

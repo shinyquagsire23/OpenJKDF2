@@ -592,180 +592,185 @@ void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
     }
 }
 
-void sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, rdMatrix34 *a4, int a5)
+int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5)
 {
     int v4; // eax
-    int v5; // ecx
-    int v6; // eax
-    double v7; // st7
-    double v8; // st5
-    double v9; // st6
+    int result; // eax
+    int v6; // ecx
+    int v7; // eax
+    double v8; // st7
+    double v9; // st5
     double v10; // st6
-    double v11; // st4
-    double v12; // st7
+    double v11; // st6
+    double v12; // st4
     double v13; // st7
-    int v15; // eax
+    double v14; // st7
     int v16; // eax
-    sithThing *v17; // edi
-    sithThing *v18; // ebx
-    sithThing *v19; // eax
-    sithThing *v20; // edi
-    int v21; // eax
+    int v17; // eax
+    sithThing *v18; // edi
+    sithThing *v19; // ebx
+    sithThing *v20; // eax
+    sithThing *v21; // edi
+    int v22; // eax
     sithThing *fleshHitTemplate; // edi
-    sithThing *v23; // ebx
-    sithThing *v24; // eax
+    sithThing *v24; // ebx
+    sithThing *v25; // eax
     sithThing *explodeTemplate; // edi
-    sithThing *v26; // ebx
-    sithThing *v27; // eax
-    int v28; // eax
-    __int32 v29; // eax
-    rdVector3 v30; // [esp+10h] [ebp-Ch]
+    sithThing *v27; // ebx
+    sithThing *v28; // eax
+    uint32_t v30; // eax
+    rdVector3 v31; // [esp+10h] [ebp-Ch]
 
-    v4 = physicsThing->weaponParams.typeflags;
-    if ( (v4 & THING_TYPEFLAGS_1000) != 0 )
+    if ( (physicsThing->weaponParams.typeflags & THING_TYPEFLAGS_1000) != 0 )
     {
-        v4 = v4 & ~0x1000 | 0x100;
-        physicsThing->weaponParams.typeflags = v4;
+        physicsThing->weaponParams.typeflags &= ~0x1000;
+        physicsThing->weaponParams.typeflags |= 0x100;
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_ACTIVATE);
-        return;
+        return 0;
     }
-    v5 = physicsThing->weaponParams.typeflags & 0x400;
-    if ( (v4 & 0x400) != 0 && (collidedThing->thingflags & SITH_TF_4) != 0
-      || collidedThing->type == SITH_THING_COG && (v4 & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 && physicsThing->weaponParams.field_18 < 2u )
+    v6 = physicsThing->weaponParams.typeflags & 0x400;
+    if ( (physicsThing->weaponParams.typeflags & 0x400) != 0 && (collidedThing->thingflags & SITH_TF_4) != 0
+      || collidedThing->thingtype == SITH_THING_COG && (physicsThing->weaponParams.typeflags & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 && physicsThing->weaponParams.field_18 < 2u )
     {
-        v6 = physicsThing->weaponParams.field_18;
-        physicsThing->weaponParams.field_18 = v6 + 1;
-        if ( (unsigned int)v6 < 6 )
+        v7 = physicsThing->weaponParams.field_18;
+        physicsThing->weaponParams.field_18 = v7 + 1;
+        if ( (unsigned int)v7 < 6 )
         {
-            v30 = physicsThing->physicsParams.vel;
-            if ( sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0) )
+            v31 = physicsThing->physicsParams.vel;
+            result = sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0);
+            if ( result )
             {
-                v7 = (a4->lvec.z * v30.x + a4->uvec.x * v30.y + a4->uvec.y * v30.z) * -2.0;
+                v8 = (a4->field_14.x * v31.x + a4->field_14.y * v31.y + a4->field_14.z * v31.z) * -2.0;
                 if ( a5 )
-                    v7 = -v7;
-                v8 = a4->uvec.x * v7 + v30.y;
-                v9 = a4->uvec.y * v7 + v30.z;
-                physicsThing->physicsParams.vel.x = a4->lvec.z * v7 + v30.x;
-                physicsThing->physicsParams.vel.y = v8;
-                physicsThing->physicsParams.vel.z = v9;
+                    v8 = -v8;
+                v9 = a4->field_14.y * v8 + v31.y;
+                v10 = a4->field_14.z * v8 + v31.z;
+                physicsThing->physicsParams.vel.x = a4->field_14.x * v8 + v31.x;
+                physicsThing->physicsParams.vel.y = v9;
+                physicsThing->physicsParams.vel.z = v10;
                 rdVector_Normalize3(&physicsThing->lookOrientation.lvec, &physicsThing->physicsParams.vel);
-                v10 = physicsThing->lookOrientation.lvec.x;
-                v11 = physicsThing->lookOrientation.lvec.y;
-                v12 = physicsThing->lookOrientation.lvec.z * 0.0;
-                physicsThing->lookOrientation.rvec.x = v11 * 1.0 - v12;
-                physicsThing->lookOrientation.rvec.y = v12 - v10 * 1.0;
-                physicsThing->lookOrientation.rvec.z = v10 * 0.0 - v11 * 0.0;
+                v11 = physicsThing->lookOrientation.lvec.x;
+                v12 = physicsThing->lookOrientation.lvec.y;
+                v13 = physicsThing->lookOrientation.lvec.z * 0.0;
+                physicsThing->lookOrientation.rvec.x = v12 * 1.0 - v13;
+                physicsThing->lookOrientation.rvec.y = v13 - v11 * 1.0;
+                physicsThing->lookOrientation.rvec.z = v11 * 0.0 - v12 * 0.0;
                 rdVector_Normalize3Acc(&physicsThing->lookOrientation.rvec);
                 physicsThing->lookOrientation.uvec.x = physicsThing->lookOrientation.rvec.y * physicsThing->lookOrientation.lvec.z
                                                      - physicsThing->lookOrientation.rvec.z * physicsThing->lookOrientation.lvec.y;
-                v13 = physicsThing->lookOrientation.lvec.y * physicsThing->lookOrientation.rvec.x;
+                v14 = physicsThing->lookOrientation.lvec.y * physicsThing->lookOrientation.rvec.x;
                 physicsThing->lookOrientation.uvec.y = physicsThing->lookOrientation.rvec.z * physicsThing->lookOrientation.lvec.x
                                                      - physicsThing->lookOrientation.lvec.z * physicsThing->lookOrientation.rvec.x;
-                physicsThing->lookOrientation.uvec.z = v13 - physicsThing->lookOrientation.rvec.y * physicsThing->lookOrientation.lvec.x;
+                physicsThing->lookOrientation.uvec.z = v14 - physicsThing->lookOrientation.rvec.y * physicsThing->lookOrientation.lvec.x;
                 sithSoundClass_ThingPlaySoundclass(physicsThing, SITH_SC_DEFLECTED);
-                physicsThing->weaponParams.typeflags &= ~0x1;
+                physicsThing->weaponParams.typeflags &= ~1;
+                result = 1;
             }
-            return;
+            return result;
         }
     }
-    v15 = collidedThing->type;
-    if ( v15 != SITH_THING_ACTOR && v15 != SITH_THING_PLAYER )
+    v16 = collidedThing->thingtype;
+    if ( v16 != SITH_THING_ACTOR && v16 != SITH_THING_PLAYER )
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
-        v16 = physicsThing->weaponParams.typeflags;
-        if ( (v16 & 4) != 0 )
+        v17 = physicsThing->weaponParams.typeflags;
+        if ( (v17 & 4) != 0 )
         {
-            v17 = physicsThing->weaponParams.explodeTemplate;
-            if ( !v17 )
-                goto LABEL_51;
-            v18 = sithThing_GetParent(physicsThing);
-            v19 = sithThing_Create(v17, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v18);
-            v20 = v19;
-            if ( !v19 )
-                goto LABEL_51;
-            if ( v18 == g_localPlayerThing )
+            v18 = physicsThing->weaponParams.explodeTemplate;
+            if ( !v18 )
+                goto LABEL_53;
+            v19 = sithThing_GetParent(physicsThing);
+            v20 = sithThing_Create(v18, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v19);
+            v21 = v20;
+            if ( !v20 )
+                goto LABEL_53;
+            if ( v19 == g_localPlayerThing )
             {
-                sithAIAwareness_AddEntry(v19->sector, &v19->position, 0, 2.0, v18);
+                sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
                 if ( (physicsThing->thingflags & 0x100) != 0 )
                 {
-LABEL_50:
-                    v20->thingflags |= 0x100;
+LABEL_52:
+                    v21->thingflags |= 0x100;
                 }
-LABEL_51:
+LABEL_53:
                 sithThing_Destroy(physicsThing);
-                return;
+                return 1;
             }
-LABEL_43:
+LABEL_45:
             if ( (physicsThing->thingflags & 0x100) != 0 )
-                goto LABEL_50;
-            goto LABEL_51;
+                goto LABEL_52;
+            goto LABEL_53;
         }
-        if ( (v16 & 0x80u) == 0 )
-        {
-            sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
-            return;
-        }
+        if ( (v17 & 0x80u) == 0 )
+            return sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
         sithPhysics_ThingStop(physicsThing);
         sithSoundClass_ThingPauseSoundclass(physicsThing, PHYSFLAGS_GRAVITY);
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
-        sithPhysics_ThingSetLook(physicsThing, (rdVector3 *)&a4->lvec.z, 0.0);
-        goto LABEL_54;
+        sithPhysics_ThingSetLook(physicsThing, &a4->field_14, 0.0);
+        goto LABEL_56;
     }
-    if ( ((collidedThing->weaponParams.typeflags & THING_TYPEFLAGS_ISBLOCKING) == 0
-       || !v5
-       || (collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
-       || collidedThing == g_localPlayerThing && sithTime_curSeconds < (double)sithWeapon_fireWait
-       || !sithUnk4_thing_anim_blocked(physicsThing, collidedThing, a4))
-      && (physicsThing->weaponParams.damage != 0.0 || (physicsThing->weaponParams.typeflags & 0x808) != 0)
-      && sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5) )
+    if ( (collidedThing->weaponParams.typeflags & THING_TYPEFLAGS_ISBLOCKING) != 0
+      && v6
+      && (collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
+      && (collidedThing != g_localPlayerThing || sithTime_curSeconds >= (double)sithWeapon_fireWait)
+      && sithUnk4_thing_anim_blocked(physicsThing, collidedThing, a4) )
+    {
+        return 1;
+    }
+    if ( physicsThing->weaponParams.damage == 0.0 && (physicsThing->weaponParams.typeflags & 0x808) == 0 )
+        return 0;
+    result = sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
+    if ( result )
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
-        v21 = physicsThing->weaponParams.typeflags;
-        if ( (v21 & THING_TYPEFLAGS_8) != 0 )
+        v22 = physicsThing->weaponParams.typeflags;
+        if ( (v22 & THING_TYPEFLAGS_8) != 0 )
         {
             if ( (collidedThing->actorParams.typeflags & THING_TYPEFLAGS_DROID) != 0 )
             {
                 explodeTemplate = physicsThing->weaponParams.explodeTemplate;
                 if ( !explodeTemplate )
-                    goto LABEL_51;
-                v26 = sithThing_GetParent(physicsThing);
-                v27 = sithThing_Create(explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v26);
-                v20 = v27;
-                if ( !v27 )
-                    goto LABEL_51;
-                if ( v26 == g_localPlayerThing )
-                    sithAIAwareness_AddEntry(v27->sector, &v27->position, 0, 2.0, v26);
+                    goto LABEL_53;
+                v27 = sithThing_GetParent(physicsThing);
+                v28 = sithThing_Create(explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v27);
+                v21 = v28;
+                if ( !v28 )
+                    goto LABEL_53;
+                if ( v27 == g_localPlayerThing )
+                    sithAIAwareness_AddEntry(v28->sector, &v28->position, 0, 2.0, v27);
                 if ( (physicsThing->thingflags & 0x100) == 0 )
-                    goto LABEL_51;
-                goto LABEL_50;
+                    goto LABEL_53;
+                goto LABEL_52;
             }
             fleshHitTemplate = physicsThing->weaponParams.fleshHitTemplate;
             if ( !fleshHitTemplate )
-                goto LABEL_51;
-            v23 = sithThing_GetParent(physicsThing);
-            v24 = sithThing_Create(fleshHitTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v23);
-            v20 = v24;
-            if ( !v24 )
-                goto LABEL_51;
-            if ( v23 == g_localPlayerThing )
-                sithAIAwareness_AddEntry(v24->sector, &v24->position, 0, 2.0, v23);
-            goto LABEL_43;
+                goto LABEL_53;
+            v24 = sithThing_GetParent(physicsThing);
+            v25 = sithThing_Create(fleshHitTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v24);
+            v21 = v25;
+            if ( !v25 )
+                goto LABEL_53;
+            if ( v24 == g_localPlayerThing )
+                sithAIAwareness_AddEntry(v25->sector, &v25->position, 0, 2.0, v24);
+            goto LABEL_45;
         }
-        if ( (v21 & THING_TYPEFLAGS_BLIND) == 0 )
-            return;
+        if ( (v22 & THING_TYPEFLAGS_BLIND) == 0 )
+            return PHYSFLAGS_GRAVITY;
         sithPhysics_ThingStop(physicsThing);
         sithThing_AttachThing(physicsThing, collidedThing);
-LABEL_54:
-        v29 = physicsThing->physicsParams.physflags | PHYSFLAGS_GRAVITY;
+LABEL_56:
+        v30 = physicsThing->physicsParams.physflags | PHYSFLAGS_GRAVITY;
         physicsThing->attach_flags |= ATTACHFLAGS_THING_RELATIVE;
-        physicsThing->physicsParams.physflags = v29;
+        physicsThing->physicsParams.physflags = v30;
+        return PHYSFLAGS_GRAVITY;
     }
+    return result;
 }
 
 int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)

@@ -207,7 +207,7 @@ void jkHud_Close()
         jkHud_bOpened = 0;
 }
 
-int jkHud_ClearRects()
+int jkHud_ClearRects(int unk)
 {
     int v0; // ecx
     int v1; // edi    

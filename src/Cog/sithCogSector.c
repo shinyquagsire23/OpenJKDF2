@@ -29,34 +29,34 @@ void sithCogSector_SyncSector(sithCog *ctx);
 
 void sithCogSector_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetTint, "getsectortint");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetTint, "setsectortint");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorAdjoins, "setsectoradjoins");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorAdjoins, "sectoradjoins");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorLight, "getsectorlight");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorLight, "setsectorlight");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorLight, "sectorlight");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetColormap, "getcolormap");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetColormap, "getsectorcolormap");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetColormap, "setcolormap");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetColormap, "setsectorcolormap");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorThrust, "getsectorthrust");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorThrust, "setsectorthrust");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorThrust, "sectorthrust");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorFlags, "getsectorflags");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SetSectorFlags, "setsectorflags");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_ClearSectorFlags, "clearsectorflags");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetThingCount, "getsectorthingcount");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetThingCount, "sectorthingcount");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetPlayerCount, "getsectorplayercount");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetPlayerCount, "sectorplayercount");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorCount, "getsectorcount");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorCenter, "getsectorcenter");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetNumSectorVertices, "getnumsectorvertices");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorVertexPos, "getsectorvertexpos");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetNumSectorSurfaces, "getnumsectorsurfaces");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_GetSectorSurfaceRef, "getsectorsurfaceref");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSector_SyncSector, "syncsector");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetTint, "getsectortint");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetTint, "setsectortint");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorAdjoins, "setsectoradjoins");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorAdjoins, "sectoradjoins");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorLight, "getsectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorLight, "setsectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorLight, "sectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetColormap, "getcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetColormap, "getsectorcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetColormap, "setcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetColormap, "setsectorcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorThrust, "getsectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorThrust, "setsectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorThrust, "sectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorFlags, "getsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorFlags, "setsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_ClearSectorFlags, "clearsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetThingCount, "getsectorthingcount");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetThingCount, "sectorthingcount");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetPlayerCount, "getsectorplayercount");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetPlayerCount, "sectorplayercount");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorCount, "getsectorcount");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorCenter, "getsectorcenter");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetNumSectorVertices, "getnumsectorvertices");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorVertexPos, "getsectorvertexpos");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetNumSectorSurfaces, "getnumsectorsurfaces");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorSurfaceRef, "getsectorsurfaceref");
+    sithCogScript_RegisterVerb(ctx, sithCogSector_SyncSector, "syncsector");
 }
 
 void sithCogSector_GetTint(sithCog *ctx)

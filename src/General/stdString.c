@@ -102,11 +102,11 @@ char* stdString_GetQuotedStringContents(char *in, char *out, int out_size)
     return result;
 }
 
-int stdString_CharToWchar(uint16_t *a1, const char *a2, int a3)
+int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3)
 {
     int result; // eax
     char *v4; // esi
-    uint16_t *v5; // edx
+    wchar_t *v5; // edx
 
     result = 0;
     if ( a3 <= 0 )
@@ -177,7 +177,7 @@ int stdString_wstrncpy(wchar_t *a1, int a2, int a3)
         v5 = result - a2;
         if ( a3 >= v5 )
             v4 = v5;
-        result = 2 * (v5 - v4) + 2;
+        result = sizeof(wchar_t) * (v5 - v4 + 1);
         // Added: memcpy -> memmove
         memmove(&a1[a2], &a1[a2 + v4], result);
     }
@@ -213,7 +213,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
         v10 = v8 - 1;
         if ( v10 >= 0 )
         {
-            v11 = (wchar_t *)(v9 + 2 * v10);
+            v11 = (wchar_t *)(v9 + sizeof(wchar_t) * v10);
             v12 = (int)v7 - v9;
             v13 = v10 + 1;
             do
@@ -242,7 +242,7 @@ wchar_t* stdString_CstrCopy(const char *a1)
     signed int v4; // ecx
     uint8_t v5; // dl
 
-    v1 = (wchar_t *)std_pHS->alloc(2 * _strlen(a1) + 2);
+    v1 = (wchar_t *)std_pHS->alloc(sizeof(wchar_t) * (_strlen(a1) + 1));
     v2 = 0;
     v3 = v1;
     v4 = _strlen(a1);

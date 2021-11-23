@@ -168,12 +168,12 @@ int main(int argc, char** argv)
 
 #ifndef ARCH_WASM
 #include <sys/mman.h>
+#include <execinfo.h>
+#include <signal.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <execinfo.h>
-#include <signal.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -185,6 +185,7 @@ int main(int argc, char** argv)
 
 //#include "external/libbacktrace/backtrace.h"
 
+#ifndef ARCH_WASM
 static char* executable_path;
 
 #if 0
@@ -283,11 +284,14 @@ void crash_handler_full(int sig)
     //backtrace_full(lbstate, 0, full_callback, error_callback, 0);
     exit(1);
 }
+#endif // ARCH_WASM
 
 int main(int argc, char** argv)
 {
+#ifndef ARCH_WASM
     executable_path = argv[0];
     signal(SIGSEGV, crash_handler_basic);
+#endif
 
 #ifndef ARCH_64BIT
 #ifndef ARCH_WASM

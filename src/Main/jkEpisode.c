@@ -525,8 +525,9 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
     return 1;
 }
 
-void jkEpisode_UpdateExtra(sithThing *thing)
+int jkEpisode_UpdateExtra(sithThing *thing)
 {
     if ( (thing->jkFlags & 1) != 0 )
         jkSaber_UpdateLength(thing);
+    return 1;
 }

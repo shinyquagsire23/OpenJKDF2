@@ -20,7 +20,7 @@ char* stdString_FastCopy(const char *str);
 int stdString_snprintf(char *out, int num, char *fmt, ...);
 char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, char *find_str);
 char* stdString_GetQuotedStringContents(char *in, char *out, int out_size);
-int stdString_CharToWchar(uint16_t *a1, const char *a2, int a3);
+int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3);
 int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3);
 int stdString_wstrncpy(wchar_t *a1, int a2, int a3);
 int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4);

@@ -325,7 +325,7 @@ void Main_Shutdown()
         fclose(debug_log_fp);
     }
     
-    while (1);
+    exit(0);
 }
 
 void Main_ParseCmdLine(char *cmdline)

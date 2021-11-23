@@ -11,7 +11,7 @@
 
 typedef struct sithThing sithThing;
 
-int sithItem_Collide(sithThing *a1, sithThing *a2);
+int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5);
 void sithItem_New(sithThing *out);
 void sithItem_Take(sithThing *item, sithThing *actor, int a3);
 void sithItem_Remove(sithThing *item);

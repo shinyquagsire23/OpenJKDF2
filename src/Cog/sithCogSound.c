@@ -385,18 +385,18 @@ void sithCogSound_GetSoundLen(sithCog *ctx)
 
 void sithCogSound_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySong, "playsong");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySoundThing, "playsoundthing");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySoundPos, "playsoundpos");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySoundLocal, "playsoundlocal");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySoundGlobal, "playsoundglobal");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_StopSound, "stopsound");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_LoadSound, "loadsound");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_PlaySoundClass, "playsoundclass");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_ChangeSoundVol, "changesoundvol");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_ChangeSoundPitch, "changesoundpitch");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_SectorSound, "sectorsound");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_SetMusicVol, "setmusicvol");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogSound_GetSoundLen, "getsoundlen");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySong, "playsong");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundThing, "playsoundthing");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundPos, "playsoundpos");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundLocal, "playsoundlocal");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundGlobal, "playsoundglobal");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_StopSound, "stopsound");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_LoadSound, "loadsound");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundClass, "playsoundclass");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_ChangeSoundVol, "changesoundvol");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_ChangeSoundPitch, "changesoundpitch");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_SectorSound, "sectorsound");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_SetMusicVol, "setmusicvol");
+    sithCogScript_RegisterVerb(ctx, sithCogSound_GetSoundLen, "getsoundlen");
 
 }

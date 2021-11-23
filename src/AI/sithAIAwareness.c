@@ -55,7 +55,7 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
     return 1;
 }
 
-int sithAIAwareness_Tick()
+int sithAIAwareness_Tick(int a, sithTimerInfo* b)
 {
     ++sithSector_timerTicks;
     if ( !sithSector_numEntries )

@@ -26,7 +26,7 @@ int jkHud_Startup();
 void jkHud_Shutdown();
 int jkHud_Open();
 void jkHud_Close();
-int jkHud_ClearRects();
+int jkHud_ClearRects(int unk);
 void jkHud_Draw();
 int jkHud_GetWeaponAmmo(sithThing *player);
 int jkHud_Chat();

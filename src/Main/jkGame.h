@@ -22,7 +22,7 @@
 #define jkGame_ParseSection_ADDR (0x00402850)
 
 int jkGame_Initialize();
-int jkGame_ParseSection(int a1, int a2);
+int jkGame_ParseSection(sithWorld* a1, int a2);
 void jkGame_ForceRefresh();
 void jkGame_Shutdown();
 int jkGame_Update();

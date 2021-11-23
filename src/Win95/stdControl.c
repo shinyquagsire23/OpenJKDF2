@@ -2,11 +2,11 @@
 
 #include "Win95/Window.h"
 
-int stdControl_MessageHandler(int a1, int a2, int a3)
+int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
 {
-    if ( a2 != 0x112 )
+    if ( Msg != 0x112 )
         return 0;
-    return a3 == 0xF100 || a3 == 0xF140;
+    return wParam == 0xF100 || wParam == 0xF140;
 }
 
 #ifdef SDL2_RENDER

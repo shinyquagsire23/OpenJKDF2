@@ -585,7 +585,7 @@ int jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, intptr_t id)
     {
         if ( wStr )
         {
-            v7 = (wchar_t *)std_pHS->alloc(2 * _wcslen(wStr) + 2);
+            v7 = (wchar_t *)std_pHS->alloc(sizeof(wchar_t) * (_wcslen(wStr) + 1));
             wStr = _wcscpy(v7, wStr);
         }
     }
@@ -1424,7 +1424,7 @@ int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu,
     return 0;
 }
 
-int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam)
+int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam, void* unused)
 {
     int ret;
     jkGuiElement *v8; // eax

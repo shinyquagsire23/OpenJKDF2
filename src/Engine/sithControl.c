@@ -90,7 +90,7 @@ LABEL_14:
     }
 }
 
-void sithControl_AddInputHandler(void *a1)
+void sithControl_AddInputHandler(sithControl_handler_t a1)
 {
     if ( sithControl_numHandlers <= 8 )
     {

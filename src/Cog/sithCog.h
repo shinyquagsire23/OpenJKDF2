@@ -181,7 +181,7 @@ static float (*_sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *re
 //static void (*sithCogScript_Tick)(sithCog* cog) = (void*)sithCogScript_Tick_ADDR;
 
 int sithCogScript_Load(sithWorld *lvl, int a2);
-void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3);
+void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, char *a3);
 void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3);
 void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3);
 void sithCogScript_TickAll();

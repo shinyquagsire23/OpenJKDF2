@@ -7,14 +7,23 @@
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
 
+#ifdef ARCH_WASM
+#include <emscripten.h>
+#include <SDL.h>
+#include <SDL_opengles2.h>
+#endif
+
 #ifdef SDL2_RENDER
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Linux/shader_utils.h"
-#include <SDL2/SDL.h>
 #ifdef MACOS
+#include <SDL2/SDL.h>
+#elif defined(ARCH_WASM)
+// wasm
 #else
+#include <SDL2/SDL.h>
 #include <GL/gl.h>
 #endif
 
@@ -54,7 +63,7 @@ void* displaypal_data;
 static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 static GLuint std3D_aLoadedTextures[1024];
 static size_t std3D_loadedTexturesAmt = 0;
-static rdTri GL_tmpTris[STD3D_MAX_VERTICES];
+static rdTri GL_tmpTris[STD3D_MAX_TRIS];
 static size_t GL_tmpTrisAmt = 0;
 static rdLine GL_tmpLines[STD3D_MAX_VERTICES];
 static size_t GL_tmpLinesAmt = 0;
@@ -84,7 +93,7 @@ void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
     // Set up our framebuffer texture
     glGenTextures(1, fbTexOut);
     glBindTexture(GL_TEXTURE_2D, *fbTexOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -993,7 +1002,7 @@ void std3D_UnloadAllTextures()
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 {
-    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_VERTICES)
+    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
     {
         return;
     }
@@ -1093,7 +1102,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     
     std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
     std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;

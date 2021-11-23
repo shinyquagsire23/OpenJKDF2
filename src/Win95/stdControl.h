@@ -41,7 +41,7 @@
 #define stdConffile_GetFileHandle_ADDR (0x00431730)
 #define stdControl_GetAxis2_ADDR (0x004D6D70)
 
-int stdControl_MessageHandler(int a1, int a2, int a3);
+int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused);
 
 #ifndef SDL2_RENDER
 static int (*stdControl_Open)() = (void*)stdControl_Open_ADDR;

@@ -252,6 +252,43 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
 
     jkRes_UnhookHS();
 
+#ifdef ARCH_WASM
+    if (!strcmp(name, "resource")) {
+        __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, "Res1hi.gob");
+        resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+        if ( resGob->gobs[resGob->numGobs] )
+            resGob->numGobs++;
+
+        __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, "Res2.gob");
+        resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+        if ( resGob->gobs[resGob->numGobs] )
+            resGob->numGobs++;
+
+        printf("%x\n", resGob->numGobs);
+    }
+    else if (!strcmp(name, "episode")) {
+        __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, "JK1.gob");
+        resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+        if ( resGob->gobs[resGob->numGobs] )
+            resGob->numGobs++;
+
+        __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, "JK1CTF.gob");
+        resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+        if ( resGob->gobs[resGob->numGobs] )
+            resGob->numGobs++;
+
+        __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, "JK1MP.gob");
+        resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+        if ( resGob->gobs[resGob->numGobs] )
+            resGob->numGobs++;
+    }
+#endif
+
     v15 = stdFileUtil_NewFind(name, 3, "gob");
     while (stdFileUtil_FindNext(v15, &v18))
     {

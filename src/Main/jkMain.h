@@ -85,27 +85,27 @@ typedef struct jkGuiStateFuncs
 } jkGuiStateFuncs;
 
 void jkMain_GuiAdvance();
-void jkMain_EscapeMenuShow();
+void jkMain_EscapeMenuShow(int a1, int a2);
 void jkMain_EscapeMenuTick(int a2);
 void jkMain_EscapeMenuLeave(int a2, int a3);
-void jkMain_EndLevelScreenShow();
-void jkMain_EndLevelScreenTick();
-void jkMain_EndLevelScreenLeave();
+void jkMain_EndLevelScreenShow(int a1, int a2);
+void jkMain_EndLevelScreenTick(int a1);
+void jkMain_EndLevelScreenLeave(int a1, int a2);
 void jkMain_GameplayShow(int a1, int a2);
 void jkMain_GameplayTick(int a2);
 void jkMain_GameplayLeave(int a2, int a3);
-void jkMain_TitleShow();
-void jkMain_TitleTick();
-void jkMain_TitleLeave();
-void jkMain_MainShow();
-void jkMain_MainTick();
-void jkMain_MainLeave();
-void jkMain_ChoiceShow();
-void jkMain_ChoiceTick();
-void jkMain_ChoiceLeave();
-void jkMain_UnkShow();
-void jkMain_UnkTick();
-void jkMain_UnkLeave();
+void jkMain_TitleShow(int a1, int a2);
+void jkMain_TitleTick(int a1);
+void jkMain_TitleLeave(int a1, int a2);
+void jkMain_MainShow(int a1, int a2);
+void jkMain_MainTick(int a1);
+void jkMain_MainLeave(int a1, int a2);
+void jkMain_ChoiceShow(int a1, int a2);
+void jkMain_ChoiceTick(int a1);
+void jkMain_ChoiceLeave(int a1, int a2);
+void jkMain_UnkShow(int a1, int a2);
+void jkMain_UnkTick(int a1);
+void jkMain_UnkLeave(int a1, int a2);
 int jkMain_LoadFile(char *a1);
 
 int jkMain_sub_403470(char *a1);
@@ -119,9 +119,9 @@ int jkMain_MenuReturn();
 
 int jkMain_EndLevel(int a1);
 int jkMain_CdSwitchShow();
-int jkMain_VideoShow(int a1);
-int jkMain_VideoTick(int a2);
-void jkMain_VideoLeave(int a1);
+void jkMain_VideoShow(int a1, int a2);
+void jkMain_VideoTick(int a2);
+void jkMain_VideoLeave(int a1, int a2);
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 

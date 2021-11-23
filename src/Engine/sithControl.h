@@ -120,7 +120,7 @@ int sithControl_IsOpen();
 int sithControl_Open();
 void sithControl_Close();
 void sithControl_Tick(float deltaSecs, int deltaMs);
-void sithControl_AddInputHandler(void *a1);
+void sithControl_AddInputHandler(sithControl_handler_t a1);
 int sithControl_HandlePlayer(sithThing *player_, float a2);
 void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 void sithControl_PlayerMovement(sithThing *player);

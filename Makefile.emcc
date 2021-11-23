@@ -1,20 +1,23 @@
 CC := emcc
-TARGET := openjkdf2.wasm
+TARGET := openjkdf2.html
 
 SRC := src
 OBJ := build_emcc
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
 SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-#-Wl,-T$(LINKER_SCRIPT_SYMS)
-LDFLAGS := -s USE_SDL=2 -s WASM=1
-CFLAGS := -s USE_SDL=2 -s WASM=1
+OPENJKDF2_NO_ASAN := 1
 
-LDFLAGS += -Wl,-Map=output-emcc.map -lm -lSDL2 -lGL -lGLEW -lopenal -lalut -fshort-wchar
-CFLAGS += -I$(ROOT_DIR)/$(SRC) -DQOL_IMPROVEMENTS -DLINUX -DNULL_SOUND -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+#-Wl,-T$(LINKER_SCRIPT_SYMS)
+LDFLAGS := -s USE_SDL=2 -s WASM=1 -s USE_SDL_MIXER=2 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s ASYNCIFY --profiling --preload-file $(ROOT_DIR)/wasm_out@/
+CFLAGS := -s USE_SDL=2 -s USE_SDL_MIXER=2
+
+LDFLAGS += -g -lm -lSDL2 -lGL -lGLEW -lopenal -fshort-wchar
+CFLAGS += -g -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DNULL_SOUND -DSDL2_RENDER -DARCH_WASM -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # Comment out these lines to use JK.EXE as a binary blob
 CFLAGS += -DLINUX_TMP -fno-exceptions -DARCH_WASM
@@ -32,4 +35,14 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJECTS)
+	rm wasm_out/openjkdf2.data
+	rm wasm_out/*.html
+	rm wasm_out/*.js
+	rm wasm_out/*.wasm
+	cp resource/shaders/* wasm_out/resource/shaders/
 	$(CC) -o $@ -g $^ $(LDFLAGS)
+	mkdir -p wasm_out
+	mv openjkdf2.html wasm_out
+	mv openjkdf2.js wasm_out
+	mv openjkdf2.wasm wasm_out
+	mv openjkdf2.data wasm_out

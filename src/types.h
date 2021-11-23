@@ -43,6 +43,7 @@
 #define __cdecl
 typedef int HKEY;
 typedef char* LPCSTR;
+typedef wchar_t* LPCWSTR;
 typedef uint32_t DWORD;
 typedef uint32_t* LPDWORD;
 typedef uint32_t LSTATUS;
@@ -77,6 +78,7 @@ typedef uint16_t WORD;
 typedef int16_t SHORT;
 typedef int LONG;
 typedef wchar_t WCHAR;
+typedef int PAINTSTRUCT;
 
 typedef int8_t __int8;
 typedef int16_t __int16;
@@ -463,16 +465,19 @@ typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
 
 typedef struct Darray Darray;
 
-#ifndef OPENAL_SOUND
+#ifndef SDL2_RENDER
 typedef IDirectSoundBuffer stdSound_buffer_t;
-#else
+#else // OPENAL_SOUND
+
 #ifdef OPENAL_SOUND
 typedef stdALBuffer stdSound_buffer_t;
 #endif
+
 #ifdef NULL_SOUND
 typedef stdNullSoundBuffer stdSound_buffer_t;
-#endif
-#endif
+#endif 
+
+#endif // OPENAL_SOUND
 
 typedef rdModel3* (*model3Loader_t)(const char *, int);
 typedef int (*model3Unloader_t)(rdModel3*);
@@ -480,7 +485,7 @@ typedef rdKeyframe* (*keyframeLoader_t)(const char*);
 typedef int (*keyframeUnloader_t)(rdKeyframe*);
 typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
-typedef void (*stdPalEffectSetPaletteFunc_t)(const void*);
+typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)
@@ -1103,7 +1108,7 @@ typedef struct sithSound
 
 typedef int (*sithControl_handler_t)(sithThing*, float);
 
-typedef int (*sithSaveHandler_t)();
+typedef void (*sithSaveHandler_t)();
 
 typedef struct sithGamesave_Header
 {

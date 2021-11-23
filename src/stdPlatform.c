@@ -60,9 +60,10 @@ for (int i = 0; i < len; i++)
 }
 #endif
 
-    //printf("File open `%s`->`%s` mode `%s`\n", fpath, tmp, mode);
+    stdFile_t ret = (stdFile_t)fcaseopen(tmp, mode);
+    //printf("File open `%s`->`%s` mode `%s`, ret %x\n", fpath, tmp, mode, ret);
     
-    return (stdFile_t)fcaseopen(tmp, mode);
+    return ret;
 }
 
 static int Linux_stdFileClose(stdFile_t fhand)

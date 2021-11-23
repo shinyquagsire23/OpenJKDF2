@@ -116,20 +116,20 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                 v18 = (char *)std_pHS->alloc(_strlen(v34) + 1);
                 _strcpy(v18, v34);
                 v19 = value;
-                value->field_0 = v18;
+                value->key = v18;
                 v20 = stdString_CopyBetweenDelimiter(v17, v34, 256, " \t");
                 if ( v20 )
                 {
                     v19->field_8 = _atoi(v34);
                     stdString_GetQuotedStringContents(v20, v34, 256);
                     v19->uniStr = stdString_CstrCopy(v34);
-                    if ( !stdHashTable_SetKeyVal(strtable->hashtable, (const char *)v19->field_0, v19) )
+                    if ( !stdHashTable_SetKeyVal(strtable->hashtable, v19->key, v19) )
                         stdPrintf(
                             std_pHS->errorPrint,
                             ".\\General\\stdStrTable.c",
                             177,
                             "The key '%s' is in the string table '%s' more than once.\n   >>>%s\n",
-                            value->field_0,
+                            value->key,
                             fpath,
                             a1a);
                 }
@@ -208,8 +208,8 @@ void stdStrTable_Free(stdStrTable *table)
             {
                 if ( table->msgs[i].uniStr )
                     std_pHS->free(table->msgs[i].uniStr);
-                if ( table->msgs[i].field_0 )
-                    std_pHS->free(table->msgs[i].field_0);
+                if ( table->msgs[i].key )
+                    std_pHS->free(table->msgs[i].key);
             }
             std_pHS->free(table->msgs);
         }

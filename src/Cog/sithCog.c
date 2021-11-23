@@ -1182,7 +1182,7 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
     return result;
 }
 
-void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3)
+void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, char *a3)
 {
     sithCogStackvar a2a;
 
@@ -1190,7 +1190,7 @@ void sithCogScript_RegisterVerb(sithCogSymboltable *a1, intptr_t a2, char *a3)
     if ( symbol )
     {
         a2a.type = COG_TYPE_VERB;
-        a2a.dataAsPtrs[0] = a2;
+        a2a.dataAsFunc = a2;
         sithCogParse_SetSymbolVal(symbol, &a2a);
     }
 }

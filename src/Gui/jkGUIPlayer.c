@@ -135,7 +135,8 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                         v5 = 1;
                     }
                     v6 = jkStrings_GetText(jkGuiPlayer_GuiDifficulties[v5]);
-                    __wcscat(tmp, v6);
+                    if (v6) // Added: avoid nullptr deref
+                        __wcscat(tmp, v6);
                     jkGuiRend_DarrayReallocStr(array, tmp, 0);
                     if ( !__strcmpi(searchRes.fpath, a1a) )
                         element->selectedTextEntry = v2;
@@ -178,7 +179,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     wchar_t a2[256]; // [esp+274h] [ebp-400h] BYREF
     wchar_t v24[256]; // [esp+474h] [ebp-200h] BYREF
 
-    v15 = 0;
+    v15 = 0; 
     jkGuiRend_DarrayNewStr(&a1a, 5, 1);
     do
     {
@@ -224,7 +225,9 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                     {
                         stdString_WcharToChar(v17, jkPlayer_playerShortName, 31);
                         v17[31] = 0;
+#ifndef ARCH_WASM
                         Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v17);
+#endif
                     }
                 }
                 continue;
@@ -233,13 +236,15 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 {
                     stdString_WcharToChar(v18, jkPlayer_playerShortName, 31);
                     v18[31] = 0;
+#ifndef ARCH_WASM
                     Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v18);
+#endif
                 }
                 continue;
             case 2:
                 jkGuiPlayer_menuNewElements[9].bIsVisible = v15 == 0;
-                jkGuiPlayer_menuNewElements[3].unistr = (char *)word_555D28;
-                _memset(word_555D28, 0, 0x20u);
+                jkGuiPlayer_menuNewElements[3].wstr = word_555D28;
+                _memset(word_555D28, 0, 16 * sizeof(wchar_t));
                 jkGuiPlayer_menuNewElements[3].selectedTextEntry = 16;
                 jkGuiPlayer_menuNewElements[8].unistr = 0;
                 jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;

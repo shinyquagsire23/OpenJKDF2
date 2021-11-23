@@ -237,7 +237,7 @@ void sithInventory_PickupBackpack(sithThing *player, sithThing *backpack);
 int sithInventory_NthBackpackBin(sithThing *player, signed int n);
 float sithInventory_NthBackpackValue(sithThing *item, signed int n);
 int sithInventory_NumBackpackItems(sithThing *item);
-int sithInventory_HandleInvSkillKeys(sithThing *player);
+int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs);
 //static int (*sithInventory_HandleInvSkillKeys)(sithThing *player, float b) = (void*)sithInventory_HandleInvSkillKeys_ADDR;
 void sithInventory_SendFire(sithThing *player);
 sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx);

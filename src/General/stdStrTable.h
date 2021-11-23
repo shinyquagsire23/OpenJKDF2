@@ -13,7 +13,7 @@
 
 typedef struct stdStrMsg
 {
-    void* field_0;
+    const char* key;
     wchar_t* uniStr;
     uint32_t field_8;
 } stdStrMsg;

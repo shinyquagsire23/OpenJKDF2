@@ -11,6 +11,10 @@
 
 #include "jk.h"
 
+#ifdef ARCH_WASM
+#include <emscripten.h>
+#endif
+
 int Window_xSize = 640;
 int Window_ySize = 480;
 int Window_screenXSize = 640;
@@ -149,12 +153,12 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     handler_count = 0;
 
     if ( g_handler_count <= 0 )
-        return Window_DefaultHandler(hWnd, Msg, wParam, lParam);
+        return Window_DefaultHandler(hWnd, Msg, wParam, lParam, NULL);
 
     for ( ext_handler = Window_ext_handlers; !ext_handler->exists || !ext_handler->handler(hWnd, Msg, wParam, lParam, &v10); ++ext_handler )
     {
         if ( ++handler_count >= g_handler_count )
-            return Window_DefaultHandler(hWnd, Msg, wParam, lParam);
+            return Window_DefaultHandler(hWnd, Msg, wParam, lParam, NULL);
     }
     return v10;
 }
@@ -271,7 +275,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
     return result;
 }
 
-int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
 {
     return DefWindowProcA(hWnd, Msg, wParam, lParam);
 }
@@ -611,6 +615,10 @@ void Window_SdlVblank()
 
     if (Window_needsRecreate)
         Window_RecreateSDL2Window();
+
+#ifdef ARCH_WASM
+    emscripten_sleep(1);
+#endif
 }
 
 void Window_RecreateSDL2Window()
@@ -639,6 +647,10 @@ void Window_RecreateSDL2Window()
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     else
         flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
+
+#if defined(ARCH_WASM)
+    flags &= ~SDL_WINDOW_RESIZABLE;
+#endif
 
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, flags);
     if (!displayWindow) {
@@ -684,6 +696,14 @@ void Window_RecreateSDL2Window()
     Window_resized = 1;
 }
 
+void Window_Main_Loop()
+{
+    jkMain_GuiAdvance();
+    Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+    
+    //Window_SdlUpdate();
+}
+
 int Window_Main_Linux(int argc, char** argv)
 {
     char cmdLine[1024];
@@ -705,6 +725,11 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+#elif defined(ARCH_WASM)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -748,14 +773,21 @@ int Window_Main_Linux(int argc, char** argv)
     Window_msg_main_handler(g_hWnd, 0x1C, 1, 0); // WM_ACTIVATEAPP
     Window_msg_main_handler(g_hWnd, 0x18, 0, 0); // WM_SHOWWINDOW
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
-    
+
+
+#ifdef ARCH_WASM
+    //int fps = 0; // Use browser's requestAnimationFrame
+    //emscripten_set_main_loop_arg(Window_Main_Loop, NULL, fps, 1);
     while (1)
     {
-        jkMain_GuiAdvance();
-        Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
-        
-        //Window_SdlUpdate();
+        Window_Main_Loop();
     }
+#else
+    while (1)
+    {
+        Window_Main_Loop();
+    }
+#endif
 }
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)
@@ -855,7 +887,7 @@ int Window_ShowCursorUnwindowed(int a1)
     return stdControl_ShowCursor(a1);
 }
 
-int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
 {
     return 0;
 }

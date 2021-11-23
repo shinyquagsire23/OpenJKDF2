@@ -779,7 +779,7 @@ int msvc_sub_512D30(int a, int b)
     assert(0);
 }
 
-int jk_MessageBoxW()
+int jk_MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
 {
     assert(0);
 }
@@ -795,17 +795,17 @@ void jk_PostMessageA()
     assert(0);
 }
 
-void jk_GetCursorPos()
+void jk_GetCursorPos(LPPOINT lpPoint)
 {
     assert(0);
 }
 
-int jk_GetUpdateRect()
+int jk_GetUpdateRect(HWND hWnd, LPRECT lpRect, BOOL bErase)
 {
     return 0;
 }
 
-void jk_BeginPaint()
+void jk_BeginPaint(int a, int b)
 {
     assert(0);
 }
@@ -821,7 +821,7 @@ int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
 #endif
 }
 
-void jk_EndPaint()
+void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint)
 {
     assert(0);
 }
@@ -832,52 +832,52 @@ int stdGdi_GetHInstance()
     return 0;
 }
 
-int jk_LoadCursorA()
+int jk_LoadCursorA(HINSTANCE hInstance, LPCSTR lpCursorName)
 {
     assert(0);
     return 1;
 }
 
-void jk_SetCursor()
+void jk_SetCursor(HCURSOR hCursor)
 {
     assert(0);
 }
 
-void jk_InvalidateRect()
+void jk_InvalidateRect(HWND hWnd, const RECT *lpRect, BOOL bErase)
 {
     assert(0);
 }
 
-void jk_ChangeDisplaySettingsA()
+void jk_ChangeDisplaySettingsA(int a, int b)
 {
     assert(0);
 }
 
-uint32_t jk_DirectDrawEnumerateA()
-{
-    assert(0);
-    return 0;
-}
-
-uint32_t jk_DirectDrawCreate()
+uint32_t jk_DirectDrawEnumerateA(int a, int b)
 {
     assert(0);
     return 0;
 }
 
-uint32_t jk_DirectSoundCreate()
+uint32_t jk_DirectDrawCreate(GUID *lpGUID, LPDIRECTDRAW *lplpDD, IUnknown *pUnkOuter)
 {
     assert(0);
     return 0;
 }
 
-uint32_t jk_DirectPlayLobbyCreateA()
+uint32_t jk_DirectSoundCreate(LPGUID a, LPDIRECTSOUND *b, LPUNKNOWN c)
 {
     assert(0);
     return 0;
 }
 
-uint32_t jk_DirectInputCreateA()
+uint32_t jk_DirectPlayLobbyCreateA(int a, int b, int c, int d, int e)
+{
+    assert(0);
+    return 0;
+}
+
+uint32_t jk_DirectInputCreateA(int a, int b, int c, int d)
 {
     assert(0);
     return 0;
@@ -907,12 +907,12 @@ uint32_t jk_MapViewOfFile()
     return 0;
 }
 
-void jk_UnmapViewOfFile()
+void jk_UnmapViewOfFile(LPCVOID lpBaseAddress)
 {
     assert(0);
 }
 
-void jk_CloseHandle()
+void jk_CloseHandle(HANDLE hObject)
 {
     assert(0);
 }
@@ -935,7 +935,7 @@ uint32_t jk_GetDeviceCaps()
     return 0;
 }
 
-uint32_t jk_WinExec()
+uint32_t jk_WinExec(int a, int b)
 {
     assert(0);
     return 0;
@@ -951,12 +951,12 @@ void jk_ReleaseDC()
     assert(0);
 }
 
-void jk_SetFocus()
+void jk_SetFocus(HWND hWnd)
 {
     assert(0);
 }
 
-void jk_SetActiveWindow()
+void jk_SetActiveWindow(HWND hWnd)
 {
     assert(0);
 }
@@ -967,7 +967,7 @@ void jk_ShowCursor(int a)
     stdControl_ShowCursor(a);
 }
 
-void jk_ValidateRect()
+void jk_ValidateRect(HWND hWnd, const RECT *lpRect)
 {
     assert(0);
 }

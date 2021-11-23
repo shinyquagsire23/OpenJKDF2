@@ -172,8 +172,9 @@ void jkMain_GuiAdvance()
         v7 = jkMain_aGuiStateFuncs[jkSmack_nextGuiState].showFunc;
         if ( !v7 )
             goto LABEL_35;
-        v7(jkSmack_nextGuiState, v4);
         //jk_printf("show %u\n", jkSmack_currentGuiState);
+        v7(jkSmack_nextGuiState, v4);
+        //jk_printf("showed %u\n", jkSmack_currentGuiState);
     }
     v6 = jkSmack_currentGuiState;
 LABEL_35:
@@ -186,7 +187,7 @@ LABEL_35:
     }
 }
 
-void jkMain_EscapeMenuShow()
+void jkMain_EscapeMenuShow(int a1, int a2)
 {
     if ( !sithNet_isMulti )
         sithTime_Pause();
@@ -297,7 +298,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
     jkGui_SetModeGame();
 }
 
-void jkMain_EndLevelScreenShow()
+void jkMain_EndLevelScreenShow(int a1, int a2)
 {
     stdControl_ToggleCursor(0); // Added
     if ( jkEpisode_mLoad.field_0 != 1 && jkSmack_gameMode == 2
@@ -316,12 +317,12 @@ void jkMain_EndLevelScreenShow()
     return;
 }
 
-void jkMain_EndLevelScreenTick()
+void jkMain_EndLevelScreenTick(int a1)
 {
     ;
 }
 
-void jkMain_EndLevelScreenLeave()
+void jkMain_EndLevelScreenLeave(int a1, int a2)
 {
     ;
 }
@@ -579,14 +580,14 @@ void jkMain_GameplayLeave(int a2, int a3)
     }
 }
 
-void jkMain_TitleShow()
+void jkMain_TitleShow(int a1, int a2)
 {
     jkGuiTitle_ShowLoadingStatic();
     sith_Load("static.jkl");
     jkHudInv_InitItems();
 }
 
-void jkMain_TitleTick()
+void jkMain_TitleTick(int a1)
 {
     jkGuiTitle_LoadingFinalize();
     if ( jkGuiRend_thing_five )
@@ -595,29 +596,29 @@ void jkMain_TitleTick()
     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
 }
 
-void jkMain_TitleLeave()
+void jkMain_TitleLeave(int a1, int a2)
 {
     ;
 }
 
-void jkMain_MainShow()
+void jkMain_MainShow(int a1, int a2)
 {
     stdControl_ShowCursor(1);
     stdControl_ToggleCursor(0); // Added
     jkGuiMain_Show();
 }
 
-void jkMain_MainTick()
+void jkMain_MainTick(int a1)
 {
     ;
 }
 
-void jkMain_MainLeave()
+void jkMain_MainLeave(int a1, int a2)
 {
     ;
 }
 
-void jkMain_ChoiceShow()
+void jkMain_ChoiceShow(int a1, int a2)
 {
     int v1; // [esp+0h] [ebp-4h] BYREF
 
@@ -634,22 +635,22 @@ void jkMain_ChoiceShow()
     }
 }
 
-void jkMain_ChoiceTick()
+void jkMain_ChoiceTick(int a1)
 {
     ;
 }
 
-void jkMain_ChoiceLeave()
+void jkMain_ChoiceLeave(int a1, int a2)
 {
     ;
 }
 
-void jkMain_UnkShow()
+void jkMain_UnkShow(int a1, int a2)
 {
     ;
 }
 
-void jkMain_UnkTick()
+void jkMain_UnkTick(int a1)
 {
     jkRes_LoadGob(jkMain_strIdk);
     if ( jkEpisode_mLoad.paEntries )
@@ -666,7 +667,7 @@ void jkMain_UnkTick()
     jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
 }
 
-void jkMain_UnkLeave()
+void jkMain_UnkLeave(int a1, int a2)
 {
     ;
 }
@@ -996,12 +997,12 @@ int jkMain_EndLevel(int a1)
     return jkMain_CdSwitch(0, a1);
 }
 
-int jkMain_CdSwitchShow()
+int jkMain_CdSwitchShow(int a1, int a2)
 {
     return jkMain_CdSwitch(0, 1);
 }
 
-int jkMain_VideoShow(int a1)
+void jkMain_VideoShow(int a1, int a2)
 {
     signed int result; // eax
 
@@ -1038,10 +1039,10 @@ int jkMain_VideoShow(int a1)
                 break;
         }
     }
-    return result;
+    return;
 }
 
-int jkMain_VideoTick(int a2)
+void jkMain_VideoTick(int a2)
 {
     signed int result; // eax
 
@@ -1080,13 +1081,13 @@ int jkMain_VideoTick(int a2)
                 jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
                 break;
             default:
-                return result;
+                return;
         }
     }
-    return result;
+    return;
 }
 
-void jkMain_VideoLeave(int a1)
+void jkMain_VideoLeave(int a1, int a2)
 {
     jkCutscene_sub_421410();
     if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )

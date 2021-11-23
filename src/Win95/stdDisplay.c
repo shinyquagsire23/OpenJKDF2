@@ -19,6 +19,11 @@ uint8_t* stdDisplay_GetPalette()
 #ifndef SDL2_RENDER
 
 #else
+
+#ifdef WIN32
+#define GL_R8 GL_R
+#endif
+
 #include <SDL2/SDL.h>
 #ifdef MACOS
 #include "OpenGL/gl.h"
@@ -140,7 +145,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Window_xSize, Window_ySize, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, Window_xSize, Window_ySize, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
     
     Video_bModeSet = 1;
     

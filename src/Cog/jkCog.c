@@ -184,58 +184,58 @@ void jkCog_dwGetActivateBin(sithCog *ctx)
 
 void jkCog_RegisterVerbs()
 {
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)sithCogPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetFlags, "jksetflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetFlags, "jkgetflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_ClearFlags, "jkclearflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_EndLevel, "jkendlevel");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_PrintUniString, "jkprintunistring");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetPovModel, "jksetpovmodel");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_PlayPovKey, "jkplaypovkey");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StopPovKey, "jkstoppovkey");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetWeaponMesh, "jksetweaponmesh");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_EnableSaber, "jkenablesaber");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_DisableSaber, "jkdisablesaber");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetSaberInfo, "jksetsaberinfo");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetPersuasionInfo, "jksetpersuasioninfo");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetForceSpeed, "jksetforcespeed");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetInvis, "jksetinvis");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetInvulnerable, "jksetinvulnerable");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetWaggle, "jksetwaggle");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetSuperFlags, "jksetsuperflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_ClearSuperFlags, "jkclearsuperflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetSuperFlags, "jkgetsuperflags");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetTarget, "jksettarget");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_EndTarget, "jkendtarget");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_SetTargetColors, "jksettargetcolors");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringClear, "jkstringclear");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatSpace, "jkstringconcatspace");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatUnistring, "jkstringconcatunistring");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatAsciiString, "jkstringconcatasciistring");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatPlayerName, "jkstringconcatplayername");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatInt, "jkstringconcatint");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatFormattedInt, "jkstringconcatformattedint");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatFlex, "jkstringconcatflex");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatFormattedFlex, "jkstringconcatformattedflex");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringConcatVector, "jkstringconcatvector");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_StringOutput, "jkstringoutput");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetSaberCam, "jkgetsabercam");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_GetChoice, "jkgetchoice");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, sithCogPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetFlags, "jksetflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_GetFlags, "jkgetflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_ClearFlags, "jkclearflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_EndLevel, "jkendlevel");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_PrintUniString, "jkprintunistring");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetPovModel, "jksetpovmodel");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_PlayPovKey, "jkplaypovkey");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StopPovKey, "jkstoppovkey");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetWeaponMesh, "jksetweaponmesh");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_EnableSaber, "jkenablesaber");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_DisableSaber, "jkdisablesaber");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetSaberInfo, "jksetsaberinfo");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetPersuasionInfo, "jksetpersuasioninfo");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetForceSpeed, "jksetforcespeed");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetInvis, "jksetinvis");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetInvulnerable, "jksetinvulnerable");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetWaggle, "jksetwaggle");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetSuperFlags, "jksetsuperflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_ClearSuperFlags, "jkclearsuperflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_GetSuperFlags, "jkgetsuperflags");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetTarget, "jksettarget");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_EndTarget, "jkendtarget");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetTargetColors, "jksettargetcolors");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringClear, "jkstringclear");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatSpace, "jkstringconcatspace");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatUnistring, "jkstringconcatunistring");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatAsciiString, "jkstringconcatasciistring");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatPlayerName, "jkstringconcatplayername");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatInt, "jkstringconcatint");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatFormattedInt, "jkstringconcatformattedint");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatFlex, "jkstringconcatflex");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatFormattedFlex, "jkstringconcatformattedflex");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringConcatVector, "jkstringconcatvector");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_StringOutput, "jkstringoutput");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_GetSaberCam, "jkgetsabercam");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_GetChoice, "jkgetchoice");
     
 #ifdef QOL_IMPROVEMENTS
     // Added for droidwork tests
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_dwGetActivateBin, "dwGetActivateBin");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub1Args, "dwsetreftopic");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_addBeam, "addbeam");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_addLaser, "addlaser");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_removeLaser, "removelaser");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_getLaserId, "getlaserid");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwFlashInventory");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwfreezeplayer");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwunfreezeplayer");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub2Args, "dwplaycharacterspeech");
-    sithCogScript_RegisterVerb(g_cog_symbolTable, (intptr_t)jkCog_stub0Args, "dwcleardialog");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub1Args, "dwsetreftopic");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_addBeam, "addbeam");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_addLaser, "addlaser");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_removeLaser, "removelaser");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_getLaserId, "getlaserid");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub0Args, "dwFlashInventory");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub0Args, "dwfreezeplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub0Args, "dwunfreezeplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_stub0Args, "dwcleardialog");
 #endif
 }
 

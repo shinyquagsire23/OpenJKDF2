@@ -35,7 +35,7 @@ void Window_GetDrawHandlers(WindowDrawHandler_t *a1, WindowDrawHandler_t *a2);
 static int (*_Window_msg_main_handler)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) = (void*)Window_msg_main_handler_ADDR;
 
 // Added
-int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused);
 
 #ifdef SDL2_RENDER
 extern int Window_lastXRel;

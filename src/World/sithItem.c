@@ -10,7 +10,7 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
-int sithItem_Collide(sithThing *a1, sithThing *a2)
+int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5)
 {
     if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
     {

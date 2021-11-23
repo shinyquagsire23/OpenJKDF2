@@ -450,7 +450,6 @@ LABEL_22:
                             ++v19;
                             if ( v17 >= v18 )
                             {
-                                unk3Flags = unk3Flags;
                                 goto LABEL_30;
                             }
                         }

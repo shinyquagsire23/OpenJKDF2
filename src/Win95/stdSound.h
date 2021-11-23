@@ -83,7 +83,7 @@ uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSamp
 
 static void (*stdSound_3DBufferRelease)(stdSound_buffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 
-#ifndef OPENAL_SOUND
+#ifndef SDL2_RENDER
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;

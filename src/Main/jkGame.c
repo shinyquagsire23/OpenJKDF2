@@ -29,7 +29,7 @@ int jkGame_Initialize()
     return 1;
 }
 
-int jkGame_ParseSection(int a1, int a2)
+int jkGame_ParseSection(sithWorld* a1, int a2)
 {
     return a2 == 0;
 }

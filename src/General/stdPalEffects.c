@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-int stdPalEffects_Open(void *a1)
+int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t *a1)
 {
     stdPalEffects_setPalette = a1;
     _memset(stdPalEffects_aEffects, 0, sizeof(stdPalEffects_aEffects));

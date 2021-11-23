@@ -760,7 +760,7 @@ int sithInventory_NumBackpackItems(sithThing *item)
     return item->itemParams.numBins;
 }
 
-int sithInventory_HandleInvSkillKeys(sithThing *player)
+int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
 {
     sithThing *v1; // edi
     int *v2; // esi
