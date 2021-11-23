@@ -19,17 +19,12 @@
 #define RDCACHE_MAX_VERTICES (0x8000)
 
 #if defined(JK_NO_MMAP)
-#define RDCACHE_MAX_TRIS (0x2000)
-#define RDCACHE_MAX_VERTICES (0x10000)
+//#define RDCACHE_MAX_TRIS (0x2000)
+//#define RDCACHE_MAX_VERTICES (0x10000)
 #endif
 
 #define STD3D_MAX_VERTICES (RDCACHE_MAX_TRIS)
 #define STD3D_MAX_TRIS (RDCACHE_MAX_TRIS)
-
-#if defined(JK_NO_MMAP)
-#define STD3D_MAX_TRIS (RDCACHE_MAX_TRIS)
-#define STD3D_MAX_VERTICES (RDCACHE_MAX_TRIS)
-#endif
 
 // TODO find some headers for these
 #define LPDDENUMCALLBACKA void*

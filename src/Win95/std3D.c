@@ -855,9 +855,7 @@ void std3D_DrawRenderList()
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_tris_batch * 3 * sizeof(GLushort), &world_data_elements[last_tex_idx * 3], GL_STREAM_DRAW);
 
-                int tris_size;  
-                glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-                glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+                glDrawElements(GL_TRIANGLES, num_tris_batch * 3, GL_UNSIGNED_SHORT, 0);
             }
 
             if (tex)
@@ -943,9 +941,7 @@ void std3D_DrawRenderList()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, remaining_batch * 3 * sizeof(GLushort), &world_data_elements[last_tex_idx * 3], GL_STREAM_DRAW);
 
-        int tris_size;  
-        glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-        glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, remaining_batch * 3, GL_UNSIGNED_SHORT, 0);
     }
     
     
