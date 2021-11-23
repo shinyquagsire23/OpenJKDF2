@@ -71,3 +71,4 @@ build_win64
 macos-debug.tar.gz
 macos-debug.zip
 win64-debug.zip
+wasm_out

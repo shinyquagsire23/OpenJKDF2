@@ -16,8 +16,8 @@ OPENJKDF2_NO_ASAN := 1
 LDFLAGS := -s USE_SDL=2 -s WASM=1 -s USE_SDL_MIXER=2 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s ASYNCIFY --profiling --preload-file $(ROOT_DIR)/wasm_out@/
 CFLAGS := -s USE_SDL=2 -s USE_SDL_MIXER=2
 
-LDFLAGS += -g -lm -lSDL2 -lGL -lGLEW -lopenal -fshort-wchar
-CFLAGS += -g -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DNULL_SOUND -DSDL2_RENDER -DARCH_WASM -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
+LDFLAGS += -g -O2 -lm -lSDL2 -lGL -lGLEW -lopenal -fshort-wchar
+CFLAGS += -g -O2 -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DNULL_SOUND -DSDL2_RENDER -DARCH_WASM -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 
 # Comment out these lines to use JK.EXE as a binary blob
 CFLAGS += -DLINUX_TMP -fno-exceptions -DARCH_WASM
@@ -42,7 +42,7 @@ $(TARGET): $(OBJECTS)
 	cp resource/shaders/* wasm_out/resource/shaders/
 	$(CC) -o $@ -g $^ $(LDFLAGS)
 	mkdir -p wasm_out
-	mv openjkdf2.html wasm_out
+	mv openjkdf2.html wasm_out/index.html
 	mv openjkdf2.js wasm_out
 	mv openjkdf2.wasm wasm_out
 	mv openjkdf2.data wasm_out

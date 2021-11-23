@@ -952,6 +952,7 @@ void std3D_DrawRenderList()
     
     free(world_data_elements);
     
+#if 0
     // Draw all lines
     world_data_elements = malloc(sizeof(GLushort) * 2 * GL_tmpLinesAmt);
     for (int j = 0; j < GL_tmpLinesAmt; j++)
@@ -966,6 +967,7 @@ void std3D_DrawRenderList()
     int lines_size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
     glDrawElements(GL_LINES, lines_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+#endif
 
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);

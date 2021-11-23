@@ -60,6 +60,9 @@ brew install mingw-w64
 
 # MacOS 64-bit
 brew install openal-soft freealut sdl2 sdl2_mixer glew
+
+# WebAssembly
+brew install emscripten
 ```
 
 ### x86 Win32/MinGW DLL
@@ -84,4 +87,10 @@ codesign -s - openjkdf2-64
 ```
 
 ### Emscripten/WebAssembly
+```
+mkdir -p wasm_out
+```
+
+Copy your `episode/` and `resource/` directory to `wasm_out`, then
+
 `make -f Makefile.emcc`
