@@ -27,6 +27,10 @@
 #include <GL/gl.h>
 #endif
 
+#ifdef WIN32
+#define GL_R8 GL_RED
+#endif
+
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 

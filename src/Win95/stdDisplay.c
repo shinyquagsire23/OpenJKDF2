@@ -21,7 +21,7 @@ uint8_t* stdDisplay_GetPalette()
 #else
 
 #ifdef WIN32
-#define GL_R8 GL_R
+#define GL_R8 GL_RED
 #endif
 
 #include <SDL2/SDL.h>
