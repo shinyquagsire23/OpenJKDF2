@@ -1,5 +1,6 @@
 #include "stdControl.h"
 
+#include "Engine/sithControl.h"
 #include "Win95/Window.h"
 
 int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
@@ -57,84 +58,6 @@ int stdControl_FinishRead()
 
 float stdControl_ReadAxis(int a)
 {
-    return stdControl_GetAxis2(a);
-}
-
-float stdControl_GetAxis2(int a)
-{
-    const Uint8 *state = SDL_GetKeyboardState(NULL);
-    
-    if (a == 0)
-    {
-        float axisAmt = 0.0;
-        
-        if (state[SDL_SCANCODE_W] && a == 0) {
-            axisAmt += 1.0;
-        }
-        else if (state[SDL_SCANCODE_S] && a == 0) {
-            axisAmt += -1.0;
-        }
-
-        return axisAmt;
-    }
-    else if (a == 1)
-    {
-        float axisAmt = 0.0;
-        
-        if (state[SDL_SCANCODE_LEFT]) {
-            axisAmt += 1.0;
-        }
-        else if (state[SDL_SCANCODE_RIGHT]) {
-            axisAmt += -1.0;
-        }
-        
-        Window_lastSampleMs = 6;
-
-#ifdef ARCH_WASM
-        Window_lastSampleMs = 32;
-#endif
-        axisAmt += (float)Window_lastXRel * -((double)Window_lastSampleMs / 44.0);
-        
-        Window_lastXRel = 0;
-        
-        return axisAmt;
-    }
-    else if (a == 2)
-    {
-        float axisAmt = 0.0;
-        if (state[SDL_SCANCODE_A]) {
-            axisAmt += -1.0;
-        }
-        if (state[SDL_SCANCODE_D]) {
-            axisAmt += 1.0;
-        }
-        
-        
-        return axisAmt;
-    }
-    else if (a == 8)
-    {
-        float axisAmt = 0.0;
-        
-        if (state[SDL_SCANCODE_UP]) {
-            axisAmt += 1.0;
-        }
-        else if (state[SDL_SCANCODE_DOWN]) {
-            axisAmt += -1.0;
-        }
-        
-        Window_lastSampleMs = 6;
-#ifdef ARCH_WASM
-        Window_lastSampleMs = 32;
-#endif
-        axisAmt += (float)Window_lastYRel * -((double)Window_lastSampleMs / 44.0);
-        
-        Window_lastYRel = 0;
-        
-        return axisAmt;
-    }
-    
-
-    return 0.0;
+    return sithControl_GetAxis2(a);
 }
 #endif

@@ -22,6 +22,10 @@
 #include "Main/jkMain.h"
 #include "jk.h"
 
+#ifdef SDL2_RENDER
+#include <SDL2/SDL.h>
+#endif
+
 int sithControl_IsOpen()
 {
     return sithControl_bOpened;
@@ -89,6 +93,88 @@ LABEL_14:
         stdControl_FinishRead();
     }
 }
+
+#ifdef SDL2_RENDER
+
+float sithControl_GetAxis2(int a)
+{
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    
+    if (a == 0)
+    {
+        float axisAmt = 0.0;
+        
+        if (state[SDL_SCANCODE_W] && a == 0) {
+            axisAmt += 1.0;
+        }
+        else if (state[SDL_SCANCODE_S] && a == 0) {
+            axisAmt += -1.0;
+        }
+
+        return axisAmt;
+    }
+    else if (a == 1)
+    {
+        float axisAmt = 0.0;
+        
+        if (state[SDL_SCANCODE_LEFT]) {
+            axisAmt += 1.0;
+        }
+        else if (state[SDL_SCANCODE_RIGHT]) {
+            axisAmt += -1.0;
+        }
+        
+        Window_lastSampleMs = 6;
+
+#ifdef ARCH_WASM
+        Window_lastSampleMs = 16;
+#endif
+        axisAmt += (float)Window_lastXRel * -((double)Window_lastSampleMs / 44.0);
+        
+        Window_lastXRel = 0;
+        
+        return axisAmt;
+    }
+    else if (a == 2)
+    {
+        float axisAmt = 0.0;
+        if (state[SDL_SCANCODE_A]) {
+            axisAmt += -1.0;
+        }
+        if (state[SDL_SCANCODE_D]) {
+            axisAmt += 1.0;
+        }
+        
+        
+        return axisAmt;
+    }
+    else if (a == 8)
+    {
+        float axisAmt = 0.0;
+        
+        if (state[SDL_SCANCODE_UP]) {
+            axisAmt += 1.0;
+        }
+        else if (state[SDL_SCANCODE_DOWN]) {
+            axisAmt += -1.0;
+        }
+        
+        Window_lastSampleMs = 6;
+#ifdef ARCH_WASM
+        Window_lastSampleMs = 16;
+#endif
+        axisAmt += (float)Window_lastYRel * -((double)Window_lastSampleMs / 44.0);
+        
+        Window_lastYRel = 0;
+        
+        return axisAmt;
+    }
+    
+
+    return 0.0;
+}
+
+#endif
 
 void sithControl_AddInputHandler(sithControl_handler_t a1)
 {
@@ -229,7 +315,7 @@ LABEL_11:
             rdMatrix_TransformVector34Acc(&sithControl_vec3_54A570, &a);
             rdVector_Normalize3Acc(&sithControl_vec3_54A570);
         }
-        v7 = -stdControl_GetAxis2(0) * (deltaSecs * 0.1);
+        v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1);
         if ( v7 != 0.0 )
         {
             v8 = v7 + sithControl_flt_54A57C;
@@ -408,8 +494,8 @@ void sithControl_PlayerMovement(sithThing *player)
     {
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
         {
-            move_multiplier_a = stdControl_GetAxis2(2);
-            v6 = move_multiplier_a - stdControl_GetAxis2(1);
+            move_multiplier_a = sithControl_GetAxis2(2);
+            v6 = move_multiplier_a - sithControl_GetAxis2(1);
             if ( v6 < -1.0 )
             {
                 v6 = -1.0;
@@ -433,11 +519,11 @@ void sithControl_PlayerMovement(sithThing *player)
             
             player->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_
                                                       + player->physicsParams.angVel.y;
-            player->physicsParams.acceleration.x = stdControl_GetAxis2(2)
+            player->physicsParams.acceleration.x = sithControl_GetAxis2(2)
                                                             * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
                                                             * 0.69999999;
         }
-        v11 = stdControl_GetAxis2(0);
+        v11 = sithControl_GetAxis2(0);
         y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
         if ( v11 < 0.0 )
             y_vel = y_vel * 0.5;
@@ -485,7 +571,7 @@ void sithControl_FreeCam(sithThing *player)
     sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0);
     if ( v1->type == SITH_THING_ACTOR || v1->type == SITH_THING_PLAYER )
     {
-        v5 = stdControl_GetAxis2(0);
+        v5 = sithControl_GetAxis2(0);
         v6 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
         v7 = &v1->physicsParams.acceleration;
         v1->physicsParams.acceleration.z = 0.0;
@@ -501,8 +587,8 @@ void sithControl_FreeCam(sithThing *player)
         }
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &tmp) )
         {
-            v15 = stdControl_GetAxis2(2);
-            v11 = v15 - stdControl_GetAxis2(1);
+            v15 = sithControl_GetAxis2(2);
+            v11 = v15 - sithControl_GetAxis2(1);
             if ( v11 < -1.0 )
             {
                 v11 = -1.0;
@@ -517,7 +603,7 @@ void sithControl_FreeCam(sithThing *player)
         }
         else
         {
-            v7->x = stdControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
+            v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
             v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
             v1->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust
                                                   + v1->physicsParams.angVel.y;
@@ -550,7 +636,6 @@ void sithControl_FreeCam(sithThing *player)
 }
 
 #ifdef SDL2_RENDER
-#include <SDL2/SDL.h>
 int sithControl_Initialize()
 {
     return 1;
@@ -735,12 +820,12 @@ int sithControl_ReadFunctionMap(int func, int* out)
 
 float sithControl_GetAxis(int num)
 {
-    return stdControl_GetAxis2(num);
+    return sithControl_GetAxis2(num);
 }
 
 float sithControl_ReadAxisStuff(int num)
 {
-    return stdControl_GetAxis2(num);
+    return sithControl_GetAxis2(num);
 }
 
 int sithControl_ReadConf()

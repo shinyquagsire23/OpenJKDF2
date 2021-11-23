@@ -17,6 +17,7 @@
 #define sithControl_input_map_idk_ADDR (0x004D6BC0)
 #define sithControl_AddInputHandler_ADDR (0x004D6C50)
 #define sithControl_Tick_ADDR (0x004D6C70)
+#define sithControl_GetAxis2_ADDR (0x004D6D70)
 #define sithControl_ReadAxisStuff_ADDR (0x004D6EB0)
 #define sithControl_GetAxis_ADDR (0x004D6F80)
 #define sithControl_ReadFunctionMap_ADDR (0x004D7010)
@@ -147,6 +148,7 @@ float sithControl_ReadAxisStuff(int num);
 int sithControl_ReadConf();
 int sithControl_WriteConf();
 void sithControl_sub_4D6930(int a);
+float sithControl_GetAxis2(int a);
 #else
 static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
 static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
@@ -156,6 +158,7 @@ static float (*sithControl_ReadAxisStuff)(int num) = (void*)sithControl_ReadAxis
 static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
 static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
 static void (*sithControl_sub_4D6930)(int a) = (void*)sithControl_sub_4D6930_ADDR;
+static float (*sithControl_GetAxis2)(int a1) = (void*)sithControl_GetAxis2_ADDR;
 #endif
 
 #endif // _SITHCONTROL_H

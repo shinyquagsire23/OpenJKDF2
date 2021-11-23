@@ -621,6 +621,16 @@ void Window_SdlVblank()
 #endif
 }
 
+#ifdef ARCH_WASM
+EM_JS(int, canvas_get_width, (), {
+  return canvas.width;
+});
+
+EM_JS(int, canvas_get_height, (), {
+  return canvas.height;
+});
+#endif
+
 void Window_RecreateSDL2Window()
 {
     printf("Recreating SDL2 Window!\n");
@@ -649,10 +659,14 @@ void Window_RecreateSDL2Window()
         flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
 
 #if defined(ARCH_WASM)
-    flags &= ~SDL_WINDOW_RESIZABLE;
+    //flags &= ~SDL_WINDOW_RESIZABLE;
 #endif
 
+#ifdef ARCH_WASM
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
+#else
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, flags);
+#endif
     if (!displayWindow) {
         char errtmp[256];
         snprintf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());

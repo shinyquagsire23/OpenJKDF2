@@ -15,8 +15,8 @@ OPENJKDF2_NO_ASAN := 1
 
 # -DWIN32 -DARCH_X86 -DTARGET_HAS_DPLAY
 
-LDFLAGS := -Wl,-Map=output-win64.map -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic -fno-trapping-math -L$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/lib -L$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/lib $(THIRDPARTY)/openal-soft/libs/Win64/OpenAL32.lib -L$(THIRDPARTY)/glew/lib/Release/x64 -L$(THIRDPARTY)/freeglut/lib/x64 -lm -lfreeglut -lopengl32 -Dmain=SDL_main -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lglew32 -mwindows -Wl,--subsystem,windows -fshort-wchar -D_MBCS
-CFLAGS := -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include/SDL2 -I$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/include -I$(THIRDPARTY)/openal-soft/include -I$(THIRDPARTY)/glew/include -I$(THIRDPARTY)/freeglut/include -DQOL_IMPROVEMENTS -DSDL2_RENDER -DWIN64 -DPLATFORM_POSIX -DARCH_64BIT -DOPENAL_SOUND -DWIN64_STANDALONE -Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS
+LDFLAGS := -g -fno-omit-frame-pointer -Wl,-Map=output-win64.map -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic -fno-trapping-math -L$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/lib -L$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/lib $(THIRDPARTY)/openal-soft/libs/Win64/OpenAL32.lib -L$(THIRDPARTY)/glew/lib/Release/x64 -L$(THIRDPARTY)/freeglut/lib/x64 -lm -lfreeglut -lopengl32 -Dmain=SDL_main -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lglew32 -mwindows -Wl,--subsystem,windows -fshort-wchar -D_MBCS -L$(THIRDPARTY)/drmingw-0.9.3-win64/lib/ -lexchndl
+CFLAGS := -g -fno-omit-frame-pointer -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include -I$(THIRDPARTY)/SDL2/x86_64-w64-mingw32/include/SDL2 -I$(THIRDPARTY)/SDL2_mixer/x86_64-w64-mingw32/include -I$(THIRDPARTY)/openal-soft/include -I$(THIRDPARTY)/glew/include -I$(THIRDPARTY)/freeglut/include -I$(THIRDPARTY)/drmingw-0.9.3-win64/include/ -DQOL_IMPROVEMENTS -DSDL2_RENDER -DWIN64 -DPLATFORM_POSIX -DARCH_64BIT -DOPENAL_SOUND -DWIN64_STANDALONE -Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS
 
 CFLAGS += -DLINUX_TMP -DNO_JK_MMAP
 LDFLAGS += -DLINUX_TMP -DNO_JK_MMAP
@@ -43,3 +43,6 @@ $(TARGET): $(OBJECTS)
 	@cp 3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll win64-package/
 	@cp 3rdparty/glew/bin/Release/x64/glew32.dll win64-package/
 	@cp 3rdparty/openal-soft/bin/Win64/soft_oal.dll win64-package/OpenAL32.dll
+	@cp 3rdparty/drmingw-0.9.3-win64/bin/*.dll win64-package/
+	@cp 3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes win64-package/
+	

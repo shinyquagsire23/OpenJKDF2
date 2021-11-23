@@ -152,6 +152,8 @@ int openjkdf2_bIsKVM = 1;
 void do_hooks();
 
 #ifdef WIN64_STANDALONE
+#include "exchndl.h"
+
 int main(int argc, char** argv)
 {   
     FILE* fp;
@@ -159,6 +161,8 @@ int main(int argc, char** argv)
     freopen_s(&fp, "CONIN$", "r", stdin);
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stdout);
+
+    ExcHndlInit();
     
     Window_Main_Linux(argc, argv);
 }
@@ -2122,7 +2126,7 @@ void do_hooks()
     hook_function(stdControl_ReadControls_ADDR, stdControl_ReadControls);
     hook_function(stdControl_FinishRead_ADDR, stdControl_FinishRead);
     hook_function(stdControl_ReadAxis_ADDR, stdControl_ReadAxis);
-    hook_function(stdControl_GetAxis2_ADDR, stdControl_GetAxis2);
+    hook_function(sithControl_GetAxis2_ADDR, sithControl_GetAxis2);
     
     hook_function(stdDisplay_Startup_ADDR, stdDisplay_Startup);
     hook_function(stdDisplay_VBufferFill_ADDR, stdDisplay_VBufferFill);
