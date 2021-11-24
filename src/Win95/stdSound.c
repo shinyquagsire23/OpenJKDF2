@@ -300,9 +300,7 @@ int stdSound_BufferStop(stdSound_buffer_t* buf)
     if (buf->source)
     {
         alSourcei(buf->source, AL_LOOPING, AL_FALSE);
-        alSourceStop(buf->source);
-        
-        stdSound_BufferReset(buf);
+        alSourcePause(buf->source);
     }
     return 1;
 }

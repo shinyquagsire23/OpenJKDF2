@@ -204,7 +204,7 @@ sithSound* sithSound_GetFromIdx(int idx)
 int sithSound_LoadFileData(sithSound *sound)
 {
     void *buf; // ebp
-    size_t bufferMaxSize; // [esp+10h] [ebp-84h] BYREF
+    int32_t bufferMaxSize; // [esp+10h] [ebp-84h] BYREF
     char outstr[128]; // [esp+14h] [ebp-80h] BYREF
 
     int fd = 0;
@@ -292,7 +292,7 @@ int sithSound_ReadDataFromFd(int fd, sithSound *sound)
 {
     void *data;
 
-    size_t bufferBytes;
+    int32_t bufferBytes;
     data = stdSound_BufferSetData(sound->dsoundBuffer2, sound->bufferBytes, &bufferBytes);
     if ( data )
     {
@@ -372,7 +372,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     stdSound_buffer_t *createdBuf; // eax
     stdSound_buffer_t *dsoundBuf; // esi
     int bStereo; // [esp+Ch] [ebp-94h] BYREF
-    size_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
+    int32_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
     int nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
     int seekOffs; // [esp+18h] [ebp-88h] BYREF
     int bitsPerSample; // [esp+1Ch] [ebp-84h] BYREF

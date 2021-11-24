@@ -12,8 +12,6 @@
 #define sithAIClass_Load_ADDR (0x004F14A0)
 #define sithAIClass_LoadEntry_ADDR (0x004F15C0)
 
-typedef int (*sithAIClassEntryFunc_t)(sithActor*, sithAIClassEntry*, sithActorInstinct*, int, int);
-
 typedef struct sithAIClassEntry
 {
   int param1;
@@ -21,7 +19,7 @@ typedef struct sithAIClassEntry
   int param3;
   float argsAsFloat[16];
   int argsAsInt[16];
-  sithAIClassEntryFunc_t func;
+  sithAICommandFunc_t func;
 } sithAIClassEntry;
 
 typedef struct sithAIClass

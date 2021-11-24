@@ -481,6 +481,7 @@ typedef int (*keyframeUnloader_t)(rdKeyframe*);
 typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
 typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
+typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithActorInstinct *a3, int b, intptr_t a4);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)

@@ -45,8 +45,6 @@
 
 typedef struct sithThing sithThing;
 
-typedef int (*sithAICommandFunc_t)(void *actor, void *a8, void *a3, int a4);
-
 typedef struct sithAICommand
 {
     char name[32];

@@ -27,24 +27,24 @@ void sithCogAI_AISetClass(sithCog *ctx);
 
 void sithCogAI_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AIGetMode, "aigetmode");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetMode, "aisetmode");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AIClearMode, "aiclearmode");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_GetMovePos, "aigetmovepos");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_SetMovePos, "aisetmovepos");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_FirstThingInView, "firstthinginview");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_NextThingInView, "nextthinginview");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_ThingViewDot, "thingviewdot");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetFireTarget, "aisetfiretarget");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetMoveThing, "aisetmovething");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetLookPos, "aisetlookpos");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetMoveSpeed, "aisetmovespeed");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetLookFrame, "aisetlookframe");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetMoveFrame, "aisetmoveframe");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_IsAITargetInSight, "isaitargetinsight");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AIFlee, "aiflee");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AISetClass, "aisetclass");
-    sithCogScript_RegisterVerb(ctx, (intptr_t)sithCogAI_AIJump, "aijump");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AIGetMode, "aigetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMode, "aisetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AIClearMode, "aiclearmode");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_GetMovePos, "aigetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_SetMovePos, "aisetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_FirstThingInView, "firstthinginview");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_NextThingInView, "nextthinginview");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_ThingViewDot, "thingviewdot");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetFireTarget, "aisetfiretarget");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveThing, "aisetmovething");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetLookPos, "aisetlookpos");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveSpeed, "aisetmovespeed");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetLookFrame, "aisetlookframe");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveFrame, "aisetmoveframe");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_IsAITargetInSight, "isaitargetinsight");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AIFlee, "aiflee");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetClass, "aisetclass");
+    sithCogScript_RegisterVerb(ctx, sithCogAI_AIJump, "aijump");
 }
 
 void sithCogAI_AISetMoveSpeed(sithCog *ctx)

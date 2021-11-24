@@ -61,8 +61,7 @@ rdParticle* sithParticle_LoadEntry(const char *a1)
         {
             v5 = &v1->particles[v4];
             _sprintf(v6, "%s%c%s", "misc\\par", 92, a1);
-            result = (rdParticle *)rdParticle_LoadEntry(v6, v5);
-            if ( result )
+            if ( rdParticle_LoadEntry(v6, v5) )
             {
                 stdHashTable_SetKeyVal(sithParticle_alloc, v5->name, v5);
                 ++v1->numParticlesLoaded;
