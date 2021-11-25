@@ -472,10 +472,13 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         }
         if ( thing->animclass )
             rdPuppet_New(&thing->rdthing);
-        if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
+        if ( thing->moveType == SITH_MT_PATH && a2->trackParams.frames )
         {
+            // Added: made this more explicit
+            thing->trackParams.numFrames = a2->trackParams.frames;
             thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
-            _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
+            if (thing->trackParams.frames) // Added: nullptr check
+                _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
         }
     }
     else

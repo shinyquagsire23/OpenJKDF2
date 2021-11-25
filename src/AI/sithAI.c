@@ -342,7 +342,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
         }
 
         if ( a2 == SITHAIFLAGS_UNK100 )
-            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, 256.0, 0.0, 0.0, 0.0);
+            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, 256.0f, 0.0, 0.0, 0.0);
 
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
@@ -1424,7 +1424,7 @@ LABEL_12:
                 v1 = a1a;
         }
     }
-    if ( (a7 & 2) != 0 )
+    if ( (a7 & 2) != 0 && v8->moveType == SITH_MT_PHYSICS) // Added: physics check
     {
         actora = v8->physicsParams.vel.y;
         v12 = actor->field_1E4.y * actora;

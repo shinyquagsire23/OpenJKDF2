@@ -115,7 +115,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 {
                     rdVector_Copy3(&tmp, &weapon->position);
                     rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
-                    sithThing_Create(weapon->actorParams.templateWeapon2, &tmp, &weapon->lookOrientation, sector, 0);
+                    sithThing_Create(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
                     elementSize += weapon->weaponParams.elementSize;
                 }
                 while ( elementSize < searchRes->distance );
@@ -482,8 +482,6 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
 sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9)
 {
     sithThing *v9; // esi
-    double v10; // st7
-    double v11; // st6
     double v12; // st6
     double v13; // st7
     double v14; // rt2
@@ -512,20 +510,18 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         if (!v9 )
             return 0;
 
-        if ( (scaleFlags & 1) != 0 )
+        if ( (scaleFlags & 1) != 0 && v9->moveType == SITH_MT_PHYSICS) // Added: physics check
         {
-            v10 = v9->physicsParams.vel.y * scale;
-            v11 = v9->physicsParams.vel.z * scale;
             v9->physicsParams.vel.x = v9->physicsParams.vel.x * scale;
-            v9->physicsParams.vel.y = v10;
-            v9->physicsParams.vel.z = v11;
+            v9->physicsParams.vel.y = v9->physicsParams.vel.y * scale;
+            v9->physicsParams.vel.z = v9->physicsParams.vel.z * scale;
         }
         if ( (scaleFlags & 2) != 0 )
             v9->weaponParams.damage = v9->weaponParams.damage * scale;
         if ( (scaleFlags & 4) != 0 )
             v9->weaponParams.damage = scale * v9->weaponParams.damage;
         if ( (scaleFlags & 8) != 0 )
-            v9->actorParams.maxHealth = scale * v9->actorParams.maxHealth;
+            v9->weaponParams.unk8 = scale * v9->weaponParams.unk8;
         v12 = aimError->z;
         v13 = aimError->y - sender->position.y;
         a1.x = aimError->x - sender->position.x;
@@ -547,7 +543,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 sithCollision_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
             }
         }
-        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->weaponParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? 5.0 : (float)v18;
@@ -732,7 +728,7 @@ LABEL_45:
         v22 = physicsThing->weaponParams.typeflags;
         if ( (v22 & THING_TYPEFLAGS_8) != 0 )
         {
-            if ( (collidedThing->actorParams.typeflags & THING_TYPEFLAGS_DROID) != 0 )
+            if ( (collidedThing->weaponParams.typeflags & THING_TYPEFLAGS_DROID) != 0 )
             {
                 explodeTemplate = physicsThing->weaponParams.explodeTemplate;
                 if ( !explodeTemplate )
@@ -887,7 +883,7 @@ LABEL_9:
 
 void sithWeapon_Remove(sithThing *weapon)
 {
-    if ( (weapon->actorParams.typeflags & 0x100) != 0 )
+    if ( (weapon->weaponParams.typeflags & 0x100) != 0 )
     {
         sithWeapon_RemoveAndExplode(weapon, weapon->weaponParams.explodeTemplate);
     }
@@ -1181,7 +1177,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
     if ( player->type != SITH_THING_PLAYER || (player->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
 
-    if ( (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
+    if ( (player->weaponParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
     {
         if ( sithTime_curSeconds < sithWeapon_mountWait )
             return 0;

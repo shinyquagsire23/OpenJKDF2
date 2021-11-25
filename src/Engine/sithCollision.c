@@ -835,7 +835,7 @@ LABEL_78:
                         v36 = sithCollision_DefaultHitHandler(v5, amount, v19);
                 }
                 v16 = v36;
-                if ( v65 != 0.0 )
+                if ( v65 != 0.0 && v5->moveType == SITH_MT_PHYSICS) // Added: physics check
                 {
                     rdVector_Scale3(&v5->field_268, &v5->physicsParams.vel, v65 * sithTime_deltaSeconds);
                     v65 = 0.0;
@@ -1022,7 +1022,9 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
         sithPhysics_ThingApplyForce(v5, &forceVec);
         return sithCollision_CollideHurt(v4, &a2, a3->distance, 0);
     }
-    sender = -(v4->physicsParams.vel.z * a2.z + v4->physicsParams.vel.y * a2.y + v4->physicsParams.vel.x * a2.x);
+    sender = 0.0f;
+    if (v4->moveType == SITH_MT_PHYSICS) // Added
+        sender = -(v4->physicsParams.vel.z * a2.z + v4->physicsParams.vel.y * a2.y + v4->physicsParams.vel.x * a2.x);
     if ( !sithCollision_CollideHurt(v4, &a2, a3->distance, 0) )
         return 0;
     if ( sender <= 0.15000001 )
