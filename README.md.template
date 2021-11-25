@@ -111,16 +111,15 @@ When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied th
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Input mapping (for blobless/SDL2, input maps are hardcoded)
- - Subtitles and credits
+ - Input menu in Options (input bindings are loaded and written to config, though)
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
    - Multiplayer character builder
  - Display menu in Options
- - Input menu in Options
  - Map view in ESC menu
  - Map view with TAB
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
+ - Subtitles and credits
  - In-game screenshots
 
 ## Usage with original JK.EXE and DirectX
