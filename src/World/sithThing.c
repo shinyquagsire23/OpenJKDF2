@@ -475,7 +475,7 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         if ( thing->moveType == SITH_MT_PATH && a2->trackParams.frames )
         {
             // Added: made this more explicit
-            thing->trackParams.numFrames = a2->trackParams.frames;
+            thing->trackParams.numFrames = a2->trackParams.numFrames;
             thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
             if (thing->trackParams.frames) // Added: nullptr check
                 _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
@@ -2056,7 +2056,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     if ( receiver )
     {
         if ( receiver != sender && sender->thingtype == SITH_THING_ACTOR )
-            sithAI_SetActorFireTarget(sender->actor, 1, receiver);
+            sithAI_SetActorFireTarget(sender->actor, 1, (intptr_t)receiver);
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
         if ( v7
