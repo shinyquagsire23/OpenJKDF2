@@ -666,9 +666,9 @@ int stdControl_Startup()
 #endif
 
     // SDL2 replacements, mouse axis
-    stdControl_InitAxis(12, -250, 250, 0.0);
-    stdControl_InitAxis(13, -200, 200, 0.0);
-    stdControl_InitAxis(14, -20, 20, 0.0);
+    stdControl_InitAxis(AXIS_MOUSE_X, -250, 250, 0.0);
+    stdControl_InitAxis(AXIS_MOUSE_Y, -200, 200, 0.0);
+    stdControl_InitAxis(AXIS_MOUSE_Z, -20, 20, 0.0);
 
     stdControl_Reset();
 
