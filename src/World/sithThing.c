@@ -2043,7 +2043,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
                  SITH_MESSAGE_DAMAGED,
                  0x10,
                  amount,
-                 *(float *)&flags,
+                 (float)flags,
                  0.0,
                  0.0);
         amount = v6;
