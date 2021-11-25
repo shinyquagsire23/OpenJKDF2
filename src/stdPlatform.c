@@ -81,7 +81,7 @@ static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
 
 static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 {
-    return fwrite(dst, len, 1, (void*)fhand);
+    return fwrite(dst, 1, len, (void*)fhand);
 }
 
 static char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)

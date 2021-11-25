@@ -12,8 +12,8 @@
 #define sithControl_sub_4D6910_ADDR (0x004D6910)
 #define sithControl_sub_4D6930_ADDR (0x004D6930)
 #define sithControl_MapFunc_ADDR (0x004D6940)
-#define sithControl_sub_4D6A30_ADDR (0x004D6A30)
-#define sithControl_sub_4D6B60_ADDR (0x004D6B60)
+#define sithControl_MapAxisFunc_ADDR (0x004D6A30)
+#define sithControl_ShiftFuncKeyinfo_ADDR (0x004D6B60)
 #define sithControl_input_map_idk_ADDR (0x004D6BC0)
 #define sithControl_AddInputHandler_ADDR (0x004D6C50)
 #define sithControl_Tick_ADDR (0x004D6C70)
@@ -117,9 +117,11 @@ enum INPUT_FUNC
     INPUT_FUNC_MAX = 74,
 };
 
+int sithControl_Initialize();
 int sithControl_IsOpen();
 int sithControl_Open();
 void sithControl_Close();
+void sithControl_InitFuncToControlType();
 void sithControl_Tick(float deltaSecs, int deltaMs);
 void sithControl_AddInputHandler(sithControl_handler_t a1);
 int sithControl_HandlePlayer(sithThing *player_, float a2);
@@ -127,8 +129,23 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 void sithControl_PlayerMovement(sithThing *player);
 void sithControl_FreeCam(sithThing *player);
 
+void sithControl_MapFunc(int funcIdx, int keyNum, int flags);
+stdControlKeyInfoEntry* sithControl_MapAxisFunc(int funcIdx, int dxKeyNum, uint32_t flags);
+void sithControl_ShiftFuncKeyinfo(int funcIdx, unsigned int idx);
+void sithControl_MapFuncToDxKey(int funcIdx, int dxKeyNum);
+int sithControl_ReadConf();
+int sithControl_WriteConf();
 
-static void (*sithControl_MapFunc)(int funcIdx, int a2, int a3) = (void*)sithControl_MapFunc_ADDR;
+void sithControl_ReadControls();
+void sithControl_FinishRead();
+void sithControl_MapDefaults();
+void sithControl_InputInit();
+float sithControl_GetAxis2(int axisNum);
+float sithControl_ReadAxisStuff(int funcIdx);
+float sithControl_GetAxis(int funcIdx);
+int sithControl_ReadFunctionMap(int func, int* out);
+
+void sithControl_sub_4D6930(int a);
 //static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
@@ -138,27 +155,5 @@ static void (*sithControl_MapFunc)(int funcIdx, int a2, int a3) = (void*)sithCon
 //static void (*sithControl_PlayerLook)(sithThing *player, float a3) = (void*)sithControl_PlayerLook_ADDR;
 //static void (*sithControl_PlayerMovement)(sithThing *player) = (void*)sithControl_PlayerMovement_ADDR;
 //static int (*sithControl_FreeCam)(sithThing *player) = (void*)sithControl_FreeCam_ADDR;
-
-#ifdef SDL2_RENDER
-int sithControl_Initialize();
-void sithControl_InputInit();
-int sithControl_ReadFunctionMap(int func, int* out);
-float sithControl_GetAxis(int num);
-float sithControl_ReadAxisStuff(int num);
-int sithControl_ReadConf();
-int sithControl_WriteConf();
-void sithControl_sub_4D6930(int a);
-float sithControl_GetAxis2(int a);
-#else
-static int (*sithControl_Initialize)() = (void*)sithControl_Initialize_ADDR;
-static void (*sithControl_InputInit)() = (void*)sithControl_InputInit_ADDR;
-static int (*sithControl_ReadFunctionMap)(int func, int* out) = (void*)sithControl_ReadFunctionMap_ADDR;
-static float (*sithControl_GetAxis)(int num) = (void*)sithControl_GetAxis_ADDR;
-static float (*sithControl_ReadAxisStuff)(int num) = (void*)sithControl_ReadAxisStuff_ADDR;
-static int (*sithControl_ReadConf)() = (void*)sithControl_ReadConf_ADDR;
-static int (*sithControl_WriteConf)() = (void*)sithControl_WriteConf_ADDR;
-static void (*sithControl_sub_4D6930)(int a) = (void*)sithControl_sub_4D6930_ADDR;
-static float (*sithControl_GetAxis2)(int a1) = (void*)sithControl_GetAxis2_ADDR;
-#endif
 
 #endif // _SITHCONTROL_H

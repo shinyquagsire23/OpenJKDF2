@@ -402,14 +402,14 @@ LABEL_84:
 void jkHudInv_InputInit()
 {
     // TODO: what is the second param, DIK?
-    sithControl_MapFunc(INPUT_FUNC_CAMERAMODE, 59, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE16, 60, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE15, 61, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE14, 62, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE0, 63, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE1, 64, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE2, 65, 0);
-    sithControl_MapFunc(INPUT_FUNC_ACTIVATE3, 66, 0);
+    sithControl_MapFunc(INPUT_FUNC_CAMERAMODE, DIK_F1, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE16, DIK_F2, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE15, DIK_F3, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE14, DIK_F4, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE0, DIK_F5, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE1, DIK_F6, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE2, DIK_F7, 0);
+    sithControl_MapFunc(INPUT_FUNC_ACTIVATE3, DIK_F8, 0);
 }
 
 int jkHudInv_InitItems()

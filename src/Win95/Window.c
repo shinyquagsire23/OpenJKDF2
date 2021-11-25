@@ -475,6 +475,9 @@ void Window_SdlUpdate()
                 {
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0xD, 0);
                 }
+
+                //if (!event.key.repeat)
+                //    stdControl_SetSDLKeydown(event.key.keysym.scancode, 1, event.key.timestamp);
                 break;
             case SDL_KEYUP:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
@@ -506,6 +509,8 @@ void Window_SdlUpdate()
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xB, 0);
                 }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
+
+                stdControl_SetSDLKeydown(event.key.keysym.scancode, 0, event.key.timestamp);
                 break;
             case SDL_MOUSEMOTION:
                 Window_HandleMouseMove(&event.motion);
@@ -555,6 +560,9 @@ void Window_SdlUpdate()
                     Window_msg_main_handler(g_hWnd, msgl, left | right, pos);
                 if (hasRight)
                     Window_msg_main_handler(g_hWnd, msgr, left | right, pos);
+
+                //stdControl_SetKeydown(KEY_MOUSE_B1, Window_bMouseLeft, mevent->timestamp);
+                //stdControl_SetKeydown(KEY_MOUSE_B2, Window_bMouseRight, mevent->timestamp);
 
                 break;
             case SDL_QUIT:

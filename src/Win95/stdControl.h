@@ -9,7 +9,7 @@
 #define stdControl_Open_ADDR (0x0042E280)
 #define stdControl_Close_ADDR (0x0042E2D0)
 #define stdControl_Flush_ADDR (0x0042E320)
-#define stdControl_input_keymap_idk2_ADDR (0x0042E440)
+#define stdControl_Reset_ADDR (0x0042E440)
 #define stdControl_EnableAxis_ADDR (0x0042E490)
 #define stdControl_ReadControls_ADDR (0x0042E560)
 #define stdControl_ReadAxis_ADDR (0x0042E9B0)
@@ -27,26 +27,41 @@
 #define stdControl_mouse_getdevicestate_ADDR (0x0042EEC0)
 #define stdControl_InitAxis_ADDR (0x0042F090)
 
+void stdControl_Reset();
+int stdControl_EnableAxis(unsigned int idx);
+float stdControl_ReadAxis(int axisNum);
+int stdControl_ReadAxisRaw(int axisNum);
+float stdControl_ReadKeyAsAxis(int keyNum);
+int stdControl_ReadAxisAsKey(int axisNum);
+int stdControl_ReadKey(int keyNum, int *pOut);
+void stdControl_FinishRead();
 int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused);
+void stdControl_SetMouseSensitivity(float xSensitivity, float ySensitivity);
+void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime);
+void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime);
+
+void stdControl_InitAxis(int index, int stickMin, int stickMax, float multiplier);
 
 #ifndef SDL2_RENDER
+static int (*stdControl_Startup)() = (void*)stdControl_Startup_ADDR;
+static void (*stdControl_Shutdown)() = (void*)stdControl_Shutdown_ADDR;
 static int (*stdControl_Open)() = (void*)stdControl_Open_ADDR;
 static int (*stdControl_Close)() = (void*)stdControl_Close_ADDR;
 static void (*stdControl_Flush)() = (void*)stdControl_Flush_ADDR;
 static void (*stdControl_ToggleCursor)(int a1) = (void*)stdControl_ToggleCursor_ADDR;
 static int (*stdControl_ShowCursor)(BOOL bShow) = (void*)stdControl_ShowCursor_ADDR;
-static int (*stdControl_ReadControls)() = (void*)stdControl_ReadControls_ADDR;
-static int (*stdControl_FinishRead)() = (void*)stdControl_FinishRead_ADDR;
-static float (*stdControl_ReadAxis)(int a) = (void*)stdControl_ReadAxis_ADDR;
+static void (*stdControl_ReadControls)() = (void*)stdControl_ReadControls_ADDR;
 #else
+int stdControl_Startup();
+void stdControl_Shutdown();
 int stdControl_Open();
 int stdControl_Close();
 void stdControl_Flush();
 void stdControl_ToggleCursor(int a);
 int stdControl_ShowCursor(int a);
-int stdControl_ReadControls();
-int stdControl_FinishRead();
-float stdControl_ReadAxis(int a);
+void stdControl_ToggleMouse();
+void stdControl_ReadControls();
+void stdControl_ReadMouse();
 #endif
 
 //static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;

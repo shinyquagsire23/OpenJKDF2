@@ -767,27 +767,27 @@ stdBitmap_MemUsage	.text	0042D9D0	00000013	00000000	0000000C	R	.	.	.	.	.	T	.
 stdPcx_Load	.text	0042D9F0	00000254	000000E4	0000000C	R	.	.	.	.	.	T	.
 stdPcx_Write	.text	0042DC50	0000020A	000000A4	00000008	R	.	.	.	.	.	T	.
 stdControl_Startup	.text	0042DE60	000003D6	000001F4	00000000	R	.	.	.	.	.	.	.
-stdControl_Shutdown	.text	0042E240	00000038			R	.	.	.	.	.	.	.
+stdControl_Shutdown	.text	0042E240	00000038			R	.	.	.	.	.	T	.
 stdControl_Open	.text	0042E280	0000004A			R	.	.	.	.	.	.	.
 stdControl_Close	.text	0042E2D0	0000004C			R	.	.	.	.	.	.	.
 stdControl_Flush	.text	0042E320	0000011E	00000038	00000000	R	.	.	.	.	.	T	.
-stdControl_input_keymap_idk2	.text	0042E440	00000041			R	.	.	.	.	.	.	.
-stdControl_EnableAxis	.text	0042E490	000000AA	00000004	00000004	R	.	.	.	.	.	.	.
-stdControl_ReadControls	.text	0042E560	00000449	00000368	00000000	R	.	.	.	.	.	.	.
-stdControl_ReadAxis	.text	0042E9B0	000000C1	00000004	00000004	R	.	.	.	.	.	.	.
-stdControl_ReadAxisRaw	.text	0042EA80	0000004B	00000000	00000004	R	.	.	.	.	.	.	.
-stdControl_ReadKeyAsAxis	.text	0042EAD0	00000081	00000008	00000004	R	.	.	.	.	.	.	.
-stdControl_ReadAxisAsKey	.text	0042EB60	00000032	00000000	00000004	R	.	.	.	.	.	.	.
-stdControl_ReadKey	.text	0042EBA0	00000065	00000004	00000008	R	.	.	.	.	.	.	.
+stdControl_Reset	.text	0042E440	00000041			R	.	.	.	.	.	T	.
+stdControl_EnableAxis	.text	0042E490	000000AA	00000004	00000004	R	.	.	.	.	.	T	.
+stdControl_ReadControls	.text	0042E560	00000449	00000368	00000000	R	.	.	.	.	.	T	.
+stdControl_ReadAxis	.text	0042E9B0	000000C1	00000004	00000004	R	.	.	.	.	.	T	.
+stdControl_ReadAxisRaw	.text	0042EA80	0000004B	00000000	00000004	R	.	.	.	.	.	T	.
+stdControl_ReadKeyAsAxis	.text	0042EAD0	00000081	00000008	00000004	R	.	.	.	.	.	T	.
+stdControl_ReadAxisAsKey	.text	0042EB60	00000032	00000000	00000004	R	.	.	.	.	.	T	.
+stdControl_ReadKey	.text	0042EBA0	00000065	00000004	00000008	R	.	.	.	.	.	T	.
 stdControl_FinishRead	.text	0042EC10	00000001			R	.	.	.	.	.	.	.
 stdControl_MessageHandler	.text	0042EC20	00000026	00000000	0000000C	R	.	.	.	.	.	.	.
-stdControl_SetMouseSensitivity	.text	0042EC50	000000EA	00000008	00000008	R	.	.	.	.	.	.	.
+stdControl_SetMouseSensitivity	.text	0042EC50	000000EA	00000008	00000008	R	.	.	.	.	.	T	.
 stdControl_ToggleCursor	.text	0042ED40	00000078	00000000	00000004	R	.	.	.	.	.	T	.
 stdControl_ShowCursor	.text	0042EDC0	0000000C	00000000	00000004	R	.	.	.	.	.	T	.
-stdControl_ToggleMouse	.text	0042EDD0	00000050	00000000	00000000	R	.	.	.	.	.	.	.
-stdControl_keyidk	.text	0042EE20	00000094	00000000	0000000C	R	.	.	.	.	.	.	.
-stdControl_mouse_getdevicestate	.text	0042EEC0	000001CA	00000238	00000000	R	.	.	.	.	.	.	.
-stdControl_axis_state	.text	0042F090	0000008F	00000008	00000010	R	.	.	.	.	.	T	.
+stdControl_ToggleMouse	.text	0042EDD0	00000050	00000000	00000000	R	.	.	.	.	.	T	.
+stdControl_SetKeydown	.text	0042EE20	00000094	00000000	0000000C	R	.	.	.	.	.	T	.
+stdControl_ReadMouse	.text	0042EEC0	000001CA	00000238	00000000	R	.	.	.	.	.	T	.
+stdControl_InitAxis	.text	0042F090	0000008F	00000008	00000010	R	.	.	.	.	.	T	.
 stdString_FastCopy	.text	0042F120	0000004A	00000008	00000004	R	.	.	.	.	.	T	.
 stdString_snprintf	.text	0042F170	00000029	00000008	0000000D	R	.	.	.	.	.	T	.
 stdString_CopyBetweenDelimiter	.text	0042F1A0	0000006E	00000010	00000010	R	.	.	.	.	.	T	.
@@ -2062,14 +2062,14 @@ sithControl_Open	.text	004D68B0	0000001F			R	.	.	.	.	.	.	.
 sithControl_Close	.text	004D68D0	00000026			R	.	.	.	.	.	T	.
 sithControl_IsOpen	.text	004D6900	00000006			R	.	.	.	.	.	.	.
 sithControl_sub_4D6910	.text	004D6910	00000012	00000000	00000008	R	.	.	.	.	.	.	.
-sithControl_sub_4D6930	.text	004D6930	00000010	00000000	00000004	R	.	.	.	.	.	.	.
+sithControl_sub_4D6930	.text	004D6930	00000010	00000000	00000004	R	.	.	.	.	.	T	.
 sithControl_MapFunc	.text	004D6940	000000EC	00000010	0000000C	R	.	.	.	.	.	T	.
-sithControl_sub_4D6A30	.text	004D6A30	0000012F	00000010	0000000C	R	.	.	.	.	.	.	.
-sithControl_sub_4D6B60	.text	004D6B60	00000058	00000004	00000008	R	.	.	.	.	.	.	.
-sithControl_input_map_idk	.text	004D6BC0	00000090	00000010	00000008	R	.	.	.	.	.	.	.
+sithControl_MapAxisFunc	.text	004D6A30	0000012F	00000010	0000000C	R	.	.	.	.	.	T	.
+sithControl_ShiftFuncKeyinfo	.text	004D6B60	00000058	00000004	00000008	R	.	.	.	.	.	T	.
+sithControl_MapFuncToDxKey	.text	004D6BC0	00000090	00000010	00000008	R	.	.	.	.	.	T	.
 sithControl_AddInputHandler	.text	004D6C50	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
 sithControl_Tick	.text	004D6C70	000000FE	0000000C	00000008	R	.	.	.	.	.	T	.
-stdControl_GetAxis2	.text	004D6D70	00000137	00000014	00000004	R	.	.	.	.	.	.	.
+sithControl_GetAxis2	.text	004D6D70	00000137	00000014	00000004	R	.	.	.	.	.	T	.
 sithControl_ReadAxisStuff	.text	004D6EB0	000000C3	0000000C	00000004	R	.	.	.	.	.	.	.
 sithControl_GetAxis	.text	004D6F80	0000008F	00000008	00000004	R	.	.	.	.	.	.	.
 sithControl_ReadFunctionMap	.text	004D7010	00000082	00000014	00000008	R	.	.	.	.	.	T	.
@@ -2082,7 +2082,7 @@ sithControl_sub_4D7670	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	.	.
 sithControl_WriteConf	.text	004D78E0	000000B2	00000018	00000000	R	.	.	.	.	.	.	.
 sithControl_ReadConf	.text	004D79A0	0000028A	00000020	00000000	R	.	.	.	.	.	.	.
 sithControl_sub_4D7C30	.text	004D7C30	00000016	00000004	00000000	R	.	.	.	.	.	.	.
-sithControl_InitFuncToControlType	.text	004D7C50	000000EF			R	.	.	.	.	.	.	.
+sithControl_InitFuncToControlType	.text	004D7C50	000000EF			R	.	.	.	.	.	T	.
 sithControl_MapDefaults	.text	004D7D40	00000574	0000000C	00000000	R	.	.	.	.	.	.	.
 sithControl_EnumBindings	.text	004D82C0	00000254	0000002C	00000014	R	.	.	.	.	.	.	.
 sithControl_HandlePlayer	.text	004D8520	000004DB	00000048	00000008	R	.	.	.	.	.	T	.

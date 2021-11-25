@@ -190,7 +190,10 @@ sithSound_hashtable 0x0084DF38 stdHashTable*
 sithSound_var4 0x0084DF40 int
 sithSound_var5 0x0084DF44 int
 
+sithControl_inputFuncToControlType 0x00833A20 int[74]
+sithControl_aInputFuncToKeyinfo 0x00833B48 stdControlKeyInfo[74]
 sithControl_msIdle 0x00835830 uint32_t
+sithControl_bInitted 0x00835834 int
 sithControl_bOpened 0x00835838 int
 sithControl_aHandlers 0x00833A00 sithControl_handler_t[5]
 sithControl_numHandlers 0x008339F8 int
@@ -341,8 +344,38 @@ word_860802 0x860802 uint16_t
 word_860804 0x860804 uint16_t
 word_860806 0x860806 uint16_t
 
+stdControl_bReadMouse 0x0053EEE0 int = 1
+stdControl_updateKHz 0x0053EEE4 float = 1.0f
+stdControl_updateHz 0x0053EEE8 float = 1.0f
+stdControl_mouseXSensitivity 0x0053EEEC float = 1.0f
+stdControl_mouseYSensitivity 0x0053EEF0 float = 1.0f
+stdControl_mouseZSensitivity 0x0053EEF4 float = 1.0f
+
+stdControl_unk_55C828 0x0055C828 int[2]
+stdControl_aAxisPos 0x0055C830 stdControlAxis
+stdControl_aInput1 0x0055C870 int[284]
+stdControl_aKeyInfo 0x0055CCE0 int[284]
+stdControl_aAxisConnected 0x0055D150 int[2]
+stdControl_aInput2 0x0055D158 int[284]
+stdControl_bStartup 0x0055D5C8 int
+stdControl_bOpen 0x0055D5CC int
 stdControl_bDisableKeyboard 0x0055D5D0 int
 stdControl_bControlsIdle 0x0055D5D4 int
+stdControl_bControlsActive 0x0055D5D8 int
+stdControl_ppDI 0x0055D5DC void*
+stdControl_mouseDirectInputDevice 0x0055D5E0 void*
+stdControl_keyboardIDirectInputDevice 0x0055D5E4 void*
+stdControl_joy_related 0x0055D5E8 int
+stdControl_curReadTime 0x0055D5EC uint32_t
+stdControl_msLast 0x0055D5F0 uint32_t
+stdControl_msDelta 0x0055D5F8 uint32_t
+stdControl_dwLastMouseX 0x0055D5FC int32_t
+stdControl_dwLastMouseY 0x0055D600 int32_t
+
+stdControl_arr_865028 0x00865028 int[2]
+stdControl_arr_865030 0x00865030 int[4]
+stdControl_aJoysticks 0x00865040 stdControlJoystickEntry[15]
+stdControl_arr_8651A8 0x008651A8 int[2]
 
 Windows_installType 0x008606E0 int
 
