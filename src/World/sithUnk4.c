@@ -120,13 +120,13 @@ int sithUnk4_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisio
         {
             v6 = thing->actor;
             if ( v6 )
-                sithAI_SetActorFireTarget(v6, 4, thing2);
+                sithAI_SetActorFireTarget(v6, 4, (intptr_t)thing2);
         }
         if ( thing2->thingtype == SITH_THING_ACTOR )
         {
             v7 = thing2->actor;
             if ( v7 )
-                sithAI_SetActorFireTarget(v7, 4, thing);
+                sithAI_SetActorFireTarget(v7, 4, (intptr_t)thing);
         }
         result = v5;
     }
