@@ -453,27 +453,52 @@ void Window_SdlUpdate()
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x25, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x25, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                 {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x27, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x27, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_UP)
                 {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x26, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x26, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_DOWN)
                 {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x28, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x28, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x8, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0x8, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {
+                    // HACK apparently Windows buffers these events in some way, but to replicate the behavior in jkGUI we just spam KEYFIRST
+                    //if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xD, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, 0xD, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_LSHIFT)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xA0, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYDOWN, 0xA0, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RSHIFT)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xA1, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYDOWN, 0xA1, 0);
                 }
 
                 //if (!event.key.repeat)
@@ -507,6 +532,14 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xB, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_LSHIFT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xA0, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_RSHIFT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xA1, 0);
                 }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
 
