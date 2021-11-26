@@ -55,13 +55,13 @@ sithRender_lightingIRMode 0x00831988 int
 sithRender_f_83198C 0x0083198C float
 sithRender_f_831990 0x00831990 float
 sithRender_needsAspectReset 0x00831994 int
-sithRender_numSectors 0x008318F0 uint32_t
-sithRender_numClipFrustums 0x0082FEE8 uint32_t
-sithRender_numLights 0x00831978 uint32_t
-sithRender_numSectors2 0x0082F640 uint32_t
+sithRender_numSectors 0x008318F0 int32_t
+sithRender_numClipFrustums 0x0082FEE8 int32_t
+sithRender_numLights 0x00831978 int32_t
+sithRender_numSectors2 0x0082F640 int32_t
 sithRender_82F4B4 0x0082F4B4 uint32_t
 sithRender_surfacesDrawn 0x0083197C int
-sithRender_numSurfaces 0x0082F4B8 uint32_t
+sithRender_numSurfaces 0x0082F4B8 int32_t
 sithRender_831980 0x00831980 int
 sithRender_831984 0x00831984 int
 sithRender_f_82F4B0 0x0082F4B0 float
@@ -71,7 +71,7 @@ sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
 sithRender_aLights 0x0082F668 rdLight[32]
 sithRender_aSectors 0x0082F110 sithSector*[128]
 sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[128]
-sithRender_aSectors2 0x0082FC68 sithSector*[128]
+sithRender_aSectors2 0x0082FC68 sithSector*[162]
 vertices_tmp 0x0082F310 rdVector3[32]
 vertices_tmp_projected 0x0082F310 rdVector3[32]
 sithRender_aSurfaces 0x008318F8 sithSurface*[32]
