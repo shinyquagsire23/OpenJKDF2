@@ -116,10 +116,6 @@ void DebugConsole_Print(char *str)
 
 void DebugConsole_PrintUniStr(wchar_t *a1)
 {
-#ifdef LINUX_TMP
-    printf("STUB: DebugConsole_PrintUniStr\n");
-    return;
-#endif
     if ( DebugGui_fnPrintUniStr )
         DebugGui_fnPrintUniStr(a1);
 }
