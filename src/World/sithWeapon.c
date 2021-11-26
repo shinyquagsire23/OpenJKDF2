@@ -603,7 +603,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     double v14; // st7
     int v16; // eax
     int v17; // eax
-    sithThing *v18; // edi
     sithThing *v19; // ebx
     sithThing *v20; // eax
     sithThing *v21; // edi
@@ -675,11 +674,10 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         v17 = physicsThing->weaponParams.typeflags;
         if ( (v17 & 4) != 0 )
         {
-            v18 = physicsThing->weaponParams.explodeTemplate;
-            if ( !v18 )
+            if ( !physicsThing->weaponParams.explodeTemplate )
                 goto LABEL_53;
             v19 = sithThing_GetParent(physicsThing);
-            v20 = sithThing_Create(v18, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v19);
+            v20 = sithThing_Create(physicsThing->weaponParams.explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v19);
             v21 = v20;
             if ( !v20 )
                 goto LABEL_53;
@@ -883,6 +881,7 @@ LABEL_9:
 
 void sithWeapon_Remove(sithThing *weapon)
 {
+    // This gets called for thermal detonators when they run out of lifetime
     if ( (weapon->weaponParams.typeflags & 0x100) != 0 )
     {
         sithWeapon_RemoveAndExplode(weapon, weapon->weaponParams.explodeTemplate);

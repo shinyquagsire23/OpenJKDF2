@@ -240,6 +240,7 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
     thing->type = type;
+    thing->thingtype = type; // Added: why is this needed?
     thing->position = NETMSG_POPVEC3();
     thing->lookOrientation.rvec = NETMSG_POPVEC3();
     thing->lookOrientation.lvec = NETMSG_POPVEC3();
