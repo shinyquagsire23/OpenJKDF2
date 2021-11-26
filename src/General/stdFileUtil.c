@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include "external/fcaseopen/fcaseopen.h"
 #endif
@@ -208,16 +210,72 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
 
 int stdFileUtil_Deltree(char* lpPathName)
 {
+    char tmp[512];
+    size_t len = _strlen(lpPathName);
+
+    if (len > 512) {
+        len = 512;
+    }
+    _strncpy(tmp, lpPathName, sizeof(tmp));
+
+#ifndef WIN64_STANDALONE
+    for (int i = 0; i < len; i++)
+    {
+        if (tmp[i] == '\\') {
+            tmp[i] = '/';
+        }
+    }
+#endif
+
+    //rmdir(tmp);
     return 0;
 }
 
 int stdFileUtil_MkDir(char* path)
 {
-    return 0;
+    char tmp[512];
+    size_t len = _strlen(path);
+
+    if (len > 512) {
+        len = 512;
+    }
+    _strncpy(tmp, path, sizeof(tmp));
+
+#ifndef WIN64_STANDALONE
+    for (int i = 0; i < len; i++)
+    {
+        if (tmp[i] == '\\') {
+            tmp[i] = '/';
+        }
+    }
+#endif
+
+    mkdir(path, 0777);
+
+    return 1;
 }
 
 int stdFileUtil_DelFile(char* lpFileName)
 {
-    return 0;
+    char tmp[512];
+    size_t len = _strlen(lpFileName);
+
+    if (len > 512) {
+        len = 512;
+    }
+    _strncpy(tmp, lpFileName, sizeof(tmp));
+
+#ifndef WIN64_STANDALONE
+    for (int i = 0; i < len; i++)
+    {
+        if (tmp[i] == '\\') {
+            tmp[i] = '/';
+        }
+    }
+#endif
+
+    unlink(tmp);
+
+    return 1;
 }
 #endif
