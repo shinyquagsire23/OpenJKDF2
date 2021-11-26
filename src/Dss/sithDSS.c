@@ -683,10 +683,10 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
 
     for (int i = 0; i < 2; i++)
     {
-        NETMSG_PUSHU32(sithWeapon_a8BD030[i]);
-        NETMSG_PUSHU32(sithWeapon_8BD0A0[i]);
+        NETMSG_PUSHF32(sithWeapon_a8BD030[i]);
+        NETMSG_PUSHF32(sithWeapon_8BD0A0[i]);
     }
-    NETMSG_PUSHU32(sithWeapon_8BD05C[1]);
+    NETMSG_PUSHF32(sithWeapon_8BD05C[1]);
     NETMSG_PUSHF32(sithWeapon_LastFireTimeSecs);
     NETMSG_PUSHF32(sithWeapon_fireWait);
     NETMSG_PUSHF32(sithWeapon_mountWait);
@@ -736,10 +736,10 @@ int sithDSS_HandleMisc(sithCogMsg *msg)
 
     for (int i = 0; i < 2; i++)
     {
-        sithWeapon_a8BD030[i] = NETMSG_POPU32();
-        sithWeapon_8BD0A0[i] = NETMSG_POPU32();
+        sithWeapon_a8BD030[i] = NETMSG_POPF32();
+        sithWeapon_8BD0A0[i] = NETMSG_POPF32();
     }
-    sithWeapon_8BD05C[1] = NETMSG_POPU32();
+    sithWeapon_8BD05C[1] = NETMSG_POPF32();
     sithWeapon_LastFireTimeSecs = NETMSG_POPF32();
     sithWeapon_fireWait = NETMSG_POPF32();
     sithWeapon_mountWait = NETMSG_POPF32();

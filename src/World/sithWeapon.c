@@ -1095,7 +1095,10 @@ float sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode)
 {
     int v3; // edx
     float result; // st7
-    float *v7; // eax
+
+    // Added: bounds check
+    if (mode < 0 || mode >= 2)
+        return 0.0;
 
     v3 = 0;
     if (sithWeapon_8BD0A0[mode] == -1.0 )
@@ -1108,12 +1111,10 @@ float sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode)
         sithWeapon_mountWait = sithWeapon_fireRate + sithTime_curSeconds;
     sithWeapon_LastFireTimeSecs = -1.0;
     sithWeapon_fireRate = 0.0;
-    v7 = sithWeapon_a8BD030;
     for (int i = 0; i < 2; i++)
     {
-        if ( *(int*)v7 == 1 )
+        if ( sithWeapon_a8BD030[i] == 1 )
             v3 = 1;
-        ++v7;
     }
 
     if ( !v3 )
