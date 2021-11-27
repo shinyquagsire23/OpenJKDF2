@@ -132,6 +132,9 @@ void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
     if (quantized > 0x8000 || quantized < -0x8000)
     {
         quantized = 0;
+        quantized_plus1 = quantized + 1;
+        v17 = aSinTable[quantized_plus1];
+        v18 = aSinTable[4095 - quantized_plus1];
         *pSinOut = (v17 - aSinTable[quantized]) * v6 + aSinTable[quantized];
         *pCosOut = (v18 - aSinTable[4095 - quantized]) * v6 + aSinTable[4095 - quantized];
         return;
@@ -318,6 +321,11 @@ float stdMath_Dist3D1(float a1, float a2, float a3)
   float v8; // [esp+10h] [ebp-8h]
   float v9; // [esp+14h] [ebp-4h]
 
+  // Added: fix undef behavior
+  v9 = 0.0;
+  v8 = 0.0;
+  v7 = 0.0;
+
   if ( a1 >= 0.0 )
     v6 = a1;
   else
@@ -373,6 +381,11 @@ float stdMath_Dist3D2(float a1, float a2, float a3)
   float v8; // [esp+10h] [ebp-8h]
   float v9; // [esp+14h] [ebp-4h]
 
+  // Added: fix undef behavior
+  v9 = 0.0;
+  v8 = 0.0;
+  v7 = 0.0;
+
   if ( a1 >= 0.0 )
     v6 = a1;
   else
@@ -427,6 +440,11 @@ float stdMath_Dist3D3(float a1, float a2, float a3)
   float v7; // [esp+Ch] [ebp-Ch]
   float v8; // [esp+10h] [ebp-8h]
   float v9; // [esp+14h] [ebp-4h]
+
+  // Added: fix undef behavior
+  v9 = 0.0;
+  v8 = 0.0;
+  v7 = 0.0;
 
   if ( a1 >= 0.0 )
     v6 = a1;

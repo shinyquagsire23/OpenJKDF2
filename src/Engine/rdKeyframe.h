@@ -22,7 +22,7 @@ typedef struct rdMarkers
 
 typedef struct rdAnimEntry
 {
-    int32_t frameNum;
+    float frameNum;
     int32_t flags;
     rdVector3 pos;
     rdVector3 orientation;

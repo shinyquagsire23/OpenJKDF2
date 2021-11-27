@@ -54,16 +54,11 @@ void rdPuppet_Free(rdPuppet *puppet)
 
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 {
-    rdModel3 *model_; // edx
     rdPuppet *puppet; // eax
     rdPuppetTrack *v4; // ebx
-    rdKeyframe *v5; // ecx
-    rdJoint *v6; // edx
-    int v7; // ecx
     rdJoint *v8; // esi
     int v9; // edi
     uint32_t v10; // eax
-    rdAnimEntry* v11; // edx
     intptr_t v12; // ecx
     rdAnimEntry *v13;
     rdHierarchyNode *v15; // edi
@@ -73,19 +68,12 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     unsigned int v19; // ecx
     rdJoint *v20; // edx
     uint32_t v21; // eax
-    rdAnimEntry *v22; // ecx
     double v23; // st7
     rdAnimEntry *v24; // eax
     int v25; // ecx
-    double v26; // st5
-    double v27; // st6
-    double v28; // st5
     double v29; // st6
     double v30; // st7
-    float *v31; // eax
-    double v32; // st3
     double v33; // st7
-    double v34; // rt2
     double v35; // rtt
     double v36; // st4
     double v37; // st7
@@ -100,31 +88,16 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     double v48; // st5
     double v49; // st7
     double v50; // st7
-    double v51; // st7
-    double v52; // st6
-    double v53; // st5
-    double v54; // st4
-    double v55; // st3
-    double v56; // st2
-    double v57; // st7
-    double v58; // st2
-    double v59; // st6
-    rdMatrix34 *v60; // eax
     rdVector3 *v61; // ecx
     float v69; // [esp+0h] [ebp-84h]
     float v70; // [esp+14h] [ebp-70h]
     float v71; // [esp+18h] [ebp-6Ch]
-    uint32_t* v72; // [esp+1Ch] [ebp-68h]
     int v73; // [esp+1Ch] [ebp-68h]
-    int v74; // [esp+20h] [ebp-64h]
     int v75; // [esp+20h] [ebp-64h]
-    int v76; // [esp+24h] [ebp-60h]
     int v77; // [esp+24h] [ebp-60h]
     rdModel3 *model; // [esp+28h] [ebp-5Ch]
     int v80; // [esp+30h] [ebp-54h]
-    int v81; // [esp+34h] [ebp-50h]
     int v82; // [esp+34h] [ebp-50h]
-    rdPuppetTrack *v83; // [esp+38h] [ebp-4Ch]
     rdVector3 a3; // [esp+3Ch] [ebp-48h] BYREF
     rdVector3 a4; // [esp+48h] [ebp-3Ch] BYREF
     float v86; // [esp+54h] [ebp-30h]
@@ -134,9 +107,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     rdVector3 v90; // [esp+6Ch] [ebp-18h]
     rdVector3 v91; // [esp+78h] [ebp-Ch]
 
-    model_ = thing->model3;
+    model = thing->model3;
     puppet = thing->puppet;
-    model = model_;
     if ( thing->field_18 )
     {
         return;
@@ -144,85 +116,69 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 
     if ( !puppet || puppet->paused )
     {
-        for (int i = 0; i < model_->numHierarchyNodes; i++)
+        for (int i = 0; i < model->numHierarchyNodes; i++)
         {
-            _memcpy(&thing->hierarchyNodeMatrices[i], &model_->hierarchyNodes[i].posRotMatrix, sizeof(rdMatrix34));
+            _memcpy(&thing->hierarchyNodeMatrices[i], &model->hierarchyNodes[i].posRotMatrix, sizeof(rdMatrix34));
         }
     }
     else
     {
-        v74 = 4;
-        v83 = puppet->tracks;
         v4 = puppet->tracks;
-        do
+        for (int i = 0; i < 4; i++)
         {
             // Added: joints check
             if ( v4->status && v4->keyframe && v4->keyframe->joints)
             {
-                v5 = v4->keyframe;
-                v6 = v5->joints;
-                v7 = v5->numJoints2;
-                if ( v7 )
+                for (int j = 0; j < v4->keyframe->numJoints2; j++)
                 {
-                    v8 = v6;
-                    v72 = &v4->nodes;
-                    v76 = v7;
-                    do
+                    v8 = &v4->keyframe->joints[j];
+                    v9 = 0;
+                    if ( v8->numAnimEntries )
                     {
-                        v9 = 0;
-                        if ( v8->numAnimEntries )
+                        // Added: this spot keeps crashing, add bounds checks
+                        if (v8->nodeIdx < 0 || v8->nodeIdx >= 64)
                         {
-                            // Added: this spot keeps crashing, add bounds checks
-                            if (v8->nodeIdx < 0 || v8->nodeIdx > 64)
+                            v8->nodeIdx = 0;
+                        }
+
+                        v10 = v4->nodes[v8->nodeIdx];// nodeIdx
+                        if ( v10 != v8->numAnimEntries - 1 )
+                        {
+                            v12 = v10 + 1;
+                            if ( v4->field_120 >= (double)v8->animEntries[v10 + 1].frameNum )
                             {
-                                v8->nodeIdx = 0;
-                            }
-                            v81 = v8->numAnimEntries - 1;
-                            v10 = v4->nodes[v8->nodeIdx];// nodeIdx
-                            if ( v10 != v81 )
-                            {
-                                v11 = v8->animEntries;
-                                v12 = v10 + 1;
-                                if ( v4->field_120 >= (double)*(float *)&v11[v10 + 1].frameNum )
+                                v13 = &v8->animEntries[v10 + 2];
+                                do
                                 {
-                                    v13 = &v11[v10 + 2];
-                                    do
+                                    if ( v12 == v8->numAnimEntries - 1 )
                                     {
-                                        if ( v12 == v81 )
-                                        {
-                                            v9 = 1;
-                                        }
-                                        else if ( v4->field_120 >= (double)*(float*)&v13->frameNum )
-                                        {
-                                            ++v12;
-                                            v13++;
-                                        }
-                                        else
-                                        {
-                                            v9 = 1;
-                                        }
+                                        v9 = 1;
                                     }
-                                    while ( !v9 );
-                                    *v72 = v12;
+                                    else if ( v4->field_120 >= (double)v13->frameNum )
+                                    {
+                                        ++v12;
+                                        v13++;
+                                    }
+                                    else
+                                    {
+                                        v9 = 1;
+                                    }
                                 }
+                                while ( !v9 );
+                                v4->nodes[j] = v12;
                             }
                         }
-                        v8++;
-                        ++v72;
                     }
-                    while (v76-- != 1);
+                    v8++;
                 }
             }
             ++v4;
-            --v74;
         }
-        while ( v74 );
-        v82 = 0;
-        v77 = 0;
+        
         for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
         {
             v15 = &model->hierarchyNodes[v80];
-            v16 = v83;
+            v16 = puppet->tracks;
             v75 = 0;
             v73 = 0;
             v70 = 0.0;
@@ -254,17 +210,14 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                             if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
                             {
                                 v21 = v16->nodes[v19];
-                                v22 = v20->animEntries;
-                                v23 = v16->field_120 - *(float *)&v22[v21].frameNum;
-                                v24 = &v22[v21];
+                                v23 = v16->field_120 - v20->animEntries[v21].frameNum;
+                                v24 = &v20->animEntries[v21];
                                 v25 = v24->flags;
                                 if ( (v25 & 1) != 0 )
                                 {
-                                    v26 = v24->vel.y * v23 + v24->pos.y;
-                                    v27 = v24->vel.z * v23 + v24->pos.z;
                                     v89.x = v24->vel.x * v23 + v24->pos.x;
-                                    v89.y = v26;
-                                    v89.z = v27;
+                                    v89.y = v24->vel.y * v23 + v24->pos.y;
+                                    v89.z = v24->vel.z * v23 + v24->pos.z;
                                 }
                                 else
                                 {
@@ -272,29 +225,25 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 }
                                 if ( (v25 & 2) != 0 )
                                 {
-                                    v28 = v24->angVel.y * v23 + v24->orientation.y;
+                                    v30 = v24->angVel.y * v23 + v24->orientation.y;
                                     v29 = v24->angVel.z * v23 + v24->orientation.z;
                                     v86 = v24->angVel.x * v23 + v24->orientation.x;
-                                    v30 = v28;
                                 }
                                 else
                                 {
-                                    v31 = &v24->orientation.x;
-                                    v86 = *v31;
-                                    v87 = v31[1];
+                                    v86 = v24->orientation.x;
+                                    v87 = v24->orientation.y;
                                     v30 = v87;
-                                    v88 = v31[2];
+                                    v88 = v24->orientation.z;
                                     v29 = v88;
                                 }
                                 v89.x = v89.x - v15->pos.x;
-                                v32 = v30;
                                 v33 = v89.z - v15->pos.z;
-                                v34 = v32 - v15->rot.y;
                                 v35 = v29 - v15->rot.z;
                                 v36 = v86 - v15->rot.x;
                                 v89.y = v89.y - v15->pos.y;
                                 v89.z = v33;
-                                v87 = v34;
+                                v87 = v30 - v15->rot.y;
                                 v88 = v35;
                                 v69 = v36;
                                 v86 = stdMath_NormalizeAngleAcute(v69);
@@ -307,9 +256,9 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                     v89.x = v40 * v89.x;
                                     v89.y = v40 * v89.y;
                                     v89.z = v40 * v89.z;
-                                    v86 = v40 * v86;
-                                    v87 = v40 * v87;
-                                    v88 = v40 * v88;
+                                    v86 *= v40;
+                                    v87 *= v40;
+                                    v88 *= v40;
                                 }
                                 if ( v18 == v75 )
                                 {
@@ -404,30 +353,18 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 LABEL_58:
             a3.x = stdMath_NormalizeAngleAcute(a3.x);
             a3.y = stdMath_NormalizeAngleAcute(a3.y);
-            v51 = stdMath_NormalizeAngleAcute(a3.z);
-            v52 = v15->pos.x;
-            v53 = v15->pos.y;
-            v54 = v15->pos.z;
-            v55 = v15->rot.x;
-            v56 = v51;
-            v57 = v15->rot.y;
-            a3.z = v56;
-            v58 = v52;
-            v59 = v15->rot.z;
-            v60 = thing->hierarchyNodeMatrices;
-            a4.x = v58 + a4.x;
-            a4.y = v53 + a4.y;
-            a4.z = v54 + a4.z;
-            a3.x = v55 + a3.x;
-            a3.y = v57 + a3.y;
-            a3.z = v59 + a3.z;
-            rdMatrix_Build34(&v60[v82], &a3, &a4);
-            v61 = &thing->hierarchyNodes2[v77];
-            if ( v61->x != 0.0 || v61->y != 0.0 || v61->z != 0.0 )
-                rdMatrix_PreRotate34(&thing->hierarchyNodeMatrices[v82], &thing->hierarchyNodes2[v77]);
+            a3.z = stdMath_NormalizeAngleAcute(a3.z);
+            a4.x = v15->pos.x + a4.x;
+            a4.y = v15->pos.y + a4.y;
+            a4.z = v15->pos.z + a4.z;
+            a3.x = v15->rot.x + a3.x;
+            a3.y = v15->rot.y + a3.y;
+            a3.z = v15->rot.z + a3.z;
+            rdMatrix_Build34(&thing->hierarchyNodeMatrices[v80], &a3, &a4);
+            v61 = &thing->hierarchyNodes2[v80];
+            if ( !rdVector_IsZero3(v61) )
+                rdMatrix_PreRotate34(&thing->hierarchyNodeMatrices[v80], &thing->hierarchyNodes2[v80]);
             v15++;
-            ++v77;
-            ++v82;
         }
     }
     rdThing_AccumulateMatrices(thing, model->hierarchyNodes, matrix);
