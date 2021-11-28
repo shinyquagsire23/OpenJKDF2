@@ -12,6 +12,8 @@
 #include "Engine/sithTimer.h"
 #include "Engine/sithAdjoin.h"
 
+#include "jk.h"
+
 void sithDSS_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;
@@ -789,7 +791,7 @@ void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
     NETMSG_PUSHS32(thing->thingIdx);
     for (int i = 0; i < 4; i++)
     {
-        NETMSG_PUSHS32(puppet->tracks[i].status);
+        NETMSG_PUSHU32(puppet->tracks[i].status);
         if ( puppet->tracks[i].status )
         {
             NETMSG_PUSHS32(puppet->tracks[i].keyframe->id);
@@ -840,7 +842,7 @@ int sithDSS_HandleSyncPuppet(sithCogMsg *msg)
 
     for (int i = 0; i < 4; i++)
     {
-        rdpuppet->tracks[i].status = NETMSG_POPS32();
+        rdpuppet->tracks[i].status = NETMSG_POPU32();
         if ( rdpuppet->tracks[i].status )
         {
             int idx = NETMSG_POPS32();
@@ -854,6 +856,10 @@ int sithDSS_HandleSyncPuppet(sithCogMsg *msg)
             rdpuppet->tracks[i].playSpeed = NETMSG_POPF32();
             rdpuppet->tracks[i].field_120 = NETMSG_POPF32();
             rdpuppet->tracks[i].field_124 = NETMSG_POPF32();
+        }
+        else // Added
+        {
+            _memset(&rdpuppet->tracks[i], 0, sizeof(rdpuppet->tracks[i]));
         }
     }
 

@@ -76,20 +76,14 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     double v33; // st7
     double v35; // rtt
     double v36; // st4
-    double v37; // st7
     double v40; // st6
-    double v41; // st4
     float v42; // edx
-    float v43; // eax
     double v44; // st4
     double v45; // st7
     double v46; // st7
-    double v47; // st6
     double v48; // st5
-    double v49; // st7
     double v50; // st7
     rdVector3 *v61; // ecx
-    float v69; // [esp+0h] [ebp-84h]
     float v70; // [esp+14h] [ebp-70h]
     float v71; // [esp+18h] [ebp-6Ch]
     int v73; // [esp+1Ch] [ebp-68h]
@@ -106,6 +100,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     rdVector3 v89; // [esp+60h] [ebp-24h]
     rdVector3 v90; // [esp+6Ch] [ebp-18h]
     rdVector3 v91; // [esp+78h] [ebp-Ch]
+    rdVector3 tmp1;
 
     model = thing->model3;
     puppet = thing->puppet;
@@ -174,7 +169,13 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             }
             ++v4;
         }
-        
+
+        if (thing->parentSithThing == g_localPlayerThing)
+        {
+            //puppet->tracks[0].playSpeed = 0.0;
+            //puppet->tracks[2].playSpeed = 1.0;
+        }
+
         for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
         {
             v15 = &model->hierarchyNodes[v80];
@@ -225,73 +226,46 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 }
                                 if ( (v25 & 2) != 0 )
                                 {
-                                    v30 = v24->angVel.y * v23 + v24->orientation.y;
-                                    v29 = v24->angVel.z * v23 + v24->orientation.z;
-                                    v86 = v24->angVel.x * v23 + v24->orientation.x;
+                                    rdVector_Copy3(&tmp1, &v24->orientation);
+                                    rdVector_MultAcc3(&tmp1, &v24->angVel, v23);
                                 }
                                 else
                                 {
-                                    v86 = v24->orientation.x;
-                                    v87 = v24->orientation.y;
-                                    v30 = v87;
-                                    v88 = v24->orientation.z;
-                                    v29 = v88;
+                                    rdVector_Copy3(&tmp1, &v24->orientation);
                                 }
-                                v89.x = v89.x - v15->pos.x;
-                                v33 = v89.z - v15->pos.z;
-                                v35 = v29 - v15->rot.z;
-                                v36 = v86 - v15->rot.x;
-                                v89.y = v89.y - v15->pos.y;
-                                v89.z = v33;
-                                v87 = v30 - v15->rot.y;
-                                v88 = v35;
-                                v69 = v36;
-                                v86 = stdMath_NormalizeAngleAcute(v69);
-                                v87 = stdMath_NormalizeAngleAcute(v87);
-                                v37 = stdMath_NormalizeAngleAcute(v88);
-                                v88 = v37;
-                                if ( v18 > v75 ) // TODO verify
+                                rdVector_Sub3Acc(&v89, &v15->pos.x);
+                                rdVector_Sub3Acc(&tmp1, &v15->rot);
+                                tmp1.x = stdMath_NormalizeAngleAcute(tmp1.x);
+                                tmp1.y = stdMath_NormalizeAngleAcute(tmp1.y);
+                                tmp1.z = stdMath_NormalizeAngleAcute(tmp1.z);
+                                if ( v18 < v75 ) // TODO verify
                                 {
                                     v40 = v16->playSpeed;
-                                    v89.x = v40 * v89.x;
-                                    v89.y = v40 * v89.y;
-                                    v89.z = v40 * v89.z;
-                                    v86 *= v40;
-                                    v87 *= v40;
-                                    v88 *= v40;
+                                    rdVector_Scale3Acc(&v89, v16->playSpeed);
+                                    rdVector_Scale3Acc(&tmp1, v16->playSpeed);
                                 }
                                 if ( v18 == v75 )
                                 {
-                                    a4.x = a4.x + v89.x;
-                                    a4.y = a4.y + v89.y;
-                                    v41 = v70 + v16->playSpeed;
-                                    a4.z = a4.z + v89.z;
-                                    a3.x = a3.x + v86;
-                                    a3.y = a3.y + v87;
-                                    a3.z = a3.z + v88;
-                                    v70 = v41;
+                                    rdVector_Add3Acc(&a4, &v89);
+                                    rdVector_Add3Acc(&a3, &tmp1);
+                                    v70 = v70 + v16->playSpeed;
                                 }
                                 else if ( v18 <= v75 )
                                 {
                                     if ( v18 <= v73 )
                                     {
-                                        v90.x = v90.x + v89.x;
-                                        v90.y = v90.y + v89.y;
+                                        rdVector_Add3Acc(&v90, &v89);
+                                        rdVector_Add3Acc(&v91, &tmp1);
                                         v44 = v71 + v16->playSpeed;
-                                        v90.z = v90.z + v89.z;
-                                        v91.x = v91.x + v86;
-                                        v91.y = v91.y + v87;
-                                        v91.z = v91.z + v88;
                                         v71 = v44;
                                     }
                                     else
                                     {
                                         v90 = v89;
-                                        v91.x = v86;
-                                        v43 = v16->playSpeed;
-                                        v91.y = v87;
-                                        v91.z = v88;
-                                        v71 = v43;
+                                        v91.x = tmp1.x;
+                                        v91.y = tmp1.y;
+                                        v91.z = tmp1.z;
+                                        v71 = v16->playSpeed;
                                         v73 = v18;
                                     }
                                 }
@@ -302,12 +276,11 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                     v71 = v70;
                                     v73 = v75;
                                     a4 = v89;
-                                    a3.x = v86;
-                                    v42 = v16->playSpeed;
+                                    a3.x = tmp1.x;
                                     v75 = v18;
-                                    a3.y = v87;
-                                    a3.z = v88;
-                                    v70 = v42;
+                                    a3.y = tmp1.y;
+                                    a3.z = tmp1.z;
+                                    v70 = v16->playSpeed;
                                 }
                             }
                         }
@@ -315,51 +288,44 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 }
                 ++v16;
             }
+
+
             if ( v70 >= 1.0 || v71 <= 0.0 )
             {
-                if ( v70 <= 1.0 )
-                    goto LABEL_58;
-                v50 = 1.0 / v70;
-                a4.x = v50 * a4.x;
-                a4.y = v50 * a4.y;
-                a4.z = v50 * a4.z;
-                a3.x = v50 * a3.x;
-                v47 = v50 * a3.y;
-                v49 = v50 * a3.z;
+                if ( v70 > 1.0 ) {
+                    v50 = 1.0 / v70;
+                    rdVector_Scale3Acc(&a4, v50);
+                    rdVector_Scale3Acc(&a3, v50);
+                }
             }
             else
             {
                 if ( v71 > 1.0 )
                 {
                     v45 = 1.0 / v71;
-                    v90.x = v45 * v90.x;
-                    v90.y = v45 * v90.y;
-                    v90.z = v45 * v90.z;
-                    v91.x = v45 * v91.x;
-                    v91.y = v45 * v91.y;
-                    v91.z = v45 * v91.z;
+                    rdVector_Scale3Acc(&v90, v45);
+                    rdVector_Scale3Acc(&v91, v45);
                 }
                 v46 = 1.0 - v70;
-                a4.x = v46 * v90.x + a4.x;
-                a4.y = v46 * v90.y + a4.y;
-                v47 = v46 * v91.y + a3.y;
-                a4.z = v46 * v90.z + a4.z;
-                v48 = v46 * v91.x + a3.x;
-                v49 = v46 * v91.z + a3.z;
-                a3.x = v48;
+                rdVector_MultAcc3(&a4, &v90, v46);
+                rdVector_MultAcc3(&a3, &v91, v46);
             }
-            a3.y = v47;
-            a3.z = v49;
-LABEL_58:
+
             a3.x = stdMath_NormalizeAngleAcute(a3.x);
             a3.y = stdMath_NormalizeAngleAcute(a3.y);
             a3.z = stdMath_NormalizeAngleAcute(a3.z);
-            a4.x = v15->pos.x + a4.x;
-            a4.y = v15->pos.y + a4.y;
-            a4.z = v15->pos.z + a4.z;
-            a3.x = v15->rot.x + a3.x;
-            a3.y = v15->rot.y + a3.y;
-            a3.z = v15->rot.z + a3.z;
+            rdVector_Add3Acc(&a4, &v15->pos);
+            rdVector_Add3Acc(&a3, &v15->rot);
+#if 0
+            if (thing->parentSithThing == g_localPlayerThing)
+            {
+                if (v80 == 0) {
+                    printf("%x: %f %f %f, %f %f %f, %f %f %f %x - %x %f %x %f %x %f %x %f\n", v80, a4.x, a4.y, a4.z, v89.x, v89.y, v89.z, v70, v71, v75, v19, puppet->tracks[0].keyframe, puppet->tracks[0].playSpeed, puppet->tracks[1].status, puppet->tracks[1].playSpeed, puppet->tracks[2].status, puppet->tracks[2].playSpeed, puppet->tracks[3].status, puppet->tracks[3].playSpeed);
+                }
+                //rdVector_Zero3(&a4);
+            }
+#endif
+                //
             rdMatrix_Build34(&thing->hierarchyNodeMatrices[v80], &a3, &a4);
             v61 = &thing->hierarchyNodes2[v80];
             if ( !rdVector_IsZero3(v61) )
@@ -395,6 +361,11 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
     for (uint32_t v2 = 0; v2 < 4; v2++)
     {
         rdPuppetTrack* track = &puppet->tracks[v2];
+
+        // Added: prevent lingering tracks
+        if (track->playSpeed < 0.0)
+            track->playSpeed = 0.0;
+
         if (!track->status)
             continue;
 
@@ -406,7 +377,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
 
         if (track->status & 4)
         {
-            track->playSpeed = track->fadeSpeed * a2 + track->playSpeed;
+            track->playSpeed += track->fadeSpeed * a2;
             if ( track->playSpeed >= 1.0 ) // TODO verify
             {
                 //printf("asdf1\n");
@@ -416,12 +387,15 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
         }
         else if (track->status & 8)
         {
-            track->playSpeed = track->playSpeed - track->fadeSpeed * a2;
+            track->playSpeed -= track->fadeSpeed * a2;
             if ( track->playSpeed <= 0.0 ) // TODO verify
             {
                 //printf("asdf2\n");
                 if ( (track->status & 0x100) != 0 )
                 {
+                    // Added: prevent lingering tracks
+                    track->playSpeed = 0.0;
+
                     track->status &= ~0x8u;
                     track->status |= 0x10;
                 }
@@ -447,20 +421,20 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     rdPuppetTrack *v6; // eax
     unsigned int result; // eax
     rdPuppetTrack *newTrack; // edx
-    int v10; // ecx
-    rdThing *v11; // eax
+
+#if 0
+    if (puppet->rdthing->parentSithThing == g_localPlayerThing) {
+        printf("%x %x %x\n", keyframe, lowPri, highPri);
+    }
+#endif
 
     v4 = puppet->tracks;
-    newTrackIdx = 0;
-    v6 = puppet->tracks;
-    do
+    for (newTrackIdx = 0; newTrackIdx < 4; newTrackIdx++)
     {
-        if ( !v6->status )
+        if ( !puppet->tracks[newTrackIdx].status )
             break;
-        ++newTrackIdx;
-        ++v6;
     }
-    while ( newTrackIdx < 4 );
+
     if ( newTrackIdx >= 4 )
     {
         newTrackIdx = 0;
@@ -469,7 +443,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
             ++newTrackIdx;
             ++v4;
             if ( newTrackIdx >= 4 )
-                goto LABEL_13;
+                return -1;
         }
 
         if ( puppet->tracks[newTrackIdx].callback )
@@ -478,7 +452,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
         puppet->tracks[newTrackIdx].status = 0;
         puppet->tracks[newTrackIdx].keyframe = 0;
         puppet->tracks[newTrackIdx].callback = 0;
-LABEL_13:
+
         if ( newTrackIdx >= 4 )
             return -1;
     }
@@ -486,16 +460,14 @@ LABEL_13:
     newTrack->speed = keyframe->fps;
     newTrack->keyframe = keyframe;
     newTrack->highPri = highPri;
-    v10 = newTrack->status;
     newTrack->lowPri = lowPri;
-    v11 = puppet->rdthing;
-    newTrack->status = v10 | 1;
+    newTrack->status |= 1;
     newTrack->playSpeed = 0.0;
     
     // Added: Added in Grim Fandango, bounds checking
-    if (v11->model3->numHierarchyNodes < 0x40)
-        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(int) * v11->model3->numHierarchyNodes);
-    else
+    //if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
+    //    _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(int) * puppet->rdthing->model3->numHierarchyNodes);
+    //else
         _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(puppet->tracks[newTrackIdx].nodes));
     result = newTrackIdx;
     newTrack->field_120 = 0.0;
@@ -563,8 +535,11 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
         {
             v21 = floorf(v22 / v6);
             v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
-            puppet->tracks[trackNum].field_120 = puppet->tracks[trackNum].field_120 - (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
-            _memset(&puppet->tracks[trackNum].nodes, 0, v11);
+            puppet->tracks[trackNum].field_120 -= (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
+            //_memset(&puppet->tracks[trackNum].nodes, 0, v11);
+
+            // Added: just clear the entire thing
+            _memset(&puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
         }
         else
         {
@@ -590,9 +565,8 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
                         puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v13]);
                     }
                 }
-                goto LABEL_34;
             }
-            if ( v21 <= 1.0 )
+            else if ( v21 <= 1.0 )
             {
                 for (uint32_t v17 = 0; v17 < v4->numMarkers; v17++)
                 {
@@ -603,10 +577,8 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
                     }
                 }
             }
-            else
+            else if ( v4->numMarkers )
             {
-                if ( !v4->numMarkers )
-                    goto LABEL_34;
                 for (uint32_t v15 = 0; v15 < v4->numMarkers; v15++)
                 {
                     puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v15]);
@@ -614,7 +586,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
             }
         }
     }
-LABEL_34:
+
     if ( v20 )
     {
         if ( puppet->tracks[trackNum].callback )

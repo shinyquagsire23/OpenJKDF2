@@ -71,6 +71,16 @@ void jkGame_ScreensizeDecrease()
     }
 }
 
+void jkGame_SetDefaultSettings()
+{
+    jkPlayer_setFullSubtitles = 0;
+    jkPlayer_setDisableCutscenes = 0;
+    jkPlayer_setRotateOverlayMap = 1;
+    jkPlayer_setDrawStatus = 1;
+    jkPlayer_setCrosshair = 0;
+    jkPlayer_setSaberCam = 0;
+}
+
 #ifndef SDL2_RENDER
 int jkGame_Update()
 {

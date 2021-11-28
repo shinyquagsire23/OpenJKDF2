@@ -193,6 +193,16 @@ int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, 
     int trackNum; // esi
     signed int result; // eax
 
+#if 0
+    // sithPuppet_sub_4E4380 599
+    // sithPuppet_sub_4E4A20 648
+    if (puppet->rdthing->parentSithThing == g_localPlayerThing) {
+        printf("startkey %x %x %x\n", keyframe, a3, a4);
+        //*(uint32_t*)0x12345 = 0x54321;
+        //return -1;
+    }
+#endif
+
     v6 = 1;
     if ( (a5 & 8) != 0 )
     {
@@ -271,13 +281,10 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
     sithAnimclass *v12; // edx
     sithAnimclassEntry *v13; // eax
     int v14; // eax
-    sithPuppet *v15; // ecx
-    unsigned int v16; // edx
     sithAnimclass *v17; // edx
     sithAnimclassEntry *v18; // eax
     int v19; // eax
     rdMatrix34 *v20; // eax
-    double v21; // st7
     double v22; // st7
     rdMatrix34 *v23; // ecx
     double v25; // st6
@@ -357,10 +364,9 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
                         {
                             v14 = -1;
                         }
-                        v15 = thing->puppet;
-                        v16 = sithTime_curMs;
-                        v15->currentTrack = v14;
-                        v15->animStartedMs = v16;
+
+                        thing->puppet->currentTrack = v14;
+                        thing->puppet->animStartedMs = sithTime_curMs;
                     }
                 }
             }
@@ -373,9 +379,8 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
             thing->rdthing.field_18 = 0;
             rdPuppet_BuildJointMatrices(&thing->rdthing, &thing->lookOrientation);
             v20 = thing->rdthing.hierarchyNodeMatrices;
-            v21 = thing->trackParams.field_24.scale.x + v20->scale.x;
             thing->rdthing.field_18 = 1;
-            a1a.x = v21;
+            a1a.x = thing->trackParams.field_24.scale.x + v20->scale.x;
             a1a.y = thing->trackParams.field_24.scale.y + v20->scale.y;
             v22 = thing->trackParams.field_24.scale.z + v20->scale.z;
             a1a.x = a1a.x - thing->position.x;
