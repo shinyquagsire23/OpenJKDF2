@@ -70,12 +70,14 @@ int Main_Startup(const char *cmdline)
     int result; // eax
 
     // TODO bring this to Windows (%appdata%) and Linux
-#if defined(MACOS) && defined(SDL2_RENDER)
+#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
     const char *homedir;
     char fname[256];
 
+#if defined(MACOS)
     // Default working directory to the folder the .app bundle is in
     chdir(SDL_GetBasePath());
+#endif
 
     if ((homedir = getenv("HOME")) == NULL) {
         homedir = getpwuid(getuid())->pw_dir;
