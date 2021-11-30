@@ -313,6 +313,10 @@ int main(int argc, char** argv)
     memset((void*)0x525000, 0, 0x3DE000);
     
     FILE* f = fopen("JK.EXE", "rb");
+    if (!f) {
+        printf("Failed to open `JK.EXE`! Make sure the file exists in the current working directory.");
+        exit(-1);
+    }
     
     // text
     fseek(f, 0x400, SEEK_SET);
