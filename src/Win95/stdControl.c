@@ -564,10 +564,10 @@ int stdControl_Startup()
 #endif
 
     v0 = 0;
-    _memset(stdControl_aInput1, 0, sizeof(stdControl_aInput1));
-    _memset(stdControl_aKeyInfo, 0, sizeof(stdControl_aKeyInfo));
-    _memset(stdControl_aJoysticks, 0, sizeof(stdControl_aJoysticks));
-    _memset(&stdControl_aAxisPos, 0, sizeof(stdControl_aAxisPos));
+    _memset(stdControl_aInput1, 0, sizeof(int) * 284);
+    _memset(stdControl_aKeyInfo, 0, sizeof(int) * 284);
+    _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * 15);
+    _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
 
 #if 0
     DirectX_DirectInputCreateA(stdGdi_GetHInstance(), 0x500u, &stdControl_ppDI, 0);
@@ -847,13 +847,13 @@ void stdControl_ReadControls()
     if (!stdControl_bControlsActive)
         return;
 
-    _memset(stdControl_aInput1, 0, sizeof(stdControl_aInput1));
+    _memset(stdControl_aInput1, 0, sizeof(int)) * 284;
     stdControl_bControlsIdle = 1;
-    _memset(stdControl_aInput2, 0, sizeof(stdControl_aInput2));
+    _memset(stdControl_aInput2, 0, sizeof(int) * 284);
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
     stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
     khz = 1.0 / (double)(__int64)(stdControl_curReadTime - stdControl_msLast);
-    _memset(&stdControl_aAxisPos, 0, sizeof(stdControl_aAxisPos));
+    _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
     if ( !stdControl_bDisableKeyboard )

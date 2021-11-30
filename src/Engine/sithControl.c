@@ -483,7 +483,7 @@ int sithControl_ReadConf()
     unsigned int dxKeyNum_; // [esp+18h] [ebp-8h]
     int v21; // [esp+1Ch] [ebp-4h]
 
-    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(sithControl_aInputFuncToKeyinfo));
+    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
     stdControl_Reset();
     if ( !stdConffile_ReadArgs()
       || !stdConffile_entry.numArgs
@@ -1459,7 +1459,7 @@ void sithControl_InputInit()
     stdControlKeyInfoEntry *v7; // eax
     stdControlKeyInfoEntry *v8; // eax
 
-    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(sithControl_aInputFuncToKeyinfo));
+    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
     stdControl_Reset();
     sithWeapon_controlOptions = 36;
     sithControl_MapDefaults();

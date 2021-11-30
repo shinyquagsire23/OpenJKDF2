@@ -8,7 +8,7 @@ int sithTimer_Startup()
     if ( sithTimer_bInit )
         return 0;
 
-    _memset(sithTimer_timerFuncs, 0, sizeof(sithTimer_timerFuncs));
+    _memset(sithTimer_timerFuncs, 0, sizeof(sithTimerFunc) * 5);
 
     sithTimer_Reset();
     sithTimer_bInit = 1;
@@ -39,7 +39,7 @@ void sithTimer_Close()
 
 void sithTimer_Reset()
 {
-    _memset(sithTimer_timers, 0, sizeof(sithTimer_timers));
+    _memset(sithTimer_timers, 0, sizeof(sithTimer) * 256);
     int id = 256;
     for (int i = 0; i < 256; i++)
     {
