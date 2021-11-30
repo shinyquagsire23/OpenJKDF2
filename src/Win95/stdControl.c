@@ -847,7 +847,7 @@ void stdControl_ReadControls()
     if (!stdControl_bControlsActive)
         return;
 
-    _memset(stdControl_aInput1, 0, sizeof(int)) * 284;
+    _memset(stdControl_aInput1, 0, sizeof(int) * 284);
     stdControl_bControlsIdle = 1;
     _memset(stdControl_aInput2, 0, sizeof(int) * 284);
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
