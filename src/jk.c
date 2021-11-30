@@ -998,7 +998,7 @@ wchar_t* __wcscat(wchar_t * a, const wchar_t * b)
 {
     wchar_t* ret = a;
     a += __wcslen(a);
-    memcpy(a, b, __wcslen(b) * sizeof(wchar_t));
+    memmove(a, b, __wcslen(b) * sizeof(wchar_t));
     return ret;
 }
 
@@ -1020,7 +1020,7 @@ wchar_t* __wcsncpy(wchar_t * a, const wchar_t * b, size_t c)
     if (len > c*2) {
         len = c*2;
     }
-    memcpy(a, b, len);
+    memmove(a, b, len);
     a[len] = 0;
     return &a[len];
 }

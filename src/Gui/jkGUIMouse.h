@@ -1,23 +1,47 @@
 #ifndef _JKGUI_MOUSE_H
 #define _JKGUI_MOUSE_H
 
-#define jkGuiMouse_sub_416CE0_ADDR (0x00416CE0)
+#include "globals.h"
+#include "types.h"
+
+#define jkGuiMouse_ListClicked1_ADDR (0x00416CE0)
 #define jkGuiMouse_sub_416D40_ADDR (0x00416D40)
-#define jkGuiMouse_sub_417080_ADDR (0x00417080)
+#define jkGuiMouse_ListClicked2_ADDR (0x00417080)
 #define jkGuiMouse_sub_417100_ADDR (0x00417100)
 #define jkGuiMouse_sub_417210_ADDR (0x00417210)
-#define jkGuiMouse_sub_417390_ADDR (0x00417390)
-#define jkGuiMouse_sub_417560_ADDR (0x00417560)
-#define jkGuiMouse_sub_417680_ADDR (0x00417680)
-#define jkGuiMouse_sub_4176B0_ADDR (0x004176B0)
-#define jkGuiMouse_sub_417720_ADDR (0x00417720)
-#define jkGuiMouse_sub_417860_ADDR (0x00417860)
+#define jkGuiMouse_EnumBindings_ADDR (0x00417390)
+#define jkGuiMouse_ListClicked3_ADDR (0x00417560)
+#define jkGuiMouse_AddEditControlsClicked_ADDR (0x00417680)
+#define jkGuiMouse_RemoveClicked_ADDR (0x004176B0)
+#define jkGuiMouse_CancelOkClicked_ADDR (0x00417720)
+#define jkGuiMouse_RestoreDefaultsClicked_ADDR (0x00417860)
 #define jkGuiMouse_Show_ADDR (0x004178D0)
 #define jkGuiMouse_Initialize_ADDR (0x00417AD0)
 #define jkGuiMouse_Shutdown_ADDR (0x00417AF0)
 
-static int (*jkGuiMouse_Initialize)() = (void*)jkGuiMouse_Initialize_ADDR;
-static int (*jkGuiMouse_Show)() = (void*)jkGuiMouse_Show_ADDR;
-static void (*jkGuiMouse_Shutdown)() = (void*)jkGuiMouse_Shutdown_ADDR;
+//static int (*jkGuiMouse_ListClicked1)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_ListClicked1_ADDR;
+//static int (*jkGuiMouse_ListClicked2)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_ListClicked2_ADDR;
+//static int (*jkGuiMouse_ListClicked3)(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_ListClicked3_ADDR;
+//static int (*jkGuiMouse_AddEditControlsClicked)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_AddEditControlsClicked_ADDR;
+//static int (*jkGuiMouse_RemoveClicked)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_RemoveClicked_ADDR;
+//static int (*jkGuiMouse_CancelOkClicked)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_CancelOkClicked_ADDR;
+//static int (*jkGuiMouse_RestoreDefaultsClicked)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_RestoreDefaultsClicked_ADDR;
+
+//static int (*jkGuiMouse_Show)() = (void*)jkGuiMouse_Show_ADDR;
+
+int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2);
+int jkGuiMouse_ListClicked2(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+void jkGuiMouse_sub_417100(int a1, int a2);
+void jkGuiMouse_sub_417210();
+int jkGuiMouse_EnumBindings(int a1, char *a2, int a3, int a4, int a5, int a6, stdControlKeyInfoEntry* a7, void* a8);
+int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiMouse_AddEditControlsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiMouse_Show();
+void jkGuiMouse_Initialize();
+void jkGuiMouse_Shutdown();
 
 #endif // _JKGUI_MOUSE_H

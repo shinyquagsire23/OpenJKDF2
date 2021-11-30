@@ -843,3 +843,10 @@ jkGuiMultiplayer_aEntries 0x00863220 jkMultiEntry[32]
 jkGuiMultiplayer_stru_556168 0x00556168 jkMultiEntry2
 jkGuiMultiplayer_mpcInfo 0x008591E0 jkPlayerMpcInfo
 jkGuiMultiplayer_stru_5564A8 0x005564A8 Darray
+
+jkGuiMouse_bOpen 0x00556690 int
+jkGuiMouse_Darray_556698 0x00556698 Darray
+jkGuiMouse_dword_5566B0 0x005566B0 int
+jkGuiMouse_Darray_5566B8 0x005566B8 Darray
+jkGuiMouse_Darray_5566D0 0x005566D0 Darray
+jkGuiMouse_pWStr_5566E8 0x005566E8 wchar_t*

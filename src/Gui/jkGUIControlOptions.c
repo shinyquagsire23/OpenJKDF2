@@ -34,7 +34,7 @@ static jkGuiElement jkGuiControlOptions_buttons[19] = {
     {ELEMENT_TEXTBUTTON, 4445, 2, "GUI_LOADCONFIG", 3, {0, 170, 320, 50}, 1, 0, "GUI_LOADCONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 4444, 2, "GUI_SAVECONFIG", 3, {320, 170, 320,  50}, 1, 0, "GUI_SAVECONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {440, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 0XFFFFFFFF, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };
 

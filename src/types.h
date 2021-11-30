@@ -460,6 +460,8 @@ typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
 
 typedef struct Darray Darray;
 
+typedef struct stdControlKeyInfoEntry stdControlKeyInfoEntry;
+
 #ifndef SDL2_RENDER
 typedef IDirectSoundBuffer stdSound_buffer_t;
 #else // OPENAL_SOUND
@@ -482,6 +484,7 @@ typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
 typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
 typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithActorInstinct *a3, int b, intptr_t a4);
+typedef int (*sithControlEnumFunc_t)(int a1, const char *a2, int a3, int a4, int a5, int a6, stdControlKeyInfoEntry* a7, void* a8);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)
@@ -2944,5 +2947,23 @@ typedef struct stdControlAxis
 #define AXIS_MOUSE_X         (12)
 #define AXIS_MOUSE_Y         (13)
 #define AXIS_MOUSE_Z         (14)
+
+typedef struct jkGuiMouseSubEntry
+{
+    int field_0;
+    int bitflag;
+    float field_8;
+} jkGuiMouseSubEntry;
+
+typedef struct jkGuiMouseEntry
+{
+    int bindIdx;
+    int mouseEntryIdx;
+    int dxKeyNum;
+    const char *displayStrKey;
+    int inputFuncIdx;
+    int flags;
+    jkGuiMouseSubEntry *pSubEnt;
+} jkGuiMouseEntry;
 
 #endif // TYPES_H

@@ -26,6 +26,84 @@
 #include <SDL2/SDL.h>
 #endif
 
+static const char *sithControl_aFunctionStrs[74] =
+{
+    "FORWARD",
+    "TURN",
+    "SLIDE",
+    "SLIDETOGGLE",
+    "JUMP",
+    "DUCK",
+    "FAST",
+    "SLOW",
+    "PITCH",
+    "CENTER",
+    "FIRE1",
+    "FIRE2",
+    "ACTIVATE",
+    "SELECT1",
+    "SELECT2",
+    "SELECT3",
+    "SELECT4",
+    "SELECT5",
+    "SELECT6",
+    "SELECT7",
+    "SELECT8",
+    "SELECT9",
+    "SELECT0",
+    "GAMESAVE",
+    "DEBUG",
+    "NEXTINV",
+    "PREVINV",
+    "USEINV",
+    "NEXTWEAPON",
+    "PREVWEAPON",
+    "NEXTSKILL",
+    "PREVSKILL",
+    "USESKILL",
+    "MAP",
+    "INCREASE",
+    "DECREASE",
+    "MLOOK",
+    "CAMERAMODE",
+    "TALK",
+    "GAMMA",
+    "SCREENSHOT",
+    "TALLY",
+    "ACTIVATE0",
+    "ACTIVATE1",
+    "ACTIVATE2",
+    "ACTIVATE3",
+    "ACTIVATE4",
+    "ACTIVATE5",
+    "ACTIVATE6",
+    "ACTIVATE7",
+    "ACTIVATE8",
+    "ACTIVATE9",
+    "ACTIVATE10",
+    "ACTIVATE11",
+    "ACTIVATE12",
+    "ACTIVATE13",
+    "ACTIVATE14",
+    "ACTIVATE15",
+    "ACTIVATE16",
+    "ACTIVATE17",
+    "ACTIVATE18",
+    "ACTIVATE19",
+    "ACTIVATE20",
+    "ACTIVATE21",
+    "ACTIVATE22",
+    "ACTIVATE23",
+    "ACTIVATE24",
+    "ACTIVATE25",
+    "ACTIVATE26",
+    "ACTIVATE27",
+    "ACTIVATE28",
+    "ACTIVATE29",
+    "ACTIVATE30",
+    "ACTIVATE31"
+};
+
 int sithControl_Initialize()
 {
     if ( sithControl_bInitted )
@@ -157,7 +235,7 @@ LABEL_14:
     }
 }
 
-void sithControl_MapFunc(int funcIdx, int keyNum, int flags)
+stdControlKeyInfoEntry* sithControl_MapFunc(int funcIdx, int keyNum, int flags)
 {
     int v3; // eax
     int v4; // edi
@@ -220,7 +298,10 @@ LABEL_14:
         v14->flags = a3a;
         v14->dxKeyNum = keyNum;
         sithControl_aInputFuncToKeyinfo[funcIdx].numEntries = v13 + 1;
+
+        return v14;
     }
+    return NULL;
 }
 
 stdControlKeyInfoEntry* sithControl_MapAxisFunc(int funcIdx, int dxKeyNum, uint32_t flags)
@@ -1412,6 +1493,182 @@ void sithControl_InputInit()
 void sithControl_sub_4D6930(int funcIdx)
 {
     sithControl_inputFuncToControlType[funcIdx] = 5;
+}
+
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5)
+{
+    stdControlKeyInfo *result; // eax
+    int v6; // ebp
+    int v7; // esi
+    stdControlKeyInfoEntry* v8; // eax
+    int v9; // edx
+    int v10; // ecx
+    int v11; // ebx
+    stdControlKeyInfoEntry *v12; // edi
+    void *v13; // edi
+    stdControlKeyInfoEntry *i; // [esp+10h] [ebp-1Ch]
+    unsigned int v16; // [esp+14h] [ebp-18h]
+    int v17; // [esp+18h] [ebp-14h]
+    int v18; // [esp+1Ch] [ebp-10h]
+    BOOL v19; // [esp+20h] [ebp-Ch]
+    stdControlKeyInfo *v20; // [esp+24h] [ebp-8h]
+    int v21; // [esp+28h] [ebp-4h]
+
+    result = sithControl_aInputFuncToKeyinfo;
+    v6 = 1;
+    v7 = 0;
+    v20 = sithControl_aInputFuncToKeyinfo;
+    for (int j = 0; j < 74; j++)
+    {
+        v18 = 0;
+        v19 = 0;
+        v17 = 0;
+        v21 = sithControl_inputFuncToControlType[v7] & 2;
+        v16 = 0;
+        v8 = &result->aEntries[0];
+        for ( i = v8; v16 < v20->numEntries; v8 = i )
+        {
+            v9 = v8->flags;
+            v10 = v8->dxKeyNum;
+            v11 = v8->flags & 2;
+            if ( (!v11 || v10 >= 256 || a2)
+              && (((v9 & 1) == 0 || v10 < 12) && (!v11 || v10 < 280 || v10 >= 284) || a4)
+              && (((v9 & 1) == 0 || v10 >= 12) && (!v11 || v10 < 256 || v10 >= 280) || a3) )
+            {
+                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], v16, v10, v9, v8, a5);
+                if ( v18 || (v12 = i, (i->dxKeyNum & 2) != 0) && (i->dxKeyNum & 4) == 0 )
+                {
+                    v12 = i;
+                    v18 = 1;
+                }
+                else
+                {
+                    v18 = 0;
+                }
+                v19 = v19 || (v12->dxKeyNum & 2) != 0 && (v12->dxKeyNum & 4) != 0;
+                if ( v17 || (v17 = 0, (v12->dxKeyNum & 1) != 0) )
+                    v17 = 1;
+            }
+            ++v16;
+            ++i;
+            if ( !v6 )
+                break;
+        }
+        if ( v6 && v21 && !v17 )
+        {
+            v13 = a5;
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 1, 0, a5);
+        }
+        else
+        {
+            v13 = a5;
+        }
+        if ( v6 && !v18 || !v20->numEntries )
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 2, 0, v13);
+        if ( v6 && v21 && !v19 )
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 6, 0, v13);
+        ++v7;
+        result = ++v20;
+    }
+    return result;
+}
+
+void sithControl_sub_4D7670()
+{
+    stdControlKeyInfo *v0; // edx
+    uint32_t v1; // ecx
+    uint32_t v2; // edi
+    int v3; // ebp
+    stdControlKeyInfoEntry *v4; // ebx
+    int v5; // esi
+    uint32_t v6; // eax
+    uint32_t v7; // ecx
+    stdControlKeyInfoEntry *v8; // eax
+    stdControlKeyInfoEntry *v9; // ebx
+    stdControlKeyInfoEntry *v10; // eax
+    stdControlKeyInfoEntry *v11; // eax
+    stdControlKeyInfoEntry *v12; // eax
+    uint32_t v13; // ebp
+    int v14; // edi
+    stdControlKeyInfo *v15; // esi
+    uint32_t v16; // eax
+    stdControlKeyInfoEntry *v17; // ecx
+    int v18; // ecx
+    uint32_t v19; // edx
+    uint32_t *v20; // edx
+    uint32_t *v21; // edi
+    stdControlKeyInfoEntry *v22; // eax
+    uint32_t v23; // ebp
+    int v24; // edi
+    stdControlKeyInfo *v25; // esi
+    unsigned int v26; // ecx
+    stdControlKeyInfoEntry *v27; // eax
+    stdControlKeyInfoEntry *v28; // eax
+    uint32_t v29; // ecx
+    stdControlKeyInfoEntry *v30; // eax
+    stdControlKeyInfoEntry *v31; // [esp+10h] [ebp-4h]
+
+    v0 = sithControl_aInputFuncToKeyinfo;
+    do
+    {
+        while ( 1 )
+        {
+            v1 = v0->numEntries;
+            v2 = 0;
+            v3 = 0;
+            if ( !v0->numEntries )
+                break;
+            v4 = v0->aEntries;
+            v31 = v0->aEntries;
+            while ( !v3 )
+            {
+                v5 = v4->dxKeyNum;
+                if ( (v4->flags & 1) == 0 && v5 >= 280 && v5 < 284 || (v4->flags & 1) != 0 && v5 >= DIK_MINUS && v5 <= DIK_BACK )
+                {
+                    v6 = v1 - 1;
+                    v7 = v2;
+                    v0->numEntries = v6;
+                    if ( v2 < v6 )
+                    {
+                        v8 = v4;
+                        do
+                        {
+                            v9 = v8;
+                            ++v7;
+                            ++v8;
+                            v9->dxKeyNum = v8->dxKeyNum;
+                            v9->flags = v8->flags;
+                            v9->binaryAxisVal = v8->binaryAxisVal;
+                        }
+                        while ( v7 < v0->numEntries );
+                        v4 = v31;
+                    }
+                    v3 = 1;
+                }
+                v1 = v0->numEntries;
+                ++v2;
+                v31 = ++v4;
+                if ( v2 >= v0->numEntries )
+                    goto LABEL_17;
+            }
+        }
+LABEL_17:
+        ;
+    }
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
+
+    v10 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, DIK_MINUS, 0xCu);
+    if ( v10 )
+        v10->binaryAxisVal = 0.40000001;
+    v11 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_EQUALS, 8u);
+    if ( v11 )
+        v11->binaryAxisVal = 0.30000001;
+    v12 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_BACK, 0);
+    if ( v12 )
+        v12->binaryAxisVal = 4.0;
+    sithControl_MapAxisFunc(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
+    sithControl_MapAxisFunc(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
+    sithControl_MapAxisFunc(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 }
 
 #ifdef SDL2_RENDER

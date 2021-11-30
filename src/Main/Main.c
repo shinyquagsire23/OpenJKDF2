@@ -219,10 +219,8 @@ int Main_Startup(const char *cmdline)
         jkGuiJoystick_Initialize(); // TODO
 #endif
         jkGuiDialog_Initialize();
-#ifndef LINUX_TMP
-        jkGuiMouse_Initialize(); // TODO
-        jkGuiControlOptions_Initialize(); // TODO
-#endif
+        jkGuiMouse_Initialize();
+        jkGuiControlOptions_Initialize();
         jkGuiObjectives_Initialize();
         jkGuiSingleTally_Initialize();
 #ifndef LINUX_TMP

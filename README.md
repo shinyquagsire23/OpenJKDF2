@@ -113,7 +113,8 @@ When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied th
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Input menu in Options (input bindings are loaded and written to config, though)
+ - Keyboard, Joystick menu in Setup > Controls (input bindings are still loaded and written to config, though)
+ - Load Configuration and Save Configuration in Setup > Controls > Options
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
    - Multiplayer character builder
@@ -246,6 +247,7 @@ rdCamera                       0xaa8      0.253%        100.000%       26 / 26
 jkGuiSaveLoad                  0xb21      0.264%        100.000%        9 / 9          
 rdPolyLine                     0xb42      0.267%        100.000%        6 / 6          
 rdVector                       0xd29      0.312%        100.000%       55 / 55         
+jkGuiMouse                     0xdb5      0.325%        100.000%       14 / 14         
 sithCogPlayer                  0xdf0      0.331%        100.000%       42 / 42         
 jkHudInv                       0xe43      0.338%        100.000%        9 / 9          
 sithCogSurface                 0xe92      0.346%        100.000%       38 / 38         
@@ -289,7 +291,7 @@ jkGuiMultiTally                0x8aa      0.206%        0.000%          0 / 7
 jkCredits                      0x8e4      0.211%        3.207%          1 / 6          
 jkGuiNet                       0x94e      0.221%        0.000%          0 / 10         
 stdColor                       0x97e      0.225%        24.198%         3 / 11         
-jkGame                         0x98f      0.227%        41.071%         7 / 13         
+jkGame                         0x98f      0.227%        42.705%         8 / 13         
 stdSound                       0x9bf      0.231%        11.222%         1 / 27         
 rdMaterial                     0xa2d      0.241%        78.081%         8 / 9          
 stdPalEffects                  0xa66      0.247%        85.875%        16 / 21         
@@ -298,7 +300,6 @@ jkGuiNetHost                   0xbc6      0.279%        0.000%          0 / 6
 sithMapView                    0xbf8      0.284%        20.790%         6 / 9          
 stdLbm                         0xc24      0.288%        0.000%          0 / 3          
 rdColormap                     0xcf4      0.307%        47.738%         7 / 12         
-jkGuiMouse                     0xdb5      0.325%        0.000%          0 / 14         
 DirectDraw                     0xdd4      0.328%        0.000%          0 / 16         
 jkEpisode                      0xdd9      0.329%        94.104%         7 / 10         
 stdPlatform                    0xdde      0.329%        13.437%        10 / 43         
@@ -332,7 +333,7 @@ sithMulti                      0x252a     0.882%        0.105%          1 / 35
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
 stdDisplay                     0x267b     0.913%        0.264%          2 / 37         
 sithCollision                  0x2827     0.953%        91.760%        18 / 22         
-sithControl                    0x285a     0.958%        79.845%        26 / 33         
+sithControl                    0x285a     0.958%        91.607%        28 / 33         
 std3D                          0x2c4a     1.051%        0.000%          0 / 39         
 rdCache                        0x331c     1.213%        43.557%        13 / 16         
 sithThing                      0x3c2e     1.428%        87.446%        45 / 53         
@@ -345,36 +346,36 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-43.258% by weight
-73.057% by weight excluding rasterizer
-2165 / 3169 functions
-2165 / 2798 functions excluding rasterizer
+43.700% by weight
+73.803% by weight excluding rasterizer
+2182 / 3169 functions
+2182 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           3.063%          165 / 1323
+sith           2.950%          163 / 1323
 stdPlatform    0.285%           33 / 43
 std            4.007%          157 / 359
-jkGui          3.465%          119 / 284
+jkGui          3.140%          105 / 284
 rd             2.960%           31 / 345
-jk             0.792%           63 / 324
+jk             0.788%           62 / 324
 Raster         40.778%         370 / 371
 other          1.393%           66 / 120
 -----------------------------------------
-total          56.742%        1004 / 3169
+total          56.300%         987 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           5.173%          165 / 1323
+sith           4.983%          163 / 1323
 stdPlatform    0.481%           33 / 43
 std            6.767%          157 / 359
-jkGui          5.853%          119 / 284
+jkGui          5.303%          105 / 284
 rd             4.998%           31 / 345
-jk             1.337%           63 / 324
+jk             1.331%           62 / 324
 other          2.353%           66 / 120
 -----------------------------------------
-total          26.961%         634 / 2798
+total          26.216%         617 / 2798
 
 ```

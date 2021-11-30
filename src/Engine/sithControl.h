@@ -129,7 +129,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs);
 void sithControl_PlayerMovement(sithThing *player);
 void sithControl_FreeCam(sithThing *player);
 
-void sithControl_MapFunc(int funcIdx, int keyNum, int flags);
+stdControlKeyInfoEntry* sithControl_MapFunc(int funcIdx, int keyNum, int flags);
 stdControlKeyInfoEntry* sithControl_MapAxisFunc(int funcIdx, int dxKeyNum, uint32_t flags);
 void sithControl_ShiftFuncKeyinfo(int funcIdx, unsigned int idx);
 void sithControl_MapFuncToDxKey(int funcIdx, int dxKeyNum);
@@ -146,6 +146,11 @@ float sithControl_GetAxis(int funcIdx);
 int sithControl_ReadFunctionMap(int func, int* out);
 
 void sithControl_sub_4D6930(int a);
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5);
+void sithControl_sub_4D7670();
+
+//static stdControlKeyInfo* (*sithControl_EnumBindings)(sithControlEnumFunc_t func, int a2, int a3, int a4, int a5) = (void*)sithControl_EnumBindings_ADDR;
+//static void (*sithControl_sub_4D7670)() = (void*)sithControl_sub_4D7670_ADDR;
 //static int (*sithControl_HandlePlayer)(sithThing *a1, float a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;

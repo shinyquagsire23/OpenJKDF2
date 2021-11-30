@@ -80,14 +80,15 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     {
         if ( !jkGuiSaveLoad_numEntries )
         {
+            // Added: this area had weird sizes with jkGuiSaveLoad_wtextShields and jkGuiSaveLoad_wtextHealth 
             _wcsncpy(jkGuiSaveLoad_wtextEpisode, jkGuiSaveLoad_word_559C54, 0xFFu);
             jkGuiSaveLoad_wtextEpisode[255] = 0;
             _wcsncpy(jkGuiSaveLoad_wtextSaveName, &jkGuiSaveLoad_word_559C54[2], 0xFFu);
             jkGuiSaveLoad_wtextSaveName[255] = 0;
-            _wcsncpy(jkGuiSaveLoad_wtextHealth, &jkGuiSaveLoad_word_559C54[4], 0xFFu);
-            jkGuiSaveLoad_word_559830[123] = 0;
-            _wcsncpy(jkGuiSaveLoad_wtextShields, &jkGuiSaveLoad_word_559C54[6], 0xFFu);
-            jkGuiSaveLoad_word_559830[191] = 0;
+            _wcsncpy(jkGuiSaveLoad_wtextHealth, &jkGuiSaveLoad_word_559C54[4], 63);
+            jkGuiSaveLoad_wtextHealth[63] = 0;
+            _wcsncpy(jkGuiSaveLoad_wtextShields, &jkGuiSaveLoad_word_559C54[6], 63);
+            jkGuiSaveLoad_wtextShields[63] = 0;
             return;
         }
         entry = (jkGuiSaveLoad_Entry *)jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, jkGuiSaveLoad_aElements[4].selectedTextEntry);
