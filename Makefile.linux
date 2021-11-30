@@ -13,10 +13,12 @@ ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar
 
+OPENJKDF2_NO_ASAN := 1
+
 # Optional: Use JK.EXE as a binary blob for unimplemented functions
 ifneq ($(OPENJKDF2_USE_BLOBS), 1)
-	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
-	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -DLINUX_TMP
+	CFLAGS += -DLINUX_TMP
+	LDFLAGS += -DLINUX_TMP
 	CFLAGS += -DNO_JK_MMAP
 	LDFLAGS += -DNO_JK_MMAP
 endif
