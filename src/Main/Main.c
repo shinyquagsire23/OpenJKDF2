@@ -56,7 +56,11 @@
 #include "Engine/rdroid.h"
 #include "Engine/sith.h"
 
-#if defined(MACOS) && defined(SDL2_RENDER)
+#if defined(PLATFORM_POSIX)
+#include <locale.h>
+#endif
+
+#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
 #include <SDL2/SDL.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -68,6 +72,9 @@ static common_functions hs;
 int Main_Startup(const char *cmdline)
 {
     int result; // eax
+
+    // Make sure floating point stuff is using . and not ,
+    setlocale(LC_NUMERIC, "C");
 
     // TODO bring this to Windows (%appdata%) and Linux
 #if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
