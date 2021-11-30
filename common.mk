@@ -16,6 +16,10 @@ SYMBOLS_FILE := $(ROOT_DIR)/symbols.syms
 # Common flag configs
 #
 
+ifeq ($(OPENJKDF2_USE_BLOBS), 1)
+	OPENJKDF2_NO_ASAN := 1
+endif
+
 # 64-bit cannot use JK.EXE as a binary blob
 ifneq ($(OPENJKDF2_NO_ASAN), 1)
 ifneq ($(OPENJKDF2_USE_BLOBS), 1)
