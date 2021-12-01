@@ -128,6 +128,8 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         }
         while ( v4 < gob->numFiles );
     }
+
+    jk_printf("Loaded GOB file `%s`...\n", fname);
     
     return 1;
 }
