@@ -939,6 +939,7 @@ void do_hooks()
     hook_function(rdActive_AdvanceFrame_ADDR, rdActive_AdvanceFrame);
     hook_function(rdActive_ClearFrameCounters_ADDR, rdActive_ClearFrameCounters);
     
+#if 0
     // rdKeyframe
     hook_function(rdKeyframe_RegisterLoader_ADDR, rdKeyframe_RegisterLoader);
     hook_function(rdKeyframe_RegisterUnloader_ADDR, rdKeyframe_RegisterUnloader);
@@ -948,6 +949,7 @@ void do_hooks()
     hook_function(rdKeyframe_Write_ADDR, rdKeyframe_Write);
     hook_function(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
     hook_function(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
+#endif
     
     // rdLight
     hook_function(rdLight_New_ADDR, rdLight_New);
@@ -1080,7 +1082,8 @@ void do_hooks()
     hook_function(rdParticle_LoadEntry_ADDR, rdParticle_LoadEntry);
     hook_function(rdParticle_Write_ADDR, rdParticle_Write);
     hook_function(rdParticle_Draw_ADDR, rdParticle_Draw);
-    
+
+#if 0
     // rdPuppet
     hook_function(rdPuppet_BuildJointMatrices_ADDR, rdPuppet_BuildJointMatrices);
     //hook_function(rdPuppet_UpdateTracks_ADDR, rdPuppet_UpdateTracks);
@@ -1094,6 +1097,7 @@ void do_hooks()
     hook_function(rdPuppet_unk_ADDR, rdPuppet_unk);
     //hook_function(rdPuppet_AdvanceTrack_ADDR, rdPuppet_AdvanceTrack);
     hook_function(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
+#endif
     
     // rdSprite
     hook_function(rdSprite_New_ADDR, rdSprite_New);
@@ -1295,7 +1299,17 @@ void do_hooks()
     hook_function(sithRenderSky_TransformVertical_ADDR, sithRenderSky_TransformVertical);
     hook_function(sithAIAwareness_AddEntry_ADDR, sithAIAwareness_AddEntry);
     hook_function(sithPhysics_ThingGetInsertOffsetZ_ADDR, sithPhysics_ThingGetInsertOffsetZ);
+    hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
+
+#if 0
     hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
+    hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
+    hook_function(sithDSSThing_HandleSyncThingFull_ADDR, sithDSSThing_HandleSyncThingFull);
+    hook_function(sithDSSThing_HandlePlaySoundPos_ADDR, sithDSSThing_HandlePlaySoundPos);
+    hook_function(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
+#endif
+
+#if 0
     hook_function(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
     hook_function(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI);
     hook_function(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface);
@@ -1306,9 +1320,6 @@ void do_hooks()
     hook_function(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
     hook_function(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
     hook_function(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
-    hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
-    hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
-    hook_function(sithDSSThing_HandleSyncThingFull_ADDR, sithDSSThing_HandleSyncThingFull);
     hook_function(sithDSS_HandleSyncPuppet_ADDR, sithDSS_HandleSyncPuppet);
     hook_function(sithDSS_HandleSyncAI_ADDR, sithDSS_HandleSyncAI);
     hook_function(sithDSS_HandleSyncSurface_ADDR, sithDSS_HandleSyncSurface);
@@ -1318,9 +1329,8 @@ void do_hooks()
     hook_function(sithDSS_HandleSyncTimers_ADDR, sithDSS_HandleSyncTimers);
     hook_function(sithDSS_HandleSyncPalEffects_ADDR, sithDSS_HandleSyncPalEffects);
     hook_function(sithDSS_HandleSyncCameras_ADDR, sithDSS_HandleSyncCameras);
-    hook_function(sithDSSThing_HandlePlaySoundPos_ADDR, sithDSSThing_HandlePlaySoundPos);
     hook_function(sithDSS_HandleMisc_ADDR, sithDSS_HandleMisc);
-    hook_function(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
+#endif
     
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
@@ -1679,12 +1689,14 @@ void do_hooks()
     hook_function(sithTimer_RegisterFunc_ADDR, sithTimer_RegisterFunc);
     hook_function(sithTimer_Advance_ADDR, sithTimer_Advance);
     
+#if 0
     // sithKeyFrame
     hook_function(sithKeyFrame_Load_ADDR, sithKeyFrame_Load);
     hook_function(sithKeyFrame_GetByIdx_ADDR, sithKeyFrame_GetByIdx);
     hook_function(sithKeyFrame_LoadEntry_ADDR, sithKeyFrame_LoadEntry);
     hook_function(sithKeyFrame_New_ADDR, sithKeyFrame_New);
     hook_function(sithKeyFrame_Free_ADDR, sithKeyFrame_Free);
+#endif
     
     // sithSprite
     hook_function(sithSprite_Startup_ADDR, sithSprite_Startup);
@@ -1728,6 +1740,7 @@ void do_hooks()
     hook_function(sithParticle_FreeEntry_ADDR, sithParticle_FreeEntry);
     hook_function(sithParticle_Free_ADDR, sithParticle_Free);
     
+#if 0
     // sithPuppet
     hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
     hook_function(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
@@ -1735,7 +1748,8 @@ void do_hooks()
     hook_function(sithPuppet_DefaultCallback_ADDR, sithPuppet_DefaultCallback);
     hook_function(sithPuppet_StopKey_ADDR, sithPuppet_StopKey);
     hook_function(sithPuppet_SetArmedMode_ADDR, sithPuppet_SetArmedMode);
-    
+#endif
+
     // sithRender
     hook_function(sithRender_Startup_ADDR, sithRender_Startup);
     hook_function(sithRender_Open_ADDR, sithRender_Open);
@@ -2244,7 +2258,85 @@ void do_hooks()
     hook_function_inv(sithCollision_sub_4E77A0_ADDR, sithCollision_sub_4E77A0);
     hook_function_inv(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
 #endif
+
+#if 0
+    hook_function_inv(rdPuppet_New_ADDR, rdPuppet_New);
+    hook_function_inv(rdPuppet_Free_ADDR, rdPuppet_Free);
+    hook_function_inv(rdPuppet_BuildJointMatrices_ADDR, rdPuppet_BuildJointMatrices);
+    hook_function_inv(rdPuppet_ResetTrack_ADDR, rdPuppet_ResetTrack);
+    hook_function_inv(rdPuppet_UpdateTracks_ADDR, rdPuppet_UpdateTracks);
+    hook_function_inv(rdPuppet_AddTrack_ADDR, rdPuppet_AddTrack);
+    hook_function_inv(rdPuppet_SetCallback_ADDR, rdPuppet_SetCallback);
+    hook_function_inv(rdPuppet_FadeInTrack_ADDR, rdPuppet_FadeInTrack);
+    hook_function_inv(rdPuppet_AdvanceTrack_ADDR, rdPuppet_AdvanceTrack);
+    hook_function_inv(rdPuppet_FadeOutTrack_ADDR, rdPuppet_FadeOutTrack);
+    hook_function_inv(rdPuppet_SetTrackSpeed_ADDR, rdPuppet_SetTrackSpeed);
+    hook_function_inv(rdPuppet_SetStatus_ADDR, rdPuppet_SetStatus);
+    hook_function_inv(rdPuppet_PlayTrack_ADDR, rdPuppet_PlayTrack);
+    hook_function_inv(rdPuppet_unk_ADDR, rdPuppet_unk);
+    hook_function_inv(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
+#endif
+
+#if 0
+    hook_function_inv(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface);
+    hook_function_inv(sithDSS_HandleSyncSurface_ADDR, sithDSS_HandleSyncSurface);
+    hook_function_inv(sithDSS_SendSyncSector_ADDR, sithDSS_SendSyncSector);
+    hook_function_inv(sithDSS_HandleSyncSector_ADDR, sithDSS_HandleSyncSector);
+// syncsectoralt
+    hook_function_inv(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI);
+    hook_function_inv(sithDSS_HandleSyncAI_ADDR, sithDSS_HandleSyncAI);
+    hook_function_inv(sithDSS_SendSyncItemDesc_ADDR, sithDSS_SendSyncItemDesc);
+    hook_function_inv(sithDSS_HandleSyncItemDesc_ADDR, sithDSS_HandleSyncItemDesc);
+    hook_function_inv(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim);
+    hook_function_inv(sithDSS_HandleStopAnim_ADDR, sithDSS_HandleStopAnim);
+    hook_function_inv(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
+    hook_function_inv(sithDSS_HandleSyncPuppet_ADDR, sithDSS_HandleSyncPuppet);
+    hook_function_inv(sithDSS_SendSyncTimers_ADDR, sithDSS_SendSyncTimers);
+    hook_function_inv(sithDSS_HandleSyncTimers_ADDR, sithDSS_HandleSyncTimers);
+    hook_function_inv(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
+    hook_function_inv(sithDSS_HandleSyncPalEffects_ADDR, sithDSS_HandleSyncPalEffects);
+    hook_function_inv(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
+    hook_function_inv(sithDSS_HandleSyncCameras_ADDR, sithDSS_HandleSyncCameras);
+    hook_function_inv(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
+    hook_function_inv(sithDSS_HandleMisc_ADDR, sithDSS_HandleMisc);
     
+    hook_function_inv(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
+    hook_function_inv(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
+    hook_function_inv(sithDSSThing_HandleSyncThingFull_ADDR, sithDSSThing_HandleSyncThingFull);
+    hook_function_inv(sithDSSThing_HandlePlaySoundPos_ADDR, sithDSSThing_HandlePlaySoundPos);
+    hook_function_inv(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
+    
+    hook_function_inv(sithPuppet_Startup_ADDR, sithPuppet_Startup);
+    hook_function_inv(sithPuppet_NewEntry_ADDR, sithPuppet_NewEntry);
+    hook_function_inv(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
+    hook_function_inv(sithPuppet_sub_4E4760_ADDR, sithPuppet_sub_4E4760);
+    hook_function_inv(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
+    hook_function_inv(sithPuppet_StartKey_ADDR, sithPuppet_StartKey);
+    hook_function_inv(sithPuppet_ResetTrack_ADDR, sithPuppet_ResetTrack);
+    hook_function_inv(sithPuppet_Tick_ADDR, sithPuppet_Tick);
+    hook_function_inv(sithPuppet_sub_4E4380_ADDR, sithPuppet_sub_4E4380);
+    hook_function_inv(sithPuppet_sub_4E4A20_ADDR, sithPuppet_sub_4E4A20);
+    hook_function_inv(sithPuppet_DefaultCallback_ADDR, sithPuppet_DefaultCallback);
+    hook_function_inv(sithPuppet_StopKey_ADDR, sithPuppet_StopKey);
+    hook_function_inv(sithPuppet_SetArmedMode_ADDR, sithPuppet_SetArmedMode);
+#endif
+
+#if 0
+    hook_function_inv(sithKeyFrame_Load_ADDR, sithKeyFrame_Load);
+    hook_function_inv(sithKeyFrame_GetByIdx_ADDR, sithKeyFrame_GetByIdx);
+    hook_function_inv(sithKeyFrame_LoadEntry_ADDR, sithKeyFrame_LoadEntry);
+    hook_function_inv(sithKeyFrame_New_ADDR, sithKeyFrame_New);
+    hook_function_inv(sithKeyFrame_Free_ADDR, sithKeyFrame_Free);
+    
+    hook_function_inv(rdKeyframe_RegisterLoader_ADDR, rdKeyframe_RegisterLoader);
+    hook_function_inv(rdKeyframe_RegisterUnloader_ADDR, rdKeyframe_RegisterUnloader);
+    hook_function_inv(rdKeyframe_NewEntry_ADDR, rdKeyframe_NewEntry);
+    hook_function_inv(rdKeyframe_Load_ADDR, rdKeyframe_Load);
+    hook_function_inv(rdKeyframe_LoadEntry_ADDR, rdKeyframe_LoadEntry);
+    hook_function_inv(rdKeyframe_Write_ADDR, rdKeyframe_Write);
+    hook_function_inv(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
+    hook_function_inv(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
+#endif
 #endif
 }
 #endif // WIN64_STANDALONE

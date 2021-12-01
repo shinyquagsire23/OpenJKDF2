@@ -193,16 +193,6 @@ int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, 
     int trackNum; // esi
     signed int result; // eax
 
-#if 0
-    // sithPuppet_sub_4E4380 599
-    // sithPuppet_sub_4E4A20 648
-    if (puppet->rdthing->parentSithThing == g_localPlayerThing) {
-        printf("startkey %x %x %x\n", keyframe, a3, a4);
-        //*(uint32_t*)0x12345 = 0x54321;
-        //return -1;
-    }
-#endif
-
     v6 = 1;
     if ( (a5 & 8) != 0 )
     {

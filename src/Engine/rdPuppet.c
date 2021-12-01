@@ -76,7 +76,6 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     double v33; // st7
     double v35; // rtt
     double v36; // st4
-    double v40; // st6
     float v42; // edx
     double v44; // st4
     double v45; // st7
@@ -170,12 +169,6 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             ++v4;
         }
 
-        if (thing->parentSithThing == g_localPlayerThing)
-        {
-            //puppet->tracks[0].playSpeed = 0.0;
-            //puppet->tracks[2].playSpeed = 1.0;
-        }
-
         for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
         {
             v15 = &model->hierarchyNodes[v80];
@@ -238,9 +231,12 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 tmp1.x = stdMath_NormalizeAngleAcute(tmp1.x);
                                 tmp1.y = stdMath_NormalizeAngleAcute(tmp1.y);
                                 tmp1.z = stdMath_NormalizeAngleAcute(tmp1.z);
-                                if ( v18 < v75 ) // TODO verify
+                                if ( v16->playSpeed <= 1.0 )
                                 {
-                                    v40 = v16->playSpeed;
+                                    // Added: Make sure anims don't leak in blending
+                                    if (v16->playSpeed < 0.0)
+                                        v16->playSpeed = 0.0;
+
                                     rdVector_Scale3Acc(&v89, v16->playSpeed);
                                     rdVector_Scale3Acc(&tmp1, v16->playSpeed);
                                 }
@@ -316,16 +312,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             a3.z = stdMath_NormalizeAngleAcute(a3.z);
             rdVector_Add3Acc(&a4, &v15->pos);
             rdVector_Add3Acc(&a3, &v15->rot);
-#if 0
-            if (thing->parentSithThing == g_localPlayerThing)
-            {
-                if (v80 == 0) {
-                    printf("%x: %f %f %f, %f %f %f, %f %f %f %x - %x %f %x %f %x %f %x %f\n", v80, a4.x, a4.y, a4.z, v89.x, v89.y, v89.z, v70, v71, v75, v19, puppet->tracks[0].keyframe, puppet->tracks[0].playSpeed, puppet->tracks[1].status, puppet->tracks[1].playSpeed, puppet->tracks[2].status, puppet->tracks[2].playSpeed, puppet->tracks[3].status, puppet->tracks[3].playSpeed);
-                }
-                //rdVector_Zero3(&a4);
-            }
-#endif
-                //
+
             rdMatrix_Build34(&thing->hierarchyNodeMatrices[v80], &a3, &a4);
             v61 = &thing->hierarchyNodes2[v80];
             if ( !rdVector_IsZero3(v61) )
@@ -347,9 +334,9 @@ int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
     return 1;
 }
 
-int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
+int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
 {
-    //return _rdPuppet_UpdateTracks(puppet, a2);
+    //return _rdPuppet_UpdateTracks(puppet, deltaSeconds);
     
     rdPuppetTrack *v3; // esi
     int v13; // [esp+14h] [ebp-4h]
@@ -372,12 +359,12 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
         ++v13;
         if ( (track->status & 0x10) == 0 )
         {
-            rdPuppet_AdvanceTrack(puppet, v2, track->speed * a2);
+            rdPuppet_AdvanceTrack(puppet, v2, track->speed * deltaSeconds);
         }
 
         if (track->status & 4)
         {
-            track->playSpeed += track->fadeSpeed * a2;
+            track->playSpeed += track->fadeSpeed * deltaSeconds;
             if ( track->playSpeed >= 1.0 ) // TODO verify
             {
                 //printf("asdf1\n");
@@ -387,7 +374,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float a2)
         }
         else if (track->status & 8)
         {
-            track->playSpeed -= track->fadeSpeed * a2;
+            track->playSpeed -= track->fadeSpeed * deltaSeconds;
             if ( track->playSpeed <= 0.0 ) // TODO verify
             {
                 //printf("asdf2\n");
@@ -434,6 +421,9 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
         if ( !puppet->tracks[newTrackIdx].status )
             break;
     }
+    
+    if (puppet->rdthing->parentSithThing == g_localPlayerThing)
+        printf("try play new track at %x\n", newTrackIdx);
 
     if ( newTrackIdx >= 4 )
     {
@@ -456,6 +446,9 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
         if ( newTrackIdx >= 4 )
             return -1;
     }
+    
+    if (puppet->rdthing->parentSithThing == g_localPlayerThing)
+        printf("play new track at %x\n", newTrackIdx);
     newTrack = &puppet->tracks[newTrackIdx];
     newTrack->speed = keyframe->fps;
     newTrack->keyframe = keyframe;

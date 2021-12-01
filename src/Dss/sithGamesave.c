@@ -13,6 +13,7 @@
 #include "Engine/sithTimer.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithNet.h"
+#include "Engine/sithAnimClass.h"
 #include "General/sithStrTable.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
