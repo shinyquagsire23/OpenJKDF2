@@ -409,21 +409,12 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     unsigned int result; // eax
     rdPuppetTrack *newTrack; // edx
 
-#if 0
-    if (puppet->rdthing->parentSithThing == g_localPlayerThing) {
-        printf("%x %x %x\n", keyframe, lowPri, highPri);
-    }
-#endif
-
     v4 = puppet->tracks;
     for (newTrackIdx = 0; newTrackIdx < 4; newTrackIdx++)
     {
         if ( !puppet->tracks[newTrackIdx].status )
             break;
     }
-    
-    if (puppet->rdthing->parentSithThing == g_localPlayerThing)
-        printf("try play new track at %x\n", newTrackIdx);
 
     if ( newTrackIdx >= 4 )
     {
@@ -447,8 +438,6 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
             return -1;
     }
     
-    if (puppet->rdthing->parentSithThing == g_localPlayerThing)
-        printf("play new track at %x\n", newTrackIdx);
     newTrack = &puppet->tracks[newTrackIdx];
     newTrack->speed = keyframe->fps;
     newTrack->keyframe = keyframe;
