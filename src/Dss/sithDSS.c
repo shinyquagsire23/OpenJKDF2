@@ -851,8 +851,8 @@ int sithDSS_HandleSyncPuppet(sithCogMsg *msg)
         {
             int idx = NETMSG_POPS32();
             rdpuppet->tracks[i].keyframe = sithKeyFrame_GetByIdx(idx);
-            if (rdpuppet->tracks[i].keyframe)
-                rdpuppet->tracks[i].keyframe->id = idx;
+            //if (rdpuppet->tracks[i].keyframe)
+            //    rdpuppet->tracks[i].keyframe->id = idx;
             rdpuppet->tracks[i].field_4 = NETMSG_POPS32();
             rdpuppet->tracks[i].lowPri = (int)NETMSG_POPS16();
             rdpuppet->tracks[i].highPri = (int)NETMSG_POPS16();

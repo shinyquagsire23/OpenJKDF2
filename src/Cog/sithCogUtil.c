@@ -520,7 +520,10 @@ void sithCogUtil_GetKeyLen(sithCog *ctx)
     rdKeyframe* keyframe = sithCogVm_PopKeyframe(ctx);
 
     if (!keyframe || keyframe->fps == 0.0)
+    {
         sithCogVm_PushFlex(ctx, 0.0);
+        return;
+    }
 
     sithCogVm_PushFlex(ctx, (double)keyframe->numFrames / keyframe->fps);
 }

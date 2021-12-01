@@ -396,11 +396,22 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
         case COG_TYPE_KEYFRAME:
             cogSymbol->val.type = COG_VARTYPE_INT;
             v17 = sithKeyFrame_LoadEntry(val);
+            
             if ( !v17 )
             {
                 cogSymbol->val.data[0] = -1;
                 return 0;
             }
+
+            // HACK HACK HACK HACK HACK somehow some keyframes aren't being set correctly?
+            if (!(v17->id & 0x8000)) {
+                v17->id = (v17 - sithWorld_pCurWorld->keyframes) & 0xFFFF;
+                if (v17->id >= 0x8000)
+                {
+                    v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
+                }
+            }
+
             cogSymbol->val.data[0] = v17->id;
             return 1;
         case COG_TYPE_SOUND:

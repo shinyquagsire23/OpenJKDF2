@@ -742,13 +742,14 @@ sithCog* sithCogVm_PopCog(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         cogIdx = (int)tmp.dataAsFloat[0];
-        if (cogIdx == -1)
-            return NULL;
     }
     else
     {
         cogIdx = -1;
     }
+
+    if (cogIdx == -1)
+        return NULL;
     
     if ( (uint16_t)cogIdx & 0x8000 )
     {
@@ -780,13 +781,14 @@ sithThing* sithCogVm_PopThing(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( world && idx >= 0 && idx < world->numThings )
     {
@@ -817,13 +819,14 @@ sithThing* sithCogVm_PopTemplate(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
 
     return sithTemplate_GetEntryByIdx(idx);
 }
@@ -847,13 +850,14 @@ sithSound* sithCogVm_PopSound(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( idx & 0x8000 )
     {
@@ -888,13 +892,14 @@ sithSector* sithCogVm_PopSector(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( world && idx >= 0 && idx < world->numSectors )
     {
@@ -923,13 +928,14 @@ sithSurface* sithCogVm_PopSurface(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( world && idx >= 0 && idx < world->numSurfaces )
     {
@@ -959,13 +965,14 @@ rdMaterial* sithCogVm_PopMaterial(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( idx & 0x8000 )
     {
@@ -1000,13 +1007,14 @@ rdModel3* sithCogVm_PopModel3(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( idx & 0x8000 )
     {
@@ -1041,20 +1049,21 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
         idx &= ~0x8000; // ?
     }
-    
+
     if ( world && idx >= 0 && idx < world->numKeyframesLoaded )
         return &world->keyframes[idx];
 
@@ -1080,13 +1089,14 @@ sithAIClass* sithCogVm_PopAIClass(sithCog *ctx)
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
         idx = (int)(double)tmp.dataAsFloat[0];
-        if (idx == -1)
-            return NULL;
     }
     else
     {
         idx = -1;
     }
+
+    if (idx == -1)
+        return NULL;
     
     if ( world && idx >= 0 && idx < world->numAIClassesLoaded )
         return &world->aiclasses[idx];

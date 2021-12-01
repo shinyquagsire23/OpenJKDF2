@@ -46,7 +46,7 @@
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
-#define TICKRATE_MS (1) // no cap
+#define TICKRATE_MS (0) // no cap
 #else
 #define TICKRATE_MS (20) // 50fps
 #endif

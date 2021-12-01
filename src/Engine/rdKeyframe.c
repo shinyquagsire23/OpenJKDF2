@@ -115,7 +115,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (!joints)
       goto read_fail;
 
-    _memset(joints, 0, sizeof(rdJoint) * keyframe->numJoints);
+    _memset(joints, 0, sizeof(rdJoint) * (keyframe->numJoints+1));
     keyframe->numJoints2 = keyframe->numJoints;
 
     if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)
@@ -212,10 +212,11 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             anim_entry->orientation = orientation;
             
             if (!stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " %f %f %f %f %f %f", &vel, &vel.y, &vel.z, &angVel, &angVel.y, &angVel.z) != 6)
+              || _sscanf(stdConffile_aLine, " %f %f %f %f %f %f", &vel.x, &vel.y, &vel.z, &angVel.x, &angVel.y, &angVel.z) != 6)
             {
               goto read_fail;
             }
+
             anim_entry->vel = vel;
             anim_entry->angVel = angVel;
             anim_entry++;

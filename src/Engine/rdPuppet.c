@@ -77,7 +77,6 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     double v35; // rtt
     double v36; // st4
     float v42; // edx
-    double v44; // st4
     double v45; // st7
     double v46; // st7
     double v48; // st5
@@ -118,6 +117,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     else
     {
         v4 = puppet->tracks;
+        //if (thing->parentSithThing == g_localPlayerThing)
+        //    printf("%s\n", v4->keyframe->name);
         for (int i = 0; i < 4; i++)
         {
             // Added: joints check
@@ -194,8 +195,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 v17 = v16->keyframe;
                 if ( v17 )
                 {
-                    v18 = (v17->type & v15->type) != 0 ? v16->highPri : v16->lowPri;
-                    if ( (v16->status & 2) != 0 )
+                    v18 = (v17->type & v15->type) ? v16->highPri : v16->lowPri;
+                    if (v16->status & 2)
                     {
                         v19 = v15->idx;
                         v20 = &v17->joints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
@@ -226,7 +227,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 {
                                     rdVector_Copy3(&tmp1, &v24->orientation);
                                 }
-                                rdVector_Sub3Acc(&v89, &v15->pos.x);
+                                rdVector_Sub3Acc(&v89, &v15->pos);
                                 rdVector_Sub3Acc(&tmp1, &v15->rot);
                                 tmp1.x = stdMath_NormalizeAngleAcute(tmp1.x);
                                 tmp1.y = stdMath_NormalizeAngleAcute(tmp1.y);
@@ -244,7 +245,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 {
                                     rdVector_Add3Acc(&a4, &v89);
                                     rdVector_Add3Acc(&a3, &tmp1);
-                                    v70 = v70 + v16->playSpeed;
+                                    v70 += v16->playSpeed;
                                 }
                                 else if ( v18 <= v75 )
                                 {
@@ -252,15 +253,12 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                     {
                                         rdVector_Add3Acc(&v90, &v89);
                                         rdVector_Add3Acc(&v91, &tmp1);
-                                        v44 = v71 + v16->playSpeed;
-                                        v71 = v44;
+                                        v71 += v16->playSpeed;
                                     }
                                     else
                                     {
                                         v90 = v89;
-                                        v91.x = tmp1.x;
-                                        v91.y = tmp1.y;
-                                        v91.z = tmp1.z;
+                                        rdVector_Copy3(&v91, &tmp1);
                                         v71 = v16->playSpeed;
                                         v73 = v18;
                                     }
@@ -272,10 +270,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                     v71 = v70;
                                     v73 = v75;
                                     a4 = v89;
-                                    a3.x = tmp1.x;
                                     v75 = v18;
-                                    a3.y = tmp1.y;
-                                    a3.z = tmp1.z;
+                                    rdVector_Copy3(&a3, &tmp1);
                                     v70 = v16->playSpeed;
                                 }
                             }

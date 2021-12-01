@@ -105,10 +105,11 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
         return NULL;
 
     keyframe->id = world->numKeyframesLoaded;
-    if (world->level_type_maybe & 1) // static
+    if (world->level_type_maybe & 1 || world == sithWorld_pStatic) // Added: check world ptr just in case?
     {
         keyframe->id |= 0x8000;
     }
+
     stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
     ++world->numKeyframesLoaded;
     return keyframe;
