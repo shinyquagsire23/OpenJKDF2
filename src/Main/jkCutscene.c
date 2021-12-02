@@ -20,6 +20,10 @@
 
 #include "../jk.h"
 
+#ifdef LINUX
+#include "external/fcaseopen/fcaseopen.h"
+#endif
+
 static smk jkCutscene_smk;
 static double jkCutscene_smk_usf;
 static unsigned long jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
@@ -104,7 +108,16 @@ int jkCutscene_sub_421310(char* fpath)
     {
         *(uint8_t*)(jkCutscene_palette+i) = i & 0xFF;
     }
-    
+
+#ifdef LINUX
+    char *r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+#endif
+
     jkCutscene_smk = smk_open_file(tmp, SMK_MODE_MEMORY);
     if (!jkCutscene_smk)
     {

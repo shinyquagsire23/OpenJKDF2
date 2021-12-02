@@ -11,6 +11,10 @@
 #include "World/jkPlayer.h"
 #include "Main/jkEpisode.h"
 
+#ifdef LINUX
+#include "external/fcaseopen/fcaseopen.h"
+#endif
+
 void jkSmack_Initialize()
 {
     jkSmack_bInit = 1;
@@ -47,6 +51,16 @@ int jkSmack_SmackPlay(const char *fname)
         return 1;
     }
     _sprintf(std_genBuffer, "video%c%s", '\\', fname);
+
+#ifdef LINUX
+    char *r = malloc(strlen(std_genBuffer) + 16);
+    if (casepath(std_genBuffer, r))
+    {
+        strcpy(std_genBuffer, r);
+    }
+    free(r);
+#endif
+
     if ( !util_FileExists(std_genBuffer) )
     {
         if ( jkGuiRend_thing_five )
