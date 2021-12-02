@@ -250,7 +250,7 @@ int stdFileUtil_MkDir(char* path)
     }
 #endif
 
-    mkdir(path, 0777);
+    mkdir(tmp, 0777);
 
     return 1;
 }
