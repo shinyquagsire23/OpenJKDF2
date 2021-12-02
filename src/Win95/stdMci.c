@@ -2,6 +2,10 @@
 
 #include "jk.h"
 
+#ifdef LINUX
+#include "external/fcaseopen/fcaseopen.h"
+#endif
+
 #ifndef SDL2_RENDER
 
 int stdMci_Startup()
@@ -216,6 +220,16 @@ void stdMci_trackStart(int track)
     char tmp[256];
     
     snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+
+#ifdef LINUX
+    char *r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+#endif
+
     if (stdMci_music)
         Mix_FreeMusic(stdMci_music);
 

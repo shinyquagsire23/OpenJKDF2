@@ -66,6 +66,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     {
         strcpy(tmp_filepath, r);
     }
+    free(r);
 #endif
 
     FILE* f = fopen(tmp_filepath, "r");

@@ -236,6 +236,7 @@ char* stdFnames_MakePath(char *a1, int a2, char *a3, char *a4)
     {
         strcpy(a1, r);
     }
+    free(r);
 #endif
 
     _strncat(a1, a4, a2 - v4 - 1);
