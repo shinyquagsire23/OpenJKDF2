@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef LINUX
+#include "external/fcaseopen/fcaseopen.h"
+#endif
+
 /**
  * Display compilation errors from the OpenGL shader compiler
  */
@@ -56,7 +60,15 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
 }
 #endif
 
-    FILE* f = fopen(filepath, "r");
+#ifdef LINUX
+    char *r = malloc(strlen(tmp_filepath) + 16);
+    if (casepath(tmp_filepath, r))
+    {
+        strcpy(tmp_filepath, r);
+    }
+#endif
+
+    FILE* f = fopen(tmp_filepath, "r");
     if (!f)
     {
         char errtmp[256];
