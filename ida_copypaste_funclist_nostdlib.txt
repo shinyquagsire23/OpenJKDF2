@@ -302,19 +302,19 @@ jkGuiNetHost_sub_411AE0	.text	00411AE0	00000116	00000020	00000008	R	.	.	.	.	.	.	
 jkGuiEsc_Startup	.text	00411C00	0000001E			R	.	.	.	.	.	.	.
 jkGuiEsc_Shutdown	.text	00411C20	0000000B			R	.	.	.	.	.	.	.
 jkGuiEsc_Show	.text	00411C30	00000166	00000008	00000000	R	.	.	.	.	.	.	.
-jkGuiKeyboard_DIKStrToNum	.text	00411DE0	00000058	00000000	00000005	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_411E40	.text	00411E40	00000042	0000000C	00000004	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_411E90	.text	00411E90	000000AB	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_411F40	.text	00411F40	000001D0	00000020	00000008	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_412110	.text	00412110	000001AC	00000238	00000020	R	.	.	.	.	.	T	.
-jkGuiKeyboard_sub_4122C0	.text	004122C0	000000FA	00000200	00000008	R	.	.	.	.	.	.	.
+jkGuiKeyboard_DIKNumToStr	.text	00411DE0	00000058	00000000	00000005	R	.	.	.	.	.	T	.
+jkGuiKeyboard_sub_411E40	.text	00411E40	00000042	0000000C	00000004	R	.	.	.	.	.	T	.
+jkGuiKeyboard_RemoveControlClicked	.text	00411E90	000000AB	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiKeyboard_sub_411F40	.text	00411F40	000001D0	00000020	00000008	R	.	.	.	.	.	T	.
+jkGuiKeyboard_EnumBindings	.text	00412110	000001AC	00000238	00000020	R	.	.	.	.	.	T	.
+jkGuiKeyboard_AddControlClicked	.text	004122C0	000000FA	00000200	00000008	R	.	.	.	.	.	T	.
 jkGuiKeyboard_sub_4123C0	.text	004123C0	000002F7	00000418	00000004	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_4126C0	.text	004126C0	00000024	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_4126F0	.text	004126F0	00000049	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_412740	.text	00412740	0000007D	00000000	00000014	R	.	.	.	.	.	.	.
-jkGuiKeyboard_sub_4127C0	.text	004127C0	0000006E	00000000	00000008	R	.	.	.	.	.	.	.
+jkGuiKeyboard_OkClicked	.text	004126C0	00000024	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiKeyboard_CancelClicked	.text	004126F0	00000049	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiKeyboard_ControlListClicked	.text	00412740	0000007D	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiKeyboard_RestoreDefaultsClicked	.text	004127C0	0000006E	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiKeyboard_Show	.text	00412830	00000138	00000010	00000000	R	.	.	.	.	.	.	.
-jkGuiKeyboard_Initialize	.text	00412970	00000014	00000000	008567EC	R	.	.	.	.	.	.	.
+jkGuiKeyboard_Initialize	.text	00412970	00000014	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiKeyboard_Shutdown	.text	00412990	00000001			R	.	.	.	.	.	.	.
 jkGui_InitMenu	.text	004129A0	0000006D	00000004	00000008	R	.	.	.	.	.	T	.
 jkGui_MessageBeep	.text	00412A10	00000009			R	.	.	.	.	.	.	.

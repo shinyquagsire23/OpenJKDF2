@@ -21,8 +21,6 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 
-static int jkGuiEsc_bInitialized;
-
 enum jkGuiEscButton_t
 {
     JKGUIESC_RETURNTOGAME = 1,

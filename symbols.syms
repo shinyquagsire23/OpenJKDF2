@@ -850,3 +850,13 @@ jkGuiMouse_dword_5566B0 0x005566B0 int
 jkGuiMouse_Darray_5566B8 0x005566B8 Darray
 jkGuiMouse_Darray_5566D0 0x005566D0 Darray
 jkGuiMouse_pWStr_5566E8 0x005566E8 wchar_t*
+
+jkGuiEsc_bInitialized 0x00555DD8 int
+jkGuiKeyboard_dword_555DE0 0x00555DE0 int
+jkGuiKeyboard_bOnceIdk 0x00555DE8 int
+jkGuiKeyboard_funcIdx 0x00555DEC int
+jkGuiKeyboard_flags 0x00555DF0 int
+jkGuiKeyboard_darrEntries 0x00555DF8 Darray
+jkGuiKeyboard_dword_555E10 0x00555E10 int
+jkGuiKeyboard_wstr_555E18 0x00555E18 wchar_t[257]
+jkGuiKeyboard_pWStr_55601C 0x0055601C wchar_t*

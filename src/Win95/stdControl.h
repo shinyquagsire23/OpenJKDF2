@@ -64,6 +64,9 @@ void stdControl_ReadControls();
 void stdControl_ReadMouse();
 #endif
 
+extern stdControlDikStrToNum stdControl_aDikNumToStr[148];
+extern const char *stdControl_aAxisNames[16];
+
 //static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
 
 #endif // _STDCONTROL_H

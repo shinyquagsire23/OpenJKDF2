@@ -1,6 +1,9 @@
 #ifndef _JKGUI_KEYBOARD_H
 #define _JKGUI_KEYBOARD_H
 
+#include "globals.h"
+#include "types.h"
+
 #define jkGuiKeyboard_DIKStrToNum_ADDR (0x00411DE0)
 #define jkGuiKeyboard_sub_411E40_ADDR (0x00411E40)
 #define jkGuiKeyboard_sub_411E90_ADDR (0x00411E90)
@@ -16,8 +19,23 @@
 #define jkGuiKeyboard_Initialize_ADDR (0x00412970)
 #define jkGuiKeyboard_Shutdown_ADDR (0x00412990)
 
-static int (*jkGuiKeyboard_Initialize)() = (void*)jkGuiKeyboard_Initialize_ADDR;
-static int (*jkGuiKeyboard_Show)() = (void*)jkGuiKeyboard_Show_ADDR;
-static void (*jkGuiKeyboard_Shutdown)() = (void*)jkGuiKeyboard_Shutdown_ADDR;
+const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis);
+int jkGuiKeyboard_sub_411E40(Darray *pDarr);
+int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr);
+int jkGuiKeyboard_EnumBindings(int inputFuncIdx, char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
+int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu);
+int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiKeyboard_Show();
+void jkGuiKeyboard_Initialize();
+void jkGuiKeyboard_Shutdown();
+
+//static int (*jkGuiKeyboard_Initialize)() = (void*)jkGuiKeyboard_Initialize_ADDR;
+//static int (*jkGuiKeyboard_Show)() = (void*)jkGuiKeyboard_Show_ADDR;
+//static void (*jkGuiKeyboard_Shutdown)() = (void*)jkGuiKeyboard_Shutdown_ADDR;
 
 #endif // _JKGUI_KEYBOARD_H

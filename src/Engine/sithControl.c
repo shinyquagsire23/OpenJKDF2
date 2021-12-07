@@ -1671,6 +1671,69 @@ LABEL_17:
     sithControl_MapAxisFunc(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 }
 
+void sithControl_sub_4D7350()
+{
+    stdControlKeyInfo *v0; // edx
+    uint32_t v1; // eax
+    uint32_t v2; // esi
+    int v3; // ebx
+    stdControlKeyInfoEntry *v4; // edi
+    uint32_t v5; // eax
+    uint32_t v6; // ecx
+    stdControlKeyInfoEntry *v7; // eax
+    stdControlKeyInfoEntry *v8; // ebx
+    stdControlKeyInfoEntry *v9; // [esp+10h] [ebp-4h]
+
+    v0 = sithControl_aInputFuncToKeyinfo;
+    do
+    {
+        while ( 1 )
+        {
+            v1 = v0->numEntries;
+            v2 = 0;
+            v3 = 0;
+            if ( !v0->numEntries )
+                break;
+            v4 = v0->aEntries;
+            v9 = v0->aEntries;
+            while ( !v3 )
+            {
+                if ( (v4->flags & 1) == 0 && v4->dxKeyNum < 256 )
+                {
+                    v5 = v1 - 1;
+                    v6 = v2;
+                    v0->numEntries = v5;
+                    if ( v2 < v5 )
+                    {
+                        v7 = v4;
+                        do
+                        {
+                            v8 = v7;
+                            ++v6;
+                            ++v7;
+                            v8->dxKeyNum = v7->dxKeyNum;
+                            v8->flags = v7->flags;
+                            v8->binaryAxisVal = v7->binaryAxisVal;
+                        }
+                        while ( v6 < v0->numEntries );
+                        v4 = v9;
+                    }
+                    v3 = 1;
+                }
+                v1 = v0->numEntries;
+                ++v2;
+                v9 = ++v4;
+                if ( v2 >= v0->numEntries )
+                    goto LABEL_13;
+            }
+        }
+LABEL_13:
+        ;
+    }
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
+    sithControl_MapDefaults();
+}
+
 #ifdef SDL2_RENDER
 
 static int last_use = 0;

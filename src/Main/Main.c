@@ -73,8 +73,10 @@ int Main_Startup(const char *cmdline)
 {
     int result; // eax
 
+#if defined(SDL2_RENDER)
     // Make sure floating point stuff is using . and not ,
     setlocale(LC_NUMERIC, "C");
+#endif
 
     // TODO bring this to Windows (%appdata%) and Linux
 #if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
@@ -224,7 +226,9 @@ int Main_Startup(const char *cmdline)
         jkGuiEsc_Startup();
 #ifndef LINUX_TMP
         jkGuiMap_Initialize(); // TODO
+#endif
         jkGuiKeyboard_Initialize(); // TODO
+#ifndef LINUX_TMP
         jkGuiJoystick_Initialize(); // TODO
 #endif
         jkGuiDialog_Initialize();

@@ -148,6 +148,7 @@ int sithControl_ReadFunctionMap(int func, int* out);
 void sithControl_sub_4D6930(int a);
 stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5);
 void sithControl_sub_4D7670();
+void sithControl_sub_4D7350();
 
 //static stdControlKeyInfo* (*sithControl_EnumBindings)(sithControlEnumFunc_t func, int a2, int a3, int a4, int a5) = (void*)sithControl_EnumBindings_ADDR;
 //static void (*sithControl_sub_4D7670)() = (void*)sithControl_sub_4D7670_ADDR;

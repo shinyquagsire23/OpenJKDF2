@@ -453,6 +453,7 @@ typedef struct rdCanvas rdCanvas;
 
 typedef struct sithGamesave_Header sithGamesave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
+typedef struct jkGuiKeyboardEntry jkGuiKeyboardEntry;
 
 typedef struct videoModeStruct videoModeStruct;
 typedef struct common_functions common_functions;
@@ -484,7 +485,7 @@ typedef void (*sithRender_weapRendFunc_t)(sithThing*);
 typedef int (*sithMultiHandler_t)();
 typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
 typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithActorInstinct *a3, int b, intptr_t a4);
-typedef int (*sithControlEnumFunc_t)(int a1, const char *a2, int a3, int a4, int a5, int a6, stdControlKeyInfoEntry* a7, void* a8);
+typedef int (*sithControlEnumFunc_t)(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int a6, stdControlKeyInfoEntry* pControlEntry, Darray* pDarr);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)
@@ -2423,8 +2424,12 @@ typedef struct jkGuiElement
 
 typedef struct jkGuiStringEntry
 {
-  wchar_t *str;
-  intptr_t id;
+    wchar_t *str;
+    union
+    {
+        intptr_t id;
+        jkGuiKeyboardEntry* pKeyboardEntry;
+    };
 } jkGuiStringEntry;
 
 typedef struct jkGuiMenu
@@ -2747,6 +2752,12 @@ typedef struct stdControlAxis
     int mouseZ;
 } stdControlAxis;
 
+typedef struct stdControlDikStrToNum
+{
+    int val;
+    const char *pStr;
+} stdControlDikStrToNum;
+
 /****************************************************************************
  *
  *      DirectInput keyboard scan codes
@@ -2965,5 +2976,15 @@ typedef struct jkGuiMouseEntry
     int flags;
     jkGuiMouseSubEntry *pSubEnt;
 } jkGuiMouseEntry;
+
+typedef struct jkGuiKeyboardEntry
+{
+    int inputFuncIdx;
+    int axisIdx;
+    int dxKeyNum;
+    int field_C;
+    int field_10;
+    int field_14;
+} jkGuiKeyboardEntry;
 
 #endif // TYPES_H

@@ -359,7 +359,7 @@ void jkGuiMouse_sub_417210()
     jkGuiRend_SetClickableString(&jkGuiMouse_aElements[13], &jkGuiMouse_Darray_5566D0);
 }
 
-int jkGuiMouse_EnumBindings(int a1, char *a2, int a3, int a4, int a5, int a6, stdControlKeyInfoEntry* a7, void* a8)
+int jkGuiMouse_EnumBindings(int a1, char *a2, uint32_t a3, int a4, uint32_t a5, int a6, stdControlKeyInfoEntry* a7, Darray* a8)
 {
     int v7; // ebx
     void *v8; // esi
