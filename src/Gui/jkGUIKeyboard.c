@@ -304,7 +304,6 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
 {
     int v3; // esi
     jkGuiKeyboardEntry *v4; // eax
-    int v5; // edx
     wchar_t *v6; // esi
     wchar_t *v7; // eax
     wchar_t *v8; // eax
@@ -315,10 +314,9 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     jkGuiRend_PlayWav(pMenu->soundClick);
     v3 = jkGuiKeyboard_aElements[12].selectedTextEntry;
     v4 = (jkGuiKeyboardEntry *)jkGuiRend_GetId(&jkGuiKeyboard_darrEntries, jkGuiKeyboard_aElements[12].selectedTextEntry);
-    v5 = v4->inputFuncIdx;
     jkGuiKeyboard_flags = v4->field_10;
     jkGuiKeyboard_bOnceIdk = 1;
-    jkGuiKeyboard_funcIdx = v5;
+    jkGuiKeyboard_funcIdx = v4->inputFuncIdx;
     if ( jkGuiKeyboard_dword_555DE0 )
     {
         stdControl_ToggleCursor(1);
@@ -333,10 +331,17 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     stdControl_Flush();
     v6 = jkGuiRend_GetString(&jkGuiKeyboard_darrEntries, v3);
     memset(v9, 0, sizeof(v9));
-    v7 = __wcschr(v6, 9u);
+    v7 = __wcschr(v6, '\t');
     __wcsncpy(v9, v6, v7 - v6);
     v8 = jkStrings_GetText("GUI_HIT_KEY_TO_ATTACH");
-    jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
+    //jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
+
+    memset(jkGuiKeyboard_wstr_555E18, 0, 0x100 * sizeof(wchar_t));
+    size_t len = __wcslen(v8);
+    __wcsncpy(jkGuiKeyboard_wstr_555E18, v8, len - 6);
+    __wcscat(jkGuiKeyboard_wstr_555E18, v9);
+    __wcscat(jkGuiKeyboard_wstr_555E18, L"...");
+
     return 0;
 }
 
@@ -391,7 +396,7 @@ void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
             for ( ; v1 >= 0; --v1 )
             {
                 v2 = jkGuiRend_GetString(&jkGuiKeyboard_darrEntries, v1);
-                v3 = __wcschr(v2, 9u) - v2;
+                v3 = __wcschr(v2, '\t') - v2;
                 if ( v3 )
                     break;
             }

@@ -39,7 +39,7 @@ static int jkGuiRend_mouseY = 0;
 static int jkGuiRend_bShiftDown = 0;
 static int jkGuiRend_mouseXLatest = 0;
 static int jkGuiRend_mouseYLatest = 0;
-static int jkGuiRend_mouseLatestMs = 0;
+static uint32_t jkGuiRend_mouseLatestMs = 0;
 static HCURSOR jkGuiRend_hCursor = 0;
 
 static int jkGuiRend_CursorVisible = 1;
@@ -1124,7 +1124,7 @@ void jkGuiRend_HoverOn(jkGuiElement *element, jkGuiMenu *menu, int a3)
     jkGuiRend_PlayWav(menu->soundHover);
 }
 
-int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mouseY, int mouseX)
+int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY)
 {
     signed int result; // eax
     jkGuiElement *element_; // esi
@@ -1136,7 +1136,6 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
     int v11; // ebp
     int v12; // ebx
     int selectedIdx; // eax
-    int maxTextEntries; // esi
     int v18; // edx
     signed int v19; // edi
     stdFont** v20; // esi
@@ -1150,19 +1149,18 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
     int v28; // eax
     int a1a; // [esp+14h] [ebp+4h]
 
-    if ( mouseY )
+    if ( mouseX )
     {
-        if ( mouseY == 1 )
+        if ( mouseX == 1 )
         {
             jkGuiRend_GetMousePos(&mouseX, &mouseY);
             selectedIdx = (mouseY - element->rect.y - 3) / element->texInfo.textHeight;
             if ( selectedIdx >= 0 )
             {
-                maxTextEntries = element->texInfo.maxTextEntries;
-                if ( selectedIdx < maxTextEntries )
+                if ( selectedIdx < element->texInfo.maxTextEntries )
                 {
                     v18 = selectedIdx + element->texInfo.textScrollY;
-                    if ( element->texInfo.numTextEntries > maxTextEntries )
+                    if ( element->texInfo.numTextEntries > element->texInfo.maxTextEntries )
                     {
                         if ( !selectedIdx )
                         {
@@ -1170,7 +1168,7 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
                             jkGuiRend_ResetMouseLatestMs();
                             return 0;
                         }
-                        if ( selectedIdx == maxTextEntries - 1 )
+                        if ( selectedIdx == element->texInfo.maxTextEntries - 1 )
                         {
                             jkGuiRend_ClickableHover(menu, element, 1);
                             jkGuiRend_ResetMouseLatestMs();
@@ -1186,7 +1184,7 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
         }
         else
         {
-            if ( mouseY != 4 )
+            if ( mouseX != 4 )
                 return 0;
             element_ = element;
             v6 = element->selectedTextEntry;
@@ -1199,7 +1197,7 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
             v12 = v10 + 1;
             if ( element_->texInfo.numTextEntries > element_->texInfo.maxTextEntries )
                 v11 += v7;
-            switch ( mouseX )
+            switch ( mouseY )
             {
                 case 13:
                     if ( element_->func )
@@ -1457,7 +1455,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int
                 if ( jkGuiRend_activeMenu->lastMouseDownClickable == jkGuiRend_activeMenu->lastMouseOverClickable )
                 {
                     int redraw = 0;
-                    int timeMs = stdPlatform_GetTimeMsec();
+                    uint32_t timeMs = stdPlatform_GetTimeMsec();
                     if ( stdDisplay_pCurDevice->video_device[0].windowedMaybe )
                     {
                         jk_GetCursorPos((LPPOINT)&Rect);
