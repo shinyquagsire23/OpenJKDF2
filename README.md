@@ -113,7 +113,7 @@ When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied th
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Keyboard, Joystick menu in Setup > Controls (input bindings are still loaded and written to config, though)
+ - Joystick menu in Setup > Controls (input bindings are still loaded and written to config, though)
  - Load Configuration and Save Configuration in Setup > Controls > Options
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
