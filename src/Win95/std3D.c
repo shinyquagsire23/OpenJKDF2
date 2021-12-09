@@ -706,6 +706,32 @@ void std3D_DrawRenderList()
     // Generate vertices list
     D3DVERTEX* vertexes = GL_tmpVertices;
 
+    float maxX, maxY, scaleX, scaleY, width, height;
+
+    maxX = 1.0;
+    maxY = 1.0;
+    scaleX = 1.0/((double)Window_xSize / 2.0);
+    scaleY = 1.0/((double)Window_ySize / 2.0);
+    width = Window_xSize;
+    height = Window_ySize;
+
+    // JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
+    // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
+    // To compensate, we zoom the y axis here.
+    // I also went ahead and fixed vertical displays in the same way because it seems to look better.
+    float zoom_yaspect = (width/height) / (640.0/480.0);
+    float zoom_xaspect = (height/width) / (480.0/640.0);
+
+    if (height > width)
+    {
+        zoom_yaspect = 1.0;
+    }
+
+    if (width > height)
+    {
+        zoom_xaspect = 1.0;
+    }
+
     for (int i = 0; i < GL_tmpVerticesAmt; i++)
     {
         uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
@@ -756,20 +782,11 @@ void std3D_DrawRenderList()
     
     {
     
-    float maxX, maxY, scaleX, scaleY, width, height;
-    
-    scaleX = 1.0/((double)Window_xSize / 2.0);
-    scaleY = 1.0/((double)Window_ySize / 2.0);
-    maxX = 1.0;
-    maxY = 1.0;
-    width = Window_xSize;
-    height = Window_ySize;
-    
     float d3dmat[16] = {
-       maxX*scaleX,      0,                                          0,      0, // right
-       0,                                       -maxY*scaleY,               0,      0, // up
+       maxX*scaleX*zoom_xaspect,      0,                                          0,      0, // right
+       0,                                       -maxY*scaleY*zoom_yaspect,               0,      0, // up
        0,                                       0,                                          1,     0, // forward
-       -(width/2)*scaleX,  (height/2)*scaleY,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+       -(width/2)*scaleX*zoom_xaspect,  (height/2)*scaleY*zoom_yaspect,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
     };
     
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);

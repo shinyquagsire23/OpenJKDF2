@@ -192,7 +192,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
             camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
 
             float fov_calc = camera->fov_y;
-            float fov_calc_height = fov_calc * camera->screenAspectRatio;
+            float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
 
             clipFrustum->farTop = project_height_half / fov_calc_height; // far top
             clipFrustum->farLeft = -project_width_half / fov_calc; // far left
@@ -225,7 +225,7 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     rdVector_Copy3(&outClip->field_0, &cameraClip->field_0);
     
     float fov_calc = camera->fov_y;
-    float fov_calc_height = fov_calc * camera->screenAspectRatio;
+    float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
 
     outClip->farTop = project_width_half / fov_calc_height;
     outClip->farLeft = -project_height_half / fov_calc;
