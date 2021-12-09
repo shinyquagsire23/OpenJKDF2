@@ -410,7 +410,7 @@ void jkPlayer_DrawPov()
 #ifdef QOL_IMPROVEMENTS
         // Shift gun down slightly at higher aspect ratios
         // TODO just make a cvar-alike for this
-        trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+        //trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
 #endif
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
