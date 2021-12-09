@@ -7,6 +7,7 @@
 #include "Win95/stdDisplay.h"
 #include "Win95/std3D.h"
 #include "Engine/sithRender.h"
+#include "World/jkPlayer.h"
 
 static rdVector3 rdCamera_camRotation;
 
@@ -189,7 +190,11 @@ int rdCamera_BuildFOV(rdCamera *camera)
             float project_width_half_2 = project_width_half;
             float project_height_half_2 = project_height_half;
             
+#ifdef QOL_IMPROVEMENTS
+            camera->fov_y = (jkPlayer_fovIsVertical ? project_height_half : project_width_half) / stdMath_Tan(camera->fov * 0.5);
+#else
             camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
+#endif
 
             float fov_calc = camera->fov_y;
             float fov_calc_height = camera->fov_y * camera->screenAspectRatio;

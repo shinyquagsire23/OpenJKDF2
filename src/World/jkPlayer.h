@@ -115,6 +115,7 @@ void jkPlayer_SetRank(int rank);
 
 #ifdef QOL_IMPROVEMENTS
 extern int jkPlayer_fov;
+extern int jkPlayer_fovIsVertical;
 
 #define FOV_MIN (90)
 #define FOV_MAX (160)

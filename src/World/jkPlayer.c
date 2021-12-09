@@ -31,6 +31,7 @@
 
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
+int jkPlayer_fovIsVertical = 0;
 #endif
 
 int jkPlayer_LoadAutosave()
@@ -243,6 +244,7 @@ void jkPlayer_WriteConf(wchar_t *name)
         }
 #ifdef QOL_IMPROVEMENTS
         stdConffile_Printf("fov %d\n", jkPlayer_fov);
+        stdConffile_Printf("fovisvertical %d\n", jkPlayer_fovIsVertical);
 #endif
         stdConffile_CloseWrite();
     }
@@ -310,6 +312,12 @@ int jkPlayer_ReadConf(wchar_t *name)
                 jkPlayer_fov = FOV_MIN;
             if (jkPlayer_fov > FOV_MAX)
                 jkPlayer_fov = FOV_MAX;
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
+            jkPlayer_fovIsVertical = !!jkPlayer_fovIsVertical;
         }
 #endif
         stdConffile_Close();
