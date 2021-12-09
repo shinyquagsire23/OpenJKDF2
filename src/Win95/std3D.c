@@ -6,6 +6,7 @@
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
+#include "World/jkPlayer.h"
 
 #ifdef ARCH_WASM
 #include <emscripten.h>

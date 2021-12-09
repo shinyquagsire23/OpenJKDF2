@@ -191,7 +191,14 @@ int rdCamera_BuildFOV(rdCamera *camera)
             float project_height_half_2 = project_height_half;
             
 #ifdef QOL_IMPROVEMENTS
-            camera->fov_y = (jkPlayer_fovIsVertical ? project_height_half : project_width_half) / stdMath_Tan(camera->fov * 0.5);
+            if (jkPlayer_fovIsVertical) {
+                camera->fov_y = project_width_half / ((1.0/camera->screenAspectRatio) * stdMath_Tan(camera->fov * 0.5));
+            }
+            else
+            {
+                camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
+            }
+            
 #else
             camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
 #endif

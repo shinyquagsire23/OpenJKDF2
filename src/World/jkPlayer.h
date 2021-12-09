@@ -117,8 +117,8 @@ void jkPlayer_SetRank(int rank);
 extern int jkPlayer_fov;
 extern int jkPlayer_fovIsVertical;
 
-#define FOV_MIN (90)
-#define FOV_MAX (160)
+#define FOV_MIN (40)
+#define FOV_MAX (170)
 #endif
 
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;
