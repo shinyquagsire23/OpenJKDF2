@@ -7,7 +7,7 @@
 #include "Main/jkGame.h"
 #include "Gui/jkGUI.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 
 #include "jk.h"
 

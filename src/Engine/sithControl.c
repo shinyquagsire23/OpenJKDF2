@@ -1,7 +1,7 @@
 #include "sithControl.h"
 
 #include "General/sithStrTable.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "Win95/DebugConsole.h"
 #include "Win95/Window.h"
 #include "World/sithWorld.h"

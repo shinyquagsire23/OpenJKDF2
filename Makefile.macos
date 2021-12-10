@@ -1,9 +1,11 @@
 CC := clang
 TARGET := openjkdf2-64
 BUNDLE := OpenJKDF2.app
-
-SRC := src
 OBJ := build_darwin64
+SRC := src
+
+TARGET_USE_LIBSMACKER := 1
+TARGET_USE_SDL2 := 1
 
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -25,10 +27,7 @@ else
 LDFLAGS += $(shell pkg-config --static --libs sdl2) $(shell pkg-config --static --libs sdl2_mixer) $(shell pkg-config --static --libs glew)
 endif
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
-SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
-OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+include sources.mk
 
 all: $(TARGET) $(BUNDLE)
 include common.mk

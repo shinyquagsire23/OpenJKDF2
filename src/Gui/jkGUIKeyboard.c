@@ -1,7 +1,7 @@
 #include "jkGUIKeyboard.h"
 
 #include "Engine/sithControl.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "General/Darray.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"

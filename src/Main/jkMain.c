@@ -34,7 +34,7 @@
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "Win95/Windows.h"
 #include "Win95/Video.h"
 #include "Win95/sithDplay.h"

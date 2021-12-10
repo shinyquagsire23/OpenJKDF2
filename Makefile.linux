@@ -1,19 +1,15 @@
 CC := gcc
 TARGET := openjkdf2
-
-SRC := src
 OBJ := build_linux
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
-SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
-OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
-ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+OPENJKDF2_NO_ASAN := 1
+TARGET_USE_LIBSMACKER := 1
+TARGET_USE_SDL2 := 1
+
+include sources.mk
 
 CFLAGS := -m32 -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
 LDFLAGS := -Wl,-Map=output-linux.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar
-
-OPENJKDF2_NO_ASAN := 1
 
 # Optional: Use JK.EXE as a binary blob for unimplemented functions
 ifneq ($(OPENJKDF2_USE_BLOBS), 1)

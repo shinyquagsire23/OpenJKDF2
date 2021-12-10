@@ -2,7 +2,7 @@
 
 #include "Win95/Video.h"
 #include "Win95/Windows.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/DebugConsole.h"
 #include "General/stdBitmap.h"

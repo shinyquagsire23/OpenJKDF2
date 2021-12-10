@@ -7,7 +7,7 @@
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "Win95/Window.h"
 #include "Win95/stdGdi.h"
 #include "Win95/wuRegistry.h"

@@ -9,7 +9,7 @@
 #include "World/sithThing.h"
 #include "World/sithWeapon.h"
 #include "World/sithInventory.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 #include "Win95/Window.h"
 #include "Win95/DebugConsole.h"
 #include "Main/jkGame.h"

@@ -1,14 +1,11 @@
 CC := clang
 TARGET := openjkdf2-64
-
-SRC := src
 OBJ := build_linux64
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
-SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
-OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
-ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+TARGET_USE_LIBSMACKER := 1
+TARGET_USE_SDL2 := 1
+
+include sources.mk
 
 # Flags
 LDFLAGS := -Wl,-Map=output-linux64.map -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar

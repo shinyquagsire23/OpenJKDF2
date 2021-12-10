@@ -28,7 +28,7 @@
 #endif
 
 #include "General/stdString.h"
-#include "Win95/stdControl.h"
+#include "Platform/stdControl.h"
 
 // Imports
 #ifdef WIN32_BLOBS

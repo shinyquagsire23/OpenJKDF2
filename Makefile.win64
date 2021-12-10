@@ -1,17 +1,14 @@
 CC := x86_64-w64-mingw32-gcc
 TARGET := openjkdf2-64.exe
-
-SRC := src
 OBJ := build_win64
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
-SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
-SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
-OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
-ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-THIRDPARTY := $(ROOT_DIR)/3rdparty
-
 OPENJKDF2_NO_ASAN := 1
+TARGET_USE_LIBSMACKER := 1
+TARGET_USE_SDL2 := 1
+
+include sources.mk
+
+THIRDPARTY := $(ROOT_DIR)/3rdparty
 
 # -DWIN32 -DARCH_X86 -DTARGET_HAS_DPLAY
 
