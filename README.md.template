@@ -2,7 +2,7 @@
 
 ![MacOS Screenshot](docs/images/screenshot.png)
 
-[Latest Releases](https://github.com/shinyquagsire23/OpenJKDF2/releases) | [Report a crash or bug](https://github.com/shinyquagsire23/OpenJKDF2/issues)
+## [Latest Releases](https://github.com/shinyquagsire23/OpenJKDF2/releases) | [Report a crash or bug](https://github.com/shinyquagsire23/OpenJKDF2/issues)
 
 OpenJKDF2 is a function-by-function reimplementation of DF2 in C, with 64-bit ports to MacOS and Linux. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port, as well as scattered assertions from various other games. It also contains the original versions of `byacc` and `flex` used for COG script parsing.
 
@@ -13,13 +13,13 @@ OpenJKDF2 supports the following configurations:
 
 | Configuration | Renderer | Description |
 | --- | --- | --- |
-| MacOS AArch64 | OpenGL 3.3 | 64-bit MacOS compilation with SDL2 and OpenAL. |
 | 64-bit Windows/SDL2 | OpenGL 3.3 | 64-bit Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. |
+| MacOS x86_64/AArch64 | OpenGL 3.3 | 64-bit MacOS compilation with SDL2 and OpenAL. All release packages include both Intel and ARM64. |
 | 64-bit Linux/SDL2 | OpenGL ES 3.0 | 64-bit Linux compilation with SDL2 and OpenAL. |
-| x86 Linux/SDL2, mmap blobs | OpenGL ES 3.0 | Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
+| Emscripten/WebAssembly | WebGL 2/OpenGL ES 3 | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit, but less performant. |
+| x86 Linux/SDL2, mmap blobs | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. JK.EXE is memory mapped into the process and used as a "binary blob"; Unimplemented functions will fall back to JK.EXE implementations. |
 | 32-bit Linux/SDL2, blobless | OpenGL ES 3.0 | 32-bit Linux compilation with SDL2 and OpenAL. The output executable is a swap-in replacement for JK.EXE, but will be missing functions and will crash on reaching unimplemented code. |
 | x86 Win32/MinGW DLL | Software/DirectX | Win32 hooked build, JK.EXE is patched to load `df2_reimpl.dll` execute `hook_init_win` before JK.EXE's `main` function. Unimplemented functions will fall back to JK.EXE implementations. `df2_reimpl_kvm.dll` is used for the KVM target |
-| Emscripten/WebAssembly | WebGL 2/OpenGL ES 3 | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit, but less performant. |
 
 The following implementations are in-progress or planned:
 
@@ -27,9 +27,9 @@ The following implementations are in-progress or planned:
 | --- | --- | --- |
 | 32-bit Windows/SDL2 | OpenGL ES 3.0 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Unimplemented functions use JK.EXE as a binary blob? |
 
-64-bit builds are currently buggy/crash somewhat often, particularly in the COG scripting subsystem. Linux building works on AArch64/RPi4 with llvmpipe, but V3D GLES has trouble with palettes.
+Linux building works on AArch64/RPi4 with llvmpipe, but V3D GLES has trouble with palettes.
 
-OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II in order to run; No game assets are provided by OpenJKDF2. On Linux, paths and filenames are case-sensitive. Your directory structure should look something like this:
+OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II in order to run; No game assets are provided by OpenJKDF2. On Linux, paths and filenames may be case-sensitive. Your directory structure should look something like this:
 ```
 .
 ├── JK.EXE
@@ -52,22 +52,11 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
 │   ├── Track30.ogg
 │   ├── Track31.ogg
 │   └── Track32.ogg
-├── OpenAL32.dll
-├── SDL2.dll
-├── SDL2_mixer.dll
-├── SMACKW32.DLL
-├── __nmm.dll
 ├── episode
 │   ├── JK1.gob
 │   ├── JK1CTF.gob
 │   └── JK1MP.gob
-├── freeglut.dll
-├── glew32.dll
-├── libogg-0.dll
-├── libvorbis-0.dll
-├── libvorbisfile-3.dll
 ├── openjkdf2-64
-├── openjkdf2-64.exe
 ├── player
 └── resource
     ├── Res1hi.gob
@@ -125,27 +114,8 @@ See [here](BUILDING.md) for instructions.
  - Subtitles and credits
  - In-game screenshots
 
-## Usage with original JK.EXE and DirectX
-OpenJKDF2 is usable as a hook-and-replace DLL with the original JK.EXE (v1.0) to allow for quality-of-life improvements and multiplayer, since the SDL2 and 64-bit versions do not currently have DirectPlay functions implemented.
-
-`df2_reimpl` supports both the KVM target (OpenJKDF2-KVM) as well as WINE/Windows, though no guarantees are made for the addition of jkgfxmod, nor other patches and hooks. Since KVM has some issues with imports/exports and stdlib, `df2_reimpl_kvm.dll` is compiled with `-Wl,-e_hook_init -nostartfiles`, while `df2_reimpl.dll` is compiled without those linker flags.
-
-Hooking is done by patching JK.EXE with `JK-hook.ips` (using Lunar IPS or similar). This patch replaces `Window_Main` at offset 0x10db50 with the following:
-```
-68 70 E7 50 00 FF 15 98 05 8F 00 68 80 E7 50 00 50 FF 15 1C 05 8F 00 FF E0 C3 00 00 00 00 00 00 64 66 32 5F 72 65 69 6D 70 6C 2E 64 6C 6C 00 00 68 6F 6F 6B 5F 69 6E 69 74 5F 77 69 6E 00 00 00
-```
-which is just some small shellcode for
-```
-int (*v1)(void); 
-v1 = GetProcAddress(LoadLibraryA("df2_reimpl.dll"), "hook_init_win");
-return v1();
-```
-OpenJKDF2 then calls the necessary `VirtualProtect` functions from `hook_init_win`, hooks all the functions it needs and then calls its own implementation of `Window_Main` which was replaced with the loader.
-
-TL;DR for Windows users
-- Patch JK.EXE with `JK-hook.ips`
-- Compile df2_reimpl with `make`
-- Copy `df2_reimpl.dll` to the same folder as `JK.EXE`
+## Usage with original JK.EXE and DirectX using hooks
+See [here](HOOKS.md) for instructions.
 
 ## Methodology
 The bulk of research and documentation occurs in IDA. Every function has been identified to a file prefix (ie `stdHashTable_`) with a corresponding .c/.h file. RenderDroid (`rd*`) and LEC stdlib (`std*`) functions are 90% canonically named, based on symbols from Grim Fandango Remastered.
@@ -157,12 +127,6 @@ Engine variables and yet-to-be-decompiled functions are referenced using `define
 Progress is tracked using `analyze.py`, `output.map` and `ida_copypaste_funclist_nostdlib.txt`: After compiling `df2_reimpl.dll`, symbols can be compared against the `.idb` to determine how much of the original `.text` is actually in use, and how much has been hooked and replaced.
 
 If you'd like a copy of my IDB to examine functions which haven't been decompiled yet (or for any other use), let me know.
-
-## Linux Partial Compilation (mmap blobs)
-
-OpenJKDF2 supports an experimental partial compilation for Linux/SDL2, using `make -f Makefile.linux`. `openjkdf2` can then be copied to the same directory as JK.EXE and run.
-
-`mmap` is used to maintain all `.rodata`, `.data`, and `.bss` variables in the same addresses as `JK.EXE`, however if `openjkdf2` invokes an unimplemented function, it will segfault at the unimplemented function address.
 
 ## Current Progress
 
