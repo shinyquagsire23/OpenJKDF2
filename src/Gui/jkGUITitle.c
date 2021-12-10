@@ -206,7 +206,17 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
             jkGuiRend_UpdateAndDrawClickable(&jkGuiTitle_elementsLoad[1], &jkGuiTitle_menuLoad, 1);
         }
 #ifdef SDL2_RENDER
-        stdDisplay_DDrawGdiSurfaceFlip();
+#ifdef PLATFORM_POSIX
+    static uint64_t lastRefresh = 0;
+    // Only update loading bar at 30fps, so that we don't waste time
+    // during vsync.
+    if (Linux_TimeUs() - lastRefresh < 32*1000) {
+        return;
+    }
+
+    lastRefresh = Linux_TimeUs();
+#endif
+    stdDisplay_DDrawGdiSurfaceFlip();
 #endif
     }
 }

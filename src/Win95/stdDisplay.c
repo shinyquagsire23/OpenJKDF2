@@ -177,19 +177,10 @@ int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
     return 1;
 }
 
-uint64_t lastRefresh = 0;
+
 
 int stdDisplay_DDrawGdiSurfaceFlip()
 {
-#ifdef PLATFORM_POSIX
-    // Only update loading bar at 30fps, so that we don't waste time
-    // during vsync.
-    if (Linux_TimeUs() - lastRefresh < 32*1000) {
-        return 1;
-    }
-
-    lastRefresh = Linux_TimeUs();
-#endif
     Window_SdlUpdate();
     return 1;
 }
