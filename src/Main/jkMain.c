@@ -1159,8 +1159,6 @@ void jkMain_FixRes()
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
-
-    printf("fix %u %u\n", newW, newH);
 }
 
 int jkMain_SetVideoMode()
