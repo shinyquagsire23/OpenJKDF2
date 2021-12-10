@@ -5,6 +5,8 @@ OBJ := build_win64
 OPENJKDF2_NO_ASAN := 1
 TARGET_USE_LIBSMACKER := 1
 TARGET_USE_SDL2 := 1
+TARGET_POSIX := 1
+TARGET_WIN32 := 1
 
 include sources.mk
 

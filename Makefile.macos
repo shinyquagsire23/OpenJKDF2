@@ -6,6 +6,7 @@ SRC := src
 
 TARGET_USE_LIBSMACKER := 1
 TARGET_USE_SDL2 := 1
+TARGET_POSIX := 1
 
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 

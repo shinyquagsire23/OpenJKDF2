@@ -122,7 +122,7 @@
 #include "Win95/stdSound.h"
 #include "Win95/Window.h"
 #include "Win95/Windows.h"
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAICmd.h"

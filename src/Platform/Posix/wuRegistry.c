@@ -1,8 +1,6 @@
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 
 #include "jk.h"
-
-#ifndef WIN32_BLOBS
 
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
 {
@@ -72,4 +70,3 @@ int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *o
     }
     return 0;
 }
-#endif

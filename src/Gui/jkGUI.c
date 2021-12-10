@@ -10,7 +10,7 @@
 #include "Platform/stdControl.h"
 #include "Win95/Window.h"
 #include "Win95/stdGdi.h"
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 #include "Win95/Windows.h"
 #include "stdPlatform.h"
 #include "jk.h"

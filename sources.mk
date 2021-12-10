@@ -12,6 +12,17 @@ ifeq ($(TARGET_USE_SDL2), 1)
 	SOURCES += $(wildcard $(SRC)/Platform/SDL2/*.c)
 endif
 
+ifeq ($(TARGET_POSIX), 1)
+	SOURCES += $(wildcard $(SRC)/Platform/Posix/*.c)
+endif
+
+ifeq ($(TARGET_WIN32), 1)
+	SOURCES += $(wildcard $(SRC)/Platform/Win32/*.c)
+
+	# Win64 can use the registry fine, even if stdlib is POSIX
+	SOURCES := $(filter-out $(SRC)/Platform/Posix/wuRegistry.c, $(SOURCES))
+endif
+
 SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))

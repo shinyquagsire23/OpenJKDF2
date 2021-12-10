@@ -3,11 +3,12 @@ TARGET := df2_reimpl_kvm.dll
 TARGET_WIN := df2_reimpl.dll
 OBJ := build
 
+OPENJKDF2_NO_ASAN := 1
+TARGET_WIN32 := 1
+
 include sources.mk
 
 CFLAGS := -O0 -g -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DWIN32 -DWIN32_BLOBS -DARCH_X86 -DTARGET_HAS_DPLAY -Wuninitialized -fno-trapping-math
-
-OPENJKDF2_NO_ASAN := 1
 
 all: $(TARGET) $(TARGET_WIN)
 include common.mk

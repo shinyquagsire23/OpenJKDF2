@@ -1,7 +1,7 @@
 #include "Windows.h"
 
 #include "Win95/WinIdk.h"
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 #include "Win95/Window.h"
 #include "Win95/stdGdi.h"
 #include "Platform/stdControl.h"

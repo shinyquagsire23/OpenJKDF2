@@ -36,7 +36,7 @@
 #include "Win95/std.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/stdConsole.h"
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 #include "Win95/Video.h"
 #include "Win95/Window.h"
 #include "Win95/Windows.h"

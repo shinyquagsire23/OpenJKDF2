@@ -14,7 +14,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
 #include "Engine/sithSoundSys.h"
-#include "Win95/wuRegistry.h"
+#include "Platform/wuRegistry.h"
 #include "Win95/stdSound.h"
 
 static int slider_1[2] = {18, 17};
