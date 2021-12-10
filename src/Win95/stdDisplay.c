@@ -70,12 +70,27 @@ int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surf
 
 int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
 {
+    uint32_t newW = Window_xSize;
+    uint32_t newH = Window_ySize;
+
+    //if (jkGame_isDDraw)
+    {
+        newW = (uint32_t)((float)Window_xSize * ((480.0*2.0)/Window_ySize));
+        newH = 480*2;
+    }
+
+    if (newW > Window_xSize)
+    {
+        newW = Window_xSize;
+        newH = Window_ySize;
+    }
+
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
     stdDisplay_pCurVideoMode->format.format.bpp = 8;
-    stdDisplay_pCurVideoMode->format.width_in_pixels = Window_xSize;
-    stdDisplay_pCurVideoMode->format.width = Window_xSize;
-    stdDisplay_pCurVideoMode->format.height = Window_ySize;
+    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
+    stdDisplay_pCurVideoMode->format.width = newW;
+    stdDisplay_pCurVideoMode->format.height = newH;
     
     _memcpy(&Video_otherBuf.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_otherBuf.format));
     _memcpy(&Video_menuBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_menuBuffer.format));
@@ -92,12 +107,12 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         Video_menuBuffer.sdlSurface = 0;
     }
     
-    SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, Window_xSize, Window_ySize, 8,
+    SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
                                         0,
                                         0,
                                         0,
                                         0);
-    SDL_Surface* menuSurface = SDL_CreateRGBSurface(0, Window_xSize, Window_ySize, 8,
+    SDL_Surface* menuSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
                                         0,
                                         0,
                                         0,
@@ -132,10 +147,10 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     
     Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
     Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
-    Video_menuBuffer.format.width = Window_xSize;
-    Video_otherBuf.format.width = Window_xSize;
-    Video_menuBuffer.format.height = Window_ySize;
-    Video_otherBuf.format.height = Window_ySize;
+    Video_menuBuffer.format.width = newW;
+    Video_otherBuf.format.width = newW;
+    Video_menuBuffer.format.height = newH;
+    Video_otherBuf.format.height = newH;
     
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
@@ -145,7 +160,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, Window_xSize, Window_ySize, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, newW, newH, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
     
     Video_bModeSet = 1;
     

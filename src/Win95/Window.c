@@ -613,6 +613,7 @@ void Window_SdlUpdate()
         if (!jkGui_SetModeMenu(0))
         {
             stdDisplay_SetMode(0, 0, 0);
+            //jkMain_FixRes();
         }
         
         Window_resized = 0;

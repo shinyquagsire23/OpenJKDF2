@@ -51,7 +51,7 @@ void jkSaber_Draw(rdMatrix34 *posRotMat);
 void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint);
 int jkSaber_Load();
-int jkSaber_Write();
+void jkSaber_Write();
 void jkSaber_player_thingsidkfunc();
 void jkSaber_nullsub_2();
 void jkSaber_Disable(sithThing *player);

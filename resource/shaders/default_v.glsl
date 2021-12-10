@@ -12,7 +12,7 @@ void main(void)
     pos.w = 1.0/(1.0-coord3d.z);
     pos.xyz *= pos.w;
     gl_Position = pos;
-    f_color = v_color;
+    f_color = v_color.bgra;
     f_uv = v_uv;
     f_coord = coord3d;
 }

@@ -403,10 +403,10 @@ int jkSaber_Load()
     return stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
 }
 
-int jkSaber_Write()
+void jkSaber_Write()
 {
     stdConffile_Write(jkRes_episodeGobName, 32);
-    return stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
 }
 
 void jkSaber_player_thingsidkfunc()

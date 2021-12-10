@@ -1103,6 +1103,18 @@ void jkMain_FixRes()
     uint32_t newW = Window_xSize;
     uint32_t newH = Window_ySize;
 
+    //if (jkGame_isDDraw)
+    {
+        newW = (uint32_t)((float)Window_xSize * ((480.0*2.0)/Window_ySize));
+        newH = 480*2;
+    }
+
+    if (newW > Window_xSize)
+    {
+        newW = Window_xSize;
+        newH = Window_ySize;
+    }
+
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMin = 0;
@@ -1111,13 +1123,14 @@ void jkMain_FixRes()
     
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
-    
-    stdDisplay_pCurVideoMode->format.width = newW;
-    stdDisplay_pCurVideoMode->format.height = newH;
     stdDisplay_pCurVideoMode->widthMaybe = newW;
+    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
+    stdDisplay_pCurVideoMode->format.width_in_bytes = newW;
     
     Video_menuBuffer.format.width_in_pixels = newW;
     Video_otherBuf.format.width_in_pixels = newW;
+    Video_menuBuffer.format.width_in_bytes = newW;
+    Video_otherBuf.format.width_in_bytes = newW;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     Video_menuBuffer.format.height = newH;
@@ -1141,6 +1154,8 @@ void jkMain_FixRes()
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
+
+    printf("fix %u %u\n", newW, newH);
 }
 
 int jkMain_SetVideoMode()
@@ -1171,6 +1186,18 @@ int jkMain_SetVideoMode()
     uint32_t newW = Window_xSize;
     uint32_t newH = Window_ySize;
 
+    //if (jkGame_isDDraw)
+    {
+        newW = (uint32_t)((float)Window_xSize * ((480.0*2.0)/Window_ySize));
+        newH = 480*2;
+    }
+
+    if (newW > Window_xSize)
+    {
+        newW = Window_xSize;
+        newH = Window_ySize;
+    }
+
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax = 0;
@@ -1179,13 +1206,14 @@ int jkMain_SetVideoMode()
 
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
-    
-    stdDisplay_pCurVideoMode->format.width = newW;
-    stdDisplay_pCurVideoMode->format.height = newH;
     stdDisplay_pCurVideoMode->widthMaybe = newW;
+    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
+    stdDisplay_pCurVideoMode->format.width_in_bytes = newW;
     
     Video_menuBuffer.format.width_in_pixels = newW;
     Video_otherBuf.format.width_in_pixels = newW;
+    Video_menuBuffer.format.width_in_bytes = newW;
+    Video_otherBuf.format.width_in_bytes = newW;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     Video_menuBuffer.format.height = newH;
@@ -1215,6 +1243,8 @@ int jkMain_SetVideoMode()
     sithRender_SetLightMode(Video_modeStruct.lightMode);
     sithRender_SetTexMode(Video_modeStruct.texMode);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
+
+    stdDisplay_SetMode(0, 0, 0);
 
     Video_bOpened = 1;
     jkGame_isDDraw = 1;
