@@ -306,9 +306,12 @@ int Window_bMouseRight = 0;
 int Window_resized = 0;
 int Window_mouseX = 0;
 int Window_mouseY = 0;
+int Window_xPos = SDL_WINDOWPOS_CENTERED;
+int Window_yPos = SDL_WINDOWPOS_CENTERED;
 
 int Window_needsRecreate = 0;
 int Window_isHiDpi = 0;
+int Window_isFullscreen = 0;
 
 void Window_SetHiDpi(int val)
 {
@@ -316,6 +319,15 @@ void Window_SetHiDpi(int val)
     {
         Window_isHiDpi = val;
 
+        Window_needsRecreate = 1;
+    }
+}
+
+void Window_SetFullscreen(int val)
+{
+    if (Window_isFullscreen != val)
+    {
+        Window_isFullscreen = val;
         Window_needsRecreate = 1;
     }
 }
@@ -374,6 +386,8 @@ void Window_HandleWindowEvent(SDL_Event* event)
             /*printf("Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);*/
+            Window_xPos = event->window.data1;
+            Window_yPos = event->window.data2;
             break;
         case SDL_WINDOWEVENT_RESIZED:
         case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -700,6 +714,11 @@ void Window_RecreateSDL2Window()
     else
         flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
 
+    if (Window_isFullscreen)
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    else
+        flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+
 #if defined(ARCH_WASM)
     //flags &= ~SDL_WINDOW_RESIZABLE;
 #endif
@@ -707,7 +726,7 @@ void Window_RecreateSDL2Window()
 #ifdef ARCH_WASM
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
 #else
-    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Window_screenXSize, Window_screenYSize, flags);
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_xPos, Window_yPos, Window_screenXSize, Window_screenYSize, flags);
 #endif
     if (!displayWindow) {
         char errtmp[256];

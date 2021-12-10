@@ -28,6 +28,7 @@
 #include "Main/jkHudInv.h"
 #include "Main/jkGame.h"
 #include "jk.h"
+#include "Win95/Window.h"
 
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
@@ -245,6 +246,8 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef QOL_IMPROVEMENTS
         stdConffile_Printf("fov %d\n", jkPlayer_fov);
         stdConffile_Printf("fovisvertical %d\n", jkPlayer_fovIsVertical);
+        stdConffile_Printf("windowishidpi %d\n", Window_isHiDpi);
+        stdConffile_Printf("windowfullscreen %d\n", Window_isFullscreen);
 #endif
         stdConffile_CloseWrite();
     }
@@ -318,6 +321,22 @@ int jkPlayer_ReadConf(wchar_t *name)
         {
             _sscanf(stdConffile_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
             jkPlayer_fovIsVertical = !!jkPlayer_fovIsVertical;
+        }
+
+        int dpi_tmp = 0;
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "windowishidpi %d", &dpi_tmp);
+            dpi_tmp = !!dpi_tmp;
+            Window_SetHiDpi(dpi_tmp);
+        }
+
+        int fulltmp = 0;
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "windowfullscreen %d", &fulltmp);
+            fulltmp = !!fulltmp;
+            Window_SetFullscreen(fulltmp);
         }
 #endif
         stdConffile_Close();
