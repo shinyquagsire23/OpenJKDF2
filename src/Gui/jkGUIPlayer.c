@@ -225,9 +225,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                     {
                         stdString_WcharToChar(v17, jkPlayer_playerShortName, 31);
                         v17[31] = 0;
-#ifndef ARCH_WASM
                         Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v17);
-#endif
                     }
                 }
                 continue;
@@ -236,9 +234,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 {
                     stdString_WcharToChar(v18, jkPlayer_playerShortName, 31);
                     v18[31] = 0;
-#ifndef ARCH_WASM
                     Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v18);
-#endif
                 }
                 continue;
             case 2:

@@ -1115,6 +1115,11 @@ void jkMain_FixRes()
         newH = Window_ySize;
     }
 
+    if (newW < 640)
+        newW = 640;
+    if (newH < 480)
+        newH = 480;
+
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMin = 0;
@@ -1197,6 +1202,11 @@ int jkMain_SetVideoMode()
         newW = Window_xSize;
         newH = Window_ySize;
     }
+
+    if (newW < 640)
+        newW = 640;
+    if (newH < 480)
+        newH = 480;
 
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;

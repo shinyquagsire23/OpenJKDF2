@@ -394,13 +394,13 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
     return;
 }
 
-int jkSaber_Load()
+void jkSaber_Load()
 {
     char a1[32]; // [esp+0h] [ebp-20h] BYREF
 
     stdConffile_Read(a1, 32);
     jkRes_LoadGob(a1);
-    return stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
 }
 
 void jkSaber_Write()

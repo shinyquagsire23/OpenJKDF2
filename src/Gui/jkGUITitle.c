@@ -205,6 +205,9 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
             jkGuiTitle_elementsLoad[1].selectedTextEntry = (__int64)percentage;
             jkGuiRend_UpdateAndDrawClickable(&jkGuiTitle_elementsLoad[1], &jkGuiTitle_menuLoad, 1);
         }
+#ifdef SDL2_RENDER
+        stdDisplay_DDrawGdiSurfaceFlip();
+#endif
     }
 }
 

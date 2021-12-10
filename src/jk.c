@@ -1017,8 +1017,8 @@ wchar_t* __wcsncpy(wchar_t * a, const wchar_t * b, size_t c)
 {
     wchar_t* ret = a;
     size_t len = __wcslen(b) * sizeof(wchar_t);
-    if (len > c*2) {
-        len = c*2;
+    if (len > c*sizeof(wchar_t)) {
+        len = c*sizeof(wchar_t);
     }
     memmove(a, b, len);
     a[len] = 0;

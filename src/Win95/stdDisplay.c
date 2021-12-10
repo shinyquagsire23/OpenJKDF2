@@ -85,6 +85,11 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         newH = Window_ySize;
     }
 
+    if (newW < 640)
+        newW = 640;
+    if (newH < 480)
+        newH = 480;
+
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
     stdDisplay_pCurVideoMode->format.format.bpp = 8;
@@ -172,8 +177,19 @@ int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
     return 1;
 }
 
+uint64_t lastRefresh = 0;
+
 int stdDisplay_DDrawGdiSurfaceFlip()
 {
+#ifdef PLATFORM_POSIX
+    // Only update loading bar at 30fps, so that we don't waste time
+    // during vsync.
+    if (Linux_TimeUs() - lastRefresh < 32*1000) {
+        return 1;
+    }
+
+    lastRefresh = Linux_TimeUs();
+#endif
     Window_SdlUpdate();
     return 1;
 }

@@ -659,7 +659,7 @@ void Window_SdlVblank()
         Window_RecreateSDL2Window();
 
 #ifdef ARCH_WASM
-    emscripten_sleep(1);
+    //emscripten_sleep(1);
 #endif
 }
 
@@ -707,7 +707,7 @@ void Window_RecreateSDL2Window()
 #ifdef ARCH_WASM
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
 #else
-    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, flags);
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Window_screenXSize, Window_screenYSize, flags);
 #endif
     if (!displayWindow) {
         char errtmp[256];
