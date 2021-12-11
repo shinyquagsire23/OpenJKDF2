@@ -12,7 +12,7 @@
 #define sithCogFunctionThing_Initialize_ADDR (0x005014E0)
 #define sithCogAI_Initialize_ADDR (0x00500B00)
 #define sithCogSound_Initialize_ADDR (0x004FF060)
-#define sithCogPlayer_Initialize_ADDR (0x004E0780)
+#define sithCogFunctionPlayer_Initialize_ADDR (0x004E0780)
 #define sithCogSector_Initialize_ADDR (0x004FE680)
 #define sithCogSurface_Initialize_ADDR (0x004FFB50)
 

@@ -1,4 +1,4 @@
-#include "sithCogPlayer.h"
+#include "sithCogFunctionPlayer.h"
 
 #include "World/jkPlayer.h"
 #include "World/sithPlayer.h"
@@ -6,7 +6,7 @@
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 
-void sithCogPlayer_SetInvActivate(sithCog *ctx)
+void sithCogFunctionPlayer_SetInvActivate(sithCog *ctx)
 {
     int bActivate = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx);
@@ -21,7 +21,7 @@ void sithCogPlayer_SetInvActivate(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_SetInvAvailable(sithCog *ctx)
+void sithCogFunctionPlayer_SetInvAvailable(sithCog *ctx)
 {
     int bAvailable = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx);
@@ -36,7 +36,7 @@ void sithCogPlayer_SetInvAvailable(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_IsInvActivated(sithCog *ctx)
+void sithCogFunctionPlayer_IsInvActivated(sithCog *ctx)
 {
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -50,7 +50,7 @@ void sithCogPlayer_IsInvActivated(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_IsInvAvailable(sithCog *ctx)
+void sithCogFunctionPlayer_IsInvAvailable(sithCog *ctx)
 {
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -64,7 +64,7 @@ void sithCogPlayer_IsInvAvailable(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_SetGoalFlags(sithCog *ctx)
+void sithCogFunctionPlayer_SetGoalFlags(sithCog *ctx)
 {
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
@@ -76,7 +76,7 @@ void sithCogPlayer_SetGoalFlags(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_ClearGoalFlags(sithCog *ctx)
+void sithCogFunctionPlayer_ClearGoalFlags(sithCog *ctx)
 {
     int flags = sithCogVm_PopInt(ctx);
     int binIdx = sithCogVm_PopInt(ctx) + SITHBIN_GOAL00;
@@ -88,7 +88,7 @@ void sithCogPlayer_ClearGoalFlags(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetNumPlayers(sithCog *ctx)
+void sithCogFunctionPlayer_GetNumPlayers(sithCog *ctx)
 {
     int numPlayers = 0;
 
@@ -101,17 +101,17 @@ void sithCogPlayer_GetNumPlayers(sithCog *ctx)
     sithCogVm_PushInt(ctx, numPlayers);
 }
 
-void sithCogPlayer_GetMaxPlayers(sithCog *ctx)
+void sithCogFunctionPlayer_GetMaxPlayers(sithCog *ctx)
 {
     sithCogVm_PushInt(ctx, jkPlayer_maxPlayers);
 }
 
-void sithCogPlayer_GetAbsoluteMaxPlayers(sithCog *ctx)
+void sithCogFunctionPlayer_GetAbsoluteMaxPlayers(sithCog *ctx)
 {
     sithCogVm_PushInt(ctx, 32);
 }
 
-void sithCogPlayer_GetLocalPlayerThing(sithCog *ctx)
+void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *ctx)
 {
     if ( g_localPlayerThing )
         sithCogVm_PushInt(ctx, g_localPlayerThing->thingIdx);
@@ -119,7 +119,7 @@ void sithCogPlayer_GetLocalPlayerThing(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_GetPlayerThing(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerThing(sithCog *ctx)
 {
     uint32_t idx = sithCogVm_PopInt(ctx);
     if ( idx < jkPlayer_maxPlayers )
@@ -128,7 +128,7 @@ void sithCogPlayer_GetPlayerThing(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_GetPlayerNum(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerNum(sithCog *ctx)
 {
     int playerIdx;
 
@@ -141,7 +141,7 @@ void sithCogPlayer_GetPlayerNum(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_GetPlayerTeam(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerTeam(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -154,7 +154,7 @@ void sithCogPlayer_GetPlayerTeam(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
+void sithCogFunctionPlayer_SetPlayerTeam(sithCog *ctx)
 {
     int teamNum = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -172,7 +172,7 @@ void sithCogPlayer_SetPlayerTeam(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetPlayerScore(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerScore(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -185,7 +185,7 @@ void sithCogPlayer_GetPlayerScore(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetPlayerScore(sithCog *ctx)
+void sithCogFunctionPlayer_SetPlayerScore(sithCog *ctx)
 {
     int score = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -203,7 +203,7 @@ void sithCogPlayer_SetPlayerScore(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetPlayerKills(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerKills(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -216,7 +216,7 @@ void sithCogPlayer_GetPlayerKills(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetPlayerKills(sithCog *ctx)
+void sithCogFunctionPlayer_SetPlayerKills(sithCog *ctx)
 {
     int numKills = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -234,7 +234,7 @@ void sithCogPlayer_SetPlayerKills(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetPlayerKilled(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerKilled(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -247,7 +247,7 @@ void sithCogPlayer_GetPlayerKilled(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetPlayerKilled(sithCog *ctx)
+void sithCogFunctionPlayer_SetPlayerKilled(sithCog *ctx)
 {
     int numKilled = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -265,7 +265,7 @@ void sithCogPlayer_SetPlayerKilled(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetPlayerSuicides(sithCog *ctx)
+void sithCogFunctionPlayer_GetPlayerSuicides(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -278,7 +278,7 @@ void sithCogPlayer_GetPlayerSuicides(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetPlayerSuicides(sithCog *ctx)
+void sithCogFunctionPlayer_SetPlayerSuicides(sithCog *ctx)
 {
     int numSuicides = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -296,7 +296,7 @@ void sithCogPlayer_SetPlayerSuicides(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_PickupBackpack(sithCog *ctx)
+void sithCogFunctionPlayer_PickupBackpack(sithCog *ctx)
 {
     sithThing* backpack = sithCogVm_PopThing(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -312,7 +312,7 @@ void sithCogPlayer_PickupBackpack(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_NthBackpackBin(sithCog *ctx)
+void sithCogFunctionPlayer_NthBackpackBin(sithCog *ctx)
 {
     int ret;
 
@@ -327,7 +327,7 @@ void sithCogPlayer_NthBackpackBin(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_NthBackpackValue(sithCog *ctx)
+void sithCogFunctionPlayer_NthBackpackValue(sithCog *ctx)
 {
     int ret;
 
@@ -342,7 +342,7 @@ void sithCogPlayer_NthBackpackValue(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_NumBackpackItems(sithCog *ctx)
+void sithCogFunctionPlayer_NumBackpackItems(sithCog *ctx)
 {
     int ret;
 
@@ -356,7 +356,7 @@ void sithCogPlayer_NumBackpackItems(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_CreateBackpack(sithCog *ctx)
+void sithCogFunctionPlayer_CreateBackpack(sithCog *ctx)
 {
     sithThing* player = sithCogVm_PopThing(ctx);
 
@@ -372,7 +372,7 @@ void sithCogPlayer_CreateBackpack(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetAutoSwitch(sithCog *ctx)
+void sithCogFunctionPlayer_GetAutoSwitch(sithCog *ctx)
 {
     if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiplayerAutoSwitch);
@@ -380,7 +380,7 @@ void sithCogPlayer_GetAutoSwitch(sithCog *ctx)
         sithCogVm_PushInt(ctx, sithWeapon_bAutoSwitch);
 }
 
-void sithCogPlayer_SetAutoSwitch(sithCog *ctx)
+void sithCogFunctionPlayer_SetAutoSwitch(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
     if ( sithNet_isMulti )
@@ -389,7 +389,7 @@ void sithCogPlayer_SetAutoSwitch(sithCog *ctx)
         sithWeapon_bAutoSwitch = bVal;
 }
 
-void sithCogPlayer_GetAutoPickup(sithCog *ctx)
+void sithCogFunctionPlayer_GetAutoPickup(sithCog *ctx)
 {
     if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiAutoPickup);
@@ -397,7 +397,7 @@ void sithCogPlayer_GetAutoPickup(sithCog *ctx)
         sithCogVm_PushInt(ctx, sithWeapon_bAutoPickup);
 }
 
-void sithCogPlayer_SetAutoPickup(sithCog *ctx)
+void sithCogFunctionPlayer_SetAutoPickup(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
     if ( sithNet_isMulti )
@@ -406,7 +406,7 @@ void sithCogPlayer_SetAutoPickup(sithCog *ctx)
         sithWeapon_bAutoSwitch = bVal;
 }
 
-void sithCogPlayer_GetAutoReload(sithCog *ctx)
+void sithCogFunctionPlayer_GetAutoReload(sithCog *ctx)
 {
     if ( sithNet_isMulti )
         sithCogVm_PushInt(ctx, sithWeapon_bMultiAutoReload);
@@ -414,7 +414,7 @@ void sithCogPlayer_GetAutoReload(sithCog *ctx)
         sithCogVm_PushInt(ctx, sithWeapon_bAutoReload);
 }
 
-void sithCogPlayer_SetAutoReload(sithCog *ctx)
+void sithCogFunctionPlayer_SetAutoReload(sithCog *ctx)
 {
     int bVal = sithCogVm_PopInt(ctx);
     if ( sithNet_isMulti )
@@ -423,7 +423,7 @@ void sithCogPlayer_SetAutoReload(sithCog *ctx)
         sithWeapon_bAutoPickup = bVal;
 }
 
-void sithCogPlayer_GetRespawnMask(sithCog *ctx)
+void sithCogFunctionPlayer_GetRespawnMask(sithCog *ctx)
 {
     sithPlayerInfo *playerInfo;
 
@@ -436,7 +436,7 @@ void sithCogPlayer_GetRespawnMask(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogPlayer_SetRespawnMask(sithCog *ctx)
+void sithCogFunctionPlayer_SetRespawnMask(sithCog *ctx)
 {
     int mask = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -450,7 +450,7 @@ void sithCogPlayer_SetRespawnMask(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_ActivateBin(sithCog *ctx)
+void sithCogFunctionPlayer_ActivateBin(sithCog *ctx)
 {
     int binIdx = sithCogVm_PopInt(ctx);
     float delay = sithCogVm_PopFlex(ctx);
@@ -465,7 +465,7 @@ void sithCogPlayer_ActivateBin(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_DeactivateBin(sithCog *ctx)
+void sithCogFunctionPlayer_DeactivateBin(sithCog *ctx)
 {
     int binIdx = sithCogVm_PopInt(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
@@ -483,7 +483,7 @@ void sithCogPlayer_DeactivateBin(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_GetNumPlayersInTeam(sithCog *ctx)
+void sithCogFunctionPlayer_GetNumPlayersInTeam(sithCog *ctx)
 {
     int numPlayers = 0;
     int teamNum = sithCogVm_PopInt(ctx);
@@ -495,7 +495,7 @@ void sithCogPlayer_GetNumPlayersInTeam(sithCog *ctx)
     sithCogVm_PushInt(ctx, numPlayers);
 }
 
-void sithCogPlayer_AddScoreToTeamMembers(sithCog *ctx)
+void sithCogFunctionPlayer_AddScoreToTeamMembers(sithCog *ctx)
 {
     int scoreAdd = sithCogVm_PopInt(ctx);
     int teamNum = sithCogVm_PopInt(ctx);
@@ -507,7 +507,7 @@ void sithCogPlayer_AddScoreToTeamMembers(sithCog *ctx)
     }
 }
 
-void sithCogPlayer_SetBinWait(sithCog *ctx)
+void sithCogFunctionPlayer_SetBinWait(sithCog *ctx)
 {
     float wait = sithCogVm_PopFlex(ctx);
     int binIdx = sithCogVm_PopInt(ctx);
@@ -519,54 +519,54 @@ void sithCogPlayer_SetBinWait(sithCog *ctx)
         sithInventory_SetBinWait(player, binIdx, wait);
 }
 
-void sithCogPlayer_SyncScores(sithCog *ctx)
+void sithCogFunctionPlayer_SyncScores(sithCog *ctx)
 {
     if (sithNet_isMulti)
         sithMulti_SyncScores();
 }
 
-void sithCogPlayer_Initialize(void* ctx)
+void sithCogFunctionPlayer_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetInvActivate, "setinvactivated");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetInvAvailable, "setinvavailable");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_IsInvActivated, "isinvactivated");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_IsInvAvailable, "isinvavailable");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetGoalFlags, "setgoalflags");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_ClearGoalFlags, "cleargoalflags");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetNumPlayers, "getnumplayers");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetMaxPlayers, "getmaxplayers");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetAbsoluteMaxPlayers, "getabsolutemaxplayers");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetLocalPlayerThing, "getlocalplayerthing");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerThing, "getplayerthing");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerNum, "getplayernum");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerTeam, "getplayerteam");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetPlayerTeam, "setplayerteam");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerScore, "getplayerscore");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetPlayerScore, "setplayerscore");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerKills, "getplayerkills");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetPlayerKills, "setplayerkills");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerKilled, "getplayerkilled");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetPlayerKilled, "setplayerkilled");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetPlayerSuicides, "getplayersuicides");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetPlayerSuicides, "setplayersuicides");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_PickupBackpack, "pickupbackpack");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_CreateBackpack, "createbackpack");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_NthBackpackBin, "nthbackpackbin");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_NthBackpackValue, "nthbackpackvalue");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_NumBackpackItems, "numbackpackitems");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetAutoSwitch, "getautoswitch");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetAutoSwitch, "setautoswitch");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetAutoPickup, "getautopickup");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetAutoPickup, "setautopickup");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetAutoReload, "getautoreload");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetAutoReload, "setautoreload");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetRespawnMask, "getrespawnmask");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetRespawnMask, "setrespawnmask");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_ActivateBin, "activatebin");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_DeactivateBin, "deactivatebin");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SetBinWait, "setbinwait");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
-    sithCogScript_RegisterVerb(ctx, sithCogPlayer_SyncScores, "syncscores");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvActivated, "isinvactivated");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvAvailable, "isinvavailable");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetGoalFlags, "setgoalflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ClearGoalFlags, "cleargoalflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayers, "getnumplayers");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetMaxPlayers, "getmaxplayers");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAbsoluteMaxPlayers, "getabsolutemaxplayers");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetLocalPlayerThing, "getlocalplayerthing");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerThing, "getplayerthing");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerNum, "getplayernum");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerTeam, "getplayerteam");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerTeam, "setplayerteam");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerScore, "getplayerscore");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerScore, "setplayerscore");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerKills, "getplayerkills");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerKills, "setplayerkills");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerKilled, "getplayerkilled");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerKilled, "setplayerkilled");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerSuicides, "getplayersuicides");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerSuicides, "setplayersuicides");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_PickupBackpack, "pickupbackpack");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_CreateBackpack, "createbackpack");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackBin, "nthbackpackbin");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackValue, "nthbackpackvalue");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NumBackpackItems, "numbackpackitems");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoSwitch, "getautoswitch");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoSwitch, "setautoswitch");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoPickup, "getautopickup");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoPickup, "setautopickup");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoReload, "getautoreload");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoReload, "setautoreload");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetRespawnMask, "getrespawnmask");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetRespawnMask, "setrespawnmask");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ActivateBin, "activatebin");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_DeactivateBin, "deactivatebin");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetBinWait, "setbinwait");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SyncScores, "syncscores");
 
 }

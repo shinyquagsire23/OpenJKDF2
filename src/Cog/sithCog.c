@@ -5,7 +5,7 @@
 #include "Win95/DebugConsole.h"
 #include "Cog/sithCogUtil.h"
 #include "Cog/sithCogFunctionThing.h"
-#include "Cog/sithCogPlayer.h"
+#include "Cog/sithCogFunctionPlayer.h"
 #include "Cog/sithCogAI.h"
 #include "Cog/sithCogSurface.h"
 #include "Cog/sithCogSector.h"
@@ -60,7 +60,7 @@ int sithCog_Startup()
     sithCogSurface_Initialize(g_cog_symbolTable);
     sithCogSound_Initialize(g_cog_symbolTable);
     sithCogSector_Initialize(g_cog_symbolTable);
-    sithCogPlayer_Initialize(g_cog_symbolTable);
+    sithCogFunctionPlayer_Initialize(g_cog_symbolTable);
 	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activate");
 	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activated");
     sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 3, "startup");

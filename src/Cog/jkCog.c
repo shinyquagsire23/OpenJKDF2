@@ -14,7 +14,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
-#include "Cog/sithCogPlayer.h"
+#include "Cog/sithCogFunctionPlayer.h"
 
 #include "jk.h"
 
@@ -184,7 +184,7 @@ void jkCog_dwGetActivateBin(sithCog *ctx)
 
 void jkCog_RegisterVerbs()
 {
-    sithCogScript_RegisterVerb(g_cog_symbolTable, sithCogPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
+    sithCogScript_RegisterVerb(g_cog_symbolTable, sithCogFunctionPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
     sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_SetFlags, "jksetflags");
     sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_GetFlags, "jkgetflags");
     sithCogScript_RegisterVerb(g_cog_symbolTable, jkCog_ClearFlags, "jkclearflags");
