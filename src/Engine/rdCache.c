@@ -2,7 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "Engine/rdActive.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "Engine/rdColormap.h"
 
 #include <math.h>

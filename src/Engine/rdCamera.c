@@ -5,7 +5,7 @@
 #include "Engine/rdroid.h"
 #include "General/stdMath.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "Engine/sithRender.h"
 #include "World/jkPlayer.h"
 

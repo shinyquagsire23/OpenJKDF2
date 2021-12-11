@@ -1,7 +1,7 @@
 #include "rdColormap.h"
 
 #include "Engine/rdroid.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "Win95/std.h"
 
 static rdTexformat rdColormap_colorInfo = {1, 0x10, 5, 6, 5, 0x0B, 5, 0, 3, 2, 3, 0, 0, 0};

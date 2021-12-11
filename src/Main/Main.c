@@ -73,7 +73,7 @@ int Main_Startup(const char *cmdline)
 {
     int result; // eax
 
-#if defined(SDL2_RENDER)
+#if defined(PLATFORM_POSIX)
     // Make sure floating point stuff is using . and not ,
     setlocale(LC_NUMERIC, "C");
 #endif

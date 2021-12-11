@@ -1,7 +1,7 @@
 #include "Window.h"
 
 #include "Win95/stdGdi.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkGame.h"
@@ -19,6 +19,28 @@ int Window_xSize = 640;
 int Window_ySize = 480;
 int Window_screenXSize = 640;
 int Window_screenYSize = 480;
+int Window_isHiDpi = 0;
+int Window_isFullscreen = 0;
+int Window_needsRecreate = 0;
+
+void Window_SetHiDpi(int val)
+{
+    if (Window_isHiDpi != val)
+    {
+        Window_isHiDpi = val;
+
+        Window_needsRecreate = 1;
+    }
+}
+
+void Window_SetFullscreen(int val)
+{
+    if (Window_isFullscreen != val)
+    {
+        Window_isFullscreen = val;
+        Window_needsRecreate = 1;
+    }
+}
 
 //static wm_handler Window_ext_handlers[16] = {0};
 
@@ -308,29 +330,6 @@ int Window_mouseX = 0;
 int Window_mouseY = 0;
 int Window_xPos = SDL_WINDOWPOS_CENTERED;
 int Window_yPos = SDL_WINDOWPOS_CENTERED;
-
-int Window_needsRecreate = 0;
-int Window_isHiDpi = 0;
-int Window_isFullscreen = 0;
-
-void Window_SetHiDpi(int val)
-{
-    if (Window_isHiDpi != val)
-    {
-        Window_isHiDpi = val;
-
-        Window_needsRecreate = 1;
-    }
-}
-
-void Window_SetFullscreen(int val)
-{
-    if (Window_isFullscreen != val)
-    {
-        Window_isFullscreen = val;
-        Window_needsRecreate = 1;
-    }
-}
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {

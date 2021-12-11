@@ -304,23 +304,8 @@ void sith_UpdateCamera()
             sithWorld_sub_4D0A20(sithWorld_pCurWorld);
             sithRender_lastRenderTick = 1;
         }
-#ifdef QOL_IMPROVEMENTS
-#ifdef SDL2_RENDER
-        if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
-        {
-            //printf("%u\n", sithCamera_currentCamera->rdCam.canvas->heightMinusOne);
-            if (sithCamera_currentCamera->rdCam.canvas->widthMinusOne != Window_xSize-1
-               || sithCamera_currentCamera->rdCam.canvas->heightMinusOne != Window_ySize-1)
-            {
-                //sithCamera_currentCamera->rdCam.canvas->screen_width_half = Window_ySize / 2;
-                //sithCamera_currentCamera->rdCam.canvas->screen_height_half = Window_xSize / 2;
-                //sithCamera_currentCamera->rdCam.canvas->widthMinusOne = Window_xSize-1;
-                //sithCamera_currentCamera->rdCam.canvas->heightMinusOne = Window_ySize-1;
-                //jkMain_FixRes();
-            }
-        }
-#endif
 
+#ifdef QOL_IMPROVEMENTS
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             // Set screen aspect ratio

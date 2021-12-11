@@ -337,7 +337,7 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     //jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
 
     memset(jkGuiKeyboard_wstr_555E18, 0, 0x100 * sizeof(wchar_t));
-    size_t len = __wcslen(v8);
+    size_t len = _wcslen(v8);
     __wcsncpy(jkGuiKeyboard_wstr_555E18, v8, len - 6);
     __wcscat(jkGuiKeyboard_wstr_555E18, v9);
     __wcscat(jkGuiKeyboard_wstr_555E18, L"...");

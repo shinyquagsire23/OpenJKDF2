@@ -5,6 +5,7 @@ OBJ := build
 
 OPENJKDF2_NO_ASAN := 1
 TARGET_WIN32 := 1
+TARGET_USE_D3D := 1
 
 include sources.mk
 

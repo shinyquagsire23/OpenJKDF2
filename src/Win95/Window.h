@@ -37,14 +37,17 @@ static int (*_Window_msg_main_handler)(HWND hWnd, UINT Msg, WPARAM wParam, LPARA
 // Added
 int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused);
 
+extern int Window_isHiDpi;
+extern int Window_isFullscreen;
+void Window_SetHiDpi(int val);
+void Window_SetFullscreen(int val);
+
 #ifdef SDL2_RENDER
 extern int Window_lastXRel;
 extern int Window_lastYRel;
 extern int Window_lastSampleMs;
 extern int Window_bMouseLeft;
 extern int Window_bMouseRight;
-extern int Window_isHiDpi;
-extern int Window_isFullscreen;
 
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
@@ -54,8 +57,6 @@ int Window_MessageLoop();
 void Window_SdlUpdate();
 void Window_SdlVblank();
 void Window_RecreateSDL2Window();
-void Window_SetHiDpi(int val);
-void Window_SetFullscreen(int val);
 #else
 static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;

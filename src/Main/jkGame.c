@@ -11,7 +11,7 @@
 #include "World/sithSector.h"
 #include "Win95/Video.h"
 #include "Win95/sithDplay.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "Win95/stdDisplay.h"
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"

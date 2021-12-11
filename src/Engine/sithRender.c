@@ -27,7 +27,7 @@
 #include "World/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 
 #ifdef QOL_IMPROVEMENTS
 static rdThing* lightDebugThing = NULL;

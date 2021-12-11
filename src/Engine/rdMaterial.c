@@ -3,7 +3,7 @@
 #include "Engine/rdroid.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "stdPlatform.h"
 #include "jk.h"
 

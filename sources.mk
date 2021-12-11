@@ -12,6 +12,14 @@ ifeq ($(TARGET_USE_SDL2), 1)
 	SOURCES += $(wildcard $(SRC)/Platform/SDL2/*.c)
 endif
 
+ifeq ($(TARGET_USE_OPENGL), 1)
+	SOURCES += $(wildcard $(SRC)/Platform/GL/*.c)
+endif
+
+ifeq ($(TARGET_USE_D3D), 1)
+	SOURCES += $(wildcard $(SRC)/Platform/D3D/*.c)
+endif
+
 ifeq ($(TARGET_POSIX), 1)
 	SOURCES += $(wildcard $(SRC)/Platform/Posix/*.c)
 endif

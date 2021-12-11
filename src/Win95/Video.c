@@ -3,7 +3,7 @@
 #include "Engine/rdroid.h"
 #include "Engine/sithCamera.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/std3D.h"
+#include "Platform/std3D.h"
 #include "General/stdPalEffects.h"
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"
