@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "Linux/shader_utils.h"
+#include "Platform/GL/shader_utils.h"
 #ifdef MACOS
 #include <SDL2/SDL.h>
 #elif defined(ARCH_WASM)
