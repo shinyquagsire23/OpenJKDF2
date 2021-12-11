@@ -1,6 +1,6 @@
 #include "Platform/wuRegistry.h"
 
-#include <Windows.h>
+#include <windows.h>
 
 #include "jk.h"
 
