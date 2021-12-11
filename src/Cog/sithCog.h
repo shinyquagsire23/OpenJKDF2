@@ -156,7 +156,7 @@ void sithCogUtil_Initialize(void* a1);
 void sithCogThing_Initialize(void* a1);
 void sithCogAI_Initialize(void* a1);
 void sithCogSound_Initialize(void* a1);
-void sithCogPlayer_Initialize(void* a1);
+void sithCogFunctionPlayer_Initialize(void* a1);
 void sithCogSector_Initialize(void* a1);
 void sithCogSurface_Initialize(void* a1);
 
