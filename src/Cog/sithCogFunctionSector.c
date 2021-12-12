@@ -1,65 +1,65 @@
-#include "sithCogSector.h"
+#include "sithCogFunctionSector.h"
 
 #include "Cog/sithCogVm.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
 
-void sithCogSector_GetTint(sithCog *ctx);
-void sithCogSector_SetTint(sithCog *ctx);
-void sithCogSector_SetSectorAdjoins(sithCog *ctx);
-void sithCogSector_GetSectorLight(sithCog *ctx);
-void sithCogSector_SetSectorLight(sithCog *ctx);
-void sithCogSector_GetColormap(sithCog *ctx);
-void sithCogSector_SetColormap(sithCog *ctx);
-void sithCogSector_GetSectorThrust(sithCog *ctx);
-void sithCogSector_SetSectorThrust(sithCog *ctx);
-void sithCogSector_SetSectorFlags(sithCog *ctx);
-void sithCogSector_ClearSectorFlags(sithCog *ctx);
-void sithCogSector_GetSectorFlags(sithCog *ctx);
-void sithCogSector_GetThingCount(sithCog *ctx);
-void sithCogSector_GetPlayerCount(sithCog *ctx);
-void sithCogSector_GetSectorCount(sithCog *ctx);
-void sithCogSector_GetSectorCenter(sithCog *ctx);
-void sithCogSector_GetNumSectorVertices(sithCog *ctx);
-void sithCogSector_GetNumSectorSurfaces(sithCog *ctx);
-void sithCogSector_GetSectorVertexPos(sithCog *ctx);
-void sithCogSector_GetSectorSurfaceRef(sithCog *ctx);
-void sithCogSector_SyncSector(sithCog *ctx);
+void sithCogFunctionSector_GetTint(sithCog *ctx);
+void sithCogFunctionSector_SetTint(sithCog *ctx);
+void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx);
+void sithCogFunctionSector_GetSectorLight(sithCog *ctx);
+void sithCogFunctionSector_SetSectorLight(sithCog *ctx);
+void sithCogFunctionSector_GetColormap(sithCog *ctx);
+void sithCogFunctionSector_SetColormap(sithCog *ctx);
+void sithCogFunctionSector_GetSectorThrust(sithCog *ctx);
+void sithCogFunctionSector_SetSectorThrust(sithCog *ctx);
+void sithCogFunctionSector_SetSectorFlags(sithCog *ctx);
+void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx);
+void sithCogFunctionSector_GetSectorFlags(sithCog *ctx);
+void sithCogFunctionSector_GetThingCount(sithCog *ctx);
+void sithCogFunctionSector_GetPlayerCount(sithCog *ctx);
+void sithCogFunctionSector_GetSectorCount(sithCog *ctx);
+void sithCogFunctionSector_GetSectorCenter(sithCog *ctx);
+void sithCogFunctionSector_GetNumSectorVertices(sithCog *ctx);
+void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *ctx);
+void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx);
+void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx);
+void sithCogFunctionSector_SyncSector(sithCog *ctx);
 
-void sithCogSector_Initialize(void* ctx)
+void sithCogFunctionSector_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetTint, "getsectortint");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetTint, "setsectortint");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorAdjoins, "setsectoradjoins");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorAdjoins, "sectoradjoins");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorLight, "getsectorlight");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorLight, "setsectorlight");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorLight, "sectorlight");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetColormap, "getcolormap");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetColormap, "getsectorcolormap");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetColormap, "setcolormap");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetColormap, "setsectorcolormap");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorThrust, "getsectorthrust");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorThrust, "setsectorthrust");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorThrust, "sectorthrust");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorFlags, "getsectorflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SetSectorFlags, "setsectorflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_ClearSectorFlags, "clearsectorflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetThingCount, "getsectorthingcount");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetThingCount, "sectorthingcount");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetPlayerCount, "getsectorplayercount");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetPlayerCount, "sectorplayercount");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorCount, "getsectorcount");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorCenter, "getsectorcenter");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetNumSectorVertices, "getnumsectorvertices");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorVertexPos, "getsectorvertexpos");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetNumSectorSurfaces, "getnumsectorsurfaces");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_GetSectorSurfaceRef, "getsectorsurfaceref");
-    sithCogScript_RegisterVerb(ctx, sithCogSector_SyncSector, "syncsector");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetTint, "getsectortint");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetTint, "setsectortint");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorAdjoins, "setsectoradjoins");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorAdjoins, "sectoradjoins");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorLight, "getsectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorLight, "setsectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorLight, "sectorlight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetColormap, "getcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetColormap, "getsectorcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetColormap, "setcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetColormap, "setsectorcolormap");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorThrust, "getsectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorThrust, "setsectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorThrust, "sectorthrust");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorFlags, "getsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorFlags, "setsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_ClearSectorFlags, "clearsectorflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetThingCount, "getsectorthingcount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetThingCount, "sectorthingcount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetPlayerCount, "getsectorplayercount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetPlayerCount, "sectorplayercount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorCount, "getsectorcount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorCenter, "getsectorcenter");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetNumSectorVertices, "getnumsectorvertices");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorVertexPos, "getsectorvertexpos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetNumSectorSurfaces, "getnumsectorsurfaces");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorSurfaceRef, "getsectorsurfaceref");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SyncSector, "syncsector");
 }
 
-void sithCogSector_GetTint(sithCog *ctx)
+void sithCogFunctionSector_GetTint(sithCog *ctx)
 {
     rdVector3 vecCopy;
 
@@ -75,7 +75,7 @@ void sithCogSector_GetTint(sithCog *ctx)
     }
 }
 
-void sithCogSector_SetTint(sithCog *ctx)
+void sithCogFunctionSector_SetTint(sithCog *ctx)
 {
     sithSector *sector; // ecx
     double v2; // st7
@@ -141,7 +141,7 @@ void sithCogSector_SetTint(sithCog *ctx)
     }
 }
 
-void sithCogSector_SetSectorAdjoins(sithCog *ctx)
+void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
 {
     signed int v1; // edi
     sithSector *sector; // esi
@@ -175,7 +175,7 @@ void sithCogSector_SetSectorAdjoins(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetSectorLight(sithCog *ctx)
+void sithCogFunctionSector_GetSectorLight(sithCog *ctx)
 {
     sithSector *sector; // eax
 
@@ -186,7 +186,7 @@ void sithCogSector_GetSectorLight(sithCog *ctx)
         sithCogVm_PushFlex(ctx, 0.0);
 }
 
-void sithCogSector_SetSectorLight(sithCog *ctx)
+void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
 {
     sithSector *sector; // ecx
     int v3; // esi
@@ -218,7 +218,7 @@ void sithCogSector_SetSectorLight(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetColormap(sithCog *ctx)
+void sithCogFunctionSector_GetColormap(sithCog *ctx)
 {
     sithSector *sector; // eax
     uintptr_t v2; // ecx
@@ -236,7 +236,7 @@ void sithCogSector_GetColormap(sithCog *ctx)
     }
 }
 
-void sithCogSector_SetColormap(sithCog *ctx)
+void sithCogFunctionSector_SetColormap(sithCog *ctx)
 {
     sithWorld* world = sithWorld_pCurWorld;
     uint32_t colormap_idx = sithCogVm_PopInt(ctx);
@@ -259,7 +259,7 @@ void sithCogSector_SetColormap(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetSectorThrust(sithCog *ctx)
+void sithCogFunctionSector_GetSectorThrust(sithCog *ctx)
 {
     sithSector* sector = sithCogVm_PopSector(ctx);
 
@@ -269,7 +269,7 @@ void sithCogSector_GetSectorThrust(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
 }
 
-void sithCogSector_SetSectorThrust(sithCog *ctx)
+void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
 {
     rdVector3 thrust;
 
@@ -304,7 +304,7 @@ void sithCogSector_SetSectorThrust(sithCog *ctx)
     }
 }
 
-void sithCogSector_SetSectorFlags(sithCog *ctx)
+void sithCogFunctionSector_SetSectorFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSector* sector = sithCogVm_PopSector(ctx);
@@ -320,7 +320,7 @@ void sithCogSector_SetSectorFlags(sithCog *ctx)
     }
 }
 
-void sithCogSector_ClearSectorFlags(sithCog *ctx)
+void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSector* sector = sithCogVm_PopSector(ctx);
@@ -336,7 +336,7 @@ void sithCogSector_ClearSectorFlags(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetSectorFlags(sithCog *ctx)
+void sithCogFunctionSector_GetSectorFlags(sithCog *ctx)
 {
     sithSector* sector = sithCogVm_PopSector(ctx);
     if ( sector )
@@ -345,7 +345,7 @@ void sithCogSector_GetSectorFlags(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSector_GetThingCount(sithCog *ctx)
+void sithCogFunctionSector_GetThingCount(sithCog *ctx)
 {
     sithSector* sector = sithCogVm_PopSector(ctx);
     if ( sector )
@@ -358,7 +358,7 @@ void sithCogSector_GetThingCount(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetPlayerCount(sithCog *ctx)
+void sithCogFunctionSector_GetPlayerCount(sithCog *ctx)
 {
     sithSector *v1; // eax
     int v2; // eax
@@ -375,12 +375,12 @@ void sithCogSector_GetPlayerCount(sithCog *ctx)
     }
 }
 
-void sithCogSector_GetSectorCount(sithCog *ctx)
+void sithCogFunctionSector_GetSectorCount(sithCog *ctx)
 {
     sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSectors);
 }
 
-void sithCogSector_GetSectorCenter(sithCog *ctx)
+void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
 {
     sithSector *v1; // eax
 
@@ -391,7 +391,7 @@ void sithCogSector_GetSectorCenter(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
 }
 
-void sithCogSector_GetNumSectorVertices(sithCog *ctx)
+void sithCogFunctionSector_GetNumSectorVertices(sithCog *ctx)
 {
     sithSector *v1; // eax
 
@@ -402,7 +402,7 @@ void sithCogSector_GetNumSectorVertices(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSector_GetNumSectorSurfaces(sithCog *ctx)
+void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *ctx)
 {
     sithSector *v1; // eax
 
@@ -413,7 +413,7 @@ void sithCogSector_GetNumSectorSurfaces(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSector_GetSectorVertexPos(sithCog *ctx)
+void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
 {
     sithWorld *active_jkl; // ebx
     int vertex_idx; // edi
@@ -428,7 +428,7 @@ void sithCogSector_GetSectorVertexPos(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
 }
 
-void sithCogSector_GetSectorSurfaceRef(sithCog *ctx)
+void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
 {
     int v1; // esi
     sithSector *v2; // eax
@@ -441,7 +441,7 @@ void sithCogSector_GetSectorSurfaceRef(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSector_SyncSector(sithCog *ctx)
+void sithCogFunctionSector_SyncSector(sithCog *ctx)
 {
     sithSector *v1; // eax
 

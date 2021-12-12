@@ -8,7 +8,7 @@
 #include "Cog/sithCogFunctionPlayer.h"
 #include "Cog/sithCogFunctionAI.h"
 #include "Cog/sithCogFunctionSurface.h"
-#include "Cog/sithCogSector.h"
+#include "Cog/sithCogFunctionSector.h"
 #include "Cog/sithCogSound.h"
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCogParse.h"
@@ -59,7 +59,7 @@ int sithCog_Startup()
     sithCogFunctionAI_Initialize(g_cog_symbolTable);
     sithCogFunctionSurface_Initialize(g_cog_symbolTable);
     sithCogSound_Initialize(g_cog_symbolTable);
-    sithCogSector_Initialize(g_cog_symbolTable);
+    sithCogFunctionSector_Initialize(g_cog_symbolTable);
     sithCogFunctionPlayer_Initialize(g_cog_symbolTable);
 	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activate");
 	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activated");

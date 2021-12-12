@@ -13,7 +13,7 @@
 #define sithCogFunctionAI_Initialize_ADDR (0x00500B00)
 #define sithCogSound_Initialize_ADDR (0x004FF060)
 #define sithCogFunctionPlayer_Initialize_ADDR (0x004E0780)
-#define sithCogSector_Initialize_ADDR (0x004FE680)
+#define sithCogFunctionSector_Initialize_ADDR (0x004FE680)
 #define sithCogFunctionSurface_Initialize_ADDR (0x004FFB50)
 
 #define sithCog_Startup_ADDR (0x004DE070)
@@ -155,7 +155,7 @@ void sithCog_HandleThingTimerPulse(sithThing *thing);
 void sithCogUtil_Initialize(void* a1);
 void sithCogThing_Initialize(void* a1);
 void sithCogSound_Initialize(void* a1);
-void sithCogSector_Initialize(void* a1);
+void sithCogFunctionSector_Initialize(void* a1);
 void sithCogSurface_Initialize(void* a1);
 
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);

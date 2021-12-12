@@ -13,6 +13,7 @@
 #include "Cog/sithCogFunctionPlayer.h"
 #include "Cog/sithCogFunctionAI.h"
 #include "Cog/sithCogFunctionSurface.h"
+#include "Cog/sithCogFunctionSector.h"
 #include "Cog/y.tab.h"
 #include "General/stdBitmap.h"
 #include "General/stdMath.h"
@@ -486,7 +487,7 @@ void do_hooks()
     hook_function(sithCogFunctionAI_Initialize_ADDR, sithCogFunctionAI_Initialize);
     hook_function(sithCogFunctionSurface_Initialize_ADDR, sithCogFunctionSurface_Initialize);
     hook_function(sithCogSound_Initialize_ADDR, sithCogSound_Initialize);
-    hook_function(sithCogSector_Initialize_ADDR, sithCogSector_Initialize);
+    hook_function(sithCogFunctionSector_Initialize_ADDR, sithCogFunctionSector_Initialize);
     hook_function(sithCogFunctionPlayer_Initialize_ADDR, sithCogFunctionPlayer_Initialize);
     hook_function(sithCogScript_RegisterVerb_ADDR, sithCogScript_RegisterVerb);
     hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
