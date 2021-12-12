@@ -1,4 +1,4 @@
-#include "sithCogSurface.h"
+#include "sithCogFunctionSurface.h"
 
 #include "Cog/sithCogVm.h"
 #include "World/sithWorld.h"
@@ -6,91 +6,91 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 
-void sithCogSurface_GetSurfaceAdjoin(sithCog *ctx);
-void sithCogSurface_GetSurfaceSector(sithCog *ctx);
-void sithCogSurface_GetNumSurfaceVertices(sithCog *ctx);
-void sithCogSurface_GetSurfaceVertexPos(sithCog *ctx);
-void sithCogSurface_SetHorizonSkyOffset(sithCog *ctx);
-void sithCogSurface_GetHorizonSkyOffset(sithCog *ctx);
-void sithCogSurface_SetCeilingSkyOffset(sithCog *ctx);
-void sithCogSurface_GetCeilingSkyOffset(sithCog *ctx);
-void sithCogSurface_SlideHorizonSky(sithCog *ctx);
-void sithCogSurface_SlideCeilingSky(sithCog *ctx);
-void sithCogSurface_SurfaceLightAnim(sithCog *ctx);
-void sithCogSurface_SlideWallSurface(sithCog *ctx);
-void sithCogSurface_GetWallCel(sithCog *ctx);
-void sithCogSurface_SetWallCel(sithCog *ctx);
-void sithCogSurface_GetSurfaceMat(sithCog *ctx);
-void sithCogSurface_SetSurfaceMat(sithCog *ctx);
-void sithCogSurface_SetSurfaceFlags(sithCog *ctx);
-void sithCogSurface_ClearSurfaceFlags(sithCog *ctx);
-void sithCogSurface_GetSurfaceFlags(sithCog *ctx);
-void sithCogSurface_SetAdjoinFlags(sithCog *ctx);
-void sithCogSurface_ClearAdjoinFlags(sithCog *ctx);
-void sithCogSurface_GetAdjoinFlags(sithCog *ctx);
-void sithCogSurface_SetFaceType(sithCog *ctx);
-void sithCogSurface_ClearFaceType(sithCog *ctx);
-void sithCogSurface_GetFaceType(sithCog *ctx);
-void sithCogSurface_SetFaceGeoMode(sithCog *ctx);
-void sithCogSurface_GetFaceGeoMode(sithCog *ctx);
-void sithCogSurface_SetFaceLightMode(sithCog *ctx);
-void sithCogSurface_GetFaceLightMode(sithCog *ctx);
-void sithCogSurface_SetFaceTexMode(sithCog *ctx);
-void sithCogSurface_GetFaceTexMode(sithCog *ctx);
-void sithCogSurface_SetSurfaceLight(sithCog *ctx);
-void sithCogSurface_GetSurfaceLight(sithCog *ctx);
-void sithCogSurface_GetSurfaceCenter(sithCog *ctx);
-void sithCogSurface_GetSurfaceCount(sithCog *ctx);
-void sithCogSurface_GetSurfaceNormal(sithCog *ctx);
-void sithCogSurface_SyncSurface(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx);
+void sithCogFunctionSurface_GetNumSurfaceVertices(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx);
+void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx);
+void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx);
+void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx);
+void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx);
+void sithCogFunctionSurface_SlideHorizonSky(sithCog *ctx);
+void sithCogFunctionSurface_SlideCeilingSky(sithCog *ctx);
+void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx);
+void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx);
+void sithCogFunctionSurface_GetWallCel(sithCog *ctx);
+void sithCogFunctionSurface_SetWallCel(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceMat(sithCog *ctx);
+void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx);
+void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx);
+void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceFlags(sithCog *ctx);
+void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx);
+void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx);
+void sithCogFunctionSurface_GetAdjoinFlags(sithCog *ctx);
+void sithCogFunctionSurface_SetFaceType(sithCog *ctx);
+void sithCogFunctionSurface_ClearFaceType(sithCog *ctx);
+void sithCogFunctionSurface_GetFaceType(sithCog *ctx);
+void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx);
+void sithCogFunctionSurface_GetFaceGeoMode(sithCog *ctx);
+void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx);
+void sithCogFunctionSurface_GetFaceLightMode(sithCog *ctx);
+void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx);
+void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx);
+void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceLight(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx);
+void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx);
+void sithCogFunctionSurface_SyncSurface(sithCog *ctx);
 
-void sithCogSurface_Initialize(void* ctx)
+void sithCogFunctionSurface_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceAdjoin, "getsurfaceadjoin");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceSector, "getsurfacesector");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetNumSurfaceVertices, "getnumsurfacevertices");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceVertexPos, "getsurfacevertexpos");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetHorizonSkyOffset, "sethorizonskyoffset");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetHorizonSkyOffset, "gethorizonskyoffset");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetCeilingSkyOffset, "setceilingskyoffset");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetCeilingSkyOffset, "getceilingskyoffset");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SlideHorizonSky, "slidehorizonsky");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SlideCeilingSky, "slideceilingsky");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceCount, "getsurfacecount");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SlideWallSurface, "slidewall");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SlideWallSurface, "slidesurface");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetWallCel, "getwallcel");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetWallCel, "setwallcel");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetWallCel, "getsurfacecel");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetWallCel, "setsurfacecel");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceMat, "getsurfacemat");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetSurfaceMat, "setsurfacemat");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceFlags, "getsurfaceflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetSurfaceFlags, "setsurfaceflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_ClearSurfaceFlags, "clearsurfaceflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetAdjoinFlags, "getadjoinflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetAdjoinFlags, "setadjoinflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_ClearAdjoinFlags, "clearadjoinflags");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetFaceType, "setfacetype");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_ClearFaceType, "clearfacetype");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetFaceType, "getfacetype");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetFaceGeoMode, "setfacegeomode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetFaceGeoMode, "getfacegeomode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetFaceLightMode, "setfacelightmode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetFaceLightMode, "getfacelightmode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetFaceTexMode, "setfacetexmode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetFaceTexMode, "getfacetexmode");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceLight, "getsurfacelight");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetSurfaceLight, "setsurfacelight");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SetSurfaceLight, "surfacelight");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceCenter, "getsurfacecenter");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceCenter, "surfacecenter");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SurfaceLightAnim, "surfacelightanim");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_GetSurfaceNormal, "getsurfacenormal");
-    sithCogScript_RegisterVerb(ctx, sithCogSurface_SyncSurface, "syncsurface");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceAdjoin, "getsurfaceadjoin");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceSector, "getsurfacesector");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetNumSurfaceVertices, "getnumsurfacevertices");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceVertexPos, "getsurfacevertexpos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetHorizonSkyOffset, "sethorizonskyoffset");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetHorizonSkyOffset, "gethorizonskyoffset");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetCeilingSkyOffset, "setceilingskyoffset");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetCeilingSkyOffset, "getceilingskyoffset");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideHorizonSky, "slidehorizonsky");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideCeilingSky, "slideceilingsky");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceCount, "getsurfacecount");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWallSurface, "slidewall");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWallSurface, "slidesurface");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetWallCel, "getwallcel");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetWallCel, "setwallcel");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetWallCel, "getsurfacecel");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetWallCel, "setsurfacecel");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceMat, "getsurfacemat");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceMat, "setsurfacemat");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceFlags, "getsurfaceflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceFlags, "setsurfaceflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_ClearSurfaceFlags, "clearsurfaceflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetAdjoinFlags, "getadjoinflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetAdjoinFlags, "setadjoinflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_ClearAdjoinFlags, "clearadjoinflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetFaceType, "setfacetype");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_ClearFaceType, "clearfacetype");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetFaceType, "getfacetype");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetFaceGeoMode, "setfacegeomode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetFaceGeoMode, "getfacegeomode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetFaceLightMode, "setfacelightmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetFaceLightMode, "getfacelightmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetFaceTexMode, "setfacetexmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetFaceTexMode, "getfacetexmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceLight, "getsurfacelight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceLight, "setsurfacelight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceLight, "surfacelight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceCenter, "getsurfacecenter");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceCenter, "surfacecenter");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SurfaceLightAnim, "surfacelightanim");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceNormal, "getsurfacenormal");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SyncSurface, "syncsurface");
 }
 
-void sithCogSurface_GetSurfaceAdjoin(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 {
     sithSurface *surface; // eax
     uint32_t *v2; // eax
@@ -102,7 +102,7 @@ void sithCogSurface_GetSurfaceAdjoin(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_GetSurfaceSector(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx)
 {
     sithSurface *v1; // eax
     int *v2; // eax
@@ -114,7 +114,7 @@ void sithCogSurface_GetSurfaceSector(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_GetNumSurfaceVertices(sithCog *ctx)
+void sithCogFunctionSurface_GetNumSurfaceVertices(sithCog *ctx)
 {
     sithSurface *surface; // eax
 
@@ -125,7 +125,7 @@ void sithCogSurface_GetNumSurfaceVertices(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_GetSurfaceVertexPos(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
 {
     sithWorld *world; // ebx
     uint32_t vtx_idx; // edi
@@ -140,7 +140,7 @@ void sithCogSurface_GetSurfaceVertexPos(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
 }
 
-void sithCogSurface_SetHorizonSkyOffset(sithCog *ctx)
+void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
@@ -150,7 +150,7 @@ void sithCogSurface_SetHorizonSkyOffset(sithCog *ctx)
     sithWorld_pCurWorld->horizontalSkyOffs.y = offs.y;
 }
 
-void sithCogSurface_GetHorizonSkyOffset(sithCog *ctx)
+void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
@@ -160,7 +160,7 @@ void sithCogSurface_GetHorizonSkyOffset(sithCog *ctx)
     sithCogVm_PushVector3(ctx, &offs);
 }
 
-void sithCogSurface_SetCeilingSkyOffset(sithCog *ctx)
+void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
@@ -170,7 +170,7 @@ void sithCogSurface_SetCeilingSkyOffset(sithCog *ctx)
     sithWorld_pCurWorld->ceilingSkyOffs.y = offs.y;
 }
 
-void sithCogSurface_GetCeilingSkyOffset(sithCog *ctx)
+void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
@@ -180,7 +180,7 @@ void sithCogSurface_GetCeilingSkyOffset(sithCog *ctx)
     sithCogVm_PushVector3(ctx, &offs);
 }
 
-void sithCogSurface_SlideHorizonSky(sithCog *ctx)
+void sithCogFunctionSurface_SlideHorizonSky(sithCog *ctx)
 {
     rdSurface *v2;
     rdVector2 a2;
@@ -194,7 +194,7 @@ void sithCogSurface_SlideHorizonSky(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SlideCeilingSky(sithCog *ctx)
+void sithCogFunctionSurface_SlideCeilingSky(sithCog *ctx)
 {
     rdSurface *v2;
     rdVector2 a2;
@@ -208,7 +208,7 @@ void sithCogSurface_SlideCeilingSky(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SurfaceLightAnim(sithCog *ctx)
+void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
 {
     rdSurface *v3; // eax
     float v4; // [esp+0h] [ebp-14h]
@@ -223,7 +223,7 @@ void sithCogSurface_SurfaceLightAnim(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SlideWallSurface(sithCog *ctx)
+void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
 {
     signed int pop_vec; // ebx
     sithSurface *surface; // eax
@@ -259,7 +259,7 @@ void sithCogSurface_SlideWallSurface(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetWallCel(sithCog *ctx)
+void sithCogFunctionSurface_GetWallCel(sithCog *ctx)
 {
     sithSurface* surface = sithCogVm_PopSurface(ctx);
     if ( surface && surface->surfaceInfo.face.material )
@@ -268,7 +268,7 @@ void sithCogSurface_GetWallCel(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetWallCel(sithCog *ctx)
+void sithCogFunctionSurface_SetWallCel(sithCog *ctx)
 {
     int wallCel; // esi
     sithSurface *surface; // eax
@@ -294,7 +294,7 @@ void sithCogSurface_SetWallCel(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetSurfaceMat(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceMat(sithCog *ctx)
 {
     rdMaterial *v2; // eax
 
@@ -305,7 +305,7 @@ void sithCogSurface_GetSurfaceMat(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetSurfaceMat(sithCog *ctx)
+void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx)
 {
     rdMaterial *v4; // eax
 
@@ -334,7 +334,7 @@ void sithCogSurface_SetSurfaceMat(sithCog *ctx)
     }
 }
 
-void sithCogSurface_SetSurfaceFlags(sithCog *ctx)
+void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -350,7 +350,7 @@ void sithCogSurface_SetSurfaceFlags(sithCog *ctx)
     }
 }
 
-void sithCogSurface_ClearSurfaceFlags(sithCog *ctx)
+void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -366,7 +366,7 @@ void sithCogSurface_ClearSurfaceFlags(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetSurfaceFlags(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceFlags(sithCog *ctx)
 {
     sithSurface* surface = sithCogVm_PopSurface(ctx);
 
@@ -376,7 +376,7 @@ void sithCogSurface_GetSurfaceFlags(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetAdjoinFlags(sithCog *ctx)
+void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -402,7 +402,7 @@ void sithCogSurface_SetAdjoinFlags(sithCog *ctx)
     }
 }
 
-void sithCogSurface_ClearAdjoinFlags(sithCog *ctx)
+void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -428,7 +428,7 @@ void sithCogSurface_ClearAdjoinFlags(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetAdjoinFlags(sithCog *ctx)
+void sithCogFunctionSurface_GetAdjoinFlags(sithCog *ctx)
 {
     sithSurface* surface = sithCogVm_PopSurface(ctx);
     if (surface && surface->adjoin)
@@ -441,7 +441,7 @@ void sithCogSurface_GetAdjoinFlags(sithCog *ctx)
     }
 }
 
-void sithCogSurface_SetFaceType(sithCog *ctx)
+void sithCogFunctionSurface_SetFaceType(sithCog *ctx)
 {
     uint32_t type = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -456,7 +456,7 @@ void sithCogSurface_SetFaceType(sithCog *ctx)
     }
 }
 
-void sithCogSurface_ClearFaceType(sithCog *ctx)
+void sithCogFunctionSurface_ClearFaceType(sithCog *ctx)
 {
     uint32_t type = sithCogVm_PopInt(ctx);
     sithSurface* surface = sithCogVm_PopSurface(ctx);
@@ -471,7 +471,7 @@ void sithCogSurface_ClearFaceType(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetFaceType(sithCog *ctx)
+void sithCogFunctionSurface_GetFaceType(sithCog *ctx)
 {
     sithSurface* surface = sithCogVm_PopSurface(ctx);
     if ( surface )
@@ -480,7 +480,7 @@ void sithCogSurface_GetFaceType(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetFaceGeoMode(sithCog *ctx)
+void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
@@ -528,7 +528,7 @@ LABEL_12:
     }
 }
 
-void sithCogSurface_GetFaceGeoMode(sithCog *ctx)
+void sithCogFunctionSurface_GetFaceGeoMode(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
@@ -539,7 +539,7 @@ void sithCogSurface_GetFaceGeoMode(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetFaceLightMode(sithCog *ctx)
+void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
@@ -564,7 +564,7 @@ void sithCogSurface_SetFaceLightMode(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetFaceLightMode(sithCog *ctx)
+void sithCogFunctionSurface_GetFaceLightMode(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
@@ -575,7 +575,7 @@ void sithCogSurface_GetFaceLightMode(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetFaceTexMode(sithCog *ctx)
+void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
@@ -600,7 +600,7 @@ void sithCogSurface_SetFaceTexMode(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetFaceTexMode(sithCog *ctx)
+void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
@@ -611,7 +611,7 @@ void sithCogSurface_GetFaceTexMode(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_SetSurfaceLight(sithCog *ctx)
+void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
 {
     sithSurface *v2; // ecx
     int v3; // esi
@@ -643,7 +643,7 @@ void sithCogSurface_SetSurfaceLight(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetSurfaceLight(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceLight(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
@@ -652,7 +652,7 @@ void sithCogSurface_GetSurfaceLight(sithCog *ctx)
         sithCogVm_PushFlex(ctx, v1->surfaceInfo.face.extraLight);
 }
 
-void sithCogSurface_GetSurfaceCenter(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
 {
     sithSurface *v1; // eax
     rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
@@ -669,7 +669,7 @@ void sithCogSurface_GetSurfaceCenter(sithCog *ctx)
     }
 }
 
-void sithCogSurface_GetSurfaceCount(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx)
 {
     if ( sithWorld_pCurWorld )
         sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSurfaces);
@@ -677,7 +677,7 @@ void sithCogSurface_GetSurfaceCount(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSurface_GetSurfaceNormal(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
@@ -688,7 +688,7 @@ void sithCogSurface_GetSurfaceNormal(sithCog *ctx)
         sithCogVm_PushVector3(ctx, &rdroid_zeroVector3);
 }
 
-void sithCogSurface_SyncSurface(sithCog *ctx)
+void sithCogFunctionSurface_SyncSurface(sithCog *ctx)
 {
     sithSurface *v1; // eax
 
