@@ -9,7 +9,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithAdjoin.h"
 
 #include "jk.h"
@@ -522,7 +522,7 @@ int sithDSS_HandleSyncTimers(sithCogMsg *msg)
     info.field_10 = NETMSG_POPF32();
     info.field_14 = NETMSG_POPF32();
     field_4 = NETMSG_POPS16();
-    sithTimer_Set(field_4, &info, deltaMs);
+    sithEvent_Set(field_4, &info, deltaMs);
     return 1;
 }
 

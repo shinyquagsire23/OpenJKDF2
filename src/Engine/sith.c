@@ -14,7 +14,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "AI/sithAIAwareness.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithSprite.h"
@@ -46,7 +46,7 @@ int sith_Startup(struct common_functions *commonFuncs)
 
     pSithHS = commonFuncs;
     is_started = sithStrTable_Startup() & 1;
-    is_started = sithTimer_Startup() & is_started;
+    is_started = sithEvent_Startup() & is_started;
     is_started = sithWorld_Startup() & is_started;
     is_started = sithRender_Startup() & is_started;
     is_started = sithCollision_Startup() & is_started;
@@ -100,7 +100,7 @@ void sith_Shutdown()
     sithCollision_Shutdown();
     sithRender_Shutdown();
     sithWorld_Shutdown();
-    sithTimer_Shutdown();
+    sithEvent_Shutdown();
     sithStrTable_Shutdown();
     sith_bInitialized = 0;
 }
@@ -133,7 +133,7 @@ int sith_Mode1Init(char *a1)
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-    sithTimer_Open();
+    sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
@@ -159,7 +159,7 @@ int sithOpenNormal(char *path)
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-    sithTimer_Open();
+    sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
@@ -181,7 +181,7 @@ int sith_Mode1Init_3(char *fpath)
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-    sithTimer_Open();
+    sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
@@ -202,7 +202,7 @@ int sith_Open()
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurWorld);
-    sithTimer_Open();
+    sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
     sithSoundSys_Open();
@@ -228,7 +228,7 @@ void sith_Close()
         sithWorld_Free();
         sithAI_Close();
         sithSurface_Startup2();
-        sithTimer_Close();
+        sithEvent_Close();
         sithPlayer_Close();
         sithWeapon_ShutdownEntry();
         g_sithMode = 0;
@@ -268,7 +268,7 @@ int sith_Tick()
         sithSoundSys_ResumeMusic(0);
         sithTime_Tick();
         sithSoundSys_Tick(sithTime_deltaSeconds);
-        sithTimer_Advance();
+        sithEvent_Advance();
 
         if ( sithCogVm_bSyncMultiplayer )
             sithCogVm_Sync();

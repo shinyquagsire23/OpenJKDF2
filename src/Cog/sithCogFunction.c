@@ -21,7 +21,7 @@
 #include "Engine/sithSound.h"
 #include "Engine/sithNet.h"
 #include "Dss/sithGamesave.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithPhysics.h"
 #include "World/sithPlayer.h"
 #include "World/sithWorld.h"
@@ -361,7 +361,7 @@ void sithCogFunction_SetTimerEx(sithCog *ctx)
     a1a = sithCogVm_PopFlex(ctx) * 1000.0;
     timerMs = (signed int)a1a;
     if ( timerMs >= 0 )
-        sithTimer_Set(4, &timerInfo, (signed int)a1a);
+        sithEvent_Set(4, &timerInfo, (signed int)a1a);
 }
 
 void sithCogFunction_KillTimerEx(sithCog *ctx)
@@ -374,9 +374,9 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
     v1 = sithCogVm_PopInt(ctx);
     if ( v1 > 0 )
     {
-        v2 = sithTimer_list;
+        v2 = sithEvent_list;
         v3 = 0;
-        if ( sithTimer_list )
+        if ( sithEvent_list )
         {
             do
             {
@@ -386,8 +386,8 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
                     if ( v3 )
                         v3->nextTimer = v4;
                     else
-                        sithTimer_list = v2->nextTimer;
-                    sithTimer_Kill(v2);
+                        sithEvent_list = v2->nextTimer;
+                    sithEvent_Kill(v2);
                     v2 = v3;
                 }
                 v3 = v2;

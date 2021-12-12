@@ -1,7 +1,7 @@
 #include "sithAIAwareness.h"
 
 #include "AI/sithAI.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithAdjoin.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
@@ -13,7 +13,7 @@ int sithAIAwareness_Startup()
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;
-        if ( sithTimer_RegisterFunc(3, sithAIAwareness_Tick, 1000, 1) )
+        if ( sithEvent_RegisterFunc(3, sithAIAwareness_Tick, 1000, 1) )
         {
             sithAIAwareness_bInitted = 1;
             return 1;
@@ -27,7 +27,7 @@ void sithAIAwareness_Shutdown()
 {
     pSithHS->free(sithAIAwareness_aSectors);
     sithAIAwareness_aSectors = 0;
-    sithTimer_RegisterFunc(3, NULL, 0, 0);
+    sithEvent_RegisterFunc(3, NULL, 0, 0);
     sithAIAwareness_bInitted = 0;
 }
 

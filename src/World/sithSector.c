@@ -11,7 +11,7 @@
 #include "jk.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithSound.h"

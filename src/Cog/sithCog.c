@@ -13,7 +13,7 @@
 #include "Cog/sithCogVm.h"
 #include "Cog/sithCogParse.h"
 #include "Cog/jkCog.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithMaterial.h"
@@ -118,7 +118,7 @@ int sithCog_Startup()
     sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global13", 0);
     sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global14", 0);
     sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global15", 0);
-    sithTimer_RegisterFunc(4, sithCogScript_TimerTick, 0, 2);
+    sithEvent_RegisterFunc(4, sithCogScript_TimerTick, 0, 2);
     sithCog_bInitted = 1;
     return 1;
 }

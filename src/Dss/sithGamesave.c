@@ -10,7 +10,7 @@
 #include "Engine/sithCamera.h"
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSurface.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithAnimClass.h"
@@ -109,7 +109,7 @@ int sithGamesave_LoadEntry(char *fpath)
 LABEL_11:
     sithSoundSys_Reset();
     sithSurface_Startup3();
-    sithTimer_Reset();
+    sithEvent_Reset();
     stdPalEffects_FlushAllEffects();
     stdPalEffects_ResetEffectsState(&stdPalEffects_state);
     if ( sithGamesave_func2 )
@@ -261,7 +261,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     sithSurface_Sync(mpFlags);
 
-    for (sithTimer* timerIter = sithTimer_list; timerIter; timerIter = timerIter->nextTimer )
+    for (sithTimer* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
         sithDSS_SendSyncTimers(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);

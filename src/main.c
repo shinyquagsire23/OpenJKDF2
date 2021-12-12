@@ -79,7 +79,7 @@
 #include "Engine/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithTimer.h"
+#include "Gameplay/sithEvent.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithMapView.h"
 #include "Engine/sithMaterial.h"
@@ -1685,15 +1685,15 @@ void do_hooks()
     hook_function(sithMap_Shutdown_ADDR, sithMap_Shutdown);
     
     // sithTimer
-    hook_function(sithTimer_Startup_ADDR, sithTimer_Startup);
-    hook_function(sithTimer_Shutdown_ADDR, sithTimer_Shutdown);
-    hook_function(sithTimer_Open_ADDR, sithTimer_Open);
-    hook_function(sithTimer_Close_ADDR, sithTimer_Close);
-    hook_function(sithTimer_Reset_ADDR, sithTimer_Reset);
-    hook_function(sithTimer_Set_ADDR, sithTimer_Set);
-    hook_function(sithTimer_Kill_ADDR, sithTimer_Kill);
-    hook_function(sithTimer_RegisterFunc_ADDR, sithTimer_RegisterFunc);
-    hook_function(sithTimer_Advance_ADDR, sithTimer_Advance);
+    hook_function(sithEvent_Startup_ADDR, sithEvent_Startup);
+    hook_function(sithEvent_Shutdown_ADDR, sithEvent_Shutdown);
+    hook_function(sithEvent_Open_ADDR, sithEvent_Open);
+    hook_function(sithEvent_Close_ADDR, sithEvent_Close);
+    hook_function(sithEvent_Reset_ADDR, sithEvent_Reset);
+    hook_function(sithEvent_Set_ADDR, sithEvent_Set);
+    hook_function(sithEvent_Kill_ADDR, sithEvent_Kill);
+    hook_function(sithEvent_RegisterFunc_ADDR, sithEvent_RegisterFunc);
+    hook_function(sithEvent_Advance_ADDR, sithEvent_Advance);
     
 #if 0
     // sithKeyFrame

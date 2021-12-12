@@ -139,13 +139,13 @@ rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
 //rdColormap_colorInfo 0x00548260 rdTexformat
 
-sithTimer_timers 0x00852F98 sithTimer[256]
-sithTimer_list 0x00855000 sithTimer*
-sithTimer_arrLut 0x00854B98 int[256]
-sithTimer_timerFuncs 0x00854F98 sithTimerFunc[5]
-sithTimer_numFree 0x00854FFC int
-sithTimer_bInit 0x855004 int
-sithTimer_bOpen 0x855008 int
+sithEvent_timers 0x00852F98 sithTimer[256]
+sithEvent_list 0x00855000 sithTimer*
+sithEvent_arrLut 0x00854B98 int[256]
+sithEvent_timerFuncs 0x00854F98 sithTimerFunc[5]
+sithEvent_numFree 0x00854FFC int
+sithEvent_bInit 0x855004 int
+sithEvent_bOpen 0x855008 int
 
 rdClip_faceStatus 0x0082EE5C int
 pSourceVert 0x0082EC50 rdVector3*
