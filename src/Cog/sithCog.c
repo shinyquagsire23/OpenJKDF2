@@ -140,9 +140,9 @@ int sithCog_Open()
     sithWorld *world; // ecx
     signed int result; // eax
     sithCog *v2; // ebx
-    sithCogIdk *v3; // ebp
+    sithCogReference *v3; // ebp
     sithCog *v5; // ebp
-    sithCogIdk *v6; // ebx
+    sithCogReference *v6; // ebx
     char *v7; // esi
     sithCogSymbol *v8; // edx
     uint32_t v10; // [esp+4h] [ebp-14h]
@@ -189,7 +189,7 @@ LABEL_25:
         v13 = cogs->field_4BC;
         while ( 1 )
         {
-            sithCogIdk* idk = &cogs->cogscript->aIdk[v10];
+            sithCogReference* idk = &cogs->cogscript->aIdk[v10];
             v8 = &cogs->symbolTable->buckets[idk->hash];
             v14 = v8;
             if ( (idk->flags & 1) != 0 )
@@ -363,7 +363,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     return NULL;
 }
 
-int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
+int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *val)
 {
     sithCogSymbol *v5; // esi
     sithCogSymbol *v7; // ecx
@@ -482,7 +482,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val)
     }
 }
 
-int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymbol *symbol)
+int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
 {
     cog_int_t v3; // eax
     int v5; // ebx

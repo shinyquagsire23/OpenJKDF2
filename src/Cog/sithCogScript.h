@@ -50,7 +50,7 @@ typedef struct sithCogSymboltable
     uint32_t unk_14;
 } sithCogSymboltable;
 
-typedef struct sithCogIdk
+typedef struct sithCogReference
 {
     int type;
     int flags;
@@ -59,7 +59,7 @@ typedef struct sithCogIdk
     int hash;
     char* desc;
     char value[32];
-} sithCogIdk;
+} sithCogReference;
 
 typedef struct sithCogScript
 {
@@ -70,7 +70,7 @@ typedef struct sithCogScript
     sithCogSymboltable *symbolTable;
     uint32_t num_triggers;
     sithCogTrigger triggers[32];
-    sithCogIdk aIdk[128];
+    sithCogReference aIdk[128];
     uint32_t numIdk;
 } sithCogScript;
 

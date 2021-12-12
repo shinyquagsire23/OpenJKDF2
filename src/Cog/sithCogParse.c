@@ -728,7 +728,7 @@ void sithCogParse_RecurseWrite(sith_cog_parser_node *node)
 
 int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
 {
-    sithCogIdk *cogIdk;
+    sithCogReference *cogIdk;
 
     if ( cogScript->numIdk >= 0x80u )
         return 0;
@@ -748,7 +748,7 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     symbol->val.dataAsName = 0;
     
     cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    _memset(cogIdk, 0, sizeof(sithCogIdk));
+    _memset(cogIdk, 0, sizeof(sithCogReference));
     cogIdk->type = a2;
     cogIdk->mask = 0x401;
     cogIdk->hash = symbol->symbol_id;
@@ -826,8 +826,8 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
         }
     }
     
-    sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
+    _memset(cogIdk, 0, sizeof(sithCogReference)); // added
     cogIdk->type = COG_TYPE_FLEX; // hmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
@@ -871,8 +871,8 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
         }
     }
     
-    sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
+    _memset(cogIdk, 0, sizeof(sithCogReference)); // added
     cogIdk->type = COG_TYPE_INT; // hmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
@@ -916,8 +916,8 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
         }
     }
     
-    sithCogIdk* cogIdk = &cogScript->aIdk[cogScript->numIdk];
-    _memset(cogIdk, 0, sizeof(sithCogIdk)); // added
+    sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
+    _memset(cogIdk, 0, sizeof(sithCogReference)); // added
     cogIdk->type = COG_TYPE_VECTOR; // TODO hmmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
