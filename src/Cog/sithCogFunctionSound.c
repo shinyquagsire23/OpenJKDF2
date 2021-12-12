@@ -1,4 +1,4 @@
-#include "sithCogSound.h"
+#include "sithCogFunctionSound.h"
 
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSoundClass.h"
@@ -6,7 +6,7 @@
 #include "World/sithSector.h"
 #include "Dss/sithDSSThing.h"
 
-void sithCogSound_PlaySong(sithCog *ctx)
+void sithCogFunctionSound_PlaySong(sithCog *ctx)
 {
     int trackTo = sithCogVm_PopInt(ctx);
     int trackFrom = sithCogVm_PopInt(ctx);
@@ -18,7 +18,7 @@ void sithCogSound_PlaySong(sithCog *ctx)
         sithSoundSys_PlaySong(trackTo, trackFrom, trackNum, 1);
 }
 
-void sithCogSound_PlaySoundThing(sithCog *ctx)
+void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
 {
     double maxDist_act; // st7
     __int32 flagsTmp; // ebx
@@ -109,7 +109,7 @@ void sithCogSound_PlaySoundThing(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSound_PlaySoundPos(sithCog *ctx)
+void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
 {
     int flagsTmp; // edi
     sithPlayingSound *playingSound; // eax
@@ -167,7 +167,7 @@ void sithCogSound_PlaySoundPos(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSound_PlaySoundLocal(sithCog *ctx)
+void sithCogFunctionSound_PlaySoundLocal(sithCog *ctx)
 {
     int flags = sithCogVm_PopInt(ctx);
     float pan = sithCogVm_PopFlex(ctx);
@@ -206,7 +206,7 @@ void sithCogSound_PlaySoundLocal(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSound_PlaySoundGlobal(sithCog *ctx)
+void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
 {
     int flags = sithCogVm_PopInt(ctx);
     float pan = sithCogVm_PopFlex(ctx);
@@ -253,7 +253,7 @@ void sithCogSound_PlaySoundGlobal(sithCog *ctx)
     }
 }
 
-void sithCogSound_StopSound(sithCog *ctx)
+void sithCogFunctionSound_StopSound(sithCog *ctx)
 {
     float fadeOut = sithCogVm_PopFlex(ctx);
     int refId = sithCogVm_PopInt(ctx);
@@ -279,7 +279,7 @@ void sithCogSound_StopSound(sithCog *ctx)
     }
 }
 
-void sithCogSound_LoadSound(sithCog *ctx)
+void sithCogFunctionSound_LoadSound(sithCog *ctx)
 {
     sithSound *sound;
 
@@ -290,7 +290,7 @@ void sithCogSound_LoadSound(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogSound_PlaySoundClass(sithCog *ctx)
+void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
 {
     sithSoundClass *soundclass;
 
@@ -313,7 +313,7 @@ void sithCogSound_PlaySoundClass(sithCog *ctx)
     }
 }
 
-void sithCogSound_ChangeSoundVol(sithCog *ctx)
+void sithCogFunctionSound_ChangeSoundVol(sithCog *ctx)
 {
     float fadeintime_ = sithCogVm_PopFlex(ctx);
     float vol = sithCogVm_PopFlex(ctx);
@@ -334,7 +334,7 @@ void sithCogSound_ChangeSoundVol(sithCog *ctx)
     }
 }
 
-void sithCogSound_ChangeSoundPitch(sithCog *ctx)
+void sithCogFunctionSound_ChangeSoundPitch(sithCog *ctx)
 {
     float changetime = sithCogVm_PopFlex(ctx);
     float pitch = sithCogVm_PopFlex(ctx);
@@ -345,7 +345,7 @@ void sithCogSound_ChangeSoundPitch(sithCog *ctx)
         sithSoundSys_SetPitch(sound, pitch, changetime);
 }
 
-void sithCogSound_SectorSound(sithCog *ctx)
+void sithCogFunctionSound_SectorSound(sithCog *ctx)
 {
     float vol = sithCogVm_PopFlex(ctx);
     sithSound* sound = sithCogVm_PopSound(ctx);
@@ -355,7 +355,7 @@ void sithCogSound_SectorSound(sithCog *ctx)
         sithSoundSys_SectorSound(sector, sound, vol);
 }
 
-void sithCogSound_SetMusicVol(sithCog *ctx)
+void sithCogFunctionSound_SetMusicVol(sithCog *ctx)
 {
     float vol = sithCogVm_PopFlex(ctx);
     if ( vol < 0.0 )
@@ -369,7 +369,7 @@ void sithCogSound_SetMusicVol(sithCog *ctx)
     sithSoundSys_SetMusicVol(vol);
 }
 
-void sithCogSound_GetSoundLen(sithCog *ctx)
+void sithCogFunctionSound_GetSoundLen(sithCog *ctx)
 {
     sithSound* sound = sithCogVm_PopSound(ctx);
 
@@ -383,20 +383,20 @@ void sithCogSound_GetSoundLen(sithCog *ctx)
     }
 }
 
-void sithCogSound_Initialize(void* ctx)
+void sithCogFunctionSound_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySong, "playsong");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundThing, "playsoundthing");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundPos, "playsoundpos");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundLocal, "playsoundlocal");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundGlobal, "playsoundglobal");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_StopSound, "stopsound");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_LoadSound, "loadsound");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_PlaySoundClass, "playsoundclass");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_ChangeSoundVol, "changesoundvol");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_ChangeSoundPitch, "changesoundpitch");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_SectorSound, "sectorsound");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_SetMusicVol, "setmusicvol");
-    sithCogScript_RegisterVerb(ctx, sithCogSound_GetSoundLen, "getsoundlen");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySong, "playsong");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPos, "playsoundpos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundLocal, "playsoundlocal");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundGlobal, "playsoundglobal");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_StopSound, "stopsound");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_LoadSound, "loadsound");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundClass, "playsoundclass");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeSoundVol, "changesoundvol");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeSoundPitch, "changesoundpitch");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SectorSound, "sectorsound");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SetMusicVol, "setmusicvol");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_GetSoundLen, "getsoundlen");
 
 }
