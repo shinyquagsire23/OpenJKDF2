@@ -715,7 +715,7 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     if ( (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
         return 0;
     v6 = actor->thing;
-    v8 = &sithSector_allocPerSector[actor->thing->sector->id];
+    v8 = &sithAIAwareness_aSectors[actor->thing->sector->id];
     v25 = v8;
     if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
     {
@@ -1133,7 +1133,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
     {
         if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 && flags == SITHAIFLAGS_ATTACKING_TARGET && aiclass->argsAsFloat[0] != 0.0 )
         {
-            v16 = &sithSector_allocPerSector[actor->thing->sector->id];
+            v16 = &sithAIAwareness_aSectors[actor->thing->sector->id];
             if (v16->field_4[2])
             {
                 if ( v16->field_58[2] )
@@ -1249,7 +1249,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     float tmp;
 
-    v7 = &sithSector_allocPerSector[actor->thing->sector->id];
+    v7 = &sithAIAwareness_aSectors[actor->thing->sector->id];
     if ( (actor->flags & SITHAIFLAGS_FLEEING) != 0 || (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
         return 0;
     if ( !flags )

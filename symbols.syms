@@ -705,11 +705,11 @@ sithCollision_dword_8B4BE4 0x008B4BE4 int
 sithCollision_collideHurtIdk 0x008B4BF0 rdVector3
 
 sithSector_surfaceNormal 0x0054C6E8 rdVector3 = {0.0, 0.0, -1.0}
-sithSector_aEntries 0x00855028 sithSectorEntry[32]
-sithSector_allocPerSector 0x008553A8 sithSectorAlloc*
-sithSector_numEntries 0x008553AC int
-sithSector_bInitted 0x008553B0 int
-sithSector_timerTicks 0x008553B4 int
+sithAIAwareness_aEntries 0x00855028 sithSectorEntry[32]
+sithAIAwareness_aSectors 0x008553A8 sithSectorAlloc*
+sithAIAwareness_numEntries 0x008553AC int
+sithAIAwareness_bInitted 0x008553B0 int
+sithAIAwareness_timerTicks 0x008553B4 int
 sithSector_flt_8553B8 0x008553B8 float
 sithSector_horizontalPixelsPerRev 0x008553BC float
 sithSector_flt_8553C0 0x008553C0 float

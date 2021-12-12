@@ -9,13 +9,13 @@
 
 int sithAIAwareness_Startup()
 {
-    sithSector_allocPerSector = (sithSectorAlloc *)pSithHS->alloc(sizeof(sithSectorAlloc) * sithWorld_pCurWorld->numSectors);
-    if (sithSector_allocPerSector)
+    sithAIAwareness_aSectors = (sithSectorAlloc *)pSithHS->alloc(sizeof(sithSectorAlloc) * sithWorld_pCurWorld->numSectors);
+    if (sithAIAwareness_aSectors)
     {
-        sithSector_numEntries = 0;
+        sithAIAwareness_numEntries = 0;
         if ( sithTimer_RegisterFunc(3, sithAIAwareness_Tick, 1000, 1) )
         {
-            sithSector_bInitted = 1;
+            sithAIAwareness_bInitted = 1;
             return 1;
         }
     }
@@ -25,10 +25,10 @@ int sithAIAwareness_Startup()
 
 void sithAIAwareness_Shutdown()
 {
-    pSithHS->free(sithSector_allocPerSector);
-    sithSector_allocPerSector = 0;
+    pSithHS->free(sithAIAwareness_aSectors);
+    sithAIAwareness_aSectors = 0;
     sithTimer_RegisterFunc(3, NULL, 0, 0);
-    sithSector_bInitted = 0;
+    sithAIAwareness_bInitted = 0;
 }
 
 int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing)
@@ -39,31 +39,31 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
 
     if ( !sithAI_bOpened )
         return 0;
-    v6 = sithSector_numEntries;
-    if ( sithSector_numEntries == 32 )
+    v6 = sithAIAwareness_numEntries;
+    if ( sithAIAwareness_numEntries == 32 )
         return 0;
-    v7 = sithSector_numEntries;
-    sithSector_aEntries[v7].sector = sector;
-    v8 = &sithSector_aEntries[v6].pos;
+    v7 = sithAIAwareness_numEntries;
+    sithAIAwareness_aEntries[v7].sector = sector;
+    v8 = &sithAIAwareness_aEntries[v6].pos;
     v8->x = pos->x;
-    sithSector_numEntries = v6 + 1;
+    sithAIAwareness_numEntries = v6 + 1;
     v8->y = pos->y;
     v8->z = pos->z;
-    sithSector_aEntries[v7].field_14 = a3;
-    sithSector_aEntries[v7].field_18 = a4;
-    sithSector_aEntries[v7].thing = thing;
+    sithAIAwareness_aEntries[v7].field_14 = a3;
+    sithAIAwareness_aEntries[v7].field_18 = a4;
+    sithAIAwareness_aEntries[v7].thing = thing;
     return 1;
 }
 
 int sithAIAwareness_Tick(int a, sithTimerInfo* b)
 {
-    ++sithSector_timerTicks;
-    if ( !sithSector_numEntries )
+    ++sithAIAwareness_timerTicks;
+    if ( !sithAIAwareness_numEntries )
         return 1;
 
-    for (size_t v1 = 0; v1 < sithSector_numEntries; v1++)
+    for (size_t v1 = 0; v1 < sithAIAwareness_numEntries; v1++)
     {
-        sithSectorEntry* v2 = (sithSectorEntry *)&sithSector_aEntries[v1];
+        sithSectorEntry* v2 = (sithSectorEntry *)&sithAIAwareness_aEntries[v1];
         sithAIAwareness_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
     }
     
@@ -85,14 +85,14 @@ int sithAIAwareness_Tick(int a, sithTimerInfo* b)
                     sithSector* v6 = i->thing->sector;
                     if ( v6 )
                     {
-                        if ( sithSector_allocPerSector[v6->id].field_0 == sithSector_timerTicks )
+                        if ( sithAIAwareness_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
                             sithAI_SetActorFireTarget(i, SITHAIFLAGS_ATTACKING_TARGET, 0);
                     }
                 }
             }
         }
     }
-    sithSector_numEntries = 0;
+    sithAIAwareness_numEntries = 0;
     return 1;
 }
 
@@ -105,9 +105,9 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *sectorEntry, sithSector *sector
     sithAdjoin *v13; // ecx
     float a6a; // [esp+24h] [ebp+14h]
 
-    v7 = sithSector_timerTicks;
-    v8 = &sithSector_allocPerSector[sector->id];
-    if ( v8->field_0 != sithSector_timerTicks )
+    v7 = sithAIAwareness_timerTicks;
+    v8 = &sithAIAwareness_aSectors[sector->id];
+    if ( v8->field_0 != sithAIAwareness_timerTicks )
     {
         _memset(v8, 0, sizeof(sithSectorAlloc));
         v8->field_0 = v7;
