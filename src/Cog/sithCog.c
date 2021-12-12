@@ -3,7 +3,7 @@
 #include "jk.h"
 #include "types.h"
 #include "Win95/DebugConsole.h"
-#include "Cog/sithCogUtil.h"
+#include "Cog/sithCogFunction.h"
 #include "Cog/sithCogFunctionThing.h"
 #include "Cog/sithCogFunctionPlayer.h"
 #include "Cog/sithCogFunctionAI.h"
@@ -54,7 +54,7 @@ int sithCog_Startup()
         return 0;
     }
     g_cog_symbolTable->bucket_idx = 0x100;
-    sithCogUtil_Initialize(g_cog_symbolTable);
+    sithCogFunction_Initialize(g_cog_symbolTable);
     sithCogFunctionThing_Initialize(g_cog_symbolTable);
     sithCogFunctionAI_Initialize(g_cog_symbolTable);
     sithCogFunctionSurface_Initialize(g_cog_symbolTable);

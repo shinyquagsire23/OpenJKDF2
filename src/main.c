@@ -9,6 +9,7 @@
 #include "Cog/sithCogVm.h"
 #include "Cog/jkCog.h"
 #include "Cog/sithCogYACC.h"
+#include "Cog/sithCogFunction.h"
 #include "Cog/sithCogFunctionThing.h"
 #include "Cog/sithCogFunctionPlayer.h"
 #include "Cog/sithCogFunctionAI.h"
@@ -483,7 +484,7 @@ void do_hooks()
     hook_function(sithCog_Free_ADDR, sithCog_Free);
     hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
     hook_function(sithCog_GetByIdx_ADDR, sithCog_GetByIdx);
-    hook_function(sithCogUtil_Initialize_ADDR, sithCogUtil_Initialize);
+    hook_function(sithCogFunction_Initialize_ADDR, sithCogFunction_Initialize);
     hook_function(sithCogFunctionThing_Initialize_ADDR, sithCogFunctionThing_Initialize);
     hook_function(sithCogFunctionAI_Initialize_ADDR, sithCogFunctionAI_Initialize);
     hook_function(sithCogFunctionSurface_Initialize_ADDR, sithCogFunctionSurface_Initialize);

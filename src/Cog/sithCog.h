@@ -8,7 +8,7 @@
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Initialize_ADDR (0x40A0C0)
-#define sithCogUtil_Initialize_ADDR (0x00505400)
+#define sithCogFunction_Initialize_ADDR (0x00505400)
 #define sithCogFunctionThing_Initialize_ADDR (0x005014E0)
 #define sithCogFunctionAI_Initialize_ADDR (0x00500B00)
 #define sithCogFunctionSound_Initialize_ADDR (0x004FF060)
@@ -152,7 +152,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogIdk *cogIdk, char *val);
 int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogIdk *idk, sithCogSymbol *symbol);
 void sithCog_HandleThingTimerPulse(sithThing *thing);
 
-void sithCogUtil_Initialize(void* a1);
+void sithCogFunction_Initialize(void* a1);
 void sithCogThing_Initialize(void* a1);
 void sithCogFunctionSound_Initialize(void* a1);
 void sithCogFunctionSector_Initialize(void* a1);
