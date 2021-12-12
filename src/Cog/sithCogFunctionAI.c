@@ -1,4 +1,4 @@
-#include "sithCogAI.h"
+#include "sithCogFunctionAI.h"
 
 #include "Engine/sithTime.h"
 #include "AI/sithAI.h"
@@ -6,48 +6,48 @@
 #include "Main/jkGame.h"
 #include "jk.h"
 
-void sithCogAI_AISetMoveSpeed(sithCog *ctx);
-void sithCogAI_SetMovePos(sithCog *ctx);
-void sithCogAI_AIJump(sithCog *ctx);
-void sithCogAI_AISetMoveFrame(sithCog *ctx);
-void sithCogAI_AISetMoveThing(sithCog *ctx);
-void sithCogAI_AISetLookPos(sithCog *ctx);
-void sithCogAI_AISetLookFrame(sithCog *ctx);
-void sithCogAI_GetMovePos(sithCog *ctx);
-void sithCogAI_AISetMode(sithCog *ctx);
-void sithCogAI_AIGetMode(sithCog *ctx);
-void sithCogAI_AIClearMode(sithCog *ctx);
-void sithCogAI_FirstThingInView(sithCog *ctx);
-void sithCogAI_NextThingInView(sithCog *ctx);
-void sithCogAI_ThingViewDot(sithCog *ctx);
-void sithCogAI_AISetFireTarget(sithCog *ctx);
-void sithCogAI_IsAITargetInSight(sithCog *ctx);
-void sithCogAI_AIFlee(sithCog *ctx);
-void sithCogAI_AISetClass(sithCog *ctx);
+void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx);
+void sithCogFunctionAI_SetMovePos(sithCog *ctx);
+void sithCogFunctionAI_AIJump(sithCog *ctx);
+void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx);
+void sithCogFunctionAI_AISetMoveThing(sithCog *ctx);
+void sithCogFunctionAI_AISetLookPos(sithCog *ctx);
+void sithCogFunctionAI_AISetLookFrame(sithCog *ctx);
+void sithCogFunctionAI_GetMovePos(sithCog *ctx);
+void sithCogFunctionAI_AISetMode(sithCog *ctx);
+void sithCogFunctionAI_AIGetMode(sithCog *ctx);
+void sithCogFunctionAI_AIClearMode(sithCog *ctx);
+void sithCogFunctionAI_FirstThingInView(sithCog *ctx);
+void sithCogFunctionAI_NextThingInView(sithCog *ctx);
+void sithCogFunctionAI_ThingViewDot(sithCog *ctx);
+void sithCogFunctionAI_AISetFireTarget(sithCog *ctx);
+void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx);
+void sithCogFunctionAI_AIFlee(sithCog *ctx);
+void sithCogFunctionAI_AISetClass(sithCog *ctx);
 
-void sithCogAI_Initialize(void* ctx)
+void sithCogFunctionAI_Initialize(void* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AIGetMode, "aigetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMode, "aisetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AIClearMode, "aiclearmode");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_GetMovePos, "aigetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_SetMovePos, "aisetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_FirstThingInView, "firstthinginview");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_NextThingInView, "nextthinginview");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_ThingViewDot, "thingviewdot");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetFireTarget, "aisetfiretarget");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveThing, "aisetmovething");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetLookPos, "aisetlookpos");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveSpeed, "aisetmovespeed");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetLookFrame, "aisetlookframe");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetMoveFrame, "aisetmoveframe");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_IsAITargetInSight, "isaitargetinsight");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AIFlee, "aiflee");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AISetClass, "aisetclass");
-    sithCogScript_RegisterVerb(ctx, sithCogAI_AIJump, "aijump");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_GetMovePos, "aigetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_SetMovePos, "aisetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveThing, "aisetmovething");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookPos, "aisetlookpos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveSpeed, "aisetmovespeed");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookFrame, "aisetlookframe");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveFrame, "aisetmoveframe");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_IsAITargetInSight, "isaitargetinsight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIFlee, "aiflee");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetClass, "aisetclass");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIJump, "aijump");
 }
 
-void sithCogAI_AISetMoveSpeed(sithCog *ctx)
+void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
     double v2; // st7
     sithThing *v3; // eax
@@ -73,7 +73,7 @@ void sithCogAI_AISetMoveSpeed(sithCog *ctx)
     }
 }
 
-void sithCogAI_SetMovePos(sithCog *ctx)
+void sithCogFunctionAI_SetMovePos(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -98,7 +98,7 @@ void sithCogAI_SetMovePos(sithCog *ctx)
     }
 }
 
-void sithCogAI_AIJump(sithCog *ctx)
+void sithCogFunctionAI_AIJump(sithCog *ctx)
 {
     signed int v2; // edi
     sithThing *v3; // eax
@@ -121,7 +121,7 @@ void sithCogAI_AIJump(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetMoveFrame(sithCog *ctx)
+void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
 {
     unsigned int v1; // esi
     sithThing *v2; // eax
@@ -152,7 +152,7 @@ void sithCogAI_AISetMoveFrame(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetMoveThing(sithCog *ctx)
+void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
 {
     sithThing *v1; // edi
     sithThing *v2; // eax
@@ -175,7 +175,7 @@ void sithCogAI_AISetMoveThing(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetLookPos(sithCog *ctx)
+void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -200,7 +200,7 @@ void sithCogAI_AISetLookPos(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetLookFrame(sithCog *ctx)
+void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
 {
     unsigned int v1; // esi
     sithThing *v2; // eax
@@ -231,7 +231,7 @@ void sithCogAI_AISetLookFrame(sithCog *ctx)
     }
 }
 
-void sithCogAI_GetMovePos(sithCog *ctx)
+void sithCogFunctionAI_GetMovePos(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -245,7 +245,7 @@ void sithCogAI_GetMovePos(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetMode(sithCog *ctx)
+void sithCogFunctionAI_AISetMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithThing *v2; // eax
@@ -274,7 +274,7 @@ void sithCogAI_AISetMode(sithCog *ctx)
     }
 }
 
-void sithCogAI_AIGetMode(sithCog *ctx)
+void sithCogFunctionAI_AIGetMode(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -286,7 +286,7 @@ void sithCogAI_AIGetMode(sithCog *ctx)
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogAI_AIClearMode(sithCog *ctx)
+void sithCogFunctionAI_AIClearMode(sithCog *ctx)
 {
     signed int mode; // esi
     sithThing *thing; // eax
@@ -317,7 +317,7 @@ void sithCogAI_AIClearMode(sithCog *ctx)
     }
 }
 
-void sithCogAI_FirstThingInView(sithCog *ctx)
+void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
 {
     sithThing *v2; // eax
     sithThing *v3; // ebx
@@ -350,10 +350,10 @@ void sithCogAI_FirstThingInView(sithCog *ctx)
                                                                                                                                    rdMatrix_PreTranslate34(
                                                                                                                                        &v7,
                                                                                                                                        &v3->actorParams.eyeOffset)) : rdMatrix_PostTranslate34(&v7, &v3->position),
-          (sithCogAI_unk1 = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogAI_apViewThings, v5, a1), sithCogAI_viewThingIdx = 0, sithCogAI_unk1 > 0)
-       && sithCogAI_apViewThings[0]) )
+          (sithCogFunctionAI_unk1 = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_apViewThings, v5, a1), sithCogFunctionAI_viewThingIdx = 0, sithCogFunctionAI_unk1 > 0)
+       && sithCogFunctionAI_apViewThings[0]) )
     {
-        sithCogVm_PushInt(ctx, sithCogAI_apViewThings[0]->thingIdx);
+        sithCogVm_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
     }
     else
     {
@@ -361,19 +361,19 @@ void sithCogAI_FirstThingInView(sithCog *ctx)
     }
 }
 
-void sithCogAI_NextThingInView(sithCog *ctx)
+void sithCogFunctionAI_NextThingInView(sithCog *ctx)
 {
     int v1; // eax
     sithThing *v2; // eax
 
-    v1 = ++sithCogAI_viewThingIdx;
-    if ( sithCogAI_viewThingIdx < sithCogAI_unk1 && (v2 = sithCogAI_apViewThings[v1]) != 0 )
+    v1 = ++sithCogFunctionAI_viewThingIdx;
+    if ( sithCogFunctionAI_viewThingIdx < sithCogFunctionAI_unk1 && (v2 = sithCogFunctionAI_apViewThings[v1]) != 0 )
         sithCogVm_PushInt(ctx, v2->thingIdx);
     else
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogAI_ThingViewDot(sithCog *ctx)
+void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
 {
     sithThing *v1; // ebp
     sithThing *v2; // eax
@@ -414,7 +414,7 @@ void sithCogAI_ThingViewDot(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetFireTarget(sithCog *ctx)
+void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
 {
     sithThing *v1; // esi
     sithThing *v2; // eax
@@ -453,7 +453,7 @@ void sithCogAI_AISetFireTarget(sithCog *ctx)
 }
 
 // Unused?
-void sithCogAI_sub_501330(sithCog *ctx)
+void sithCogFunctionAI_sub_501330(sithCog *ctx)
 {
     char *v1; // edi
     sithThing *v2; // eax
@@ -497,7 +497,7 @@ LABEL_12:
         sithCogVm_PushInt(ctx, -1);
 }
 
-void sithCogAI_IsAITargetInSight(sithCog *ctx)
+void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -509,7 +509,7 @@ void sithCogAI_IsAITargetInSight(sithCog *ctx)
         sithCogVm_PushInt(ctx, 0);
 }
 
-void sithCogAI_AIFlee(sithCog *ctx)
+void sithCogFunctionAI_AIFlee(sithCog *ctx)
 {
     sithThing *v1; // edi
     sithThing *v2; // eax
@@ -544,7 +544,7 @@ void sithCogAI_AIFlee(sithCog *ctx)
     }
 }
 
-void sithCogAI_AISetClass(sithCog *ctx)
+void sithCogFunctionAI_AISetClass(sithCog *ctx)
 {
     sithAIClass *aiclass; // esi
     sithThing *thing; // eax

@@ -414,9 +414,9 @@ rdRaster_aOtherLUT 0x86CDDC float[16]
 rdRaster_aOneDivXLUT 0x0086CE20 float[2048]
 rdRaster_fixedScale 0x00548E28 float = 65536.0f
 
-sithCogAI_apViewThings 0x00855CE8 sithThing*[32]
-sithCogAI_unk1 0x00855D68 int
-sithCogAI_viewThingIdx 0x00855D6C int
+sithCogFunctionAI_apViewThings 0x00855CE8 sithThing*[32]
+sithCogFunctionAI_unk1 0x00855D68 int
+sithCogFunctionAI_viewThingIdx 0x00855D6C int
 
 sithCogVm_MsgTmpBuf 0x00837468 sithCogMsg[32]
 sithCogVm_aMsgPairs 0x00847968 sithCogMsg_Pair[128]
