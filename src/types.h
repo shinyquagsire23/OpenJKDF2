@@ -433,8 +433,8 @@ typedef struct sithCogSymboltable sithCogSymboltable;
 typedef struct sithSurfaceInfo sithSurfaceInfo;
 typedef struct sithSoundClass sithSoundClass;
 typedef struct sithSoundClassEntry sithSoundClassEntry;
-typedef struct sithTimer sithTimer;
-typedef struct sithTimerInfo sithTimerInfo;
+typedef struct sithEvent sithEvent;
+typedef struct sithEventInfo sithEventInfo;
 typedef struct sithCollisionEntry sithCollisionEntry;
 typedef struct sithCollisionSectorEntry sithCollisionSectorEntry;
 typedef struct sithMap sithMap;
@@ -1036,35 +1036,35 @@ typedef struct rdMaterial
     rdTexture* textures;
 } rdMaterial;
 
-typedef struct sithTimerInfo sithTimerInfo; 
-typedef struct sithTimer sithTimer;
+typedef struct sithEventInfo sithEventInfo; 
+typedef struct sithEvent sithEvent;
 
-typedef int (*sithTimerHandler_t)(int, sithTimerInfo*);
+typedef int (*sithEventHandler_t)(int, sithEventInfo*);
 
-typedef struct sithTimerInfo
+typedef struct sithEventInfo
 {
     int cogIdx;
     int timerIdx;
     float field_10;
     float field_14;
-} sithTimerInfo;
+} sithEventInfo;
 
-typedef struct sithTimer
+typedef struct sithEvent
 {
     uint32_t endMs;
-    int field_4;
-    sithTimerInfo timerInfo;
-    sithTimer* nextTimer;
-} sithTimer;
+    int taskNum;
+    sithEventInfo timerInfo;
+    sithEvent* nextTimer;
+} sithEvent;
 
-typedef struct sithTimerFunc
+typedef struct sithEventTask
 {
-    sithTimerHandler_t handler;
-    uint32_t field_4;
+    sithEventHandler_t pfProcess;
+    uint32_t startMode;
     uint32_t rate;
     uint32_t creationMs;
     uint32_t field_10;
-} sithTimerFunc;
+} sithEventTask;
 
 
 typedef struct sithPlayingSound

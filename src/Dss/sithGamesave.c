@@ -261,8 +261,8 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     sithSurface_Sync(mpFlags);
 
-    for (sithTimer* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
-        sithDSS_SendSyncTimers(timerIter, 0, mpFlags);
+    for (sithEvent* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
+        sithDSS_SendSyncEvents(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);
     sithDSS_SendSyncCameras(0, mpFlags);

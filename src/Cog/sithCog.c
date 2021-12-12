@@ -1295,7 +1295,7 @@ void sithCogScript_Tick(sithCog *cog)
     }
 }
 
-int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info)
+int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
 {
     sithWorld *v2; // ecx
     int v3; // eax

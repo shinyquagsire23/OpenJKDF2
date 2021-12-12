@@ -13,7 +13,7 @@ int sithAIAwareness_Startup()
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;
-        if ( sithEvent_RegisterFunc(3, sithAIAwareness_Tick, 1000, 1) )
+        if ( sithEvent_RegisterFunc(3, sithAIAwareness_Tick, 1000, SITHEVENT_TASKPERIODIC) )
         {
             sithAIAwareness_bInitted = 1;
             return 1;
@@ -27,7 +27,7 @@ void sithAIAwareness_Shutdown()
 {
     pSithHS->free(sithAIAwareness_aSectors);
     sithAIAwareness_aSectors = 0;
-    sithEvent_RegisterFunc(3, NULL, 0, 0);
+    sithEvent_RegisterFunc(3, NULL, 0, SITHEVENT_TASKDISABLED);
     sithAIAwareness_bInitted = 0;
 }
 
@@ -55,7 +55,7 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
     return 1;
 }
 
-int sithAIAwareness_Tick(int a, sithTimerInfo* b)
+int sithAIAwareness_Tick(int a, sithEventInfo* b)
 {
     ++sithAIAwareness_timerTicks;
     if ( !sithAIAwareness_numEntries )

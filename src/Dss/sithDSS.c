@@ -492,7 +492,7 @@ int sithDSS_HandleStopAnim(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSS_SendSyncTimers(sithTimer *timer, int sendto_id, int mpFlags)
+void sithDSS_SendSyncEvents(sithEvent *timer, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -501,18 +501,18 @@ void sithDSS_SendSyncTimers(sithTimer *timer, int sendto_id, int mpFlags)
     NETMSG_PUSHU32(timer->timerInfo.timerIdx);
     NETMSG_PUSHF32(timer->timerInfo.field_10);
     NETMSG_PUSHF32(timer->timerInfo.field_14);
-    NETMSG_PUSHS16(timer->field_4);
+    NETMSG_PUSHS16(timer->taskNum);
     
-    NETMSG_END(COGMSG_SYNCTIMERS);
+    NETMSG_END(COGMSG_SYNCEVENTS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_HandleSyncTimers(sithCogMsg *msg)
+int sithDSS_HandleSyncEvents(sithCogMsg *msg)
 {
     int deltaMs;
     int16_t field_4;
-    sithTimerInfo info;
+    sithEventInfo info;
 
     NETMSG_IN_START(msg);
 

@@ -184,7 +184,7 @@ void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const c
 void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3);
 void sithCogScript_TickAll();
 void sithCogScript_Tick(sithCog *cog);
-int sithCogScript_TimerTick(int deltaMs, sithTimerInfo *info);
+int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info);
 void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra);
 sithCog* sithCog_GetByIdx(int idx);
 

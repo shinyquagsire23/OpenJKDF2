@@ -1684,7 +1684,7 @@ void do_hooks()
     hook_function(sithMap_Initialize_ADDR, sithMap_Initialize);
     hook_function(sithMap_Shutdown_ADDR, sithMap_Shutdown);
     
-    // sithTimer
+    // sithEvent
     hook_function(sithEvent_Startup_ADDR, sithEvent_Startup);
     hook_function(sithEvent_Shutdown_ADDR, sithEvent_Shutdown);
     hook_function(sithEvent_Open_ADDR, sithEvent_Open);

@@ -350,7 +350,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
 
 void sithCogFunction_SetTimerEx(sithCog *ctx)
 {
-    sithTimerInfo timerInfo; // [esp+4h] [ebp-14h]
+    sithEventInfo timerInfo; // [esp+4h] [ebp-14h]
     int timerMs; // [esp+14h] [ebp-4h]
     float a1a; // [esp+20h] [ebp+8h]
 
@@ -367,9 +367,9 @@ void sithCogFunction_SetTimerEx(sithCog *ctx)
 void sithCogFunction_KillTimerEx(sithCog *ctx)
 {
     signed int v1; // ebx
-    sithTimer *v2; // eax
-    sithTimer *v3; // edi
-    sithTimer *v4; // esi
+    sithEvent *v2; // eax
+    sithEvent *v3; // edi
+    sithEvent *v4; // esi
 
     v1 = sithCogVm_PopInt(ctx);
     if ( v1 > 0 )
@@ -381,7 +381,7 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
             do
             {
                 v4 = v2->nextTimer;
-                if ( v2->field_4 == 4 && v2->timerInfo.cogIdx == ctx->selfCog && v2->timerInfo.timerIdx == v1 )
+                if ( v2->taskNum == 4 && v2->timerInfo.cogIdx == ctx->selfCog && v2->timerInfo.timerIdx == v1 )
                 {
                     if ( v3 )
                         v3->nextTimer = v4;

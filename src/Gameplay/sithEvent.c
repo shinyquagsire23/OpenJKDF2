@@ -8,7 +8,7 @@ int sithEvent_Startup()
     if ( sithEvent_bInit )
         return 0;
 
-    _memset(sithEvent_timerFuncs, 0, sizeof(sithTimerFunc) * 5);
+    _memset(sithEvent_aTasks, 0, sizeof(sithEventTask) * 5);
 
     sithEvent_Reset();
     sithEvent_bInit = 1;
@@ -39,33 +39,33 @@ void sithEvent_Close()
 
 void sithEvent_Reset()
 {
-    _memset(sithEvent_timers, 0, sizeof(sithTimer) * 256);
+    _memset(sithEvent_aEvents, 0, sizeof(sithEvent) * 256);
     int id = 256;
     for (int i = 0; i < 256; i++)
     {
         sithEvent_arrLut[i] = --id;
     }
 
-    sithEvent_numFree = 256;
+    sithEvent_numFreeEventBuffers = 256;
     sithEvent_list = 0;
 }
 
-int sithEvent_Set(int a1, sithTimerInfo *timerInfo, int timerMs)
+int sithEvent_Set(int taskId, sithEventInfo *timerInfo, uint32_t when)
 {
-    sithTimer *timer;
-    sithTimer *v5;
-    sithTimer *i;
+    sithEvent *timer;
+    sithEvent *v5;
+    sithEvent *i;
 
-    if ( sithEvent_numFree )
-        timer = &sithEvent_timers[sithEvent_arrLut[--sithEvent_numFree]];
+    if ( sithEvent_numFreeEventBuffers )
+        timer = &sithEvent_aEvents[sithEvent_arrLut[--sithEvent_numFreeEventBuffers]];
     else
         timer = 0;
 
     if ( !timer )
         return 0;
 
-    timer->endMs = sithTime_curMs + timerMs;
-    timer->field_4 = a1;
+    timer->endMs = sithTime_curMs + when;
+    timer->taskNum = taskId;
     timer->timerInfo = *timerInfo;
 
     v5 = sithEvent_list;
@@ -90,40 +90,40 @@ int sithEvent_Set(int a1, sithTimerInfo *timerInfo, int timerMs)
     return 1;
 }
 
-void sithEvent_Kill(sithTimer *timer)
+void sithEvent_Kill(sithEvent *pEvent)
 {
-    _memset(timer, 0, sizeof(sithTimer));
+    _memset(pEvent, 0, sizeof(sithEvent));
     
-    intptr_t timerOffs = ((intptr_t)timer - (intptr_t)sithEvent_timers);
+    intptr_t timerOffs = ((intptr_t)pEvent - (intptr_t)sithEvent_aEvents);
     
-    sithEvent_arrLut[sithEvent_numFree] = timerOffs / sizeof(sithTimer);
+    sithEvent_arrLut[sithEvent_numFreeEventBuffers] = timerOffs / sizeof(sithEvent);
 
-    sithEvent_numFree++;
+    sithEvent_numFreeEventBuffers++;
 }
 
-int sithEvent_RegisterFunc(int idx, sithTimerHandler_t handler, int rate, int a4)
+int sithEvent_RegisterFunc(int idx, sithEventHandler_t handler, int rate, int startMode)
 {
-    sithEvent_timerFuncs[idx].handler = handler;
-    sithEvent_timerFuncs[idx].creationMs = sithTime_curMs;
-    sithEvent_timerFuncs[idx].field_10 = 0;
-    sithEvent_timerFuncs[idx].rate = rate;
-    sithEvent_timerFuncs[idx].field_4 = a4;
+    sithEvent_aTasks[idx].pfProcess = handler;
+    sithEvent_aTasks[idx].creationMs = sithTime_curMs;
+    sithEvent_aTasks[idx].field_10 = 0;
+    sithEvent_aTasks[idx].rate = rate;
+    sithEvent_aTasks[idx].startMode = startMode;
     return 1;
 }
 
 void sithEvent_Advance()
 {
-    sithTimer *i;
+    sithEvent *i;
 
     for (int idx = 1; idx < 5; idx++)
     {
-        sithTimerFunc* timerFunc = &sithEvent_timerFuncs[idx];
-        if ( timerFunc->field_4 == 1 )
+        sithEventTask* timerFunc = &sithEvent_aTasks[idx];
+        if ( timerFunc->startMode == SITHEVENT_TASKPERIODIC )
         {
             uint32_t delta = (sithTime_curMs - timerFunc->creationMs);
             if ( delta > timerFunc->rate )
             {
-                if ( timerFunc->handler(delta, 0) )
+                if ( timerFunc->pfProcess(delta, 0) )
                     timerFunc->creationMs = sithTime_curMs;
             }
         }
@@ -138,8 +138,8 @@ void sithEvent_Advance()
         sithEvent_list = i->nextTimer;
 
         // Added: nullptr check
-        if (sithEvent_timerFuncs[i->field_4].handler)
-            sithEvent_timerFuncs[i->field_4].handler(0, &i->timerInfo);
+        if (sithEvent_aTasks[i->taskNum].pfProcess)
+            sithEvent_aTasks[i->taskNum].pfProcess(0, &i->timerInfo);
         
         sithEvent_Kill(i);
         i = sithEvent_list;

@@ -85,7 +85,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithDSS_HandleSyncPuppet;
     sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
     sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = sithDSSThing_HandleSyncThingAttachment;
-    sithCogVm_msgFuncs[COGMSG_SYNCTIMERS] = sithDSS_HandleSyncTimers;
+    sithCogVm_msgFuncs[COGMSG_SYNCEVENTS] = sithDSS_HandleSyncEvents;
     sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = sithDSS_HandleSyncCameras;
     sithCogVm_msgFuncs[COGMSG_TAKEITEM1] = cogMsg_HandleTakeItem;
     sithCogVm_msgFuncs[COGMSG_TAKEITEM2] = cogMsg_HandleTakeItem;
