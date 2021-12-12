@@ -49,7 +49,7 @@ int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
 
 sithThing* sithTemplate_GetEntryByIdx(int idx)
 {
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;

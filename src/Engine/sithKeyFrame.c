@@ -64,7 +64,7 @@ rdKeyframe* sithKeyFrame_GetByIdx(int idx)
 {
     rdKeyframe *result;
 
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;

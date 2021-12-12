@@ -33,7 +33,7 @@ void sithPlayer_Initialize(int idx)
     v2 = jkPlayer_playerInfos[idx].playerThing;
     if ( v2 )
     {
-        if ( sithWorld_pCurWorld )
+        if ( sithWorld_pCurrentWorld )
         {
             sithThing_SetNewModel(v2, v2->templateBase->rdthing.model3);
             jkPlayer_playerInfos[idx].playerThing->thingflags |= SITH_TF_DISABLED;
@@ -136,8 +136,8 @@ void sithPlayer_idk(int idx)
     g_selfPlayerInfo = &jkPlayer_playerInfos[idx];
     g_localPlayerThing = jkPlayer_playerInfos[idx].playerThing;
 
-    sithWorld_pCurWorld->playerThing = g_localPlayerThing;
-    sithWorld_pCurWorld->cameraFocus = g_localPlayerThing;
+    sithWorld_pCurrentWorld->playerThing = g_localPlayerThing;
+    sithWorld_pCurrentWorld->cameraFocus = g_localPlayerThing;
 
     g_localPlayerThing->thingflags &= ~0x100u;
 
@@ -308,7 +308,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
     }
     else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
     {
-        stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+        stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
         stdFnames_ChangeExt(v1, "jks");
         sithGamesave_Load(v1, 0, 0);
     }
@@ -324,7 +324,7 @@ void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
     double v5; // st7
     double v8; // st7
 
-    focusThing = sithWorld_pCurWorld->cameraFocus;
+    focusThing = sithWorld_pCurrentWorld->cameraFocus;
     if ( (focusThing->type & SITH_THING_PLAYER) != 0 ) // ???
     {
         paleffect = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
@@ -498,7 +498,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
             }
             else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
             {
-                stdString_snprintf(v4, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+                stdString_snprintf(v4, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
                 stdFnames_ChangeExt(v4, "jks");
                 sithGamesave_Load(v4, 0, 0);
             }

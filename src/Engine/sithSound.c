@@ -186,7 +186,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
 
 sithSound* sithSound_GetFromIdx(int idx)
 {
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (idx & 0x8000)
     {
@@ -315,12 +315,12 @@ int sithSound_StopAll(uint32_t idk)
     v9 = 0;
     while ( 1 )
     {
-        world = sithWorld_pCurWorld;
+        world = sithWorld_pCurrentWorld;
         if ( v8 )
         {
             world = sithWorld_pStatic;
             if (!world)
-                world = sithWorld_pCurWorld;
+                world = sithWorld_pCurrentWorld;
             else
                 v8 = 0;
         }

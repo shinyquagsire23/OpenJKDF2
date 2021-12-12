@@ -213,29 +213,29 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
         return 0;
 
     thingIdx = NETMSG_POPS16();
-    if ( thingIdx >= sithWorld_pCurWorld->numThingsLoaded )
+    if ( thingIdx >= sithWorld_pCurrentWorld->numThingsLoaded )
         return 0;
 
-    if ( sithWorld_pCurWorld->things[thingIdx].type )
-        sithThing_FreeEverythingNet(&sithWorld_pCurWorld->things[thingIdx]);
+    if ( sithWorld_pCurrentWorld->things[thingIdx].type )
+        sithThing_FreeEverythingNet(&sithWorld_pCurrentWorld->things[thingIdx]);
 
-    if ( sithWorld_pCurWorld->numThings > thingIdx )
-        thingIdx = sithWorld_pCurWorld->numThings;
+    if ( sithWorld_pCurrentWorld->numThings > thingIdx )
+        thingIdx = sithWorld_pCurrentWorld->numThings;
 
-    sithWorld_pCurWorld->numThings = thingIdx;
+    sithWorld_pCurrentWorld->numThings = thingIdx;
 
     type = NETMSG_POPS16();
     if ( !type )
         return 1;
 
-    thing = &sithWorld_pCurWorld->things[thingIdx];
+    thing = &sithWorld_pCurrentWorld->things[thingIdx];
     sithThing_DoesRdThingInit(thing);
     v8 = NETMSG_POPS16();
 
-    if ( v8 >= sithWorld_pCurWorld->numTemplatesLoaded )
+    if ( v8 >= sithWorld_pCurrentWorld->numTemplatesLoaded )
         return 0;
 
-    sithThing_sub_4CD8A0(thing, &sithWorld_pCurWorld->templates[v8]);
+    sithThing_sub_4CD8A0(thing, &sithWorld_pCurrentWorld->templates[v8]);
 
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();

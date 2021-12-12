@@ -612,7 +612,7 @@ jkMain_wstrIdk 0x00552A58 wchar_t[128]
 
 sithWorld_aSectionParsers 0x00833548 sithWorldParser[32]
 sithWorld_some_integer_4 0x008339E0 uint32_t
-sithWorld_pCurWorld 0x8339C8 sithWorld*
+sithWorld_pCurrentWorld 0x8339C8 sithWorld*
 sithWorld_pStatic 0x8339CC sithWorld*
 sithWorld_pLoading 0x8339D0 sithWorld*
 sithWorld_numParsers 0x8339D4 uint32_t

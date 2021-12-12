@@ -40,7 +40,7 @@ int jkPlayer_LoadAutosave()
     char tmp[128];
 
     jkPlayer_dword_525470 = 1;
-    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
     return sithGamesave_Load(tmp, 0, 0);
 }
@@ -132,9 +132,9 @@ void jkPlayer_InitThings()
     jkPlayer_numOtherThings = 0;
 
     jkPlayerInfo* playerInfoIter = jkPlayer_otherThings;
-    for (int i = 0; i < sithWorld_pCurWorld->numThingsLoaded; i++)
+    for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* thingIter = &sithWorld_pCurWorld->things[i];
+        sithThing* thingIter = &sithWorld_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & THING_TYPEFLAGS_BOSS 
@@ -387,7 +387,7 @@ void jkPlayer_DrawPov()
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_deltaSeconds);
     }
 
-    if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurWorld->cameraFocus )
+    if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurrentWorld->cameraFocus )
     {
         sithThing* player = playerThings[playerThingIdx].actorThing;
 

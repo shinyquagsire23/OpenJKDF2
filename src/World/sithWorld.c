@@ -94,11 +94,11 @@ int sithWorld_Startup()
 
 void sithWorld_Shutdown()
 {
-    if ( sithWorld_pCurWorld )
-        pSithHS->free(sithWorld_pCurWorld);
+    if ( sithWorld_pCurrentWorld )
+        pSithHS->free(sithWorld_pCurrentWorld);
     if ( sithWorld_pStatic )
         pSithHS->free(sithWorld_pStatic);
-    sithWorld_pCurWorld = 0;
+    sithWorld_pCurrentWorld = 0;
     sithWorld_pStatic = 0;
     sithWorld_pLoading = 0;
     sithWorld_bInitted = 0;
@@ -737,8 +737,8 @@ void sithWorld_Free()
 {
     if ( sithWorld_bLoaded )
     {
-        sithWorld_FreeEntry(sithWorld_pCurWorld);
-        sithWorld_pCurWorld = 0;
+        sithWorld_FreeEntry(sithWorld_pCurrentWorld);
+        sithWorld_pCurrentWorld = 0;
         sithWorld_bLoaded = 0;
     }
 }

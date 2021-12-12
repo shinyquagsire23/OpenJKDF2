@@ -386,7 +386,7 @@ void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const r
 LABEL_46:
                 if ( (unk3Flags & 4) == 0 && ((unk3Flags & 0x10) == 0 || (v12->surfaceFlags & SURFACEFLAGS_1) != 0) )
                 {
-                    v35 = sithWorld_pCurWorld->vertices;
+                    v35 = sithWorld_pCurrentWorld->vertices;
                     rdVector3 dist;
                     rdVector_Sub3(&dist, &tmp, &v35[*v12->surfaceInfo.face.vertexPosIdx]);
                     
@@ -435,7 +435,7 @@ LABEL_46:
             }
 LABEL_22:
             // Standing?
-            if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &a7, unk3Flags) )
+            if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, unk3Flags) )
             {
                 if ( !v45 || (unk3Flags & 1) == 0 )
                 {;
@@ -473,7 +473,7 @@ LABEL_30:
                 }
                 
                 // Falling?
-                if ( (unk3Flags & 2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurWorld->vertices, &v48, unk3Flags) )
+                if ( (unk3Flags & 2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, unk3Flags) )
                 {
                     v24 = sithCollision_searchStackIdx;
                     if ( v45 && (unk3Flags & 1) != 0 )

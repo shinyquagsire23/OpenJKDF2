@@ -664,30 +664,30 @@ void sithSurface_ScrollSky(rdSurface *surface, int skyType, float deltaSecs, uin
 
     if ( skyType == SITH_SURFACE_HORIZONSKY )
     {
-        float offs_x = scroll_x + sithWorld_pCurWorld->horizontalSkyOffs.x;
-        float offs_y = scroll_y + sithWorld_pCurWorld->horizontalSkyOffs.y;
+        float offs_x = scroll_x + sithWorld_pCurrentWorld->horizontalSkyOffs.x;
+        float offs_y = scroll_y + sithWorld_pCurrentWorld->horizontalSkyOffs.y;
 
-        sithWorld_pCurWorld->horizontalSkyOffs.x = offs_x;
-        sithWorld_pCurWorld->horizontalSkyOffs.y = offs_y;
+        sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs_x;
+        sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs_y;
 
         if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
         {
-            sithWorld_pCurWorld->horizontalSkyOffs.x = fmod(offs_x, 1024.0);
-            sithWorld_pCurWorld->horizontalSkyOffs.y = fmod(offs_y, 1024.0);
+            sithWorld_pCurrentWorld->horizontalSkyOffs.x = fmod(offs_x, 1024.0);
+            sithWorld_pCurrentWorld->horizontalSkyOffs.y = fmod(offs_y, 1024.0);
         }
     }
     else
     {
-        float offs_x = scroll_x + sithWorld_pCurWorld->ceilingSkyOffs.x;
-        float offs_y = scroll_y + sithWorld_pCurWorld->ceilingSkyOffs.y;
+        float offs_x = scroll_x + sithWorld_pCurrentWorld->ceilingSkyOffs.x;
+        float offs_y = scroll_y + sithWorld_pCurrentWorld->ceilingSkyOffs.y;
 
-        sithWorld_pCurWorld->ceilingSkyOffs.x = offs_x;
-        sithWorld_pCurWorld->ceilingSkyOffs.y = offs_y;
+        sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs_x;
+        sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs_y;
 
         if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
         {
-            sithWorld_pCurWorld->ceilingSkyOffs.x = fmod(offs_x, 1024.0);
-            sithWorld_pCurWorld->ceilingSkyOffs.y = fmod(offs_y, 1024.0);
+            sithWorld_pCurrentWorld->ceilingSkyOffs.x = fmod(offs_x, 1024.0);
+            sithWorld_pCurrentWorld->ceilingSkyOffs.y = fmod(offs_y, 1024.0);
         }
     }
 }
@@ -842,7 +842,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
         return 0;
     v3->flags = SURFACEFLAGS_100000|SURFACEFLAGS_WATER;
     v3->sithSurfaceParent = surface;
-    v6 = sithWorld_pCurWorld;
+    v6 = sithWorld_pCurrentWorld;
     v3->field_24 = *a2;
     v7 = 1;
     v8 = surface->surfaceInfo.face.normal.x;
@@ -1049,7 +1049,7 @@ int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
     a1a.y = 0.0;
     a1a.z = 0.0;
     for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i )
-        rdVector_Add3Acc(&a1a, &sithWorld_pCurWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
+        rdVector_Add3Acc(&a1a, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
 
     v6 = (float)(unsigned int)surface->surfaceInfo.face.numVertices;
     rdVector_InvScale3(out, &a1a, v6);
@@ -1268,8 +1268,8 @@ sithSurface* sithSurface_sub_4E63B0(int idx)
 {
     sithSurface *result; // eax
 
-    if ( sithWorld_pCurWorld && idx >= 0 && idx < sithWorld_pCurWorld->numSurfaces )
-        result = &sithWorld_pCurWorld->surfaces[idx];
+    if ( sithWorld_pCurrentWorld && idx >= 0 && idx < sithWorld_pCurrentWorld->numSurfaces )
+        result = &sithWorld_pCurrentWorld->surfaces[idx];
     else
         result = 0;
     return result;

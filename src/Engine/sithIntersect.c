@@ -44,7 +44,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSecto
         sithAdjoin* adjoin = surface->adjoin;
         if ( (surface->surfaceFlags & SURFACEFLAGS_4) != 0 || adjoin && (adjoin->flags & 2) != 0 )
         {
-            v7 = sithWorld_pCurWorld->vertices;
+            v7 = sithWorld_pCurrentWorld->vertices;
             v8 = stdMath_ClipPrecision(rdVector_NormalDot(pos, &v7[*surface->surfaceInfo.face.vertexPosIdx], &surface->surfaceInfo.face.normal));
             if ( v8 < radius )
                 return 0;

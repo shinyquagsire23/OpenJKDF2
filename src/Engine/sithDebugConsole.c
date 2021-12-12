@@ -97,9 +97,9 @@ int sithDebugConsole_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pA
             v3 = 128;
             goto LABEL_13;
         case 5u:
-            if ( !sithWorld_pCurWorld )
+            if ( !sithWorld_pCurrentWorld )
                 goto LABEL_24;
-            v4 = sithWorld_pCurWorld->playerThing;
+            v4 = sithWorld_pCurrentWorld->playerThing;
             if ( !v4 || v4->thingtype != SITH_THING_PLAYER )
                 goto LABEL_24;
             v2 = (int*)&v4->actorParams.typeflags;
@@ -150,7 +150,7 @@ int sithDebugConsole_CmdFly()
     sithThing *v0; // ecx
     wchar_t *v3; // eax
 
-    if ( sithWorld_pCurWorld && (v0 = sithWorld_pCurWorld->playerThing) != 0 )
+    if ( sithWorld_pCurrentWorld && (v0 = sithWorld_pCurrentWorld->playerThing) != 0 )
     {
         if ( v0->moveType == SITH_MT_PHYSICS )
         {
@@ -196,7 +196,7 @@ int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     rdVector3 a3a; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+28h] [ebp-30h] BYREF
 
-    if ( !sithWorld_pCurWorld || (v3 = sithWorld_pCurWorld->playerThing) == 0 )
+    if ( !sithWorld_pCurrentWorld || (v3 = sithWorld_pCurrentWorld->playerThing) == 0 )
     {
         DebugConsole_Print("No world.");
         return 0;
@@ -215,15 +215,15 @@ int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     else
         rdMatrix_Identity34(&a);
 
-    v6 = sithWorld_pCurWorld->sectors;
-    for ( i = 0; i < sithWorld_pCurWorld->numSectors; ++v6 )
+    v6 = sithWorld_pCurrentWorld->sectors;
+    for ( i = 0; i < sithWorld_pCurrentWorld->numSectors; ++v6 )
     {
         if ( sithIntersect_IsSphereInSector(&a1, 0.0, v6) )
             break;
         ++i;
     }
 
-    if ( i == sithWorld_pCurWorld->numSectors )
+    if ( i == sithWorld_pCurrentWorld->numSectors )
     {
         DebugConsole_Print("Position not in world");
         result = 0;
@@ -244,7 +244,7 @@ int sithDebugConsole_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithThing *v2; // esi
     int tmp;
 
-    if ( sithWorld_pCurWorld && (v2 = sithWorld_pCurWorld->playerThing) != 0 )
+    if ( sithWorld_pCurrentWorld && (v2 = sithWorld_pCurrentWorld->playerThing) != 0 )
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
           && tmp >= 0

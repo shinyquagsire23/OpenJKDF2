@@ -1433,7 +1433,7 @@ LABEL_12:
         a1a.x = actor->field_1E4.x * actora;
         a1a.y = v12;
         a1a.z = v13;
-        a1a.z = v14 * sithWorld_pCurWorld->worldGravity + a1a.z;
+        a1a.z = v14 * sithWorld_pCurrentWorld->worldGravity + a1a.z;
         v15 = 1;
         v21 = rdVector_Normalize3(&v1, &a1a) / actora;
     }

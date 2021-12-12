@@ -939,7 +939,7 @@ void sithSoundSys_Tick(float deltaSecs)
     if ( (sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 )
         sithSoundSys_pFocusedThing = 0;
     else
-        sithSoundSys_pFocusedThing = sithWorld_pCurWorld->cameraFocus;
+        sithSoundSys_pFocusedThing = sithWorld_pCurrentWorld->cameraFocus;
     v1 = sithCamera_currentCamera->sector;
     if ( v1 == sithSoundSys_pLastSectorSoundSector )
         goto LABEL_72;

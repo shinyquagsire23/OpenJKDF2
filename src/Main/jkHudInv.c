@@ -147,7 +147,7 @@ void jkHudInv_Draw()
     wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
     wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
 
-    player = sithWorld_pCurWorld->playerThing;
+    player = sithWorld_pCurrentWorld->playerThing;
     if ( player->type == SITH_THING_PLAYER )
     {
         v1 = 0;

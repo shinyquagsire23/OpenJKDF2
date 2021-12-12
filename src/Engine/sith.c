@@ -123,16 +123,16 @@ void sith_Free()
 
 int sith_Mode1Init(char *a1)
 {
-    sithWorld_pCurWorld = sithWorld_New();
+    sithWorld_pCurrentWorld = sithWorld_New();
 
-    if ( !sithWorld_Load(sithWorld_pCurWorld, a1) )
+    if ( !sithWorld_Load(sithWorld_pCurrentWorld, a1) )
         return 0;
 
     sithTime_Startup();
     sithWorld_Initialize();
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -150,15 +150,15 @@ int sith_Mode1Init(char *a1)
 
 int sithOpenNormal(char *path)
 {
-    sithWorld_pCurWorld = sithWorld_New();
+    sithWorld_pCurrentWorld = sithWorld_New();
 
-    if ( !sithWorld_Load(sithWorld_pCurWorld, path) )
+    if ( !sithWorld_Load(sithWorld_pCurrentWorld, path) )
         return 0;
 
     sithWorld_Initialize();
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -175,12 +175,12 @@ int sithOpenNormal(char *path)
 
 int sith_Mode1Init_3(char *fpath)
 {
-    sithWorld_pCurWorld = sithWorld_New();
-    if ( !sithWorld_Load(sithWorld_pCurWorld, fpath) )
+    sithWorld_pCurrentWorld = sithWorld_New();
+    if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
         return 0;
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -201,7 +201,7 @@ int sith_Open()
 {
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -256,13 +256,13 @@ int sith_Tick()
     else
     {
         // TODO REMOVE
-        //sithWorld_pCurWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
-        //sithWorld_pCurWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
+        //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags |= PHYSFLAGS_FLYING;
+        //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
         
         ++bShowInvisibleThings;
         if (sithRender_lastRenderTick++ == -1)
         {
-            sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+            sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
             sithRender_lastRenderTick = 1;
         }
         sithSoundSys_ResumeMusic(0);
@@ -301,7 +301,7 @@ void sith_UpdateCamera()
     {
         if ( !++sithRender_lastRenderTick )
         {
-            sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+            sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
             sithRender_lastRenderTick = 1;
         }
 
@@ -332,7 +332,7 @@ void sith_sub_4C4D80()
 {
     if ( !++sithRender_lastRenderTick )
     {
-        sithWorld_sub_4D0A20(sithWorld_pCurWorld);
+        sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
         sithRender_lastRenderTick = 1;
     }
 }
@@ -366,9 +366,9 @@ void sith_AutoSave()
     sithInventory_Reset(g_localPlayerThing);
 
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
-    v0 = sithWorld_pCurWorld;
+    v0 = sithWorld_pCurrentWorld;
     v1 = 0;
-    if ( sithWorld_pCurWorld->numThingsLoaded )
+    if ( sithWorld_pCurrentWorld->numThingsLoaded )
     {
         v2 = 0;
         do
@@ -378,12 +378,12 @@ void sith_AutoSave()
             if ( v4 )
             {
                 sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
-                v0 = sithWorld_pCurWorld;
+                v0 = sithWorld_pCurrentWorld;
             }
             if ( v3->type == SITH_THING_ACTOR )
             {
                 sithUnk4_SetMaxHeathForDifficulty(v3);
-                v0 = sithWorld_pCurWorld;
+                v0 = sithWorld_pCurrentWorld;
             }
             ++v1;
             ++v2;

@@ -728,7 +728,7 @@ sithCog* sithCogVm_PopCog(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t cogIdx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -766,7 +766,7 @@ sithThing* sithCogVm_PopThing(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -835,7 +835,7 @@ sithSound* sithCogVm_PopSound(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -877,7 +877,7 @@ sithSector* sithCogVm_PopSector(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -913,7 +913,7 @@ sithSurface* sithCogVm_PopSurface(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -950,7 +950,7 @@ rdMaterial* sithCogVm_PopMaterial(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -992,7 +992,7 @@ rdModel3* sithCogVm_PopModel3(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -1034,7 +1034,7 @@ rdKeyframe* sithCogVm_PopKeyframe(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {
@@ -1074,7 +1074,7 @@ sithAIClass* sithCogVm_PopAIClass(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
 
     if (!sithCogVm_PopValue(ctx, &tmp))
     {

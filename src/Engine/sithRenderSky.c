@@ -63,7 +63,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
     a1->textureMode = v4 > 0 ? 0 : v4;
     if ( num_vertices )
     {
-        v5 = sithWorld_pCurWorld;
+        v5 = sithWorld_pCurrentWorld;
         v6 = rdCamera_pCurCamera->canvas;
         v7 = a1->vertexUVs;
         v15 = rdCamera_pCurCamera->cameraClipFrustum;
@@ -140,7 +140,7 @@ void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVec
             v11 = a2->face.clipIdk.x;
             a1a.x = sithCamera_currentCamera->vec3_1.x + a1a.x;
             a1a.y = sithCamera_currentCamera->vec3_1.y + a1a.y;
-            v12 = sithWorld_pCurWorld;
+            v12 = sithWorld_pCurrentWorld;
             a1a.z = sithCamera_currentCamera->vec3_1.z + a1a.z;
             v10->x = a1a.x * 16.0;
             v13 = v12->ceilingSkyOffs.x;

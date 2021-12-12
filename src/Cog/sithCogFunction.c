@@ -615,7 +615,7 @@ void sithCogFunction_GetLevelTime(sithCog *ctx)
 
 void sithCogFunction_GetThingCount(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numThingsLoaded);
+    sithCogVm_PushInt(ctx, sithWorld_pCurrentWorld->numThingsLoaded);
 }
 
 void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
@@ -624,7 +624,7 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
     sithThing *v2; // eax
     int template_count; // edi
 
-    v1 = sithWorld_pCurWorld;
+    v1 = sithWorld_pCurrentWorld;
     v2 = sithCogVm_PopTemplate(ctx);
     if ( v2 )
     {
@@ -641,12 +641,12 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
 
 void sithCogFunction_GetGravity(sithCog *ctx)
 {
-    sithCogVm_PushFlex(ctx, sithWorld_pCurWorld->worldGravity);
+    sithCogVm_PushFlex(ctx, sithWorld_pCurrentWorld->worldGravity);
 }
 
 void sithCogFunction_SetGravity(sithCog *ctx)
 {
-    sithWorld_pCurWorld->worldGravity = sithCogVm_PopFlex(ctx);
+    sithWorld_pCurrentWorld->worldGravity = sithCogVm_PopFlex(ctx);
 }
 
 void sithCogFunction_ReturnEx(sithCog *ctx)
@@ -1445,7 +1445,7 @@ void sithCogFunction_AutoSaveGame(sithCog *ctx)
 {
     char tmp[128];
 
-    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurWorld->map_jkl_fname);
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
     sithGamesave_Write(tmp, 1, 0, 0);
 }

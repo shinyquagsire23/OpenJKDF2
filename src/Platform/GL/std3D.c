@@ -341,10 +341,10 @@ int std3D_StartScene()
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	
-    if (sithWorld_pCurWorld && sithWorld_pCurWorld->colormaps && memcmp(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300))
+    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && memcmp(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300))
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-	    memcpy(worldpal_data, sithWorld_pCurWorld->colormaps->colors, 0x300);
+	    memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     }
     
@@ -1081,7 +1081,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
             else
             {
                 uint8_t val = image_8bpp[index];
-                rdColor24* pal_master = (rdColor24*)sithWorld_pCurWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
                 rdColor24* color = &pal_master[val];
                 val_rgba |= (color->r << 16);
                 val_rgba |= (color->g << 8);

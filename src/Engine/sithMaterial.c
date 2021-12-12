@@ -187,7 +187,7 @@ rdMaterial* sithMaterial_GetByIdx(int idx)
     sithWorld *world; // ecx
     rdMaterial *result; // eax
 
-    world = sithWorld_pCurWorld;
+    world = sithWorld_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;
@@ -251,7 +251,7 @@ void sithMaterial_UnloadAll()
     rdMaterial *i; // esi
 
     v0 = 0;
-    for ( i = sithWorld_pCurWorld->materials; v0 < sithWorld_pCurWorld->numMaterialsLoaded; ++v0 )
+    for ( i = sithWorld_pCurrentWorld->materials; v0 < sithWorld_pCurrentWorld->numMaterialsLoaded; ++v0 )
     {
         rdMaterial_ResetCacheInfo(i++);
     }

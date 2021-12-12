@@ -131,7 +131,7 @@ void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
     uint32_t vtx_idx; // edi
     sithSurface *surface; // eax
 
-    world = sithWorld_pCurWorld;
+    world = sithWorld_pCurrentWorld;
     vtx_idx = sithCogVm_PopInt(ctx);
     surface = sithCogVm_PopSurface(ctx);
     if ( surface && vtx_idx < surface->surfaceInfo.face.numVertices && (vtx_idx & 0x80000000) == 0 )
@@ -146,16 +146,16 @@ void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogVm_PopVector3(ctx, &offs);
-    sithWorld_pCurWorld->horizontalSkyOffs.x = offs.x;
-    sithWorld_pCurWorld->horizontalSkyOffs.y = offs.y;
+    sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs.x;
+    sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_pCurWorld->horizontalSkyOffs.x;
-    offs.y = sithWorld_pCurWorld->horizontalSkyOffs.y;
+    offs.x = sithWorld_pCurrentWorld->horizontalSkyOffs.x;
+    offs.y = sithWorld_pCurrentWorld->horizontalSkyOffs.y;
     offs.z = 0.0;
     sithCogVm_PushVector3(ctx, &offs);
 }
@@ -166,16 +166,16 @@ void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogVm_PopVector3(ctx, &offs);
-    sithWorld_pCurWorld->ceilingSkyOffs.x = offs.x;
-    sithWorld_pCurWorld->ceilingSkyOffs.y = offs.y;
+    sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs.x;
+    sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_pCurWorld->ceilingSkyOffs.x;
-    offs.y = sithWorld_pCurWorld->ceilingSkyOffs.y;
+    offs.x = sithWorld_pCurrentWorld->ceilingSkyOffs.x;
+    offs.y = sithWorld_pCurrentWorld->ceilingSkyOffs.y;
     offs.z = 0.0;
     sithCogVm_PushVector3(ctx, &offs);
 }
@@ -300,7 +300,7 @@ void sithCogFunctionSurface_GetSurfaceMat(sithCog *ctx)
 
     sithSurface* surface = sithCogVm_PopSurface(ctx);
     if ( surface && (v2 = surface->surfaceInfo.face.material) != 0 )
-        sithCogVm_PushInt(ctx, v2 - sithWorld_pCurWorld->materials);
+        sithCogVm_PushInt(ctx, v2 - sithWorld_pCurrentWorld->materials);
     else
         sithCogVm_PushInt(ctx, -1);
 }
@@ -316,7 +316,7 @@ void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx)
         v4 = surface->surfaceInfo.face.material;
         surface->surfaceInfo.face.material = mat;
         if ( v4 )
-            sithCogVm_PushInt(ctx, v4 - sithWorld_pCurWorld->materials);
+            sithCogVm_PushInt(ctx, v4 - sithWorld_pCurrentWorld->materials);
         else
             sithCogVm_PushInt(ctx, -1);
         if ( sithCogVm_multiplayerFlags )
@@ -671,8 +671,8 @@ void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx)
 {
-    if ( sithWorld_pCurWorld )
-        sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSurfaces);
+    if ( sithWorld_pCurrentWorld )
+        sithCogVm_PushInt(ctx, sithWorld_pCurrentWorld->numSurfaces);
     else
         sithCogVm_PushInt(ctx, -1);
 }

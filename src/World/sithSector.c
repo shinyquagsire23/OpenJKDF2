@@ -179,7 +179,7 @@ int sithSector_Load(sithWorld *world, int tmp)
 
 int sithSector_GetIdxFromPtr(sithSector *sector)
 {
-    return sector && sector->id == sector - sithWorld_pCurWorld->sectors && sector->id < (unsigned int)sithWorld_pCurWorld->numSectors;
+    return sector && sector->id == sector - sithWorld_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_pCurrentWorld->numSectors;
 }
 
 void sithSector_SetAdjoins(sithSector *sector)
@@ -241,8 +241,8 @@ sithSector* sithSector_GetPtrFromIdx(int idx)
 {
     sithSector *result; // eax
 
-    if ( sithWorld_pCurWorld && idx >= 0 && idx < sithWorld_pCurWorld->numSectors )
-        result = &sithWorld_pCurWorld->sectors[idx];
+    if ( sithWorld_pCurrentWorld && idx >= 0 && idx < sithWorld_pCurrentWorld->numSectors )
+        result = &sithWorld_pCurrentWorld->sectors[idx];
     else
         result = 0;
     return result;

@@ -225,8 +225,8 @@ void sithCogFunctionSector_GetColormap(sithCog *ctx)
 
     sector = sithCogVm_PopSector(ctx);
     if ( sector
-      && (v2 = (char *)sector->colormap - (char *)sithWorld_pCurWorld->colormaps,
-          (unsigned int)((int)v2 / (int)sizeof(rdColormap)) < sithWorld_pCurWorld->numColormaps) )
+      && (v2 = (char *)sector->colormap - (char *)sithWorld_pCurrentWorld->colormaps,
+          (unsigned int)((int)v2 / (int)sizeof(rdColormap)) < sithWorld_pCurrentWorld->numColormaps) )
     {
         sithCogVm_PushInt(ctx, (int)v2 / (int)sizeof(rdColormap));
     }
@@ -238,7 +238,7 @@ void sithCogFunctionSector_GetColormap(sithCog *ctx)
 
 void sithCogFunctionSector_SetColormap(sithCog *ctx)
 {
-    sithWorld* world = sithWorld_pCurWorld;
+    sithWorld* world = sithWorld_pCurrentWorld;
     uint32_t colormap_idx = sithCogVm_PopInt(ctx);
     sithSector* sector = sithCogVm_PopSector(ctx);
 
@@ -377,7 +377,7 @@ void sithCogFunctionSector_GetPlayerCount(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorCount(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, sithWorld_pCurWorld->numSectors);
+    sithCogVm_PushInt(ctx, sithWorld_pCurrentWorld->numSectors);
 }
 
 void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
@@ -419,7 +419,7 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
     int vertex_idx; // edi
     sithSector *sector; // eax
 
-    active_jkl = sithWorld_pCurWorld;
+    active_jkl = sithWorld_pCurrentWorld;
     vertex_idx = sithCogVm_PopInt(ctx);
     sector = sithCogVm_PopSector(ctx);
     if ( sector && (unsigned int)vertex_idx < sector->numVertices && vertex_idx >= 0 )

@@ -159,7 +159,7 @@ int rdSetMipDistances(rdVector4 *dists)
     static rdVector4 origLoad;
     static int once = 0;
     if (!once) {
-        origLoad = sithWorld_pCurWorld->loadDistance;
+        origLoad = sithWorld_pCurrentWorld->loadDistance;
         once = 1;
     }
 
@@ -169,10 +169,10 @@ int rdSetMipDistances(rdVector4 *dists)
     rdroid_aMipDistances.z *= scale_factor;
     rdroid_aMipDistances.w *= scale_factor;
 
-    sithWorld_pCurWorld->loadDistance.x = origLoad.x * scale_factor;
-    sithWorld_pCurWorld->loadDistance.y = origLoad.y * scale_factor;
-    sithWorld_pCurWorld->loadDistance.z = origLoad.z * scale_factor;
-    sithWorld_pCurWorld->loadDistance.w = origLoad.w * scale_factor;
+    sithWorld_pCurrentWorld->loadDistance.x = origLoad.x * scale_factor;
+    sithWorld_pCurrentWorld->loadDistance.y = origLoad.y * scale_factor;
+    sithWorld_pCurrentWorld->loadDistance.z = origLoad.z * scale_factor;
+    sithWorld_pCurrentWorld->loadDistance.w = origLoad.w * scale_factor;
 #endif
 
     return 1;

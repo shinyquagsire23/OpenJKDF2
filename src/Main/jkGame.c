@@ -118,7 +118,7 @@ int jkGame_Update()
     rdFinishFrame();
     /*if ( Main_bDispStats )
     {
-        v2 = sithWorld_pCurWorld->playerThing;
+        v2 = sithWorld_pCurrentWorld->playerThing;
         ++Video_dword_5528A0;
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
@@ -206,7 +206,7 @@ int jkGame_Update()
     //if ( Video_modeStruct.b3DAccel )
         rdSetColorEffects(&stdPalEffects_state.effect);
 
-    _memcpy(stdDisplay_masterPalette, sithWorld_pCurWorld->colormaps->colors, 0x300);
+    _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )
     {
@@ -224,7 +224,7 @@ int jkGame_Update()
 
     /*if ( Main_bDispStats )
     {
-        v2 = sithWorld_pCurWorld->playerThing;
+        v2 = sithWorld_pCurrentWorld->playerThing;
         ++Video_dword_5528A0;
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;

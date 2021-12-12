@@ -151,8 +151,8 @@ int sithCog_Open()
     sithCogSymbol *v14; // [esp+10h] [ebp-8h]
     sithWorld *world_; // [esp+14h] [ebp-4h]
 
-    world = sithWorld_pCurWorld;
-    world_ = sithWorld_pCurWorld;
+    world = sithWorld_pCurrentWorld;
+    world_ = sithWorld_pCurrentWorld;
     if ( sithCog_bOpened )
         return 0;
     if ( sithWorld_pStatic )
@@ -405,7 +405,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
 
             // HACK HACK HACK HACK HACK somehow some keyframes aren't being set correctly?
             if (!(v17->id & 0x8000)) {
-                v17->id = (v17 - sithWorld_pCurWorld->keyframes) & 0xFFFF;
+                v17->id = (v17 - sithWorld_pCurrentWorld->keyframes) & 0xFFFF;
                 if (v17->id >= 0x8000)
                 {
                     v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
@@ -508,11 +508,11 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
     switch ( idk->type )
     {
         case 3:
-            if ( v3 >= sithWorld_pCurWorld->numThingsLoaded )
+            if ( v3 >= sithWorld_pCurrentWorld->numThingsLoaded )
                 return 0;
             v17 = idk->mask;
             v18 = idk->linkid;
-            v19 = &sithWorld_pCurWorld->things[v3];
+            v19 = &sithWorld_pCurrentWorld->things[v3];
             if ( sithThing_GetIdxFromThing(v19) && v19->type && v18 >= 0 )
             {
                 v21 = sithCog_numThingLinks;
@@ -528,11 +528,11 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
             }
             break;
         case 5:
-            if ( v3 >= sithWorld_pCurWorld->numSectors )
+            if ( v3 >= sithWorld_pCurrentWorld->numSectors )
                 return 0;
             v11 = idk->mask;
             v12 = idk->linkid;
-            v13 = &sithWorld_pCurWorld->sectors[v3];
+            v13 = &sithWorld_pCurrentWorld->sectors[v3];
             if ( sithSector_GetIdxFromPtr(v13) && v12 >= 0 )
             {
                 v15 = sithCog_numSectorLinks;
@@ -547,11 +547,11 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
             }
             break;
         case 6:
-            if ( v3 >= sithWorld_pCurWorld->numSurfaces )
+            if ( v3 >= sithWorld_pCurrentWorld->numSurfaces )
                 return 0;
             v5 = idk->mask;
             v6 = idk->linkid;
-            v7 = &sithWorld_pCurWorld->surfaces[v3];
+            v7 = &sithWorld_pCurrentWorld->surfaces[v3];
             if ( sithSurface_GetIdxFromPtr(v7) )
             {
                 if ( v6 >= 0 )
@@ -854,10 +854,10 @@ void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sour
         for ( i = 0; i < sithWorld_pStatic->numCogsLoaded; ++i )
             sithCog_SendMessageEx(v9++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
-    if ( sithWorld_pCurWorld )
+    if ( sithWorld_pCurrentWorld )
     {
-        v11 = sithWorld_pCurWorld->cogs;
-        for ( j = 0; j < sithWorld_pCurWorld->numCogsLoaded; ++j )
+        v11 = sithWorld_pCurrentWorld->cogs;
+        for ( j = 0; j < sithWorld_pCurrentWorld->numCogsLoaded; ++j )
             sithCog_SendMessageEx(v11++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
 }
@@ -1237,9 +1237,9 @@ void sithCogScript_TickAll()
     if (g_sithMode == 2)
         return;
 
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithCogScript_Tick(&sithWorld_pCurWorld->cogs[i]);
+        sithCogScript_Tick(&sithWorld_pCurrentWorld->cogs[i]);
     }
 
     if ( sithWorld_pStatic )
@@ -1281,7 +1281,7 @@ void sithCogScript_Tick(sithCog *cog)
             sithCogVm_Exec(cog);
             return;
         }
-        if ( cog->script_running == 3 && (sithWorld_pCurWorld->things[cog->wakeTimeMs].trackParams.field_C & 3) == 0 )
+        if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.field_C & 3) == 0 )
         {
             if ((cog->flags & 1))
             {
@@ -1301,7 +1301,7 @@ int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
     int v3; // eax
     sithCog *v4; // eax
 
-    v2 = sithWorld_pCurWorld;
+    v2 = sithWorld_pCurrentWorld;
     v3 = info->cogIdx;
     if ( (v3 & 0x8000u) != 0 )
     {
@@ -1327,8 +1327,8 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
     const char *v7; // eax
     uint32_t tmp;
 
-    world = sithWorld_pCurWorld;
-    if ( sithWorld_pCurWorld
+    world = sithWorld_pCurrentWorld;
+    if ( sithWorld_pCurrentWorld
       && extra
       && _sscanf(extra, "%d", &tmp) == 1
       && tmp <= world->numCogsLoaded
@@ -1370,7 +1370,7 @@ sithCog* sithCog_GetByIdx(int idx)
     sithWorld *world; // ecx
     sithCog *result; // eax
 
-    world = sithWorld_pCurWorld;
+    world = sithWorld_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;

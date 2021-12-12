@@ -181,7 +181,7 @@ rdModel3* sithModel_GetByIdx(int idx)
     sithWorld *world;
     rdModel3 *result;
 
-    world = sithWorld_pCurWorld;
+    world = sithWorld_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;

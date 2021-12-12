@@ -70,8 +70,8 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
 
     if ( jkGuiSaveLoad_bIsSaveMenu && jkGuiSaveLoad_menu.focusedElement == &jkGuiSaveLoad_aElements[2] )
     {
-        saveName = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurWorld->map_jkl_fname);
-        v1 = sithWorld_pCurWorld->episodeName;
+        saveName = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
+        v1 = sithWorld_pCurrentWorld->episodeName;
         playerHealth_ = g_localPlayerThing->actorParams.health;
         shieldsAmt = g_selfPlayerInfo->iteminfo[SITHBIN_SHIELDS].ammoAmt;
         playerMaxHealth_ = g_localPlayerThing->actorParams.maxHealth;
@@ -393,7 +393,7 @@ LABEL_24:
             pHS->free(v15);
 LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;
-            v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurWorld->map_jkl_fname);
+            v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
             //jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
             int i = 0;
             for (i = 0; i < 256; i++)
@@ -419,7 +419,7 @@ LABEL_44:
     }
     if ( !v6 )
         goto LABEL_46;
-    if ( !sithWorld_pCurWorld )
+    if ( !sithWorld_pCurrentWorld )
     {
 LABEL_32:
         v12 = jkGuiRend_GetString(&jkGuiSaveLoad_DarrayEntries, v5);
@@ -427,7 +427,7 @@ LABEL_32:
         v3 = 34;
         goto LABEL_46;
     }
-    if ( __strcmpi(v6->saveHeader.episodeName, sithWorld_pCurWorld->episodeName) || __strcmpi(v6->saveHeader.jklName, sithWorld_pCurWorld->map_jkl_fname) )
+    if ( __strcmpi(v6->saveHeader.episodeName, sithWorld_pCurrentWorld->episodeName) || __strcmpi(v6->saveHeader.jklName, sithWorld_pCurrentWorld->map_jkl_fname) )
     {
         v5 = jkGuiSaveLoad_aElements[4].selectedTextEntry;
         goto LABEL_32;

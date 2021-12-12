@@ -52,10 +52,10 @@ int sithDSS_HandleSyncSurface(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     v1 = NETMSG_POPS16();
-    if ( v1 >= sithWorld_pCurWorld->numSurfaces )
+    if ( v1 >= sithWorld_pCurrentWorld->numSurfaces )
         return 0;
 
-    surface = &sithWorld_pCurWorld->surfaces[v1];
+    surface = &sithWorld_pCurrentWorld->surfaces[v1];
 
     surface->surfaceFlags = NETMSG_POPU32();
     surface->surfaceInfo.face.material = sithMaterial_GetByIdx(NETMSG_POPS32());;
@@ -84,7 +84,7 @@ void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)
     NETMSG_START;
 
     NETMSG_PUSHS16(sector->id);
-    NETMSG_PUSHS16(((intptr_t)sector->colormap - (intptr_t)sithWorld_pCurWorld->colormaps) / sizeof(rdColormap));
+    NETMSG_PUSHS16(((intptr_t)sector->colormap - (intptr_t)sithWorld_pCurrentWorld->colormaps) / sizeof(rdColormap));
     NETMSG_PUSHU32(sector->flags);
     NETMSG_PUSHF32(sector->ambientLight);
     NETMSG_PUSHF32(sector->extraLight);
@@ -110,15 +110,15 @@ int sithDSS_HandleSyncSector(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     idx = NETMSG_POPS16();
-    if ( idx >= sithWorld_pCurWorld->numSectors )
+    if ( idx >= sithWorld_pCurrentWorld->numSectors )
         return 0;
-    sector = &sithWorld_pCurWorld->sectors[idx];
+    sector = &sithWorld_pCurrentWorld->sectors[idx];
     sector->id = idx; // Not in original?
 
     colormapIdx = NETMSG_POPS16();
-    if ( colormapIdx >= sithWorld_pCurWorld->numColormaps )
+    if ( colormapIdx >= sithWorld_pCurrentWorld->numColormaps )
         return 0;
-    sector->colormap = &sithWorld_pCurWorld->colormaps[colormapIdx];
+    sector->colormap = &sithWorld_pCurrentWorld->colormaps[colormapIdx];
 
     oldSectorFlags = sector->flags;
     sector->flags = NETMSG_POPU32();
@@ -162,7 +162,7 @@ void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx)
     NETMSG_START;
 
     NETMSG_PUSHS16(actor->thing->thingIdx);
-    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurWorld->aiclasses) / sizeof(sithAIClass)));
+    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurrentWorld->aiclasses) / sizeof(sithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->thingidk ) {
@@ -242,11 +242,11 @@ int sithDSS_HandleSyncAI(sithCogMsg *msg)
         return 0;
     
     int16_t idx = NETMSG_POPS16();
-    if ( idx >= sithWorld_pCurWorld->numAIClassesLoaded )
+    if ( idx >= sithWorld_pCurrentWorld->numAIClassesLoaded )
         return 0;
 
-    actor->aiclass = &sithWorld_pCurWorld->aiclasses[idx];
-    actor->numAIClassEntries = sithWorld_pCurWorld->aiclasses[idx].numEntries;
+    actor->aiclass = &sithWorld_pCurrentWorld->aiclasses[idx];
+    actor->numAIClassEntries = sithWorld_pCurrentWorld->aiclasses[idx].numEntries;
     actor->flags = NETMSG_POPU32();
     actor->nextUpdate = NETMSG_POPU32();
     actor->thingidk = sithThing_GetThingByIdx(NETMSG_POPS16());
@@ -352,10 +352,10 @@ int sithDSS_HandleSyncItemDesc(sithCogMsg *msg)
     thingIdx = NETMSG_POPS16();
     if ( thingIdx < 0 )
         return 0;
-    if ( thingIdx >= sithWorld_pCurWorld->numThingsLoaded )
+    if ( thingIdx >= sithWorld_pCurrentWorld->numThingsLoaded )
         return 0;
 
-    thing = &sithWorld_pCurWorld->things[thingIdx];
+    thing = &sithWorld_pCurrentWorld->things[thingIdx];
     if ( thing->type != SITH_THING_ACTOR && thing->type != SITH_THING_PLAYER )
         return 0;
 
@@ -451,10 +451,10 @@ int sithDSS_HandleStopAnim(sithCogMsg *msg)
         if (rdsurface->flags & 0x20000)
         {
             v7 = NETMSG_POPS32();
-            if ( v7 >= 0 && v7 < sithWorld_pCurWorld->numSurfaces )
+            if ( v7 >= 0 && v7 < sithWorld_pCurrentWorld->numSurfaces )
             {
-                rdsurface->sithSurfaceParent = &sithWorld_pCurWorld->surfaces[v7];
-                rdsurface->material = sithWorld_pCurWorld->surfaces[v7].surfaceInfo.face.material;
+                rdsurface->sithSurfaceParent = &sithWorld_pCurrentWorld->surfaces[v7];
+                rdsurface->material = sithWorld_pCurrentWorld->surfaces[v7].surfaceInfo.face.material;
             }
         }
 

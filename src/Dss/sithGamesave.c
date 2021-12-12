@@ -61,7 +61,7 @@ int sithGamesave_Load(char *saveFname, int a2, int a3)
     {
         stdConffile_Close();
         sithGamesave_dword_835914 = a3;
-        if ( sithWorld_pCurWorld )
+        if ( sithWorld_pCurrentWorld )
         {
             sithGamesave_dword_835900 = a2 != 0 ? 3 : 1;
             _strncpy(sithGamesave_fpath, fpath, 0x7Fu);
@@ -93,11 +93,11 @@ int sithGamesave_LoadEntry(char *fpath)
         sithGamesave_funcRead();
     stdConffile_Read(SrcStr, 32);
     _strtolower(SrcStr);
-    if ( sithWorld_pCurWorld )
+    if ( sithWorld_pCurrentWorld )
     {
-        if ( !_strcmp(SrcStr, sithWorld_pCurWorld->map_jkl_fname) )
+        if ( !_strcmp(SrcStr, sithWorld_pCurrentWorld->map_jkl_fname) )
         {
-            sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurWorld);
+            sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurrentWorld);
             goto LABEL_11;
         }
         sith_Close();
@@ -126,7 +126,7 @@ LABEL_11:
     stdConffile_Read((char*)&jkPlayer_setDiff, sizeof(jkPlayer_setDiff));
     stdConffile_Read((char*)&g_mapModeFlags, sizeof(g_mapModeFlags));
 
-    sithThing_freestuff(sithWorld_pCurWorld);
+    sithThing_freestuff(sithWorld_pCurrentWorld);
     
     // Apparently this works by interpreting a bunch of netMsg packets from the
     // savefile? Funky.
@@ -200,9 +200,9 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     if ( (sithCogVm_multiplayerFlags & mpFlags) == 0 )
         return 0;
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numThingsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v4 = &sithWorld_pCurWorld->things[i];
+        sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
         if ( sithThing_ShouldSync(v4) )
         {
             sithDSSThing_SendSyncThingFull(v4, 0, mpFlags);
@@ -211,9 +211,9 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numThingsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v7 = &sithWorld_pCurWorld->things[i];
+        sithThing* v7 = &sithWorld_pCurrentWorld->things[i];
         if (sithThing_ShouldSync(v7))
         {
             if ( v7->attach_flags )
@@ -230,9 +230,9 @@ int sithGamesave_SerializeAllThings(int mpFlags)
             sithDSS_SendSyncAI(&sithAI_actors[i], 0, mpFlags);
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithDSSCog_SendSyncCog(&sithWorld_pCurWorld->cogs[i], 0, mpFlags);
+        sithDSSCog_SendSyncCog(&sithWorld_pCurrentWorld->cogs[i], 0, mpFlags);
     }
 
     if ( sithWorld_pStatic )
@@ -243,14 +243,14 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numSurfaces; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSurfaces; i++)
     {
-        sithDSS_SendSyncSurface(&sithWorld_pCurWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SendSyncSurface(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurWorld->numSectors; i++)
+    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SendSyncSector(&sithWorld_pCurWorld->sectors[i], 0, mpFlags);
+        sithDSS_SendSyncSector(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
@@ -307,9 +307,9 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
         sithGamesave_headerTmp.version = 6;
-        _strncpy(sithGamesave_headerTmp.episodeName, sithWorld_pCurWorld->episodeName, 0x7Fu);
+        _strncpy(sithGamesave_headerTmp.episodeName, sithWorld_pCurrentWorld->episodeName, 0x7Fu);
         sithGamesave_headerTmp.episodeName[127] = 0;
-        _strncpy(sithGamesave_headerTmp.jklName, sithWorld_pCurWorld->map_jkl_fname, 0x7Fu);
+        _strncpy(sithGamesave_headerTmp.jklName, sithWorld_pCurrentWorld->map_jkl_fname, 0x7Fu);
         sithGamesave_headerTmp.jklName[127] = 0;
         _wcsncpy(sithGamesave_headerTmp.saveName, v5, 0xFFu);
         sithGamesave_headerTmp.saveName[255] = 0;
@@ -378,7 +378,7 @@ LABEL_17:
         stdConffile_Write((const char*)&sithGamesave_headerTmp, sizeof(sithGamesave_Header));
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
-        stdConffile_Write((const char*)sithWorld_pCurWorld->map_jkl_fname, 32);
+        stdConffile_Write((const char*)sithWorld_pCurrentWorld->map_jkl_fname, 32);
         stdConffile_Write((const char*)&sithTime_curMs, sizeof(sithTime_curMs));
         
         // Added: split this apart, g_sithMode is a struct...
