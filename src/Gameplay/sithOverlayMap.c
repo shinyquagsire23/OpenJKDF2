@@ -152,9 +152,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
                      v9,
                      -1);
     }
-
-    printf("%d %d %f\n", sithOverlayMap_x1, sithOverlayMap_y1, canvasa);
-
+    
     return result;
 }
 
