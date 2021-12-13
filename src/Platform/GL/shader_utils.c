@@ -119,13 +119,17 @@ GLuint create_shader(const char* shader, GLenum type) {
 	//else
     //version = "#version 330 core\n";  // OpenGL 3.3
 #ifdef MACOS
-	version = "#version 330\n";
+	version = "#version 330\n#define CAN_BILINEAR_FILTER\n";
 #else
-    version = "#version 300 es\n";  // OpenGL ES 2.0
+    version = "#version 330\n#define CAN_BILINEAR_FILTER\n";  // OpenGL ES 2.0
 #endif
 
 #if defined(WIN64_STANDALONE)
-    version = "#version 330\n";
+    version = "#version 330\n#define CAN_BILINEAR_FILTER\n";
+#endif
+
+#if defined(ARCH_WASM)
+    version = "#version 300 es\n";
 #endif
 
 	// GLES2 precision specifiers

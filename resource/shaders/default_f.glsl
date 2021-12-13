@@ -1,4 +1,6 @@
+#ifdef CAN_BILINEAR_FILTER
 #extension GL_ARB_texture_gather : enable
+#endif
 
 uniform sampler2D tex;
 uniform sampler2D worldPalette;
@@ -17,13 +19,16 @@ void main(void)
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
 
+#ifdef CAN_BILINEAR_FILTER
     if (tex_mode == 1)
+#endif
     {
         float transparency = 1.0;
         if (index == 0.0)
             discard;
         sampled_color = vec4(palval.r, palval.g, palval.b, transparency);
     }
+#ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == 2)
     {
         // Get texture size in pixels:
@@ -49,12 +54,13 @@ void main(void)
         vec4 temp0 = mix(c01, c11, filterWeight.x);
         vec4 temp1 = mix(c00, c10, filterWeight.x);
         vec4 blendColor = mix(temp1, temp0, filterWeight.y);
-    
+
         float transparency = 1.0;
         if (index == 0.0)
             discard;
         sampled_color = vec4(blendColor.r, blendColor.g, blendColor.b, transparency);
     }
+#endif
 
     if (blend_mode == 5)
     {
