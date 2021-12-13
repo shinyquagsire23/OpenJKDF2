@@ -1,4 +1,5 @@
 funclist = open("ida_copypaste_funclist_nostdlib.txt", "r").read().split("\n")
+wontimpl_funclist = open("wontimpl.txt", "r").read().split("\n")
 
 funclist_noxref = open("noxrefs.txt").read().split("\n")
 
@@ -151,7 +152,7 @@ for line in funclist:
     #if "cogMsg" in funcname and funcname not in decompiled_funcs:
     #    print (funcname)
     
-    if funcname not in decompiled_funcs:
+    if funcname not in decompiled_funcs and funcname not in wontimpl_funclist:
         total_notdecomp_bySubsys[subsys_ident] += size
         total_notdecomp_funcs_bySubsys[subsys_ident] += 1
     else:
@@ -160,7 +161,7 @@ for line in funclist:
     total_bySubsys[subsys_ident] += size
     total_funcs_bySubsys[subsys_ident] += 1
     
-    if funcname in decompiled_funcs:
+    if funcname in decompiled_funcs or funcname in wontimpl_funclist:
         #print (funcname, filefrom)
         decomped_sizes[filefrom] += size
         decomped_funcs[filefrom] += 1

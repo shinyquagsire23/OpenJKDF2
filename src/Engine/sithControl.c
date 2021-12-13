@@ -16,7 +16,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithTime.h"
 #include "Dss/sithGamesave.h"
-#include "Engine/sithMapView.h"
+#include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "Main/jkMain.h"
@@ -888,11 +888,11 @@ LABEL_39:
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )
-                    sithMapView_ToggleMapDrawn();
+                    sithOverlayMap_ToggleMapDrawn();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &input_read) )
-                    sithMapView_FuncIncrease();
+                    sithOverlayMap_FuncIncrease();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
-                    sithMapView_FuncDecrease();
+                    sithOverlayMap_FuncDecrease();
             }
         }
         return 0;

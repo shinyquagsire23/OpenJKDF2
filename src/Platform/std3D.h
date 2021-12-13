@@ -50,6 +50,8 @@ int std3D_HasModulateAlpha();
 int std3D_HasAlphaFlatStippled();
 
 #ifdef SDL2_RENDER
+int std3D_Startup();
+void std3D_Shutdown();
 int std3D_StartScene();
 int std3D_EndScene();
 void std3D_ResetRenderList();
@@ -70,6 +72,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
 void std3D_DrawMenu();
 void std3D_FreeResources();
 #else
+static int (*std3D_Startup)() = (void*)std3D_Startup_ADDR;
+static void (*std3D_Shutdown)() = (void*)std3D_Shutdown_ADDR;
 static int (*std3D_StartScene)() = (void*)std3D_StartScene_ADDR;
 static int (*std3D_EndScene)() = (void*)std3D_EndScene_ADDR;
 static void (*std3D_ResetRenderList)() = (void*)std3D_ResetRenderList_ADDR;
@@ -85,7 +89,6 @@ static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
 static int (*std3D_AddToTextureCache)(stdVBuffer *a1, rdDDrawSurface *tex_2, int is_16bit_maybe, int no_alpha) = (void*)std3D_AddToTextureCache_ADDR;
 static void (*std3D_UpdateFrameCount)(rdDDrawSurface *surface) = (void*)std3D_UpdateFrameCount_ADDR;
 static void (*std3D_PurgeTextureCache)() = (void*)std3D_PurgeTextureCache_ADDR;
-static void (*std3D_Shutdown)() = (void*)std3D_Shutdown_ADDR;
 #endif
 
 #endif // _STD3D_H

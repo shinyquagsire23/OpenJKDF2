@@ -287,6 +287,16 @@ int init_resources()
     return true;
 }
 
+int std3D_Startup()
+{
+    return 1;
+}
+
+void std3D_Shutdown()
+{
+
+}
+
 void std3D_FreeResources()
 {
     glDeleteProgram(programDefault);
@@ -1165,4 +1175,3 @@ void std3D_PurgeTextureCache()
     }
     std3D_loadedTexturesAmt = 0;
 }
-void std3D_Shutdown(){}

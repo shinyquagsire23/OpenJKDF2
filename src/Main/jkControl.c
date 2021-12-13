@@ -1,7 +1,7 @@
 #include "jkControl.h"
 
 #include "Engine/sithControl.h"
-#include "Engine/sithMapView.h"
+#include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"
 #include "Cog/jkCog.h"
@@ -104,7 +104,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
             i = v15 == 0;
         }
 
-        if ( !sithMapView_bShowMap )
+        if ( !sithOverlayMap_bShowMap )
         {
             sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )

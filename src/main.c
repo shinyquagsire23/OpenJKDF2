@@ -81,7 +81,7 @@
 #include "Engine/sithTemplate.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithMapView.h"
+#include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithRenderSky.h"
@@ -1713,15 +1713,15 @@ void do_hooks()
     hook_function(sithSprite_New_ADDR, sithSprite_New);
     
     // sithMapView
-    hook_function(sithMapView_Initialize_ADDR, sithMapView_Initialize);
-    hook_function(sithMapView_Shutdown_ADDR, sithMapView_Shutdown);
-    hook_function(sithMapView_ToggleMapDrawn_ADDR, sithMapView_ToggleMapDrawn);
-    hook_function(sithMapView_FuncIncrease_ADDR, sithMapView_FuncIncrease);
-    hook_function(sithMapView_FuncDecrease_ADDR, sithMapView_FuncDecrease);
-    // sithMapView_Render1
-    // sithMapView_Render2
-    // sithMapView_Render3
-    hook_function(sithMapView_Render4_ADDR, sithMapView_Render4);
+    hook_function(sithOverlayMap_Initialize_ADDR, sithOverlayMap_Initialize);
+    hook_function(sithOverlayMap_Shutdown_ADDR, sithOverlayMap_Shutdown);
+    hook_function(sithOverlayMap_ToggleMapDrawn_ADDR, sithOverlayMap_ToggleMapDrawn);
+    hook_function(sithOverlayMap_FuncIncrease_ADDR, sithOverlayMap_FuncIncrease);
+    hook_function(sithOverlayMap_FuncDecrease_ADDR, sithOverlayMap_FuncDecrease);
+    // sithOverlayMap_Render1
+    // sithOverlayMap_Render2
+    // sithOverlayMap_Render3
+    hook_function(sithOverlayMap_Render4_ADDR, sithOverlayMap_Render4);
     
     // sithMaterial
     hook_function(sithMaterial_Startup_ADDR, sithMaterial_Startup);

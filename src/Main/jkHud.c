@@ -13,7 +13,7 @@
 #include "General/stdMath.h"
 #include "Primitives/rdPrimit2.h"
 #include "Primitives/rdPrimit3.h"
-#include "Engine/sithMapView.h"
+#include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithMulti.h"
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
@@ -157,7 +157,7 @@ int jkHud_Open()
     jkHud_mapRendConfig.numArr = 5;
     jkHud_mapRendConfig.unkArr = jkHud_aFltIdk;
     jkHud_mapRendConfig.bRotateOverlayMap = jkPlayer_setRotateOverlayMap;
-    sithMapView_Initialize(&jkHud_mapRendConfig);
+    sithOverlayMap_Initialize(&jkHud_mapRendConfig);
     jkHud_targetRed16 = stdColor_Indexed8ToRGB16(jkHud_targetRed, Video_aPalette, &Video_format.format);
     jkHud_targetGreen16 = stdColor_Indexed8ToRGB16(jkHud_targetBlue, Video_aPalette, &Video_format.format);
     jkHud_targetBlue16 = stdColor_Indexed8ToRGB16(jkHud_targetGreen, Video_aPalette, &Video_format.format);
@@ -183,7 +183,7 @@ void jkHud_Close()
     }
     if ( !Main_bNoHUD )
     {
-        sithMapView_Shutdown();
+        sithOverlayMap_Shutdown();
 
         for (int i = 0; i < 8; i++)
         {
@@ -401,9 +401,7 @@ void jkHud_Draw()
     v4 = sithWorld_pCurrentWorld->playerThing;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
-#ifndef LINUX_TMP
-    sithMapView_Render1(Video_pCanvas);
-#endif
+    sithOverlayMap_Render1(Video_pCanvas);
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 

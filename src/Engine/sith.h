@@ -39,6 +39,7 @@ void sith_sub_4C4D80();
 void sith_set_sithmode_5();
 void sith_SetEpisodeName(char *text);
 void sith_AutoSave();
+void sith_sub_4C4D80();
 
 //static int (*sith_Startup)() = (void*)sith_Startup_ADDR;
 //static int (*sith_Tick)() = (void*)sith_Tick_ADDR;

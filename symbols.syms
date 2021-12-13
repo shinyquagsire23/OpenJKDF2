@@ -232,15 +232,15 @@ sithNet_syncIdx 0x008330F4 int
 sithNet_aSyncFlags 0x008330B0 int[16]
 sithNet_aSyncThings 0x00832668 sithThing*[16]
 
-sithMapView_flMapSize 0x0054A5E0 float
-sithMapView_matrix 0x00835840 rdMatrix34
-sithMapView_pPlayer 0x00835870 sithThing*
-sithMapView_pCanvas 0x00835874 rdCanvas*
-sithMapView_x1 0x00835878 int
-sithMapView_y1 0x0083587C int
-sithMapView_inst 0x00835880 sithMapView
-sithMapView_bShowMap 0x008358C4 int
-sithMapView_bInitted 0x008358C8 int
+sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
+sithOverlayMap_matrix 0x00835840 rdMatrix34
+sithOverlayMap_pPlayer 0x00835870 sithThing*
+sithOverlayMap_pCanvas 0x00835874 rdCanvas*
+sithOverlayMap_x1 0x00835878 int
+sithOverlayMap_y1 0x0083587C int
+sithOverlayMap_inst 0x00835880 sithMapView
+sithOverlayMap_bShowMap 0x008358C4 int
+sithOverlayMap_bInitted 0x008358C8 int
 
 sithSoundClass_hashtable 0x00847F1C stdHashTable*
 sithSoundClass_nameToKeyHashtable 0x00847F20 stdHashTable*
