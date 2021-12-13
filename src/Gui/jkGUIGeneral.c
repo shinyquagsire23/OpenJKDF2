@@ -38,15 +38,11 @@ static jkGuiElement jkGuiGeneral_aElements[21] = {
     { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1,            2, "GUI_CANCEL",           3, {0, 430, 200, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"FOV is vertical (Hor+)",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-#ifdef SDL2_RENDER
-    {ELEMENT_CHECKBOX,     0,            0, L"Enable HiDPI",    0, {20, 350, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, L"Enable Fullscreen",    0, {20, 380, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-#endif
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -64,7 +60,7 @@ void jkGuiGeneral_Shutdown()
     ;
 }
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
     jkPlayer_fov = FOV_MIN + jkGuiGeneral_aElements[13].selectedTextEntry;
@@ -90,13 +86,9 @@ int jkGuiGeneral_Show()
     jkGuiRend_SetDisplayingStruct(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[11]);
     jkGuiSetup_sub_412EF0(&jkGuiGeneral_menu, 0);
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
     jkGuiGeneral_aElements[13].selectedTextEntry = jkPlayer_fov - FOV_MIN;
     jkGuiGeneral_aElements[15].selectedTextEntry = jkPlayer_fovIsVertical;
-#ifdef SDL2_RENDER
-    jkGuiGeneral_aElements[16].selectedTextEntry = Window_isHiDpi;
-    jkGuiGeneral_aElements[17].selectedTextEntry = Window_isFullscreen;
-#endif
 #endif
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);
@@ -106,12 +98,8 @@ int jkGuiGeneral_Show()
         jkPlayer_setRotateOverlayMap = jkGuiGeneral_aElements[8].selectedTextEntry;
         jkPlayer_setDisableCutscenes = jkGuiGeneral_aElements[9].selectedTextEntry;
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
         jkPlayer_fovIsVertical = jkGuiGeneral_aElements[15].selectedTextEntry;
-#ifdef SDL2_RENDER
-        Window_SetHiDpi(jkGuiGeneral_aElements[16].selectedTextEntry);
-        Window_SetFullscreen(jkGuiGeneral_aElements[17].selectedTextEntry);
-#endif
 #endif
 
         jkPlayer_WriteConf(jkPlayer_playerShortName);

@@ -216,9 +216,7 @@ int Main_Startup(const char *cmdline)
         jkGuiNetHost_Initialize(); //TODO
 #endif
         jkGuiSetup_Initialize();
-#ifndef SDL2_RENDER
-        jkGuiDisplay_Initialize(); //TODO
-#endif
+        jkGuiDisplay_Initialize();
         jkGuiForce_Initialize();
         jkGuiMain_Initialize();
         jkGuiPlayer_Initialize();

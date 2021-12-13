@@ -13,8 +13,14 @@
 #define jkGuiDisplay_sub_415410_ADDR (0x00415410)
 #define jkGuiDisplay_sub_415620_ADDR (0x00415620)
 
+#ifdef SDL2_RENDER
+void jkGuiDisplay_Initialize();
+void jkGuiDisplay_Shutdown();
+int jkGuiDisplay_Show();
+#else
 static int (*jkGuiDisplay_Initialize)() = (void*)jkGuiDisplay_Initialize_ADDR;
 static void (*jkGuiDisplay_Shutdown)() = (void*)jkGuiDisplay_Shutdown_ADDR;
 static int (*jkGuiDisplay_Show)() = (void*)jkGuiDisplay_Show_ADDR;
+#endif
 
 #endif // _JKGUI_DISPLAY_H

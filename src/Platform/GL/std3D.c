@@ -33,6 +33,7 @@
 
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
+#define TEX_MODE_BILINEAR 2
 
 static bool has_initted = false;
 static GLuint fb;
@@ -882,7 +883,11 @@ void std3D_DrawRenderList()
                     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
                 else
                     glBindTexture(GL_TEXTURE_2D, tex_id);
-                glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);//TEX_MODE_BGR
+
+                if (!jkPlayer_enableTextureFilter)
+                    glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);
+                else
+                    glUniform1i(uniform_tex_mode, TEX_MODE_BILINEAR);
                 
                 if (tex_id == 0)
                     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);

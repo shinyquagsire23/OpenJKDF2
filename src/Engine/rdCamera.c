@@ -206,6 +206,11 @@ int rdCamera_BuildFOV(rdCamera *camera)
             float fov_calc = camera->fov_y;
             float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
 
+#ifdef QOL_IMPROVEMENTS
+            if (jkPlayer_enableOrigAspect)
+                fov_calc_height = camera->fov_y;
+#endif
+
             clipFrustum->farTop = project_height_half / fov_calc_height; // far top
             clipFrustum->farLeft = -project_width_half / fov_calc; // far left
             clipFrustum->bottom = -project_height_half_2 / fov_calc_height; // bottom
@@ -238,6 +243,11 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     
     float fov_calc = camera->fov_y;
     float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
+
+#ifdef QOL_IMPROVEMENTS
+    if (jkPlayer_enableOrigAspect)
+        fov_calc_height = camera->fov_y;
+#endif
 
     outClip->farTop = project_width_half / fov_calc_height;
     outClip->farLeft = -project_height_half / fov_calc;
@@ -297,7 +307,7 @@ void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
 void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
 {
     out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - rdCamera_pCurCamera->screenAspectRatio * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? 1.0 : rdCamera_pCurCamera->screenAspectRatio) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
     out->z = v->y;
 
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);

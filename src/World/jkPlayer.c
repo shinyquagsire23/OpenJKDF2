@@ -33,6 +33,8 @@
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
 int jkPlayer_fovIsVertical = 0;
+int jkPlayer_enableTextureFilter = 0;
+int jkPlayer_enableOrigAspect = 0;
 #endif
 
 int jkPlayer_LoadAutosave()
@@ -248,6 +250,8 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdConffile_Printf("fovisvertical %d\n", jkPlayer_fovIsVertical);
         stdConffile_Printf("windowishidpi %d\n", Window_isHiDpi);
         stdConffile_Printf("windowfullscreen %d\n", Window_isFullscreen);
+        stdConffile_Printf("texturefiltering %d\n", jkPlayer_enableTextureFilter);
+        stdConffile_Printf("originalaspect %d\n", jkPlayer_enableOrigAspect);
 #endif
         stdConffile_CloseWrite();
     }
@@ -337,6 +341,18 @@ int jkPlayer_ReadConf(wchar_t *name)
             _sscanf(stdConffile_aLine, "windowfullscreen %d", &fulltmp);
             fulltmp = !!fulltmp;
             Window_SetFullscreen(fulltmp);
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "texturefiltering %d", &jkPlayer_enableTextureFilter);
+            jkPlayer_enableTextureFilter = !!jkPlayer_enableTextureFilter;
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
+            jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
         }
 #endif
         stdConffile_Close();
