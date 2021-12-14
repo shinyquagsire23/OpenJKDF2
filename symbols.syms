@@ -650,8 +650,7 @@ sithWeapon_8BD0A0 0x008BD0A0 float[2]
 sithWeapon_fireWait 0x008BD0A8 float
 sithWeapon_fireRate 0x008BD0AC float
 sithWeapon_LastFireTimeSecs 0x008BD0B0 float
-sithWeapon_a8BD030 0x008BD030 float[2]
-sithWeapon_a8BD038 0x008BD030 int[2]
+sithWeapon_a8BD030 0x008BD030 int[4]
 sithWeapon_8BD05C 0x008BD05C float[2]
 sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int

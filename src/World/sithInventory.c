@@ -91,7 +91,7 @@ void sithInventory_SelectItem(sithThing *thing, int binIdx)
 {
     if ( binIdx < 0 )
         return;
-        
+
     if ( thing->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(sithInventory_aDescriptors[binIdx].flags & ITEMINFO_VALID) || !(thing->actorParams.playerinfo->iteminfo[binIdx].state & ITEMSTATE_AVAILABLE) )
         return;
         
@@ -834,7 +834,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                 while ( (int)v2 < (int)&sithInventory_powerKeybinds[20].idk );
                 if ( sithInventory_bUnk == 1 )
                 {
-                    sithInventory_bUnk = SENDERTYPE_0;
+                    sithInventory_bUnk = 0;
                     v5 = *(int*)(&v39[200].ammoAmt);
                     if ( v5 >= 0 )
                     {
@@ -848,7 +848,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                 }
                 if ( sithInventory_bUnkPower == 1 )
                 {
-                    sithInventory_bUnkPower = SENDERTYPE_0;
+                    sithInventory_bUnkPower = 0;
                     v7 = v39[200].state;
                     if ( v7 >= 0 )
                     {

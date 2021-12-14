@@ -914,13 +914,13 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
 void sithWeapon_InitializeEntry()
 {
     sithWeapon_8BD0A0[0] = -1.0;
-    sithWeapon_a8BD030[0] = 0.0;
+    sithWeapon_a8BD030[0] = 0;
     sithWeapon_8BD0A0[1] = -1.0;
     sithWeapon_8BD05C[1] = -1.0;
     sithWeapon_LastFireTimeSecs = -1.0;
     sithWeapon_fireWait = -1.0;
     sithWeapon_fireRate = -1.0;
-    sithWeapon_a8BD030[1] = 0.0;
+    sithWeapon_a8BD030[1] = 0;
     sithWeapon_mountWait = 0.0;
     sithWeapon_8BD05C[0] = 0.0;
     sithWeapon_CurWeaponMode = -1;
@@ -978,11 +978,12 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     v14 = v13->cog;
     if ( v14 )
     {
-        sithCog_SendMessage(v14, COGMSG_SYNCSECTOR, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->thingIdx, 0);
+        sithCog_SendMessage(v14, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->thingIdx, 0);
         for (int i = 0; i < 2; i++)
         {
-            if (sithWeapon_8BD0A0[i] != -1.0 )
-                sithCog_SendMessage(v13->cog, COGMSG_SYNCPUPPET, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, player->thingIdx, 0);
+            if (sithWeapon_8BD0A0[i] != -1.0 ) {
+                sithCog_SendMessage(v13->cog, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, player->thingIdx, 0);
+            }
         }
     }
 
@@ -1078,7 +1079,7 @@ void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, float fireRate, int
     sithWeapon_fireRate = fireRate;
     sithWeapon_CurWeaponMode = mode;
     sithWeapon_8BD0A0[mode] = sithTime_curSeconds;
- 
+
     if (sithWeapon_fireRate <= 0.0)
         sithWeapon_fireWait = -1.0;
 
@@ -1254,27 +1255,28 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                 v22 = v20 - 10;
                 if ( sithControl_ReadFunctionMap(v20, &readInput) )
                 {
-                    if ( !sithWeapon_a8BD038[v25] )
+                    if ( !sithWeapon_a8BD030[v25] )
                     {
-                        sithWeapon_a8BD038[v25] = 1;
+                        sithWeapon_a8BD030[v25] = 1;
                         v23 = v19->cog;
                         if ( v23 )
                         {
-                            if (sithWeapon_a8BD030[v21])
-                                sithCog_SendMessage(v23, COGMSG_SYNCPUPPET, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->thingIdx, 0);
-                            sithCog_SendMessage(v19->cog, COGMSG_TELEPORTTHING, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->thingIdx, 0);
+                            if (sithWeapon_a8BD030[v21]) {
+                                sithCog_SendMessage(v23, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->thingIdx, 0);
+                            }
+                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->thingIdx, 0);
                         }
                     }
                 }
-                else if ( sithWeapon_a8BD038[v25] == 1 )
+                else if ( sithWeapon_a8BD030[v25] == 1 )
                 {
-                    sithWeapon_a8BD038[v25] = 0;
+                    sithWeapon_a8BD030[v25] = 0;
                     v24 = v19->cog;
                     if ( v24 )
                     {
-                        sithCog_SendMessage(v24, COGMSG_SYNCPUPPET, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->thingIdx, 0);
+                        sithCog_SendMessage(v24, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->thingIdx, 0);
                         if (sithWeapon_a8BD030[v21])
-                            sithCog_SendMessage(v19->cog, COGMSG_TELEPORTTHING, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->thingIdx, 0);
+                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->thingIdx, 0);
                     }
                 }
                 ++v21;
@@ -1296,8 +1298,9 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
             sithWeapon_a8BD030[v2] = 0;
             v4 = sithInventory_GetCurWeapon(player);
             v5 = sithInventory_GetBinByIdx(v4)->cog;
-            if ( v5 )
-                sithCog_SendMessage(v5, COGMSG_SYNCPUPPET, SENDERTYPE_SYSTEM, v2, SENDERTYPE_THING, player->thingIdx, 0);
+            if ( v5 ) {
+                sithCog_SendMessage(v5, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v2, SENDERTYPE_THING, player->thingIdx, 0);
+            }
         }
     }
     return 0;
@@ -1519,8 +1522,9 @@ void sithWeapon_SyncPuppet(sithThing *player)
         cog = itemDesc->cog;
         if ( cog )
         {
-            if ( sithWeapon_CurWeaponMode != -1 )
-                sithCog_SendMessage(cog, COGMSG_SYNCPUPPET, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, player->thingIdx, 0);
+            if ( sithWeapon_CurWeaponMode != -1 ) {
+                sithCog_SendMessage(cog, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, player->thingIdx, 0);
+            }
         }
     }
 }
