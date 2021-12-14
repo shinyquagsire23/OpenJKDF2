@@ -37,6 +37,7 @@ void jkHud_EndTarget();
 int jkHud_SortPlayerScore(const jkHudPlayerScore *a1, const jkHudPlayerScore *a2);
 int jkHud_SortTeamScore(const jkHudTeamScore *a1, const jkHudTeamScore *a2);
 void jkHud_Tally();
+void jkHud_idk_time();
 
 //static int (*jkHud_Startup)() = (void*)jkHud_Startup_ADDR;
 //static void (*jkHud_Shutdown)() = (void*)jkHud_Shutdown_ADDR;
@@ -44,7 +45,7 @@ void jkHud_Tally();
 //static void (*jkHud_Tally)() = (void*)jkHud_Tally_ADDR;
 
 //static int (*jkHud_ClearRects)() = (void*)jkHud_ClearRects_ADDR;
-static void (*jkHud_idk_time)() = (void*)jkHud_idk_time_ADDR;
+//static void (*jkHud_idk_time)() = (void*)jkHud_idk_time_ADDR;
 //static void (*jkHud_SendChat)(char a1) = (void*)jkHud_SendChat_ADDR;
 //static void (*jkHud_Draw)() = (void*)jkHud_Draw_ADDR;
 //static void (*jkHud_Close)() = (void*)jkHud_Close_ADDR;

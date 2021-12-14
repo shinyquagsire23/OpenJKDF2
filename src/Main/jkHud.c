@@ -1041,3 +1041,12 @@ LABEL_9:
             break;
     }
 }
+
+void jkHud_idk_time()
+{
+    jkHud_chatStrPos = 0;
+    jkHud_bChatOpen = 0;
+    jkDev_sub_41FC90(103);
+    stdControl_Flush();
+    stdControl_bDisableKeyboard = 0;
+}

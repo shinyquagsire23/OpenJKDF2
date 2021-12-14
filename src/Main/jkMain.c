@@ -14,6 +14,7 @@
 #include "Engine/sithTime.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGame.h"
+#include "Main/jkCredits.h"
 #include "Main/jkCutscene.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkHud.h"
@@ -54,9 +55,6 @@
 #define jkMain_CutsceneShow ((void*)(0x00404450))
 #define jkMain_CutsceneTick ((void*)(0x00404460))
 #define jkMain_CutsceneLeave ((void*)(0x00404470))
-#define jkMain_CreditsShow ((void*)(0x00404480))
-#define jkMain_CreditsTick ((void*)(0x004044B0))
-#define jkMain_CreditsLeave ((void*)(0x004044E0))
 
 static jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 static jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
@@ -1092,6 +1090,33 @@ void jkMain_VideoLeave(int a1, int a2)
     jkCutscene_sub_421410();
     if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )
         jkMain_CdSwitch(0, 1);
+}
+
+void jkMain_CreditsShow()
+{
+    if ( !jkCredits_Show() )
+    {
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 3;
+    }
+}
+
+void jkMain_CreditsTick()
+{
+    if ( jkCredits_Tick() )
+    {
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 3;
+    }
+}
+
+void jkMain_CreditsLeave()
+{
+    jkCredits_Skip();
 }
 
 #ifdef SDL2_RENDER

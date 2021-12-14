@@ -123,6 +123,10 @@ void jkMain_VideoShow(int a1, int a2);
 void jkMain_VideoTick(int a2);
 void jkMain_VideoLeave(int a1, int a2);
 
+void jkMain_CreditsShow();
+void jkMain_CreditsTick();
+void jkMain_CreditsLeave();
+
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
 //static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
