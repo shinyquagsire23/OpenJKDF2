@@ -2939,6 +2939,7 @@ typedef struct stdControlDikStrToNum
 #define KEY_MOUSE_B2        (0x119)
 #define KEY_MOUSE_B3        (0x11A)
 #define KEY_MOUSE_B4        (0x11B)
+#define KEY_MOUSE_B5        (0x11C)
 
 // Axis idxs
 #define AXIS_JOY1_X          (0)

@@ -657,6 +657,12 @@ void stdControl_ReadMouse()
         //stdControl_SetKeydown(280 + i, 0 /* buttonval */, stdControl_curReadTime);
     }
 
+    int x,y;
+    uint32_t buttons = SDL_GetMouseState(&x, &y);
+
     stdControl_SetKeydown(KEY_MOUSE_B1, Window_bMouseLeft, stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B2, Window_bMouseRight, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_MOUSE_B3, !!(buttons & SDL_BUTTON_MMASK), stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_MOUSE_B4, !!(buttons & SDL_BUTTON_X1MASK), stdControl_curReadTime);
+    //stdControl_SetKeydown(KEY_MOUSE_B5, !!(buttons & SDL_BUTTON_X2MASK), stdControl_curReadTime);
 }
