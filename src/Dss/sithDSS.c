@@ -792,8 +792,10 @@ void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
     for (int i = 0; i < 4; i++)
     {
         // HACK HACK HACK weird animation glitches on savefile load -- only for player?
-        if (thing == g_localPlayerThing)
-            _memset(&puppet->tracks[i], 0, sizeof(puppet->tracks[i]));
+        if (thing == g_localPlayerThing) {
+            NETMSG_PUSHU32(0);
+            continue;
+        }
                 
         NETMSG_PUSHU32(puppet->tracks[i].status);
         if ( puppet->tracks[i].status )
