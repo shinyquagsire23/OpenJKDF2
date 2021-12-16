@@ -486,6 +486,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
     {
         if ( g_selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
+            int oldGeoMode = thing->rdthing.geometryMode;
             thing->rdthing.geometryMode = thing->rdthing.geoMode;
             rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
             rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
@@ -493,7 +494,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
             thing->lookOrientation.scale.x = 0.0;
             thing->lookOrientation.scale.y = 0.0;
             thing->lookOrientation.scale.z = 0.0;
-            thing->rdthing.geometryMode = thing->rdthing.geometryMode;
+            thing->rdthing.geometryMode = oldGeoMode;
 
             if (playerInfo->rd_thing.model3)
                 rdThing_Draw(&playerInfo->rd_thing, primaryMat);

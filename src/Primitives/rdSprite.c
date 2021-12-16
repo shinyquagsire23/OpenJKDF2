@@ -165,9 +165,12 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdSprite_inVerts[3].y = sprite->offset.y + vertex_out.y;
     rdSprite_inVerts[3].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
 
-    if ( rdroid_curGeometryMode >= sprite->face.geometryMode )
-        rdroid_curGeometryMode = sprite->face.geometryMode;
-    if ( rdroid_curGeometryMode >= thing->geometryMode )
+    int curGeometryMode = rdroid_curGeometryMode;
+    int curLightingMode = rdroid_curLightingMode;
+    int curTextureMode = rdroid_curTextureMode;
+    if ( curGeometryMode >= sprite->face.geometryMode )
+        curGeometryMode = sprite->face.geometryMode;
+    if ( curGeometryMode >= thing->geometryMode )
     {
         procEntry->geometryMode = thing->geometryMode;
     }    
@@ -187,9 +190,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     }
     else
     {
-        if ( rdroid_curLightingMode >= sprite->face.lightingMode )
-            rdroid_curLightingMode = sprite->face.lightingMode;
-        if ( rdroid_curLightingMode >= thing->lightingMode )
+        if ( curLightingMode >= sprite->face.lightingMode )
+            curLightingMode = sprite->face.lightingMode;
+        if ( curLightingMode >= thing->lightingMode )
         {
             sprite->face.lightingMode = thing->lightingMode;
         }
@@ -200,13 +203,13 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         procEntry->lightingMode = sprite->face.lightingMode;
     }
 
-    if ( rdroid_curTextureMode >= sprite->face.textureMode )
-        rdroid_curTextureMode = sprite->face.textureMode;
+    if ( curTextureMode >= sprite->face.textureMode )
+        curTextureMode = sprite->face.textureMode;
     
     procEntry->textureMode = thing->textureMode;
-    if ( rdroid_curTextureMode < procEntry->textureMode )
+    if ( curTextureMode < procEntry->textureMode )
     {
-        if ( rdroid_curTextureMode >= sprite->face.textureMode )
+        if ( curTextureMode >= sprite->face.textureMode )
             procEntry->textureMode = sprite->face.textureMode;
         else
             procEntry->textureMode = rdroid_curTextureMode;

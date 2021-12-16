@@ -119,12 +119,12 @@ LABEL_11:
     sithTime_SetMs(curMs);
     
     // Added: split this apart, g_sithMode is a struct...
-    stdConffile_Read((char*)&g_sithMode, sizeof(g_sithMode));
-    stdConffile_Read((char*)&g_submodeFlags, sizeof(g_submodeFlags));
-    stdConffile_Read((char*)&sithSurface_byte_8EE668, sizeof(sithSurface_byte_8EE668));
-    stdConffile_Read((char*)&g_debugmodeFlags, sizeof(g_debugmodeFlags));
-    stdConffile_Read((char*)&jkPlayer_setDiff, sizeof(jkPlayer_setDiff));
-    stdConffile_Read((char*)&g_mapModeFlags, sizeof(g_mapModeFlags));
+    stdConffile_Read((char*)&g_sithMode, sizeof(int32_t));
+    stdConffile_Read((char*)&g_submodeFlags, sizeof(int32_t));
+    stdConffile_Read((char*)&sithSurface_byte_8EE668, sizeof(int32_t));
+    stdConffile_Read((char*)&g_debugmodeFlags, sizeof(int32_t));
+    stdConffile_Read((char*)&jkPlayer_setDiff, sizeof(int32_t));
+    stdConffile_Read((char*)&g_mapModeFlags, sizeof(int32_t));
 
     sithThing_freestuff(sithWorld_pCurrentWorld);
     
@@ -382,12 +382,12 @@ LABEL_17:
         stdConffile_Write((const char*)&sithTime_curMs, sizeof(sithTime_curMs));
         
         // Added: split this apart, g_sithMode is a struct...
-        stdConffile_Write((const char*)&g_sithMode, sizeof(g_sithMode));
-        stdConffile_Write((const char*)&g_submodeFlags, sizeof(g_submodeFlags));
-        stdConffile_Write((const char*)&sithSurface_byte_8EE668, sizeof(sithSurface_byte_8EE668));
-        stdConffile_Write((const char*)&g_debugmodeFlags, sizeof(g_debugmodeFlags));
-        stdConffile_Write((const char*)&jkPlayer_setDiff, sizeof(jkPlayer_setDiff));
-        stdConffile_Write((const char*)&g_mapModeFlags, sizeof(g_mapModeFlags));
+        stdConffile_Write((const char*)&g_sithMode, sizeof(int32_t));
+        stdConffile_Write((const char*)&g_submodeFlags, sizeof(int32_t));
+        stdConffile_Write((const char*)&sithSurface_byte_8EE668, sizeof(int32_t));
+        stdConffile_Write((const char*)&g_debugmodeFlags, sizeof(int32_t));
+        stdConffile_Write((const char*)&jkPlayer_setDiff, sizeof(int32_t));
+        stdConffile_Write((const char*)&g_mapModeFlags, sizeof(int32_t));
         
         sithGamesave_SerializeAllThings(4);
         if ( sithGamesave_func1 )

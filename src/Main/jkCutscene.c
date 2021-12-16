@@ -276,6 +276,12 @@ int jkCutscene_smack_related_loops()
             return smack_finished;
         }
     }
+#if defined(SDL2_RENDER)
+    else
+    {
+        stdDisplay_DDrawGdiSurfaceFlip();
+    }
+#endif
     return smack_finished;
 }
 
@@ -294,15 +300,16 @@ int jkCutscene_PauseShow(int unk)
         stdDisplay_VBufferFill(&Video_otherBuf, 0, &jkCutscene_rect2);
     }
     result = Main_bWindowGUI;
+#if !defined(SDL2_RENDER)
     if ( Main_bWindowGUI )
         result = stdDisplay_DDrawGdiSurfaceFlip();
+#endif
     return result;
 }
 
 int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 {
     wchar_t *v5; // eax
-    int v7; // [esp-4h] [ebp-8h]
 
     switch ( a2 )
     {
@@ -320,26 +327,25 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
             {
                 if ( a3 == 0x20 )
                 {
-                    v7 = jkCutscene_55AA54 == 0;
-                    jkCutscene_55AA54 = v7;
+                    jkCutscene_55AA54 = !jkCutscene_55AA54;
 #if !defined(SDL2_RENDER)
                     if (!openjkdf2_bIsKVM)
-                        smack_off(v7);
+                        smack_off(jkCutscene_55AA54);
 #endif
-                    if ( jkCutscene_55AA54 )
+
+#if defined(SDL2_RENDER)
+                    if (jkCutscene_55AA54)
                     {
-                        v5 = jkStrings_GetText("GUI_PAUSED");
-                        stdFont_Draw4(&Video_otherBuf, jkCutscene_subtitlefont, 0, 10, 640, 40, 3, v5, 0);
+                        stdSound_BufferStop(jkCutscene_audioFull);
+                        last_displayFrame -= Linux_TimeUs();
                     }
                     else
                     {
-                        stdDisplay_VBufferFill(&Video_otherBuf, 0, &jkCutscene_rect2);
+                        stdSound_BufferPlay(jkCutscene_audioFull, 0);
+                        last_displayFrame += Linux_TimeUs();
                     }
-                    if ( Main_bWindowGUI )
-                    {
-                        stdDisplay_DDrawGdiSurfaceFlip();
-                        return 0;
-                    }
+#endif
+                    jkCutscene_PauseShow(0);
                 }
                 return 0;
             }
