@@ -544,3 +544,16 @@ int sithPlayer_GetNumidk(int a1)
     }
     return result;
 }
+
+void sithPlayer_SetBinCarries(int binIdx, int bCarries)
+{
+    sithItemInfo *v2; // eax
+    int v3; // ecx
+
+    v2 = &jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx];
+    v3 = v2->state;
+    if ( bCarries )
+        v2->state = v3 | 8;
+    else
+        v2->state = v3 & ~8u;
+}
