@@ -12,6 +12,14 @@ lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libGLEW.2.2.dylib Op
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2-2.0.0.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
 
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libmodplug.1.dylib OpenJKDF2.app/Contents/MacOS/libmodplug.1.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libmodplug.1.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libmpg123.0.dylib OpenJKDF2.app/Contents/MacOS/libmpg123.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libmpg123.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libvorbis.0.dylib OpenJKDF2.app/Contents/MacOS/libvorbis.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libvorbis.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libvorbisfile.3.dylib OpenJKDF2.app/Contents/MacOS/libvorbisfile.3.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libvorbisfile.3.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libFLAC.8.dylib OpenJKDF2.app/Contents/MacOS/libFLAC.8.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libFLAC.8.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libogg.0.dylib OpenJKDF2.app/Contents/MacOS/libogg.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libogg.0.dylib
+
+
 chmod 774 OpenJKDF2_universal.app/Contents/MacOS/openjkdf2-64
 chmod 774 OpenJKDF2_universal.app/Contents/MacOS/*.dylib
 
