@@ -328,13 +328,21 @@ int Window_bMouseRight = 0;
 int Window_resized = 0;
 int Window_mouseX = 0;
 int Window_mouseY = 0;
+int Window_lastMouseX = 0;
+int Window_lastMouseY = 0;
 int Window_xPos = SDL_WINDOWPOS_CENTERED;
 int Window_yPos = SDL_WINDOWPOS_CENTERED;
+int last_jkGame_isDDraw = 0;
+int Window_menu_mouseX = 0;
+int Window_menu_mouseY = 0;
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
     int x = event->x;
     int y = event->y;
+
+    Window_lastMouseX = Window_mouseX;
+    Window_lastMouseY = Window_mouseY;
 
     if (!jkGame_isDDraw)
     {
@@ -364,6 +372,12 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
     //Window_lastSampleTime = event->timestamp;
     Window_lastXRel = event->xrel;
     Window_lastYRel = event->yrel;
+
+    if ((abs(Window_lastMouseX - Window_mouseX) > 300
+        || abs(Window_lastMouseY - Window_mouseY) > 300)
+        && (Window_mouseX == 0 && Window_mouseY == 0)) {
+        SDL_WarpMouseInWindow(displayWindow, Window_lastMouseX, Window_lastMouseY);
+    }
 
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
 }
@@ -412,10 +426,10 @@ void Window_HandleWindowEvent(SDL_Event* event)
             //printf("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            //printf("Mouse entered window %d", event->window.windowID);
+            //printf("Mouse entered window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            //printf("Mouse left window %d", event->window.windowID);
+            //printf("Mouse left window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             //printf("Window %d gained keyboard focus", event->window.windowID);
@@ -637,6 +651,11 @@ void Window_SdlUpdate()
 
     if (!jkGame_isDDraw)
     {
+        // Restore menu mouse position
+        if (jkGame_isDDraw != last_jkGame_isDDraw) {
+            SDL_WarpMouseInWindow(displayWindow, Window_menu_mouseX, Window_menu_mouseY);
+        }
+
         SDL_SetRelativeMouseMode(SDL_FALSE);
 
         std3D_StartScene();
@@ -652,7 +671,12 @@ void Window_SdlUpdate()
     }
     else
     {
-        
+        // Save mouse position for menu
+        if (jkGame_isDDraw != last_jkGame_isDDraw) {
+            Window_menu_mouseX = Window_mouseX;
+            Window_menu_mouseY = Window_mouseY;
+        }
+
         if (SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
             SDL_SetRelativeMouseMode(SDL_TRUE);
             SDL_WarpMouseInWindow(displayWindow, 100, 100);
@@ -662,6 +686,8 @@ void Window_SdlUpdate()
             SDL_SetRelativeMouseMode(SDL_FALSE);
         }
     }
+
+    last_jkGame_isDDraw = jkGame_isDDraw;
 }
 
 void Window_SdlVblank()
