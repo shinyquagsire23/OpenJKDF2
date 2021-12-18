@@ -85,7 +85,9 @@ int Main_Startup(const char *cmdline)
 
 #if defined(MACOS)
     // Default working directory to the folder the .app bundle is in
-    chdir(SDL_GetBasePath());
+    char* base_path = SDL_GetBasePath();
+    chdir(base_path);
+    SDL_free(base_path);
 #endif
 
     if ((homedir = getenv("HOME")) == NULL) {

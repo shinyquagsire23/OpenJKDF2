@@ -92,6 +92,8 @@ FILE *fcaseopen(char const *path, char const *mode)
         {
             f = fopen(r, mode);
         }
+        if (r)
+            free(r);
     }
 #endif
     return f;
@@ -109,6 +111,8 @@ void casechdir(char const *path)
     {
         errno = ENOENT;
     }
+    if (r)
+        free(r);
 #else
     chdir(path);
 #endif

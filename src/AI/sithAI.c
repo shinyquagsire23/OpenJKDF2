@@ -238,6 +238,14 @@ void sithAI_FreeEntry(sithThing *thing)
     if ( v1 )
     {
         v2 = v1 - sithAI_actors;
+
+        // Added: fix memleak
+        if (sithAI_actors[v2].framesAlloc)
+        {
+            pSithHS->free(sithAI_actors[v2].framesAlloc);
+            sithAI_actors[v2].framesAlloc = NULL;
+        }
+
         _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
         if ( v2 == sithAI_inittedActors )
         {

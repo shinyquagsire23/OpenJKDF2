@@ -696,6 +696,7 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     stdString_CharToWchar(a1, tmp_out, a2);
     
     free(tmp_fmt);
+    free(tmp_out);
     return ret;
 }
 

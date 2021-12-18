@@ -211,6 +211,8 @@ int jkCutscene_sub_421410()
     //stdSound_BufferRelease(jkCutscene_audio2);
     stdSound_BufferRelease(jkCutscene_audioFull);
     smk_close(jkCutscene_smk);
+    stdDisplay_VBufferFree(jkCutscene_frameBuf);
+    jkCutscene_frameBuf = NULL;
 #endif
 
     last_displayFrame = 0;

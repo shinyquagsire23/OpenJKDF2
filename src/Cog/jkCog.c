@@ -344,6 +344,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                 if ( model3->numGeosets == 1 && model3->geosets[0].numMeshes == 1 )
                 {
                     v5 = &v4->rd_thing;
+                    rdThing_FreeEntry(v5); // Added: fix memleak
                     rdThing_NewEntry(&v4->rd_thing, v3);
                     rdThing_SetModel3(v5, model3);
                     if ( sithCogVm_multiplayerFlags )

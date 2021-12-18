@@ -536,6 +536,13 @@ void jkHudInv_LoadItemRes()
         _sprintf(v18, "ui\\sft\\%s", "HelthNum.sft");
     else
         _sprintf(v18, "ui\\sft\\%s", "HelthNum16.sft");
+    
+    // Added: fix memleak
+    if (jkHudInv_font) {
+        stdFont_Free(jkHudInv_font);
+        jkHudInv_font = NULL;
+    }
+
     v5 = stdFont_Load(v18, 0, 0);
     jkHudInv_font = v5;
     if ( !v5 )

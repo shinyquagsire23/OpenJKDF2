@@ -63,11 +63,17 @@ void jkPlayer_Shutdown()
 {
     for (int i = 0; i < jkPlayer_numThings; i++ )
     {
+        rdPolyLine_FreeEntry(&playerThings[i].polyline); // Added: prevent memleak
+
         if (playerThings[i].polylineThing.model3)
         {
             rdThing_FreeEntry(&playerThings[i].polylineThing);
             playerThings[i].polylineThing.model3 = 0;
         }
+
+        rdThing_FreeEntry(&playerThings[i].povModel); // Added: prevent memleak
+
+        rdThing_FreeEntry(&playerThings[i].rd_thing); // Added: fix memleak
     }
     _memset(playerThings, 0, sizeof(playerThings));
     

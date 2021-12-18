@@ -1417,7 +1417,7 @@ void sithThing_freestuff(sithWorld *world)
             sithThing_LeaveSector(thingIter);
         if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.frames )
             pSithHS->free(thingIter->trackParams.frames);
-        if ( thingIter->thingtype == SITH_THING_ACTOR )
+        if ( thingIter->thingtype == SITH_THING_ACTOR || thingIter->thingtype == SITH_THING_PLAYER) // Added: SITH_THING_PLAYER
             sithAI_FreeEntry(thingIter);
         if ( thingIter->type == SITH_THING_PARTICLE )
             sithParticle_FreeEntry(thingIter);

@@ -25,6 +25,9 @@ ifneq ($(OPENJKDF2_NO_ASAN), 1)
 ifneq ($(OPENJKDF2_USE_BLOBS), 1)
 	CFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero
 	LDFLAGS += -fsanitize=address -fsanitize=float-divide-by-zero -static-libsan
+
+#	CFLAGS += -fsanitize=leak
+#	LDFLAGS += -fsanitize=leak
 endif
 endif
 

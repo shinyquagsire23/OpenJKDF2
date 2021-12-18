@@ -218,8 +218,8 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     wchar_t *v1; // eax
     HWND v2; // eax
     wchar_t *v3; // [esp-8h] [ebp-408h]
-    wchar_t Text[512]; // [esp+0h] [ebp-400h] BYREF
-    char tmp[256];
+    wchar_t Text[512+1]; // [esp+0h] [ebp-400h] BYREF
+    char tmp[512+1];
     va_list va; // [esp+408h] [ebp+8h] BYREF
 
     va_start(va, a1);
