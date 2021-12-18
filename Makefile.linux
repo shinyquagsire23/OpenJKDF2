@@ -14,7 +14,7 @@ LDFLAGS := -Wl,-Map=output-linux.map
 
 include sources.mk
 
-CFLAGS += -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces $(shell pkg-config --cflags gtk+-3.0) 
+CFLAGS += -D_XOPEN_SOURCE=500 -D_DEFAULT_SOURCE -I$(ROOT_DIR)/$(SRC) -I/usr/include/SDL2 -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DOPENAL_SOUND -DSDL2_RENDER -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces $(shell pkg-config --cflags gtk+-3.0) 
 LDFLAGS += -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar $(shell pkg-config --libs gtk+-3.0) 
 
 # Optional: Use JK.EXE as a binary blob for unimplemented functions
@@ -30,7 +30,7 @@ include common.mk
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
-	$(CC) -c -g -rdynamic -o $@ $< $(CFLAGS)
+	$(CC) -c -g -rdynamic -o $@ $< $(CFLAGS) -std=c11
 
 $(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ) initial
 	@mkdir -p $(dir $@)
