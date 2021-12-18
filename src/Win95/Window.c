@@ -8,6 +8,7 @@
 #include "Gui/jkGUI.h"
 #include "Win95/stdDisplay.h"
 #include "Platform/stdControl.h"
+#include "stdPlatform.h"
 
 #include "jk.h"
 
@@ -692,7 +693,13 @@ void Window_SdlUpdate()
 
 void Window_SdlVblank()
 {
+    //static uint32_t roundtrip = 0;
+    //uint32_t before = stdPlatform_GetTimeMsec();
     SDL_GL_SwapWindow(displayWindow);
+    //uint32_t after = stdPlatform_GetTimeMsec();
+    //printf("%u %u\n", after-before, before-roundtrip);
+
+    //roundtrip = before;
 
     if (Window_needsRecreate)
         Window_RecreateSDL2Window();
@@ -787,7 +794,7 @@ void Window_RecreateSDL2Window()
     }
 
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
-    //SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_GL_SetSwapInterval(0); // Disable vsync
     SDL_StartTextInput();
 
     SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
