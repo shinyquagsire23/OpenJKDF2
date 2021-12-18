@@ -1,8 +1,10 @@
 SRC := src
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
+SOURCES_CXX := $(wildcard $(SRC)/*.cpp $(SRC)/*/*.cpp)
 
 SOURCES += $(wildcard $(SRC)/Platform/Common/*.c)
+SOURCES_CXX += $(wildcard $(SRC)/Platform/Common/*.cpp)
 
 ifeq ($(TARGET_USE_LIBSMACKER), 1)
 	SOURCES += $(SRC)/external/libsmacker/smacker.c $(SRC)/external/libsmacker/smk_bitstream.c $(SRC)/external/libsmacker/smk_hufftree.c
@@ -38,12 +40,14 @@ ifeq ($(TARGET_WIN32), 1)
 	# Win64 can use the registry fine, even if stdlib is POSIX
 	SOURCES := $(filter-out $(SRC)/Platform/Posix/wuRegistry.c, $(SOURCES))
 
-	SOURCES += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_win.cpp)
+	SOURCES_CXX += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_win.cpp)
+	LDFLAGS += -lole32 -luuid
 endif
 
-CFLAGS += -I$(ROOT_DIR)/$(SRC)/external/nativefiledialog-extended/include
-LDFLAGS += -I$(ROOT_DIR)/$(SRC)/external/nativefiledialog-extended/include
+CFLAGS += -I$(SRC)/external/nativefiledialog-extended
+#LDFLAGS += -I$(SRC)/external/nativefiledialog-extended
 
 SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+OBJECTS += $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES_CXX))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))

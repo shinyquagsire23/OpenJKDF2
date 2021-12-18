@@ -32,6 +32,10 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
+$(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ) initial
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -o $@ $< $(CFLAGS) -lstdc++
+
 $(TARGET): $(OBJECTS)
 	rm -f wasm_out/openjkdf2.data
 	rm -f wasm_out/*.html

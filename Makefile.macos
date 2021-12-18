@@ -39,6 +39,10 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
+$(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ) initial
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -o $@ $< $(CFLAGS) -lstdc++
+
 $(TARGET): $(OBJECTS)
 	$(CC) -o $@ -g $^ $(LDFLAGS)
 	dsymutil $@ -o $@.dsym

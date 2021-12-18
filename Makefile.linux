@@ -32,5 +32,9 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -rdynamic -o $@ $< $(CFLAGS)
 
+$(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ) initial
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -rdynamic -o $@ $< $(CFLAGS) -lstdc++
+
 $(TARGET): $(OBJECTS)
 	$(CC) -m32 -o $@ -g -rdynamic $^ $(LDFLAGS)

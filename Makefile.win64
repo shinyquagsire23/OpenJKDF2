@@ -31,6 +31,10 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ) initial
 	@mkdir -p $(dir $@)
 	$(CC) -c -g -o $@ $< $(CFLAGS)
 
+$(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ) initial
+	@mkdir -p $(dir $@)
+	$(CC) -c -g -o $@ $< $(CFLAGS) -lstdc++
+
 $(TARGET): $(OBJECTS)
 	@convert $(ROOT_DIR)/packaging/icon.png -resize 25% $(ROOT_DIR)/packaging/icon-256.png
 	@convert $(ROOT_DIR)/packaging/icon-256.png $(ROOT_DIR)/packaging/openjkdf2.ico
