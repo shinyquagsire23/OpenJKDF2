@@ -42,7 +42,7 @@ static jkGuiElement jkGuiDisplay_aElements[18] = {
     {ELEMENT_CHECKBOX,     0,            0, L"Enable Fullscreen",    0, {400, 150, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"Enable HiDPI",    0, {400, 180, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"Enable Texture Filtering",    0, {400, 210, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, L"Use original 1:1 aspect",    0, {20, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, L"Use 1:1 aspect",    0, {20, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };

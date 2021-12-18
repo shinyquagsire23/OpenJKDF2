@@ -799,8 +799,8 @@ void std3D_DrawRenderList()
     // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
     // To compensate, we zoom the y axis here.
     // I also went ahead and fixed vertical displays in the same way because it seems to look better.
-    float zoom_yaspect = (width/height) / (640.0/480.0);
-    float zoom_xaspect = (height/width) / (480.0/640.0);
+    float zoom_yaspect = (width/height);
+    float zoom_xaspect = (height/width);
 
     if (height > width)
     {
