@@ -24,12 +24,25 @@ ifeq ($(TARGET_POSIX), 1)
 	SOURCES += $(wildcard $(SRC)/Platform/Posix/*.c)
 endif
 
+ifeq ($(TARGET_LINUX), 1)
+	SOURCES += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_gtk.cpp)
+endif
+
+ifeq ($(TARGET_MACOS), 1)
+	SOURCES += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_cocoa.m)
+endif
+
 ifeq ($(TARGET_WIN32), 1)
 	SOURCES += $(wildcard $(SRC)/Platform/Win32/*.c)
 
 	# Win64 can use the registry fine, even if stdlib is POSIX
 	SOURCES := $(filter-out $(SRC)/Platform/Posix/wuRegistry.c, $(SOURCES))
+
+	SOURCES += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_win.cpp)
 endif
+
+CFLAGS += -I$(ROOT_DIR)/$(SRC)/external/nativefiledialog-extended/include
+LDFLAGS += -I$(ROOT_DIR)/$(SRC)/external/nativefiledialog-extended/include
 
 SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))

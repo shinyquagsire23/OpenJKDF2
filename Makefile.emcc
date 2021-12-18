@@ -8,10 +8,13 @@ TARGET_USE_SDL2 := 1
 TARGET_POSIX := 1
 TARGET_USE_OPENGL := 1
 
+CFLAGS := ""
+LDFLAGS := ""
+
 include sources.mk
 
-LDFLAGS := -s USE_SDL=2 -s WASM=1 -s USE_SDL_MIXER=2 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s ASYNCIFY --profiling --preload-file $(ROOT_DIR)/wasm_out@/
-CFLAGS := -s USE_SDL=2 -s USE_SDL_MIXER=2
+LDFLAGS += -s USE_SDL=2 -s WASM=1 -s USE_SDL_MIXER=2 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s ASYNCIFY --profiling --preload-file $(ROOT_DIR)/wasm_out@/
+CFLAGS += -s USE_SDL=2 -s USE_SDL_MIXER=2
 
 LDFLAGS += -g -O2 -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -fshort-wchar
 CFLAGS += -g -O2 -I$(ROOT_DIR)/$(SRC) -I$(ROOT_DIR)/$(SRC)/external/libsmacker -DQOL_IMPROVEMENTS -DLINUX -DPLATFORM_POSIX -DOPENAL_SOUND -DSDL2_RENDER -DARCH_WASM -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces 
