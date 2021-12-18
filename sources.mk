@@ -2,6 +2,7 @@ SRC := src
 
 SOURCES := $(wildcard $(SRC)/*.c $(SRC)/*/*.c) #$(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 SOURCES_CXX := $(wildcard $(SRC)/*.cpp $(SRC)/*/*.cpp)
+SOURCES_M := $(wildcard $(SRC)/*.m $(SRC)/*/*.m)
 
 SOURCES += $(wildcard $(SRC)/Platform/Common/*.c)
 SOURCES_CXX += $(wildcard $(SRC)/Platform/Common/*.cpp)
@@ -50,4 +51,5 @@ CFLAGS += -I$(SRC)/external/nativefiledialog-extended
 SOURCES += $(SRC)/external/fcaseopen/fcaseopen.c
 OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
 OBJECTS += $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES_CXX))
+OBJECTS += $(patsubst $(SRC)/%.m, $(OBJ)/%.o, $(SOURCES_M))
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
