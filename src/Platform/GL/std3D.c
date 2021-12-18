@@ -103,7 +103,7 @@ GLuint menu_ibo_triangle;
 
 void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
 {
-	// Generate the framebuffer
+    // Generate the framebuffer
     *fbOut = 0;
     glGenFramebuffers(1, fbOut);
     glBindFramebuffer(GL_FRAMEBUFFER, *fbOut);
@@ -128,33 +128,33 @@ void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
     // Bind it to our framebuffer fb
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *fbRboOut);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            printf("ERROR: Framebuffer is incomplete!\n");
+        printf("ERROR: Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void deleteFramebuffer(GLuint fbIn, GLuint fbTexIn, GLuint fbRboIn)
 {
-	glDeleteFramebuffers(1, &fbIn);
-	glDeleteTextures(1, &fbTexIn);
-	glDeleteRenderbuffers(1, &fbRboIn);
+    glDeleteFramebuffers(1, &fbIn);
+    glDeleteTextures(1, &fbTexIn);
+    glDeleteRenderbuffers(1, &fbRboIn);
 }
 
 void swap_framebuffers()
 {
-	if (activeFb == 2)
-	{
-		activeFb = 1;
-		fb = fb1;
-   		fbTex = fbTex1;
-	    fbRbo = fbRbo1;
-	}
-	else
-	{
-		activeFb = 2;
-		fb = fb2;
-   		fbTex = fbTex2;
-	    fbRbo = fbRbo2;
-	}
+    if (activeFb == 2)
+    {
+        activeFb = 1;
+        fb = fb1;
+        fbTex = fbTex1;
+        fbRbo = fbRbo1;
+    }
+    else
+    {
+        activeFb = 2;
+        fb = fb2;
+        fbTex = fbTex2;
+        fbRbo = fbRbo2;
+    }
 }
 
 GLuint std3D_loadProgram(const char* fpath_base)
@@ -343,19 +343,21 @@ int std3D_StartScene()
     
     //glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
     glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendEquation(GL_FUNC_ADD);
-	    
-	// Technically this should be from Clear2
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    glCullFace(GL_FRONT);
+        
+    // Technically this should be from Clear2
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    
     if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && memcmp(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300))
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-	    memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
+        memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     }
     
@@ -398,7 +400,7 @@ int std3D_StartScene()
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
     glEnableVertexAttribArray(attribute_v_uv);
-	
+    
     return 1;
 }
 
@@ -499,9 +501,9 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
     GL_tmpTris[GL_tmpTrisAmt+0].v2 = GL_tmpVerticesAmt+0;
     GL_tmpTris[GL_tmpTrisAmt+0].v3 = GL_tmpVerticesAmt+2;
     
-    GL_tmpTris[GL_tmpTrisAmt+1].v1 = GL_tmpVerticesAmt+2;
+    GL_tmpTris[GL_tmpTrisAmt+1].v1 = GL_tmpVerticesAmt+0;
     GL_tmpTris[GL_tmpTrisAmt+1].v2 = GL_tmpVerticesAmt+3;
-    GL_tmpTris[GL_tmpTrisAmt+1].v3 = GL_tmpVerticesAmt+0;
+    GL_tmpTris[GL_tmpTrisAmt+1].v3 = GL_tmpVerticesAmt+2;
     
     GL_tmpVerticesAmt += 4;
     GL_tmpTrisAmt += 2;
@@ -586,9 +588,9 @@ void std3D_DrawMenu()
         GL_tmpTris[0].v2 = 0;
         GL_tmpTris[0].v3 = 2;
         
-        GL_tmpTris[1].v1 = 2;
+        GL_tmpTris[1].v1 = 0;
         GL_tmpTris[1].v2 = 3;
-        GL_tmpTris[1].v3 = 0;
+        GL_tmpTris[1].v3 = 2;
         
         GL_tmpVerticesAmt = 4;
         GL_tmpTrisAmt = 2;
