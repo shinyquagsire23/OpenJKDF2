@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <ftw.h>
 
 #include "external/fcaseopen/fcaseopen.h"
 #endif
@@ -100,6 +101,46 @@ BOOL stdFileUtil_MkDir(LPCSTR lpPathName)
 int stdFileUtil_DelFile(char* lpFileName)
 {
     return DeleteFileA(lpFileName);
+}
+#endif
+
+#ifdef PLATFORM_POSIX
+
+// Stolen from https://stackoverflow.com/questions/2256945/removing-a-non-empty-directory-programmatically-in-c-or-c
+static int rmFiles(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb)
+{
+    if(remove(pathname) < 0)
+    {
+        perror("ERROR: remove");
+        return -1;
+    }
+    return 0;
+}
+
+
+int stdFileUtil_Deltree(char* lpPathName)
+{
+    char tmp[512];
+    size_t len = _strlen(lpPathName);
+
+    if (len > 512) {
+        len = 512;
+    }
+    _strncpy(tmp, lpPathName, sizeof(tmp));
+
+#ifndef WIN64_STANDALONE
+    for (int i = 0; i < len; i++)
+    {
+        if (tmp[i] == '\\') {
+            tmp[i] = '/';
+        }
+    }
+#endif
+
+    nftw(tmp, rmFiles, 10, FTW_DEPTH|FTW_MOUNT|FTW_PHYS);
+
+    //rmdir(tmp);
+    return 0;
 }
 #endif
 
@@ -206,29 +247,6 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
 
         std_pHS->free(search);
     }
-}
-
-int stdFileUtil_Deltree(char* lpPathName)
-{
-    char tmp[512];
-    size_t len = _strlen(lpPathName);
-
-    if (len > 512) {
-        len = 512;
-    }
-    _strncpy(tmp, lpPathName, sizeof(tmp));
-
-#ifndef WIN64_STANDALONE
-    for (int i = 0; i < len; i++)
-    {
-        if (tmp[i] == '\\') {
-            tmp[i] = '/';
-        }
-    }
-#endif
-
-    //rmdir(tmp);
-    return 0;
 }
 
 int stdFileUtil_MkDir(char* path)
