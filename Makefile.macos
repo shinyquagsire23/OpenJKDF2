@@ -95,6 +95,7 @@ $(BUNDLE): $(TARGET)
 	@generate-iconset packaging/icon.png
 	@mkdir -p $(BUNDLE)/Contents/Resources/
 	@cp packaging/icon.icns $(BUNDLE)/Contents/Resources/OpenJKDF2.icns
+	@cp -r resource/ $(BUNDLE)/Contents/Resources/resource/
 	@rm -rf packaging/icon.iconset
 	@rm -rf packaging/icon.icns
 

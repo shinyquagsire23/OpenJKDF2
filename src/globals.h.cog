@@ -9,6 +9,13 @@
 #include "General/stdPalEffects.h"
 #include "Engine/rdCache.h"
 
+typedef struct embeddedResource_t
+{
+    const char* fpath;
+    const char* data;
+    size_t data_len;
+} embeddedResource_t;
+
 // Addrs
 [[[cog
     import cog
@@ -116,5 +123,17 @@
 [[[end]]]
 
 #endif
+
+// Embed
+[[[cog
+    import cog
+    import glob
+    import os
+
+    embed_files = glob.glob("resource/shaders/*.glsl")
+    cog.outl("extern const size_t embeddedResource_aFiles_num;")
+    cog.outl("extern const embeddedResource_t embeddedResource_aFiles[%d];" % (len(embed_files),))
+]]]
+[[[end]]]
 
 #endif // _OPENJKDF2_GLOBALS_H

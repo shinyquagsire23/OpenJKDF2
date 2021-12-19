@@ -56,18 +56,659 @@
 #include "Engine/rdroid.h"
 #include "Engine/sith.h"
 
+#include "General/util.h"
+#include "General/stdFileUtil.h"
+
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
 #endif
 
-#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
+#if defined(SDL2_RENDER)
 #include <SDL2/SDL.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <stdbool.h>
+#if defined(LINUX) || defined(MACOS)
 #include <pwd.h>
+#endif
+#include "nfd.h"
+#endif
+
+#ifdef LINUX
+#include "external/fcaseopen/fcaseopen.h"
 #endif
 
 static common_functions hs;
+
+const char* aRequiredAssets[] = {
+    "episode/JK1.gob",
+    "episode/JK1CTF.gob",
+    "episode/JK1MP.gob",
+    "resource/Res1hi.gob",
+    "resource/Res2.gob",
+    "resource/jk_.cd",
+};
+
+const size_t aRequiredAssets_len = sizeof(aRequiredAssets) / sizeof(const char*);
+
+#define BUF_SIZE 65536 //2^16
+
+int Main_copy(const char* in_path, const char* out_path){
+  size_t n;
+  FILE* in=NULL, * out=NULL;
+  char* buf = calloc(BUF_SIZE, 1);
+  if((in = fopen(in_path, "rb")) && (out = fopen(out_path, "wb")))
+    while((n = fread(buf, 1, BUF_SIZE, in)) && fwrite(buf, 1, n, out));
+  free(buf);
+  if(in) fclose(in);
+  if(out) fclose(out);
+  return EXIT_SUCCESS;
+}
+
+int Main_CopyFile(const char* pFolder, const char* pName)
+{
+    char tmp[4096];
+    char tmpTo[4096];
+    
+    strncpy(tmp, pFolder, sizeof(tmp)-1);
+    strncat(tmp, "/", sizeof(tmp)-1);
+    strncat(tmp, pName, sizeof(tmp)-1);
+    strncpy(tmpTo, pName, sizeof(tmpTo)-1);
+
+#ifdef LINUX
+    char *r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+
+    r = malloc(strlen(tmpTo) + 16);
+    if (casepath(tmpTo, r))
+    {
+        strcpy(tmpTo, r);
+    }
+    free(r);
+#endif
+
+#ifdef WIN32
+    for (int i = 0; i < strlen(tmp); i++)
+    {
+        if (tmp[i] == '/') {
+            tmp[i] = '\\';
+        }
+    }
+
+    for (int i = 0; i < strlen(tmpTo); i++)
+    {
+        if (tmpTo[i] == '/') {
+            tmpTo[i] = '\\';
+        }
+    }
+#endif
+
+    printf("asset copy: %s -> %s\n", tmp, tmpTo);
+
+    // Files are the same
+    if (!strcmp(tmp, tmpTo)) {
+        return 0;
+    }
+
+    if (!util_FileExists(tmp)) {
+        return 0;
+    }
+
+    Main_copy(tmp, tmpTo);
+
+    if (!util_FileExists(tmpTo)) {
+        return 0;
+    }
+
+    return 1;
+}
+
+int Main_CopyFileDisk(const char* pFolder, const char* pName)
+{
+    char tmp[4096];
+    char tmpTo[4096];
+    
+    strncpy(tmp, pFolder, sizeof(tmp)-1);
+    strncat(tmp, "/GAMEDATA/", sizeof(tmp)-1);
+    if (!strcmp(pName, "resource/Res1hi.gob")) {
+        strncat(tmp, "MININSTALL/RES1HI.GOB", sizeof(tmp)-1);
+    }
+    else if (!strcmp(pName, "resource/Res1low.gob")) {
+        strncat(tmp, "MININSTALL/RES1LOW.GOB", sizeof(tmp)-1);
+    }
+    else if (!strcmp(pName, "JK.EXE")) {
+        strncat(tmp, "EXE/JK.EXE", sizeof(tmp)-1);
+    }
+    else
+    {
+        strncat(tmp, pName, sizeof(tmp)-1);
+    }
+    strncpy(tmpTo, pName, sizeof(tmpTo)-1);
+
+#ifdef LINUX
+    char *r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+
+    r = malloc(strlen(tmpTo) + 16);
+    if (casepath(tmpTo, r))
+    {
+        strcpy(tmpTo, r);
+    }
+    free(r);
+#endif
+
+#ifdef WIN32
+    for (int i = 0; i < strlen(tmp); i++)
+    {
+        if (tmp[i] == '/') {
+            tmp[i] = '\\';
+        }
+    }
+
+    for (int i = 0; i < strlen(tmpTo); i++)
+    {
+        if (tmpTo[i] == '/') {
+            tmpTo[i] = '\\';
+        }
+    }
+#endif
+
+    printf("disk copy: %s -> %s\n", tmp, tmpTo);
+
+    // Files are the same
+    if (!strcmp(tmp, tmpTo)) {
+        return 0;
+    }
+
+    if (!util_FileExists(tmp)) {
+        return 0;
+    }
+
+    Main_copy(tmp, tmpTo);
+
+    if (!util_FileExists(tmpTo)) {
+        return 0;
+    }
+
+    return 1;
+}
+
+void Main_UseLocalData()
+{
+    const char *homedir;
+    char fname[256];
+
+#if defined(MACOS) || defined(LINUX)
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+
+    if (homedir) {
+        strcpy(fname, homedir);
+        strcat(fname, "/.local");
+        stdFileUtil_MkDir(fname);
+        strcat(fname, "/share");
+        stdFileUtil_MkDir(fname);
+        strcat(fname, "/openjkdf2");
+        stdFileUtil_MkDir(fname);
+        chdir(fname);   
+        printf("Using root directory: %s\n", fname);     
+    }
+
+#elif defined(WIN32)
+    homedir = getenv("AppData");
+
+    if (homedir) {
+        strcpy(fname, homedir);
+        stdFileUtil_MkDir(fname);
+        strcat(fname, "\\Local");
+        stdFileUtil_MkDir(fname);
+        strcat(fname, "\\openjkdf2");
+        stdFileUtil_MkDir(fname);
+        chdir(fname);
+        printf("Using root directory: %s\n", fname);
+    }
+#endif
+}
+
+int Main_AttemptInstallFromExisting(nfdu8char_t* path)
+{
+    const char* aOptionalAssets[] = {
+        "JK.EXE",
+
+        // idk if these are possible, but whatever, try it.
+        "MUSIC/Track0.ogg",
+        "MUSIC/Track1.ogg",
+        "MUSIC/Track2.ogg",
+        "MUSIC/Track3.ogg",
+        "MUSIC/Track4.ogg",
+        "MUSIC/Track5.ogg",
+        "MUSIC/Track6.ogg",
+        "MUSIC/Track7.ogg",
+        "MUSIC/Track8.ogg",
+        "MUSIC/Track9.ogg",
+        "MUSIC/Track10.ogg",
+        "MUSIC/Track11.ogg",
+
+        // GOG tracks
+        "MUSIC/Track12.ogg",
+        "MUSIC/Track13.ogg",
+        "MUSIC/Track14.ogg",
+        "MUSIC/Track15.ogg",
+        "MUSIC/Track16.ogg",
+        "MUSIC/Track17.ogg",
+        "MUSIC/Track18.ogg",
+        "MUSIC/Track22.ogg",
+        "MUSIC/Track23.ogg",
+        "MUSIC/Track24.ogg",
+        "MUSIC/Track25.ogg",
+        "MUSIC/Track26.ogg",
+        "MUSIC/Track27.ogg",
+        "MUSIC/Track28.ogg",
+        "MUSIC/Track29.ogg",
+        "MUSIC/Track30.ogg",
+        "MUSIC/Track31.ogg",
+        "MUSIC/Track32.ogg",
+
+        // Technically optional
+        "resource/video/01-02A.SMK",
+        "resource/video/03-04A.SMK",
+        "resource/video/06A.SMK",
+        "resource/video/08-10A.SMK",
+        "resource/video/12A.SMK",
+        "resource/video/16A.SMK",
+        "resource/video/18-19A.SMK",
+        "resource/video/21A.SMK",
+        "resource/video/23A.SMK",
+        "resource/video/25A.SMK",
+        "resource/video/27A.SMK",
+        "resource/video/33-34A.SMK",
+        "resource/video/36A.SMK",
+        "resource/video/38A.SMK",
+        "resource/video/39A.SMK",
+        "resource/video/41-42A.SMK",
+        "resource/video/41DA.SMK",
+        "resource/video/41DSA.SMK",
+        "resource/video/44A.SMK",
+        "resource/video/46A.SMK",
+        "resource/video/48A.SMK",
+        "resource/video/50A.SMK",
+        "resource/video/52-53A.SMK",
+        "resource/video/54A.SMK",
+        "resource/video/57A.SMK",
+
+        // Controls
+        "controls/assassin.ctl",
+        "controls/chkeybrd.ctl",
+        "controls/fcskybrd.ctl",
+        "controls/ms_3dpro.ctl",
+        "controls/wwarrior.ctl",
+        "controls/ch_f-16.ctl",
+        "controls/cybrman2.ctl",
+        "controls/gamepad.ctl",
+        "controls/prcision.ctl",
+        "controls/ch_pro.ctl",
+        "controls/fcs.ctl",
+        "controls/gravis.ctl",
+        "controls/spaceorb.ctl",
+        "controls/CH F-16 COMBAT STICK.CTL",
+        "controls/CH FLIGHTSTICK PRO OPTIMIZED WITH KEYBOARD.CTL",
+        "controls/CH FLIGHTSTICK PRO.CTL",
+        "controls/FP GAMING ASSASSIN 3D WITH JOYSTICK.CTL",
+        "controls/GRAVIS GAMEPAD PRO.CTL",
+        "controls/LOGITECH CYBERMAN 2.CTL",
+        "controls/LOGITECH WINGMAN WARRIOR.CTL",
+        "controls/MS SIDEWINDER 3D PRO.CTL",
+        "controls/MS SIDEWINDER GAME PAD.CTL",
+        "controls/MS SIDEWINDER PRECISION PRO OR FF.CTL",
+        "controls/SPACETEC SPACEORB 360.CTL",
+        "controls/THRUSTMASTER FCS OPTIMIZED WITH KEYBOARD.CTL",
+        "controls/THRUSTMASTER FCS.CTL",
+
+        // Demo assets
+        "jkdemo.exe",
+        "episode/jk1demo.gob",
+        "episode/jk1mpdem.gob",
+        "episode/jk1mpdemo.gob",
+        "resource/res1demo.gob",
+        "resource/video/splash.smk",
+
+        // OpenJKDF2, not really optional but if they copied it, then copy it.
+        "resource/shaders/default_f.glsl",
+        "resource/shaders/default_v.glsl",
+        "resource/shaders/menu_f.glsl",
+        "resource/shaders/menu_v.glsl",
+    };
+
+    if (path[strlen(path)-1] == '/' || path[strlen(path)-1] == '\\')
+    {
+        path[strlen(path)-1] = 0;
+    }
+
+    const size_t aOptionalAssets_len = sizeof(aOptionalAssets) / sizeof(const char*);
+
+    Main_UseLocalData();
+    stdFileUtil_MkDir("episode");
+    stdFileUtil_MkDir("MUSIC");
+    stdFileUtil_MkDir("player");
+    stdFileUtil_MkDir("resource");
+    stdFileUtil_MkDir("resource/shaders");
+    stdFileUtil_MkDir("resource/video");
+    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    {
+        if (!Main_CopyFile(path, aRequiredAssets[i]))
+        {
+            char tmp[4096+256];
+            snprintf(tmp, sizeof(tmp), "Missing required asset `%s`!", aRequiredAssets[i]);
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenJKDF2 Install Helper", tmp, NULL);
+        }
+    }
+
+    for (size_t i = 0; i < aOptionalAssets_len; i++)
+    {
+        Main_CopyFile(path, aOptionalAssets[i]);
+    }
+
+    uint32_t magic = 0x699232C4;
+    FILE* f = fopen("resource/jk_.cd", "wb");
+    if (f) {
+        fwrite(&magic, 1, sizeof(magic), f);
+        fclose(f);
+    }
+
+    NFD_Quit();
+
+    return 1;
+}
+
+int Main_AttemptInstallFromDisk(nfdu8char_t* path)
+{
+    bool isTwoPartCD = false;
+
+    const char* aOptionalAssets[] = {
+        "JK.EXE",
+
+        // Technically optional
+        "resource/video/01-02A.SMK",
+        "resource/video/03-04A.SMK",
+        "resource/video/06A.SMK",
+        "resource/video/08-10A.SMK",
+        "resource/video/12A.SMK",
+        "resource/video/16A.SMK",
+        "resource/video/18-19A.SMK",
+        "resource/video/21A.SMK",
+        "resource/video/23A.SMK",
+        "resource/video/25A.SMK",
+        "resource/video/27A.SMK",
+        "resource/video/33-34A.SMK",
+        "resource/video/36A.SMK",
+        "resource/video/38A.SMK",
+        "resource/video/39A.SMK",
+        "resource/video/41-42A.SMK",
+        "resource/video/41DA.SMK",
+        "resource/video/41DSA.SMK",
+        "resource/video/44A.SMK",
+        "resource/video/46A.SMK",
+        "resource/video/48A.SMK",
+        "resource/video/50A.SMK",
+        "resource/video/52-53A.SMK",
+        "resource/video/54A.SMK",
+        "resource/video/57A.SMK",
+
+        // Controls
+        "controls/assassin.ctl",
+        "controls/chkeybrd.ctl",
+        "controls/fcskybrd.ctl",
+        "controls/ms_3dpro.ctl",
+        "controls/wwarrior.ctl",
+        "controls/ch_f-16.ctl",
+        "controls/cybrman2.ctl",
+        "controls/gamepad.ctl",
+        "controls/prcision.ctl",
+        "controls/ch_pro.ctl",
+        "controls/fcs.ctl",
+        "controls/gravis.ctl",
+        "controls/spaceorb.ctl",
+        "controls/CH F-16 COMBAT STICK.CTL",
+        "controls/CH FLIGHTSTICK PRO OPTIMIZED WITH KEYBOARD.CTL",
+        "controls/CH FLIGHTSTICK PRO.CTL",
+        "controls/FP GAMING ASSASSIN 3D WITH JOYSTICK.CTL",
+        "controls/GRAVIS GAMEPAD PRO.CTL",
+        "controls/LOGITECH CYBERMAN 2.CTL",
+        "controls/LOGITECH WINGMAN WARRIOR.CTL",
+        "controls/MS SIDEWINDER 3D PRO.CTL",
+        "controls/MS SIDEWINDER GAME PAD.CTL",
+        "controls/MS SIDEWINDER PRECISION PRO OR FF.CTL",
+        "controls/SPACETEC SPACEORB 360.CTL",
+        "controls/THRUSTMASTER FCS OPTIMIZED WITH KEYBOARD.CTL",
+        "controls/THRUSTMASTER FCS.CTL",
+
+        // Demo assets
+        "jkdemo.exe",
+        "episode/jk1demo.gob",
+        "episode/jk1mpdem.gob",
+        "episode/jk1mpdemo.gob",
+        "resource/res1demo.gob",
+        "resource/video/splash.smk",
+
+        // OpenJKDF2, not really optional but if they copied it, then copy it.
+        "resource/shaders/default_f.glsl",
+        "resource/shaders/default_v.glsl",
+        "resource/shaders/menu_f.glsl",
+        "resource/shaders/menu_v.glsl",
+    };
+
+    if (path[strlen(path)-1] == '/' || path[strlen(path)-1] == '\\')
+    {
+        path[strlen(path)-1] = 0;
+    }
+
+    const size_t aOptionalAssets_len = sizeof(aOptionalAssets) / sizeof(const char*);
+
+    // Check if this is a two-disk set, or one of the new-printed single disks
+    char checkDisk1[4096];
+    char checkDisk2[4096];
+
+    strncpy(checkDisk1, path, sizeof(checkDisk1)-1);
+    strncat(checkDisk1, "/GAMEDATA/RESOURCE/VIDEO/01-02A.SMK", sizeof(checkDisk1)-1);
+
+    strncpy(checkDisk2, path, sizeof(checkDisk2)-1);
+    strncat(checkDisk2, "/GAMEDATA/RESOURCE/VIDEO/23A.SMK", sizeof(checkDisk2)-1);
+    if (!util_FileExists(checkDisk1) || !util_FileExists(checkDisk2)) {
+        isTwoPartCD = true;
+    }
+
+    Main_UseLocalData();
+    stdFileUtil_MkDir("episode");
+    stdFileUtil_MkDir("MUSIC");
+    stdFileUtil_MkDir("player");
+    stdFileUtil_MkDir("resource");
+    stdFileUtil_MkDir("resource/shaders");
+    stdFileUtil_MkDir("resource/video");
+    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    {
+        Main_CopyFileDisk(path, aRequiredAssets[i]);
+    }
+
+    for (size_t i = 0; i < aOptionalAssets_len; i++)
+    {
+        Main_CopyFileDisk(path, aOptionalAssets[i]);
+    }
+
+    if (isTwoPartCD) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Finished copying from Disk 1.\nPlease mount and then select Disk 2.", NULL);
+
+        nfdresult_t selRet = NFD_PickFolderU8(&path, NULL);
+        if (selRet != NFD_OKAY || !path) {
+            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed during file chooser", NULL);
+            //return 0;
+            goto final_check;
+        }
+
+        if (path[strlen(path)-1] == '/' || path[strlen(path)-1] == '\\')
+        {
+            path[strlen(path)-1] = 0;
+        }
+
+        for (size_t i = 0; i < aRequiredAssets_len; i++)
+        {
+            Main_CopyFileDisk(path, aRequiredAssets[i]);
+        }
+
+        for (size_t i = 0; i < aOptionalAssets_len; i++)
+        {
+            Main_CopyFileDisk(path, aOptionalAssets[i]);
+        }
+    }
+
+final_check:
+
+#if 0
+    // Final check
+    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    {
+        if (!util_FileExists(aRequiredAssets[i]))
+        {
+            char tmp[4096+256];
+            snprintf(tmp, sizeof(tmp), "Missing required asset `%s`!", aRequiredAssets[i]);
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenJKDF2 Install Helper", tmp, NULL);
+        }
+    }
+#endif
+    Main_CheckRequiredAssets(0);
+
+    uint32_t magic = 0x699232C4;
+    FILE* f = fopen("resource/jk_.cd", "wb");
+    if (f) {
+        fwrite(&magic, 1, sizeof(magic), f);
+        fclose(f);
+    }
+
+    NFD_Quit();
+
+    return 1;
+}
+
+int Main_AttemptInstall()
+{
+    // TODO: Polyglot
+    const SDL_MessageBoxButtonData buttons[] = {
+        { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 0, "Install" },
+        { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 1, "Cancel" },
+    };
+    const SDL_MessageBoxColorScheme colorScheme = {
+        { /* .colors (.r, .g, .b) */
+            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+            { 255,   0,   0 },
+            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+            {   0, 255,   0 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+            { 255, 255,   0 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+            {   0,   0, 255 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+            { 255,   0, 255 }
+        }
+    };
+    const SDL_MessageBoxData messageboxdata = {
+        SDL_MESSAGEBOX_INFORMATION, /* .flags */
+        NULL, /* .window */
+        "OpenJKDF2 Install Helper", /* .title */
+        "OpenJKDF2 could not find required game assets.\nWould you like to install assets now?", /* .message */
+        SDL_arraysize(buttons), /* .numbuttons */
+        buttons, /* .buttons */
+        &colorScheme /* .colorScheme */
+    };
+
+    int buttonid;
+    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+        SDL_Log("error displaying message box");
+        return 0;
+    }
+
+    if (buttonid == -1 || buttonid == 1) return 0;
+
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Please select your existing JKDF2 installation, or an install disk mount.", NULL);
+    
+    if (NFD_Init() != NFD_OKAY) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to initialize file chooser", NULL);
+        return 0;
+    }
+
+    nfdu8char_t* path;
+    nfdresult_t selRet = NFD_PickFolderU8(&path, NULL);
+    if (selRet != NFD_OKAY || !path) {
+        //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed during file chooser", NULL);
+        return 0;
+    }
+    //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenJKDF2 Install Helper", path, NULL);
+
+    // Check if this is a disk
+    char checkDisk[4096];
+
+    strncpy(checkDisk, path, sizeof(checkDisk)-1);
+    strncat(checkDisk, "/AUTORUN.INF", sizeof(checkDisk)-1);
+    if (util_FileExists(checkDisk)) {
+        return Main_AttemptInstallFromDisk(path);
+    }
+
+    // Disk 2 has no autorun
+    strncpy(checkDisk, path, sizeof(checkDisk)-1);
+    strncat(checkDisk, "/GAMEDATA/RESOURCE/JK_.CD", sizeof(checkDisk)-1);
+    if (util_FileExists(checkDisk)) {
+        return Main_AttemptInstallFromDisk(path);
+    }
+
+    return Main_AttemptInstallFromExisting(path);
+}
+
+void Main_CheckRequiredAssets(int doInstall)
+{
+    const char* msg = "OpenJKDF2 is missing the following required assets:\n";
+
+    char* bigList = NULL;
+    size_t bigList_len = strlen(msg);
+    bool missingRequireds = false;
+    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    {
+        if (!util_FileExists(aRequiredAssets[i]))
+        {
+            missingRequireds = true;
+            bigList_len += strlen(aRequiredAssets[i]) + 2;
+        }
+    }
+
+    if (!missingRequireds) return;
+
+    bigList = malloc(bigList_len);
+    if (!bigList) return;
+    memset(bigList, 0, bigList_len);
+
+    strcpy(bigList, msg);
+
+    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    {
+        if (!util_FileExists(aRequiredAssets[i]))
+        {
+            strcat(bigList, aRequiredAssets[i]);
+            strcat(bigList, "\n");
+        }
+    }
+
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", bigList, NULL);
+
+    if (doInstall) {
+        Main_AttemptInstall();
+    }
+}
 
 int Main_Startup(const char *cmdline)
 {
@@ -76,35 +717,6 @@ int Main_Startup(const char *cmdline)
 #if defined(PLATFORM_POSIX)
     // Make sure floating point stuff is using . and not ,
     setlocale(LC_NUMERIC, "C");
-#endif
-
-    // TODO bring this to Windows (%appdata%) and Linux
-#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
-    const char *homedir;
-    char fname[256];
-
-#if defined(MACOS)
-    // Default working directory to the folder the .app bundle is in
-    char* base_path = SDL_GetBasePath();
-    chdir(base_path);
-    SDL_free(base_path);
-#endif
-
-    if ((homedir = getenv("HOME")) == NULL) {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-
-    if (homedir) {
-        strcpy(fname, homedir);
-        strcat(fname, "/.local/share/openjkdf2/resource/jk_.cd");
-
-        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
-        if( access( fname, F_OK ) == 0 ) {
-            strcpy(fname, homedir);
-            strcat(fname, "/.local/share/openjkdf2");
-            chdir(fname);
-        }
-    }    
 #endif
 
     stdInitServices(&hs);    
@@ -194,6 +806,57 @@ int Main_Startup(const char *cmdline)
     }
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     stdStartup(&hs);
+
+    // TODO bring this to Windows (%appdata%) and Linux
+#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
+    const char *homedir;
+    char fname[256];
+
+#if defined(MACOS)
+    // Default working directory to the folder the .app bundle is in
+    char* base_path = SDL_GetBasePath();
+    chdir(base_path);
+    chdir("..");
+    SDL_free(base_path);
+#endif
+
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+
+    if (homedir) {
+        strcpy(fname, homedir);
+        strcat(fname, "/.local/share/openjkdf2/resource/jk_.cd");
+
+        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
+        if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
+            Main_UseLocalData();
+        }
+    }
+#elif defined(WIN32)&& defined(SDL2_RENDER)
+    const char *homedir;
+    char fname[256];
+    homedir = getenv("AppData");
+    if (homedir) {
+        strcpy(fname, homedir);
+        strcat(fname, "\\Local\\openjkdf2\\resource\\jk_.cd");
+
+        if (util_FileExists(fname) && !util_FileExists("resource\\jk_.cd")) {
+            Main_UseLocalData();
+        }
+    }
+#endif // (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
+
+#ifdef SDL2_RENDER
+    /*if (!util_FileExists("resource/jk_.cd")) {
+        // TODO: polyglot
+        //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "OpenJKDF2 could not find any game assets (`resource/jk_.cd` is missing). Would you like to install assets now?", NULL);
+        Main_AttemptInstall();
+    }*/
+    if (!util_FileExists("resource/jk_.cd")) {
+        Main_CheckRequiredAssets(1);
+    }
+#endif
 
 #ifndef __APPLE__
     stdFile_t tf = std_pHS->fileOpen("is_alive.txt", "w");

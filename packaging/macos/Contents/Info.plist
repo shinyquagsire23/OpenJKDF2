@@ -21,6 +21,6 @@
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>SDL_FILESYSTEM_BASE_DIR_TYPE</key>
-	<string>parent</string>
+	<string>bundle</string>
 </dict>
 </plist>

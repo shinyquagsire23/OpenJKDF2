@@ -7,6 +7,7 @@
 #ifdef SDL2_RENDER
 
 #include "shader_utils.h"
+#include "globals.h"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -69,31 +70,71 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     free(r);
 #endif
 
+    char* shader_contents = NULL;
     FILE* f = fopen(tmp_filepath, "r");
-    if (!f)
+    if (f)
     {
-        char errtmp[256];
+retry_file:
+	    fseek(f, 0, SEEK_END);
+	    size_t len = ftell(f);
+	    rewind(f);
+	    
+	    shader_contents = malloc(len+1);
+	    
+	    if (fread(shader_contents, 1, len, f) != len)
+	    {
+	        char errtmp[256];
+	        snprintf(errtmp, 256, "Failed to read shader file `%s`!\n", filepath);
+	        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+	        return -1;
+	    }
+	    shader_contents[len] = 0;
+	    
+	    fclose(f);
+	}
+	else
+    {
+#if defined(MACOS)
+    	char* base_path = SDL_GetBasePath();
+    	strncpy(tmp_filepath, base_path, 256);
+    	strncat(tmp_filepath, "Contents/Resources/", 256);
+    	strncat(tmp_filepath, filepath, 256);
+    	SDL_free(base_path);
+
+    	printf("%s\n", tmp_filepath);
+
+    	f = fopen(tmp_filepath, "r");
+    	if (f)
+    		goto retry_file;
+#endif
+
+	    strncpy(tmp_filepath, filepath, 256);
+	    
+		for (int i = 0; i < strlen(tmp_filepath); i++)
+		{
+		    if (tmp_filepath[i] == '\\') {
+		        tmp_filepath[i] = '/';
+		    }
+		}
+
+    	for (size_t i = 0; i < embeddedResource_aFiles_num; i++)
+    	{
+    		if (!strcmp(embeddedResource_aFiles[i].fpath, tmp_filepath)) {
+    			shader_contents = malloc(embeddedResource_aFiles[i].data_len+1);
+    			memcpy(shader_contents, embeddedResource_aFiles[i].data, embeddedResource_aFiles[i].data_len);
+    			shader_contents[embeddedResource_aFiles[i].data_len] = 0;
+    			break;
+    		}
+    	}
+    }
+
+    if (!shader_contents)
+    {
+    	char errtmp[256];
         snprintf(errtmp, 256, "Failed to load shader file `%s`!\n", filepath);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         return -1;
     }
-    
-    fseek(f, 0, SEEK_END);
-    size_t len = ftell(f);
-    rewind(f);
-    
-    char* shader_contents = malloc(len+1);
-    
-    if (fread(shader_contents, 1, len, f) != len)
-    {
-        char errtmp[256];
-        snprintf(errtmp, 256, "Failed to read shader file `%s`!\n", filepath);
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
-        return -1;
-    }
-    shader_contents[len] = 0;
-    
-    fclose(f);
     
     printf("Parse shader `%s`\n", filepath);
     

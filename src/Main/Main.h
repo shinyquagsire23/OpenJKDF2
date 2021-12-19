@@ -14,4 +14,6 @@ void Main_Shutdown();
 void Main_ParseCmdLine(char *cmdline);
 static int (*Main_FPrintf)(const char* fmt, ...) = (void*)Main_FPrintf_ADDR;
 
+void Main_CheckRequiredAssets(int doInstall);
+
 #endif // _MAINMAIN_H

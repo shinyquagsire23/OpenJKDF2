@@ -137,7 +137,9 @@ int jkRes_LoadCd(char *a1)
     unsigned int v1; // esi
     char v4[128]; // [esp+Ch] [ebp-80h] BYREF
 
-    _strncpy(jkRes_curDir, a1, 0x7Fu);
+    // Added: prevent overlap
+    if (jkRes_curDir != a1)
+        _strncpy(jkRes_curDir, a1, 0x7Fu);
     v1 = 0;
     jkRes_curDir[127] = 0;
     for (v1 = 0; v1 < jkRes_gCtx.gobs[4].numGobs; v1++)

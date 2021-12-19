@@ -13,6 +13,8 @@
 #include "jk.h"
 #include "General/stdString.h"
 
+#include "Main/Main.h"
+
 #ifdef SDL2_RENDER
 #include <SDL2/SDL.h>
 #endif
@@ -235,6 +237,8 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     vsnprintf(tmp, 0x200u, a1, va);
     jk_printf("FATAL ERROR: %s\n", tmp);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
+
+    Main_CheckRequiredAssets(1);
 #endif
     jk_exit(1);
 }
