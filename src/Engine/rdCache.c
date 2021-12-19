@@ -295,6 +295,7 @@ int rdCache_SendFaceListToHardware()
     {
         flags_idk |= 0x8000;
     }
+
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
     v7 = rdCamera_pCurCamera->cameraClipFrustum;
@@ -312,6 +313,12 @@ int rdCache_SendFaceListToHardware()
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
+
+        // Added: We need to know if a face is double-sided
+        if (active_6c->type & 1)
+        {
+            flags_idk_ |= 0x10000;
+        }
 
 #ifdef SDL2_RENDER
         d3d_maxVertices = STD3D_MAX_VERTICES;

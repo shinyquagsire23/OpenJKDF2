@@ -344,11 +344,11 @@ int std3D_StartScene()
     //glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
-    //glCullFace(GL_FRONT);
+    glCullFace(GL_FRONT);
         
     // Technically this should be from Clear2
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -861,6 +861,7 @@ void std3D_DrawRenderList()
     
     //glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
+    glCullFace(GL_FRONT);
 
     if (!(tris[0].flags & 0x800)) {
         //glDepthFunc(GL_ALWAYS);
@@ -942,6 +943,17 @@ void std3D_DrawRenderList()
                     //glDepthMask(GL_FALSE);
                 }
             }
+
+            if (changed_flags & 0x10000)
+            {
+                if (tris[j].flags & 0x10000) {
+                    glCullFace(GL_BACK);
+                }
+                else
+                {
+                    glCullFace(GL_FRONT);
+                }
+            }
             
             last_tex = tris[j].texture;
             last_flags = tris[j].flags;
@@ -995,6 +1007,7 @@ void std3D_DrawRenderList()
         
     // Done drawing    
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+    glCullFace(GL_FRONT);
     
     std3D_ResetRenderList();
 }
