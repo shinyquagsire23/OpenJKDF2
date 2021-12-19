@@ -607,15 +607,15 @@ int Main_AttemptInstall()
     const SDL_MessageBoxColorScheme colorScheme = {
         { /* .colors (.r, .g, .b) */
             /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
-            { 255,   0,   0 },
+            { 56,  54,  53 },
             /* [SDL_MESSAGEBOX_COLOR_TEXT] */
-            {   0, 255,   0 },
+            {   209, 207, 205 },
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
-            { 255, 255,   0 },
+            { 209, 207, 205 },
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-            {   0,   0, 255 },
+            { 209, 207, 205 },
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-            { 255,   0, 255 }
+            { 209, 207, 205 }
         }
     };
     const SDL_MessageBoxData messageboxdata = {
