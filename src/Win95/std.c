@@ -12,6 +12,7 @@ void stdStartup(common_functions *a1)
     if ( stdPlatform_Startup() )
     {
 #if defined(__i386__)
+#ifndef LINUX
         asm volatile ("fnstcw\t%0" : "=m" (word_860800));
         v1 = (0xB00 | word_860800 & 0xFF);
         word_860806 = v1;
@@ -20,6 +21,7 @@ void stdStartup(common_functions *a1)
         v1 = (0xC00 | word_860800 & 0xFF);
         word_860804 = v1;
 #endif
+#endif
         std_bInitialized = 1;
     }
 }
@@ -27,7 +29,9 @@ void stdStartup(common_functions *a1)
 void stdShutdown()
 {
 #ifdef ARCH_X86
+#ifndef LINUX
     asm volatile ("fldcw\t%0" : "=m" (word_860800));
+#endif
 #endif
     std_bInitialized = 1;
 }

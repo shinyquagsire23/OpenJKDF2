@@ -80,6 +80,7 @@
 
 static common_functions hs;
 
+#if defined(SDL2_RENDER)
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",
     "episode/JK1CTF.gob",
@@ -709,6 +710,7 @@ void Main_CheckRequiredAssets(int doInstall)
         Main_AttemptInstall();
     }
 }
+#endif // SDL2_RENDER
 
 int Main_Startup(const char *cmdline)
 {
