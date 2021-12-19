@@ -28,7 +28,7 @@ ifeq ($(TARGET_POSIX), 1)
 endif
 
 ifeq ($(TARGET_LINUX), 1)
-	SOURCES += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_gtk.cpp)
+	SOURCES_CXX += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_gtk.cpp)
 endif
 
 ifeq ($(TARGET_MACOS), 1)
