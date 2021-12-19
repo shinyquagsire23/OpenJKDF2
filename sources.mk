@@ -41,8 +41,10 @@ ifeq ($(TARGET_WIN32), 1)
 	# Win64 can use the registry fine, even if stdlib is POSIX
 	SOURCES := $(filter-out $(SRC)/Platform/Posix/wuRegistry.c, $(SOURCES))
 
-	#SOURCES_CXX += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_win.cpp)
-	#LDFLAGS += -lole32 -luuid
+ifeq ($(TARGET_USE_SDL2), 1)
+	SOURCES_CXX += $(wildcard $(SRC)/external/nativefiledialog-extended/nfd_win.cpp)
+	LDFLAGS += -lole32 -luuid
+endif
 endif
 
 CFLAGS += -I$(SRC)/external/nativefiledialog-extended
