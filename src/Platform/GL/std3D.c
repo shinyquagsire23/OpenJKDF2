@@ -344,11 +344,11 @@ int std3D_StartScene()
     //glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
-    glCullFace(GL_FRONT);
+    //glCullFace(GL_FRONT);
         
     // Technically this should be from Clear2
     glClearColor(0.0, 0.0, 0.0, 1.0);
