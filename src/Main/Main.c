@@ -613,9 +613,9 @@ int Main_AttemptInstall()
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
             { 209, 207, 205 },
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-            { 209, 207, 205 },
+            { 105, 102, 99 },
             /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-            { 209, 207, 205 }
+            { 205, 202, 53 }
         }
     };
     const SDL_MessageBoxData messageboxdata = {
