@@ -315,7 +315,7 @@ int rdCache_SendFaceListToHardware()
             v148 = 0.0;
 
         // Added: We need to know if a face is double-sided
-        if (active_6c->type & 1)
+        if (active_6c->type & 1 && active_6c->light_flags)
         {
             flags_idk_ |= 0x10000;
         }
