@@ -561,14 +561,13 @@ int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4,
     int v11; // eax
     rdVector3 *v14; // esi
     rdVector3 *v15; // edi
-    long double v16; // st7
+    double v16; // st7
     //char v18; // c0
     int v19; // ecx
     double v20; // st6
     double v21; // st5
     double v22; // st7
-    long double v24; // st6
-    float v26; // [esp+0h] [ebp-30h]
+    double v24; // st6
     float v27; // [esp+4h] [ebp-2Ch]
     int i; // [esp+8h] [ebp-28h]
     rdVector3 v29; // [esp+Ch] [ebp-24h]
@@ -592,13 +591,12 @@ int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4,
             rdVector_Sub3(&a1a, v15, v14);
             v16 = rdVector_Normalize3Acc(&a1a);
             v34 = a1a.x * (a1->x - a4[v10[v8]].x) + a1a.y * (a1->y - a4[v10[v8]].y) + a1a.z * (a1->z - a4[v10[v8]].z);
-            v26 = v16;
-            if ( v34 > a2 && v34 - a2 <= v26 )
+            if ( -a2 <= v34 && v34 - a2 <= v16 )
             {
                 v19 = 16;
                 if ( v34 >= 0.0 )
                 {
-                    if ( v34 <= (double)v26 )
+                    if ( v34 <= (double)v16 )
                     {
                         v29.x = v34 * a1a.x + v14->x;
                         v29.y = v34 * a1a.y + v14->y;

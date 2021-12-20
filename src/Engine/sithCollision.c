@@ -225,8 +225,6 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
     sithThing *v8; // ebp
     int v9; // ebx
     int v10; // eax
-    int v11; // eax
-    int v12; // edx
     sithThing *v13; // ecx
     sithThing *v14; // eax
     sithThing *v15; // ecx
@@ -263,17 +261,15 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
                     goto LABEL_41;
                 if ( v8 != v7 )
                 {
-                    v11 = v8->type;
-                    v12 = v7->type;
-                    if ( sithCollision_collisionHandlers[12 * v11 + v12].handler )
+                    if ( sithCollision_collisionHandlers[12 * v8->type + v7->type].handler )
                     {
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
-                          && (v11 != SITH_THING_WEAPON
+                          && (v8->type != SITH_THING_WEAPON
                            || (v8->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
                            && (v13 != v7 || v8->child_signature != v7->signature))
-                          && (v12 != SITH_THING_WEAPON
+                          && (v7->type != SITH_THING_WEAPON
                            || (v7->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
@@ -656,16 +652,12 @@ float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6,
     int v35; // eax
     int v36; // eax
     sithSurface *v37; // eax
-    int (__cdecl *v38)(sithThing *, sithSurface *, sithCollisionSearchEntry *); // eax
     double v44; // st7
     //char v46; // c3
     //char v49; // c0
     //char v52; // c0
     sithThing *i; // esi
-    sithSector *v58; // eax
-    sithSector *v59; // ecx
     int v61; // eax
-    float amounta; // [esp+0h] [ebp-54h]
     sithSurface *amount; // [esp+0h] [ebp-54h]
     float v64; // [esp+18h] [ebp-3Ch]
     float v65; // [esp+1Ch] [ebp-38h]
@@ -715,8 +707,7 @@ float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6,
 LABEL_20:
                     if ( (v5->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
                     {
-                        amounta = (a6 - v11) * 100.0;
-                        sithThing_Damage(v10, v5, amounta, 1);
+                        sithThing_Damage(v10, v5, (a6 - v11) * 100.0, 1);
                     }
                     a6 = v11;
                 }
@@ -796,7 +787,7 @@ LABEL_78:
                     rdVector_Scale3(&v5->field_268, &direction, v25);
                     if ( v5->moveType == SITH_MT_PHYSICS
                       && (v5->physicsParams.physflags & 0x20) != 0
-                      && (v5->physicsParams.addedVelocity.x != 0.0 || v5->physicsParams.addedVelocity.y != 0.0 || v5->physicsParams.addedVelocity.z != 0.0) )
+                      && (!rdVector_IsZero3(&v5->physicsParams.addedVelocity)) )
                     {
                         v30 = 1.0 - v19->distance / a6;
                         v65 = v30;
@@ -828,9 +819,8 @@ LABEL_78:
                 else
                 {
                     amount = v19->surface;
-                    v38 = (int (__cdecl *)(sithThing *, sithSurface *, sithCollisionSearchEntry *))sithCollision_funcList[v5->type];
-                    if ( v38 )
-                        v36 = v38(v5, amount, v19);
+                    if ( sithCollision_funcList[v5->type] )
+                        v36 = sithCollision_funcList[v5->type](v5, amount, v19);
                     else
                         v36 = sithCollision_DefaultHitHandler(v5, amount, v19);
                 }
@@ -888,11 +878,9 @@ LABEL_81:
         if ( (i->attach_flags & ATTACHFLAGS_THING_RELATIVE) != 0 )
         {
             rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
-            v58 = v5->sector;
-            v59 = i->sector;
             rdVector_Add3Acc(&i->position, &v5->position);
-            if ( v59 != v58 )
-                sithThing_MoveToSector(i, v58, 0);
+            if ( i->sector != v5->sector )
+                sithThing_MoveToSector(i, v5->sector, 0);
         }
     }
     if ( v5->moveType == SITH_MT_PHYSICS )

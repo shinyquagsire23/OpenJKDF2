@@ -486,6 +486,7 @@ typedef int (*sithMultiHandler_t)();
 typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
 typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithActorInstinct *a3, int b, intptr_t a4);
 typedef int (*sithControlEnumFunc_t)(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int a6, stdControlKeyInfoEntry* pControlEntry, Darray* pDarr);
+typedef int (*sithCollisionHitHandler_t)(sithThing *, sithSurface *, sithCollisionSearchEntry *);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)

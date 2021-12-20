@@ -695,7 +695,7 @@ jkPlayer_tipMat 0x00860580 char[32]
 
 sithCollision_stackIdk 0x847F28 int[4]
 sithCollision_collisionHandlers 0x00847F38 sithCollisionEntry[144]
-sithCollision_funcList 0x8485F8 void*[12]
+sithCollision_funcList 0x8485F8 sithCollisionHitHandler_t[12]
 sithCollision_searchStack 0x00848628 sithCollisionSearchResult[4]
 sithCollision_searchNumResults 0x84DA28 int[4]
 sithCollision_searchStackIdx 0x0054BA90 int = -1
