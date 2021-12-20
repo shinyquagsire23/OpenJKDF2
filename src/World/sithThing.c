@@ -1947,9 +1947,9 @@ int sithThing_DetachThing(sithThing *thing)
         {
             if ( v3->moveType != SITH_MT_PATH )
                 goto LABEL_8;
-            thing->physicsParams.vel.x = (v3->physicsParams.angVel.x * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = (v3->physicsParams.angVel.y * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.y;
-            thing->physicsParams.vel.z = (v3->physicsParams.angVel.z * v3->physicsParams.acceleration.y) + thing->physicsParams.vel.z;
+            thing->physicsParams.vel.x = (v3->trackParams.vel.x * v3->trackParams.field_20) + thing->physicsParams.vel.x;
+            thing->physicsParams.vel.y = (v3->trackParams.vel.y * v3->trackParams.field_20) + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = (v3->trackParams.vel.z * v3->trackParams.field_20) + thing->physicsParams.vel.z;
         }
     }
 LABEL_8:

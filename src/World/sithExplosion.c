@@ -7,6 +7,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithPhysics.h"
+#include "Primitives/rdMath.h"
 #include "jk.h"
 
 void sithExplosion_CreateThing(sithThing *explosion)
@@ -68,49 +69,29 @@ void sithExplosion_Tick(sithThing *explosion)
 void sithExplosion_UpdateForce(sithThing *explosion)
 {
     sithCollisionSearchEntry *i; // ebp
-    double v3; // st6
-    sithThing *v4; // edi
-    double v5; // st6
-    double v6; // st7
-    double v7; // st5
     sithThing **debrisTemplates; // edi
-    int v9; // ebx
-    float v10; // [esp+0h] [ebp-60h]
-    float v11; // [esp+0h] [ebp-60h]
-    float damage; // [esp+18h] [ebp-48h]
-    float force; // [esp+1Ch] [ebp-44h]
-    float range; // [esp+20h] [ebp-40h]
     rdVector3 a2; // [esp+24h] [ebp-3Ch] BYREF
     rdMatrix34 a3; // [esp+30h] [ebp-30h] BYREF
-    float a1a; // [esp+64h] [ebp+4h]
 
-    range = explosion->explosionParams.range;
-    force = explosion->explosionParams.force;
-    damage = explosion->explosionParams.damage;
+    float range = explosion->explosionParams.range;
+    float force = explosion->explosionParams.force;
+    float damage = explosion->explosionParams.damage;
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
         sithAIAwareness_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
         sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, 0x482);
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
-            v3 = i->distance / range;
-            a1a = 1.0 - v3 * v3;
-            if ( a1a < 0.25 )
-            {
-                a1a = 0.25;
-            }
-            else if ( a1a > 1.0 )
-            {
-                a1a = 1.0;
-            }
+            double v3 = i->distance / range;
+            float a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
+
             if ( (i->collideType & 2) != 0 )
             {
-                v10 = a1a * damage;
-                sithSurface_SendDamageToThing(i->surface, explosion, v10, explosion->explosionParams.damageClass);
+                sithSurface_SendDamageToThing(i->surface, explosion, a1a * damage, explosion->explosionParams.damageClass);
             }
             else
             {
-                v4 = i->receiver;
+                sithThing* v4 = i->receiver;
                 if ( ((explosion->actorParams.typeflags & THING_TYPEFLAGS_40) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
@@ -118,27 +99,21 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                 {
                     if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
                     {
-                        v5 = -(a1a * force);
-                        v6 = i->field_14.y * v5;
-                        v7 = i->field_14.z * v5;
-                        a2.x = i->field_14.x * v5;
-                        a2.y = v6;
-                        a2.z = v7;
+                        rdVector_Scale3(&a2, &i->field_14, -(a1a * force));
                         sithPhysics_ThingApplyForce(v4, &a2);
                     }
                     if ( damage != 0.0 )
                     {
-                        v11 = a1a * damage;
-                        sithThing_Damage(v4, explosion, v11, explosion->explosionParams.damageClass);
+                        sithThing_Damage(v4, explosion, a1a * damage, explosion->explosionParams.damageClass);
                     }
                 }
             }
         }
         sithCollision_SearchClose();
     }
+    
     debrisTemplates = explosion->explosionParams.debrisTemplates;
-    v9 = 4;
-    do
+    for (int i = 0; i < 4; i++)
     {
         if ( *debrisTemplates )
         {
@@ -149,9 +124,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
             sithThing_Create(*debrisTemplates, &explosion->position, &a3, explosion->sector, 0);
         }
         ++debrisTemplates;
-        --v9;
     }
-    while ( v9 );
 }
 
 int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int param)
