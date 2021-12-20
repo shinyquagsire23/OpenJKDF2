@@ -638,8 +638,8 @@ void stdControl_ReadMouse()
 
     if ( stdControl_msDelta < 25 )
     {
-        stdControl_aAxisPos.mouseX = (stdControl_aAxisPos.mouseX + stdControl_dwLastMouseX) >> 1;
-        stdControl_aAxisPos.mouseY = (stdControl_aAxisPos.mouseY + stdControl_dwLastMouseY) >> 1;
+        //stdControl_aAxisPos.mouseX = (stdControl_aAxisPos.mouseX + stdControl_dwLastMouseX) >> 1;
+        //stdControl_aAxisPos.mouseY = (stdControl_aAxisPos.mouseY + stdControl_dwLastMouseY) >> 1;
     }
     stdControl_dwLastMouseX = Window_lastXRel; // TODO
     stdControl_dwLastMouseY = Window_lastYRel; // TODO
