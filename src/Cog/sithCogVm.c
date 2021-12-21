@@ -790,7 +790,7 @@ sithThing* sithCogVm_PopThing(sithCog *ctx)
     if (idx == -1)
         return NULL;
     
-    if ( world && idx >= 0 && idx < world->numThings )
+    if ( world && idx >= 0 && idx <= world->numThings ) // TODO is this correct...? vs world->numThingsLoaded
     {
         if (world->things[idx].type == SITH_THING_FREE)
             return NULL;
