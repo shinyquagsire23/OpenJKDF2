@@ -21,4 +21,4 @@ jobs:
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
     - name: cmake
-      run: export HOMEBREW_PREFIX="/usr/lib/" && mkdir -p build_darwin64 && cd build_darwin64 && cmake .. && make
+      run: export HOMEBREW_PREFIX="/usr/local" && mkdir -p build_darwin64 && cd build_darwin64 && cmake .. && make
