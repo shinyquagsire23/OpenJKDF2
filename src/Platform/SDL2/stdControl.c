@@ -4,7 +4,7 @@
 #include "Win95/Window.h"
 #include "stdPlatform.h"
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include "jk.h"
 

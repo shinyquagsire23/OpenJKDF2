@@ -9,7 +9,7 @@ Building is currently only tested on Arch Linux, Ubuntu, and MacOS. Windows buil
 
 ```
 # All
-pacman -S base-devel make python python-pip bison imagemagick
+pacman -S cmake base-devel make python python-pip bison imagemagick
 pip3 install cogapp
 
 # Win32/MinGW
@@ -31,7 +31,7 @@ pacaur -S emscripten
 
 ```
 # All
-apt install build-essential make python3 python3-pip bison imagemagick
+apt install build-essential cmake make python3 python3-pip bison imagemagick
 pip3 install cogapp
 
 # Win32/MinGW
@@ -59,7 +59,7 @@ export PATH=$PATH:~/.local/bin
 Before starting, install Xcode. This is required for OpenGL headers, among other things.
 ```
 # All
-brew install make python3 imagemagick
+brew install cmake make python3 imagemagick
 pip3 install cogapp generate-iconset
 
 # After installing cogapp, make sure the following is in your ~/.zshrc:
@@ -83,7 +83,13 @@ brew install emscripten
 
 64-bit Linux supports both x86_64 and ARM64 targets, and has been tested on Intel, NVIDIA and V3D (Raspberry Pi 4) graphics cards.
 
-`OPENJKDF2_NO_ASAN=1 make -f Makefile.linux64`
+```
+mkdir -p build
+cd build
+
+cmake ..
+make -j10
+```
 </details>
 
 <details>
@@ -91,7 +97,9 @@ brew install emscripten
 
 64-bit Windows can be cross-compiled from Linux or MacOS, and has been tested on Intel and NVIDIA graphics cards.
 
-`make -f Makefile.win64`
+```
+./build_win64.sh
+```
 </details>
 
 <details>
@@ -104,7 +112,11 @@ A full, universal MacOS appbundle can be created using
 
 Otherwise, a plain binary and single-architecture appbundle can be compiled using:
 ```
-OPENJKDF2_NO_ASAN=1 make -f Makefile.macos -j8
+mkdir -p build_darwin64
+cd build_darwin64
+
+cmake ..
+make -j10
 codesign -s - openjkdf2-64
 ```
 </details>
@@ -120,13 +132,29 @@ mkdir -p wasm_out
 
 Copy your `episode/` and `resource/` directory to `wasm_out`, then
 
-`make -f Makefile.emcc`
+```
+rm -rf build_emcc
+mkdir -p build_emcc
+cd build_emcc
+cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
+make -j10
+```
 </details>
 
 <details>
   <summary>x86 Linux/SDL2, mmap blobs</summary>
 
-OpenJKDF2 supports an experimental hybrid compilation for Linux/SDL2 which uses `JK.EXE` for any unimplemented functions. Compile using `OPENJKDF2_USE_BLOBS=1 make -f Makefile.linux`, then copy `openjkdf2` to the same directory as JK.EXE and run it. *JK.EXE version 1.0.0 is required in order to use blobs!*
+OpenJKDF2 supports an experimental hybrid compilation for Linux/SDL2 which uses `JK.EXE` for any unimplemented functions. Compile using: 
+
+```
+mkdir -p build_blobs
+cd build_blobs
+
+cmake .. -DOPENJKDF2_USE_BLOBS=true
+make -j10
+``` 
+
+then copy `openjkdf2` to the same directory as JK.EXE and run it. *JK.EXE version 1.0.0 is required in order to use blobs!*
 
 `mmap` is used to maintain all `.rodata`, `.data`, and `.bss` variables in the same addresses as `JK.EXE`, and if `openjkdf2` invokes an unimplemented function, it will jump to the mapped `JK.EXE` implementation.
 </details>
@@ -134,11 +162,17 @@ OpenJKDF2 supports an experimental hybrid compilation for Linux/SDL2 which uses 
 <details>
   <summary>32-bit Linux/SDL2, blobless</summary>
 
-`OPENJKDF2_NO_ASAN=1 make -f Makefile.linux`
+```
+mkdir -p build
+cd build
+
+cmake .. --toolchain ../cmake_modules/linux_32_toolchain.cmake
+make -j10
+```
 </details>
 
 <details>
   <summary>x86 Win32/MinGW hook DLL</summary>
 
-`make`
+`./build.sh`
 </details>

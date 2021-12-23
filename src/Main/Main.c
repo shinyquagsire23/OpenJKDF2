@@ -64,7 +64,7 @@
 #endif
 
 #if defined(SDL2_RENDER)
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <stdbool.h>
@@ -80,7 +80,7 @@
 
 static common_functions hs;
 
-#if defined(SDL2_RENDER)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",
     "episode/JK1CTF.gob",
@@ -710,7 +710,7 @@ void Main_CheckRequiredAssets(int doInstall)
         Main_AttemptInstall();
     }
 }
-#endif // SDL2_RENDER
+#endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
 int Main_Startup(const char *cmdline)
 {
@@ -810,7 +810,7 @@ int Main_Startup(const char *cmdline)
     stdStartup(&hs);
 
     // TODO bring this to Windows (%appdata%) and Linux
-#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
+#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
     const char *homedir;
     char fname[256];
 
@@ -849,7 +849,7 @@ int Main_Startup(const char *cmdline)
     }
 #endif // (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
     /*if (!util_FileExists("resource/jk_.cd")) {
         // TODO: polyglot
         //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "OpenJKDF2 could not find any game assets (`resource/jk_.cd` is missing). Would you like to install assets now?", NULL);

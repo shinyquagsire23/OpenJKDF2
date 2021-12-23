@@ -307,8 +307,14 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 #ifdef SDL2_RENDER
 
-#include <string.h>
+#ifdef ARCH_WASM
 #include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif
+
+#include <string.h>
+
 #include <GL/glew.h>
 #ifdef MACOS
 #else

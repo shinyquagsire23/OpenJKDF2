@@ -62,8 +62,8 @@ initial: $(FLEX_BIN) $(YACC_BIN)
 	cd $(SRC)/Cog && $(FLEX_BIN) -i cog.l
 	cd $(SRC)/Cog && $(YACC_BIN) -d cog.y
 	@echo Generating globals...
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_H_COG) > $(GLOBALS_H)
-	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" $(GLOBALS_C_COG) > $(GLOBALS_C)
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" -o $(GLOBALS_H) $(GLOBALS_H_COG)
+	cog -d -D symbols_fpath="$(SYMBOLS_FILE)" -o $(GLOBALS_C) $(GLOBALS_C_COG)
 
 $(OBJ): | initial $(SRC)/Cog/lex.yy.c $(SRC)/Cog/y.tab.c
 	@mkdir -p $(OBJ)

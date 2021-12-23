@@ -19,11 +19,11 @@
 #include <stdlib.h>
 #include "Platform/GL/shader_utils.h"
 #ifdef MACOS
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #elif defined(ARCH_WASM)
 // wasm
 #else
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <GL/gl.h>
 #endif
 

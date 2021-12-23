@@ -16,7 +16,7 @@
 #include "Main/Main.h"
 
 #ifdef SDL2_RENDER
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #endif
 
 static int Windows_bInitted;
@@ -238,7 +238,9 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     jk_printf("FATAL ERROR: %s\n", tmp);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 
+#ifndef ARCH_WASM
     Main_CheckRequiredAssets(1);
+#endif
 #endif
     jk_exit(1);
 }

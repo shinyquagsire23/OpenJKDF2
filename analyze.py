@@ -31,7 +31,7 @@ for subsys in filefrom_subsys:
     total_decomp_bySubsys[subsys] = 0
     total_notdecomp_bySubsys[subsys] = 0
 
-mapread = open("output.map", "r").read().split("\n")
+mapread = open("build_hooks/output.map", "r").read().split("\n")
 
 decompiled_funcs = []
 foundFuncs = False

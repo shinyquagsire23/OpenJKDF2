@@ -24,7 +24,12 @@ uint8_t* stdDisplay_GetPalette()
 #define GL_R8 GL_RED
 #endif
 
+#ifdef ARCH_WASM
 #include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif
+
 #ifdef MACOS
 #include "OpenGL/gl.h"
 #else

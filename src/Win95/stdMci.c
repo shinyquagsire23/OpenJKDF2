@@ -187,7 +187,7 @@ double stdMci_GetTrackLength(int track)
 
 #else // !NULL_SOUND
 
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 int stdMci_trackTo;
 int stdMci_trackFrom;

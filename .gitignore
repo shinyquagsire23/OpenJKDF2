@@ -67,10 +67,11 @@ OpenJKDF2.app
 OpenJKDF2_x86_64.app
 OpenJKDF2_universal.app
 build_win64
-*.ico
 macos-debug.tar.gz
 macos-debug.zip
 win64-debug.zip
 wasm_out
 win64-debug
 win64-package
+asan.log.*
+build_hooks/

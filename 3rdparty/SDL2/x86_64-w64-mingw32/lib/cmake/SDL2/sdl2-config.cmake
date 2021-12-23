@@ -1,6 +1,6 @@
 # sdl2 cmake project-config input for ./configure scripts
 
-set(prefix "/opt/local/x86_64-w64-mingw32") 
+set(prefix "${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32") 
 set(exec_prefix "${prefix}")
 set(libdir "${exec_prefix}/lib")
 set(includedir "${prefix}/include")

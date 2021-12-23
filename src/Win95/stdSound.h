@@ -32,7 +32,14 @@
 #define stdSound_SetMenuSoundFormat_ADDR (0x0437890)
 
 #ifdef OPENAL_SOUND
+//#include <AL/al.h>
+#ifdef ARCH_WASM
 #include <AL/al.h>
+#include <AL/alc.h>
+#else
+#include "al.h"
+#include "alc.h"
+#endif
 typedef struct stdALBuffer
 {
     ALuint buffer;
