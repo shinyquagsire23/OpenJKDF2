@@ -53,6 +53,8 @@ set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 # Options for compiling
 set(OPENJKDF2_NO_ASAN FALSE)
 
+message( STATUS "${PLAT_MINGW_X86_64}")
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND PLAT_AUTO)
     set(PLAT_LINUX_64 TRUE)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND PLAT_AUTO)
@@ -174,6 +176,7 @@ elseif(PLAT_MINGW_X86_64)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/glew/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/include/SDL2)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/include/SDL2)
 
 elseif(PLAT_WASM)
     message( STATUS "Targeting Emscripten WASM" )
@@ -383,10 +386,11 @@ if(PLAT_MINGW_X86_64)
 
     target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/" freeglut)
     target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/glew/lib/Release/x64" opengl32 glew32)
+    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib" mingw32 SDL2main SDL2)
     target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/lib" SDL2_mixer)
     target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
 
-    target_link_libraries(${BIN_NAME} SDL2::SDL2 -lmingw32 -lSDL2main -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
+    target_link_libraries(${BIN_NAME} -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
     
 
     add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/bin/SDL2.dll ${CMAKE_CURRENT_BINARY_DIR})

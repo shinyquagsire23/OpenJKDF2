@@ -14,7 +14,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 set(WIN32 TRUE)
 set(MINGW TRUE)
-set(PLAT_MINGW_X86_64 TRUE)
+set(PLAT_MINGW_X86_64 TRUE CACHE BOOL "MinGW Win64 target")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
@@ -24,7 +24,7 @@ set(OPENAL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/include/AL")
 #set(SDL2_LIBRARIES "${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib/libSDL2.la ${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib/libSDL2main.la")
 #set(SDL2_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/include")
 
-set(SDL2_DIR "${CMAKE_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib/cmake/SDL2")
-find_package(SDL2 REQUIRED)
+#set(SDL2_DIR "${CMAKE_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib/cmake/SDL2")
+#find_package(SDL2 REQUIRED)
 
 message( STATUS "MinGW cross-compile toolchain invoked" )

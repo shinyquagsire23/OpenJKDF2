@@ -2,6 +2,7 @@
 
 rm -rf win64-package
 
+rm -rf build_win64
 mkdir -p build_win64 && cd build_win64
 cmake .. --toolchain ../cmake_modules/mingw_toolchain.cmake &&
 make -j10 &&
