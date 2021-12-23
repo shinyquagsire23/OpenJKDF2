@@ -17,14 +17,8 @@ jobs:
       run: |
           set -e
           brew update
-          brew install make python3 imagemagick
+          brew install cmake make python3 imagemagick
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
-    - name: make
-      run: make clean && OPENJKDF2_NO_ASAN=1 HOMEBREW_PREFIX=/usr/local make -f Makefile.macos
-    - name: Publish Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: macos-debug
-        path: macos-package
-        type: 'tar'
+    - name: cmake
+      run: mkdir -p build_darwin64 && cd build_darwin64 cmake .. && make

@@ -16,13 +16,8 @@ jobs:
     - name: Install Packages
       run: |
           sudo apt-get update -qq
-          sudo apt-get install -y build-essential make python3 python3-pip bison imagemagick
+          sudo apt-get install -y build-essential cmake make python3 python3-pip bison imagemagick
           sudo pip3 install cogapp
           sudo apt-get install -y mingw-w64 clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
-    - name: make
-      run: make clean && make -f Makefile.win64 -j4
-    - name: Publish Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win64-debug
-        path: win64-package
+    - name: cmake
+      run: mkdir -p build_mingw64_cmake && cd build_mingw64_cmake && cmake .. --toolchain ../cmake_modules/mingw_toolchain.cmake && make
