@@ -49,3 +49,5 @@ ENDIF()
 IF(EXISTS ${LIB32}/pkgconfig)
     SET(ENV{PKG_CONFIG_LIBDIR} ${LIB32}/pkgconfig:/usr/share/pkgconfig:/usr/lib/pkgconfig:/usr/lib64/pkgconfig)
 ENDIF()
+
+set(PLAT_LINUX_32 TRUE)
