@@ -224,6 +224,10 @@ set(CMAKE_BUILD_TYPE Debug)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
+if(TARGET_LINUX)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
+endif()
+
 if(NOT PLAT_MINGW_X86_64 AND NOT PLAT_HOOKS AND NOT PLAT_WASM)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_mixer REQUIRED)
