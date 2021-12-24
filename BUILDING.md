@@ -81,9 +81,12 @@ brew install emscripten
 <details>
   <summary>64-bit Linux/SDL2</summary>
 
-64-bit Linux supports both x86_64 and ARM64 targets, and has been tested on Intel, NVIDIA and V3D (Raspberry Pi 4) graphics cards.
+64-bit Linux supports both x86_64 and ARM64 targets, and has been tested on Intel, NVIDIA and V3D (Raspberry Pi 4) graphics cards. **GCC <11.1 is currently not supported due to crashes, use clang instead.**
 
 ```
+export CC=clang
+export CXX=clang++
+
 mkdir -p build
 cd build
 

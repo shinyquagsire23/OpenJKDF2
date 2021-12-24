@@ -20,4 +20,4 @@ jobs:
           sudo pip3 install cogapp
           sudo apt-get install -y mingw-w64 clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
     - name: cmake
-      run: mkdir -p build && cd build && cmake .. && make
+      run: export CC=clang && export CXX=clang++ && mkdir -p build && cd build && cmake .. && make
