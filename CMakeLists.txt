@@ -242,7 +242,7 @@ elseif(PLAT_MSVC)
 	
 	set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.0.18)
 	set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.0.4)
-	#set(GLEW_DIR ${CMAKE_SOURCE_DIR}/3rdparty/glew-2.1.0)
+	#set(GLEW_DIR ${CMAKE_SOURCE_DIR}/3rdparty/glew)
 	list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/3rdparty/glew")
 	
 	
