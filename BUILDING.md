@@ -9,7 +9,7 @@ Building is currently only tested on Arch Linux, Ubuntu, and MacOS. Windows buil
 
 ```
 # All
-pacman -S cmake base-devel make python python-pip bison imagemagick
+pacman -S cmake base-devel make python python-pip bison imagemagick gtk3
 pip3 install cogapp
 
 # Win32/MinGW
@@ -31,7 +31,7 @@ pacaur -S emscripten
 
 ```
 # All
-apt install build-essential cmake make python3 python3-pip bison imagemagick
+apt install build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev
 pip3 install cogapp
 
 # Win32/MinGW

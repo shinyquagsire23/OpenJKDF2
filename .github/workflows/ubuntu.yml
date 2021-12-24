@@ -16,7 +16,7 @@ jobs:
     - name: Install Packages
       run: |
           sudo apt-get update -qq
-          sudo apt-get install -y build-essential cmake make python3 python3-pip bison imagemagick
+          sudo apt-get install -y build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev
           sudo pip3 install cogapp
           sudo apt-get install -y mingw-w64 clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
     - name: cmake
