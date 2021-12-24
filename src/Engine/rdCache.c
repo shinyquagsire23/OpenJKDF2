@@ -473,6 +473,7 @@ int rdCache_SendFaceListToHardware()
 
         if ( v11.mipmap_related != 3 )
         {
+            v26 = 1.0;
             if ( v11.mipmap_related != 4 )
                 continue;
             if ( lighting_capability == 1 )

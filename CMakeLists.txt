@@ -28,6 +28,7 @@ set(PLAT_MACOS_X86_64 FALSE CACHE BOOL "MacOS x86_64")
 set(PLAT_MINGW_X86_64 FALSE CACHE BOOL "MinGW Win64 target")
 set(PLAT_WASM FALSE CACHE BOOL "Emscripten WASM target")
 set(PLAT_HOOKS FALSE CACHE BOOL "Hook DLL target")
+set(PLAT_MSVC FALSE CACHE BOOL "Windows 64-bit MSVC")
 set(PLAT_AUTO FALSE CACHE BOOL "Target the host OS")
 
 # Set PLAT_AUTO if a platform isn't specifically selected
@@ -60,7 +61,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND PLAT_AUTO)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND PLAT_AUTO)
     set(PLAT_MACOS TRUE)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND PLAT_AUTO)
-    message( FATAL_ERROR "MSVC and Windows are currently unsupported" )
+    set(PLAT_MSVC TRUE)
 endif()
 
 add_definitions(-DQOL_IMPROVEMENTS)
@@ -221,6 +222,43 @@ elseif(PLAT_HOOKS)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_WIN32 TRUE)
     set(TARGET_USE_D3D TRUE)
+elseif(PLAT_MSVC)
+    message( STATUS "Targeting Win64 MSVC" )
+
+    set(BIN_NAME "openjkdf2-64")
+
+    add_definitions(-DWIN64)
+    add_definitions(-DWIN64_STANDALONE)
+    add_definitions(-DARCH_64BIT)
+    add_definitions(-DWIN32)
+
+    set(OPENJKDF2_NO_ASAN TRUE)
+    set(TARGET_USE_LIBSMACKER TRUE)
+    set(TARGET_USE_SDL2 TRUE)
+    set(TARGET_USE_OPENGL TRUE)
+    set(TARGET_POSIX TRUE)
+    set(TARGET_WIN32 TRUE)
+    set(TARGET_NO_BLOBS TRUE)
+	
+	set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.0.18)
+	set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.0.4)
+	#set(GLEW_DIR ${CMAKE_SOURCE_DIR}/3rdparty/glew-2.1.0)
+	list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/3rdparty/glew")
+	
+	
+
+    # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
+    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    #add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
+    #add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS)
+
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
+	include_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include)
+	
+	add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/libexchndl.a")
+	add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/libfreeglut.a")
+	add_link_options(OpenGL32.lib)
 endif()
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -229,6 +267,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
 if(TARGET_LINUX)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
+endif()
+
+if(PLAT_MSVC)
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
 endif()
 
 if(NOT PLAT_MINGW_X86_64 AND NOT PLAT_HOOKS AND NOT PLAT_WASM)
@@ -316,7 +358,11 @@ if(TARGET_WIN32)
 
     if(TARGET_USE_SDL2)
         list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended/nfd_win.cpp)
-        add_link_options(-lole32 -luuid)
+        if(PLAT_MSVC)
+			set(LINK_LIBS ${LINK_LIBS} ole32.lib uuid.lib)
+		else()
+			add_link_options(-lole32 -luuid)
+		endif()
     endif()
 endif()
 
@@ -409,8 +455,27 @@ elseif(PLAT_WASM)
     target_link_libraries(${BIN_NAME} -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
 elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
+elseif(PLAT_MSVC)
+	target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES})
+	
+	add_custom_command(TARGET ${BIN_NAME} 
+	POST_BUILD 
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/bin/SDL2.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/SDL2_mixer.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libogg-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbis-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/OpenAL32.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbgcore.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbghelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+	)
 else()
-    target_link_libraries(${BIN_NAME} SDL2::SDL2 ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES})
 endif()
 
 if(TARGET_MACOS)

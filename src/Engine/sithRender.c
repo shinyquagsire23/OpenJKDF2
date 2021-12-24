@@ -1265,6 +1265,7 @@ void sithRender_RenderThings()
                     
                     if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THINGTYPE_SPRITE3 || sithRender_82F4B4 < 8 )
                     {
+                        clipRadius = 0.0f;
                         switch ( thingIter->rdthing.type )
                         {
                             case RD_THINGTYPE_MODEL:

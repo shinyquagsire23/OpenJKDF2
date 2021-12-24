@@ -65,7 +65,9 @@
 
 #if defined(SDL2_RENDER)
 #include <SDL.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <sys/types.h>
 #include <stdbool.h>
 #if defined(LINUX) || defined(MACOS)

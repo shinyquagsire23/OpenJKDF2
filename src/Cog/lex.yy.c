@@ -67,9 +67,11 @@ void free( void* );
  * so it's got to be a K&R compiler, and therefore there's no standard
  * place from which to include these definitions
  */
+#if !defined(_MSC_VER)
 char *malloc();
 int free();
 int read();
+#endif
 #endif
 
 

@@ -33,6 +33,14 @@
 #define LPDIRECTPLAYLOBBYA void*
 #define LPDIRECTSOUND void*
 
+#if defined(_MSC_VER)
+#define ALIGNED_(x) __declspec(align(x))
+#else
+#if defined(__GNUC__)
+#define ALIGNED_(x) __attribute__ ((aligned(x)))
+#endif
+#endif
+
 #ifdef LINUX
 #define __stdcall
 #define __cdecl
@@ -699,7 +707,7 @@ typedef float D3DVALUE;
 #pragma pack(push, 4)
 typedef struct D3DVERTEX
 {
-  union __attribute__((aligned(4)))
+  union ALIGNED_(4)
   {
     D3DVALUE x;
     float dvX;
@@ -827,7 +835,7 @@ typedef struct D3DDeviceDesc
 } D3DDeviceDesc;
 #pragma pack(pop)
 
-typedef struct __attribute__((aligned(16))) d3d_device
+typedef struct ALIGNED_(16) d3d_device
 {
   uint32_t hasColorModel;
   uint32_t dpcTri_hasperspectivecorrectttexturing;
@@ -849,7 +857,7 @@ typedef struct __attribute__((aligned(16))) d3d_device
   uint32_t dwMaxVertexCount;
   char deviceName[128];
   char deviceDescription[128];
-  __attribute__((aligned(16))) D3DDeviceDesc device_desc;
+  ALIGNED_(16) D3DDeviceDesc device_desc;
   DWORD d3d_this;
 } d3d_device;
 

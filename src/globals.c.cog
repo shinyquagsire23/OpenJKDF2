@@ -68,17 +68,18 @@
     import glob
     import os
     
-    embed_files = glob.glob("resource/shaders/*.glsl")
+    embed_files = glob.glob("../resource/shaders/*.glsl")
     cog.outl("const size_t embeddedResource_aFiles_num = %d;" % (len(embed_files),))
     cog.outl("const embeddedResource_t embeddedResource_aFiles[%d] = {" % (len(embed_files),))
 
     for fpath in embed_files:
+        fpath_ = fpath.replace("../", "").replace("\\", "/")
         fname = os.path.basename(fpath)
         contents = open(fpath, "r").read()
 
         contents = contents.replace("\n", "\\n")
 
-        cog.outl("{\"%s\", \"%s\", 0x%x}," % (fpath, contents, len(contents)))
+        cog.outl("{\"%s\", \"%s\", 0x%x}," % (fpath_, contents, len(contents)))
 
     cog.outl("};")
 

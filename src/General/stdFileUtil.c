@@ -8,10 +8,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <dirent.h>
 #include <unistd.h>
+#endif
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <ftw.h>
+#endif
 
 #include "external/fcaseopen/fcaseopen.h"
 #endif
@@ -102,6 +106,48 @@ int stdFileUtil_DelFile(char* lpFileName)
 {
     return DeleteFileA(lpFileName);
 }
+
+int stdFileUtil_Deltree(LPCSTR lpPathName)
+{
+    int v2; // ebx
+    char* v3; // edi
+    int v4; // eax
+    HANDLE hFindFile; // [esp+10h] [ebp-248h]
+    char FileName[260]; // [esp+14h] [ebp-244h] BYREF
+    struct _WIN32_FIND_DATAA FindFileData; // [esp+118h] [ebp-140h] BYREF
+
+    strcpy(FileName, lpPathName);
+    v2 = 1;
+    v3 = &FileName[strlen(FileName)];
+    strcpy(v3, "\\*.*");
+    hFindFile = FindFirstFileA(FileName, &FindFileData);
+    if (hFindFile == (HANDLE)-1)
+        return 0;
+    do
+    {
+        if (FindFileData.dwFileAttributes != 16)
+        {
+            strcpy(FileName, lpPathName);
+            strcpy(&FileName[strlen(FileName)], "\\");
+            strcat(FileName, FindFileData.cFileName);
+            v4 = DeleteFileA(FileName);
+            goto LABEL_7;
+        }
+        if (strcmp(FindFileData.cFileName, ".") && strcmp(FindFileData.cFileName, ".."))
+        {
+            strcpy(FileName, lpPathName);
+            strcpy(&FileName[strlen(FileName)], "\\");
+            strcat(FileName, FindFileData.cFileName);
+            v4 = stdFileUtil_Deltree(FileName);
+LABEL_7:
+            v2 = v4;
+        }
+    } while (FindNextFileA(hFindFile, &FindFileData) && v2 == 1);
+    FindClose(hFindFile);
+    if (v2)
+        return RemoveDirectoryA(lpPathName);
+    return v2;
+}
 #endif
 
 #ifdef PLATFORM_POSIX
@@ -117,7 +163,7 @@ static int rmFiles(const char *pathname, const struct stat *sbuf, int type, stru
     return 0;
 }
 
-
+#ifndef _WIN32
 int stdFileUtil_Deltree(char* lpPathName)
 {
     char tmp[512];
@@ -142,6 +188,7 @@ int stdFileUtil_Deltree(char* lpPathName)
     //rmdir(tmp);
     return 0;
 }
+#endif // _WIN32
 #endif
 
 #ifdef LINUX

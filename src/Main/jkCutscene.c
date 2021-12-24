@@ -106,7 +106,7 @@ int jkCutscene_sub_421310(char* fpath)
     
     for (int i = 0; i < 0x300; i++)
     {
-        *(uint8_t*)(jkCutscene_palette+i) = i & 0xFF;
+        *(uint8_t*)((char*)jkCutscene_palette+i) = i & 0xFF;
     }
 
 #ifdef LINUX
@@ -163,7 +163,7 @@ int jkCutscene_sub_421310(char* fpath)
 	uint64_t copiedSize = 0;
 	for (size_t i = 0; i < jkCutscene_smk_frames; i++)
 	{
-	    _memcpy(audioBuf + copiedSize, smk_get_audio(jkCutscene_smk, 0), smk_get_audio_size(jkCutscene_smk, 0));
+	    _memcpy((char*)audioBuf + copiedSize, smk_get_audio(jkCutscene_smk, 0), smk_get_audio_size(jkCutscene_smk, 0));
 	    copiedSize += smk_get_audio_size(jkCutscene_smk, 0);
 	    smk_next(jkCutscene_smk);
 	}

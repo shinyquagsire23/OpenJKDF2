@@ -256,7 +256,7 @@ void* _memset(void* ptr, int val, size_t num)
     int i;
     for (i = 0; i < num; i++)
     {
-        *(uint8_t*)(ptr+i) = val;
+        *(uint8_t*)((char*)ptr+i) = val;
     }
     return ptr;
 }
@@ -278,7 +278,7 @@ void* _memset32(void* ptr, uint32_t val, size_t num)
     int i;
     for (i = 0; i < num; i++)
     {
-        *(uint32_t*)(ptr+(i*sizeof(uint32_t))) = val;
+        *(uint32_t*)((char*)ptr+(i*sizeof(uint32_t))) = val;
     }
     return ptr;
 }

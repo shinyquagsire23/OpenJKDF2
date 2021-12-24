@@ -160,6 +160,10 @@ void do_hooks();
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
 
+#if defined(_MSC_VER)
+#include <Windows.h>
+#endif
+
 int main(int argc, char** argv)
 {   
     FILE* fp;
@@ -168,8 +172,13 @@ int main(int argc, char** argv)
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stdout);
 
+#if defined(_MSC_VER)
+    HMODULE hLib = LoadLibrary("exchndl.dll");
+    void (*pfnExcHndlInit)(void) = GetProcAddress(hLib, "ExcHndlInit");
+    pfnExcHndlInit();
+#else
     ExcHndlInit();
-    
+#endif
     Window_Main_Linux(argc, argv);
 }
 #endif
