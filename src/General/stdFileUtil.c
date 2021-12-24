@@ -164,7 +164,7 @@ static int rmFiles(const char *pathname, const struct stat *sbuf, int type, stru
 }
 
 #ifndef _WIN32
-int stdFileUtil_Deltree(char* lpPathName)
+int stdFileUtil_Deltree(const char* lpPathName)
 {
     char tmp[512];
     size_t len = _strlen(lpPathName);

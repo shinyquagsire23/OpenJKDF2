@@ -85,8 +85,8 @@ if(PLAT_LINUX_32)
         set(TARGET_NO_BLOBS FALSE)
     endif()
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_LINUX_64)
@@ -105,8 +105,8 @@ elseif(PLAT_LINUX_64)
     set(TARGET_NO_BLOBS TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS)
@@ -125,7 +125,7 @@ elseif(PLAT_MACOS)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2.app")
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     add_link_options(-fshort-wchar)
 
@@ -145,8 +145,8 @@ elseif(PLAT_MACOS_X86_64)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MINGW_X86_64)
@@ -216,8 +216,8 @@ elseif(PLAT_HOOKS)
     add_definitions(-DARCH_X86)
     add_definitions(-DTARGET_HAS_DPLAY)
 
-    add_compile_options(-Wuninitialized -fno-trapping-math)
-    add_link_options(-Wl,--subsystem,windows -Wl,-Map=output.map -fno-trapping-math)
+    add_compile_options(-g -Wuninitialized -fno-trapping-math)
+    add_link_options(-g -Wl,--subsystem,windows -Wl,-Map=output.map -fno-trapping-math)
 
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_WIN32 TRUE)
