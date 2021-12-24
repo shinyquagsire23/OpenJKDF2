@@ -720,7 +720,7 @@ int Main_Startup(const char *cmdline)
 
 #if defined(PLATFORM_POSIX)
     // Make sure floating point stuff is using . and not ,
-    setlocale(LC_NUMERIC, "C");
+    setlocale(LC_ALL, "C");
 #endif
 
     stdInitServices(&hs);    
