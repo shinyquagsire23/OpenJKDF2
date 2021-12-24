@@ -1,4 +1,4 @@
-name: Win64 SDL2
+name: Ubuntu 20.04 SDL2
 
 on:
   push:
