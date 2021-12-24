@@ -18,7 +18,7 @@ uint32_t Linux_TimeMs()
 {
     struct timespec _t;
 
-#ifdef _WIN32
+#if defined(_MSC_VER)
     timespec_get(&_t, TIME_UTC);
 #else
     clock_gettime(CLOCK_REALTIME, &_t);
@@ -31,7 +31,7 @@ uint64_t Linux_TimeUs()
 {
     struct timespec _t;
 
-#ifdef _WIN32
+#if defined(_MSC_VER)
     timespec_get(&_t, TIME_UTC);
 #else
     clock_gettime(CLOCK_REALTIME, &_t);
