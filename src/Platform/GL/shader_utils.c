@@ -101,8 +101,6 @@ retry_file:
     	strncat(tmp_filepath, filepath, 256);
     	SDL_free(base_path);
 
-    	printf("%s\n", tmp_filepath);
-
     	f = fopen(tmp_filepath, "r");
     	if (f)
     		goto retry_file;
