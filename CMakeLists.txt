@@ -130,7 +130,7 @@ elseif(PLAT_MACOS)
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS_X86_64)
-    message( STATUS "Targeting MacOS x86_64" )
+    message( STATUS "Targeting MacOS x86_64 ${CMAKE_OSX_ARCHITECTURES}" )
     set(BIN_NAME "openjkdf2-64")
 
     add_definitions(-DARCH_64BIT)

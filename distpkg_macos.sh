@@ -8,13 +8,17 @@ rm -rf OpenJKDF2_universal.app
 rm -rf build_darwin_x86_64
 rm -rf build_darwin64
 
-mkdir -p build_darwin_x86_64 && cd build_darwin_x86_64
+rm -f src/globals.h
+rm -f src/globals.c
+
+mkdir -p build_darwin_x86_64 && cd build_darwin_x86_64 &&
+cmake .. -DPLAT_MACOS_X86_64=true &&
 cmake .. -DPLAT_MACOS_X86_64=true &&
 make -j10 &&
 cd .. &&
 
 
-mkdir -p build_darwin64 && cd build_darwin64
+mkdir -p build_darwin64 && cd build_darwin64 &&
 cmake .. &&
 make -j10 &&
 cd .. &&

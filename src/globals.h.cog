@@ -9,6 +9,9 @@
 #include "General/stdPalEffects.h"
 #include "Engine/rdCache.h"
 
+// HACK: Fix macOS x86_64
+#define SDL_cpuinfo_h_
+
 typedef struct embeddedResource_t
 {
     const char* fpath;
