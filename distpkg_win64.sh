@@ -19,5 +19,6 @@ cp build_win64/*.exe win64-package
 rm -f win64-debug.zip
 cd win64-package ; zip -r ../win64-debug.zip . ; cd ..
 
-make -f Makefile.win64 clean
+#make -f Makefile.win64 clean
+rm -rf build_win64
 rm -rf win64-package

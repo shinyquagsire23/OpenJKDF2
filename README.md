@@ -8,6 +8,8 @@ OpenJKDF2 is a function-by-function reimplementation of DF2 in C, with 64-bit po
 
 OpenJKDF2 does *not* include any original game assets; a valid copy of JKDF2 is *required* and can be purchased from [GOG](https://www.gog.com/game/star_wars_jedi_knight_dark_forces_ii) or [Steam](https://store.steampowered.com/app/32380/STAR_WARS_Jedi_Knight_Dark_Forces_II/). The GOG version is recommended, since it is DRM-free and also includes the soundtrack in Ogg Vorbis format. If you'd like to try before you buy, a WebAssembly demo of OpenJKDF2 can be found at https://maxthomas.dev/openjkdf2/.
 
+Support for playing the original soundtrack from Ogg Vorbis files is currently limited to the GOG and Steam versions of the game assets; game assets and music cannot be mixed and matched from disk and digital, because digital releases alter track numbers in the game scripts. Dumping the soundtrack from disks at install time is planned for a future release of OpenJKDF2, but is not currently implemented.
+
 ## Platforms
 OpenJKDF2 supports the following configurations:
 
@@ -248,7 +250,7 @@ rdClip                         0x81f2     3.084%        100.000%       17 / 17
 sithAIAwareness                0x31f      0.074%        90.488%         5 / 6          
 sithDplay                      0x53c      0.124%        2.090%          1 / 17         
 Video                          0x5dc      0.139%        19.800%         3 / 5          
-stdFileUtil                    0x687      0.155%        24.237%         5 / 11         
+stdFileUtil                    0x687      0.155%        54.159%         6 / 11         
 rdPrimit2                      0x69a      0.157%        53.787%         2 / 5          
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithCogScript                  0x6ca      0.161%        89.241%         8 / 9          
@@ -260,7 +262,7 @@ sithSector                     0x806      0.190%        90.458%        11 / 13
 sithMap                        0x814      0.192%        3.046%          2 / 6          
 Main                           0x87b      0.201%        96.868%         3 / 4          
 jkGuiMultiTally                0x8aa      0.206%        0.000%          0 / 7          
-jkCredits                      0x8e4      0.211%        3.207%          1 / 6          
+jkCredits                      0x8e4      0.211%        6.722%          2 / 6          
 jkGuiNet                       0x94e      0.221%        0.000%          0 / 10         
 stdColor                       0x97e      0.225%        24.198%         3 / 11         
 jkGame                         0x98f      0.227%        42.705%         8 / 13         
@@ -270,7 +272,7 @@ stdLbm                         0xc24      0.288%        0.000%          0 / 3
 rdColormap                     0xcf4      0.307%        47.738%         7 / 12         
 jkEpisode                      0xdd9      0.329%        94.104%         7 / 10         
 stdPlatform                    0xdde      0.329%        27.718%        19 / 43         
-sithPlayer                     0xe72      0.343%        72.255%        17 / 27         
+sithPlayer                     0xe72      0.343%        73.905%        18 / 27         
 stdBitmap                      0xeb6      0.349%        47.398%         6 / 14         
 sithTrackThing                 0xf9f      0.371%        90.098%        12 / 15         
 rdPuppet                       0x101f     0.383%        97.407%        15 / 19         
@@ -284,12 +286,12 @@ sithCamera                     0x124b     0.434%        98.612%        19 / 23
 sithIntersect                  0x12a8     0.443%        92.588%         9 / 12         
 jkGuiDisplay                   0x12ff     0.451%        0.000%          0 / 11         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
-jkMain                         0x16cd     0.541%        84.050%        36 / 53         
+jkMain                         0x16cd     0.541%        85.678%        39 / 53         
 rdPrimit3                      0x16e0     0.543%        88.268%         6 / 9          
 sithDSS                        0x175d     0.554%        96.673%        20 / 22         
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
 sithSurface                    0x1c6a     0.674%        95.298%        31 / 35         
-jkHud                          0x1c9b     0.679%        97.324%        15 / 17         
+jkHud                          0x1c9b     0.679%        97.952%        16 / 17         
 sithCog                        0x1ed3     0.731%        90.686%        21 / 28         
 jkSaber                        0x1f4a     0.742%        75.980%        23 / 40         
 jkDev                          0x1fd6     0.755%        94.687%        39 / 41         
@@ -308,36 +310,36 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-48.975% by weight
-82.712% by weight excluding rasterizer
-2331 / 3169 functions
-2331 / 2798 functions excluding rasterizer
+49.047% by weight
+82.835% by weight excluding rasterizer
+2338 / 3169 functions
+2338 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           2.677%          156 / 1323
+sith           2.672%          155 / 1323
 stdPlatform    0.238%           24 / 43
-std            2.450%           82 / 359
+std            2.404%           81 / 359
 jkGui          2.871%           91 / 284
 rd             0.307%           15 / 345
-jk             0.788%           62 / 324
+jk             0.767%           57 / 324
 Raster         40.778%         370 / 371
 other          0.916%           38 / 120
 -----------------------------------------
-total          51.025%         838 / 3169
+total          50.953%         831 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           4.522%          156 / 1323
+sith           4.512%          155 / 1323
 stdPlatform    0.402%           24 / 43
-std            4.138%           82 / 359
+std            4.059%           81 / 359
 jkGui          4.849%           91 / 284
 rd             0.518%           15 / 345
-jk             1.331%           62 / 324
+jk             1.296%           57 / 324
 other          1.548%           38 / 120
 -----------------------------------------
-total          17.306%         468 / 2798
+total          17.184%         461 / 2798
 
 ```
