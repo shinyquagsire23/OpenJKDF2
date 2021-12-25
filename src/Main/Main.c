@@ -301,6 +301,33 @@ int Main_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/Track10.ogg",
         "MUSIC/Track11.ogg",
 
+        // OpenJKDF2 song rips
+        "MUSIC/1/Track0.ogg",
+        "MUSIC/1/Track1.ogg",
+        "MUSIC/1/Track2.ogg",
+        "MUSIC/1/Track3.ogg",
+        "MUSIC/1/Track4.ogg",
+        "MUSIC/1/Track5.ogg",
+        "MUSIC/1/Track6.ogg",
+        "MUSIC/1/Track7.ogg",
+        "MUSIC/1/Track8.ogg",
+        "MUSIC/1/Track9.ogg",
+        "MUSIC/1/Track10.ogg",
+        "MUSIC/1/Track11.ogg",
+
+        "MUSIC/2/Track0.ogg",
+        "MUSIC/2/Track1.ogg",
+        "MUSIC/2/Track2.ogg",
+        "MUSIC/2/Track3.ogg",
+        "MUSIC/2/Track4.ogg",
+        "MUSIC/2/Track5.ogg",
+        "MUSIC/2/Track6.ogg",
+        "MUSIC/2/Track7.ogg",
+        "MUSIC/2/Track8.ogg",
+        "MUSIC/2/Track9.ogg",
+        "MUSIC/2/Track10.ogg",
+        "MUSIC/2/Track11.ogg",
+
         // GOG tracks
         "MUSIC/Track12.ogg",
         "MUSIC/Track13.ogg",
@@ -401,6 +428,8 @@ int Main_AttemptInstallFromExisting(nfdu8char_t* path)
     Main_UseLocalData();
     stdFileUtil_MkDir("episode");
     stdFileUtil_MkDir("MUSIC");
+    stdFileUtil_MkDir("MUSIC/1");
+    stdFileUtil_MkDir("MUSIC/2");
     stdFileUtil_MkDir("player");
     stdFileUtil_MkDir("resource");
     stdFileUtil_MkDir("resource/shaders");
@@ -532,6 +561,8 @@ int Main_AttemptInstallFromDisk(nfdu8char_t* path)
     Main_UseLocalData();
     stdFileUtil_MkDir("episode");
     stdFileUtil_MkDir("MUSIC");
+    stdFileUtil_MkDir("MUSIC/1");
+    stdFileUtil_MkDir("MUSIC/2");
     stdFileUtil_MkDir("player");
     stdFileUtil_MkDir("resource");
     stdFileUtil_MkDir("resource/shaders");

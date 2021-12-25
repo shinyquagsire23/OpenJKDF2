@@ -84,6 +84,9 @@ typedef struct jkGuiStateFuncs
   void (*leaveFunc)(int, int);
 } jkGuiStateFuncs;
 
+extern jkEpisodeEntry* jkMain_pEpisodeEnt;
+extern jkEpisodeEntry* jkMain_pEpisodeEnt2;
+
 void jkMain_GuiAdvance();
 void jkMain_EscapeMenuShow(int a1, int a2);
 void jkMain_EscapeMenuTick(int a2);

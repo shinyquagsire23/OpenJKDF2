@@ -56,8 +56,8 @@
 #define jkMain_CutsceneTick ((void*)(0x00404460))
 #define jkMain_CutsceneLeave ((void*)(0x00404470))
 
-static jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
-static jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
+jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
+jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
 
 static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
     {0,  0,  0},

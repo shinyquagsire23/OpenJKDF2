@@ -1,5 +1,6 @@
 #include "stdMci.h"
 
+#include "Main/jkMain.h"
 #include "jk.h"
 
 #ifdef LINUX
@@ -218,8 +219,18 @@ void stdMci_trackFinished();
 void stdMci_trackStart(int track)
 {
     char tmp[256];
-    
-    snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+ 
+    if (stdMci_music)
+        Mix_FreeMusic(stdMci_music);
+
+    int cdNum = 1;
+    if(jkMain_pEpisodeEnt)
+        cdNum = jkMain_pEpisodeEnt->cdNum;
+    else if(jkMain_pEpisodeEnt2)
+        cdNum = jkMain_pEpisodeEnt2->cdNum;
+
+    // Try and play disk-dumped music
+    snprintf(tmp, 255, "MUSIC/%d/Track%d.ogg", cdNum, track);
 
 #ifdef LINUX
     char *r = malloc(strlen(tmp) + 16);
@@ -230,16 +241,68 @@ void stdMci_trackStart(int track)
     free(r);
 #endif
 
-    if (stdMci_music)
-        Mix_FreeMusic(stdMci_music);
-
-    stdMci_music = Mix_LoadMUS(tmp);
-            
+    stdMci_music = Mix_LoadMUS(tmp); 
     if (!stdMci_music) {
-        printf("WARN: Failed to play music `%s'\n", tmp);
-        return;
+        printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
     }
 
+    if (stdMci_music)
+        goto done;
+
+    // GOG and Steam soundtrack location
+    snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+
+#ifdef LINUX
+    r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+#endif
+
+    stdMci_music = Mix_LoadMUS(tmp); 
+    if (!stdMci_music) {
+        printf("WARN: Failed to play music `%s'\n", tmp);
+        //return;
+    }
+
+    if (stdMci_music)
+        goto done;
+
+    // Try and convert the OG track numbers to GOG/Steam
+    if (!stdMci_music && track < 12)
+    {
+        if (cdNum == 1)
+        {
+            track += 10;
+        }
+        else if (cdNum == 2)
+        {
+            track += 20;
+        }
+
+        // GOG and Steam soundtrack location
+        snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+
+#ifdef LINUX
+        r = malloc(strlen(tmp) + 16);
+        if (casepath(tmp, r))
+        {
+            strcpy(tmp, r);
+        }
+        free(r);
+#endif
+
+        stdMci_music = Mix_LoadMUS(tmp); 
+        if (!stdMci_music) {
+            printf("WARN: Failed to play music `%s' too. Must not have any music.\n", tmp);
+        }
+    }
+
+    if (!stdMci_music) return;
+
+done:
     Mix_PlayMusic(stdMci_music, 0);
     Mix_HookMusicFinished(stdMci_trackFinished);
     printf("INFO: Playing music `%s'\n", tmp);

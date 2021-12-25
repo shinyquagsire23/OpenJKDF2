@@ -231,6 +231,8 @@ int jkGuiSingleplayer_Show()
                                     //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
                                     if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
                                         jkEpisode_mLoad.field_8 = j;
+                                        jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
+                                        jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
                                         break;
                                     }
                                 }
