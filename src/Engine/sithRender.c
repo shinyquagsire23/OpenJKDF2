@@ -1365,18 +1365,8 @@ LABEL_42:
                                   && thingIter->light > 0.0
                                   && (thingIter->light < 0.0 ? (v10 = 0.0) : thingIter->light > 1.0 ? (v10 = 1.0) : (v10 = thingIter->light), a2 <= v10) )
                                 {
-                                    if ( thingIter->light < 0.0 )
-                                    {
-                                        rdCamera_SetAmbientLight(rdCamera_pCurCamera, 0.0);
-                                    }
-                                    else
-                                    {
-                                        if ( thingIter->light > 1.0 )
-                                            v12 = 1.0;
-                                        else
-                                            v12 = thingIter->light;
-                                        rdCamera_SetAmbientLight(rdCamera_pCurCamera, v12);
-                                    }
+                                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
+                
                                 }
                                 else
                                 {
@@ -1492,18 +1482,7 @@ void sithRender_RenderAlphaSurfaces()
         else
         {
             v2 = v1->extraLight + v1->ambientLight;
-            if ( v2 < 0.0 )
-            {
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 0.0);
-            }
-            else if ( v2 > 1.0 )
-            {
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 1.0);
-            }
-            else
-            {
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, v2);
-            }
+            rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(v2, 0.0, 1.0));
         }
         rdColormap_SetCurrent(v1->colormap);
 
@@ -1556,18 +1535,8 @@ void sithRender_RenderAlphaSurfaces()
             continue;
         }
         rdCamera_pCurCamera->projectLst(v9->vertices, vertices_tmp, meshinfo_out.numVertices);
-        if ( surfaceSector->extraLight < 0.0 )
-        {
-            v9->ambientLight = 0.0;
-        }
-        else if ( surfaceSector->extraLight > 1.0 )
-        {
-            v9->ambientLight = 1.0;
-        }
-        else
-        {
-            v9->ambientLight = surfaceSector->extraLight;
-        }
+        
+        v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight, 0.0, 1.0);
 
         if ( v9->ambientLight < 1.0 )
         {

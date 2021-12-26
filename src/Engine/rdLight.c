@@ -64,7 +64,7 @@ void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPo
     idkIter = vertices_i_end;
     outLights = vertices_i;
     vertexIter = vertices;
-    for (j = numVertices; j != 1; --j)
+    for (j = 0; j < numVertices; j++)
     {
         *outLights = *idkIter;
         meshLightIter = meshLights;
