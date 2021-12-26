@@ -240,7 +240,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
             jkGuiRend_UpdateAndDrawClickable(clickable, menu, 0);
             clickable = &menu->clickables[++clickableIdx];
         }
-        
+
 #ifdef SDL2_RENDER
         menu->focusedElement = lastFocused;
         menu->lastMouseDownClickable = lastDown;
@@ -664,7 +664,7 @@ void jkGuiRend_DarrayFreeEntry(Darray *array)
 
 int jkGuiRend_sub_5103E0(jkGuiElement *element)
 {
-    return (element->bIsVisible && !element->anonymous_9 && element->type >= 4 && element->type <= 5);
+    return (element->bIsVisible && !element->anonymous_9 && element->type >= ELEMENT_LISTBOX && element->type <= ELEMENT_TEXTBOX);
 }
 
 int jkGuiRend_ElementHasHoverSound(jkGuiElement *element)
@@ -741,8 +741,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
         goto LABEL_47;
     if ( menu->lastMouseOverClickable == clickable )
         menu->lastMouseOverClickable = 0;
-
-    jkGuiRend_RenderIdk2(menu);
+    jkGuiRend_RenderIdk2_alt(menu);
     if ( menu->lastMouseDownClickable == clickable )
         menu->lastMouseDownClickable = 0;
 LABEL_47:
@@ -836,7 +835,61 @@ LABEL_12:
     jkGuiElement* element = &menu->clickables[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
+//#ifndef SDL2_RENDER
         menu->focusedElement = element;
+//#endif
+        if ( focusedElement )
+        {
+            if ( focusedElement != element )
+            {
+                jkGuiRend_UpdateAndDrawClickable(focusedElement, menu, 1);
+                goto LABEL_22;
+            }
+        }
+        else
+        {
+LABEL_22:
+            if ( focusedElement != element )
+                jkGuiRend_UpdateAndDrawClickable(element, menu, 1);
+        }
+    }
+}
+
+void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
+{
+    int idx = 0;
+    jkGuiElement* focusedElement = menu->focusedElement;
+    if ( focusedElement )
+        idx = focusedElement - menu->clickables;
+
+    int idxOther = idx + 1;
+    if ( idx + 1 == idx )
+        return;
+
+    jkGuiElement* iter;
+    while ( 1 )
+    {
+        iter = &menu->clickables[idxOther];
+        if ( menu->clickables[idxOther].type != ELEMENT_END )
+            break;
+        idxOther = -1;
+LABEL_12:
+        if ( ++idxOther == idx )
+            return;
+    }
+    if ( !iter->bIsVisible )
+        goto LABEL_12;
+    if ( iter->anonymous_9 )
+        goto LABEL_12;
+    if ( iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX )
+        goto LABEL_12;
+
+    jkGuiElement* element = &menu->clickables[idxOther];
+    if ( element && jkGuiRend_sub_5103E0(element) )
+    {
+#ifndef SDL2_RENDER
+        menu->focusedElement = element;
+#endif
         if ( focusedElement )
         {
             if ( focusedElement != element )

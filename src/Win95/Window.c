@@ -489,25 +489,25 @@ void Window_SdlUpdate()
                 {
                     if (!event.key.repeat)
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x25, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x25, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x25, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                 {
                     if (!event.key.repeat)
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x27, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x27, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x27, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_UP)
                 {
                     if (!event.key.repeat)
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x26, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x26, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x26, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_DOWN)
                 {
                     if (!event.key.repeat)
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x28, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x28, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x28, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
@@ -533,6 +533,24 @@ void Window_SdlUpdate()
                     if (!event.key.repeat)
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xA1, 0);
                     Window_msg_main_handler(g_hWnd, WM_KEYDOWN, 0xA1, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_TAB)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x9, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x9, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_END)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x23, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x23, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_HOME)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x24, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x24, 0);
                 }
 
                 //if (!event.key.repeat)
@@ -574,6 +592,18 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_RSHIFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xA1, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_TAB)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x9, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_END)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x23, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_HOME)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x24, 0);
                 }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
 

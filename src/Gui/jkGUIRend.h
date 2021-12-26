@@ -170,6 +170,7 @@ int jkGuiRend_InvokeButtonUp(jkGuiElement *clickable, jkGuiMenu *menu, int mouse
 int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 void jkGuiRend_RenderFocused(jkGuiMenu *menu, jkGuiElement *element);
 void jkGuiRend_RenderIdk2(jkGuiMenu *menu);
+void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu);
 void jkGuiRend_RenderAll(jkGuiMenu *menu);
 void jkGuiRend_ClickableMouseover(jkGuiMenu *menu, jkGuiElement *element);
 void jkGuiRend_MouseMovedCallback(jkGuiMenu *menu, int x, int y);
