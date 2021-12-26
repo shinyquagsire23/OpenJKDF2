@@ -1,6 +1,6 @@
 ## Building OpenJKDF2
 
-Building is currently only tested on Arch Linux, Ubuntu, and MacOS. Windows builds require MinGW.
+Building is currently tested primarily on Arch Linux, Ubuntu 20.04, and MacOS Monterey. Windows releases are cross-compiled using MinGW, however MSVC/Visual Studio is supported.
 
 ### 1) Install dependencies
 
@@ -74,6 +74,19 @@ brew install openal-soft sdl2 sdl2_mixer glew
 # WebAssembly
 brew install emscripten
 ```
+</details>
+
+<details>
+  <summary>Windows Dependencies</summary>
+
+Download and install [Python 3.8](https://www.python.org/downloads/release/python-380/) (be sure it is added to your PATH when installing).
+
+Install [cog](https://nedbatchelder.com/code/cog/index.html#h_installation) using pip. You may need to specify `pip3` instead of `pip`.
+
+Download and install the OpenAL 1.1 SDK from [here](https://www.openal.org/downloads/). Then, add `OPENALDIR` to your system environment variables as `C:\Program Files (x86)\OpenAL 1.1 SDK`.
+
+Download and install the latest CMake from [here](https://cmake.org/download/).
+
 </details>
 
 ### 2) Compile the desired target
@@ -178,4 +191,12 @@ make -j10
   <summary>x86 Win32/MinGW hook DLL</summary>
 
 `./build.sh`
+</details>
+
+<details>
+  <summary>x86_64 Windows MSVC/Visual Studio Project</summary>
+
+Run the CMake GUI and select the `OpenJKDF2/` directory for your sources. Create `OpenJKDF2/build` and set it as your build folder. Click `Configure` until it succeeds (for some reason it errors a few times initially), then click `Generate` and `Open Project`.
+
+You'll probably want to set `openjkdf2-64` as the default project, from there it should work and debug as expected.
 </details>
