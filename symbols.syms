@@ -272,7 +272,7 @@ sithSurface_aAvail 0x0084DF4C int[256+1]
 sithSurface_numSurfaces 0x0084E350 int
 sithSurface_aSurfaces 0x0084E358 rdSurface[256]
 sithSurface_bOpened 0x00852F58 int
-sithSurface_byte_8EE668 0x008EE668 uint32_t
+sithSurface_byte_8EE668 0x008EE668 uint32_t = 0
 sithSurface_numSurfaces_0 0x00847F18 int
 
 // rdMaterial

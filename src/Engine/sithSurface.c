@@ -157,6 +157,8 @@ int sithSurface_Load(sithWorld *world)
         if ( _sscanf(stdConffile_entry.args[2].value, "%x", &surfaceIter->surfaceFlags) != 1 )
             return 0;
 
+        surfaceIter->surfaceFlags |= 4;
+
         if ( _sscanf(stdConffile_entry.args[3].value, "%x", &face->type) != 1 )
             return 0;
         if ( (sithSurface_byte_8EE668 & 1) == 0 )
@@ -702,7 +704,7 @@ int sithSurface_StopAnim(rdSurface *surface)
     if ( (surface->flags & SURFACEFLAGS_WATER) != 0 && (surface->flags & SURFACEFLAGS_100000) != 0 )
     {
         v2 = surface->sithSurfaceParent;
-        v2->surfaceFlags &= 0x800;
+        v2->surfaceFlags &= ~0x800;
         surface->field_24.x = 0.0;
         surface->field_24.y = 0.0;
         surface->field_24.z = 0.0;
