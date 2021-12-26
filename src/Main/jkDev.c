@@ -45,10 +45,10 @@ void jkDev_Startup()
 
     jkDev_RegisterCmd(jkDev_CmdDebugFlags, "whiteflag", "Disable AI", 0);
     jkDev_RegisterCmd(jkDev_CmdFly, "eriamjh", "", 0);
-    jkDev_RegisterCmd(jkDev_CmdDebugFlags2, "jediwannabe", "Invul", 0);
+    jkDev_RegisterCmd(jkDev_CmdDebugFlags2, "jediwannabe", "Invul", 5);
     jkDev_RegisterCmd(jkDev_CmdWarp, "warp", "", 0);
     jkDev_RegisterCmd(jkDev_CmdActivate, "activate", "", 0);
-    jkDev_RegisterCmd(jkDev_CmdDebugFlags3, "slowmo", "Slowmo", 0);
+    jkDev_RegisterCmd(jkDev_CmdDebugFlags3, "slowmo", "Slowmo", 7);
     jkDev_RegisterCmd(jkDev_CmdJump, "hyper", "", 0);
     jkDev_RegisterCmd(jkDev_CmdEndLevel2, "thereisnotry", "", 0);
     jkDev_RegisterCmd(jkDev_CmdAllWeapons, "red5", "", 0);
