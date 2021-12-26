@@ -1258,57 +1258,39 @@ void sithControl_FreeCam(sithThing *player)
     }
 }
 
-void sithControl_MapDefaults()
+void sithControl_DefaultHelper(int funcIdx, int dxKeyNum, int flags)
 {
     uint32_t v0; // ecx
     stdControlKeyInfoEntry *v1; // eax
-    uint32_t v2; // eax
-    uint32_t v3; // ecx
-    stdControlKeyInfoEntry *v4; // eax
-    uint32_t v5; // ecx
-    stdControlKeyInfoEntry *v6; // eax
-    uint32_t v7; // ecx
-    stdControlKeyInfoEntry *v8; // eax
-    uint32_t v9; // ecx
-    stdControlKeyInfoEntry *v10; // eax
-    uint32_t v11; // eax
-    uint32_t v12; // ecx
-    stdControlKeyInfoEntry *v13; // eax
-    uint32_t v14; // ecx
-    stdControlKeyInfoEntry *v15; // eax
-    uint32_t v16; // ecx
-    stdControlKeyInfoEntry *v17; // eax
-    uint32_t v18; // ecx
-    stdControlKeyInfoEntry *v19; // eax
-    uint32_t v20; // ecx
-    stdControlKeyInfoEntry *v21; // eax
 
+    if ( (sithControl_inputFuncToControlType[funcIdx] & 1) != 0 && sithControl_aInputFuncToKeyinfo[funcIdx].numEntries != 8 )
+    {
+        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, dxKeyNum);
+        v0 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries + 1;
+        v1 = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[sithControl_aInputFuncToKeyinfo[funcIdx].numEntries];
+        v1->flags = flags;
+        v1->dxKeyNum = dxKeyNum;
+        sithControl_aInputFuncToKeyinfo[funcIdx].numEntries = v0;
+    }
+}
+
+void sithControl_MapDefaults()
+{
     // TODO verify these
-    sithControl_MapFunc(INPUT_FUNC_MLOOK, DIK_V, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_V);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_LEFT, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_LEFT);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_RIGHT, 6);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_RIGHT);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_NUMPAD4, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_NUMPAD4);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_NUMPAD4, 6);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_NUMPAD4);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_LEFT, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_LEFT);
-    sithControl_MapFunc(INPUT_FUNC_TURN, DIK_RIGHT, 6);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_RIGHT);
+    sithControl_DefaultHelper(INPUT_FUNC_MLOOK, DIK_V, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_LEFT, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_RIGHT, 6);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_NUMPAD4, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_NUMPAD4, 6);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_LEFT, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_RIGHT, 6);
 
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_UP, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_UP);
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_DOWN, 6);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_DOWN);
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_W, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_W);
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_S, 6);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_S);
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_NUMPAD8, 2);
-    sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, DIK_NUMPAD8);
+    sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_UP, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_DOWN, 6);
+    sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_W, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_S, 6);
+    sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_NUMPAD8, 2);
+
     sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_NUMPAD2, 4);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_A, 4);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_D, 0);
@@ -1377,9 +1359,9 @@ void sithControl_InputInit()
     sithControl_MapDefaults();
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, DIK_ESCAPE, 4u);
     sithControl_MapAxisFunc(INPUT_FUNC_TURN, 0, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
     sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0);
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HUP, 4);
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HDOWN, 0);
@@ -1397,9 +1379,9 @@ void sithControl_InputInit()
     if ( v8 )
         v8->binaryAxisVal = 4.0;
     
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 }
 
 void sithControl_sub_4D6930(int funcIdx)
@@ -1578,9 +1560,9 @@ LABEL_17:
     v12 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_BACK, 0);
     if ( v12 )
         v12->binaryAxisVal = 4.0;
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
-    sithControl_MapAxisFunc(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 }
 
 void sithControl_sub_4D7350()
