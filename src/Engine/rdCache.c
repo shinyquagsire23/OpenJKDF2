@@ -4,6 +4,7 @@
 #include "Engine/rdActive.h"
 #include "Platform/std3D.h"
 #include "Engine/rdColormap.h"
+#include "General/stdMath.h"
 
 #include <math.h>
 
@@ -473,23 +474,13 @@ int rdCache_SendFaceListToHardware()
 
         if ( v11.mipmap_related != 3 )
         {
-            v26 = 1.0;
+            v26 = v148;
             if ( v11.mipmap_related != 4 )
                 continue;
             if ( lighting_capability == 1 )
             {
-                if ( active_6c->extralight < 0.0 )
-                {
-                    v27 = 0.0;
-                }
-                else if ( active_6c->extralight > 1.0 )
-                {
-                    v27 = 1.0;
-                }
-                else
-                {
-                    v27 = active_6c->extralight;
-                }
+                v27 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+
                 if ( v27 > v148 )
                 {
                     if ( active_6c->extralight >= 0.0 )
@@ -594,7 +585,7 @@ int rdCache_SendFaceListToHardware()
                 }
                 while ( vert_lights_iter_cnt );
 
-                active_6c->light_level_static = v26 * 255.0;
+                //active_6c->light_level_static = v26 * 255.0;
             }
 
             vertex_cnt = active_6c->numVertices;
@@ -787,20 +778,8 @@ int rdCache_SendFaceListToHardware()
 solid_tri:
         if ( lighting_capability == 1 )
         {
-            v77 = 1.0; // Added, TODO: figure out why this is needed? The fan on lv1 switches between 0.0 and shaded, this makes it switch between shaded and 1.0.
-
-            if ( active_6c->extralight < 0.0 )
-            {
-                v78 = 0.0;
-            }
-            else if ( active_6c->extralight > 1.0 )
-            {
-                v78 = 1.0;
-            }
-            else
-            {
-                v78 = active_6c->extralight;
-            }
+            v77 = v148;
+            v78 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
 
 
             if ( v78 > v148 )
@@ -857,7 +836,6 @@ solid_tri:
         }
         else if ( lighting_capability == 3 && active_6c->numVertices )
         {
-            v77 = 1.0;
             v70 = active_6c->vertexIntensities;
             v71 = active_6c->numVertices;
             do
@@ -898,6 +876,7 @@ solid_tri:
                 --v71;
             }
             while ( v71 );
+            goto LABEL_232;
         }
         else
         {
