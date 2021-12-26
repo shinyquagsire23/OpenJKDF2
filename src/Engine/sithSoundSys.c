@@ -557,6 +557,9 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
     jkGuiSound_numChannels = 256;
 #endif
 
+    // Added: Prevent undef usage
+    rdVector_Zero3(&a1);
+
     v34 = 50.0;
     if ( sithSoundSys_bOpened )
     {
