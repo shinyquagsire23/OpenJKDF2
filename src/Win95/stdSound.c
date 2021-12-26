@@ -5,6 +5,7 @@
 
 #include "jk.h"
 
+float stdSound_fMenuVolume = 1.0f;
 
 uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
 {
@@ -98,6 +99,7 @@ void stdSound_Shutdown()
 
 void stdSound_SetMenuVolume(float a1)
 {
+    stdSound_fMenuVolume = a1;
 }
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
@@ -307,7 +309,7 @@ void stdSound_BufferSetVolume(stdSound_buffer_t* sound, float vol)
 {
     if (!sound) return;
     
-    sound->vol = vol;
+    sound->vol = vol * stdSound_fMenuVolume;
     if (!sound->source)
         return;
 
@@ -398,7 +400,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16
     out->nSamplesPerSec = nSamplesPerSec;
     out->bitsPerSample = bitsPerSample;
     out->refcnt = 1;
-    out->vol = 1.0;
+    out->vol = 1.0 * stdSound_fMenuVolume;
     
     out->format = 0;
     

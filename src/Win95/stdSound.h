@@ -87,6 +87,7 @@ typedef struct stdWaveFormat
 
 uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
 
+extern float stdSound_fMenuVolume;
 
 static void (*stdSound_3DBufferRelease)(stdSound_buffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 

@@ -471,6 +471,10 @@ void jkGuiRend_PlayWav(char *fpath)
         if ( jkGuiRend_LoadedSounds[i] && !__strcmpi(jkGuiRend_LoadedSounds[i], fpath) )
         {
             stdSound_BufferReset(jkGuiRend_DsoundHandles[i]);
+            
+            // Added
+            stdSound_BufferSetVolume(jkGuiRend_DsoundHandles[i], 1.0f);
+            
             stdSound_BufferPlay(jkGuiRend_DsoundHandles[i], 0);
             return;
         }
@@ -496,6 +500,11 @@ void jkGuiRend_PlayWav(char *fpath)
         char* soundPath = (char *)std_pHS->alloc(_strlen(fpath) + 1);
         _strcpy(soundPath, fpath);
         jkGuiRend_LoadedSounds[0] = soundPath;
+
+        // Added
+        stdSound_BufferSetVolume(newHandle, 1.0f);
+            
+
         stdSound_BufferPlay(newHandle, 0);
     }
 }
