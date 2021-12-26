@@ -787,6 +787,8 @@ int rdCache_SendFaceListToHardware()
 solid_tri:
         if ( lighting_capability == 1 )
         {
+            v77 = 1.0; // Added, TODO: figure out why this is needed? The fan on lv1 switches between 0.0 and shaded, this makes it switch between shaded and 1.0.
+
             if ( active_6c->extralight < 0.0 )
             {
                 v78 = 0.0;
@@ -799,6 +801,8 @@ solid_tri:
             {
                 v78 = active_6c->extralight;
             }
+
+
             if ( v78 > v148 )
             {
                 if ( active_6c->extralight >= 0.0 )
@@ -853,6 +857,7 @@ solid_tri:
         }
         else if ( lighting_capability == 3 && active_6c->numVertices )
         {
+            v77 = 1.0;
             v70 = active_6c->vertexIntensities;
             v71 = active_6c->numVertices;
             do
