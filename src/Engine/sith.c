@@ -69,8 +69,14 @@ int sith_Startup(struct common_functions *commonFuncs)
     sithWeapon_Startup();
 
 #ifndef NO_JK_MMAP
-    _memset(&g_sithMode, 0, 0x18u);
+    //_memset(&g_sithMode, 0, 0x18u);
 #endif
+    g_sithMode = 0;
+    g_submodeFlags = 0;
+    sithSurface_byte_8EE668 = 0;
+    g_debugmodeFlags = 0;
+    jkPlayer_setDiff = 0;
+    g_mapModeFlags = 0;
 
     if ( !is_started )
         return 0;
@@ -130,21 +136,9 @@ int sith_Mode1Init(char *a1)
 
     sithTime_Startup();
     sithWorld_Initialize();
-    bShowInvisibleThings = 0;
-    sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
-    sithEvent_Open();
-    sithSurface_Open();
-    sithAI_Open();
-    sithSoundSys_Open();
-    sithCog_Open();
-    sithControl_Open();
-    sithAIAwareness_Startup();
-    sithRender_Open();
-    sithWeapon_InitializeEntry();
+    sith_Open();
     sithTime_Startup();
     g_sithMode = 1;
-    sith_bOpened = 1;
     return 1;
 }
 
@@ -156,19 +150,7 @@ int sithOpenNormal(char *path)
         return 0;
 
     sithWorld_Initialize();
-    bShowInvisibleThings = 0;
-    sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
-    sithEvent_Open();
-    sithSurface_Open();
-    sithAI_Open();
-    sithSoundSys_Open();
-    sithCog_Open();
-    sithControl_Open();
-    sithAIAwareness_Startup();
-    sithRender_Open();
-    sithWeapon_InitializeEntry();
-    sith_bOpened = 1;
+    sith_Open();
     g_sithMode = 1;
     return 1;
 }
@@ -178,19 +160,7 @@ int sith_Mode1Init_3(char *fpath)
     sithWorld_pCurrentWorld = sithWorld_New();
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
         return 0;
-    bShowInvisibleThings = 0;
-    sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
-    sithEvent_Open();
-    sithSurface_Open();
-    sithAI_Open();
-    sithSoundSys_Open();
-    sithCog_Open();
-    sithControl_Open();
-    sithAIAwareness_Startup();
-    sithRender_Open();
-    sithWeapon_InitializeEntry();
-    sith_bOpened = 1;
+    sith_Open();
     sithTime_Startup();
     sithMulti_Startup();
     g_sithMode = 1;

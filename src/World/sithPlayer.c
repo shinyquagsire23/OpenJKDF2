@@ -141,6 +141,9 @@ void sithPlayer_idk(int idx)
 
     g_localPlayerThing->thingflags &= ~0x100u;
 
+    // Added: idk why this is needed?
+    g_localPlayerThing->thingtype = SITH_THING_PLAYER;
+
     _wcsncpy(g_selfPlayerInfo->player_name, jkPlayer_playerShortName, 0x1Fu);
     g_selfPlayerInfo->player_name[31] = 0;
 

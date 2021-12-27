@@ -338,13 +338,7 @@ void jkGuiMouse_sub_417210()
         {
             v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_556698, v2[1].mouseEntryIdx);
         }
-        //jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
-        _memset(v5, 0, sizeof(v5));
-        if (v3)
-            __wcsncpy(v5, v3, 255);
-        __wcscat(v5, L"\t");
-        if (v4)
-            __wcscat(v5, v4);
+        jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
 
         if ( i >= 3 || (stdControl_aJoysticks[v2->dxKeyNum].flags & 1) != 0 )
             jkGuiRend_DarrayReallocStr(&jkGuiMouse_Darray_5566B8, v5, i);
@@ -404,10 +398,7 @@ int jkGuiMouse_EnumBindings(int a1, char *a2, uint32_t a3, int a4, uint32_t a5, 
             return 1;
         v9 = v15;
     }
-    //jk_snwprintf(v17, 0xFFu, L"%ls%ls", v9, v8);
-    _memset(v17, 0, sizeof(v17));
-    __wcsncpy(v17, v9, 255);
-    __wcscat(v17, v8);
+    jk_snwprintf(v17, 0xFFu, L"%ls%ls", v9, v8);
     if ( v7 )
     {
         v11 = jkGuiMouse_Darray_556698.total;

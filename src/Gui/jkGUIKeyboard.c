@@ -277,12 +277,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, char *pInputFuncStr, uint32_t a
 LABEL_25:
                 v9 = jkStrings_GetText(v11);
             }
-            //_snwprintf(wStr, 0xFFu, L"%ls%ls\t%ls", v17, v8, v9);
-            memset(wStr, 0, sizeof(wStr));
-            _wcscpy(wStr, v17);
-            __wcscat(wStr, v8);
-            __wcscat(wStr, L"\t");
-            __wcscat(wStr, v9);
+            jk_snwprintf(wStr, 0xFFu, L"%ls%ls\t%ls", v17, v8, v9);
 
             v14 = (jkGuiKeyboardEntry *)pHS->alloc(sizeof(jkGuiKeyboardEntry));
             if ( v14 )
@@ -334,13 +329,7 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     v7 = __wcschr(v6, '\t');
     __wcsncpy(v9, v6, v7 - v6);
     v8 = jkStrings_GetText("GUI_HIT_KEY_TO_ATTACH");
-    //jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
-
-    memset(jkGuiKeyboard_wstr_555E18, 0, 0x100 * sizeof(wchar_t));
-    size_t len = _wcslen(v8);
-    __wcsncpy(jkGuiKeyboard_wstr_555E18, v8, len - 6);
-    __wcscat(jkGuiKeyboard_wstr_555E18, v9);
-    __wcscat(jkGuiKeyboard_wstr_555E18, L"...");
+    jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
 
     return 0;
 }

@@ -394,20 +394,7 @@ LABEL_24:
 LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;
             v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
-            //jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
-            int i = 0;
-            for (i = 0; i < 256; i++)
-            {
-                v31[i] = v22[i];
-                if (!v22[i]) break;
-            }
-            v31[i++] = '~';
-            int i_shift = i;
-            for (i; i < 256; i++)
-            {
-                v31[i] = v28[i-i_shift];
-                if (!v28[i-i_shift]) break;
-            }
+            jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
             sithGamesave_Write(v30, 1, 1, v31);
             sithGamesave_WriteEntry();
             goto LABEL_45;

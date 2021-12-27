@@ -532,6 +532,7 @@ void jk_init()
 
 #ifdef PLATFORM_POSIX
 #include <ctype.h>
+#include "wprintf.h"
 
 int _sscanf(const char * s, const char * format, ...)
 {
@@ -683,6 +684,7 @@ size_t _wcslen(const wchar_t * str)
 
 int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
 {
+#if 0
     char* tmp_fmt = malloc(_wcslen(fmt)+1);
     char* tmp_out = malloc(a2+1);
     
@@ -697,6 +699,14 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     
     free(tmp_fmt);
     free(tmp_out);
+    return ret;
+#endif
+
+    va_list args;
+    va_start (args, fmt);
+    int ret = vsnwprintf_(a1, a2, fmt, args);
+    va_end(args);
+
     return ret;
 }
 
@@ -816,9 +826,9 @@ int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
 #ifdef ARCH_WASM
     return vswprintf(a, b, fmt, list);
 #elif defined(MACOS) || defined(WIN64_STANDALONE)
-    return 0;//vswprintf(a,b,fmt,list);
+    return vsnwprintf_(a,b, fmt,list);
 #else
-    return vswprintf(a, fmt, list);
+    return vsnwprintf_(a, b, fmt, list);
 #endif
 }
 

@@ -67,22 +67,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
             if ( v15 )
             {
                 v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
-                //jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetText("GUI_SLQUICKSAVE"));
-                
-                wchar_t* other = jkStrings_GetText("GUI_SLQUICKSAVE");
-                int i = 0;
-                for (i = 0; i < 256; i++)
-                {
-                    a4[i] = v2[i];
-                    if (!v2[i]) break;
-                }
-                a4[i++] = '~';
-                int i_shift = i;
-                for (i; i < 256; i++)
-                {
-                    a4[i] = other[i-i_shift];
-                    if (!other[i-i_shift]) break;
-                }
+                jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetText("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Write("quicksave.jks", 1, 0, a4);
                 DebugConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
