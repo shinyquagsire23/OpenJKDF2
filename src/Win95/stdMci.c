@@ -220,8 +220,10 @@ void stdMci_trackStart(int track)
 {
     char tmp[256];
  
-    if (stdMci_music)
+    if (stdMci_music) {
+        Mix_HaltMusic();
         Mix_FreeMusic(stdMci_music);
+    }
 
     int cdNum = 1;
     if(jkMain_pEpisodeEnt)
@@ -303,6 +305,7 @@ void stdMci_trackStart(int track)
     if (!stdMci_music) return;
 
 done:
+    Mix_HaltMusic();
     Mix_PlayMusic(stdMci_music, 0);
     Mix_HookMusicFinished(stdMci_trackFinished);
     printf("INFO: Playing music `%s'\n", tmp);
