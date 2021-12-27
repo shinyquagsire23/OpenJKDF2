@@ -107,6 +107,9 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
         return;
     }
 
+    // Added: Fix a crash?
+    if (!thing->hierarchyNodeMatrices) return;
+
     if ( !puppet || puppet->paused )
     {
         for (int i = 0; i < model->numHierarchyNodes; i++)
