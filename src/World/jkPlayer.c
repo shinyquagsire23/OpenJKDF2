@@ -723,7 +723,7 @@ float jkPlayer_CalcAlignment(int isMp)
             totalPeds = 1.0;
 
         float pedRatio = pedsKilled / totalPeds * 100.0;
-        if (pedRatio) // ??
+        if (pedsKilled / totalPeds <= 0.0) // ??
             alignment -= -20.0;
         else
             alignment -= pedRatio - -20.0;
