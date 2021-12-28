@@ -338,6 +338,10 @@ endif()
 
 if(TARGET_MACOS)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended/nfd_cocoa.m)
+    file(GLOB TARGET_MACOS_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/macOS/*.c)
+    list(APPEND SOURCE_FILES ${TARGET_MACOS_SRCS})
+    file(GLOB TARGET_MACOS_M_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/macOS/*.m)
+    list(APPEND SOURCE_FILES ${TARGET_MACOS_M_SRCS})
 
     add_definitions(-DMACOS)
     add_definitions(-DLINUX)

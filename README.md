@@ -27,6 +27,9 @@ The following implementations are in-progress or planned:
 
 | Configuration | Renderer | Description |
 | --- | --- | --- |
+| Android | OpenGL ES 3 | Not a huge priority, but would be nice to have. |
+| iOS | Metal? | Not a huge priority, but would be nice to have. |
+| Switch libnx | OpenGL ES 3 | Not a huge priority, but would be nice to have. |
 | 32-bit Windows/SDL2 | OpenGL 3.3 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Unimplemented functions use JK.EXE as a binary blob? |
 
 Linux building works on AArch64/RPi4 with llvmpipe, but V3D GLES has trouble with palettes.

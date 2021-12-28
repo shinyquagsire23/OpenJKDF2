@@ -317,6 +317,7 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 #include <GL/glew.h>
 #ifdef MACOS
+#include "Platform/macOS/SDL_fix.h"
 #else
 #include <GL/gl.h>
 #endif
@@ -813,6 +814,10 @@ void Window_RecreateSDL2Window()
         exit (-1);
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
+
+#ifdef MACOS
+    SDL_FixWindowMacOS(displayWindow);
+#endif
 
     if (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
         SDL_SetWindowFullscreen(displayWindow, flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
