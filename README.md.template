@@ -114,7 +114,7 @@ See [here](BUILDING.md) for instructions.
    - Multiplayer character builder
  - Map view in ESC menu
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
- - Subtitles and credits
+ - The credits screen
  - In-game screenshots
 
 ## Usage with original JK.EXE and DirectX using hooks
