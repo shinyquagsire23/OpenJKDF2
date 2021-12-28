@@ -326,6 +326,15 @@ static smk smk_open_generic(const unsigned char m, union smk_read_t fp, unsigned
 			/* Bits 25 & 24 are unused. */
 			s->audio[temp_l].rate = (temp_u & 0x00FFFFFF);
 		}
+		else if (temp_u == 4)
+		{
+			s->audio[temp_l].exists = 1;
+			smk_malloc(s->audio[temp_l].buffer, s->audio[temp_l].max_buffer);
+			s->audio[temp_l].compress = 0;
+			s->audio[temp_l].bitdepth = 0;
+			s->audio[temp_l].channels = 0;
+			s->audio[temp_l].rate = 4;
+		}
 	}
 
 	/* Skip over Dummy field */

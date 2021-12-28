@@ -394,6 +394,7 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
     stdVBuffer *vbuf2; // [esp+10h] [ebp-18h]
     wchar_t *v30; // [esp+14h] [ebp-14h]
     rdRect rect; // [esp+18h] [ebp-10h] BYREF
+    int tmp;
 
     v7 = a5;
     v8 = 0;
@@ -413,7 +414,7 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
         {
             do
             {
-                v13 = stdFont_sub_4352C0(v13, v9, v10->x, v10, &font);
+                v13 = stdFont_sub_4352C0(v13, v9, v10->x, v10, &tmp);
                 ++v8;
             }
             while ( v13 );
@@ -700,6 +701,9 @@ WCHAR* stdFont_sub_4352C0(WCHAR *a1, stdFont *a2, int a3, rdRect *a4, int *a5)
     WCHAR *v24; // [esp+18h] [ebp-4h]
     int v25; // [esp+20h] [ebp+4h]
 
+    // Added: nullptr check
+    if (!a1) return NULL;
+
     v5 = a1;
     v6 = 0;
     v7 = *a1;
@@ -864,6 +868,7 @@ int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4)
     wchar_t *v3; // eax
     int v4; // edi
     rdRect *v5; // esi
+    int tmp;
 
     v3 = a2;
     v4 = 0;
@@ -872,7 +877,7 @@ int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4)
         v5 = a4;
         do
         {
-            v3 = stdFont_sub_4352C0(v3, a1, v5->x, v5, (int *)&a2);
+            v3 = stdFont_sub_4352C0(v3, a1, v5->x, v5, &tmp);
             ++v4;
         }
         while ( v3 );
