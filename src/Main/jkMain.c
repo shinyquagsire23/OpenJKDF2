@@ -48,7 +48,7 @@
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
-#define TICKRATE_MS (1000 / jkPlayer_fpslimit) // no cap
+#define TICKRATE_MS (jkPlayer_fpslimit ? 1000 / jkPlayer_fpslimit : 0) // no cap
 #else
 #define TICKRATE_MS (20) // 50fps
 #endif
