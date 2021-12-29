@@ -118,9 +118,14 @@ extern int jkPlayer_fov;
 extern int jkPlayer_fovIsVertical;
 extern int jkPlayer_enableTextureFilter;
 extern int jkPlayer_enableOrigAspect;
+extern int jkPlayer_fpslimit;
+extern int jkPlayer_enableVsync;
 
 #define FOV_MIN (40)
 #define FOV_MAX (170)
+
+#define FPS_LIMIT_MIN (0)
+#define FPS_LIMIT_MAX (360)
 #endif
 
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;

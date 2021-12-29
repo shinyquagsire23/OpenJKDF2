@@ -44,10 +44,11 @@
 #include "General/util.h"
 #include "General/stdBitmap.h"
 #include "General/stdPalEffects.h"
+#include "World/jkPlayer.h"
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
-#define TICKRATE_MS (0) // no cap
+#define TICKRATE_MS (1000 / jkPlayer_fpslimit) // no cap
 #else
 #define TICKRATE_MS (20) // 50fps
 #endif
@@ -126,8 +127,12 @@ void jkMain_GuiAdvance()
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
-                if ( g_app_suspended && jkSmack_currentGuiState != 6 )
+                if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
+#ifdef SDL2_RENDER
+                    if (jkMain_lastTickMs == v1)
+#endif
                     jkGame_Update();
+                }
                 game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }
@@ -235,8 +240,12 @@ void jkMain_EscapeMenuTick(int a2)
                     jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
                     jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                     v3 = stdPlatform_GetTimeMsec();
-                    if ( g_app_suspended && a2 != 6 )
+                    if ( g_app_suspended && a2 != 6 ) {
+#ifdef SDL2_RENDER
+                    if (jkMain_lastTickMs == v1)
+#endif
                         jkGame_Update();
+                    }
                     game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
@@ -524,8 +533,12 @@ void jkMain_GameplayTick(int a2)
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
-                if ( g_app_suspended && a2 != 6 )
+                if ( g_app_suspended && a2 != 6 ) {
+#ifdef SDL2_RENDER
+                    if (jkMain_lastTickMs == v1)
+#endif
                     jkGame_Update();
+                }
                 game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }

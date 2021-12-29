@@ -7,6 +7,7 @@
 #include "Main/jkGame.h"
 #include "Gui/jkGUI.h"
 #include "Win95/stdDisplay.h"
+#include "World/jkPlayer.h"
 #include "Platform/stdControl.h"
 #include "stdPlatform.h"
 
@@ -697,6 +698,13 @@ void Window_SdlUpdate()
     //printf("%u\n", SDL_GetTicks() - Window_lastSampleTime);
     Window_lastSampleTime = SDL_GetTicks();
 
+    static int jkPlayer_enableVsync_last = 0;
+
+    if (jkPlayer_enableVsync_last != jkPlayer_enableVsync)
+    {
+        SDL_GL_SetSwapInterval(jkPlayer_enableVsync);
+    }
+
     if (!jkGame_isDDraw)
     {
         // Restore menu mouse position
@@ -734,6 +742,8 @@ void Window_SdlUpdate()
             SDL_SetRelativeMouseMode(SDL_FALSE);
         }
     }
+
+    jkPlayer_enableVsync_last = jkPlayer_enableVsync;
 
     last_jkGame_isDDraw = jkGame_isDDraw;
 }
@@ -845,7 +855,7 @@ void Window_RecreateSDL2Window()
     }
 
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
-    SDL_GL_SetSwapInterval(0); // Disable vsync
+    SDL_GL_SetSwapInterval(jkPlayer_enableVsync); // Disable vsync
     SDL_StartTextInput();
 
     SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);

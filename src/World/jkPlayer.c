@@ -35,6 +35,8 @@ int jkPlayer_fov = 90;
 int jkPlayer_fovIsVertical = 0;
 int jkPlayer_enableTextureFilter = 0;
 int jkPlayer_enableOrigAspect = 0;
+int jkPlayer_fpslimit = 0;
+int jkPlayer_enableVsync = 0;
 #endif
 
 int jkPlayer_LoadAutosave()
@@ -258,6 +260,8 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdConffile_Printf("windowfullscreen %d\n", Window_isFullscreen);
         stdConffile_Printf("texturefiltering %d\n", jkPlayer_enableTextureFilter);
         stdConffile_Printf("originalaspect %d\n", jkPlayer_enableOrigAspect);
+        stdConffile_Printf("fpslimit %d\n", jkPlayer_fpslimit);
+        stdConffile_Printf("enablevsync %d\n", jkPlayer_enableVsync);
 #endif
         stdConffile_CloseWrite();
     }
@@ -360,6 +364,17 @@ int jkPlayer_ReadConf(wchar_t *name)
             _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
             jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
         }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "fpslimit %d", &jkPlayer_fpslimit);
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "enablevsync %d", &jkPlayer_enableVsync);
+            jkPlayer_enableVsync = !!jkPlayer_enableVsync;
+        }
 #endif
         stdConffile_Close();
         return 1;
@@ -417,7 +432,7 @@ void jkPlayer_DrawPov()
 #ifndef QOL_IMPROVEMENTS
         float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
-        float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag * (sithTime_deltaSeconds / 0.02); // scale animation to be in line w/ 50fps og limit
+        float waggleAmt = (fabs(player->waggle) > sithTime_deltaSeconds ? sithTime_deltaSeconds : fabs(player->waggle)) * jkPlayer_waggleMag; // scale animation to be in line w/ 50fps og limit
 #endif
         if ( waggleAmt == 0.0 )
             jkPlayer_waggleAngle = 0.0;
@@ -430,7 +445,6 @@ void jkPlayer_DrawPov()
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel;
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
-
         jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
         jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
