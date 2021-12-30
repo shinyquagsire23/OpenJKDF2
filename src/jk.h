@@ -256,6 +256,7 @@ static wchar_t* (*__wcscat)(wchar_t *a1, const wchar_t *a2) = (void*)0x513060;
 static wchar_t* (*__wcschr)(const wchar_t *, wchar_t) = (void*)0x005133B0;
 static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (void*)0x00512C70;
 static wchar_t* (*__wcsrchr)(const wchar_t *, wchar_t) = (void*)0x00514650;
+static char* (*_strstr)(const char *, const char *) = (void*)0x00513980;
 #else
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);
@@ -342,6 +343,7 @@ wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
 wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int __snprintf(char *, size_t, const char *, ...);
 int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
+char* _strstr(const char* a, const char* b);
 #endif
 
 int _strlen(const char *str);

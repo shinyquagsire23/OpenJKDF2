@@ -1132,6 +1132,18 @@ void jkMain_CreditsLeave()
     jkCredits_Skip();
 }
 
+int jkMain_SwitchTo13()
+{
+    signed int result; // eax
+
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 13;
+    return result;
+}
+
 #ifdef SDL2_RENDER
 void jkMain_FixRes()
 {

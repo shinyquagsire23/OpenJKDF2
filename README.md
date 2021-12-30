@@ -114,7 +114,6 @@ See [here](BUILDING.md) for instructions.
    - Multiplayer character builder
  - Map view in ESC menu
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
- - The credits screen
  - In-game screenshots
 
 ## Usage with original JK.EXE and DirectX using hooks
@@ -265,7 +264,7 @@ sithSector                     0x806      0.190%        90.458%        11 / 13
 sithMap                        0x814      0.192%        3.046%          2 / 6          
 Main                           0x87b      0.201%        96.868%         3 / 4          
 jkGuiMultiTally                0x8aa      0.206%        0.000%          0 / 7          
-jkCredits                      0x8e4      0.211%        6.722%          2 / 6          
+jkCredits                      0x8e4      0.211%        54.350%         5 / 6          
 jkGuiNet                       0x94e      0.221%        0.000%          0 / 10         
 stdColor                       0x97e      0.225%        24.198%         3 / 11         
 jkGame                         0x98f      0.227%        42.705%         8 / 13         
@@ -289,7 +288,7 @@ sithCamera                     0x124b     0.434%        98.612%        19 / 23
 sithIntersect                  0x12a8     0.443%        92.588%         9 / 12         
 jkGuiDisplay                   0x12ff     0.451%        0.000%          0 / 11         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
-jkMain                         0x16cd     0.541%        85.678%        39 / 53         
+jkMain                         0x16cd     0.541%        86.294%        40 / 53         
 rdPrimit3                      0x16e0     0.543%        88.268%         6 / 9          
 sithDSS                        0x175d     0.554%        96.673%        20 / 22         
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
@@ -313,10 +312,10 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-49.047% by weight
-82.835% by weight excluding rasterizer
-2338 / 3169 functions
-2338 / 2798 functions excluding rasterizer
+49.151% by weight
+83.010% by weight excluding rasterizer
+2342 / 3169 functions
+2342 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
@@ -326,11 +325,11 @@ stdPlatform    0.238%           24 / 43
 std            2.404%           81 / 359
 jkGui          2.871%           91 / 284
 rd             0.307%           15 / 345
-jk             0.767%           57 / 324
+jk             0.664%           53 / 324
 Raster         40.778%         370 / 371
 other          0.916%           38 / 120
 -----------------------------------------
-total          50.953%         831 / 3169
+total          50.849%         827 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
@@ -340,9 +339,9 @@ stdPlatform    0.402%           24 / 43
 std            4.059%           81 / 359
 jkGui          4.849%           91 / 284
 rd             0.518%           15 / 345
-jk             1.296%           57 / 324
+jk             1.121%           53 / 324
 other          1.548%           38 / 120
 -----------------------------------------
-total          17.184%         461 / 2798
+total          17.009%         457 / 2798
 
 ```

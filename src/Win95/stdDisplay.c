@@ -179,7 +179,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
 
 int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
 {
-    return 1;
+    return stdDisplay_VBufferFill(buf, fillColor, rect);
 }
 
 
@@ -332,9 +332,47 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     uint8_t* dstPixels = vbuf->sdlSurface->pixels;
     uint32_t srcStride = vbuf2->format.width_in_bytes;
     uint32_t dstStride = vbuf->format.width_in_bytes;
+
+    int self_copy = 0;
+
+    if (dstPixels == srcPixels)
+    {
+        size_t buf_len = srcStride * dstRect.w * dstRect.h;
+        uint8_t* dstPixels = malloc(buf_len);
+        int has_alpha = 0;//!(rect->width == 640);
+
+        SDL_Rect dstRect_inter = {0, 0, rect->width, rect->height};
+
+        printf("%p %p %zx\n", dstPixels, srcPixels, buf_len);
+        
+        for (int i = 0; i < rect->width; i++)
+        {
+            for (int j = 0; j < rect->height; j++)
+            {
+                if ((uint32_t)(i + srcRect.x) > (uint32_t)vbuf2->format.width) continue;
+                if ((uint32_t)(j + srcRect.y) > (uint32_t)vbuf2->format.height) continue;
+                
+                uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
+
+                if (!pixel && has_alpha) continue;
+                if ((uint32_t)(i + dstRect_inter.x) > (uint32_t)vbuf->format.width) continue;
+                if ((uint32_t)(j + dstRect_inter.y) > (uint32_t)vbuf->format.height) continue;
+
+                dstPixels[(i + dstRect_inter.x) + ((j + dstRect_inter.y)*srcStride)] = pixel;
+            }
+        }
+        
+        
+
+        srcPixels = dstPixels;
+        srcRect.x = 0;
+        srcRect.y = 0;
+
+        self_copy = 1;
+    }
     
     int once = 0;
-    int has_alpha = !(rect->width == 640);
+    int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
     
     for (int i = 0; i < rect->width; i++)
     {
@@ -351,6 +389,11 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
             dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
         }
+    }
+
+    if (self_copy)
+    {
+        free(srcPixels);
     }
     
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check

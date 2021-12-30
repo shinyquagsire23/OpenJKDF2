@@ -561,10 +561,22 @@ Main_path 0x008606E4 char[128]
 debug_log_fp 0x00552880 stdFile_t = 0
 pHS 0x860440 common_functions*
 
+jkCredits_aPalette 0x0055AA60 char[0x300]
+jkCredits_pVbuffer2 0x0055AD60 stdVBuffer*
+jkCredits_dword_55AD64 0x0055AD64 int
+jkCredits_dword_55AD68 0x0055AD68 int
 jkCredits_table 0x0055AD70 stdStrTable
+jkCredits_startMs 0x0055AD80 int
+jkCredits_dword_55AD84 0x0055AD84 int
+jkCredits_strIdx 0x0055AD88 int
+jkCredits_aIdk 0x0055AD8C char*
+jkCredits_pVbuffer 0x0055AD90 stdVBuffer*
+jkCredits_dword_55AD94 0x0055AD94 int
 jkCredits_fontLarge 0x0055AD98 stdFont*
 jkCredits_fontSmall 0x0055AD9C stdFont*
+jkCredits_dword_55ADA0 0x0055ADA0 int
 jkCredits_bInitted 0x0055ADA4 int
+jkCredits_dword_55ADA8 0x0055ADA8 int
 
 g_sithMode 0x8EE660 int
 g_submodeFlags 0x8EE664 int

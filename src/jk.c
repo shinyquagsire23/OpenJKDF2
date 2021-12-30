@@ -682,6 +682,11 @@ size_t _wcslen(const wchar_t * str)
     return len;
 }
 
+char* _strstr(const char* a, const char* b)
+{
+    return strstr(a,b);
+}
+
 int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
 {
 #if 0
@@ -964,7 +969,7 @@ void jk_ReleaseDC()
 
 void jk_SetFocus(HWND hWnd)
 {
-    assert(0);
+    //assert(0);
 }
 
 void jk_SetActiveWindow(HWND hWnd)

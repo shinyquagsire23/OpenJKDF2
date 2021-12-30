@@ -13,10 +13,14 @@
 
 void jkCredits_Initialize(char *fpath);
 void jkCredits_Shutdown();
+int jkCredits_Show();
+int jkCredits_Tick();
+int jkCredits_Skip();
+int jkCredits_Handler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5);
 
-static int (*jkCredits_Show)() = (void*)jkCredits_Show_ADDR;
-static void (*jkCredits_Skip)() = (void*)jkCredits_Skip_ADDR;
-static int (*jkCredits_Tick)() = (void*)jkCredits_Tick_ADDR;
+//static int (*jkCredits_Show)() = (void*)jkCredits_Show_ADDR;
+//static void (*jkCredits_Skip)() = (void*)jkCredits_Skip_ADDR;
+//static int (*jkCredits_Tick)() = (void*)jkCredits_Tick_ADDR;
 
 //static void (*jkCredits_Initialize)() = (void*)jkCredits_Initialize_ADDR;
 
