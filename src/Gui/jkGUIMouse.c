@@ -18,6 +18,9 @@
 #include "Main/jkStrings.h"
 #include "Engine/sithControl.h"
 
+#include <math.h>
+#include <float.h>
+
 static const int jkGUIMouse_idk1 = 0xAA;
 static int aIdk_52B170[2] = {0xd, 0xe};
 static int aIdk_52B168[2] = {0x13, 0x11};
@@ -160,9 +163,9 @@ LABEL_30:
                 jkGuiMouse_aElements[18].bIsVisible = (v14 >> 3) & 1;
                 jkGuiMouse_aElements[20].bIsVisible = 1;
                 if ( v13 > 1.0 )
-                    v15 = (__int64)((v13 - 1.0) * 16.666666) + 50;
+                    v15 = (__int64)ceilf(((v13 - 1.0) * 16.666666) + 50);
                 else
-                    v15 = (__int64)((v13 - 0.25) * 66.666664);
+                    v15 = (__int64)ceilf(((v13 - 0.25) * 66.666664));
                 jkGuiMouse_aElements[20].selectedTextEntry = v15;
                 v16 = ((unsigned int)v12->bitflag >> 3) & 1;
                 jkGuiMouse_aElements[17].selectedTextEntry = ((unsigned int)~v12->bitflag >> 2) & 1;
