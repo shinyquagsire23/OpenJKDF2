@@ -34,6 +34,8 @@
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 #define TEX_MODE_BILINEAR 2
+#define TEX_MODE_16BPP 5
+#define TEX_MODE_BILINEAR_16BPP 6
 
 static bool has_initted = false;
 static GLuint fb;
@@ -898,10 +900,21 @@ void std3D_DrawRenderList()
                     glBindTexture(GL_TEXTURE_2D, tex_id);
 
                 if (!jkPlayer_enableTextureFilter)
-                    glUniform1i(uniform_tex_mode, TEX_MODE_WORLDPAL);
+                    glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
                 else
-                    glUniform1i(uniform_tex_mode, TEX_MODE_BILINEAR);
+                    glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
                 
+                if (jkPlayer_enableTextureFilter && tex->is_16bit)
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                }
+                else
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                }
+
                 if (tex_id == 0)
                     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
             }
@@ -1019,9 +1032,24 @@ int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 
 void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH)
 {
-    // TODO
-    *outW = inW;
-    *outH = inH;
+    // TODO hack for JKE? I don't know what they're doing
+    if (inW >= 512)
+    {
+         *outW = inW / 2;
+    }
+    else
+    {
+        *outW = inW;
+    }
+
+    if (inH >= 512)
+    {
+        *outH = inH / 2;
+    }
+    else
+    {
+        *outH = inH;
+    }
 }
 
 int std3D_DrawOverlay()
@@ -1077,7 +1105,7 @@ int std3D_ClearZBuffer()
     return 1;
 }
 
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16bit_maybe, int no_alpha)
+int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     //printf("Add to texture cache\n");
     
@@ -1090,6 +1118,27 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     uint32_t width, height;
     width = vbuf->format.width;
     height = vbuf->format.height;
+
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
+    if (vbuf->format.format.is16bit)
+    {
+        texture->is_16bit = 1;
+        if (!is_alpha_tex)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+    }
+    else
+    {
+        texture->is_16bit = 0;
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+    }
 
 #if 0    
     void* image_data = malloc(width*height*4);
@@ -1131,13 +1180,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_16
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 #endif
 
-    glBindTexture(GL_TEXTURE_2D, image_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+    
+    
     
     std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
     std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;

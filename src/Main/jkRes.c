@@ -254,6 +254,25 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
 
     jkRes_UnhookHS();
 
+    // Add a mods dir which always overrides resource/
+    if (!_strcmp(name, "resource"))
+    {
+        v15 = stdFileUtil_NewFind("mods", 3, "gob");
+        while (stdFileUtil_FindNext(v15, &v18))
+        {
+            if ( resGob->numGobs >= 0x40u )
+                break;
+            if ( v18.fpath[0] != '.' )
+            {
+                __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", "mods", LEC_PATH_SEPARATOR_CHR, v18.fpath);
+                resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+                if ( resGob->gobs[resGob->numGobs] )
+                    resGob->numGobs++;
+            }
+        }
+    }
+
     v15 = stdFileUtil_NewFind(name, 3, "gob");
     while (stdFileUtil_FindNext(v15, &v18))
     {

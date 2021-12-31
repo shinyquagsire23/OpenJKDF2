@@ -77,6 +77,9 @@ int sithMaterial_Load(sithWorld *world, int a2)
         sithWorld_UpdateLoadPercent(5.0);
         if ( _sscanf(stdConffile_aLine, " world materials %d", &a2) == 1 )
         {
+            // Added: needed for JKE?
+            a2 *= 2;
+
             v4 = a2;
             v12 = 45.0 / (double)(unsigned int)a2;
             v5 = (rdMaterial *)pSithHS->alloc(sizeof(rdMaterial) * a2);
@@ -222,6 +225,9 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
     rdMaterial *v2; // eax
     stdHashTable *v3; // eax
     rdVector2 *result; // eax
+
+    // Added: needed for JKE?
+    num *= 2;
 
     v2 = (rdMaterial *)pSithHS->alloc(sizeof(rdMaterial) * num);
     world->materials = v2;

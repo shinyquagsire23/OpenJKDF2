@@ -71,6 +71,8 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
   int textures_idk[16]; // [esp+F8h] [ebp-40h]
   stdVBuffer *created_tex; // eax
 
+  memset(&format, 0, sizeof(format));
+
   _memset(material, 0, sizeof(rdMaterial));
   mat_file = rdroid_pHS->fileOpen(mat_fpath, "rb");
   mat_file_ = mat_file;

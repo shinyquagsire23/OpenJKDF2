@@ -381,7 +381,7 @@ list(APPEND SOURCE_FILES ${GLOBALS_C})
 add_custom_command(
     OUTPUT ${GLOBALS_C}
     COMMAND cog -d -D symbols_fpath="${SYMBOLS_FILE}" -o ${GLOBALS_C} ${GLOBALS_C_COG}
-    DEPENDS ${SYMBOLS_FILE} ${GLOBALS_C_COG} ${GLOBALS_H}
+    DEPENDS ${SYMBOLS_FILE} ${GLOBALS_C_COG} ${GLOBALS_H} ${PROJECT_SOURCE_DIR}/resource/shaders/default_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/default_v.glsl
 )
 
 add_custom_command(

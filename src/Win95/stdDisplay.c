@@ -211,8 +211,6 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
         tmp[i].a = 0xFF;
     }
     
-    SDL_SetPaletteColors(Video_otherBuf.sdlSurface->format->palette, tmp, 0, 256);
-    SDL_SetPaletteColors(Video_menuBuffer.sdlSurface->format->palette, tmp, 0, 256);
     free(tmp);
     return 1;
 }
@@ -233,14 +231,16 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     uint32_t rbitmask = ((1 << fmt->format.r_bits) - 1) << fmt->format.r_shift;
     uint32_t gbitmask = ((1 << fmt->format.g_bits) - 1) << fmt->format.g_shift;
     uint32_t bbitmask = ((1 << fmt->format.b_bits) - 1) << fmt->format.b_shift;
+    uint32_t abitmask = 0;//((1 << fmt->format.a_bits) - 1) << fmt->format.a_shift;
     if (fmt->format.bpp == 8)
     {
         rbitmask = 0;
         gbitmask = 0;
         bbitmask = 0;
+        abitmask = 0;
     }
 
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, 0);
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask);
     
     if (surface)
     {
@@ -252,7 +252,8 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     }
     else
     {
-        printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp);
+        //printf("asdf\n");
+        printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits);
         assert(0);
     }
     
@@ -343,8 +344,6 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
         SDL_Rect dstRect_inter = {0, 0, rect->width, rect->height};
 
-        printf("%p %p %zx\n", dstPixels, srcPixels, buf_len);
-        
         for (int i = 0; i < rect->width; i++)
         {
             for (int j = 0; j < rect->height; j++)
