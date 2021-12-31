@@ -356,7 +356,7 @@ jkGuiDisplay_sub_415410	.text	00415410	00000209			R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_415620	.text	00415620	0000004C	00000000	00000008	R	.	.	.	.	.	.	.
 jkGuiMap_Initialize	.text	00415670	00000014			R	.	.	.	.	.	.	.
 jkGuiMap_Shutdown	.text	00415690	00000001			R	.	.	.	.	.	.	.
-jkGuiMap_dim	.text	004156A0	00000078	00000000	0000000C	R	.	.	.	.	.	.	.
+jkGuiMap_DrawMapScreen	.text	004156A0	00000078	00000000	0000000C	R	.	.	.	.	.	.	.
 jkGuiMap_sub_415720	.text	00415720	000003E0	00000020	00000004	R	.	.	.	.	.	.	.
 jkGuiMap_sub_415B40	.text	00415B40	00000015	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiMap_sub_415B60	.text	00415B60	00000003	00000000	00000000	R	.	.	.	.	.	.	.

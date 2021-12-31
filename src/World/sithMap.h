@@ -13,5 +13,11 @@
 
 int sithMap_Initialize(sithMap* map);
 int sithMap_Shutdown();
+void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat);
+void sithMap_sub_4EC4D0(sithSector *sector);
+int sithMap_Draw(sithSector *sector);
+int sithMap_IsSurfaceDrawable(sithSurface *pSurface, int idx, int idx2);
+
+//static int (*sithMap_Draw)(sithSector *sector) = (void*)sithMap_Draw_ADDR;
 
 #endif // _SITH_MAP_H

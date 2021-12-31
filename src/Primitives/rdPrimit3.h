@@ -22,6 +22,7 @@ void rdPrimit3_ClearFrameCounters(void);
 void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed int clipSubtype, int sortingMethod, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn);
 void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk);
 int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt);
+void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int color16, int mask);
 
 static void (__cdecl *_rdPrimit3_ClipFace)(rdClipFrustum *a1, signed int a2, signed int a3, int textureMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *a7) = (void*)rdPrimit3_ClipFace_ADDR;
 //static void (__cdecl *rdPrimit3_NoClipFace)(int a1, signed int lightingMode, int textureMode, rdMeshinfo *a4, rdMeshinfo *a5, rdVector2 *a6) = (void*)rdPrimit3_NoClipFace_ADDR;

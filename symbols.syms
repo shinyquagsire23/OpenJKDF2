@@ -668,9 +668,6 @@ sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int
 
-sithMap_bInitted 0x0084DF1C int
-sithMap_ctx 0x0084DEB0 sithMap
-
 jkPlayer_playerInfos 0x008C4CA0 sithPlayerInfo[32]
 jkPlayer_playerShortName 0x08EC320 wchar_t[32]
 jkPlayer_numOtherThings 0x0085FF44 int
@@ -871,3 +868,28 @@ jkGuiKeyboard_darrEntries 0x00555DF8 Darray
 jkGuiKeyboard_dword_555E10 0x00555E10 int
 jkGuiKeyboard_wstr_555E18 0x00555E18 wchar_t[257]
 jkGuiKeyboard_pWStr_55601C 0x0055601C wchar_t*
+
+jkGuiMap_vec3Idk2 0x005565A0 rdVector3
+jkGuiMap_pCanvas 0x005565AC rdCanvas*
+jkGuiMap_viewMat 0x005565B0 rdMatrix34
+jkGuiMap_matTmp 0x005565E0 rdMatrix34
+jkGuiMap_pVbuffer 0x00556610 stdVBuffer*
+jkGuiMap_unk4 0x00556618 sithMap
+jkGuiMap_vec3Idk 0x00556650 rdVector3
+jkGuiMap_pCamera 0x0055665C rdCamera*
+jkGuiMap_dword_556660 0x00556660 int
+jkGuiMap_dword_556664 0x00556664 int
+jkGuiMap_dword_556668 0x00556668 int
+jkGuiMap_dword_55666C 0x0055666C int
+
+sithMap_unkArr 0x0052E9E0 float[12] = {0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 0.0}
+sithMap_pPlayerThing 0x0084DE78 sithThing*
+sithMap_invMatrix 0x0084DE80 rdMatrix34
+sithMap_flt_84DEA8 0x0084DEA8 float
+sithMap_flt_84DEAC 0x0084DEAC float
+sithMap_ctx 0x0084DEB0 sithMap
+sithMap_pCurWorld 0x0084DEE4 sithWorld*
+sithMap_camera 0x0084DEE8 rdMatrix34
+sithMap_pCurCamera 0x0084DF18 rdCamera*
+sithMap_bInitted 0x0084DF1C int
+sithMap_var 0x0084DF20 int

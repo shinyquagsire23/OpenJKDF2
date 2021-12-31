@@ -112,7 +112,6 @@ See [here](BUILDING.md) for instructions.
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
    - Multiplayer character builder
- - Map view in ESC menu
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
  - In-game screenshots
 
@@ -199,8 +198,10 @@ jkGuiPlayer                    0x73a      0.171%        100.000%        5 / 5
 jkGuiMultiplayer               0x749      0.173%        100.000%        3 / 3          
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
 stdConffile                    0x78d      0.179%        100.000%       13 / 13         
+jkGuiMap                       0x793      0.180%        100.000%        8 / 8          
 sithTemplate                   0x79d      0.181%        100.000%       10 / 10         
 sithParticle                   0x7f5      0.189%        100.000%       10 / 10         
+sithMap                        0x814      0.192%        100.000%        6 / 6          
 jkGuiSingleplayer              0x8d8      0.210%        100.000%        7 / 7          
 sithCogFunctionSector          0x93a      0.219%        100.000%       22 / 22         
 sithCogFunctionAI              0x943      0.220%        100.000%       20 / 20         
@@ -258,10 +259,8 @@ stdBmp                         0x6b8      0.159%        0.000%          0 / 3
 sithCogScript                  0x6ca      0.161%        89.241%         8 / 9          
 sithAnimClass                  0x6cc      0.161%        94.080%         4 / 5          
 jkGuiControlSaveLoad           0x732      0.171%        0.000%          0 / 6          
-jkGuiMap                       0x793      0.180%        0.000%          0 / 8          
 stdStrTable                    0x7b6      0.183%        82.877%         4 / 6          
 sithSector                     0x806      0.190%        90.458%        11 / 13         
-sithMap                        0x814      0.192%        3.046%          2 / 6          
 Main                           0x87b      0.201%        96.868%         3 / 4          
 jkGuiMultiTally                0x8aa      0.206%        0.000%          0 / 7          
 jkCredits                      0x8e4      0.211%        54.350%         5 / 6          
@@ -289,7 +288,7 @@ sithIntersect                  0x12a8     0.443%        92.588%         9 / 12
 jkGuiDisplay                   0x12ff     0.451%        0.000%          0 / 11         
 jkGuiJoystick                  0x13f0     0.473%        0.000%          0 / 19         
 jkMain                         0x16cd     0.541%        86.294%        40 / 53         
-rdPrimit3                      0x16e0     0.543%        88.268%         6 / 9          
+rdPrimit3                      0x16e0     0.543%        91.684%         7 / 9          
 sithDSS                        0x175d     0.554%        96.673%        20 / 22         
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
 sithSurface                    0x1c6a     0.674%        95.298%        31 / 35         
@@ -300,7 +299,7 @@ jkDev                          0x1fd6     0.755%        94.687%        39 / 41
 sithDSSThing                   0x22aa     0.823%        39.542%         7 / 37         
 sithMulti                      0x252a     0.882%        0.105%          1 / 35         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
-stdDisplay                     0x267b     0.913%        0.264%          2 / 37         
+stdDisplay                     0x267b     0.913%        61.537%        22 / 37         
 sithCollision                  0x2827     0.953%        91.760%        18 / 22         
 sithControl                    0x285a     0.958%        92.943%        29 / 33         
 sithThing                      0x3c2e     1.428%        87.446%        45 / 53         
@@ -312,36 +311,36 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-49.151% by weight
-83.010% by weight excluding rasterizer
-2342 / 3169 functions
-2342 / 2798 functions excluding rasterizer
+50.095% by weight
+84.604% by weight excluding rasterizer
+2375 / 3169 functions
+2375 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           2.672%          155 / 1323
+sith           2.486%          151 / 1323
 stdPlatform    0.238%           24 / 43
-std            2.404%           81 / 359
-jkGui          2.871%           91 / 284
-rd             0.307%           15 / 345
+std            1.844%           61 / 359
+jkGui          2.691%           83 / 284
+rd             0.288%           14 / 345
 jk             0.664%           53 / 324
 Raster         40.778%         370 / 371
 other          0.916%           38 / 120
 -----------------------------------------
-total          50.849%         827 / 3169
+total          49.905%         794 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           4.512%          155 / 1323
+sith           4.198%          151 / 1323
 stdPlatform    0.402%           24 / 43
-std            4.059%           81 / 359
-jkGui          4.849%           91 / 284
-rd             0.518%           15 / 345
+std            3.115%           61 / 359
+jkGui          4.545%           83 / 284
+rd             0.487%           14 / 345
 jk             1.121%           53 / 324
 other          1.548%           38 / 120
 -----------------------------------------
-total          17.009%         457 / 2798
+total          15.415%         424 / 2798
 
 ```

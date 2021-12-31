@@ -1,6 +1,7 @@
 #include "rdPrimit3.h"
 
 #include "Primitives/rdFace.h"
+#include "Primitives/rdPrimit2.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdClip.h"
 
@@ -922,4 +923,27 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
         screenpt->z = v4.z;
     }
     return 1;
+}
+
+void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int color16, int mask)
+{
+    float v5; // [esp+0h] [ebp-40h]
+    rdVector3 vertex_out; // [esp+10h] [ebp-30h] BYREF
+    rdVector3 v7; // [esp+1Ch] [ebp-24h] BYREF
+    rdVector3 v8; // [esp+28h] [ebp-18h] BYREF
+    rdVector3 v9; // [esp+34h] [ebp-Ch] BYREF
+
+    // TODO is this GetScreenCoord but inlined?
+
+    rdMatrix_TransformPoint34(&vertex_out, pVecPos, &rdCamera_pCurCamera->view_matrix);
+    v7.y = vertex_out.y;
+    v7.z = vertex_out.z;
+    v7.x = vertex_out.x + xOffs;
+    if ( vertex_out.y > 0.0 )
+    {
+        rdCamera_pCurCamera->project(&v8, &vertex_out);
+        rdCamera_pCurCamera->project(&v9, &v7);
+        v5 = v9.x - v8.x;
+        rdPrimit2_DrawCircle(rdCamera_pCurCamera->canvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
+    }
 }

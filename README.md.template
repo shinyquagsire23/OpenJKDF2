@@ -112,7 +112,6 @@ See [here](BUILDING.md) for instructions.
  - Multiplayer menu and all submenus
    - Multiplayer tally screen
    - Multiplayer character builder
- - Map view in ESC menu
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
  - In-game screenshots
 

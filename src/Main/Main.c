@@ -922,9 +922,7 @@ int Main_Startup(const char *cmdline)
         jkGuiPlayer_Initialize();
         jkGuiSound_Initialize();
         jkGuiEsc_Startup();
-#ifndef LINUX_TMP
-        jkGuiMap_Initialize(); // TODO
-#endif
+        jkGuiMap_Initialize();
         jkGuiKeyboard_Initialize(); // TODO
 #ifndef LINUX_TMP
         jkGuiJoystick_Initialize(); // TODO
