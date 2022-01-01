@@ -1033,23 +1033,8 @@ int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH)
 {
     // TODO hack for JKE? I don't know what they're doing
-    if (inW >= 512)
-    {
-         *outW = inW / 2;
-    }
-    else
-    {
-        *outW = inW;
-    }
-
-    if (inH >= 512)
-    {
-        *outH = inH / 2;
-    }
-    else
-    {
-        *outH = inH;
-    }
+    *outW = inW > 256 ? 256 : inW;
+    *outH = inH > 256 ? 256 : inH;
 }
 
 int std3D_DrawOverlay()
