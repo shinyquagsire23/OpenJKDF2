@@ -1,0 +1,23 @@
+pkgname="openjkdf2"
+pkgver=0.3.1
+pkgrel=1
+epoch=
+pkgdesc="A cross-platform reimplementation of Jedi Knight: Dark Forces II"
+arch=("x86_64" "aarch64")
+url="https://github.com/shinyquagsire23/OpenJKDF2"
+license=("custom")
+depends=("imagemagick" "gtk3")
+makedepends=("cmake" "bison" "python-cogapp")
+checkdepends=()
+optdepends=()
+backup=()
+source=("openjkdf2-$pkgver.tar.gz::https://github.com/shinyquagsire23/OpenJKDF2/archive/refs/tags/v$pkgver.tar.gz")
+md5sums=('7c841a575cb1d64db6ddf0bd82c5bebb')
+
+build() {
+    echo "TODO"
+}
+
+package() {
+    echo "TODO"
+}
