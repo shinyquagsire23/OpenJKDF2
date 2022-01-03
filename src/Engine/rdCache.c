@@ -365,9 +365,6 @@ int rdCache_SendFaceListToHardware()
         v11.material = active_6c->material;
         if (!v11.material)
         {
-#ifdef QOL_IMPROVEMENTS
-            goto solid_tri;
-#endif
             continue;
         }
 
