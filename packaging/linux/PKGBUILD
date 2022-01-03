@@ -19,7 +19,7 @@ source=(
 md5sums=('7c841a575cb1d64db6ddf0bd82c5bebb'
          '41fab13ca2b0f4f379a1974bd6ba2517'
          '36404aac1598ba82f7fbcae2a3736a55'
-         '515a0565755bc7e4c80b3f134e35e113')
+         '08c4c18e02a87bb8965cef0410266635')
 
 build() {
     export CC=clang

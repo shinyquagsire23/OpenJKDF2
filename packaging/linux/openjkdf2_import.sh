@@ -10,7 +10,7 @@ if [ "$gameid" != 1422286819 ]; then
     exit 1;
 fi
 tmpdir=$(mktemp -d)
-innoextract -q -d "$tmpdir" -I app/Resource -I app/MUSIC -I app/Episode -I app/player -I app/JK.EXE -- "$1"
+innoextract -q -d "$tmpdir" -I app/Resource -I app/MUSIC -I app/Episode -I app/JK.EXE -- "$1"
 mv "$tmpdir/app/Resource"           "$tmpdir/app/resource"
 mv "$tmpdir/app/resource/VIDEO"     "$tmpdir/app/resource/video"
 mv "$tmpdir/app/resource/JK_.CD"    "$tmpdir/app/resource/jk_.cd"
