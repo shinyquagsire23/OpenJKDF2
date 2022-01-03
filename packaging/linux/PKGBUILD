@@ -6,18 +6,24 @@ pkgdesc="A cross-platform reimplementation of Jedi Knight: Dark Forces II"
 arch=("x86_64" "aarch64")
 url="https://github.com/shinyquagsire23/OpenJKDF2"
 license=("BSD")
-depends=("imagemagick" "gtk3")
-makedepends=("cmake" "bison" "python-cogapp")
+depends=("imagemagick" "gtk3" "sdl2" "sdl2_mixer" "glew" "openal")
+makedepends=("clang" "cmake" "bison" "python-cogapp")
 checkdepends=()
-optdepends=()
+optdepends=("innoextract: installing game data from GOOG release")
 backup=()
 source=(
     "$pkgname-$pkgver.tar.gz::https://github.com/shinyquagsire23/OpenJKDF2/archive/refs/tags/v$pkgver.tar.gz"
-    "openjkdf2.desktop")
+    "openjkdf2.desktop"
+    "openjkdf2.sh"
+    "openjkdf2_import.sh")
 md5sums=('7c841a575cb1d64db6ddf0bd82c5bebb'
-         '41fab13ca2b0f4f379a1974bd6ba2517')
+         '41fab13ca2b0f4f379a1974bd6ba2517'
+         '36404aac1598ba82f7fbcae2a3736a55'
+         '515a0565755bc7e4c80b3f134e35e113')
 
 build() {
+    export CC=clang
+    export CXX=clang++
     cd "$srcdir/OpenJKDF2-$pkgver"
     cmake .
     make
@@ -25,10 +31,13 @@ build() {
 
 package() {
     cd "$srcdir/OpenJKDF2-$pkgver"
-    install -DT "openjkdf2-64" "$pkgdir/usr/bin/openjkdf2"
     install -DTm644 "packaging/icon.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
     install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" "LICENSE.md"
     install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" "README.md"
     install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname/docs/images" "docs/images/"*
     install -Dm644 -t "$pkgdir/usr/share/applications" "../$pkgname.desktop"
+    install -Dm644 -t "$pkgdir/usr/share/$pkgname/resource/shaders" "resource/shaders/"*
+    install -D -t "$pkgdir/usr/share/$pkgname" "openjkdf2-64"
+    install -DT "../openjkdf2.sh" "$pkgdir/usr/bin/openjkdf2"
+    install -DT "../openjkdf2_import.sh" "$pkgdir/usr/bin/openjkdf2_import"
 }
