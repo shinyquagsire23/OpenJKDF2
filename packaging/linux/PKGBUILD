@@ -26,7 +26,7 @@ build() {
 package() {
     cd "$srcdir/OpenJKDF2-$pkgver"
     install -DT "openjkdf2-64" "$pkgdir/usr/bin/openjkdf2"
-    install -DTm644 "packaging/icon.png" "$pkgdir/usr/share/icons/hicolor/1024x1024/apps/$pkgname.png"
+    install -DTm644 "packaging/icon.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
     install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" "LICENSE.md"
     install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" "README.md"
     install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname/docs/images" "docs/images/"*
