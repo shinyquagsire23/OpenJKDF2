@@ -115,7 +115,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     if (cog->script_running)
     {
         NETMSG_PUSHU32(cog->wakeTimeMs);
-        NETMSG_PUSHU32(cog->cogscript_pc);
+        NETMSG_PUSHU32(cog->execPos);
         NETMSG_PUSHU32(cog->senderId);
         NETMSG_PUSHU32(cog->senderRef);
         NETMSG_PUSHU32(cog->senderType);
@@ -178,7 +178,7 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
     if (cog->script_running)
     {
         cog->wakeTimeMs = NETMSG_POPU32();
-        cog->cogscript_pc = NETMSG_POPU32();
+        cog->execPos = NETMSG_POPU32();
         cog->senderId = NETMSG_POPU32();
         cog->senderRef = NETMSG_POPU32();
         cog->senderType = NETMSG_POPU32();

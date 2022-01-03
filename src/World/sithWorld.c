@@ -546,7 +546,7 @@ uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
     // Hash all world cogscript __VM bytecode__ (*not* text)
     for (int i = 0; i < world->numCogScriptsLoaded; i++)
     {
-        hash = util_Weirdchecksum((uint8_t *)world->cogScripts[i].script_program, world->cogScripts[i].program_pc_max, hash);
+        hash = util_Weirdchecksum((uint8_t *)world->cogScripts[i].script_program, world->cogScripts[i].codeSize, hash);
     }
 
     // Hash all world vertices
@@ -563,7 +563,7 @@ uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
     {
         for (int i = 0; i < sithWorld_pStatic->numCogScriptsLoaded; i++)
         {
-            hash = util_Weirdchecksum((uint8_t *)sithWorld_pStatic->cogScripts[i].script_program, sithWorld_pStatic->cogScripts[i].program_pc_max, hash);
+            hash = util_Weirdchecksum((uint8_t *)sithWorld_pStatic->cogScripts[i].script_program, sithWorld_pStatic->cogScripts[i].codeSize, hash);
         }
     }
     return hash;

@@ -242,7 +242,7 @@ LABEL_16:
                     goto LABEL_19;
                 cur_instr = cogparser_topnode;
                 script_prog_curidx = 0;
-                script->program_pc_max = cogvm_stackpos + 1;
+                script->codeSize = cogvm_stackpos + 1;
                 script_prog_next = script_program;
                 node_parent = cur_instr->parent;
                 cogvm_stackpos = 0;
@@ -292,7 +292,7 @@ LABEL_32:
                             break;
                     }
                 }
-                script->script_program[script->program_pc_max - 1] = 29;
+                script->script_program[script->codeSize - 1] = 29;
                 cogparser_current_nodeidx = 0;
                 cogparser_topnode = 0;
                 result = 1;

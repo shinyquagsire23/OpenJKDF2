@@ -1496,7 +1496,7 @@ typedef struct sithCog
     uint32_t flags;
     int selfCog;
     uint32_t script_running;
-    uint32_t cogscript_pc;
+    uint32_t execPos;
     uint32_t wakeTimeMs;
     uint32_t pulsePeriodMs;
     uint32_t nextPulseMs;

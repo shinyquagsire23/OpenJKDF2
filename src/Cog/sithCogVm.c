@@ -425,14 +425,14 @@ void sithCogVm_Exec(sithCog *cog_ctx)
     int iTmp;
     sithCogStackvar* tmpStackVar;
     
-    //jk_printf("cog trace %s %x\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc);
+    //jk_printf("cog trace %s %x\n", cog_ctx->cogscript->cog_fpath, cog_ctx->execPos);
 
     cog_ctx->script_running = 1;
     while ( 2 )
     {
         cogscript = cog_ctx->cogscript;
         op = sithCogVm_PopProgramVal(cog_ctx);
-        //jk_printf("cog trace %s %x op %u stackpos %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->cogscript_pc, op, cog_ctx->stackPos);
+        //jk_printf("cog trace %s %x op %u stackpos %u\n", cog_ctx->cogscript->cog_fpath, cog_ctx->execPos, op, cog_ctx->stackPos);
         switch ( op )
         {
             case COG_OPCODE_NOP:
@@ -460,8 +460,8 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 break;
 
             case COG_OPCODE_PUSHVECTOR:
-                _memcpy(val.data, &cogscript->script_program[cog_ctx->cogscript_pc], sizeof(rdVector3));
-                cog_ctx->cogscript_pc += 3;
+                _memcpy(val.data, &cogscript->script_program[cog_ctx->execPos], sizeof(rdVector3));
+                cog_ctx->execPos += 3;
                 val.type = COG_VARTYPE_VECTOR;
                 sithCogVm_PushVar(cog_ctx, &val);
                 break;
@@ -529,15 +529,15 @@ void sithCogVm_Exec(sithCog *cog_ctx)
             case COG_OPCODE_GOFALSE:
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
                 if ( !sithCogVm_PopInt(cog_ctx) )
-                    cog_ctx->cogscript_pc = iTmp;
+                    cog_ctx->execPos = iTmp;
                 break;
             case COG_OPCODE_GOTRUE:
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
                 if ( sithCogVm_PopInt(cog_ctx) )
-                    cog_ctx->cogscript_pc = iTmp;
+                    cog_ctx->execPos = iTmp;
                 break;
             case COG_OPCODE_GO:
-                cog_ctx->cogscript_pc = sithCogVm_PopProgramVal(cog_ctx);
+                cog_ctx->execPos = sithCogVm_PopProgramVal(cog_ctx);
                 break;
             case COG_OPCODE_RET:
                 if ( cog_ctx->flags & COGVM_FLAG_TRACE )
@@ -551,10 +551,10 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 if (cog_ctx->calldepth >= 4)
                     break;
                 iTmp = sithCogVm_PopProgramVal(cog_ctx);
-                if ( iTmp < cog_ctx->cogscript->program_pc_max )
+                if ( iTmp < cog_ctx->cogscript->codeSize )
                 {
                     sithCogVm_Call(cog_ctx);
-                    cog_ctx->cogscript_pc = iTmp;
+                    cog_ctx->execPos = iTmp;
                 }
                 break;
             case COG_OPCODE_ADD:
@@ -597,7 +597,7 @@ void sithCogVm_ExecCog(sithCog *ctx, int trigIdx)
         {
             ctx->stackPos = 0;
         }
-        ctx->cogscript_pc = ctx->cogscript->triggers[trigIdx].trigPc;
+        ctx->execPos = ctx->cogscript->triggers[trigIdx].trigPc;
         ctx->trigId = ctx->cogscript->triggers[trigIdx].trigId;
         if ( ctx->flags & COGFLAGS_TRACE )
         {
@@ -1202,10 +1202,10 @@ void sithCogVm_PushVector3(sithCog *ctx, const rdVector3* val)
 
 int sithCogVm_PopProgramVal(sithCog *ctx)
 {
-    if ( ctx->cogscript_pc >= ctx->cogscript->program_pc_max - 1 )
+    if ( ctx->execPos >= ctx->cogscript->codeSize - 1 )
         return COG_OPCODE_RET;
 
-    return ctx->cogscript->script_program[ctx->cogscript_pc++];
+    return ctx->cogscript->script_program[ctx->execPos++];
 }
 
 void sithCogVm_ResetStack(sithCog *ctx)
@@ -1218,7 +1218,7 @@ void sithCogVm_Call(sithCog *ctx)
 {
     if ( ctx->calldepth != 4 )
     {
-        ctx->callstack[ctx->calldepth].pc = ctx->cogscript_pc;
+        ctx->callstack[ctx->calldepth].pc = ctx->execPos;
         ctx->callstack[ctx->calldepth].script_running = ctx->script_running;
         ctx->callstack[ctx->calldepth].waketimeMs = ctx->wakeTimeMs;
         ctx->callstack[ctx->calldepth++].trigId = ctx->trigId;
@@ -1230,7 +1230,7 @@ void sithCogVm_Ret(sithCog *ctx)
     if ( ctx->calldepth )
     {
         ctx->script_running = ctx->callstack[--ctx->calldepth].script_running;
-        ctx->cogscript_pc = ctx->callstack[ctx->calldepth].pc;
+        ctx->execPos = ctx->callstack[ctx->calldepth].pc;
         ctx->wakeTimeMs = ctx->callstack[ctx->calldepth].waketimeMs;
         ctx->trigId = ctx->callstack[ctx->calldepth].trigId;
     }

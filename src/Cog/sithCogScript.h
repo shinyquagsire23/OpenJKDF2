@@ -66,7 +66,7 @@ typedef struct sithCogScript
     uint32_t debug_maybe;
     char cog_fpath[32];
     int* script_program;
-    uint32_t program_pc_max;
+    uint32_t codeSize;
     sithCogSymboltable *symbolTable;
     uint32_t num_triggers;
     sithCogTrigger triggers[32];
