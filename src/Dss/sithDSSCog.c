@@ -129,7 +129,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     }
     if ( (cog->flags & COGFLAGS_8) != 0 )
         NETMSG_PUSHU32(cog->field_20);
-    v13 = cog->symbolTable;
+    v13 = cog->pSymbolTable;
     if ( v13->entry_cnt )
     {
         for (int i = 0; i < v13->entry_cnt; i++)
@@ -197,7 +197,7 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
         cog->field_20 = NETMSG_POPU32();
     }
     
-    v13 = cog->symbolTable;
+    v13 = cog->pSymbolTable;
     if ( v13->entry_cnt )
     {
         for (int i = 0; i < v13->entry_cnt; i++)

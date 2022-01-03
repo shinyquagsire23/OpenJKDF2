@@ -85,7 +85,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
             double v3 = i->distance / range;
             float a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
 
-            if ( (i->collideType & 2) != 0 )
+            if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
             {
                 sithSurface_SendDamageToThing(i->surface, explosion, a1a * damage, explosion->explosionParams.damageClass);
             }
@@ -99,7 +99,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                 {
                     if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
                     {
-                        rdVector_Scale3(&a2, &i->field_14, -(a1a * force));
+                        rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
                         sithPhysics_ThingApplyForce(v4, &a2);
                     }
                     if ( damage != 0.0 )

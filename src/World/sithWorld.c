@@ -793,12 +793,12 @@ void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuanti
     outQuantity[8] = world->numCogScriptsLoaded;
     for (int i = 0; i < world->numCogScriptsLoaded; i++)
     {
-        outAllocated[8] += 4 * (7 * world->cogScripts[i].symbolTable->entry_cnt + world->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
+        outAllocated[8] += 4 * (7 * world->cogScripts[i].pSymbolTable->entry_cnt + world->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
     }
     outQuantity[7] = world->numCogsLoaded;
     for (int i = 0; i < world->numCogsLoaded; i++)
     {
-        outAllocated[7] += 28 * world->cogs[i].symbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
+        outAllocated[7] += 28 * world->cogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
     }
     outQuantity[10] = world->numModelsLoaded;
     for (int i = 0; i < world->numModelsLoaded; i++)

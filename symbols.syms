@@ -781,7 +781,7 @@ jkGuiNetHost_tickRate 0x00860478 int
 jkGuiNetHost_gameName 0x0086047C wchar_t[32]
 
 g_hInstance 0x00855DEC HINSTANCE
-g_cog_symbolTable 0x008B5428 sithCogSymboltable*
+sithCog_pSymbolTable 0x008B5428 sithCogSymboltable*
 pSithHS 0x82F0A4 struct common_functions*
 g_hWnd 0x855DE0 HWND
 g_nShowCmd 0x855DE8 uint32_t
@@ -825,7 +825,7 @@ stdMemory_info 0x008607C0 stdMemoryInfo
 yyin 0x00855D90 stdFile_t
 yyout 0x00855D94 stdFile_t
 
-sithCogParse_symbolTable 0x008554C0 sithCogSymboltable*
+sithCogParse_pSymbolTable 0x008554C0 sithCogSymboltable*
 yacc_linenum 0x00889F0C int
 cog_yacc_loop_depth 0x0054C850 int = 1
 cog_parser_node_stackpos 0x008554C8 int[512]

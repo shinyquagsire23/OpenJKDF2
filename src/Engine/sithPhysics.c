@@ -41,7 +41,7 @@ void sithPhysics_FindFloor(sithThing *thing, int a3)
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
-            while ( (v5->collideType & 0x20) == 0 || (v5->surface->adjoin->sector->flags & SITH_SF_UNDERWATER) != 0 )
+            while ( (v5->hitType & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->adjoin->sector->flags & SITH_SF_UNDERWATER) != 0 )
             {
                 v5 = sithCollision_NextSearchResult();
                 if ( !v5 )
@@ -100,14 +100,14 @@ LABEL_8:
             {
                 for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
                 {
-                    if ( (i->collideType & 2) != 0 )
+                    if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
                         sithThing_AttachToSurface(thing, i->surface, a3);
                         sithCollision_SearchClose();
                         return;
                     }
-                    if ( (i->collideType & 1) != 0 )
+                    if ( (i->hitType & SITHCOLLISION_THING) != 0 )
                     {
                         v11 = i->receiver;
                         if ( v11 != thing )

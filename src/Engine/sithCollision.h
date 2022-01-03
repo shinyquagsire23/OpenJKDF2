@@ -27,6 +27,16 @@
 #define sithCollision_FallHurt_ADDR (0x004E9550)
 #define sithCollision_DebrisPlayerCollide_ADDR (0x004E95A0)
 
+enum SITHCOLLISION
+{
+    SITHCOLLISION_NONE = 0,
+    SITHCOLLISION_THING = 1,
+    SITHCOLLISION_WORLD = 2,
+
+    SITHCOLLISION_ADJOINCROSS = 0x20,
+    SITHCOLLISION_ADJOINTOUCH = 0x40,
+};
+
 int sithCollision_Startup();
 static void (*sithCollision_Shutdown)() = (void*)sithCollision_Shutdown_ADDR;
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);

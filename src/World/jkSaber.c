@@ -232,11 +232,11 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
         if ( !searchResult )
             break;
     
-        if ( searchResult->collideType & 0x20 )
+        if ( searchResult->hitType & SITHCOLLISION_ADJOINCROSS )
         {
             sector = searchResult->surface->adjoin->sector;
         }
-        else if ( searchResult->collideType & 1 )
+        else if ( searchResult->hitType & SITHCOLLISION_THING )
         {
             resultThing = searchResult->receiver;
     
@@ -354,7 +354,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             playerInfo->damagedThings[playerInfo->numDamagedThings++] = searchResult->receiver;            
             break;
         }
-        else if ( searchResult->collideType & 2 )
+        else if ( searchResult->hitType & SITHCOLLISION_WORLD )
         {
             a2a.x = (searchResult->distance - 0.001) * jointMat.lvec.x + jointMat.scale.x;
             a2a.y = (searchResult->distance - 0.001) * jointMat.lvec.y + jointMat.scale.y;

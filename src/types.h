@@ -1511,7 +1511,7 @@ typedef struct sithCog
     float returnEx;
     sithCogCallstack callstack[4];
     uint32_t calldepth;
-    sithCogSymboltable* symbolTable;
+    sithCogSymboltable* pSymbolTable;
     sithCogStackvar stack[SITHCOGVM_MAX_STACKSIZE];
     uint32_t stackPos;
     char cogscript_fpath[32];
@@ -1937,12 +1937,12 @@ typedef struct sithCollisionEntry
 
 typedef struct sithCollisionSearchEntry
 {
-    uint32_t collideType;
+    uint32_t hitType;
     sithThing* receiver;
     sithSurface* surface;
     rdFace* face;
     rdMesh* sender;
-    rdVector3 field_14;
+    rdVector3 hitNorm;
     float distance;
     uint32_t hasBeenEnumerated;
 } sithCollisionSearchEntry;

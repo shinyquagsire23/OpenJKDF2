@@ -120,7 +120,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 }
                 while ( elementSize < searchRes->distance );
             }
-            if ( (searchRes->collideType & 0x20) == 0 )
+            if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
             searchRes = sithCollision_NextSearchResult();
@@ -133,7 +133,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
             if ( weapon->weaponParams.mindDamage > (double)damage_ )
                 damage_ = weapon->weaponParams.mindDamage;
         }
-        if ( (searchRes->collideType & 1) != 0 )
+        if ( (searchRes->hitType & SITHCOLLISION_THING) != 0 )
         {
             sithThing_Damage(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageClass);
             if ( weapon->weaponParams.force != 0.0 )
@@ -146,7 +146,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 }
             }
         }
-        else if ( (searchRes->collideType & 2) != 0 )
+        else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
         {
             sithSurface_SendDamageToThing(searchRes->surface, weapon, damage_, weapon->weaponParams.damageClass);
         }
@@ -303,7 +303,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                 }
                 while ( elementSize_ < (double)searchRes->distance );
             }
-            if ( (searchRes->collideType & 0x20) == 0 )
+            if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
             searchRes = sithCollision_NextSearchResult();
@@ -317,7 +317,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             if ( v22 > amount )
                 amount = weapon->weaponParams.mindDamage;
         }
-        if ( (searchRes->collideType & 1) != 0 )
+        if ( (searchRes->hitType & SITHCOLLISION_THING) != 0 )
         {
             sithThing_Damage(searchRes->receiver, weapon, amount, weapon->weaponParams.damageClass);
             if ( weapon->weaponParams.force != 0.0 )
@@ -332,7 +332,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                 }
             }
         }
-        else if ( (searchRes->collideType & 2) != 0 )
+        else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
         {
             sithSurface_SendDamageToThing(searchRes->surface, weapon, amount, weapon->weaponParams.damageClass);
         }
@@ -552,7 +552,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             sithCollision_SearchClose();
             if ( v19 )
             {
-                if ( (v19->collideType & 1) != 0 )
+                if ( (v19->hitType & SITHCOLLISION_THING) != 0 )
                 {
                     v20 = v19->receiver;
                     if ( v20->thingtype == SITH_THING_ACTOR )
@@ -595,8 +595,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     int v6; // ecx
     int v7; // eax
     double v8; // st7
-    double v9; // st5
-    double v10; // st6
     double v11; // st6
     double v12; // st4
     double v13; // st7
@@ -614,7 +612,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     sithThing *v27; // ebx
     sithThing *v28; // eax
     uint32_t v30; // eax
-    rdVector3 v31; // [esp+10h] [ebp-Ch]
 
     if ( (physicsThing->weaponParams.typeflags & THING_TYPEFLAGS_1000) != 0 )
     {
@@ -633,18 +630,13 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         physicsThing->weaponParams.field_18 = v7 + 1;
         if ( (unsigned int)v7 < 6 )
         {
-            v31 = physicsThing->physicsParams.vel;
             result = sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0);
             if ( result )
             {
-                v8 = (a4->field_14.x * v31.x + a4->field_14.y * v31.y + a4->field_14.z * v31.z) * -2.0;
+                v8 = rdVector_Dot3(&a4->hitNorm, &physicsThing->physicsParams.vel) * -2.0;
                 if ( a5 )
                     v8 = -v8;
-                v9 = a4->field_14.y * v8 + v31.y;
-                v10 = a4->field_14.z * v8 + v31.z;
-                physicsThing->physicsParams.vel.x = a4->field_14.x * v8 + v31.x;
-                physicsThing->physicsParams.vel.y = v9;
-                physicsThing->physicsParams.vel.z = v10;
+                rdVector_MultAcc3(&physicsThing->physicsParams.vel, &a4->hitNorm, v8);
                 rdVector_Normalize3(&physicsThing->lookOrientation.lvec, &physicsThing->physicsParams.vel);
                 v11 = physicsThing->lookOrientation.lvec.x;
                 v12 = physicsThing->lookOrientation.lvec.y;
@@ -705,7 +697,7 @@ LABEL_45:
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
-        sithPhysics_ThingSetLook(physicsThing, &a4->field_14, 0.0);
+        sithPhysics_ThingSetLook(physicsThing, &a4->hitNorm, 0.0);
         goto LABEL_56;
     }
     if ( (collidedThing->weaponParams.typeflags & THING_TYPEFLAGS_ISBLOCKING) != 0

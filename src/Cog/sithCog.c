@@ -40,8 +40,8 @@ int sithCog_Startup()
 {
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    g_cog_symbolTable = sithCogParse_NewSymboltable(1024); // changed from 512 to 1024
-    if (!g_cog_symbolTable )
+    sithCog_pSymbolTable = sithCogParse_NewSymboltable(1024); // changed from 512 to 1024
+    if (!sithCog_pSymbolTable )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
         return 0;
@@ -53,71 +53,71 @@ int sithCog_Startup()
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
         return 0;
     }
-    g_cog_symbolTable->bucket_idx = 0x100;
-    sithCogFunction_Initialize(g_cog_symbolTable);
-    sithCogFunctionThing_Initialize(g_cog_symbolTable);
-    sithCogFunctionAI_Initialize(g_cog_symbolTable);
-    sithCogFunctionSurface_Initialize(g_cog_symbolTable);
-    sithCogFunctionSound_Initialize(g_cog_symbolTable);
-    sithCogFunctionSector_Initialize(g_cog_symbolTable);
-    sithCogFunctionPlayer_Initialize(g_cog_symbolTable);
-	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activate");
-	sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 1, "activated");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 3, "startup");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 4, "timer");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 5, "blocked");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 6, "entered");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 7, "exited");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 8, "crossed");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 9, "sighted");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 10, "damaged");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 11, "arrived");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 12, "killed");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 13, "pulse");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 14, "touched");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 15, "created");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 16, "loading");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 17, "selected");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 18, "deselected");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 20, "changed");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 21, "deactivated");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 22, "shutdown");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 23, "respawn");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 2, "removed");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 19, "autoselect");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 24, "aievent");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 25, "skill");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 26, "taken");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 27, "user0");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 28, "user1");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 29, "user2");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 30, "user3");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 31, "user4");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 32, "user5");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 33, "user6");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 34, "user7");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 35, "newplayer");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 36, "fire");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 37, "join");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 38, "leave");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 39, "splash");
-    sithCogScript_RegisterMessageSymbol(g_cog_symbolTable, 40, "trigger");
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global0", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global1", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global2", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global3", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global4", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global5", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global6", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global7", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global8", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global9", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global10", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global11", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global12", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global13", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global14", 0);
-    sithCogScript_RegisterGlobalMessage(g_cog_symbolTable, "global15", 0);
+    sithCog_pSymbolTable->bucket_idx = 0x100;
+    sithCogFunction_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionThing_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionAI_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionSurface_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionSound_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionSector_Initialize(sithCog_pSymbolTable);
+    sithCogFunctionPlayer_Initialize(sithCog_pSymbolTable);
+	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activate");
+	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activated");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 3, "startup");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 4, "timer");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 5, "blocked");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 6, "entered");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 7, "exited");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 8, "crossed");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 9, "sighted");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 10, "damaged");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 11, "arrived");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 12, "killed");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 13, "pulse");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 14, "touched");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 15, "created");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 16, "loading");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 17, "selected");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 18, "deselected");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 20, "changed");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 21, "deactivated");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 22, "shutdown");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 23, "respawn");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 2, "removed");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 19, "autoselect");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 24, "aievent");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 25, "skill");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 26, "taken");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 27, "user0");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 28, "user1");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 29, "user2");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 30, "user3");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 31, "user4");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 32, "user5");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 33, "user6");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 34, "user7");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 35, "newplayer");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 36, "fire");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 37, "join");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 38, "leave");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 39, "splash");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global0", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global1", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global2", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global3", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global4", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global5", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global6", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global7", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global8", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global9", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global10", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global11", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global12", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global13", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global14", 0);
+    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global15", 0);
     sithEvent_RegisterFunc(4, sithCogScript_TimerTick, 0, 2);
     sithCog_bInitted = 1;
     return 1;
@@ -125,7 +125,7 @@ int sithCog_Startup()
 
 void sithCog_Shutdown()
 {
-    sithCogParse_FreeSymboltable(g_cog_symbolTable);
+    sithCogParse_FreeSymboltable(sithCog_pSymbolTable);
     if ( sithCog_pScriptHashtable )
     {
         stdHashTable_Free(sithCog_pScriptHashtable);
@@ -164,7 +164,7 @@ int sithCog_Open()
             {
                 v3 = &v2->cogscript->aIdk[j];
                 if ( _strlen(v3->value) )
-                    sithCog_LoadEntry(&v2->symbolTable->buckets[v3->hash], v3, v3->value);
+                    sithCog_LoadEntry(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
             }
             sithCog_SendMessage(v2++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
             world = world_;
@@ -190,7 +190,7 @@ LABEL_25:
         while ( 1 )
         {
             sithCogReference* idk = &cogs->cogscript->aIdk[v10];
-            v8 = &cogs->symbolTable->buckets[idk->hash];
+            v8 = &cogs->pSymbolTable->buckets[idk->hash];
             v14 = v8;
             if ( (idk->flags & 1) != 0 )
             {
@@ -354,8 +354,8 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     cog->cogscript_fpath[31] = 0;
     cog->cogscript = v8;
     cog->flags = v8->debug_maybe;
-    cog->symbolTable = sithCogParse_CopySymboltable(v8->symbolTable);
-    if ( cog->symbolTable )
+    cog->pSymbolTable = sithCogParse_CopySymboltable(v8->pSymbolTable);
+    if ( cog->pSymbolTable )
     {
         sithWorld_pLoading->numCogsLoaded++;
         return cog;
@@ -1077,7 +1077,7 @@ void sithCog_Free(sithWorld *world)
         for (int i = 0; i < world->numCogScriptsLoaded; i++)
         {
             v4 = &world->cogScripts[i];
-            sithCogParse_FreeSymboltable(v4->symbolTable);
+            sithCogParse_FreeSymboltable(v4->pSymbolTable);
             for (v5 = 0; v5 < v4->numIdk; v5++)
             {
                 if (v4->aIdk[v5].desc)
@@ -1103,7 +1103,7 @@ void sithCog_Free(sithWorld *world)
         for (int i = 0; i < world->numCogsLoaded; i++ )
         {
             v9 = &world->cogs[i];
-            sithCogParse_FreeSymboltable(v9->symbolTable);
+            sithCogParse_FreeSymboltable(v9->pSymbolTable);
             if ( v9->heap )
             {
                 pSithHS->free(v9->heap);
@@ -1333,11 +1333,11 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
       && _sscanf(extra, "%d", &tmp) == 1
       && tmp <= world->numCogsLoaded
       && (v3 = &world->cogs[tmp], v3->cogscript)
-      && v3->symbolTable )
+      && v3->pSymbolTable )
     {
         _sprintf(std_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
         DebugConsole_Print(std_genBuffer);
-        v4 = v3->symbolTable;
+        v4 = v3->pSymbolTable;
         v5 = 0;
         v6 = v4->buckets;
         if ( v4->entry_cnt )
@@ -1356,7 +1356,7 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
                 ++v5;
                 ++v6;
             }
-            while ( v5 < v3->symbolTable->entry_cnt );
+            while ( v5 < v3->pSymbolTable->entry_cnt );
         }
     }
     else

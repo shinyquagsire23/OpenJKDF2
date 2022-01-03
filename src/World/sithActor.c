@@ -165,7 +165,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
             sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
             for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
-                if ( (searchResult->collideType & SITH_THING_ACTOR) != 0 )
+                if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
                     if ( (searchResult->surface->surfaceFlags & SITH_THING_ACTOR) != 0 )
                     {
@@ -174,7 +174,7 @@ void sithActor_cogMsg_OpenDoor(sithThing *thing)
                         return;
                     }
                 }
-                else if ( (searchResult->collideType & 1) != 0 )
+                else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
                 {
                     v7 = searchResult->receiver;
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )

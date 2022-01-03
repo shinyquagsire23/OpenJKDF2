@@ -1059,7 +1059,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     v22 = sithCollision_NextSearchResult();
     if ( v22 )
     {
-        while ( (v22->collideType & 1) != 0 )
+        while ( (v22->hitType & SITHCOLLISION_THING) != 0 )
         {
             v23 = v22->receiver;
             if ( v23 != arg8 )
@@ -1150,9 +1150,9 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     v7 = sithCollision_NextSearchResult();
     if ( !v7 )
         goto LABEL_20;
-    while ( (v7->collideType & 2) == 0 )
+    while ( (v7->hitType & SITHCOLLISION_WORLD) == 0 )
     {
-        if ( (v7->collideType & 1) != 0 )
+        if ( (v7->hitType & SITHCOLLISION_THING) != 0 )
         {
             v10 = v7->receiver;
             if ( (v10->thingflags & SITH_TF_STANDABLE) != 0 )
@@ -1228,7 +1228,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     {
         while ( 1 )
         {
-            if ( (v6->collideType & 2) != 0 )
+            if ( (v6->hitType & SITHCOLLISION_WORLD) != 0 )
             {
                 v7 = v6->surface;
                 v8 = v7->surfaceFlags;
@@ -1251,7 +1251,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
                 }
                 return result;
             }
-            if ( (v6->collideType & 1) != 0 )
+            if ( (v6->hitType & SITHCOLLISION_THING) != 0 )
                 break;
             v6 = sithCollision_NextSearchResult();
             if ( !v6 )

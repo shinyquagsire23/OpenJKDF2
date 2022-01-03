@@ -461,11 +461,11 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, v8);
     for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
     {
-        if ( (i->collideType & 0x20) != 0 )
+        if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
         {
             v9 = i->surface->adjoin->sector;
         }
-        else if ( (i->collideType & 1) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
+        else if ( (i->hitType & SITHCOLLISION_THING) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
         {
             a6->x = i->distance * a5.x + a4->x;
             a6->y = i->distance * a5.y + a4->y;
@@ -479,12 +479,8 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
 
 void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4)
 {
-    sithCamera_povShakeVector1.x = a1->x;
-    sithCamera_povShakeVector1.y = a1->y;
-    sithCamera_povShakeVector1.z = a1->z;
-    sithCamera_povShakeVector2.x = a2->x;
-    sithCamera_povShakeVector2.y = a2->y;
-    sithCamera_povShakeVector2.z = a2->z;
+    rdVector_Copy3(&sithCamera_povShakeVector1, a1);
+    rdVector_Copy3(&sithCamera_povShakeVector2, a2);
     sithCamera_povShakeF1 = a3;
     sithCamera_povShakeF2 = a4;
 }
