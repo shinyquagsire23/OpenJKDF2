@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=OpenJKDF2
+Comment=A cross-platform reimplementation of Jedi Knight: Dark Forces II
+Icon=openjkdf2
+Exec=openjkdf2
+Categories=Game;Shooter;
