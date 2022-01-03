@@ -9,7 +9,7 @@ license=("BSD")
 depends=("imagemagick" "gtk3" "sdl2" "sdl2_mixer" "glew" "openal")
 makedepends=("clang" "cmake" "bison" "python-cogapp")
 checkdepends=()
-optdepends=("innoextract: installing game data from GOOG release")
+optdepends=("innoextract: installing game data from GOG release")
 backup=()
 source=(
     "$pkgname-$pkgver.tar.gz::https://github.com/shinyquagsire23/OpenJKDF2/archive/refs/tags/v$pkgver.tar.gz"
