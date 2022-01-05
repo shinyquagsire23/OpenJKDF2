@@ -734,6 +734,9 @@ int rdCache_SendFaceListToHardware()
                 
                 *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].ny = active_6c->extraData;
                 *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].ny = active_6c->extraData;
+
+                rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].nz = 0.0;
+                rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].nz = 0.0;
                 
                 rdCache_totalLines++;
             }
