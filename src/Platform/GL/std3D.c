@@ -56,14 +56,16 @@ static int activeFb;
 
 int init_once = 0;
 GLuint programDefault, programMenu;
-GLint attribute_coord3d, attribute_v_color, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette;
+GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
+GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
 
 GLuint worldpal_texture;
 void* worldpal_data;
+GLuint worldpal_lights_texture;
+void* worldpal_lights_data;
 GLuint displaypal_texture;
 void* displaypal_data;
 
@@ -229,10 +231,12 @@ int init_resources()
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
+    attribute_v_light = std3D_tryFindAttribute(programDefault, "v_light");
     attribute_v_uv = std3D_tryFindAttribute(programDefault, "v_uv");
     uniform_mvp = std3D_tryFindUniform(programDefault, "mvp");
     uniform_tex = std3D_tryFindUniform(programDefault, "tex");
     uniform_worldPalette = std3D_tryFindUniform(programDefault, "worldPalette");
+    uniform_worldPaletteLights = std3D_tryFindUniform(programDefault, "worldPaletteLights");
     uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
     uniform_blend_mode = std3D_tryFindUniform(programDefault, "blend_mode");
     
@@ -255,6 +259,19 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+
+    // World palette lights
+    glGenTextures(1, &worldpal_lights_texture);
+    worldpal_lights_data = malloc(0x4000);
+    memset(worldpal_lights_data, 0x3F, 0x4000);
+    
+    glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 0x40, 0, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
     
     
     // Display palette
@@ -306,13 +323,17 @@ void std3D_FreeResources()
     deleteFramebuffer(fb1, fbTex1, fbRbo1);
     deleteFramebuffer(fb2, fbTex2, fbRbo2);
     glDeleteTextures(1, &worldpal_texture);
+    glDeleteTextures(1, &worldpal_lights_texture);
     glDeleteTextures(1, &displaypal_texture);
     if (worldpal_data)
         free(worldpal_data);
+    if (worldpal_lights_data)
+        free(worldpal_lights_data);
     if (displaypal_data)
         free(displaypal_data);
 
     worldpal_data = NULL;
+    worldpal_lights_data = NULL;
     displaypal_data = NULL;
 
     if (world_data_all)
@@ -362,6 +383,13 @@ int std3D_StartScene()
         memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     }
+
+    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && sithWorld_pCurrentWorld->colormaps->lightlevel && memcmp(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000))
+    {
+        glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
+        memcpy(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 0x40, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
+    }
     
     if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
     {
@@ -391,6 +419,15 @@ int std3D_StartScene()
     );
 
     glVertexAttribPointer(
+        attribute_v_light, // attribute
+        1,                 // number of elements per vertex, here (L)
+        GL_FLOAT,  // the type of each element
+        GL_FALSE,          // normalize fixed-point data?
+        sizeof(std3DWorldVBO),                 // no extra data between each position
+        (GLvoid*)offsetof(std3DWorldVBO, nz) // offset of first element
+    );
+
+    glVertexAttribPointer(
         attribute_v_uv,    // attribute
         2,                 // number of elements per vertex, here (U,V)
         GL_FLOAT,          // the type of each element
@@ -401,6 +438,7 @@ int std3D_StartScene()
 
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
+    glEnableVertexAttribArray(attribute_v_light);
     glEnableVertexAttribArray(attribute_v_uv);
     
     return 1;
@@ -819,12 +857,15 @@ void std3D_DrawRenderList()
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
     
     glUniform1i(uniform_tex, 0);
     glUniform1i(uniform_worldPalette, 1);
+    glUniform1i(uniform_worldPaletteLights, 2);
     
     {
     

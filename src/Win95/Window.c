@@ -382,12 +382,6 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
     Window_lastXRel = event->xrel;
     Window_lastYRel = event->yrel;
 
-    if ((abs(Window_lastMouseX - Window_mouseX) > 300
-        || abs(Window_lastMouseY - Window_mouseY) > 300)
-        && (Window_mouseX == 0 && Window_mouseY == 0)) {
-        SDL_WarpMouseInWindow(displayWindow, Window_lastMouseX, Window_lastMouseY);
-    }
-
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
 }
 

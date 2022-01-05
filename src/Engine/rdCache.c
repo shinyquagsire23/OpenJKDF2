@@ -617,6 +617,9 @@ int rdCache_SendFaceListToHardware()
                     blue = 255;
                     green = 255;
                     vertex_r = 255;
+#ifdef SDL2_RENDER
+                rdCache_aHWVertices[rdCache_totalVerts].nz = 1.0;
+#endif
                 }
                 else
                 {
@@ -624,6 +627,9 @@ int rdCache_SendFaceListToHardware()
                         light_level = active_6c->vertexIntensities[vtx_idx];
                     else
                         light_level = active_6c->light_level_static;
+#ifdef SDL2_RENDER
+                rdCache_aHWVertices[rdCache_totalVerts].nz = light_level / 255.0;
+#endif
                     vertex_b = (__int64)light_level;
                     vertex_g = vertex_b;
                     blue = vertex_b;
@@ -913,6 +919,9 @@ LABEL_232:
                 red_and_alpha = v96;
                 green = v94;
                 blue = v98;
+#ifdef SDL2_RENDER
+                rdCache_aHWVertices[rdCache_totalVerts].nz = 1.0;
+#endif
             }
             else
             {
@@ -921,6 +930,9 @@ LABEL_232:
                     v92 = active_6c->vertexIntensities[vtx_idx];
                 else
                     v92 = active_6c->light_level_static;
+#ifdef SDL2_RENDER
+                rdCache_aHWVertices[rdCache_totalVerts].nz = v92 / 255.0;
+#endif
                 v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
                 v94 = (uint8_t)v91->colors[v93].g;
                 v95 = (uint8_t)v91->colors[v93].b;

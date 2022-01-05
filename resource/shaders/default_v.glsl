@@ -1,8 +1,10 @@
 in vec3 coord3d;
 in vec4 v_color;
+in float v_light;
 in vec2 v_uv;
 uniform mat4 mvp;
 out vec4 f_color;
+out float f_light;
 out vec2 f_uv;
 out vec3 f_coord;
 
@@ -15,4 +17,5 @@ void main(void)
     f_color = v_color.bgra;
     f_uv = v_uv;
     f_coord = coord3d;
+    f_light = v_light;
 }
