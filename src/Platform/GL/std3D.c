@@ -80,6 +80,8 @@ static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES];
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
+static void* loaded_colormap = NULL;
+
 rdDDrawSurface* last_tex = NULL;
 int last_flags = 0;
 
@@ -344,6 +346,8 @@ void std3D_FreeResources()
         free(world_data_elements);
     world_data_elements = NULL;
 
+    loaded_colormap = NULL;
+
     glDeleteBuffers(1, &world_vbo_all);
     glDeleteBuffers(1, &world_ibo_triangle);
 
@@ -377,19 +381,23 @@ int std3D_StartScene()
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && memcmp(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300))
+    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
         memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+    
+        if (sithWorld_pCurrentWorld->colormaps->lightlevel)
+        {
+            glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
+            memcpy(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 0x40, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
+        }
+
+        loaded_colormap = sithWorld_pCurrentWorld->colormaps;
     }
 
-    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && sithWorld_pCurrentWorld->colormaps->lightlevel && memcmp(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000))
-    {
-        glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
-        memcpy(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 0x40, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
-    }
+    
     
     if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
     {
