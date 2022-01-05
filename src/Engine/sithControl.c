@@ -1255,7 +1255,12 @@ void sithControl_FreeCam(sithThing *player)
         {
             v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
             v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
+#ifdef QOL_IMPROVEMENTS
+            // Scale appropriately to high framerates
+            v1->physicsParams.angVel.y +=  (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust;
+#else
             v1->physicsParams.angVel.y += sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust;
+#endif
         }
         if ( v2 )
         {
