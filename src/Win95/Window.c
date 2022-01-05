@@ -379,8 +379,8 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
     
     Window_lastSampleMs = event->timestamp - Window_lastSampleTime;
     //Window_lastSampleTime = event->timestamp;
-    Window_lastXRel = event->xrel;
-    Window_lastYRel = event->yrel;
+    Window_lastXRel += event->xrel;
+    Window_lastYRel += event->yrel;
 
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
 }
@@ -725,6 +725,8 @@ void Window_SdlUpdate()
         if (jkGame_isDDraw != last_jkGame_isDDraw) {
             Window_menu_mouseX = Window_mouseX;
             Window_menu_mouseY = Window_mouseY;
+            Window_lastXRel = 0;
+            Window_lastYRel = 0;
         }
 
         if (SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
