@@ -1003,17 +1003,21 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
             a2 = player->actorParams.eyePYR;
+
+            // Map directly to axis, the value we have is an angular velocity
             v5 = sithControl_GetAxis(8);
             if ( v5 != 0.0 )
             {
                 v3 = 1;
-                a2.x = a2.x + v5;
+                a2.x += v5;
             }
+
+            // Not mapped directly to axis, accomodate w/ deltaSecs
             v6 = sithControl_ReadAxisStuff(8);
             if ( v6 != 0.0 )
             {
                 v3 = 1;
-                a2.x = v6 * 90.0 * deltaSecs + a2.x;
+                a2.x += v6 * 90.0 * deltaSecs + a2.x;
             }
             if ( v3 )
             {
