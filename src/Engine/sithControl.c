@@ -926,7 +926,12 @@ LABEL_11:
             else
                 sithCamera_SetCurrentCamera(&sithCamera_cameras[6]);
         }
+#ifdef QOL_IMPROVEMENTS
+        // Scale appropriately to high framerates
+        v18 = deltaSecs * 90.0 * ((1.0/deltaSecs) / 50.0);
+#else
         v18 = deltaSecs * 90.0;
+#endif
         a3a.y = sithControl_ReadAxisStuff(1);
         a3a.x = sithControl_ReadAxisStuff(8);
         a3a.z = 0.0;
@@ -938,7 +943,11 @@ LABEL_11:
             rdMatrix_TransformVector34Acc(&sithControl_vec3_54A570, &a);
             rdVector_Normalize3Acc(&sithControl_vec3_54A570);
         }
+#ifdef QOL_IMPROVEMENTS
+        v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1) * ((1.0/deltaSecs) / 50.0);
+#else
         v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1);
+#endif
         if ( v7 != 0.0 )
         {
             v8 = v7 + sithControl_flt_54A57C;
@@ -1017,8 +1026,14 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             if ( v6 != 0.0 )
             {
                 v3 = 1;
-                a2.x += v6 * 90.0 * deltaSecs + a2.x;
+#ifdef QOL_IMPROVEMENTS
+                // Scale appropriately to high framerates
+                a2.x += v6 * 90.0 * deltaSecs * ((1.0/deltaSecs) / 50.0);
+#else
+                a2.x += v6 * 90.0 * deltaSecs;
+#endif
             }
+
             if ( v3 )
             {
                 if ( a2.x < (double)player->actorParams.minHeadPitch )
@@ -1037,7 +1052,12 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
 LABEL_20:
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & 2) != 0 )
                 {
+#ifdef QOL_IMPROVEMENTS
+                    // Scale appropriately to high framerates
+                    v8 = deltaSecs * 180.0 * ((1.0/deltaSecs) / 50.0);
+#else
                     v8 = deltaSecs * 180.0;
+#endif
                     a3a = v8;
                     v9 = -player->actorParams.eyePYR.x;
                     a1a = -v8;
@@ -1062,7 +1082,7 @@ LABEL_20:
                     }
                     else
                     {
-                        player->actorParams.eyePYR.x = v9 + player->actorParams.eyePYR.x;
+                        player->actorParams.eyePYR.x += v9;
                         sithUnk4_MoveJointsForEyePYR(player, &player->actorParams.eyePYR);
                     }
                 }
@@ -1080,7 +1100,6 @@ void sithControl_PlayerMovement(sithThing *player)
     int new_state; // eax
     double v6; // st7
     double v7; // st6
-    double v8; // st7
     double v11; // st7
     double y_vel; // st6
     int v16; // eax
@@ -1137,15 +1156,19 @@ void sithControl_PlayerMovement(sithThing *player)
         }
         else
         {
-            v8 = sithControl_GetAxis(1);
-            player->physicsParams.angVel.y = v8 * sithTime_TickHz;
+            // Player yaw handling
+            player->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
             if ( move_multiplier > 1.0 )
                 move_multiplier_ = move_multiplier;
             else
                 move_multiplier_ = 1.0;
             
-            player->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_
-                                                      + player->physicsParams.angVel.y;
+#ifdef QOL_IMPROVEMENTS
+            // Scale appropriately to high framerates
+            player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_;
+#else
+            player->physicsParams.angVel.y += sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_;
+#endif
             player->physicsParams.acceleration.x = sithControl_GetAxis2(2)
                                                             * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
                                                             * 0.69999999;
@@ -1232,8 +1255,7 @@ void sithControl_FreeCam(sithThing *player)
         {
             v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
             v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
-            v1->physicsParams.angVel.y = sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust
-                                                  + v1->physicsParams.angVel.y;
+            v1->physicsParams.angVel.y += sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust;
         }
         if ( v2 )
         {
