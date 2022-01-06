@@ -26,6 +26,9 @@ void jkCog_EndLevel(sithCog *ctx);
 void jkCog_SetPovModel(sithCog *ctx);
 void jkCog_PlayPovKey(sithCog *ctx);
 void jkCog_StopPovKey(sithCog *ctx);
+void jkCog_SetForceSpeed(sithCog *pCog);
+void jkCog_SetInvis(sithCog *pCog);
+void jkCog_SetInvulnerable(sithCog *pCog);
 void jkCog_EndTarget(sithCog *ctx);
 void jkCog_SetSuperFlags(sithCog *ctx);
 void jkCog_ClearSuperFlags(sithCog *ctx);
@@ -40,8 +43,16 @@ void jkCog_EnableSaber(sithCog *ctx);
 void jkCog_DisableSaber(sithCog *ctx);
 void jkCog_SetWaggle(sithCog *ctx);
 void jkCog_GetChoice(sithCog *ctx);
-void jkCog_StringClear();
+void jkCog_StringClear(sithCog *pCog);
+void jkCog_StringConcatUnistring(sithCog *pCog);
+void jkCog_StringConcatAsciiString(sithCog *pCog);
+void jkCog_StringConcatPlayerName(sithCog *pCog);
+void jkCog_StringConcatSpace(sithCog *pCog);
+void jkCog_StringConcatInt(sithCog *pCog);
 void jkCog_StringConcatFormattedInt(sithCog *ctx);
+void jkCog_StringConcatFlex(sithCog *pCog);
+void jkCog_StringConcatFormattedFlex(sithCog *pCog);
+void jkCog_StringConcatVector(sithCog *pCog);
 void jkCog_StringOutput(sithCog *ctx);
 
 //static void (*jkCog_SetFlags)(sithCog* ctx) = (void*)0x0040A3E0;
@@ -52,9 +63,9 @@ void jkCog_StringOutput(sithCog *ctx);
 //static void (*jkCog_SetPovModel)(sithCog* ctx) = (void*)0x0040A5D0;
 //static void (*jkCog_PlayPovKey)(sithCog* ctx) = (void*)0x0040A620;
 //static void (*jkCog_StopPovKey)(sithCog* ctx) = (void*)0x0040A6B0;
-static void (*jkCog_SetForceSpeed)(sithCog* ctx) = (void*)0x0040A710;
-static void (*jkCog_SetInvis)(sithCog* ctx) = (void*)0x0040A730;
-static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
+//static void (*jkCog_SetForceSpeed)(sithCog* ctx) = (void*)0x0040A710;
+//static void (*jkCog_SetInvis)(sithCog* ctx) = (void*)0x0040A730;
+//static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
 //jkCog_PrintUniString
 //jkCog_SetSuperFlags 
 //jkCog_ClearSuperFlags
@@ -67,15 +78,15 @@ static void (*jkCog_SetInvulnerable)(sithCog* ctx) = (void*)0x0040A7A0;
 //static void (*jkCog_SetTarget)(sithCog* ctx) = (void*)0x0040AD00;
 //static void (*jkCog_SetTargetColors)(sithCog* ctx) = (void*)0x0040AD30;
 //static void (*jkCog_StringClear)(sithCog* ctx) = (void*)0x0040AD80;
-static void (*jkCog_StringConcatUnistring)(sithCog* ctx) = (void*)0x0040ADA0;
-static void (*jkCog_StringConcatAsciiString)(sithCog* ctx) = (void*)0x0040AE30;
-static void (*jkCog_StringConcatPlayerName)(sithCog* ctx) = (void*)0x0040AEB0;
-static void (*jkCog_StringConcatSpace)(sithCog* ctx) = (void*)0x0040AF10;
-static void (*jkCog_StringConcatInt)(sithCog* ctx) = (void*)0x0040AF70;
+//static void (*jkCog_StringConcatUnistring)(sithCog* ctx) = (void*)0x0040ADA0;
+//static void (*jkCog_StringConcatAsciiString)(sithCog* ctx) = (void*)0x0040AE30;
+//static void (*jkCog_StringConcatPlayerName)(sithCog* ctx) = (void*)0x0040AEB0;
+//static void (*jkCog_StringConcatSpace)(sithCog* ctx) = (void*)0x0040AF10;
+//static void (*jkCog_StringConcatInt)(sithCog* ctx) = (void*)0x0040AF70;
 //static void (*jkCog_StringConcatFormattedInt)(sithCog* ctx) = (void*)0x0040AFE0;
-static void (*jkCog_StringConcatFlex)(sithCog* ctx) = (void*)0x0040B090;
-static void (*jkCog_StringConcatFormattedFlex)(sithCog* ctx) = (void*)0x0040B100;
-static void (*jkCog_StringConcatVector)(sithCog* ctx) = (void*)0x0040B1C0;
+//static void (*jkCog_StringConcatFlex)(sithCog* ctx) = (void*)0x0040B090;
+//static void (*jkCog_StringConcatFormattedFlex)(sithCog* ctx) = (void*)0x0040B100;
+//static void (*jkCog_StringConcatVector)(sithCog* ctx) = (void*)0x0040B1C0;
 //static void (*jkCog_StringOutput)(sithCog* ctx) = (void*)0x0040B270;
 //static void (*jkCog_GetSaberCam)(sithCog* ctx) = (void*)0x0040B3B0;
 //static void (*jkCog_GetChoice)(sithCog* ctx) = (void*)0x0040B3D0;
@@ -444,6 +455,61 @@ void jkCog_StopPovKey(sithCog *ctx)
     }
 }
 
+void jkCog_SetForceSpeed(sithCog *pCog)
+{
+    g_localPlayerThing->actorParams.extraSpeed = sithCogVm_PopFlex(pCog);
+}
+
+void jkCog_SetInvis(sithCog *pCog)
+{
+    int v1; // edi
+    sithThing *v2; // eax
+    int v3; // esi
+
+    v1 = sithCogVm_PopInt(pCog);
+    v2 = sithCogVm_PopThing(pCog);
+    if ( v1 <= 0 )
+        v2->rdthing.geometryMode = v2->rdthing.geoMode;
+    else
+        v2->rdthing.geometryMode = 1;
+    if ( sithCogVm_multiplayerFlags )
+    {
+        if ( (pCog->flags & 0x200) == 0 )
+        {
+            v3 = pCog->trigId;
+            if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
+                sithThing_SyncThingPos(v2, 2);
+        }
+    }
+}
+
+void jkCog_SetInvulnerable(sithCog *pCog)
+{
+    int v1; // edi
+    sithThing *v2; // eax
+    uint32_t v3; // ecx
+    unsigned int v4; // ecx
+    int v5; // esi
+
+    v1 = sithCogVm_PopInt(pCog);
+    v2 = sithCogVm_PopThing(pCog);
+    v3 = v2->actorParams.typeflags;
+    if ( v1 <= 0 )
+        v4 = v3 & ~8u;
+    else
+        v4 = v3 | 8;
+    v2->actorParams.typeflags = v4;
+    if ( sithCogVm_multiplayerFlags )
+    {
+        if ( (pCog->flags & 0x200) == 0 )
+        {
+            v5 = pCog->trigId;
+            if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
+                sithThing_SyncThingPos(v2, 2);
+        }
+    }
+}
+
 void jkCog_EndTarget(sithCog *ctx)
 {
     jkHud_EndTarget();
@@ -691,9 +757,85 @@ void jkCog_GetChoice(sithCog *ctx)
     sithCogVm_PushInt(ctx, jkPlayer_GetChoice());
 }
 
-void jkCog_StringClear()
+void jkCog_StringClear(sithCog *pCog)
 {
     _wcscpy(jkCog_jkstring, jkCog_emptystring);
+}
+
+void jkCog_StringConcatUnistring(sithCog *pCog)
+{
+    signed int v1; // eax
+    wchar_t *v2; // esi
+    size_t v3; // edi
+    char key[32]; // [esp+8h] [ebp-20h] BYREF
+
+    v1 = sithCogVm_PopInt(pCog);
+    stdString_snprintf(key, 32, "COG_%05d", v1);
+    v2 = stdStrTable_GetUniString(&jkCog_strings, key);
+    if ( !v2 )
+        v2 = jkStrings_GetText(key);
+    v3 = _wcslen(jkCog_jkstring);
+    if ( _wcslen(v2) + v3 < 0x81 )
+        __wcscat(jkCog_jkstring, v2);
+}
+
+void jkCog_StringConcatAsciiString(sithCog *pCog)
+{
+    char *v1; // edx
+    size_t v2; // esi
+    wchar_t v3[130]; // [esp+8h] [ebp-104h] BYREF
+
+    v1 = sithCogVm_PopString(pCog);
+    stdString_CharToWchar(v3, v1, strlen(v1) + 1);
+    v2 = _wcslen(jkCog_jkstring);
+    if ( _wcslen(v3) + v2 < 0x81 )
+        __wcscat(jkCog_jkstring, v3);
+}
+
+void jkCog_StringConcatPlayerName(sithCog *pCog)
+{
+    sithThing *v1; // eax
+    sithPlayerInfo *v2; // esi
+    size_t v3; // edi
+
+    v1 = sithCogVm_PopThing(pCog);
+    if ( v1 )
+    {
+        if ( v1->thingtype == SITH_THING_PLAYER )
+        {
+            v2 = v1->actorParams.playerinfo;
+            if ( v2 )
+            {
+                v3 = _wcslen(jkCog_jkstring);
+                if ( _wcslen(v2->player_name) + v3 < 0x81 )
+                    __wcscat(jkCog_jkstring, v2->player_name);
+            }
+        }
+    }
+}
+
+void jkCog_StringConcatSpace(sithCog *pCog)
+{
+    size_t v1; // esi
+    wchar_t v2[130]; // [esp+4h] [ebp-104h] BYREF
+
+    _wcscpy(v2, L" ");
+    v1 = _wcslen(jkCog_jkstring);
+    if ( _wcslen(v2) + v1 < 0x81 )
+        __wcscat(jkCog_jkstring, v2);
+}
+
+void jkCog_StringConcatInt(sithCog *pCog)
+{
+    signed int v1; // eax
+    size_t v2; // esi
+    wchar_t v3[130]; // [esp+4h] [ebp-104h] BYREF
+
+    v1 = sithCogVm_PopInt(pCog);
+    jk_snwprintf(v3, 130, L"%d", v1); // Added: bounds check
+    v2 = _wcslen(v3);
+    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+        __wcscat(jkCog_jkstring, v3);
 }
 
 void jkCog_StringConcatFormattedInt(sithCog *ctx)
@@ -720,6 +862,58 @@ void jkCog_StringConcatFormattedInt(sithCog *ctx)
     v4 = _wcslen(v5);
     if ( _wcslen(jkCog_jkstring) + v4 < 0x81 )
         __wcscat(jkCog_jkstring, v5);
+}
+
+void jkCog_StringConcatFlex(sithCog *pCog)
+{
+    double v1; // st7
+    size_t v2; // esi
+    wchar_t v3[130]; // [esp+Ch] [ebp-104h] BYREF
+
+    v1 = sithCogVm_PopFlex(pCog);
+    jk_snwprintf(v3, 130, L"%f", v1); // Added: bounds check
+    v2 = _wcslen(v3);
+    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+        __wcscat(jkCog_jkstring, v3);
+}
+
+void jkCog_StringConcatFormattedFlex(sithCog *pCog)
+{
+    char *v1; // esi
+    size_t v2; // esi
+    float v3; // [esp+10h] [ebp-20Ch]
+    wchar_t v4[130]; // [esp+14h] [ebp-208h] BYREF
+    wchar_t v5[130]; // [esp+118h] [ebp-104h] BYREF
+
+    v1 = sithCogVm_PopString(pCog);
+    v3 = sithCogVm_PopFlex(pCog);
+    if ( v1 )
+    {
+        stdString_CharToWchar(v5, v1, strlen(v1) + 1);
+        jk_snwprintf(v4, 130, v5, v3); // Added: bounds
+    }
+    else
+    {
+        jk_snwprintf(v4, 130, L"%f", v3); // Added: bounds
+    }
+    v2 = _wcslen(v4);
+    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+        __wcscat(jkCog_jkstring, v4);
+}
+
+void jkCog_StringConcatVector(sithCog *pCog)
+{
+    size_t v1; // esi
+    rdVector3 v2; // [esp+1Ch] [ebp-110h] BYREF
+    wchar_t v3[130]; // [esp+28h] [ebp-104h] BYREF
+
+    if ( sithCogVm_PopVector3(pCog, &v2) )
+        jk_snwprintf(v3, 130, L"<%f %f %f>", v2.x, v2.y, v2.z);
+    else
+        _wcscpy(v3, L"<Bad Vector>");
+    v1 = _wcslen(v3);
+    if ( _wcslen(jkCog_jkstring) + v1 < 0x81 )
+        __wcscat(jkCog_jkstring, v3);
 }
 
 void jkCog_StringOutput(sithCog *ctx)
