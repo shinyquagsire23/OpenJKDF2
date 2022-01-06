@@ -95,7 +95,7 @@ sithPuppet* sithPuppet_NewEntry(sithThing *thing)
         thing->animclass = 0;
     _memset(v1, 0, sizeof(sithPuppet));
     sector = thing->sector;
-    if ( sector && (sector->flags & SITH_SF_UNDERWATER) != 0 )
+    if ( sector && (sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
     {
         result = thing->puppet;
         result->field_4 = 1;
@@ -535,7 +535,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     }
     else if ( v3 )
     {
-        if ( v3 == SITH_SF_NOGRAVITY )
+        if ( v3 == SITH_SECTOR_NOGRAVITY )
         {
             if ( thinga >= 0.0 )
             {

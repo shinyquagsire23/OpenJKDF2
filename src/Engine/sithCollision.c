@@ -363,7 +363,7 @@ void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const r
 
     rdVector_Copy3(&tmp, vec1);
     rdVector_MultAcc3(&tmp, vec2, a4);
-    if ( (sector->flags & SITH_SF_COLLIDEBOX) == 0
+    if ( (sector->flags & SITH_SECTOR_COLLIDEBOX) == 0
       || tmp.z - a5 <= sector->collidebox_onecorner.z
       || tmp.y - a5 <= sector->collidebox_onecorner.y
       || tmp.x - a5 <= sector->collidebox_onecorner.x

@@ -71,7 +71,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     sithThing *v2; // ecx
     float v3; // edx
     sithSector *v4; // esi
-    SITH_SF v5; // ecx
+    int v5; // ecx
     sithAdjoin *i; // esi
     int v8; // eax
     __int16 v9; // si

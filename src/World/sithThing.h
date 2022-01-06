@@ -274,6 +274,11 @@ enum THING_TYPEFLAGS
     THING_TYPEFLAGS_80000000  = 0x80000000
 };
 
+typedef enum SITH_WF
+{
+    SITH_WF_PROXIMITY = 0x1000, // "Weapon will explode when something touches its sphere."
+} SITH_WF;
+
 int sithThing_Startup();
 int sithThing_Shutdown();
 void sithThing_SetHandler(sithThing_handler_t handler);

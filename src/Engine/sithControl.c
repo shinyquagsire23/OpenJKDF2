@@ -1214,7 +1214,7 @@ void sithControl_FreeCam(sithThing *player)
 
     v1 = player;
     v2 = 0;
-    if ( (player->physicsParams.physflags & 0x2000) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SF_UNDERWATER) != 0 )
+    if ( (player->physicsParams.physflags & 0x2000) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
         v2 = 1;
     if ( (sithWeapon_controlOptions & 2) == 0 )
         sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0);

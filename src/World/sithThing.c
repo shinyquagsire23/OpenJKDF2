@@ -1173,7 +1173,7 @@ void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
     thing->prevThing = 0;
     sector->thingsList = thing;
     thing->sector = sector;
-    if ( (v5 & SITH_SF_UNDERWATER) != 0 )
+    if ( (v5 & SITH_SECTOR_UNDERWATER) != 0 )
     {
         v6 = thing->attach_flags;
         if ( v6 && (v6 & 8) == 0 && thing->moveType == SITH_MT_PHYSICS )
@@ -1188,7 +1188,7 @@ void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
     if ( !a4 )
     {
         v7 = thing->sector;
-        if ( (v7->flags & SITH_SF_COGLINKED) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+        if ( (v7->flags & SITH_SECTOR_COGLINKED) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
             sithCog_SendMessageFromSector(v7, thing, SITH_MESSAGE_ENTERED);
     }
 }
@@ -1772,7 +1772,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
         sithSurface_DetachThing(surface, &a2a);
         rdVector_Sub3Acc(&thing->physicsParams.vel, &a2a);
     }
-    if ( (surface->surfaceFlags & SITH_SF_UNDERWATER) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+    if ( (surface->surfaceFlags & SITH_SECTOR_UNDERWATER) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromSurface(surface, thing, SITH_MESSAGE_ENTERED);
     if ( !a3 && v4 )
     {

@@ -124,7 +124,7 @@ int sithSector_Load(sithWorld *world, int tmp)
                      &sectors->collidebox_othercorner.y,
                      &sectors->collidebox_othercorner.z) == 6 )
             {
-                sectors->flags |= SITH_SF_COLLIDEBOX;
+                sectors->flags |= SITH_SECTOR_COLLIDEBOX;
                 if ( !stdConffile_ReadLine() )
                     break;
             }
@@ -188,7 +188,7 @@ void sithSector_SetAdjoins(sithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_SetAdjoins(i);
-    sector->flags &= ~SITH_SF_80;
+    sector->flags &= ~SITH_SECTOR_80;
 }
 
 void sithSector_UnsetAdjoins(sithSector *sector)
@@ -197,7 +197,7 @@ void sithSector_UnsetAdjoins(sithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_UnsetAdjoins(i);
-    sector->flags |= SITH_SF_80;
+    sector->flags |= SITH_SECTOR_80;
 }
 
 int sithSector_GetThingsCount(sithSector *sector)

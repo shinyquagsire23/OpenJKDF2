@@ -282,9 +282,9 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
                 v15 = v3->sector;
                 if ( v15 )
                 {
-                    if ( (v15->flags & 0x40) != 0 )
+                    if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 )
                     {
-                        v3->thingflags |= 0x200;
+                        v3->thingflags |= SITH_TF_DEAD;
                         v3->actorParams.typeflags |= THING_TYPEFLAGS_400000;
                         sithCamera_SetCameraFocus(&sithCamera_cameras[1], v3, 0);
                         sithCamera_SetCurrentCamera(&sithCamera_cameras[1]);

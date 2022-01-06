@@ -464,7 +464,7 @@ sithPlayingSound* sithSoundSys_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *a2
             a4 = 1.5;
         }
         v7 = a7 & ~SITHSOUNDFLAG_PLAYING | SITHSOUNDFLAG_ABSOLUTE;
-        if ( a3 && (a3->flags & SITH_SF_UNDERWATER) != 0 )
+        if ( a3 && (a3->flags & SITH_SECTOR_UNDERWATER) != 0 )
             v7 |= SITHSOUNDFLAG_UNDERWATER;
         if ( sithCamera_currentCamera )
         {
@@ -871,7 +871,7 @@ void sithSoundSys_FadeSound(sithPlayingSound *sound, float vol_, float fadeintim
                 v7 = -v3;
             sound->volumeVelocity = v7 / fadeintime_;
             sound->volume = vol_;
-            if ( v3 <= 0.0 ) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
+            if ( v3 < 0.0 ) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
                 sound->flags = v4 | SITHSOUNDFLAG_20;
             else
                 sound->flags = v4 | SITHSOUNDFLAG_10;
@@ -986,7 +986,7 @@ LABEL_12:
                 v7 = -v4;
             v3->volume = 0.0;
             v3->volumeVelocity = v7 + v7;
-            if ( v4 <= 0.0 ) // TODO verify? v4
+            if ( v4 < 0.0 ) // TODO verify? v4
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1015,6 +1015,10 @@ LABEL_12:
                     goto LABEL_72;
                 v42 = v14;
                 v17 = v42;
+
+                // added copy for later
+                v43 = v14;
+
                 sithSoundSys_pPlayingSoundIdk->flags &= ~(SITHSOUNDFLAG_20|SITHSOUNDFLAG_10|SITHSOUNDFLAG_FADING);
                 if ( v17 < 0.0 )
                     v17 = -v17;
@@ -1030,7 +1034,7 @@ LABEL_12:
                         v23 = -v20;
                     v3->volume = 0.0;
                     v3->volumeVelocity = v23 + v23;
-                    if ( v20 <= 0.0 ) // TODO verify? v20 <
+                    if ( v20 < 0.0 ) // TODO verify? v20 <
                         v3->flags |= SITHSOUNDFLAG_20;
                     else
                         v3->flags |= SITHSOUNDFLAG_10;
@@ -1093,7 +1097,7 @@ LABEL_49:
             }
             v3->volumeVelocity = v17 + v17;
             v3->volume = v13;
-            if ( v17 <= 0.0 ) // TODO verify? v43 > 0.0
+            if ( v43 < 0.0 ) // TODO verify? v43 > 0.0
                 v3->flags |= SITHSOUNDFLAG_20;
             else
                 v3->flags |= SITHSOUNDFLAG_10;
@@ -1245,7 +1249,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
     if ( (sound->flags & SITHSOUNDFLAG_1000) != 0 )
     {
         deltaSecsa = sound->pitchVel * deltaSecs + sound->pitch;
-        if ( sound->pitchVel > 0.0 && deltaSecsa > (double)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (double)sound->nextPitch ) // TODO verify sound->pitchVel > 0
+        if ( sound->pitchVel <= 0.0 && deltaSecsa > (double)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (double)sound->nextPitch ) // TODO verify sound->pitchVel > 0
         {
             sound->flags &= ~SITHSOUNDFLAG_1000;
             deltaSecsa = sound->nextPitch;
@@ -1301,7 +1305,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
             
             // Added: adjusted this so that sounds actually free?
             // TODO figure out why this needed to be changed
-            if (!(sound->flags & SITHSOUNDFLAG_LOOP) || !sound->pSoundBuf) // 
+            if (!(sound->flags & SITHSOUNDFLAG_LOOP)) 
             {
                 sithSoundSys_StopSound(sound);
             }
@@ -1570,7 +1574,7 @@ void sithSoundSys_UpdatePlayingSoundPosition(sithPlayingSound *sound)
         sound->posRelative.y = v6->position.y - v8->vec3_1.y;
 
         sound->posRelative.z = v6->position.z - v8->vec3_1.z;
-        if ( v6->sector && (v6->sector->flags & SITH_SF_UNDERWATER) == 0 ) // added v6->sector
+        if ( v6->sector && (v6->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // added v6->sector
             sound->flags &= ~SITHSOUNDFLAG_UNDERWATER;
         else
             sound->flags |= SITHSOUNDFLAG_UNDERWATER;
@@ -1597,11 +1601,11 @@ LABEL_23:
     {
         sounda = rdVector_Normalize3QuickAcc(pRelative);
         sound->anonymous_13 = sounda;
-        if ( sounda < sound->maxPosition ) // TODO verify
+        if ( sounda > sound->maxPosition ) // TODO verify
         {
-            if ( (sound->flags & SITHSOUNDFLAG_UNDERWATER) == 0 || (sithCamera_currentCamera->sector->flags & SITH_SF_UNDERWATER) != 0 )
+            if ( (sound->flags & SITHSOUNDFLAG_UNDERWATER) == 0 || (sithCamera_currentCamera->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
             {
-                if ( (sound->flags & SITHSOUNDFLAG_UNDERWATER) == 0 && (sithCamera_currentCamera->sector->flags & SITH_SF_UNDERWATER) != 0 )
+                if ( (sound->flags & SITHSOUNDFLAG_UNDERWATER) == 0 && (sithCamera_currentCamera->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
                     sound->anonymous_13 = sounda * 1.5;
             }
             else

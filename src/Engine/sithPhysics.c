@@ -35,13 +35,13 @@ void sithPhysics_FindFloor(sithThing *thing, int a3)
     if (!sector)
         return;
 
-    if (sector->flags & SITH_SF_UNDERWATER && thing->type == SITH_THING_PLAYER)
+    if (sector->flags & SITH_SECTOR_UNDERWATER && thing->type == SITH_THING_PLAYER)
     {
         sithCollision_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
-            while ( (v5->hitType & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->adjoin->sector->flags & SITH_SF_UNDERWATER) != 0 )
+            while ( (v5->hitType & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->adjoin->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
             {
                 v5 = sithCollision_NextSearchResult();
                 if ( !v5 )
@@ -167,7 +167,7 @@ void sithPhysics_ThingTick(sithThing *thing, float deltaSecs)
     {
         sithPhysics_ThingPhysAttached(thing, deltaSecs);
     }
-    else if (thing->sector->flags & SITH_SF_UNDERWATER)
+    else if (thing->sector->flags & SITH_SECTOR_UNDERWATER)
     {
         sithPhysics_ThingPhysUnderwater(thing, deltaSecs);
     }
@@ -492,7 +492,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     }
 
     if (thing->physicsParams.mass != 0.0 
-        && (thing->sector->flags & SITH_SF_HASTHRUST) 
+        && (thing->sector->flags & SITH_SECTOR_HASTHRUST) 
         && !(thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
     {
         rdVector_MultAcc3(&a1a, &thing->sector->thrust, deltaSeconds);
@@ -500,7 +500,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
 
     if (thing->physicsParams.mass != 0.0 
         && thing->physicsParams.physflags & PHYSFLAGS_GRAVITY
-        && !(thing->sector->flags & SITH_SF_NOGRAVITY))
+        && !(thing->sector->flags & SITH_SECTOR_NOGRAVITY))
     {
         float gravity = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
         if ( (thing->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
@@ -587,7 +587,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
         if ( player->physicsParams.mass != 0.0 )
         {
-            if ((player->sector->flags & SITH_SF_HASTHRUST)
+            if ((player->sector->flags & SITH_SECTOR_HASTHRUST)
                 && !(player->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
             {
                 rdVector_MultAcc3(&a1a, &player->sector->thrust, DELTA_50FPS);
@@ -596,7 +596,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
         if ( player->physicsParams.mass != 0.0 
              && (player->physicsParams.physflags & PHYSFLAGS_GRAVITY) 
-             && !(player->sector->flags & SITH_SF_NOGRAVITY) )
+             && !(player->sector->flags & SITH_SECTOR_NOGRAVITY) )
         {
             float gravity = sithWorld_pCurrentWorld->worldGravity * DELTA_50FPS;
             if ( (player->physicsParams.physflags & PHYSFLAGS_PARTIALGRAVITY) != 0 )
@@ -953,7 +953,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         if ( (thing->physicsParams.physflags & PHYSFLAGS_8000) == 0 )
         {
             if ( rdVector_IsZero3(&thing->physicsParams.acceleration)
-              && !(thing->sector->flags & SITH_SF_HASTHRUST)
+              && !(thing->sector->flags & SITH_SECTOR_HASTHRUST)
               && possibly_undef_2 > 0.80000001 )
             {
                 a2a = thing->physicsParams.surfaceDrag * possibly_undef_2;
@@ -984,7 +984,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             rdMatrix_TransformVector34Acc(&vel_change, &thing->lookOrientation);
     }
 
-    if (thing->physicsParams.mass != 0.0 && (thing->sector->flags & SITH_SF_HASTHRUST) && !(thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
+    if (thing->physicsParams.mass != 0.0 && (thing->sector->flags & SITH_SECTOR_HASTHRUST) && !(thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
     {
         if ( thing->sector->thrust.z > sithWorld_pCurrentWorld->worldGravity * thing->physicsParams.mass )
         {
@@ -1033,7 +1033,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             }
 
             if ( thing->physicsParams.mass != 0.0
-              && (thing->sector->flags & SITH_SF_HASTHRUST)
+              && (thing->sector->flags & SITH_SECTOR_HASTHRUST)
               && !(thing->physicsParams.physflags & PHYSFLAGS_NOTHRUST))
             {
                 rdVector_MultAcc3(&out, &thing->sector->thrust, deltaSeconds);

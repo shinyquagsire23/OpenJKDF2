@@ -536,7 +536,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
             if ( sithSector_GetIdxFromPtr(v13) && v12 >= 0 )
             {
                 v15 = sithCog_numSectorLinks;
-                v13->flags |= SITH_SF_COGLINKED;
+                v13->flags |= SITH_SECTOR_COGLINKED;
                 v16 = v15;
                 sithCog_aSectorLinks[v16].sector = v13;
                 sithCog_aSectorLinks[v16].cog = cog;

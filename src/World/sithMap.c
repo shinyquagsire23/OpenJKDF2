@@ -63,7 +63,7 @@ LABEL_10:
         goto LABEL_11;
     }
 
-    if ( (v3->flags & 0x4000) != 0 || (g_mapModeFlags & 2) != 0 )
+    if ( (v3->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
     {
         v3->field_8C = sithRender_lastRenderTick;
         if ( (v3->flags & 0x10) != 0 )
@@ -99,10 +99,10 @@ LABEL_11:
         return;
     }
 
-    if ( (sector->flags & 0x4000) != 0 || (g_mapModeFlags & 2) != 0 )
+    if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
     {
         sector->field_8C = sithRender_lastRenderTick;
-        if ( (sector->flags & SITH_SF_AUTOMAPHIDE) != 0 )
+        if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
             v2 = 1;
         else
             v2 = sithMap_Draw(sector);

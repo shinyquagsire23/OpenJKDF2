@@ -89,7 +89,7 @@ void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sector->ambientLight);
     NETMSG_PUSHF32(sector->extraLight);
     
-    if (sector->flags & SITH_SF_HASTHRUST)
+    if (sector->flags & SITH_SECTOR_HASTHRUST)
     {
         NETMSG_PUSHVEC3(sector->thrust);
     }
@@ -124,16 +124,16 @@ int sithDSS_HandleSyncSector(sithCogMsg *msg)
     sector->flags = NETMSG_POPU32();
 
     // TODO: untangle this
-    if (!(sector->flags & SITH_SF_80))
+    if (!(sector->flags & SITH_SECTOR_80))
     {
-        if ( (oldSectorFlags & SITH_SF_80) == 0 )
+        if ( (oldSectorFlags & SITH_SECTOR_80) == 0 )
             goto LABEL_11;
 LABEL_9:
-        if ( (sector->flags & SITH_SF_80) == 0 )
+        if ( (sector->flags & SITH_SECTOR_80) == 0 )
             sithSector_SetAdjoins(sector);
         goto LABEL_11;
     }
-    if (oldSectorFlags & SITH_SF_80)
+    if (oldSectorFlags & SITH_SECTOR_80)
         goto LABEL_9;
     sithSector_UnsetAdjoins(sector);
 LABEL_11:
@@ -141,7 +141,7 @@ LABEL_11:
     sector->ambientLight = NETMSG_POPF32();
     sector->extraLight = NETMSG_POPF32();
 
-    if (sector->flags & SITH_SF_HASTHRUST)
+    if (sector->flags & SITH_SECTOR_HASTHRUST)
     {
         sector->thrust = NETMSG_POPVEC3();
     }

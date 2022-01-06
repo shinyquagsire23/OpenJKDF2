@@ -757,7 +757,7 @@ LABEL_15:
                         a4.y = v3->physicsParams.vel.y * deltaSeconds + v3->position.y;
                         a4.z = v3->physicsParams.vel.z * deltaSeconds + v3->position.z;
                         v18 = sithCollision_GetSectorLookAt(v3->sector, &v3->position, &a4, 0.0);
-                        if ( !v18 || (v18->flags & SITH_SF_UNDERWATER) == 0 )
+                        if ( !v18 || (v18->flags & SITH_SECTOR_UNDERWATER) == 0 )
                             goto LABEL_22;
                         v16->x = 0.0;
                         v3->physicsParams.vel.y = 0.0;
@@ -1182,9 +1182,9 @@ LABEL_8:
     }
     v8 = v7->surface;
     v9 = v8->surfaceFlags;
-    if ( (v9 & SITH_SF_HASTHRUST) != 0 )
+    if ( (v9 & SITH_SECTOR_HASTHRUST) != 0 )
         goto LABEL_8;
-    v12 = 2 - ((v9 & SITH_SF_NOGRAVITY) != 0);
+    v12 = 2 - ((v9 & SITH_SECTOR_NOGRAVITY) != 0);
     if ( !arg8 )
         goto LABEL_20;
     if ( (v4->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
@@ -1368,7 +1368,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
     v20 = 0;
     if ( (g_debugmodeFlags & 0x80u) != 0
       || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
-      || (v9->sector->flags & SITH_SF_UNDERWATER) != 0 && (v9->actorParams.typeflags & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 )
+      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) != 0 && (v9->actorParams.typeflags & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 )
     {
         return 0;
     }

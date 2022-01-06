@@ -281,14 +281,14 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
     {
         if ( thrust.x == 0.0 && thrust.y == 0.0 && thrust.z == 0.0 )
         {
-            sector->flags &= ~SITH_SF_HASTHRUST;
+            sector->flags &= ~SITH_SECTOR_HASTHRUST;
             sector->thrust.x = 0.0;
             sector->thrust.y = 0.0;
             sector->thrust.z = 0.0;
         }
         else
         {
-            sector->flags |= SITH_SF_HASTHRUST;
+            sector->flags |= SITH_SECTOR_HASTHRUST;
             sector->thrust.x = mult * thrust.x;
             sector->thrust.y = mult * thrust.y;
             sector->thrust.z = mult * thrust.z;

@@ -369,10 +369,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             return;
 
         sithRender_aSectors[sithRender_numSectors++] = sector;
-        if ( (sector->flags & SITH_SF_AUTOMAPVISIBLE) == 0 )
+        if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) == 0 )
         {
-            sector->flags |= SITH_SF_AUTOMAPVISIBLE;
-            if ( (sector->flags & SITH_SF_COGLINKED) != 0 )
+            sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
+            if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
                 sithCog_SendMessageFromSector(sector, 0, SITH_MESSAGE_SIGHTED);
         }
         frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];

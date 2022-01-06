@@ -613,9 +613,9 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     sithThing *v28; // eax
     uint32_t v30; // eax
 
-    if ( (physicsThing->weaponParams.typeflags & THING_TYPEFLAGS_1000) != 0 )
+    if ( (physicsThing->weaponParams.typeflags & SITH_WF_PROXIMITY) != 0 )
     {
-        physicsThing->weaponParams.typeflags &= ~0x1000;
+        physicsThing->weaponParams.typeflags &= ~SITH_WF_PROXIMITY;
         physicsThing->weaponParams.typeflags |= 0x100;
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
