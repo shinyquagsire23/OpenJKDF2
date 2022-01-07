@@ -21,9 +21,15 @@
 #include <math.h>
 #include <float.h>
 
+void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+
 static const int jkGUIMouse_idk1 = 0xAA;
 static int aIdk_52B170[2] = {0xd, 0xe};
 static int aIdk_52B168[2] = {0x13, 0x11};
+
+#ifdef QOL_IMPROVEMENTS
+static wchar_t slider_val_text[5] = {0};
+#endif
 
 static jkGuiMouseEntry jkGuiMouse_aEntries[8] =
 {
@@ -37,7 +43,7 @@ static jkGuiMouseEntry jkGuiMouse_aEntries[8] =
   { 0, 0, 0,   NULL,            0, 0, NULL },
 };
 
-static jkGuiElement jkGuiMouse_aElements[25] =
+static jkGuiElement jkGuiMouse_aElements[26] =
 {
     {ELEMENT_TEXT,        0,   0, NULL,                     3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT,        0,   6, "GUI_SETUP",              3, {20, 20, 600, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -59,14 +65,35 @@ static jkGuiElement jkGuiMouse_aElements[25] =
     {ELEMENT_CHECKBOX,    0,   0, "GUI_REVERSE_AXIS",       0, { 320, 335, 300, 20 }, 1, 0, "GUI_REVERSE_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_CHECKBOX,    0,   0, "GUI_CONTROL_RAW",        0, { 320, 365, 300, 20 }, 1, 0, "GUI_RAW_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_TEXT,        0,   0, "GUI_SENSITIVITY",        2, { 50, 335, 170, 20 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
-    {ELEMENT_SLIDER,      0,   0, (char *)0x64,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", NULL, NULL, aIdk_52B168, {0}, 0},
+    {ELEMENT_SLIDER,      0,   0, (char *)0x64,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", jkGuiMouse_SensitivityDraw, NULL, aIdk_52B168, {0}, 0},
     {ELEMENT_TEXTBUTTON,  1,   2, "GUI_OK",                 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON, -1,   2, "GUI_CANCEL",             3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_RESTORE_DEFAULTS",   3, { 200, 430, 240, 40 }, 1, 0, NULL, NULL, jkGuiMouse_RestoreDefaultsClicked, NULL, {0}, 0},
+
+#ifdef QOL_IMPROVEMENTS
+    // 24
+    {ELEMENT_TEXT,        0,   0, slider_val_text,        3, { 60, 385, 205, 20 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
+#endif
+
     {ELEMENT_END,         0,   0, NULL,                     0, {0}, 0, 0, NULL, NULL, NULL, NULL, {0}, 0},
 };
 
 static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, &jkGUIMouse_idk1, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+
+void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+{
+#ifdef QOL_IMPROVEMENTS
+    int val = jkGuiMouse_aElements[20].selectedTextEntry;
+    
+    jk_snwprintf(slider_val_text, 5, L"%u", val);
+    jkGuiMouse_aElements[24].wstr = slider_val_text;
+    
+#endif
+    jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
+    
+    // Redraw text
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiMouse_aElements[24], menu, 1);
+}
 
 int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
 {

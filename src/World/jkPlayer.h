@@ -121,6 +121,7 @@ extern int jkPlayer_enableOrigAspect;
 extern int jkPlayer_enableBloom;
 extern int jkPlayer_fpslimit;
 extern int jkPlayer_enableVsync;
+extern float jkPlayer_ssaaMultiple;
 
 #define FOV_MIN (40)
 #define FOV_MAX (170)

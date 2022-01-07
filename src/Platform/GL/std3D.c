@@ -425,7 +425,7 @@ int std3D_StartScene()
     
     std3D_swapFramebuffers();
     
-    double supersample_level = 1.0; // Can also be set lower
+    double supersample_level = jkPlayer_ssaaMultiple; // Can also be set lower
     int32_t tex_w = (int32_t)((double)Window_xSize * supersample_level);
     int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
 
