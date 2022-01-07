@@ -11,7 +11,14 @@ in vec4 f_color;
 in float f_light;
 in vec2 f_uv;
 in vec3 f_coord;
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragColorEmiss;
+
+float luminance(vec3 c_rgb)
+{
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+    return dot(c_rgb, W);
+}
 
 vec4 bilinear_paletted()
 {
@@ -85,7 +92,7 @@ void main(void)
     vec4 vertex_color = f_color;
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
-    vec4 color_add = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
 
     if (tex_mode == 5
 #ifndef CAN_BILINEAR_FILTER_16
@@ -149,7 +156,7 @@ void main(void)
 
         // Take the fragment light, and divide by 4.0 to select for colors
         // which glow in the dark
-        float light_idx = light / 4.0;
+        float light_idx = light / 5.0;
 
         // Get the shaded palette index
         float light_worldpalidx = texture(worldPaletteLights, vec2(index, light_idx)).r;
@@ -160,6 +167,9 @@ void main(void)
         // Add more of the emissive color depending on the darkness of the fragment
         color_add = (lightPalval * (1.0 - light) * 0.85);
         sampled_color = palval;
+
+        //if (light_worldpalidx == 0.0)
+        //    color_add.a = 0.0;
     }
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == 2)
@@ -177,5 +187,20 @@ void main(void)
         if (sampled_color.a < 0.1)
             discard;
     }
-    fragColor = (sampled_color * vertex_color) + color_add;
+    vec4 main_color = (sampled_color * vertex_color);
+
+    color_add.a = 0.0;
+    fragColor = main_color;// + color_add;
+
+    color_add.a = main_color.a;
+
+    // The emissive maps also include slight amounts of darkly-rendered geometry,
+    // so we want to ramp the amount that gets added based on luminance/brightness.
+    float luma = luminance(color_add.rgb) * 4.0;
+
+    color_add.r *= luma;
+    color_add.g *= luma;
+    color_add.b *= luma;
+
+    fragColorEmiss = color_add;
 }

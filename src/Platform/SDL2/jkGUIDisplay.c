@@ -27,7 +27,7 @@ static int slider_2[2] = {18, 17};
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiDisplay_aElements[22] = { 
+static jkGuiElement jkGuiDisplay_aElements[23] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -53,6 +53,9 @@ static jkGuiElement jkGuiDisplay_aElements[22] = {
     {ELEMENT_SLIDER,       0,            0, (FPS_LIMIT_MAX - FPS_LIMIT_MIN),                    0, {10, 310, 320, 30}, 1, 0, L"Set FPS limit", jkGuiDisplay_FramelimitDraw, 0, slider_2, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text_2,        3, {20, 340, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"Enable VSync",    0, {20, 360, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    
+    // 21
+    {ELEMENT_CHECKBOX,     0,            0, L"Enable Bloom",    0, {400, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
@@ -115,6 +118,7 @@ int jkGuiDisplay_Show()
 
     jkGuiDisplay_aElements[18].selectedTextEntry = jkPlayer_fpslimit - FPS_LIMIT_MIN;
     jkGuiDisplay_aElements[20].selectedTextEntry = jkPlayer_enableVsync;
+    jkGuiDisplay_aElements[21].selectedTextEntry = jkPlayer_enableBloom;
 
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDisplay_menu);
@@ -126,6 +130,7 @@ int jkGuiDisplay_Show()
         jkPlayer_enableTextureFilter = jkGuiDisplay_aElements[15].selectedTextEntry;
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
         jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
+        jkPlayer_enableBloom = jkGuiDisplay_aElements[21].selectedTextEntry;
 
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }

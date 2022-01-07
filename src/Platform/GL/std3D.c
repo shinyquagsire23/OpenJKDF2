@@ -37,22 +37,39 @@
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+typedef struct std3DSimpleTexStage
+{
+    GLuint program;
+
+    GLint attribute_coord3d;
+    GLint attribute_v_color;
+    GLint attribute_v_uv;
+    GLint attribute_v_norm;
+
+    GLint uniform_mvp;
+    GLint uniform_tex;
+    GLint uniform_iResolution;
+} std3DSimpleTexStage;
+
+typedef struct std3DFramebuffer
+{
+    GLuint fbo;
+    GLuint tex0;
+    GLuint tex1;
+    GLuint rbo;
+    int32_t w;
+    int32_t h;
+} std3DFramebuffer;
+
+GLint std3D_windowFbo = 0;
+std3DFramebuffer std3D_framebuffers[2];
+std3DFramebuffer *std3D_pFb = NULL;
+
 static bool has_initted = false;
-static GLuint fb;
-static GLuint fbTex;
-static GLuint fbRbo;
-
-static GLuint fb1;
-static GLuint fbTex1;
-static GLuint fbRbo1;
-
-static GLuint fb2;
-static GLuint fbTex2;
-static GLuint fbRbo2;
 
 static void* last_overlay = NULL;
 
-static int activeFb;
+static int std3D_activeFb = 1;
 
 int init_once = 0;
 GLuint programDefault, programMenu;
@@ -61,6 +78,9 @@ GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_wo
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
+
+std3DSimpleTexStage std3D_texFboStage;
+std3DSimpleTexStage std3D_blurStage;
 
 GLuint worldpal_texture;
 void* worldpal_data;
@@ -107,59 +127,73 @@ GLuint world_ibo_triangle;
 GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
 GLuint menu_ibo_triangle;
 
-void generateFramebuffer(GLuint* fbOut, GLuint* fbTexOut, GLuint* fbRboOut)
+void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
     // Generate the framebuffer
-    *fbOut = 0;
-    glGenFramebuffers(1, fbOut);
-    glBindFramebuffer(GL_FRAMEBUFFER, *fbOut);
+    memset(pFb, 0, sizeof(*pFb));
+
+    pFb->w = width;
+    pFb->h = height;
+
+    glGenFramebuffers(1, &pFb->fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, pFb->fbo);
     
     // Set up our framebuffer texture
-    glGenTextures(1, fbTexOut);
-    glBindTexture(GL_TEXTURE_2D, *fbTexOut);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glGenTextures(1, &pFb->tex0);
+    glBindTexture(GL_TEXTURE_2D, pFb->tex0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Attach fbTex to our currently bound framebuffer fb
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *fbTexOut, 0); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFb->tex0, 0);
+
+    // Set up our framebuffer texture
+    glGenTextures(1, &pFb->tex1);
+    glBindTexture(GL_TEXTURE_2D, pFb->tex1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
+    // Attach fbTex to our currently bound framebuffer fb
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, pFb->tex1, 0);
+
     // Set up our render buffer
-    glGenRenderbuffers(1, fbRboOut);
-    glBindRenderbuffer(GL_RENDERBUFFER, *fbRboOut);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 640, 480);
+    glGenRenderbuffers(1, &pFb->rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, pFb->rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
     // Bind it to our framebuffer fb
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *fbRboOut);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         printf("ERROR: Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void deleteFramebuffer(GLuint fbIn, GLuint fbTexIn, GLuint fbRboIn)
+void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
 {
-    glDeleteFramebuffers(1, &fbIn);
-    glDeleteTextures(1, &fbTexIn);
-    glDeleteRenderbuffers(1, &fbRboIn);
+    glDeleteFramebuffers(1, &pFb->fbo);
+    glDeleteTextures(1, &pFb->tex0);
+    glDeleteTextures(1, &pFb->tex1);
+    glDeleteRenderbuffers(1, &pFb->rbo);
 }
 
-void swap_framebuffers()
+void std3D_swapFramebuffers()
 {
-    if (activeFb == 2)
+    if (std3D_activeFb == 2)
     {
-        activeFb = 1;
-        fb = fb1;
-        fbTex = fbTex1;
-        fbRbo = fbRbo1;
+        std3D_activeFb = 1;
+        std3D_pFb = &std3D_framebuffers[0];
     }
     else
     {
-        activeFb = 2;
-        fb = fb2;
-        fbTex = fbTex2;
-        fbRbo = fbRbo2;
+        std3D_activeFb = 2;
+        std3D_pFb = &std3D_framebuffers[1];
     }
 }
 
@@ -216,19 +250,40 @@ GLint std3D_tryFindUniform(GLuint program, const char* uniform_name)
     return out;
 }
 
+bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOut)
+{
+    if (!pOut) return false;
+    if ((pOut->program = std3D_loadProgram(fpath_base)) == 0) return false;
+    
+    pOut->attribute_coord3d = std3D_tryFindAttribute(pOut->program, "coord3d");
+    pOut->attribute_v_color = std3D_tryFindAttribute(pOut->program, "v_color");
+    pOut->attribute_v_uv = std3D_tryFindAttribute(pOut->program, "v_uv");
+    pOut->uniform_mvp = std3D_tryFindUniform(pOut->program, "mvp");
+    pOut->uniform_iResolution = std3D_tryFindUniform(pOut->program, "iResolution");
+    pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
+
+    return true;
+}
+
 int init_resources()
 {
     printf("OpenGL init...\n");
-    generateFramebuffer(&fb1, &fbTex1, &fbRbo1);
-    generateFramebuffer(&fb2, &fbTex2, &fbRbo2);
 
-    activeFb = 1;
-    fb = fb1;
-    fbTex = fbTex1;
-    fbRbo = fbRbo1;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &std3D_windowFbo);
+
+    int32_t tex_w = Window_xSize;
+    int32_t tex_h = Window_ySize;
+
+    std3D_generateFramebuffer(tex_w, tex_h, &std3D_framebuffers[0]);
+    std3D_generateFramebuffer(tex_w, tex_h, &std3D_framebuffers[1]);
+
+    std3D_activeFb = 1;
+    std3D_pFb = &std3D_framebuffers[0];
     
     if ((programDefault = std3D_loadProgram("resource/shaders/default")) == 0) return false;
     if ((programMenu = std3D_loadProgram("resource/shaders/menu")) == 0) return false;
+    if (!std3D_loadSimpleTexProgram("resource/shaders/texfbo", &std3D_texFboStage)) return false;
+    if (!std3D_loadSimpleTexProgram("resource/shaders/blur", &std3D_blurStage)) return false;
     
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
@@ -322,8 +377,8 @@ void std3D_FreeResources()
 {
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
-    deleteFramebuffer(fb1, fbTex1, fbRbo1);
-    deleteFramebuffer(fb2, fbTex2, fbRbo2);
+    std3D_deleteFramebuffer(&std3D_framebuffers[0]);
+    std3D_deleteFramebuffer(&std3D_framebuffers[1]);
     glDeleteTextures(1, &worldpal_texture);
     glDeleteTextures(1, &worldpal_lights_texture);
     glDeleteTextures(1, &displaypal_texture);
@@ -368,7 +423,19 @@ int std3D_StartScene()
     
     rendered_tris = 0;
     
-    //glBindFramebuffer(GL_FRAMEBUFFER, idirect3dexecutebuffer->fb);
+    std3D_swapFramebuffers();
+    
+    double supersample_level = 1.0; // Can also be set lower
+    int32_t tex_w = (int32_t)((double)Window_xSize * supersample_level);
+    int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
+
+    if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h)
+    {
+        std3D_deleteFramebuffer(std3D_pFb);
+        std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -561,6 +628,9 @@ static rdDDrawSurface* test_idk = NULL;
 
 void std3D_DrawMenu()
 {
+    std3D_DrawSceneFbo();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
@@ -822,9 +892,238 @@ void std3D_DrawMenu()
     //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, GLuint texId)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    glDepthFunc(GL_ALWAYS);
+    glUseProgram(pStage->program);
+    
+    float menu_w, menu_h, menu_u, menu_v, menu_x;
+    menu_w = (double)Window_xSize + 1.0;
+    menu_h = (double)Window_ySize + 1.0;
+    menu_u = 1.0;
+    menu_v = 1.0;
+    menu_x = 0.0;
+
+    GL_tmpVertices[0].x = menu_x;
+    GL_tmpVertices[0].y = 0.0;
+    GL_tmpVertices[0].z = 0.0;
+    GL_tmpVertices[0].tu = 0.0;
+    GL_tmpVertices[0].tv = menu_v;
+    *(uint32_t*)&GL_tmpVertices[0].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[0].nz = 0;
+    
+    GL_tmpVertices[1].x = menu_x;
+    GL_tmpVertices[1].y = menu_h;
+    GL_tmpVertices[1].z = 0.0;
+    GL_tmpVertices[1].tu = 0.0;
+    GL_tmpVertices[1].tv = 0.0;
+    *(uint32_t*)&GL_tmpVertices[1].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[1].nz = 0;
+    
+    GL_tmpVertices[2].x = menu_x + menu_w;
+    GL_tmpVertices[2].y = menu_h;
+    GL_tmpVertices[2].z = 0.0;
+    GL_tmpVertices[2].tu = menu_u;
+    GL_tmpVertices[2].tv = 0.0;
+    *(uint32_t*)&GL_tmpVertices[2].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[2].nz = 0;
+    
+    GL_tmpVertices[3].x = menu_x + menu_w;
+    GL_tmpVertices[3].y = 0.0;
+    GL_tmpVertices[3].z = 0.0;
+    GL_tmpVertices[3].tu = menu_u;
+    GL_tmpVertices[3].tv = menu_v;
+    *(uint32_t*)&GL_tmpVertices[3].nx = 0;
+    *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
+    *(uint32_t*)&GL_tmpVertices[3].nz = 0;
+    
+    GL_tmpTris[0].v1 = 1;
+    GL_tmpTris[0].v2 = 0;
+    GL_tmpTris[0].v3 = 2;
+    
+    GL_tmpTris[1].v1 = 0;
+    GL_tmpTris[1].v2 = 3;
+    GL_tmpTris[1].v3 = 2;
+    
+    GL_tmpVerticesAmt = 4;
+    GL_tmpTrisAmt = 2;
+    
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texId);
+
+    GLfloat data_vertices[32 * 3];
+    GLubyte data_colors[32 * 4];
+    GLfloat data_uvs[32 * 2];
+    GLushort data_elements[32 * 3];
+
+    // Generate vertices list
+    //GLfloat* data_vertices = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
+    //GLfloat* data_colors = (GLfloat*)malloc(GL_tmpVerticesAmt * 4 * sizeof(GLfloat));
+    //GLfloat* data_uvs = (GLfloat*)malloc(GL_tmpVerticesAmt * 2 * sizeof(GLfloat));
+
+    D3DVERTEX* vertexes = GL_tmpVertices;
+
+    for (int i = 0; i < GL_tmpVerticesAmt; i++)
+    {
+        uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
+        uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
+        uint32_t v_unknz = *(uint32_t*)&vertexes[i].nz;
+        
+        /*printf("%f %f %f, %x %x %x, %f %f\n", vertexes[i].x, vertexes[i].y, vertexes[i].z,
+                                              v_unknx, v_color, v_unknz,
+                                              vertexes[i].tu, vertexes[i].tv);*/
+                                             
+        
+        uint8_t v_a = (v_color >> 24) & 0xFF;
+        uint8_t v_r = (v_color >> 16) & 0xFF;
+        uint8_t v_g = (v_color >> 8) & 0xFF;
+        uint8_t v_b = v_color & 0xFF;
+ 
+        data_vertices[(i*3)+0] = vertexes[i].x;
+        data_vertices[(i*3)+1] = vertexes[i].y;
+        data_vertices[(i*3)+2] = vertexes[i].z;
+        data_colors[(i*4)+0] = v_r;
+        data_colors[(i*4)+1] = v_g;
+        data_colors[(i*4)+2] = v_b;
+        data_colors[(i*4)+3] = v_a;
+        
+        data_uvs[(i*2)+0] = vertexes[i].tu;
+        data_uvs[(i*2)+1] = vertexes[i].tv;
+        
+        //printf("nx, ny, nz %x %x %x, %f %f, %f\n", v_unknx, v_color, v_unknz, vertexes[i].nx, vertexes[i].nz, vertexes[i].z);
+    }
+    
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STREAM_DRAW);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLubyte), data_colors, GL_STREAM_DRAW);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STREAM_DRAW);
+    
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glUniform1i(programMenu_uniform_tex, 0);
+    
+    {
+
+    float maxX, maxY, scaleX, scaleY, width, height;
+
+    scaleX = 1.0/((double)Window_xSize / 2.0);
+    scaleY = 1.0/((double)Window_ySize / 2.0);
+    maxX = 1.0;
+    maxY = 1.0;
+    width = Window_xSize;
+    height = Window_ySize;
+    
+    float d3dmat[16] = {
+       maxX*scaleX,      0,                                          0,      0, // right
+       0,                                       -maxY*scaleY,               0,      0, // up
+       0,                                       0,                                          1,     0, // forward
+       -(width/2)*scaleX,  (height/2)*scaleY,     -1,      1  // pos
+    };
+    
+    glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, d3dmat);
+    glViewport(0, 0, width, height);
+    glUniform2f(pStage->uniform_iResolution, width, height);
+
+    }
+    
+    rdTri* tris = GL_tmpTris;
+    glEnableVertexAttribArray(pStage->attribute_coord3d);
+    glEnableVertexAttribArray(pStage->attribute_v_color);
+    glEnableVertexAttribArray(pStage->attribute_v_uv);
+    
+    // Describe our vertices array to OpenGL (it can't guess its format automatically)
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
+    glVertexAttribPointer(
+        pStage->attribute_coord3d, // attribute
+        3,                 // number of elements per vertex, here (x,y,z)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
+    glVertexAttribPointer(
+        pStage->attribute_v_color, // attribute
+        4,                 // number of elements per vertex, here (R,G,B,A)
+        GL_UNSIGNED_BYTE,          // the type of each element
+        GL_TRUE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
+    glVertexAttribPointer(
+        pStage->attribute_v_uv,    // attribute
+        2,                 // number of elements per vertex, here (U,V)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    
+    rdDDrawSurface* last_tex = (void*)-1;
+    int last_tex_idx = 0;
+    //GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
+    for (int j = 0; j < GL_tmpTrisAmt; j++)
+    {
+        data_elements[(j*3)+0] = tris[j].v1;
+        data_elements[(j*3)+1] = tris[j].v2;
+        data_elements[(j*3)+2] = tris[j].v3;
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
+
+    int tris_size;  
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
+    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(pStage->attribute_v_uv);
+    glDisableVertexAttribArray(pStage->attribute_v_color);
+    glDisableVertexAttribArray(pStage->attribute_coord3d);
+    
+    //free(data_elements);
+        
+    //glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void std3D_DrawSceneFbo()
+{
+    glEnable(GL_BLEND);
+    
+    glBlendEquation(GL_FUNC_ADD);
+
+    std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex0);
+    //std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex1); // test emission output
+
+    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex1);
+    if (jkPlayer_enableBloom)
+    {
+        std3D_DrawSimpleTex(&std3D_blurStage, std3D_pFb->tex1);
+    }
+    //
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 void std3D_DrawRenderList()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
+
+    GLenum bufs[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, bufs);
     
     last_tex = NULL;
 
@@ -840,8 +1139,8 @@ void std3D_DrawRenderList()
     maxY = 1.0;
     scaleX = 1.0/((double)internalWidth / 2.0);
     scaleY = 1.0/((double)internalHeight / 2.0);
-    width = Window_xSize;
-    height = Window_ySize;
+    width = std3D_pFb->w;
+    height = std3D_pFb->h;
 
     // JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
     // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.

@@ -32,9 +32,10 @@
 
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
-int jkPlayer_fovIsVertical = 0;
+int jkPlayer_fovIsVertical = 1;
 int jkPlayer_enableTextureFilter = 0;
 int jkPlayer_enableOrigAspect = 0;
+int jkPlayer_enableBloom = 0;
 int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
 #endif
@@ -262,6 +263,7 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdConffile_Printf("originalaspect %d\n", jkPlayer_enableOrigAspect);
         stdConffile_Printf("fpslimit %d\n", jkPlayer_fpslimit);
         stdConffile_Printf("enablevsync %d\n", jkPlayer_enableVsync);
+        stdConffile_Printf("enablebloom %d\n", jkPlayer_enableBloom);
 #endif
         stdConffile_CloseWrite();
     }
@@ -374,6 +376,12 @@ int jkPlayer_ReadConf(wchar_t *name)
         {
             _sscanf(stdConffile_aLine, "enablevsync %d", &jkPlayer_enableVsync);
             jkPlayer_enableVsync = !!jkPlayer_enableVsync;
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "enablebloom %d", &jkPlayer_enableBloom);
+            jkPlayer_enableBloom = !!jkPlayer_enableBloom;
         }
 #endif
         stdConffile_Close();
