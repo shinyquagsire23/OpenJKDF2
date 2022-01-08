@@ -271,7 +271,7 @@ void sith_UpdateCamera()
     {
         if ( !++sithRender_lastRenderTick )
         {
-            sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
+            _sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
             sithRender_lastRenderTick = 1;
         }
 
@@ -280,12 +280,16 @@ void sith_UpdateCamera()
         {
             // Set screen aspect ratio
             float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            //float aspect = sithCamera_currentCamera->rdCam.canvas->screen_height_half / sithCamera_currentCamera->rdCam.canvas->screen_width_half;
+            
+            //if (!jkPlayer_fovIsVertical)
+                aspect = 1.0;
             
             //if (aspect != sith_lastAspect)
             {
                 rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
                 rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
-                rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
+                //rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
             }
             
             sith_lastAspect = aspect;

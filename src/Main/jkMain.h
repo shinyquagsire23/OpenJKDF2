@@ -150,4 +150,6 @@ void jkMain_FixRes();
 static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
 #endif
 
+static void (*_jkMain_GuiAdvance)() = (void*)jkMain_GuiAdvance_ADDR;
+
 #endif // _JKMAIN_H

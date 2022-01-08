@@ -192,7 +192,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
             
 #ifdef QOL_IMPROVEMENTS
             if (jkPlayer_fovIsVertical) {
-                camera->fov_y = project_width_half / ((1.0/camera->screenAspectRatio) * stdMath_Tan(camera->fov * 0.5));
+                camera->fov_y = project_width_half / ((1.0/(canvas->screen_width_half/canvas->screen_height_half)) * stdMath_Tan(camera->fov * 0.5));
             }
             else
             {
@@ -325,9 +325,10 @@ void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, u
 
 void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v)
 {
-    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
-    out->z = v->y;
+    rdCamera_PerspProject(out, v); 
+    //out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
+    //out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
+    //out->z = v->y;
 }
 
 void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices)

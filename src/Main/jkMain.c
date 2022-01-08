@@ -62,20 +62,20 @@ jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
 
 static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
     {0,  0,  0},
-    {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave},
-    {jkMain_TitleShow, jkMain_TitleTick, jkMain_TitleLeave},
-    {jkMain_MainShow, jkMain_MainTick, jkMain_MainLeave},
-    {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave},
-    {jkMain_GameplayShow, jkMain_GameplayTick, jkMain_GameplayLeave},
-    {jkMain_EscapeMenuShow, jkMain_EscapeMenuTick, jkMain_EscapeMenuLeave},
-    {jkMain_CdSwitchShow,  0,  0},
-    {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave},
-    {jkMain_EndLevelScreenShow, jkMain_EndLevelScreenTick, jkMain_EndLevelScreenLeave},
-    {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave},
-    {jkMain_ChoiceShow, jkMain_ChoiceTick, jkMain_ChoiceLeave},
-    {jkMain_CutsceneShow, jkMain_CutsceneTick, jkMain_CutsceneLeave},
-    {jkMain_CreditsShow, jkMain_CreditsTick, jkMain_CreditsLeave},
-    {jkMain_UnkShow, jkMain_UnkTick, jkMain_UnkLeave},
+    {jkMain_VideoShow_ADDR, jkMain_VideoTick_ADDR, jkMain_VideoLeave_ADDR},
+    {jkMain_TitleShow_ADDR, jkMain_TitleTick_ADDR, jkMain_TitleLeave_ADDR},
+    {jkMain_MainShow_ADDR, jkMain_MainTick_ADDR, jkMain_MainLeave_ADDR},
+    {jkMain_VideoShow_ADDR, jkMain_VideoTick_ADDR, jkMain_VideoLeave_ADDR},
+    {jkMain_GameplayShow_ADDR, jkMain_GameplayTick_ADDR, jkMain_GameplayLeave_ADDR},
+    {jkMain_EscapeMenuShow_ADDR, jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuLeave_ADDR},
+    {jkMain_CdSwitchShow_ADDR,  0,  0},
+    {jkMain_VideoShow_ADDR, jkMain_VideoTick_ADDR, jkMain_VideoLeave_ADDR},
+    {jkMain_EndLevelScreenShow_ADDR, jkMain_EndLevelScreenTick_ADDR, jkMain_EndLevelScreenLeave_ADDR},
+    {jkMain_VideoShow_ADDR, jkMain_VideoTick_ADDR, jkMain_VideoLeave_ADDR},
+    {jkMain_ChoiceShow_ADDR, jkMain_ChoiceTick_ADDR, jkMain_ChoiceLeave_ADDR},
+    {jkMain_CutsceneShow_ADDR, jkMain_CutsceneTick_ADDR, jkMain_CutsceneLeave_ADDR},
+    {jkMain_CreditsShow_ADDR, jkMain_CreditsTick_ADDR, jkMain_CreditsLeave_ADDR},
+    {jkMain_UnkShow_ADDR, jkMain_UnkTick_ADDR, jkMain_UnkLeave_ADDR},
 };
 
 void jkMain_GuiAdvance()
@@ -128,10 +128,10 @@ void jkMain_GuiAdvance()
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
-#ifdef SDL2_RENDER
+#ifdef QOL_IMPROVEMENTS
                     if (jkMain_lastTickMs == v1)
 #endif
-                    jkGame_Update();
+                    _jkGame_Update();
                 }
                 game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
@@ -148,11 +148,11 @@ void jkMain_GuiAdvance()
             case JK_GAMEMODE_VIDEO2:
             case JK_GAMEMODE_VIDEO3:
             case JK_GAMEMODE_VIDEO4:
-                jkCutscene_PauseShow(0);
+                _jkCutscene_PauseShow(0);
                 break;
             case JK_GAMEMODE_GAMEPLAY:
                 stdControl_ToggleCursor(1);
-                jkGame_ddraw_idk_palettes(0);
+                _jkGame_ddraw_idk_palettes(0);
                 break;
             default:
                 break;
@@ -241,10 +241,10 @@ void jkMain_EscapeMenuTick(int a2)
                     jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                     v3 = stdPlatform_GetTimeMsec();
                     if ( g_app_suspended && a2 != 6 ) {
-#ifdef SDL2_RENDER
+#ifdef QOL_IMPROVEMENTS
                     if (jkMain_lastTickMs == v1)
 #endif
-                        jkGame_Update();
+                        _jkGame_Update();
                     }
                     game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
@@ -365,7 +365,7 @@ LABEL_39:
         {
             stdControl_ToggleCursor(1);
             stdControl_Flush();
-            jkGame_Update();
+            _jkGame_Update();
             thing_eight = 1;
         }
         else
@@ -534,10 +534,10 @@ void jkMain_GameplayTick(int a2)
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && a2 != 6 ) {
-#ifdef SDL2_RENDER
+#ifdef QOL_IMPROVEMENTS
                     if (jkMain_lastTickMs == v1)
 #endif
-                    jkGame_Update();
+                    _jkGame_Update();
                 }
                 game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }

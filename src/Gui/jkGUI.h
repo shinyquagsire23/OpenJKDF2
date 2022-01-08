@@ -39,4 +39,7 @@ void jkGui_copies_string(char* out);
 char *jkGui_sub_412EC0();
 wchar_t* jkGui_sub_412ED0();
 
+static void (*_jkGui_InitMenu)(jkGuiMenu *menu, stdBitmap *bgBitmap) = (void*)jkGui_InitMenu_ADDR;
+static void (*_jkGui_sub_412E20)(jkGuiMenu* menu, int a2, int a3, int a4) = (void*)jkGui_sub_412E20_ADDR;
+
 #endif // _JKGUI_H

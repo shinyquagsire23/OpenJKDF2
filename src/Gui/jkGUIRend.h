@@ -199,4 +199,10 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer 
 int jkGuiRend_TextButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int b);
 void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
+static int (*_jkGuiRend_DisplayAndReturnClicked)(jkGuiMenu *menu) = (void*)jkGuiRend_DisplayAndReturnClicked_ADDR;
+static void (*_jkGuiRend_SliderDraw)(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw) = (void*)jkGuiRend_SliderDraw_ADDR;
+static void (*_jkGuiRend_UpdateAndDrawClickable)(jkGuiElement *clickable, jkGuiMenu *menu, int forceRedraw) = (void*)jkGuiRend_UpdateAndDrawClickable_ADDR;
+static void (*_jkGuiRend_MenuSetLastElement)(jkGuiMenu *menu, jkGuiElement *element) = (void*)jkGuiRend_MenuSetLastElement_ADDR;
+static void (*_jkGuiRend_SetDisplayingStruct)(jkGuiMenu *menu, jkGuiElement *element) = (void*)jkGuiRend_SetDisplayingStruct_ADDR;
+
 #endif // _JKGUIREND_H

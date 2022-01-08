@@ -35,8 +35,8 @@ void jkGame_ScreensizeDecrease();
 //static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 //static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 //static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
-//static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
-static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
+static void (*_jkGame_Update)() = (void*)jkGame_Update_ADDR;
+static int (*_jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
 static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
 static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
 

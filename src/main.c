@@ -385,9 +385,17 @@ __declspec(dllexport) void hook_init_win(uint32_t hInstance, uint32_t hPrevInsta
     
     hook_init();
     
+    const uint8_t old_data[0x40] = {0x83, 0xEC, 0x30, 0x8B, 0x44, 0x24, 0x40, 0x53, 0x55, 0x56, 0x8B, 0x74, 0x24, 0x40, 0x57, 0x8B, 0x3D, 0x24, 0x06, 0x8F, 0x00, 0x33, 0xED, 0x68, 0x8C, 0xF6, 0x54, 0x00, 0x56, 0x89, 0x2D, 0x84, 0x5E, 0x85, 0x00, 0x89, 0x2D, 0x80, 0x5E, 0x85, 0x00, 0x89, 0x2D, 0x7C, 0x5E, 0x85, 0x00, 0x89, 0x2D, 0x94, 0x5E, 0x85, 0x00, 0x89, 0x35, 0xEC, 0x5D, 0x85, 0x00, 0xA3, 0xE8, 0x5D, 0x85, 0x00};
+    memcpy(Window_Main_ADDR, old_data, sizeof(old_data));
+    
     VirtualProtect((void*)0x401000, 0x522000-0x401000, old, NULL);
     
-    Window_Main(hInstance, hPrevInstance, lpCmdLine, nShowCmd, "Jedi Knight");
+    //lpCmdLine = " -windowgui ";
+    
+    
+    
+    
+    _Window_Main(hInstance, hPrevInstance, lpCmdLine, nShowCmd, "Jedi Knight");
 }
 
 void _pei386_runtime_relocator(){}
@@ -403,8 +411,98 @@ int yyparse();
 void do_hooks()
 {
 #ifndef LINUX
-    hook_function(WinMain_ADDR, WinMain_);
+    //hook_function(WinMain_ADDR, WinMain_);
 #endif
+
+    // jkGUIGeneral
+    hook_function(jkGuiGeneral_Initialize_ADDR, jkGuiGeneral_Initialize);
+    hook_function(jkGuiGeneral_Shutdown_ADDR, jkGuiGeneral_Shutdown);
+    hook_function(jkGuiGeneral_Show_ADDR, jkGuiGeneral_Show);
+    
+    // stdConffile
+    hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
+    hook_function(stdConffile_OpenWrite_ADDR, stdConffile_OpenWrite);
+    hook_function(stdConffile_OpenMode_ADDR, stdConffile_OpenMode);
+    hook_function(stdConffile_Close_ADDR, stdConffile_Close);
+    hook_function(stdConffile_CloseWrite_ADDR, stdConffile_CloseWrite);
+    hook_function(stdConffile_WriteLine_ADDR, stdConffile_WriteLine);
+    hook_function(stdConffile_Write_ADDR, stdConffile_Write);
+    hook_function(stdConffile_Printf_ADDR, stdConffile_Printf);
+    hook_function(stdConffile_Read_ADDR, stdConffile_Read);
+    hook_function(stdConffile_ReadArgsFromStr_ADDR, stdConffile_ReadArgsFromStr);
+    hook_function(stdConffile_ReadArgs_ADDR, stdConffile_ReadArgs);
+    hook_function(stdConffile_ReadLine_ADDR, stdConffile_ReadLine);
+    hook_function(stdConffile_GetFileHandle_ADDR, stdConffile_GetFileHandle);
+    
+    // jkPlayer
+    hook_function(jkPlayer_WriteConf_ADDR, jkPlayer_WriteConf);
+    hook_function(jkPlayer_ReadConf_ADDR, jkPlayer_ReadConf);
+    hook_function(jkPlayer_DrawPov_ADDR, jkPlayer_DrawPov);
+    
+    // sithRender
+    hook_function(sithRender_Draw_ADDR, sithRender_Draw);
+    
+    // rdCamera
+    hook_function(rdCamera_New_ADDR, rdCamera_New);
+    hook_function(rdCamera_NewEntry_ADDR, rdCamera_NewEntry);
+    hook_function(rdCamera_Free_ADDR, rdCamera_Free);
+    hook_function(rdCamera_FreeEntry_ADDR, rdCamera_FreeEntry);
+    hook_function(rdCamera_SetCanvas_ADDR, rdCamera_SetCanvas);
+    hook_function(rdCamera_SetCurrent_ADDR, rdCamera_SetCurrent);
+    hook_function(rdCamera_SetFOV_ADDR, rdCamera_SetFOV);
+    hook_function(rdCamera_SetProjectType_ADDR, rdCamera_SetProjectType);
+    hook_function(rdCamera_SetOrthoScale_ADDR, rdCamera_SetOrthoScale);
+    hook_function(rdCamera_SetAspectRatio_ADDR, rdCamera_SetAspectRatio);
+    hook_function(rdCamera_BuildFOV_ADDR, rdCamera_BuildFOV);
+    hook_function(rdCamera_BuildClipFrustum_ADDR, rdCamera_BuildClipFrustum);
+    hook_function(rdCamera_Update_ADDR, rdCamera_Update);
+    hook_function(rdCamera_PerspProject_ADDR, rdCamera_PerspProject);
+    hook_function(rdCamera_PerspProjectLst_ADDR, rdCamera_PerspProjectLst);
+    hook_function(rdCamera_PerspProjectSquare_ADDR, rdCamera_PerspProjectSquare);
+    hook_function(rdCamera_PerspProjectSquareLst_ADDR, rdCamera_PerspProjectSquareLst);
+    hook_function(rdCamera_OrthoProject_ADDR, rdCamera_OrthoProject);
+    hook_function(rdCamera_OrthoProjectLst_ADDR, rdCamera_OrthoProjectLst);
+    hook_function(rdCamera_OrthoProjectSquare_ADDR, rdCamera_OrthoProjectSquare);
+    hook_function(rdCamera_OrthoProjectSquareLst_ADDR, rdCamera_OrthoProjectSquareLst);
+    hook_function(rdCamera_SetAmbientLight_ADDR, rdCamera_SetAmbientLight);
+    hook_function(rdCamera_SetAttenuation_ADDR, rdCamera_SetAttenuation);
+    hook_function(rdCamera_AddLight_ADDR, rdCamera_AddLight);
+    hook_function(rdCamera_ClearLights_ADDR, rdCamera_ClearLights);
+    hook_function(rdCamera_AdvanceFrame_ADDR, rdCamera_AdvanceFrame);
+    
+    // sith
+    hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
+    
+    // sithCamera
+    hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
+    hook_function(sithCamera_SetsFocus_ADDR, sithCamera_SetsFocus);
+    hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
+    hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
+    hook_function(sithCamera_SetCurrentCamera_ADDR, sithCamera_SetCurrentCamera);
+    hook_function(sithCamera_Open_ADDR, sithCamera_Open);
+    hook_function(sithCamera_Close_ADDR, sithCamera_Close);
+    hook_function(sithCamera_SetCameraFocus_ADDR, sithCamera_SetCameraFocus);
+    hook_function(sithCamera_SetPovShake_ADDR, sithCamera_SetPovShake);
+    hook_function(sithCamera_GetPrimaryFocus_ADDR, sithCamera_GetPrimaryFocus);
+    hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
+    
+    // jkMain
+    hook_function(jkMain_GuiAdvance_ADDR, jkMain_GuiAdvance);
+    //hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
+    hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
+    //hook_function(jkMain_TitleTick_ADDR, jkMain_TitleTick);
+    //hook_function(jkMain_MainTick_ADDR, jkMain_MainTick);
+    
+    // sithPhysics
+    hook_function(sithPhysics_ThingTick_ADDR, sithPhysics_ThingTick);
+    
+    // sithTime
+    hook_function(sithTime_Tick_ADDR, sithTime_Tick);
+    hook_function(sithTime_Pause_ADDR, sithTime_Pause);
+    hook_function(sithTime_Resume_ADDR, sithTime_Resume);
+    hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
+    hook_function(sithTime_Startup_ADDR, sithTime_Startup);
+    hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
 
 #if 0
     // stdPlatform
@@ -701,21 +799,6 @@ void do_hooks()
     hook_function(stdColor_Indexed8ToRGB16_ADDR, stdColor_Indexed8ToRGB16);
     hook_function(stdColor_ColorConvertOnePixel_ADDR, stdColor_ColorConvertOnePixel);
     hook_function(stdColor_ColorConvertOneRow_ADDR, stdColor_ColorConvertOneRow);
-    
-    // stdConffile
-    hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
-    hook_function(stdConffile_OpenWrite_ADDR, stdConffile_OpenWrite);
-    hook_function(stdConffile_OpenMode_ADDR, stdConffile_OpenMode);
-    hook_function(stdConffile_Close_ADDR, stdConffile_Close);
-    hook_function(stdConffile_CloseWrite_ADDR, stdConffile_CloseWrite);
-    hook_function(stdConffile_WriteLine_ADDR, stdConffile_WriteLine);
-    hook_function(stdConffile_Write_ADDR, stdConffile_Write);
-    hook_function(stdConffile_Printf_ADDR, stdConffile_Printf);
-    hook_function(stdConffile_Read_ADDR, stdConffile_Read);
-    hook_function(stdConffile_ReadArgsFromStr_ADDR, stdConffile_ReadArgsFromStr);
-    hook_function(stdConffile_ReadArgs_ADDR, stdConffile_ReadArgs);
-    hook_function(stdConffile_ReadLine_ADDR, stdConffile_ReadLine);
-    hook_function(stdConffile_GetFileHandle_ADDR, stdConffile_GetFileHandle);
     
     // stdFont
     hook_function(stdFont_Load_ADDR, stdFont_Load);

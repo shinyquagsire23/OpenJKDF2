@@ -16,4 +16,6 @@ static int (*Main_FPrintf)(const char* fmt, ...) = (void*)Main_FPrintf_ADDR;
 
 void Main_CheckRequiredAssets(int doInstall);
 
+static int (*_Main_Startup)(const char *cmdline) = (void*)Main_Startup_ADDR;
+
 #endif // _MAINMAIN_H

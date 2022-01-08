@@ -26,7 +26,7 @@ int jkCutscene_smacker_process();
 
 //static void (*jkCutscene_Shutdown)() = (void*)jkCutscene_Shutdown_ADDR;
 //static void (*jkCutscene_Initialize)() = (void*)jkCutscene_Initialize_ADDR;
-//static void (*jkCutscene_PauseShow)() = (void*)jkCutscene_PauseShow_ADDR;
+static void (*_jkCutscene_PauseShow)() = (void*)jkCutscene_PauseShow_ADDR;
 //static void (*jkCutscene_sub_421410)() = (void*)jkCutscene_sub_421410_ADDR;
 static int (*_jkCutscene_sub_421310)(char* a1) = (void*)jkCutscene_sub_421310_ADDR;
 

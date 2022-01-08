@@ -59,7 +59,7 @@ void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world);
 
 
 //static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
-//static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
+static void (*_sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
 //static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
 //static void (*sithWorld_ResetSectorRuntimeAlteredVars)(sithWorld *world) = (void*)sithWorld_ResetSectorRuntimeAlteredVars_ADDR;

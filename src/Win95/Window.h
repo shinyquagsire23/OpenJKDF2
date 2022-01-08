@@ -60,6 +60,7 @@ void Window_RecreateSDL2Window();
 #else
 static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
 static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;
+static int (*_Window_Main)(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName) = (void*)Window_Main_ADDR;
 //static int (*Window_AddMsgHandler)(WindowHandler_t handler) = (void*)Window_AddMsgHandler_ADDR;
 //static int (*Window_RemoveMsgHandler)(WindowHandler_t handler) = (void*)Window_RemoveMsgHandler_ADDR;
 #endif

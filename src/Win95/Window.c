@@ -206,7 +206,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = "wKernel";
     wndClass.lpszMenuName = 0;
-    wndClass.lpfnWndProc = Window_msg_main_handler;
+    wndClass.lpfnWndProc = Window_msg_main_handler_ADDR;
     wndClass.style = 3;
     wndClass.hIcon = jk_LoadIconA(hInstance, "APPICON");
     if ( !wndClass.hIcon )
@@ -243,7 +243,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
     g_855E8C = 2 * jk_GetSystemMetrics(32);
     uint32_t metrics_32 = jk_GetSystemMetrics(32);
     g_855E90 = jk_GetSystemMetrics(15) + 2 * metrics_32;
-    result = Main_Startup(lpCmdLine);
+    result = _Main_Startup(lpCmdLine);
 
     if (!result) return result;
 
@@ -264,17 +264,16 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
             uint32_t some_cnt = 0;
             if (g_thing_two_some_dialog_count > 0)
             {
-#if 0
-                v16 = &thing_three;
+
+                HWND* v16 = Window_aDialogHwnds;
                 do
                 {
-                    //TODO if ( jk_IsDialogMessageA(*v16, &msg) )
-                    //  break;
+                    if ( jk_IsDialogMessageA(*v16, &msg) )
+                        break;
                     ++some_cnt;
                     ++v16;
                 }
                 while ( some_cnt < g_thing_two_some_dialog_count );
-#endif
             }
 
             if (some_cnt == g_thing_two_some_dialog_count)
@@ -293,7 +292,7 @@ int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCS
 
         //if (user32->stopping) break;
 
-        jkMain_GuiAdvance();
+        _jkMain_GuiAdvance();
     }
 
     return result;
