@@ -405,7 +405,8 @@ void do_hooks()
 #ifndef LINUX
     hook_function(WinMain_ADDR, WinMain_);
 #endif
-    
+
+#if 0
     // stdPlatform
     hook_function(stdPlatform_InitServices_ADDR, stdPlatform_InitServices);
     hook_function(stdPlatform_Startup_ADDR, stdPlatform_Startup);
@@ -2351,6 +2352,7 @@ void do_hooks()
     hook_function_inv(rdKeyframe_Write_ADDR, rdKeyframe_Write);
     hook_function_inv(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
     hook_function_inv(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
+#endif
 #endif
 #endif
 }
