@@ -64,8 +64,8 @@ vec4 bilinear_paletted_light(float index)
     float light = clamp(f_light, 0.0, 1.0);
 
     // Special case for lightsabers
-    if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
-        light = 0.0;
+    //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
+    //    light = 0.0;
 
     // Take the fragment light, and divide by 4.0 to select for colors
     // which glow in the dark
@@ -168,8 +168,8 @@ void main(void)
         float light = clamp(f_light, 0.0, 1.0);
 
         // Special case for lightsabers
-        if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
-            light = 0.0;
+        //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
+        //    light = 0.0;
 
         // Take the fragment light, and divide by 4.0 to select for colors
         // which glow in the dark
