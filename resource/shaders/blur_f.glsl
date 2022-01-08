@@ -1,5 +1,8 @@
 uniform sampler2D tex;
 uniform vec2 iResolution;
+uniform float param1;
+uniform float param2;
+uniform float param3;
 in vec4 f_color;
 in vec2 f_uv;
 in vec3 f_coord;
@@ -10,9 +13,9 @@ void main(void)
     float Pi = 6.28318530718; // Pi*2
     
     // GAUSSIAN BLUR SETTINGS {{{
-    float Directions = 16.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
-    float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
-    float Size = 12.0; // BLUR SIZE (Radius)
+    float Directions = param1; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
+    float Quality = param2; // BLUR QUALITY (Default 4.0 - More is better but slower)
+    float Size = param3; // BLUR SIZE (Radius)
     // GAUSSIAN BLUR SETTINGS }}}
    
     vec2 Radius = Size/iResolution.xy;

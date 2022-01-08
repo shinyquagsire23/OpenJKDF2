@@ -257,6 +257,10 @@ int rdCache_SendFaceListToHardware()
     int red_and_alpha; // [esp+98h] [ebp-8h]
     int green; // [esp+9Ch] [ebp-4h]
 
+    //printf("b %f %f %f ", rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.z, rdroid_curColorEffects.tint.z);
+    //printf("%d %d %d\n", rdroid_curColorEffects.filter.x, rdroid_curColorEffects.filter.z, rdroid_curColorEffects.filter.z);
+
+
     a3 = 0; // added? aaaaaaa undefined
     v0 = 0;
     v1 = 0;
@@ -480,21 +484,7 @@ int rdCache_SendFaceListToHardware()
 
                 if ( v27 > v148 )
                 {
-                    if ( active_6c->extralight >= 0.0 )
-                    {
-                        if ( active_6c->extralight <= 1.0 )
-                        {
-                            v26 = active_6c->extralight;
-                        }
-                        else
-                        {
-                            v26 = 1.0;
-                        }
-                    }
-                    else
-                    {
-                        v26 = 0.0;
-                    }
+                    v26 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
                 }
                 else
                 {
@@ -506,19 +496,8 @@ int rdCache_SendFaceListToHardware()
             else if ( lighting_capability == 2 )
             {
                 v24 = active_6c->extralight + active_6c->light_level_static;
+                v25 = stdMath_Clamp(v24, 0.0, 1.0);
 
-                if ( v24 < 0.0 )
-                {
-                    v25 = 0.0;
-                }
-                else if ( v24 > 1.0 )
-                {
-                    v25 = 1.0;
-                }
-                else
-                {
-                    v25 = v24;
-                }
                 if ( v25 <= v148 )
                 {
                     v26 = v148;

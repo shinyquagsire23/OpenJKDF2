@@ -1,5 +1,8 @@
 uniform sampler2D tex;
 uniform vec2 iResolution;
+uniform float param1;
+uniform float param2;
+uniform float param3;
 in vec4 f_color;
 in vec2 f_uv;
 in vec3 f_coord;

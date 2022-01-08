@@ -2,15 +2,24 @@
 #extension GL_ARB_texture_gather : enable
 #endif
 
+#define LIGHT_DIVISOR (6.0)
+
 uniform sampler2D tex;
 uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
 uniform int tex_mode;
 uniform int blend_mode;
+uniform vec3 colorEffects_tint;
+uniform vec3 colorEffects_filter;
+uniform float colorEffects_fade;
+uniform vec3 colorEffects_add;
+uniform float light_mult;
+
 in vec4 f_color;
 in float f_light;
 in vec2 f_uv;
 in vec3 f_coord;
+
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
 
@@ -49,14 +58,18 @@ vec4 bilinear_paletted()
     return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0);
 }
 
-vec4 bilinear_paletted_light()
+vec4 bilinear_paletted_light(float index)
 {
     // Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
 
+    // Special case for lightsabers
+    if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
+        light = 0.0;
+
     // Take the fragment light, and divide by 4.0 to select for colors
     // which glow in the dark
-    float light_idx = light / 4.0;
+    float light_idx = light / LIGHT_DIVISOR;
 
     // Get texture size in pixels:
     vec2 colorTextureSize = vec2(textureSize(tex, 0));
@@ -82,7 +95,7 @@ vec4 bilinear_paletted_light()
     vec4 temp1 = mix(c00, c10, filterWeight.x);
     vec4 blendColor = mix(temp1, temp0, filterWeight.y);
 
-    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * (1.0 - light) * 0.85;
+    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * (1.0 - light) * light_mult;
 }
 
 void main(void)
@@ -154,9 +167,13 @@ void main(void)
         // Makes sure light is in a sane range
         float light = clamp(f_light, 0.0, 1.0);
 
+        // Special case for lightsabers
+        if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
+            light = 0.0;
+
         // Take the fragment light, and divide by 4.0 to select for colors
         // which glow in the dark
-        float light_idx = light / 5.0;
+        float light_idx = light / LIGHT_DIVISOR;
 
         // Get the shaded palette index
         float light_worldpalidx = texture(worldPaletteLights, vec2(index, light_idx)).r;
@@ -165,7 +182,7 @@ void main(void)
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
         // Add more of the emissive color depending on the darkness of the fragment
-        color_add = (lightPalval * (1.0 - light) * 0.85);
+        color_add = (lightPalval * (1.0 - light) * light_mult);
         sampled_color = palval;
 
         //if (light_worldpalidx == 0.0)
@@ -178,7 +195,7 @@ void main(void)
             discard;
         
         sampled_color = bilinear_paletted();
-        color_add = bilinear_paletted_light();
+        color_add = bilinear_paletted_light(index);
     }
 #endif
 
@@ -188,9 +205,10 @@ void main(void)
             discard;
     }
     vec4 main_color = (sampled_color * vertex_color);
+    vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
 
     color_add.a = 0.0;
-    fragColor = main_color;// + color_add;
+    fragColor = main_color + effectAdd_color;// + color_add;
 
     color_add.a = main_color.a;
 
@@ -201,6 +219,27 @@ void main(void)
     color_add.r *= luma;
     color_add.g *= luma;
     color_add.b *= luma;
+
+    vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3);
+
+    /*if (colorEffects_tint.r > 0.0 || colorEffects_tint.g > 0.0 || colorEffects_tint.b > 0.0)
+    {
+        color_add.r *= (colorEffects_tint.r - (0.5 * (colorEffects_tint.g + colorEffects_tint.b)));
+        color_add.g *= (colorEffects_tint.g - (0.5 * (colorEffects_tint.r + colorEffects_tint.b)));
+        color_add.b *= (colorEffects_tint.b - (0.5 * (colorEffects_tint.g + colorEffects_tint.r)));
+    }*/
+
+    color_add.r *= tint.r;
+    color_add.g *= tint.g;
+    color_add.b *= tint.b;
+
+    color_add.r *= colorEffects_fade;
+    color_add.g *= colorEffects_fade;
+    color_add.b *= colorEffects_fade;
+
+    color_add.r *= colorEffects_filter.r;
+    color_add.g *= colorEffects_filter.g;
+    color_add.b *= colorEffects_filter.b;
 
     fragColorEmiss = color_add;
 }

@@ -49,13 +49,40 @@ typedef struct std3DSimpleTexStage
     GLint uniform_mvp;
     GLint uniform_tex;
     GLint uniform_iResolution;
+
+    GLint uniform_param1;
+    GLint uniform_param2;
+    GLint uniform_param3;
 } std3DSimpleTexStage;
+
+typedef struct std3DIntermediateFbo
+{
+    GLuint fbo;
+    GLuint tex;
+
+    GLuint rbo;
+    int32_t w;
+    int32_t h;
+
+    int32_t iw;
+    int32_t ih;
+} std3DIntermediateFbo;
 
 typedef struct std3DFramebuffer
 {
     GLuint fbo;
     GLuint tex0;
     GLuint tex1;
+
+    std3DIntermediateFbo window;
+    std3DIntermediateFbo main;
+
+    int enable_extra;
+    std3DIntermediateFbo blur1;
+    std3DIntermediateFbo blur2;
+    std3DIntermediateFbo blur3;
+    std3DIntermediateFbo blur4;
+
     GLuint rbo;
     int32_t w;
     int32_t h;
@@ -75,6 +102,8 @@ int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
+GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
+GLint uniform_light_mult;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -127,6 +156,51 @@ GLuint world_ibo_triangle;
 GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
 GLuint menu_ibo_triangle;
 
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo)
+{
+    // Generate the framebuffer
+    memset(pFbo, 0, sizeof(*pFbo));
+
+    pFbo->w = width;
+    pFbo->h = height;
+    pFbo->iw = width;
+    pFbo->ih = height;
+
+    glGenFramebuffers(1, &pFbo->fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
+    
+    // Set up our framebuffer texture
+    glGenTextures(1, &pFbo->tex);
+    glBindTexture(GL_TEXTURE_2D, pFbo->tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // Attach fbTex to our currently bound framebuffer fb
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFbo->tex, 0);
+
+    // Set up our render buffer
+    glGenRenderbuffers(1, &pFbo->rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, pFbo->rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    
+    // Bind it to our framebuffer fb
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        printf("ERROR: Framebuffer is incomplete!\n");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
+{
+    glDeleteFramebuffers(1, &pFbo->fbo);
+    glDeleteTextures(1, &pFbo->tex);
+    glDeleteRenderbuffers(1, &pFbo->rbo);
+}
+
 void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
     // Generate the framebuffer
@@ -150,7 +224,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFb->tex0, 0);
 
-    // Set up our framebuffer texture
+    // Set up our emissive fb texture
     glGenTextures(1, &pFb->tex1);
     glBindTexture(GL_TEXTURE_2D, pFb->tex1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -173,6 +247,38 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         printf("ERROR: Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (jkPlayer_enableBloom)
+    {
+        pFb->enable_extra = 1;
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1);
+        std3D_generateIntermediateFbo(pFb->blur1.w/2, pFb->blur1.h/2, &pFb->blur2);
+        std3D_generateIntermediateFbo(pFb->blur2.w/2, pFb->blur2.h/2, &pFb->blur3);
+        std3D_generateIntermediateFbo(pFb->blur3.w/2, pFb->blur3.h/2, &pFb->blur4);
+
+        /*pFb->blur1.iw = width;
+        pFb->blur1.ih = height;
+        pFb->blur2.iw = width;
+        pFb->blur2.ih = height;
+        pFb->blur3.iw = width;
+        pFb->blur3.ih = height;
+        pFb->blur4.iw = width;
+        pFb->blur4.ih = height;*/
+    }
+
+    pFb->main.fbo = pFb->fbo;
+    pFb->main.tex = pFb->tex1;
+    pFb->main.rbo = pFb->rbo;
+    pFb->main.w = pFb->w;
+    pFb->main.h = pFb->h;
+    pFb->main.iw = pFb->w;
+    pFb->main.ih = pFb->h;
+
+    pFb->window.fbo = std3D_windowFbo;
+    pFb->window.w = Window_xSize;
+    pFb->window.h = Window_ySize;
+    pFb->window.iw = Window_xSize;
+    pFb->window.ih = Window_ySize;
 }
 
 void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
@@ -181,6 +287,11 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex0);
     glDeleteTextures(1, &pFb->tex1);
     glDeleteRenderbuffers(1, &pFb->rbo);
+
+    std3D_deleteIntermediateFbo(&pFb->blur1);
+    std3D_deleteIntermediateFbo(&pFb->blur2);
+    std3D_deleteIntermediateFbo(&pFb->blur3);
+    std3D_deleteIntermediateFbo(&pFb->blur4);
 }
 
 void std3D_swapFramebuffers()
@@ -262,6 +373,10 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     pOut->uniform_iResolution = std3D_tryFindUniform(pOut->program, "iResolution");
     pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
 
+    pOut->uniform_param1 = std3D_tryFindUniform(pOut->program, "param1");
+    pOut->uniform_param2 = std3D_tryFindUniform(pOut->program, "param2");
+    pOut->uniform_param3 = std3D_tryFindUniform(pOut->program, "param3");
+
     return true;
 }
 
@@ -296,6 +411,11 @@ int init_resources()
     uniform_worldPaletteLights = std3D_tryFindUniform(programDefault, "worldPaletteLights");
     uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
     uniform_blend_mode = std3D_tryFindUniform(programDefault, "blend_mode");
+    uniform_tint = std3D_tryFindUniform(programDefault, "colorEffects_tint");
+    uniform_filter = std3D_tryFindUniform(programDefault, "colorEffects_filter");
+    uniform_fade = std3D_tryFindUniform(programDefault, "colorEffects_fade");
+    uniform_add = std3D_tryFindUniform(programDefault, "colorEffects_add");
+    uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
@@ -429,7 +549,7 @@ int std3D_StartScene()
     int32_t tex_w = (int32_t)((double)Window_xSize * supersample_level);
     int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
 
-    if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h)
+    if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h || (!std3D_pFb->enable_extra && jkPlayer_enableBloom))
     {
         std3D_deleteFramebuffer(std3D_pFb);
         std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);
@@ -892,15 +1012,15 @@ void std3D_DrawMenu()
     //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, GLuint texId)
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, float param1, float param2, float param3)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
     glUseProgram(pStage->program);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
-    menu_w = (double)Window_xSize + 1.0;
-    menu_h = (double)Window_ySize + 1.0;
+    menu_w = (double)pFbo->w;
+    menu_h = (double)pFbo->h;
     menu_u = 1.0;
     menu_v = 1.0;
     menu_x = 0.0;
@@ -1013,12 +1133,12 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, GLuint texId)
 
     float maxX, maxY, scaleX, scaleY, width, height;
 
-    scaleX = 1.0/((double)Window_xSize / 2.0);
-    scaleY = 1.0/((double)Window_ySize / 2.0);
+    scaleX = 1.0/((double)pFbo->w / 2.0);
+    scaleY = 1.0/((double)pFbo->h / 2.0);
     maxX = 1.0;
     maxY = 1.0;
-    width = Window_xSize;
-    height = Window_ySize;
+    width = pFbo->w;
+    height = pFbo->h;
     
     float d3dmat[16] = {
        maxX*scaleX,      0,                                          0,      0, // right
@@ -1029,7 +1149,11 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, GLuint texId)
     
     glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, d3dmat);
     glViewport(0, 0, width, height);
-    glUniform2f(pStage->uniform_iResolution, width, height);
+    glUniform2f(pStage->uniform_iResolution, pFbo->iw, pFbo->ih);
+
+    glUniform1f(pStage->uniform_param1, param1);
+    glUniform1f(pStage->uniform_param2, param2);
+    glUniform1f(pStage->uniform_param3, param3);
 
     }
     
@@ -1103,14 +1227,29 @@ void std3D_DrawSceneFbo()
     
     glBlendEquation(GL_FUNC_ADD);
 
-    std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex0);
-    //std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex1); // test emission output
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0.0, 0.0, 0.0);
+    //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0); // test emission output
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    std3D_DrawSimpleTex(&std3D_texFboStage, std3D_pFb->tex1);
+    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0);
     if (jkPlayer_enableBloom)
     {
-        std3D_DrawSimpleTex(&std3D_blurStage, std3D_pFb->tex1);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 16.0, 3.0, 3.0);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0.0, 0.0, 0.0);
     }
     //
 
@@ -1187,7 +1326,32 @@ void std3D_DrawRenderList()
     glViewport(0, 0, width, height);
     
     }
-    
+
+    //rdroid_curColorEffects.tint.x = 0.0;
+    //rdroid_curColorEffects.tint.y = 0.5;
+    //rdroid_curColorEffects.tint.z = 0.5;
+
+#if 0
+    //if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+    //if (rdroid_curColorEffects.tint.x || rdroid_curColorEffects.tint.y || rdroid_curColorEffects.tint.z)
+    if (rdroid_curColorEffects.add.x || rdroid_curColorEffects.add.y || rdroid_curColorEffects.add.z)
+    {
+        printf("a %f %f %f ", rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+        printf("%d %d %d ", rdroid_curColorEffects.filter.x, rdroid_curColorEffects.filter.y, rdroid_curColorEffects.filter.z);
+        printf("%d %d %d ", rdroid_curColorEffects.add.x, rdroid_curColorEffects.add.y, rdroid_curColorEffects.add.z);
+        printf("%f\n", rdroid_curColorEffects.fade);
+    }
+#endif
+
+    glUniform3f(uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+    if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+        glUniform3f(uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+    else
+        glUniform3f(uniform_filter, 1.0, 1.0, 1.0);
+    glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
+    glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+    glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.25 : 0.85);
+
     rdTri* tris = GL_tmpTris;
     rdLine* lines = GL_tmpLines;
     
