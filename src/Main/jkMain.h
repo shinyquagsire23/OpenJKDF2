@@ -134,7 +134,7 @@ int jkMain_SwitchTo13();
 
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
-//static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
+static int (*_jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;
 //static void (*jkMain_do_guistate6)() = (void*)jkMain_do_guistate6_ADDR;
 static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
 //static void (*jkMain_SwitchTo13)() = (void*)jkMain_SwitchTo13_ADDR;

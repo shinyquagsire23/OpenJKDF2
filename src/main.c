@@ -487,7 +487,9 @@ void do_hooks()
     hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
 
     // jkMain
+#if 1
     hook_function(jkMain_GuiAdvance_ADDR, jkMain_GuiAdvance);
+#endif
     //hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
     hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
     //hook_function(jkMain_TitleTick_ADDR, jkMain_TitleTick);

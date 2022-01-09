@@ -80,6 +80,7 @@ static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
 
 void jkMain_GuiAdvance()
 {
+    int v0;
     unsigned int v1; // esi
     int v3; // esi
     int v4; // esi
@@ -96,12 +97,13 @@ void jkMain_GuiAdvance()
         {
             if ( sithNet_isMulti && !thing_six)
             {
+                v0 = jkSmack_currentGuiState;
                 v1 = stdPlatform_GetTimeMsec();
                 
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-                    if (!sith_Tick()) return;
+                    if (!_sith_Tick()) return;
                 }
                 
                 if ( g_sithMode == 5 )
@@ -122,12 +124,12 @@ void jkMain_GuiAdvance()
                 if ( sith_bEndLevel )
                 {
                     sith_bEndLevel = 0;
-                    jkMain_EndLevel(1);
+                    _jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
-                if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
+                if ( g_app_suspended && v0 != 6 ) {
 #ifdef QOL_IMPROVEMENTS
                     if (jkMain_lastTickMs == v1)
 #endif
