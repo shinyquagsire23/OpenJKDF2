@@ -205,8 +205,8 @@ MMRESULT (__stdcall *jk_joyGetDevCapsA)(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cb
 HRESULT (__stdcall *jk_CoInitialize)(LPVOID pvReserved);
 HRESULT (__stdcall *jk_CoCreateInstance)(const IID *const rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, const IID *const riid, LPVOID *ppv);
 
-LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dwFlags);
-BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
+//LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dwFlags);
+//BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
 
 int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
 
@@ -523,8 +523,8 @@ void jk_init()
     jk_CoInitialize = *(void**)0x008F0678;
     jk_CoCreateInstance = *(void**)0x008F067C;
     
-    jk_ChangeDisplaySettingsA = *(void**)0x8F4153;
-    jk_EnumDisplaySettingsA = *(void**)0x8F4157;
+    //jk_ChangeDisplaySettingsA = *(void**)0x8F4153;
+    //jk_EnumDisplaySettingsA = *(void**)0x8F4157;
     
     jk_snwprintf = (void*)0x00512BD0;
 #endif

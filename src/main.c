@@ -441,7 +441,7 @@ void do_hooks()
     
     // sithRender
     hook_function(sithRender_Draw_ADDR, sithRender_Draw);
-    
+
     // rdCamera
     hook_function(rdCamera_New_ADDR, rdCamera_New);
     hook_function(rdCamera_NewEntry_ADDR, rdCamera_NewEntry);
@@ -485,14 +485,14 @@ void do_hooks()
     hook_function(sithCamera_SetPovShake_ADDR, sithCamera_SetPovShake);
     hook_function(sithCamera_GetPrimaryFocus_ADDR, sithCamera_GetPrimaryFocus);
     hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
-    
+
     // jkMain
     hook_function(jkMain_GuiAdvance_ADDR, jkMain_GuiAdvance);
     //hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
     hook_function(jkMain_GameplayTick_ADDR, jkMain_GameplayTick);
     //hook_function(jkMain_TitleTick_ADDR, jkMain_TitleTick);
     //hook_function(jkMain_MainTick_ADDR, jkMain_MainTick);
-    
+
     // sithPhysics
     hook_function(sithPhysics_ThingTick_ADDR, sithPhysics_ThingTick);
     

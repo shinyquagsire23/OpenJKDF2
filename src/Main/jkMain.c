@@ -507,7 +507,7 @@ void jkMain_GameplayTick(int a2)
             if (v1 > jkMain_lastTickMs + TICKRATE_MS)
             {
                 jkMain_lastTickMs = v1;
-                if (sith_Tick()) return;
+                if (_sith_Tick()) return;
             }
             
             if ( g_sithMode == 5 )

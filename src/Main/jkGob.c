@@ -14,5 +14,5 @@ int jkGob_Startup()
 
 void jkGob_Shutdown()
 {
-    jk_ChangeDisplaySettingsA(0, 0);
+    //jk_ChangeDisplaySettingsA(0, 0);
 }
