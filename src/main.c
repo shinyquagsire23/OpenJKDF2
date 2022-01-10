@@ -487,7 +487,7 @@ void do_hooks()
     hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
 
     // jkMain
-#if 1
+#if 0
     hook_function(jkMain_GuiAdvance_ADDR, jkMain_GuiAdvance);
 #endif
     //hook_function(jkMain_EscapeMenuTick_ADDR, jkMain_EscapeMenuTick);
@@ -505,6 +505,9 @@ void do_hooks()
     hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
     hook_function(sithTime_Startup_ADDR, sithTime_Startup);
     hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
+    
+    // rdMaterial
+    hook_function(rdMaterial_LoadEntry_ADDR, rdMaterial_LoadEntry);
 
 #if 0
     // stdPlatform
