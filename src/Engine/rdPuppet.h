@@ -23,33 +23,6 @@
 #define rdPuppet_unk_ADDR (0x0043EE60)
 #define rdPuppet_BuildJointMatrices_ADDR (0x0043EEB0)
 
-typedef void (*rdPuppetTrackCallback_t)(sithThing*, uint32_t, uint32_t);
-
-typedef struct rdPuppetTrack
-{
-    int status;
-    int field_4;
-    int lowPri;
-    int highPri;
-    float speed;
-    float noise;
-    float playSpeed;
-    float fadeSpeed;
-    uint32_t nodes[64];
-    float field_120;
-    float field_124;
-    rdKeyframe *keyframe;
-    rdPuppetTrackCallback_t callback;
-    int field_130;
-} rdPuppetTrack;
-
-typedef struct rdPuppet
-{
-    uint32_t paused;
-    rdThing *rdthing;
-    rdPuppetTrack tracks[4];
-} rdPuppet;
-
 rdPuppet* rdPuppet_New(rdThing *thing);
 void rdPuppet_Free(rdPuppet *puppet);
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix);

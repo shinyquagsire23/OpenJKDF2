@@ -13,7 +13,7 @@ void stdDisplay_SetGammaTable(int len, uint32_t *table)
 
 uint8_t* stdDisplay_GetPalette()
 {
-    return stdDisplay_gammaPalette;
+    return (uint8_t*)stdDisplay_gammaPalette;
 }
 
 #ifndef SDL2_RENDER
@@ -215,7 +215,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
     return 1;
 }
 
-stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, int is_paletted)
+stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, void* palette)
 {
     stdVBuffer* out = std_pHS->alloc(sizeof(stdVBuffer));
     

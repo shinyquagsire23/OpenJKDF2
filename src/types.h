@@ -495,6 +495,7 @@ typedef int (*stdPalEffectSetPaletteFunc_t)(uint8_t*);
 typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithActorInstinct *a3, int b, intptr_t a4);
 typedef int (*sithControlEnumFunc_t)(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int a6, stdControlKeyInfoEntry* pControlEntry, Darray* pDarr);
 typedef int (*sithCollisionHitHandler_t)(sithThing *, sithSurface *, sithCollisionSearchEntry *);
+typedef void (*rdPuppetTrackCallback_t)(sithThing*, int32_t, uint32_t);
 
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)
@@ -1603,23 +1604,23 @@ typedef struct common_functions_basic
     int (*warningPrint)(const char *, ...);
     int (*errorPrint)(const char *, ...);
     int (*debugPrint)(const char *, ...);
-    int assert;
+    void (*assert)(const char *, const char *, int);
     int unk_0;
-    void *(__cdecl *alloc)(unsigned int);
-    void (__cdecl *free)(void *);
-    int realloc;
-    int getTimerTick;
-    stdFile_t (__cdecl *fileOpen)(const char *, const char *);
-    int (__cdecl *fileClose)(stdFile_t);
-    size_t (__cdecl *fileRead)(stdFile_t, void *, size_t);
-    char *(__cdecl *fileGets)(stdFile_t, char *, int);
-    size_t (__cdecl *fileWrite)(stdFile_t, void *, size_t);
+    void *(*alloc)(unsigned int);
+    void (*free)(void *);
+    void *(*realloc)(void *, unsigned int);
+    uint32_t (*getTimerTick)();
+    stdFile_t (*fileOpen)(const char *, const char *);
+    int (*fileClose)(stdFile_t);
+    size_t (*fileRead)(stdFile_t, void *, size_t);
+    char *(*fileGets)(stdFile_t, char *, size_t);
+    size_t (*fileWrite)(stdFile_t, void *, size_t);
     int (*feof)(stdFile_t);
     int (*ftell)(stdFile_t);
-    int (__cdecl *fseek)(stdFile_t, int, int);
+    int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
-    void (*filePrintf)(stdFile_t, const char *, ...);
-    wchar_t *(__cdecl *fileGetws)(stdFile_t, wchar_t *, unsigned int);
+    int (*filePrintf)(stdFile_t, const char*, ...);
+    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
 } common_functions_basic;
 
 typedef struct common_functions
@@ -1853,6 +1854,31 @@ typedef struct rdThing
     uint32_t clippingIdk;
     sithThing* parentSithThing;
 } rdThing;
+
+typedef struct rdPuppetTrack
+{
+    int status;
+    int field_4;
+    int lowPri;
+    int highPri;
+    float speed;
+    float noise;
+    float playSpeed;
+    float fadeSpeed;
+    uint32_t nodes[64];
+    float field_120;
+    float field_124;
+    rdKeyframe *keyframe;
+    rdPuppetTrackCallback_t callback;
+    int field_130;
+} rdPuppetTrack;
+
+typedef struct rdPuppet
+{
+    uint32_t paused;
+    rdThing *rdthing;
+    rdPuppetTrack tracks[4];
+} rdPuppet;
 
 typedef struct sithPlayerInfo
 {

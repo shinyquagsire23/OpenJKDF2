@@ -50,7 +50,7 @@ void stdFPutc(char c, stdFile_t fd);
 //static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
 static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
-static stdFile_t (*stdFileOpen)(char*,char*) = (void*)stdFileOpen_ADDR;
+static stdFile_t (*stdFileOpen)(const char*,const char*) = (void*)stdFileOpen_ADDR;
 static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;
 static size_t (*stdFileRead)(stdFile_t,void*,size_t) = (void*)stdFileRead_ADDR;
 static size_t (*stdFileWrite)(stdFile_t,void*,size_t) = (void*)stdFileWrite_ADDR;

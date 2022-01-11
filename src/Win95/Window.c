@@ -821,7 +821,7 @@ void Window_RecreateSDL2Window()
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
-#ifdef MACOS
+#if defined(MACOS) && defined(__aarch64__)
     SDL_FixWindowMacOS(displayWindow);
 #endif
 

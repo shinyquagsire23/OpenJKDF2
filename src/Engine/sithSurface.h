@@ -99,7 +99,7 @@ rdSurface* sithSurface_MaterialAnim(rdMaterial *material, float a2, int a3);
 void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out);
 int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out);
 rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2);
-rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint16_t a3);
+rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint32_t a3);
 rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a4);
 void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, float damage, int damageType);
 rdSurface* sithSurface_GetRdSurface(sithSurface *surface);

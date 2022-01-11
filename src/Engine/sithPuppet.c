@@ -141,7 +141,7 @@ void sithPuppet_sub_4E4760(sithThing *thing, int a2)
     }
 }
 
-int sithPuppet_PlayMode(sithThing *thing, signed int anim, intptr_t callback)
+int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback_t callback)
 {
     sithAnimclass *v4; // ebx
     sithPuppet *v6; // edx
@@ -188,7 +188,7 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, intptr_t callback)
     return result;
 }
 
-int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, intptr_t callback)
+int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback)
 {
     int v6; // ecx
     int trackNum; // esi

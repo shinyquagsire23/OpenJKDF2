@@ -831,7 +831,7 @@ int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
     jkPlayer_playerInfos[playerIdx].teamNum = teamNum;
     if ( jkPlayer_playerInfos[playerIdx].playerThing )
     {
-        v5 = sithModel_LoadEntry(&jkSaber_aKyTeamModels[32 * teamNum], 1);
+        v5 = sithModel_LoadEntry(jkSaber_aKyTeamModels[teamNum], 1);
         if ( v5 )
         {
             sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);

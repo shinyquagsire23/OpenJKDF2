@@ -334,7 +334,6 @@ void jk_ValidateRect(HWND hWnd, const RECT *lpRect);
 #ifndef ARCH_WASM
 int __isspace(int a);
 #endif
-int _iswspace(int a);
 void* _memset(void* ptr, int val, size_t num);
 void* _memset32(void* ptr, uint32_t val, size_t num);
 wchar_t* __wcscat(wchar_t *, const wchar_t *);
@@ -356,5 +355,6 @@ int __wcsicmp(const wchar_t *a, const wchar_t *b);
 float _frand();
 
 void jk_init();
+int _iswspace(int a);
 
 #endif // JK_H

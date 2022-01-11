@@ -69,6 +69,7 @@ int wuRegistry_SaveFloat(LPCSTR lpValueName, float val)
     HKEY v2; // ecx
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
 
+    v2 = 0; // Added: fix undef
     phkResult = v2;
     if ( RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &phkResult) )
         return 0;

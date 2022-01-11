@@ -1108,7 +1108,7 @@ rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
     return result;
 }
 
-rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint16_t a3)
+rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint32_t a3)
 {
     rdSurface *v3; // esi
     int v4; // edx

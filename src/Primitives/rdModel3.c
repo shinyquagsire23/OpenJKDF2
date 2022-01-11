@@ -986,7 +986,7 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
                 }
                 if ( idx1 < face->numVertices )
                     rdMath_CalcSurfaceNormal(
-                        face->wallCel,
+                        &face->normal,
                         &mesh->vertices[face->vertexPosIdx[idx1]],
                         &mesh->vertices[face->vertexPosIdx[idx3]],
                         &mesh->vertices[face->vertexPosIdx[idx2]]);
