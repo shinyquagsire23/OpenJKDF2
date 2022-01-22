@@ -157,8 +157,6 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
                 else
                     v6 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
                 v5->field_8 = v6;
-
-                printf("a %f %u\n", v6, jkGuiMouse_aElements[20].selectedTextEntry);
             }
             if ( jkGuiMouse_aElements[18].bIsVisible )
                 v5->bitflag = v5->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
@@ -197,7 +195,6 @@ LABEL_30:
                 else
                     v15 = (__int64)ceilf(((v13) * (100.0 / 1.0)));
                 jkGuiMouse_aElements[20].selectedTextEntry = v15;
-                printf("b %f %u\n", v13, jkGuiMouse_aElements[20].selectedTextEntry);
                 v16 = ((unsigned int)v12->bitflag >> 3) & 1;
                 jkGuiMouse_aElements[17].selectedTextEntry = ((unsigned int)~v12->bitflag >> 2) & 1;
                 jkGuiMouse_aElements[18].selectedTextEntry = v16;
@@ -662,8 +659,6 @@ int jkGuiMouse_Show()
         else
             v2 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
         pSubEnt->field_8 = v2;
-
-        printf("a %f %u\n", v2, jkGuiMouse_aElements[20].selectedTextEntry);
     }
     if ( jkGuiMouse_aElements[18].bIsVisible )
         pSubEnt->bitflag = pSubEnt->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
