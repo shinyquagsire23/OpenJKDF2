@@ -65,7 +65,7 @@ static jkGuiElement jkGuiMouse_aElements[26] =
     {ELEMENT_CHECKBOX,    0,   0, "GUI_REVERSE_AXIS",       0, { 320, 335, 300, 20 }, 1, 0, "GUI_REVERSE_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_CHECKBOX,    0,   0, "GUI_CONTROL_RAW",        0, { 320, 365, 300, 20 }, 1, 0, "GUI_RAW_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_TEXT,        0,   0, "GUI_SENSITIVITY",        2, { 50, 335, 170, 20 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
-    {ELEMENT_SLIDER,      0,   0, (char *)0x64,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", jkGuiMouse_SensitivityDraw, NULL, aIdk_52B168, {0}, 0},
+    {ELEMENT_SLIDER,      0,   0, (char *)200,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", jkGuiMouse_SensitivityDraw, NULL, aIdk_52B168, {0}, 0},
     {ELEMENT_TEXTBUTTON,  1,   2, "GUI_OK",                 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON, -1,   2, "GUI_CANCEL",             3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_RESTORE_DEFAULTS",   3, { 200, 430, 240, 40 }, 1, 0, NULL, NULL, jkGuiMouse_RestoreDefaultsClicked, NULL, {0}, 0},
@@ -151,11 +151,14 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
             v5 = jkGuiMouse_aEntries[jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aEntries[0].mouseEntryIdx)].pSubEnt;
             if ( jkGuiMouse_aElements[20].bIsVisible )
             {
-                if ( jkGuiMouse_aElements[20].selectedTextEntry > 50 )
-                    v6 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 50) * 0.059999999 - -1.0;
+                // Adjusted: More granularity
+                if ( jkGuiMouse_aElements[20].selectedTextEntry > 100 )
+                    v6 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
                 else
-                    v6 = (double)jkGuiMouse_aElements[20].selectedTextEntry * 0.015 - -0.25;
+                    v6 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
                 v5->field_8 = v6;
+
+                printf("a %f %u\n", v6, jkGuiMouse_aElements[20].selectedTextEntry);
             }
             if ( jkGuiMouse_aElements[18].bIsVisible )
                 v5->bitflag = v5->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
@@ -190,10 +193,11 @@ LABEL_30:
                 jkGuiMouse_aElements[18].bIsVisible = (v14 >> 3) & 1;
                 jkGuiMouse_aElements[20].bIsVisible = 1;
                 if ( v13 > 1.0 )
-                    v15 = (__int64)ceilf(((v13 - 1.0) * 16.666666) + 50);
+                    v15 = (__int64)ceilf(((v13 - 1.0) * (100.0 / 3.0)) + 100);
                 else
-                    v15 = (__int64)ceilf(((v13 - 0.25) * 66.666664));
+                    v15 = (__int64)ceilf(((v13) * (100.0 / 1.0)));
                 jkGuiMouse_aElements[20].selectedTextEntry = v15;
+                printf("b %f %u\n", v13, jkGuiMouse_aElements[20].selectedTextEntry);
                 v16 = ((unsigned int)v12->bitflag >> 3) & 1;
                 jkGuiMouse_aElements[17].selectedTextEntry = ((unsigned int)~v12->bitflag >> 2) & 1;
                 jkGuiMouse_aElements[18].selectedTextEntry = v16;
@@ -653,11 +657,13 @@ int jkGuiMouse_Show()
     pSubEnt = jkGuiMouse_aEntries[jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry)].pSubEnt;
     if ( jkGuiMouse_aElements[20].bIsVisible )
     {
-        if ( jkGuiMouse_aElements[20].selectedTextEntry > 50 )
-            v2 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 50) * 0.059999999 - -1.0;
+        if ( jkGuiMouse_aElements[20].selectedTextEntry > 100 )
+            v2 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
         else
-            v2 = (double)jkGuiMouse_aElements[20].selectedTextEntry * 0.015 - -0.25;
+            v2 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
         pSubEnt->field_8 = v2;
+
+        printf("a %f %u\n", v2, jkGuiMouse_aElements[20].selectedTextEntry);
     }
     if ( jkGuiMouse_aElements[18].bIsVisible )
         pSubEnt->bitflag = pSubEnt->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
