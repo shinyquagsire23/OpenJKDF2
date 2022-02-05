@@ -9,7 +9,7 @@ Building is currently tested primarily on Arch Linux, Ubuntu 20.04, and MacOS Mo
 
 ```
 # All
-pacman -S cmake base-devel make python python-pip bison imagemagick gtk3
+pacman -S git cmake base-devel make python python-pip bison imagemagick gtk3
 pip3 install cogapp
 
 # Win32/MinGW
@@ -31,17 +31,17 @@ pacaur -S emscripten
 
 ```
 # All
-apt install build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev
+sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev
 pip3 install cogapp
 
 # Win32/MinGW
-apt install mingw-w64
+sudo apt install mingw-w64
 
 # Linux 32-bit
 # TODO find equivalents: multilib-devel lib32-sdl2 lib32-glew lib32-openal
 
 # Linux 64-bit
-apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
+sudo apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev
 
 # WebAssembly
 # TODO find equivalents: emscripten
@@ -59,7 +59,7 @@ export PATH=$PATH:~/.local/bin
 Before starting, install Xcode. This is required for OpenGL headers, among other things.
 ```
 # All
-brew install cmake make python3 imagemagick
+brew install git cmake make python3 imagemagick
 pip3 install cogapp generate-iconset
 
 # After installing cogapp, make sure the following is in your ~/.zshrc:
@@ -97,6 +97,9 @@ Download and install the latest CMake from [here](https://cmake.org/download/).
 64-bit Linux supports both x86_64 and ARM64 targets, and has been tested on Intel, NVIDIA and V3D (Raspberry Pi 4) graphics cards. **GCC <11.1 is currently not supported due to crashes, use clang instead.**
 
 ```
+git clone https://github.com/shinyquagsire23/OpenJKDF2.git
+cd OpenJKDF2
+
 export CC=clang
 export CXX=clang++
 
@@ -114,6 +117,9 @@ make -j10
 64-bit Windows can be cross-compiled from Linux or MacOS, and has been tested on Intel and NVIDIA graphics cards.
 
 ```
+git clone https://github.com/shinyquagsire23/OpenJKDF2.git
+cd OpenJKDF2
+
 ./build_win64.sh
 ```
 </details>
@@ -123,6 +129,9 @@ make -j10
 
 A full, universal MacOS appbundle can be created using
 ```
+git clone https://github.com/shinyquagsire23/OpenJKDF2.git
+cd OpenJKDF2
+
 ./distpkg_macos.sh
 ```
 
