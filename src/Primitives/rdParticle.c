@@ -123,13 +123,8 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
     const char *v3; // eax
     rdParticle *v4; // esi
     int v5; // ebx
-    double v6; // st7
     rdMaterial *v7; // eax
     int v8; // ebp
-    float v9; // eax
-    float v10; // ecx
-    struct common_functions *v11; // edx
-    int v12; // ST18_4
     rdVector3 *v13; // eax
     struct common_functions *v14; // edx
     int v15; // eax
@@ -162,9 +157,8 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
                     {
                         if ( _sscanf(stdConffile_aLine, " size %f", &size) == 1 )
                         {
-                            v6 = size * 0.5;
                             v4->diameter = size;
-                            v4->radius = v6;
+                            v4->radius = size * 0.5;
                             if ( stdConffile_ReadLine() )
                             {
                                 if ( _sscanf(stdConffile_aLine, " material %s", std_genBuffer) == 1 )
@@ -191,21 +185,17 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
                                                                 {
                                                                     if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &v19, &v19.y, &v19.z) == 3 )
                                                                     {
-                                                                        v9 = v19.y;
-                                                                        v10 = v19.z;
                                                                         v4->insertOffset.x = v19.x;
-                                                                        v4->insertOffset.y = v9;
-                                                                        v4->insertOffset.z = v10;
+                                                                        v4->insertOffset.y = v19.y;
+                                                                        v4->insertOffset.z = v19.z;
                                                                         if ( stdConffile_ReadLine() )
                                                                         {
-                                                                            int numVertices;
+                                                                            uint32_t numVertices;
                                                                             if ( _sscanf(stdConffile_aLine, " vertices %d", &numVertices) == 1
-                                                                              && (unsigned int)fpath <= 0x100 )
+                                                                              && numVertices <= 0x100 )
                                                                             {
-                                                                                v11 = rdroid_pHS;
-                                                                                v12 = 12 * numVertices;
-                                                                                v4->numVertices = (int)fpath;
-                                                                                v13 = (rdVector3 *)v11->alloc(v12);
+                                                                                v4->numVertices = numVertices;
+                                                                                v13 = (rdVector3 *)rdroid_pHS->alloc(12 * numVertices);
                                                                                 v14 = rdroid_pHS;
                                                                                 v4->vertices = v13;
                                                                                 v4->vertexCel = (int*)v14->alloc(4 * numVertices);
@@ -215,7 +205,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
                                                                                     if ( v4->vertexCel )
                                                                                     {
                                                                                         v17 = v4->vertexCel;
-                                                                                        if ( (unsigned int)fpath <= 0 )
+                                                                                        if ( numVertices <= 0 )
                                                                                         {
 LABEL_28:
                                                                                             stdConffile_Close();
@@ -235,7 +225,7 @@ LABEL_28:
                                                                                             ++v17;
                                                                                             *v16 = v19;
                                                                                             ++v16;
-                                                                                            if ( ++v5 >= (unsigned int)fpath )
+                                                                                            if ( ++v5 >= numVertices )
                                                                                                 goto LABEL_28;
                                                                                         }
                                                                                     }

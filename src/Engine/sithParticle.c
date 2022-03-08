@@ -60,7 +60,7 @@ rdParticle* sithParticle_LoadEntry(const char *a1)
         if ( v4 < v1->numParticles )
         {
             v5 = &v1->particles[v4];
-            _sprintf(v6, "%s%c%s", "misc\\par", 92, a1);
+            _sprintf(v6, "%s%c%s", "misc\\par", '\\', a1);
             if ( rdParticle_LoadEntry(v6, v5) )
             {
                 stdHashTable_SetKeyVal(sithParticle_alloc, v5->name, v5);
