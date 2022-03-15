@@ -4,48 +4,7 @@
 #include "General/stdMath.h"
 #include "Engine/rdClip.h"
 
-void rdPrimit2_DrawCircle(rdCanvas *canvas, int x1, int y1, float a4, float radius, uint16_t color16, int mask)
-{
-    __int64 v7; // rax
-    int v8; // edi
-    int v9; // ebx
-    int v10; // ebp
-    int v11; // esi
-    int v12; // edi
-    double v13; // st7
-    float a2a; // [esp+0h] [ebp-Ch]
-    float a4a; // [esp+4h] [ebp-8h] BYREF
-    float a3a; // [esp+8h] [ebp-4h] BYREF
-
-    v7 = (__int64)(a4 - -0.5);
-    v8 = x1;
-    if ( (int)v7 + x1 >= canvas->xStart && x1 - (int)v7 <= canvas->widthMinusOne && (int)v7 + y1 >= canvas->yStart && y1 - (int)v7 <= canvas->heightMinusOne )
-    {
-        stdMath_SinCos(0.0, &a3a, &a4a);
-        v9 = x1 + (__int64)(a4a * a4 - -0.5);
-        a2a = radius;
-        v10 = y1 + (__int64)(a3a * a4 - -0.5);
-        if ( radius <= 360.0 )
-        {
-            while ( 1 )
-            {
-                stdMath_SinCos(a2a, &a3a, &a4a);
-                v11 = v8 + (__int64)(a4a * a4 - -0.5);
-                v12 = y1 + (__int64)(a3a * a4 - -0.5);
-                rdPrimit2_DrawClippedLine(canvas, v9, v10, v11, v12, color16, mask);
-                v13 = a2a + radius;
-                v9 = v11;
-                v10 = v12;
-                a2a = v13;
-                if ( v13 > 360.0 )
-                    break;
-                v8 = x1;
-            }
-        }
-    }
-}
-
-int rdPrimit2_DrawClippedLine(rdCanvas *canvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
+int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
 {
     stdVBuffer *v7; // ebx
     int v8; // ebp
@@ -66,9 +25,7 @@ int rdPrimit2_DrawClippedLine(rdCanvas *canvas, int x1, int y1, int x2, int y2, 
     int v24; // [esp+14h] [ebp-4h]
     int v25; // [esp+14h] [ebp-4h]
 
-    if ( !rdClip_Line2(canvas, &x1, &y1, &x2, &y2) )
-        return 0;
-    v7 = canvas->vbuffer;
+    v7 = pCanvas->vbuffer;
     v19 = 0x80000000;
     if ( v7->format.format.bpp == 8 )
     {
@@ -102,7 +59,7 @@ int rdPrimit2_DrawClippedLine(rdCanvas *canvas, int x1, int y1, int x2, int y2, 
                 v8 += v22;
             }
             if ( (v19 & mask) != 0 )
-                canvas->vbuffer->surface_lock_alloc[v9 * canvas->vbuffer->format.width_in_bytes + v8] = color16;
+                pCanvas->vbuffer->surface_lock_alloc[v9 * pCanvas->vbuffer->format.width_in_bytes + v8] = color16;
         }
     }
     else
@@ -137,8 +94,73 @@ int rdPrimit2_DrawClippedLine(rdCanvas *canvas, int x1, int y1, int x2, int y2, 
                 v12 += v23;
             }
             if ( (v19 & mask) != 0 )
-                *(uint16_t*)&canvas->vbuffer->surface_lock_alloc[2 * v12 + 2 * v13 * canvas->vbuffer->format.width_in_pixels] = color16;
+                *(uint16_t*)&pCanvas->vbuffer->surface_lock_alloc[2 * v12 + 2 * v13 * pCanvas->vbuffer->format.width_in_pixels] = color16;
         }
     }
     return 1;
+}
+
+int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
+{
+    if ( !rdClip_Line2(pCanvas, &x1, &y1, &x2, &y2) )
+        return 0;
+    return rdPrimit2_DrawLine(pCanvas, x1, y1, x2, y2, color16, mask);
+}
+
+
+void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, float a4, float radius, uint16_t color16, int mask)
+{
+    __int64 v7; // rax
+    int v8; // edi
+    int v9; // ebx
+    int v10; // ebp
+    int v11; // esi
+    int v12; // edi
+    double v13; // st7
+    float a2a; // [esp+0h] [ebp-Ch]
+    float a4a; // [esp+4h] [ebp-8h] BYREF
+    float a3a; // [esp+8h] [ebp-4h] BYREF
+
+    v7 = (__int64)(a4 - -0.5);
+    v8 = x1;
+    if ( (int)v7 + x1 >= pCanvas->xStart && x1 - (int)v7 <= pCanvas->widthMinusOne && (int)v7 + y1 >= pCanvas->yStart && y1 - (int)v7 <= pCanvas->heightMinusOne )
+    {
+        stdMath_SinCos(0.0, &a3a, &a4a);
+        v9 = x1 + (__int64)(a4a * a4 - -0.5);
+        a2a = radius;
+        v10 = y1 + (__int64)(a3a * a4 - -0.5);
+        if ( radius <= 360.0 )
+        {
+            while ( 1 )
+            {
+                stdMath_SinCos(a2a, &a3a, &a4a);
+                v11 = v8 + (__int64)(a4a * a4 - -0.5);
+                v12 = y1 + (__int64)(a3a * a4 - -0.5);
+                rdPrimit2_DrawClippedLine(pCanvas, v9, v10, v11, v12, color16, mask);
+                v13 = a2a + radius;
+                v9 = v11;
+                v10 = v12;
+                a2a = v13;
+                if ( v13 > 360.0 )
+                    break;
+                v8 = x1;
+            }
+        }
+    }
+}
+
+
+void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int mask)
+{
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y1, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x2, y1, x2, y2, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x1, y2, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y2, x2, y2, color, mask);
+}
+
+void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int mask)
+{
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y2, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x2, y2, x3, y3, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x3, y3, x1, y1, color, mask);
 }

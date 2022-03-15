@@ -1044,8 +1044,11 @@ void do_hooks()
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
     
     // rdPrimit2
-    hook_function(rdPrimit2_DrawCircle_ADDR, rdPrimit2_DrawCircle);
+    hook_function(rdPrimit2_DrawLine_ADDR, rdPrimit2_DrawLine);
     hook_function(rdPrimit2_DrawClippedLine_ADDR, rdPrimit2_DrawClippedLine);
+    hook_function(rdPrimit2_DrawCircle_ADDR, rdPrimit2_DrawCircle);
+    hook_function(rdPrimit2_DrawRectangle_ADDR, rdPrimit2_DrawRectangle);
+    hook_function(rdPrimit2_DrawTriangle_ADDR, rdPrimit2_DrawTriangle);
 
     // rdPrimit3
     //hook_function(rdPrimit3_ClipFace_ADDR, rdPrimit3_ClipFace);
