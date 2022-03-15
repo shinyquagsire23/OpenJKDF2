@@ -67,11 +67,6 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
     ├── Res1hi.gob
     ├── Res2.gob
     ├── jk_.cd
-    ├── shaders
-    │   ├── default_f.glsl
-    │   ├── default_v.glsl
-    │   ├── menu_f.glsl
-    │   └── menu_v.glsl
     └── video
         ├── 01-02A.SMK
         ├── 03-04A.SMK
