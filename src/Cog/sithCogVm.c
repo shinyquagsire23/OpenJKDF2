@@ -51,8 +51,6 @@
 #define cogMsg_HandleTakeItem ((void*)0x004F5150)
 #define cogMsg_HandleCreateThing ((void*)0x004F52E0)
 #define cogMsg_HandleDestroyThing ((void*)0x004F5410)
-#define cogMsg_HandleSyncSector ((void*)0x004F91F0)
-#define cogMsg_HandleSyncSectorAlt ((void*)0x004F9350)
 #define sithDplay_cogMsg_HandleEnumPlayers ((void*)0x004C9A40)
 
 
@@ -60,8 +58,8 @@ int sithCogVm_Startup()
 {
     if (sithCogVm_bInit)
         return 0;
-    _memset(sithCogVm_msgFuncs, 0, sizeof(cogMsg_Handler) * 65);
-    _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80);
+    _memset(sithCogVm_msgFuncs, 0, sizeof(cogMsg_Handler) * 65);  // TODO define
+    _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithCogVm_dword_847E84 = 0;
     sithCogVm_msgId = 1;
     sithCogVm_msgFuncs[COGMSG_TELEPORTTHING] = cogMsg_HandleTeleportThing;
@@ -96,7 +94,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[COGMSG_ID_1F] = sithDSS_HandleMisc;
     sithCogVm_msgFuncs[COGMSG_CHAT] = sithMulti_HandleChat;
     sithCogVm_msgFuncs[COGMSG_DESTROYTHING] = cogMsg_HandleDestroyThing;
-    sithCogVm_msgFuncs[COGMSG_SYNCSECTORALT] = cogMsg_HandleSyncSectorAlt;
+    sithCogVm_msgFuncs[COGMSG_SYNCSECTORALT] = sithDSS_HandleSyncSectorAlt;
     sithCogVm_msgFuncs[COGMSG_SOUNDCLASSPLAY] = cogMsg_HandleSoundClassPlay;
     sithCogVm_msgFuncs[COGMSG_OPENDOOR] = cogMsg_HandleOpenDoor;
     sithCogVm_msgFuncs[COGMSG_SETTHINGMODEL] = cogMsg_HandleSetThingModel;
