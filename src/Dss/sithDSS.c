@@ -176,11 +176,11 @@ int sithDSS_HandleSyncSectorAlt(sithCogMsg *msg)
     int idx = NETMSG_POPS16();
 
     sithSector* pSector = sithSector_GetPtrFromIdx(idx);
-    if ( sector )
+    if ( pSector )
     {
         int oldFlags = pSector->flags;
-        sector->flags = NETMSG_POPU32();
-        if (sector->flags & SITH_SECTOR_80)
+        pSector->flags = NETMSG_POPU32();
+        if (pSector->flags & SITH_SECTOR_80)
         {
             if (!(oldFlags & SITH_SECTOR_80))
             {
@@ -193,7 +193,7 @@ int sithDSS_HandleSyncSectorAlt(sithCogMsg *msg)
             return 1;
         }
 
-        if (!(sector->flags & SITH_SECTOR_80))
+        if (!(pSector->flags & SITH_SECTOR_80))
             sithSector_SetAdjoins(pSector);
 
         return 1;

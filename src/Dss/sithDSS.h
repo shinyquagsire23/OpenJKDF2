@@ -31,7 +31,7 @@ void sithDSS_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags);
 int sithDSS_HandleSyncSurface(sithCogMsg *msg);
 void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
 int sithDSS_HandleSyncSector(sithCogMsg *msg);
-void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags)
+void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags);
 int sithDSS_HandleSyncSectorAlt(sithCogMsg *msg);
 void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx);
 int sithDSS_HandleSyncAI(sithCogMsg *msg);
