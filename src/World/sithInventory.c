@@ -763,7 +763,7 @@ int sithInventory_NumBackpackItems(sithThing *item)
 int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
 {
     sithThing *v1; // edi
-    int *v2; // esi
+    sithKeybind *v2; // esi
     int v3; // eax
     sithCog *v4; // ecx
     int v5; // esi
@@ -809,17 +809,17 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
         {
             if ( (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
             {
-                v2 = &sithInventory_powerKeybinds[0].idk;
+                v2 = &sithInventory_powerKeybinds[0];
                 do
                 {
-                    if ( *(v2 - 2) == 1 )
-                        v3 = *(v2 - 1);
+                    if ( v2->enabled == 1 )
+                        v3 = v2->binding;
                     else
                         v3 = -1;
-                    if ( v3 != -1 && *v2 == 1 )
+                    if ( v3 != -1 && v2->idk == 1 )
                     {
-                        *v2 = SENDERTYPE_0;
-                        if ( v3 >= SENDERTYPE_0
+                        v2->idk = 0;
+                        if ( v3 >= 0
                           && v1->actorParams.playerinfo != (sithPlayerInfo *)-136
                           && (sithInventory_aDescriptors[v3].flags & ITEMINFO_VALID) != 0
                           && (v1->actorParams.playerinfo->iteminfo[v3].state & 4) != 0 )
@@ -829,9 +829,9 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                                 sithCog_SendMessage(v4, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v3, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
                         }
                     }
-                    v2 += 3;
+                    v2++;
                 }
-                while ( (int)v2 < (int)&sithInventory_powerKeybinds[20].idk );
+                while ( (intptr_t)v2 < (intptr_t)&sithInventory_powerKeybinds[20] );
                 if ( sithInventory_bUnk == 1 )
                 {
                     sithInventory_bUnk = 0;

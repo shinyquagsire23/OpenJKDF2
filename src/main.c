@@ -1319,6 +1319,10 @@ void do_hooks()
     hook_function(sithPhysics_ThingGetInsertOffsetZ_ADDR, sithPhysics_ThingGetInsertOffsetZ);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
 
+    // sithDSSThing
+    hook_function(sithDSSThing_SendTeleportThing_ADDR, sithDSSThing_SendTeleportThing);
+    hook_function(sithDSSThing_HandleTeleportThing_ADDR, sithDSSThing_HandleTeleportThing);
+
 #if 0
     hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
     hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);

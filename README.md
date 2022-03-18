@@ -291,7 +291,7 @@ jkHud                          0x1c9b     0.679%        97.952%        16 / 17
 sithCog                        0x1ed3     0.731%        90.686%        21 / 28         
 jkSaber                        0x1f4a     0.742%        75.980%        23 / 40         
 jkDev                          0x1fd6     0.755%        94.687%        39 / 41         
-sithDSSThing                   0x22aa     0.823%        39.542%         7 / 37         
+sithDSSThing                   0x22aa     0.823%        50.980%        10 / 37         
 sithMulti                      0x252a     0.882%        0.105%          1 / 35         
 jkGuiBuildMulti                0x258b     0.891%        0.000%          0 / 24         
 stdDisplay                     0x267b     0.913%        61.537%        22 / 37         
@@ -306,15 +306,15 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-50.297% by weight
-84.945% by weight excluding rasterizer
-2391 / 3169 functions
-2391 / 2798 functions excluding rasterizer
+50.391% by weight
+85.104% by weight excluding rasterizer
+2394 / 3169 functions
+2394 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           2.468%          149 / 1323
+sith           2.373%          146 / 1323
 stdPlatform    0.238%           24 / 43
 std            1.844%           61 / 359
 jkGui          2.691%           83 / 284
@@ -323,12 +323,12 @@ jk             0.552%           42 / 324
 Raster         40.778%         370 / 371
 other          0.916%           38 / 120
 -----------------------------------------
-total          49.703%         778 / 3169
+total          49.609%         775 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           4.167%          149 / 1323
+sith           4.008%          146 / 1323
 stdPlatform    0.402%           24 / 43
 std            3.115%           61 / 359
 jkGui          4.545%           83 / 284
@@ -336,6 +336,6 @@ rd             0.364%           11 / 345
 jk             0.933%           42 / 324
 other          1.548%           38 / 120
 -----------------------------------------
-total          15.074%         408 / 2798
+total          14.915%         405 / 2798
 
 ```

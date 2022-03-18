@@ -36,7 +36,6 @@
 #define sithMulti_HandleTimeLimit ((void*)0x004CB690)
 #define sithMulti_HandleDeath ((void*)0x004CBC50)
 #define sithMulti_HandleScore ((void*)0x004CBDE0)
-#define cogMsg_HandleTeleportThing ((void*)0x004F3270)
 #define cogMsg_HandleSyncThing ((void*)0x004F35E0)
 #define cogMsg_HandleSoundClassPlay ((void*)0x004F39C0)
 #define cogMsg_HandlePlayKey ((void*)0x004F3AA0)
@@ -62,7 +61,7 @@ int sithCogVm_Startup()
     _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithCogVm_dword_847E84 = 0;
     sithCogVm_msgId = 1;
-    sithCogVm_msgFuncs[COGMSG_TELEPORTTHING] = cogMsg_HandleTeleportThing;
+    sithCogVm_msgFuncs[COGMSG_TELEPORTTHING] = sithDSSThing_HandleTeleportThing;
     sithCogVm_msgFuncs[COGMSG_FIREPROJECTILE] = cogMsg_HandleFireProjectile;
     sithCogVm_msgFuncs[COGMSG_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
     sithCogVm_msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;

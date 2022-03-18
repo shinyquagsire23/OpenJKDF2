@@ -7,8 +7,104 @@
 #include "Engine/sithSound.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
+#include "World/sithUnk4.h"
 
 // Teleport
+
+void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
+{
+    rdVector3 lookOrientation; // [esp+4h] [ebp-Ch] BYREF
+
+    NETMSG_START;
+
+    if ( pThing && pThing->thingtype && pThing->sector)
+    {
+        sithSector* pSector = pThing->sector;
+        NETMSG_PUSHS32(pThing->thing_id);
+        NETMSG_PUSHU16(pThing->attach_flags);
+        NETMSG_PUSHS16(pSector->id);
+        NETMSG_PUSHVEC3(pThing->position);
+        rdMatrix_ExtractAngles34(&pThing->lookOrientation, &lookOrientation);
+        NETMSG_PUSHF32(lookOrientation.x);
+        NETMSG_PUSHF32(lookOrientation.y);
+        NETMSG_PUSHF32(lookOrientation.z);
+
+        if ( pThing->moveType == SITH_MT_PHYSICS )
+        {
+            NETMSG_PUSHU32(pThing->physicsParams.physflags);
+            NETMSG_PUSHVEC3(pThing->physicsParams.vel);
+            if ( !pThing->attach_flags )
+            {
+                NETMSG_PUSHVEC3(pThing->physicsParams.angVel);
+            }
+        }
+        if ( pThing->thingtype == SITH_THING_PLAYER )
+            NETMSG_PUSHF32(pThing->actorParams.eyePYR.x);
+
+        NETMSG_END(COGMSG_TELEPORTTHING);
+
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 255, bSync);
+    }
+}
+
+int sithDSSThing_HandleTeleportThing(sithCogMsg *msg)
+{
+    rdVector3 lookTmp; // [esp+10h] [ebp-18h] BYREF
+    rdVector3 pos; // [esp+1Ch] [ebp-Ch] BYREF
+
+    if ( !sithWorld_pCurrentWorld )
+        return 0;
+
+    NETMSG_IN_START(msg);
+
+    int thing_id = NETMSG_POPS32();
+
+    sithThing* pThing = sithThing_GetById(thing_id);
+    if ( !pThing || pThing->thingtype == SITH_THING_FREE || !pThing->sector )
+        return 0;
+    uint16_t attach_flags = NETMSG_POPU16();
+    if ( !attach_flags && pThing->attach_flags )
+        sithThing_DetachThing(pThing);
+
+    // TODO attach flags not set??
+
+    int16_t sectorIdx = NETMSG_POPS16();
+    sithSector* pSector = sithSector_GetPtrFromIdx(sectorIdx);
+    if ( !pSector )
+        return 0;
+
+    pos = NETMSG_POPVEC3();
+    lookTmp = NETMSG_POPVEC3();
+
+    rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookTmp);
+    if ( pThing->moveType == SITH_MT_PHYSICS )
+    {
+        pThing->physicsParams.physflags = NETMSG_POPU32();
+
+        pThing->physicsParams.vel = NETMSG_POPVEC3();
+        if ( attach_flags )
+        {
+            rdVector_Zero3(&pThing->physicsParams.angVel);
+        }
+        else
+        {
+            pThing->physicsParams.angVel = NETMSG_POPVEC3();
+        }
+        sithDSSThing_TransitionMovingThing(pThing, &pos, pSector);
+    }
+    else
+    {
+        pThing->position = pos;
+        sithThing_MoveToSector(pThing, pSector, 0);
+    }
+    if ( pThing->thingtype == SITH_THING_PLAYER )
+    {
+        rdVector_Zero3(&lookTmp);
+        lookTmp.x = NETMSG_POPF32();
+        sithUnk4_MoveJointsForEyePYR(pThing, &lookTmp);
+    }
+    return 1;
+}
 
 // SyncThing
 
@@ -440,4 +536,23 @@ void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, 
     NETMSG_END(COGMSG_DEATH);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector)
+{
+    rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
+
+    rdVector_Scale3(&a1, &pThing->physicsParams.vel, 0.25);
+    rdVector_Add3Acc(&a1, pPos);
+    rdVector_Sub3Acc(&a1, &pThing->position);
+    float v5 = rdVector_Len3(&a1);
+    if ( v5 == 0.0 || v5 >= 0.5 )
+    {
+        rdVector_Copy3(&pThing->position, pPos);
+        sithThing_MoveToSector(pThing, pSector, 0);
+    }
+    else
+    {
+        rdVector_Scale3(&pThing->physicsParams.vel, &a1, 4.0);
+    }
 }

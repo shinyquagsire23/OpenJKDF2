@@ -42,6 +42,9 @@
 #define sithDSSThing_HandleDestroyThing_ADDR (0x004F5410)
 #define sithSector_TransitionMovingThing_ADDR (0x004F5440)
 
+void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync);
+int sithDSSThing_HandleTeleportThing(sithCogMsg *msg);
+
 void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
 int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg);
 
@@ -52,6 +55,8 @@ void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int m
 int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg);
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
+
+void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector);
 
 static void (*sithDSSThing_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_SendPlayKey_ADDR;
 static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;
@@ -65,7 +70,6 @@ static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThi
 static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;
 static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
 static void (*sithDSSThing_SendSyncThing)(sithThing *a1, int a2, int a3) = (void*)sithDSSThing_SendSyncThing_ADDR;
-static void (*sithDSSThing_SendTeleportThing)(sithThing *a1, int a2, int a3) = (void*)sithDSSThing_SendTeleportThing_ADDR;
 static void (*sithDSSThing_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithDSSThing_SendTakeItem_ADDR;
 
 
