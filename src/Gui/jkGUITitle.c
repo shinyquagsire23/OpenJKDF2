@@ -17,6 +17,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 
+static wchar_t jkGuiTitle_versionBuffer[32];
 static float jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[5] = {
@@ -227,7 +228,8 @@ void jkGuiTitle_ShowLoadingStatic()
     int verMajor; // [esp-Ch] [ebp-2Ch]
     int verMinor; // [esp-8h] [ebp-28h]
     int verRevision; // [esp-4h] [ebp-24h]
-    wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
+    //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
+    // Added: removed undefined behavior, used to use the stack.....
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     jkGuiTitle_whichLoading = 1;
@@ -236,8 +238,8 @@ void jkGuiTitle_ShowLoadingStatic()
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
     guiVersionStr = jkStrings_GetText("GUI_VERSION");
-    jk_snwprintf(v4, sizeof(v4), guiVersionStr, verMajor, verMinor, verRevision);
-    jkGuiTitle_elementsLoadStatic[4].wstr = v4; // AAAAAAAAAAAAAAAaaaaaa undefined behavior
+    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer), guiVersionStr, verMajor, verMinor, verRevision);
+    jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);
 }
