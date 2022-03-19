@@ -433,9 +433,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     adjoinIter = sector->adjoins;
     v45 = sector->field_90;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
-    sithRender_idxInfo.extraUV = sithWorld_pCurrentWorld->vertexUVs;
+    sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
     sector->field_90 = 1;
-    sithRender_idxInfo.field_14 = sithWorld_pCurrentWorld->verticesDynamicLight;
+    sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
     while ( adjoinIter )
     {
         if (adjoinIter->sector->field_90 )
@@ -559,7 +559,6 @@ void sithRender_RenderLevelGeometry()
     int v42; // eax
     int v43; // ecx
     int v44; // eax
-    rdClipFrustum *v46; // edx
     unsigned int num_vertices; // ebp
     float v49; // edx
     float *v51; // eax
@@ -607,8 +606,8 @@ void sithRender_RenderLevelGeometry()
 
     vertices_uvs = sithWorld_pCurrentWorld->vertexUVs;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
-    sithRender_idxInfo.field_14 = sithWorld_pCurrentWorld->verticesDynamicLight;
-    sithRender_idxInfo.extraUV = vertices_uvs;
+    sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
+    sithRender_idxInfo.vertexUVs = vertices_uvs;
     v77 = rdCamera_pCurCamera->cameraClipFrustum;
 
     for (v72 = 0; v72 < sithRender_numSectors; v72++)
@@ -728,14 +727,13 @@ void sithRender_RenderLevelGeometry()
                 procEntry->textureMode = v44;
                 meshinfo_out.verticesProjected = vertices_tmp;
                 sithRender_idxInfo.intensities = v65->surfaceInfo.intensities;
-                meshinfo_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
+                meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
-                v46 = level_idk->clipFrustum;
                 sithRender_idxInfo.numVertices = v65->surfaceInfo.face.numVertices;
                 v64 = v44;
                 sithRender_idxInfo.vertexUVIdx = v65->surfaceInfo.face.vertexUVIdx;
-                rdPrimit3_ClipFace(v46, procEntry->geometryMode, procEntry->lightingMode, v64, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
+                rdPrimit3_ClipFace(level_idk->clipFrustum, procEntry->geometryMode, procEntry->lightingMode, v64, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
                 num_vertices = meshinfo_out.numVertices;
                 if ( meshinfo_out.numVertices < 3u )
                 {
@@ -905,7 +903,7 @@ void sithRender_RenderLevelGeometry()
                     v80[2] = v65->surfaceInfo.intensities[v18];
                     meshinfo_out.vertexUVs = v20->vertexUVs;
                     sithRender_idxInfo.vertexPosIdx = v78;
-                    meshinfo_out.vertex_lights_maybe_ = v20->vertexIntensities;
+                    meshinfo_out.paDynamicLight = v20->vertexIntensities;
                     sithRender_idxInfo.vertexUVIdx = v79;
                     sithRender_idxInfo.intensities = v80;
                     rdPrimit3_ClipFace(level_idk->clipFrustum, v20->geometryMode, v20->lightingMode, v20->textureMode, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
@@ -1235,18 +1233,7 @@ void sithRender_RenderThings()
         else
         {
             v2 = v1->ambientLight + v1->extraLight;
-            if ( v2 < 0.0 )
-            {
-                a2 = 0.0;
-            }
-            else if ( v2 > 1.0 )
-            {
-                a2 = 1.0;
-            }
-            else
-            {
-                a2 = v2;
-            }
+            a2 = stdMath_Clamp(v2, 0.0, 1.0);
         }
         rdColormap_SetCurrent(v1->colormap);
         thingIter = v1->thingsList;
@@ -1524,7 +1511,7 @@ void sithRender_RenderAlphaSurfaces()
 
         sithRender_idxInfo.intensities = v0->surfaceInfo.intensities;
         meshinfo_out.vertexUVs = v9->vertexUVs;
-        meshinfo_out.vertex_lights_maybe_ = v9->vertexIntensities;
+        meshinfo_out.paDynamicLight = v9->vertexIntensities;
         sithRender_idxInfo.numVertices = v0->surfaceInfo.face.numVertices;
         sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
         sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;

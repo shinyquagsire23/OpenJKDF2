@@ -145,13 +145,13 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     mesh_in.vertexPosIdx = sprite->face.vertexPosIdx;
     mesh_in.vertexUVIdx = sprite->face.vertexUVIdx;
     mesh_in.verticesProjected = rdSprite_inVerts;
-    mesh_in.vertex_lights_maybe_ = 0;
+    mesh_in.paDynamicLight = 0;
     mesh_in.vertexUVs = sprite->vertexUVs;
-    mesh_in.field_18 = 0;
+    mesh_in.intensities = 0;
     mesh_out.verticesProjected = rdSprite_tmpVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
-    mesh_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
+    mesh_out.paDynamicLight = procEntry->vertexIntensities;
     rdSprite_inVerts[0].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
     rdSprite_inVerts[1].y = sprite->offset.y + vertex_out.y;
     rdSprite_inVerts[1].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;

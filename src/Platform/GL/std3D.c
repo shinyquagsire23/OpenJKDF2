@@ -134,21 +134,7 @@ static void* loaded_colormap = NULL;
 rdDDrawSurface* last_tex = NULL;
 int last_flags = 0;
 
-#pragma pack(push, 4)
-typedef struct std3DWorldVBO
-{
-    float x;
-    float y;
-    float z;
-    float nx;
-    uint32_t color;
-    float nz;
-    float tu;
-    float tv;
-} std3DWorldVBO;
-#pragma pack(pop)
-
-std3DWorldVBO* world_data_all = NULL;
+D3DVERTEX* world_data_all = NULL;
 GLushort* world_data_elements = NULL;
 GLuint world_vbo_all;
 GLuint world_ibo_triangle;
@@ -468,7 +454,7 @@ int init_resources()
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao ); 
 
-    world_data_all = malloc(STD3D_MAX_VERTICES * sizeof(std3DWorldVBO));
+    world_data_all = malloc(STD3D_MAX_VERTICES * sizeof(D3DVERTEX));
     world_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_TRIS);
 
     glGenBuffers(1, &world_vbo_all);
@@ -600,8 +586,8 @@ int std3D_StartScene()
         3,                 // number of elements per vertex, here (x,y,z)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // normalize fixed-point data?
-        sizeof(std3DWorldVBO),                 // data stride
-        (GLvoid*)offsetof(std3DWorldVBO, x)                  // offset of first element
+        sizeof(D3DVERTEX),                 // data stride
+        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
     );
     
     glVertexAttribPointer(
@@ -609,8 +595,8 @@ int std3D_StartScene()
         4,                 // number of elements per vertex, here (R,G,B,A)
         GL_UNSIGNED_BYTE,  // the type of each element
         GL_TRUE,          // normalize fixed-point data?
-        sizeof(std3DWorldVBO),                 // no extra data between each position
-        (GLvoid*)offsetof(std3DWorldVBO, color) // offset of first element
+        sizeof(D3DVERTEX),                 // no extra data between each position
+        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
     );
 
     glVertexAttribPointer(
@@ -618,8 +604,8 @@ int std3D_StartScene()
         1,                 // number of elements per vertex, here (L)
         GL_FLOAT,  // the type of each element
         GL_FALSE,          // normalize fixed-point data?
-        sizeof(std3DWorldVBO),                 // no extra data between each position
-        (GLvoid*)offsetof(std3DWorldVBO, nz) // offset of first element
+        sizeof(D3DVERTEX),                 // no extra data between each position
+        (GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
     );
 
     glVertexAttribPointer(
@@ -627,8 +613,8 @@ int std3D_StartScene()
         2,                 // number of elements per vertex, here (U,V)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // take our values as-is
-        sizeof(std3DWorldVBO),                 // no extra data between each position
-        (GLvoid*)offsetof(std3DWorldVBO, tu)                  // offset of first element
+        sizeof(D3DVERTEX),                 // no extra data between each position
+        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
     );
 
     glEnableVertexAttribArray(attribute_coord3d);
@@ -702,7 +688,7 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
     GL_tmpVertices[GL_tmpVerticesAmt+0].tu = u1;
     GL_tmpVertices[GL_tmpVerticesAmt+0].tv = v1;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].ny = 0xFFFFFFFF;
+    GL_tmpVertices[GL_tmpVerticesAmt+0].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+0].nz = 0;
     
     GL_tmpVertices[GL_tmpVerticesAmt+1].x = dstX;
@@ -711,7 +697,7 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
     GL_tmpVertices[GL_tmpVerticesAmt+1].tu = u1;
     GL_tmpVertices[GL_tmpVerticesAmt+1].tv = v2;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].ny = 0xFFFFFFFF;
+    GL_tmpVertices[GL_tmpVerticesAmt+1].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+1].nz = 0;
     
     GL_tmpVertices[GL_tmpVerticesAmt+2].x = dstX + (scale * w_dst);
@@ -720,7 +706,7 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
     GL_tmpVertices[GL_tmpVerticesAmt+2].tu = u2;
     GL_tmpVertices[GL_tmpVerticesAmt+2].tv = v2;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].ny = 0xFFFFFFFF;
+    GL_tmpVertices[GL_tmpVerticesAmt+2].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+2].nz = 0;
     
     GL_tmpVertices[GL_tmpVerticesAmt+3].x = dstX + (scale * w_dst);
@@ -729,7 +715,7 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
     GL_tmpVertices[GL_tmpVerticesAmt+3].tu = u2;
     GL_tmpVertices[GL_tmpVerticesAmt+3].tv = v1;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].ny = 0xFFFFFFFF;
+    GL_tmpVertices[GL_tmpVerticesAmt+3].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[GL_tmpVerticesAmt+3].nz = 0;
     
     GL_tmpTris[GL_tmpTrisAmt+0].v1 = GL_tmpVerticesAmt+1;
@@ -792,7 +778,7 @@ void std3D_DrawMenu()
         GL_tmpVertices[0].tu = 0.0;
         GL_tmpVertices[0].tv = 0.0;
         *(uint32_t*)&GL_tmpVertices[0].nx = 0;
-        *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
+        GL_tmpVertices[0].color = 0xFFFFFFFF;
         *(uint32_t*)&GL_tmpVertices[0].nz = 0;
         
         GL_tmpVertices[1].x = menu_x;
@@ -801,7 +787,7 @@ void std3D_DrawMenu()
         GL_tmpVertices[1].tu = 0.0;
         GL_tmpVertices[1].tv = menu_v;
         *(uint32_t*)&GL_tmpVertices[1].nx = 0;
-        *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
+        GL_tmpVertices[1].color = 0xFFFFFFFF;
         *(uint32_t*)&GL_tmpVertices[1].nz = 0;
         
         GL_tmpVertices[2].x = menu_x + menu_w;
@@ -810,7 +796,7 @@ void std3D_DrawMenu()
         GL_tmpVertices[2].tu = menu_u;
         GL_tmpVertices[2].tv = menu_v;
         *(uint32_t*)&GL_tmpVertices[2].nx = 0;
-        *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
+        GL_tmpVertices[2].color = 0xFFFFFFFF;
         *(uint32_t*)&GL_tmpVertices[2].nz = 0;
         
         GL_tmpVertices[3].x = menu_x + menu_w;
@@ -819,7 +805,7 @@ void std3D_DrawMenu()
         GL_tmpVertices[3].tu = menu_u;
         GL_tmpVertices[3].tv = 0.0;
         *(uint32_t*)&GL_tmpVertices[3].nx = 0;
-        *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
+        GL_tmpVertices[3].color = 0xFFFFFFFF;
         *(uint32_t*)&GL_tmpVertices[3].nz = 0;
         
         GL_tmpTris[0].v1 = 1;
@@ -883,7 +869,7 @@ void std3D_DrawMenu()
 
     for (int i = 0; i < GL_tmpVerticesAmt; i++)
     {
-        uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
+        uint32_t v_color = vertexes[i].color;
         uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
         uint32_t v_unknz = *(uint32_t*)&vertexes[i].nz;
         
@@ -1031,7 +1017,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     GL_tmpVertices[0].tu = 0.0;
     GL_tmpVertices[0].tv = menu_v;
     *(uint32_t*)&GL_tmpVertices[0].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[0].ny = 0xFFFFFFFF;
+    GL_tmpVertices[0].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[0].nz = 0;
     
     GL_tmpVertices[1].x = menu_x;
@@ -1040,7 +1026,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     GL_tmpVertices[1].tu = 0.0;
     GL_tmpVertices[1].tv = 0.0;
     *(uint32_t*)&GL_tmpVertices[1].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[1].ny = 0xFFFFFFFF;
+    GL_tmpVertices[1].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[1].nz = 0;
     
     GL_tmpVertices[2].x = menu_x + menu_w;
@@ -1049,7 +1035,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     GL_tmpVertices[2].tu = menu_u;
     GL_tmpVertices[2].tv = 0.0;
     *(uint32_t*)&GL_tmpVertices[2].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[2].ny = 0xFFFFFFFF;
+    GL_tmpVertices[2].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[2].nz = 0;
     
     GL_tmpVertices[3].x = menu_x + menu_w;
@@ -1058,7 +1044,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     GL_tmpVertices[3].tu = menu_u;
     GL_tmpVertices[3].tv = menu_v;
     *(uint32_t*)&GL_tmpVertices[3].nx = 0;
-    *(uint32_t*)&GL_tmpVertices[3].ny = 0xFFFFFFFF;
+    GL_tmpVertices[3].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpVertices[3].nz = 0;
     
     GL_tmpTris[0].v1 = 1;
@@ -1089,7 +1075,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 
     for (int i = 0; i < GL_tmpVerticesAmt; i++)
     {
-        uint32_t v_color = *(uint32_t*)&vertexes[i].ny;
+        uint32_t v_color = vertexes[i].color;
         uint32_t v_unknx = *(uint32_t*)&vertexes[i].nx;
         uint32_t v_unknz = *(uint32_t*)&vertexes[i].nz;
         
@@ -1299,7 +1285,7 @@ void std3D_DrawRenderList()
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(std3DWorldVBO), vertexes, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), vertexes, GL_STREAM_DRAW);
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);

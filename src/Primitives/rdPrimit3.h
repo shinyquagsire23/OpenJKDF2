@@ -20,7 +20,8 @@
 
 void rdPrimit3_ClearFrameCounters(void);
 void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed int clipSubtype, int sortingMethod, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn);
-void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk);
+//void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk);
+void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMethod, rdMeshinfo *vertexSrc, rdMeshinfo *vertexDst, rdVector2 *idkIn);
 int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt);
 void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int color16, int mask);
 

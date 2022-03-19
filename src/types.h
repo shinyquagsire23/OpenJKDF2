@@ -668,18 +668,6 @@ typedef struct rdProcEntry
     uint32_t vertexColorMode;
 } rdProcEntry;
 
-typedef struct rdMeshinfo
-{
-    uint32_t numVertices;
-    int* vertexPosIdx;
-    int* vertexUVIdx;
-    rdVector3* verticesProjected;
-    rdVector2* vertexUVs;
-    float* vertex_lights_maybe_;
-    uint32_t field_18;
-    rdVector3* verticesOrig;
-} rdMeshinfo;
-
 typedef struct v11_struct
 {
   int mipmap_related;
@@ -706,7 +694,68 @@ typedef struct rdLine
 typedef float D3DVALUE;
 
 #pragma pack(push, 4)
-typedef struct D3DVERTEX
+typedef struct D3DVERTEX_orig
+{
+  union ALIGNED_(4)
+  {
+    D3DVALUE x;
+    float dvX;
+  };
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE y;
+    D3DVALUE dvY;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE z;
+    D3DVALUE dvZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE nx;
+    D3DVALUE dvNX;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE ny;
+    D3DVALUE dvNY;
+    uint32_t color;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE nz;
+    D3DVALUE dvNZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE tu;
+    D3DVALUE dvTU;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    D3DVALUE tv;
+    D3DVALUE dvTV;
+  };
+  #pragma pack(pop)
+} D3DVERTEX_orig;
+#pragma pack(pop)
+
+#pragma pack(push, 4)
+typedef struct D3DVERTEX_ext
 {
   union ALIGNED_(4)
   {
@@ -762,8 +811,21 @@ typedef struct D3DVERTEX
     D3DVALUE dvTV;
   };
   #pragma pack(pop)
-} D3DVERTEX;
+  #pragma pack(push, 4)
+  uint32_t color;
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  float lightLevel;
+  #pragma pack(pop)
+} D3DVERTEX_ext;
 #pragma pack(pop)
+
+// TODO: Differentiate by renderer, not SDL2
+#ifdef SDL2_RENDER
+typedef D3DVERTEX_ext D3DVERTEX;
+#else
+typedef D3DVERTEX_orig D3DVERTEX;
+#endif
 
 /* 174 */
 typedef DWORD D3DCOLORMODEL;
@@ -1184,10 +1246,22 @@ typedef struct rdVertexIdxInfo
     int* vertexPosIdx;
     int* vertexUVIdx;
     rdVector3* vertices;
-    rdVector2* extraUV;
-    float* field_14;
+    rdVector2* vertexUVs;
+    float* paDynamicLight;
     float* intensities;
 } rdVertexIdxInfo;
+
+typedef struct rdMeshinfo
+{
+    uint32_t numVertices;
+    int* vertexPosIdx;
+    int* vertexUVIdx;
+    rdVector3* verticesProjected;
+    rdVector2* vertexUVs;
+    float* paDynamicLight;
+    float* intensities;
+    rdVector3* verticesOrig;
+} rdMeshinfo;
 
 typedef struct rdFace
 {

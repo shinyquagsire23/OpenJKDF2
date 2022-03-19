@@ -192,7 +192,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     // This is slightly different than IDA?
     idxInfo.numVertices = 4;
     idxInfo.vertices = polylineVerts;
-    idxInfo.field_14 = 0;
+    idxInfo.paDynamicLight = 0;
     idxInfo.intensities = 0;
 
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix);
@@ -216,7 +216,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     polylineVerts[3].x = tip_left;
     polylineVerts[3].y = vertex_out.y - -0.001;
     polylineVerts[3].z = tip_top;
-    idxInfo.extraUV = polyline->extraUVFaceMaybe;
+    idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
     rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
 
     polylineVerts[0].x = out.scale.x - polyline->baseRadius;
@@ -231,7 +231,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     polylineVerts[3].x = out.scale.x - polyline->baseRadius;
     polylineVerts[3].y = out.scale.y - -0.001;
     polylineVerts[3].z = out.scale.z + polyline->baseRadius;
-    idxInfo.extraUV = polyline->extraUVFaceMaybe;
+    idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
     rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     
     float zdist = vertex_out.z - out.scale.z;
@@ -265,7 +265,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     polylineVerts[3].x = (polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
     polylineVerts[3].y = out.scale.y;
     polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
-    idxInfo.extraUV = polyline->extraUVTipMaybe;
+    idxInfo.vertexUVs = polyline->extraUVTipMaybe;
     rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     return 1;
 }
@@ -285,7 +285,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     mesh_out.verticesProjected = rdPolyLine_FaceVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
-    mesh_out.vertex_lights_maybe_ = procEntry->vertexIntensities;
+    mesh_out.paDynamicLight = procEntry->vertexIntensities;
     
     idxInfo->numVertices = face->numVertices;
     idxInfo->vertexPosIdx = face->vertexPosIdx;

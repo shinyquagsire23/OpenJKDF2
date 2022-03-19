@@ -1258,10 +1258,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     if ( rdModel3_textureMode >= curTextureMode )
         rdModel3_textureMode = curTextureMode;
 
-    vertexSrc.vertex_lights_maybe_ = pCurMesh->vertices_unk;
+    vertexSrc.paDynamicLight = pCurMesh->vertices_unk;
     vertexSrc.verticesProjected = aView;
     vertexSrc.vertexUVs = pCurMesh->vertexUVs;
-    vertexSrc.field_18 = 0;
+    vertexSrc.intensities = 0;
     vertexDst.verticesProjected = aFaceVerts;
 
     if (rdModel3_lightingMode == 0)
@@ -1368,7 +1368,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     procEntry->textureMode = textureMode;
     vertexDst.verticesOrig = procEntry->vertices;
     vertexDst.vertexUVs = procEntry->vertexUVs;
-    vertexDst.vertex_lights_maybe_ = procEntry->vertexIntensities;
+    vertexDst.paDynamicLight = procEntry->vertexIntensities;
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
     vertexSrc.vertexUVIdx = face->vertexUVIdx;

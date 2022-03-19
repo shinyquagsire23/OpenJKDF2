@@ -169,7 +169,6 @@ int rdCache_SendFaceListToHardware()
     double d3dvtx_zval; // st7
     double v38; // st6
     int v39; // eax
-    int normals_related; // zf
     double light_level; // st7
     int vertex_g; // ebx
     int vertex_r; // edi
@@ -229,8 +228,6 @@ int rdCache_SendFaceListToHardware()
     float actual_width; // [esp+1Ch] [ebp-84h]
     float actual_height; // [esp+20h] [ebp-80h]
     float v121; // [esp+24h] [ebp-7Ch]
-    float vert_y_int; // [esp+28h] [ebp-78h]
-    float vert_x_int; // [esp+30h] [ebp-70h]
     float green_scalar; // [esp+34h] [ebp-6Ch]
     float blue_scalar; // [esp+38h] [ebp-68h]
     int rend_6c_current_idx; // [esp+3Ch] [ebp-64h]
@@ -497,23 +494,7 @@ int rdCache_SendFaceListToHardware()
             {
                 v24 = active_6c->extralight + active_6c->light_level_static;
                 v25 = stdMath_Clamp(v24, 0.0, 1.0);
-
-                if ( v25 <= v148 )
-                {
-                    v26 = v148;
-                }
-                else if ( v24 < 0.0 )
-                {
-                    v26 = 0.0;
-                }
-                else if ( v24 > 1.0 )
-                {
-                    v26 = 1.0;
-                }
-                else
-                {
-                    v26 = v24;
-                }
+                v26 = stdMath_Clamp(v25, v148, 1.0);
 
                 active_6c->light_level_static = v26 * 255.0;
             }
@@ -525,35 +506,8 @@ int rdCache_SendFaceListToHardware()
                 {
                     v21 = *vert_lights_iter + active_6c->extralight;
 
-                    if ( v21 < 0.0 )
-                    {
-                        v22 = 0.0;
-                    }
-                    else if ( v21 > 1.0 )
-                    {
-                        v22 = 1.0;
-                    }
-                    else
-                    {
-                        v22 = v21;
-                    }
-                    
-                    if ( v22 <= v148 )
-                    {
-                        v23 = v148;
-                    }
-                    else if ( v21 < 0.0 )
-                    {
-                        v23 = 0.0;
-                    }
-                    else if ( v21 > 1.0 )
-                    {
-                        v23 = 1.0;
-                    }
-                    else
-                    {
-                        v23 = v21;
-                    }
+                    v22 = stdMath_Clamp(v21, 0.0, 1.0);
+                    v23 = stdMath_Clamp(v22, v148, 1.0);
 
                     *vert_lights_iter = v23 * 255.0;
                     ++vert_lights_iter;
@@ -570,11 +524,9 @@ int rdCache_SendFaceListToHardware()
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
             {
-                vert_x_int = ceilf(iterating_6c_vtxs[vtx_idx].x);
-                rdCache_aHWVertices[rdCache_totalVerts].x = vert_x_int;
-                vert_y_int = ceilf(active_6c->vertices[vtx_idx].y);
+                rdCache_aHWVertices[rdCache_totalVerts].x = ceilf(iterating_6c_vtxs[vtx_idx].x);
                 iterating_6c_vtxs_ = active_6c->vertices;
-                rdCache_aHWVertices[rdCache_totalVerts].y = vert_y_int;
+                rdCache_aHWVertices[rdCache_totalVerts].y = ceilf(active_6c->vertices[vtx_idx].y);
                 v36 = iterating_6c_vtxs_[vtx_idx].z;
                 iterating_6c_vtxs = iterating_6c_vtxs_;
                 if ( v36 == 0.0 )
@@ -586,10 +538,9 @@ int rdCache_SendFaceListToHardware()
                     v38 = 1.0 - v38;
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
                 v39 = lighting_capability;
-                normals_related = lighting_capability == 0;
-                rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval * 0.03125;
+                rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
-                if ( normals_related )
+                if ( lighting_capability == 0 )
                 {
                     vertex_b = 255;
                     vertex_g = 255;
@@ -597,7 +548,7 @@ int rdCache_SendFaceListToHardware()
                     green = 255;
                     vertex_r = 255;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].nz = 1.0;
+                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 1.0;
 #endif
                 }
                 else
@@ -607,7 +558,8 @@ int rdCache_SendFaceListToHardware()
                     else
                         light_level = active_6c->light_level_static;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].nz = light_level / 255.0;
+
+                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
 #endif
                     vertex_b = (__int64)light_level;
                     vertex_g = vertex_b;
@@ -693,7 +645,7 @@ int rdCache_SendFaceListToHardware()
                 final_vertex_color = vertex_b | (((uint8_t)vertex_g | ((vertex_a | (uint8_t)vertex_r) << 8)) << 8);
                 
                 // For some reason, ny holds the vertex color.
-                *(uint32_t*)&rdCache_aHWVertices[rdCache_totalVerts].ny = final_vertex_color;
+                rdCache_aHWVertices[rdCache_totalVerts].color = final_vertex_color;
                 uvs_in_pixels = v52->vertexUVs;
                 
                 rdCache_aHWVertices[rdCache_totalVerts].tu = uvs_in_pixels[vtx_idx].x / actual_width;
@@ -711,8 +663,8 @@ int rdCache_SendFaceListToHardware()
                 rdCache_aHWLines[tri_idx].v1 = tri_vert_idx + 1;
                 rdCache_aHWLines[tri_idx].flags = flags_idk_;
                 
-                *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].ny = active_6c->extraData;
-                *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].ny = active_6c->extraData;
+                rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].color = active_6c->extraData;
+                rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].color = active_6c->extraData;
 
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].nz = 0.0;
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].nz = 0.0;
@@ -888,10 +840,10 @@ LABEL_232:
                 v89 = 1.0 - v89;
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
             v90 = lighting_capability;
-            normals_related = lighting_capability == 0;
-            rdCache_aHWVertices[rdCache_totalVerts].nx = v88 * 0.03125;
+
+            rdCache_aHWVertices[rdCache_totalVerts].nx = v88 / 32.0;
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
-            if ( normals_related )
+            if ( lighting_capability == 0 )
             {
                 v91 = (rdColormap *)active_6c->colormap;
                 v97 = v137->header.field_4;
@@ -902,7 +854,7 @@ LABEL_232:
                 green = v94;
                 blue = v98;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].nz = 1.0;
+                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 1.0;
 #endif
             }
             else
@@ -913,7 +865,7 @@ LABEL_232:
                 else
                     v92 = active_6c->light_level_static;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].nz = v92 / 255.0;
+                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = v92 / 255.0;
 #endif
                 v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
                 v94 = (uint8_t)v91->colors[v93].g;
@@ -990,7 +942,7 @@ LABEL_232:
                 v103 = -1;
             }
             v104 = v103 | (((uint8_t)v94 | ((alpha_upshifta | (uint8_t)v96) << 8)) << 8);
-            *(uint32_t *)&rdCache_aHWVertices[rdCache_totalVerts].ny = v104;
+            rdCache_aHWVertices[rdCache_totalVerts].color = v104;
             rdCache_aHWVertices[rdCache_totalVerts].tu = 0.0;
             rdCache_aHWVertices[rdCache_totalVerts].tv = 0.0;
             rdCache_totalVerts++;
@@ -1005,8 +957,8 @@ LABEL_232:
             rdCache_aHWLines[v117].v1 = tri_vert_idx + 1;
             rdCache_aHWLines[v117].flags = flags_idk_;
             
-            *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[v117].v1].ny = active_6c->extraData;
-            *(uint32_t*)&rdCache_aHWVertices[rdCache_aHWLines[v117].v2].ny = active_6c->extraData;
+            rdCache_aHWVertices[rdCache_aHWLines[v117].v1].color = active_6c->extraData;
+            rdCache_aHWVertices[rdCache_aHWLines[v117].v2].color = active_6c->extraData;
             
             rdCache_totalLines++;
         }
@@ -1133,9 +1085,6 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     int y_min_related; // ebx
     double v12; // st7
     double v13; // st7
-    unsigned int v23; // ecx
-    unsigned int v24; // eax
-    unsigned int v25; // esi
     int y_max_related; // [esp+Ch] [ebp-18h]
     float v27; // [esp+10h] [ebp-14h]
     float z_max; // [esp+14h] [ebp-10h]
@@ -1206,10 +1155,10 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     procFace->y_max = (int32_t)ceilf(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
-    if ( procFace->x_min >= (unsigned int)procFace->x_max )
-        return 0;
-    if ( procFace->y_min >= (unsigned int)procFace->y_max )
-        return 0;
+    //if ( procFace->x_min >= (unsigned int)procFace->x_max )
+    //    return 0;
+    //if ( procFace->y_min >= (unsigned int)procFace->y_max )
+    //    return 0;
     procFace->y_min_related = y_min_related;
     procFace->y_max_related = y_max_related;
     if ( (flags & 1) != 0 )
@@ -1218,18 +1167,15 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
         rdCache_numUsedTexVertices += num_vertices;
     if ( (flags & 4) != 0 )
         rdCache_numUsedIntensities += num_vertices;
-    v23 = rdCache_ulcExtent.x;
     procFace->colormap = rdColormap_pCurMap;
-    v24 = procFace->x_min;
     ++rdCache_numProcFaces;
-    if ( v24 < v23 )
-        rdCache_ulcExtent.x = v24;
+    if ( procFace->x_min < (unsigned int)rdCache_ulcExtent.x )
+        rdCache_ulcExtent.x = procFace->x_min;
     if ( procFace->x_max > (unsigned int)rdCache_lrcExtent.x )
         rdCache_lrcExtent.x = procFace->x_max;
     if ( procFace->y_min < (unsigned int)rdCache_ulcExtent.y )
         rdCache_ulcExtent.y = procFace->y_min;
-    v25 = procFace->y_max;
-    if ( v25 > rdCache_lrcExtent.y )
-        rdCache_lrcExtent.y = v25;
+    if ( procFace->y_max > (unsigned int)rdCache_lrcExtent.y )
+        rdCache_lrcExtent.y = procFace->y_max;
     return 1;
 }

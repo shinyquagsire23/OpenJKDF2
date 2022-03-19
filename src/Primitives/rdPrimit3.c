@@ -113,6 +113,9 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     int a7a; // [esp+40h] [ebp+1Ch]
     int a7b; // [esp+40h] [ebp+1Ch]
 
+    //rdPrimit3_NoClipFace(clipType, clipSubtype, sortingMethod, idxInfo, mesh_out, idkIn);
+    //return;
+
     switch ( clipType )
     {
         case 0:
@@ -245,11 +248,11 @@ LABEL_25:
                         {
                             a3a = v36->vertices;
                             v40 = v36->vertexPosIdx;
-                            v87 = v36->field_14;
+                            v87 = v36->paDynamicLight;
                             v41 = mesh_out->verticesProjected;
                             float* intenseIter = v38;
                             a7a = v39;
-                            float* lightIter = mesh_out->vertex_lights_maybe_;
+                            float* lightIter = mesh_out->paDynamicLight;
                             do
                             {
                                 v43 = *v40;
@@ -282,9 +285,9 @@ LABEL_25:
                     {
                         v46 = mesh_out->verticesProjected;
                         v47 = v36->vertexPosIdx;
-                        v48 = v36->field_14;
+                        v48 = v36->paDynamicLight;
                         a3b = v36->vertices;
-                        a2b = (char *)((char *)mesh_out->vertex_lights_maybe_ - (char *)v47);
+                        a2b = (char *)((char *)mesh_out->paDynamicLight - (char *)v47);
                         a7b = v39;
                         do
                         {
@@ -313,7 +316,7 @@ LABEL_25:
                         v37 = mesh_out;
                         v39 = idxInfoe;
                     }
-                    v84 = (float*)v37->vertex_lights_maybe_;
+                    v84 = (float*)v37->paDynamicLight;
                     v82 = v37->verticesProjected;
                     if ( rdCamera_pCurCamera->projectType == 1 )
                         v37->numVertices = rdClip_Face3GS(clipFrustum, v82, v84, v39);
@@ -335,7 +338,7 @@ LABEL_25:
                     if ( idxInfog )
                     {
                         v73 = idxInfo->vertexUVIdx;
-                        v74 = idxInfo->extraUV;
+                        v74 = idxInfo->vertexUVs;
                         a3e = idxInfo->vertices;
                         v75 = mesh_out->vertexUVs;
                         v76 = mesh_out->verticesProjected;
@@ -380,8 +383,8 @@ LABEL_25:
                         {
                             v56 = mesh_out->verticesProjected;
                             a3c = v52->vertices;
-                            v92 = v52->extraUV;
-                            v88 = v52->field_14;
+                            v92 = v52->vertexUVs;
+                            v88 = v52->paDynamicLight;
                             v58 = mesh_out->vertexUVs;
                             //printf("%x %x\n", v52->vertexUVIdx, &v52->vertexUVIdx);
                             for (int i = 0; i < idxInfo->numVertices; i++)
@@ -407,7 +410,7 @@ LABEL_25:
                                 }
                                 ++v56;
                                 ++v58;
-                                mesh_out->vertex_lights_maybe_[i] = v62;
+                                mesh_out->paDynamicLight[i] = v62;
                             }
                             v55 = idxInfof;
                             v53 = mesh_out;
@@ -417,9 +420,9 @@ LABEL_25:
                     {
                         v64 = mesh_out->verticesProjected;
                         a3d = v52->vertices;
-                        v89 = v52->field_14;
+                        v89 = v52->paDynamicLight;
                         v65 = mesh_out->vertexUVs;
-                        v93 = v52->extraUV;
+                        v93 = v52->vertexUVs;
                         v95 = v55;
                         for (int i = 0; i < idxInfo->numVertices; i++)
                         {
@@ -447,16 +450,16 @@ LABEL_25:
                             }
                             ++v64;
                             ++v65;
-                            mesh_out->vertex_lights_maybe_[i] = v69;
+                            mesh_out->paDynamicLight[i] = v69;
                             --v95;
                         }
                         v53 = mesh_out;
                         v55 = idxInfof;
                     }
                     if ( rdCamera_pCurCamera->projectType == 1 )
-                        v53->numVertices = rdClip_Face3GT(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->vertex_lights_maybe_, v55);
+                        v53->numVertices = rdClip_Face3GT(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->paDynamicLight, v55);
                     else
-                        v53->numVertices = rdClip_Face3GTOrtho(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->vertex_lights_maybe_, v55);
+                        v53->numVertices = rdClip_Face3GTOrtho(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->paDynamicLight, v55);
                 }
             }
             break;
@@ -465,7 +468,7 @@ LABEL_25:
     }
 }
 
-void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk)
+void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMethod, rdMeshinfo *vertexSrc, rdMeshinfo *vertexDst, rdVector2 *idkIn)
 {
     rdMeshinfo *v6; // eax
     int v7; // esi
@@ -474,137 +477,125 @@ void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int texture
     int *v10; // ecx
     int v11; // eax
     rdVector3 *v12; // ebx
-    rdVector3 *v13; // eax
-    rdMeshinfo *v14; // eax
-    rdVector3 *v15; // edi
-    int *v16; // ecx
-    rdVector3 *v17; // edx
-    int v18; // eax
-    rdVector3 *v19; // ebx
-    rdVector3 *v20; // eax
-    rdMeshinfo *v21; // eax
-    rdVector3 *v22; // edi
-    int *v23; // ecx
-    rdVector3 *v24; // edx
-    int v25; // eax
-    rdVector3 *v26; // ebx
-    rdVector3 *v27; // eax
-    rdMeshinfo *v28; // eax
-    rdVector3 *v29; // edi
-    int *v30; // ecx
-    rdVector3 *v31; // edx
-    int v32; // eax
-    rdVector3 *v33; // ebx
-    rdVector3 *v34; // eax
-    rdMeshinfo *v35; // eax
-    rdMeshinfo *v36; // edi
+    rdMeshinfo *v13; // eax
+    rdVector3 *v14; // edi
+    int *v15; // ecx
+    rdVector3 *v16; // edx
+    int v17; // eax
+    rdVector3 *v18; // ebx
+    rdMeshinfo *v19; // eax
+    rdVector3 *v20; // edi
+    int *v21; // ecx
+    rdVector3 *v22; // edx
+    int v23; // eax
+    rdVector3 *v24; // ebx
+    rdMeshinfo *v25; // eax
+    rdVector3 *v26; // edi
+    int *v27; // ecx
+    rdVector3 *v28; // edx
+    int v29; // eax
+    rdVector3 *v30; // ebx
+    rdMeshinfo *v31; // eax
+    rdMeshinfo *v32; // edi
+    float *v33; // esi
+    int v34; // ebx
+    int *v35; // ecx
+    rdVector3 *v36; // edx
     int v37; // esi
-    int v38; // ebx
-    int *v39; // ecx
-    rdVector3 *v40; // edx
-    int v41; // esi
-    int v42; // edi
+    int v38; // edi
+    double v39; // st7
+    rdVector3 *v40; // esi
+    int *paPosIdx; // ecx
+    char *v42; // edi
     rdVector3 *v43; // eax
-    double v44; // st7
-    rdVector3 *v45; // esi
-    int *v46; // ecx
-    char *v47; // edi
-    rdVector3 *v48; // eax
-    float *v49; // edx
-    double v50; // st7
-    rdMeshinfo *v51; // eax
-    rdMeshinfo *v52; // ebp
-    int v53; // ebx
-    int v54; // ecx
-    rdVector2 *v55; // edi
-    int *v56; // edx
-    rdVector3 *v57; // esi
-    rdVector2 *v58; // ecx
-    rdVector3 *v59; // eax
+    float *v44; // edx
+    double v45; // st7
+    rdMeshinfo *v46; // eax
+    rdMeshinfo *v47; // ebp
+    float *v48; // ebx
+    int v49; // ecx
+    rdVector2 *v50; // edi
+    int *v51; // edx
+    rdVector3 *v52; // esi
+    rdVector2 *v53; // ecx
+    int v54; // eax
+    double v55; // st7
+    rdVector2 *v56; // ebx
+    int *v57; // edx
+    rdVector3 *v58; // edi
+    rdVector2 *v59; // ecx
     int v60; // eax
-    double v61; // st7
-    rdVector2 *v62; // ebx
-    int *v63; // edx
-    rdVector3 *v64; // edi
-    rdVector2 *v65; // ecx
-    rdVector3 *v66; // eax
-    int v67; // eax
-    float *v68; // esi
-    double v69; // st7
-    rdMeshinfo *v71; // esi
-    int v72; // ebx
-    int *v73; // ecx
-    rdVector2 *v74; // edi
-    rdVector2 *v75; // eax
-    rdVector3 *v76; // esi
-    char *v77; // edx
-    int v78; // edx
-    rdVector3 *v79; // edx
-    rdVector3 *v80; // ebx
-    int v81; // edx
-    //bool v82; // zf
-    int v83; // [esp+10h] [ebp-10h]
-    int v84; // [esp+10h] [ebp-10h]
-    char *v85; // [esp+14h] [ebp-Ch]
-    intptr_t v86; // [esp+14h] [ebp-Ch]
-    int v87; // [esp+18h] [ebp-8h]
-    int v88; // [esp+18h] [ebp-8h]
-    int v89; // [esp+1Ch] [ebp-4h]
-    char *v90; // [esp+1Ch] [ebp-4h]
-    float *v91; // [esp+24h] [ebp+4h]
-    float *v92; // [esp+24h] [ebp+4h]
-    float *v93; // [esp+24h] [ebp+4h]
-    float *v94; // [esp+24h] [ebp+4h]
-    int v95; // [esp+24h] [ebp+4h]
-    rdVector3 *lightingModea; // [esp+28h] [ebp+8h]
-    rdVector3 *lightingModeb; // [esp+28h] [ebp+8h]
+    float *v61; // esi
+    double v62; // st7
+    rdMeshinfo *v64; // esi
+    int v65; // ebx
+    int *v66; // ecx
+    rdVector2 *v67; // edi
+    rdVector2 *v68; // eax
+    rdVector3 *v69; // esi
+    char *v70; // edx
+    int v71; // edx
+    rdVector3 *v72; // ebx
+    int v73; // edx
+    int v75; // [esp+10h] [ebp-10h]
+    int v76; // [esp+10h] [ebp-10h]
+    int v77; // [esp+14h] [ebp-Ch]
+    int v78; // [esp+14h] [ebp-Ch]
+    int v79; // [esp+18h] [ebp-8h]
+    int v80; // [esp+18h] [ebp-8h]
+    int v81; // [esp+1Ch] [ebp-4h]
+    char *v82; // [esp+1Ch] [ebp-4h]
+    float *geometryModea; // [esp+24h] [ebp+4h]
+    float *geometryModeb; // [esp+24h] [ebp+4h]
+    float *geometryModec; // [esp+24h] [ebp+4h]
+    float *geometryModed; // [esp+24h] [ebp+4h]
+    int geometryModee; // [esp+24h] [ebp+4h]
+    rdVector3 *pVertices; // [esp+28h] [ebp+8h]
+    rdVector3 *pVertices_; // [esp+28h] [ebp+8h]
     rdVector3 *lightingModec; // [esp+28h] [ebp+8h]
     rdVector3 *lightingModed; // [esp+28h] [ebp+8h]
     rdVector3 *lightingModee; // [esp+28h] [ebp+8h]
-    int v101; // [esp+30h] [ebp+10h]
-    int v102; // [esp+30h] [ebp+10h]
-    int v103; // [esp+30h] [ebp+10h]
-    int v104; // [esp+30h] [ebp+10h]
-    int v105; // [esp+30h] [ebp+10h]
-    int v106; // [esp+30h] [ebp+10h]
-    int v107; // [esp+30h] [ebp+10h]
-    int v108; // [esp+38h] [ebp+18h]
+    int vertexSrca; // [esp+30h] [ebp+10h]
+    int vertexSrcb; // [esp+30h] [ebp+10h]
+    int vertexSrcc; // [esp+30h] [ebp+10h]
+    int vertexSrcd; // [esp+30h] [ebp+10h]
+    int vertexSrce; // [esp+30h] [ebp+10h]
+    int vertexSrcf; // [esp+30h] [ebp+10h]
+    int vertexSrcg; // [esp+30h] [ebp+10h]
+    int clipIdka; // [esp+38h] [ebp+18h]
 
-    switch ( geometryMode )
+    switch ( clipType )
     {
         case 0:
-            v14 = _vertexSrc;
-            v7 = _vertexSrc->numVertices;
-            v102 = _vertexSrc->numVertices;
-            if ( !v102 )
+            v13 = vertexSrc;
+            v7 = vertexSrc->numVertices;
+            vertexSrcb = vertexSrc->numVertices;
+            if ( !vertexSrcb )
                 goto LABEL_19;
-            v15 = v14->verticesProjected;
-            v16 = v14->vertexPosIdx;
-            v17 = _vertexDst->verticesProjected;
+            v14 = v13->verticesProjected;
+            v15 = v13->vertexPosIdx;
+            v16 = vertexDst->verticesProjected;
             do
             {
-                v18 = *v16;
-                v19 = v17;
+                v17 = *v15;
+                v18 = v16;
+                ++v15;
                 ++v16;
-                ++v17;
                 --v7;
-                v20 = &v15[v18];
-                v19->x = v20->x;
-                v19->y = v20->y;
-                v19->z = v20->z;
+                *v18 = v14[v17];
             }
             while ( v7 );
-            _vertexDst->numVertices = v102;
+            vertexDst->numVertices = vertexSrcb;
             return;
         case 1:
         case 2:
-            v6 = _vertexSrc;
-            v7 = _vertexSrc->numVertices;
-            v101 = _vertexSrc->numVertices;
-            if ( v101 )
+            v6 = vertexSrc;
+            v7 = vertexSrc->numVertices;
+            vertexSrca = vertexSrc->numVertices;
+            if ( vertexSrca )
             {
                 v8 = v6->verticesProjected;
-                v9 = _vertexDst->verticesProjected;
+                v9 = vertexDst->verticesProjected;
                 v10 = v6->vertexPosIdx;
                 do
                 {
@@ -613,292 +604,270 @@ void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int texture
                     ++v10;
                     ++v9;
                     --v7;
-                    v13 = &v8[v11];
-                    v12->x = v13->x;
-                    v12->y = v13->y;
-                    v12->z = v13->z;
+                    *v12 = v8[v11];
                 }
                 while ( v7 );
-                _vertexDst->numVertices = v101;
+                vertexDst->numVertices = vertexSrca;
             }
             else
             {
 LABEL_19:
-                _vertexDst->numVertices = v7;
+                vertexDst->numVertices = v7;
             }
             return;
         case 3:
-            switch ( lightingMode )
+            switch ( clipSubtype )
             {
                 case 0:
                 case 1:
-                    v21 = _vertexSrc;
-                    v7 = _vertexSrc->numVertices;
-                    v103 = _vertexSrc->numVertices;
-                    if ( !v103 )
+                    v19 = vertexSrc;
+                    v7 = vertexSrc->numVertices;
+                    vertexSrcc = vertexSrc->numVertices;
+                    if ( !vertexSrcc )
                         goto LABEL_19;
-                    v22 = v21->verticesProjected;
-                    v23 = v21->vertexPosIdx;
-                    v24 = _vertexDst->verticesProjected;
+                    v20 = v19->verticesProjected;
+                    v21 = v19->vertexPosIdx;
+                    v22 = vertexDst->verticesProjected;
                     do
                     {
-                        v25 = *v23;
-                        v26 = v24;
-                        ++v23;
-                        ++v24;
+                        v23 = *v21;
+                        v24 = v22;
+                        ++v21;
+                        ++v22;
                         --v7;
-                        v27 = &v22[v25];
-                        v26->x = v27->x;
-                        v26->y = v27->y;
-                        v26->z = v27->z;
+                        *v24 = v20[v23];
                     }
                     while ( v7 );
-                    _vertexDst->numVertices = v103;
+                    vertexDst->numVertices = vertexSrcc;
                     return;
                 case 2:
-                    v28 = _vertexSrc;
-                    v7 = _vertexSrc->numVertices;
-                    v104 = _vertexSrc->numVertices;
-                    if ( v104 )
+                    v25 = vertexSrc;
+                    v7 = vertexSrc->numVertices;
+                    vertexSrcd = vertexSrc->numVertices;
+                    if ( vertexSrcd )
                     {
-                        v29 = v28->verticesProjected;
-                        v30 = v28->vertexPosIdx;
-                        v31 = _vertexDst->verticesProjected;
+                        v26 = v25->verticesProjected;
+                        v27 = v25->vertexPosIdx;
+                        v28 = vertexDst->verticesProjected;
                         do
                         {
-                            v32 = *v30;
-                            v33 = v31;
-                            ++v30;
-                            ++v31;
+                            v29 = *v27;
+                            v30 = v28;
+                            ++v27;
+                            ++v28;
                             --v7;
-                            v34 = &v29[v32];
-                            v33->x = v34->x;
-                            v33->y = v34->y;
-                            v33->z = v34->z;
+                            *v30 = v26[v29];
                         }
                         while ( v7 );
-                        v7 = v104;
+                        v7 = vertexSrcd;
                     }
                     goto LABEL_19;
                 case 3:
-                    v35 = _vertexSrc;
-                    v36 = _vertexDst;
-                    v37 = _vertexSrc->field_18;
-                    v38 = _vertexSrc->numVertices;
-                    v105 = _vertexSrc->numVertices;
-                    if ( v37 )
+                    v31 = vertexSrc;
+                    v32 = vertexDst;
+                    v33 = vertexSrc->intensities;
+                    v34 = vertexSrc->numVertices;
+                    vertexSrce = vertexSrc->numVertices;
+                    if ( v33 )
                     {
-                        if ( v38 )
+                        if ( v34 )
                         {
-                            v39 = v35->vertexPosIdx;
-                            lightingModea = v35->verticesProjected;
-                            v40 = _vertexDst->verticesProjected;
-                            v41 = v37 - (intptr_t)v39;
-                            v91 = v35->vertex_lights_maybe_;
-                            v42 = (char *)_vertexDst->vertex_lights_maybe_ - (char *)v39;
-                            v108 = v38;
+                            v35 = v31->vertexPosIdx;
+                            pVertices = v31->verticesProjected;
+                            v36 = vertexDst->verticesProjected;
+                            geometryModea = v31->paDynamicLight;
+                            float* lightIter = vertexDst->paDynamicLight;
+                            clipIdka = v34;
                             do
                             {
-                                v43 = &lightingModea[*v39];
-                                v40->x = v43->x;
-                                v40->y = v43->y;
-                                v40->z = v43->z;
-                                v44 = v91[*v39] + *(float *)((char *)v39 + v41);
-                                if ( v44 < 0.0 )
+                                *v36 = pVertices[*v35];
+                                v39 = geometryModea[*v35] + *(v33++);
+                                if ( v39 < 0.0 )
                                 {
-                                    v44 = 0.0;
+                                    v39 = 0.0;
                                 }
-                                else if ( v44 > 1.0 )
+                                else if ( v39 > 1.0 )
                                 {
-                                    v44 = 1.0;
+                                    v39 = 1.0;
                                 }
-                                *(float *)((char *)v39 + v42) = v44;
-                                ++v40;
-                                ++v39;
-                                --v108;
+                                *(lightIter++) = v39;
+                                ++v36;
+                                ++v35;
+                                --clipIdka;
                             }
-                            while ( v108 );
-                            _vertexDst->numVertices = v105;
+                            while ( clipIdka );
+                            vertexDst->numVertices = vertexSrce;
                             return;
                         }
                     }
-                    else if ( v38 )
+                    else if ( v34 )
                     {
-                        v45 = _vertexDst->verticesProjected;
-                        lightingModeb = v35->verticesProjected;
-                        v46 = v35->vertexPosIdx;
-                        v92 = v35->vertex_lights_maybe_;
-                        v47 = (char *)((char *)_vertexDst->vertex_lights_maybe_ - (char *)v46);
+                        v40 = vertexDst->verticesProjected;
+                        pVertices_ = v31->verticesProjected;
+                        paPosIdx = v31->vertexPosIdx;
+                        geometryModeb = v31->paDynamicLight;
+                        float* lightIter = vertexDst->paDynamicLight;
                         do
                         {
-                            v48 = &lightingModeb[*v46];
-                            v45->x = v48->x;
-                            v45->y = v48->y;
-                            v45->z = v48->z;
-                            v49 = &v92[*v46];
-                            if ( *v49 < 0.0 )
+                            v43 = &pVertices_[*paPosIdx];
+                            v40->x = v43->x;
+                            v40->y = v43->y;
+                            v40->z = v43->z;
+                            v44 = &geometryModeb[*paPosIdx];
+                            if ( *v44 < 0.0 )
                             {
-                                v50 = 0.0;
+                                v45 = 0.0;
                             }
-                            else if ( *v49 > 1.0 )
+                            else if ( *v44 > 1.0 )
                             {
-                                v50 = 1.0;
+                                v45 = 1.0;
                             }
                             else
                             {
-                                v50 = *v49;
+                                v45 = *v44;
                             }
-                            *(float *)&v47[(intptr_t)v46] = v50;
-                            ++v45;
-                            ++v46;
-                            --v38;
+                            *(lightIter++) = v45;
+                            ++v40;
+                            ++paPosIdx;
+                            --v34;
                         }
-                        while ( v38 );
-                        v36 = _vertexDst;
-                        v38 = v105;
+                        while ( v34 );
+                        v32 = vertexDst;
+                        v34 = vertexSrce;
                     }
-                    v36->numVertices = v38;
+                    v32->numVertices = v34;
                     return;
                 default:
                     return;
             }
         case 4:
-            if ( lightingMode < 0 )
+            if ( clipSubtype < 0 )
                 return;
-            if ( lightingMode > 2 )
+            if ( clipSubtype > 2 )
             {
-                if ( lightingMode != 3 )
+                if ( clipSubtype != 3 )
                     return;
-                v51 = _vertexSrc;
-                v52 = _vertexDst;
-                v53 = _vertexSrc->field_18;
-                v54 = _vertexSrc->numVertices;
-                v106 = _vertexSrc->numVertices;
-                if ( v53 )
+                v46 = vertexSrc;
+                v47 = vertexDst;
+                v48 = vertexSrc->intensities;
+                v49 = vertexSrc->numVertices;
+                vertexSrcf = vertexSrc->numVertices;
+                if ( v48 )
                 {
-                    if ( v54 )
+                    if ( v49 )
                     {
-                        v55 = v51->vertexUVs;
-                        v56 = v51->vertexPosIdx;
-                        lightingModec = v51->verticesProjected;
-                        v57 = _vertexDst->verticesProjected;
-                        v83 = (char *)v51->vertexUVIdx - (char *)v56;
-                        v93 = v51->vertex_lights_maybe_;
-                        v58 = _vertexDst->vertexUVs;
-                        v89 = v53 - (intptr_t)v56;
-                        v87 = v106;
-                        v85 = (char *)((char *)_vertexDst->vertex_lights_maybe_ - (char *)v56);
+                        v50 = v46->vertexUVs;
+                        v51 = v46->vertexPosIdx;
+                        lightingModec = v46->verticesProjected;
+                        v52 = vertexDst->verticesProjected;
+                        int* uvIter = v46->vertexUVIdx;
+                        geometryModec = v46->paDynamicLight;
+                        v53 = vertexDst->vertexUVs;
+                        v79 = vertexSrcf;
+                        float* lightIter = vertexDst->paDynamicLight;
                         do
                         {
-                            v59 = &lightingModec[*v56];
-                            v57->x = v59->x;
-                            v57->y = v59->y;
-                            v57->z = v59->z;
-                            v60 = *(int *)((char *)v56 + v83);
-                            v58->x = v55[v60].x;
-                            v58->y = v55[v60].y;
-                            v58->x = clipIdk->x + v58->x;
-                            v58->y = v58->y + clipIdk->y;
-                            v61 = v93[*v56] + *(float *)((char *)v56 + v89);
-                            if ( v61 < 0.0 )
+                            *v52 = lightingModec[*v51];
+                            v54 = *(uvIter++);
+                            v53->x = v50[v54].x;
+                            v53->y = v50[v54].y;
+                            v53->x = idkIn->x + v53->x;
+                            v53->y = v53->y + idkIn->y;
+                            v55 = geometryModec[*v51] + *(v48++);
+                            if ( v55 < 0.0 )
                             {
-                                v61 = 0.0;
+                                v55 = 0.0;
                             }
-                            else if ( v61 > 1.0 )
+                            else if ( v55 > 1.0 )
                             {
-                                v61 = 1.0;
+                                v55 = 1.0;
                             }
-                            ++v57;
-                            ++v58;
-                            *(float *)&v85[(intptr_t)v56++] = v61;
-                            --v87;
+                            ++v52;
+                            ++v53;
+                            *(lightIter++) = v55;
+                            v51++;
+                            --v79;
                         }
-                        while ( v87 );
-                        _vertexDst->numVertices = v106;
+                        while ( v79 );
+                        vertexDst->numVertices = vertexSrcf;
                         return;
                     }
                 }
-                else if ( v54 )
+                else if ( v49 )
                 {
-                    v62 = v51->vertexUVs;
-                    v63 = v51->vertexPosIdx;
-                    v64 = _vertexDst->verticesProjected;
-                    lightingModed = v51->verticesProjected;
-                    v94 = v51->vertex_lights_maybe_;
-                    v65 = _vertexDst->vertexUVs;
-                    v84 = (char *)v51->vertexUVIdx - (char *)v63;
-                    v86 = (char *)_vertexDst->vertex_lights_maybe_ - (char *)v63;
-                    v88 = v106;
+                    v56 = v46->vertexUVs;
+                    v57 = v46->vertexPosIdx;
+                    v58 = vertexDst->verticesProjected;
+                    lightingModed = v46->verticesProjected;
+                    geometryModed = v46->paDynamicLight;
+                    v59 = vertexDst->vertexUVs;
+                    float* lightIter = vertexDst->paDynamicLight;
+                    v80 = vertexSrcf;
+                    int* uvIter = v46->vertexUVIdx;
                     do
                     {
-                        v66 = &lightingModed[*v63];
-                        v64->x = v66->x;
-                        v64->y = v66->y;
-                        v64->z = v66->z;
-                        v67 = *(int *)((char *)v63 + v84);
-                        v65->x = v62[v67].x;
-                        v65->y = v62[v67].y;
-                        v65->x = clipIdk->x + v65->x;
-                        v65->y = v65->y + clipIdk->y;
-                        v68 = &v94[*v63];
-                        if ( *v68 < 0.0 )
+                        *v58 = lightingModed[*v57];
+                        v60 = *(uvIter++);
+                        v59->x = v56[v60].x;
+                        v59->y = v56[v60].y;
+                        v59->x = idkIn->x + v59->x;
+                        v59->y = v59->y + idkIn->y;
+                        v61 = &geometryModed[*v57];
+                        if ( *v61 < 0.0 )
                         {
-                            v69 = 0.0;
+                            v62 = 0.0;
                         }
-                        else if ( *v68 > 1.0 )
+                        else if ( *v61 > 1.0 )
                         {
-                            v69 = 1.0;
+                            v62 = 1.0;
                         }
                         else
                         {
-                            v69 = *v68;
+                            v62 = *v61;
                         }
-                        ++v64;
-                        ++v65;
-                        *(float *)((char *)v63++ + v86) = v69;
-                        --v88;
+                        ++v58;
+                        ++v59;
+                        v57++;
+                        *(lightIter++) = v62;
+                        --v80;
                     }
-                    while ( v88 );
-                    v52 = _vertexDst;
+                    while ( v80 );
+                    v47 = vertexDst;
                 }
-                v52->numVertices = v106;
+                v47->numVertices = vertexSrcf;
                 return;
             }
-            v71 = _vertexDst;
-            v72 = _vertexSrc->numVertices;
-            v107 = _vertexSrc->numVertices;
-            if ( v107 )
+            v64 = vertexDst;
+            v65 = vertexSrc->numVertices;
+            vertexSrcg = vertexSrc->numVertices;
+            if ( vertexSrcg )
             {
-                v73 = _vertexSrc->vertexUVIdx;
-                v74 = _vertexSrc->vertexUVs;
-                lightingModee = _vertexSrc->verticesProjected;
-                v75 = _vertexDst->vertexUVs;
-                v76 = _vertexDst->verticesProjected;
-                v77 = (char *)((char *)_vertexSrc->vertexPosIdx - (char *)v73);
-                v90 = v77;
-                v95 = v72;
+                v66 = vertexSrc->vertexUVIdx;
+                v67 = vertexSrc->vertexUVs;
+                lightingModee = vertexSrc->verticesProjected;
+                v68 = vertexDst->vertexUVs;
+                v69 = vertexDst->verticesProjected;
+                int* idxIter = vertexSrc->vertexPosIdx;
+                geometryModee = v65;
                 while ( 1 )
                 {
-                    v78 = *(int *)((char *)v73++ + (intptr_t)v77);
-                    ++v75;
-                    v79 = &lightingModee[v78];
-                    v80 = v76++;
-                    v80->x = v79->x;
-                    v80->y = v79->y;
-                    v80->z = v79->z;
-                    v81 = *(v73 - 1);
-                    v75[-1].x = v74[v81].x;
-                    v75[-1].y = v74[v81].y;
-                    v75[-1].x = clipIdk->x + v75[-1].x;
-                    v75[-1].y = v75[-1].y + clipIdk->y;
-                    if ( v95-- == 1 )
+                    v71 = *(idxIter++);
+                    
+                    v72 = v69++;
+                    *v72 = lightingModee[v71];
+                    v73 = *(v66++);
+                    v68->x = v67[v73].x;
+                    v68->y = v67[v73].y;
+                    v68->x = idkIn->x + v68->x;
+                    v68->y = v68->y + idkIn->y;
+                    ++v68;
+                    if ( geometryModee-- == 1 )
                         break;
-                    v77 = v90;
                 }
-                v71 = _vertexDst;
-                v72 = v107;
+                v64 = vertexDst;
+                v65 = vertexSrcg;
             }
-            v71->numVertices = v72;
+            v64->numVertices = v65;
             return;
         default:
             return;
