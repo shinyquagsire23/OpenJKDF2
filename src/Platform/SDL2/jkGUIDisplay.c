@@ -24,6 +24,7 @@ enum jkGuiDecisionButton_t
 };
 
 static wchar_t render_level[256] = {0};
+static wchar_t gamma_level[256] = {0};
 
 static wchar_t slider_val_text[5] = {0};
 static wchar_t slider_val_text_2[5] = {0};
@@ -32,7 +33,7 @@ static int slider_2[2] = {18, 17};
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiDisplay_aElements[25] = { 
+static jkGuiElement jkGuiDisplay_aElements[28] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -61,11 +62,19 @@ static jkGuiElement jkGuiDisplay_aElements[25] = {
     
     // 21
     {ELEMENT_CHECKBOX,     0,            0, L"Enable Bloom",    0, {400, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    
+
     // 22
-    { ELEMENT_TEXT,        0,            0, L"SSAA Multiplier:",            2, {400, 270, 120, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 270+10, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, L"Enable SSAO",    0, {400, 270, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
+    // 23
+    { ELEMENT_TEXT,        0,            0, L"SSAA Multiplier:",            2, {400, 310, 120, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 310+10, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    
+    // 25
+    { ELEMENT_TEXT,        0,            0, L"Gamma Value:",            2, {400, 310+40, 120, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 310+10+40, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    
+
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
 
@@ -74,9 +83,12 @@ static jkGuiMenu jkGuiDisplay_menu = { jkGuiDisplay_aElements, 0, 0xFF, 0xE1, 0x
 void jkGuiDisplay_Initialize()
 {
     jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[3]);
-    jkGuiDisplay_aElements[23].wstr = render_level;
+    jkGuiDisplay_aElements[24].wstr = render_level;
+
+    jkGuiDisplay_aElements[26].wstr = gamma_level;
 
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
+    jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
 }
 
 void jkGuiDisplay_Shutdown()
@@ -131,8 +143,10 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[18].selectedTextEntry = jkPlayer_fpslimit - FPS_LIMIT_MIN;
     jkGuiDisplay_aElements[20].selectedTextEntry = jkPlayer_enableVsync;
     jkGuiDisplay_aElements[21].selectedTextEntry = jkPlayer_enableBloom;
+    jkGuiDisplay_aElements[22].selectedTextEntry = jkPlayer_enableSSAO;
 
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
+    jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
 
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDisplay_menu);
     if ( v0 != -1 )
@@ -144,15 +158,19 @@ int jkGuiDisplay_Show()
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
         jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
         jkPlayer_enableBloom = jkGuiDisplay_aElements[21].selectedTextEntry;
+        jkPlayer_enableSSAO = jkGuiDisplay_aElements[22].selectedTextEntry;
 
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);
 
         if(_sscanf(tmp, "%f", &jkPlayer_ssaaMultiple) != 1) {
-            printf("%s %f\n", tmp, jkPlayer_ssaaMultiple);
             jkPlayer_ssaaMultiple = 1.0;
         }
-        printf("%s %f\n", tmp, jkPlayer_ssaaMultiple);
+
+        stdString_WcharToChar(tmp, gamma_level, 255);
+        if(_sscanf(tmp, "%f", &jkPlayer_gamma) != 1) {
+            jkPlayer_gamma = 1.0;
+        }
 
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }

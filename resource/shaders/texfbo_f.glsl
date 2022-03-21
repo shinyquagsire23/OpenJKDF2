@@ -15,5 +15,6 @@ void main(void)
     vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);
 
     fragColor = sampled_color * vertex_color * blend;
+    fragColor.rgb = pow(fragColor.rgb, vec3(1.0/param3));
     //fragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }

@@ -1155,10 +1155,12 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     procFace->y_max = (int32_t)ceilf(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
-    //if ( procFace->x_min >= (unsigned int)procFace->x_max )
-    //    return 0;
-    //if ( procFace->y_min >= (unsigned int)procFace->y_max )
-    //    return 0;
+#ifndef SDL2_RENDER
+    if ( procFace->x_min >= (unsigned int)procFace->x_max )
+        return 0;
+    if ( procFace->y_min >= (unsigned int)procFace->y_max )
+        return 0;
+#endif
     procFace->y_min_related = y_min_related;
     procFace->y_max_related = y_max_related;
     if ( (flags & 1) != 0 )

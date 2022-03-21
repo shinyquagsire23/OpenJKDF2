@@ -8,6 +8,8 @@
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
 
+#include "jk.h"
+
 #ifdef ARCH_WASM
 #include <emscripten.h>
 #include <SDL.h>
@@ -48,6 +50,8 @@ typedef struct std3DSimpleTexStage
 
     GLint uniform_mvp;
     GLint uniform_tex;
+    GLint uniform_tex2;
+    GLint uniform_tex3;
     GLint uniform_iResolution;
 
     GLint uniform_param1;
@@ -73,6 +77,8 @@ typedef struct std3DFramebuffer
     GLuint fbo;
     GLuint tex0;
     GLuint tex1;
+    GLuint tex2;
+    GLuint tex3;
 
     std3DIntermediateFbo window;
     std3DIntermediateFbo main;
@@ -82,6 +88,10 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo blur2;
     std3DIntermediateFbo blur3;
     std3DIntermediateFbo blur4;
+
+    std3DIntermediateFbo ssaoBlur1;
+    std3DIntermediateFbo ssaoBlur2;
+    //std3DIntermediateFbo ssaoBlur3;
 
     GLuint rbo;
     int32_t w;
@@ -103,13 +113,15 @@ GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
-GLint uniform_light_mult;
+GLint uniform_light_mult, uniform_iResolution;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
 
 std3DSimpleTexStage std3D_texFboStage;
 std3DSimpleTexStage std3D_blurStage;
+std3DSimpleTexStage std3D_ssaoStage;
+std3DSimpleTexStage std3D_ssaoMixStage;
 
 GLuint worldpal_texture;
 void* worldpal_data;
@@ -117,6 +129,8 @@ GLuint worldpal_lights_texture;
 void* worldpal_lights_data;
 GLuint displaypal_texture;
 void* displaypal_data;
+GLuint tiledrand_texture;
+rdVector3* tiledrand_data;
 
 static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 static GLuint std3D_aLoadedTextures[1024];
@@ -142,7 +156,7 @@ GLuint world_ibo_triangle;
 GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
 GLuint menu_ibo_triangle;
 
-void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo)
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
 {
     // Generate the framebuffer
     memset(pFbo, 0, sizeof(*pFbo));
@@ -158,7 +172,7 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     // Set up our framebuffer texture
     glGenTextures(1, &pFbo->tex);
     glBindTexture(GL_TEXTURE_2D, pFbo->tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, isFloat ? GL_RGBA16F : GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -222,6 +236,30 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, pFb->tex1, 0);
 
+    // Set up our position fb texture
+    glGenTextures(1, &pFb->tex2);
+    glBindTexture(GL_TEXTURE_2D, pFb->tex2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Attach fbTex to our currently bound framebuffer fb
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, pFb->tex2, 0);
+
+    // Set up our normal fb texture
+    glGenTextures(1, &pFb->tex3);
+    glBindTexture(GL_TEXTURE_2D, pFb->tex3);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // Attach fbTex to our currently bound framebuffer fb
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
+
     // Set up our render buffer
     glGenRenderbuffers(1, &pFb->rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, pFb->rbo);
@@ -234,13 +272,22 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         printf("ERROR: Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    if (jkPlayer_enableSSAO)
+    {
+        std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0);
+        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, 0);
+        //std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0);
+
+        pFb->enable_extra |= 2;
+    }
+
     if (jkPlayer_enableBloom)
     {
-        pFb->enable_extra = 1;
-        std3D_generateIntermediateFbo(width, height, &pFb->blur1);
-        std3D_generateIntermediateFbo(pFb->blur1.w/2, pFb->blur1.h/2, &pFb->blur2);
-        std3D_generateIntermediateFbo(pFb->blur2.w/2, pFb->blur2.h/2, &pFb->blur3);
-        std3D_generateIntermediateFbo(pFb->blur3.w/2, pFb->blur3.h/2, &pFb->blur4);
+        pFb->enable_extra |= 1;
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 0);
+        std3D_generateIntermediateFbo(pFb->blur1.w/2, pFb->blur1.h/2, &pFb->blur2, 0);
+        std3D_generateIntermediateFbo(pFb->blur2.w/2, pFb->blur2.h/2, &pFb->blur3, 0);
+        std3D_generateIntermediateFbo(pFb->blur3.w/2, pFb->blur3.h/2, &pFb->blur4, 0);
 
         /*pFb->blur1.iw = width;
         pFb->blur1.ih = height;
@@ -272,12 +319,18 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteFramebuffers(1, &pFb->fbo);
     glDeleteTextures(1, &pFb->tex0);
     glDeleteTextures(1, &pFb->tex1);
+    glDeleteTextures(1, &pFb->tex2);
+    glDeleteTextures(1, &pFb->tex3);
     glDeleteRenderbuffers(1, &pFb->rbo);
 
     std3D_deleteIntermediateFbo(&pFb->blur1);
     std3D_deleteIntermediateFbo(&pFb->blur2);
     std3D_deleteIntermediateFbo(&pFb->blur3);
     std3D_deleteIntermediateFbo(&pFb->blur4);
+
+    std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
+    std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
+    //std3D_deleteIntermediateFbo(&pFb->ssaoBlur3);
 }
 
 void std3D_swapFramebuffers()
@@ -358,6 +411,8 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     pOut->uniform_mvp = std3D_tryFindUniform(pOut->program, "mvp");
     pOut->uniform_iResolution = std3D_tryFindUniform(pOut->program, "iResolution");
     pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
+    pOut->uniform_tex2 = std3D_tryFindUniform(pOut->program, "tex2");
+    pOut->uniform_tex3 = std3D_tryFindUniform(pOut->program, "tex3");
 
     pOut->uniform_param1 = std3D_tryFindUniform(pOut->program, "param1");
     pOut->uniform_param2 = std3D_tryFindUniform(pOut->program, "param2");
@@ -385,7 +440,9 @@ int init_resources()
     if ((programMenu = std3D_loadProgram("resource/shaders/menu")) == 0) return false;
     if (!std3D_loadSimpleTexProgram("resource/shaders/texfbo", &std3D_texFboStage)) return false;
     if (!std3D_loadSimpleTexProgram("resource/shaders/blur", &std3D_blurStage)) return false;
-    
+    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao", &std3D_ssaoStage)) return false;
+    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
+
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
@@ -402,6 +459,7 @@ int init_resources()
     uniform_fade = std3D_tryFindUniform(programDefault, "colorEffects_fade");
     uniform_add = std3D_tryFindUniform(programDefault, "colorEffects_add");
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
+    uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
@@ -449,6 +507,27 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
+
+    // Tiled random
+    glGenTextures(1, &tiledrand_texture);
+    tiledrand_data = malloc(3 * 4 * 4 * sizeof(float));
+    memset(tiledrand_data, 0, 3 * 4 * 4 * sizeof(float));
+
+    for (int i = 0; i < 4*4; i++)
+    {
+        tiledrand_data[i].x = (_frand() * 2.0) - 1.0;
+        tiledrand_data[i].y = (_frand() * 2.0) - 1.0;
+        tiledrand_data[i].z = 0.0;
+        rdVector_Normalize3Acc(&tiledrand_data[i]);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tiledrand_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, tiledrand_data);
 
     unsigned int vao;
     glGenVertexArrays( 1, &vao );
@@ -535,7 +614,9 @@ int std3D_StartScene()
     int32_t tex_w = (int32_t)((double)Window_xSize * supersample_level);
     int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
 
-    if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h || (!std3D_pFb->enable_extra && jkPlayer_enableBloom))
+    if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h 
+        || (!(std3D_pFb->enable_extra & 1) && jkPlayer_enableBloom)
+        || (!(std3D_pFb->enable_extra & 2) && jkPlayer_enableSSAO))
     {
         std3D_deleteFramebuffer(std3D_pFb);
         std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);
@@ -578,6 +659,19 @@ int std3D_StartScene()
         memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
     }
+
+#if 0
+    // New random values
+    glBindTexture(GL_TEXTURE_2D, tiledrand_texture);
+    for (int i = 0; i < 4*4; i++)
+    {
+        tiledrand_data[i].x = (_frand() * 2.0) - 1.0;
+        tiledrand_data[i].y = (_frand() * 2.0) - 1.0;
+        tiledrand_data[i].z = 0.0;
+        rdVector_Normalize3Acc(&tiledrand_data[i]);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 4, 4, GL_RGB, GL_FLOAT, tiledrand_data);
+    }
+#endif
 
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
     glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
@@ -998,7 +1092,7 @@ void std3D_DrawMenu()
     //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, float param1, float param2, float param3)
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
@@ -1060,6 +1154,10 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, texId);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, texId2 ? texId2 : texId);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, texId3 ? texId3 : texId);
 
     GLfloat data_vertices[32 * 3];
     GLubyte data_colors[32 * 4];
@@ -1112,8 +1210,9 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STREAM_DRAW);
     
-    glActiveTexture(GL_TEXTURE0 + 1);
-    glUniform1i(programMenu_uniform_tex, 0);
+    glUniform1i(pStage->uniform_tex, 0);
+    glUniform1i(pStage->uniform_tex2, 1);
+    glUniform1i(pStage->uniform_tex3, 2);
     
     {
 
@@ -1216,29 +1315,60 @@ void std3D_DrawSceneFbo()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
     glClear( GL_COLOR_BUFFER_BIT );
 
-    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0.0, 0.0, 0.0);
-    //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0); // test emission output
+    static float frameNum = 1.0;
+    //frameNum += (rand() % 16);
+
+    if (!jkGame_isDDraw)
+    {
+        return;
+    }
+
+    // Clear SSAO stuff
+    if (jkPlayer_enableSSAO)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur1.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur2.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+    }
+
+    if (!jkPlayer_enableSSAO)
+    {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0); // test emission output
+    }
+    else
+    {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, std3D_pFb->tex2, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0); // test ssao output
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur2, std3D_pFb->ssaoBlur1.tex, 0, 0, 14.0, 3.0, 4.0);
+        //std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur3, std3D_pFb->ssaoBlur2.tex, 0, 0, 8.0, 3.0, 4.0);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->window, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma);
+    }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0);
+    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+
     if (jkPlayer_enableBloom)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 3.0);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 3.0);
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0.0, 0.0, 0.0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0.0, 0.0, 0.0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0.0, 0.0, 0.0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0.0, 0.0, 0.0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0.0, 0.0, 0.0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
     }
-    //
-
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -1247,8 +1377,8 @@ void std3D_DrawRenderList()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
 
-    GLenum bufs[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    glDrawBuffers(2, bufs);
+    GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, bufs);
     
     last_tex = NULL;
 
@@ -1312,6 +1442,8 @@ void std3D_DrawRenderList()
     glViewport(0, 0, width, height);
     
     }
+
+    glUniform2f(uniform_iResolution, width, height);
 
     //rdroid_curColorEffects.tint.x = 0.0;
     //rdroid_curColorEffects.tint.y = 0.5;

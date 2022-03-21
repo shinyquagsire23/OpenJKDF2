@@ -36,9 +36,11 @@ int jkPlayer_fovIsVertical = 1;
 int jkPlayer_enableTextureFilter = 0;
 int jkPlayer_enableOrigAspect = 0;
 int jkPlayer_enableBloom = 0;
+int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
 float jkPlayer_ssaaMultiple = 1.0;
+float jkPlayer_gamma = 1.0;
 #endif
 
 int jkPlayer_LoadAutosave()
@@ -266,6 +268,8 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdConffile_Printf("enablevsync %d\n", jkPlayer_enableVsync);
         stdConffile_Printf("enablebloom %d\n", jkPlayer_enableBloom);
         stdConffile_Printf("ssaamultiple %f\n", jkPlayer_ssaaMultiple);
+        stdConffile_Printf("enablessao %d\n", jkPlayer_enableSSAO);
+        stdConffile_Printf("gamma %f\n", jkPlayer_gamma);
 #endif
         stdConffile_CloseWrite();
     }
@@ -390,6 +394,18 @@ int jkPlayer_ReadConf(wchar_t *name)
         {
             if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &jkPlayer_ssaaMultiple) != 1)
                 jkPlayer_ssaaMultiple = 1.0;
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            _sscanf(stdConffile_aLine, "enablessao %d", &jkPlayer_enableSSAO);
+            jkPlayer_enableSSAO = !!jkPlayer_enableSSAO;
+        }
+
+        if (stdConffile_ReadLine())
+        {
+            if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
+                jkPlayer_gamma = 1.0;
         }
 #endif
         stdConffile_Close();

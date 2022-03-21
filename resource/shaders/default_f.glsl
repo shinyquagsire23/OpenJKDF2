@@ -14,6 +14,7 @@ uniform vec3 colorEffects_filter;
 uniform float colorEffects_fade;
 uniform vec3 colorEffects_add;
 uniform float light_mult;
+uniform vec2 iResolution;
 
 in vec4 f_color;
 in float f_light;
@@ -22,11 +23,19 @@ in vec3 f_coord;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
+layout(location = 2) out vec4 fragColorPos;
+layout(location = 3) out vec4 fragColorNormal;
 
 float luminance(vec3 c_rgb)
 {
     const vec3 W = vec3(0.2125, 0.7154, 0.0721);
     return dot(c_rgb, W);
+}
+
+vec3 normals(vec3 pos) {
+    vec3 fdx = dFdx(pos);
+    vec3 fdy = dFdy(pos);
+    return normalize(cross(fdx, fdy));
 }
 
 vec4 bilinear_paletted()
@@ -106,6 +115,11 @@ void main(void)
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
+
+    float originalZ = gl_FragCoord.z / gl_FragCoord.w;
+    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ);
+    vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
+    vec3 face_normals = normals(adjusted_coords_norms);
 
     if (tex_mode == 5
 #ifndef CAN_BILINEAR_FILTER_16
@@ -241,5 +255,22 @@ void main(void)
     color_add.g *= colorEffects_filter.g;
     color_add.b *= colorEffects_filter.b;
 
+    //color_add = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // Dont include any windows or transparent objects in emissivity output
+    if (luma < 0.01 && main_color.a < 0.5)
+    {
+        color_add = vec4(0.0, 0.0, 0.0, 0.0);
+    }
+
     fragColorEmiss = color_add;
+
+    //fragColor = vec4(face_normals.x, face_normals.y, face_normals.z, 1.0);
+    //fragColor = vec4(face_normals*0.5 + 0.5,1.0);
+    //vec4 test_norms = (main_color + effectAdd_color);
+    //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
+    //fragColor = test_norms;
+
+    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, 1.0);
+    fragColorNormal = vec4(face_normals, 1.0);
 }
