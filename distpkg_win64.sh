@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 rm -rf win64-package
+rm -f win64-debug.zip
 
 rm -rf build_win64
 mkdir -p build_win64 && cd build_win64
