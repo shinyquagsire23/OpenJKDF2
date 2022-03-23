@@ -56,7 +56,7 @@ export PATH=$PATH:~/.local/bin
 <details>
   <summary>MacOS Dependencies</summary>
 
-Before starting, install Xcode. This is required for OpenGL headers, among other things.
+Before starting, install Xcode. This is required for OpenGL headers, among other things. For packaging a Universal build on ARM64 Macs, all `brew` steps should be done both natively and with an x86_64 prefix (see [here](https://gist.github.com/progrium/b286cd8c82ce0825b2eb3b0b3a0720a0) for how to set that up).
 ```
 # All
 brew install git cmake make python3 imagemagick
