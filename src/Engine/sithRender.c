@@ -192,30 +192,8 @@ int sithRender_GetSomeRenderFlag()
 void sithRender_EnableIRMode(float a, float b)
 {
     sithRender_lightingIRMode = 1;
-    if ( a < 0.0 )
-    {
-        sithRender_f_83198C = 0.0;
-    }
-    else if ( a > 1.0 )
-    {
-        sithRender_f_83198C = 1.0;
-    }
-    else
-    {
-        sithRender_f_83198C = a;
-    }
-    if ( b < 0.0 )
-    {
-        sithRender_f_831990 = 0.0;
-    }
-    else if ( b > 1.0 )
-    {
-        sithRender_f_831990 = 1.0;
-    }
-    else
-    {
-        sithRender_f_831990 = b;
-    }
+    sithRender_f_83198C = stdMath_Clamp(a, 0.0, 1.0);
+    sithRender_f_831990 = stdMath_Clamp(b, 0.0, 1.0);
 }
 
 void sithRender_DisableIRMode()
@@ -621,21 +599,8 @@ void sithRender_RenderLevelGeometry()
         else
         {
             float baseLight = level_idk->ambientLight + level_idk->extraLight;
-            if ( baseLight < 0.0 )
-            {
-                a2 = 0.0;
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 0.0);
-            }
-            else if ( baseLight > 1.0 )
-            {
-                a2 = 1.0;
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, 1.0);
-            }
-            else
-            {
-                a2 = baseLight;
-                rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
-            }
+            a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
+            rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
         }
         rdColormap_SetCurrent(level_idk->colormap);
         v68 = level_idk->colormap == sithWorld_pCurrentWorld->colormaps;
@@ -746,17 +711,9 @@ void sithRender_RenderLevelGeometry()
                     procEntry->light_level_static = 0.0;
                     procEntry->ambientLight = v49;
                 }
-                else if ( level_idk->extraLight < 0.0 )
-                {
-                    procEntry->ambientLight = 0.0;
-                }
-                else if ( level_idk->extraLight > 1.0 )
-                {
-                    procEntry->ambientLight = 1.0;
-                }
                 else
                 {
-                    procEntry->ambientLight = level_idk->extraLight;
+                    procEntry->ambientLight = stdMath_Clamp(level_idk->extraLight, 0.0, 1.0);
                 }
                 if ( procEntry->ambientLight >= 1.0 )
                 {
@@ -1202,7 +1159,6 @@ void sithRender_RenderDynamicLights()
 
 void sithRender_RenderThings()
 {
-    uint32_t v0; // edi
     sithSector *v1; // ebp
     double v2; // st7
     sithThing *thingIter; // esi
@@ -1222,10 +1178,10 @@ void sithRender_RenderThings()
 
     rdSetZBufferMethod(2);
     rdSetOcclusionMethod(0);
-    v0 = 0;
-    for ( i = 0; v0 < sithRender_numSectors2; i = v0 )
+
+    for ( i = 0; i < sithRender_numSectors2; i++ )
     {
-        v1 = sithRender_aSectors2[v0];
+        v1 = sithRender_aSectors2[i];
         if ( sithRender_lightingIRMode )
         {
             a2 = sithRender_f_831990;
@@ -1238,162 +1194,163 @@ void sithRender_RenderThings()
         rdColormap_SetCurrent(v1->colormap);
         thingIter = v1->thingsList;
         v16 = v1->colormap == sithWorld_pCurrentWorld->colormaps;
-        if ( thingIter )
+        for (thingIter; thingIter; thingIter = thingIter->nextThing)
         {
-            do
+            if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
+              && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
+              && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus) )
             {
-                if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
-                  && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
-                  && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus) )
+                rdMatrix_TransformPoint34(&thingIter->screenPos, &thingIter->position, &rdCamera_pCurCamera->view_matrix);
+                
+                //printf("%f %f %f ; %f %f %f\n", thingIter->screenPos.x, thingIter->screenPos.y, thingIter->screenPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
+                
+                if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THINGTYPE_SPRITE3 || sithRender_82F4B4 < 8 )
                 {
-                    rdMatrix_TransformPoint34(&thingIter->screenPos, &thingIter->position, &rdCamera_pCurCamera->view_matrix);
-                    
-                    //printf("%f %f %f ; %f %f %f\n", thingIter->screenPos.x, thingIter->screenPos.y, thingIter->screenPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
-                    
-                    if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THINGTYPE_SPRITE3 || sithRender_82F4B4 < 8 )
+                    clipRadius = 0.0f;
+                    switch ( thingIter->rdthing.type )
                     {
-                        clipRadius = 0.0f;
-                        switch ( thingIter->rdthing.type )
+                        case RD_THINGTYPE_MODEL:
+                            radius = thingIter->rdthing.model3->radius;
+                            clipRadius = radius;
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            break;
+
+                        case RD_THINGTYPE_SPRITE3:
+                            clipRadius = thingIter->rdthing.sprite3->radius;
+                            ++sithRender_82F4B4;
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            break;
+
+                        case RD_THINGTYPE_PARTICLECLOUD:
+                            clipRadius = thingIter->rdthing.particlecloud->cloudRadius;
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            break;
+
+                        case RD_THINGTYPE_POLYLINE:
+                            radius = thingIter->rdthing.polyline->length;
+                            clipRadius = radius;
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            break;
+
+                        default:
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            break;
+                    }
+                    thingIter->rdthing.clippingIdk = clippingVal;
+                    if ( clippingVal == 2 )
+                        continue;
+                    curWorld = sithWorld_pCurrentWorld;
+                    if ( thingIter->rdthing.type == RD_THINGTYPE_MODEL )
+                    {
+                        model3 = thingIter->rdthing.model3;
+                        switch ( model3->numGeosets )
                         {
-                            case RD_THINGTYPE_MODEL:
-                                radius = thingIter->rdthing.model3->radius;
-                                clipRadius = radius;
-                                clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
-                                goto LABEL_24;
-
-                            case RD_THINGTYPE_SPRITE3:
-                                clipRadius = thingIter->rdthing.sprite3->radius;
-                                ++sithRender_82F4B4;
-                                clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
-                                goto LABEL_24;
-
-                            case RD_THINGTYPE_PARTICLECLOUD:
-                                clipRadius = thingIter->rdthing.particlecloud->cloudRadius;
-                                clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
-                                goto LABEL_24;
-
-                            case RD_THINGTYPE_POLYLINE:
-                                radius = thingIter->rdthing.polyline->length;
-                                clipRadius = radius;
-                                clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
-                                goto LABEL_24;
-
-                            default:
-                                clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
-LABEL_24:
-                                thingIter->rdthing.clippingIdk = clippingVal;
-                                if ( clippingVal == 2 )
-                                    break;
-                                curWorld = sithWorld_pCurrentWorld;
-                                if ( thingIter->rdthing.type != RD_THINGTYPE_MODEL )
-                                    goto LABEL_42;
-                                model3 = thingIter->rdthing.model3;
-                                switch ( model3->numGeosets )
+                            case 1:
+                                break;
+                            case 2:
+                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
                                 {
-                                    case 1:
-                                        goto LABEL_42;
-                                    case 2:
-                                        if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
-                                        {
-                                            model3->geosetSelect = 0;
-                                            goto LABEL_42;
-                                        }
-                                        goto LABEL_41;
-                                    case 3:
-                                        if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.x )
-                                        {
-                                            model3->geosetSelect = 0;
-                                            goto LABEL_42;
-                                        }
-                                        if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.y )
-                                        {
-                                            model3->geosetSelect = 2;
-                                            goto LABEL_42;
-                                        }
-LABEL_41:
-                                        model3->geosetSelect = 1;
-                                        goto LABEL_42;
+                                    model3->geosetSelect = 0;
                                 }
+                                else
+                                {
+                                    model3->geosetSelect = 1;
+                                }
+                                break;
+                            case 3:
                                 if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.x )
                                 {
                                     model3->geosetSelect = 0;
-                                    goto LABEL_42;
                                 }
-                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
-                                    goto LABEL_41;
-                                if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.z )
+                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.y )
+                                {
+                                    model3->geosetSelect = 2;
+                                }
+                                else
+                                {
+                                    model3->geosetSelect = 1;
+                                }
+
+                                break;
+                            default:
+                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.x )
+                                {
+                                    model3->geosetSelect = 0;
+                                }
+                                else if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
+                                    model3->geosetSelect = 1;
+                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.z )
                                     model3->geosetSelect = 3;
                                 else
                                     model3->geosetSelect = 2;
-LABEL_42:
-                                v8 = thingIter->rdthing.texMode;
-                                if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
-                                {
-                                    thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
-                                }
-                                else
-                                {
-                                    v9 = 1;
-                                    if ( v8 <= 1 )
-                                        v9 = thingIter->rdthing.texMode;
-                                    thingIter->rdthing.textureMode = v9;
-                                }
-                                if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
-                                {
-                                    thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
-                                }
-                                else
-                                {
-                                    if ( v8 > 1 )
-                                        v8 = 1;
-                                    thingIter->rdthing.textureMode = v8;
-                                }
-                                if ( (thingIter->thingflags & 1) != 0
-                                  && thingIter->light > 0.0
-                                  && (thingIter->light < 0.0 ? (v10 = 0.0) : thingIter->light > 1.0 ? (v10 = 1.0) : (v10 = thingIter->light), a2 <= v10) )
-                                {
-                                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
-                
-                                }
-                                else
-                                {
-                                    rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
-                                }
-                                if ( a2 >= 1.0 )
-                                {
-                                    v11 = thingIter->rdthing.lightMode;
-                                    if ( v16 )
-                                    {
-                                        v11 = v11 > 0 ? 0 : v11;
-                                        goto LABEL_77;
-                                    }
-                                    goto LABEL_73;
-                                }
-                                if ( (thingIter->thingflags & SITH_TF_4000000) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
-                                {
-                                    v11 = thingIter->rdthing.lightMode;
-LABEL_73:
-                                    if ( v11 > 2 )
-                                        v11 = 2;
-                                    goto LABEL_77;
-                                }
-                                v11 = thingIter->rdthing.lightMode;
-                                if ( v11 > 3 )
-                                    v11 = 3;
-LABEL_77:
-                                thingIter->rdthing.lightingMode = v11;
-                                if ( sithRender_RenderPov(thingIter) )
-                                    ++sithRender_831984;
                                 break;
                         }
                     }
+                    
+                    v8 = thingIter->rdthing.texMode;
+                    if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
+                    {
+                        thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
+                    }
+                    else
+                    {
+                        v9 = 1;
+                        if ( v8 <= 1 )
+                            v9 = thingIter->rdthing.texMode;
+                        thingIter->rdthing.textureMode = v9;
+                    }
+                    if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
+                    {
+                        thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
+                    }
+                    else
+                    {
+                        if ( v8 > 1 )
+                            v8 = 1;
+                        thingIter->rdthing.textureMode = v8;
+                    }
+                    if ( (thingIter->thingflags & 1) != 0
+                      && thingIter->light > 0.0
+                      && (thingIter->light < 0.0 ? (v10 = 0.0) : thingIter->light > 1.0 ? (v10 = 1.0) : (v10 = thingIter->light), a2 <= v10) )
+                    {
+                        rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
+    
+                    }
+                    else
+                    {
+                        rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
+                    }
+                    if ( a2 >= 1.0 )
+                    {
+                        v11 = thingIter->rdthing.lightMode;
+                        if ( v16 )
+                        {
+                            v11 = v11 > 0 ? 0 : v11;
+                        }
+                        else
+                        {
+                            if ( v11 > 2 )
+                                v11 = 2;
+                        }
+                    }
+                    else if ( (thingIter->thingflags & SITH_TF_4000000) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
+                    {
+                        v11 = thingIter->rdthing.lightMode;
+                        if ( v11 > 2 )
+                            v11 = 2;
+                    }
+                    else
+                    {
+                        v11 = thingIter->rdthing.lightMode;
+                        if ( v11 > 3 )
+                            v11 = 3;
+                    }
+                    thingIter->rdthing.lightingMode = v11;
+                    if ( sithRender_RenderPov(thingIter) )
+                        ++sithRender_831984;
                 }
-                thingIter = thingIter->nextThing;
             }
-            while ( thingIter );
-            v0 = i;
         }
-        ++v0;
     }
     rdCache_Flush();
 }
