@@ -1792,7 +1792,7 @@ void do_hooks()
     hook_function(sithRender_UpdateLights_ADDR, sithRender_UpdateLights);
     hook_function(sithRender_RenderDynamicLights_ADDR, sithRender_RenderDynamicLights);
     hook_function(sithRender_RenderThings_ADDR, sithRender_RenderThings);
-    hook_function(sithRender_RenderPov_ADDR, sithRender_RenderPov);
+    hook_function(sithRender_RenderThing_ADDR, sithRender_RenderThing);
     hook_function(sithRender_RenderAlphaSurfaces_ADDR, sithRender_RenderAlphaSurfaces);
     hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
     

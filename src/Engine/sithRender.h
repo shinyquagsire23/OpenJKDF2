@@ -23,7 +23,7 @@
 #define sithRender_UpdateLights_ADDR (0x004C7720)
 #define sithRender_RenderDynamicLights_ADDR (0x004C79A0)
 #define sithRender_RenderThings_ADDR (0x004C7BE0)
-#define sithRender_RenderPov_ADDR (0x004C8070)
+#define sithRender_RenderThing_ADDR (0x004C8070)
 #define sithRender_RenderAlphaSurfaces_ADDR (0x004C8220)
 #define sithRender_SetRenderWeaponHandle_ADDR (0x004C8600)
 
@@ -46,7 +46,7 @@ void sithRender_UpdateAllLights();
 void sithRender_UpdateLights(sithSector *sector, float prev, float dist);
 void sithRender_RenderDynamicLights();
 void sithRender_RenderThings();
-int sithRender_RenderPov(sithThing *povThing);
+int sithRender_RenderThing(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
 int sithRender_SetRenderWeaponHandle(void *a1);
 
@@ -61,6 +61,6 @@ static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_RenderDynam
 static void (*sithRender_RenderLevelGeometry_)() = (void*)sithRender_RenderLevelGeometry_ADDR;
 //static void (*sithRender_RenderThings)() = (void*)sithRender_RenderThings_ADDR;
 static void (*sithRender_RenderAlphaSurfaces_)() = (void*)sithRender_RenderAlphaSurfaces_ADDR;
-//static int (*sithRender_RenderPov)(sithThing *a2) = (void*)sithRender_RenderPov_ADDR;
+//static int (*sithRender_RenderThing)(sithThing *a2) = (void*)sithRender_RenderThing_ADDR;
 
 #endif // _SITHRENDER_H

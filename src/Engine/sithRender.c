@@ -987,7 +987,7 @@ LABEL_150:
                 {
                     if ( a2 >= 1.0 )
                         i->rdthing.lightMode = 0;
-                    if ( sithRender_RenderPov(i) )
+                    if ( sithRender_RenderThing(i) )
                         ++sithRender_831980;
                 }
             }
@@ -1333,7 +1333,7 @@ void sithRender_RenderThings()
                             v11 = 3;
                     }
                     thingIter->rdthing.lightingMode = v11;
-                    if ( sithRender_RenderPov(thingIter) )
+                    if ( sithRender_RenderThing(thingIter) )
                         ++sithRender_831984;
                 }
             }
@@ -1342,7 +1342,7 @@ void sithRender_RenderThings()
     rdCache_Flush();
 }
 
-int sithRender_RenderPov(sithThing *povThing)
+int sithRender_RenderThing(sithThing *povThing)
 {
     int ret;
 
