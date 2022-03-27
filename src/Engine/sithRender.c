@@ -748,9 +748,7 @@ void sithRender_RenderLevelGeometry()
                         v53 = v51 + 1;
                         do
                         {
-                            v54 = *v53 - v67;
-                            if ( v54 < 0.0 )
-                                v54 = -v54;
+                            v54 = fabs(*v53 - v67);
                             if ( v54 > 0.015625 )
                                 break;
                             ++v52;
@@ -876,17 +874,9 @@ void sithRender_RenderLevelGeometry()
                         v20->light_level_static = 0.0;
                         v20->ambientLight = v29;
                     }
-                    else if ( level_idk->extraLight < 0.0 )
-                    {
-                        v20->ambientLight = 0.0;
-                    }
-                    else if ( level_idk->extraLight > 1.0 )
-                    {
-                        v20->ambientLight = 1.0;
-                    }
                     else
                     {
-                        v20->ambientLight = level_idk->extraLight;
+                        v20->ambientLight = stdMath_Clamp(level_idk->extraLight, 0.0, 1.0);
                     }
                     if ( v20->ambientLight < 1.0 )
                     {
@@ -912,9 +902,7 @@ void sithRender_RenderLevelGeometry()
                             v33 = v31 + 1;
                             do
                             {
-                                v34 = *v33 - v66;
-                                if ( v34 < 0.0 )
-                                    v34 = -v34;
+                                v34 = fabs(*v33 - v66);
                                 if ( v34 > 0.015625 )
                                     break;
                                 ++v32;
@@ -1168,7 +1156,6 @@ void sithRender_RenderThings()
     rdModel3 *model3; // ecx
     int v8; // ecx
     int v9; // eax
-    double v10; // st7
     int v11; // eax
     float v12; // [esp-Ch] [ebp-28h]
     float a2; // [esp+8h] [ebp-14h]
@@ -1311,7 +1298,7 @@ void sithRender_RenderThings()
                     }
                     if ( (thingIter->thingflags & 1) != 0
                       && thingIter->light > 0.0
-                      && (thingIter->light < 0.0 ? (v10 = 0.0) : thingIter->light > 1.0 ? (v10 = 1.0) : (v10 = thingIter->light), a2 <= v10) )
+                      && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
                         rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
     
