@@ -292,3 +292,32 @@ int jkGame_Update()
     return result;
 }
 #endif
+
+#ifdef SDL2_RENDER
+void jkGame_Screenshot()
+{
+    printf("TODO: Implement screenshots\n");
+}
+#endif
+
+void jkGame_Gamma()
+{
+    int v0; // eax
+    char *v1; // eax
+
+    v0 = ++Video_modeStruct.Video_8606A4;
+    if ( Video_modeStruct.Video_8606A4 >= 0xAu )
+    {
+        v0 = 0;
+        Video_modeStruct.Video_8606A4 = 0;
+    }
+    stdDisplay_GammaCorrect3(v0);
+#ifndef SDL2_RENDER
+    stdPalEffects_RefreshPalette();
+    if ( Video_modeStruct.b3DAccel )
+    {
+        v1 = stdDisplay_GetPalette();
+        sithRender_SetPalette(v1);
+    }
+#endif
+}

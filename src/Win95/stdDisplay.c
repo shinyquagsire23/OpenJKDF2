@@ -476,4 +476,10 @@ stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b)
 {
     return b;
 }
+
+int stdDisplay_GammaCorrect3(int a1)
+{
+    jk_printf("STUB: stdDisplay_GammaCorrect3\n");
+    return 1;
+}
 #endif

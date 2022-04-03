@@ -76,6 +76,7 @@ static void (*stdDisplay_ddraw_waitforvblank)(void) = (void*)stdDisplay_ddraw_wa
 static void (*stdDisplay_ddraw_surface_flip2)() = (void*)stdDisplay_ddraw_surface_flip2_ADDR;
 static void (*stdDisplay_RestoreDisplayMode)() = (void*)stdDisplay_RestoreDisplayMode_ADDR;
 static stdVBuffer* (*stdDisplay_VBufferConvertColorFormat)(void* a, stdVBuffer* b) = (void*)stdDisplay_VBufferConvertColorFormat_ADDR;
+static int (*stdDisplay_GammaCorrect3)(int a1) = (void*)stdDisplay_GammaCorrect3_ADDR;
 #else
 extern uint32_t Video_menuTexId;
 extern rdColor24 stdDisplay_masterPalette[256];
@@ -100,6 +101,7 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf);
 void stdDisplay_ddraw_surface_flip2();
 void stdDisplay_RestoreDisplayMode();
 stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b);
+int stdDisplay_GammaCorrect3(int a1);
 #endif
 
 #endif // _STDDISPLAY_H

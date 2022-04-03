@@ -37,7 +37,14 @@ void jkGame_ScreensizeDecrease();
 //static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
 //static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
 static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
-static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
+//static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
+
+void jkGame_Gamma();
+
+#ifdef SDL2_RENDER
+void jkGame_Screenshot();
+#else
 static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
+#endif
 
 #endif // _JKGAME_H
