@@ -370,7 +370,7 @@ void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal)
 
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos)
 {
-    sithRender_RenderDebugLight(light->intensity, lightPos);
+    //sithRender_RenderDebugLight(light->intensity * 10.0, lightPos);
     if ( camera->numLights > 0x40 )
         return 0;
 

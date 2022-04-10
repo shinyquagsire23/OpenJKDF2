@@ -39,20 +39,27 @@ void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
 {
 #if 0
     rdVector3 scale_test;
+
+    //intensity *= 10.0;
     
     scale_test.x = intensity * 2.0;
     scale_test.y = intensity * 2.0;
     scale_test.z = intensity * 2.0;
+
+    lightDebugThing_model3->radius = 0;
+    lightDebugThing->lightingMode = 0;
+    lightDebugThing->geosetSelect = 0;
+    lightDebugThing_model3->geosetSelect = 0;
     
-    if (intensity == 1.0)
+    /*if (intensity == 1.0)
     {
         scale_test.x = intensity * 2.0;
-    }
+    }*/
     
     rdMatrix_Identity34(&lightDebugThing_mat);
     rdMatrix_PreScale34(&lightDebugThing_mat, &scale_test);
     
-    printf("light %u: %f %f %f, %f\n", lightDebugNum++, pos->x, pos->y, pos->z, intensity);
+    //printf("light %u: %f %f %f, %f\n", lightDebugNum++, pos->x, pos->y, pos->z, intensity);
     rdVector_Copy3(&lightDebugThing_mat.scale, pos);
     rdThing_Draw(lightDebugThing, &lightDebugThing_mat);
 #endif
@@ -86,7 +93,7 @@ void sithRender_RenderDebugLights()
         v24 = 0;
         for (int i = 0; i < rdCamera_pCurCamera->numLights; i++)
         {
-            //sithRender_RenderDebugLight(2.0, &rdCamera_pCurCamera->lightPositions[i]);
+            sithRender_RenderDebugLight(rdCamera_pCurCamera->lights[i]->intensity, &rdCamera_pCurCamera->lightPositions[i]);
         
             /*float distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[i], &sectorIter->center);
             if ( (*curCamera_lights)->falloffMin + sectorIter->radius > distCalc)
@@ -293,10 +300,6 @@ void sithRender_Draw()
         sithRender_831980 = 0;
         rdCamera_ClearLights(rdCamera_pCurCamera);
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
-        
-#ifdef QOL_IMPROVEMENTS
-        sithRender_RenderDebugLights();
-#endif
 
         sithRender_UpdateAllLights();
         
@@ -312,6 +315,9 @@ void sithRender_Draw()
             sithRender_RenderAlphaSurfaces();
 
         rdSetCullFlags(3);
+#ifdef QOL_IMPROVEMENTS
+        sithRender_RenderDebugLights();
+#endif
     }
 }
 
