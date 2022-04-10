@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
+
 rm -rf OpenJKDF2.app
 rm -rf OpenJKDF2_x86_64.app
 rm -rf OpenJKDF2_arm64.app

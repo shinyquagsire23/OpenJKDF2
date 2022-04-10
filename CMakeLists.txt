@@ -269,6 +269,10 @@ if(TARGET_LINUX)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
 endif()
 
+if(TARGET_MACOS)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
+endif()
+
 if(PLAT_MSVC)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules_linux")
 endif()
@@ -479,7 +483,7 @@ elseif(PLAT_MSVC)
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
 	)
 else()
-    target_link_libraries(${BIN_NAME} SDL2::SDL2 ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
 endif()
 
 if(TARGET_MACOS)
