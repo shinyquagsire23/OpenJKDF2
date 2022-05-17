@@ -70,7 +70,7 @@ enum SITHSOUNDFLAG
 
 int sithSoundSys_Startup();
 void sithSoundSys_Shutdown();
-int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4);
+int sithSoundSys_PlaySong(unsigned int trackFrom, unsigned int trackTo, unsigned int trackNum, int a4);
 void sithSoundSys_StopSong();
 void sithSoundSys_UpdateMusicVolume(float musicVolume);
 void sithSoundSys_SetMusicVol(float volume);
