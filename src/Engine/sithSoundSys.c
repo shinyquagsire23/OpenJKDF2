@@ -39,29 +39,29 @@ void sithSoundSys_Shutdown()
     }
 }
 
-int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned int trackNum, int a4)
+int sithSoundSys_PlaySong(unsigned int trackFrom, unsigned int trackTo, unsigned int trackNum, int a4)
 {
-    unsigned int trackFrom_; // esi
-    unsigned int trackTo_; // edi
+    unsigned int trackTo_; // esi
+    unsigned int trackFrom_; // edi
     int result; // eax
 
     if ( sithSoundSys_bPlayingMci )
         stdMci_Stop();
-    trackFrom_ = trackFrom;
-    if ( trackFrom <= trackTo )
-        trackFrom_ = trackTo;
-    trackTo_ = trackNum;
-    if ( trackNum < trackTo )
+    trackTo_ = trackTo;
+    if (trackTo <= trackFrom)
+        trackTo_ = trackFrom;
+    trackFrom_ = trackNum;
+    if ( trackNum < trackFrom)
     {
-        trackTo_ = trackTo;
+        trackFrom_ = trackFrom;
     }
-    else if ( trackNum > trackFrom_ )
+    else if ( trackNum > trackTo_ )
     {
-        trackTo_ = trackFrom_;
+        trackFrom_ = trackTo_;
     }
-    sithSoundSys_trackTo = trackTo;
+    sithSoundSys_trackFrom = trackFrom;
     sithSoundSys_bPlayingMci = 1;
-    sithSoundSys_trackFrom = trackFrom_;
+    sithSoundSys_trackTo = trackTo_;
     sithSoundSys_dword_835FCC = a4;
     if ( !sithSoundSys_bIsMuted )
     {
@@ -71,7 +71,7 @@ int sithSoundSys_PlaySong(unsigned int trackTo, unsigned int trackFrom, unsigned
             stdMci_SetVolume(sithSoundSys_globalVolume);
         }
 
-        if ( !stdMci_Play(trackTo_, trackFrom_) )
+        if ( !stdMci_Play(trackFrom_, trackTo_) )
         {
             sithSoundSys_bPlayingMci = 0;
             return 0;
@@ -124,7 +124,7 @@ void sithSoundSys_UpdateMusicVolume(float musicVolume)
             if ( sithSoundSys_dword_835FCC )
             {
                 sithSoundSys_flt_835FD8 = sithTime_curSeconds - -5.0;
-                if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundSys_trackTo, sithSoundSys_trackFrom) )
+                if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundSys_trackFrom, sithSoundSys_trackTo) )
                 {
                     sithSoundSys_bPlayingMci = 0;
                     sithSoundSys_dword_835FCC = 0;
@@ -162,12 +162,14 @@ void sithSoundSys_ResumeMusic(int a1)
 {
     if ( sithSoundSys_bPlayingMci
       && !sithSoundSys_bIsMuted
+#ifndef QOL_IMPROVEMENTS
       && (a1 || sithControl_msIdle >= 0x7D0)
+#endif
       && sithSoundSys_dword_835FCC
       && (a1 || sithSoundSys_flt_835FD8 <= (double)sithTime_curSeconds) )
     {
         sithSoundSys_flt_835FD8 = sithTime_curSeconds - -5.0;
-        if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundSys_trackTo, sithSoundSys_trackFrom) )
+        if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundSys_trackFrom, sithSoundSys_trackTo) )
         {
             sithSoundSys_bPlayingMci = 0;
             sithSoundSys_dword_835FCC = 0;

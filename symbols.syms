@@ -174,8 +174,8 @@ sithSoundSys_bOpened 0x00836BEC int
 sithSoundSys_pLastSectorSoundSector 0x00836BF4 sithSector*
 sithSoundSys_dword_836BF8 0x00836BF8 int
 sithSoundSys_dword_836BFC 0x00836BFC int
-sithSoundSys_trackTo 0x008BBC74 int
-sithSoundSys_trackFrom 0x008BBC70 int
+sithSoundSys_trackFrom 0x008BBC74 int
+sithSoundSys_trackTo 0x008BBC70 int
 sithSoundSys_pPlayingSoundIdk 0x00836BF8 sithPlayingSound*
 sithSoundSys_dword_836C00 0x00836C00 int
 sithSoundSys_nextSoundIdx 0x0054A684 int = 1

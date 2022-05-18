@@ -8,14 +8,14 @@
 
 void sithCogFunctionSound_PlaySong(sithCog *ctx)
 {
-    int trackTo = sithCogVm_PopInt(ctx);
     int trackFrom = sithCogVm_PopInt(ctx);
+    int trackTo = sithCogVm_PopInt(ctx);
     int trackNum = sithCogVm_PopInt(ctx);
 
     if ( trackNum <= 0 )
         sithSoundSys_StopSong();
     else
-        sithSoundSys_PlaySong(trackTo, trackFrom, trackNum, 1);
+        sithSoundSys_PlaySong(trackFrom, trackTo, trackNum, 1);
 }
 
 void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)

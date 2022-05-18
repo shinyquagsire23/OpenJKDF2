@@ -765,8 +765,8 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
     if ( sithSoundSys_bPlayingMci )
     {
         NETMSG_PUSHU8(sithSoundSys_dword_835FCC);
-        NETMSG_PUSHU8(sithSoundSys_trackTo);
         NETMSG_PUSHU8(sithSoundSys_trackFrom);
+        NETMSG_PUSHU8(sithSoundSys_trackTo);
     }
     
     NETMSG_END(COGMSG_ID_1F);
@@ -818,8 +818,8 @@ int sithDSS_HandleMisc(sithCogMsg *msg)
     if ( sithSoundSys_bPlayingMci )
     {
         sithSoundSys_dword_835FCC = NETMSG_POPU8();
-        sithSoundSys_trackTo = NETMSG_POPU8();
         sithSoundSys_trackFrom = NETMSG_POPU8();
+        sithSoundSys_trackTo = NETMSG_POPU8();
         sithSoundSys_ResumeMusic(1);
     }
 
