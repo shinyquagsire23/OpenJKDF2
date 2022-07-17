@@ -1,0 +1,37 @@
+*.dSYM
+*.o
+*.gcno
+*.gcda
+.DS_Store
+
+.wsjcpp-logs/*
+.wsjcpp/*
+
+/.idea
+/cmake-build-*
+
+/.vs/
+/.vscode/
+
+# clangd cache
+/.cache/
+
+# build directories (vscode-cmake-tools, user-defined, ...)
+/build*/
+
+# fuzzers
+/tests/parse_*_fuzzer
+/tests/corpus_*
+
+/docs/mkdocs/docs/examples/
+/docs/mkdocs/docs/__pycache__/
+/docs/mkdocs/site/
+/docs/mkdocs/venv/
+/docs/docset/JSON_for_Modern_C++.docset/
+/docs/docset/JSON_for_Modern_C++.tgz
+/docs/mkdocs/docs/images/json.gif
+
+# serve_header
+/serve_header.yml
+/localhost.pem
+/localhost-key.pem
