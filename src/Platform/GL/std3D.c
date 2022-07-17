@@ -7,7 +7,6 @@
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
-#include "General/jsmn.h"
 
 #include "jk.h"
 

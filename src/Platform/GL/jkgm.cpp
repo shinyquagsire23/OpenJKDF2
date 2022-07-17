@@ -241,6 +241,7 @@ typedef struct jkgm_cache_entry_t
 static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache;
 static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache_hash;
 static bool jkgm_cache_once = false;
+static bool jkgm_fastpath_disable = false;
 
 #if 0
 static void jkgm_populate_cache()
@@ -440,6 +441,16 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     texture->emissive_data = NULL;
     texture->albedo_data = NULL;
 
+    if (jkgm_fastpath_disable) {
+        return 0;
+    }
+
+    const fs::path jkgm_materials_path{ "jkgm/materials/" };
+    if (!fs::exists(jkgm_materials_path)) {
+        jkgm_fastpath_disable = true;
+        return 0;
+    }
+
     uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
     uint16_t* image_16bpp = (uint16_t*)vbuf->sdlSurface->pixels;
     uint8_t* pal = (uint8_t*)vbuf->palette;
@@ -483,8 +494,6 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     //print_hash(ctx.digest);
 
     std::string hash = jkgm_hash_to_str(ctx.digest);
-    
-    const fs::path jkgm_materials_path{ "jkgm/materials/" };
 
     std::string full_fpath_str = std::string(material->mat_full_fpath);
     std::string cache_key = full_fpath_str + std::to_string(cel);
