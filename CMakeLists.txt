@@ -52,7 +52,7 @@ set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
 # Options for compiling
-set(OPENJKDF2_NO_ASAN FALSE)
+set(OPENJKDF2_NO_ASAN TRUE)
 
 message( STATUS "${PLAT_MINGW_X86_64}")
 
@@ -65,6 +65,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND PLAT_AUTO)
 endif()
 
 add_definitions(-DQOL_IMPROVEMENTS)
+set(CMAKE_CXX_STANDARD 17)
 
 if(PLAT_LINUX_32)
     message( STATUS "Targeting Linux 32-bit" )
@@ -86,7 +87,7 @@ if(PLAT_LINUX_32)
     endif()
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_LINUX_64)
@@ -106,7 +107,7 @@ elseif(PLAT_LINUX_64)
     set(OPENJKDF2_NO_ASAN TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS)
@@ -126,7 +127,7 @@ elseif(PLAT_MACOS)
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS_X86_64)
@@ -146,7 +147,7 @@ elseif(PLAT_MACOS_X86_64)
     set(HOMEBREW_PREFIX "/usr/local")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MINGW_X86_64)
@@ -158,6 +159,7 @@ elseif(PLAT_MINGW_X86_64)
     add_definitions(-DWIN64_STANDALONE)
     add_definitions(-DARCH_64BIT)
     add_definitions(-DWIN32)
+    add_definitions(-DWIN64_MINGW)
 
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
@@ -169,7 +171,7 @@ elseif(PLAT_MINGW_X86_64)
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    
     add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
     add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS)
 
@@ -178,6 +180,8 @@ elseif(PLAT_MINGW_X86_64)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/glew/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/include/SDL2)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/include/SDL2)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/include)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/include)
 
 elseif(PLAT_WASM)
     message( STATUS "Targeting Emscripten WASM" )
@@ -249,7 +253,7 @@ elseif(PLAT_MSVC)
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    
     #add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
     #add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS)
 
@@ -282,8 +286,13 @@ if(NOT PLAT_MINGW_X86_64 AND NOT PLAT_HOOKS AND NOT PLAT_WASM)
     find_package(SDL2_mixer REQUIRED)
     find_package(OpenAL REQUIRED)
     find_package(GLEW 2.0 REQUIRED)
+
+    set(JSON_Install OFF CACHE INTERNAL "")
+    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 else()
     # idk
+    set(JSON_Install OFF CACHE INTERNAL "")
+    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 endif()
 
 # All of the includes
@@ -320,6 +329,9 @@ endif()
 if(TARGET_USE_OPENGL)
     file(GLOB TARGET_GL_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/GL/*.c)
     list(APPEND SOURCE_FILES ${TARGET_GL_SRCS})
+
+    file(GLOB TARGET_GL_CPP_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/GL/*.cpp)
+    list(APPEND SOURCE_FILES ${TARGET_GL_CPP_SRCS})
 endif()
 
 if(TARGET_USE_D3D)
@@ -369,7 +381,7 @@ if(TARGET_WIN32)
         if(PLAT_MSVC)
 			set(LINK_LIBS ${LINK_LIBS} ole32.lib uuid.lib)
 		else()
-			add_link_options(-lole32 -luuid)
+			add_link_options(-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid)
 		endif()
     endif()
 endif()
@@ -415,7 +427,23 @@ endif()
 # TODO byacc and flex
 
 if(TARGET_MACOS)
-    target_link_libraries(${BIN_NAME} "-framework AppKit")
+    set_target_properties(${BIN_NAME} PROPERTIES
+      LINK_SEARCH_START_STATIC ON
+      LINK_SEARCH_END_STATIC ON
+    )
+    target_link_libraries(${BIN_NAME} PRIVATE "-framework AppKit")
+
+    find_package(PkgConfig REQUIRED)
+    
+    pkg_check_modules(LIBPNG REQUIRED libpng)
+    include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
+    link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
+    add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
+
+    pkg_check_modules(ZLIB REQUIRED zlib)
+    include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
+    link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
+    add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 endif()
 
 if(TARGET_LINUX)
@@ -424,28 +452,46 @@ if(TARGET_LINUX)
     include_directories(${GTK3_INCLUDE_DIRS})
     link_directories(${GTK3_LIBRARY_DIRS})
     add_definitions(${GTK3_CFLAGS_OTHER})
+    
+    pkg_check_modules(LIBPNG REQUIRED libpng)
+    include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
+    link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
+    add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 endif()
 
 if(NOT OPENJKDF2_NO_ASAN)
     add_compile_options(-fsanitize=address -fsanitize=float-divide-by-zero)
     add_link_options(-fsanitize=address -fsanitize=float-divide-by-zero)
-    target_link_libraries(${BIN_NAME} "-static-libsan")
+    target_link_libraries(${BIN_NAME} PRIVATE "-static-libsan")
 
     add_compile_options(-fsanitize=leak)
     add_link_options(-fsanitize=leak)
 endif()
 
 if(PLAT_MINGW_X86_64)
-    target_link_libraries(${BIN_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lpthread -Wl,-Bdynamic)
+    set_target_properties(${BIN_NAME} PROPERTIES
+      LINK_SEARCH_START_STATIC ON
+      LINK_SEARCH_END_STATIC ON
+    )
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+    target_link_libraries(${BIN_NAME} PRIVATE -static)
+    set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+    target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
 
-    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/" freeglut)
-    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/glew/lib/Release/x64" opengl32 glew32)
-    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib" mingw32 SDL2main SDL2)
-    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/lib" SDL2_mixer)
-    target_link_libraries(${BIN_NAME} "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
-
-    target_link_libraries(${BIN_NAME} -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
     
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/" freeglut)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/glew/lib/Release/x64" opengl32 glew32)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/lib" mingw32 SDL2main SDL2)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/lib" SDL2_mixer)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib/" png)
+    target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib/" z)
+    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid)
+
+    target_link_libraries(${BIN_NAME} PRIVATE -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/bin/SDL2.dll ${CMAKE_CURRENT_BINARY_DIR})
     add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/SDL2_mixer.dll ${CMAKE_CURRENT_BINARY_DIR})
@@ -457,24 +503,23 @@ if(PLAT_MINGW_X86_64)
     add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/*.dll ${CMAKE_CURRENT_BINARY_DIR})
     add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR})
 elseif(PLAT_HOOKS)
-    target_link_libraries(${BIN_NAME} -static-libgcc)
-    target_link_libraries("${BIN_NAME}_kvm" -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
+    target_link_libraries(${BIN_NAME} PRIVATE -static-libgcc)
+    target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
 elseif(PLAT_WASM)
-    target_link_libraries(${BIN_NAME} -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
+    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lpng)
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
-    target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(PLAT_MSVC)
-	target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES})
+	target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid)
 	
 	add_custom_command(TARGET ${BIN_NAME} 
 	POST_BUILD 
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/bin/SDL2.dll ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/SDL2_mixer.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libogg-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbis-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/OpenAL32.dll
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbgcore.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
 	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbghelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
 	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
@@ -483,7 +528,14 @@ elseif(PLAT_MSVC)
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
 	)
 else()
-    target_link_libraries(${BIN_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    set(LIBPNG_LIST ${LIBPNG_LIBRARY_DIRS})
+    separate_arguments(LIBPNG_LIST)
+    message(STATUS "list = ${ZLIB_STATIC_LDFLAGS}")
+    list(FILTER LIBPNG_LIST INCLUDE REGEX ${HOMEBREW_PREFIX}.*)
+    message(STATUS "list = ${LIBPNG_LIST}")
+
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW ${LIBPNG_LIST}/libpng.a ${ZLIB_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
 if(TARGET_MACOS)

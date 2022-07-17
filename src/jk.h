@@ -1,6 +1,10 @@
 #ifndef JK_H
 #define JK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 #include <stdio.h>
 
@@ -20,7 +24,9 @@
 #include <ctype.h>
 #endif
 
+#ifndef __cplusplus
 #include "Cog/sithCogParse.h"
+#endif
 
 #define WinMain_ADDR (0x41EBD0)
 
@@ -356,5 +362,9 @@ float _frand();
 
 void jk_init();
 int _iswspace(int a);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // JK_H

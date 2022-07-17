@@ -919,7 +919,7 @@ LABEL_56:
             }
             break;
         case THINGPARAM_CREATETHING:
-            thing->template = sithTemplate_GetEntryByName(arg->value);
+            thing->pTemplate = sithTemplate_GetEntryByName(arg->value);
             result = 1;
             break;
         case THINGPARAM_ORIENT:
@@ -1674,7 +1674,7 @@ LABEL_48:
     v24 = v17->class_cog;
     if ( v24 )
         sithCog_SendMessage(v24, SITH_MESSAGE_CREATED, 3, v17->thingIdx, 0, 0, 0);
-    v25 = v17->template;
+    v25 = v17->pTemplate;
     if ( v25 )
     {
         v26 = sithThing_Create(v25, position, lookOrientation, sector, prevThing);

@@ -29,7 +29,7 @@ build_run_openjkdf2_64.sh
 build_run_openjkdf2_blobs.sh
 build_run_tpm.sh
 build_run_mots.sh
-*.txt
+./*.txt
 *.idb
 *.id0
 *.id1

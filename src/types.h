@@ -939,6 +939,12 @@ typedef struct rdDDrawSurface
     uint32_t gpu_accel_maybe;
     rdDDrawSurface* tex_prev;
     rdDDrawSurface* tex_next;
+#ifdef SDL2_RENDER
+    uint32_t emissive_texture_id;
+    float emissive_factor[3];
+    void* emissive_data;
+    void* albedo_data;
+#endif
 } rdDDrawSurface;
 
 typedef struct rdTexformat
@@ -1098,6 +1104,9 @@ typedef struct rdMaterial
 {
     uint32_t tex_type;
     char mat_fpath[32];
+#ifdef SDL2_RENDER
+    char mat_full_fpath[256];
+#endif
     uint32_t id;
     rdTexformat tex_format;
     rdColor24 *palette_alloc;
@@ -2406,7 +2415,7 @@ typedef struct sithThing
     sithThing* parentThing;
     uint32_t signature;
     sithThing* templateBase;
-    sithThing* template;
+    sithThing* pTemplate;
     sithThing* prev_thing;
     uint32_t child_signature;
     rdMatrix34 lookOrientation;

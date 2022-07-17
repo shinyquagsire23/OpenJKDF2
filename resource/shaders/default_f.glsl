@@ -5,6 +5,7 @@
 #define LIGHT_DIVISOR (6.0)
 
 uniform sampler2D tex;
+uniform sampler2D texEmiss;
 uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
 uniform int tex_mode;
@@ -13,6 +14,7 @@ uniform vec3 colorEffects_tint;
 uniform vec3 colorEffects_filter;
 uniform float colorEffects_fade;
 uniform vec3 colorEffects_add;
+uniform vec3 emissiveFactor;
 uniform float light_mult;
 uniform vec2 iResolution;
 
@@ -110,6 +112,7 @@ vec4 bilinear_paletted_light(float index)
 void main(void)
 {
     vec4 sampled = texture(tex, f_uv);
+    vec4 sampledEmiss = texture(texEmiss, f_uv);
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 vertex_color = f_color;
     float index = sampled.r;
@@ -220,6 +223,12 @@ void main(void)
     }
     vec4 main_color = (sampled_color * vertex_color);
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
+
+    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    {
+        color_add = sampledEmiss;
+        color_add.rgb *= (emissiveFactor * 0.12);
+    }
 
     color_add.a = 0.0;
     fragColor = main_color + effectAdd_color;// + color_add;

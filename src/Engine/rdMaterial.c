@@ -7,6 +7,10 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+#ifdef SDL2_RENDER
+#include "Platform/GL/jkgm.h"
+#endif
+
 void rdMaterial_RegisterLoader(rdMaterialLoader_t load)
 {
     pMaterialsLoader = load;
@@ -41,44 +45,45 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
 
 int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem)
 {
-  int mat_file; // eax
-  int mat_file_; // ebx
-  int num_texinfo; // eax
-  int tex_type; // edx
-  int *texture_idk; // edi
-  rdTexinfo *texinfo_alloc; // eax
-  int num_textures; // ecx
-  rdTexture *textures; // eax
-  rdTexture *texture; // esi
-  unsigned int mipmap_num; // ebx
-  int bpp; // eax
-  stdVBuffer **texture_struct; // edi
-  int v21; // cf
-  unsigned int v22; // edi
-  int *v23; // esi
-  rdTexinfo **v24; // ebx
-  rdColor24 *colors; // eax
-  char *v26; // eax
-  struct common_functions *v27; // eax
-  int mat_file__; // [esp+10h] [ebp-128h]
-  int tex_num; // [esp+14h] [ebp-124h]
-  int tex_numa; // [esp+14h] [ebp-124h]
-  rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]
-  rdTexinfoHeader texinfo_header; // [esp+38h] [ebp-100h]
-  rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
-  stdVBufferTexFmt format; // [esp+60h] [ebp-D8h]
-  rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
-  int textures_idk[16]; // [esp+F8h] [ebp-40h]
-  stdVBuffer *created_tex; // eax
+    int mat_file; // eax
+    int mat_file_; // ebx
+    int num_texinfo; // eax
+    int tex_type; // edx
+    int *texture_idk; // edi
+    rdTexinfo *texinfo_alloc; // eax
+    int num_textures; // ecx
+    rdTexture *textures; // eax
+    rdTexture *texture; // esi
+    unsigned int mipmap_num; // ebx
+    int bpp; // eax
+    stdVBuffer **texture_struct; // edi
+    int v21; // cf
+    unsigned int v22; // edi
+    int *v23; // esi
+    rdTexinfo **v24; // ebx
+    rdColor24 *colors; // eax
+    char *v26; // eax
+    int mat_file__; // [esp+10h] [ebp-128h]
+    int tex_num; // [esp+14h] [ebp-124h]
+    int tex_numa; // [esp+14h] [ebp-124h]
+    rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]
+    rdTexinfoHeader texinfo_header; // [esp+38h] [ebp-100h]
+    rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
+    stdVBufferTexFmt format; // [esp+60h] [ebp-D8h]
+    rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
+    int textures_idk[16]; // [esp+F8h] [ebp-40h]
+    stdVBuffer *created_tex; // eax
 
-  memset(&format, 0, sizeof(format));
+    memset(&format, 0, sizeof(format));
 
-  _memset(material, 0, sizeof(rdMaterial));
-  mat_file = rdroid_pHS->fileOpen(mat_fpath, "rb");
-  mat_file_ = mat_file;
-  mat_file__ = mat_file;
-  if ( mat_file )
-  {
+    _memset(material, 0, sizeof(rdMaterial));
+    mat_file = rdroid_pHS->fileOpen(mat_fpath, "rb");
+    mat_file_ = mat_file;
+    mat_file__ = mat_file;
+    if (!mat_file) {
+        return 0;
+    }
+
     rdroid_pHS->fileRead(mat_file, &mat_header, sizeof(rdMaterialHeader));
     if ( _memcmp(mat_header.magic, "MAT ", 4u) || mat_header.revision != '2' )
     {
@@ -216,12 +221,21 @@ LABEL_22:
     }
     v26 = stdFileFromPath(mat_fpath);
     _strncpy(material->mat_fpath, v26, 0x1Fu);
-    v27 = rdroid_pHS;
     material->mat_fpath[31] = 0;
-    v27->fileClose(mat_file_);
+    rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
-  }
-  return mat_file;
+#ifdef SDL2_RENDER
+    _strncpy(material->mat_full_fpath, mat_fpath, 0xFF);
+    for (int i = 0; i < 256; i++)
+    {
+        if (material->mat_full_fpath[i] == '\\') {
+            material->mat_full_fpath[i] = '/';
+        }
+    }
+    material->mat_full_fpath[255] = 0;
+#endif
+
+    return mat_file;
 }
 
 void rdMaterial_Free(rdMaterial *material)
@@ -298,6 +312,16 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
 {
     stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
 
+    int celIdx = 0;
+    for (int i = 0; i < material->num_textures; i++)
+    {
+        if (texture == &material->textures[i])
+        {
+            celIdx = i;
+            break;
+        }
+    }
+
 #ifdef SDL2_RENDER
     mipmap->palette = material->palette_alloc;
 #endif
@@ -310,6 +334,13 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             std3D_UpdateFrameCount(surface);
             return 1;
         }
+#ifdef SDL2_RENDER
+        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
+        {
+            //printf("%s\n", material->mat_fpath);
+            return 1;
+        }
+#endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
         {
             return 1;
@@ -324,6 +355,13 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             std3D_UpdateFrameCount(surface);
             return 1;
         }
+#ifdef SDL2_RENDER
+        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
+        {
+            //printf("%s\n", material->mat_fpath);
+            return 1;
+        }
+#endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
         {
             return 1;

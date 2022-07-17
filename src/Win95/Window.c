@@ -731,7 +731,7 @@ void Window_SdlUpdate()
 
         if (SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
             SDL_SetRelativeMouseMode(SDL_TRUE);
-            SDL_WarpMouseInWindow(displayWindow, 100, 100);
+            //SDL_WarpMouseInWindow(displayWindow, 100, 100);
         }
         else
         {

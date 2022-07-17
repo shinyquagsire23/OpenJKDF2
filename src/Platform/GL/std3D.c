@@ -7,23 +7,23 @@
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
+#include "General/jsmn.h"
 
 #include "jk.h"
-
-#ifdef ARCH_WASM
-#include <emscripten.h>
-#include <SDL.h>
-#include <SDL_opengles2.h>
-#endif
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Platform/GL/shader_utils.h"
+#include "Platform/GL/jkgm.h"
+
 #ifdef MACOS
+#define GL_SILENCE_DEPRECATION
 #include <SDL.h>
 #elif defined(ARCH_WASM)
-// wasm
+#include <emscripten.h>
+#include <SDL.h>
+#include <SDL_opengles2.h>
 #else
 #include <SDL.h>
 #include <GL/gl.h>
@@ -111,8 +111,8 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
-GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
+GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
+GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor;
 GLint uniform_light_mult, uniform_iResolution;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
@@ -123,6 +123,8 @@ std3DSimpleTexStage std3D_blurStage;
 std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
 
+GLuint blank_tex;
+void* blank_data;
 GLuint worldpal_texture;
 void* worldpal_data;
 GLuint worldpal_lights_texture;
@@ -132,9 +134,9 @@ void* displaypal_data;
 GLuint tiledrand_texture;
 rdVector3* tiledrand_data;
 
-static rdDDrawSurface* std3D_aLoadedSurfaces[1024];
-static GLuint std3D_aLoadedTextures[1024];
-static size_t std3D_loadedTexturesAmt = 0;
+rdDDrawSurface* std3D_aLoadedSurfaces[1024];
+GLuint std3D_aLoadedTextures[1024];
+size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[STD3D_MAX_TRIS];
 static size_t GL_tmpTrisAmt = 0;
 static rdLine GL_tmpLines[STD3D_MAX_VERTICES];
@@ -165,6 +167,8 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     pFbo->h = height;
     pFbo->iw = width;
     pFbo->ih = height;
+
+    glActiveTexture(GL_TEXTURE0);
 
     glGenFramebuffers(1, &pFbo->fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
@@ -208,6 +212,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 
     pFb->w = width;
     pFb->h = height;
+
+    glActiveTexture(GL_TEXTURE0);
 
     glGenFramebuffers(1, &pFb->fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, pFb->fbo);
@@ -450,6 +456,7 @@ int init_resources()
     attribute_v_uv = std3D_tryFindAttribute(programDefault, "v_uv");
     uniform_mvp = std3D_tryFindUniform(programDefault, "mvp");
     uniform_tex = std3D_tryFindUniform(programDefault, "tex");
+    uniform_texEmiss = std3D_tryFindUniform(programDefault, "texEmiss");
     uniform_worldPalette = std3D_tryFindUniform(programDefault, "worldPalette");
     uniform_worldPaletteLights = std3D_tryFindUniform(programDefault, "worldPaletteLights");
     uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
@@ -458,6 +465,7 @@ int init_resources()
     uniform_filter = std3D_tryFindUniform(programDefault, "colorEffects_filter");
     uniform_fade = std3D_tryFindUniform(programDefault, "colorEffects_fade");
     uniform_add = std3D_tryFindUniform(programDefault, "colorEffects_add");
+    uniform_emissiveFactor = std3D_tryFindUniform(programDefault, "emissiveFactor");
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
     
@@ -468,6 +476,19 @@ int init_resources()
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
     
+    // Blank texture
+    glGenTextures(1, &blank_tex);
+    blank_data = malloc(64);
+    memset(blank_data, 0xFF, 64);
+    
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, blank_data);
+
     // World palette
     glGenTextures(1, &worldpal_texture);
     worldpal_data = malloc(0x300);
@@ -564,6 +585,7 @@ void std3D_FreeResources()
     glDeleteProgram(programMenu);
     std3D_deleteFramebuffer(&std3D_framebuffers[0]);
     std3D_deleteFramebuffer(&std3D_framebuffers[1]);
+    glDeleteTextures(1, &blank_tex);
     glDeleteTextures(1, &worldpal_texture);
     glDeleteTextures(1, &worldpal_lights_texture);
     glDeleteTextures(1, &displaypal_texture);
@@ -1419,15 +1441,19 @@ void std3D_DrawRenderList()
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
     
     glUniform1i(uniform_tex, 0);
     glUniform1i(uniform_worldPalette, 1);
     glUniform1i(uniform_worldPaletteLights, 2);
+    glUniform1i(uniform_texEmiss, 3);
     
     {
     
@@ -1468,6 +1494,7 @@ void std3D_DrawRenderList()
         glUniform3f(uniform_filter, 1.0, 1.0, 1.0);
     glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+    glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
     glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.25 : 0.85);
 
     rdTri* tris = GL_tmpTris;
@@ -1525,9 +1552,18 @@ void std3D_DrawRenderList()
                 int tex_id = tex->texture_id;
                 glActiveTexture(GL_TEXTURE0 + 0);
                 if (tex_id == 0)
-                    glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+                    glBindTexture(GL_TEXTURE_2D, blank_tex);
                 else
                     glBindTexture(GL_TEXTURE_2D, tex_id);
+
+                int emiss_tex_id = tex->emissive_texture_id;
+                glActiveTexture(GL_TEXTURE0 + 3);
+                if (emiss_tex_id == 0)
+                    glBindTexture(GL_TEXTURE_2D, blank_tex);
+                else
+                    glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
+                glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+                glActiveTexture(GL_TEXTURE0 + 0);
 
                 if (!jkPlayer_enableTextureFilter)
                     glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
@@ -1536,14 +1572,23 @@ void std3D_DrawRenderList()
                 
                 if (jkPlayer_enableTextureFilter && tex->is_16bit)
                 {
+                    glActiveTexture(GL_TEXTURE0 + 0);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glActiveTexture(GL_TEXTURE0 + 3);
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 }
                 else
                 {
+                    glActiveTexture(GL_TEXTURE0 + 0);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                    glActiveTexture(GL_TEXTURE0 + 3);
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 }
+                 glActiveTexture(GL_TEXTURE0 + 0);
 
                 if (tex_id == 0)
                     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
@@ -1740,6 +1785,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
     if (vbuf->format.format.is16bit)
     {
@@ -1796,7 +1843,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 #endif
 
     
-    
+done_load:    
     
     std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
     std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
@@ -1805,7 +1852,11 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     ext->surfacepaltex = pal_texture;*/
     
     texture->texture_id = image_texture;
+    texture->emissive_texture_id = 0;
     texture->texture_loaded = 1;
+    texture->emissive_factor[0] = 0.0;
+    texture->emissive_factor[1] = 0.0;
+    texture->emissive_factor[2] = 0.0;
     
     return 1;
 }
