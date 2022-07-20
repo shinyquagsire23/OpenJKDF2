@@ -250,6 +250,7 @@ void stdMci_trackStart(int track)
     stdMci_music = Mix_LoadMUS(tmp); 
     if (!stdMci_music) {
         printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
+        printf("Mix_LoadMUS: %s\n", Mix_GetError());
     }
 
     if (stdMci_music)
@@ -270,6 +271,7 @@ void stdMci_trackStart(int track)
     stdMci_music = Mix_LoadMUS(tmp); 
     if (!stdMci_music) {
         printf("WARN: Failed to play music `%s'\n", tmp);
+        printf("Mix_LoadMUS: %s\n", Mix_GetError());
         //return;
     }
 
@@ -303,6 +305,7 @@ void stdMci_trackStart(int track)
         stdMci_music = Mix_LoadMUS(tmp); 
         if (!stdMci_music) {
             printf("WARN: Failed to play music `%s' too. Must not have any music.\n", tmp);
+            printf("Mix_LoadMUS: %s\n", Mix_GetError());
         }
     }
 
@@ -311,7 +314,9 @@ void stdMci_trackStart(int track)
 done:
     stdMci_trackCurrent = track;
     Mix_HaltMusic();
-    Mix_PlayMusic(stdMci_music, 0);
+    if (Mix_PlayMusic(stdMci_music, 0) < 0) {
+        printf("Mix_PlayMusic: %s\n", Mix_GetError());
+    }
     Mix_HookMusicFinished(stdMci_trackFinished);
     printf("INFO: Playing music `%s'\n", tmp);
 }
