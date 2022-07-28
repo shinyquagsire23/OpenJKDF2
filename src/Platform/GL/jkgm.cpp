@@ -349,8 +349,16 @@ static std::string jkgm_hash_to_str(uint8_t *p){
     return std::string(tmp);
 }
 
-static void jkgm_populate_cache(const fs::path jkgm_materials_path)
+const fs::path jkgm_materials_path{ "jkgm/materials/" };
+
+void jkgm_populate_cache()
 {
+    if (jkgm_cache_once) return;
+
+    if (!fs::exists(jkgm_materials_path)) {
+        jkgm_fastpath_disable = true;
+        return;
+    }
 
     for (const auto& fs_entry : fs::directory_iterator(jkgm_materials_path)) {
         if (!fs_entry.is_directory()) {
@@ -432,24 +440,9 @@ static void jkgm_populate_cache(const fs::path jkgm_materials_path)
     jkgm_cache_once = true;
 }
 
-int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
+std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex)
 {
-    texture->emissive_texture_id = 0;
-    texture->emissive_factor[0] = 0.0f;
-    texture->emissive_factor[1] = 0.0f;
-    texture->emissive_factor[2] = 0.0f;
-    texture->emissive_data = NULL;
-    texture->albedo_data = NULL;
-
-    if (jkgm_fastpath_disable) {
-        return 0;
-    }
-
-    const fs::path jkgm_materials_path{ "jkgm/materials/" };
-    if (!fs::exists(jkgm_materials_path)) {
-        jkgm_fastpath_disable = true;
-        return 0;
-    }
+    if (!vbuf || !texture) return "AAAAAAAAAA";
 
     uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
     uint16_t* image_16bpp = (uint16_t*)vbuf->sdlSurface->pixels;
@@ -494,6 +487,61 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     //print_hash(ctx.digest);
 
     std::string hash = jkgm_hash_to_str(ctx.digest);
+    return hash;
+}
+
+void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int cel)
+{
+    if (!vbuf || !texture || jkgm_fastpath_disable) return;
+
+    jkgm_populate_cache();
+
+    std::string hash = jkgm_get_tex_hash(vbuf, texture, material, is_alpha_tex);
+
+    std::string full_fpath_str = std::string(material->mat_full_fpath);
+    std::string cache_key = full_fpath_str + std::to_string(cel);
+
+    //printf("%s %s %s\n", full_fpath_str.c_str(), cache_key.c_str(), hash.c_str());
+
+    if (jkgm_cache.find(cache_key) != jkgm_cache.end()) {
+        texture->skip_jkgm = 0;
+        return;
+    }
+
+    if (jkgm_cache_hash.find(hash) != jkgm_cache_hash.end()) {
+        texture->skip_jkgm = 0;
+        return;
+    }
+
+    texture->skip_jkgm = 1;
+}
+
+int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
+{
+    texture->emissive_texture_id = 0;
+    texture->emissive_factor[0] = 0.0f;
+    texture->emissive_factor[1] = 0.0f;
+    texture->emissive_factor[2] = 0.0f;
+    texture->emissive_data = NULL;
+    texture->albedo_data = NULL;
+
+    if (jkgm_fastpath_disable || texture->skip_jkgm) {
+        return 0;
+    }
+
+    
+    if (!jkgm_cache_once) {
+        if (!fs::exists(jkgm_materials_path)) {
+            jkgm_fastpath_disable = true;
+            return 0;
+        }
+    }
+    
+    uint32_t width, height;
+    width = vbuf->format.width;
+    height = vbuf->format.height;
+
+    std::string hash = jkgm_get_tex_hash(vbuf, texture, material, is_alpha_tex);
 
     std::string full_fpath_str = std::string(material->mat_full_fpath);
     std::string cache_key = full_fpath_str + std::to_string(cel);
@@ -503,10 +551,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     bool found_replace = false;
     bool has_emissive = false;
 
-    if (!jkgm_cache_once)
-    {
-        jkgm_populate_cache(jkgm_materials_path);
-    }
+    
+    jkgm_populate_cache();
 
     if (jkgm_cache.find(cache_key) != jkgm_cache.end()) {
         //printf("Path match!\n");
@@ -651,6 +697,10 @@ found_cached:
         texture->texture_loaded = 1;
         return 1;
     }
+
+    texture->skip_jkgm = 1;
+
+    printf("Cache miss, %s\n", cache_key.c_str());
 
     return 0;
 }

@@ -944,6 +944,7 @@ typedef struct rdDDrawSurface
     float emissive_factor[3];
     void* emissive_data;
     void* albedo_data;
+    int skip_jkgm;
 #endif
 } rdDDrawSurface;
 

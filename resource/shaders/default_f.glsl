@@ -106,7 +106,7 @@ vec4 bilinear_paletted_light(float index)
     vec4 temp1 = mix(c00, c10, filterWeight.x);
     vec4 blendColor = mix(temp1, temp0, filterWeight.y);
 
-    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * (1.0 - light) * light_mult;
+    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * light_mult ;//* (1.0 - light) * light_mult;
 }
 
 void main(void)
@@ -130,14 +130,14 @@ void main(void)
 #endif
     )
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && blend_mode == 5)
+        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == 5 || blend_mode == 6))
             discard;
         sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);
     }
 #ifdef CAN_BILINEAR_FILTER_16
     else if (tex_mode == 6)
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && blend_mode == 5)
+        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == 5 || blend_mode == 6))
             discard;
 
         // Get texture size in pixels:
@@ -199,7 +199,7 @@ void main(void)
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
         // Add more of the emissive color depending on the darkness of the fragment
-        color_add = (lightPalval * (1.0 - light) * light_mult);
+        color_add = (lightPalval  * light_mult); // * (1.0 - light)
         sampled_color = palval;
 
         //if (light_worldpalidx == 0.0)
@@ -218,30 +218,57 @@ void main(void)
 
     if (blend_mode == 5)
     {
-        if (sampled_color.a < 0.1)
-            discard;
+        //if (sampled_color.a < 0.1)
+        //    discard;
     }
+
     vec4 main_color = (sampled_color * vertex_color);
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
 
-    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    float should_write_normals = 1.0;
+    float orig_alpha = main_color.a;
+
+    if (blend_mode == 5 || blend_mode == 6)
     {
-        color_add = sampledEmiss;
-        color_add.rgb *= (emissiveFactor * 0.12);
+        should_write_normals = 0.0;
     }
 
-    color_add.a = 0.0;
+    if (blend_mode == 6)
+    {
+        //main_color.rgb *= (1.0 - main_color.a);
+        //should_write_normals = 0.0;
+        main_color.a = (1.0 - main_color.a);
+    }
+
+    //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    {
+        color_add.rgb += sampledEmiss.rgb * (emissiveFactor * 0.06);
+        //color_add.rgb *= main_color.a;
+        //color_add = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+
+    //color_add.a = 0.0;
     fragColor = main_color + effectAdd_color;// + color_add;
 
-    color_add.a = main_color.a;
+    color_add.a = orig_alpha;
 
-    // The emissive maps also include slight amounts of darkly-rendered geometry,
-    // so we want to ramp the amount that gets added based on luminance/brightness.
-    float luma = luminance(color_add.rgb) * 4.0;
+    float luma = luminance(color_add.rgb) * 0.5;// * 4.0;
 
-    color_add.r *= luma;
-    color_add.g *= luma;
-    color_add.b *= luma;
+    if (emissiveFactor.r != 0 || emissiveFactor.g != 0.0 || emissiveFactor.b != 0.0)
+    {
+        //color_add = vec4(1.0, 1.0, 1.0, 1.0);
+        luma = 1.0;
+    }
+    else
+    {
+        // The emissive maps also include slight amounts of darkly-rendered geometry,
+        // so we want to ramp the amount that gets added based on luminance/brightness.
+        
+
+        color_add.r *= luma;
+        color_add.g *= luma;
+        color_add.b *= luma;
+    }
 
     vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3);
 
@@ -267,7 +294,7 @@ void main(void)
     //color_add = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Dont include any windows or transparent objects in emissivity output
-    if (luma < 0.01 && main_color.a < 0.5)
+    if (luma < 0.01 && orig_alpha < 0.5 && (blend_mode == 5 || blend_mode == 6))
     {
         color_add = vec4(0.0, 0.0, 0.0, 0.0);
     }
@@ -280,6 +307,6 @@ void main(void)
     //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
     //fragColor = test_norms;
 
-    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, 1.0);
-    fragColorNormal = vec4(face_normals, 1.0);
+    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
+    fragColorNormal = vec4(face_normals, should_write_normals);
 }

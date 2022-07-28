@@ -21,19 +21,19 @@ void main(void)
     vec2 Radius = Size/iResolution.xy;
     
     // Pixel colour
-    vec4 Color = texture(tex, f_uv);
+    vec4 Color = texture(tex, f_uv, 1);
     
     // Blur calculations
     for( float d=0.0; d<Pi; d+=Pi/Directions)
     {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality)
         {
-            Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i);      
+            Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i, 1);      
         }
     }
     
     // Output to screen
-    Color /= Quality * Directions - (Directions == 16.0 ? 15.0 : 0.0); // HACK
+    Color /= Quality * Directions;// - (Directions == 16.0 ? 15.0 : 0.0); // HACK
 
     fragColor =  Color;
 

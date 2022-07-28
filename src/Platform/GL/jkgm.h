@@ -23,6 +23,8 @@ extern "C" {
 #include <GL/gl.h>
 #endif
 
+void jkgm_populate_cache();
+void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int cel);
 int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel);
 void* jkgm_alloc_aligned(size_t amt);
 

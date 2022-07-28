@@ -166,6 +166,10 @@ LABEL_21:
         texture->alphaMats[mipmap_num].gpu_accel_maybe = 0;
         texture->opaqueMats[mipmap_num].texture_loaded = 0;
         texture->opaqueMats[mipmap_num].gpu_accel_maybe = 0;
+#ifdef SDL2_RENDER
+        texture->alphaMats[mipmap_num].skip_jkgm = 0;
+        texture->opaqueMats[mipmap_num].skip_jkgm = 0;
+#endif
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
         if ( !created_tex )
@@ -233,6 +237,16 @@ LABEL_22:
         }
     }
     material->mat_full_fpath[255] = 0;
+
+    for (int i = 0; i < material->num_textures; i++)
+    {
+        rdTexture *texture = &material->textures[i];
+        for (int j = 0; j < texture->num_mipmaps; j++) {
+            stdVBuffer* mipmap = texture->texture_struct[j];
+            rdDDrawSurface* surface = &texture->alphaMats[j];
+            jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, i);
+        }
+    }
 #endif
 
     return mat_file;

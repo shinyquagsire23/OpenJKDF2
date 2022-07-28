@@ -180,6 +180,9 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+    glGenerateMipmap(GL_TEXTURE_2D);
     
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFbo->tex, 0);
@@ -237,6 +240,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, pFb->tex1, 0);
@@ -290,9 +297,9 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     {
         pFb->enable_extra |= 1;
         std3D_generateIntermediateFbo(width, height, &pFb->blur1, 0);
-        std3D_generateIntermediateFbo(pFb->blur1.w/2, pFb->blur1.h/2, &pFb->blur2, 0);
-        std3D_generateIntermediateFbo(pFb->blur2.w/2, pFb->blur2.h/2, &pFb->blur3, 0);
-        std3D_generateIntermediateFbo(pFb->blur3.w/2, pFb->blur3.h/2, &pFb->blur4, 0);
+        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 0);
+        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 0);
+        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 0);
 
         /*pFb->blur1.iw = width;
         pFb->blur1.ih = height;
@@ -477,16 +484,19 @@ int init_resources()
     
     // Blank texture
     glGenTextures(1, &blank_tex);
-    blank_data = malloc(64);
-    memset(blank_data, 0xFF, 64);
+    blank_data = malloc(0x100);
+    memset(blank_data, 0x0, 0x100);
     
     glBindTexture(GL_TEXTURE_2D, blank_tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, blank_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, blank_data);
 
     // World palette
     glGenTextures(1, &worldpal_texture);
@@ -498,19 +508,25 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
 
     // World palette lights
     glGenTextures(1, &worldpal_lights_texture);
     worldpal_lights_data = malloc(0x4000);
-    memset(worldpal_lights_data, 0x3F, 0x4000);
+    memset(worldpal_lights_data, 0xFF, 0x4000);
     
     glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 0x40, 0, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
     
@@ -525,6 +541,9 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
@@ -546,6 +565,9 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, tiledrand_data);
 
@@ -1113,7 +1135,7 @@ void std3D_DrawMenu()
     //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3)
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
@@ -1175,10 +1197,16 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, texId);
+    if (gen_mips)
+        glGenerateMipmap(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, texId2 ? texId2 : texId);
+    glBindTexture(GL_TEXTURE_2D, texId2 ? texId2 : blank_tex);
+    if (texId2 && gen_mips)
+        glGenerateMipmap(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0 + 2);
-    glBindTexture(GL_TEXTURE_2D, texId3 ? texId3 : texId);
+    glBindTexture(GL_TEXTURE_2D, texId3 ? texId3 : blank_tex);
+    if (texId3 && gen_mips)
+        glGenerateMipmap(GL_TEXTURE_2D);
 
     GLfloat data_vertices[32 * 3];
     GLubyte data_colors[32 * 4];
@@ -1344,6 +1372,18 @@ void std3D_DrawSceneFbo()
         return;
     }
 
+    if (jkPlayer_enableBloom)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur1.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur2.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur3.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+        glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur4.fbo);
+        glClear( GL_COLOR_BUFFER_BIT );
+    }
+
     // Clear SSAO stuff
     if (jkPlayer_enableSSAO)
     {
@@ -1353,44 +1393,122 @@ void std3D_DrawSceneFbo()
         glClear( GL_COLOR_BUFFER_BIT );
     }
 
+    float rad_scale = (float)std3D_pFb->w / 640.0;
+
     if (!jkPlayer_enableSSAO)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0.0, 0.0, 0.0); // test emission output
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
     }
     else
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, std3D_pFb->tex2, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0); // test ssao output
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur2, std3D_pFb->ssaoBlur1.tex, 0, 0, 14.0, 3.0, 4.0);
+        std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, std3D_pFb->tex2, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0, 0); // test ssao output
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur2, std3D_pFb->ssaoBlur1.tex, 0, 0, 14.0, 3.0, 1.0 * rad_scale, 1);
         //std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur3, std3D_pFb->ssaoBlur2.tex, 0, 0, 8.0, 3.0, 4.0);
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->window, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->window, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma, 0);
     }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+    if (!jkPlayer_enableBloom)
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
 
     if (jkPlayer_enableBloom)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 3.0);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 3.0);
+        
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
 
+        float bloom_intensity = 3.0;
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 0.0, 0.0, jkPlayer_gamma);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, bloom_intensity * 5.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, bloom_intensity * 2.5, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 0.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 0.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 0.0, bloom_intensity * 1.2, jkPlayer_gamma, 0);
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
+{
+    if (!tex) {
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glBindTexture(GL_TEXTURE_2D, blank_tex);
+        glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
+        glUniform1i(uniform_blend_mode, 2);
+        return;
+    }
+    int tex_id = tex->texture_id;
+    glActiveTexture(GL_TEXTURE0 + 0);
+    if (tex_id == 0)
+        glBindTexture(GL_TEXTURE_2D, blank_tex);
+    else
+        glBindTexture(GL_TEXTURE_2D, tex_id);
+
+    int emiss_tex_id = tex->emissive_texture_id;
+    glActiveTexture(GL_TEXTURE0 + 3);
+    if (emiss_tex_id == 0) {
+        glBindTexture(GL_TEXTURE_2D, blank_tex);
+    }
+    else {
+        //printf("emissive tex id %x\n", emiss_tex_id);
+        glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
+
+        // HACK
+        if (tri[0].flags & 0x600) {
+            glUniform1i(uniform_blend_mode, 6);
+            glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
+            last_flags |= 0x200;
+        }
+
+        
+        for (int i = 0; i < tris_left; i++) {
+            if (tri[i].texture != tex) break;
+            if (tri[i].flags & 0x600) {
+                tri[i].flags |= 0x200;
+            }
+        }
+    }
+    //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
+    //    printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    glActiveTexture(GL_TEXTURE0 + 0);
+
+    if (!jkPlayer_enableTextureFilter)
+        glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+    else
+        glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+    
+    if (jkPlayer_enableTextureFilter && tex->is_16bit)
+    {
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+     glActiveTexture(GL_TEXTURE0 + 0);
+
+    if (tex_id == 0)
+        glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
 }
 
 void std3D_DrawRenderList()
@@ -1494,7 +1612,7 @@ void std3D_DrawRenderList()
     glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
-    glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.25 : 0.85);
+    glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.45 : 0.85);
 
     rdTri* tris = GL_tmpTris;
     rdLine* lines = GL_tmpLines;
@@ -1520,10 +1638,47 @@ void std3D_DrawRenderList()
     //glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
     glCullFace(GL_FRONT);
+    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunci(1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunci(2, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunci(3, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (!(tris[0].flags & 0x800)) {
+    if (last_tex) {
+        std3D_DoTex(last_tex, &tris[0], GL_tmpTrisAmt);
+    }
+
+    if (!(last_flags & 0x800)) {
         //glDepthFunc(GL_ALWAYS);
         glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    else {
+        glDepthFunc(GL_LESS);
+    }
+
+    if (last_flags & 0x600) {
+        
+        if (last_flags & 0x200) {
+            glUniform1i(uniform_blend_mode, 6);
+            glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
+        }
+        else {
+            glUniform1i(uniform_blend_mode, 5);
+            glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    }
+    else {
+        glUniform1i(uniform_blend_mode, 2);
+        glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc (GL_SRC_COLOR, GL_DST_COLOR);
+    }
+
+    if (last_flags & 0x10000) {
+        glCullFace(GL_BACK);
+    }
+    else
+    {
+        glCullFace(GL_FRONT);
     }
     
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -1537,6 +1692,8 @@ void std3D_DrawRenderList()
         {
             int num_tris_batch = j - last_tex_idx;
             rdDDrawSurface* tex = tris[j].texture;
+
+
             
             test_idk = tex;
 
@@ -1546,67 +1703,29 @@ void std3D_DrawRenderList()
                 glDrawElements(GL_TRIANGLES, num_tris_batch * 3, GL_UNSIGNED_SHORT, (GLvoid*)((intptr_t)&world_data_elements[last_tex_idx * 3] - (intptr_t)&world_data_elements[0]));
             }
 
-            if (tex)
-            {
-                int tex_id = tex->texture_id;
-                glActiveTexture(GL_TEXTURE0 + 0);
-                if (tex_id == 0)
-                    glBindTexture(GL_TEXTURE_2D, blank_tex);
-                else
-                    glBindTexture(GL_TEXTURE_2D, tex_id);
-
-                int emiss_tex_id = tex->emissive_texture_id;
-                glActiveTexture(GL_TEXTURE0 + 3);
-                if (emiss_tex_id == 0)
-                    glBindTexture(GL_TEXTURE_2D, blank_tex);
-                else
-                    glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
-                glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-                glActiveTexture(GL_TEXTURE0 + 0);
-
-                if (!jkPlayer_enableTextureFilter)
-                    glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
-                else
-                    glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
-                
-                if (jkPlayer_enableTextureFilter && tex->is_16bit)
-                {
-                    glActiveTexture(GL_TEXTURE0 + 0);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glActiveTexture(GL_TEXTURE0 + 3);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                }
-                else
-                {
-                    glActiveTexture(GL_TEXTURE0 + 0);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    glActiveTexture(GL_TEXTURE0 + 3);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                }
-                 glActiveTexture(GL_TEXTURE0 + 0);
-
-                if (tex_id == 0)
-                    glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
-            }
-            else
-            {
-                glActiveTexture(GL_TEXTURE0 + 0);
-                glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-                glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
-            }
+            std3D_DoTex(tex, &tris[j], GL_tmpTrisAmt-j);
             
             int changed_flags = (last_flags ^ tris[j].flags);
 
             if (changed_flags & 0x600)
             {
-                if (tris[j].flags & 0x600)
-                    glUniform1i(uniform_blend_mode, 5);
-                else
+                if (tris[j].flags & 0x600) {
+                    
+                    if (tris[j].flags & 0x200) {
+                        glUniform1i(uniform_blend_mode, 6);
+                        glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
+                    }
+                    else {
+                        //printf ("flags %x\n", tris[j].flags);
+                        glUniform1i(uniform_blend_mode, 5);
+                        glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                    }
+                    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+                }
+                else {
                     glUniform1i(uniform_blend_mode, 2);
+                    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                }
             }
             
             if (changed_flags & 0x1800)
@@ -1673,6 +1792,8 @@ void std3D_DrawRenderList()
     {
         glDrawElements(GL_TRIANGLES, remaining_batch * 3, GL_UNSIGNED_SHORT, (GLvoid*)((intptr_t)&world_data_elements[last_tex_idx * 3] - (intptr_t)&world_data_elements[0]));
     }
+
+    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     
 #if 0
@@ -1787,6 +1908,9 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     //glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
     if (vbuf->format.format.is16bit)
     {
         texture->is_16bit = 1;
@@ -1882,6 +2006,7 @@ int std3D_HasAlphaFlatStippled()
 
 void std3D_PurgeTextureCache()
 {
+    printf("Purging texture cache...\n");
     for (int i = 0; i < 1024; i++)
     {
         rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
@@ -1891,6 +2016,25 @@ void std3D_PurgeTextureCache()
             glDeleteTextures(1, &std3D_aLoadedTextures[i]);
 
         std3D_aLoadedTextures[i] = 0;
+
+        if (tex->albedo_data) {
+            free(tex->albedo_data);
+            tex->albedo_data = NULL;
+        }
+
+        if (tex->emissive_data) {
+            free(tex->albedo_data);
+            tex->emissive_data = NULL;
+        }
+
+        if (tex->emissive_texture_id) {
+            glDeleteTextures(1, &tex->emissive_texture_id);
+            tex->emissive_texture_id = 0;
+        }
+
+        tex->emissive_factor[0] = 0.0;
+        tex->emissive_factor[1] = 0.0;
+        tex->emissive_factor[2] = 0.0;
 
         tex->texture_loaded = 0;
         tex->texture_id = 0;

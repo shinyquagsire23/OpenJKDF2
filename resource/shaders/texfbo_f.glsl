@@ -12,7 +12,7 @@ void main(void)
 {
     vec4 sampled_color = texture(tex, f_uv);
     vec4 vertex_color = f_color;
-    vec4 blend = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 blend = vec4(param2, param2, param2, 1.0);
 
     fragColor = sampled_color * vertex_color * blend;
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0/param3));

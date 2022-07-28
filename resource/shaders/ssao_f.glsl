@@ -115,8 +115,8 @@ void main(void)
     srand( hash(1117 * int(param1)));
 
     // coordinate
-    vec2 uv = fragCoord/iResolution.xy;
-    vec2 coord = fragCoord/iResolution.y;
+    vec2 uv = fragCoord/(iResolution.xy);
+    vec2 coord = fragCoord/(iResolution.y);
 
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     float d = depth(coord);
