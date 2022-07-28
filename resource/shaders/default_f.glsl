@@ -8,6 +8,7 @@ uniform sampler2D tex;
 uniform sampler2D texEmiss;
 uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
+uniform sampler2D displacement_map;
 uniform int tex_mode;
 uniform int blend_mode;
 uniform vec3 colorEffects_tint;
@@ -15,6 +16,7 @@ uniform vec3 colorEffects_filter;
 uniform float colorEffects_fade;
 uniform vec3 colorEffects_add;
 uniform vec3 emissiveFactor;
+uniform float displacement_factor;
 uniform float light_mult;
 uniform vec2 iResolution;
 
@@ -38,6 +40,63 @@ vec3 normals(vec3 pos) {
     vec3 fdx = dFdx(pos);
     vec3 fdy = dFdy(pos);
     return normalize(cross(fdx, fdy));
+}
+
+mat3 construct_tbn(vec3 vp_normal, vec3 adjusted_coords)
+{
+    vec3 n = normalize(vp_normal);
+
+    vec3 dp1 = dFdx(adjusted_coords);
+    vec3 dp2 = dFdy(adjusted_coords);
+    vec2 duv1 = dFdx(f_uv);
+    vec2 duv2 = dFdy(f_uv);
+
+    vec3 dp2perp = cross(dp2, n);
+    vec3 dp1perp = cross(n, dp1);
+
+    vec3 t = dp2perp * duv1.x + dp1perp * duv2.x;
+    vec3 b = dp2perp * duv1.y + dp1perp * duv2.y;
+
+    float invmax = inversesqrt(max(dot(t, t), dot(b, b)));
+    return mat3(t * invmax, b * invmax, n);
+}
+
+vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
+{
+    /*if (f_coord.x < 0.5) {
+        return tc;
+    }*/
+
+    // The injector world space view position is always considered (0, 0, 0):
+    vec3 view_dir = -normalize(transpose(construct_tbn(vp_normal, adjusted_coords)) * adjusted_coords);
+
+    const float min_layers = 32.0;
+    const float max_layers = 128.0;
+    float num_layers = mix(max_layers, min_layers, abs(dot(vec3(0.0, 0.0, 1.0), view_dir)));
+
+    float layer_depth = 1.0 / num_layers;
+    float current_layer_depth = 0.0;
+    vec2 shift_per_layer = (view_dir.xy / view_dir.z) * displacement_factor;
+    vec2 d_tc = shift_per_layer / num_layers;
+
+    vec2 current_tc = tc;
+    float current_sample = texture(displacement_map, current_tc).r;
+
+    while(current_layer_depth < current_sample) {
+        current_tc -= d_tc;
+        current_sample = texture(displacement_map, current_tc).r;
+        current_layer_depth += layer_depth;
+    }
+
+    vec2 prev_tc = current_tc + d_tc;
+
+    float after_col_depth = current_sample - current_layer_depth;
+    float before_col_depth = texture(displacement_map, prev_tc).r - current_layer_depth + layer_depth;
+
+    float a = after_col_depth / (after_col_depth - before_col_depth);
+    vec2 adj_tc = mix(current_tc, prev_tc, a);
+
+    return adj_tc;
 }
 
 vec4 bilinear_paletted()
@@ -111,18 +170,26 @@ vec4 bilinear_paletted_light(float index)
 
 void main(void)
 {
-    vec4 sampled = texture(tex, f_uv);
-    vec4 sampledEmiss = texture(texEmiss, f_uv);
+    float originalZ = gl_FragCoord.z / gl_FragCoord.w;
+    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ);
+    vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
+    vec3 adjusted_coords_parallax = vec3(adjusted_coords_norms.x - 0.5, adjusted_coords_norms.y - 0.5, gl_FragCoord.z);
+    vec3 face_normals = normals(adjusted_coords_norms);
+    vec3 face_normals_parallax = normals(adjusted_coords_parallax);
+
+    vec2 adj_texcoords = f_uv;
+    if(displacement_factor != 0.0) {
+        adj_texcoords = parallax_mapping(f_uv, face_normals_parallax, adjusted_coords_parallax);
+    }
+
+    vec4 sampled = texture(tex, adj_texcoords);
+    vec4 sampledEmiss = texture(texEmiss, adj_texcoords);
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 vertex_color = f_color;
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
-
-    float originalZ = gl_FragCoord.z / gl_FragCoord.w;
-    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ);
-    vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
-    vec3 face_normals = normals(adjusted_coords_norms);
+    
 
     if (tex_mode == 5
 #ifndef CAN_BILINEAR_FILTER_16
@@ -144,7 +211,7 @@ void main(void)
         vec2 colorTextureSize = vec2(textureSize(tex, 0));
 
         // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-        vec2 pixCoord = f_uv * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
+        vec2 pixCoord = adj_texcoords * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
         vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
 
         // For Gather we want UV coordinates of bottom right corner of top left pixel
@@ -301,7 +368,7 @@ void main(void)
 
     fragColorEmiss = color_add;
 
-    //fragColor = vec4(face_normals.x, face_normals.y, face_normals.z, 1.0);
+    //fragColor = vec4(face_normals_parallax.x, face_normals_parallax.y, face_normals_parallax.z, 1.0);
     //fragColor = vec4(face_normals*0.5 + 0.5,1.0);
     //vec4 test_norms = (main_color + effectAdd_color);
     //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);

@@ -110,9 +110,9 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
+GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor;
-GLint uniform_light_mult, uniform_iResolution;
+GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -465,6 +465,7 @@ int init_resources()
     uniform_texEmiss = std3D_tryFindUniform(programDefault, "texEmiss");
     uniform_worldPalette = std3D_tryFindUniform(programDefault, "worldPalette");
     uniform_worldPaletteLights = std3D_tryFindUniform(programDefault, "worldPaletteLights");
+    uniform_displacement_map = std3D_tryFindUniform(programDefault, "displacement_map");
     uniform_tex_mode = std3D_tryFindUniform(programDefault, "tex_mode");
     uniform_blend_mode = std3D_tryFindUniform(programDefault, "blend_mode");
     uniform_tint = std3D_tryFindUniform(programDefault, "colorEffects_tint");
@@ -473,6 +474,7 @@ int init_resources()
     uniform_add = std3D_tryFindUniform(programDefault, "colorEffects_add");
     uniform_emissiveFactor = std3D_tryFindUniform(programDefault, "emissiveFactor");
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
+    uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
@@ -1477,9 +1479,23 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
             }
         }
     }
+
+    int displace_tex_id = tex->displacement_texture_id;
+    glActiveTexture(GL_TEXTURE0 + 4);
+    if (displace_tex_id == 0) {
+        glBindTexture(GL_TEXTURE_2D, blank_tex);
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, displace_tex_id);
+    }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    if (tex->displacement_factor) {
+        //printf("%f\n", tex->displacement_factor);
+        //tex->displacement_factor = -0.4;
+    }
+    glUniform1f(uniform_displacement_factor, tex->displacement_factor);
     glActiveTexture(GL_TEXTURE0 + 0);
 
     if (!jkPlayer_enableTextureFilter)
@@ -1558,6 +1574,8 @@ void std3D_DrawRenderList()
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
+    glActiveTexture(GL_TEXTURE0 + 4);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
     glActiveTexture(GL_TEXTURE0 + 3);
     glBindTexture(GL_TEXTURE_2D, blank_tex);
     glActiveTexture(GL_TEXTURE0 + 2);
@@ -1571,6 +1589,7 @@ void std3D_DrawRenderList()
     glUniform1i(uniform_worldPalette, 1);
     glUniform1i(uniform_worldPaletteLights, 2);
     glUniform1i(uniform_texEmiss, 3);
+    glUniform1i(uniform_displacement_map, 4);
     
     {
     
@@ -1613,6 +1632,7 @@ void std3D_DrawRenderList()
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
     glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.45 : 0.85);
+    glUniform1f(uniform_displacement_factor, 1.0);
 
     rdTri* tris = GL_tmpTris;
     rdLine* lines = GL_tmpLines;
@@ -1976,10 +1996,12 @@ done_load:
     
     texture->texture_id = image_texture;
     texture->emissive_texture_id = 0;
+    texture->displacement_texture_id = 0;
     texture->texture_loaded = 1;
     texture->emissive_factor[0] = 0.0;
     texture->emissive_factor[1] = 0.0;
     texture->emissive_factor[2] = 0.0;
+    texture->displacement_factor = 0.0;
     
     return 1;
 }

@@ -941,9 +941,12 @@ typedef struct rdDDrawSurface
     rdDDrawSurface* tex_next;
 #ifdef SDL2_RENDER
     uint32_t emissive_texture_id;
+    uint32_t displacement_texture_id;
     float emissive_factor[3];
+    float displacement_factor;
     void* emissive_data;
     void* albedo_data;
+    void* displacement_data;
     int skip_jkgm;
 #endif
 } rdDDrawSurface;

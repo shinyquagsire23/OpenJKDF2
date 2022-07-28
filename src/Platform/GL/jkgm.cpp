@@ -235,7 +235,9 @@ typedef struct jkgm_cache_entry_t
 {
     std::string albedo_tex;
     std::string emissive_tex;
+    std::string displacement_tex;
     float emissive_factor[3];
+    float displacement_factor;
 } jkgm_cache_entry_t;
 
 static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache;
@@ -380,6 +382,7 @@ void jkgm_populate_cache()
                 jkgm_cache_entry_t entry;
                 entry.emissive_tex = "";
                 entry.albedo_tex = "";
+                entry.displacement_tex = "";
 
                 //TODO safety/bounds checks
                 if (it["emissive_factor"].type() != nlohmann::json::value_t::null) {
@@ -399,6 +402,22 @@ void jkgm_populate_cache()
                     entry.emissive_factor[1] = 0.0f;
                     entry.emissive_factor[2] = 0.0f;
                     entry.emissive_tex = "";
+                }
+
+                if (it["displacement_factor"].type() != nlohmann::json::value_t::null) {
+                    auto json_displacement_factor = it["displacement_factor"];
+                    entry.displacement_factor = json_displacement_factor;
+
+                    entry.displacement_tex = it.value("displacement_map", "");
+                    if (entry.displacement_tex != "") {
+                        entry.displacement_tex = base_path + entry.displacement_tex;
+                    }
+                    printf("%s %f\n", entry.displacement_tex.c_str(), entry.displacement_factor);
+                }
+                else
+                {
+                    entry.displacement_factor = 0.0f;
+                    entry.displacement_tex = "";
                 }
                     
                 entry.albedo_tex = base_path + it.value("albedo_map", "");
@@ -523,6 +542,9 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     texture->emissive_factor[1] = 0.0f;
     texture->emissive_factor[2] = 0.0f;
     texture->emissive_data = NULL;
+    texture->displacement_texture_id = 0;
+    texture->displacement_factor = 0.0;
+    texture->displacement_data = NULL;
     texture->albedo_data = NULL;
 
     if (jkgm_fastpath_disable || texture->skip_jkgm) {
@@ -547,10 +569,12 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     std::string cache_key = full_fpath_str + std::to_string(cel);
     std::string albedo_tex = "";
     std::string emissive_tex = "";
+    std::string displacement_tex = "";
     float emissive_factor[3] = {0.0f, 0.0f, 0.0f};
+    float displacement_factor = 0.0;
     bool found_replace = false;
     bool has_emissive = false;
-
+    bool has_displacement = false;
     
     jkgm_populate_cache();
 
@@ -563,6 +587,9 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
         emissive_factor[1] = entry.emissive_factor[1];
         emissive_factor[2] = entry.emissive_factor[2];
         has_emissive = (emissive_tex != "");
+        displacement_tex = entry.displacement_tex;
+        displacement_factor = entry.displacement_factor;
+        has_displacement = (displacement_tex != "");
         found_replace = true;
         goto found_cached;
     }
@@ -576,6 +603,9 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
         emissive_factor[1] = entry.emissive_factor[1];
         emissive_factor[2] = entry.emissive_factor[2];
         has_emissive = (emissive_tex != "");
+        displacement_tex = entry.displacement_tex;
+        displacement_factor = entry.displacement_factor;
+        has_displacement = (displacement_tex != "");
         found_replace = true;
         goto found_cached;
     }
@@ -609,6 +639,7 @@ found_cached:
         //glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
         texture->emissive_texture_id = 0;
+        texture->displacement_texture_id = 0;
         texture->texture_id = 0;
 
         {
@@ -686,9 +717,54 @@ found_cached:
             }
         }
 
+        if (has_displacement)
+        {
+            printf("%s\n", displacement_tex.c_str());
+            GLuint displace_texture;
+            glGenTextures(1, &displace_texture);
+            glBindTexture(GL_TEXTURE_2D, displace_texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+            //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+            const char* path = displacement_tex.c_str();
+
+            GLubyte* data = NULL;
+            int width = 0;
+            int height = 0;
+            int hasAlpha = 0;
+
+            if (loadPngImage(path, &width, &height, &hasAlpha, &data, 0))
+            {
+                //printf("Loaded %s\n", path);
+                //glTexStorage2D(GL_TEXTURE_2D, 1, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
+                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height, 0,  hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
+                //glGetTexImage(GL_TEXTURE_2D, 0, hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
+                //printf("%x\n", *(uint32_t*)data);
+                texture->displacement_texture_id = displace_texture;
+                texture->displacement_data = data;;
+            }
+            else
+            {
+                texture->displacement_data = NULL;
+                glDeleteTextures(1, &displace_texture);
+                if (data) {
+                    free(data);
+                }
+            }
+        }
+
         texture->emissive_factor[0] = emissive_factor[0];
         texture->emissive_factor[1] = emissive_factor[1];
         texture->emissive_factor[2] = emissive_factor[2];
+        texture->displacement_factor = displacement_factor;
 
         std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
         std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
