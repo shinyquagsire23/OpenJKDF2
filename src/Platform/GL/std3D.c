@@ -2045,8 +2045,13 @@ void std3D_PurgeTextureCache()
         }
 
         if (tex->emissive_data) {
-            free(tex->albedo_data);
+            free(tex->emissive_data);
             tex->emissive_data = NULL;
+        }
+
+        if (tex->displacement_data) {
+            free(tex->displacement_data);
+            tex->displacement_data = NULL;
         }
 
         if (tex->emissive_texture_id) {
@@ -2054,9 +2059,15 @@ void std3D_PurgeTextureCache()
             tex->emissive_texture_id = 0;
         }
 
+        if (tex->displacement_texture_id) {
+            glDeleteTextures(1, &tex->displacement_texture_id);
+            tex->displacement_texture_id = 0;
+        }
+
         tex->emissive_factor[0] = 0.0;
         tex->emissive_factor[1] = 0.0;
         tex->emissive_factor[2] = 0.0;
+        tex->displacement_factor = 0.0;
 
         tex->texture_loaded = 0;
         tex->texture_id = 0;
