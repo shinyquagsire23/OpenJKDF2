@@ -1657,10 +1657,6 @@ void std3D_DrawRenderList()
     //glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
     glCullFace(GL_FRONT);
-    //glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunci(1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunci(2, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunci(3, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (last_tex) {
         std3D_DoTex(last_tex, &tris[0], GL_tmpTrisAmt);
