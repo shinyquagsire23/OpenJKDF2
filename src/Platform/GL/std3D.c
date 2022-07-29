@@ -1467,7 +1467,6 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
         // HACK
         if (tri[0].flags & 0x600) {
             glUniform1i(uniform_blend_mode, 6);
-            glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
             last_flags |= 0x200;
         }
 
@@ -1658,10 +1657,10 @@ void std3D_DrawRenderList()
     //glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
     glCullFace(GL_FRONT);
-    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendFunci(1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendFunci(2, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendFunci(3, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunci(1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunci(2, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunci(3, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (last_tex) {
         std3D_DoTex(last_tex, &tris[0], GL_tmpTrisAmt);
@@ -1679,18 +1678,13 @@ void std3D_DrawRenderList()
         
         if (last_flags & 0x200) {
             glUniform1i(uniform_blend_mode, 6);
-            glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
         }
         else {
             glUniform1i(uniform_blend_mode, 5);
-            glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
-        //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
     }
     else {
         glUniform1i(uniform_blend_mode, 2);
-        glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendFunc (GL_SRC_COLOR, GL_DST_COLOR);
     }
 
     if (last_flags & 0x10000) {
@@ -1733,18 +1727,14 @@ void std3D_DrawRenderList()
                     
                     if (tris[j].flags & 0x200) {
                         glUniform1i(uniform_blend_mode, 6);
-                        glBlendFunci(0, GL_SRC_ALPHA, GL_SRC_ALPHA);
                     }
                     else {
                         //printf ("flags %x\n", tris[j].flags);
                         glUniform1i(uniform_blend_mode, 5);
-                        glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     }
-                    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
                 }
                 else {
                     glUniform1i(uniform_blend_mode, 2);
-                    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 }
             }
             
@@ -1813,7 +1803,8 @@ void std3D_DrawRenderList()
         glDrawElements(GL_TRIANGLES, remaining_batch * 3, GL_UNSIGNED_SHORT, (GLvoid*)((intptr_t)&world_data_elements[last_tex_idx * 3] - (intptr_t)&world_data_elements[0]));
     }
 
-    glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     
     
 #if 0

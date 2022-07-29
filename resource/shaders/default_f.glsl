@@ -304,7 +304,7 @@ void main(void)
     {
         //main_color.rgb *= (1.0 - main_color.a);
         //should_write_normals = 0.0;
-        main_color.a = (1.0 - main_color.a);
+        //main_color.a = (1.0 - main_color.a);
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
@@ -364,6 +364,11 @@ void main(void)
     if (luma < 0.01 && orig_alpha < 0.5 && (blend_mode == 5 || blend_mode == 6))
     {
         color_add = vec4(0.0, 0.0, 0.0, 0.0);
+    }
+
+    if (blend_mode == 6) {
+        //color_add.a = (1.0 - color_add.a);
+        //should_write_normals = 1.0 - should_write_normals;
     }
 
     fragColorEmiss = color_add;
