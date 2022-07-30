@@ -244,6 +244,17 @@ LABEL_22:
         for (int j = 0; j < texture->num_mipmaps; j++) {
             stdVBuffer* mipmap = texture->texture_struct[j];
             rdDDrawSurface* surface = &texture->alphaMats[j];
+
+            surface->albedo_data = NULL;
+            surface->displacement_data = NULL;
+            surface->emissive_data = NULL;
+            surface->emissive_texture_id = 0;
+            surface->displacement_texture_id = 0;
+            surface->emissive_factor[0] = 0.0;
+            surface->emissive_factor[1] = 0.0;
+            surface->emissive_factor[2] = 0.0;
+            surface->displacement_factor = 0.0;
+
             jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, i);
         }
     }

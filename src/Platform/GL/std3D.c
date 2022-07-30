@@ -1989,6 +1989,9 @@ done_load:
     texture->emissive_factor[1] = 0.0;
     texture->emissive_factor[2] = 0.0;
     texture->displacement_factor = 0.0;
+    texture->albedo_data = NULL;
+    texture->displacement_data = NULL;
+    texture->emissive_data = NULL;
     
     return 1;
 }
@@ -2027,17 +2030,17 @@ void std3D_PurgeTextureCache()
         std3D_aLoadedTextures[i] = 0;
 
         if (tex->albedo_data) {
-            free(tex->albedo_data);
+            jkgm_aligned_free(tex->albedo_data);
             tex->albedo_data = NULL;
         }
 
         if (tex->emissive_data) {
-            free(tex->emissive_data);
+            jkgm_aligned_free(tex->emissive_data);
             tex->emissive_data = NULL;
         }
 
         if (tex->displacement_data) {
-            free(tex->displacement_data);
+            jkgm_aligned_free(tex->displacement_data);
             tex->displacement_data = NULL;
         }
 

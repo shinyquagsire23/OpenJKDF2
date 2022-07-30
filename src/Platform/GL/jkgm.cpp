@@ -231,6 +231,19 @@ void* jkgm_alloc_aligned(size_t amt)
     return buffer;
 }
 
+void jkgm_aligned_free(void* p)
+{
+    if (!p) return;
+
+#ifdef PLAT_MACOS
+    free(p);
+#elif defined(WIN64_MINGW)
+    _aligned_free(p);
+#else
+    free(p);
+#endif
+}
+
 typedef struct jkgm_cache_entry_t
 {
     std::string albedo_tex;
