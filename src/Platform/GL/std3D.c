@@ -486,8 +486,8 @@ int init_resources()
     
     // Blank texture
     glGenTextures(1, &blank_tex);
-    blank_data = malloc(0x100);
-    memset(blank_data, 0x0, 0x100);
+    blank_data = malloc(0x400);
+    memset(blank_data, 0x0, 0x400);
     
     glBindTexture(GL_TEXTURE_2D, blank_tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -502,7 +502,7 @@ int init_resources()
 
     // World palette
     glGenTextures(1, &worldpal_texture);
-    worldpal_data = malloc(0x300);
+    worldpal_data = jkgm_alloc_aligned(0x300);
     memset(worldpal_data, 0xFF, 0x300);
     
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
@@ -513,12 +513,14 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_PACK_ALIGNMENT, 1);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
 
     // World palette lights
     glGenTextures(1, &worldpal_lights_texture);
-    worldpal_lights_data = malloc(0x4000);
+    worldpal_lights_data = jkgm_alloc_aligned(0x4000);
     memset(worldpal_lights_data, 0xFF, 0x4000);
     
     glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
@@ -529,13 +531,15 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_PACK_ALIGNMENT, 1);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 0x40, 0, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
     
     
     // Display palette
     glGenTextures(1, &displaypal_texture);
-    displaypal_data = malloc(0x400);
+    displaypal_data = jkgm_alloc_aligned(0x400);
     memset(displaypal_data, 0xFF, 0x300);
     
     glBindTexture(GL_TEXTURE_2D, displaypal_texture);
@@ -546,6 +550,8 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_PACK_ALIGNMENT, 1);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
@@ -613,11 +619,11 @@ void std3D_FreeResources()
     glDeleteTextures(1, &worldpal_lights_texture);
     glDeleteTextures(1, &displaypal_texture);
     if (worldpal_data)
-        free(worldpal_data);
+        jkgm_aligned_free(worldpal_data);
     if (worldpal_lights_data)
-        free(worldpal_lights_data);
+        jkgm_aligned_free(worldpal_lights_data);
     if (displaypal_data)
-        free(displaypal_data);
+        jkgm_aligned_free(displaypal_data);
 
     worldpal_data = NULL;
     worldpal_lights_data = NULL;
@@ -720,6 +726,7 @@ int std3D_StartScene()
 
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
     glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+    glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
     glVertexAttribPointer(
         attribute_coord3d, // attribute
         3,                 // number of elements per vertex, here (x,y,z)
@@ -870,12 +877,15 @@ void std3D_DrawMenuSubrect(float x, float y, float w, float h, float dstX, float
 }
 
 static rdDDrawSurface* test_idk = NULL;
-
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips);
 void std3D_DrawMenu()
 {
     std3D_DrawSceneFbo();
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    glDepthMask(GL_TRUE);
+    glCullFace(GL_FRONT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
@@ -988,16 +998,32 @@ void std3D_DrawMenu()
         // Active forcepowers/items
         std3D_DrawMenuSubrect(menu_w - 64, 0, 64, 128, Window_xSize - (64*hudScale), 0, hudScale);
     }
+
+    glActiveTexture(GL_TEXTURE0 + 4);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
     
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
-
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Video_menuBuffer.format.width, Video_menuBuffer.format.height, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
 
     GLfloat data_vertices[32 * 3];
     GLubyte data_colors[32 * 4];
     GLfloat data_uvs[32 * 2];
     GLushort data_elements[32 * 3];
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glUniform1i(programMenu_uniform_tex, 0);
+    glUniform1i(programMenu_uniform_displayPalette, 1);
 
     // Generate vertices list
     //GLfloat* data_vertices = (GLfloat*)malloc(GL_tmpVerticesAmt * 3 * sizeof(GLfloat));
@@ -1037,19 +1063,42 @@ void std3D_DrawMenu()
     }
     
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices, GL_STREAM_DRAW);
-    
+    glVertexAttribPointer(
+        programMenu_attribute_coord3d, // attribute
+        3,                 // number of elements per vertex, here (x,y,z)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 3 * sizeof(GLfloat), data_vertices,  GL_STREAM_DRAW);
+    glEnableVertexAttribArray(programMenu_attribute_coord3d);
+
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLubyte), data_colors, GL_STREAM_DRAW);
-    
+    glVertexAttribPointer(
+        programMenu_attribute_v_color, // attribute
+        4,                 // number of elements per vertex, here (R,G,B,A)
+        GL_UNSIGNED_BYTE,          // the type of each element
+        GL_TRUE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 4 * sizeof(GLubyte), data_colors,  GL_STREAM_DRAW);
+    glEnableVertexAttribArray(programMenu_attribute_v_color);
+
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs, GL_STREAM_DRAW);
-    
-    glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
-    glUniform1i(programMenu_uniform_tex, 0);
-    glUniform1i(programMenu_uniform_displayPalette, 1);
-    
+    glVertexAttribPointer(
+        programMenu_attribute_v_uv,    // attribute
+        2,                 // number of elements per vertex, here (U,V)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * 2 * sizeof(GLfloat), data_uvs,  GL_STREAM_DRAW);
+    glEnableVertexAttribArray(programMenu_attribute_v_uv);
+
+
     {
 
     float maxX, maxY, scaleX, scaleY, width, height;
@@ -1074,42 +1123,6 @@ void std3D_DrawMenu()
     }
     
     rdTri* tris = GL_tmpTris;
-    glEnableVertexAttribArray(programMenu_attribute_coord3d);
-    glEnableVertexAttribArray(programMenu_attribute_v_color);
-    glEnableVertexAttribArray(programMenu_attribute_v_uv);
-    
-    // Describe our vertices array to OpenGL (it can't guess its format automatically)
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_vertices);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
-    
-    
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_colors);
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,          // the type of each element
-        GL_TRUE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
-    
-    
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_uvs);
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
     
     rdDDrawSurface* last_tex = (void*)-1;
     int last_tex_idx = 0;
@@ -1124,17 +1137,13 @@ void std3D_DrawMenu()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
-    int tris_size;  
+    int tris_size = 0;  
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
     glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
     glDisableVertexAttribArray(programMenu_attribute_coord3d);
-    
-    //free(data_elements);
-        
-    //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips)
@@ -1502,24 +1511,6 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     else
         glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
     
-    if (jkPlayer_enableTextureFilter && tex->is_16bit)
-    {
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glActiveTexture(GL_TEXTURE0 + 3);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }
-    else
-    {
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glActiveTexture(GL_TEXTURE0 + 3);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    }
      glActiveTexture(GL_TEXTURE0 + 0);
 
     if (tex_id == 0)
@@ -1917,6 +1908,17 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+    if (jkPlayer_enableTextureFilter && texture->is_16bit)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
 
     if (vbuf->format.format.is16bit)
     {

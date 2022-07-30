@@ -4,7 +4,6 @@ in vec2 v_uv;
 uniform mat4 mvp;
 out vec4 f_color;
 out vec2 f_uv;
-out vec3 f_coord;
 
 void main(void)
 {
@@ -14,5 +13,4 @@ void main(void)
     gl_Position = pos;
     f_color = v_color;
     f_uv = v_uv;
-    f_coord = coord3d;
 }

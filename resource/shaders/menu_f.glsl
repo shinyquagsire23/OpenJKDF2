@@ -3,7 +3,6 @@ uniform sampler2D worldPalette;
 uniform sampler2D displayPalette;
 in vec4 f_color;
 in vec2 f_uv;
-in vec3 f_coord;
 out vec4 fragColor;
 
 void main(void)

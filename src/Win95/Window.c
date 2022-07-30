@@ -787,9 +787,9 @@ void Window_RecreateSDL2Window()
 
     if (displayWindow) {
         flags = SDL_GetWindowFlags(displayWindow);
-        std3D_FreeResources();
+        //std3D_FreeResources();
         //SDL_GL_DeleteContext(glWindowContext);
-        SDL_DestroyWindow(displayWindow);
+        //SDL_DestroyWindow(displayWindow);
 
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     }
@@ -889,6 +889,14 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+
+    // apitrace
+#if 0
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+#endif
 #elif defined(ARCH_WASM)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);

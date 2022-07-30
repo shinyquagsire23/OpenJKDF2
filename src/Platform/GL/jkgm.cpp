@@ -24,6 +24,7 @@ extern void* worldpal_data;
 extern rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 extern GLuint std3D_aLoadedTextures[1024];
 extern size_t std3D_loadedTexturesAmt;
+extern int jkPlayer_enableTextureFilter;
 
 int compare_hashstr(uint8_t *p, const char* str){
     char tmp[34];
@@ -643,13 +644,22 @@ found_cached:
         glActiveTexture(GL_TEXTURE0);
 
         glBindTexture(GL_TEXTURE_2D, image_texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        if (jkPlayer_enableTextureFilter)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
 
         texture->emissive_texture_id = 0;
         texture->displacement_texture_id = 0;
@@ -692,13 +702,22 @@ found_cached:
             GLuint emiss_texture;
             glGenTextures(1, &emiss_texture);
             glBindTexture(GL_TEXTURE_2D, emiss_texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
             //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+            if (jkPlayer_enableTextureFilter)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            }
 
             const char* path = emissive_tex.c_str();
 
@@ -736,13 +755,22 @@ found_cached:
             GLuint displace_texture;
             glGenTextures(1, &displace_texture);
             glBindTexture(GL_TEXTURE_2D, displace_texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
             //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+            if (jkPlayer_enableTextureFilter)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            }
 
             const char* path = displacement_tex.c_str();
 
