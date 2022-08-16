@@ -49,37 +49,34 @@ int sithGamesave_GetProfilePath(char *out, int outSize, char *a3)
 
 int sithGamesave_Load(char *saveFname, int a2, int a3)
 {
-    int result; // eax
     char playerName[32]; // [esp+0h] [ebp-A0h] BYREF
     char fpath[128]; // [esp+20h] [ebp-80h] BYREF
 
     stdString_WcharToChar(playerName, jkPlayer_playerShortName, 31);
     playerName[31] = 0;
     stdString_snprintf(fpath, 128, "player\\%s\\%s", playerName, saveFname);
-    result = stdConffile_OpenMode(fpath, "rb");
-    if ( result )
+
+    if (stdConffile_OpenMode(fpath, "rb"))
     {
         stdConffile_Close();
         sithGamesave_dword_835914 = a3;
-        if ( sithWorld_pCurrentWorld )
+        if (sithWorld_pCurrentWorld)
         {
             sithGamesave_dword_835900 = a2 != 0 ? 3 : 1;
             _strncpy(sithGamesave_fpath, fpath, 0x7Fu);
             sithGamesave_fpath[127] = 0;
-            result = 1;
+            return 1;
         }
         else
         {
-            result = sithGamesave_LoadEntry(fpath);
+            return sithGamesave_LoadEntry(fpath);
         }
     }
-    return result;
+    return 0;
 }
 
 int sithGamesave_LoadEntry(char *fpath)
 {
-    char *v1; // eax
-    char *v2; // eax
     int curMs; // [esp+Ch] [ebp-650h] BYREF
     char SrcStr[32]; // [esp+10h] [ebp-64Ch] BYREF
     sithGamesave_Header header; // [esp+30h] [ebp-62Ch] BYREF
@@ -167,13 +164,11 @@ LABEL_11:
         sithGamesave_func3();
     stdConffile_Close();
     _memcpy(&sithGamesave_headerTmp, &header, sizeof(sithGamesave_headerTmp));
-    v1 = stdFnames_FindMedName(fpath);
-    _strncpy(sithGamesave_autosave_fname, v1, 0x7Fu);
+    _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(fpath), 0x7Fu);
     sithGamesave_autosave_fname[127] = 0;
     if ( sithGamesave_dword_835914 )
     {
-        v2 = stdFnames_FindMedName(fpath);
-        _strncpy(sithGamesave_saveName, v2, 0x7Fu);
+        _strncpy(sithGamesave_saveName, stdFnames_FindMedName(fpath), 0x7Fu);
         sithGamesave_saveName[127] = 0;
         _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
         sithGamesave_wsaveName[255] = 0;
@@ -274,9 +269,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
 int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
 {
-    int result; // eax
     wchar_t *v5; // esi
-    float v6; // edx
     float *v7; // eax
     sithItemInfo *v8; // ecx
     float v9; // edx
@@ -313,9 +306,8 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_headerTmp.jklName[127] = 0;
         _wcsncpy(sithGamesave_headerTmp.saveName, v5, 0xFFu);
         sithGamesave_headerTmp.saveName[255] = 0;
-        v6 = g_localPlayerThing->actorParams.maxHealth;
         sithGamesave_headerTmp.playerHealth = g_localPlayerThing->actorParams.health;
-        sithGamesave_headerTmp.playerMaxHealth = v6;
+        sithGamesave_headerTmp.playerMaxHealth = g_localPlayerThing->actorParams.maxHealth;
         v7 = sithGamesave_headerTmp.binAmts;
         v8 = g_selfPlayerInfo->iteminfo;
         do
@@ -328,52 +320,47 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_dword_835900 = 2;
         _strncpy(sithGamesave_fpath, PathName, 0x7Fu);
         sithGamesave_fpath[127] = 0;
-        result = 1;
+        return 1;
     }
     else
     {
         stdConffile_Close();
-        result = 0;
+        return 0;
     }
-    return result;
 }
 
 int sithGamesave_WriteEntry()
 {
-    int result; // eax
-    int v1; // esi
-    char *v2; // eax
-    char *v3; // eax
-    wchar_t *v4; // eax
-
     if ( sithGamesave_dword_835900 == 1 )
     {
         if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
         {
-LABEL_18:
             sithGamesave_dword_835900 = 0;
             return 1;
         }
-LABEL_17:
+        // TODO inlined?
         sith_set_sithmode_5();
-        goto LABEL_18;
+        sithGamesave_dword_835900 = 0;
+        return 1;
     }
     if ( sithGamesave_dword_835900 != 2 )
     {
-        result = sithGamesave_dword_835900 - 3;
         if ( sithGamesave_dword_835900 != 3 )
-            return result;
+            return sithGamesave_dword_835900 - 3;
         if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
         {
             sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
             sithGamesave_dword_835900 = 0;
             return 1;
         }
-        goto LABEL_17;
+        // TODO inlined?
+        sith_set_sithmode_5();
+        sithGamesave_dword_835900 = 0;
+        return 1;
     }
     if ( (g_localPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
     {
-        v1 = sithCogVm_multiplayerFlags;
+        int multiplayerFlagsSave = sithCogVm_multiplayerFlags;
         sithCogVm_multiplayerFlags = 4;
         stdConffile_Write((const char*)&sithGamesave_headerTmp, sizeof(sithGamesave_Header));
         if ( sithGamesave_funcWrite )
@@ -393,20 +380,17 @@ LABEL_17:
         if ( sithGamesave_func1 )
             sithGamesave_func1();
         stdConffile_CloseWrite();
-        v2 = stdFnames_FindMedName(sithGamesave_fpath);
-        _strncpy(sithGamesave_autosave_fname, v2, 0x7Fu);
+        _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(sithGamesave_fpath), 0x7Fu);
         sithGamesave_autosave_fname[127] = 0;
         if ( sithGamesave_dword_835914 )
         {
-            v3 = stdFnames_FindMedName(sithGamesave_fpath);
-            _strncpy(sithGamesave_saveName, v3, 0x7Fu);
+            _strncpy(sithGamesave_saveName, stdFnames_FindMedName(sithGamesave_fpath), 0x7Fu);
             sithGamesave_saveName[127] = 0;
             _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
             sithGamesave_wsaveName[255] = 0;
-            v4 = sithStrTable_GetString("GAME_SAVED");
-            DebugConsole_PrintUniStr(v4);
+            DebugConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
         }
-        sithCogVm_multiplayerFlags = v1;
+        sithCogVm_multiplayerFlags = multiplayerFlagsSave;
     }
     sithGamesave_dword_835900 = 0;
     return 0;
