@@ -468,7 +468,7 @@ LABEL_25:
     }
 }
 
-void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMethod, rdMeshinfo *vertexSrc, rdMeshinfo *vertexDst, rdVector2 *idkIn)
+void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMethod, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn)
 {
     rdMeshinfo *v6; // eax
     int v7; // esi
@@ -567,14 +567,14 @@ void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMetho
     switch ( clipType )
     {
         case 0:
-            v13 = vertexSrc;
-            v7 = vertexSrc->numVertices;
-            vertexSrcb = vertexSrc->numVertices;
+            v13 = _vertexSrc;
+            v7 = _vertexSrc->numVertices;
+            vertexSrcb = _vertexSrc->numVertices;
             if ( !vertexSrcb )
                 goto LABEL_19;
             v14 = v13->verticesProjected;
             v15 = v13->vertexPosIdx;
-            v16 = vertexDst->verticesProjected;
+            v16 = _vertexDst->verticesProjected;
             do
             {
                 v17 = *v15;
@@ -585,17 +585,17 @@ void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMetho
                 *v18 = v14[v17];
             }
             while ( v7 );
-            vertexDst->numVertices = vertexSrcb;
+            _vertexDst->numVertices = vertexSrcb;
             return;
         case 1:
         case 2:
-            v6 = vertexSrc;
-            v7 = vertexSrc->numVertices;
-            vertexSrca = vertexSrc->numVertices;
+            v6 = _vertexSrc;
+            v7 = _vertexSrc->numVertices;
+            vertexSrca = _vertexSrc->numVertices;
             if ( vertexSrca )
             {
                 v8 = v6->verticesProjected;
-                v9 = vertexDst->verticesProjected;
+                v9 = _vertexDst->verticesProjected;
                 v10 = v6->vertexPosIdx;
                 do
                 {
@@ -607,12 +607,12 @@ void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMetho
                     *v12 = v8[v11];
                 }
                 while ( v7 );
-                vertexDst->numVertices = vertexSrca;
+                _vertexDst->numVertices = vertexSrca;
             }
             else
             {
 LABEL_19:
-                vertexDst->numVertices = v7;
+                _vertexDst->numVertices = v7;
             }
             return;
         case 3:
@@ -620,14 +620,14 @@ LABEL_19:
             {
                 case 0:
                 case 1:
-                    v19 = vertexSrc;
-                    v7 = vertexSrc->numVertices;
-                    vertexSrcc = vertexSrc->numVertices;
+                    v19 = _vertexSrc;
+                    v7 = _vertexSrc->numVertices;
+                    vertexSrcc = _vertexSrc->numVertices;
                     if ( !vertexSrcc )
                         goto LABEL_19;
                     v20 = v19->verticesProjected;
                     v21 = v19->vertexPosIdx;
-                    v22 = vertexDst->verticesProjected;
+                    v22 = _vertexDst->verticesProjected;
                     do
                     {
                         v23 = *v21;
@@ -638,17 +638,17 @@ LABEL_19:
                         *v24 = v20[v23];
                     }
                     while ( v7 );
-                    vertexDst->numVertices = vertexSrcc;
+                    _vertexDst->numVertices = vertexSrcc;
                     return;
                 case 2:
-                    v25 = vertexSrc;
-                    v7 = vertexSrc->numVertices;
-                    vertexSrcd = vertexSrc->numVertices;
+                    v25 = _vertexSrc;
+                    v7 = _vertexSrc->numVertices;
+                    vertexSrcd = _vertexSrc->numVertices;
                     if ( vertexSrcd )
                     {
                         v26 = v25->verticesProjected;
                         v27 = v25->vertexPosIdx;
-                        v28 = vertexDst->verticesProjected;
+                        v28 = _vertexDst->verticesProjected;
                         do
                         {
                             v29 = *v27;
@@ -663,20 +663,20 @@ LABEL_19:
                     }
                     goto LABEL_19;
                 case 3:
-                    v31 = vertexSrc;
-                    v32 = vertexDst;
-                    v33 = vertexSrc->intensities;
-                    v34 = vertexSrc->numVertices;
-                    vertexSrce = vertexSrc->numVertices;
+                    v31 = _vertexSrc;
+                    v32 = _vertexDst;
+                    v33 = _vertexSrc->intensities;
+                    v34 = _vertexSrc->numVertices;
+                    vertexSrce = _vertexSrc->numVertices;
                     if ( v33 )
                     {
                         if ( v34 )
                         {
                             v35 = v31->vertexPosIdx;
                             pVertices = v31->verticesProjected;
-                            v36 = vertexDst->verticesProjected;
+                            v36 = _vertexDst->verticesProjected;
                             geometryModea = v31->paDynamicLight;
-                            float* lightIter = vertexDst->paDynamicLight;
+                            float* lightIter = _vertexDst->paDynamicLight;
                             clipIdka = v34;
                             do
                             {
@@ -696,17 +696,17 @@ LABEL_19:
                                 --clipIdka;
                             }
                             while ( clipIdka );
-                            vertexDst->numVertices = vertexSrce;
+                            _vertexDst->numVertices = vertexSrce;
                             return;
                         }
                     }
                     else if ( v34 )
                     {
-                        v40 = vertexDst->verticesProjected;
+                        v40 = _vertexDst->verticesProjected;
                         pVertices_ = v31->verticesProjected;
                         paPosIdx = v31->vertexPosIdx;
                         geometryModeb = v31->paDynamicLight;
-                        float* lightIter = vertexDst->paDynamicLight;
+                        float* lightIter = _vertexDst->paDynamicLight;
                         do
                         {
                             v43 = &pVertices_[*paPosIdx];
@@ -732,7 +732,7 @@ LABEL_19:
                             --v34;
                         }
                         while ( v34 );
-                        v32 = vertexDst;
+                        v32 = _vertexDst;
                         v34 = vertexSrce;
                     }
                     v32->numVertices = v34;
@@ -747,11 +747,11 @@ LABEL_19:
             {
                 if ( clipSubtype != 3 )
                     return;
-                v46 = vertexSrc;
-                v47 = vertexDst;
-                v48 = vertexSrc->intensities;
-                v49 = vertexSrc->numVertices;
-                vertexSrcf = vertexSrc->numVertices;
+                v46 = _vertexSrc;
+                v47 = _vertexDst;
+                v48 = _vertexSrc->intensities;
+                v49 = _vertexSrc->numVertices;
+                vertexSrcf = _vertexSrc->numVertices;
                 if ( v48 )
                 {
                     if ( v49 )
@@ -759,12 +759,12 @@ LABEL_19:
                         v50 = v46->vertexUVs;
                         v51 = v46->vertexPosIdx;
                         lightingModec = v46->verticesProjected;
-                        v52 = vertexDst->verticesProjected;
+                        v52 = _vertexDst->verticesProjected;
                         int* uvIter = v46->vertexUVIdx;
                         geometryModec = v46->paDynamicLight;
-                        v53 = vertexDst->vertexUVs;
+                        v53 = _vertexDst->vertexUVs;
                         v79 = vertexSrcf;
-                        float* lightIter = vertexDst->paDynamicLight;
+                        float* lightIter = _vertexDst->paDynamicLight;
                         do
                         {
                             *v52 = lightingModec[*v51];
@@ -789,7 +789,7 @@ LABEL_19:
                             --v79;
                         }
                         while ( v79 );
-                        vertexDst->numVertices = vertexSrcf;
+                        _vertexDst->numVertices = vertexSrcf;
                         return;
                     }
                 }
@@ -797,11 +797,11 @@ LABEL_19:
                 {
                     v56 = v46->vertexUVs;
                     v57 = v46->vertexPosIdx;
-                    v58 = vertexDst->verticesProjected;
+                    v58 = _vertexDst->verticesProjected;
                     lightingModed = v46->verticesProjected;
                     geometryModed = v46->paDynamicLight;
-                    v59 = vertexDst->vertexUVs;
-                    float* lightIter = vertexDst->paDynamicLight;
+                    v59 = _vertexDst->vertexUVs;
+                    float* lightIter = _vertexDst->paDynamicLight;
                     v80 = vertexSrcf;
                     int* uvIter = v46->vertexUVIdx;
                     do
@@ -832,22 +832,22 @@ LABEL_19:
                         --v80;
                     }
                     while ( v80 );
-                    v47 = vertexDst;
+                    v47 = _vertexDst;
                 }
                 v47->numVertices = vertexSrcf;
                 return;
             }
-            v64 = vertexDst;
-            v65 = vertexSrc->numVertices;
-            vertexSrcg = vertexSrc->numVertices;
+            v64 = _vertexDst;
+            v65 = _vertexSrc->numVertices;
+            vertexSrcg = _vertexSrc->numVertices;
             if ( vertexSrcg )
             {
-                v66 = vertexSrc->vertexUVIdx;
-                v67 = vertexSrc->vertexUVs;
-                lightingModee = vertexSrc->verticesProjected;
-                v68 = vertexDst->vertexUVs;
-                v69 = vertexDst->verticesProjected;
-                int* idxIter = vertexSrc->vertexPosIdx;
+                v66 = _vertexSrc->vertexUVIdx;
+                v67 = _vertexSrc->vertexUVs;
+                lightingModee = _vertexSrc->verticesProjected;
+                v68 = _vertexDst->vertexUVs;
+                v69 = _vertexDst->verticesProjected;
+                int* idxIter = _vertexSrc->vertexPosIdx;
                 geometryModee = v65;
                 while ( 1 )
                 {
@@ -864,7 +864,7 @@ LABEL_19:
                     if ( geometryModee-- == 1 )
                         break;
                 }
-                v64 = vertexDst;
+                v64 = _vertexDst;
                 v65 = vertexSrcg;
             }
             v64->numVertices = v65;

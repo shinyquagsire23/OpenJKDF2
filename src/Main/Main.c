@@ -934,16 +934,14 @@ int Main_Startup(const char *cmdline)
         jkGuiSingleTally_Initialize();
 #ifndef LINUX_TMP
         jkGuiMultiTally_Initialize(); // TODO
-        jkGuiBuildMulti_InitializeEditCharacter(); // TODO
 #endif
+        jkGuiBuildMulti_InitializeEditCharacter(); // TODO
         jkGuiTitle_Initialize();
         jkGuiGeneral_Initialize();
         jkGuiGameplay_Initialize();
         jkGuiDecision_Initialize();
         jkGuiSingleplayer_Initialize();
-#ifndef LINUX_TMP
-        jkGuiBuildMulti_Initialize(); // TODO
-#endif
+        jkGuiBuildMulti_Initialize();
         jkGuiSaveLoad_Initialize(); // TODO
 #ifndef LINUX_TMP
         jkGuiControlSaveLoad_Initialize(); // TODO

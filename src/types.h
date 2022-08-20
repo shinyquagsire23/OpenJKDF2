@@ -3102,4 +3102,17 @@ typedef struct jkGuiKeyboardEntry
     int field_14;
 } jkGuiKeyboardEntry;
 
+typedef struct jkSaberInfo
+{
+    char BM[0x20];
+    char sideMat[0x20];
+    char tipMat[0x20];
+} jkSaberInfo;
+
+typedef struct jkMultiModelInfo
+{
+    char modelFpath[0x20];
+    char sndFpath[0x20];
+} jkMultiModelInfo;
+
 #endif // TYPES_H

@@ -14,14 +14,16 @@
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"
 
-void rdModel3_RegisterLoader(model3Loader_t loader)
+model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader)
 {
     pModel3Loader = loader;
+    return loader;
 }
 
-void rdModel3_RegisterUnloader(model3Unloader_t unloader)
+model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader)
 {
     pModel3Unloader = unloader;
+    return unloader;
 }
 
 void rdModel3_ClearFrameCounters()

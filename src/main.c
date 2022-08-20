@@ -55,6 +55,7 @@
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIMultiplayer.h"
+#include "Gui/jkGUIBuildMulti.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdActive.h"
 #include "Engine/rdKeyframe.h"
@@ -2116,6 +2117,32 @@ void do_hooks()
     hook_function(jkGuiMultiplayer_Initialize_ADDR, jkGuiMultiplayer_Initialize);
     hook_function(jkGuiMultiplayer_Shutdown_ADDR, jkGuiMultiplayer_Shutdown);
     hook_function(jkGuiMultiplayer_Show_ADDR, jkGuiMultiplayer_Show);
+
+    // jkGUIBuildMulti
+    hook_function(jkGuiBuildMulti_InitializeEditCharacter_ADDR, jkGuiBuildMulti_InitializeEditCharacter);
+    hook_function(jkGuiBuildMulti_ShutdownEditCharacter_ADDR, jkGuiBuildMulti_ShutdownEditCharacter);
+    hook_function(jkGuiBuildMulti_ModelLoader_ADDR, jkGuiBuildMulti_ModelLoader);
+    hook_function(jkGuiBuildMulti_MatLoader_ADDR, jkGuiBuildMulti_MatLoader);
+    hook_function(jkGuiBuildMulti_KeyframeLoader_ADDR, jkGuiBuildMulti_KeyframeLoader);
+    hook_function(jkGuiBuildMulti_CloseRender_ADDR, jkGuiBuildMulti_CloseRender);
+    hook_function(jkGuiBuildMulti_ThingInit_ADDR, jkGuiBuildMulti_ThingInit);
+    hook_function(jkGuiBuildMulti_ThingCleanup_ADDR, jkGuiBuildMulti_ThingCleanup);
+    hook_function(jkGuiBuildMulti_ShowEditCharacter_ADDR, jkGuiBuildMulti_ShowEditCharacter);
+    hook_function(jkGuiBuildMulti_DisplayModel_ADDR, jkGuiBuildMulti_DisplayModel);
+    hook_function(jkGuiBuildMulti_ModelDrawer_ADDR, jkGuiBuildMulti_ModelDrawer);
+    hook_function(jkGuiBuildMulti_SaberDrawer_ADDR, jkGuiBuildMulti_SaberDrawer);
+    hook_function(jkGuiBuildMulti_sub_41A120_ADDR, jkGuiBuildMulti_sub_41A120);
+    hook_function(jkGuiBuildMulti_SaberButtonClicked_ADDR, jkGuiBuildMulti_SaberButtonClicked);
+    hook_function(jkGuiBuildMulti_Initialize_ADDR, jkGuiBuildMulti_Initialize);
+    hook_function(jkGuiBuildMulti_Shutdown_ADDR, jkGuiBuildMulti_Shutdown);
+    hook_function(jkGuiBuildMulti_Load_ADDR, jkGuiBuildMulti_Load);
+    hook_function(jkGuiBuildMulti_Show_ADDR, jkGuiBuildMulti_Show);
+    hook_function(jkGuiBuildMulti_Show2_ADDR, jkGuiBuildMulti_Show2);
+    hook_function(jkGuiBuildMulti_ShowNewCharacter_ADDR, jkGuiBuildMulti_ShowNewCharacter);
+    hook_function(jkGuiBuildMulti_sub_41D000_ADDR, jkGuiBuildMulti_sub_41D000);
+    hook_function(jkGuiBuildMulti_ShowLoad_ADDR, jkGuiBuildMulti_ShowLoad);
+    hook_function(jkGuiBuildMulti_sub_41D680_ADDR, jkGuiBuildMulti_sub_41D680);
+    hook_function(jkGuiBuildMulti_sub_41D830_ADDR, jkGuiBuildMulti_sub_41D830);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);

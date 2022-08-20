@@ -53,8 +53,8 @@ typedef struct rdKeyframe
     rdMarkers markers;
 } rdKeyframe;
 
-void rdKeyframe_RegisterLoader(keyframeLoader_t loader);
-void rdKeyframe_RegisterUnloader(keyframeUnloader_t loader);
+keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader);
+keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader);
 void rdKeyframe_NewEntry(rdKeyframe *keyframe);
 rdKeyframe* rdKeyframe_Load(char *fname);
 int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe);

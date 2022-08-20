@@ -115,8 +115,8 @@ typedef struct rdMesh
     int field_6C;
 } rdMesh;
 
-void rdModel3_RegisterLoader(model3Loader_t loader);
-void rdModel3_RegisterUnloader(model3Unloader_t unloader);
+model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader);
+model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader);
 void rdModel3_ClearFrameCounters();
 int rdModel3_NewEntry(rdModel3 *model);
 rdModel3* rdModel3_New(char *path);

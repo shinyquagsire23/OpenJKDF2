@@ -72,9 +72,9 @@ jkMain_VideoLeave	.text	00404430	00000020	00000000	00000004	R	.	.	.	.	.	T	.
 jkMain_CutsceneShow	.text	00404450	00000005			R	.	.	.	.	.	.	.
 jkMain_CutsceneTick	.text	00404460	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_CutsceneLeave	.text	00404470	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkMain_CreditsShow	.text	00404480	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
-jkMain_CreditsTick	.text	004044B0	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
-jkMain_CreditsLeave	.text	004044E0	00000005			R	.	.	.	.	.	.	.
+jkMain_CreditsShow	.text	00404480	0000002D	00000000	00000000	R	.	.	.	.	.	T	.
+jkMain_CreditsTick	.text	004044B0	0000002D	00000000	00000000	R	.	.	.	.	.	T	.
+jkMain_CreditsLeave	.text	004044E0	00000005			R	.	.	.	.	.	T	.
 jkMain_ChoiceShow	.text	004044F0	00000057	00000004	00000004	R	.	.	.	.	.	T	.
 jkMain_ChoiceTick	.text	00404550	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_ChoiceLeave	.text	00404560	00000001	00000000	00000000	R	.	.	.	.	.	.	.
@@ -165,8 +165,8 @@ jkCog_SetPovModel	.text	0040A5D0	00000042	00000008	00000004	R	.	.	.	.	.	T	.
 jkCog_PlayPovKey	.text	0040A620	00000085	00000010	00000004	R	.	.	.	.	.	T	.
 jkCog_StopPovKey	.text	0040A6B0	00000060	00000008	00000004	R	.	.	.	.	.	T	.
 jkCog_SetForceSpeed	.text	0040A710	0000001A	00000000	00000004	R	.	.	.	.	.	T	.
-jkCog_SetInvis	.text	0040A730	00000063	00000008	00000004	R	.	.	.	.	.	.	.
-jkCog_SetInvulnerable	.text	0040A7A0	0000005F	00000008	00000004	R	.	.	.	.	.	.	.
+jkCog_SetInvis	.text	0040A730	00000063	00000008	00000004	R	.	.	.	.	.	T	.
+jkCog_SetInvulnerable	.text	0040A7A0	0000005F	00000008	00000004	R	.	.	.	.	.	T	.
 jkCog_PrintUniString	.text	0040A800	00000163	000000D0	00000004	R	.	.	.	.	.	T	.
 jkCog_SetSuperFlags	.text	0040A970	00000062	00000000	00000004	R	.	.	.	.	.	T	.
 jkCog_ClearSuperFlags	.text	0040A9E0	00000062	00000000	00000004	R	.	.	.	.	.	T	.
@@ -180,15 +180,15 @@ jkCog_SetTarget	.text	0040AD00	00000017	00000000	00000004	R	.	.	.	.	.	.	.
 jkCog_EndTarget	.text	0040AD20	00000005	00000000	00000004	R	.	.	.	.	.	T	.
 jkCog_SetTargetColors	.text	0040AD30	00000041	00000010	00000004	R	.	.	.	.	.	.	.
 jkCog_StringClear	.text	0040AD80	00000013	00000000	00000000	R	.	.	.	.	.	.	.
-jkCog_StringConcatUnistring	.text	0040ADA0	00000084	00000028	00000004	R	.	.	.	.	.	.	.
-jkCog_StringConcatAsciiString	.text	0040AE30	00000072	0000010C	00000004	R	.	.	.	.	.	.	.
-jkCog_StringConcatPlayerName	.text	0040AEB0	00000056	00000008	00000004	R	.	.	.	.	.	.	.
-jkCog_StringConcatSpace	.text	0040AF10	00000059	00000108	00000000	R	.	.	.	.	.	.	.
-jkCog_StringConcatInt	.text	0040AF70	00000067	00000108	00000004	R	.	.	.	.	.	.	.
+jkCog_StringConcatUnistring	.text	0040ADA0	00000084	00000028	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatAsciiString	.text	0040AE30	00000072	0000010C	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatPlayerName	.text	0040AEB0	00000056	00000008	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatSpace	.text	0040AF10	00000059	00000108	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatInt	.text	0040AF70	00000067	00000108	00000004	R	.	.	.	.	.	T	.
 jkCog_StringConcatFormattedInt	.text	0040AFE0	000000AC	00000214	00000004	R	.	.	.	.	.	T	.
-jkCog_StringConcatFlex	.text	0040B090	0000006A	00000110	00000004	R	.	.	.	.	.	.	.
-jkCog_StringConcatFormattedFlex	.text	0040B100	000000BE	0000021C	00000004	R	.	.	.	.	.	.	.
-jkCog_StringConcatVector	.text	0040B1C0	000000A1	0000012C	00000004	R	.	.	.	.	.	.	.
+jkCog_StringConcatFlex	.text	0040B090	0000006A	00000110	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatFormattedFlex	.text	0040B100	000000BE	0000021C	00000004	R	.	.	.	.	.	T	.
+jkCog_StringConcatVector	.text	0040B1C0	000000A1	0000012C	00000004	R	.	.	.	.	.	T	.
 jkCog_StringOutput	.text	0040B270	00000132	0000008C	00000004	R	.	.	.	.	.	T	.
 jkCog_GetSaberCam	.text	0040B3B0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 jkCog_GetChoice	.text	0040B3D0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
@@ -356,11 +356,11 @@ jkGuiDisplay_sub_415410	.text	00415410	00000209			R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_415620	.text	00415620	0000004C	00000000	00000008	R	.	.	.	.	.	.	.
 jkGuiMap_Initialize	.text	00415670	00000014			R	.	.	.	.	.	.	.
 jkGuiMap_Shutdown	.text	00415690	00000001			R	.	.	.	.	.	.	.
-jkGuiMap_DrawMapScreen	.text	004156A0	00000078	00000000	0000000C	R	.	.	.	.	.	.	.
-jkGuiMap_sub_415720	.text	00415720	000003E0	00000020	00000004	R	.	.	.	.	.	.	.
+jkGuiMap_DrawMapScreen	.text	004156A0	00000078	00000000	00000010	R	.	.	.	.	.	T	.
+jkGuiMap_sub_415720	.text	00415720	000003E0	00000020	00000004	R	.	.	.	.	.	T	.
 jkGuiMap_sub_415B40	.text	00415B40	00000015	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiMap_sub_415B60	.text	00415B60	00000003	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiMap_sub_415B70	.text	00415B70	000000D5	0000000C	00000008	R	.	.	.	.	.	.	.
+jkGuiMap_sub_415B70	.text	00415B70	000000D5	0000000C	00000008	R	.	.	.	.	.	T	.
 jkGuiMap_Show	.text	00415C50	00000239	0000005C	00000000	R	.	.	.	.	.	.	.
 jkGuiForce_ChoiceRemoveStar	.text	00415E90	000000D7	0000000C	0000000C	R	.	.	.	.	.	T	.
 jkGuiForce_ChoiceRemoveStars	.text	00415F70	00000171	0000000C	00000004	R	.	.	.	.	.	T	.
@@ -423,15 +423,15 @@ jkGuiBuildMulti_ShutdownEditCharacter	.text	00418EF0	00000001	00000000	00000000	
 jkGuiBuildMulti_ModelLoader	.text	00418F00	00000054	00000084	00000004	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_MatLoader	.text	00418F60	00000080	00000088	00000004	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_KeyframeLoader	.text	00418FE0	0000004F	00000084	00000004	R	.	.	.	.	.	T	.
-jkGuiBuildMulti_sub_419030	.text	00419030	000000B1	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_ThingInstancer	.text	004190F0	000000EB	00000010	00000004	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_4191E0	.text	004191E0	00000045	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_ShowEditCharacter	.text	00419230	000008AA	0000018C	00000004	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_CloseRender	.text	00419030	000000B1	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_ThingInit	.text	004190F0	000000EB	00000010	00000004	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_ThingCleanup	.text	004191E0	00000045	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_ShowEditCharacter	.text	00419230	000008AA	0000018C	00000004	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_DisplayModel	.text	00419AE0	000002C5	00000054	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_419DB0	.text	00419DB0	000002E9	0000001C	0000000C	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_41A0A0	.text	0041A0A0	0000007B	00000014	0000000C	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_41A120	.text	0041A120	0000001E	00000000	00000004	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_41A140	.text	0041A140	000001AC	00000010	00000008	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_ModelDrawer	.text	00419DB0	000002E9	0000001C	0000000C	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_SaberDrawer	.text	0041A0A0	0000007B	00000014	0000000C	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_sub_41A120	.text	0041A120	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_SaberButtonClicked	.text	0041A140	000001AC	00000010	00000008	R	.	.	.	.	.	T	.
 jkGuiGeneral_Initialize	.text	0041A300	00000014			R	.	.	.	.	.	.	.
 jkGuiGeneral_Shutdown	.text	0041A320	00000001			R	.	.	.	.	.	.	.
 jkGuiGeneral_Show	.text	0041A330	000000B0	00000004	00000000	R	.	.	.	.	.	.	.
@@ -474,12 +474,12 @@ jkGuiBuildMulti_Initialize	.text	0041C5E0	00000046			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Shutdown	.text	0041C630	0000000B			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Load	.text	0041C640	000000B8	00000108	00000014	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_Show	.text	0041C700	0000031F	000003EC	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_Show2	.text	0041CAA0	0000020C	00001654	00000014	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_ShowNewCharacter	.text	0041CCB0	00000345	000001A8	00000008	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_41D000	.text	0041D000	000000DB	00000014	00000008	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_Show2	.text	0041CAA0	0000020C	00001654	00000014	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_ShowNewCharacter	.text	0041CCB0	00000345	000001A8	00000008	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_sub_41D000	.text	0041D000	000000DB	00000014	00000008	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_ShowLoad	.text	0041D0E0	00000513	0000041C	00000011	R	.	.	.	.	.	T	.
-jkGuiBuildMulti_sub_41D680	.text	0041D680	000001AD	00000014	00000008	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_sub_41D830	.text	0041D830	000000C1	0000000C	00000014	R	.	.	.	.	.	.	.
+jkGuiBuildMulti_sub_41D680	.text	0041D680	000001AD	00000014	00000008	R	.	.	.	.	.	T	.
+jkGuiBuildMulti_sub_41D830	.text	0041D830	000000C1	0000000C	00000014	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_ListClick	.text	0041D900	0000003B	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_PopulateInfo	.text	0041D940	00000316	00000020	00000004	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_DeleteOnClick	.text	0041DC60	00000167	00000088	00000008	R	.	.	.	.	.	T	.
@@ -529,7 +529,7 @@ jkDev_CmdEndLevel	.text	0041FEF0	00000022	00000000	00000008	R	.	.	.	.	.	T	.
 jkDev_CmdSkipToLevel	.text	0041FF20	00000050	00000000	00000008	R	.	.	.	.	.	T	.
 jkDev_CmdDebugFlags	.text	0041FF70	00000021	00000000	00000008	R	.	.	.	.	.	T	.
 jkDev_CmdFly	.text	0041FFA0	00000021	00000000	00000008	R	.	.	.	.	.	T	.
-jkDev_CmdDebugFlags2	.text	0041FFD0	00000021	00000000	00000008	R	.	.	.	.	.	T	.
+jkDev_CmdDebugFlags2	.text	0041FFD0	00000021	00000000	0000000C	R	.	.	.	.	.	T	.
 jkDev_CmdWarp	.text	00420000	0000004F	0000000C	00000008	R	.	.	.	.	.	T	.
 jkDev_CmdActivate	.text	00420050	00000021	00000000	00000008	R	.	.	.	.	.	T	.
 jkDev_CmdDebugFlags3	.text	00420080	00000021	00000000	00000008	R	.	.	.	.	.	T	.
@@ -559,8 +559,8 @@ jkCredits_Initialize	.text	004216C0	00000049	00000000	00000004	R	.	.	.	.	.	T	.
 jkCredits_Shutdown	.text	00421710	00000050			R	.	.	.	.	.	.	.
 jkCredits_Show	.text	00421760	00000358	000000C4	00000000	R	.	.	.	.	.	.	.
 jkCredits_Skip	.text	00421AC0	00000086	00000004	00000000	R	.	.	.	.	.	.	.
-jkCredits_sub_421B50	.text	00421B50	0000040F	00000050	00000000	R	.	.	.	.	.	.	.
-jkCredits_Handler	.text	00421F60	0000005E	00000000	0000000C	R	.	.	.	.	.	.	.
+jkCredits_Tick	.text	00421B50	0000040F	00000050	00000000	R	.	.	.	.	.	.	.
+jkCredits_Handler	.text	00421F60	0000005E	00000000	0000000C	R	.	.	.	.	.	T	.
 stdDisplay_Startup	.text	00421FC0	000000E8	00000004	00000000	R	.	.	.	.	.	.	.
 stdDisplay_RestoreDisplayMode	.text	004220B0	00000028			R	.	.	.	.	.	T	.
 stdDisplay_Open	.text	004220E0	000003F0	0000000C	00000004	R	.	.	.	.	.	T	.
@@ -1228,11 +1228,11 @@ rdModel3_Draw	.text	00445E10	0000027C	00000028	00000008	R	.	.	.	.	.	T	.
 rdModel3_DrawHNode	.text	00446090	0000007E	0000000C	00000004	R	.	.	.	.	.	T	.
 rdModel3_DrawMesh	.text	00446110	00000470	000000A0	00000008	R	.	.	.	.	.	T	.
 rdModel3_DrawFace	.text	00446580	0000030F	0000001C	00000008	R	.	.	.	.	.	T	.
-rdPrimit2_DrawLine	.text	00446890	00000226	00000020	0000001C	R	.	.	.	.	.	.	.
+rdPrimit2_DrawLine	.text	00446890	00000226	00000020	0000001C	R	.	.	.	.	.	T	.
 rdPrimit2_DrawClippedLine	.text	00446AC0	00000243	00000018	0000001C	R	.	.	.	.	.	T	.
 rdPrimit2_DrawCircle	.text	00446D10	0000014A	0000000C	0000001C	R	.	.	.	.	.	T	.
-rdPrimit2_DrawRectangle	.text	00446E60	00000079	00000010	0000001C	R	.	.	.	.	.	.	.
-rdPrimit2_DrawTriangle	.text	00446EE0	0000006E	00000010	00000024	R	.	.	.	.	.	.	.
+rdPrimit2_DrawRectangle	.text	00446E60	00000079	00000010	0000001C	R	.	.	.	.	.	T	.
+rdPrimit2_DrawTriangle	.text	00446EE0	0000006E	00000010	00000024	R	.	.	.	.	.	T	.
 rdPrimit3_ClearFrameCounters	.text	00446F50	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 rdPrimit3_GetScreenCoord	.text	00446F60	00000086	00000018	00000008	R	.	.	.	.	.	T	.
 rdPrimit3_DrawPoint	.text	00446FF0	000000CE	00000018	0000000A	R	.	.	.	.	.	.	.
@@ -1323,7 +1323,7 @@ rdKeyframe_FreeJoints	.text	0044B5F0	00000058	00000004	00000004	R	.	.	.	.	.	T	.
 rdLight_New	.text	0044B650	00000042	00000000	00000000	R	.	.	.	.	.	.	.
 rdLight_NewEntry	.text	0044B6A0	00000037	00000000	00000004	R	.	.	.	.	.	T	.
 rdLight_Free	.text	0044B6E0	00000015	00000000	00000004	R	.	.	.	.	.	T	.
-rdLight_FreeEntry	.text	0044B700	00000001			R	.	.	.	.	.	.	.
+rdLight_FreeEntry	.text	0044B700	00000001			R	.	.	.	.	.	T	.
 rdLight_CalcVertexIntensities	.text	0044B710	00000169	00000018	00000024	R	.	.	.	.	.	T	.
 rdLight_CalcDistVertexIntensities	.text	0044B880	000000E0	0000000C	00000024	R	.	.	.	.	.	T	.
 rdLight_CalcFaceIntensity	.text	0044B960	00000136	00000024	0000001C	R	.	.	.	.	.	T	.
@@ -1339,8 +1339,8 @@ rdActive_BuildEdges	.text	0044C690	00000142	00000014	00000000	R	.	.	.	.	.	.	.
 rdActive_AddActiveFace	.text	0044C7E0	00000E65	00000014	00000004	R	.	.	.	.	.	T	.
 rdRaster_sub_44D6A0	.text	0044D6A0	000004A2	00000034	00000004	R	.	.	.	.	.	.	.
 rdRaster_sub_44DB50	.text	0044DB50	00000600	00000038	00000004	R	.	.	.	.	.	T	.
-rdNRaster_DrawNGonLV	.text	0044E150	000000A1	00000008	00000008	R	.	.	.	.	B	.	.
-rdNRaster_DrawNGonLW	.text	0044E200	00000176	00000020	00000008	R	.	.	.	.	B	.	.
+rdNRaster_DrawNGonLV	.text	0044E150	000000A1	00000008	00000008	R	.	.	.	.	B	T	.
+rdNRaster_DrawNGonLW	.text	0044E200	00000176	00000020	00000008	R	.	.	.	.	B	T	.
 rdNRaster_DrawNGonLS	.text	0044E380	000001A2	00000094	00000008	R	.	.	.	.	.	.	.
 rdRaster_sub_44E530	.text	0044E530	00000080	0000000C	00000008	R	.	.	.	.	.	.	.
 rdRaster_sub_44E5B0	.text	0044E5B0	000001B3	00000024	00000004	R	.	.	.	.	B	.	.
@@ -1354,10 +1354,10 @@ rdRaster_sub_44EF80	.text	0044EF80	000001B3	00000024	00000004	R	.	.	.	.	B	.	.
 rdNRaster_DrawNGonFS	.text	0044F140	000001D1	00000098	0000000C	R	.	.	.	.	B	T	.
 rdRaster_sub_44F320	.text	0044F320	00000082	00000008	00000008	R	.	.	.	.	.	.	.
 rdNRaster_DrawNGonGS	.text	0044F3B0	0000016C	00000088	00000008	R	.	.	.	.	.	.	.
-rdRaster_sub_44F520	.text	0044F520	000000E9	00000018	00000008	R	.	.	.	.	B	.	.
+rdRaster_sub_44F520	.text	0044F520	000000E9	00000018	00000008	R	.	.	.	.	B	T	.
 rdNRaster_SetupLeftEdgeNGonGS	.text	0044F610	0000024A	00000024	00000004	R	.	.	.	.	B	.	.
 rdRaster_sub_44F860	.text	0044F860	0000024A	00000020	00000004	R	.	.	.	.	B	.	.
-rdNRaster_DrawNGonTGS	.text	0044FAB0	0000017E	00000088	00000008	R	.	.	.	.	.	.	.
+rdNRaster_DrawNGonTGS	.text	0044FAB0	0000017E	00000088	00000008	R	.	.	.	.	.	T	.
 rdRaster_sub_44FC30	.text	0044FC30	00000106	00000018	00000008	R	.	.	.	.	B	.	.
 rdNRaster_sub_44FD40	.text	0044FD40	0000024E	0000008C	00000008	R	.	.	.	.	.	.	.
 rdRaster_sub_4500B0	.text	004500B0	0000018D	00000018	00000008	R	.	.	.	.	B	.	.
@@ -1807,7 +1807,7 @@ sithRender_UpdateAllLights	.text	004C76B0	00000069	00000004	00000000	R	.	.	.	.	.
 sithRender_UpdateLights	.text	004C7720	0000027D	00000018	0000000C	R	.	.	.	.	.	T	.
 sithRender_RenderDynamicLights	.text	004C79A0	0000023F	00000144	00000000	R	.	.	.	.	.	T	.
 sithRender_RenderThings	.text	004C7BE0	00000471	0000001C	00000000	R	.	.	.	.	.	.	.
-sithRender_RenderPov	.text	004C8070	000001AC	0000001C	00000004	R	.	.	.	.	.	T	.
+sithRender_RenderThing	.text	004C8070	000001AC	0000001C	00000004	R	.	.	.	.	.	T	.
 sithRender_RenderAlphaSurfaces	.text	004C8220	000003D6	00000014	00000000	R	.	.	.	.	.	.	.
 sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
@@ -2205,7 +2205,7 @@ sithCogScript_LoadEntry	.text	004E0240	000000BB	00000088	00000008	R	.	.	.	.	.	.	
 sithCogScript_Tick	.text	004E0300	000000FE	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogScript_TickAll	.text	004E0400	00000075	0000000C	00000000	R	.	.	.	.	.	T	.
 sithCogScript_DevCmdCogStatus	.text	004E0480	00000174	00000018	00000008	R	.	.	.	.	.	T	.
-sithCogScript_RegisterMessageSymbol	.text	004E0600	0000003B	00000010	0000000C	R	.	.	.	.	.	.	.
+sithCogScript_RegisterMessageSymbol	.text	004E0600	0000003B	00000010	0000000C	R	.	.	.	.	.	T	.
 sithCogScript_TimerTick	.text	004E0640	00000078	00000004	00000008	R	.	.	.	.	.	T	.
 sithCogScript_RegisterGlobalMessage	.text	004E06C0	0000003B	00000010	0000000C	R	.	.	.	.	.	.	.
 sithCogScript_RegisterVerb	.text	004E0700	0000003B	00000010	0000000C	R	.	.	.	.	.	T	.
@@ -2436,7 +2436,7 @@ sithThing_LoadActorPlayerParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	
 sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
 sithDebugConsole_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdSession	.text	004EDF10	000000A7	00000000	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	.	.
 sithDebugConsole_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	.	.
 sithDebugConsole_CmdCogList	.text	004EE2F0	00000125	00000000	00000000	R	.	.	.	.	.	.	.

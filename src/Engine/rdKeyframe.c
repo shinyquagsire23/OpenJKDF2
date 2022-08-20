@@ -6,12 +6,12 @@
 #include "Win95/std.h"
 #include "jk.h"
 
-void rdKeyframe_RegisterLoader(keyframeLoader_t loader)
+keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader)
 {
     pKeyframeLoader = loader;
 }
 
-void rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
+keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 {
     pKeyframeUnloader = loader;
 }

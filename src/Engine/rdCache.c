@@ -101,6 +101,7 @@ void rdCache_Flush()
         }
         else if ( rdroid_curZBufferMethod )
         {
+#ifndef SDL2_RENDER
             if ( rdroid_curZBufferMethod == 2 )
             {
                 for (v1 = 0; v1 < rdCache_numProcFaces; v1++)
@@ -112,10 +113,11 @@ void rdCache_Flush()
                         rdCache_DrawFaceZ(face);
                 }
             }
+#endif
         }
         else
         {
-            
+#ifndef SDL2_RENDER
             for (v3 = 0; v3 < rdCache_numProcFaces; v3++)
             {
                 face = &rdCache_aProcFaces[v3];
@@ -124,6 +126,7 @@ void rdCache_Flush()
                 else
                     rdCache_DrawFaceN(face);
             }
+#endif
         }
     }
     else

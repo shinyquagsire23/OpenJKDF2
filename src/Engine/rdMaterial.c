@@ -11,12 +11,12 @@
 #include "Platform/GL/jkgm.h"
 #endif
 
-void rdMaterial_RegisterLoader(rdMaterialLoader_t load)
+rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t load)
 {
     pMaterialsLoader = load;
 }
 
-void rdMaterial_RegisterUnloader(rdMaterialUnloader_t unload)
+rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t unload)
 {
     pMaterialsUnloader = unload;
 }
