@@ -23,6 +23,8 @@ void jkGuiMultiplayer_Initialize();
 void jkGuiMultiplayer_Shutdown();
 int jkGuiMultiplayer_Show();
 
+int jkGuiNet_ShowSynchronizing();
+
 //static int (*jkGuiMultiplayer_Initialize)() = (void*)jkGuiMultiplayer_Initialize_ADDR;
 //static void (*jkGuiMultiplayer_Shutdown)() = (void*)jkGuiMultiplayer_Shutdown_ADDR;
 //static int (__cdecl *jkGuiMultiplayer_Show)() = (void*)jkGuiMultiplayer_Show_ADDR;

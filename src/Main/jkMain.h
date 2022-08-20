@@ -110,6 +110,7 @@ void jkMain_UnkShow(int a1, int a2);
 void jkMain_UnkTick(int a1);
 void jkMain_UnkLeave(int a1, int a2);
 int jkMain_LoadFile(char *a1);
+int jkMain_loadFile2(char *pGobPath, char *pEpisodeName);
 
 int jkMain_sub_403470(char *a1);
 int jkMain_CdSwitch(int a1, int bIsAPath);
@@ -141,7 +142,7 @@ static void (*jkMain_SwitchTo12)() = (void*)jkMain_SwitchTo12_ADDR;
 //static void (*jkMain_MenuReturn)() = (void*)jkMain_MenuReturn_ADDR;
 static void (*jkMain_SwitchTo4)(void*) = (void*)jkMain_SwitchTo4_ADDR;
 //static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
-static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
+//static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
 
 #ifdef SDL2_RENDER
 int jkMain_SetVideoMode();

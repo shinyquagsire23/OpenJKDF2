@@ -531,3 +531,20 @@ int jkEpisode_UpdateExtra(sithThing *thing)
         jkSaber_UpdateLength(thing);
     return 1;
 }
+
+int jkEpisode_idk4(jkEpisodeLoad *pEpisodeLoad, char *pEpisodeName)
+{
+    int v2; // edi
+    int i; // ebx
+
+    v2 = 0;
+    if ( pEpisodeLoad->numSeq <= 0 )
+        return 0;
+    for ( i = 0; __strcmpi(pEpisodeLoad->paEntries[i].fileName, pEpisodeName); ++i )
+    {
+        if ( ++v2 >= pEpisodeLoad->numSeq )
+            return 0;
+    }
+    pEpisodeLoad->field_8 = v2;
+    return 1;
+}

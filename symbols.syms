@@ -134,6 +134,9 @@ rdCache_dword_865258 0x00865258 int
 
 sithMulti_name 0x008C4BE0 wchar_t[32]
 sithMulti_handlerIdk 0x0083264C sithMultiHandler_t
+sithMulti_multiModeFlags 0x00832650 int
+sithMulti_dword_83265C 0x0083265C uint32_t
+sithMulti_arr_832218 0x00832218 int[256]
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
@@ -221,6 +224,7 @@ sithNet_MultiModeFlags 0x008C4BA0 int
 sithNet_scorelimit 0x008C4BAC int
 sithNet_teamScore 0x008C4BC0 int[5]
 sithNet_multiplayer_timelimit 0x008C4BD4 int
+sithMulti_multiplayerTimelimit 0x0083261C int
 sithNet_isMulti 0x00832624 int
 sithNet_isServer 0x00832628 int
 sithNet_dword_832638 0x00832638 int
@@ -231,6 +235,12 @@ sithNet_thingsIdx 0x008330F0 int
 sithNet_syncIdx 0x008330F4 int
 sithNet_aSyncFlags 0x008330B0 int[16]
 sithNet_aSyncThings 0x00832668 sithThing*[16]
+sithNet_tickrate 0x005490D4 int = 180
+sithNet_dword_8C4BA8 0x008C4BA8 int
+sithNet_dword_83262C 0x0083262C int
+sithNet_dword_83263C 0x0083263C int
+sithNet_checksum 0x00832630 int
+sithNet_dword_832640 0x00832640 int
 
 sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
 sithOverlayMap_matrix 0x00835840 rdMatrix34
@@ -312,6 +322,9 @@ sithDplay_bInitted 0x008321D8 int
 sithDplay_dword_8321F0 0x008321F0 int
 sithDplay_dword_8321F4 0x008321F4 int
 sithDplay_dword_8321EC 0x008321EC int
+sithDplay_dword_832204 0x00832204 int
+sithDplay_dword_8321E0 0x008321E0 int
+sithDplay_dword_8321E4 0x008321E4 int
 
 stdMci_mciId 0x00563720 MCIDEVICEID
 stdMci_dwVolume 0x00563724 int
@@ -780,6 +793,9 @@ jkGuiNetHost_gameFlags 0x00860474 int
 jkGuiNetHost_tickRate 0x00860478 int
 jkGuiNetHost_gameName 0x0086047C wchar_t[32]
 
+jkGuiNet_checksumSeed 0x00832634 int
+jkGuiNet_dword_5564EC 0x005564EC int
+
 g_hInstance 0x00855DEC HINSTANCE
 sithCog_pSymbolTable 0x008B5428 sithCogSymboltable*
 pSithHS 0x82F0A4 struct common_functions*
@@ -845,7 +861,7 @@ jkGui_dword_556040 0x00556040 int
 jkGui_dword_556044 0x00556044 int
 jkGui_dword_556048 0x00556048 int
 jkGui_dword_55604C 0x0055604C int
-jkGuiMultiplayer_unk_865020 0x00865020 int
+jkGuiMultiplayer_numConnections 0x00865020 int
 jkGuiMultiplayer_aConnections 0x008620A0 sith_dplay_connection[32]
 jkGuiMultiplayer_aEntries 0x00863220 jkMultiEntry[32]
 jkGuiMultiplayer_stru_556168 0x00556168 jkMultiEntry2

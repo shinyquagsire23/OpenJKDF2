@@ -560,3 +560,44 @@ void sithPlayer_SetBinCarries(int binIdx, int bCarries)
     else
         v2->state = v3 & ~8u;
 }
+
+void sithPlayer_sub_4C8910(unsigned int idx)
+{
+    sithPlayerInfo *pPlayerInfo;
+
+    pPlayerInfo = &jkPlayer_playerInfos[idx];
+    if ( idx < 0x20 )
+    {
+        pPlayerInfo->numKills = 0;
+        pPlayerInfo->numKilled = 0;
+        pPlayerInfo->teamNum = 0;
+        pPlayerInfo->numSuicides = 0;
+        pPlayerInfo->score = 0;
+        pPlayerInfo->respawnMask = 0;
+        pPlayerInfo->net_id = 0;
+        pPlayerInfo->player_name[0] = 0;
+        pPlayerInfo->multi_name[0] = 0;
+        if ( pPlayerInfo->playerThing && sithWorld_pCurrentWorld )
+            sithInventory_ClearInventory(pPlayerInfo->playerThing);
+        if ( pPlayerInfo == g_selfPlayerInfo )
+        {
+            stdPalEffects_FlushAllEffects();
+            g_selfPlayerInfo->palEffectsIdx1 = stdPalEffects_NewRequest(1);
+            g_selfPlayerInfo->palEffectsIdx2 = stdPalEffects_NewRequest(2);
+        }
+        pPlayerInfo->flags &= ~0x5;
+    }
+}
+
+int sithPlayer_sub_4C87C0(int idx, int netId)
+{
+    sithThing *v2; // ecx
+
+    v2 = jkPlayer_playerInfos[idx].playerThing;
+    if ( !v2 )
+        return 0;
+    jkPlayer_playerInfos[idx].flags |= 5;
+    jkPlayer_playerInfos[idx].net_id = netId;
+    v2->thingflags &= ~SITH_TF_DISABLED;
+    return 1;
+}

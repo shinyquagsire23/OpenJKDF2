@@ -1055,8 +1055,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     wchar_t *v21; // [esp-4h] [ebp-420h]
     int v22; // [esp+10h] [ebp-40Ch]
     Darray darr; // [esp+14h] [ebp-408h] BYREF
-    wchar_t name; // [esp+2Ch] [ebp-3F0h] BYREF
-    char tmp4[60]; // [esp+2Eh] [ebp-3EEh] BYREF
+    wchar_t name[32]; // [esp+2Ch] [ebp-3F0h] BYREF
     __int16 v26; // [esp+6Ah] [ebp-3B2h]
     char tmp5[32]; // [esp+6Ch] [ebp-3B0h] BYREF
     stdStrTable strtable; // [esp+8Ch] [ebp-390h] BYREF
@@ -1065,9 +1064,9 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     char tmp3[128]; // [esp+19Ch] [ebp-280h] BYREF
     wchar_t wtmp1[256]; // [esp+21Ch] [ebp-200h] BYREF
 
-    name = 0;
-    memset(tmp4, 0, sizeof(tmp4));
-    v26 = 0;
+    name[0] = 0;
+    memset(&name[1], 0, 0x3Cu);
+    name[31] = 0;
     tmp5[0] = 0;
     memset(&tmp5[1], 0, 0x1Cu);
     tmp5[29] = 0;

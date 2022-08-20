@@ -72,11 +72,19 @@ static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 static int (*sithDplay_Open)(int a, void* b) = (void*)sithDplay_Open_ADDR;
 static int (*sithDplay_OpenConnection)(void* a) = (void*)sithDplay_OpenConnection_ADDR;
 static void (*sithDplay_CloseConnection)() = (void*)sithDplay_CloseConnection_ADDR;
+static int (*sithDplay_seed_idk)(void*) = (void*)sithDplay_seed_idk_ADDR;
+static int (*sithDplay_CreatePlayer)(void*) = (void*)sithDplay_CreatePlayer_ADDR;
+static void (*sithDplay_DoReceive)() = (void*)sithDplay_DoReceive_ADDR;
+static void (*sithDplay_Close)() = (void*)sithDplay_Close_ADDR;
 #else
 int sithDplay_EarlyInit();
 int sithDplay_OpenConnection(void* a);
 void sithDplay_CloseConnection();
 int sithDplay_Open(int a, void* b);
+int sithDplay_seed_idk(void* a);
+int sithDplay_CreatePlayer(void* a);
+void sithDplay_DoReceive();
+void sithDplay_Close();
 #endif
 
 #endif // _SITHDPLAY_H

@@ -32,6 +32,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUISingleTally.h"
+#include "Gui/jkGUIMultiplayer.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"
@@ -721,6 +722,39 @@ int jkMain_LoadFile(char *a1)
         }
     }
     return 0;
+}
+
+int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
+{
+    BOOL v2; // esi
+    int result; // eax
+
+    _strncpy(gamemode_0_2_str, pEpisodeName, 0x7Fu);
+    gamemode_0_2_str[127] = 0;
+    jkSmack_gameMode = 2;
+    jkRes_LoadGob(pGobPath);
+    if ( jkEpisode_mLoad.paEntries )
+    {
+        pHS->free(jkEpisode_mLoad.paEntries);
+        jkEpisode_mLoad.paEntries = 0;
+    }
+    v2 = jkEpisode_Load(&jkEpisode_mLoad);
+    jkEpisode_idk4(&jkEpisode_mLoad, pEpisodeName);
+    if ( v2 )
+    {
+        result = 1;
+        jkPlayer_dword_525470 = 1;
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 5;
+    }
+    else
+    {
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", pGobPath);
+        result = 0;
+    }
+    return result;
 }
 
 int jkMain_CdSwitch(int a1, int bIsAPath)

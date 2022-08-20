@@ -51,6 +51,8 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing);
 void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy);
 int sithPlayer_GetNumidk(int a1);
 void sithPlayer_SetBinCarries(int binIdx, int bCarries);
+void sithPlayer_sub_4C8910(unsigned int idx);
+int sithPlayer_sub_4C87C0(int idx, int netId);
 
 static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;

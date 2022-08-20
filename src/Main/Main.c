@@ -912,9 +912,7 @@ int Main_Startup(const char *cmdline)
         jkGuiRend_Initialize();
         jkGui_Initialize();
         jkGuiMultiplayer_Initialize();
-#ifndef LINUX_TMP
         jkGuiNetHost_Initialize(); //TODO
-#endif
         jkGuiSetup_Initialize();
         jkGuiDisplay_Initialize();
         jkGuiForce_Initialize();

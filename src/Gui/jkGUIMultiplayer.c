@@ -91,7 +91,6 @@ int jkGuiMultiplayer_Show()
     wchar_t *v6; // eax
     int v7; // esi
     BOOL v8; // ecx
-    wchar_t *v9; // eax
     HRESULT v10; // eax
     wchar_t *v11; // eax
     int v12; // esi
@@ -108,7 +107,6 @@ int jkGuiMultiplayer_Show()
     wchar_t *v23; // eax
     wchar_t *v24; // [esp-4h] [ebp-268h]
     wchar_t *v25; // [esp-4h] [ebp-268h]
-    wchar_t *v26; // [esp-4h] [ebp-268h]
     wchar_t *v27; // [esp-4h] [ebp-268h]
     wchar_t *v28; // [esp-4h] [ebp-268h]
     wchar_t *v29; // [esp-4h] [ebp-268h]
@@ -134,16 +132,16 @@ LABEL_1:
                     jkGuiRend_DarrayNewStr(&a1, 4, 1);
                     jkGuiRend_DarrayFreeEntry(&a1);
                     v1 = 0;
-                    if ( jkGuiMultiplayer_unk_865020 )
+                    if ( jkGuiMultiplayer_numConnections )
                     {
                         v2 = jkGuiMultiplayer_aConnections;
                         do
                         {
-                            jkGuiRend_DarrayReallocStr(&a1, (wchar_t *)v2, 0);
+                            jkGuiRend_DarrayReallocStr(&a1, v2->name, 0);
                             ++v1;
                             ++v2;
                         }
-                        while ( v1 < jkGuiMultiplayer_unk_865020 );
+                        while ( v1 < jkGuiMultiplayer_numConnections );
                     }
                     jkGuiRend_AddStringEntry(&a1, 0, 0);
                     jkGuiRend_SetClickableString(&jkGuiMultiplayer_aElements2[3], &a1);
@@ -199,16 +197,16 @@ LABEL_1:
                     jkGuiRend_DarrayNewStr(&array, 4, 1);
                     jkGuiRend_DarrayFreeEntry(&array);
                     v14 = 0;
-                    if ( jkGuiMultiplayer_unk_865020 )
+                    if ( jkGuiMultiplayer_numConnections )
                     {
                         v15 = jkGuiMultiplayer_aConnections;
                         do
                         {
-                            jkGuiRend_DarrayReallocStr(&array, (wchar_t *)v15, 0);
+                            jkGuiRend_DarrayReallocStr(&array, v15->name, 0);
                             ++v14;
                             ++v15;
                         }
-                        while ( v14 < jkGuiMultiplayer_unk_865020 );
+                        while ( v14 < jkGuiMultiplayer_numConnections );
                     }
                     jkGuiRend_AddStringEntry(&array, 0, 0);
                     jkGuiRend_SetClickableString(&jkGuiMultiplayer_aElements2[3], &array);
@@ -294,7 +292,7 @@ LABEL_51:
         }
         while ( 1 )
         {
-            _wcsncpy(v35.field_A0, (const wchar_t *)jkGuiMultiplayer_aElements3[5].unistr, 0x1Fu);
+            _wcsncpy(v35.field_A0, jkGuiMultiplayer_aElements3[5].wstr, 0x1Fu);
             v35.field_A0[31] = 0;
             v7 = jkGuiMultiplayer_aElements3[3].selectedTextEntry;
             if ( jkGuiMultiplayer_aElements3[3].selectedTextEntry < 0 )
@@ -305,9 +303,7 @@ LABEL_51:
                 goto LABEL_51;
             if ( jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_E0 == 10 )
                 break;
-            v26 = jkStrings_GetText("GUINET_WRONGVERSION");
-            v9 = jkStrings_GetText("GUINET_JOINERROR");
-            jkGuiDialog_ErrorDialog(v9, v26);
+            jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_JOINERROR"), jkStrings_GetText("GUINET_WRONGVERSION"));
 LABEL_28:
             jkGuiRend_MenuSetLastElement(&jkGuiMultiplayer_menu3, &jkGuiMultiplayer_aElements3[9]);
             jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu3, &jkGuiMultiplayer_aElements3[10]);
@@ -360,4 +356,20 @@ LABEL_29:
             continue;
         return 1;
     }
+}
+
+int jkGuiNet_ShowSynchronizing()
+{
+    int v0; // esi
+    void *v2; // [esp-4h] [ebp-8h]
+
+    v2 = jkGui_stdBitmaps[2]->palette;
+    g_submodeFlags |= 8u;
+    jkGui_SetModeMenu(v2);
+    jkGuiMultiplayer_aElements4[1].unistr = (jkGuiStringEntry *)jkStrings_GetText("GUI_SYNCHRONIZING");
+    jkGuiMultiplayer_menu4.idkFunc = jkGuiNet_idk;
+    jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
+    v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
+    jkGui_SetModeGame();
+    return v0;
 }
