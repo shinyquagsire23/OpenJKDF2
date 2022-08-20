@@ -76,6 +76,7 @@ vertices_tmp 0x0082F310 rdVector3[32]
 vertices_tmp_projected 0x0082F310 rdVector3[32]
 sithRender_aSurfaces 0x008318F8 sithSurface*[32]
 sithRender_lastRenderTick 0x008EE678 int
+aSithSurfaces 0x00847E98 sithSurface*[32]
 
 sithCamera_cameras 0x008EC380 sithCamera[7]
 sithCamera_dword_8EE5A0 0x008EE5A0 int
@@ -241,6 +242,7 @@ sithNet_dword_83262C 0x0083262C int
 sithNet_dword_83263C 0x0083263C int
 sithNet_checksum 0x00832630 int
 sithNet_dword_832640 0x00832640 int
+sithNet_dword_832648 0x00832648 int
 
 sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
 sithOverlayMap_matrix 0x00835840 rdMatrix34

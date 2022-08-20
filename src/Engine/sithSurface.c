@@ -1276,3 +1276,13 @@ sithSurface* sithSurface_sub_4E63B0(int idx)
         result = 0;
     return result;
 }
+
+void sithSurface_PushSurface(sithSurface *pSurface)
+{
+    pSurface->surfaceFlags |= SURFACEFLAGS_8000;
+
+    if ( sithSurface_numSurfaces_0 < 0x20 )
+    {
+        aSithSurfaces[sithSurface_numSurfaces_0++] = pSurface;
+    }
+}

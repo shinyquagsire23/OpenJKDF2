@@ -363,8 +363,10 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                         if ( (ctx->flags & 0x200) == 0 )
                         {
                             v6 = ctx->trigId;
+#ifdef WIN32_BLOBS // TODO impl
                             if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
                                 jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
+#endif
                         }
                     }
                 }

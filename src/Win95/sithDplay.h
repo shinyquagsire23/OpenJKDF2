@@ -59,8 +59,6 @@ static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
 //static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
 
-static int (*sithDplay_SendToPlayer)(sithCogMsg *msg, int a2) = (void*)sithDplay_SendToPlayer_ADDR;
-static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 
 static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
 static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFlagidk_ADDR;
@@ -76,6 +74,8 @@ static int (*sithDplay_seed_idk)(void*) = (void*)sithDplay_seed_idk_ADDR;
 static int (*sithDplay_CreatePlayer)(void*) = (void*)sithDplay_CreatePlayer_ADDR;
 static void (*sithDplay_DoReceive)() = (void*)sithDplay_DoReceive_ADDR;
 static void (*sithDplay_Close)() = (void*)sithDplay_Close_ADDR;
+static BOOL (*sithDplay_SendToPlayer)(void *a1, int sendto_id) = (void*)sithDplay_SendToPlayer_ADDR;
+static int (*sithDplay_Recv)(void *a1) = (void*)sithDplay_Recv_ADDR;
 #else
 int sithDplay_EarlyInit();
 int sithDplay_OpenConnection(void* a);
@@ -85,6 +85,8 @@ int sithDplay_seed_idk(void* a);
 int sithDplay_CreatePlayer(void* a);
 void sithDplay_DoReceive();
 void sithDplay_Close();
+BOOL sithDplay_SendToPlayer(void *a1, int sendto_id);
+int sithDplay_Recv(void *a1);
 #endif
 
 #endif // _SITHDPLAY_H

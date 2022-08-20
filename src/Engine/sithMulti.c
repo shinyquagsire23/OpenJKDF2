@@ -4,6 +4,8 @@
 #include "Gameplay/sithEvent.h"
 #include "World/sithWorld.h"
 #include "World/sithPlayer.h"
+#include "Cog/sithCog.h"
+#include "Engine/sithCollision.h"
 #include "jk.h"
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
@@ -54,7 +56,9 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
         sithMulti_multiplayerTimelimit = sithNet_multiplayer_timelimit;
         sithDplay_dword_832204 = sithNet_scorelimit;
         sithNet_tickrate = rate;
+#ifdef WIN32_BLOBS // TODO impl
         sithEvent_RegisterFunc(2, sithMulti_ServerLeft, rate, 1); // TODO enum
+#endif
         result = 0;
     }
     return result;
@@ -177,4 +181,92 @@ void sithMulti_Shutdown()
     sithEvent_RegisterFunc(2, 0, 0, 0);
     sithDplay_Close();
     sithDplay_CloseConnection();
+}
+
+int sithMulti_SendRequestConnect(int sendto_id)
+{
+     NETMSG_START;
+
+    NETMSG_PUSHSTR(sithWorld_pCurrentWorld->map_jkl_fname, 0x20);
+    NETMSG_PUSHWSTR(jkPlayer_playerShortName, 0x10);
+    NETMSG_PUSHWSTR(sithMulti_name, 0x20);
+    NETMSG_PUSHU32(sithNet_checksum);
+
+    NETMSG_END(COGMSG_REQUESTCONNECT);
+    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sendto_id, 1, 0);
+}
+
+int sithMulti_sub_4CBFC0(sithThing *pPlayerThing)
+{
+    unsigned int v1; // esi
+    unsigned int v2; // ebp
+    unsigned int v3; // ecx
+    int *v4; // eax
+    int v5; // edx
+    unsigned int v7; // ebx
+    int v8; // edi
+    sithCollisionSearchEntry *i; // esi
+    sithThing *v10; // eax
+    unsigned int v11; // [esp+10h] [ebp-90h]
+    int v12[32]; // [esp+20h] [ebp-80h] BYREF
+
+    v1 = jkPlayer_maxPlayers;
+    v2 = 0;
+    v3 = 0;
+    v11 = 0;
+    if ( jkPlayer_maxPlayers )
+    {
+        v4 = v12;
+        v5 = pPlayerThing->actorParams.playerinfo->respawnMask;
+        do
+        {
+            if ( ((1 << v3) & v5) == 0 )
+            {
+                *v4 = v3;
+                ++v2;
+                ++v4;
+            }
+            ++v3;
+        }
+        while ( v3 < v1 );
+    }
+    if ( !v2 )
+        return 0;
+    if ( v2 == 1 )
+        return v12[0];
+    v7 = (__int64)(_frand() * (double)v2);
+    if ( v7 > v2 - 1 )
+        v7 = v2 - 1;
+    while ( 1 )
+    {
+        v8 = v12[v7];
+        sithCollision_SearchRadiusForThings(
+            jkPlayer_playerInfos[v8].field_138C,
+            0,
+            &jkPlayer_playerInfos[v8].field_135C.scale,
+            &rdroid_zeroVector3,
+            0.0,
+            pPlayerThing->moveSize,
+            1154);
+        for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
+        {
+            if ( (i->hitType & SITHCOLLISION_THING) != 0 )
+            {
+                v10 = i->receiver;
+                if ( v10->thingtype == SITH_THING_PLAYER && (v10->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                    break;
+            }
+        }
+        sithCollision_SearchClose();
+        if ( !i || v11 >= v2 )
+            break;
+        ++v11;
+        v7 = (v7 + 1) % v2;
+    }
+    return v8;
+}
+
+void sithMulti_SyncScores()
+{
+    sithNet_dword_832648 = 1;
 }

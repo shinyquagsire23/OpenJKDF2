@@ -15,6 +15,7 @@
 #include "Engine/sithTime.h"
 #include "Engine/sithControl.h"
 #include "Engine/sithPhysics.h"
+#include "Engine/sithPuppet.h"
 #include "Main/jkGame.h"
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
@@ -600,4 +601,71 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
     jkPlayer_playerInfos[idx].net_id = netId;
     v2->thingflags &= ~SITH_TF_DISABLED;
     return 1;
+}
+
+void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
+{
+    rdPuppet *v1; // ecx
+    sithPuppet *v2; // eax
+    int v3; // eax
+    sithThing *v4; // eax
+    stdPalEffect *v6; // eax
+    int v7; // eax
+    uint32_t v8; // ecx
+    int v9; // edi
+
+    v1 = player->rdthing.puppet;
+    if ( v1 )
+    {
+        v2 = player->puppet;
+        if ( v2 )
+        {
+            v3 = v2->field_18;
+            if ( v3 >= 0 )
+                sithPuppet_StopKey(v1, v3, 0.0);
+        }
+    }
+    if ( !sithNet_isMulti || (player->thingflags & SITH_TF_INVULN) == 0 )
+    {
+        v4 = player->templateBase;
+        player->actorParams.health = v4->actorParams.health;
+        if ( (v4->physicsParams.physflags & PHYSFLAGS_800) != 0 )
+        {
+            player->physicsParams.physflags &= ~(PHYSFLAGS_100|PHYSFLAGS_SURFACEALIGN);
+            player->physicsParams.physflags |= PHYSFLAGS_800;
+        }
+        sithUnk4_MoveJointsForEyePYR(player, &rdroid_zeroVector3);
+        if ( player == g_localPlayerThing )
+        {
+            sithCamera_SetCameraFocus(sithCamera_cameras, player, 0);
+            sithCamera_SetCameraFocus(&sithCamera_cameras[1], player, 0);
+            sithCamera_DoIdleAnimation();
+            v6 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
+            stdPalEffects_ResetEffect(v6);
+        }
+        v7 = sithNet_isMulti;
+        v8 = player->actorParams.typeflags & ~THING_TYPEFLAGS_400000;
+        player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_WILLBEREMOVED);
+        player->actorParams.typeflags = v8;
+        player->lifeLeftMs = 0;
+        if ( !v7 || player == g_localPlayerThing )
+        {
+            v9 = sithMulti_sub_4CBFC0(player);
+            sithThing_LeaveSector(player);
+            sithThing_SetPosAndRot(
+                player,
+                &jkPlayer_playerInfos[v9].field_135C.scale,
+                &jkPlayer_playerInfos[v9].field_135C);
+            sithThing_EnterSector(player, &jkPlayer_playerInfos[v9].field_138C, 1, 0);
+            sithCamera_FollowFocus(sithCamera_currentCamera);
+            sithPhysics_ThingStop(player);
+            sithWeapon_SyncPuppet(player);
+            sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
+            // TODO impl
+#ifdef WIN32_BLOBS
+            if ( sithCogVm_multiplayerFlags )
+                sithDSSThing_SendSyncThing(player, -1, 255);
+#endif
+        }
+    }
 }

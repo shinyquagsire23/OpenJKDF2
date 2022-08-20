@@ -66,6 +66,7 @@
 #define NETMSG_PUSHVEC3I(x) {*(rdVector3i*)craftingPacket = x; craftingPacket += sizeof(rdVector3i);};
 #define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = x; craftingPacket += sizeof(rdMatrix34);};
 #define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, x, (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
+#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((char*)craftingPacket, x, (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
                             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
@@ -88,6 +89,7 @@ rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 #define NETMSG_POPVEC3I() (_readingOutV3i = *(rdVector3i*)_readingPacket, _readingPacket += sizeof(rdVector3i), _readingOutV3i)
 #define NETMSG_POPMAT34() (_readingOutM34 = *(rdMatrix34*)_readingPacket, _readingPacket += sizeof(rdMatrix34), _readingOutM34)
 #define NETMSG_POPSTR(x,l) { _strncpy((x), (char*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l); }
+#define NETMSG_POPWSTR(x,l) { _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
 #define NETMSG_IN_END {}
 
 typedef int SITH_MESSAGE;

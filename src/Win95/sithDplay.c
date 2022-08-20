@@ -14,6 +14,7 @@ int sithDplay_Startup()
 #ifndef WIN32_BLOBS
     jkGuiMultiplayer_numConnections = 1;
     jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"OpenJKDF2 TCP");
+    sithDplay_dword_8321E0 = 1;
 #endif
     sithDplay_bInitted = 1;
 
@@ -57,6 +58,16 @@ void sithDplay_DoReceive()
 
 void sithDplay_Close()
 {
-    
+
+}
+
+BOOL sithDplay_SendToPlayer(void *a1, int sendto_id)
+{
+    return 1;
+}
+
+int sithDplay_Recv(void *a1)
+{
+    return 0;
 }
 #endif
