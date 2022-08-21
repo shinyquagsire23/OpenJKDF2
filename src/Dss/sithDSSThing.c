@@ -8,8 +8,7 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithUnk4.h"
-
-// Teleport
+#include "Engine/sithPuppet.h"
 
 void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
 {
@@ -106,7 +105,62 @@ int sithDSSThing_HandleTeleportThing(sithCogMsg *msg)
     return 1;
 }
 
-// SyncThing
+void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
+{
+    NETMSG_START;
+
+    if (!pThing || !pThing->thingtype || !pThing->sector || !sithThing_GetIdxFromThing(pThing) )
+        return;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->jkFlags);
+    NETMSG_PUSHS32(pThing->lifeLeftMs);
+    NETMSG_PUSHS16(pThing->sector->id);
+    NETMSG_PUSHS16(pThing->collide);
+    NETMSG_PUSHVEC3(pThing->position);
+    NETMSG_PUSHS32(pThing->thingflags);
+    NETMSG_PUSHS32(pThing->rdthing.geometryMode);
+
+    if ( pThing->animclass )
+    {
+        NETMSG_PUSHS16(pThing->puppet->field_0);
+        NETMSG_PUSHS16(pThing->puppet->field_4);
+    }
+    NETMSG_PUSHS32(pThing->light);
+    switch ( pThing->thingtype )
+    {
+        case SITH_THING_ACTOR:
+        case SITH_THING_CORPSE:
+        case SITH_THING_PLAYER:
+            NETMSG_PUSHS32(pThing->actorParams.typeflags);
+            break;
+        case SITH_THING_WEAPON:
+            NETMSG_PUSHS32(pThing->weaponParams.typeflags);
+            break;
+        case SITH_THING_ITEM:
+            NETMSG_PUSHS32(pThing->itemParams.typeflags);
+            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            {
+                NETMSG_PUSHS16(pThing->itemParams.numBins);
+                for (int i = 0; i < pThing->itemParams.numBins; i++)
+                {
+                    NETMSG_PUSHS16(pThing->itemParams.contents[i].binIdx);
+                    NETMSG_PUSHF32(pThing->itemParams.contents[i].value);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    if ( pThing->moveType == SITH_MT_PHYSICS )
+        NETMSG_PUSHS32(pThing->physicsParams.physflags);
+
+    NETMSG_END(COGMSG_SYNCTHING);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+// HandleSyncThing
 
 void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
 {
@@ -174,6 +228,69 @@ int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg)
 
     return 1;
 }
+
+// SoundClassPlay
+// PlayKey
+// OpenDoor
+// SetThingModel
+// StopKey
+
+void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pSound->refid);
+    NETMSG_PUSHF32(a2);
+
+    NETMSG_END(COGMSG_STOPSOUND);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a3, a4, 1);
+}
+
+int sithDSSThing_HandleStopSound(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    int refid = NETMSG_POPS32();
+    float fadeInTime = NETMSG_POPF32();
+    sithPlayingSound* pSound = sithSoundSys_GetSoundFromRef(refid);
+    if ( pSound )
+    {
+        if ( fadeInTime <= 0.0 )
+        {
+            sithSoundSys_StopSound(pSound);
+            return 1;
+        }
+        sithSoundSys_FadeSound(pSound, 0.0, fadeInTime);
+        pSound->flags |= SITHSOUNDFLAG_FADING;
+    }
+    return 1;
+}
+
+// FireProjectile
+
+void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags)
+{
+    NETMSG_START;
+    
+    NETMSG_PUSHS32(sender->thing_id);
+    if ( receiver ) {
+        NETMSG_PUSHS32(receiver->thing_id);
+    }
+    else {
+        NETMSG_PUSHS32(-1);
+    }
+    NETMSG_PUSHU8(cause);
+    
+    NETMSG_END(COGMSG_DEATH);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+}
+
+// HandleDeath
+
+// SendDamage
+// HandleDamage
 
 void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
 {
@@ -520,23 +637,9 @@ int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags)
-{
-    NETMSG_START;
-    
-    NETMSG_PUSHS32(sender->thing_id);
-    if ( receiver ) {
-        NETMSG_PUSHS32(receiver->thing_id);
-    }
-    else {
-        NETMSG_PUSHS32(-1);
-    }
-    NETMSG_PUSHU8(cause);
-    
-    NETMSG_END(COGMSG_DEATH);
-    
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
-}
+// TakeItem
+// CreateThing
+// DestroyThing
 
 void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector)
 {

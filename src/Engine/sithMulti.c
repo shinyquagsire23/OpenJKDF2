@@ -185,7 +185,7 @@ void sithMulti_Shutdown()
 
 int sithMulti_SendRequestConnect(int sendto_id)
 {
-     NETMSG_START;
+    NETMSG_START;
 
     NETMSG_PUSHSTR(sithWorld_pCurrentWorld->map_jkl_fname, 0x20);
     NETMSG_PUSHWSTR(jkPlayer_playerShortName, 0x10);

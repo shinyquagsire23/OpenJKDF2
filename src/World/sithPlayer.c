@@ -656,7 +656,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
                 player,
                 &jkPlayer_playerInfos[v9].field_135C.scale,
                 &jkPlayer_playerInfos[v9].field_135C);
-            sithThing_EnterSector(player, &jkPlayer_playerInfos[v9].field_138C, 1, 0);
+            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].field_138C, 1, 0);
             sithCamera_FollowFocus(sithCamera_currentCamera);
             sithPhysics_ThingStop(player);
             sithWeapon_SyncPuppet(player);
