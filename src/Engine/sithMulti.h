@@ -44,8 +44,10 @@ void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 
 #ifdef WIN32_BLOBS
 static int (*sithMulti_SendChat)(char *a1, int a2, int a3) = (void*)sithMulti_SendChat_ADDR;
+static void (*sithMulti_HandleScore)() = (void*)sithMulti_HandleScore_ADDR;
 #else
 int sithMulti_SendChat(char *a1, int a2, int a3);
+void sithMulti_HandleScore();
 #endif
 
 HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
@@ -55,6 +57,7 @@ void sithMulti_Shutdown();
 int sithMulti_SendRequestConnect(int sendto_id);
 int sithMulti_sub_4CBFC0(sithThing *pPlayerThing);
 void sithMulti_SyncScores();
+void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
@@ -64,7 +67,7 @@ static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer
 static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
 static void (*sithMulti_HandleTimeLimit)(int) = (void*)sithMulti_HandleTimeLimit_ADDR;
 static int (*sithMulti_sendmsgidk3)(int,int,int) = (void*)sithMulti_sendmsgidk3_ADDR;
-static void (*sithMulti_HandleDeath)(sithPlayerInfo *a1, sithThing *killed, sithThing *killed_by) = (void*)sithMulti_HandleDeath_ADDR;
+//static void (*sithMulti_HandleDeath)(sithPlayerInfo *a1, sithThing *killed, sithThing *killed_by) = (void*)sithMulti_HandleDeath_ADDR;
 //static int (*sithMulti_CreatePlayer)(wchar_t *a1, wchar_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
 static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
 static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;

@@ -745,8 +745,8 @@ sithSector_horizontalPixelsPerRev_idk 0x008553EC float
 sithSector_horizontalDist 0x008553F0 float
 sithSector_flt_8553F4 0x008553F4 float
 sithSector_aSyncIdk 0x00855438 sithSector*[16]
-sithSector_aSyncIdk2 0x00855478 int
-sithSector_numSync 0x008554B8 int
+sithSector_aSyncIdk2 0x00855478 int[16]
+sithSector_numSync 0x008554B8 uint32_t
 
 sithThing_paramKeyToParamValMap 0x008326A8 stdHashTable*
 sithThing_handler 0x008330FC sithThing_handler_t

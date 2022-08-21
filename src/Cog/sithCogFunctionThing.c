@@ -179,7 +179,7 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx)
             if ( !(ctx->flags & 0x200) )
             {
                 if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithDSSThing_SendCreateThing(popTemplate, v7, 0, popSector, (int *)&pos, (int *)&rot, 255, a8);
+                    sithDSSThing_SendCreateThing(popTemplate, v7, 0, popSector, &pos, &rot, 255, a8);
             }
         }
         sithCogVm_PushInt(ctx, v7->thingIdx);

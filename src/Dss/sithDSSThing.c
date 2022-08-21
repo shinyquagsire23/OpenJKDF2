@@ -9,6 +9,8 @@
 #include "World/sithSector.h"
 #include "World/sithUnk4.h"
 #include "Engine/sithPuppet.h"
+#include "World/sithItem.h"
+#include "jk.h"
 
 void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
 {
@@ -160,7 +162,78 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-// HandleSyncThing
+int sithDSSThing_HandleSyncThing(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(msg->pktData[0]);
+    if ( !pThing )
+        return 0;
+    if ( pThing->thingtype == SITH_THING_FREE )
+        return 0;
+    if ( !pThing->sector )
+        return 0;
+    pThing->jkFlags = NETMSG_POPS32();
+    pThing->lifeLeftMs = NETMSG_POPS32();
+    sithSector* pSector = sithSector_GetPtrFromIdx(NETMSG_POPS16());
+    if ( !pSector )
+        return 0;
+    pThing->collide = NETMSG_POPS16();
+    pThing->position = NETMSG_POPVEC3();
+    sithThing_MoveToSector(pThing, pSector, 0);
+
+    uint32_t thingflags = NETMSG_POPS32();
+    if ( pThing->thingtype == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD))
+        sithPlayer_debug_loadauto(pThing);
+    
+    // Lol, anticheat?
+    if ( (pThing->thingflags & SITH_TF_INVULN) != 0 )
+        thingflags |= SITH_TF_INVULN;
+    else
+        thingflags &= ~SITH_TF_INVULN;
+
+    sithAnimclass* pAnimclass = pThing->animclass;
+    pThing->thingflags = thingflags;
+    pThing->rdthing.geometryMode = NETMSG_POPS32();
+    if ( pAnimclass )
+    {
+        sithPuppet_SetArmedMode(pThing, NETMSG_POPS16());
+        sithPuppet_sub_4E4760(pThing, NETMSG_POPS16());
+    }
+
+    pThing->light = NETMSG_POPF32();
+
+    switch ( pThing->thingtype )
+    {
+        case SITH_THING_ACTOR:
+        case SITH_THING_CORPSE:
+        case SITH_THING_PLAYER:
+            pThing->actorParams.typeflags = NETMSG_POPS32();
+            break;
+        case SITH_THING_WEAPON:
+            pThing->weaponParams.typeflags = NETMSG_POPS32();
+            break;
+        case SITH_THING_ITEM:
+            pThing->itemParams.typeflags = NETMSG_POPS32();
+            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            {
+                pThing->itemParams.numBins = NETMSG_POPS16();
+                for (int i = 0; i < pThing->itemParams.numBins; i++)
+                {
+                    pThing->itemParams.contents[i].binIdx = NETMSG_POPS16();
+                    pThing->itemParams.contents[i].value = NETMSG_POPF32();
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    if ( pThing->moveType == SITH_MT_PHYSICS )
+        pThing->physicsParams.physflags = NETMSG_POPS32();
+
+    return 1;
+}
 
 void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
 {
@@ -229,11 +302,84 @@ int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg)
     return 1;
 }
 
-// SoundClassPlay
-// PlayKey
-// OpenDoor
-// SetThingModel
-// StopKey
+void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(a3);
+    NETMSG_PUSHF32(a4);
+    NETMSG_PUSHS16(a2);
+
+    NETMSG_END(COGMSG_SOUNDCLASSPLAY);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
+}
+// HandleSoundClassPlay
+
+void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pRdKeyframe->id);
+    NETMSG_PUSHS16(a4);
+    NETMSG_PUSHS32(a3);
+    NETMSG_PUSHS32(a5);
+
+    NETMSG_END(COGMSG_PLAYKEY);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a6, a7, 0);
+}
+// HandlePlayKey
+
+void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(idx2);
+    NETMSG_PUSHS16(idx1);
+    
+    NETMSG_END(COGMSG_OPENDOOR);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
+}
+// HandleOpenDoor
+
+void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId)
+{
+    if (!pThing || pThing->rdthing.type != RD_THINGTYPE_MODEL )
+        return;
+
+    const char *pFname = pThing->rdthing.model3->filename;
+    if (!pFname)
+        return;
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHSTR(pFname, 0x20);
+
+    NETMSG_END(COGMSG_SETTHINGMODEL);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
+}
+// HandleSetThingModel
+
+void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(a2);
+    NETMSG_PUSHF32(a3);
+
+    NETMSG_END(COGMSG_STOPKEY);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+}
+// HandleStopKey
 
 void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4)
 {
@@ -267,7 +413,37 @@ int sithDSSThing_HandleStopSound(sithCogMsg *msg)
     return 1;
 }
 
-// FireProjectile
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pWeapon->thing_id);
+    NETMSG_PUSHS16(scaleFlags);
+    
+    int16_t v12 = -1;
+    if ( pProjectile ) {
+        NETMSG_PUSHS16(pProjectile->thingIdx);
+    }
+    else {
+        NETMSG_PUSHS16(-1);
+    }
+    if ( pFireSound ) {
+        v12 = pFireSound->id;
+    }
+
+    NETMSG_PUSHS16(v12);
+    NETMSG_PUSHS16(anim);
+    NETMSG_PUSHVEC3(*pAimError);
+    NETMSG_PUSHVEC3(*pFireOffset);
+    NETMSG_PUSHF32(scale);
+    NETMSG_PUSHF32(a9);
+    NETMSG_PUSHS32(thingId);
+
+    NETMSG_END(COGMSG_FIREPROJECTILE);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
+}
+// HandleFireProjectile
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags)
 {
@@ -289,7 +465,25 @@ void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, 
 
 // HandleDeath
 
-// SendDamage
+void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pDamagedThing->thing_id);
+    if ( pDamagedBy ) {
+        NETMSG_PUSHS32(pDamagedBy->thing_id);
+    }
+    else{
+        NETMSG_PUSHS32(-1);
+    }
+    NETMSG_PUSHF32(amt);
+    NETMSG_PUSHS16(a4);
+
+     NETMSG_END(COGMSG_DAMAGE);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+}
+
 // HandleDamage
 
 void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
@@ -555,6 +749,34 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
     return 1;
 }
 
+void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags)
+{
+    rdVector3 out;
+
+    if (!pThing || pThing->moveType != SITH_MT_PATH || !pThing->thingtype )
+        return;
+    if (!pThing->sector)
+        return;
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(a4);
+    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(bShowInvisibleThings);
+    NETMSG_PUSHS16(pThing->sector->id);
+    NETMSG_PUSHVEC3(pThing->position);
+    rdMatrix_ExtractAngles34(&pThing->lookOrientation, &out);
+    NETMSG_PUSHVEC3(out);
+    NETMSG_PUSHS16(a2);
+    NETMSG_PUSHF32(a3);
+
+    NETMSG_END(COGMSG_SYNCTHINGFRAME);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+}
+
+// HandleSyncThingFrame
+
 void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4)
 {
     NETMSG_START;
@@ -637,9 +859,91 @@ int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg)
     return 0;
 }
 
-// TakeItem
-// CreateThing
-// DestroyThing
+// TODO probably some weird inlining going on here
+void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpFlags)
+{
+    int itemThingId; // edi
+    int actorId; // edx
+    sithThing *pItemThing2; // esi
+    sithThing *pActor2_; // eax
+    sithThing *pActor2; // edi
+
+    itemThingId = pItemThing->thing_id;
+    actorId = pActor->thing_id;
+    sithCogVm_netMsgTmp.pktData[0] = itemThingId;
+    sithCogVm_netMsgTmp.pktData[1] = actorId;
+    sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+    sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_TAKEITEM1;
+    sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+    if ( !sithNet_isServer )
+    {
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, mpFlags, 1);
+        return;
+    }
+    pItemThing2 = sithThing_GetById(itemThingId);
+    if ( !pItemThing2 && sithNet_isServer )
+    {
+        sithCogVm_netMsgTmp.pktData[0] = itemThingId;
+        sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+        sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_DESTROYTHING;
+        sithCogVm_netMsgTmp.netMsg.msg_size = 4;
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithCogVm_netMsgTmp.netMsg.thingIdx, 255, 1);
+        return;
+    }
+    pActor2_ = sithThing_GetById(sithCogVm_netMsgTmp.pktData[1]);
+    pActor2 = pActor2_;
+    if ( pItemThing2 && pActor2_ )
+    {
+        if ( sithCogVm_netMsgTmp.netMsg.cogMsgId != COGMSG_TAKEITEM1 )
+        {
+LABEL_12:
+            sithItem_Take(pItemThing2, pActor2, 1);
+            return;
+        }
+        if ( pItemThing2->thingtype == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
+        {
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_TAKEITEM2;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
+            goto LABEL_12;
+        }
+    }
+}
+// HandleTakeItem
+
+void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithThing *pThing2, sithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS16(pTemplate->thingIdx);
+    if ( pThing2 )
+    {
+        NETMSG_PUSHS32(pThing2->thing_id);
+    }
+    else
+    {
+        NETMSG_PUSHS32(-1);
+        NETMSG_PUSHS32(pSector->id);
+        NETMSG_PUSHVEC3(*pPos);
+        NETMSG_PUSHVEC3(*pRot);
+    }
+    NETMSG_PUSHS32(pThing->thing_id);
+
+    NETMSG_END(COGMSG_CREATETHING);
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, mpFlags, bSync);
+}
+
+// HandleCreateThing
+
+void sithDSSThing_SendDestroyThing(int idx, int sendtoId)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(idx);
+    NETMSG_END(COGMSG_DESTROYTHING);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
+}
+// HandleDestroyThing
 
 void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector)
 {

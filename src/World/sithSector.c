@@ -247,3 +247,42 @@ sithSector* sithSector_GetPtrFromIdx(int idx)
         result = 0;
     return result;
 }
+
+void sithSector_Sync(sithSector *pSector, int a2)
+{
+    uint32_t v3; // edx
+    uint32_t v4; // eax
+    sithSector **v5; // ecx
+
+    if ( a2 )
+    {
+        pSector->flags |= SITH_SECTOR_8000;
+    }
+    if ( sithCogVm_multiplayerFlags )
+    {
+        v3 = sithSector_numSync;
+        if ( sithSector_numSync < 0x10 )
+        {
+            v4 = 0;
+            if ( sithSector_numSync )
+            {
+                v5 = sithSector_aSyncIdk;
+                while ( *v5 != pSector )
+                {
+                    ++v4;
+                    ++v5;
+                    if ( v4 >= sithSector_numSync )
+                        goto LABEL_9;
+                }
+                sithSector_aSyncIdk2[v4] |= a2;
+            }
+            else
+            {
+LABEL_9:
+                sithSector_aSyncIdk[sithSector_numSync] = pSector;
+                sithSector_aSyncIdk2[v3] = a2;
+                sithSector_numSync = v3 + 1;
+            }
+        }
+    }
+}

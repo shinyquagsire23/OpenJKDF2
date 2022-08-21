@@ -46,36 +46,73 @@ void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
 int sithDSSThing_HandleTeleportThing(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags);
+int sithDSSThing_HandleSyncThing(sithCogMsg *msg);
 
 void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
 int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg);
 
-void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
-int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg);
+void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4);
+// HandleSoundClassPlay
 
-void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
-int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg);
+void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7);
+// HandlePlayKey
 
-void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
+void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags);
+// HandleOpenDoor
 
-void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector);
+void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId);
+// HandleSetThingModel
+
+void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags);
+// HandleStopKey
 
 void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4);
 int sithDSSThing_HandleStopSound(sithCogMsg *msg);
 
-static void (*sithDSSThing_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_SendPlayKey_ADDR;
-static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;
-static void (*sithDSSThing_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithDSSThing_SendSetThingModel_ADDR;
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags);
+// HandleFireProjectile
+
+void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
+// HandleDeath
+
+void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags);
+// HandleDamage
+
+void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
+int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg);
+
+void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
+// HandleSyncThingFrame
+
+void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
+int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg);
+
+void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpFlags);
+// HandleTakeItem
+
+void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithThing *pThing2, sithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync);
+// HandleCreateThing
+
+void sithDSSThing_SendDestroyThing(int idx, int sendtoId);
+// HandleDestroyThing
+
+void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector);
+
+
+
+//static void (*sithDSSThing_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_SendPlayKey_ADDR;
+//static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;
+//static void (*sithDSSThing_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithDSSThing_SendSetThingModel_ADDR;
 //static int (*sithDSSThing_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithDSSThing_SendStopSound_ADDR;
-static int (*sithDSSThing_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithDSSThing_SoundClassPlay_ADDR;
-static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
-static void (*sithDSSThing_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendSyncThingFrame_ADDR;
-static void (*sithDSSThing_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendOpenDoor_ADDR;
-static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThing_SendDestroyThing_ADDR;
-static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;
-static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
+//static int (*sithDSSThing_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithDSSThing_SoundClassPlay_ADDR;
+//static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
+//static void (*sithDSSThing_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendSyncThingFrame_ADDR;
+//static void (*sithDSSThing_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendOpenDoor_ADDR;
+//static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThing_SendDestroyThing_ADDR;
+//static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;
+//static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
 //static void (*sithDSSThing_SendSyncThing)(sithThing *a1, int a2, int a3) = (void*)sithDSSThing_SendSyncThing_ADDR;
-static void (*sithDSSThing_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithDSSThing_SendTakeItem_ADDR;
+//static void (*sithDSSThing_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithDSSThing_SendTakeItem_ADDR;
 
 
 #endif // _DSS_SITHDSSTHING_H

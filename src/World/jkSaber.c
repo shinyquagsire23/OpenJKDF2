@@ -842,3 +842,42 @@ int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
     sithMulti_SyncScores();
     return 1;
 }
+
+void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pPlayerThing->thing_id);
+
+    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
+    rdModel3* pModel3 = pPlayerInfo->rd_thing.model3;
+    if ( pModel3 ) {
+        NETMSG_PUSHS32(pModel3->id);
+    }
+    else {
+        NETMSG_PUSHS32(-1);
+    }
+
+    NETMSG_PUSHS16(pPlayerInfo->maxTwinkles);
+    NETMSG_PUSHS16(pPlayerInfo->twinkleSpawnRate);
+
+    NETMSG_END(COGMSG_JKSETWEAPONMESH);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+}
+
+void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
+{
+    NETMSG_START;
+
+    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
+
+    NETMSG_PUSHS16(pPlayerThing->thingIdx);
+    NETMSG_PUSHF32(pPlayerInfo->damage);
+    NETMSG_PUSHF32(pPlayerInfo->field_1AC);
+    NETMSG_PUSHF32(pPlayerInfo->field_1B0);
+
+    NETMSG_END(COGMSG_JKENABLESABER);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
+}

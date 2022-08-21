@@ -47,6 +47,7 @@ typedef enum SITH_SECTOR_FLAG
   SITH_SECTOR_COLLIDEBOX = 0x1000,
   SITH_SECTOR_2000 = 0x2000,
   SITH_SECTOR_AUTOMAPVISIBLE = 0x4000,
+  SITH_SECTOR_8000 = 0x8000,
 } SITH_SECTOR_FLAG;
 
 int sithSector_Load(sithWorld *world, int tmp);
@@ -58,6 +59,7 @@ int sithSector_GetThingsCount(sithSector *sector);
 void sithSector_Free(sithWorld *world);
 int sithSector_GetNumPlayers(sithSector *sector);
 sithSector* sithSector_GetPtrFromIdx(int idx);
+void sithSector_Sync(sithSector *pSector, int a2);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -73,7 +75,7 @@ sithSector* sithSector_GetPtrFromIdx(int idx);
 //static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 //static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
-static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
+//static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
 //static void (*sithSector_sub_4F2C30)(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing) = (void*)sithSector_sub_4F2C30_ADDR;
 
 #endif // _SITHSECTOR_H

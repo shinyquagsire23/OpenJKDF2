@@ -7,6 +7,8 @@
 #include "Cog/sithCog.h"
 #include "Engine/sithCollision.h"
 #include "jk.h"
+#include "General/sithStrTable.h"
+#include "Win95/DebugConsole.h"
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
 {
@@ -193,7 +195,7 @@ int sithMulti_SendRequestConnect(int sendto_id)
     NETMSG_PUSHU32(sithNet_checksum);
 
     NETMSG_END(COGMSG_REQUESTCONNECT);
-    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sendto_id, 1, 0);
+    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 1, 0);
 }
 
 int sithMulti_sub_4CBFC0(sithThing *pPlayerThing)
@@ -270,3 +272,72 @@ void sithMulti_SyncScores()
 {
     sithNet_dword_832648 = 1;
 }
+
+void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing)
+{
+    double v3; // st7
+    wchar_t *v4; // eax
+    wchar_t *v5; // eax
+    wchar_t *v6; // eax
+    wchar_t *v7; // [esp-8h] [ebp-114h]
+    wchar_t *v8; // [esp-8h] [ebp-114h]
+    sithPlayerInfo *v9; // [esp-4h] [ebp-110h]
+    sithPlayerInfo *v10; // [esp-4h] [ebp-110h]
+    wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
+
+    ++pPlayerInfo->numKilled;
+    if ( !pKilledByThing || pKilledByThing->thingtype != SITH_THING_PLAYER )
+    {
+        v6 = sithStrTable_GetString("%s_DIED");
+        jk_snwprintf(a1a, 0x80u, v6, pPlayerInfo);
+        DebugConsole_PrintUniStr(a1a);
+        goto LABEL_15;
+    }
+    if ( pKilledByThing != pKilledThing )
+    {
+        v10 = pKilledByThing->actorParams.playerinfo;
+        v5 = sithStrTable_GetString("%s_WAS_KILLED_BY_%s");
+        jk_snwprintf(a1a, 0x80u, v5, pPlayerInfo, v10);
+        DebugConsole_PrintUniStr(a1a);
+        ++pKilledByThing->actorParams.playerinfo->numKills;
+        sithMulti_HandleScore();
+        return;
+    }
+    v3 = _frand() * 4.0;
+    if ( v3 < 1.0 )
+    {
+        v9 = pPlayerInfo;
+        v4 = sithStrTable_GetString("%s_COMMITTED_SUICIDE0");
+LABEL_11:
+        jk_snwprintf(a1a, 0x80u, v4, v9);
+        goto LABEL_12;
+    }
+    if ( v3 >= 2.0 )
+    {
+        v9 = pPlayerInfo;
+        if ( v3 >= 3.0 )
+        {
+            v4 = sithStrTable_GetString("%s_COMMITTED_SUICIDE3");
+            goto LABEL_11;
+        }
+        v8 = sithStrTable_GetString("%s_COMMITTED_SUICIDE2");
+        jk_snwprintf(a1a, 0x80u, v8, pPlayerInfo);
+    }
+    else
+    {
+        v7 = sithStrTable_GetString("%s_COMMITTED_SUICIDE1");
+        jk_snwprintf(a1a, 0x80u, v7, pPlayerInfo);
+    }
+LABEL_12:
+    DebugConsole_PrintUniStr(a1a);
+LABEL_15:
+    ++pPlayerInfo->numSuicides;
+    sithMulti_HandleScore();
+}
+
+#ifndef WIN32_BLOBS
+void sithMulti_HandleScore()
+{
+
+}
+#endif
