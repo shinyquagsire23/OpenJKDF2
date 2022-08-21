@@ -525,7 +525,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     if ( param == THINGPARAM_FRAME )
     {
         v6 = v3->loadedFrames;
-        if ( v6 < v3->numFrames && _sscanf(arg->value, "(%f/%f/%f)", &v9, &v10, &v11) == 3 )
+        if ( v6 < v3->sizeFrames && _sscanf(arg->value, "(%f/%f/%f)", &v9, &v10, &v11) == 3 )
         {
             v7 = &v3->framesAlloc[v6];
             v7->x = v9;
@@ -538,7 +538,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     }
     if ( param != THINGPARAM_NUMFRAMES )
         return 0;
-    if ( v3->numFrames )
+    if ( v3->sizeFrames )
         return 0;
     v5 = _atoi(arg->value);
     if ( !v5 )
@@ -548,7 +548,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     if ( result )
     {
         _memset((void *)result, 0, sizeof(rdVector3) * v5);
-        v3->numFrames = v5;
+        v3->sizeFrames = v5;
         v3->loadedFrames = 0;
         result = 1;
     }
@@ -569,8 +569,8 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
 
     v3 = a3;
     v4 = a2->actor;
-    v4->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.numFrames);
-    v4->numFrames = a3->trackParams.numFrames;
+    v4->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.sizeFrames);
+    v4->sizeFrames = a3->trackParams.sizeFrames;
     v5 = a3->trackParams.loadedFrames;
     v6 = 0;
     v7 = 0;

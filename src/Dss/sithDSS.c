@@ -339,7 +339,7 @@ int sithDSS_HandleSyncAI(sithCogMsg *msg)
     if ( actor->loadedFrames)
     {
         actor->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * actor->loadedFrames);
-        actor->numFrames = actor->loadedFrames;
+        actor->sizeFrames = actor->loadedFrames;
         if ( actor->framesAlloc )
         {
             for (int i = 0; i < actor->loadedFrames; i++)
@@ -351,7 +351,7 @@ int sithDSS_HandleSyncAI(sithCogMsg *msg)
     }
     else
     {
-        actor->numFrames = 0;
+        actor->sizeFrames = 0;
         actor->loadedFrames = 0;
         actor->framesAlloc = NULL; // Added
     }

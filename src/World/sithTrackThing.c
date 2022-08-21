@@ -77,8 +77,8 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
         // Added
         //if (v3 < 0)
         //    v3 = 0;
-        //if (v3 >= thing->trackParams.numFrames)
-        //    v3 = 0;//thing->trackParams.numFrames - 1;
+        //if (v3 >= thing->trackParams.sizeFrames)
+        //    v3 = 0;//thing->trackParams.sizeFrames - 1;
 
         v12 = thing->trackParams.frames;
         thing->field_258 = v3;
@@ -372,7 +372,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     {
         v8 = thing;
         v9 = thing->trackParams.loadedFrames;
-        if ( v9 < thing->trackParams.numFrames )
+        if ( v9 < thing->trackParams.sizeFrames )
         {
             if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &v12.x, &v12.y, &v12.z, &v13.x, &v13.y, &v13.z) != 6 )
                 return 0;
@@ -386,7 +386,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     if ( param != THINGPARAM_NUMFRAMES )
         return 0;
     v4 = thing;
-    if ( thing->trackParams.numFrames )
+    if ( thing->trackParams.sizeFrames )
         return 0;
     v5 = _atoi(arg->value);
     v6 = v5;
@@ -397,7 +397,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     if ( v4->trackParams.frames )
     {
         _memset(v4->trackParams.frames, 0, v7);
-        v4->trackParams.numFrames = v6;
+        v4->trackParams.sizeFrames = v6;
         v4->trackParams.loadedFrames = 0;
         return 1;
     }
@@ -429,14 +429,14 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
     uint32_t v10; // eax
     rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
 
-    v3 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.numFrames);
+    v3 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
     v4 = thing2->trackParams.frames;
-    v5 = 3 * thing2->trackParams.numFrames;
+    v5 = 3 * thing2->trackParams.sizeFrames;
     thing->trackParams.frames = v3;
     _memcpy(v3, v4, 8 * v5);
     v6 = thing2->trackParams.loadedFrames;
     v7 = 0;
-    thing->trackParams.numFrames = thing2->trackParams.numFrames;
+    thing->trackParams.sizeFrames = thing2->trackParams.sizeFrames;
     thing->trackParams.loadedFrames = v6;
     if ( v6 )
     {

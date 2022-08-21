@@ -541,8 +541,8 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
         if ( thing->trackParams.loadedFrames )
         {
             // TODO: verify this doesn't leak memory
-            thing->trackParams.numFrames = thing->trackParams.loadedFrames;
-            thing->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
+            thing->trackParams.sizeFrames = thing->trackParams.loadedFrames;
+            thing->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
 
         for (int i = 0; i < thing->trackParams.loadedFrames; i++)

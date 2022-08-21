@@ -433,18 +433,18 @@ void sithThing_sub_4CD100(sithThing *thing)
 
 int sithThing_DoesRdThingInit(sithThing *thing)
 {
-    int v2; // ebp
-    int result; // eax
-    int thinga; // [esp+14h] [ebp+4h]
 
-    v2 = thing->thingIdx;
-    thinga = thing->signature;
+    int idx = thing->thingIdx;
+    int sig = thing->signature;
+
     _memset(thing, 0, sizeof(sithThing));
     _memcpy(&thing->lookOrientation, &rdroid_identMatrix34, sizeof(thing->lookOrientation));
-    result = rdThing_NewEntry(&thing->rdthing, thing);
-    thing->thingIdx = v2;
-    thing->signature = thinga;
-    return result;
+
+    int out = rdThing_NewEntry(&thing->rdthing, thing);
+    thing->thingIdx = idx;
+    thing->signature = sig;
+
+    return out;
 }
 
 sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
@@ -475,19 +475,15 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         if ( thing->moveType == SITH_MT_PATH && a2->trackParams.frames )
         {
             // Added: made this more explicit
-            thing->trackParams.numFrames = a2->trackParams.numFrames;
-            thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.numFrames);
+            thing->trackParams.sizeFrames = a2->trackParams.sizeFrames;
+            thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
             if (thing->trackParams.frames) // Added: nullptr check
-                _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.numFrames);
+                _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
     }
     else
     {
-        _memset(thing, 0, sizeof(sithThing));
-        _memcpy(&thing->lookOrientation, &rdroid_identMatrix34, sizeof(thing->lookOrientation));
-        rdThing_NewEntry(&thing->rdthing, thing);
-        thing->thingIdx = thinga;
-        thing->signature = v10;
+        sithThing_DoesRdThingInit(thing);
     }
     thing->thingIdx = thinga;
     result = v12;

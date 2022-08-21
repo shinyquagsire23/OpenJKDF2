@@ -2176,7 +2176,7 @@ typedef struct sithActor
     int field_28C;
     rdVector3 *framesAlloc;
     int loadedFrames;
-    int numFrames;
+    int sizeFrames;
 } sithActor;
 
 typedef struct sithThingParticleParams
@@ -2372,7 +2372,7 @@ typedef struct sithThingFrame
 
 typedef struct sithThingTrackParams
 {
-    uint32_t numFrames;
+    uint32_t sizeFrames;
     uint32_t loadedFrames;
     sithThingFrame *frames;
     uint32_t field_C;
