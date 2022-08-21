@@ -579,7 +579,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
     {
         while ( 1 )
         {
-            v8 = &v3->trackParams.frames[v6].pos;
+            v8 = &v3->trackParams.aFrames[v6].pos;
             rdVector_Rotate3(&a1, a4, v8 + 1);
             v9 = &v4->framesAlloc[v7];
             ++v7;

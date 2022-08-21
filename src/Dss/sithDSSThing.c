@@ -400,8 +400,8 @@ void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags
 
             for (int i = 0; i < thing->trackParams.loadedFrames; i++)
             {
-                NETMSG_PUSHVEC3(thing->trackParams.frames[i].pos);
-                NETMSG_PUSHVEC3(thing->trackParams.frames[i].rot);
+                NETMSG_PUSHVEC3(thing->trackParams.aFrames[i].pos);
+                NETMSG_PUSHVEC3(thing->trackParams.aFrames[i].rot);
             }
         }
     }
@@ -542,13 +542,13 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
         {
             // TODO: verify this doesn't leak memory
             thing->trackParams.sizeFrames = thing->trackParams.loadedFrames;
-            thing->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
+            thing->trackParams.aFrames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
 
         for (int i = 0; i < thing->trackParams.loadedFrames; i++)
         {
-            thing->trackParams.frames[i].pos = NETMSG_POPVEC3();
-            thing->trackParams.frames[i].rot = NETMSG_POPVEC3();
+            thing->trackParams.aFrames[i].pos = NETMSG_POPVEC3();
+            thing->trackParams.aFrames[i].rot = NETMSG_POPVEC3();
         }
     }
     sithThing_sub_4CD100(thing);

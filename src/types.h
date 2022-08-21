@@ -2374,7 +2374,7 @@ typedef struct sithThingTrackParams
 {
     uint32_t sizeFrames;
     uint32_t loadedFrames;
-    sithThingFrame *frames;
+    sithThingFrame *aFrames;
     uint32_t field_C;
     rdVector3 vel;
     float field_1C;

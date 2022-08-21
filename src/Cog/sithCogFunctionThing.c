@@ -282,8 +282,8 @@ void sithCogFunctionThing_JumpToFrame(sithCog *ctx)
         if ( thing->attach_flags )
             sithThing_DetachThing(thing);
 
-        rdMatrix_BuildRotate34(&thing->lookOrientation, &thing->trackParams.frames[frame].rot);
-        rdVector_Copy3(&thing->position, &thing->trackParams.frames[frame].pos);
+        rdMatrix_BuildRotate34(&thing->lookOrientation, &thing->trackParams.aFrames[frame].rot);
+        rdVector_Copy3(&thing->position, &thing->trackParams.aFrames[frame].pos);
 
         if ( !thing->sector )
             sithThing_EnterSector(thing, sector, 1, 0);
@@ -341,8 +341,8 @@ void sithCogFunctionThing_RotatePivot(sithCog *ctx)
 
     if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.loadedFrames > frame )
     {
-        rdVector3* pos = &thing->trackParams.frames[frame].pos;
-        rdVector3* rot = &thing->trackParams.frames[frame].rot;
+        rdVector3* pos = &thing->trackParams.aFrames[frame].pos;
+        rdVector3* rot = &thing->trackParams.aFrames[frame].rot;
         if ( speed <= 0.0 )
         {
             rdVector3 negRot;
@@ -1285,7 +1285,7 @@ void sithCogFunctionThing_GetFramePos(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if ( thing && thing->moveType == SITH_MT_PATH && frame < thing->trackParams.loadedFrames )
-        sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].pos);
+        sithCogVm_PushVector3(ctx, &thing->trackParams.aFrames[frame].pos);
     sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
@@ -1296,7 +1296,7 @@ void sithCogFunctionThing_GetFrameRot(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing && thing->moveType == SITH_MT_PATH && frame < thing->trackParams.loadedFrames)
-        sithCogVm_PushVector3(ctx, &thing->trackParams.frames[frame].rot);
+        sithCogVm_PushVector3(ctx, &thing->trackParams.aFrames[frame].rot);
     sithCogVm_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 

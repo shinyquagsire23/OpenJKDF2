@@ -261,8 +261,8 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
         if ( thingIter->sector )
             sithThing_LeaveSector(thingIter);
 
-        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.frames )
-            pSithHS->free(thingIter->trackParams.frames);
+        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.aFrames )
+            pSithHS->free(thingIter->trackParams.aFrames);
 
         if ( thingIter->thingtype == SITH_THING_ACTOR )
             sithAI_FreeEntry(thingIter);
@@ -387,8 +387,8 @@ void sithThing_FreeEverything(sithThing *thing)
         sithThing_DetachThing(thing);
     if ( thing->sector )
         sithThing_LeaveSector(thing);
-    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
-        pSithHS->free(thing->trackParams.frames);
+    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.aFrames )
+        pSithHS->free(thing->trackParams.aFrames);
     if ( thing->thingtype == SITH_THING_ACTOR )
         sithAI_FreeEntry(thing);
     if ( thing->type == SITH_THING_PARTICLE )
@@ -472,13 +472,13 @@ sithThing* sithThing_sub_4CD8A0(sithThing *thing, sithThing *a2)
         }
         if ( thing->animclass )
             rdPuppet_New(&thing->rdthing);
-        if ( thing->moveType == SITH_MT_PATH && a2->trackParams.frames )
+        if ( thing->moveType == SITH_MT_PATH && a2->trackParams.aFrames )
         {
             // Added: made this more explicit
             thing->trackParams.sizeFrames = a2->trackParams.sizeFrames;
-            thing->trackParams.frames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
-            if (thing->trackParams.frames) // Added: nullptr check
-                _memcpy(thing->trackParams.frames, a2->trackParams.frames, sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
+            thing->trackParams.aFrames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
+            if (thing->trackParams.aFrames) // Added: nullptr check
+                _memcpy(thing->trackParams.aFrames, a2->trackParams.aFrames, sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
     }
     else
@@ -1411,8 +1411,8 @@ void sithThing_freestuff(sithWorld *world)
             sithThing_DetachThing(thingIter);
         if ( thingIter->sector )
             sithThing_LeaveSector(thingIter);
-        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.frames )
-            pSithHS->free(thingIter->trackParams.frames);
+        if ( thingIter->moveType == SITH_MT_PATH && thingIter->trackParams.aFrames )
+            pSithHS->free(thingIter->trackParams.aFrames);
         if ( thingIter->thingtype == SITH_THING_ACTOR || thingIter->thingtype == SITH_THING_PLAYER) // Added: SITH_THING_PLAYER
             sithAI_FreeEntry(thingIter);
         if ( thingIter->type == SITH_THING_PARTICLE )
@@ -1516,8 +1516,8 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     {
         if ( result->moveType == SITH_MT_PATH
           && spawnThing->moveType == SITH_MT_PATH
-          && spawnThing->trackParams.frames
-          && !result->trackParams.frames )
+          && spawnThing->trackParams.aFrames
+          && !result->trackParams.aFrames )
         {
             sithTrackThing_idkpathmove(result, spawnThing, &diffVec);
         }
@@ -1698,8 +1698,8 @@ void sithThing_FreeEverythingNet(sithThing *thing)
         sithThing_DetachThing(thing);
     if ( thing->sector )
         sithThing_LeaveSector(thing);
-    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.frames )
-        pSithHS->free(thing->trackParams.frames);
+    if ( thing->moveType == SITH_MT_PATH && thing->trackParams.aFrames )
+        pSithHS->free(thing->trackParams.aFrames);
     if ( thing->thingtype == SITH_THING_ACTOR )
         sithAI_FreeEntry(thing);
     if ( thing->type == SITH_THING_PARTICLE )

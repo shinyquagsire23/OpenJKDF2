@@ -40,7 +40,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     v3 = thing->goalframe;
     if ( v2 == v3 )
     {
-        v4 = thing->trackParams.frames;
+        v4 = thing->trackParams.aFrames;
         v5 = v2;
         thing->trackParams.vel.x = v4[v5].pos.x - thing->position.x;
         thing->trackParams.vel.y = v4[v5].pos.y - thing->position.y;
@@ -80,7 +80,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
         //if (v3 >= thing->trackParams.sizeFrames)
         //    v3 = 0;//thing->trackParams.sizeFrames - 1;
 
-        v12 = thing->trackParams.frames;
+        v12 = thing->trackParams.aFrames;
         thing->field_258 = v3;
         v13 = v12[v3].pos.x - thing->position.x;
         v14 = &v12[v3];
@@ -99,7 +99,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     }
     if ( thinga < 1.0 )
         thinga = 1.0;
-    sithTrackThing_sub_4FAD50(thing, &thing->trackParams.frames[v3].rot, thinga);
+    sithTrackThing_sub_4FAD50(thing, &thing->trackParams.aFrames[v3].rot, thinga);
 }
 
 void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
@@ -376,7 +376,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
         {
             if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &v12.x, &v12.y, &v12.z, &v13.x, &v13.y, &v13.z) != 6 )
                 return 0;
-            v10 = &v8->trackParams.frames[v9];
+            v10 = &v8->trackParams.aFrames[v9];
             v8->trackParams.loadedFrames = v9 + 1;
             rdVector_Copy3(&v10->pos, &v12);
             rdVector_Copy3(&v10->rot, &v13);
@@ -393,10 +393,10 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     if ( v5 < 1 )
         return 0;
     v7 = sizeof(sithThingFrame) * v5;
-    v4->trackParams.frames = pSithHS->alloc(sizeof(sithThingFrame) * v5);
-    if ( v4->trackParams.frames )
+    v4->trackParams.aFrames = pSithHS->alloc(sizeof(sithThingFrame) * v5);
+    if ( v4->trackParams.aFrames )
     {
-        _memset(v4->trackParams.frames, 0, v7);
+        _memset(v4->trackParams.aFrames, 0, v7);
         v4->trackParams.sizeFrames = v6;
         v4->trackParams.loadedFrames = 0;
         return 1;
@@ -430,9 +430,9 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
     rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
 
     v3 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
-    v4 = thing2->trackParams.frames;
+    v4 = thing2->trackParams.aFrames;
     v5 = 3 * thing2->trackParams.sizeFrames;
-    thing->trackParams.frames = v3;
+    thing->trackParams.aFrames = v3;
     _memcpy(v3, v4, 8 * v5);
     v6 = thing2->trackParams.loadedFrames;
     v7 = 0;
@@ -443,7 +443,7 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
         v8 = 0;
         do
         {
-            v9 = &thing->trackParams.frames[v8];
+            v9 = &thing->trackParams.aFrames[v8];
             rdVector_Rotate3(&a1a, a3, &v9->rot);
             v10 = thing->trackParams.loadedFrames;
             ++v7;
@@ -556,7 +556,7 @@ void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, fl
         sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_STARTMOVE);
         sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
 
-        goalFrame = &trackThing->trackParams.frames[trackThing->goalframe];
+        goalFrame = &trackThing->trackParams.aFrames[trackThing->goalframe];
 
         trackThing->trackParams.vel.x = goalFrame->pos.x - trackThing->position.x;
         trackThing->trackParams.vel.y = goalFrame->pos.y - trackThing->position.y;
