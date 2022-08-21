@@ -405,8 +405,8 @@ jkGuiMultiTally_Show	.text	00418070	00000525	00029EA0	00000004	R	.	.	.	.	.	.	.
 jkGuiMultiTally_SortPlayerScore	.text	004185A0	00000098	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiMultiTally_Initialize	.text	00418640	0000003C			R	.	.	.	.	.	.	.
 jkGuiMultiTally_Shutdown	.text	00418680	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiMultiTally_ShowMenu3	.text	00418690	000001CF	00000860	00000004	R	.	.	.	.	.	.	.
-jkGuiMultiTally_Sortidk	.text	00418870	0000003C	00000004	00000008	R	.	.	.	.	.	T	.
+jkGuiMultiTally_ShowTeamScores	.text	00418690	000001CF	00000860	00000004	R	.	.	.	.	.	.	.
+jkGuiMultiTally_SortTeamScore	.text	00418870	0000003C	00000004	00000008	R	.	.	.	.	.	T	.
 jkGuiMultiTally_sub_4188B0	.text	004188B0	000000A5	00000004	00000004	R	.	.	.	.	.	.	.
 jkGuiTitle_Initialize	.text	00418960	00000028			R	.	.	.	.	.	.	.
 jkGuiTitle_Shutdown	.text	00418990	00000001			R	.	.	.	.	.	.	.

@@ -930,9 +930,7 @@ int Main_Startup(const char *cmdline)
         jkGuiControlOptions_Initialize();
         jkGuiObjectives_Initialize();
         jkGuiSingleTally_Initialize();
-#ifndef LINUX_TMP
-        jkGuiMultiTally_Initialize(); // TODO
-#endif
+        jkGuiMultiTally_Initialize();
         jkGuiBuildMulti_InitializeEditCharacter(); // TODO
         jkGuiTitle_Initialize();
         jkGuiGeneral_Initialize();

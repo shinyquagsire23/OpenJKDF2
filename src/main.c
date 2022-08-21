@@ -56,6 +56,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIBuildMulti.h"
+#include "Gui/jkGUIMultiTally.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdActive.h"
 #include "Engine/rdKeyframe.h"
@@ -2143,6 +2144,15 @@ void do_hooks()
     hook_function(jkGuiBuildMulti_ShowLoad_ADDR, jkGuiBuildMulti_ShowLoad);
     hook_function(jkGuiBuildMulti_sub_41D680_ADDR, jkGuiBuildMulti_sub_41D680);
     hook_function(jkGuiBuildMulti_sub_41D830_ADDR, jkGuiBuildMulti_sub_41D830);
+
+    // jkGUIMultiTally
+    hook_function(jkGuiMultiTally_Show_ADDR, jkGuiMultiTally_Show);
+    hook_function(jkGuiMultiTally_SortPlayerScore_ADDR, jkGuiMultiTally_SortPlayerScore);
+    hook_function(jkGuiMultiTally_Initialize_ADDR, jkGuiMultiTally_Initialize);
+    hook_function(jkGuiMultiTally_Shutdown_ADDR, jkGuiMultiTally_Shutdown);
+    hook_function(jkGuiMultiTally_ShowTeamScores_ADDR, jkGuiMultiTally_ShowTeamScores);
+    hook_function(jkGuiMultiTally_SortTeamScore_ADDR, jkGuiMultiTally_SortTeamScore);
+    hook_function(jkGuiMultiTally_sub_4188B0_ADDR, jkGuiMultiTally_sub_4188B0);
     
     // Darray
     hook_function(Darray_New_ADDR, Darray_New);
