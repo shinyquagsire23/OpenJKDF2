@@ -71,11 +71,15 @@ int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg);
 
 void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing);
 void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing);
+void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2);
+void jkSaber_cogMsg_SendEndLevel();
+int jkSaber_cogMsg_wrap_SendSaberInfo_alt();
+int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
 
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
-static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
-static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
-static int (*jkSaber_cogMsg_SendJKPrintUniString)(int a1, unsigned int a2) = (void*)jkSaber_cogMsg_SendJKPrintUniString_ADDR;
+//static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
+//static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
+//static int (*jkSaber_cogMsg_SendJKPrintUniString)(int a1, unsigned int a2) = (void*)jkSaber_cogMsg_SendJKPrintUniString_ADDR;
 //static int (*jkSaber_cogMsg_SendJKSetWeaponMesh)(sithThing *a1) = (void*)jkSaber_cogMsg_SendJKSetWeaponMesh_ADDR;
 //static int (*jkSaber_cogMsg_SendSetSaberInfo)(sithThing *a1) = (void*)jkSaber_cogMsg_SendSetSaberInfo_ADDR;
 //static int (*jkSaber_cogMsg_SendSetSaberInfo2)(sithThing *a1) = (void*)jkSaber_cogMsg_SendSetSaberInfo2_ADDR;
