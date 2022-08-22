@@ -881,3 +881,74 @@ void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
 }
+
+void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2)
+{
+    int v2; // eax
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(a1);
+
+    
+    if ( (a2 & 0x80000000) != 0 )
+    {
+        v2 = -1;
+LABEL_6:
+        NETMSG_END(COGMSG_JKPRINTUNISTRING);
+
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 255, 1);
+        return;
+    }
+    if ( a2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[a2].flags & 1) != 0 )
+    {
+        v2 = jkPlayer_playerInfos[a2].net_id;
+        if ( v2 )
+            goto LABEL_6;
+    }
+}
+
+void jkSaber_cogMsg_SendEndLevel()
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(jkEpisode_idk1(&jkEpisode_mLoad)->level);
+    NETMSG_END(COGMSG_ENDLEVEL);
+
+    // lol
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+}
+
+int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
+{
+    return jkSaber_cogMsg_SendSaberInfo_alt(
+               g_localPlayerThing,
+               jkGuiMultiplayer_mpcInfo.model,
+               jkGuiMultiplayer_mpcInfo.soundClass,
+               jkGuiMultiplayer_mpcInfo.sideMat,
+               jkGuiMultiplayer_mpcInfo.tipMat);
+}
+
+int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr)
+{
+    int result; // eax
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pPlayerThing->thing_id);
+    NETMSG_PUSHSTR(pModelStr, 0x20);
+    NETMSG_PUSHSTR(pSoundclassStr, 0x20);
+    NETMSG_PUSHSTR(pSideMatStr, 0x20);
+    NETMSG_PUSHSTR(pTipMatStr, 0x20);
+
+    NETMSG_END(COGMSG_SABERINFO1);
+
+    if ( sithNet_isServer )
+        result = jkSaber_cogMsg_HandleSetSaberInfo(&sithCogVm_netMsgTmp);
+    else
+        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sithNet_dword_8C4BA4, 255, 1);
+    return result;
+}

@@ -138,6 +138,7 @@ sithMulti_handlerIdk 0x0083264C sithMultiHandler_t
 sithMulti_multiModeFlags 0x00832650 int
 sithMulti_dword_83265C 0x0083265C uint32_t
 sithMulti_arr_832218 0x00832218 int[256]
+sithMulti_dword_832658 0x00832658 int
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*

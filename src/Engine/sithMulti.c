@@ -341,3 +341,24 @@ void sithMulti_HandleScore()
 
 }
 #endif
+
+void sithMulti_EndLevel(unsigned int a1, int a2)
+{
+    if ( sithNet_dword_83263C != a2 || a1 < sithMulti_dword_832658 )
+    {
+        sithNet_dword_83263C = a2;
+        sithMulti_dword_832658 = a1;
+    }
+}
+
+void sithMulti_sendmsgidk3(int a1, int playerIdx, int sendtoId)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(playerIdx);
+    NETMSG_PUSHS32(a1);
+    NETMSG_PUSHWSTR(jkPlayer_playerInfos[playerIdx].player_name, 0x10);
+    NETMSG_END(COGMSG_JOINLEAVE);
+    
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, 1);
+}
