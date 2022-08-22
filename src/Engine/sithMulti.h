@@ -60,10 +60,11 @@ void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
 void sithMulti_EndLevel(unsigned int a1, int a2);
 void sithMulti_sendmsgidk3(int a1, int playerIdx, int sendtoId);
+void sithMulti_SendKickPlayer(int idx);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
-static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
+//static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
 //static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
 //static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
 static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;

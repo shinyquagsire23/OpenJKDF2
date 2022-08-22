@@ -362,3 +362,15 @@ void sithMulti_sendmsgidk3(int a1, int playerIdx, int sendtoId)
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, 1);
 }
+
+void sithMulti_SendKickPlayer(int idx)
+{
+    if (!sithNet_isServer) return;
+    
+    NETMSG_START;
+
+    NETMSG_PUSHS32(idx);
+    NETMSG_END(COGMSG_KICK);
+
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, idx, 1, 1);
+}

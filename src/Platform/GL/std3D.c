@@ -1378,6 +1378,17 @@ void std3D_DrawSceneFbo()
     static float frameNum = 1.0;
     //frameNum += (rand() % 16);
 
+    int draw_ssao = jkPlayer_enableSSAO;
+
+    float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
+                     + (((float)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
+                     + (((float)rdroid_curColorEffects.add.z / 255.0f) * 0.0721);
+
+    // HACK: Force blinding shouldn't show the SSAO
+    if (add_luma >= 0.7) {
+        draw_ssao = 0;
+    }
+
     if (!jkGame_isDDraw)
     {
         return;
@@ -1396,7 +1407,7 @@ void std3D_DrawSceneFbo()
     }
 
     // Clear SSAO stuff
-    if (jkPlayer_enableSSAO)
+    if (draw_ssao)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur1.fbo);
         glClear( GL_COLOR_BUFFER_BIT );
@@ -1406,7 +1417,7 @@ void std3D_DrawSceneFbo()
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
 
-    if (!jkPlayer_enableSSAO)
+    if (!draw_ssao)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
