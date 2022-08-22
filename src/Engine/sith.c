@@ -364,10 +364,8 @@ void sith_AutoSave()
     if ( sithNet_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
-#ifdef WIN32_BLOBS // TODO impl
         sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
         sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
-#endif
         sithTime_Startup();
     }
     else
