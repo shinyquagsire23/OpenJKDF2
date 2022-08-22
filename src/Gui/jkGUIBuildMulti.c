@@ -306,8 +306,7 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     char tmp1[32]; // [esp+2Ch] [ebp-160h] BYREF
     char tmp2[32]; // [esp+4Ch] [ebp-140h] BYREF
     char tmp3[32]; // [esp+6Ch] [ebp-120h] BYREF
-    char v28; // [esp+8Ch] [ebp-100h] BYREF
-    char v29[28]; // [esp+8Dh] [ebp-FFh] BYREF
+    char v28[32]; // [esp+8Ch] [ebp-100h] BYREF
     int16_t v30; // [esp+A9h] [ebp-E3h]
     char v31; // [esp+ABh] [ebp-E1h]
     char v32[32]; // [esp+ACh] [ebp-E0h] BYREF
@@ -315,7 +314,7 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     char v34[32]; // [esp+ECh] [ebp-A0h] BYREF
     char FileName[128]; // [esp+10Ch] [ebp-80h] BYREF
 
-    memset(v29, 0, sizeof(v29));
+    memset(v28, 0, sizeof(v28));
     v30 = 0;
     v31 = 0;
     jkGui_SetModeMenu(jkGui_stdBitmaps[11]->palette);
@@ -328,7 +327,7 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     v3 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_waTmp[64], 0x40u, v3, jkPlayer_playerShortName);
     jkGuiBuildMulti_buttons[1].wstr = &jkGuiBuildMulti_waTmp[64];
-    v4 = jkPlayer_GetMpcInfo(&jkGuiBuildMulti_waTmp[32], &v28, v34, v33, v32);
+    v4 = jkPlayer_GetMpcInfo(&jkGuiBuildMulti_waTmp[32], v28, v34, v33, v32);
     _v23 = v4;
     jkGuiBuildMulti_buttons[3].wstr = &jkGuiBuildMulti_waTmp[32];
     jkGuiRend_MenuSetLastElement(&jkGuiBuildMulti_menu, &jkGuiBuildMulti_buttons[15]);
@@ -420,7 +419,7 @@ LABEL_16:
         if ( jkGuiBuildMulti_numModels > 0 )
         {
             v13 = jkGuiBuildMulti_aModels;
-            while ( strcmp(&v28, v13->modelFpath) )
+            while ( strcmp(v28, v13->modelFpath) )
             {
                 ++v12;
                 ++v13;
