@@ -21,6 +21,11 @@ int sithDplay_Startup()
     return 1;
 }
 
+HRESULT sithDplay_EnumSessions2(void)
+{
+    return DirectPlay_EnumSessions2();
+}
+
 #ifndef WIN32_BLOBS
 int sithDplay_EarlyInit()
 {
@@ -51,9 +56,9 @@ int sithDplay_CreatePlayer(void* a)
     return 0;
 }
 
-void sithDplay_DoReceive()
+int sithDplay_DoReceive()
 {
-
+    return 1;
 }
 
 void sithDplay_Close()
@@ -67,6 +72,16 @@ BOOL sithDplay_SendToPlayer(void *a1, int sendto_id)
 }
 
 int sithDplay_Recv(void *a1)
+{
+    return 0;
+}
+
+int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen)
+{
+    return 1;
+}
+
+int DirectPlay_EnumSessions2()
 {
     return 0;
 }

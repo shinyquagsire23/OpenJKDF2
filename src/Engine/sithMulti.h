@@ -41,14 +41,9 @@
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
-
-#ifdef WIN32_BLOBS
-static int (*sithMulti_SendChat)(char *a1, int a2, int a3) = (void*)sithMulti_SendChat_ADDR;
-static void (*sithMulti_HandleScore)() = (void*)sithMulti_HandleScore_ADDR;
-#else
-int sithMulti_SendChat(char *a1, int a2, int a3);
+void sithMulti_SendChat(char *pStr, int arg0, int arg1);
 void sithMulti_HandleScore();
-#endif
+int sithMulti_HandleChat(sithCogMsg *msg);
 
 HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
 int sithMulti_Startup();
@@ -61,19 +56,25 @@ void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing,
 void sithMulti_EndLevel(unsigned int a1, int a2);
 void sithMulti_sendmsgidk3(int a1, int playerIdx, int sendtoId);
 void sithMulti_SendKickPlayer(int idx);
+int sithMulti_LobbyMessage();
+int sithMulti_HandleJoinLeave(sithCogMsg *msg);
+int sithMulti_HandlePing(sithCogMsg *msg);
+int sithMulti_HandlePingResponse(sithCogMsg *msg);
+int sithMulti_HandleKickPlayer(sithCogMsg *msg);
+int sithMulti_ServerLeft();
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
 //static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
 //static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
 //static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
-static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
+//static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
 static void (*sithMulti_HandleTimeLimit)(int) = (void*)sithMulti_HandleTimeLimit_ADDR;
 //static int (*sithMulti_sendmsgidk3)(int,int,int) = (void*)sithMulti_sendmsgidk3_ADDR;
 //static void (*sithMulti_HandleDeath)(sithPlayerInfo *a1, sithThing *killed, sithThing *killed_by) = (void*)sithMulti_HandleDeath_ADDR;
 //static int (*sithMulti_CreatePlayer)(wchar_t *a1, wchar_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
 static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
-static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;
+//static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;
 //static int (*sithMulti_SendRequestConnect)(int a1) = (void*)sithMulti_SendRequestConnect_ADDR;
 
 #endif // _SITHMULTI_H

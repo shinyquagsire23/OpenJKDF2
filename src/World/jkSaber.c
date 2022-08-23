@@ -21,17 +21,14 @@
 #include "Main/jkSmack.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
+#include "Main/jkStrings.h"
 #include "Gui/jkGUINet.h"
+#include "General/stdString.h"
+#include "General/stdStrTable.h"
+#include "Main/jkDev.h"
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)
-
-#define jkSaber_cogMsg_HandleJKEnableSaber ((void*)jkSaber_cogMsg_HandleJKEnableSaber_ADDR)
-#define jkSaber_cogMsg_HandleJKSetWeaponMesh ((void*)jkSaber_cogMsg_HandleJKSetWeaponMesh_ADDR)
-#define jkSaber_cogMsg_Handlex33 ((void*)jkSaber_cogMsg_Handlex33_ADDR)
-#define jkSaber_cogMsg_HandleJKPrintUniString ((void*)jkSaber_cogMsg_HandleJKPrintUniString_ADDR)
-#define jkSaber_cogMsg_HandleEndLevel ((void*)jkSaber_cogMsg_HandleEndLevel_ADDR)
-#define jkSaber_idk4 ((void*)jkSaber_idk4_ADDR)
 
 const char* jkSaber_aKyTeamModels[5] = {
     "ky.3do",
@@ -866,6 +863,38 @@ void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
 }
 
+int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+    int arg0 = NETMSG_POPS32();
+    int arg1 = NETMSG_POPS32();
+    int16_t arg2 = NETMSG_POPS16();
+    int16_t arg3 = NETMSG_POPS16();
+
+    sithThing* pThing = sithThing_GetById(arg0);
+    if ( pThing )
+    {
+        jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
+        if ( pPlayerInfo )
+        {
+            rdModel3* pModel = sithModel_GetByIdx(arg1);
+            if ( pModel )
+            {
+                rdThing_NewEntry(&pPlayerInfo->rd_thing, 0);
+                rdThing_SetModel3(&pPlayerInfo->rd_thing, pModel);
+            }
+            pPlayerInfo->maxTwinkles = arg2;
+            pPlayerInfo->twinkleSpawnRate = arg3;
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
 void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
 {
     NETMSG_START;
@@ -880,6 +909,27 @@ void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
     NETMSG_END(COGMSG_JKENABLESABER);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
+}
+
+int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    if ( !pThing )
+        return 0;
+    if ( !pThing->playerInfo )
+        return 0;
+    int type = pThing->thingtype;
+    if ( type != SITH_THING_PLAYER && type != SITH_THING_ACTOR )
+        return 0;
+
+    float arg1 = NETMSG_POPF32();
+    float arg2 = NETMSG_POPF32();
+    float arg3 = NETMSG_POPF32();
+
+    jkSaber_Enable(pThing, arg1, arg2, arg3);
+    return 1;
 }
 
 void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2)
@@ -908,6 +958,20 @@ LABEL_6:
     }
 }
 
+int jkSaber_cogMsg_HandleJKPrintUniString(sithCogMsg *msg)
+{
+    char key[64];
+
+    NETMSG_IN_START(msg);
+
+    stdString_snprintf(key, 64, "COG_%05d", NETMSG_POPS32());
+    wchar_t* v1 = stdStrTable_GetUniString(&jkCog_strings, key);
+    if ( !v1 )
+        v1 = jkStrings_GetText(key);
+    jkDev_PrintUniString(v1);
+    return 1;
+}
+
 void jkSaber_cogMsg_SendEndLevel()
 {
     NETMSG_START;
@@ -920,6 +984,19 @@ void jkSaber_cogMsg_SendEndLevel()
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
     sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+}
+
+int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg)
+{
+    if ( msg->netMsg.thingIdx != sithNet_dword_8C4BA4 )
+        return 0;
+
+    NETMSG_IN_START(msg);
+    int arg0 = NETMSG_POPS32();
+
+    jkEpisode_EndLevel(&jkEpisode_mLoad, arg0);
+    sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+    return 1;
 }
 
 int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
@@ -949,6 +1026,66 @@ int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, c
     if ( sithNet_isServer )
         result = jkSaber_cogMsg_HandleSetSaberInfo(&sithCogVm_netMsgTmp);
     else
-        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sithNet_dword_8C4BA4, 255, 1);
+        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, 255, 1);
     return result;
+}
+
+// Unused?
+int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+    int16_t arg0 = NETMSG_POPS16();
+    int16_t arg1 = NETMSG_POPS16();
+    int16_t arg2 = NETMSG_POPS16();
+    int arg3 = NETMSG_POPS32();
+
+    if ( arg0 > sithWorld_pCurrentWorld->numThingsLoaded )
+        return 0;
+    sithThing* pThing = &sithWorld_pCurrentWorld->things[arg0];
+
+
+    int type = pThing->thingtype;
+    if ( type != SITH_THING_ACTOR && type != SITH_THING_PLAYER )
+        return 0;
+
+    jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
+    if ( !pPlayerInfo )
+        return 0;
+    if ( !pPlayerInfo->povModel.puppet )
+        return 0;
+
+    rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(arg1);
+    if ( !pKeyframe )
+        return 0;
+    sithPuppet_StartKey(
+        pPlayerInfo->povModel.puppet,
+        pKeyframe,
+        arg2,
+        arg2 + 2,
+        arg3,
+        0);
+    return 1;
+}
+
+void jkSaber_idk4()
+{
+    if ( g_localPlayerThing )
+    {
+        if ( sithNet_isServer )
+        {
+            if ( sithNet_dword_83263C )
+            {
+                sithCogVm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
+                sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+                sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_ENDLEVEL;
+                sithCogVm_netMsgTmp.netMsg.msg_size = 4;
+                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+                sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+            }
+        }
+        jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+    }
 }

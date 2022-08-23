@@ -70,11 +70,22 @@ void jkSaber_cogMsg_SendSetTeam(int16_t teamNum);
 int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg);
 
 void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing);
+int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg);
+
 void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing);
+int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg);
+
 void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2);
+int jkSaber_cogMsg_HandleJKPrintUniString(sithCogMsg *msg);
+
 void jkSaber_cogMsg_SendEndLevel();
+int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg);
+
 int jkSaber_cogMsg_wrap_SendSaberInfo_alt();
 int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
+
+int jkSaber_cogMsg_Handlex33(sithCogMsg *msg);
+void jkSaber_idk4();
 
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 //static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;

@@ -340,7 +340,7 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     }
 }
 
-void sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
+sithSoundClass* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
 {
     sithSoundClass *v3; // eax
     sithSoundClassEntry *v4; // esi
@@ -374,9 +374,11 @@ void sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
                     }
                 }
                 sithSoundClass_ThingPlaySoundclass2(thing, v4, 1.0);
+                return v3;
             }
         }
     }
+    return NULL;
 }
 
 void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)

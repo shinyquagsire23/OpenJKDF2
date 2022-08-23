@@ -52,49 +52,49 @@ void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithS
 int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg);
 
 void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4);
-// HandleSoundClassPlay
+int sithDSSThing_HandleSoundClassPlay(sithCogMsg *msg);
 
 void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7);
-// HandlePlayKey
+int sithDSSThing_HandlePlayKey(sithCogMsg *msg);
 
 void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags);
-// HandleOpenDoor
+int sithDSSThing_HandleOpenDoor(sithCogMsg *msg);
 
 void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId);
-// HandleSetThingModel
+int sithDSSThing_HandleSetThingModel(sithCogMsg *msg);
 
 void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags);
-// HandleStopKey
+int sithDSSThing_HandleStopKey(sithCogMsg *msg);
 
 void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4);
 int sithDSSThing_HandleStopSound(sithCogMsg *msg);
 
 void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags);
-// HandleFireProjectile
+int sithDSSThing_HandleFireProjectile(sithCogMsg *msg);
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
-// HandleDeath
+int sithDSSThing_HandleDeath(sithCogMsg *msg);
 
 void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags);
-// HandleDamage
+int sithDSSThing_HandleDamage(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
 int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
-// HandleSyncThingFrame
+int sithDSSThing_HandleSyncThingFrame(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
 int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg);
 
 void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpFlags);
-// HandleTakeItem
+int sithDSSThing_HandleTakeItem(sithCogMsg *msg);
 
 void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithThing *pThing2, sithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync);
-// HandleCreateThing
+int sithDSSThing_HandleCreateThing(sithCogMsg *msg);
 
 void sithDSSThing_SendDestroyThing(int idx, int sendtoId);
-// HandleDestroyThing
+int sithDSSThing_HandleDestroyThing(sithCogMsg *msg);
 
 void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector);
 

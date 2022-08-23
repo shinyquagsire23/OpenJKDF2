@@ -5,11 +5,16 @@
 #include "Engine/sithSoundSys.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSound.h"
+#include "Engine/sithKeyFrame.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithUnk4.h"
 #include "Engine/sithPuppet.h"
+#include "Engine/sithModel.h"
+#include "Engine/sithTemplate.h"
 #include "World/sithItem.h"
+#include "World/sithWeapon.h"
+#include "World/sithTrackThing.h"
 #include "jk.h"
 
 void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
@@ -315,7 +320,29 @@ void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
 }
-// HandleSoundClassPlay
+
+int sithDSSThing_HandleSoundClassPlay(sithCogMsg *msg)
+{
+    sithSoundClass *v6; // eax
+
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if (!pThing)
+        return 0;
+    
+    int v4 = NETMSG_POPS32();
+    float v3 = NETMSG_POPF32();
+    int16_t idk = NETMSG_POPS16();
+
+    if ( v3 >= 0.0 )
+        v6 = sithSoundClass_ThingPlaySoundclass5(pThing, idk, v3);
+    else
+        v6 = sithSoundClass_ThingPlaySoundclass(pThing, idk);
+    if ( v6 )
+        v6->entries[14] = (sithSoundClassEntry*)v4; // TODO wat??
+    return 1;
+}
 
 void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7)
 {
@@ -331,7 +358,41 @@ void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a6, a7, 0);
 }
-// HandlePlayKey
+
+int sithDSSThing_HandlePlayKey(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pThing )
+    {
+        if ( pThing->rdthing.puppet )
+        {
+            rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(NETMSG_POPS32());
+            if ( pKeyframe )
+            {
+                int arg1 = NETMSG_POPS16();
+                int arg2 = NETMSG_POPS32();
+                int arg3 = NETMSG_POPS32();
+                int v4 = sithPuppet_StartKey(
+                         pThing->rdthing.puppet,
+                         pKeyframe,
+                         arg1,
+                         arg1 + 2,
+                         arg2,
+                         0);
+                if ( v4 >= 0 )
+                    pThing->rdthing.puppet->tracks[v4].field_130 = arg3;
+                return 1;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
 
 void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags)
 {
@@ -345,7 +406,30 @@ void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int se
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
 }
-// HandleOpenDoor
+
+int sithDSSThing_HandleOpenDoor(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+
+    if ( pThing )
+    {
+        if ( pThing->rdthing.puppet )
+        {
+            int arg1 = NETMSG_POPS32();
+            int v4 = sithPuppet_PlayMode(pThing, NETMSG_POPS16(), 0);
+            if ( v4 >= 0 )
+                pThing->rdthing.puppet->tracks[v4].field_130 = arg1;
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
 
 void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId)
 {
@@ -365,7 +449,26 @@ void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId)
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
 }
-// HandleSetThingModel
+
+int sithDSSThing_HandleSetThingModel(sithCogMsg *msg)
+{
+    char model_3do_fname[32];
+
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pThing )
+    {
+        NETMSG_POPSTR(model_3do_fname, 0x20);
+        rdModel3* pModel = sithModel_LoadEntry(model_3do_fname, 1);
+        if ( pModel )
+        {
+            sithThing_SetNewModel(pThing, pModel);
+            return 1;
+        }
+    }
+    return 0;
+}
 
 void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags)
 {
@@ -379,7 +482,35 @@ void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId,
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
 }
-// HandleStopKey
+
+int sithDSSThing_HandleStopKey(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( !pThing )
+        return 0;
+
+    rdPuppet* pPuppet = pThing->rdthing.puppet;
+    if ( !pPuppet )
+        return 0;
+
+    uint32_t v3 = 0;
+    int arg1 = NETMSG_POPS32();
+    rdPuppetTrack* v4 = &pPuppet->tracks[0];
+    for (int i = 0; i < 4; i++)
+    {
+        if ( v4->field_130 == arg1 )
+            break;
+        ++v3;
+        ++v4;
+    }
+
+    if ( v3 < 4 )
+        sithPuppet_StopKey(pPuppet, v3, NETMSG_POPF32());
+
+    return 1;
+}
 
 void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4)
 {
@@ -443,7 +574,42 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
 }
-// HandleFireProjectile
+
+int sithDSSThing_HandleFireProjectile(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pThing )
+    {
+        int16_t scaleFlags = NETMSG_POPS16();
+        sithThing* pTemplate = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+        sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
+        int anim = NETMSG_POPS16();
+        rdVector3 aimError = NETMSG_POPVEC3();
+        rdVector3 fireOffset = NETMSG_POPVEC3();
+        float scale = NETMSG_POPF32();
+        float a9 = NETMSG_POPF32();
+        int thingId = NETMSG_POPS32();
+        sithThing* pThing2 = sithWeapon_FireProjectile_0(
+                      pThing,
+                      pTemplate,
+                      &fireOffset,
+                      &aimError,
+                      pSound,
+                      anim,
+                      scale,
+                      scaleFlags,
+                      a9);
+        if ( pThing2 )
+        {
+            pThing2->thing_id = thingId;
+            pThing2->thingflags |= SITH_TF_INVULN;
+        }
+        return 1;
+    }
+    return 0;
+}
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags)
 {
@@ -463,7 +629,33 @@ void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-// HandleDeath
+int sithDSSThing_HandleDeath(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pSender = sithThing_GetById(NETMSG_POPS32());
+    if ( pSender )
+    {
+        sithThing* pReceiver = sithThing_GetById(NETMSG_POPS32());
+        int cause = NETMSG_POPU8();
+        int senderType = pSender->thingtype;
+        if ( senderType == SITH_THING_ACTOR)
+        {
+            sithThing_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+        }
+        else if (senderType == SITH_THING_PLAYER)
+        {
+            if ( cause == 1 )
+            {
+                sithPlayer_HandleSentDeathPkt(pSender);
+                return 1;
+            }
+            sithThing_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+        }
+        return 1;
+    }
+    return 0;
+}
 
 void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags)
 {
@@ -484,7 +676,27 @@ void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, fl
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
-// HandleDamage
+int sithDSSThing_HandleDamage(sithCogMsg *msg)
+{
+    if ( msg->netMsg.thingIdx != sithNet_dword_8C4BA4 )
+        return 0;
+
+    NETMSG_IN_START(msg);
+
+    sithThing* pDamagedThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pDamagedThing )
+    {
+        sithThing* pDamagedBy = sithThing_GetById(NETMSG_POPS32());
+        if ( !pDamagedBy )
+            pDamagedBy = pDamagedThing;
+
+        float arg2 = NETMSG_POPF32();
+        int16_t arg3 = NETMSG_POPS16();
+        sithThing_Damage(pDamagedThing, pDamagedBy, arg2, arg3);
+        return 1;
+    }
+    return 0;
+}
 
 void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
 {
@@ -762,7 +974,7 @@ void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, in
 
     NETMSG_PUSHS32(a4);
     NETMSG_PUSHS32(pThing->thing_id);
-    NETMSG_PUSHS32(bShowInvisibleThings);
+    NETMSG_PUSHU32(bShowInvisibleThings);
     NETMSG_PUSHS16(pThing->sector->id);
     NETMSG_PUSHVEC3(pThing->position);
     rdMatrix_ExtractAngles34(&pThing->lookOrientation, &out);
@@ -775,7 +987,51 @@ void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, in
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
-// HandleSyncThingFrame
+int sithDSSThing_HandleSyncThingFrame(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    int arg0 = NETMSG_POPS32();
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( !pThing || pThing->moveType != SITH_MT_PATH )
+        return 0;
+
+    uint32_t arg2 = NETMSG_POPU32();
+    if ( pThing->field_260 <= arg2 )
+    {
+        pThing->field_260 = arg2;
+        sithSector* pSector = sithSector_GetPtrFromIdx(NETMSG_POPS16());
+        if ( !pSector )
+            return 0;
+
+        pThing->position = NETMSG_POPVEC3();
+        sithThing_MoveToSector(pThing, pSector, 0);
+        rdVector3 lookAngles = NETMSG_POPVEC3();
+        
+        rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookAngles);
+        int arg9 = NETMSG_POPS16();
+        float arg10 = NETMSG_POPF32();
+
+        if ( arg0 )
+        {
+            if ( arg0 == 1 )
+            {
+                sithTrackThing_SkipToFrame(pThing, arg9, arg10);
+                return 1;
+            }
+            if ( arg0 == 2 )
+            {
+                sithTrackThing_Stop(pThing);
+                return 1;
+            }
+        }
+        else
+        {
+            sithTrackThing_MoveToFrame(pThing, arg9, arg10);
+        }
+    }
+    return 1;
+}
 
 void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4)
 {
@@ -908,7 +1164,43 @@ LABEL_12:
         }
     }
 }
-// HandleTakeItem
+
+int sithDSSThing_HandleTakeItem(sithCogMsg *msg)
+{
+    int v1; // ebx
+    sithThing *v2; // edi
+    sithThing *v4; // eax
+    sithThing *v5; // esi
+    int v6; // [esp-Ch] [ebp-1Ch]
+
+    v1 = msg->pktData[0];
+    v2 = sithThing_GetById(v1);
+    if ( !v2 && sithNet_isServer )
+    {
+        v6 = msg->netMsg.thingIdx;
+        sithCogVm_netMsgTmp.pktData[0] = v1;
+        sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+        sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_DESTROYTHING;
+        sithCogVm_netMsgTmp.netMsg.msg_size = 4;
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v6, 255, 1);
+        return 0;
+    }
+    v4 = sithThing_GetById(msg->pktData[1]);
+    v5 = v4;
+    if ( v2 && v4 )
+    {
+        if ( msg->netMsg.cogMsgId == COGMSG_TAKEITEM1 )
+        {
+            if ( v2->thingtype != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) != 0 )
+                return 1;
+            msg->netMsg.cogMsgId = COGMSG_TAKEITEM2;
+            sithCogVm_SendMsgToPlayer(&msg->netMsg, -1, 1, 1);
+        }
+        sithItem_Take(v2, v5, 1);
+        return 1;
+    }
+    return 0;
+}
 
 void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithThing *pThing2, sithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync)
 {
@@ -932,7 +1224,44 @@ void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithT
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, mpFlags, bSync);
 }
 
-// HandleCreateThing
+int sithDSSThing_HandleCreateThing(sithCogMsg *msg)
+{
+    rdMatrix34 lookOrient;
+
+    NETMSG_IN_START(msg);
+
+    sithThing* pCreated = NULL;
+    sithThing* pThing = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+    if ( pThing )
+    {
+        int pThing2Id = NETMSG_POPS32();
+        if ( pThing2Id < 0 )
+        {
+            sithSector* pSector = (sithThing *)sithSector_GetPtrFromIdx(NETMSG_POPS16());
+            if ( !pSector )
+                return 0;
+            rdVector3 pos = NETMSG_POPVEC3();
+            rdVector3 rot = NETMSG_POPVEC3();
+            rdMatrix_BuildRotate34(&lookOrient, &rot);
+            pCreated = sithThing_Create(pThing, &pos, &lookOrient, pSector, 0);
+        }
+        else
+        {
+            sithThing* pThing2 = sithThing_GetById(pThing2Id);
+            if ( !pThing2 )
+                return pThing2;
+            pCreated = sithThing_SpawnTemplate(pThing, pThing2);
+        }
+
+        if ( pCreated )
+        {
+            pCreated->thing_id = NETMSG_POPS32();
+            pCreated->thingflags |= SITH_TF_INVULN;
+            return 1;
+        }
+    }
+    return 0;
+}
 
 void sithDSSThing_SendDestroyThing(int idx, int sendtoId)
 {
@@ -943,7 +1272,19 @@ void sithDSSThing_SendDestroyThing(int idx, int sendtoId)
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
 }
-// HandleDestroyThing
+
+int sithDSSThing_HandleDestroyThing(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pThing )
+    {
+        sithThing_Destroy(pThing);
+        return 1;
+    }
+    return 0;
+}
 
 void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector)
 {

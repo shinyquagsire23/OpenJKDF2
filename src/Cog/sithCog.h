@@ -66,12 +66,13 @@
 #define NETMSG_PUSHVEC3I(x) {*(rdVector3i*)craftingPacket = x; craftingPacket += sizeof(rdVector3i);};
 #define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = x; craftingPacket += sizeof(rdMatrix34);};
 #define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, x, (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
-#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((char*)craftingPacket, x, (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
+#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((wchar_t*)craftingPacket, x, (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
                             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
                             sithCogVm_netMsgTmp.netMsg.msg_size = len; \
                           };
+#define NETMSG_LEN(msgid) ((intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0])
 
 #define NETMSG_IN_START(x) intptr_t _readingPacket = (intptr_t)&x->pktData[0]; uint8_t _readingOutU8; \
 uint16_t _readingOutU16; int16_t _readingOutS16; uint32_t _readingOutU32; \

@@ -145,7 +145,7 @@ int sithSoundClass_Load(sithWorld *world, int a2);
 sithSoundClass* sithSoundClass_LoadFile(char *fpath);
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
 void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundclass_id);
-void sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3);
+sithSoundClass* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id);
 void sithSoundClass_Free2(sithWorld *world);

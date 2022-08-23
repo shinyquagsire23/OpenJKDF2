@@ -139,6 +139,8 @@ sithMulti_multiModeFlags 0x00832650 int
 sithMulti_dword_83265C 0x0083265C uint32_t
 sithMulti_arr_832218 0x00832218 int[256]
 sithMulti_dword_832658 0x00832658 int
+sithMulti_dword_832654 0x00832654 int
+sithMulti_dword_832660 0x00832660 int
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
@@ -243,6 +245,7 @@ sithNet_dword_83262C 0x0083262C int
 sithNet_dword_83263C 0x0083263C int
 sithNet_checksum 0x00832630 int
 sithNet_dword_832640 0x00832640 int
+sithMulti_sendto_id 0x00832644 int
 sithNet_dword_832648 0x00832648 int
 
 sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
@@ -326,8 +329,11 @@ sithDplay_dword_8321F0 0x008321F0 int
 sithDplay_dword_8321F4 0x008321F4 int
 sithDplay_dword_8321EC 0x008321EC int
 sithDplay_dword_832204 0x00832204 int
+sithDplay_dword_832208 0x00832208 int
+sithDplay_dword_83220C 0x0083220C int
 sithDplay_dword_8321E0 0x008321E0 int
 sithDplay_dword_8321E4 0x008321E4 int
+sithDplay_dword_8321F8 0x008321F8 int
 
 stdMci_mciId 0x00563720 MCIDEVICEID
 stdMci_dwVolume 0x00563724 int
@@ -692,7 +698,7 @@ jkPlayer_otherThings 0x008592E0 jkPlayerInfo[16]
 jkPlayer_dword_525470 0x00525470 int = 1
 bShowInvisibleThings 0x8EE640 int
 playerThingIdx 0x83199C int
-jkPlayer_maxPlayers 0x8319A0 int
+jkPlayer_maxPlayers 0x8319A0 uint32_t
 g_localPlayerThing 0x8319A4 sithThing*
 g_selfPlayerInfo 0x8319A8 sithPlayerInfo*
 playerThings 0x85B580 jkPlayerInfo[32]
