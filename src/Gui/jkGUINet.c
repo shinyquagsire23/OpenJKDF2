@@ -16,6 +16,7 @@
 #include "Win95/sithDplay.h"
 #include "World/sithPlayer.h"
 #include "World/sithThing.h"
+#include "Gameplay/sithEvent.h"
 
 void jkGuiNet_idk(jkGuiMenu *pMenu)
 {
@@ -32,8 +33,8 @@ void jkGuiNet_idk(jkGuiMenu *pMenu)
             if ( (g_submodeFlags & 8) == 0 )
                 pMenu->lastButtonUp = 1;
 #ifdef SDL2_RENDER
-            pMenu->lastButtonUp = 1;
 
+            pMenu->lastButtonUp = 1;
             for (int i = 0; i < jkPlayer_maxPlayers; i++ )
             {
                 jkPlayer_playerInfos[i].field_13B0 = sithTime_curMs;
@@ -44,7 +45,7 @@ void jkGuiNet_idk(jkGuiMenu *pMenu)
             sithPlayer_sub_4C87C0(0, sithDplay_dword_8321EC);
             sithPlayer_idk(0);
             sithPlayer_ResetPalEffects();
-            //sithEvent_RegisterFunc(2, (int)sithMulti_ServerLeft, sithNet_tickrate, 1);
+            sithEvent_RegisterFunc(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
             sithCogVm_SetNeedsSync();
 
             sithNet_isServer = 1;

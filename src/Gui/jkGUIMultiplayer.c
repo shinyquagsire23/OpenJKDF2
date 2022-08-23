@@ -373,3 +373,48 @@ int jkGuiNet_ShowSynchronizing()
     jkGui_SetModeGame();
     return v0;
 }
+
+
+int jkGuiNet_CogMsgHandleJoining(sithCogMsg *msg)
+{
+    wchar_t *v2; // eax
+    wchar_t *v3; // [esp-4h] [ebp-4h]
+
+    if ( (g_submodeFlags & 8) != 0 )
+    {
+        switch ( msg->pktData[0] )
+        {
+            case 0:
+                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_JOININGOK");
+                jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements4[1], &jkGuiMultiplayer_menu4, 1);
+                return 1;
+            case 1:
+                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_JOININGBUSY");
+                jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements4[1], &jkGuiMultiplayer_menu4, 1);
+                return 1;
+            case 3:
+                v3 = jkStrings_GetText("GUINET_JOINCANCEL");
+                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                goto LABEL_9;
+            case 4:
+                v3 = jkStrings_GetText("GUINET_WRONGCHECKSUM");
+                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                goto LABEL_9;
+            case 5:
+                v3 = jkStrings_GetText("GUINET_GAMEFULL");
+                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                goto LABEL_9;
+            case 6:
+                v3 = jkStrings_GetText("GUINET_WRONGLEVEL");
+                v2 = jkStrings_GetText("GUINET_JOINERROR");
+LABEL_9:
+                jkGuiDialog_ErrorDialog(v2, v3);
+                jkGuiMultiplayer_menu4.lastButtonUp = -2;
+                sithCogVm_SetNeedsSync();
+                break;
+            default:
+                return 1;
+        }
+    }
+    return 1;
+}

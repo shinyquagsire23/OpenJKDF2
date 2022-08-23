@@ -516,10 +516,10 @@ int sithMulti_LobbyMessage()
                 if ( (v6->flags & 1) != 0 )
                 {
                     NETMSG_PUSHWSTR(v6->multi_name, 0x20);
-                    NETMSG_PUSHS32(v6->numKills);
-                    NETMSG_PUSHS32(v6->numKilled);
-                    NETMSG_PUSHS32(v6->numSuicides);
-                    NETMSG_PUSHS32(v6->teamNum);
+                    NETMSG_PUSHS16(v6->numKills);
+                    NETMSG_PUSHS16(v6->numKilled);
+                    NETMSG_PUSHS16(v6->numSuicides);
+                    NETMSG_PUSHS16(v6->teamNum);
                     NETMSG_PUSHS32(v6->score);
                 }
             }
@@ -764,4 +764,112 @@ int sithMulti_ServerLeft()
             sithCog_SendSimpleMessageToAll(38, 3, jkPlayer_playerInfos[0].playerThing->thingIdx, 0, 0);
     }
     return 1;
+}
+
+void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
+{
+    char v15[32]; // [esp+10h] [ebp-20h] BYREF
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(sithNet_MultiModeFlags);
+    NETMSG_PUSHS32(sithNet_dword_8C4BA4);
+    NETMSG_PUSHS16(jkPlayer_maxPlayers)
+
+    for (int i = 0; i < jkPlayer_maxPlayers; i++)
+    {
+        sithPlayerInfo* v6 = &jkPlayer_playerInfos[i];
+        NETMSG_PUSHS32(v6->flags);
+        if ( (v6->flags & 4) != 0 )
+        {
+            NETMSG_PUSHU8(v6->net_id);
+
+            stdString_WcharToChar(v15, v6->player_name, 15);
+            v15[15] = 0;
+
+            NETMSG_PUSHSTR(v15, 0x10);
+            NETMSG_PUSHS16(v6->numKills);
+            NETMSG_PUSHS16(v6->numKilled);
+            NETMSG_PUSHS16(v6->numSuicides);
+            NETMSG_PUSHS16(v6->teamNum);
+            NETMSG_PUSHS16(v6->score); // why is this s16 here but s32 in LobbyMessage?
+        }
+    }
+
+    if ( (sithNet_MultiModeFlags & 1) != 0 )
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            NETMSG_PUSHS16(sithNet_teamScore[i]);
+        }
+    }
+    NETMSG_END(COGMSG_LEAVEJOIN);
+    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, bSync);
+}
+
+void sithMulti_sub_4CA470(int a1)
+{
+    uint32_t v1; // eax
+    sithPlayerInfo* v2; // ecx
+    int v3; // edi
+    wchar_t *v4; // eax
+    wchar_t *v5; // eax
+    wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
+
+    if ( sithNet_dword_832640 && a1 == sithMulti_sendto_id )
+    {
+        if ( sithMulti_sendto_id )
+        {
+            sithCogVm_netMsgTmp.pktData[0] = 3;
+            sithCogVm_netMsgTmp.pktData[1] = 0;
+            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
+        }
+        sithNet_dword_832640 = 0;
+        sithMulti_sendto_id = 0;
+        sithDplay_dword_83220C = 2;
+        sithDplay_dword_832208 = 0;
+    }
+    v1 = 0;
+    if ( jkPlayer_maxPlayers )
+    {
+        v2 = &jkPlayer_playerInfos[0];
+        while ( a1 != v2->net_id )
+        {
+            ++v1;
+            ++v2;
+            if ( v1 >= jkPlayer_maxPlayers )
+                goto LABEL_10;
+        }
+        v3 = v1;
+    }
+    else
+    {
+LABEL_10:
+        v3 = -1;
+    }
+    if ( v3 >= 0 )
+    {
+        v4 = sithStrTable_GetString("%s_HAS_LEFT_THE_GAME");
+        jk_snwprintf(a1a, 0x80u, v4, &jkPlayer_playerInfos[v3]);
+        DebugConsole_PrintUniStr(a1a);
+        DebugConsole_AlertSound();
+        if ( jkPlayer_playerInfos[v3].net_id == sithNet_dword_8C4BA4 )
+        {
+            v5 = sithStrTable_GetString("SERVER_LEFT_GAME");
+            DebugConsole_PrintUniStr(v5);
+            DebugConsole_AlertSound();
+            if ( sithNet_dword_83263C != 2 || sithTime_curMs + 5000 < sithMulti_dword_832658 )
+            {
+                sithNet_dword_83263C = 2;
+                sithMulti_dword_832658 = sithTime_curMs + 5000;
+            }
+        }
+        sithSoundClass_StopSound(jkPlayer_playerInfos[v3].playerThing, 0);
+        sithPlayer_Initialize(v3);
+        if ( sithNet_isServer )
+            sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v3].playerThing->thingIdx, 0, v3);
+    }
 }

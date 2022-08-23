@@ -15,9 +15,10 @@
 #define jkGuiNet_sub_4142C0_ADDR (0x004142C0)
 
 void jkGuiNet_idk(jkGuiMenu *pMenu);
+int jkGuiNet_CogMsgHandleJoining(sithCogMsg *msg);
 
 static void (*jkGuiNet_sub_413E00)() = (void*)jkGuiNet_sub_413E00_ADDR;
-static int (*jkGuiNet_CogMsgHandleJoining)(int a1) = (void*)jkGuiNet_CogMsgHandleJoining_ADDR;
+//static int (*jkGuiNet_CogMsgHandleJoining)(int a1) = (void*)jkGuiNet_CogMsgHandleJoining_ADDR;
 //static int (*jkGuiNet_ShowSynchronizing)() = (void*)jkGuiNet_ShowSynchronizing_ADDR;
 static int (*jkGuiNet_Show)() = (void*)jkGuiNet_Show_ADDR;
 //static void (*jkGuiNet_idk)(jkGuiElement *a1) = (void*)jkGuiNet_idk_ADDR;

@@ -62,6 +62,8 @@ int sithMulti_HandlePing(sithCogMsg *msg);
 int sithMulti_HandlePingResponse(sithCogMsg *msg);
 int sithMulti_HandleKickPlayer(sithCogMsg *msg);
 int sithMulti_ServerLeft();
+void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
+void sithMulti_sub_4CA470(int a1);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
