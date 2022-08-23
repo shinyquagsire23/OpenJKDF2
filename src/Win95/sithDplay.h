@@ -54,45 +54,74 @@
 #define DirectPlay_sub_4308C0_ADDR (0x004308C0)
 #define DirectPlay_parseSessionDescidk_ADDR (0x004308F0)
 
+
 int sithDplay_Startup();
 HRESULT sithDplay_EnumSessions2(void);
+int sithDplay_seed_idk(jkMultiEntry *pEntry);
+int sithDplay_CreatePlayer(jkMultiEntry *pEntry);
 int sithDplay_Recv(sithCogMsg *msg);
+int sithDplay_DoReceive();
+int sithDplay_SendToPlayer(sithCogMsg *msg, int sendto_id);
+int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext);
+
+void sithDplay_cogMsg_SendEnumPlayers(int sendtoId);
+
 static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
 //static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
 
 
-static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
-static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFlagidk_ADDR;
-static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPlay_SetSessionDesc_ADDR;
+
 //static void (*sithDplay_EnumSessions2)() = (void*)sithDplay_EnumSessions2_ADDR;
 
 #ifdef WIN32_BLOBS
+static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
+static int (*DirectPlay_EarlyInit)(wchar_t*, wchar_t*) = (void*)DirectPlay_EarlyInit_ADDR;
 static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
-static int (*sithDplay_Open)(int a, void* b) = (void*)sithDplay_Open_ADDR;
+static int (*sithDplay_Open)(int idx, wchar_t* pwPassword) = (void*)sithDplay_Open_ADDR;
 static int (*sithDplay_OpenConnection)(void* a) = (void*)sithDplay_OpenConnection_ADDR;
 static void (*sithDplay_CloseConnection)() = (void*)sithDplay_CloseConnection_ADDR;
-static int (*sithDplay_seed_idk)(void*) = (void*)sithDplay_seed_idk_ADDR;
-static int (*sithDplay_CreatePlayer)(void*) = (void*)sithDplay_CreatePlayer_ADDR;
-static int (*sithDplay_DoReceive)() = (void*)sithDplay_DoReceive_ADDR;
+//static int (*sithDplay_seed_idk)(void*) = (void*)sithDplay_seed_idk_ADDR;
+//static int (*sithDplay_CreatePlayer)(void*) = (void*)sithDplay_CreatePlayer_ADDR;
+//static int (*sithDplay_DoReceive)() = (void*)sithDplay_DoReceive_ADDR;
 static void (*sithDplay_Close)() = (void*)sithDplay_Close_ADDR;
-static BOOL (*sithDplay_SendToPlayer)(void *a1, int sendto_id) = (void*)sithDplay_SendToPlayer_ADDR;
+//static BOOL (*sithDplay_SendToPlayer)(void *a1, int sendto_id) = (void*)sithDplay_SendToPlayer_ADDR;
 static int (*DirectPlay_SendLobbyMessage)(void*, uint32_t) = (void*)DirectPlay_SendLobbyMessage_ADDR;
 static int (*DirectPlay_EnumSessions2)() = (void*)DirectPlay_EnumSessions2_ADDR;
 static int (*DirectPlay_Receive)(int *pIdOut, int *pMsgIdOut, int *pLenOut) = (void*)DirectPlay_Receive_ADDR;
+static BOOL (*DirectPlay_Send)(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize) = (void*)DirectPlay_Send_ADDR;
+static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFlagidk_ADDR;
+static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPlay_SetSessionDesc_ADDR;
+static DPID (*DirectPlay_CreatePlayer)(wchar_t*, int) = (void*)DirectPlay_CreatePlayer_ADDR;
+static void (*DirectPlay_Close)() = (void*)DirectPlay_Close_ADDR;
+static int (*DirectPlay_OpenIdk)(void*) = (void*)DirectPlay_OpenIdk_ADDR;
+static int (*DirectPlay_GetSession_passwordidk)(void*) = (void*)DirectPlay_GetSession_passwordidk_ADDR;
+static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions_ADDR;
+static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
 #else
 int sithDplay_EarlyInit();
 int sithDplay_OpenConnection(void* a);
 void sithDplay_CloseConnection();
-int sithDplay_Open(int a, void* b);
-int sithDplay_seed_idk(void* a);
-int sithDplay_CreatePlayer(void* a);
-int sithDplay_DoReceive();
+int sithDplay_Open(int idx, wchar_t* pwPassword);
+//int sithDplay_seed_idk(void* a);
+//int sithDplay_CreatePlayer(void* a);
+//int sithDplay_DoReceive();
 void sithDplay_Close();
-BOOL sithDplay_SendToPlayer(void *a1, int sendto_id);
+//BOOL sithDplay_SendToPlayer(void *a1, int sendto_id);
 int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen);
 int DirectPlay_EnumSessions2();
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut);
+BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize);
+void DirectPlay_SetSessionDesc(int a1, DWORD maxPlayers);
+BOOL DirectPlay_SetSessionFlagidk(int a1);
+BOOL DirectPlay_Initialize();
+int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
+DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
+void DirectPlay_Close();
+int DirectPlay_OpenIdk(void* a);
+int DirectPlay_GetSession_passwordidk(void* a);
+int sithDplay_EnumSessions(int a, void* b);
+void DirectPlay_EnumPlayers(int a);
 #endif
 
 #endif // _SITHDPLAY_H

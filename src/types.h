@@ -2722,10 +2722,7 @@ typedef struct sith_dplay_connection
 
 typedef struct jkMultiEntry
 {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
+    GUID guidInstance;
     int field_10;
     int field_14;
     wchar_t field_18[32];
@@ -3085,5 +3082,68 @@ typedef struct jkMultiModelInfo
     char modelFpath[0x20];
     char sndFpath[0x20];
 } jkMultiModelInfo;
+
+typedef struct sithDplayPlayer
+{
+    wchar_t waName[32];
+    int field_40;
+    int field_44;
+    int field_48;
+    int field_4C;
+    int field_50;
+    int field_54;
+    int field_58;
+    int field_5C;
+    int field_60;
+    int16_t field_64;
+    int16_t field_66;
+    int field_68;
+    int field_6C;
+    int field_70;
+    int field_74;
+    int field_78;
+    int field_7C;
+    int field_80;
+    int field_84;
+    int field_88;
+    int field_8C;
+    int dpId;
+} sithDplayPlayer;
+
+typedef wchar_t* LPWSTR;
+
+typedef struct DPNAME
+{
+  DWORD dwSize;
+  DWORD dwFlags;
+  union
+  {
+    LPWSTR lpszShortName;
+    LPSTR lpszShortNameA;
+  };
+  union
+  {
+    LPWSTR lpszLongName;
+    LPSTR lpszLongNameA;
+  };
+} DPNAME;
+
+typedef uint32_t DPID;
+typedef uint32_t *LPDPID;
+typedef const DPNAME *LPCDPNAME;
+
+#define DPSYS_ADDPLAYER               0x0003  // DPMSG_ADDPLAYER
+#define DPSYS_DELETEPLAYER            0x0005  // DPMSG_DELETEPLAYER
+#define DPSYS_ADDPLAYERTOGROUP        0x0007  // DPMSG_GROUPADD
+#define DPSYS_INVITE                  0x000e  // DPMSG_INVITE, Net only.
+#define DPSYS_DELETEGROUP             0x0020  // DPMSG_DELETEPLAYER
+#define DPSYS_DELETEPLAYERFROMGRP     0x0021  // DPMSG_GROUPDELETE
+#define DPSYS_SESSIONLOST             0x0031
+#define DPSYS_CONNECT                 0x484b  // DPMSG_GENERIC
+
+#define DPID_SYSMSG         0
+#define DPID_ALLPLAYERS     0
+#define DPID_SERVERPLAYER   1
+#define DPID_UNKNOWN        0xFFFFFFFF
 
 #endif // TYPES_H

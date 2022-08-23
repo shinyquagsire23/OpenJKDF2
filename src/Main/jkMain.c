@@ -462,7 +462,6 @@ LABEL_28:
         }
         if ( sithNet_isMulti )
         {
-#ifdef WIN32_BLOBS // TODO impl
             if ( sithNet_isServer )
             {
                 DirectPlay_SetSessionFlagidk(1);
@@ -471,7 +470,6 @@ LABEL_28:
                     v5 = jkPlayer_maxPlayers;
                 DirectPlay_SetSessionDesc(gamemode_0_2_str, v5);
             }
-#endif
             if ( sithNet_isMulti )
                 jkSaber_cogMsg_wrap_SendSaberInfo_alt();
         }

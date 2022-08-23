@@ -15,6 +15,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "Win95/sithDplay.h"
+#include "General/stdString.h"
 
 static int jkGuiMultiplayer_bInitted = 0;
 static int jkGuiMultiplayer_aElements2_aIdk[2] = {0xd, 0xe};
@@ -43,7 +44,7 @@ static jkGuiElement jkGuiMultiplayer_aElements3[12] = {
     {ELEMENT_TEXT,  0,  0,  0,  3, { 0, 0x19A, 0x280, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  6, "GUI_MULTIPLAYER",  3, {0x14, 0x14, 0x258, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_CHOOSEAGAME",  2, {0xAA, 0x82, 0x1C2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_LISTBOX,  1,  0,  0,  0, {0xAA, 0xA0, 0x140, 0x6E},  1,  0, "GUI_GAMESTOJOIN_HINT",  0, (void*)jkGuiNet_sub_413E00_ADDR, jkGuiMultiplayer_aElements3_aIdk, {0},  0},
+    {ELEMENT_LISTBOX,  1,  0,  0,  0, {0xAA, 0xA0, 0x140, 0x6E},  1,  0, "GUI_GAMESTOJOIN_HINT",  0, jkGuiNet_sub_413E00, jkGuiMultiplayer_aElements3_aIdk, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUINET_PASSWORD",  2, {0xAA, 0x12C, 0x64, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBOX,  0,  0, &jkGuiMultiplayer_stru_556168.field_240+0xC0, 0x20, {0x118, 0x127, 0xD2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  1, &jkGuiMultiplayer_stru_556168,  3, {0x32, 0x14A, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -63,8 +64,8 @@ static jkGuiElement jkGuiMultiplayer_aElements4[4] = {
 
 static jkGuiMenu jkGuiMultiplayer_menu = {jkGuiMultiplayer_aElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 static jkGuiMenu jkGuiMultiplayer_menu2 = {jkGuiMultiplayer_aElements2, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
-static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
-static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_sub_4140B0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_idk, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 void jkGuiMultiplayer_Initialize()
 {
@@ -177,10 +178,7 @@ LABEL_1:
                         continue;
                     _memset(&v35, 0, sizeof(v35));
                     _memset(&jkGuiMultiplayer_stru_556168, 0, sizeof(jkGuiMultiplayer_stru_556168));
-                    jkGui_dword_556040 = 0;
-                    jkGui_dword_556044 = 0;
-                    jkGui_dword_556048 = 0;
-                    jkGui_dword_55604C = 0;
+                    memset(&jkGui_guid_556040, 0, sizeof(GUID));
                     jkGuiRend_DarrayNewStr(&jkGuiMultiplayer_stru_5564A8, 8, 1);
                     jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, 0, 0);
                     jkGuiRend_SetClickableString(&jkGuiMultiplayer_aElements3[3], &jkGuiMultiplayer_stru_5564A8);
@@ -344,9 +342,9 @@ LABEL_29:
             goto LABEL_28;
         }
         v12 = v7;
-        _strncpy(v35.field_20, (const char *)&jkGuiMultiplayer_aEntries[v12].field_78, 0x1Fu);
+        _strncpy(v35.field_20, (const char *)jkGuiMultiplayer_aEntries[v12].field_78, 0x1Fu);
         v35.field_20[31] = 0;
-        _strncpy(v35.field_0, (const char *)&jkGuiMultiplayer_aEntries[v12].field_58, 0x1Fu);
+        _strncpy(v35.field_0, (const char *)jkGuiMultiplayer_aEntries[v12].field_58, 0x1Fu);
         v13 = jkGuiMultiplayer_aEntries[v12].field_E8;
         v35.field_0[31] = 0;
         v35.field_E0 = v13;
@@ -417,4 +415,165 @@ LABEL_9:
         }
     }
     return 1;
+}
+
+void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
+{
+    uint32_t v1; // eax
+    int v2; // esi
+    HRESULT v3; // eax
+    wchar_t *v4; // eax
+    int v5; // ebp
+    jkMultiEntry *v6; // ebx
+    wchar_t *v7; // eax
+    int v8; // [esp-14h] [ebp-18h]
+    wchar_t *v9; // [esp-14h] [ebp-18h]
+    int v10; // [esp+0h] [ebp-4h]
+
+    if ( g_app_suspended )
+    {
+        v1 = stdPlatform_GetTimeMsec();
+        if ( v1 > jkGuiNet_dword_5564E8 + 5000 )
+        {
+            v2 = -1;
+            jkGuiNet_dword_5564E8 = v1;
+            v10 = -1;
+            v3 = sithDplay_EnumSessions(1, (wchar_t *)jkGuiMultiplayer_aElements3[5].wstr);
+            if ( !v3 )
+            {
+                jkGuiRend_DarrayFreeEntry(&jkGuiMultiplayer_stru_5564A8);
+                if ( dplay_dword_55D618 )
+                {
+                    v5 = 0;
+                    if ( dplay_dword_55D618 > 0 )
+                    {
+                        v6 = jkGuiMultiplayer_aEntries;
+                        do
+                        {
+                            jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v6->field_18, 0);
+                            if ( !memcmp(&jkGui_guid_556040, v6, 0x10u) )
+                                v10 = v5;
+                            ++v5;
+                            ++v6;
+                        }
+                        while ( v5 < dplay_dword_55D618 );
+                        v2 = v10;
+                    }
+                    jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, 0, 0);
+                    jkGuiRend_SetClickableString(&jkGuiMultiplayer_aElements3[3], &jkGuiMultiplayer_stru_5564A8);
+                    jkGuiMultiplayer_aElements3[3].anonymous_9 = 0;
+                }
+                else
+                {
+                    v8 = dplay_dword_55D618;
+                    v4 = jkStrings_GetText("GUI_NOGAMESTOJOIN");
+                    jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v4, v8);
+                    jkGuiMultiplayer_aElements3[3].anonymous_9 = 1;
+                }
+                jkGuiMultiplayer_aElements3[3].selectedTextEntry = v2;
+                jkGuiNet_sub_413E50(v2);
+                v3 = 0;
+            }
+            if ( v3 == 0x88770118 )
+            {
+                pMenu->lastButtonUp = -1;
+            }
+            else if ( v3 )
+            {
+                v9 = jkStrings_GetText("GUINET_NOCONNECT");
+                v7 = jkStrings_GetText("GUINET_JOINERROR");
+                jkGuiDialog_ErrorDialog(v7, v9);
+                pMenu->lastButtonUp = -1;
+            }
+            jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[3], &jkGuiMultiplayer_menu3, 1);
+        }
+    }
+}
+
+void jkGuiNet_sub_413E50(int idx)
+{
+    wchar_t *v1; // eax
+    wchar_t *v2; // eax
+    wchar_t *v3; // eax
+    wchar_t *v4; // eax
+    wchar_t *v5; // eax
+    int v6; // [esp-10h] [ebp-38h]
+    int v7; // [esp-Ch] [ebp-34h]
+    wchar_t *v8; // [esp-8h] [ebp-30h]
+    int v9; // [esp-4h] [ebp-2Ch]
+    char v10[32]; // [esp+8h] [ebp-20h] BYREF
+
+    if ( idx >= 0 )
+    {
+        v1 = jkStrings_GetText("GUI_LEVEL");
+        jk_snwprintf(
+            (wchar_t *)&jkGuiMultiplayer_stru_556168,
+            0x80u,
+            v1,
+            jkGuiMultiplayer_aEntries[idx].field_18,
+            jkGuiMultiplayer_aEntries[idx].field_58,
+            jkGuiMultiplayer_aEntries[idx].field_78);
+        stdString_snprintf(v10, 32, "RANK_%d_L", jkGuiMultiplayer_aEntries[idx].field_EC);
+        v9 = jkGuiMultiplayer_aEntries[idx].field_EC;
+        v8 = jkStrings_GetText(v10);
+        v7 = jkGuiMultiplayer_aEntries[idx].field_10;
+        v6 = jkGuiMultiplayer_aEntries[idx].field_14;
+        v2 = jkStrings_GetText("GUI_NUM_PLAYERS");
+        jk_snwprintf((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, 0x80u, v2, v6, v7, v8, v9);
+        jkGui_guid_556040 = jkGuiMultiplayer_aEntries[idx].guidInstance;
+        if ( (jkGuiMultiplayer_aEntries[idx].field_D8 & 0x400) != 0 )
+        {
+            v3 = jkStrings_GetText("GUINET_GAMEPASSWORD");
+            __wcscat((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, v3);
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[5], &jkGuiMultiplayer_menu3, 1);
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[4], &jkGuiMultiplayer_menu3, 1);
+        }
+        else
+        {
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[5], &jkGuiMultiplayer_menu3, 0);
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[4], &jkGuiMultiplayer_menu3, 0);
+        }
+        if ( (jkGuiMultiplayer_aEntries[idx].field_E4 & 1) != 0 )
+        {
+            v4 = jkStrings_GetText("GUINET_GAMETEAM");
+            __wcscat((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, v4);
+        }
+        if ( (jkGuiMultiplayer_aEntries[idx].field_D8 & 0x20) != 0 )
+        {
+            v5 = jkStrings_GetText("GUINET_GAMECLOSED");
+            jk_snwprintf((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, 0x80u, v5);
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[9], &jkGuiMultiplayer_menu3, 0);
+        }
+        else
+        {
+            jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[9], &jkGuiMultiplayer_menu3, 1);
+        }
+    }
+    else
+    {
+        memset(&jkGuiMultiplayer_stru_556168, 0, 0x100u);
+        memset(jkGuiMultiplayer_stru_556168.field_100, 0, 0x100u);
+        memset(&jkGuiMultiplayer_stru_556168.field_140[192], 0, 0x100u);
+        jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[9], &jkGuiMultiplayer_menu3, 0);
+        jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[5], &jkGuiMultiplayer_menu3, 0);
+        jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[4], &jkGuiMultiplayer_menu3, 0);
+        memset(&jkGui_guid_556040, 0, sizeof(GUID));
+    }
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[6], &jkGuiMultiplayer_menu3, 1);
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[7], &jkGuiMultiplayer_menu3, 1);
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[8], &jkGuiMultiplayer_menu3, 1);
+}
+
+int jkGuiNet_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
+{
+    int v5; // eax
+
+    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, bRedraw);
+    if ( jkGuiMultiplayer_aElements3[3].selectedTextEntry < 0 )
+        v5 = 0;
+    else
+        v5 = jkGuiMultiplayer_aElements3[3].selectedTextEntry <= dplay_dword_55D618 - 1;
+    if ( v5 )
+        jkGuiNet_sub_413E50(jkGuiMultiplayer_aElements3[3].selectedTextEntry);
+    return 0;
 }

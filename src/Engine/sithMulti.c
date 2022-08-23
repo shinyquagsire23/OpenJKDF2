@@ -88,9 +88,9 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
         result = sithDplay_CreatePlayer(&multiEntry);
     if ( !result )
     {
-        sithNet_dword_83262C = sithDplay_dword_8321EC;
+        sithNet_dword_83262C = sithDplay_dplayIdSelf;
         sithNet_dword_8C4BA8 = 0;
-        sithNet_dword_8C4BA4 = sithDplay_dword_8321EC;
+        sithNet_dword_8C4BA4 = sithDplay_dplayIdSelf;
         sithNet_isServer = 1;
         sithNet_isMulti = 1;
         sithNet_MultiModeFlags = multiModeFlags;
@@ -170,7 +170,7 @@ int sithMulti_Startup()
         sithNet_teamScore[2] = 0;
         sithNet_teamScore[3] = 0;
         sithNet_teamScore[4] = 0;
-        sithPlayer_sub_4C87C0(0, sithDplay_dword_8321EC);
+        sithPlayer_sub_4C87C0(0, sithDplay_dplayIdSelf);
         sithPlayer_idk(0);
         sithPlayer_ResetPalEffects();
         if ( (sithNet_MultiModeFlags & 0x100) != 0 )
@@ -545,7 +545,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     v2 = NETMSG_POPS32();
     NETMSG_POPWSTR(jkPlayer_playerInfos[v1].player_name, 0x10);
 
-    if ( v2 != sithDplay_dword_8321EC )
+    if ( v2 != sithDplay_dplayIdSelf )
     {
         if ( (jkPlayer_playerInfos[v1].flags & 1) == 0 )
         {
@@ -630,7 +630,7 @@ int sithMulti_HandleKickPlayer(sithCogMsg *msg)
 
     if ( msg->netMsg.thingIdx != sithNet_dword_8C4BA4 )
         return 0;
-    if ( msg->pktData[0] == sithDplay_dword_8321EC )
+    if ( msg->pktData[0] == sithDplay_dplayIdSelf )
     {
         if ( sithNet_dword_83263C != 2 )
         {
@@ -872,4 +872,198 @@ LABEL_10:
         if ( sithNet_isServer )
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v3].playerThing->thingIdx, 0, v3);
     }
+}
+
+void sithMulti_InitTick(unsigned int tickrate)
+{
+    sithNet_isMulti = 1;
+    sithNet_dword_83262C = sithDplay_dplayIdSelf;
+    sithNet_dword_8C4BA4 = 0;
+    sithNet_isServer = 0;
+    if ( tickrate < 100 )
+    {
+        sithNet_tickrate = 100;
+    }
+    else if ( tickrate > 300 )
+    {
+        sithNet_tickrate = 300;
+    }
+    else
+    {
+        sithNet_tickrate = tickrate;
+    }
+    sithNet_MultiModeFlags = 0;
+    sithNet_dword_8C4BA4 = 0;
+    sithNet_dword_8C4BA8 = 0;
+}
+
+int sithMulti_HandleRequestConnect(sithCogMsg *msg)
+{
+    int v1; // esi
+    uint32_t v3; // eax
+    sithPlayerInfo* v4; // ecx
+    uint32_t v5; // ecx
+    sithPlayerInfo* v6; // eax
+    uint32_t v7; // eax
+    int *v8; // ecx
+    unsigned int v9; // eax
+    int v10; // ecx
+    char v11[32]; // [esp+Ch] [ebp-20h] BYREF
+
+    v1 = msg->netMsg.thingIdx;
+    if ( sithDplay_dword_8321E4 && v1 )
+    {
+        _strncpy(v11, (const char *)msg->pktData, 0x1Fu);
+        v11[31] = 0;
+        if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
+        {
+            sithCogVm_netMsgTmp.pktData[0] = 6;
+            sithCogVm_netMsgTmp.pktData[1] = 0;
+            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v1, 1, 0);
+            return 1;
+        }
+        v3 = 0;
+        if ( jkPlayer_maxPlayers )
+        {
+            v4 = &jkPlayer_playerInfos[0];
+            do
+            {
+                if ( v4->net_id == v1 )
+                    break;
+                ++v3;
+                ++v4;
+            }
+            while ( v3 < jkPlayer_maxPlayers );
+        }
+        if ( v3 < jkPlayer_maxPlayers )
+        {
+            NETMSG_START;
+
+            NETMSG_PUSHS32(v3);
+            NETMSG_PUSHS32(v1);
+            NETMSG_PUSHWSTR(jkPlayer_playerInfos[v3].player_name, 0x10);
+            NETMSG_END(COGMSG_JOINLEAVE);
+
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 1);
+            return 1;
+        }
+        sithDplay_cogMsg_SendEnumPlayers(v1);
+        if ( sithNet_dword_83263C )
+        {
+            sithCogVm_netMsgTmp.pktData[0] = 3;
+            sithCogVm_netMsgTmp.pktData[1] = 0;
+            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v1, 1, 0);
+            return 1;
+        }
+        if ( sithNet_dword_832640 )
+        {
+            if ( sithMulti_sendto_id == v1 )
+            {
+                sithCogVm_netMsgTmp.pktData[0] = 0;
+                sithCogVm_netMsgTmp.pktData[1] = 0x3F000000;
+LABEL_32:
+                sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+                sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+                sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v1, 1, 0);
+                return 1;
+            }
+            sithCogVm_netMsgTmp.pktData[0] = 1;
+LABEL_31:
+            sithCogVm_netMsgTmp.pktData[1] = 0;
+            goto LABEL_32;
+        }
+        v5 = 0;
+        if ( jkPlayer_maxPlayers )
+        {
+            v6 = &jkPlayer_playerInfos[0];
+            do
+            {
+                if ( (v6->flags & 2) != 0 && !v6->net_id )
+                    break;
+                ++v5;
+                ++v6;
+            }
+            while ( v5 < jkPlayer_maxPlayers );
+        }
+        if ( v5 == jkPlayer_maxPlayers )
+        {
+            sithCogVm_netMsgTmp.pktData[0] = 5;
+            sithCogVm_netMsgTmp.pktData[1] = 0;
+            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v1, 1, 0);
+            return 1;
+        }
+        sithMulti_requestConnectIdx = v5;
+        DirectPlay_EnumPlayers(0);
+        v7 = 0;
+        if ( DirectPlay_numPlayers )
+        {
+            v8 = &DirectPlay_aPlayers[0].dpId;
+            do
+            {
+                if ( *v8 == v1 )
+                    break;
+                ++v7;
+                v8 += 37;
+            }
+            while ( v7 < DirectPlay_numPlayers );
+        }
+        if ( v7 != DirectPlay_numPlayers )
+        {
+            sithPlayer_sub_4C8910(sithMulti_requestConnectIdx);
+            _wcsncpy(jkPlayer_playerInfos[sithMulti_requestConnectIdx].player_name, (const wchar_t *)&msg->pktData[8], 0xFu);
+            v9 = sithMulti_requestConnectIdx;
+            jkPlayer_playerInfos[v9].player_name[15] = 0;
+            _wcsncpy(jkPlayer_playerInfos[v9].multi_name, (const wchar_t *)&msg->pktData[16], 0x1Fu);
+            v10 = sithNet_checksum;
+            jkPlayer_playerInfos[sithMulti_requestConnectIdx].multi_name[31] = 0;
+            if ( v10 != msg->pktData[32] )
+            {
+                sithCogVm_netMsgTmp.pktData[0] = 4;
+                goto LABEL_31;
+            }
+            sithCogVm_netMsgTmp.pktData[0] = 0;
+            sithCogVm_netMsgTmp.pktData[1] = 0x3E800000;
+            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v1, 1, 0);
+            sithMulti_SendLeaveJoin(v1, 0);
+            sithNet_dword_832640 = 1;
+            sithMulti_sendto_id = v1;
+            sithDplay_dword_83220C = 2;
+            sithDplay_dword_832208 = 0;
+            sithDplay_dword_832200 = 0;
+            sithDplay_dword_832210 = 0;
+            sithMulti_dword_832620 = 0;
+        }
+    }
+    return 1;
+}
+
+void sithDplay_cogMsg_SendEnumPlayers(int sendtoId)
+{
+    NETMSG_START;
+
+    DirectPlay_EnumPlayers(0);
+    
+
+    NETMSG_PUSHU8(DirectPlay_numPlayers);
+
+    for (int i = 0; i < DirectPlay_numPlayers; i++)
+    {
+        NETMSG_PUSHS32(DirectPlay_aPlayers[i].dpId)
+    }
+
+    NETMSG_END(COGMSG_ENUMPLAYERS);
+    sithCogVm_SendMsgToPlayer(&sithDplay_cogMsgTmp, sendtoId, 1, 1);
 }

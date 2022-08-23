@@ -364,8 +364,8 @@ void sith_AutoSave()
     if ( sithNet_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
-        sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
-        sithMulti_sendmsgidk3(sithDplay_dword_8321EC, playerThingIdx, -1);
+        sithMulti_sendmsgidk3(sithDplay_dplayIdSelf, playerThingIdx, -1);
+        sithMulti_sendmsgidk3(sithDplay_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();
     }
     else

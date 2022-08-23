@@ -26,7 +26,6 @@
 #include <math.h>
 
 #define sithMulti_HandleLeaveJoin ((void*)0x004CAAF0)
-#define sithMulti_HandleRequestConnect ((void*)0x004CAE50)
 #define sithMulti_HandleTimeLimit ((void*)0x004CB690)
 #define sithDplay_cogMsg_HandleEnumPlayers ((void*)0x004C9A40)
 
@@ -108,13 +107,11 @@ int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     sithCogMsg *v17; // edi
     int v19; // ecx
     int v20; // eax
-    char multiplayerFlags_; // [esp+8h] [ebp-4h]
     int idx_; // [esp+18h] [ebp+Ch]
 
     int ret = 1;
     multiplayerFlags = sithCogVm_multiplayerFlags & mpFlags;
-    multiplayerFlags_ = sithCogVm_multiplayerFlags & mpFlags;
-    if ( (sithCogVm_multiplayerFlags & mpFlags) == 0 )
+    if (!multiplayerFlags)
         return 1;
     curMs = sithTime_curMs;
     msg->netMsg.thingIdx = playerThingIdx;
@@ -190,7 +187,6 @@ int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             if ( !v20 )
 LABEL_35:
                 msg->netMsg.msgId = 0;
-            multiplayerFlags = multiplayerFlags_;
         }
         else
         {
@@ -219,7 +215,6 @@ int sithCogVm_Sync()
     uint16_t v2; // dx
     uint32_t *v3; // ecx
     int v4; // eax
-    unsigned int v5; // ecx
     int v12; // ecx
     int v13; // [esp+4h] [ebp-4h]
 
@@ -254,11 +249,10 @@ LABEL_14:
                         i++;
                         if ( i >= 128 )
                         {
-                            v5 = sithCogVm_dword_847E84;
                             sithCogVm_aMsgPairs[sithCogVm_dword_847E84].thingIdx = sithCogVm_netMsgTmp.netMsg.thingIdx;
-                            sithCogVm_aMsgPairs[v5].msgId = v4;
-                            sithCogVm_dword_847E84 = v5 + 1;
-                            if ( v5 + 1 >= 0x80 )
+                            sithCogVm_aMsgPairs[sithCogVm_dword_847E84].msgId = v4;
+                            sithCogVm_dword_847E84++;
+                            if ( sithCogVm_dword_847E84 >= 0x80 )
                                 sithCogVm_dword_847E84 = 0;
                             v2 = sithCogVm_netMsgTmp.netMsg.cogMsgId;
                             goto LABEL_22;
@@ -318,7 +312,7 @@ void sithCogVm_SyncWithPlayers()
     if ( sithCogVm_idk2 )
     {
         
-        for (int i = 0; i < 32; i++) // off by one?
+        for (int i = 0; i < 32; i++)
         {
             if (!sithCogVm_MsgTmpBuf[i].netMsg.msgId)
                 continue;

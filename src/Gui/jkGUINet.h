@@ -16,8 +16,11 @@
 
 void jkGuiNet_idk(jkGuiMenu *pMenu);
 int jkGuiNet_CogMsgHandleJoining(sithCogMsg *msg);
+void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu);
+void jkGuiNet_sub_413E50(int idx);
+int jkGuiNet_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
 
-static void (*jkGuiNet_sub_413E00)() = (void*)jkGuiNet_sub_413E00_ADDR;
+//static void (*jkGuiNet_sub_413E00)() = (void*)jkGuiNet_sub_413E00_ADDR;
 //static int (*jkGuiNet_CogMsgHandleJoining)(int a1) = (void*)jkGuiNet_CogMsgHandleJoining_ADDR;
 //static int (*jkGuiNet_ShowSynchronizing)() = (void*)jkGuiNet_ShowSynchronizing_ADDR;
 static int (*jkGuiNet_Show)() = (void*)jkGuiNet_Show_ADDR;

@@ -666,3 +666,18 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
         }
     }
 }
+
+uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx)
+{
+    if ( !thingIdx )
+        return -1;
+
+    if ( !jkPlayer_maxPlayers )
+        return -1;
+    for ( uint32_t i = 0; i < jkPlayer_maxPlayers; ++i )
+    {
+        if (jkPlayer_playerInfos[i].net_id == thingIdx)
+            return i;
+    }
+    return -1;
+}
