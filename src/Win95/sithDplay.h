@@ -65,6 +65,7 @@ int sithDplay_SendToPlayer(sithCogMsg *msg, int sendto_id);
 int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext);
 
 void sithDplay_cogMsg_SendEnumPlayers(int sendtoId);
+int sithDplay_cogMsg_HandleEnumPlayers(sithCogMsg *msg);
 
 static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
@@ -98,6 +99,7 @@ static int (*DirectPlay_OpenIdk)(void*) = (void*)DirectPlay_OpenIdk_ADDR;
 static int (*DirectPlay_GetSession_passwordidk)(void*) = (void*)DirectPlay_GetSession_passwordidk_ADDR;
 static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions_ADDR;
 static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
+static int (*DirectPlay_StartSession)(void*, void*) = (void*)DirectPlay_StartSession_ADDR;
 #else
 int sithDplay_EarlyInit();
 int sithDplay_OpenConnection(void* a);
@@ -122,6 +124,7 @@ int DirectPlay_OpenIdk(void* a);
 int DirectPlay_GetSession_passwordidk(void* a);
 int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);
+int DirectPlay_StartSession(void* a, void* b);
 #endif
 
 #endif // _SITHDPLAY_H

@@ -801,7 +801,7 @@ void jkCog_StringConcatPlayerName(sithCog *pCog)
     v1 = sithCogVm_PopThing(pCog);
     if ( v1 )
     {
-        if ( v1->thingtype == SITH_THING_PLAYER )
+        if ( v1->type == SITH_THING_PLAYER )
         {
             v2 = v1->actorParams.playerinfo;
             if ( v2 )

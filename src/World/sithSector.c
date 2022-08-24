@@ -24,6 +24,7 @@
 #include "Engine/sithSurface.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
+#include "Dss/sithDSS.h"
 
 int sithSector_Load(sithWorld *world, int tmp)
 {
@@ -285,4 +286,18 @@ LABEL_9:
             }
         }
     }
+}
+
+void sithSector_sub_4F8EF0()
+{
+    uint32_t i; // esi
+
+    for ( i = 0; i < sithSector_numSync; ++i )
+    {
+        if ( (sithSector_aSyncIdk2[i] & 1) != 0 )
+            sithDSS_SendSyncSector(sithSector_aSyncIdk[i], -1, 255);
+        else
+            sithDSS_SendSyncSectorAlt(sithSector_aSyncIdk[i], -1, 255);
+    }
+    sithSector_numSync = 0;
 }

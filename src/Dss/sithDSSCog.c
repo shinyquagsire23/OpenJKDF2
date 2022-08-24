@@ -12,32 +12,40 @@ int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int 
     
     NETMSG_START;
 
-    NETMSG_PUSHU32(a7);
+    NETMSG_PUSHS32(a7);
     v12 = 1;
-    NETMSG_PUSHU16(a1 ? a1->selfCog : -1);
+    NETMSG_PUSHS16(a1 ? a1->selfCog : -1);
     NETMSG_PUSHU8(a3);
     NETMSG_PUSHU8(a5);
 
+    int a,b;
+
     if ( a3 == 3 && (v13 = sithThing_GetThingByIdx(a4)) != 0 ) {
-        NETMSG_PUSHU32(v13->thing_id);
+        a = v13->thingIdx;
+        NETMSG_PUSHS32(v13->thing_id);
     }
     else {
-        NETMSG_PUSHU32(a4);
+        a = a4;
+        NETMSG_PUSHS32(a4);
     }
 
     if ( a5 == 3 && (v14 = sithThing_GetThingByIdx(a6)) != 0 ) {
-        NETMSG_PUSHU32(v14->thing_id);
+        b = v14->thing_id;
+        NETMSG_PUSHS32(v14->thing_id);
     }
     else {
-        NETMSG_PUSHU32(a6);
+        b = a6;
+        NETMSG_PUSHS32(a6);
     }
 
-    NETMSG_PUSHU16(a2 & 0xFF);
+    NETMSG_PUSHS16(a2 & 0xFF);
     
     NETMSG_PUSHF32(param0);
     NETMSG_PUSHF32(param1);
     NETMSG_PUSHF32(param2);
     NETMSG_PUSHF32(param3);
+
+    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", a7, a1->selfCog, a3, a5, a, b, a2, param0, param1, param2, param3);
     
     NETMSG_END(COGMSG_SENDTRIGGER);
 
@@ -65,12 +73,12 @@ int sithDSSCog_HandleSendTrigger(sithCogMsg *in_netMsg)
     
     NETMSG_IN_START(in_netMsg);
 
-    linkId = NETMSG_POPU32();
-    cog = sithCog_GetByIdx(NETMSG_POPU16());
+    linkId = NETMSG_POPS32();
+    cog = sithCog_GetByIdx(NETMSG_POPS16());
     senderType = NETMSG_POPU8();
     sourceType = NETMSG_POPU8();
-    senderIdx = NETMSG_POPU32();
-    sourceIndex = NETMSG_POPU32();
+    senderIdx = NETMSG_POPS32();
+    sourceIndex = NETMSG_POPS32();
     if ( senderType == SENDERTYPE_THING )
     {
         v6 = sithThing_GetById(senderIdx);
@@ -83,11 +91,12 @@ int sithDSSCog_HandleSendTrigger(sithCogMsg *in_netMsg)
         if ( v7 )
             sourceIndex = v7->thingIdx;
     }
-    msgid = NETMSG_POPU16();
+    msgid = NETMSG_POPS16() & 0xFF;
     param0 = NETMSG_POPF32();
     param1 = NETMSG_POPF32();
     param2 = NETMSG_POPF32();
     param3 = NETMSG_POPF32();
+    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", linkId, cog->selfCog, senderType, sourceType, senderIdx, sourceIndex, msgid, param0, param1, param2, param3);
     if ( !cog )
     {
         sithCog_SendMessageToAll(msgid, senderType, senderIdx, sourceType, sourceIndex, param0, param1, param2, param3);
@@ -109,26 +118,26 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     
     NETMSG_START;
 
-    NETMSG_PUSHU32(cog->selfCog);
-    NETMSG_PUSHU32(cog->script_running);
-    NETMSG_PUSHU32(cog->flags);
+    NETMSG_PUSHS32(cog->selfCog);
+    NETMSG_PUSHS32(cog->script_running);
+    NETMSG_PUSHS32(cog->flags);
     if (cog->script_running)
     {
-        NETMSG_PUSHU32(cog->wakeTimeMs);
-        NETMSG_PUSHU32(cog->execPos);
-        NETMSG_PUSHU32(cog->senderId);
-        NETMSG_PUSHU32(cog->senderRef);
-        NETMSG_PUSHU32(cog->senderType);
-        NETMSG_PUSHU32(cog->sourceRef);
-        NETMSG_PUSHU32(cog->sourceType);
+        NETMSG_PUSHS32(cog->wakeTimeMs);
+        NETMSG_PUSHS32(cog->execPos);
+        NETMSG_PUSHS32(cog->senderId);
+        NETMSG_PUSHS32(cog->senderRef);
+        NETMSG_PUSHS32(cog->senderType);
+        NETMSG_PUSHS32(cog->sourceRef);
+        NETMSG_PUSHS32(cog->sourceType);
     }
     if ( (cog->flags & COGFLAGS_PULSE) != 0 )
     {
-        NETMSG_PUSHU32(cog->pulsePeriodMs);
-        NETMSG_PUSHU32(cog->nextPulseMs);
+        NETMSG_PUSHS32(cog->pulsePeriodMs);
+        NETMSG_PUSHS32(cog->nextPulseMs);
     }
     if ( (cog->flags & COGFLAGS_8) != 0 )
-        NETMSG_PUSHU32(cog->field_20);
+        NETMSG_PUSHS32(cog->field_20);
     v13 = cog->pSymbolTable;
     if ( v13->entry_cnt )
     {
@@ -143,7 +152,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
             sithCogSymbol* sym = &v13->buckets[i];
             if (sym->val.type == COG_VARTYPE_FLEX)
             {
-                NETMSG_PUSHU32((uint32_t)sym->val.data[0]);
+                NETMSG_PUSHS32((uint32_t)sym->val.data[0]);
             }
             else if ( sym->val.type == COG_VARTYPE_VECTOR )
             {
@@ -153,7 +162,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
             }
             else
             {
-                NETMSG_PUSHU32((uint32_t)sym->val.data[0]); // TODO ??? this is a pointer?
+                NETMSG_PUSHS32((uint32_t)sym->val.data[0]); // TODO ??? this is a pointer?
             }
         }
     }
@@ -169,32 +178,32 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
     
     NETMSG_IN_START(msg);
 
-    cog = sithCog_GetByIdx(NETMSG_POPU32());
+    cog = sithCog_GetByIdx(NETMSG_POPS32());
     if (!cog)
         return 0;
 
-    cog->script_running = NETMSG_POPU32();
-    cog->flags = NETMSG_POPU32();
+    cog->script_running = NETMSG_POPS32();
+    cog->flags = NETMSG_POPS32();
     if (cog->script_running)
     {
-        cog->wakeTimeMs = NETMSG_POPU32();
-        cog->execPos = NETMSG_POPU32();
-        cog->senderId = NETMSG_POPU32();
-        cog->senderRef = NETMSG_POPU32();
-        cog->senderType = NETMSG_POPU32();
-        cog->sourceRef = NETMSG_POPU32();
-        cog->sourceType = NETMSG_POPU32();
+        cog->wakeTimeMs = NETMSG_POPS32();
+        cog->execPos = NETMSG_POPS32();
+        cog->senderId = NETMSG_POPS32();
+        cog->senderRef = NETMSG_POPS32();
+        cog->senderType = NETMSG_POPS32();
+        cog->sourceRef = NETMSG_POPS32();
+        cog->sourceType = NETMSG_POPS32();
     }
 
     if (cog->flags & COGFLAGS_PULSE)
     {
-        cog->pulsePeriodMs = NETMSG_POPU32();
-        cog->nextPulseMs = NETMSG_POPU32();
+        cog->pulsePeriodMs = NETMSG_POPS32();
+        cog->nextPulseMs = NETMSG_POPS32();
     }
 
     if (cog->flags & COGFLAGS_8)
     {
-        cog->field_20 = NETMSG_POPU32();
+        cog->field_20 = NETMSG_POPS32();
     }
     
     v13 = cog->pSymbolTable;
@@ -211,7 +220,7 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
             sithCogSymbol* sym = &v13->buckets[i];
             if (sym->val.type == COG_VARTYPE_FLEX)
             {
-                sym->val.data[0] = NETMSG_POPU32();
+                sym->val.data[0] = NETMSG_POPS32();
             }
             else if ( sym->val.type == COG_VARTYPE_VECTOR )
             {
@@ -221,7 +230,7 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
             }
             else
             {
-                sym->val.data[0] = NETMSG_POPU32();
+                sym->val.data[0] = NETMSG_POPS32();
             }
         }
     }

@@ -920,7 +920,7 @@ int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg)
         return 0;
     if ( !pThing->playerInfo )
         return 0;
-    int type = pThing->thingtype;
+    int type = pThing->type;
     if ( type != SITH_THING_PLAYER && type != SITH_THING_ACTOR )
         return 0;
 
@@ -1044,7 +1044,7 @@ int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
     sithThing* pThing = &sithWorld_pCurrentWorld->things[arg0];
 
 
-    int type = pThing->thingtype;
+    int type = pThing->type;
     if ( type != SITH_THING_ACTOR && type != SITH_THING_PLAYER )
         return 0;
 

@@ -316,6 +316,8 @@ LABEL_41:
                     }
                 }
             }
+            // Added: Prevent deadlocks in some conditions
+            if (v7->nextThing == v7) break;
             v7 = v7->nextThing;
             if ( !v7 )
                 break;

@@ -108,6 +108,7 @@ void sithSurface_Sync(int mpFlags);
 rdSurface* sithSurface_Alloc();
 sithSurface* sithSurface_sub_4E63B0(int idx);
 void sithSurface_PushSurface(sithSurface *pSurface);
+void sithSurface_Syncidk();
 
 //static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;

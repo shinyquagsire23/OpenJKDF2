@@ -55,6 +55,7 @@
 #define sithCogScript_RegisterVerb_ADDR (0x004E0700)
 
 #define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithCogVm_netMsgTmp.pktData[0];
+#define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&sithDplay_cogMsgTmp.pktData[0];
 #define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = x; craftingPacket += sizeof(uint8_t);};
 #define NETMSG_PUSHU16(x) {*(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t);};
 #define NETMSG_PUSHS16(x) {*(int16_t*)craftingPacket = x; craftingPacket += sizeof(int16_t);};
@@ -73,6 +74,13 @@
                             sithCogVm_netMsgTmp.netMsg.msg_size = len; \
                           };
 #define NETMSG_LEN(msgid) ((intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0])
+
+#define NETMSG_END_2(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithDplay_cogMsgTmp.pktData[0]; \
+                            sithDplay_cogMsgTmp.netMsg.flag_maybe = 0; \
+                            sithDplay_cogMsgTmp.netMsg.cogMsgId = msgid; \
+                            sithDplay_cogMsgTmp.netMsg.msg_size = len; \
+                          };
+#define NETMSG_LEN_2(msgid) ((intptr_t)craftingPacket - (intptr_t)&sithDplay_cogMsgTmp.pktData[0])
 
 #define NETMSG_IN_START(x) intptr_t _readingPacket = (intptr_t)&x->pktData[0]; uint8_t _readingOutU8; \
 uint16_t _readingOutU16; int16_t _readingOutS16; uint32_t _readingOutU32; \

@@ -1,8 +1,47 @@
 #include "sithDplay.h"
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
+
+#define DESIRED_ADDRESS "127.0.0.1"
+#define DESIRED_PORT 3500
+#define BUFSIZE 4096
+
+int DirectPlay_sock = -1;
+int DirectPlay_clientSocks[32];
+
+void Hack_ResetClients()
+{
+    DirectPlay_numPlayers = 2;
+    DirectPlay_aPlayers[0].dpId = 1;
+    jk_snwprintf(DirectPlay_aPlayers[0].waName, 32, "asdf1");
+
+    DirectPlay_aPlayers[1].dpId = 2;
+    jk_snwprintf(DirectPlay_aPlayers[1].waName, 32, "asdf2");
+
+    int id_self = 1;
+    int id_other = 2;
+    if (!sithDplay_dword_8321E4)
+    {
+        id_self = 2;
+        id_other = 1;
+    }
+    //jkPlayer_playerInfos[0].net_id = id_self;
+    //jkPlayer_playerInfos[1].net_id = id_other;
+    //jk_snwprintf(jkPlayer_playerInfos[0].player_name, 32, "asdf1");
+    //jk_snwprintf(jkPlayer_playerInfos[1].player_name, 32, "asdf2");
+
+    jkPlayer_maxPlayers = 2;
+}
 
 int sithDplay_Startup()
 {
@@ -24,6 +63,13 @@ int sithDplay_Startup()
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_58, 0x20, "JK1MP");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_78, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;
+
+    for (int i = 0; i < 32; i++)
+    {
+        DirectPlay_clientSocks[i] = -1;
+    }
+
+    Hack_ResetClients();
 #endif
     sithDplay_bInitted = 1;
 
@@ -69,6 +115,7 @@ HRESULT sithDplay_EnumSessions2(void)
 
 int sithDplay_seed_idk(jkMultiEntry *pEntry)
 {
+    printf("Seed idk\n");
     jkGuiNet_checksumSeed = (__int64)((double)rand() * 0.000030518509 * 4294967300.0);
     pEntry->checksumSeed = jkGuiNet_checksumSeed;
     pEntry->field_E0 = 10;
@@ -91,6 +138,7 @@ int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
         sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
         if ( sithDplay_dplayIdSelf )
         {
+            sithDplay_dplayIdSelf = 1; // HACK
             sithDplay_dword_8321E4 = 1;
             sithDplay_dword_8321E0 = 1;
             result = 0;
@@ -113,6 +161,8 @@ int sithDplay_Recv(sithCogMsg *msg)
     pMsg = msg;
     msgBytes = 2052;
     int playerId = 0;
+
+    memset(&msg->netMsg.cogMsgId, 0, msgBytes); // Added
 
     // TODO I got a struct offset wrong.....
     ret = DirectPlay_Receive(&playerId, &msg->netMsg.cogMsgId, &msgBytes);
@@ -233,67 +283,107 @@ DPlayPktWrap aDplayOutgoing[DPLAY_OUTQUEUE_LEN] = {0};
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
+    Hack_ResetClients();
+    int idRecv = sithDplay_dword_8321E4 ? 2 : 1;
+    /*static int has_send_idk = 0;
+    if (!has_send_idk)
+    {
+        has_send_idk = 1;
+        *pIdOut = idRecv;
+        return 2;
+    }*/
     int pMsgIdOut_size = *pLenOut;
+    int n;
+
     *pIdOut = 0;
     *pMsgIdOut = 0;
     *pLenOut = 0;
 
-    // Loopback
-    DPlayPktWrap* pPkt = NULL;
-    for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
     {
-        if (aDplayOutgoing[i].data)
+        // Loopback
+        DPlayPktWrap* pPkt = NULL;
+        for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
         {
-            pPkt = &aDplayOutgoing[i];
-            break;
+            if (aDplayOutgoing[i].data)
+            {
+                pPkt = &aDplayOutgoing[i];
+                break;
+            }
         }
+        if (!pPkt) goto not_loopback;
+
+        if (pMsgIdOut_size > pPkt->dataSize)
+            pMsgIdOut_size = pPkt->dataSize;
+
+        *pIdOut = pPkt->idFrom;
+        memcpy((void*)pMsgIdOut, pPkt->data, pMsgIdOut_size);
+        *pLenOut = pMsgIdOut_size;
+
+        // Clear the packet
+        pPkt->idFrom = 0;
+        pPkt->idTo = 0;
+        free(pPkt->data);
+        pPkt->data = NULL;
+        pPkt->dataSize = 0;
+
+        printf("Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
+
+        return 0;
     }
-    if (!pPkt) return -1;
 
-    if (pMsgIdOut_size > pPkt->dataSize)
-        pMsgIdOut_size = pPkt->dataSize;
+not_loopback:
 
-    *pIdOut = pPkt->idFrom;
-    memcpy((void*)pMsgIdOut, pPkt->data, pMsgIdOut_size);
-    *pLenOut = pMsgIdOut_size;
+    n = read(DirectPlay_clientSocks[0], (void*)pMsgIdOut, pMsgIdOut_size);
+    if (n <= 0) {
+      return -1;
+   }
 
-    // Clear the packet
-    pPkt->idFrom = 0;
-    pPkt->idTo = 0;
-    free(pPkt->data);
-    pPkt->data = NULL;
-    pPkt->dataSize = 0;
+   *pIdOut = idRecv;
+   *pLenOut = n;
 
-    printf("Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
+    printf("Recv %x bytes from %x (%x)\n", pMsgIdOut_size, idRecv, *pMsgIdOut);
 
     return 0;
 }
 
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
 {
-    if (!lpData || dwDataSize > 2052) return 0;
+    Hack_ResetClients();
+    if (!lpData || dwDataSize > 2052 || dwDataSize <= 0) return 0;
+    dwDataSize = 2052;
 
-    DPlayPktWrap* pPkt = NULL;
-    for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
+    if (idFrom == idTo)
     {
-        if (!aDplayOutgoing[i].data)
+        DPlayPktWrap* pPkt = NULL;
+        for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
         {
-            pPkt = &aDplayOutgoing[i];
-            break;
+            if (!aDplayOutgoing[i].data)
+            {
+                pPkt = &aDplayOutgoing[i];
+                break;
+            }
         }
+
+        if (!pPkt) return 0;
+
+        pPkt->idFrom = idFrom;
+        pPkt->idTo = idTo;
+        pPkt->data = malloc(dwDataSize);
+        pPkt->dataSize = dwDataSize;
+
+        printf("Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
+
+        memcpy(pPkt->data, lpData, dwDataSize);
+
+        return 1;
     }
 
-    if (!pPkt) return 0;
+    int n = 0;
+    while (n <= 0) {
+        n = write( DirectPlay_clientSocks[0], lpData, dwDataSize);
+    }
 
-    pPkt->idFrom = idFrom;
-    pPkt->idTo = idTo;
-    pPkt->data = malloc(dwDataSize);
-    pPkt->dataSize = dwDataSize;
-
-    printf("Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
-
-    memcpy(pPkt->data, lpData, dwDataSize);
-
+    printf("Sent %x bytes to %x (%x)\n", n, idTo, *(int*)lpData);
     return 1;
 }
 
@@ -314,7 +404,64 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dword_8321E0 = 1;
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
     sithDplay_dword_8321E4 = 0;
+    sithDplay_dplayIdSelf = 2; // HACK
     jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
+
+    // Client socket connect
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(DESIRED_PORT); /*converts short to
+                                           short with network byte order*/
+    addr.sin_addr.s_addr = inet_addr(DESIRED_ADDRESS);
+
+    DirectPlay_sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (DirectPlay_sock == -1) {
+        perror("Socket creation error");
+        return EXIT_FAILURE;
+    }
+    if (connect(DirectPlay_sock, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+        perror("Connection error");
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < 32; i++)
+    {
+        DirectPlay_clientSocks[i] = DirectPlay_sock;
+    }
+
+    fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
+
+#if 0
+    char buf[BUFSIZE];
+    if (send(sock, "hello", 5, 0); /*write may be also used*/ == -1) {
+        perror("Send error");
+        close(client_sock);
+        close(sock);
+        return EXIT_FAILURE;
+    }
+
+    ssize_t readden = recv(sock, buf, BUFSIZE, 0); /*read may be also used*/
+    if (readden < 0) {
+        perror("Receive error");
+        close(client_sock);
+        close(sock);
+        return EXIT_FAILURE;
+    }
+    else if (readden == 0)
+    {
+        fprintf(stderr, "Client orderly shut down the connection.\n");
+    }
+    else /* if (readden > 0) */ {
+        if (readden < BUFSIZE)
+        {
+          fprintf(stderr, "Received less bytes (%zd) then requested (%d).\n", 
+            readden, BUFSIZE);
+        }
+
+        write (STDOUT_FILENO, buf, readden);
+    }  
+#endif
     return 0;
 }
 
@@ -376,6 +523,79 @@ void DirectPlay_Close()
 
 int DirectPlay_OpenIdk(void* a)
 {
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(DESIRED_PORT); /*converts short to
+                                           short with network byte order*/
+    addr.sin_addr.s_addr = inet_addr(DESIRED_ADDRESS);
+
+    DirectPlay_sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (DirectPlay_sock == -1) {
+        perror("Socket creation error");
+        return EXIT_FAILURE;
+    }
+
+    if (bind(DirectPlay_sock, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+        perror("Bind error");
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+
+    if (listen(DirectPlay_sock, 1/*length of connections queue*/) == -1) {
+        perror("Listen error");
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+
+    socklen_t socklen = sizeof addr;
+    int client_sock = accept(DirectPlay_sock, &addr, &socklen); /* 2nd and 3rd argument may be NULL. */
+    if (client_sock == -1) {
+        perror("Accept error");
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+
+    fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
+    fcntl(client_sock, F_SETFL, O_NONBLOCK);
+
+    printf("Client with IP %s connected\n", inet_ntoa(addr.sin_addr));
+
+    for (int i = 0; i < 32; i++)
+    {
+        DirectPlay_clientSocks[i] = client_sock;
+    }
+
+    //DirectPlay_clientSocks[sithDplay_dplayIdSelf] = DirectPlay_sock;
+
+#if 0
+    char buf[BUFSIZE];
+    if (send(DirectPlay_sock, "hello", 5, 0) == -1) {
+        perror("Send error");
+        close(client_sock);
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+
+    ssize_t readden = recv(DirectPlay_sock, buf, BUFSIZE, 0);
+    if (readden < 0) {
+        perror("Receive error");
+        close(client_sock);
+        close(DirectPlay_sock);
+        return EXIT_FAILURE;
+    }
+    else if (readden == 0) {
+      fprintf(stderr, "Client orderly shut down the connection.\n");
+    }
+    else {readden > 0) {
+        if (readden < BUFSIZE)
+        {
+          fprintf(stderr, "Received less bytes (%zd) then requested (%d).\n", 
+            readden, BUFSIZE);
+        }
+
+        write (STDOUT_FILENO, buf, readden);
+    }
+#endif
     return 0;
 }
 
@@ -386,11 +606,17 @@ int DirectPlay_GetSession_passwordidk(void* a)
 
 int sithDplay_EnumSessions(int a, void* b)
 {
+    Hack_ResetClients();
     return 0;
 }
 
 void DirectPlay_EnumPlayers(int a)
 {
-    
+    Hack_ResetClients();
+}
+
+int DirectPlay_StartSession(void* a, void* b)
+{
+    return 1;
 }
 #endif

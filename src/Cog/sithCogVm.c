@@ -25,9 +25,7 @@
 #include <stdint.h>
 #include <math.h>
 
-#define sithMulti_HandleLeaveJoin ((void*)0x004CAAF0)
 #define sithMulti_HandleTimeLimit ((void*)0x004CB690)
-#define sithDplay_cogMsg_HandleEnumPlayers ((void*)0x004C9A40)
 
 
 int sithCogVm_Startup()
@@ -108,6 +106,8 @@ int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     int v19; // ecx
     int v20; // eax
     int idx_; // [esp+18h] [ebp+Ch]
+
+    printf("sithCogVm_SendMsgToPlayer %x %x %x %x\n", msg->netMsg.cogMsgId, a2, mpFlags, a4);
 
     int ret = 1;
     multiplayerFlags = sithCogVm_multiplayerFlags & mpFlags;
@@ -356,7 +356,9 @@ int sithCogVm_cogMsg_Reset(sithCogMsg *msg)
     
     int foundIdx;
 
-    v1 = *(uint16_t*)&msg->pktData[0];
+    NETMSG_IN_START(msg);
+
+    v1 = NETMSG_POPS16();
     playerIdx = sithPlayer_ThingIdxToPlayerIdx(msg->netMsg.thingIdx);
     foundIdx = 0;
     

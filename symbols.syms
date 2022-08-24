@@ -143,6 +143,7 @@ sithMulti_dword_832654 0x00832654 int
 sithMulti_dword_832660 0x00832660 int
 sithMulti_dword_832620 0x00832620 int
 sithMulti_requestConnectIdx 0x00832618 uint32_t
+sithMulti_dword_832664 0x00832664 int
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
@@ -249,6 +250,7 @@ sithNet_checksum 0x00832630 int
 sithNet_dword_832640 0x00832640 int
 sithMulti_sendto_id 0x00832644 int
 sithNet_dword_832648 0x00832648 int
+sithNet_dword_832620 0x00832620 int
 
 sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
 sithOverlayMap_matrix 0x00835840 rdMatrix34
@@ -331,7 +333,7 @@ sithDplay_dword_8321F0 0x008321F0 int
 sithDplay_dword_8321F4 0x008321F4 int
 sithDplay_dplayIdSelf 0x008321EC int
 sithDplay_dword_832204 0x00832204 int
-sithDplay_dword_832208 0x00832208 int
+sithDplay_dword_832208 0x00832208 uint32_t
 sithDplay_dword_83220C 0x0083220C int
 sithDplay_dword_8321E0 0x008321E0 int
 sithDplay_dword_8321E4 0x008321E4 int

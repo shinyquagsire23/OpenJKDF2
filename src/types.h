@@ -1985,11 +1985,11 @@ typedef struct sithPlayerInfo
     uint32_t palEffectsIdx1;
     uint32_t palEffectsIdx2;
     uint32_t teamNum;
-    uint32_t numKills;
-    uint32_t numKilled;
-    uint32_t numSuicides;
-    uint32_t score;
-    uint32_t field_13B0;
+    int32_t numKills;
+    int32_t numKilled;
+    int32_t numSuicides;
+    int32_t score;
+    int32_t field_13B0;
 } sithPlayerInfo;
 
 

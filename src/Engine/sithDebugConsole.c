@@ -100,7 +100,7 @@ int sithDebugConsole_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pA
             if ( !sithWorld_pCurrentWorld )
                 goto LABEL_24;
             v4 = sithWorld_pCurrentWorld->playerThing;
-            if ( !v4 || v4->thingtype != SITH_THING_PLAYER )
+            if ( !v4 || v4->type != SITH_THING_PLAYER )
                 goto LABEL_24;
             v2 = (int*)&v4->actorParams.typeflags;
             v3 = 8;

@@ -392,7 +392,7 @@ LABEL_30:
             if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 v27 = (v25 & 0x40) != 0;
-                v28 = i->thingtype;
+                v28 = i->type;
                 if ( v28 == SITH_THING_PLAYER )
                 {
                     if ( (v25 & 0xC) != 0 )
@@ -451,7 +451,7 @@ LABEL_30:
                     a4 = i->moveSize * sithOverlayMap_flMapSize;
                     v31 = v37 + sithOverlayMap_x1;
                     rdPrimit2_DrawCircle(sithOverlayMap_pCanvas, v37 + sithOverlayMap_x1, sithOverlayMap_y1 - v40_, a4, 20.0, circleColor, -1);
-                    v32 = i->thingtype;
+                    v32 = i->type;
                     if ( v32 == SITH_THING_ACTOR || v32 == SITH_THING_PLAYER )
                     {
                         v35.x = i->lookOrientation.lvec.x * (i->moveSize + i->moveSize);

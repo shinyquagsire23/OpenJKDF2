@@ -600,6 +600,9 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
     jkPlayer_playerInfos[idx].flags |= 5;
     jkPlayer_playerInfos[idx].net_id = netId;
     v2->thingflags &= ~SITH_TF_DISABLED;
+
+    v2->thingtype = SITH_THING_PLAYER; // TODO: WHY IS THIS NEEDED?
+
     return 1;
 }
 

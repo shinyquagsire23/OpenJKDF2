@@ -1286,3 +1286,26 @@ void sithSurface_PushSurface(sithSurface *pSurface)
         aSithSurfaces[sithSurface_numSurfaces_0++] = pSurface;
     }
 }
+
+void sithSurface_Syncidk()
+{
+    unsigned int v0; // esi
+    sithSurface **v1; // edi
+
+    if ( sithCogVm_multiplayerFlags && sithSurface_numSurfaces_0 )
+    {
+        v0 = 0;
+        if ( sithSurface_numSurfaces_0 )
+        {
+            v1 = aSithSurfaces;
+            do
+            {
+                sithDSS_SendSyncSurface(*v1, -1, 255);
+                ++v0;
+                ++v1;
+            }
+            while ( v0 < sithSurface_numSurfaces_0 );
+        }
+        sithSurface_numSurfaces_0 = 0;
+    }
+}

@@ -2328,3 +2328,34 @@ sithThing* sithThing_GetById(int thing_id)
 
     return NULL;
 }
+
+void sithThing_netidk()
+{
+    int v0; // esi
+    int v1; // eax
+
+    v0 = 0;
+    if ( sithNet_syncIdx )
+    {
+        while ( 1 )
+        {
+            v1 = sithNet_aSyncFlags[v0];
+            if ( (v1 & 4) != 0 )
+                break;
+            if ( (v1 & 2) != 0 )
+                sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
+            if ( (sithNet_aSyncFlags[v0] & 1) != 0 )
+                sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
+            if ( ++v0 >= (unsigned int)sithNet_syncIdx )
+            {
+                sithNet_syncIdx = 0;
+                return;
+            }
+        }
+        sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
+    }
+    else
+    {
+        sithNet_syncIdx = 0;
+    }
+}

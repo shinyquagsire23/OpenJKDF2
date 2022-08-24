@@ -257,9 +257,7 @@ int sith_Tick()
         sithCogScript_TickAll();
         
         DebugConsole_AdvanceLogBuf();
-#ifndef LINUX_TMP
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
-#endif
         sithGamesave_WriteEntry();
         return 0;
     }

@@ -325,6 +325,7 @@ void sithThing_SyncThingPos(sithThing *thing, int a2);
 int sithThing_ShouldSync(sithThing *thing);
 sithThing* sithThing_GetById(int thing_id);
 int sithThing_HasAttachment(sithThing *thing);
+void sithThing_netidk();
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;

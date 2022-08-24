@@ -23,7 +23,7 @@ void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
 
     NETMSG_START;
 
-    if ( pThing && pThing->thingtype && pThing->sector)
+    if ( pThing && pThing->type && pThing->sector)
     {
         sithSector* pSector = pThing->sector;
         NETMSG_PUSHS32(pThing->thing_id);
@@ -44,7 +44,7 @@ void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
                 NETMSG_PUSHVEC3(pThing->physicsParams.angVel);
             }
         }
-        if ( pThing->thingtype == SITH_THING_PLAYER )
+        if ( pThing->type == SITH_THING_PLAYER )
             NETMSG_PUSHF32(pThing->actorParams.eyePYR.x);
 
         NETMSG_END(COGMSG_TELEPORTTHING);
@@ -66,7 +66,8 @@ int sithDSSThing_HandleTeleportThing(sithCogMsg *msg)
     int thing_id = NETMSG_POPS32();
 
     sithThing* pThing = sithThing_GetById(thing_id);
-    if ( !pThing || pThing->thingtype == SITH_THING_FREE || !pThing->sector )
+    //printf("sithDSSThing_HandleTeleportThing %x %x\n", thing_id, pThing->thingtype);
+    if ( !pThing || pThing->type == SITH_THING_FREE || !pThing->sector )
         return 0;
     uint16_t attach_flags = NETMSG_POPU16();
     if ( !attach_flags && pThing->attach_flags )
@@ -103,12 +104,13 @@ int sithDSSThing_HandleTeleportThing(sithCogMsg *msg)
         pThing->position = pos;
         sithThing_MoveToSector(pThing, pSector, 0);
     }
-    if ( pThing->thingtype == SITH_THING_PLAYER )
+    if ( pThing->type == SITH_THING_PLAYER )
     {
         rdVector_Zero3(&lookTmp);
         lookTmp.x = NETMSG_POPF32();
         sithUnk4_MoveJointsForEyePYR(pThing, &lookTmp);
     }
+
     return 1;
 }
 
@@ -116,7 +118,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    if (!pThing || !pThing->thingtype || !pThing->sector || !sithThing_GetIdxFromThing(pThing) )
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) )
         return;
 
     NETMSG_PUSHS32(pThing->thing_id);
@@ -134,7 +136,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
         NETMSG_PUSHS16(pThing->puppet->field_4);
     }
     NETMSG_PUSHS32(pThing->light);
-    switch ( pThing->thingtype )
+    switch ( pThing->type )
     {
         case SITH_THING_ACTOR:
         case SITH_THING_CORPSE:
@@ -171,10 +173,19 @@ int sithDSSThing_HandleSyncThing(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(msg->pktData[0]);
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
     if ( !pThing )
         return 0;
-    if ( pThing->thingtype == SITH_THING_FREE )
+
+#if 0
+    // Added: why is this needed???
+    if (!pThing->thingtype && pThing->type)
+        pThing->thingtype = pThing->type;
+    if (pThing->thingtype && !pThing->type)
+        pThing->type = pThing->thingtype;
+#endif
+
+    if ( pThing->type == SITH_THING_FREE )
         return 0;
     if ( !pThing->sector )
         return 0;
@@ -188,7 +199,7 @@ int sithDSSThing_HandleSyncThing(sithCogMsg *msg)
     sithThing_MoveToSector(pThing, pSector, 0);
 
     uint32_t thingflags = NETMSG_POPS32();
-    if ( pThing->thingtype == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD))
+    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD))
         sithPlayer_debug_loadauto(pThing);
     
     // Lol, anticheat?
@@ -208,7 +219,7 @@ int sithDSSThing_HandleSyncThing(sithCogMsg *msg)
 
     pThing->light = NETMSG_POPF32();
 
-    switch ( pThing->thingtype )
+    switch ( pThing->type )
     {
         case SITH_THING_ACTOR:
         case SITH_THING_CORPSE:
@@ -413,22 +424,16 @@ int sithDSSThing_HandleOpenDoor(sithCogMsg *msg)
 
     sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
 
-    if ( pThing )
-    {
-        if ( pThing->rdthing.puppet )
-        {
-            int arg1 = NETMSG_POPS32();
-            int v4 = sithPuppet_PlayMode(pThing, NETMSG_POPS16(), 0);
-            if ( v4 >= 0 )
-                pThing->rdthing.puppet->tracks[v4].field_130 = arg1;
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    return 0;
+    if (!pThing )
+        return 0;
+    if (!pThing->rdthing.puppet)
+        return 0;
+
+    int arg1 = NETMSG_POPS32();
+    int v4 = sithPuppet_PlayMode(pThing, NETMSG_POPS16(), 0);
+    if ( v4 >= 0 )
+        pThing->rdthing.puppet->tracks[v4].field_130 = arg1;
+    return 1;
 }
 
 void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId)
@@ -638,7 +643,7 @@ int sithDSSThing_HandleDeath(sithCogMsg *msg)
     {
         sithThing* pReceiver = sithThing_GetById(NETMSG_POPS32());
         int cause = NETMSG_POPU8();
-        int senderType = pSender->thingtype;
+        int senderType = pSender->type;
         if ( senderType == SITH_THING_ACTOR)
         {
             sithThing_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
@@ -859,7 +864,7 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
     thing->type = type;
-    thing->thingtype = type; // Added: why is this needed?
+    //thing->thingtype = type; // Added: why is this needed?
     thing->position = NETMSG_POPVEC3();
     thing->lookOrientation.rvec = NETMSG_POPVEC3();
     thing->lookOrientation.lvec = NETMSG_POPVEC3();
@@ -965,7 +970,7 @@ void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, in
 {
     rdVector3 out;
 
-    if (!pThing || pThing->moveType != SITH_MT_PATH || !pThing->thingtype )
+    if (!pThing || pThing->moveType != SITH_MT_PATH || !pThing->type )
         return;
     if (!pThing->sector)
         return;
@@ -1121,7 +1126,6 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
     int itemThingId; // edi
     int actorId; // edx
     sithThing *pItemThing2; // esi
-    sithThing *pActor2_; // eax
     sithThing *pActor2; // edi
 
     itemThingId = pItemThing->thing_id;
@@ -1146,9 +1150,8 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithCogVm_netMsgTmp.netMsg.thingIdx, 255, 1);
         return;
     }
-    pActor2_ = sithThing_GetById(sithCogVm_netMsgTmp.pktData[1]);
-    pActor2 = pActor2_;
-    if ( pItemThing2 && pActor2_ )
+    pActor2 = sithThing_GetById(sithCogVm_netMsgTmp.pktData[1]);
+    if ( pItemThing2 && pActor2 )
     {
         if ( sithCogVm_netMsgTmp.netMsg.cogMsgId != COGMSG_TAKEITEM1 )
         {
@@ -1156,7 +1159,7 @@ LABEL_12:
             sithItem_Take(pItemThing2, pActor2, 1);
             return;
         }
-        if ( pItemThing2->thingtype == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
+        if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
         {
             sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_TAKEITEM2;
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
@@ -1170,7 +1173,6 @@ int sithDSSThing_HandleTakeItem(sithCogMsg *msg)
     int v1; // ebx
     sithThing *v2; // edi
     sithThing *v4; // eax
-    sithThing *v5; // esi
     int v6; // [esp-Ch] [ebp-1Ch]
 
     v1 = msg->pktData[0];
@@ -1182,21 +1184,20 @@ int sithDSSThing_HandleTakeItem(sithCogMsg *msg)
         sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
         sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_DESTROYTHING;
         sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, v6, 255, 1);
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v6, 255, 1);
         return 0;
     }
     v4 = sithThing_GetById(msg->pktData[1]);
-    v5 = v4;
     if ( v2 && v4 )
     {
         if ( msg->netMsg.cogMsgId == COGMSG_TAKEITEM1 )
         {
-            if ( v2->thingtype != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) != 0 )
+            if ( v2->type != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) != 0 )
                 return 1;
             msg->netMsg.cogMsgId = COGMSG_TAKEITEM2;
-            sithCogVm_SendMsgToPlayer(&msg->netMsg, -1, 1, 1);
+            sithCogVm_SendMsgToPlayer(msg, -1, 1, 1);
         }
-        sithItem_Take(v2, v5, 1);
+        sithItem_Take(v2, v4, 1);
         return 1;
     }
     return 0;
@@ -1237,7 +1238,7 @@ int sithDSSThing_HandleCreateThing(sithCogMsg *msg)
         int pThing2Id = NETMSG_POPS32();
         if ( pThing2Id < 0 )
         {
-            sithSector* pSector = (sithThing *)sithSector_GetPtrFromIdx(NETMSG_POPS16());
+            sithSector* pSector = sithSector_GetPtrFromIdx(NETMSG_POPS16());
             if ( !pSector )
                 return 0;
             rdVector3 pos = NETMSG_POPVEC3();
@@ -1249,7 +1250,7 @@ int sithDSSThing_HandleCreateThing(sithCogMsg *msg)
         {
             sithThing* pThing2 = sithThing_GetById(pThing2Id);
             if ( !pThing2 )
-                return pThing2;
+                return 0;
             pCreated = sithThing_SpawnTemplate(pThing, pThing2);
         }
 
