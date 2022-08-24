@@ -381,7 +381,7 @@ if(TARGET_WIN32)
         if(PLAT_MSVC)
 			set(LINK_LIBS ${LINK_LIBS} ole32.lib uuid.lib)
 		else()
-			add_link_options(-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid)
+			add_link_options(-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lws2_32)
 		endif()
     endif()
 endif()
@@ -488,7 +488,7 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
     target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib/" png)
     target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib/" z)
-    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid)
+    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
 
     target_link_libraries(${BIN_NAME} PRIVATE -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
@@ -524,7 +524,7 @@ elseif(PLAT_MSVC)
 	target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid)
+    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
 	
 	add_custom_command(TARGET ${BIN_NAME} 
 	POST_BUILD 

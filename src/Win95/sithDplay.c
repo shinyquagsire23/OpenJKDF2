@@ -1,8 +1,13 @@
 #include "sithDplay.h"
 
 #if defined(WIN64_MINGW)
+typedef size_t socklen_t;
+//#include <arpa/inet.h>
+//#include <netinet/in.h>
+#include <winsock2.h>
 #include <stdio.h>
 #include <stdlib.h>
+//#include <sys/socket.h>
 #include <unistd.h>
 #include <fcntl.h>
 #elif defined(WIN32_BLOBS)
@@ -439,7 +444,12 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
         DirectPlay_clientSocks[i] = DirectPlay_sock;
     }
 
+#ifdef WIN64_MINGW
+    u_long iMode = 0;
+    ioctlsocket(DirectPlay_sock, FIONBIO, &iMode);
+#else
     fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
+#endif
 
 #if 0
     char buf[BUFSIZE];
@@ -564,8 +574,16 @@ int DirectPlay_OpenIdk(void* a)
         return EXIT_FAILURE;
     }
 
+#ifdef WIN64_MINGW
+    u_long iMode = 0;
+    ioctlsocket(DirectPlay_sock, FIONBIO, &iMode);
+    ioctlsocket(client_sock, FIONBIO, &iMode);
+#else
     fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
     fcntl(client_sock, F_SETFL, O_NONBLOCK);
+#endif
+
+    
 
     printf("Client with IP %s connected\n", inet_ntoa(addr.sin_addr));
 
