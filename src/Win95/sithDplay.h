@@ -66,6 +66,7 @@ int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpNa
 
 void sithDplay_cogMsg_SendEnumPlayers(int sendtoId);
 int sithDplay_cogMsg_HandleEnumPlayers(sithCogMsg *msg);
+int sithDplay_EarlyInit();
 
 static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
@@ -78,7 +79,7 @@ static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 #ifdef WIN32_BLOBS
 static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
 static int (*DirectPlay_EarlyInit)(wchar_t*, wchar_t*) = (void*)DirectPlay_EarlyInit_ADDR;
-static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
+//static int (*sithDplay_EarlyInit)() = (void*)sithDplay_EarlyInit_ADDR;
 static int (*sithDplay_Open)(int idx, wchar_t* pwPassword) = (void*)sithDplay_Open_ADDR;
 static int (*sithDplay_OpenConnection)(void* a) = (void*)sithDplay_OpenConnection_ADDR;
 static void (*sithDplay_CloseConnection)() = (void*)sithDplay_CloseConnection_ADDR;
@@ -101,7 +102,7 @@ static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions
 static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
 static int (*DirectPlay_StartSession)(void*, void*) = (void*)DirectPlay_StartSession_ADDR;
 #else
-int sithDplay_EarlyInit();
+
 int sithDplay_OpenConnection(void* a);
 void sithDplay_CloseConnection();
 int sithDplay_Open(int idx, wchar_t* pwPassword);

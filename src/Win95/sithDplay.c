@@ -1,5 +1,13 @@
 #include "sithDplay.h"
 
+#if defined(WIN64_MINGW)
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#elif defined(WIN32_BLOBS)
+
+#else
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -7,6 +15,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
