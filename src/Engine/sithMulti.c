@@ -1337,7 +1337,6 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                 {
                     do
                     {
-                        printf("Sync step %x %x %x\n", sithDplay_dword_83220C, sithDplay_dword_832208, sithWorld_pCurrentWorld->numThings);
                         switch ( sithDplay_dword_83220C )
                         {
                             case 1:
@@ -1455,8 +1454,6 @@ LABEL_30:
                             sithDSSThing_SendSyncThingFull(v14, sithMulti_sendto_id, 1);
                         else
                             sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
-
-                        printf("Sync thing %x %x %x %x\n", sithDplay_dword_832208, v14->thing_id, v14->type, v14->thingtype);
 
                         sithDSSThing_SendTeleportThing(v14, sithMulti_sendto_id, 0);
 

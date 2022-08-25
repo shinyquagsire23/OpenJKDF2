@@ -641,7 +641,7 @@ jkCutscene_dword_55B750 0x0055B750 int
 jkCutscene_dword_55AA50 0x0055AA50 int
 jkCutscene_55AA54 0x0055AA54 int
 
-gamemode_0_2_str 0x005528D0 char[128]
+jkMain_aLevelJklFname 0x005528D0 char[128]
 thing_nine 0x0052552C int = 1
 jkMain_bInit 0x00552B80 int
 thing_six 0x00552B90 int

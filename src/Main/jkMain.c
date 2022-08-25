@@ -387,26 +387,26 @@ LABEL_39:
     }
     else
     {
-        jkGui_copies_string(gamemode_0_2_str);
-        jkGuiTitle_ShowLoading(gamemode_0_2_str, 0);
+        jkGui_copies_string(jkMain_aLevelJklFname);
+        jkGuiTitle_ShowLoading(jkMain_aLevelJklFname, 0);
     }
 
     if ( jkSmack_gameMode )
     {
         if ( jkSmack_gameMode == 1 )
         {
-            v3 = sithGamesave_Load(gamemode_0_2_str, 0, 1);
+            v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
         }
         else
         {
             if ( jkSmack_gameMode != 2 )
                 goto LABEL_15;
-            v3 = sith_Mode1Init_3(gamemode_0_2_str);
+            v3 = sith_Mode1Init_3(jkMain_aLevelJklFname);
         }
     }
     else
     {
-        v3 = sith_Mode1Init(gamemode_0_2_str);
+        v3 = sith_Mode1Init(jkMain_aLevelJklFname);
     }
 
     level_loaded = v3;
@@ -468,7 +468,7 @@ LABEL_28:
                 v5 = idx_13b4_related;
                 if ( idx_13b4_related >= (unsigned int)jkPlayer_maxPlayers )
                     v5 = jkPlayer_maxPlayers;
-                DirectPlay_SetSessionDesc(gamemode_0_2_str, v5);
+                DirectPlay_SetSessionDesc(jkMain_aLevelJklFname, v5);
             }
             if ( sithNet_isMulti )
                 jkSaber_cogMsg_wrap_SendSaberInfo_alt();
@@ -687,9 +687,9 @@ int jkMain_sub_403470(char *a1)
     int result; // eax
 
     sithInventory_549FA0 = 1;
-    _strncpy(gamemode_0_2_str, a1, 0x7Fu);
+    _strncpy(jkMain_aLevelJklFname, a1, 0x7Fu);
     result = 0;
-    gamemode_0_2_str[127] = 0;
+    jkMain_aLevelJklFname[127] = 0;
     jkSmack_gameMode = 0;
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
@@ -727,8 +727,8 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     BOOL v2; // esi
     int result; // eax
 
-    _strncpy(gamemode_0_2_str, pEpisodeName, 0x7Fu);
-    gamemode_0_2_str[127] = 0;
+    _strncpy(jkMain_aLevelJklFname, pEpisodeName, 0x7Fu);
+    jkMain_aLevelJklFname[127] = 0;
     jkSmack_gameMode = 2;
     jkRes_LoadGob(pGobPath);
     if ( jkEpisode_mLoad.paEntries )
@@ -892,8 +892,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
                 break;
             }
         }
-        _strncpy(gamemode_0_2_str, ent->fileName, 0x7Fu);
-        gamemode_0_2_str[127] = 0;
+        _strncpy(jkMain_aLevelJklFname, ent->fileName, 0x7Fu);
+        jkMain_aLevelJklFname[127] = 0;
         jkSmack_gameMode = sithNet_isMulti != 0 ? 2 : 0;
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
@@ -925,7 +925,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     _sprintf(v9, "video%c%s", 92, ent->fileName);
     if ( !util_FileExists(v9) )
         return jkMain_CdSwitch(0, 1);
-    jkRes_FileExists(v9, gamemode_0_2_str, 128);
+    jkRes_FileExists(v9, jkMain_aLevelJklFname, 128);
     switch ( jkSmack_currentGuiState )
     {
         case 3:
@@ -971,8 +971,8 @@ void jkMain_do_guistate6()
 int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
 {
     sithInventory_549FA0 = 0;
-    _strncpy(gamemode_0_2_str, a2, 0x7Fu);
-    gamemode_0_2_str[127] = 0;
+    _strncpy(jkMain_aLevelJklFname, a2, 0x7Fu);
+    jkMain_aLevelJklFname[127] = 0;
     _strncpy(jkMain_strIdk, a1, 0x7Fu);
     jkMain_strIdk[127] = 0;
     _strncpy(gamemode_1_str, a3, 0x7Fu);
@@ -1049,10 +1049,10 @@ void jkMain_VideoShow(int a1, int a2)
 {
     signed int result; // eax
 
-    result = jkCutscene_sub_421310(gamemode_0_2_str);
+    result = jkCutscene_sub_421310(jkMain_aLevelJklFname);
     if ( !result )
     {
-        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", gamemode_0_2_str);
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", jkMain_aLevelJklFname);
         switch ( a1 )
         {
             case JK_GAMEMODE_VIDEO:

@@ -70,7 +70,7 @@ int jkSmack_SmackPlay(const char *fname)
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
-    jkRes_FileExists(std_genBuffer, gamemode_0_2_str, 128);
+    jkRes_FileExists(std_genBuffer, jkMain_aLevelJklFname, 128);
 
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;

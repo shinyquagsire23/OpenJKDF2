@@ -222,10 +222,10 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             pMultiEntry->playerName[31] = 0;
             for ( i = __wcschr(pMultiEntry->playerName, ':'); i; i = __wcschr(pMultiEntry->playerName, ':') )
                 *i = '-';
-            _strncpy(pMultiEntry->field_44, jkGuiNetHost_aElements[19].unistr[jkGuiNetHost_aElements[19].selectedTextEntry].c_str, 0x1Fu);
-            pMultiEntry->field_44[31] = 0;
-            _strncpy(pMultiEntry->field_64, jkGuiNetHost_aElements[21].unistr[jkGuiNetHost_aElements[21].selectedTextEntry].c_str, 0x7Fu);
-            pMultiEntry->field_64[127] = 0;
+            _strncpy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[19].unistr[jkGuiNetHost_aElements[19].selectedTextEntry].c_str, 0x1Fu);
+            pMultiEntry->episodeGobName[31] = 0;
+            _strncpy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[21].unistr[jkGuiNetHost_aElements[21].selectedTextEntry].c_str, 0x7Fu);
+            pMultiEntry->mapJklFname[127] = 0;
             if ( msvc_sub_5133E0(v25, &v22, '\n') < 1 )
             {
                 v10 = 1;
@@ -254,7 +254,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
                 v23 = msvc_sub_5133E0(v26, &v22, '\n');
             }
             v11 = (__int64)((double)v23 * 60000.0);
-            pMultiEntry->field_134 = v11;
+            pMultiEntry->timeLimit = v11;
             jkGuiNetHost_timeLimit = v11;
             if ( jkGuiNetHost_aElements[8].selectedTextEntry )
             {
@@ -272,7 +272,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             {
                 v13 = msvc_sub_5133E0(v27, &v22, '\n');
             }
-            pMultiEntry->field_138 = v13;
+            pMultiEntry->scoreLimit = v13;
             jkGuiNetHost_scoreLimit = v13;
             if ( jkGuiNetHost_aElements[6].selectedTextEntry )
             {
@@ -289,7 +289,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             v17 = jkGuiNetHost_sessionFlags;
             v18 = pMultiEntry->field_12C;
             pMultiEntry->field_E8[31] = 0;
-            pMultiEntry->field_13C = v16;
+            pMultiEntry->tickRateMs = v16;
             pMultiEntry->field_128 = v17;
             jkGuiNetHost_gameFlags = v18;
         }
@@ -319,7 +319,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
                     v5 = msvc_sub_5133E0(a1, &a2, '\n');
                 }
                 v6 = pMultiEntry->field_128;
-                pMultiEntry->field_13C = v5;
+                pMultiEntry->tickRateMs = v5;
                 jkGuiNetHost_tickRate = v5;
                 jkGuiNetHost_sessionFlags = v6;
             }
@@ -362,7 +362,7 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
         {
             tickRate = msvc_sub_5133E0(a1a, &a2, '\n');
         }
-        pEntry->field_13C = tickRate;
+        pEntry->tickRateMs = tickRate;
         jkGuiNetHost_tickRate = tickRate;
         jkGuiNetHost_sessionFlags = pEntry->field_128;
     }

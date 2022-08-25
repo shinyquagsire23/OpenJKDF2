@@ -244,19 +244,19 @@ LABEL_1:
                         goto LABEL_51;
                     do
                     {
-                        sithNet_scorelimit = v34.field_138;
-                        sithNet_multiplayer_timelimit = v34.field_134;
-                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.field_44, v34.field_64, 0, v34.field_130) == 1 )
+                        sithNet_scorelimit = v34.scoreLimit;
+                        sithNet_multiplayer_timelimit = v34.timeLimit;
+                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.episodeGobName, v34.mapJklFname, 0, v34.field_130) == 1 )
                         {
                             v21 = sithMulti_CreatePlayer(
                                       v34.playerName,
                                       v34.field_E8,
-                                      v34.field_44,
-                                      v34.field_64,
+                                      v34.episodeGobName,
+                                      v34.mapJklFname,
                                       v34.field_E4,
                                       v34.field_128,
                                       v34.field_12C,
-                                      v34.field_13C,
+                                      v34.tickRateMs,
                                       v34.field_130);
                             if ( v21 == 0x88770118 )
                             {
@@ -270,7 +270,7 @@ LABEL_1:
                                 v22 = jkStrings_GetText("GUINET_HOSTERROR");
                                 jkGuiDialog_ErrorDialog(v22, v30);
                             }
-                            else if ( jkMain_loadFile2(v34.field_44, v34.field_64) )
+                            else if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
                             {
                                 return 1;
                             }
@@ -290,8 +290,8 @@ LABEL_51:
         }
         while ( 1 )
         {
-            _wcsncpy(v35.field_A0, jkGuiMultiplayer_aElements3[5].wstr, 0x1Fu);
-            v35.field_A0[31] = 0;
+            _wcsncpy(v35.sessionName, jkGuiMultiplayer_aElements3[5].wstr, 0x1Fu);
+            v35.sessionName[31] = 0;
             v7 = jkGuiMultiplayer_aElements3[3].selectedTextEntry;
             if ( jkGuiMultiplayer_aElements3[3].selectedTextEntry < 0 )
                 v8 = 0;
@@ -320,7 +320,7 @@ LABEL_29:
                  0,
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_EC) != 1 )
             goto LABEL_28;
-        v10 = sithDplay_Open(v7, v35.field_A0);
+        v10 = sithDplay_Open(v7, v35.sessionName);
         if ( v10 )
         {
             if ( v10 == 0x8877014A )

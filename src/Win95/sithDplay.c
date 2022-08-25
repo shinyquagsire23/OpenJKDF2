@@ -26,8 +26,8 @@ typedef size_t socklen_t;
 #include "General/stdString.h"
 #include "jk.h"
 
-#define DESIRED_ADDRESS "127.0.0.1"
-#define DESIRED_PORT 3500
+#define SITHDPLAY_ADDRESS "127.0.0.1"
+#define SITHDPLAY_PORT 3500
 #define BUFSIZE 4096
 
 int DirectPlay_sock = -1;
@@ -292,112 +292,312 @@ typedef struct DPlayPktWrap
     uint32_t dataSize;
 } DPlayPktWrap;
 
+enum MyDplayState
+{
+    STATE_FINDMAGIC = 0,
+    STATE_READLEN = 1,
+    STATE_READING = 2,
+};
+
+#define MYDPLAY_MAGIC (0xAA55F00F)
 #define DPLAY_OUTQUEUE_LEN (256)
 DPlayPktWrap aDplayOutgoing[DPLAY_OUTQUEUE_LEN] = {0};
+int MyDplay_hasClient = 0;
+struct sockaddr_in MyDplay_addr = {0};
+int MyDplay_curState = STATE_FINDMAGIC;
+
+uint8_t MyDplay_sendBuffer[4096];
+uint32_t MyDplay_amtSent = 0;
+
+uint8_t MyDplay_readBuffer[4096];
+uint32_t MyDplay_amtRead = 0;
+
+void MyDplay_CheckIncoming()
+{
+    if (!sithDplay_dword_8321E4) return;
+    if (MyDplay_hasClient) return;
+
+    socklen_t socklen = sizeof MyDplay_addr;
+    int client_sock = accept(DirectPlay_sock, &MyDplay_addr, &socklen); /* 2nd and 3rd argument may be NULL. */
+    if (client_sock < 0) {
+        //TODO: specific error checks
+        return;
+    }
+
+#ifdef WIN64_MINGW
+    u_long iMode = 0;
+    ioctlsocket(client_sock, FIONBIO, &iMode);
+#else
+    fcntl(client_sock, F_SETFL, O_NONBLOCK);
+#endif
+
+    printf("Client with IP %s connected\n", inet_ntoa(MyDplay_addr.sin_addr));
+
+    for (int i = 0; i < 32; i++)
+    {
+        DirectPlay_clientSocks[i] = client_sock;
+    }
+    MyDplay_hasClient = 1;
+}
+
+int DirectPlay_ReceiveLoopback(int *pIdOut, int *pMsgIdOut, int *pLenOut)
+{
+    int pMsgIdOut_size = *pLenOut;
+
+    // Loopback
+    DPlayPktWrap* pPkt = NULL;
+    for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
+    {
+        if (aDplayOutgoing[i].data)
+        {
+            pPkt = &aDplayOutgoing[i];
+            break;
+        }
+    }
+    if (!pPkt) return -1;
+
+    if (pMsgIdOut_size > pPkt->dataSize)
+        pMsgIdOut_size = pPkt->dataSize;
+
+    *pIdOut = pPkt->idFrom;
+    memcpy((void*)pMsgIdOut, pPkt->data, pMsgIdOut_size);
+    *pLenOut = pMsgIdOut_size;
+
+    // Clear the packet
+    pPkt->idFrom = 0;
+    pPkt->idTo = 0;
+    free(pPkt->data);
+    pPkt->data = NULL;
+    pPkt->dataSize = 0;
+
+    printf("[L] Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
+
+    return 0;
+}
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
-    Hack_ResetClients();
     int idRecv = sithDplay_dword_8321E4 ? 2 : 1;
-    /*static int has_send_idk = 0;
-    if (!has_send_idk)
-    {
-        has_send_idk = 1;
-        *pIdOut = idRecv;
-        return 2;
-    }*/
     int pMsgIdOut_size = *pLenOut;
-    int n;
+
+    Hack_ResetClients();
+    MyDplay_CheckIncoming();
+    
+    if (!DirectPlay_ReceiveLoopback(pIdOut, pMsgIdOut, pLenOut))
+        return 0;
+
+    if (!MyDplay_hasClient) return -1;
 
     *pIdOut = 0;
     *pMsgIdOut = 0;
     *pLenOut = 0;
 
+    MyDplay_curState = STATE_FINDMAGIC;
+
+    uint8_t magicBytes[4] = {0};
+    uint32_t magicAmt = 0;
+    uint8_t lenBytes[4] = {0};
+    uint32_t lenAmt = 0;
+    uint32_t readingLen = 0;
+
+    MyDplay_amtRead = 0;
+
+    int magicAttempts = 100;
+    while (1)
     {
-        // Loopback
-        DPlayPktWrap* pPkt = NULL;
-        for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
+        //if (MyDplay_curState)
+        //    printf("Reading... %x\n", MyDplay_curState);
+        if (MyDplay_curState == STATE_FINDMAGIC)
         {
-            if (aDplayOutgoing[i].data)
+            if (magicAmt == 4)
             {
-                pPkt = &aDplayOutgoing[i];
+                if (*(uint32_t*)magicBytes == MYDPLAY_MAGIC) {
+                    MyDplay_curState = STATE_READLEN;
+                    continue;
+                }
+                else {
+                    printf("%x\n", *(uint32_t*)magicBytes);
+                    uint8_t magicBytesShift[4];
+                    memcpy(magicBytesShift, &magicBytes[1], 3);
+                    memcpy(magicBytes, magicBytesShift, 3);
+                    magicAmt = 3;
+                }
+            }
+
+            int n = read(DirectPlay_clientSocks[0], (void*)&magicBytes[magicAmt], sizeof(uint32_t) - magicAmt);
+            if (n <= 0) {
+                //return -1;
+                if (magicAmt == 0)
+                {
+                    magicAttempts -= 1;
+                    if (magicAttempts <= 0)
+                        return -1;
+                }
+                continue;
+            }
+
+            magicAmt += n;
+        }
+        else if (MyDplay_curState == STATE_READLEN)
+        {
+            if (lenAmt == 4)
+            {
+                readingLen = *(uint32_t*)lenBytes;
+                MyDplay_curState = STATE_READING;
+                continue;
+            }
+
+            int n = read(DirectPlay_clientSocks[0], (void*)&lenBytes[lenAmt], sizeof(uint32_t) - lenAmt);
+            if (n <= 0) {
+                //return -1;
+                continue;
+            }
+
+            lenAmt += n;
+        }
+        else if (MyDplay_curState == STATE_READING)
+        {
+            if (MyDplay_amtRead == readingLen)
+            {
                 break;
             }
+
+            //printf("%x %x\n", MyDplay_amtRead, readingLen);
+            int n = read(DirectPlay_clientSocks[0], (void*)&MyDplay_readBuffer[MyDplay_amtRead], readingLen - MyDplay_amtRead);
+            if (n <= 0) {
+                //return -1;
+                continue;
+            }
+
+            MyDplay_amtRead += n;
         }
-        if (!pPkt) goto not_loopback;
-
-        if (pMsgIdOut_size > pPkt->dataSize)
-            pMsgIdOut_size = pPkt->dataSize;
-
-        *pIdOut = pPkt->idFrom;
-        memcpy((void*)pMsgIdOut, pPkt->data, pMsgIdOut_size);
-        *pLenOut = pMsgIdOut_size;
-
-        // Clear the packet
-        pPkt->idFrom = 0;
-        pPkt->idTo = 0;
-        free(pPkt->data);
-        pPkt->data = NULL;
-        pPkt->dataSize = 0;
-
-        printf("Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
-
-        return 0;
     }
 
-not_loopback:
+    if (MyDplay_amtRead < 8) {
+        return -1;
+    }
 
-    n = read(DirectPlay_clientSocks[0], (void*)pMsgIdOut, pMsgIdOut_size);
-    if (n <= 0) {
-      return -1;
-   }
+    int idFrom = *(uint32_t*)&MyDplay_readBuffer[0];
+    int idTo = *(uint32_t*)&MyDplay_readBuffer[4];
 
-   *pIdOut = idRecv;
-   *pLenOut = n;
+    if (pMsgIdOut_size > MyDplay_amtRead-8)
+        pMsgIdOut_size = MyDplay_amtRead-8;
 
-    printf("Recv %x bytes from %x (%x)\n", pMsgIdOut_size, idRecv, *pMsgIdOut);
+    // Info request packet
+    if (idFrom == 0xFFFFFFFF) {
+        printf("[I] Recv %x bytes from %x/%x (%x)\n", pMsgIdOut_size, idRecv, idFrom, *pMsgIdOut);
+
+        int type = *(uint32_t*)&MyDplay_readBuffer[8];
+        if (type == 0) {
+            memcpy(pMsgIdOut, &MyDplay_readBuffer[8], pMsgIdOut_size);
+
+            *pIdOut = idFrom;
+            *pLenOut = pMsgIdOut_size;
+            return 0;
+        }
+        else if (type == 1) {
+            struct
+            {
+                int type;
+                jkMultiEntry3 entry;
+            } outPkt;
+
+            memset(&outPkt, 0, sizeof(outPkt));
+
+            outPkt.type = 0;
+            __wcsncpy(outPkt.entry.field_E8, L"OpenJKDF2 Loopback", 0x20);
+            _strncpy(outPkt.entry.episodeGobName, sithWorld_episodeName, 0x20);
+            _strncpy(outPkt.entry.mapJklFname, jkMain_aLevelJklFname, 0x80);
+
+            DirectPlay_Send(0xFFFFFFFF, idRecv, &outPkt, sizeof(outPkt));
+
+            close(DirectPlay_clientSocks[0]);
+            MyDplay_hasClient = 0;
+            return -1;
+        }
+
+        return -1;
+    }
+
+    memcpy(pMsgIdOut, &MyDplay_readBuffer[8], pMsgIdOut_size);
+
+    *pIdOut = idFrom;
+    *pLenOut = pMsgIdOut_size;
+
+    printf("Recv %x bytes from %x/%x %x (%x)\n", pMsgIdOut_size, idFrom, idRecv, idTo, *pMsgIdOut);
+    MyDplay_amtRead = 0;
+
+    //
+    //
 
     return 0;
+}
+
+BOOL DirectPlay_SendLoopback(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
+{
+    if (!lpData || dwDataSize > 2052 || dwDataSize <= 0) return 0;
+    //dwDataSize = 2052;
+
+    DPlayPktWrap* pPkt = NULL;
+    for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
+    {
+        if (!aDplayOutgoing[i].data)
+        {
+            pPkt = &aDplayOutgoing[i];
+            break;
+        }
+    }
+
+    if (!pPkt) return 0;
+
+    pPkt->idFrom = idFrom;
+    pPkt->idTo = idTo;
+    pPkt->data = malloc(dwDataSize);
+    pPkt->dataSize = dwDataSize;
+
+    printf("[L] Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
+
+    memcpy(pPkt->data, lpData, dwDataSize);
+
+    return 1;
 }
 
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
 {
     Hack_ResetClients();
+    MyDplay_CheckIncoming();
     if (!lpData || dwDataSize > 2052 || dwDataSize <= 0) return 0;
-    dwDataSize = 2052;
+    //dwDataSize = 2052;
 
     if (idFrom == idTo)
     {
-        DPlayPktWrap* pPkt = NULL;
-        for (int i = 0; i < DPLAY_OUTQUEUE_LEN; i++)
+        return DirectPlay_SendLoopback(idFrom, idTo, lpData, dwDataSize);
+    }
+
+    if (!MyDplay_hasClient) return 0;
+
+    uint32_t amtToSend = dwDataSize + (sizeof(uint32_t) * 4);
+    *(uint32_t*)&MyDplay_sendBuffer[0] = MYDPLAY_MAGIC;
+    *(uint32_t*)&MyDplay_sendBuffer[4] = dwDataSize + (sizeof(uint32_t) * 2);
+    *(uint32_t*)&MyDplay_sendBuffer[8] = idFrom;
+    *(uint32_t*)&MyDplay_sendBuffer[0xC] = idTo;
+    memcpy(&MyDplay_sendBuffer[0x10], lpData, dwDataSize);
+
+    MyDplay_amtSent = 0;
+    while (MyDplay_amtSent < amtToSend)
+    {
+        int n = write(DirectPlay_clientSocks[0], &MyDplay_sendBuffer[MyDplay_amtSent], amtToSend - MyDplay_amtSent);
+        if (n < 0)
         {
-            if (!aDplayOutgoing[i].data)
-            {
-                pPkt = &aDplayOutgoing[i];
-                break;
-            }
+            return 0;
         }
 
-        if (!pPkt) return 0;
-
-        pPkt->idFrom = idFrom;
-        pPkt->idTo = idTo;
-        pPkt->data = malloc(dwDataSize);
-        pPkt->dataSize = dwDataSize;
-
-        printf("Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
-
-        memcpy(pPkt->data, lpData, dwDataSize);
-
-        return 1;
+        MyDplay_amtSent += n;
     }
 
-    int n = 0;
-    while (n <= 0) {
-        n = write( DirectPlay_clientSocks[0], lpData, dwDataSize);
-    }
-
-    printf("Sent %x bytes to %x (%x)\n", n, idTo, *(int*)lpData);
+    printf("Sent %x bytes to %x (%x) %x %x\n", MyDplay_amtSent, idTo, *(int*)lpData, *(uint32_t*)&MyDplay_sendBuffer[0], *(uint32_t*)&MyDplay_sendBuffer[4]);
+    
+    MyDplay_amtSent = 0;
     return 1;
 }
 
@@ -422,18 +622,17 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
     // Client socket connect
-    struct sockaddr_in addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(DESIRED_PORT); /*converts short to
+    MyDplay_addr.sin_family = AF_INET;
+    MyDplay_addr.sin_port = htons(SITHDPLAY_PORT); /*converts short to
                                            short with network byte order*/
-    addr.sin_addr.s_addr = inet_addr(DESIRED_ADDRESS);
+    MyDplay_addr.sin_addr.s_addr = inet_addr(SITHDPLAY_ADDRESS);
 
     DirectPlay_sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (DirectPlay_sock == -1) {
         perror("Socket creation error");
         return EXIT_FAILURE;
     }
-    if (connect(DirectPlay_sock, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+    if (connect(DirectPlay_sock, (struct sockaddr*) &MyDplay_addr, sizeof(MyDplay_addr)) == -1) {
         perror("Connection error");
         close(DirectPlay_sock);
         return EXIT_FAILURE;
@@ -443,6 +642,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     {
         DirectPlay_clientSocks[i] = DirectPlay_sock;
     }
+    MyDplay_hasClient = 1;
 
 #ifdef WIN64_MINGW
     u_long iMode = 0;
@@ -537,16 +737,15 @@ DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2)
 
 void DirectPlay_Close()
 {
-
+    close(DirectPlay_sock);
 }
 
 int DirectPlay_OpenIdk(void* a)
 {
-    struct sockaddr_in addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(DESIRED_PORT); /*converts short to
+    MyDplay_addr.sin_family = AF_INET;
+    MyDplay_addr.sin_port = htons(SITHDPLAY_PORT); /*converts short to
                                            short with network byte order*/
-    addr.sin_addr.s_addr = inet_addr(DESIRED_ADDRESS);
+    MyDplay_addr.sin_addr.s_addr = inet_addr(SITHDPLAY_ADDRESS);
 
     DirectPlay_sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (DirectPlay_sock == -1) {
@@ -554,7 +753,7 @@ int DirectPlay_OpenIdk(void* a)
         return EXIT_FAILURE;
     }
 
-    if (bind(DirectPlay_sock, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+    if (bind(DirectPlay_sock, (struct sockaddr*) &MyDplay_addr, sizeof(MyDplay_addr)) == -1) {
         perror("Bind error");
         close(DirectPlay_sock);
         return EXIT_FAILURE;
@@ -566,31 +765,12 @@ int DirectPlay_OpenIdk(void* a)
         return EXIT_FAILURE;
     }
 
-    socklen_t socklen = sizeof addr;
-    int client_sock = accept(DirectPlay_sock, &addr, &socklen); /* 2nd and 3rd argument may be NULL. */
-    if (client_sock == -1) {
-        perror("Accept error");
-        close(DirectPlay_sock);
-        return EXIT_FAILURE;
-    }
-
 #ifdef WIN64_MINGW
     u_long iMode = 0;
     ioctlsocket(DirectPlay_sock, FIONBIO, &iMode);
-    ioctlsocket(client_sock, FIONBIO, &iMode);
 #else
     fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
-    fcntl(client_sock, F_SETFL, O_NONBLOCK);
 #endif
-
-    
-
-    printf("Client with IP %s connected\n", inet_ntoa(addr.sin_addr));
-
-    for (int i = 0; i < 32; i++)
-    {
-        DirectPlay_clientSocks[i] = client_sock;
-    }
 
     //DirectPlay_clientSocks[sithDplay_dplayIdSelf] = DirectPlay_sock;
 
@@ -633,7 +813,37 @@ int DirectPlay_GetSession_passwordidk(void* a)
 
 int sithDplay_EnumSessions(int a, void* b)
 {
+    struct
+    {
+        int type;
+        jkMultiEntry3 entry;
+    } inPkt;
+
     Hack_ResetClients();
+    sithDplay_Open(0, NULL);
+
+    uint32_t aAskForInfo[1] = {1};
+    DirectPlay_Send(0xFFFFFFFF, 1, aAskForInfo, sizeof(aAskForInfo));
+
+    while (1)
+    {
+        int id_from = 0;
+        uint32_t len_recv = sizeof(inPkt);
+
+        memset(&inPkt, 0, sizeof(inPkt));
+        DirectPlay_Receive(&id_from, &inPkt, &len_recv);
+
+        if (len_recv == sizeof(inPkt) && id_from == 0xFFFFFFFF) {
+            break;
+        }
+    }
+
+    __wcsncpy(jkGuiMultiplayer_aEntries[0].field_18, inPkt.entry.field_E8, 0x20);
+    _strncpy(jkGuiMultiplayer_aEntries[0].field_58, inPkt.entry.episodeGobName, 0x20);
+    _strncpy(jkGuiMultiplayer_aEntries[0].field_78, inPkt.entry.mapJklFname, 0x20);
+
+    sithDplay_Close();
+
     return 0;
 }
 

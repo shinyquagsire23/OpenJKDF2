@@ -2749,16 +2749,16 @@ typedef struct jkMultiEntry3
 {
     int field_0;
     wchar_t playerName[32];
-    char field_44[32];
-    char field_64[128];
+    char episodeGobName[32];
+    char mapJklFname[128];
     int field_E4;
     wchar_t field_E8[32];
     int field_128;
     int field_12C;
     int field_130;
-    int field_134;
-    int field_138;
-    int field_13C;
+    int timeLimit;
+    int scoreLimit;
+    int tickRateMs;
 } jkMultiEntry3;
 
 typedef struct jkMultiEntry4
@@ -2789,7 +2789,7 @@ typedef struct jkMultiEntry4
     int field_94;
     int field_98;
     int field_9C;
-    wchar_t field_A0[32];
+    wchar_t sessionName[32];
     int field_E0;
 } jkMultiEntry4;
 
