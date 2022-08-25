@@ -72,7 +72,7 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    if (thing == g_localPlayerThing) {
+    if (thing == g_localPlayerThing && !sithNet_isMulti) {
         material_tip_fname = "saberpurple0.mat";
         material_side_fname = "saberpurple1.mat";
     }

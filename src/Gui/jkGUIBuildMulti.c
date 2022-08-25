@@ -302,7 +302,7 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     int idx; // [esp+10h] [ebp-17Ch] BYREF
     int _v23;
     int64_t v23; // [esp+14h] [ebp-178h]
-    char v24[16]; // [esp+1Ch] [ebp-170h] BYREF
+    char v24[32]; // [esp+1Ch] [ebp-170h] BYREF
     char tmp1[32]; // [esp+2Ch] [ebp-160h] BYREF
     char tmp2[32]; // [esp+4Ch] [ebp-140h] BYREF
     char tmp3[32]; // [esp+6Ch] [ebp-120h] BYREF
@@ -1217,7 +1217,7 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
     wchar_t *v9; // [esp-4h] [ebp-18h]
     int v10; // [esp-4h] [ebp-18h]
     wchar_t *v11; // [esp-4h] [ebp-18h]
-    char tmp1[16]; // [esp+4h] [ebp-10h] BYREF
+    char tmp1[32]; // [esp+4h] [ebp-10h] BYREF
 
     if ( pMenu == &jkGuiBuildMulti_menuEditCharacter )
     {

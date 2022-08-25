@@ -37,10 +37,10 @@ void Hack_ResetClients()
 {
     DirectPlay_numPlayers = 2;
     DirectPlay_aPlayers[0].dpId = 1;
-    jk_snwprintf(DirectPlay_aPlayers[0].waName, 32, "asdf1");
+    jk_snwprintf(DirectPlay_aPlayers[0].waName, 32, L"asdf1");
 
     DirectPlay_aPlayers[1].dpId = 2;
-    jk_snwprintf(DirectPlay_aPlayers[1].waName, 32, "asdf2");
+    jk_snwprintf(DirectPlay_aPlayers[1].waName, 32, L"asdf2");
 
     int id_self = 1;
     int id_other = 2;

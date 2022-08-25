@@ -377,14 +377,14 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     {
         for (int j = 0; j < rect->height; j++)
         {
-            if ((uint32_t)(i + srcRect.x) > (uint32_t)vbuf2->format.width) continue;
-            if ((uint32_t)(j + srcRect.y) > (uint32_t)vbuf2->format.height) continue;
+            if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
+            if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
             
             uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
 
             if (!pixel && has_alpha) continue;
-            if ((uint32_t)(i + dstRect.x) > (uint32_t)vbuf->format.width) continue;
-            if ((uint32_t)(j + dstRect.y) > (uint32_t)vbuf->format.height) continue;
+            if ((uint32_t)(i + dstRect.x) >= (uint32_t)vbuf->format.width) continue;
+            if ((uint32_t)(j + dstRect.y) >= (uint32_t)vbuf->format.height) continue;
 
             dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
         }

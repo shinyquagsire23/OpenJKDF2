@@ -625,44 +625,46 @@ LABEL_16:
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    sithInventory_SetBinAmount(player, SITHBIN_JEDI_RANK, 7.0);
-    jkPlayer_SetRank(7);
-    sithInventory_SetBinAmount(player, SITHBIN_FISTS, 1.0);
-    sithInventory_SetBinAmount(player, SITHBIN_LIGHTSABER, 1.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_JUMP, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_SPEED, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_PULL, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_SEEING, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_HEALING, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_PERSUASION, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_BLINDING, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_ABSORB, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_GRIP, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_LIGHTNING, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_THROW, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_DESTRUCTION, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_DEADLYSIGHT, 4.0);
-    sithInventory_SetBinAmount(player, SITHBIN_F_PROTECTION, 4.0);
+    if (!sithNet_isMulti) {
+        sithInventory_SetBinAmount(player, SITHBIN_JEDI_RANK, 7.0);
+        jkPlayer_SetRank(7);
+        sithInventory_SetBinAmount(player, SITHBIN_FISTS, 1.0);
+        sithInventory_SetBinAmount(player, SITHBIN_LIGHTSABER, 1.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_JUMP, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_SPEED, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_PULL, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_SEEING, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_HEALING, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_PERSUASION, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_BLINDING, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_ABSORB, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_GRIP, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_LIGHTNING, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_THROW, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_DESTRUCTION, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_DEADLYSIGHT, 4.0);
+        sithInventory_SetBinAmount(player, SITHBIN_F_PROTECTION, 4.0);
 
-    sithInventory_SetBinAmount(player, SITHBIN_FORCEMANA, 100.0);
-    
-    sithInventory_SetAvailable(player, SITHBIN_F_JUMP, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_SPEED, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_PULL, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_SEEING, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_HEALING, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_PERSUASION, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_BLINDING, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_ABSORB, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_GRIP, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_LIGHTNING, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_THROW, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_DESTRUCTION, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_DEADLYSIGHT, 1);
-    sithInventory_SetAvailable(player, SITHBIN_F_PROTECTION, 1);
+        sithInventory_SetBinAmount(player, SITHBIN_FORCEMANA, 100.0);
+        
+        sithInventory_SetAvailable(player, SITHBIN_F_JUMP, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_SPEED, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_PULL, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_SEEING, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_HEALING, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_PERSUASION, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_BLINDING, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_ABSORB, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_GRIP, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_LIGHTNING, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_THROW, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_DESTRUCTION, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_DEADLYSIGHT, 1);
+        sithInventory_SetAvailable(player, SITHBIN_F_PROTECTION, 1);
 
-    jkPlayer_SetAccessiblePowers(7);
-    //jkSaber_InitializeSaberInfo(player, "sabergreen1.mat", "sabergreen0.mat", 0.003, 0.001, 0.100, );
+        jkPlayer_SetAccessiblePowers(7);
+        //jkSaber_InitializeSaberInfo(player, "sabergreen1.mat", "sabergreen0.mat", 0.003, 0.001, 0.100, );
+    }
 #endif
 
     v2[200].ammoAmt = 0.0;

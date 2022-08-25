@@ -451,7 +451,7 @@ void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
                         do
                         {
                             jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v6->field_18, 0);
-                            if ( !memcmp(&jkGui_guid_556040, v6, 0x10u) )
+                            if ( !memcmp(&jkGui_guid_556040, &v6->guidInstance, sizeof(GUID)) )
                                 v10 = v5;
                             ++v5;
                             ++v6;

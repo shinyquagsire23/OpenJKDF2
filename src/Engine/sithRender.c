@@ -30,10 +30,12 @@
 #include "Platform/std3D.h"
 
 #ifdef QOL_IMPROVEMENTS
+#if 0
 static rdThing* lightDebugThing = NULL;
 static rdModel3* lightDebugThing_model3 = NULL;
 static rdMatrix34 lightDebugThing_mat;
 static int lightDebugNum = 0;
+#endif
 
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
 {
@@ -161,12 +163,14 @@ int sithRender_Open()
     sithRender_needsAspectReset = 0;
     
 #ifdef QOL_IMPROVEMENTS
+#if 0
     // Added: Light debug
     lightDebugThing = rdThing_New(NULL);
     if (!lightDebugThing_model3)
         lightDebugThing_model3 = rdModel3_New("3d0\\lamp.3do");
     rdThing_SetModel3(lightDebugThing, lightDebugThing_model3);
     rdMatrix_Identity34(&lightDebugThing_mat);
+#endif
 #endif
     
     return 1;
@@ -176,7 +180,7 @@ void sithRender_Close()
 {
     // Added: Light debug
     //rdModel3_Free(lightDebugThing_model3); // TODO figure out weird free issues
-    rdThing_Free(lightDebugThing);
+    //rdThing_Free(lightDebugThing);
 
     sithRenderSky_Close();
 }
@@ -247,7 +251,7 @@ void sithRender_Draw()
 
     //printf("%x %x %x\n", sithRender_texMode, rdroid_curTextureMode, sithRender_lightMode);
 
-    lightDebugNum = 0;
+    //lightDebugNum = 0; // Added
 
     sithRenderSky_Update();
     if ( sithRender_geoMode )
