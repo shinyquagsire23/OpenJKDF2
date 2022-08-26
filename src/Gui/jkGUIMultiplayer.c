@@ -40,7 +40,7 @@ static jkGuiElement jkGuiMultiplayer_aElements2[7] = {
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0},
 };
 
-static jkGuiElement jkGuiMultiplayer_aElements3[12] = {
+static jkGuiElement jkGuiMultiplayer_aElements3[13] = {
     {ELEMENT_TEXT,  0,  0,  0,  3, { 0, 0x19A, 0x280, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  6, "GUI_MULTIPLAYER",  3, {0x14, 0x14, 0x258, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_CHOOSEAGAME",  2, {0xAA, 0x82, 0x1C2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -52,6 +52,9 @@ static jkGuiElement jkGuiMultiplayer_aElements3[12] = {
     {ELEMENT_TEXT,  0,  0, jkGuiMultiplayer_stru_556168.field_140+0xC0,  3, {0x32, 0x17C, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBUTTON,  1,  2, "GUI_OK",  3, {0x1A4, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBUTTON, -1,  2, "GUI_CANCEL",  3, {0x14, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
+#ifdef QOL_IMPROVEMENTS
+    { ELEMENT_TEXTBOX, 0, 0, NULL, 16, { 170, 280, 320, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#endif
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0},
 };
 
@@ -67,6 +70,8 @@ static jkGuiMenu jkGuiMultiplayer_menu2 = {jkGuiMultiplayer_aElements2, 0, 0xFFF
 static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_sub_4140B0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_idk, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
+wchar_t jkGuiMultiplayer_ipText[256];
+
 void jkGuiMultiplayer_Initialize()
 {
     jkGui_InitMenu(&jkGuiMultiplayer_menu, jkGui_stdBitmaps[2]);
@@ -74,6 +79,12 @@ void jkGuiMultiplayer_Initialize()
     jkGui_InitMenu(&jkGuiMultiplayer_menu3, jkGui_stdBitmaps[2]);
     jkGui_InitMenu(&jkGuiMultiplayer_menu4, jkGui_stdBitmaps[2]);
     jkGuiMultiplayer_bInitted = 1;
+
+#ifdef QOL_IMPROVEMENTS
+    jk_snwprintf(jkGuiMultiplayer_ipText, 0x100, L"127.0.0.1");
+    jkGuiMultiplayer_aElements3[11].wstr = jkGuiMultiplayer_ipText;
+    jkGuiMultiplayer_aElements3[11].selectedTextEntry = 16;
+#endif
 }
 
 void jkGuiMultiplayer_Shutdown()

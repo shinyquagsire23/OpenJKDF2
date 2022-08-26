@@ -20,6 +20,8 @@
 #include <cctype>
 
 #include <steam/steamnetworkingsockets.h>
+#include <steam/isteamnetworkingmessages.h>
+#include <steam/steamnetworkingtypes.h>
 #include <steam/isteamnetworkingutils.h>
 #ifndef STEAMNETWORKINGSOCKETS_OPENSOURCE
 #include <steam/steam_api.h>
@@ -42,6 +44,8 @@ typedef struct GNSInfoPacket
 } GNSInfoPacket;
 
 static jkMultiEntry sithDplayGNS_storedEntry;
+extern wchar_t jkGuiMultiplayer_ipText[256];
+char jkGuiMultiplayer_ipText_conv[256];
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -189,13 +193,19 @@ public:
         serverLocalAddr.m_port = nPort;
         SteamNetworkingConfigValue_t opt;
         opt.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, (void*)SteamNetConnectionStatusChangedCallback );
+        //opt.SetPtr( k_ESteamNetworkingConfig_Callback_CreateConnectionSignaling, (void*)SteamNetCreateConnectionSignalingCallback);
         m_hListenSock = m_pInterface->CreateListenSocketIP( serverLocalAddr, 1, &opt );
         if ( m_hListenSock == k_HSteamListenSocket_Invalid )
-            FatalError( "Failed to listen on port %d", nPort );
+            Printf( "[1] Failed to listen on port %d", nPort );
         m_hPollGroup = m_pInterface->CreatePollGroup();
         if ( m_hPollGroup == k_HSteamNetPollGroup_Invalid )
-            FatalError( "Failed to listen on port %d", nPort );
+            Printf( "[2] Failed to listen on port %d", nPort );
         Printf( "Server listening on port %d\n", nPort );
+
+        m_pBcastInterface = SteamNetworkingMessages();
+
+        m_identity.Clear();
+        m_identity.SetGenericString("OpenJKDF2");
 
         id = 1;
         availableIds = 0x1;
@@ -233,6 +243,7 @@ public:
         //printf("Server runstep\n");
         //PollIncomingMessages();
         PollConnectionStateChanges();
+        //TickBroadcastOut();
     }
 
     void Run()
@@ -338,8 +349,10 @@ private:
     HSteamListenSocket m_hListenSock;
     HSteamNetPollGroup m_hPollGroup;
     ISteamNetworkingSockets *m_pInterface;
+    ISteamNetworkingMessages *m_pBcastInterface;
     uint64_t availableIds = 0x1;
     uint8_t sendBuffer[4096];
+    SteamNetworkingIdentity m_identity;
 
     struct Client_t
     {
@@ -391,6 +404,12 @@ private:
     void SetClientId( HSteamNetConnection hConn, int id )
     {
         m_mapClients[hConn].m_id = id;
+    }
+
+    void TickBroadcastOut()
+    {
+        uint8_t tmp[8] = {0};
+        m_pBcastInterface->SendMessageToUser(m_identity, tmp, 8, k_nSteamNetworkingSend_Unreliable, 1337);
     }
 
     void OnSteamNetConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t *pInfo )
@@ -546,6 +565,13 @@ private:
         s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
     }
 
+    static ISteamNetworkingConnectionSignaling* SteamNetCreateConnectionSignalingCallback( ISteamNetworkingSockets *pLocalInterface, const SteamNetworkingIdentity &identityPeer, int nLocalVirtualPort, int nRemoteVirtualPort )
+    {
+        //s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
+        printf("incoming!\n");
+        return nullptr;
+    }
+
     void PollConnectionStateChanges()
     {
         s_pCallbackInstance = this;
@@ -605,11 +631,17 @@ public:
         Printf( "Connecting to chat server at %s", szAddr );
         SteamNetworkingConfigValue_t opt;
         opt.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, (void*)SteamNetConnectionStatusChangedCallback );
+        //opt.SetPtr( k_ESteamNetworkingConfig_Callback_CreateConnectionSignaling, (void*)SteamNetCreateConnectionSignalingCallback);
         m_hConnection = m_pInterface->ConnectByIPAddress( serverAddr, 1, &opt );
         if ( m_hConnection == k_HSteamNetConnection_Invalid ) {
             Printf( "Failed to create connection" );
             m_closed = 1;
         }
+
+        m_pBcastInterface = SteamNetworkingMessages();
+
+        m_identity.Clear();
+        m_identity.SetGenericString("OpenJKDF2");
     }
 
     void Shutdown()
@@ -625,6 +657,7 @@ public:
         //printf("Client runstep\n");
         //PollIncomingMessages();
         PollConnectionStateChanges();
+        //TickBroadcastIn();
     }
 
     void Run()
@@ -704,6 +737,7 @@ public:
     {
         int attempts = 100;
         id = 0xFFFFFFFF;
+        m_closed = 0;
         
         while (id == 0xFFFFFFFF && !m_closed && attempts) {
             Init(serverAddr);
@@ -724,6 +758,8 @@ private:
 
     HSteamNetConnection m_hConnection;
     ISteamNetworkingSockets *m_pInterface;
+    ISteamNetworkingMessages *m_pBcastInterface;
+    SteamNetworkingIdentity m_identity;
     uint8_t sendBuffer[4096];
     int m_closed = 0;
 
@@ -759,6 +795,30 @@ private:
             // We don't need this anymore.
             pIncomingMsg->Release();
         }
+    }
+
+    int TickBroadcastIn()
+    {
+        SteamNetworkingMessage_t *pMsg = nullptr;
+        int numMsgs = m_pBcastInterface->ReceiveMessagesOnChannel(1337, &pMsg, 1);
+        if ( numMsgs == 0 )
+            return -1;
+        if ( numMsgs < 0 ) {
+            printf( "Error checking for messages (%d)\n", numMsgs);
+            Shutdown();
+            m_closed = 1;
+            return 2;
+        }
+
+        if (pMsg->m_cbSize < 8) {
+            printf("Bad packet size %x\n", pMsg->m_cbSize);
+            Shutdown();
+            m_closed = 1;
+            return -1;
+        }
+
+        printf("Got broadcast %x\n", pMsg->m_cbSize);
+        return 0;
     }
 
     void OnSteamNetConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t *pInfo )
@@ -832,6 +892,13 @@ private:
         s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
     }
 
+    static ISteamNetworkingConnectionSignaling* SteamNetCreateConnectionSignalingCallback( ISteamNetworkingSockets *pLocalInterface, const SteamNetworkingIdentity &identityPeer, int nLocalVirtualPort, int nRemoteVirtualPort )
+    {
+        //s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
+        printf("incoming!\n");
+        return nullptr;
+    }
+
     void PollConnectionStateChanges()
     {
         s_pCallbackInstance = this;
@@ -896,7 +963,7 @@ void sithDplay_GNS_Startup()
     Hack_ResetClients();
 
     addrServer.Clear();
-    addrServer.ParseString("127.0.0.1");
+    addrServer.ParseString("192.168.2.2");
     addrServer.m_port = DEFAULT_SERVER_PORT;
 
     // Create client and server sockets
@@ -1059,6 +1126,15 @@ int DirectPlay_GetSession_passwordidk(void* a)
 int sithDplay_EnumSessions(int a, void* b)
 {
     Hack_ResetClients();
+
+    dplay_dword_55D618 = 0;
+    memset(&jkGuiMultiplayer_aEntries[0], 0, sizeof(jkGuiMultiplayer_aEntries[0]));
+
+    stdString_WcharToChar(jkGuiMultiplayer_ipText_conv, jkGuiMultiplayer_ipText, 255);
+    addrServer.ParseString(jkGuiMultiplayer_ipText_conv);
+    if (!addrServer.m_port) {
+        addrServer.m_port = DEFAULT_SERVER_PORT;
+    }
 
     client.GetServerInfo(addrServer);
 
