@@ -37,6 +37,7 @@ int rdCache_TriCompare(const void* a_, const void* b_);
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
+#ifndef __cplusplus
 static void (*rdCache_DrawFaceUser)(rdProcEntry* face) = (void*)rdCache_DrawFaceUser_ADDR;
 static void (*rdCache_DrawFaceN)(rdProcEntry* face) = (void*)rdCache_DrawFaceN_ADDR;
 static void (*rdCache_DrawFaceZ)(rdProcEntry* face) = (void*)rdCache_DrawFaceZ_ADDR;
@@ -48,5 +49,6 @@ static void (*rdCache_DrawFaceZ)(rdProcEntry* face) = (void*)rdCache_DrawFaceZ_A
 
 //static rdProcEntry* (*rdCache_GetProcEntry)(void) = (void*)rdCache_GetProcEntry_ADDR;
 //static int (*__cdecl rdCache_AddProcFace)(int extdata, unsigned int numVertices, char flags) = (void*)rdCache_AddProcFace_ADDR;
+#endif
 
 #endif // _RDCACHE_H

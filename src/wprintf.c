@@ -793,6 +793,7 @@ static int _vsnprintf(out_fct_type out, wchar_t* buffer, const size_t maxlen, co
         break;
       }
 
+      case 'S' :
       case 's' : {
         const wchar_t* p = va_arg(va, wchar_t*);
         unsigned int l = _strnlen_s(p, precision ? precision : (size_t)-1);

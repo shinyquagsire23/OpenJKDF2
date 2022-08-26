@@ -39,6 +39,15 @@ int sithCamera_Startup()
     return 1;
 }
 
+void sithCamera_Shutdown()
+{
+    for (int i = 0; i < 7; i++)
+    {
+        rdCamera_FreeEntry(&sithCamera_cameras[i].rdCam);
+    }
+    sithCamera_bInitted = 0;
+}
+
 int sithCamera_Open(rdCanvas *canvas, float aspect)
 {
     if ( sithCamera_bOpen )

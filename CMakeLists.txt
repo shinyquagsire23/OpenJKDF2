@@ -37,6 +37,8 @@ if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS
 endif()
 
 # Internal targets: Stuff like OpenGL vs D3D, OpenAL vs null sound, etc
+set(TARGET_USE_BASICSOCKETS FALSE)
+set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)
 set(TARGET_USE_LIBSMACKER FALSE)
 set(TARGET_USE_SDL2 FALSE)
 set(TARGET_USE_OPENGL FALSE)
@@ -87,7 +89,7 @@ if(PLAT_LINUX_32)
     endif()
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_LINUX_64)
@@ -107,7 +109,7 @@ elseif(PLAT_LINUX_64)
     set(OPENJKDF2_NO_ASAN TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS)
@@ -116,6 +118,8 @@ elseif(PLAT_MACOS)
 
     add_definitions(-DARCH_64BIT)
 
+    #set(TARGET_USE_BASICSOCKETS TRUE)
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)
@@ -127,6 +131,7 @@ elseif(PLAT_MACOS)
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     
     add_link_options(-fshort-wchar)
 
@@ -136,6 +141,7 @@ elseif(PLAT_MACOS_X86_64)
 
     add_definitions(-DARCH_64BIT)
 
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)
@@ -147,8 +153,10 @@ elseif(PLAT_MACOS_X86_64)
     set(HOMEBREW_PREFIX "/usr/local")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
+
+    #set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${HOMEBREW_PREFIX}/opt/protobuf/lib/pkgconfig")
 
 elseif(PLAT_MINGW_X86_64)
     message( STATUS "Targeting Win64 MinGW" )
@@ -315,6 +323,33 @@ if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)
 endif()
 
+if (NOT TARGET_USE_BASICSOCKETS AND NOT TARGET_USE_GAMENETWORKINGSOCKETS)
+    set(TARGET_USE_NOSOCKETS TRUE)
+endif()
+
+if(TARGET_USE_GAMENETWORKINGSOCKETS)
+    file(GLOB TARGET_GNS_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Networking/GNS/*.cpp)
+    list(APPEND SOURCE_FILES ${TARGET_GNS_SRCS})
+
+    add_definitions(-DPLATFORM_GNS)
+
+    add_subdirectory(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets)
+endif()
+
+if(TARGET_USE_BASICSOCKETS)
+    file(GLOB TARGET_BASIC_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Networking/Basic/*.c)
+    list(APPEND SOURCE_FILES ${TARGET_BASIC_SRCS})
+
+    add_definitions(-DPLATFORM_BASICSOCKETS)
+endif()
+
+if(TARGET_USE_NOSOCKETS)
+    file(GLOB TARGET_NOSOCK_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Networking/None/*.c)
+    list(APPEND SOURCE_FILES ${TARGET_NOSOCK_SRCS})
+
+    add_definitions(-DPLATFORM_NOSOCKETS)
+endif()
+
 if(TARGET_USE_LIBSMACKER)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smacker.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_bitstream.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_hufftree.c)
 endif()
@@ -444,6 +479,11 @@ if(TARGET_MACOS)
     include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
     link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
+
+if(TARGET_USE_GAMENETWORKINGSOCKETS)
+    target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::static)
+endif()
+
 endif()
 
 if(TARGET_LINUX)
@@ -460,12 +500,16 @@ if(TARGET_LINUX)
 endif()
 
 if(NOT OPENJKDF2_NO_ASAN)
-    add_compile_options(-fsanitize=address -fsanitize=float-divide-by-zero)
-    add_link_options(-fsanitize=address -fsanitize=float-divide-by-zero)
+    #add_compile_options(-fsanitize=address -fsanitize=float-divide-by-zero)
+    #add_link_options(-fsanitize=address -fsanitize=float-divide-by-zero)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
+    set(SANITIZE_ADDRESS TRUE)
     target_link_libraries(${BIN_NAME} PRIVATE "-static-libsan")
 
-    add_compile_options(-fsanitize=leak)
-    add_link_options(-fsanitize=leak)
+    #add_compile_options(-fsanitize=leak)
+    #add_link_options(-fsanitize=leak)
 endif()
 
 if(PLAT_MINGW_X86_64)

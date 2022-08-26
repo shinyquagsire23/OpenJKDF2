@@ -1,6 +1,10 @@
 #ifndef _SITHMULTI_H
 #define _SITHMULTI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 #include "globals.h"
 
@@ -82,5 +86,10 @@ void sithMulti_HandleTimeLimit(int deltaMs);
 //static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
 //static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;
 //static int (*sithMulti_SendRequestConnect)(int a1) = (void*)sithMulti_SendRequestConnect_ADDR;
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // _SITHMULTI_H

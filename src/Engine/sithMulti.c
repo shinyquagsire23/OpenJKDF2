@@ -81,9 +81,9 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
     _strncpy(multiEntry.field_78, a4, 0x1Fu);
     multiEntry.field_78[31] = 0;
     _wcsncpy(multiEntry.field_98, a2, 0x1Fu);
-    multiEntry.field_10 = a5;
+    multiEntry.numPlayers = a5;
     idx_13b4_related = a5;
-    multiEntry.field_EC = a9;
+    multiEntry.maxRank = a9;
     multiEntry.field_98[31] = 0;
     multiEntry.field_E4 = multiModeFlags;
     multiEntry.field_E8 = rate;
@@ -550,6 +550,8 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     v1 = NETMSG_POPS32();
     v2 = NETMSG_POPS32();
     NETMSG_POPWSTR(jkPlayer_playerInfos[v1].player_name, 0x10);
+
+    printf("sithMulti_HandleJoinLeave %x %x\n", v2, sithDplay_dplayIdSelf);
 
     if ( v2 != sithDplay_dplayIdSelf )
     {
@@ -1053,7 +1055,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         }
         if ( v3 < jkPlayer_maxPlayers )
         {
-            printf("Idk 2\n");
+            printf("Idk 2, %x %x\n", v3, jkPlayer_maxPlayers);
             NETMSG_START;
 
             NETMSG_PUSHS32(v3);
@@ -1068,7 +1070,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         if ( sithNet_dword_83263C )
         {
             printf("Idk 1\n");
-            NETMSG_START_2;
+            NETMSG_START;
             NETMSG_PUSHS32(3);
             NETMSG_PUSHS32(0);
             NETMSG_END(COGMSG_JOINING);
@@ -1145,7 +1147,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             {
                 printf("Bad checksum\n");
 #if 0
-                NETMSG_START_2;
+                NETMSG_START;
                 NETMSG_PUSHS32(4);
                 NETMSG_PUSHS32(0);
                 NETMSG_END(COGMSG_JOINING);
@@ -1155,7 +1157,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             }
 
             printf("Sending the final\n");
-            NETMSG_START_2;
+            NETMSG_START;
             NETMSG_PUSHS32(0);
             NETMSG_PUSHF32(0.25);
             NETMSG_END(COGMSG_JOINING);

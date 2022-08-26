@@ -1,8 +1,16 @@
 #ifndef _SITHDPLAY_H
 #define _SITHDPLAY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 #include "globals.h"
+
+#include "Platform/Networking/Basic/sithDplay_basic.h"
+#include "Platform/Networking/GNS/sithDplay_GNS.h"
+#include "Platform/Networking/None/sithDplay_none.h"
 
 #define sithDplay_Startup_ADDR (0x004C9530)
 #define sithDplay_Shutdown_ADDR (0x004C9550)
@@ -56,6 +64,7 @@
 
 
 int sithDplay_Startup();
+void sithDplay_Shutdown();
 HRESULT sithDplay_EnumSessions2(void);
 int sithDplay_seed_idk(jkMultiEntry *pEntry);
 int sithDplay_CreatePlayer(jkMultiEntry *pEntry);
@@ -68,7 +77,7 @@ void sithDplay_cogMsg_SendEnumPlayers(int sendtoId);
 int sithDplay_cogMsg_HandleEnumPlayers(sithCogMsg *msg);
 int sithDplay_EarlyInit();
 
-static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
+//static void (*sithDplay_Shutdown)() = (void*)sithDplay_Shutdown_ADDR;
 
 //static int (*sithDplay_Startup)() = (void*)sithDplay_Startup_ADDR;
 
@@ -101,6 +110,7 @@ static int (*DirectPlay_GetSession_passwordidk)(void*) = (void*)DirectPlay_GetSe
 static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions_ADDR;
 static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
 static int (*DirectPlay_StartSession)(void*, void*) = (void*)DirectPlay_StartSession_ADDR;
+static void (*DirectPlay_Destroy)() = (void*)DirectPlay_Destroy_ADDR;
 #else
 
 int sithDplay_OpenConnection(void* a);
@@ -126,6 +136,11 @@ int DirectPlay_GetSession_passwordidk(void* a);
 int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);
 int DirectPlay_StartSession(void* a, void* b);
+void DirectPlay_Destroy();
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _SITHDPLAY_H

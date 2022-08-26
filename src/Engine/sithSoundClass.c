@@ -434,6 +434,7 @@ void sithSoundClass_Free2(sithWorld *world)
                     do
                     {
                         v6 = v5->nextSound;
+                        v5->nextSound = NULL; // Added
                         pSithHS->free(v5);
                         v5 = v6;
                     }

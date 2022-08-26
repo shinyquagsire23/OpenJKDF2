@@ -318,7 +318,7 @@ LABEL_29:
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_58,
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_78,
                  0,
-                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_EC) != 1 )
+                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].maxRank) != 1 )
             goto LABEL_28;
         v10 = sithDplay_Open(v7, v35.sessionName);
         if ( v10 )
@@ -513,11 +513,11 @@ void jkGuiNet_sub_413E50(int idx)
             jkGuiMultiplayer_aEntries[idx].field_18,
             jkGuiMultiplayer_aEntries[idx].field_58,
             jkGuiMultiplayer_aEntries[idx].field_78);
-        stdString_snprintf(v10, 32, "RANK_%d_L", jkGuiMultiplayer_aEntries[idx].field_EC);
-        v9 = jkGuiMultiplayer_aEntries[idx].field_EC;
+        stdString_snprintf(v10, 32, "RANK_%d_L", jkGuiMultiplayer_aEntries[idx].maxRank);
+        v9 = jkGuiMultiplayer_aEntries[idx].maxRank;
         v8 = jkStrings_GetText(v10);
-        v7 = jkGuiMultiplayer_aEntries[idx].field_10;
-        v6 = jkGuiMultiplayer_aEntries[idx].field_14;
+        v7 = jkGuiMultiplayer_aEntries[idx].numPlayers;
+        v6 = jkGuiMultiplayer_aEntries[idx].maxPlayers;
         v2 = jkStrings_GetText("GUI_NUM_PLAYERS");
         jk_snwprintf((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, 0x80u, v2, v6, v7, v8, v9);
         jkGui_guid_556040 = jkGuiMultiplayer_aEntries[idx].guidInstance;

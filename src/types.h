@@ -1,6 +1,10 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 #include <io.h>
@@ -2714,7 +2718,7 @@ typedef void* DPLCONNECTION;
 
 typedef struct sith_dplay_connection
 {
-  int16_t name[128];
+  wchar_t name[128];
   GUID guid;
   DPLCONNECTION *connection;
   int connectionSize;
@@ -2723,8 +2727,8 @@ typedef struct sith_dplay_connection
 typedef struct jkMultiEntry
 {
     GUID guidInstance;
-    int field_10;
-    int field_14;
+    int numPlayers;
+    int maxPlayers;
     wchar_t field_18[32];
     char field_58[32];
     char field_78[32];
@@ -2734,7 +2738,7 @@ typedef struct jkMultiEntry
     int field_E0;
     int field_E4;
     int field_E8;
-    int field_EC;
+    int maxRank;
 } jkMultiEntry;
 
 typedef struct jkMultiEntry2
@@ -3145,5 +3149,9 @@ typedef const DPNAME *LPCDPNAME;
 #define DPID_ALLPLAYERS     0
 #define DPID_SERVERPLAYER   1
 #define DPID_UNKNOWN        0xFFFFFFFF
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // TYPES_H

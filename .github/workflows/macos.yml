@@ -20,5 +20,6 @@ jobs:
           brew install cmake make python3 imagemagick
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
+          brew install openssl protobuf
     - name: cmake
       run: export HOMEBREW_PREFIX="/usr/local" && mkdir -p build_darwin64 && cd build_darwin64 && cmake .. && make

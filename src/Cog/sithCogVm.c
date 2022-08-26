@@ -107,7 +107,7 @@ int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     int v20; // eax
     int idx_; // [esp+18h] [ebp+Ch]
 
-    printf("sithCogVm_SendMsgToPlayer %x %x %x %x\n", msg->netMsg.cogMsgId, a2, mpFlags, a4);
+    //printf("sithCogVm_SendMsgToPlayer %x %x %x %x\n", msg->netMsg.cogMsgId, a2, mpFlags, a4);
 
     int ret = 1;
     multiplayerFlags = sithCogVm_multiplayerFlags & mpFlags;

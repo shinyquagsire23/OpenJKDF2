@@ -1,6 +1,10 @@
 #ifndef _STDSTRING_H
 #define _STDSTRING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 #define stdString_FastCopy_ADDR (0x0042F120)
@@ -27,5 +31,9 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4);
 wchar_t *__cdecl stdString_CstrCopy(const char *a1);
 char* stdString_WcharCopy(wchar_t *a1);
 void stdString_CStrToLower(char *a1);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STDSTRING_H
