@@ -152,33 +152,14 @@ static void ShutdownSteamDatagramConnectionSockets()
     #endif
 }
 
-// You really gotta wonder what kind of pedantic garbage was
-// going through the minds of people who designed std::string
-// that they decided not to include trim.
-// https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
-
-// trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-        return !std::isspace(ch);
-    }));
-}
-
-// trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// ChatServer
+// GNSServer
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class ChatServer
+class GNSServer
 {
 public:
     void Init( uint16 nPort )
@@ -442,14 +423,14 @@ private:
                     if ( pInfo->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
                     {
                         pszDebugLogAction = "problem detected locally";
-                        sprintf( temp, "Alas, %s hath fallen into shadow.  (%s)", itClient->second.m_sNick.c_str(), pInfo->m_info.m_szEndDebug );
+                        sprintf( temp, "Problem detected with client %x (%s)", itClient->second.m_id, pInfo->m_info.m_szEndDebug );
                     }
                     else
                     {
                         // Note that here we could check the reason code to see if
                         // it was a "usual" connection or an "unusual" one.
                         pszDebugLogAction = "closed by peer";
-                        sprintf( temp, "%s hath departed", itClient->second.m_sNick.c_str() );
+                        sprintf( temp, "Client id %x has left.", itClient->second.m_id );
                     }
 
                     // Spew something to our own log.  Note that because we put their nick
@@ -559,7 +540,7 @@ private:
         }
     }
 
-    static ChatServer *s_pCallbackInstance;
+    static GNSServer *s_pCallbackInstance;
     static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusChangedCallback_t *pInfo )
     {
         s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
@@ -606,15 +587,15 @@ private:
     }
 };
 
-ChatServer *ChatServer::s_pCallbackInstance = nullptr;
+GNSServer *GNSServer::s_pCallbackInstance = nullptr;
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// ChatClient
+// GNSClient
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class ChatClient
+class GNSClient
 {
 public:
     void Init( const SteamNetworkingIPAddr &serverAddr )
@@ -777,8 +758,6 @@ private:
             }
 
             // Just echo anything we get from the server
-            //fwrite( pIncomingMsg->m_pData, 1, pIncomingMsg->m_cbSize, stdout );
-            //fputc( '\n', stdout );
             printf("Received %x bytes\n", pIncomingMsg->m_cbSize);
 
             if (id == 0xFFFFFFFF && pIncomingMsg->m_cbSize == sizeof(GNSInfoPacket)) {
@@ -825,7 +804,6 @@ private:
     {
         if (m_hConnection == k_HSteamNetConnection_Invalid )
             return;
-        //pInfo->m_hConn == m_hConnection || 
 
         // What's the state of the connection?
         switch ( pInfo->m_info.m_eState )
@@ -844,16 +822,16 @@ private:
                 {
                     // Note: we could distinguish between a timeout, a rejected connection,
                     // or some other transport problem.
-                    Printf( "We sought the remote host, yet our efforts were met with defeat.  (%s)", pInfo->m_info.m_szEndDebug );
+                    Printf( "Couldn't connect to host. (%s)", pInfo->m_info.m_szEndDebug );
                 }
                 else if ( pInfo->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
                 {
-                    Printf( "Alas, troubles beset us; we have lost contact with the host.  (%s)", pInfo->m_info.m_szEndDebug );
+                    Printf( "Lost contact with the host. (%s)", pInfo->m_info.m_szEndDebug );
                 }
                 else
                 {
                     // NOTE: We could check the reason code for a normal disconnection
-                    Printf( "The host hath bidden us farewell.  (%s)", pInfo->m_info.m_szEndDebug );
+                    Printf( "Host has disconnected. (%s)", pInfo->m_info.m_szEndDebug );
                 }
 
                 // Clean up the connection.  This is important!
@@ -886,7 +864,7 @@ private:
         }
     }
 
-    static ChatClient *s_pCallbackInstance;
+    static GNSClient *s_pCallbackInstance;
     static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusChangedCallback_t *pInfo )
     {
         s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
@@ -906,7 +884,7 @@ private:
     }
 };
 
-ChatClient *ChatClient::s_pCallbackInstance = nullptr;
+GNSClient *GNSClient::s_pCallbackInstance = nullptr;
 
 const uint16 DEFAULT_SERVER_PORT = 27020;
 
@@ -915,8 +893,8 @@ extern "C"
 
 int nPort = DEFAULT_SERVER_PORT;
 SteamNetworkingIPAddr addrServer;
-ChatClient client;
-ChatServer server;
+GNSClient client;
+GNSServer server;
 
 void Hack_ResetClients()
 {

@@ -94,9 +94,9 @@ void sithDplay_Basic_Startup()
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 1;
-    jk_snwprintf(jkGuiMultiplayer_aEntries[0].field_18, 0x20, L"OpenJKDF2 Loopback");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_58, 0x20, "JK1MP");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_78, 0x20, "m2.jkl");
+    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;
 
     for (int i = 0; i < 32; i++)
@@ -535,7 +535,7 @@ void DirectPlay_Close()
     close(DirectPlay_sock);
 }
 
-int DirectPlay_OpenIdk(void* a)
+int DirectPlay_OpenIdk(jkMultiEntry* a)
 {
     MyDplay_addr.sin_family = AF_INET;
     MyDplay_addr.sin_port = htons(SITHDPLAY_PORT); /*converts short to
@@ -633,9 +633,9 @@ int sithDplay_EnumSessions(int a, void* b)
         }
     }
 
-    __wcsncpy(jkGuiMultiplayer_aEntries[0].field_18, inPkt.entry.field_E8, 0x20);
-    _strncpy(jkGuiMultiplayer_aEntries[0].field_58, inPkt.entry.episodeGobName, 0x20);
-    _strncpy(jkGuiMultiplayer_aEntries[0].field_78, inPkt.entry.mapJklFname, 0x20);
+    __wcsncpy(jkGuiMultiplayer_aEntries[0].serverName, inPkt.entry.field_E8, 0x20);
+    _strncpy(jkGuiMultiplayer_aEntries[0].episodeGobName, inPkt.entry.episodeGobName, 0x20);
+    _strncpy(jkGuiMultiplayer_aEntries[0].mapJklFname, inPkt.entry.mapJklFname, 0x20);
 
     sithDplay_Close();
 

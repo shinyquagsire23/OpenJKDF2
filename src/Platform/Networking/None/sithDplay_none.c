@@ -37,9 +37,9 @@ void sithDplay_None_Startup()
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 1;
-    jk_snwprintf(jkGuiMultiplayer_aEntries[0].field_18, 0x20, L"OpenJKDF2 Loopback");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_58, 0x20, "JK1MP");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_78, 0x20, "m2.jkl");
+    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;
 
     Hack_ResetClients();
@@ -127,7 +127,7 @@ void DirectPlay_Close()
     
 }
 
-int DirectPlay_OpenIdk(void* a)
+int DirectPlay_OpenIdk(jkMultiEntry* a)
 {
     
     return 0;
