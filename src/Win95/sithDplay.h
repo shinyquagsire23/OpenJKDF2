@@ -131,7 +131,7 @@ BOOL DirectPlay_Initialize();
 int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
 DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
 void DirectPlay_Close();
-int DirectPlay_OpenIdk(void* a);
+int DirectPlay_OpenIdk(jkMultiEntry* a);
 int DirectPlay_GetSession_passwordidk(void* a);
 int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);

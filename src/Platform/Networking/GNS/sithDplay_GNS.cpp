@@ -38,8 +38,10 @@ void Hack_ResetClients();
 typedef struct GNSInfoPacket
 {
     int id;
-    jkMultiEntry3 entry;
+    jkMultiEntry entry;
 } GNSInfoPacket;
+
+static jkMultiEntry sithDplayGNS_storedEntry;
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -512,9 +514,9 @@ private:
 
                 GNSInfoPacket infoPkt = {0};
                 infoPkt.id = nextId;
-                __wcsncpy(infoPkt.entry.field_E8, L"My Server", 0x20);
-                _strncpy(infoPkt.entry.episodeGobName, sithWorld_episodeName, 0x20);
-                _strncpy(infoPkt.entry.mapJklFname, jkMain_aLevelJklFname, 0x80);
+                infoPkt.entry = sithDplayGNS_storedEntry;
+                infoPkt.entry.numPlayers = RealConnectedPlayers();
+                infoPkt.entry.maxPlayers = jkPlayer_maxPlayers;
 
                 SendBytesToClient( pInfo->m_hConn, &infoPkt, sizeof(infoPkt)); 
 
@@ -560,6 +562,21 @@ private:
             }
         }
         return ret;
+    }
+
+    int RealConnectedPlayers()
+    {
+        int amt = 0;
+        for (int i = 0; i < jkPlayer_maxPlayers; i++)
+        {
+            if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].net_id ){
+
+            }
+            else {
+                amt++;
+            }
+        }
+        return amt;
     }
 };
 
@@ -647,6 +664,11 @@ public:
         int idFrom = *(uint32_t*)&dataBuf[0];//itClient->second.m_id;
         int idTo = *(uint32_t*)&dataBuf[4];
         *pIdOut = idFrom;
+
+        // Not intended for us
+        if (idTo && idTo != id) {
+            return -1;
+        }
         
         int outsize = maxLen;
         if (outsize > pIncomingMsg->m_cbSize-8)
@@ -680,12 +702,21 @@ public:
 
     void GetServerInfo( const SteamNetworkingIPAddr &serverAddr )
     {
+        int attempts = 100;
         id = 0xFFFFFFFF;
-        Init(serverAddr);
-        while (id == 0xFFFFFFFF && !m_closed) {
-            RunStep();
+        
+        while (id == 0xFFFFFFFF && !m_closed && attempts) {
+            Init(serverAddr);
+            for (int i = 0; i < 10; i++)
+            {
+                RunStep();
+                std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            }
+            Shutdown();
+            attempts--;
+            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
         }
-        Shutdown();
+        
     }
 
     uint32_t id = 0xFFFFFFFF;
@@ -719,10 +750,8 @@ private:
                 id = pPkt->id;
                 printf("We are ID %x\n", id);
 
-                __wcsncpy(jkGuiMultiplayer_aEntries[0].field_18, pPkt->entry.field_E8, 0x20);
-                _strncpy(jkGuiMultiplayer_aEntries[0].field_58, pPkt->entry.episodeGobName, 0x20);
-                _strncpy(jkGuiMultiplayer_aEntries[0].field_78, pPkt->entry.mapJklFname, 0x20);
-            
+                jkGuiMultiplayer_aEntries[0] = pPkt->entry;
+                
                 dplay_dword_55D618 = 1;
                 jkGuiMultiplayer_aEntries[0].field_E0 = 10;
             }
@@ -859,9 +888,9 @@ void sithDplay_GNS_Startup()
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 0;
-    jk_snwprintf(jkGuiMultiplayer_aEntries[0].field_18, 0x20, L"OpenJKDF2 Loopback");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_58, 0x20, "JK1MP");
-    stdString_snprintf(jkGuiMultiplayer_aEntries[0].field_78, 0x20, "m2.jkl");
+    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
+    stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;
 
     Hack_ResetClients();
@@ -1014,8 +1043,9 @@ void DirectPlay_Close()
     
 }
 
-int DirectPlay_OpenIdk(void* a)
+int DirectPlay_OpenIdk(jkMultiEntry* pEntry)
 {
+    sithDplayGNS_storedEntry = *pEntry;
     sithDplay_dword_8321E4 = 1;
     server.Init(nPort);
     return 0;

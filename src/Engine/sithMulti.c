@@ -68,26 +68,26 @@ int sithMulti_HandleChat(sithCogMsg *msg)
     return 1;
 }
 
-HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9)
+HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int maxPlayers, int a6, int multiModeFlags, int rate, int a9)
 {
     HRESULT result; // eax
     jkMultiEntry multiEntry; // [esp+Ch] [ebp-F0h] BYREF
 
     _memset(&multiEntry, 0, sizeof(multiEntry));
-    _wcsncpy(multiEntry.field_18, a1, 0x1Fu);
-    multiEntry.field_18[31] = 0;
-    _strncpy(multiEntry.field_58, a3, 0x1Fu);
-    multiEntry.field_58[31] = 0;
-    _strncpy(multiEntry.field_78, a4, 0x1Fu);
-    multiEntry.field_78[31] = 0;
+    _wcsncpy(multiEntry.serverName, a1, 0x1Fu);
+    multiEntry.serverName[31] = 0;
+    _strncpy(multiEntry.episodeGobName, a3, 0x1Fu);
+    multiEntry.episodeGobName[31] = 0;
+    _strncpy(multiEntry.mapJklFname, a4, 0x1Fu);
+    multiEntry.mapJklFname[31] = 0;
     _wcsncpy(multiEntry.field_98, a2, 0x1Fu);
-    multiEntry.numPlayers = a5;
-    idx_13b4_related = a5;
+    multiEntry.maxPlayers = maxPlayers;
+    idx_13b4_related = maxPlayers;
     multiEntry.maxRank = a9;
     multiEntry.field_98[31] = 0;
-    multiEntry.field_E4 = multiModeFlags;
+    multiEntry.multiModeFlags = multiModeFlags;
     multiEntry.field_E8 = rate;
-    multiEntry.field_D8 = a6;
+    multiEntry.sessionFlags = a6;
     if ( sithDplay_dword_8321E0 )
         result = sithDplay_seed_idk(&multiEntry);
     else
@@ -406,16 +406,20 @@ void sithMulti_HandleScore()
         {
             for (int i = 0; i < 5; i++)
             {
-                if ( sithNet_teamScore[i] >= sithNet_scorelimit )
+                if ( sithNet_teamScore[i] >= sithNet_scorelimit ) {
                     score_limit_met = 1;
+                    printf("team score limit met %x %x\n", sithNet_teamScore[i], sithNet_scorelimit);
+                }
             }
         }
         else
         {
             for (int i = 0; i < jkPlayer_maxPlayers; i++)
             {
-                if ( jkPlayer_playerInfos[i].score >= sithNet_scorelimit )
+                if ( jkPlayer_playerInfos[i].score >= sithNet_scorelimit ) {
                     score_limit_met = 1;
+                    printf("player score limit met %x %x\n", jkPlayer_playerInfos[i].score, sithNet_scorelimit);
+                }
             }
         }
         if ( score_limit_met )

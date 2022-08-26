@@ -46,10 +46,10 @@ static jkGuiElement jkGuiMultiplayer_aElements3[12] = {
     {ELEMENT_TEXT,  0,  0, "GUI_CHOOSEAGAME",  2, {0xAA, 0x82, 0x1C2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_LISTBOX,  1,  0,  0,  0, {0xAA, 0xA0, 0x140, 0x6E},  1,  0, "GUI_GAMESTOJOIN_HINT",  0, jkGuiNet_sub_413E00, jkGuiMultiplayer_aElements3_aIdk, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUINET_PASSWORD",  2, {0xAA, 0x12C, 0x64, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_TEXTBOX,  0,  0, &jkGuiMultiplayer_stru_556168.field_240+0xC0, 0x20, {0x118, 0x127, 0xD2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_TEXT,  0,  1, &jkGuiMultiplayer_stru_556168,  3, {0x32, 0x14A, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_TEXT,  0,  0, &jkGuiMultiplayer_stru_556168.field_100,  3, {0x32, 0x163, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_TEXT,  0,  0, &jkGuiMultiplayer_stru_556168.field_140+0xC0,  3, {0x32, 0x17C, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXTBOX,  0,  0, jkGuiMultiplayer_stru_556168.field_240+0xC0, 0x20, {0x118, 0x127, 0xD2, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,  0,  1, jkGuiMultiplayer_stru_556168.field_0,  3, {0x32, 0x14A, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,  0,  0, jkGuiMultiplayer_stru_556168.field_100,  3, {0x32, 0x163, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,  0,  0, jkGuiMultiplayer_stru_556168.field_140+0xC0,  3, {0x32, 0x17C, 0x21C, 0x14},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBUTTON,  1,  2, "GUI_OK",  3, {0x1A4, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBUTTON, -1,  2, "GUI_CANCEL",  3, {0x14, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0},
@@ -239,25 +239,25 @@ LABEL_1:
                     if ( v16 != 1 )
                         continue;
                     v20 = jkStrings_GetText("GUI_DEFAULT_GAME_NAME");
-                    jk_snwprintf(v34.playerName, 0x20u, v20, jkPlayer_playerShortName);
+                    jk_snwprintf(v34.serverName, 0x20u, v20, jkPlayer_playerShortName);
                     if ( jkGuiNetHost_Show(&v34) != 1 )
                         goto LABEL_51;
                     do
                     {
                         sithNet_scorelimit = v34.scoreLimit;
                         sithNet_multiplayer_timelimit = v34.timeLimit;
-                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.episodeGobName, v34.mapJklFname, 0, v34.field_130) == 1 )
+                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.episodeGobName, v34.mapJklFname, 0, v34.maxRank) == 1 )
                         {
                             v21 = sithMulti_CreatePlayer(
-                                      v34.playerName,
+                                      v34.serverName,
                                       v34.field_E8,
                                       v34.episodeGobName,
                                       v34.mapJklFname,
-                                      v34.field_E4,
-                                      v34.field_128,
-                                      v34.field_12C,
+                                      v34.maxPlayers,
+                                      v34.sessionFlags,
+                                      v34.multiModeFlags,
                                       v34.tickRateMs,
-                                      v34.field_130);
+                                      v34.maxRank);
                             if ( v21 == 0x88770118 )
                             {
                                 v31 = jkStrings_GetText("GUINET_USERCANCEL");
@@ -315,8 +315,8 @@ LABEL_29:
         }
         if ( jkGuiBuildMulti_ShowLoad(
                  &jkGuiMultiplayer_mpcInfo,
-                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_58,
-                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_78,
+                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].episodeGobName,
+                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].mapJklFname,
                  0,
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].maxRank) != 1 )
             goto LABEL_28;
@@ -342,9 +342,9 @@ LABEL_29:
             goto LABEL_28;
         }
         v12 = v7;
-        _strncpy(v35.field_20, (const char *)jkGuiMultiplayer_aEntries[v12].field_78, 0x1Fu);
+        _strncpy(v35.field_20, (const char *)jkGuiMultiplayer_aEntries[v12].mapJklFname, 0x1Fu);
         v35.field_20[31] = 0;
-        _strncpy(v35.field_0, (const char *)jkGuiMultiplayer_aEntries[v12].field_58, 0x1Fu);
+        _strncpy(v35.field_0, (const char *)jkGuiMultiplayer_aEntries[v12].episodeGobName, 0x1Fu);
         v13 = jkGuiMultiplayer_aEntries[v12].field_E8;
         v35.field_0[31] = 0;
         v35.field_E0 = v13;
@@ -364,7 +364,7 @@ int jkGuiNet_ShowSynchronizing()
     v2 = jkGui_stdBitmaps[2]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
-    jkGuiMultiplayer_aElements4[1].unistr = (jkGuiStringEntry *)jkStrings_GetText("GUI_SYNCHRONIZING");
+    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUI_SYNCHRONIZING");
     jkGuiMultiplayer_menu4.idkFunc = jkGuiNet_idk;
     jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
@@ -450,7 +450,7 @@ void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
                         v6 = jkGuiMultiplayer_aEntries;
                         do
                         {
-                            jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v6->field_18, 0);
+                            jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v6->serverName, 0);
                             if ( !memcmp(&jkGui_guid_556040, &v6->guidInstance, sizeof(GUID)) )
                                 v10 = v5;
                             ++v5;
@@ -507,21 +507,21 @@ void jkGuiNet_sub_413E50(int idx)
     {
         v1 = jkStrings_GetText("GUI_LEVEL");
         jk_snwprintf(
-            (wchar_t *)&jkGuiMultiplayer_stru_556168,
+            jkGuiMultiplayer_stru_556168.field_0,
             0x80u,
             v1,
-            jkGuiMultiplayer_aEntries[idx].field_18,
-            jkGuiMultiplayer_aEntries[idx].field_58,
-            jkGuiMultiplayer_aEntries[idx].field_78);
+            jkGuiMultiplayer_aEntries[idx].serverName,
+            jkGuiMultiplayer_aEntries[idx].episodeGobName,
+            jkGuiMultiplayer_aEntries[idx].mapJklFname);
         stdString_snprintf(v10, 32, "RANK_%d_L", jkGuiMultiplayer_aEntries[idx].maxRank);
         v9 = jkGuiMultiplayer_aEntries[idx].maxRank;
         v8 = jkStrings_GetText(v10);
-        v7 = jkGuiMultiplayer_aEntries[idx].numPlayers;
-        v6 = jkGuiMultiplayer_aEntries[idx].maxPlayers;
+        v7 = jkGuiMultiplayer_aEntries[idx].maxPlayers;
+        v6 = jkGuiMultiplayer_aEntries[idx].numPlayers;
         v2 = jkStrings_GetText("GUI_NUM_PLAYERS");
         jk_snwprintf((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, 0x80u, v2, v6, v7, v8, v9);
         jkGui_guid_556040 = jkGuiMultiplayer_aEntries[idx].guidInstance;
-        if ( (jkGuiMultiplayer_aEntries[idx].field_D8 & 0x400) != 0 )
+        if ( (jkGuiMultiplayer_aEntries[idx].sessionFlags & 0x400) != 0 )
         {
             v3 = jkStrings_GetText("GUINET_GAMEPASSWORD");
             __wcscat((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, v3);
@@ -533,12 +533,12 @@ void jkGuiNet_sub_413E50(int idx)
             jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[5], &jkGuiMultiplayer_menu3, 0);
             jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[4], &jkGuiMultiplayer_menu3, 0);
         }
-        if ( (jkGuiMultiplayer_aEntries[idx].field_E4 & 1) != 0 )
+        if ( (jkGuiMultiplayer_aEntries[idx].multiModeFlags & 1) != 0 )
         {
             v4 = jkStrings_GetText("GUINET_GAMETEAM");
             __wcscat((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, v4);
         }
-        if ( (jkGuiMultiplayer_aEntries[idx].field_D8 & 0x20) != 0 )
+        if ( (jkGuiMultiplayer_aEntries[idx].sessionFlags & 0x20) != 0 )
         {
             v5 = jkStrings_GetText("GUINET_GAMECLOSED");
             jk_snwprintf((wchar_t *)jkGuiMultiplayer_stru_556168.field_100, 0x80u, v5);

@@ -2727,23 +2727,23 @@ typedef struct sith_dplay_connection
 typedef struct jkMultiEntry
 {
     GUID guidInstance;
-    int numPlayers;
     int maxPlayers;
-    wchar_t field_18[32];
-    char field_58[32];
-    char field_78[32];
+    int numPlayers;
+    wchar_t serverName[32];
+    char episodeGobName[32];
+    char mapJklFname[32];
     wchar_t field_98[32];
-    int field_D8;
+    int sessionFlags;
     int checksumSeed;
     int field_E0;
-    int field_E4;
+    int multiModeFlags;
     int field_E8;
     int maxRank;
 } jkMultiEntry;
 
 typedef struct jkMultiEntry2
 {
-    char field_0[256];
+    wchar_t field_0[128];
     char field_100[64];
     char field_140[256];
     char field_240[256];
@@ -2752,14 +2752,14 @@ typedef struct jkMultiEntry2
 typedef struct jkMultiEntry3
 {
     int field_0;
-    wchar_t playerName[32];
+    wchar_t serverName[32];
     char episodeGobName[32];
     char mapJklFname[128];
-    int field_E4;
+    int maxPlayers;
     wchar_t field_E8[32];
-    int field_128;
-    int field_12C;
-    int field_130;
+    int sessionFlags;
+    int multiModeFlags;
+    int maxRank;
     int timeLimit;
     int scoreLimit;
     int tickRateMs;

@@ -1,5 +1,7 @@
 #include "jkGUINetHost.h"
 
+#include <errno.h>
+
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
@@ -77,10 +79,82 @@ static wchar_t jkGuiNetHost_waIdk[32];
 static Darray jkGuiNetHost_dArray1;
 static Darray jkGuiNetHost_dArray2;
 
+#define LONG_MAX ((long)(~0UL>>1))
+#define LONG_MIN (~LONG_MAX)
+
+long wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base)
+{
+    const wchar_t *p = nptr, *endp;
+    _Bool is_neg = 0, overflow = 0;
+    /* Need unsigned so (-LONG_MIN) can fit in these: */
+    unsigned long n = 0UL, cutoff;
+    int cutlim;
+    if (base < 0 || base == 1 || base > 36) {
+#ifdef EINVAL /* errno value defined by POSIX */
+        errno = EINVAL;
+#endif
+        return 0L;
+    }
+    endp = nptr;
+    while (isspace(*p))
+        p++;
+    if (*p == '+') {
+        p++;
+    } else if (*p == '-') {
+        is_neg = 1, p++;
+    }
+    if (*p == '0') {
+        p++;
+        /* For strtol(" 0xZ", &endptr, 16), endptr should point to 'x';
+         * pointing to ' ' or '0' is non-compliant.
+         * (Many implementations do this wrong.) */
+        endp = p;
+        if (base == 16 && (*p == 'X' || *p == 'x')) {
+            p++;
+        } else if (base == 0) {
+            if (*p == 'X' || *p == 'x') {
+                base = 16, p++;
+            } else {
+                base = 8;
+            }
+        }
+    } else if (base == 0) {
+        base = 10;
+    }
+    cutoff = (is_neg) ? -(LONG_MIN / base) : LONG_MAX / base;
+    cutlim = (is_neg) ? -(LONG_MIN % base) : LONG_MAX % base;
+    while (1) {
+        int c;
+        if (*p >= 'A')
+            c = ((*p - 'A') & (~('a' ^ 'A'))) + 10;
+        else if (*p <= '9')
+            c = *p - '0';
+        else
+            break;
+        if (c < 0 || c >= base) break;
+        endp = ++p;
+        if (overflow) {
+            /* endptr should go forward and point to the non-digit character
+             * (of the given base); required by ANSI standard. */
+            if (endptr) continue;
+            break;
+        }
+        if (n > cutoff || (n == cutoff && c > cutlim)) {
+            overflow = 1; continue;
+        }
+        n = n * base + c;
+    }
+    if (endptr) *endptr = (wchar_t *)endp;
+    if (overflow) {
+        errno = ERANGE; return ((is_neg) ? LONG_MIN : LONG_MAX);
+    }
+    return (long)((is_neg) ? -n : n);
+}
+
 int msvc_sub_5133E0(wchar_t *a1, wchar_t **a2, char a3)
 {
     //TODO
-    return 0;
+    return wcstol(a1, a2, a3);
 }
 
 void jkGuiNetHost_Initialize()
@@ -217,80 +291,80 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
         v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menu);
         if ( v4 == 1 )
         {
-            pMultiEntry->field_12C = 0;
-            _wcsncpy(pMultiEntry->playerName, jkGuiNetHost_gameName, 0x1Fu);
-            pMultiEntry->playerName[31] = 0;
-            for ( i = __wcschr(pMultiEntry->playerName, ':'); i; i = __wcschr(pMultiEntry->playerName, ':') )
+            pMultiEntry->multiModeFlags = 0;
+            _wcsncpy(pMultiEntry->serverName, jkGuiNetHost_gameName, 0x1Fu);
+            pMultiEntry->serverName[31] = 0;
+            for ( i = __wcschr(pMultiEntry->serverName, ':'); i; i = __wcschr(pMultiEntry->serverName, ':') )
                 *i = '-';
             _strncpy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[19].unistr[jkGuiNetHost_aElements[19].selectedTextEntry].c_str, 0x1Fu);
             pMultiEntry->episodeGobName[31] = 0;
             _strncpy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[21].unistr[jkGuiNetHost_aElements[21].selectedTextEntry].c_str, 0x7Fu);
             pMultiEntry->mapJklFname[127] = 0;
-            if ( msvc_sub_5133E0(v25, &v22, '\n') < 1 )
+            if ( msvc_sub_5133E0(v25, &v22, 10) < 1 )
             {
                 v10 = 1;
             }
-            else if ( msvc_sub_5133E0(v25, &v22, '\n') > 32 )
+            else if ( msvc_sub_5133E0(v25, &v22, 10) > 32 )
             {
                 v10 = 32;
             }
             else
             {
-                v10 = msvc_sub_5133E0(v25, &v22, '\n');
+                v10 = msvc_sub_5133E0(v25, &v22, 10);
             }
-            pMultiEntry->field_E4 = v10;
+            pMultiEntry->maxPlayers = v10;
             jkGuiNetHost_maxPlayers = v10;
-            pMultiEntry->field_130 = jkGuiNetHost_maxRank;
-            if ( msvc_sub_5133E0(v26, &v22, '\n') < 1 )
+            pMultiEntry->maxRank = jkGuiNetHost_maxRank;
+            if ( msvc_sub_5133E0(v26, &v22, 10) < 1 )
             {
                 v23 = 1;
             }
-            else if ( msvc_sub_5133E0(v26, &v22, '\n') > 100 )
+            else if ( msvc_sub_5133E0(v26, &v22, 10) > 100 )
             {
                 v23 = 100;
             }
             else
             {
-                v23 = msvc_sub_5133E0(v26, &v22, '\n');
+                v23 = msvc_sub_5133E0(v26, &v22, 10);
             }
             v11 = (__int64)((double)v23 * 60000.0);
             pMultiEntry->timeLimit = v11;
             jkGuiNetHost_timeLimit = v11;
             if ( jkGuiNetHost_aElements[8].selectedTextEntry )
             {
-                pMultiEntry->field_12C |= 8;
+                pMultiEntry->multiModeFlags |= 8;
             }
-            if ( msvc_sub_5133E0(v27, &v22, '\n') < 0 )
+            if ( msvc_sub_5133E0(v27, &v22, 10) < 0 )
             {
                 v13 = 0;
             }
-            else if ( msvc_sub_5133E0(v27, &v22, '\n') > 999 )
+            else if ( msvc_sub_5133E0(v27, &v22, 10) > 999 )
             {
                 v13 = 999;
             }
             else
             {
-                v13 = msvc_sub_5133E0(v27, &v22, '\n');
+                v13 = msvc_sub_5133E0(v27, &v22, 10);
             }
             pMultiEntry->scoreLimit = v13;
             jkGuiNetHost_scoreLimit = v13;
             if ( jkGuiNetHost_aElements[6].selectedTextEntry )
             {
-                pMultiEntry->field_12C |= 0x10;
+                pMultiEntry->multiModeFlags |= 0x10;
             }
             if ( jkGuiNetHost_aElements[11].selectedTextEntry )
             {
-                pMultiEntry->field_12C |= 0x80;
+                pMultiEntry->multiModeFlags |= 0x80;
             }
             if ( jkGuiNetHost_aElements[10].selectedTextEntry )
-                pMultiEntry->field_12C |= 0x103u;
+                pMultiEntry->multiModeFlags |= 0x103u;
             _wcsncpy(pMultiEntry->field_E8, v30, 0x1Fu);
             v16 = jkGuiNetHost_tickRate;
             v17 = jkGuiNetHost_sessionFlags;
-            v18 = pMultiEntry->field_12C;
+            v18 = pMultiEntry->multiModeFlags;
             pMultiEntry->field_E8[31] = 0;
             pMultiEntry->tickRateMs = v16;
-            pMultiEntry->field_128 = v17;
+            pMultiEntry->sessionFlags = v17;
             jkGuiNetHost_gameFlags = v18;
         }
         else if ( v4 == 200 )
@@ -305,20 +379,20 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
             if ( jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menuSettings) == 1 )
             {
-                pMultiEntry->field_128 = 0;
-                if ( msvc_sub_5133E0(a1, &a2, '\n') < 100 )
+                pMultiEntry->sessionFlags = 0;
+                if ( msvc_sub_5133E0(a1, &a2, 10) < 100 )
                 {
                     v5 = 100;
                 }
-                else if ( msvc_sub_5133E0(a1, &a2, '\n') > 300 )
+                else if ( msvc_sub_5133E0(a1, &a2, 10) > 300 )
                 {
                     v5 = 300;
                 }
                 else
                 {
-                    v5 = msvc_sub_5133E0(a1, &a2, '\n');
+                    v5 = msvc_sub_5133E0(a1, &a2, 10);
                 }
-                v6 = pMultiEntry->field_128;
+                v6 = pMultiEntry->sessionFlags;
                 pMultiEntry->tickRateMs = v5;
                 jkGuiNetHost_tickRate = v5;
                 jkGuiNetHost_sessionFlags = v6;
@@ -349,22 +423,22 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
     v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menuSettings);
     if ( v1 == 1 )
     {
-        pEntry->field_128 = 0;
-        if ( msvc_sub_5133E0(a1a, &a2, '\n') < 100 )
+        pEntry->sessionFlags = 0;
+        if ( msvc_sub_5133E0(a1a, &a2, 10) < 100 )
         {
             tickRate = 100;
         }
-        else if ( msvc_sub_5133E0(a1a, &a2, '\n') > 300 )
+        else if ( msvc_sub_5133E0(a1a, &a2, 10) > 300 )
         {
             tickRate = 300;
         }
         else
         {
-            tickRate = msvc_sub_5133E0(a1a, &a2, '\n');
+            tickRate = msvc_sub_5133E0(a1a, &a2, 10);
         }
         pEntry->tickRateMs = tickRate;
         jkGuiNetHost_tickRate = tickRate;
-        jkGuiNetHost_sessionFlags = pEntry->field_128;
+        jkGuiNetHost_sessionFlags = pEntry->sessionFlags;
     }
     return v1;
 }

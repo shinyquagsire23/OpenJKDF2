@@ -175,6 +175,15 @@ static inline unsigned int _strnlen_s(const wchar_t* str, size_t maxsize)
   return (unsigned int)(s - str);
 }
 
+// internal secure strlen
+// \return The length of the string (excluding the terminating 0) limited by 'maxsize'
+static inline unsigned int _strnlen_s__(const char* str, size_t maxsize)
+{
+  const char* s;
+  for (s = str; *s && maxsize--; ++s);
+  return (unsigned int)(s - str);
+}
+
 
 // internal test if wchar_t is a digit (0-9)
 // \return true if wchar_t is a digit
@@ -793,7 +802,32 @@ static int _vsnprintf(out_fct_type out, wchar_t* buffer, const size_t maxlen, co
         break;
       }
 
-      case 'S' :
+      case 'S' : {
+        const char* p = va_arg(va, char*);
+        unsigned int l = _strnlen_s__(p, precision ? precision : (size_t)-1);
+        // pre padding
+        if (flags & FLAGS_PRECISION) {
+          l = (l < precision ? l : precision);
+        }
+        if (!(flags & FLAGS_LEFT)) {
+          while (l++ < width) {
+            out(' ', buffer, idx++, maxlen);
+          }
+        }
+        // string output
+        while ((*p != 0) && (!(flags & FLAGS_PRECISION) || precision--)) {
+          out(*(p++), buffer, idx++, maxlen);
+        }
+        // post padding
+        if (flags & FLAGS_LEFT) {
+          while (l++ < width) {
+            out(' ', buffer, idx++, maxlen);
+          }
+        }
+        format++;
+        break;
+      }
+
       case 's' : {
         const wchar_t* p = va_arg(va, wchar_t*);
         unsigned int l = _strnlen_s(p, precision ? precision : (size_t)-1);
