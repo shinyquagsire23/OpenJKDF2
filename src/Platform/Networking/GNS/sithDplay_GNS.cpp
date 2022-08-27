@@ -145,7 +145,7 @@ static void ShutdownSteamDatagramConnectionSockets()
     // more sure about cleanup, you won't be able to do this.  You will need to send
     // a message and then either wait for the peer to close the connection, or
     // you can pool the connection to see if any reliable data is pending.
-    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    //std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
         GameNetworkingSockets_Kill();
@@ -234,7 +234,7 @@ public:
         while ( !g_bQuit )
         {
             RunStep();
-            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
         }
 
         Shutdown();
@@ -648,7 +648,7 @@ public:
         while ( !g_bQuit )
         {
             RunStep();
-            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
         }
     }
 
@@ -727,11 +727,11 @@ public:
             for (int i = 0; i < 10; i++)
             {
                 RunStep();
-                std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+                //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
             }
             Shutdown();
             attempts--;
-            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
         }
         
     }
