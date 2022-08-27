@@ -9,7 +9,7 @@ Building is currently tested primarily on Arch Linux, Ubuntu 20.04, and MacOS Mo
 
 ```
 # All
-pacman -S git cmake base-devel make python python-pip bison imagemagick gtk3 openssl protobuf
+pacman -S git cmake base-devel make python python-pip bison imagemagick gtk3 openssl protobuf  zsh
 pip3 install cogapp
 
 # Win32/MinGW
@@ -31,7 +31,7 @@ pacaur -S emscripten
 
 ```
 # All
-sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler
+sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler zsh
 pip3 install cogapp
 
 # Win32/MinGW
