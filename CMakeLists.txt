@@ -568,7 +568,7 @@ elseif(PLAT_WASM)
     target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
-    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.so)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(PLAT_MSVC)
     set_target_properties(${BIN_NAME} PROPERTIES
