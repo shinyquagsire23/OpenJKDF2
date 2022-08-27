@@ -38,4 +38,6 @@ function copyForOBJ() {
 }
 
 copyForOBJ $EXE
-copyForOBJ $GNS
+if [ -f $GNS ]; then
+    copyForOBJ $GNS
+fi
