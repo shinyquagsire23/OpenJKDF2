@@ -8,10 +8,12 @@ rm -rf build_win64
 mkdir -p build_win64 && cd build_win64
 
 # Begin ughhhhh
-mkdir -p build_protoc && cd build_protoc
-cmake -DCMAKE_BUILD_TYPE=Release -Dprotobuf_BUILD_TESTS=OFF ../../3rdparty/protobuf/cmake
-make -j10 protoc
-cd ..
+if [ ! -f build_protoc/protoc ]; then
+    mkdir -p build_protoc && cd build_protoc
+    cmake -DCMAKE_BUILD_TYPE=Release -Dprotobuf_BUILD_TESTS=OFF ../../3rdparty/protobuf/cmake
+    make -j10 protoc
+    cd ..
+fi
 
 mkdir -p build_protobuf && cd build_protobuf
 cmake --toolchain ../../cmake_modules/mingw_toolchain.cmake -DCMAKE_INSTALL_PREFIX=. -DCMAKE_BUILD_TYPE=Release -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON ../../3rdparty/protobuf/cmake

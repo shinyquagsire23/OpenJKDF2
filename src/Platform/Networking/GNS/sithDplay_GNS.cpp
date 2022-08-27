@@ -59,6 +59,26 @@ bool g_bQuit = false;
 
 SteamNetworkingMicroseconds g_logTimeZero;
 
+#ifdef WIN32
+#elif _POSIX_C_SOURCE >= 199309L
+#include <time.h>   // for nanosleep
+#endif
+
+void sleep_ms(int milliseconds){ // cross-platform sleep function
+#ifdef WIN32
+    Sleep(milliseconds);
+#elif _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = (milliseconds % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    if (milliseconds >= 1000)
+      sleep(milliseconds / 1000);
+    usleep((milliseconds % 1000) * 1000);
+#endif
+}
+
 // We do this because I won't want to figure out how to cleanly shut
 // down the thread that is reading from stdin.
 static void NukeProcess( int rc )
@@ -145,7 +165,7 @@ static void ShutdownSteamDatagramConnectionSockets()
     // more sure about cleanup, you won't be able to do this.  You will need to send
     // a message and then either wait for the peer to close the connection, or
     // you can pool the connection to see if any reliable data is pending.
-    //std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    sleep_ms( 500 );
 
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
         GameNetworkingSockets_Kill();
@@ -234,7 +254,7 @@ public:
         while ( !g_bQuit )
         {
             RunStep();
-            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            sleep_ms(10);
         }
 
         Shutdown();
@@ -648,7 +668,7 @@ public:
         while ( !g_bQuit )
         {
             RunStep();
-            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            sleep_ms(10);
         }
     }
 
@@ -727,11 +747,11 @@ public:
             for (int i = 0; i < 10; i++)
             {
                 RunStep();
-                //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+                sleep_ms(10);
             }
             Shutdown();
             attempts--;
-            //std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            sleep_ms(10);
         }
         
     }

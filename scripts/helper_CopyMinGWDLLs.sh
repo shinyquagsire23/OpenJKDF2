@@ -13,7 +13,11 @@ paths=("/usr/local/mingw64/bin"
     "/opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib"
     "/opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin"
     "/usr/local/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib"
-    "/usr/local/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin")
+    "/usr/local/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin"
+    "/opt/homebrew/Cellar/mingw-w64/10.0.0_3/toolchain-x86_64/x86_64-w64-mingw32/lib"
+    "/opt/homebrew/Cellar/mingw-w64/10.0.0_3/toolchain-x86_64/x86_64-w64-mingw32/bin"
+    "/usr/local/Cellar/mingw-w64/10.0.0_3/toolchain-x86_64/x86_64-w64-mingw32/lib"
+    "/usr/local/Cellar/mingw-w64/10.0.0_3/toolchain-x86_64/x86_64-w64-mingw32/bin")
 
 function findAndCopyDLL() {
     for i in "${paths[@]}"
