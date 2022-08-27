@@ -20,4 +20,4 @@ jobs:
           sudo pip3 install cogapp
           sudo apt-get install -y zsh mingw-w64 clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libssl-dev libprotobuf-dev protobuf-compiler
     - name: cmake
-      run: ./build_win64.sh
+      run: ./.github/build_win64.sh
