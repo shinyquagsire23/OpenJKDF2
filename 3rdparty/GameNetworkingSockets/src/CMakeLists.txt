@@ -234,7 +234,7 @@ macro(set_clientlib_target_properties GNS_TARGET)
 		)
 
 	target_include_directories(${GNS_TARGET} PRIVATE
-		${Protobuf_INCLUDE_DIRS}
+		${Protobuf_INCLUDE_DIR} ${Protobuf_INCLUDE_DIR2}
 	)
 	target_link_libraries(${GNS_TARGET} PRIVATE ${Protobuf_LIBRARIES})
 

@@ -822,7 +822,7 @@ void Window_RecreateSDL2Window()
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
 #if defined(MACOS) && defined(__aarch64__)
-    SDL_FixWindowMacOS(displayWindow);
+    //SDL_FixWindowMacOS(displayWindow);
 #endif
 
     if (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
