@@ -122,7 +122,7 @@ int jkMain_MissionReload();
 int jkMain_MenuReturn();
 
 int jkMain_EndLevel(int a1);
-int jkMain_CdSwitchShow();
+void jkMain_CdSwitchShow(int a1, int a2);
 void jkMain_VideoShow(int a1, int a2);
 void jkMain_VideoTick(int a2);
 void jkMain_VideoLeave(int a1, int a2);

@@ -49,8 +49,8 @@
 void stdDisplay_SetGammaTable(int len, uint32_t *table);
 uint8_t* stdDisplay_GetPalette();
 
-static void (*stdDisplay_DrawAndFlipGdi)() = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
-static void (*stdDisplay_SetCooperativeLevel)() = (void*)stdDisplay_SetCooperativeLevel_ADDR;
+static int (*stdDisplay_DrawAndFlipGdi)(uint32_t) = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
+static int (*stdDisplay_SetCooperativeLevel)(uint32_t) = (void*)stdDisplay_SetCooperativeLevel_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 //static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;

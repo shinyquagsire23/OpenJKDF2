@@ -3,7 +3,7 @@
 # Run in OpenJKDF2 directory:
 # python -m SimpleHTTPServer
 
-cp resource/* wasm_out/resource/
+#cp resource/* wasm_out/resource/
 
 rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc

@@ -167,7 +167,7 @@ void jkPlayer_InitThings()
     jkPlayer_numOtherThings = num;
 }
 
-void jkPlayer_nullsub_1(int unk)
+void jkPlayer_nullsub_1(jkPlayerInfo* unk)
 {
 }
 

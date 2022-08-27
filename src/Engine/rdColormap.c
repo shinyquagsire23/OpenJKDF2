@@ -109,7 +109,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
             }
             colormap->transparency = transparencyAlloc;
             if ( (intptr_t)transparencyAlloc & 0xFF )
-                colormap->transparency = (intptr_t)transparencyAlloc - (((intptr_t)transparencyAlloc) & 0xFF) + 256;
+                colormap->transparency = (void*)((intptr_t)transparencyAlloc - (((intptr_t)transparencyAlloc) & 0xFF) + 256);
             rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
         }
         colormap->rgb16Alloc = 0;

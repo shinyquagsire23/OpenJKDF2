@@ -5,16 +5,26 @@
 extern "C" {
 #endif
 
-#ifdef SDL2_RENDER
-
 #include "types.h"
+
+void* jkgm_alloc_aligned(size_t amt);
+void jkgm_aligned_free(void* p);
+
+#ifdef SDL2_RENDER
+#ifndef ARCH_WASM
 
 #ifdef MACOS
 #define GL_SILENCE_DEPRECATION
 #include <SDL.h>
 #include <OpenGL/gl.h>
 #elif defined(ARCH_WASM)
+#ifdef __cplusplus
+}
+#endif
 #include <emscripten.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <SDL.h>
 #include <SDL_opengles2.h>
 #else
@@ -26,9 +36,8 @@ extern "C" {
 void jkgm_populate_cache();
 void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int cel);
 int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel);
-void* jkgm_alloc_aligned(size_t amt);
-void jkgm_aligned_free(void* p);
 
+#endif // ARCH_WASM
 #endif //SDL2_RENDER
 
 #ifdef __cplusplus

@@ -1067,7 +1067,7 @@ int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
     return 1;
 }
 
-void jkSaber_idk4()
+int jkSaber_idk4()
 {
     if ( g_localPlayerThing )
     {
@@ -1087,5 +1087,7 @@ void jkSaber_idk4()
         }
         jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
         jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+        return 1;
     }
+    return 0;
 }

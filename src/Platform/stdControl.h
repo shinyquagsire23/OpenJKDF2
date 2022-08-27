@@ -35,7 +35,7 @@ float stdControl_ReadKeyAsAxis(int keyNum);
 int stdControl_ReadAxisAsKey(int axisNum);
 int stdControl_ReadKey(int keyNum, int *pOut);
 void stdControl_FinishRead();
-int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused);
+int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, HWND lParam, LRESULT* unused);
 void stdControl_SetMouseSensitivity(float xSensitivity, float ySensitivity);
 void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime);
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime);

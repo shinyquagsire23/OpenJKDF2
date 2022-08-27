@@ -535,7 +535,7 @@ LABEL_39:
     return 0;
 }
 
-uint32_t jkRes_FileOpen(const char *fpath, const char *mode)
+stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
 {
     unsigned int resIdx; // edi
     int v6; // esi
@@ -558,7 +558,7 @@ uint32_t jkRes_FileOpen(const char *fpath, const char *mode)
             break;
     }
     if ( resIdx >= 0x20 )
-        return 0;
+        return (stdFile_t)0;
     v6 = 0;
     fhand = pLowLevelHS->fileOpen(fpath, mode);
     if ( fhand )
@@ -572,7 +572,7 @@ uint32_t jkRes_FileOpen(const char *fpath, const char *mode)
         v6 = 1;
 LABEL_21:
         if ( !v6 )
-            return 0;
+            return (stdFile_t)0;
     }
     else
     {
@@ -628,7 +628,7 @@ LABEL_21:
                 goto LABEL_21;
         }
     }
-    return resIdx + 1;
+    return (stdFile_t)(resIdx + 1);
 }
 
 int jkRes_FileClose(stdFile_t fd)
@@ -664,7 +664,7 @@ size_t jkRes_FileWrite(stdFile_t fd, void* out, size_t len)
         return 0; // GOB has no write function
 }
 
-char* jkRes_FileGets(stdFile_t fd, char* a2, unsigned int a3)
+char* jkRes_FileGets(stdFile_t fd, char* a2,size_t a3)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -673,7 +673,7 @@ char* jkRes_FileGets(stdFile_t fd, char* a2, unsigned int a3)
         return stdGob_FileGets(resFile->gobHandle, a2, a3);
 }
 
-wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2, unsigned int a3)
+wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2, size_t a3)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
@@ -709,7 +709,7 @@ int jkRes_FSeek(stdFile_t fd, int offs, int whence)
         return stdGob_FSeek(resFile->gobHandle, offs, whence);
 }
 
-size_t jkRes_FileSize(stdFile_t fd, wchar_t* a2, unsigned int a3)
+int jkRes_FileSize(stdFile_t fd)
 {
     // This is implemented wonky in the original? 
     // It assumes GOB just doesn't exist and goes straight to pLowLevelHS...

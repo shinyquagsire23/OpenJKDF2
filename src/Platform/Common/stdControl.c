@@ -374,7 +374,7 @@ void stdControl_FinishRead()
     ;
 }
 
-int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
+int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, HWND lParam, LRESULT* unused)
 {
     if ( Msg != 0x112 )
         return 0;

@@ -1,7 +1,5 @@
 #include "jkgm.h"
 
-#ifdef SDL2_RENDER
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -15,6 +13,44 @@
 #include "jk.h"
 
 namespace fs = std::filesystem;
+
+extern "C" {
+
+void* jkgm_alloc_aligned(size_t amt)
+{
+    void *buffer = NULL;
+
+#ifdef PLAT_MACOS
+    int pagesize = getpagesize();
+
+    if (posix_memalign((void **)&buffer, pagesize, amt) != 0) {
+        return NULL;
+    }
+#elif defined(WIN64_MINGW)
+    buffer = _aligned_malloc(amt, 0x1000);
+#else
+    buffer = malloc(amt);
+#endif
+    return buffer;
+}
+
+void jkgm_aligned_free(void* p)
+{
+    if (!p) return;
+
+#ifdef PLAT_MACOS
+    free(p);
+#elif defined(WIN64_MINGW)
+    _aligned_free(p);
+#else
+    free(p);
+#endif
+}
+
+}
+
+#ifdef SDL2_RENDER
+#ifndef ARCH_WASM
 
 extern "C" {
 
@@ -212,37 +248,6 @@ static std::vector<uint8_t> hex_to_bytes(const std::string& hex) {
   }
 
   return bytes;
-}
-
-void* jkgm_alloc_aligned(size_t amt)
-{
-    void *buffer = NULL;
-
-#ifdef PLAT_MACOS
-    int pagesize = getpagesize();
-
-    if (posix_memalign((void **)&buffer, pagesize, amt) != 0) {
-        return NULL;
-    }
-#elif defined(WIN64_MINGW)
-    buffer = _aligned_malloc(amt, 0x1000);
-#else
-    buffer = malloc(amt);
-#endif
-    return buffer;
-}
-
-void jkgm_aligned_free(void* p)
-{
-    if (!p) return;
-
-#ifdef PLAT_MACOS
-    free(p);
-#elif defined(WIN64_MINGW)
-    _aligned_free(p);
-#else
-    free(p);
-#endif
 }
 
 typedef struct jkgm_cache_entry_t
@@ -822,4 +827,5 @@ found_cached:
     return 0;
 }
 
+#endif // ARCH_WASM
 #endif //SDL2_RENDER

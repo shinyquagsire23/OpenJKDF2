@@ -78,7 +78,7 @@ static jkGuiElement jkGuiMouse_aElements[26] =
     {ELEMENT_END,         0,   0, NULL,                     0, {0}, 0, 0, NULL, NULL, NULL, NULL, {0}, 0},
 };
 
-static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, &jkGUIMouse_idk1, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)&jkGUIMouse_idk1, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
@@ -384,7 +384,7 @@ void jkGuiMouse_sub_417210()
     jkGuiRend_SetClickableString(&jkGuiMouse_aElements[13], &jkGuiMouse_Darray_5566D0);
 }
 
-int jkGuiMouse_EnumBindings(int a1, char *a2, uint32_t a3, int a4, uint32_t a5, int a6, stdControlKeyInfoEntry* a7, Darray* a8)
+int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_t a5, int a6, stdControlKeyInfoEntry* a7, Darray* a8)
 {
     int v7; // ebx
     void *v8; // esi

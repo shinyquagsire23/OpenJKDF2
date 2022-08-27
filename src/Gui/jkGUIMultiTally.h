@@ -16,7 +16,7 @@ int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerIn
 void jkGuiMultiTally_Initialize();
 void jkGuiMultiTally_Shutdown();
 int jkGuiMultiTally_ShowTeamScores(int a1);
-int jkGuiMultiTally_SortTeamScore(const jkHudTeamScore *pA, const jkHudTeamScore *pB);
+int jkGuiMultiTally_SortTeamScore(const void* a, const void* b);
 void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu);
 
 //static int (*jkGuiMultiTally_ShowTeamScores)(int) = (void*)jkGuiMultiTally_ShowTeamScores_ADDR;

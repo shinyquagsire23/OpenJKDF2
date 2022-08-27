@@ -1002,13 +1002,17 @@ void jkHud_EndTarget()
     jkHud_pTargetThing = NULL;
 }
 
-int jkHud_SortPlayerScore(const jkHudPlayerScore *a1, const jkHudPlayerScore *a2)
+int jkHud_SortPlayerScore(const void* a, const void* b)
 {
+    const jkHudPlayerScore *a1 = (const jkHudPlayerScore *)a;
+    const jkHudPlayerScore *a2 = (const jkHudPlayerScore *)b;
     return a2->score - a1->score;
 }
 
-int jkHud_SortTeamScore(const jkHudTeamScore *a1, const jkHudTeamScore *a2)
+int jkHud_SortTeamScore(const void* a, const void* b)
 {
+    const jkHudTeamScore *a1 = (const jkHudTeamScore *)a;
+    const jkHudTeamScore *a2 = (const jkHudTeamScore *)b;
     return a2->score - a1->score;
 }
 

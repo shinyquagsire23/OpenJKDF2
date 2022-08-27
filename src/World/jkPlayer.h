@@ -75,7 +75,7 @@ void jkPlayer_nullsub_29();
 void jkPlayer_nullsub_30();
 void jkPlayer_InitSaber();
 void jkPlayer_InitThings();
-void jkPlayer_nullsub_1(int unk);
+void jkPlayer_nullsub_1(jkPlayerInfo* unk);
 void jkPlayer_CreateConf(wchar_t *name);
 void jkPlayer_WriteConf(wchar_t *name);
 int jkPlayer_ReadConf(wchar_t *name);

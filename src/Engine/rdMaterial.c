@@ -167,8 +167,10 @@ LABEL_21:
         texture->opaqueMats[mipmap_num].texture_loaded = 0;
         texture->opaqueMats[mipmap_num].gpu_accel_maybe = 0;
 #ifdef SDL2_RENDER
+#ifndef ARCH_WASM
         texture->alphaMats[mipmap_num].skip_jkgm = 0;
         texture->opaqueMats[mipmap_num].skip_jkgm = 0;
+#endif
 #endif
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
@@ -229,6 +231,7 @@ LABEL_22:
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 #ifdef SDL2_RENDER
+#ifndef ARCH_WASM
     _strncpy(material->mat_full_fpath, mat_fpath, 0xFF);
     for (int i = 0; i < 256; i++)
     {
@@ -258,6 +261,7 @@ LABEL_22:
             jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, i);
         }
     }
+#endif
 #endif
 
     return mat_file;
@@ -360,11 +364,13 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             return 1;
         }
 #ifdef SDL2_RENDER
+#ifndef ARCH_WASM
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
         {
             //printf("%s\n", material->mat_fpath);
             return 1;
         }
+#endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
         {
@@ -381,11 +387,13 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             return 1;
         }
 #ifdef SDL2_RENDER
+#ifndef ARCH_WASM
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
         {
             //printf("%s\n", material->mat_fpath);
             return 1;
         }
+#endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
         {

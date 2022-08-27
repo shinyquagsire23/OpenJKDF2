@@ -49,16 +49,16 @@ int jkRes_LoadCD(int a1);
 //static int (*jkRes_LoadCD)(int a1) = (void*)jkRes_LoadCD_ADDR;
 //static int (*jkRes_LoadNew)(jkResGob *a1, char *a2, int a3) = (void*)jkRes_LoadNew_ADDR;
 
-uint32_t jkRes_FileOpen(const char *fpath, const char *mode);
+stdFile_t jkRes_FileOpen(const char *fpath, const char *mode);
 int jkRes_FileClose(stdFile_t fd);
 size_t jkRes_FileRead(stdFile_t fd, void* out, size_t len);
 size_t jkRes_FileWrite(stdFile_t fd, void* out, size_t len);
-char* jkRes_FileGets(stdFile_t fd, char* a2, unsigned int a3);
-wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2, unsigned int a3);
+char* jkRes_FileGets(stdFile_t fd, char* a2, size_t a3);
+wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2,size_t a3);
 int jkRes_FEof(stdFile_t fd);
 int jkRes_FTell(stdFile_t fd);
 int jkRes_FSeek(stdFile_t fd, int offs, int whence);
-size_t jkRes_FileSize(stdFile_t fd, wchar_t* a2, unsigned int a3);
+int jkRes_FileSize(stdFile_t fd);
 int jkRes_FilePrintf(stdFile_t fd, const char* fmt, ...);
 
 //static int (*jkRes_FileOpen)() = (void*)jkRes_FileOpen_ADDR;

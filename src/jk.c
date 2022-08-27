@@ -821,7 +821,7 @@ int jk_GetUpdateRect(HWND hWnd, LPRECT lpRect, BOOL bErase)
     return 0;
 }
 
-void jk_BeginPaint(int a, int b)
+void jk_BeginPaint(int a, struct tagPAINTSTRUCT * lpPaint)
 {
     assert(0);
 }
@@ -869,7 +869,7 @@ void jk_ChangeDisplaySettingsA(int a, int b)
     assert(0);
 }
 
-uint32_t jk_DirectDrawEnumerateA(int a, int b)
+uint32_t jk_DirectDrawEnumerateA(void* a, void** b)
 {
     assert(0);
     return 0;
@@ -887,13 +887,13 @@ uint32_t jk_DirectSoundCreate(LPGUID a, LPDIRECTSOUND *b, LPUNKNOWN c)
     return 0;
 }
 
-uint32_t jk_DirectPlayLobbyCreateA(int a, int b, int c, int d, int e)
+uint32_t jk_DirectPlayLobbyCreateA(GUID *lpGUID, void** b, IUnknown* c, LPVOID d, int e)
 {
     assert(0);
     return 0;
 }
 
-uint32_t jk_DirectInputCreateA(int a, int b, int c, int d)
+uint32_t jk_DirectInputCreateA(int a, int b, void** c, LPUNKNOWN d)
 {
     assert(0);
     return 0;
@@ -951,7 +951,7 @@ uint32_t jk_GetDeviceCaps()
     return 0;
 }
 
-uint32_t jk_WinExec(int a, int b)
+uint32_t jk_WinExec(const char* a, int b)
 {
     assert(0);
     return 0;

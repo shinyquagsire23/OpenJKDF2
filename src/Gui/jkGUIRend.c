@@ -17,8 +17,8 @@
 
 static char *jkGuiRend_LoadedSounds[4] = {0};
 static uint8_t jkGuiRend_palette[0x300] = {0};
-static intptr_t jkGuiRend_idk2 = 0;
-static intptr_t jkGuiRend_idk = 0;
+static WindowDrawHandler_t jkGuiRend_idk2 = 0;
+static WindowDrawHandler_t jkGuiRend_idk = 0;
 static stdSound_buffer_t* jkGuiRend_DsoundHandles[4] = {0};
 static jkGuiMenu *jkGuiRend_activeMenu = NULL;
 static stdVBuffer* jkGuiRend_menuBuffer = NULL;
@@ -559,17 +559,19 @@ void jkGuiRend_UpdateSurface()
     }
 }
 
-void jkGuiRend_DrawAndFlip()
+int jkGuiRend_DrawAndFlip(uint32_t a)
 {
-    stdDisplay_DrawAndFlipGdi();
+    stdDisplay_DrawAndFlipGdi(0);
     jkGuiRend_bIsSurfaceValid = 1;
+    return 1;
 }
 
-void jkGuiRend_Invalidate()
+int jkGuiRend_Invalidate(uint32_t a)
 {
-    stdDisplay_SetCooperativeLevel();
+    stdDisplay_SetCooperativeLevel(0);
     jkGuiRend_bIsSurfaceValid = 0;
     jkGuiRend_InvalidateGdi();
+    return 1;
 }
 
 int jkGuiRend_DarrayNewStr(Darray *array, int num, int initVal)
@@ -1087,7 +1089,7 @@ void jkGuiRend_ClickableHover(jkGuiMenu *menu, jkGuiElement *element, int a3)
         }
         else
         {
-            v8 = menu;
+            v8 = (intptr_t)menu;
         }
 LABEL_10:
         if ( !v10 )
@@ -1407,7 +1409,7 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
                 v11,
                 v12,
                 element_->rect.width - 6,
-                menu->anonymous_7,
+                (int*)menu->anonymous_7,
                 v16->str,
                 1);
             v12 += element_->texInfo.textHeight;
@@ -1484,7 +1486,7 @@ int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu,
     return 0;
 }
 
-int jkGuiRend_WindowHandler(HWND hWnd, unsigned int a2, int wParam, unsigned int lParam, void* unused)
+int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, HWND lParam, LRESULT * unused)
 {
     int ret;
     jkGuiElement *v8; // eax
@@ -1796,7 +1798,7 @@ LABEL_5:
                             a4 = 1;
                     }
                 }
-                v20 = element->unistr;
+                v20 = (intptr_t)element->unistr;
                 v21 = v20 * (pX - v11 - element->rect.x) / v12;
                 if ( v21 < 0 )
                 {
@@ -1837,7 +1839,7 @@ LABEL_24:
                     if ( v31 <= (signed int)v32 )
                         v32 = (jkGuiStringEntry *)v31;
                 }
-                v29->otherDataPtr = v32;
+                v29->otherDataPtr = (intptr_t)v32;
                 jkGuiRend_UpdateAndDrawClickable(v29, menu, 1);
                 return 0;
             }
@@ -1861,7 +1863,7 @@ LABEL_24:
                     return 0;
                 }
             }
-            v23->otherDataPtr = v26;
+            v23->otherDataPtr = (intptr_t)v26;
             jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
             return 0;
         default:

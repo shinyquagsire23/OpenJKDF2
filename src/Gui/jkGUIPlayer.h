@@ -18,7 +18,7 @@
 int jkGuiPlayer_Initialize();
 void jkGuiPlayer_Shutdown();
 void jkGuiPlayer_ShowNewPlayer(int a1);
-int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4);
+int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
 
 //static int (*jkGuiPlayer_Initialize)() = (void*)jkGuiPlayer_Initialize_ADDR;
 //static void (*jkGuiPlayer_ShowNewPlayer)(int) = (void*)jkGuiPlayer_ShowNewPlayer_ADDR;

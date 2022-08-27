@@ -169,7 +169,9 @@ void jkGuiNetHost_Initialize()
     jkGuiNetHost_maxPlayers = wuRegistry_GetInt("maxPlayers", jkGuiNetHost_maxPlayers);
     jkGuiNetHost_tickRate = wuRegistry_GetInt("tickRate", jkGuiNetHost_tickRate);
     memset(jkGuiNetHost_gameName, 0, sizeof(jkGuiNetHost_gameName));
+#ifndef ARCH_WASM
     wuRegistry_GetBytes("gameName", jkGuiNetHost_gameName, 0x40u);
+#endif
     jkGuiNetHost_bInitted = 1;
 }
 
@@ -182,7 +184,9 @@ void jkGuiNetHost_Shutdown()
     wuRegistry_SaveInt("scoreLimit", jkGuiNetHost_scoreLimit);
     wuRegistry_SaveInt("maxPlayers", jkGuiNetHost_maxPlayers);
     wuRegistry_SaveInt("tickRate", jkGuiNetHost_tickRate);
+#ifndef ARCH_WASM
     wuRegistry_SaveBytes("gameName", (BYTE *)jkGuiNetHost_gameName, 0x40u);
+#endif
     jkGuiNetHost_bInitted = 0;
 }
 

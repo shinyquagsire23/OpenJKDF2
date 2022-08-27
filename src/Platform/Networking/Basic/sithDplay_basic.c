@@ -494,7 +494,7 @@ int DirectPlay_EnumSessions2()
     return 0;
 }
 
-void DirectPlay_SetSessionDesc(int a1, DWORD maxPlayers)
+void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers)
 {
 
 }

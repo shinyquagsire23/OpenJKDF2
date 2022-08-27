@@ -23,7 +23,7 @@ const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis);
 int jkGuiKeyboard_sub_411E40(Darray *pDarr);
 int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr);
-int jkGuiKeyboard_EnumBindings(int inputFuncIdx, char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
+int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
 int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu);
 int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);

@@ -15,11 +15,11 @@
 
 void jkGuiMap_Initialize();
 void jkGuiMap_Shutdown();
-int jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiMap_sub_415720(jkGuiMenu *menu);
 int jkGuiMap_sub_415B40();
 int jkGuiMap_sub_415B60();
-int jkGuiMap_sub_415B70(int a1, jkGuiMenu *menu);
+int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
 int jkGuiMap_Show();
 
 //static int (*jkGuiMap_Show)() = (void*)jkGuiMap_Show_ADDR;

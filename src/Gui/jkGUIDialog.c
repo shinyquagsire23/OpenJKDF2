@@ -47,7 +47,7 @@ stdVBuffer *jkGuiDialog_sub_416900()
     stdVBuffer *v0; // eax
     stdVBuffer *v1; // esi
 
-    v0 = stdDisplay_VBufferNew(&(*jkGui_stdBitmaps[0]->mipSurfaces)->format, 0, 0, (int)Video_menuBuffer.palette);
+    v0 = stdDisplay_VBufferNew(&(*jkGui_stdBitmaps[0]->mipSurfaces)->format, 0, 0, Video_menuBuffer.palette);
     v1 = v0;
     if ( v0 )
     {

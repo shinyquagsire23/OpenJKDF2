@@ -205,7 +205,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     v7 = &a1[a3];
     v8 = v5 - a3 + 1;
     v15 = &a1[a3];
-    v9 = &v4[v6 + a3];
+    v9 = (intptr_t)&v4[v6 + a3];
     if ( v8 >= a2 - a3 - v6 )
         v8 = a2 - a3 - v6;
     if ( v8 > 0 )

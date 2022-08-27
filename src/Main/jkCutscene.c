@@ -141,7 +141,7 @@ int jkCutscene_sub_421310(char* fpath)
 	texFmt.width = jkCutscene_smk_w;
 	texFmt.height = jkCutscene_smk_h;
 	texFmt.format.bpp = 8;
-	jkCutscene_frameBuf = stdDisplay_VBufferNew(&texFmt, 1, 0, 1);
+	jkCutscene_frameBuf = stdDisplay_VBufferNew(&texFmt, 1, 0, (void*)1);
 	stdDisplay_VBufferFill(jkCutscene_frameBuf, 0, NULL);
 	
 	smk_enable_video(jkCutscene_smk, 0);
@@ -326,7 +326,7 @@ int jkCutscene_PauseShow(int unk)
     return result;
 }
 
-int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
+int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5)
 {
     wchar_t *v5; // eax
 

@@ -612,8 +612,11 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     return v14;
 }
 
-int jkGuiMultiTally_SortTeamScore(const jkHudTeamScore *pA, const jkHudTeamScore *pB)
+int jkGuiMultiTally_SortTeamScore(const void* a, const void* b)
 {
+    const jkHudTeamScore *pA = (const jkHudTeamScore *)a; 
+    const jkHudTeamScore *pB = (const jkHudTeamScore *)b;
+
     int v2; // eax
 
     v2 = pA->field_8;

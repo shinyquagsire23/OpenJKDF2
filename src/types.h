@@ -107,7 +107,7 @@ typedef int IUnknown;
 typedef uint16_t WPARAM;
 typedef uint32_t LRESULT;
 typedef int HCURSOR;
-typedef int* LPARAM;
+typedef int LPARAM;
 typedef int WNDPROC;
 
 typedef int CONSOLE_CURSOR_INFO;

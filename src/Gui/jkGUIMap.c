@@ -21,19 +21,19 @@ static int jkGuiMap_idk[5] = {0, 0x38, 1, 0x37, 0x18};
 static jkGuiElement jkGuiMap_aElements[16] =
 {
     {ELEMENT_TEXT, 0, 8, NULL, 3, { 40, 360, 520, 20 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
-    {ELEMENT_CUSTOM, 0, 0, NULL, 0, { 40, 40, 520, 320 }, 1, 0, NULL, &jkGuiMap_DrawMapScreen, NULL, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 100, 0, NULL, 25, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 101, 0, NULL, 26, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 102, 0, NULL, 21, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 103, 0, NULL, 22, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 104, 0, NULL, 23, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 105, 0, NULL, 24, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 106, 0, NULL, 27, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 107, 0, NULL, 28, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 108, 0, NULL, 29, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 109, 0, NULL, 30, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B60, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 110, 0, NULL, 31, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B40, NULL, {0}, 0}, 
-    {ELEMENT_PICBUTTON, 111, 0, NULL, 32, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, &jkGuiMap_sub_415B70, NULL, {0}, 0}, 
+    {ELEMENT_CUSTOM, 0, 0, NULL, 0, { 40, 40, 520, 320 }, 1, 0, NULL, jkGuiMap_DrawMapScreen, NULL, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 100, 0, NULL, 25, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 101, 0, NULL, 26, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 102, 0, NULL, 21, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 103, 0, NULL, 22, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 104, 0, NULL, 23, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 105, 0, NULL, 24, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 106, 0, NULL, 27, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 107, 0, NULL, 28, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 108, 0, NULL, 29, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 109, 0, NULL, 30, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B60, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 110, 0, NULL, 31, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B40, NULL, {0}, 0}, 
+    {ELEMENT_PICBUTTON, 111, 0, NULL, 32, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, jkGuiMap_sub_415B70, NULL, {0}, 0}, 
     {ELEMENT_PICBUTTON, 1, 0, NULL, 20, { -1, -1, -1, -1 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
     {ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, {0}, 0},
 };
@@ -50,11 +50,8 @@ void jkGuiMap_Shutdown()
     ;
 }
 
-int jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    int result; // eax
-
-    result = g_app_suspended;
     if ( g_app_suspended )
     {
         rdCamera_SetCurrent(jkGuiMap_pCamera);
@@ -74,7 +71,7 @@ int jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
         stdDisplay_VBufferUnlock(jkGuiMap_pVbuffer);
 #endif
 
-        result = stdControl_ShowCursor(0);
+        stdControl_ShowCursor(0);
 #ifdef SDL2_RENDER
         // rdFinishFrame calls stdDisplay_ddraw_waitforvblank which causes flickering on SDL2
         rdCache_Flush();
@@ -85,7 +82,6 @@ int jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
         rdModel3_ClearFrameCounters();
 #endif
     }
-    return result;
 }
 
 void jkGuiMap_sub_415720(jkGuiMenu *menu)
@@ -240,7 +236,7 @@ int jkGuiMap_sub_415B60()
     return 0;
 }
 
-int jkGuiMap_sub_415B70(int a1, jkGuiMenu *menu)
+int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     rdVector3 a2a; // [esp+0h] [ebp-Ch] BYREF
 

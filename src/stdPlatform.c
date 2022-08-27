@@ -107,7 +107,7 @@ static int Linux_stdFtell(stdFile_t fhand)
     return ftell((void*)fhand);
 }
 
-static void* Linux_alloc(size_t len)
+static void* Linux_alloc(uint32_t len)
 {
     //TODO figure out where we're having alloc issues?
     return malloc(len);
@@ -118,7 +118,7 @@ static void Linux_free(void* ptr)
     return free(ptr);
 }
 
-static void* Linux_realloc(void* ptr, size_t len)
+static void* Linux_realloc(void* ptr, uint32_t len)
 {
     //printf("%p %zx\n", ptr, len);
     return realloc(ptr, len);

@@ -33,15 +33,15 @@ static jkGuiElement jkGuiBuildMulti_buttons[17] =
   { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 0, NULL, 3, { 30, 60, 140, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 2, NULL, 3, { 310, 90, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 105, 0, NULL, 33, { 6, 90, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 170, 90, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_CUSTOM, 0, 0, NULL, 0, { 315, 115, 260, 260 }, 1, 0, NULL, &jkGuiBuildMulti_ModelDrawer, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_CUSTOM, 0, 0, NULL, 0, { 80, 115, 50, 260 }, 1, 0, NULL, &jkGuiBuildMulti_SaberDrawer, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 105, 0, NULL, 33, { 6, 90, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 170, 90, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_CUSTOM, 0, 0, NULL, 0, { 315, 115, 260, 260 }, 1, 0, NULL, jkGuiBuildMulti_ModelDrawer, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_CUSTOM, 0, 0, NULL, 0, { 80, 115, 50, 260 }, 1, 0, NULL, jkGuiBuildMulti_SaberDrawer, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 0, "GUI_MODEL", 3, { 336, 380, 216, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 100, 0, NULL, 33, { 312, 380, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 101, 0, NULL, 34, { 552, 380, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 102, 0, NULL, 33, { 70, 380, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 103, 0, NULL, 34, { 113, 380, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 100, 0, NULL, 33, { 312, 380, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 101, 0, NULL, 34, { 552, 380, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 102, 0, NULL, 33, { 70, 380, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 103, 0, NULL, 34, { 113, 380, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 20, 430, 170, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXTBUTTON, 109, 2, "GUI_FORCEPOWERS", 3, { 290, 430, 170, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXTBUTTON, 106, 2, "GUI_SAVE", 3, { 470, 430, 170, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -549,9 +549,8 @@ int jkGuiBuildMulti_DisplayModel()
     return rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
 }
 
-int jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
+void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
 {
-    int result; // eax
     double v5; // st7
     double v6; // st7
     rdPuppet *v7; // [esp-8h] [ebp-24h]
@@ -562,14 +561,16 @@ int jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBu
 
     if ( jkGuiBuildMulti_lastModelDrawMs )
     {
-        if ( stdPlatform_GetTimeMsec() - jkGuiBuildMulti_lastModelDrawMs <= 1000 )
-            return stdDisplay_VBufferCopy(pVbuf, pMenu->texture, 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
+        if ( stdPlatform_GetTimeMsec() - jkGuiBuildMulti_lastModelDrawMs <= 1000 ) {
+            stdDisplay_VBufferCopy(pVbuf, pMenu->texture, 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
+            return;
+        }
         jkGuiBuildMulti_ThingCleanup(); // inlined
 
         jkGuiBuildMulti_ThingInit(jkGuiBuildMulti_aModels[jkGuiBuildMulti_modelIdx].modelFpath); // inlined
         jkGuiBuildMulti_lastModelDrawMs = 0;
     }
-    result = g_app_suspended;
+
     if ( g_app_suspended )
     {
         stdControl_ShowCursor(1);
@@ -602,12 +603,11 @@ int jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBu
         rot.y = a2a * 20.0;
         rdMatrix_PostRotate34(&jkGuiBuildMulti_matrix, &rot);
         stdDisplay_VBufferCopy(pVbuf, jkGuiBuildMulti_pVBuf1, 0x13Bu, 115, 0, 0);
-        result = stdControl_ShowCursor(0);
+        stdControl_ShowCursor(0);
     }
-    return result;
 }
 
-int jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
+void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
 {
     stdBitmap *pSabBm; // eax
     signed int bmWidth; // esi
@@ -625,7 +625,7 @@ int jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBu
     rect.height = pElement->rect.height;
     if ( rect.height >= bmHeight )
         rect.height = bmHeight;
-    return stdDisplay_VBufferCopy(pVbuf, *pSabBm->mipSurfaces, pElement->rect.x, pElement->rect.y, &rect, 0);
+    stdDisplay_VBufferCopy(pVbuf, *pSabBm->mipSurfaces, pElement->rect.x, pElement->rect.y, &rect, 0);
 }
 
 int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
@@ -1222,7 +1222,7 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
     if ( pMenu == &jkGuiBuildMulti_menuEditCharacter )
     {
         v8 = jkGuiBuildMulti_aMpcInfo[idx].jediRank;
-        jkGuiBuildMulti_menuEditCharacter_buttons[5].wstr = &jkGuiBuildMulti_aMpcInfo[idx];
+        jkGuiBuildMulti_menuEditCharacter_buttons[5].wstr = jkGuiBuildMulti_aMpcInfo[idx].name;
         stdString_snprintf(tmp1, 32, "RANK_%d_L", v8);
         v9 = jkStrings_GetText(tmp1);
         v6 = jkGuiBuildMulti_aMpcInfo[idx].jediRank;
@@ -1238,7 +1238,7 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
     else if ( pMenu == &jkGuiBuildMulti_menuLoadCharacter )
     {
         v10 = jkGuiBuildMulti_aMpcInfo[idx].jediRank;
-        jkGuiBuildMulti_menuLoadCharacter_buttons[11].wstr = &jkGuiBuildMulti_aMpcInfo[idx];
+        jkGuiBuildMulti_menuLoadCharacter_buttons[11].wstr = jkGuiBuildMulti_aMpcInfo[idx].name;
         stdString_snprintf(tmp1, 32, "RANK_%d_L", v10);
         v11 = jkStrings_GetText(tmp1);
         v7 = jkGuiBuildMulti_aMpcInfo[idx].jediRank;

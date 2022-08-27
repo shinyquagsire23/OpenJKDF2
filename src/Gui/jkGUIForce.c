@@ -274,7 +274,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
     return 0;
 }
 
-int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, intptr_t a5, int *pbIsLight, int bEnableIdk)
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *pbIsLight, int bEnableIdk)
 {
     int newStars;
     int spendStars;

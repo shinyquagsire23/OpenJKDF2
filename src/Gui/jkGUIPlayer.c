@@ -41,7 +41,7 @@ static jkGuiElement jkGuiPlayer_menuSelectElements[8] = {
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };
 
-static jkGuiMenu jkGuiPlayer_menuSelect = {jkGuiPlayer_menuSelectElements, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, jkGuiPlayer_menuSelectIdk, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0,0};
+static jkGuiMenu jkGuiPlayer_menuSelect = {jkGuiPlayer_menuSelectElements, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)jkGuiPlayer_menuSelectIdk, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0,0};
 
 static jkGuiElement jkGuiPlayer_menuNewElements[12] = {
     { ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 280, 14}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -316,7 +316,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     jkGuiRend_DarrayFree(&a1a);
 }
 
-int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
+int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;
     jkGuiPlayer_menuNewElements[6].selectedTextEntry = 0;

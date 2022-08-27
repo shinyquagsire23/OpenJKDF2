@@ -34,8 +34,8 @@ void jkHud_SendChat(char a1);
 void jkHud_SetTargetColors(int *color_idxs);
 void jkHud_SetTarget(sithThing *target);
 void jkHud_EndTarget();
-int jkHud_SortPlayerScore(const jkHudPlayerScore *a1, const jkHudPlayerScore *a2);
-int jkHud_SortTeamScore(const jkHudTeamScore *a1, const jkHudTeamScore *a2);
+int jkHud_SortPlayerScore(const void* a, const void* b);
+int jkHud_SortTeamScore(const void* a, const void* b);
 void jkHud_Tally();
 void jkHud_idk_time();
 

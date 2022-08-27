@@ -16,9 +16,9 @@
 
 int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int a5);
 void jkGuiSaveLoad_PopulateInfo(int bRedraw);
-int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu);
+int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
 void jkGuiSaveLoad_PopulateList();
-int jkGuiSaveLoad_SaveSort(jkGuiStringEntry *a, jkGuiStringEntry *b);
+int jkGuiSaveLoad_SaveSort(const void* a_, const void* b_);
 int jkGuiSaveLoad_Show(int bIsSave);
 int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, int a5);
 void jkGuiSaveLoad_Initialize();

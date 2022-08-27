@@ -106,7 +106,7 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     shieldsAmt_ = shieldsAmt;
     if ( jkGuiSaveLoad_numEntries > 0 )
     {
-        v7 = jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, jkGuiSaveLoad_aElements[4].selectedTextEntry);
+        v7 = (jkGuiSaveLoad_Entry*)jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, jkGuiSaveLoad_aElements[4].selectedTextEntry);
         jkGuiSaveLoad_aElements[13].bIsVisible = __strcmpi(v7->fpath, "quicksave.jks") != 0;
     }
     v8 = 0;
@@ -146,7 +146,7 @@ LABEL_15:
     }
 }
 
-int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu)
+int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     jkGuiSaveLoad_Entry *v2; // esi
     wchar_t *wstr_del; // eax
@@ -230,7 +230,7 @@ void jkGuiSaveLoad_PopulateList()
                             _strncpy(v6->fpath, a2.fpath, 0x7Fu);
                             v6->fpath[127] = 0;
                             _strtolower(v6->fpath);
-                            jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, v4 + 1, v6);
+                            jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, v4 + 1, (intptr_t)v6);
                             v1 = v7;
                             ++jkGuiSaveLoad_numEntries;
                         }
@@ -251,8 +251,10 @@ void jkGuiSaveLoad_PopulateList()
     jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, 0, 0);
 }
 
-int jkGuiSaveLoad_SaveSort(jkGuiStringEntry *a, jkGuiStringEntry *b)
+int jkGuiSaveLoad_SaveSort(const void* a_, const void* b_)
 {
+    const jkGuiStringEntry *a = (const jkGuiStringEntry *)a_;
+    const jkGuiStringEntry *b = (const jkGuiStringEntry *)b_;
     if ( !a->str )
         return 1;
     if ( b->str )

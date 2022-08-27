@@ -125,7 +125,7 @@ int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen);
 int DirectPlay_EnumSessions2();
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut);
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize);
-void DirectPlay_SetSessionDesc(int a1, DWORD maxPlayers);
+void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers);
 BOOL DirectPlay_SetSessionFlagidk(int a1);
 BOOL DirectPlay_Initialize();
 int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);

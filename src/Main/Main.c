@@ -819,7 +819,7 @@ int Main_Startup(const char *cmdline)
     }
     else if ( Main_logLevel == 2 )
     {
-        debug_log_fp = fopen("debug.log", "w+");
+        debug_log_fp = (stdFile_t)fopen("debug.log", "w+");
         if ( Main_verboseLevel )
         {
             if ( Main_verboseLevel == 1 )
@@ -1023,7 +1023,7 @@ void Main_Shutdown()
     }
     else if ( Main_logLevel == 2 )
     {
-        fclose(debug_log_fp);
+        fclose((FILE*)debug_log_fp);
     }
     
     exit(0);

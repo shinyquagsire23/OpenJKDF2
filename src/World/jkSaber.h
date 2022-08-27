@@ -85,7 +85,7 @@ int jkSaber_cogMsg_wrap_SendSaberInfo_alt();
 int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
 
 int jkSaber_cogMsg_Handlex33(sithCogMsg *msg);
-void jkSaber_idk4();
+int jkSaber_idk4();
 
 static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 //static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
