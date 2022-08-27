@@ -19,5 +19,5 @@ make -j10
 cd ..
 
 cmake .. &&
-make -j10 &&
+VERBOSE=1 make -j10 &&
 cd ..
