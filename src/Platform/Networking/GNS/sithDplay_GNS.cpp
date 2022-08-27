@@ -37,11 +37,13 @@ extern "C"
 {
 void Hack_ResetClients();
 
+#pragma pack(push, 4)
 typedef struct GNSInfoPacket
 {
     int id;
     jkMultiEntry entry;
 } GNSInfoPacket;
+#pragma pack(pop)
 
 static jkMultiEntry sithDplayGNS_storedEntry;
 extern wchar_t jkGuiMultiplayer_ipText[256];
@@ -609,7 +611,7 @@ public:
         // Start connecting
         char szAddr[ SteamNetworkingIPAddr::k_cchMaxString ];
         serverAddr.ToString( szAddr, sizeof(szAddr), true );
-        Printf( "Connecting to chat server at %s", szAddr );
+        Printf( "Connecting to server at %s", szAddr );
         SteamNetworkingConfigValue_t opt;
         opt.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, (void*)SteamNetConnectionStatusChangedCallback );
         //opt.SetPtr( k_ESteamNetworkingConfig_Callback_CreateConnectionSignaling, (void*)SteamNetCreateConnectionSignalingCallback);
@@ -746,34 +748,31 @@ private:
 
     void PollIncomingMessages()
     {
-        while ( !g_bQuit )
-        {
-            ISteamNetworkingMessage *pIncomingMsg = nullptr;
-            int numMsgs = m_pInterface->ReceiveMessagesOnConnection( m_hConnection, &pIncomingMsg, 1 );
-            if ( numMsgs == 0 )
-                break;
-            if ( numMsgs < 0 ) {
-                printf( "Error checking for messages (%d)\n", numMsgs);
-                break;
-            }
-
-            // Just echo anything we get from the server
-            printf("Received %x bytes\n", pIncomingMsg->m_cbSize);
-
-            if (id == 0xFFFFFFFF && pIncomingMsg->m_cbSize == sizeof(GNSInfoPacket)) {
-                GNSInfoPacket* pPkt = (GNSInfoPacket*)pIncomingMsg->m_pData;
-                id = pPkt->id;
-                printf("We are ID %x\n", id);
-
-                jkGuiMultiplayer_aEntries[0] = pPkt->entry;
-                
-                dplay_dword_55D618 = 1;
-                jkGuiMultiplayer_aEntries[0].field_E0 = 10;
-            }
-
-            // We don't need this anymore.
-            pIncomingMsg->Release();
+        ISteamNetworkingMessage *pIncomingMsg = nullptr;
+        int numMsgs = m_pInterface->ReceiveMessagesOnConnection( m_hConnection, &pIncomingMsg, 1 );
+        if ( numMsgs == 0 )
+            return;
+        if ( numMsgs < 0 ) {
+            printf( "Error checking for messages (%d)\n", numMsgs);
+            return;
         }
+
+        // Just echo anything we get from the server
+        printf("Received %x bytes (%x)\n", pIncomingMsg->m_cbSize, sizeof(GNSInfoPacket));
+
+        if (id == 0xFFFFFFFF && pIncomingMsg->m_cbSize == sizeof(GNSInfoPacket)) {
+            GNSInfoPacket* pPkt = (GNSInfoPacket*)pIncomingMsg->m_pData;
+            id = pPkt->id;
+            printf("We are ID %x\n", id);
+
+            jkGuiMultiplayer_aEntries[0] = pPkt->entry;
+            
+            dplay_dword_55D618 = 1;
+            jkGuiMultiplayer_aEntries[0].field_E0 = 10;
+        }
+
+        // We don't need this anymore.
+        pIncomingMsg->Release();
     }
 
     int TickBroadcastIn()
@@ -941,7 +940,7 @@ void sithDplay_GNS_Startup()
     Hack_ResetClients();
 
     addrServer.Clear();
-    addrServer.ParseString("192.168.2.2");
+    addrServer.ParseString("127.0.0.1");
     addrServer.m_port = DEFAULT_SERVER_PORT;
 
     // Create client and server sockets

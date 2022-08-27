@@ -877,7 +877,7 @@ parsing_script_idk 0x0054C854 int = 1
 dplay_dword_55D618 0x0055D618 int
 dplay_dword_55D61C 0x0055D61C int
 
-jkGui_guid_556040 0x00556040 GUID
+jkGui_guid_556040 0x00556040 GUID_idk
 jkGuiMultiplayer_numConnections 0x00865020 int
 jkGuiMultiplayer_aConnections 0x008620A0 sith_dplay_connection[32]
 jkGuiMultiplayer_aEntries 0x00863220 jkMultiEntry[32]

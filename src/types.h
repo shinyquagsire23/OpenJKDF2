@@ -45,6 +45,11 @@ extern "C" {
 #endif
 #endif
 
+typedef struct GUID_idk
+{
+    uint32_t a,b,c,d;
+} GUID_idk;
+
 #ifdef LINUX
 #define __stdcall
 #define __cdecl
@@ -92,7 +97,11 @@ typedef int16_t __int16;
 typedef int32_t __int32;
 typedef int64_t __int64;
 
-typedef uint32_t* GUID;
+typedef struct GUID
+{
+    uint32_t a,b,c,d;
+} GUID;
+
 typedef GUID* LPGUID;
 typedef int IUnknown;
 typedef uint16_t WPARAM;
@@ -2724,9 +2733,10 @@ typedef struct sith_dplay_connection
   int connectionSize;
 } sith_dplay_connection;
 
+#pragma pack(push, 4)
 typedef struct jkMultiEntry
 {
-    GUID guidInstance;
+    GUID_idk guidInstance;
     int maxPlayers;
     int numPlayers;
     wchar_t serverName[32];
@@ -2740,6 +2750,7 @@ typedef struct jkMultiEntry
     int field_E8;
     int maxRank;
 } jkMultiEntry;
+#pragma pack(pop)
 
 typedef struct jkMultiEntry2
 {

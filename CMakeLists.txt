@@ -76,6 +76,7 @@ if(PLAT_LINUX_32)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
 
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)
@@ -100,6 +101,7 @@ elseif(PLAT_LINUX_64)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
 
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)
@@ -169,6 +171,7 @@ elseif(PLAT_MINGW_X86_64)
     add_definitions(-DWIN32)
     add_definitions(-DWIN64_MINGW)
 
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
@@ -181,7 +184,7 @@ elseif(PLAT_MINGW_X86_64)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
     
     add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
-    add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS)
+    add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS -static -pthread)
 
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/include)
@@ -190,6 +193,7 @@ elseif(PLAT_MINGW_X86_64)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/SDL2/x86_64-w64-mingw32/include/SDL2)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/include)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
 
 elseif(PLAT_WASM)
     message( STATUS "Targeting Emscripten WASM" )
@@ -333,7 +337,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
 
     add_definitions(-DPLATFORM_GNS)
 
-    add_subdirectory(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets)
+
 endif()
 
 if(TARGET_USE_BASICSOCKETS)
@@ -481,7 +485,11 @@ if(TARGET_MACOS)
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 
 if(TARGET_USE_GAMENETWORKINGSOCKETS)
-    target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::static)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
+    target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_gns/bin" GameNetworkingSockets)
+    target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_protobuf/" protobuf)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(${BIN_NAME} PUBLIC OpenSSL::Crypto)
 endif()
 
 endif()
@@ -522,8 +530,6 @@ if(PLAT_MINGW_X86_64)
     find_package(Threads REQUIRED)
     target_link_libraries(${BIN_NAME} PRIVATE -static)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-    target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
-
     
     target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/" freeglut)
     target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/glew/lib/Release/x64" opengl32 glew32)
@@ -537,13 +543,22 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE -mwindows -Wl,--subsystem,windows ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/libs/Win64/OpenAL32.lib)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libogg-0.dll ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbis-0.dll ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${CMAKE_CURRENT_BINARY_DIR}/OpenAL32.dll)
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/*.dll ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET ${BIN_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR})
+    target_link_libraries(${BIN_NAME} PRIVATE "-Lbuild_gns/src/" GameNetworkingSockets.dll)
+    #target_link_libraries(${BIN_NAME} PRIVATE "-Wl,-Bstatic -pthread -Wl,-Bdynamic")
+    target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
+
+    add_custom_command(TARGET ${BIN_NAME}
+    POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libogg-0.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbis-0.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/bin/libvorbisfile-3.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${CMAKE_CURRENT_BINARY_DIR}/OpenAL32.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/*.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
+    )
 elseif(PLAT_HOOKS)
     target_link_libraries(${BIN_NAME} PRIVATE -static-libgcc)
     target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
@@ -583,7 +598,12 @@ elseif(PLAT_MSVC)
 	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
 	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
 	)
+    #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libgcc_s_seh-1.dll .
+    #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
+    #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libstdc++-6.dll . 
 else()
     set(LIBPNG_LIST ${LIBPNG_LIBRARY_DIRS})
     separate_arguments(LIBPNG_LIST)
@@ -593,6 +613,7 @@ else()
 
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW ${LIBPNG_LIST}/libpng.a ${ZLIB_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    #target_link_libraries(${BIN_NAME} PRIVATE 3rdparty/protobuf/libprotobufd.a)
 endif()
 
 if(TARGET_MACOS)
@@ -612,6 +633,11 @@ if(TARGET_MACOS)
     COMMAND cp ${HOMEBREW_PREFIX}/opt/sdl2/lib/libSDL2-2.0.0.dylib ${BUNDLE}/Contents/MacOS
     COMMAND cp ${HOMEBREW_PREFIX}/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib ${BUNDLE}/Contents/MacOS
     COMMAND cp ${HOMEBREW_PREFIX}/opt/glew/lib/libGLEW.2.2.dylib ${BUNDLE}/Contents/MacOS
+    
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.3.21.4.0.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND install_name_tool -change @rpath/libGameNetworkingSockets.dylib @executable_path/libGameNetworkingSockets.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
+    COMMAND install_name_tool -change @rpath/libprotobuf.3.21.4.0.dylib @executable_path/libprotobuf.3.21.4.0.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/sdl2/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib @executable_path/libSDL2_mixer-2.0.0.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib

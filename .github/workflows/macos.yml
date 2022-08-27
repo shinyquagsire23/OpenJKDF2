@@ -22,4 +22,4 @@ jobs:
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
           brew install openssl@1.1 protobuf
     - name: cmake
-      run: export HOMEBREW_PREFIX="/usr/local" && export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/opt/openssl/lib/pkgconfig && mkdir -p build_darwin64 && cd build_darwin64 && cmake .. && make
+      run: export HOMEBREW_PREFIX="/usr/local" && chmod +x ./.github/build_macos.sh && ./.github/build_macos.sh

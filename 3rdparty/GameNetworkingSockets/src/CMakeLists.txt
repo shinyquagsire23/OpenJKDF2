@@ -170,9 +170,8 @@ protobuf_generate_cpp(GNS_COMMON_PROTO_SRCS GNS_COMMON_PROTO_HDRS ${GNS_COMMON_P
 protobuf_generate_cpp(GNS_CLIENTLIB_PROTO_SRCS GNS_CLIENTLIB_PROTO_HDRS ${GNS_CLIENTLIB_PROTOS})
 
 function(gns_set_target_protobuf_properties TGT )
-	target_link_libraries(${TGT} PUBLIC
-		protobuf::libprotobuf
-		Threads::Threads
+	target_link_libraries(${TGT} PRIVATE
+		protobuf
 		)
 endfunction()
 
@@ -234,8 +233,16 @@ macro(set_clientlib_target_properties GNS_TARGET)
 		${CMAKE_CURRENT_BINARY_DIR}
 		)
 
+	target_include_directories(${GNS_TARGET} PRIVATE
+		${Protobuf_INCLUDE_DIRS}
+	)
+	target_link_libraries(${GNS_TARGET} PRIVATE ${Protobuf_LIBRARIES})
+
 	gns_set_target_protobuf_properties(${GNS_TARGET})
 	gns_set_target_crypto_properties(${GNS_TARGET})
+
+	file(GLOB I_HATE_PROTOBUF ${Protobuf_LIBRARIES_PATH}/libabsl*.a)
+	target_link_libraries(${GNS_TARGET} PRIVATE ${I_HATE_PROTOBUF})
 
 	target_compile_definitions(${GNS_TARGET} PRIVATE
 		STEAMNETWORKINGSOCKETS_FOREXPORT )
@@ -314,6 +321,7 @@ macro(set_clientlib_target_properties GNS_TARGET)
 		if(USE_CRYPTO STREQUAL "BCrypt")
 			target_link_libraries(${GNS_TARGET} PUBLIC bcrypt)
 		endif()
+
 	else()
 		message(FATAL_ERROR "Could not identify your target operating system")
 	endif()

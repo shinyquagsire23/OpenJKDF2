@@ -19,6 +19,8 @@ lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libvorbisfile.3.dyli
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libFLAC.8.dylib OpenJKDF2.app/Contents/MacOS/libFLAC.8.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libFLAC.8.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libogg.0.dylib OpenJKDF2.app/Contents/MacOS/libogg.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libogg.0.dylib
 
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libGameNetworkingSockets.dylib OpenJKDF2.app/Contents/MacOS/libGameNetworkingSockets.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libGameNetworkingSockets.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib OpenJKDF2.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib
 
 chmod 774 OpenJKDF2_universal.app/Contents/MacOS/openjkdf2-64
 chmod 774 OpenJKDF2_universal.app/Contents/MacOS/*.dylib
