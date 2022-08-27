@@ -1486,7 +1486,7 @@ int jkGuiRend_DrawClickableAndUpdatebool(jkGuiElement *element, jkGuiMenu *menu,
     return 0;
 }
 
-int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, HWND lParam, LRESULT * unused)
+int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LRESULT * unused)
 {
     int ret;
     jkGuiElement *v8; // eax

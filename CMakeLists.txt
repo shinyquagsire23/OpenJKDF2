@@ -505,6 +505,8 @@ if(TARGET_LINUX)
     include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
     link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
+
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
 endif()
 
 if(NOT OPENJKDF2_NO_ASAN)

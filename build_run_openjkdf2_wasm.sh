@@ -7,7 +7,9 @@
 
 rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc
-cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake && make -j10 VERBOSE=1
+cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
+cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
+make -j10 VERBOSE=1
 cd ..
 
 cp build_emcc/openjkdf2.js wasm_out/openjkdf2.js
@@ -19,8 +21,8 @@ gsed -i 's/var hasByteServing/var hasByteServing = false;\/\//g' wasm_out/openjk
 # Update maxthomas.dev/openjkdf2, if you're me
 whodis=$(whoami)
 if [ "$whodis"  = 'maxamillion' ]; then
-    cp wasm_out/openjkdf2.wasm ../shinyquagsire23.github.io/openjkdf2
-    cp wasm_out/index.html ../shinyquagsire23.github.io/openjkdf2
-    cp wasm_out/openjkdf2.data ../shinyquagsire23.github.io/openjkdf2
-    cp wasm_out/openjkdf2.js ../shinyquagsire23.github.io/openjkdf2
+    #cp wasm_out/openjkdf2.wasm ../shinyquagsire23.github.io/openjkdf2
+    #cp wasm_out/index.html ../shinyquagsire23.github.io/openjkdf2
+    #cp wasm_out/openjkdf2.data ../shinyquagsire23.github.io/openjkdf2
+    #cp wasm_out/openjkdf2.js ../shinyquagsire23.github.io/openjkdf2
 fi

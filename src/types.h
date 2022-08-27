@@ -1347,7 +1347,7 @@ typedef int (*rdMaterialUnloader_t)(rdMaterial*);
 typedef rdMaterial* (*rdMaterialLoader_t)(const char*, int, int);
 
 typedef int (*WindowDrawHandler_t)(uint32_t);
-typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, HWND, LRESULT *);
+typedef int (*WindowHandler_t)(HWND, UINT, WPARAM, LPARAM, LRESULT *);
 
 typedef struct wm_handler
 {

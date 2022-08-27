@@ -326,7 +326,7 @@ int jkCutscene_PauseShow(int unk)
     return result;
 }
 
-int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5)
+int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 {
     wchar_t *v5; // eax
 
