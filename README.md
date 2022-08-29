@@ -104,9 +104,6 @@ See [here](BUILDING.md) for instructions.
 ## TL;DR: What Isn't Implemented, Yet
  - Joystick menu in Setup > Controls (input bindings are still loaded and written to config, though)
  - Load Configuration and Save Configuration in Setup > Controls > Options
- - Multiplayer menu and all submenus
-   - Multiplayer tally screen
-   - Multiplayer character builder
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
  - In-game screenshots
 
