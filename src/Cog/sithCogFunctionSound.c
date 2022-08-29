@@ -292,19 +292,19 @@ void sithCogFunctionSound_LoadSound(sithCog *ctx)
 
 void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
 {
-    sithSoundClass *soundclass;
+    sithPlayingSound *pPlayingSound;
 
     int soundClassId = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->soundclass && (soundclass = sithSoundClass_ThingPlaySoundclass(thing, soundClassId)) != 0 )
+    if ( thing && thing->soundclass && (pPlayingSound = sithSoundClass_ThingPlaySoundclass(thing, soundClassId)) != 0 )
     {
-        sithCogVm_PushInt(ctx, (intptr_t)soundclass->entries[14]);
+        sithCogVm_PushInt(ctx, pPlayingSound->refid);
         if (sithCogVm_multiplayerFlags
             && !(ctx->flags & 0x200))
         {
             if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithDSSThing_SoundClassPlay(thing, soundClassId, (intptr_t)soundclass->entries[14], -1.0);
+                sithDSSThing_SoundClassPlay(thing, soundClassId, pPlayingSound->refid, -1.0);
         }
     }
     else

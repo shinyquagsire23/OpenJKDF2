@@ -340,7 +340,7 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     }
 }
 
-sithSoundClass* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
 {
     sithSoundClass *v3; // eax
     sithSoundClassEntry *v4; // esi
@@ -373,8 +373,7 @@ sithSoundClass* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id,
                         while ( v7 );
                     }
                 }
-                sithSoundClass_ThingPlaySoundclass2(thing, v4, 1.0);
-                return v3;
+                return sithSoundClass_ThingPlaySoundclass2(thing, v4, 1.0);
             }
         }
     }
@@ -413,7 +412,6 @@ void sithSoundClass_Free2(sithWorld *world)
 {
     sithSoundClass *v2; // esi
     sithSoundClassEntry **v3; // edi
-    int v4; // ebx
     sithSoundClassEntry *v5; // eax
     sithSoundClassEntry *v6; // esi
     int v8; // [esp+8h] [ebp-4h]
@@ -425,8 +423,7 @@ void sithSoundClass_Free2(sithWorld *world)
             v2 = &world->soundclasses[v8];
             stdHashTable_FreeKey(sithSoundClass_hashtable, v2->snd_fname);
             v3 = v2->entries;
-            v4 = 96;
-            do
+            for (int i = 0; i < 96; i++)
             {
                 v5 = *v3;
                 if ( *v3 )
@@ -441,9 +438,7 @@ void sithSoundClass_Free2(sithWorld *world)
                     while ( v6 );
                 }
                 ++v3;
-                --v4;
             }
-            while ( v4 );
         }
         pSithHS->free(world->soundclasses);
         world->soundclasses = 0;
@@ -452,7 +447,7 @@ void sithSoundClass_Free2(sithWorld *world)
     }
 }
 
-sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2)
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2)
 {
     sithSoundClass *v2; // eax
     sithSoundClassEntry *v3; // esi
@@ -474,43 +469,36 @@ sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2
                     for ( ; v5; v5-- )
                         v3 = v3->nextSound;
                 }
-                sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
-                return v2;
+                return sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
             }
         }
     }
-    return 0;
+    return NULL;
 }
 
-void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3)
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3)
 {
-    int v5; // eax
-    float a3a; // [esp+1Ch] [ebp+Ch]
+    sithSound* pSithSound = entry->sound;
+    if ( !entry->sound )
+        return 0;
 
-    if ( entry->sound )
+    if ( (entry->playflags & SITHSOUNDFLAG_400) != 0 )
     {
-        a3a = entry->maxVolume * a3;
-        if ( (entry->playflags & 0x400) != 0 )
-        {
-            v5 = sithSoundSys_GetThingSoundIdx(0, entry->sound);
-        }
-        else
-        {
-            if ( (entry->playflags & 0x800) == 0 )
-            {
-LABEL_7:
-                if ( (entry->playflags & 0x40) != 0 )
-                    sithSoundSys_PlaySoundPosAbsolute(entry->sound, &thing->position, thing->sector, a3a, entry->minRadius, entry->maxRadius, entry->playflags);
-                else
-                    sithSoundSys_PlaySoundPosThing(entry->sound, thing, a3a, entry->minRadius, entry->maxRadius, entry->playflags);
-                return;
-            }
-            v5 = sithSoundSys_GetThingSoundIdx(thing, entry->sound);
-        }
-        if ( v5 >= 0 )
-            return;
-        goto LABEL_7;
+        if ( sithSoundSys_GetThingSoundIdx(0, pSithSound) >= 0 )
+            return 0;
     }
+    else
+    {
+        if (entry->playflags & SITHSOUNDFLAG_800) {
+            if ( sithSoundSys_GetThingSoundIdx(thing, pSithSound) >= 0 )
+                return 0;
+        }
+    }
+    
+    if ( (entry->playflags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
+        return sithSoundSys_PlaySoundPosAbsolute(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+    else
+        return sithSoundSys_PlaySoundPosThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
 }
 
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)

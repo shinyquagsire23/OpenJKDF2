@@ -22,7 +22,7 @@ cd ..
 
 mkdir -p build_gns && cd build_gns
 GNS_BUILD=$(pwd)
-cmake --toolchain $GNS_BUILD/../../cmake_modules/mingw_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DProtobuf_USE_STATIC_LIBS=ON -DProtobuf_LIBRARIES="-L$GNS_BUILD/../build_protobuf/lib" -DProtobuf_LIBRARIES_PATH="$GNS_BUILD/../build_protobuf/lib" -DProtobuf_INCLUDE_DIRS=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_PROTOC_EXECUTABLE=$GNS_BUILD/../build_protoc/protoc -D USE_CRYPTO="BCrypt" $GNS_BUILD/../../3rdparty/GameNetworkingSockets
+cmake --toolchain $GNS_BUILD/../../cmake_modules/mingw_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DProtobuf_USE_STATIC_LIBS=ON -DProtobuf_LIBRARIES="-L$GNS_BUILD/../build_protobuf/lib" -DProtobuf_LIBRARIES_PATH="$GNS_BUILD/../build_protobuf/lib" -DProtobuf_INCLUDE_DIRS=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR2=$GNS_BUILD/../../3rdparty/protobuf/third_party/abseil-cpp -DProtobuf_PROTOC_EXECUTABLE=$GNS_BUILD/../build_protoc/protoc -D USE_CRYPTO="BCrypt" $GNS_BUILD/../../3rdparty/GameNetworkingSockets
 make -j10
 cd ..
 # End ughhhh

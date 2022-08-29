@@ -145,13 +145,13 @@ int sithSoundClass_Load(sithWorld *world, int a2);
 sithSoundClass* sithSoundClass_LoadFile(char *fpath);
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
 void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundclass_id);
-sithSoundClass* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3);
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id);
 void sithSoundClass_Free2(sithWorld *world);
 
-sithSoundClass* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2);
-void sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3);
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2);
+sithPlayingSound* sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3);
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound);
 int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass);
 

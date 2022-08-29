@@ -334,7 +334,7 @@ void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4
 
 int sithDSSThing_HandleSoundClassPlay(sithCogMsg *msg)
 {
-    sithSoundClass *v6; // eax
+    sithPlayingSound *v6; // eax
 
     NETMSG_IN_START(msg);
 
@@ -351,7 +351,7 @@ int sithDSSThing_HandleSoundClassPlay(sithCogMsg *msg)
     else
         v6 = sithSoundClass_ThingPlaySoundclass(pThing, idk);
     if ( v6 )
-        v6->entries[14] = (sithSoundClassEntry*)v4; // TODO wat??
+        v6->refid = v4;
     return 1;
 }
 

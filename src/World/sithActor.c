@@ -63,7 +63,7 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
     int v12; // eax
     int jumpSound; // edi
     int v14; // eax
-    sithSoundClass *v15; // eax
+    sithPlayingSound *v15; // eax
 
     if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
     {
@@ -123,7 +123,7 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
             }
             v15 = sithSoundClass_ThingPlaySoundclass(thing, jumpSound);
             if ( v15 && sithCogVm_multiplayerFlags )
-                sithDSSThing_SoundClassPlay(thing, jumpSound, (int)v15->entries[14], -1.0);
+                sithDSSThing_SoundClassPlay(thing, jumpSound, v15->refid, -1.0);
             sithThing_DetachThing(thing);
         }
         if ( sithCogVm_multiplayerFlags )
