@@ -38,7 +38,7 @@ for i in range(0, num_files-1):
     f_out = open(full_path, "wb")
     f.seek(f_offs)
     contents = f.read(f_size)
-    if contents[-1] == 0x1a:
+    if len(contents) > 0 and contents[-1] == 0x1a:
         contents = contents[:-1]
     f_out.write(contents)
     f_out.close()
