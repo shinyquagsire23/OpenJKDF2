@@ -23,7 +23,7 @@
 
 static int jkGuiNetHost_aIdk[2] = {0xd, 0xe};
 
-static jkGuiElement jkGuiNetHost_aElements[26] =
+static jkGuiElement jkGuiNetHost_aElements[28] =
 {
     { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 410, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 6, "GUI_MULTIPLAYER", 3, { 20, 20, 600, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -50,6 +50,11 @@ static jkGuiElement jkGuiNetHost_aElements[26] =
     { ELEMENT_TEXTBUTTON, 200, 2, "GUI_ADVANCED", 3, { 220, 430, 200, 40 }, 1, 0, "GUI_ADVANCED_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 420, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 20, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#ifdef QOL_IMPROVEMENTS
+    { ELEMENT_TEXT, 0, 0, L"Server Port:", 2, { 540, 80, 90, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX, 0, 0, NULL, 16, { 540, 125, 90, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    
+#endif
     { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
 
@@ -78,6 +83,10 @@ static int jkGuiNetHost_bInitted;
 static wchar_t jkGuiNetHost_waIdk[32];
 static Darray jkGuiNetHost_dArray1;
 static Darray jkGuiNetHost_dArray2;
+
+// Added
+wchar_t jkGuiNetHost_portText[32];
+int jkGuiNetHost_portNum = 27020;
 
 #define LONG_MAX ((long)(~0UL>>1))
 #define LONG_MIN (~LONG_MAX)
@@ -172,6 +181,13 @@ void jkGuiNetHost_Initialize()
 #ifndef ARCH_WASM
     wuRegistry_GetBytes("gameName", jkGuiNetHost_gameName, 0x40u);
 #endif
+
+#ifdef QOL_IMPROVEMENTS
+    jk_snwprintf(jkGuiNetHost_portText, 0x100, L"%d", jkGuiNetHost_portNum);
+    jkGuiNetHost_aElements[26].wstr = jkGuiNetHost_portText;
+    jkGuiNetHost_aElements[26].selectedTextEntry = 31;
+#endif
+
     jkGuiNetHost_bInitted = 1;
 }
 
@@ -247,6 +263,11 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     //a2[0] = (unsigned int)jkGuiNetHost_timeLimit; wat??
     jkGuiNetHost_aElements[7].wstr = v27;
     jkGuiNetHost_aElements[7].selectedTextEntry = 4;
+#ifdef QOL_IMPROVEMENTS
+    jk_snwprintf(jkGuiNetHost_portText, 0x20u, L"%d", jkGuiNetHost_portNum);
+    jkGuiNetHost_aElements[26].wstr = jkGuiNetHost_portText;
+    jkGuiNetHost_aElements[26].selectedTextEntry = 31;
+#endif
     jk_snwprintf(v26, 0x20u, L"%d", (unsigned int)(__int64)((double)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
     jkGuiNetHost_aElements[9].wstr = v26;
     jkGuiNetHost_aElements[9].selectedTextEntry = 4;
@@ -370,6 +391,20 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             pMultiEntry->tickRateMs = v16;
             pMultiEntry->sessionFlags = v17;
             jkGuiNetHost_gameFlags = v18;
+#ifdef QOL_IMPROVEMENTS
+            if ( msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10) < 1 )
+            {
+                jkGuiNetHost_portNum = 1;
+            }
+            else if ( msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10) > 65535 )
+            {
+                jkGuiNetHost_portNum = 65535;
+            }
+            else
+            {
+                jkGuiNetHost_portNum = msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10);
+            }
+#endif
         }
         else if ( v4 == 200 )
         {

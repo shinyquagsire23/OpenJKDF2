@@ -906,7 +906,7 @@ const uint16 DEFAULT_SERVER_PORT = 27020;
 extern "C"
 {
 
-int nPort = DEFAULT_SERVER_PORT;
+extern int jkGuiNetHost_portNum;
 SteamNetworkingIPAddr addrServer;
 GNSClient client;
 GNSServer server;
@@ -1107,7 +1107,7 @@ int DirectPlay_OpenIdk(jkMultiEntry* pEntry)
 {
     sithDplayGNS_storedEntry = *pEntry;
     sithDplay_dword_8321E4 = 1;
-    server.Init(nPort);
+    server.Init(jkGuiNetHost_portNum);
     return 0;
 }
 
