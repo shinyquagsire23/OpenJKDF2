@@ -19,6 +19,8 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sith.h"
 
+static wchar_t sithMulti_chatWStrTmp[256]; // Added
+
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
 {
     sithMulti_handlerIdk = a1;
@@ -46,7 +48,8 @@ void sithMulti_SendChat(char *pStr, int arg0, int arg1)
 
 int sithMulti_HandleChat(sithCogMsg *msg)
 {
-    char v5[132];
+    // Added: 132 -> 256
+    char v5[256];
 
     NETMSG_IN_START(msg);
 
@@ -59,12 +62,14 @@ int sithMulti_HandleChat(sithCogMsg *msg)
     NETMSG_POPSTR(v5, arg2);
     v5[arg2 + 1] = 0;
 
+    printf("Handle chat %s\n", v5);
+
     if ( arg1 < 0 )
-        _sprintf(std_genBuffer, "%s", v5);
+        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s", v5); // Added: char -> wchar
     else
-        _sprintf(std_genBuffer, "%S says '%s'", jkPlayer_playerInfos[arg1].player_name, v5);
+        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s says '%S'", jkPlayer_playerInfos[arg1].player_name, v5); // Added: char -> wchar
     DebugConsole_AlertSound();
-    DebugConsole_Print(std_genBuffer);
+    DebugConsole_PrintUniStr(sithMulti_chatWStrTmp); // Added: char -> wchar
     return 1;
 }
 

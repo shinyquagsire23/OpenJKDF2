@@ -220,11 +220,7 @@ public:
         Printf( "Closing connections...\n" );
         for ( auto it: m_mapClients )
         {
-            // Send them one more goodbye message.  Note that we also have the
-            // connection close reason as a place to send final data.  However,
-            // that's usually best left for more diagnostic/debug text not actual
-            // protocol strings.
-            SendStringToClient( it.first, "Server is shutting down.  Goodbye." );
+            // TODO: Send a proper shutdown message
 
             // Close the connection.  We use "linger mode" to ask SteamNetworkingSockets
             // to flush this out and close gracefully.
@@ -738,7 +734,7 @@ public:
 
     void GetServerInfo( const SteamNetworkingIPAddr &serverAddr )
     {
-        int attempts = 100;
+        int attempts = 10;
         id = 0xFFFFFFFF;
         m_closed = 0;
         
@@ -751,7 +747,7 @@ public:
             }
             Shutdown();
             attempts--;
-            sleep_ms(10);
+            sleep_ms(100);
         }
         
     }

@@ -90,15 +90,11 @@ void DebugConsole_Close()
 
 void DebugConsole_Print(char *str)
 {
-#ifdef PLATFORM_POSIX
-    printf("%s\n", str);
-    return;
-#endif
     if ( DebugGui_fnPrint )
     {
         // TODO TODO regression
-        //DebugGui_fnPrint(str);
-        jk_printf("%s\n", str);
+        DebugGui_fnPrint(str);
+        //jk_printf("%s\n", str);
     }
     else
     {
