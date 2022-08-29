@@ -482,14 +482,14 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoun
     if ( !entry->sound )
         return 0;
 
-    if ( (entry->playflags & SITHSOUNDFLAG_400) != 0 )
+    if ( (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_ABOLUTE) != 0 )
     {
         if ( sithSoundSys_GetThingSoundIdx(0, pSithSound) >= 0 )
             return 0;
     }
     else
     {
-        if (entry->playflags & SITHSOUNDFLAG_800) {
+        if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_THING) {
             if ( sithSoundSys_GetThingSoundIdx(thing, pSithSound) >= 0 )
                 return 0;
         }
