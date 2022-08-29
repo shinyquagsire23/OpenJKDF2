@@ -62,8 +62,6 @@ int sithMulti_HandleChat(sithCogMsg *msg)
     NETMSG_POPSTR(v5, arg2);
     v5[arg2 + 1] = 0;
 
-    printf("Handle chat %s\n", v5);
-
     if ( arg1 < 0 )
         jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s", v5); // Added: char -> wchar
     else
