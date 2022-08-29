@@ -1,6 +1,10 @@
 #!/bin/sh
 
-prefix=/opt/local/x86_64-w64-mingw32
+# Get the canonical path of the folder containing this script
+bindir=$(cd -P -- "$(dirname -- "$0")" && printf '%s\n' "$(pwd -P)")
+
+# Calculate the canonical path of the prefix, relative to the folder of this script
+prefix=$(cd -P -- "$bindir/.." && printf '%s\n' "$(pwd -P)")
 exec_prefix=${prefix}
 exec_prefix_set=no
 libdir=${exec_prefix}/lib
@@ -39,7 +43,7 @@ while test $# -gt 0; do
       echo $exec_prefix
       ;;
     --version)
-      echo 2.0.16
+      echo 2.24.0
       ;;
     --cflags)
       echo -I${prefix}/include/SDL2  -Dmain=SDL_main
@@ -49,7 +53,8 @@ while test $# -gt 0; do
       ;;
     --static-libs)
 #    --libs|--static-libs)
-      echo -L${exec_prefix}/lib -lmingw32 -lSDL2main -lSDL2 -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+      sdl_static_libs=$(echo "-lmingw32 -lSDL2main -lSDL2 -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid" | sed -E "s#-lSDL2[ $]#$libdir/libSDL2.a #g")
+      echo -L${exec_prefix}/lib $sdl_static_libs
       ;;
     *)
       echo "${usage}" 1>&2

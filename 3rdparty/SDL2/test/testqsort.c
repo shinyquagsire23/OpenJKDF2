@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -12,7 +12,7 @@
 
 #include "SDL_test.h"
 
-static int
+static int SDLCALL
 num_compare(const void *_a, const void *_b)
 {
     const int a = *((const int *) _a);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -16,6 +16,8 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
+
+#include "testutils.h"
 
 static SDL_AudioSpec spec;
 static Uint8 *sound = NULL;     /* Pointer to wave data */
@@ -180,18 +182,18 @@ main(int argc, char **argv)
     if (devcount < 1) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Don't see any specific audio devices!\n");
     } else {
-        if (argv[1] == NULL) {
-            argv[1] = "sample.wav";
-        }
+        char *file = GetResourceFilename(argc > 1 ? argv[1] : NULL, "sample.wav");
 
         /* Load the wave file into memory */
-        if (SDL_LoadWAV(argv[1], &spec, &sound, &soundlen) == NULL) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't load %s: %s\n", argv[1],
+        if (SDL_LoadWAV(file, &spec, &sound, &soundlen) == NULL) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't load %s: %s\n", file,
                     SDL_GetError());
         } else {
             test_multi_audio(devcount);
             SDL_FreeWAV(sound);
         }
+
+        SDL_free(file);
     }
 
     SDL_Quit();

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -190,7 +190,8 @@ loop(void)
                     case SDLK_i: {
                         for (i = 0; i < SDL_GetNumTouchDevices(); ++i) {
                             const SDL_TouchID id = SDL_GetTouchDevice(i);
-                            SDL_Log("Fingers Down on device %"SDL_PRIs64": %d", id, SDL_GetNumTouchFingers(id));
+                            const char *name = SDL_GetTouchName(i);
+                            SDL_Log("Fingers Down on device %"SDL_PRIs64" (%s): %d", id, name, SDL_GetNumTouchFingers(id));
                         }
                         break;
                     }
@@ -215,7 +216,7 @@ loop(void)
 
 #if VERBOSE
             case SDL_FINGERMOTION:
-                SDL_Log("Finger: %"SDL_PRIs64",x: %f, y: %f",event.tfinger.fingerId,
+                SDL_Log("Finger: %"SDL_PRIs64", x: %f, y: %f",event.tfinger.fingerId,
                         event.tfinger.x,event.tfinger.y);
                 break;
 

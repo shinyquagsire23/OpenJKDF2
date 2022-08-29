@@ -23,8 +23,8 @@ dependency_libs=' -L/opt/local/x86_64-w64-mingw32/lib -lmingw32 /opt/local/x86_6
 weak_library_names=''
 
 # Version information for libSDL2_mixer.
-current=2
-age=2
+current=600
+age=600
 revision=2
 
 # Is this an already installed library?
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/valve/release/SDL_mixer/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib'
+libdir='/Users/valve/release/SDL_mixer/SDL2_mixer-2.6.2/x86_64-w64-mingw32/lib'

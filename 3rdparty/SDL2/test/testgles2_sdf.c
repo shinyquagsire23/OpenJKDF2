@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -163,11 +163,10 @@ process_shader(GLuint *shader, const char * source, GLint shader_type)
 }
 
 /* Notes on a_angle:
-   * It is a vector containing sin and cos for rotation matrix
-   * To get correct rotation for most cases when a_angle is disabled cos
-     value is decremented by 1.0 to get proper output with 0.0 which is
-     default value
-*/
+ * It is a vector containing sine and cosine for rotation matrix
+ * To get correct rotation for most cases when a_angle is disabled cosine
+ * value is decremented by 1.0 to get proper output with 0.0 which is default value
+ */
 static const Uint8 GLES2_VertexSrc_Default_[] = " \
     uniform mat4 u_projection; \
     attribute vec2 a_position; \
@@ -459,6 +458,7 @@ main(int argc, char *argv[])
     Uint32 then, now;
     int status;
     shader_data *data;
+    char *path = NULL;
 
     /* Initialize parameters */
     fsaa = 0;
@@ -562,14 +562,25 @@ main(int argc, char *argv[])
 
         /* Load SDF BMP image */
 #if 1
-        tmp = SDL_LoadBMP(f);
-        if  (tmp == NULL) {
-            SDL_Log("missing image file: %s", f);
+        path = GetNearbyFilename(f);
+
+        if (path == NULL)
+            path = SDL_strdup(f);
+
+        if (path == NULL) {
+            SDL_Log("out of memory\n");
             exit(-1);
-        } else {
-            SDL_Log("Load image file: %s", f);
         }
 
+        tmp = SDL_LoadBMP(path);
+        if  (tmp == NULL) {
+            SDL_Log("missing image file: %s", path);
+            exit(-1);
+        } else {
+            SDL_Log("Load image file: %s", path);
+        }
+
+        SDL_free(path);
 #else
         /* Generate SDF image using SDL_ttf */
 

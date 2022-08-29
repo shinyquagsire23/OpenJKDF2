@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "SDL.h"
+#include "testutils.h"
 
 #ifndef SDL_JOYSTICK_DISABLED
 
@@ -119,7 +120,7 @@ static int s_arrBindingOrder[] = {
     SDL_CONTROLLER_BUTTON_PADDLE2,
     SDL_CONTROLLER_BUTTON_PADDLE3,
     SDL_CONTROLLER_BUTTON_PADDLE4,
-    -1,
+    SDL_CONTROLLER_BUTTON_TOUCHPAD,
 };
 SDL_COMPILE_TIME_ASSERT(s_arrBindingOrder, SDL_arraysize(s_arrBindingOrder) == BINDING_COUNT);
 
@@ -167,39 +168,7 @@ static SDL_bool s_bBindingComplete;
 static SDL_Window *window;
 static SDL_Renderer *screen;
 static SDL_bool done = SDL_FALSE;
-
-SDL_Texture *
-LoadTexture(SDL_Renderer *renderer, const char *file, SDL_bool transparent)
-{
-    SDL_Surface *temp;
-    SDL_Texture *texture;
-
-    /* Load the sprite image */
-    temp = SDL_LoadBMP(file);
-    if (temp == NULL) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't load %s: %s", file, SDL_GetError());
-        return NULL;
-    }
-
-    /* Set transparent pixel as the pixel at (0,0) */
-    if (transparent) {
-        if (temp->format->palette) {
-            SDL_SetColorKey(temp, SDL_TRUE, *(Uint8 *) temp->pixels);
-        }
-    }
-
-    /* Create textures from the image */
-    texture = SDL_CreateTextureFromSurface(renderer, temp);
-    if (!texture) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture: %s\n", SDL_GetError());
-        SDL_FreeSurface(temp);
-        return NULL;
-    }
-    SDL_FreeSurface(temp);
-
-    /* We're ready to roll. :) */
-    return texture;
-}
+static SDL_bool bind_touchpad = SDL_FALSE;
 
 static int
 StandardizeAxisValue(int nValue)
@@ -229,6 +198,13 @@ SetCurrentBinding(int iBinding)
     }
 
     if (s_arrBindingOrder[iBinding] == -1)
+    {
+        SetCurrentBinding(iBinding + 1);
+        return;
+    }
+
+    if (s_arrBindingOrder[iBinding] == SDL_CONTROLLER_BUTTON_TOUCHPAD &&
+        !bind_touchpad)
     {
         SetCurrentBinding(iBinding + 1);
         return;
@@ -384,10 +360,10 @@ WatchJoystick(SDL_Joystick * joystick)
     Uint32 alpha_ticks = 0;
     SDL_JoystickID nJoystickID;
 
-    background_front = LoadTexture(screen, "controllermap.bmp", SDL_FALSE);
-    background_back = LoadTexture(screen, "controllermap_back.bmp", SDL_FALSE);
-    button = LoadTexture(screen, "button.bmp", SDL_TRUE);
-    axis = LoadTexture(screen, "axis.bmp", SDL_TRUE);
+    background_front = LoadTexture(screen, "controllermap.bmp", SDL_FALSE, NULL, NULL);
+    background_back = LoadTexture(screen, "controllermap_back.bmp", SDL_FALSE, NULL, NULL);
+    button = LoadTexture(screen, "button.bmp", SDL_TRUE, NULL, NULL);
+    axis = LoadTexture(screen, "axis.bmp", SDL_TRUE, NULL, NULL);
     SDL_RaiseWindow(window);
 
     /* scale for platforms that don't give you the window size you asked for. */
@@ -562,7 +538,7 @@ WatchJoystick(SDL_Joystick * joystick)
                 if ((event.key.keysym.sym != SDLK_ESCAPE)) {
                     break;
                 }
-                /* Fall through to signal quit */
+                SDL_FALLTHROUGH;
             case SDL_QUIT:
                 done = SDL_TRUE;
                 break;
@@ -731,6 +707,10 @@ main(int argc, char *argv[])
         exit(1);
     }
 
+    if (argv[1] && SDL_strcmp(argv[1], "--bind-touchpad") == 0) {
+        bind_touchpad = SDL_TRUE;
+    }
+
     /* Create a window to display joystick axis position */
     window = SDL_CreateWindow("Game Controller Map", SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
@@ -755,7 +735,7 @@ main(int argc, char *argv[])
                 if ((event.key.keysym.sym != SDLK_ESCAPE)) {
                     break;
                 }
-                /* Fall through to signal quit */
+                SDL_FALLTHROUGH;
             case SDL_QUIT:
                 done = SDL_TRUE;
                 break;

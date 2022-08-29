@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,8 +24,12 @@
 #endif
 
 #include "SDL.h"
+#include "SDL_test_font.h"
 
-int done;
+static SDL_Window *window;
+static SDL_Renderer *renderer;
+static SDLTest_TextWindow *textwin;
+static int done;
 
 /* Call this instead of exit(), so we can clean up SDL: atexit() is evil. */
 static void
@@ -86,6 +90,8 @@ print_modifiers(char **text, size_t *maxlen)
         print_string(text, maxlen, " CAPS");
     if (mod & KMOD_MODE)
         print_string(text, maxlen, " MODE");
+    if (mod & KMOD_SCROLL)
+        print_string(text, maxlen, " SCROLL");
 }
 
 static void
@@ -135,9 +141,10 @@ PrintKey(SDL_Keysym * sym, SDL_bool pressed, SDL_bool repeat)
 }
 
 static void
-PrintText(char *eventtype, char *text)
+PrintText(const char *eventtype, const char *text)
 {
-    char *spot, expanded[1024];
+    const char *spot;
+    char expanded[1024];
 
     expanded[0] = '\0';
     for ( spot = text; *spot; ++spot )
@@ -160,12 +167,38 @@ loop()
         case SDL_KEYDOWN:
         case SDL_KEYUP:
             PrintKey(&event.key.keysym, (event.key.state == SDL_PRESSED) ? SDL_TRUE : SDL_FALSE, (event.key.repeat) ? SDL_TRUE : SDL_FALSE);
+            if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                case SDLK_BACKSPACE:
+                    SDLTest_TextWindowAddText(textwin, "\b");
+                    break;
+                case SDLK_RETURN:
+                    SDLTest_TextWindowAddText(textwin, "\n");
+                    break;
+                default:
+                    break;
+                }
+            }
             break;
         case SDL_TEXTEDITING:
-            PrintText("EDIT", event.text.text);
+            PrintText("EDIT", event.edit.text);
+            break;
+        case SDL_TEXTEDITING_EXT:
+            PrintText("EDIT_EXT", event.editExt.text);
+            SDL_free(event.editExt.text);
             break;
         case SDL_TEXTINPUT:
             PrintText("INPUT", event.text.text);
+            SDLTest_TextWindowAddText(textwin, "%s", event.text.text);
+            break;
+        case SDL_FINGERDOWN:
+            if (SDL_IsTextInputActive()) {
+                SDL_Log("Stopping text input\n");
+                SDL_StopTextInput();
+            } else {
+                SDL_Log("Starting text input\n");
+                SDL_StartTextInput();
+            }
             break;
         case SDL_MOUSEBUTTONDOWN:
             /* Left button quits the app, other buttons toggles text input */
@@ -188,6 +221,16 @@ loop()
             break;
         }
     }
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDLTest_TextWindowDisplay(textwin, renderer);
+    SDL_RenderPresent(renderer);
+
+    /* Slow down framerate */
+    SDL_Delay(100);
+
 #ifdef __EMSCRIPTEN__
     if (done) {
         emscripten_cancel_main_loop();
@@ -198,10 +241,14 @@ loop()
 int
 main(int argc, char *argv[])
 {
-    SDL_Window *window;
-
     /* Enable standard application logging */
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+
+    /* Disable mouse emulation */
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+
+    /* Enable extended text editing events */
+    SDL_SetHint(SDL_HINT_IME_SUPPORT_EXTENDED_TEXT, "1");
 
     /* Initialize SDL */
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -218,6 +265,15 @@ main(int argc, char *argv[])
                 SDL_GetError());
         quit(2);
     }
+
+    renderer = SDL_CreateRenderer(window, -1, 0);
+    if (!renderer) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create renderer: %s\n",
+                SDL_GetError());
+        quit(2);
+    }
+
+    textwin = SDLTest_TextWindowCreate(0, 0, 640, 480);
 
 #if __IPHONEOS__
     /* Creating the context creates the view, which we need to show keyboard */
