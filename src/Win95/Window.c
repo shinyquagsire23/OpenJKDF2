@@ -794,6 +794,10 @@ void Window_RecreateSDL2Window()
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     }
 
+#ifdef WIN64_STANDALONE
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+#endif
+
     if (Window_isHiDpi)
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     else
