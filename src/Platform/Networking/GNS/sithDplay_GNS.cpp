@@ -734,13 +734,13 @@ public:
 
     void GetServerInfo( const SteamNetworkingIPAddr &serverAddr )
     {
-        int attempts = 10;
+        int attempts = 3;
         id = 0xFFFFFFFF;
         m_closed = 0;
         
         while (id == 0xFFFFFFFF && !m_closed && attempts) {
             Init(serverAddr);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 RunStep();
                 sleep_ms(10);

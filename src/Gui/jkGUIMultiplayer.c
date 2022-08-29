@@ -53,7 +53,7 @@ static jkGuiElement jkGuiMultiplayer_aElements3[13] = {
     {ELEMENT_TEXTBUTTON,  1,  2, "GUI_OK",  3, {0x1A4, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBUTTON, -1,  2, "GUI_CANCEL",  3, {0x14, 0x1AE, 0xC8, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
 #ifdef QOL_IMPROVEMENTS
-    { ELEMENT_TEXTBOX, 0, 0, NULL, 16, { 170, 280, 320, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX, 0, 0, NULL, 255, { 170, 280, 320, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 #endif
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0},
 };
@@ -83,7 +83,7 @@ void jkGuiMultiplayer_Initialize()
 #ifdef QOL_IMPROVEMENTS
     jk_snwprintf(jkGuiMultiplayer_ipText, 0x100, L"127.0.0.1");
     jkGuiMultiplayer_aElements3[11].wstr = jkGuiMultiplayer_ipText;
-    jkGuiMultiplayer_aElements3[11].selectedTextEntry = 16;
+    jkGuiMultiplayer_aElements3[11].selectedTextEntry = 255;
 #endif
 }
 
