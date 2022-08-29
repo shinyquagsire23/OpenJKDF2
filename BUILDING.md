@@ -103,11 +103,8 @@ cd OpenJKDF2
 export CC=clang
 export CXX=clang++
 
-mkdir -p build
-cd build
-
-cmake ..
-make -j10
+chmod +x build_linux64.sh
+./build_linux64.sh
 ```
 </details>
 
@@ -120,6 +117,7 @@ make -j10
 git clone https://github.com/shinyquagsire23/OpenJKDF2.git
 cd OpenJKDF2
 
+chmod +x build_win64.sh
 ./build_win64.sh
 ```
 </details>
@@ -127,7 +125,7 @@ cd OpenJKDF2
 <details>
   <summary>MacOS SDL2</summary>
 
-A full, universal MacOS appbundle can be created using
+A full, universal MacOS appbundle can be created on ARM64 Macs using
 ```
 git clone https://github.com/shinyquagsire23/OpenJKDF2.git
 cd OpenJKDF2
@@ -137,12 +135,8 @@ cd OpenJKDF2
 
 Otherwise, a plain binary and single-architecture appbundle can be compiled using:
 ```
-mkdir -p build_darwin64
-cd build_darwin64
-
-cmake ..
-make -j10
-codesign -s - openjkdf2-64
+chmod +x ./.github/build_macos.sh
+./.github/build_macos.sh
 ```
 </details>
 
@@ -158,11 +152,8 @@ mkdir -p wasm_out
 Copy your `episode/` and `resource/` directory to `wasm_out`, then
 
 ```
-rm -rf build_emcc
-mkdir -p build_emcc
-cd build_emcc
-cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
-make -j10
+chmod +x ./build_run_openjkdf2_wasm.sh
+./build_run_openjkdf2_wasm.sh
 ```
 </details>
 
