@@ -689,7 +689,9 @@ void Window_SdlUpdate()
         Window_resized = 0;
     }
     
-    //printf("%u\n", SDL_GetTicks() - Window_lastSampleTime);
+    static int sampleTime_delay = 0;
+    int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
+    //printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
 
     static int jkPlayer_enableVsync_last = 0;
@@ -715,9 +717,21 @@ void Window_SdlUpdate()
 
         if (Window_needsRecreate)
             Window_RecreateSDL2Window();
-        //SDL_RenderClear(displayRenderer);
-        //SDL_RenderCopy(displayRenderer, menuTexture, NULL, NULL);
-        //SDL_RenderPresent(displayRenderer);
+        
+        // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.
+        if (sampleTime_roundtrip < 16) {
+            sampleTime_delay++;
+        }
+        else {
+            sampleTime_delay--;
+        }
+        if (sampleTime_delay <= 0) {
+            sampleTime_delay = 1;
+        }
+        if (sampleTime_delay >= 16) {
+            sampleTime_delay = 16;
+        }
+        SDL_Delay(sampleTime_delay);
     }
     else
     {
