@@ -5,6 +5,16 @@
 #include "General/stdString.h"
 #include "jk.h"
 
+#ifdef MACOS
+#define GL_SILENCE_DEPRECATION
+#include <SDL.h>
+#elif defined(ARCH_WASM)
+#include <emscripten.h>
+#include <SDL.h>
+#else
+#include <SDL.h>
+#endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -45,9 +55,11 @@ typedef struct GNSInfoPacket
 } GNSInfoPacket;
 #pragma pack(pop)
 
+static jkMultiEntry sithDplayGNS_storedEntryEnum;
 static jkMultiEntry sithDplayGNS_storedEntry;
 extern wchar_t jkGuiMultiplayer_ipText[256];
 char jkGuiMultiplayer_ipText_conv[256];
+static int sithDplayGNS_numEnumd = 0;
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -65,18 +77,7 @@ SteamNetworkingMicroseconds g_logTimeZero;
 #endif
 
 void sleep_ms(int milliseconds){ // cross-platform sleep function
-#ifdef WIN32
-    Sleep(milliseconds);
-#elif _POSIX_C_SOURCE >= 199309L
-    struct timespec ts;
-    ts.tv_sec = milliseconds / 1000;
-    ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
-#else
-    if (milliseconds >= 1000)
-      sleep(milliseconds / 1000);
-    usleep((milliseconds % 1000) * 1000);
-#endif
+    SDL_Delay(milliseconds);
 }
 
 // We do this because I won't want to figure out how to cleanly shut
@@ -100,7 +101,7 @@ static void DebugOutput( ESteamNetworkingSocketsDebugOutputType eType, const cha
     {
         fflush(stdout);
         fflush(stderr);
-        NukeProcess(1);
+        //NukeProcess(1);
     }
 }
 
@@ -753,7 +754,8 @@ public:
 
     void GetServerInfo( const SteamNetworkingIPAddr &serverAddr )
     {
-        int attempts = 3;
+        int attempts = 1;
+        int id_real = 0xFFFFFFFF;
         id = 0xFFFFFFFF;
         m_closed = 0;
         
@@ -763,12 +765,19 @@ public:
             {
                 RunStep();
                 sleep_ms(10);
+                if (id != 0xFFFFFFFF) break;
             }
+            id_real = id;
             Shutdown();
             attempts--;
-            sleep_ms(100);
         }
         
+        if (id_real == 0xFFFFFFFF) {
+            sithDplayGNS_numEnumd = 0;
+        }
+
+        // Hack: Force the UI to update
+        jkGuiNet_dword_5564E8 -= 10000;
     }
 
     uint32_t id = 0xFFFFFFFF;
@@ -801,10 +810,9 @@ private:
             id = pPkt->id;
             printf("We are ID %x\n", id);
 
-            jkGuiMultiplayer_aEntries[0] = pPkt->entry;
-            
-            dplay_dword_55D618 = 1;
-            jkGuiMultiplayer_aEntries[0].field_E0 = 10;
+            sithDplayGNS_storedEntryEnum = pPkt->entry;
+            sithDplayGNS_storedEntryEnum.field_E0 = 10;
+            sithDplayGNS_numEnumd = 1;
         }
 
         // We don't need this anymore.
@@ -929,6 +937,8 @@ extern "C"
 
 extern int jkGuiNetHost_portNum;
 SteamNetworkingIPAddr addrServer;
+int addrServerPortLast = -1;
+char addrServerLast[256];
 GNSClient client;
 GNSServer server;
 
@@ -969,10 +979,10 @@ void sithDplay_GNS_Startup()
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 0;
-    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    /*jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
-    jkGuiMultiplayer_aEntries[0].field_E0 = 10;
+    jkGuiMultiplayer_aEntries[0].field_E0 = 10;*/
 
     Hack_ResetClients();
 
@@ -1050,6 +1060,8 @@ void sithDplay_CloseConnection()
 
 int sithDplay_Open(int idx, wchar_t* pwPassword)
 {
+    DirectPlay_EnumSessions2();
+
     sithDplay_dword_8321E8 = 0;
     sithDplay_dword_8321E0 = 1;
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
@@ -1076,11 +1088,6 @@ void sithDplay_Close()
 int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen)
 {
     return 1;
-}
-
-int DirectPlay_EnumSessions2()
-{
-    return 0;
 }
 
 void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers)
@@ -1137,20 +1144,89 @@ int DirectPlay_GetSession_passwordidk(void* a)
     return 1;
 }
 
+static int sithDplay_EnumThread_bInit = 0;
+static SDL_Thread *sithDplay_EnumThread_thread = NULL;
+static SDL_mutex* sithDplay_EnumThread_mutex = NULL;
+
+static int sithDplay_EnumThread(void *ptr)
+{
+    while (sithDplay_EnumThread_bInit)
+    {
+        SDL_LockMutex(sithDplay_EnumThread_mutex);
+        stdString_WcharToChar(jkGuiMultiplayer_ipText_conv, jkGuiMultiplayer_ipText, 255);
+        addrServer.ParseString(jkGuiMultiplayer_ipText_conv);
+        if (!addrServer.m_port) {
+            addrServer.m_port = DEFAULT_SERVER_PORT;
+        }
+
+        if (strncmp(jkGuiMultiplayer_ipText_conv, addrServerLast, 256) || addrServerPortLast != addrServer.m_port)
+            client.GetServerInfo(addrServer);
+        strncpy(addrServerLast, jkGuiMultiplayer_ipText_conv, 256);
+        addrServerPortLast = addrServer.m_port;
+
+        SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+
+        SDL_Delay(100);
+        printf("aaaa\n");
+    }
+
+    return 0;
+}
+
+int DirectPlay_EnumSessions2()
+{
+    printf("sithDplay_EnumSessions2\n");
+    if (!sithDplay_EnumThread_bInit)
+        return 0;
+
+    sithDplay_EnumThread_bInit = 0;
+
+    int threadReturnValue;
+    SDL_WaitThread(sithDplay_EnumThread_thread, &threadReturnValue);
+    sithDplay_EnumThread_thread = NULL;
+
+    printf("Enum thread done\n");
+
+    return 0;
+}
+
 int sithDplay_EnumSessions(int a, void* b)
 {
+    printf("sithDplay_EnumSessions\n");
+    if (!sithDplay_EnumThread_mutex)
+        sithDplay_EnumThread_mutex = SDL_CreateMutex();
+
+    SDL_LockMutex(sithDplay_EnumThread_mutex);
+    jkGuiMultiplayer_aEntries[0] = sithDplayGNS_storedEntryEnum;
+    dplay_dword_55D618 = sithDplayGNS_numEnumd;
+    SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+
+    if (sithDplay_EnumThread_bInit)
+        return 0;
+
     Hack_ResetClients();
 
     dplay_dword_55D618 = 0;
+    sithDplayGNS_numEnumd = 0;
+    memset(&sithDplayGNS_storedEntryEnum, 0, sizeof(sithDplayGNS_storedEntryEnum));
     memset(&jkGuiMultiplayer_aEntries[0], 0, sizeof(jkGuiMultiplayer_aEntries[0]));
+    memset(addrServerLast, 0, sizeof(addrServerLast));
+    addrServerPortLast = -1;
 
-    stdString_WcharToChar(jkGuiMultiplayer_ipText_conv, jkGuiMultiplayer_ipText, 255);
-    addrServer.ParseString(jkGuiMultiplayer_ipText_conv);
-    if (!addrServer.m_port) {
-        addrServer.m_port = DEFAULT_SERVER_PORT;
-    }
+    sithDplay_EnumThread_bInit = 1;
 
-    client.GetServerInfo(addrServer);
+    sithDplay_EnumThread_thread = SDL_CreateThread(sithDplay_EnumThread, "sithDplay_EnumThread", (void *)NULL);
+    printf("Enum thread start\n");
+
+    //DirectPlay_EnumSessions2();
+
+    //client.GetServerInfo(addrServer);
+
+    SDL_LockMutex(sithDplay_EnumThread_mutex);
+    jkGuiMultiplayer_aEntries[0] = sithDplayGNS_storedEntryEnum;
+    dplay_dword_55D618 = sithDplayGNS_numEnumd;
+    SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+    
 
     return 0;
 }

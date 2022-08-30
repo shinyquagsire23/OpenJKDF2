@@ -189,14 +189,26 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
     HWND v2; // eax
     wchar_t *v4; // [esp-8h] [ebp-808h]
     wchar_t Text[1024]; // [esp+0h] [ebp-800h] BYREF
+    char tmp[1024+1];
     va_list va; // [esp+808h] [ebp+8h] BYREF
 
     va_start(va, a1);
+#ifndef SDL2_RENDER
     v1 = jkStrings_GetText(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
     v4 = jkStrings_GetText("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
+#else
+    v1 = jkStrings_GetText(a1);
+    jk_vsnwprintf(Text, 0x400u, v1, va);
+    //v4 = jkStrings_GetText("ERROR");
+    stdString_WcharToChar(tmp, Text, 1024);
+
+    jk_printf("ERROR: %s\n", tmp);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
+    return 0;
+#endif
 }
 
 int Windows_ErrorMsgbox(const char *a1, ...)
@@ -206,13 +218,27 @@ int Windows_ErrorMsgbox(const char *a1, ...)
     wchar_t *v4; // [esp-8h] [ebp-408h]
     wchar_t Text[512]; // [esp+0h] [ebp-400h] BYREF
     va_list va; // [esp+408h] [ebp+8h] BYREF
+    char tmp[512+1];
 
     va_start(va, a1);
+
+#ifndef SDL2_RENDER
     v1 = jkStrings_GetText(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
     v4 = jkStrings_GetText("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
+#else
+    v1 = jkStrings_GetText(a1);
+    jk_vsnwprintf(Text, 0x200u, v1, va);
+    //v4 = jkStrings_GetText("ERROR");
+
+    stdString_WcharToChar(tmp, Text, 512);
+
+    jk_printf("ERROR: %s\n", tmp);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
+    return 0;
+#endif
 }
 
 void Windows_GameErrorMsgbox(const char *a1, ...)
