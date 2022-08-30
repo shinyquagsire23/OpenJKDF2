@@ -412,6 +412,7 @@ void stdControl_Shutdown()
 int stdControl_Open()
 {
     stdControl_bOpen = 1;
+
 #if 0
     if ( stdControl_mouseDirectInputDevice && stdControl_bReadMouse )
     {
@@ -527,6 +528,32 @@ LABEL_19:
 
 void stdControl_ToggleCursor(int a)
 {
+    if ( stdControl_bOpen )
+    {
+        if ( a )
+        {
+            if ( stdControl_mouseDirectInputDevice && stdControl_bReadMouse )
+            {
+                //stdControl_mouseDirectInputDevice->lpVtbl->Acquire(stdControl_mouseDirectInputDevice);
+                stdControl_ShowCursor(0);
+            }
+            //if ( stdControl_keyboardIDirectInputDevice )
+            //    stdControl_keyboardIDirectInputDevice->lpVtbl->Acquire(stdControl_keyboardIDirectInputDevice);
+            stdControl_bControlsActive = 1;
+        }
+        else
+        {
+            if ( stdControl_mouseDirectInputDevice )
+            {
+                //stdControl_mouseDirectInputDevice->lpVtbl->Unacquire(stdControl_mouseDirectInputDevice);
+                stdControl_ShowCursor(1);
+            }
+            //if ( stdControl_keyboardIDirectInputDevice )
+            //    stdControl_keyboardIDirectInputDevice->lpVtbl->Unacquire(stdControl_keyboardIDirectInputDevice);
+            stdControl_bControlsActive = 0;
+        }
+    }
+
     SDL_SetRelativeMouseMode(!!a);
 }
 

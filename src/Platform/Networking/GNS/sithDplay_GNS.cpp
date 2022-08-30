@@ -641,6 +641,8 @@ public:
 
         m_identity.Clear();
         m_identity.SetGenericString("OpenJKDF2");
+
+        m_hostDisconnected = 0;
     }
 
     void Shutdown()
@@ -649,6 +651,8 @@ public:
         m_hConnection = k_HSteamNetConnection_Invalid;
         id = 0xFFFFFFFF;
         m_closed = 1;
+
+        m_hostDisconnected = 0;
     }
 
     void RunStep()
@@ -674,6 +678,14 @@ public:
         *pIdOut = 0;
         *pLenInOut = 0;
 
+        if ( m_hostDisconnected ) {
+            printf( "Host is disconnected, forcing exit...\n");
+            Shutdown();
+            m_closed = 1;
+            *pIdOut = 1;
+            return 2;
+        }
+
         ISteamNetworkingMessage *pIncomingMsg = nullptr;
         int numMsgs = m_pInterface->ReceiveMessagesOnConnection( m_hConnection, &pIncomingMsg, 1 );
         if ( numMsgs == 0 )
@@ -682,6 +694,7 @@ public:
             printf( "Error checking for messages (%d)\n", numMsgs);
             Shutdown();
             m_closed = 1;
+            *pIdOut = 1;
             return 2;
         }
 
@@ -727,7 +740,13 @@ public:
 
         printf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
 
-        m_pInterface->SendMessageToConnection( m_hConnection, sendBuffer, dwDataSize+8, k_nSteamNetworkingSend_Reliable, nullptr );
+        EResult ret = m_pInterface->SendMessageToConnection( m_hConnection, sendBuffer, dwDataSize+8, k_nSteamNetworkingSend_Reliable, nullptr );
+        if (ret < 0) {
+            printf( "Error sending message (%d)\n", ret);
+        }
+        if (ret == k_EResultNoConnection || ret == k_EResultInvalidParam) {
+            return 0;
+        }
 
         return 1;
     }
@@ -761,6 +780,7 @@ private:
     SteamNetworkingIdentity m_identity;
     uint8_t sendBuffer[4096];
     int m_closed = 0;
+    int m_hostDisconnected = 0;
 
     void PollIncomingMessages()
     {
@@ -847,6 +867,7 @@ private:
                 {
                     // NOTE: We could check the reason code for a normal disconnection
                     Printf( "Host has disconnected. (%s)", pInfo->m_info.m_szEndDebug );
+                    m_hostDisconnected = 1;
                 }
 
                 // Clean up the connection.  This is important!
