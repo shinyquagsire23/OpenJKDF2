@@ -1167,7 +1167,6 @@ static int sithDplay_EnumThread(void *ptr)
         SDL_UnlockMutex(sithDplay_EnumThread_mutex);
 
         SDL_Delay(100);
-        printf("aaaa\n");
     }
 
     return 0;
