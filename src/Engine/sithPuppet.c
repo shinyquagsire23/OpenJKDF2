@@ -6,7 +6,7 @@
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithCollision.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "Main/jkGame.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithSoundClass.h"
@@ -766,7 +766,7 @@ LABEL_14:
             v11 = thing;
             if ( thing->attach_flags )
             {
-                sithActor_JumpWithVel(thing, 1.0);
+                sithPlayerActions_JumpWithVel(thing, 1.0);
                 goto LABEL_50;
             }
             return;
@@ -774,7 +774,7 @@ LABEL_14:
             v11 = thing;
             if ( thing->attach_flags )
             {
-                sithActor_JumpWithVel(thing, 2.0);
+                sithPlayerActions_JumpWithVel(thing, 2.0);
 LABEL_50:
                 if ( v11->thingtype == SITH_THING_ACTOR )
                     v11->actor->flags |= 1u;

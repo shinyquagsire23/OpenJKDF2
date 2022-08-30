@@ -512,7 +512,7 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
     for (int i = 0; i < sithSoundSys_numSoundsAvailable; i++)
     {
         v3 = &sithSoundSys_aPlayingSounds[i];
-        if ( v3->flags & 0x80 && thing == v3->thing && (!sound || v3->sound == sound) )
+        if ( v3->flags & SITHSOUNDFLAG_FOLLOWSTHING && thing == v3->thing && (!sound || v3->sound == sound) )
         {
             sithSoundSys_StopSound(v3);
         }

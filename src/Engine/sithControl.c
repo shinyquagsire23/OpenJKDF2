@@ -7,7 +7,7 @@
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithPlayer.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
 #include "World/sithWeapon.h"
@@ -884,7 +884,7 @@ LABEL_39:
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
                 if ( input_read != 0 )
-                    sithActor_cogMsg_OpenDoor(player);
+                    sithPlayerActions_Activate(player);
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )
@@ -908,7 +908,7 @@ LABEL_39:
         if ( ++v3 > (unsigned int)INPUT_FUNC_SELECT0 )
             goto LABEL_11;
     }
-    sithActor_cogMsg_WarpThingToCheckpoint(player, v3 - INPUT_FUNC_SELECT1);
+    sithPlayerActions_WarpToCheckpoint(player, v3 - INPUT_FUNC_SELECT1);
 LABEL_11:
     sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &input_read);
     if ( input_read )
@@ -1193,7 +1193,7 @@ void sithControl_PlayerMovement(sithThing *player)
         }
         sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &v20);
         if ( v20 )
-            sithActor_JumpWithVel(player, 1.0);
+            sithPlayerActions_JumpWithVel(player, 1.0);
     }
 }
 
@@ -1269,7 +1269,7 @@ void sithControl_FreeCam(sithThing *player)
                 if ( (v1->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
                 {
                     if ( tmp )
-                        sithActor_JumpWithVel(v1, 1.0);
+                        sithPlayerActions_JumpWithVel(v1, 1.0);
                 }
                 else
                 {

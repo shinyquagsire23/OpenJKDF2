@@ -4,7 +4,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
 #include "World/sithThing.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "Cog/sithCog.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithSoundClass.h"
@@ -883,7 +883,7 @@ int sithAICmd_OpenDoors(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
 {
     if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) != 0 )
     {
-        sithActor_cogMsg_OpenDoor(actor->thing);
+        sithPlayerActions_Activate(actor->thing);
         instinct->nextUpdate = sithTime_curMs + 1000;
     }
     return 0;

@@ -4,7 +4,7 @@
 #include "General/util.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "World/sithWeapon.h"
 #include "World/sithExplosion.h"
 #include "World/sithItem.h"
@@ -230,7 +230,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 case SITH_THING_PLAYER:
                     sithPlayer_Tick(thingIter->actorParams.playerinfo, deltaSeconds);
                 case SITH_THING_ACTOR:
-                    sithActor_Tick(thingIter, deltaMs);
+                    sithThing_TickUnderwater(thingIter, deltaMs);
                     break;
                 case SITH_THING_WEAPON:
                     sithWeapon_Tick(thingIter, deltaSeconds);
@@ -2016,6 +2016,43 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
     return amount;
 }
 
+void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
+{
+    unsigned int v2; // eax
+    unsigned int v3; // eax
+
+    if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_40) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    {
+        if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
+        {
+            v3 = thing->actorParams.msUnderwater;
+            if ( v3 )
+            {
+                if ( v3 <= 18000 )
+                {
+                    if ( v3 > 10000 )
+                        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_BREATH);
+                }
+                else
+                {
+                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_GASP);
+                }
+                thing->actorParams.msUnderwater = 0;
+            }
+        }
+        else
+        {
+            v2 = deltaMs + thing->actorParams.msUnderwater;
+            thing->actorParams.msUnderwater = v2;
+            if ( v2 > 20000 )
+            {
+                sithThing_Damage(thing, thing, 10.0, 32);
+                thing->actorParams.msUnderwater -= 2000;
+            }
+        }
+    }
+}
+
 float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int flags)
 {
     sithThing *receiver_; // edi
@@ -2358,4 +2395,15 @@ void sithThing_netidk()
     {
         sithNet_syncIdx = 0;
     }
+}
+
+void sithActor_Remove(sithThing *thing)
+{
+    thing->thingflags |= SITH_TF_DEAD;
+    sithThing_detachallchildren(thing);
+    thing->type = SITH_THING_CORPSE;
+    thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
+    thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+    thing->lifeLeftMs = 20000;
+    sithPhysics_FindFloor(thing, 0);
 }

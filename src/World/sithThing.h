@@ -57,10 +57,12 @@
 #define sithThing_ShouldSync_ADDR (0x004CF660)
 #define sithThing_netidk2_ADDR (0x004CF690)
 #define sithThing_Release_ADDR (0x004E0740)
+#define sithThing_TickUnderwater_ADDR (0x004ECBE0)
 #define sithThing_Hit_ADDR (0x004ECC90)
 #define sithThing_HurtSound_ADDR (0x004ECE90)
 #define sithThing_SpawnDeadBodyMaybe_ADDR (0x004ECFE0)
 #define sithThing_LoadActorPlayerParams_ADDR (0x004ED7E0)
+#define sithActor_Remove_ADDR (0x004ED760)
 
 enum MOVETYPE
 {
@@ -316,6 +318,7 @@ void sithThing_MoveToSector(sithThing *thing, sithSector *sector, int a4);
 int sithThing_DetachThing(sithThing *thing);
 void sithThing_Destroy(sithThing *thing);
 float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
+void sithThing_TickUnderwater(sithThing *thing, int deltaMs);
 float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int flags);
 void sithThing_HurtSound(sithThing *thing, float amount, int hurtType);
 void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
@@ -326,6 +329,7 @@ int sithThing_ShouldSync(sithThing *thing);
 sithThing* sithThing_GetById(int thing_id);
 int sithThing_HasAttachment(sithThing *thing);
 void sithThing_netidk();
+void sithActor_Remove(sithThing *thing);
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;

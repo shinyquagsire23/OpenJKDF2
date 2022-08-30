@@ -4,7 +4,7 @@
 #include "World/sithThing.h"
 #include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
@@ -866,7 +866,7 @@ void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel)
     rdVector_Copy3(&actor->movePos, pos);
 
     if ( sithPuppet_PlayMode(actor->thing, SITH_ANIM_JUMP, 0) < 0 )
-        sithActor_JumpWithVel(actor->thing, vel);
+        sithPlayerActions_JumpWithVel(actor->thing, vel);
 
     actor->field_28C = sithTime_curMs + 2000;
     actor->flags |= SITHAIFLAGS_MOVING_TO_DEST;

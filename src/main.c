@@ -115,7 +115,7 @@
 #include "World/sithUnk4.h"
 #include "World/sithMap.h"
 #include "Engine/sithIntersect.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "World/sithTrackThing.h"
 #include "Win95/DebugConsole.h"
 #include "Win95/DirectX.h"
@@ -1265,12 +1265,10 @@ void do_hooks()
     hook_function(sithControl_AddInputHandler_ADDR, sithControl_AddInputHandler);
     hook_function(sithControl_HandlePlayer_ADDR, sithControl_HandlePlayer);
     
-    // sithActor
-    hook_function(sithActor_Tick_ADDR, sithActor_Tick);
-    hook_function(sithActor_Remove_ADDR, sithActor_Remove);
-    hook_function(sithActor_cogMsg_OpenDoor_ADDR, sithActor_cogMsg_OpenDoor);
-    hook_function(sithActor_JumpWithVel_ADDR, sithActor_JumpWithVel);
-    hook_function(sithActor_cogMsg_WarpThingToCheckpoint_ADDR, sithActor_cogMsg_WarpThingToCheckpoint);
+    // sithPlayerActions
+    hook_function(sithPlayerActions_Activate_ADDR, sithPlayerActions_Activate);
+    hook_function(sithPlayerActions_JumpWithVel_ADDR, sithPlayerActions_JumpWithVel);
+    hook_function(sithPlayerActions_WarpToCheckpoint_ADDR, sithPlayerActions_WarpToCheckpoint);
     
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);
@@ -1304,6 +1302,8 @@ void do_hooks()
     hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
     hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
     hook_function(sithThing_GetById_ADDR, sithThing_GetById);
+    hook_function(sithThing_TickUnderwater_ADDR, sithThing_TickUnderwater);
+    hook_function(sithActor_Remove_ADDR, sithActor_Remove);
     
     // sithSector
     hook_function(sithAIAwareness_Startup_ADDR, sithAIAwareness_Startup);

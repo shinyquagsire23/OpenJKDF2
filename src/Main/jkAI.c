@@ -8,7 +8,7 @@
 #include "Engine/sithPuppet.h"
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "World/jkSaber.h"
 #include "Cog/sithCog.h"
 #include "../jk.h"

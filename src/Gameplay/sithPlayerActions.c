@@ -1,4 +1,4 @@
-#include "sithActor.h"
+#include "sithPlayerActions.h"
 
 #include "World/sithThing.h"
 #include "World/sithSector.h"
@@ -18,44 +18,65 @@
 
 static int lastDoorOpenTime = 0;
 
-void sithActor_Tick(sithThing *thing, int deltaMs)
+void sithPlayerActions_Activate(sithThing *thing)
 {
-    unsigned int v2; // eax
-    unsigned int v3; // eax
+    sithSector *v4; // esi
+    int v5; // eax
+    sithCollisionSearchEntry *searchResult; // eax
+    sithThing *v7; // edx
+    float a6; // [esp+0h] [ebp-58h]
+    rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
+    rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
 
-    if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_40) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( !sithNet_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
     {
-        if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
+        lastDoorOpenTime = sithTime_curMsAbsolute;
+        _memcpy(&out, &thing->lookOrientation, sizeof(out));
+        thingPos.x = thing->position.x;
+        thingPos.y = thing->position.y;
+        thingPos.z = thing->position.z;
+        if ( thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )
         {
-            v3 = thing->actorParams.msUnderwater;
-            if ( v3 )
-            {
-                if ( v3 <= 18000 )
-                {
-                    if ( v3 > 10000 )
-                        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_BREATH);
-                }
-                else
-                {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_GASP);
-                }
-                thing->actorParams.msUnderwater = 0;
-            }
+            rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
+            thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
+            thingPos.y = thing->actorParams.eyeOffset.y + thingPos.y;;
+            thingPos.z = thing->actorParams.eyeOffset.z + thingPos.z;
         }
-        else
+        v4 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
+        if ( v4 )
         {
-            v2 = deltaMs + thing->actorParams.msUnderwater;
-            thing->actorParams.msUnderwater = v2;
-            if ( v2 > 20000 )
+            v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
+            if ( sithCogVm_multiplayerFlags && v5 >= 0 )
+                sithDSSThing_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
+            a6 = thing->moveSize - -0.1;
+            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
+            for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
-                sithThing_Damage(thing, thing, 10.0, 32);
-                thing->actorParams.msUnderwater -= 2000;
+                if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
+                {
+                    if ( (searchResult->surface->surfaceFlags & SITH_THING_ACTOR) != 0 )
+                    {
+                        sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
+                        sithCollision_SearchClose();
+                        return;
+                    }
+                }
+                else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
+                {
+                    v7 = searchResult->receiver;
+                    if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
+                    {
+                        sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
+                        break;
+                    }
+                }
             }
+            sithCollision_SearchClose();
         }
     }
 }
 
-void sithActor_JumpWithVel(sithThing *thing, float vel)
+void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
 {
     double final_vel;
     int isAttached; // zf
@@ -131,76 +152,7 @@ void sithActor_JumpWithVel(sithThing *thing, float vel)
     }
 }
 
-void sithActor_cogMsg_OpenDoor(sithThing *thing)
-{
-    sithSector *v4; // esi
-    int v5; // eax
-    sithCollisionSearchEntry *searchResult; // eax
-    sithThing *v7; // edx
-    float a6; // [esp+0h] [ebp-58h]
-    rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
-    rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
-
-    if ( !sithNet_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
-    {
-        lastDoorOpenTime = sithTime_curMsAbsolute;
-        _memcpy(&out, &thing->lookOrientation, sizeof(out));
-        thingPos.x = thing->position.x;
-        thingPos.y = thing->position.y;
-        thingPos.z = thing->position.z;
-        if ( thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )
-        {
-            rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
-            thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
-            thingPos.y = thing->actorParams.eyeOffset.y + thingPos.y;;
-            thingPos.z = thing->actorParams.eyeOffset.z + thingPos.z;
-        }
-        v4 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
-        if ( v4 )
-        {
-            v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
-            if ( sithCogVm_multiplayerFlags && v5 >= 0 )
-                sithDSSThing_SendOpenDoor(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
-            a6 = thing->moveSize - -0.1;
-            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
-            for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
-            {
-                if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
-                {
-                    if ( (searchResult->surface->surfaceFlags & SITH_THING_ACTOR) != 0 )
-                    {
-                        sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
-                        sithCollision_SearchClose();
-                        return;
-                    }
-                }
-                else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
-                {
-                    v7 = searchResult->receiver;
-                    if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
-                    {
-                        sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
-                        break;
-                    }
-                }
-            }
-            sithCollision_SearchClose();
-        }
-    }
-}
-
-void sithActor_Remove(sithThing *thing)
-{
-    thing->thingflags |= SITH_TF_DEAD;
-    sithThing_detachallchildren(thing);
-    thing->type = SITH_THING_CORPSE;
-    thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
-    thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
-    thing->lifeLeftMs = 20000;
-    sithPhysics_FindFloor(thing, 0);
-}
-
-void sithActor_cogMsg_WarpThingToCheckpoint(sithThing *thing, int idx)
+void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
 {
     if ( idx < (unsigned int)jkPlayer_maxPlayers )
     {

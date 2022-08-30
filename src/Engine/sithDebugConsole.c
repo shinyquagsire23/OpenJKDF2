@@ -7,7 +7,7 @@
 #include "Main/jkGame.h"
 #include "Cog/sithCog.h"
 #include "World/sithThing.h"
-#include "World/sithActor.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "Engine/sithIntersect.h"
 #include "jk.h"
 
@@ -276,7 +276,7 @@ int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     result = _sscanf(pArgStr, "%d", &pArgStr);
     if ( result )
     {
-        sithActor_cogMsg_WarpThingToCheckpoint(g_localPlayerThing, (int)(pArgStr - 1));
+        sithPlayerActions_WarpToCheckpoint(g_localPlayerThing, (int)(pArgStr - 1));
         result = 1;
     }
     return result;
