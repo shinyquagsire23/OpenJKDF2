@@ -160,7 +160,7 @@ LABEL_27:
     }
     if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
     {
-        sithSoundClass_ThingPlaySoundclass(v7, SITH_SC_VICTORY);
+        sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
     result = 1;
@@ -208,7 +208,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                     sithAI_sub_4EAD60(actor);
                     if ( aiclass->argsAsFloat[2] <= (double)actor->field_1F0 && aiclass->argsAsFloat[3] >= (double)actor->field_1F0 )
                     {
-                        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_RESERVED1);
+                        sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED1);
                         v13 = actor->thing;
                         if ( (actor->thing->actorParams.typeflags & SITHAIFLAGS_DISABLED) != 0 )
                         {
@@ -234,7 +234,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     if ( !extra || extra != g_localPlayerThing )
         return 0;
     sithThing_Damage(extra, actor->thing, aiclass->argsAsFloat[7], 0x10);
-    sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_RESERVED2);
+    sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED2);
     v5 = actor->thing->rdthing.puppet;
     if ( v5 )
         sithPuppet_StopKey(v5, (__int64)instinct->param0, 0.5);

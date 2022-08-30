@@ -651,7 +651,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
                 physicsThing->lookOrientation.uvec.y = physicsThing->lookOrientation.rvec.z * physicsThing->lookOrientation.lvec.x
                                                      - physicsThing->lookOrientation.lvec.z * physicsThing->lookOrientation.rvec.x;
                 physicsThing->lookOrientation.uvec.z = v14 - physicsThing->lookOrientation.rvec.y * physicsThing->lookOrientation.lvec.x;
-                sithSoundClass_ThingPlaySoundclass(physicsThing, SITH_SC_DEFLECTED);
+                sithSoundClass_PlayModeRandom(physicsThing, SITH_SC_DEFLECTED);
                 physicsThing->weaponParams.typeflags &= ~1;
                 result = 1;
             }
@@ -822,7 +822,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         v16 = thing->lookOrientation.lvec.y * thing->lookOrientation.rvec.x - thing->lookOrientation.rvec.y * thing->lookOrientation.lvec.x;
         thing->weaponParams.typeflags &= ~THING_TYPEFLAGS_1;
         thing->lookOrientation.uvec.z = v16;
-        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEFLECTED);
+        sithSoundClass_PlayModeRandom(thing, SITH_SC_DEFLECTED);
         result = 1;
     }
     else

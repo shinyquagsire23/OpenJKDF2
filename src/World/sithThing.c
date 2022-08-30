@@ -656,7 +656,7 @@ void sithThing_sub_4CD100(sithThing *thing)
     if ( thing->thingtype == SITH_THING_ACTOR )
         sithAI_NewEntry(thing);
     if ( thing->soundclass )
-        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_CREATE);
+        sithSoundClass_PlayModeRandom(thing, SITH_SC_CREATE);
 
     if ( (sithWorld_pCurrentWorld->level_type_maybe & 2) != 0
       && thing->moveType == SITH_MT_PHYSICS
@@ -795,9 +795,9 @@ void sithThing_EnterWater(sithThing *thing, int a2)
         if ( thing->soundclass )
         {
             if ( thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.vel.z > -1.0 )
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_ENTERWATERSLOW);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_ENTERWATERSLOW);
             else
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_ENTERWATER);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_ENTERWATER);
         }
         v4 = g_localPlayerThing;
         if ( g_localPlayerThing && (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
@@ -826,9 +826,9 @@ void sithThing_ExitWater(sithThing *thing, int a2)
     if ( thing->soundclass )
     {
         if ( thing->moveType == SITH_MT_PHYSICS && rdVector_Len3(&thing->physicsParams.vel) < 1.0 )
-            sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_EXITWATERSLOW);
+            sithSoundClass_PlayModeRandom(thing, SITH_SC_EXITWATERSLOW);
         else
-            sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_EXITWATER);
+            sithSoundClass_PlayModeRandom(thing, SITH_SC_EXITWATER);
     }
 
     if ( (thing->thingflags & SITH_TF_WATERCREATURE) != 0 )
@@ -1060,7 +1060,7 @@ LABEL_24:
     if ( v17->thingtype == SITH_THING_ACTOR )
         sithAI_NewEntry(v17);
     if ( v17->soundclass )
-        sithSoundClass_ThingPlaySoundclass(v17, SITH_SC_CREATE);
+        sithSoundClass_PlayModeRandom(v17, SITH_SC_CREATE);
     if ( (sithWorld_pCurrentWorld->level_type_maybe & 2) == 0 )
         goto LABEL_48;
     if ( v17->moveType == SITH_MT_PHYSICS )
@@ -1197,7 +1197,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
             sithCollision_FallHurt(thing, v14);
             if ( thing->soundclass )
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHURT);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDHURT);
             }
             
         }
@@ -1208,24 +1208,24 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
             {
                 if ( (v15 & SURFACEFLAGS_METAL) != 0 )
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDMETAL);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDMETAL);
                 }
                 else if ( (v15 & SURFACEFLAGS_WATER) != 0 )
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDWATER);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDWATER);
                 }
                 else if ( (v15 & SURFACEFLAGS_PUDDLE) != 0 )
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDPUDDLE);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDPUDDLE);
                 }
                 else
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDEARTH);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDEARTH);
                 }
             }
             else
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LANDHARD);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDHARD);
             }
         }
         if ( thing->animclass && thing->moveType == SITH_MT_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
@@ -1287,21 +1287,21 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
         {
             a1a = downward_velocity;
             sithCollision_FallHurt(a1, a1a);
-            sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDHURT);
+            sithSoundClass_PlayModeRandom(a1, SITH_SC_LANDHURT);
         }
         if ( a1->soundclass )
         {
             if ( (a2->thingflags & SITH_TF_METAL) != 0 )
             {
-                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDMETAL);
+                sithSoundClass_PlayModeRandom(a1, SITH_SC_LANDMETAL);
             }
             else if ( (SITH_TF_EARTH & a2->thingflags) != 0 )
             {
-                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDEARTH);
+                sithSoundClass_PlayModeRandom(a1, SITH_SC_LANDEARTH);
             }
             else
             {
-                sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_LANDHARD);
+                sithSoundClass_PlayModeRandom(a1, SITH_SC_LANDHARD);
             }
         }
     }
@@ -2044,11 +2044,11 @@ void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
                 if ( v3 <= 18000 )
                 {
                     if ( v3 > 10000 )
-                        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_BREATH);
+                        sithSoundClass_PlayModeRandom(thing, SITH_SC_BREATH);
                 }
                 else
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_GASP);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_GASP);
                 }
                 thing->actorParams.msUnderwater = 0;
             }
@@ -2196,23 +2196,23 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
             sithSoundClass_StopSound(thing, 0);
             if ( a4 == 0x20 )
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DROWNED);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_DROWNED);
             }
             else if ( a4 == 0x40 )
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_SPLATTERED);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_SPLATTERED);
             }
             else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATHUNDER);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATHUNDER);
             }
             else if ( thing->actorParams.health >= -10.0 )
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATH1);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH1);
             }
             else
             {
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_DEATH2);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH2);
             }
             sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
             sithAIAwareness_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);

@@ -699,12 +699,12 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
                         goto LABEL_14;
                     if ( (v10 & SURFACEFLAGS_WATER) != 0 )
                     {
-                        sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + SITH_SC_LWALKWATER));
+                        sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKWATER));
                         return;
                     }
                     if ( (v10 & SURFACEFLAGS_PUDDLE) != 0 )
                     {
-                        sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + SITH_SC_LWALKPUDDLE));
+                        sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKPUDDLE));
                         return;
                     }
                     v3 = (~v10 & SURFACEFLAGS_EARTH | (unsigned int)SURFACEFLAGS_200000) >> 19;
@@ -715,16 +715,16 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
                 if ( (thing->attachedThing->thingflags & SITH_TF_METAL) != 0 )
                 {
 LABEL_14:
-                    sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + SITH_SC_LWALKMETAL));
+                    sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKMETAL));
                     return;
                 }
                 if ( (thing->attachedThing->thingflags & SITH_TF_EARTH) != 0 )
                 {
-                    sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + SITH_SC_LWALKEARTH));
+                    sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKEARTH));
                     return;
                 }
             }
-            sithSoundClass_ThingPlaySoundclass(thing, (soundToPlay_base + 4 * v3 + 6));
+            sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + 4 * v3 + 6));
             return;
         case 3u:
             if ( thing->thingtype == SITH_THING_ACTOR )
@@ -744,23 +744,23 @@ LABEL_14:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
                 if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LSWIMSURFACE);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMSURFACE);
                 else
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_LSWIMUNDER);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMUNDER);
             }
             return;
         case 7u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
                 if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_TREADSURFACE);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADSURFACE);
                 else
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_TREADUNDER);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADUNDER);
             }
             return;
         case 0xAu:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->attach_flags )
-                sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_CORPSEHIT);
+                sithSoundClass_PlayModeRandom(thing, SITH_SC_CORPSEHIT);
             return;
         case 0xBu:
             v11 = thing;
@@ -784,9 +784,9 @@ LABEL_50:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
                 if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_RSWIMSURFACE);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMSURFACE);
                 else
-                    sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_RSWIMUNDER);
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMUNDER);
             }
             return;
         case 0xEu:

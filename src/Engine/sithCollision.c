@@ -603,7 +603,7 @@ void sithCollision_FallHurt(sithThing *thing, float vel)
     v2 = (vel - 2.5) * (vel - 2.5) * 45.0;
     if ( v2 > 1.0 )
     {
-        sithSoundClass_ThingPlaySoundclass(thing, SITH_SC_HITDAMAGED);
+        sithSoundClass_PlayModeRandom(thing, SITH_SC_HITDAMAGED);
         sithThing_Damage(thing, thing, v2, 64);
     }
 }
@@ -1109,7 +1109,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
                 //printf("%f %f, %f %f %f\n", v39, v35, a1->physicsParams.vel.x, a1->physicsParams.vel.y, a1->physicsParams.vel.z);
                 if ( v39 > 1.0 )
                 {
-                    sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_HITDAMAGED);
+                    sithSoundClass_PlayModeRandom(a1, SITH_SC_HITDAMAGED);
                     sithThing_Damage(a1, a1, v39, 0x40);
                 }
             }

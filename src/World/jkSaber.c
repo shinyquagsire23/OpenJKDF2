@@ -312,7 +312,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             {
                 if (!(player->actorParams.typeflags & THING_TYPEFLAGS_80)) // verify
                 {
-                    sithSoundClass_ThingPlaySoundclass(player, SITH_SC_DEFLECTED);
+                    sithSoundClass_PlayModeRandom(player, SITH_SC_DEFLECTED);
 
                     if ( _frand() >= 0.5 )
                         sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK2, 0);

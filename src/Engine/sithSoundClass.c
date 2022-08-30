@@ -336,7 +336,7 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     {
         v3 = soundclass->entries[soundclass_id];
         if ( v3 )
-            sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
+            sithSoundClass_PlayMode(thing, v3, 1.0);
     }
 }
 
@@ -373,7 +373,7 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_i
                         while ( v7 );
                     }
                 }
-                return sithSoundClass_ThingPlaySoundclass2(thing, v4, 1.0);
+                return sithSoundClass_PlayMode(thing, v4, 1.0);
             }
         }
     }
@@ -390,7 +390,7 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
     {
         entry = v3->entries[sc_id];
         if ( entry )
-            sithSoundClass_ThingPlaySoundclass2(thing, entry, a3);
+            sithSoundClass_PlayMode(thing, entry, a3);
     }
 }
 
@@ -447,7 +447,7 @@ void sithSoundClass_Free2(sithWorld *world)
     }
 }
 
-sithPlayingSound* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2)
+sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
 {
     sithSoundClass *v2; // eax
     sithSoundClassEntry *v3; // esi
@@ -469,14 +469,14 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t 
                     for ( ; v5; v5-- )
                         v3 = v3->nextSound;
                 }
-                return sithSoundClass_ThingPlaySoundclass2(thing, v3, 1.0);
+                return sithSoundClass_PlayMode(thing, v3, 1.0);
             }
         }
     }
     return NULL;
 }
 
-sithPlayingSound* sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3)
+sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry *entry, float a3)
 {
     sithSound* pSithSound = entry->sound;
     if ( !entry->sound )

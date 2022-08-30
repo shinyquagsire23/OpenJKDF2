@@ -15,10 +15,10 @@
 #define sithSoundClass_Free2_ADDR (0x004E6A30)
 #define sithSoundClass_PlayThingSoundclass_ADDR (0x004E6AF0)
 #define sithSoundClass_ThingPlaySoundclass4_ADDR (0x004E6B30)
-#define sithSoundClass_ThingPlaySoundclass_ADDR (0x004E6B70)
+#define sithSoundClass_PlayModeRandom_ADDR (0x004E6B70)
 #define sithSoundClass_ThingPlaySoundclass5_ADDR (0x004E6C10)
 #define sithSoundClass_ThingPauseSoundclass_ADDR (0x004E6CA0)
-#define sithSoundClass_ThingPlaySoundclass2_ADDR (0x004E6CD0)
+#define sithSoundClass_PlayMode_ADDR (0x004E6CD0)
 #define sithSoundClass_SetThingSoundClass_ADDR (0x004E6D70)
 
 enum SITH_SC
@@ -150,8 +150,8 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3);
 void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id);
 void sithSoundClass_Free2(sithWorld *world);
 
-sithPlayingSound* sithSoundClass_ThingPlaySoundclass(sithThing *thing, uint32_t a2);
-sithPlayingSound* sithSoundClass_ThingPlaySoundclass2(sithThing *thing, sithSoundClassEntry *entry, float a3);
+sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2);
+sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry *entry, float a3);
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound);
 int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass);
 

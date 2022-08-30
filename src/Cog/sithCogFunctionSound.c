@@ -297,7 +297,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     int soundClassId = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
 
-    if ( thing && thing->soundclass && (pPlayingSound = sithSoundClass_ThingPlaySoundclass(thing, soundClassId)) != 0 )
+    if ( thing && thing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(thing, soundClassId)) != 0 )
     {
         sithCogVm_PushInt(ctx, pPlayingSound->refid);
         if (sithCogVm_multiplayerFlags

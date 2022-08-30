@@ -423,7 +423,7 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     }
     if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
     {
-        sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_VICTORY);
+        sithSoundClass_PlayModeRandom(v6, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
 
@@ -508,7 +508,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     }
     if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
     {
-        sithSoundClass_ThingPlaySoundclass(v7, SITH_SC_VICTORY);
+        sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
 
@@ -724,9 +724,9 @@ LABEL_26:
         if ( instinct->param0 == 0.0 )
         {
             if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
-                sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_SURPRISE);
+                sithSoundClass_PlayModeRandom(v6, SITH_SC_SURPRISE);
             else
-                sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_CURIOUS);
+                sithSoundClass_PlayModeRandom(v6, SITH_SC_CURIOUS);
             instinct_->param0 = 0.1;
         }
         v17 = extra;
@@ -814,7 +814,7 @@ LABEL_15:
     if ( aiclass->argsAsFloat[0] > _frand() && (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
     {
         sithAI_SetMoveThing(actor_, &actor_->field_1C4, 1.0);
-        sithSoundClass_ThingPlaySoundclass(v6, SITH_SC_CURIOUS);
+        sithSoundClass_PlayModeRandom(v6, SITH_SC_CURIOUS);
     }
     if ( v15 && v15->type )
     {
@@ -865,7 +865,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     v12 = actor->thing;
                     actor->flags &= ~SITHAIFLAGS_SEARCHING;
                     actor->flags |= (SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET);
-                    sithSoundClass_ThingPlaySoundclass(v12, SITH_SC_ALERT);
+                    sithSoundClass_PlayModeRandom(v12, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
                     actor->thingidk = actor->field_1D0;
@@ -1148,7 +1148,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
                         movePos.z = a5.z * -aiclass->argsAsFloat[0] + actor->thing->position.z;
                         sithAI_SetMoveThing(actor, &movePos, 2.5);
                         actor->field_28C = sithTime_curMs + 1000;
-                        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_CURIOUS);
+                        sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_CURIOUS);
                     }
                 }
             }
@@ -1264,7 +1264,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             {
                 actor->flags &= ~SITHAIFLAGS_SEARCHING;
                 actor->flags |= SITHAIFLAGS_FLEEING;
-                sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+                sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
                 sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
                 actor->field_1C0 = actor->field_1D0;
                 return 1;
@@ -1286,7 +1286,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                     actor->field_1C0 = v8;
                     if ( (actor->flags & SITHAIFLAGS_FLEEING) == 0 )
                     {
-                        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+                        sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
                         sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
                     }
                     actor->flags &= ~SITHAIFLAGS_SEARCHING;
@@ -1297,7 +1297,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         }
         return 0;
     }
-    sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_SURPRISE);
+    sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_SURPRISE);
     if ( extra )
         actor->field_1C0 = sithThing_GetParent(extra);
     result = 1;
@@ -1364,14 +1364,14 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
         if ( aiclass->argsAsFloat[1] > _frand() )
         {
             instinct->param0 = instinct->param0 - -1.0;
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FLEE);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FLEE);
             actor->flags |= SITHAIFLAGS_FLEEING;
             actor->field_1C0 = actor->field_1D0;
             return 1;
         }
 
         if ( _frand() < 0.1 )
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
     }
 
     result = sithTime_curMs + aiclass->argsAsInt[2];
@@ -1416,10 +1416,10 @@ int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     {
         if ( healthPercent > 0.5 )
         {
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_GLOAT);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_GLOAT);
             return 0;
         }
-        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+        sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
         return 0;
     }
 
@@ -1427,18 +1427,18 @@ int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     {
         if ( healthPercent < 0.25 )
         {
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_FEAR);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
             return 0;
         }
-        sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_BOAST);
+        sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_BOAST);
         return 0;
     }
     else
     {
         if ( healthPercent >= 0.5 )
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_HAPPY);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_HAPPY);
         else
-            sithSoundClass_ThingPlaySoundclass(actor->thing, SITH_SC_SEARCH);
+            sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_SEARCH);
         return 0;
     }
     return 0;

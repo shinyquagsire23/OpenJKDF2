@@ -217,7 +217,7 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionS
         a1->lookOrientation.uvec.x = a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.z - a1->lookOrientation.rvec.z * a1->lookOrientation.lvec.y;
         a1->lookOrientation.uvec.y = v15 - a1->lookOrientation.lvec.z * a1->lookOrientation.rvec.x;
         a1->lookOrientation.uvec.z = a1->lookOrientation.lvec.y * a1->lookOrientation.rvec.x - a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.x;
-        sithSoundClass_ThingPlaySoundclass(a1, SITH_SC_DEFLECTED);
+        sithSoundClass_PlayModeRandom(a1, SITH_SC_DEFLECTED);
         if ( thing2->lookOrientation.uvec.x * a1a.x + thing2->lookOrientation.uvec.y * a1a.y + thing2->lookOrientation.uvec.z * a1a.z <= 0.0 )
             sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK2, 0);
         else
