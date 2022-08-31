@@ -92,3 +92,7 @@ build_darwin64/*
 EnhancementMod/*
 openjkdf2.sublime-workspace
 formatting_notes.txt
+DW_res/*
+Jones_res/*
+build_emcc/*
+JK.h
