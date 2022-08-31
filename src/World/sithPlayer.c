@@ -278,7 +278,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
         if ( !v3->attach_flags )
         {
             v14 = v3->actorParams.typeflags;
-            if ( (v14 & THING_TYPEFLAGS_400000) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
+            if ( (v14 & SITH_AF_PLAYER_KILLED) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
             {
                 v15 = v3->sector;
                 if ( v15 )
@@ -286,14 +286,14 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
                     if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 )
                     {
                         v3->thingflags |= SITH_TF_DEAD;
-                        v3->actorParams.typeflags |= THING_TYPEFLAGS_400000;
+                        v3->actorParams.typeflags |= SITH_AF_PLAYER_KILLED;
                         sithCamera_SetCameraFocus(&sithCamera_cameras[1], v3, 0);
                         sithCamera_SetCurrentCamera(&sithCamera_cameras[1]);
                     }
                 }
             }
         }
-        if ( (v3->actorParams.typeflags & THING_TYPEFLAGS_400000) != 0 )
+        if ( (v3->actorParams.typeflags & SITH_AF_PLAYER_KILLED) != 0 )
         {
             v4->fade -= a2 * 0.69999999;
             if (v4->fade <= 0.0)
@@ -489,7 +489,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
         thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
         thing->physicsParams.physflags |= (SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
-        thing->actorParams.typeflags &= ~0x2000;
+        thing->actorParams.typeflags &= ~SITH_AF_BLEEDS;
         sithPhysics_ThingStop(thing);
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
@@ -521,7 +521,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     player->physicsParams.physflags &= ~(SITH_PF_800|SITH_PF_100);
     player->physicsParams.physflags |= SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY;
     player->thingflags |= SITH_TF_DEAD;
-    player->actorParams.typeflags &= ~THING_TYPEFLAGS_ISBLOCKING;
+    player->actorParams.typeflags &= ~SITH_AF_BLEEDS;
     sithPhysics_ThingStop(player);
     sithWeapon_SyncPuppet(player);
     sithInventory_SendKilledMessageToAll(player, killedBy);
@@ -614,7 +614,6 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     sithThing *v4; // eax
     stdPalEffect *v6; // eax
     int v7; // eax
-    uint32_t v8; // ecx
     int v9; // edi
 
     v1 = player->rdthing.puppet;
@@ -647,9 +646,8 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             stdPalEffects_ResetEffect(v6);
         }
         v7 = sithNet_isMulti;
-        v8 = player->actorParams.typeflags & ~THING_TYPEFLAGS_400000;
         player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_WILLBEREMOVED);
-        player->actorParams.typeflags = v8;
+        player->actorParams.typeflags &= ~SITH_AF_PLAYER_KILLED;
         player->lifeLeftMs = 0;
         if ( !v7 || player == g_localPlayerThing )
         {

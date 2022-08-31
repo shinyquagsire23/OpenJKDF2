@@ -601,13 +601,13 @@ float stdMath_ArcSin1(float val)
     // TODO: verify all these constants are expanded properly to the og values
     if ( v3 <= 0.70710677 )
     {
-        v5 = (stdMath_FlexPower(v3, 3) * 0.212749 + v3) * 57.295784;
+        v5 = (stdMath_FlexPower(v3, 3) * 0.212749 + v3) *  (180.0 / M_PI);
     }
     else
     {
         v2 = 1.0 - v3 * v3;
         v6 = stdMath_Sqrt(v2);
-        v5 = 90.0 - (stdMath_FlexPower(v6, 3) * 0.212749 + v6) * 57.295784;
+        v5 = 90.0 - (stdMath_FlexPower(v6, 3) * 0.212749 + v6) *  (180.0 / M_PI);
     }
 
     if ( val < 0.0 )
@@ -638,14 +638,14 @@ float stdMath_ArcSin2(float val)
     if ( v5 <= 0.70710677 )
     {
         v3 = stdMath_FlexPower(v5, 3) / 6.0 + v5;
-        v7 = (stdMath_FlexPower(v5, 5) * 0.105502 + v3) * 57.295784;
+        v7 = (stdMath_FlexPower(v5, 5) * 0.105502 + v3) *  (180.0 / M_PI);
     }
     else
     {
         v2 = 1.0 - v5 * v5;
         v8 = stdMath_Sqrt(v2);
         v4 = stdMath_FlexPower(v8, 3) / 6.0 + v8;
-        v7 = 90.0 - (stdMath_FlexPower(v8, 5) * 0.105502 + v4) * 57.295784;
+        v7 = 90.0 - (stdMath_FlexPower(v8, 5) * 0.105502 + v4) *  (180.0 / M_PI);
     }
 
     if ( val < 0.0 )
@@ -677,7 +677,7 @@ float stdMath_ArcSin3(float a1)
     {
         v4 = stdMath_FlexPower(v7, 3) / 6.0 + v7;
         v3 = stdMath_FlexPower(v7, 5) * 0.075000003 + v4;
-        v9 = (stdMath_FlexPower(v7, 7) * 0.066797003 + v3) * 57.295784;
+        v9 = (stdMath_FlexPower(v7, 7) * 0.066797003 + v3) * (180.0 / M_PI);
     }
     else
     {
@@ -685,7 +685,7 @@ float stdMath_ArcSin3(float a1)
         v10 = stdMath_Sqrt(v2);
         v6 = stdMath_FlexPower(v10, 3) / 6.0 + v10;
         v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
-        v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * 57.295784;
+        v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * (180.0 / M_PI);
     }
     if ( a1 < 0.0 )
         return -v9;
@@ -722,7 +722,7 @@ float stdMath_ArcTan1(float a1, float a2)
         v4 = v3;
     else
         v4 = -v9;
-    v7 = (v4 - stdMath_FlexPower(v4, 3) * 0.22629) * 57.295784;
+    v7 = (v4 - stdMath_FlexPower(v4, 3) * 0.22629) * (180.0 / M_PI);
     if ( v6 >= (double)v5 )
         v7 = 90.0 - v7;
     v8 = 90.0 - v7;
@@ -764,7 +764,7 @@ float stdMath_ArcTan2(float a1, float a2)
     else
         v5 = -v10;
     v4 = v5 - stdMath_FlexPower(v5, 3) / 3.0;
-    v8 = (stdMath_FlexPower(v5, 5) * 0.12366 + v4) * 57.295784;
+    v8 = (stdMath_FlexPower(v5, 5) * 0.12366 + v4) * (180.0 / M_PI);
     if ( v7 >= (double)v6 )
         v8 = 90.0 - v8;
     v9 = 90.0 - v8;
@@ -808,7 +808,7 @@ float stdMath_ArcTan3(float a1, float a2)
         v6 = -v11;
     v5 = v6 - stdMath_FlexPower(v6, 3) / 3.0;
     v4 = stdMath_FlexPower(v6, 5) / 5.0 + v5;
-    v9 = (v4 - stdMath_FlexPower(v6, 7) * 0.083920002) * 57.295784;
+    v9 = (v4 - stdMath_FlexPower(v6, 7) * 0.083920002) * (180.0 / M_PI);
     if ( v8 >= (double)v7 )
         v9 = 90.0 - v9;
     v10 = 90.0 - v9;
@@ -854,7 +854,7 @@ float stdMath_ArcTan4(float a1, float a2)
     v6 = v7 - stdMath_FlexPower(v7, 3) / 3.0;
     v5 = stdMath_FlexPower(v7, 5) / 5.0 + v6;
     v4 = v5 - stdMath_FlexPower(v7, 7) / 7.0;
-    v10 = (stdMath_FlexPower(v7, 9) * 0.063235 + v4) * 57.295784;
+    v10 = (stdMath_FlexPower(v7, 9) * 0.063235 + v4) * (180.0 / M_PI);
     if ( v9 >= (double)v8 )
         v10 = 90.0 - v10;
     v11 = 90.0 - v10;

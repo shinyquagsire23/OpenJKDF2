@@ -58,7 +58,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
         return 0;
     if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
-        if ( (v7->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
+        if ( (v7->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
         {
             if ( v8->polyline.length < (double)v8->length )
             {

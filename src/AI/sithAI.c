@@ -707,7 +707,7 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
     float actora; // [esp+34h] [ebp+4h]
 
     v3 = actor->thing;
-    if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
+    if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
     {
         v4 = actor->movePos.y - v3->position.y;
         v5 = actor->movePos.z - v3->position.z;
@@ -743,7 +743,7 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
             if ( (v3->physicsParams.physflags & SITH_PF_FLY) != 0 )
             {
 LABEL_15:
-                if ( (v3->actorParams.typeflags & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 )
+                if ( (v3->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 )
                 {
                     if ( (v3->thingflags & SITH_TF_WATER) != 0 )
                     {
@@ -821,7 +821,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
     actor->lookVector.z = v4;
     if ( rdVector_Normalize3Acc(&actor->lookVector) != 0.0 )
     {
-        if ( (v5->typeflags & 1) != 0 )
+        if ( (v5->typeflags & SITH_AF_1) != 0 )
         {
             v6 = stdMath_ArcSin3(actor->lookVector.z);
             if ( v6 < v5->minHeadPitch )
@@ -901,7 +901,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
         actor->blindAimError.z = v2->position.z + actor->blindAimError.z;
         if ( v4 )
         {
-            if ( (v4->actorParams.typeflags & THING_TYPEFLAGS_80) || (actor->thing->actorParams.typeflags & THING_TYPEFLAGS_BLIND) != 0 )
+            if ( (v4->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_BLIND) != 0 )
                 v9 = 3;
             actor->field_1D4 = v4->position;
             v5 = sithAI_sub_4EB090(v2, &actor->blindAimError, v4, actor->aiclass->fov, actor->aiclass->sightDist, actora, &actor->field_1E4, &actor->field_1F0);
@@ -960,7 +960,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
         actor->field_224 = bShowInvisibleThings;
         if ( v2 )
         {
-            if ( (v2->actorParams.typeflags & THING_TYPEFLAGS_80) || (actor->thing->actorParams.typeflags & THING_TYPEFLAGS_BLIND) != 0 )
+            if ( (v2->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_BLIND) != 0 )
                 v1 = 3;
             v3 = sithAI_sub_4EB090(actor->thing, &actor->thing->position, v2, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->field_234);
             actor->field_238 = v3;
@@ -1128,7 +1128,6 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     sithSector *v6; // edi
     sithCollisionSearchEntry *v7; // eax
     sithSurface *v8; // ecx
-    int v9; // eax
     sithThing *v10; // eax
     float a6; // [esp+0h] [ebp-2Ch]
     int v12; // [esp+1Ch] [ebp-10h]
@@ -1181,10 +1180,9 @@ LABEL_8:
             goto LABEL_20;
     }
     v8 = v7->surface;
-    v9 = v8->surfaceFlags;
-    if ( (v9 & SITH_SECTOR_HASTHRUST) != 0 )
+    if ( (v8->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
         goto LABEL_8;
-    v12 = 2 - ((v9 & SITH_SECTOR_NOGRAVITY) != 0);
+    v12 = 2 - ((v8->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
     if ( !arg8 )
         goto LABEL_20;
     if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
@@ -1208,7 +1206,6 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     int v5; // ebx
     sithCollisionSearchEntry *v6; // eax
     sithSurface *v7; // ecx
-    int v8; // eax
     int result; // eax
     sithThing *v10; // eax
     float a6; // [esp+0h] [ebp-24h]
@@ -1231,10 +1228,9 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
             if ( (v6->hitType & SITHCOLLISION_WORLD) != 0 )
             {
                 v7 = v6->surface;
-                v8 = v7->surfaceFlags;
-                if ( (v8 & SURFACEFLAGS_8) != 0 )
+                if ( (v7->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
                     goto LABEL_13;
-                v5 = 2 - ((v8 & SURFACEFLAGS_1) != 0);
+                v5 = 2 - ((v7->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
                 if ( !out )
                     goto LABEL_19;
                 if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v7 )
@@ -1368,7 +1364,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
     v20 = 0;
     if ( (g_debugmodeFlags & 0x80u) != 0
       || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
-      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) != 0 && (v9->actorParams.typeflags & THING_TYPEFLAGS_CANTSHOOTUNDERWATER) != 0 )
+      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) != 0 && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) != 0 )
     {
         return 0;
     }
@@ -1406,7 +1402,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
         v19 = -v19;
     if ( v19 > 1.0 - a4 )
         return 0;
-    if ( (v9->actorParams.typeflags & THING_TYPEFLAGS_20000) != 0 )
+    if ( (v9->actorParams.typeflags & SITH_AF_DELAYFIRE) != 0 )
     {
         actor->field_268 = a7 | 8;
         actor->field_264 = a5;
@@ -1581,7 +1577,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
     {
         if ( (a1->flags & SITHAI_MODE_ACTIVE) == 0 )
             v8 = 0.5;
-        if ( (a2->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) == 0 && (a2->jkFlags & 1) == 0 )
+        if ( (a2->actorParams.typeflags & SITH_AF_4) == 0 && (a2->jkFlags & 1) == 0 )
         {
             v5 = (a3 - 2.0) * 0.1;
             if ( v5 < 0.0 )
@@ -1593,7 +1589,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
                 v5 = 0.60000002;
             }
             v8 = (1.0 - v5) * v8;
-            if ( (v3->actorParams.typeflags & THING_TYPEFLAGS_2000000) == 0 )
+            if ( (v3->actorParams.typeflags & SITH_AF_2000000) == 0 )
             {
                 v6 = a2->sector;
                 if ( v6->ambientLight < 0.5 )
@@ -1608,9 +1604,9 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
             }
         }
     }
-    if ( a2->actorParams.typeflags & THING_TYPEFLAGS_80 && (v3->actorParams.typeflags & THING_TYPEFLAGS_8000) == 0 )
+    if ( a2->actorParams.typeflags & SITH_AF_INVISIBLE && (v3->actorParams.typeflags & SITH_AF_8000) == 0 )
         v8 = v8 * 0.050000001;
-    if ( (v3->actorParams.typeflags & THING_TYPEFLAGS_BLIND) != 0 )
+    if ( (v3->actorParams.typeflags & SITH_AF_BLIND) != 0 )
         v8 = v8 * 0.050000001;
     if ( v8 < 0.050000001 )
     {

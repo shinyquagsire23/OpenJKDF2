@@ -167,7 +167,7 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
         }
     }*/
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_800000) == 0 )
         jkHud_Draw();
     jkDev_sub_41F950();
     jkHudInv_Draw();
@@ -274,7 +274,7 @@ int jkGame_Update()
         }
     }*/
 
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_800000) == 0 )
         jkHud_Draw();
     jkDev_sub_41F950();
     jkHudInv_Draw();

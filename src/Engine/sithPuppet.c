@@ -581,21 +581,21 @@ LABEL_51:
     {
         if ( anim == SITH_ANIM_FALL )
         {
-            if ( (thing->thingflags & SITH_TF_DEAD) != 0 || (thing->actorParams.typeflags & THING_TYPEFLAGS_SCREAMING) != 0 )
+            if ( (thing->thingflags & SITH_TF_DEAD) != 0 || (thing->actorParams.typeflags & SITH_AF_SCREAMING) != 0 )
                 goto LABEL_60;
             sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_FALLING);
-            v20 = thing->actorParams.typeflags | THING_TYPEFLAGS_SCREAMING;
+            v20 = thing->actorParams.typeflags | SITH_AF_SCREAMING;
         }
         else
         {
-            if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_SCREAMING) == 0 )
+            if ( (thing->actorParams.typeflags & SITH_AF_SCREAMING) == 0 )
             {
 LABEL_60:
                 sithPuppet_sub_4E4A20(thing, v19);
                 return thinga;
             }
             sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_FALLING);
-            v20 = thing->actorParams.typeflags & ~THING_TYPEFLAGS_SCREAMING;
+            v20 = thing->actorParams.typeflags & ~SITH_AF_SCREAMING;
         }
         thing->actorParams.typeflags = v20;
         goto LABEL_60;
@@ -693,21 +693,21 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
             if ( !(thing->attach_flags & SITH_ATTACH_THINGSURFACE) )
             {
                 v10 = thing->attachedSurface->surfaceFlags;
-                if ( (v10 & (SURFACEFLAGS_100000|SURFACEFLAGS_EARTH|SURFACEFLAGS_PUDDLE|SURFACEFLAGS_WATER|SURFACEFLAGS_METAL)) != 0 )
+                if ( (v10 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
-                    if ( (v10 & SURFACEFLAGS_METAL) != 0 )
+                    if ( (v10 & SITH_SURFACE_METAL) != 0 )
                         goto LABEL_14;
-                    if ( (v10 & SURFACEFLAGS_WATER) != 0 )
+                    if ( (v10 & SITH_SURFACE_WATER) != 0 )
                     {
                         sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKWATER));
                         return;
                     }
-                    if ( (v10 & SURFACEFLAGS_PUDDLE) != 0 )
+                    if ( (v10 & SITH_SURFACE_PUDDLE) != 0 )
                     {
                         sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKPUDDLE));
                         return;
                     }
-                    v3 = (~v10 & SURFACEFLAGS_EARTH | (unsigned int)SURFACEFLAGS_200000) >> 19;
+                    v3 = (~v10 & SITH_SURFACE_EARTH | (unsigned int)SITH_SURFACE_200000) >> 19;
                 }
             }
             else

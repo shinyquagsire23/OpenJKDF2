@@ -807,9 +807,9 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
     if ( player->type == SITH_THING_PLAYER )
     {
         v39 = player->actorParams.playerinfo->iteminfo;
-        if ( (player->thingflags & 0x200) == 0 )
+        if ( (player->thingflags & SITH_TF_DEAD) == 0 )
         {
-            if ( (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) != 0 )
+            if ( (player->actorParams.typeflags & SITH_AF_DISABLED) != 0 )
             {
                 v2 = &sithInventory_powerKeybinds[0];
                 do

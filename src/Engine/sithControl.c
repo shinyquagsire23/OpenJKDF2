@@ -194,7 +194,7 @@ void sithControl_Tick(float deltaSecs, int deltaMs)
         return;
 
     if ( !g_localPlayerThing
-      || (THING_TYPEFLAGS_800000 & g_localPlayerThing->actorParams.typeflags) != 0
+      || (SITH_AF_800000 & g_localPlayerThing->actorParams.typeflags) != 0
       || (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_state & 1) != 0 )
     {
@@ -840,7 +840,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     {
         if ( (player->thingflags & SITH_TF_DEAD) != 0 )
         {
-            if ( (player->actorParams.typeflags & THING_TYPEFLAGS_400000) == 0 )
+            if ( (player->actorParams.typeflags & SITH_AF_PLAYER_KILLED) == 0 )
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;
@@ -875,7 +875,7 @@ LABEL_39:
         else
         {
             sithControl_PlayerLook(player, deltaSecs);
-            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & THING_TYPEFLAGS_IMMOBILE) == 0 )
+            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & SITH_AF_DISABLED) == 0 )
             {
                 if ( player->attach_flags )
                     sithControl_PlayerMovement(player);
@@ -1007,7 +1007,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
-        if ( (player->actorParams.typeflags & THING_TYPEFLAGS_1) != 0 )
+        if ( (player->actorParams.typeflags & SITH_AF_1) != 0 )
         {
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
@@ -1045,12 +1045,12 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
                     a2.x = player->actorParams.maxHeadPitch;
                 }
                 sithUnk4_MoveJointsForEyePYR(player, &a2);
-                player->actorParams.typeflags &= ~THING_TYPEFLAGS_FORCE;
+                player->actorParams.typeflags &= ~SITH_AF_2;
             }
             else
             {
 LABEL_20:
-                if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & 2) != 0 )
+                if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_2) != 0 )
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
@@ -1061,7 +1061,7 @@ LABEL_20:
                     a3a = v8;
                     v9 = -player->actorParams.eyePYR.x;
                     a1a = -v8;
-                    player->actorParams.typeflags |= THING_TYPEFLAGS_LIGHT;
+                    player->actorParams.typeflags |= SITH_AF_HEAD_IS_CENTERED;
                     if ( v9 < a1a )
                     {
                         v9 = a1a;
@@ -1077,8 +1077,8 @@ LABEL_20:
                         v9 = 0.0;
                     if ( v9 == 0.0 )
                     {
-                        player->actorParams.typeflags &= ~THING_TYPEFLAGS_FORCE;
-                        player->actorParams.typeflags |= THING_TYPEFLAGS_LIGHT;
+                        player->actorParams.typeflags &= ~SITH_AF_2;
+                        player->actorParams.typeflags |= SITH_AF_HEAD_IS_CENTERED;
                     }
                     else
                     {
@@ -1131,7 +1131,7 @@ void sithControl_PlayerMovement(sithThing *player)
     }
 
     if ( (player->attach_flags & SITH_ATTACH_WORLDSURFACE)
-         && (player->attachedSurface->surfaceFlags & (SURFACEFLAGS_100000|SURFACEFLAGS_WATER)) )
+         && (player->attachedSurface->surfaceFlags & (SITH_SURFACE_100000|SITH_SURFACE_WATER)) )
     {
         move_multiplier *= 0.5;
     }
@@ -1180,9 +1180,9 @@ void sithControl_PlayerMovement(sithThing *player)
         player->physicsParams.acceleration.y = y_vel;
         if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
         {
-            if ( (player->actorParams.typeflags & THING_TYPEFLAGS_LIGHT) == 0 )
+            if ( (player->actorParams.typeflags & SITH_AF_HEAD_IS_CENTERED) == 0 )
             {
-                player->actorParams.typeflags |= THING_TYPEFLAGS_FORCE;
+                player->actorParams.typeflags |= SITH_AF_2;
             }
         }
         player->physicsParams.acceleration.z = 0;

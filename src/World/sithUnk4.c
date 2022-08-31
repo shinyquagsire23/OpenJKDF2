@@ -54,7 +54,7 @@ void sithUnk4_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
     int v14; // ecx
     rdVector3 *actora; // [esp+14h] [ebp+4h]
 
-    actor->actorParams.typeflags &= ~0x10;
+    actor->actorParams.typeflags &= ~SITH_AF_HEAD_IS_CENTERED;
     actor->actorParams.eyePYR = *eyePYR;
     v3 = actor->animclass;
     if ( v3 )
@@ -223,7 +223,7 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionS
         else
             sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK, 0);
         v16 = thing2->signature;
-        a1->actorParams.typeflags &= ~1u;
+        a1->actorParams.typeflags &= ~SITH_AF_1;
         a1->prev_thing = thing2;
         a1->child_signature = v16;
         sithCog_SendMessageFromThing(thing2, 0, SITH_MESSAGE_BLOCKED);

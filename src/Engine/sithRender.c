@@ -397,7 +397,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.typeflags & SITH_AF_4) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -666,12 +666,12 @@ void sithRender_RenderLevelGeometry()
                 v65->field_4 = sithRender_lastRenderTick;
             }
 
-            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SURFACEFLAGS_400|SURFACEFLAGS_200)) != 0 || !v65->surfaceInfo.face.lightingMode )
+            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode )
             {
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
                     continue;
-                if ( (v65->surfaceFlags & (SURFACEFLAGS_200|SURFACEFLAGS_400)) != 0 )
+                if ( (v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY)) != 0 )
                 {
                     v41 = sithRender_geoMode;
                     if ( sithRender_geoMode > 3 )
@@ -795,11 +795,11 @@ void sithRender_RenderLevelGeometry()
                 }
 
                 surfaceFlags = v65->surfaceFlags;
-                if ( (surfaceFlags & SURFACEFLAGS_200) != 0 )
+                if ( (surfaceFlags & SITH_SURFACE_HORIZON_SKY) != 0 )
                 {
                     sithRenderSky_TransformHorizontal(procEntry, &v65->surfaceInfo, num_vertices);
                 }
-                else if ( (surfaceFlags & SURFACEFLAGS_400) != 0 )
+                else if ( (surfaceFlags & SITH_SURFACE_CEILING_SKY) != 0 )
                 {
                     sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, vertices_tmp, num_vertices);
                 }
@@ -1056,7 +1056,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
                 if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numLights < 0x20 )
                 {
                     // Actors all have a small amount of light
-                    if ( (i->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) && i->actorParams.lightIntensity > 0.0 )
+                    if ( (i->actorParams.typeflags & SITH_AF_4) && i->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &i->actorParams.lightOffset, &i->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &i->position);

@@ -240,7 +240,7 @@ int jkHud_ClearRects(int unk)
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, &jkHud_rectViewScores);
     if ( !jkHud_bViewScores && jkHud_tallyWhich )
         --jkHud_tallyWhich;
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & THING_TYPEFLAGS_800000) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_800000) == 0 )
     {
         result = 0;
 LABEL_29:

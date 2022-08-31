@@ -54,7 +54,7 @@ void sithPlayerActions_Activate(sithThing *thing)
             {
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
-                    if ( (searchResult->surface->surfaceFlags & SITH_THING_ACTOR) != 0 )
+                    if ( (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
                     {
                         sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
                         sithCollision_SearchClose();
@@ -86,7 +86,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
     int v14; // eax
     sithPlayingSound *v15; // eax
 
-    if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
+    if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
     {
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
@@ -110,23 +110,23 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
             if ( isAttached )
             {
                 v14 = attachedSurface->surfaceFlags;
-                if ( (v14 & (SURFACEFLAGS_100000|SURFACEFLAGS_EARTH|SURFACEFLAGS_PUDDLE|SURFACEFLAGS_WATER|SURFACEFLAGS_METAL)) != 0 )
+                if ( (v14 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
-                    if ( (v14 & SURFACEFLAGS_METAL) != 0 )
+                    if ( (v14 & SITH_SURFACE_METAL) != 0 )
                     {
                         jumpSound = SITH_SC_JUMPMETAL;
                     }
-                    else if ( (v14 & SURFACEFLAGS_WATER) != 0 )
+                    else if ( (v14 & SITH_SURFACE_WATER) != 0 )
                     {
                         jumpSound = SITH_SC_JUMPWATER;
                     }
-                    else if ( (v14 & SURFACEFLAGS_PUDDLE) != 0 )
+                    else if ( (v14 & SITH_SURFACE_PUDDLE) != 0 )
                     {
                         jumpSound = SITH_SC_JUMPWATER;
                     }
                     else
                     {
-                        jumpSound = (v14 & SURFACEFLAGS_EARTH) != 0 ? SITH_SC_JUMPEARTH : SITH_SC_JUMP;
+                        jumpSound = (v14 & SITH_SURFACE_EARTH) != 0 ? SITH_SC_JUMPEARTH : SITH_SC_JUMP;
                     }
                 }
                 else

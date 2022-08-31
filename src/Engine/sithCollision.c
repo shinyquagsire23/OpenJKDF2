@@ -266,11 +266,11 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
                           && (v8->type != SITH_THING_WEAPON
-                           || (v8->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
+                           || (v8->actorParams.typeflags & SITH_AF_1) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
                            && (v13 != v7 || v8->child_signature != v7->signature))
                           && (v7->type != SITH_THING_WEAPON
-                           || (v7->actorParams.typeflags & THING_TYPEFLAGS_1) == 0
+                           || (v7->actorParams.typeflags & SITH_AF_1) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
                         {
@@ -377,12 +377,12 @@ void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const r
         {
             v12 = &sector->surfaces[v47];
             v15 = v12->adjoin;
-            if ( (v12->surfaceFlags & SURFACEFLAGS_4) == 0 && !v15 )
+            if ( (v12->surfaceFlags & SITH_SURFACE_HAS_COLLISION) == 0 && !v15 )
                 continue;
             if ( !v15 )
             {
 LABEL_46:
-                if ( (unk3Flags & 4) == 0 && ((unk3Flags & 0x10) == 0 || (v12->surfaceFlags & SURFACEFLAGS_1) != 0) )
+                if ( (unk3Flags & 4) == 0 && ((unk3Flags & 0x10) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
                 {
                     v35 = sithWorld_pCurrentWorld->vertices;
                     rdVector3 dist;
@@ -813,7 +813,7 @@ LABEL_78:
                 {
                     v37 = v19->surface;
                     rdVector_Copy3(&v72, &v5->position);
-                    if ( (v37->surfaceFlags & 2) != 0 )
+                    if ( (v37->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
                         sithCog_SendMessageFromSurface(v37, v5, 8);
                     sithThing_MoveToSector(v5, v19->surface->adjoin->sector, 0);
                     v36 = _memcmp(&v72, &v5->position, sizeof(rdVector3)) != 0;
@@ -912,10 +912,10 @@ int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sith
         return 0;
     a1a = -rdVector_Dot3(&a3->hitNorm, &thing->physicsParams.vel);
 
-    if ( !sithCollision_CollideHurt(thing, &a3->hitNorm, a3->distance, surface->surfaceFlags & 0x80) )
+    if ( !sithCollision_CollideHurt(thing, &a3->hitNorm, a3->distance, surface->surfaceFlags & SITH_SURFACE_80) )
         return 0;
 
-    if ( (surface->surfaceFlags & SURFACEFLAGS_2) != 0 && (v3->thingflags & 0x100) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_curMsAbsolute )
+    if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (v3->thingflags & SITH_TF_INVULN) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_curMsAbsolute )
     {
         surface->surfaceInfo.lastTouchedMs = sithTime_curMsAbsolute;
         sithCog_SendMessageFromSurface(surface, v3, SITH_MESSAGE_TOUCHED);
@@ -924,7 +924,7 @@ int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sith
     {
         if ( a1a > 1.0 )
             a1a = 1.0;
-        if ( (surface->surfaceFlags & SURFACEFLAGS_METAL) != 0 )
+        if ( (surface->surfaceFlags & SITH_SURFACE_METAL) != 0 )
         {
             sithSoundClass_PlayThingSoundclass(v3, SITH_SC_HITMETAL, a1a);
             return 1;

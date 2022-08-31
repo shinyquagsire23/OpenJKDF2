@@ -157,8 +157,6 @@ int sithSurface_Load(sithWorld *world)
         if ( _sscanf(stdConffile_entry.args[2].value, "%x", &surfaceIter->surfaceFlags) != 1 )
             return 0;
 
-        surfaceIter->surfaceFlags |= 4;
-
         if ( _sscanf(stdConffile_entry.args[3].value, "%x", &face->type) != 1 )
             return 0;
         if ( (sithSurface_byte_8EE668 & 1) == 0 )
@@ -172,7 +170,7 @@ int sithSurface_Load(sithWorld *world)
             if ( (face->material->tex_type & 2) == 0 )
             {
                 face->geometryMode = 3;
-                surfaceIter->surfaceFlags &= ~0x600;
+                surfaceIter->surfaceFlags &= ~(SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY);
             }
         }
         else
@@ -180,7 +178,7 @@ int sithSurface_Load(sithWorld *world)
             face->geometryMode = 0;
         }
         face->lightingMode = _atoi(stdConffile_entry.args[5].value);
-        if ( (surfaceIter->surfaceFlags & 0x600) != 0 )
+        if ( (surfaceIter->surfaceFlags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) != 0 )
             face->lightingMode = 0;
         face->textureMode = _atoi(stdConffile_entry.args[6].value);
         adjoinIdx = _atoi(stdConffile_entry.args[7].value);
@@ -497,9 +495,9 @@ void sithSurface_Tick(float deltaSecs)
         sithThing* parent_thing = surface->parent_thing;
         if ( !parent_thing || parent_thing->type && parent_thing->signature == surface->signature )
         {
-            if ( (flags & SURFACEFLAGS_100000) != 0 )
+            if ( (flags & SITH_SURFACE_100000) != 0 )
             {
-                if ( (flags & SURFACEFLAGS_WATER) != 0 )
+                if ( (flags & SITH_SURFACE_WATER) != 0 )
                 {
                     v10 = surface->sithSurfaceParent;
                     if ( v10 )
@@ -517,16 +515,16 @@ void sithSurface_Tick(float deltaSecs)
                         }
                     }
                 }
-                else if ( (flags & SURFACEFLAGS_800000) != 0 )
+                else if ( (flags & SITH_SURFACE_800000) != 0 )
                 {
                     sithSurface_ScrollSky(surface, SITH_SURFACE_HORIZONSKY, deltaSecs, v2);
                 }
-                else if ( (flags & SURFACEFLAGS_1000000) != 0 )
+                else if ( (flags & SITH_SURFACE_1000000) != 0 )
                 {
                     sithSurface_ScrollSky(surface, SITH_SURFACE_CEILINGSKY, deltaSecs, v2);
                 }
             }
-            else if ( (flags & SURFACEFLAGS_200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
+            else if ( (flags & SITH_SURFACE_200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
             {
                 v14 = surface->field_34;
                 v15 = 0;
@@ -574,7 +572,7 @@ void sithSurface_Tick(float deltaSecs)
                     {
                         sithSurface* v23 = surface->sithSurfaceParent;
                         v23->surfaceInfo.face.wallCel = surface->wallCel;
-                        v23->surfaceFlags |= 0x8000;
+                        v23->surfaceFlags |= SITH_SURFACE_CHANGED;
                     }
                     else if ( (v22 & 0x10000) != 0 )
                     {
@@ -701,10 +699,10 @@ int sithSurface_StopAnim(rdSurface *surface)
     int v5; // edx
     int v6; // eax
 
-    if ( (surface->flags & SURFACEFLAGS_WATER) != 0 && (surface->flags & SURFACEFLAGS_100000) != 0 )
+    if ( (surface->flags & SITH_SURFACE_WATER) != 0 && (surface->flags & SITH_SURFACE_100000) != 0 )
     {
         v2 = surface->sithSurfaceParent;
-        v2->surfaceFlags &= ~0x800;
+        v2->surfaceFlags &= ~SITH_SURFACE_SCROLLING;
         surface->field_24.x = 0.0;
         surface->field_24.y = 0.0;
         surface->field_24.z = 0.0;
@@ -737,7 +735,7 @@ uint32_t sithSurface_GetSurfaceAnim(sithSurface *surface)
     v1 = 0;
     for ( i = sithSurface_aSurfaces; v1 <= sithSurface_numSurfaces; ++i )
     {
-        if ( (i->flags & SURFACEFLAGS_WATER) != 0 && i->sithSurfaceParent == surface )
+        if ( (i->flags & SITH_SURFACE_WATER) != 0 && i->sithSurfaceParent == surface )
             break;
         ++v1;
     }
@@ -778,7 +776,7 @@ rdSurface* sithSurface_SurfaceLightAnim(sithSurface *surface, float a2, float a3
     {
         v7 = surface->surfaceInfo.face.extraLight;
         result->sithSurfaceParent = surface;
-        result->flags = SURFACEFLAGS_400000|SURFACEFLAGS_WATER;
+        result->flags = SITH_SURFACE_400000|SITH_SURFACE_WATER;
         surfacea = v3;
         result->field_44 = surfacea / a3;
         result->field_3C = v7;
@@ -842,7 +840,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     v32 = v3;
     if ( !v3 )
         return 0;
-    v3->flags = SURFACEFLAGS_100000|SURFACEFLAGS_WATER;
+    v3->flags = SITH_SURFACE_100000|SITH_SURFACE_WATER;
     v3->sithSurfaceParent = surface;
     v6 = sithWorld_pCurrentWorld;
     v3->field_24 = *a2;
@@ -908,22 +906,22 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     }
     else
     {
-        v18 = atan2(v29 / v26, 1.0) * 57.295784;
+        v18 = atan2(v29 / v26, 1.0) * (180.0 / M_PI);
         if ( v26 < 0.0 && v29 > 0.0 )
             v18 = v18 - -180.0;
         if ( v26 < 0.0 && v29 < 0.0 )
             v18 = v18 - 180.0;
     }
     v27 = 320.0;
-    if ( (v34 & SURFACEFLAGS_20) != 0 )
+    if ( (v34 & SITH_SURFACE_HALF_TEXTURE_SCALE) != 0 )
     {
         v27 = 160.0;
     }
-    else if ( (v34 & SURFACEFLAGS_10) != 0 )
+    else if ( (v34 & SITH_SURFACE_DOUBLE_TEXTURE_SCALE) != 0 )
     {
         v27 = 640.0;
     }
-    else if ( (v34 & SURFACEFLAGS_40) != 0 )
+    else if ( (v34 & SITH_SURFACE_EIGHT_TEXTURE_SCALE) != 0 )
     {
         v27 = 40.0;
     }
@@ -941,7 +939,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     result = v32;
     v32->field_1C.x = -a1a.x;
     v32->field_1C.y = -a1a.y;
-    surface->surfaceFlags |= 0x800;
+    surface->surfaceFlags |= SITH_SURFACE_SCROLLING;
     return result;
 }
 
@@ -979,7 +977,7 @@ rdSurface* sithSurface_MaterialAnim(rdMaterial *material, float a2, int a3)
     else
         v4->wallCel = (a3 & 2) != 0;
     v4->material = material;
-    v4->flags = (uint16_t)a3 | SURFACEFLAGS_200000|SURFACEFLAGS_METAL;
+    v4->flags = (uint16_t)a3 | SITH_SURFACE_200000|SITH_SURFACE_METAL;
     v7 = (int64_t)(1000.0 / a2);
     v4->field_34 = v7;
     if (v7)
@@ -1024,7 +1022,7 @@ void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out)
     v2 = 0;
     for ( i = sithSurface_aSurfaces; v2 <= sithSurface_numSurfaces; ++i )
     {
-        if ( (i->flags & SURFACEFLAGS_WATER) != 0 && i->sithSurfaceParent == a1 )
+        if ( (i->flags & SITH_SURFACE_WATER) != 0 && i->sithSurfaceParent == a1 )
             break;
         ++v2;
     }
@@ -1071,8 +1069,6 @@ rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
     rdSurface *result; // eax
     int v3; // edx
     rdSurface *v4; // esi
-    float v5; // ecx
-    float v6; // ecx
 
     //result = (rdSurface *)sithSurface_numAvail;
     // Added: fix undef behavior?
@@ -1092,17 +1088,13 @@ rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
         if ( skyType == SITH_SURFACE_HORIZONSKY )
         {
             result->flags = 0x900000;
-            v5 = a2->y;
-            result->field_1C.x = a2->x;
-            result->field_1C.y = v5;
+            rdVector_Copy2(&result->field_1C, a2);
         }
         else
         {
             if ( skyType == SITH_SURFACE_CEILINGSKY )
                 result->flags = 0x1100000;
-            v6 = a2->y;
-            result->field_1C.x = a2->x;
-            result->field_1C.y = v6;
+            rdVector_Copy2(&result->field_1C, a2);
         }
     }
     return result;
@@ -1138,7 +1130,7 @@ rdSurface* sithSurface_sub_4F00A0(sithThing *thing, float a2, uint32_t a3)
     else
         v3->wallCel = (a3 & 2) != 0;
     v6 = thing->signature;
-    v3->flags = a3 | SURFACEFLAGS_200000|SURFACEFLAGS_EARTH;
+    v3->flags = a3 | SITH_SURFACE_200000|SITH_SURFACE_EARTH;
     v7 = thing->rdthing.sprite3;
     v3->parent_thing = thing;
     v3->signature = v6;
@@ -1181,7 +1173,7 @@ rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a
         v9 = thing->signature;
         result->parent_thing = thing;
         result->signature = v9;
-        result->flags = a4 & 1 | SURFACEFLAGS_400000|SURFACEFLAGS_PUDDLE;
+        result->flags = a4 & 1 | SITH_SURFACE_400000|SITH_SURFACE_PUDDLE;
         thing->thingflags |= SITH_TF_LIGHT;
         a1a = v5;
         result->field_44 = a1a / a3;
@@ -1279,7 +1271,7 @@ sithSurface* sithSurface_sub_4E63B0(int idx)
 
 void sithSurface_PushSurface(sithSurface *pSurface)
 {
-    pSurface->surfaceFlags |= SURFACEFLAGS_8000;
+    pSurface->surfaceFlags |= SITH_SURFACE_CHANGED;
 
     if ( sithSurface_numSurfaces_0 < 0x20 )
     {

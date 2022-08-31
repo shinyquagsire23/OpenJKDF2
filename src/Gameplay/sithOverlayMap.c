@@ -246,7 +246,7 @@ int sithOverlayMap_Render3(sithSector *pSector)
     {
         while ( 1 )
         {
-            if ( (v4->surfaceFlags & 1) != 0 )
+            if ( (v4->surfaceFlags & SITH_SURFACE_FLOOR) != 0 )
             {
                 v5 = v4->surfaceInfo.face.numVertices;
                 v6 = 0;
@@ -556,7 +556,7 @@ LABEL_11:
                 goto LABEL_11;
             }
         }
-        result = (sector_paSurfaces_->surfaceFlags & SURFACEFLAGS_1) == 0;
+        result = (sector_paSurfaces_->surfaceFlags & SITH_SURFACE_FLOOR) == 0;
     }
     else
     {
@@ -580,7 +580,7 @@ LABEL_24:
             v14 = &v12->surfaces[0];
             while ( 1 )
             {
-                if ( (v14->surfaceFlags & SURFACEFLAGS_1) != 0 )
+                if ( (v14->surfaceFlags & SITH_SURFACE_FLOOR) != 0 )
                 {
                     v15 = v14->surfaceInfo.face.numVertices;
                     v16 = 0;

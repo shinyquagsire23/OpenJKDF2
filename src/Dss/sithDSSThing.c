@@ -777,7 +777,7 @@ void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags
             case SITH_THING_WEAPON:
                 NETMSG_PUSHU32(thing->weaponParams.typeflags);
                 NETMSG_PUSHF32(thing->weaponParams.unk8);
-                NETMSG_PUSHS16(thing->weaponParams.field_18);
+                NETMSG_PUSHS16(thing->weaponParams.numDeflectionBounces);
                 break;
             case SITH_THING_EXPLOSION:
                 NETMSG_PUSHU32(thing->explosionParams.typeflags);
@@ -917,7 +917,7 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
         case SITH_THING_WEAPON:
             thing->weaponParams.typeflags = NETMSG_POPU32();
             thing->weaponParams.unk8 = NETMSG_POPF32();
-            thing->weaponParams.field_18 = NETMSG_POPS16();
+            thing->weaponParams.numDeflectionBounces = NETMSG_POPS16();
             break;
         case SITH_THING_EXPLOSION:
             thing->explosionParams.typeflags = NETMSG_POPU32();

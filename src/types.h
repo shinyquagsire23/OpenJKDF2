@@ -2288,7 +2288,7 @@ typedef struct sithThingWeaponParams
     float damage;
     sithThing* explodeTemplate;
     sithThing* fleshHitTemplate;
-    int32_t field_18;
+    uint32_t numDeflectionBounces;
     float rate;
     float mindDamage;
     sithThing* trailThing;

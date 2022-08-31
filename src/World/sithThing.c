@@ -319,7 +319,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     if (thing->attach_flags && thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
         v5 = thing->attachedSurface;
-        if ( (v5->surfaceFlags & SURFACEFLAGS_800) != 0 )
+        if ( (v5->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 )
         {
             sithSurface_DetachThing(v5, &v8);
             rdVector_MultAcc3(&thing->field_268, &v8, deltaSecs);
@@ -1182,12 +1182,12 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
     thing->field_38.z = v8->z;
     thing->attachedSufaceInfo = &surface->surfaceInfo;
     thing->physicsParams.physflags &= ~SITH_PF_100;
-    if ( (surface->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
+    if ( (surface->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 && thing->moveType == SITH_MT_PHYSICS )
     {
         sithSurface_DetachThing(surface, &a2a);
         rdVector_Sub3Acc(&thing->physicsParams.vel, &a2a);
     }
-    if ( (surface->surfaceFlags & SITH_SECTOR_UNDERWATER) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+    if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromSurface(surface, thing, SITH_MESSAGE_ENTERED);
     if ( !a3 && v4 )
     {
@@ -1204,17 +1204,17 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
         if ( thing->soundclass )
         {
             v15 = surface->surfaceFlags;
-            if ( (v15 & (SURFACEFLAGS_100000|SURFACEFLAGS_EARTH|SURFACEFLAGS_PUDDLE|SURFACEFLAGS_WATER|SURFACEFLAGS_METAL)) != 0 )
+            if ( (v15 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
             {
-                if ( (v15 & SURFACEFLAGS_METAL) != 0 )
+                if ( (v15 & SITH_SURFACE_METAL) != 0 )
                 {
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDMETAL);
                 }
-                else if ( (v15 & SURFACEFLAGS_WATER) != 0 )
+                else if ( (v15 & SITH_SURFACE_WATER) != 0 )
                 {
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDWATER);
                 }
-                else if ( (v15 & SURFACEFLAGS_PUDDLE) != 0 )
+                else if ( (v15 & SITH_SURFACE_PUDDLE) != 0 )
                 {
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDPUDDLE);
                 }
@@ -1354,12 +1354,12 @@ int sithThing_DetachThing(sithThing *thing)
         if ( (thing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 )
         {
             attached = thing->attachedSurface;
-            if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
+            if ( (attached->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 && thing->moveType == SITH_MT_PHYSICS )
             {
                 sithSurface_DetachThing(attached, &a2);
                 rdVector_Add3Acc(&thing->physicsParams.vel, &a2);
             }
-            if ( (attached->surfaceFlags & SURFACEFLAGS_2) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+            if ( (attached->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
                 sithCog_SendMessageFromSurface(attached, thing, SITH_MESSAGE_EXITED);
         }
         result = 0;
@@ -2034,7 +2034,7 @@ void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
     unsigned int v2; // eax
     unsigned int v3; // eax
 
-    if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_40) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( (thing->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
         if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
         {
@@ -2078,7 +2078,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
         receiver_ = receiver;
         goto LABEL_32;
     }
-    if ( (sender->actorParams.typeflags & THING_TYPEFLAGS_8) != 0 && flags != 0x40 )
+    if ( (sender->actorParams.typeflags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
         return 0.0;
     if ( sender->actorParams.health <= 0.0 )
         return amount;
@@ -2109,7 +2109,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
           && flags != 0x20
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & THING_TYPEFLAGS_1000000) == 0
+          && (v7->actorParams.typeflags & SITH_AF_1000000) == 0
           && sender->type == SITH_THING_ACTOR )
         {
             amount = amount * 0.1;
@@ -2233,7 +2233,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
             if ( thing->type != SITH_THING_PLAYER )
             {
                 v7 = thing->actorParams.typeflags;
-                if ( (v7 & THING_TYPEFLAGS_20) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
+                if ( (v7 & SITH_AF_EXPLODE_WHEN_KILLED) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
                 {
                     sithThing_Create(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
                     sithThing_Destroy(thing);

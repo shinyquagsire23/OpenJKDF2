@@ -245,7 +245,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             {
                 continue;
             }
-            if (resultThing->actorParams.typeflags & 0x100 
+            if (resultThing->actorParams.typeflags & SITH_AF_DROID 
                 || resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER )
             {
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->wall_sparks)
@@ -279,7 +279,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             
             if ( resultThing->type != SITH_THING_ACTOR 
                  && resultThing->type != SITH_THING_PLAYER 
-                 || !(resultThing->actorParams.typeflags & 0x2000) )
+                 || !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS) )
             {
                 if ( sithTime_curMs >= playerInfo->lastSparkSpawnMs + 200 && playerInfo->blood_sparks)
                 {
@@ -310,7 +310,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
             if ( rdVector_Dot3(&v52, &a1) >= resultThing->actorParams.fov
               && (_frand() < resultThing->actorParams.chance) )
             {
-                if (!(player->actorParams.typeflags & THING_TYPEFLAGS_80)) // verify
+                if (!(player->actorParams.typeflags & SITH_AF_INVISIBLE)) // verify
                 {
                     sithSoundClass_PlayModeRandom(player, SITH_SC_DEFLECTED);
 

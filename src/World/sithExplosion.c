@@ -92,7 +92,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
             else
             {
                 sithThing* v4 = i->receiver;
-                if ( ((explosion->actorParams.typeflags & THING_TYPEFLAGS_40) == 0
+                if ( ((explosion->explosionParams.typeflags & THING_TYPEFLAGS_40) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
                   && sithCollision_HasLos(explosion, v4, 1) )

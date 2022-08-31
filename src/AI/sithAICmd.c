@@ -169,7 +169,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
                 v10 = actor->field_238;
                 if ( v10 && v10 != 2 )
                 {
-                    if ( (actor->thing->actorParams.typeflags & THING_TYPEFLAGS_BLIND) == 0 && v9->param0 == 0.0 )
+                    if ( (actor->thing->actorParams.typeflags & SITH_AF_BLIND) == 0 && v9->param0 == 0.0 )
                     {
                         v9->param0 = 1.0;
                         sithAI_SetMoveThing(actor, &actor->field_23C, 2.0);

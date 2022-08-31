@@ -556,7 +556,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
             {
                 if ( v6 >= 0 )
                 {
-                    v7->surfaceFlags |= 0x2;
+                    v7->surfaceFlags |= SITH_SURFACE_COG_LINKED;
                     v10 = sithCog_numSurfaceLinks;
                     sithCog_aSurfaceLinks[v10].surface = v7;
                     sithCog_aSurfaceLinks[v10].cog = cog;
