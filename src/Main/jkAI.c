@@ -73,7 +73,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 v12 = actor->field_1F4;
                 if ( v12 == 3
                   && ((actor->thing->actorParams.typeflags & SITH_TF_NOIMPACTDAMAGE) != 0
-                   || (v13 = actor->field_1D0) != 0 && v13->actorParams.typeflags & SITHAIFLAGS_UNK80) )
+                   || (v13 = actor->field_1D0) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
                 {
                     actor->field_1F0 = 0.0;
                 }
@@ -84,9 +84,9 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                     if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
                     {
 LABEL_27:
-                        if ( (actor->thing->actorParams.typeflags & SITHAIFLAGS_DISABLED) == 0 )
+                        if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) == 0 )
                         {
-                            actor->thing->actorParams.typeflags |= SITHAIFLAGS_DISABLED;
+                            actor->thing->actorParams.typeflags |= SITHAI_MODE_DISABLED;
                             return 0;
                         }
                         return 0;
@@ -103,7 +103,7 @@ LABEL_27:
                 while ( v5 < 4 );
                 if ( !v5 )
                 {
-                    actor->flags &= ~SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+                    actor->flags &= ~SITHAI_MODE_TARGET_VISIBLE;
                     goto LABEL_27;
                 }
                 v17_lo = (int)(_frand() * (double)v5);
@@ -143,11 +143,11 @@ LABEL_27:
                     a3a = aiclass->argsAsFloat[1];
                 }
                 v21 = actor->thing;
-                if ( (actor->thing->actorParams.typeflags & SITHAIFLAGS_DISABLED) != 0 )
+                if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) != 0 )
                 {
-                    v21->actorParams.typeflags &= ~SITHAIFLAGS_DISABLED;
+                    v21->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
                 }
-                actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+                actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
                 sithSoundClass_ThingPlaySoundclass4(v21, v17_lo + SITH_SC_FIRE1);
                 sithPuppet_PlayMode(actor->thing, v20, 0);
                 jkSaber_Enable(actor->thing, a2a, a3a, 0.0);
@@ -158,13 +158,13 @@ LABEL_27:
         }
         return 0;
     }
-    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
     result = 1;
-    actor->flags = actor->flags & ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET) | SITHAIFLAGS_SEARCHING;
+    actor->flags = actor->flags & ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING) | SITHAI_MODE_SEARCHING;
     return result;
 }
 
@@ -181,7 +181,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     int v16; // eax
     int aiclassa; // [esp+24h] [ebp+8h]
 
-    if ( flags != SITHAIFLAGS_SEARCHING || instinct->param0 == 0.0 )
+    if ( flags != SITHAI_MODE_SEARCHING || instinct->param0 == 0.0 )
     {
         if ( !flags )
         {
@@ -210,9 +210,9 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED1);
                         v13 = actor->thing;
-                        if ( (actor->thing->actorParams.typeflags & SITHAIFLAGS_DISABLED) != 0 )
+                        if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) != 0 )
                         {
-                            v13->actorParams.typeflags &= ~SITHAIFLAGS_DISABLED;
+                            v13->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
                         }
                         aiclassa = sithPuppet_PlayMode(v13, aiclass->argsAsInt[5], 0);
                         if ( aiclassa >= 0 )
@@ -233,7 +233,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     }
     if ( !extra || extra != g_localPlayerThing )
         return 0;
-    sithThing_Damage(extra, actor->thing, aiclass->argsAsFloat[7], 0x10);
+    sithThing_Damage(extra, actor->thing, aiclass->argsAsFloat[7], SITH_DAMAGE_SABER);
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED2);
     v5 = actor->thing->rdthing.puppet;
     if ( v5 )

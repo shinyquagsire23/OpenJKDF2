@@ -229,15 +229,15 @@ void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx)
     NETMSG_PUSHU32(actor->field_204);
     NETMSG_PUSHF32(actor->moveSpeed);
 
-    if (actor->flags & SITHAIFLAGS_MOVING_TO_DEST)
+    if (actor->flags & SITHAI_MODE_MOVING)
     {
         NETMSG_PUSHVEC3(actor->movePos);
     }
-    if (actor->flags & SITHAIFLAGS_TURNING_TO_DEST)
+    if (actor->flags & SITHAI_MODE_TURNING)
     {
         NETMSG_PUSHVEC3(actor->lookVector);
     }
-    if (actor->flags & SITHAIFLAGS_FLEEING)
+    if (actor->flags & SITHAI_MODE_FLEEING)
     {
         if ( actor->field_1C0 ) {
             NETMSG_PUSHS16(actor->field_1C0->thingIdx);
@@ -308,15 +308,15 @@ int sithDSS_HandleSyncAI(sithCogMsg *msg)
     actor->field_204 = NETMSG_POPU32();
     actor->moveSpeed = NETMSG_POPF32();
 
-    if (actor->flags & SITHAIFLAGS_MOVING_TO_DEST)
+    if (actor->flags & SITHAI_MODE_MOVING)
     {
         actor->movePos = NETMSG_POPVEC3();
     }
-    if (actor->flags & SITHAIFLAGS_TURNING_TO_DEST)
+    if (actor->flags & SITHAI_MODE_TURNING)
     {
         actor->lookVector = NETMSG_POPVEC3();
     }
-    if (actor->flags & SITHAIFLAGS_FLEEING)
+    if (actor->flags & SITHAI_MODE_FLEEING)
     {
         actor->field_1C0 = sithThing_GetThingByIdx(NETMSG_POPS16());
     }

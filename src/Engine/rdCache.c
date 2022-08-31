@@ -320,7 +320,7 @@ int rdCache_SendFaceListToHardware()
             v148 = 0.0;
 
         // Added: We need to know if a face is double-sided
-        if (active_6c->type & 1 && active_6c->light_flags)
+        if (active_6c->type & RD_FF_DOUBLE_SIDED && active_6c->light_flags)
         {
             flags_idk_ |= 0x10000;
         }
@@ -346,7 +346,7 @@ int rdCache_SendFaceListToHardware()
         if ( lighting_capability >= rdroid_curLightingMode )
             lighting_capability = rdroid_curLightingMode;
 
-        if ( (active_6c->type & 2) != 0 )
+        if ( (active_6c->type & RD_FF_TEX_TRANSLUCENT) != 0 )
         {
             expected_alpha = 90;
             flags_idk_ |= 0x200;

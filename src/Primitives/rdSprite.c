@@ -35,7 +35,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     sprite->type = type;
     sprite->height = height;
     sprite->offset = *offset;
-    sprite->face.type = 1;
+    sprite->face.type = RD_FF_DOUBLE_SIDED;
     sprite->face.geometryMode = geometryMode;
     sprite->face.lightingMode = lightMode;
     sprite->face.textureMode = textureMode;

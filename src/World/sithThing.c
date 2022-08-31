@@ -303,7 +303,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     float arg4a; // [esp+2Ch] [ebp+8h]
 
     v2 = 0;
-    if ((thing->attach_flags & ATTACHFLAGS_THING_RELATIVE))
+    if ((thing->attach_flags & SITH_ATTACH_NO_MOVE))
         return;
         
     if ( thing->moveType == SITH_MT_PHYSICS )
@@ -316,7 +316,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
         rdVector_Zero3(&thing->field_268);
     }
 
-    if (thing->attach_flags && thing->attach_flags & ATTACHFLAGS_WORLDSURFACE)
+    if (thing->attach_flags && thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
         v5 = thing->attachedSurface;
         if ( (v5->surfaceFlags & SURFACEFLAGS_800) != 0 )
@@ -328,7 +328,7 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     
     if (rdVector_IsZero3(&thing->field_268))
     {
-        if ( thing->moveType == SITH_MT_PHYSICS && (thing->attach_flags & (ATTACHFLAGS_THINGSURFACE|ATTACHFLAGS_THING)) != 0 && thing->attachedThing->moveType == SITH_MT_PATH )
+        if ( thing->moveType == SITH_MT_PHYSICS && (thing->attach_flags & (SITH_ATTACH_THINGSURFACE|SITH_ATTACH_THING)) != 0 && thing->attachedThing->moveType == SITH_MT_PATH )
             sithPhysics_FindFloor(thing, 0);
     }
     else
@@ -660,7 +660,7 @@ void sithThing_sub_4CD100(sithThing *thing)
 
     if ( (sithWorld_pCurrentWorld->level_type_maybe & 2) != 0
       && thing->moveType == SITH_MT_PHYSICS
-      && (thing->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
+      && (thing->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)) != 0 )
     {
         sithPhysics_FindFloor(thing, 1);
     }
@@ -1065,10 +1065,10 @@ LABEL_24:
         goto LABEL_48;
     if ( v17->moveType == SITH_MT_PHYSICS )
     {
-        if ( (v17->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)) != 0 )
+        if ( (v17->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)) != 0 )
             sithPhysics_FindFloor(v17, 1);
 LABEL_48:
-        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & PHYSFLAGS_20000) == 0 )
+        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & SITH_PF_20000) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
     }
     v24 = v17->class_cog;
@@ -1181,7 +1181,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
     thing->attachedSurface = surface;
     thing->field_38.z = v8->z;
     thing->attachedSufaceInfo = &surface->surfaceInfo;
-    thing->physicsParams.physflags &= ~PHYSFLAGS_100;
+    thing->physicsParams.physflags &= ~SITH_PF_100;
     if ( (surface->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
     {
         sithSurface_DetachThing(surface, &a2a);
@@ -1228,7 +1228,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_LANDHARD);
             }
         }
-        if ( thing->animclass && thing->moveType == SITH_MT_PHYSICS && (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) == 0 )
+        if ( thing->animclass && thing->moveType == SITH_MT_PHYSICS && (thing->physicsParams.physflags & SITH_PF_CROUCHING) == 0 )
             sithPuppet_PlayMode(thing, SITH_ANIM_LAND, 0);
         return;
     }
@@ -1249,13 +1249,13 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     v18 = 1;
     if ( a1->attach_flags )
     {
-        if ( (a1->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
+        if ( (a1->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
             return;
         v18 = 0;
         sithThing_DetachThing(a1);
     }
     v7 = a3->vertexPosIdx;
-    a1->attach_flags = ATTACHFLAGS_THINGSURFACE;
+    a1->attach_flags = SITH_ATTACH_THINGSURFACE;
     a1->attachedSufaceInfo = (sithSurfaceInfo *)a3;
     v8 = *v7;
     a1->attachedThing = a2;
@@ -1266,7 +1266,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
         v9->parentThing = a1;
     a1->parentThing = 0;
     a2->attachedParentMaybe = a1;
-    a1->physicsParams.physflags &= ~PHYSFLAGS_100;
+    a1->physicsParams.physflags &= ~SITH_PF_100;
     if ( a2->moveType == SITH_MT_PHYSICS )
     {
         rdVector_Sub3Acc(&a1->physicsParams.vel, &a2->physicsParams.vel);
@@ -1316,12 +1316,12 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
     v2 = parent->attach_flags;
     if ( v2 )
     {
-        if ( (v2 & ATTACHFLAGS_THING) != 0 && parent->attachedThing == child )
+        if ( (v2 & SITH_ATTACH_THING) != 0 && parent->attachedThing == child )
             return;
         sithThing_DetachThing(parent);
     }
     v3 = child->attachedParentMaybe;
-    parent->attach_flags = ATTACHFLAGS_THING;
+    parent->attach_flags = SITH_ATTACH_THING;
     parent->attachedThing = child;
     parent->childThing = v3;
     if ( v3 )
@@ -1349,9 +1349,9 @@ int sithThing_DetachThing(sithThing *thing)
     rdVector3 a2; // [esp+Ch] [ebp-Ch] BYREF
 
     v2 = &thing->attach_flags;
-    if ( (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE)) == 0 )
+    if ( (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0 )
     {
-        if ( (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 )
+        if ( (thing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 )
         {
             attached = thing->attachedSurface;
             if ( (attached->surfaceFlags & SURFACEFLAGS_800) != 0 && thing->moveType == SITH_MT_PHYSICS )
@@ -2036,7 +2036,7 @@ void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
 
     if ( (thing->actorParams.typeflags & THING_TYPEFLAGS_40) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
-        if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
         {
             v3 = thing->actorParams.msUnderwater;
             if ( v3 )
@@ -2059,7 +2059,7 @@ void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
             thing->actorParams.msUnderwater = v2;
             if ( v2 > 20000 )
             {
-                sithThing_Damage(thing, thing, 10.0, 32);
+                sithThing_Damage(thing, thing, 10.0, SITH_DAMAGE_DROWN);
                 thing->actorParams.msUnderwater -= 2000;
             }
         }
@@ -2229,7 +2229,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                     thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH2, 0);
             }
 
-            thing->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+            thing->physicsParams.physflags &= ~SITH_PF_CROUCHING;
             if ( thing->type != SITH_THING_PLAYER )
             {
                 v7 = thing->actorParams.typeflags;
@@ -2242,13 +2242,13 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 {
                     if ( (v7 & THING_TYPEFLAGS_40) != 0 )
                         thing->physicsParams.buoyancy = 0.30000001;
-                    if ( (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                    if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
                         thing->thingflags |= SITH_TF_DEAD;
                         sithThing_detachallchildren(thing);
-                        v10 = thing->physicsParams.physflags & ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
+                        v10 = thing->physicsParams.physflags & ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
                         thing->type = SITH_THING_CORPSE;
-                        thing->physicsParams.physflags = v10 | (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+                        thing->physicsParams.physflags = v10 | (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
                         thing->lifeLeftMs = 20000;
                         sithPhysics_FindFloor(thing, 0);
                     }
@@ -2417,8 +2417,8 @@ void sithActor_Remove(sithThing *thing)
     thing->thingflags |= SITH_TF_DEAD;
     sithThing_detachallchildren(thing);
     thing->type = SITH_THING_CORPSE;
-    thing->physicsParams.physflags &= ~(PHYSFLAGS_FLYING|PHYSFLAGS_800|PHYSFLAGS_100|PHYSFLAGS_WALLSTICK);
-    thing->physicsParams.physflags |= (PHYSFLAGS_FLOORSTICK|PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+    thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
+    thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
     thing->lifeLeftMs = 20000;
     sithPhysics_FindFloor(thing, 0);
 }

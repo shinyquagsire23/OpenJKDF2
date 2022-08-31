@@ -285,7 +285,7 @@ int sithWorld_NewEntry(sithWorld *world)
                 v16 = &world->things[i];
                 if ( v16->type
                   && v16->moveType == SITH_MT_PHYSICS
-                  && (v16->physicsParams.physflags & (PHYSFLAGS_WALLSTICK|PHYSFLAGS_FLOORSTICK)))
+                  && (v16->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)))
                 {
                     sithPhysics_FindFloor(v16, 1);
                 }

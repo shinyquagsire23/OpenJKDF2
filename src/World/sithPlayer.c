@@ -487,8 +487,8 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         sithSoundClass_StopSound(thing, 0);
         sithThing_detachallchildren(thing);
         sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
-        thing->physicsParams.physflags &= ~(PHYSFLAGS_CROUCHING|PHYSFLAGS_800|PHYSFLAGS_100);
-        thing->physicsParams.physflags |= (PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY);
+        thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
+        thing->physicsParams.physflags |= (SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
         thing->actorParams.typeflags &= ~0x2000;
         sithPhysics_ThingStop(thing);
         sithWeapon_SyncPuppet(thing);
@@ -518,8 +518,8 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     sithPlayerInfo *v5; // edi
 
     v5 = player->actorParams.playerinfo;
-    player->physicsParams.physflags &= ~(PHYSFLAGS_800|PHYSFLAGS_100);
-    player->physicsParams.physflags |= PHYSFLAGS_SURFACEALIGN|PHYSFLAGS_GRAVITY;
+    player->physicsParams.physflags &= ~(SITH_PF_800|SITH_PF_100);
+    player->physicsParams.physflags |= SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY;
     player->thingflags |= SITH_TF_DEAD;
     player->actorParams.typeflags &= ~THING_TYPEFLAGS_ISBLOCKING;
     sithPhysics_ThingStop(player);
@@ -632,10 +632,10 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     {
         v4 = player->templateBase;
         player->actorParams.health = v4->actorParams.health;
-        if ( (v4->physicsParams.physflags & PHYSFLAGS_800) != 0 )
+        if ( (v4->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            player->physicsParams.physflags &= ~(PHYSFLAGS_100|PHYSFLAGS_SURFACEALIGN);
-            player->physicsParams.physflags |= PHYSFLAGS_800;
+            player->physicsParams.physflags &= ~(SITH_PF_100|SITH_PF_SURFACEALIGN);
+            player->physicsParams.physflags |= SITH_PF_800;
         }
         sithUnk4_MoveJointsForEyePYR(player, &rdroid_zeroVector3);
         if ( player == g_localPlayerThing )

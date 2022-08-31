@@ -89,20 +89,20 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
     if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
     {
         final_vel = thing->actorParams.jumpSpeed * vel;
-        if ( (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING) != 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             final_vel = final_vel * 0.69999999;
-        if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
         {
             thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
             thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
             thing->physicsParams.vel.z = 1.0 * final_vel + thing->physicsParams.vel.z;
-            thing->physicsParams.physflags &= ~PHYSFLAGS_MIDAIR;
+            thing->physicsParams.physflags &= ~SITH_PF_MIDAIR;
         }
         else
         {
             if ( !thing->attach_flags )
                 return;
-            isAttached = (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE)) == 0;
+            isAttached = (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0;
             attachedSurface = thing->attachedSurface;
             thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
             thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
@@ -168,7 +168,7 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
             sithPhysics_ThingStop(thing);
-            thing->physicsParams.physflags &= ~PHYSFLAGS_100;
+            thing->physicsParams.physflags &= ~SITH_PF_100;
             sithPhysics_FindFloor(thing, 1);
         }
     }

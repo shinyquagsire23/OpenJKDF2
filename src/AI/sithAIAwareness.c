@@ -86,7 +86,7 @@ int sithAIAwareness_Tick(int a, sithEventInfo* b)
                     if ( v6 )
                     {
                         if ( sithAIAwareness_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
-                            sithAI_SetActorFireTarget(i, SITHAIFLAGS_ATTACKING_TARGET, 0);
+                            sithAI_SetActorFireTarget(i, SITHAI_MODE_ATTACKING, 0);
                     }
                 }
             }

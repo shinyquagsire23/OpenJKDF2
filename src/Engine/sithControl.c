@@ -1117,20 +1117,20 @@ void sithControl_PlayerMovement(sithThing *player)
     int old_state = player->physicsParams.physflags;
     if ( !sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, 0) )
     {
-        new_state = old_state & ~PHYSFLAGS_CROUCHING;
+        new_state = old_state & ~SITH_PF_CROUCHING;
     }
     else
     {
-        new_state = old_state | PHYSFLAGS_CROUCHING;
+        new_state = old_state | SITH_PF_CROUCHING;
         move_multiplier = 0.5;
     }
     player->physicsParams.physflags = new_state;
-    if ( (player->physicsParams.physflags & PHYSFLAGS_200000) != 0 )
+    if ( (player->physicsParams.physflags & SITH_PF_200000) != 0 )
     {
         move_multiplier = 0.5;
     }
 
-    if ( (player->attach_flags & ATTACHFLAGS_WORLDSURFACE)
+    if ( (player->attach_flags & SITH_ATTACH_WORLDSURFACE)
          && (player->attachedSurface->surfaceFlags & (SURFACEFLAGS_100000|SURFACEFLAGS_WATER)) )
     {
         move_multiplier *= 0.5;
@@ -1230,7 +1230,7 @@ void sithControl_FreeCam(sithThing *player)
         if ( (v6 != 0.0 || v9 != 0.0) // TODO verify first comparison?
           && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
           && v2
-          && (v1->physicsParams.physflags & PHYSFLAGS_MIDAIR) == 0 )
+          && (v1->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
         {
             rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
             rdMatrix_TransformVector34Acc(&v1->physicsParams.acceleration, &a);
@@ -1266,7 +1266,7 @@ void sithControl_FreeCam(sithThing *player)
         {
             if ( sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp) )
             {
-                if ( (v1->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+                if ( (v1->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
                 {
                     if ( tmp )
                         sithPlayerActions_JumpWithVel(v1, 1.0);
@@ -1282,9 +1282,9 @@ void sithControl_FreeCam(sithThing *player)
         else
         {
             if ( !sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp) )
-                v1->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+                v1->physicsParams.physflags &= ~SITH_PF_CROUCHING;
             else
-                v1->physicsParams.physflags |= PHYSFLAGS_CROUCHING;
+                v1->physicsParams.physflags |= SITH_PF_CROUCHING;
         }
     }
 }

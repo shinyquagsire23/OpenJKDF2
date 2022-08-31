@@ -154,16 +154,16 @@ int sithDebugConsole_CmdFly()
     {
         if ( v0->moveType == SITH_MT_PHYSICS )
         {
-            if (v0->physicsParams.physflags & PHYSFLAGS_FLYING)
+            if (v0->physicsParams.physflags & SITH_PF_FLY)
             {
-                v0->physicsParams.physflags &= ~PHYSFLAGS_FLYING;
-                v0->physicsParams.physflags |= PHYSFLAGS_GRAVITY;
+                v0->physicsParams.physflags &= ~SITH_PF_FLY;
+                v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
                 v3 = sithStrTable_GetString("FLYING_OFF");
             }
             else
             {
-                v0->physicsParams.physflags &= ~PHYSFLAGS_GRAVITY;
-                v0->physicsParams.physflags |= PHYSFLAGS_FLYING;
+                v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
+                v0->physicsParams.physflags |= SITH_PF_FLY;
                 v3 = sithStrTable_GetString("FLYING_ON");
             }
             DebugConsole_PrintUniStr(v3);

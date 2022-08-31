@@ -24,87 +24,87 @@ void sithAICmd_Startup()
     sithAI_RegisterCommand("listen", sithAICmd_Listen, 
         0, // allowed flags...?
         0, // disallowed flags
-        SITHAIFLAGS_SEARCHING|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST);
+        SITHAI_MODE_SEARCHING|SITHAI_MODE_ATTACKING|SITHAI_MODE_MOVING);
     sithAI_RegisterCommand("lookfortarget", sithAICmd_LookForTarget, 
-        SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_SEARCHING, // allowed flags
+        SITHAI_MODE_ACTIVE|SITHAI_MODE_SEARCHING, // allowed flags
         0,                              // disallowed flags
         0);
     sithAI_RegisterCommand("primaryfire", sithAICmd_PrimaryFire, 
-        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        SITHAI_MODE_ATTACKING,   // allowed flags
         0,                              // disallowed flags
-        SITHAIFLAGS_UNK100);
+        SITHAI_MODE_UNK100);
     sithAI_RegisterCommand("follow", sithAICmd_Follow,
-        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
-        SITHAIFLAGS_FLEEING,            // disallowed flags
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE);
+        SITHAI_MODE_ATTACKING,   // allowed flags
+        SITHAI_MODE_FLEEING,            // disallowed flags
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE);
     sithAI_RegisterCommand("turretfire", sithAICmd_TurretFire, 
-        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
-        SITHAIFLAGS_FLEEING,            // disallowed flags
-        SITHAIFLAGS_UNK100);
+        SITHAI_MODE_ATTACKING,   // allowed flags
+        SITHAI_MODE_FLEEING,            // disallowed flags
+        SITHAI_MODE_UNK100);
     sithAI_RegisterCommand("opendoors", sithAICmd_OpenDoors, 
-        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        SITHAI_MODE_ATTACKING,   // allowed flags
         0,                              // disallowed flags
         0);
     sithAI_RegisterCommand("jump", sithAICmd_Jump, 
         0,                      // allowed flags
         0,                      // disallowed flags
-        SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_SEARCHING);
+        SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_SEARCHING);
     sithAI_RegisterCommand("randomturn", sithAICmd_RandomTurn, 
-        SITHAIFLAGS_SEARCHING,  // allowed flags
+        SITHAI_MODE_SEARCHING,  // allowed flags
         0,                      // disallowed flags
         0);
     sithAI_RegisterCommand("roam", sithAICmd_Roam, 
-        SITHAIFLAGS_SEARCHING,  // allowed flags
+        SITHAI_MODE_SEARCHING,  // allowed flags
         0,                      // disallowed flags
         0);
     sithAI_RegisterCommand("flee", sithAICmd_Flee,
-        SITHAIFLAGS_FLEEING,    // allowed flags
+        SITHAI_MODE_FLEEING,    // allowed flags
         0,                      // disallowed flags
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_UNK100|SITHAIFLAGS_SEARCHING|SITHAIFLAGS_MOVING_TO_DEST);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
     sithAI_RegisterCommand("sensedanger", sithAICmd_SenseDanger,
-        SITHAIFLAGS_SEARCHING, // SenseDanger allowed flags
-        SITHAIFLAGS_FLEEING,   // SenseDanger disallowed flags
-        SITHAIFLAGS_SEARCHING|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST); // SenseDanger idk?
+        SITHAI_MODE_SEARCHING, // SenseDanger allowed flags
+        SITHAI_MODE_FLEEING,   // SenseDanger disallowed flags
+        SITHAI_MODE_SEARCHING|SITHAI_MODE_ATTACKING|SITHAI_MODE_MOVING); // SenseDanger idk?
     sithAI_RegisterCommand("hitandrun", sithAICmd_HitAndRun, 
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE, // HitAndRun allowed flags
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE, // HitAndRun allowed flags
         0,                            // HitAndRun disallowed flags
         0);                           // HitAndRun idk?
     sithAI_RegisterCommand("retreat", sithAICmd_Retreat, 
-        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
-        SITHAIFLAGS_FLEEING,          // disallowed flags
+        SITHAI_MODE_ATTACKING, // allowed flags
+        SITHAI_MODE_FLEEING,          // disallowed flags
         0);
     sithAI_RegisterCommand("circlestrafe", sithAICmd_CircleStrafe, 
-        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
-        SITHAIFLAGS_FLEEING,          // disallowed flags
+        SITHAI_MODE_ATTACKING, // allowed flags
+        SITHAI_MODE_FLEEING,          // disallowed flags
         0);
     sithAI_RegisterCommand("blindfire", sithAICmd_BlindFire, 
-        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE, // disallowed flags
+        SITHAI_MODE_ATTACKING, // allowed flags
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE, // disallowed flags
         0);
     sithAI_RegisterCommand("returnhome", sithAICmd_ReturnHome, 
         0, // allowed flags
         0, // disallowed flags
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_UNK100);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_UNK100);
     sithAI_RegisterCommand("lobfire", sithAICmd_LobFire, 
-        SITHAIFLAGS_ATTACKING_TARGET,   // allowed flags
+        SITHAI_MODE_ATTACKING,   // allowed flags
         0,                              // disallowed flags
-        SITHAIFLAGS_UNK100);
+        SITHAI_MODE_UNK100);
     sithAI_RegisterCommand("talk", sithAICmd_Talk, 
         0xFFFF, // allowed flags (any)
         0,      // disallowed flags
         0);
     sithAI_RegisterCommand("crouch", sithAICmd_Crouch, 
-        SITHAIFLAGS_ATTACKING_TARGET, // allowed flags
+        SITHAI_MODE_ATTACKING, // allowed flags
         0, // disallowed flags
-        SITHAIFLAGS_UNK100);
+        SITHAI_MODE_UNK100);
     sithAI_RegisterCommand("withdraw", sithAICmd_Withdraw,
-        SITHAIFLAGS_FLEEING, // allowed flags
+        SITHAI_MODE_FLEEING, // allowed flags
         0, // disallowed flags
-        SITHAIFLAGS_FLEEING|SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_UNK100|SITHAIFLAGS_SEARCHING|SITHAIFLAGS_MOVING_TO_DEST);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
     sithAI_RegisterCommand("dodge", sithAICmd_Dodge, 
         0, // allowed flags
         0, // disallowed flags
-        SITHAIFLAGS_AT_EASE|SITHAIFLAGS_ATTACKING_TARGET|SITHAIFLAGS_MOVING_TO_DEST);
+        SITHAI_MODE_SLEEPING|SITHAI_MODE_ATTACKING|SITHAI_MODE_MOVING);
 }
 
 int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
@@ -126,11 +126,11 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     float tmp2;
     float tmp;
 
-    if ( flags > SITHAIFLAGS_AWAKE_AND_ACTIVE )
+    if ( flags > SITHAI_MODE_ACTIVE )
     {
-        if ( flags != SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE )
+        if ( flags != SITHAI_MODE_TARGET_VISIBLE )
         {
-            if ( flags != SITHAIFLAGS_FLEEING || (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 || instinct->param0 == 0.0 )
+            if ( flags != SITHAI_MODE_FLEEING || (actor->flags & SITHAI_MODE_ACTIVE) == 0 || instinct->param0 == 0.0 )
                 return 0;
             a4a.x = 0.0;
             a4a.z = 0.0;
@@ -152,7 +152,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
             return 0;
         }
     }
-    else if ( flags != SITHAIFLAGS_AWAKE_AND_ACTIVE )
+    else if ( flags != SITHAI_MODE_ACTIVE )
     {
         if ( !flags)
         {
@@ -189,7 +189,7 @@ LABEL_16:
                     arg8a.x = actor->field_228.x * v16 + actor->thing->position.x;
                     arg8a.y = actor->field_228.y * v16 + actor->thing->position.y;
                     arg8a.z = actor->field_228.z * v16 + actor->thing->position.z;
-                    if ( (actor->thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                    if ( (actor->thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
                         arg8a.z = v7->position.z - -0.02;
                     }
@@ -224,12 +224,12 @@ LABEL_16:
         return 0;
     }
 
-    if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+    if ( (actor->flags & SITHAI_MODE_MOVING) == 0 )
         return 0;
-    if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 )
+    if ( (actor->flags & SITHAI_MODE_ACTIVE) == 0 )
         return 0;
     _rand(); // TODO wat? did something get optimized out?
-    if ( flags == SITHAIFLAGS_AWAKE_AND_ACTIVE
+    if ( flags == SITHAI_MODE_ACTIVE
       && actor->field_228.z * actor->thing->physicsParams.vel.z
        + actor->field_228.x * actor->thing->physicsParams.vel.x
        + actor->field_228.y * actor->thing->physicsParams.vel.y > 0.029999999 )
@@ -315,16 +315,16 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
 int sithAICmd_Crouch(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
 {
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
-    if (!(actor->flags & SITHAIFLAGS_MOVING_TO_DEST) 
-        && (actor->flags & SITHAIFLAGS_ATTACKING_TARGET)
-        && (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE))
+    if (!(actor->flags & SITHAI_MODE_MOVING) 
+        && (actor->flags & SITHAI_MODE_ATTACKING)
+        && (actor->flags & SITHAI_MODE_TARGET_VISIBLE))
     {
-        actor->thing->physicsParams.physflags |= PHYSFLAGS_CROUCHING;
+        actor->thing->physicsParams.physflags |= SITH_PF_CROUCHING;
         return 0;
     }
     else
     {
-        actor->thing->physicsParams.physflags &= ~PHYSFLAGS_CROUCHING;
+        actor->thing->physicsParams.physflags &= ~SITH_PF_CROUCHING;
         return 0;
     }
 }
@@ -356,7 +356,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             projectile = weapon->actorParams.templateWeapon;
         if ( !actor->field_1D0 || !projectile )
         {
-            actor->flags &= ~SITHAIFLAGS_ATTACKING_TARGET;
+            actor->flags &= ~SITHAI_MODE_ATTACKING;
             return 1;
         }
         if ( !sithAI_sub_4EB300(weapon, &weapon->position, &actor->field_1F8, aiclass->argsAsFloat[3], 10.0, projectile->moveSize, &fireOffs, &fOut)
@@ -393,9 +393,9 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     v7 = actor->field_1D0;
     if ( flags )
     {
-        if ( flags == SITHAIFLAGS_UNK100 )
+        if ( flags == SITHAI_MODE_UNK100 )
         {
-            if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
+            if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
                 sithPuppet_SetArmedMode(v6, 1);
             else
                 sithPuppet_SetArmedMode(v6, 0);
@@ -410,25 +410,25 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
             v5 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[2], aiclass->argsAsFloat[3], aiclass->argsAsFloat[1], aiclass->argsAsFloat[4], v5, 2) )
         {
-            actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+            actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
             v11 = sithTime_curMs + aiclass->argsAsInt[0];
             instinct->nextUpdate = v11;
             actor->field_288 = v11;
             return 0;
         }
         sithAI_SetLookFrame(actor, &v7->position);
-        actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+        actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
         instinct->nextUpdate = sithTime_curMs + 500;
         return 0;
     }
-    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v6, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
 
-    actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
-    actor->flags |= SITHAIFLAGS_SEARCHING;
+    actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+    actor->flags |= SITHAI_MODE_SEARCHING;
     return 1;
 }
 
@@ -445,9 +445,9 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     v7 = actor->thing;
     if ( flags )
     {
-        if ( flags == SITHAIFLAGS_UNK100 )
+        if ( flags == SITHAI_MODE_UNK100 )
         {
-            if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
+            if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
             {
                 sithPuppet_SetArmedMode(v7, 1);
                 v9 = sithTime_curMs + aiclass->argsAsInt[5];
@@ -472,7 +472,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             v6 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
-            actor->flags |= SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+            actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
             if ( instinct->param0 == 0.0 )
             {
                 instinct->param0 = aiclass->argsAsFloat[8];
@@ -501,20 +501,20 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         }
         if ( actor->field_1F4 == 3 )
         {
-            actor->flags &= ~SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE;
+            actor->flags &= ~SITHAI_MODE_TARGET_VISIBLE;
         }
         instinct->nextUpdate = sithTime_curMs + 250;
         return 0;
     }
-    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
 
     instinct->param0 = aiclass->argsAsFloat[8];
-    actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
-    actor->flags |= SITHAIFLAGS_SEARCHING;
+    actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+    actor->flags |= SITHAI_MODE_SEARCHING;
     return 1;
 }
 
@@ -550,13 +550,13 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         return 0;
     if ( !v7 || !v8 )
     {
-        actor->flags &= ~SITHAIFLAGS_ATTACKING_TARGET;
+        actor->flags &= ~SITHAI_MODE_ATTACKING;
         return 1;
     }
     if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
     {
-        actor->flags &= ~(SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
-        actor->flags |= SITHAIFLAGS_SEARCHING;
+        actor->flags &= ~(SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+        actor->flags |= SITHAI_MODE_SEARCHING;
         return 1;
     }
     sithPuppet_SetArmedMode(actor->thing, 1);
@@ -568,7 +568,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         sithAI_sub_4EAD60(actor);
         if ( actor->field_1F4 )
         {
-            actor->flags = actor->flags & ~(SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET) | SITHAIFLAGS_SEARCHING;
+            actor->flags = actor->flags & ~(SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING) | SITHAI_MODE_SEARCHING;
             return 1;
         }
         v31 = aiclass->argsAsFloat[1] * sithTime_deltaSeconds;
@@ -712,18 +712,18 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     float tmp;
 
     actor_ = actor;
-    if ( (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
+    if ( (actor->flags & SITHAI_MODE_SEARCHING) == 0 )
         return 0;
     v6 = actor->thing;
     v8 = &sithAIAwareness_aSectors[actor->thing->sector->id];
     v25 = v8;
-    if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
+    if ( flags == SITHAI_MODE_MOVING )
     {
 LABEL_26:
         instinct_ = instinct;
         if ( instinct->param0 == 0.0 )
         {
-            if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
+            if ( flags == SITHAI_MODE_MOVING )
                 sithSoundClass_PlayModeRandom(v6, SITH_SC_SURPRISE);
             else
                 sithSoundClass_PlayModeRandom(v6, SITH_SC_CURIOUS);
@@ -734,7 +734,7 @@ LABEL_26:
         {
             lookPos = extra->position;
             sithAI_SetLookFrame(actor_, &lookPos);
-            if ( (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+            if ( (actor_->flags & SITHAI_MODE_MOVING) == 0 )
             {
                 if ( aiclass->argsAsFloat[1] != 0.0 )
                 {
@@ -751,22 +751,22 @@ LABEL_26:
                     sithAI_SetMoveThing(actor_, &movePos, 2.5);
                 }
             }
-            if ( _frand() < 0.1 && flags == SITHAIFLAGS_MOVING_TO_DEST )
+            if ( _frand() < 0.1 && flags == SITHAI_MODE_MOVING )
             {
                 if ( v17->type == SITH_THING_ACTOR || v17->type == SITH_THING_PLAYER )
                 {
                     actor_->field_1D0 = v17;
                     actor_->thingidk = v17;
-                    actor_->flags &= ~SITHAIFLAGS_SEARCHING;
-                    actor_->flags |= SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET;
+                    actor_->flags &= ~SITHAI_MODE_SEARCHING;
+                    actor_->flags |= SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING;
                 }
             }
         }
         return 0;
     }
-    if ( flags != SITHAIFLAGS_ATTACKING_TARGET )
+    if ( flags != SITHAI_MODE_ATTACKING )
     {
-        if ( flags != SITHAIFLAGS_SEARCHING )
+        if ( flags != SITHAI_MODE_SEARCHING )
             return 0;
         goto LABEL_26;
     }
@@ -811,7 +811,7 @@ LABEL_15:
     if ( v14 > instinct->param0 )
         instinct->param0 = v14;
 
-    if ( aiclass->argsAsFloat[0] > _frand() && (actor_->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+    if ( aiclass->argsAsFloat[0] > _frand() && (actor_->flags & SITHAI_MODE_MOVING) == 0 )
     {
         sithAI_SetMoveThing(actor_, &actor_->field_1C4, 1.0);
         sithSoundClass_PlayModeRandom(v6, SITH_SC_CURIOUS);
@@ -839,18 +839,18 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
 
     if ( !flags && (g_debugmodeFlags & 0x200) == 0 )
     {
-        if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 )
+        if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
         {
             v6 = aiclass->argsAsInt[1];
             if ( v6 && v6 + actor->field_204 < sithTime_curMs )
             {
-                actor->flags &= ~(SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE|SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_ATTACKING_TARGET);
-                actor->flags |= SITHAIFLAGS_SEARCHING;
+                actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+                actor->flags |= SITHAI_MODE_SEARCHING;
                 sithUnk4_MoveJointsForEyePYR(actor->thing, &rdroid_zeroVector3);
                 return 1;
             }
         }
-        else if ( (actor->flags & SITHAIFLAGS_SEARCHING) != 0 )
+        else if ( (actor->flags & SITHAI_MODE_SEARCHING) != 0 )
         {
             v9 = sithTime_curMs;
             v10 = g_localPlayerThing;
@@ -863,8 +863,8 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 if ( !actor->field_1F4 )
                 {
                     v12 = actor->thing;
-                    actor->flags &= ~SITHAIFLAGS_SEARCHING;
-                    actor->flags |= (SITHAIFLAGS_AWAKE_AND_ACTIVE|SITHAIFLAGS_HAS_TARGET|SITHAIFLAGS_HAS_DEST|SITHAIFLAGS_ATTACKING_TARGET);
+                    actor->flags &= ~SITHAI_MODE_SEARCHING;
+                    actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(v12, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
@@ -881,7 +881,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
 
 int sithAICmd_OpenDoors(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    if ( (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) != 0 )
+    if ( (actor->flags & SITHAI_MODE_MOVING) != 0 )
     {
         sithPlayerActions_Activate(actor->thing);
         instinct->nextUpdate = sithTime_curMs + 1000;
@@ -902,7 +902,7 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     v7 = actor->thing->sector;
     if ( !actor->thing->attach_flags )
         return 0;
-    if (!(actor->flags & SITHAIFLAGS_MOVING_TO_DEST))
+    if (!(actor->flags & SITHAI_MODE_MOVING))
         return 0;
     if ( actor->field_228.x * v6->physicsParams.vel.x
        + actor->field_228.y * v6->physicsParams.vel.y
@@ -913,9 +913,9 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         return 0;
 
     instinct->param0 = aiclass->argsAsFloat[0] + (double)sithTime_curMs;
-    if ( flags != SITHAIFLAGS_SEARCHING && flags != SITHAIFLAGS_AWAKE_AND_ACTIVE )
+    if ( flags != SITHAI_MODE_SEARCHING && flags != SITHAI_MODE_ACTIVE )
     {
-        if ( flags != SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE )
+        if ( flags != SITHAI_MODE_TARGET_VISIBLE )
             return 0;
 
         a2.x = (aiclass->argsAsFloat[2] * v5->field_1AC.x) + v6->position.x;
@@ -970,7 +970,7 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     v7 = actor->flags;
     aiclass1a = aiclass->argsAsFloat[0];
     v8 = aiclass->argsAsFloat[2];
-    if ( (v7 & SITHAIFLAGS_FLEEING) == 0 )
+    if ( (v7 & SITHAI_MODE_FLEEING) == 0 )
         return 0;
 
     if ( instinct->param0 == 0.0 )
@@ -980,15 +980,15 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     v11 = actor->field_1C0;
     if ( !v11
       || sithTime_curSeconds > instinct->param0 + v8
-      || ((v12 = aiclass->argsAsInt[1], actor->flags = v7 & ~SITHAIFLAGS_ATTACKING_TARGET, !v12) ? (instinct->nextUpdate = sithTime_curMs + 5000) : (instinct->nextUpdate = v12 + sithTime_curMs),
+      || ((v12 = aiclass->argsAsInt[1], actor->flags = v7 & ~SITHAI_MODE_ATTACKING, !v12) ? (instinct->nextUpdate = sithTime_curMs + 5000) : (instinct->nextUpdate = v12 + sithTime_curMs),
           sithAI_sub_4EB090(actor->thing, &actor->thing->position, v11, -1.0, aiclass1a, 0.0, &a5, &tmp)) )
     {
         v16 = actor->field_1C0;
         if ( v16 )
             sithAI_SetLookFrame(actor, &v16->position);
         actor->field_1C0 = 0;
-        actor->flags &= ~(SITHAIFLAGS_FLEEING|SITHAIFLAGS_AWAKE_AND_ACTIVE);
-        actor->flags |= SITHAIFLAGS_SEARCHING;
+        actor->flags &= ~(SITHAI_MODE_FLEEING|SITHAI_MODE_ACTIVE);
+        actor->flags |= SITHAI_MODE_SEARCHING;
         
         instinct->param0 = 0.0;
         result = 1;
@@ -1000,14 +1000,14 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         v19.z = 0.0;
         if ( flags )
         {
-            if ( flags == SITHAIFLAGS_UNK100 || flags == SITHAIFLAGS_FLEEING )
+            if ( flags == SITHAI_MODE_UNK100 || flags == SITHAI_MODE_FLEEING )
             {
                 a5.x = -a5.x;
                 a5.y = -a5.y;
                 a5.z = -a5.z;
                 v15 = actor->thing;
                 v19.y = (_frand() - 0.5) * 180.0;
-                if ( (v15->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                if ( (v15->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     v19.x = (_frand() - 0.5) * 90.0;
                 rdVector_Rotate3Acc(&a5, &v19);
             }
@@ -1043,7 +1043,7 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     rdVector3 movePos; // [esp+1Ch] [ebp-Ch] BYREF
     float tmp;
 
-    if ( (actor->flags & SITHAIFLAGS_FLEEING) == 0 )
+    if ( (actor->flags & SITHAI_MODE_FLEEING) == 0 )
         return 0;
 
     if ( actor->field_1C0 )
@@ -1056,18 +1056,18 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
         if ( sithAI_sub_4EB090(actor->thing, &actor->thing->position, actor->field_1C0, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
         {
             result = 1;
-            actor->flags &= ~(SITHAIFLAGS_FLEEING|SITHAIFLAGS_AWAKE_AND_ACTIVE);
-            actor->flags |= SITHAIFLAGS_SEARCHING;
+            actor->flags &= ~(SITHAI_MODE_FLEEING|SITHAI_MODE_ACTIVE);
+            actor->flags |= SITHAI_MODE_SEARCHING;
         }
         else
         {
             rdVector_Zero3(&v17);
-            if ( !flags || flags == SITHAIFLAGS_UNK100 || flags == SITHAIFLAGS_FLEEING )
+            if ( !flags || flags == SITHAI_MODE_UNK100 || flags == SITHAI_MODE_FLEEING )
             {
                 rdVector_Neg3Acc(&a5);
                 v14 = actor->thing;
                 v17.y = (_frand() - 0.5) * 180.0;
-                if ( (v14->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+                if ( (v14->physicsParams.physflags & SITH_PF_FLY) != 0 )
                 {
                     v17.x = (_frand() - 0.5) * 90.0;
                 }
@@ -1091,7 +1091,7 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     }
     else
     {
-        actor->flags &= ~SITHAIFLAGS_FLEEING;
+        actor->flags &= ~SITHAI_MODE_FLEEING;
         result = 0;
     }
     return result;
@@ -1108,9 +1108,9 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
 
     if ( !flags )
         return 0;
-    if ( flags == SITHAIFLAGS_MOVING_TO_DEST )
+    if ( flags == SITHAI_MODE_MOVING )
     {
-        if ( aiclass->argsAsFloat[1] != 0.0 && extra && (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+        if ( aiclass->argsAsFloat[1] != 0.0 && extra && (actor->flags & SITHAI_MODE_MOVING) == 0 )
         {
             vAngs.x = extra->position.x;
             vAngs.y = extra->position.y;
@@ -1129,9 +1129,9 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
         }
         return 0;
     }
-    if ( flags != SITHAIFLAGS_AT_EASE )
+    if ( flags != SITHAI_MODE_SLEEPING )
     {
-        if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) != 0 && flags == SITHAIFLAGS_ATTACKING_TARGET && aiclass->argsAsFloat[0] != 0.0 )
+        if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 && flags == SITHAI_MODE_ATTACKING && aiclass->argsAsFloat[0] != 0.0 )
         {
             v16 = &sithAIAwareness_aSectors[actor->thing->sector->id];
             if (v16->field_4[2])
@@ -1155,7 +1155,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
         }
         return 0;
     }
-    if ( (actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 )
+    if ( (actor->flags & SITHAI_MODE_ACTIVE) == 0 )
         return 0;
 
     if ( aiclass->argsAsFloat[1] == 0.0
@@ -1214,7 +1214,7 @@ int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     rdVector3 v17; // [esp+1Ch] [ebp-Ch] BYREF
 
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
-    if ( (actor->flags & SITHAIFLAGS_ATTACKING_TARGET) == 0 )
+    if ( (actor->flags & SITHAI_MODE_ATTACKING) == 0 )
     {
         rdVector_Zero3(&v17);
         v13 = &actor->thing->lookOrientation.lvec;
@@ -1250,7 +1250,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     float tmp;
 
     v7 = &sithAIAwareness_aSectors[actor->thing->sector->id];
-    if ( (actor->flags & SITHAIFLAGS_FLEEING) != 0 || (actor->flags & SITHAIFLAGS_SEARCHING) == 0 )
+    if ( (actor->flags & SITHAI_MODE_FLEEING) != 0 || (actor->flags & SITHAI_MODE_SEARCHING) == 0 )
         return 0;
     if ( !flags )
     {
@@ -1262,8 +1262,8 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             sithAI_sub_4EAD60(actor);
             if ( !actor->field_1F4 )
             {
-                actor->flags &= ~SITHAIFLAGS_SEARCHING;
-                actor->flags |= SITHAIFLAGS_FLEEING;
+                actor->flags &= ~SITHAI_MODE_SEARCHING;
+                actor->flags |= SITHAI_MODE_FLEEING;
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
                 sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
                 actor->field_1C0 = actor->field_1D0;
@@ -1284,13 +1284,13 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                 if ( v9 != 1 && v9 != 3 )
                 {
                     actor->field_1C0 = v8;
-                    if ( (actor->flags & SITHAIFLAGS_FLEEING) == 0 )
+                    if ( (actor->flags & SITHAI_MODE_FLEEING) == 0 )
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
                         sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
                     }
-                    actor->flags &= ~SITHAIFLAGS_SEARCHING;
-                    actor->flags |= SITHAIFLAGS_FLEEING;
+                    actor->flags &= ~SITHAI_MODE_SEARCHING;
+                    actor->flags |= SITHAI_MODE_FLEEING;
                     return 1;
                 }
             }
@@ -1301,8 +1301,8 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     if ( extra )
         actor->field_1C0 = sithThing_GetParent(extra);
     result = 1;
-    actor->flags &= ~SITHAIFLAGS_SEARCHING;
-    actor->flags |= SITHAIFLAGS_FLEEING;
+    actor->flags &= ~SITHAI_MODE_SEARCHING;
+    actor->flags |= SITHAI_MODE_FLEEING;
     return result;
 }
 
@@ -1314,12 +1314,12 @@ int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
     if ( flags )
         return 0;
 
-    if ( (actor->flags & SITHAIFLAGS_FLEEING) != 0 )
+    if ( (actor->flags & SITHAI_MODE_FLEEING) != 0 )
     {
-        actor->flags &= ~SITHAIFLAGS_FLEEING;
+        actor->flags &= ~SITHAI_MODE_FLEEING;
         return 1;
     }
-    if ( (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE) == 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) == 0 )
     {
         instinct->param0 = 0.0;
         instinct->nextUpdate = sithTime_curMs + 1000;
@@ -1335,7 +1335,7 @@ int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
     else
     {
         instinct->param0 = 0.0;
-        actor->flags |= SITHAIFLAGS_FLEEING;
+        actor->flags |= SITHAI_MODE_FLEEING;
         actor->field_1C0 = actor->field_1D0;
         instinct->nextUpdate = sithTime_curMs + (int)aiclass->argsAsFloat[1];
         return 1;
@@ -1350,7 +1350,7 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     if ( flags )
         return 0;
 
-    if ( (actor->flags & SITHAIFLAGS_ATTACKING_TARGET) == 0 )
+    if ( (actor->flags & SITHAI_MODE_ATTACKING) == 0 )
         return 0;
 
     if ( aiclass->argsAsFloat[3] != 0.0 && aiclass->argsAsFloat[3] < (double)instinct->param0 )
@@ -1365,7 +1365,7 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
         {
             instinct->param0 = instinct->param0 - -1.0;
             sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FLEE);
-            actor->flags |= SITHAIFLAGS_FLEEING;
+            actor->flags |= SITHAI_MODE_FLEEING;
             actor->field_1C0 = actor->field_1D0;
             return 1;
         }
@@ -1383,15 +1383,15 @@ int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
 {
     rdVector3 a2;
 
-    if ( flags == SITHAIFLAGS_UNK100 )
+    if ( flags == SITHAI_MODE_UNK100 )
     {
-        if ( (actor->flags & SITHAIFLAGS_SEARCHING) && (extra & SITHAIFLAGS_SEARCHING) == 0 )
+        if ( (actor->flags & SITHAI_MODE_SEARCHING) && (extra & SITHAI_MODE_SEARCHING) == 0 )
         {
             sithAI_SetMoveThing(actor, &actor->position, 1.0);
             sithAI_SetLookFrame(actor, &actor->position);
         }
     }
-    else if ( flags == SITHAIFLAGS_FLEEING && (actor->flags & SITHAIFLAGS_SEARCHING) != 0 )
+    else if ( flags == SITHAI_MODE_FLEEING && (actor->flags & SITHAI_MODE_SEARCHING) != 0 )
     {
         rdVector_Add3(&a2, &actor->lookOrientation, &actor->thing->position);
         sithAI_SetLookFrame(actor, &a2);
@@ -1409,10 +1409,10 @@ int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         return 0;
     healthPercent = actor->thing->actorParams.health / actor->thing->actorParams.maxHealth;
 
-    if (!(actor->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE))
+    if (!(actor->flags & SITHAI_MODE_ACTIVE))
         return 0;
 
-    if (actor->flags & SITHAIFLAGS_FLEEING )
+    if (actor->flags & SITHAI_MODE_FLEEING )
     {
         if ( healthPercent > 0.5 )
         {
@@ -1423,7 +1423,7 @@ int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         return 0;
     }
 
-    if (actor->flags & SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE)
+    if (actor->flags & SITHAI_MODE_TARGET_VISIBLE)
     {
         if ( healthPercent < 0.25 )
         {

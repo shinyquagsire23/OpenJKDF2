@@ -436,7 +436,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     else
     {
         rdMatrix_TransformVector34Acc_0(&a1a, &thing->physicsParams.vel, &thing->lookOrientation);
-        if ( thing->attach_flags || (thing->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
+        if ( thing->attach_flags || (thing->physicsParams.physflags & SITH_PF_FLY) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;
             v5 = a1a.y;
@@ -497,7 +497,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
                 }
             }
         }
-        if ( thing->moveType == SITH_ANIM_STAND && thing->attach_flags && (thing->physicsParams.physflags & (PHYSFLAGS_200000|PHYSFLAGS_CROUCHING)) )
+        if ( thing->moveType == SITH_ANIM_STAND && thing->attach_flags && (thing->physicsParams.physflags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
         {
             if ( v3 == SITH_ANIM_STAND && thinga < 0.0 )
                 anim = SITH_ANIM_CROUCHBACK;
@@ -690,7 +690,7 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
             soundToPlay_base = a3 - 1;
             if ( a3 - 1 > 1 )
                 soundToPlay_base = a3 - 6;
-            if ( !(thing->attach_flags & ATTACHFLAGS_THINGSURFACE) )
+            if ( !(thing->attach_flags & SITH_ATTACH_THINGSURFACE) )
             {
                 v10 = thing->attachedSurface->surfaceFlags;
                 if ( (v10 & (SURFACEFLAGS_100000|SURFACEFLAGS_EARTH|SURFACEFLAGS_PUDDLE|SURFACEFLAGS_WATER|SURFACEFLAGS_METAL)) != 0 )
@@ -743,7 +743,7 @@ LABEL_14:
         case 6u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMUNDER);
@@ -752,7 +752,7 @@ LABEL_14:
         case 7u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADUNDER);
@@ -783,7 +783,7 @@ LABEL_50:
         case 0xDu:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & PHYSFLAGS_MIDAIR) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMUNDER);

@@ -604,7 +604,7 @@ void sithCollision_FallHurt(sithThing *thing, float vel)
     if ( v2 > 1.0 )
     {
         sithSoundClass_PlayModeRandom(thing, SITH_SC_HITDAMAGED);
-        sithThing_Damage(thing, thing, v2, 64);
+        sithThing_Damage(thing, thing, v2, SITH_DAMAGE_FALL);
     }
 }
 
@@ -620,7 +620,7 @@ void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
         rdVector_Sub3(&tmp, &i->position, &thing->position);
         rdVector_Copy3(&i->lookOrientation.scale, &tmp);
         sithCollision_sub_4E7670(i, orient);
-        if ( (i->attach_flags & ATTACHFLAGS_THING_RELATIVE) == 0 )
+        if ( (i->attach_flags & SITH_ATTACH_NO_MOVE) == 0 )
         {
             rdVector_Sub3(&a1a, &i->lookOrientation.scale, &tmp);
             if ( !rdVector_IsZero3(&a1a) )
@@ -695,12 +695,12 @@ float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6,
     v10 = a3->attachedParentMaybe;
     for ( direction = *a2; v10; v10 = v10->childThing )
     {
-        if ( (v10->attach_flags & ATTACHFLAGS_THING_RELATIVE) == 0 )
+        if ( (v10->attach_flags & SITH_ATTACH_NO_MOVE) == 0 )
         {
             v11 = sithCollision_UpdateThingCollision(v10, a2, a6, 64);
             if ( v11 < a6 )
             {
-                if ( (v10->attach_flags & ATTACHFLAGS_THINGSURFACE) == 0 )
+                if ( (v10->attach_flags & SITH_ATTACH_THINGSURFACE) == 0 )
                     goto LABEL_20;
                 rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
                 v12 = stdMath_ClipPrecision(rdVector_Dot3(a2, &out));
@@ -709,7 +709,7 @@ float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6,
 LABEL_20:
                     if ( (v5->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
                     {
-                        sithThing_Damage(v10, v5, (a6 - v11) * 100.0, 1);
+                        sithThing_Damage(v10, v5, (a6 - v11) * 100.0, SITH_DAMAGE_IMPACT);
                     }
                     a6 = v11;
                 }
@@ -788,7 +788,7 @@ LABEL_78:
                     v25 = a6 - v19->distance;
                     rdVector_Scale3(&v5->field_268, &direction, v25);
                     if ( v5->moveType == SITH_MT_PHYSICS
-                      && (v5->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) != 0
+                      && (v5->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) != 0
                       && (!rdVector_IsZero3(&v5->physicsParams.addedVelocity)) )
                     {
                         v30 = 1.0 - v19->distance / a6;
@@ -877,7 +877,7 @@ LABEL_81:
     }
     for ( i = v5->attachedParentMaybe; i; i = i->childThing )
     {
-        if ( (i->attach_flags & ATTACHFLAGS_THING_RELATIVE) != 0 )
+        if ( (i->attach_flags & SITH_ATTACH_NO_MOVE) != 0 )
         {
             rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
             rdVector_Add3Acc(&i->position, &v5->position);
@@ -891,8 +891,8 @@ LABEL_81:
             return 0.0;
         if ( (a8 & 0x40) == 0 )
         {
-            if ( (v5->attach_flags) != 0 && !(v5->attach_flags & ATTACHFLAGS_THING_RELATIVE)
-              || (v5->physicsParams.physflags & PHYSFLAGS_FLOORSTICK) != 0
+            if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NO_MOVE)
+              || (v5->physicsParams.physflags & SITH_PF_FLOORSTICK) != 0
               && (v5->physicsParams.vel.z < -2.0 || v5->physicsParams.vel.z <= 0.2) )
             {
                 sithPhysics_FindFloor(v5, 0);
@@ -986,7 +986,7 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
                 {
                     a1a = v15;
                     a3a = (sendera - a1a) * 100.0;
-                    sithThing_Damage(v5, v4, a3a, 1);
+                    sithThing_Damage(v5, v4, a3a, SITH_DAMAGE_IMPACT);
                 }
                 rdVector_Zero3(&v4->field_268);
             }
@@ -1001,9 +1001,9 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
         if ( v6 <= 0.0 )
             return 0;
 
-        if ( (v4->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+        if ( (v4->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0 )
             v6 = v6 * 0.5;
-        if ( (v5->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+        if ( (v5->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0 )
             v6 = v6 * 0.5;
         
         // (2*mass^2) / (2*mass)
@@ -1057,7 +1057,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     if ( a1a <= 0.0 )
         return 0;
     v43 = 1.9;
-    if ( (a1->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+    if ( (a1->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0 )
         v43 = 1.0001;
     if ( a3 == 0.0 && sithCollision_dword_8B4BE4 )
     {
@@ -1110,7 +1110,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
                 if ( v39 > 1.0 )
                 {
                     sithSoundClass_PlayModeRandom(a1, SITH_SC_HITDAMAGED);
-                    sithThing_Damage(a1, a1, v39, 0x40);
+                    sithThing_Damage(a1, a1, v39, SITH_DAMAGE_FALL);
                 }
             }
         }
@@ -1234,7 +1234,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
             sithCollision_sub_4E77A0(v5, &out);
             if ( v5->moveType == SITH_MT_PHYSICS )
             {
-                v5->physicsParams.physflags &= ~PHYSFLAGS_100;
+                v5->physicsParams.physflags &= ~SITH_PF_100;
             }
             v5 = v5->childThing;
         }
@@ -1267,7 +1267,7 @@ int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithC
     {
         if ( tmp > 0.25 )
         {
-            sithThing_Damage(thing2, thing, mass * 0.30000001 * tmp, 1);
+            sithThing_Damage(thing2, thing, mass * 0.30000001 * tmp, SITH_DAMAGE_IMPACT);
         }
         return 1;
     }

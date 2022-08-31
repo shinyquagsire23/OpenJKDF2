@@ -676,24 +676,24 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             if ( v19 == g_localPlayerThing )
             {
                 sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
-                if ( (physicsThing->thingflags & 0x100) != 0 )
+                if ( (physicsThing->thingflags & SITH_TF_INVULN) != 0 )
                 {
 LABEL_52:
-                    v21->thingflags |= 0x100;
+                    v21->thingflags |= SITH_TF_INVULN;
                 }
 LABEL_53:
                 sithThing_Destroy(physicsThing);
                 return 1;
             }
 LABEL_45:
-            if ( (physicsThing->thingflags & 0x100) != 0 )
+            if ( (physicsThing->thingflags & SITH_TF_INVULN) != 0 )
                 goto LABEL_52;
             goto LABEL_53;
         }
         if ( (v17 & 0x80u) == 0 )
             return sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
         sithPhysics_ThingStop(physicsThing);
-        sithSoundClass_ThingPauseSoundclass(physicsThing, PHYSFLAGS_GRAVITY);
+        sithSoundClass_ThingPauseSoundclass(physicsThing, SITH_PF_USEGRAVITY);
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
@@ -747,14 +747,14 @@ LABEL_45:
             goto LABEL_45;
         }
         if ( (v22 & THING_TYPEFLAGS_BLIND) == 0 )
-            return PHYSFLAGS_GRAVITY;
+            return SITH_PF_USEGRAVITY;
         sithPhysics_ThingStop(physicsThing);
         sithThing_AttachThing(physicsThing, collidedThing);
 LABEL_56:
-        v30 = physicsThing->physicsParams.physflags | PHYSFLAGS_GRAVITY;
-        physicsThing->attach_flags |= ATTACHFLAGS_THING_RELATIVE;
+        v30 = physicsThing->physicsParams.physflags | SITH_PF_USEGRAVITY;
+        physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
         physicsThing->physicsParams.physflags = v30;
-        return PHYSFLAGS_GRAVITY;
+        return SITH_PF_USEGRAVITY;
     }
     return result;
 }
@@ -801,11 +801,11 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     if ( ((typeFlags & 0x400) != 0 && (v6 & 0x4000) != 0 || (typeFlags & 0x80000) != 0 && thing->weaponParams.field_18 < 2u)
       && (v8 = thing->weaponParams.field_18, thing->weaponParams.field_18 = v8 + 1, v8 < 6) )
     {
-        thing->physicsParams.physflags |= PHYSFLAGS_SURFACEBOUNCE;
+        thing->physicsParams.physflags |= SITH_PF_SURFACEBOUNCE;
         sithCollision_DefaultHitHandler(thing, surface, a3);
-        if ( (thing->physicsParams.physflags & PHYSFLAGS_SURFACEBOUNCE) == 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0 )
         {
-            thing->physicsParams.physflags &= ~PHYSFLAGS_SURFACEBOUNCE;
+            thing->physicsParams.physflags &= ~SITH_PF_SURFACEBOUNCE;
         }
         rdVector_Normalize3(&thing->lookOrientation.lvec, &thing->physicsParams.vel);
         v12 = thing->lookOrientation.lvec.x;
@@ -864,7 +864,7 @@ LABEL_9:
             thing->moveSize = 0.0;
             sithThing_AttachToSurface(thing, surface, 0);
             sithPhysics_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);
-            thing->physicsParams.physflags |= PHYSFLAGS_NOTHRUST;
+            thing->physicsParams.physflags |= SITH_PF_NOTHRUST;
             result = 1;
         }
     }

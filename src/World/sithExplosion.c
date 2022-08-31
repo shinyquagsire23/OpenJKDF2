@@ -97,7 +97,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                    || v4->signature != explosion->child_signature)
                   && sithCollision_HasLos(explosion, v4, 1) )
                 {
-                    if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & PHYSFLAGS_FEELBLASTFORCE) != 0 )
+                    if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & SITH_PF_FEELBLASTFORCE) != 0 )
                     {
                         rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
                         sithPhysics_ThingApplyForce(v4, &a2);

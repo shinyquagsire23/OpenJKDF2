@@ -213,7 +213,7 @@ void sithAI_NewEntry(sithThing *thing)
             actor->aiclass = sith_ai;
             actor->thing = thing;
             actor->numAIClassEntries = sith_ai->numEntries;
-            actor->flags = (SITHAIFLAGS_AT_EASE|SITHAIFLAGS_SEARCHING);
+            actor->flags = (SITHAI_MODE_SLEEPING|SITHAI_MODE_SEARCHING);
             actor->moveSpeed = 1.5;
         }
         else
@@ -280,7 +280,7 @@ void sithAI_TickAll()
         if ( actor->aiclass
           && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
           && actor->thing->actorParams.health > 0.0
-          && (actor->flags & (SITHAIFLAGS_DISABLED|SITHAIFLAGS_AT_EASE)) == 0
+          && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0
           && actor->nextUpdate <= sithTime_curMs )
         {
             sithAI_TickActor(actor);
@@ -310,7 +310,7 @@ LABEL_2:
                     actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
                     if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                     {
-                        sithAI_SetActorFireTarget(actor, SITHAIFLAGS_UNK100, a3);
+                        sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
                         a3 = actor->flags;
                         goto LABEL_2;
                     }
@@ -329,7 +329,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
     uint32_t v7; // ebx
     int old_flags; // [esp+14h] [ebp+4h]
 
-    for ( ; actor->aiclass; a2 = SITHAIFLAGS_UNK100 )
+    for ( ; actor->aiclass; a2 = SITHAI_MODE_UNK100 )
     {
         if ( !actor->thing )
             break;
@@ -340,17 +340,17 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
         if ( actor->thing->actorParams.health <= 0.0 )
             break;
         old_flags = actor->flags;
-        if ( (actor->flags & SITHAIFLAGS_DISABLED) != 0 )
+        if ( (actor->flags & SITHAI_MODE_DISABLED) != 0 )
             break;
-        if ( (actor->flags & SITHAIFLAGS_AT_EASE) != 0 )
+        if ( (actor->flags & SITHAI_MODE_SLEEPING) != 0 )
         {
-            if ( a2 != SITHAIFLAGS_ATTACKING_TARGET )
+            if ( a2 != SITHAI_MODE_ATTACKING )
                 return;
-            actor->flags &= ~SITHAIFLAGS_AT_EASE;
+            actor->flags &= ~SITHAI_MODE_SLEEPING;
         }
 
-        if ( a2 == SITHAIFLAGS_UNK100 )
-            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, 256.0f, 0.0, 0.0, 0.0);
+        if ( a2 == SITHAI_MODE_UNK100 )
+            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, (float)SITHAI_EVENTMODECHANGED, 0.0, 0.0, 0.0);
 
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
@@ -598,9 +598,9 @@ void sithAI_Tick(sithThing *thing, float deltaSeconds)
 {
     if ( thing->type == SITH_THING_ACTOR && thing->actorParams.health > 0.0 )
     {
-        if ( (thing->actor->flags & SITHAIFLAGS_TURNING_TO_DEST) != 0 )
+        if ( (thing->actor->flags & SITHAI_MODE_TURNING) != 0 )
             sithAI_sub_4EA630(thing->actor, deltaSeconds);
-        if ( (thing->actor->flags & SITHAIFLAGS_MOVING_TO_DEST) != 0 )
+        if ( (thing->actor->flags & SITHAI_MODE_MOVING) != 0 )
             sithAI_idk_msgarrived_target(thing->actor, deltaSeconds);
     }
 }
@@ -640,7 +640,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
         v10 = &v2->lookOrientation.lvec;
         if ( v2->lookOrientation.lvec.y * actor->lookVector.y + v2->lookOrientation.lvec.x * v3->x + v2->lookOrientation.lvec.z * actor->lookVector.z >= 0.0 )
         {
-            actor->flags &= ~SITHAIFLAGS_TURNING_TO_DEST;
+            actor->flags &= ~SITHAI_MODE_TURNING;
             return;
         }
         v11 = v2->actorParams.maxRotThrust * 0.1 * deltaSeconds;
@@ -707,7 +707,7 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
     float actora; // [esp+34h] [ebp+4h]
 
     v3 = actor->thing;
-    if ( (actor->flags & SITHAIFLAGS_AT_EASE) == 0 && (v3->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
+    if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & THING_TYPEFLAGS_40000) == 0 )
     {
         v4 = actor->movePos.y - v3->position.y;
         v5 = actor->movePos.z - v3->position.z;
@@ -728,7 +728,7 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
         v15 = v14->flags;
         v23 = v10;
         v24 = v11;
-        if ( (v15 & SITHAIFLAGS_ATTACKING_TARGET) == 0 && (v3->physicsParams.physflags & PHYSFLAGS_FLYING) == 0 )
+        if ( (v15 & SITHAI_MODE_ATTACKING) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
             v13 = 0.0;
         actora = v23 + v3->physicsParams.vel.x;
         v16 = &v3->physicsParams.vel;
@@ -738,12 +738,12 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
         v3->physicsParams.vel.x = actora;
         v3->physicsParams.vel.y = v20;
         v3->physicsParams.vel.z = v21;
-        if ( (v17 & SITHAIFLAGS_UNK40) == 0 && v3->attach_flags )
+        if ( (v17 & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 && v3->attach_flags )
         {
-            if ( (v3->physicsParams.physflags & PHYSFLAGS_FLYING) != 0 )
+            if ( (v3->physicsParams.physflags & SITH_PF_FLY) != 0 )
             {
 LABEL_15:
-                if ( (v3->actorParams.typeflags & SITHAIFLAGS_UNK40) == 0 )
+                if ( (v3->actorParams.typeflags & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 )
                 {
                     if ( (v3->thingflags & SITH_TF_WATER) != 0 )
                     {
@@ -771,10 +771,10 @@ LABEL_22:
                     v16->x = 0.0;
                     v3->physicsParams.vel.y = 0.0;
                     v3->physicsParams.vel.z = 0.0;
-                    actor->flags &= ~SITHAIFLAGS_MOVING_TO_DEST;
+                    actor->flags &= ~SITHAI_MODE_MOVING;
                     sithSoundClass_ThingPauseSoundclass(v3, SITH_SC_MOVING);
                     sithCog_SendMessageFromThing(v3, 0, SITH_MESSAGE_ARRIVED);
-                    sithAI_SetActorFireTarget(actor, SITHAIFLAGS_FLEEING, 0);
+                    sithAI_SetActorFireTarget(actor, SITHAI_MODE_FLEEING, 0);
                 }
                 return;
             }
@@ -788,13 +788,13 @@ LABEL_22:
                     v16->x = 0.0;
                     v3->physicsParams.vel.y = 0.0;
                     v3->physicsParams.vel.z = 0.0;
-                    sithAI_SetActorFireTarget(actor, SITHAIFLAGS_TARGET_SIGHTED_IN_RANGE, 0);
+                    sithAI_SetActorFireTarget(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
                     return;
                 }
                 goto LABEL_22;
             }
         }
-        if ( (v3->physicsParams.physflags & PHYSFLAGS_FLYING) == 0 )
+        if ( (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
             goto LABEL_22;
         goto LABEL_15;
     }
@@ -845,18 +845,18 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
         }
         actor->lookVector.z = 0.0;
         rdVector_Normalize3Acc(&actor->lookVector);
-        actor->flags |= SITHAIFLAGS_TURNING_TO_DEST;
+        actor->flags |= SITHAI_MODE_TURNING;
     }
 }
 
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
 {
-    if ( sithTime_curMs >= actor->field_28C || (actor->flags & SITHAIFLAGS_MOVING_TO_DEST) == 0 )
+    if ( sithTime_curMs >= actor->field_28C || (actor->flags & SITHAI_MODE_MOVING) == 0 )
     {
         actor->moveSpeed = moveSpeed;
         rdVector_Copy3(&actor->movePos, movePos);
         sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_MOVING);
-        actor->flags |= SITHAIFLAGS_MOVING_TO_DEST;
+        actor->flags |= SITHAI_MODE_MOVING;
     }
 }
 
@@ -869,7 +869,7 @@ void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel)
         sithPlayerActions_JumpWithVel(actor->thing, vel);
 
     actor->field_28C = sithTime_curMs + 2000;
-    actor->flags |= SITHAIFLAGS_MOVING_TO_DEST;
+    actor->flags |= SITHAI_MODE_MOVING;
 }
 
 void sithAI_sub_4EAD60(sithActor *actor)
@@ -1029,7 +1029,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     {
         if ( arg8->moveType != SITH_MT_PHYSICS )
             return 3;
-        if ( (arg8->physicsParams.physflags & PHYSFLAGS_MIDAIR) == 0 )
+        if ( (arg8->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
             return 3;
     }
     if ( (a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER) == 0 )
@@ -1160,7 +1160,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
                 v12 = 1;
                 if ( arg8 )
                 {
-                    if ( (v4->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && v4->attachedThing == v10 )
+                    if ( (v4->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && v4->attachedThing == v10 )
                     {
                         *arg8 = 0;
                         sithCollision_SearchClose();
@@ -1187,7 +1187,7 @@ LABEL_8:
     v12 = 2 - ((v9 & SITH_SECTOR_NOGRAVITY) != 0);
     if ( !arg8 )
         goto LABEL_20;
-    if ( (v4->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
+    if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
     {
         *arg8 = 0;
         sithCollision_SearchClose();
@@ -1237,7 +1237,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
                 v5 = 2 - ((v8 & SURFACEFLAGS_1) != 0);
                 if ( !out )
                     goto LABEL_19;
-                if ( (v4->attach_flags & ATTACHFLAGS_WORLDSURFACE) != 0 && v4->attachedSurface == v7 )
+                if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v7 )
                 {
                     *out = 0;
                     sithCollision_SearchClose();
@@ -1267,7 +1267,7 @@ LABEL_13:
         v5 = 1;
         if ( out )
         {
-            if ( (v4->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 && v4->attachedThing == v10 )
+            if ( (v4->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && v4->attachedThing == v10 )
             {
                 *out = 0;
                 sithCollision_SearchClose();
@@ -1579,7 +1579,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
         goto LABEL_34;
     if ( a3 >= 2.0 )
     {
-        if ( (a1->flags & SITHAIFLAGS_AWAKE_AND_ACTIVE) == 0 )
+        if ( (a1->flags & SITHAI_MODE_ACTIVE) == 0 )
             v8 = 0.5;
         if ( (a2->actorParams.typeflags & THING_TYPEFLAGS_DAMAGE) == 0 && (a2->jkFlags & 1) == 0 )
         {
@@ -1601,7 +1601,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
             }
             if ( a2->moveType == SITH_MT_PHYSICS )
             {
-                if ( (a2->physicsParams.physflags & PHYSFLAGS_CROUCHING) != 0 )
+                if ( (a2->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
                     v8 = v8 * 0.75;
                 if ( a2->physicsParams.vel.x == 0.0 && a2->physicsParams.vel.y == 0.0 && a2->physicsParams.vel.z == 0.0 )
                     v8 = v8 * 0.5;

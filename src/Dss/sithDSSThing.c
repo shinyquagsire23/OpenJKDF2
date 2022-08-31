@@ -1045,15 +1045,15 @@ void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int m
     NETMSG_PUSHS32(thing->thing_id);
     NETMSG_PUSHU16(thing->attach_flags);
 
-    if (thing->attach_flags & ATTACHFLAGS_WORLDSURFACE)
+    if (thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
         NETMSG_PUSHU16(thing->attachedSurface->field_0);
     }
-    else if (thing->attach_flags & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE))
+    else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
     {
         sithThing* v7 = (sithThing *)thing->attachedThing;
         NETMSG_PUSHS32(v7->thing_id)
-        if ( (thing->attach_flags & ATTACHFLAGS_THINGSURFACE) != 0 )
+        if ( (thing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
         {
             NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->rdthing.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
         }
@@ -1076,7 +1076,7 @@ int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg)
     if ( !v1 )
         return 0;
     int v3 = NETMSG_POPS16();
-    if (v3 & ATTACHFLAGS_WORLDSURFACE)
+    if (v3 & SITH_ATTACH_WORLDSURFACE)
     {
         sithSurface* v5 = sithSurface_sub_4E63B0(NETMSG_POPS16());
         if ( v5 )
@@ -1087,12 +1087,12 @@ int sithDSSThing_HandleSyncThingAttachment(sithCogMsg *msg)
         }
         return 0;
     }
-    if (v3 & (ATTACHFLAGS_THING|ATTACHFLAGS_THINGSURFACE))
+    if (v3 & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
     {
         sithThing* v9 = sithThing_GetById(NETMSG_POPS32());
         if ( !v9 )
             return 0;
-        if (v3 & ATTACHFLAGS_THINGSURFACE)
+        if (v3 & SITH_ATTACH_THINGSURFACE)
         {
             sithThing_LandThing(
                 v1,

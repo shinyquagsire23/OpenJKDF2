@@ -292,7 +292,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
                     }
                 }
 
-                sithThing_Damage(searchResult->receiver, player, playerInfo->damage, SITH_DT_SABER);
+                sithThing_Damage(searchResult->receiver, player, playerInfo->damage, SITH_DAMAGE_SABER);
                 playerInfo->damagedThings[playerInfo->numDamagedThings++] = searchResult->receiver;
                 break;
             }
@@ -347,7 +347,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
                 }
             }
 
-            sithThing_Damage(resultThing, player, playerInfo->damage, SITH_DT_SABER);
+            sithThing_Damage(resultThing, player, playerInfo->damage, SITH_DAMAGE_SABER);
             playerInfo->damagedThings[playerInfo->numDamagedThings++] = searchResult->receiver;            
             break;
         }
@@ -380,7 +380,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
                 }
                 if ( surfaceNum >= playerInfo->numDamagedSurfaces )
                 {
-                    sithSurface_SendDamageToThing(searchResult->surface, player, playerInfo->damage, SITH_DT_SABER);
+                    sithSurface_SendDamageToThing(searchResult->surface, player, playerInfo->damage, SITH_DAMAGE_SABER);
                     playerInfo->damagedSurfaces[playerInfo->numDamagedSurfaces++] = searchResult->surface;
                 }
             }

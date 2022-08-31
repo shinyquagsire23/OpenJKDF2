@@ -1140,7 +1140,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
         rdMatrix_Copy34(&thing->lookOrientation, &thingTo->lookOrientation);
         rdVector_Copy3(&thing->position, &thingTo->position);
         sithThing_MoveToSector(thing, thingTo->sector, 0);
-        if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & PHYSFLAGS_FLOORSTICK)
+        if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & SITH_PF_FLOORSTICK)
             sithPhysics_FindFloor(thing, 1);
 
         if ( thing == g_localPlayerThing )
@@ -1791,7 +1791,7 @@ void sithCogFunctionThing_IsCrouching(sithCog *ctx)
     if ( !thing || thing->moveType != SITH_MT_PHYSICS )
         sithCogVm_PushInt(ctx, -1);
 
-    if (thing->physicsParams.physflags & PHYSFLAGS_CROUCHING)
+    if (thing->physicsParams.physflags & SITH_PF_CROUCHING)
         sithCogVm_PushInt(ctx, 1);
     else
         sithCogVm_PushInt(ctx, 0);
