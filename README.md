@@ -131,6 +131,7 @@ Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (se
 DirectX                        0x1e       0.003%        100.000%        5 / 5          
 sithCorpse                     0x27       0.004%        100.000%        1 / 1          
 jkGob                          0x29       0.004%        100.000%        2 / 2          
+sithActor                      0x43       0.006%        100.000%        1 / 1          
 jkGuiDecision                  0x45       0.006%        100.000%        3 / 3          
 sithStrTable                   0x5b       0.008%        100.000%        4 / 4          
 sithCopyright                  0x67       0.010%        100.000%        1 / 1          
@@ -167,6 +168,7 @@ sithKeyFrame                   0x44e      0.102%        100.000%        5 / 5
 stdPcx                         0x45e      0.104%        100.000%        2 / 2          
 sithDSSCog                     0x460      0.104%        100.000%        4 / 4          
 smack                          0x466      0.104%        100.000%        6 / 6          
+sithPlayerActions              0x46f      0.105%        100.000%        3 / 3          
 rdMath                         0x47d      0.107%        100.000%        6 / 6          
 rdLight                        0x49f      0.110%        100.000%        8 / 8          
 jkGuiMain                      0x4b1      0.111%        100.000%        6 / 6          
@@ -175,7 +177,6 @@ sithSprite                     0x4f1      0.117%        100.000%        6 / 6
 jkGui                          0x4fb      0.118%        100.000%       10 / 10         
 jkGuiTitle                     0x4fb      0.118%        100.000%       10 / 10         
 sithMaterial                   0x4fd      0.118%        100.000%        9 / 9          
-sithActor                      0x559      0.127%        100.000%        5 / 5          
 wuRegistry                     0x5b2      0.135%        100.000%       12 / 12         
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 DebugConsole                   0x5de      0.139%        100.000%       13 / 13         
@@ -294,7 +295,7 @@ sithMulti                      0x252a     0.882%        90.277%        27 / 35
 stdDisplay                     0x267b     0.913%        61.537%        22 / 37         
 sithCollision                  0x2827     0.953%        91.760%        18 / 22         
 sithControl                    0x285a     0.958%        92.943%        29 / 33         
-sithThing                      0x3c2e     1.428%        88.381%        46 / 53         
+sithThing                      0x3cd5     1.444%        88.506%        47 / 54         
 rdRaster                       0xf04d     5.702%        0.195%          1 / 89         
 rdZRaster                      0x15fb4    8.346%        0.000%          0 / 73         
 rdAFRaster                     0x1620d    8.402%        0.000%          0 / 122        
