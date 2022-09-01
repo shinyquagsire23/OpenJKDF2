@@ -105,7 +105,7 @@ char* stdString_GetQuotedStringContents(char *in, char *out, int out_size)
 int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3)
 {
     int result; // eax
-    char *v4; // esi
+    const char *v4; // esi
     wchar_t *v5; // edx
 
     result = 0;
@@ -214,7 +214,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
         if ( v10 >= 0 )
         {
             v11 = (wchar_t *)(v9 + sizeof(wchar_t) * v10);
-            v12 = (int)v7 - v9;
+            v12 = (intptr_t)v7 - v9;
             v13 = v10 + 1;
             do
             {

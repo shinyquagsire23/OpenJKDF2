@@ -1077,7 +1077,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = 0;
     v5 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, v5, jkPlayer_playerShortName);
-    jkGuiBuildMulti_menuLoadCharacter_buttons[2].unistr = (char *)&jkGuiBuildMulti_wTmp[64];
+    jkGuiBuildMulti_menuLoadCharacter_buttons[2].wstr = (char *)&jkGuiBuildMulti_wTmp[64];
     jkEpisode_LoadVerify();
     v6 = -1;
     v7 = 0;
@@ -1098,9 +1098,9 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     }
 LABEL_7:
     if ( v6 == -1 )
-        jkGuiBuildMulti_menuLoadCharacter_buttons[5].unistr = 0;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[5].wstr = 0;
     else
-        jkGuiBuildMulti_menuLoadCharacter_buttons[5].unistr = (char *)jkEpisode_aEpisodes[v6].unistr;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[5].wstr = jkEpisode_aEpisodes[v6].unistr;
     jkRes_LoadGob(pStrEpisode);
     stdStrTable_Load(&strtable, "misc\\cogStrings.uni");
     v9 = a5;
@@ -1134,17 +1134,17 @@ LABEL_7:
                 goto LABEL_18;
             case 1:
                 v20 = jkGuiRend_GetStringEntry(&darr, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
-                _wcsncpy(&name, v20->str, 0x1Fu);
+                _wcsncpy(name, v20->str, 0x1Fu);
                 v14 = 0;
                 v26 = 0;
-                if ( jkPlayer_VerifyWcharName(&name) )
+                if ( jkPlayer_VerifyWcharName(name) )
                 {
-                    jkPlayer_MPCParse(pPlayerMpcInfo, &jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, &name, 1);
+                    jkPlayer_MPCParse(pPlayerMpcInfo, &jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name, 1);
                 }
                 else
                 {
                     v14 = 1;
-                    jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = (char *)jkStrings_GetText("ERR_BAD_PLAYER_NAME");
+                    jkGuiBuildMulti_menuLoadCharacter_buttons[0].wstr = jkStrings_GetText("ERR_BAD_PLAYER_NAME");
                 }
                 break;
             case 100:
@@ -1154,16 +1154,16 @@ LABEL_18:
                 break;
             case 101:
                 v16 = jkGuiRend_GetStringEntry(&darr, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
-                _wcsncpy(&name, v16->str, 0x1Fu);
+                _wcsncpy(name, v16->str, 0x1Fu);
                 v26 = 0;
                 v14 = 1;
-                if ( jkPlayer_VerifyWcharName(&name) )
+                if ( jkPlayer_VerifyWcharName(name) )
                 {
                     jkPlayer_MPCParse(
                         &jkGuiBuildMulti_aMpcInfo[jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry],
                         &jkPlayer_playerInfos[playerThingIdx],
                         jkPlayer_playerShortName,
-                        &name,
+                        name,
                         1);
                     jkGuiBuildMulti_ShowEditCharacter(0);
                     jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, &name);
@@ -1171,7 +1171,7 @@ LABEL_18:
                 }
                 else
                 {
-                    jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = (char *)jkStrings_GetText("ERR_BAD_PLAYER_NAME");
+                    jkGuiBuildMulti_menuLoadCharacter_buttons[0].wstr = jkStrings_GetText("ERR_BAD_PLAYER_NAME");
                 }
                 break;
             case 102:

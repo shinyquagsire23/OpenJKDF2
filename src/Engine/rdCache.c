@@ -165,7 +165,6 @@ int rdCache_SendFaceListToHardware()
     double v25; // st7
     double v26; // st7
     double v27; // st7
-    int vertex_cnt; // eax
     rdVector3 *iterating_6c_vtxs_; // esi
     int v35; // ecx
     double v36; // st7
@@ -184,8 +183,6 @@ int rdCache_SendFaceListToHardware()
     int final_vertex_color; // eax
     rdVector2 *uvs_in_pixels; // eax
     double tex_v; // st7
-    unsigned int vtx_idx_inc_max; // eax
-    unsigned int iter_6c_vtx_num; // edi
     int v61; // ecx
     int lighting_maybe_2; // edx
     unsigned int v63; // edi
@@ -201,7 +198,6 @@ int rdCache_SendFaceListToHardware()
     double v76; // st7
     double v77; // st7
     double v78; // st7
-    int v79; // eax
     rdDDrawSurface *v80; // edx
     double v87; // st7
     double v88; // st7
@@ -256,6 +252,7 @@ int rdCache_SendFaceListToHardware()
     int blue; // [esp+8Ch] [ebp-14h]
     int red_and_alpha; // [esp+98h] [ebp-8h]
     int green; // [esp+9Ch] [ebp-4h]
+    int tmpiter;
 
     //printf("b %f %f %f ", rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.z, rdroid_curColorEffects.tint.z);
     //printf("%d %d %d\n", rdroid_curColorEffects.filter.x, rdroid_curColorEffects.filter.z, rdroid_curColorEffects.filter.z);
@@ -521,7 +518,6 @@ int rdCache_SendFaceListToHardware()
                 //active_6c->light_level_static = v26 * 255.0;
             }
 
-            vertex_cnt = active_6c->numVertices;
             iterating_6c_vtxs = active_6c->vertices;
             vertex_a = red_and_alpha << 8;
 
@@ -654,10 +650,8 @@ int rdCache_SendFaceListToHardware()
                 rdCache_aHWVertices[rdCache_totalVerts].tu = uvs_in_pixels[vtx_idx].x / actual_width;
                 rdCache_aHWVertices[rdCache_totalVerts].tv = uvs_in_pixels[vtx_idx].y / actual_height;
                 
-                vtx_idx_inc_max = v52->numVertices;
                 ++rdCache_totalVerts;
             }
-            iter_6c_vtx_num = active_6c->numVertices;
 #ifdef QOL_IMPROVEMENTS
             if ( active_6c->numVertices <= 2 )
             {
@@ -825,8 +819,7 @@ solid_tri:
 
         active_6c->light_level_static = v77 * 63.0;
 LABEL_232:
-        v79 = active_6c->numVertices;
-        int tmpiter = 0;
+        tmpiter = 0;
         alpha_upshifta = red_and_alpha << 8;
         for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
         {

@@ -85,7 +85,7 @@ typedef struct stdWaveFormat
   int16_t wBitsPerSample;
 } stdWaveFormat;
 
-uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
+uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
 
 extern float stdSound_fMenuVolume;
 

@@ -485,7 +485,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
     rdKeyframe *v4; // ecx
     rdPuppetTrack *v5; // esi
     double v6; // st7
-    unsigned int v11; // ebx
+    //unsigned int v11; // ebx
     rdKeyframe *v12; // ecx
     int v20; // [esp+14h] [ebp-8h]
     float v21; // [esp+18h] [ebp-4h]
@@ -515,7 +515,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
         else if ( !(v5->status & 0x80u) )
         {
             v21 = floorf(v22 / v6);
-            v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
+            //v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
             puppet->tracks[trackNum].field_120 -= (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
             //_memset(&puppet->tracks[trackNum].nodes, 0, v11);
 

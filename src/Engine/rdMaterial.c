@@ -14,11 +14,13 @@
 rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t load)
 {
     pMaterialsLoader = load;
+    return load;
 }
 
 rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t unload)
 {
     pMaterialsUnloader = unload;
+    return unload;
 }
 
 rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int gpu_memory)

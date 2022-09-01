@@ -10,7 +10,7 @@
 int DebugConsole_Initialize(int maxCmds)
 {
     stdHashTable *v1; // eax
-    IDirectSoundBuffer *v2; // eax
+    stdSound_buffer_t *v2; // eax
     signed int result; // eax
 
     DebugConsole_aCmds = (stdDebugConsoleCmd *)pSithHS->alloc(sizeof(stdDebugConsoleCmd) * maxCmds);

@@ -20,7 +20,7 @@ void sithModel_Shutdown();
 int sithModel_Load(sithWorld *world, int a2);
 void sithModel_Free(sithWorld *world);
 rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk);
-int sithModel_GetMemorySize(rdModel3 *model);
+uint32_t sithModel_GetMemorySize(rdModel3 *model);
 int sithModel_New(sithWorld *world, int num);
 rdModel3* sithModel_GetByIdx(int idx);
 

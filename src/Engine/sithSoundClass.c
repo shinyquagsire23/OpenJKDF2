@@ -115,7 +115,7 @@ int sithSoundClass_Startup()
     {
         for (int i = 1; i < 96; i++)
         {
-            stdHashTable_SetKeyVal(sithSoundClass_nameToKeyHashtable, sithSoundClass_aKeys[i], (void *)i);
+            stdHashTable_SetKeyVal(sithSoundClass_nameToKeyHashtable, sithSoundClass_aKeys[i], (void *)(intptr_t)i);
         }
         return 1;
     }
@@ -265,7 +265,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
     {
         if ( stdConffile_entry.numArgs >= 2u )
         {
-            soundIdx = (uint32_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, stdConffile_entry.args[0].value);
+            soundIdx = (uint32_t)((intptr_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, (void*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
             if (soundIdx)
             {
                 if (soundIdx < 0x60)

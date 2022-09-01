@@ -7,7 +7,7 @@
 
 float stdSound_fMenuVolume = 1.0f;
 
-uint32_t stdSound_ParseWav(int sound_file, int *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
+uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
 {
     unsigned int result; // eax
     int v8; // eax

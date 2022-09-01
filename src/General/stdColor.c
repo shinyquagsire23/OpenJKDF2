@@ -50,7 +50,7 @@ int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8
     formatFroma = v9 - formatTo->b_bits;
     if ( numPixels > 0 )
     {
-        v11 = (uint32_t)inPixels;
+        v11 = (uint32_t)((intptr_t)inPixels & 0xFFFFFFFF);
         formatToa = numPixels;
         do
         {

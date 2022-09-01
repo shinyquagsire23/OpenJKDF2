@@ -2322,6 +2322,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 v45->x = v28->x;
                 v45->y = v28->y;
                 v45->z = v28->z;
+                v26 = pSourceVert;
             }
         }
         v27 = v28++;
@@ -2330,7 +2331,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
         return v5;
 
     v46 = v5;
-    v47 = pSourceVert;
+    v47 = v26;
     v5 = 0;
     v48 = pDestVert;
     pDestVert = v47;

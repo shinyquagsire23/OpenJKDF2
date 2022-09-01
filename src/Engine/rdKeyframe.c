@@ -9,11 +9,13 @@
 keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader)
 {
     pKeyframeLoader = loader;
+    return loader;
 }
 
 keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 {
     pKeyframeUnloader = loader;
+    return loader;
 }
 
 void rdKeyframe_NewEntry(rdKeyframe *keyframe)

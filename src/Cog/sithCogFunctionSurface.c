@@ -105,7 +105,7 @@ void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx)
 {
     sithSurface *v1; // eax
-    int *v2; // eax
+    uint32_t *v2; // eax
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 && (v2 = &v1->parent_sector->id) != 0 )

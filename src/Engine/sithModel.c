@@ -111,18 +111,17 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
     return model;
 }
 
-int sithModel_GetMemorySize(rdModel3 *model)
+uint32_t sithModel_GetMemorySize(rdModel3 *model)
 {
-    int result; // eax
+    unsigned int result; // eax
     rdGeoset *v2; // ebx
     int v3; // edi
-    int *v4; // edx
+    rdMesh* v4; // edx
     int v5; // esi
-    int *v6; // ecx
-    int v7; // ebp
+    rdFace* v6; // ecx
     int modela; // [esp+8h] [ebp+4h]
 
-    result = 4 * (model->numMaterials + 45 * model->numHierarchyNodes) + 132;
+    result = (sizeof(void*) * model->numMaterials) + (sizeof(rdHierarchyNode) * model->numHierarchyNodes) + sizeof(rdModel3);
     if ( model->numGeosets )
     {
         v2 = model->geosets;
@@ -133,30 +132,29 @@ int sithModel_GetMemorySize(rdModel3 *model)
             if ( v2->numMeshes )
             {
                 v3 = v2->numMeshes;
-                v4 = &v2->meshes->numFaces;
+                v4 = v2->meshes;
                 do
                 {
-                    v5 = *v4;
-                    result += 8 * (*(v4 - 1) + 4 * (*(v4 - 2) + 2 * *v4)) + 112;
-                    if ( *v4 )
+                    v5 = v4->numFaces;
+                    result += (sizeof(rdVector2) * v4->numUVs) + ((sizeof(rdVector3) + sizeof(rdVector3) + sizeof(rdVector2)) * v4->numVertices) + (sizeof(rdFace) * v4->numFaces) + sizeof(rdMesh);
+                    if ( v4->numFaces )
                     {
-                        v6 = (int *)(*(v4 - 4) + 20);
+                        v6 = v4->faces;
                         do
                         {
-                            v7 = *v6;
-                            v6 += 16;
+                            result += (sizeof(int) * 2) * v6->numVertices;
+                            v6++;
                             --v5;
-                            result += 8 * v7;
                         }
                         while ( v5 );
                     }
-                    v4 += 28;
+                    ++v4;
                     --v3;
                 }
                 while ( v3 );
             }
             ++v2;
-            modela--;
+            --modela;
         }
         while ( modela );
     }

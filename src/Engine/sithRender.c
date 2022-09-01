@@ -70,11 +70,11 @@ void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
 void sithRender_RenderDebugLights()
 {
     sithSector *sectorIter; // edx
-    rdLight **lightIter; // ebx
-    rdLight **curCamera_lights; // edi
+    //rdLight **lightIter; // ebx
+    //rdLight **curCamera_lights; // edi
     int *verticeIdxs; // edx
     rdLight **lightIter2; // edi
-    unsigned int v24; // [esp+8h] [ebp-13Ch]
+    //unsigned int v24; // [esp+8h] [ebp-13Ch]
     sithSector **aSectorIter; // [esp+Ch] [ebp-138h]
     float attenuationMax; // [esp+40h] [ebp-104h]
     rdLight *tmpLights[64]; // [esp+44h] [ebp-100h] BYREF
@@ -87,12 +87,12 @@ void sithRender_RenderDebugLights()
     {
         sectorIter = aSectorIter[k];
         
-        lightIter = tmpLights;
-        curCamera_lights = rdCamera_pCurCamera->lights;
+        //lightIter = tmpLights;
+        //curCamera_lights = rdCamera_pCurCamera->lights;
         
         sithRender_RenderDebugLight(1.0, &sectorIter->center);
         
-        v24 = 0;
+        //v24 = 0;
         for (int i = 0; i < rdCamera_pCurCamera->numLights; i++)
         {
             sithRender_RenderDebugLight(rdCamera_pCurCamera->lights[i]->intensity, &rdCamera_pCurCamera->lightPositions[i]);
@@ -1191,7 +1191,7 @@ void sithRender_RenderThings()
         rdColormap_SetCurrent(v1->colormap);
         thingIter = v1->thingsList;
         v16 = v1->colormap == sithWorld_pCurrentWorld->colormaps;
-        for (thingIter; thingIter; thingIter = thingIter->nextThing)
+        for (; thingIter; thingIter = thingIter->nextThing)
         {
             if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
               && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0

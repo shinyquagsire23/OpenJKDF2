@@ -72,7 +72,7 @@ int sithPuppet_Startup()
         sithPuppet_animNamesToIdxHashtable = stdHashTable_New(86);
         for (int i = 1; i < 43; i++)
         {
-            stdHashTable_SetKeyVal(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)i);
+            stdHashTable_SetKeyVal(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)(intptr_t)i);
         }
         return 1;
     }

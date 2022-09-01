@@ -67,7 +67,7 @@ int sithIntersect_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVect
     rdVector3 a1; // [esp+14h] [ebp-48h] BYREF
     rdVector3 v35; // [esp+20h] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+2Ch] [ebp-30h] BYREF
-    sithThing *thinga; // [esp+60h] [ebp+4h]
+    uint32_t thinga; // [esp+60h] [ebp+4h]
     rdMatrix34 *a2a; // [esp+64h] [ebp+8h]
     int v39; // [esp+68h] [ebp+Ch]
     int a3a; // [esp+6Ch] [ebp+10h]
@@ -123,9 +123,9 @@ int sithIntersect_sub_5080D0(sithThing *thing, const rdVector3 *a2, const rdVect
                         v41 = *v29;
                     }
                     ++v30;
-                    thinga = (sithThing *)((char *)thinga + 1);
+                    thinga++;
                 }
-                while ( (unsigned int)thinga < v27->numMeshes );
+                while ( thinga < v27->numMeshes );
                 v28 = a3a;
             }
             if ( v28 )
