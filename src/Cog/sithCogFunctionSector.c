@@ -81,8 +81,6 @@ void sithCogFunctionSector_SetTint(sithCog *ctx)
     double v2; // st7
     double v3; // st7
     double v4; // st7
-    int v5; // eax
-    int v6; // esi
     rdVector3 poppedVector; // [esp+4h] [ebp-Ch] BYREF
 
     sithCogVm_PopVector3(ctx, &poppedVector);
@@ -127,16 +125,10 @@ void sithCogFunctionSector_SetTint(sithCog *ctx)
         {
             v4 = poppedVector.z;
         }
-        v5 = sithCogVm_multiplayerFlags;
         sector->tint.z = v4;
-        if ( v5 )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v6 = ctx->trigId;
-                if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_Sync(sector, 1);
-            }
+            sithSector_Sync(sector, 1);
         }
     }
 }
@@ -163,14 +155,9 @@ void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
                 return;
             sithSector_UnsetAdjoins(sector);
         }
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v3 = ctx->trigId;
-                if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_Sync(sector, 0);
-            }
+            sithSector_Sync(sector, 0);
         }
     }
 }
@@ -189,7 +176,6 @@ void sithCogFunctionSector_GetSectorLight(sithCog *ctx)
 void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
 {
     sithSector *sector; // ecx
-    int v3; // esi
     float v4; // [esp+4h] [ebp-4h]
     float extraLight; // [esp+Ch] [ebp+4h]
 
@@ -201,14 +187,9 @@ void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
         if ( v4 == 0.0 )
         {
             sector->extraLight = extraLight;
-            if ( sithCogVm_multiplayerFlags )
+            if ( COG_SHOULD_SYNC(ctx) )
             {
-                if ( (ctx->flags & 0x200) == 0 )
-                {
-                    v3 = ctx->trigId;
-                    if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
-                        sithSector_Sync(sector, 1);
-                }
+                sithSector_Sync(sector, 1);
             }
         }
         else
@@ -249,10 +230,9 @@ void sithCogFunctionSector_SetColormap(sithCog *ctx)
             if ( colormap_idx < world->numColormaps )
             {
                 sector->colormap = &world->colormaps[colormap_idx];
-                if ( (sithCogVm_multiplayerFlags != 0) && (ctx->flags & 0x200) == 0 )
+                if ( COG_SHOULD_SYNC(ctx) )
                 {
-                    if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                        sithSector_Sync(sector, 1);
+                    sithSector_Sync(sector, 1);
                 }
             }
         }
@@ -293,13 +273,9 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
             sector->thrust.y = mult * thrust.y;
             sector->thrust.z = mult * thrust.z;
         }
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSector_Sync(sector, 1);
-            }
+            sithSector_Sync(sector, 1);
         }
     }
 }
@@ -312,10 +288,9 @@ void sithCogFunctionSector_SetSectorFlags(sithCog *ctx)
     if (sector && flags)
     {
         sector->flags |= flags;
-        if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSector_Sync(sector, 0);
+            sithSector_Sync(sector, 0);
         }
     }
 }
@@ -328,10 +303,9 @@ void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx)
     if (sector && flags)
     {
         sector->flags &= ~flags;
-        if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSector_Sync(sector, 0);
+            sithSector_Sync(sector, 0);
         }
     }
 }

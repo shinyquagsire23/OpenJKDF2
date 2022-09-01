@@ -164,7 +164,7 @@ int sithMulti_Startup()
     sithSector_numSync = 0;
     sithNet_dword_832640 = 0;
     sithCogVm_ClearMsgTmpBuf();
-    if ( sithDplay_dword_8321E4 )
+    if ( sithDplay_bIsServer )
     {
         sithNet_MultiModeFlags = sithMulti_multiModeFlags;
         sithNet_scorelimit = sithDplay_dword_832204;
@@ -1029,11 +1029,11 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
 
     v1 = msg->netMsg.thingIdx;
     
-    if ( sithDplay_dword_8321E4 && v1 )
+    if ( sithDplay_bIsServer && v1 )
     {
         NETMSG_POPSTR(v11, 32);
         
-        printf("sithMulti_HandleRequestConnect %x %x %s\n", sithDplay_dword_8321E4, v1, v11);
+        printf("sithMulti_HandleRequestConnect %x %x %s\n", sithDplay_bIsServer, v1, v11);
 
         if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
         {

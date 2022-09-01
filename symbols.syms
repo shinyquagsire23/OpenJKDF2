@@ -336,7 +336,7 @@ sithDplay_dword_832204 0x00832204 int
 sithDplay_dword_832208 0x00832208 uint32_t
 sithDplay_dword_83220C 0x0083220C int
 sithDplay_dword_8321E0 0x008321E0 int
-sithDplay_dword_8321E4 0x008321E4 int
+sithDplay_bIsServer 0x008321E4 int
 sithDplay_dword_8321F8 0x008321F8 int
 sithDplay_dword_8321E8 0x008321E8 int
 sithDplay_waIdk 0x008C4C60 wchar_t[32]

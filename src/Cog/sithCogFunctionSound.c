@@ -73,34 +73,26 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
             playingSound = sithSoundSys_PlaySoundPosThing(sound, thing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
-        if (sithCogVm_multiplayerFlags 
-            && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-            {
-                if ( playingSound )
-                    refid_ = playingSound->refid;
-                else
-                    refid_ = -1;
-                sithDSSThing_SendPlaySoundPos(thing, &thing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
-            }
+            if ( playingSound )
+                refid_ = playingSound->refid;
+            else
+                refid_ = -1;
+            sithDSSThing_SendPlaySoundPos(thing, &thing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
         }
     }
     else
     {
         flags &= ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE);
         playingSound = sithSoundSys_cog_playsound_internal(sound, volume, 0.0, flags);
-        if (sithCogVm_multiplayerFlags 
-            && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-            {
-                if ( playingSound )
-                    refid = playingSound->refid;
-                else
-                    refid = -1;
-                sithDSSThing_SendPlaySoundPos(0, 0, sound, volume, 0.0, flags, refid, -1, 255);
-            }
+            if ( playingSound )
+                refid = playingSound->refid;
+            else
+                refid = -1;
+            sithDSSThing_SendPlaySoundPos(0, 0, sound, volume, 0.0, flags, refid, -1, 255);
         }
     }
     if ( playingSound )
@@ -147,18 +139,14 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
         maxDist_act = minDist_act;
     flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
     playingSound = sithSoundSys_PlaySoundPosAbsolute(sound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
-    if (sithCogVm_multiplayerFlags 
-        && !(ctx->flags & 0x200))
+    if (COG_SHOULD_SYNC(ctx))
     {
-        if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-        {
-            if ( playingSound )
-                refId = playingSound->refid;
-            else
-                refId = -1;
+        if ( playingSound )
+            refId = playingSound->refid;
+        else
+            refId = -1;
 
-            sithDSSThing_SendPlaySoundPos(0, &pos, sound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
-        }
+        sithDSSThing_SendPlaySoundPos(0, &pos, sound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
     }
 
     if ( playingSound )
@@ -239,11 +227,9 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     sithPlayingSound* playingSound = sithSoundSys_cog_playsound_internal(sound, volume, pan, flagsTmp);
     if ( playingSound )
     {
-        if (sithCogVm_multiplayerFlags
-            && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithDSSThing_SendPlaySoundPos(0, 0, sound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
+            sithDSSThing_SendPlaySoundPos(0, 0, sound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
         }
         sithCogVm_PushInt(ctx, playingSound->refid);
     }
@@ -261,11 +247,9 @@ void sithCogFunctionSound_StopSound(sithCog *ctx)
 
     if ( playingSound && (playingSound->sound || playingSound->pSoundBuf) )
     {
-        if (sithCogVm_multiplayerFlags
-            && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithDSSThing_SendStopSound(playingSound, fadeOut, -1, 255);
+            sithDSSThing_SendStopSound(playingSound, fadeOut, -1, 255);
         }
         if ( fadeOut > 0.0 )
         {
@@ -300,11 +284,9 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     if ( thing && thing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(thing, soundClassId)) != 0 )
     {
         sithCogVm_PushInt(ctx, pPlayingSound->refid);
-        if (sithCogVm_multiplayerFlags
-            && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithDSSThing_SoundClassPlay(thing, soundClassId, pPlayingSound->refid, -1.0);
+            sithDSSThing_SoundClassPlay(thing, soundClassId, pPlayingSound->refid, -1.0);
         }
     }
     else

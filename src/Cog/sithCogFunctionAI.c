@@ -441,9 +441,9 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
                 v3->field_204 = v4;
                 v5 = v3->flags;
                 if ( v1 )
-                    v6 = v5 | 0x20;
+                    v6 = v5 | SITHAI_MODE_TOUGHSKIN;
                 else
-                    v6 = v5 & ~0x20u;
+                    v6 = v5 & ~SITHAI_MODE_TOUGHSKIN;
                 v3->flags = v6;
                 if ( v6 != v5 )
                     sithAI_SetActorFireTarget(v3, 256, v5);
@@ -533,9 +533,9 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
                 {
                     v4 = v3->flags;
                     v3->field_1C0 = v1;
-                    if ( (v4 & 0x800) == 0 )
+                    if ( (v4 & SITHAI_MODE_FLEEING) == 0 )
                     {
-                        v3->flags |= 0x800;
+                        v3->flags |= SITHAI_MODE_FLEEING;
                         sithAI_SetActorFireTarget(v3, 256, v4);
                     }
                 }

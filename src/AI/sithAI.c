@@ -821,7 +821,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
     actor->lookVector.z = v4;
     if ( rdVector_Normalize3Acc(&actor->lookVector) != 0.0 )
     {
-        if ( (v5->typeflags & SITH_AF_1) != 0 )
+        if ( (v5->typeflags & SITH_AF_CAN_ROTATE_HEAD) != 0 )
         {
             v6 = stdMath_ArcSin3(actor->lookVector.z);
             if ( v6 < v5->minHeadPitch )

@@ -37,7 +37,7 @@ extern "C" {
 #define DirectPlay_CloseConnection_ADDR (0x0042FB80)
 #define DirectPlay_Send_ADDR (0x0042FBB0)
 #define DirectPlay_Receive_ADDR (0x0042FBE0)
-#define DirectPlay_OpenIdk_ADDR (0x0042FC90)
+#define DirectPlay_OpenHost_ADDR (0x0042FC90)
 #define DirectPlay_GetSession_passwordidk_ADDR (0x0042FDC0)
 #define DirectPlay_IdkSessionDesc_ADDR (0x0042FEE0)
 #define DirectPlay_SetSessionFlagidk_ADDR (0x0042FF50)
@@ -105,7 +105,7 @@ static int (*DirectPlay_SetSessionFlagidk)(int) = (void*)DirectPlay_SetSessionFl
 static wchar_t* (*DirectPlay_SetSessionDesc)(int a1, DWORD a2) = (void*)DirectPlay_SetSessionDesc_ADDR;
 static DPID (*DirectPlay_CreatePlayer)(wchar_t*, int) = (void*)DirectPlay_CreatePlayer_ADDR;
 static void (*DirectPlay_Close)() = (void*)DirectPlay_Close_ADDR;
-static int (*DirectPlay_OpenIdk)(void*) = (void*)DirectPlay_OpenIdk_ADDR;
+static int (*DirectPlay_OpenHost)(void*) = (void*)DirectPlay_OpenHost_ADDR;
 static int (*DirectPlay_GetSession_passwordidk)(void*) = (void*)DirectPlay_GetSession_passwordidk_ADDR;
 static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions_ADDR;
 static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
@@ -131,7 +131,7 @@ BOOL DirectPlay_Initialize();
 int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
 DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
 void DirectPlay_Close();
-int DirectPlay_OpenIdk(jkMultiEntry* a);
+int DirectPlay_OpenHost(jkMultiEntry* a);
 int DirectPlay_GetSession_passwordidk(void* a);
 int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);

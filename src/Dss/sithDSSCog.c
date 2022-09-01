@@ -125,12 +125,12 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
         NETMSG_PUSHS32(cog->sourceRef);
         NETMSG_PUSHS32(cog->sourceType);
     }
-    if ( (cog->flags & COGFLAGS_PULSE) != 0 )
+    if ( (cog->flags & SITH_COG_PULSE_SET) != 0 )
     {
         NETMSG_PUSHS32(cog->pulsePeriodMs);
         NETMSG_PUSHS32(cog->nextPulseMs);
     }
-    if ( (cog->flags & COGFLAGS_8) != 0 )
+    if ( (cog->flags & SITH_COG_TIMER_SET) != 0 )
         NETMSG_PUSHS32(cog->field_20);
     v13 = cog->pSymbolTable;
     if ( v13->entry_cnt )
@@ -189,13 +189,13 @@ int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
         cog->sourceType = NETMSG_POPS32();
     }
 
-    if (cog->flags & COGFLAGS_PULSE)
+    if (cog->flags & SITH_COG_PULSE_SET)
     {
         cog->pulsePeriodMs = NETMSG_POPS32();
         cog->nextPulseMs = NETMSG_POPS32();
     }
 
-    if (cog->flags & COGFLAGS_8)
+    if (cog->flags & SITH_COG_TIMER_SET)
     {
         cog->field_20 = NETMSG_POPS32();
     }

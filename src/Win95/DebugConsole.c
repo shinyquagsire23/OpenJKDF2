@@ -216,35 +216,29 @@ int DebugConsole_PrintHelp()
         DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
-    v1 = 0;
-    if ( DebugConsole_numRegisteredCmds )
+    v2 = 0;
+    for (v1 = 0; v1 < DebugConsole_numRegisteredCmds; v1++ )
     {
-        v2 = 0;
-        do
+        if ( v0 + 0x10 >= 0x50 )
         {
-            if ( v0 + 0x10 >= 0x50 )
+            if ( DebugGui_fnPrint )
             {
-                if ( DebugGui_fnPrint )
-                {
-                    DebugGui_fnPrint(v4);
-                }
-                else
-                {
-                    DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
-                    if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
-                        DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-                    _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x7Fu);
-                    DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
-                    DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
-                }
-                v0 = 0;
+                DebugGui_fnPrint(v4);
             }
-            _sprintf(&v4[v0], "%-15s", DebugConsole_aCmds[v2].cmdStr);
-            v0 += 15;
-            ++v1;
-            ++v2;
+            else
+            {
+                DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
+                if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
+                    DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
+                _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x7Fu);
+                DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+                DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
+            }
+            v0 = 0;
         }
-        while ( v1 < DebugConsole_numRegisteredCmds );
+        _sprintf(&v4[v0], "%-15s", DebugConsole_aCmds[v2].cmdStr);
+        v0 += 15;
+        ++v2;
     }
     if ( DebugGui_fnPrint )
     {

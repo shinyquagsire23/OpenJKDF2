@@ -1665,8 +1665,8 @@ void std3D_DrawRenderList()
     }
 
     if (!(last_flags & 0x800)) {
-        //glDepthFunc(GL_ALWAYS);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        glDepthFunc(GL_ALWAYS);
+        //glClear(GL_DEPTH_BUFFER_BIT);
     }
     else {
         glDepthFunc(GL_LESS);
@@ -1683,6 +1683,15 @@ void std3D_DrawRenderList()
     }
     else {
         glUniform1i(uniform_blend_mode, 2);
+    }
+
+    if (last_flags & 0x1000)
+    {
+        glDepthMask(GL_TRUE);
+    }
+    else
+    {
+        glDepthMask(GL_FALSE);
     }
 
     if (last_flags & 0x10000) {
@@ -1744,17 +1753,17 @@ void std3D_DrawRenderList()
                 }
                 else
                 {
-                    //glDepthFunc(GL_ALWAYS);
-                    glClear(GL_DEPTH_BUFFER_BIT);
+                    glDepthFunc(GL_ALWAYS);
+                    //glClear(GL_DEPTH_BUFFER_BIT);
                 }
                 
-                if (changed_flags & 0x1000)
+                if (tris[j].flags & 0x1000)
                 {
                     glDepthMask(GL_TRUE);
                 }
                 else
                 {
-                    //glDepthMask(GL_FALSE);
+                    glDepthMask(GL_FALSE);
                 }
             }
 

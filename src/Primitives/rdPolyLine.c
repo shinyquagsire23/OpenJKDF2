@@ -204,69 +204,83 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     tip_bottom = vertex_out.z - polyline->tipRadius;
     tip_right = vertex_out.x + polyline->tipRadius;
     tip_top = vertex_out.z + polyline->tipRadius;
-    polylineVerts[0].x = tip_left;
-    polylineVerts[0].y = vertex_out.y - -0.001;
-    polylineVerts[0].z = tip_bottom;
-    polylineVerts[1].x = tip_right;
-    polylineVerts[1].y = vertex_out.y - -0.001;
-    polylineVerts[1].z = tip_bottom;
-    polylineVerts[2].x = tip_right;
-    polylineVerts[2].y = vertex_out.y - -0.001;
-    polylineVerts[2].z = tip_top;
-    polylineVerts[3].x = tip_left;
-    polylineVerts[3].y = vertex_out.y - -0.001;
-    polylineVerts[3].z = tip_top;
-    idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-    rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
 
-    polylineVerts[0].x = out.scale.x - polyline->baseRadius;
-    polylineVerts[0].y = out.scale.y - -0.001;
-    polylineVerts[0].z = out.scale.z - polyline->baseRadius;
-    polylineVerts[1].x = out.scale.x + polyline->baseRadius;
-    polylineVerts[1].y = out.scale.y - -0.001;
-    polylineVerts[1].z = out.scale.z - polyline->baseRadius;
-    polylineVerts[2].x = out.scale.x + polyline->baseRadius;
-    polylineVerts[2].y = out.scale.y - -0.001;
-    polylineVerts[2].z = out.scale.z + polyline->baseRadius;
-    polylineVerts[3].x = out.scale.x - polyline->baseRadius;
-    polylineVerts[3].y = out.scale.y - -0.001;
-    polylineVerts[3].z = out.scale.z + polyline->baseRadius;
-    idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-    rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+    // Tip
+    {
+        polylineVerts[0].x = tip_left;
+        polylineVerts[0].y = vertex_out.y - -0.001;
+        polylineVerts[0].z = tip_bottom;
+        polylineVerts[1].x = tip_right;
+        polylineVerts[1].y = vertex_out.y - -0.001;
+        polylineVerts[1].z = tip_bottom;
+        polylineVerts[2].x = tip_right;
+        polylineVerts[2].y = vertex_out.y - -0.001;
+        polylineVerts[2].z = tip_top;
+        polylineVerts[3].x = tip_left;
+        polylineVerts[3].y = vertex_out.y - -0.001;
+        polylineVerts[3].z = tip_top;
+        idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+    }
+
+    // Blade
+    {
+        polylineVerts[0].x = out.scale.x - polyline->baseRadius;
+        polylineVerts[0].y = out.scale.y - -0.001;
+        polylineVerts[0].z = out.scale.z - polyline->baseRadius;
+        polylineVerts[1].x = out.scale.x + polyline->baseRadius;
+        polylineVerts[1].y = out.scale.y - -0.001;
+        polylineVerts[1].z = out.scale.z - polyline->baseRadius;
+        polylineVerts[2].x = out.scale.x + polyline->baseRadius;
+        polylineVerts[2].y = out.scale.y - -0.001;
+        polylineVerts[2].z = out.scale.z + polyline->baseRadius;
+        polylineVerts[3].x = out.scale.x - polyline->baseRadius;
+        polylineVerts[3].y = out.scale.y - -0.001;
+        polylineVerts[3].z = out.scale.z + polyline->baseRadius;
+        idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+    }
     
-    float zdist = vertex_out.z - out.scale.z;
-    float xdist = vertex_out.x - out.scale.x;
-    float mag = stdMath_Sqrt(xdist * xdist + zdist * zdist);
 
-    // Added: prevent div 0
-    if (mag == 0)
+    // Blade
     {
-        mag = 0.000001f;
-    }
+        float zdist = vertex_out.z - out.scale.z;
+        float xdist = vertex_out.x - out.scale.x;
+        float mag = stdMath_Sqrt(xdist * xdist + zdist * zdist);
 
-    ang = stdMath_ArcSin3((-xdist) / mag);
-    if ( zdist < 0.0 )
-    {
-        if ( xdist <= 0.0 )
-            ang = -(ang - -180.0);
-        else
-            ang = 180.0 - ang;
+        // Added: prevent div 0
+        if (mag == 0)
+        {
+            mag = 0.000001f;
+        }
+
+        ang = stdMath_ArcSin3((-xdist) / mag);
+        if ( zdist < 0.0 )
+        {
+            if ( xdist <= 0.0 )
+                ang = -(ang - -180.0);
+            else
+                ang = 180.0 - ang;
+        }
+        stdMath_SinCos(ang, &angSin, &angCos);
+        polylineVerts[0].x = (polyline->tipRadius * angCos) - (mag * angSin) + out.scale.x;
+        polylineVerts[0].y = vertex_out.y;
+        polylineVerts[0].z = (polyline->tipRadius * angSin) + (mag * angCos) + out.scale.z;
+        
+        polylineVerts[1].x = (-polyline->tipRadius * angCos) - (mag * angSin) + out.scale.x;
+        polylineVerts[1].y = vertex_out.y;
+        polylineVerts[1].z = (-polyline->tipRadius * angSin) + (mag * angCos) + out.scale.z;
+        
+        polylineVerts[2].x = (-polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
+        polylineVerts[2].y = out.scale.y;
+        polylineVerts[2].z = (-polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
+        
+        polylineVerts[3].x = (polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
+        polylineVerts[3].y = out.scale.y;
+        polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
+        idxInfo.vertexUVs = polyline->extraUVTipMaybe;
+        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
-    stdMath_SinCos(ang, &angSin, &angCos);
-    polylineVerts[0].x = (polyline->tipRadius * angCos) - (mag * angSin) + out.scale.x;
-    polylineVerts[0].y = vertex_out.y;
-    polylineVerts[0].z = (polyline->tipRadius * angSin) + (mag * angCos) + out.scale.z;
-    polylineVerts[1].x = (-polyline->tipRadius * angCos) - (mag * angSin) + out.scale.x;
-    polylineVerts[1].y = vertex_out.y;
-    polylineVerts[1].z = (-polyline->tipRadius * angSin) + (mag * angCos) + out.scale.z;
-    polylineVerts[2].x = (-polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
-    polylineVerts[2].y = out.scale.y;
-    polylineVerts[2].z = (-polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
-    polylineVerts[3].x = (polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
-    polylineVerts[3].y = out.scale.y;
-    polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
-    idxInfo.vertexUVs = polyline->extraUVTipMaybe;
-    rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     return 1;
 }
 

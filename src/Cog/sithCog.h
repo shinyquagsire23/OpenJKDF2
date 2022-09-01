@@ -101,6 +101,21 @@ rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 #define NETMSG_POPWSTR(x,l) { _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
 #define NETMSG_IN_END {}
 
+#define COG_SHOULD_SYNC(ctx) (sithCogVm_multiplayerFlags && !(ctx->flags & SITH_COG_NO_SYNC) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+
+enum SithCogFlag
+{
+    SITH_COG_DEBUG = 0x1,
+    SITH_COG_DISABLED = 0x2,
+    SITH_COG_PULSE_SET = 0x4,
+    SITH_COG_TIMER_SET = 0x8,
+    SITH_COG_PAUSED = 0x10,
+    SITH_COG_LOCAL = 0x40,
+    SITH_COG_80 = 0x80,
+    SITH_COG_100 = 0x100,
+    SITH_COG_NO_SYNC = 0x200,
+};
+
 typedef int SITH_MESSAGE;
 
 enum SITH_MESSAGE_E
@@ -194,6 +209,7 @@ static float (*_sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *re
 //static void (*sithCogScript_Tick)(sithCog* cog) = (void*)sithCogScript_Tick_ADDR;
 
 int sithCogScript_Load(sithWorld *lvl, int a2);
+sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int unk);
 void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, char *a3);
 void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3);
 void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3);

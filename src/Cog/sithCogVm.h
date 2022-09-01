@@ -53,17 +53,6 @@
 #define sithCogVm_MathOperation_ADDR (0x004E3870)
 #define sithCogVm_AssignStackVar_ADDR (0x004E3B90)
 
-#define COGVM_FLAG_TRACE (1)
-#define COGVM_FLAG_IDK   (2)
-
-enum COGFLAGS
-{
-    COGFLAGS_TRACE = 1,
-    COGFLAGS_PAUSED = 2,
-    COGFLAGS_PULSE = 4,
-    COGFLAGS_8 = 8,
-};
-
 enum COGMSG_ID
 {
     COGMSG_TELEPORTTHING  = 1,

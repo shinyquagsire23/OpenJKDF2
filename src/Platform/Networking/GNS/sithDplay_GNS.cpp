@@ -953,7 +953,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_dword_8321E4)
+    if (!sithDplay_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -965,7 +965,7 @@ void Hack_ResetClients()
 
     //jkPlayer_maxPlayers = 2;
 
-    if (sithDplay_dword_8321E4)
+    if (sithDplay_bIsServer)
         sithDplay_dplayIdSelf = server.id;
     else
         sithDplay_dplayIdSelf = client.id;
@@ -1003,7 +1003,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
     Hack_ResetClients();
 
-    if (sithDplay_dword_8321E4)
+    if (sithDplay_bIsServer)
     {
         server.RunStep();
         return server.Receive(pIdOut, (void*)pMsgIdOut, pLenOut);
@@ -1021,7 +1021,7 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
 {
     Hack_ResetClients();
 
-    if (sithDplay_dword_8321E4)
+    if (sithDplay_bIsServer)
     {
         server.RunStep();
         return server.Send(idFrom, idTo, lpData, dwDataSize);
@@ -1050,7 +1050,7 @@ void sithDplay_CloseConnection()
             //DirectPlay_DestroyPlayer(sithDplay_dplayIdSelf);
             DirectPlay_Close();
             sithDplay_dword_8321E0 = 0;
-            sithDplay_dword_8321E4 = 0;
+            sithDplay_bIsServer = 0;
             sithDplay_dplayIdSelf = 0;
         }
         //DirectPlay_CloseConnection();
@@ -1065,7 +1065,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dword_8321E8 = 0;
     sithDplay_dword_8321E0 = 1;
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-    sithDplay_dword_8321E4 = 0;
+    sithDplay_bIsServer = 0;
     sithDplay_dplayIdSelf = 2; // HACK
     jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
@@ -1075,7 +1075,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
 
 void sithDplay_Close()
 {
-    if (sithDplay_dword_8321E4)
+    if (sithDplay_bIsServer)
     {
         server.Shutdown();
     }
@@ -1131,10 +1131,10 @@ void DirectPlay_Close()
     
 }
 
-int DirectPlay_OpenIdk(jkMultiEntry* pEntry)
+int DirectPlay_OpenHost(jkMultiEntry* pEntry)
 {
     sithDplayGNS_storedEntry = *pEntry;
-    sithDplay_dword_8321E4 = 1;
+    sithDplay_bIsServer = 1;
     server.Init(jkGuiNetHost_portNum);
     return 0;
 }

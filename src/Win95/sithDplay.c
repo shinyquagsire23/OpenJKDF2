@@ -56,11 +56,11 @@ int sithDplay_EarlyInit()
             result = sithDplay_dword_8321F8;
             if ( sithDplay_dword_8321F8 == 1 )
             {
-                sithDplay_dword_8321E4 = 1;
+                sithDplay_bIsServer = 1;
             }
             else if ( sithDplay_dword_8321F8 == 2 )
             {
-                sithDplay_dword_8321E4 = 0;
+                sithDplay_bIsServer = 0;
             }
         }
         else
@@ -80,7 +80,7 @@ HRESULT sithDplay_EnumSessions2(void)
 int sithDplay_seed_idk(jkMultiEntry *pEntry)
 {
     printf("Seed idk\n");
-    jkGuiNet_checksumSeed = (__int64)((double)rand() * 0.000030518509 * 4294967300.0);
+    jkGuiNet_checksumSeed = (__int64)(_frand() * 4294967300.0);
     pEntry->checksumSeed = jkGuiNet_checksumSeed;
     pEntry->field_E0 = 10;
     if ( DirectPlay_GetSession_passwordidk(pEntry) )
@@ -96,14 +96,14 @@ int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
     jkGuiNet_checksumSeed = (__int64)(_frand() * 4294967300.0);
     pEntry->checksumSeed = jkGuiNet_checksumSeed;
     pEntry->field_E0 = 10;
-    result = DirectPlay_OpenIdk(pEntry);
+    result = DirectPlay_OpenHost(pEntry);
     if ( !result )
     {
         sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
         if ( sithDplay_dplayIdSelf )
         {
             sithDplay_dplayIdSelf = 1; // HACK
-            sithDplay_dword_8321E4 = 1;
+            sithDplay_bIsServer = 1;
             sithDplay_dword_8321E0 = 1;
             result = 0;
         }

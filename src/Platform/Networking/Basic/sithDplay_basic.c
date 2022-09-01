@@ -73,7 +73,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_dword_8321E4)
+    if (!sithDplay_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -109,7 +109,7 @@ void sithDplay_Basic_Startup()
 
 void MyDplay_CheckIncoming()
 {
-    if (!sithDplay_dword_8321E4) return;
+    if (!sithDplay_bIsServer) return;
     if (MyDplay_hasClient) return;
 
     socklen_t socklen = sizeof MyDplay_addr;
@@ -172,7 +172,7 @@ int DirectPlay_ReceiveLoopback(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
-    int idRecv = sithDplay_dword_8321E4 ? 2 : 1;
+    int idRecv = sithDplay_bIsServer ? 2 : 1;
     int pMsgIdOut_size = *pLenOut;
 
     Hack_ResetClients();
@@ -412,7 +412,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dword_8321E8 = 0;
     sithDplay_dword_8321E0 = 1;
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-    sithDplay_dword_8321E4 = 0;
+    sithDplay_bIsServer = 0;
     sithDplay_dplayIdSelf = 2; // HACK
     jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
@@ -535,7 +535,7 @@ void DirectPlay_Close()
     close(DirectPlay_sock);
 }
 
-int DirectPlay_OpenIdk(jkMultiEntry* a)
+int DirectPlay_OpenHost(jkMultiEntry* a)
 {
     MyDplay_addr.sin_family = AF_INET;
     MyDplay_addr.sin_port = htons(SITHDPLAY_PORT); /*converts short to

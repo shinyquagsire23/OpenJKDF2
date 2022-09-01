@@ -223,7 +223,7 @@ int sithUnk4_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionS
         else
             sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK, 0);
         v16 = thing2->signature;
-        a1->actorParams.typeflags &= ~SITH_AF_1;
+        a1->actorParams.typeflags &= ~SITH_AF_CAN_ROTATE_HEAD;
         a1->prev_thing = thing2;
         a1->child_signature = v16;
         sithCog_SendMessageFromThing(thing2, 0, SITH_MESSAGE_BLOCKED);

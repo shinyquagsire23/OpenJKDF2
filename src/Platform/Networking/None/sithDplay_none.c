@@ -16,7 +16,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_dword_8321E4)
+    if (!sithDplay_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -127,7 +127,7 @@ void DirectPlay_Close()
     
 }
 
-int DirectPlay_OpenIdk(jkMultiEntry* a)
+int DirectPlay_OpenHost(jkMultiEntry* a)
 {
     
     return 0;

@@ -156,7 +156,7 @@ void jkSaber_UpdateLength(sithThing *thing)
 
         playerInfo->polyline.length = newLength;
         thing->actorParams.timeLeftLengthChange = deltaLen * (1.0 - JKSABER_EXTENDTIME);
-        if ( newLength < 0.0 || deltaLen < 0.0 ) // ? verify, IDA crapped out on this comparison
+        if ( deltaLen < 0.0 ) // ? verify, IDA crapped out on this comparison
         {
             playerInfo->polyline.length = 0.0;
             thing->jkFlags &= ~(JKFLAG_SABEREXTEND | JKFLAG_SABERRETRACT | JKFLAG_SABERON);

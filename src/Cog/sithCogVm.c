@@ -511,7 +511,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 cog_ctx->execPos = sithCogVm_PopProgramVal(cog_ctx);
                 break;
             case COG_OPCODE_RET:
-                if ( cog_ctx->flags & COGVM_FLAG_TRACE )
+                if ( cog_ctx->flags & SITH_COG_DEBUG )
                 {
                     _sprintf(std_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
                     DebugConsole_Print(std_genBuffer);
@@ -570,7 +570,7 @@ void sithCogVm_ExecCog(sithCog *ctx, int trigIdx)
         }
         ctx->execPos = ctx->cogscript->triggers[trigIdx].trigPc;
         ctx->trigId = ctx->cogscript->triggers[trigIdx].trigId;
-        if ( ctx->flags & COGFLAGS_TRACE )
+        if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
@@ -1116,7 +1116,7 @@ char* sithCogVm_PopString(sithCog *ctx)
     v1 = ctx->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, ctx->stackPos = v2, ctx->stack[v2].type != COG_VARTYPE_SYMBOL)
-      || (v5 = sithCogParse_GetSymbol(ctx->pSymbolTable, ctx->stack[v2].data[0]), v5->val.type != COG_VARTYPE_STR) )
+      || (v5 = sithCogParse_GetSymbol(ctx->pSymbolTable, ctx->stack[v2].data[0]), !v5 || v5->val.type != COG_VARTYPE_STR) ) // Added: v5 nullptr check
     {
         result = 0;
     }

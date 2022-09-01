@@ -89,7 +89,7 @@ void sithCogFunction_Sleep(sithCog *ctx)
         fSecs_ = 0.1;
     
     // TODO this is probably an inlined func?
-    if ( ctx_->flags & COGFLAGS_TRACE )
+    if ( ctx_->flags & SITH_COG_DEBUG )
     {
         _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs_);
         DebugConsole_Print(std_genBuffer);
@@ -304,7 +304,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
     popFlex = sithCogVm_PopFlex(ctx);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & 1 )
+        if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
@@ -313,7 +313,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
     }
     else
     {
-        if ( ctx->flags & 1 )
+        if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
             DebugConsole_Print(std_genBuffer);
@@ -329,7 +329,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
     float popFlex = sithCogVm_PopFlex(ctx);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & 1 )
+        if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
             DebugConsole_Print(std_genBuffer);
@@ -338,7 +338,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
     }
     else
     {
-        if ( ctx->flags & 1 )
+        if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
             DebugConsole_Print(std_genBuffer);

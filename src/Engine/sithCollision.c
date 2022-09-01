@@ -266,11 +266,11 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
                           && (v8->type != SITH_THING_WEAPON
-                           || (v8->actorParams.typeflags & SITH_AF_1) == 0
+                           || (v8->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
                            && (v13 != v7 || v8->child_signature != v7->signature))
                           && (v7->type != SITH_THING_WEAPON
-                           || (v7->actorParams.typeflags & SITH_AF_1) == 0
+                           || (v7->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
                         {

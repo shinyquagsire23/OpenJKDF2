@@ -1007,7 +1007,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
-        if ( (player->actorParams.typeflags & SITH_AF_1) != 0 )
+        if ( (player->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) != 0 )
         {
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
@@ -1045,12 +1045,12 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
                     a2.x = player->actorParams.maxHeadPitch;
                 }
                 sithUnk4_MoveJointsForEyePYR(player, &a2);
-                player->actorParams.typeflags &= ~SITH_AF_2;
+                player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
             }
             else
             {
 LABEL_20:
-                if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_2) != 0 )
+                if ( sithControl_ReadFunctionMap(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_CENTER_VIEW) != 0 )
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
@@ -1077,7 +1077,7 @@ LABEL_20:
                         v9 = 0.0;
                     if ( v9 == 0.0 )
                     {
-                        player->actorParams.typeflags &= ~SITH_AF_2;
+                        player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
                         player->actorParams.typeflags |= SITH_AF_HEAD_IS_CENTERED;
                     }
                     else
@@ -1182,7 +1182,7 @@ void sithControl_PlayerMovement(sithThing *player)
         {
             if ( (player->actorParams.typeflags & SITH_AF_HEAD_IS_CENTERED) == 0 )
             {
-                player->actorParams.typeflags |= SITH_AF_2;
+                player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
             }
         }
         player->physicsParams.acceleration.z = 0;

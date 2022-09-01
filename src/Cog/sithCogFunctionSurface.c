@@ -229,7 +229,6 @@ void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
     sithSurface *surface; // eax
     sithSurface *v4; // edi
     rdSurface *v5; // ebx
-    int v6; // eax
     rdVector3 v7; // [esp+Ch] [ebp-Ch] BYREF
     float scale; // [esp+1Ch] [ebp+4h]
 
@@ -242,14 +241,9 @@ void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
       && pop_vec
       && (v7.x = scale * v7.x, v7.y = scale * v7.y, v7.z = scale * v7.z, (v5 = sithSurface_SlideWall(surface, &v7)) != 0) )
     {
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v6 = ctx->trigId;
-                if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
-                    sithSurface_PushSurface(v4);
-            }
+            sithSurface_PushSurface(v4);
         }
         sithCogVm_PushInt(ctx, v5->index);
     }
@@ -281,10 +275,9 @@ void sithCogFunctionSurface_SetWallCel(sithCog *ctx)
     {
         v4 = surface->surfaceInfo.face.wallCel;
         surface->surfaceInfo.face.wallCel = wallCel;
-        if (sithCogVm_multiplayerFlags && (ctx->flags & 0x200) == 0 )
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSurface_PushSurface(surface);
+            sithSurface_PushSurface(surface);
         }
         sithCogVm_PushInt(ctx, v4);
     }
@@ -319,13 +312,9 @@ void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx)
             sithCogVm_PushInt(ctx, v4 - sithWorld_pCurrentWorld->materials);
         else
             sithCogVm_PushInt(ctx, -1);
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                    sithSurface_PushSurface(surface);
-            }
+            sithSurface_PushSurface(surface);
         }
     }
     else
@@ -342,10 +331,9 @@ void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
     if (surface && flags)
     {
         surface->surfaceFlags |= flags;
-        if (sithCogVm_multiplayerFlags && (ctx->flags & 0x200) == 0 )
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSurface_PushSurface(surface);
+            sithSurface_PushSurface(surface);
         }
     }
 }
@@ -358,10 +346,9 @@ void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
     if (surface && flags)
     {
         surface->surfaceFlags &= ~flags;
-        if (sithCogVm_multiplayerFlags && (ctx->flags & 0x200) == 0 )
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSurface_PushSurface(surface);
+            sithSurface_PushSurface(surface);
         }
     }
 }
@@ -389,13 +376,9 @@ void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
             if ( flags )
             {
                 adjoin->flags |= flags;
-                if ( sithCogVm_multiplayerFlags )
+                if ( COG_SHOULD_SYNC(ctx) )
                 {
-                    if ( (ctx->flags & 0x200) == 0 )
-                    {
-                        if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                            sithSurface_PushSurface(surface);
-                    }
+                    sithSurface_PushSurface(surface);
                 }
             }
         }
@@ -415,13 +398,9 @@ void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
             if ( flags )
             {
                 adjoin->flags &= ~flags;
-                if ( sithCogVm_multiplayerFlags )
+                if ( COG_SHOULD_SYNC(ctx) )
                 {
-                    if ( (ctx->flags & 0x200) == 0 )
-                    {
-                        if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                            sithSurface_PushSurface(surface);
-                    }
+                     sithSurface_PushSurface(surface);
                 }
             }
         }
@@ -448,10 +427,9 @@ void sithCogFunctionSurface_SetFaceType(sithCog *ctx)
     if ( surface )
     {
         surface->surfaceInfo.face.type |= type;
-        if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSurface_PushSurface(surface);
+            sithSurface_PushSurface(surface);
         }
     }
 }
@@ -463,10 +441,9 @@ void sithCogFunctionSurface_ClearFaceType(sithCog *ctx)
     if ( surface )
     {
         surface->surfaceInfo.face.type &= ~type;
-        if (sithCogVm_multiplayerFlags && !(ctx->flags & 0x200))
+        if (COG_SHOULD_SYNC(ctx))
         {
-            if ( ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN )
-                sithSurface_PushSurface(surface);
+            sithSurface_PushSurface(surface);
         }
     }
 }
@@ -484,10 +461,6 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
-    int v3; // ecx
-    int v4; // esi
-    int v5; // ecx
-    int v6; // esi
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
@@ -495,34 +468,20 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
     {
         if ( v2->surfaceInfo.face.material )
         {
-            v3 = sithCogVm_multiplayerFlags;
             v2->surfaceInfo.face.geometryMode = v1;
-            if ( v3 )
+            if ( COG_SHOULD_SYNC(ctx) )
             {
-                if ( (ctx->flags & 0x200) == 0 )
-                {
-                    v4 = ctx->trigId;
-                    if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
-                    {
-LABEL_12:
-                        sithSurface_PushSurface(v2);
-                        return;
-                    }
-                }
+                sithSurface_PushSurface(v2);
+                return;
             }
         }
         else
         {
-            v5 = sithCogVm_multiplayerFlags;
             v2->surfaceInfo.face.geometryMode = 0;
-            if ( v5 )
+            if ( COG_SHOULD_SYNC(ctx) )
             {
-                if ( (ctx->flags & 0x200) == 0 )
-                {
-                    v6 = ctx->trigId;
-                    if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
-                        goto LABEL_12;
-                }
+                sithSurface_PushSurface(v2);
+                return;
             }
         }
     }
@@ -543,23 +502,15 @@ void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
-    int v3; // ecx
-    int v4; // esi
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
     if ( v2 )
     {
-        v3 = sithCogVm_multiplayerFlags;
         v2->surfaceInfo.face.lightingMode = v1;
-        if ( v3 )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v4 = ctx->trigId;
-                if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
-                    sithSurface_PushSurface(v2);
-            }
+            sithSurface_PushSurface(v2);
         }
     }
 }
@@ -579,23 +530,15 @@ void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
 {
     signed int v1; // edi
     sithSurface *v2; // eax
-    int v3; // ecx
-    int v4; // esi
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
     if ( v2 )
     {
-        v3 = sithCogVm_multiplayerFlags;
         v2->surfaceInfo.face.textureMode = v1;
-        if ( v3 )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v4 = ctx->trigId;
-                if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN )
-                    sithSurface_PushSurface(v2);
-            }
+            sithSurface_PushSurface(v2);
         }
     }
 }
@@ -614,7 +557,6 @@ void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
 {
     sithSurface *v2; // ecx
-    int v3; // esi
     float v4; // [esp+4h] [ebp-4h]
     float a1; // [esp+Ch] [ebp+4h]
 
@@ -626,14 +568,9 @@ void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
         if ( v4 == 0.0 )
         {
             v2->surfaceInfo.face.extraLight = a1;
-            if ( sithCogVm_multiplayerFlags )
+            if ( COG_SHOULD_SYNC(ctx) )
             {
-                if ( (ctx->flags & 0x200) == 0 )
-                {
-                    v3 = ctx->trigId;
-                    if ( v3 != 3 && v3 != 22 )
-                        sithSurface_PushSurface(v2);
-                }
+                sithSurface_PushSurface(v2);
             }
         }
         else
