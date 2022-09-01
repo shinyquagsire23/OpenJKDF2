@@ -223,7 +223,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
 
-    // Blade
+    // Base
     {
         polylineVerts[0].x = out.scale.x - polyline->baseRadius;
         polylineVerts[0].y = out.scale.y - -0.001;
