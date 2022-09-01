@@ -162,7 +162,7 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
     v2 = deltaMs + particle->particleParams.field_2C;
     typeFlags = particle->particleParams.typeFlags;
     particle->particleParams.field_2C = v2;
-    if ( (typeFlags & THING_TYPEFLAGS_20) != 0 )
+    if ( (typeFlags & SITHPARTICLE_FLAG_RANDOM_CEL_CHANGE) != 0 )
     {
         i = 0;
         v5 = particle->rdthing.particlecloud;
@@ -187,7 +187,7 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
             while ( i < v5->numVertices );
         }
     }
-    if ( (particle->particleParams.typeFlags & THING_TYPEFLAGS_1) != 0 )
+    if ( (particle->particleParams.typeFlags & SITHPARTICLE_FLAG_OUTWARD_EXPANDING) != 0 )
     {
         if ( particle->particleParams.field_28 < 0.0099999998)
         {
@@ -254,7 +254,7 @@ void sithParticle_CreateThing(sithThing *thing)
     {
         v6 = thing->particleParams.material;
         v7 = v6->num_texinfo;
-        if ( (thing->particleParams.typeFlags & THING_TYPEFLAGS_LIGHT) != 0 )
+        if ( (thing->particleParams.typeFlags & SITHPARTICLE_FLAG_EMIT_LIGHT) != 0 )
             v1 = 0;
 
         v8 = rdParticle_New(thing->particleParams.count, thing->particleParams.elementSize, v6, v1, 1);
@@ -291,7 +291,7 @@ void sithParticle_CreateThing(sithThing *thing)
                     v16->x = v15 * thinga;
                     v16->y = v16->y * thinga;
                     v16->z = v16->z * thinga;
-                    if ( v7 > 1 && (thing->particleParams.typeFlags & THING_TYPEFLAGS_DAMAGE) != 0 )
+                    if ( v7 > 1 && (thing->particleParams.typeFlags & SITHPARTICLE_FLAG_RANDOM_START_CEL) != 0 )
                     {
                         v17 = (int)(_frand() * (double)v7);
                         if ( v17 >= v7 - 1 )
@@ -321,7 +321,7 @@ void sithParticle_Remove(sithThing *particle)
     unsigned int v1;
     rdParticle* particlePrim;
 
-    if (!(particle->particleParams.typeFlags & THING_TYPEFLAGS_8))
+    if (!(particle->particleParams.typeFlags & SITHPARTICLE_FLAG_FADE_OUT_OVER_TIME))
     {
         sithThing_Destroy(particle);
         return;

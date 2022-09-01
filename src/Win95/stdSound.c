@@ -279,7 +279,7 @@ stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
     
     //_memcpy(out->data, sound->data, out->bufferBytes);
     
-    stdSound_BufferUnlock(out, out->data, out->bufferBytes);
+    //stdSound_BufferUnlock(out, out->data, out->bufferBytes);
     
     //printf("%u %u\n", out->source, out->buffer);
     

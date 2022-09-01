@@ -2240,7 +2240,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 }
                 else
                 {
-                    if ( (v7 & THING_TYPEFLAGS_40) != 0 )
+                    if ( (v7 & SITH_AF_BREATH_UNDER_WATER) != 0 )
                         thing->physicsParams.buoyancy = 0.30000001;
                     if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {

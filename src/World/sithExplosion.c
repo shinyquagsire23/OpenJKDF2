@@ -17,7 +17,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     explosion->explosionParams.lifeLeftMs = explosion->lifeLeftMs;
-    if ( (explosion->explosionParams.typeflags & SITH_TF_LIGHT) != 0 && explosion->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    if ( (explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_ANIMATED_SPRITE) != 0 && explosion->rdthing.type == RD_THINGTYPE_SPRITE3 )
     {
         v3 = explosion->rdthing.sprite3->face.material;
         if ( v3 && (v4 = v3->num_texinfo, v4 > 1) )
@@ -26,7 +26,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
         }
         else
         {
-            explosion->explosionParams.typeflags &= ~THING_TYPEFLAGS_1;
+            explosion->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_ANIMATED_SPRITE;
         }
     }
     if ( (explosion->explosionParams.typeflags & SITH_TF_20) != 0 )
@@ -43,13 +43,13 @@ void sithExplosion_Tick(sithThing *explosion)
     double v5; // st7
     double v6; // st6
 
-    if ((explosion->explosionParams.typeflags & THING_TYPEFLAGS_FORCE)
+    if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_HAS_BLAST_PHASE)
       && explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
     {
         sithExplosion_UpdateForce(explosion);
-        explosion->explosionParams.typeflags &= ~THING_TYPEFLAGS_FORCE;
+        explosion->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
     }
-    if ((explosion->explosionParams.typeflags & THING_TYPEFLAGS_LIGHT) 
+    if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_VARIABLE_LIGHT) 
         && (explosion->thingflags & SITH_TF_LIGHT))
     {
         if (explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
@@ -92,7 +92,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
             else
             {
                 sithThing* v4 = i->receiver;
-                if ( ((explosion->explosionParams.typeflags & THING_TYPEFLAGS_40) == 0
+                if ( ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_NO_DAMAGE_TO_SHOOTER) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
                   && sithCollision_HasLos(explosion, v4, 1) )
@@ -144,7 +144,7 @@ int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int par
 
         case THINGPARAM_DAMAGE:
             thing->explosionParams.damage = _atof(arg->value);
-            thing->explosionParams.typeflags |= (THING_TYPEFLAGS_DAMAGE|THING_TYPEFLAGS_FORCE);
+            thing->explosionParams.typeflags |= (SITHEXPLOSION_FLAG_HAS_BLAST_PHASE|SITHEXPLOSION_FLAG_DAMAGE_IN_BLAST_RADIUS);
             return 1;
 
         case THINGPARAM_DAMAGECLASS:
@@ -155,22 +155,22 @@ int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int par
 
         case THINGPARAM_BLASTTIME:
             thing->explosionParams.blastTime = (int)(_atof(arg->value) * 1000.0);
-            thing->explosionParams.typeflags |= THING_TYPEFLAGS_FORCE;
+            thing->explosionParams.typeflags |= SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
             return 1;
 
         case THINGPARAM_FORCE:
             thing->explosionParams.force = _atof(arg->value);
-            thing->explosionParams.typeflags |= THING_TYPEFLAGS_FORCE;
+            thing->explosionParams.typeflags |= SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
             return 1;
 
         case THINGPARAM_MAXLIGHT:
             thing->explosionParams.maxLight = _atof(arg->value);
-            thing->explosionParams.typeflags |= THING_TYPEFLAGS_LIGHT;
+            thing->explosionParams.typeflags |= SITHEXPLOSION_FLAG_VARIABLE_LIGHT;
             return 1;
 
         case THINGPARAM_RANGE:
             thing->explosionParams.range = _atof(arg->value);
-            thing->explosionParams.typeflags |= THING_TYPEFLAGS_FORCE;
+            thing->explosionParams.typeflags |= SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
             return 1;
 
         case THINGPARAM_FLASHRGB:
