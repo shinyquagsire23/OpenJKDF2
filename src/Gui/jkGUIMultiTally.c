@@ -16,6 +16,7 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdString.h"
+#include "Engine/sithMulti.h"
 
 static jkGuiElement jkGuiMultiTally_buttons[92] = {
     { ELEMENT_TEXT, 0, 2, "GUI_MULTIPLAYER_SCORE", 3, { 90, 20, 460, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -149,6 +150,8 @@ static wchar_t jkGuiMultiTally_waTmp[64];
 static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
+
+#define SCORE_DELAY_MS ((sithMulti_bIsDedicated && sithNet_isServer) ? 0 : 30000)
 
 int jkGuiMultiTally_Show(int a1)
 {
@@ -468,7 +471,7 @@ void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)
     if ( jkGuiMultiTally_idkType )
     {
         v1 = stdPlatform_GetTimeMsec() - jkGuiMultiTally_msStart;
-        if ( v1 > 30000 )
+        if ( v1 > SCORE_DELAY_MS )
             pMenu->lastButtonUp = 1;
         if ( v1 / 1000 != jkGuiMultiTally_dword_5568D0 )
         {

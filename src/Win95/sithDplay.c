@@ -188,7 +188,7 @@ int sithDplay_SendToPlayer(sithCogMsg *msg, int sendto_id)
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         sithPlayerInfo* v5 = &jkPlayer_playerInfos[i];
-        if ( (v5->flags & 1) != 0 && v5->net_id != sithDplay_dplayIdSelf )
+        if ( !i || ((v5->flags & 1) != 0 && v5->net_id != sithDplay_dplayIdSelf) ) // Added: always allow sending to 0, for dedicated servers' fake player
         {
             DirectPlay_Send(sithDplay_dplayIdSelf, v5->net_id, &msg->netMsg.cogMsgId, v2);
             ++sithDplay_dword_8321F4;

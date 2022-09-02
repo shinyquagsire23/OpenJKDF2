@@ -21,6 +21,8 @@
 
 static wchar_t sithMulti_chatWStrTmp[256]; // Added
 
+int sithMulti_bIsDedicated = 0;
+
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
 {
     sithMulti_handlerIdk = a1;
@@ -158,7 +160,7 @@ int sithMulti_Startup()
         v0 = sithWorld_pCurrentWorld;
     }
     v8 = 0;
-    sithNet_checksum = sithWorld_CalcChecksum(v0, jkGuiNet_checksumSeed);
+    sithNet_checksum = sithWorld_CalcChecksum(v0, 0/*jkGuiNet_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
     sithSurface_numSurfaces_0 = 0;
     sithSector_numSync = 0;
@@ -182,6 +184,13 @@ int sithMulti_Startup()
         sithPlayer_sub_4C87C0(0, sithDplay_dplayIdSelf);
         sithPlayer_idk(0);
         sithPlayer_ResetPalEffects();
+        
+        // Added: dedicated server
+        if (sithMulti_bIsDedicated) {
+            jkPlayer_playerInfos[0].flags = 6;
+            jkPlayer_playerInfos[0].playerThing->thingflags |= SITH_TF_DISABLED;
+        }
+
         if ( (sithNet_MultiModeFlags & 0x100) != 0 )
         {
             jkPlayer_playerInfos[0].teamNum = 1;
@@ -558,7 +567,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     v2 = NETMSG_POPS32();
     NETMSG_POPWSTR(jkPlayer_playerInfos[v1].player_name, 0x10);
 
-    printf("sithMulti_HandleJoinLeave %x %x\n", v2, sithDplay_dplayIdSelf);
+    printf("sithMulti_HandleJoinLeave %x %x %x\n", v1, v2, sithDplay_dplayIdSelf);
 
     if ( v2 != sithDplay_dplayIdSelf )
     {
@@ -794,8 +803,8 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         sithPlayerInfo* v6 = &jkPlayer_playerInfos[i];
-        NETMSG_PUSHS32(v6->flags);
-        if ( (v6->flags & 4) != 0 )
+        NETMSG_PUSHS32((sithNet_isServer && sithMulti_bIsDedicated && !i) ? v6->flags & ~2 : v6->flags);
+        if ( (v6->flags & 4) != 0 ) // Added: dedicated host
         {
             NETMSG_PUSHS32(v6->net_id);
 
@@ -1149,10 +1158,11 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             //jkPlayer_playerInfos[sithMulti_requestConnectIdx].net_id = v1; // Added?
             //jkPlayer_playerInfos[sithMulti_requestConnectIdx].flags = 5;
             
+            uint32_t popped_check = NETMSG_POPS32();
             v10 = sithNet_checksum;
-            if ( v10 != NETMSG_POPS32() )
+            if ( v10 != popped_check )
             {
-                printf("Bad checksum\n");
+                printf("Bad checksum %x vs %x\n", v10, popped_check);
 #if 0
                 NETMSG_START;
                 NETMSG_PUSHS32(4);
@@ -1422,6 +1432,7 @@ LABEL_30:
                                     if ( (sithNet_MultiModeFlags & 1) != 0 && (sithNet_MultiModeFlags & 0x100) != 0 )
                                         jkPlayer_playerInfos[sithMulti_requestConnectIdx].teamNum = (sithMulti_requestConnectIdx & 1) + 1;
                                     v18 = sithMulti_sendto_id;
+                                    printf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);
                                     jkPlayer_playerInfos[v16].net_id = sithMulti_sendto_id;
                                     sithMulti_SendLeaveJoin(v18, 1);
                                     v17 = sithMulti_sendto_id;

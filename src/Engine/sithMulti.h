@@ -44,6 +44,8 @@ extern "C" {
 #define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
+extern int sithMulti_bIsDedicated;
+
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 void sithMulti_SendChat(char *pStr, int arg0, int arg1);
 void sithMulti_HandleScore();

@@ -135,6 +135,9 @@ int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             {
                 if ( i != playerThingIdx && (jkPlayer_playerInfos[i].net_id == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
                     msg->netMsg.field_14 |= 1 << i;
+                if (!i && i != playerThingIdx) {
+                    msg->netMsg.field_14 |= 1 << i; // Added: Dedicated server hax
+                }
             }
             if ( !msg->netMsg.field_14 )
                 goto LABEL_35;
