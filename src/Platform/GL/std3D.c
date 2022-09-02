@@ -157,6 +157,8 @@ GLuint world_ibo_triangle;
 GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
 GLuint menu_ibo_triangle;
 
+extern int jkGuiBuildMulti_bRendering;
+
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
 {
     // Generate the framebuffer
@@ -686,7 +688,22 @@ int std3D_StartScene()
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
+    if (jkGuiBuildMulti_bRendering && rdColormap_pCurMap)
+    {
+        glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+        memcpy(worldpal_data, rdColormap_pCurMap->colors, 0x300);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
+    
+        if (rdColormap_pCurMap->lightlevel)
+        {
+            glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
+            memcpy(worldpal_lights_data, rdColormap_pCurMap->lightlevel, 0x4000);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 0x40, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
+        }
+
+        loaded_colormap = rdColormap_pCurMap;
+    }
+    else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
         memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
@@ -880,6 +897,7 @@ static rdDDrawSurface* test_idk = NULL;
 void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips);
 void std3D_DrawMenu()
 {
+    //printf("Draw menu\n");
     std3D_DrawSceneFbo();
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
@@ -898,10 +916,22 @@ void std3D_DrawMenu()
     
     int bFixHudScale = 0;
 
-    if (!jkGame_isDDraw)
+    if (!jkGame_isDDraw && !jkGuiBuildMulti_bRendering)
     {
         //menu_w = 640.0;
         //menu_h = 480.0;
+
+        // Stretch screen
+        menu_u = (1.0 / Video_menuBuffer.format.width) * 640.0;
+        menu_v = (1.0 / Video_menuBuffer.format.height) * 480.0;
+
+        // Keep 4:3 aspect
+        menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+        menu_w = (menu_h * (640.0 / 480.0));
+    }
+    else if (jkGuiBuildMulti_bRendering)
+    {
+        bFixHudScale = 1;
 
         // Stretch screen
         menu_u = (1.0 / Video_menuBuffer.format.width) * 640.0;
@@ -967,6 +997,14 @@ void std3D_DrawMenu()
         
         GL_tmpVerticesAmt = 4;
         GL_tmpTrisAmt = 2;
+    }
+    else if (jkGuiBuildMulti_bRendering)
+    {
+        GL_tmpVerticesAmt = 0;
+        GL_tmpTrisAmt = 0;
+
+        // Main View
+        std3D_DrawMenuSubrect(0, 0, 640, 480, menu_x, 0, menu_w/640.0);
     }
     else
     {
@@ -1368,6 +1406,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 
 void std3D_DrawSceneFbo()
 {
+    //printf("Draw scene FBO\n");
     glEnable(GL_BLEND);
     
     glBlendEquation(GL_FUNC_ADD);
@@ -1379,6 +1418,7 @@ void std3D_DrawSceneFbo()
     //frameNum += (rand() % 16);
 
     int draw_ssao = jkPlayer_enableSSAO;
+    int draw_bloom = jkPlayer_enableBloom;
 
     float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
                      + (((float)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
@@ -1389,12 +1429,17 @@ void std3D_DrawSceneFbo()
         draw_ssao = 0;
     }
 
-    if (!jkGame_isDDraw)
+    if (!jkGame_isDDraw && !jkGuiBuildMulti_bRendering)
     {
         return;
     }
 
-    if (jkPlayer_enableBloom)
+    if (jkGuiBuildMulti_bRendering) {
+        draw_ssao = 0;
+        //draw_bloom = 0;
+    }
+
+    if (draw_bloom)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur1.fbo);
         glClear( GL_COLOR_BUFFER_BIT );
@@ -1436,10 +1481,10 @@ void std3D_DrawSceneFbo()
     }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    if (!jkPlayer_enableBloom)
+    if (!draw_bloom)
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
 
-    if (jkPlayer_enableBloom)
+    if (draw_bloom)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
@@ -1530,6 +1575,7 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
 
 void std3D_DrawRenderList()
 {
+    //printf("Draw render list\n");
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
 
@@ -1546,12 +1592,22 @@ void std3D_DrawRenderList()
     float internalWidth = Video_menuBuffer.format.width;
     float internalHeight = Video_menuBuffer.format.height;
 
+    if (jkGuiBuildMulti_bRendering) {
+        internalWidth = 640.0;
+        internalHeight = 480.0;
+    }
+
     maxX = 1.0;
     maxY = 1.0;
     scaleX = 1.0/((double)internalWidth / 2.0);
     scaleY = 1.0/((double)internalHeight / 2.0);
     width = std3D_pFb->w;
     height = std3D_pFb->h;
+
+    if (jkGuiBuildMulti_bRendering) {
+        width = 640;
+        height = 480;
+    }
 
     // JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
     // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
@@ -1568,6 +1624,27 @@ void std3D_DrawRenderList()
     if (width > height)
     {
         zoom_xaspect = 1.0;
+    }
+
+    float shift_add_x = 0;
+    float shift_add_y = 0;
+
+    if (jkGuiBuildMulti_bRendering) {
+        float menu_w, menu_h, menu_x;
+        menu_w = (double)std3D_pFb->w;
+        menu_h = (double)std3D_pFb->h;
+
+        // Keep 4:3 aspect
+        menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+
+        width = std3D_pFb->w;
+        height = std3D_pFb->h;
+
+        zoom_xaspect = (height/width);
+
+        shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
+        shift_add_y = -0.5;
+        zoom_yaspect = 1.0;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
@@ -1598,7 +1675,7 @@ void std3D_DrawRenderList()
        maxX*scaleX*zoom_xaspect,      0,                                          0,      0, // right
        0,                                       -maxY*scaleY*zoom_yaspect,               0,      0, // up
        0,                                       0,                                          1,     0, // forward
-       -(internalWidth/2)*scaleX*zoom_xaspect,  (internalHeight/2)*scaleY*zoom_yaspect,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+       -(internalWidth/2)*scaleX*zoom_xaspect + shift_add_x,  (internalHeight/2)*scaleY*zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
     };
     
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);
@@ -1632,15 +1709,13 @@ void std3D_DrawRenderList()
     glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
-    glUniform1f(uniform_light_mult, jkPlayer_enableBloom ? 0.45 : 0.85);
+    glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.45 : (jkPlayer_enableBloom ? 0.45 : 0.85));
     glUniform1f(uniform_displacement_factor, 1.0);
 
     rdTri* tris = GL_tmpTris;
     rdLine* lines = GL_tmpLines;
     
     //glEnableVertexAttribArray(attribute_v_norm);
-
-    
 
     int last_tex_idx = 0;
     //GLushort* world_data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);

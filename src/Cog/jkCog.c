@@ -273,23 +273,15 @@ void jkCog_SetFlags(sithCog *ctx)
 {
     signed int flags; // esi
     sithThing *thing; // eax
-    int v3; // edx
-    int v5; // edi
 
     flags = sithCogVm_PopInt(ctx);
     thing = sithCogVm_PopThing(ctx);
-    if ( thing )
+    if ( thing && flags)
     {
-        if ( flags )
+        thing->jkFlags |= flags;
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            v3 = thing->jkFlags;
-            thing->jkFlags = v3 | flags;
-            if ( sithCogVm_multiplayerFlags != 0 && (ctx->flags & 0x200) == 0 )
-            {
-                v5 = ctx->trigId;
-                if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN && v3 != (v3 | flags) )
-                    sithThing_SyncThingPos(thing, 2);
-            }
+            sithThing_SyncThingPos(thing, 2);
         }
     }
 }
@@ -298,9 +290,6 @@ void jkCog_ClearFlags(sithCog *ctx)
 {
     signed int v1; // esi
     sithThing *v2; // eax
-    int v3; // ecx
-    int v4; // esi
-    int v6; // edi
 
     v1 = sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopThing(ctx);
@@ -308,14 +297,10 @@ void jkCog_ClearFlags(sithCog *ctx)
     {
         if ( v1 )
         {
-            v3 = v2->jkFlags;
-            v4 = v3 & ~v1;
-            v2->jkFlags = v4;
-            if ( sithCogVm_multiplayerFlags && (ctx->flags & 0x200) == 0 )
+            v2->jkFlags &= ~v1;
+            if ( COG_SHOULD_SYNC(ctx) )
             {
-                v6 = ctx->trigId;
-                if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN && v3 != v4 )
-                    sithThing_SyncThingPos(v2, 2);
+                sithThing_SyncThingPos(v2, 2);
             }
         }
     }

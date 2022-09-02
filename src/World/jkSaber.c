@@ -130,7 +130,14 @@ void jkSaber_UpdateLength(sithThing *thing)
     {
         thing->jkFlags |= JKFLAG_SABERRETRACT;
     }
-    
+
+    // Added: HACK fix a bug where the saber gets stuck extended.
+    if ((thing->jkFlags & (JKFLAG_SABEREXTEND | JKFLAG_SABERRETRACT)) == (JKFLAG_SABEREXTEND | JKFLAG_SABERRETRACT))
+    {
+        thing->jkFlags &= ~JKFLAG_SABERRETRACT;
+        playerInfo->polyline.length = 0;
+    }
+
     if ( thing->jkFlags & JKFLAG_SABEREXTEND)
     {
         float newLength = playerInfo->polyline.length + (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
@@ -208,9 +215,9 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
     player->actorParams.saberBladePos.x = playerInfo->polyline.length * jointMat.lvec.x + jointMat.scale.x;
     player->actorParams.saberBladePos.y = playerInfo->polyline.length * jointMat.lvec.y + jointMat.scale.y;
     player->actorParams.saberBladePos.z = playerInfo->polyline.length * jointMat.lvec.z + jointMat.scale.z;
-    if ( player->jkFlags & 0x40 )
+    if ( player->jkFlags & JKFLAG_40 )
     {
-        player->jkFlags &= ~0x40;
+        player->jkFlags &= ~JKFLAG_40;
         playerInfo->numDamagedThings = 0;
         playerInfo->numDamagedSurfaces = 0;
     }

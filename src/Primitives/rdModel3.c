@@ -51,16 +51,7 @@ rdModel3* rdModel3_New(char *path)
     {
         if ( rdModel3_Load(path, model) )
             return model;
-        if ( model )
-        {
-            if ( pModel3Unloader )
-            {
-                pModel3Unloader(model);
-                return 0;
-            }
-            rdModel3_FreeEntry(model);
-            rdroid_pHS->free(model);
-        }
+        rdModel3_Free(model);
     }
     return 0;
 }

@@ -24,6 +24,8 @@
 #include "Main/jkRes.h"
 #include "General/stdStrTable.h"
 #include "Main/jkEpisode.h"
+#include "Platform/std3D.h"
+#include "Win95/Window.h"
 
 #include "jk.h"
 
@@ -161,7 +163,7 @@ static rdKeyframe *jkGuiBuildMulti_keyframe;
 static rdThing *jkGuiBuildMulti_pThingCamera;
 static rdThing *jkGuiBuildMulti_thing;
 static rdThing *jkGuiBuildMulti_pThingGun;
-static int jkGuiBuildMulti_startTimeSecs; // TODO verify type
+static uint32_t jkGuiBuildMulti_startTimeSecs; // Added: float -> u32
 static rdColormap jkGuiBuildMulti_colormap;
 static rdLight jkGuiBuildMulti_light;
 static rdMatrix34 jkGuiBuildMulti_matrix;
@@ -179,7 +181,7 @@ static int jkGuiBuildMulti_numSabers;
 static int jkGuiBuildMulti_saberIdx;
 static int jkGuiBuildMulti_modelIdx;
 static jkMultiModelInfo *jkGuiBuildMulti_aModels;
-static int jkGuiBuildMulti_renderOptions;
+static int jkGuiBuildMulti_renderOptions = 0x103;
 static rdVector3 jkGuiBuildMulti_projectRot;
 static rdVector3 jkGuiBuildMulti_projectPos;
 static stdVBufferTexFmt jkGuiBuildMulti_texFmt;
@@ -188,6 +190,15 @@ static rdVector3 jkGuiBuildMulti_lightPos;
 static uint32_t jkGuiBuildMulti_lastModelDrawMs;
 
 static rdRect jkGuiBuildMulti_rect_5353C8 = {315, 115, 260, 260};
+
+#ifndef QOL_IMPROVEMENTS
+#define BUILDMULTI_SWITCH_DELAY_MS (1000)
+#else
+#define BUILDMULTI_SWITCH_DELAY_MS (10)
+#endif
+
+// Added
+int jkGuiBuildMulti_bRendering = 0;
 
 void jkGuiBuildMulti_InitializeEditCharacter()
 {
@@ -263,7 +274,7 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
     jkGuiBuildMulti_keyframe = rdKeyframe_Load("kyrun1.key");
     jkGuiBuildMulti_trackNum = rdPuppet_AddTrack(jkGuiBuildMulti_thing->puppet, jkGuiBuildMulti_keyframe, 0, 0);
     pPuppet = jkGuiBuildMulti_thing->puppet;
-    jkGuiBuildMulti_startTimeSecs = (double)((int64_t)stdPlatform_GetTimeMsec()) * 0.001; // TODO: macro?
+    jkGuiBuildMulti_startTimeSecs = stdPlatform_GetTimeMsec(); // Added: float -> u32, sec -> ms
     rdPuppet_PlayTrack(pPuppet, jkGuiBuildMulti_trackNum);
     rdPuppet_SetTrackSpeed(jkGuiBuildMulti_thing->puppet, jkGuiBuildMulti_trackNum, 150.0);
     _memcpy(&jkGuiBuildMulti_matrix, &rdroid_identMatrix34, sizeof(jkGuiBuildMulti_matrix));
@@ -275,6 +286,9 @@ void jkGuiBuildMulti_ThingCleanup()
     rdKeyframe_FreeEntry(jkGuiBuildMulti_keyframe);
     rdThing_Free(jkGuiBuildMulti_thing);
     rdModel3_Free(jkGuiBuildMulti_model);
+
+    // Added
+    std3D_PurgeTextureCache();
 }
 
 int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
@@ -471,7 +485,9 @@ LABEL_32:
                 break;
             case 109:
                 jkPlayer_FixStars();
+                jkGuiBuildMulti_bRendering = 0; // Added
                 jkGuiForce_Show(1, 1, 0, &jkGuiBuildMulti_waTmp[32], 0, 0);
+                jkGuiBuildMulti_bRendering = 1; // Added
                 v16 = 1;
                 break;
         }
@@ -480,6 +496,7 @@ LABEL_32:
     jkGuiBuildMulti_ThingCleanup(); // inlined
 
     jkGuiBuildMulti_CloseRender(); // inlined
+    jkGuiBuildMulti_bRendering = 0; // Added
 
     jkGuiBuildMulti_bSabersLoaded = 0;
     if ( jkGuiBuildMulti_aModels )
@@ -551,7 +568,7 @@ int jkGuiBuildMulti_DisplayModel()
 
 void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
 {
-    double v5; // st7
+    uint32_t v5; // st7
     double v6; // st7
     rdPuppet *v7; // [esp-8h] [ebp-24h]
     int64_t v8; // [esp+8h] [ebp-14h]
@@ -559,9 +576,11 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     rdVector3 rot; // [esp+10h] [ebp-Ch] BYREF
     float a2a; // [esp+24h] [ebp+8h]
 
+    jkGuiBuildMulti_bRendering = 1;
+
     if ( jkGuiBuildMulti_lastModelDrawMs )
     {
-        if ( stdPlatform_GetTimeMsec() - jkGuiBuildMulti_lastModelDrawMs <= 1000 ) {
+        if ( stdPlatform_GetTimeMsec() - (uint32_t)jkGuiBuildMulti_lastModelDrawMs <= BUILDMULTI_SWITCH_DELAY_MS ) {
             stdDisplay_VBufferCopy(pVbuf, pMenu->texture, 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
             return;
         }
@@ -577,9 +596,10 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
         stdDisplay_VBufferFill(jkGuiBuildMulti_pVBuf1, 0, 0);
         stdDisplay_VBufferLock(jkGuiBuildMulti_pVBuf1);
         rdAdvanceFrame();
-        v5 = (double)stdPlatform_GetTimeMsec() * 0.001;
-        v9 = v5;
-        v6 = v5 - jkGuiBuildMulti_startTimeSecs;
+
+        // Added: switched around the order of casting for this...
+        v5 = stdPlatform_GetTimeMsec();
+        v6 = (v5 - jkGuiBuildMulti_startTimeSecs) * 0.001;
         if ( v6 < 0.0 )
         {
             a2a = 0.0;
@@ -593,7 +613,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
             a2a = v6;
         }
         rdPuppet_UpdateTracks(jkGuiBuildMulti_thing->puppet, a2a);
-        jkGuiBuildMulti_startTimeSecs = v9;
+        jkGuiBuildMulti_startTimeSecs = v5;
         rdThing_Draw(jkGuiBuildMulti_thing, &jkGuiBuildMulti_matrix);
         rdThing_Draw(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_thing->hierarchyNodeMatrices + 12);
         rdFinishFrame();
@@ -830,6 +850,7 @@ LABEL_8:
         }
     }
     while ( v3 );
+    jkGuiBuildMulti_bRendering = 0; // Added
     jkGuiRend_DarrayFree(&darr);
     jkGui_SetModeGame();
     return v9;

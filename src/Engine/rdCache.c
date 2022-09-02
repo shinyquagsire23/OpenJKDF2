@@ -20,13 +20,21 @@ int rdCache_Startup()
 
 void rdCache_AdvanceFrame()
 {
+#ifdef SDL2_RENDER
+    rdroid_curAcceleration = 1;
+#endif
+
+#ifndef SDL2_RENDER
     if ( rdroid_curAcceleration > 0 )
+#endif
         std3D_StartScene();
 }
 
 void rdCache_FinishFrame()
 {
+#ifndef SDL2_RENDER
     if ( rdroid_curAcceleration > 0 )
+#endif
         std3D_EndScene();
 }
 
@@ -89,6 +97,7 @@ void rdCache_Flush()
     {
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
     }
+#ifndef SDL2_RENDER
     if ( rdroid_curAcceleration <= 0 )
     {
         if ( rdroid_curOcclusionMethod )
@@ -101,7 +110,7 @@ void rdCache_Flush()
         }
         else if ( rdroid_curZBufferMethod )
         {
-#ifndef SDL2_RENDER
+
             if ( rdroid_curZBufferMethod == 2 )
             {
                 for (v1 = 0; v1 < rdCache_numProcFaces; v1++)
@@ -113,11 +122,9 @@ void rdCache_Flush()
                         rdCache_DrawFaceZ(face);
                 }
             }
-#endif
         }
         else
         {
-#ifndef SDL2_RENDER
             for (v3 = 0; v3 < rdCache_numProcFaces; v3++)
             {
                 face = &rdCache_aProcFaces[v3];
@@ -126,10 +133,11 @@ void rdCache_Flush()
                 else
                     rdCache_DrawFaceN(face);
             }
-#endif
+
         }
     }
     else
+#endif
     {
         rdCache_SendFaceListToHardware();
     }

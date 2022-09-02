@@ -345,6 +345,8 @@ int last_jkGame_isDDraw = 0;
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
 
+extern int jkGuiBuildMulti_bRendering;
+
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
     int x = event->x;
@@ -695,6 +697,7 @@ void Window_SdlUpdate()
     Window_lastSampleTime = SDL_GetTicks();
 
     static int jkPlayer_enableVsync_last = 0;
+    int menu_framelimit_amt_ms = 16;
 
     if (jkPlayer_enableVsync_last != jkPlayer_enableVsync)
     {
@@ -710,16 +713,23 @@ void Window_SdlUpdate()
 
         SDL_SetRelativeMouseMode(SDL_FALSE);
 
-        std3D_StartScene();
-        std3D_DrawMenu();
-        std3D_EndScene();
-        SDL_GL_SwapWindow(displayWindow);
+        if (!jkGuiBuildMulti_bRendering) {
+            std3D_StartScene();
+            std3D_DrawMenu();
+            std3D_EndScene();
+            SDL_GL_SwapWindow(displayWindow);
+        }
+        else {
+            std3D_DrawMenu();
+            SDL_GL_SwapWindow(displayWindow);
+            //menu_framelimit_amt_ms = 64;
+        }
 
         if (Window_needsRecreate)
             Window_RecreateSDL2Window();
         
         // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.
-        if (sampleTime_roundtrip < 16) {
+        if (sampleTime_roundtrip < menu_framelimit_amt_ms) {
             sampleTime_delay++;
         }
         else {
@@ -728,8 +738,8 @@ void Window_SdlUpdate()
         if (sampleTime_delay <= 0) {
             sampleTime_delay = 1;
         }
-        if (sampleTime_delay >= 16) {
-            sampleTime_delay = 16;
+        if (sampleTime_delay >= menu_framelimit_amt_ms) {
+            sampleTime_delay = menu_framelimit_amt_ms;
         }
         SDL_Delay(sampleTime_delay);
     }

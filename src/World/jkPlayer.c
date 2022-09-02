@@ -516,6 +516,7 @@ void jkPlayer_DrawPov()
         {
             jkSaber_Draw(&viewMat);
         }
+        rdCache_Flush(); // Added: force polyline to be underneath model
 
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
         rdCache_Flush();
