@@ -76,6 +76,9 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
         material_tip_fname = "saberpurple0.mat";
         material_side_fname = "saberpurple1.mat";
     }
+    if (thing == g_localPlayerThing) {
+        //thing->jkFlags |= JKFLAG_DUALSABERS;
+    }
 #endif
 
     rdPolyLine_FreeEntry(&saberinfo->polyline); // Added: fix memleak
@@ -112,8 +115,8 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
 
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
         rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
-        //if (thing->jkFlags & JKFLAG_DUALSABERS)
-        //    rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]); // K_Lhand
+        if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_DUALSABERS)
+            rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]); // K_Lhand
     }
 }
 
