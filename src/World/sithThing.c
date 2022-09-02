@@ -2114,7 +2114,7 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
         {
             amount = amount * 0.1;
         }
-        if ( sithNet_isMulti && (sithNet_MultiModeFlags & 2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
+        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
             return 0.0;
     }
 

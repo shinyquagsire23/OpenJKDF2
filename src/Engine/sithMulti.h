@@ -44,7 +44,40 @@ extern "C" {
 #define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
-extern int sithMulti_bIsDedicated;
+enum sithMultiModeFlags
+{
+    MULTIMODEFLAG_TEAMS = 0x1,
+    MULTIMODEFLAG_2 = 0x2,
+    MULTIMODEFLAG_4 = 0x4,
+    MULTIMODEFLAG_TIMELIMIT = 0x8,
+    MULTIMODEFLAG_SCORELIMIT = 0x10,
+    MULTIMODEFLAG_20 = 0x20,
+    MULTIMODEFLAG_40 = 0x40,
+    MULTIMODEFLAG_SINGLE_LEVEL = 0x80,
+    MULTIMODEFLAG_100 = 0x100,
+};
+
+enum sithMultiSessionFlags
+{
+    SESSIONFLAG_1 = 0x1,
+    SESSIONFLAG_2 = 0x2,
+    SESSIONFLAG_4 = 0x4,
+    SESSIONFLAG_8 = 0x8,
+    SESSIONFLAG_10 = 0x10,
+    SESSIONFLAG_20 = 0x20,
+    SESSIONFLAG_40 = 0x40,
+    SESSIONFLAG_80 = 0x80,
+    SESSIONFLAG_100 = 0x100,
+    SESSIONFLAG_200 = 0x200,
+    SESSIONFLAG_PASSWORD = 0x400,
+    SESSIONFLAG_800 = 0x800,
+    SESSIONFLAG_1000 = 0x1000,
+    SESSIONFLAG_2000 = 0x2000,
+    SESSIONFLAG_4000 = 0x4000,
+    SESSIONFLAG_ISDEDICATED = 0x8000,
+};
+
+extern int jkGuiNetHost_bIsDedicated;
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 void sithMulti_SendChat(char *pStr, int arg0, int arg1);

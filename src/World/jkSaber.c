@@ -654,9 +654,9 @@ int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
 
     if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 )
     {
-        if ( (sithNet_MultiModeFlags & 0x20) != 0 )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_20) != 0 )
             return 1;
-        if ( (sithNet_MultiModeFlags & 0x100) != 0 )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
         {
             _strncpy(model_3do_fname, jkSaber_aKyTeamModels[v11->teamNum], 0x1Fu);
             model_3do_fname[31] = 0;
@@ -832,7 +832,7 @@ int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
     if ( !teamNum || teamNum > 4 )
         return 0;
 
-    if ( (sithNet_MultiModeFlags & 1) == 0 || (sithNet_MultiModeFlags & 0x100) == 0 )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )
         return 1;
 
     jkPlayer_playerInfos[playerIdx].teamNum = teamNum;

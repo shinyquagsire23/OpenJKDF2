@@ -58,6 +58,7 @@
 
 #include "General/util.h"
 #include "General/stdFileUtil.h"
+#include "General/stdJSON.h"
 
 #if defined(PLATFORM_POSIX)
 #include <locale.h>

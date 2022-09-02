@@ -21,8 +21,6 @@
 
 static wchar_t sithMulti_chatWStrTmp[256]; // Added
 
-int sithMulti_bIsDedicated = 0;
-
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
 {
     sithMulti_handlerIdk = a1;
@@ -73,26 +71,22 @@ int sithMulti_HandleChat(sithCogMsg *msg)
     return 1;
 }
 
-HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int maxPlayers, int a6, int multiModeFlags, int rate, int a9)
+HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int maxPlayers, int sessionFlags, int multiModeFlags, int rate, int maxRank)
 {
     HRESULT result; // eax
     jkMultiEntry multiEntry; // [esp+Ch] [ebp-F0h] BYREF
 
     _memset(&multiEntry, 0, sizeof(multiEntry));
-    _wcsncpy(multiEntry.serverName, a1, 0x1Fu);
-    multiEntry.serverName[31] = 0;
-    _strncpy(multiEntry.episodeGobName, a3, 0x1Fu);
-    multiEntry.episodeGobName[31] = 0;
-    _strncpy(multiEntry.mapJklFname, a4, 0x1Fu);
-    multiEntry.mapJklFname[31] = 0;
-    _wcsncpy(multiEntry.field_98, a2, 0x1Fu);
+    stdString_SafeWStrCopy(multiEntry.serverName, a1, 0x20);
+    stdString_SafeStrCopy(multiEntry.episodeGobName, a3, 0x20);
+    stdString_SafeStrCopy(multiEntry.mapJklFname, a4, 0x20);
+    stdString_SafeWStrCopy(multiEntry.wPassword, a2, 0x20);
     multiEntry.maxPlayers = maxPlayers;
     idx_13b4_related = maxPlayers;
-    multiEntry.maxRank = a9;
-    multiEntry.field_98[31] = 0;
+    multiEntry.maxRank = maxRank;
     multiEntry.multiModeFlags = multiModeFlags;
-    multiEntry.field_E8 = rate;
-    multiEntry.sessionFlags = a6;
+    multiEntry.tickRateMs = rate;
+    multiEntry.sessionFlags = sessionFlags;
     if ( sithDplay_dword_8321E0 )
         result = sithDplay_seed_idk(&multiEntry);
     else
@@ -186,12 +180,12 @@ int sithMulti_Startup()
         sithPlayer_ResetPalEffects();
         
         // Added: dedicated server
-        if (sithMulti_bIsDedicated) {
+        if (jkGuiNetHost_bIsDedicated) {
             jkPlayer_playerInfos[0].flags = 6;
             jkPlayer_playerInfos[0].playerThing->thingflags |= SITH_TF_DISABLED;
         }
 
-        if ( (sithNet_MultiModeFlags & 0x100) != 0 )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
         {
             jkPlayer_playerInfos[0].teamNum = 1;
             sithDplay_DoReceive();
@@ -395,7 +389,7 @@ void sithMulti_HandleScore()
 {
     int score_limit_met;
 
-    if ( (sithNet_MultiModeFlags & 4) == 0 )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_4) == 0 )
     {
         sithNet_teamScore[0] = 0;
         sithNet_teamScore[1] = 0;
@@ -406,15 +400,15 @@ void sithMulti_HandleScore()
         {
             int v4 = jkPlayer_playerInfos[i].numKills - jkPlayer_playerInfos[i].numSuicides;
             jkPlayer_playerInfos[i].score = v4;
-            if ( (sithNet_MultiModeFlags & 1) != 0 )
+            if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                 sithNet_teamScore[jkPlayer_playerInfos[i].teamNum] += v4;
         }
     }
     sithNet_dword_832648 = 1;
-    if ( sithNet_isServer && (sithNet_MultiModeFlags & 0x10) != 0 )
+    if ( sithNet_isServer && (sithNet_MultiModeFlags & MULTIMODEFLAG_SCORELIMIT) != 0 )
     {
         score_limit_met = 0;
-        if ( (sithNet_MultiModeFlags & 1) != 0 )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
         {
             for (int i = 0; i < 5; i++)
             {
@@ -455,7 +449,7 @@ void sithMulti_HandleScore()
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
             
             sithNet_dword_832638 = 1;
-            sithNet_MultiModeFlags &= ~0x8;
+            sithNet_MultiModeFlags &= ~MULTIMODEFLAG_TIMELIMIT;
         }
     }
 }
@@ -803,7 +797,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         sithPlayerInfo* v6 = &jkPlayer_playerInfos[i];
-        NETMSG_PUSHS32((sithNet_isServer && sithMulti_bIsDedicated && !i) ? v6->flags & ~2 : v6->flags);
+        NETMSG_PUSHS32((sithNet_isServer && jkGuiNetHost_bIsDedicated && !i) ? v6->flags & ~2 : v6->flags);
         if ( (v6->flags & 4) != 0 ) // Added: dedicated host
         {
             NETMSG_PUSHS32(v6->net_id);
@@ -820,7 +814,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
         }
     }
 
-    if ( (sithNet_MultiModeFlags & 1) != 0 )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
         for (int i = 0; i < 5; i++)
         {
@@ -919,7 +913,7 @@ int sithMulti_HandleLeaveJoin(sithCogMsg *msg)
             v6->score = NETMSG_POPS16();
         }
     }
-    if ( (sithNet_MultiModeFlags & 1) != 0 )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
         int* v18 = sithNet_teamScore;
         do
@@ -1305,7 +1299,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
             sithNet_dword_832648 = 0;
             sithMulti_SendLeaveJoin(-1, 0);
         }
-        if ( (sithNet_MultiModeFlags & 8) != 0 && sithTime_curMs > sithNet_multiplayer_timelimit )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TIMELIMIT) != 0 && sithTime_curMs > sithNet_multiplayer_timelimit )
         {
             v1 = sithStrTable_GetString("MULTI_TIMELIMIT");
             stdString_WcharToChar(std_genBuffer, v1, 127);
@@ -1326,7 +1320,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
 
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
             sithNet_dword_832638 = 1;
-            sithNet_MultiModeFlags &= ~8;
+            sithNet_MultiModeFlags &= ~MULTIMODEFLAG_TIMELIMIT;
         }
         if ( sithNet_dword_832640 )
         {
@@ -1429,7 +1423,7 @@ LABEL_30:
                                       sithDplay_dword_832208 >= sithMulti_dword_83265C) )
                                 {
                                     v16 = sithMulti_requestConnectIdx;
-                                    if ( (sithNet_MultiModeFlags & 1) != 0 && (sithNet_MultiModeFlags & 0x100) != 0 )
+                                    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
                                         jkPlayer_playerInfos[sithMulti_requestConnectIdx].teamNum = (sithMulti_requestConnectIdx & 1) + 1;
                                     v18 = sithMulti_sendto_id;
                                     printf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);

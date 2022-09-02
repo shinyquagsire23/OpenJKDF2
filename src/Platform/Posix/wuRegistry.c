@@ -1,5 +1,7 @@
 #include "Platform/wuRegistry.h"
 
+#include "General/stdJSON.h"
+
 #include "jk.h"
 
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
@@ -15,58 +17,61 @@ void wuRegistry_Shutdown()
 
 int wuRegistry_SaveInt(LPCSTR lpValueName, int val)
 {
-    
+    stdJSON_SaveInt("registry.json", lpValueName, val);
     return 1;
 }
 
 int wuRegistry_SaveFloat(LPCSTR lpValueName, float val)
 {
-    
-    return 1;
+    return stdJSON_SaveFloat("registry.json", lpValueName, val);
 }
 
-int wuRegistry_GetInt(LPCSTR lpValueName, int a2)
+int wuRegistry_GetInt(LPCSTR lpValueName, int defaultVal)
 {
-    return a2;
+    return stdJSON_GetInt("registry.json", lpValueName, defaultVal);
 }
 
-float wuRegistry_GetFloat(LPCSTR lpValueName, float v5)
+float wuRegistry_GetFloat(LPCSTR lpValueName, float defaultVal)
 {
-    return v5;
+    return stdJSON_GetFloat("registry.json", lpValueName, defaultVal);
 }
 
-int wuRegistry_SaveBool(LPCSTR lpValueName, HKEY phkResult)
+int wuRegistry_SaveBool(LPCSTR lpValueName, int bVal)
 {
-    return 1;
+    return stdJSON_SaveBool("registry.json", lpValueName, bVal);
 }
 
-int wuRegistry_GetBool(LPCSTR lpValueName, int a2)
+int wuRegistry_GetBool(LPCSTR lpValueName, int bDefaultVal)
 {
-    return a2;
+    return stdJSON_GetBool("registry.json", lpValueName, bDefaultVal);
 }
 
 int wuRegistry_SaveBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData)
 {
-    return 1;
+    return stdJSON_SaveBytes("registry.json", lpValueName, lpData, cbData);
 }
 
-int wuRegistry_GetBytes(LPCSTR lpValueName, DWORD Type, DWORD cbData)
+int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData)
 {
-    return 1;
+    return stdJSON_GetBytes("registry.json", lpValueName, lpData, cbData);
 }
 
-LSTATUS wuRegistry_SetString(LPCSTR lpValueName, BYTE *lpData)
+int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
 {
-    return 1;
+    return stdJSON_SetString("registry.json", lpValueName, lpData);
 }
 
-int wuRegistry_GetString(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out)
+int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault)
 {
+    return stdJSON_GetString("registry.json", lpValueName, lpData, outSize, outDefault);
+}
 
-    if (out && out != lpData)
-    {
-        _strncpy((char *)lpData, out, outSize - 1);
-        lpData[outSize - 1] = 0;
-    }
-    return 0;
+int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData)
+{
+    return stdJSON_SetWString("registry.json", lpValueName, lpData);
+}
+
+int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, const wchar_t *outDefault)
+{
+    return stdJSON_GetWString("registry.json", lpValueName, lpData, outSize, outDefault);
 }

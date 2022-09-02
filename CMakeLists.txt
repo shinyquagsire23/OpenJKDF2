@@ -313,7 +313,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/src  ${PROJECT_SOURCE_DIR}/src/external/libsmacker ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended ${OPENAL_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
 
 # All of the base sources
-file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c ${PROJECT_SOURCE_DIR}/src/*/*.c ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c)
+file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c ${PROJECT_SOURCE_DIR}/src/*/*.c ${PROJECT_SOURCE_DIR}/src/General/*.cpp ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c)
 
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)

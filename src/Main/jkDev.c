@@ -12,6 +12,7 @@
 #include "World/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithDebugConsole.h"
+#include "Engine/sithMulti.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"
@@ -788,7 +789,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    if ( !pArgStr || !sithNet_isMulti || (sithNet_MultiModeFlags & 1) == 0 || (sithNet_MultiModeFlags & 0x100) == 0 )
+    if ( !pArgStr || !sithNet_isMulti || (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )
         return 1;
 
     uint32_t v2 = _atol(pArgStr);

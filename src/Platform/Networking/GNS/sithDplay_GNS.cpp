@@ -535,7 +535,9 @@ private:
                 infoPkt.id = nextId;
                 infoPkt.entry = sithDplayGNS_storedEntry;
                 infoPkt.entry.numPlayers = RealConnectedPlayers();
-                infoPkt.entry.maxPlayers = jkPlayer_maxPlayers;
+                infoPkt.entry.maxPlayers = sithDplayGNS_storedEntry.maxPlayers;
+
+                jkPlayer_maxPlayers = sithDplayGNS_storedEntry.maxPlayers; // Hack?
 
                 SendBytesToClient( pInfo->m_hConn, &infoPkt, sizeof(infoPkt)); 
 
@@ -595,6 +597,8 @@ private:
         int amt = 0;
         for (int i = 0; i < jkPlayer_maxPlayers; i++)
         {
+            if (!i && jkGuiNetHost_bIsDedicated) continue;
+
             if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].net_id ){
 
             }
@@ -696,7 +700,8 @@ public:
             Shutdown();
             m_closed = 1;
             *pIdOut = 1;
-            return 2;
+            m_hackFallback = !m_hackFallback;
+            return m_hackFallback ? 2 : -1;
         }
 
         if (pIncomingMsg->m_cbSize < 8) {
@@ -790,6 +795,7 @@ private:
     uint8_t sendBuffer[4096];
     int m_closed = 0;
     int m_hostDisconnected = 0;
+    int m_hackFallback = 0;
 
     void PollIncomingMessages()
     {
@@ -1092,7 +1098,7 @@ int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen)
 
 void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers)
 {
-    _strncpy(sithDplayGNS_storedEntry.mapJklFname, jkMain_aLevelJklFname, 0x80);
+    _strncpy(sithDplayGNS_storedEntry.mapJklFname, jkMain_aLevelJklFname, 0x20);
 }
 
 BOOL DirectPlay_SetSessionFlagidk(int a1)
@@ -1134,13 +1140,20 @@ void DirectPlay_Close()
 int DirectPlay_OpenHost(jkMultiEntry* pEntry)
 {
     sithDplayGNS_storedEntry = *pEntry;
+
+    jkPlayer_maxPlayers = pEntry->maxPlayers; // Hack?
+
     sithDplay_bIsServer = 1;
     server.Init(jkGuiNetHost_portNum);
     return 0;
 }
 
-int DirectPlay_GetSession_passwordidk(void* a)
+int DirectPlay_GetSession_passwordidk(jkMultiEntry* pEntry)
 {
+    sithDplayGNS_storedEntry = *pEntry;
+
+    jkPlayer_maxPlayers = pEntry->maxPlayers; // Hack?
+
     return 1;
 }
 

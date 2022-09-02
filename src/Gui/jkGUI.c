@@ -120,7 +120,7 @@ int jkGui_Initialize()
 
     stdString_WcharToChar(playerShortName, jkPlayer_playerShortName, 31);
     playerShortName[31] = 0;
-    wuRegistry_GetString("playerShortName", (LPBYTE)playerShortName, 32, playerShortName);
+    wuRegistry_GetString("playerShortName", playerShortName, 32, playerShortName);
     stdString_CharToWchar(jkPlayer_playerShortName, playerShortName, 31);
     jkPlayer_playerShortName[31] = 0;
 

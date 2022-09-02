@@ -151,7 +151,7 @@ static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
 
-#define SCORE_DELAY_MS ((sithMulti_bIsDedicated && sithNet_isServer) ? 0 : 30000)
+#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithNet_isServer) ? 0 : 30000)
 
 int jkGuiMultiTally_Show(int a1)
 {
@@ -203,7 +203,7 @@ int jkGuiMultiTally_Show(int a1)
     memset(jkGuiMultiTally_waTmp, 0, 0x40u);
     jkGuiMultiTally_msStart = stdPlatform_GetTimeMsec();
     jkGuiMultiTally_idkType = a1;
-    if ( (sithNet_MultiModeFlags & 1) != 0 )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
         result = jkGuiMultiTally_ShowTeamScores(a1);
         if ( result == -1 )
@@ -214,6 +214,14 @@ int jkGuiMultiTally_Show(int a1)
     jkGuiRend_MenuSetLastElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[90]);
     jkGuiRend_SetDisplayingStruct(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[89]);
     jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons[89], &jkGuiMultiTally_menu, a1);
+
+#ifdef QOL_IMPROVEMENTS
+    // Added
+    uint32_t hack = jkPlayer_playerInfos[0].flags;
+    if (jkGuiNetHost_bIsDedicated)
+        jkPlayer_playerInfos[0].flags = 0;
+#endif
+
     _memcpy(aPlayerInfoSorted, jkPlayer_playerInfos, sizeof(aPlayerInfoSorted));
     _qsort(aPlayerInfoSorted, 0x20u, sizeof(sithPlayerInfo), (int (__cdecl *)(const void *, const void *))jkGuiMultiTally_SortPlayerScore);
     v2 = 0;
@@ -245,7 +253,7 @@ int jkGuiMultiTally_Show(int a1)
         v37 = v33;
         do
         {
-            if ( (pPlayerInfoIter->flags & 2) != 0 && (pPlayerInfoIter->flags & 4) != 0 )
+            if ( (pPlayerInfoIter->flags & 2) != 0 && (pPlayerInfoIter->flags & 4) != 0)
             {
                 if ( pPlayerInfoIter->net_id == jkPlayer_playerInfos[playerThingIdx].net_id )
                 {
@@ -414,6 +422,13 @@ LABEL_50:
         }
         while ( v28 );
     }
+
+#ifdef QOL_IMPROVEMENTS
+    // Added
+    if (jkGuiNetHost_bIsDedicated)
+        jkPlayer_playerInfos[0].flags = hack;
+#endif
+
     jkGui_SetModeGame();
     return v17;
 }

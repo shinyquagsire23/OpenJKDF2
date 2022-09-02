@@ -90,6 +90,15 @@ static Darray jkGuiNetHost_dArray2;
 // Added
 wchar_t jkGuiNetHost_portText[32];
 int jkGuiNetHost_portNum = 27020;
+int jkGuiNetHost_bIsDedicated = 0;
+
+#ifdef QOL_IMPROVEMENTS
+#define TICKRATE_MIN (1)
+#define TICKRATE_MAX (1000)
+#else
+#define TICKRATE_MIN (100)
+#define TICKRATE_MAX (300)
+#endif
 
 #define LONG_MAX ((long)(~0UL>>1))
 #define LONG_MIN (~LONG_MAX)
@@ -169,10 +178,59 @@ int msvc_sub_5133E0(wchar_t *a1, wchar_t **a2, char a3)
     return wcstol(a1, a2, a3);
 }
 
-void jkGuiNetHost_Initialize()
+int wstr_to_int_clamped(wchar_t *pWstr, int minVal, int maxVal)
 {
-    jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[2]);
-    jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[3]);
+    wchar_t *dummy;
+    int val = msvc_sub_5133E0(pWstr, &dummy, 10);
+     if (val < minVal)
+    {
+        return minVal;
+    }
+    else if (val > maxVal)
+    {
+        return maxVal;
+    }
+
+    return val;
+}
+
+// Added: Make sure stuff actually gets into the registry
+void jkGuiNetHost_SaveSettings()
+{
+#ifdef QOL_IMPROVEMENTS
+    if (jkGuiNetHost_bIsDedicated) {
+        jkGuiNetHost_maxPlayers -= 1;
+    }
+    if (jkGuiNetHost_bIsDedicated) {
+        jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
+    }
+    else {
+        jkGuiNetHost_sessionFlags &= ~SESSIONFLAG_ISDEDICATED;
+    }
+#endif
+    wuRegistry_SaveInt("maxRank", jkGuiNetHost_maxRank);
+    wuRegistry_SaveInt("sessionFlags", jkGuiNetHost_sessionFlags);
+    wuRegistry_SaveInt("gameFlags", jkGuiNetHost_gameFlags);
+    wuRegistry_SaveInt("timeLimit", jkGuiNetHost_timeLimit);
+    wuRegistry_SaveInt("scoreLimit", jkGuiNetHost_scoreLimit);
+    wuRegistry_SaveInt("maxPlayers", jkGuiNetHost_maxPlayers);
+    wuRegistry_SaveInt("tickRate", jkGuiNetHost_tickRate);
+#ifndef ARCH_WASM
+    wuRegistry_SetWString("gameName", jkGuiNetHost_gameName);
+#endif
+#ifdef QOL_IMPROVEMENTS
+    wuRegistry_SaveInt("portNum", jkGuiNetHost_portNum);
+    wuRegistry_SaveBool("bIsDedicated", jkGuiNetHost_bIsDedicated);
+
+    wuRegistry_SaveBool("bUseScoreLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT);
+    wuRegistry_SaveBool("bUseTimeLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT);
+    wuRegistry_SaveBool("bIsSingleLevel", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL);
+    wuRegistry_SaveBool("bIsTeams", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS);
+#endif
+}
+
+void jkGuiNetHost_LoadSettings()
+{
     jkGuiNetHost_maxRank = wuRegistry_GetInt("maxRank", jkGuiNetHost_maxRank);
     jkGuiNetHost_sessionFlags = wuRegistry_GetInt("sessionFlags", jkGuiNetHost_sessionFlags);
     jkGuiNetHost_gameFlags = wuRegistry_GetInt("gameFlags", jkGuiNetHost_gameFlags);
@@ -182,30 +240,67 @@ void jkGuiNetHost_Initialize()
     jkGuiNetHost_tickRate = wuRegistry_GetInt("tickRate", jkGuiNetHost_tickRate);
     memset(jkGuiNetHost_gameName, 0, sizeof(jkGuiNetHost_gameName));
 #ifndef ARCH_WASM
-    wuRegistry_GetBytes("gameName", jkGuiNetHost_gameName, 0x40u);
+    wuRegistry_GetWString("gameName", jkGuiNetHost_gameName, 0x40u, jkGuiNetHost_gameName);
 #endif
 
 #ifdef QOL_IMPROVEMENTS
-    jk_snwprintf(jkGuiNetHost_portText, 0x100, L"%d", jkGuiNetHost_portNum);
-    jkGuiNetHost_aElements[26].wstr = jkGuiNetHost_portText;
-    jkGuiNetHost_aElements[26].selectedTextEntry = 31;
-#endif
+    jkGuiNetHost_portNum = wuRegistry_GetInt("portNum", jkGuiNetHost_portNum);
+    jkGuiNetHost_bIsDedicated = wuRegistry_GetBool("bIsDedicated", jkGuiNetHost_bIsDedicated);
 
+    if (jkGuiNetHost_bIsDedicated) {
+        jkGuiNetHost_maxPlayers += 1;
+    }
+
+    if (jkGuiNetHost_bIsDedicated) {
+        jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
+    }
+    else {
+        jkGuiNetHost_sessionFlags &= ~SESSIONFLAG_ISDEDICATED;
+    }
+
+    if(wuRegistry_GetBool("bUseScoreLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT)) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_SCORELIMIT;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_SCORELIMIT;
+    }
+
+    if(wuRegistry_GetBool("bUseTimeLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT)) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_TIMELIMIT;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_TIMELIMIT;
+    }
+
+    if(wuRegistry_GetBool("bIsSingleLevel", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL)) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_SINGLE_LEVEL;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_SINGLE_LEVEL;
+    }
+
+    if(wuRegistry_GetBool("bIsTeams", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS)) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_TEAMS;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_TEAMS;
+    }
+
+#endif
+}
+
+void jkGuiNetHost_Initialize()
+{
+    jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[2]);
+    jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[3]);
+    
+    jkGuiNetHost_LoadSettings();
     jkGuiNetHost_bInitted = 1;
 }
 
 void jkGuiNetHost_Shutdown()
 {
-    wuRegistry_SaveInt("maxRank", jkGuiNetHost_maxRank);
-    wuRegistry_SaveInt("sessionFlags", jkGuiNetHost_sessionFlags);
-    wuRegistry_SaveInt("gameFlags", jkGuiNetHost_gameFlags);
-    wuRegistry_SaveInt("timeLimit", jkGuiNetHost_timeLimit);
-    wuRegistry_SaveInt("scoreLimit", jkGuiNetHost_scoreLimit);
-    wuRegistry_SaveInt("maxPlayers", jkGuiNetHost_maxPlayers);
-    wuRegistry_SaveInt("tickRate", jkGuiNetHost_tickRate);
-#ifndef ARCH_WASM
-    wuRegistry_SaveBytes("gameName", (BYTE *)jkGuiNetHost_gameName, 0x40u);
-#endif
+    jkGuiNetHost_SaveSettings();
     jkGuiNetHost_bInitted = 0;
 }
 
@@ -215,8 +310,6 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     wchar_t *v2; // eax
     wchar_t *v3; // eax
     int v4; // ebp
-    int v5; // eax
-    int v6; // ecx
     wchar_t *i; // eax
     int v10; // eax
     __int64 v11; // rax
@@ -224,12 +317,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     int v13; // eax
     int v14; // eax
     int v15; // eax
-    int v16; // eax
-    int v17; // ecx
-    int v18; // edx
     int v20; // [esp-8h] [ebp-188h]
     wchar_t *v21; // [esp-4h] [ebp-184h]
-    wchar_t *v22; // [esp+10h] [ebp-170h] BYREF
     int v23; // [esp+14h] [ebp-16Ch]
     wchar_t *a2; // [esp+18h] [ebp-168h] BYREF
     wchar_t v25[32]; // [esp+20h] [ebp-160h] BYREF
@@ -238,6 +327,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     wchar_t a1[32]; // [esp+E0h] [ebp-A0h] BYREF
     char v29[32]; // [esp+120h] [ebp-60h] BYREF
     wchar_t v30[32]; // [esp+140h] [ebp-40h] BYREF
+
+    jkGuiNetHost_LoadSettings(); // Added
 
     v25[0] = '8';
     v25[1] = 0;
@@ -248,10 +339,10 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     v27[31] = 0;
     memset(&v26[1], 0, 0x3Cu);
     v26[31] = 0;
-    jkGuiNetHost_aElements[6].selectedTextEntry = jkGuiNetHost_gameFlags & 0x10;
-    jkGuiNetHost_aElements[8].selectedTextEntry = jkGuiNetHost_gameFlags & 8;
-    jkGuiNetHost_aElements[11].selectedTextEntry = jkGuiNetHost_gameFlags & 0x80;
-    jkGuiNetHost_aElements[10].selectedTextEntry = jkGuiNetHost_gameFlags & 1;
+    jkGuiNetHost_aElements[6].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT;
+    jkGuiNetHost_aElements[8].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT;
+    jkGuiNetHost_aElements[11].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL;
+    jkGuiNetHost_aElements[10].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS;
     if ( !jkGuiNetHost_gameName[0] )
     {
         v1 = jkStrings_GetText("GUI_DEFAULT_GAME_NAME");
@@ -259,7 +350,11 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     }
     jkGuiNetHost_aElements[3].wstr = jkGuiNetHost_gameName;
     jkGuiNetHost_aElements[3].selectedTextEntry = 16;
+#ifdef QOL_IMPROVEMENTS
+    jk_snwprintf(v25, 0x20u, L"%d", jkGuiNetHost_bIsDedicated ? jkGuiNetHost_maxPlayers-1 : jkGuiNetHost_maxPlayers);
+#else
     jk_snwprintf(v25, 0x20u, L"%d", jkGuiNetHost_maxPlayers);
+#endif
     jkGuiNetHost_aElements[5].wstr = v25;
     jkGuiNetHost_aElements[5].selectedTextEntry = 3;
     jk_snwprintf(v27, 0x20u, L"%d", jkGuiNetHost_scoreLimit);
@@ -320,93 +415,64 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
         if ( v4 == 1 )
         {
             pMultiEntry->multiModeFlags = 0;
-            _wcsncpy(pMultiEntry->serverName, jkGuiNetHost_gameName, 0x1Fu);
-            pMultiEntry->serverName[31] = 0;
+            stdString_SafeWStrCopy(pMultiEntry->serverName, jkGuiNetHost_gameName, 0x20);
             for ( i = __wcschr(pMultiEntry->serverName, ':'); i; i = __wcschr(pMultiEntry->serverName, ':') )
                 *i = '-';
-            _strncpy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[19].unistr[jkGuiNetHost_aElements[19].selectedTextEntry].c_str, 0x1Fu);
-            pMultiEntry->episodeGobName[31] = 0;
-            _strncpy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[21].unistr[jkGuiNetHost_aElements[21].selectedTextEntry].c_str, 0x7Fu);
-            pMultiEntry->mapJklFname[127] = 0;
-            if ( msvc_sub_5133E0(v25, &v22, 10) < 1 )
-            {
-                v10 = 1;
+            
+            stdString_SafeStrCopy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[19].unistr[jkGuiNetHost_aElements[19].selectedTextEntry].c_str, 0x20);
+            stdString_SafeStrCopy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[21].unistr[jkGuiNetHost_aElements[21].selectedTextEntry].c_str, 0x80);
+            
+            v10 = wstr_to_int_clamped(v25, 1, 32);
+
+            // Added: Clamping is slightly different for dedicated
+            if (jkGuiNetHost_bIsDedicated) {
+                v10 += 1;
+                if (v10 < 2)
+                    v10 = 2;
+                if (v10 > 31)
+                    v10 = 31;
             }
-            else if ( msvc_sub_5133E0(v25, &v22, 10) > 32 )
-            {
-                v10 = 32;
-            }
-            else
-            {
-                v10 = msvc_sub_5133E0(v25, &v22, 10);
-            }
+
             pMultiEntry->maxPlayers = v10;
             jkGuiNetHost_maxPlayers = v10;
             pMultiEntry->maxRank = jkGuiNetHost_maxRank;
-            if ( msvc_sub_5133E0(v26, &v22, 10) < 1 )
-            {
-                v23 = 1;
-            }
-            else if ( msvc_sub_5133E0(v26, &v22, 10) > 100 )
-            {
-                v23 = 100;
-            }
-            else
-            {
-                v23 = msvc_sub_5133E0(v26, &v22, 10);
-            }
+            v23 = wstr_to_int_clamped(v26, 1, 100);
             v11 = (__int64)((double)v23 * 60000.0);
             pMultiEntry->timeLimit = v11;
             jkGuiNetHost_timeLimit = v11;
             if ( jkGuiNetHost_aElements[8].selectedTextEntry )
             {
-                pMultiEntry->multiModeFlags |= 8;
+                pMultiEntry->multiModeFlags |= MULTIMODEFLAG_TIMELIMIT;
             }
-            if ( msvc_sub_5133E0(v27, &v22, 10) < 0 )
-            {
-                v13 = 0;
-            }
-            else if ( msvc_sub_5133E0(v27, &v22, 10) > 999 )
-            {
-                v13 = 999;
-            }
-            else
-            {
-                v13 = msvc_sub_5133E0(v27, &v22, 10);
-            }
+            v13 = wstr_to_int_clamped(v27, 0, 999);
             pMultiEntry->scoreLimit = v13;
             jkGuiNetHost_scoreLimit = v13;
             if ( jkGuiNetHost_aElements[6].selectedTextEntry )
             {
-                pMultiEntry->multiModeFlags |= 0x10;
+                pMultiEntry->multiModeFlags |= MULTIMODEFLAG_SCORELIMIT;
             }
             if ( jkGuiNetHost_aElements[11].selectedTextEntry )
             {
-                pMultiEntry->multiModeFlags |= 0x80;
+                pMultiEntry->multiModeFlags |= MULTIMODEFLAG_SINGLE_LEVEL;
             }
             if ( jkGuiNetHost_aElements[10].selectedTextEntry )
-                pMultiEntry->multiModeFlags |= 0x103u;
-            _wcsncpy(pMultiEntry->field_E8, v30, 0x1Fu);
-            v16 = jkGuiNetHost_tickRate;
-            v17 = jkGuiNetHost_sessionFlags;
-            v18 = pMultiEntry->multiModeFlags;
-            pMultiEntry->field_E8[31] = 0;
-            pMultiEntry->tickRateMs = v16;
-            pMultiEntry->sessionFlags = v17;
-            jkGuiNetHost_gameFlags = v18;
+                pMultiEntry->multiModeFlags |= (MULTIMODEFLAG_100 | MULTIMODEFLAG_2 | MULTIMODEFLAG_TEAMS);
+            stdString_SafeWStrCopy(pMultiEntry->wPassword, v30, 0x20);
+            if (_wcslen(pMultiEntry->wPassword)) {
+                jkGuiNetHost_sessionFlags |= SESSIONFLAG_PASSWORD; // Added: wtf?
+            }
+            pMultiEntry->tickRateMs = jkGuiNetHost_tickRate;
+            pMultiEntry->sessionFlags = jkGuiNetHost_sessionFlags;
+            jkGuiNetHost_gameFlags = pMultiEntry->multiModeFlags;
 #ifdef QOL_IMPROVEMENTS
-            if ( msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10) < 1 )
-            {
-                jkGuiNetHost_portNum = 1;
+            jkGuiNetHost_portNum = wstr_to_int_clamped(jkGuiNetHost_portText, 1, 65535);
+            wuRegistry_SetWString("serverPassword", pMultiEntry->wPassword);
+            wuRegistry_SetString("serverEpisodeGob", pMultiEntry->episodeGobName);
+            wuRegistry_SetString("serverMapJkl", pMultiEntry->mapJklFname);
+            if (jkGuiNetHost_bIsDedicated) {
+                jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
             }
-            else if ( msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10) > 65535 )
-            {
-                jkGuiNetHost_portNum = 65535;
-            }
-            else
-            {
-                jkGuiNetHost_portNum = msvc_sub_5133E0(jkGuiNetHost_portText, &v22, 10);
-            }
+            pMultiEntry->sessionFlags = jkGuiNetHost_sessionFlags;
 #endif
         }
         else if ( v4 == 200 )
@@ -418,36 +484,24 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiNetHost_aSettingsElements[3].wstr = a1;
             jkGuiNetHost_aSettingsElements[3].selectedTextEntry = 32;
 #ifdef QOL_IMPROVEMENTS
-            jkGuiNetHost_aSettingsElements[4].selectedTextEntry = sithMulti_bIsDedicated;
+            jkGuiNetHost_aSettingsElements[4].selectedTextEntry = jkGuiNetHost_bIsDedicated;
 #endif
             jkGuiRend_MenuSetLastElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
             jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
             if ( jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menuSettings) == 1 )
             {
                 pMultiEntry->sessionFlags = 0;
-                if ( msvc_sub_5133E0(a1, &a2, 10) < 100 )
-                {
-                    v5 = 100;
-                }
-                else if ( msvc_sub_5133E0(a1, &a2, 10) > 300 )
-                {
-                    v5 = 300;
-                }
-                else
-                {
-                    v5 = msvc_sub_5133E0(a1, &a2, 10);
-                }
-                v6 = pMultiEntry->sessionFlags;
-                pMultiEntry->tickRateMs = v5;
-                jkGuiNetHost_tickRate = v5;
-                jkGuiNetHost_sessionFlags = v6;
+                pMultiEntry->tickRateMs = wstr_to_int_clamped(a1, TICKRATE_MIN, TICKRATE_MAX);
+                jkGuiNetHost_tickRate = pMultiEntry->tickRateMs;
+                jkGuiNetHost_sessionFlags = pMultiEntry->sessionFlags;
             }
 #ifdef QOL_IMPROVEMENTS
-            sithMulti_bIsDedicated = !!jkGuiNetHost_aSettingsElements[4].selectedTextEntry;
+            jkGuiNetHost_bIsDedicated = !!jkGuiNetHost_aSettingsElements[4].selectedTextEntry;
 #endif
         }
     }
     while ( v4 == 200 );
+    jkGuiNetHost_SaveSettings(); // Added: Make sure stuff actually gets into the registry
     jkGuiRend_DarrayFree(&jkGuiNetHost_dArray1);
     jkGuiRend_DarrayFree(&jkGuiNetHost_dArray2);
     return v4;
@@ -457,7 +511,6 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
 {
     int v1; // edi
     int tickRate; // eax
-    wchar_t *a2; // [esp+4h] [ebp-44h] BYREF
     wchar_t a1a[32]; // [esp+8h] [ebp-40h] BYREF
 
     a1a[0] = 0;
@@ -472,18 +525,7 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
     if ( v1 == 1 )
     {
         pEntry->sessionFlags = 0;
-        if ( msvc_sub_5133E0(a1a, &a2, 10) < 100 )
-        {
-            tickRate = 100;
-        }
-        else if ( msvc_sub_5133E0(a1a, &a2, 10) > 300 )
-        {
-            tickRate = 300;
-        }
-        else
-        {
-            tickRate = msvc_sub_5133E0(a1a, &a2, 10);
-        }
+        tickRate = wstr_to_int_clamped(a1a, TICKRATE_MIN, TICKRATE_MAX);
         pEntry->tickRateMs = tickRate;
         jkGuiNetHost_tickRate = tickRate;
         jkGuiNetHost_sessionFlags = pEntry->sessionFlags;

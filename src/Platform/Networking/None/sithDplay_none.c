@@ -133,7 +133,7 @@ int DirectPlay_OpenHost(jkMultiEntry* a)
     return 0;
 }
 
-int DirectPlay_GetSession_passwordidk(void* a)
+int DirectPlay_GetSession_passwordidk(jkMultiEntry* a)
 {
     return 1;
 }

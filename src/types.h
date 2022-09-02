@@ -2742,12 +2742,12 @@ typedef struct jkMultiEntry
     wchar_t serverName[32];
     char episodeGobName[32];
     char mapJklFname[32];
-    wchar_t field_98[32];
+    wchar_t wPassword[32];
     int sessionFlags;
     int checksumSeed;
     int field_E0;
     int multiModeFlags;
-    int field_E8;
+    int tickRateMs;
     int maxRank;
 } jkMultiEntry;
 #pragma pack(pop)
@@ -2755,9 +2755,9 @@ typedef struct jkMultiEntry
 typedef struct jkMultiEntry2
 {
     wchar_t field_0[128];
-    char field_100[64];
-    char field_140[256];
-    char field_240[256];
+    wchar_t field_100[128];
+    char field_200[256];
+    char field_300[256];
 } jkMultiEntry2;
 
 typedef struct jkMultiEntry3
@@ -2767,7 +2767,7 @@ typedef struct jkMultiEntry3
     char episodeGobName[32];
     char mapJklFname[128];
     int maxPlayers;
-    wchar_t field_E8[32];
+    wchar_t wPassword[32];
     int sessionFlags;
     int multiModeFlags;
     int maxRank;
@@ -2778,8 +2778,8 @@ typedef struct jkMultiEntry3
 
 typedef struct jkMultiEntry4
 {
-    char field_0[32];
-    char field_20[32];
+    char episodeGobName[32];
+    char mapJklFname[32];
     int field_40;
     int field_44;
     int field_48;
@@ -2805,7 +2805,7 @@ typedef struct jkMultiEntry4
     int field_98;
     int field_9C;
     wchar_t sessionName[32];
-    int field_E0;
+    int tickRateMs;
 } jkMultiEntry4;
 
 typedef struct stdControlKeyInfoEntry
@@ -3160,6 +3160,10 @@ typedef const DPNAME *LPCDPNAME;
 #define DPID_ALLPLAYERS     0
 #define DPID_SERVERPLAYER   1
 #define DPID_UNKNOWN        0xFFFFFFFF
+
+#ifndef __cplusplus
+typedef wchar_t char16_t;
+#endif
 
 #ifdef __cplusplus
 }

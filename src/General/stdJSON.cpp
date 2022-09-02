@@ -1,0 +1,299 @@
+#include "stdJSON.h"
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstring>
+#include <stdlib.h>
+#include <unistd.h>
+#include <nlohmann/json.hpp>
+#include <filesystem>
+#include <unordered_map>
+#include <locale> 
+#include <codecvt> 
+#include "General/md5.h"
+#include "jk.h"
+
+namespace fs = std::filesystem;
+
+// string (utf8) -> u16string
+static std::u16string utf8_to_utf16(const std::string& utf8)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; 
+    std::u16string utf16 = convert.from_bytes(utf8);
+    return utf16;
+}
+// u16string -> string (utf8)
+static std::string utf16_to_utf8(const std::u16string& utf16) {
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; 
+    std::string utf8 = convert.to_bytes(utf16);
+    return utf8;
+}
+
+extern "C"
+{
+
+#define CHECK_COMMON(pFpath, pKey) \
+    if (!pFpath) { \
+        stdJSON_PrintNullWarning();  \
+        return 0;  \
+    }  \
+    if (!pKey) {  \
+        stdJSON_PrintNullKeyWarning();  \
+        return 0;  \
+    } \
+    ; \
+
+#define CHECK_COMMON_GET(pFpath, pKey, val) \
+    if (!pFpath) { \
+        stdJSON_PrintNullWarning();  \
+        return val;  \
+    }  \
+    if (!pKey) {  \
+        stdJSON_PrintNullKeyWarning();  \
+        return val;  \
+    } \
+    ; \
+
+#define CHECK_ARGPTR(pPtr) \
+    if (!pPtr) { \
+        stdJSON_PrintNullPtrWarning();  \
+        return 0;  \
+    }  \
+    ; \
+
+static inline void stdJSON_PrintNullWarning() {
+    printf("WARN: stdJSON was passed a NULL pFpath.\n");
+}
+
+static inline void stdJSON_PrintNullKeyWarning() {
+    printf("WARN: stdJSON was passed a NULL key.\n");
+}
+
+static inline void stdJSON_PrintNullPtrWarning() {
+    printf("WARN: stdJSON was passed a NULL ptr value.\n");
+}
+
+static nlohmann::json stdJSON_OpenAndReadFile(const char* pFpath)
+{
+    fs::path json_path = {pFpath};
+    nlohmann::json json_file(nlohmann::json::value_t::object);
+    if (!fs::exists(json_path)) {
+        return json_file;
+    }
+
+    std::ifstream i(json_path);
+    i >> json_file;
+    i.close();
+
+    return json_file;
+}
+
+static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
+{
+    fs::path json_path = {pFpath};
+    std::ofstream o(json_path);
+    if (!o)
+    {
+        printf("ERROR: Failed to open `%s`!\n", pFpath);
+        return 0;
+    }
+    o << json_file.dump(4, ' ', true);
+    if (!o)
+    {
+        printf("ERROR: Failed to write `%s`!\n", pFpath);
+        return 0;
+    }
+    return 1;
+}
+
+int stdJSON_SaveInt(const char* pFpath, const char* pKey, int val)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = val;
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_SaveFloat(const char* pFpath, const char* pKey, float val)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = val;
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, valDefault);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    try {
+        return json_file[pKey];
+    }
+    catch (nlohmann::detail::type_error& e) {
+        stdJSON_SaveInt(pFpath, pKey, valDefault);
+        return valDefault;
+    }
+}
+
+float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, valDefault);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    try {
+        return json_file[pKey];
+    }
+    catch (nlohmann::detail::type_error& e) {
+        stdJSON_SaveFloat(pFpath, pKey, valDefault);
+        return valDefault;
+    }
+}
+
+int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = !!bVal;
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_GetBool(const char* pFpath, const char* pKey, int bValDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, bValDefault);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    try {
+        return json_file[pKey] ? 1 : 0;
+    }
+    catch (nlohmann::detail::type_error& e) {
+        stdJSON_SaveBool(pFpath, pKey, !!bValDefault);
+        return bValDefault;
+    }
+}
+
+int stdJSON_SaveBytes(const char* pFpath, const char* pKey, uint8_t *pData, uint32_t dataLen)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pData);
+
+    std::vector<uint8_t> data(pData, pData+dataLen);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = data;
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_GetBytes(const char* pFpath, const char* pKey, uint8_t* pData, uint32_t dataLen)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pData);
+
+    std::vector<uint8_t> out(pData, pData+dataLen);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    try {
+        out = json_file[pKey].get<std::vector<uint8_t>>();
+    }
+    catch (nlohmann::detail::type_error& e) {
+        stdJSON_SaveBytes(pFpath, pKey, out.data(), dataLen);
+    }
+
+    std::copy_n(out.begin(), dataLen, pData);
+
+    return 1;
+}
+
+int stdJSON_SetString(const char* pFpath, const char* pKey, const char *pVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pVal);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = std::string(pVal);
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_GetString(const char* pFpath, const char* pKey, char* pOut, int outSize, const char *pValDefault)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pOut);
+    CHECK_ARGPTR(pValDefault);
+
+    std::string out = "";
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    out = json_file.value(std::string(pKey), std::string(pValDefault));
+    if (out == std::string(pValDefault)) {
+        stdJSON_SetString(pFpath, pKey, pValDefault);
+    }
+    
+    size_t readSize = strlen(out.c_str());
+    if (readSize < outSize) {
+        outSize = readSize;
+    }
+    _strncpy(pOut, out.c_str(), outSize);
+
+    return 1;
+}
+
+/*
+static std::string utf16_to_utf8( std::u16string&& utf16_string )
+{
+   std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+   auto p = reinterpret_cast<const int16_t *>( utf16_string.data() );
+   return convert.to_bytes( p, p + utf16_string.size() );
+}
+
+static std::u16string utf8_to_utf16( std::string&& utf8_string )
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; 
+    std::u16string dest = convert.from_bytes(utf8_string);
+}
+*/
+
+int stdJSON_SetWString(const char* pFpath, const char* pKey, const char16_t *pVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pVal);
+
+    std::string val = utf16_to_utf8(std::u16string(pVal));
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file[pKey] = val;
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int outSize, const char16_t *pValDefault)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pOut);
+    CHECK_ARGPTR(pValDefault);
+
+    std::u16string out = u"";
+    std::string out_u8 = "";
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    try {
+        out_u8 = json_file[pKey];
+    }
+    catch (nlohmann::detail::type_error& e) {
+        stdJSON_SetWString(pFpath, pKey, pValDefault);
+    }
+
+    out = utf8_to_utf16(out_u8);
+    
+    size_t readSize = _wcslen((wchar_t*)out.data());
+    if (readSize < outSize) {
+        outSize = readSize;
+    }
+    _wcsncpy((wchar_t*)pOut, (wchar_t*)out.data(), outSize);
+
+    return 1;
+}
+
+}

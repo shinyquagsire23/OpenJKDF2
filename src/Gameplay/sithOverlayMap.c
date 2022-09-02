@@ -4,6 +4,7 @@
 #include "World/sithSector.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/rdroid.h"
+#include "Engine/sithMulti.h"
 #include "Primitives/rdPrimit2.h"
 #include "Engine/sith.h"
 #include "jk.h"
@@ -114,7 +115,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
             }
         }
     }
-    if ( sithNet_isMulti && (sithNet_MultiModeFlags & 1) != 0 )
+    if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
         v8 = sithOverlayMap_inst.config.aTeamColors[sithOverlayMap_pPlayer->actorParams.playerinfo->teamNum];
         v9 = v8;
@@ -397,7 +398,7 @@ LABEL_30:
                 {
                     if ( (v25 & 0xC) != 0 )
                         v27 = 1;
-                    if ( sithNet_isMulti && (sithNet_MultiModeFlags & 1) != 0 )
+                    if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                     {
                         circleColor = sithOverlayMap_inst.config.aTeamColors[i->actorParams.playerinfo->teamNum];
                         a6_ = circleColor;

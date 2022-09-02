@@ -811,7 +811,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
-    if ( sithNet_isMulti && (sithNet_MultiModeFlags & 0x80u) != 0 )
+    if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_SINGLE_LEVEL) != 0 )
     {
         v4 = jkGuiRend_thing_five;
         

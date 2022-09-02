@@ -4,6 +4,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sith.h"
 #include "Engine/rdroid.h"
+#include "Engine/sithMulti.h"
 #include "Primitives/rdPrimit2.h"
 #include "Primitives/rdPrimit3.h"
 #include "Engine/rdClip.h"
@@ -78,7 +79,7 @@ LABEL_10:
         goto LABEL_10;
     }
 LABEL_11:
-    if ( sithNet_isMulti && (sithNet_MultiModeFlags & 1) != 0 )
+    if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
         color = sithMap_ctx.teamColors[v2->actorParams.playerinfo->teamNum];
     else
         color = sithMap_ctx.playerColor;
@@ -291,7 +292,7 @@ LABEL_22:
                     case SITH_THING_PLAYER:
                         if ( (g_mapModeFlags & 0xC) != 0 )
                             v37 = 1;
-                        if ( sithNet_isMulti && (sithNet_MultiModeFlags & 1) != 0 )
+                        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                             circleColor = sithMap_ctx.teamColors[i->actorParams.playerinfo->teamNum];
                         else
                             circleColor = sithMap_ctx.playerColor & 0xFF;

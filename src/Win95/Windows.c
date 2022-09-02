@@ -36,7 +36,7 @@ void Windows_Startup()
     WinIdk_SetDplayGuid(Windows_DplayGuid);
     WinIdk_detect_cpu(Windows_cpu_info);
 
-    wuRegistry_GetString("CD Path", (LPBYTE)cdPath, 128, Windows_cdpath_default); // ????
+    wuRegistry_GetString("CD Path", cdPath, 128, Windows_cdpath_default); // ????
 
     jkRes_LoadCd(cdPath);
     Windows_installType = wuRegistry_GetInt("InstallType", 9);

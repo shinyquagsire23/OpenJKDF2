@@ -29,6 +29,7 @@
 #include "Main/jkGame.h"
 #include "jk.h"
 #include "Win95/Window.h"
+#include "General/stdJSON.h"
 
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
@@ -236,9 +237,11 @@ void jkPlayer_WriteConf(wchar_t *name)
 {
     char nameTmp[32]; // [esp+0h] [ebp-A0h]
     char fpath[128]; // [esp+20h] [ebp-80h]
+    char ext_fpath[256];
 
     stdString_WcharToChar(nameTmp, name, 31);
     nameTmp[31] = 0;
+    stdFnames_MakePath3(ext_fpath, 256, "player", nameTmp, "openjkdf2.json");
     stdString_snprintf(fpath, 128, "player\\%s\\%s.plr", nameTmp, nameTmp);
     if ( stdConffile_OpenWrite(fpath) )
     {
@@ -258,28 +261,108 @@ void jkPlayer_WriteConf(wchar_t *name)
             }
         }
 #ifdef QOL_IMPROVEMENTS
-        stdConffile_Printf("fov %d\n", jkPlayer_fov);
-        stdConffile_Printf("fovisvertical %d\n", jkPlayer_fovIsVertical);
-        stdConffile_Printf("windowishidpi %d\n", Window_isHiDpi);
-        stdConffile_Printf("windowfullscreen %d\n", Window_isFullscreen);
-        stdConffile_Printf("texturefiltering %d\n", jkPlayer_enableTextureFilter);
-        stdConffile_Printf("originalaspect %d\n", jkPlayer_enableOrigAspect);
-        stdConffile_Printf("fpslimit %d\n", jkPlayer_fpslimit);
-        stdConffile_Printf("enablevsync %d\n", jkPlayer_enableVsync);
-        stdConffile_Printf("enablebloom %d\n", jkPlayer_enableBloom);
-        stdConffile_Printf("ssaamultiple %f\n", jkPlayer_ssaaMultiple);
-        stdConffile_Printf("enablessao %d\n", jkPlayer_enableSSAO);
-        stdConffile_Printf("gamma %f\n", jkPlayer_gamma);
+        stdJSON_SaveInt(ext_fpath, "fov", jkPlayer_fov);
+        stdJSON_SaveBool(ext_fpath, "fovisvertical", jkPlayer_fovIsVertical);
+        stdJSON_SaveBool(ext_fpath, "windowishidpi", Window_isHiDpi);
+        stdJSON_SaveBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
+        stdJSON_SaveBool(ext_fpath, "texturefiltering", jkPlayer_enableTextureFilter);
+        stdJSON_SaveBool(ext_fpath, "originalaspect", jkPlayer_enableOrigAspect);
+        stdJSON_SaveInt(ext_fpath, "fpslimit", jkPlayer_fpslimit);
+        stdJSON_SaveBool(ext_fpath, "enablevsync", jkPlayer_enableVsync);
+        stdJSON_SaveBool(ext_fpath, "enablebloom", jkPlayer_enableBloom);
+        stdJSON_SaveFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
+        stdJSON_SaveInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
+        stdJSON_SaveFloat(ext_fpath, "gamma", jkPlayer_gamma);
 #endif
         stdConffile_CloseWrite();
     }
 }
 
+#ifdef QOL_IMPROVEMENTS
+void jkPlayer_ParseLegacyExt()
+{
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "fov %d", &jkPlayer_fov);
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
+        jkPlayer_fovIsVertical = !!jkPlayer_fovIsVertical;
+    }
+
+    int dpi_tmp = 0;
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "windowishidpi %d", &dpi_tmp);
+        dpi_tmp = !!dpi_tmp;
+        Window_SetHiDpi(dpi_tmp);
+    }
+
+    int fulltmp = 0;
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "windowfullscreen %d", &fulltmp);
+        fulltmp = !!fulltmp;
+        Window_SetFullscreen(fulltmp);
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "texturefiltering %d", &jkPlayer_enableTextureFilter);
+        jkPlayer_enableTextureFilter = !!jkPlayer_enableTextureFilter;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
+        jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "fpslimit %d", &jkPlayer_fpslimit);
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "enablevsync %d", &jkPlayer_enableVsync);
+        jkPlayer_enableVsync = !!jkPlayer_enableVsync;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "enablebloom %d", &jkPlayer_enableBloom);
+        jkPlayer_enableBloom = !!jkPlayer_enableBloom;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &jkPlayer_ssaaMultiple) != 1)
+            jkPlayer_ssaaMultiple = 1.0;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        _sscanf(stdConffile_aLine, "enablessao %d", &jkPlayer_enableSSAO);
+        jkPlayer_enableSSAO = !!jkPlayer_enableSSAO;
+    }
+
+    if (stdConffile_ReadLine())
+    {
+        if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
+            jkPlayer_gamma = 1.0;
+    }
+}
+#endif
+
 int jkPlayer_ReadConf(wchar_t *name)
 {
     char *v4; // edi
     char v6[32]; // [esp+10h] [ebp-A0h]
-    char fpath[128]; // [esp+30h] [ebp-80h]
+    char fpath[256]; // Added: 128 -> 256
+    char ext_fpath[256];
 
     int version = 0;
     if (!jkPlayer_VerifyWcharName(name))
@@ -289,7 +372,8 @@ int jkPlayer_ReadConf(wchar_t *name)
     v6[31] = 0;
     _wcsncpy(jkPlayer_playerShortName, name, 0x1Fu);
     jkPlayer_playerShortName[31] = 0;
-    _sprintf(fpath, "player\\%s\\%s.plr", v6, v6);
+    stdFnames_MakePath3(ext_fpath, 256, "player", v6, "openjkdf2.json");
+    stdString_snprintf(fpath, 256, "player\\%s\\%s.plr", v6, v6); // Added: sprintf -> snprintf
     if (!stdConffile_OpenRead(fpath))
         return 0;
 
@@ -330,84 +414,35 @@ int jkPlayer_ReadConf(wchar_t *name)
             }
         }
 #ifdef QOL_IMPROVEMENTS
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "fov %d", &jkPlayer_fov);
-            if (jkPlayer_fov < FOV_MIN)
-                jkPlayer_fov = FOV_MIN;
-            if (jkPlayer_fov > FOV_MAX)
-                jkPlayer_fov = FOV_MAX;
-        }
+        // Unfortunately we have to live with our past mistakes and keep all of this parsing.
+        jkPlayer_ParseLegacyExt();
 
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
-            jkPlayer_fovIsVertical = !!jkPlayer_fovIsVertical;
-        }
-
+        // New JSON parsing
         int dpi_tmp = 0;
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "windowishidpi %d", &dpi_tmp);
-            dpi_tmp = !!dpi_tmp;
-            Window_SetHiDpi(dpi_tmp);
-        }
-
         int fulltmp = 0;
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "windowfullscreen %d", &fulltmp);
-            fulltmp = !!fulltmp;
-            Window_SetFullscreen(fulltmp);
-        }
+        jkPlayer_fov = stdJSON_GetInt(ext_fpath, "fov", jkPlayer_fov);
+        jkPlayer_fovIsVertical = stdJSON_GetBool(ext_fpath, "fovisvertical", jkPlayer_fovIsVertical);
+        dpi_tmp = stdJSON_GetBool(ext_fpath, "windowishidpi", Window_isHiDpi);
+        fulltmp = stdJSON_GetBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
+        jkPlayer_enableTextureFilter = stdJSON_GetBool(ext_fpath, "texturefiltering", jkPlayer_enableTextureFilter);
+        jkPlayer_enableOrigAspect = stdJSON_GetBool(ext_fpath, "originalaspect", jkPlayer_enableOrigAspect);
+        jkPlayer_fpslimit = stdJSON_GetInt(ext_fpath, "fpslimit", jkPlayer_fpslimit);
+        jkPlayer_enableVsync = stdJSON_GetBool(ext_fpath, "enablevsync", jkPlayer_enableVsync);
+        jkPlayer_enableBloom = stdJSON_GetBool(ext_fpath, "enablebloom", jkPlayer_enableBloom);
+        jkPlayer_ssaaMultiple = stdJSON_GetFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
+        jkPlayer_enableSSAO = stdJSON_GetInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
+        jkPlayer_gamma = stdJSON_GetFloat(ext_fpath, "gamma", jkPlayer_gamma);
 
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "texturefiltering %d", &jkPlayer_enableTextureFilter);
-            jkPlayer_enableTextureFilter = !!jkPlayer_enableTextureFilter;
-        }
+        if (jkPlayer_fov < FOV_MIN)
+            jkPlayer_fov = FOV_MIN;
+        if (jkPlayer_fov > FOV_MAX)
+            jkPlayer_fov = FOV_MAX;
 
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
-            jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "fpslimit %d", &jkPlayer_fpslimit);
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "enablevsync %d", &jkPlayer_enableVsync);
-            jkPlayer_enableVsync = !!jkPlayer_enableVsync;
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "enablebloom %d", &jkPlayer_enableBloom);
-            jkPlayer_enableBloom = !!jkPlayer_enableBloom;
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &jkPlayer_ssaaMultiple) != 1)
-                jkPlayer_ssaaMultiple = 1.0;
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            _sscanf(stdConffile_aLine, "enablessao %d", &jkPlayer_enableSSAO);
-            jkPlayer_enableSSAO = !!jkPlayer_enableSSAO;
-        }
-
-        if (stdConffile_ReadLine())
-        {
-            if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
-                jkPlayer_gamma = 1.0;
-        }
+        Window_SetHiDpi(dpi_tmp);
+        Window_SetFullscreen(fulltmp);
 #endif
+
+
         stdConffile_Close();
         return 1;
     }

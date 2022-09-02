@@ -132,7 +132,7 @@ int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
 DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
 void DirectPlay_Close();
 int DirectPlay_OpenHost(jkMultiEntry* a);
-int DirectPlay_GetSession_passwordidk(void* a);
+int DirectPlay_GetSession_passwordidk(jkMultiEntry* a);
 int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);
 int DirectPlay_StartSession(void* a, void* b);

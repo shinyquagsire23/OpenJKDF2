@@ -447,7 +447,7 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
     int v4; // ecx
     int v5; // eax
 
-    if ( (sithNet_MultiModeFlags & 1) != 0 && thing1 != thing2 && thing1->type == SITH_THING_PLAYER && thing2->type == SITH_THING_PLAYER )
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && thing1 != thing2 && thing1->type == SITH_THING_PLAYER && thing2->type == SITH_THING_PLAYER )
     {
         v2 = thing1->actorParams.playerinfo;
         if ( v2 )

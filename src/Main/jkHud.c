@@ -656,7 +656,7 @@ void jkHud_Draw()
             while ( v30 < jkPlayer_maxPlayers );
         }
         _qsort(jkHud_aPlayerScores, v29, sizeof(jkHudPlayerScore), jkHud_SortPlayerScore);
-        if ( (sithNet_MultiModeFlags & 1) != 0 )
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
         {
             v39 = &jkHud_aTeamScores[0];
             v40 = sithNet_teamScore;
@@ -785,7 +785,7 @@ LABEL_116:
                 while ( v45 < v43 + 8 )
                 {
                     a4.y = v44 + 1;
-                    if ( (sithNet_MultiModeFlags & 1) != 0 )
+                    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                     {
                         v47 = v46->teamNum;
                         if ( v46->teamNum )
@@ -1023,7 +1023,7 @@ void jkHud_Tally()
     switch ( jkHud_bViewScores )
     {
         case 0:
-            if ( (sithNet_MultiModeFlags & 1) != 0 )
+            if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
             {
                 jkHud_bViewScores = 1;
                 return;
