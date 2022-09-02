@@ -254,6 +254,8 @@ const uint8_t stdControl_aSdlToDik[256] =
     0,//DIK_RGUI,
 };
 
+uint8_t stdControl_aDebounce[256];
+
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
 {
@@ -288,6 +290,7 @@ int stdControl_Startup()
     _memset(stdControl_aKeyInfo, 0, sizeof(int) * 284);
     _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * 15);
     _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
+    _memset(stdControl_aDebounce, 0, sizeof(stdControl_aDebounce)); // Added
 
 #if 0
     DirectX_DirectInputCreateA(stdGdi_GetHInstance(), 0x500u, &stdControl_ppDI, 0);
@@ -606,12 +609,30 @@ void stdControl_ReadControls()
     _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
+
+    static int stdControl_bDisableKeyboard_last = 0;
+    if (!stdControl_bDisableKeyboard && stdControl_bDisableKeyboard_last)
+    {
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        for (int i = 0; i < 256; i++)
+        {
+            stdControl_aDebounce[i] = !!state[i];
+        }
+        stdControl_aDebounce[SDLK_RETURN] = 1;
+    }
+    stdControl_bDisableKeyboard_last = stdControl_bDisableKeyboard;
+
     if ( !stdControl_bDisableKeyboard )
     {
         const Uint8 *state = SDL_GetKeyboardState(NULL);
         for (int i = 0; i < 256; i++)
         {
-            stdControl_SetSDLKeydown(i, !!state[i], stdControl_curReadTime);
+            int s = !!state[i];
+            if (s && stdControl_aDebounce[i]) {
+                continue;
+            }
+            stdControl_SetSDLKeydown(i, s, stdControl_curReadTime);
+            stdControl_aDebounce[i] = 0;
         }
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
