@@ -1092,7 +1092,7 @@ int DirectPlay_SendLobbyMessage(void* pPkt, uint32_t pktLen)
 
 void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers)
 {
-
+    _strncpy(sithDplayGNS_storedEntry.mapJklFname, jkMain_aLevelJklFname, 0x80);
 }
 
 BOOL DirectPlay_SetSessionFlagidk(int a1)

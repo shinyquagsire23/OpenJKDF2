@@ -63,7 +63,7 @@ int sithMulti_HandleChat(sithCogMsg *msg)
     v5[arg2 + 1] = 0;
 
     if ( arg1 < 0 )
-        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s", v5); // Added: char -> wchar
+        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%S", v5); // Added: char -> wchar
     else
         jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s says '%S'", jkPlayer_playerInfos[arg1].player_name, v5); // Added: char -> wchar
     DebugConsole_AlertSound();
