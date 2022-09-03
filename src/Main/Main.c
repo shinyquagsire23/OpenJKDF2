@@ -763,6 +763,8 @@ int Main_StartupDedicated()
     jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
     Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
 
+    jkPlayer_CreateConf(L"ServerDed");
+
     jkGuiNetHost_bIsDedicated = 1;
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_LoadSettings();
@@ -777,16 +779,16 @@ int Main_StartupDedicated()
     jkGuiMultiplayer_mpcInfo.jediRank = 0;
 
     // Set up minimal render settings
-    jkPlayer_fov = 90;
-    jkPlayer_fovIsVertical = 1;
-    jkPlayer_enableTextureFilter = 0;
-    jkPlayer_enableOrigAspect = 0;
-    jkPlayer_enableBloom = 0;
-    jkPlayer_fpslimit = 150;
-    jkPlayer_enableVsync = 0;
-    jkPlayer_ssaaMultiple = 1.0;
-    jkPlayer_enableSSAO = 0;
-    jkPlayer_gamma = 1.0;
+    //jkPlayer_fov = 90;
+    //jkPlayer_fovIsVertical = 1;
+    //jkPlayer_enableTextureFilter = 0;
+    //jkPlayer_enableOrigAspect = 0;
+    //jkPlayer_enableBloom = 0;
+    //jkPlayer_fpslimit = 150;
+    //jkPlayer_enableVsync = 0;
+    //jkPlayer_ssaaMultiple = 1.0;
+    //jkPlayer_enableSSAO = 0;
+    //jkPlayer_gamma = 1.0;
     
     jkMultiEntry3 v34;
     memset(&v34, 0, sizeof(v34));

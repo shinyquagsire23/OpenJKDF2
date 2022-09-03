@@ -92,14 +92,6 @@ wchar_t jkGuiNetHost_portText[32];
 int jkGuiNetHost_portNum = 27020;
 int jkGuiNetHost_bIsDedicated = 0;
 
-#ifdef QOL_IMPROVEMENTS
-#define TICKRATE_MIN (1)
-#define TICKRATE_MAX (1000)
-#else
-#define TICKRATE_MIN (100)
-#define TICKRATE_MAX (300)
-#endif
-
 #define LONG_MAX ((long)(~0UL>>1))
 #define LONG_MIN (~LONG_MAX)
 

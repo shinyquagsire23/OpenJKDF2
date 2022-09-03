@@ -17,6 +17,7 @@
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
 #include "Gui/jkGUITitle.h"
+#include "Engine/sithMulti.h"
 #include "../jk.h"
 
 static int jkControl_bInit;
@@ -52,7 +53,8 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
     wchar_t v16[128]; // [esp+8h] [ebp-300h] BYREF
     wchar_t a4[256]; // [esp+108h] [ebp-200h] BYREF
 
-    if ( (player->actorParams.typeflags & SITH_TF_RENDERWEAPON) == 0 )
+    // Added: dedicated
+    if ((sithNet_isServer && jkGuiNetHost_bIsDedicated) || (player->actorParams.typeflags & SITH_TF_RENDERWEAPON) == 0 )
     {
         if ( !jkHud_bChatOpen )
         {

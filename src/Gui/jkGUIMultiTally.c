@@ -151,7 +151,7 @@ static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
 
-#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithNet_isServer) ? 0 : 30000)
+#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithDplay_bIsServer) ? 0 : 30000)
 
 int jkGuiMultiTally_Show(int a1)
 {
@@ -218,7 +218,7 @@ int jkGuiMultiTally_Show(int a1)
 #ifdef QOL_IMPROVEMENTS
     // Added
     uint32_t hack = jkPlayer_playerInfos[0].flags;
-    if (jkGuiNetHost_bIsDedicated)
+    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = 0;
 #endif
 
@@ -425,7 +425,7 @@ LABEL_50:
 
 #ifdef QOL_IMPROVEMENTS
     // Added
-    if (jkGuiNetHost_bIsDedicated)
+    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = hack;
 #endif
 

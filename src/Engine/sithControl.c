@@ -20,7 +20,13 @@
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "Main/jkMain.h"
+#include "Engine/sithMulti.h"
 #include "jk.h"
+
+// Added
+static int sithControl_followingPlayer = 0;
+static int sithControl_curDebugCam = 0;
+static wchar_t sithControl_debugWStrTmp[256];
 
 static const char *sithControl_aFunctionStrs[74] =
 {
@@ -836,6 +842,21 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
 
     if ( player->moveType != SITH_MT_PHYSICS )
         return 0;
+
+    // Added: dedicated
+    if (sithNet_isServer && jkGuiNetHost_bIsDedicated) {
+        sithControl_PlayerLook(player, deltaSecs);
+        sithControl_FreeCam(player);
+        sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
+        if ( (input_read & 1) != 0 )
+            sithOverlayMap_ToggleMapDrawn();
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &input_read) )
+            sithOverlayMap_FuncIncrease();
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
+            sithOverlayMap_FuncDecrease();
+        goto debug_controls;
+    }
+
     if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
     {
         if ( (player->thingflags & SITH_TF_DEAD) != 0 )
@@ -897,24 +918,70 @@ LABEL_39:
         }
         return 0;
     }
+
+debug_controls:
     if ( player->moveType == SITH_MT_PHYSICS )
         sithPhysics_ThingStop(player);
-    v3 = INPUT_FUNC_SELECT1;
-    while ( 1 )
+
+    // Added
+    if (sithControl_followingPlayer > 0) {
+        sithThing* pThing = jkPlayer_playerInfos[sithControl_followingPlayer].playerThing;
+        if (pThing) {
+            rdVector_Copy3(&player->position, &pThing->position);
+            rdMatrix_Copy34(&player->lookOrientation, &pThing->lookOrientation);
+            sithThing_MoveToSector(player, pThing->sector, 0);
+            sithWorld_pCurrentWorld->cameraFocus = pThing;
+            sithWorld_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
+            stdPalEffects_FlushAllEffects();
+        }
+    }
+
+    for (v3 = INPUT_FUNC_SELECT1; v3 <= INPUT_FUNC_SELECT0; v3++)
     {
         sithControl_ReadFunctionMap(v3, &input_read);
         if ( input_read )
+        {
+            sithControl_followingPlayer = 0; // Added
+            int old = jkPlayer_maxPlayers;// Added
+            jkPlayer_maxPlayers = 10; // Added
+            sithControl_curDebugCam = v3 - INPUT_FUNC_SELECT1; // Added
+            sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);
+            jkPlayer_maxPlayers = old; // Added
+
+            // Added
+            jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
+            DebugConsole_PrintUniStr(sithControl_debugWStrTmp);
+
             break;
-        if ( ++v3 > (unsigned int)INPUT_FUNC_SELECT0 )
-            goto LABEL_11;
+        }
     }
-    sithPlayerActions_WarpToCheckpoint(player, v3 - INPUT_FUNC_SELECT1);
-LABEL_11:
     sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &input_read);
     if ( input_read )
     {
-        sithThing_Hit(player, player, 200.0, 1);
-        result = 1;
+        // Added: dedicated
+        if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) {
+            sithThing_Hit(player, player, 200.0, 1);
+            result = 1;
+        }
+        else {
+            for (sithControl_followingPlayer++; sithControl_followingPlayer < jkPlayer_maxPlayers; sithControl_followingPlayer++) {
+                if (!sithControl_followingPlayer || jkPlayer_playerInfos[sithControl_followingPlayer].flags & 1) {
+                    break;
+                }
+            }
+            if (sithControl_followingPlayer >= jkPlayer_maxPlayers) {
+                sithControl_followingPlayer = 0;
+            }
+            if (sithControl_followingPlayer)
+                jk_snwprintf(sithControl_debugWStrTmp, 256, L"Following %s", jkPlayer_playerInfos[sithControl_followingPlayer].player_name);
+            else
+                jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
+            DebugConsole_PrintUniStr(sithControl_debugWStrTmp);
+            
+            if (!sithControl_followingPlayer) {
+                sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);
+            }
+        }
     }
     else
     {
@@ -987,7 +1054,10 @@ LABEL_11:
         if ( input_read )
             g_mapModeFlags ^= 0x42u;
         sithCamera_currentCamera->cameraPerspective = 128;
-        result = 1;
+        if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) // Added
+            result = 1;
+        else
+            result = 0;
     }
     return result;
 }

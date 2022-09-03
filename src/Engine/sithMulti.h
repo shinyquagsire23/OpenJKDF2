@@ -44,6 +44,14 @@ extern "C" {
 #define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
+#ifdef QOL_IMPROVEMENTS
+#define TICKRATE_MIN (1)
+#define TICKRATE_MAX (1000)
+#else
+#define TICKRATE_MIN (100)
+#define TICKRATE_MAX (300)
+#endif
+
 enum sithMultiModeFlags
 {
     MULTIMODEFLAG_TEAMS = 0x1,

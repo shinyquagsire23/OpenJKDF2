@@ -9,7 +9,7 @@
 #include "World/sithSector.h"
 #include "jk.h"
 
-#define TARGET_FPS (50.0)
+#define TARGET_FPS (sithNet_tickrate < 100 ? 150.0 : 50.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
 
 void sithPhysics_FindFloor(sithThing *thing, int a3)

@@ -191,6 +191,7 @@ int sithMulti_Startup()
         if (jkGuiNetHost_bIsDedicated) {
             jkPlayer_playerInfos[0].flags = 6;
             jkPlayer_playerInfos[0].playerThing->thingflags |= SITH_TF_DISABLED;
+            jkPlayer_playerInfos[0].playerThing->attach_flags = 0;
         }
 
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
@@ -1006,13 +1007,13 @@ void sithMulti_InitTick(unsigned int tickrate)
     sithNet_dword_83262C = sithDplay_dplayIdSelf;
     sithNet_dword_8C4BA4 = 0;
     sithNet_isServer = 0;
-    if ( tickrate < 100 )
+    if ( tickrate < TICKRATE_MIN )
     {
-        sithNet_tickrate = 100;
+        sithNet_tickrate = TICKRATE_MIN;
     }
-    else if ( tickrate > 300 )
+    else if ( tickrate > TICKRATE_MAX )
     {
-        sithNet_tickrate = 300;
+        sithNet_tickrate = TICKRATE_MAX;
     }
     else
     {
