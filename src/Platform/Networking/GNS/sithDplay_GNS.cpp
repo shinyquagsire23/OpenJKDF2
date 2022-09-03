@@ -39,8 +39,19 @@
 
 #ifdef _WIN32
     #include <windows.h> // Ug, for NukeProcess -- see below
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    typedef int socklen_t;
 #else
     #include <unistd.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
+    #include <arpa/inet.h>
+    #include <netinet/in.h>
+    #include <netdb.h>
+    #include <sys/ioctl.h>
+    typedef int SOCKET;
+    constexpr SOCKET INVALID_SOCKET = -1;
     #include <signal.h>
 #endif
 
@@ -1169,13 +1180,67 @@ static int sithDplay_EnumThread_bInit = 0;
 static SDL_Thread *sithDplay_EnumThread_thread = NULL;
 static SDL_mutex* sithDplay_EnumThread_mutex = NULL;
 
+char *get_ip_str(const struct sockaddr *sa, char *s, size_t maxlen)
+{
+    switch(sa->sa_family) {
+        case AF_INET:
+            inet_ntop(AF_INET, &(((struct sockaddr_in *)sa)->sin_addr),
+                    s, maxlen);
+            break;
+
+        case AF_INET6:
+            inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)sa)->sin6_addr),
+                    s, maxlen);
+            break;
+
+        default:
+            strncpy(s, "Unknown AF", maxlen);
+            return NULL;
+    }
+
+    return s;
+}
+
 static int sithDplay_EnumThread(void *ptr)
 {
     while (sithDplay_EnumThread_bInit)
     {
         SDL_LockMutex(sithDplay_EnumThread_mutex);
         stdString_WcharToChar(jkGuiMultiplayer_ipText_conv, jkGuiMultiplayer_ipText, 255);
-        addrServer.ParseString(jkGuiMultiplayer_ipText_conv);
+
+        std::string sAddress( jkGuiMultiplayer_ipText_conv );
+        std::string sService;
+        size_t colon = sAddress.find( ':' );
+        if ( colon == std::string::npos )
+        {
+            sService = ""; // Default port
+        }
+        else
+        {
+            sService = sAddress.substr( colon+1 );
+            sAddress.erase( colon );
+        }
+
+        // Resolve name synchronously
+        addrinfo *pAddrInfo = nullptr;
+        std::string finalStr = "";
+        int r = getaddrinfo( sAddress.c_str(), sService.c_str(), nullptr, &pAddrInfo );
+        if ( r != 0 || pAddrInfo == nullptr )
+        {
+            //sprintf( errMsg, "Invalid/unknown server address.  getaddrinfo returned %d", r );
+            //return nullptr;
+
+        }
+        else {
+            get_ip_str(pAddrInfo->ai_addr, jkGuiMultiplayer_ipText_conv, 255);
+            finalStr += std::string(jkGuiMultiplayer_ipText_conv);
+            if (sService != "") {
+                finalStr += ":";
+            finalStr += sService;
+            }
+        }
+
+        addrServer.ParseString(finalStr.c_str());
         if (!addrServer.m_port) {
             addrServer.m_port = DEFAULT_SERVER_PORT;
         }
