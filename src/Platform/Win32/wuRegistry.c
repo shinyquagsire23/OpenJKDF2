@@ -176,7 +176,7 @@ int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpDefaultData, DWORD defaultDa
     return 0;
 }
 
-LSTATUS wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
+int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
 {
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
 
@@ -196,7 +196,7 @@ int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const ch
     cbData = outSize;
     if (RegQueryValueExA(phkResult, lpValueName, 0, &Type, lpData, &cbData))
     {
-        if (out)
+        if (outDefault)
         {
             _strncpy(lpData, outDefault, outSize - 1);
             lpData[outSize - 1] = 0;
@@ -212,7 +212,7 @@ int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const ch
     return result;
 }
 
-LSTATUS wuRegistry_SetWString(LPCSTR lpValueName, const char *lpData)
+int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData)
 {
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
 
@@ -232,7 +232,7 @@ int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, cons
     cbData = outSize * sizeof(wchar_t);
     if (RegQueryValueExA(phkResult, lpValueName, 0, &Type, lpData, &cbData))
     {
-        if (out)
+        if (outDefault)
         {
             _wcsncpy(lpData, outDefault, outSize - 1);
             lpData[outSize - 1] = 0;

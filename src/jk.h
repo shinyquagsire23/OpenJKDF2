@@ -213,6 +213,8 @@ extern HRESULT (__stdcall *jk_CoCreateInstance)(const IID *const rclsid, LPUNKNO
 extern LONG (__stdcall *jk_ChangeDisplaySettingsA)(DEVMODEA *lpDevMode, DWORD dwFlags);
 extern BOOL (__stdcall *jk_EnumDisplaySettingsA)(LPCSTR lpszDeviceName, DWORD iModeNum, DEVMODEA *lpDevMode);
 extern int (__stdcall *jk_snwprintf)(wchar_t *a1, size_t a2, const wchar_t *a3, ...);
+
+#ifndef __cplusplus
 static int (__cdecl *jk_vsnwprintf)(wchar_t *, size_t, const wchar_t *, va_list) = (void*)0x005138E0;
 static size_t (*_fwrite)(const void *, size_t, size_t, FILE *) = (void*)0x00513D40;
 static int (*_printf)(const char *, ...) = (void*)0x005141D0;
@@ -263,6 +265,12 @@ static wchar_t* (*__wcschr)(const wchar_t *, wchar_t) = (void*)0x005133B0;
 static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (void*)0x00512C70;
 static wchar_t* (*__wcsrchr)(const wchar_t *, wchar_t) = (void*)0x00514650;
 static char* (*_strstr)(const char *, const char *) = (void*)0x00513980;
+#else
+static char* (*_strncpy)(char *, const char *, size_t) = (char* (*)(char*, const char*, unsigned int))0x5126A0;
+static size_t (*_wcslen)(const wchar_t *) = (size_t (*)(const wchar_t *))0x512FE0;
+static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (wchar_t* (*)(wchar_t *, const wchar_t *, size_t))0x00512C70;
+static wchar_t* (*_wcsncpy)(wchar_t *, const wchar_t *, size_t) = (wchar_t* (*)(wchar_t *, const wchar_t *, size_t))0x00512C70;
+#endif
 #else
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);

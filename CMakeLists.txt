@@ -465,6 +465,9 @@ else()
 
     SET_TARGET_PROPERTIES(${BIN_NAME} PROPERTIES PREFIX "")
     SET_TARGET_PROPERTIES("${BIN_NAME}_kvm" PROPERTIES PREFIX "")
+
+    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(${BIN_NAME}_kvm PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
 # TODO byacc and flex
