@@ -107,6 +107,8 @@ void sithMulti_sub_4CA470(int a1);
 void sithMulti_InitTick(unsigned int tickrate);
 int sithMulti_HandleRequestConnect(sithCogMsg *msg);
 void sithMulti_HandleTimeLimit(int deltaMs);
+uint32_t sithMulti_IterPlayersnothingidk(int net_id);
+int sithMulti_SendPing(int sendtoId);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;

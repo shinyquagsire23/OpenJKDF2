@@ -306,6 +306,11 @@ void crash_handler_full(int sig)
     //backtrace_full(lbstate, 0, full_callback, error_callback, 0);
     exit(1);
 }
+
+void int_handler(int sig) {
+    //exit(0);
+    signal(SIGINT, int_handler);
+}
 #endif // ARCH_WASM
 
 int main(int argc, char** argv)
@@ -313,6 +318,7 @@ int main(int argc, char** argv)
 #ifndef ARCH_WASM
     executable_path = argv[0];
     signal(SIGSEGV, crash_handler_basic);
+    //signal(SIGINT, int_handler);
 #endif
 
 #ifndef ARCH_64BIT

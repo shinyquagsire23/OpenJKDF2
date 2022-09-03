@@ -10,6 +10,7 @@
 #include "World/jkPlayer.h"
 #include "Platform/stdControl.h"
 #include "stdPlatform.h"
+#include "Win95/DebugConsole.h"
 
 #include "jk.h"
 
@@ -308,6 +309,17 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 #ifdef SDL2_RENDER
 
+#include <fcntl.h> 
+#include <poll.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <curses.h>
+
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <termios.h>
+//#include <stropts.h>
+
 #ifdef ARCH_WASM
 #include <SDL2/SDL.h>
 #else
@@ -454,8 +466,141 @@ void Window_HandleWindowEvent(SDL_Event* event)
     }
 }
 
+int _kbhit() {
+    static const int STDIN = 0;
+    static bool initialized = false;
+
+    if (! initialized) {
+        // Use termios to turn off line buffering
+        struct termios term;
+        tcgetattr(STDIN, &term);
+        term.c_lflag &= ~ICANON;
+        term.c_lflag &= ~ECHO;
+        tcsetattr(STDIN, TCSANOW, &term);
+        setbuf(stdin, NULL);
+        initialized = true;
+    }
+
+    int bytesWaiting;
+    ioctl(STDIN, FIONREAD, &bytesWaiting);
+    return bytesWaiting;
+}
+
+static char Window_headlessBuffer[256];
+
+void Window_UpdateHeadless()
+{
+    //int ch = getch();
+    //if (ch > 0)
+    //    printf("%c\n", ch);
+
+
+    char buffer[32];
+    size_t bytes_read = 0;
+    int fd = STDIN_FILENO;
+    if (_kbhit()) {
+        bytes_read = read(fd, buffer, sizeof(buffer)-1);
+        buffer[bytes_read] = 0;
+
+        for (int i = 0; i < bytes_read; i++)
+        {
+            if (buffer[i] == '\n') {
+                printf("\r> %s\n", Window_headlessBuffer);
+                DebugConsole_TryCommand(Window_headlessBuffer);
+                memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
+                continue;
+            }
+            else if (buffer[i] == 0x7F && strlen(Window_headlessBuffer)) {
+                Window_headlessBuffer[strlen(Window_headlessBuffer)-1] = 0;
+                printf("\r> %s ", Window_headlessBuffer);
+                continue;
+            }
+            else if (buffer[i] < ' ' || buffer[i] > '~')
+            {
+                continue;
+            }
+
+            char tmp[2] = {buffer[i], 0};
+            strncat(Window_headlessBuffer, tmp, 255);
+        }
+
+        //strncat(Window_headlessBuffer, buffer, 255);
+    }
+    
+    printf("\r> %s", Window_headlessBuffer);
+    fflush(stdout);
+
+    if (Window_resized)
+    {
+        jkMain_FixRes();
+        if (!jkGui_SetModeMenu(0))
+        {
+            stdDisplay_SetMode(0, 0, 0);
+            //jkMain_FixRes();
+        }
+        
+        Window_resized = 0;
+    }
+    
+    int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
+    //printf("%u\n", sampleTime_roundtrip);
+    Window_lastSampleTime = SDL_GetTicks();
+
+    static int sampleTime_delay = 0;
+    int menu_framelimit_amt_ms = 6;
+
+    if (!jkGame_isDDraw)
+    {
+
+        if (!jkGuiBuildMulti_bRendering) {
+            std3D_StartScene();
+            std3D_DrawMenu();
+            std3D_EndScene();
+            //SDL_GL_SwapWindow(displayWindow);
+        }
+        else {
+            std3D_DrawMenu();
+            //SDL_GL_SwapWindow(displayWindow);
+            //menu_framelimit_amt_ms = 64;
+        }
+    }
+    else
+    {
+        // Save mouse position for menu
+        if (jkGame_isDDraw != last_jkGame_isDDraw) {
+            Window_menu_mouseX = Window_mouseX;
+            Window_menu_mouseY = Window_mouseY;
+            Window_lastXRel = 0;
+            Window_lastYRel = 0;
+        }
+    }
+
+    // Keep entire loop at 6ms (150FPS)
+    if (sampleTime_roundtrip < menu_framelimit_amt_ms) {
+        sampleTime_delay++;
+    }
+    else {
+        sampleTime_delay--;
+    }
+    if (sampleTime_delay <= 0) {
+        sampleTime_delay = 1;
+    }
+    if (sampleTime_delay >= menu_framelimit_amt_ms) {
+        sampleTime_delay = menu_framelimit_amt_ms;
+    }
+    SDL_Delay(sampleTime_delay);
+
+    last_jkGame_isDDraw = jkGame_isDDraw;
+}
+
 void Window_SdlUpdate()
 {
+    if (Main_bHeadless)
+    {
+        Window_UpdateHeadless();
+        return;
+    }
+
     uint16_t left, right;
     uint32_t pos, msgl, msgr;
     int hasLeft, hasRight;
@@ -770,6 +915,8 @@ void Window_SdlUpdate()
 
 void Window_SdlVblank()
 {
+    if (Main_bHeadless) return;
+
     //static uint32_t roundtrip = 0;
     //uint32_t before = stdPlatform_GetTimeMsec();
     SDL_GL_SwapWindow(displayWindow);
@@ -798,6 +945,8 @@ EM_JS(int, canvas_get_height, (), {
 
 void Window_RecreateSDL2Window()
 {
+    if (Main_bHeadless) return;
+
     printf("Recreating SDL2 Window!\n");
     Window_needsRecreate = 0;
 
@@ -900,8 +1049,22 @@ int Window_Main_Linux(int argc, char** argv)
 {
     char cmdLine[1024];
     int result;
+
+    //initscr();
+    //endwin();
+
+    //setvbuf(stdout, NULL, _IOLBF, 0);
+    //setvbuf(stderr, NULL, _IONBF, 0);
+    
+    /*setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    char c;
+    while ((c = getchar()) != EOF) {
+        putchar(c);
+    }*/
     
     // Init SDL
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
 #if defined(MACOS)
@@ -966,6 +1129,15 @@ int Window_Main_Linux(int argc, char** argv)
     result = Main_Startup(cmdLine);
 
     if (!result) return result;
+
+    if (Main_bHeadless)
+    {
+        if (displayWindow) {
+            std3D_FreeResources();
+            SDL_GL_DeleteContext(glWindowContext);
+            SDL_DestroyWindow(displayWindow);
+        }
+    }
 
     g_window_not_destroyed = 1;
     

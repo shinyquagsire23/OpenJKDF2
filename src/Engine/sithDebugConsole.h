@@ -27,9 +27,22 @@
 
 void sithDebugConsole_Initialize();
 int sithDebugConsole_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
-int sithDebugConsole_CmdFly();
+int sithDebugConsole_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+// Matlist
+int sithDebugConsole_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithDebugConsole_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithDebugConsole_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
 #endif // _SITHDEBUGCONSOLE_H

@@ -61,6 +61,7 @@ extern rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 extern GLuint std3D_aLoadedTextures[1024];
 extern size_t std3D_loadedTexturesAmt;
 extern int jkPlayer_enableTextureFilter;
+extern int Main_bHeadless;
 
 int compare_hashstr(uint8_t *p, const char* str){
     char tmp[34];
@@ -530,6 +531,7 @@ std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMater
 
 void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int cel)
 {
+    if (Main_bHeadless) return;
     if (!vbuf || !texture || jkgm_fastpath_disable) return;
 
     jkgm_populate_cache();
@@ -556,6 +558,8 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
 
 int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
 {
+    if (Main_bHeadless) return 0;
+
     texture->emissive_texture_id = 0;
     texture->emissive_factor[0] = 0.0f;
     texture->emissive_factor[1] = 0.0f;

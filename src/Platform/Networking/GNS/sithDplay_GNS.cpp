@@ -43,6 +43,14 @@
     #include <unistd.h>
     #include <signal.h>
 #endif
+
+#define sithDplayGNS_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define sithDplayGNS_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
+    { \
+        printf(fmt, ##__VA_ARGS__);  \
+    } \
+    ;
+
 extern "C"
 {
 void Hack_ResetClients();
@@ -60,6 +68,7 @@ static jkMultiEntry sithDplayGNS_storedEntry;
 extern wchar_t jkGuiMultiplayer_ipText[256];
 char jkGuiMultiplayer_ipText_conv[256];
 static int sithDplayGNS_numEnumd = 0;
+extern int Main_bVerboseNetworking;
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -95,7 +104,7 @@ static void NukeProcess( int rc )
 static void DebugOutput( ESteamNetworkingSocketsDebugOutputType eType, const char *pszMsg )
 {
     SteamNetworkingMicroseconds time = SteamNetworkingUtils()->GetLocalTimestamp() - g_logTimeZero;
-    printf( "%10.6f %s\n", time*1e-6, pszMsg );
+    sithDplayGNS_verbosePrintf( "%10.6f %s\n", time*1e-6, pszMsg );
     fflush(stdout);
     if ( eType == k_ESteamNetworkingSocketsDebugOutputType_Bug )
     {
@@ -278,7 +287,7 @@ public:
         if ( numMsgs == 0 )
             return -1;
         if ( numMsgs < 0 ) {
-            printf( "Error checking for messages (%d)\n", numMsgs);
+            sithDplayGNS_infoPrintf( "Error checking for messages (%d)\n", numMsgs);
             return -1;
         }
         assert( numMsgs == 1 && pIncomingMsg );
@@ -286,7 +295,7 @@ public:
         assert( itClient != m_mapClients.end() );
 
         if (pIncomingMsg->m_cbSize < 8) {
-            printf("Bad packet size %x\n", pIncomingMsg->m_cbSize);
+            sithDplayGNS_infoPrintf("Bad packet size %x\n", pIncomingMsg->m_cbSize);
             pIncomingMsg->Release();
             return -1;
         }
@@ -306,8 +315,6 @@ public:
             return Receive(pIdOut, pMsg, pLenInOut);
         }
 
-        //printf("Received %x bytes from %x\n", pIncomingMsg->m_cbSize, itClient->second.m_id);
-
         int outsize = maxLen;
         if (outsize > pIncomingMsg->m_cbSize-8)
             outsize = pIncomingMsg->m_cbSize-8;
@@ -315,7 +322,7 @@ public:
         memcpy(pMsg, &dataBuf[8], outsize);
         *pLenInOut = outsize;
 
-        printf("Recv %x bytes from %x %x (%x)\n", outsize, idFrom, idTo, *(uint32_t*)pMsg);
+        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%x)\n", outsize, idFrom, idTo, *(uint32_t*)pMsg);
 
         // We don't need this anymore.
         pIncomingMsg->Release();
@@ -335,7 +342,7 @@ public:
         for ( auto &c: m_mapClients )
         {
             if ( c.first != except && c.second.m_id == idTo ) {
-                printf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
+                sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
                 SendBytesToClient( c.first, sendBuffer, dwDataSize+8 );
             }
         }
@@ -529,7 +536,7 @@ private:
                     }
                 }
 
-                printf("Assigning ID: %x\n", nextId);
+                sithDplayGNS_verbosePrintf("Assigning ID: %x\n", nextId);
 
                 GNSInfoPacket infoPkt = {0};
                 infoPkt.id = nextId;
@@ -570,7 +577,7 @@ private:
     static ISteamNetworkingConnectionSignaling* SteamNetCreateConnectionSignalingCallback( ISteamNetworkingSockets *pLocalInterface, const SteamNetworkingIdentity &identityPeer, int nLocalVirtualPort, int nRemoteVirtualPort )
     {
         //s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
-        printf("incoming!\n");
+        sithDplayGNS_verbosePrintf("incoming!\n");
         return nullptr;
     }
 
@@ -684,7 +691,7 @@ public:
         *pLenInOut = 0;
 
         if ( m_hostDisconnected ) {
-            printf( "Host is disconnected, forcing exit...\n");
+            sithDplayGNS_infoPrintf( "Host is disconnected, forcing exit...\n");
             Shutdown();
             m_closed = 1;
             *pIdOut = 1;
@@ -696,7 +703,7 @@ public:
         if ( numMsgs == 0 )
             return -1;
         if ( numMsgs < 0 ) {
-            printf( "Error checking for messages (%d)\n", numMsgs);
+            sithDplayGNS_infoPrintf( "Error checking for messages (%d)\n", numMsgs);
             Shutdown();
             m_closed = 1;
             *pIdOut = 1;
@@ -705,7 +712,7 @@ public:
         }
 
         if (pIncomingMsg->m_cbSize < 8) {
-            printf("Bad packet size %x\n", pIncomingMsg->m_cbSize);
+            sithDplayGNS_infoPrintf("Bad packet size %x\n", pIncomingMsg->m_cbSize);
             Shutdown();
             m_closed = 1;
             return -1;
@@ -728,7 +735,7 @@ public:
         memcpy(pMsg, &dataBuf[8], outsize);
         *pLenInOut = outsize;
 
-        printf("Recv %x bytes from %x %x (%x)\n", pIncomingMsg->m_cbSize, idFrom, idTo, *(uint32_t*)pMsg);
+        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%x)\n", pIncomingMsg->m_cbSize, idFrom, idTo, *(uint32_t*)pMsg);
 
         // We don't need this anymore.
         pIncomingMsg->Release();
@@ -744,11 +751,11 @@ public:
 
         memcpy(&sendBuffer[8], lpData, dwDataSize);
 
-        printf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
+        sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
 
         EResult ret = m_pInterface->SendMessageToConnection( m_hConnection, sendBuffer, dwDataSize+8, k_nSteamNetworkingSend_Reliable, nullptr );
         if (ret < 0) {
-            printf( "Error sending message (%d)\n", ret);
+            sithDplayGNS_infoPrintf( "Error sending message (%d)\n", ret);
         }
         if (ret == k_EResultNoConnection || ret == k_EResultInvalidParam) {
             return 0;
@@ -804,17 +811,17 @@ private:
         if ( numMsgs == 0 )
             return;
         if ( numMsgs < 0 ) {
-            printf( "Error checking for messages (%d)\n", numMsgs);
+            sithDplayGNS_infoPrintf( "Error checking for messages (%d)\n", numMsgs);
             return;
         }
 
         // Just echo anything we get from the server
-        printf("Received %x bytes (%x)\n", pIncomingMsg->m_cbSize, sizeof(GNSInfoPacket));
+        sithDplayGNS_verbosePrintf("Received %x bytes (%x)\n", pIncomingMsg->m_cbSize, sizeof(GNSInfoPacket));
 
         if (id == 0xFFFFFFFF && pIncomingMsg->m_cbSize == sizeof(GNSInfoPacket)) {
             GNSInfoPacket* pPkt = (GNSInfoPacket*)pIncomingMsg->m_pData;
             id = pPkt->id;
-            printf("We are ID %x\n", id);
+            sithDplayGNS_verbosePrintf("We are ID %x\n", id);
 
             sithDplayGNS_storedEntryEnum = pPkt->entry;
             sithDplayGNS_storedEntryEnum.field_E0 = 10;
@@ -832,20 +839,20 @@ private:
         if ( numMsgs == 0 )
             return -1;
         if ( numMsgs < 0 ) {
-            printf( "Error checking for messages (%d)\n", numMsgs);
+            sithDplayGNS_infoPrintf( "Error checking for messages (%d)\n", numMsgs);
             Shutdown();
             m_closed = 1;
             return 2;
         }
 
         if (pMsg->m_cbSize < 8) {
-            printf("Bad packet size %x\n", pMsg->m_cbSize);
+            sithDplayGNS_infoPrintf("Bad packet size %x\n", pMsg->m_cbSize);
             Shutdown();
             m_closed = 1;
             return -1;
         }
 
-        printf("Got broadcast %x\n", pMsg->m_cbSize);
+        sithDplayGNS_infoPrintf("Got broadcast %x\n", pMsg->m_cbSize);
         return 0;
     }
 
@@ -923,7 +930,7 @@ private:
     static ISteamNetworkingConnectionSignaling* SteamNetCreateConnectionSignalingCallback( ISteamNetworkingSockets *pLocalInterface, const SteamNetworkingIdentity &identityPeer, int nLocalVirtualPort, int nRemoteVirtualPort )
     {
         //s_pCallbackInstance->OnSteamNetConnectionStatusChanged( pInfo );
-        printf("incoming!\n");
+        sithDplayGNS_infoPrintf("incoming!\n");
         return nullptr;
     }
 
@@ -1157,6 +1164,7 @@ int DirectPlay_GetSession_passwordidk(jkMultiEntry* pEntry)
     return 1;
 }
 
+static int sithDplay_EnumThread_bForce = 0;
 static int sithDplay_EnumThread_bInit = 0;
 static SDL_Thread *sithDplay_EnumThread_thread = NULL;
 static SDL_mutex* sithDplay_EnumThread_mutex = NULL;
@@ -1172,10 +1180,11 @@ static int sithDplay_EnumThread(void *ptr)
             addrServer.m_port = DEFAULT_SERVER_PORT;
         }
 
-        if (strncmp(jkGuiMultiplayer_ipText_conv, addrServerLast, 256) || addrServerPortLast != addrServer.m_port)
+        if (sithDplay_EnumThread_bForce || strncmp(jkGuiMultiplayer_ipText_conv, addrServerLast, 256) || addrServerPortLast != addrServer.m_port)
             client.GetServerInfo(addrServer);
         strncpy(addrServerLast, jkGuiMultiplayer_ipText_conv, 256);
         addrServerPortLast = addrServer.m_port;
+        sithDplay_EnumThread_bForce = 0;
 
         SDL_UnlockMutex(sithDplay_EnumThread_mutex);
 
@@ -1187,7 +1196,6 @@ static int sithDplay_EnumThread(void *ptr)
 
 int DirectPlay_EnumSessions2()
 {
-    printf("sithDplay_EnumSessions2\n");
     if (!sithDplay_EnumThread_bInit)
         return 0;
 
@@ -1197,18 +1205,18 @@ int DirectPlay_EnumSessions2()
     SDL_WaitThread(sithDplay_EnumThread_thread, &threadReturnValue);
     sithDplay_EnumThread_thread = NULL;
 
-    printf("Enum thread done\n");
+    sithDplayGNS_verbosePrintf("Enum thread done\n");
 
     return 0;
 }
 
 int sithDplay_EnumSessions(int a, void* b)
 {
-    printf("sithDplay_EnumSessions\n");
     if (!sithDplay_EnumThread_mutex)
         sithDplay_EnumThread_mutex = SDL_CreateMutex();
 
     SDL_LockMutex(sithDplay_EnumThread_mutex);
+    sithDplay_EnumThread_bForce = 1;
     jkGuiMultiplayer_aEntries[0] = sithDplayGNS_storedEntryEnum;
     dplay_dword_55D618 = sithDplayGNS_numEnumd;
     SDL_UnlockMutex(sithDplay_EnumThread_mutex);
@@ -1228,7 +1236,7 @@ int sithDplay_EnumSessions(int a, void* b)
     sithDplay_EnumThread_bInit = 1;
 
     sithDplay_EnumThread_thread = SDL_CreateThread(sithDplay_EnumThread, "sithDplay_EnumThread", (void *)NULL);
-    printf("Enum thread start\n");
+    sithDplayGNS_verbosePrintf("Enum thread start\n");
 
     //DirectPlay_EnumSessions2();
 

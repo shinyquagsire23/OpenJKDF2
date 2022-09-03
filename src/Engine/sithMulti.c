@@ -18,6 +18,14 @@
 #include "World/sithSector.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sith.h"
+#include "Main/Main.h"
+
+#define sithMulti_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define sithMulti_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
+    { \
+        printf(fmt, ##__VA_ARGS__);  \
+    } \
+    ;
 
 static wchar_t sithMulti_chatWStrTmp[256]; // Added
 
@@ -414,7 +422,7 @@ void sithMulti_HandleScore()
             {
                 if ( sithNet_teamScore[i] >= sithNet_scorelimit ) {
                     score_limit_met = 1;
-                    printf("team score limit met %x %x\n", sithNet_teamScore[i], sithNet_scorelimit);
+                    sithMulti_infoPrintf("Team score limit met by team %d, %u pts of %u\n", i, sithNet_teamScore[i], sithNet_scorelimit);
                 }
             }
         }
@@ -424,7 +432,7 @@ void sithMulti_HandleScore()
             {
                 if ( jkPlayer_playerInfos[i].score >= sithNet_scorelimit ) {
                     score_limit_met = 1;
-                    printf("player score limit met %x %x\n", jkPlayer_playerInfos[i].score, sithNet_scorelimit);
+                    sithMulti_infoPrintf("Player score limit met by player %d (netid %u), %u pts of %u\n", i, jkPlayer_playerInfos[i].net_id, jkPlayer_playerInfos[i].score, sithNet_scorelimit);
                 }
             }
         }
@@ -561,7 +569,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     v2 = NETMSG_POPS32();
     NETMSG_POPWSTR(jkPlayer_playerInfos[v1].player_name, 0x10);
 
-    printf("sithMulti_HandleJoinLeave %x %x %x\n", v1, v2, sithDplay_dplayIdSelf);
+    sithMulti_verbosePrintf("sithMulti_HandleJoinLeave %x %x %x\n", v1, v2, sithDplay_dplayIdSelf);
 
     if ( v2 != sithDplay_dplayIdSelf )
     {
@@ -1036,11 +1044,11 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
     {
         NETMSG_POPSTR(v11, 32);
         
-        printf("sithMulti_HandleRequestConnect %x %x %s\n", sithDplay_bIsServer, v1, v11);
+        sithMulti_verbosePrintf("sithMulti_HandleRequestConnect, id %x map %s\n", v1, v11);
 
         if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
         {
-            printf("Bad map name %s\n", v11);
+            sithMulti_verbosePrintf("Bad map name %s\n", v11);
 
             NETMSG_START;
             NETMSG_PUSHS32(6);
@@ -1065,7 +1073,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         }
         if ( v3 < jkPlayer_maxPlayers )
         {
-            printf("Idk 2, %x %x\n", v3, jkPlayer_maxPlayers);
+            sithMulti_verbosePrintf("Idk 2, %x %x\n", v3, jkPlayer_maxPlayers);
             NETMSG_START;
 
             NETMSG_PUSHS32(v3);
@@ -1079,7 +1087,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         sithDplay_cogMsg_SendEnumPlayers(v1);
         if ( sithNet_dword_83263C )
         {
-            printf("Idk 1\n");
+            sithMulti_verbosePrintf("Idk 1\n");
             NETMSG_START;
             NETMSG_PUSHS32(3);
             NETMSG_PUSHS32(0);
@@ -1092,7 +1100,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         {
             if ( sithMulti_sendto_id == v1 )
             {
-                printf("idk 2\n");
+                sithMulti_verbosePrintf("idk 2\n");
                 NETMSG_START;
                 NETMSG_PUSHS32(0);
                 NETMSG_PUSHF32(0.5);
@@ -1102,7 +1110,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             }
             else
             {
-                printf("idk 3\n");
+                sithMulti_verbosePrintf("idk 3\n");
                 NETMSG_START;
                 NETMSG_PUSHS32(1);
                 NETMSG_PUSHS32(0);
@@ -1126,7 +1134,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         }
         if ( v5 == jkPlayer_maxPlayers )
         {
-            printf("Too many players\n");
+            sithMulti_verbosePrintf("Too many players\n");
             NETMSG_START;
             NETMSG_PUSHS32(5);
             NETMSG_PUSHS32(0);
@@ -1144,7 +1152,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         }
         if ( v7 != DirectPlay_numPlayers )
         {
-            printf("aaaaaa %x\n", sithMulti_requestConnectIdx);
+            sithMulti_verbosePrintf("aaaaaa %x\n", sithMulti_requestConnectIdx);
             sithPlayer_sub_4C8910(sithMulti_requestConnectIdx);
 
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_requestConnectIdx].player_name, 0x10);
@@ -1156,7 +1164,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             v10 = sithNet_checksum;
             if ( v10 != popped_check )
             {
-                printf("Bad checksum %x vs %x\n", v10, popped_check);
+                sithMulti_verbosePrintf("Bad checksum %x vs %x\n", v10, popped_check);
 #if 0
                 NETMSG_START;
                 NETMSG_PUSHS32(4);
@@ -1167,7 +1175,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
 #endif
             }
 
-            printf("Sending the final\n");
+            sithMulti_verbosePrintf("Sending the final\n");
             NETMSG_START;
             NETMSG_PUSHS32(0);
             NETMSG_PUSHF32(0.25);
@@ -1183,7 +1191,6 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             sithDplay_dword_832210 = 0;
             sithMulti_dword_832620 = 0;
         }
-        printf("Rip? %x %x %x\n", v7, DirectPlay_numPlayers, v1);
     }
     return 1;
 }
@@ -1426,7 +1433,7 @@ LABEL_30:
                                     if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
                                         jkPlayer_playerInfos[sithMulti_requestConnectIdx].teamNum = (sithMulti_requestConnectIdx & 1) + 1;
                                     v18 = sithMulti_sendto_id;
-                                    printf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);
+                                    sithMulti_verbosePrintf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);
                                     jkPlayer_playerInfos[v16].net_id = sithMulti_sendto_id;
                                     sithMulti_SendLeaveJoin(v18, 1);
                                     v17 = sithMulti_sendto_id;
@@ -1488,4 +1495,30 @@ LABEL_64:
             }
         }
     }
+}
+
+uint32_t sithMulti_IterPlayersnothingidk(int net_id)
+{
+    uint32_t result; // eax
+    sithPlayerInfo* i; // ecx
+
+    result = 0;
+    if ( !jkPlayer_maxPlayers )
+        return -1;
+    for ( i = &jkPlayer_playerInfos[0]; net_id != i->net_id; ++i )
+    {
+        if ( ++result >= jkPlayer_maxPlayers )
+            return -1;
+    }
+    return result;
+}
+
+int sithMulti_SendPing(int sendtoId)
+{
+    sithMulti_dword_832654 = sithTime_curMs;
+    sithCogVm_netMsgTmp.pktData[0] = sithTime_curMs;
+    sithCogVm_netMsgTmp.netMsg.msg_size = 4;
+    sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
+    sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_PING;
+    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sendtoId, 1, 0);
 }

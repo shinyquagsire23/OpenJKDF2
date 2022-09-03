@@ -55,6 +55,7 @@ void sithPlayer_sub_4C8910(unsigned int idx);
 int sithPlayer_sub_4C87C0(int idx, int netId);
 void sithPlayer_debug_ToNextCheckpoint(sithThing *player);
 uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx);
+int sithPlayer_FindPlayerByName(wchar_t *pwStr);
 
 //static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
 //static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;

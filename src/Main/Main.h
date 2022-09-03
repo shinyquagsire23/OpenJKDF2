@@ -9,6 +9,12 @@
 #define Main_ParseCmdLine_ADDR (0x004014B0)
 #define Main_FPrintf_ADDR (0x00401870)
 
+#ifdef QOL_IMPROVEMENTS
+extern int Main_bDedicatedServer;
+extern int Main_bHeadless;
+extern int Main_bVerboseNetworking;
+#endif
+
 int Main_Startup(const char *cmdline);
 void Main_Shutdown();
 void Main_ParseCmdLine(char *cmdline);

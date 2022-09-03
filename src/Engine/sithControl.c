@@ -831,7 +831,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
 
     // TODO: fix this?
 #ifdef ARCH_64BIT
-    g_debugmodeFlags &= ~0x100;
+    //g_debugmodeFlags &= ~0x100;
 #endif
 
     if ( player->moveType != SITH_MT_PHYSICS )

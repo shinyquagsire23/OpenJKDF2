@@ -1,6 +1,7 @@
 #include "sith.h"
 
 #include "Main/jkGame.h"
+#include "Main/Main.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithCollision.h"
@@ -77,6 +78,11 @@ int sith_Startup(struct common_functions *commonFuncs)
     g_debugmodeFlags = 0;
     jkPlayer_setDiff = 0;
     g_mapModeFlags = 0;
+
+    // Added
+    if (Main_bHeadless || Main_bDedicatedServer) {
+        g_debugmodeFlags |= 0x100;
+    }
 
     if ( !is_started )
         return 0;

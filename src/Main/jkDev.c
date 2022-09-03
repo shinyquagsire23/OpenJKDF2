@@ -16,6 +16,7 @@
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"
+#include "wprintf.h"
 #include "../jk.h"
 
 void jkDev_Startup()
@@ -285,6 +286,13 @@ LABEL_7:
     ++jkDev_log_55A4A4;
     jkDev_aEntries[v6].bDrawEntry = 2;
     jkDev_aEntries[v6].field_10C = 2;
+#ifdef QOL_IMPROVEMENTS
+    char tmp[256];
+    stdString_WcharToChar(tmp, str, 255);
+    tmp[255] = 0;
+    printf("\r                                            \r");
+    printf("%s%c", tmp, tmp[strlen(tmp)-1] == '\n' ? ' ' : '\n');
+#endif
     return v5;
 }
 
@@ -303,7 +311,7 @@ void jkDev_DebugLog(char *lParam)
         WinIdk_PrintConsole(v1, (LPARAM)lParam, 50);
     }
 #else
-    printf("%s", lParam);
+    //printf("%s", lParam);
 #endif
 }
 
@@ -492,7 +500,7 @@ int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdFly();
+        sithDebugConsole_CmdFly(pCmd, pArgStr);
     return 1;
 }
 

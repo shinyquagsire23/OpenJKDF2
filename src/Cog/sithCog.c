@@ -32,8 +32,6 @@
 
 #include "jk.h"
 
-void (*sithDebugConsole_CmdCogList)(void) = (void*)0x004EE2F0;
-
 static int sithCog_bInitted = 0;
 
 int sithCog_Startup()

@@ -649,6 +649,8 @@ void std3D_FreeResources()
 
 int std3D_StartScene()
 {
+    if (Main_bHeadless) return 1;
+
     //printf("Begin draw\n");
     if (!has_initted)
     {
@@ -790,6 +792,13 @@ int std3D_StartScene()
 
 int std3D_EndScene()
 {
+    if (Main_bHeadless) {
+        last_tex = NULL;
+        last_flags = 0;
+        std3D_ResetRenderList();
+        return 1;
+    }
+
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
@@ -897,6 +906,8 @@ static rdDDrawSurface* test_idk = NULL;
 void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips);
 void std3D_DrawMenu()
 {
+    if (Main_bHeadless) return;
+
     //printf("Draw menu\n");
     std3D_DrawSceneFbo();
 
@@ -1575,6 +1586,8 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
 
 void std3D_DrawRenderList()
 {
+    if (Main_bHeadless) return;
+
     //printf("Draw render list\n");
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
@@ -1932,12 +1945,15 @@ int std3D_DrawOverlay()
 
 void std3D_UnloadAllTextures()
 {
-    glDeleteTextures(std3D_loadedTexturesAmt, std3D_aLoadedTextures);
+    if (!Main_bHeadless)
+        glDeleteTextures(std3D_loadedTexturesAmt, std3D_aLoadedTextures);
     std3D_loadedTexturesAmt = 0;
 }
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 {
+    if (Main_bHeadless) return;
+
     if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
     {
         return;
@@ -1950,6 +1966,8 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
 {
+    if (Main_bHeadless) return;
+
     if (GL_tmpLinesAmt + num_lines > STD3D_MAX_VERTICES)
     {
         return;
@@ -1961,6 +1979,8 @@ void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 {
+    if (Main_bHeadless) return 1;
+
     if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
     {
         return 0;
@@ -1980,6 +2000,7 @@ int std3D_ClearZBuffer()
 
 int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
+    if (Main_bHeadless) return 1;
     //printf("Add to texture cache\n");
     
     GLuint image_texture;
@@ -2115,6 +2136,11 @@ int std3D_HasAlphaFlatStippled()
 
 void std3D_PurgeTextureCache()
 {
+    if (Main_bHeadless) {
+        std3D_loadedTexturesAmt = 0;
+        return;
+    }
+
     printf("Purging texture cache...\n");
     for (int i = 0; i < 1024; i++)
     {

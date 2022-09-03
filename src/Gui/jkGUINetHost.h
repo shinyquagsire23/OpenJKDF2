@@ -11,6 +11,9 @@
 #define jkGuiNetHost_sub_4119D0_ADDR (0x004119D0)
 #define jkGuiNetHost_sub_411AE0_ADDR (0x00411AE0)
 
+void jkGuiNetHost_SaveSettings();
+void jkGuiNetHost_LoadSettings();
+
 void jkGuiNetHost_Initialize();
 void jkGuiNetHost_Shutdown();
 int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry);

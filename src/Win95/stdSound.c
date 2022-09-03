@@ -1,6 +1,7 @@
 #include "stdSound.h"
 
 #include "Gui/jkGUISound.h"
+#include "Main/Main.h"
 #include "stdPlatform.h"
 
 #include "jk.h"
@@ -44,6 +45,8 @@ ALCcontext *context;
 
 int stdSound_Initialize()
 {
+    if (Main_bHeadless) return 1;
+
 	ALboolean enumeration;
 	const ALCchar *defaultDeviceName = NULL;
 	int ret;
@@ -91,6 +94,8 @@ int stdSound_Initialize()
 
 void stdSound_Shutdown()
 {
+    if (Main_bHeadless) return;
+
 	device = alcGetContextsDevice(context);
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
@@ -118,7 +123,8 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16
     out->refcnt = 1;
     out->vol = 1.0;
     
-    alGenBuffers(1, &out->buffer);
+    if (!Main_bHeadless)
+        alGenBuffers(1, &out->buffer);
     
     int format = 0;
     if (bStereo)
@@ -150,7 +156,8 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
     
     _memset(sound->data, 0, sound->bufferBytes);
     
-    alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
+    if (!Main_bHeadless)
+        alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
     
     
     return sound->data;
@@ -158,13 +165,16 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
 
 int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead)
 {
-    alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
+    if (!Main_bHeadless)
+        alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
 
     return 1;
 }
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
+    if (Main_bHeadless) return 1;
+
     //alSourceStop(buf->source);
     
     if (!buf->source)
@@ -190,6 +200,9 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     ALint source_state;
     
+    if (Main_bHeadless)
+        goto end;
+
     //sound->refcnt--;
     //if (sound->refcnt > 0)
     //    return;
@@ -211,7 +224,8 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 	
 	if (!sound->bIsCopy && sound->buffer)
 	    alDeleteBuffers(1, &sound->buffer);
-	
+
+end:
 	sound->source = 0;
 	sound->buffer = 0;
 	
@@ -222,6 +236,8 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
 {
+    if (Main_bHeadless) return 1;
+
     //alSourcef(sound->source, AL_PITCH, 1.0);
 	//alSourcef(sound->source, AL_GAIN, 1.0);
 	//alSource3f(sound->source, AL_POSITION, 0, 0, 0);
@@ -248,6 +264,8 @@ void stdSound_BufferSetPan(stdSound_buffer_t* a1, float a2)
 
 void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 {
+    if (Main_bHeadless) return;
+
     float pitch = (double)freq / (double)sound->nSamplesPerSec;
     
     if (sound->source)
@@ -297,6 +315,8 @@ void stdSound_IA3D_idk(float a)
 
 int stdSound_BufferStop(stdSound_buffer_t* buf)
 {
+    if (Main_bHeadless) return 1;
+
     if (buf->source)
     {
         alSourcei(buf->source, AL_LOOPING, AL_FALSE);
@@ -307,6 +327,7 @@ int stdSound_BufferStop(stdSound_buffer_t* buf)
 
 void stdSound_BufferSetVolume(stdSound_buffer_t* sound, float vol)
 {
+    if (Main_bHeadless) return;
     if (!sound) return;
     
     sound->vol = vol * stdSound_fMenuVolume;
@@ -352,6 +373,8 @@ void stdSound_SetVelocity(stdSound_buffer_t* sound, rdVector3 *vel)
 
 int stdSound_IsPlaying(stdSound_buffer_t* sound, rdVector3 *pos)
 {
+    if (Main_bHeadless) return 0;
+
     if (pos)
         rdVector_Zero3(pos);
     

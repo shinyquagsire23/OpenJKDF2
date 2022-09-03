@@ -37,6 +37,7 @@
 #include "Win95/stdDisplay.h"
 #include "Win95/stdConsole.h"
 #include "Platform/wuRegistry.h"
+#include "Platform/std3D.h"
 #include "Win95/Video.h"
 #include "Win95/Window.h"
 #include "Win95/Windows.h"
@@ -53,8 +54,11 @@
 #include "Main/jkControl.h"
 #include "Main/jkSmack.h"
 #include "Main/smack.h"
+#include "Main/jkMain.h"
 #include "Engine/rdroid.h"
 #include "Engine/sith.h"
+#include "Engine/sithMulti.h"
+#include "General/stdString.h"
 
 #include "General/util.h"
 #include "General/stdFileUtil.h"
@@ -82,6 +86,12 @@
 #endif
 
 static common_functions hs;
+
+#ifdef QOL_IMPROVEMENTS
+int Main_bDedicatedServer = 0;
+int Main_bHeadless = 0;
+int Main_bVerboseNetworking = 0;
+#endif
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
 const char* aRequiredAssets[] = {
@@ -746,6 +756,96 @@ void Main_CheckRequiredAssets(int doInstall)
 }
 #endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
+#ifdef QOL_IMPROVEMENTS
+int Main_StartupDedicated()
+{
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
+    Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
+
+    jkGuiNetHost_bIsDedicated = 1;
+    jkGuiNetHost_SaveSettings();
+    jkGuiNetHost_LoadSettings();
+
+    // Fake player
+    stdString_SafeWStrCopy(jkGuiMultiplayer_mpcInfo.name, L"", 32);
+    stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.model, "ky.3do", 32);
+    stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.soundClass, "ky.snd", 32);
+    //stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.gap80, "", 32);
+    stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.sideMat, "sabergreen1.mat", 32);
+    stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.tipMat, "sabergreen0.mat", 32);
+    jkGuiMultiplayer_mpcInfo.jediRank = 0;
+
+    // Set up minimal render settings
+    jkPlayer_fov = 90;
+    jkPlayer_fovIsVertical = 1;
+    jkPlayer_enableTextureFilter = 0;
+    jkPlayer_enableOrigAspect = 0;
+    jkPlayer_enableBloom = 0;
+    jkPlayer_fpslimit = 150;
+    jkPlayer_enableVsync = 0;
+    jkPlayer_ssaaMultiple = 1.0;
+    jkPlayer_enableSSAO = 0;
+    jkPlayer_gamma = 1.0;
+    
+    jkMultiEntry3 v34;
+    memset(&v34, 0, sizeof(v34));
+
+    wuRegistry_GetWString("gameName", v34.serverName, 32, L"OpenJKDF2 Dedicated Server");
+    wuRegistry_GetWString("serverPassword", v34.wPassword, 32, L"");
+    wuRegistry_GetString("serverEpisodeGob", v34.episodeGobName, 32, "JK1MP");
+    wuRegistry_GetString("serverMapJkl", v34.mapJklFname, 32, "m2.jkl");
+
+    if (_wcslen(v34.wPassword)) {
+        jkGuiNetHost_sessionFlags |= SESSIONFLAG_PASSWORD;
+    }
+
+    jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
+
+    v34.tickRateMs = jkGuiNetHost_tickRate;
+    v34.maxPlayers = jkGuiNetHost_maxPlayers;
+    v34.sessionFlags = jkGuiNetHost_sessionFlags;
+    v34.multiModeFlags = jkGuiNetHost_gameFlags;
+    v34.maxRank = jkGuiNetHost_maxRank;
+    v34.scoreLimit = jkGuiNetHost_scoreLimit;
+    v34.timeLimit = jkGuiNetHost_timeLimit;
+
+    sithNet_scorelimit = v34.scoreLimit;
+    sithNet_multiplayer_timelimit = v34.timeLimit;
+
+    int v21 = sithMulti_CreatePlayer(
+              v34.serverName,
+              v34.wPassword,
+              v34.episodeGobName,
+              v34.mapJklFname,
+              v34.maxPlayers,
+              v34.sessionFlags,
+              v34.multiModeFlags,
+              v34.tickRateMs,
+              v34.maxRank);
+    if ( v21 == 0x88770118 )
+    {
+        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_USERCANCEL"));
+    }
+    else if ( v21 )
+    {
+        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_NOCONNECT"));
+    }
+    
+    std3D_StartScene();
+    std3D_EndScene();
+    sith_Load("static.jkl");
+    jkHudInv_InitItems();
+
+    if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
+    {
+        return 1;
+    }
+
+    return 0;
+}
+#endif // QOL_IMPROVEMENTS
+
 int Main_Startup(const char *cmdline)
 {
     int result; // eax
@@ -960,6 +1060,14 @@ int Main_Startup(const char *cmdline)
 
         if (jkRes_LoadCD(0))
         {
+#ifdef QOL_IMPROVEMENTS
+            if (Main_bDedicatedServer) {
+                if (Main_StartupDedicated())
+                {
+                    return 1;
+                }
+            }
+#endif
             jkSmack_SmackPlay("01-02a.smk");
             Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
             return 1;
@@ -1030,6 +1138,23 @@ void Main_Shutdown()
     exit(0);
 }
 
+// Inlined?
+void Main_ShowHelp()
+{
+    pHS->messagePrint("\n", 0, 0, 0, 0);
+    pHS->messagePrint(
+        "Dark Forces II: Jedi Knight v%d.%02d%c\n",
+        jkGuiTitle_verMajor,
+        jkGuiTitle_verMinor,
+        jkGuiTitle_verRevision,
+        0);
+    pHS->messagePrint("(c) 1997 Lucasfilm Ltd. and LucasArts Entertainment Company. All Rights Reserved.");
+    pHS->messagePrint("Built %s %s\n", "Sep 10 1997", "09:39:21");
+    pHS->messagePrint("\n");
+    pHS->messagePrint("\n");
+    jk_exit(3);
+}
+
 void Main_ParseCmdLine(char *cmdline)
 {
     char *v1; // esi
@@ -1037,114 +1162,96 @@ void Main_ParseCmdLine(char *cmdline)
     char *v3; // esi
     char *v4; // eax
 
-    v1 = _strtok(cmdline, " \t");
-    if ( v1 )
+    for (v1 = _strtok(cmdline, " \t"); v1; v1 = _strtok(0, " \t"))
     {
-        while ( 1 )
+        if ( !__strcmpi(v1, "-path") || !__strcmpi(v1, "/path") )
         {
-            if ( !__strcmpi(v1, "-path") || !__strcmpi(v1, "/path") )
+            v4 = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_path, v4, 0x80);
+        }
+        else if ( !__strcmpi(v1, "-devMode") || !__strcmpi(v1, "devMode") )
+        {
+            Main_bDevMode = 1;
+            Main_bDisplayConfig = 1;
+        }
+        else if (!__strcmpi(v1, "-dispStats") || !__strcmpi(v1, "/dispStats") )
+        {
+            Main_bDispStats = 1;
+        }
+        else if (!__strcmpi(v1, "-frameRate") || !__strcmpi(v1, "/frameRate") )
+        {
+            Main_bFrameRate = 1;
+        }
+        else if (!__strcmpi(v1, "-windowGUI") || !__strcmpi(v1, "/windowGUI") )
+        {
+            Main_bWindowGUI = 1;
+        }
+        else if ( !__strcmpi(v1, "-displayConfig") || !__strcmpi(v1, "/displayConfig") )
+        {
+            Main_bDisplayConfig = 1;
+        }
+        else if ( !__strcmpi(v1, "-?") || !__strcmpi(v1, "/?") )
+        {
+            Main_ShowHelp();
+        }
+        else if (!__strcmpi(v1, "-debug") || !__strcmpi(v1, "/debug") )
+        {
+            v3 = _strtok(0, " \t");
+            if (!__strcmpi(v3, "con") )
             {
-                v4 = _strtok(0, " \t");
-                _strncpy(Main_path, v4, 0x7Fu);
-                Main_path[127] = 0;
-                goto LABEL_40;
+                Main_logLevel = 1;
             }
-            if ( !__strcmpi(v1, "-devMode") || !__strcmpi(v1, "devMode") )
-                break;
-            if ( __strcmpi(v1, "-dispStats") && __strcmpi(v1, "/dispStats") )
+            else if (!__strcmpi(v3, "log") )
             {
-                if ( __strcmpi(v1, "-frameRate") && __strcmpi(v1, "/frameRate") )
-                {
-                    if ( __strcmpi(v1, "-windowGUI") && __strcmpi(v1, "/windowGUI") )
-                    {
-                        if ( !__strcmpi(v1, "-displayConfig") || !__strcmpi(v1, "/displayConfig") )
-                            goto LABEL_38;
-                        if ( !__strcmpi(v1, "-?") || !__strcmpi(v1, "/?") )
-                            goto LABEL_43;
-                        if ( __strcmpi(v1, "-debug") && __strcmpi(v1, "/debug") )
-                        {
-                            if ( __strcmpi(v1, "-verbose") && __strcmpi(v1, "/verbose") )
-                            {
-                                if ( __strcmpi(v1, "-noHUD") && __strcmpi(v1, "/noHUD") )
-                                {
-                                    pHS->errorPrint("Error in arguments.\n", 0, 0, 0, 0);
-LABEL_43:
-                                    pHS->messagePrint("\n", 0, 0, 0, 0);
-                                    pHS->messagePrint(
-                                        "Dark Forces II: Jedi Knight v%d.%02d%c\n",
-                                        jkGuiTitle_verMajor,
-                                        jkGuiTitle_verMinor,
-                                        jkGuiTitle_verRevision,
-                                        0);
-                                    pHS->messagePrint("(c) 1997 Lucasfilm Ltd. and LucasArts Entertainment Company. All Rights Reserved.", 0, 0, 0, 0);
-                                    pHS->messagePrint("Built %s %s\n", "Sep 10 1997", "09:39:21", 0, 0);
-                                    pHS->messagePrint("\n", 0, 0, 0, 0);
-                                    pHS->messagePrint("\n", 0, 0, 0, 0);
-                                    jk_exit(3);
-                                }
-                                Main_bNoHUD = 1;
-                            }
-                            else
-                            {
-                                v2 = _strtok(0, " \t");
-                                if ( _atoi(v2) < 0 )
-                                {
-                                    Main_verboseLevel = 0;
-                                }
-                                else if ( _atoi(v2) > 2 )
-                                {
-                                    Main_verboseLevel = 2;
-                                }
-                                else
-                                {
-                                    Main_verboseLevel = _atoi(v2);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            v3 = _strtok(0, " \t");
-                            if ( __strcmpi(v3, "con") )
-                            {
-                                if ( __strcmpi(v3, "log") )
-                                {
-                                    if ( __strcmpi(v3, "none") )
-                                        goto LABEL_43;
-                                    Main_logLevel = 0;
-                                }
-                                else
-                                {
-                                    Main_logLevel = 2;
-                                }
-                            }
-                            else
-                            {
-                                Main_logLevel = 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Main_bWindowGUI = 1;
-                    }
-                }
-                else
-                {
-                    Main_bFrameRate = 1;
-                }
+                Main_logLevel = 2;
+            }
+            else if (!__strcmpi(v3, "none") )
+            {
+                Main_logLevel = 0;
             }
             else
             {
-                Main_bDispStats = 1;
+                Main_ShowHelp();
             }
-LABEL_40:
-            v1 = _strtok(0, " \t");
-            if ( !v1 )
-                return;
         }
-        Main_bDevMode = 1;
-LABEL_38:
-        Main_bDisplayConfig = 1;
-        goto LABEL_40;
+        else if (!__strcmpi(v1, "-verbose") || !__strcmpi(v1, "/verbose") )
+        {
+            v2 = _strtok(0, " \t");
+            if ( _atoi(v2) < 0 )
+            {
+                Main_verboseLevel = 0;
+            }
+            else if ( _atoi(v2) > 2 )
+            {
+                Main_verboseLevel = 2;
+            }
+            else
+            {
+                Main_verboseLevel = _atoi(v2);
+            }
+        }
+        else if (!__strcmpi(v1, "-noHUD") || !__strcmpi(v1, "/noHUD") )
+        {
+            Main_bNoHUD = 1;
+        }
+#ifdef QOL_IMPROVEMENTS
+        else if (!__strcmpi(v1, "-dedicatedServer") || !__strcmpi(v1, "/dedicatedServer") )
+        {
+            Main_bDedicatedServer = 1;
+        }
+        else if (!__strcmpi(v1, "-headless") || !__strcmpi(v1, "/headless") )
+        {
+            Main_bHeadless = 1;
+        }
+        else if (!__strcmpi(v1, "-verboseNetworking") || !__strcmpi(v1, "/verboseNetworking") )
+        {
+            Main_bVerboseNetworking = 1;
+        }
+#endif
+        else
+        {
+            pHS->errorPrint("Error in arguments.\n", 0, 0, 0, 0);
+            Main_ShowHelp();
+        }
     }
 }

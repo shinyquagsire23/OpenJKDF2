@@ -682,3 +682,21 @@ uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx)
     }
     return -1;
 }
+
+int sithPlayer_FindPlayerByName(wchar_t *pwStr)
+{
+    int v1; // edi
+    sithPlayerInfo *i; // esi
+
+    if ( !pwStr )
+        return -1;
+    v1 = 0;
+    if ( !jkPlayer_maxPlayers )
+        return -1;
+    for ( i = jkPlayer_playerInfos; (i->flags & 1) == 0 || __wcsicmp(i->player_name, pwStr); ++i )
+    {
+        if ( ++v1 >= (unsigned int)jkPlayer_maxPlayers )
+            return -1;
+    }
+    return v1;
+}
