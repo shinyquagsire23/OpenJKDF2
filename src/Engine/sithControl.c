@@ -932,7 +932,7 @@ debug_controls:
             sithThing_MoveToSector(player, pThing->sector, 0);
             sithWorld_pCurrentWorld->cameraFocus = pThing;
             sithWorld_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
-            stdPalEffects_FlushAllEffects();
+            stdPalEffects_FlushAllAdds();
         }
     }
 

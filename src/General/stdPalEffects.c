@@ -62,6 +62,15 @@ void stdPalEffects_FlushAllEffects()
     stdPalEffects_numEffectRequests = 0;
 }
 
+// Added
+void stdPalEffects_FlushAllAdds()
+{
+    for (int i = 0; i < 32; i++)
+    {
+        _memset(&stdPalEffects_aEffects[i].effect.add, 0, sizeof(stdPalEffects_aEffects[i].effect.add));
+    }
+}
+
 stdPalEffect* stdPalEffects_GetEffectPointer(int idx)
 {
     return &stdPalEffects_aEffects[idx].effect;

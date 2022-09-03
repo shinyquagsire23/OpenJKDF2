@@ -33,6 +33,7 @@ void stdPalEffects_Close();
 int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);
 void stdPalEffects_FlushAllEffects();
+void stdPalEffects_FlushAllAdds();
 stdPalEffect* stdPalEffects_GetEffectPointer(int idx);
 int stdPalEffects_RefreshPalette();
 void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState);
