@@ -409,7 +409,7 @@ void jkHud_Draw()
     stdDisplay_VBufferLock(Video_pCanvas->vbuffer);
 #endif
 
-    if ( v4->type == SITH_THING_PLAYER )
+    if ( v4->type == SITH_THING_PLAYER && !(sithNet_isServer && jkGuiNetHost_bIsDedicated) )
     {
         v5 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_BATTERY);
         if ( v5 < 0 )
@@ -817,7 +817,7 @@ LABEL_116:
     {
         jkHud_idk16 = 0;
     }
-    if ( Video_modeStruct.viewSizeIdx < 0xAu )
+    if ( Video_modeStruct.viewSizeIdx < 0xAu  && !(sithNet_isServer && jkGuiNetHost_bIsDedicated))
     {
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusLeftBm->mipSurfaces, jkHud_leftBlitX, jkHud_leftBlitY, 0, 1);
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusRightBm->mipSurfaces, jkHud_rightBlitX, jkHud_rightBlitY, 0, 1);
