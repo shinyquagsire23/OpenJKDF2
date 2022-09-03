@@ -310,14 +310,16 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 #ifdef SDL2_RENDER
 
 #include <fcntl.h> 
-#include <poll.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <curses.h>
 
+#ifndef WIN64_MINGW
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <termios.h>
+#else
+#include <conio.h>
+#endif
 //#include <stropts.h>
 
 #ifdef ARCH_WASM
@@ -466,9 +468,62 @@ void Window_HandleWindowEvent(SDL_Event* event)
     }
 }
 
-int _kbhit() {
+#ifdef WIN64_MINGW
+CHAR my_getch() {
+    DWORD mode, cc;
+    DWORD num;
+    INPUT_RECORD irInBuf[1];
+    HANDLE h = GetStdHandle( STD_INPUT_HANDLE );
+
+    if (h == NULL) {
+        return 0; // console not found
+    }
+
+    GetConsoleMode( h, &mode );
+    SetConsoleMode( h, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT) );
+    TCHAR c = 0;
+    GetNumberOfConsoleInputEvents(h, &num);
+    if (num)
+    {
+        if (!ReadConsoleInput(
+            h,      // input buffer handle 
+            irInBuf,     // buffer to read into 
+            1,         // size of read buffer 
+            &num))
+        {
+
+        }
+        else
+        {
+            if (irInBuf[0].EventType == KEY_EVENT && irInBuf[0].Event.KeyEvent.bKeyDown) {
+                c = irInBuf[0].Event.KeyEvent.uChar.AsciiChar;
+            }
+        }
+    }
+    SetConsoleMode( h, mode );
+    return c;
+}
+
+int my_kbhit() {
+    DWORD num;
+    DWORD mode, cc;
+    HANDLE h = GetStdHandle( STD_INPUT_HANDLE );
+    if (h == NULL) {
+        return 0; // console not found
+    }
+
+    GetConsoleMode( h, &mode );
+    SetConsoleMode( h, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT) );
+    
+    GetNumberOfConsoleInputEvents(h, &num);
+    SetConsoleMode( h, mode );
+
+    return num;
+}
+#else
+int my_kbhit() {
     static const int STDIN = 0;
-    static bool initialized = false;
+    static int initialized = 0;
 
     if (! initialized) {
         // Use termios to turn off line buffering
@@ -478,33 +533,35 @@ int _kbhit() {
         term.c_lflag &= ~ECHO;
         tcsetattr(STDIN, TCSANOW, &term);
         setbuf(stdin, NULL);
-        initialized = true;
+        initialized = 1;
     }
 
     int bytesWaiting;
     ioctl(STDIN, FIONREAD, &bytesWaiting);
     return bytesWaiting;
 }
+#endif
 
 static char Window_headlessBuffer[256];
 
 void Window_UpdateHeadless()
 {
-    //int ch = getch();
-    //if (ch > 0)
-    //    printf("%c\n", ch);
-
-
     char buffer[32];
     size_t bytes_read = 0;
     int fd = STDIN_FILENO;
-    if (_kbhit()) {
+    if (my_kbhit() > 0) {
+#ifdef WIN64_MINGW
+        buffer[0] = my_getch();
+        buffer[1] = 0;
+        bytes_read = 1;
+#else
         bytes_read = read(fd, buffer, sizeof(buffer)-1);
         buffer[bytes_read] = 0;
+#endif
 
         for (int i = 0; i < bytes_read; i++)
         {
-            if (buffer[i] == '\n') {
+            if (buffer[i] == '\n' || buffer[i] == '\r') {
                 printf("\r> %s\n", Window_headlessBuffer);
                 DebugConsole_TryCommand(Window_headlessBuffer);
                 memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
@@ -523,11 +580,10 @@ void Window_UpdateHeadless()
             char tmp[2] = {buffer[i], 0};
             strncat(Window_headlessBuffer, tmp, 255);
         }
-
-        //strncat(Window_headlessBuffer, buffer, 255);
     }
     
     printf("\r> %s", Window_headlessBuffer);
+    //printf("> %x %x %s\n", buffer[0], my_kbhit(), Window_headlessBuffer);
     fflush(stdout);
 
     if (Window_resized)
@@ -1050,19 +1106,6 @@ int Window_Main_Linux(int argc, char** argv)
     char cmdLine[1024];
     int result;
 
-    //initscr();
-    //endwin();
-
-    //setvbuf(stdout, NULL, _IOLBF, 0);
-    //setvbuf(stderr, NULL, _IONBF, 0);
-    
-    /*setvbuf(stdin, NULL, _IONBF, 0);
-    setvbuf(stdout, NULL, _IONBF, 0);
-    char c;
-    while ((c = getchar()) != EOF) {
-        putchar(c);
-    }*/
-    
     // Init SDL
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);

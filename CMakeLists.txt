@@ -414,8 +414,10 @@ if(TARGET_WIN32)
 
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/packaging/win32/openjkdf2.rc)
 
-    # Win64 can use the registry fine, even if stdlib is POSIX
-    list(REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Posix/wuRegistry.c)
+    # Prefer the POSIX wuRegistry (JSON) over native
+    if (TARGET_POSIX)
+        list(REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Win32/wuRegistry.c)
+    endif()
 
     if(TARGET_USE_SDL2)
         list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended/nfd_win.cpp)
