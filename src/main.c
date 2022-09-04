@@ -173,7 +173,7 @@ int main(int argc, char** argv)
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stdout);
 
-    int can_has_crashdumps = 0;
+    int can_has_crashdumps = 1;
 
     OSVERSIONINFOEX info;
     ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
@@ -183,9 +183,9 @@ int main(int argc, char** argv)
     // Apparently Windows 7 has a security update kb4507456
     // which is required for api-ms-win-downlevel-kernel32-l2-1-0.dll.
     // So only try and load drmingw on Win8+ for now.
-    if (info.dwMajorVersion >= 6 && info.dwMinorVersion > 1) {
-        can_has_crashdumps = 1;
-    }
+    //if (info.dwMajorVersion >= 6 && info.dwMinorVersion > 1) {
+    //    can_has_crashdumps = 1;
+    //}
 
     if (can_has_crashdumps) {
         HMODULE hLib = LoadLibrary("exchndl.dll");
