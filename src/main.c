@@ -163,9 +163,7 @@ void do_hooks();
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
 
-#if defined(_MSC_VER)
 #include <Windows.h>
-#endif
 
 int main(int argc, char** argv)
 {   
@@ -175,13 +173,28 @@ int main(int argc, char** argv)
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stdout);
 
-#if defined(_MSC_VER)
-    HMODULE hLib = LoadLibrary("exchndl.dll");
-    void (*pfnExcHndlInit)(void) = GetProcAddress(hLib, "ExcHndlInit");
-    pfnExcHndlInit();
-#else
-    ExcHndlInit();
-#endif
+    int can_has_crashdumps = 0;
+
+    OSVERSIONINFOEX info;
+    ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
+    info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    GetVersionEx((LPOSVERSIONINFO)&info);//info requires typecasting
+
+    // Apparently Windows 7 has a security update kb4507456
+    // which is required for api-ms-win-downlevel-kernel32-l2-1-0.dll.
+    // So only try and load drmingw on Win8+ for now.
+    if (info.dwMajorVersion >= 6 && info.dwMinorVersion > 1) {
+        can_has_crashdumps = 1;
+    }
+
+    if (can_has_crashdumps) {
+        HMODULE hLib = LoadLibrary("exchndl.dll");
+        if (hLib) {
+            void (*pfnExcHndlInit)(void) = GetProcAddress(hLib, "ExcHndlInit");
+            pfnExcHndlInit();
+        }
+    }
+
     Window_Main_Linux(argc, argv);
 }
 #endif
