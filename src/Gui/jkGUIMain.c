@@ -156,7 +156,8 @@ void jkGuiMain_ShowCutscenes()
             if ( jkRes_LoadCD(jkPlayer_aCutsceneVal[jkGuiMain_cutscenesElements[1].selectedTextEntry]) )
             {
                 v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
-                sprintf(v12, "video%c%s", 92, v5);
+                printf("%p\n", v5);
+                snprintf(v12, 256, "video%c%s", '\\', v5); // Added: sprintf -> snprintf
                 if ( util_FileExists(v12) )
                 {
                     jkMain_SwitchTo4(v12);
@@ -197,21 +198,15 @@ void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)
     int v6; // [esp+4h] [ebp-44h]
     char key[64]; // [esp+8h] [ebp-40h] BYREF
 
-    v6 = 0;
-    if ( jkPlayer_setNumCutscenes > 0 )
+    v2 = jkPlayer_cutscenePath;
+    for (v6 = 0; v6 < jkPlayer_setNumCutscenes; v6++)
     {
-        v2 = jkPlayer_cutscenePath;
-        do
-        {
-            v3 = _strcpy((char *)pHS->alloc(_strlen(v2) + 1), v2);
-            stdFnames_CopyShortName(key, 64, v3); // TODO aaaaaaa ??? disassembly was wrong?
-            jkGuiTitle_sub_4189A0(key);
-            v5 = jkStrings_GetText2(key);
-            jkGuiRend_DarrayReallocStr(list, v5, (int)v3);
-            v2 += 32;
-            ++v6;
-        }
-        while ( v6 < jkPlayer_setNumCutscenes );
+        v3 = _strcpy((char *)pHS->alloc(_strlen(v2) + 1), v2);
+        stdFnames_CopyShortName(key, 64, v3); // TODO aaaaaaa ??? disassembly was wrong?
+        jkGuiTitle_sub_4189A0(key);
+        v5 = jkStrings_GetText2(key);
+        jkGuiRend_DarrayReallocStr(list, v5, v3);
+        v2 += 32;
     }
     jkGuiRend_AddStringEntry(list, 0, 0);
     jkGuiRend_SetClickableString(element, list);

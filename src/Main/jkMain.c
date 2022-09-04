@@ -54,10 +54,6 @@
 #define TICKRATE_MS (20) // 50fps
 #endif
 
-#define jkMain_CutsceneShow ((void*)(0x00404450))
-#define jkMain_CutsceneTick ((void*)(0x00404460))
-#define jkMain_CutsceneLeave ((void*)(0x00404470))
-
 jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
 
@@ -1164,6 +1160,21 @@ void jkMain_CreditsLeave()
     jkCredits_Skip();
 }
 
+void jkMain_CutsceneShow()
+{
+    jkGuiMain_ShowCutscenes();
+}
+
+void jkMain_CutsceneTick()
+{
+    ;
+}
+
+void jkMain_CutsceneLeave()
+{
+    ;
+}
+
 int jkMain_SwitchTo13()
 {
     signed int result; // eax
@@ -1173,6 +1184,31 @@ int jkMain_SwitchTo13()
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 13;
+    return result;
+}
+
+int jkMain_SwitchTo12()
+{
+    signed int result; // eax
+
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 12;
+    return result;
+}
+
+int jkMain_SwitchTo4(const char *pFpath)
+{
+    int result; // eax
+
+    jkRes_FileExists(pFpath, jkMain_aLevelJklFname, 128);
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 4;
     return result;
 }
 
