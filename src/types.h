@@ -2811,7 +2811,7 @@ typedef struct jkMultiEntry4
 typedef struct stdControlKeyInfoEntry
 {
     int dxKeyNum;
-    int flags;
+    uint32_t flags;
     float binaryAxisVal;
 } stdControlKeyInfoEntry;
 
@@ -2956,6 +2956,7 @@ typedef struct stdControlDikStrToNum
 #define DIK_YEN             0x7D    /* (Japanese keyboard)            */
 #define DIK_ABNT_C2         0x7E    /* Numpad . on Brazilian keyboard */
 #define DIK_NUMPADEQUALS    0x8D    /* = on numeric keypad (NEC PC98) */
+#define DIK_CIRCUMFLEX      0x90
 #define DIK_PREVTRACK       0x90    /* Previous Track (DIK_CIRCUMFLEX on Japanese keyboard) */
 #define DIK_AT              0x91    /*                     (NEC PC98) */
 #define DIK_COLON           0x92    /*                     (NEC PC98) */
@@ -3176,6 +3177,26 @@ typedef struct jkGuiControlInfo
     jkGuiControlInfoHeader header;
     char fpath[128];
 } jkGuiControlInfo;
+
+typedef struct jkGuiJoystickStrings
+{
+    wchar_t aStrings[3][128];
+} jkGuiJoystickStrings;
+
+typedef struct jkGuiJoystickEntry
+{
+  int dikNum;
+  const char *displayStrKey;
+  int keybits;
+  int inputFunc;
+  uint32_t flags;
+  stdControlKeyInfoEntry *pControlEntry;
+  int dxKeyNum;
+  union {
+    int binaryAxisValInt;
+    float binaryAxisVal;
+  };
+} jkGuiJoystickEntry;
 
 #ifdef __cplusplus
 }

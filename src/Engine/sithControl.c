@@ -1729,3 +1729,141 @@ LABEL_13:
     sithControl_MapDefaults();
 }
 
+void sithControl_JoyInputInit()
+{
+    stdControlKeyInfo *v0; // edx
+    uint32_t v1; // ecx
+    uint32_t v2; // edi
+    int v3; // ebp
+    stdControlKeyInfoEntry *v4; // ebx
+    int v5; // esi
+    uint32_t v6; // eax
+    uint32_t v7; // ecx
+    stdControlKeyInfoEntry *v8; // eax
+    stdControlKeyInfoEntry *v9; // ebx
+    uint32_t v10; // ecx
+    stdControlKeyInfoEntry *v11; // eax
+    uint32_t v12; // ecx
+    stdControlKeyInfoEntry *v13; // eax
+    uint32_t v14; // ecx
+    stdControlKeyInfoEntry *v15; // eax
+    uint32_t v16; // ecx
+    stdControlKeyInfoEntry *v17; // eax
+    uint32_t v18; // ecx
+    stdControlKeyInfoEntry *v19; // eax
+    uint32_t v20; // ecx
+    stdControlKeyInfoEntry *v21; // eax
+    stdControlKeyInfoEntry *v22; // [esp+10h] [ebp-4h]
+
+    v0 = sithControl_aInputFuncToKeyinfo;
+    do
+    {
+        while ( 1 )
+        {
+            v1 = v0->numEntries;
+            v2 = 0;
+            v3 = 0;
+            if ( !v0->numEntries )
+                break;
+            v4 = v0->aEntries;
+            v22 = v0->aEntries;
+            while ( !v3 )
+            {
+                v5 = v4->dxKeyNum;
+                if ( (v4->flags & 1) == 0 && v5 >= 256 && v5 < 280 || (v4->flags & 1) != 0 && v5 >= 0 && v5 <= 11 )
+                {
+                    v6 = v1 - 1;
+                    v7 = v2;
+                    v0->numEntries = v6;
+                    if ( v2 < v6 )
+                    {
+                        v8 = v4;
+                        do
+                        {
+                            v9 = v8;
+                            ++v7;
+                            ++v8;
+                            v9->dxKeyNum = v8->dxKeyNum;
+                            v9->flags = v8->flags;
+                            v9->binaryAxisVal = v8->binaryAxisVal;
+                        }
+                        while ( v7 < v0->numEntries );
+                        v4 = v22;
+                    }
+                    v3 = 1;
+                }
+                v1 = v0->numEntries;
+                ++v2;
+                v22 = ++v4;
+                if ( v2 >= v0->numEntries )
+                    goto LABEL_17;
+            }
+        }
+LABEL_17:
+        ;
+    }
+    while ( v3 || ++v0 < (stdControlKeyInfo *)&sithControl_msIdle );
+    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, DIK_ESCAPE, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_TURN, 0, 4u);
+    if ( (sithControl_inputFuncToControlType[10] & 1) != 0 && sithControl_aInputFuncToKeyinfo[10].numEntries != 8 )
+    {
+        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B1);
+        v10 = sithControl_aInputFuncToKeyinfo[10].numEntries + 1;
+        v11 = &sithControl_aInputFuncToKeyinfo[10].aEntries[sithControl_aInputFuncToKeyinfo[10].numEntries];
+        v11->flags = 2;
+        v11->dxKeyNum = 256;
+        sithControl_aInputFuncToKeyinfo[10].numEntries = v10;
+    }
+    if ( (sithControl_inputFuncToControlType[11] & 1) != 0 && sithControl_aInputFuncToKeyinfo[11].numEntries != 8 )
+    {
+        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B2);
+        v12 = sithControl_aInputFuncToKeyinfo[11].numEntries + 1;
+        v13 = &sithControl_aInputFuncToKeyinfo[11].aEntries[sithControl_aInputFuncToKeyinfo[11].numEntries];
+        v13->flags = 2;
+        v13->dxKeyNum = KEY_JOY1_B2;
+        sithControl_aInputFuncToKeyinfo[11].numEntries = v12;
+    }
+    if ( (sithControl_inputFuncToControlType[12] & 1) != 0 && sithControl_aInputFuncToKeyinfo[12].numEntries != 8 )
+    {
+        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B3);
+        v14 = sithControl_aInputFuncToKeyinfo[12].numEntries + 1;
+        v15 = &sithControl_aInputFuncToKeyinfo[12].aEntries[sithControl_aInputFuncToKeyinfo[12].numEntries];
+        v15->flags = 2;
+        v15->dxKeyNum = KEY_JOY1_B3;
+        sithControl_aInputFuncToKeyinfo[12].numEntries = v14;
+    }
+    if ( (sithControl_inputFuncToControlType[4] & 1) != 0 && sithControl_aInputFuncToKeyinfo[4].numEntries != 8 )
+    {
+        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B4);
+        v16 = sithControl_aInputFuncToKeyinfo[4].numEntries + 1;
+        v17 = &sithControl_aInputFuncToKeyinfo[4].aEntries[sithControl_aInputFuncToKeyinfo[4].numEntries];
+        v17->flags = 2;
+        v17->dxKeyNum = KEY_JOY1_B4;
+        sithControl_aInputFuncToKeyinfo[4].numEntries = v16;
+    }
+    if ( (sithControl_inputFuncToControlType[8] & 1) != 0 )
+    {
+        if ( sithControl_aInputFuncToKeyinfo[8].numEntries != 8 )
+        {
+            sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_HUP);
+            v18 = sithControl_aInputFuncToKeyinfo[8].numEntries + 1;
+            v19 = &sithControl_aInputFuncToKeyinfo[8].aEntries[sithControl_aInputFuncToKeyinfo[8].numEntries];
+            v19->flags = 6;
+            v19->dxKeyNum = KEY_JOY1_HUP;
+            sithControl_aInputFuncToKeyinfo[8].numEntries = v18;
+        }
+        if ( (sithControl_inputFuncToControlType[8] & 1) != 0 && sithControl_aInputFuncToKeyinfo[8].numEntries != 8 )
+        {
+            sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_HDOWN);
+            v20 = sithControl_aInputFuncToKeyinfo[8].numEntries + 1;
+            v21 = &sithControl_aInputFuncToKeyinfo[8].aEntries[sithControl_aInputFuncToKeyinfo[8].numEntries];
+            v21->flags = 2;
+            v21->dxKeyNum = KEY_JOY1_HDOWN;
+            sithControl_aInputFuncToKeyinfo[8].numEntries = v20;
+        }
+    }
+    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HLEFT, 4);
+    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
+    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
+    sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
+}

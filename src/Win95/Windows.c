@@ -100,7 +100,11 @@ void Windows_ShutdownGdi()
 
 UINT Windows_CalibrateJoystick()
 {
+#ifndef SDL2_RENDER
     return jk_WinExec("CONTROL JOY.CPL", 5u);
+#else
+    return 0;
+#endif
 }
 
 int Windows_DefaultHandler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5)

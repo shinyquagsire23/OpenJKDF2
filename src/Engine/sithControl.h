@@ -25,7 +25,7 @@
 #define sithControl_FinishRead_ADDR (0x004D70B0)
 #define sithControl_InputInit_ADDR (0x004D70C0)
 #define sithControl_sub_4D7350_ADDR (0x004D7350)
-#define sithControl_sub_4D73E0_ADDR (0x004D73E0)
+#define sithControl_JoyInputInit_ADDR (0x004D73E0)
 #define sithControl_sub_4D7670_ADDR (0x004D7670)
 #define sithControl_WriteConf_ADDR (0x004D78E0)
 #define sithControl_ReadConf_ADDR (0x004D79A0)
@@ -149,6 +149,7 @@ void sithControl_sub_4D6930(int a);
 stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5);
 void sithControl_sub_4D7670();
 void sithControl_sub_4D7350();
+void sithControl_JoyInputInit();
 
 //static stdControlKeyInfo* (*sithControl_EnumBindings)(sithControlEnumFunc_t func, int a2, int a3, int a4, int a5) = (void*)sithControl_EnumBindings_ADDR;
 //static void (*sithControl_sub_4D7670)() = (void*)sithControl_sub_4D7670_ADDR;

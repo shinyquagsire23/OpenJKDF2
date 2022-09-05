@@ -306,13 +306,23 @@ int stdControl_Startup()
     }
 #endif
 
-    stdControl_arr_865030[0] = 0;
-    stdControl_arr_8651A8[0] = 0;
-    stdControl_arr_865028[0] = 0;
-    stdControl_arr_865030[1] = 0;
-    stdControl_arr_8651A8[1] = 0;
-    stdControl_arr_865028[1] = 0;
+    stdControl_aJoystickExists[0] = 0;
+    stdControl_aJoystickMaxButtons[0] = 0;
+    stdControl_aJoystickEnabled[0] = 0;
+    stdControl_aJoystickExists[1] = 0;
+    stdControl_aJoystickMaxButtons[1] = 0;
+    stdControl_aJoystickEnabled[1] = 0;
     v2 = 2;
+
+    stdControl_aJoystickExists[0] = 1;
+    stdControl_aJoystickEnabled[0] = 1;
+    stdControl_aJoystickMaxButtons[0] = 12;
+    stdControl_InitAxis(AXIS_JOY1_X, -1.0, 1.0, 0.1);
+    stdControl_InitAxis(AXIS_JOY1_Y, -1.0, 1.0, 0.1);
+    stdControl_InitAxis(AXIS_JOY1_Z, -1.0, 1.0, 0.1);
+    stdControl_InitAxis(AXIS_JOY1_R, -1.0, 1.0, 0.1);
+    stdControl_InitAxis(AXIS_JOY1_U, -1.0, 1.0, 0.1);
+    stdControl_InitAxis(AXIS_JOY1_V, -1.0, 1.0, 0.1);
 
 #if 0
     v14 = joyGetNumDevs();
@@ -320,19 +330,19 @@ int stdControl_Startup()
         v14 = 2;
     if ( v14 )
     {
-        v15 = stdControl_arr_865028;
+        v15 = stdControl_aJoystickEnabled;
         pJoystickIter = stdControl_aJoysticks;
         do
         {
             if ( !joyGetPos(v0, &pji) && !joyGetDevCapsA(v0, &pjc, 0x194u) )
             {
                 v4 = pjc.wMaxButtons;
-                stdControl_arr_865030[v0] = 1;
+                stdControl_aJoystickExists[v0] = 1;
                 if ( v4 >= 0xC )
                     v4 = 12;
                 v5 = pjc.wXmax;
                 v6 = pjc.wXmin;
-                stdControl_arr_8651A8[v0] = v4;
+                stdControl_aJoystickMaxButtons[v0] = v4;
                 pJoystickIter->flags |= 1u;
                 v7 = v6 + (v5 - v6 + 1) / 2;
                 pJoystickIter->uMinVal = v6;
@@ -640,7 +650,7 @@ void stdControl_ReadControls()
     {
         for (int i = 0; i < 2; i++)
         {
-            if ( !(stdControl_unk_55C828[i] && stdControl_arr_865030[i]) )
+            if ( !(stdControl_unk_55C828[i] && stdControl_aJoystickExists[i]) )
                 continue;
 
             stdControl_unk_55C828[i] = 0;

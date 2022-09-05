@@ -404,10 +404,10 @@ stdControl_msDelta 0x0055D5F8 uint32_t
 stdControl_dwLastMouseX 0x0055D5FC int32_t
 stdControl_dwLastMouseY 0x0055D600 int32_t
 
-stdControl_arr_865028 0x00865028 int[2]
-stdControl_arr_865030 0x00865030 int[4]
+stdControl_aJoystickEnabled 0x00865028 int[2]
+stdControl_aJoystickExists 0x00865030 int[4]
 stdControl_aJoysticks 0x00865040 stdControlJoystickEntry[15]
-stdControl_arr_8651A8 0x008651A8 int[2]
+stdControl_aJoystickMaxButtons 0x008651A8 int[2]
 
 Windows_installType 0x008606E0 int
 
@@ -673,7 +673,7 @@ sithInventory_8339EC 0x008339EC int
 sithInventory_bRendIsHidden 0x008339F0 int
 sithInventory_8339F4 0x008339F4 int
 
-sithWeapon_controlOptions 0x008BD020 int
+sithWeapon_controlOptions 0x008BD020 uint32_t
 g_flt_8BD040 0x008BD040 float
 g_flt_8BD044 0x008BD044 float
 g_flt_8BD048 0x008BD048 float

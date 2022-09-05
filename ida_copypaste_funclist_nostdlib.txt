@@ -283,8 +283,8 @@ jkGuiMain_Show	.text	004100F0	000000FD	00000008	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_ShowCutscenes	.text	00410210	0000028F	0000016C	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_Initialize	.text	004104A0	00000014			R	.	.	.	.	.	.	.
 jkGuiMain_Shutdown	.text	004104C0	00000001			R	.	.	.	.	.	.	.
-jkGuiMain_sub_4104D0	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.	.
-jkGuiMain_sub_4105B0	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.	.
+jkGuiMain_PopulateCutscenes	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.	.
+jkGuiMain_FreeCutscenes	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.	.
 jkGuiPlayer_Initialize	.text	004105F0	00000032			R	.	.	.	.	.	.	.
 jkGuiPlayer_Shutdown	.text	00410630	0000000B			R	.	.	.	.	.	.	.
 jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	T	.
@@ -446,22 +446,22 @@ jkGuiSingleplayer_sub_41AA30	.text	0041AA30	00000232	000001B4	00000020	R	.	.	.	.
 jkGuiSingleplayer_sub_41AC70	.text	0041AC70	0000008F	00000020	0000000C	R	.	.	.	.	.	T	.
 jkGuiSingleplayer_sub_41AD00	.text	0041AD00	00000042	0000000C	00000004	R	.	.	.	.	.	T	.
 jkGuiJoystick_nullsub_51	.text	0041AD50	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41AD60	.text	0041AD60	00000066	0000000C	00000014	R	.	.	.	.	.	T	.
-jkGuiJoystick_sub_41ADD0	.text	0041ADD0	0000044A	00000018	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B220	.text	0041B220	0000007F	00000000	00000014	R	.	.	.	.	.	T	.
-jkGuiJoystick_sub_41B2A0	.text	0041B2A0	000000EB	00000014	00000008	R	.	.	.	.	.	.	.
+jkGuiJoystick_ClickList1	.text	0041AD60	00000066	0000000C	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_Draw	.text	0041ADD0	0000044A	00000018	00000008	R	.	.	.	.	.	T	.
+jkGuiJoystick_ClickList2	.text	0041B220	0000007F	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_BindControl	.text	0041B2A0	000000EB	00000014	00000008	R	.	.	.	.	.	.	.
 jkGuiJoystick_sub_41B390	.text	0041B390	000001D2	00000218	00000000	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B570	.text	0041B570	000001CE	00000234	0000001C	R	.	.	.	.	.	T	.
-jkGuiJoystick_sub_41B740	.text	0041B740	00000126	00000000	00000014	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B870	.text	0041B870	00000036	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B8B0	.text	0041B8B0	0000006B	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41B920	.text	0041B920	0000014B	00000010	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41BA70	.text	0041BA70	00000074	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41BAF0	.text	0041BAF0	00000034	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41BB30	.text	0041BB30	00000021	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41BB60	.text	0041BB60	00000396	00000024	00000004	R	.	.	.	.	.	.	.
+jkGuiJoystick_EnumFunc	.text	0041B570	000001CE	00000234	0000001C	R	.	.	.	.	.	T	.
+jkGuiJoystick_ClickList3	.text	0041B740	00000126	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_AddEditClick	.text	0041B870	00000036	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_RemoveClick	.text	0041B8B0	0000006B	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_OkCancelClick	.text	0041B920	0000014B	00000010	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_RestoreDefaultsClick	.text	0041BA70	00000074	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_CaptureClick	.text	0041BAF0	00000034	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_CalibrateClick	.text	0041BB30	00000021	00000000	00000014	R	.	.	.	.	.	T	.
+jkGuiJoystick_MenuTick	.text	0041BB60	00000396	00000024	00000004	R	.	.	.	.	.	T	.
 jkGuiJoystick_Show	.text	0041BF00	00000265	0000000C	00000000	R	.	.	.	.	.	.	.
-jkGuiJoystick_sub_41C170	.text	0041C170	0000004A	00000000	00000014	R	.	.	.	.	.	.	.
+jkGuiJoystick_DisableJoystickClick	.text	0041C170	0000004A	00000000	00000014	R	.	.	.	.	.	T	.
 jkGuiJoystick_Initialize	.text	0041C1C0	00000014			R	.	.	.	.	.	.	.
 jkGuiJoystick_Shutdown	.text	0041C1E0	00000001			R	.	.	.	.	.	.	.
 jkGuiGameplay_Initialize	.text	0041C1F0	00000014			R	.	.	.	.	.	.	.
@@ -489,10 +489,10 @@ jkGuiSaveLoad_Show	.text	0041E010	00000419	00000294	00000004	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_PopulateInfoInit	.text	0041E430	0000000D	00000000	00000000	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_Initialize	.text	0041E440	00000014			R	.	.	.	.	.	.	.
 jkGuiSaveLoad_Shutdown	.text	0041E460	00000001			R	.	.	.	.	.	.	.
-jkGuiControlSaveLoad_sub_41E470	.text	0041E470	0000007E	00000004	00000014	R	.	.	.	.	.	.	.
-jkGuiControlSaveLoad_ConfirmDelete	.text	0041E4F0	00000144	00000084	00000008	R	.	.	.	.	.	.	.
-jkGuiControlSaveLoad_FindFile	.text	0041E640	0000019F	00000218	00000000	R	.	.	.	.	.	.	.
-jkGuiControlSaveLoad_Write	.text	0041E7E0	000003BC	00000198	00000004	R	.	.	.	.	.	.	.
+jkGuiControlSaveLoad_sub_41E470	.text	0041E470	0000007E	00000004	00000014	R	.	.	.	.	.	T	.
+jkGuiControlSaveLoad_ConfirmDelete	.text	0041E4F0	00000144	00000084	00000008	R	.	.	.	.	.	T	.
+jkGuiControlSaveLoad_FindFile	.text	0041E640	0000019F	00000218	00000000	R	.	.	.	.	.	T	.
+jkGuiControlSaveLoad_Write	.text	0041E7E0	000003BC	00000198	00000004	R	.	.	.	.	.	T	.
 jkGuiControlSaveLoad_Initialize	.text	0041EBA0	00000014			R	.	.	.	.	.	.	.
 jkGuiControlSaveLoad_Shutdown	.text	0041EBC0	00000001			R	.	.	.	.	.	.	.
 WinMain(x,x,x,x)	.text	0041EBD0	00000026	00000000	00000010	R	.	.	.	.	.	T	.
@@ -1875,14 +1875,14 @@ sithMulti_HandleRequestConnect	.text	004CAE50	000003AE	0000002C	00000004	R	.	.	.
 sithMulti_Send36	.text	004CB200	00000047	00000000	0000000C	R	.	.	.	.	.	.	.
 sithMulti_SendChat	.text	004CB250	00000087	00000008	0000000C	R	.	.	.	.	.	T	.
 sithMulti_HandleChat	.text	004CB2E0	000000AC	0000008C	00000004	R	.	.	.	.	.	T	.
-sithMulti_SendPing	.text	004CB390	00000043	00000000	00000004	R	.	.	.	.	.	.	.
+sithMulti_SendPing	.text	004CB390	00000043	00000000	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandlePing	.text	004CB3E0	00000025	00000000	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandlePingResponse	.text	004CB410	00000083	00000008	00000004	R	.	.	.	.	.	T	.
 sithMulti_SendKickPlayer	.text	004CB4A0	00000042	00000000	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandleKickPlayer	.text	004CB4F0	00000197	0000010C	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandleTimeLimit	.text	004CB690	0000055B	00000014	00000004	R	.	.	.	.	.	T	.
 sithMulti_SyncScores	.text	004CBC00	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
-sithMulti_IterPlayersnothingidk	.text	004CBC10	0000002A	00000004	00000004	R	.	.	.	.	.	.	.
+sithMulti_IterPlayersnothingidk	.text	004CBC10	0000002A	00000004	00000004	R	.	.	.	.	.	T	.
 sithMulti_SetHandleridk	.text	004CBC40	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandleDeath	.text	004CBC50	00000183	0000010C	0000000C	R	.	.	.	.	.	T	.
 sithMulti_HandleScore	.text	004CBDE0	000001A4	00000010	00000000	R	.	.	.	.	.	T	.
@@ -2077,7 +2077,7 @@ sithControl_ReadControls	.text	004D70A0	00000005	00000000	00000000	R	.	.	.	.	.	.
 sithControl_FinishRead	.text	004D70B0	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 sithControl_InputInit	.text	004D70C0	00000287	0000000C	00000000	R	.	.	.	.	.	T	.
 sithControl_sub_4D7350	.text	004D7350	0000008A	00000014	00000000	R	.	.	.	.	.	.	.
-sithControl_sub_4D73E0	.text	004D73E0	00000290	00000014	00000000	R	.	.	.	.	.	.	.
+sithControl_JoyInputInit	.text	004D73E0	00000290	00000014	00000000	R	.	.	.	.	.	.	.
 sithControl_sub_4D7670	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	T	.
 sithControl_WriteConf	.text	004D78E0	000000B2	00000018	00000000	R	.	.	.	.	.	.	.
 sithControl_ReadConf	.text	004D79A0	0000028A	00000020	00000000	R	.	.	.	.	.	.	.
@@ -2435,22 +2435,22 @@ sithCorpse_Remove	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_LoadActorPlayerParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
 sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
 sithDebugConsole_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdSession	.text	004EDF10	000000A7	00000000	00000000	R	.	.	.	.	.	.	.
+sithDebugConsole_CmdSession	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdCogList	.text	004EE2F0	00000125	00000000	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdFly	.text	004EE420	0000007D			R	.	.	.	.	.	.	.
-sithDebugConsole_CmdMem	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdDynamicMem	.text	004EE710	00000039	00000000	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdMemDump	.text	004EE750	00000098	00000004	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdMatList	.text	004EE7F0	0000016E	0000000C	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdCoords	.text	004EE960	000000D6	00000044	00000000	R	.	.	.	.	.	.	.
+sithDebugConsole_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdCogList	.text	004EE2F0	00000125	00000000	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdFly	.text	004EE420	0000007D			R	.	.	.	.	.	T	.
+sithDebugConsole_CmdMem	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdDynamicMem	.text	004EE710	00000039	00000000	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdMemDump	.text	004EE750	00000098	00000004	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdMatList	.text	004EE7F0	0000016E	0000000C	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdCoords	.text	004EE960	000000D6	00000044	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdWarp	.text	004EEA40	00000141	00000058	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdActivate	.text	004EEB90	0000009A	00000004	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdJump	.text	004EEC30	00000036	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdPlayers	.text	004EEC70	0000009F	00000028	00000000	R	.	.	.	.	.	.	.
-sithDebugConsole_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	.	.
+sithDebugConsole_CmdPlayers	.text	004EEC70	0000009F	00000028	00000008	R	.	.	.	.	.	T	.
+sithDebugConsole_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
 sithDebugConsole_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	T	.
