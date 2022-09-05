@@ -1015,7 +1015,7 @@ int Main_Startup(const char *cmdline)
         jkGuiRend_Initialize();
         jkGui_Initialize();
         jkGuiMultiplayer_Initialize();
-        jkGuiNetHost_Initialize(); //TODO
+        jkGuiNetHost_Initialize();
         jkGuiSetup_Initialize();
         jkGuiDisplay_Initialize();
         jkGuiForce_Initialize();
@@ -1024,7 +1024,7 @@ int Main_Startup(const char *cmdline)
         jkGuiSound_Initialize();
         jkGuiEsc_Startup();
         jkGuiMap_Initialize();
-        jkGuiKeyboard_Initialize(); // TODO
+        jkGuiKeyboard_Initialize();
 #ifndef LINUX_TMP
         jkGuiJoystick_Initialize(); // TODO
 #endif
@@ -1034,16 +1034,16 @@ int Main_Startup(const char *cmdline)
         jkGuiObjectives_Initialize();
         jkGuiSingleTally_Initialize();
         jkGuiMultiTally_Initialize();
-        jkGuiBuildMulti_InitializeEditCharacter(); // TODO
+        jkGuiBuildMulti_InitializeEditCharacter();
         jkGuiTitle_Initialize();
         jkGuiGeneral_Initialize();
         jkGuiGameplay_Initialize();
         jkGuiDecision_Initialize();
         jkGuiSingleplayer_Initialize();
         jkGuiBuildMulti_Initialize();
-        jkGuiSaveLoad_Initialize(); // TODO
+        jkGuiSaveLoad_Initialize();
+        jkGuiControlSaveLoad_Initialize();
 #ifndef LINUX_TMP
-        jkGuiControlSaveLoad_Initialize(); // TODO
         smack_Initialize(); // TODO
 #endif
         sith_Startup(&hs); // ~TODO
@@ -1056,8 +1056,8 @@ int Main_Startup(const char *cmdline)
         jkControl_Initialize(); // ~TODO
         jkHudInv_Initialize();
         jkSaber_Startup();
-        jkCutscene_Initialize("ui\\cutStrings.uni"); // TODO
-        jkCredits_Initialize("ui\\credits.uni"); // TODO
+        jkCutscene_Initialize("ui\\cutStrings.uni");
+        jkCredits_Initialize("ui\\credits.uni");
         jkSmack_Initialize();
 
         if (jkRes_LoadCD(0))

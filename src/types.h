@@ -3165,6 +3165,18 @@ typedef const DPNAME *LPCDPNAME;
 typedef wchar_t char16_t;
 #endif
 
+typedef struct jkGuiControlInfoHeader
+{
+    uint32_t version;
+    wchar_t wstr[64];
+} jkGuiControlInfoHeader;
+
+typedef struct jkGuiControlInfo
+{
+    jkGuiControlInfoHeader header;
+    char fpath[128];
+} jkGuiControlInfo;
+
 #ifdef __cplusplus
 }
 #endif
