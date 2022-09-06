@@ -156,7 +156,6 @@ void jkGuiMain_ShowCutscenes()
             if ( jkRes_LoadCD(jkPlayer_aCutsceneVal[jkGuiMain_cutscenesElements[1].selectedTextEntry]) )
             {
                 v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
-                printf("%p\n", v5);
                 snprintf(v12, 256, "video%c%s", '\\', v5); // Added: sprintf -> snprintf
                 if ( util_FileExists(v12) )
                 {
