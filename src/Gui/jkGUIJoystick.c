@@ -20,13 +20,15 @@
 #include "Gui/jkGUISetup.h"
 #include "Engine/sithControl.h"
 
+#define JKGUIJOYSTICK_NUM_ENTRIES (JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_BUTTON_STRIDE)
+
 static int jkGuiJoystick_dword_557078;
-static int jkGuiJoystick_aUnk1[36];
+static int jkGuiJoystick_aUnk1[JKGUIJOYSTICK_NUM_ENTRIES];
 static Darray jkGuiJoystick_darray;
 static int jkGuiJoystick_dword_557128;
 static Darray jkGuiJoystick_darray2;
 static jkGuiJoystickStrings jkGuiJoystick_strings;
-static float jkGuiJoystick_aFloats[36];
+static float jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES];
 static wchar_t jkGuiJoystick_awTmp[256];
 static Darray jkGuiJoystick_darray3;
 static int jkGuiJoystick_dword_5576F0;
@@ -36,44 +38,73 @@ static wchar_t jkGuiJoystick_waIdk2[4];
 static int jkGuiJoystick_dword_536B98 = -1;
 static int jkGuiJoystick_dword_536B9C = -1;
 
-static jkGuiJoystickEntry jkGuiJoystick_aEntries[36] =
+static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
 {
-    { AXIS_JOY1_X, "AXIS_JOY1_X", 0, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY1_Y, "AXIS_JOY1_Y", 1, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY1_Z, "AXIS_JOY1_Z", 2, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY1_R, "AXIS_JOY1_R", 3, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY1_U, "AXIS_JOY1_U", 4, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY1_V, "AXIS_JOY1_V", 5, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_X, "AXIS_JOY2_X", 128, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_Y, "AXIS_JOY2_Y", 129, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_Z, "AXIS_JOY2_Z", 130, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_R, "AXIS_JOY2_R", 131, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_U, "AXIS_JOY2_U", 132, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_V, "AXIS_JOY2_V", 133, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B1, "KEY_JOY1_B1", 32, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B2, "KEY_JOY1_B2", 33, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B3, "KEY_JOY1_B3", 34, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B4, "KEY_JOY1_B4", 35, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B5, "KEY_JOY1_B5", 36, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B6, "KEY_JOY1_B6", 37, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B7, "KEY_JOY1_B7", 38, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B8, "KEY_JOY1_B8", 39, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_HLEFT, "KEY_JOY1_HLEFT", 16, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0},
-    { KEY_JOY1_HUP, "KEY_JOY1_HUP", 17, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_HRIGHT, "KEY_JOY1_HRIGHT", 18, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0},
-    { KEY_JOY1_HDOWN, "KEY_JOY1_HDOWN", 19, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0},
-    { KEY_JOY2_B1, "KEY_JOY2_B1", 160, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B2, "KEY_JOY2_B2", 161, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B3, "KEY_JOY2_B3", 162, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B4, "KEY_JOY2_B4", 163, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B5, "KEY_JOY2_B5", 164, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B6, "KEY_JOY2_B6", 165, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B7, "KEY_JOY2_B7", 166, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B8, "KEY_JOY2_B8", 167, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_HLEFT, "KEY_JOY2_HLEFT", 144, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0},
-    { KEY_JOY2_HUP, "KEY_JOY2_HUP", 145, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_HRIGHT, "KEY_JOY2_HRIGHT", 146, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0},
-    { KEY_JOY2_HDOWN, "KEY_JOY2_HDOWN", 147, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0}
+    { AXIS_JOY1_X,      "AXIS_JOY1_X",      0, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY1_Y,      "AXIS_JOY1_Y",      1, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY1_Z,      "AXIS_JOY1_Z",      2, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY1_R,      "AXIS_JOY1_R",      3, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY1_U,      "AXIS_JOY1_U",      4, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY1_V,      "AXIS_JOY1_V",      5, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+    { AXIS_JOY2_X,      "AXIS_JOY2_X",      0x80, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_Y,      "AXIS_JOY2_Y",      0x81, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_Z,      "AXIS_JOY2_Z",      0x82, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_R,      "AXIS_JOY2_R",      0x83, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_U,      "AXIS_JOY2_U",      0x84, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_V,      "AXIS_JOY2_V",      0x85, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+    { KEY_JOY1_B1,      "KEY_JOY1_B1",      0x20, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B2,      "KEY_JOY1_B2",      0x21, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B3,      "KEY_JOY1_B3",      0x22, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B4,      "KEY_JOY1_B4",      0x23, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B5,      "KEY_JOY1_B5",      0x24, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B6,      "KEY_JOY1_B6",      0x25, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B7,      "KEY_JOY1_B7",      0x26, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B8,      "KEY_JOY1_B8",      0x27, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+#ifdef SDL2_RENDER
+    { KEY_JOY1_B9,      "KEY_JOY1_B9",      0x28, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B10,     "KEY_JOY1_B10",     0x29, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B11,     "KEY_JOY1_B11",     0x2A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B12,     "KEY_JOY1_B12",     0x2B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B13,     "KEY_JOY1_B13",     0x2C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B14,     "KEY_JOY1_B14",     0x2D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B15,     "KEY_JOY1_B15",     0x2E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B16,     "KEY_JOY1_B16",     0x2F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+#endif
+
+    { KEY_JOY1_HLEFT,   "KEY_JOY1_HLEFT",   0x10, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HUP,     "KEY_JOY1_HUP",     0x11, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HRIGHT,  "KEY_JOY1_HRIGHT",  0x12, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HDOWN,   "KEY_JOY1_HDOWN",   0x13, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+    { KEY_JOY2_B1,      "KEY_JOY2_B1",      0xA0, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B2,      "KEY_JOY2_B2",      0xA1, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B3,      "KEY_JOY2_B3",      0xA2, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B4,      "KEY_JOY2_B4",      0xA3, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B5,      "KEY_JOY2_B5",      0xA4, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B6,      "KEY_JOY2_B6",      0xA5, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B7,      "KEY_JOY2_B7",      0xA6, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B8,      "KEY_JOY2_B8",      0xA7, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+#ifdef SDL2_RENDER
+    { KEY_JOY2_B9,      "KEY_JOY2_B9",      0xA8, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B10,     "KEY_JOY2_B10",     0xA9, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B11,     "KEY_JOY2_B11",     0xAA, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B12,     "KEY_JOY2_B12",     0xAB, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B13,     "KEY_JOY2_B13",     0xAC, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B14,     "KEY_JOY2_B14",     0xAD, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B15,     "KEY_JOY2_B15",     0xAE, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B16,     "KEY_JOY2_B16",     0xAF, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+#endif
+
+    { KEY_JOY2_HLEFT,   "KEY_JOY2_HLEFT",   0x90, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HUP,     "KEY_JOY2_HUP",     0x91, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HRIGHT,  "KEY_JOY2_HRIGHT",  0x92, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HDOWN,   "KEY_JOY2_HDOWN",   0x93, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+
 };
 
 static int jkGuiJoystick_aIdk1[2] = {0xD, 0xE};
@@ -210,6 +241,8 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
                 jkGuiJoystick_aElements[16].bIsVisible = 0;
                 jkGuiJoystick_aElements[17].bIsVisible = 0;
                 jkGuiJoystick_aElements[18].bIsVisible = 0;
+
+                // Button
                 if ( v3 >= 12 )
                 {
                     jkGuiJoystick_aElements[12].bIsVisible = 0;
@@ -219,7 +252,7 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
                     if ( v11 && (v11->flags & 4) != 0 )
                         v21 = v4 | 0x80000000;
                 }
-                else
+                else // Axis
                 {
                     jkGuiJoystick_aElements[13].bIsVisible = 0;
                     v10 = &jkGuiJoystick_darray;
@@ -366,7 +399,6 @@ void jkGuiJoystick_BindControl(int a1, int a2)
     int v7; // ebx
     stdControlKeyInfoEntry *v8; // ecx
     stdControlKeyInfoEntry *v9; // eax
-    unsigned int v10; // edx
     wchar_t *v11; // eax
     wchar_t *v12; // [esp-4h] [ebp-18h]
     float v13; // [esp+10h] [ebp-4h]
@@ -391,9 +423,9 @@ void jkGuiJoystick_BindControl(int a1, int a2)
     v9 = sithControl_MapAxisFunc(v7, v6, v2);
     if ( v9 )
     {
-        v10 = v9->flags & ~8u;
         v9->binaryAxisVal = v13;
-        v9->flags = v10 | 4;
+        v9->flags &= ~8;
+        v9->flags |= 4;
         jkGuiJoystick_sub_41B390();
     }
     else
@@ -432,7 +464,7 @@ void jkGuiJoystick_sub_41B390()
         v0->pControlEntry = 0;
         v0++;
     }
-    while ( v0 < &jkGuiJoystick_aEntries[36]);
+    while ( v0 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES]);
     sithControl_EnumBindings(jkGuiJoystick_EnumFunc, 0, 1, 0, 0);
     v7 = 0;
     v1 = &jkGuiJoystick_aEntries[0];
@@ -465,7 +497,7 @@ void jkGuiJoystick_sub_41B390()
         ++v1;
         ++v7;
     }
-    while ( v1 < &jkGuiJoystick_aEntries[36] );
+    while ( v1 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
     jkGuiRend_DarrayReallocStr(&jkGuiJoystick_darray2, 0, 0);
     jkGuiRend_DarrayReallocStr(&jkGuiJoystick_darray, 0, 0);
     jkGuiRend_DarrayReallocStr(&jkGuiJoystick_darray3, 0, 0);
@@ -500,6 +532,7 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, char *pInputFuncStr, uint32_t flags
     {
         _strncpy(v17, pInputFuncStr, 0x1Fu);
         v17[31] = 0;
+        flags2 |= 1; // Added: HACK
         if ( (flags2 & 1) != 0 )
         {
             strncat(v17, "_A", 0x20u);
@@ -519,9 +552,13 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, char *pInputFuncStr, uint32_t flags
             return 1;
         v10 = v16;
     }
+
     jk_snwprintf(v18, 0xFFu, L"%ls%ls", v10, v9);
+
+    
     if ( v8 )
     {
+        // Axis
         v12 = jkGuiJoystick_darray.total;
         for ( i = 0; i < v12; ++i )
         {
@@ -536,6 +573,7 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, char *pInputFuncStr, uint32_t flags
     }
     else
     {
+        // Button
         v12 = jkGuiJoystick_darray3.total;
         for ( i = 0; i < v12; ++i )
         {
@@ -565,7 +603,7 @@ LABEL_23:
             }
             ++v14;
         }
-        while ( v14 < &jkGuiJoystick_aEntries[36] );
+        while ( v14 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
     }
     return 1;
 }
@@ -821,12 +859,13 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
                 if ( (v4->keybits & 0x30) == 0 )
                 {
                     v18 = v4->dikNum;
+                    //printf("%x vs %x\n", v4->keybits, stdControl_aJoysticks[v18].flags);
                     jkGuiJoystick_aUnk1[v18] = stdControl_aJoysticks[v18].flags & 2;
                     stdControl_EnableAxis(v18);
                 }
                 v4++;
             }
-            while ( v4 < &jkGuiJoystick_aEntries[36] );
+            while ( v4 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
             v1 = jkGuiJoystick_dword_5576F0;
             v23 = 1;
             v21 = 1;
@@ -850,7 +889,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
                     stdControl_aJoysticks[v6].flags &= ~2u;
                 ++v5;
             }
-            while ( v5 < &jkGuiJoystick_aEntries[36] );
+            while ( v5 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
             if ( jkGuiJoystick_dword_557078 )
                 stdControl_ToggleCursor(0);
             else
@@ -916,7 +955,7 @@ LABEL_36:
             v15 = v24->aStrings[1];
         }
         ++v8;
-        if ( ++v20 >= &jkGuiJoystick_aFloats[36] )
+        if ( ++v20 >= &jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES] )
             break;
         v2 = 0;
     }

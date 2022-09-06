@@ -6,7 +6,7 @@
 
 #include "jk.h"
 
-const char *stdControl_aAxisNames[16] =
+const char *stdControl_aAxisNames[JK_NUM_AXES+1] =
 {
     "AXIS_JOY1_X",
     "AXIS_JOY1_Y",
@@ -26,7 +26,7 @@ const char *stdControl_aAxisNames[16] =
     " "
 };
 
-const stdControlDikStrToNum stdControl_aDikNumToStr[148] =
+const stdControlDikStrToNum stdControl_aDikNumToStr[120 + JK_NUM_EXTENDED_KEYS] =
 {
   { DIK_ESCAPE,         "DIK_ESCAPE" },
   { DIK_1,              "DIK_1" },
@@ -148,6 +148,8 @@ const stdControlDikStrToNum stdControl_aDikNumToStr[148] =
   { DIK_LWIN,           "DIK_LWIN" },
   { DIK_RWIN,           "DIK_RWIN" },
   { DIK_APPS,           "DIK_APPS" },
+
+
   { KEY_JOY1_B1,        "KEY_JOY1_B1" },
   { KEY_JOY1_B2,        "KEY_JOY1_B2" },
   { KEY_JOY1_B3,        "KEY_JOY1_B3" },
@@ -156,6 +158,21 @@ const stdControlDikStrToNum stdControl_aDikNumToStr[148] =
   { KEY_JOY1_B6,        "KEY_JOY1_B6" },
   { KEY_JOY1_B7,        "KEY_JOY1_B7" },
   { KEY_JOY1_B8,        "KEY_JOY1_B8" },
+#ifdef SDL2_RENDER
+  { KEY_JOY1_B9,        "KEY_JOY1_B9" },
+
+  { KEY_JOY1_B10,       "KEY_JOY1_B10" },
+  { KEY_JOY1_B11,        "KEY_JOY1_B11" },
+  { KEY_JOY1_B12,        "KEY_JOY1_B12" },
+  { KEY_JOY1_B13,        "KEY_JOY1_B13" },
+  { KEY_JOY1_B14,        "KEY_JOY1_B14" },
+  { KEY_JOY1_B15,        "KEY_JOY1_B15" },
+  { KEY_JOY1_B16,        "KEY_JOY1_B16" },
+  //{ KEY_JOY1_B17,        "KEY_JOY1_B17" },
+  //{ KEY_JOY1_B18,        "KEY_JOY1_B18" },
+  //{ KEY_JOY1_B19,        "KEY_JOY1_B19" },
+  //{ KEY_JOY1_B20,        "KEY_JOY1_B20" },
+#endif
   { KEY_JOY1_HLEFT,     "KEY_JOY1_HLEFT" },
   { KEY_JOY1_HUP,       "KEY_JOY1_HUP" },
   { KEY_JOY1_HRIGHT,    "KEY_JOY1_HRIGHT" },
@@ -168,6 +185,21 @@ const stdControlDikStrToNum stdControl_aDikNumToStr[148] =
   { KEY_JOY2_B6,        "KEY_JOY2_B6" },
   { KEY_JOY2_B7,        "KEY_JOY2_B7" },
   { KEY_JOY2_B8,        "KEY_JOY2_B8" },
+#ifdef SDL2_RENDER
+  { KEY_JOY2_B9,        "KEY_JOY2_B9" },
+
+  { KEY_JOY2_B10,       "KEY_JOY2_B10" },
+  { KEY_JOY2_B11,        "KEY_JOY2_B11" },
+  { KEY_JOY2_B12,        "KEY_JOY2_B12" },
+  { KEY_JOY2_B13,        "KEY_JOY2_B13" },
+  { KEY_JOY2_B14,        "KEY_JOY2_B14" },
+  { KEY_JOY2_B15,        "KEY_JOY2_B15" },
+  { KEY_JOY2_B16,        "KEY_JOY2_B16" },
+  //{ KEY_JOY2_B17,        "KEY_JOY2_B17" },
+  //{ KEY_JOY2_B18,        "KEY_JOY2_B18" },
+  //{ KEY_JOY2_B19,        "KEY_JOY2_B19" },
+  //{ KEY_JOY2_B20,        "KEY_JOY2_B20" },
+#endif
   { KEY_JOY2_HLEFT,     "KEY_JOY2_HLEFT" },
   { KEY_JOY2_HUP,       "KEY_JOY2_HUP" },
   { KEY_JOY2_HRIGHT,    "KEY_JOY2_HRIGHT" },
@@ -175,7 +207,10 @@ const stdControlDikStrToNum stdControl_aDikNumToStr[148] =
   { KEY_MOUSE_B1,       "KEY_MOUSE_B1" },
   { KEY_MOUSE_B2,       "KEY_MOUSE_B2" },
   { KEY_MOUSE_B3,       "KEY_MOUSE_B3" },
-  { KEY_MOUSE_B4,       "KEY_MOUSE_B4" }
+  { KEY_MOUSE_B4,       "KEY_MOUSE_B4" },
+#ifdef SDL2_RENDER
+  { KEY_MOUSE_B5,       "KEY_MOUSE_B5" }
+#endif
 };
 
 void stdControl_Reset()
@@ -183,14 +218,15 @@ void stdControl_Reset()
     stdControlJoystickEntry *v0; // eax
 
     stdControl_bReadMouse = 0;
-    stdControl_joy_related = 0;
-    stdControl_unk_55C828[0] = 0;
-    stdControl_aAxisConnected[0] = 0x680;
-    stdControl_unk_55C828[1] = 0;
-    stdControl_aAxisConnected[1] = 0x680;
+    stdControl_bHasJoysticks = 0;
+
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        stdControl_aAxisEnabled[i] = 0;
+        stdControl_aAxisConnected[i] = 0x680;
+    }
 
     v0 = stdControl_aJoysticks;
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < JK_NUM_AXES; i++)
     {
         v0->flags &= ~2;
         ++v0;
@@ -199,38 +235,36 @@ void stdControl_Reset()
 
 int stdControl_EnableAxis(unsigned int idx)
 {
-    int v3; // ecx
-
-    if ( idx >= 0xF )
+    if ( idx >= JK_NUM_AXES )
         return 0;
 
     if ( (stdControl_aJoysticks[idx].flags & 1) == 0 )
         return 0;
     stdControl_aJoysticks[idx].flags |= 2;
-    if ( idx < 0xC )
+    if ( idx < AXIS_MOUSE_X )
     {
-        stdControl_joy_related = 1;
-        v3 = idx > 5;
-        stdControl_unk_55C828[v3] = 1;
-        switch ( idx - 6 * v3 )
+        int controller_idx = idx / JK_JOYSTICK_AXIS_STRIDE;
+        stdControl_bHasJoysticks = 1;
+        stdControl_aAxisEnabled[controller_idx] = 1;
+        switch (idx % JK_JOYSTICK_AXIS_STRIDE)
         {
             case 0u:
-                stdControl_aAxisConnected[v3] |= 1u;
+                stdControl_aAxisConnected[controller_idx] |= 1u;
                 break;
             case 1u:
-                stdControl_aAxisConnected[v3] |= 2u;
+                stdControl_aAxisConnected[controller_idx] |= 2u;
                 break;
             case 2u:
-                stdControl_aAxisConnected[v3] |= 4u;
+                stdControl_aAxisConnected[controller_idx] |= 4u;
                 break;
             case 3u:
-                stdControl_aAxisConnected[v3] |= 8u;
+                stdControl_aAxisConnected[controller_idx] |= 8u;
                 break;
             case 4u:
-                stdControl_aAxisConnected[v3] |= 0x10u;
+                stdControl_aAxisConnected[controller_idx] |= 0x10u;
                 break;
             case 5u:
-                stdControl_aAxisConnected[v3] |= 0x20u;
+                stdControl_aAxisConnected[controller_idx] |= 0x20u;
                 break;
             default:
                 return 1;
@@ -257,11 +291,17 @@ float stdControl_ReadAxis(int axisNum)
 
     if ( !stdControl_bControlsActive )
         return 0.0;
+
+    // Added: OOB
+    if (axisNum >= JK_NUM_AXES) {
+        return 0.0;
+    }
+
     v2 = axisNum;
     v3 = stdControl_aJoysticks[axisNum].flags;
     if ( (v3 & 2) == 0 )
         return 0.0;
-    v4 = *(&stdControl_aAxisPos.aEntries[0].dwXpos + axisNum) - stdControl_aJoysticks[axisNum].dwXoffs;
+    v4 = stdControl_aAxisPos[axisNum] - stdControl_aJoysticks[axisNum].dwXoffs;
     v9 = v4;
     if ( !v4 )
         return 0.0;
@@ -296,9 +336,13 @@ int stdControl_ReadAxisRaw(int axisNum)
 
     if ( !stdControl_bControlsActive )
         return 0;
+    // Added: OOB
+    if (axisNum >= JK_NUM_AXES) {
+        return 0;
+    }
     if ( (stdControl_aJoysticks[axisNum].flags & 2) == 0 )
         return 0;
-    result = *(&stdControl_aAxisPos.aEntries[0].dwXpos + axisNum) - stdControl_aJoysticks[axisNum].dwXoffs;
+    result = stdControl_aAxisPos[axisNum] - stdControl_aJoysticks[axisNum].dwXoffs;
     if ( !result )
         return 0;
     if ( stdControl_bControlsIdle )
@@ -385,23 +429,23 @@ void stdControl_SetMouseSensitivity(float xSensitivity, float ySensitivity)
 {
     stdControl_mouseXSensitivity = xSensitivity;
     stdControl_mouseYSensitivity = ySensitivity;
-    if ( (stdControl_aJoysticks[12].flags & 1) != 0 )
+    if ( (stdControl_aJoysticks[AXIS_MOUSE_X].flags & 1) != 0 )
     {
-        stdControl_aJoysticks[12].dwYoffs = 0;
-        stdControl_aJoysticks[12].uMaxVal = (__int64)(xSensitivity * 250.0);
-        stdControl_aJoysticks[12].uMinVal = -stdControl_aJoysticks[12].uMaxVal;
-        stdControl_aJoysticks[12].flags |= 1u;
-        stdControl_aJoysticks[12].dwXoffs = (2 * stdControl_aJoysticks[12].uMaxVal + 1) / 2 - stdControl_aJoysticks[12].uMaxVal;
-        stdControl_aJoysticks[12].fRangeConversion = 1.0 / (double)(stdControl_aJoysticks[12].uMaxVal - stdControl_aJoysticks[12].dwXoffs);
+        stdControl_aJoysticks[AXIS_MOUSE_X].dwYoffs = 0;
+        stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal = (__int64)(xSensitivity * 250.0);
+        stdControl_aJoysticks[AXIS_MOUSE_X].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
+        stdControl_aJoysticks[AXIS_MOUSE_X].flags |= 1u;
+        stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
+        stdControl_aJoysticks[AXIS_MOUSE_X].fRangeConversion = 1.0 / (double)(stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs);
     }
-    if ( (stdControl_aJoysticks[13].flags & 1) != 0 )
+    if ( (stdControl_aJoysticks[AXIS_MOUSE_Y].flags & 1) != 0 )
     {
-        stdControl_aJoysticks[13].dwYoffs = 0;
-        stdControl_aJoysticks[13].uMaxVal = (__int64)(ySensitivity * 200.0);
-        stdControl_aJoysticks[13].uMinVal = -stdControl_aJoysticks[13].uMaxVal;
-        stdControl_aJoysticks[13].flags |= 1u;
-        stdControl_aJoysticks[13].dwXoffs = (2 * stdControl_aJoysticks[13].uMaxVal + 1) / 2 - stdControl_aJoysticks[13].uMaxVal;
-        stdControl_aJoysticks[13].fRangeConversion = 1.0 / (double)(stdControl_aJoysticks[13].uMaxVal - stdControl_aJoysticks[13].dwXoffs);
+        stdControl_aJoysticks[AXIS_MOUSE_Y].dwYoffs = 0;
+        stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal = (__int64)(ySensitivity * 200.0);
+        stdControl_aJoysticks[AXIS_MOUSE_Y].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
+        stdControl_aJoysticks[AXIS_MOUSE_Y].flags |= 1u;
+        stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
+        stdControl_aJoysticks[AXIS_MOUSE_Y].fRangeConversion = 1.0 / (double)(stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs);
     }
 }
 
@@ -413,7 +457,7 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
     int v4; // ecx
 
     // Added: bounds check
-    if (keyNum >= 284 || keyNum < 0)
+    if (keyNum >= JK_NUM_KEYS || keyNum < 0)
         return;
 
     if ( !bDown || stdControl_aKeyInfo[keyNum] )
@@ -443,6 +487,11 @@ void stdControl_InitAxis(int index, int stickMin, int stickMax, float multiplier
     int v4; // eax
     int v5; // esi
     double v6; // st7
+
+    // Added: OOB
+    if (index >= JK_NUM_AXES) {
+        return;
+    }
 
     v4 = stickMin + (stickMax - stickMin + 1) / 2;
     v5 = index;

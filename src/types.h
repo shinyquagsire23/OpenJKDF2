@@ -2841,14 +2841,6 @@ typedef struct stdControlStickEntry
     int dwVpos;
 } stdControlStickEntry;
 
-typedef struct stdControlAxis
-{
-    stdControlStickEntry aEntries[2];
-    int mouseX;
-    int mouseY;
-    int mouseZ;
-} stdControlAxis;
-
 typedef struct stdControlDikStrToNum
 {
     int val;
@@ -3006,38 +2998,110 @@ typedef struct stdControlDikStrToNum
 #define DIK_MAIL            0xEC    /* Mail */
 #define DIK_MEDIASELECT     0xED    /* Media Select */
 
+#define JK_JOYSTICK_AXIS_STRIDE (6)
+#define JK_NUM_JOYSTICKS        (2)
+#define JK_NUM_MOUSE_AXES       (3)
+#define JK_NUM_AXES             ((JK_JOYSTICK_AXIS_STRIDE * JK_NUM_JOYSTICKS) + JK_NUM_MOUSE_AXES)
+
+#ifndef SDL2_RENDER
+#define JK_NUM_MOUSE_BUTTONS     (4)
+#define JK_NUM_EXT_MOUSE_BUTTONS (0)
+#define JK_NUM_JOY_BUTTONS       (8)
+#define JK_NUM_EXT_JOY_BUTTONS   (0)
+#define JK_NUM_HAT_BUTTONS       (4)
+#else
+#define JK_NUM_MOUSE_BUTTONS     (4)
+#define JK_NUM_EXT_MOUSE_BUTTONS (28)
+#define JK_NUM_JOY_BUTTONS       (8)
+#define JK_NUM_EXT_JOY_BUTTONS   (12)
+#define JK_NUM_HAT_BUTTONS       (4)
+#endif
+
+#define JK_JOYSTICK_BUTTON_STRIDE       (JK_NUM_JOY_BUTTONS + JK_NUM_HAT_BUTTONS)
+#define JK_JOYSTICK_EXT_BUTTON_STRIDE   (JK_NUM_EXT_JOY_BUTTONS)
+#define JK_NUM_EXTENDED_KEYS ((JK_JOYSTICK_BUTTON_STRIDE * JK_NUM_JOYSTICKS) + JK_NUM_MOUSE_BUTTONS + JK_NUM_EXT_MOUSE_BUTTONS + (JK_JOYSTICK_EXT_BUTTON_STRIDE * JK_NUM_JOYSTICKS))
+
+#define JK_NUM_KEYS_ORIG        (0x100 + JK_NUM_EXTENDED_KEYS) // original game had an off-by-one?
+#define JK_NUM_KEYS             (0x100 + JK_NUM_EXTENDED_KEYS)
+
 // JK specific keys
-#define KEY_JOY1_B1         (0x100)
-#define KEY_JOY1_B2         (0x101)
-#define KEY_JOY1_B3         (0x102)
-#define KEY_JOY1_B4         (0x103)
-#define KEY_JOY1_B5         (0x104)
-#define KEY_JOY1_B6         (0x105)
-#define KEY_JOY1_B7         (0x106)
-#define KEY_JOY1_B8         (0x107)
-#define KEY_JOY1_HLEFT      (0x108)
-#define KEY_JOY1_HUP        (0x109)
-#define KEY_JOY1_HRIGHT     (0x10A)
-#define KEY_JOY1_HDOWN      (0x10B)
+#define JK_EXTENDED_KEY_START   (0x100)
+#define KEY_JOY1_B1             (JK_EXTENDED_KEY_START + 0)
+#define KEY_JOY1_B2             (JK_EXTENDED_KEY_START + 1)
+#define KEY_JOY1_B3             (JK_EXTENDED_KEY_START + 2)
+#define KEY_JOY1_B4             (JK_EXTENDED_KEY_START + 3)
+#define KEY_JOY1_B5             (JK_EXTENDED_KEY_START + 4)
+#define KEY_JOY1_B6             (JK_EXTENDED_KEY_START + 5)
+#define KEY_JOY1_B7             (JK_EXTENDED_KEY_START + 6)
+#define KEY_JOY1_B8             (JK_EXTENDED_KEY_START + 7)
+#define KEY_JOY1_HLEFT          (JK_EXTENDED_KEY_START + JK_NUM_JOY_BUTTONS + 0)
+#define KEY_JOY1_HUP            (JK_EXTENDED_KEY_START + JK_NUM_JOY_BUTTONS + 1)
+#define KEY_JOY1_HRIGHT         (JK_EXTENDED_KEY_START + JK_NUM_JOY_BUTTONS + 2)
+#define KEY_JOY1_HDOWN          (JK_EXTENDED_KEY_START + JK_NUM_JOY_BUTTONS + 3)
 
-#define KEY_JOY2_B1         (0x10C)
-#define KEY_JOY2_B2         (0x10D)
-#define KEY_JOY2_B3         (0x10E)
-#define KEY_JOY2_B4         (0x10F)
-#define KEY_JOY2_B5         (0x110)
-#define KEY_JOY2_B6         (0x111)
-#define KEY_JOY2_B7         (0x112)
-#define KEY_JOY2_B8         (0x113)
-#define KEY_JOY2_HLEFT      (0x114)
-#define KEY_JOY2_HUP        (0x115)
-#define KEY_JOY2_HRIGHT     (0x116)
-#define KEY_JOY2_HDOWN      (0x117)
+#define KEY_JOY2_STARTIDX       (JK_EXTENDED_KEY_START + JK_JOYSTICK_BUTTON_STRIDE)
+#define KEY_JOY2_B1             (KEY_JOY2_STARTIDX + 0)
+#define KEY_JOY2_B2             (KEY_JOY2_STARTIDX + 1)
+#define KEY_JOY2_B3             (KEY_JOY2_STARTIDX + 2)
+#define KEY_JOY2_B4             (KEY_JOY2_STARTIDX + 3)
+#define KEY_JOY2_B5             (KEY_JOY2_STARTIDX + 4)
+#define KEY_JOY2_B6             (KEY_JOY2_STARTIDX + 5)
+#define KEY_JOY2_B7             (KEY_JOY2_STARTIDX + 6)
+#define KEY_JOY2_B8             (KEY_JOY2_STARTIDX + 7)
+#define KEY_JOY2_HLEFT          (KEY_JOY2_STARTIDX + JK_NUM_JOY_BUTTONS + 0)
+#define KEY_JOY2_HUP            (KEY_JOY2_STARTIDX + JK_NUM_JOY_BUTTONS + 1)
+#define KEY_JOY2_HRIGHT         (KEY_JOY2_STARTIDX + JK_NUM_JOY_BUTTONS + 2)
+#define KEY_JOY2_HDOWN          (KEY_JOY2_STARTIDX + JK_NUM_JOY_BUTTONS + 3)
 
-#define KEY_MOUSE_B1        (0x118)
-#define KEY_MOUSE_B2        (0x119)
-#define KEY_MOUSE_B3        (0x11A)
-#define KEY_MOUSE_B4        (0x11B)
-#define KEY_MOUSE_B5        (0x11C)
+#define KEY_MOUSE_STARTIDX      (JK_EXTENDED_KEY_START + (JK_JOYSTICK_BUTTON_STRIDE * 2))
+#define KEY_MOUSE_B1            (KEY_MOUSE_STARTIDX + 0)
+#define KEY_MOUSE_B2            (KEY_MOUSE_STARTIDX + 1)
+#define KEY_MOUSE_B3            (KEY_MOUSE_STARTIDX + 2)
+#define KEY_MOUSE_B4            (KEY_MOUSE_STARTIDX + 3)
+#define JK_ORIG_EXT_END         (KEY_MOUSE_B4 + 1)
+
+#define KEY_MOUSE_B5            (JK_ORIG_EXT_END + 0)
+#define KEY_MOUSE_B6            (JK_ORIG_EXT_END + 1)
+#define KEY_MOUSE_B7            (JK_ORIG_EXT_END + 2)
+#define KEY_MOUSE_B8            (JK_ORIG_EXT_END + 3)
+
+#define JK_EXT_MOUSE_END        (KEY_MOUSE_B5 + JK_NUM_EXT_MOUSE_BUTTONS)
+
+#define KEY_IS_MOUSE(x) (x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4)
+#define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= KEY_JOY1_EXT_STARTIDX && x < KEY_JOY2_EXT_ENDIDX))
+#define KEY_IS_BUTTON(x) (KEY_IS_JOY_BUTTON(x) || x < JK_EXTENDED_KEY_START)
+
+// QOL added:
+#ifdef SDL2_RENDER
+#define KEY_JOY1_EXT_STARTIDX   (JK_EXT_MOUSE_END)
+#define KEY_JOY1_B9             (KEY_JOY1_EXT_STARTIDX + 0)
+#define KEY_JOY1_B10            (KEY_JOY1_EXT_STARTIDX + 1)
+#define KEY_JOY1_B11            (KEY_JOY1_EXT_STARTIDX + 2)
+#define KEY_JOY1_B12            (KEY_JOY1_EXT_STARTIDX + 3)
+#define KEY_JOY1_B13            (KEY_JOY1_EXT_STARTIDX + 4)
+#define KEY_JOY1_B14            (KEY_JOY1_EXT_STARTIDX + 5)
+#define KEY_JOY1_B15            (KEY_JOY1_EXT_STARTIDX + 6)
+#define KEY_JOY1_B16            (KEY_JOY1_EXT_STARTIDX + 7)
+#define KEY_JOY1_B17            (KEY_JOY1_EXT_STARTIDX + 8)
+#define KEY_JOY1_B18            (KEY_JOY1_EXT_STARTIDX + 9)
+#define KEY_JOY1_B19            (KEY_JOY1_EXT_STARTIDX + 10)
+#define KEY_JOY1_B20            (KEY_JOY1_EXT_STARTIDX + 11)
+
+#define KEY_JOY2_EXT_STARTIDX   (JK_EXT_MOUSE_END + JK_JOYSTICK_EXT_BUTTON_STRIDE)
+#define KEY_JOY2_B9             (KEY_JOY2_EXT_STARTIDX + 0)
+#define KEY_JOY2_B10            (KEY_JOY2_EXT_STARTIDX + 1)
+#define KEY_JOY2_B11            (KEY_JOY2_EXT_STARTIDX + 2)
+#define KEY_JOY2_B12            (KEY_JOY2_EXT_STARTIDX + 3)
+#define KEY_JOY2_B13            (KEY_JOY2_EXT_STARTIDX + 4)
+#define KEY_JOY2_B14            (KEY_JOY2_EXT_STARTIDX + 5)
+#define KEY_JOY2_B15            (KEY_JOY2_EXT_STARTIDX + 6)
+#define KEY_JOY2_B16            (KEY_JOY2_EXT_STARTIDX + 7)
+#define KEY_JOY2_B17            (KEY_JOY2_EXT_STARTIDX + 8)
+#define KEY_JOY2_B18            (KEY_JOY2_EXT_STARTIDX + 9)
+#define KEY_JOY2_B19            (KEY_JOY2_EXT_STARTIDX + 10)
+#define KEY_JOY2_B20            (KEY_JOY2_EXT_STARTIDX + 11)
+#define KEY_JOY2_EXT_ENDIDX     (KEY_JOY2_EXT_STARTIDX + 12)
+#endif
 
 // Axis idxs
 #define AXIS_JOY1_X          (0)
@@ -3047,16 +3111,16 @@ typedef struct stdControlDikStrToNum
 #define AXIS_JOY1_U          (4)
 #define AXIS_JOY1_V          (5)
 
-#define AXIS_JOY2_X          (6)
-#define AXIS_JOY2_Y          (7)
-#define AXIS_JOY2_Z          (8)
-#define AXIS_JOY2_R          (9)
-#define AXIS_JOY2_U          (10)
-#define AXIS_JOY2_V          (11)
+#define AXIS_JOY2_X          (JK_JOYSTICK_AXIS_STRIDE + 0) // 6
+#define AXIS_JOY2_Y          (JK_JOYSTICK_AXIS_STRIDE + 1) // 7
+#define AXIS_JOY2_Z          (JK_JOYSTICK_AXIS_STRIDE + 2) // 8
+#define AXIS_JOY2_R          (JK_JOYSTICK_AXIS_STRIDE + 3) // 9
+#define AXIS_JOY2_U          (JK_JOYSTICK_AXIS_STRIDE + 4) // a 10
+#define AXIS_JOY2_V          (JK_JOYSTICK_AXIS_STRIDE + 5) // b 11
 
-#define AXIS_MOUSE_X         (12)
-#define AXIS_MOUSE_Y         (13)
-#define AXIS_MOUSE_Z         (14)
+#define AXIS_MOUSE_X         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 0) // c 12
+#define AXIS_MOUSE_Y         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 1) // d 13
+#define AXIS_MOUSE_Z         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 2) // e 14
 
 typedef struct jkGuiMouseSubEntry
 {
@@ -3067,13 +3131,13 @@ typedef struct jkGuiMouseSubEntry
 
 typedef struct jkGuiMouseEntry
 {
-    int bindIdx;
-    int mouseEntryIdx;
     int dxKeyNum;
     const char *displayStrKey;
     int inputFuncIdx;
     int flags;
     jkGuiMouseSubEntry *pSubEnt;
+    int bindIdx;
+    int mouseEntryIdx;
 } jkGuiMouseEntry;
 
 typedef struct jkGuiKeyboardEntry

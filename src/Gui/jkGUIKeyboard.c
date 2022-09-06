@@ -54,7 +54,7 @@ const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis)
         if ( (idx & 0x80000000) != 0 )
             v2 = 0;
         else
-            v2 = idx <= 0xE;
+            v2 = idx <= JK_NUM_AXES;
         if ( v2 )
             pOutStr = stdControl_aAxisNames[idx];
         else
@@ -252,7 +252,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint
                     if ( (a5 & 0x80000000) != 0 )
                         v10 = 0;
                     else
-                        v10 = a5 <= 0xE;
+                        v10 = a5 <= JK_NUM_AXES;
                     if ( v10 )
                         v11 = stdControl_aAxisNames[a5];
                     else
@@ -363,7 +363,7 @@ void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
     {
         v10 = 0;
         stdControl_ReadKey(v4, &v10);
-        if ( v10 && (v4 < 256 || v4 >= 280) && v4 < 280 )
+        if ( v10 && (KEY_IS_BUTTON(v4)) && !KEY_IS_MOUSE(v4) )
         {
             if ( v4 == 1 )
                 goto LABEL_27;
@@ -429,7 +429,7 @@ LABEL_27:
         }
         v11 = ++v4;
     }
-    while ( v4 < 284 );
+    while ( v4 < JK_NUM_KEYS );
     stdControl_FinishRead();
     stdControl_bControlsActive = jkGuiKeyboard_dword_555DE0 == 0;
     if ( !jkGuiKeyboard_bOnceIdk )

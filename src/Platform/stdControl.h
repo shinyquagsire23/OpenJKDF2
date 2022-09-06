@@ -27,6 +27,11 @@
 #define stdControl_mouse_getdevicestate_ADDR (0x0042EEC0)
 #define stdControl_InitAxis_ADDR (0x0042F090)
 
+#ifdef SDL2_RENDER
+void stdControl_FreeSdlJoysticks();
+void stdControl_InitSdlJoysticks();
+#endif
+
 void stdControl_Reset();
 int stdControl_EnableAxis(unsigned int idx);
 float stdControl_ReadAxis(int axisNum);
@@ -64,8 +69,8 @@ void stdControl_ReadControls();
 void stdControl_ReadMouse();
 #endif
 
-extern const stdControlDikStrToNum stdControl_aDikNumToStr[148];
-extern const char *stdControl_aAxisNames[16];
+extern const stdControlDikStrToNum stdControl_aDikNumToStr[120 + JK_NUM_EXTENDED_KEYS];
+extern const char *stdControl_aAxisNames[JK_NUM_AXES+1];
 
 //static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
 

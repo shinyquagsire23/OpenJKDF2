@@ -383,12 +383,12 @@ stdControl_mouseXSensitivity 0x0053EEEC float = 1.0f
 stdControl_mouseYSensitivity 0x0053EEF0 float = 1.0f
 stdControl_mouseZSensitivity 0x0053EEF4 float = 1.0f
 
-stdControl_unk_55C828 0x0055C828 int[2]
-stdControl_aAxisPos 0x0055C830 stdControlAxis
-stdControl_aInput1 0x0055C870 int[284]
-stdControl_aKeyInfo 0x0055CCE0 int[284]
-stdControl_aAxisConnected 0x0055D150 int[2]
-stdControl_aInput2 0x0055D158 int[284]
+stdControl_aAxisEnabled 0x0055C828 int[JK_NUM_JOYSTICKS]
+stdControl_aAxisPos 0x0055C830 int[JK_NUM_AXES]
+stdControl_aInput1 0x0055C870 int[JK_NUM_KEYS]
+stdControl_aKeyInfo 0x0055CCE0 int[JK_NUM_KEYS]
+stdControl_aAxisConnected 0x0055D150 int[JK_NUM_JOYSTICKS]
+stdControl_aInput2 0x0055D158 int[JK_NUM_KEYS]
 stdControl_bStartup 0x0055D5C8 int
 stdControl_bOpen 0x0055D5CC int
 stdControl_bDisableKeyboard 0x0055D5D0 int
@@ -397,17 +397,17 @@ stdControl_bControlsActive 0x0055D5D8 int
 stdControl_ppDI 0x0055D5DC void*
 stdControl_mouseDirectInputDevice 0x0055D5E0 void*
 stdControl_keyboardIDirectInputDevice 0x0055D5E4 void*
-stdControl_joy_related 0x0055D5E8 int
+stdControl_bHasJoysticks 0x0055D5E8 int
 stdControl_curReadTime 0x0055D5EC uint32_t
 stdControl_msLast 0x0055D5F0 uint32_t
 stdControl_msDelta 0x0055D5F8 uint32_t
 stdControl_dwLastMouseX 0x0055D5FC int32_t
 stdControl_dwLastMouseY 0x0055D600 int32_t
 
-stdControl_aJoystickEnabled 0x00865028 int[2]
+stdControl_aJoystickEnabled 0x00865028 int[JK_NUM_JOYSTICKS]
 stdControl_aJoystickExists 0x00865030 int[4]
-stdControl_aJoysticks 0x00865040 stdControlJoystickEntry[15]
-stdControl_aJoystickMaxButtons 0x008651A8 int[2]
+stdControl_aJoysticks 0x00865040 stdControlJoystickEntry[JK_NUM_AXES]
+stdControl_aJoystickMaxButtons 0x008651A8 int[JK_NUM_JOYSTICKS]
 
 Windows_installType 0x008606E0 int
 

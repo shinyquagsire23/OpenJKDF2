@@ -31,16 +31,31 @@ static int aIdk_52B168[2] = {0x13, 0x11};
 static wchar_t slider_val_text[5] = {0};
 #endif
 
-static jkGuiMouseEntry jkGuiMouse_aEntries[8] =
+static int jkGuiMouse_dword_530328 = -1;
+static int jkGuiMouse_dword_53032C = -1;
+
+#ifndef SDL2_RENDER
+#define NUM_MOUSE_ENTRIES (7)
+#else
+#define NUM_MOUSE_ENTRIES (7+1)
+#endif
+
+static jkGuiMouseEntry jkGuiMouse_aEntries[NUM_MOUSE_ENTRIES+1] =
 {
-  { -1, -1, 12, "AXIS_MOUSE_X", 0, 0, NULL },
-  { 0, 0, 13, "AXIS_MOUSE_Y",   0, 0, NULL },
-  { 0, 0, 14, "AXIS_MOUSE_Z",   0, 0, NULL },
-  { 0, 0, 280, "KEY_MOUSE_B1",  0, 0, NULL },
-  { 0, 0, 281, "KEY_MOUSE_B2",  0, 0, NULL },
-  { 0, 0, 282, "KEY_MOUSE_B3",  0, 0, NULL },
-  { 0, 0, 283, "KEY_MOUSE_B4",  0, 0, NULL },
-  { 0, 0, 0,   NULL,            0, 0, NULL },
+  { AXIS_MOUSE_X, "AXIS_MOUSE_X",  0, 0, NULL, 0, 0 },
+  { AXIS_MOUSE_Y, "AXIS_MOUSE_Y",  0, 0, NULL, 0, 0  },
+  { AXIS_MOUSE_Z, "AXIS_MOUSE_Z",  0, 0, NULL, 0, 0  },
+  { KEY_MOUSE_B1, "KEY_MOUSE_B1",  0, 0, NULL, 0, 0  },
+  { KEY_MOUSE_B2, "KEY_MOUSE_B2",  0, 0, NULL, 0, 0  },
+  { KEY_MOUSE_B3, "KEY_MOUSE_B3",  0, 0, NULL, 0, 0  },
+  { KEY_MOUSE_B4, "KEY_MOUSE_B4",  0, 0, NULL, 0, 0  },
+#ifdef SDL2_RENDER
+  { KEY_MOUSE_B5, "KEY_MOUSE_B5",  0, 0, NULL, 0, 0  },
+  //{ KEY_MOUSE_B6, "KEY_MOUSE_B6",  0, 0, NULL, 0, 0  },
+  //{ KEY_MOUSE_B7, "KEY_MOUSE_B7",  0, 0, NULL, 0, 0  },
+  //{ KEY_MOUSE_B8, "KEY_MOUSE_B8",  0, 0, NULL, 0, 0  },
+#endif
+  { 0,   NULL,            0, 0, NULL, 0, 0  },
 };
 
 static jkGuiElement jkGuiMouse_aElements[26] =
@@ -141,14 +156,14 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
     while ( 1 )
     {
         v2 = jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry);
-        v3 = jkGuiMouse_aEntries[0].mouseEntryIdx;
+        v3 = jkGuiMouse_dword_53032C;
         v18 = jkGuiMouse_aEntries[v2].inputFuncIdx;
-        if ( v2 == jkGuiMouse_aEntries[0].mouseEntryIdx && jkGuiMouse_dword_5566B0 == jkGuiMouse_aEntries[0].bindIdx )
+        if ( v2 == jkGuiMouse_dword_53032C && jkGuiMouse_dword_5566B0 == jkGuiMouse_dword_530328 )
             break;
         v4 = 0;
-        if ( jkGuiMouse_aEntries[0].mouseEntryIdx >= 0 && jkGuiMouse_aEntries[jkGuiMouse_aEntries[0].mouseEntryIdx].pSubEnt )
+        if ( jkGuiMouse_dword_53032C >= 0 && jkGuiMouse_aEntries[jkGuiMouse_dword_53032C].pSubEnt )
         {
-            v5 = jkGuiMouse_aEntries[jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aEntries[0].mouseEntryIdx)].pSubEnt;
+            v5 = jkGuiMouse_aEntries[jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_dword_53032C)].pSubEnt;
             if ( jkGuiMouse_aElements[20].bIsVisible )
             {
                 // Adjusted: More granularity
@@ -162,7 +177,7 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
                 v5->bitflag = v5->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
             if ( jkGuiMouse_aElements[17].bIsVisible )
                 v5->bitflag = v5->bitflag & ~4u | (jkGuiMouse_aElements[17].selectedTextEntry != 0 ? 0 : 4);
-            v3 = jkGuiMouse_aEntries[0].mouseEntryIdx;
+            v3 = jkGuiMouse_dword_53032C;
         }
         if ( !jkGuiMouse_dword_5566B0 )
         {
@@ -211,8 +226,8 @@ LABEL_30:
                     jkGuiRend_MouseMovedCallback(v7, mouseX, mouseY);
                 }
             }
-            jkGuiMouse_aEntries[0].mouseEntryIdx = v2;
-            jkGuiMouse_aEntries[0].bindIdx = jkGuiMouse_dword_5566B0;
+            jkGuiMouse_dword_53032C = v2;
+            jkGuiMouse_dword_530328 = jkGuiMouse_dword_5566B0;
             return;
         }
         if ( v3 == v2 )
@@ -306,7 +321,7 @@ void jkGuiMouse_sub_417100(int a1, int a2)
             v13 = pSubEnt->field_8;
             mapFlags = pSubEnt->bitflag & 4;
         }
-        sithControl_ShiftFuncKeyinfo(v5, jkGuiMouse_aEntries[v3 + 1].bindIdx);
+        sithControl_ShiftFuncKeyinfo(v5, jkGuiMouse_aEntries[v3].bindIdx);
     }
     v8 = sithControl_MapAxisFunc(inputFuncIdx, dxKeyNum, mapFlags);
     if ( v8 )
@@ -341,12 +356,12 @@ void jkGuiMouse_sub_417210()
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_556698);
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_5566D0);
     v0 = &jkGuiMouse_aEntries[0];
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
     {
         v0->inputFuncIdx = -1;
         v0->flags = 0;
-        v0[1].bindIdx = 0; // original had [1]?
-        v0[1].mouseEntryIdx = 0; // original had [1]?
+        v0->bindIdx = 0; // original had [1]?
+        v0->mouseEntryIdx = 0; // original had [1]?
         v0->pSubEnt = 0;
         v0++;
     }
@@ -354,7 +369,7 @@ void jkGuiMouse_sub_417210()
     sithControl_EnumBindings(jkGuiMouse_EnumBindings, 0, 0, 1, 0);
 
     v2 = &jkGuiMouse_aEntries[0];
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
     {
         v3 = jkStrings_GetText(v2->displayStrKey);
         if ( v2->inputFuncIdx == -1 )
@@ -363,11 +378,11 @@ void jkGuiMouse_sub_417210()
         }
         else if ( i >= 3 )
         {
-            v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_5566D0, v2[1].mouseEntryIdx);
+            v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_5566D0, v2->mouseEntryIdx);
         }
         else
         {
-            v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_556698, v2[1].mouseEntryIdx);
+            v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_556698, v2->mouseEntryIdx);
         }
         jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
 
@@ -410,6 +425,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     {
         _strncpy(v16, a2, 0x1Fu);
         v16[31] = 0;
+        a6 |= 1; // TODO: HACK
         if ( (a6 & 1) != 0 )
         {
             strncat(v16, "_A", 0x20u);
@@ -427,6 +443,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         v8 = jkStrings_GetText(v16);
         if ( !v8 )
             return 1;
+        printf("%s\n", v16);
         v9 = v15;
     }
     jk_snwprintf(v17, 0xFFu, L"%ls%ls", v9, v8);
@@ -441,7 +458,9 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         if ( i == v11 )
         {
             jkGuiRend_DarrayReallocStr(&jkGuiMouse_Darray_556698, v17, v10);
-            goto LABEL_23;
+        }
+        else {
+            v11 = i;
         }
     }
     else
@@ -455,25 +474,26 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         if ( i == v11 )
         {
             jkGuiRend_DarrayReallocStr(&jkGuiMouse_Darray_5566D0, v17, v10);
-            goto LABEL_23;
+        }
+        else {
+            v11 = i;
         }
     }
-    v11 = i;
-LABEL_23:
+
     if ( a7 )
     {
-        v13 = &jkGuiMouse_aEntries[0];
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
         {
+            v13 = &jkGuiMouse_aEntries[i];
+            printf("%s %x %x\n", v13->displayStrKey, v13->dxKeyNum, a5);
             if ( a5 == v13->dxKeyNum )
             {
                 v13->inputFuncIdx = a1;
                 v13->flags = a3;
-                v13[1].bindIdx = a4; // [1] in orig?
-                v13[1].mouseEntryIdx = v11; // [1] in orig?
+                v13->bindIdx = a4; // [1] in orig?
+                v13->mouseEntryIdx = v11; // [1] in orig?
                 v13->pSubEnt = (jkGuiMouseSubEntry *)a7;
             }
-            ++v13;
         }
     }
     return 1;
@@ -511,7 +531,7 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
         v12 = (v8 >> 29) & 4;
         v13 = v8 & 0x7FFFFFFF;
         if ( v10 != -1 )
-            sithControl_ShiftFuncKeyinfo(v10, jkGuiMouse_aEntries[v9 + 1].bindIdx);
+            sithControl_ShiftFuncKeyinfo(v10, jkGuiMouse_aEntries[v9].bindIdx);
         if ( sithControl_MapFunc(v13, v11, v12) )
         {
             jkGuiMouse_sub_417210();
@@ -543,11 +563,11 @@ int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, in
     int v5; // eax
 
     v5 = jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry);
-    sithControl_ShiftFuncKeyinfo(jkGuiMouse_aEntries[v5].inputFuncIdx, jkGuiMouse_aEntries[v5 + 1].bindIdx);
+    sithControl_ShiftFuncKeyinfo(jkGuiMouse_aEntries[v5].inputFuncIdx, jkGuiMouse_aEntries[v5].bindIdx);
     jkGuiRend_PlayWav(pMenu->soundClick);
     jkGuiMouse_sub_417210();
-    jkGuiMouse_aEntries[0].mouseEntryIdx = -1;
-    jkGuiMouse_aEntries[0].bindIdx = -1;
+    jkGuiMouse_dword_53032C = -1;
+    jkGuiMouse_dword_530328 = -1;
     jkGuiMouse_sub_416D40(pMenu, 1);
     return 0;
 }
@@ -581,7 +601,7 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
             v11 = (v7 >> 29) & 4;
             v12 = v7 & ~0x80000000;
             if ( v9 != -1 )
-                sithControl_ShiftFuncKeyinfo(v9, jkGuiMouse_aEntries[v8 + 1].bindIdx);
+                sithControl_ShiftFuncKeyinfo(v9, jkGuiMouse_aEntries[v8].bindIdx);
             if ( sithControl_MapFunc(v12, v10, v11) )
             {
                 jkGuiMouse_sub_417210();
@@ -616,8 +636,8 @@ int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
     if ( jkGuiDialog_YesNoDialog(v5, v7) )
         sithControl_sub_4D7670();
     jkGuiMouse_sub_417210();
-    jkGuiMouse_aEntries[0].mouseEntryIdx = -1;
-    jkGuiMouse_aEntries[0].bindIdx = -1;
+    jkGuiMouse_dword_53032C = -1;
+    jkGuiMouse_dword_530328 = -1;
     jkGuiMouse_sub_416D40(pMenu, 0);
     jkGuiRend_Paint(pMenu);
     return 0;
@@ -642,8 +662,8 @@ int jkGuiMouse_Show()
     jkGuiMouse_aElements[12].selectedTextEntry = 0;
     jkGuiMouse_aElements[13].selectedTextEntry = 0;
     jkGuiMouse_dword_5566B0 = 0;
-    jkGuiMouse_aEntries[0].bindIdx = -1;
-    jkGuiMouse_aEntries[0].mouseEntryIdx = -1;
+    jkGuiMouse_dword_530328 = -1;
+    jkGuiMouse_dword_53032C = -1;
     jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
     jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[14], 45);
     jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[16], 46);

@@ -149,49 +149,49 @@ void sithControl_Close()
 
 void sithControl_InitFuncToControlType()
 {
-    sithControl_inputFuncToControlType[INPUT_FUNC_TURN] = 11;
-    sithControl_inputFuncToControlType[INPUT_FUNC_PITCH] = 11;
-    sithControl_inputFuncToControlType[INPUT_FUNC_FORWARD] = 3;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SLIDE] = 3;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SLIDETOGGLE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_JUMP] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_DUCK] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_FAST] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SLOW] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_CENTER] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_FIRE1] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_FIRE2] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_ACTIVATE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT0] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT1] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT2] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT3] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT4] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT5] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT6] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT7] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT8] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT9] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_GAMESAVE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTINV] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_PREVINV] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_USEINV] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_PREVSKILL] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTSKILL] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_USESKILL] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_PREVWEAPON] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTWEAPON] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_MAP] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_INCREASE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_DECREASE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_MLOOK] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_CAMERAMODE] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_TALK] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_GAMMA] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_SCREENSHOT] = 5;
-    sithControl_inputFuncToControlType[INPUT_FUNC_TALLY] = 5;
+    sithControl_inputFuncToControlType[INPUT_FUNC_TURN] = 8 | 2 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_PITCH] = 8 | 2 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_FORWARD] = 2 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SLIDE] = 2 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SLIDETOGGLE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_JUMP] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_DUCK] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_FAST] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SLOW] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_CENTER] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_FIRE1] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_FIRE2] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_ACTIVATE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT0] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT1] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT2] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT3] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT4] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT5] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT6] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT7] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT8] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SELECT9] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_GAMESAVE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTINV] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_PREVINV] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_USEINV] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_PREVSKILL] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTSKILL] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_USESKILL] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_PREVWEAPON] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_NEXTWEAPON] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_MAP] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_INCREASE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_DECREASE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_MLOOK] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_CAMERAMODE] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_TALK] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_GAMMA] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_SCREENSHOT] = 4 | 1;
+    sithControl_inputFuncToControlType[INPUT_FUNC_TALLY] = 4 | 1;
     if ( (g_debugmodeFlags & 0x100) != 0 )
-        sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 5;
+        sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 4 | 1;
 }
 
 void sithControl_Tick(float deltaSecs, int deltaMs)
@@ -256,6 +256,7 @@ stdControlKeyInfoEntry* sithControl_MapFunc(int funcIdx, int keyNum, int flags)
     v3 = flags;
     v3 = flags & ~9 | 2;
     a3a = v3;
+    //printf("1] Map %x\n", keyNum);
     if ( (sithControl_inputFuncToControlType[funcIdx] & 1) != 0 && sithControl_aInputFuncToKeyinfo[funcIdx].numEntries != 8 )
     {
         v4 = 0;
@@ -295,7 +296,9 @@ LABEL_9:
             while ( v10 < sithControl_aInputFuncToKeyinfo[v8].numEntries );
         }
 LABEL_14:
+
         v13 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries;
+        //printf("1] Map %x, %x %x %x %x\n", keyNum, funcIdx, v8, v6, v13);
         v14 = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[v13];
         v14->flags = a3a;
         v14->dxKeyNum = keyNum;
@@ -517,7 +520,7 @@ int sithControl_ReadConf()
                 v3 = v19;
                 if ( (v19 & 2) != 0 )
                 {
-                    if ( dxKeyNum <= 0x11C )
+                    if ( dxKeyNum <= JK_NUM_KEYS )
                     {
                         v3 = v19 & ~9 | 2;
                         v21 = v3;
@@ -573,7 +576,7 @@ LABEL_30:
                         }
                     }
                 }
-                else if ( dxKeyNum <= 0xF )
+                else if ( dxKeyNum <= JK_NUM_AXES )
                 {
                     v16 = sithControl_MapAxisFunc(v1, dxKeyNum, v19);
                     if ( v16 )
@@ -637,7 +640,7 @@ int sithControl_ReadFunctionMap(int funcIdx, int *pOut)
         do
         {
             v4 = v3->dxKeyNum;
-            if ( !(sithWeapon_controlOptions & 0x20) || v4 < 0x100 || v4 > 0x117 )
+            if ( !(sithWeapon_controlOptions & 0x20) || v4 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v4) )
                 v6 |= stdControl_ReadKey(v4, pOut);
             ++v2;
             ++v3;
@@ -676,7 +679,7 @@ float sithControl_GetAxis2(int axisNum)
             v3 = entryIter->flags;
             if ( (v3 & 1) != 0 )
             {
-                if ( (sithWeapon_controlOptions & 0x20) == 0 || entryIter->dxKeyNum > 0xBu )
+                if ( (sithWeapon_controlOptions & 0x20) == 0 || entryIter->dxKeyNum >= AXIS_MOUSE_X )
                 {
                     v4 = stdControl_ReadAxis(entryIter->dxKeyNum);
 LABEL_11:
@@ -701,7 +704,7 @@ LABEL_11:
                     goto LABEL_23;
                 }
             }
-            else if ( (sithWeapon_controlOptions & 0x20) == 0 || entryIter->dxKeyNum < 0x100u || entryIter->dxKeyNum > 0x117u )
+            else if ( (sithWeapon_controlOptions & 0x20) == 0 || entryIter->dxKeyNum < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(entryIter->dxKeyNum) )
             {
                 v4 = stdControl_ReadKeyAsAxis(entryIter->dxKeyNum);
                 goto LABEL_11;
@@ -739,13 +742,13 @@ float sithControl_ReadAxisStuff(int funcIdx)
             {
                 if ( (v3 & 1) != 0 )
                 {
-                    if ( (sithWeapon_controlOptions & 0x20) == 0 || v2->dxKeyNum > 0xBu )
+                    if ( (sithWeapon_controlOptions & 0x20) == 0 || v2->dxKeyNum >= AXIS_MOUSE_X )
                     {
                         v4 = stdControl_ReadAxis(v2->dxKeyNum);
                         goto LABEL_12;
                     }
                 }
-                else if ( (sithWeapon_controlOptions & 0x20) == 0 || v2->dxKeyNum < 0x100u || v2->dxKeyNum > 0x117u )
+                else if ( (sithWeapon_controlOptions & 0x20) == 0 || v2->dxKeyNum < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v2->dxKeyNum) )
                 {
                     v4 = stdControl_ReadKeyAsAxis(v2->dxKeyNum);
 LABEL_12:
@@ -787,7 +790,7 @@ float sithControl_GetAxis(int funcIdx)
         do
         {
             v4 = v2->flags;
-            if ( (v4 & 8) != 0 && ((sithWeapon_controlOptions & 0x20) == 0 || v1->dxKeyNum > 0xBu) )
+            if ( (v4 & 8) != 0 && ((sithWeapon_controlOptions & 0x20) == 0 || v1->dxKeyNum >= AXIS_MOUSE_X) )
             {
                 v5 = (double)stdControl_ReadAxisRaw(v2->dxKeyNum);
                 if ( (v4 & 4) != 0 )
@@ -1458,8 +1461,8 @@ void sithControl_InputInit()
     stdControl_Reset();
     sithWeapon_controlOptions = 36;
     sithControl_MapDefaults();
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, DIK_ESCAPE, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, 0, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
@@ -1470,13 +1473,13 @@ void sithControl_InputInit()
     sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
     sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
     sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
-    v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, DIK_MINUS, 0xCu);
+    v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v6 )
         v6->binaryAxisVal = 0.40000001;
-    v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_EQUALS, 8u);
+    v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
     if ( v7 )
         v7->binaryAxisVal = 0.30000001;
-    v8 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_BACK, 0);
+    v8 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
     if ( v8 )
         v8->binaryAxisVal = 4.0;
     
@@ -1526,9 +1529,11 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
             v9 = v8->flags;
             v10 = v8->dxKeyNum;
             v11 = v8->flags & 2;
-            if ( (!v11 || v10 >= 256 || a2)
-              && (((v9 & 1) == 0 || v10 < 12) && (!v11 || v10 < 280 || v10 >= 284) || a4)
-              && (((v9 & 1) == 0 || v10 >= 12) && (!v11 || v10 < 256 || v10 >= 280) || a3) )
+            if ( (!v11 || v10 >= JK_EXTENDED_KEY_START || a2)
+              && (((v9 & 1) == 0 || v10 < AXIS_MOUSE_X) 
+              && (!v11 || !KEY_IS_MOUSE(v10)) || a4)
+              && (((v9 & 1) == 0 || v10 >= AXIS_MOUSE_X) 
+              && (!v11 || v10 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v10)) || a3) )
             {
                 v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], v16, v10, v9, v8, a5);
                 if ( v18 || (v12 = i, (i->dxKeyNum & 2) != 0) && (i->dxKeyNum & 4) == 0 )
@@ -1618,7 +1623,7 @@ void sithControl_sub_4D7670()
             while ( !v3 )
             {
                 v5 = v4->dxKeyNum;
-                if ( (v4->flags & 1) == 0 && v5 >= 280 && v5 < 284 || (v4->flags & 1) != 0 && v5 >= DIK_MINUS && v5 <= DIK_BACK )
+                if ( (v4->flags & 1) == 0 && KEY_IS_MOUSE(v5) || (v4->flags & 1) != 0 && v5 >= AXIS_MOUSE_X && v5 <= AXIS_MOUSE_Z )
                 {
                     v6 = v1 - 1;
                     v7 = v2;
@@ -1652,13 +1657,13 @@ LABEL_17:
     }
     while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
 
-    v10 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, DIK_MINUS, 0xCu);
+    v10 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v10 )
         v10->binaryAxisVal = 0.40000001;
-    v11 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_EQUALS, 8u);
+    v11 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
     if ( v11 )
         v11->binaryAxisVal = 0.30000001;
-    v12 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, DIK_BACK, 0);
+    v12 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
     if ( v12 )
         v12->binaryAxisVal = 4.0;
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
@@ -1693,7 +1698,7 @@ void sithControl_sub_4D7350()
             v9 = v0->aEntries;
             while ( !v3 )
             {
-                if ( (v4->flags & 1) == 0 && v4->dxKeyNum < 256 )
+                if ( (v4->flags & 1) == 0 && v4->dxKeyNum < JK_EXTENDED_KEY_START )
                 {
                     v5 = v1 - 1;
                     v6 = v2;
@@ -1770,7 +1775,7 @@ void sithControl_JoyInputInit()
             while ( !v3 )
             {
                 v5 = v4->dxKeyNum;
-                if ( (v4->flags & 1) == 0 && v5 >= 256 && v5 < 280 || (v4->flags & 1) != 0 && v5 >= 0 && v5 <= 11 )
+                if ( (v4->flags & 1) == 0 && KEY_IS_JOY_BUTTON(v5) || (v4->flags & 1) != 0 && v5 >= 0 && v5 <= 11 )
                 {
                     v6 = v1 - 1;
                     v7 = v2;
@@ -1803,15 +1808,15 @@ LABEL_17:
         ;
     }
     while ( v3 || ++v0 < (stdControlKeyInfo *)&sithControl_msIdle );
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, DIK_ESCAPE, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, 0, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
     if ( (sithControl_inputFuncToControlType[10] & 1) != 0 && sithControl_aInputFuncToKeyinfo[10].numEntries != 8 )
     {
         sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B1);
         v10 = sithControl_aInputFuncToKeyinfo[10].numEntries + 1;
         v11 = &sithControl_aInputFuncToKeyinfo[10].aEntries[sithControl_aInputFuncToKeyinfo[10].numEntries];
         v11->flags = 2;
-        v11->dxKeyNum = 256;
+        v11->dxKeyNum = KEY_JOY1_B1;
         sithControl_aInputFuncToKeyinfo[10].numEntries = v10;
     }
     if ( (sithControl_inputFuncToControlType[11] & 1) != 0 && sithControl_aInputFuncToKeyinfo[11].numEntries != 8 )

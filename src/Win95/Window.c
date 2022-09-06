@@ -351,6 +351,8 @@ int Window_bMouseRight = 0;
 int Window_resized = 0;
 int Window_mouseX = 0;
 int Window_mouseY = 0;
+int Window_mouseWheelX = 0;
+int Window_mouseWheelY = 0;
 int Window_lastMouseX = 0;
 int Window_lastMouseY = 0;
 int Window_xPos = SDL_WINDOWPOS_CENTERED;
@@ -667,6 +669,15 @@ void Window_SdlUpdate()
     {
         switch (event.type)
         {
+            case SDL_JOYDEVICEADDED: {
+                stdControl_InitSdlJoysticks();
+                break;
+            }
+            case SDL_JOYDEVICEREMOVED: {
+                stdControl_InitSdlJoysticks();
+                break;
+            }
+
             case SDL_TEXTINPUT:
                 for (int i = 0; i < _strlen(event.text.text); i++)
                 {
@@ -870,6 +881,10 @@ void Window_SdlUpdate()
                 //stdControl_SetKeydown(KEY_MOUSE_B1, Window_bMouseLeft, mevent->timestamp);
                 //stdControl_SetKeydown(KEY_MOUSE_B2, Window_bMouseRight, mevent->timestamp);
 
+                break;
+            case SDL_MOUSEWHEEL:
+                Window_mouseWheelY = event.wheel.y;
+                Window_mouseWheelX = event.wheel.x;
                 break;
             case SDL_QUIT:
                 printf("Quit!\n");
@@ -1108,7 +1123,7 @@ int Window_Main_Linux(int argc, char** argv)
 
     // Init SDL
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
 
 #if defined(MACOS)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

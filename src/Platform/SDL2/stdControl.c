@@ -256,19 +256,89 @@ const uint8_t stdControl_aSdlToDik[256] =
 
 uint8_t stdControl_aDebounce[256];
 
+#define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
+
+static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
+static SDL_Joystick *pJoysticks[2] = {NULL, NULL};
+
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
 {
-    if (keyNum < 0 || keyNum > 256)
+    if (keyNum < 0 || keyNum >= 256)
         return;
 
     stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
 }
 
+void stdControl_FreeSdlJoysticks()
+{
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        if (pJoysticks[i])
+            SDL_JoystickClose(pJoysticks[i]);
+        pJoysticks[i] = NULL;
+    }
+
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        stdControl_aJoystickExists[i] = 0;
+        stdControl_aJoystickMaxButtons[i] = 0;
+        stdControl_aJoystickEnabled[i] = 0;
+
+        stdControl_aJoystickQuirks[i] = 0;
+    }
+}
+
+void stdControl_InitSdlJoysticks()
+{
+    stdControl_FreeSdlJoysticks();
+
+    //SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+    
+    //v2 = 2;
+
+    int numJoysticks = SDL_NumJoysticks();
+    printf ("SDL has %u joysticks.\n", numJoysticks);
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        if (i >= JK_NUM_JOYSTICKS) break;
+
+        pJoysticks[i] = SDL_JoystickOpen(i);
+        if (!pJoysticks[i]) break;
+
+        int numAxes = SDL_JoystickNumAxes(pJoysticks[i]);
+        int numButtons = SDL_JoystickNumButtons(pJoysticks[i]);
+        int numHats = SDL_JoystickNumHats(pJoysticks[i]);
+
+        printf("SDL Joystick %u: %s, %u axes %u buttons %u hats\n", i, SDL_JoystickNameForIndex(i), numAxes, numButtons, numHats);
+        if (numButtons > JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE) {
+            numButtons = JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE;
+        }
+
+        if (numAxes > JK_JOYSTICK_AXIS_STRIDE) {
+            numAxes = JK_JOYSTICK_AXIS_STRIDE;
+        }
+
+        uint32_t quirks = 0;
+        if (!strcmp(SDL_JoystickNameForIndex(i), "Nintendo Switch Pro Controller")) {
+            quirks |= QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON;
+        }
+
+        if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
+            numAxes -= 2;
+        }
+
+        stdControl_aJoystickQuirks[i] = quirks;
+        stdControl_aJoystickExists[i] = 1;
+        stdControl_aJoystickEnabled[i] = 1;
+        stdControl_aJoystickMaxButtons[i] = numButtons;
+        for (int j = 0; j < numAxes; j++) {
+            stdControl_InitAxis((JK_JOYSTICK_AXIS_STRIDE*i) + AXIS_JOY1_X + j, -0x7FFF, 0x7FFF, 0.2);
+        }
+    }
+}
+
 int stdControl_Startup()
 {
     UINT v0; // ebp
-    int v2; // ebx
+    //int v2; // ebx
     UINT v4; // eax
     int v5; // ecx
     int v6; // edi
@@ -286,10 +356,10 @@ int stdControl_Startup()
 #endif
 
     v0 = 0;
-    _memset(stdControl_aInput1, 0, sizeof(int) * 284);
-    _memset(stdControl_aKeyInfo, 0, sizeof(int) * 284);
-    _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * 15);
-    _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
+    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);
+    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
     _memset(stdControl_aDebounce, 0, sizeof(stdControl_aDebounce)); // Added
 
 #if 0
@@ -306,23 +376,14 @@ int stdControl_Startup()
     }
 #endif
 
-    stdControl_aJoystickExists[0] = 0;
-    stdControl_aJoystickMaxButtons[0] = 0;
-    stdControl_aJoystickEnabled[0] = 0;
-    stdControl_aJoystickExists[1] = 0;
-    stdControl_aJoystickMaxButtons[1] = 0;
-    stdControl_aJoystickEnabled[1] = 0;
-    v2 = 2;
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        stdControl_aJoystickExists[i] = 0;
+        stdControl_aJoystickMaxButtons[i] = 0;
+        stdControl_aJoystickEnabled[i] = 0;
+    }
+    //v2 = 2;
 
-    stdControl_aJoystickExists[0] = 1;
-    stdControl_aJoystickEnabled[0] = 1;
-    stdControl_aJoystickMaxButtons[0] = 12;
-    stdControl_InitAxis(AXIS_JOY1_X, -1.0, 1.0, 0.1);
-    stdControl_InitAxis(AXIS_JOY1_Y, -1.0, 1.0, 0.1);
-    stdControl_InitAxis(AXIS_JOY1_Z, -1.0, 1.0, 0.1);
-    stdControl_InitAxis(AXIS_JOY1_R, -1.0, 1.0, 0.1);
-    stdControl_InitAxis(AXIS_JOY1_U, -1.0, 1.0, 0.1);
-    stdControl_InitAxis(AXIS_JOY1_V, -1.0, 1.0, 0.1);
+    stdControl_InitSdlJoysticks();
 
 #if 0
     v14 = joyGetNumDevs();
@@ -368,8 +429,8 @@ int stdControl_Startup()
                     *v15 = 1;
             }
             ++v0;
-            pJoystickIter += 6;
-            v2 += 6;
+            pJoystickIter += JK_JOYSTICK_AXIS_STRIDE;
+            v2 += JK_JOYSTICK_AXIS_STRIDE;
             ++v15;
         }
         while ( v0 < v14 );
@@ -411,6 +472,7 @@ int stdControl_Startup()
 
 void stdControl_Shutdown()
 {
+    stdControl_FreeSdlJoysticks();
     stdControl_bStartup = 0;
 #if 0
     if ( stdControl_mouseDirectInputDevice )
@@ -502,21 +564,21 @@ void stdControl_Flush()
             stdControl_mouseDirectInputDevice->lpVtbl->GetDeviceData(stdControl_mouseDirectInputDevice, 16, 0, (LPDWORD)&v9, 0);
             v3 = stdControl_msDelta;
             v4 = 0;
-            v5 = &stdControl_aInput1[280];
+            v5 = &stdControl_aInput1[KEY_MOUSE_B1]; 
             v6 = 0;
             while ( v10[v4 + 12] )
             {
-                if ( stdControl_aKeyInfo[v6 + 280] )
+                if ( stdControl_aKeyInfo[v6 + KEY_MOUSE_B1] )
                 {
                     if ( !v10[v4 + 12] )
                         break;
                 }
                 else
                 {
-                    v7 = stdControl_aInput2[v6 + 280];
-                    stdControl_aKeyInfo[v6 + 280] = 1;
+                    v7 = stdControl_aInput2[v6 + KEY_MOUSE_B1];
+                    stdControl_aKeyInfo[v6 + KEY_MOUSE_B1] = 1;
                     *v5 = 0;
-                    stdControl_aInput2[v6 + 280] = v7 + 1;
+                    stdControl_aInput2[v6 + KEY_MOUSE_B1] = v7 + 1;
                 }
 LABEL_19:
                 ++v6;
@@ -525,10 +587,10 @@ LABEL_19:
                 if ( v6 >= 4 )
                     return;
             }
-            if ( stdControl_aKeyInfo[v6 + 280] )
+            if ( stdControl_aKeyInfo[v6 + KEY_MOUSE_B1] )
             {
                 v8 = *v5;
-                stdControl_aKeyInfo[v6 + 280] = 0;
+                stdControl_aKeyInfo[v6 + KEY_MOUSE_B1] = 0;
                 if ( !v8 )
                     *v5 = v3;
                 *v5 = *v5;
@@ -603,20 +665,19 @@ void stdControl_ReadControls()
 {
     double khz;
 
-
     if (!stdControl_bControlsActive)
         return;
 
-    _memset(stdControl_aInput1, 0, sizeof(int) * 284);
+    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_bControlsIdle = 1;
-    _memset(stdControl_aInput2, 0, sizeof(int) * 284);
+    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
     stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
     if (stdControl_msDelta != 0)
         khz = 1.0 / (double)(__int64)(stdControl_msDelta);
     else
         khz = 1.0;
-    _memset(&stdControl_aAxisPos, 0, sizeof(stdControlAxis));
+    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
 
@@ -646,39 +707,53 @@ void stdControl_ReadControls()
         }
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
-    if ( stdControl_joy_related )
+    if ( stdControl_bHasJoysticks )
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < JK_NUM_JOYSTICKS; i++)
         {
-            if ( !(stdControl_unk_55C828[i] && stdControl_aJoystickExists[i]) )
+            if ( !(stdControl_aAxisEnabled[i] && stdControl_aJoystickExists[i]) )
                 continue;
 
-            stdControl_unk_55C828[i] = 0;
+            if (!pJoysticks[i]) continue;
 
-            // TODO
-            stdControl_aAxisPos.aEntries[i].dwXpos = 0;
-            stdControl_aAxisPos.aEntries[i].dwYpos = 0;
-            stdControl_aAxisPos.aEntries[i].dwZpos = 0;
-            stdControl_aAxisPos.aEntries[i].dwUpos = 0;
-            stdControl_aAxisPos.aEntries[i].dwVpos = 0;
+            uint32_t quirks = stdControl_aJoystickQuirks[i];
+
+            //stdControl_aAxisEnabled[i] = 0;
 
             
-            for (int j = 0; j <= 7; ++j )
+            for (int j = 0; j < JK_JOYSTICK_AXIS_STRIDE; j++)
             {
-                stdControl_SetKeydown(j + (256 + 12*i), 0 /* button val */, stdControl_curReadTime);
+                int val = SDL_JoystickGetAxis(pJoysticks[i],j);
+                //printf("%u: %d\n", j, val);
+                stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
+            }
+            
+            for (int j = 0; j < JK_NUM_JOY_BUTTONS + JK_NUM_EXT_JOY_BUTTONS; ++j )
+            {
+                int val = SDL_JoystickGetButton(pJoysticks[i], j);
+
+                if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
+                    if (j == 15) { // Capture
+                        val = SDL_JoystickGetAxis(pJoysticks[i],4) > 0;
+                    }
+                    else if (j == 5) { // Home
+                        val = SDL_JoystickGetAxis(pJoysticks[i],5) > 0;
+                    }
+                }
+                
+                int idx = j + (256 + JK_JOYSTICK_BUTTON_STRIDE*i);
+                if (j >= JK_NUM_JOY_BUTTONS) {
+                    idx = (j - JK_NUM_JOY_BUTTONS) + (KEY_JOY1_EXT_STARTIDX + (JK_JOYSTICK_EXT_BUTTON_STRIDE*i));
+                }
+                //printf("%u: %u %x\n", j, val, idx);
+                stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
             }
 
-            // Hat?
-#if 0
-            if ( (pji.dwFlags & 0x200) != 0 )
-            {
-                v27 = pji.dwPOV;
-                stdControl_SetKeydown((256 + 12*i) + 8, v27 >= 22500 && v27 <= 31500, stdControl_curReadTime);
-                stdControl_SetKeydown((256 + 12*i) + 9, (v27 >= 31500 || v27 <= 4500) && v27 >= 0 && v27 != 0xFFFF, stdControl_curReadTime);
-                stdControl_SetKeydown((256 + 12*i) + 10, v27 >= 4500 && v27 <= 13500, stdControl_curReadTime);
-                stdControl_SetKeydown((256 + 12*i) + 11, v27 >= 13500 && v27 <= 22500, stdControl_curReadTime);
-            }
-#endif
+            uint8_t hatState = SDL_JoystickGetHat(pJoysticks[i], 0);
+            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HLEFT, !!(hatState & SDL_HAT_LEFT) /* button val */, stdControl_curReadTime);
+            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HUP, !!(hatState & SDL_HAT_UP) /* button val */, stdControl_curReadTime);
+            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HRIGHT, !!(hatState & SDL_HAT_RIGHT) /* button val */, stdControl_curReadTime);
+            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HDOWN, !!(hatState & SDL_HAT_DOWN) /* button val */, stdControl_curReadTime);
         }
     }
     stdControl_ReadMouse();
@@ -690,20 +765,21 @@ void stdControl_ReadMouse()
     if (!stdControl_bReadMouse)
         return;
 
-    stdControl_aAxisPos.mouseZ = 0; // TODO
-    stdControl_aAxisPos.mouseX = Window_lastXRel; // TODO
-    stdControl_aAxisPos.mouseY = Window_lastYRel; // TODO
+    stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
+    stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO
+    stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel; // TODO
 
     if ( stdControl_msDelta < 25 )
     {
-        //stdControl_aAxisPos.mouseX = (stdControl_aAxisPos.mouseX + stdControl_dwLastMouseX) >> 1;
-        //stdControl_aAxisPos.mouseY = (stdControl_aAxisPos.mouseY + stdControl_dwLastMouseY) >> 1;
+        //stdControl_aAxisPos[AXIS_MOUSE_X] = (stdControl_aAxisPos[AXIS_MOUSE_X] + stdControl_dwLastMouseX) >> 1;
+        //stdControl_aAxisPos[AXIS_MOUSE_Y] = (stdControl_aAxisPos[AXIS_MOUSE_Y] + stdControl_dwLastMouseY) >> 1;
     }
     stdControl_dwLastMouseX = Window_lastXRel; // TODO
     stdControl_dwLastMouseY = Window_lastYRel; // TODO
 
     Window_lastXRel = 0;
     Window_lastYRel = 0;
+    Window_mouseWheelY = 0;
 
     for (int i = 0; i < 32; i++)
     {
@@ -712,7 +788,7 @@ void stdControl_ReadMouse()
 
     for (int i = 0; i < 4; i++)
     {
-        //stdControl_SetKeydown(280 + i, 0 /* buttonval */, stdControl_curReadTime);
+        //stdControl_SetKeydown(KEY_MOUSE_B1 + i, 0 /* buttonval */, stdControl_curReadTime);
     }
 
     int x,y;
@@ -722,5 +798,5 @@ void stdControl_ReadMouse()
     stdControl_SetKeydown(KEY_MOUSE_B2, Window_bMouseRight, stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B3, !!(buttons & SDL_BUTTON_MMASK), stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B4, !!(buttons & SDL_BUTTON_X1MASK), stdControl_curReadTime);
-    //stdControl_SetKeydown(KEY_MOUSE_B5, !!(buttons & SDL_BUTTON_X2MASK), stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_MOUSE_B5, !!(buttons & SDL_BUTTON_X2MASK), stdControl_curReadTime);
 }
