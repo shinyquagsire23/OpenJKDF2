@@ -3013,7 +3013,7 @@ typedef struct stdControlDikStrToNum
 #define JK_NUM_MOUSE_BUTTONS     (4)
 #define JK_NUM_EXT_MOUSE_BUTTONS (28)
 #define JK_NUM_JOY_BUTTONS       (8)
-#define JK_NUM_EXT_JOY_BUTTONS   (12)
+#define JK_NUM_EXT_JOY_BUTTONS   (24)
 #define JK_NUM_HAT_BUTTONS       (4)
 #endif
 
@@ -3086,6 +3086,18 @@ typedef struct stdControlDikStrToNum
 #define KEY_JOY1_B18            (KEY_JOY1_EXT_STARTIDX + 9)
 #define KEY_JOY1_B19            (KEY_JOY1_EXT_STARTIDX + 10)
 #define KEY_JOY1_B20            (KEY_JOY1_EXT_STARTIDX + 11)
+#define KEY_JOY1_B21            (KEY_JOY1_EXT_STARTIDX + 12)
+#define KEY_JOY1_B22            (KEY_JOY1_EXT_STARTIDX + 13)
+#define KEY_JOY1_B23            (KEY_JOY1_EXT_STARTIDX + 14)
+#define KEY_JOY1_B24            (KEY_JOY1_EXT_STARTIDX + 15)
+#define KEY_JOY1_B25            (KEY_JOY1_EXT_STARTIDX + 16)
+#define KEY_JOY1_B26            (KEY_JOY1_EXT_STARTIDX + 17)
+#define KEY_JOY1_B27            (KEY_JOY1_EXT_STARTIDX + 18)
+#define KEY_JOY1_B28            (KEY_JOY1_EXT_STARTIDX + 19)
+#define KEY_JOY1_B29            (KEY_JOY1_EXT_STARTIDX + 20)
+#define KEY_JOY1_B30            (KEY_JOY1_EXT_STARTIDX + 21)
+#define KEY_JOY1_B31            (KEY_JOY1_EXT_STARTIDX + 22)
+#define KEY_JOY1_B32            (KEY_JOY1_EXT_STARTIDX + 23)
 
 #define KEY_JOY2_EXT_STARTIDX   (JK_EXT_MOUSE_END + JK_JOYSTICK_EXT_BUTTON_STRIDE)
 #define KEY_JOY2_B9             (KEY_JOY2_EXT_STARTIDX + 0)
@@ -3100,7 +3112,19 @@ typedef struct stdControlDikStrToNum
 #define KEY_JOY2_B18            (KEY_JOY2_EXT_STARTIDX + 9)
 #define KEY_JOY2_B19            (KEY_JOY2_EXT_STARTIDX + 10)
 #define KEY_JOY2_B20            (KEY_JOY2_EXT_STARTIDX + 11)
-#define KEY_JOY2_EXT_ENDIDX     (KEY_JOY2_EXT_STARTIDX + 12)
+#define KEY_JOY2_B21            (KEY_JOY2_EXT_STARTIDX + 12)
+#define KEY_JOY2_B22            (KEY_JOY2_EXT_STARTIDX + 13)
+#define KEY_JOY2_B23            (KEY_JOY2_EXT_STARTIDX + 14)
+#define KEY_JOY2_B24            (KEY_JOY2_EXT_STARTIDX + 15)
+#define KEY_JOY2_B25            (KEY_JOY2_EXT_STARTIDX + 16)
+#define KEY_JOY2_B26            (KEY_JOY2_EXT_STARTIDX + 17)
+#define KEY_JOY2_B27            (KEY_JOY2_EXT_STARTIDX + 18)
+#define KEY_JOY2_B28            (KEY_JOY2_EXT_STARTIDX + 19)
+#define KEY_JOY2_B29            (KEY_JOY2_EXT_STARTIDX + 20)
+#define KEY_JOY2_B30            (KEY_JOY2_EXT_STARTIDX + 21)
+#define KEY_JOY2_B31            (KEY_JOY2_EXT_STARTIDX + 22)
+#define KEY_JOY2_B32            (KEY_JOY2_EXT_STARTIDX + 23)
+#define KEY_JOY2_EXT_ENDIDX     (KEY_JOY2_EXT_STARTIDX + 24)
 #endif
 
 // Axis idxs

@@ -297,7 +297,7 @@ void stdControl_InitSdlJoysticks()
 
     int numJoysticks = SDL_NumJoysticks();
     printf ("SDL has %u joysticks.\n", numJoysticks);
-    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+    for (int i = 0; i < numJoysticks; i++) {
         if (i >= JK_NUM_JOYSTICKS) break;
 
         pJoysticks[i] = SDL_JoystickOpen(i);

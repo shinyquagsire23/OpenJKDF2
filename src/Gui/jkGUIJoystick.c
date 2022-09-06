@@ -20,7 +20,7 @@
 #include "Gui/jkGUISetup.h"
 #include "Engine/sithControl.h"
 
-#define JKGUIJOYSTICK_NUM_ENTRIES (JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_BUTTON_STRIDE)
+#define JKGUIJOYSTICK_NUM_ENTRIES (JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE)
 
 static int jkGuiJoystick_dword_557078;
 static int jkGuiJoystick_aUnk1[JKGUIJOYSTICK_NUM_ENTRIES];
@@ -38,6 +38,7 @@ static wchar_t jkGuiJoystick_waIdk2[4];
 static int jkGuiJoystick_dword_536B98 = -1;
 static int jkGuiJoystick_dword_536B9C = -1;
 
+// Added: Changed the bitfield to give button numbers 8 bits instead of 4
 static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
 {
     { AXIS_JOY1_X,      "AXIS_JOY1_X",      0, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
@@ -47,62 +48,94 @@ static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
     { AXIS_JOY1_U,      "AXIS_JOY1_U",      4, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
     { AXIS_JOY1_V,      "AXIS_JOY1_V",      5, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
 
-    { AXIS_JOY2_X,      "AXIS_JOY2_X",      0x80, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_Y,      "AXIS_JOY2_Y",      0x81, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_Z,      "AXIS_JOY2_Z",      0x82, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_R,      "AXIS_JOY2_R",      0x83, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_U,      "AXIS_JOY2_U",      0x84, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { AXIS_JOY2_V,      "AXIS_JOY2_V",      0x85, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_X,      "AXIS_JOY2_X",      0x800, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_Y,      "AXIS_JOY2_Y",      0x801, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_Z,      "AXIS_JOY2_Z",      0x802, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_R,      "AXIS_JOY2_R",      0x803, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_U,      "AXIS_JOY2_U",      0x804, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { AXIS_JOY2_V,      "AXIS_JOY2_V",      0x805, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
 
-    { KEY_JOY1_B1,      "KEY_JOY1_B1",      0x20, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B2,      "KEY_JOY1_B2",      0x21, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B3,      "KEY_JOY1_B3",      0x22, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B4,      "KEY_JOY1_B4",      0x23, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B5,      "KEY_JOY1_B5",      0x24, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B6,      "KEY_JOY1_B6",      0x25, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B7,      "KEY_JOY1_B7",      0x26, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B8,      "KEY_JOY1_B8",      0x27, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-
-#ifdef SDL2_RENDER
-    { KEY_JOY1_B9,      "KEY_JOY1_B9",      0x28, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B10,     "KEY_JOY1_B10",     0x29, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B11,     "KEY_JOY1_B11",     0x2A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B12,     "KEY_JOY1_B12",     0x2B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B13,     "KEY_JOY1_B13",     0x2C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B14,     "KEY_JOY1_B14",     0x2D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B15,     "KEY_JOY1_B15",     0x2E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_B16,     "KEY_JOY1_B16",     0x2F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-#endif
-
-    { KEY_JOY1_HLEFT,   "KEY_JOY1_HLEFT",   0x10, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_HUP,     "KEY_JOY1_HUP",     0x11, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_HRIGHT,  "KEY_JOY1_HRIGHT",  0x12, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY1_HDOWN,   "KEY_JOY1_HDOWN",   0x13, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-
-    { KEY_JOY2_B1,      "KEY_JOY2_B1",      0xA0, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B2,      "KEY_JOY2_B2",      0xA1, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B3,      "KEY_JOY2_B3",      0xA2, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B4,      "KEY_JOY2_B4",      0xA3, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B5,      "KEY_JOY2_B5",      0xA4, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B6,      "KEY_JOY2_B6",      0xA5, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B7,      "KEY_JOY2_B7",      0xA6, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B8,      "KEY_JOY2_B8",      0xA7, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B1,      "KEY_JOY1_B1",      0x200, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B2,      "KEY_JOY1_B2",      0x201, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B3,      "KEY_JOY1_B3",      0x202, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B4,      "KEY_JOY1_B4",      0x203, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B5,      "KEY_JOY1_B5",      0x204, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B6,      "KEY_JOY1_B6",      0x205, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B7,      "KEY_JOY1_B7",      0x206, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B8,      "KEY_JOY1_B8",      0x207, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
 
 #ifdef SDL2_RENDER
-    { KEY_JOY2_B9,      "KEY_JOY2_B9",      0xA8, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B10,     "KEY_JOY2_B10",     0xA9, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B11,     "KEY_JOY2_B11",     0xAA, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B12,     "KEY_JOY2_B12",     0xAB, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B13,     "KEY_JOY2_B13",     0xAC, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B14,     "KEY_JOY2_B14",     0xAD, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B15,     "KEY_JOY2_B15",     0xAE, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_B16,     "KEY_JOY2_B16",     0xAF, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B9,      "KEY_JOY1_B9",      0x208, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B10,     "KEY_JOY1_B10",     0x209, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B11,     "KEY_JOY1_B11",     0x20A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B12,     "KEY_JOY1_B12",     0x20B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B13,     "KEY_JOY1_B13",     0x20C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B14,     "KEY_JOY1_B14",     0x20D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B15,     "KEY_JOY1_B15",     0x20E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B16,     "KEY_JOY1_B16",     0x20F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B17,     "KEY_JOY1_B17",     0x210, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B18,     "KEY_JOY1_B18",     0x211, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B19,     "KEY_JOY1_B19",     0x212, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B20,     "KEY_JOY1_B20",     0x213, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B21,     "KEY_JOY1_B21",     0x214, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B22,     "KEY_JOY1_B22",     0x215, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B23,     "KEY_JOY1_B23",     0x216, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B24,     "KEY_JOY1_B24",     0x217, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B25,     "KEY_JOY1_B25",     0x218, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B26,     "KEY_JOY1_B26",     0x219, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B27,     "KEY_JOY1_B27",     0x21A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B28,     "KEY_JOY1_B28",     0x21B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B29,     "KEY_JOY1_B29",     0x21C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B30,     "KEY_JOY1_B30",     0x21D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B31,     "KEY_JOY1_B31",     0x21E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_B32,     "KEY_JOY1_B32",     0x21F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
 #endif
 
-    { KEY_JOY2_HLEFT,   "KEY_JOY2_HLEFT",   0x90, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_HUP,     "KEY_JOY2_HUP",     0x91, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_HRIGHT,  "KEY_JOY2_HRIGHT",  0x92, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
-    { KEY_JOY2_HDOWN,   "KEY_JOY2_HDOWN",   0x93, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HLEFT,   "KEY_JOY1_HLEFT",   0x100, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HUP,     "KEY_JOY1_HUP",     0x101, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HRIGHT,  "KEY_JOY1_HRIGHT",  0x102, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY1_HDOWN,   "KEY_JOY1_HDOWN",   0x103, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+    { KEY_JOY2_B1,      "KEY_JOY2_B1",      0xA00, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B2,      "KEY_JOY2_B2",      0xA01, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B3,      "KEY_JOY2_B3",      0xA02, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B4,      "KEY_JOY2_B4",      0xA03, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B5,      "KEY_JOY2_B5",      0xA04, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B6,      "KEY_JOY2_B6",      0xA05, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B7,      "KEY_JOY2_B7",      0xA06, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B8,      "KEY_JOY2_B8",      0xA07, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+
+#ifdef SDL2_RENDER
+    { KEY_JOY2_B9,      "KEY_JOY2_B9",      0xA08, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B10,     "KEY_JOY2_B10",     0xA09, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B11,     "KEY_JOY2_B11",     0xA0A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B12,     "KEY_JOY2_B12",     0xA0B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B13,     "KEY_JOY2_B13",     0xA0C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B14,     "KEY_JOY2_B14",     0xA0D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B15,     "KEY_JOY2_B15",     0xA0E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B16,     "KEY_JOY2_B16",     0xA0F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B17,     "KEY_JOY2_B17",     0x210, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B18,     "KEY_JOY2_B18",     0x211, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B19,     "KEY_JOY2_B19",     0x212, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B20,     "KEY_JOY2_B20",     0x213, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B21,     "KEY_JOY2_B21",     0x214, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B22,     "KEY_JOY2_B22",     0x215, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B23,     "KEY_JOY2_B23",     0x216, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B24,     "KEY_JOY2_B24",     0x217, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B25,     "KEY_JOY2_B25",     0x218, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B26,     "KEY_JOY2_B26",     0x219, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B27,     "KEY_JOY2_B27",     0x21A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B28,     "KEY_JOY2_B28",     0x21B, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B29,     "KEY_JOY2_B29",     0x21C, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B30,     "KEY_JOY2_B30",     0x21D, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B31,     "KEY_JOY2_B31",     0x21E, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_B32,     "KEY_JOY2_B32",     0x21F, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+#endif
+
+    { KEY_JOY2_HLEFT,   "KEY_JOY2_HLEFT",   0x900, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HUP,     "KEY_JOY2_HUP",     0x901, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HRIGHT,  "KEY_JOY2_HRIGHT",  0x902, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
+    { KEY_JOY2_HDOWN,   "KEY_JOY2_HDOWN",   0x903, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0.0 },
 
 
 };
@@ -470,9 +503,9 @@ void jkGuiJoystick_sub_41B390()
     v1 = &jkGuiJoystick_aEntries[0];
     do
     {
-        v2 = v1->keybits & 0xF;
-        v8 = v1->keybits & 0x30;
-        v3 = v1->keybits & 0x80;
+        v2 = v1->keybits & 0xFF; // Added: 4bit -> 8bit
+        v8 = v1->keybits & 0x300; // Added: 4bit -> 8bit
+        v3 = v1->keybits & 0x800; // Added: 4bit -> 8bit
         v4 = jkStrings_GetText(v1->displayStrKey);
         if ( v1->inputFunc == -1 )
         {
@@ -489,8 +522,8 @@ void jkGuiJoystick_sub_41B390()
         jk_snwprintf(wtmp, 0x100u, L"%ls\t%ls", v4, v5);
         v6 = v3 >> 7;
         if ( stdControl_aJoystickExists[v6] && !v8 && (stdControl_aJoysticks[v1->dikNum].flags & 1) != 0
-          || v8 == 32 && v2 < stdControl_aJoystickMaxButtons[v6]
-          || v8 == 16 && stdControl_aJoystickEnabled[v6] )
+          || v8 == 0x200 && v2 < stdControl_aJoystickMaxButtons[v6] // Added: 4bit -> 8bit
+          || v8 == 0x100 && stdControl_aJoystickEnabled[v6] ) // Added: 4bit -> 8bit
         {
             jkGuiRend_DarrayReallocStr(&jkGuiJoystick_darray2, wtmp, v7);
         }
