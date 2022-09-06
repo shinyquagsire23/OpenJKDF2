@@ -33,6 +33,12 @@ static uint32_t aGammaTable[20] = {
     0x3FDBD37A,
 };
 
+#ifdef SDL2_RENDER
+rdCanvas* Video_pCanvasOverlayMap = NULL;
+stdVBuffer* Video_pOverlayMapBuffer = NULL;
+stdVBuffer Video_overlayMapBuffer;
+#endif
+
 void Video_SwitchToGDI()
 {
     jkDev_Close();
@@ -42,6 +48,9 @@ void Video_SwitchToGDI()
 #endif
     sithCamera_Close();
 
+#ifdef SDL2_RENDER
+    rdCanvas_Free(Video_pCanvasOverlayMap);
+#endif
     rdCanvas_Free(Video_pCanvas);
     rdClose();
     if ( Video_modeStruct.b3DAccel )
@@ -72,6 +81,9 @@ int Video_Startup()
         jkHud_Startup();
         Video_pOtherBuf = &Video_otherBuf;
         Video_pMenuBuffer = &Video_menuBuffer;
+#ifdef SDL2_RENDER
+        Video_pOverlayMapBuffer = &Video_overlayMapBuffer;
+#endif
         stdPalEffects_Open(stdDisplay_SetMasterPalette);
         sithCamera_Startup();
         Video_bInitted = 1;

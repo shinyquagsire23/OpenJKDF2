@@ -38,6 +38,9 @@ void jkGame_ForceRefresh()
 {
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
+#ifdef SDL2_RENDER
+    rdCanvas_Free(Video_pCanvasOverlayMap);
+#endif
 }
 
 void jkGame_Shutdown()
@@ -52,6 +55,9 @@ void jkGame_ScreensizeIncrease()
 #ifndef LINUX_TMP
         sithCamera_Close();
         rdCanvas_Free(Video_pCanvas);
+#ifdef SDL2_RENDER
+    rdCanvas_Free(Video_pCanvasOverlayMap);
+#endif
         ++Video_modeStruct.viewSizeIdx;
         Video_camera_related();
 #endif
@@ -65,6 +71,9 @@ void jkGame_ScreensizeDecrease()
 #ifndef LINUX_TMP
         sithCamera_Close();
         rdCanvas_Free(Video_pCanvas);
+#ifdef SDL2_RENDER
+    rdCanvas_Free(Video_pCanvasOverlayMap);
+#endif
         --Video_modeStruct.viewSizeIdx;
         Video_camera_related();
 #endif

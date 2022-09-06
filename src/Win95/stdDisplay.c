@@ -38,6 +38,7 @@ uint8_t* stdDisplay_GetPalette()
 #include <assert.h>
 
 uint32_t Video_menuTexId = 0;
+uint32_t Video_overlayTexId = 0;
 rdColor24 stdDisplay_masterPalette[256];
 int Video_bModeSet = 0;
 
@@ -105,16 +106,23 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     _memcpy(&Video_otherBuf.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_otherBuf.format));
     _memcpy(&Video_menuBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_menuBuffer.format));
     
+    _memcpy(&Video_overlayMapBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_overlayMapBuffer.format));
+    
+
     if (Video_bModeSet)
     {
         glDeleteTextures(1, &Video_menuTexId);
+        glDeleteTextures(1, &Video_overlayTexId);
         if (Video_otherBuf.sdlSurface)
             SDL_FreeSurface(Video_otherBuf.sdlSurface);
         if (Video_menuBuffer.sdlSurface)
             SDL_FreeSurface(Video_menuBuffer.sdlSurface);
+        if (Video_overlayMapBuffer.sdlSurface)
+            SDL_FreeSurface(Video_overlayMapBuffer.sdlSurface);
         
         Video_otherBuf.sdlSurface = 0;
         Video_menuBuffer.sdlSurface = 0;
+        Video_overlayMapBuffer.sdlSurface = 0;
     }
     
     SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
@@ -127,6 +135,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
                                         0,
                                         0,
                                         0);
+    SDL_Surface* overlaySurface = SDL_CreateRGBSurface(0, newW, newH, 8, 0, 0, 0, 0);
     
     if (palette)
     {
@@ -143,6 +152,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         
         SDL_SetPaletteColors(otherSurface->format->palette, tmp, 0, 256);
         SDL_SetPaletteColors(menuSurface->format->palette, tmp, 0, 256);
+        SDL_SetPaletteColors(overlaySurface->format->palette, tmp, 0, 256);
         free(tmp);
     }
     
@@ -151,19 +161,25 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     
     Video_otherBuf.sdlSurface = otherSurface;
     Video_menuBuffer.sdlSurface = menuSurface;
+    Video_overlayMapBuffer.sdlSurface = overlaySurface;
     
     Video_menuBuffer.format.width_in_bytes = menuSurface->pitch;
     Video_otherBuf.format.width_in_bytes = otherSurface->pitch;
+    Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
     
     Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
     Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
+    Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
+    Video_overlayMapBuffer.format.width = newW;
     Video_menuBuffer.format.height = newH;
     Video_otherBuf.format.height = newH;
+    Video_overlayMapBuffer.format.height = newH;
     
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
+    Video_overlayMapBuffer.format.format.bpp = 8;
     
     glGenTextures(1, &Video_menuTexId);
     glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
@@ -172,6 +188,14 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, newW, newH, 0, GL_RED, GL_UNSIGNED_BYTE, Video_menuBuffer.sdlSurface->pixels);
     
+    glGenTextures(1, &Video_overlayTexId);
+    glBindTexture(GL_TEXTURE_2D, Video_overlayTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, newW, newH, 0, GL_RED, GL_UNSIGNED_BYTE, Video_overlayMapBuffer.sdlSurface->pixels);
+    
+
     Video_bModeSet = 1;
     
     return 1;

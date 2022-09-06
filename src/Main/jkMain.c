@@ -1271,11 +1271,15 @@ void jkMain_FixRes()
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
 
+    rdCanvas_Free(Video_pCanvasOverlayMap);
+
+
     jkHudInv_LoadItemRes();
     jkHud_Open();
     jkDev_Open();
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
+    Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 }
 
@@ -1364,6 +1368,7 @@ int jkMain_SetVideoMode()
     
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
+    Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
     sithRender_SetSomeRenderflag(0x2a);
     sithRender_SetGeoMode(Video_modeStruct.geoMode);
     sithRender_SetLightMode(Video_modeStruct.lightMode);

@@ -391,6 +391,14 @@ void jkHud_Draw()
         jkDev_sub_41FC40(0x66, std_genBuffer);
     }
 
+#ifndef SDL2_RENDER
+    stdVBuffer* pOverlayBuffer = Video_pMenuBuffer;
+    rdCanvas* pOverlayCanvas = Video_pCanvas;
+#else
+    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
+#endif
+
     if (Main_bNoHUD) {
 #ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
@@ -401,7 +409,13 @@ void jkHud_Draw()
     v4 = sithWorld_pCurrentWorld->playerThing;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
-    sithOverlayMap_Render1(Video_pCanvas);
+
+#ifdef SDL2_RENDER
+    stdDisplay_VBufferLock(pOverlayBuffer);
+    stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
+#endif
+
+    sithOverlayMap_Render1(pOverlayCanvas);
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
@@ -588,11 +602,11 @@ void jkHud_Draw()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
-            rdPrimit2_DrawCircle(Video_pCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
+            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
             a2c = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2c, &valSin, &valCos);
             v59 = valSin * 20.0;
-            rdPrimit2_DrawCircle(Video_pCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
+            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
             a2d = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2d, &valSin, &valCos);
             v26 = jkHud_targetBlue16;
@@ -601,18 +615,20 @@ void jkHud_Draw()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v56 = valSin * 20.0;
-            rdPrimit2_DrawCircle(Video_pCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
+            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
             a2a = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2a, &valSin, &valCos);
             v57 = valSin * 20.0;
-            rdPrimit2_DrawCircle(Video_pCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
+            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
             a2b = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2b, &valSin, &valCos);
             v26 = jkHud_targetGreen;
         }
         v60 = valSin * 20.0;
-        rdPrimit2_DrawCircle(Video_pCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
+        rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
     }
+
+    
     if ( jkHud_bViewScores )
     {
         char tmpFname[16];
@@ -633,16 +649,14 @@ void jkHud_Draw()
                 v32 = playerInfoIter;
                 if ((playerInfoIter->flags & 1) != 0)
                 {
-                    _wcsncpy(jkHud_aPlayerScores[v29].playerName, playerInfoIter->player_name, 0x1Fu);
+                    stdString_SafeWStrCopy(jkHud_aPlayerScores[v29].playerName, playerInfoIter->player_name, 0x20);
                     v33 = v32->playerThing->rdthing.model3->filename;
-                    jkHud_aPlayerScores[jkHud_numPlayers].playerName[31] = 0;
                     stdFnames_CopyShortName(tmpFname, 16, v33);
                     jkGuiTitle_sub_4189A0(tmpFname);
                     v34 = jkStrings_GetText(tmpFname);
-                    _wcsncpy(jkHud_aPlayerScores[jkHud_numPlayers].modelName, v34, 0x1Fu);
+                    stdString_SafeWStrCopy(jkHud_aPlayerScores[jkHud_numPlayers].modelName, v34, 0x20);
                     v35 = jkHud_numPlayers;
                     v36 = v32->score;
-                    jkHud_aPlayerScores[jkHud_numPlayers].modelName[31] = 0;
                     jkHud_aPlayerScores[jkHud_numPlayers].score = v36;
                     jkHud_aPlayerScores[jkHud_numPlayers].teamNum = playerInfoIter->teamNum;
                     jkHud_aTeamScores[playerInfoIter->teamNum].field_8 = 1;
@@ -835,6 +849,7 @@ LABEL_116:
 #endif
 
 #ifdef SDL2_RENDER
+    stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->vbuffer);
     stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
 #endif
 }
@@ -897,13 +912,13 @@ int jkHud_Chat()
         if ( sithNet_isMulti != 0 )
         {
             v2 = jkStrings_GetText("HUD_SENDTOALL");
-            _wcsncpy(tmp, v2, 0x80u);
+            stdString_SafeWStrCopy(tmp, v2, 0x80u);
         }
     }
     else
     {
         v3 = jkStrings_GetText("HUD_COMMAND");
-        _wcsncpy(tmp, v3, 0x80u);
+        stdString_SafeWStrCopy(tmp, v3, 0x80u);
     }
     v0 = _wcslen(tmp);
     stdString_CharToWchar(&tmp[v0], jkHud_chatStr, 127 - v0);
@@ -965,12 +980,12 @@ void jkHud_SendChat(char a1)
         if ( jkHud_dword_552D10 == -2 )
         {
             v4 = jkStrings_GetText("HUD_COMMAND");
-            _wcsncpy(tmp, v4, 0x80u);
+            stdString_SafeWStrCopy(tmp, v4, 0x80u);
         }
         else if ( jkHud_dword_552D10 == -1 )
         {
             v3 = jkStrings_GetText("HUD_SENDTOALL");
-            _wcsncpy(tmp, v3, 0x80u);
+            stdString_SafeWStrCopy(tmp, v3, 0x80u);
         }
         v2 = _wcslen(tmp);
         stdString_CharToWchar(&tmp[v2], jkHud_chatStr, 127 - v2);
