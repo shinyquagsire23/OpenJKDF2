@@ -3067,7 +3067,7 @@ typedef struct stdControlDikStrToNum
 
 #define JK_EXT_MOUSE_END        (KEY_MOUSE_B5 + JK_NUM_EXT_MOUSE_BUTTONS)
 
-#define KEY_IS_MOUSE(x) (x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4)
+#define KEY_IS_MOUSE(x) ((x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4) || (x >= KEY_MOUSE_B5 && x <= JK_EXT_MOUSE_END))
 #define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= KEY_JOY1_EXT_STARTIDX && x < KEY_JOY2_EXT_ENDIDX))
 #define KEY_IS_BUTTON(x) (KEY_IS_JOY_BUTTON(x) || x < JK_EXTENDED_KEY_START)
 
