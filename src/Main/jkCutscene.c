@@ -46,11 +46,11 @@ void jkCutscene_Initialize(char *fpath)
     stdStrTable_Load(&jkCutscene_strings, fpath);
     jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);
     jkCutscene_rect1.x = 10;
-    jkCutscene_rect2.y = 10;
     jkCutscene_rect1.y = 360;
     jkCutscene_rect1.width = 620;
     jkCutscene_rect1.height = 120;
     jkCutscene_rect2.x = 0;
+    jkCutscene_rect2.y = 10;
     jkCutscene_rect2.width = 640;
     jkCutscene_rect2.height = 40;
     jkCutscene_bInitted = 1;
@@ -195,7 +195,7 @@ int jkCutscene_sub_421310(char* fpath)
 	stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 	
 	Window_AddMsgHandler(jkCutscene_Handler);
-	jkCutscene_smack_loaded = 1;
+	jkCutscene_isRendering = 1;
 #endif
     // STUBBED
     return 1;
@@ -203,7 +203,7 @@ int jkCutscene_sub_421310(char* fpath)
 
 int jkCutscene_sub_421410()
 {
-    if ( !jkCutscene_smack_loaded )
+    if ( !jkCutscene_isRendering )
         return 0;
     Window_RemoveMsgHandler(jkCutscene_Handler);
 
@@ -224,7 +224,7 @@ int jkCutscene_sub_421410()
     last_displayFrame = 0;
     extraUs = 0;
 
-    jkCutscene_smack_loaded = 0;
+    jkCutscene_isRendering = 0;
     jk_ShowCursor(1);
     return 1;
 }
@@ -235,7 +235,7 @@ int jkCutscene_smack_related_loops()
     int v2; // ecx
 
     smack_finished = 0;
-    if ( !jkCutscene_smack_loaded )
+    if ( !jkCutscene_isRendering )
         return 1;
     if ( !jkCutscene_55AA54 && g_app_suspended )
     {
@@ -249,14 +249,14 @@ int jkCutscene_smack_related_loops()
 #endif
         if ( smack_finished )
         {
-            if ( jkCutscene_smack_loaded )
+            if ( jkCutscene_isRendering )
             {
                 Window_RemoveMsgHandler(jkCutscene_Handler);
 #if !defined(SDL2_RENDER)
                 if (!openjkdf2_bIsKVM)
                     smack_sub_426940();
 #endif
-                jkCutscene_smack_loaded = 0;
+                jkCutscene_isRendering = 0;
                 jk_ShowCursor(1);
             }
         }
@@ -310,7 +310,7 @@ int jkCutscene_PauseShow(int unk)
 
 #if defined(SDL2_RENDER)
     stdDisplay_VBufferLock(Video_pMenuBuffer);
-    stdDisplay_VBufferCopy(Video_pMenuBuffer, jkCutscene_frameBuf, 0, 40, NULL, 0);
+    stdDisplay_VBufferCopy(Video_pMenuBuffer, jkCutscene_frameBuf, 0, 50, NULL, 0);
     stdDisplay_VBufferFill(Video_pMenuBuffer, 0, &jkCutscene_rect1);
     stdDisplay_VBufferFill(Video_pMenuBuffer, 0, &jkCutscene_rect2);
     stdDisplay_VBufferCopy(Video_pMenuBuffer, &Video_otherBuf, jkCutscene_rect1.x, jkCutscene_rect1.y, &jkCutscene_rect1, 0);
@@ -368,7 +368,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
                 }
                 return 0;
             }
-            if ( jkCutscene_smack_loaded )
+            if ( jkCutscene_isRendering )
             {
                 return jkCutscene_sub_421410();
             }
@@ -380,7 +380,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 #ifdef SDL2_RENDER
 int jkCutscene_smacker_process()
 {
-    if ( !jkCutscene_smack_loaded )
+    if ( !jkCutscene_isRendering )
         return 0;
 
     double cur_displayFrame = (double)Linux_TimeUs();
@@ -417,7 +417,7 @@ int jkCutscene_smacker_process()
 	stdDisplay_VBufferUnlock(jkCutscene_frameBuf);
     
     stdDisplay_VBufferLock(Video_pMenuBuffer);
-	stdDisplay_VBufferCopy(Video_pMenuBuffer, jkCutscene_frameBuf, 0, 40, NULL, 0);
+	stdDisplay_VBufferCopy(Video_pMenuBuffer, jkCutscene_frameBuf, 0, 50, NULL, 0);
     stdDisplay_VBufferFill(Video_pMenuBuffer, 0, &jkCutscene_rect1);
     stdDisplay_VBufferCopy(Video_pMenuBuffer, &Video_otherBuf, jkCutscene_rect1.x, jkCutscene_rect1.y, &jkCutscene_rect1, 0);
 	stdDisplay_VBufferUnlock(Video_pMenuBuffer);

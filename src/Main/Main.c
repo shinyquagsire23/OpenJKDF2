@@ -1112,7 +1112,7 @@ void Main_Shutdown()
     jkCutscene_Shutdown();
     jkSaber_Shutdown();
     jkHudInv_Shutdown();
-    if ( jkCutscene_smack_loaded )
+    if ( jkCutscene_isRendering )
         jkCutscene_sub_421410();
     Video_Shutdown();
     jkGame_Shutdown();

@@ -636,7 +636,7 @@ jkCutscene_rect2 0x0055AA38 rdRect
 jkCutscene_strings 0x0055AA28 stdStrTable
 jkCutscene_subtitlefont 0x0055AA4C stdFont*
 jkCutscene_bInitted 0x0055AA58 int
-jkCutscene_smack_loaded 0x0055AA48 int
+jkCutscene_isRendering 0x0055AA48 int
 jkCutscene_dword_55B750 0x0055B750 int
 jkCutscene_dword_55AA50 0x0055AA50 int
 jkCutscene_55AA54 0x0055AA54 int
