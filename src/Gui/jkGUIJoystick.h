@@ -29,7 +29,7 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw);
 int jkGuiJoystick_ClickList2(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
 void jkGuiJoystick_BindControl(int a1, int a2);
 void jkGuiJoystick_sub_41B390();
-int jkGuiJoystick_EnumFunc(int inputFuncIdx, char *pInputFuncStr, uint32_t flags, int dxKeyNum, uint32_t dikNum, int flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
+int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t flags, int dxKeyNum, uint32_t dikNum, int flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
 int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
 int jkGuiJoystick_AddEditClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
 int jkGuiJoystick_RemoveClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);

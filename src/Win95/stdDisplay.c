@@ -4,8 +4,9 @@
 #include "jk.h"
 #include "Win95/Video.h"
 #include "Win95/Window.h"
+#include "General/stdColor.h"
 
-void stdDisplay_SetGammaTable(int len, uint32_t *table)
+void stdDisplay_SetGammaTable(int len, double *table)
 {
     stdDisplay_gammaTableLen = len;
     stdDisplay_paGammaTable = table;
@@ -507,3 +508,12 @@ int stdDisplay_GammaCorrect3(int a1)
     return 1;
 }
 #endif
+
+void stdDisplay_GammaCorrect(const void *pPal)
+{
+    _memcpy(stdDisplay_tmpGammaPal, pPal, sizeof(stdDisplay_tmpGammaPal));
+    if ( stdDisplay_paGammaTable && stdDisplay_gammaIdx )
+        stdColor_GammaCorrect((uint8_t *)stdDisplay_gammaPalette, (uint8_t *)stdDisplay_tmpGammaPal, 256, stdDisplay_paGammaTable[stdDisplay_gammaIdx - 1]);
+    else
+        _memcpy(stdDisplay_gammaPalette, pPal, sizeof(stdDisplay_gammaPalette));
+}

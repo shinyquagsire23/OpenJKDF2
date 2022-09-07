@@ -108,7 +108,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg);
 int sithMulti_HandlePing(sithCogMsg *msg);
 int sithMulti_HandlePingResponse(sithCogMsg *msg);
 int sithMulti_HandleKickPlayer(sithCogMsg *msg);
-int sithMulti_ServerLeft();
+int sithMulti_ServerLeft(int a, sithEventInfo* b);
 void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
 int sithMulti_HandleLeaveJoin(sithCogMsg *msg);
 void sithMulti_sub_4CA470(int a1);

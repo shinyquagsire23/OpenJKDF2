@@ -204,7 +204,7 @@ void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)
         stdFnames_CopyShortName(key, 64, v3); // TODO aaaaaaa ??? disassembly was wrong?
         jkGuiTitle_sub_4189A0(key);
         v5 = jkStrings_GetText2(key);
-        jkGuiRend_DarrayReallocStr(list, v5, v3);
+        jkGuiRend_DarrayReallocStr(list, v5, (intptr_t)v3);
         v2 += 32;
     }
     jkGuiRend_AddStringEntry(list, 0, 0);

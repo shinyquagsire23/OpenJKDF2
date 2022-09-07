@@ -33,6 +33,7 @@
 #include "Gui/jkGUIEsc.h"
 #include "Gui/jkGUISingleTally.h"
 #include "Gui/jkGUIMultiplayer.h"
+#include "Gui/jkGUIDisplay.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "World/sithWorld.h"
@@ -74,6 +75,117 @@ static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
     {jkMain_CreditsShow, jkMain_CreditsTick, jkMain_CreditsLeave},
     {jkMain_UnkShow, jkMain_UnkTick, jkMain_UnkLeave},
 };
+
+void jkMain_Startup()
+{
+    jkPlayer_Startup();
+    jkPlayer_InitForceBins();
+    jkMain_bInit = 1;
+}
+
+void jkMain_Shutdown()
+{
+    jkPlayer_Shutdown();
+    sith_Close();
+    jkMain_bInit = 0;
+}
+
+// TODO merge SDL2 in
+#ifndef SDL2_RENDER
+int jkMain_SetVideoMode()
+{
+    signed int result; // eax
+    wchar_t *v1; // eax
+    wchar_t *v2; // eax
+    wchar_t *v3; // [esp-4h] [ebp-10h]
+    wchar_t *v4; // [esp-4h] [ebp-10h]
+
+    if ( jkGame_isDDraw )
+        return 0;
+    jkPlayer_nullsub_29();
+    if ( Video_SetVideoDesc(sithWorld_pCurrentWorld->colormaps->colors) )
+        goto LABEL_12;
+    if ( !sithNet_isMulti )
+    {
+        thing_six = 1;
+        sithControl_Close();
+        v3 = jkStrings_GetText("ERR_CHANGING_VIDEO_DESC");
+        v1 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        jkGuiDialog_ErrorDialog(v1, v3);
+        sithControl_Open();
+        thing_six = 0;
+    }
+    _memcpy(&Video_modeStruct, &Video_modeStruct2, sizeof(Video_modeStruct));
+    jkGuiDisplay_sub_4149C0();
+    if ( Video_SetVideoDesc(sithWorld_pCurrentWorld->colormaps->colors) )
+    {
+LABEL_12:
+        Windows_InitGdi(stdDisplay_pCurDevice->video_device[0].windowedMaybe);
+        jkGame_isDDraw = 1;
+        result = 1;
+    }
+    else
+    {
+        jkPlayer_nullsub_30();
+        if ( sithControl_IsOpen() )
+            sithControl_Close();
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 3;
+        v4 = jkStrings_GetText("ERR_CHANGING_VIDEO_ABORT");
+        v2 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        jkGuiDialog_ErrorDialog(v2, v4);
+        result = 0;
+    }
+    return result;
+}
+#endif
+
+void jkMain_SetVideoModeGdi()
+{
+    if ( jkGame_isDDraw )
+    {
+        Windows_ShutdownGdi();
+        Video_SwitchToGDI();
+        jkPlayer_nullsub_30();
+        jkGame_isDDraw = 0;
+    }
+}
+
+void jkMain_InitPlayerThings()
+{
+    jkPlayer_InitThings();
+}
+
+int jkMain_SwitchTo5_2()
+{
+    signed int result; // eax
+
+    result = 1;
+    jkSmack_gameMode = 4;
+    jkPlayer_dword_525470 = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 5;
+    return result;
+}
+
+int jkMain_SwitchTo5(char *pJklFname)
+{
+    signed int result; // eax
+
+    _strncpy(jkMain_aLevelJklFname, pJklFname, 0x7Fu);
+    jkMain_aLevelJklFname[127] = 0;
+    jkSmack_gameMode = 3;
+    result = 1;
+    if ( jkGuiRend_thing_five )
+        jkGuiRend_thing_four = 1;
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = 5;
+    return result;
+}
 
 void jkMain_GuiAdvance()
 {
@@ -1133,7 +1245,7 @@ void jkMain_VideoLeave(int a1, int a2)
         jkMain_CdSwitch(0, 1);
 }
 
-void jkMain_CreditsShow()
+void jkMain_CreditsShow(int a1, int a2)
 {
     if ( !jkCredits_Show() )
     {
@@ -1144,7 +1256,7 @@ void jkMain_CreditsShow()
     }
 }
 
-void jkMain_CreditsTick()
+void jkMain_CreditsTick(int a1)
 {
     if ( jkCredits_Tick() )
     {
@@ -1155,22 +1267,22 @@ void jkMain_CreditsTick()
     }
 }
 
-void jkMain_CreditsLeave()
+void jkMain_CreditsLeave(int a1, int a2)
 {
     jkCredits_Skip();
 }
 
-void jkMain_CutsceneShow()
+void jkMain_CutsceneShow(int a1, int a2)
 {
     jkGuiMain_ShowCutscenes();
 }
 
-void jkMain_CutsceneTick()
+void jkMain_CutsceneTick(int a1)
 {
     ;
 }
 
-void jkMain_CutsceneLeave()
+void jkMain_CutsceneLeave(int a1, int a2)
 {
     ;
 }

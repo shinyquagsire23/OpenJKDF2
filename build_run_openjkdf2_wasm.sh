@@ -3,7 +3,12 @@
 # Run in OpenJKDF2 directory:
 # python -m SimpleHTTPServer
 
-#cp resource/* wasm_out/resource/
+rm -f wasm_out/openjkdf2.js
+rm -f wasm_out/openjkdf2.wasm
+rm -f wasm_out/openjkdf2.data
+rm -rf wasm_out/resource/shaders
+mkdir -p wasm_out/resource/shaders
+cp resource/shaders/* wasm_out/resource/shaders
 
 rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc
@@ -21,8 +26,8 @@ gsed -i 's/var hasByteServing/var hasByteServing = false;\/\//g' wasm_out/openjk
 # Update maxthomas.dev/openjkdf2, if you're me
 whodis=$(whoami)
 if [ "$whodis"  = 'maxamillion' ]; then
-    #cp wasm_out/openjkdf2.wasm ../shinyquagsire23.github.io/openjkdf2
-    #cp wasm_out/index.html ../shinyquagsire23.github.io/openjkdf2
-    #cp wasm_out/openjkdf2.data ../shinyquagsire23.github.io/openjkdf2
-    #cp wasm_out/openjkdf2.js ../shinyquagsire23.github.io/openjkdf2
+    cp wasm_out/openjkdf2.wasm ../shinyquagsire23.github.io/openjkdf2
+    cp wasm_out/index.html ../shinyquagsire23.github.io/openjkdf2
+    cp wasm_out/openjkdf2.data ../shinyquagsire23.github.io/openjkdf2
+    cp wasm_out/openjkdf2.js ../shinyquagsire23.github.io/openjkdf2
 fi

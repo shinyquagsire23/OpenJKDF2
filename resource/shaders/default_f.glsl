@@ -99,6 +99,7 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
     return adj_tc;
 }
 
+#ifdef CAN_BILINEAR_FILTER
 vec4 bilinear_paletted()
 {
     // Get texture size in pixels:
@@ -167,6 +168,7 @@ vec4 bilinear_paletted_light(float index)
 
     return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * light_mult ;//* (1.0 - light) * light_mult;
 }
+#endif
 
 void main(void)
 {
@@ -321,7 +323,7 @@ void main(void)
 
     float luma = luminance(color_add.rgb) * 0.5;// * 4.0;
 
-    if (emissiveFactor.r != 0 || emissiveFactor.g != 0.0 || emissiveFactor.b != 0.0)
+    if (emissiveFactor.r != 0.0 || emissiveFactor.g != 0.0 || emissiveFactor.b != 0.0)
     {
         //color_add = vec4(1.0, 1.0, 1.0, 1.0);
         luma = 1.0;
@@ -337,7 +339,7 @@ void main(void)
         color_add.b *= luma;
     }
 
-    vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3);
+    vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3.0);
 
     /*if (colorEffects_tint.r > 0.0 || colorEffects_tint.g > 0.0 || colorEffects_tint.b > 0.0)
     {

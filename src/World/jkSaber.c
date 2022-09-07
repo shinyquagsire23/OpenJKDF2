@@ -59,6 +59,11 @@ int jkSaber_Startup()
     return 1;
 }
 
+void jkSaber_Shutdown()
+{
+    ;
+}
+
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
 {
     float length = 0.0;
@@ -1100,4 +1105,40 @@ int jkSaber_idk4()
         return 1;
     }
     return 0;
+}
+
+void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType)
+{
+    sithThing *pTemplate; // eax
+    sithThing *v5; // eax
+    sithThing *pActor; // ecx
+    int v7; // edx
+
+    if ( sithTime_curMs >= pPlayerInfo->lastSparkSpawnMs + 200 )
+    {
+        if ( sparkType == 1 )
+        {
+            pTemplate = pPlayerInfo->blood_sparks;
+        }
+        else if ( sparkType == 2 )
+        {
+            pTemplate = pPlayerInfo->saber_sparks;
+        }
+        else
+        {
+            pTemplate = pPlayerInfo->wall_sparks;
+        }
+        if ( pTemplate )
+        {
+            v5 = sithThing_Create(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
+            if ( v5 )
+            {
+                pActor = pPlayerInfo->actorThing;
+                v7 = sithTime_curMs;
+                v5->prev_thing = pActor;
+                pPlayerInfo->lastSparkSpawnMs = v7;
+                v5->child_signature = pActor->signature;
+            }
+        }
+    }
 }

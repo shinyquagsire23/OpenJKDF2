@@ -214,7 +214,7 @@ elseif(PLAT_WASM)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
-    set(USE_FLAGS "-s USE_SDL=2 -s USE_SDL_MIXER=2 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 -s ASYNCIFY")
+    set(USE_FLAGS "-s USE_SDL=2 -s USE_SDL_MIXER=2 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES2=1 -s FULL_ES3=1 -s ASYNCIFY")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")

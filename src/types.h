@@ -3072,7 +3072,6 @@ typedef struct stdControlDikStrToNum
 #define KEY_IS_BUTTON(x) (KEY_IS_JOY_BUTTON(x) || x < JK_EXTENDED_KEY_START)
 
 // QOL added:
-#ifdef SDL2_RENDER
 #define KEY_JOY1_EXT_STARTIDX   (JK_EXT_MOUSE_END)
 #define KEY_JOY1_B9             (KEY_JOY1_EXT_STARTIDX + 0)
 #define KEY_JOY1_B10            (KEY_JOY1_EXT_STARTIDX + 1)
@@ -3124,8 +3123,7 @@ typedef struct stdControlDikStrToNum
 #define KEY_JOY2_B30            (KEY_JOY2_EXT_STARTIDX + 21)
 #define KEY_JOY2_B31            (KEY_JOY2_EXT_STARTIDX + 22)
 #define KEY_JOY2_B32            (KEY_JOY2_EXT_STARTIDX + 23)
-#define KEY_JOY2_EXT_ENDIDX     (KEY_JOY2_EXT_STARTIDX + 24)
-#endif
+#define KEY_JOY2_EXT_ENDIDX     (KEY_JOY2_EXT_STARTIDX + JK_JOYSTICK_EXT_BUTTON_STRIDE)
 
 // Axis idxs
 #define AXIS_JOY1_X          (0)

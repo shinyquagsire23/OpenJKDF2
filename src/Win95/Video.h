@@ -13,6 +13,8 @@
 int Video_Startup();
 void Video_Shutdown();
 void Video_SwitchToGDI();
+int Video_camera_related();
+int Video_SetVideoDesc(const void *color_buf);
 
 #ifdef SDL2_RENDER
 extern rdCanvas* Video_pCanvasOverlayMap;
@@ -21,7 +23,7 @@ extern stdVBuffer Video_overlayMapBuffer;
 extern uint32_t Video_overlayTexId;
 #endif
 
-static void (*Video_camera_related)() = (void*)Video_camera_related_ADDR;
+//static void (*Video_camera_related)() = (void*)Video_camera_related_ADDR;
 
 //static void (*Video_Shutdown)() = (void*)Video_Shutdown_ADDR;
 //static void (*Video_SwitchToGDI)() = (void*)Video_SwitchToGDI_ADDR;

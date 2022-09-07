@@ -18,7 +18,7 @@ extern int Main_bVerboseNetworking;
 int Main_Startup(const char *cmdline);
 void Main_Shutdown();
 void Main_ParseCmdLine(char *cmdline);
-static int (*Main_FPrintf)(const char* fmt, ...) = (void*)Main_FPrintf_ADDR;
+int Main_FPrintf(const char* fmt, ...);
 
 void Main_CheckRequiredAssets(int doInstall);
 

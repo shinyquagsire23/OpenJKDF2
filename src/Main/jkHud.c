@@ -1069,3 +1069,26 @@ void jkHud_idk_time()
     stdControl_Flush();
     stdControl_bDisableKeyboard = 0;
 }
+
+int jkHud_chat2()
+{
+    size_t v0; // eax
+    wchar_t *v2; // [esp-8h] [ebp-108h]
+    wchar_t *v3; // [esp-8h] [ebp-108h]
+    wchar_t a1[128]; // [esp+0h] [ebp-100h] BYREF
+
+    if ( jkHud_dword_552D10 == -2 )
+    {
+        v3 = jkStrings_GetText("HUD_COMMAND");
+        _wcsncpy(a1, v3, 0x80u);
+    }
+    else if ( jkHud_dword_552D10 == -1 )
+    {
+        v2 = jkStrings_GetText("HUD_SENDTOALL");
+        _wcsncpy(a1, v2, 0x80u);
+    }
+    v0 = _wcslen(a1);
+    stdString_CharToWchar(&a1[v0], jkHud_chatStr, 127 - v0);
+    a1[127] = 0;
+    return jkDev_sub_41FB80(103, a1);
+}

@@ -21,14 +21,22 @@ void main(void)
     vec2 Radius = Size/iResolution.xy;
     
     // Pixel colour
+#ifdef HAS_MIPS
     vec4 Color = texture(tex, f_uv, 1);
+#else
+    vec4 Color = texture(tex, f_uv);
+#endif
     
     // Blur calculations
     for( float d=0.0; d<Pi; d+=Pi/Directions)
     {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality)
         {
-            Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i, 1);      
+#ifdef HAS_MIPS
+            Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i, 1);
+#else
+            Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i);
+#endif      
         }
     }
     

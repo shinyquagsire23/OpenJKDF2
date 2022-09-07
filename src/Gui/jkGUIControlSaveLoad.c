@@ -130,10 +130,9 @@ void jkGuiControlSaveLoad_FindFile()
                 {
                     v2 = (jkGuiControlInfo *)pHS->alloc(sizeof(jkGuiControlInfo));
                     _memcpy(v2, &v5, sizeof(jkGuiControlInfoHeader));
-                    _strncpy(v2->fpath, a2.fpath, 0x7Fu);
-                    v2->fpath[127] = 0;
+                    stdString_SafeStrCopy(v2->fpath, a2.fpath, 0x80);
                     _strtolower(v2->fpath);
-                    jkGuiRend_DarrayReallocStr(&jkGuiControlSaveLoad_darray, v2->header.wstr, v2);
+                    jkGuiRend_DarrayReallocStr(&jkGuiControlSaveLoad_darray, v2->header.wstr, (intptr_t)v2);
                     v0 = v3;
                     ++jkGuiControlSaveLoad_dword_559C84;
                 }

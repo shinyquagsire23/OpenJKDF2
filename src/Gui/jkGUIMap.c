@@ -225,13 +225,13 @@ LABEL_26:
     }
 }
 
-int jkGuiMap_sub_415B40()
+int jkGuiMap_sub_415B40(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     jkGuiMap_dword_556664 = jkGuiMap_dword_556664 == 0;
     return 0;
 }
 
-int jkGuiMap_sub_415B60()
+int jkGuiMap_sub_415B60(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     return 0;
 }

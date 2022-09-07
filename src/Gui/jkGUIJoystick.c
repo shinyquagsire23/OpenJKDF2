@@ -182,7 +182,7 @@ static jkGuiElement jkGuiJoystick_aElements[33] = {
 };
 
 static jkGuiMenu jkGuiJoystick_menu = {
-  jkGuiJoystick_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, jkGuiKeyboard_aIdk3, jkGuiJoystick_MenuTick, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+  jkGuiJoystick_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)jkGuiKeyboard_aIdk3, jkGuiJoystick_MenuTick, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };  
 
 void jkGuiJoystick_nullsub_51()
@@ -539,7 +539,7 @@ void jkGuiJoystick_sub_41B390()
     jkGuiRend_SetClickableString(&jkGuiJoystick_aElements[13], &jkGuiJoystick_darray3);
 }
 
-int jkGuiJoystick_EnumFunc(int inputFuncIdx, char *pInputFuncStr, uint32_t flags, int dxKeyNum, uint32_t dikNum, int flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr)
+int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t flags, int dxKeyNum, uint32_t dikNum, int flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr)
 {
     int v8; // ebx
     wchar_t *v9; // esi

@@ -53,7 +53,7 @@ void jkDev_Close();
 void jkDev_DrawLog();
 void jkDev_sub_41F950();
 int jkDev_PrintUniString(const wchar_t *str);
-void jkDev_DebugLog(char *lParam);
+int jkDev_DebugLog(const char *lParam);
 int jkDev_sub_41FB80(int a1, const wchar_t *a2);
 int jkDev_sub_41FC40(int a1, const char *a2);
 void jkDev_sub_41FC90(int a1);

@@ -83,12 +83,14 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     mat_file_ = mat_file;
     mat_file__ = mat_file;
     if (!mat_file) {
+        //jk_printf("OpenJKDF2: Material `%s` could not be opened!\n", mat_fpath); // Added
         return 0;
     }
 
     rdroid_pHS->fileRead(mat_file, &mat_header, sizeof(rdMaterialHeader));
     if ( _memcmp(mat_header.magic, "MAT ", 4u) || mat_header.revision != '2' )
     {
+        jk_printf("OpenJKDF2: Material `%s` has improper magic or bad revision!\n", mat_fpath); // Added
         rdroid_pHS->fileClose(mat_file_);
         return 0;
     }
@@ -107,6 +109,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
         material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
         {
+            jk_printf("OpenJKDF2: Material `%s` texinfo could not be allocated!\n", mat_fpath); // Added
             rdroid_pHS->fileClose(mat_file_);
             return 0;
         }
@@ -128,6 +131,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
       material->textures = textures;
       if ( !textures )
       {
+        jk_printf("OpenJKDF2: Material `%s` textures array could not be allocated!\n", mat_fpath); // Added
         rdroid_pHS->fileClose(mat_file_);
         return 0;
       }
@@ -222,6 +226,7 @@ LABEL_22:
       material->palette_alloc = colors;
       if ( !colors )
       {
+        jk_printf("OpenJKDF2: Material `%s` color palette could not be allocated!\n", mat_fpath); // Added
         rdroid_pHS->fileClose(mat_file_);
         return 0;
       }
@@ -233,7 +238,7 @@ LABEL_22:
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 #ifdef SDL2_RENDER
-#ifndef ARCH_WASM
+
     _strncpy(material->mat_full_fpath, mat_fpath, 0xFF);
     for (int i = 0; i < 256; i++)
     {
@@ -259,11 +264,11 @@ LABEL_22:
             surface->emissive_factor[1] = 0.0;
             surface->emissive_factor[2] = 0.0;
             surface->displacement_factor = 0.0;
-
+#ifndef ARCH_WASM
             jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, i);
+#endif
         }
     }
-#endif
 #endif
 
     return mat_file;

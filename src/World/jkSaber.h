@@ -8,7 +8,7 @@
 #define jkSaber_Draw_ADDR (0x0040B5E0)
 #define jkSaber_UpdateLength_ADDR (0x0040B6D0)
 #define jkSaber_UpdateCollision_ADDR (0x0040B860)
-#define jkSaber_idk3_ADDR (0x0040BF40)
+#define jkSaber_SpawnSparks_ADDR (0x0040BF40)
 #define jkSaber_Enable_ADDR (0x0040BFC0)
 #define jkSaber_Disable_ADDR (0x0040C020)
 #define jkSaber_Startup_ADDR (0x0040C040)
@@ -45,6 +45,7 @@
 #define jkSaber_cogMsg_HandleSetTeam_ADDR (0x0040D450)
 
 int jkSaber_Startup();
+void jkSaber_Shutdown();
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks);
 void jkSaber_PolylineRand(rdThing *thing);
 void jkSaber_Draw(rdMatrix34 *posRotMat);
@@ -86,8 +87,9 @@ int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, c
 
 int jkSaber_cogMsg_Handlex33(sithCogMsg *msg);
 int jkSaber_idk4();
+void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType);
 
-static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
+//static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 //static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
 //static int (*jkSaber_cogMsg_SendEndLevel)() = (void*)jkSaber_cogMsg_SendEndLevel_ADDR;
 //static int (*jkSaber_cogMsg_SendJKPrintUniString)(int a1, unsigned int a2) = (void*)jkSaber_cogMsg_SendJKPrintUniString_ADDR;

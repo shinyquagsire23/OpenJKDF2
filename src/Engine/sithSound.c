@@ -3,6 +3,7 @@
 #include "Win95/stdSound.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
+#include "General/stdFnames.h"
 #include "World/sithWorld.h"
 #include "jk.h"
 
@@ -108,6 +109,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
     unsigned int frequencyKHz; // eax
     struct common_functions *v12; // ecx
     char tmp[128]; // [esp+14h] [ebp-80h] BYREF
+    char tmp2[128];
 
     sound_file = 0;
 
@@ -136,8 +138,8 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
         v6 = stdString_CopyBetweenDelimiter(v6, tmp, 128, ";");
         if ( tmp[0] )
         {
-            _sprintf(tmp, "%s%c%s", tmp, '\\', sound_fname);
-            sound_file = pSithHS->fileOpen(tmp, "rb");
+            stdString_snprintf(tmp2, 128, "%s%c%s", tmp, LEC_PATH_SEPARATOR_CHR, sound_fname); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
+            sound_file = pSithHS->fileOpen(tmp2, "rb");
             if ( sound_file )
                 break;
         }

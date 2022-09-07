@@ -72,6 +72,12 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 void std3D_DrawMenu();
 void std3D_DrawSceneFbo();
 void std3D_FreeResources();
+void std3D_InitializeViewport(rdRect *viewRect);
+int std3D_GetValidDimensions(int a1, int a2, int a3, int a4);
+int std3D_FindClosestDevice(uint32_t index, int a2);
+int std3D_SetRenderList(intptr_t a1);
+intptr_t std3D_GetRenderList();
+int std3D_CreateExecuteBuffer();
 #else
 static int (*std3D_Startup)() = (void*)std3D_Startup_ADDR;
 static void (*std3D_Shutdown)() = (void*)std3D_Shutdown_ADDR;
@@ -90,6 +96,12 @@ static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
 static int (*std3D_AddToTextureCache)(stdVBuffer *a1, rdDDrawSurface *tex_2, int is_16bit_maybe, int no_alpha) = (void*)std3D_AddToTextureCache_ADDR;
 static void (*std3D_UpdateFrameCount)(rdDDrawSurface *surface) = (void*)std3D_UpdateFrameCount_ADDR;
 static void (*std3D_PurgeTextureCache)() = (void*)std3D_PurgeTextureCache_ADDR;
+void std3D_InitializeViewport(rdRect *viewRect);
+int std3D_GetValidDimensions(int a1, int a2, int a3, int a4);
+static int (*std3D_FindClosestDevice)(uint32_t index, int a2) = (void*)std3D_FindClosestDevice_ADDR;
+int std3D_SetRenderList(intptr_t a1);
+intptr_t std3D_GetRenderList();
+static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADDR;
 #endif
 
 #endif // _STD3D_H

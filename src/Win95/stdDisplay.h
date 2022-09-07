@@ -46,8 +46,9 @@
 #define stdDisplay_sub_424440_ADDR (0x0424440)
 #define stdDisplay_SortVideoModes_ADDR (0x04246E0)
 
-void stdDisplay_SetGammaTable(int len, uint32_t *table);
+void stdDisplay_SetGammaTable(int len, double *table);
 uint8_t* stdDisplay_GetPalette();
+void stdDisplay_GammaCorrect(const void *pPal);
 
 static int (*stdDisplay_DrawAndFlipGdi)(uint32_t) = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
 static int (*stdDisplay_SetCooperativeLevel)(uint32_t) = (void*)stdDisplay_SetCooperativeLevel_ADDR;

@@ -95,7 +95,7 @@ int jkGuiNetHost_bIsDedicated = 0;
 #define LONG_MAX ((long)(~0UL>>1))
 #define LONG_MIN (~LONG_MAX)
 
-long wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base)
+long jk_wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base)
 {
     const wchar_t *p = nptr, *endp;
     _Bool is_neg = 0, overflow = 0;
@@ -167,7 +167,7 @@ long wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base)
 int msvc_sub_5133E0(wchar_t *a1, wchar_t **a2, char a3)
 {
     //TODO
-    return wcstol(a1, a2, a3);
+    return jk_wcstol(a1, a2, a3);
 }
 
 int wstr_to_int_clamped(wchar_t *pWstr, int minVal, int maxVal)

@@ -2,6 +2,7 @@
 
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
+#include "General/stdFnames.h"
 #include "World/sithWorld.h"
 #include "Engine/sith.h"
 #include "Engine/rdMaterial.h"
@@ -137,6 +138,7 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
     int v11; // eax
     int v12; // ecx
     char mat_fpath[128]; // [esp+14h] [ebp-80h] BYREF
+    char mat_fpath2[128];
 
     while ( 1 )
     {
@@ -154,8 +156,8 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
             v7 = stdString_CopyBetweenDelimiter(v7, mat_fpath, 128, ";");
             if ( mat_fpath[0] )
             {
-                _sprintf(mat_fpath, "%s%c%s", mat_fpath, 92, a1);
-                if ( rdMaterial_LoadEntry(mat_fpath, v8, create_ddraw_surface, gpu_mem) )
+                stdString_snprintf(mat_fpath2, 128, "%s%c%s", mat_fpath, LEC_PATH_SEPARATOR_CHR, a1); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
+                if ( rdMaterial_LoadEntry(mat_fpath2, v8, create_ddraw_surface, gpu_mem) )
                 {
                     v9 = 1;
                     goto LABEL_10;

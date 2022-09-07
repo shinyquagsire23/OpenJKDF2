@@ -296,14 +296,14 @@ LABEL_7:
     return v5;
 }
 
-void jkDev_DebugLog(char *lParam)
+int jkDev_DebugLog(const char *lParam)
 {
     HWND v1; // eax
     wchar_t a1[128]; // [esp+8h] [ebp-100h] BYREF
 
     stdString_CharToWchar(a1, lParam, 127);
     a1[127] = 0;
-    jkDev_PrintUniString(a1);
+    int ret = jkDev_PrintUniString(a1);
 #ifdef WIN32
     if ( jkDev_hDlg )
     {
@@ -313,6 +313,7 @@ void jkDev_DebugLog(char *lParam)
 #else
     //printf("%s", lParam);
 #endif
+    return ret;
 }
 
 int jkDev_sub_41FB80(int a1, const wchar_t *a2)

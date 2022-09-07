@@ -326,6 +326,14 @@ DebugConsole_idk2 0x008358FC int16_t
 // std3D
 d3d_maxVertices 0x0055C7F0 uint32_t
 d3d_device_ptr 0x0055C7DC d3d_device*
+std3D_rectViewIdk 0x00865320 rdRect
+std3D_aViewIdk 0x008652A0 float[32]
+std3D_aViewTris 0x00865260 rdTri[2]
+std3D_gpuMaxTexSizeMaybe 0x0053D668 int = 1
+std3D_dword_53D66C 0x0053D668 int = 1
+std3D_dword_53D670 0x0053D668 int = 0x100
+std3D_dword_53D674 0x0053D668 int = 0x100
+std3D_renderList 0x0055C7D0 intptr_t
 
 sithDplay_idk 0x008321F8 int
 sithDplay_bInitted 0x008321D8 int
@@ -360,7 +368,7 @@ WinIdk_aDplayGuid 0x008607F0 uint32_t[4]
 
 stdDisplay_aDevices 0x00868280 stdVideoDevice[16]
 stdDisplay_gammaTableLen 0x055B410 int
-stdDisplay_paGammaTable 0x055B414 int*
+stdDisplay_paGammaTable 0x055B414 double*
 stdDisplay_gammaPalette 0x0055ADB8 rdColor24[256]
 stdDisplay_pCurDevice 0x0055B3E8 stdVideoDevice*
 stdDisplay_pCurVideoMode 0x0055B3F0 stdVideoMode*
@@ -369,6 +377,8 @@ stdDisplay_bOpen 0x0055B3DC int
 stdDisplay_bModeSet 0x0055B3E0 int
 stdDisplay_numVideoModes 0x0055B3EC int
 stdDisplay_bPaged 0x0055B3F4 int
+stdDisplay_tmpGammaPal 0x0055B0C0 uint8_t[0x300]
+stdDisplay_gammaIdx 0x0055B40C int
 
 // std
 word_860800 0x860800 uint16_t
@@ -433,6 +443,8 @@ Video_pCanvas 0x00552894 rdCanvas*
 Video_aPalette 0x00860140 rdColor24[0x100]
 Video_format 0x008600E0 stdVBufferTexFmt
 Video_format2 0x0085FF60 stdVBufferTexFmt
+Video_modeStruct2 0x0085FFC0 videoModeStruct
+Video_bufIdk 0x00866120 stdVBuffer
 
 stdConsole_foregroundAttr 0x0055BB68 uint16_t
 stdConsole_wAttributes 0x0055BB6C uint16_t

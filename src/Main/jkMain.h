@@ -87,6 +87,13 @@ typedef struct jkGuiStateFuncs
 extern jkEpisodeEntry* jkMain_pEpisodeEnt;
 extern jkEpisodeEntry* jkMain_pEpisodeEnt2;
 
+void jkMain_Startup();
+void jkMain_Shutdown();
+int jkMain_SetVideoMode();
+void jkMain_SetVideoModeGdi();
+void jkMain_InitPlayerThings();
+int jkMain_SwitchTo5_2();
+int jkMain_SwitchTo5(char *pJklFname);
 void jkMain_GuiAdvance();
 void jkMain_EscapeMenuShow(int a1, int a2);
 void jkMain_EscapeMenuTick(int a2);
@@ -127,13 +134,13 @@ void jkMain_VideoShow(int a1, int a2);
 void jkMain_VideoTick(int a2);
 void jkMain_VideoLeave(int a1, int a2);
 
-void jkMain_CreditsShow();
-void jkMain_CreditsTick();
-void jkMain_CreditsLeave();
+void jkMain_CreditsShow(int a1, int a2);
+void jkMain_CreditsTick(int a1);
+void jkMain_CreditsLeave(int a1, int a2);
 
-void jkMain_CutsceneShow();
-void jkMain_CutsceneTick();
-void jkMain_CutsceneLeave();
+void jkMain_CutsceneShow(int a1, int a2);
+void jkMain_CutsceneTick(int a1);
+void jkMain_CutsceneLeave(int a1, int a2);
 
 int jkMain_SwitchTo13();
 int jkMain_SwitchTo12();
@@ -151,10 +158,10 @@ int jkMain_SwitchTo4(const char *pFpath);
 //static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
 
 #ifdef SDL2_RENDER
-int jkMain_SetVideoMode();
+//int jkMain_SetVideoMode();
 void jkMain_FixRes();
 #else
-static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
+//static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
 #endif
 
 #endif // _JKMAIN_H

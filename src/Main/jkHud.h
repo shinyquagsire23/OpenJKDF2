@@ -38,6 +38,7 @@ int jkHud_SortPlayerScore(const void* a, const void* b);
 int jkHud_SortTeamScore(const void* a, const void* b);
 void jkHud_Tally();
 void jkHud_idk_time();
+int jkHud_chat2();
 
 //static int (*jkHud_Startup)() = (void*)jkHud_Startup_ADDR;
 //static void (*jkHud_Shutdown)() = (void*)jkHud_Shutdown_ADDR;

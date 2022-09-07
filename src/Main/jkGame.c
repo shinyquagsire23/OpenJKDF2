@@ -166,7 +166,7 @@ int jkGame_Update()
     {
         ++Video_dword_5528A0;
         Video_dword_5528A8 = stdPlatform_GetTimeMsec();
-        if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 0x3E8 )
+        if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 1000 )
         {
             v4 = (double)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (double)(unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec);
             Video_flt_55289C = v4;
@@ -329,4 +329,88 @@ void jkGame_Gamma()
         sithRender_SetPalette(v1);
     }
 #endif
+}
+
+void jkGame_PrecalcViewSizes(int width, int height, jkViewSize *aOut)
+{
+    double v5; // st7
+    double v6; // st6
+    float v7; // [esp+4h] [ebp-Ch]
+    float v8;
+    float widtha; // [esp+14h] [ebp+4h]
+    float widthb; // [esp+14h] [ebp+4h]
+    float heighta; // [esp+18h] [ebp+8h]
+
+    v5 = (double)width;
+
+    widtha = (float)height;
+    heighta = widtha;
+    v6 = widtha * 0.5;
+    widthb = v5 * 0.5;
+    v8 = v6;
+    v7 = heighta * 0.36000001;
+    aOut[10].xMax = widthb;
+    aOut[10].yMax = v6;
+    aOut[9].xMax = widthb;
+    aOut[9].yMax = v8;
+    aOut[10].xMin = width;
+    aOut[10].yMin = height;
+    aOut[9].xMin = width;
+    aOut[9].yMin = height;
+    aOut[8].xMin = (__int64)(v5 * 0.9375 - -0.5);
+    aOut[8].xMax = widthb;
+    aOut[8].yMax = v8;
+    aOut[8].yMin = (__int64)(heighta * 0.9375 - -0.5);
+    aOut[7].xMin = (__int64)(v5 * 0.875 - -0.5);
+    aOut[7].xMax = widthb;
+    aOut[7].yMax = v8;
+    aOut[7].yMin = (__int64)(heighta * 0.875 - -0.5);
+    aOut[6].xMin = (__int64)(v5 * 0.8125 - -0.5);
+    aOut[6].xMax = widthb;
+    aOut[6].yMax = v8;
+    aOut[6].yMin = (__int64)(heighta * 0.8125 - -0.5);
+    aOut[5].xMin = (__int64)(v5 * 0.71875 - -0.5);
+    aOut[5].xMax = widthb;
+    aOut[5].yMax = v7;
+    aOut[5].yMin = (__int64)(heighta * 0.71875 - -0.5);
+    aOut[4].xMin = (__int64)(v5 * 0.625 - -0.5);
+    aOut[4].xMax = widthb;
+    aOut[4].yMax = v7;
+    aOut[4].yMin = (__int64)(heighta * 0.625 - -0.5);
+    aOut[3].xMin = (__int64)(v5 * 0.53125 - -0.5);
+    aOut[3].xMax = widthb;
+    aOut[3].yMax = v7;
+    aOut[3].yMin = (__int64)(heighta * 0.53125 - -0.5);
+    aOut[2].xMin = (__int64)(v5 * 0.4375 - -0.5);
+    aOut[2].xMax = widthb;
+    aOut[2].yMax = v7;
+    aOut[2].yMin = (__int64)(heighta * 0.4375 - -0.5);
+    aOut[1].xMin = (__int64)(v5 * 0.34375 - -0.5);
+    aOut[1].xMax = widthb;
+    aOut[1].yMax = v7;
+    aOut[1].yMin = (__int64)(heighta * 0.34375 - -0.5);
+    aOut->xMin = (__int64)(v5 * 0.25 - -0.5);
+    aOut->yMin = (__int64)(heighta * 0.25 - -0.5);
+    aOut->xMax = widthb;
+    aOut->yMax = v7;
+}
+
+void jkGame_ddraw_idk_palettes()
+{
+    char *v0; // eax
+
+    if ( Video_bOpened )
+    {
+        stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
+        stdDisplay_DDrawGdiSurfaceFlip();
+        stdDisplay_ddraw_surface_flip2();
+        stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
+        v0 = stdDisplay_GetPalette();
+        sithRender_SetPalette(v0);
+    }
+}
+
+void jkGame_nullsub_36()
+{
+    ;
 }

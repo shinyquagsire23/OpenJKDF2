@@ -294,19 +294,19 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     char *v14; // edx
     char *v15; // ebx
     wchar_t *v16; // eax
-    char *v17; // esi
+    jkEpisodeEntry *v17; // esi
     char *v18; // edx
     char *v19; // ebx
     wchar_t *v20; // eax
     int v22; // [esp+10h] [ebp-1A4h]
     int v23; // [esp+10h] [ebp-1A4h]
     stdFileSearch *a1; // [esp+14h] [ebp-1A0h]
-    void *a1a; // [esp+14h] [ebp-1A0h]
     stdStrTable strtable; // [esp+18h] [ebp-19Ch]
     char tmp[128]; // [esp+28h] [ebp-18Ch]
     stdFileSearchResult a2; // [esp+A8h] [ebp-10Ch]
 
     stdStrTable_Load(&strtable, "misc\\cogStrings.uni");
+
     for ( i = 0; i < (signed int)array->total; ++i )
     {
         v9 = jkGuiRend_GetStringEntry(array, i);
@@ -336,27 +336,27 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         }
         stdFileUtil_DisposeFind(search);
     }
+    
     if ( (!v13 || !v22) && a6 > 0 )
     {
         v23 = a6;
-        v17 = a8->fileName;
-        a1a = a8->fileName;
+        v17 = a8;
         do
         {
-            if ( !*((int *)v17 - 1) )
+            if ( !v17->type )
             {
-                v18 = (char *)pHS->alloc(_strlen(v17) + 1);
-                v19 = _strcpy(v18, v17);
+                uint32_t alloc_sz = _strlen(v17->fileName) + 1;
+                v18 = (char *)pHS->alloc(alloc_sz);
+                v19 = _strncpy(v18, v17->fileName, alloc_sz); // Added: strcpy -> strncpy
                 v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18);
                 jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v19);
-                v17 = (char *)a1a;
+                
             }
-            v17 += 0x40;
+            v17++;
 
-            a1a = v17;
             --v23;
         }
-        while ( v23 != 1 );
+        while ( v23 > 1 ); // Added: != -> >
     }
     jkGuiRend_AddStringEntry(array, 0, 0);
     jkGuiRend_SetClickableString(element, array);

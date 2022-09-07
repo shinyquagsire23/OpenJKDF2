@@ -80,7 +80,7 @@ float SSAO(vec2 coord)
         kernels[i] = hemisphereVolumeRandPoint();// * frand();
 
         // Sample points should concentrate near the center of the hemisphere
-        float scale = i / Samples;
+        float scale = float(i) / Samples;
         scale = mix(0.1f, 1.0f, scale * scale);
         kernels[i] *= scale;
     }

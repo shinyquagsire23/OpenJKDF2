@@ -88,7 +88,7 @@ void DebugConsole_Close()
     DebugConsole_bOpened = 0;
 }
 
-void DebugConsole_Print(char *str)
+void DebugConsole_Print(const char *str)
 {
     if ( DebugGui_fnPrint )
     {
@@ -110,7 +110,7 @@ void DebugConsole_Print(char *str)
     }
 }
 
-void DebugConsole_PrintUniStr(wchar_t *a1)
+void DebugConsole_PrintUniStr(const wchar_t *a1)
 {
     if ( DebugGui_fnPrintUniStr )
         DebugGui_fnPrintUniStr(a1);

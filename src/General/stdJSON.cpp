@@ -129,13 +129,18 @@ int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault)
     CHECK_COMMON_GET(pFpath, pKey, valDefault);
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    try {
-        return json_file[pKey];
-    }
-    catch (nlohmann::detail::type_error& e) {
+    if (!json_file.contains(pKey)) {
         stdJSON_SaveInt(pFpath, pKey, valDefault);
         return valDefault;
     }
+
+    auto ret = json_file[pKey];
+    if (!ret.is_number()) {
+        stdJSON_SaveInt(pFpath, pKey, valDefault);
+        return valDefault;
+    }
+
+    return ret.get<int>();
 }
 
 float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
@@ -143,13 +148,19 @@ float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
     CHECK_COMMON_GET(pFpath, pKey, valDefault);
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    try {
-        return json_file[pKey];
-    }
-    catch (nlohmann::detail::type_error& e) {
+
+    if (!json_file.contains(pKey)) {
         stdJSON_SaveFloat(pFpath, pKey, valDefault);
         return valDefault;
     }
+
+    auto ret = json_file[pKey];
+    if (!ret.is_number()) {
+        stdJSON_SaveFloat(pFpath, pKey, valDefault);
+        return valDefault;
+    }
+
+    return ret.get<float>();
 }
 
 int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal)
@@ -166,13 +177,22 @@ int stdJSON_GetBool(const char* pFpath, const char* pKey, int bValDefault)
     CHECK_COMMON_GET(pFpath, pKey, bValDefault);
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    try {
-        return json_file[pKey] ? 1 : 0;
-    }
-    catch (nlohmann::detail::type_error& e) {
+    if (!json_file.contains(pKey)) {
         stdJSON_SaveBool(pFpath, pKey, !!bValDefault);
         return bValDefault;
     }
+
+    auto ret = json_file[pKey];
+    if (ret.is_number()) {
+        return ret.get<int>() != 0 ? 1 : 0;
+    }
+
+    if (!ret.is_boolean()) {
+        stdJSON_SaveBool(pFpath, pKey, !!bValDefault);
+        return bValDefault;
+    }
+
+    return ret.get<bool>() ? 1 : 0;
 }
 
 int stdJSON_SaveBytes(const char* pFpath, const char* pKey, uint8_t *pData, uint32_t dataLen)
@@ -195,11 +215,12 @@ int stdJSON_GetBytes(const char* pFpath, const char* pKey, uint8_t* pData, uint3
     std::vector<uint8_t> out(pData, pData+dataLen);
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    try {
-        out = json_file[pKey].get<std::vector<uint8_t>>();
-    }
-    catch (nlohmann::detail::type_error& e) {
+    auto ret = json_file[pKey];
+    if (!ret.is_array()) {
         stdJSON_SaveBytes(pFpath, pKey, out.data(), dataLen);
+    }
+    else {
+        out = json_file[pKey].get<std::vector<uint8_t>>();
     }
 
     std::copy_n(out.begin(), dataLen, pData);
@@ -273,18 +294,18 @@ int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int
     CHECK_ARGPTR(pOut);
     CHECK_ARGPTR(pValDefault);
 
-    std::u16string out = u"";
+    std::u16string out = std::u16string(pValDefault);
     std::string out_u8 = "";
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    try {
-        out_u8 = json_file[pKey];
-    }
-    catch (nlohmann::detail::type_error& e) {
+    auto ret = json_file[pKey];
+    if (!ret.is_string()) {
         stdJSON_SetWString(pFpath, pKey, pValDefault);
     }
-
-    out = utf8_to_utf16(out_u8);
+    else {
+        out_u8 = ret.get<std::string>();
+        out = utf8_to_utf16(out_u8);
+    }
     
     size_t readSize = _wcslen((wchar_t*)out.data());
     if (readSize < outSize) {

@@ -1127,8 +1127,11 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
     char *v5; // esi
     sithWorld *v6; // edi
     unsigned int v7; // eax
-    sithCogScript *v8; // esi
+    int v8; // esi
     char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
+
+    // Added: ??
+    v8 = 0;
 
     if ( a2 )
         return 0;

@@ -4,6 +4,7 @@
 #include "World/sithWorld.h"
 #include "General/stdHashTable.h"
 #include "General/stdConffile.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -59,10 +60,13 @@ int sithSprite_Load(sithWorld *world, int a2)
                     ".\\World\\sithSprite.c",
                     159,
                     "Parse error while reading sprites, line %d.\n",
-                    stdConffile_linenum,
-                    0,
-                    0,
-                    0);
+                    stdConffile_linenum);
+                stdPrintf(
+                    pSithHS->errorPrint,
+                    ".\\World\\sithSprite.c",
+                    159,
+                    "OpenJKDF2: Failed sprite was `%s`\n",
+                    stdConffile_entry.args[1].value);
                 return 0;
             }
             float percentDelta = 10.0 / (double)sprites_amt;
@@ -115,8 +119,7 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                     rdVector3 off;
                     char mat[32];
 
-                    _strncpy(mat, stdConffile_entry.args[0].value, 0x1Fu);
-                    mat[31] = 0;
+                    stdString_SafeStrCopy(mat, stdConffile_entry.args[0].value, 0x20);
                     uint32_t typeid = _atoi(stdConffile_entry.args[1].value);
                     float width = _atof(stdConffile_entry.args[2].value);
                     float height = _atof(stdConffile_entry.args[3].value);
@@ -137,10 +140,17 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                             ++world->numSpritesLoaded;
                             return sprite;
                         }
+                        else {
+                            jk_printf("OpenJKDF2: Failed to create sprite `%s`! rdSprite_NewEntry failed.\n", spriteFpath);
+                        }
+                    }
+                    else { // Added
+                        jk_printf("OpenJKDF2: Failed to read sprite `%s`! typeid %x > 2? width %f height %f\n", spriteFpath, typeid, width, height);
                     }
                 }
-                else
+                else // Added
                 {
+                    jk_printf("OpenJKDF2: Failed to read sprite `%s`! NumArgs %x < 0xB?\n", spriteFpath, stdConffile_entry.numArgs);
                     stdConffile_Close();
                 }
             }
@@ -148,6 +158,12 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
             {
                 return sithSprite_LoadEntry("default.spr");
             }
+            else { // Added
+                jk_printf("OpenJKDF2: Failed to open sprite `%s`!\n", spriteFpath);
+            }
+        }
+        else { // Added
+            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSpritesLoaded < numSprites -> %x < %x failed\n", fpath, world->numSpritesLoaded, world->numSprites);
         }
     }
     return result;

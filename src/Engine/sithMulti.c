@@ -703,7 +703,7 @@ int sithMulti_HandleKickPlayer(sithCogMsg *msg)
     return 1;
 }
 
-int sithMulti_ServerLeft()
+int sithMulti_ServerLeft(int a, sithEventInfo* b)
 {
     unsigned int v0; // edi
     sithPlayerInfo* v1; // esi

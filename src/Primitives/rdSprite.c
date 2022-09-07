@@ -1,6 +1,7 @@
 #include "rdSprite.h"
 
 #include "General/stdMath.h"
+#include "General/stdString.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdCache.h"
 #include "Engine/rdClip.h"
@@ -28,8 +29,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
 {
     if (spritepath)
     {
-        _strncpy(sprite->path, spritepath, 0x1Fu);
-        sprite->path[31] = 0;
+        stdString_SafeStrCopy(sprite->path, spritepath, 0x20);
     }
     sprite->width = width;
     sprite->type = type;
@@ -84,6 +84,9 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
             sprite->radius = stdMath_Sqrt(sprite->halfWidth * sprite->halfWidth + sprite->halfHeight * sprite->halfHeight);
             return 1;
         }
+    }
+    else {
+        jk_printf("OpenJKDF2: Sprite `%s` is missing material.\n", sprite->path);
     }
     return 0;
 }

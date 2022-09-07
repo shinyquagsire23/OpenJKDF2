@@ -149,7 +149,8 @@ for line in funclist:
     #if not found_func_subsys:
         #print (filefrom, subsys_ident)
     
-    #if "cogMsg" in funcname and funcname not in decompiled_funcs:
+    # Uncomment to see missing funcs
+    #if subsys != "Raster" and funcname not in decompiled_funcs and funcname not in wontimpl_funclist:
     #    print (funcname)
     
     if funcname not in decompiled_funcs and funcname not in wontimpl_funclist:

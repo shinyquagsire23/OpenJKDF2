@@ -30,13 +30,16 @@ void jkGame_SetDefaultSettings();
 
 void jkGame_ScreensizeIncrease();
 void jkGame_ScreensizeDecrease();
+void jkGame_PrecalcViewSizes(int width, int height, jkViewSize *aOut);
+void jkGame_ddraw_idk_palettes();
+void jkGame_nullsub_36();
 
 //static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
 //static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 //static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 //static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
 //static void (*jkGame_Update)() = (void*)jkGame_Update_ADDR;
-static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
+//static int (*jkGame_ddraw_idk_palettes)() = (void*)jkGame_ddraw_idk_palettes_ADDR;
 //static void (*jkGame_Gamma)() = (void*)jkGame_Gamma_ADDR;
 
 void jkGame_Gamma();
