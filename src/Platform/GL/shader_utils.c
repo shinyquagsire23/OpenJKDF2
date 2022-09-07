@@ -150,25 +150,36 @@ GLuint create_shader(const char* shader, GLenum type) {
 	GLuint res = glCreateShader(type);
 
 	// GLSL version
-	const char* version;
+	const char* version = "";
 	int profile;
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
+
+	const char* extensions = "\n";
+	const char* defines = "\n";
 	//if (profile == SDL_GL_CONTEXT_PROFILE_ES)
 	//	version = "#version 100\n";  // OpenGL ES 2.0
 	//else
     //version = "#version 330 core\n";  // OpenGL 3.3
 #ifdef MACOS
-	version = "#version 330\n#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
+	version = "#version 330\n";
+	extensions = "#extension GL_ARB_texture_gather : enable\n";
+	defines = "#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
 #else
-    version = "#version 330\n#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";  // OpenGL ES 2.0
+    version = "#version 330\n";  // OpenGL ES 2.0
+    extensions = "#extension GL_ARB_texture_gather : enable\n";
+    defines = "#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
 #endif
 
 #if defined(WIN64_STANDALONE)
-    version = "#version 330\n#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
+    version = "#version 330\n";
+    extensions = "#extension GL_ARB_texture_gather : enable\n";
+    defines = "#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
 #endif
 
 #if defined(ARCH_WASM)
     version = "#version 300 es\n";
+    extensions = "\n";
+    defines = "#define CAN_BILINEAR_FILTER\n";
 #endif
 
 	// GLES2 precision specifiers
@@ -189,10 +200,12 @@ GLuint create_shader(const char* shader, GLenum type) {
 
 	const GLchar* sources[] = {
 		version,
+		extensions,
+		defines,
 		precision,
 		source
 	};
-	glShaderSource(res, 3, sources, NULL);
+	glShaderSource(res, 5, sources, NULL);
 	
 	glCompileShader(res);
 	GLint compile_ok = GL_FALSE;

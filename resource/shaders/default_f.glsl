@@ -1,5 +1,40 @@
-#ifdef CAN_BILINEAR_FILTER
-#extension GL_ARB_texture_gather : enable
+#ifdef GL_ARB_texture_gather
+#define HAS_TEXTUREGATHER
+#endif
+
+#ifdef HAS_TEXTUREGATHER
+vec4 impl_textureGather(sampler2D tex, vec2 uv)
+{
+    return textureGather(tex, uv);
+}
+#else
+float modI(float a,float b) {
+    float m=a-floor((a+0.5)/b)*b;
+    return floor(m+0.5);
+}
+
+vec4 impl_textureGather(sampler2D tex, vec2 uv)
+{
+    ivec2 idims = textureSize(tex,0) - ivec2(1, 1);
+    vec2 dims = vec2(idims);
+
+    ivec2 base = ivec2(dims*uv);
+    if (base.x < 0) {
+        //base.x = -base.x;
+    }
+    if (base.y < 0) {
+        //base.y = -base.y;
+    }
+
+    base.x = int(modI(float(base.x), dims.x));
+    base.y = int(modI(float(base.y), dims.y));
+
+    return vec4(texelFetch(tex,base+ivec2(0,1),0).x,
+        texelFetch(tex,base+ivec2(1,1),0).x,
+        texelFetch(tex,base+ivec2(1,0),0).x,
+        texelFetch(tex,base+ivec2(0,0),0).x
+    );
+}
 #endif
 
 #define LIGHT_DIVISOR (6.0)
@@ -112,7 +147,7 @@ vec4 bilinear_paletted()
     // For Gather we want UV coordinates of bottom right corner of top left pixel
     vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
 
-    vec4 gIndex   = textureGather(tex, gUV);
+    vec4 gIndex   = impl_textureGather(tex, gUV);
 
     vec4 c00   = texture(worldPalette, vec2(gIndex.w, 0.5));
     vec4 c01 = texture(worldPalette, vec2(gIndex.x, 0.5));
@@ -152,7 +187,7 @@ vec4 bilinear_paletted_light(float index)
     // For Gather we want UV coordinates of bottom right corner of top left pixel
     vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
 
-    vec4 gIndex   = textureGather(tex, gUV);
+    vec4 gIndex   = impl_textureGather(tex, gUV);
 
     vec4 c00   = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.w, light_idx)).r, 0.5));
     vec4 c01 = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.x, light_idx)).r, 0.5));
@@ -219,10 +254,10 @@ void main(void)
         // For Gather we want UV coordinates of bottom right corner of top left pixel
         vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
 
-        vec4 gR   = textureGather(tex, gUV, 0);
-        vec4 gG   = textureGather(tex, gUV, 1);
-        vec4 gB   = textureGather(tex, gUV, 2);
-        vec4 gA   = textureGather(tex, gUV, 3);
+        vec4 gR   = impl_textureGather(tex, gUV, 0);
+        vec4 gG   = impl_textureGather(tex, gUV, 1);
+        vec4 gB   = impl_textureGather(tex, gUV, 2);
+        vec4 gA   = impl_textureGather(tex, gUV, 3);
 
         vec4 c00   = vec4(gB.w, gG.w, gR.w, gA.w);
         vec4 c01 = vec4(gB.x, gG.x, gR.x, gA.x);
