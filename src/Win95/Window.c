@@ -11,6 +11,7 @@
 #include "Platform/stdControl.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
+#include "Platform/wuRegistry.h"
 
 #include "jk.h"
 
@@ -34,6 +35,8 @@ void Window_SetHiDpi(int val)
 
         Window_needsRecreate = 1;
     }
+
+    wuRegistry_SaveBool("Window_isHiDpi", Window_isHiDpi);
 }
 
 void Window_SetFullscreen(int val)
@@ -43,6 +46,9 @@ void Window_SetFullscreen(int val)
         Window_isFullscreen = val;
         Window_needsRecreate = 1;
     }
+
+    wuRegistry_SaveBool("Window_isFullscreen", Window_isFullscreen);
+    
 }
 
 //static wm_handler Window_ext_handlers[16] = {0};
@@ -1161,8 +1167,8 @@ int Window_Main_Linux(int argc, char** argv)
 
 #endif
 
-    Window_RecreateSDL2Window();
     
+    Window_RecreateSDL2Window();
     glewInit();
     
     //SDL_RenderClear(displayRenderer);
@@ -1185,6 +1191,12 @@ int Window_Main_Linux(int argc, char** argv)
     }
     
     result = Main_Startup(cmdLine);
+
+    int fullscreen = wuRegistry_GetBool("Window_isFullscreen", 0);
+    int hidpi = wuRegistry_GetBool("Window_isHiDpi", 0);
+    Window_SetFullscreen(fullscreen);
+    Window_SetHiDpi(hidpi);
+    Window_RecreateSDL2Window();
 
     if (!result) return result;
 
