@@ -256,10 +256,14 @@ const uint8_t stdControl_aSdlToDik[256] =
 
 uint8_t stdControl_aDebounce[256];
 
+#define SDL2_MIN_BINARY_THRESH (-0x7000)
+#define SDL2_MAX_BINARY_THRESH (0x7000)
+
 #define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
 
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
-static SDL_Joystick *pJoysticks[2] = {NULL, NULL};
+static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
+static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
 
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
@@ -284,6 +288,7 @@ void stdControl_FreeSdlJoysticks()
         stdControl_aJoystickEnabled[i] = 0;
 
         stdControl_aJoystickQuirks[i] = 0;
+        stdControl_aJoystickNumAxes[i] = 0;
     }
 }
 
@@ -317,18 +322,22 @@ void stdControl_InitSdlJoysticks()
         }
 
         uint32_t quirks = 0;
-        if (!strcmp(SDL_JoystickNameForIndex(i), "Nintendo Switch Pro Controller")) {
-            quirks |= QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON;
-        }
+        //if (!strcmp(SDL_JoystickNameForIndex(i), "Nintendo Switch Pro Controller")) {
+        //    quirks |= QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON;
+        //}
 
         if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
             numAxes -= 2;
         }
 
+        // Each axis gets a binary button
+        numButtons += numAxes * 2;
+
         stdControl_aJoystickQuirks[i] = quirks;
         stdControl_aJoystickExists[i] = 1;
         stdControl_aJoystickEnabled[i] = 1;
         stdControl_aJoystickMaxButtons[i] = numButtons;
+        stdControl_aJoystickNumAxes[i] = numAxes;
         for (int j = 0; j < numAxes; j++) {
             stdControl_InitAxis((JK_JOYSTICK_AXIS_STRIDE*i) + AXIS_JOY1_X + j, -0x7FFF, 0x7FFF, 0.2);
         }
@@ -380,6 +389,10 @@ int stdControl_Startup()
         stdControl_aJoystickExists[i] = 0;
         stdControl_aJoystickMaxButtons[i] = 0;
         stdControl_aJoystickEnabled[i] = 0;
+
+        stdControl_aJoystickQuirks[i] = 0;
+        stdControl_aJoystickNumAxes[i] = 0;
+        pJoysticks[i] = NULL;
     }
     //v2 = 2;
 
@@ -727,6 +740,11 @@ void stdControl_ReadControls()
                 //printf("%u: %d\n", j, val);
                 stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
             }
+
+            int numAxes = stdControl_aJoystickNumAxes[i];
+            int numButtons = stdControl_aJoystickMaxButtons[i];
+            int numRealButtons = numButtons - (numAxes * 2);
+            int numAxisButtons = numAxes * 2;
             
             for (int j = 0; j < JK_NUM_JOY_BUTTONS + JK_NUM_EXT_JOY_BUTTONS; ++j )
             {
@@ -738,6 +756,17 @@ void stdControl_ReadControls()
                     }
                     else if (j == 5) { // Home
                         val = SDL_JoystickGetAxis(pJoysticks[i],5) > 0;
+                    }
+                }
+
+                if (j >= numRealButtons && j < numButtons) {
+                    int axisButtonNum = (j - numRealButtons);
+                    int axisNum = axisButtonNum / 2;
+                    if (axisButtonNum & 1) {
+                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) < SDL2_MIN_BINARY_THRESH);
+                    }
+                    else {
+                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) > SDL2_MAX_BINARY_THRESH);
                     }
                 }
                 

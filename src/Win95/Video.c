@@ -227,7 +227,7 @@ LABEL_9:
     Video_pMenuBuffer = &Video_menuBuffer;
     if ( !Video_modeStruct.b3DAccel )
     {
-        Video_pMenuBuffer = stdDisplay_VBufferNew(&Video_format, 0, 0, (int)color_buf);
+        Video_pMenuBuffer = stdDisplay_VBufferNew(&Video_format, 0, 0, color_buf);
         if ( !Video_modeStruct.b3DAccel )
         {
             result = rdOpen(0);

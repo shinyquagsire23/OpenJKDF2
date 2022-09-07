@@ -145,7 +145,7 @@ static int jkGuiJoystick_aIdk2[2] = {0x13, 0x11};
 static int jkGuiJoystick_aIdk2_[2] = {0x12, 0x11}; // unused?
 static int jkGuiKeyboard_aIdk3[2] = {0xAA, 0x0};
 
-static jkGuiElement jkGuiJoystick_aElements[33] = {
+static jkGuiElement jkGuiJoystick_aElements[33+3] = {
     { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 410, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 6, "GUI_SETUP", 3, { 20, 20, 600, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, 100, 2, "GUI_GENERAL", 3, { 20, 80, 120, 40 }, 1, 0, "GUI_GENERAL_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -175,9 +175,18 @@ static jkGuiElement jkGuiJoystick_aElements[33] = {
     { ELEMENT_CHECKBOX, 0, 0, "GUI_DISABLE_JOYSTICK", 0, { 320, 335, 300, 20 }, 1, 0, "GUI_DISABLE_JOYSTICK_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 2, &jkGuiJoystick_awTmp, 3, { 50, 180, 320, 120 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 2, &jkGuiJoystick_awTmp, 3, { 50, 180, 540, 120 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#ifdef SDL2_RENDER
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[0], 3, { 20, 310, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[1], 3, { 20, 335, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[2], 3, { 20, 360, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[3], 3, { 20+190, 310, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[4], 3, { 20+190, 335, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[5], 3, { 20+190, 360, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#else
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[0], 3, { 20, 310, 380, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[1], 3, { 20, 335, 380, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[2], 3, { 20, 360, 380, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#endif
     { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
 
@@ -866,6 +875,13 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[29].bIsVisible = 1;
             jkGuiJoystick_aElements[30].bIsVisible = 1;
             jkGuiJoystick_aElements[31].bIsVisible = 1;
+
+#ifdef SDL2_RENDER
+            jkGuiJoystick_aElements[32].bIsVisible = 1;
+            jkGuiJoystick_aElements[33].bIsVisible = 1;
+            jkGuiJoystick_aElements[34].bIsVisible = 1;
+#endif
+
             jkGuiJoystick_aElements[11].bIsVisible = 0;
             jkGuiJoystick_aElements[26].bIsVisible = 0;
             jkGuiJoystick_aElements[19].bIsVisible = 0;
@@ -889,7 +905,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             memset(jkGuiJoystick_aUnk1, 0, sizeof(jkGuiJoystick_aUnk1));
             do
             {
-                if ( (v4->keybits & 0x30) == 0 )
+                if ( (v4->keybits & 0x300) == 0 )
                 {
                     v18 = v4->dikNum;
                     //printf("%x vs %x\n", v4->keybits, stdControl_aJoysticks[v18].flags);
@@ -911,6 +927,11 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[29].bIsVisible = 0;
             jkGuiJoystick_aElements[30].bIsVisible = 0;
             jkGuiJoystick_aElements[31].bIsVisible = 0;
+#ifdef SDL2_RENDER
+            jkGuiJoystick_aElements[32].bIsVisible = 0;
+            jkGuiJoystick_aElements[33].bIsVisible = 0;
+            jkGuiJoystick_aElements[34].bIsVisible = 0;
+#endif
             jkGuiJoystick_aElements[11].bIsVisible = 1;
             jkGuiJoystick_aElements[26].bIsVisible = 1;
             jkGuiJoystick_Draw(pMenu, 0);
@@ -918,7 +939,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             do
             {
                 v6 = v5->dikNum;
-                if ( (v5->keybits & 0x30) == 0 && !jkGuiJoystick_aUnk1[v6] )
+                if ( (v5->keybits & 0x300) == 0 && !jkGuiJoystick_aUnk1[v6] )
                     stdControl_aJoysticks[v6].flags &= ~2u;
                 ++v5;
             }
@@ -947,45 +968,46 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
         jkGuiRend_PlayWav(v7);
     }
     v24 = &jkGuiJoystick_strings;
-    v15 = v24->aStrings[0];
     v20 = jkGuiJoystick_aFloats;
     v8 = &jkGuiJoystick_aEntries[0];
+    int idx = 0;
     while ( 1 )
     {
         v9 = v8->dikNum;
-        if ( (v8->keybits & 0x30) != 0 )
+        if ( (v8->keybits & 0x300) != 0 )
         {
-            if ( !stdControl_ReadKey(v9, &pOut) )
-                goto LABEL_36;
-LABEL_35:
-            v2 = 1;
-            goto LABEL_36;
+            if ( stdControl_ReadKey(v9, &pOut) )
+                v2 = 1;
         }
-        v10 = v9;
-        v19 = v8->dikNum;
-        v11 = stdControl_aJoysticks[v9].flags;
-        stdControl_aJoysticks[v9].flags = v11 | 2;
-        v12 = stdControl_ReadAxis(v19);
-        stdControl_aJoysticks[v10].flags = v11;
-        if ( v23 != 0 )
-        {
-            *v20 = v12;
-            goto LABEL_36;
+        else {
+            v10 = v9;
+            v19 = v8->dikNum;
+            v11 = stdControl_aJoysticks[v9].flags;
+            stdControl_aJoysticks[v9].flags = v11 | 2;
+            v12 = stdControl_ReadAxis(v19);
+            stdControl_aJoysticks[v10].flags = v11;
+            //v23 = 0;
+            if ( v23 != 0 )
+            {
+                *v20 = v12;
+            }
+            else {
+                v14 = v12 - *v20;
+                if ( v14 < 0.0 )
+                    v14 = -v14;
+                if ( v14 > 0.5 ) // Added: 0.2 -> 0.5
+                    v2 = 1;
+            }
         }
-        v14 = v12 - *v20;
-        if ( v14 < 0.0 )
-            v14 = -v14;
-        if ( v14 > 0.2 )
-            goto LABEL_35;
-LABEL_36:
+        
         if ( v2 )
         {
-            if ( v15 < v24->aStrings[3] )
+            if (idx < JOYSTICK_MAX_STRS)
             {
+                //printf("%x %x %f %s\n", v19, v9, v12, v8->displayStrKey);
                 v16 = jkStrings_GetText(v8->displayStrKey);
-                _wcscpy(v15, v16);
+                _wcscpy(v24->aStrings[idx++], v16);
             }
-            v15 = v24->aStrings[1];
         }
         ++v8;
         if ( ++v20 >= &jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES] )
@@ -1000,6 +1022,11 @@ LABEL_36:
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[29], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[30], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[31], pMenu, 1);
+#ifdef SDL2_RENDER
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[32], pMenu, 1);
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[33], pMenu, 1);
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[34], pMenu, 1);
+#endif
         v1 = jkGuiJoystick_dword_5576F0;
         goto LABEL_45;
     }
@@ -1037,6 +1064,11 @@ int jkGuiJoystick_Show()
     jkGuiJoystick_aElements[29].bIsVisible = 0;
     jkGuiJoystick_aElements[30].bIsVisible = 0;
     jkGuiJoystick_aElements[31].bIsVisible = 0;
+#ifdef SDL2_RENDER
+    jkGuiJoystick_aElements[32].bIsVisible = 0;
+    jkGuiJoystick_aElements[33].bIsVisible = 0;
+    jkGuiJoystick_aElements[34].bIsVisible = 0;
+#endif
     jkGuiJoystick_aElements[26].func = jkGuiJoystick_DisableJoystickClick;
     jkGuiJoystick_aElements[11].selectedTextEntry = 0;
     jkGuiJoystick_aElements[12].selectedTextEntry = 0;

@@ -3067,8 +3067,8 @@ typedef struct stdControlDikStrToNum
 
 #define JK_EXT_MOUSE_END        (KEY_MOUSE_B5 + JK_NUM_EXT_MOUSE_BUTTONS)
 
-#define KEY_IS_MOUSE(x) ((x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4) || (x >= KEY_MOUSE_B5 && x <= JK_EXT_MOUSE_END))
-#define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= KEY_JOY1_EXT_STARTIDX && x < KEY_JOY2_EXT_ENDIDX))
+#define KEY_IS_MOUSE(x) ((x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4) || (x >= KEY_MOUSE_B5 && x < JK_EXT_MOUSE_END))
+#define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= (KEY_JOY1_B9 - 1) && x < KEY_JOY2_EXT_ENDIDX))
 #define KEY_IS_BUTTON(x) (KEY_IS_JOY_BUTTON(x) || x < JK_EXTENDED_KEY_START)
 
 // QOL added:
@@ -3264,9 +3264,15 @@ typedef struct jkGuiControlInfo
     char fpath[128];
 } jkGuiControlInfo;
 
+#ifdef SDL2_RENDER
+#define JOYSTICK_MAX_STRS (6)
+#else
+#define JOYSTICK_MAX_STRS (3)
+#endif
+
 typedef struct jkGuiJoystickStrings
 {
-    wchar_t aStrings[3][128];
+    wchar_t aStrings[JOYSTICK_MAX_STRS][128];
 } jkGuiJoystickStrings;
 
 typedef struct jkGuiJoystickEntry
