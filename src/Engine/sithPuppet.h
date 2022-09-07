@@ -36,7 +36,7 @@ struct sithPuppet
 };
 
 int sithPuppet_Startup();
-static void (*sithPuppet_Shutdown)() = (void*)sithPuppet_Shutdown_ADDR;
+void sithPuppet_Shutdown();
 sithPuppet* sithPuppet_NewEntry(sithThing *thing);
 void sithPuppet_FreeEntry(sithThing *puppet);
 void sithPuppet_sub_4E4760(sithThing *thing, int a2);
@@ -49,6 +49,9 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass);
 void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3);
 int sithPuppet_StopKey(rdPuppet *pupper, int track, float a3);
 void sithPuppet_SetArmedMode(sithThing *thing, int mode);
+void sithPuppet_FidgetAnim(sithThing *pThing);
+void sithPuppet_resetidk(sithThing *pThing);
+void sithPuppet_advanceidk(sithThing *pThing, float a2);
 
 //static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
 //static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;

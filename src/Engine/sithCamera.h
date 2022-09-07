@@ -43,7 +43,10 @@ int sithCamera_SetCurrentCamera(sithCamera *camera);
 void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing *secondary);
 sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14);
 void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4);
-sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam);
+sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera);
+sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera);
+int sithCamera_SetState(int a1);
+int sithCamera_GetState();
 void sithCamera_CycleCamera();
 
 #ifndef __cplusplus
@@ -51,12 +54,12 @@ void sithCamera_CycleCamera();
 static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 //static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
 //static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCamera_GetPrimaryFocus_ADDR;
-static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
+//static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
 //static void (*sithCamera_CycleCamera)(void) = (void*)sithCamera_CycleCamera_ADDR;
 //static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, float a3, float a4) = (void*)sithCamera_SetPovShake_ADDR;
 //static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
-static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;
-static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
+//static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;
+//static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
 //static void (*sithCamera_Close)() = (void*)sithCamera_Close_ADDR;
 //static void (*sithCamera_FollowFocus)(sithCamera *cam) = (void*)sithCamera_FollowFocus_ADDR;
 //static void (*sithCamera_SetRdCameraAndRenderidk)() = (void*)sithCamera_SetRdCameraAndRenderidk_ADDR;

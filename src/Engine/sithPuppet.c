@@ -83,6 +83,25 @@ int sithPuppet_Startup()
     }
 }
 
+void sithPuppet_Shutdown()
+{
+    if ( sithPuppet_hashtable )
+    {
+        stdHashTable_Free(sithPuppet_hashtable);
+        sithPuppet_hashtable = 0;
+    }
+    if ( sithPuppet_keyframesHashtable )
+    {
+        stdHashTable_Free(sithPuppet_keyframesHashtable);
+        sithPuppet_keyframesHashtable = 0;
+    }
+    if ( sithPuppet_animNamesToIdxHashtable )
+    {
+        stdHashTable_Free(sithPuppet_animNamesToIdxHashtable);
+        sithPuppet_animNamesToIdxHashtable = 0;
+    }
+}
+
 sithPuppet* sithPuppet_NewEntry(sithThing *thing)
 {
     sithPuppet *v1; // edi
@@ -312,55 +331,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
                     }
                 }
             }
-            v10 = thing->puppet;
-            if ( v10->currentTrack < 0 && v10->currentAnimation == 1 )
-            {
-                if ( (double)v10->animStartedMs - -30000.0 < (double)sithTime_curMs )
-                {
-                    v11 = _frand();
-                    if ( v11 >= 0.30000001 )
-                    {
-                        if ( v11 < 0.60000002 )
-                        {
-                            v17 = thing->animclass;
-                            if ( !v17
-                              || (v18 = &v17->modes[thing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET2], !v18->keyframe)
-                              || (v19 = sithPuppet_StartKey(
-                                            thing->rdthing.puppet,
-                                            v18->keyframe,
-                                            v18->lowPri,
-                                            v18->highPri,
-                                            v17->modes[thing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET2].flags,
-                                            0),
-                                  v19 < 0) )
-                            {
-                                v19 = -1;
-                            }
-                            thing->puppet->currentTrack = v19;
-                        }
-                    }
-                    else
-                    {
-                        v12 = thing->animclass;
-                        if ( !v12
-                          || (v13 = &v12->modes[thing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET], !v13->keyframe)
-                          || (v14 = sithPuppet_StartKey(
-                                        thing->rdthing.puppet,
-                                        v13->keyframe,
-                                        v13->lowPri,
-                                        v13->highPri,
-                                        v12->modes[thing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET].flags,
-                                        0),
-                              v14 < 0) )
-                        {
-                            v14 = -1;
-                        }
-
-                        thing->puppet->currentTrack = v14;
-                        thing->puppet->animStartedMs = sithTime_curMs;
-                    }
-                }
-            }
+            sithPuppet_FidgetAnim(thing);
         }
         if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->moveType == SITH_MT_PATH )
         {
@@ -817,5 +788,116 @@ void sithPuppet_SetArmedMode(sithThing *thing, int mode)
         v2 = thing->puppet;
         v2->field_0 = mode;
         v2->majorMode = mode + 2 * v2->field_4 + v2->field_4;
+    }
+}
+
+void sithPuppet_FidgetAnim(sithThing *pThing)
+{
+    sithPuppet *puppet; // eax
+    double v2; // st7
+    sithAnimclass *v3; // edx
+    sithAnimclassEntry *v4; // eax
+    int v5; // eax
+    sithPuppet *v6; // esi
+    unsigned int v7; // edx
+    sithAnimclass *v8; // edx
+    sithAnimclassEntry *v9; // eax
+    int v10; // eax
+
+    puppet = pThing->puppet;
+    if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (double)(unsigned int)puppet->animStartedMs - -30000.0 < (double)sithTime_curMs )
+    {
+        v2 = _frand();
+        if ( v2 >= 0.30000001 )
+        {
+            if ( v2 < 0.60000002 )
+            {
+                v8 = pThing->animclass;
+                if ( !v8
+                  || (v9 = &v8->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET2], !v9->keyframe)
+                  || (v10 = sithPuppet_StartKey(
+                                pThing->rdthing.puppet,
+                                v9->keyframe,
+                                v9->lowPri,
+                                v9->highPri,
+                                v8->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET2].flags,
+                                0),
+                      v10 < 0) )
+                {
+                    v10 = -1;
+                }
+                pThing->puppet->currentTrack = v10;
+            }
+        }
+        else
+        {
+            v3 = pThing->animclass;
+            if ( !v3
+              || (v4 = &v3->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET], !v4->keyframe)
+              || (v5 = sithPuppet_StartKey(
+                           pThing->rdthing.puppet,
+                           v4->keyframe,
+                           v4->lowPri,
+                           v4->highPri,
+                           v3->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET].flags,
+                           0),
+                  v5 < 0) )
+            {
+                v5 = -1;
+            }
+            v6 = pThing->puppet;
+            v7 = sithTime_curMs;
+            v6->currentTrack = v5;
+            v6->animStartedMs = v7;
+        }
+    }
+}
+
+void sithPuppet_resetidk(sithThing *pThing)
+{
+    sithPuppet *puppet; // eax
+    int v2; // eax
+    rdPuppet *v3; // ecx
+
+    puppet = pThing->puppet;
+    puppet->animStartedMs = sithTime_curMs;
+    v2 = puppet->currentTrack;
+    if ( v2 >= 0 )
+    {
+        v3 = pThing->rdthing.puppet;
+        if ( v3->tracks[v2].keyframe )
+            rdPuppet_ResetTrack(v3, v2);
+        pThing->puppet->currentTrack = -1;
+    }
+}
+
+void sithPuppet_advanceidk(sithThing *pThing, float a2)
+{
+    double v3; // st7
+    sithPuppet *puppet; // eax
+    sithAnimclassEntry *v5; // ecx
+    int v6; // ecx
+    double v8; // st7
+    float a3; // [esp+0h] [ebp-8h]
+    float thinga; // [esp+Ch] [ebp+4h]
+
+    v3 = sithPuppet_sub_4E4380(pThing);
+    puppet = pThing->puppet;
+    v5 = puppet->playingAnim;
+    if ( v5 )
+    {
+        if ( (v5->flags & 1) != 0 )
+        {
+            v6 = puppet->otherTrack;
+            if ( v6 >= 0 )
+            {
+                thinga = v3 * a2;
+                v8 = thinga;
+                if ( v8 < 0.0 )
+                    v8 = -v8;
+                a3 = v8 * 280.0;
+                rdPuppet_AdvanceTrack(pThing->rdthing.puppet, v6, a3);
+            }
+        }
     }
 }

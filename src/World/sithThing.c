@@ -2422,3 +2422,20 @@ void sithActor_Remove(sithThing *thing)
     thing->lifeLeftMs = 20000;
     sithPhysics_FindFloor(thing, 0);
 }
+
+int sithThing_Release(sithThing *pThing)
+{
+    sithCogThingLink *v1; // eax
+    sithCogThingLink *v2; // ecx
+
+    v1 = sithCog_aThingLinks;
+    v2 = &sithCog_aThingLinks[sithCog_numThingLinks];
+    if ( v2 <= sithCog_aThingLinks )
+        return 0;
+    while ( v1->thing != pThing )
+    {
+        if ( ++v1 >= v2 )
+            return 0;
+    }
+    return 1;
+}

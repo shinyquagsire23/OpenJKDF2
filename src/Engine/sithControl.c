@@ -122,6 +122,15 @@ int sithControl_Initialize()
     return 0;
 }
 
+int sithControl_Shutdown()
+{
+    if ( !sithControl_bInitted )
+        return 0;
+    stdControl_Shutdown();
+    sithControl_bInitted = 0;
+    return 1;
+}
+
 int sithControl_IsOpen()
 {
     return sithControl_bOpened;

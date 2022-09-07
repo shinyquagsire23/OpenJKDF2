@@ -371,6 +371,7 @@ sithThing* sithThing_GetById(int thing_id);
 int sithThing_HasAttachment(sithThing *thing);
 void sithThing_netidk();
 void sithActor_Remove(sithThing *thing);
+int sithThing_Release(sithThing *pThing);
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
@@ -392,7 +393,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static void (*sithThing_MoveToSector)(sithThing *a1, sithSector *a2, int a4) = (void*)sithThing_MoveToSector_ADDR;
 //static void (*sithThing_EnterSector)(sithThing *a1, sithSector *a2, int a3, int a4) = (void*)sithThing_EnterSector_ADDR;
 //static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThing_ADDR;
-static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
+//static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 //static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
 //static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
 //static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;

@@ -118,6 +118,7 @@ enum INPUT_FUNC
 };
 
 int sithControl_Initialize();
+int sithControl_Shutdown();
 int sithControl_IsOpen();
 int sithControl_Open();
 void sithControl_Close();

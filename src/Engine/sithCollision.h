@@ -38,7 +38,7 @@ enum SITHCOLLISION
 };
 
 int sithCollision_Startup();
-static void (*sithCollision_Shutdown)() = (void*)sithCollision_Shutdown_ADDR;
+int sithCollision_Shutdown();
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);
 void sithCollision_RegisterHitHandler(int type, void* a2);
 #if 1

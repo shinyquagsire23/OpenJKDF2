@@ -494,9 +494,28 @@ void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4)
     sithCamera_povShakeF2 = a4;
 }
 
-sithThing* sithCamera_GetPrimaryFocus(sithCamera *cam)
+sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera)
 {
-    return cam->primaryFocus;
+    return pCamera->primaryFocus;
+}
+
+sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera)
+{
+    return pCamera->secondaryFocus;
+}
+
+int sithCamera_SetState(int a1)
+{
+    int result; // eax
+
+    result = a1;
+    sithCamera_state = a1;
+    return result;
+}
+
+int sithCamera_GetState()
+{
+    return sithCamera_state;
 }
 
 void sithCamera_CycleCamera()

@@ -46,6 +46,16 @@ int sithCollision_Startup()
     return 1;
 }
 
+int sithCollision_Shutdown()
+{
+    int result; // eax
+
+    result = sithCollision_initted;
+    if ( sithCollision_initted )
+        sithCollision_initted = 0;
+    return result;
+}
+
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4)
 {
     int idx = idxB + 12 * idxA;
