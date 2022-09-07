@@ -256,8 +256,8 @@ const uint8_t stdControl_aSdlToDik[256] =
 
 uint8_t stdControl_aDebounce[256];
 
-#define SDL2_MIN_BINARY_THRESH (-0x7000)
-#define SDL2_MAX_BINARY_THRESH (0x7000)
+#define SDL2_MIN_BINARY_THRESH (-0x5000)
+#define SDL2_MAX_BINARY_THRESH (0x5000)
 
 #define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
 
