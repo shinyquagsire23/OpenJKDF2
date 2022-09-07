@@ -127,7 +127,6 @@ void jkDev_DrawLog()
     stdVBuffer *v0; // ecx
     int v1; // ebp
     signed int v2; // edi
-    signed int v3; // eax
     jkDevLogEnt* v4; // esi
     int v5; // edx
     int v6; // eax
@@ -144,40 +143,13 @@ void jkDev_DrawLog()
     jkDev_UpdateEntries();
     v0 = jkDev_vbuf;
     v1 = 0;
-    if ( jkDev_vbuf && jkDev_log_55A4A8 && (v2 = 0, jkDev_log_55A4A8 = 0, jkDev_log_55A4A4 > 0) )
-    {
-        v3 = jkDev_dword_55A9C8;
-        v4 = &jkDev_aEntries[0];
-        do
-        {
-            if ( v4->bDrawEntry )
-            {
-                v5 = v4->drawWidth;
-                a4.height = v3;
-                a4.width = v5;
-                a4.x = 0;
-                a4.y = v2;
-                stdDisplay_VBufferFill(v0, jkDev_ColorKey, &a4);
-                v6 = stdFont_Draw1(jkDev_vbuf, jkHud_pMsgFontSft, 0, v2, jkDev_vbuf->format.width, v4->text, 0);
-                v0 = jkDev_vbuf;
-                v4->drawWidth = v6;
-                v3 = jkDev_dword_55A9C8;
-            }
-            v2 += v3;
-            ++v1;
-            ++v4;
-        }
-        while ( v1 < jkDev_log_55A4A4 );
-    }
-    else
-    {
-        v3 = jkDev_dword_55A9C8;
-    }
+    jkDev_DrawEntries();
+
     if ( v0 )
     {
         v7 = Video_pCanvas;
         v8 = jkDev_dword_55A9D0;
-        a4.height = v3;
+        a4.height = jkDev_dword_55A9C8;
         v9 = 4;
         v10 = 0;
         v11 = &jkDev_aEntries[0];
@@ -192,7 +164,6 @@ void jkDev_DrawLog()
                 a4.x = v13;
                 a4.width = v14;
                 stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, &a4);
-                v3 = jkDev_dword_55A9C8;
                 v7 = Video_pCanvas;
                 v8 = jkDev_dword_55A9D0;
             }
@@ -200,7 +171,7 @@ void jkDev_DrawLog()
             if ( v11->field_10C > 0 )
                 --v11->field_10C;
             ++v11;
-            v9 += v3;
+            v9 += jkDev_dword_55A9C8;
             v10 += 2;
         }
     }
@@ -859,4 +830,47 @@ int jkDev_UpdateEntries()
     }
     jkDev_log_55A4A4 = v4;
     return result;
+}
+
+void jkDev_DrawEntries()
+{
+    int v0; // ebp
+    signed int v1; // edi
+    signed int v2; // eax
+    jkDevLogEnt* v3; // esi
+    int v4; // ecx
+    rdRect a4; // [esp+8h] [ebp-10h] BYREF
+
+    v0 = 0;
+    if ( jkDev_vbuf )
+    {
+        if ( jkDev_log_55A4A8 )
+        {
+            v1 = 0;
+            jkDev_log_55A4A8 = 0;
+            if ( jkDev_log_55A4A4 > 0 )
+            {
+                v2 = jkDev_dword_55A9C8;
+                v3 = &jkDev_aEntries[0];
+                do
+                {
+                    if ( v3->bDrawEntry )
+                    {
+                        v4 = v3->drawWidth;
+                        a4.height = v2;
+                        a4.width = v4;
+                        a4.x = 0;
+                        a4.y = v1;
+                        stdDisplay_VBufferFill(jkDev_vbuf, jkDev_ColorKey, &a4);
+                        v3->drawWidth = stdFont_Draw1(jkDev_vbuf, jkHud_pMsgFontSft, 0, v1, jkDev_vbuf->format.width, v3->text, 0);
+                        v2 = jkDev_dword_55A9C8;
+                    }
+                    v1 += v2;
+                    ++v0;
+                    ++v3;
+                }
+                while ( v0 < jkDev_log_55A4A4 );
+            }
+        }
+    }
 }

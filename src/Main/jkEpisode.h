@@ -15,6 +15,7 @@
 #define jkEpisode_idk6_ADDR (0x0040E2B0)
 
 int jkEpisode_Startup();
+void jkEpisode_Shutdown();
 int jkEpisode_LoadVerify();
 int jkEpisode_Load(jkEpisodeLoad *a1);
 jkEpisodeEntry* jkEpisode_idk1(jkEpisodeLoad *a1);
@@ -22,6 +23,7 @@ jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath);
 int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum);
 int jkEpisode_UpdateExtra(sithThing *thing);
 int jkEpisode_idk4(jkEpisodeLoad *pEpisodeLoad, char *pEpisodeName);
+int jkEpisode_idk6(const char *pName);
 
 //static int (*jkEpisode_Startup)() = (void*)jkEpisode_Startup_ADDR;
 //static int (*jkEpisode_Load)(jkEpisodeLoad *a1) = (void*)jkEpisode_Load_ADDR;

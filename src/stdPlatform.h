@@ -41,4 +41,6 @@ int stdPlatform_Printf(const char *fmt, ...);
 uint32_t stdPlatform_GetTimeMsec();
 #endif
 
+int stdConsolePrintf(const char *fmt, ...);
+
 #endif // _STDPLATFORM_H

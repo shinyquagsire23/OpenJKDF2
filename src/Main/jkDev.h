@@ -57,6 +57,7 @@ int jkDev_DebugLog(const char *lParam);
 int jkDev_sub_41FB80(int a1, const wchar_t *a2);
 int jkDev_sub_41FC40(int a1, const char *a2);
 void jkDev_sub_41FC90(int a1);
+void jkDev_DrawEntries();
 
 int jkDev_RegisterCmd(void *pfCheatFunc, const char *pCryptCheatStr, const char *pCheatFlavortext, int extra);
 int jkDev_TryCommand(const char *cmd);

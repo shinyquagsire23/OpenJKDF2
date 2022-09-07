@@ -20,6 +20,11 @@ int jkEpisode_Startup()
     return 1;
 }
 
+void jkEpisode_Shutdown()
+{
+    ;
+}
+
 int jkEpisode_LoadVerify()
 {
     stdFileSearch *v0; // ebp
@@ -547,4 +552,41 @@ int jkEpisode_idk4(jkEpisodeLoad *pEpisodeLoad, char *pEpisodeName)
     }
     pEpisodeLoad->field_8 = v2;
     return 1;
+}
+
+
+int jkEpisode_idk6(const char *pName)
+{
+    int v1; // eax
+    int result; // eax
+    unsigned int v3; // esi
+    jkEpisode *v4; // edi
+    int v5; // edx
+
+    v1 = jkEpisode_var2;
+    if ( (unsigned int)jkEpisode_var2 >= 0x40 )
+        return 0;
+    v3 = 0;
+    if ( jkEpisode_var2 )
+    {
+        v4 = jkEpisode_aEpisodes;
+        while ( __strnicmp(pName, v4->name, 0x20u) )
+        {
+            v1 = jkEpisode_var2;
+            ++v3;
+            ++v4;
+            if ( v3 >= jkEpisode_var2 )
+                goto LABEL_7;
+        }
+        result = 0;
+    }
+    else
+    {
+LABEL_7:
+        _strncpy(jkEpisode_aEpisodes[v1].name, pName, 0x1Fu);
+        v5 = jkEpisode_var2;
+        result = ++jkEpisode_var2;
+        jkEpisode_aEpisodes[v5].name[31] = 0;
+    }
+    return result;
 }

@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "jk.h"
+#include "Win95/stdConsole.h"
 
 static int std_bInitialized;
 
@@ -85,4 +86,36 @@ char stdFGetc(stdFile_t fd)
 void stdFPutc(char c, stdFile_t fd)
 {
     std_pHS->fileWrite(fd, &c, 1);
+}
+
+int stdConsolePrintf(const char *fmt, ...)
+{
+    va_list va; // [esp+8h] [ebp+8h] BYREF
+
+    va_start(va, fmt);
+    __vsnprintf(std_genBuffer, 0x400u, fmt, va);
+#ifndef PLATFORM_POSIX
+    stdConsole_Puts(std_genBuffer, 7u);
+#else
+    jk_printf("%s", std_genBuffer);
+#endif
+    return 1024;
+}
+
+int stdFilePrintf(stdFile_t pFile, const char *fmt, ...)
+{
+    int v2; // eax
+    va_list va; // [esp+Ch] [ebp+Ch] BYREF
+
+    static char tmp[0x400];
+
+    va_start(va, fmt);
+    v2 = __vsnprintf(tmp, 0x400u, fmt, va);
+    fwrite(tmp, 1u, v2, (FILE*)pFile);
+    return 0;
+}
+
+int stdAssert(const char *pMsg, const char *pFileName, int lineNo)
+{
+    return printf("[ASSERT] %s(%d): %s\n", pFileName, lineNo, pMsg);
 }

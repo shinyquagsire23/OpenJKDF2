@@ -46,10 +46,12 @@ int stdCalcBitPos(signed int val);
 int stdReadRaw(char *fpath, void *out, signed int len);
 char stdFGetc(stdFile_t fd);
 void stdFPutc(char c, stdFile_t fd);
+int stdFilePrintf(stdFile_t pFile, const char *fmt, ...);
+int stdAssert(const char *pMsg, const char *pFileName, int lineNo);
 
 //static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
-static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
+//static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
 static stdFile_t (*stdFileOpen)(const char*,const char*) = (void*)stdFileOpen_ADDR;
 static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;
 static size_t (*stdFileRead)(stdFile_t,void*,size_t) = (void*)stdFileRead_ADDR;
@@ -59,7 +61,7 @@ static int (*stdFeof)(stdFile_t) = (void*)stdFeof_ADDR;
 static int (*stdFtell)(stdFile_t) = (void*)stdFtell_ADDR;
 static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
 static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
-static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
+//static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
 static wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
 
 #endif // _STDLEC_H
