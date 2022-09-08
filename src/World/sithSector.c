@@ -28,7 +28,6 @@
 
 int sithSector_Load(sithWorld *world, int tmp)
 {
-    unsigned int sectors_amt_; // esi
     unsigned int alloc_size; // ebx
     sithSector *v5; // eax
     sithSector *v6; // eax
@@ -51,7 +50,6 @@ int sithSector_Load(sithWorld *world, int tmp)
         return 0;
     if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " world sectors %d", &sectors_amt) != 1 )
         return 0;
-    sectors_amt_ = sectors_amt;
     alloc_size = sizeof(sithSector) * sectors_amt;
     v5 = (sithSector *)pSithHS->alloc(sizeof(sithSector) * sectors_amt);
     world->sectors = v5;
@@ -60,7 +58,7 @@ int sithSector_Load(sithWorld *world, int tmp)
         _memset(v5, 0, alloc_size);
         v6 = world->sectors;
         v7 = 0;
-        for ( world->numSectors = sectors_amt_; v7 < sectors_amt_; ++v7 )
+        for ( world->numSectors = sectors_amt; v7 < sectors_amt; ++v7 )
         {
             v6->id = v7;
             v6->numVertices = 0;
@@ -125,7 +123,7 @@ int sithSector_Load(sithWorld *world, int tmp)
                      &sectors->collidebox_othercorner.y,
                      &sectors->collidebox_othercorner.z) == 6 )
             {
-                sectors->flags |= SITH_SECTOR_COLLIDEBOX;
+                sectors->flags |= SITH_SECTOR_HAS_COLLIDE_BOX;
                 if ( !stdConffile_ReadLine() )
                     break;
             }
@@ -189,7 +187,7 @@ void sithSector_SetAdjoins(sithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_SetAdjoins(i);
-    sector->flags &= ~SITH_SECTOR_80;
+    sector->flags &= ~SITH_SECTOR_ADJOINS_SET;
 }
 
 void sithSector_UnsetAdjoins(sithSector *sector)
@@ -198,7 +196,7 @@ void sithSector_UnsetAdjoins(sithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_UnsetAdjoins(i);
-    sector->flags |= SITH_SECTOR_80;
+    sector->flags |= SITH_SECTOR_ADJOINS_SET;
 }
 
 int sithSector_GetThingsCount(sithSector *sector)
@@ -257,34 +255,25 @@ void sithSector_Sync(sithSector *pSector, int a2)
 
     if ( a2 )
     {
-        pSector->flags |= SITH_SECTOR_8000;
+        pSector->flags |= SITH_SECTOR_SYNC;
     }
-    if ( sithCogVm_multiplayerFlags )
+
+    if (!sithCogVm_multiplayerFlags || sithSector_numSync >= 0x10)
+        return;
+
+    for (v4 = 0; v4 < sithSector_numSync; v4++ )
     {
-        v3 = sithSector_numSync;
-        if ( sithSector_numSync < 0x10 )
+        if ( sithSector_aSyncIdk[v4] == pSector )
         {
-            v4 = 0;
-            if ( sithSector_numSync )
-            {
-                v5 = sithSector_aSyncIdk;
-                while ( *v5 != pSector )
-                {
-                    ++v4;
-                    ++v5;
-                    if ( v4 >= sithSector_numSync )
-                        goto LABEL_9;
-                }
-                sithSector_aSyncIdk2[v4] |= a2;
-            }
-            else
-            {
-LABEL_9:
-                sithSector_aSyncIdk[sithSector_numSync] = pSector;
-                sithSector_aSyncIdk2[v3] = a2;
-                sithSector_numSync = v3 + 1;
-            }
+            sithSector_aSyncIdk2[v4] |= a2;
+            break;
         }
+    }
+
+    if (v4 == sithSector_numSync)
+    {
+        sithSector_aSyncIdk[sithSector_numSync] = pSector;
+        sithSector_aSyncIdk2[sithSector_numSync++] = a2;
     }
 }
 

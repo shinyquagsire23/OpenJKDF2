@@ -1370,9 +1370,9 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                                     v12 = v11;
                                     ++sithDplay_dword_832208;
                                     ++v11;
-                                    if ( v12->flags & 0x8000 )
+                                    if ( v12->flags & SITH_SECTOR_SYNC )
                                         break;
-                                    if ( (v12->flags & SITH_SECTOR_80) != 0 )
+                                    if ( (v12->flags & SITH_SECTOR_ADJOINS_SET) != 0 )
                                     {
                                         sithDSS_SendSyncSectorAlt(v12, sithMulti_sendto_id, 1);
                                         goto LABEL_41;

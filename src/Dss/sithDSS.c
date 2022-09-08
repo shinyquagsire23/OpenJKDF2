@@ -124,18 +124,19 @@ int sithDSS_HandleSyncSector(sithCogMsg *msg)
     sector->flags = NETMSG_POPU32();
 
     // TODO: untangle this
-    if (!(sector->flags & SITH_SECTOR_80))
+    if (!(sector->flags & SITH_SECTOR_ADJOINS_SET))
     {
-        if ( (oldSectorFlags & SITH_SECTOR_80) == 0 )
+        if ( (oldSectorFlags & SITH_SECTOR_ADJOINS_SET) == 0 )
             goto LABEL_11;
 LABEL_9:
-        if ( (sector->flags & SITH_SECTOR_80) == 0 )
+        if ( (sector->flags & SITH_SECTOR_ADJOINS_SET) == 0 )
             sithSector_SetAdjoins(sector);
-        goto LABEL_11;
     }
-    if (oldSectorFlags & SITH_SECTOR_80)
-        goto LABEL_9;
-    sithSector_UnsetAdjoins(sector);
+    else {
+        if (oldSectorFlags & SITH_SECTOR_ADJOINS_SET)
+            goto LABEL_9;
+        sithSector_UnsetAdjoins(sector);
+    }
 LABEL_11:
 
     sector->ambientLight = NETMSG_POPF32();
@@ -163,7 +164,7 @@ void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags)
     NETMSG_PUSHU32(pSector->flags);
     NETMSG_END(COGMSG_SYNCSECTORALT);
 
-    if (!(pSector->flags & SITH_SECTOR_80))
+    if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
     else
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 0);
@@ -180,20 +181,20 @@ int sithDSS_HandleSyncSectorAlt(sithCogMsg *msg)
     {
         int oldFlags = pSector->flags;
         pSector->flags = NETMSG_POPU32();
-        if (pSector->flags & SITH_SECTOR_80)
+        if (pSector->flags & SITH_SECTOR_ADJOINS_SET)
         {
-            if (!(oldFlags & SITH_SECTOR_80))
+            if (!(oldFlags & SITH_SECTOR_ADJOINS_SET))
             {
                 sithSector_UnsetAdjoins(pSector);
                 return 1;
             }
         }
-        else if (!(oldFlags & SITH_SECTOR_80))
+        else if (!(oldFlags & SITH_SECTOR_ADJOINS_SET))
         {
             return 1;
         }
 
-        if (!(pSector->flags & SITH_SECTOR_80))
+        if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
             sithSector_SetAdjoins(pSector);
 
         return 1;
