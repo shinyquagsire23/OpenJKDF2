@@ -1251,7 +1251,7 @@ void sithSoundSys_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
     if ( (sound->flags & SITHSOUNDFLAG_PER_VEL_PITCH_BEND) != 0 )
     {
         deltaSecsa = sound->pitchVel * deltaSecs + sound->pitch;
-        if ( sound->pitchVel <= 0.0 && deltaSecsa > (double)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (double)sound->nextPitch ) // TODO verify sound->pitchVel > 0
+        if ( sound->pitchVel > 0.0 && deltaSecsa > (double)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (double)sound->nextPitch ) // TODO verify sound->pitchVel > 0
         {
             sound->flags &= ~SITHSOUNDFLAG_PER_VEL_PITCH_BEND;
             deltaSecsa = sound->nextPitch;
