@@ -10,7 +10,7 @@ rm -rf wasm_out/resource/shaders
 mkdir -p wasm_out/resource/shaders
 cp resource/shaders/* wasm_out/resource/shaders
 
-rm -rf build_emcc
+#rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc
 cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
 cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
