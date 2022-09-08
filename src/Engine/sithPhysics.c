@@ -9,7 +9,7 @@
 #include "World/sithSector.h"
 #include "jk.h"
 
-#define TARGET_FPS (sithNet_tickrate < 100 ? 150.0 : 50.0)
+#define TARGET_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 150.0)
 #define DELTA_50FPS (1.0/TARGET_FPS)
 
 void sithPhysics_FindFloor(sithThing *thing, int a3)
@@ -27,7 +27,6 @@ void sithPhysics_FindFloor(sithThing *thing, int a3)
     rdVector3 direction; // [esp+18h] [ebp-18h] BYREF
     rdVector3 a1; // [esp+24h] [ebp-Ch] BYREF
     float thinga; // [esp+34h] [ebp+4h]
-    float thingb; // [esp+34h] [ebp+4h]
 
     range = 0.0;
     sector = thing->sector;
@@ -92,10 +91,10 @@ LABEL_8:
         {
             v8 = thing->moveSize - -0.0049999999;
         }
-        thingb = v8;
+
         if ( v8 > 0.0 )
         {
-            sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, 0.0, v14 | 0x2802);
+            sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, v8, 0.0, v14 | 0x2802);
             while ( 1 )
             {
                 for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
@@ -139,7 +138,7 @@ LABEL_8:
                 if ( thing->moveSize == 0.0 )
                     break;
                 range = thing->moveSize;
-                sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, thingb, range, v14 | 0x2802);
+                sithCollision_SearchRadiusForThings(thing->sector, 0, &thing->position, &direction, v8, range, v14 | 0x2802);
             }
         }
         if ( thing->attach_flags )
@@ -865,7 +864,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     if ( (thing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 )
     {
         attachedNormal = thing->attachedSufaceInfo->face.normal;
-        possibly_undef_1 = rdVector_NormalDot(&thing->position, &thing->field_38, &attachedNormal);
+        possibly_undef_1 = rdMath_DistancePointToPlane(&thing->position, &attachedNormal, &thing->field_38);
         if ( (thing->attachedSurface->surfaceFlags & (SITH_SURFACE_1000|SITH_SURFACE_2000)) != 0 )
         {
             if ( (thing->attachedSurface->surfaceFlags & SITH_SURFACE_2000) != 0 )
@@ -884,7 +883,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         rdMatrix_TransformVector34(&a3, &thing->field_38, &thing->attachedThing->lookOrientation);
         possibly_undef_2 = 1.0;
         rdVector_Add3Acc(&a3, &thing->attachedThing->position);
-        possibly_undef_1 = rdVector_NormalDot(&thing->position, &a3, &attachedNormal);
+        possibly_undef_1 = rdMath_DistancePointToPlane(&thing->position, &attachedNormal, &a3);
     }
 
     if (thing->physicsParams.physflags & SITH_PF_800)
@@ -1062,17 +1061,21 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     // Is the player climbing up/down a slope?
     if ( thing->type == SITH_THING_PLAYER
       && (thing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0
-      && v158 < 1.0
+      && v158 <= 1.0
       && (possibly_undef_2 < 0.80000001 || !rdVector_IsZero3(&thing->physicsParams.vel)) )
     {
         float v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.80000001);
-        thing->physicsParams.vel.z = thing->physicsParams.vel.z - sithWorld_pCurrentWorld->worldGravity * deltaSeconds * v108;
+        thing->physicsParams.vel.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * v108;
     }
 
     if ( !rdVector_IsZero3(&thing->physicsParams.vel) )
     {
-        float v109 = stdMath_ClipPrecision(rdVector_Dot3(&attachedNormal, &thing->physicsParams.vel));
-        if ( v109 != 0.0 )
+        float v109 = rdVector_Dot3(&attachedNormal, &thing->physicsParams.vel);
+        
+        // Fix physics being tied to framerate?
+        v109 *= (deltaSeconds / (1.0 / 25.0));
+
+        if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
@@ -1107,22 +1110,24 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     v131 = stdMath_ClipPrecision(v131);
     if ( v131 != 0.0 )
     {
-        //if (thing->type == SITH_THING_PLAYER)
-        //    printf("%f before\n", v131);
-        v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
-        //if (thing->type == SITH_THING_PLAYER)
-        //    printf("%f after\n", v131);
+        // Fix physics being tied to framerate?
+        float orig_v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
+        float new_v131 = v131 * (deltaSeconds / (1.0 / 25.0));
+        new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
+
+        v131 = new_v131;
+        
 
         if ( (thing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            //if (thing->type == SITH_THING_PLAYER)
-            //    printf("a\n");
+            v131 = new_v131;
+            
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
         else
         {
-            //if (thing->type == SITH_THING_PLAYER)
-            //    printf("b\n");
+            v131 = new_v131;
+            
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
     }

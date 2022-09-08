@@ -3,6 +3,7 @@
 #include <math.h>
 #include "rdMatrix.h"
 #include "General/stdMath.h"
+#include "Primitives/rdMath.h"
 
 const rdVector3 rdroid_zeroVector3 = {0.0,0.0,0.0};
 const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
@@ -601,10 +602,7 @@ int rdVector_IsZero3(rdVector3* v)
 
 float rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm)
 {
-    rdVector3 tmp;
-    
-    rdVector_Sub3(&tmp, v1, v2);
-    return rdVector_Dot3(&tmp, norm);
+    return rdMath_DistancePointToPlane(v1, norm, v2);
 }
 
 void rdVector_AbsRound3(rdVector3* v)
