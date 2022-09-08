@@ -156,7 +156,7 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
             v7 = stdString_CopyBetweenDelimiter(v7, mat_fpath, 128, ";");
             if ( mat_fpath[0] )
             {
-                stdString_snprintf(mat_fpath2, 128, "%s%c%s", mat_fpath, LEC_PATH_SEPARATOR_CHR, a1); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
+                stdString_snprintf(mat_fpath2, 128, "%s%c%s", mat_fpath, 92, a1); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
                 if ( rdMaterial_LoadEntry(mat_fpath2, v8, create_ddraw_surface, gpu_mem) )
                 {
                     v9 = 1;

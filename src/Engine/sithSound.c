@@ -138,7 +138,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
         v6 = stdString_CopyBetweenDelimiter(v6, tmp, 128, ";");
         if ( tmp[0] )
         {
-            stdString_snprintf(tmp2, 128, "%s%c%s", tmp, LEC_PATH_SEPARATOR_CHR, sound_fname); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
+            stdString_snprintf(tmp2, 128, "%s%c%s", tmp, '\\', sound_fname); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
             sound_file = pSithHS->fileOpen(tmp2, "rb");
             if ( sound_file )
                 break;
