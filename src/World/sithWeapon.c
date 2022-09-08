@@ -14,7 +14,7 @@
 #include "Engine/sithCamera.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithPhysics.h"
@@ -565,7 +565,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
 
 LABEL_31:
     if ( fireSound )
-        sithSoundSys_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
+        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
     if ( anim >= 0 )
     {
         if ( sender->animclass )

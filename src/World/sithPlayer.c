@@ -9,7 +9,7 @@
 #include "Engine/sithMulti.h"
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithTime.h"
@@ -316,7 +316,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
         stdFnames_ChangeExt(v1, "jks");
         sithGamesave_Load(v1, 0, 0);
     }
-    sithSoundSys_ResumeMusic(1);
+    sithSoundMixer_ResumeMusic(1);
     player->type = SITH_THING_PLAYER;
     player->lifeLeftMs = 0;
 }
@@ -506,7 +506,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
                 stdFnames_ChangeExt(v4, "jks");
                 sithGamesave_Load(v4, 0, 0);
             }
-            sithSoundSys_ResumeMusic(1);
+            sithSoundMixer_ResumeMusic(1);
             thing->type = SITH_THING_PLAYER;
             thing->lifeLeftMs = 0;
         }

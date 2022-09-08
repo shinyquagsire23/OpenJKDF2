@@ -16,7 +16,7 @@
 #include "Engine/sithCollision.h"
 #include "World/sithUnk4.h"
 #include "Engine/sithSurface.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithMulti.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithTemplate.h"
@@ -274,7 +274,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             sithPuppet_FreeEntry(thingIter);
 
         rdThing_FreeEntry(&thingIter->rdthing);
-        sithSoundSys_FreeThing(thingIter);
+        sithSoundMixer_FreeThing(thingIter);
 
         v7 = thingIter->thingIdx;
         thingIter->type = SITH_THING_FREE;
@@ -504,7 +504,7 @@ void sithThing_freestuff(sithWorld *world)
         if ( thingIter->animclass )
             sithPuppet_FreeEntry(thingIter);
         rdThing_FreeEntry(&thingIter->rdthing);
-        sithSoundSys_FreeThing(thingIter);
+        sithSoundMixer_FreeThing(thingIter);
         v3 = sithWorld_pCurrentWorld;
         thingIter->type = SITH_THING_FREE;
         thingIter->signature = 0;
@@ -590,7 +590,7 @@ void sithThing_FreeEverythingNet(sithThing *thing)
     if ( thing->animclass )
         sithPuppet_FreeEntry(thing);
     rdThing_FreeEntry(&thing->rdthing);
-    sithSoundSys_FreeThing(thing);
+    sithSoundMixer_FreeThing(thing);
     v1 = sithWorld_pCurrentWorld;
     thing->type = SITH_THING_FREE;
     thing->signature = 0;
@@ -631,7 +631,7 @@ void sithThing_FreeEverything(sithThing *thing)
     if ( thing->animclass )
         sithPuppet_FreeEntry(thing);
     rdThing_FreeEntry(&thing->rdthing);
-    sithSoundSys_FreeThing(thing);
+    sithSoundMixer_FreeThing(thing);
     thing->type = SITH_THING_FREE;
     thing->signature = 0;
     thing->thing_id = -1;

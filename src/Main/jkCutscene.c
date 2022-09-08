@@ -13,7 +13,7 @@
 #include "Main/smack.h"
 #include "Gui/jkGUI.h"
 #include "Win95/stdSound.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "stdPlatform.h"
 
 #include "smacker.h"
@@ -100,7 +100,7 @@ int jkCutscene_sub_421310(char* fpath)
 #endif
 
 #ifdef SDL2_RENDER
-    sithSoundSys_StopSong();
+    sithSoundMixer_StopSong();
     stdMci_Stop();
     jkCutscene_palette = malloc(0x300);
     

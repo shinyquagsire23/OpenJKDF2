@@ -5,7 +5,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sith.h"
 #include "Engine/sithControl.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithMulti.h"
@@ -373,7 +373,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         if ( a3 == JK_GAMEMODE_ESCAPE )
         {
             stdControl_ToggleCursor(0);
-            sithSoundSys_StopAll();
+            sithSoundMixer_StopAll();
         }
         if ( jkGame_isDDraw )
         {
@@ -454,8 +454,8 @@ void jkMain_GameplayShow(int a1, int a2)
     level_loaded = 0;
     if ( a2 == JK_GAMEMODE_ESCAPE )
     {
-        sithSoundSys_ResumeAll();
-        sithSoundSys_ResumeMusic(1);
+        sithSoundMixer_ResumeAll();
+        sithSoundMixer_ResumeMusic(1);
 #ifdef SDL2_RENDER
         jkGame_isDDraw = 0;
 #endif
@@ -659,7 +659,7 @@ void jkMain_GameplayLeave(int a2, int a3)
     if ( a3 == JK_GAMEMODE_ESCAPE )
     {
         stdControl_ToggleCursor(0);
-        sithSoundSys_StopAll();
+        sithSoundMixer_StopAll();
     }
     if ( jkGame_isDDraw )
     {

@@ -27,7 +27,7 @@
 #include "Engine/sithModel.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSound.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithControl.h"
@@ -66,7 +66,7 @@ int sith_Startup(struct common_functions *commonFuncs)
     is_started = sithModel_Startup() & is_started;
     is_started = sithSurface_Startup() & is_started;
     sithSound_Startup();
-    sithSoundSys_Startup();
+    sithSoundMixer_Startup();
     sithWeapon_Startup();
 
 #ifndef NO_JK_MMAP
@@ -93,7 +93,7 @@ int sith_Startup(struct common_functions *commonFuncs)
 
 void sith_Shutdown()
 {
-    sithSoundSys_Shutdown();
+    sithSoundMixer_Shutdown();
     sithSound_Shutdown();
     sithSurface_Shutdown();
     sithModel_Shutdown();
@@ -181,7 +181,7 @@ int sith_Open()
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
-    sithSoundSys_Open();
+    sithSoundMixer_Open();
     sithCog_Open();
     sithControl_Open();
     sithAIAwareness_Startup();
@@ -195,12 +195,12 @@ void sith_Close()
 {
     if ( sith_bOpened )
     {
-        sithSoundSys_StopSong();
+        sithSoundMixer_StopSong();
         sithRender_Close();
         sithAIAwareness_Shutdown();
         sithControl_Close();
         sithCog_Close();
-        sithSoundSys_Close();
+        sithSoundMixer_Close();
         sithWorld_Free();
         sithAI_Close();
         sithSurface_Startup2();
@@ -241,9 +241,9 @@ int sith_Tick()
             sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
             sithRender_lastRenderTick = 1;
         }
-        sithSoundSys_ResumeMusic(0);
+        sithSoundMixer_ResumeMusic(0);
         sithTime_Tick();
-        sithSoundSys_Tick(sithTime_deltaSeconds);
+        sithSoundMixer_Tick(sithTime_deltaSeconds);
         sithEvent_Advance();
 
         if ( sithCogVm_bSyncMultiplayer )

@@ -15,7 +15,7 @@
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithSound.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithRender.h"
 #include "Engine/rdCache.h"
 #include "Engine/sithPuppet.h"

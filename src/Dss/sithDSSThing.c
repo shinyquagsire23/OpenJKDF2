@@ -2,7 +2,7 @@
 
 #include "Cog/sithCog.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSound.h"
 #include "Engine/sithKeyFrame.h"
@@ -297,11 +297,11 @@ int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg)
         if ( (flags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
         {
             rdVector3 pos = NETMSG_POPVEC3();
-            out = sithSoundSys_PlaySoundPosAbsolute(sound, &pos, 0, 1.0, volume, a5, flags);
+            out = sithSoundMixer_PlaySoundPosAbsolute(sound, &pos, 0, 1.0, volume, a5, flags);
         }
         else
         {
-            out = sithSoundSys_cog_playsound_internal(sound, volume, a5, flags);
+            out = sithSoundMixer_cog_playsound_internal(sound, volume, a5, flags);
         }
     }
     else
@@ -309,7 +309,7 @@ int sithDSSThing_HandlePlaySoundPos(sithCogMsg *msg)
         sithThing* thing = sithThing_GetById(NETMSG_POPS32());
         if ( !thing )
             return 0;
-        out = sithSoundSys_PlaySoundPosThing(sound, thing, 1.0, volume, a5, flags);
+        out = sithSoundMixer_PlaySoundPosThing(sound, thing, 1.0, volume, a5, flags);
     }
 
     if ( out )
@@ -535,15 +535,15 @@ int sithDSSThing_HandleStopSound(sithCogMsg *msg)
 
     int refid = NETMSG_POPS32();
     float fadeInTime = NETMSG_POPF32();
-    sithPlayingSound* pSound = sithSoundSys_GetSoundFromRef(refid);
+    sithPlayingSound* pSound = sithSoundMixer_GetSoundFromRef(refid);
     if ( pSound )
     {
         if ( fadeInTime <= 0.0 )
         {
-            sithSoundSys_StopSound(pSound);
+            sithSoundMixer_StopSound(pSound);
             return 1;
         }
-        sithSoundSys_FadeSound(pSound, 0.0, fadeInTime);
+        sithSoundMixer_FadeSound(pSound, 0.0, fadeInTime);
         pSound->flags |= SITHSOUNDFLAG_FADING;
     }
     return 1;

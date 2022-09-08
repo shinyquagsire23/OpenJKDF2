@@ -8,7 +8,7 @@
 #include "Main/jkGame.h"
 #include "Engine/sith.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithTime.h"
@@ -104,7 +104,7 @@ int sithGamesave_LoadEntry(char *fpath)
         goto load_fail;
     }
 LABEL_11:
-    sithSoundSys_Reset();
+    sithSoundMixer_Reset();
     sithSurface_Startup3();
     sithEvent_Reset();
     stdPalEffects_FlushAllEffects();
@@ -261,7 +261,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     sithDSS_SendSyncPalEffects(0, mpFlags);
     sithDSS_SendSyncCameras(0, mpFlags);
-    sithSoundSys_SyncSounds();
+    sithSoundMixer_SyncSounds();
     sithDSS_SendMisc(0, mpFlags);
 
     return 1;

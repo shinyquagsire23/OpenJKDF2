@@ -5,7 +5,7 @@
 #include "Cog/sithCog.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"
@@ -759,14 +759,14 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sithRender_f_83198C);
     NETMSG_PUSHF32(sithRender_f_831990);
     NETMSG_PUSHU32(sithRender_needsAspectReset);
-    NETMSG_PUSHU8(sithSoundSys_bPlayingMci);
-    NETMSG_PUSHF32(sithSoundSys_musicVolume);
+    NETMSG_PUSHU8(sithSoundMixer_bPlayingMci);
+    NETMSG_PUSHF32(sithSoundMixer_musicVolume);
 
-    if ( sithSoundSys_bPlayingMci )
+    if ( sithSoundMixer_bPlayingMci )
     {
-        NETMSG_PUSHU8(sithSoundSys_dword_835FCC);
-        NETMSG_PUSHU8(sithSoundSys_trackFrom);
-        NETMSG_PUSHU8(sithSoundSys_trackTo);
+        NETMSG_PUSHU8(sithSoundMixer_dword_835FCC);
+        NETMSG_PUSHU8(sithSoundMixer_trackFrom);
+        NETMSG_PUSHU8(sithSoundMixer_trackTo);
     }
     
     NETMSG_END(COGMSG_ID_1F);
@@ -812,15 +812,15 @@ int sithDSS_HandleMisc(sithCogMsg *msg)
     sithRender_f_83198C = NETMSG_POPF32();
     sithRender_f_831990 = NETMSG_POPF32();
     sithRender_needsAspectReset = NETMSG_POPU32();
-    sithSoundSys_bPlayingMci = NETMSG_POPU8();
+    sithSoundMixer_bPlayingMci = NETMSG_POPU8();
 
-    sithSoundSys_SetMusicVol(NETMSG_POPF32());
-    if ( sithSoundSys_bPlayingMci )
+    sithSoundMixer_SetMusicVol(NETMSG_POPF32());
+    if ( sithSoundMixer_bPlayingMci )
     {
-        sithSoundSys_dword_835FCC = NETMSG_POPU8();
-        sithSoundSys_trackFrom = NETMSG_POPU8();
-        sithSoundSys_trackTo = NETMSG_POPU8();
-        sithSoundSys_ResumeMusic(1);
+        sithSoundMixer_dword_835FCC = NETMSG_POPU8();
+        sithSoundMixer_trackFrom = NETMSG_POPU8();
+        sithSoundMixer_trackTo = NETMSG_POPU8();
+        sithSoundMixer_ResumeMusic(1);
     }
 
     return 1;

@@ -89,7 +89,7 @@
 #include "Engine/sithRender.h"
 #include "Engine/sithRenderSky.h"
 #include "Engine/sithSound.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Primitives/rdModel3.h"
@@ -1853,27 +1853,27 @@ void do_hooks()
     hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
     hook_function(sithSoundClass_SetThingSoundClass_ADDR, sithSoundClass_SetThingSoundClass);
     
-    // sithSoundSys
-    hook_function(sithSoundSys_Startup_ADDR, sithSoundSys_Startup);
-    hook_function(sithSoundSys_Shutdown_ADDR, sithSoundSys_Shutdown);
-    hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
-    hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
-    hook_function(sithSoundSys_UpdateMusicVolume_ADDR, sithSoundSys_UpdateMusicVolume);
-    hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
-    hook_function(sithSoundSys_ResumeMusic_ADDR, sithSoundSys_ResumeMusic);
-    hook_function(sithSoundSys_Open_ADDR, sithSoundSys_Open);
-    hook_function(sithSoundSys_Close_ADDR, sithSoundSys_Close);
-    hook_function(sithSoundSys_ClearAll_ADDR, sithSoundSys_ClearAll);
-    hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
-    hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
-    hook_function(sithSoundSys_PlayingSoundFromSound_ADDR, sithSoundSys_PlayingSoundFromSound);
-    hook_function(sithSoundSys_cog_playsound_internal_ADDR, sithSoundSys_cog_playsound_internal);
-    hook_function(sithSoundSys_PlaySoundPosAbsolute_ADDR, sithSoundSys_PlaySoundPosAbsolute);
-    hook_function(sithSoundSys_PlaySoundPosThing_ADDR, sithSoundSys_PlaySoundPosThing);
-    hook_function(sithSoundSys_SetPitch_ADDR, sithSoundSys_SetPitch);
-    hook_function(sithSoundSys_FreeThing_ADDR, sithSoundSys_FreeThing);
-    hook_function(sithSoundSys_SectorSound_ADDR, sithSoundSys_SectorSound);
-    hook_function(sithSoundSys_SetVelocity_ADDR, sithSoundSys_SetVelocity);
+    // sithSoundMixer
+    hook_function(sithSoundMixer_Startup_ADDR, sithSoundMixer_Startup);
+    hook_function(sithSoundMixer_Shutdown_ADDR, sithSoundMixer_Shutdown);
+    hook_function(sithSoundMixer_PlaySong_ADDR, sithSoundMixer_PlaySong);
+    hook_function(sithSoundMixer_StopSong_ADDR, sithSoundMixer_StopSong);
+    hook_function(sithSoundMixer_UpdateMusicVolume_ADDR, sithSoundMixer_UpdateMusicVolume);
+    hook_function(sithSoundMixer_SetMusicVol_ADDR, sithSoundMixer_SetMusicVol);
+    hook_function(sithSoundMixer_ResumeMusic_ADDR, sithSoundMixer_ResumeMusic);
+    hook_function(sithSoundMixer_Open_ADDR, sithSoundMixer_Open);
+    hook_function(sithSoundMixer_Close_ADDR, sithSoundMixer_Close);
+    hook_function(sithSoundMixer_ClearAll_ADDR, sithSoundMixer_ClearAll);
+    hook_function(sithSoundMixer_StopAll_ADDR, sithSoundMixer_StopAll);
+    hook_function(sithSoundMixer_ResumeAll_ADDR, sithSoundMixer_ResumeAll);
+    hook_function(sithSoundMixer_PlayingSoundFromSound_ADDR, sithSoundMixer_PlayingSoundFromSound);
+    hook_function(sithSoundMixer_cog_playsound_internal_ADDR, sithSoundMixer_cog_playsound_internal);
+    hook_function(sithSoundMixer_PlaySoundPosAbsolute_ADDR, sithSoundMixer_PlaySoundPosAbsolute);
+    hook_function(sithSoundMixer_PlaySoundPosThing_ADDR, sithSoundMixer_PlaySoundPosThing);
+    hook_function(sithSoundMixer_SetPitch_ADDR, sithSoundMixer_SetPitch);
+    hook_function(sithSoundMixer_FreeThing_ADDR, sithSoundMixer_FreeThing);
+    hook_function(sithSoundMixer_SectorSound_ADDR, sithSoundMixer_SectorSound);
+    hook_function(sithSoundMixer_SetVelocity_ADDR, sithSoundMixer_SetVelocity);
     
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
@@ -2268,11 +2268,11 @@ void do_hooks()
     hook_function(stdSound_SetVelocity_ADDR, stdSound_SetVelocity);
     hook_function(stdSound_IsPlaying_ADDR, stdSound_IsPlaying);
     
-    hook_function(sithSoundSys_StopAll_ADDR, sithSoundSys_StopAll);
-    hook_function(sithSoundSys_ResumeAll_ADDR, sithSoundSys_ResumeAll);
-    hook_function(sithSoundSys_StopSong_ADDR, sithSoundSys_StopSong);
-    hook_function(sithSoundSys_PlaySong_ADDR, sithSoundSys_PlaySong);
-    hook_function(sithSoundSys_SetMusicVol_ADDR, sithSoundSys_SetMusicVol);
+    hook_function(sithSoundMixer_StopAll_ADDR, sithSoundMixer_StopAll);
+    hook_function(sithSoundMixer_ResumeAll_ADDR, sithSoundMixer_ResumeAll);
+    hook_function(sithSoundMixer_StopSong_ADDR, sithSoundMixer_StopSong);
+    hook_function(sithSoundMixer_PlaySong_ADDR, sithSoundMixer_PlaySong);
+    hook_function(sithSoundMixer_SetMusicVol_ADDR, sithSoundMixer_SetMusicVol);
     
     hook_function(sithDplay_OpenConnection_ADDR, sithDplay_OpenConnection);
     hook_function(sithDplay_CloseConnection_ADDR, sithDplay_CloseConnection);

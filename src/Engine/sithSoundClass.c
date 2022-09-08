@@ -4,7 +4,7 @@
 #include "General/stdHashTable.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithSound.h"
-#include "Engine/sithSoundSys.h"
+#include "Engine/sithSoundMixer.h"
 #include "Win95/stdSound.h"
 #include "World/sithWorld.h"
 
@@ -484,21 +484,21 @@ sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry 
 
     if ( (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_ABOLUTE) != 0 )
     {
-        if ( sithSoundSys_GetThingSoundIdx(0, pSithSound) >= 0 )
+        if ( sithSoundMixer_GetThingSoundIdx(0, pSithSound) >= 0 )
             return 0;
     }
     else
     {
         if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_THING) {
-            if ( sithSoundSys_GetThingSoundIdx(thing, pSithSound) >= 0 )
+            if ( sithSoundMixer_GetThingSoundIdx(thing, pSithSound) >= 0 )
                 return 0;
         }
     }
     
     if ( (entry->playflags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
-        return sithSoundSys_PlaySoundPosAbsolute(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+        return sithSoundMixer_PlaySoundPosAbsolute(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
     else
-        return sithSoundSys_PlaySoundPosThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+        return sithSoundMixer_PlaySoundPosThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
 }
 
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
@@ -506,15 +506,15 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
     sithPlayingSound* v3; // esi
     sithPlayingSound *v5; // edi
 
-    if (!sithSoundSys_bOpened)
+    if (!sithSoundMixer_bOpened)
         return;
 
-    for (int i = 0; i < sithSoundSys_numSoundsAvailable; i++)
+    for (int i = 0; i < sithSoundMixer_numSoundsAvailable; i++)
     {
-        v3 = &sithSoundSys_aPlayingSounds[i];
+        v3 = &sithSoundMixer_aPlayingSounds[i];
         if ( v3->flags & SITHSOUNDFLAG_FOLLOWSTHING && thing == v3->thing && (!sound || v3->sound == sound) )
         {
-            sithSoundSys_StopSound(v3);
+            sithSoundMixer_StopSound(v3);
         }
     }
 
