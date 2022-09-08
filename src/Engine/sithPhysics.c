@@ -1014,12 +1014,11 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     if ( !rdVector_IsZero3(&thing->physicsParams.vel) )
     {
         float v109 = rdVector_Dot3(&attachedNormal, &thing->physicsParams.vel);
-        
-        // Fix physics being tied to framerate?
-        v109 *= (deltaSeconds / (1.0 / 25.0));
 
         if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
+            // Fix physics being tied to framerate?
+            v109 *= (deltaSeconds / (1.0 / 25.0));
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
