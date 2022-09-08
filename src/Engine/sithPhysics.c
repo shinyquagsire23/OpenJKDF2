@@ -203,16 +203,11 @@ void sithPhysics_ThingApplyForce(sithThing *thing, rdVector3 *forceVec)
 
 void sithPhysics_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3)
 {
-    rdVector3 *v3; // edi
     double v4; // st7
-    double v6; // st6
-    double v8; // st7
+    double v8;
     double v9; // st6
     double v10; // st4
-    double v11; // st3
-    float v12; // ecx
     double v13; // rt0
-    double v14; // st2
     double v15; // st7
     double v16; // st5
     double v17; // st4
@@ -231,40 +226,31 @@ void sithPhysics_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3)
     double v31; // st5
     double v32; // st7
 
-    v3 = &thing->lookOrientation.uvec;
-    v4 = 1.0 - (thing->lookOrientation.uvec.x * look->x + look->y * thing->lookOrientation.uvec.y + look->z * thing->lookOrientation.uvec.z);
-    v6 = v4;
-    if ( v6 < 0.0 )
-        v6 = -v4;
-    if ( v6 <= 0.0000099999997 )
-        v4 = 0.0;
+    v4 = stdMath_ClipPrecision(1.0 - rdVector_Dot3(&thing->lookOrientation.uvec, look));
     if ( v4 == 0.0 )
     {
         thing->physicsParams.physflags |= SITH_PF_100;
     }
     else if ( a3 == 0.0 )
     {
+        v10 = thing->lookOrientation.lvec.x;
         v8 = thing->lookOrientation.lvec.y;
         v9 = thing->lookOrientation.lvec.z;
-        v10 = thing->lookOrientation.lvec.x;
-        v11 = v10;
-        v3->x = look->x;
-        v12 = look->z;
+
+        thing->lookOrientation.uvec.x = look->x;
         thing->lookOrientation.uvec.y = look->y;
-        thing->lookOrientation.uvec.z = v12;
-        v13 = v8;
-        v14 = v8 * thing->lookOrientation.uvec.z - v9 * thing->lookOrientation.uvec.y;
-        v15 = v3->x;
-        thing->lookOrientation.rvec.x = v14;
+        thing->lookOrientation.uvec.z = look->z;
+        v15 = thing->lookOrientation.uvec.x;
+        thing->lookOrientation.rvec.x = v8 * thing->lookOrientation.uvec.z - v9 * thing->lookOrientation.uvec.y;
         v16 = v9 * v15 - v10 * thing->lookOrientation.uvec.z;
         v17 = thing->lookOrientation.uvec.y;
         thing->lookOrientation.rvec.y = v16;
-        thing->lookOrientation.rvec.z = v11 * v17 - v13 * v3->x;
+        thing->lookOrientation.rvec.z = v10 * v17 - v8 * thing->lookOrientation.uvec.x;
         rdVector_Normalize3Acc(&thing->lookOrientation.rvec);
         thing->lookOrientation.lvec.x = thing->lookOrientation.rvec.z * thing->lookOrientation.uvec.y
                                       - thing->lookOrientation.rvec.y * thing->lookOrientation.uvec.z;
-        v19 = thing->lookOrientation.rvec.y * v3->x;
-        thing->lookOrientation.lvec.y = thing->lookOrientation.rvec.x * thing->lookOrientation.uvec.z - thing->lookOrientation.rvec.z * v3->x;
+        v19 = thing->lookOrientation.rvec.y * thing->lookOrientation.uvec.x;
+        thing->lookOrientation.lvec.y = thing->lookOrientation.rvec.x * thing->lookOrientation.uvec.z - thing->lookOrientation.rvec.z * thing->lookOrientation.uvec.x;
         thing->lookOrientation.lvec.z = v19 - thing->lookOrientation.rvec.x * thing->lookOrientation.uvec.y;
         thing->physicsParams.physflags |= SITH_PF_100;
     }
@@ -273,26 +259,26 @@ void sithPhysics_ThingSetLook(sithThing *thing, const rdVector3 *look, float a3)
         v20 = a3 * 10.0;
         v21 = look->z * v20 + thing->lookOrientation.uvec.y;
         v22 = look->y * v20 + thing->lookOrientation.uvec.z;
-        v3->x = look->x * v20 + v3->x;
+        thing->lookOrientation.uvec.x = look->x * v20 + thing->lookOrientation.uvec.x;
         thing->lookOrientation.uvec.y = v21;
         thing->lookOrientation.uvec.z = v22;
-        rdVector_Normalize3Acc(v3);
+        rdVector_Normalize3Acc(&thing->lookOrientation.uvec);
         v23 = thing->lookOrientation.uvec.z;
-        v24 = v3->x;
+        v24 = thing->lookOrientation.uvec.x;
         v25 = thing->lookOrientation.uvec.y;
         v26 = thing->lookOrientation.rvec.x;
         thing->lookOrientation.lvec.x = thing->lookOrientation.rvec.z * v25 - thing->lookOrientation.rvec.y * v23;
-        v27 = v26 * v23 - thing->lookOrientation.rvec.z * v3->x;
+        v27 = v26 * v23 - thing->lookOrientation.rvec.z * thing->lookOrientation.uvec.x;
         v28 = thing->lookOrientation.rvec.y;
         thing->lookOrientation.lvec.y = v27;
         thing->lookOrientation.lvec.z = v28 * v24 - thing->lookOrientation.rvec.x * v25;
         rdVector_Normalize3Acc(&thing->lookOrientation.lvec);
-        v29 = thing->lookOrientation.lvec.z * v3->x;
+        v29 = thing->lookOrientation.lvec.z * thing->lookOrientation.uvec.x;
         thing->lookOrientation.rvec.x = thing->lookOrientation.lvec.y * thing->lookOrientation.uvec.z
                                       - thing->lookOrientation.lvec.z * thing->lookOrientation.uvec.y;
         v30 = thing->lookOrientation.lvec.x * thing->lookOrientation.uvec.y;
         v31 = v29 - thing->lookOrientation.lvec.x * thing->lookOrientation.uvec.z;
-        v32 = thing->lookOrientation.lvec.y * v3->x;
+        v32 = thing->lookOrientation.lvec.y * thing->lookOrientation.uvec.x;
         thing->lookOrientation.rvec.y = v31;
         thing->lookOrientation.rvec.z = v30 - v32;
     }
@@ -617,11 +603,6 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     double v9; // st6
     double v10; // st7
     double v12; // st5
-    double v18; // st6
-    double v20; // st6
-    double v22; // st6
-    double v24; // st6
-    double v26; // st6
     double v30; // st7
     double v31; // st5
     double v32; // st1
@@ -630,11 +611,8 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     double v35; // st6
     double v36; // st5
     double v37; // st7
-    double v39; // st6
     double v42; // st6
     double v44; // st6
-    double v46; // st5
-    double v48; // st5
     double v51; // st7
     double v55; // st5
     double v56; // st6
@@ -705,28 +683,9 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
                 v10 = v62;
         }
         thing->physicsParams.angVel.z = v10;
-        v18 = thingb;
-        if ( v18 < 0.0 )
-            v18 = -v18;
-        if ( v18 <= 0.0000099999997 )
-            v20 = 0.0;
-        else
-            v20 = thingb;
-        v4->x = v20;
-        v22 = v60;
-        if ( v22 < 0.0 )
-            v22 = -v22;
-        if ( v22 <= 0.0000099999997 )
-            v24 = 0.0;
-        else
-            v24 = v60;
-        thing->physicsParams.angVel.y = v24;
-        v26 = v10;
-        if ( v26 < 0.0 )
-            v26 = -v10;
-        if ( v26 <= 0.0000099999997 )
-            v10 = 0.0;
-        thing->physicsParams.angVel.z = v10;
+        v4->x = stdMath_ClipPrecision(thingb);
+        thing->physicsParams.angVel.y = stdMath_ClipPrecision(v60);
+        thing->physicsParams.angVel.z = stdMath_ClipPrecision(v10);
     }
     if ( thing->physicsParams.angVel.x == 0.0 && thing->physicsParams.angVel.y == 0.0 && thing->physicsParams.angVel.z == 0.0 )
     {
@@ -790,33 +749,17 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     thing->physicsParams.vel.x = v37;
     thing->physicsParams.vel.y = thingc;
     thing->physicsParams.vel.z = v61;
-    v39 = v37;
-    if ( v39 < 0.0 )
-        v39 = -v37;
-    if ( v39 <= 0.0000099999997 )
-        v37 = 0.0;
+    v37 = stdMath_ClipPrecision(v37);
     thing->physicsParams.vel.x = v37;
-    v42 = thingc;
-    if ( v42 < 0.0 )
-        v42 = -v42;
-    if ( v42 <= 0.0000099999997 )
-        v44 = 0.0;
-    else
-        v44 = thingc;
-    thing->physicsParams.vel.y = v44;
-    v46 = v61;
-    if ( v46 < 0.0 )
-        v46 = -v46;
-    if ( v46 <= 0.0000099999997 )
-        v48 = 0.0;
-    else
-        v48 = v61;
-    thing->physicsParams.vel.z = v48;
-    if ( v37 != 0.0 || v44 != 0.0 || v48 != 0.0 )
+    thingc = stdMath_ClipPrecision(thingc);
+    thing->physicsParams.vel.y = thingc;
+    v61 = stdMath_ClipPrecision(v61);
+    thing->physicsParams.vel.z = v61;
+    if ( v37 != 0.0 || thingc != 0.0 || v61 != 0.0 )
     {
         thing->physicsParams.velocityMaybe.x = v37 * deltaSeconds;
-        thing->physicsParams.velocityMaybe.y = v44 * deltaSeconds;
-        thing->physicsParams.velocityMaybe.z = v48 * deltaSeconds;
+        thing->physicsParams.velocityMaybe.y = thingc * deltaSeconds;
+        thing->physicsParams.velocityMaybe.z = v61 * deltaSeconds;
     }
     if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 && thing->physicsParams.acceleration.z >= 0.0 )
     {
