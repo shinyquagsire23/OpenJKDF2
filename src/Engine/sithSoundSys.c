@@ -594,33 +594,9 @@ sithPlayingSound* sithSoundSys_PlaySoundPosThing(sithSound *sound, sithThing *a2
                 a4a = a5 * 0.60000002;
                 sithAIAwareness_AddEntry(a2->sector, &a2->position, 0, a4a, a2);
             }
-            if ( sithSoundSys_bOpened )
-            {
-                if ( sithSoundSys_numSoundsAvailable2 )
-                    v12 = sithSoundSys_aIdk[--sithSoundSys_numSoundsAvailable2];
-                else
-                    v12 = -1;
-                if ( v12 >= 0 )
-                {
-                    v11 = &sithSoundSys_aPlayingSounds[v12];
-                    v11->sound = sound;
-                    v11->flags = flags;
-                    v11->volumeVelocity = 1.0;
-                    v11->pitch = 1.0;
-                    if ( sithSoundSys_nextSoundIdx == 0 )
-                        sithSoundSys_nextSoundIdx = 1;
-                    v14 = sithSoundSys_nextSoundIdx++ | ((playerThingIdx + 1) << 16);
-                    v11->refid = v14;
-                }
-                else
-                {
-                    v11 = 0;
-                }
-            }
-            else
-            {
-                v11 = 0;
-            }
+
+            v11 = sithSoundSys_PlayingSoundFromSound(sound, flags);
+
             if ( v11 )
             {
                 v11->thing = a2;

@@ -208,6 +208,7 @@ int sithSound_LoadFileData(sithSound *sound)
     void *buf; // ebp
     int32_t bufferMaxSize; // [esp+10h] [ebp-84h] BYREF
     char outstr[128]; // [esp+14h] [ebp-80h] BYREF
+    char outstr2[128];
 
     int fd = 0;
     if (sound->isLoaded & 1)
@@ -229,8 +230,8 @@ int sithSound_LoadFileData(sithSound *sound)
             v6 = stdString_CopyBetweenDelimiter(v6, outstr, 128, ";");
             if ( outstr[0] )
             {
-                _sprintf(outstr, "%s%c%s", outstr, '\\', sound->sound_fname);
-                fd = pSithHS->fileOpen(outstr, "rb");
+                stdString_snprintf(outstr2, 128, "%s%c%s", outstr, '\\', sound->sound_fname); // sprintf -> snprintf, outstr can't be input+output
+                fd = pSithHS->fileOpen(outstr2, "rb");
                 if ( fd )
                     break;
             }
