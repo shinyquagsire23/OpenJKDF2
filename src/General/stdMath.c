@@ -1,8 +1,5 @@
 #include "stdMath.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "stdMathTables.h"
 
 float stdMath_FlexPower(float num, int32_t exp)

@@ -799,7 +799,7 @@ jkGuiTitle_aTexts 0x005568E0 jkGuiStringEntry[20]
 jkGuiTitle_whichLoading 0x00556980 int
 
 jkGuiSound_sfxVolume 0x00547DD0 float = 0.8
-jkGuiSound_numChannels 0x0054A680 int = 16
+jkGuiSound_numChannels 0x0054A680 uint32_t = 16
 jkGuiSound_bLowResSound 0x00563700 int
 jkGuiSound_b3DSound 0x00563704 int
 jkGuiSound_b3DSound_2 0x00563708 int

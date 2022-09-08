@@ -1181,7 +1181,7 @@ typedef struct sithPlayingSound
     float pitch;
     float pitchVel;
     float nextPitch;
-    float anonymous_13;
+    float distance;
     rdVector3 posRelative;
     sithThing* thing;
     rdVector3 pos;

@@ -3,6 +3,9 @@
 
 #include "hook.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #define stdMath_FlexPower_ADDR (0x00431E20)
 #define stdMath_NormalizeAngle_ADDR (0x00431E5B)
 #define stdMath_NormalizeAngleAcute_ADDR (0x00431F10)
@@ -69,6 +72,10 @@ float stdMath_Sqrt(float a);
 float stdMath_ClipPrecision(float val);
 float stdMath_Clamp(float val, float valMin, float valMax);
 float stdMath_ClampValue(float val, float valAbsMax);
+static inline float stdMath_Fabs(float val)
+{
+    return fabs(val);
+}
 
 extern const float aSinTable[4096];
 extern const float aTanTable[4096];
