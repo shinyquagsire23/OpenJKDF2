@@ -56,9 +56,10 @@ void jkGuiSound_Initialize()
     jkGuiSound_musicVolume = wuRegistry_GetFloat("musicVolume", jkGuiSound_musicVolume);
     jkGuiSound_sfxVolume = wuRegistry_GetFloat("sfxVolume", jkGuiSound_sfxVolume);
     jkGuiSound_numChannels = wuRegistry_GetInt("numChannels", jkGuiSound_numChannels);
-    jkGuiSound_bLowResSound = wuRegistry_GetInt("bLowRes", jkGuiSound_bLowResSound);
-    jkGuiSound_b3DSound = wuRegistry_GetInt("b3DSound", jkGuiSound_b3DSound);
+    jkGuiSound_bLowResSound = wuRegistry_GetBool("bLowRes", jkGuiSound_bLowResSound);
+    jkGuiSound_b3DSound = wuRegistry_GetBool("b3DSound", jkGuiSound_b3DSound);
     jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
+    printf("%x\n", jkGuiSound_b3DSound);
     sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume); // TODO
 
     stdSound_SetMenuVolume(jkGuiSound_sfxVolume);

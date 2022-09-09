@@ -135,6 +135,10 @@ int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault)
     }
 
     auto ret = json_file[pKey];
+    if (ret.is_boolean()) {
+        return ret.get<bool>() ? 1 : 0;
+    }
+
     if (!ret.is_number()) {
         stdJSON_SaveInt(pFpath, pKey, valDefault);
         return valDefault;
