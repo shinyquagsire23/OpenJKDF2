@@ -1018,7 +1018,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
             // Fix physics being tied to framerate?
-            v109 *= (deltaSeconds / (1.0 / 25.0));
+            //v109 *= (deltaSeconds / (1.0 / 25.0));
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
