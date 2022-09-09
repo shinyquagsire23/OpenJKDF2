@@ -140,6 +140,7 @@ int jkRes_LoadCd(char *a1)
     // Added: prevent overlap
     if (jkRes_curDir != a1)
         _strncpy(jkRes_curDir, a1, 0x7Fu);
+
     v1 = 0;
     jkRes_curDir[127] = 0;
     for (v1 = 0; v1 < jkRes_gCtx.gobs[4].numGobs; v1++)
@@ -372,7 +373,9 @@ LABEL_11:
         {
             if ( v24 )
             {
-                _strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
+                //_strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu); //TODO ??
+                //jkRes_curDir[0] = 0; // Added
+
                 v10 = 0;
                 jkRes_curDir[127] = 0;
                 if ( jkRes_gCtx.gobs[4].numGobs )
@@ -483,7 +486,8 @@ LABEL_39:
         if ( v23 )
             return 1;
     }
-    _strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu);
+    //_strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu); // TODO ???
+    //jkRes_curDir[0] = 0; // Added
     jkRes_curDir[127] = 0;
     for (v16 = 0; v16 < jkRes_gCtx.gobs[4].numGobs; v16++)
     {

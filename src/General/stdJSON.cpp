@@ -5,7 +5,9 @@
 #include <vector>
 #include <cstring>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <unordered_map>

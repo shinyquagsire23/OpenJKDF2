@@ -21,8 +21,8 @@
 
 static int Windows_bInitted;
 static uint32_t Windows_DplayGuid[4] = {0x0BF0613C0, 0x11D0DE79, 0x0A000C999, 0x4BAD7624};
-static char Windows_cpu_info[0x4c];
-static char Windows_cdpath_default[4]; // ???
+static char Windows_cpu_info[0x4c] = { 0 };
+static char Windows_cdpath_default[4] = {0}; // ???
 
 static int Windows_bInittedGdi;
 static int Windows_bWindowed;
@@ -36,8 +36,11 @@ void Windows_Startup()
     WinIdk_SetDplayGuid(Windows_DplayGuid);
     WinIdk_detect_cpu(Windows_cpu_info);
 
+#ifndef SDL2_RENDER
     wuRegistry_GetString("CD Path", cdPath, 128, Windows_cdpath_default); // ????
-
+#else
+    memset(cdPath, 0, sizeof(cdPath));
+#endif
     jkRes_LoadCd(cdPath);
     Windows_installType = wuRegistry_GetInt("InstallType", 9);
     Window_AddMsgHandler(Windows_DefaultHandler);

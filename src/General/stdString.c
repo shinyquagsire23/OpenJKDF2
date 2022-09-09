@@ -300,3 +300,18 @@ void stdString_CStrToLower(char *a1)
         result = v1[1];
     }
 }
+
+// Added: These were macros or something
+char* stdString_SafeStrCopy(char* pDst, const char* pSrc, uint32_t lenDst)
+{
+    _strncpy(pDst, pSrc, lenDst - 1);
+    pDst[lenDst - 1] = 0;
+    return pDst;
+}
+
+wchar_t* stdString_SafeWStrCopy(wchar_t* pDst, const wchar_t* pSrc, uint32_t lenDst)
+{
+    _wcsncpy(pDst, pSrc, lenDst - 1);
+    pDst[lenDst - 1] = 0;
+    return pDst;
+}

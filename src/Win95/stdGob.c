@@ -41,8 +41,6 @@ stdGob* stdGob_Load(char *fpath, int a2, int a3)
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 {
     unsigned int v4; // ebx
-    HANDLE v6; // eax
-    HANDLE v7; // eax
     int v8; // edx
     stdGobFile *v9; // eax
     stdGobEntry *ent; // edi
@@ -60,9 +58,9 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 #if 0
     if ( a4 )
     {
-        v6 = jk_CreateFileA(gob->fpath, 0x80000000, 1u, 0, 3u, 0x10000000u, 0);
+        HANDLE v6 = jk_CreateFileA(gob->fpath, 0x80000000, 1u, 0, 3u, 0x10000000u, 0);
         gob->viewHandle2 = v6;
-        v7 = jk_CreateFileMappingA(v6, 0, 2u, 0, 0, 0);
+        HANDLE v7 = jk_CreateFileMappingA(v6, 0, 2u, 0, 0, 0);
         gob->viewHandle = v7;
         if ( v7 )
         {

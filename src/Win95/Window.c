@@ -317,9 +317,11 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 #include <fcntl.h> 
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
-#ifndef WIN64_MINGW
+#if !defined(WIN64_MINGW) && !defined(_WIN32)
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <termios.h>
@@ -476,7 +478,7 @@ void Window_HandleWindowEvent(SDL_Event* event)
     }
 }
 
-#ifdef WIN64_MINGW
+#if defined(WIN64_MINGW) || defined(_WIN32)
 CHAR my_getch() {
     DWORD mode, cc;
     DWORD num;
@@ -556,13 +558,14 @@ void Window_UpdateHeadless()
 {
     char buffer[32];
     size_t bytes_read = 0;
-    int fd = STDIN_FILENO;
+
     if (my_kbhit() > 0) {
-#ifdef WIN64_MINGW
+#if defined(WIN64_MINGW) || (_WIN32)
         buffer[0] = my_getch();
         buffer[1] = 0;
         bytes_read = 1;
 #else
+        int fd = STDIN_FILENO;
         bytes_read = read(fd, buffer, sizeof(buffer)-1);
         buffer[bytes_read] = 0;
 #endif

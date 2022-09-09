@@ -634,8 +634,8 @@ jkGame_dword_552B5C 0x00552B5C int
 jkGame_isDDraw 0x00552B60 int
 
 jkRes_pHS 0x00555C68 common_functions*
-jkRes_episodeGobName 0x00555C70 char[32]
-jkRes_curDir 0x00555C90 char[128]
+jkRes_episodeGobName 0x00555C70 char[32] = {0}
+jkRes_curDir 0x00555C90 char[128] = {0}
 jkRes_bHookedHS 0x00555D18 int
 jkRes_aFiles 0x00554A68 jkResFile[32]
 jkRes_gCtx 0x005541E0 jkRes

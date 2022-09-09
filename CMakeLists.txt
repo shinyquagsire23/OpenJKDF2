@@ -83,6 +83,7 @@ if(PLAT_LINUX_32)
     set(TARGET_POSIX TRUE)
     set(TARGET_LINUX TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
 
     if(OPENJKDF2_USE_BLOBS)
@@ -108,6 +109,7 @@ elseif(PLAT_LINUX_64)
     set(TARGET_POSIX TRUE)
     set(TARGET_LINUX TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
@@ -128,6 +130,7 @@ elseif(PLAT_MACOS)
     set(TARGET_POSIX TRUE)
     set(TARGET_MACOS TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
 
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2.app")
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
@@ -150,6 +153,7 @@ elseif(PLAT_MACOS_X86_64)
     set(TARGET_POSIX TRUE)
     set(TARGET_MACOS TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
 
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
@@ -181,6 +185,7 @@ elseif(PLAT_MINGW_X86_64)
     set(TARGET_POSIX TRUE)
     set(TARGET_WIN32 TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
@@ -211,6 +216,7 @@ elseif(PLAT_WASM)
     set(TARGET_POSIX TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_WASM TRUE)
+    set(TARGET_CAN_JKGM FALSE)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
@@ -257,6 +263,7 @@ elseif(PLAT_MSVC)
     set(TARGET_POSIX TRUE)
     set(TARGET_WIN32 TRUE)
     set(TARGET_NO_BLOBS TRUE)
+    set(TARGET_CAN_JKGM TRUE)
 	
 	set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
 	set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
@@ -273,9 +280,13 @@ elseif(PLAT_MSVC)
 
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
 	include_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/include)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/include)
 	
 	add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/libexchndl.a")
 	add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64/libfreeglut.a")
+    add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib/libz.a")
+    add_link_options("${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib/libpng.dll.a")
 	add_link_options(OpenGL32.lib)
 endif()
 
@@ -415,8 +426,12 @@ if(TARGET_WIN32)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/packaging/win32/openjkdf2.rc)
 
     # Prefer the POSIX wuRegistry (JSON) over native
-    if (TARGET_POSIX)
+    if (TARGET_POSIX OR PLAT_MSVC)
         list(REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Win32/wuRegistry.c)
+    endif()
+
+    if (PLAT_MSVC)
+        list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Posix/wuRegistry.c)
     endif()
 
     if(TARGET_USE_SDL2)
@@ -439,13 +454,13 @@ list(APPEND SOURCE_FILES ${GLOBALS_C})
 # All of our pre-build steps
 add_custom_command(
     OUTPUT ${GLOBALS_C}
-    COMMAND cog -d -D symbols_fpath="${SYMBOLS_FILE}" -o ${GLOBALS_C} ${GLOBALS_C_COG}
+    COMMAND cog -d -D symbols_fpath="${SYMBOLS_FILE}" -D project_root="${PROJECT_SOURCE_DIR}" -o ${GLOBALS_C} ${GLOBALS_C_COG}
     DEPENDS ${SYMBOLS_FILE} ${GLOBALS_C_COG} ${GLOBALS_H} ${PROJECT_SOURCE_DIR}/resource/shaders/default_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/default_v.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/menu_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/menu_v.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/texfbo_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/texfbo_v.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/blur_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/blur_v.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/ssao_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/ssao_v.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/ssao_mix_f.glsl ${PROJECT_SOURCE_DIR}/resource/shaders/ssao_mix_v.glsl
 )
 
 add_custom_command(
     OUTPUT ${GLOBALS_H}
-    COMMAND cog -d -D symbols_fpath="${SYMBOLS_FILE}" -o ${GLOBALS_H} ${GLOBALS_H_COG}
+    COMMAND cog -d -D symbols_fpath="${SYMBOLS_FILE}" -D project_root="${PROJECT_SOURCE_DIR}" -o ${GLOBALS_H} ${GLOBALS_H_COG}
     DEPENDS ${SYMBOLS_FILE} ${GLOBALS_H_COG}
 )
 
@@ -609,21 +624,26 @@ elseif(PLAT_MSVC)
 	target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-    target_link_libraries(${BIN_NAME} PRIVATE m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
-	
+    target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
+
 	add_custom_command(TARGET ${BIN_NAME} 
 	POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libogg-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopus-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopusfile-0.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/OpenAL32.dll
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbgcore.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbghelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${CMAKE_CURRENT_BINARY_DIR}/\$\(Configuration\)/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libogg-0.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopus-0.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopusfile-0.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${PROJECT_BINARY_DIR}/OpenAL32.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbgcore.dll ${PROJECT_BINARY_DIR}
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbghelp.dll ${PROJECT_BINARY_DIR}
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2-2.24.0/lib/x64/SDL2.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/libpng16-16.dll ${PROJECT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/zlib1.dll ${PROJECT_BINARY_DIR}
     )
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)

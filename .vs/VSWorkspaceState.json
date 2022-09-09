@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\3rdparty\\libpng-1.2.37-lib\\share\\licenses",
+    "\\3rdparty\\libpng-1.2.37-lib\\share\\man",
+    "\\3rdparty\\SDL2-2.24.0\\lib",
+    "\\3rdparty\\SDL2-2.24.0\\lib\\x64",
+    "\\src",
+    "\\src\\Platform\\GL",
+    "\\src\\Platform\\Networking",
+    "\\src\\Platform\\Networking\\GNS",
+    "\\src\\Platform\\Posix"
+  ],
+  "SelectedNode": "\\.gitignore",
+  "PreviewInSolutionExplorer": false
+}

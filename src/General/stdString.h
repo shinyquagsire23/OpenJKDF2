@@ -34,19 +34,8 @@ char* stdString_WcharCopy(wchar_t *a1);
 void stdString_CStrToLower(char *a1);
 
 // Added: These were macros or something
-static inline char* stdString_SafeStrCopy(char* pDst, const char* pSrc, uint32_t lenDst)
-{
-    _strncpy(pDst, pSrc, lenDst-1);
-    pDst[lenDst-1] = 0;
-    return pDst;
-}
-
-static inline wchar_t* stdString_SafeWStrCopy(wchar_t* pDst, const wchar_t* pSrc, uint32_t lenDst)
-{
-    _wcsncpy(pDst, pSrc, lenDst-1);
-    pDst[lenDst-1] = 0;
-    return pDst;
-}
+char* stdString_SafeStrCopy(char* pDst, const char* pSrc, uint32_t lenDst);
+wchar_t* stdString_SafeWStrCopy(wchar_t* pDst, const wchar_t* pSrc, uint32_t lenDst);
 
 #ifdef __cplusplus
 }

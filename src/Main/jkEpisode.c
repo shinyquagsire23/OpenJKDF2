@@ -36,7 +36,6 @@ int jkEpisode_LoadVerify()
     stdFileSearch *v10; // ebp
     unsigned int v12; // esi
     jkEpisode *v13; // edi
-    int v14; // ecx
     int result; // eax
     jkEpisode *v16; // ebx
     int v17; // eax

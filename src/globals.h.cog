@@ -136,8 +136,9 @@ typedef struct embeddedResource_t
     import cog
     import glob
     import os
+    from pathlib import Path
 
-    embed_files = glob.glob("../resource/shaders/*.glsl")
+    embed_files = glob.glob(str(Path(project_root) / "resource" / "shaders" / "*.glsl"))
     cog.outl("extern const size_t embeddedResource_aFiles_num;")
     cog.outl("extern const embeddedResource_t embeddedResource_aFiles[%d];" % (len(embed_files),))
 ]]]
