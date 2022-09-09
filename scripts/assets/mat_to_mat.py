@@ -178,11 +178,22 @@ class CmpPal:
     def set_transparency(self, n, val):
         self.transparency[n] = val
 
+    def is_emissive(self, n):
+        vals = self.get_lightlevels(n)
+        x = vals[0]
+        for v in vals:
+            if x != v:
+                return False
+        return True
+
     def closest_color(self, other_cmp, n):
+        needs_emissive = self.is_emissive(n)
         rgb = self.get_color(n)
         r, g, b = rgb
         color_diffs = []
         for i in range(1, 256):
+            if needs_emissive and not other_cmp.is_emissive(i):
+                continue
             color = other_cmp.get_color(i)
             cr, cg, cb = color
             color_diff = math.sqrt((r - cr)**2 + (g - cg)**2 + (b - cb)**2)
@@ -480,7 +491,8 @@ def mat_to_mat_2(f_path, cmp_from=None, cmp_to=None, close_lut=None):
 
         for i in range(0, num_texinfo):
             texture_type, b, c, d, e, _f = struct.unpack("<LLLLLL", f.read(6*4))
-            f_out.write(struct.pack("<LLLLLL", texture_type, b, c, d, e, _f))
+            
+            f_out.write(struct.pack("<LLLLLL", texture_type, close_lut[b], c, d, e, _f))
             if (texture_type & 8) != 0:
                 ext_a, height, alpha_en, ext_d = struct.unpack("<LLLL", f.read(4*4))
                 f_out.write(struct.pack("<LLLL", ext_a, height, alpha_en, ext_d))

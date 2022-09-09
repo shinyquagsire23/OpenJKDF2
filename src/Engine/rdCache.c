@@ -747,18 +747,7 @@ solid_tri:
         {
             v75 = active_6c->extralight + active_6c->light_level_static;
 
-            if ( v75 < 0.0 )
-            {
-                v76 = 0.0;
-            }
-            else if ( v75 > 1.0 )
-            {
-                v76 = 1.0;
-            }
-            else
-            {
-                v76 = v75;
-            }
+            v76 = stdMath_Clamp(v75, 0.0, 1.0);
             if ( v76 <= v148 )
             {
                 v77 = v148;

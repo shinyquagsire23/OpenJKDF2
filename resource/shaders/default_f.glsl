@@ -228,7 +228,10 @@ void main(void)
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
     
 
-    if (tex_mode == 5
+    if (tex_mode == 0) {
+        sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+    else if (tex_mode == 5
 #ifndef CAN_BILINEAR_FILTER_16
     || tex_mode == 6
 #endif

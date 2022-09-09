@@ -122,8 +122,8 @@ std3DSimpleTexStage std3D_blurStage;
 std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
 
-GLuint blank_tex;
-void* blank_data;
+GLuint blank_tex, blank_tex_white;
+void* blank_data, *blank_data_white;
 GLuint worldpal_texture;
 void* worldpal_data;
 GLuint worldpal_lights_texture;
@@ -488,7 +488,7 @@ int init_resources()
     
     // Blank texture
     glGenTextures(1, &blank_tex);
-    blank_data = malloc(0x400);
+    blank_data = jkgm_alloc_aligned(0x400);
     memset(blank_data, 0x0, 0x400);
     
     glBindTexture(GL_TEXTURE_2D, blank_tex);
@@ -501,6 +501,22 @@ int init_resources()
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, blank_data);
+
+    // Blank texture
+    glGenTextures(1, &blank_tex_white);
+    blank_data_white = jkgm_alloc_aligned(0x400);
+    memset(blank_data_white, 0x0, 0x400);
+    
+    glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, blank_data_white);
 
     // World palette
     glGenTextures(1, &worldpal_texture);
@@ -617,9 +633,14 @@ void std3D_FreeResources()
     std3D_deleteFramebuffer(&std3D_framebuffers[0]);
     std3D_deleteFramebuffer(&std3D_framebuffers[1]);
     glDeleteTextures(1, &blank_tex);
+    glDeleteTextures(1, &blank_tex_white);
     glDeleteTextures(1, &worldpal_texture);
     glDeleteTextures(1, &worldpal_lights_texture);
     glDeleteTextures(1, &displaypal_texture);
+    if (blank_data)
+        jkgm_aligned_free(blank_data);
+    if (blank_data_white)
+        jkgm_aligned_free(blank_data_white);
     if (worldpal_data)
         jkgm_aligned_free(worldpal_data);
     if (worldpal_lights_data)
@@ -627,6 +648,8 @@ void std3D_FreeResources()
     if (displaypal_data)
         jkgm_aligned_free(displaypal_data);
 
+    blank_data = NULL;
+    blank_data_white = NULL;
     worldpal_data = NULL;
     worldpal_lights_data = NULL;
     displaypal_data = NULL;
@@ -1840,8 +1863,13 @@ void std3D_DrawSceneFbo()
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
 {
     if (!tex) {
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
+        glActiveTexture(GL_TEXTURE0 + 4);
+        glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
+
         glActiveTexture(GL_TEXTURE0 + 0);
-        glBindTexture(GL_TEXTURE_2D, blank_tex);
+        glBindTexture(GL_TEXTURE_2D, blank_tex_white);
         glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
         glUniform1i(uniform_blend_mode, 2);
         return;
@@ -1849,7 +1877,7 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     int tex_id = tex->texture_id;
     glActiveTexture(GL_TEXTURE0 + 0);
     if (tex_id == 0)
-        glBindTexture(GL_TEXTURE_2D, blank_tex);
+        glBindTexture(GL_TEXTURE_2D, blank_tex_white);
     else
         glBindTexture(GL_TEXTURE_2D, tex_id);
 
@@ -1996,7 +2024,7 @@ void std3D_DrawRenderList()
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, blank_tex);
+    glBindTexture(GL_TEXTURE_2D, blank_tex_white);
     
     glUniform1i(uniform_tex, 0);
     glUniform1i(uniform_worldPalette, 1);
