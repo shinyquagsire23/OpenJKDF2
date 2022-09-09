@@ -143,7 +143,7 @@ int sithMulti_Startup()
     sithMulti_dword_83265C = 0;
 
     // Remove all actor things from the world
-    if ( v2 >= 0 )
+    if (!(sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && v2 >= 0 ) // Added: Co-op
     {
         v5 = &sithWorld_pCurrentWorld->things;
         do

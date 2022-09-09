@@ -370,6 +370,7 @@ private:
     ISteamNetworkingMessages *m_pBcastInterface;
     uint64_t availableIds = 0x1;
     uint8_t sendBuffer[4096];
+    uint8_t sendBuffer2[4096];
     SteamNetworkingIdentity m_identity;
 
     struct Client_t
@@ -549,6 +550,8 @@ private:
 
                 sithDplayGNS_verbosePrintf("Assigning ID: %x\n", nextId);
 
+                sithDplayGNS_storedEntry.multiModeFlags = sithMulti_multiModeFlags;
+
                 GNSInfoPacket infoPkt = {0};
                 infoPkt.id = nextId;
                 infoPkt.entry = sithDplayGNS_storedEntry;
@@ -557,7 +560,8 @@ private:
 
                 jkPlayer_maxPlayers = sithDplayGNS_storedEntry.maxPlayers; // Hack?
 
-                SendBytesToClient( pInfo->m_hConn, &infoPkt, sizeof(infoPkt)); 
+                memcpy(sendBuffer2, &infoPkt, sizeof(infoPkt));
+                SendBytesToClient( pInfo->m_hConn, sendBuffer2, sizeof(infoPkt)); 
 
                 // Add them to the client list, using std::map wacky syntax
                 m_mapClients[ pInfo->m_hConn ];
@@ -836,6 +840,10 @@ private:
 
             sithDplayGNS_storedEntryEnum = pPkt->entry;
             sithDplayGNS_storedEntryEnum.field_E0 = 10;
+
+            // Hack?
+            sithMulti_multiModeFlags = sithDplayGNS_storedEntryEnum.multiModeFlags;
+            sithNet_MultiModeFlags = sithDplayGNS_storedEntryEnum.multiModeFlags;
             sithDplayGNS_numEnumd = 1;
         }
 

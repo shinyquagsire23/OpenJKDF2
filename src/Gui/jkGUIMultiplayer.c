@@ -370,6 +370,9 @@ LABEL_29:
             goto LABEL_28;
         }
         v12 = v7;
+#ifdef QOL_IMPROVEMENTS
+        sithMulti_multiModeFlags = jkGuiMultiplayer_aEntries[v12].multiModeFlags; // TODO: why?
+#endif
         stdString_SafeStrCopy(v35.mapJklFname, (const char *)jkGuiMultiplayer_aEntries[v12].mapJklFname, 0x20);
         stdString_SafeStrCopy(v35.episodeGobName, (const char *)jkGuiMultiplayer_aEntries[v12].episodeGobName, 0x20);
         v13 = jkGuiMultiplayer_aEntries[v12].tickRateMs;

@@ -63,7 +63,7 @@ static jkGuiMenu jkGuiNetHost_menu =
     &jkGuiNetHost_aElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
-static jkGuiElement jkGuiNetHost_aSettingsElements[8] =
+static jkGuiElement jkGuiNetHost_aSettingsElements[9] =
 {
     { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 410, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 6, "GUI_MULTIPLAYER", 3, { 20, 20, 600, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -71,6 +71,7 @@ static jkGuiElement jkGuiNetHost_aSettingsElements[8] =
     { ELEMENT_TEXTBOX, 0, 0, NULL, 0, { 280, 240, 50, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 #ifdef QOL_IMPROVEMENTS
     { ELEMENT_CHECKBOX, 0, 0, L"Dedicated Server", 0, { 70, 270, 200, 40 }, 1, 0, L"Launch server without participating as a player.", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX, 0, 0, L"Experimental Co-op", 0, { 70, 300, 200, 40 }, 1, 0, L"Launch server with actors enabled.", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 #endif
     { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 420, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 20, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -91,6 +92,7 @@ static Darray jkGuiNetHost_dArray2;
 wchar_t jkGuiNetHost_portText[32];
 int jkGuiNetHost_portNum = 27020;
 int jkGuiNetHost_bIsDedicated = 0;
+int jkGuiNetHost_bIsCoop = 0;
 
 #define LONG_MAX ((long)(~0UL>>1))
 #define LONG_MIN (~LONG_MAX)
@@ -199,6 +201,14 @@ void jkGuiNetHost_SaveSettings()
     else {
         jkGuiNetHost_sessionFlags &= ~SESSIONFLAG_ISDEDICATED;
     }
+
+    if (jkGuiNetHost_bIsDedicated) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_COOP;
+    }
+
 #endif
     wuRegistry_SaveInt("maxRank", jkGuiNetHost_maxRank);
     wuRegistry_SaveInt("sessionFlags", jkGuiNetHost_sessionFlags);
@@ -213,6 +223,7 @@ void jkGuiNetHost_SaveSettings()
 #ifdef QOL_IMPROVEMENTS
     wuRegistry_SaveInt("portNum", jkGuiNetHost_portNum);
     wuRegistry_SaveBool("bIsDedicated", jkGuiNetHost_bIsDedicated);
+    wuRegistry_SaveBool("bIsCoop", jkGuiNetHost_bIsCoop);
 
     wuRegistry_SaveBool("bUseScoreLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT);
     wuRegistry_SaveBool("bUseTimeLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT);
@@ -248,6 +259,14 @@ void jkGuiNetHost_LoadSettings()
     }
     else {
         jkGuiNetHost_sessionFlags &= ~SESSIONFLAG_ISDEDICATED;
+    }
+
+    jkGuiNetHost_bIsCoop = wuRegistry_GetBool("bIsCoop", jkGuiNetHost_bIsCoop);
+    if (jkGuiNetHost_bIsCoop) {
+        jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
+    }
+    else {
+        jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_COOP;
     }
 
     if(wuRegistry_GetBool("bUseScoreLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT)) {
@@ -464,6 +483,11 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             if (jkGuiNetHost_bIsDedicated) {
                 jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
             }
+
+            if (jkGuiNetHost_bIsCoop) {
+                jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
+            }
+            pMultiEntry->multiModeFlags = jkGuiNetHost_gameFlags;
             pMultiEntry->sessionFlags = jkGuiNetHost_sessionFlags;
 #endif
         }
@@ -477,6 +501,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiNetHost_aSettingsElements[3].selectedTextEntry = 32;
 #ifdef QOL_IMPROVEMENTS
             jkGuiNetHost_aSettingsElements[4].selectedTextEntry = jkGuiNetHost_bIsDedicated;
+            jkGuiNetHost_aSettingsElements[5].selectedTextEntry = jkGuiNetHost_bIsCoop;
 #endif
             jkGuiRend_MenuSetLastElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
             jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
@@ -489,6 +514,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             }
 #ifdef QOL_IMPROVEMENTS
             jkGuiNetHost_bIsDedicated = !!jkGuiNetHost_aSettingsElements[4].selectedTextEntry;
+            jkGuiNetHost_bIsCoop = !!jkGuiNetHost_aSettingsElements[5].selectedTextEntry;
 #endif
         }
     }
