@@ -18,7 +18,7 @@
 #define stdSound_SetVelocity_ADDR (0x0437480)
 #define stdSound_SetPositionOrientation_ADDR (0x04374B0)
 #define stdSound_CommitDeferredSettings_ADDR (0x0437510)
-#define stdSound_3DBufferIdk_ADDR (0x0437520)
+#define stdSound_3DSetMode_ADDR (0x0437520)
 #define stdSound_IA3D_idk_ADDR (0x0437540)
 #define stdSound_BufferReset_ADDR (0x0437560)
 #define stdSound_BufferStop_ADDR (0x0437590)
@@ -54,6 +54,8 @@ typedef struct stdALBuffer
     int refcnt;
     float vol;
     int bIsCopy;
+    rdVector3 pos;
+    rdVector3 vel;
 } stdALBuffer;
 #else
 typedef struct IDirectSoundBuffer
@@ -73,6 +75,8 @@ typedef struct stdNullSoundBuffer
     int refcnt;
     float vol;
     int bIsCopy;
+    rdVector3 pos;
+    rdVector3 vel;
 } stdNullSoundBuffer;
 
 typedef struct stdWaveFormat
@@ -88,8 +92,6 @@ typedef struct stdWaveFormat
 uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset);
 
 extern float stdSound_fMenuVolume;
-
-static void (*stdSound_3DBufferRelease)(stdSound_buffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 
 #ifndef SDL2_RENDER
 static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
@@ -108,13 +110,14 @@ static stdSound_buffer_t* (*stdSound_BufferDuplicate)(stdSound_buffer_t* buf) = 
 static void (*stdSound_IA3D_idk)(float a) = (void*)stdSound_IA3D_idk_ADDR;
 static int (*stdSound_BufferStop)(stdSound_buffer_t* a1) = (void*)stdSound_BufferStop_ADDR;
 static void (*stdSound_BufferSetVolume)(stdSound_buffer_t* a1, float a2) = (void*)stdSound_BufferSetVolume_ADDR;
-static int (*stdSound_3DBufferIdk)(stdSound_buffer_t* a1, int a2) = (void*)stdSound_3DBufferIdk_ADDR;
-static void* (*stdSound_BufferQueryInterface)(stdSound_buffer_t* a1) = (void*)stdSound_BufferQueryInterface_ADDR;
+static int (*stdSound_3DSetMode)(stdSound_buffer_t* a1, int a2) = (void*)stdSound_3DSetMode_ADDR;
+static stdSound_3dBuffer_t* (*stdSound_BufferQueryInterface)(stdSound_buffer_t* a1) = (void*)stdSound_BufferQueryInterface_ADDR;
 static void (*stdSound_CommitDeferredSettings)() = (void*)stdSound_CommitDeferredSettings_ADDR;
 static void (*stdSound_SetPositionOrientation)(rdVector3 *pos, rdVector3 *lvec, rdVector3 *uvec) = (void*)stdSound_SetPositionOrientation_ADDR;
 static void (*stdSound_SetPosition)(stdSound_buffer_t* sound, rdVector3 *pos) = (void*)stdSound_SetPosition_ADDR;
 static void (*stdSound_SetVelocity)(stdSound_buffer_t* sound, rdVector3 *vel) = (void*)stdSound_SetVelocity_ADDR;
 static int (*stdSound_IsPlaying)(stdSound_buffer_t* a1, rdVector3 *pos) = (void*)stdSound_IsPlaying_ADDR;
+static void (*stdSound_3DBufferRelease)(stdSound_3dBuffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 #else
 int stdSound_Initialize();
 void stdSound_Shutdown();
@@ -132,13 +135,14 @@ stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound);
 void stdSound_IA3D_idk(float a);
 int stdSound_BufferStop(stdSound_buffer_t* a1);
 void stdSound_BufferSetVolume(stdSound_buffer_t* a1, float a2);
-int stdSound_3DBufferIdk(stdSound_buffer_t* a1, int a2);
-void* stdSound_BufferQueryInterface(stdSound_buffer_t* a1);
+int stdSound_3DSetMode(stdSound_3dBuffer_t* a1, int a2);
+stdSound_3dBuffer_t* stdSound_BufferQueryInterface(stdSound_buffer_t* a1);
 void stdSound_CommitDeferredSettings();
 void stdSound_SetPositionOrientation(rdVector3 *pos, rdVector3 *lvec, rdVector3 *uvec);
 void stdSound_SetPosition(stdSound_buffer_t* sound, rdVector3 *pos);
 void stdSound_SetVelocity(stdSound_buffer_t* sound, rdVector3 *vel);
 int stdSound_IsPlaying(stdSound_buffer_t* a1, rdVector3 *pos);
+void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer);
 #endif
 
 #endif // _STDSOUND_H

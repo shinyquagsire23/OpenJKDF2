@@ -42,9 +42,20 @@ uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPe
 
 ALCdevice *device;
 ALCcontext *context;
+static rdVector3 stdSound_listenerPos;
+static ALfloat stdSound_listenerOri[6] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+
+void stdSound_DS3DToAL(rdVector3* pOut, rdVector3* pIn)
+{
+    pOut->x = pIn->x * 0.1;
+    pOut->y = pIn->y * 0.1;
+    pOut->z = pIn->z * 0.1;
+}
 
 int stdSound_Initialize()
 {
+    jkGuiSound_b3DSound_3 = 1;
+
     if (Main_bHeadless) return 1;
 
 	ALboolean enumeration;
@@ -54,7 +65,6 @@ int stdSound_Initialize()
 	ALvoid *data;
 	ALsizei size, freq;
 	ALenum format;
-	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 	ALboolean loop = AL_FALSE;
 	ALCenum error;
 	ALint source_state;
@@ -85,7 +95,11 @@ int stdSound_Initialize()
 	/* set orientation */
 	alListener3f(AL_POSITION, 0, 0, 1.0f);
     alListener3f(AL_VELOCITY, 0, 0, 0);
-	alListenerfv(AL_ORIENTATION, listenerOri);
+	alListenerfv(AL_ORIENTATION, stdSound_listenerOri);
+    alListenerf(AL_ROLLOFF_FACTOR, 0.0f);
+    alListenerf(AL_REFERENCE_DISTANCE, 5.0f);
+    alListenerf(AL_MAX_GAIN, 1.0f);
+    alListenerf(AL_MIN_GAIN, 0.0f);
 
     jkGuiSound_b3DSound = 0;
 
@@ -122,6 +136,9 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16
     out->bitsPerSample = bitsPerSample;
     out->refcnt = 1;
     out->vol = 1.0;
+
+    rdVector_Zero3(&out->pos);
+    rdVector_Zero3(&out->vel);
     
     if (!Main_bHeadless)
         alGenBuffers(1, &out->buffer);
@@ -182,8 +199,9 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
         alGenSources((ALuint)1, &buf->source);
 
 	    alSourcef(buf->source, AL_PITCH, 1.0);
-	    alSource3f(buf->source, AL_POSITION, 0, 0, 0);
-	    alSource3f(buf->source, AL_VELOCITY, 0, 0, 0);
+        alSourcefv(buf->source, AL_POSITION, (ALfloat*)&buf->pos);
+        alSourcefv(buf->source, AL_VELOCITY, (ALfloat*)&buf->vel);
+        alSourcei(buf->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
 	    
 	    //printf("%u %u\n", buf->source, buf->buffer);
 	}
@@ -292,6 +310,9 @@ stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
     out->bufferBytes = sound->bufferBytes;
     out->bIsCopy = 1;
     out->buffer = sound->buffer;
+
+    out->pos = sound->pos;
+    out->vel = sound->vel;
     
     //stdSound_BufferSetData(out, sound->bufferBytes, NULL);
     
@@ -343,14 +364,14 @@ void stdSound_BufferSetVolume(stdSound_buffer_t* sound, float vol)
     }
 }
 
-int stdSound_3DBufferIdk(stdSound_buffer_t* a1, int a2)
+int stdSound_3DSetMode(stdSound_buffer_t* a1, int a2)
 {
     return 1;
 }
 
-void* stdSound_BufferQueryInterface(stdSound_buffer_t* a1)
+stdSound_3dBuffer_t* stdSound_BufferQueryInterface(stdSound_buffer_t* pSoundBuffer)
 {
-    return NULL;
+    return pSoundBuffer;
 }
 
 void stdSound_CommitDeferredSettings()
@@ -359,37 +380,74 @@ void stdSound_CommitDeferredSettings()
 
 void stdSound_SetPositionOrientation(rdVector3 *pos, rdVector3 *lvec, rdVector3 *uvec)
 {
+    if (!pos || !lvec || !uvec) return;
+
+    stdSound_DS3DToAL(&stdSound_listenerPos, pos);
+
+    stdSound_DS3DToAL((rdVector3*)&stdSound_listenerOri[0], lvec);
+    stdSound_DS3DToAL((rdVector3*)&stdSound_listenerOri[3], uvec);
+
+    if (Main_bHeadless) return;
+
+    alListenerfv(AL_POSITION, (ALfloat*)&stdSound_listenerPos);
+    alListenerfv(AL_ORIENTATION, stdSound_listenerOri);
 }
 
-void stdSound_SetPosition(stdSound_buffer_t* sound, rdVector3 *pos)
+void stdSound_SetPosition(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
 {
+    if (!pSoundBuf || !pos) return;
 
+    stdSound_DS3DToAL(&pSoundBuf->pos, pos);
+
+    if (!pSoundBuf->source)
+        return;
+
+    if (Main_bHeadless) return;
+
+    alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
+    alSourcefv(pSoundBuf->source, AL_POSITION, (ALfloat*)&pSoundBuf->pos);    
 }
 
-void stdSound_SetVelocity(stdSound_buffer_t* sound, rdVector3 *vel)
+void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
 {
-    
+    if (!pSoundBuf || !vel) return;
+
+    stdSound_DS3DToAL(&pSoundBuf->vel, vel);
+
+    if (!pSoundBuf->source)
+        return;
+
+    if (Main_bHeadless) return;
+
+    alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
+    alSourcefv(pSoundBuf->source, AL_VELOCITY, (ALfloat*)&pSoundBuf->pos);
 }
 
-int stdSound_IsPlaying(stdSound_buffer_t* sound, rdVector3 *pos)
+int stdSound_IsPlaying(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
 {
-    if (Main_bHeadless) return 0;
+    if (!pSoundBuf) return 0;
 
     if (pos)
-        rdVector_Zero3(pos);
+        rdVector_Copy3(pos, &pSoundBuf->pos);
     
-    if (!sound->source)
+    if (!pSoundBuf->source)
         return 0;
     
     // Added
-    if (sound->vol == 0.0)
+    if (pSoundBuf->vol == 0.0)
         return 0;
 
+    if (Main_bHeadless) return 0;
+
     ALint source_state;
-    
-    alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
+    alGetSourcei(pSoundBuf->source, AL_SOURCE_STATE, &source_state);
     
     return (source_state == AL_PLAYING);
+}
+
+void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer)
+{
+    
 }
 #endif
 
@@ -519,14 +577,14 @@ void stdSound_BufferSetVolume(stdSound_buffer_t* sound, float vol)
     sound->vol = vol;
 }
 
-int stdSound_3DBufferIdk(stdSound_buffer_t* a1, int a2)
+int stdSound_3DSetMode(stdSound_buffer_t* a1, int a2)
 {
     return 1;
 }
 
-void* stdSound_BufferQueryInterface(stdSound_buffer_t* a1)
+stdSound_3dBuffer_t* stdSound_BufferQueryInterface(stdSound_buffer_t* pSoundBuffer)
 {
-    return NULL;
+    return pSoundBuffer;
 }
 
 void stdSound_CommitDeferredSettings()
@@ -550,5 +608,10 @@ void stdSound_SetVelocity(stdSound_buffer_t* sound, rdVector3 *vel)
 int stdSound_IsPlaying(stdSound_buffer_t* sound, rdVector3 *pos)
 {
     return 0;
+}
+
+void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer)
+{
+
 }
 #endif

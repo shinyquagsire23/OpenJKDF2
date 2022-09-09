@@ -141,6 +141,8 @@ int sithMulti_Startup()
     sithCogVm_multiplayerFlags |= 1u;
     sithCogVm_bSyncMultiplayer |= 1u;
     sithMulti_dword_83265C = 0;
+
+    // Remove all actor things from the world
     if ( v2 >= 0 )
     {
         v5 = &sithWorld_pCurrentWorld->things;

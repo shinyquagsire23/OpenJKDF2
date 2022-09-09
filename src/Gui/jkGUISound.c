@@ -100,6 +100,11 @@ int jkGuiSound_Show()
         jkGuiSound_musicVolume = (double)jkGuiSound_elements[10].selectedTextEntry * 0.0099999998;
         jkGuiSound_sfxVolume = (double)jkGuiSound_elements[14].selectedTextEntry * 0.0099999998;
         jkGuiSound_numChannels = jkGuiSound_elements[18].selectedTextEntry + 8;
+#ifdef SDL2_RENDER
+        jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
+        jkGuiSound_b3DSound = jkGuiSound_b3DSound_2;
+        wuRegistry_SaveBool("b3DSound", (HKEY)jkGuiSound_elements[7].selectedTextEntry);
+#else
         if ( jkGuiSound_b3DSound_3 && jkGuiSound_elements[7].selectedTextEntry != jkGuiSound_b3DSound_2 )
         {
             v4 = jkStrings_GetText("GUISOUND_MUSTRESTART");
@@ -108,6 +113,7 @@ int jkGuiSound_Show()
             jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
             wuRegistry_SaveBool("b3DSound", (HKEY)jkGuiSound_elements[7].selectedTextEntry);
         }
+#endif
         sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume);
         stdSound_SetMenuVolume(jkGuiSound_sfxVolume);
     }

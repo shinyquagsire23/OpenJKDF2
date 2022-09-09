@@ -486,14 +486,17 @@ typedef struct stdControlKeyInfoEntry stdControlKeyInfoEntry;
 
 #ifndef SDL2_RENDER
 typedef IDirectSoundBuffer stdSound_buffer_t;
+typedef IDirectSound3DBuffer stdSound_3dBuffer_t;
 #else // OPENAL_SOUND
 
 #ifdef OPENAL_SOUND
 typedef stdALBuffer stdSound_buffer_t;
+typedef stdALBuffer stdSound_3dBuffer_t;
 #endif
 
 #ifdef NULL_SOUND
 typedef stdNullSoundBuffer stdSound_buffer_t;
+typedef stdNullSoundBuffer stdSound_3dBuffer_t;
 #endif 
 
 #endif // OPENAL_SOUND
