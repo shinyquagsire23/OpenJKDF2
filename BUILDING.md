@@ -81,11 +81,11 @@ brew install emscripten
 
 Download and install [Python 3.8](https://www.python.org/downloads/release/python-380/) (be sure it is added to your PATH when installing).
 
-Install [cog](https://nedbatchelder.com/code/cog/index.html#h_installation) using pip. You may need to specify `pip3` instead of `pip`.
+Install [cog](https://nedbatchelder.com/code/cog/index.html#h_installation) using pip (`pip3 install cogapp`). You may need to specify `pip` instead of `pip3`.
 
 Download and install the OpenAL 1.1 SDK from [here](https://www.openal.org/downloads/). Then, add `OPENALDIR` to your system environment variables as `C:\Program Files (x86)\OpenAL 1.1 SDK`.
 
-Download and install the latest CMake from [here](https://cmake.org/download/).
+Download and install the latest CMake from [here](https://cmake.org/download/), or use Visual Studio 2022 which includes CMake support.
 
 </details>
 
@@ -194,7 +194,15 @@ make -j10
 </details>
 
 <details>
-  <summary>x86_64 Windows MSVC/Visual Studio Project</summary>
+  <summary>x86_64 Visual Studio 2022 Project</summary>
+
+Clone the repository using git, then open VS 2022 and select `Open a local folder`. Right click CMakeLists.txt and select `Configure OpenJKDF2` until it succeeds (for some reason it errors a few times initially on SDL2_mixer, etc). Once it succeeds, right click CMakeLists.txt and select `Build`. 
+
+After it builds you can set it as a startup item, from there it should work and debug as expected.
+</details>
+
+<details>
+  <summary>x86_64 Windows MSVC/Visual Studio Project (Legacy, deprecated)</summary>
 
 Run the CMake GUI and select the `OpenJKDF2/` directory for your sources. Create `OpenJKDF2/build` and set it as your build folder. Click `Configure` until it succeeds (for some reason it errors a few times initially), then click `Generate` and `Open Project`.
 
