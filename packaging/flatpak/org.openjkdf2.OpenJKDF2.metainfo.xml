@@ -35,8 +35,6 @@
   </screenshots>
   <url type="homepage">https://github.com/shinyquagsire23/OpenJKDF2</url>
   <url type="bugtracker">https://github.com/shinyquagsire23/OpenJKDF2/issues</url>
-  <url type="other platform releases">https://github.com/shinyquagsire23/OpenJKDF2/releases</url>
-  <url type="online demo">https://maxthomas.dev/openjkdf2/</url>
   <content_rating type="oars-1.1">
     <content_attribute id="violence-fantasy">moderate</content_attribute>
     <content_attribute id="violence-bloodshed">mild</content_attribute>
