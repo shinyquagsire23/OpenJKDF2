@@ -1,0 +1,24 @@
+app-id: org.openjkdf2.OpenJKDF2
+runtime: org.freedesktop.Platform
+runtime-version: '21.08'
+sdk: org.freedesktop.Sdk
+command: openjkdf2-64
+modules:
+  - packaging/flatpak/glew/glew.json
+  - packaging/flatpak/glu/glu-9.json
+  
+  - name: openjkdf2-64
+    buildsystem: simple
+    build-commands:
+      - bash packaging/flatpak/build_linux64_flatpak.sh
+    sources:
+      - type: dir
+        path: .
+
+finish-args:
+  - --device=all # needed for gamepads
+  - --share=ipc  # needed for X11
+  - --share=network # needed for networking (App Store downloader)
+  - --socket=x11
+  - --socket=pulseaudio
+  - --filesystem=home:rw
