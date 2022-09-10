@@ -30,6 +30,10 @@ pacaur -S emscripten
   <summary>Ubuntu Dependencies</summary>
 
 ```
+# Make sure everything is up to date before installing new dependencies
+sudo apt-get update
+sudo apt-get upgrade
+
 # All
 sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler zsh
 pip3 install cogapp
@@ -45,6 +49,11 @@ sudo apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev l
 
 # WebAssembly
 # TODO find equivalents: emscripten
+
+# Flatpak
+sudo apt install flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
 ```
 
 Add the following to the end of ~/.bashrc:

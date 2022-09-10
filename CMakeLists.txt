@@ -705,6 +705,9 @@ if(TARGET_MACOS)
     
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisfile.3.dylib @executable_path/libvorbisfile.3.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND cp ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisfile.3.dylib ${BUNDLE}/Contents/MacOS
+
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS
     
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/flac/lib/libFLAC.8.dylib @executable_path/libFLAC.8.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND cp ${HOMEBREW_PREFIX}/opt/flac/lib/libFLAC.8.dylib ${BUNDLE}/Contents/MacOS

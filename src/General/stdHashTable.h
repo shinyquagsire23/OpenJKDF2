@@ -42,7 +42,7 @@ typedef struct stdHashTable
     uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
 } stdHashTable;
 
-int stdHashTable_HashStringToIdx(const char *data, int numBuckets);
+uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets);
 stdHashTable* stdHashTable_New(int maxEntries);
 stdHashKey* stdHashTable_GetBucketTail(stdHashKey *a1);
 void stdHashTable_FreeBuckets(stdHashKey *a1);
