@@ -96,7 +96,7 @@ void stdPalEffects_ResetEffectsState(stdPalEffectsState *effectsState)
 
 void stdPalEffects_ResetEffect(stdPalEffect *effect)
 {
-    memset(effect, 0, sizeof(stdPalEffect));
+    _memset(effect, 0, sizeof(stdPalEffect));
     effect->fade = 1.0;
 }
 
@@ -321,7 +321,7 @@ void stdPalEffects_GatherEffects()
     stdPalEffect v8; // [esp+10h] [ebp-28h] BYREF
 
     v0 = 0;
-    memset(&v8, 0, sizeof(v8));
+    _memset(&v8, 0, sizeof(v8));
     v8.fade = 1.0;
     if ( stdPalEffects_numEffectRequests )
     {

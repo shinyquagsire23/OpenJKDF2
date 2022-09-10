@@ -126,10 +126,10 @@ int sithDplay_Recv(sithCogMsg *msg)
     msgBytes = 2052;
     int playerId = 0;
 
-    memset(&msg->netMsg.cogMsgId, 0, msgBytes); // Added
+    _memset(&msg->netMsg.cogMsgId, 0, msgBytes); // Added
 
     // TODO I got a struct offset wrong.....
-    ret = DirectPlay_Receive(&playerId, &msg->netMsg.cogMsgId, &msgBytes);
+    ret = DirectPlay_Receive(&playerId, (int*)&msg->netMsg.cogMsgId, &msgBytes);
     if ( ret != -1 )
     {
         if ( !ret )
@@ -210,7 +210,7 @@ int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpNa
     if ( DirectPlay_numPlayers >= 0x20 )
         return 1;
     v7 = DirectPlay_numPlayers;
-    memset(&DirectPlay_aPlayers[DirectPlay_numPlayers], 0, sizeof(sithDplayPlayer));
+    _memset(&DirectPlay_aPlayers[DirectPlay_numPlayers], 0, sizeof(sithDplayPlayer));
     v8 = lpName->lpszShortName;
     if ( v8 )
     {

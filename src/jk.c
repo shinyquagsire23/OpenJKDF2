@@ -261,7 +261,7 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
-#if !defined(MACOS) && !defined(WIN64_STANDALONE)
+#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX)
 void* memset(void* ptr, int val, size_t num)
 {
     int i;

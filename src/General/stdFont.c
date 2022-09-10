@@ -429,13 +429,14 @@ LABEL_9:
             {
                 while ( 1 )
                 {
-                    v15 = stdFont_sub_4352C0(v12, v9, v10->x, v10, &font);
+                    int font_ = 0;
+                    v15 = stdFont_sub_4352C0(v12, v9, v10->x, v10, &font_);
                     v16 = a6;
                     v17 = v15;
                     v18 = 0;
                     v30 = v15;
                     a5 = 0;
-                    if ( (int)font > 0 )
+                    if ( font_ > 0 )
                     {
                         do
                         {
@@ -499,12 +500,12 @@ LABEL_29:
                             ++v16;
                             ++a5;
                         }
-                        while ( a5 < (int)font );
+                        while ( a5 < font_ );
                         v17 = v30;
                     }
                     v23 = 0;
                     v24 = v10->x + (v10->width - v18) / 2;
-                    if ( (int)font > 0 )
+                    if ( font_ > 0 )
                     {
                         do
                         {
@@ -571,7 +572,7 @@ LABEL_51:
                             ++v23;
                             ++a6;
                         }
-                        while ( v23 < (int)font );
+                        while ( v23 < font_ );
                         v17 = v30;
                     }
                     if ( v17 )

@@ -262,7 +262,7 @@ LABEL_7:
     stdString_WcharToChar(tmp, str, 255);
     tmp[255] = 0;
     printf("\r                                            \r");
-    printf("%s%c", tmp, tmp[strlen(tmp)-1] == '\n' ? ' ' : '\n');
+    printf("%s%c", tmp, tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
 #endif
     return v5;
 }
@@ -387,7 +387,7 @@ int jkDev_TryCommand(const char *cmd)
     _strncpy(SrcStr, cmd, 0x7Fu);
     SrcStr[127] = 0;
     _strtolower(SrcStr);
-    v1 = strtok(SrcStr, ", \t\n\r");
+    v1 = _strtok(SrcStr, ", \t\n\r");
     if ( !v1 )
         return 0;
     _strncpy(key, v1, 0x1Fu);
@@ -395,7 +395,7 @@ int jkDev_TryCommand(const char *cmd)
     pFoundCmd = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(jkDev_cheatHashtable, key);
     if ( !pFoundCmd )
         return 0;
-    v5 = strtok(0, "\n\r");
+    v5 = _strtok(0, "\n\r");
     pFoundCmd->cmdFunc(pFoundCmd, v5);
     return 1;
 }

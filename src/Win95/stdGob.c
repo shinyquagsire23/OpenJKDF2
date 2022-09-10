@@ -44,7 +44,6 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     int v8; // edx
     stdGobFile *v9; // eax
     stdGobEntry *ent; // edi
-    const char *ent_fname; // ebp
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
 
@@ -110,18 +109,19 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     gob->entries = (stdGobEntry *)std_pHS->alloc(sizeof(stdGobEntry) * gob->numFiles);
     if ( !gob->entries )
       return 0;
+    
+    // Added
+    _memset(gob->entries, 0, sizeof(stdGobEntry) * gob->numFiles);
 
     ent = gob->entries;
     gob->entriesHashtable = stdHashTable_New(1024);
     if ( gob->numFiles > 0u )
     {
-        ent_fname = ent->fname;
         do
         {
             pGobHS->fileRead(gob->fhand, ent, sizeof(stdGobEntry));
-            stdHashTable_SetKeyVal(gob->entriesHashtable, ent_fname, ent);
+            stdHashTable_SetKeyVal(gob->entriesHashtable, ent->fname, ent);
             ++ent;
-            ent_fname += sizeof(stdGobEntry);
             ++v4;
         }
         while ( v4 < gob->numFiles );

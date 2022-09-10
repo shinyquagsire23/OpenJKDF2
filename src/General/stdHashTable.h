@@ -39,7 +39,7 @@ typedef struct stdHashTable
 {
     int numBuckets;
     stdHashKey* buckets;
-    int (*keyHashToIndex)(const char *data, int numBuckets);
+    uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
 } stdHashTable;
 
 int stdHashTable_HashStringToIdx(const char *data, int numBuckets);

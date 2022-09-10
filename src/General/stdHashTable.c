@@ -44,10 +44,12 @@ int hashmapBucketSizes[hashmapBucketSizes_MAX] =
     1999
 };
 
-int stdHashTable_HashStringToIdx(const char *data, int numBuckets)
+uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets)
 {
-    int hash;
+    uint32_t hash;
     uint8_t i;
+    
+    if (!data || !data[0]) return 0; // Added
 
     hash = 0;
     for ( i = *data; i; ++data )
@@ -55,7 +57,7 @@ int stdHashTable_HashStringToIdx(const char *data, int numBuckets)
         hash = (65599 * hash) + i;
         i = (uint8_t)data[1];
     }
-    return abs(hash % numBuckets);
+    return hash % numBuckets;
 }
 
 stdHashTable* stdHashTable_New(int maxEntries)
@@ -70,6 +72,9 @@ stdHashTable* stdHashTable_New(int maxEntries)
     hashtable = (stdHashTable *)std_pHS->alloc(sizeof(stdHashKey));
     if (!hashtable)
         return NULL;
+    
+    // Added: memset
+    _memset(hashtable, 0, sizeof(*hashtable));
 
     sizeIterIdx = 0;
     calcedPrime = maxEntries;
@@ -123,6 +128,9 @@ stdHashKey* stdHashTable_GetBucketTail(stdHashKey *a1)
 {
     stdHashKey *result; // eax
     stdHashKey *i; // ecx
+    
+    // Added: nullptr check
+    if (!a1) return NULL;
 
     result = a1;
     for ( i = a1->child; i; i = i->child )
@@ -133,6 +141,9 @@ stdHashKey* stdHashTable_GetBucketTail(stdHashKey *a1)
 void stdHashTable_FreeBuckets(stdHashKey *a1)
 {
     stdHashKey *iter;
+    
+    // Added: nullptr check
+    if (!a1) return;
 
     iter = a1->child;
     if ( iter )
@@ -157,6 +168,9 @@ void stdHashTable_Free(stdHashTable *table)
     int bucketIdx2;
     stdHashKey *iter;
     stdHashKey *iter_child;
+    
+    // Added: nullptr check
+    if (!table) return;
 
     bucketIdx = 0;
     if ( table->numBuckets > 0 )
@@ -182,7 +196,6 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     stdHashKey *new_child; // eax
     stdHashKey *v9; // ecx
     stdHashKey *v10; // esi
-    stdHashKey *j; // eax
 
     // ADDED
     if (!hashmap)
@@ -200,20 +213,14 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         if (!new_child)
             return 0;
 
-        new_child->parent = 0;
-        new_child->child = 0;
-        new_child->key = 0;
-        new_child->value = 0;
+        _memset(new_child, 0, sizeof(*new_child));
         new_child->key = key;
         new_child->value = value;
         stdHashKey_AddLink(v10, new_child);
     }
     else
     {
-        v9->parent = 0;
-        v9->child = 0;
-        v9->key = 0;
-        v9->value = 0;
+        _memset(v9, 0, sizeof(*v9));
         v9->key = key;
         v9->value = value;
     }

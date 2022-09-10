@@ -604,8 +604,8 @@ elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
      
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.so)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.so)
+        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
+        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
     endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)

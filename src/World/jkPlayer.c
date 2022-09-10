@@ -574,7 +574,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
     if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->rdthing.model3) {
         for (int i = 0; i < thing->rdthing.model3->numHierarchyNodes; i++)
         {
-            int l = strlen(thing->rdthing.model3->hierarchyNodes[i].name);
+            int l = _strlen(thing->rdthing.model3->hierarchyNodes[i].name);
             if (l < 5) continue;
 
             if (!__strcmpi(thing->rdthing.model3->hierarchyNodes[i].name + (l - 5), "lhand")) {
