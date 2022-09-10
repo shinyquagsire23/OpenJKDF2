@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Install build dependencies
-pip3 install cogapp
-
 mkdir -p build_linux64 && cd build_linux64
 
 if [ ! -f build_protoc/protoc ]; then
