@@ -18,10 +18,13 @@ modules:
       - type: dir
         path: .
 
+cleanup-commands:
+  - 'pip3 uninstall -y cogapp' # We only use this for building
+
 finish-args:
   - --device=all # needed for gamepads
   - --share=ipc  # needed for X11
-  - --share=network # needed for networking (App Store downloader)
-  - --socket=x11
+  - --share=network # needed for networking (Multiplayer/Valve GameNetworkingSockets)
+  - --socket=fallback-x11
   - --socket=pulseaudio
-  - --filesystem=home:rw
+  - --filesystem=host:rw # Assets, mods, and saves are located at ~/.local/share/openjkdf2. One-time asset installation prompts user for a disk (ie /run/media mounts) or an existing install (ie Steam, GOG).
