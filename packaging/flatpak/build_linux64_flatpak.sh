@@ -37,6 +37,7 @@ make -j10 &&
 cd .. &&
 mkdir -p $FLATPAK_DEST/share/applications/ &&
 mkdir -p $FLATPAK_DEST/bin &&
+mkdir -p $FLATPAK_DEST/share/metainfo &&
 cp build_linux64/openjkdf2-64 $FLATPAK_DEST/bin &&
 cp build_linux64/*.so $FLATPAK_DEST/lib &&
 cp build_linux64/libprotobuf.so.3.21.4.0 $FLATPAK_DEST/lib &&

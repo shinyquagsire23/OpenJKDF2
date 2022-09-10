@@ -17,7 +17,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/shinyquagsire23/OpenJKDF2
-        commit: 2976242156af29fd32304b8b9e4ecaad83c88fb1
+        commit: fac60322dd5346e2c926ee04501dd114617e6b2b
 
 cleanup-commands:
   - 'pip3 uninstall -y cogapp' # We only use this for building
