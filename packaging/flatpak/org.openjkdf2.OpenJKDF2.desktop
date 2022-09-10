@@ -2,5 +2,5 @@
 Name=OpenJKDF2
 Exec=openjkdf2-64
 Type=Application
-Icon=org.gnome.OpenJKDF2
+Icon=org.openjkdf2.OpenJKDF2
 Categories=Game
