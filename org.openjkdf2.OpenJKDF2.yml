@@ -2,10 +2,13 @@ app-id: org.openjkdf2.OpenJKDF2
 runtime: org.freedesktop.Platform
 runtime-version: '21.08'
 sdk: org.freedesktop.Sdk
+
 command: openjkdf2-64
+
 modules:
   - packaging/flatpak/glew/glew.json
   - packaging/flatpak/glu/glu-9.json
+  - packaging/flatpak/python3-cogapp.json
   
   - name: openjkdf2-64
     buildsystem: simple
