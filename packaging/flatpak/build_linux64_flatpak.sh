@@ -41,4 +41,5 @@ cp build_linux64/openjkdf2-64 $FLATPAK_DEST/bin &&
 cp build_linux64/*.so $FLATPAK_DEST/lib &&
 cp build_linux64/libprotobuf.so.3.21.4.0 $FLATPAK_DEST/lib &&
 cp packaging/flatpak/org.openjkdf2.OpenJKDF2.desktop $FLATPAK_DEST/share/applications/ &&
+cp packaging/flatpak/org.openjkdf2.OpenJKDF2.metainfo.xml $FLATPAK_DEST/share/metainfo/ &&
 bash packaging/flatpak/copy_icons.sh packaging/flatpak/icons
