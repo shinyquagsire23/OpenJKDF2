@@ -29,4 +29,3 @@ finish-args:
   - --socket=fallback-x11
   - --socket=pulseaudio
   - --filesystem=~/.local/share/openjkdf2:rw # Assets, mods, and saves are located here.
-  - --filesystem=host:ro # One-time asset installation prompts user for a disk (ie /run/media mounts) or an existing install (ie Steam, GOG).
