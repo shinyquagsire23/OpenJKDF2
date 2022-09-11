@@ -51,9 +51,10 @@ sudo apt install clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev l
 # TODO find equivalents: emscripten
 
 # Flatpak
-sudo apt install flatpak
+sudo apt install flatpak qemu-user-static
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install flathub org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
+flatpak install flathub org.freedesktop.Platform/aarch64/22.08 org.freedesktop.Sdk/aarch64/22.08
+flatpak install flathub org.freedesktop.Platform/x86_64/22.08 org.freedesktop.Sdk/x86_64/22.08
 ```
 
 Add the following to the end of ~/.bashrc:
