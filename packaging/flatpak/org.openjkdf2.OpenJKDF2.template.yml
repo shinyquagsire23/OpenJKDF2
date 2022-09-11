@@ -3,14 +3,14 @@ runtime: org.freedesktop.Platform
 runtime-version: '22.08'
 sdk: org.freedesktop.Sdk
 
-command: openjkdf2-64
+command: openjkdf2
 
 modules:
   - packaging/flatpak/glew/glew.json
   - packaging/flatpak/glu/glu-9.json
   - packaging/flatpak/python3-cogapp.json
   
-  - name: openjkdf2-64
+  - name: openjkdf2
     buildsystem: simple
     build-commands:
       - bash packaging/flatpak/build_linux_flatpak.sh
