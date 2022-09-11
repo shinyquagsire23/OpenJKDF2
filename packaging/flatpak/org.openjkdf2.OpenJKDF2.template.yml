@@ -1,6 +1,6 @@
 app-id: org.openjkdf2.OpenJKDF2
 runtime: org.freedesktop.Platform
-runtime-version: '21.08'
+runtime-version: '22.08'
 sdk: org.freedesktop.Sdk
 
 command: openjkdf2-64
@@ -13,7 +13,7 @@ modules:
   - name: openjkdf2-64
     buildsystem: simple
     build-commands:
-      - bash packaging/flatpak/build_linux64_flatpak.sh
+      - bash packaging/flatpak/build_linux_flatpak.sh
     sources:
       - type: git
         url: https://github.com/shinyquagsire23/OpenJKDF2
@@ -28,4 +28,4 @@ finish-args:
   - --share=network # needed for networking (Multiplayer/Valve GameNetworkingSockets)
   - --socket=fallback-x11
   - --socket=pulseaudio
-  - --filesystem=~/.local/share/openjkdf2:rw # Assets, mods, and saves are located here.
+  - --filesystem=xdg-data:rw # Assets, mods, and saves are located here.

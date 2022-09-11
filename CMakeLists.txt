@@ -96,7 +96,7 @@ if(PLAT_LINUX_32)
 
 elseif(PLAT_LINUX_64)
     message( STATUS "Targeting Linux 64-bit" )
-    set(BIN_NAME "openjkdf2-64")
+    set(BIN_NAME "openjkdf2")
 
     add_definitions(-DARCH_64BIT)
     add_definitions(-D_XOPEN_SOURCE=500)

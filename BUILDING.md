@@ -115,6 +115,7 @@ export CXX=clang++
 
 chmod +x build_linux64.sh
 ./build_linux64.sh
+LD_LIBRARY_PATH=build_linux64 ./build_linux64/openjkdf2
 ```
 </details>
 
