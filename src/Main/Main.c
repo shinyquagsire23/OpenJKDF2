@@ -261,20 +261,29 @@ void Main_UseLocalData()
     char fname[256];
 
 #if defined(MACOS) || defined(LINUX)
-    if ((homedir = getenv("HOME")) == NULL) {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
+    char* data_home;
+    if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+        if ((homedir = getenv("HOME")) == NULL) {
+            homedir = getpwuid(getuid())->pw_dir;
+        }
 
-    if (homedir) {
-        strcpy(fname, homedir);
-        strcat(fname, "/.local");
+        if (homedir) {
+            strcpy(fname, homedir);
+            strcat(fname, "/.local");
+            stdFileUtil_MkDir(fname);
+            strcat(fname, "/share");
+            stdFileUtil_MkDir(fname);
+            strcat(fname, "/openjkdf2");
+            stdFileUtil_MkDir(fname);
+            chdir(fname);   
+            printf("Using root directory: %s\n", fname);     
+        }
+    }
+    else {
+        stdFnames_MakePath(fname, 256, data_home, "openjkdf2");
         stdFileUtil_MkDir(fname);
-        strcat(fname, "/share");
-        stdFileUtil_MkDir(fname);
-        strcat(fname, "/openjkdf2");
-        stdFileUtil_MkDir(fname);
-        chdir(fname);   
-        printf("Using root directory: %s\n", fname);     
+        chdir(fname);
+        printf("Using XDG root directory: %s\n", fname);  
     }
 
 #elif defined(WIN32)
@@ -945,7 +954,6 @@ int Main_Startup(const char *cmdline)
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     stdStartup(&hs);
 
-    // TODO bring this to Windows (%appdata%) and Linux
 #if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
     const char *homedir;
     char fname[256];
@@ -958,19 +966,32 @@ int Main_Startup(const char *cmdline)
     SDL_free(base_path);
 #endif
 
-    if ((homedir = getenv("HOME")) == NULL) {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
+    
+    char* data_home;
+    if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+        if ((homedir = getenv("HOME")) == NULL) {
+            homedir = getpwuid(getuid())->pw_dir;
+        }
+        
+        if (homedir) {
+            snprintf(fname, 256, "%s/.local/share/openjkdf2/resource/jk_.cd", homedir);
 
-    if (homedir) {
-        strcpy(fname, homedir);
-        strcat(fname, "/.local/share/openjkdf2/resource/jk_.cd");
+            // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
+            if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
+                Main_UseLocalData();
+            }
+        }
+    }
+    else {
+        snprintf(fname, 256, "%s/openjkdf2/resource/jk_.cd", data_home);
 
         // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
         if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
             Main_UseLocalData();
         }
     }
+
+    
 #elif defined(WIN32)&& defined(SDL2_RENDER)
     const char *homedir;
     char fname[256];
