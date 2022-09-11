@@ -1,7 +1,7 @@
 #!/bin/zsh
 #rm -rf build_linux_arm64_flatpak
 #rm -rf build_linux_x86_64_flatpak
-rm -rf build_linux64
+rm -rf build_linux
 
 # There's no caching for dir type sources
 commit=$(git log -n 1 --pretty=format:"%H")

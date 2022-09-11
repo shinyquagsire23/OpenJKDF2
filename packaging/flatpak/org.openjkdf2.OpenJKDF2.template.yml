@@ -19,9 +19,6 @@ modules:
         url: https://github.com/shinyquagsire23/OpenJKDF2
         commit: REPLACE_COMMIT_HASH
 
-cleanup-commands:
-  - 'pip3 uninstall -y cogapp' # We only use this for building
-
 finish-args:
   - --device=all # needed for gamepads
   - --share=ipc  # needed for X11
