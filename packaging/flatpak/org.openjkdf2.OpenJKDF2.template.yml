@@ -5,6 +5,14 @@ sdk: org.freedesktop.Sdk
 
 command: openjkdf2
 
+finish-args:
+  - --device=all # needed for gamepads
+  - --share=ipc  # needed for X11
+  - --share=network # needed for networking (Multiplayer/Valve GameNetworkingSockets)
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --filesystem=xdg-data:rw # Assets, mods, and saves are located here.
+
 modules:
   - packaging/flatpak/glew/glew.json
   - packaging/flatpak/glu/glu-9.json
@@ -18,11 +26,3 @@ modules:
       - type: git
         url: https://github.com/shinyquagsire23/OpenJKDF2
         commit: REPLACE_COMMIT_HASH
-
-finish-args:
-  - --device=all # needed for gamepads
-  - --share=ipc  # needed for X11
-  - --share=network # needed for networking (Multiplayer/Valve GameNetworkingSockets)
-  - --socket=fallback-x11
-  - --socket=pulseaudio
-  - --filesystem=xdg-data:rw # Assets, mods, and saves are located here.
