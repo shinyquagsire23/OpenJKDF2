@@ -584,7 +584,7 @@ void jkGuiNet_sub_413E50(int idx)
     }
     else
     {
-        memset(&jkGuiMultiplayer_stru_556168, 0, 0x100u);
+        memset(&jkGuiMultiplayer_stru_556168.field_0, 0, 0x100u);
         memset(jkGuiMultiplayer_stru_556168.field_100, 0, 0x100u);
         memset(&jkGuiMultiplayer_stru_556168.field_200, 0, 0x100u);
         jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[9], &jkGuiMultiplayer_menu3, 0);

@@ -59,7 +59,7 @@
 #include "Engine/sith.h"
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
-
+#include "General/stdFnames.h"
 #include "General/util.h"
 #include "General/stdFileUtil.h"
 #include "General/stdJSON.h"
