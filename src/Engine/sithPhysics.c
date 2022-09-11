@@ -1062,13 +1062,13 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
 
         if ( (thing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            v131 = new_v131;
+            v131 = orig_v131; // TODO: figure out oscillations
             
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
         else
         {
-            v131 = new_v131;
+            v131 = orig_v131; // TODO: figure out oscillations
             
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
