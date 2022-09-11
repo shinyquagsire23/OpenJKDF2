@@ -3,6 +3,7 @@ base=$1
 
 mkdir -p "$FLATPAK_DEST/share/icons/hicolor/16x16/apps/"
 mkdir -p "$FLATPAK_DEST/share/icons/hicolor/32x32/apps/"
+mkdir -p "$FLATPAK_DEST/share/icons/hicolor/48x48/apps/"
 mkdir -p "$FLATPAK_DEST/share/icons/hicolor/64x64/apps/"
 mkdir -p "$FLATPAK_DEST/share/icons/hicolor/128x128/apps/"
 mkdir -p "$FLATPAK_DEST/share/icons/hicolor/256x256/apps/"
