@@ -40,4 +40,7 @@
     <content_attribute id="violence-bloodshed">mild</content_attribute>
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
+  <releases>
+    <release version="0.6.3" date="2022-09-10" />
+  </releases>
 </component>
