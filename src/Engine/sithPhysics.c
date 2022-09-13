@@ -171,8 +171,8 @@ void sithPhysics_ThingTick(sithThing *thing, float deltaSecs)
 #ifdef QOL_IMPROVEMENTS
     else if ( thing->type == SITH_THING_PLAYER && sithNet_isMulti)
     {
-        //sithPhysics_ThingPhysPlayer(thing, deltaSecs);
-        sithPhysics_ThingPhysGeneral(thing, deltaSecs);
+        sithPhysics_ThingPhysPlayer(thing, deltaSecs);
+        //sithPhysics_ThingPhysGeneral(thing, deltaSecs);
     }
 #else
     else if ( thing->type == SITH_THING_PLAYER )
