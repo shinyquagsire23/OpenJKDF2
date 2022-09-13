@@ -189,10 +189,10 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
     }
     if ( (particle->particleParams.typeFlags & SITHPARTICLE_FLAG_OUTWARD_EXPANDING) != 0 )
     {
-        if ( particle->particleParams.field_28 < 0.0099999998)
+        if ( particle->particleParams.field_28 < 0.01)
         {
-            v11 = 0.0099999998 / particle->particleParams.field_28;
-            particle->particleParams.field_28 = 0.0099999998;
+            v11 = 0.01 / particle->particleParams.field_28;
+            particle->particleParams.field_28 = 0.01;
             deltaMsa = v11;
         }
         else

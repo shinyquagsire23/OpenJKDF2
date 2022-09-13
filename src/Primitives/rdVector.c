@@ -5,6 +5,7 @@
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 
+const rdVector2 rdroid_zeroVector2 = {0.0, 0.0};
 const rdVector3 rdroid_zeroVector3 = {0.0,0.0,0.0};
 const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
 const rdVector3 rdroid_yVector3 = {0.0,1.0,0.0};
@@ -593,6 +594,11 @@ rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale)
 void rdVector_Zero3(rdVector3 *v)
 {
     rdVector_Copy3(v, &rdroid_zeroVector3);
+}
+
+void rdVector_Zero2(rdVector2 *v)
+{
+    rdVector_Copy3(v, &rdroid_zeroVector2);
 }
 
 int rdVector_IsZero3(rdVector3* v)

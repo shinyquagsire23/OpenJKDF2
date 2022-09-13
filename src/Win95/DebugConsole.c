@@ -28,7 +28,7 @@ int DebugConsole_Initialize(int maxCmds)
             v2 = sithSound_InitFromPath("set_vlo2.wav");
             DebugConsole_alertSound = v2;
             if ( v2 )
-                stdSound_BufferSetVolume(v2, 0.80000001);
+                stdSound_BufferSetVolume(v2, 0.8);
             result = 1;
             DebugConsole_bInitted = 1;
             return result;

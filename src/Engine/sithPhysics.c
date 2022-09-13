@@ -36,7 +36,7 @@ void sithPhysics_FindFloor(sithThing *thing, int a3)
 
     if (sector->flags & SITH_SECTOR_UNDERWATER && thing->type == SITH_THING_PLAYER)
     {
-        sithCollision_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.050000001, 0.0, 1);
+        sithCollision_SearchRadiusForThings(sector, thing, &thing->position, &rdroid_zVector3, 0.05, 0.0, 1);
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
@@ -78,7 +78,7 @@ LABEL_8:
             {
                 if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
                     v9 = thing->rdthing.model3->insertOffset.z;
-                thinga = thing->moveSize - -0.0049999999;
+                thinga = thing->moveSize - -0.005;
                 if ( v9 <= thinga )
                     v9 = thinga;
             }
@@ -89,7 +89,7 @@ LABEL_8:
         }
         else
         {
-            v8 = thing->moveSize - -0.0049999999;
+            v8 = thing->moveSize - -0.005;
         }
 
         if ( v8 > 0.0 )
@@ -120,7 +120,7 @@ LABEL_8:
                             
                             // Track thing that can move
                             if ( (v14 & 0x10) == 0
-                              || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.60000002) )
+                              || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
                                 sithThing_LandThing(thing, v11, i->face, i->sender->vertices, a3);
                                 sithCollision_SearchClose();
@@ -413,7 +413,7 @@ float sithPhysics_ThingGetInsertOffsetZ(sithThing *thing)
     {
         if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
             result = thing->rdthing.model3->insertOffset.z;
-        v2 = thing->moveSize - -0.0049999999;
+        v2 = thing->moveSize - -0.005;
         if ( result <= v2 )
             result = v2;
     }
@@ -470,7 +470,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     {
         if (!(thing->physicsParams.physflags & SITH_PF_FLY))
         {
-            rdVector_Scale3Acc(&thing->physicsParams.acceleration, 0.30000001);
+            rdVector_Scale3Acc(&thing->physicsParams.acceleration, 0.3);
         }
         rdVector_Scale3(&a1a, &thing->physicsParams.acceleration, deltaSeconds);
         rdMatrix_TransformVector34Acc(&a1a, &thing->lookOrientation);
@@ -546,7 +546,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
     if (!(player->physicsParams.physflags & SITH_PF_FLY))
     {
-        rdVector_Scale3Acc(&player->physicsParams.acceleration, 0.30000001);
+        rdVector_Scale3Acc(&player->physicsParams.acceleration, 0.3);
     }
 
     // I think all of this is specifically for multiplayer, so that player things
@@ -713,9 +713,9 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     }
     if ( (thing->physicsParams.physflags & SITH_PF_USESTHRUST) != 0 )
     {
-        v30 = thing->physicsParams.acceleration.y * 0.60000002;
-        v31 = thing->physicsParams.acceleration.z * 0.60000002;
-        v32 = thing->physicsParams.acceleration.x * 0.60000002;
+        v30 = thing->physicsParams.acceleration.y * 0.6;
+        v31 = thing->physicsParams.acceleration.z * 0.6;
+        v32 = thing->physicsParams.acceleration.x * 0.6;
         thing->physicsParams.acceleration.x = v32;
         v63 = v31;
         thing->physicsParams.acceleration.y = v30;
@@ -763,7 +763,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     }
     if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 && thing->physicsParams.acceleration.z >= 0.0 )
     {
-        v51 = thing->field_48 - 0.0099999998;
+        v51 = thing->field_48 - 0.01;
         deltaSecondsa = deltaSeconds * 0.2;
         if ( thing->physicsParams.velocityMaybe.z > 0.0 && thing->physicsParams.velocityMaybe.z < (double)deltaSecondsa ) // verify first
             thing->physicsParams.velocityMaybe.z = 0.0;
@@ -813,7 +813,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             if ( (thing->attachedSurface->surfaceFlags & SITH_SURFACE_2000) != 0 )
                 possibly_undef_2 = 0.1;
             else
-                possibly_undef_2 = 0.30000001;
+                possibly_undef_2 = 0.3;
         }
         else
         {
@@ -896,7 +896,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         {
             if ( rdVector_IsZero3(&thing->physicsParams.acceleration)
               && !(thing->sector->flags & SITH_SECTOR_HASTHRUST)
-              && possibly_undef_2 > 0.80000001 )
+              && possibly_undef_2 > 0.8 )
             {
                 a2a = thing->physicsParams.surfaceDrag * possibly_undef_2;
                 v144 = thing->physicsParams.staticDrag * possibly_undef_2;
@@ -919,7 +919,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     {
         float v44 = possibly_undef_2 * deltaSeconds;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
-            v44 = deltaSeconds * 0.80000001;
+            v44 = deltaSeconds * 0.8;
         rdVector_Scale3(&vel_change, &thing->physicsParams.acceleration, v44);
         rdVector_ClipPrecision3(&vel_change);
         if ( !rdVector_IsZero3(&vel_change) )
@@ -969,7 +969,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             {
                 if (!(thing->physicsParams.physflags & SITH_PF_FLY))
                 {
-                    rdVector_Scale3Acc(&thing->physicsParams.acceleration, 0.30000001);
+                    rdVector_Scale3Acc(&thing->physicsParams.acceleration, 0.3);
                 }
                 rdVector_Scale3(&out, &thing->physicsParams.acceleration, deltaSeconds);
             }
@@ -1005,9 +1005,9 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     if ( thing->type == SITH_THING_PLAYER
       && (thing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0
       && v158 <= 1.0
-      && (possibly_undef_2 < 0.80000001 || !rdVector_IsZero3(&thing->physicsParams.vel)) )
+      && (possibly_undef_2 < 0.8 || !rdVector_IsZero3(&thing->physicsParams.vel)) )
     {
-        float v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.80000001);
+        float v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.8);
         thing->physicsParams.vel.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * v108;
     }
 
@@ -1032,7 +1032,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     float v131;
     if (thing->physicsParams.physflags & SITH_PF_CROUCHING)
     {
-        v131 = v158 * possibly_undef_1 - (thing->moveSize - -0.0099999998);
+        v131 = v158 * possibly_undef_1 - (thing->moveSize - -0.01);
     }
     else
     {
@@ -1041,7 +1041,7 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         {
             if ( thing->rdthing.type == RD_THINGTYPE_MODEL )
                 v132 = thing->rdthing.model3->insertOffset.z;
-            new_ya = thing->moveSize - -0.0049999999;
+            new_ya = thing->moveSize - -0.005;
             if ( v132 <= new_ya )
                 v132 = new_ya;
         }

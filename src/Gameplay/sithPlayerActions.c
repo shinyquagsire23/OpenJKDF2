@@ -32,15 +32,11 @@ void sithPlayerActions_Activate(sithThing *thing)
     {
         lastDoorOpenTime = sithTime_curMsAbsolute;
         _memcpy(&out, &thing->lookOrientation, sizeof(out));
-        thingPos.x = thing->position.x;
-        thingPos.y = thing->position.y;
-        thingPos.z = thing->position.z;
+        rdVector_Copy3(&thingPos, &thing->position);
         if ( thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )
         {
             rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
-            thingPos.x = thing->actorParams.eyeOffset.x + thingPos.x;
-            thingPos.y = thing->actorParams.eyeOffset.y + thingPos.y;;
-            thingPos.z = thing->actorParams.eyeOffset.z + thingPos.z;
+            rdVector_Add3Acc(&thingPos, &thing->actorParams.eyeOffset);
         }
         v4 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
         if ( v4 )
@@ -90,12 +86,10 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
     {
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
-            final_vel = final_vel * 0.69999999;
+            final_vel = final_vel * 0.7;
         if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
         {
-            thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
-            thing->physicsParams.vel.z = 1.0 * final_vel + thing->physicsParams.vel.z;
+            rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             thing->physicsParams.physflags &= ~SITH_PF_MIDAIR;
         }
         else
@@ -104,9 +98,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
                 return;
             isAttached = (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0;
             attachedSurface = thing->attachedSurface;
-            thing->physicsParams.vel.x = 0.0 * final_vel + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = 0.0 * final_vel + thing->physicsParams.vel.y;
-            thing->physicsParams.vel.z = 1.0 * final_vel + thing->physicsParams.vel.z;
+            rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             if ( isAttached )
             {
                 v14 = attachedSurface->surfaceFlags;
@@ -160,9 +152,7 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
         {
             _memcpy(&thing->lookOrientation, &jkPlayer_playerInfos[idx].field_135C, sizeof(thing->lookOrientation));
             thing->position = thing->lookOrientation.scale;
-            thing->lookOrientation.scale.x = rdroid_zeroVector3.x;
-            thing->lookOrientation.scale.y = 0.0;
-            thing->lookOrientation.scale.z = 0.0;
+            rdVector_Zero3(&thing->lookOrientation.scale);
             sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].field_138C, 0);
         }
         if ( thing->moveType == SITH_MT_PHYSICS )

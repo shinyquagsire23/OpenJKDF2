@@ -295,14 +295,9 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
     sithAnimclassEntry *v18; // eax
     int v19; // eax
     rdMatrix34 *v20; // eax
-    double v22; // st7
     rdMatrix34 *v23; // ecx
-    double v25; // st6
-    double v26; // st7
     float *v27; // eax
     int i; // edx
-    double v29; // st7
-    float *v30; // ecx
     float v31; // [esp+0h] [ebp-18h]
     rdVector3 a1a; // [esp+Ch] [ebp-Ch] BYREF
     float thinga; // [esp+1Ch] [ebp+4h]
@@ -335,39 +330,24 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
         }
         if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->moveType == SITH_MT_PATH )
         {
-            thing->lookOrientation.scale.x = 0.0;
-            thing->lookOrientation.scale.y = 0.0;
-            thing->lookOrientation.scale.z = 0.0;
+            rdVector_Zero3(&thing->lookOrientation.scale);
             thing->rdthing.field_18 = 0;
             rdPuppet_BuildJointMatrices(&thing->rdthing, &thing->lookOrientation);
             v20 = thing->rdthing.hierarchyNodeMatrices;
             thing->rdthing.field_18 = 1;
-            a1a.x = thing->trackParams.field_24.scale.x + v20->scale.x;
-            a1a.y = thing->trackParams.field_24.scale.y + v20->scale.y;
-            v22 = thing->trackParams.field_24.scale.z + v20->scale.z;
-            a1a.x = a1a.x - thing->position.x;
-            a1a.y = a1a.y - thing->position.y;
-            a1a.z = v22 - thing->position.z;
-            if ( a1a.x != 0.0 || a1a.y != 0.0 || a1a.z != 0.0 )
+            rdVector_Add3(&a1a, &thing->trackParams.field_24.scale, &v20->scale);
+            rdVector_Sub3Acc(&a1a, &thing->position);
+            if (!rdVector_IsZero3(&a1a))
             {
                 a2a = rdVector_Normalize3Acc(&a1a);
                 sithCollision_UpdateThingCollision(thing, &a1a, a2a, 0);
             }
             v23 = thing->rdthing.hierarchyNodeMatrices;
-            v25 = thing->position.y;
-            v26 = thing->position.z;
-            a1a.x = thing->position.x - v23->scale.x;
-            v27 = &v23->scale.y;
-            a1a.y = v25 - v23->scale.y;
-            a1a.z = v26 - v23->scale.z;
-            for ( i = thing->rdthing.model3->numHierarchyNodes; i; *v30 = a1a.z + *v30 )
+            rdVector_Sub3(&a1a, &thing->position, &v23->scale);
+            for ( i = thing->rdthing.model3->numHierarchyNodes; i != 0; i--)
             {
-                v29 = a1a.x + *(v27 - 1);
-                v30 = v27 + 1;
-                v27 += 12;
-                --i;
-                *(v27 - 13) = v29;
-                *(v27 - 12) = a1a.y + *(v27 - 12);
+                rdVector_Add3Acc(&v23->scale, &a1a);
+                v23++;
             }
         }
     }
@@ -398,7 +378,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
 
     v23 = 0.5;
     if ( !thing->sector
-      || thing->physicsParams.vel.x == 0.0 && thing->physicsParams.vel.y == 0.0 && thing->physicsParams.vel.z == 0.0 )
+      || rdVector_IsZero3(&thing->physicsParams.vel) )
     {
         v2 = 0.0;
         thinga = 0.0;
@@ -489,13 +469,13 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         }
         else
         {
-            thinga = thing->physicsParams.angVel.y * 0.00019999999;
+            thinga = thing->physicsParams.angVel.y * 0.0002;
             if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 3) != 0 )
                 return thinga;
-            if ( thinga >= -0.0099999998 )
+            if ( thinga >= -0.01 )
             {
                 anim = SITH_ANIM_TURNRIGHT;
-                if ( thinga <= 0.0099999998 )
+                if ( thinga <= 0.01 )
                     anim = SITH_ANIM_STAND;
             }
             else
@@ -808,9 +788,9 @@ void sithPuppet_FidgetAnim(sithThing *pThing)
     if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (double)(unsigned int)puppet->animStartedMs - -30000.0 < (double)sithTime_curMs )
     {
         v2 = _frand();
-        if ( v2 >= 0.30000001 )
+        if ( v2 >= 0.3 )
         {
-            if ( v2 < 0.60000002 )
+            if ( v2 < 0.6 )
             {
                 v8 = pThing->animclass;
                 if ( !v8

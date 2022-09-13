@@ -28,7 +28,7 @@ int sithCamera_Startup()
     sithCamera_NewEntry(&sithCamera_cameras[1], 0, 4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_cameras[1].vec3_3.x = 0.0;
     sithCamera_cameras[1].vec3_3.y = -0.2;
-    sithCamera_cameras[1].vec3_3.z = 0.059999999;
+    sithCamera_cameras[1].vec3_3.z = 0.06;
     sithCamera_NewEntry(&sithCamera_cameras[2], 0, 8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_cameras[4], 0, 32, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_cameras[5], 0, 64, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
@@ -55,27 +55,27 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
 
     sithCamera_cameras[0].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, canvas);
     sithCamera_cameras[1].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[1].rdCam, sithCamera_cameras[1].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, canvas);
     sithCamera_cameras[2].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[2].rdCam, sithCamera_cameras[2].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, canvas);
     sithCamera_cameras[4].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[4].rdCam, sithCamera_cameras[4].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, canvas);
     sithCamera_cameras[5].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[5].rdCam, sithCamera_cameras[5].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, canvas);
     sithCamera_cameras[6].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[6].rdCam, sithCamera_cameras[6].rdCam.fov, 0.0, 1.0/64.0, 64.0, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, canvas);
     sithCamera_FollowFocus(sithCamera_currentCamera);
     sithCamera_bOpen = 1;
@@ -135,7 +135,7 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     camera->aspectRatio = aspectRatio;
     camera->secondaryFocus = focus_near;
     rdCamera_NewEntry(&camera->rdCam, fov, 0.0, 1.0/64.0, 64.0, aspectRatio);
-    rdCamera_SetAttenuation(&camera->rdCam, 0.40000001, 0.80000001);
+    rdCamera_SetAttenuation(&camera->rdCam, 0.4, 0.8);
 
     if (canvas)
         rdCamera_SetCanvas(&camera->rdCam, canvas);
@@ -227,7 +227,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             break;
         case 32:
             rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_focusMat);
-            v2 = (rdVector3){0.0, 0.0, 0.050000001};
+            v2 = (rdVector3){0.0, 0.0, 0.05};
             rdVector_Sub3(&v2, &focusThing->position, &v2);
             rdVector_Add3Acc(&a1, &v2);
             rdMatrix_LookAt(&cam->viewMat, &a1, &v2, 0.0);

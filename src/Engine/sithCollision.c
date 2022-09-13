@@ -1236,7 +1236,7 @@ int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithC
     {
         if ( tmp > 0.25 )
         {
-            sithThing_Damage(thing2, thing, mass * 0.30000001 * tmp, SITH_DAMAGE_IMPACT);
+            sithThing_Damage(thing2, thing, mass * 0.3 * tmp, SITH_DAMAGE_IMPACT);
         }
         return 1;
     }

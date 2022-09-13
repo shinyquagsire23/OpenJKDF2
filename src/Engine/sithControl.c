@@ -1234,7 +1234,7 @@ void sithControl_PlayerMovement(sithThing *player)
             }
             v7 = player->actorParams.maxThrust + player->actorParams.extraSpeed;
             player->physicsParams.angVel.y = 0.0;
-            player->physicsParams.acceleration.x = v7 * v6 * 0.69999999;
+            player->physicsParams.acceleration.x = v7 * v6 * 0.7;
         }
         else
         {
@@ -1253,7 +1253,7 @@ void sithControl_PlayerMovement(sithThing *player)
 #endif
             player->physicsParams.acceleration.x = sithControl_GetAxis2(2)
                                                             * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
-                                                            * 0.69999999;
+                                                            * 0.7;
         }
         v11 = sithControl_GetAxis2(0);
         y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
@@ -1331,11 +1331,11 @@ void sithControl_FreeCam(sithThing *player)
             }
             v12 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
             v1->physicsParams.angVel.y = 0.0;
-            v7->x = v12 * v11 * 0.69999999;
+            v7->x = v12 * v11 * 0.7;
         }
         else
         {
-            v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.69999999;
+            v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
             v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
@@ -1484,10 +1484,10 @@ void sithControl_InputInit()
     sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
     v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v6 )
-        v6->binaryAxisVal = 0.40000001;
+        v6->binaryAxisVal = 0.4;
     v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
     if ( v7 )
-        v7->binaryAxisVal = 0.30000001;
+        v7->binaryAxisVal = 0.3;
     v8 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
     if ( v8 )
         v8->binaryAxisVal = 4.0;
@@ -1668,10 +1668,10 @@ LABEL_17:
 
     v10 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v10 )
-        v10->binaryAxisVal = 0.40000001;
+        v10->binaryAxisVal = 0.4;
     v11 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
     if ( v11 )
-        v11->binaryAxisVal = 0.30000001;
+        v11->binaryAxisVal = 0.3;
     v12 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
     if ( v12 )
         v12->binaryAxisVal = 4.0;

@@ -195,7 +195,7 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
         jkGuiTitle_loadPercent = (__int64)percentage;
         if ( jkGuiTitle_whichLoading == 1 )
         {
-            v1 = (percentage - 60.0) * 0.050000001 * 100.0;
+            v1 = (percentage - 60.0) * 0.05 * 100.0;
             if ( v1 <= 5.0 )
                 v1 = 5.0;
             jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = (__int64)v1;

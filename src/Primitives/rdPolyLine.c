@@ -76,14 +76,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVTipMaybe )
             return 0;
         v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVTipMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
+        extraUVTipMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.01;
         extraUVTipMaybe[0].y = 0.0;
         extraUVTipMaybe[1].x = 0.0;
         extraUVTipMaybe[1].y = 0.0;
         extraUVTipMaybe[2].x = 0.0;
-        extraUVTipMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
-        extraUVTipMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
-        extraUVTipMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
+        extraUVTipMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.01;
+        extraUVTipMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.01;
+        extraUVTipMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.01;
     }
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
@@ -116,14 +116,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVFaceMaybe )
             return 0;
         v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVFaceMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
+        extraUVFaceMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.01;
         extraUVFaceMaybe[0].y = 0.0;
         extraUVFaceMaybe[1].x = 0.0;
         extraUVFaceMaybe[1].y = 0.0;
         extraUVFaceMaybe[2].x = 0.0;
-        extraUVFaceMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
-        extraUVFaceMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.0099999998;
-        extraUVFaceMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.0099999998;
+        extraUVFaceMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.01;
+        extraUVFaceMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.01;
+        extraUVFaceMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.01;
     }
     return 1;
 }

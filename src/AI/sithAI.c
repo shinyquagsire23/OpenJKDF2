@@ -635,7 +635,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
        + actor->lookVector.z * actor->thing->lookOrientation.rvec.z;
     if ( v5 < 0.0 )
         v5 = -v5;
-    if ( v5 <= 0.0099999998 )
+    if ( v5 <= 0.01 )
     {
         v10 = &v2->lookOrientation.lvec;
         if ( v2->lookOrientation.lvec.y * actor->lookVector.y + v2->lookOrientation.lvec.x * v3->x + v2->lookOrientation.lvec.z * actor->lookVector.z >= 0.0 )
@@ -661,7 +661,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
     v10->x = v8;
     v2->lookOrientation.lvec.y = v7;
     v2->lookOrientation.lvec.z = v9;
-    if ( rdVector_Normalize3Acc(v20) < 0.0099999998 )
+    if ( rdVector_Normalize3Acc(v20) < 0.01 )
         rdVector_Normalize3(v10, v3);
     v12 = v2->lookOrientation.lvec.z;
     v13 = v10->x;
@@ -1584,9 +1584,9 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
             {
                 v5 = 0.0;
             }
-            else if ( v5 > 0.60000002 )
+            else if ( v5 > 0.6 )
             {
-                v5 = 0.60000002;
+                v5 = 0.6;
             }
             v8 = (1.0 - v5) * v8;
             if ( (v3->actorParams.typeflags & SITH_AF_2000000) == 0 )
@@ -1605,12 +1605,12 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
         }
     }
     if ( a2->actorParams.typeflags & SITH_AF_INVISIBLE && (v3->actorParams.typeflags & SITH_AF_8000) == 0 )
-        v8 = v8 * 0.050000001;
+        v8 = v8 * 0.05;
     if ( (v3->actorParams.typeflags & SITH_AF_BLIND) != 0 )
-        v8 = v8 * 0.050000001;
-    if ( v8 < 0.050000001 )
+        v8 = v8 * 0.05;
+    if ( v8 < 0.05 )
     {
-        v8 = 0.050000001;
+        v8 = 0.05;
     }
     else if ( v8 > 1.0 )
     {

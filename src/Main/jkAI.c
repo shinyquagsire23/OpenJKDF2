@@ -219,7 +219,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                         {
                             v15 = actor->thing;
                             instinct->param0 = (float)aiclassa;
-                            jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.30000001, 0.0);
+                            jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.3, 0.0);
                             sithAI_SetMoveThing(actor, &actor->field_1D4, 4.0);
                             v16 = aiclass->argsAsInt[4] + sithTime_curMs;
                             instinct->nextUpdate = v16;

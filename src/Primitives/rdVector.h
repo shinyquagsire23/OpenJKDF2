@@ -59,6 +59,7 @@
 #define rdVector_Rotate3Acc_ADDR (0x0044A09E)
 #define rdVector_ExtractAngle_ADDR (0x0044A0CE)
 
+extern const rdVector2 rdroid_zeroVector2;
 extern const rdVector3 rdroid_zeroVector3;
 extern const rdVector3 rdroid_xVector3;
 extern const rdVector3 rdroid_yVector3;
@@ -124,6 +125,7 @@ void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out);
 float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2);
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale);
 void rdVector_Zero3(rdVector3 *v);
+void rdVector_Zero2(rdVector2 *v);
 int rdVector_IsZero3(rdVector3* v);
 float rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm);
 void rdVector_AbsRound3(rdVector3* v);

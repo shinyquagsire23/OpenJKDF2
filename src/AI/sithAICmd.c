@@ -144,9 +144,9 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
             {
                 rdVector_Rotate3(&a1, &actor->thing->lookOrientation.lvec, &a4a);
             }
-            a2.x = a1.x * 0.69999999 + actor->thing->position.x;
-            a2.y = a1.y * 0.69999999 + actor->thing->position.y;
-            a2.z = a1.z * 0.69999999 + actor->thing->position.z;
+            a2.x = a1.x * 0.7 + actor->thing->position.x;
+            a2.y = a1.y * 0.7 + actor->thing->position.y;
+            a2.z = a1.z * 0.7 + actor->thing->position.z;
             sithAI_SetLookFrame(actor, &a2);
             sithAI_SetMoveThing(actor, &a2, 2.0);
             return 0;
@@ -476,7 +476,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             if ( instinct->param0 == 0.0 )
             {
                 instinct->param0 = aiclass->argsAsFloat[8];
-                instinct->nextUpdate = sithTime_curMs + (int64_t)((_frand() * 0.40000001 - 0.2 - -1.0) * aiclass->argsAsFloat[0]);
+                instinct->nextUpdate = sithTime_curMs + (int64_t)((_frand() * 0.4 - 0.2 - -1.0) * aiclass->argsAsFloat[0]);
             }
             else
             {

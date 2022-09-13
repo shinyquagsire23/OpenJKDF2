@@ -23,8 +23,8 @@ void sithUnk4_SetMaxHeathForDifficulty(sithThing *thing)
     }
     else
     {
-        thing->actorParams.maxHealth = thing->actorParams.maxHealth * 0.80000001;
-        thing->actorParams.health = thing->actorParams.health * 0.80000001;
+        thing->actorParams.maxHealth = thing->actorParams.maxHealth * 0.8;
+        thing->actorParams.health = thing->actorParams.health * 0.8;
     }
 }
 
@@ -93,13 +93,13 @@ void sithUnk4_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
                 else
                     v13 = primaryWeapJointIdx <= v10;
                 if ( v13 )
-                    v4[primaryWeapJointIdx].x = eyePYR->x * 0.30000001;
+                    v4[primaryWeapJointIdx].x = eyePYR->x * 0.3;
                 if ( v9 < 0 )
                     v14 = 0;
                 else
                     v14 = v9 <= v10;
                 if ( v14 )
-                    v4[v9].x = eyePYR->x * 0.30000001;
+                    v4[v9].x = eyePYR->x * 0.3;
             }
         }
     }

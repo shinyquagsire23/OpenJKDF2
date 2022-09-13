@@ -522,7 +522,7 @@ jkEpisode_mLoad 0x00552B68 jkEpisodeLoad
 jkHud_targetRed 0x00525960 uint32_t = 1
 jkHud_targetBlue 0x00525964 uint32_t = 2
 jkHud_targetGreen 0x00525968 uint32_t = 3
-jkHud_aFltIdk 0x00525970 float[6] = {0.2, 0.40000001, 0.80000001, 1.0, 2.0, 0.0}
+jkHud_aFltIdk 0x00525970 float[6] = {0.2, 0.4, 0.8, 1.0, 2.0, 0.0}
 jkHud_aColors8bpp 0x00525988 int[6] = {1,2,3,4,5,0}
 //jkHud_aFonts 0x005259A0 
 //jkHud_aBitmaps 0x005259E8 

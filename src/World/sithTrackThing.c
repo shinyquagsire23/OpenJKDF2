@@ -56,7 +56,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
         thinga = thing->trackParams.field_1C;
         if ( thing->trackParams.field_1C == 0.0 )
         {
-            thing->trackParams.field_C &= 0xE8;
+            thing->trackParams.field_C &= ~0x17;
             thing->trackParams.field_20 = 0.0;
             thing->goalframe = 0;
             thing->field_258 = 0;
@@ -107,24 +107,11 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
     int v3; // eax
     double v4; // st7
     double v5; // st7
-    double v6; // st7
-    double v7; // st6
-    double v8; // st7
-    double v9; // st6
-    double v10; // rt1
-    double v11; // st6
-    double v12; // st7
-    double v16; // st7
     double v18; // st7
-    double v19; // st6
-    double v20; // st7
     double v22; // st7
-    double v24; // st6
     double v26; // st7
-    double v28; // st7
     double v30; // st7
     double v31; // st7
-    double v33; // st6
     int v37; // eax
     int v38; // ecx
     sithThing *v39; // [esp-14h] [ebp-64h]
@@ -156,31 +143,16 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         a3 = 1.0;
                         v41 = 1.0 - thing->field_24C;
                     }
-                    v6 = thing->trackParams.field_64.y * a3;
-                    v7 = thing->trackParams.field_64.z * a3;
-                    rot.x = thing->trackParams.field_64.x * a3;
-                    rot.y = v6;
-                    rot.z = v7;
+                    rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
                     _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
                     rdMatrix_PostRotate34(&a, &rot);
                     if ( (thing->trackParams.field_C & 0x10) != 0 )
                     {
-                        v8 = thing->trackParams.field_58.y + a.scale.y;
-                        v9 = thing->trackParams.field_58.z + a.scale.z;
-                        a1a.x = thing->trackParams.field_58.x + a.scale.x - thing->position.x;
-                        v10 = v9;
-                        v11 = v8 - thing->position.y;
-                        v12 = v10 - thing->position.z;
-                        a1a.y = v11;
-                        a1a.z = v12;
-                        if ( a1a.x != 0.0 || a1a.y != 0.0 || a1a.z != 0.0 )
+                        rdVector_Add3(&a1a, &thing->trackParams.field_58, &a.scale);
+                        rdVector_Sub3Acc(&a1a, &thing->position);
+                        if (!rdVector_IsZero3(&a1a))
                         {
-                            a6 = rdVector_Normalize3Acc(&a1a);
-                            v16 = a6;
-                            if ( v16 < 0.0 )
-                                v16 = -v16;
-                            if ( v16 <= 0.0000099999997 )
-                                a6 = 0.0;
+                            a6 = stdMath_ClipPrecision(rdVector_Normalize3Acc(&a1a));
                             if ( a6 != 0.0 )
                             {
                                 v18 = sithCollision_UpdateThingCollision(thing, &a1a, a6, 0x44);
@@ -188,29 +160,21 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 {
                                     _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
                                     a3 = v18 / a6 * v41 + thing->field_24C;
-                                    v19 = thing->trackParams.field_64.y * a3;
-                                    v20 = thing->trackParams.field_64.z * a3;
-                                    rot.x = thing->trackParams.field_64.x * a3;
-                                    rot.y = v19;
-                                    rot.z = v20;
+                                    rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
                                     rdMatrix_PreRotate34(&a, &rot);
                                 }
                             }
                         }
                     }
                     thing->field_24C = a3;
-                    thing->lookOrientation.scale.x = 0.0;
-                    thing->lookOrientation.scale.y = 0.0;
-                    thing->lookOrientation.scale.z = 0.0;
+                    rdVector_Zero3(&thing->lookOrientation.scale);
                     sithCollision_sub_4E77A0(thing, &a);
                     if ( thing->field_24C >= 1.0 )
                     {
                         if ( (thing->trackParams.field_C & 0x10) == 0 )
                         {
                             rdMatrix_BuildRotate34(&a, &thing->trackParams.orientation);
-                            thing->lookOrientation.scale.x = 0.0;
-                            thing->lookOrientation.scale.y = 0.0;
-                            thing->lookOrientation.scale.z = 0.0;
+                            rdVector_Zero3(&thing->lookOrientation.scale);
                             sithCollision_sub_4E77A0(thing, &a);
                         }
                         thing->trackParams.field_C &= ~0x12;
@@ -223,12 +187,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                     else
                         v22 = deltaSeconds;
                     v42 = v22;
-                    deltaSecondsa = thing->trackParams.field_20 * v22;
-                    v24 = deltaSecondsa;
-                    if ( v24 < 0.0 )
-                        v24 = -v24;
-                    if ( v24 <= 0.0000099999997 )
-                        deltaSecondsa = 0.0;
+                    deltaSecondsa = stdMath_ClipPrecision(thing->trackParams.field_20 * v22);
                     if ( deltaSecondsa != 0.0 )
                     {
                         v26 = sithCollision_UpdateThingCollision(thing, &thing->trackParams.vel, deltaSecondsa, 68);
@@ -239,13 +198,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         }
                         else
                         {
-                            v28 = a3a;
-                            if ( v28 < 0.0 )
-                                v28 = -v28;
-                            if ( v28 <= 0.0000099999997 )
-                                v30 = 0.0;
-                            else
-                                v30 = a3a;
+                            v30 = stdMath_ClipPrecision(a3a);
                             if ( v30 <= 0.0 )
                             {
                                 v22 = 0.0;
@@ -260,11 +213,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                     }
                     v31 = thing->trackParams.field_1C - v22;
                     thing->trackParams.field_1C = v31;
-                    v33 = v31;
-                    if ( v33 < 0.0 )
-                        v33 = -v31;
-                    if ( v33 <= 0.0000099999997 )
-                        v31 = 0.0;
+                    v31 = stdMath_ClipPrecision(v31);
                     if ( v31 == 0.0 )
                     {
                         thing->trackParams.field_C &= ~1;

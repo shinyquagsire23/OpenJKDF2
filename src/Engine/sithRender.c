@@ -1077,7 +1077,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
             }
         }
     }
-    if ( prev < 0.80000001 )
+    if ( prev < 0.8 )
     {
         if ( sithRender_numSectors2 < 0xA0 )
         {
@@ -1090,7 +1090,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
         if ( (j->flags & 1) != 0 && j->sector->field_8C != sithRender_lastRenderTick )
         {
             float nextDist = j->mirror->dist + j->dist + dist + prev;
-            if ( nextDist < 0.80000001 || nextDist < 2.0 )
+            if ( nextDist < 0.8 || nextDist < 2.0 )
             {
                 j->sector->clipFrustum = sector->clipFrustum;
                 sithRender_UpdateLights(j->sector, nextDist, 0.0);

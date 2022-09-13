@@ -536,14 +536,14 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_texFmt.format.bpp = 16;
     jkGuiBuildMulti_pVBuf2 = stdDisplay_VBufferNew(&jkGuiBuildMulti_texFmt, 0, 0, 0);
     jkGuiBuildMulti_pCanvas = rdCanvas_New(3, jkGuiBuildMulti_pVBuf1, jkGuiBuildMulti_pVBuf2, 0, 0, 259, 259, 6);
-    jkGuiBuildMulti_pCamera = rdCamera_New(60.0, 0.0, 0.079999998, 15.0, 1.0);
+    jkGuiBuildMulti_pCamera = rdCamera_New(60.0, 0.0, 0.08, 15.0, 1.0);
     rdCamera_SetCanvas(jkGuiBuildMulti_pCamera, jkGuiBuildMulti_pCanvas);
     jkGuiBuildMulti_pThingCamera = rdThing_New(0);
     rdThing_SetCamera(jkGuiBuildMulti_pThingCamera, jkGuiBuildMulti_pCamera);
     rdCamera_SetCurrent(jkGuiBuildMulti_pCamera);
     jkGuiBuildMulti_projectRot.x = 0.0;
     jkGuiBuildMulti_projectRot.y = 0.2;
-    jkGuiBuildMulti_projectRot.z = -0.039999999;
+    jkGuiBuildMulti_projectRot.z = -0.04;
     jkGuiBuildMulti_projectPos.x = 0.0;
     jkGuiBuildMulti_projectPos.y = 180.0;
     jkGuiBuildMulti_projectPos.z = 0.0;
@@ -557,7 +557,7 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_lightPos.z = 0.0;
     jkGuiBuildMulti_light.intensity = 4.0;
     rdCamera_AddLight(jkGuiBuildMulti_pCamera, &jkGuiBuildMulti_light, &jkGuiBuildMulti_lightPos);
-    rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, 0.40000001);
+    rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, 0.4);
     jkGuiBuildMulti_fnMatLoader = rdMaterial_RegisterLoader(jkGuiBuildMulti_MatLoader);
     jkGuiBuildMulti_fnModelLoader = rdModel3_RegisterLoader(jkGuiBuildMulti_ModelLoader);
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);

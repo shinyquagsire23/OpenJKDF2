@@ -704,11 +704,8 @@ int sithSurface_StopAnim(rdSurface *surface)
     {
         v2 = surface->sithSurfaceParent;
         v2->surfaceFlags &= ~SITH_SURFACE_SCROLLING;
-        surface->field_24.x = 0.0;
-        surface->field_24.y = 0.0;
-        surface->field_24.z = 0.0;
-        surface->field_1C.x = 0.0;
-        surface->field_1C.y = 0.0;
+        rdVector_Zero3(&surface->field_24);
+        rdVector_Zero2(&surface->field_1C);
     }
     surface->flags = 0;
     v4 = sithSurface_numAvail;
@@ -1034,32 +1031,24 @@ void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out)
     }
     else
     {
-        out->x = 0.0;
-        out->y = 0.0;
-        out->z = 0.0;
+        rdVector_Zero3(out);
     }
 }
 
 int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
 {
-    float v6; // [esp+0h] [ebp-2Ch]
     rdVector3 a1a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 a2a; // [esp+20h] [ebp-Ch] BYREF
 
-    a1a.x = 0.0;
-    a1a.y = 0.0;
-    a1a.z = 0.0;
+    rdVector_Zero3(&a1a);
     for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i )
         rdVector_Add3Acc(&a1a, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
 
-    v6 = (float)(unsigned int)surface->surfaceInfo.face.numVertices;
-    rdVector_InvScale3(out, &a1a, v6);
+    rdVector_InvScale3(out, &a1a, (float)(unsigned int)surface->surfaceInfo.face.numVertices);
 
     if ( !sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector) )
     {
-        a2a.x = surface->surfaceInfo.face.normal.x * 0.00019999999;
-        a2a.y = surface->surfaceInfo.face.normal.y * 0.00019999999;
-        a2a.z = surface->surfaceInfo.face.normal.z * 0.00019999999;
+        rdVector_Scale3(&a2a, &surface->surfaceInfo.face.normal, 0.0002);
         rdVector_Add3Acc(out, &a2a);
     }
     return sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector);

@@ -2121,13 +2121,13 @@ float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     sender->actorParams.health -= amount;
     if ( sender == g_localPlayerThing )
     {
-        fR = amount * 0.039999999;
+        fR = amount * 0.04;
         sithPlayer_AddDynamicTint(fR, 0.0, 0.0);
     }
     if ( sender->actorParams.health >= 1.0 )
     {
 LABEL_32:
-        if ( sender->animclass && sender != receiver_ && amount * 0.050000001 > _frand() )
+        if ( sender->animclass && sender != receiver_ && amount * 0.05 > _frand() )
             sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
         sithThing_HurtSound(sender, amount, flags);
         return amount;
@@ -2147,7 +2147,7 @@ void sithThing_HurtSound(sithThing *thing, float amount, int hurtType)
     {
         v3 = amount / thing->actorParams.health * 1.5;
         v4 = v3;
-        if ( v3 >= 0.0099999998 )
+        if ( v3 >= 0.01 )
         {
             if ( v4 < 0.0 )
             {
@@ -2241,7 +2241,7 @@ void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 else
                 {
                     if ( (v7 & SITH_AF_BREATH_UNDER_WATER) != 0 )
-                        thing->physicsParams.buoyancy = 0.30000001;
+                        thing->physicsParams.buoyancy = 0.3;
                     if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
                         thing->thingflags |= SITH_TF_DEAD;

@@ -117,7 +117,7 @@ void jkGuiMap_sub_415720(jkGuiMenu *menu)
                             rdMatrix_PostTranslate34(&jkGuiMap_viewMat, &a2);
                         }
                     }
-                    else if ( -jkGuiMap_viewMat.scale.y > 0.30000001 )
+                    else if ( -jkGuiMap_viewMat.scale.y > 0.3 )
                     {
                         a2.x = 0.0;
                         a2.y = 0.1;
@@ -242,7 +242,7 @@ int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int
 
     a2a.x = 0.0;
     a2a.y = -2.0;
-    a2a.z = 0.30000001;
+    a2a.z = 0.3;
     rdMatrix_BuildTranslate34(&jkGuiMap_viewMat, &a2a);
     a2a.x = -sithWorld_pCurrentWorld->playerThing->position.x;
     a2a.y = -sithWorld_pCurrentWorld->playerThing->position.y;
@@ -290,7 +290,7 @@ int jkGuiMap_Show()
         sithMap_Initialize(&jkGuiMap_unk4);
         a2.x = 0.0;
         a2.y = -2.0;
-        a2.z = 0.30000001;
+        a2.z = 0.3;
         rdMatrix_BuildTranslate34(&jkGuiMap_viewMat, &a2);
         a2.x = -sithWorld_pCurrentWorld->playerThing->position.x;
         a2.y = -sithWorld_pCurrentWorld->playerThing->position.y;

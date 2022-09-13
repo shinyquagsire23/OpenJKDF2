@@ -501,7 +501,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
         }
         if ( pThing == g_localPlayerThing || pThing->moveType == SITH_MT_PATH )
         {
-            sithAIAwareness_AddEntry(pThing->sector, &pThing->position, 0, a5 * 0.60000002, pThing);
+            sithAIAwareness_AddEntry(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
         }
 
         v11 = sithSoundMixer_PlayingSoundFromSound(sound, flags);
@@ -1115,7 +1115,7 @@ void sithSoundMixer_UpdateSoundPos(sithPlayingSound *sound)
             if ( a1a >= 0.0 )
                 v2 = v16;
             else
-                v2 = (1.0 - -a1a * 0.30000001) * v16;
+                v2 = (1.0 - -a1a * 0.3) * v16;
         }
         v6 = sound->distance - sound->anonymous_5;
         if ( v6 > 0.0 )

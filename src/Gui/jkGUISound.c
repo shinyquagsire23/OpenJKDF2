@@ -98,8 +98,8 @@ int jkGuiSound_Show()
     v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiSound_menu);
     if ( v1 != -1 )
     {
-        jkGuiSound_musicVolume = (double)jkGuiSound_elements[10].selectedTextEntry * 0.0099999998;
-        jkGuiSound_sfxVolume = (double)jkGuiSound_elements[14].selectedTextEntry * 0.0099999998;
+        jkGuiSound_musicVolume = (double)jkGuiSound_elements[10].selectedTextEntry * 0.01;
+        jkGuiSound_sfxVolume = (double)jkGuiSound_elements[14].selectedTextEntry * 0.01;
         jkGuiSound_numChannels = jkGuiSound_elements[18].selectedTextEntry + 8;
 #ifdef SDL2_RENDER
         jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;

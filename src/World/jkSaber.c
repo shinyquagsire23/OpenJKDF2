@@ -103,7 +103,7 @@ void jkSaber_PolylineRand(rdThing *thing)
     {
         if ( !(bShowInvisibleThings & 0xF) )
             line->edgeFace.clipIdk.y = 0.0;
-        line->edgeFace.clipIdk.y = (_frand() - 0.80000001) * 80.0 + line->edgeFace.clipIdk.y;
+        line->edgeFace.clipIdk.y = (_frand() - 0.8) * 80.0 + line->edgeFace.clipIdk.y;
     }
 }
 

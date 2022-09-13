@@ -186,7 +186,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
     sithSector *v15; // eax
     float v20; // [esp+0h] [ebp-4h]
 
-    v20 = a2 * 0.40000001;
+    v20 = a2 * 0.4;
     v2 = (__int64)(a2 * 256.0 - -0.5);
     if ( playerInfo == g_selfPlayerInfo )
     {
@@ -295,7 +295,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
         }
         if ( (v3->actorParams.typeflags & SITH_AF_PLAYER_KILLED) != 0 )
         {
-            v4->fade -= a2 * 0.69999999;
+            v4->fade -= a2 * 0.7;
             if (v4->fade <= 0.0)
                 sithPlayer_HandleSentDeathPkt(v3);
         }

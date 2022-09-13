@@ -3,6 +3,7 @@
 #include "Engine/sithControl.h"
 #include "Win95/Window.h"
 #include "stdPlatform.h"
+#include "General/stdMath.h"
 
 #include "jk.h"
 
@@ -310,7 +311,6 @@ float stdControl_ReadAxis(int axisNum)
     int v3; // edx
     int v4; // eax
     int v5; // edx
-    double v7; // st6
     int v9; // [esp+8h] [ebp+4h]
 
     if ( !stdControl_bControlsActive )
@@ -340,12 +340,7 @@ float stdControl_ReadAxis(int axisNum)
                 return 0.0;
         }
     }
-    result = stdControl_aJoysticks[v2].fRangeConversion * (double)v9;
-    v7 = result;
-    if ( v7 < 0.0 )
-        v7 = -result;
-    if ( v7 <= 0.0000099999997 )
-        result = 0.0;
+    result = stdMath_ClipPrecision(stdControl_aJoysticks[v2].fRangeConversion * (double)v9);
     if ( stdControl_bControlsIdle )
     {
         if ( result != 0.0 )
