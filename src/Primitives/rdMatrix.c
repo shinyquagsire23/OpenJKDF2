@@ -42,9 +42,8 @@ void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *po
 
 void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt)
 {
-    out->lvec.x = lookAt->x;
-    out->lvec.y = lookAt->y;
-    out->lvec.z = lookAt->z;
+    rdVector_Copy3(&out->lvec, lookAt);
+
     out->rvec.x = (out->lvec.y * 1.0) - (out->lvec.z * 0.0);
     out->rvec.y = (out->lvec.z * 0.0) - (out->lvec.x * 1.0);
     out->rvec.z = (out->lvec.x * 0.0) - (out->lvec.y * 0.0);
@@ -868,7 +867,6 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     float v4; // ST08_4
     double v5; // st6
     double v6; // st7
-    float v7; // ST0C_4
 
     v2 = a2->vC.x * a1->z + a2->vD.x * a1->w + a2->vB.x * a1->y + a2->vA.x * a1->x;
     v3 = a2->vC.y * a1->z + a2->vD.y * a1->w + a2->vB.y * a1->y + a2->vA.y * a1->x;
@@ -877,9 +875,8 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     v6 = a2->vC.w * a1->z + a2->vD.w * a1->w + a2->vB.w * a1->y;
     a1->x = v2;
     a1->y = v3;
-    v7 = v6 + v5;
     a1->z = v4;
-    a1->w = v7;
+    a1->w = v6 + v5;
 }
 
 void rdMatrix_TransformPoint34(rdVector3 *vOut, const rdVector3 *vIn, const rdMatrix34 *camera)
@@ -899,10 +896,10 @@ void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2)
 
 void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatrix44 *a3)
 {
-    a1->x = a3->vB.x * a2->y + a3->vC.x * a2->z + a3->vA.x * a2->x + a3->vD.x;
+    a1->x = (a3->vB.x * a2->y) + (a3->vC.x * a2->z) + (a3->vA.x * a2->x) + a3->vD.x;
     a1->y = (a3->vB.y * a2->y) + (a3->vC.y * a2->z) + (a3->vA.y * a2->x) + a3->vD.y;
-    a1->z = (a3->vB.z * a2->y + a3->vC.z * a2->z) + a3->vA.z * a2->x + a3->vD.z;
-    a1->w = a3->vB.w * a2->y + a3->vC.w * a2->z + a3->vA.w * a2->x + a3->vD.z;
+    a1->z = (a3->vB.z * a2->y) + (a3->vC.z * a2->z) + (a3->vA.z * a2->x) + a3->vD.z;
+    a1->w = (a3->vB.w * a2->y) + (a3->vC.w * a2->z) + (a3->vA.w * a2->x) + a3->vD.z;
 }
 
 void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
