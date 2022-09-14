@@ -268,7 +268,13 @@ void Main_UseLocalData()
         chdir(fname);
         printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);  
     }
-    else if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+    else if ((data_home = getenv("XDG_DATA_HOME")) != NULL) {
+        stdFnames_MakePath(fname, 256, data_home, "openjkdf2");
+        stdFileUtil_MkDir(fname);
+        chdir(fname);
+        printf("Using XDG root directory: %s\n", fname); 
+    }
+    else {
         if ((homedir = getenv("HOME")) == NULL) {
             homedir = getpwuid(getuid())->pw_dir;
         }
@@ -285,17 +291,15 @@ void Main_UseLocalData()
             printf("Using root directory: %s\n", fname);     
         }
     }
-    else {
-        stdFnames_MakePath(fname, 256, data_home, "openjkdf2");
-        stdFileUtil_MkDir(fname);
-        chdir(fname);
-        printf("Using XDG root directory: %s\n", fname);  
-    }
 
 #elif defined(WIN32)
-    homedir = getenv("AppData");
-
-    if (homedir) {
+    if ((homedir = getenv("OPENJKDF2_ROOT")) != NULL) {
+        strcpy(fname, homedir);
+        stdFileUtil_MkDir(fname);
+        chdir(fname);
+        printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+    }
+    else if ((homedir = getenv("AppData")) != NULL) {
         strcpy(fname, homedir);
         stdFileUtil_MkDir(fname);
         strcat(fname, "\\Local");
@@ -972,17 +976,30 @@ int Main_Startup(const char *cmdline)
     SDL_free(base_path);
 #endif
 
+    int found_override = 0;
     
     char* data_home;
     if ((data_home = getenv("OPENJKDF2_ROOT")) != NULL) {
         snprintf(fname, 256, "%s/resource/jk_.cd", data_home);
 
+        // Always override
+        Main_UseLocalData();
+        found_override = 1;
+    }
+    
+    if (!found_override && (data_home = getenv("XDG_DATA_HOME")) != NULL) {
+        snprintf(fname, 256, "%s/openjkdf2/resource/jk_.cd", data_home);
+
         // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
         if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
             Main_UseLocalData();
+            found_override = 1;
+        }
+        else {
+            printf("Running from current working directory.\n");
         }
     }
-    else if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+    else if (!found_override) {
         if ((homedir = getenv("HOME")) == NULL) {
             homedir = getpwuid(getuid())->pw_dir;
         }
@@ -993,30 +1010,40 @@ int Main_Startup(const char *cmdline)
             // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
             if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
                 Main_UseLocalData();
+                found_override = 1;
+            }
+            else {
+                printf("Running from current working directory.\n");
             }
         }
-    }
-    else {
-        snprintf(fname, 256, "%s/openjkdf2/resource/jk_.cd", data_home);
-
-        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
-        if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
-            Main_UseLocalData();
+        else {
+            printf("Running from current working directory.\n");
         }
     }
 
-    
-#elif defined(WIN32)&& defined(SDL2_RENDER)
+#elif defined(WIN32) && defined(SDL2_RENDER)
     const char *homedir;
     char fname[256];
-    homedir = getenv("AppData");
-    if (homedir) {
+    if ((homedir = getenv("OPENJKDF2_ROOT")) != NULL) {
+        strcpy(fname, homedir);
+        strcat(fname, "\\resource\\jk_.cd");
+
+        // This will be forced
+        Main_UseLocalData();
+    }
+    else if ((homedir = getenv("AppData")) != NULL) {
         strcpy(fname, homedir);
         strcat(fname, "\\Local\\openjkdf2\\resource\\jk_.cd");
 
         if (util_FileExists(fname) && !util_FileExists("resource\\jk_.cd")) {
             Main_UseLocalData();
         }
+        else {
+            printf("Running from current working directory.\n");
+        }
+    }
+    else {
+        printf("Running from current working directory.\n");
     }
 #endif // (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
 
