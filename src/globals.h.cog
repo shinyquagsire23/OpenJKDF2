@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "engine_config.h"
 #include "types.h"
 
 #include "Engine/rdLight.h"

@@ -271,6 +271,9 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
     if (keyNum < 0 || keyNum >= 256)
         return;
 
+    if (bDown)
+        stdControl_bControlsIdle = 0;
+
     stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
 }
 
@@ -797,6 +800,9 @@ void stdControl_ReadMouse()
     stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel; // TODO
+
+    if (Window_lastXRel || Window_lastYRel || Window_mouseWheelX || Window_mouseWheelY)
+        stdControl_bControlsIdle = 0;
 
     if ( stdControl_msDelta < 25 )
     {

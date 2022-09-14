@@ -171,8 +171,12 @@ void sithPhysics_ThingTick(sithThing *thing, float deltaSecs)
 #ifdef QOL_IMPROVEMENTS
     else if ( thing->type == SITH_THING_PLAYER && sithNet_isMulti)
     {
+#ifdef FIXED_TIMESTEP_PHYS
+        // time stepping is handled elsewhere
+        sithPhysics_ThingPhysGeneral(thing, deltaSecs);
+#else
         sithPhysics_ThingPhysPlayer(thing, deltaSecs);
-        //sithPhysics_ThingPhysGeneral(thing, deltaSecs);
+#endif
     }
 #else
     else if ( thing->type == SITH_THING_PLAYER )
@@ -895,8 +899,10 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
 
         if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
+#ifdef FIXED_TIMESTEP_PHYS
             // Fix physics being tied to framerate?
-            //v109 *= (deltaSeconds / (1.0 / 25.0));
+            v109 *= (deltaSeconds / (1.0 / 25.0));
+#endif
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
@@ -935,19 +941,18 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         float new_v131 = v131 * (deltaSeconds / (1.0 / 25.0));
         new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
 
+#ifdef FIXED_TIMESTEP_PHYS
         v131 = new_v131;
-        
+#else
+        v131 = orig_v131;
+#endif
 
         if ( (thing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            v131 = orig_v131; // TODO: figure out oscillations
-            
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
         else
         {
-            v131 = orig_v131; // TODO: figure out oscillations
-            
             rdVector_MultAcc3(&thing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
     }

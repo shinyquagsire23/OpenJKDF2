@@ -346,6 +346,9 @@ float stdControl_ReadAxis(int axisNum)
         if ( result != 0.0 )
             stdControl_bControlsIdle = 0;
     }
+
+    // Added: Scale to FPS
+    //result = (result * (sithTime_TickHz / 50.0));
     return result;
 }
 
@@ -366,6 +369,7 @@ int stdControl_ReadAxisRaw(int axisNum)
         return 0;
     if ( stdControl_bControlsIdle )
         stdControl_bControlsIdle = 0;
+
     return result;
 }
 

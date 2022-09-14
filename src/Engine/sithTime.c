@@ -2,19 +2,6 @@
 
 #include "stdPlatform.h"
 
-// original game will speed up if framerate is over 100?
-#ifndef QOL_IMPROVEMENTS
-#define SITHTIME_MINDELTA (10)
-#define SITHTIME_MAXDELTA (500)
-#else
-#define SITHTIME_MINDELTA (1)
-#define SITHTIME_MAXDELTA (500)
-#endif
-
-#ifdef PLATFORM_POSIX
-//#define MICROSECOND_TIME
-#endif
-
 #ifdef MICROSECOND_TIME
 static uint64_t sithTime_deltaUs;
 static uint64_t sithTime_curUsAbsolute;

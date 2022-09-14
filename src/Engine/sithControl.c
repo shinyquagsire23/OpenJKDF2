@@ -21,6 +21,7 @@
 #include "Main/jkGame.h"
 #include "Main/jkMain.h"
 #include "Engine/sithMulti.h"
+#include "General/stdMath.h"
 #include "jk.h"
 
 // Added
@@ -236,13 +237,17 @@ LABEL_13:
 LABEL_14:
     if ( sithWorld_pCurrentWorld->playerThing && sithControl_numHandlers > 0 )
     {
+#ifndef FIXED_TIMESTEP_PHYS
         sithControl_ReadControls();
+#endif
         for (int i = 0; i < sithControl_numHandlers; i++)
         {
             if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_pCurrentWorld->playerThing, deltaSecs) )
                 break;
         }
+#ifndef FIXED_TIMESTEP_PHYS
         sithControl_FinishRead();
+#endif
     }
 }
 
@@ -1007,12 +1012,12 @@ debug_controls:
         }
 #ifdef QOL_IMPROVEMENTS
         // Scale appropriately to high framerates
-        v18 = deltaSecs * 90.0 * ((1.0/deltaSecs) / 50.0);
+        v18 = deltaSecs * 90.0 * (sithTime_TickHz / 50.0);
 #else
         v18 = deltaSecs * 90.0;
 #endif
-        a3a.y = sithControl_ReadAxisStuff(1);
-        a3a.x = sithControl_ReadAxisStuff(8);
+        a3a.y = sithControl_ReadAxisStuff(INPUT_FUNC_TURN);
+        a3a.x = sithControl_ReadAxisStuff(INPUT_FUNC_PITCH);
         a3a.z = 0.0;
         a3a.x = v18 * a3a.x;
         a3a.y = v18 * a3a.y;
@@ -1023,7 +1028,7 @@ debug_controls:
             rdVector_Normalize3Acc(&sithControl_vec3_54A570);
         }
 #ifdef QOL_IMPROVEMENTS
-        v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1) * ((1.0/deltaSecs) / 50.0);
+        v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1) * (sithTime_TickHz / 50.0);
 #else
         v7 = -sithControl_GetAxis2(0) * (deltaSecs * 0.1);
 #endif
@@ -1079,12 +1084,10 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
     int v3; // edi
     double v5; // st7
     double v6; // st7
+    double v9;
     double v8; // st6
-    double v9; // st7
     double v12; // st6
     rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
-    float a1a; // [esp+18h] [ebp+4h]
-    float a3a; // [esp+1Ch] [ebp+8h]
 
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
@@ -1096,7 +1099,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             a2 = player->actorParams.eyePYR;
 
             // Map directly to axis, the value we have is an angular velocity
-            v5 = sithControl_GetAxis(8);
+            v5 = sithControl_GetAxis(INPUT_FUNC_PITCH);
             if ( v5 != 0.0 )
             {
                 v3 = 1;
@@ -1104,13 +1107,13 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             }
 
             // Not mapped directly to axis, accomodate w/ deltaSecs
-            v6 = sithControl_ReadAxisStuff(8);
+            v6 = sithControl_ReadAxisStuff(INPUT_FUNC_PITCH);
             if ( v6 != 0.0 )
             {
                 v3 = 1;
 #ifdef QOL_IMPROVEMENTS
                 // Scale appropriately to high framerates
-                a2.x += v6 * 90.0 * deltaSecs * ((1.0/deltaSecs) / 50.0);
+                a2.x += v6 * 90.0 * deltaSecs * (sithTime_TickHz / 50.0);
 #else
                 a2.x += v6 * 90.0 * deltaSecs;
 #endif
@@ -1118,14 +1121,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
 
             if ( v3 )
             {
-                if ( a2.x < (double)player->actorParams.minHeadPitch )
-                {
-                    a2.x = player->actorParams.minHeadPitch;
-                }
-                else if ( a2.x > (double)player->actorParams.maxHeadPitch )
-                {
-                    a2.x = player->actorParams.maxHeadPitch;
-                }
+                a2.x = stdMath_Clamp(a2.x, player->actorParams.minHeadPitch, player->actorParams.maxHeadPitch);
                 sithUnk4_MoveJointsForEyePYR(player, &a2);
                 player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
             }
@@ -1136,27 +1132,12 @@ LABEL_20:
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
-                    v8 = deltaSecs * 180.0 * ((1.0/deltaSecs) / 50.0);
+                    v8 = deltaSecs * 180.0 * (sithTime_TickHz / 50.0);
 #else
                     v8 = deltaSecs * 180.0;
 #endif
-                    a3a = v8;
-                    v9 = -player->actorParams.eyePYR.x;
-                    a1a = -v8;
                     player->actorParams.typeflags |= SITH_AF_HEAD_IS_CENTERED;
-                    if ( v9 < a1a )
-                    {
-                        v9 = a1a;
-                    }
-                    else if ( v9 > a3a )
-                    {
-                        v9 = a3a;
-                    }
-                    v12 = v9;
-                    if ( v12 < 0.0 )
-                        v12 = -v9;
-                    if ( v12 <= 0.0000099999997 )
-                        v9 = 0.0;
+                    v9 = stdMath_ClipPrecision(stdMath_ClampValue(-player->actorParams.eyePYR.x, v8));
                     if ( v9 == 0.0 )
                     {
                         player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
@@ -1222,8 +1203,8 @@ void sithControl_PlayerMovement(sithThing *player)
     {
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
         {
-            move_multiplier_a = sithControl_GetAxis2(2);
-            v6 = move_multiplier_a - sithControl_GetAxis2(1);
+            move_multiplier_a = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+            v6 = move_multiplier_a - sithControl_GetAxis2(INPUT_FUNC_TURN);
             if ( v6 < -1.0 )
             {
                 v6 = -1.0;
@@ -1239,7 +1220,7 @@ void sithControl_PlayerMovement(sithThing *player)
         else
         {
             // Player yaw handling
-            player->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
+            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
             if ( move_multiplier > 1.0 )
                 move_multiplier_ = move_multiplier;
             else
@@ -1247,11 +1228,11 @@ void sithControl_PlayerMovement(sithThing *player)
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_;
+            player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
 #else
-            player->physicsParams.angVel.y += sithControl_ReadAxisStuff(1) * player->actorParams.maxRotThrust * move_multiplier_;
+            player->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
 #endif
-            player->physicsParams.acceleration.x = sithControl_GetAxis2(2)
+            player->physicsParams.acceleration.x = sithControl_GetAxis2(INPUT_FUNC_SLIDE)
                                                             * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
                                                             * 0.7;
         }
@@ -1319,8 +1300,8 @@ void sithControl_FreeCam(sithThing *player)
         }
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &tmp) )
         {
-            v15 = sithControl_GetAxis2(2);
-            v11 = v15 - sithControl_GetAxis2(1);
+            v15 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+            v11 = v15 - sithControl_GetAxis2(INPUT_FUNC_TURN);
             if ( v11 < -1.0 )
             {
                 v11 = -1.0;
@@ -1335,13 +1316,13 @@ void sithControl_FreeCam(sithThing *player)
         }
         else
         {
-            v7->x = sithControl_GetAxis2(2) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
-            v1->physicsParams.angVel.y = sithControl_GetAxis(1) * sithTime_TickHz;
+            v7->x = sithControl_GetAxis2(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
+            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            v1->physicsParams.angVel.y +=  (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust;
+            v1->physicsParams.angVel.y +=  (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
 #else
-            v1->physicsParams.angVel.y += sithControl_ReadAxisStuff(1) * v1->actorParams.maxRotThrust;
+            v1->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
 #endif
         }
         if ( v2 )
@@ -1816,7 +1797,7 @@ void sithControl_JoyInputInit()
 LABEL_17:
         ;
     }
-    while ( v3 || ++v0 < (stdControlKeyInfo *)&sithControl_msIdle );
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
     sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
     if ( (sithControl_inputFuncToControlType[10] & 1) != 0 && sithControl_aInputFuncToKeyinfo[10].numEntries != 8 )
