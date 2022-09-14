@@ -392,8 +392,10 @@ typedef int32_t cog_int_t;
 typedef float cog_flex_t;
 #endif
 
+typedef struct IDirectSound3DBuffer IDirectSound3DBuffer;
 typedef struct IDirectSoundBuffer IDirectSoundBuffer;
 typedef IDirectSoundBuffer* LPDIRECTSOUNDBUFFER;
+typedef IDirectSound3DBuffer* LPDIRECTSOUND3DBUFFER;
 
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;

@@ -22,7 +22,7 @@
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
-#include "Gui/jkGUINet.h"
+#include "Gui/jkGUIMultiplayer.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "Main/jkDev.h"
@@ -53,7 +53,7 @@ int jkSaber_Startup()
     sithCogVm_SetMsgFunc(COGMSG_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
     sithCogVm_SetMsgFunc(COGMSG_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
     sithCogVm_SetMsgFunc(COGMSG_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
-    sithCogVm_SetMsgFunc(COGMSG_JOINING, jkGuiNet_CogMsgHandleJoining);
+    sithCogVm_SetMsgFunc(COGMSG_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
     sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
     sithMulti_SetHandleridk(jkSaber_idk4);
     return 1;

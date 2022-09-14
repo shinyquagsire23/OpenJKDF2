@@ -132,7 +132,7 @@ stdSound_SetPosition
 stdSound_SetVelocity
 stdSound_SetPositionOrientation
 stdSound_CommitDeferredSettings
-stdSound_3DBufferIdk
+stdSound_3DSetMode
 stdSound_IA3D_idk
 stdSound_BufferReset
 stdSound_BufferStop

@@ -804,7 +804,7 @@ public:
         }
 
         // Hack: Force the UI to update
-        jkGuiNet_dword_5564E8 -= 10000;
+        jkGuiMultiplayer_dword_5564E8 -= 10000;
     }
 
     uint32_t id = 0xFFFFFFFF;
@@ -1099,7 +1099,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
     sithDplay_bIsServer = 0;
     sithDplay_dplayIdSelf = 2; // HACK
-    jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
+    jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
     client.Init(addrServer);
     return 0;
@@ -1337,6 +1337,12 @@ int DirectPlay_StartSession(void* a, void* b)
 void DirectPlay_Destroy()
 {
     
+}
+
+int DirectPlay_IdkSessionDesc(jkMultiEntry* pEntry)
+{
+    //TODO
+    return 1;
 }
 
 }

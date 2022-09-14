@@ -414,7 +414,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
     sithDplay_bIsServer = 0;
     sithDplay_dplayIdSelf = 2; // HACK
-    jkGuiNet_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
+    jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
     // Client socket connect
     MyDplay_addr.sin_family = AF_INET;
@@ -655,4 +655,10 @@ int DirectPlay_StartSession(void* a, void* b)
 void DirectPlay_Destroy()
 {
     
+}
+
+int DirectPlay_IdkSessionDesc(jkMultiEntry* pEntry)
+{
+    //TODO
+    return 1;
 }

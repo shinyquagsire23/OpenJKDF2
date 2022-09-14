@@ -156,3 +156,9 @@ void DirectPlay_Destroy()
 {
     
 }
+
+int DirectPlay_IdkSessionDesc(jkMultiEntry* pEntry)
+{
+    //TODO
+    return 1;
+}

@@ -192,7 +192,6 @@ jkAI                           0x6e7      0.164%        100.000%        5 / 5
 sith                           0x72b      0.170%        100.000%       16 / 16         
 jkGuiControlSaveLoad           0x732      0.171%        100.000%        6 / 6          
 jkGuiPlayer                    0x73a      0.171%        100.000%        5 / 5          
-jkGuiMultiplayer               0x749      0.173%        100.000%        3 / 3          
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
 stdConffile                    0x78d      0.179%        100.000%       13 / 13         
 jkGuiMap                       0x793      0.180%        100.000%        8 / 8          
@@ -229,6 +228,7 @@ sithCogFunctionPlayer          0xdf0      0.331%        100.000%       42 / 42
 jkHudInv                       0xe43      0.338%        100.000%        9 / 9          
 sithCogFunctionSurface         0xe92      0.346%        100.000%       38 / 38         
 stdConsole                     0xfff      0.380%        100.000%       20 / 20         
+jkGuiMultiplayer               0x1097     0.394%        100.000%       13 / 13         
 DirectPlay                     0x10cc     0.399%        100.000%       31 / 31         
 VBuffer                        0x10dc     0.400%        100.000%        4 / 4          
 jkCog                          0x11b8     0.420%        100.000%       40 / 40         
@@ -252,7 +252,7 @@ sithDSSThing                   0x22aa     0.823%        100.000%       37 / 37
 sithCogVm                      0x22f7     0.830%        100.000%       42 / 42         
 sithRender                     0x23de     0.851%        100.000%       22 / 22         
 jkGuiBuildMulti                0x258b     0.891%        100.000%       24 / 24         
-sithSoundSys                   0x2626     0.905%        100.000%       37 / 37         
+sithSoundMixer                 0x2626     0.905%        100.000%       37 / 37         
 stdDisplay                     0x267b     0.913%        100.000%       37 / 37         
 sithCogFunction                0x26c2     0.920%        100.000%      119 / 119        
 sithAI                         0x2771     0.936%        100.000%       35 / 35         
@@ -273,7 +273,6 @@ stdFileUtil                    0x687      0.155%        54.159%         6 / 11
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithAnimClass                  0x6cc      0.161%        94.080%         4 / 5          
 stdStrTable                    0x7b6      0.183%        82.877%         4 / 6          
-jkGuiNet                       0x94e      0.221%        64.484%         6 / 10         
 stdColor                       0x97e      0.225%        24.198%         3 / 11         
 jkGame                         0x98f      0.227%        80.384%        12 / 13         
 stdPalEffects                  0xa66      0.247%        85.875%        16 / 21         
@@ -304,10 +303,10 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-56.629% by weight
-95.640% by weight excluding rasterizer
-2683 / 3169 functions
-2683 / 2798 functions excluding rasterizer
+56.708% by weight
+95.772% by weight excluding rasterizer
+2687 / 3169 functions
+2687 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
@@ -315,13 +314,13 @@ Subsystem Breakdown (Not Decomp'd)
 sith           0.543%           41 / 1323
 stdPlatform    0.188%           10 / 43
 std            1.493%           46 / 359
-jkGui          0.078%            4 / 284
+jkGui          0.000%            0 / 284
 rd             0.216%           11 / 345
 jk             0.075%            4 / 324
 Raster         40.778%         370 / 371
 other          0.000%            0 / 120
 -----------------------------------------
-total          43.371%         486 / 3169
+total          43.292%         482 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
@@ -329,11 +328,11 @@ Subsystem Breakdown (Not Decomp'd, Excl Raster)
 sith           0.918%           41 / 1323
 stdPlatform    0.317%           10 / 43
 std            2.521%           46 / 359
-jkGui          0.132%            4 / 284
+jkGui          0.000%            0 / 284
 rd             0.364%           11 / 345
 jk             0.126%            4 / 324
 other          0.000%            0 / 120
 -----------------------------------------
-total          4.379%          116 / 2798
+total          4.247%          112 / 2798
 
 ```

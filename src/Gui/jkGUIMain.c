@@ -16,7 +16,6 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIPlayer.h"
-#include "Gui/jkGUINet.h"
 #include "Gui/jkGUISetup.h"
 #include "Win95/sithDplay.h"
 #include "Win95/stdGdi.h"
@@ -64,7 +63,7 @@ void jkGuiMain_Show()
     wchar_t *v4; // [esp-4h] [ebp-Ch]
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
-    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !sithDplay_idk) || jkGuiNet_Show() != 1 )
+    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !sithDplay_idk) || jkGuiMultiplayer_Show2() != 1 )
     {
         do
         {

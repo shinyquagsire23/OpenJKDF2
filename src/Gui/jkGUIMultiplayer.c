@@ -11,7 +11,6 @@
 #include "Gui/jkGUIBuildMulti.h"
 #include "Gui/jkGUINetHost.h"
 #include "Gui/jkGUIDialog.h"
-#include "Gui/jkGUINet.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "Win95/sithDplay.h"
@@ -45,7 +44,7 @@ static jkGuiElement jkGuiMultiplayer_aElements3[13] = {
     {ELEMENT_TEXT,  0,  0,  0,  3, { 0, 0x19A, 0x280, 20},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  6, "GUI_MULTIPLAYER",  3, {20, 20, 0x258, 0x28},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_CHOOSEAGAME",  2, {170, 0x82, 0x1C2, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_LISTBOX,  1,  0,  0,  0, {170, 0xA0, 320, 0x6E},  1,  0, "GUI_GAMESTOJOIN_HINT",  0, jkGuiNet_sub_413E00, jkGuiMultiplayer_aElements3_aIdk, {0},  0},
+    {ELEMENT_LISTBOX,  1,  0,  0,  0, {170, 0xA0, 320, 0x6E},  1,  0, "GUI_GAMESTOJOIN_HINT",  0, jkGuiMultiplayer_sub_413E00, jkGuiMultiplayer_aElements3_aIdk, {0},  0},
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_TEXT,  0,  0, "GUINET_PASSWORD",  2, {170, 300+5, 100, 20},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXTBOX,  0,  0, jkGuiMultiplayer_stru_556168.field_300, 0x20, {280, 295+10, 210, 20},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -73,8 +72,8 @@ static jkGuiElement jkGuiMultiplayer_aElements4[4] = {
 
 static jkGuiMenu jkGuiMultiplayer_menu = {jkGuiMultiplayer_aElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 static jkGuiMenu jkGuiMultiplayer_menu2 = {jkGuiMultiplayer_aElements2, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
-static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_sub_4140B0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
-static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiNet_idk, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMultiplayer_sub_4140B0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMultiplayer_idk, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 wchar_t jkGuiMultiplayer_ipText[256];
 
@@ -385,7 +384,7 @@ LABEL_29:
     }
 }
 
-int jkGuiNet_ShowSynchronizing()
+int jkGuiMultiplayer_ShowSynchronizing()
 {
     int v0; // esi
     void *v2; // [esp-4h] [ebp-8h]
@@ -394,7 +393,7 @@ int jkGuiNet_ShowSynchronizing()
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
     jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUI_SYNCHRONIZING");
-    jkGuiMultiplayer_menu4.idkFunc = jkGuiNet_idk;
+    jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_idk;
     jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
     jkGui_SetModeGame();
@@ -402,7 +401,7 @@ int jkGuiNet_ShowSynchronizing()
 }
 
 
-int jkGuiNet_CogMsgHandleJoining(sithCogMsg *msg)
+int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
 {
     wchar_t *v2; // eax
     wchar_t *v3; // [esp-4h] [ebp-4h]
@@ -446,7 +445,7 @@ LABEL_9:
     return 1;
 }
 
-void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
+void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
 {
     uint32_t v1; // eax
     int v2; // esi
@@ -462,10 +461,10 @@ void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
     if ( g_app_suspended )
     {
         v1 = stdPlatform_GetTimeMsec();
-        if ( v1 > jkGuiNet_dword_5564E8 + 5000 )
+        if ( v1 > jkGuiMultiplayer_dword_5564E8 + 5000 )
         {
             v2 = -1;
-            jkGuiNet_dword_5564E8 = v1;
+            jkGuiMultiplayer_dword_5564E8 = v1;
             v10 = -1;
             v3 = sithDplay_EnumSessions(1, (wchar_t *)jkGuiMultiplayer_aElements3[5].wstr);
             if ( !v3 )
@@ -500,7 +499,7 @@ void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
                     jkGuiMultiplayer_aElements3[3].anonymous_9 = 1;
                 }
                 jkGuiMultiplayer_aElements3[3].selectedTextEntry = v2;
-                jkGuiNet_sub_413E50(v2);
+                jkGuiMultiplayer_sub_413E50(v2);
                 v3 = 0;
             }
             if ( v3 == 0x88770118 )
@@ -519,7 +518,7 @@ void jkGuiNet_sub_4140B0(jkGuiMenu *pMenu)
     }
 }
 
-void jkGuiNet_sub_413E50(int idx)
+void jkGuiMultiplayer_sub_413E50(int idx)
 {
     wchar_t *v1; // eax
     wchar_t *v2; // eax
@@ -597,7 +596,7 @@ void jkGuiNet_sub_413E50(int idx)
     jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[8], &jkGuiMultiplayer_menu3, 1);
 }
 
-int jkGuiNet_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
+int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
 {
     int v5; // eax
 
@@ -607,6 +606,169 @@ int jkGuiNet_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, in
     else
         v5 = jkGuiMultiplayer_aElements3[3].selectedTextEntry <= dplay_dword_55D618 - 1;
     if ( v5 )
-        jkGuiNet_sub_413E50(jkGuiMultiplayer_aElements3[3].selectedTextEntry);
+        jkGuiMultiplayer_sub_413E50(jkGuiMultiplayer_aElements3[3].selectedTextEntry);
     return 0;
+}
+
+void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
+{
+    uint32_t v1; // eax
+    wchar_t *v2; // eax
+    wchar_t *v3; // [esp-4h] [ebp-4h]
+
+    if ( sithDplay_dword_8321E0 && (g_submodeFlags & 8) != 0 )
+    {
+        v1 = stdPlatform_GetTimeMsec();
+        if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendRequestConnect(sithNet_dword_8C4BA4)) )
+        {
+            sithCogVm_Sync();
+            if ( (g_submodeFlags & 8) == 0 )
+                pMenu->lastButtonUp = 1;
+        }
+        else
+        {
+            v3 = jkStrings_GetText("GUINET_NOGAMECONNECT");
+            v2 = jkStrings_GetText("GUINET_JOINERROR");
+            jkGuiDialog_ErrorDialog(v2, v3);
+            pMenu->lastButtonUp = -2;
+        }
+    }
+}
+
+int jkGuiMultiplayer_Show2()
+{
+    int result; // eax
+    int v1; // eax
+    int v2; // esi
+    HRESULT v3; // eax
+    wchar_t *v4; // eax
+    wchar_t *v5; // eax
+    wchar_t *v6; // [esp-4h] [ebp-14Ch]
+    wchar_t *v7; // [esp-4h] [ebp-14Ch]
+    jkMultiEntry3 v8; // [esp+8h] [ebp-140h] BYREF
+
+    memset(&v8, 0, sizeof(v8));
+    if ( sithDplay_dword_8321F8 )
+    {
+        if ( sithDplay_dword_8321F8 != 1 )
+        {
+            result = sithDplay_dword_8321F8 - 2;
+            if ( sithDplay_dword_8321F8 != 2 )
+                return result;
+            g_submodeFlags |= 8;
+            jkGui_SetModeMenu(jkGui_stdBitmaps[2]->palette);
+            jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
+            jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
+            jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
+            v2 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
+            jkGui_SetModeGame();
+            if ( v2 == 1
+              && jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, jkGuiMultiplayer_aGobPath, jkGuiMultiplayer_aEpisodeJkl, 0, jkGuiMultiplayer_dword_55613C) == 1 )
+            {
+                sithMulti_InitTick(jkGuiMultiplayer_tickrate);
+                jkMain_loadFile2(jkGuiMultiplayer_aGobPath, jkGuiMultiplayer_aEpisodeJkl);
+                return 1;
+            }
+            goto LABEL_10;
+        }
+        if ( jkGuiNetHost_Show(&v8) != 1
+          || (sithNet_scorelimit = v8.scoreLimit,
+              sithNet_multiplayer_timelimit = v8.timeLimit,
+              jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v8.episodeGobName, v8.mapJklFname, 0, v8.maxRank) != 1) )
+        {
+LABEL_10:
+            sithDplay_CloseConnection();
+            return -1;
+        }
+        v3 = sithMulti_CreatePlayer(
+                 v8.serverName,
+                 v8.wPassword,
+                 v8.episodeGobName,
+                 v8.mapJklFname,
+                 v8.maxPlayers,
+                 v8.sessionFlags,
+                 v8.multiModeFlags,
+                 v8.tickRateMs,
+                 v8.maxRank);
+        if ( v3 == 0x88770118 )
+        {
+            v7 = jkStrings_GetText("GUINET_USERCANCEL");
+            v5 = jkStrings_GetText("GUINET_HOSTERROR");
+            jkGuiDialog_ErrorDialog(v5, v7);
+        }
+        else
+        {
+            if ( !v3 )
+            {
+                jkMain_loadFile2(v8.episodeGobName, v8.mapJklFname);
+                return 1;
+            }
+            v6 = jkStrings_GetText("GUINET_NOCONNECT");
+            v4 = jkStrings_GetText("GUINET_HOSTERROR");
+            jkGuiDialog_ErrorDialog(v4, v6);
+        }
+    }
+    return -1;
+}
+
+void jkGuiMultiplayer_sub_4142C0(jkGuiMenu *pMenu)
+{
+    uint32_t v1; // eax
+
+    if ( sithDplay_dword_8321E0 )
+    {
+        v1 = stdPlatform_GetTimeMsec();
+        if ( v1 > jkGuiMultiplayer_dword_5564F0 + 2000 )
+        {
+            jkGuiMultiplayer_dword_5564F0 = v1;
+            DirectPlay_IdkSessionDesc(&jkGuiMultiplayer_multiEntry);
+            if ( jkGuiMultiplayer_multiEntry.field_E0 )
+            {
+                jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_multiEntry.checksumSeed;
+                pMenu->lastButtonUp = 1;
+            }
+        }
+    }
+}
+
+int jkGuiMultiplayer_sub_413C80(Darray *pDarray, jkGuiElement *pElement, int a3)
+{
+    unsigned int v3; // esi
+    sith_dplay_connection *v4; // edi
+    int result; // eax
+
+    jkGuiRend_DarrayFreeEntry(pDarray);
+    v3 = 0;
+    if ( jkGuiMultiplayer_numConnections )
+    {
+        v4 = jkGuiMultiplayer_aConnections;
+        do
+        {
+            jkGuiRend_DarrayReallocStr(pDarray, v4->name, 0);
+            ++v3;
+            ++v4;
+        }
+        while ( v3 < jkGuiMultiplayer_numConnections );
+    }
+    jkGuiRend_AddStringEntry(pDarray, 0, 0);
+    jkGuiRend_SetClickableString(pElement, pDarray);
+    result = a3;
+    pElement->selectedTextEntry = a3;
+    return result;
+}
+
+int jkGuiMultiplayer_ShowWaitHostSettings()
+{
+    int v0; // esi
+    void *v2; // [esp-4h] [ebp-8h]
+
+    v2 = jkGui_stdBitmaps[2]->palette;
+    g_submodeFlags |= 8u;
+    jkGui_SetModeMenu(v2);
+    jkGuiMultiplayer_aElements4[1].wstr = (const char *)jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
+    jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
+    jkGuiRend_SetDisplayingStruct(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
+    v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
+    jkGui_SetModeGame();
+    return v0;
 }

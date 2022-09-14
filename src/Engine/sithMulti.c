@@ -164,7 +164,7 @@ int sithMulti_Startup()
         v0 = sithWorld_pCurrentWorld;
     }
     v8 = 0;
-    sithNet_checksum = sithWorld_CalcChecksum(v0, 0/*jkGuiNet_checksumSeed*/); // Added: TODO fix the checksum seed
+    sithNet_checksum = sithWorld_CalcChecksum(v0, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
     sithSurface_numSurfaces_0 = 0;
     sithSector_numSync = 0;

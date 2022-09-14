@@ -824,9 +824,17 @@ jkGuiNetHost_gameFlags 0x00860474 int
 jkGuiNetHost_tickRate 0x00860478 int
 jkGuiNetHost_gameName 0x0086047C wchar_t[32]
 
-jkGuiNet_checksumSeed 0x00832634 int
-jkGuiNet_dword_5564EC 0x005564EC int
-jkGuiNet_dword_5564E8 0x005564E8 int
+jkGuiMultiplayer_checksumSeed 0x00832634 int
+jkGuiMultiplayer_dword_5564EC 0x005564EC int
+jkGuiMultiplayer_dword_5564E8 0x005564E8 int
+jkGuiMultiplayer_aGobPath 0x005560A8 char[32]
+jkGuiMultiplayer_aEpisodeJkl 0x005560C8 char[100]
+jkGuiMultiplayer_dword_55612C 0x0055612C int
+jkGuiMultiplayer_dword_556130 0x00556130 int
+jkGuiMultiplayer_dword_55613C 0x0055613C int
+jkGuiMultiplayer_tickrate 0x00556138 uint32_t
+jkGuiMultiplayer_multiEntry 0x00556050 jkMultiEntry
+jkGuiMultiplayer_dword_5564F0 0x005564F0 int
 
 g_hInstance 0x00855DEC HINSTANCE
 sithCog_pSymbolTable 0x008B5428 sithCogSymboltable*

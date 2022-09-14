@@ -79,9 +79,8 @@ HRESULT sithDplay_EnumSessions2(void)
 
 int sithDplay_seed_idk(jkMultiEntry *pEntry)
 {
-    printf("Seed idk\n");
-    jkGuiNet_checksumSeed = (__int64)(_frand() * 4294967300.0);
-    pEntry->checksumSeed = jkGuiNet_checksumSeed;
+    jkGuiMultiplayer_checksumSeed = (__int64)(_frand() * 4294967300.0);
+    pEntry->checksumSeed = jkGuiMultiplayer_checksumSeed;
     pEntry->field_E0 = 10;
     if ( DirectPlay_GetSession_passwordidk(pEntry) )
         return 0;
@@ -93,8 +92,8 @@ int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
 {
     HRESULT result; // eax
 
-    jkGuiNet_checksumSeed = (__int64)(_frand() * 4294967300.0);
-    pEntry->checksumSeed = jkGuiNet_checksumSeed;
+    jkGuiMultiplayer_checksumSeed = (__int64)(_frand() * 4294967300.0);
+    pEntry->checksumSeed = jkGuiMultiplayer_checksumSeed;
     pEntry->field_E0 = 10;
     result = DirectPlay_OpenHost(pEntry);
     if ( !result )

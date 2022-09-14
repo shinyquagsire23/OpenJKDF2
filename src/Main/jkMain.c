@@ -24,7 +24,6 @@
 #include "Main/jkStrings.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
-#include "Gui/jkGUINet.h"
 #include "Gui/jkGUIMultiTally.h"
 #include "Gui/jkGUIForce.h"
 #include "Gui/jkGUIMain.h"
@@ -585,7 +584,7 @@ LABEL_28:
     }
     thing_six = 1;
     stdControl_ToggleCursor(0);
-    if ( jkGuiNet_ShowSynchronizing() == 1 )
+    if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
     {
         thing_six = 0;
         stdControl_ToggleCursor(1);

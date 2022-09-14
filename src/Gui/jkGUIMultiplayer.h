@@ -7,6 +7,18 @@
 #define jkGuiMultiplayer_Initialize_ADDR (0x00413180)
 #define jkGuiMultiplayer_Shutdown_ADDR (0x004131E0)
 #define jkGuiMultiplayer_Show_ADDR (0x004131F0)
+#define jkGuiMultiplayer_Show2_ADDR (0x00413960)
+#define jkGuiMultiplayer_ShowSynchronizing_ADDR (0x00413BA0)
+#define jkGuiMultiplayer_ShowWaitHostSettings_ADDR (0x00413C10)
+#define jkGuiMultiplayer_sub_413C80_ADDR (0x00413C80)
+#define jkGuiMultiplayer_CogMsgHandleJoining_ADDR (0x00413CF0)
+#define jkGuiMultiplayer_sub_413E00_ADDR (0x00413E00)
+#define jkGuiMultiplayer_sub_413E50_ADDR (0x00413E50)
+#define jkGuiMultiplayer_sub_4140B0_ADDR (0x004140B0)
+#define jkGuiMultiplayer_idk_ADDR (0x00414230)
+#define jkGuiMultiplayer_sub_4142C0_ADDR (0x004142C0)
+
+
 
 //#define jkGuiMultiplayer_bInitted (*(int*)0x005564E0)
 /*#define jkGuiMultiplayer_menu (*(jkGuiMenu*)0x0052C360)
@@ -23,7 +35,25 @@ void jkGuiMultiplayer_Initialize();
 void jkGuiMultiplayer_Shutdown();
 int jkGuiMultiplayer_Show();
 
-int jkGuiNet_ShowSynchronizing();
+int jkGuiMultiplayer_ShowSynchronizing();
+
+void jkGuiMultiplayer_idk(jkGuiMenu *pMenu);
+int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg);
+void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu);
+void jkGuiMultiplayer_sub_413E50(int idx);
+int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+
+int jkGuiMultiplayer_Show2();
+void jkGuiMultiplayer_sub_4142C0(jkGuiMenu *pMenu);
+int jkGuiMultiplayer_sub_413C80(Darray *pDarray, jkGuiElement *pElement, int a3);
+int jkGuiMultiplayer_ShowWaitHostSettings();
+
+//static void (*jkGuiMultiplayer_sub_413E00)() = (void*)jkGuiMultiplayer_sub_413E00_ADDR;
+//static int (*jkGuiMultiplayer_CogMsgHandleJoining)(int a1) = (void*)jkGuiMultiplayer_CogMsgHandleJoining_ADDR;
+//static int (*jkGuiMultiplayer_ShowSynchronizing)() = (void*)jkGuiMultiplayer_ShowSynchronizing_ADDR;
+//static int (*jkGuiMultiplayer_Show2)() = (void*)jkGuiMultiplayer_Show2_ADDR;
+//static void (*jkGuiMultiplayer_idk)(jkGuiElement *a1) = (void*)jkGuiMultiplayer_idk_ADDR;
+
 
 //static int (*jkGuiMultiplayer_Initialize)() = (void*)jkGuiMultiplayer_Initialize_ADDR;
 //static void (*jkGuiMultiplayer_Shutdown)() = (void*)jkGuiMultiplayer_Shutdown_ADDR;

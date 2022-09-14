@@ -111,6 +111,7 @@ static int (*sithDplay_EnumSessions)(int, void*) = (void*)sithDplay_EnumSessions
 static void (*DirectPlay_EnumPlayers)(int a) = (void*)DirectPlay_EnumPlayers_ADDR;
 static int (*DirectPlay_StartSession)(void*, void*) = (void*)DirectPlay_StartSession_ADDR;
 static void (*DirectPlay_Destroy)() = (void*)DirectPlay_Destroy_ADDR;
+static int (*DirectPlay_IdkSessionDesc)(jkMultiEntry* pEntry) = (void*)DirectPlay_IdkSessionDesc_ADDR;
 #else
 
 int sithDplay_OpenConnection(void* a);
@@ -137,6 +138,7 @@ int sithDplay_EnumSessions(int a, void* b);
 void DirectPlay_EnumPlayers(int a);
 int DirectPlay_StartSession(void* a, void* b);
 void DirectPlay_Destroy();
+int DirectPlay_IdkSessionDesc(jkMultiEntry* pEntry);
 #endif
 
 #ifdef __cplusplus
