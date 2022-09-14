@@ -262,7 +262,13 @@ void Main_UseLocalData()
 
 #if defined(MACOS) || defined(LINUX)
     char* data_home;
-    if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+    if ((data_home = getenv("OPENJKDF2_ROOT")) != NULL) {
+        strncpy(fname, data_home, 256);
+        stdFileUtil_MkDir(fname);
+        chdir(fname);
+        printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);  
+    }
+    else if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
         if ((homedir = getenv("HOME")) == NULL) {
             homedir = getpwuid(getuid())->pw_dir;
         }
@@ -968,7 +974,15 @@ int Main_Startup(const char *cmdline)
 
     
     char* data_home;
-    if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
+    if ((data_home = getenv("OPENJKDF2_ROOT")) != NULL) {
+        snprintf(fname, 256, "%s/resource/jk_.cd", data_home);
+
+        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
+        if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
+            Main_UseLocalData();
+        }
+    }
+    else if ((data_home = getenv("XDG_DATA_HOME")) == NULL) {
         if ((homedir = getenv("HOME")) == NULL) {
             homedir = getpwuid(getuid())->pw_dir;
         }
