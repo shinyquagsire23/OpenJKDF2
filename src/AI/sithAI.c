@@ -3,7 +3,7 @@
 #include "General/stdMath.h"
 #include "World/sithThing.h"
 #include "Engine/sithCollision.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "Gameplay/sithPlayerActions.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
@@ -840,7 +840,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
                 a2a.y = v7;
                 v9 = actor->thing;
                 a2a.z = v8;
-                sithUnk4_MoveJointsForEyePYR(v9, &a2a);
+                sithActor_MoveJointsForEyePYR(v9, &a2a);
             }
         }
         actor->lookVector.z = 0.0;

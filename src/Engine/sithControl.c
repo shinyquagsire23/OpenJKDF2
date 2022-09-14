@@ -11,7 +11,7 @@
 #include "World/sithSector.h"
 #include "World/sithThing.h"
 #include "World/sithWeapon.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithTime.h"
@@ -977,7 +977,7 @@ debug_controls:
     {
         // Added: dedicated
         if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) {
-            sithThing_Hit(player, player, 200.0, 1);
+            sithActor_Hit(player, player, 200.0, 1);
             result = 1;
         }
         else {
@@ -1122,7 +1122,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             if ( v3 )
             {
                 a2.x = stdMath_Clamp(a2.x, player->actorParams.minHeadPitch, player->actorParams.maxHeadPitch);
-                sithUnk4_MoveJointsForEyePYR(player, &a2);
+                sithActor_MoveJointsForEyePYR(player, &a2);
                 player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
             }
             else
@@ -1146,7 +1146,7 @@ LABEL_20:
                     else
                     {
                         player->actorParams.eyePYR.x += v9;
-                        sithUnk4_MoveJointsForEyePYR(player, &player->actorParams.eyePYR);
+                        sithActor_MoveJointsForEyePYR(player, &player->actorParams.eyePYR);
                     }
                 }
             }

@@ -11,6 +11,7 @@
 #include "World/sithInventory.h"
 #include "World/jkSaber.h"
 #include "World/jkPlayer.h"
+#include "World/sithActor.h"
 #include "Engine/sithDebugConsole.h"
 #include "Engine/sithMulti.h"
 #include "Main/jkMain.h"
@@ -436,7 +437,7 @@ int jkDev_CmdDispStats(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int jkDev_CmdKill(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithThing_Hit(g_localPlayerThing, g_localPlayerThing, 200.0, 1);
+    sithActor_Hit(g_localPlayerThing, g_localPlayerThing, 200.0, 1);
     return 1;
 }
 

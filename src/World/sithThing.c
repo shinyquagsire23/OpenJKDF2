@@ -8,13 +8,12 @@
 #include "World/sithWeapon.h"
 #include "World/sithExplosion.h"
 #include "World/sithItem.h"
-#include "World/sithCorpse.h"
 #include "World/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"
 #include "Engine/sithCollision.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundMixer.h"
 #include "Engine/sithMulti.h"
@@ -230,7 +229,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
                 case SITH_THING_PLAYER:
                     sithPlayer_Tick(thingIter->actorParams.playerinfo, deltaSeconds);
                 case SITH_THING_ACTOR:
-                    sithThing_TickUnderwater(thingIter, deltaMs);
+                    sithActor_Tick(thingIter, deltaMs);
                     break;
                 case SITH_THING_WEAPON:
                     sithWeapon_Tick(thingIter, deltaSeconds);
@@ -352,7 +351,7 @@ void sithThing_Remove(sithThing *thing)
             sithItem_Remove(thing);
             break;
         case SITH_THING_CORPSE:
-            sithCorpse_Remove(thing);
+            sithActor_RemoveCorpse(thing);
             break;
         case SITH_THING_PLAYER:
             return;
@@ -449,7 +448,7 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
             if ( sender->type != SITH_THING_PLAYER )
                 return amount;
         }
-        amount = amount - sithThing_Hit(sender, reciever, amount, damageClass);
+        amount = amount - sithActor_Hit(sender, reciever, amount, damageClass);
     }
     return amount;
 }
@@ -1602,7 +1601,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing *thing)
     {
         case SITH_THING_ACTOR:
         case SITH_THING_PLAYER:
-            v7 = sithThing_LoadActorPlayerParams(arg, thing, paramIdx);
+            v7 = sithActor_LoadParams(arg, thing, paramIdx);
             goto LABEL_10;
         case SITH_THING_WEAPON:
             v7 = sithWeapon_LoadParams(arg, thing, paramIdx);
@@ -2028,400 +2027,6 @@ int sithThing_netidk2(int a1)
 }
 
 //sithThing_Release
-
-void sithThing_TickUnderwater(sithThing *thing, int deltaMs)
-{
-    unsigned int v2; // eax
-    unsigned int v3; // eax
-
-    if ( (thing->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
-    {
-        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 || (thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 )
-        {
-            v3 = thing->actorParams.msUnderwater;
-            if ( v3 )
-            {
-                if ( v3 <= 18000 )
-                {
-                    if ( v3 > 10000 )
-                        sithSoundClass_PlayModeRandom(thing, SITH_SC_BREATH);
-                }
-                else
-                {
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_GASP);
-                }
-                thing->actorParams.msUnderwater = 0;
-            }
-        }
-        else
-        {
-            v2 = deltaMs + thing->actorParams.msUnderwater;
-            thing->actorParams.msUnderwater = v2;
-            if ( v2 > 20000 )
-            {
-                sithThing_Damage(thing, thing, 10.0, SITH_DAMAGE_DROWN);
-                thing->actorParams.msUnderwater -= 2000;
-            }
-        }
-    }
-}
-
-float sithThing_Hit(sithThing *sender, sithThing *receiver, float amount, int flags)
-{
-    sithThing *receiver_; // edi
-    double v6; // st7
-    sithThing *v7; // eax
-    float fR; // [esp+0h] [ebp-1Ch]
-
-    if ( sithNet_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
-    {
-        receiver_ = receiver;
-        goto LABEL_32;
-    }
-    if ( (sender->actorParams.typeflags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
-        return 0.0;
-    if ( sender->actorParams.health <= 0.0 )
-        return amount;
-    receiver_ = receiver;
-    if ( sender->type == SITH_THING_PLAYER )
-    {
-        v6 = sithInventory_SendMessageToAllWithFlag(
-                 sender,
-                 SENDERTYPE_THING,
-                 receiver->thingIdx,
-                 SITH_MESSAGE_DAMAGED,
-                 0x10,
-                 amount,
-                 (float)flags,
-                 0.0,
-                 0.0);
-        amount = v6;
-        if ( v6 == 0.0 )
-            return 0.0;
-    }
-    if ( receiver )
-    {
-        if ( receiver != sender && sender->thingtype == SITH_THING_ACTOR )
-            sithAI_SetActorFireTarget(sender->actor, 1, (intptr_t)receiver);
-        v7 = sithThing_GetParent(receiver);
-        receiver_ = v7;
-        if ( v7
-          && flags != 0x20
-          && flags != 0x40
-          && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & SITH_AF_1000000) == 0
-          && sender->type == SITH_THING_ACTOR )
-        {
-            amount = amount * 0.1;
-        }
-        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
-            return 0.0;
-    }
-
-    sender->actorParams.health -= amount;
-    if ( sender == g_localPlayerThing )
-    {
-        fR = amount * 0.04;
-        sithPlayer_AddDynamicTint(fR, 0.0, 0.0);
-    }
-    if ( sender->actorParams.health >= 1.0 )
-    {
-LABEL_32:
-        if ( sender->animclass && sender != receiver_ && amount * 0.05 > _frand() )
-            sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
-        sithThing_HurtSound(sender, amount, flags);
-        return amount;
-    }
-    if ( sithCogVm_multiplayerFlags )
-        sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
-    sithThing_SpawnDeadBodyMaybe(sender, receiver_, flags);
-    return amount - sender->actorParams.health;
-}
-
-void sithThing_HurtSound(sithThing *thing, float amount, int hurtType)
-{
-    double v3; // st7
-    float v4; // [esp+8h] [ebp+8h]
-
-    if ( thing->actorParams.health > 0.0 && amount >= 3.0 )
-    {
-        v3 = amount / thing->actorParams.health * 1.5;
-        v4 = v3;
-        if ( v3 >= 0.01 )
-        {
-            if ( v4 < 0.0 )
-            {
-                v4 = 0.0;
-            }
-            else if ( v4 > 1.0 )
-            {
-                v4 = 1.0;
-            }
-            switch ( hurtType )
-            {
-                case 2:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTENERGY, v4);
-                    break;
-                case 4:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTFIRE, v4);
-                    break;
-                case 8:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTMAGIC, v4);
-                    break;
-                case 16:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTSPECIAL, v4);
-                    break;
-                case 32:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_DROWNING, v4);
-                    break;
-                default:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTIMPACT, v4);
-                    break;
-            }
-        }
-    }
-}
-
-void sithThing_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
-{
-    int v7; // ecx
-    sithThing *v8; // eax
-    uint32_t v10; // edx
-
-    if ( (thing->thingflags & SITH_TF_DEAD) == 0 )
-    {
-        thing->actorParams.health = 0.0;
-        if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_SendMessageFromThing(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
-        {
-            sithSoundClass_StopSound(thing, 0);
-            if ( a4 == 0x20 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DROWNED);
-            }
-            else if ( a4 == 0x40 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_SPLATTERED);
-            }
-            else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATHUNDER);
-            }
-            else if ( thing->actorParams.health >= -10.0 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH1);
-            }
-            else
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH2);
-            }
-            sithUnk4_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
-            sithAIAwareness_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
-            if ( thing->type == SITH_THING_PLAYER )
-                sithPlayer_sub_4C9150(thing, a3);
-            if ( thing == sithWorld_pCurrentWorld->cameraFocus )
-                sithCamera_SetCurrentCamera(&sithCamera_cameras[5]);
-            if ( thing->animclass )
-            {
-                sithPuppet_ResetTrack(thing);
-                if ( thing->actorParams.health >= -10.0 )
-                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH, 0);
-                else
-                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH2, 0);
-            }
-
-            thing->physicsParams.physflags &= ~SITH_PF_CROUCHING;
-            if ( thing->type != SITH_THING_PLAYER )
-            {
-                v7 = thing->actorParams.typeflags;
-                if ( (v7 & SITH_AF_EXPLODE_WHEN_KILLED) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
-                {
-                    sithThing_Create(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
-                    sithThing_Destroy(thing);
-                }
-                else
-                {
-                    if ( (v7 & SITH_AF_BREATH_UNDER_WATER) != 0 )
-                        thing->physicsParams.buoyancy = 0.3;
-                    if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
-                    {
-                        thing->thingflags |= SITH_TF_DEAD;
-                        sithThing_detachallchildren(thing);
-                        v10 = thing->physicsParams.physflags & ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
-                        thing->type = SITH_THING_CORPSE;
-                        thing->physicsParams.physflags = v10 | (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
-                        thing->lifeLeftMs = 20000;
-                        sithPhysics_FindFloor(thing, 0);
-                    }
-                    else
-                    {
-                        thing->lifeLeftMs = 1000;
-                    }
-                }
-            }
-        }
-    }
-}
-
-int sithThing_LoadActorPlayerParams(stdConffileArg *arg, sithThing *thing, unsigned int param)
-{
-    sithThing *v3; // eax
-    int result; // eax
-    sithThing *v5; // eax
-    double v6; // st7
-    double v9; // st7
-    double v10; // st7
-    double v11; // st7
-    double v12; // st7
-    int v13; // eax
-    sithThing *v14; // esi
-    sithThing *v16; // eax
-    sithThing *v18; // eax
-    double v19; // st7
-    double v20; // st7
-    double v21; // st7
-    float tmp;
-    int tmpInt;
-
-    switch ( param )
-    {
-        case THINGPARAM_TYPEFLAGS:
-            if ( _sscanf(arg->value, "%x", &tmpInt) != 1 )
-                goto LABEL_38;
-            thing->actorParams.typeflags = tmpInt;
-            return 1;
-        case THINGPARAM_HEALTH:
-            tmp = _atof(arg->value);
-            if ( tmp < 0.0 )
-                goto LABEL_38;
-
-            thing->actorParams.health = tmp;
-            if ( tmp < (double)thing->actorParams.maxHealth )
-                thing->actorParams.maxHealth = thing->actorParams.maxHealth;
-            else
-                thing->actorParams.maxHealth = tmp;
-            return 1;
-        case THINGPARAM_MAXTHRUST:
-            v10 = _atof(arg->value);
-            if ( v10 < 0.0 )
-                return 0;
-            result = 1;
-            thing->actorParams.maxThrust = v10;
-            return result;
-        case THINGPARAM_MAXROTTHRUST:
-            v11 = _atof(arg->value);
-            if ( v11 < 0.0 )
-                return 0;
-            result = 1;
-            thing->actorParams.maxRotThrust = v11;
-            return result;
-        case THINGPARAM_JUMPSPEED:
-            v12 = _atof(arg->value);
-            if ( v12 < 0.0 )
-                return 0;
-            result = 1;
-            thing->actorParams.jumpSpeed = v12;
-            return result;
-        case THINGPARAM_WEAPON:
-            v3 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateWeapon = v3;
-            return 1;
-        case THINGPARAM_WEAPON2:
-            v5 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateWeapon2 = v5;
-            return 1;
-        case THINGPARAM_EXPLODE:
-            v18 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateExplode = v18;
-            return 1;
-        case THINGPARAM_MAXHEALTH:
-            v9 = _atof(arg->value);
-            if ( v9 < 0.0 )
-                return 0;
-            result = 1;
-            thing->actorParams.maxHealth = v9;
-            thing->actorParams.health = v9;
-            return result;
-        case THINGPARAM_EYEOFFSET:
-            v13 = _sscanf(
-                      arg->value,
-                      "(%f/%f/%f)",
-                      &thing->actorParams.eyeOffset.x,
-                      &thing->actorParams.eyeOffset.y,
-                      &thing->actorParams.eyeOffset.z);
-            goto LABEL_25;
-        case THINGPARAM_MINHEADPITCH:
-            result = _sscanf(arg->value, "%f", &tmp);
-            if ( result != 1 )
-                goto LABEL_38;
-            thing->actorParams.minHeadPitch = tmp;
-            break;
-        case THINGPARAM_MAXHEADPITCH:
-            result = _sscanf(arg->value, "%f", &tmp);
-            if ( result != 1 )
-                goto LABEL_38;
-            thing->actorParams.maxHeadPitch = tmp;
-            break;
-        case THINGPARAM_FIREOFFSET:
-            v13 = _sscanf(
-                      arg->value,
-                      "(%f/%f/%f)",
-                      &thing->actorParams.fireOffset.x,
-                      &thing->actorParams.fireOffset.y,
-                      &thing->actorParams.fireOffset.z);
-LABEL_25:
-            if ( v13 != 3 )
-                goto LABEL_38;
-            result = 1;
-            break;
-        case THINGPARAM_LIGHTOFFSET:
-            v14 = thing;
-            if ( _sscanf(
-                     arg->value,
-                     "(%f/%f/%f)",
-                     &thing->actorParams.lightOffset.x,
-                     &thing->actorParams.lightOffset.y,
-                     &thing->actorParams.lightOffset.z) != 3 )
-                goto LABEL_38;
-            v14->thingflags |= SITH_TF_LIGHT;
-            result = 1;
-            break;
-        case THINGPARAM_LIGHTINTENSITY:
-            if ( _sscanf(arg->value, "%f", &tmp) != 1 )
-                return 0;
-            v16 = thing;
-            thing->actorParams.lightIntensity = tmp;
-            v16->thingflags |= SITH_TF_LIGHT;
-            return 1;
-        case THINGPARAM_ERROR:
-            v19 = _atof(arg->value);
-            thing->actorParams.error = v19;
-            return 1;
-        case THINGPARAM_FOV:
-            v20 = _atof(arg->value);
-            thing->actorParams.fov = v20;
-            return 1;
-        case THINGPARAM_CHANCE:
-            v21 = _atof(arg->value);
-            thing->actorParams.chance = v21;
-            return 1;
-        default:
-LABEL_38:
-            result = 0;
-            break;
-    }
-    return result;
-}
-
-void sithActor_Remove(sithThing *thing)
-{
-    thing->thingflags |= SITH_TF_DEAD;
-    sithThing_detachallchildren(thing);
-    thing->type = SITH_THING_CORPSE;
-    thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
-    thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
-    thing->lifeLeftMs = 20000;
-    sithPhysics_FindFloor(thing, 0);
-}
 
 int sithThing_Release(sithThing *pThing)
 {

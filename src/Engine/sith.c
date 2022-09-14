@@ -5,7 +5,7 @@
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithCollision.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "General/sithStrTable.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -442,7 +442,7 @@ void sith_AutoSave()
             }
             if ( v3->type == SITH_THING_ACTOR )
             {
-                sithUnk4_SetMaxHeathForDifficulty(v3);
+                sithActor_SetMaxHeathForDifficulty(v3);
                 v0 = sithWorld_pCurrentWorld;
             }
             ++v1;

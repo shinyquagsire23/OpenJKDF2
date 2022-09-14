@@ -129,9 +129,7 @@ Generated using `analyze.py`. Some filenames may be inaccurate or incomplete (se
 
 [file]                         [size]     [% of text]   [% complete]  [decomp / total] 
 DirectX                        0x1e       0.003%        100.000%        5 / 5          
-sithCorpse                     0x27       0.004%        100.000%        1 / 1          
 jkGob                          0x29       0.004%        100.000%        2 / 2          
-sithActor                      0x43       0.006%        100.000%        1 / 1          
 jkGuiDecision                  0x45       0.006%        100.000%        3 / 3          
 sithStrTable                   0x5b       0.008%        100.000%        4 / 4          
 sithCopyright                  0x67       0.010%        100.000%        1 / 1          
@@ -181,7 +179,6 @@ wuRegistry                     0x5b2      0.135%        100.000%       12 / 12
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 Video                          0x5dc      0.139%        100.000%        5 / 5          
 DebugConsole                   0x5de      0.139%        100.000%       13 / 13         
-sithUnk4                       0x5e9      0.140%        100.000%        6 / 6          
 sithExplosion                  0x61d      0.145%        100.000%        4 / 4          
 sithAIClass                    0x689      0.155%        100.000%        7 / 7          
 rdPrimit2                      0x69a      0.157%        100.000%        5 / 5          
@@ -227,6 +224,7 @@ jkEpisode                      0xdd9      0.329%        100.000%       10 / 10
 sithCogFunctionPlayer          0xdf0      0.331%        100.000%       42 / 42         
 jkHudInv                       0xe43      0.338%        100.000%        9 / 9          
 sithCogFunctionSurface         0xe92      0.346%        100.000%       38 / 38         
+sithActor                      0xf9c      0.370%        100.000%       13 / 13         
 stdConsole                     0xfff      0.380%        100.000%       20 / 20         
 jkGuiMultiplayer               0x1097     0.394%        100.000%       13 / 13         
 DirectPlay                     0x10cc     0.399%        100.000%       31 / 31         
@@ -294,7 +292,7 @@ jkSaber                        0x1f4a     0.742%        95.943%        37 / 40
 sithMulti                      0x252a     0.882%        91.423%        29 / 35         
 sithCollision                  0x2827     0.953%        91.954%        19 / 22         
 sithControl                    0x285a     0.958%        99.613%        31 / 33         
-sithThing                      0x3cd5     1.444%        88.840%        48 / 54         
+sithThing                      0x338c     1.223%        86.829%        43 / 49         
 rdRaster                       0xf04d     5.702%        0.195%          1 / 89         
 rdZRaster                      0x15fb4    8.346%        0.000%          0 / 73         
 rdAFRaster                     0x1620d    8.402%        0.000%          0 / 122        

@@ -4,7 +4,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "Engine/sithCollision.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithTemplate.h"
@@ -695,7 +695,7 @@ LABEL_45:
       && v6
       && (collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
       && (collidedThing != g_localPlayerThing || sithTime_curSeconds >= (double)sithWeapon_fireWait)
-      && sithUnk4_thing_anim_blocked(physicsThing, collidedThing, a4) )
+      && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
     {
         return 1;
     }

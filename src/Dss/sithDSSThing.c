@@ -8,7 +8,7 @@
 #include "Engine/sithKeyFrame.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithTemplate.h"
@@ -108,7 +108,7 @@ int sithDSSThing_HandleTeleportThing(sithCogMsg *msg)
     {
         rdVector_Zero3(&lookTmp);
         lookTmp.x = NETMSG_POPF32();
-        sithUnk4_MoveJointsForEyePYR(pThing, &lookTmp);
+        sithActor_MoveJointsForEyePYR(pThing, &lookTmp);
     }
 
     return 1;
@@ -646,7 +646,7 @@ int sithDSSThing_HandleDeath(sithCogMsg *msg)
         int senderType = pSender->type;
         if ( senderType == SITH_THING_ACTOR)
         {
-            sithThing_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+            sithActor_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
         }
         else if (senderType == SITH_THING_PLAYER)
         {
@@ -655,7 +655,7 @@ int sithDSSThing_HandleDeath(sithCogMsg *msg)
                 sithPlayer_HandleSentDeathPkt(pSender);
                 return 1;
             }
-            sithThing_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+            sithActor_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
         }
         return 1;
     }

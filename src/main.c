@@ -106,14 +106,13 @@
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
 #include "World/sithExplosion.h"
-#include "World/sithCorpse.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
 #include "World/sithInventory.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "Engine/sithCollision.h"
-#include "World/sithUnk4.h"
+#include "World/sithActor.h"
 #include "World/sithMap.h"
 #include "Engine/sithIntersect.h"
 #include "Gameplay/sithPlayerActions.h"
@@ -1322,7 +1321,6 @@ void do_hooks()
     hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
     hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
     hook_function(sithThing_GetById_ADDR, sithThing_GetById);
-    hook_function(sithThing_TickUnderwater_ADDR, sithThing_TickUnderwater);
     hook_function(sithActor_Remove_ADDR, sithActor_Remove);
     
     // sithSector
@@ -1414,9 +1412,6 @@ void do_hooks()
     hook_function(sithExplosion_Tick_ADDR, sithExplosion_Tick);
     hook_function(sithExplosion_UpdateForce_ADDR, sithExplosion_UpdateForce);
     hook_function(sithExplosion_LoadThingParams_ADDR, sithExplosion_LoadThingParams);
-    
-    // sithCorpse
-    hook_function(sithCorpse_Remove_ADDR, sithCorpse_Remove);
     
     // sithIntersect
 #if 0
@@ -1704,11 +1699,13 @@ void do_hooks()
     hook_function(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
 #endif
     
-    // sithUnk4
-    hook_function(sithUnk4_SetMaxHeathForDifficulty_ADDR, sithUnk4_SetMaxHeathForDifficulty);
-    hook_function(sithUnk4_sub_4ED1D0_ADDR, sithUnk4_sub_4ED1D0);
-    hook_function(sithUnk4_MoveJointsForEyePYR_ADDR, sithUnk4_MoveJointsForEyePYR);
-    hook_function(sithUnk4_ActorActorCollide_ADDR, sithUnk4_ActorActorCollide);
+    // sithActor
+    hook_function(sithActor_SetMaxHeathForDifficulty_ADDR, sithActor_SetMaxHeathForDifficulty);
+    hook_function(sithActor_sub_4ED1D0_ADDR, sithActor_sub_4ED1D0);
+    hook_function(sithActor_MoveJointsForEyePYR_ADDR, sithActor_MoveJointsForEyePYR);
+    hook_function(sithActor_ActorActorCollide_ADDR, sithActor_ActorActorCollide);
+    hook_function(sithActor_Tick_ADDR, sithActor_Tick);
+    hook_function(sithActor_RemoveCorpse_ADDR, sithActor_RemoveCorpse);
     
     // sithItem
     hook_function(sithItem_Collide_ADDR, sithItem_Collide);
