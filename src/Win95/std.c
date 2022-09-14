@@ -119,3 +119,39 @@ int stdAssert(const char *pMsg, const char *pFileName, int lineNo)
 {
     return printf("[ASSERT] %s(%d): %s\n", pFileName, lineNo, pMsg);
 }
+
+void* stdDebugMalloc(unsigned int amt)
+{
+    int *v1; // eax
+
+    v1 = malloc(amt + 4);
+    *v1 = amt;
+    memset(v1 + 1, 0xDDu, amt);
+    return v1 + 1;
+}
+
+void stdDebugFree(void *a1)
+{
+    memset((char *)a1 - 4, 0xBBu, *((int*)a1 - 1) + 4);
+    free((char *)a1 - 4);
+}
+
+void* stdDebugRealloc(void *a1, unsigned int amt)
+{
+    int *v2; // eax
+
+    v2 = realloc((char *)a1 - 4, amt + 4);
+    *v2 = amt;
+    memset(v2 + 1, 0xDDu, amt);
+    return v2 + 1;
+}
+
+
+void stdDelay(int a1, float a2)
+{
+    int v2; // esi
+
+    v2 = (__int64)(a2 * std_pHS->some_float - -0.5) + std_pHS->getTimerTick();
+    while ( std_pHS->getTimerTick() < v2 )
+        ;
+}

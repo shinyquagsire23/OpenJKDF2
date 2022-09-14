@@ -48,6 +48,10 @@ char stdFGetc(stdFile_t fd);
 void stdFPutc(char c, stdFile_t fd);
 int stdFilePrintf(stdFile_t pFile, const char *fmt, ...);
 int stdAssert(const char *pMsg, const char *pFileName, int lineNo);
+void* stdDebugMalloc(unsigned int amt);
+void stdDebugFree(void *a1);
+void* stdDebugRealloc(void *a1, unsigned int amt);
+void stdDelay(int a1, float a2);
 
 //static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;

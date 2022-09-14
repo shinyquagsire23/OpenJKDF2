@@ -278,7 +278,7 @@ jkGame                         0x98f      0.227%        80.384%        12 / 13
 stdPalEffects                  0xa66      0.247%        85.875%        16 / 21         
 stdLbm                         0xc24      0.288%        0.000%          0 / 3          
 rdColormap                     0xcf4      0.307%        47.738%         7 / 12         
-stdPlatform                    0xdde      0.329%        42.901%        33 / 43         
+stdPlatform                    0xdde      0.329%        49.042%        37 / 43         
 sithPlayer                     0xe72      0.343%        95.944%        23 / 27         
 stdBitmap                      0xeb6      0.349%        47.398%         6 / 14         
 sithTrackThing                 0xf9f      0.371%        90.098%        12 / 15         
@@ -303,16 +303,16 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-56.708% by weight
-95.772% by weight excluding rasterizer
-2687 / 3169 functions
-2687 / 2798 functions excluding rasterizer
+56.728% by weight
+95.806% by weight excluding rasterizer
+2691 / 3169 functions
+2691 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
 sith           0.543%           41 / 1323
-stdPlatform    0.188%           10 / 43
+stdPlatform    0.168%            6 / 43
 std            1.493%           46 / 359
 jkGui          0.000%            0 / 284
 rd             0.216%           11 / 345
@@ -320,19 +320,19 @@ jk             0.075%            4 / 324
 Raster         40.778%         370 / 371
 other          0.000%            0 / 120
 -----------------------------------------
-total          43.292%         482 / 3169
+total          43.272%         478 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
 sith           0.918%           41 / 1323
-stdPlatform    0.317%           10 / 43
+stdPlatform    0.283%            6 / 43
 std            2.521%           46 / 359
 jkGui          0.000%            0 / 284
 rd             0.364%           11 / 345
 jk             0.126%            4 / 324
 other          0.000%            0 / 120
 -----------------------------------------
-total          4.247%          112 / 2798
+total          4.213%          108 / 2798
 
 ```
