@@ -1868,7 +1868,7 @@ typedef struct sithWorld
     rdVector2 horizontalSkyOffs;
     rdVector2 ceilingSkyOffs;
     rdVector4 mipmapDistance;
-    rdVector4 loadDistance;
+    rdVector4 lodDistance;
     float perspectiveDistance;
     float gouradDistance;
     sithThing* cameraFocus;

@@ -1164,9 +1164,9 @@ void sithRender_RenderThings()
     int clippingVal; // eax
     sithWorld *curWorld; // edx
     rdModel3 *model3; // ecx
-    int v8; // ecx
-    int v9; // eax
-    int v11; // eax
+    int texMode; // ecx
+    int texMode2; // eax
+    int lightMode; // eax
     float v12; // [esp-Ch] [ebp-28h]
     float a2; // [esp+8h] [ebp-14h]
     float clipRadius; // [esp+Ch] [ebp-10h]
@@ -1245,7 +1245,7 @@ void sithRender_RenderThings()
                             case 1:
                                 break;
                             case 2:
-                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
+                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->lodDistance.y )
                                 {
                                     model3->geosetSelect = 0;
                                 }
@@ -1255,11 +1255,11 @@ void sithRender_RenderThings()
                                 }
                                 break;
                             case 3:
-                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.x )
+                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->lodDistance.x )
                                 {
                                     model3->geosetSelect = 0;
                                 }
-                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.y )
+                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->lodDistance.y )
                                 {
                                     model3->geosetSelect = 2;
                                 }
@@ -1270,13 +1270,13 @@ void sithRender_RenderThings()
 
                                 break;
                             default:
-                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.x )
+                                if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->lodDistance.x )
                                 {
                                     model3->geosetSelect = 0;
                                 }
-                                else if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->loadDistance.y )
+                                else if ( thingIter->screenPos.y < (double)sithWorld_pCurrentWorld->lodDistance.y )
                                     model3->geosetSelect = 1;
-                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->loadDistance.z )
+                                else if ( thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->lodDistance.z )
                                     model3->geosetSelect = 3;
                                 else
                                     model3->geosetSelect = 2;
@@ -1284,29 +1284,29 @@ void sithRender_RenderThings()
                         }
                     }
                     
-                    v8 = thingIter->rdthing.curTexMode;
+                    texMode = thingIter->rdthing.curTexMode;
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
+                        thingIter->rdthing.textureMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
                     {
-                        v9 = 1;
-                        if ( v8 <= 1 )
-                            v9 = thingIter->rdthing.curTexMode;
-                        thingIter->rdthing.textureMode = v9;
+                        texMode2 = RD_TEXTUREMODE_PERSPECTIVE;
+                        if ( texMode <= RD_TEXTUREMODE_PERSPECTIVE)
+                            texMode2 = thingIter->rdthing.curTexMode;
+                        thingIter->rdthing.textureMode = texMode2;
                     }
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
+                        thingIter->rdthing.textureMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
                     {
-                        if ( v8 > 1 )
-                            v8 = 1;
-                        thingIter->rdthing.textureMode = v8;
+                        if ( texMode > RD_TEXTUREMODE_PERSPECTIVE)
+                            texMode = RD_TEXTUREMODE_PERSPECTIVE;
+                        thingIter->rdthing.textureMode = texMode;
                     }
-                    if ( (thingIter->thingflags & 1) != 0
+                    if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
@@ -1319,30 +1319,30 @@ void sithRender_RenderThings()
                     }
                     if ( a2 >= 1.0 )
                     {
-                        v11 = thingIter->rdthing.curLightMode;
+                        lightMode = thingIter->rdthing.curLightMode;
                         if ( v16 )
                         {
-                            v11 = v11 > 0 ? 0 : v11;
+                            lightMode = lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : lightMode;
                         }
                         else
                         {
-                            if ( v11 > 2 )
-                                v11 = 2;
+                            if ( lightMode > RD_LIGHTMODE_DIFFUSE)
+                                lightMode = RD_LIGHTMODE_DIFFUSE;
                         }
                     }
-                    else if ( (thingIter->thingflags & SITH_TF_4000000) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
+                    else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
                     {
-                        v11 = thingIter->rdthing.curLightMode;
-                        if ( v11 > 2 )
-                            v11 = 2;
+                        lightMode = thingIter->rdthing.curLightMode;
+                        if ( lightMode > RD_LIGHTMODE_DIFFUSE)
+                            lightMode = RD_LIGHTMODE_DIFFUSE;
                     }
                     else
                     {
-                        v11 = thingIter->rdthing.curLightMode;
-                        if ( v11 > 3 )
-                            v11 = 3;
+                        lightMode = thingIter->rdthing.curLightMode;
+                        if ( lightMode > RD_LIGHTMODE_GOURAUD)
+                            lightMode = RD_LIGHTMODE_GOURAUD;
                     }
-                    thingIter->rdthing.lightingMode = v11;
+                    thingIter->rdthing.lightingMode = lightMode;
                     if ( sithRender_RenderThing(thingIter) )
                         ++sithRender_831984;
                 }
