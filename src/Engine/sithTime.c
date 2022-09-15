@@ -8,6 +8,9 @@ static uint64_t sithTime_curUsAbsolute;
 static uint64_t sithTime_pauseTimeUs;
 #endif
 
+// Added
+double sithTime_physicsRolloverFrames = 0.0;
+
 void sithTime_Tick()
 {
     sithTime_SetDelta(stdPlatform_GetTimeMsec() - sithTime_curMsAbsolute);
@@ -22,6 +25,8 @@ void sithTime_Pause()
 #ifdef MICROSECOND_TIME
         sithTime_pauseTimeUs = Linux_TimeUs();
 #endif
+
+        sithTime_physicsRolloverFrames = 0.0; // Added
     }
 }
 
@@ -34,6 +39,8 @@ void sithTime_Resume()
 #ifdef MICROSECOND_TIME
         sithTime_curUsAbsolute += Linux_TimeUs() - sithTime_pauseTimeUs;
 #endif
+
+        sithTime_physicsRolloverFrames = 0.0; // Added
     }
 }
 
@@ -75,6 +82,8 @@ void sithTime_Startup()
     sithTime_deltaSeconds = 0.0;
     sithTime_TickHz = 0.0;
     sithTime_curMsAbsolute = stdPlatform_GetTimeMsec();
+
+    sithTime_physicsRolloverFrames = 0.0; // Added
 }
 
 void sithTime_SetMs(uint32_t curMs)

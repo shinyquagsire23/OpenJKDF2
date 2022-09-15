@@ -17,4 +17,6 @@ void sithTime_SetDelta(int deltaMs);
 void sithTime_Startup();
 void sithTime_SetMs(uint32_t curMs);
 
+extern double sithTime_physicsRolloverFrames;
+
 #endif // _SITHTIME_H

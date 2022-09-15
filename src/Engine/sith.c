@@ -39,6 +39,10 @@
 #include "Cog/sithCog.h"
 #include "jk.h"
 
+#ifdef FIXED_TIMESTEP_PHYS
+#include <math.h>
+#endif
+
 float sith_lastAspect = 1.0;
 
 int sith_Startup(struct common_functions *commonFuncs)
@@ -218,8 +222,6 @@ void sith_SetEndLevel()
     sith_bEndLevel = 1;
 }
 
-double physicsRolloverFrames = 0.0;
-
 int sith_Tick()
 {
     if ( (g_submodeFlags & 8) != 0 )
@@ -229,11 +231,11 @@ int sith_Tick()
 
 #ifdef FIXED_TIMESTEP_PHYS
         // Run all physics at a fixed timestep
-        double rolloverCombine = sithTime_deltaSeconds + physicsRolloverFrames;
+        double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
         double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
-        uint32_t wholeFramesToApply = (uint32_t)framesToApply;
-        physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+        uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
+        sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
         //printf("%f %f\n", framesToApply, rolloverCombine);
 
@@ -273,11 +275,11 @@ int sith_Tick()
 
 #ifdef FIXED_TIMESTEP_PHYS
         // Run all physics at a fixed timestep
-        double rolloverCombine = sithTime_deltaSeconds + physicsRolloverFrames;
+        double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
         double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
-        uint32_t wholeFramesToApply = (uint32_t)framesToApply;
-        physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+        uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
+        sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
         //printf("%f %f\n", framesToApply, rolloverCombine);
 
@@ -299,6 +301,8 @@ int sith_Tick()
         sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
         //stdControl_updateKHz = 1.0 / (DELTA_PHYSTICK_FPS * 1000.0);
         //stdControl_updateHz = sithTime_TickHz;        
+
+        //printf("%f %u %f %f\n",framesToApply, wholeFramesToApply, rolloverCombine, sithTime_physicsRolloverFrames);
 
         for (int i = 0; i < wholeFramesToApply; i++)
         {
