@@ -210,7 +210,7 @@ void sithControl_Tick(float deltaSecs, int deltaMs)
         return;
 
     if ( !g_localPlayerThing
-      || (SITH_AF_800000 & g_localPlayerThing->actorParams.typeflags) != 0
+      || (SITH_AF_NOHUD & g_localPlayerThing->actorParams.typeflags) != 0
       || (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_state & 1) != 0 )
     {
@@ -878,7 +878,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
     {
         if ( (player->thingflags & SITH_TF_DEAD) != 0 )
         {
-            if ( (player->actorParams.typeflags & SITH_AF_PLAYER_KILLED) == 0 )
+            if ( (player->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH) == 0 )
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;

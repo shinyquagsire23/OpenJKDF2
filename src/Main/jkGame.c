@@ -283,7 +283,7 @@ int jkGame_Update()
         }
     }*/
 
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_800000) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
         jkHud_Draw();
     jkDev_sub_41F950();
     jkHudInv_Draw();

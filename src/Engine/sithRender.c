@@ -27,6 +27,7 @@
 #include "World/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
+#include "World/sithExplosion.h"
 #include "Platform/std3D.h"
 
 #ifdef QOL_IMPROVEMENTS
@@ -397,7 +398,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & SITH_AF_4) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.typeflags & SITH_AF_FIELDLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -1056,7 +1057,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
                 if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numLights < 0x20 )
                 {
                     // Actors all have a small amount of light
-                    if ( (i->actorParams.typeflags & SITH_AF_4) && i->actorParams.lightIntensity > 0.0 )
+                    if ( (i->actorParams.typeflags & SITH_AF_FIELDLIGHT) && i->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &i->actorParams.lightOffset, &i->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &i->position);
@@ -1365,7 +1366,7 @@ int sithRender_RenderThing(sithThing *povThing)
         {
             if ( povThing->actor )
             {
-                povThing->actor->flags &= ~0x1000u;
+                povThing->actor->flags &= ~SITH_AF_1000;
             }
         }
         povThing->thingflags |= SITH_TF_INCAMFOV;
@@ -1378,7 +1379,7 @@ int sithRender_RenderThing(sithThing *povThing)
     povThing->lookOrientation.scale.z = 0.0;
     if ( sithRender_weaponRenderHandle && (povThing->thingflags & SITH_TF_RENDERWEAPON) != 0 )
         sithRender_weaponRenderHandle(povThing);
-    if ( povThing->type == SITH_THING_EXPLOSION && (povThing->explosionParams.typeflags & 0x100) != 0 )
+    if ( povThing->type == SITH_THING_EXPLOSION && (povThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS) != 0 )
     {
         float v5 = stdMath_Dist3D1(povThing->screenPos.x, povThing->screenPos.y, povThing->screenPos.z);
         uint32_t v6 = povThing->explosionParams.flashB;
@@ -1387,7 +1388,7 @@ int sithRender_RenderThing(sithThing *povThing)
         float v9 = ((double)(v8 + v7 + v6) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * v5) * 0.1;
         if ( v9 > 0.0 )
             sithPlayer_AddDyamicAdd((__int64)((double)v7 * v9 - -0.5), (__int64)((double)v6 * v9 - -0.5), (__int64)((double)v8 * v9 - -0.5));
-        povThing->explosionParams.typeflags &= ~0x100;
+        povThing->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
     }
     return ret;
 }
@@ -1481,18 +1482,18 @@ void sithRender_RenderAlphaSurfaces()
 
         if ( v9->ambientLight < 1.0 )
         {
-            if ( v9->lightingMode == 2 )
+            if ( v9->lightingMode == RD_LIGHTMODE_DIFFUSE)
             {
                 if ( v9->light_level_static >= 1.0 && surfaceSector->colormap == sithWorld_pCurrentWorld->colormaps )
                 {
-                    v9->lightingMode = 0;
+                    v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
                 }
                 else if ( v9->light_level_static <= 0.0 )
                 {
-                    v9->lightingMode = 1;
+                    v9->lightingMode = RD_LIGHTMODE_NOTLIT;
                 }
             }
-            else if ( v9->lightingMode == 3 )
+            else if ( v9->lightingMode == RD_LIGHTMODE_GOURAUD)
             {
                 v20 = v9->vertexIntensities;
                 v21 = 1;
@@ -1517,23 +1518,23 @@ void sithRender_RenderAlphaSurfaces()
                 {
                     if ( v31 == 0.0 )
                     {
-                        v9->lightingMode = 1;
+                        v9->lightingMode = RD_LIGHTMODE_NOTLIT;
                         v9->light_level_static = 0.0;
                     }
                     else
                     {
-                        v9->lightingMode = 2;
+                        v9->lightingMode = RD_LIGHTMODE_DIFFUSE;
                         v9->light_level_static = v31;
                     }
                 }
                 else if ( surfaceSector->colormap != sithWorld_pCurrentWorld->colormaps )
                 {
-                    v9->lightingMode = 2;
+                    v9->lightingMode = RD_LIGHTMODE_DIFFUSE;
                     v9->light_level_static = 1.0;
                 }
                 else
                 {
-                    v9->lightingMode = 0;
+                    v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
                 }
             }
         }
@@ -1541,19 +1542,19 @@ void sithRender_RenderAlphaSurfaces()
         {
             if ( surfaceSector->colormap != sithWorld_pCurrentWorld->colormaps )
             {
-                v9->lightingMode = 2;
+                v9->lightingMode = RD_LIGHTMODE_DIFFUSE;
                 v9->light_level_static = 1.0;
             }
             else
             {
-                v9->lightingMode = 0;
+                v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
             }
         }
 
         v23 = 1;
-        if ( v9->geometryMode >= 4 )
+        if ( v9->geometryMode >= RD_GEOMODE_TEXTURED)
             v23 = 3;
-        if ( v9->lightingMode >= 3 )
+        if ( v9->lightingMode >= RD_LIGHTMODE_GOURAUD)
             v23 |= 4u;
 
         v9->type = v0->surfaceInfo.face.type;

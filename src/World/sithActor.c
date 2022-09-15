@@ -115,7 +115,7 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
           && flags != 0x20
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & SITH_AF_1000000) == 0
+          && (v7->actorParams.typeflags & SITH_AF_FULL_ACTOR_DAMAGE) == 0
           && sender->type == SITH_THING_ACTOR )
         {
             amount = amount * 0.1;
