@@ -7,10 +7,8 @@
 #include "Engine/sithSurface.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
+#include "World/jkPlayer.h"
 #include "jk.h"
-
-#define TARGET_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 150.0)
-#define DELTA_50FPS (1.0/TARGET_FPS)
 
 void sithPhysics_FindFloor(sithThing *thing, int a3)
 {
@@ -172,8 +170,14 @@ void sithPhysics_ThingTick(sithThing *thing, float deltaSecs)
     else if ( thing->type == SITH_THING_PLAYER && sithNet_isMulti)
     {
 #ifdef FIXED_TIMESTEP_PHYS
+        if (NEEDS_STEPPED_PHYS) {
         // time stepping is handled elsewhere
         sithPhysics_ThingPhysGeneral(thing, deltaSecs);
+        }
+        else
+        {
+            sithPhysics_ThingPhysPlayer(thing, deltaSecs);
+        }
 #else
         sithPhysics_ThingPhysPlayer(thing, deltaSecs);
 #endif
@@ -545,20 +549,20 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     // sync better between clients.
     float rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
-    float framesToApply = rolloverCombine * TARGET_FPS; // get number of 50FPS steps passed
-    player->physicsParams.physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * DELTA_50FPS;
+    float framesToApply = rolloverCombine * OLDSTEP_TARGET_FPS; // get number of 50FPS steps passed
+    player->physicsParams.physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * OLDSTEP_DELTA_50FPS;
 
     for (int i = (int)framesToApply; i > 0; i--)
     {
         rdVector_Zero3(&a1a);
         if ( player->physicsParams.airDrag != 0.0 )
         {
-            sithPhysics_ApplyDrag(&player->physicsParams.vel, player->physicsParams.airDrag, 0.0, DELTA_50FPS);
+            sithPhysics_ApplyDrag(&player->physicsParams.vel, player->physicsParams.airDrag, 0.0, OLDSTEP_DELTA_50FPS);
         }
 
         if (player->physicsParams.physflags & SITH_PF_USESTHRUST)
         {
-            rdVector_Scale3(&a1a, &player->physicsParams.acceleration, DELTA_50FPS);
+            rdVector_Scale3(&a1a, &player->physicsParams.acceleration, OLDSTEP_DELTA_50FPS);
             rdMatrix_TransformVector34Acc(&a1a, &player->lookOrientation);
         }
 
@@ -567,7 +571,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
             if ((player->sector->flags & SITH_SECTOR_HASTHRUST)
                 && !(player->physicsParams.physflags & SITH_PF_NOTHRUST))
             {
-                rdVector_MultAcc3(&a1a, &player->sector->thrust, DELTA_50FPS);
+                rdVector_MultAcc3(&a1a, &player->sector->thrust, OLDSTEP_DELTA_50FPS);
             }
         }
 
@@ -575,14 +579,14 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
              && (player->physicsParams.physflags & SITH_PF_USEGRAVITY) 
              && !(player->sector->flags & SITH_SECTOR_NOGRAVITY) )
         {
-            float gravity = sithWorld_pCurrentWorld->worldGravity * DELTA_50FPS;
+            float gravity = sithWorld_pCurrentWorld->worldGravity * OLDSTEP_DELTA_50FPS;
             if ( (player->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
                 gravity = gravity * 0.5;
             a1a.z = a1a.z - gravity;
             player->physicsParams.addedVelocity.z = -gravity;
         }
         rdVector_Add3Acc(&player->physicsParams.vel, &a1a);
-        rdVector_MultAcc3(&player->physicsParams.velocityMaybe, &player->physicsParams.vel, DELTA_50FPS);
+        rdVector_MultAcc3(&player->physicsParams.velocityMaybe, &player->physicsParams.vel, OLDSTEP_DELTA_50FPS);
     }
 }
 
@@ -901,7 +905,8 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         {
 #ifdef FIXED_TIMESTEP_PHYS
             // Fix physics being tied to framerate?
-            v109 *= (deltaSeconds / (1.0 / 25.0));
+            if (NEEDS_STEPPED_PHYS)
+                v109 *= (deltaSeconds / (1.0 / 25.0));
 #endif
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
@@ -942,7 +947,10 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
         new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
 
 #ifdef FIXED_TIMESTEP_PHYS
-        v131 = new_v131;
+        if (NEEDS_STEPPED_PHYS)
+            v131 = new_v131;
+        else
+            v131 = orig_v131;
 #else
         v131 = orig_v131;
 #endif

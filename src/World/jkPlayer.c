@@ -44,6 +44,10 @@ float jkPlayer_ssaaMultiple = 1.0;
 float jkPlayer_gamma = 1.0;
 #endif
 
+#ifdef FIXED_TIMESTEP_PHYS
+int jkPlayer_bJankyPhysics = 0;
+#endif
+
 int jkPlayer_LoadAutosave()
 {
     char tmp[128];
@@ -274,6 +278,9 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
         stdJSON_SaveFloat(ext_fpath, "gamma", jkPlayer_gamma);
 #endif
+#ifdef FIXED_TIMESTEP_PHYS
+        stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
+#endif
         stdConffile_CloseWrite();
     }
 }
@@ -440,6 +447,9 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         Window_SetHiDpi(dpi_tmp);
         Window_SetFullscreen(fulltmp);
+#endif
+#ifdef FIXED_TIMESTEP_PHYS
+        jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
 
 

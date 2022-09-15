@@ -36,6 +36,7 @@
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 #include "World/sithSector.h"
+#include "World/jkPlayer.h"
 #include "Cog/sithCog.h"
 #include "jk.h"
 
@@ -230,31 +231,36 @@ int sith_Tick()
         sithCogVm_Sync();
 
 #ifdef FIXED_TIMESTEP_PHYS
-        // Run all physics at a fixed timestep
-        double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+        if (NEEDS_STEPPED_PHYS) {
+            // Run all physics at a fixed timestep
+            double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
-        double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
-        uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
-        sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+            double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
+            uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
+            sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
-        //printf("%f %f\n", framesToApply, rolloverCombine);
+            //printf("%f %f\n", framesToApply, rolloverCombine);
 
-        float tmp = sithTime_deltaSeconds;
-        uint32_t tmp2 = sithTime_deltaMs;
-        sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
-        sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
+            float tmp = sithTime_deltaSeconds;
+            uint32_t tmp2 = sithTime_deltaMs;
+            sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
+            sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
 
-        for (int i = (int)framesToApply; i > 0; i--)
+            for (int i = (int)framesToApply; i > 0; i--)
+            {
+                sithSurface_Tick(sithTime_deltaSeconds);
+                sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+            }
+
+            sithTime_deltaSeconds = tmp;
+        sithTime_deltaMs = tmp2;
+        }
+        else
+#endif
         {
             sithSurface_Tick(sithTime_deltaSeconds);
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
         }
-
-        sithTime_deltaSeconds = tmp;
-        sithTime_deltaMs = tmp2;
-#else
-        sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-#endif
         DebugConsole_AdvanceLogBuf();
         return 1;
     }
@@ -274,37 +280,65 @@ int sith_Tick()
         sithTime_Tick();
 
 #ifdef FIXED_TIMESTEP_PHYS
-        // Run all physics at a fixed timestep
-        double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+        if (NEEDS_STEPPED_PHYS) {
+            // Run all physics at a fixed timestep
+            double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
-        double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
-        uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
-        sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+            double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
+            uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
+            sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
-        //printf("%f %f\n", framesToApply, rolloverCombine);
+            //printf("%f %f\n", framesToApply, rolloverCombine);
 
-        // TODO figure this out
-        sithControl_ReadControls();
-        if ( g_sithMode != 2 )
-        {
-            sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+            // TODO figure this out
+            sithControl_ReadControls();
+            if ( g_sithMode != 2 )
+            {
+                sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+            }
+            sithControl_FinishRead();
+
+            float tmp = sithTime_deltaSeconds;
+            uint32_t tmp2 = sithTime_deltaMs;
+            float tmp3 = sithTime_TickHz;
+            float tmp4 = stdControl_updateKHz;
+            float tmp5 = stdControl_updateHz;
+            sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
+            sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
+            sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
+            //stdControl_updateKHz = 1.0 / (DELTA_PHYSTICK_FPS * 1000.0);
+            //stdControl_updateHz = sithTime_TickHz;        
+
+            //printf("%f %u %f %f\n",framesToApply, wholeFramesToApply, rolloverCombine, sithTime_physicsRolloverFrames);
+
+            for (int i = 0; i < wholeFramesToApply; i++)
+            {
+                sithSoundMixer_Tick(sithTime_deltaSeconds);
+                sithEvent_Advance();
+
+                if ( sithCogVm_bSyncMultiplayer )
+                    sithCogVm_Sync();
+
+                if ( (g_debugmodeFlags & 1) == 0 )
+                    sithAI_TickAll();
+
+                sithSurface_Tick(sithTime_deltaSeconds);
+                // TODO
+                //if (g_sithMode != 2 )
+                //{
+                //    sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+                //}
+                sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+            }
+
+            sithTime_deltaSeconds = tmp;
+            sithTime_deltaMs = tmp2;
+            sithTime_TickHz = tmp3;
+            //stdControl_updateKHz = tmp4;
+            //stdControl_updateHz = tmp5;
         }
-        sithControl_FinishRead();
-
-        float tmp = sithTime_deltaSeconds;
-        uint32_t tmp2 = sithTime_deltaMs;
-        float tmp3 = sithTime_TickHz;
-        float tmp4 = stdControl_updateKHz;
-        float tmp5 = stdControl_updateHz;
-        sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
-        sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
-        sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
-        //stdControl_updateKHz = 1.0 / (DELTA_PHYSTICK_FPS * 1000.0);
-        //stdControl_updateHz = sithTime_TickHz;        
-
-        //printf("%f %u %f %f\n",framesToApply, wholeFramesToApply, rolloverCombine, sithTime_physicsRolloverFrames);
-
-        for (int i = 0; i < wholeFramesToApply; i++)
+        else
+#endif
         {
             sithSoundMixer_Tick(sithTime_deltaSeconds);
             sithEvent_Advance();
@@ -314,41 +348,21 @@ int sith_Tick()
 
             if ( (g_debugmodeFlags & 1) == 0 )
                 sithAI_TickAll();
-
+        
             sithSurface_Tick(sithTime_deltaSeconds);
-            // TODO
-            //if (g_sithMode != 2 )
-            //{
-            //    sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
-            //}
+            if ( g_sithMode != 2 )
+            {
+#ifdef FIXED_TIMESTEP_PHYS
+                sithControl_ReadControls();
+#endif
+                sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+#ifdef FIXED_TIMESTEP_PHYS
+                sithControl_FinishRead();
+#endif
+            }
+
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
         }
-
-        sithTime_deltaSeconds = tmp;
-        sithTime_deltaMs = tmp2;
-        sithTime_TickHz = tmp3;
-        //stdControl_updateKHz = tmp4;
-        //stdControl_updateHz = tmp5;
-
-        
-#else
-        sithSoundMixer_Tick(sithTime_deltaSeconds);
-        sithEvent_Advance();
-
-        if ( sithCogVm_bSyncMultiplayer )
-            sithCogVm_Sync();
-
-        if ( (g_debugmodeFlags & 1) == 0 )
-            sithAI_TickAll();
-    
-        sithSurface_Tick(sithTime_deltaSeconds);
-        if ( g_sithMode != 2 )
-        {
-            sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
-        }
-
-        sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-#endif
 
         sithCogScript_TickAll();
         
