@@ -56,7 +56,7 @@ sithThing* sithTemplate_GetEntryByIdx(int idx)
         idx &= ~0x8000; // ?
     }
     
-    if ( world && idx >= 0 && idx < world->numTemplatesLoaded ) // original doesn't check world, but Cog does?
+    if ( world && idx > 0 && idx < world->numTemplatesLoaded ) // original doesn't check world, but Cog does?
     {
         return &world->templates[idx];
     }

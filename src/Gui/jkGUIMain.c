@@ -63,7 +63,7 @@ void jkGuiMain_Show()
     wchar_t *v4; // [esp-4h] [ebp-Ch]
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
-    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !sithDplay_idk) || jkGuiMultiplayer_Show2() != 1 )
+    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !sithDplay_dword_8321F8) || jkGuiMultiplayer_Show2() != 1 )
     {
         do
         {

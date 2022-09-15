@@ -1192,7 +1192,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             sithDplay_dword_832208 = 0;
             sithDplay_dword_832200 = 0;
             sithDplay_dword_832210 = 0;
-            sithMulti_dword_832620 = 0;
+            sithNet_dword_832620 = 0;
         }
     }
     return 1;

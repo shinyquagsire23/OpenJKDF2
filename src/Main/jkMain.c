@@ -241,7 +241,7 @@ void jkMain_GuiAdvance()
 #endif
                     jkGame_Update();
                 }
-                game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
+                jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }
         thing_nine = 0;
@@ -354,7 +354,7 @@ void jkMain_EscapeMenuTick(int a2)
 #endif
                         jkGame_Update();
                     }
-                    game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
+                    jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
                 }
             }
         }
@@ -645,7 +645,7 @@ void jkMain_GameplayTick(int a2)
 #endif
                     jkGame_Update();
                 }
-                game_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
+                jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }
     }

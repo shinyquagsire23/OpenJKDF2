@@ -17,6 +17,8 @@
 [[[cog
     import cog
 
+    addrs = []
+
     f = open(symbols_fpath, "r")
     for line in f.readlines():
         if "//" in line:
@@ -32,6 +34,11 @@
         c_type = " ".join(parts[2:])
         c_type_post = ""
         c_val = "";
+
+        if addr in addrs:
+            cog.outl("aaaaaaaa duplicate addr %s" % addr)
+        else:
+            addrs += [addr]
         
         if "=" in c_type:
             c_val = c_type.split("=")[1]

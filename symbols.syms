@@ -73,7 +73,7 @@ sithRender_aSectors 0x0082F110 sithSector*[128]
 sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[128]
 sithRender_aSectors2 0x0082FC68 sithSector*[162]
 vertices_tmp 0x0082F310 rdVector3[32]
-vertices_tmp_projected 0x0082F310 rdVector3[32]
+vertices_tmp_projected 0x0082F4C0 rdVector3[32]
 sithRender_aSurfaces 0x008318F8 sithSurface*[32]
 sithRender_lastRenderTick 0x008EE678 int
 aSithSurfaces 0x00847E98 sithSurface*[32]
@@ -141,7 +141,6 @@ sithMulti_arr_832218 0x00832218 int[256]
 sithMulti_dword_832658 0x00832658 int
 sithMulti_dword_832654 0x00832654 int
 sithMulti_dword_832660 0x00832660 int
-sithMulti_dword_832620 0x00832620 int
 sithMulti_requestConnectIdx 0x00832618 uint32_t
 sithMulti_dword_832664 0x00832664 int
 
@@ -182,7 +181,6 @@ sithSoundMixer_aIdk 0x00836B68 int[32]
 sithSoundMixer_activeChannels 0x00836BE8 int
 sithSoundMixer_bOpened 0x00836BEC int
 sithSoundMixer_pLastSectorSoundSector 0x00836BF4 sithSector*
-sithSoundMixer_dword_836BF8 0x00836BF8 int
 sithSoundMixer_dword_836BFC 0x00836BFC int
 sithSoundMixer_trackFrom 0x008BBC74 int
 sithSoundMixer_trackTo 0x008BBC70 int
@@ -236,7 +234,6 @@ sithNet_isMulti 0x00832624 int
 sithNet_isServer 0x00832628 int
 sithNet_dword_832638 0x00832638 int
 sithNet_dword_8C4BA4 0x008C4BA4 int
-sithNet_things_idx 0x008330F0 int
 sithNet_things 0x008326AC int[641]
 sithNet_thingsIdx 0x008330F0 int
 sithNet_syncIdx 0x008330F4 int
@@ -330,12 +327,12 @@ std3D_rectViewIdk 0x00865320 rdRect
 std3D_aViewIdk 0x008652A0 float[32]
 std3D_aViewTris 0x00865260 rdTri[2]
 std3D_gpuMaxTexSizeMaybe 0x0053D668 int = 1
-std3D_dword_53D66C 0x0053D668 int = 1
-std3D_dword_53D670 0x0053D668 int = 0x100
-std3D_dword_53D674 0x0053D668 int = 0x100
+std3D_dword_53D66C 0x0053D66C int = 1
+std3D_dword_53D670 0x0053D670 int = 0x100
+std3D_dword_53D674 0x0053D674 int = 0x100
 std3D_renderList 0x0055C7D0 intptr_t
 
-sithDplay_idk 0x008321F8 int
+sithDplay_dword_8321F8 0x008321F8 int
 sithDplay_bInitted 0x008321D8 int
 sithDplay_dword_8321F0 0x008321F0 int
 sithDplay_dword_8321F4 0x008321F4 int
@@ -345,7 +342,6 @@ sithDplay_dword_832208 0x00832208 uint32_t
 sithDplay_dword_83220C 0x0083220C int
 sithDplay_dword_8321E0 0x008321E0 int
 sithDplay_bIsServer 0x008321E4 int
-sithDplay_dword_8321F8 0x008321F8 int
 sithDplay_dword_8321E8 0x008321E8 int
 sithDplay_waIdk 0x008C4C60 wchar_t[32]
 sithDplay_dword_8321DC 0x008321DC int
@@ -660,7 +656,6 @@ thing_six 0x00552B90 int
 thing_eight 0x00552B94 int
 jkMain_dword_552B98 0x00552B98 int
 jkMain_lastTickMs 0x00552B9C int
-game_updateMsecsTotal 0x00552B58 int
 idx_13b4_related 0x008C4BD8 int
 gamemode_1_str 0x00552958 char[128]
 jkMain_strIdk 0x005529D8 char[128]
