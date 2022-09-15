@@ -1419,7 +1419,7 @@ void do_hooks()
     hook_function(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
     hook_function(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
     hook_function(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
-    hook_function(sithIntersect_sub_508BE0_ADDR, sithIntersect_sub_508BE0);
+    hook_function(sithIntersect_SphereHit_ADDR, sithIntersect_SphereHit);
     hook_function(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
     hook_function(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
     hook_function(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);
@@ -2308,7 +2308,7 @@ void do_hooks()
     hook_function_inv(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
     hook_function_inv(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
     hook_function_inv(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
-    hook_function_inv(sithIntersect_sub_508BE0_ADDR, sithIntersect_sub_508BE0); // regressed
+    hook_function_inv(sithIntersect_SphereHit_ADDR, sithIntersect_SphereHit); // regressed
     hook_function_inv(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
     hook_function_inv(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
     hook_function_inv(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);

@@ -76,9 +76,7 @@ void sithItem_Remove(sithThing *item)
     }
     else
     {
-        item->physicsParams.vel.x = 0.0;
-        item->physicsParams.vel.y = 0.0;
-        item->physicsParams.vel.z = 0.0;
+        rdVector_Zero3(&item->physicsParams.vel);
         sithThing_LeaveSector(item);
         sithThing_SetPosAndRot(item, &item->itemParams.position, &item->lookOrientation);
         sithThing_MoveToSector(item, item->itemParams.sector, 1);

@@ -99,11 +99,6 @@ void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVec
     int v8; // esi
     rdVector2 *v9; // eax
     rdVector2 *v10; // eax
-    double v11; // st7
-    sithWorld *v12; // ecx
-    double v13; // st5
-    double v14; // st6
-    sithSurfaceInfo *v15; // ecx
     unsigned int v16; // eax
     rdMatrix34 *v17; // [esp-4h] [ebp-38h]
     rdVector3 a1a; // [esp+10h] [ebp-24h] BYREF
@@ -129,28 +124,19 @@ void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVec
             rdVector_Normalize3(&a1a, &a2a);
             
             float tmp = 0.0;
-            if ( !sithIntersect_sub_508BE0(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0) )
+            if ( !sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0) )
                 tmp = 1000.0;
             v9 = v5->vertexUVs;
-            a1a.x = tmp * a1a.x;
-            a1a.y = tmp * a1a.y;
-            a1a.z = tmp * a1a.z;
+            rdVector_Scale3Acc(&a1a, tmp);
             v10 = &v9[v6];
             v17 = &sithCamera_currentCamera->rdCam.view_matrix;
-            v11 = a2->face.clipIdk.x;
-            a1a.x = sithCamera_currentCamera->vec3_1.x + a1a.x;
-            a1a.y = sithCamera_currentCamera->vec3_1.y + a1a.y;
-            v12 = sithWorld_pCurrentWorld;
-            a1a.z = sithCamera_currentCamera->vec3_1.z + a1a.z;
+            rdVector_Add3Acc(&a1a, &sithCamera_currentCamera->vec3_1);
             v10->x = a1a.x * 16.0;
-            v13 = v12->ceilingSkyOffs.x;
-            v14 = v12->ceilingSkyOffs.y;
             v10->y = a1a.y * 16.0;
-            v15 = a2;
-            v10->x = v13 + v10->x;
-            v10->y = v14 + v10->y;
-            v10->x = v11 + v10->x;
-            v10->y = v10->y + v15->face.clipIdk.y;
+            v10->x = sithWorld_pCurrentWorld->ceilingSkyOffs.x + v10->x;
+            v10->y = sithWorld_pCurrentWorld->ceilingSkyOffs.y + v10->y;
+            v10->x = a2->face.clipIdk.x + v10->x;
+            v10->y = v10->y + a2->face.clipIdk.y;
             rdMatrix_TransformPoint34(&vertex_out, &a1a, v17);
             v16 = a4;
             ++v6;

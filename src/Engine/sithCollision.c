@@ -230,7 +230,7 @@ void sithCollision_SearchClose()
     --sithCollision_searchStackIdx;
 }
 
-float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags)
+float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags)
 {
     sithThing *v7; // esi
     sithThing *v8; // ebp
@@ -249,17 +249,16 @@ float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender
     sithCollision_searchHandler_t handler;
     int v27; // eax
     rdFace *a10; // [esp+4h] [ebp-18h] BYREF
-    int i; // [esp+Ch] [ebp-10h]
     rdVector3 a11; // [esp+10h] [ebp-Ch] BYREF
 
     senderMesh = 0;
     a10 = 0;
-    v7 = a1->thingsList;
+    v7 = pSector->thingsList;
     if ( v7 )
     {
         v8 = sender;
         v10 = flags & 8;
-        for ( i = v10; ; v10 = i )
+        while (1)
         {
             if ( (!v10 || (v7->thingflags & SITH_TF_80))
               && ((flags & RAYCAST_10) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)

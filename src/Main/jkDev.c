@@ -112,15 +112,16 @@ int jkDev_Open()
 
 void jkDev_Close()
 {
-    if ( jkDev_bOpened )
+    if (!jkDev_bOpened)
+        return;
+
+    if ( jkDev_vbuf )
     {
-        if ( jkDev_vbuf )
-        {
-            stdDisplay_VBufferFree(jkDev_vbuf);
-            jkDev_vbuf = 0;
-        }
-        jkDev_bOpened = 0;
+        stdDisplay_VBufferFree(jkDev_vbuf);
+        jkDev_vbuf = NULL;
     }
+
+    jkDev_bOpened = 0;
 }
 
 void jkDev_DrawLog()
