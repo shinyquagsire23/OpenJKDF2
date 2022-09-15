@@ -9,7 +9,7 @@ void rdPrimit3_ClearFrameCounters()
 {
 }
 
-void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed int clipSubtype, int sortingMethod, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
+void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int geoMode, signed int lightMode, int texMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
 {
     rdVertexIdxInfo *v7; // eax
     rdMeshinfo *v8; // ebx
@@ -116,9 +116,9 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int clipType, signed 
     //rdPrimit3_NoClipFace(clipType, clipSubtype, sortingMethod, idxInfo, mesh_out, idkIn);
     //return;
 
-    switch ( clipType )
+    switch ( geoMode )
     {
-        case 0:
+        case RD_GEOMODE_NOTRENDERED:
             v15 = idxInfo;
             v16 = mesh_out;
             v17 = idxInfo->numVertices;
@@ -149,8 +149,8 @@ LABEL_26:
 LABEL_27:
                 v16->numVertices = rdClip_Face3SOrtho(clipFrustum, v16->verticesProjected, v86);
             break;
-        case 1:
-        case 2:
+        case RD_GEOMODE_VERTICES:
+        case RD_GEOMODE_WIREFRAME:
             v7 = idxInfo;
             v8 = mesh_out;
             v9 = idxInfo->numVertices;
@@ -178,11 +178,11 @@ LABEL_27:
             else
                 v8->numVertices = rdClip_Face3WOrtho(clipFrustum, v8->verticesProjected, v9);
             break;
-        case 3:
-            switch ( clipSubtype )
+        case RD_GEOMODE_SOLIDCOLOR:
+            switch ( lightMode )
             {
-                case 0:
-                case 1:
+                case RD_LIGHTMODE_FULLYLIT:
+                case RD_LIGHTMODE_NOTLIT:
                     v23 = idxInfo;
                     v16 = mesh_out;
                     v24 = idxInfo->numVertices;
@@ -208,7 +208,7 @@ LABEL_27:
                         goto LABEL_27;
                     mesh_out->numVertices = rdClip_Face3S(clipFrustum, mesh_out->verticesProjected, idxInfoc);
                     break;
-                case 2:
+                case RD_LIGHTMODE_DIFFUSE:
                     v30 = idxInfo;
                     v16 = mesh_out;
                     v24 = idxInfo->numVertices;
@@ -236,7 +236,7 @@ LABEL_25:
                     if ( rdCamera_pCurCamera->projectType == 1 )
                         goto LABEL_26;
                     goto LABEL_27;
-                case 3:
+                case RD_LIGHTMODE_GOURAUD:
                     v36 = idxInfo;
                     v37 = mesh_out;
                     v38 = idxInfo->intensities;
@@ -327,10 +327,10 @@ LABEL_25:
                     return;
             }
             break;
-        case 4:
-            if ( clipSubtype >= 0 )
+        case RD_GEOMODE_TEXTURED:
+            if ( lightMode >= RD_LIGHTMODE_FULLYLIT)
             {
-                if ( clipSubtype <= 2 )
+                if ( lightMode <= RD_LIGHTMODE_DIFFUSE)
                 {
                     v71 = mesh_out;
                     v72 = idxInfo->numVertices;
@@ -370,7 +370,7 @@ LABEL_25:
                     else
                         v71->numVertices = rdClip_Face3TOrtho(clipFrustum, v83, v85, v72);
                 }
-                else if ( clipSubtype == 3 )
+                else if ( lightMode == RD_LIGHTMODE_GOURAUD)
                 {
                     v52 = idxInfo;
                     v53 = mesh_out;
@@ -468,7 +468,7 @@ LABEL_25:
     }
 }
 
-void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMethod, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn)
+void rdPrimit3_NoClipFace(int geoMode, signed int lightMode, int texMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn)
 {
     rdMeshinfo *v6; // eax
     int v7; // esi
@@ -564,9 +564,9 @@ void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMetho
     int vertexSrcg; // [esp+30h] [ebp+10h]
     int clipIdka; // [esp+38h] [ebp+18h]
 
-    switch ( clipType )
+    switch ( geoMode )
     {
-        case 0:
+        case RD_GEOMODE_NOTRENDERED:
             v13 = _vertexSrc;
             v7 = _vertexSrc->numVertices;
             vertexSrcb = _vertexSrc->numVertices;
@@ -587,8 +587,8 @@ void rdPrimit3_NoClipFace(int clipType, signed int clipSubtype, int sortingMetho
             while ( v7 );
             _vertexDst->numVertices = vertexSrcb;
             return;
-        case 1:
-        case 2:
+        case RD_GEOMODE_VERTICES:
+        case RD_GEOMODE_WIREFRAME:
             v6 = _vertexSrc;
             v7 = _vertexSrc->numVertices;
             vertexSrca = _vertexSrc->numVertices;
@@ -615,11 +615,11 @@ LABEL_19:
                 _vertexDst->numVertices = v7;
             }
             return;
-        case 3:
-            switch ( clipSubtype )
+        case RD_GEOMODE_SOLIDCOLOR:
+            switch ( lightMode )
             {
-                case 0:
-                case 1:
+                case RD_LIGHTMODE_FULLYLIT:
+                case RD_LIGHTMODE_NOTLIT:
                     v19 = _vertexSrc;
                     v7 = _vertexSrc->numVertices;
                     vertexSrcc = _vertexSrc->numVertices;
@@ -640,7 +640,7 @@ LABEL_19:
                     while ( v7 );
                     _vertexDst->numVertices = vertexSrcc;
                     return;
-                case 2:
+                case RD_LIGHTMODE_DIFFUSE:
                     v25 = _vertexSrc;
                     v7 = _vertexSrc->numVertices;
                     vertexSrcd = _vertexSrc->numVertices;
@@ -662,7 +662,7 @@ LABEL_19:
                         v7 = vertexSrcd;
                     }
                     goto LABEL_19;
-                case 3:
+                case RD_LIGHTMODE_GOURAUD:
                     v31 = _vertexSrc;
                     v32 = _vertexDst;
                     v33 = _vertexSrc->intensities;
@@ -740,12 +740,12 @@ LABEL_19:
                 default:
                     return;
             }
-        case 4:
-            if ( clipSubtype < 0 )
+        case RD_GEOMODE_TEXTURED:
+            if ( lightMode < RD_LIGHTMODE_FULLYLIT)
                 return;
-            if ( clipSubtype > 2 )
+            if ( lightMode > RD_LIGHTMODE_DIFFUSE)
             {
-                if ( clipSubtype != 3 )
+                if ( lightMode != RD_LIGHTMODE_GOURAUD)
                     return;
                 v46 = _vertexSrc;
                 v47 = _vertexDst;

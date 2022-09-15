@@ -565,7 +565,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
 
 LABEL_31:
     if ( fireSound )
-        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
+        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
     if ( anim >= 0 )
     {
         if ( sender->animclass )
@@ -884,9 +884,9 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         {
             if ( player == g_localPlayerThing )
                 sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
-            if ( (weapon->thingflags & 0x100) != 0 )
+            if ( (weapon->thingflags & SITH_TF_INVULN) != 0 )
             {
-                spawned->thingflags |= 0x100;
+                spawned->thingflags |= SITH_TF_INVULN;
             }
         }
     }
