@@ -69,20 +69,20 @@ int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int 
         {
             fX1 = x_clipped;
             fY1 = y_clipped;
-            clipOutcodeX1Y1 = rdClip_CalcOutcode2(canvas, (int)x_clipped, (int)y_clipped);
+            clipOutcodeX1Y1 = rdClip_CalcOutcode2(canvas, round(x_clipped), round(y_clipped));
         }
         else
         {
             fX2 = x_clipped;
             fY2 = y_clipped;
-            clipOutcodeX2Y2 = rdClip_CalcOutcode2(canvas, (int)x_clipped, (int)y_clipped);
+            clipOutcodeX2Y2 = rdClip_CalcOutcode2(canvas, round(x_clipped), round(y_clipped));
         }
     }
     
-    *pX1 = (int)fX1;
-    *pY1 = (int)fY1;
-    *pX2 = (int)fX2;
-    *pY2 = (int)fY2;
+    *pX1 = round(fX1);
+    *pY1 = round(fY1);
+    *pX2 = round(fX2);
+    *pY2 = round(fY2);
     return 1;
 }
 
@@ -1366,7 +1366,7 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
         v101 = pDestVert;
     }
     if ( v101 != vertices )
-        _memcpy(vertices, pDestVert, 4 * ((unsigned int)(sizeof(rdVector3) * v5) >> 2));
+        _memcpy(vertices, pDestVert, sizeof(rdVector3) * v5);
     return v5;
 }
 

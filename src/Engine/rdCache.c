@@ -531,9 +531,9 @@ int rdCache_SendFaceListToHardware()
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
             {
-                rdCache_aHWVertices[rdCache_totalVerts].x = ceilf(iterating_6c_vtxs[vtx_idx].x);
+                rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x); // Added: The original game rounded to ints here (with ceilf?)
                 iterating_6c_vtxs_ = active_6c->vertices;
-                rdCache_aHWVertices[rdCache_totalVerts].y = ceilf(active_6c->vertices[vtx_idx].y);
+                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
                 v36 = iterating_6c_vtxs_[vtx_idx].z;
                 iterating_6c_vtxs = iterating_6c_vtxs_;
                 if ( v36 == 0.0 )
@@ -820,8 +820,8 @@ LABEL_232:
         alpha_upshifta = red_and_alpha << 8;
         for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
         {
-            rdCache_aHWVertices[rdCache_totalVerts].x = ceilf(active_6c->vertices[tmpiter].x);
-            rdCache_aHWVertices[rdCache_totalVerts].y = ceilf(active_6c->vertices[tmpiter].y);
+            rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[tmpiter].x);  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[tmpiter].y);  // Added: The original game rounded to ints here (with ceilf?)
             v87 = active_6c->vertices[tmpiter].z;
 
             if ( v87 == 0.0 )
