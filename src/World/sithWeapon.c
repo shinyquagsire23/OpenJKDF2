@@ -788,7 +788,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     if ( (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 )
         goto LABEL_9;
     typeFlags = thing->weaponParams.typeflags;
-    if ( ((typeFlags & SITH_WF_IMPACT_SOUND_FX) != 0 && (v6 & SITH_SURFACE_4000) != 0 || (typeFlags & SITH_WF_RICOCHET_OFF_SURFACE) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
+    if ( ((typeFlags & SITH_WF_IMPACT_SOUND_FX) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (typeFlags & SITH_WF_RICOCHET_OFF_SURFACE) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
       && (++thing->weaponParams.numDeflectionBounces < 6) )
     {
         thing->physicsParams.physflags |= SITH_PF_SURFACEBOUNCE;

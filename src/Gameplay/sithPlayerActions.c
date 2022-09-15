@@ -102,7 +102,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
             if ( isAttached )
             {
                 v14 = attachedSurface->surfaceFlags;
-                if ( (v14 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
+                if ( (v14 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
                     if ( (v14 & SITH_SURFACE_METAL) != 0 )
                     {

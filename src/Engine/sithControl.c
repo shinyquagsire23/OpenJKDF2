@@ -1194,7 +1194,7 @@ void sithControl_PlayerMovement(sithThing *player)
     }
 
     if ( (player->attach_flags & SITH_ATTACH_WORLDSURFACE)
-         && (player->attachedSurface->surfaceFlags & (SITH_SURFACE_100000|SITH_SURFACE_WATER)) )
+         && (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER)) )
     {
         move_multiplier *= 0.5;
     }
