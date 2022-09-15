@@ -229,7 +229,7 @@ void sithSoundMixer_ClearAll()
         sithSoundMixer_aIdk[31 - i] = i;
     }
 
-    sithSoundMixer_dword_836BF8 = 0;
+    sithSoundMixer_pPlayingSoundIdk = 0;
     sithSoundMixer_dword_836BFC = 0;
     sithSoundMixer_pLastSectorSoundSector = 0;
 }
