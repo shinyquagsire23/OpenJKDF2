@@ -996,7 +996,7 @@ LABEL_150:
                 if ( v63 != 2 )
                 {
                     if ( a2 >= 1.0 )
-                        i->rdthing.lightMode = 0;
+                        i->rdthing.curLightMode = RD_LIGHTMODE_FULLYLIT;
                     if ( sithRender_RenderThing(i) )
                         ++sithRender_831980;
                 }
@@ -1284,7 +1284,7 @@ void sithRender_RenderThings()
                         }
                     }
                     
-                    v8 = thingIter->rdthing.texMode;
+                    v8 = thingIter->rdthing.curTexMode;
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
                     {
                         thingIter->rdthing.textureMode = v8 > 0 ? 0 : v8;
@@ -1293,7 +1293,7 @@ void sithRender_RenderThings()
                     {
                         v9 = 1;
                         if ( v8 <= 1 )
-                            v9 = thingIter->rdthing.texMode;
+                            v9 = thingIter->rdthing.curTexMode;
                         thingIter->rdthing.textureMode = v9;
                     }
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
@@ -1319,7 +1319,7 @@ void sithRender_RenderThings()
                     }
                     if ( a2 >= 1.0 )
                     {
-                        v11 = thingIter->rdthing.lightMode;
+                        v11 = thingIter->rdthing.curLightMode;
                         if ( v16 )
                         {
                             v11 = v11 > 0 ? 0 : v11;
@@ -1332,13 +1332,13 @@ void sithRender_RenderThings()
                     }
                     else if ( (thingIter->thingflags & SITH_TF_4000000) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
                     {
-                        v11 = thingIter->rdthing.lightMode;
+                        v11 = thingIter->rdthing.curLightMode;
                         if ( v11 > 2 )
                             v11 = 2;
                     }
                     else
                     {
-                        v11 = thingIter->rdthing.lightMode;
+                        v11 = thingIter->rdthing.curLightMode;
                         if ( v11 > 3 )
                             v11 = 3;
                     }

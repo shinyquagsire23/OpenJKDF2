@@ -520,6 +520,37 @@ typedef void (*rdPuppetTrackCallback_t)(sithThing*, int32_t, uint32_t);
 // Define some maximums here
 #define SITHBIN_NUMBINS (200)
 
+// Constants
+enum RD_GEOMODE
+{
+    RD_GEOMODE_NOTRENDERED = 0,
+    RD_GEOMODE_VERTICES = 1,
+    RD_GEOMODE_WIREFRAME = 2,
+    RD_GEOMODE_SOLIDCOLOR = 3,
+    RD_GEOMODE_TEXTURED = 4,
+    RD_GEOMODE_Dunno = 5
+};
+
+enum RD_LIGHTMODE
+{
+    RD_LIGHTMODE_FULLYLIT = 0,
+    RD_LIGHTMODE_NOTLIT = 1, // doesn't seem to do anything
+    RD_LIGHTMODE_DIFFUSE = 2,
+    RD_LIGHTMODE_GOURAUD = 3,
+    RD_LIGHTMODE_Dunno1 = 4,
+    RD_LIGHTMODE_Dunno2 = 5,
+    RD_LIGHTMODE_Dunno3 = 6
+};
+
+enum RD_TEXTUREMODE
+{
+    RD_TEXTUREMODE_AFFINE = 0,
+    RD_TEXTUREMODE_PERSPECTIVE = 1,
+    RD_TEXTUREMODE_Dunno1 = 2,
+    RD_TEXTUREMODE_Dunno2 = 3,
+    RD_TEXTUREMODE_Dunno3 = 4
+};
+
 // All the typedefs
 typedef struct rdVector2i
 {
@@ -1944,9 +1975,9 @@ typedef struct rdThing
         rdParticle* particlecloud;
         rdPolyLine* polyline;
     };
-    uint32_t geoMode;
-    uint32_t lightMode;
-    uint32_t texMode;
+    uint32_t curGeoMode;
+    uint32_t curLightMode;
+    uint32_t curTexMode;
     rdPuppet* puppet;
     uint32_t field_18;
     uint32_t frameTrue;

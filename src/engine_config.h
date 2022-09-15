@@ -21,4 +21,25 @@
 // Run game physics at a fixed timestep
 #define FIXED_TIMESTEP_PHYS
 
+// Disable warnings for Vegetable Studio
+#if 1 && defined _MSC_VER
+#pragma warning(disable: 4003) // not enough arguments for function-like macro invocation
+#pragma warning(disable: 4005) // 'blahblah': macro redefinition
+#pragma warning(disable: 4022) // pointer mismatch for actual parameter
+#pragma warning(disable: 4024) // different types for formal and actual parameter
+#pragma warning(disable: 4047) // 'blahblah *' differs in levels of indirection from 'blahblah (*)[blah]'
+#pragma warning(disable: 4090) // different 'const' qualifiers
+#pragma warning(disable: 4098) // 'void' function returning a value
+#pragma warning(disable: 4113) // 'FARPROC' differs in parameter lists from 'blahblah'
+#pragma warning(disable: 4133) // 'function': incompatible types - from 'blahblah [blah]' to 'const blah *'
+#pragma warning(disable: 4190) // 'blahblah' has C-linkage specified, but returns UDT 'blahblahblahhhhh' which is incompatible with C
+#pragma warning(disable: 4229) // anachronism used: modifiers on data are ignored
+#pragma warning(disable: 4311) // 'type cast': pointer truncation from 'blah *' to 'blah'
+#pragma warning(disable: 4312) // 'type cast': conversion from 'blah' to 'blah *' of greater size
+#pragma warning(disable: 4700) // uninitialized local variable 'blahblah' used
+#pragma warning(disable: 4715) // not all control paths return a value
+#pragma warning(disable: 4716) // 'blahblah': must return a value
+#pragma warning(disable: 5105) // macro expansion producing 'defined' has undefined behavior
+#endif
+
 #endif // _OPENJKDF2_ENGINE_CONFIG_H
