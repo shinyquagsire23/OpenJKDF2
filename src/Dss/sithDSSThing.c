@@ -210,7 +210,7 @@ int sithDSSThing_HandleSyncThing(sithCogMsg *msg)
 
     sithAnimclass* pAnimclass = pThing->animclass;
     pThing->thingflags = thingflags;
-    pThing->rdthing.geometryMode = NETMSG_POPS32();
+    pThing->rdthing.geometryMode = (rdGeoMode_t)NETMSG_POPS32();
     if ( pAnimclass )
     {
         sithPuppet_SetArmedMode(pThing, NETMSG_POPS16());
@@ -880,7 +880,7 @@ int sithDSSThing_HandleSyncThingFull(sithCogMsg *msg)
     thing->pulse_end_ms = NETMSG_POPS32();
     thing->pulse_ms = NETMSG_POPS32();
     thing->userdata = NETMSG_POPF32();
-    thing->rdthing.geometryMode = NETMSG_POPU8();
+    thing->rdthing.geometryMode = (rdGeoMode_t)NETMSG_POPU8();
     thing->collide = NETMSG_POPS16();
     thing->collideSize = NETMSG_POPF32();
     thing->light = NETMSG_POPF32();
