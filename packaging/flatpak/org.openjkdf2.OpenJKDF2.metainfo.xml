@@ -41,6 +41,7 @@
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.6.7" date="2022-09-14" />
     <release version="0.6.6" date="2022-09-14" />
     <release version="0.6.5" date="2022-09-10" />
     <release version="0.6.4" date="2022-09-10" />
