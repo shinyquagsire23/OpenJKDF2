@@ -38,8 +38,8 @@
 #endif
 
 #ifdef _WIN32
-    #include <windows.h> // Ug, for NukeProcess -- see below
     #include <winsock2.h>
+    #include <windows.h> // Ug, for NukeProcess -- see below
     #include <ws2tcpip.h>
     typedef int socklen_t;
 #else
