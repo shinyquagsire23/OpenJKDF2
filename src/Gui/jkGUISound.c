@@ -59,7 +59,6 @@ void jkGuiSound_Initialize()
     jkGuiSound_bLowResSound = wuRegistry_GetBool("bLowRes", jkGuiSound_bLowResSound);
     jkGuiSound_b3DSound = wuRegistry_GetBool("b3DSound", jkGuiSound_b3DSound);
     jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
-    printf("%x\n", jkGuiSound_b3DSound);
     sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume); // TODO
 
     stdSound_SetMenuVolume(jkGuiSound_sfxVolume);

@@ -3,6 +3,7 @@
 #include "Gui/jkGUISound.h"
 #include "Main/Main.h"
 #include "stdPlatform.h"
+#include "Platform/wuRegistry.h"
 
 #include "jk.h"
 
@@ -101,7 +102,12 @@ int stdSound_Initialize()
     alListenerf(AL_MAX_GAIN, 1.0f);
     alListenerf(AL_MIN_GAIN, 0.0f);
 
-    jkGuiSound_b3DSound = 0;
+    jkGuiSound_musicVolume = wuRegistry_GetFloat("musicVolume", jkGuiSound_musicVolume);
+    jkGuiSound_sfxVolume = wuRegistry_GetFloat("sfxVolume", jkGuiSound_sfxVolume);
+    jkGuiSound_numChannels = 256;
+    jkGuiSound_bLowResSound = wuRegistry_GetBool("bLowRes", jkGuiSound_bLowResSound);
+    jkGuiSound_b3DSound = wuRegistry_GetBool("b3DSound", jkGuiSound_b3DSound);
+    jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
 
     return 1;
 }
