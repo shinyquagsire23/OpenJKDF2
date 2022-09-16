@@ -2077,7 +2077,7 @@ void do_hooks()
     hook_function(jkGuiSingleplayer_Initialize_ADDR, jkGuiSingleplayer_Initialize);
     hook_function(jkGuiSingleplayer_Shutdown_ADDR, jkGuiSingleplayer_Shutdown);
     hook_function(jkGuiSingleplayer_Show_ADDR, jkGuiSingleplayer_Show);
-    hook_function(jkGuiSingleplayer_sub_41A9B0_ADDR, jkGuiSingleplayer_sub_41A9B0);
+    hook_function(jkGuiSingleplayer_EnumEpisodes_ADDR, jkGuiSingleplayer_EnumEpisodes);
     hook_function(jkGuiSingleplayer_sub_41AA30_ADDR, jkGuiSingleplayer_sub_41AA30);
     hook_function(jkGuiSingleplayer_sub_41AC70_ADDR, jkGuiSingleplayer_sub_41AC70);
     hook_function(jkGuiSingleplayer_sub_41AD00_ADDR, jkGuiSingleplayer_sub_41AD00);

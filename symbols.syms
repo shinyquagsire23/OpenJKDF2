@@ -237,8 +237,8 @@ sithNet_dword_8C4BA4 0x008C4BA4 int
 sithNet_things 0x008326AC int[641]
 sithNet_thingsIdx 0x008330F0 int
 sithNet_syncIdx 0x008330F4 int
-sithNet_aSyncFlags 0x008330B0 int[16]
-sithNet_aSyncThings 0x00832668 sithThing*[16]
+sithNet_aSyncFlags 0x008330B0 int[SITH_MAX_SYNC_THINGS]
+sithNet_aSyncThings 0x00832668 sithThing*[SITH_MAX_SYNC_THINGS]
 sithNet_tickrate 0x005490D4 int = 180
 sithNet_dword_8C4BA8 0x008C4BA8 int
 sithNet_dword_83262C 0x0083262C int

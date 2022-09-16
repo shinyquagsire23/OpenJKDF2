@@ -19,6 +19,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sith.h"
 #include "Main/Main.h"
+#include "AI/sithAI.h"
 
 #define sithMulti_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
 #define sithMulti_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
@@ -259,7 +260,7 @@ int sithMulti_SendRequestConnect(int sendto_id)
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 1, 0);
 }
 
-int sithMulti_sub_4CBFC0(sithThing *pPlayerThing)
+int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
 {
     unsigned int v1; // esi
     unsigned int v2; // ebp
@@ -272,6 +273,11 @@ int sithMulti_sub_4CBFC0(sithThing *pPlayerThing)
     sithThing *v10; // eax
     unsigned int v11; // [esp+10h] [ebp-90h]
     int v12[32]; // [esp+20h] [ebp-80h] BYREF
+
+    // Added: Spawn at start in co-op.
+    if (sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+        return 0;
+    }
 
     v1 = jkPlayer_maxPlayers;
     v2 = 0;
@@ -1480,6 +1486,15 @@ LABEL_30:
                             sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
 
                         sithDSSThing_SendTeleportThing(v14, sithMulti_sendto_id, 0);
+
+                        // Added: co-op
+                        if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {
+                            printf("Sending corpse sync?\n");
+                            //sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
+                            //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
+                            if (v14->rdthing.puppet)
+                                sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
+                        }
 
 LABEL_55:
                         if ( (signed int)sithDplay_dword_832208 > sithWorld_pCurrentWorld->numThings )

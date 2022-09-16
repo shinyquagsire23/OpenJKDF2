@@ -196,7 +196,7 @@ LABEL_30:
                     v22 = jkStrings_GetText(jkEpisode_var4);
                     _wcsncpy(v16->unistr, v22, 0x40u);
                     v23 = pHS;
-                    v16->field_A0 = 1;
+                    v16->type = JK_EPISODE_SINGLEPLAYER;
                     v24 = 0;
                     v23->fileGets(v17, v29, 64);
                     if ( !pHS->feof(v17) )
@@ -220,7 +220,7 @@ LABEL_30:
                             if ( pHS->feof(v17) )
                                 goto LABEL_50;
                         }
-                        _sscanf(v29, "TYPE %d", &v16->field_A0);
+                        _sscanf(v29, "TYPE %d", &v16->type);
                     }
                 }
 LABEL_50:
@@ -242,7 +242,6 @@ LABEL_50:
 
 int jkEpisode_Load(jkEpisodeLoad *a1)
 {
-    common_functions *v1; // eax
     int v2; // eax
     int v4; // esi
     char *i; // ecx
@@ -272,12 +271,11 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
     char sFile[64]; // [esp+D8h] [ebp-80h] BYREF
     char v31[64]; // [esp+118h] [ebp-40h] BYREF
 
-    v1 = pHS;
     numSeq = 0;
     a1->numSeq = 0;
     a1->field_8 = 0;
     a1->paEntries = 0;
-    v2 = v1->fileOpen("episode.jk", "rt");
+    v2 = pHS->fileOpen("episode.jk", "rt");
     if ( !v2 )
         return 0;
     v4 = 0;
@@ -322,7 +320,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
         if ( pHS->feof(v2) )
             goto LABEL_30;
     }
-    if ( _sscanf(a1a, "TYPE %d", a1) != 1 )
+    if ( _sscanf(a1a, "TYPE %d", &a1->type) != 1 )
     {
 LABEL_30:
         pHS->fileClose((intptr_t)v2);
@@ -359,7 +357,8 @@ LABEL_47:
         stdPrintf(pHS->errorPrint, ".\\Main\\jkEpisode.c", 114, "Bad 'SEQ n' line in sequence list 'episode.jkl'\n", 0, 0, 0, 0);
         return 0;
     }
-    aEnts_size = (numSeq + 1) << 6;
+    aEnts_size = (numSeq + 1) * sizeof(jkEpisodeEntry);
+
     aEnts = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
     a1->paEntries = aEnts;
     if ( !aEnts )

@@ -35,6 +35,7 @@
 #include "Cog/sithCog.h"
 #include "Dss/sithDSSThing.h"
 #include "stdPlatform.h"
+#include "Dss/sithDSS.h"
 #include "jk.h"
 
 #define NUM_THING_PARAMS (72)
@@ -1913,13 +1914,11 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
 
 void sithThing_SyncThingPos(sithThing *thing, int a2)
 {
-    int v2; // edx
     unsigned int v3; // eax
     sithThing **v4; // ecx
 
     if ( sithCogVm_multiplayerFlags )
     {
-        v2 = sithNet_syncIdx;
         v3 = 0;
         if ( sithNet_syncIdx )
         {
@@ -1936,11 +1935,11 @@ void sithThing_SyncThingPos(sithThing *thing, int a2)
         else
         {
 LABEL_6:
-            if ( sithNet_syncIdx != 16 )
+            if ( sithNet_syncIdx < SITH_MAX_SYNC_THINGS ) // Added: != -> <
             {
                 sithNet_aSyncThings[sithNet_syncIdx] = thing;
-                sithNet_aSyncFlags[v2] = a2;
-                sithNet_syncIdx = v2 + 1;
+                sithNet_aSyncFlags[sithNet_syncIdx] = a2;
+                sithNet_syncIdx++;
             }
         }
     }
@@ -1958,18 +1957,28 @@ void sithThing_netidk()
         {
             v1 = sithNet_aSyncFlags[v0];
             if ( (v1 & 4) != 0 )
-                break;
-            if ( (v1 & 2) != 0 )
-                sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
-            if ( (sithNet_aSyncFlags[v0] & 1) != 0 )
-                sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
+            {
+                // Added: this used to be outside the loop?
+                sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
+
+                // Added: Co-op
+                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8) && sithNet_aSyncThings[v0]->rdthing.puppet)
+                    sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+            }
+            else
+            {
+                if ( (v1 & 2) != 0 )
+                    sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
+                if ( (sithNet_aSyncFlags[v0] & 1) != 0 )
+                    sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
+            }
             if ( ++v0 >= (unsigned int)sithNet_syncIdx )
             {
                 sithNet_syncIdx = 0;
                 return;
             }
         }
-        sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
+        
     }
     else
     {

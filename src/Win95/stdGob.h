@@ -75,7 +75,7 @@ stdGob* stdGob_Load(char *fpath, int a2, int a3);
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4);
 void stdGob_Free(stdGob *gob);
 void stdGob_FreeEntry(stdGob *gob);
-stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath);
+stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath);
 void stdGob_FileClose(stdGobFile *f);
 int stdGob_FSeek(stdGobFile *f, int pos, int whence);
 int32_t stdGob_FTell(stdGobFile *f);

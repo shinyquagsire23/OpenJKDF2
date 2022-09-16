@@ -416,7 +416,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 void jkMain_EndLevelScreenShow(int a1, int a2)
 {
     stdControl_ToggleCursor(0); // Added
-    if ( jkEpisode_mLoad.field_0 != 1 && jkSmack_gameMode == 2
+    if ( jkEpisode_mLoad.type != JK_EPISODE_SINGLEPLAYER && jkSmack_gameMode == 2
       || jkGuiSingleTally_Show() != -1
       && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
        || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )

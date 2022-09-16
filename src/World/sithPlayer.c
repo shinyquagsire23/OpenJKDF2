@@ -496,19 +496,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
             sithMulti_HandleDeath(v1, thing, thing);
         if ( thing == g_localPlayerThing )
         {
-            if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & 0x100) != 0 )
-            {
-                sithPlayer_debug_ToNextCheckpoint(thing);
-            }
-            else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
-            {
-                stdString_snprintf(v4, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
-                stdFnames_ChangeExt(v4, "jks");
-                sithGamesave_Load(v4, 0, 0);
-            }
-            sithSoundMixer_ResumeMusic(1);
-            thing->type = SITH_THING_PLAYER;
-            thing->lifeLeftMs = 0;
+            sithPlayer_debug_loadauto(thing);
         }
     }
 }
@@ -613,7 +601,6 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     int v3; // eax
     sithThing *v4; // eax
     stdPalEffect *v6; // eax
-    int v7; // eax
     int v9; // edi
 
     v1 = player->rdthing.puppet;
@@ -645,13 +632,13 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             v6 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
             stdPalEffects_ResetEffect(v6);
         }
-        v7 = sithNet_isMulti;
+
         player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_WILLBEREMOVED);
         player->actorParams.typeflags &= ~SITH_AF_PLAYER_KILLED;
         player->lifeLeftMs = 0;
-        if ( !v7 || player == g_localPlayerThing )
+        if ( !sithNet_isMulti || player == g_localPlayerThing )
         {
-            v9 = sithMulti_sub_4CBFC0(player);
+            v9 = sithMulti_GetSpawnIdx(player);
             sithThing_LeaveSector(player);
             sithThing_SetPosAndRot(
                 player,

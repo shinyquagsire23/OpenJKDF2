@@ -19,6 +19,12 @@ extern "C" {
 
 #include "Primitives/rdRect.h"
 
+#ifdef QOL_IMPROVEMENTS
+#define SITH_MAX_SYNC_THINGS (128)
+#else
+#define SITH_MAX_SYNC_THINGS (16)
+#endif
+
 #define SITHCOGVM_MAX_STACKSIZE (64)
 
 #define RDCACHE_MAX_TRIS (0x400)
@@ -1656,6 +1662,8 @@ typedef struct sithCogSurfaceLink
 } sithCogSurfaceLink;
 
 // jkEpisode
+typedef int jkEpisodeTypeFlags_t;
+
 typedef struct jkEpisode
 {
     char name[32];
@@ -1676,7 +1684,7 @@ typedef struct jkEpisode
     int field_94;
     int field_98;
     int field_9C;
-    int field_A0;
+    jkEpisodeTypeFlags_t type;
 } jkEpisode;
 
 typedef struct jkEpisodeEntry
@@ -1692,10 +1700,18 @@ typedef struct jkEpisodeEntry
     int gotoB;
 } jkEpisodeEntry;
 
+enum jkEpisodeLoadType
+{
+    JK_EPISODE_SINGLEPLAYER = 1,
+    JK_EPISODE_DEATHMATCH = 2,
+    JK_EPISODE_4_UNK = 4,
+    JK_EPISODE_SPECIAL_CTF = 8,
+    JK_EPISODE_ALL = 0xFFFF
+};
 
 typedef struct jkEpisodeLoad
 {
-    int field_0;
+    jkEpisodeTypeFlags_t type;
     int numSeq;
     int field_8;
     jkEpisodeEntry* paEntries;

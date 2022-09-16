@@ -4,6 +4,7 @@
 #include "Win95/stdSound.h"
 #include "Engine/sithSound.h"
 #include "General/stdHashTable.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -21,7 +22,7 @@ int DebugConsole_Initialize(int maxCmds)
         if ( v1 )
         {
             DebugConsole_maxCmds = maxCmds;
-            _memset(DebugConsole_aCmds, 0, 4 * ((sizeof(stdDebugConsoleCmd) * maxCmds) >> 2));
+            _memset(DebugConsole_aCmds, 0, sizeof(stdDebugConsoleCmd) * maxCmds);
             DebugGui_fnPrint = 0;
             DebugGui_fnPrintUniStr = 0;
             sithDebugConsole_Initialize();
@@ -70,7 +71,7 @@ int DebugConsole_Open(int maxLines)
     signed int result; // eax
 
     DebugGui_maxLines = maxLines;
-    _memset(DebugLog_buffer, 0, 4 * ((unsigned int)(maxLines << 7) >> 2));
+    _memset(DebugLog_buffer, 0, 0x80 * maxLines);
     DebugGui_some_line_amt = 0;
     DebugGui_some_num_lines = 0;
     DebugGui_idk = 0;
@@ -104,8 +105,8 @@ void DebugConsole_Print(const char *str)
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
             DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-        _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], str, 0x7Fu);
-        DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+
+        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], str, 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
 }
@@ -142,8 +143,8 @@ int DebugConsole_TryCommand(char *cmd)
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
             DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-        _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_genBuffer, 0x7Fu);
-        DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+
+        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_genBuffer, 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
     return 0;
@@ -174,9 +175,8 @@ int DebugConsole_RegisterDevCmd(void *fn, char *cmd, int extra)
 
     if ( DebugConsole_numRegisteredCmds == DebugConsole_maxCmds )
         return 0;
-    _strncpy(DebugConsole_aCmds[DebugConsole_numRegisteredCmds].cmdStr, cmd, 0x1Fu);
+    stdString_SafeStrCopy(DebugConsole_aCmds[DebugConsole_numRegisteredCmds].cmdStr, cmd, 0x20);
     v4 = &DebugConsole_aCmds[DebugConsole_numRegisteredCmds];
-    v4->cmdStr[31] = 0;
     v4->cmdFunc = fn;
     v4->extra = extra;
     stdHashTable_SetKeyVal(DebugConsole_pCmdHashtable, v4->cmdStr, v4);
@@ -212,8 +212,8 @@ int DebugConsole_PrintHelp()
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
             DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-        _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], "The following commands are available:", 0x7Fu);
-        DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+        
+        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], "The following commands are available:", 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
     v2 = 0;
@@ -230,8 +230,7 @@ int DebugConsole_PrintHelp()
                 DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
                 if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
                     DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-                _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x7Fu);
-                DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+                stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x80);
                 DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
             }
             v0 = 0;
@@ -250,8 +249,7 @@ int DebugConsole_PrintHelp()
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
             DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
-        _strncpy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x7Fu);
-        DebugLog_buffer[128 * DebugGui_some_num_lines + 127] = 0;
+        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], v4, 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
         result = 1;
     }

@@ -128,7 +128,7 @@ int jkGuiSingleplayer_Show()
                         v17 = jkEpisode_aEpisodes;
                         do
                         {
-                            if ( v17->field_A0 & 1 )
+                            if ( v17->type & JK_EPISODE_SINGLEPLAYER )
                             {
                                 jkGuiRend_DarrayReallocStr(&darray, v17->unistr, (intptr_t)v17);
                                 ++v15;
@@ -170,7 +170,7 @@ int jkGuiSingleplayer_Show()
                     a1[0] = 0;
                     jkGui_sub_412E20(&jkGuiSingleplayer_menu2, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                     jkGuiRend_DarrayNewStr(&array, jkEpisode_var2 + 1, 0);
-                    if ( jkGuiSingleplayer_sub_41A9B0(&array, &jkGuiSingleplayer_buttons2[6], 0, 0xFFFF) == 1 )
+                    if ( jkGuiSingleplayer_EnumEpisodes(&array, &jkGuiSingleplayer_buttons2[6], 0, JK_EPISODE_ALL) == 1 )
                     {
                         clicked = 1;
                         jkGuiSingleplayer_buttons2[6].selectedTextEntry = 0;
@@ -200,7 +200,7 @@ int jkGuiSingleplayer_Show()
                         {
                             jkGui_sub_412E20(&jkGuiSingleplayer_menu3, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                             jkGuiRend_DarrayNewStr(&array2, 10, 1);
-                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.field_0, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.field_8, jkGui_episodeLoad.paEntries);
+                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.type, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.field_8, jkGui_episodeLoad.paEntries);
                             jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[7]);
                             jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[8]);
                             clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu3);
@@ -236,7 +236,7 @@ int jkGuiSingleplayer_Show()
                                         break;
                                     }
                                 }
-                                //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.field_0, jkEpisode_mLoad.field_8);
+                                //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.type, jkEpisode_mLoad.field_8);
                             }
                         }
                     }
@@ -262,7 +262,7 @@ int jkGuiSingleplayer_Show()
     return 1;
 }
 
-int jkGuiSingleplayer_sub_41A9B0(Darray *array, jkGuiElement *element, int a3, int a4)
+int jkGuiSingleplayer_EnumEpisodes(Darray *array, jkGuiElement *element, int a3, jkEpisodeTypeFlags_t typeMask)
 {
     int ret = 0;
 
@@ -271,7 +271,7 @@ int jkGuiSingleplayer_sub_41A9B0(Darray *array, jkGuiElement *element, int a3, i
 
     for (int i = 0; i < jkEpisode_var2; i++)
     {
-        if ( jkEpisode_aEpisodes[i].field_A0 & a4 )
+        if ( jkEpisode_aEpisodes[i].type & typeMask )
         {
             jkGuiRend_DarrayReallocStr(array, jkEpisode_aEpisodes[i].unistr, (intptr_t)&jkEpisode_aEpisodes[i]);
             ++ret;

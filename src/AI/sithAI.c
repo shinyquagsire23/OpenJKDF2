@@ -25,6 +25,8 @@
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
+#include "Dss/sithDSS.h"
+#include "Engine/sithMulti.h"
 #include "jk.h"
 
 stdHashTable* sithAI_commandsHashmap = NULL;
@@ -284,7 +286,13 @@ void sithAI_TickAll()
           && actor->nextUpdate <= sithTime_curMs )
         {
             sithAI_TickActor(actor);
+
+            if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+                sithThing_SyncThingPos(actor->thing, 0xF); // Added
+                sithDSS_SendSyncAI(actor, -1, 1); // Added
+            }
         }
+
         ++v0;
     }
 }

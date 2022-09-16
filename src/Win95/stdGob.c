@@ -164,14 +164,13 @@ void stdGob_FreeEntry(stdGob *gob)
     }
 }
 
-stdGobFile* stdGob_FileOpen(stdGob *gob, char *filepath)
+stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
 {
     stdGobEntry *entry;
     stdGobFile *result;
     int v5;
 
-    _strncpy(stdGob_fpath, filepath, 127);
-    stdGob_fpath[127] = 0;
+    stdString_SafeStrCopy(stdGob_fpath, filepath, 128);
     stdString_CStrToLower(stdGob_fpath);
 
 #ifdef PLATFORM_POSIX

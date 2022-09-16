@@ -41,7 +41,7 @@ extern "C" {
 #define sithMulti_HandleDeath_ADDR (0x004CBC50)
 #define sithMulti_HandleScore_ADDR (0x004CBDE0)
 #define sithMulti_EndLevel_ADDR (0x004CBF90)
-#define sithMulti_sub_4CBFC0_ADDR (0x004CBFC0)
+#define sithMulti_GetSpawnIdx_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
 #ifdef QOL_IMPROVEMENTS
@@ -105,7 +105,7 @@ int sithMulti_Startup();
 void sithMulti_FreeThing(int a1);
 void sithMulti_Shutdown();
 int sithMulti_SendRequestConnect(int sendto_id);
-int sithMulti_sub_4CBFC0(sithThing *pPlayerThing);
+int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
 void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
 void sithMulti_EndLevel(unsigned int a1, int a2);

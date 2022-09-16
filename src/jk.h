@@ -360,6 +360,7 @@ int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
 char* _strstr(const char* a, const char* b);
 #endif
 
+long jk_wcstol(const wchar_t * nptr, wchar_t ** endptr, int base);
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);

@@ -11,6 +11,7 @@
 #include "General/util.h"
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
+#include "General/stdString.h"
 
 static int jkRes_bInit;
 
@@ -92,8 +93,7 @@ void jkRes_LoadGob(char *a1)
         stdGob_Free(jkRes_gCtx.gobs[2].gobs[v3]);
     }
     jkRes_gCtx.gobs[2].numGobs = 0;
-    _strncpy(jkRes_episodeGobName, a1, 0x1Fu);
-    jkRes_episodeGobName[31] = 0;
+    stdString_SafeStrCopy(jkRes_episodeGobName, a1, 0x20);
     if (*a1 != 0)
     {
         __snprintf(v30, 0x80u, "%s.gob", jkRes_episodeGobName);

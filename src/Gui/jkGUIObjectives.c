@@ -19,12 +19,12 @@
 static jkGuiStringEntry jkGuiObjectives_aTexts[50];
 
 static jkGuiElement jkGuiObjectives_elements[6] = {
-    {ELEMENT_TEXT,  0, 11, "GUI_OBJECTIVES",  3, {0x32, 0x32, 0x1F4, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_TEXT,  0,  9,  0,  3, {0x32, 0x50, 0x1F4, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  8,  0,  0, {0x28, 0x6E, 0x208, 0x122},  1,  0,  0, jkGuiObjectives_CustomRender,  0,  0, {0},  0},
-    {ELEMENT_TEXT,  0,  8,  0,  3, {0x28, 0x190, 0x208, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_PICBUTTON,  1,  0,  0, 20, {-1, -1, -1, -1},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
+    {ELEMENT_TEXT,          0, 11, "GUI_OBJECTIVES",  3, {0x32, 0x32, 0x1F4, 20},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,          0,  9,  0,  3, {0x32, 0x50, 0x1F4, 20},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_CUSTOM,        0,  8,  0,  0, {0x28, 0x6E, 0x208, 0x122},  1,  0,  0, jkGuiObjectives_CustomRender,  0,  0, {0},  0},
+    {ELEMENT_TEXT,          0,  8,  0,  3, {0x28, 0x190, 0x208, 20},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_PICBUTTON,     1,  0,  0, 20, {-1, -1, -1, -1},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_END,           0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
 };
 
 static jkGuiMenu jkGuiObjectives_menu = {jkGuiObjectives_elements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};

@@ -319,7 +319,7 @@ int sith_Tick()
                 if ( sithCogVm_bSyncMultiplayer )
                     sithCogVm_Sync();
 
-                if ( (g_debugmodeFlags & 1) == 0 )
+                if ( (g_debugmodeFlags & 1) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                     sithAI_TickAll();
 
                 sithSurface_Tick(sithTime_deltaSeconds);
@@ -346,7 +346,7 @@ int sith_Tick()
             if ( sithCogVm_bSyncMultiplayer )
                 sithCogVm_Sync();
 
-            if ( (g_debugmodeFlags & 1) == 0 )
+            if ( (g_debugmodeFlags & 1) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                 sithAI_TickAll();
         
             sithSurface_Tick(sithTime_deltaSeconds);
