@@ -33,7 +33,7 @@ sithThing* sithAICmd_NearestPlayer(sithActor *actor)
         sithThing* playerThing = playerInfo->playerThing;
         if (!playerThing) continue;
 
-        if ((playerThing->thingflags & SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED) || playerThing->type != SITH_THING_PLAYER)
+        if ((playerThing->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) || playerThing->type != SITH_THING_PLAYER)
             continue;
 
         float dist = rdVector_Dist3(&playerThing->position, &actor->thing->position);
