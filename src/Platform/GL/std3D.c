@@ -2502,27 +2502,27 @@ void std3D_PurgeTextureCache()
 
         std3D_aLoadedTextures[i] = 0;
 
-        if (tex->albedo_data) {
+        if (tex->albedo_data != NULL) {
             jkgm_aligned_free(tex->albedo_data);
             tex->albedo_data = NULL;
         }
 
-        if (tex->emissive_data) {
+        if (tex->emissive_data != NULL) {
             jkgm_aligned_free(tex->emissive_data);
             tex->emissive_data = NULL;
         }
 
-        if (tex->displacement_data) {
+        if (tex->displacement_data != NULL) {
             jkgm_aligned_free(tex->displacement_data);
             tex->displacement_data = NULL;
         }
 
-        if (tex->emissive_texture_id) {
+        if (tex->emissive_texture_id != NULL) {
             glDeleteTextures(1, &tex->emissive_texture_id);
             tex->emissive_texture_id = 0;
         }
 
-        if (tex->displacement_texture_id) {
+        if (tex->displacement_texture_id != NULL) {
             glDeleteTextures(1, &tex->displacement_texture_id);
             tex->displacement_texture_id = 0;
         }

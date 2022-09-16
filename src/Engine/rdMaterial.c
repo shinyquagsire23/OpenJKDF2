@@ -106,6 +106,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
     {
         texinfo_alloc = (rdTexinfo *)rdroid_pHS->alloc(sizeof(rdTexinfo));
+        memset(texinfo_alloc, 0, sizeof(rdTexinfo));
         material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
         {
@@ -128,6 +129,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     if ( num_textures )
     {
       textures = (rdTexture *)rdroid_pHS->alloc(sizeof(rdTexture) * num_textures);
+      memset(textures, 0, sizeof(rdTexture) * num_textures);
       material->textures = textures;
       if ( !textures )
       {
