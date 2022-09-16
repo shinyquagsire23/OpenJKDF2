@@ -164,24 +164,24 @@ int sithSurface_Load(sithWorld *world)
         {
             face->type &= ~4;
         }
-        face->geometryMode = _atoi(stdConffile_entry.args[4].value);
+        face->geometryMode = (rdGeoMode_t)_atoi(stdConffile_entry.args[4].value);
 
         if ( face->material )
         {
             if ( (face->material->tex_type & 2) == 0 )
             {
-                face->geometryMode = 3;
+                face->geometryMode = RD_GEOMODE_SOLIDCOLOR;
                 surfaceIter->surfaceFlags &= ~(SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY);
             }
         }
         else
         {
-            face->geometryMode = 0;
+            face->geometryMode = RD_GEOMODE_NOTRENDERED;
         }
-        face->lightingMode = _atoi(stdConffile_entry.args[5].value);
+        face->lightingMode = (rdLightMode_t)_atoi(stdConffile_entry.args[5].value);
         if ( (surfaceIter->surfaceFlags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) != 0 )
-            face->lightingMode = 0;
-        face->textureMode = _atoi(stdConffile_entry.args[6].value);
+            face->lightingMode = RD_LIGHTMODE_FULLYLIT;
+        face->textureMode = (rdTexMode_t)_atoi(stdConffile_entry.args[6].value);
         adjoinIdx = _atoi(stdConffile_entry.args[7].value);
         if ( adjoinIdx == -1 )
         {

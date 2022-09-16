@@ -459,16 +459,16 @@ void sithCogFunctionSurface_GetFaceType(sithCog *ctx)
 
 void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
 {
-    signed int v1; // edi
+    rdGeoMode_t geoMode; // edi
     sithSurface *v2; // eax
 
-    v1 = sithCogVm_PopInt(ctx);
+    geoMode = (rdGeoMode_t)sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
     if ( v2 )
     {
         if ( v2->surfaceInfo.face.material )
         {
-            v2->surfaceInfo.face.geometryMode = v1;
+            v2->surfaceInfo.face.geometryMode = geoMode;
             if ( COG_SHOULD_SYNC(ctx) )
             {
                 sithSurface_PushSurface(v2);
@@ -477,7 +477,7 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
         }
         else
         {
-            v2->surfaceInfo.face.geometryMode = 0;
+            v2->surfaceInfo.face.geometryMode = RD_GEOMODE_NOTRENDERED;
             if ( COG_SHOULD_SYNC(ctx) )
             {
                 sithSurface_PushSurface(v2);
@@ -493,21 +493,21 @@ void sithCogFunctionSurface_GetFaceGeoMode(sithCog *ctx)
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
-        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.geometryMode);
+        sithCogVm_PushInt(ctx, (int)v1->surfaceInfo.face.geometryMode);
     else
         sithCogVm_PushInt(ctx, -1);
 }
 
 void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
 {
-    signed int v1; // edi
+    rdLightMode_t lightMode; // edi
     sithSurface *v2; // eax
 
-    v1 = sithCogVm_PopInt(ctx);
+    lightMode = (rdLightMode_t)sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
     if ( v2 )
     {
-        v2->surfaceInfo.face.lightingMode = v1;
+        v2->surfaceInfo.face.lightingMode = lightMode;
         if ( COG_SHOULD_SYNC(ctx) )
         {
             sithSurface_PushSurface(v2);
@@ -521,21 +521,21 @@ void sithCogFunctionSurface_GetFaceLightMode(sithCog *ctx)
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
-        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.lightingMode);
+        sithCogVm_PushInt(ctx, (int)v1->surfaceInfo.face.lightingMode);
     else
         sithCogVm_PushInt(ctx, -1);
 }
 
 void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
 {
-    signed int v1; // edi
+    rdTexMode_t texMode; // edi
     sithSurface *v2; // eax
 
-    v1 = sithCogVm_PopInt(ctx);
+    texMode = (rdTexMode_t)sithCogVm_PopInt(ctx);
     v2 = sithCogVm_PopSurface(ctx);
     if ( v2 )
     {
-        v2->surfaceInfo.face.textureMode = v1;
+        v2->surfaceInfo.face.textureMode = texMode;
         if ( COG_SHOULD_SYNC(ctx) )
         {
             sithSurface_PushSurface(v2);
@@ -549,7 +549,7 @@ void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
-        sithCogVm_PushInt(ctx, v1->surfaceInfo.face.textureMode);
+        sithCogVm_PushInt(ctx, (int)v1->surfaceInfo.face.textureMode);
     else
         sithCogVm_PushInt(ctx, -1);
 }

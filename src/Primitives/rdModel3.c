@@ -1142,7 +1142,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 
     if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
-        curLightingMode = 0;
+        curLightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
     {
@@ -1155,7 +1155,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curTextureMode >= rdroid_curTextureMode )
         curTextureMode = rdroid_curTextureMode;
 
-    if ( curLightingMode > 1 )
+    if ( curLightingMode > RD_LIGHTMODE_NOTLIT)
     {
         rdModel3_numGeoLights = 0;
         pGeoLight = apGeoLights;
@@ -1334,9 +1334,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 int rdModel3_DrawFace(rdFace *face, int lightFlags)
 {
     rdProcEntry *procEntry;
-    int geometryMode;
-    int lightingMode;
-    int textureMode;
+    rdGeoMode_t geometryMode;
+    rdLightMode_t lightingMode;
+    rdTexMode_t textureMode;
     rdVector3 faceNormal;
     int flags;
 

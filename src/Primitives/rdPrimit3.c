@@ -9,7 +9,7 @@ void rdPrimit3_ClearFrameCounters()
 {
 }
 
-void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, signed int geoMode, signed int lightMode, int texMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
+void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
 {
     rdVertexIdxInfo *v7; // eax
     rdMeshinfo *v8; // ebx
@@ -468,7 +468,7 @@ LABEL_25:
     }
 }
 
-void rdPrimit3_NoClipFace(int geoMode, signed int lightMode, int texMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn)
+void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn)
 {
     rdMeshinfo *v6; // eax
     int v7; // esi

@@ -25,7 +25,7 @@ rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, float width, 
     return sprite;
 }
 
-int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, int geometryMode, int lightMode, int textureMode, float extraLight, rdVector3 *offset)
+int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *material, float width, float height, rdGeoMode_t geometryMode, rdLightMode_t lightMode, rdTexMode_t textureMode, float extraLight, rdVector3 *offset)
 {
     if (spritepath)
     {
@@ -47,7 +47,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
         sprite->face.vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
         if ( sprite->face.vertexPosIdx )
         {
-            if ( sprite->face.geometryMode <= 3 )
+            if ( sprite->face.geometryMode <= RD_GEOMODE_SOLIDCOLOR)
             {
                 for (int i = 0; i < sprite->face.numVertices; i++)
                 {
@@ -168,9 +168,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdSprite_inVerts[3].y = sprite->offset.y + vertex_out.y;
     rdSprite_inVerts[3].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
 
-    int curGeometryMode_ = rdroid_curGeometryMode;
-    int curLightingMode_ = rdroid_curLightingMode;
-    int curTextureMode_ = rdroid_curTextureMode;
+    rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
+    rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+    rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
     if ( curGeometryMode_ >= sprite->face.geometryMode )
         curGeometryMode_ = sprite->face.geometryMode;
     if ( curGeometryMode_ >= thing->geometryMode )

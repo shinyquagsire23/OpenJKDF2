@@ -146,9 +146,9 @@ int sithRender_Startup()
 
 int sithRender_Open()
 {
-    sithRender_geoMode = 4;
-    sithRender_lightMode = 3;
-    sithRender_texMode = 1;
+    sithRender_geoMode = RD_GEOMODE_TEXTURED;
+    sithRender_lightMode = RD_LIGHTMODE_GOURAUD;
+    sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
 
     for (int i = 0; i < SITHREND_NUM_LIGHTS; i++)
     {
@@ -213,19 +213,19 @@ void sithRender_DisableIRMode()
     sithRender_lightingIRMode = 0;
 }
 
-void sithRender_SetGeoMode(int val)
+void sithRender_SetGeoMode(rdGeoMode_t geoMode)
 {
-    sithRender_geoMode = val;
+    sithRender_geoMode = geoMode;
 }
 
-void sithRender_SetLightMode(int a1)
+void sithRender_SetLightMode(rdLightMode_t lightMode)
 {
-    sithRender_lightMode = a1;
+    sithRender_lightMode = lightMode;
 }
 
-void sithRender_SetTexMode(int a1)
+void sithRender_SetTexMode(int texMode)
 {
-    sithRender_texMode = a1;
+    sithRender_texMode = texMode;
 }
 
 void sithRender_SetPalette(const void *palette)
@@ -466,7 +466,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             meshinfo_out.verticesProjected = vertices_tmp;
             sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
-            rdPrimit3_ClipFace(frustumArg, 2, 1, 0, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
+            rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
 
             if ( ((unsigned int)meshinfo_out.numVertices >= 3u || (rdClip_faceStatus & 0x40) != 0)
               && ((rdClip_faceStatus & 0x41) != 0
@@ -532,7 +532,7 @@ void sithRender_RenderLevelGeometry()
     int v19; // ebp
     rdProcEntry *v20; // esi
     int v21; // eax
-    int v22; // eax
+    rdLightMode_t lightMode2; // eax
     int v23; // ecx
     int v24; // eax
     unsigned int v28; // ebp
@@ -544,10 +544,10 @@ void sithRender_RenderLevelGeometry()
     int v38; // ecx
     char v39; // al
     rdProcEntry *procEntry; // esi
-    int v41; // eax
-    int v42; // eax
-    int v43; // ecx
-    int v44; // eax
+    rdGeoMode_t geoMode; // eax
+    rdLightMode_t lightMode; // eax
+    rdTexMode_t texMode; // ecx
+    rdTexMode_t texMode2; // eax
     unsigned int num_vertices; // ebp
     float v49; // edx
     float *v51; // eax
@@ -561,7 +561,7 @@ void sithRender_RenderLevelGeometry()
     char rend_flags; // al
     sithThing *i; // esi
     int v63; // eax
-    int v64; // [esp-10h] [ebp-74h]
+    rdTexMode_t texMode3; // [esp-10h] [ebp-74h]
     sithSurface *v65; // [esp+10h] [ebp-54h]
     float v66; // [esp+14h] [ebp-50h]
     float v67; // [esp+14h] [ebp-50h]
@@ -674,42 +674,42 @@ void sithRender_RenderLevelGeometry()
                     continue;
                 if ( (v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY)) != 0 )
                 {
-                    v41 = sithRender_geoMode;
-                    if ( sithRender_geoMode > 3 )
-                        v41 = 3;
+                    geoMode = sithRender_geoMode;
+                    if ( sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
+                        geoMode = RD_GEOMODE_SOLIDCOLOR;
                 }
                 else
                 {
-                    v41 = v65->surfaceInfo.face.geometryMode;
-                    if ( v41 >= sithRender_geoMode )
-                        v41 = sithRender_geoMode;
+                    geoMode = v65->surfaceInfo.face.geometryMode;
+                    if ( geoMode >= sithRender_geoMode )
+                        geoMode = sithRender_geoMode;
                 }
-                procEntry->geometryMode = v41;
-                v42 = v65->surfaceInfo.face.lightingMode;
+                procEntry->geometryMode = geoMode;
+                lightMode = v65->surfaceInfo.face.lightingMode;
                 if ( sithRender_lightingIRMode )
                 {
-                    if ( v42 >= 2 )
-                        v42 = 2;
+                    if ( lightMode >= RD_LIGHTMODE_DIFFUSE)
+                        lightMode = RD_LIGHTMODE_DIFFUSE;
                 }
-                else if ( v42 >= sithRender_lightMode )
+                else if ( lightMode >= sithRender_lightMode )
                 {
-                    v42 = sithRender_lightMode;
+                    lightMode = sithRender_lightMode;
                 }
-                v43 = sithRender_texMode;
-                procEntry->lightingMode = v42;
-                v44 = v65->surfaceInfo.face.textureMode;
-                if ( v44 >= v43 )
-                    v44 = v43;
-                procEntry->textureMode = v44;
+                texMode = sithRender_texMode;
+                procEntry->lightingMode = lightMode;
+                texMode2 = v65->surfaceInfo.face.textureMode;
+                if ( texMode2 >= texMode )
+                    texMode2 = texMode;
+                procEntry->textureMode = texMode2;
                 meshinfo_out.verticesProjected = vertices_tmp;
                 sithRender_idxInfo.intensities = v65->surfaceInfo.intensities;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
                 sithRender_idxInfo.numVertices = v65->surfaceInfo.face.numVertices;
-                v64 = v44;
+                texMode3 = texMode2;
                 sithRender_idxInfo.vertexUVIdx = v65->surfaceInfo.face.vertexUVIdx;
-                rdPrimit3_ClipFace(level_idk->clipFrustum, procEntry->geometryMode, procEntry->lightingMode, v64, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
+                rdPrimit3_ClipFace(level_idk->clipFrustum, procEntry->geometryMode, procEntry->lightingMode, texMode3, &sithRender_idxInfo, &meshinfo_out, &v65->surfaceInfo.face.clipIdk);
                 num_vertices = meshinfo_out.numVertices;
                 if ( meshinfo_out.numVertices < 3u )
                 {
@@ -730,26 +730,26 @@ void sithRender_RenderLevelGeometry()
                 {
                     if ( v68 )
                     {
-                        procEntry->lightingMode = 0;
+                        procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
                     }
                     else
                     {
-                        procEntry->lightingMode = 2;
+                        procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
                         procEntry->light_level_static = 1.0;
                     }
                 }
-                else if ( procEntry->lightingMode == 2 )
+                else if ( procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)
                 {
                     if ( procEntry->light_level_static >= 1.0 && v68 )
                     {
-                        procEntry->lightingMode = 0;
+                        procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
                     }
                     else if ( procEntry->light_level_static <= 0.0 )
                     {
-                        procEntry->lightingMode = 1;
+                        procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
                     }
                 }
-                else if ( procEntry->lightingMode == 3 )
+                else if ( procEntry->lightingMode == RD_LIGHTMODE_GOURAUD)
                 {
                     v51 = procEntry->vertexIntensities;
                     v67 = *v51;
@@ -775,22 +775,22 @@ void sithRender_RenderLevelGeometry()
                     {
                         if ( v68 )
                         {
-                            procEntry->lightingMode = 0;
+                            procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
                         }
                         else
                         {
-                            procEntry->lightingMode = 2;
+                            procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
                             procEntry->light_level_static = 1.0;
                         }
                     }
                     else if ( v67 == 0.0 )
                     {
-                        procEntry->lightingMode = 1;
+                        procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
                         procEntry->light_level_static = 0.0;
                     }
                     else
                     {
-                        procEntry->lightingMode = 2;
+                        procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
                         procEntry->light_level_static = v67;
                     }
                 }
@@ -815,7 +815,7 @@ void sithRender_RenderLevelGeometry()
                 rend_flags = 1;
                 if ( v59 >= 4 )
                     rend_flags = 3;
-                if ( procEntry->lightingMode >= 3 )
+                if ( procEntry->lightingMode >= RD_LIGHTMODE_GOURAUD)
                     rend_flags |= 4u;
                 rdCache_AddProcFace(0, num_vertices, rend_flags);
                 continue;
@@ -837,18 +837,18 @@ void sithRender_RenderLevelGeometry()
                     if ( v21 >= sithRender_geoMode )
                         v21 = sithRender_geoMode;
                     v20->geometryMode = v21;
-                    v22 = v65->surfaceInfo.face.lightingMode;
+                    lightMode2 = v65->surfaceInfo.face.lightingMode;
                     if ( sithRender_lightingIRMode )
                     {
-                        if ( v22 >= 2 )
-                            v22 = 2;
+                        if ( lightMode2 >= RD_LIGHTMODE_DIFFUSE)
+                            lightMode2 = RD_LIGHTMODE_DIFFUSE;
                     }
-                    else if ( v22 >= sithRender_lightMode )
+                    else if ( lightMode2 >= sithRender_lightMode )
                     {
-                        v22 = sithRender_lightMode;
+                        lightMode2 = sithRender_lightMode;
                     }
                     v23 = sithRender_texMode;
-                    v20->lightingMode = v22;
+                    v20->lightingMode = lightMode2;
                     v24 = v65->surfaceInfo.face.textureMode;
                     if ( v24 >= v23 )
                         v24 = v23;
@@ -856,7 +856,7 @@ void sithRender_RenderLevelGeometry()
                     v78[0] = v65->surfaceInfo.face.vertexPosIdx[v19];
                     v78[1] = v65->surfaceInfo.face.vertexPosIdx[v71];
                     v78[2] = v65->surfaceInfo.face.vertexPosIdx[v18];
-                    if ( v20->geometryMode >= 4 )
+                    if ( v20->geometryMode >= RD_GEOMODE_TEXTURED)
                     {
                         v79[0] = v65->surfaceInfo.face.vertexUVIdx[v19];
                         v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
@@ -891,15 +891,15 @@ void sithRender_RenderLevelGeometry()
                     }
                     if ( v20->ambientLight < 1.0 )
                     {
-                        if ( v20->lightingMode == 2 )
+                        if ( v20->lightingMode == RD_LIGHTMODE_DIFFUSE)
                         {
                             if ( v20->light_level_static >= 1.0 && v68 )
                             {
-                                v20->lightingMode = 0;
+                                v20->lightingMode = RD_LIGHTMODE_FULLYLIT;
                             }
                             else if ( v20->light_level_static <= 0.0 )
                             {
-                                v20->lightingMode = 1;
+                                v20->lightingMode = RD_LIGHTMODE_NOTLIT;
                             }
                             goto LABEL_87;
                         }
@@ -933,7 +933,7 @@ LABEL_87:
                             v39 = 1;
                             if ( v38 >= 4 )
                                 v39 = 3;
-                            if ( v20->lightingMode >= 3 )
+                            if ( v20->lightingMode >= RD_LIGHTMODE_GOURAUD)
                                 v39 |= 4u;
                             rdCache_AddProcFace(0, v28, v39);
 LABEL_92:
@@ -970,11 +970,11 @@ LABEL_92:
                 }
                 if ( v68 )
                 {
-                    v20->lightingMode = 0;
+                    v20->lightingMode = RD_LIGHTMODE_FULLYLIT;
                 }
                 else
                 {
-                    v20->lightingMode = 2;
+                    v20->lightingMode = RD_LIGHTMODE_DIFFUSE;
                     v20->light_level_static = 1.0;
                 }
                 goto LABEL_87;
@@ -1167,7 +1167,7 @@ void sithRender_RenderThings()
     rdModel3 *model3; // ecx
     int texMode; // ecx
     int texMode2; // eax
-    int lightMode; // eax
+    rdLightMode_t lightMode; // eax
     float v12; // [esp-Ch] [ebp-28h]
     float a2; // [esp+8h] [ebp-14h]
     float clipRadius; // [esp+Ch] [ebp-10h]

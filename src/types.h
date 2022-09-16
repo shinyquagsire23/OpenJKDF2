@@ -521,7 +521,7 @@ typedef void (*rdPuppetTrackCallback_t)(sithThing*, int32_t, uint32_t);
 #define SITHBIN_NUMBINS (200)
 
 // Constants
-typedef uint32_t rdGeoMode_t;
+typedef int32_t rdGeoMode_t;
 enum RD_GEOMODE
 {
     RD_GEOMODE_NOTRENDERED = 0,
@@ -532,6 +532,7 @@ enum RD_GEOMODE
     RD_GEOMODE_5_UNK = 5
 };
 
+typedef int32_t rdLightMode_t;
 enum RD_LIGHTMODE
 {
     RD_LIGHTMODE_FULLYLIT = 0,
@@ -543,6 +544,7 @@ enum RD_LIGHTMODE
     RD_LIGHTMODE_6_UNK = 6
 };
 
+typedef int32_t rdTexMode_t;
 enum RD_TEXTUREMODE
 {
     RD_TEXTUREMODE_AFFINE = 0,
@@ -693,9 +695,9 @@ typedef struct rdProcEntry
 {
     uint32_t extraData;
     int type;
-    uint32_t geometryMode;
-    uint32_t lightingMode;
-    uint32_t textureMode;
+    rdGeoMode_t geometryMode;
+    rdLightMode_t lightingMode;
+    rdTexMode_t textureMode;
     uint32_t anonymous_4;
     uint32_t anonymous_5;
     uint32_t numVertices;
@@ -1332,9 +1334,9 @@ typedef struct rdFace
 {
     uint32_t num;
     uint32_t type;
-    uint32_t geometryMode;
-    uint32_t lightingMode;
-    uint32_t textureMode;
+    rdGeoMode_t geometryMode;
+    rdLightMode_t lightingMode;
+    rdTexMode_t textureMode;
     uint32_t numVertices;
     int* vertexPosIdx;
     int* vertexUVIdx;
@@ -1954,9 +1956,9 @@ typedef struct rdPolyLine
     float length;
     float baseRadius;
     float tipRadius;
-    uint32_t geometryMode;
-    uint32_t lightingMode;
-    uint32_t textureMode;
+    rdGeoMode_t geometryMode;
+    rdLightMode_t lightingMode;
+    rdTexMode_t textureMode;
     rdFace edgeFace;
     rdFace tipFace;
     rdVector2* extraUVTipMaybe;
@@ -1977,8 +1979,8 @@ typedef struct rdThing
         rdPolyLine* polyline;
     };
     rdGeoMode_t curGeoMode;
-    uint32_t curLightMode;
-    uint32_t curTexMode;
+    rdLightMode_t curLightMode;
+    rdTexMode_t curTexMode;
     rdPuppet* puppet;
     uint32_t field_18;
     uint32_t frameTrue;
@@ -1988,8 +1990,8 @@ typedef struct rdThing
     uint32_t wallCel;
     uint32_t geosetSelect;
     rdGeoMode_t geometryMode;
-    uint32_t lightingMode;
-    uint32_t textureMode;
+    rdLightMode_t lightingMode;
+    rdTexMode_t textureMode;
     uint32_t clippingIdk;
     sithThing* parentSithThing;
 } rdThing;
