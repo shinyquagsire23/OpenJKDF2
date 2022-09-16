@@ -1017,7 +1017,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     float a4a; // [esp+18h] [ebp+8h]
     float a5a; // [esp+2Ch] [ebp+1Ch]
 
-    rdVector_Sub3(a5, arg8, a4);
+    rdVector_Sub3(a5, &arg8->position, a4);
     v12 = rdVector_Normalize3Acc(a5) - arg8->collideSize;
     *a8 = v12;
  
