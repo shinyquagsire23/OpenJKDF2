@@ -648,13 +648,14 @@ elseif(PLAT_MSVC)
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/zlib1.dll ${PROJECT_BINARY_DIR}
     )
 
-    #if(TARGET_USE_GAMENETWORKINGSOCKETS)
-    #    add_custom_command(TARGET ${BIN_NAME} 
-    #    POST_BUILD
-    #    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}
-    #    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
-    #	)
-    #endif()
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        add_custom_command(TARGET ${BIN_NAME} 
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/GameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.dll
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/libprotobufd.dll ${CMAKE_CURRENT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/libcrypto-3-x64.dll ${CMAKE_CURRENT_BINARY_DIR}
+    	)
+    endif()
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libgcc_s_seh-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libstdc++-6.dll . 

@@ -170,9 +170,11 @@ protobuf_generate_cpp(GNS_COMMON_PROTO_SRCS GNS_COMMON_PROTO_HDRS ${GNS_COMMON_P
 protobuf_generate_cpp(GNS_CLIENTLIB_PROTO_SRCS GNS_CLIENTLIB_PROTO_HDRS ${GNS_CLIENTLIB_PROTOS})
 
 function(gns_set_target_protobuf_properties TGT )
-	target_link_libraries(${TGT} PRIVATE
-		protobuf
-		)
+	if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+		target_link_libraries(${TGT} PRIVATE
+			protobuf
+			)
+	endif()
 endfunction()
 
 # Set the target properties (sources, link libs, defines) based on crypto settings
@@ -236,13 +238,16 @@ macro(set_clientlib_target_properties GNS_TARGET)
 	target_include_directories(${GNS_TARGET} PRIVATE
 		${Protobuf_INCLUDE_DIR} ${Protobuf_INCLUDE_DIR2}
 	)
+
 	target_link_libraries(${GNS_TARGET} PRIVATE ${Protobuf_LIBRARIES})
 
 	gns_set_target_protobuf_properties(${GNS_TARGET})
 	gns_set_target_crypto_properties(${GNS_TARGET})
 
-	file(GLOB I_HATE_PROTOBUF ${Protobuf_LIBRARIES_PATH}/libabsl*.a)
-	target_link_libraries(${GNS_TARGET} PRIVATE ${I_HATE_PROTOBUF})
+	if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+		file(GLOB I_HATE_PROTOBUF ${Protobuf_LIBRARIES_PATH}/libabsl*.a)
+		target_link_libraries(${GNS_TARGET} PRIVATE ${I_HATE_PROTOBUF})
+	endif()
 
 	target_compile_definitions(${GNS_TARGET} PRIVATE
 		STEAMNETWORKINGSOCKETS_FOREXPORT )
