@@ -164,24 +164,24 @@ int sithSurface_Load(sithWorld *world)
         {
             face->type &= ~4;
         }
-        face->geometryMode = _atoi(stdConffile_entry.args[4].value);
+        face->geometryMode = (rdGeoMode_t)_atoi(stdConffile_entry.args[4].value);
 
         if ( face->material )
         {
             if ( (face->material->tex_type & 2) == 0 )
             {
-                face->geometryMode = 3;
+                face->geometryMode = RD_GEOMODE_SOLIDCOLOR;
                 surfaceIter->surfaceFlags &= ~(SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY);
             }
         }
         else
         {
-            face->geometryMode = 0;
+            face->geometryMode = RD_GEOMODE_NOTRENDERED;
         }
-        face->lightingMode = _atoi(stdConffile_entry.args[5].value);
+        face->lightingMode = (rdLightMode_t)_atoi(stdConffile_entry.args[5].value);
         if ( (surfaceIter->surfaceFlags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) != 0 )
-            face->lightingMode = 0;
-        face->textureMode = _atoi(stdConffile_entry.args[6].value);
+            face->lightingMode = RD_LIGHTMODE_FULLYLIT;
+        face->textureMode = (rdTexMode_t)_atoi(stdConffile_entry.args[6].value);
         adjoinIdx = _atoi(stdConffile_entry.args[7].value);
         if ( adjoinIdx == -1 )
         {
@@ -496,7 +496,7 @@ void sithSurface_Tick(float deltaSecs)
         sithThing* parent_thing = surface->parent_thing;
         if ( !parent_thing || parent_thing->type && parent_thing->signature == surface->signature )
         {
-            if ( (flags & SITH_SURFACE_100000) != 0 )
+            if ( (flags & SITH_SURFACE_VERYDEEPWATER) != 0 )
             {
                 if ( (flags & SITH_SURFACE_WATER) != 0 )
                 {
@@ -700,7 +700,7 @@ int sithSurface_StopAnim(rdSurface *surface)
     int v5; // edx
     int v6; // eax
 
-    if ( (surface->flags & SITH_SURFACE_WATER) != 0 && (surface->flags & SITH_SURFACE_100000) != 0 )
+    if ( (surface->flags & SITH_SURFACE_WATER) != 0 && (surface->flags & SITH_SURFACE_VERYDEEPWATER) != 0 )
     {
         v2 = surface->sithSurfaceParent;
         v2->surfaceFlags &= ~SITH_SURFACE_SCROLLING;
@@ -838,7 +838,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     v32 = v3;
     if ( !v3 )
         return 0;
-    v3->flags = SITH_SURFACE_100000|SITH_SURFACE_WATER;
+    v3->flags = SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER;
     v3->sithSurfaceParent = surface;
     v6 = sithWorld_pCurrentWorld;
     v3->field_24 = *a2;

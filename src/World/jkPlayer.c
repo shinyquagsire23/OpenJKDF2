@@ -605,8 +605,8 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
     {
         if ( g_selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
-            int oldGeoMode = thing->rdthing.geometryMode;
-            thing->rdthing.geometryMode = thing->rdthing.geoMode;
+            rdGeoMode_t oldGeoMode = thing->rdthing.geometryMode;
+            thing->rdthing.geometryMode = thing->rdthing.curGeoMode;
             rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
             rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
 
@@ -631,7 +631,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
             jkPlayer_renderSaberTwinkle(thing);
         }
     }
-    else if ( thing->rdthing.geometryMode > 0 )
+    else if ( thing->rdthing.geometryMode > RD_GEOMODE_NOTRENDERED)
     {
         if (playerInfo->rd_thing.model3)
             rdThing_Draw(&playerInfo->rd_thing, primaryMat);

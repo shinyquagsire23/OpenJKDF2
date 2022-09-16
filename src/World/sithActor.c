@@ -108,14 +108,14 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     if ( receiver )
     {
         if ( receiver != sender && sender->thingtype == SITH_THING_ACTOR )
-            sithAI_SetActorFireTarget(sender->actor, 1, (intptr_t)receiver);
+            sithAI_SetActorFireTarget(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
         if ( v7
           && flags != 0x20
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & SITH_AF_1000000) == 0
+          && (v7->actorParams.typeflags & SITH_AF_FULL_ACTOR_DAMAGE) == 0
           && sender->type == SITH_THING_ACTOR )
         {
             amount = amount * 0.1;
@@ -274,7 +274,7 @@ int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSe
 
     v3 = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
     if ( v3 && thing->thingtype == SITH_THING_ACTOR )
-        sithAI_SetActorFireTarget(thing->actor, 512, 0);
+        sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_ACTIVE, 0);
     return v3;
 }
 
@@ -360,13 +360,13 @@ int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisi
         {
             v6 = thing->actor;
             if ( v6 )
-                sithAI_SetActorFireTarget(v6, 4, (intptr_t)thing2);
+                sithAI_SetActorFireTarget(v6, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
         }
         if ( thing2->thingtype == SITH_THING_ACTOR )
         {
             v7 = thing2->actor;
             if ( v7 )
-                sithAI_SetActorFireTarget(v7, 4, (intptr_t)thing);
+                sithAI_SetActorFireTarget(v7, SITHAI_MODE_SEARCHING, (intptr_t)thing);
         }
         result = v5;
     }

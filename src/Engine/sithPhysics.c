@@ -694,9 +694,9 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     {
         attachedNormal = thing->attachedSufaceInfo->face.normal;
         possibly_undef_1 = rdMath_DistancePointToPlane(&thing->position, &attachedNormal, &thing->field_38);
-        if ( (thing->attachedSurface->surfaceFlags & (SITH_SURFACE_1000|SITH_SURFACE_2000)) != 0 )
+        if ( (thing->attachedSurface->surfaceFlags & (SITH_SURFACE_ICY|SITH_SURFACE_VERYICY)) != 0 )
         {
-            if ( (thing->attachedSurface->surfaceFlags & SITH_SURFACE_2000) != 0 )
+            if ( (thing->attachedSurface->surfaceFlags & SITH_SURFACE_VERYICY) != 0 )
                 possibly_undef_2 = 0.1;
             else
                 possibly_undef_2 = 0.3;

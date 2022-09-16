@@ -69,9 +69,9 @@ int sithDSS_HandleSyncSurface(sithCogMsg *msg)
     surface->surfaceInfo.face.clipIdk = NETMSG_POPVEC2();
     surface->surfaceInfo.face.extraLight = NETMSG_POPF32();
     surface->surfaceInfo.face.type = NETMSG_POPU32();
-    surface->surfaceInfo.face.geometryMode = NETMSG_POPU32();
-    surface->surfaceInfo.face.lightingMode = NETMSG_POPU32();
-    surface->surfaceInfo.face.textureMode = NETMSG_POPU32();
+    surface->surfaceInfo.face.geometryMode = (rdGeoMode_t)NETMSG_POPU32();
+    surface->surfaceInfo.face.lightingMode = (rdLightMode_t)NETMSG_POPU32();
+    surface->surfaceInfo.face.textureMode = (rdTexMode_t)NETMSG_POPU32();
 
     if ( surface->adjoin )
         surface->adjoin->flags = NETMSG_POPU32();

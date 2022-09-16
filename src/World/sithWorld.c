@@ -424,7 +424,7 @@ int sithHeader_Load(sithWorld *world, int junk)
         &world->mipmapDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &world->loadDistance.x, &world->loadDistance.y, &world->loadDistance.z, &world->loadDistance.w);
+    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &world->lodDistance.x, &world->lodDistance.y, &world->lodDistance.z, &world->lodDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_aLine, "perspective distance %f", &world->perspectiveDistance);

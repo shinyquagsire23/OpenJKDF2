@@ -644,7 +644,7 @@ void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
             if ( !(thing->attach_flags & SITH_ATTACH_THINGSURFACE) )
             {
                 v10 = thing->attachedSurface->surfaceFlags;
-                if ( (v10 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
+                if ( (v10 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
                     if ( (v10 & SITH_SURFACE_METAL) != 0 )
                         goto LABEL_14;

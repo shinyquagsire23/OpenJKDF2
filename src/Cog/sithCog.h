@@ -56,18 +56,18 @@
 
 #define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithCogVm_netMsgTmp.pktData[0];
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&sithDplay_cogMsgTmp.pktData[0];
-#define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = x; craftingPacket += sizeof(uint8_t);};
-#define NETMSG_PUSHU16(x) {*(uint16_t*)craftingPacket = x; craftingPacket += sizeof(uint16_t);};
-#define NETMSG_PUSHS16(x) {*(int16_t*)craftingPacket = x; craftingPacket += sizeof(int16_t);};
-#define NETMSG_PUSHU32(x) {*(uint32_t*)craftingPacket = x; craftingPacket += sizeof(uint32_t);};
-#define NETMSG_PUSHS32(x) {*(int32_t*)craftingPacket = x; craftingPacket += sizeof(int32_t);};
-#define NETMSG_PUSHF32(x) {*(float*)craftingPacket = x; craftingPacket += sizeof(float);};
-#define NETMSG_PUSHVEC2(x) {*(rdVector2*)craftingPacket = x; craftingPacket += sizeof(rdVector2);};
-#define NETMSG_PUSHVEC3(x) {*(rdVector3*)craftingPacket = x; craftingPacket += sizeof(rdVector3);};
-#define NETMSG_PUSHVEC3I(x) {*(rdVector3i*)craftingPacket = x; craftingPacket += sizeof(rdVector3i);};
-#define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = x; craftingPacket += sizeof(rdMatrix34);};
-#define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, x, (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
-#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((wchar_t*)craftingPacket, x, (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
+#define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = (uint8_t)(x); craftingPacket += sizeof(uint8_t);};
+#define NETMSG_PUSHU16(x) {*(uint16_t*)craftingPacket = (uint16_t)(x); craftingPacket += sizeof(uint16_t);};
+#define NETMSG_PUSHS16(x) {*(int16_t*)craftingPacket = (int16_t)(x); craftingPacket += sizeof(int16_t);};
+#define NETMSG_PUSHU32(x) {*(uint32_t*)craftingPacket = (uint32_t)(x); craftingPacket += sizeof(uint32_t);};
+#define NETMSG_PUSHS32(x) {*(int32_t*)craftingPacket = (int32_t)(x); craftingPacket += sizeof(int32_t);};
+#define NETMSG_PUSHF32(x) {*(float*)craftingPacket = (float)(x); craftingPacket += sizeof(float);};
+#define NETMSG_PUSHVEC2(x) {*(rdVector2*)craftingPacket = (x); craftingPacket += sizeof(rdVector2);};
+#define NETMSG_PUSHVEC3(x) {*(rdVector3*)craftingPacket = (x); craftingPacket += sizeof(rdVector3);};
+#define NETMSG_PUSHVEC3I(x) {*(rdVector3i*)craftingPacket = (x); craftingPacket += sizeof(rdVector3i);};
+#define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = (x); craftingPacket += sizeof(rdMatrix34);};
+#define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, (x), (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
+#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((wchar_t*)craftingPacket, (x), (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
                             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \

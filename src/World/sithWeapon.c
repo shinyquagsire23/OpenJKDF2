@@ -556,7 +556,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 {
                     v20 = v19->receiver;
                     if ( v20->thingtype == SITH_THING_ACTOR )
-                        sithAI_SetActorFireTarget(v20->actor, 0x1000, (intptr_t)v9); // aaaaaaaaa undefined
+                        sithAI_SetActorFireTarget(v20->actor, SITHAI_MODE_SLEEPING, (intptr_t)v9); // aaaaaaaaa undefined
                 }
             }
         }
@@ -565,7 +565,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
 
 LABEL_31:
     if ( fireSound )
-        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, 0x180);
+        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
     if ( anim >= 0 )
     {
         if ( sender->animclass )
@@ -788,7 +788,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     if ( (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 )
         goto LABEL_9;
     typeFlags = thing->weaponParams.typeflags;
-    if ( ((typeFlags & SITH_WF_IMPACT_SOUND_FX) != 0 && (v6 & SITH_SURFACE_4000) != 0 || (typeFlags & SITH_WF_RICOCHET_OFF_SURFACE) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
+    if ( ((typeFlags & SITH_WF_IMPACT_SOUND_FX) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (typeFlags & SITH_WF_RICOCHET_OFF_SURFACE) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
       && (++thing->weaponParams.numDeflectionBounces < 6) )
     {
         thing->physicsParams.physflags |= SITH_PF_SURFACEBOUNCE;
@@ -884,9 +884,9 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         {
             if ( player == g_localPlayerThing || player->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                 sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
-            if ( (weapon->thingflags & 0x100) != 0 )
+            if ( (weapon->thingflags & SITH_TF_INVULN) != 0 )
             {
-                spawned->thingflags |= 0x100;
+                spawned->thingflags |= SITH_TF_INVULN;
             }
         }
     }

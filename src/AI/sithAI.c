@@ -1579,7 +1579,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
     {
         if ( (a1->flags & SITHAI_MODE_ACTIVE) == 0 )
             v8 = 0.5;
-        if ( (a2->actorParams.typeflags & SITH_AF_4) == 0 && (a2->jkFlags & 1) == 0 )
+        if ( (a2->actorParams.typeflags & SITH_AF_FIELDLIGHT) == 0 && (a2->jkFlags & 1) == 0 )
         {
             v5 = (a3 - 2.0) * 0.1;
             if ( v5 < 0.0 )
@@ -1591,7 +1591,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
                 v5 = 0.6;
             }
             v8 = (1.0 - v5) * v8;
-            if ( (v3->actorParams.typeflags & SITH_AF_2000000) == 0 )
+            if ( (v3->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK) == 0 )
             {
                 v6 = a2->sector;
                 if ( v6->ambientLight < 0.5 )
@@ -1606,7 +1606,7 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
             }
         }
     }
-    if ( a2->actorParams.typeflags & SITH_AF_INVISIBLE && (v3->actorParams.typeflags & SITH_AF_8000) == 0 )
+    if ( a2->actorParams.typeflags & SITH_AF_INVISIBLE && (v3->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE) == 0 )
         v8 = v8 * 0.05;
     if ( (v3->actorParams.typeflags & SITH_AF_BLIND) != 0 )
         v8 = v8 * 0.05;

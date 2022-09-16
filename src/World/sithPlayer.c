@@ -278,7 +278,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
         if ( !v3->attach_flags )
         {
             v14 = v3->actorParams.typeflags;
-            if ( (v14 & SITH_AF_PLAYER_KILLED) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
+            if ( (v14 & SITH_AF_FALLING_TO_DEATH) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
             {
                 v15 = v3->sector;
                 if ( v15 )
@@ -286,14 +286,14 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
                     if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 )
                     {
                         v3->thingflags |= SITH_TF_DEAD;
-                        v3->actorParams.typeflags |= SITH_AF_PLAYER_KILLED;
+                        v3->actorParams.typeflags |= SITH_AF_FALLING_TO_DEATH;
                         sithCamera_SetCameraFocus(&sithCamera_cameras[1], v3, 0);
                         sithCamera_SetCurrentCamera(&sithCamera_cameras[1]);
                     }
                 }
             }
         }
-        if ( (v3->actorParams.typeflags & SITH_AF_PLAYER_KILLED) != 0 )
+        if ( (v3->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH) != 0 )
         {
             v4->fade -= a2 * 0.7;
             if (v4->fade <= 0.0)
@@ -634,7 +634,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
         }
 
         player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_WILLBEREMOVED);
-        player->actorParams.typeflags &= ~SITH_AF_PLAYER_KILLED;
+        player->actorParams.typeflags &= ~SITH_AF_FALLING_TO_DEATH;
         player->lifeLeftMs = 0;
         if ( !sithNet_isMulti || player == g_localPlayerThing )
         {

@@ -40,7 +40,7 @@ void sithRenderSky_Update()
 
 void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertices)
 {
-    int v3; // eax
+    rdGeoMode_t geoMode; // eax
     int v4; // eax
     sithWorld *v5; // edi
     rdCanvas *v6; // esi
@@ -54,13 +54,13 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
     rdClipFrustum *v15; // [esp+10h] [ebp-4h]
     float a1a; // [esp+18h] [ebp+4h]
 
-    v3 = sithRender_geoMode;
-    if ( sithRender_geoMode > 4 )
-        v3 = 4;
-    a1->geometryMode = v3;
+    geoMode = sithRender_geoMode;
+    if ( sithRender_geoMode > RD_GEOMODE_TEXTURED)
+        geoMode = RD_GEOMODE_TEXTURED;
+    a1->geometryMode = geoMode;
     v4 = sithRender_texMode;
-    a1->lightingMode = sithRender_lightMode > 0 ? 0 : sithRender_lightMode;
-    a1->textureMode = v4 > 0 ? 0 : v4;
+    a1->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
+    a1->textureMode = v4 > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : v4;
     if ( num_vertices )
     {
         v5 = sithWorld_pCurrentWorld;
@@ -93,7 +93,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
 
 void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4)
 {
-    int v4; // eax
+    rdGeoMode_t geoMode; // eax
     rdProcEntry *v5; // ebx
     unsigned int v6; // edi
     int v8; // esi
@@ -105,13 +105,13 @@ void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVec
     rdVector3 a2a; // [esp+1Ch] [ebp-18h] BYREF
     rdVector3 vertex_out; // [esp+28h] [ebp-Ch] BYREF
 
-    v4 = sithRender_geoMode;
-    if ( sithRender_geoMode > 4 )
-        v4 = 4;
+    geoMode = sithRender_geoMode;
+    if ( sithRender_geoMode > RD_GEOMODE_TEXTURED)
+        geoMode = RD_GEOMODE_TEXTURED;
     v5 = a1;
-    a1->geometryMode = v4;
+    a1->geometryMode = geoMode;
     v6 = 0;
-    v5->lightingMode = sithRender_lightMode > 0 ? 0 : sithRender_lightMode;
+    v5->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
     if ( a4 != 0 )
     {
         v8 = 0;

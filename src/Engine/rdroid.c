@@ -156,10 +156,10 @@ int rdSetMipDistances(rdVector4 *dists)
     rdVector_Copy4(&rdroid_aMipDistances, dists);
 
 #ifdef QOL_IMPROVEMENTS
-    static rdVector4 origLoad;
+    static rdVector4 origLod;
     static int once = 0;
     if (!once) {
-        origLoad = sithWorld_pCurrentWorld->loadDistance;
+        origLod = sithWorld_pCurrentWorld->lodDistance;
         once = 1;
     }
 
@@ -169,10 +169,10 @@ int rdSetMipDistances(rdVector4 *dists)
     rdroid_aMipDistances.z *= scale_factor;
     rdroid_aMipDistances.w *= scale_factor;
 
-    sithWorld_pCurrentWorld->loadDistance.x = origLoad.x * scale_factor;
-    sithWorld_pCurrentWorld->loadDistance.y = origLoad.y * scale_factor;
-    sithWorld_pCurrentWorld->loadDistance.z = origLoad.z * scale_factor;
-    sithWorld_pCurrentWorld->loadDistance.w = origLoad.w * scale_factor;
+    sithWorld_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
+    sithWorld_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
+    sithWorld_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
+    sithWorld_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
 #endif
 
     return 1;

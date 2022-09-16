@@ -24,7 +24,7 @@ rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *mat
     return polyline;
 }
 
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeGeometryMode, int edgeLightingMode, int edgeTextureMode, float extraLight)
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, float extraLight)
 {
 
     rdMaterial *mat;
@@ -63,7 +63,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     numVertices = polyline->edgeFace.numVertices;
     for (int i = 0; i < numVertices; ++vertexPosIdx )
         *vertexPosIdx = i++;
-    if ( polyline->edgeFace.geometryMode >= 4 )
+    if ( polyline->edgeFace.geometryMode >= RD_GEOMODE_TEXTURED)
     {
         vertexUVIdx = (int *)rdroid_pHS->alloc(4 * numVertices);
         polyline->edgeFace.vertexUVIdx = vertexUVIdx;
@@ -103,7 +103,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         return 0;
     for (int k = 0; k < polyline->tipFace.numVertices; ++vertexPosIdx )
         *vertexPosIdx = k++;
-    if ( polyline->tipFace.geometryMode >= 4 )
+    if ( polyline->tipFace.geometryMode >= RD_GEOMODE_TEXTURED)
     {
         vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
         polyline->tipFace.vertexUVIdx = vertexUVIdx;
@@ -287,7 +287,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
 {
     rdProcEntry *procEntry;
-    int geometryMode;
+    rdGeoMode_t geometryMode;
     int textureMode;
     rdMeshinfo mesh_out;
     float staticLight;
@@ -319,7 +319,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     procEntry->geometryMode = geometryMode;
     if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
-        procEntry->lightingMode = 0;
+        procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
     {

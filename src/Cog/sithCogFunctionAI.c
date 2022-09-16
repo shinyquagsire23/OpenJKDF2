@@ -268,7 +268,7 @@ void sithCogFunctionAI_AISetMode(sithCog *ctx)
                 v4 = v3->flags;
                 v3->flags = v4 | v1;
                 if ( v4 != (v4 | v1) )
-                    sithAI_SetActorFireTarget(v3, 256, v4);
+                    sithAI_SetActorFireTarget(v3, SITHAI_MODE_UNK100, v4);
             }
         }
     }
@@ -311,7 +311,7 @@ void sithCogFunctionAI_AIClearMode(sithCog *ctx)
                 mode_inv = ~mode;
                 v3->flags = v4 & mode_inv;
                 if ( v4 != (v4 & mode_inv) )
-                    sithAI_SetActorFireTarget(v3, 256, v4);
+                    sithAI_SetActorFireTarget(v3, SITHAI_MODE_UNK100, v4);
             }
         }
     }
@@ -446,7 +446,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
                     v6 = v5 & ~SITHAI_MODE_TOUGHSKIN;
                 v3->flags = v6;
                 if ( v6 != v5 )
-                    sithAI_SetActorFireTarget(v3, 256, v5);
+                    sithAI_SetActorFireTarget(v3, SITHAI_MODE_UNK100, v5);
             }
         }
     }
@@ -536,7 +536,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
                     if ( (v4 & SITHAI_MODE_FLEEING) == 0 )
                     {
                         v3->flags |= SITHAI_MODE_FLEEING;
-                        sithAI_SetActorFireTarget(v3, 256, v4);
+                        sithAI_SetActorFireTarget(v3, SITHAI_MODE_UNK100, v4);
                     }
                 }
             }

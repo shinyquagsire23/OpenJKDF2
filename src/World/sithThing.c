@@ -1181,7 +1181,7 @@ void sithThing_AttachToSurface(sithThing *thing, sithSurface *surface, int a3)
         if ( thing->soundclass )
         {
             v15 = surface->surfaceFlags;
-            if ( (v15 & (SITH_SURFACE_100000|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
+            if ( (v15 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
             {
                 if ( (v15 & SITH_SURFACE_METAL) != 0 )
                 {
