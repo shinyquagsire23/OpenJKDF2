@@ -37,8 +37,10 @@ sithThing* sithAICmd_NearestPlayer(sithActor *actor)
             continue;
 
         float dist = rdVector_Dist3(&playerThing->position, &actor->thing->position);
-        if (dist < closestDist)
+        if (dist < closestDist) {
+            closestDist = dist;
             closest = playerThing;
+        }
     }
     return closest;
 }
