@@ -53,6 +53,7 @@
     typedef int SOCKET;
     constexpr SOCKET INVALID_SOCKET = -1;
     #include <signal.h>
+    #include <dlfcn.h>
 #endif
 
 #define sithDplayGNS_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
@@ -80,6 +81,21 @@ extern wchar_t jkGuiMultiplayer_ipText[256];
 char jkGuiMultiplayer_ipText_conv[256];
 static int sithDplayGNS_numEnumd = 0;
 extern int Main_bVerboseNetworking;
+
+typedef bool (*GameNetworkingSockets_Init_t)( const SteamNetworkingIdentity *pIdentity, SteamNetworkingErrMsg &errMsg );
+typedef ISteamNetworkingUtils* (*SteamNetworkingUtils_t)(void);
+typedef void (*GameNetworkingSockets_Kill_t)(void);
+typedef ISteamNetworkingSockets* (*SteamNetworkingSockets_t)(void);
+typedef void (*SteamNetworkingIPAddr_ToString_t)( const SteamNetworkingIPAddr *pAddr, char *buf, size_t cbBuf, bool bWithPort );
+typedef bool (*SteamNetworkingIPAddr_ParseString_t)( SteamNetworkingIPAddr *pAddr, const char *pszStr );
+
+GameNetworkingSockets_Init_t g_GameNetworkingSockets_Init = NULL;
+SteamNetworkingUtils_t g_SteamNetworkingUtils = NULL;
+GameNetworkingSockets_Kill_t g_GameNetworkingSockets_Kill = NULL;
+SteamNetworkingSockets_t g_SteamNetworkingSockets = NULL;
+SteamNetworkingIPAddr_ToString_t g_SteamNetworkingIPAddr_ToString = NULL;
+SteamNetworkingIPAddr_ParseString_t g_SteamNetworkingIPAddr_ParseString = NULL;
+
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -114,8 +130,9 @@ static void NukeProcess( int rc )
 
 static void DebugOutput( ESteamNetworkingSocketsDebugOutputType eType, const char *pszMsg )
 {
-    SteamNetworkingMicroseconds time = SteamNetworkingUtils()->GetLocalTimestamp() - g_logTimeZero;
-    sithDplayGNS_verbosePrintf( "%10.6f %s\n", time*1e-6, pszMsg );
+    //SteamNetworkingMicroseconds time = g_SteamNetworkingUtils()->GetLocalTimestamp() - g_logTimeZero;
+    //sithDplayGNS_verbosePrintf( "%10.6f %s\n", time*1e-6, pszMsg );
+    sithDplayGNS_verbosePrintf( "%s\n", pszMsg );
     fflush(stdout);
     if ( eType == k_ESteamNetworkingSocketsDebugOutputType_Bug )
     {
@@ -151,11 +168,74 @@ static void Printf( const char *fmt, ... )
     DebugOutput( k_ESteamNetworkingSocketsDebugOutputType_Msg, text );
 }
 
+static int sithDplay_GNS_bForceStubs = 0;
+static int sithDplay_GNS_bSymbolsLoaded = 0;
+
+static void sithDplay_GNS_LoadSymbols()
+{
+    if (sithDplay_GNS_bSymbolsLoaded) return;
+
+    static const char pszExportFunc[] = "GameNetworkingSockets_Init";
+
+    #if defined( WIN32 )
+        static const char pszModule[] = "libGameNetworkingSockets.dll";
+        HMODULE h = ::LoadLibraryA( pszModule );
+        if ( h == NULL )
+        {
+            printf("Failed to load %s.\n", pszModule );
+            sithDplay_GNS_bForceStubs = 1;
+            
+            return;
+        }
+        g_GameNetworkingSockets_Init = (GameNetworkingSockets_Init_t)::GetProcAddress(h, "GameNetworkingSockets_Init");
+        g_SteamNetworkingUtils = (SteamNetworkingUtils_t)::GetProcAddress(h, "SteamNetworkingUtils_LibV4");
+        g_GameNetworkingSockets_Kill = (GameNetworkingSockets_Kill_t)::GetProcAddress(h, "GameNetworkingSockets_Kill");
+        g_SteamNetworkingSockets = (SteamNetworkingSockets_t)::GetProcAddress(h, "SteamNetworkingSockets_LibV12");
+        g_SteamNetworkingIPAddr_ToString = (SteamNetworkingIPAddr_ToString_t)::GetProcAddress(h, "SteamNetworkingIPAddr_ToString");
+        g_SteamNetworkingIPAddr_ParseString = (SteamNetworkingIPAddr_ParseString_t)::GetProcAddress(h, "SteamNetworkingIPAddr_ParseString");
+    #elif defined(LINUX) | defined(MACOS)
+        #if defined(MACOS)
+            static const char pszModule[] = "libGameNetworkingSockets.dylib";
+        #else
+            static const char pszModule[] = "libGameNetworkingSockets.so";
+        #endif
+        void* h = dlopen(pszModule, RTLD_LAZY);
+        if ( h == NULL )
+        {
+            printf("Failed to dlopen %s.  %s\n", pszModule, dlerror() );
+            sithDplay_GNS_bForceStubs = 1;
+            return;
+        }
+        g_GameNetworkingSockets_Init = (GameNetworkingSockets_Init_t)dlsym(h, "GameNetworkingSockets_Init");
+        g_SteamNetworkingUtils = (SteamNetworkingUtils_t)dlsym(h, "SteamNetworkingUtils_LibV4");
+        g_GameNetworkingSockets_Kill = (GameNetworkingSockets_Kill_t)dlsym(h, "GameNetworkingSockets_Kill");
+        g_SteamNetworkingSockets = (SteamNetworkingSockets_t)dlsym(h, "SteamNetworkingSockets_LibV12");
+        g_SteamNetworkingIPAddr_ToString = (SteamNetworkingIPAddr_ToString_t)dlsym(h, "SteamNetworkingIPAddr_ToString");
+        g_SteamNetworkingIPAddr_ParseString = (SteamNetworkingIPAddr_ParseString_t)dlsym(h, "SteamNetworkingIPAddr_ParseString");
+    #else
+        
+    #endif
+
+    if (!g_SteamNetworkingIPAddr_ToString || !g_GameNetworkingSockets_Init 
+        || !g_GameNetworkingSockets_Kill || !g_SteamNetworkingSockets 
+        || !g_SteamNetworkingIPAddr_ToString || !g_SteamNetworkingIPAddr_ParseString)
+    {
+        printf("Failed to load %s, reverting to stubs.\n");
+        sithDplay_GNS_bForceStubs = 1;
+        return;
+    }
+    printf("Loaded %s successfully.\n", pszModule);
+
+    sithDplay_GNS_bSymbolsLoaded = 1;
+}
+
 static void InitSteamDatagramConnectionSockets()
 {
+    sithDplay_GNS_LoadSymbols();
+
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
         SteamDatagramErrMsg errMsg;
-        if ( !GameNetworkingSockets_Init( nullptr, errMsg ) )
+        if ( !g_GameNetworkingSockets_Init( nullptr, errMsg ) )
             FatalError( "GameNetworkingSockets_Init failed.  %s", errMsg );
     #else
         SteamDatagram_SetAppID( 570 ); // Just set something, doesn't matter what
@@ -171,12 +251,12 @@ static void InitSteamDatagramConnectionSockets()
         // Authentication is disabled automatically in the open-source
         // version since we don't have a trusted third party to issue
         // certs.
-        SteamNetworkingUtils()->SetGlobalConfigValueInt32( k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 1 );
+        g_SteamNetworkingUtils()->SetGlobalConfigValueInt32( k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 1 );
     #endif
 
-    g_logTimeZero = SteamNetworkingUtils()->GetLocalTimestamp();
+    g_logTimeZero = g_SteamNetworkingUtils()->GetLocalTimestamp();
 
-    SteamNetworkingUtils()->SetDebugOutputFunction( k_ESteamNetworkingSocketsDebugOutputType_Msg, DebugOutput );
+    g_SteamNetworkingUtils()->SetDebugOutputFunction( k_ESteamNetworkingSocketsDebugOutputType_Msg, DebugOutput );
 }
 
 static void ShutdownSteamDatagramConnectionSockets()
@@ -189,7 +269,7 @@ static void ShutdownSteamDatagramConnectionSockets()
     sleep_ms( 500 );
 
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
-        GameNetworkingSockets_Kill();
+        g_GameNetworkingSockets_Kill();
     #else
         SteamDatagramClient_Kill();
     #endif
@@ -209,7 +289,7 @@ public:
     {
         // Select instance to use.  For now we'll always use the default.
         // But we could use SteamGameServerNetworkingSockets() on Steam.
-        m_pInterface = SteamNetworkingSockets();
+        m_pInterface = g_SteamNetworkingSockets();
 
         // Start listening
         SteamNetworkingIPAddr serverLocalAddr;
@@ -226,7 +306,7 @@ public:
             Printf( "[2] Failed to listen on port %d", nPort );
         Printf( "Server listening on port %d\n", nPort );
 
-        m_pBcastInterface = SteamNetworkingMessages();
+        //m_pBcastInterface = SteamNetworkingMessages();
 
         m_identity.Clear();
         m_identity.SetGenericString("OpenJKDF2");
@@ -367,7 +447,7 @@ private:
     HSteamListenSocket m_hListenSock;
     HSteamNetPollGroup m_hPollGroup;
     ISteamNetworkingSockets *m_pInterface;
-    ISteamNetworkingMessages *m_pBcastInterface;
+    //ISteamNetworkingMessages *m_pBcastInterface;
     uint64_t availableIds = 0x1;
     uint8_t sendBuffer[4096];
     uint8_t sendBuffer2[4096];
@@ -425,11 +505,13 @@ private:
         m_mapClients[hConn].m_id = id;
     }
 
+#if 0
     void TickBroadcastOut()
     {
         uint8_t tmp[8] = {0};
         m_pBcastInterface->SendMessageToUser(m_identity, tmp, 8, k_nSteamNetworkingSend_Unreliable, 1337);
     }
+#endif
 
     void OnSteamNetConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t *pInfo )
     {
@@ -649,11 +731,11 @@ public:
         m_closed = 0;
 
         // Select instance to use.  For now we'll always use the default.
-        m_pInterface = SteamNetworkingSockets();
+        m_pInterface = g_SteamNetworkingSockets();
 
         // Start connecting
         char szAddr[ SteamNetworkingIPAddr::k_cchMaxString ];
-        serverAddr.ToString( szAddr, sizeof(szAddr), true );
+        g_SteamNetworkingIPAddr_ToString(&serverAddr, szAddr, sizeof(szAddr), true );
         Printf( "Connecting to server at %s", szAddr );
         SteamNetworkingConfigValue_t opt;
         opt.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, (void*)SteamNetConnectionStatusChangedCallback );
@@ -664,7 +746,7 @@ public:
             m_closed = 1;
         }
 
-        m_pBcastInterface = SteamNetworkingMessages();
+        //m_pBcastInterface = SteamNetworkingMessages();
 
         m_identity.Clear();
         m_identity.SetGenericString("OpenJKDF2");
@@ -812,7 +894,7 @@ private:
 
     HSteamNetConnection m_hConnection;
     ISteamNetworkingSockets *m_pInterface;
-    ISteamNetworkingMessages *m_pBcastInterface;
+    //ISteamNetworkingMessages *m_pBcastInterface;
     SteamNetworkingIdentity m_identity;
     uint8_t sendBuffer[4096];
     int m_closed = 0;
@@ -851,6 +933,7 @@ private:
         pIncomingMsg->Release();
     }
 
+#if 0
     int TickBroadcastIn()
     {
         SteamNetworkingMessage_t *pMsg = nullptr;
@@ -874,6 +957,7 @@ private:
         sithDplayGNS_infoPrintf("Got broadcast %x\n", pMsg->m_cbSize);
         return 0;
     }
+#endif
 
     void OnSteamNetConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t *pInfo )
     {
@@ -1005,6 +1089,19 @@ void Hack_ResetClients()
 
 void sithDplay_GNS_Startup()
 {
+    sithDplay_GNS_LoadSymbols();
+
+    if (sithDplay_GNS_bForceStubs)
+    {
+        jkGuiMultiplayer_numConnections = 1;
+        jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Screaming Into The Void (GNS Failed)");
+        sithDplay_dword_8321E0 = 0;
+
+        memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
+        dplay_dword_55D618 = 0;
+        return;
+    }
+
     jkGuiMultiplayer_numConnections = 1;
     jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Valve GNS");
     sithDplay_dword_8321E0 = 0;
@@ -1019,7 +1116,7 @@ void sithDplay_GNS_Startup()
     Hack_ResetClients();
 
     addrServer.Clear();
-    addrServer.ParseString("127.0.0.1");
+    g_SteamNetworkingIPAddr_ParseString(&addrServer, "127.0.0.1");
     addrServer.m_port = DEFAULT_SERVER_PORT;
 
     // Create client and server sockets
@@ -1028,11 +1125,17 @@ void sithDplay_GNS_Startup()
 
 void sithDplay_GNS_Shutdown()
 {
+    if (sithDplay_GNS_bForceStubs)
+        return;
+
     ShutdownSteamDatagramConnectionSockets();
 }
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
+    if (sithDplay_GNS_bForceStubs)
+        return -1;
+
     Hack_ResetClients();
 
     if (sithDplay_bIsServer)
@@ -1051,6 +1154,9 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
 {
+    if (sithDplay_GNS_bForceStubs)
+        return 0;
+
     Hack_ResetClients();
 
     if (sithDplay_bIsServer)
@@ -1101,12 +1207,18 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     sithDplay_dplayIdSelf = 2; // HACK
     jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
+    if (sithDplay_GNS_bForceStubs)
+        return 0;
+
     client.Init(addrServer);
     return 0;
 }
 
 void sithDplay_Close()
 {
+    if (sithDplay_GNS_bForceStubs)
+        return;
+
     if (sithDplay_bIsServer)
     {
         server.Shutdown();
@@ -1170,7 +1282,11 @@ int DirectPlay_OpenHost(jkMultiEntry* pEntry)
     jkPlayer_maxPlayers = pEntry->maxPlayers; // Hack?
 
     sithDplay_bIsServer = 1;
+
+    if (sithDplay_GNS_bForceStubs)
+        return 0;
     server.Init(jkGuiNetHost_portNum);
+
     return 0;
 }
 
@@ -1248,7 +1364,7 @@ static int sithDplay_EnumThread(void *ptr)
             }
         }
 
-        addrServer.ParseString(finalStr.c_str());
+        g_SteamNetworkingIPAddr_ParseString(&addrServer, finalStr.c_str());
         if (!addrServer.m_port) {
             addrServer.m_port = DEFAULT_SERVER_PORT;
         }
@@ -1269,6 +1385,9 @@ static int sithDplay_EnumThread(void *ptr)
 
 int DirectPlay_EnumSessions2()
 {
+    if (sithDplay_GNS_bForceStubs)
+        return 0;
+
     if (!sithDplay_EnumThread_bInit)
         return 0;
 
@@ -1285,6 +1404,9 @@ int DirectPlay_EnumSessions2()
 
 int sithDplay_EnumSessions(int a, void* b)
 {
+    if (sithDplay_GNS_bForceStubs)
+        return 0;
+
     if (!sithDplay_EnumThread_mutex)
         sithDplay_EnumThread_mutex = SDL_CreateMutex();
 

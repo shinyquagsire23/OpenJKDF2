@@ -256,6 +256,7 @@ elseif(PLAT_MSVC)
     add_definitions(-DARCH_64BIT)
     add_definitions(-DWIN32)
 
+    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_SDL2 TRUE)
@@ -570,7 +571,7 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE "-Lbuild_gns/src/" GameNetworkingSockets.dll)
+        #target_link_libraries(${BIN_NAME} PRIVATE "-Lbuild_gns/src/" GameNetworkingSockets.dll)
     endif()
     target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
 
@@ -604,8 +605,8 @@ elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS})
      
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
+        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
+        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
     endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
@@ -646,13 +647,13 @@ elseif(PLAT_MSVC)
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/zlib1.dll ${PROJECT_BINARY_DIR}
     )
 
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        add_custom_command(TARGET ${BIN_NAME} 
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
-    	)
-    endif()
+    #if(TARGET_USE_GAMENETWORKINGSOCKETS)
+    #    add_custom_command(TARGET ${BIN_NAME} 
+    #    POST_BUILD
+    #    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}
+    #    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
+    #	)
+    #endif()
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libgcc_s_seh-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libstdc++-6.dll . 
