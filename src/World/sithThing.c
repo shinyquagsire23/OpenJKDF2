@@ -1966,8 +1966,8 @@ void sithThing_netidk()
                     if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
                         sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1); // Added
 
-                    if (sithNet_aSyncThings[v0]->rdthing.puppet)
-                        sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+                    //if (sithNet_aSyncThings[v0]->rdthing.puppet)
+                    //    sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
                 }
             }
             else
