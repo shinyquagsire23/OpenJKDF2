@@ -1962,8 +1962,13 @@ void sithThing_netidk()
                 sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
 
                 // Added: Co-op
-                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8) && sithNet_aSyncThings[v0]->rdthing.puppet)
-                    sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
+                    if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
+                        sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1); // Added
+
+                    if (sithNet_aSyncThings[v0]->rdthing.puppet)
+                        sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+                }
             }
             else
             {
@@ -1971,6 +1976,12 @@ void sithThing_netidk()
                     sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
                 if ( (sithNet_aSyncFlags[v0] & 1) != 0 )
                     sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
+
+                // Added: Co-op
+                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
+                    if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
+                        sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1); // Added
+                }
             }
             if ( ++v0 >= (unsigned int)sithNet_syncIdx )
             {

@@ -19,6 +19,30 @@
 #include "Engine/sithCollision.h"
 #include "jk.h"
 
+// Added: Targeting for multiple players for co-op
+sithThing* sithAICmd_NearestPlayer(sithActor *actor)
+{
+    if (!sithNet_isMulti)
+        return g_localPlayerThing;
+
+    sithThing* closest = g_localPlayerThing;
+    float closestDist = 999999.0;
+    for (int i = 0; i < jkPlayer_maxPlayers; i++)
+    {
+        sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
+        sithThing* playerThing = playerInfo->playerThing;
+        if (!playerThing) continue;
+
+        if ((playerThing->thingflags & SITH_TF_DISABLED) || playerThing->type != SITH_THING_PLAYER)
+            continue;
+
+        float dist = rdVector_Dist3(&playerThing->position, &actor->thing->position);
+        if (dist < closestDist)
+            closest = playerThing;
+    }
+    return closest;
+}
+
 void sithAICmd_Startup()
 {
     sithAI_RegisterCommand("listen", sithAICmd_Listen, 
@@ -144,9 +168,8 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
             {
                 rdVector_Rotate3(&a1, &actor->thing->lookOrientation.lvec, &a4a);
             }
-            a2.x = a1.x * 0.7 + actor->thing->position.x;
-            a2.y = a1.y * 0.7 + actor->thing->position.y;
-            a2.z = a1.z * 0.7 + actor->thing->position.z;
+            rdVector_Copy3(&a2, &actor->thing->position);
+            rdVector_MultAcc3(&a2, &a1, 0.7);
             sithAI_SetLookFrame(actor, &a2);
             sithAI_SetMoveThing(actor, &a2, 2.0);
             return 0;
@@ -186,9 +209,8 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
                 {
                     v16 = v13 - a1a;
 LABEL_16:
-                    arg8a.x = actor->field_228.x * v16 + actor->thing->position.x;
-                    arg8a.y = actor->field_228.y * v16 + actor->thing->position.y;
-                    arg8a.z = actor->field_228.z * v16 + actor->thing->position.z;
+                    rdVector_Copy3(&arg8a, &actor->thing->position);
+                    rdVector_MultAcc3(&arg8a, &actor->field_228, v16);
                     if ( (actor->thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
                         arg8a.z = v7->position.z - -0.02;
@@ -242,12 +264,8 @@ LABEL_16:
     if ( _frand() <= 0.5 )
         a1.y = -45.0;
     rdVector_Rotate3(&a4a, &actor->field_1AC, &a1);
-    a4a.x = actor->field_1B8 * a4a.x;
-    a4a.y = actor->field_1B8 * a4a.y;
-    a4a.z = actor->field_1B8 * a4a.z;
-    a4a.x = actor->thing->position.x + a4a.x;
-    a4a.y = actor->thing->position.y + a4a.y;
-    a4a.z = actor->thing->position.z + a4a.z;
+    rdVector_Scale3Acc(&a4a, actor->field_1B8);
+    rdVector_Add3Acc(&a4a, &actor->thing->position);
     sithAI_SetMoveThing(actor, &a4a, actor->moveSpeed);
     instinct->nextUpdate = sithTime_curMs + 1000;
     return 1;
@@ -295,9 +313,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
                 }
                 a4.y = v13;
                 rdVector_Rotate3(&movePos, &a2a, &a4);
-                movePos.x = movePos.x + actor->thingidk->position.x;
-                movePos.y = actor->thingidk->position.y + movePos.y;
-                movePos.z = actor->thingidk->position.z + movePos.z;
+                rdVector_Add3Acc(&movePos, &actor->thingidk->position);
                 if ( !sithAI_sub_4EB300(actor->thingidk, &actor->thingidk->position, &movePos, -1.0, actor->aiclass->sightDist, 0.0, &a5, &unused) )
                 {
                     sithAI_SetMoveThing(actor, &movePos, 0.5);
@@ -738,16 +754,10 @@ LABEL_26:
             {
                 if ( aiclass->argsAsFloat[1] != 0.0 )
                 {
-                    movePos.x = lookPos.x - actor_->thing->position.x;
-                    movePos.y = lookPos.y - actor_->thing->position.y;
-                    movePos.z = lookPos.z - actor_->thing->position.z;
+                    rdVector_Sub3(&movePos, &lookPos, &actor_->thing->position);
                     rdVector_Normalize3Acc(&movePos);
-                    movePos.x *= aiclass->argsAsFloat[1];
-                    movePos.y *= aiclass->argsAsFloat[1];
-                    movePos.z *= aiclass->argsAsFloat[1];
-                    movePos.x += actor_->thing->position.x;
-                    movePos.y += actor_->thing->position.y;
-                    movePos.z += actor_->thing->position.z;
+                    rdVector_Scale3Acc(&movePos, aiclass->argsAsFloat[1]);
+                    rdVector_Add3Acc(&movePos, &actor_->thing->position);
                     sithAI_SetMoveThing(actor_, &movePos, 2.5);
                 }
             }
@@ -801,10 +811,8 @@ LABEL_26:
         }
     }
     v14 = v25->field_4[v12];
-    actor_->field_1C4.x = v25->field_10[v12].x;
-    actor_->field_1C4.y = v25->field_10[v12].y;
+    rdVector_Copy3(&actor_->field_1C4, &v25->field_10[v12]);
     v15 = v25->field_58[v12];
-    actor_->field_1C4.z = v25->field_10[v12].z;
 LABEL_15:
     if ( v12 < 0 )
         return 0;
@@ -831,18 +839,11 @@ LABEL_15:
 
 int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    int v6; // ecx
-    unsigned int v9; // edx
-    sithThing *v10; // eax
-    int v11; // ecx
-    sithThing *v12; // [esp-8h] [ebp-10h]
-
     if ( !flags && (g_debugmodeFlags & 0x200) == 0 )
     {
         if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
         {
-            v6 = aiclass->argsAsInt[1];
-            if ( v6 && v6 + actor->field_204 < sithTime_curMs )
+            if ( aiclass->argsAsInt[1] && aiclass->argsAsInt[1] + actor->field_204 < sithTime_curMs )
             {
                 actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
                 actor->flags |= SITHAI_MODE_SEARCHING;
@@ -852,20 +853,16 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
         }
         else if ( (actor->flags & SITHAI_MODE_SEARCHING) != 0 )
         {
-            v9 = sithTime_curMs;
-            v10 = g_localPlayerThing;
-            v11 = aiclass->argsAsInt[0];
-            actor->field_1D0 = g_localPlayerThing;
-            instinct->nextUpdate = v9 + v11;
-            if ( (v10->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+            actor->field_1D0 = sithAICmd_NearestPlayer(actor);
+            instinct->nextUpdate = sithTime_curMs +  aiclass->argsAsInt[0];
+            if (!(actor->field_1D0->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)))
             {
                 sithAI_sub_4EAD60(actor);
                 if ( !actor->field_1F4 )
                 {
-                    v12 = actor->thing;
                     actor->flags &= ~SITHAI_MODE_SEARCHING;
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
-                    sithSoundClass_PlayModeRandom(v12, SITH_SC_ALERT);
+                    sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->field_1D0->sector, &actor->thing->position, 0, 3.0, actor->field_1D0);
                     actor->thingidk = actor->field_1D0;
@@ -1256,8 +1253,8 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     {
         if ( aiclass->argsAsFloat[1] != 0.0 )
         {
-            actor->field_1D0 = g_localPlayerThing;
-            if ( (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+            actor->field_1D0 = sithAICmd_NearestPlayer(actor);
+            if ( (actor->field_1D0->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
                 return 0;
             sithAI_sub_4EAD60(actor);
             if ( !actor->field_1F4 )

@@ -499,7 +499,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
                 return 0;
             pThing->actorParams.field_1BC = sithTime_curMs + sound->sound_len;
         }
-        if ( pThing == g_localPlayerThing || pThing->moveType == SITH_MT_PATH )
+        if ( pThing == g_localPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->thingtype == SITH_THING_PLAYER) // Added: third comparison, co-op
         {
             sithAIAwareness_AddEntry(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
         }

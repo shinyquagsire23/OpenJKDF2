@@ -5,6 +5,8 @@
 #include "Engine/sithAdjoin.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
+#include "World/sithThing.h"
+#include "Engine/sithMulti.h"
 #include "jk.h"
 
 int sithAIAwareness_Startup()
@@ -52,6 +54,7 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
     sithAIAwareness_aEntries[v7].field_14 = a3;
     sithAIAwareness_aEntries[v7].field_18 = a4;
     sithAIAwareness_aEntries[v7].thing = thing;
+
     return 1;
 }
 
