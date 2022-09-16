@@ -206,7 +206,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
                 v9->param0 = 0.0;
                 sithAI_SetLookFrame(actor, &v7->position);
                 v13 = actor->field_234;
-                // TODO verify
+ 
                 if ( v13 > tmp1 )
                 {
                     v16 = v13 - a1a;

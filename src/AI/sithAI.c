@@ -903,9 +903,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
             actora = 0.0;
         rdMatrix_TransformVector34(&actor->blindAimError, &v2->actorParams.fireOffset, &v2->lookOrientation);
         v4 = actor->field_1D0;
-        actor->blindAimError.x = v2->position.x + actor->blindAimError.x;
-        actor->blindAimError.y = v2->position.y + actor->blindAimError.y;
-        actor->blindAimError.z = v2->position.z + actor->blindAimError.z;
+        rdVector_Add3Acc(&actor->blindAimError, &v2->position);
         if ( v4 )
         {
             if ( (v4->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_BLIND) != 0 )
@@ -1011,8 +1009,6 @@ void sithAI_sub_4EAF40(sithActor *actor)
 
 int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8)
 {
-    double v9; // st7
-    double v10; // st6
     long double v12; // st7
     double v18; // st7
     sithSector *v21; // eax
@@ -1021,16 +1017,13 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     float a4a; // [esp+18h] [ebp+8h]
     float a5a; // [esp+2Ch] [ebp+1Ch]
 
-    v9 = arg8->position.y - a4->y;
-    v10 = arg8->position.z - a4->z;
-    a5->x = arg8->position.x - a4->x;
-    a5->y = v9;
-    a5->z = v10;
+    rdVector_Sub3(a5, arg8, a4);
     v12 = rdVector_Normalize3Acc(a5) - arg8->collideSize;
     *a8 = v12;
-    // TODO verify
+ 
     if ( v12 <= 0.0 )
         v12 = 0.0;
+
     *a8 = v12;
     if ( !(a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER) != 0 )
     {
@@ -1047,9 +1040,10 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     {
         v18 = a3->lookOrientation.rvec.y * a5->y + a3->lookOrientation.rvec.z * a5->z + a3->lookOrientation.rvec.x * a5->x;
         a5a = a3->lookOrientation.lvec.z * a5->z + a3->lookOrientation.lvec.y * a5->y + a3->lookOrientation.lvec.x * a5->x;
-        // TODO verify
+
         if ( v18 < 0.0 )
             v18 = -v18;
+
         a4a = v18;
         if ( argC >= 0.0 )
         {
@@ -1099,14 +1093,15 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     a5->z = arg8->z - a4->z;
     v11 = rdVector_Normalize3Acc(a5);
     *a8 = v11;
-    // TODO verify
+
     if ( v11 > arg10 )
         return 1;
+
     if ( argC > -1.0 )
     {
         v16 = a3->lookOrientation.rvec.y * a5->y + a3->lookOrientation.rvec.z * a5->z + a3->lookOrientation.rvec.x * a5->x;
         a4a = a3->lookOrientation.lvec.z * a5->z + a3->lookOrientation.lvec.y * a5->y + a3->lookOrientation.lvec.x * a5->x;
-        // TODO verify
+
         if ( v16 < 0.0 )
             v16 = -v16;
         arg8a = v16;
