@@ -1274,7 +1274,7 @@ void sithSurface_Sync()
 
     for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
     {
-        sithDSS_SendSyncSurface(aSithSurfaces[v0], -1, 255);
+        sithDSS_SendSurfaceStatus(aSithSurfaces[v0], -1, 255);
     }
 
     sithSurface_numSurfaces_0 = 0;

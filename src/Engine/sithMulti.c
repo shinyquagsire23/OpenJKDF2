@@ -1409,7 +1409,7 @@ LABEL_41:
                                     goto LABEL_30;
                                 }
                             }
-                            sithDSS_SendSyncSurface(v9, sithMulti_sendto_id, 1);
+                            sithDSS_SendSurfaceStatus(v9, sithMulti_sendto_id, 1);
 LABEL_30:
                             if ( sithDplay_dword_832208 >= sithWorld_pCurrentWorld->numSurfaces )
                             {

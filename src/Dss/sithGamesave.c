@@ -240,7 +240,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSurfaces; i++)
     {
-        sithDSS_SendSyncSurface(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SendSurfaceStatus(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)

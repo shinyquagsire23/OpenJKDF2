@@ -15,7 +15,7 @@
 
 #include "jk.h"
 
-void sithDSS_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags)
+void sithDSS_SendSurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -39,12 +39,12 @@ void sithDSS_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags)
         NETMSG_PUSHU32(surface->adjoin->flags);
     }
     
-    NETMSG_END(DSS_SYNCSURFACE);
+    NETMSG_END(DSS_SURFACESTATUS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSyncSurface(sithCogMsg *msg)
+int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
 {
     unsigned int v1; // eax
     sithSurface *surface; // edi
