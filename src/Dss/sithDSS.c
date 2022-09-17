@@ -427,7 +427,7 @@ int sithDSS_ProcessInventory(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags)
+void sithDSS_SendSurface(rdSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -463,12 +463,12 @@ void sithDSS_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags)
     if (surface->flags & 0x2000000)
         NETMSG_PUSHS32(surface->sector->id);
     
-    NETMSG_END(DSS_STOPANIM);
+    NETMSG_END(DSS_SURFACE);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessStopAnim(sithCogMsg *msg)
+int sithDSS_ProcessSurface(sithCogMsg *msg)
 {
     rdSurface *rdsurface; // edi
     rdSurface *surface; // eax

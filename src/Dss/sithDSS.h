@@ -14,8 +14,8 @@
 #define sithDSS_ProcessAIStatus_ADDR (0x004F9640)
 #define sithDSS_SendInventory_ADDR (0x004F9900)
 #define sithDSS_ProcessInventory_ADDR (0x004F99C0)
-#define sithDSS_SendStopAnim_ADDR (0x004F9A70)
-#define sithDSS_ProcessStopAnim_ADDR (0x004F9BA0)
+#define sithDSS_SendSurface_ADDR (0x004F9A70)
+#define sithDSS_ProcessSurface_ADDR (0x004F9BA0)
 #define sithDSS_SendSyncPuppet_ADDR (0x004F9D20)
 #define sithDSS_ProcessSyncPuppet_ADDR (0x004F9E10)
 #define sithDSS_SendSyncTimers_ADDR (0x004F9F20)
@@ -37,8 +37,8 @@ void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx);
 int sithDSS_ProcessAIStatus(sithCogMsg *msg);
 void sithDSS_SendInventory(sithThing *thing, int binIdx, int sendto_id, int mpFlags);
 int sithDSS_ProcessInventory(sithCogMsg *msg);
-void sithDSS_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags);
-int sithDSS_ProcessStopAnim(sithCogMsg *msg);
+void sithDSS_SendSurface(rdSurface *surface, int sendto_id, int mpFlags);
+int sithDSS_ProcessSurface(sithCogMsg *msg);
 void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncPuppet(sithCogMsg *msg);
 void sithDSS_SendSyncEvents(sithEvent *timer, int sendto_id, int mpFlags);

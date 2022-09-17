@@ -1225,7 +1225,7 @@ void sithSurface_SyncFull(int mpFlags)
     {
         int flags = sithSurface_aSurfaces[i].flags;
         if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
-            sithDSS_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
+            sithDSS_SendSurface(&sithSurface_aSurfaces[i], 0, mpFlags);
     }
 }
 
