@@ -1410,6 +1410,11 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
         actor->field_264 = a5;
         actor->field_26C = bAltFire;
         sithPuppet_PlayMode(v9, v20, 0);
+
+        // Added: co-op
+        if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+        }
         return 1;
     }
 LABEL_12:

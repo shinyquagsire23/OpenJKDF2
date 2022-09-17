@@ -417,6 +417,12 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
                 sithPuppet_SetArmedMode(v6, 1);
             else
                 sithPuppet_SetArmedMode(v6, 0);
+
+            // Added: co-op
+            if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+                sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+            }
+
             instinct->nextUpdate = sithTime_curMs + 1000;
             return 0;
         }
@@ -443,6 +449,11 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     {
         sithSoundClass_PlayModeRandom(v6, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
+
+        // Added: co-op
+        if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+        }
     }
 
     actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
@@ -475,6 +486,11 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             else
             {
                 sithPuppet_SetArmedMode(v7, 0);
+            }
+
+            // Added: co-op
+            if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+                sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
             }
             return 0;
         }
@@ -528,6 +544,11 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     {
         sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
+
+        // Added: co-op
+        if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+        }
     }
 
     instinct->param0 = aiclass->argsAsFloat[8];

@@ -1489,7 +1489,6 @@ LABEL_30:
 
                         // Added: co-op
                         if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {
-                            printf("Sending corpse sync?\n");
                             //sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
                             //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
                             if (v14->rdthing.puppet)

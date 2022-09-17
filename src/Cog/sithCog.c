@@ -29,6 +29,7 @@
 #include "Main/jkGame.h"
 #include "stdPlatform.h"
 #include "Dss/sithDSSCog.h"
+#include "Engine/sithMulti.h"
 
 #include "jk.h"
 
@@ -910,8 +911,37 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         return;
     }
 
-    if ( msgid == COGMSG_SYNCSECTORALT || msgid == COGMSG_SYNCTHINGATTACHMENT || !sithNet_isMulti || sithNet_isServer || (cog->flags & SITH_COG_LOCAL) != 0 )
+    // Added: Co-op
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && msgid == SITH_MESSAGE_USER0 && sithCog_masterCog && cog->selfCog == sithCog_masterCog->selfCog && sithNet_isMulti)
     {
+        // Send objectives to everyone
+        //printf("Send objective to everyone\n");
+        //if (param3 != 1234.0)
+        sithDSSCog_SendSendTrigger(
+            cog,
+            msgid,
+            senderType,
+            senderIndex,
+            sourceType,
+            sourceIndex,
+            linkId,
+            0.0,
+            0.0,
+            0.0,
+            1234.0, // prevent infinite looping
+            -1);
+
+        goto execute;
+    }
+
+    // Added: Co-op, don't double-spawn drops
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && msgid == SITH_MESSAGE_KILLED && sithNet_isMulti && !sithNet_isServer) {
+        return;
+    }
+    
+    if ( msgid == SITH_MESSAGE_STARTUP || msgid == SITH_MESSAGE_SHUTDOWN || !sithNet_isMulti || sithNet_isServer || (cog->flags & SITH_COG_LOCAL) != 0 )
+    {
+execute:
         cog->params[0] = 0.0;
         cog->senderId = linkId;
         cog->senderRef = senderIndex;
@@ -928,7 +958,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         }
         sithCogVm_ExecCog(cog, v10);
     }
-    else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
+    else if ( msgid != SITH_MESSAGE_PULSE && msgid != SITH_MESSAGE_TIMER )
     {
         sithDSSCog_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_serverNetId);
     }
@@ -1008,8 +1038,39 @@ LABEL_18:
         }
         return -9999.9873046875;
     }
+
+    // Added: Co-op
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && message == SITH_MESSAGE_USER0 && sithCog_masterCog && cog->selfCog == sithCog_masterCog->selfCog && sithNet_isMulti)
+    {
+        // Send objectives to everyone
+        //printf("Send objective to everyone\n");
+        if (param3 != 1234.0) {
+            sithDSSCog_SendSendTrigger(
+                cog,
+                message,
+                senderType,
+                senderIndex,
+                sourceType,
+                sourceIndex,
+                linkId,
+                param0,
+                param1,
+                param2,
+                1234.0, // prevent infinite looping
+                -1);
+        }
+
+        goto execute;
+    }
+
+    // Added: Co-op, don't double-spawn drops
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && message == SITH_MESSAGE_KILLED && sithNet_isMulti && !sithNet_isServer) {
+        return 0.0;
+    }
+
     if ( message == SITH_MESSAGE_STARTUP || message == SITH_MESSAGE_SHUTDOWN || !sithNet_isMulti || sithNet_isServer || (v13 & 0x40) != 0 )
     {
+execute:
         cog->senderId = linkId;
         cog->senderRef = senderIndex;
         cog->senderType = senderType;

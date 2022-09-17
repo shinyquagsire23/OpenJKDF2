@@ -495,7 +495,7 @@ void sithCogFunction_SendMessage(sithCog *ctx)
     int msgId = sithCogVm_PopInt(ctx);
     sithCog* cog = sithCogVm_PopCog(ctx);
 
-    if (cog && msgId >= 0 && msgId < COGMSG_ENUMPLAYERS)
+    if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
         sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0);
 }
 
@@ -508,7 +508,7 @@ void sithCogFunction_SendMessageEx(struct sithCog *ctx)
     int msgId = sithCogVm_PopInt(ctx);
     sithCog* cog = sithCogVm_PopCog(ctx);
 
-    if (cog && msgId >= 0 && msgId < COGMSG_ENUMPLAYERS)
+    if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
     {
         float flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0, param0, param1, param2, param3);
         sithCogVm_PushFlex(ctx, flexRet);

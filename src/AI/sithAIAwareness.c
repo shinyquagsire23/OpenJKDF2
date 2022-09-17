@@ -60,6 +60,10 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
 
 int sithAIAwareness_Tick(int a, sithEventInfo* b)
 {
+    // Added: co-op
+    if (sithNet_isMulti && !sithNet_isServer)
+        return 1;
+
     ++sithAIAwareness_timerTicks;
     if ( !sithAIAwareness_numEntries )
         return 1;

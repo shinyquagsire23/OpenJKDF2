@@ -324,6 +324,7 @@ enum THING_SYNC_FLAGS
 
     // Added
     THING_SYNC_AI = 8,
+    THING_SYNC_PUPPET = 0x10,
 
     // Helper
     THING_SYNC_ALL = 0xFF,

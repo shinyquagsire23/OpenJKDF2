@@ -161,6 +161,7 @@ enum SITH_MESSAGE_E
     SITH_MESSAGE_LEAVE  = 38,
     SITH_MESSAGE_SPLASH  = 39,
     SITH_MESSAGE_TRIGGER  = 40,
+    SITH_MESSAGE_MAX = 41,
 };
 
 static int (*_sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR;

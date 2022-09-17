@@ -20,6 +20,7 @@
 #include "Main/jk.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
+#include "Engine/sithMulti.h"
 
 enum jkGuiEscButton_t
 {
@@ -81,7 +82,7 @@ void jkGuiEsc_Show()
     {
         jkGuiEsc_aElements[JKGUIESC_ELMT_LOAD].bIsVisible = 0;
         jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
-        jkGuiEsc_aElements[JKGUIESC_ELMT_OBJECTIVES].bIsVisible = 0;
+        jkGuiEsc_aElements[JKGUIESC_ELMT_OBJECTIVES].bIsVisible = !!(sithMulti_multiModeFlags & MULTIMODEFLAG_COOP); // Added: co-op
         jkGuiEsc_aElements[JKGUIESC_ELMT_RESTART].bIsVisible = 0;
     }
     else
