@@ -1547,7 +1547,7 @@ void do_hooks()
     hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
     hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
-    hook_function(sithSurface_Sync_ADDR, sithSurface_Sync);
+    hook_function(sithSurface_SyncFull_ADDR, sithSurface_SyncFull);
     hook_function(sithSurface_Alloc_ADDR, sithSurface_Alloc);
     hook_function(sithSurface_sub_4E63B0_ADDR, sithSurface_sub_4E63B0);
 

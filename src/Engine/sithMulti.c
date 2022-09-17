@@ -1292,8 +1292,8 @@ void sithMulti_HandleTimeLimit(int deltaMs)
     if (!sithNet_isMulti)
         return;
 
-    sithThing_netidk();
-    sithSurface_Syncidk();
+    sithThing_Sync();
+    sithSurface_Sync();
     sithSector_sub_4F8EF0();
     if ( sithMulti_leaveJoinType && sithTime_curMs > sithMulti_leaveJoinWaitMs )
     {

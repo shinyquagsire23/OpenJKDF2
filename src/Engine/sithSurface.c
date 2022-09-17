@@ -1217,16 +1217,15 @@ rdSurface* sithSurface_GetByIdx(int idx)
     return &sithSurface_aSurfaces[v1];
 }
 
-void sithSurface_Sync(int mpFlags)
+void sithSurface_SyncFull(int mpFlags)
 {
-    if ( (sithCogVm_multiplayerFlags & mpFlags) != 0 )
+    if (!(sithCogVm_multiplayerFlags & mpFlags)) return;
+
+    for (int i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
     {
-        for (int i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
-        {
-            int flags = sithSurface_aSurfaces[i].flags;
-            if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
-                sithDSS_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
-        }
+        int flags = sithSurface_aSurfaces[i].flags;
+        if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
+            sithDSS_SendStopAnim(&sithSurface_aSurfaces[i], 0, mpFlags);
     }
 }
 
@@ -1259,7 +1258,7 @@ sithSurface* sithSurface_sub_4E63B0(int idx)
     return result;
 }
 
-void sithSurface_PushSurface(sithSurface *pSurface)
+void sithSurface_SyncSurface(sithSurface *pSurface)
 {
     pSurface->surfaceFlags |= SITH_SURFACE_CHANGED;
 
@@ -1269,25 +1268,14 @@ void sithSurface_PushSurface(sithSurface *pSurface)
     }
 }
 
-void sithSurface_Syncidk()
+void sithSurface_Sync()
 {
-    unsigned int v0; // esi
-    sithSurface **v1; // edi
+    if (!sithCogVm_multiplayerFlags) return;
 
-    if ( sithCogVm_multiplayerFlags && sithSurface_numSurfaces_0 )
+    for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
     {
-        v0 = 0;
-        if ( sithSurface_numSurfaces_0 )
-        {
-            v1 = aSithSurfaces;
-            do
-            {
-                sithDSS_SendSyncSurface(*v1, -1, 255);
-                ++v0;
-                ++v1;
-            }
-            while ( v0 < sithSurface_numSurfaces_0 );
-        }
-        sithSurface_numSurfaces_0 = 0;
+        sithDSS_SendSyncSurface(aSithSurfaces[v0], -1, 255);
     }
+
+    sithSurface_numSurfaces_0 = 0;
 }

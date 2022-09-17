@@ -243,7 +243,7 @@ void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
     {
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSurface_PushSurface(v4);
+            sithSurface_SyncSurface(v4);
         }
         sithCogVm_PushInt(ctx, v5->index);
     }
@@ -277,7 +277,7 @@ void sithCogFunctionSurface_SetWallCel(sithCog *ctx)
         surface->surfaceInfo.face.wallCel = wallCel;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
         sithCogVm_PushInt(ctx, v4);
     }
@@ -314,7 +314,7 @@ void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx)
             sithCogVm_PushInt(ctx, -1);
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
     }
     else
@@ -333,7 +333,7 @@ void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
         surface->surfaceFlags |= flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
     }
 }
@@ -348,7 +348,7 @@ void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
         surface->surfaceFlags &= ~flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
     }
 }
@@ -378,7 +378,7 @@ void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
                 adjoin->flags |= flags;
                 if ( COG_SHOULD_SYNC(ctx) )
                 {
-                    sithSurface_PushSurface(surface);
+                    sithSurface_SyncSurface(surface);
                 }
             }
         }
@@ -400,7 +400,7 @@ void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
                 adjoin->flags &= ~flags;
                 if ( COG_SHOULD_SYNC(ctx) )
                 {
-                     sithSurface_PushSurface(surface);
+                     sithSurface_SyncSurface(surface);
                 }
             }
         }
@@ -429,7 +429,7 @@ void sithCogFunctionSurface_SetFaceType(sithCog *ctx)
         surface->surfaceInfo.face.type |= type;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
     }
 }
@@ -443,7 +443,7 @@ void sithCogFunctionSurface_ClearFaceType(sithCog *ctx)
         surface->surfaceInfo.face.type &= ~type;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSurface_PushSurface(surface);
+            sithSurface_SyncSurface(surface);
         }
     }
 }
@@ -471,7 +471,7 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
             v2->surfaceInfo.face.geometryMode = geoMode;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithSurface_PushSurface(v2);
+                sithSurface_SyncSurface(v2);
                 return;
             }
         }
@@ -480,7 +480,7 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
             v2->surfaceInfo.face.geometryMode = RD_GEOMODE_NOTRENDERED;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithSurface_PushSurface(v2);
+                sithSurface_SyncSurface(v2);
                 return;
             }
         }
@@ -510,7 +510,7 @@ void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
         v2->surfaceInfo.face.lightingMode = lightMode;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSurface_PushSurface(v2);
+            sithSurface_SyncSurface(v2);
         }
     }
 }
@@ -538,7 +538,7 @@ void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
         v2->surfaceInfo.face.textureMode = texMode;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSurface_PushSurface(v2);
+            sithSurface_SyncSurface(v2);
         }
     }
 }
@@ -570,7 +570,7 @@ void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
             v2->surfaceInfo.face.extraLight = a1;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithSurface_PushSurface(v2);
+                sithSurface_SyncSurface(v2);
             }
         }
         else
@@ -631,5 +631,5 @@ void sithCogFunctionSurface_SyncSurface(sithCog *ctx)
 
     v1 = sithCogVm_PopSurface(ctx);
     if ( v1 )
-        sithSurface_PushSurface(v1);
+        sithSurface_SyncSurface(v1);
 }

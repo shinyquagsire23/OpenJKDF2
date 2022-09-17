@@ -254,7 +254,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
             sithDSS_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
     }
 
-    sithSurface_Sync(mpFlags);
+    sithSurface_SyncFull(mpFlags);
 
     for (sithEvent* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
         sithDSS_SendSyncEvents(timerIter, 0, mpFlags);
