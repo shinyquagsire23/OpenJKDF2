@@ -35,7 +35,7 @@ int sithCogVm_Startup()
     sithCogVm_msgId = 1;
     sithCogVm_msgFuncs[DSS_THINGPOS] = sithDSSThing_ProcessPos;
     sithCogVm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFireProjectile;
-    sithCogVm_msgFuncs[DSS_REQUESTCONNECT] = sithMulti_ProcessRequestConnect;
+    sithCogVm_msgFuncs[DSS_JOINREQUEST] = sithMulti_ProcessJoinRequest;
     sithCogVm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessJoinLeave;
     sithCogVm_msgFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
     sithCogVm_msgFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
@@ -271,7 +271,7 @@ LABEL_22:
                 goto LABEL_25;
             }
             if ( sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_WELCOME
-              || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_REQUESTCONNECT
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_JOINREQUEST
               || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_RESET
               || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_LEAVEJOIN
               || (g_submodeFlags & 8) != 0 )

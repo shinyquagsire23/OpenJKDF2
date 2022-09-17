@@ -24,8 +24,8 @@ extern "C" {
 #define sithMulti_ProcessJoin_unused_ADDR (0x004CA910)
 #define sithMulti_SendLeaveJoin_ADDR (0x004CA9C0)
 #define sithMulti_ProcessLeaveJoin_ADDR (0x004CAAF0)
-#define sithMulti_SendRequestConnect_ADDR (0x004CADB0)
-#define sithMulti_ProcessRequestConnect_ADDR (0x004CAE50)
+#define sithMulti_SendJoinRequest_ADDR (0x004CADB0)
+#define sithMulti_ProcessJoinRequest_ADDR (0x004CAE50)
 #define sithMulti_Send36_ADDR (0x004CB200)
 #define sithMulti_SendChat_ADDR (0x004CB250)
 #define sithMulti_ProcessChat_ADDR (0x004CB2E0)
@@ -79,7 +79,7 @@ enum DSS_ID
     DSS_ID_1F     = 31,
     DSS_LEAVEJOIN  = 32,
     DSS_WELCOME  = 33,
-    DSS_REQUESTCONNECT  = 34,
+    DSS_JOINREQUEST  = 34,
     DSS_DESTROYTHING  = 35,
     DSS_JOINING   = 36,
     DSS_SOUNDCLASSPLAY  = 37,
@@ -214,7 +214,7 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
 int sithMulti_Startup();
 void sithMulti_FreeThing(int a1);
 void sithMulti_Shutdown();
-int sithMulti_SendRequestConnect(int sendto_id);
+int sithMulti_SendJoinRequest(int sendto_id);
 int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
 void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
@@ -231,7 +231,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
 int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
 void sithMulti_sub_4CA470(int a1);
 void sithMulti_InitTick(unsigned int tickrate);
-int sithMulti_ProcessRequestConnect(sithCogMsg *msg);
+int sithMulti_ProcessJoinRequest(sithCogMsg *msg);
 void sithMulti_HandleTimeLimit(int deltaMs);
 uint32_t sithMulti_IterPlayersnothingidk(int net_id);
 int sithMulti_SendPing(int sendtoId);
@@ -248,7 +248,7 @@ int sithMulti_SendPing(int sendtoId);
 //static int (*sithMulti_CreatePlayer)(wchar_t *a1, wchar_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
 //static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
 //static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;
-//static int (*sithMulti_SendRequestConnect)(int a1) = (void*)sithMulti_SendRequestConnect_ADDR;
+//static int (*sithMulti_SendJoinRequest)(int a1) = (void*)sithMulti_SendJoinRequest_ADDR;
 
 #ifdef __cplusplus
 }

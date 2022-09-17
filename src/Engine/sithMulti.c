@@ -247,7 +247,7 @@ void sithMulti_Shutdown()
     sithDplay_CloseConnection();
 }
 
-int sithMulti_SendRequestConnect(int sendto_id)
+int sithMulti_SendJoinRequest(int sendto_id)
 {
     NETMSG_START;
 
@@ -256,7 +256,7 @@ int sithMulti_SendRequestConnect(int sendto_id)
     NETMSG_PUSHWSTR(sithMulti_name, 0x20);
     NETMSG_PUSHU32(sithNet_checksum);
 
-    NETMSG_END(DSS_REQUESTCONNECT);
+    NETMSG_END(DSS_JOINREQUEST);
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 1, 0);
 }
 
@@ -1032,7 +1032,7 @@ void sithMulti_InitTick(unsigned int tickrate)
     sithNet_dword_8C4BA8 = 0;
 }
 
-int sithMulti_ProcessRequestConnect(sithCogMsg *msg)
+int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
 {
     int v1; // esi
     uint32_t v3; // eax
@@ -1053,7 +1053,7 @@ int sithMulti_ProcessRequestConnect(sithCogMsg *msg)
     {
         NETMSG_POPSTR(v11, 32);
 
-        sithMulti_verbosePrintf("sithMulti_ProcessRequestConnect, id %x map %s\n", v1, v11);
+        sithMulti_verbosePrintf("sithMulti_ProcessJoinRequest, id %x map %s\n", v1, v11);
 
         if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
         {
