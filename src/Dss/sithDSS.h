@@ -10,8 +10,8 @@
 #define sithDSS_ProcessSyncSector_ADDR (0x004F91F0)
 #define sithDSS_SendSyncSectorAlt_ADDR (0x004F92E0)
 #define sithDSS_ProcessSyncSectorAlt_ADDR (0x004F9350)
-#define sithDSS_SendSyncAI_ADDR (0x004F93B0)
-#define sithDSS_ProcessSyncAI_ADDR (0x004F9640)
+#define sithDSS_SendAIStatus_ADDR (0x004F93B0)
+#define sithDSS_ProcessAIStatus_ADDR (0x004F9640)
 #define sithDSS_SendSyncItemDesc_ADDR (0x004F9900)
 #define sithDSS_ProcessSyncItemDesc_ADDR (0x004F99C0)
 #define sithDSS_SendStopAnim_ADDR (0x004F9A70)
@@ -33,8 +33,8 @@ void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncSector(sithCogMsg *msg);
 void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncSectorAlt(sithCogMsg *msg);
-void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx);
-int sithDSS_ProcessSyncAI(sithCogMsg *msg);
+void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx);
+int sithDSS_ProcessAIStatus(sithCogMsg *msg);
 void sithDSS_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncItemDesc(sithCogMsg *msg);
 void sithDSS_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags);

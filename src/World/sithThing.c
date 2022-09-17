@@ -1959,7 +1959,7 @@ void sithThing_Sync()
         // Added: Co-op
         if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
             if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
-                sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1);
+                sithDSS_SendAIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
         }
 
         // Added: Co-op

@@ -203,7 +203,7 @@ int sithDSS_ProcessSyncSectorAlt(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx)
+void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx)
 {    
     NETMSG_START;
 
@@ -266,12 +266,12 @@ void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx)
         NETMSG_PUSHVEC3(actor->framesAlloc[i]);
     }
     
-    NETMSG_END(DSS_SYNCAI);
+    NETMSG_END(DSS_AISTATUS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, idx, 1);
 }
 
-int sithDSS_ProcessSyncAI(sithCogMsg *msg)
+int sithDSS_ProcessAIStatus(sithCogMsg *msg)
 {
     sithThing *thing;
     sithActor *actor;
