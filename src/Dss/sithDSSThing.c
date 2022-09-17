@@ -319,7 +319,7 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4)
+void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, float a4)
 {
     NETMSG_START;
 
@@ -328,12 +328,12 @@ void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4
     NETMSG_PUSHF32(a4);
     NETMSG_PUSHS16(a2);
 
-    NETMSG_END(DSS_SOUNDCLASSPLAY);
+    NETMSG_END(DSS_PLAYSOUNDMODE);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
 }
 
-int sithDSSThing_ProcessSoundClassPlay(sithCogMsg *msg)
+int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg)
 {
     sithPlayingSound *v6; // eax
 

@@ -136,7 +136,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
             }
             v15 = sithSoundClass_PlayModeRandom(thing, jumpSound);
             if ( v15 && sithCogVm_multiplayerFlags )
-                sithDSSThing_SoundClassPlay(thing, jumpSound, v15->refid, -1.0);
+                sithDSSThing_SendPlaySoundMode(thing, jumpSound, v15->refid, -1.0);
             sithThing_DetachThing(thing);
         }
         if ( sithCogVm_multiplayerFlags )

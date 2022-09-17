@@ -286,7 +286,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
         sithCogVm_PushInt(ctx, pPlayingSound->refid);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SoundClassPlay(thing, soundClassId, pPlayingSound->refid, -1.0);
+            sithDSSThing_SendPlaySoundMode(thing, soundClassId, pPlayingSound->refid, -1.0);
         }
     }
     else
