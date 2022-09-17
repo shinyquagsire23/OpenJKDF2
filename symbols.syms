@@ -717,7 +717,7 @@ bShowInvisibleThings 0x8EE640 int
 playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 uint32_t
 g_localPlayerThing 0x8319A4 sithThing*
-g_selfPlayerInfo 0x8319A8 sithPlayerInfo*
+sithPlayer_pLocalPlayer 0x8319A8 sithPlayerInfo*
 playerThings 0x85B580 jkPlayerInfo[32]
 jkSaber_rotateMat 0x85FA80 rdMatrix34
 jkPlayer_setRotateOverlayMap 0x00860764 int

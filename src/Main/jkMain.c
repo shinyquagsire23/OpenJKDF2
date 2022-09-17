@@ -556,7 +556,7 @@ LABEL_15:
     {
 LABEL_28:
         sithInventory_ClearInventory(g_localPlayerThing);
-        jkPlayer_MpcInitBins(g_selfPlayerInfo);
+        jkPlayer_MpcInitBins(sithPlayer_pLocalPlayer);
         
         jkPlayer_Startup();
         jkPlayer_InitForceBins();

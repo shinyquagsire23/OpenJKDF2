@@ -603,7 +603,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
-        if ( g_selfPlayerInfo->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
+        if ( sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
             rdGeoMode_t oldGeoMode = thing->rdthing.geometryMode;
             thing->rdthing.geometryMode = thing->rdthing.curGeoMode;

@@ -678,8 +678,8 @@ void sithDSS_SendSyncCameras(int sendto_id, int mpFlags)
         NETMSG_PUSHF32(sithCamera_cameras[i].fov);
     }
 
-    NETMSG_PUSHU16(g_selfPlayerInfo->palEffectsIdx1);
-    NETMSG_PUSHU16(g_selfPlayerInfo->palEffectsIdx2);
+    NETMSG_PUSHU16(sithPlayer_pLocalPlayer->palEffectsIdx1);
+    NETMSG_PUSHU16(sithPlayer_pLocalPlayer->palEffectsIdx2);
     
     NETMSG_END(DSS_SYNCCAMERAS);
     
@@ -712,8 +712,8 @@ int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
         sithCamera_cameras[i].fov = NETMSG_POPF32();
     }
 
-    g_selfPlayerInfo->palEffectsIdx1 = NETMSG_POPU16();
-    g_selfPlayerInfo->palEffectsIdx2 = NETMSG_POPU16();
+    sithPlayer_pLocalPlayer->palEffectsIdx1 = NETMSG_POPU16();
+    sithPlayer_pLocalPlayer->palEffectsIdx2 = NETMSG_POPU16();
 
     return 1;
 }
@@ -742,9 +742,9 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sithWeapon_fireRate);
     NETMSG_PUSHU32(sithWeapon_CurWeaponMode);
     NETMSG_PUSHU32(sithWeapon_8BD024);
-    NETMSG_PUSHU32(g_selfPlayerInfo->curItem);
-    NETMSG_PUSHU32(g_selfPlayerInfo->curWeapon);
-    NETMSG_PUSHU32(g_selfPlayerInfo->curPower);
+    NETMSG_PUSHU32(sithPlayer_pLocalPlayer->curItem);
+    NETMSG_PUSHU32(sithPlayer_pLocalPlayer->curWeapon);
+    NETMSG_PUSHU32(sithPlayer_pLocalPlayer->curPower);
 
     for (int i = 0; i < 20; i++)
     {
@@ -795,9 +795,9 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
     sithWeapon_fireRate = NETMSG_POPF32();
     sithWeapon_CurWeaponMode = NETMSG_POPU32();
     sithWeapon_8BD024 = NETMSG_POPU32();
-    g_selfPlayerInfo->curItem = NETMSG_POPU32();
-    g_selfPlayerInfo->curWeapon = NETMSG_POPU32();
-    g_selfPlayerInfo->curPower = NETMSG_POPU32();
+    sithPlayer_pLocalPlayer->curItem = NETMSG_POPU32();
+    sithPlayer_pLocalPlayer->curWeapon = NETMSG_POPU32();
+    sithPlayer_pLocalPlayer->curPower = NETMSG_POPU32();
 
     for (int i = 0; i < 20; i++)
     {

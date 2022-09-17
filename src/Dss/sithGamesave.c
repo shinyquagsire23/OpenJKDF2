@@ -309,7 +309,7 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_headerTmp.playerHealth = g_localPlayerThing->actorParams.health;
         sithGamesave_headerTmp.playerMaxHealth = g_localPlayerThing->actorParams.maxHealth;
         v7 = sithGamesave_headerTmp.binAmts;
-        v8 = g_selfPlayerInfo->iteminfo;
+        v8 = sithPlayer_pLocalPlayer->iteminfo;
         do
         {
             v9 = v8->ammoAmt;

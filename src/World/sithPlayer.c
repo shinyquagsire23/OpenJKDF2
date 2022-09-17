@@ -44,13 +44,13 @@ void sithPlayer_Initialize(int idx)
 
 void sithPlayer_Close()
 {
-    if ( g_selfPlayerInfo )
+    if ( sithPlayer_pLocalPlayer )
     {
-        stdPalEffects_FreeRequest(g_selfPlayerInfo->palEffectsIdx1);
-        stdPalEffects_FreeRequest(g_selfPlayerInfo->palEffectsIdx2);
+        stdPalEffects_FreeRequest(sithPlayer_pLocalPlayer->palEffectsIdx1);
+        stdPalEffects_FreeRequest(sithPlayer_pLocalPlayer->palEffectsIdx2);
     }
     g_localPlayerThing = 0;
-    g_selfPlayerInfo = 0;
+    sithPlayer_pLocalPlayer = 0;
 }
 
 void sithPlayer_NewEntry(sithWorld *world)
@@ -134,7 +134,7 @@ void sithPlayer_idk(int idx)
     unsigned int v6; // eax
 
     playerThingIdx = idx;
-    g_selfPlayerInfo = &jkPlayer_playerInfos[idx];
+    sithPlayer_pLocalPlayer = &jkPlayer_playerInfos[idx];
     g_localPlayerThing = jkPlayer_playerInfos[idx].playerThing;
 
     sithWorld_pCurrentWorld->playerThing = g_localPlayerThing;
@@ -145,11 +145,11 @@ void sithPlayer_idk(int idx)
     // Added: idk why this is needed?
     g_localPlayerThing->thingtype = SITH_THING_PLAYER;
 
-    _wcsncpy(g_selfPlayerInfo->player_name, jkPlayer_playerShortName, 0x1Fu);
-    g_selfPlayerInfo->player_name[31] = 0;
+    _wcsncpy(sithPlayer_pLocalPlayer->player_name, jkPlayer_playerShortName, 0x1Fu);
+    sithPlayer_pLocalPlayer->player_name[31] = 0;
 
-    _wcsncpy(g_selfPlayerInfo->multi_name, sithMulti_name, 0x1Fu);
-    g_selfPlayerInfo->multi_name[31] = 0;
+    _wcsncpy(sithPlayer_pLocalPlayer->multi_name, sithMulti_name, 0x1Fu);
+    sithPlayer_pLocalPlayer->multi_name[31] = 0;
 
     for (v6 = 0; v6 < jkPlayer_maxPlayers; v6++)
     {
@@ -164,8 +164,8 @@ void sithPlayer_idk(int idx)
 void sithPlayer_ResetPalEffects()
 {
     stdPalEffects_FlushAllEffects();
-    g_selfPlayerInfo->palEffectsIdx1 = stdPalEffects_NewRequest(1);
-    g_selfPlayerInfo->palEffectsIdx2 = stdPalEffects_NewRequest(2);
+    sithPlayer_pLocalPlayer->palEffectsIdx1 = stdPalEffects_NewRequest(1);
+    sithPlayer_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }
 
 void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
@@ -188,7 +188,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
 
     v20 = a2 * 0.4;
     v2 = (__int64)(a2 * 256.0 - -0.5);
-    if ( playerInfo == g_selfPlayerInfo )
+    if ( playerInfo == sithPlayer_pLocalPlayer )
     {
         v3 = playerInfo->playerThing;
         v4 = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
@@ -382,7 +382,7 @@ void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
     double v7; // st6
     double v8; // st7
 
-    v3 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
+    v3 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
     v4 = fR + v3->tint.x;
     if ( v4 < 0.0 )
     {
@@ -425,7 +425,7 @@ void sithPlayer_AddDyamicAdd(int r, int g, int b)
     unsigned int v5; // ecx
     unsigned int v6; // ecx
 
-    v3 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
+    v3 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
     v4 = r + v3->add.x;
     if ( v4 > 0xFF )
         v4 = 255;
@@ -568,11 +568,11 @@ void sithPlayer_sub_4C8910(unsigned int idx)
         pPlayerInfo->multi_name[0] = 0;
         if ( pPlayerInfo->playerThing && sithWorld_pCurrentWorld )
             sithInventory_ClearInventory(pPlayerInfo->playerThing);
-        if ( pPlayerInfo == g_selfPlayerInfo )
+        if ( pPlayerInfo == sithPlayer_pLocalPlayer )
         {
             stdPalEffects_FlushAllEffects();
-            g_selfPlayerInfo->palEffectsIdx1 = stdPalEffects_NewRequest(1);
-            g_selfPlayerInfo->palEffectsIdx2 = stdPalEffects_NewRequest(2);
+            sithPlayer_pLocalPlayer->palEffectsIdx1 = stdPalEffects_NewRequest(1);
+            sithPlayer_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
         }
         pPlayerInfo->flags &= ~0x5;
     }
@@ -629,7 +629,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             sithCamera_SetCameraFocus(sithCamera_cameras, player, 0);
             sithCamera_SetCameraFocus(&sithCamera_cameras[1], player, 0);
             sithCamera_DoIdleAnimation();
-            v6 = stdPalEffects_GetEffectPointer(g_selfPlayerInfo->palEffectsIdx1);
+            v6 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
             stdPalEffects_ResetEffect(v6);
         }
 
