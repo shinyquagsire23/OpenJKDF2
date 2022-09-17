@@ -875,7 +875,7 @@ void sithCogFunctionThing_PlayMode(sithCog *ctx)
             sithCogVm_PushInt(ctx, track);
             if (COG_SHOULD_SYNC(ctx))
             {
-                sithDSSThing_SendOpenDoor(thing, mode, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
+                sithDSSThing_SendPlayKeyMode(thing, mode, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
             }
         }
     }

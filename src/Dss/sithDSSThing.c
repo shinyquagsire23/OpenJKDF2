@@ -406,7 +406,7 @@ int sithDSSThing_ProcessPlayKey(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags)
+void sithDSSThing_SendPlayKeyMode(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags)
 {
     NETMSG_START;
 
@@ -414,12 +414,12 @@ void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int se
     NETMSG_PUSHS32(idx2);
     NETMSG_PUSHS16(idx1);
     
-    NETMSG_END(DSS_OPENDOOR);
+    NETMSG_END(DSS_PLAYKEYMODE);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
 }
 
-int sithDSSThing_ProcessOpenDoor(sithCogMsg *msg)
+int sithDSSThing_ProcessPlayKeyMode(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 

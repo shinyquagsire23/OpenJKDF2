@@ -14,8 +14,8 @@
 #define sithDSSThing_ProcessPlaySoundMode_ADDR (0x004F39C0)
 #define sithDSSThing_SendPlayKey_ADDR (0x004F3A30)
 #define sithDSSThing_ProcessPlayKey_ADDR (0x004F3AA0)
-#define sithDSSThing_SendOpenDoor_ADDR (0x004F3B30)
-#define sithDSSThing_ProcessOpenDoor_ADDR (0x004F3B90)
+#define sithDSSThing_SendPlayKeyMode_ADDR (0x004F3B30)
+#define sithDSSThing_ProcessPlayKeyMode_ADDR (0x004F3B90)
 #define sithDSSThing_SendSetThingModel_ADDR (0x004F3C00)
 #define sithDSSThing_ProcessSetThingModel_ADDR (0x004F3C80)
 #define sithDSSThing_SendStopKey_ADDR (0x004F3CF0)
@@ -57,8 +57,8 @@ int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg);
 void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7);
 int sithDSSThing_ProcessPlayKey(sithCogMsg *msg);
 
-void sithDSSThing_SendOpenDoor(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags);
-int sithDSSThing_ProcessOpenDoor(sithCogMsg *msg);
+void sithDSSThing_SendPlayKeyMode(sithThing *pThing, int16_t idx1, int idx2, int sendtoId, int mpFlags);
+int sithDSSThing_ProcessPlayKeyMode(sithCogMsg *msg);
 
 void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId);
 int sithDSSThing_ProcessSetThingModel(sithCogMsg *msg);
@@ -107,7 +107,7 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
 //static int (*sithDSSThing_PlaySoundMode)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithDSSThing_PlaySoundMode_ADDR;
 //static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
 //static void (*sithDSSThing_SendPathMove)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendPathMove_ADDR;
-//static void (*sithDSSThing_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendOpenDoor_ADDR;
+//static void (*sithDSSThing_SendPlayKeyMode)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendPlayKeyMode_ADDR;
 //static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThing_SendDestroyThing_ADDR;
 //static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;
 //static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
