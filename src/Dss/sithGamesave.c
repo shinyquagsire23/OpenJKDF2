@@ -245,7 +245,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SendSyncSector(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
+        sithDSS_SendSectorStatus(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum

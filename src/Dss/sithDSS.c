@@ -80,7 +80,7 @@ int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)
+void sithDSS_SendSectorStatus(sithSector *sector, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -101,7 +101,7 @@ void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSyncSector(sithCogMsg *msg)
+int sithDSS_ProcessSectorStatus(sithCogMsg *msg)
 {
     uint32_t idx; // eax
     sithSector *sector; // edi

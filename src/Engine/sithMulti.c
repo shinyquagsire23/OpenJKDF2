@@ -1389,7 +1389,7 @@ LABEL_42:
                                     goto LABEL_64;
                                 }
                             }
-                            sithDSS_SendSyncSector(v12, sithMulti_sendto_id, 1);
+                            sithDSS_SendSectorStatus(v12, sithMulti_sendto_id, 1);
 LABEL_41:
                             goto LABEL_42;
                         case 2:

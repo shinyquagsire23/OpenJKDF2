@@ -6,8 +6,8 @@
 
 #define sithDSS_SendSurfaceStatus_ADDR (0x004F8F80)
 #define sithDSS_ProcessSurfaceStatus_ADDR (0x004F9050)
-#define sithDSS_SendSyncSector_ADDR (0x004F9120)
-#define sithDSS_ProcessSyncSector_ADDR (0x004F91F0)
+#define sithDSS_SendSectorStatus_ADDR (0x004F9120)
+#define sithDSS_ProcessSectorStatus_ADDR (0x004F91F0)
 #define sithDSS_SendSyncSectorAlt_ADDR (0x004F92E0)
 #define sithDSS_ProcessSyncSectorAlt_ADDR (0x004F9350)
 #define sithDSS_SendAIStatus_ADDR (0x004F93B0)
@@ -29,8 +29,8 @@
 
 void sithDSS_SendSurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags);
 int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg);
-void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags);
-int sithDSS_ProcessSyncSector(sithCogMsg *msg);
+void sithDSS_SendSectorStatus(sithSector *sector, int sendto_id, int mpFlags);
+int sithDSS_ProcessSectorStatus(sithCogMsg *msg);
 void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncSectorAlt(sithCogMsg *msg);
 void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx);
