@@ -55,7 +55,7 @@ void sithMulti_SendChat(char *pStr, int arg0, int arg1)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
 }
 
-int sithMulti_HandleChat(sithCogMsg *msg)
+int sithMulti_ProcessChat(sithCogMsg *msg)
 {
     // Added: 132 -> 256
     char v5[256];
@@ -367,7 +367,7 @@ void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing,
         jk_snwprintf(a1a, 0x80u, v5, pPlayerInfo, v10);
         DebugConsole_PrintUniStr(a1a);
         ++pKilledByThing->actorParams.playerinfo->numKills;
-        sithMulti_HandleScore();
+        sithMulti_ProcessScore();
         return;
     }
     v3 = _frand() * 4.0;
@@ -399,10 +399,10 @@ LABEL_12:
     DebugConsole_PrintUniStr(a1a);
 LABEL_15:
     ++pPlayerInfo->numSuicides;
-    sithMulti_HandleScore();
+    sithMulti_ProcessScore();
 }
 
-void sithMulti_HandleScore()
+void sithMulti_ProcessScore()
 {
     int score_limit_met;
 
@@ -562,7 +562,7 @@ int sithMulti_LobbyMessage()
     return sithDplay_DoReceive();
 }
 
-int sithMulti_HandleJoinLeave(sithCogMsg *msg)
+int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
 {
     int v1; // edi
     int v2; // ebx
@@ -578,7 +578,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     v2 = NETMSG_POPS32();
     NETMSG_POPWSTR(jkPlayer_playerInfos[v1].player_name, 0x10);
 
-    sithMulti_verbosePrintf("sithMulti_HandleJoinLeave %x %x %x\n", v1, v2, sithDplay_dplayIdSelf);
+    sithMulti_verbosePrintf("sithMulti_ProcessJoinLeave %x %x %x\n", v1, v2, sithDplay_dplayIdSelf);
 
     if ( v2 != sithDplay_dplayIdSelf )
     {
@@ -624,14 +624,14 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
     return 1;
 }
 
-int sithMulti_HandlePing(sithCogMsg *msg)
+int sithMulti_ProcessPing(sithCogMsg *msg)
 {
     msg->netMsg.cogMsgId = DSS_PINGREPLY;
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, msg->netMsg.thingIdx, 1, 0);
     return 1;
 }
 
-int sithMulti_HandlePingResponse(sithCogMsg *msg)
+int sithMulti_ProcessPingResponse(sithCogMsg *msg)
 {
     int v1; // eax
     sithPlayerInfo* i; // ecx
@@ -653,7 +653,7 @@ int sithMulti_HandlePingResponse(sithCogMsg *msg)
     return 1;
 }
 
-int sithMulti_HandleKickPlayer(sithCogMsg *msg)
+int sithMulti_ProcessKickPlayer(sithCogMsg *msg)
 {
     wchar_t *v2; // eax
     int v3; // eax
@@ -842,7 +842,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, bSync);
 }
 
-int sithMulti_HandleLeaveJoin(sithCogMsg *msg)
+int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
 {
     uint32_t v1; // eax
     int v2; // edx
@@ -1032,7 +1032,7 @@ void sithMulti_InitTick(unsigned int tickrate)
     sithNet_dword_8C4BA8 = 0;
 }
 
-int sithMulti_HandleRequestConnect(sithCogMsg *msg)
+int sithMulti_ProcessRequestConnect(sithCogMsg *msg)
 {
     int v1; // esi
     uint32_t v3; // eax
@@ -1053,7 +1053,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
     {
         NETMSG_POPSTR(v11, 32);
 
-        sithMulti_verbosePrintf("sithMulti_HandleRequestConnect, id %x map %s\n", v1, v11);
+        sithMulti_verbosePrintf("sithMulti_ProcessRequestConnect, id %x map %s\n", v1, v11);
 
         if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
         {

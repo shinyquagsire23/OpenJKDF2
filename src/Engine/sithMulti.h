@@ -20,37 +20,29 @@ extern "C" {
 #define sithMulti_sub_4CA470_ADDR (0x004CA470)
 #define sithMulti_sendmsgidk4_ADDR (0x004CA610)
 #define sithMulti_SendWelcome_ADDR (0x004CA710)
-#define sithMulti_HandleJoinLeave_ADDR (0x004CA780)
-#define sithMulti_HandleJoin_unused_ADDR (0x004CA910)
+#define sithMulti_ProcessJoinLeave_ADDR (0x004CA780)
+#define sithMulti_ProcessJoin_unused_ADDR (0x004CA910)
 #define sithMulti_SendLeaveJoin_ADDR (0x004CA9C0)
-#define sithMulti_HandleLeaveJoin_ADDR (0x004CAAF0)
+#define sithMulti_ProcessLeaveJoin_ADDR (0x004CAAF0)
 #define sithMulti_SendRequestConnect_ADDR (0x004CADB0)
-#define sithMulti_HandleRequestConnect_ADDR (0x004CAE50)
+#define sithMulti_ProcessRequestConnect_ADDR (0x004CAE50)
 #define sithMulti_Send36_ADDR (0x004CB200)
 #define sithMulti_SendChat_ADDR (0x004CB250)
-#define sithMulti_HandleChat_ADDR (0x004CB2E0)
+#define sithMulti_ProcessChat_ADDR (0x004CB2E0)
 #define sithMulti_SendPing_ADDR (0x004CB390)
-#define sithMulti_HandlePing_ADDR (0x004CB3E0)
-#define sithMulti_HandlePingResponse_ADDR (0x004CB410)
+#define sithMulti_ProcessPing_ADDR (0x004CB3E0)
+#define sithMulti_ProcessPingResponse_ADDR (0x004CB410)
 #define sithMulti_SendKickPlayer_ADDR (0x004CB4A0)
-#define sithMulti_HandleKickPlayer_ADDR (0x004CB4F0)
+#define sithMulti_ProcessKickPlayer_ADDR (0x004CB4F0)
 #define sithMulti_HandleTimeLimit_ADDR (0x004CB690)
 #define sithMulti_SyncScores_ADDR (0x004CBC00)
 #define sithMulti_IterPlayersnothingidk_ADDR (0x004CBC10)
 #define sithMulti_SetHandleridk_ADDR (0x004CBC40)
 #define sithMulti_HandleDeath_ADDR (0x004CBC50)
-#define sithMulti_HandleScore_ADDR (0x004CBDE0)
+#define sithMulti_ProcessScore_ADDR (0x004CBDE0)
 #define sithMulti_EndLevel_ADDR (0x004CBF90)
 #define sithMulti_GetSpawnIdx_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
-
-#ifdef QOL_IMPROVEMENTS
-#define TICKRATE_MIN (1)
-#define TICKRATE_MAX (1000)
-#else
-#define TICKRATE_MIN (100)
-#define TICKRATE_MAX (300)
-#endif
 
 enum DSS_ID
 {
@@ -215,8 +207,8 @@ extern int jkGuiNetHost_bIsDedicated;
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1);
 void sithMulti_SendChat(char *pStr, int arg0, int arg1);
-void sithMulti_HandleScore();
-int sithMulti_HandleChat(sithCogMsg *msg);
+void sithMulti_ProcessScore();
+int sithMulti_ProcessChat(sithCogMsg *msg);
 
 HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
 int sithMulti_Startup();
@@ -230,16 +222,16 @@ void sithMulti_EndLevel(unsigned int a1, int a2);
 void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId);
 void sithMulti_SendKickPlayer(int idx);
 int sithMulti_LobbyMessage();
-int sithMulti_HandleJoinLeave(sithCogMsg *msg);
-int sithMulti_HandlePing(sithCogMsg *msg);
-int sithMulti_HandlePingResponse(sithCogMsg *msg);
-int sithMulti_HandleKickPlayer(sithCogMsg *msg);
+int sithMulti_ProcessJoinLeave(sithCogMsg *msg);
+int sithMulti_ProcessPing(sithCogMsg *msg);
+int sithMulti_ProcessPingResponse(sithCogMsg *msg);
+int sithMulti_ProcessKickPlayer(sithCogMsg *msg);
 int sithMulti_ServerLeft(int a, sithEventInfo* b);
 void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
-int sithMulti_HandleLeaveJoin(sithCogMsg *msg);
+int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
 void sithMulti_sub_4CA470(int a1);
 void sithMulti_InitTick(unsigned int tickrate);
-int sithMulti_HandleRequestConnect(sithCogMsg *msg);
+int sithMulti_ProcessRequestConnect(sithCogMsg *msg);
 void sithMulti_HandleTimeLimit(int deltaMs);
 uint32_t sithMulti_IterPlayersnothingidk(int net_id);
 int sithMulti_SendPing(int sendtoId);

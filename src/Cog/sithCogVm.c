@@ -25,9 +25,6 @@
 #include <stdint.h>
 #include <math.h>
 
-#define sithMulti_HandleTimeLimit ((void*)0x004CB690)
-
-
 int sithCogVm_Startup()
 {
     if (sithCogVm_bInit)
@@ -36,47 +33,47 @@ int sithCogVm_Startup()
     _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithCogVm_dword_847E84 = 0;
     sithCogVm_msgId = 1;
-    sithCogVm_msgFuncs[DSS_TELEPORTTHING] = sithDSSThing_HandleTeleportThing;
-    sithCogVm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_HandleFireProjectile;
-    sithCogVm_msgFuncs[DSS_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
-    sithCogVm_msgFuncs[DSS_WELCOME] = sithMulti_HandleJoinLeave;
-    sithCogVm_msgFuncs[DSS_DEATH] = sithDSSThing_HandleDeath;
-    sithCogVm_msgFuncs[DSS_DAMAGE] = sithDSSThing_HandleDamage;
-    sithCogVm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_HandleSendTrigger;
-    sithCogVm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_HandleSyncThing;
-    sithCogVm_msgFuncs[DSS_PLAYSOUNDPOS] = sithDSSThing_HandlePlaySoundPos;
-    sithCogVm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_HandlePlayKey;
-    sithCogVm_msgFuncs[DSS_SYNCTHINGFULL] = sithDSSThing_HandleSyncThingFull;
-    sithCogVm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_HandleSyncCog;
-    sithCogVm_msgFuncs[DSS_SYNCSURFACE] = sithDSS_HandleSyncSurface;
-    sithCogVm_msgFuncs[DSS_SYNCAI] = sithDSS_HandleSyncAI;
-    sithCogVm_msgFuncs[DSS_SYNCITEMDESC] = sithDSS_HandleSyncItemDesc;
-    sithCogVm_msgFuncs[DSS_STOPANIM] = sithDSS_HandleStopAnim;
-    sithCogVm_msgFuncs[DSS_SYNCSECTOR] = sithDSS_HandleSyncSector;
-    sithCogVm_msgFuncs[DSS_SYNCTHINGFRAME] = sithDSSThing_HandleSyncThingFrame;
-    sithCogVm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_HandleSyncPuppet;
-    sithCogVm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
-    sithCogVm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_HandleSyncThingAttachment;
-    sithCogVm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_HandleSyncEvents;
-    sithCogVm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_HandleSyncCameras;
-    sithCogVm_msgFuncs[DSS_TAKEITEM1] = sithDSSThing_HandleTakeItem;
-    sithCogVm_msgFuncs[DSS_TAKEITEM2] = sithDSSThing_HandleTakeItem;
-    sithCogVm_msgFuncs[DSS_STOPKEY] = sithDSSThing_HandleStopKey;
-    sithCogVm_msgFuncs[DSS_STOPSOUND] = sithDSSThing_HandleStopSound;
-    sithCogVm_msgFuncs[DSS_CREATETHING] = sithDSSThing_HandleCreateThing;
-    sithCogVm_msgFuncs[DSS_SYNCPALEFFECTS] = sithDSS_HandleSyncPalEffects;
-    sithCogVm_msgFuncs[DSS_ID_1F] = sithDSS_HandleMisc;
-    sithCogVm_msgFuncs[DSS_CHAT] = sithMulti_HandleChat;
-    sithCogVm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_HandleDestroyThing;
-    sithCogVm_msgFuncs[DSS_SYNCSECTORALT] = sithDSS_HandleSyncSectorAlt;
-    sithCogVm_msgFuncs[DSS_SOUNDCLASSPLAY] = sithDSSThing_HandleSoundClassPlay;
-    sithCogVm_msgFuncs[DSS_OPENDOOR] = sithDSSThing_HandleOpenDoor;
-    sithCogVm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_HandleSetThingModel;
-    sithCogVm_msgFuncs[DSS_PING] = sithMulti_HandlePing;
-    sithCogVm_msgFuncs[DSS_PINGREPLY] = sithMulti_HandlePingResponse;
+    sithCogVm_msgFuncs[DSS_TELEPORTTHING] = sithDSSThing_ProcessTeleportThing;
+    sithCogVm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFireProjectile;
+    sithCogVm_msgFuncs[DSS_REQUESTCONNECT] = sithMulti_ProcessRequestConnect;
+    sithCogVm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessJoinLeave;
+    sithCogVm_msgFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
+    sithCogVm_msgFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
+    sithCogVm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessSendTrigger;
+    sithCogVm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_ProcessSyncThing;
+    sithCogVm_msgFuncs[DSS_PLAYSOUNDPOS] = sithDSSThing_ProcessPlaySoundPos;
+    sithCogVm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_ProcessPlayKey;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGFULL] = sithDSSThing_ProcessSyncThingFull;
+    sithCogVm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessSyncCog;
+    sithCogVm_msgFuncs[DSS_SYNCSURFACE] = sithDSS_ProcessSyncSurface;
+    sithCogVm_msgFuncs[DSS_SYNCAI] = sithDSS_ProcessSyncAI;
+    sithCogVm_msgFuncs[DSS_SYNCITEMDESC] = sithDSS_ProcessSyncItemDesc;
+    sithCogVm_msgFuncs[DSS_STOPANIM] = sithDSS_ProcessStopAnim;
+    sithCogVm_msgFuncs[DSS_SYNCSECTOR] = sithDSS_ProcessSyncSector;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGFRAME] = sithDSSThing_ProcessSyncThingFrame;
+    sithCogVm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessSyncPuppet;
+    sithCogVm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessLeaveJoin;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_ProcessSyncThingAttachment;
+    sithCogVm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncEvents;
+    sithCogVm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_ProcessSyncCameras;
+    sithCogVm_msgFuncs[DSS_TAKEITEM1] = sithDSSThing_ProcessTakeItem;
+    sithCogVm_msgFuncs[DSS_TAKEITEM2] = sithDSSThing_ProcessTakeItem;
+    sithCogVm_msgFuncs[DSS_STOPKEY] = sithDSSThing_ProcessStopKey;
+    sithCogVm_msgFuncs[DSS_STOPSOUND] = sithDSSThing_ProcessStopSound;
+    sithCogVm_msgFuncs[DSS_CREATETHING] = sithDSSThing_ProcessCreateThing;
+    sithCogVm_msgFuncs[DSS_SYNCPALEFFECTS] = sithDSS_ProcessSyncPalEffects;
+    sithCogVm_msgFuncs[DSS_ID_1F] = sithDSS_ProcessMisc;
+    sithCogVm_msgFuncs[DSS_CHAT] = sithMulti_ProcessChat;
+    sithCogVm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_ProcessDestroyThing;
+    sithCogVm_msgFuncs[DSS_SYNCSECTORALT] = sithDSS_ProcessSyncSectorAlt;
+    sithCogVm_msgFuncs[DSS_SOUNDCLASSPLAY] = sithDSSThing_ProcessSoundClassPlay;
+    sithCogVm_msgFuncs[DSS_OPENDOOR] = sithDSSThing_ProcessOpenDoor;
+    sithCogVm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetThingModel;
+    sithCogVm_msgFuncs[DSS_PING] = sithMulti_ProcessPing;
+    sithCogVm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPingResponse;
     sithCogVm_msgFuncs[DSS_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
     sithCogVm_msgFuncs[DSS_RESET] = sithCogVm_cogMsg_Reset;
-    sithCogVm_msgFuncs[DSS_KICK] = sithMulti_HandleKickPlayer;
+    sithCogVm_msgFuncs[DSS_KICK] = sithMulti_ProcessKickPlayer;
     sithCogVm_bInit = 1;
     return 1;
 }

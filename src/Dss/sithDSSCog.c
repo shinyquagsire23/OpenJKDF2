@@ -49,7 +49,7 @@ int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int 
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a11, 1, v12);
 }
 
-int sithDSSCog_HandleSendTrigger(sithCogMsg *in_netMsg)
+int sithDSSCog_ProcessSendTrigger(sithCogMsg *in_netMsg)
 {
     int senderType; // edi
     int senderIdx; // ebx
@@ -166,7 +166,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSSCog_HandleSyncCog(sithCogMsg *msg)
+int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
 {
     sithCog *cog; // eax
     sithCogSymboltable *v13; // ebp
