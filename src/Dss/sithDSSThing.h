@@ -30,8 +30,8 @@
 #define sithDSSThing_ProcessDamage_ADDR (0x004F41A0)
 #define sithDSSThing_SendFullDesc_ADDR (0x004F4210)
 #define sithDSSThing_ProcessFullDesc_ADDR (0x004F46F0)
-#define sithDSSThing_SendSyncThingFrame_ADDR (0x004F4C60)
-#define sithDSSThing_ProcessSyncThingFrame_ADDR (0x004F4D60)
+#define sithDSSThing_SendPathMove_ADDR (0x004F4C60)
+#define sithDSSThing_ProcessPathMove_ADDR (0x004F4D60)
 #define sithDSSThing_SendSyncThingAttachment_ADDR (0x004F4E80)
 #define sithDSSThing_ProcessSyncThingAttachment_ADDR (0x004F4F50)
 #define sithDSSThing_SendTakeItem_ADDR (0x004F5040)
@@ -81,8 +81,8 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg);
 void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessFullDesc(sithCogMsg *msg);
 
-void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
-int sithDSSThing_ProcessSyncThingFrame(sithCogMsg *msg);
+void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
+int sithDSSThing_ProcessPathMove(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
 int sithDSSThing_ProcessSyncThingAttachment(sithCogMsg *msg);
@@ -106,7 +106,7 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
 //static int (*sithDSSThing_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithDSSThing_SendStopSound_ADDR;
 //static int (*sithDSSThing_SoundClassPlay)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithDSSThing_SoundClassPlay_ADDR;
 //static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
-//static void (*sithDSSThing_SendSyncThingFrame)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendSyncThingFrame_ADDR;
+//static void (*sithDSSThing_SendPathMove)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendPathMove_ADDR;
 //static void (*sithDSSThing_SendOpenDoor)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendOpenDoor_ADDR;
 //static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThing_SendDestroyThing_ADDR;
 //static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;

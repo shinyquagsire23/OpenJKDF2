@@ -277,7 +277,7 @@ void sithCogFunctionThing_MoveToFrame(sithCog *ctx)
         sithTrackThing_MoveToFrame(thing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 0, -1, 255);
+            sithDSSThing_SendPathMove(thing, frame, speed, 0, -1, 255);
     }
 }
 
@@ -294,7 +294,7 @@ void sithCogFunctionThing_SkipToFrame(sithCog *ctx)
         sithTrackThing_SkipToFrame(thing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 1, -1, 255);
+            sithDSSThing_SendPathMove(thing, frame, speed, 1, -1, 255);
     }
 }
 
@@ -461,7 +461,7 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
     {
         sithTrackThing_Stop(thing);
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
+            sithDSSThing_SendPathMove(thing, 0, 0.0, 2, -1, 255);
     }
     else if (thing->moveType == SITH_MT_PHYSICS)
     {

@@ -967,7 +967,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags)
+void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags)
 {
     rdVector3 out;
 
@@ -988,12 +988,12 @@ void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, in
     NETMSG_PUSHS16(a2);
     NETMSG_PUSHF32(a3);
 
-    NETMSG_END(DSS_SYNCTHINGFRAME);
+    NETMSG_END(DSS_PATHMOVE);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
-int sithDSSThing_ProcessSyncThingFrame(sithCogMsg *msg)
+int sithDSSThing_ProcessPathMove(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
