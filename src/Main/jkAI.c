@@ -231,7 +231,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
         }
         return 0;
     }
-    if ( !extra || extra != g_localPlayerThing )
+    if ( !extra || extra != sithPlayer_pLocalPlayerThing )
         return 0;
     sithThing_Damage(extra, actor->thing, aiclass->argsAsFloat[7], SITH_DAMAGE_SABER);
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED2);

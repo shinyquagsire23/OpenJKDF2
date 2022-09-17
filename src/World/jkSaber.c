@@ -77,11 +77,11 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    if (thing == g_localPlayerThing && !sithNet_isMulti) {
+    if (thing == sithPlayer_pLocalPlayerThing && !sithNet_isMulti) {
         material_tip_fname = "saberpurple0.mat";
         material_side_fname = "saberpurple1.mat";
     }
-    if (thing == g_localPlayerThing) {
+    if (thing == sithPlayer_pLocalPlayerThing) {
         //thing->jkFlags |= JKFLAG_DUALSABERS;
     }
 #endif
@@ -457,8 +457,8 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
 
 void jkSaber_playerconfig_idksync()
 {
-    jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
-    jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+    jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+    jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
     jkSaber_cogMsg_Sendx32(&playerThings[playerThingIdx]);
 
 
@@ -1017,7 +1017,7 @@ int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg)
 int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
 {
     return jkSaber_cogMsg_SendSaberInfo_alt(
-               g_localPlayerThing,
+               sithPlayer_pLocalPlayerThing,
                jkGuiMultiplayer_mpcInfo.model,
                jkGuiMultiplayer_mpcInfo.soundClass,
                jkGuiMultiplayer_mpcInfo.sideMat,
@@ -1084,7 +1084,7 @@ int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
 
 int jkSaber_idk4()
 {
-    if ( g_localPlayerThing )
+    if ( sithPlayer_pLocalPlayerThing )
     {
         if ( sithNet_isServer )
         {
@@ -1100,8 +1100,8 @@ int jkSaber_idk4()
                 sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }
-        jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
-        jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
         return 1;
     }
     return 0;

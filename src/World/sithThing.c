@@ -798,14 +798,14 @@ void sithThing_EnterWater(sithThing *thing, int a2)
             else
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_ENTERWATER);
         }
-        v4 = g_localPlayerThing;
-        if ( g_localPlayerThing && (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+        v4 = sithPlayer_pLocalPlayerThing;
+        if ( sithPlayer_pLocalPlayerThing && (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
         {
-            v5 = g_localPlayerThing->class_cog;
+            v5 = sithPlayer_pLocalPlayerThing->class_cog;
             if ( v5 )
             {
                 sithCog_SendMessage(v5, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, thing->thingIdx, 0, 1, 0);
-                v4 = g_localPlayerThing;
+                v4 = sithPlayer_pLocalPlayerThing;
             }
             v6 = v4->capture_cog;
             if ( v6 )
@@ -838,18 +838,18 @@ void sithThing_ExitWater(sithThing *thing, int a2)
     }
     else if ( !a2 )
     {
-        if ( g_localPlayerThing )
+        if ( sithPlayer_pLocalPlayerThing )
         {
             if ( (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
             {
-                if ( g_localPlayerThing->class_cog )
+                if ( sithPlayer_pLocalPlayerThing->class_cog )
                 {
-                    sithCog_SendMessage(g_localPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
                 }
 
-                if ( g_localPlayerThing->capture_cog )
+                if ( sithPlayer_pLocalPlayerThing->capture_cog )
                 {
-                    sithCog_SendMessage(g_localPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
                 }
             }
         }

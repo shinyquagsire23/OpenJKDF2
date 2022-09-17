@@ -54,7 +54,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
     for (int i = 0; i < 50; i++)
     {
         a4a = &jkGuiObjectives_aTexts[i];
-        v15 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, i + SITHBIN_GOAL00);
+        v15 = (__int64)sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, i + SITHBIN_GOAL00);
         if ( (v15 & 1) != 0 )
         {
             v16 = a4a->str;
@@ -106,7 +106,7 @@ int jkGuiObjectives_Show()
     char key[64]; // [esp+4Ch] [ebp-40h] BYREF
 
     _memset(jkGuiObjectives_aTexts, 0, sizeof(jkGuiObjectives_aTexts));
-    v0 = (__int64)sithInventory_GetBinAmount(g_localPlayerThing, 99);
+    v0 = (__int64)sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, 99);
     if ( v0 )
     {
         for (v1 = 0; v1 < 50; v1++)

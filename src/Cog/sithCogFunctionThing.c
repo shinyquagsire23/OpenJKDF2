@@ -1066,7 +1066,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
         if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & SITH_PF_FLOORSTICK)
             sithPhysics_FindFloor(thing, 1);
 
-        if ( thing == g_localPlayerThing )
+        if ( thing == sithPlayer_pLocalPlayerThing )
             sithCamera_FollowFocus(sithCamera_currentCamera);
 
         if (COG_SHOULD_SYNC(ctx))

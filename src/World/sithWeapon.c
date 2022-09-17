@@ -543,7 +543,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
                 sithCollision_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
             }
         }
-        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == g_localPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? 5.0 : (float)v18;
@@ -664,7 +664,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             v21 = v20;
             if ( !v20 )
                 goto LABEL_53;
-            if ( v19 == g_localPlayerThing || v19->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
+            if ( v19 == sithPlayer_pLocalPlayerThing || v19->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
             {
                 sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
                 if ( (physicsThing->thingflags & SITH_TF_INVULN) != 0 )
@@ -694,7 +694,7 @@ LABEL_45:
     if ( (collidedThing->weaponParams.typeflags & SITH_WF_INSTANT_IMPACT) != 0
       && v6
       && (collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
-      && (collidedThing != g_localPlayerThing || sithTime_curSeconds >= (double)sithWeapon_fireWait)
+      && (collidedThing != sithPlayer_pLocalPlayerThing || sithTime_curSeconds >= (double)sithWeapon_fireWait)
       && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
     {
         return 1;
@@ -719,7 +719,7 @@ LABEL_45:
                 v21 = v28;
                 if ( !v28 )
                     goto LABEL_53;
-                if ( v27 == g_localPlayerThing || v27->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
+                if ( v27 == sithPlayer_pLocalPlayerThing || v27->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                     sithAIAwareness_AddEntry(v28->sector, &v28->position, 0, 2.0, v27);
                 if ( (physicsThing->thingflags & 0x100) == 0 )
                     goto LABEL_53;
@@ -733,7 +733,7 @@ LABEL_45:
             v21 = v25;
             if ( !v25 )
                 goto LABEL_53;
-            if ( v24 == g_localPlayerThing || v24->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
+            if ( v24 == sithPlayer_pLocalPlayerThing || v24->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                 sithAIAwareness_AddEntry(v25->sector, &v25->position, 0, 2.0, v24);
             goto LABEL_45;
         }
@@ -830,7 +830,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
                 v21 = v20;
                 if ( v20 )
                 {
-                    if ( v19 == g_localPlayerThing || v19->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
+                    if ( v19 == sithPlayer_pLocalPlayerThing || v19->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                         sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
                     if ( (thing->thingflags & SITH_TF_INVULN) != 0 )
                     {
@@ -882,7 +882,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         sithThing* spawned = sithThing_Create(explodeTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
         if ( spawned )
         {
-            if ( player == g_localPlayerThing || player->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
+            if ( player == sithPlayer_pLocalPlayerThing || player->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                 sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
             if ( (weapon->thingflags & SITH_TF_INVULN) != 0 )
             {

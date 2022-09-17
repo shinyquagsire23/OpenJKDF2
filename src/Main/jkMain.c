@@ -555,7 +555,7 @@ LABEL_15:
     if ( sithNet_isServer )
     {
 LABEL_28:
-        sithInventory_ClearInventory(g_localPlayerThing);
+        sithInventory_ClearInventory(sithPlayer_pLocalPlayerThing);
         jkPlayer_MpcInitBins(sithPlayer_pLocalPlayer);
         
         jkPlayer_Startup();

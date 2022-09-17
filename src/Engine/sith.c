@@ -438,7 +438,7 @@ void sith_AutoSave()
 #endif
 
     sithTime_Startup();
-    sithInventory_Reset(g_localPlayerThing);
+    sithInventory_Reset(sithPlayer_pLocalPlayerThing);
 
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     for (uint32_t v2 = 0; v2 < sithWorld_pCurrentWorld->numThingsLoaded; v2++)
@@ -457,7 +457,7 @@ void sith_AutoSave()
 
     if ( sithNet_isMulti )
     {
-        sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
+        sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
         sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
         sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();

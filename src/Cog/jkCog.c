@@ -189,7 +189,7 @@ void jkCog_dwPlayCammySpeech(sithCog* ctx)
 
 void jkCog_dwGetActivateBin(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, sithInventory_GetCurItem(g_localPlayerThing));
+    sithCogVm_PushInt(ctx, sithInventory_GetCurItem(sithPlayer_pLocalPlayerThing));
 }
 #endif
 
@@ -442,7 +442,7 @@ void jkCog_StopPovKey(sithCog *ctx)
 
 void jkCog_SetForceSpeed(sithCog *pCog)
 {
-    g_localPlayerThing->actorParams.extraSpeed = sithCogVm_PopFlex(pCog);
+    sithPlayer_pLocalPlayerThing->actorParams.extraSpeed = sithCogVm_PopFlex(pCog);
 }
 
 void jkCog_SetInvis(sithCog *pCog)

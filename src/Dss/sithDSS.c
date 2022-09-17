@@ -838,7 +838,7 @@ void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
     for (int i = 0; i < 4; i++)
     {
         // HACK HACK HACK weird animation glitches on savefile load -- only for player?
-        if (!sithNet_isMulti && thing == g_localPlayerThing) {
+        if (!sithNet_isMulti && thing == sithPlayer_pLocalPlayerThing) {
             NETMSG_PUSHU32(0);
             continue;
         }
@@ -910,7 +910,7 @@ int sithDSS_ProcessSyncPuppet(sithCogMsg *msg)
             rdpuppet->tracks[i].field_124 = NETMSG_POPF32();
             
             // HACK HACK HACK weird animation glitches on savefile load -- only for player?
-            if (!sithNet_isMulti && thing == g_localPlayerThing)
+            if (!sithNet_isMulti && thing == sithPlayer_pLocalPlayerThing)
                 _memset(&rdpuppet->tracks[i], 0, sizeof(rdpuppet->tracks[i]));
         }
         else // Added

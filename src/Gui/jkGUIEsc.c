@@ -92,7 +92,7 @@ void jkGuiEsc_Show()
         jkGuiEsc_aElements[JKGUIESC_ELMT_OBJECTIVES].bIsVisible = 1;
         jkGuiEsc_aElements[JKGUIESC_ELMT_RESTART].bIsVisible = 1;
 
-        if (g_localPlayerThing->thingflags & SITH_TF_DEAD)
+        if (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD)
             jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
     }
 

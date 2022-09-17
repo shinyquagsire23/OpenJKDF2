@@ -49,7 +49,7 @@ void sithPlayer_Close()
         stdPalEffects_FreeRequest(sithPlayer_pLocalPlayer->palEffectsIdx1);
         stdPalEffects_FreeRequest(sithPlayer_pLocalPlayer->palEffectsIdx2);
     }
-    g_localPlayerThing = 0;
+    sithPlayer_pLocalPlayerThing = 0;
     sithPlayer_pLocalPlayer = 0;
 }
 
@@ -135,15 +135,15 @@ void sithPlayer_idk(int idx)
 
     playerThingIdx = idx;
     sithPlayer_pLocalPlayer = &jkPlayer_playerInfos[idx];
-    g_localPlayerThing = jkPlayer_playerInfos[idx].playerThing;
+    sithPlayer_pLocalPlayerThing = jkPlayer_playerInfos[idx].playerThing;
 
-    sithWorld_pCurrentWorld->playerThing = g_localPlayerThing;
-    sithWorld_pCurrentWorld->cameraFocus = g_localPlayerThing;
+    sithWorld_pCurrentWorld->playerThing = sithPlayer_pLocalPlayerThing;
+    sithWorld_pCurrentWorld->cameraFocus = sithPlayer_pLocalPlayerThing;
 
-    g_localPlayerThing->thingflags &= ~0x100u;
+    sithPlayer_pLocalPlayerThing->thingflags &= ~0x100u;
 
     // Added: idk why this is needed?
-    g_localPlayerThing->thingtype = SITH_THING_PLAYER;
+    sithPlayer_pLocalPlayerThing->thingtype = SITH_THING_PLAYER;
 
     _wcsncpy(sithPlayer_pLocalPlayer->player_name, jkPlayer_playerShortName, 0x1Fu);
     sithPlayer_pLocalPlayer->player_name[31] = 0;
@@ -478,7 +478,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
 
     v1 = thing->actorParams.playerinfo;
 
-    if ( thing == g_localPlayerThing)
+    if ( thing == sithPlayer_pLocalPlayerThing)
         sithDSSThing_SendDeath(thing, thing, 1, -1, 255);
 
     if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
@@ -494,7 +494,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
             sithMulti_HandleDeath(v1, thing, thing);
-        if ( thing == g_localPlayerThing )
+        if ( thing == sithPlayer_pLocalPlayerThing )
         {
             sithPlayer_debug_loadauto(thing);
         }
@@ -515,7 +515,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     sithInventory_SendKilledMessageToAll(player, killedBy);
     if ( sithNet_isMulti )
         sithMulti_HandleDeath(v5, player, killedBy);
-    if ( player == g_localPlayerThing )
+    if ( player == sithPlayer_pLocalPlayerThing )
         sithControl_death_msgtimer = sithTime_curMs + 3000;
 }
 
@@ -624,7 +624,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             player->physicsParams.physflags |= SITH_PF_800;
         }
         sithActor_MoveJointsForEyePYR(player, &rdroid_zeroVector3);
-        if ( player == g_localPlayerThing )
+        if ( player == sithPlayer_pLocalPlayerThing )
         {
             sithCamera_SetCameraFocus(sithCamera_cameras, player, 0);
             sithCamera_SetCameraFocus(&sithCamera_cameras[1], player, 0);
@@ -636,7 +636,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
         player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_WILLBEREMOVED);
         player->actorParams.typeflags &= ~SITH_AF_FALLING_TO_DEATH;
         player->lifeLeftMs = 0;
-        if ( !sithNet_isMulti || player == g_localPlayerThing )
+        if ( !sithNet_isMulti || player == sithPlayer_pLocalPlayerThing )
         {
             v9 = sithMulti_GetSpawnIdx(player);
             sithThing_LeaveSector(player);

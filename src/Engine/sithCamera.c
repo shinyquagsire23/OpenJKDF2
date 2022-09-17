@@ -185,7 +185,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 {
                     v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->lookOrientation.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
                 }
-                if ( focusThing == g_localPlayerThing )
+                if ( focusThing == sithPlayer_pLocalPlayerThing )
                 {
                     rdVector_Add3Acc(&v76, &sithCamera_povShakeVector2);
                 }
@@ -194,7 +194,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
                     rdMatrix_PreTranslate34(&cam->viewMat, &focusThing->actorParams.eyeOffset);
-                    if ( focusThing == g_localPlayerThing )
+                    if ( focusThing == sithPlayer_pLocalPlayerThing )
                         rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_povShakeVector1);
                 }
                 rdMatrix_Normalize34(&cam->viewMat);

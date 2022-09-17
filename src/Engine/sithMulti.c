@@ -593,7 +593,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
                 sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
             if ( sithMulti_handlerIdk )
                 sithMulti_handlerIdk();
-            sithDSSThing_SendSyncThing(g_localPlayerThing, -1, 255);
+            sithDSSThing_SendSyncThing(sithPlayer_pLocalPlayerThing, -1, 255);
             if ( sithNet_isServer )
                 sithNet_bSyncScores = 1;
         }
@@ -722,8 +722,8 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
     wchar_t *v7; // eax
     wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
-    if ( sithWorld_pCurrentWorld && g_localPlayerThing && (g_submodeFlags & 8) == 0 )
-        sithDSSThing_SendPos(g_localPlayerThing, -1, 0);
+    if ( sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
+        sithDSSThing_SendPos(sithPlayer_pLocalPlayerThing, -1, 0);
     if ( sithNet_isServer )
     {
         v0 = 1;
@@ -917,7 +917,7 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
                     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
                 if ( sithMulti_handlerIdk )
                     sithMulti_handlerIdk();
-                sithDSSThing_SendSyncThing(g_localPlayerThing, -1, 255);
+                sithDSSThing_SendSyncThing(sithPlayer_pLocalPlayerThing, -1, 255);
             }
             NETMSG_POPSTR(a2, 0x10);
 

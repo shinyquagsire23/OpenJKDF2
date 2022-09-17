@@ -72,9 +72,9 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     {
         saveName = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
         v1 = sithWorld_pCurrentWorld->episodeName;
-        playerHealth_ = g_localPlayerThing->actorParams.health;
+        playerHealth_ = sithPlayer_pLocalPlayerThing->actorParams.health;
         shieldsAmt = sithPlayer_pLocalPlayer->iteminfo[SITHBIN_SHIELDS].ammoAmt;
-        playerMaxHealth_ = g_localPlayerThing->actorParams.maxHealth;
+        playerMaxHealth_ = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
     }
     else
     {

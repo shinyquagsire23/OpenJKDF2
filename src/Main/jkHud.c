@@ -570,7 +570,7 @@ void jkHud_Draw()
         }
     }
 
-    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(g_localPlayerThing->thingflags & SITH_TF_DEAD))
+    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD))
     {
         uint32_t tmpInt;
         v20 = (double)Video_format.width * 0.0015625;
