@@ -360,7 +360,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int mpFlags)
+void sithDSS_SendInventory(sithThing *thing, int binIdx, int sendto_id, int mpFlags)
 {
     if ( thing->type == SITH_THING_PLAYER || thing->type == SITH_THING_ACTOR )
     {
@@ -378,14 +378,14 @@ void sithDSS_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int m
             NETMSG_PUSHF32(v5->iteminfo[binIdx].activationDelaySecs);
             NETMSG_PUSHF32(v5->iteminfo[binIdx].binWait);
             
-            NETMSG_END(DSS_SYNCITEMDESC);
+            NETMSG_END(DSS_INVENTORY);
             
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
         }
     }
 }
 
-int sithDSS_ProcessSyncItemDesc(sithCogMsg *msg)
+int sithDSS_ProcessInventory(sithCogMsg *msg)
 {
     int thingIdx; // edx
     sithThing *thing; // ecx

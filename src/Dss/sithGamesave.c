@@ -251,7 +251,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
         if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
+            sithDSS_SendInventory(g_localPlayerThing, v19, 0, mpFlags);
     }
 
     sithSurface_SyncFull(mpFlags);
