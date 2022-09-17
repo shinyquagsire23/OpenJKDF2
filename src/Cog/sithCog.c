@@ -227,7 +227,7 @@ void sithCog_Close()
 {
     if ( sithCog_bOpened )
     {
-        sithCog_SendMessageToAll(COGMSG_SYNCTHINGATTACHMENT, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0);
+        sithCog_SendMessageToAll(SITH_MESSAGE_SHUTDOWN, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0);
         sithCog_numSectorLinks = 0;
         sithCog_numSurfaceLinks = 0;
         sithCog_numThingLinks = 0;

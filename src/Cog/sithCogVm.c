@@ -36,47 +36,47 @@ int sithCogVm_Startup()
     _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithCogVm_dword_847E84 = 0;
     sithCogVm_msgId = 1;
-    sithCogVm_msgFuncs[COGMSG_TELEPORTTHING] = sithDSSThing_HandleTeleportThing;
-    sithCogVm_msgFuncs[COGMSG_FIREPROJECTILE] = sithDSSThing_HandleFireProjectile;
-    sithCogVm_msgFuncs[COGMSG_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
-    sithCogVm_msgFuncs[COGMSG_JOINLEAVE] = sithMulti_HandleJoinLeave;
-    sithCogVm_msgFuncs[COGMSG_DEATH] = sithDSSThing_HandleDeath;
-    sithCogVm_msgFuncs[COGMSG_DAMAGE] = sithDSSThing_HandleDamage;
-    sithCogVm_msgFuncs[COGMSG_SENDTRIGGER] = sithDSSCog_HandleSendTrigger;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHING] = sithDSSThing_HandleSyncThing;
-    sithCogVm_msgFuncs[COGMSG_PLAYSOUNDPOS] = sithDSSThing_HandlePlaySoundPos;
-    sithCogVm_msgFuncs[COGMSG_PLAYKEY] = sithDSSThing_HandlePlayKey;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFULL] = sithDSSThing_HandleSyncThingFull;
-    sithCogVm_msgFuncs[COGMSG_SYNCCOG] = sithDSSCog_HandleSyncCog;
-    sithCogVm_msgFuncs[COGMSG_SYNCSURFACE] = sithDSS_HandleSyncSurface;
-    sithCogVm_msgFuncs[COGMSG_SYNCAI] = sithDSS_HandleSyncAI;
-    sithCogVm_msgFuncs[COGMSG_SYNCITEMDESC] = sithDSS_HandleSyncItemDesc;
-    sithCogVm_msgFuncs[COGMSG_STOPANIM] = sithDSS_HandleStopAnim;
-    sithCogVm_msgFuncs[COGMSG_SYNCSECTOR] = sithDSS_HandleSyncSector;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGFRAME] = sithDSSThing_HandleSyncThingFrame;
-    sithCogVm_msgFuncs[COGMSG_SYNCPUPPET] = sithDSS_HandleSyncPuppet;
-    sithCogVm_msgFuncs[COGMSG_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
-    sithCogVm_msgFuncs[COGMSG_SYNCTHINGATTACHMENT] = sithDSSThing_HandleSyncThingAttachment;
-    sithCogVm_msgFuncs[COGMSG_SYNCEVENTS] = sithDSS_HandleSyncEvents;
-    sithCogVm_msgFuncs[COGMSG_SYNCCAMERAS] = sithDSS_HandleSyncCameras;
-    sithCogVm_msgFuncs[COGMSG_TAKEITEM1] = sithDSSThing_HandleTakeItem;
-    sithCogVm_msgFuncs[COGMSG_TAKEITEM2] = sithDSSThing_HandleTakeItem;
-    sithCogVm_msgFuncs[COGMSG_STOPKEY] = sithDSSThing_HandleStopKey;
-    sithCogVm_msgFuncs[COGMSG_STOPSOUND] = sithDSSThing_HandleStopSound;
-    sithCogVm_msgFuncs[COGMSG_CREATETHING] = sithDSSThing_HandleCreateThing;
-    sithCogVm_msgFuncs[COGMSG_SYNCPALEFFECTS] = sithDSS_HandleSyncPalEffects;
-    sithCogVm_msgFuncs[COGMSG_ID_1F] = sithDSS_HandleMisc;
-    sithCogVm_msgFuncs[COGMSG_CHAT] = sithMulti_HandleChat;
-    sithCogVm_msgFuncs[COGMSG_DESTROYTHING] = sithDSSThing_HandleDestroyThing;
-    sithCogVm_msgFuncs[COGMSG_SYNCSECTORALT] = sithDSS_HandleSyncSectorAlt;
-    sithCogVm_msgFuncs[COGMSG_SOUNDCLASSPLAY] = sithDSSThing_HandleSoundClassPlay;
-    sithCogVm_msgFuncs[COGMSG_OPENDOOR] = sithDSSThing_HandleOpenDoor;
-    sithCogVm_msgFuncs[COGMSG_SETTHINGMODEL] = sithDSSThing_HandleSetThingModel;
-    sithCogVm_msgFuncs[COGMSG_PING] = sithMulti_HandlePing;
-    sithCogVm_msgFuncs[COGMSG_PINGREPLY] = sithMulti_HandlePingResponse;
-    sithCogVm_msgFuncs[COGMSG_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
-    sithCogVm_msgFuncs[COGMSG_RESET] = sithCogVm_cogMsg_Reset;
-    sithCogVm_msgFuncs[COGMSG_KICK] = sithMulti_HandleKickPlayer;
+    sithCogVm_msgFuncs[DSS_TELEPORTTHING] = sithDSSThing_HandleTeleportThing;
+    sithCogVm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_HandleFireProjectile;
+    sithCogVm_msgFuncs[DSS_REQUESTCONNECT] = sithMulti_HandleRequestConnect;
+    sithCogVm_msgFuncs[DSS_WELCOME] = sithMulti_HandleJoinLeave;
+    sithCogVm_msgFuncs[DSS_DEATH] = sithDSSThing_HandleDeath;
+    sithCogVm_msgFuncs[DSS_DAMAGE] = sithDSSThing_HandleDamage;
+    sithCogVm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_HandleSendTrigger;
+    sithCogVm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_HandleSyncThing;
+    sithCogVm_msgFuncs[DSS_PLAYSOUNDPOS] = sithDSSThing_HandlePlaySoundPos;
+    sithCogVm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_HandlePlayKey;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGFULL] = sithDSSThing_HandleSyncThingFull;
+    sithCogVm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_HandleSyncCog;
+    sithCogVm_msgFuncs[DSS_SYNCSURFACE] = sithDSS_HandleSyncSurface;
+    sithCogVm_msgFuncs[DSS_SYNCAI] = sithDSS_HandleSyncAI;
+    sithCogVm_msgFuncs[DSS_SYNCITEMDESC] = sithDSS_HandleSyncItemDesc;
+    sithCogVm_msgFuncs[DSS_STOPANIM] = sithDSS_HandleStopAnim;
+    sithCogVm_msgFuncs[DSS_SYNCSECTOR] = sithDSS_HandleSyncSector;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGFRAME] = sithDSSThing_HandleSyncThingFrame;
+    sithCogVm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_HandleSyncPuppet;
+    sithCogVm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_HandleLeaveJoin;
+    sithCogVm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_HandleSyncThingAttachment;
+    sithCogVm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_HandleSyncEvents;
+    sithCogVm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_HandleSyncCameras;
+    sithCogVm_msgFuncs[DSS_TAKEITEM1] = sithDSSThing_HandleTakeItem;
+    sithCogVm_msgFuncs[DSS_TAKEITEM2] = sithDSSThing_HandleTakeItem;
+    sithCogVm_msgFuncs[DSS_STOPKEY] = sithDSSThing_HandleStopKey;
+    sithCogVm_msgFuncs[DSS_STOPSOUND] = sithDSSThing_HandleStopSound;
+    sithCogVm_msgFuncs[DSS_CREATETHING] = sithDSSThing_HandleCreateThing;
+    sithCogVm_msgFuncs[DSS_SYNCPALEFFECTS] = sithDSS_HandleSyncPalEffects;
+    sithCogVm_msgFuncs[DSS_ID_1F] = sithDSS_HandleMisc;
+    sithCogVm_msgFuncs[DSS_CHAT] = sithMulti_HandleChat;
+    sithCogVm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_HandleDestroyThing;
+    sithCogVm_msgFuncs[DSS_SYNCSECTORALT] = sithDSS_HandleSyncSectorAlt;
+    sithCogVm_msgFuncs[DSS_SOUNDCLASSPLAY] = sithDSSThing_HandleSoundClassPlay;
+    sithCogVm_msgFuncs[DSS_OPENDOOR] = sithDSSThing_HandleOpenDoor;
+    sithCogVm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_HandleSetThingModel;
+    sithCogVm_msgFuncs[DSS_PING] = sithMulti_HandlePing;
+    sithCogVm_msgFuncs[DSS_PINGREPLY] = sithMulti_HandlePingResponse;
+    sithCogVm_msgFuncs[DSS_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
+    sithCogVm_msgFuncs[DSS_RESET] = sithCogVm_cogMsg_Reset;
+    sithCogVm_msgFuncs[DSS_KICK] = sithMulti_HandleKickPlayer;
     sithCogVm_bInit = 1;
     return 1;
 }
@@ -241,7 +241,7 @@ LABEL_14:
                     sithCogVm_MsgTmpBuf2.netMsg.msgId = 0;
                     *(uint16_t*)sithCogVm_MsgTmpBuf2.pktData = sithCogVm_netMsgTmp.netMsg.msgId;
                     sithCogVm_MsgTmpBuf2.netMsg.field_C = sithCogVm_netMsgTmp.netMsg.thingIdx;
-                    sithCogVm_MsgTmpBuf2.netMsg.cogMsgId = COGMSG_RESET;
+                    sithCogVm_MsgTmpBuf2.netMsg.cogMsgId = DSS_RESET;
                     sithCogVm_MsgTmpBuf2.netMsg.msg_size = 2;
                     sithDplay_SendToPlayer(&sithCogVm_MsgTmpBuf2, sithCogVm_netMsgTmp.netMsg.thingIdx);
                     
@@ -265,7 +265,7 @@ LABEL_14:
                 else
                 {
 LABEL_22:
-                    if ( v2 < (unsigned int)COGMSG_MAX )
+                    if ( v2 < (unsigned int)DSS_MAX )
                     {
                         if ( sithCogVm_msgFuncs[v2] )
                             sithCogVm_msgFuncs[v2](&sithCogVm_netMsgTmp);
@@ -273,10 +273,10 @@ LABEL_22:
                 }
                 goto LABEL_25;
             }
-            if ( sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_JOINLEAVE
-              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_REQUESTCONNECT
-              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_RESET
-              || sithCogVm_netMsgTmp.netMsg.cogMsgId == COGMSG_LEAVEJOIN
+            if ( sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_WELCOME
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_REQUESTCONNECT
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_RESET
+              || sithCogVm_netMsgTmp.netMsg.cogMsgId == DSS_LEAVEJOIN
               || (g_submodeFlags & 8) != 0 )
             {
                 goto LABEL_14;

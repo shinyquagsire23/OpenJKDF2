@@ -50,7 +50,7 @@ void sithMulti_SendChat(char *pStr, int arg0, int arg1)
     NETMSG_PUSHS32(pStr_len);
     NETMSG_PUSHSTR(pStr, pStr_len);
 
-    NETMSG_END(COGMSG_CHAT);
+    NETMSG_END(DSS_CHAT);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
 }
@@ -189,7 +189,7 @@ int sithMulti_Startup()
         sithPlayer_sub_4C87C0(0, sithDplay_dplayIdSelf);
         sithPlayer_idk(0);
         sithPlayer_ResetPalEffects();
-        
+
         // Added: dedicated server
         if (jkGuiNetHost_bIsDedicated) {
             jkPlayer_playerInfos[0].flags = 6;
@@ -256,7 +256,7 @@ int sithMulti_SendRequestConnect(int sendto_id)
     NETMSG_PUSHWSTR(sithMulti_name, 0x20);
     NETMSG_PUSHU32(sithNet_checksum);
 
-    NETMSG_END(COGMSG_REQUESTCONNECT);
+    NETMSG_END(DSS_REQUESTCONNECT);
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 1, 0);
 }
 
@@ -461,10 +461,10 @@ void sithMulti_HandleScore()
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(v10);
             NETMSG_PUSHSTR(std_genBuffer, v10);
-            NETMSG_END(COGMSG_CHAT);
-            
+            NETMSG_END(DSS_CHAT);
+
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
-            
+
             sithMulti_bTimelimitMet = 1;
             sithNet_MultiModeFlags &= ~MULTIMODEFLAG_TIMELIMIT;
         }
@@ -480,26 +480,26 @@ void sithMulti_EndLevel(unsigned int waitMs, int type)
     }
 }
 
-void sithMulti_sendmsgidk3(int a1, int playerIdx, int sendtoId)
+void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId)
 {
     NETMSG_START;
 
     NETMSG_PUSHS32(playerIdx);
     NETMSG_PUSHS32(a1);
     NETMSG_PUSHWSTR(jkPlayer_playerInfos[playerIdx].player_name, 0x10);
-    NETMSG_END(COGMSG_JOINLEAVE);
-    
+    NETMSG_END(DSS_WELCOME);
+
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, 1);
 }
 
 void sithMulti_SendKickPlayer(int idx)
 {
     if (!sithNet_isServer) return;
-    
+
     NETMSG_START;
 
     NETMSG_PUSHS32(idx);
-    NETMSG_END(COGMSG_KICK);
+    NETMSG_END(DSS_KICK);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, idx, 1, 1);
 }
@@ -520,7 +520,7 @@ int sithMulti_LobbyMessage()
                 sithCogVm_netMsgTmp.pktData[1] = 0;
                 sithCogVm_netMsgTmp.netMsg.msg_size = 8;
                 sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+                sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
             }
             sithNet_dword_832640 = 0;
@@ -542,7 +542,7 @@ int sithMulti_LobbyMessage()
                     ++v0;
             }
             NETMSG_PUSHS16(v0);
-            
+
             for (int i = 0; i < jkPlayer_maxPlayers; i++)
             {
                 sithPlayerInfo* v6 = &jkPlayer_playerInfos[i];
@@ -626,7 +626,7 @@ int sithMulti_HandleJoinLeave(sithCogMsg *msg)
 
 int sithMulti_HandlePing(sithCogMsg *msg)
 {
-    msg->netMsg.cogMsgId = COGMSG_PINGREPLY;
+    msg->netMsg.cogMsgId = DSS_PINGREPLY;
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, msg->netMsg.thingIdx, 1, 0);
     return 1;
 }
@@ -740,7 +740,7 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
                         sithCogVm_netMsgTmp.pktData[0] = v1->net_id;
                         sithCogVm_netMsgTmp.netMsg.msg_size = 4;
                         sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                        sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_KICK;
+                        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_KICK;
                         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 1, 1);
                     }
                     v3 = sithStrTable_GetString("%s_HAS_LEFT_THE_GAME");
@@ -838,7 +838,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
             NETMSG_PUSHS16(sithNet_teamScore[i]);
         }
     }
-    NETMSG_END(COGMSG_LEAVEJOIN);
+    NETMSG_END(DSS_LEAVEJOIN);
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, bSync);
 }
 
@@ -869,7 +869,7 @@ int sithMulti_HandleLeaveJoin(sithCogMsg *msg)
     sithNet_serverNetId = NETMSG_POPS32();
     v3 = 0;
     v4 = NETMSG_POPS16();
-    
+
     sithNet_MultiModeFlags = v2;
     jkPlayer_maxPlayers = v4;
     for (v3 = 0; v3 < jkPlayer_maxPlayers; v3++)
@@ -911,7 +911,7 @@ int sithMulti_HandleLeaveJoin(sithCogMsg *msg)
                 v10 = sithStrTable_GetString("%s_HAS_JOINED_THE_GAME");
                 jk_snwprintf(a1a, 0x80u, v10, v6);
                 DebugConsole_PrintUniStr(a1a);
-                
+
                 v6->lastUpdateMs = sithTime_curMs;
                 if ( sithNet_isServer != 0 )
                     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
@@ -920,7 +920,7 @@ int sithMulti_HandleLeaveJoin(sithCogMsg *msg)
                 sithDSSThing_SendSyncThing(g_localPlayerThing, -1, 255);
             }
             NETMSG_POPSTR(a2, 0x10);
-            
+
             stdString_CharToWchar(v6->player_name, a2, 15);
 
             v6->numKills = NETMSG_POPS16();
@@ -959,7 +959,7 @@ void sithMulti_sub_4CA470(int a1)
             sithCogVm_netMsgTmp.pktData[1] = 0;
             sithCogVm_netMsgTmp.netMsg.msg_size = 8;
             sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-            sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_JOINING;
+            sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
         }
         sithNet_dword_832640 = 0;
@@ -1048,11 +1048,11 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     v1 = msg->netMsg.thingIdx;
-    
+
     if ( sithDplay_bIsServer && v1 )
     {
         NETMSG_POPSTR(v11, 32);
-        
+
         sithMulti_verbosePrintf("sithMulti_HandleRequestConnect, id %x map %s\n", v1, v11);
 
         if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
@@ -1062,8 +1062,8 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             NETMSG_START;
             NETMSG_PUSHS32(6);
             NETMSG_PUSHS32(0);
-            NETMSG_END(COGMSG_JOINING);
-            
+            NETMSG_END(DSS_JOINING);
+
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
             return 1;
         }
@@ -1083,14 +1083,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
         if ( v3 < jkPlayer_maxPlayers )
         {
             sithMulti_verbosePrintf("Idk 2, %x %x\n", v3, jkPlayer_maxPlayers);
-            NETMSG_START;
-
-            NETMSG_PUSHS32(v3);
-            NETMSG_PUSHS32(v1);
-            NETMSG_PUSHWSTR(jkPlayer_playerInfos[v3].player_name, 0x10);
-            NETMSG_END(COGMSG_JOINLEAVE);
-
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 1);
+            sithMulti_SendWelcome(v1, v3, v1);
             return 1;
         }
         sithDplay_cogMsg_SendEnumPlayers(v1);
@@ -1100,7 +1093,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             NETMSG_START;
             NETMSG_PUSHS32(3);
             NETMSG_PUSHS32(0);
-            NETMSG_END(COGMSG_JOINING);
+            NETMSG_END(DSS_JOINING);
 
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
             return 1;
@@ -1113,7 +1106,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
                 NETMSG_START;
                 NETMSG_PUSHS32(0);
                 NETMSG_PUSHF32(0.5);
-                NETMSG_END(COGMSG_JOINING);
+                NETMSG_END(DSS_JOINING);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
                 return 1;
             }
@@ -1123,7 +1116,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
                 NETMSG_START;
                 NETMSG_PUSHS32(1);
                 NETMSG_PUSHS32(0);
-                NETMSG_END(COGMSG_JOINING);
+                NETMSG_END(DSS_JOINING);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
                 return 1;
             }
@@ -1147,7 +1140,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             NETMSG_START;
             NETMSG_PUSHS32(5);
             NETMSG_PUSHS32(0);
-            NETMSG_END(COGMSG_JOINING);
+            NETMSG_END(DSS_JOINING);
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
 
             return 1;
@@ -1168,7 +1161,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_requestConnectIdx].multi_name, 0x20);
             //jkPlayer_playerInfos[sithMulti_requestConnectIdx].net_id = v1; // Added?
             //jkPlayer_playerInfos[sithMulti_requestConnectIdx].flags = 5;
-            
+
             uint32_t popped_check = NETMSG_POPS32();
             v10 = sithNet_checksum;
             if ( v10 != popped_check )
@@ -1178,7 +1171,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
                 NETMSG_START;
                 NETMSG_PUSHS32(4);
                 NETMSG_PUSHS32(0);
-                NETMSG_END(COGMSG_JOINING);
+                NETMSG_END(DSS_JOINING);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
                 return 1;
 #endif
@@ -1188,7 +1181,7 @@ int sithMulti_HandleRequestConnect(sithCogMsg *msg)
             NETMSG_START;
             NETMSG_PUSHS32(0);
             NETMSG_PUSHF32(0.25);
-            NETMSG_END(COGMSG_JOINING);
+            NETMSG_END(DSS_JOINING);
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
 
             sithMulti_SendLeaveJoin(v1, 0);
@@ -1209,7 +1202,7 @@ void sithDplay_cogMsg_SendEnumPlayers(int sendtoId)
     NETMSG_START_2;
 
     DirectPlay_EnumPlayers(0);
-    
+
 
     NETMSG_PUSHU8(DirectPlay_numPlayers);
 
@@ -1218,7 +1211,7 @@ void sithDplay_cogMsg_SendEnumPlayers(int sendtoId)
         NETMSG_PUSHS32(DirectPlay_aPlayers[i].dpId)
     }
 
-    NETMSG_END_2(COGMSG_ENUMPLAYERS);
+    NETMSG_END_2(DSS_ENUMPLAYERS);
     sithCogVm_SendMsgToPlayer(&sithDplay_cogMsgTmp, sendtoId, 1, 1);
 }
 
@@ -1284,8 +1277,6 @@ void sithMulti_HandleTimeLimit(int deltaMs)
     sithSector *v12; // ecx
     sithThing *v14; // esi
     unsigned int v16; // ecx
-    int v17; // esi
-    int v18; // [esp-8h] [ebp-1Ch]
     unsigned int v19; // [esp+10h] [ebp-4h]
     unsigned int deltaMsa; // [esp+18h] [ebp+4h]
 
@@ -1294,7 +1285,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
 
     sithThing_Sync();
     sithSurface_Sync();
-    sithSector_sub_4F8EF0();
+    sithSector_Sync();
     if ( sithMulti_leaveJoinType && sithTime_curMs > sithMulti_leaveJoinWaitMs )
     {
         if ( sithMulti_leaveJoinType == 1 )
@@ -1332,7 +1323,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(v2);
             NETMSG_PUSHSTR(std_genBuffer, v2);
-            NETMSG_END(COGMSG_CHAT);
+            NETMSG_END(DSS_CHAT);
 
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
             sithMulti_bTimelimitMet = 1;
@@ -1348,7 +1339,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
 
                     NETMSG_PUSHS32(3);
                     NETMSG_PUSHS32(0);
-                    NETMSG_END(COGMSG_JOINING);
+                    NETMSG_END(DSS_JOINING);
                     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
                 }
                 sithNet_dword_832640 = 0;
@@ -1368,103 +1359,94 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                     {
                         switch ( sithDplay_dword_83220C )
                         {
-                            case 1:
-                                v10 = sithWorld_pCurrentWorld->numSectors;
-                                if ( sithDplay_dword_832208 >= v10 )
-                                    goto LABEL_42;
-                                v11 = &sithWorld_pCurrentWorld->sectors[sithDplay_dword_832208];
-                                while ( 1 )
-                                {
-                                    v12 = v11;
-                                    ++sithDplay_dword_832208;
-                                    ++v11;
-                                    if ( v12->flags & SITH_SECTOR_SYNC )
-                                        break;
-                                    if ( (v12->flags & SITH_SECTOR_ADJOINS_SET) != 0 )
-                                    {
-                                        sithDSS_SendSyncSectorAlt(v12, sithMulti_sendto_id, 1);
-                                        goto LABEL_41;
-                                    }
-                                    if ( sithDplay_dword_832208 >= v10 )
-                                    {
-LABEL_42:
-                                        if ( sithDplay_dword_832208 >= sithWorld_pCurrentWorld->numSectors )
-                                        {
-                                            sithDplay_dword_832208 = 0;
-                                            sithDplay_dword_83220C = 3;
-                                            sithDplay_dword_832208 = 0;
-                                        }
-                                        ++sithDplay_dword_832210;
-                                        goto LABEL_64;
-                                    }
-                                }
-                                sithDSS_SendSyncSector(v12, sithMulti_sendto_id, 1);
-LABEL_41:
+                        case 1:
+                            v10 = sithWorld_pCurrentWorld->numSectors;
+                            if ( sithDplay_dword_832208 >= v10 )
                                 goto LABEL_42;
-                            case 2:
-                                v7 = sithWorld_pCurrentWorld->numSurfaces;
-                                if ( sithDplay_dword_832208 >= v7 )
-                                    goto LABEL_30;
-                                v8 = &sithWorld_pCurrentWorld->surfaces[sithDplay_dword_832208];
-                                while ( 1 )
+                            v11 = &sithWorld_pCurrentWorld->sectors[sithDplay_dword_832208];
+                            while ( 1 )
+                            {
+                                v12 = v11;
+                                ++sithDplay_dword_832208;
+                                ++v11;
+                                if ( v12->flags & SITH_SECTOR_SYNC )
+                                    break;
+                                if ( (v12->flags & SITH_SECTOR_ADJOINS_SET) != 0 )
                                 {
-                                    v9 = v8;
-                                    ++sithDplay_dword_832208;
-                                    ++v8;
-                                    if ( (v9->surfaceFlags & SITH_SURFACE_CHANGED) != 0 )
-                                        break;
-                                    if ( sithDplay_dword_832208 >= v7 )
+                                    sithDSS_SendSyncSectorAlt(v12, sithMulti_sendto_id, 1);
+                                    goto LABEL_41;
+                                }
+                                if ( sithDplay_dword_832208 >= v10 )
+                                {
+LABEL_42:
+                                    if ( sithDplay_dword_832208 >= sithWorld_pCurrentWorld->numSectors )
                                     {
-                                        goto LABEL_30;
+                                        sithDplay_dword_832208 = 0;
+                                        sithDplay_dword_83220C = 3;
+                                        sithDplay_dword_832208 = 0;
                                     }
+                                    ++sithDplay_dword_832210;
+                                    goto LABEL_64;
                                 }
-                                sithDSS_SendSyncSurface(v9, sithMulti_sendto_id, 1);
+                            }
+                            sithDSS_SendSyncSector(v12, sithMulti_sendto_id, 1);
+LABEL_41:
+                            goto LABEL_42;
+                        case 2:
+                            v7 = sithWorld_pCurrentWorld->numSurfaces;
+                            if ( sithDplay_dword_832208 >= v7 )
+                                goto LABEL_30;
+                            v8 = &sithWorld_pCurrentWorld->surfaces[sithDplay_dword_832208];
+                            while ( 1 )
+                            {
+                                v9 = v8;
+                                ++sithDplay_dword_832208;
+                                ++v8;
+                                if ( (v9->surfaceFlags & SITH_SURFACE_CHANGED) != 0 )
+                                    break;
+                                if ( sithDplay_dword_832208 >= v7 )
+                                {
+                                    goto LABEL_30;
+                                }
+                            }
+                            sithDSS_SendSyncSurface(v9, sithMulti_sendto_id, 1);
 LABEL_30:
-                                if ( sithDplay_dword_832208 >= sithWorld_pCurrentWorld->numSurfaces )
-                                {
-                                    sithDplay_dword_832208 = 0;
-                                    sithDplay_dword_83220C = 1;
-                                    sithDplay_dword_832208 = 0;
-                                }
-                                ++sithDplay_dword_832200;
-                                goto LABEL_64;
-                            case 3:
-                                if ( (signed int)sithDplay_dword_832208 > sithWorld_pCurrentWorld->numThings )
-                                    goto LABEL_56;
-                                break;
-                            case 4:
-                                if ( sithDplay_dword_832208 >= sithMulti_dword_83265C
-                                  || (sithDSSThing_SendDestroyThing(sithMulti_arr_832218[sithDplay_dword_832208], sithMulti_sendto_id),
-                                      ++sithDplay_dword_832208,
-                                      sithDplay_dword_832208 >= sithMulti_dword_83265C) )
-                                {
-                                    v16 = sithMulti_requestConnectIdx;
-                                    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
-                                        jkPlayer_playerInfos[sithMulti_requestConnectIdx].teamNum = (sithMulti_requestConnectIdx & 1) + 1;
-                                    v18 = sithMulti_sendto_id;
-                                    sithMulti_verbosePrintf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);
-                                    jkPlayer_playerInfos[v16].net_id = sithMulti_sendto_id;
-                                    sithMulti_SendLeaveJoin(v18, 1);
-                                    v17 = sithMulti_sendto_id;
+                            if ( sithDplay_dword_832208 >= sithWorld_pCurrentWorld->numSurfaces )
+                            {
+                                sithDplay_dword_832208 = 0;
+                                sithDplay_dword_83220C = 1;
+                                sithDplay_dword_832208 = 0;
+                            }
+                            ++sithDplay_dword_832200;
+                            goto LABEL_64;
+                        case 3:
+                            if ( (signed int)sithDplay_dword_832208 > sithWorld_pCurrentWorld->numThings )
+                                goto LABEL_56;
+                            break;
+                        case 4:
+                            if ( sithDplay_dword_832208 >= sithMulti_dword_83265C
+                                    || (sithDSSThing_SendDestroyThing(sithMulti_arr_832218[sithDplay_dword_832208], sithMulti_sendto_id),
+                                        ++sithDplay_dword_832208,
+                                        sithDplay_dword_832208 >= sithMulti_dword_83265C) )
+                            {
+                                v16 = sithMulti_requestConnectIdx;
+                                if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
+                                    jkPlayer_playerInfos[sithMulti_requestConnectIdx].teamNum = (sithMulti_requestConnectIdx & 1) + 1;
+                                sithMulti_verbosePrintf("Last sync %x %x\n", sithMulti_sendto_id, sithMulti_requestConnectIdx);
+                                jkPlayer_playerInfos[v16].net_id = sithMulti_sendto_id;
+                                sithMulti_SendLeaveJoin(sithMulti_sendto_id, 1);
+                                sithMulti_SendWelcome(sithMulti_sendto_id, sithMulti_requestConnectIdx, sithMulti_sendto_id);
 
-                                    NETMSG_START;
-
-                                    NETMSG_PUSHS32(sithMulti_requestConnectIdx);
-                                    NETMSG_PUSHS32(sithMulti_sendto_id);
-                                    NETMSG_PUSHWSTR(jkPlayer_playerInfos[sithMulti_requestConnectIdx].player_name, 0x10);
-                                    NETMSG_END(COGMSG_JOINLEAVE);
-
-                                    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v17, 1, 1);
-                                    sithDplay_dword_832208 = 0;
-                                    sithNet_dword_832640 = 0;
-                                    sithMulti_sendto_id = 0;
-                                    sithDplay_dword_83220C = 2;
-                                    sithDplay_dword_832208 = 0;
-                                    sithNet_bSyncScores = 1;
-                                }
-                                goto LABEL_64;
-                            default:
-                                return;
+                                sithDplay_dword_832208 = 0;
+                                sithNet_dword_832640 = 0;
+                                sithMulti_sendto_id = 0;
+                                sithDplay_dword_83220C = 2;
+                                sithDplay_dword_832208 = 0;
+                                sithNet_bSyncScores = 1;
+                            }
+                            goto LABEL_64;
+                        default:
+                            return;
                         }
 
                         while ( 1 )
@@ -1479,7 +1461,7 @@ LABEL_30:
                             if ( sithDplay_dword_832208 > sithWorld_pCurrentWorld->numThings )
                                 goto LABEL_55;
                         }
-                        
+
                         if ( (v14->thing_id & 0xFFFF0000) != 0 )
                             sithDSSThing_SendSyncThingFull(v14, sithMulti_sendto_id, 1);
                         else
@@ -1536,6 +1518,6 @@ int sithMulti_SendPing(int sendtoId)
     sithCogVm_netMsgTmp.pktData[0] = sithTime_curMs;
     sithCogVm_netMsgTmp.netMsg.msg_size = 4;
     sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-    sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_PING;
+    sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_PING;
     return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sendtoId, 1, 0);
 }

@@ -9,6 +9,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"
+#include "Engine/sithMulti.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithAdjoin.h"
 
@@ -38,7 +39,7 @@ void sithDSS_SendSyncSurface(sithSurface *surface, int sendto_id, int mpFlags)
         NETMSG_PUSHU32(surface->adjoin->flags);
     }
     
-    NETMSG_END(COGMSG_SYNCSURFACE);
+    NETMSG_END(DSS_SYNCSURFACE);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -95,7 +96,7 @@ void sithDSS_SendSyncSector(sithSector *sector, int sendto_id, int mpFlags)
     }
     NETMSG_PUSHVEC3(sector->tint);
     
-    NETMSG_END(COGMSG_SYNCSECTOR);
+    NETMSG_END(DSS_SYNCSECTOR);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -162,7 +163,7 @@ void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags)
 
     NETMSG_PUSHS16(pSector->id);
     NETMSG_PUSHU32(pSector->flags);
-    NETMSG_END(COGMSG_SYNCSECTORALT);
+    NETMSG_END(DSS_SYNCSECTORALT);
 
     if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
@@ -265,7 +266,7 @@ void sithDSS_SendSyncAI(sithActor *actor, int sendto_id, int idx)
         NETMSG_PUSHVEC3(actor->framesAlloc[i]);
     }
     
-    NETMSG_END(COGMSG_SYNCAI);
+    NETMSG_END(DSS_SYNCAI);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, idx, 1);
 }
@@ -377,7 +378,7 @@ void sithDSS_SendSyncItemDesc(sithThing *thing, int binIdx, int sendto_id, int m
             NETMSG_PUSHF32(v5->iteminfo[binIdx].activationDelaySecs);
             NETMSG_PUSHF32(v5->iteminfo[binIdx].binWait);
             
-            NETMSG_END(COGMSG_SYNCITEMDESC);
+            NETMSG_END(DSS_SYNCITEMDESC);
             
             sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
         }
@@ -462,7 +463,7 @@ void sithDSS_SendStopAnim(rdSurface *surface, int sendto_id, int mpFlags)
     if (surface->flags & 0x2000000)
         NETMSG_PUSHS32(surface->sector->id);
     
-    NETMSG_END(COGMSG_STOPANIM);
+    NETMSG_END(DSS_STOPANIM);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -548,7 +549,7 @@ void sithDSS_SendSyncEvents(sithEvent *timer, int sendto_id, int mpFlags)
     NETMSG_PUSHF32(timer->timerInfo.field_14);
     NETMSG_PUSHS16(timer->taskNum);
     
-    NETMSG_END(COGMSG_SYNCEVENTS);
+    NETMSG_END(DSS_SYNCEVENTS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -605,7 +606,7 @@ void sithDSS_SendSyncPalEffects(int sendto_id, int mpFlags)
         ++iter;
     }
     
-    NETMSG_END(COGMSG_SYNCPALEFFECTS);
+    NETMSG_END(DSS_SYNCPALEFFECTS);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -680,7 +681,7 @@ void sithDSS_SendSyncCameras(int sendto_id, int mpFlags)
     NETMSG_PUSHU16(g_selfPlayerInfo->palEffectsIdx1);
     NETMSG_PUSHU16(g_selfPlayerInfo->palEffectsIdx2);
     
-    NETMSG_END(COGMSG_SYNCCAMERAS);
+    NETMSG_END(DSS_SYNCCAMERAS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -770,7 +771,7 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
         NETMSG_PUSHU8(sithSoundMixer_trackTo);
     }
     
-    NETMSG_END(COGMSG_ID_1F);
+    NETMSG_END(DSS_ID_1F);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
@@ -862,7 +863,7 @@ void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
         NETMSG_PUSHS16(thing->puppet->field_4);
     }
     
-    NETMSG_END(COGMSG_SYNCPUPPET);
+    NETMSG_END(DSS_SYNCPUPPET);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }

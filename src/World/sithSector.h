@@ -18,8 +18,8 @@
 #define sithSector_SetAdjoins_ADDR (0x004F8E10)
 #define sithSector_GetThingsCount_ADDR (0x004F8E40)
 #define sithSector_GetNumPlayers_ADDR (0x004F8E60)
-#define sithSector_Sync_ADDR (0x004F8E80)
-#define sithSector_sub_4F8EF0_ADDR (0x004F8EF0)
+#define sithSector_SyncSector_ADDR (0x004F8E80)
+#define sithSector_Sync_ADDR (0x004F8EF0)
 #define sithSector_GetPtrFromIdx_ADDR (0x004F8F50)
 
 typedef enum ATTACHFLAGS
@@ -59,8 +59,8 @@ int sithSector_GetThingsCount(sithSector *sector);
 void sithSector_Free(sithWorld *world);
 int sithSector_GetNumPlayers(sithSector *sector);
 sithSector* sithSector_GetPtrFromIdx(int idx);
-void sithSector_Sync(sithSector *pSector, int a2);
-void sithSector_sub_4F8EF0();
+void sithSector_SyncSector(sithSector *pSector, int a2);
+void sithSector_Sync();
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
@@ -76,7 +76,7 @@ void sithSector_sub_4F8EF0();
 //static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;
 //static int (*sithSector_TimerTick)() = (void*)sithSector_TimerTick_ADDR;
-//static int (*sithSector_Sync)(sithSector *sector, int a2) = (void*)sithSector_Sync_ADDR;
+//static int (*sithSector_SyncSector)(sithSector *sector, int a2) = (void*)sithSector_SyncSector_ADDR;
 //static void (*sithSector_sub_4F2C30)(sithSectorEntry *sectorEntry, sithSector *sector, rdVector3 *pos1, rdVector3 *pos2, float a5, float a6, sithThing *thing) = (void*)sithSector_sub_4F2C30_ADDR;
 
 #endif // _SITHSECTOR_H
