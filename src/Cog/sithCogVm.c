@@ -49,7 +49,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[DSS_AISTATUS] = sithDSS_ProcessAIStatus;
     sithCogVm_msgFuncs[DSS_INVENTORY] = sithDSS_ProcessInventory;
     sithCogVm_msgFuncs[DSS_SURFACE] = sithDSS_ProcessSurface;
-    sithCogVm_msgFuncs[DSS_SYNCSECTOR] = sithDSS_ProcessSectorStatus;
+    sithCogVm_msgFuncs[DSS_SECTORSTATUS] = sithDSS_ProcessSectorStatus;
     sithCogVm_msgFuncs[DSS_SYNCTHINGFRAME] = sithDSSThing_ProcessSyncThingFrame;
     sithCogVm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessSyncPuppet;
     sithCogVm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessLeaveJoin;

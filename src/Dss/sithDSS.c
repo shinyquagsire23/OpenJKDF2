@@ -96,7 +96,7 @@ void sithDSS_SendSectorStatus(sithSector *sector, int sendto_id, int mpFlags)
     }
     NETMSG_PUSHVEC3(sector->tint);
     
-    NETMSG_END(DSS_SYNCSECTOR);
+    NETMSG_END(DSS_SECTORSTATUS);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
