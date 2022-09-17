@@ -8,8 +8,8 @@
 #define sithDSSThing_ProcessPos_ADDR (0x004F3270)
 #define sithDSSThing_SendSyncThing_ADDR (0x004F3420)
 #define sithDSSThing_ProcessSyncThing_ADDR (0x004F35E0)
-#define sithDSSThing_SendPlaySoundPos_ADDR (0x004F37B0)
-#define sithDSSThing_ProcessPlaySoundPos_ADDR (0x004F3870)
+#define sithDSSThing_SendPlaySound_ADDR (0x004F37B0)
+#define sithDSSThing_ProcessPlaySound_ADDR (0x004F3870)
 #define sithDSSThing_SoundClassPlay_ADDR (0x004F3960)
 #define sithDSSThing_ProcessSoundClassPlay_ADDR (0x004F39C0)
 #define sithDSSThing_SendPlayKey_ADDR (0x004F3A30)
@@ -48,8 +48,8 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg);
 void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessSyncThing(sithCogMsg *msg);
 
-void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
-int sithDSSThing_ProcessPlaySoundPos(sithCogMsg *msg);
+void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
+int sithDSSThing_ProcessPlaySound(sithCogMsg *msg);
 
 void sithDSSThing_SoundClassPlay(sithThing *pThing, int16_t a2, int a3, float a4);
 int sithDSSThing_ProcessSoundClassPlay(sithCogMsg *msg);

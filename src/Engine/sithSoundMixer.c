@@ -1154,7 +1154,7 @@ void sithSoundMixer_SyncSounds()
             if ( sound )
             {
                 if (iter->flags & SITHSOUNDFLAG_LOOP)
-                    sithDSSThing_SendPlaySoundPos(
+                    sithDSSThing_SendPlaySound(
                         iter->thing,
                         &iter->pos,
                         sound,

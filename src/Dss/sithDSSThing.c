@@ -252,7 +252,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
+void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -273,12 +273,12 @@ void sithDSSThing_SendPlaySoundPos(sithThing *followThing, rdVector3 *pos, sithS
     }
     NETMSG_PUSHU32(refid);
     
-    NETMSG_END(DSS_PLAYSOUNDPOS);
+    NETMSG_END(DSS_PLAYSOUND);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 0);
 }
 
-int sithDSSThing_ProcessPlaySoundPos(sithCogMsg *msg)
+int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
 {
     sithPlayingSound* out = NULL;
 
