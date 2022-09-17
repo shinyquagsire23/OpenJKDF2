@@ -1373,7 +1373,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                                     break;
                                 if ( (v12->flags & SITH_SECTOR_ADJOINS_SET) != 0 )
                                 {
-                                    sithDSS_SendSyncSectorAlt(v12, sithMulti_sendto_id, 1);
+                                    sithDSS_SendSectorFlags(v12, sithMulti_sendto_id, 1);
                                     goto LABEL_41;
                                 }
                                 if ( sithDplay_dword_832208 >= v10 )

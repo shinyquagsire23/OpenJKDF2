@@ -65,7 +65,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[DSS_ID_1F] = sithDSS_ProcessMisc;
     sithCogVm_msgFuncs[DSS_CHAT] = sithMulti_ProcessChat;
     sithCogVm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_ProcessDestroyThing;
-    sithCogVm_msgFuncs[DSS_SYNCSECTORALT] = sithDSS_ProcessSyncSectorAlt;
+    sithCogVm_msgFuncs[DSS_SECTORFLAGS] = sithDSS_ProcessSectorFlags;
     sithCogVm_msgFuncs[DSS_SOUNDCLASSPLAY] = sithDSSThing_ProcessSoundClassPlay;
     sithCogVm_msgFuncs[DSS_OPENDOOR] = sithDSSThing_ProcessOpenDoor;
     sithCogVm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetThingModel;

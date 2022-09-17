@@ -157,13 +157,13 @@ LABEL_11:
     return 1;
 }
 
-void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags)
+void sithDSS_SendSectorFlags(sithSector *pSector, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
     NETMSG_PUSHS16(pSector->id);
     NETMSG_PUSHU32(pSector->flags);
-    NETMSG_END(DSS_SYNCSECTORALT);
+    NETMSG_END(DSS_SECTORFLAGS);
 
     if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
@@ -171,7 +171,7 @@ void sithDSS_SendSyncSectorAlt(sithSector *pSector, int sendto_id, int mpFlags)
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 0);
 }
 
-int sithDSS_ProcessSyncSectorAlt(sithCogMsg *msg)
+int sithDSS_ProcessSectorFlags(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
