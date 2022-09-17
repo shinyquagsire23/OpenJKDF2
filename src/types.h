@@ -2060,7 +2060,7 @@ typedef struct sithPlayerInfo
     int32_t numKilled;
     int32_t numSuicides;
     int32_t score;
-    int32_t field_13B0;
+    int32_t lastUpdateMs;
 } sithPlayerInfo;
 
 

@@ -288,7 +288,7 @@ void sithAI_TickAll()
             sithAI_TickActor(actor);
 
             if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-                sithThing_SyncThingPos(actor->thing, 0xF); // Added
+                sithThing_SetSyncFlags(actor->thing, THING_SYNC_ALL); // Added
             }
         }
 

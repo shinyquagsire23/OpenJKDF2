@@ -712,7 +712,7 @@ void sithCogFunctionThing_SetThingVel(sithCog *ctx)
         rdVector_Copy3(&thing->physicsParams.vel, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
         }
     }
 }
@@ -728,7 +728,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
         sithPhysics_ThingApplyForce(thing, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
         }
     }
 }
@@ -744,7 +744,7 @@ void sithCogFunctionThing_AddThingVel(sithCog *ctx)
         rdVector_Add3Acc(&thing->physicsParams.vel, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
         }
     }
 }
@@ -1030,7 +1030,7 @@ void sithCogFunctionThing_SetThingFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1045,7 +1045,7 @@ void sithCogFunctionThing_ClearThingFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1106,7 +1106,7 @@ void sithCogFunctionThing_SetCollideType(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1356,7 +1356,7 @@ void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
         thing->rdthing.geometryMode = mode;
         if (COG_SHOULD_SYNC(ctx))
         {
-                sithThing_SyncThingPos(thing, 2);
+                sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1428,7 +1428,7 @@ void sithCogFunctionThing_SetLifeLeft(sithCog *ctx)
         thing->lifeLeftMs = (int)(lifeLeftSecs * 1000.0);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1559,7 +1559,7 @@ void sithCogFunctionThing_SetPhysicsFlags(sithCog *ctx)
         thing->physicsParams.physflags |= flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1654,7 +1654,7 @@ void sithCogFunctionThing_SetThingRotVel(sithCog *ctx)
         rdVector_Copy3(&thing->physicsParams.angVel, &popped_vector3);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
         }
     }
 }
@@ -1682,7 +1682,7 @@ void sithCogFunctionThing_SetThingLook(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
         }
     }
 }
@@ -1913,7 +1913,7 @@ void sithCogFunctionThing_SetXFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -1941,7 +1941,7 @@ void sithCogFunctionThing_ClearXFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -2074,7 +2074,7 @@ void sithCogFunctionThing_SetThingMass(sithCog *ctx)
         thing->physicsParams.mass = mass;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -2084,7 +2084,7 @@ void sithCogFunctionThing_SyncThingPos(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithThing_SyncThingPos(thing, 1);
+        sithThing_SetSyncFlags(thing, THING_SYNC_POS);
 }
 
 void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
@@ -2100,7 +2100,7 @@ void sithCogFunctionThing_SyncThingState(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithThing_SyncThingPos(thing, 2);
+        sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
 }
 
 void sithCogFunctionThing_GetMajorMode(sithCog *ctx)

@@ -234,7 +234,7 @@ int sithCogVm_Sync()
             v2 = sithCogVm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
-                jkPlayer_playerInfos[v1].field_13B0 = sithTime_curMs;
+                jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_curMs;
 LABEL_14:
                 if ( sithCogVm_netMsgTmp.netMsg.msgId )
                 {

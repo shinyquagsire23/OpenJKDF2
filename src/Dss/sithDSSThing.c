@@ -683,7 +683,7 @@ void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, fl
 
 int sithDSSThing_HandleDamage(sithCogMsg *msg)
 {
-    if ( msg->netMsg.thingIdx != sithNet_dword_8C4BA4 )
+    if ( msg->netMsg.thingIdx != sithNet_serverNetId )
         return 0;
 
     NETMSG_IN_START(msg);
@@ -1137,7 +1137,7 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
     sithCogVm_netMsgTmp.netMsg.msg_size = 8;
     if ( !sithNet_isServer )
     {
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, mpFlags, 1);
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, mpFlags, 1);
         return;
     }
     pItemThing2 = sithThing_GetById(itemThingId);

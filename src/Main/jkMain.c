@@ -221,9 +221,9 @@ void jkMain_GuiAdvance()
                     thing_nine = 0;
                     return;
                 }
-                if ( sithNet_dword_832638 )
+                if ( sithMulti_bTimelimitMet )
                 {
-                    sithNet_dword_832638 = 0;
+                    sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
                         jkSaber_cogMsg_SendEndLevel();
                 }
@@ -334,9 +334,9 @@ void jkMain_EscapeMenuTick(int a2)
                 }
                 else
                 {
-                    if ( sithNet_dword_832638 )
+                    if ( sithMulti_bTimelimitMet )
                     {
-                        sithNet_dword_832638 = 0;
+                        sithMulti_bTimelimitMet = 0;
                         if ( sithNet_isServer )
                             jkSaber_cogMsg_SendEndLevel();
                     }
@@ -625,9 +625,9 @@ void jkMain_GameplayTick(int a2)
             }
             else
             {
-                if ( sithNet_dword_832638 )
+                if ( sithMulti_bTimelimitMet )
                 {
-                    sithNet_dword_832638 = 0;
+                    sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
                         jkSaber_cogMsg_SendEndLevel();
                 }

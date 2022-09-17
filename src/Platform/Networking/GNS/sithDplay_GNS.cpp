@@ -462,23 +462,9 @@ private:
     std::map< HSteamNetConnection, Client_t > m_mapClients;
     std::queue<int> m_DisconnectedPeers;
 
-    void SendStringToClient( HSteamNetConnection conn, const char *str )
-    {
-        SendBytesToClient( conn, (void*)str, (uint32)strlen(str));
-    }
-
     void SendBytesToClient( HSteamNetConnection conn, void *pData, uint32_t len)
     {
         m_pInterface->SendMessageToConnection( conn, pData, len, k_nSteamNetworkingSend_Reliable, nullptr );
-    }
-
-    void SendStringToAllClients( const char *str, HSteamNetConnection except = k_HSteamNetConnection_Invalid )
-    {
-        for ( auto &c: m_mapClients )
-        {
-            if ( c.first != except )
-                SendStringToClient( c.first, str );
-        }
     }
 
     void SendBytesToAllClients( void *pData, uint32_t len, HSteamNetConnection except = k_HSteamNetConnection_Invalid )
@@ -563,14 +549,19 @@ private:
                         pInfo->m_info.m_szEndDebug
                     );
 
-                    m_DisconnectedPeers.push(itClient->second.m_id);
+                    // Only send disconnect messages to fully connected clients.
+                    for (int i = 0; i < jkPlayer_maxPlayers; i++)
+                    {
+                        if (!i && jkGuiNetHost_bIsDedicated) continue;
+
+                        if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && jkPlayer_playerInfos[i].net_id == itClient->second.m_id) {
+                            m_DisconnectedPeers.push(itClient->second.m_id);
+                            break;
+                        }
+                    }
 
                     availableIds &= ~(1 << (itClient->second.m_id-1));
-
                     m_mapClients.erase( itClient );
-
-                    // Send a message so everybody else knows what happened
-                    SendStringToAllClients( temp );
                 }
                 else
                 {
@@ -687,6 +678,7 @@ private:
     int ConnectedPlayers()
     {
         int ret = 0;
+        //RealConnectedPlayers();
         for (int i = 0; i < 64; i++)
         {
             if (availableIds & (1 << i)) {
@@ -699,14 +691,17 @@ private:
     int RealConnectedPlayers()
     {
         int amt = 0;
+        //availableIds = 3;
         for (int i = 0; i < jkPlayer_maxPlayers; i++)
         {
             if (!i && jkGuiNetHost_bIsDedicated) continue;
 
-            if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].net_id ){
 
+            if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].net_id ){
+                
             }
             else {
+                //availableIds |= (1 << (jkPlayer_playerInfos[i].net_id-1));
                 amt++;
             }
         }

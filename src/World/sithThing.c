@@ -1912,7 +1912,7 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
     return hash;
 }
 
-void sithThing_SyncThingPos(sithThing *thing, int a2)
+void sithThing_SetSyncFlags(sithThing *thing, int a2)
 {
     unsigned int v3; // eax
     sithThing **v4; // ecx
@@ -1956,7 +1956,7 @@ void sithThing_netidk()
         while ( 1 )
         {
             v1 = sithNet_aSyncFlags[v0];
-            if ( (v1 & 4) != 0 )
+            if ( (v1 & THING_SYNC_FULL) != 0 )
             {
                 // Added: this used to be outside the loop?
                 sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
@@ -1972,9 +1972,10 @@ void sithThing_netidk()
             }
             else
             {
-                if ( (v1 & 2) != 0 )
+                if ( (v1 & THING_SYNC_STATE) != 0 )
                     sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
-                if ( (sithNet_aSyncFlags[v0] & 1) != 0 )
+
+                if ( (sithNet_aSyncFlags[v0] & THING_SYNC_POS) != 0 )
                     sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
 
                 // Added: Co-op

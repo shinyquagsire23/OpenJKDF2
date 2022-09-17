@@ -930,7 +930,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
     }
     else if ( msgid != COGMSG_SYNCCOG && msgid != COGMSG_FIREPROJECTILE )
     {
-        sithDSSCog_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_dword_8C4BA4);
+        sithDSSCog_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_serverNetId);
     }
 }
 
@@ -1046,7 +1046,7 @@ LABEL_18:
             param1,
             param2,
             param3,
-            sithNet_dword_8C4BA4);
+            sithNet_serverNetId);
         result = 0.0;
     }
     return result;

@@ -1318,7 +1318,7 @@ void do_hooks()
     hook_function(sithThing_Destroy_ADDR, sithThing_Destroy);
     hook_function(sithThing_Damage_ADDR, sithThing_Damage);
     hook_function(sithThing_AttachThing_ADDR, sithThing_AttachThing);
-    hook_function(sithThing_SyncThingPos_ADDR, sithThing_SyncThingPos);
+    hook_function(sithThing_SetSyncFlags_ADDR, sithThing_SetSyncFlags);
     hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
     hook_function(sithThing_GetById_ADDR, sithThing_GetById);
     hook_function(sithActor_Remove_ADDR, sithActor_Remove);

@@ -138,9 +138,9 @@ sithMulti_handlerIdk 0x0083264C sithMultiHandler_t
 sithMulti_multiModeFlags 0x00832650 int
 sithMulti_dword_83265C 0x0083265C uint32_t
 sithMulti_arr_832218 0x00832218 int[256]
-sithMulti_dword_832658 0x00832658 int
+sithMulti_leaveJoinWaitMs 0x00832658 uint32_t
 sithMulti_dword_832654 0x00832654 int
-sithMulti_dword_832660 0x00832660 int
+sithMulti_lastScoreUpdateMs 0x00832660 uint32_t
 sithMulti_requestConnectIdx 0x00832618 uint32_t
 sithMulti_dword_832664 0x00832664 int
 
@@ -232,8 +232,8 @@ sithNet_multiplayer_timelimit 0x008C4BD4 int
 sithMulti_multiplayerTimelimit 0x0083261C int
 sithNet_isMulti 0x00832624 int
 sithNet_isServer 0x00832628 int
-sithNet_dword_832638 0x00832638 int
-sithNet_dword_8C4BA4 0x008C4BA4 int
+sithMulti_bTimelimitMet 0x00832638 int
+sithNet_serverNetId 0x008C4BA4 int
 sithNet_things 0x008326AC int[641]
 sithNet_thingsIdx 0x008330F0 int
 sithNet_syncIdx 0x008330F4 int
@@ -242,11 +242,11 @@ sithNet_aSyncThings 0x00832668 sithThing*[SITH_MAX_SYNC_THINGS]
 sithNet_tickrate 0x005490D4 int = 180
 sithNet_dword_8C4BA8 0x008C4BA8 int
 sithNet_dword_83262C 0x0083262C int
-sithNet_dword_83263C 0x0083263C int
+sithMulti_leaveJoinType 0x0083263C int
 sithNet_checksum 0x00832630 int
 sithNet_dword_832640 0x00832640 int
 sithMulti_sendto_id 0x00832644 int
-sithNet_dword_832648 0x00832648 int
+sithNet_bSyncScores 0x00832648 int
 sithNet_dword_832620 0x00832620 int
 
 sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0

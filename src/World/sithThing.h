@@ -52,7 +52,7 @@
 #define sithThing_TypeIdxFromStr_ADDR (0x004CF320)
 #define sithThing_GetIdxFromThing_ADDR (0x004CF380)
 #define sithThing_Checksum_ADDR (0x004CF3C0)
-#define sithThing_SyncThingPos_ADDR (0x004CF560)
+#define sithThing_SetSyncFlags_ADDR (0x004CF560)
 #define sithThing_netidk_ADDR (0x004CF5D0)
 #define sithThing_ShouldSync_ADDR (0x004CF660)
 #define sithThing_netidk2_ADDR (0x004CF690)
@@ -316,6 +316,19 @@ enum SITH_AF
     SITH_AF_ARACHNID = 0x80000000, // prob. joes specific
 };
 
+enum THING_SYNC_FLAGS
+{
+    THING_SYNC_POS = 1,
+    THING_SYNC_STATE = 2,
+    THING_SYNC_FULL = 4,
+
+    // Added
+    THING_SYNC_AI = 8,
+
+    // Helper
+    THING_SYNC_ALL = 0xFF,
+};
+
 int sithThing_Startup();
 int sithThing_Shutdown();
 void sithThing_SetHandler(sithThing_handler_t handler);
@@ -354,7 +367,7 @@ void sithThing_Destroy(sithThing *thing);
 float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
 void sithThing_detachallchildren(sithThing *thing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
-void sithThing_SyncThingPos(sithThing *thing, int a2);
+void sithThing_SetSyncFlags(sithThing *thing, int a2);
 int sithThing_ShouldSync(sithThing *thing);
 sithThing* sithThing_GetById(int thing_id);
 int sithThing_HasAttachment(sithThing *thing);
@@ -383,7 +396,7 @@ static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_
 //static int (*sithThing_DetachThing)(sithThing *a1) = (void*)sithThing_DetachThing_ADDR;
 //static int (*sithThing_Release)(sithThing *a1) = (void*)sithThing_Release_ADDR;
 //static sithThing* (*sithThing_GetParent)(sithThing *a1) = (void*)sithThing_GetParent_ADDR;
-//static void (*sithThing_SyncThingPos)(sithThing *a1, int a2) = (void*)sithThing_SyncThingPos_ADDR;
+//static void (*sithThing_SetSyncFlags)(sithThing *a1, int a2) = (void*)sithThing_SetSyncFlags_ADDR;
 //static void (*sithThing_AttachToSurface)(sithThing *a1, sithSurface *a2, int a3) = (void*)sithThing_AttachToSurface_ADDR;
 //static void (*sithThing_AttachThing)(sithThing *parent, sithThing *child) = (void*)sithThing_AttachThing_ADDR;
 //static int (*sithThing_SetNewModel)(sithThing *a1, rdModel3 *a2) = (void*)sithThing_SetNewModel_ADDR;

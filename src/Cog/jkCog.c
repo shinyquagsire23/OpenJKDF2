@@ -281,7 +281,7 @@ void jkCog_SetFlags(sithCog *ctx)
         thing->jkFlags |= flags;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithThing_SyncThingPos(thing, 2);
+            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -300,7 +300,7 @@ void jkCog_ClearFlags(sithCog *ctx)
             v2->jkFlags &= ~v1;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithThing_SyncThingPos(v2, 2);
+                sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
             }
         }
     }
@@ -463,7 +463,7 @@ void jkCog_SetInvis(sithCog *pCog)
         {
             v3 = pCog->trigId;
             if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
-                sithThing_SyncThingPos(v2, 2);
+                sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
         }
     }
 }
@@ -490,7 +490,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
         {
             v5 = pCog->trigId;
             if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
-                sithThing_SyncThingPos(v2, 2);
+                sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
         }
     }
 }

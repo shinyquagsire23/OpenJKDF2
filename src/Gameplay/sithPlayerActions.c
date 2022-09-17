@@ -140,7 +140,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
             sithThing_DetachThing(thing);
         }
         if ( sithCogVm_multiplayerFlags )
-            sithThing_SyncThingPos(thing, 1);
+            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
     }
 }
 

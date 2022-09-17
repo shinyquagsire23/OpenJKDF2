@@ -816,7 +816,7 @@ void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
     if ( sithNet_isServer )
         jkSaber_cogMsg_HandleSetTeam(&sithCogVm_netMsgTmp);
     else
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, 255, 1);
+        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, 255, 1);
 }
 
 int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
@@ -1003,7 +1003,7 @@ void jkSaber_cogMsg_SendEndLevel()
 
 int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg)
 {
-    if ( msg->netMsg.thingIdx != sithNet_dword_8C4BA4 )
+    if ( msg->netMsg.thingIdx != sithNet_serverNetId )
         return 0;
 
     NETMSG_IN_START(msg);
@@ -1041,7 +1041,7 @@ int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, c
     if ( sithNet_isServer )
         result = jkSaber_cogMsg_HandleSetSaberInfo(&sithCogVm_netMsgTmp);
     else
-        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_dword_8C4BA4, 255, 1);
+        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, 255, 1);
     return result;
 }
 
@@ -1088,7 +1088,7 @@ int jkSaber_idk4()
     {
         if ( sithNet_isServer )
         {
-            if ( sithNet_dword_83263C )
+            if ( sithMulti_leaveJoinType )
             {
                 sithCogVm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
                 sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
@@ -1097,7 +1097,7 @@ int jkSaber_idk4()
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
-                sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+                sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }
         jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
