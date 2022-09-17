@@ -703,7 +703,7 @@ int sithDebugConsole_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             {
                 _sprintf(std_genBuffer, "Kicked %S", v3->player_name);
                 DebugConsole_Print(std_genBuffer);
-                sithMulti_SendKickPlayer(v3->net_id);
+                sithMulti_SendQuit(v3->net_id);
             }
             ++v2;
             ++v3;

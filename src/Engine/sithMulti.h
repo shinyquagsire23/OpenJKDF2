@@ -32,8 +32,8 @@ extern "C" {
 #define sithMulti_SendPing_ADDR (0x004CB390)
 #define sithMulti_ProcessPing_ADDR (0x004CB3E0)
 #define sithMulti_ProcessPingResponse_ADDR (0x004CB410)
-#define sithMulti_SendKickPlayer_ADDR (0x004CB4A0)
-#define sithMulti_ProcessKickPlayer_ADDR (0x004CB4F0)
+#define sithMulti_SendQuit_ADDR (0x004CB4A0)
+#define sithMulti_ProcessQuit_ADDR (0x004CB4F0)
 #define sithMulti_HandleTimeLimit_ADDR (0x004CB690)
 #define sithMulti_SyncScores_ADDR (0x004CBC00)
 #define sithMulti_IterPlayersnothingidk_ADDR (0x004CBC10)
@@ -87,7 +87,7 @@ enum DSS_ID
     DSS_PINGREPLY  = 39,
     DSS_RESET     = 40,
     DSS_ENUMPLAYERS  = 41,
-    DSS_KICK      = 42,
+    DSS_QUIT      = 42,
     DSS_ID_2B     = 43,
     DSS_ID_2C     = 44,
     DSS_ID_2D     = 45,
@@ -220,12 +220,12 @@ void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
 void sithMulti_EndLevel(unsigned int a1, int a2);
 void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId);
-void sithMulti_SendKickPlayer(int idx);
+void sithMulti_SendQuit(int idx);
 int sithMulti_LobbyMessage();
 int sithMulti_ProcessJoinLeave(sithCogMsg *msg);
 int sithMulti_ProcessPing(sithCogMsg *msg);
 int sithMulti_ProcessPingResponse(sithCogMsg *msg);
-int sithMulti_ProcessKickPlayer(sithCogMsg *msg);
+int sithMulti_ProcessQuit(sithCogMsg *msg);
 int sithMulti_ServerLeft(int a, sithEventInfo* b);
 void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
 int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
@@ -238,7 +238,7 @@ int sithMulti_SendPing(int sendtoId);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
 //static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
-//static int (*sithMulti_SendKickPlayer)(int a1) = (void*)sithMulti_SendKickPlayer_ADDR;
+//static int (*sithMulti_SendQuit)(int a1) = (void*)sithMulti_SendQuit_ADDR;
 //static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
 //static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
 //static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;

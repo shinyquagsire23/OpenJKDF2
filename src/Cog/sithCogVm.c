@@ -73,7 +73,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPingResponse;
     sithCogVm_msgFuncs[DSS_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
     sithCogVm_msgFuncs[DSS_RESET] = sithCogVm_cogMsg_Reset;
-    sithCogVm_msgFuncs[DSS_KICK] = sithMulti_ProcessKickPlayer;
+    sithCogVm_msgFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
     sithCogVm_bInit = 1;
     return 1;
 }
@@ -279,7 +279,7 @@ LABEL_22:
                 goto LABEL_14;
             }
             if ( sithNet_isServer )
-                sithMulti_SendKickPlayer(sithCogVm_netMsgTmp.netMsg.thingIdx);
+                sithMulti_SendQuit(sithCogVm_netMsgTmp.netMsg.thingIdx);
         }
 LABEL_25:
         if ( sithCogVm_needsSync )

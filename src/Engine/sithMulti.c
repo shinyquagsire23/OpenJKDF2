@@ -492,14 +492,14 @@ void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId)
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, 1);
 }
 
-void sithMulti_SendKickPlayer(int idx)
+void sithMulti_SendQuit(int idx)
 {
     if (!sithNet_isServer) return;
 
     NETMSG_START;
 
     NETMSG_PUSHS32(idx);
-    NETMSG_END(DSS_KICK);
+    NETMSG_END(DSS_QUIT);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, idx, 1, 1);
 }
@@ -653,7 +653,7 @@ int sithMulti_ProcessPingResponse(sithCogMsg *msg)
     return 1;
 }
 
-int sithMulti_ProcessKickPlayer(sithCogMsg *msg)
+int sithMulti_ProcessQuit(sithCogMsg *msg)
 {
     wchar_t *v2; // eax
     int v3; // eax
@@ -740,7 +740,7 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
                         sithCogVm_netMsgTmp.pktData[0] = v1->net_id;
                         sithCogVm_netMsgTmp.netMsg.msg_size = 4;
                         sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_KICK;
+                        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_QUIT;
                         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 1, 1);
                     }
                     v3 = sithStrTable_GetString("%s_HAS_LEFT_THE_GAME");
