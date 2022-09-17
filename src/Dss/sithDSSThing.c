@@ -704,7 +704,7 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags)
+void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -818,12 +818,12 @@ void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags
         }
     }
     
-    NETMSG_END(DSS_SYNCTHINGFULL);
+    NETMSG_END(DSS_THINGFULLDESC);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSSThing_ProcessSyncThingFull(sithCogMsg *msg)
+int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
 {
     int16_t thingIdx; // ebp
     int32_t v8; // ecx

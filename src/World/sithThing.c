@@ -1944,7 +1944,7 @@ void sithThing_Sync()
         if ( (v1 & THING_SYNC_FULL) != 0 )
         {
             // Added: this used to be outside the loop?
-            sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
+            sithDSSThing_SendFullDesc(sithNet_aSyncThings[v0], -1, 255);
             //return; // Removed, this used to stop the loop.
         }
         else

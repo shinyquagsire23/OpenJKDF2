@@ -200,7 +200,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
         if ( sithThing_ShouldSync(v4) )
         {
-            sithDSSThing_SendSyncThingFull(v4, 0, mpFlags);
+            sithDSSThing_SendFullDesc(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
                 sithDSS_SendSyncPuppet(v4, 0, mpFlags);
         }

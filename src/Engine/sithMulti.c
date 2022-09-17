@@ -1463,7 +1463,7 @@ LABEL_30:
                         }
 
                         if ( (v14->thing_id & 0xFFFF0000) != 0 )
-                            sithDSSThing_SendSyncThingFull(v14, sithMulti_sendto_id, 1);
+                            sithDSSThing_SendFullDesc(v14, sithMulti_sendto_id, 1);
                         else
                             sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
 

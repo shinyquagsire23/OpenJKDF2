@@ -28,8 +28,8 @@
 #define sithDSSThing_ProcessDeath_ADDR (0x004F40B0)
 #define sithDSSThing_SendDamage_ADDR (0x004F4120)
 #define sithDSSThing_ProcessDamage_ADDR (0x004F41A0)
-#define sithDSSThing_SendSyncThingFull_ADDR (0x004F4210)
-#define sithDSSThing_ProcessSyncThingFull_ADDR (0x004F46F0)
+#define sithDSSThing_SendFullDesc_ADDR (0x004F4210)
+#define sithDSSThing_ProcessFullDesc_ADDR (0x004F46F0)
 #define sithDSSThing_SendSyncThingFrame_ADDR (0x004F4C60)
 #define sithDSSThing_ProcessSyncThingFrame_ADDR (0x004F4D60)
 #define sithDSSThing_SendSyncThingAttachment_ADDR (0x004F4E80)
@@ -78,8 +78,8 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg);
 void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags);
 int sithDSSThing_ProcessDamage(sithCogMsg *msg);
 
-void sithDSSThing_SendSyncThingFull(sithThing *thing, int sendto_id, int mpFlags);
-int sithDSSThing_ProcessSyncThingFull(sithCogMsg *msg);
+void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags);
+int sithDSSThing_ProcessFullDesc(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingFrame(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
 int sithDSSThing_ProcessSyncThingFrame(sithCogMsg *msg);

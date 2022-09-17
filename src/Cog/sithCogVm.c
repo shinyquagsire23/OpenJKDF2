@@ -43,7 +43,7 @@ int sithCogVm_Startup()
     sithCogVm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_ProcessSyncThing;
     sithCogVm_msgFuncs[DSS_PLAYSOUNDPOS] = sithDSSThing_ProcessPlaySoundPos;
     sithCogVm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_ProcessPlayKey;
-    sithCogVm_msgFuncs[DSS_SYNCTHINGFULL] = sithDSSThing_ProcessSyncThingFull;
+    sithCogVm_msgFuncs[DSS_THINGFULLDESC] = sithDSSThing_ProcessFullDesc;
     sithCogVm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessSyncCog;
     sithCogVm_msgFuncs[DSS_SYNCSURFACE] = sithDSS_ProcessSyncSurface;
     sithCogVm_msgFuncs[DSS_SYNCAI] = sithDSS_ProcessSyncAI;
