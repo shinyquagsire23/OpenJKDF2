@@ -247,7 +247,7 @@ sithSector* sithSector_GetPtrFromIdx(int idx)
     return result;
 }
 
-void sithSector_Sync(sithSector *pSector, int a2)
+void sithSector_SyncSector(sithSector *pSector, int a2)
 {
     uint32_t v3; // edx
     uint32_t v4; // eax
@@ -277,16 +277,16 @@ void sithSector_Sync(sithSector *pSector, int a2)
     }
 }
 
-void sithSector_sub_4F8EF0()
+void sithSector_Sync()
 {
     uint32_t i; // esi
 
     for ( i = 0; i < sithSector_numSync; ++i )
     {
         if ( (sithSector_aSyncIdk2[i] & 1) != 0 )
-            sithDSS_SendSyncSector(sithSector_aSyncIdk[i], -1, 255);
+            sithDSS_SendSectorStatus(sithSector_aSyncIdk[i], -1, 255);
         else
-            sithDSS_SendSyncSectorAlt(sithSector_aSyncIdk[i], -1, 255);
+            sithDSS_SendSectorFlags(sithSector_aSyncIdk[i], -1, 255);
     }
     sithSector_numSync = 0;
 }

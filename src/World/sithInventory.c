@@ -314,7 +314,7 @@ void sithInventory_BinSendDeactivate(sithThing *player, int senderIndex)
       && player->actorParams.playerinfo->iteminfo[senderIndex].state & ITEMSTATE_AVAILABLE )
     {
         if ( sithInventory_aDescriptors[senderIndex].cog )
-            sithCog_SendMessage(sithInventory_aDescriptors[senderIndex].cog, COGMSG_SYNCPUPPET, SENDERTYPE_0, senderIndex, SENDERTYPE_THING, player->thingIdx, 0);
+            sithCog_SendMessage(sithInventory_aDescriptors[senderIndex].cog, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, senderIndex, SENDERTYPE_THING, player->thingIdx, 0);
     }
 }
 

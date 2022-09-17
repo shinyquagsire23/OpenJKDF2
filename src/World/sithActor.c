@@ -125,7 +125,7 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     }
 
     sender->actorParams.health -= amount;
-    if ( sender == g_localPlayerThing )
+    if ( sender == sithPlayer_pLocalPlayerThing )
     {
         fR = amount * 0.04;
         sithPlayer_AddDynamicTint(fR, 0.0, 0.0);

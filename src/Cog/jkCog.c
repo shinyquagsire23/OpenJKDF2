@@ -189,7 +189,7 @@ void jkCog_dwPlayCammySpeech(sithCog* ctx)
 
 void jkCog_dwGetActivateBin(sithCog *ctx)
 {
-    sithCogVm_PushInt(ctx, sithInventory_GetCurItem(g_localPlayerThing));
+    sithCogVm_PushInt(ctx, sithInventory_GetCurItem(sithPlayer_pLocalPlayerThing));
 }
 #endif
 
@@ -442,7 +442,7 @@ void jkCog_StopPovKey(sithCog *ctx)
 
 void jkCog_SetForceSpeed(sithCog *pCog)
 {
-    g_localPlayerThing->actorParams.extraSpeed = sithCogVm_PopFlex(pCog);
+    sithPlayer_pLocalPlayerThing->actorParams.extraSpeed = sithCogVm_PopFlex(pCog);
 }
 
 void jkCog_SetInvis(sithCog *pCog)
@@ -565,18 +565,13 @@ void jkCog_PrintUniString(sithCog *ctx)
     {
         if ( v3 == playerThingIdx )
         {
-LABEL_8:
             jkDev_PrintUniString(v4);
             return;
         }
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) && v3 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v3].flags & 1) != 0 )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v6 = ctx->trigId;
-                if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN && v3 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v3].flags & 1) != 0 )
-                    jkSaber_cogMsg_SendJKPrintUniString(v1, v3);
-            }
+            
+            jkSaber_cogMsg_SendJKPrintUniString(v1, v3);
         }
     }
     else
@@ -585,17 +580,13 @@ LABEL_8:
         {
             if ( v3 != -1 )
                 return;
-            goto LABEL_8;
+            jkDev_PrintUniString(v4);
+            return;
         }
         jkDev_PrintUniString(v4);
-        if ( sithCogVm_multiplayerFlags )
+        if ( COG_SHOULD_SYNC(ctx) )
         {
-            if ( (ctx->flags & 0x200) == 0 )
-            {
-                v5 = ctx->trigId;
-                if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
-                    jkSaber_cogMsg_SendJKPrintUniString(v1, 0xFFFFFFFF);
-            }
+            jkSaber_cogMsg_SendJKPrintUniString(v1, 0xFFFFFFFF);
         }
     }
 }
@@ -614,14 +605,9 @@ void jkCog_SetPersuasionInfo(sithCog *ctx)
     v4 = v3->playerInfo;
     v4->maxTwinkles = v2;
     v4->twinkleSpawnRate = v1;
-    if ( sithCogVm_multiplayerFlags )
+    if ( COG_SHOULD_SYNC(ctx) )
     {
-        if ( (ctx->flags & 0x200) == 0 )
-        {
-            v5 = ctx->trigId;
-            if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
-                jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
-        }
+        jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
     }
 }
 

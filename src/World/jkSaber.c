@@ -41,19 +41,19 @@ const char* jkSaber_aKyTeamModels[5] = {
 
 int jkSaber_Startup()
 {
-    sithCogVm_SetMsgFunc(COGMSG_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
-    sithCogVm_SetMsgFunc(COGMSG_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
-    sithCogVm_SetMsgFunc(COGMSG_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
-    sithCogVm_SetMsgFunc(COGMSG_ID_32, jkSaber_cogMsg_Handlex32);
-    sithCogVm_SetMsgFunc(COGMSG_ID_33, jkSaber_cogMsg_Handlex33);
-    sithCogVm_SetMsgFunc(COGMSG_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
-    sithCogVm_SetMsgFunc(COGMSG_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
-    sithCogVm_SetMsgFunc(COGMSG_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
-    sithCogVm_SetMsgFunc(COGMSG_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
-    sithCogVm_SetMsgFunc(COGMSG_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithCogVm_SetMsgFunc(COGMSG_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithCogVm_SetMsgFunc(COGMSG_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
-    sithCogVm_SetMsgFunc(COGMSG_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
+    sithCogVm_SetMsgFunc(DSS_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
+    sithCogVm_SetMsgFunc(DSS_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
+    sithCogVm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
+    sithCogVm_SetMsgFunc(DSS_ID_32, jkSaber_cogMsg_Handlex32);
+    sithCogVm_SetMsgFunc(DSS_ID_33, jkSaber_cogMsg_Handlex33);
+    sithCogVm_SetMsgFunc(DSS_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
+    sithCogVm_SetMsgFunc(DSS_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
+    sithCogVm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
+    sithCogVm_SetMsgFunc(DSS_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
+    sithCogVm_SetMsgFunc(DSS_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithCogVm_SetMsgFunc(DSS_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithCogVm_SetMsgFunc(DSS_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
+    sithCogVm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
     sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
     sithMulti_SetHandleridk(jkSaber_idk4);
     return 1;
@@ -77,11 +77,11 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    if (thing == g_localPlayerThing && !sithNet_isMulti) {
+    if (thing == sithPlayer_pLocalPlayerThing && !sithNet_isMulti) {
         material_tip_fname = "saberpurple0.mat";
         material_side_fname = "saberpurple1.mat";
     }
-    if (thing == g_localPlayerThing) {
+    if (thing == sithPlayer_pLocalPlayerThing) {
         //thing->jkFlags |= JKFLAG_DUALSABERS;
     }
 #endif
@@ -457,8 +457,8 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
 
 void jkSaber_playerconfig_idksync()
 {
-    jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
-    jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+    jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+    jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
     jkSaber_cogMsg_Sendx32(&playerThings[playerThingIdx]);
 
 
@@ -468,7 +468,7 @@ void jkSaber_playerconfig_idksync()
         NETMSG_PUSHVEC3(jkPlayer_waggleVec);
         NETMSG_PUSHF32(jkPlayer_waggleMag);
 
-        NETMSG_END(COGMSG_ID_36);
+        NETMSG_END(DSS_ID_36);
 
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
     }
@@ -494,7 +494,7 @@ void jkSaber_playerconfig_idksync()
         NETMSG_PUSHU16(jkHud_targetBlue);
         NETMSG_PUSHU16(jkHud_targetGreen);
         
-        NETMSG_END(COGMSG_HUDTARGET);
+        NETMSG_END(DSS_HUDTARGET);
         
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
     }
@@ -557,7 +557,7 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
         NETMSG_PUSHU32(thing->playerInfo->shields);
         NETMSG_PUSHU32(thing->playerInfo->field_224);
         
-        NETMSG_END(COGMSG_SABERINFO3);
+        NETMSG_END(DSS_SABERINFO3);
         
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
     }
@@ -627,7 +627,7 @@ void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
     NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
     NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
 
-    NETMSG_END(COGMSG_SABERINFO2);
+    NETMSG_END(DSS_SABERINFO2);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
 }
@@ -643,7 +643,7 @@ int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 && !sithNet_isServer )
+    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
         return 1;
 
     sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
@@ -657,7 +657,7 @@ int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
     NETMSG_POPSTR(material_side_fname, 0x20);
     NETMSG_POPSTR(material_tip_fname, 0x20);
 
-    if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 )
+    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
     {
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_20) != 0 )
             return 1;
@@ -683,7 +683,7 @@ int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
 
     if ( sithNet_isServer )
     {
-        if ( msg->netMsg.cogMsgId == COGMSG_SABERINFO1 )
+        if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
         {
             jkSaber_cogMsg_SendSetSaberInfo(v2);
         }
@@ -730,7 +730,7 @@ void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
         }
     }
 
-    NETMSG_END(COGMSG_ID_32);
+    NETMSG_END(DSS_ID_32);
     
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
 }
@@ -811,7 +811,7 @@ void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
     NETMSG_PUSHS16(playerThingIdx);
     NETMSG_PUSHS16(teamNum);
 
-    NETMSG_END(COGMSG_SETTEAM);
+    NETMSG_END(DSS_SETTEAM);
     
     if ( sithNet_isServer )
         jkSaber_cogMsg_HandleSetTeam(&sithCogVm_netMsgTmp);
@@ -873,7 +873,7 @@ void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
     NETMSG_PUSHS16(pPlayerInfo->maxTwinkles);
     NETMSG_PUSHS16(pPlayerInfo->twinkleSpawnRate);
 
-    NETMSG_END(COGMSG_JKSETWEAPONMESH);
+    NETMSG_END(DSS_JKSETWEAPONMESH);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
 }
@@ -921,7 +921,7 @@ void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
     NETMSG_PUSHF32(pPlayerInfo->field_1AC);
     NETMSG_PUSHF32(pPlayerInfo->field_1B0);
 
-    NETMSG_END(COGMSG_JKENABLESABER);
+    NETMSG_END(DSS_JKENABLESABER);
 
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
 }
@@ -960,7 +960,7 @@ void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2)
     {
         v2 = -1;
 LABEL_6:
-        NETMSG_END(COGMSG_JKPRINTUNISTRING);
+        NETMSG_END(DSS_JKPRINTUNISTRING);
 
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 255, 1);
         return;
@@ -992,7 +992,7 @@ void jkSaber_cogMsg_SendEndLevel()
     NETMSG_START;
 
     NETMSG_PUSHS32(jkEpisode_idk1(&jkEpisode_mLoad)->level);
-    NETMSG_END(COGMSG_ENDLEVEL);
+    NETMSG_END(DSS_ENDLEVEL);
 
     // lol
     sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
@@ -1017,7 +1017,7 @@ int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg)
 int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
 {
     return jkSaber_cogMsg_SendSaberInfo_alt(
-               g_localPlayerThing,
+               sithPlayer_pLocalPlayerThing,
                jkGuiMultiplayer_mpcInfo.model,
                jkGuiMultiplayer_mpcInfo.soundClass,
                jkGuiMultiplayer_mpcInfo.sideMat,
@@ -1036,7 +1036,7 @@ int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, c
     NETMSG_PUSHSTR(pSideMatStr, 0x20);
     NETMSG_PUSHSTR(pTipMatStr, 0x20);
 
-    NETMSG_END(COGMSG_SABERINFO1);
+    NETMSG_END(DSS_SABERINFO1);
 
     if ( sithNet_isServer )
         result = jkSaber_cogMsg_HandleSetSaberInfo(&sithCogVm_netMsgTmp);
@@ -1084,7 +1084,7 @@ int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
 
 int jkSaber_idk4()
 {
-    if ( g_localPlayerThing )
+    if ( sithPlayer_pLocalPlayerThing )
     {
         if ( sithNet_isServer )
         {
@@ -1092,7 +1092,7 @@ int jkSaber_idk4()
             {
                 sithCogVm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
                 sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithCogVm_netMsgTmp.netMsg.cogMsgId = COGMSG_ENDLEVEL;
+                sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
                 sithCogVm_netMsgTmp.netMsg.msg_size = 4;
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
                 sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
@@ -1100,8 +1100,8 @@ int jkSaber_idk4()
                 sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }
-        jkSaber_cogMsg_SendSetSaberInfo2(g_localPlayerThing);
-        jkSaber_cogMsg_SendSetSaberInfo(g_localPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
         return 1;
     }
     return 0;

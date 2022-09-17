@@ -128,7 +128,7 @@ void sithCogFunctionSector_SetTint(sithCog *ctx)
         sector->tint.z = v4;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSector_Sync(sector, 1);
+            sithSector_SyncSector(sector, 1);
         }
     }
 }
@@ -157,7 +157,7 @@ void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
         }
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSector_Sync(sector, 0);
+            sithSector_SyncSector(sector, 0);
         }
     }
 }
@@ -189,7 +189,7 @@ void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
             sector->extraLight = extraLight;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithSector_Sync(sector, 1);
+                sithSector_SyncSector(sector, 1);
             }
         }
         else
@@ -232,7 +232,7 @@ void sithCogFunctionSector_SetColormap(sithCog *ctx)
                 sector->colormap = &world->colormaps[colormap_idx];
                 if ( COG_SHOULD_SYNC(ctx) )
                 {
-                    sithSector_Sync(sector, 1);
+                    sithSector_SyncSector(sector, 1);
                 }
             }
         }
@@ -275,7 +275,7 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
         }
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithSector_Sync(sector, 1);
+            sithSector_SyncSector(sector, 1);
         }
     }
 }
@@ -290,7 +290,7 @@ void sithCogFunctionSector_SetSectorFlags(sithCog *ctx)
         sector->flags |= flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSector_Sync(sector, 0);
+            sithSector_SyncSector(sector, 0);
         }
     }
 }
@@ -305,7 +305,7 @@ void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx)
         sector->flags &= ~flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithSector_Sync(sector, 0);
+            sithSector_SyncSector(sector, 0);
         }
     }
 }
@@ -421,5 +421,5 @@ void sithCogFunctionSector_SyncSector(sithCog *ctx)
 
     v1 = sithCogVm_PopSector(ctx);
     if ( v1 )
-        sithSector_Sync(v1, 1);
+        sithSector_SyncSector(v1, 1);
 }

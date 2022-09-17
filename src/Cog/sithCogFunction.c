@@ -222,7 +222,7 @@ void sithCogFunction_StopAnim(sithCog *ctx)
     {
         sithSurface_StopAnim(v2);
         if ( sithCogVm_multiplayerFlags )
-            sithDSS_SendStopAnim(v2, -1, 255); // TODO ??
+            sithDSS_SendSurface(v2, -1, 255); // TODO ??
     }
 }
 
@@ -239,7 +239,7 @@ void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
         {
             sithSurface_StopAnim(v2);
             if ( sithCogVm_multiplayerFlags )
-                sithDSS_SendStopAnim(v2, -1, 255); // TODO ??
+                sithDSS_SendSurface(v2, -1, 255); // TODO ??
         }
     }
 }
@@ -495,7 +495,7 @@ void sithCogFunction_SendMessage(sithCog *ctx)
     int msgId = sithCogVm_PopInt(ctx);
     sithCog* cog = sithCogVm_PopCog(ctx);
 
-    if (cog && msgId >= 0 && msgId < COGMSG_ENUMPLAYERS)
+    if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
         sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0);
 }
 
@@ -508,7 +508,7 @@ void sithCogFunction_SendMessageEx(struct sithCog *ctx)
     int msgId = sithCogVm_PopInt(ctx);
     sithCog* cog = sithCogVm_PopCog(ctx);
 
-    if (cog && msgId >= 0 && msgId < COGMSG_ENUMPLAYERS)
+    if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
     {
         float flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0, param0, param1, param2, param3);
         sithCogVm_PushFlex(ctx, flexRet);
@@ -841,7 +841,7 @@ void sithCogFunction_SetCurrentCamera(sithCog *ctx)
     if (camIdx == 7)
     {
         camIdx = 0;
-        sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], g_localPlayerThing, 0);
+        sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], sithPlayer_pLocalPlayerThing, 0);
     }
 #endif
 
@@ -1060,7 +1060,7 @@ void sithCogFunction_AddDynamicTint(sithCog *ctx)
     fG = sithCogVm_PopFlex(v1);
     fR = sithCogVm_PopFlex(v1);
     player = sithCogVm_PopThing(v1);
-    if ( player && player->type == SITH_THING_PLAYER && player == g_localPlayerThing )
+    if ( player && player->type == SITH_THING_PLAYER && player == sithPlayer_pLocalPlayerThing )
         sithPlayer_AddDynamicTint(fR, fG, fB);
 }
 
@@ -1075,7 +1075,7 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
     g = sithCogVm_PopInt(ctx);
     r = sithCogVm_PopInt(ctx);
     playerThing = sithCogVm_PopThing(ctx);
-    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == g_localPlayerThing )
+    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == sithPlayer_pLocalPlayerThing )
         sithPlayer_AddDyamicAdd(r, g, b);
 }
 
@@ -1151,14 +1151,14 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             {
                 if ( playerinfo->flags & 1 )
                 {
-                    if ( sourceThing == g_localPlayerThing )
-                        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, g_localPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+                    if ( sourceThing == sithPlayer_pLocalPlayerThing )
+                        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
                     else
                         sithDSSCog_SendSendTrigger(
                             0,
                             SITH_MESSAGE_TRIGGER,
                             SENDERTYPE_THING,
-                            g_localPlayerThing->thingIdx,
+                            sithPlayer_pLocalPlayerThing->thingIdx,
                             0,
                             sourceType,
                             0,
@@ -1177,7 +1177,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             0,
             SITH_MESSAGE_TRIGGER,
             SENDERTYPE_THING,
-            g_localPlayerThing->thingIdx,
+            sithPlayer_pLocalPlayerThing->thingIdx,
             0,
             sourceType,
             0,
@@ -1186,7 +1186,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             arg2,
             arg3,
             -1);
-        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, g_localPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+        sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
     }
 }
 
@@ -1223,7 +1223,7 @@ void sithCogFunction_SetFireWait(sithCog *ctx)
     float fireRate = sithCogVm_PopFlex(ctx);
     sithThing* weapon = sithCogVm_PopThing(ctx);
 
-    if ( weapon && weapon == g_localPlayerThing && fireRate >= -1.0 )
+    if ( weapon && weapon == sithPlayer_pLocalPlayerThing && fireRate >= -1.0 )
         sithWeapon_SetFireWait(weapon, fireRate);
 }
 
@@ -1232,7 +1232,7 @@ void sithCogFunction_SetMountWait(sithCog *ctx)
     float mountWait = sithCogVm_PopFlex(ctx);
     sithThing* weapon = sithCogVm_PopThing(ctx);
 
-    if ( weapon && weapon == g_localPlayerThing && mountWait >= -1.0 )
+    if ( weapon && weapon == sithPlayer_pLocalPlayerThing && mountWait >= -1.0 )
         sithWeapon_SetMountWait(weapon, mountWait);
 }
 
@@ -1437,7 +1437,7 @@ void sithCogFunction_ChangeFireRate(sithCog *ctx)
     float fireRate = sithCogVm_PopFlex(ctx);
     sithThing* player = sithCogVm_PopThing(ctx);
 
-    if ( player && player == g_localPlayerThing && fireRate > 0.0 )
+    if ( player && player == sithPlayer_pLocalPlayerThing && fireRate > 0.0 )
         sithWeapon_SetFireRate(player, fireRate);
 }
 

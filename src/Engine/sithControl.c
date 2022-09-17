@@ -209,9 +209,9 @@ void sithControl_Tick(float deltaSecs, int deltaMs)
     if ( !sithControl_bOpened )
         return;
 
-    if ( !g_localPlayerThing
-      || (SITH_AF_NOHUD & g_localPlayerThing->actorParams.typeflags) != 0
-      || (g_localPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
+    if ( !sithPlayer_pLocalPlayerThing
+      || (SITH_AF_NOHUD & sithPlayer_pLocalPlayerThing->actorParams.typeflags) != 0
+      || (sithPlayer_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_state & 1) != 0 )
     {
         if ( sithCamera_currentCamera == &sithCamera_cameras[4] )

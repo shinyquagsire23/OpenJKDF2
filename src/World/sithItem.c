@@ -34,7 +34,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
 {
     if ( !sithNet_isMulti || a3 )
     {
-        if ( actor == g_localPlayerThing )
+        if ( actor == sithPlayer_pLocalPlayerThing )
         {
             sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
         }
@@ -88,7 +88,7 @@ void sithItem_Remove(sithThing *item)
     if ( sithCogVm_multiplayerFlags )
     {
         sithDSSThing_SendSyncThing(item, -1, 255);
-        sithDSSThing_SendTeleportThing(item, -1, 1);
+        sithDSSThing_SendPos(item, -1, 1);
     }
 }
 

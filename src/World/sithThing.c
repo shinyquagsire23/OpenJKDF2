@@ -798,14 +798,14 @@ void sithThing_EnterWater(sithThing *thing, int a2)
             else
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_ENTERWATER);
         }
-        v4 = g_localPlayerThing;
-        if ( g_localPlayerThing && (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+        v4 = sithPlayer_pLocalPlayerThing;
+        if ( sithPlayer_pLocalPlayerThing && (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
         {
-            v5 = g_localPlayerThing->class_cog;
+            v5 = sithPlayer_pLocalPlayerThing->class_cog;
             if ( v5 )
             {
                 sithCog_SendMessage(v5, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, thing->thingIdx, 0, 1, 0);
-                v4 = g_localPlayerThing;
+                v4 = sithPlayer_pLocalPlayerThing;
             }
             v6 = v4->capture_cog;
             if ( v6 )
@@ -838,18 +838,18 @@ void sithThing_ExitWater(sithThing *thing, int a2)
     }
     else if ( !a2 )
     {
-        if ( g_localPlayerThing )
+        if ( sithPlayer_pLocalPlayerThing )
         {
             if ( (thing->thingflags & SITH_TF_SPLASHES) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
             {
-                if ( g_localPlayerThing->class_cog )
+                if ( sithPlayer_pLocalPlayerThing->class_cog )
                 {
-                    sithCog_SendMessage(g_localPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
                 }
 
-                if ( g_localPlayerThing->capture_cog )
+                if ( sithPlayer_pLocalPlayerThing->capture_cog )
                 {
-                    sithCog_SendMessage(g_localPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, thing->thingIdx, 0, 0, 0);
                 }
             }
         }
@@ -1912,90 +1912,65 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
     return hash;
 }
 
-void sithThing_SetSyncFlags(sithThing *thing, int a2)
+void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 {
-    unsigned int v3; // eax
-    sithThing **v4; // ecx
+    if (!sithCogVm_multiplayerFlags) return;
 
-    if ( sithCogVm_multiplayerFlags )
+    for (uint32_t v3 = 0; v3 < sithNet_syncIdx; v3++)
     {
-        v3 = 0;
-        if ( sithNet_syncIdx )
-        {
-            v4 = sithNet_aSyncThings;
-            while ( *v4 != thing )
-            {
-                ++v3;
-                ++v4;
-                if ( v3 >= sithNet_syncIdx )
-                    goto LABEL_6;
-            }
-            sithNet_aSyncFlags[v3] |= a2;
+        if (sithNet_aSyncThings[v3] == pThing) {
+            sithNet_aSyncFlags[v3] |= flags;
+            return;
         }
-        else
-        {
-LABEL_6:
-            if ( sithNet_syncIdx < SITH_MAX_SYNC_THINGS ) // Added: != -> <
-            {
-                sithNet_aSyncThings[sithNet_syncIdx] = thing;
-                sithNet_aSyncFlags[sithNet_syncIdx] = a2;
-                sithNet_syncIdx++;
-            }
-        }
+    }
+
+    if ( sithNet_syncIdx < SITH_MAX_SYNC_THINGS ) // Added: != -> <
+    {
+        sithNet_aSyncThings[sithNet_syncIdx] = pThing;
+        sithNet_aSyncFlags[sithNet_syncIdx] = flags;
+        sithNet_syncIdx++;
     }
 }
 
-void sithThing_netidk()
+void sithThing_Sync()
 {
-    int v0; // esi
+    uint32_t v0; // esi
     int v1; // eax
 
-    v0 = 0;
-    if ( sithNet_syncIdx )
+
+    for (v0 = 0; v0 < sithNet_syncIdx; v0++)
     {
-        while ( 1 )
+        v1 = sithNet_aSyncFlags[v0];
+        if ( (v1 & THING_SYNC_FULL) != 0 )
         {
-            v1 = sithNet_aSyncFlags[v0];
-            if ( (v1 & THING_SYNC_FULL) != 0 )
-            {
-                // Added: this used to be outside the loop?
-                sithDSSThing_SendSyncThingFull(sithNet_aSyncThings[v0], -1, 255);
-
-                // Added: Co-op
-                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
-                    if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
-                        sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1); // Added
-
-                    //if (sithNet_aSyncThings[v0]->rdthing.puppet)
-                    //    sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
-                }
-            }
-            else
-            {
-                if ( (v1 & THING_SYNC_STATE) != 0 )
-                    sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
-
-                if ( (sithNet_aSyncFlags[v0] & THING_SYNC_POS) != 0 )
-                    sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
-
-                // Added: Co-op
-                if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
-                    if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
-                        sithDSS_SendSyncAI(sithNet_aSyncThings[v0]->actor, -1, 1); // Added
-                }
-            }
-            if ( ++v0 >= (unsigned int)sithNet_syncIdx )
-            {
-                sithNet_syncIdx = 0;
-                return;
-            }
+            // Added: this used to be outside the loop?
+            sithDSSThing_SendFullDesc(sithNet_aSyncThings[v0], -1, 255);
+            //return; // Removed, this used to stop the loop.
         }
-        
+        else
+        {
+            if ( (v1 & THING_SYNC_STATE) != 0 )
+                sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
+
+            if ( (sithNet_aSyncFlags[v0] & THING_SYNC_POS) != 0 )
+                sithDSSThing_SendPos(sithNet_aSyncThings[v0], -1, 0);
+        }
+
+        // Added: Co-op
+        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 8)) {
+            if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
+                sithDSS_SendAIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
+        }
+
+        // Added: Co-op
+        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & 0x10)) {
+            if (sithNet_aSyncThings[v0]->rdthing.puppet)
+                sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+        }
     }
-    else
-    {
-        sithNet_syncIdx = 0;
-    }
+
+    sithNet_syncIdx = 0;
+    return;
 }
 
 int sithThing_ShouldSync(sithThing *thing)

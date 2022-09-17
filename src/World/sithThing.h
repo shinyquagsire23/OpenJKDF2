@@ -53,7 +53,7 @@
 #define sithThing_GetIdxFromThing_ADDR (0x004CF380)
 #define sithThing_Checksum_ADDR (0x004CF3C0)
 #define sithThing_SetSyncFlags_ADDR (0x004CF560)
-#define sithThing_netidk_ADDR (0x004CF5D0)
+#define sithThing_Sync_ADDR (0x004CF5D0)
 #define sithThing_ShouldSync_ADDR (0x004CF660)
 #define sithThing_netidk2_ADDR (0x004CF690)
 #define sithThing_Release_ADDR (0x004E0740)
@@ -324,6 +324,7 @@ enum THING_SYNC_FLAGS
 
     // Added
     THING_SYNC_AI = 8,
+    THING_SYNC_PUPPET = 0x10,
 
     // Helper
     THING_SYNC_ALL = 0xFF,
@@ -367,11 +368,11 @@ void sithThing_Destroy(sithThing *thing);
 float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
 void sithThing_detachallchildren(sithThing *thing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
-void sithThing_SetSyncFlags(sithThing *thing, int a2);
+void sithThing_SetSyncFlags(sithThing *pThing, int flags);
 int sithThing_ShouldSync(sithThing *thing);
 sithThing* sithThing_GetById(int thing_id);
 int sithThing_HasAttachment(sithThing *thing);
-void sithThing_netidk();
+void sithThing_Sync();
 int sithThing_Release(sithThing *pThing);
 
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;

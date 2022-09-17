@@ -277,7 +277,7 @@ void sithCogFunctionThing_MoveToFrame(sithCog *ctx)
         sithTrackThing_MoveToFrame(thing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 0, -1, 255);
+            sithDSSThing_SendPathMove(thing, frame, speed, 0, -1, 255);
     }
 }
 
@@ -294,7 +294,7 @@ void sithCogFunctionThing_SkipToFrame(sithCog *ctx)
         sithTrackThing_SkipToFrame(thing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, frame, speed, 1, -1, 255);
+            sithDSSThing_SendPathMove(thing, frame, speed, 1, -1, 255);
     }
 }
 
@@ -461,7 +461,7 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
     {
         sithTrackThing_Stop(thing);
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendSyncThingFrame(thing, 0, 0.0, 2, -1, 255);
+            sithDSSThing_SendPathMove(thing, 0, 0.0, 2, -1, 255);
     }
     else if (thing->moveType == SITH_MT_PHYSICS)
     {
@@ -591,7 +591,7 @@ void sithCogFunctionThing_SetThingPos(sithCog *ctx)
         rdVector_Copy3(&thing->position, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendPos(thing, -1, 1);
         }
         sithCogVm_PushInt(ctx, 1);
     }
@@ -1066,12 +1066,12 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
         if (thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.physflags & SITH_PF_FLOORSTICK)
             sithPhysics_FindFloor(thing, 1);
 
-        if ( thing == g_localPlayerThing )
+        if ( thing == sithPlayer_pLocalPlayerThing )
             sithCamera_FollowFocus(sithCamera_currentCamera);
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendPos(thing, -1, 1);
         }
     }
 }

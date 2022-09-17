@@ -40,6 +40,15 @@
 #define MULTI_BIG_UPDATE_INTERVAL_MS (60)
 #endif
 
+// UI tickrate limits
+#ifdef QOL_IMPROVEMENTS
+#define TICKRATE_MIN (1)
+#define TICKRATE_MAX (1000)
+#else
+#define TICKRATE_MIN (100)
+#define TICKRATE_MAX (300)
+#endif
+
 // Run game physics at a fixed timestep
 #define FIXED_TIMESTEP_PHYS
 

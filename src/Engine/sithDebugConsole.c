@@ -624,7 +624,7 @@ int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     result = _sscanf(pArgStr, "%d", &pArgStr);
     if ( result )
     {
-        sithPlayerActions_WarpToCheckpoint(g_localPlayerThing, (int)(pArgStr - 1));
+        sithPlayerActions_WarpToCheckpoint(sithPlayer_pLocalPlayerThing, (int)(pArgStr - 1));
         result = 1;
     }
     return result;

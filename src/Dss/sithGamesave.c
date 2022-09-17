@@ -200,7 +200,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
         if ( sithThing_ShouldSync(v4) )
         {
-            sithDSSThing_SendSyncThingFull(v4, 0, mpFlags);
+            sithDSSThing_SendFullDesc(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
                 sithDSS_SendSyncPuppet(v4, 0, mpFlags);
         }
@@ -222,7 +222,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
     for (uint32_t i = 0; i < 256; i++) // TODO define this maximum
     {
         if ( sithAI_actors[i].aiclass )
-            sithDSS_SendSyncAI(&sithAI_actors[i], 0, mpFlags);
+            sithDSS_SendAIStatus(&sithAI_actors[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
@@ -240,21 +240,21 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSurfaces; i++)
     {
-        sithDSS_SendSyncSurface(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SendSurfaceStatus(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SendSyncSector(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
+        sithDSS_SendSectorStatus(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
         if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_SendSyncItemDesc(g_localPlayerThing, v19, 0, mpFlags);
+            sithDSS_SendInventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
     }
 
-    sithSurface_Sync(mpFlags);
+    sithSurface_SyncFull(mpFlags);
 
     for (sithEvent* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
         sithDSS_SendSyncEvents(timerIter, 0, mpFlags);
@@ -279,7 +279,7 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
 
     if ( (g_submodeFlags & 1) != 0 )
         return 0;
-    if ( (g_localPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
+    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
     v5 = saveName;
     if ( !saveName )
@@ -306,10 +306,10 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_headerTmp.jklName[127] = 0;
         _wcsncpy(sithGamesave_headerTmp.saveName, v5, 0xFFu);
         sithGamesave_headerTmp.saveName[255] = 0;
-        sithGamesave_headerTmp.playerHealth = g_localPlayerThing->actorParams.health;
-        sithGamesave_headerTmp.playerMaxHealth = g_localPlayerThing->actorParams.maxHealth;
+        sithGamesave_headerTmp.playerHealth = sithPlayer_pLocalPlayerThing->actorParams.health;
+        sithGamesave_headerTmp.playerMaxHealth = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
         v7 = sithGamesave_headerTmp.binAmts;
-        v8 = g_selfPlayerInfo->iteminfo;
+        v8 = sithPlayer_pLocalPlayer->iteminfo;
         do
         {
             v9 = v8->ammoAmt;
@@ -349,7 +349,7 @@ int sithGamesave_WriteEntry()
             return sithGamesave_dword_835900 - 3;
         if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
         {
-            sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
+            sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
             sithGamesave_dword_835900 = 0;
             return 1;
         }
@@ -358,7 +358,7 @@ int sithGamesave_WriteEntry()
         sithGamesave_dword_835900 = 0;
         return 1;
     }
-    if ( (g_localPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
+    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
     {
         int multiplayerFlagsSave = sithCogVm_multiplayerFlags;
         sithCogVm_multiplayerFlags = 4;

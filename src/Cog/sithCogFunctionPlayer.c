@@ -113,8 +113,8 @@ void sithCogFunctionPlayer_GetAbsoluteMaxPlayers(sithCog *ctx)
 
 void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *ctx)
 {
-    if ( g_localPlayerThing )
-        sithCogVm_PushInt(ctx, g_localPlayerThing->thingIdx);
+    if ( sithPlayer_pLocalPlayerThing )
+        sithCogVm_PushInt(ctx, sithPlayer_pLocalPlayerThing->thingIdx);
     else
         sithCogVm_PushInt(ctx, -1);
 }

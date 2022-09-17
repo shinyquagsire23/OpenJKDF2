@@ -499,7 +499,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
                 return 0;
             pThing->actorParams.field_1BC = sithTime_curMs + sound->sound_len;
         }
-        if ( pThing == g_localPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->thingtype == SITH_THING_PLAYER) // Added: third comparison, co-op
+        if ( pThing == sithPlayer_pLocalPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->thingtype == SITH_THING_PLAYER) // Added: third comparison, co-op
         {
             sithAIAwareness_AddEntry(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
         }
@@ -1154,7 +1154,7 @@ void sithSoundMixer_SyncSounds()
             if ( sound )
             {
                 if (iter->flags & SITHSOUNDFLAG_LOOP)
-                    sithDSSThing_SendPlaySoundPos(
+                    sithDSSThing_SendPlaySound(
                         iter->thing,
                         &iter->pos,
                         sound,

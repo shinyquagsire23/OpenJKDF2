@@ -619,7 +619,7 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
     if ( sithDplay_dword_8321E0 && (g_submodeFlags & 8) != 0 )
     {
         v1 = stdPlatform_GetTimeMsec();
-        if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendRequestConnect(sithNet_serverNetId)) )
+        if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendJoinRequest(sithNet_serverNetId)) )
         {
             sithCogVm_Sync();
             if ( (g_submodeFlags & 8) == 0 )

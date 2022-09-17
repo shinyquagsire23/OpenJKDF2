@@ -428,9 +428,6 @@ void sith_SetEpisodeName(char *text)
 
 void sith_AutoSave()
 {
-    sithWorld *v0; // ecx
-    unsigned int v1; // ebx
-    int v2; // edi
     sithThing *v3; // esi
     sithCog *v4; // eax
     char v5[128]; // [esp+10h] [ebp-80h] BYREF
@@ -441,44 +438,33 @@ void sith_AutoSave()
 #endif
 
     sithTime_Startup();
-    sithInventory_Reset(g_localPlayerThing);
+    sithInventory_Reset(sithPlayer_pLocalPlayerThing);
 
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
-    v0 = sithWorld_pCurrentWorld;
-    v1 = 0;
-    if ( sithWorld_pCurrentWorld->numThingsLoaded )
+    for (uint32_t v2 = 0; v2 < sithWorld_pCurrentWorld->numThingsLoaded; v2++)
     {
-        v2 = 0;
-        do
+        v3 = &sithWorld_pCurrentWorld->things[v2];
+        v4 = v3->class_cog;
+        if ( v4 )
         {
-            v3 = &v0->things[v2];
-            v4 = v3->class_cog;
-            if ( v4 )
-            {
-                sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
-                v0 = sithWorld_pCurrentWorld;
-            }
-            if ( v3->type == SITH_THING_ACTOR )
-            {
-                sithActor_SetMaxHeathForDifficulty(v3);
-                v0 = sithWorld_pCurrentWorld;
-            }
-            ++v1;
-            ++v2;
+            sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
         }
-        while ( v1 < v0->numThingsLoaded );
+        if ( v3->type == SITH_THING_ACTOR )
+        {
+            sithActor_SetMaxHeathForDifficulty(v3);
+        }
     }
 
     if ( sithNet_isMulti )
     {
-        sithPlayer_debug_ToNextCheckpoint(g_localPlayerThing);
-        sithMulti_sendmsgidk3(sithDplay_dplayIdSelf, playerThingIdx, -1);
-        sithMulti_sendmsgidk3(sithDplay_dplayIdSelf, playerThingIdx, -1);
+        sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
+        sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
+        sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();
     }
     else
     {
-        stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", v0->map_jkl_fname);
+        stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
         stdFnames_ChangeExt(v5, "jks");
         sithGamesave_Write(v5, 1, 0, 0);
         sithTime_Startup();
