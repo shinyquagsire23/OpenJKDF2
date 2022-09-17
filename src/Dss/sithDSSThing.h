@@ -4,8 +4,8 @@
 #include "types.h"
 #include "globals.h"
 
-#define sithDSSThing_SendTeleportThing_ADDR (0x004F3120)
-#define sithDSSThing_ProcessTeleportThing_ADDR (0x004F3270)
+#define sithDSSThing_SendPos_ADDR (0x004F3120)
+#define sithDSSThing_ProcessPos_ADDR (0x004F3270)
 #define sithDSSThing_SendSyncThing_ADDR (0x004F3420)
 #define sithDSSThing_ProcessSyncThing_ADDR (0x004F35E0)
 #define sithDSSThing_SendPlaySoundPos_ADDR (0x004F37B0)
@@ -42,8 +42,8 @@
 #define sithDSSThing_ProcessDestroyThing_ADDR (0x004F5410)
 #define sithSector_TransitionMovingThing_ADDR (0x004F5440)
 
-void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync);
-int sithDSSThing_ProcessTeleportThing(sithCogMsg *msg);
+void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync);
+int sithDSSThing_ProcessPos(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessSyncThing(sithCogMsg *msg);

@@ -46,7 +46,7 @@ extern "C" {
 
 enum DSS_ID
 {
-    DSS_TELEPORTTHING  = 1,
+    DSS_THINGPOS  = 1,
     DSS_CHAT      = 2,
     DSS_SYNCSECTORALT  = 3,
     DSS_FIREPROJECTILE  = 4,

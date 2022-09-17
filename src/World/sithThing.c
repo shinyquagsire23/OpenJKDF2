@@ -1953,7 +1953,7 @@ void sithThing_Sync()
                 sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
 
             if ( (sithNet_aSyncFlags[v0] & THING_SYNC_POS) != 0 )
-                sithDSSThing_SendTeleportThing(sithNet_aSyncThings[v0], -1, 0);
+                sithDSSThing_SendPos(sithNet_aSyncThings[v0], -1, 0);
         }
 
         // Added: Co-op

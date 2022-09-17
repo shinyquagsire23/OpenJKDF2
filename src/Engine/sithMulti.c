@@ -723,7 +723,7 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
     wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
     if ( sithWorld_pCurrentWorld && g_localPlayerThing && (g_submodeFlags & 8) == 0 )
-        sithDSSThing_SendTeleportThing(g_localPlayerThing, -1, 0);
+        sithDSSThing_SendPos(g_localPlayerThing, -1, 0);
     if ( sithNet_isServer )
     {
         v0 = 1;
@@ -1467,7 +1467,7 @@ LABEL_30:
                         else
                             sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
 
-                        sithDSSThing_SendTeleportThing(v14, sithMulti_sendto_id, 0);
+                        sithDSSThing_SendPos(v14, sithMulti_sendto_id, 0);
 
                         // Added: co-op
                         if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {

@@ -1340,8 +1340,8 @@ void do_hooks()
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
 
     // sithDSSThing
-    hook_function(sithDSSThing_SendTeleportThing_ADDR, sithDSSThing_SendTeleportThing);
-    hook_function(sithDSSThing_ProcessTeleportThing_ADDR, sithDSSThing_ProcessTeleportThing);
+    hook_function(sithDSSThing_SendPos_ADDR, sithDSSThing_SendPos);
+    hook_function(sithDSSThing_ProcessPos_ADDR, sithDSSThing_ProcessPos);
 
 #if 0
     hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);

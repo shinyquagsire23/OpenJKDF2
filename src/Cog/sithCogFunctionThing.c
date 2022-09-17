@@ -591,7 +591,7 @@ void sithCogFunctionThing_SetThingPos(sithCog *ctx)
         rdVector_Copy3(&thing->position, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendPos(thing, -1, 1);
         }
         sithCogVm_PushInt(ctx, 1);
     }
@@ -1071,7 +1071,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendTeleportThing(thing, -1, 1);
+            sithDSSThing_SendPos(thing, -1, 1);
         }
     }
 }

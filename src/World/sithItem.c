@@ -88,7 +88,7 @@ void sithItem_Remove(sithThing *item)
     if ( sithCogVm_multiplayerFlags )
     {
         sithDSSThing_SendSyncThing(item, -1, 255);
-        sithDSSThing_SendTeleportThing(item, -1, 1);
+        sithDSSThing_SendPos(item, -1, 1);
     }
 }
 

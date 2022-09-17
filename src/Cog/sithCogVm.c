@@ -33,7 +33,7 @@ int sithCogVm_Startup()
     _memset(sithCogVm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithCogVm_dword_847E84 = 0;
     sithCogVm_msgId = 1;
-    sithCogVm_msgFuncs[DSS_TELEPORTTHING] = sithDSSThing_ProcessTeleportThing;
+    sithCogVm_msgFuncs[DSS_THINGPOS] = sithDSSThing_ProcessPos;
     sithCogVm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFireProjectile;
     sithCogVm_msgFuncs[DSS_REQUESTCONNECT] = sithMulti_ProcessRequestConnect;
     sithCogVm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessJoinLeave;

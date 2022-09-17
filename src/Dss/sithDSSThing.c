@@ -18,7 +18,7 @@
 #include "World/sithTrackThing.h"
 #include "jk.h"
 
-void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
+void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync)
 {
     rdVector3 lookOrientation; // [esp+4h] [ebp-Ch] BYREF
 
@@ -48,13 +48,13 @@ void sithDSSThing_SendTeleportThing(sithThing *pThing, int sendto_id, int bSync)
         if ( pThing->type == SITH_THING_PLAYER )
             NETMSG_PUSHF32(pThing->actorParams.eyePYR.x);
 
-        NETMSG_END(DSS_TELEPORTTHING);
+        NETMSG_END(DSS_THINGPOS);
 
         sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 255, bSync);
     }
 }
 
-int sithDSSThing_ProcessTeleportThing(sithCogMsg *msg)
+int sithDSSThing_ProcessPos(sithCogMsg *msg)
 {
     rdVector3 lookTmp; // [esp+10h] [ebp-18h] BYREF
     rdVector3 pos; // [esp+1Ch] [ebp-Ch] BYREF
@@ -67,7 +67,7 @@ int sithDSSThing_ProcessTeleportThing(sithCogMsg *msg)
     int thing_id = NETMSG_POPS32();
 
     sithThing* pThing = sithThing_GetById(thing_id);
-    //printf("sithDSSThing_ProcessTeleportThing %x %x\n", thing_id, pThing->thingtype);
+    //printf("sithDSSThing_ProcessPos %x %x\n", thing_id, pThing->thingtype);
     if ( !pThing || pThing->type == SITH_THING_FREE || !pThing->sector )
         return 0;
     uint16_t attach_flags = NETMSG_POPU16();
