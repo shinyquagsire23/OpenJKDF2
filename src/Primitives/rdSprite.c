@@ -3,7 +3,7 @@
 #include "General/stdMath.h"
 #include "General/stdString.h"
 #include "Engine/rdroid.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"

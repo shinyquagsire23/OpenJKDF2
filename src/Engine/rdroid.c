@@ -1,8 +1,8 @@
 #include "rdroid.h"
 
 #include "Raster/rdRaster.h"
-#include "rdActive.h"
-#include "rdCache.h"
+#include "Engine/rdActive.h"
+#include "Raster/rdCache.h"
 #include "Primitives/rdModel3.h"
 #include "General/stdPalEffects.h"
 #include "Engine/rdCamera.h"

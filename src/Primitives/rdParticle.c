@@ -4,7 +4,7 @@
 #include "stdPlatform.h"
 #include "General/stdConffile.h"
 #include "jk.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdClip.h"
 #include "Win95/std.h"
 

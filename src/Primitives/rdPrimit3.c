@@ -1,6 +1,6 @@
 #include "rdPrimit3.h"
 
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "Primitives/rdPrimit2.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdClip.h"

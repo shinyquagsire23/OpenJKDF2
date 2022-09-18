@@ -12,7 +12,7 @@ extern "C" {
 #include "Engine/rdCamera.h"
 #include "Engine/sithCamera.h"
 #include "General/stdPalEffects.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 
 // HACK: Fix macOS x86_64
 #define SDL_cpuinfo_h_

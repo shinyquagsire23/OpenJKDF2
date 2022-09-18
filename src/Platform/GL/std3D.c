@@ -1,6 +1,6 @@
 #include "Platform/std3D.h"
 
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
 #include "World/sithWorld.h"

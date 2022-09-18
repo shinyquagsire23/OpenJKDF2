@@ -6,7 +6,7 @@
 #include "World/sithTemplate.h"
 #include "World/sithMaterial.h"
 #include "Devices/sithSound.h"
-#include "Engine/rdCache.h" // rdTri
+#include "Raster/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
 #include "Cog/sithCogScript.h"
 #include "Engine/sithKeyFrame.h"

@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "globals.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 
 #define sithSurface_UnsetAdjoins_ADDR (0x004E5A10)
 #define sithSurface_SetAdjoins_ADDR (0x004E5A30)

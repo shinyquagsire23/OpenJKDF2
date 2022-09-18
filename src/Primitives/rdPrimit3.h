@@ -3,9 +3,9 @@
 
 #include "Engine/rdCamera.h"
 #include "Primitives/rdModel3.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "Primitives/rdVector.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 
 #define rdPrimit3_ClearFrameCounters_ADDR (0x00446F50)
 #define rdPrimit3_GetScreenCoord_ADDR (0x00446F60)

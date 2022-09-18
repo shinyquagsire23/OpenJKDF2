@@ -3,7 +3,7 @@
 #include "General/stdPalEffects.h"
 #include "Main/sithMain.h"
 #include "Engine/rdroid.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithNet.h"
 #include "World/sithWorld.h"

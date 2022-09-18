@@ -5,7 +5,7 @@
 #include "globals.h"
 
 #include "Primitives/rdVector.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "Engine/rdMaterial.h"
 #include "Primitives/rdMatrix.h"
 

@@ -2,7 +2,7 @@
 
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "World/sithThing.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
@@ -17,7 +17,7 @@
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
 #include "Engine/sithRender.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithKeyFrame.h"
 #include "World/sithMaterial.h"

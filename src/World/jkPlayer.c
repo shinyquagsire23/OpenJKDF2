@@ -9,7 +9,7 @@
 #include "Engine/rdPuppet.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithCamera.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdroid.h"
