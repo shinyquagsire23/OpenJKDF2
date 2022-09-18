@@ -6,7 +6,7 @@
 #include "types.h"
 
 #include "Cog/sithCog.h"
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Cog/jkCog.h"
 #include "Cog/sithCogYACC.h"
 #include "Cog/sithCogFunction.h"
@@ -543,33 +543,33 @@ void do_hooks()
     hook_function(sithComm_cogMsg_Reset_ADDR, sithComm_cogMsg_Reset);
 
     // sithCogVm
-    hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
-    hook_function(sithCogVm_ExecCog_ADDR, sithCogVm_ExecCog);
-    hook_function(sithCogVm_PopValue_ADDR, sithCogVm_PopValue);
-    hook_function(sithCogVm_PopFlex_ADDR, sithCogVm_PopFlex);
-    hook_function(sithCogVm_PopInt_ADDR, sithCogVm_PopInt);
-    hook_function(sithCogVm_PopSymbolIdx_ADDR, sithCogVm_PopSymbolIdx);
-    hook_function(sithCogVm_PopVector3_ADDR, sithCogVm_PopVector3);
-    hook_function(sithCogVm_PopCog_ADDR, sithCogVm_PopCog);
-    hook_function(sithCogVm_PopThing_ADDR, sithCogVm_PopThing);
-    hook_function(sithCogVm_PopTemplate_ADDR, sithCogVm_PopTemplate);
-    hook_function(sithCogVm_PopSound_ADDR, sithCogVm_PopSound);
-    hook_function(sithCogVm_PopSector_ADDR, sithCogVm_PopSector);
-    hook_function(sithCogVm_PopSurface_ADDR, sithCogVm_PopSurface);
-    hook_function(sithCogVm_PopMaterial_ADDR, sithCogVm_PopMaterial);
-    hook_function(sithCogVm_PopModel3_ADDR, sithCogVm_PopModel3);
-    hook_function(sithCogVm_PopKeyframe_ADDR, sithCogVm_PopKeyframe);
-    hook_function(sithCogVm_PopString_ADDR, sithCogVm_PopString);
-    hook_function(sithCogVm_PushVar_ADDR, sithCogVm_PushVar);
-    hook_function(sithCogVm_PushInt_ADDR, sithCogVm_PushInt);
-    hook_function(sithCogVm_PushFlex_ADDR, sithCogVm_PushFlex);
-    hook_function(sithCogVm_PushVector3_ADDR, sithCogVm_PushVector3);
-    hook_function(sithCogVm_PopProgramVal_ADDR, sithCogVm_PopProgramVal);
-    hook_function(sithCogVm_ResetStack_ADDR, sithCogVm_ResetStack);
-    hook_function(sithCogVm_Call_ADDR, sithCogVm_Call);
-    hook_function(sithCogVm_Ret_ADDR, sithCogVm_Ret);
-    hook_function(sithCogVm_PopStackVar_ADDR, sithCogVm_PopStackVar);
-    hook_function(sithCogVm_AssignStackVar_ADDR, sithCogVm_AssignStackVar);
+    hook_function(sithCogExec_Exec_ADDR, sithCogExec_Exec);
+    hook_function(sithCogExec_ExecCog_ADDR, sithCogExec_ExecCog);
+    hook_function(sithCogExec_PopValue_ADDR, sithCogExec_PopValue);
+    hook_function(sithCogExec_PopFlex_ADDR, sithCogExec_PopFlex);
+    hook_function(sithCogExec_PopInt_ADDR, sithCogExec_PopInt);
+    hook_function(sithCogExec_PopSymbolIdx_ADDR, sithCogExec_PopSymbolIdx);
+    hook_function(sithCogExec_PopVector3_ADDR, sithCogExec_PopVector3);
+    hook_function(sithCogExec_PopCog_ADDR, sithCogExec_PopCog);
+    hook_function(sithCogExec_PopThing_ADDR, sithCogExec_PopThing);
+    hook_function(sithCogExec_PopTemplate_ADDR, sithCogExec_PopTemplate);
+    hook_function(sithCogExec_PopSound_ADDR, sithCogExec_PopSound);
+    hook_function(sithCogExec_PopSector_ADDR, sithCogExec_PopSector);
+    hook_function(sithCogExec_PopSurface_ADDR, sithCogExec_PopSurface);
+    hook_function(sithCogExec_PopMaterial_ADDR, sithCogExec_PopMaterial);
+    hook_function(sithCogExec_PopModel3_ADDR, sithCogExec_PopModel3);
+    hook_function(sithCogExec_PopKeyframe_ADDR, sithCogExec_PopKeyframe);
+    hook_function(sithCogExec_PopString_ADDR, sithCogExec_PopString);
+    hook_function(sithCogExec_PushVar_ADDR, sithCogExec_PushVar);
+    hook_function(sithCogExec_PushInt_ADDR, sithCogExec_PushInt);
+    hook_function(sithCogExec_PushFlex_ADDR, sithCogExec_PushFlex);
+    hook_function(sithCogExec_PushVector3_ADDR, sithCogExec_PushVector3);
+    hook_function(sithCogExec_PopProgramVal_ADDR, sithCogExec_PopProgramVal);
+    hook_function(sithCogExec_ResetStack_ADDR, sithCogExec_ResetStack);
+    hook_function(sithCogExec_Call_ADDR, sithCogExec_Call);
+    hook_function(sithCogExec_Ret_ADDR, sithCogExec_Ret);
+    hook_function(sithCogExec_PopStackVar_ADDR, sithCogExec_PopStackVar);
+    hook_function(sithCogExec_AssignStackVar_ADDR, sithCogExec_AssignStackVar);
     
     // stdBitmap
     hook_function(stdBitmap_Load_ADDR, stdBitmap_Load);

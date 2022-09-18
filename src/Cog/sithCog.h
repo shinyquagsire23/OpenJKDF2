@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include "globals.h"
-#include "sithCogVm.h"
-#include "sithCogScript.h"
+#include "Cog/sithCogExec.h"
+#include "Cog/sithCogScript.h"
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Initialize_ADDR (0x40A0C0)

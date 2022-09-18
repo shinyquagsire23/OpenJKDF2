@@ -1,7 +1,7 @@
 #ifndef _SITHCOGFUNCTION_H
 #define _SITHCOGFUNCTION_H
 
-#include "sithCog.h"
+#include "Cog/sithCog.h"
 
 void sithCogFunction_Initialize(void* ctx);
 

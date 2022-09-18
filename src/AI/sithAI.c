@@ -21,7 +21,7 @@
 #include "Engine/sithPhysics.h"
 #include "General/stdHashTable.h"
 #include "Main/jkGame.h"
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Devices/sithConsole.h"

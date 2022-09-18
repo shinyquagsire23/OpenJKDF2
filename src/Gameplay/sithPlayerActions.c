@@ -11,7 +11,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithPhysics.h"
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Cog/sithCog.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"

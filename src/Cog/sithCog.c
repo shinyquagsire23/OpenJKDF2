@@ -10,7 +10,7 @@
 #include "Cog/sithCogFunctionSurface.h"
 #include "Cog/sithCogFunctionSector.h"
 #include "Cog/sithCogFunctionSound.h"
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Cog/sithCogParse.h"
 #include "Cog/jkCog.h"
 #include "Gameplay/sithEvent.h"
@@ -956,7 +956,7 @@ execute:
             _sprintf(std_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
             sithConsole_Print(std_genBuffer);
         }
-        sithCogVm_ExecCog(cog, v10);
+        sithCogExec_ExecCog(cog, v10);
     }
     else if ( msgid != SITH_MESSAGE_PULSE && msgid != SITH_MESSAGE_TIMER )
     {
@@ -1086,7 +1086,7 @@ execute:
             _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
             sithConsole_Print(std_genBuffer);
         }
-        sithCogVm_ExecCog(cog, trigIdx);
+        sithCogExec_ExecCog(cog, trigIdx);
         result = cog->returnEx;
     }
     else if ( message == SITH_MESSAGE_PULSE || message == SITH_MESSAGE_TIMER )
@@ -1343,7 +1343,7 @@ void sithCogScript_Tick(sithCog *cog)
                 sithConsole_Print(std_genBuffer);
             }
 
-            sithCogVm_Exec(cog);
+            sithCogExec_Exec(cog);
             return;
         }
         if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.field_C & 3) == 0 )
@@ -1354,7 +1354,7 @@ void sithCogScript_Tick(sithCog *cog)
                 sithConsole_Print(std_genBuffer);
             }
 
-            sithCogVm_Exec(cog);
+            sithCogExec_Exec(cog);
             return;
         }
     }

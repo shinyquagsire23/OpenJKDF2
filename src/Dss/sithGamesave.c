@@ -21,7 +21,7 @@
 #include "General/stdConffile.h"
 #include "General/stdFileUtil.h"
 #include "Devices/sithConsole.h"
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"

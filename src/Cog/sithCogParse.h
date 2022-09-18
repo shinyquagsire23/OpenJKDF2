@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#include "Cog/sithCogVm.h"
+#include "Cog/sithCogExec.h"
 #include "Cog/sithCogYACC.h"
 
 #define sithCogParse_Reset_ADDR (0x004FC9A0)
