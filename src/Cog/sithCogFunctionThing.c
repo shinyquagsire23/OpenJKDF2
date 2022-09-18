@@ -1307,14 +1307,14 @@ void sithCogFunctionThing_SetThingGeoMode(sithCog *ctx)
     rdGeoMode_t mode = (rdGeoMode_t)sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        thing->rdthing.curGeoMode = mode;
+        thing->rdthing.desiredGeoMode = mode;
 }
 
 void sithCogFunctionThing_GetThingGeoMode(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        sithCogVm_PushInt(ctx, (int)thing->rdthing.curGeoMode);
+        sithCogVm_PushInt(ctx, (int)thing->rdthing.desiredGeoMode);
 }
 
 void sithCogFunctionThing_SetThingLightMode(sithCog *ctx)
@@ -1322,14 +1322,14 @@ void sithCogFunctionThing_SetThingLightMode(sithCog *ctx)
     rdLightMode_t mode = (rdLightMode_t)sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        thing->rdthing.curLightMode = mode;
+        thing->rdthing.desiredLightMode = mode;
 }
 
 void sithCogFunctionThing_GetThingLightMode(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        sithCogVm_PushInt(ctx, (int)thing->rdthing.curLightMode);
+        sithCogVm_PushInt(ctx, (int)thing->rdthing.desiredLightMode);
 }
 
 void sithCogFunctionThing_SetThingTexMode(sithCog *ctx)
@@ -1337,14 +1337,14 @@ void sithCogFunctionThing_SetThingTexMode(sithCog *ctx)
     int mode = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        thing->rdthing.curTexMode = mode;
+        thing->rdthing.desiredTexMode = mode;
 }
 
 void sithCogFunctionThing_GetThingTexMode(sithCog *ctx)
 {
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        sithCogVm_PushInt(ctx, thing->rdthing.curTexMode);
+        sithCogVm_PushInt(ctx, thing->rdthing.desiredTexMode);
 }
 
 void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
