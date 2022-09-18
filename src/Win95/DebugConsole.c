@@ -1,6 +1,6 @@
 #include "DebugConsole.h"
 
-#include "Engine/sithDebugConsole.h"
+#include "Main/sithCommand.h"
 #include "Win95/stdSound.h"
 #include "Devices/sithSound.h"
 #include "General/stdHashTable.h"
@@ -25,7 +25,7 @@ int DebugConsole_Initialize(int maxCmds)
             _memset(DebugConsole_aCmds, 0, sizeof(stdDebugConsoleCmd) * maxCmds);
             DebugGui_fnPrint = 0;
             DebugGui_fnPrintUniStr = 0;
-            sithDebugConsole_Initialize();
+            sithCommand_Initialize();
             v2 = sithSound_InitFromPath("set_vlo2.wav");
             DebugConsole_alertSound = v2;
             if ( v2 )

@@ -151,8 +151,6 @@ static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
 
-#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithDplay_bIsServer) ? 0 : 30000)
-
 int jkGuiMultiTally_Show(int a1)
 {
     int result; // eax

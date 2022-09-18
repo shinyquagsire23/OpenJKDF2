@@ -73,7 +73,7 @@
 #include "Devices/sithControl.h"
 #include "Engine/sithTime.h"
 #include "Engine/sith.h"
-#include "Engine/sithDebugConsole.h"
+#include "Main/sithCommand.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPhysics.h"
@@ -2197,8 +2197,8 @@ void do_hooks()
     hook_function(DebugConsole_PrintHelp_ADDR, DebugConsole_PrintHelp);
     hook_function(DebugConsole_AlertSound_ADDR, DebugConsole_AlertSound);
 
-    // sithDebugConsole
-    hook_function(sithDebugConsole_Initialize_ADDR, sithDebugConsole_Initialize);
+    // sithCommand
+    hook_function(sithCommand_Initialize_ADDR, sithCommand_Initialize);
 
     //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time

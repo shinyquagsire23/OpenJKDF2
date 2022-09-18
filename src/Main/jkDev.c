@@ -12,7 +12,7 @@
 #include "World/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
-#include "Engine/sithDebugConsole.h"
+#include "Main/sithCommand.h"
 #include "Engine/sithMulti.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
@@ -467,21 +467,21 @@ int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdFly(pCmd, pArgStr);
+        sithCommand_CmdFly(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
@@ -496,7 +496,7 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( pArgStr )
         {
             if ( _sscanf(pArgStr, "%f %f %f", &v5, &v4, &v6) == 3 )
-                sithDebugConsole_CmdWarp(pCmd, pArgStr);
+                sithCommand_CmdWarp(pCmd, pArgStr);
         }
     }
     return 1;
@@ -505,21 +505,21 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdActivate(pCmd, pArgStr);
+        sithCommand_CmdActivate(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags3(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdJump(pCmd, pArgStr);
+        sithCommand_CmdJump(pCmd, pArgStr);
     return 1;
 }
 

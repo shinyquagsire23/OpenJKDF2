@@ -1,4 +1,4 @@
-#include "sithDebugConsole.h"
+#include "sithCommand.h"
 
 #include "General/sithStrTable.h"
 #include "General/stdString.h"
@@ -16,14 +16,14 @@
 #include "World/sithPlayer.h"
 #include "jk.h"
 
-#define sithDebugConsole_CmdMatList ((void*)sithDebugConsole_CmdMatList_ADDR)
+#define sithCommand_CmdMatList ((void*)sithCommand_CmdMatList_ADDR)
 
-#define sithDebugConsole_matlist_sort ((void*)sithDebugConsole_matlist_sort_ADDR)
+#define sithCommand_matlist_sort ((void*)sithCommand_matlist_sort_ADDR)
 
-static char sithDebugConsole_aIdk[4]; // TODO symbols?
+static char sithCommand_aIdk[4]; // TODO symbols?
 
 #ifdef QOL_IMPROVEMENTS
-int sithDebugConsole_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     // TODO disconnect clients?
     exit(0);
@@ -31,51 +31,51 @@ int sithDebugConsole_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 }
 #endif
 
-void sithDebugConsole_Initialize()
+void sithCommand_Initialize()
 {
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdPlayers, "players", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdCoords, "coords", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "trackshots", 3);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdPing, "ping", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdKick, "kick", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdTick, "tick", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdSession, "session", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdPlayers, "players", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdCoords, "coords", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "trackshots", 3);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdPing, "ping", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdKick, "kick", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdTick, "tick", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdSession, "session", 0);
 
     if ( (g_debugmodeFlags & 0x100) != 0 )
     {
         DebugConsole_RegisterDevCmd(DebugConsole_PrintHelp, "help", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "disableai", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "notarget", 6);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "outline", 1);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "disablepuppet", 2);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdCogTrace, "cogtrace", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdCogList, "coglist", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "disableai", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "notarget", 6);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "outline", 1);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "disablepuppet", 2);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdCogTrace, "cogtrace", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdCogList, "coglist", 0);
         DebugConsole_RegisterDevCmd(sithCogScript_DevCmdCogStatus, "cogstatus", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "noaishots", 4);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "noaishots", 4);
         DebugConsole_RegisterDevCmd(sithAI_PrintThingStatus, "aistatus", 0);
         DebugConsole_RegisterDevCmd(sithAI_PrintThings, "ailist", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdFly, "fly", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdMem, "mem", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdDynamicMem, "dynamicmem", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdMemDump, "memdump", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "invul", 5);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdCogPause, "cogpause", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdFly, "fly", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdMem, "mem", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdDynamicMem, "dynamicmem", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdMemDump, "memdump", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "invul", 5);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdCogPause, "cogpause", 0);
 #ifndef LINUX_TMP
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdMatList, "matlist", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdMatList, "matlist", 0);
 #endif
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdWarp, "warp", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdActivate, "activate", 0);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CheatSetDebugFlags, "slowmo", 7);
-        DebugConsole_RegisterDevCmd(sithDebugConsole_CmdJump, "jump", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdWarp, "warp", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdActivate, "activate", 0);
+        DebugConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "slowmo", 7);
+        DebugConsole_RegisterDevCmd(sithCommand_CmdJump, "jump", 0);
     }
 
 #ifdef QOL_IMPROVEMENTS
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdQuit, "quit", 0);
-    DebugConsole_RegisterDevCmd(sithDebugConsole_CmdQuit, "q", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdQuit, "quit", 0);
+    DebugConsole_RegisterDevCmd(sithCommand_CmdQuit, "q", 0);
 #endif
 }
 
-int sithDebugConsole_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int *v2; // esi
     int v3; // edi
@@ -158,7 +158,7 @@ LABEL_24:
     return result;
 }
 
-int sithDebugConsole_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int newTickrate; // eax
@@ -188,7 +188,7 @@ int sithDebugConsole_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v3; // edi
     sithDplayPlayer* v4; // esi
@@ -216,7 +216,7 @@ int sithDebugConsole_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithDebugConsole_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // eax
@@ -262,7 +262,7 @@ int sithDebugConsole_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // eax
@@ -309,7 +309,7 @@ int sithDebugConsole_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // ebp
@@ -327,7 +327,7 @@ int sithDebugConsole_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(paused) ");
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
                 _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(trace)  ");
-            _sprintf(&std_genBuffer[strlen(std_genBuffer)], sithDebugConsole_aIdk);
+            _sprintf(&std_genBuffer[strlen(std_genBuffer)], sithCommand_aIdk);
             DebugConsole_Print(std_genBuffer);
             ++v3;
         }
@@ -341,7 +341,7 @@ int sithDebugConsole_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v0; // ecx
     wchar_t *v3; // eax
@@ -379,7 +379,7 @@ int sithDebugConsole_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 0;
 }
 
-int sithDebugConsole_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithWorld *v2; // eax
     signed int result; // eax
@@ -457,7 +457,7 @@ int sithDebugConsole_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     _sprintf(
         std_genBuffer,
@@ -469,7 +469,7 @@ int sithDebugConsole_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr
     return 1;
 }
 
-int sithDebugConsole_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result; // eax
     int v3; // edi
@@ -496,7 +496,7 @@ int sithDebugConsole_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 // MatList
 
-int sithDebugConsole_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *player; // esi
     signed int result; // eax
@@ -533,7 +533,7 @@ int sithDebugConsole_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v3; // ebp
     int result; // eax
@@ -587,7 +587,7 @@ int sithDebugConsole_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v2; // esi
     int tmp;
@@ -617,7 +617,7 @@ int sithDebugConsole_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 0;
 }
 
-int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result; // eax
 
@@ -630,7 +630,7 @@ int sithDebugConsole_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithDebugConsole_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
     sithPlayerInfo* v3; // esi
@@ -660,7 +660,7 @@ int sithDebugConsole_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithDebugConsole_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int v2; // esi
     wchar_t v4[32]; // [esp+4h] [ebp-40h] BYREF
@@ -683,7 +683,7 @@ int sithDebugConsole_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithDebugConsole_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
     sithPlayerInfo *v3; // esi
