@@ -12,7 +12,7 @@
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithPuppet.h"

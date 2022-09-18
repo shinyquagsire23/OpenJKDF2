@@ -15,7 +15,7 @@
 #include "Engine/sithTemplate.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/rdKeyframe.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
 #include "Devices/sithSound.h"

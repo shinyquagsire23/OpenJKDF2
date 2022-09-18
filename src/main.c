@@ -74,7 +74,7 @@
 #include "Gameplay/sithTime.h"
 #include "Main/sithMain.h"
 #include "Main/sithCommand.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPhysics.h"
 #include "Engine/sithPuppet.h"

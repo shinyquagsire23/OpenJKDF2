@@ -11,7 +11,7 @@
 #include "Engine/sithPuppet.h"
 #include "Dss/sithMulti.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithKeyFrame.h"
 #include "World/sithSector.h"
 #include "Engine/sithCollision.h"

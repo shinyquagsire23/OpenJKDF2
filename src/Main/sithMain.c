@@ -24,7 +24,7 @@
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithSurface.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"

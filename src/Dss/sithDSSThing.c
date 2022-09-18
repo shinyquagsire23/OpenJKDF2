@@ -11,7 +11,7 @@
 #include "World/sithSector.h"
 #include "World/sithActor.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "Engine/sithTemplate.h"
 #include "World/sithItem.h"
 #include "World/sithWeapon.h"

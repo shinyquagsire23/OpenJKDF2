@@ -1,7 +1,7 @@
 #include "sithWorld.h"
 
 #include "General/stdConffile.h"
-#include "Engine/sithModel.h"
+#include "World/sithModel.h"
 #include "World/sithSprite.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithMaterial.h"
