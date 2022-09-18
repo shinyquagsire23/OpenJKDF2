@@ -119,7 +119,7 @@
 #include "World/sithTrackThing.h"
 #include "Devices/sithConsole.h"
 #include "Win95/DirectX.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Win95/std.h"
 #include "Win95/stdGob.h"
 #include "Win95/stdMci.h"
@@ -710,7 +710,7 @@ void do_hooks()
     hook_function(DirectX_DirectInputCreateA_ADDR, DirectX_DirectInputCreateA);*/
     
     // sithDplay
-    hook_function(sithDplay_Startup_ADDR, sithDplay_Startup);
+    hook_function(stdComm_Startup_ADDR, stdComm_Startup);
     
     // std
     hook_function(stdStartup_ADDR, stdStartup);
@@ -2275,9 +2275,9 @@ void do_hooks()
     hook_function(sithSoundMixer_PlaySong_ADDR, sithSoundMixer_PlaySong);
     hook_function(sithSoundMixer_SetMusicVol_ADDR, sithSoundMixer_SetMusicVol);
     
-    hook_function(sithDplay_OpenConnection_ADDR, sithDplay_OpenConnection);
-    hook_function(sithDplay_CloseConnection_ADDR, sithDplay_CloseConnection);
-    hook_function(sithDplay_Open_ADDR, sithDplay_Open);
+    hook_function(stdComm_OpenConnection_ADDR, stdComm_OpenConnection);
+    hook_function(stdComm_CloseConnection_ADDR, stdComm_CloseConnection);
+    hook_function(stdComm_Open_ADDR, stdComm_Open);
 
     //hook_function_inv(sithSurface_Startup_ADDR, sithSurface_Startup);
     //hook_function_inv(sithSurface_Shutdown_ADDR, sithSurface_Shutdown);

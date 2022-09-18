@@ -216,7 +216,7 @@ int jkGuiMultiTally_Show(int a1)
 #ifdef QOL_IMPROVEMENTS
     // Added
     uint32_t hack = jkPlayer_playerInfos[0].flags;
-    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
+    if (stdComm_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = 0;
 #endif
 
@@ -423,7 +423,7 @@ LABEL_50:
 
 #ifdef QOL_IMPROVEMENTS
     // Added
-    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
+    if (stdComm_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = hack;
 #endif
 

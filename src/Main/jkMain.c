@@ -39,7 +39,7 @@
 #include "Platform/stdControl.h"
 #include "Win95/Windows.h"
 #include "Win95/Video.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
 #include "General/util.h"

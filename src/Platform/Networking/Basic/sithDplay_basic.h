@@ -7,7 +7,7 @@ extern "C" {
 
 #ifdef PLATFORM_BASICSOCKETS
 
-void sithDplay_Basic_Startup();
+void stdComm_Basic_Startup();
 
 #endif // PLATFORM_BASICSOCKETS
 

@@ -1,6 +1,6 @@
-#include "sithDplay_none.h"
+#include "stdComm_none.h"
 
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
@@ -16,7 +16,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_bIsServer)
+    if (!stdComm_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -29,11 +29,11 @@ void Hack_ResetClients()
     jkPlayer_maxPlayers = 2;
 }
 
-void sithDplay_None_Startup()
+void stdComm_None_Startup()
 {
     jkGuiMultiplayer_numConnections = 1;
     jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Screaming Into The Void");
-    sithDplay_dword_8321E0 = 0;
+    stdComm_dword_8321E0 = 0;
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 1;
@@ -55,23 +55,23 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
     return 0;
 }
 
-int sithDplay_OpenConnection(void* a)
+int stdComm_OpenConnection(void* a)
 {
-    sithDplay_dword_8321DC = 1;
+    stdComm_dword_8321DC = 1;
     return 0;
 }
 
-void sithDplay_CloseConnection()
+void stdComm_CloseConnection()
 {
 
 }
 
-int sithDplay_Open(int idx, wchar_t* pwPassword)
+int stdComm_Open(int idx, wchar_t* pwPassword)
 {
     return 1;
 }
 
-void sithDplay_Close()
+void stdComm_Close()
 {
 
 }
@@ -138,7 +138,7 @@ int DirectPlay_GetSession_passwordidk(jkMultiEntry* a)
     return 1;
 }
 
-int sithDplay_EnumSessions(int a, void* b)
+int stdComm_EnumSessions(int a, void* b)
 {
     return 0;
 }

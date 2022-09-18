@@ -13,7 +13,7 @@
 #include "World/sithTemplate.h"
 #include "Devices/sithSound.h"
 #include "Gameplay/sithTime.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Main/jkGame.h"
 #include "Engine/sithNet.h"
 #include "Dss/sithMulti.h"

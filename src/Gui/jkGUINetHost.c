@@ -14,7 +14,7 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Platform/wuRegistry.h"
 #include "General/stdString.h"
 #include "Main/jkRes.h"

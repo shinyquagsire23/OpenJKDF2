@@ -4,7 +4,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "jk.h"
 
 int sithComm_Startup()
@@ -53,7 +53,7 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetThingModel;
     sithComm_msgFuncs[DSS_PING] = sithMulti_ProcessPing;
     sithComm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPingResponse;
-    sithComm_msgFuncs[DSS_ENUMPLAYERS] = sithDplay_cogMsg_HandleEnumPlayers;
+    sithComm_msgFuncs[DSS_ENUMPLAYERS] = stdComm_cogMsg_HandleEnumPlayers;
     sithComm_msgFuncs[DSS_RESET] = sithComm_cogMsg_Reset;
     sithComm_msgFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
     sithComm_bInit = 1;
@@ -148,7 +148,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
                         if ( (v19 & (1 << v15)) != 0 )
                         {
                             if (jkPlayer_playerInfos[v15].net_id)
-                                sithDplay_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
+                                stdComm_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
                             else
                                 sithComm_MsgTmpBuf[idx_].netMsg.field_14 = ~(1 << v15) & v19;
                         }
@@ -175,7 +175,7 @@ LABEL_35:
             v11 = a2;
             msg->netMsg.msgId = 0;
         }
-        ret = sithDplay_SendToPlayer(msg, v11);
+        ret = stdComm_SendToPlayer(msg, v11);
     }
     if ( (multiplayerFlags & 4) != 0 )
     {
@@ -204,7 +204,7 @@ int sithComm_Sync()
     sithComm_needsSync = 0;
     if ( !sithComm_bSyncMultiplayer )
         return 0;
-    while ( sithDplay_Recv(&sithComm_netMsgTmp) == 1 )
+    while ( stdComm_Recv(&sithComm_netMsgTmp) == 1 )
     {
         ++v13;
         if ( sithComm_netMsgTmp.netMsg.thingIdx )
@@ -222,7 +222,7 @@ LABEL_14:
                     sithComm_MsgTmpBuf2.netMsg.field_C = sithComm_netMsgTmp.netMsg.thingIdx;
                     sithComm_MsgTmpBuf2.netMsg.cogMsgId = DSS_RESET;
                     sithComm_MsgTmpBuf2.netMsg.msg_size = 2;
-                    sithDplay_SendToPlayer(&sithComm_MsgTmpBuf2, sithComm_netMsgTmp.netMsg.thingIdx);
+                    stdComm_SendToPlayer(&sithComm_MsgTmpBuf2, sithComm_netMsgTmp.netMsg.thingIdx);
                     
                     int i = 0;
                     v4 = (uint16_t)sithComm_netMsgTmp.netMsg.msgId;
@@ -309,7 +309,7 @@ void sithComm_SyncWithPlayers()
                     if (sithComm_MsgTmpBuf[i].netMsg.field_14 & (1 << v9))
                     {
                         if (jkPlayer_playerInfos[v9].net_id)
-                            sithDplay_SendToPlayer(&sithComm_MsgTmpBuf[i], jkPlayer_playerInfos[v9].net_id);
+                            stdComm_SendToPlayer(&sithComm_MsgTmpBuf[i], jkPlayer_playerInfos[v9].net_id);
                         else
                             sithComm_MsgTmpBuf[i].netMsg.field_14 &= ~(1 << v9);
                     }

@@ -1,6 +1,6 @@
-#include "sithDplay_GNS.h"
+#include "stdComm_GNS.h"
 
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
@@ -168,12 +168,12 @@ static void Printf( const char *fmt, ... )
     DebugOutput( k_ESteamNetworkingSocketsDebugOutputType_Msg, text );
 }
 
-static int sithDplay_GNS_bForceStubs = 0;
-static int sithDplay_GNS_bSymbolsLoaded = 0;
+static int stdComm_GNS_bForceStubs = 0;
+static int stdComm_GNS_bSymbolsLoaded = 0;
 
-static void sithDplay_GNS_LoadSymbols()
+static void stdComm_GNS_LoadSymbols()
 {
-    if (sithDplay_GNS_bSymbolsLoaded) return;
+    if (stdComm_GNS_bSymbolsLoaded) return;
 
     static const char pszExportFunc[] = "GameNetworkingSockets_Init";
 
@@ -183,7 +183,7 @@ static void sithDplay_GNS_LoadSymbols()
         if ( h == NULL )
         {
             printf("Failed to load %s.\n", pszModule );
-            sithDplay_GNS_bForceStubs = 1;
+            stdComm_GNS_bForceStubs = 1;
             
             return;
         }
@@ -203,7 +203,7 @@ static void sithDplay_GNS_LoadSymbols()
         if ( h == NULL )
         {
             printf("Failed to dlopen %s.  %s\n", pszModule, dlerror() );
-            sithDplay_GNS_bForceStubs = 1;
+            stdComm_GNS_bForceStubs = 1;
             return;
         }
         g_GameNetworkingSockets_Init = (GameNetworkingSockets_Init_t)dlsym(h, "GameNetworkingSockets_Init");
@@ -221,17 +221,17 @@ static void sithDplay_GNS_LoadSymbols()
         || !g_SteamNetworkingIPAddr_ToString || !g_SteamNetworkingIPAddr_ParseString)
     {
         printf("Failed to load %s, reverting to stubs.\n");
-        sithDplay_GNS_bForceStubs = 1;
+        stdComm_GNS_bForceStubs = 1;
         return;
     }
     printf("Loaded %s successfully.\n", pszModule);
 
-    sithDplay_GNS_bSymbolsLoaded = 1;
+    stdComm_GNS_bSymbolsLoaded = 1;
 }
 
 static void InitSteamDatagramConnectionSockets()
 {
-    sithDplay_GNS_LoadSymbols();
+    stdComm_GNS_LoadSymbols();
 
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
         SteamDatagramErrMsg errMsg;
@@ -1064,7 +1064,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_bIsServer)
+    if (!stdComm_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -1076,21 +1076,21 @@ void Hack_ResetClients()
 
     //jkPlayer_maxPlayers = 2;
 
-    if (sithDplay_bIsServer)
-        sithDplay_dplayIdSelf = server.id;
+    if (stdComm_bIsServer)
+        stdComm_dplayIdSelf = server.id;
     else
-        sithDplay_dplayIdSelf = client.id;
+        stdComm_dplayIdSelf = client.id;
 }
 
-void sithDplay_GNS_Startup()
+void stdComm_GNS_Startup()
 {
-    sithDplay_GNS_LoadSymbols();
+    stdComm_GNS_LoadSymbols();
 
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
     {
         jkGuiMultiplayer_numConnections = 1;
         jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Screaming Into The Void (GNS Failed)");
-        sithDplay_dword_8321E0 = 0;
+        stdComm_dword_8321E0 = 0;
 
         memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
         dplay_dword_55D618 = 0;
@@ -1099,7 +1099,7 @@ void sithDplay_GNS_Startup()
 
     jkGuiMultiplayer_numConnections = 1;
     jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Valve GNS");
-    sithDplay_dword_8321E0 = 0;
+    stdComm_dword_8321E0 = 0;
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 0;
@@ -1118,9 +1118,9 @@ void sithDplay_GNS_Startup()
     InitSteamDatagramConnectionSockets();
 }
 
-void sithDplay_GNS_Shutdown()
+void stdComm_GNS_Shutdown()
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return;
 
     ShutdownSteamDatagramConnectionSockets();
@@ -1128,12 +1128,12 @@ void sithDplay_GNS_Shutdown()
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return -1;
 
     Hack_ResetClients();
 
-    if (sithDplay_bIsServer)
+    if (stdComm_bIsServer)
     {
         server.RunStep();
         return server.Receive(pIdOut, (void*)pMsgIdOut, pLenOut);
@@ -1149,12 +1149,12 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return 0;
 
     Hack_ResetClients();
 
-    if (sithDplay_bIsServer)
+    if (stdComm_bIsServer)
     {
         server.RunStep();
         return server.Send(idFrom, idTo, lpData, dwDataSize);
@@ -1168,53 +1168,53 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
     return 1;
 }
 
-int sithDplay_OpenConnection(void* a)
+int stdComm_OpenConnection(void* a)
 {
-    sithDplay_dword_8321DC = 1;
+    stdComm_dword_8321DC = 1;
     return 0;
 }
 
-void sithDplay_CloseConnection()
+void stdComm_CloseConnection()
 {
-    if ( sithDplay_dword_8321DC )
+    if ( stdComm_dword_8321DC )
     {
-        if ( sithDplay_dword_8321E0 )
+        if ( stdComm_dword_8321E0 )
         {
-            //DirectPlay_DestroyPlayer(sithDplay_dplayIdSelf);
+            //DirectPlay_DestroyPlayer(stdComm_dplayIdSelf);
             DirectPlay_Close();
-            sithDplay_dword_8321E0 = 0;
-            sithDplay_bIsServer = 0;
-            sithDplay_dplayIdSelf = 0;
+            stdComm_dword_8321E0 = 0;
+            stdComm_bIsServer = 0;
+            stdComm_dplayIdSelf = 0;
         }
         //DirectPlay_CloseConnection();
-        sithDplay_dword_8321DC = 0;
+        stdComm_dword_8321DC = 0;
     }
 }
 
-int sithDplay_Open(int idx, wchar_t* pwPassword)
+int stdComm_Open(int idx, wchar_t* pwPassword)
 {
     DirectPlay_EnumSessions2();
 
-    sithDplay_dword_8321E8 = 0;
-    sithDplay_dword_8321E0 = 1;
-    sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-    sithDplay_bIsServer = 0;
-    sithDplay_dplayIdSelf = 2; // HACK
+    stdComm_dword_8321E8 = 0;
+    stdComm_dword_8321E0 = 1;
+    stdComm_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
+    stdComm_bIsServer = 0;
+    stdComm_dplayIdSelf = 2; // HACK
     jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return 0;
 
     client.Init(addrServer);
     return 0;
 }
 
-void sithDplay_Close()
+void stdComm_Close()
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return;
 
-    if (sithDplay_bIsServer)
+    if (stdComm_bIsServer)
     {
         server.Shutdown();
     }
@@ -1276,9 +1276,9 @@ int DirectPlay_OpenHost(jkMultiEntry* pEntry)
 
     jkPlayer_maxPlayers = pEntry->maxPlayers; // Hack?
 
-    sithDplay_bIsServer = 1;
+    stdComm_bIsServer = 1;
 
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return 0;
     server.Init(jkGuiNetHost_portNum);
 
@@ -1294,10 +1294,10 @@ int DirectPlay_GetSession_passwordidk(jkMultiEntry* pEntry)
     return 1;
 }
 
-static int sithDplay_EnumThread_bForce = 0;
-static int sithDplay_EnumThread_bInit = 0;
-static SDL_Thread *sithDplay_EnumThread_thread = NULL;
-static SDL_mutex* sithDplay_EnumThread_mutex = NULL;
+static int stdComm_EnumThread_bForce = 0;
+static int stdComm_EnumThread_bInit = 0;
+static SDL_Thread *stdComm_EnumThread_thread = NULL;
+static SDL_mutex* stdComm_EnumThread_mutex = NULL;
 
 char *get_ip_str(const struct sockaddr *sa, char *s, size_t maxlen)
 {
@@ -1320,11 +1320,11 @@ char *get_ip_str(const struct sockaddr *sa, char *s, size_t maxlen)
     return s;
 }
 
-static int sithDplay_EnumThread(void *ptr)
+static int stdComm_EnumThread(void *ptr)
 {
-    while (sithDplay_EnumThread_bInit)
+    while (stdComm_EnumThread_bInit)
     {
-        SDL_LockMutex(sithDplay_EnumThread_mutex);
+        SDL_LockMutex(stdComm_EnumThread_mutex);
         stdString_WcharToChar(jkGuiMultiplayer_ipText_conv, jkGuiMultiplayer_ipText, 255);
 
         std::string sAddress( jkGuiMultiplayer_ipText_conv );
@@ -1364,13 +1364,13 @@ static int sithDplay_EnumThread(void *ptr)
             addrServer.m_port = DEFAULT_SERVER_PORT;
         }
 
-        if (sithDplay_EnumThread_bForce || strncmp(jkGuiMultiplayer_ipText_conv, addrServerLast, 256) || addrServerPortLast != addrServer.m_port)
+        if (stdComm_EnumThread_bForce || strncmp(jkGuiMultiplayer_ipText_conv, addrServerLast, 256) || addrServerPortLast != addrServer.m_port)
             client.GetServerInfo(addrServer);
         strncpy(addrServerLast, jkGuiMultiplayer_ipText_conv, 256);
         addrServerPortLast = addrServer.m_port;
-        sithDplay_EnumThread_bForce = 0;
+        stdComm_EnumThread_bForce = 0;
 
-        SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+        SDL_UnlockMutex(stdComm_EnumThread_mutex);
 
         SDL_Delay(100);
     }
@@ -1380,38 +1380,38 @@ static int sithDplay_EnumThread(void *ptr)
 
 int DirectPlay_EnumSessions2()
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return 0;
 
-    if (!sithDplay_EnumThread_bInit)
+    if (!stdComm_EnumThread_bInit)
         return 0;
 
-    sithDplay_EnumThread_bInit = 0;
+    stdComm_EnumThread_bInit = 0;
 
     int threadReturnValue;
-    SDL_WaitThread(sithDplay_EnumThread_thread, &threadReturnValue);
-    sithDplay_EnumThread_thread = NULL;
+    SDL_WaitThread(stdComm_EnumThread_thread, &threadReturnValue);
+    stdComm_EnumThread_thread = NULL;
 
     sithDplayGNS_verbosePrintf("Enum thread done\n");
 
     return 0;
 }
 
-int sithDplay_EnumSessions(int a, void* b)
+int stdComm_EnumSessions(int a, void* b)
 {
-    if (sithDplay_GNS_bForceStubs)
+    if (stdComm_GNS_bForceStubs)
         return 0;
 
-    if (!sithDplay_EnumThread_mutex)
-        sithDplay_EnumThread_mutex = SDL_CreateMutex();
+    if (!stdComm_EnumThread_mutex)
+        stdComm_EnumThread_mutex = SDL_CreateMutex();
 
-    SDL_LockMutex(sithDplay_EnumThread_mutex);
-    sithDplay_EnumThread_bForce = 1;
+    SDL_LockMutex(stdComm_EnumThread_mutex);
+    stdComm_EnumThread_bForce = 1;
     jkGuiMultiplayer_aEntries[0] = sithDplayGNS_storedEntryEnum;
     dplay_dword_55D618 = sithDplayGNS_numEnumd;
-    SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+    SDL_UnlockMutex(stdComm_EnumThread_mutex);
 
-    if (sithDplay_EnumThread_bInit)
+    if (stdComm_EnumThread_bInit)
         return 0;
 
     Hack_ResetClients();
@@ -1423,19 +1423,19 @@ int sithDplay_EnumSessions(int a, void* b)
     memset(addrServerLast, 0, sizeof(addrServerLast));
     addrServerPortLast = -1;
 
-    sithDplay_EnumThread_bInit = 1;
+    stdComm_EnumThread_bInit = 1;
 
-    sithDplay_EnumThread_thread = SDL_CreateThread(sithDplay_EnumThread, "sithDplay_EnumThread", (void *)NULL);
+    stdComm_EnumThread_thread = SDL_CreateThread(stdComm_EnumThread, "stdComm_EnumThread", (void *)NULL);
     sithDplayGNS_verbosePrintf("Enum thread start\n");
 
     //DirectPlay_EnumSessions2();
 
     //client.GetServerInfo(addrServer);
 
-    SDL_LockMutex(sithDplay_EnumThread_mutex);
+    SDL_LockMutex(stdComm_EnumThread_mutex);
     jkGuiMultiplayer_aEntries[0] = sithDplayGNS_storedEntryEnum;
     dplay_dword_55D618 = sithDplayGNS_numEnumd;
-    SDL_UnlockMutex(sithDplay_EnumThread_mutex);
+    SDL_UnlockMutex(stdComm_EnumThread_mutex);
     
 
     return 0;

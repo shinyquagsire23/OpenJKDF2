@@ -13,7 +13,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Platform/wuRegistry.h"
 #include "General/stdString.h"
 #include "Devices/sithComm.h"
@@ -170,7 +170,7 @@ LABEL_1:
                     if ( v3 > 0 )
                     {
                         // TODO if this is a ptr, fix it
-                        v4 = sithDplay_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
+                        v4 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v4 == 0x887700FA )
                         {
                             v24 = jkStrings_GetText("GUINET_NOTAVAIL");
@@ -232,7 +232,7 @@ LABEL_1:
                     if ( v16 > 0 )
                     {
                         // TODO if this is a ptr, fix it
-                        v17 = sithDplay_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
+                        v17 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v17 == 0x887700FA )
                         {
                             v28 = jkStrings_GetText("GUINET_NOTAVAIL");
@@ -295,7 +295,7 @@ LABEL_1:
                     }
                     while ( jkGuiNetHost_Show(&v34) == 1 );
 LABEL_51:
-                    sithDplay_CloseConnection();
+                    stdComm_CloseConnection();
                     continue;
                 case 102:
                     jkGuiBuildMulti_Show();
@@ -324,8 +324,8 @@ LABEL_28:
             if ( jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu3) != 1 )
             {
 LABEL_29:
-                sithDplay_EnumSessions2();
-                sithDplay_CloseConnection();
+                stdComm_EnumSessions2();
+                stdComm_CloseConnection();
                 goto LABEL_1;
             }
         }
@@ -348,7 +348,7 @@ LABEL_29:
 
         wuRegistry_SetWString("lastConnectedHost", jkGuiMultiplayer_ipText);
 #endif
-        v10 = sithDplay_Open(v7, v35.sessionName);
+        v10 = stdComm_Open(v7, v35.sessionName);
         if ( v10 )
         {
             if ( v10 == 0x8877014A )
@@ -467,7 +467,7 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
             v2 = -1;
             jkGuiMultiplayer_dword_5564E8 = v1;
             v10 = -1;
-            v3 = sithDplay_EnumSessions(1, (wchar_t *)jkGuiMultiplayer_aElements3[5].wstr);
+            v3 = stdComm_EnumSessions(1, (wchar_t *)jkGuiMultiplayer_aElements3[5].wstr);
             if ( !v3 )
             {
                 jkGuiRend_DarrayFreeEntry(&jkGuiMultiplayer_stru_5564A8);
@@ -617,7 +617,7 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
     wchar_t *v2; // eax
     wchar_t *v3; // [esp-4h] [ebp-4h]
 
-    if ( sithDplay_dword_8321E0 && (g_submodeFlags & 8) != 0 )
+    if ( stdComm_dword_8321E0 && (g_submodeFlags & 8) != 0 )
     {
         v1 = stdPlatform_GetTimeMsec();
         if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendJoinRequest(sithNet_serverNetId)) )
@@ -649,12 +649,12 @@ int jkGuiMultiplayer_Show2()
     jkMultiEntry3 v8; // [esp+8h] [ebp-140h] BYREF
 
     memset(&v8, 0, sizeof(v8));
-    if ( sithDplay_dword_8321F8 )
+    if ( stdComm_dword_8321F8 )
     {
-        if ( sithDplay_dword_8321F8 != 1 )
+        if ( stdComm_dword_8321F8 != 1 )
         {
-            result = sithDplay_dword_8321F8 - 2;
-            if ( sithDplay_dword_8321F8 != 2 )
+            result = stdComm_dword_8321F8 - 2;
+            if ( stdComm_dword_8321F8 != 2 )
                 return result;
             g_submodeFlags |= 8;
             jkGui_SetModeMenu(jkGui_stdBitmaps[2]->palette);
@@ -678,7 +678,7 @@ int jkGuiMultiplayer_Show2()
               jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v8.episodeGobName, v8.mapJklFname, 0, v8.maxRank) != 1) )
         {
 LABEL_10:
-            sithDplay_CloseConnection();
+            stdComm_CloseConnection();
             return -1;
         }
         v3 = sithMulti_CreatePlayer(
@@ -716,7 +716,7 @@ void jkGuiMultiplayer_sub_4142C0(jkGuiMenu *pMenu)
 {
     uint32_t v1; // eax
 
-    if ( sithDplay_dword_8321E0 )
+    if ( stdComm_dword_8321E0 )
     {
         v1 = stdPlatform_GetTimeMsec();
         if ( v1 > jkGuiMultiplayer_dword_5564F0 + 2000 )

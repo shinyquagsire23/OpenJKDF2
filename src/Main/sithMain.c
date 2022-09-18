@@ -9,7 +9,7 @@
 #include "General/sithStrTable.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Devices/sithConsole.h"
 #include "Win95/Window.h"
 #include "AI/sithAI.h"
@@ -59,7 +59,7 @@ int sithMain_Startup(struct common_functions *commonFuncs)
     is_started = sithCollision_Startup() & is_started;
     is_started = sithThing_Startup() & is_started;
     is_started = sithComm_Startup() & is_started;
-    is_started = sithDplay_Startup() & is_started;
+    is_started = stdComm_Startup() & is_started;
     is_started = sithCog_Startup() & is_started;
     is_started = sithAI_Startup() & is_started;
     is_started = sithSprite_Startup() & is_started;
@@ -112,7 +112,7 @@ void sithMain_Shutdown()
     sithSprite_Shutdown();
     sithAI_Shutdown();
     sithCog_Shutdown();
-    sithDplay_Shutdown();
+    stdComm_Shutdown();
     sithComm_Shutdown();
     sithThing_Shutdown();
     sithCollision_Shutdown();
@@ -459,8 +459,8 @@ void sithMain_AutoSave()
     if ( sithNet_isMulti )
     {
         sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
-        sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
-        sithMulti_SendWelcome(sithDplay_dplayIdSelf, playerThingIdx, -1);
+        sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
+        sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();
     }
     else

@@ -7,7 +7,7 @@
 #include "Main/jkMain.h"
 #include "Main/jkRes.h"
 #include "Gui/jkGUIRend.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "World/jkPlayer.h"
 #include "Main/jkEpisode.h"
 
@@ -40,7 +40,7 @@ int jkSmack_GetCurrentGuiState()
 int jkSmack_SmackPlay(const char *fname)
 {
 #ifndef ARCH_WASM
-    if ( sithDplay_EarlyInit() || jkPlayer_setDisableCutscenes )
+    if ( stdComm_EarlyInit() || jkPlayer_setDisableCutscenes )
 #endif
     {
         if ( jkGuiRend_thing_five )

@@ -10,7 +10,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "Win95/Video.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Platform/std3D.h"
 #include "Win95/stdDisplay.h"
 #include "Main/jkHud.h"
@@ -150,7 +150,7 @@ int jkGame_Update()
                     v6,
                     net_things_idx);
                 if ( net_isMulti )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", sithDplay_dword_8321F4, sithDplay_dword_8321F0);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
                 jkDev_sub_41FC40(100, std_genBuffer);
                 v3 = Video_dword_5528A8;
             }
@@ -158,8 +158,8 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
             jkGame_dword_552B5C = 0;
             jkGame_updateMsecsTotal = 0;
-            sithDplay_dword_8321F0 = 0;
-            sithDplay_dword_8321F4 = 0;
+            stdComm_dword_8321F0 = 0;
+            stdComm_dword_8321F4 = 0;
         }
     }
     else if ( Main_bFrameRate )
@@ -256,7 +256,7 @@ int jkGame_Update()
                     v6,
                     net_things_idx);
                 if ( net_isMulti )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", sithDplay_dword_8321F4, sithDplay_dword_8321F0);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
                 jkDev_sub_41FC40(100, std_genBuffer);
                 v3 = Video_dword_5528A8;
             }
@@ -264,8 +264,8 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
             jkGame_dword_552B5C = 0;
             jkGame_updateMsecsTotal = 0;
-            sithDplay_dword_8321F0 = 0;
-            sithDplay_dword_8321F4 = 0;
+            stdComm_dword_8321F0 = 0;
+            stdComm_dword_8321F4 = 0;
         }
     }
     else if ( Main_bFrameRate )

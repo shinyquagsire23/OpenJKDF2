@@ -41,7 +41,7 @@
 #endif
 
 // jkGuiMultiTally delay between maps
-#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithDplay_bIsServer) ? 0 : 30000)
+#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && stdComm_bIsServer) ? 0 : 30000)
 
 // UI tickrate limits
 #ifdef QOL_IMPROVEMENTS

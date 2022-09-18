@@ -7,7 +7,7 @@ extern "C" {
 
 #ifdef PLATFORM_NOSOCKETS
 
-void sithDplay_None_Startup();
+void stdComm_None_Startup();
 
 #endif // PLATFORM_NOSOCKETS
 

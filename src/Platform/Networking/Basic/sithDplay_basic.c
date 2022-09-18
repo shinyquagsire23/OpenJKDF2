@@ -1,6 +1,6 @@
-#include "sithDplay_basic.h"
+#include "stdComm_basic.h"
 
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
@@ -73,7 +73,7 @@ void Hack_ResetClients()
 
     int id_self = 1;
     int id_other = 2;
-    if (!sithDplay_bIsServer)
+    if (!stdComm_bIsServer)
     {
         id_self = 2;
         id_other = 1;
@@ -86,11 +86,11 @@ void Hack_ResetClients()
     jkPlayer_maxPlayers = 2;
 }
 
-void sithDplay_Basic_Startup()
+void stdComm_Basic_Startup()
 {
     jkGuiMultiplayer_numConnections = 1;
     jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"OpenJKDF2 TCP");
-    sithDplay_dword_8321E0 = 0;
+    stdComm_dword_8321E0 = 0;
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 1;
@@ -109,7 +109,7 @@ void sithDplay_Basic_Startup()
 
 void MyDplay_CheckIncoming()
 {
-    if (!sithDplay_bIsServer) return;
+    if (!stdComm_bIsServer) return;
     if (MyDplay_hasClient) return;
 
     socklen_t socklen = sizeof MyDplay_addr;
@@ -172,7 +172,7 @@ int DirectPlay_ReceiveLoopback(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 
 int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 {
-    int idRecv = sithDplay_bIsServer ? 2 : 1;
+    int idRecv = stdComm_bIsServer ? 2 : 1;
     int pMsgIdOut_size = *pLenOut;
 
     Hack_ResetClients();
@@ -396,24 +396,24 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
     return 1;
 }
 
-int sithDplay_OpenConnection(void* a)
+int stdComm_OpenConnection(void* a)
 {
-    sithDplay_dword_8321DC = 1;
+    stdComm_dword_8321DC = 1;
     return 0;
 }
 
-void sithDplay_CloseConnection()
+void stdComm_CloseConnection()
 {
 
 }
 
-int sithDplay_Open(int idx, wchar_t* pwPassword)
+int stdComm_Open(int idx, wchar_t* pwPassword)
 {
-    sithDplay_dword_8321E8 = 0;
-    sithDplay_dword_8321E0 = 1;
-    sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-    sithDplay_bIsServer = 0;
-    sithDplay_dplayIdSelf = 2; // HACK
+    stdComm_dword_8321E8 = 0;
+    stdComm_dword_8321E0 = 1;
+    stdComm_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
+    stdComm_bIsServer = 0;
+    stdComm_dplayIdSelf = 2; // HACK
     jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_aEntries[idx].checksumSeed;
 
     // Client socket connect
@@ -479,7 +479,7 @@ int sithDplay_Open(int idx, wchar_t* pwPassword)
     return 0;
 }
 
-void sithDplay_Close()
+void stdComm_Close()
 {
 
 }
@@ -567,7 +567,7 @@ int DirectPlay_OpenHost(jkMultiEntry* a)
     fcntl(DirectPlay_sock, F_SETFL, O_NONBLOCK);
 #endif
 
-    //DirectPlay_clientSocks[sithDplay_dplayIdSelf] = DirectPlay_sock;
+    //DirectPlay_clientSocks[stdComm_dplayIdSelf] = DirectPlay_sock;
 
 #if 0
     char buf[BUFSIZE];
@@ -606,7 +606,7 @@ int DirectPlay_GetSession_passwordidk(jkMultiEntry* a)
     return 1;
 }
 
-int sithDplay_EnumSessions(int a, void* b)
+int stdComm_EnumSessions(int a, void* b)
 {
     struct
     {
@@ -615,7 +615,7 @@ int sithDplay_EnumSessions(int a, void* b)
     } inPkt;
 
     Hack_ResetClients();
-    sithDplay_Open(0, NULL);
+    stdComm_Open(0, NULL);
 
     uint32_t aAskForInfo[1] = {1};
     DirectPlay_Send(0xFFFFFFFF, 1, aAskForInfo, sizeof(aAskForInfo));
@@ -637,7 +637,7 @@ int sithDplay_EnumSessions(int a, void* b)
     _strncpy(jkGuiMultiplayer_aEntries[0].episodeGobName, inPkt.entry.episodeGobName, 0x20);
     _strncpy(jkGuiMultiplayer_aEntries[0].mapJklFname, inPkt.entry.mapJklFname, 0x20);
 
-    sithDplay_Close();
+    stdComm_Close();
 
     return 0;
 }

@@ -1,13 +1,13 @@
-#include "sithDplay.h"
+#include "stdComm.h"
 
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
 
 
-int sithDplay_Startup()
+int stdComm_Startup()
 {
-    if ( sithDplay_bInitted )
+    if ( stdComm_bInitted )
         return 0;
 
 #ifdef TARGET_HAS_DPLAY
@@ -15,52 +15,52 @@ int sithDplay_Startup()
 #endif
 
 #ifdef PLATFORM_BASICSOCKETS
-    sithDplay_Basic_Startup();
+    stdComm_Basic_Startup();
 #endif
 #ifdef PLATFORM_GNS
-    sithDplay_GNS_Startup();
+    stdComm_GNS_Startup();
 #endif
 #ifdef PLATFORM_NOSOCKETS
-    sithDplay_None_Startup();
+    stdComm_None_Startup();
 #endif
-    sithDplay_bInitted = 1;
+    stdComm_bInitted = 1;
 
     return 1;
 }
 
-void sithDplay_Shutdown()
+void stdComm_Shutdown()
 {
-    if ( sithDplay_bInitted )
+    if ( stdComm_bInitted )
     {
         DirectPlay_Destroy();
-        sithDplay_bInitted = 0;
+        stdComm_bInitted = 0;
     }
 #ifdef PLATFORM_GNS
-    sithDplay_GNS_Shutdown();
+    stdComm_GNS_Shutdown();
 #endif
 }
 
-int sithDplay_EarlyInit()
+int stdComm_EarlyInit()
 {
     int result; // eax
 
-    result = DirectPlay_EarlyInit(sithDplay_waIdk, sithMulti_name);
-    sithDplay_dword_8321F8 = result;
+    result = DirectPlay_EarlyInit(stdComm_waIdk, sithMulti_name);
+    stdComm_dword_8321F8 = result;
     if ( result )
     {
-        sithDplay_dword_8321DC = 1;
-        sithDplay_dword_8321E0 = 1;
-        sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-        if ( sithDplay_dplayIdSelf )
+        stdComm_dword_8321DC = 1;
+        stdComm_dword_8321E0 = 1;
+        stdComm_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
+        if ( stdComm_dplayIdSelf )
         {
-            result = sithDplay_dword_8321F8;
-            if ( sithDplay_dword_8321F8 == 1 )
+            result = stdComm_dword_8321F8;
+            if ( stdComm_dword_8321F8 == 1 )
             {
-                sithDplay_bIsServer = 1;
+                stdComm_bIsServer = 1;
             }
-            else if ( sithDplay_dword_8321F8 == 2 )
+            else if ( stdComm_dword_8321F8 == 2 )
             {
-                sithDplay_bIsServer = 0;
+                stdComm_bIsServer = 0;
             }
         }
         else
@@ -72,12 +72,12 @@ int sithDplay_EarlyInit()
     return result;
 }
 
-HRESULT sithDplay_EnumSessions2(void)
+HRESULT stdComm_EnumSessions2(void)
 {
     return DirectPlay_EnumSessions2();
 }
 
-int sithDplay_seed_idk(jkMultiEntry *pEntry)
+int stdComm_seed_idk(jkMultiEntry *pEntry)
 {
     jkGuiMultiplayer_checksumSeed = (__int64)(_frand() * 4294967300.0);
     pEntry->checksumSeed = jkGuiMultiplayer_checksumSeed;
@@ -88,7 +88,7 @@ int sithDplay_seed_idk(jkMultiEntry *pEntry)
     return 0x80004005;
 }
 
-int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
+int stdComm_CreatePlayer(jkMultiEntry *pEntry)
 {
     HRESULT result; // eax
 
@@ -98,12 +98,12 @@ int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
     result = DirectPlay_OpenHost(pEntry);
     if ( !result )
     {
-        sithDplay_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-        if ( sithDplay_dplayIdSelf )
+        stdComm_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
+        if ( stdComm_dplayIdSelf )
         {
-            sithDplay_dplayIdSelf = 1; // HACK
-            sithDplay_bIsServer = 1;
-            sithDplay_dword_8321E0 = 1;
+            stdComm_dplayIdSelf = 1; // HACK
+            stdComm_bIsServer = 1;
+            stdComm_dword_8321E0 = 1;
             result = 0;
         }
         else
@@ -115,7 +115,7 @@ int sithDplay_CreatePlayer(jkMultiEntry *pEntry)
     return result;
 }
 
-int sithDplay_Recv(sithCogMsg *msg)
+int stdComm_Recv(sithCogMsg *msg)
 {
     sithCogMsg *pMsg; // esi
     int ret; // eax
@@ -154,7 +154,7 @@ int sithDplay_Recv(sithCogMsg *msg)
     return 0;
 }
 
-int sithDplay_DoReceive()
+int stdComm_DoReceive()
 {
     int result; // eax
     int v1; // [esp+0h] [ebp-8h] BYREF
@@ -167,16 +167,16 @@ int sithDplay_DoReceive()
     return result;
 }
 
-int sithDplay_SendToPlayer(sithCogMsg *msg, int sendto_id)
+int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id)
 {
     uint32_t v2 = msg->netMsg.msg_size + 4;
     if ( sendto_id != -1 )
     {
-        int ret = DirectPlay_Send(sithDplay_dplayIdSelf, sendto_id, &msg->netMsg.cogMsgId, v2);
+        int ret = DirectPlay_Send(stdComm_dplayIdSelf, sendto_id, &msg->netMsg.cogMsgId, v2);
         if ( !ret )
             return 0;
-        ++sithDplay_dword_8321F4;
-        sithDplay_dword_8321F0 += v2;
+        ++stdComm_dword_8321F4;
+        stdComm_dword_8321F0 += v2;
         return 1;
     }
 
@@ -187,11 +187,11 @@ int sithDplay_SendToPlayer(sithCogMsg *msg, int sendto_id)
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         sithPlayerInfo* v5 = &jkPlayer_playerInfos[i];
-        if ( !i || ((v5->flags & 1) != 0 && v5->net_id != sithDplay_dplayIdSelf) ) // Added: always allow sending to 0, for dedicated servers' fake player
+        if ( !i || ((v5->flags & 1) != 0 && v5->net_id != stdComm_dplayIdSelf) ) // Added: always allow sending to 0, for dedicated servers' fake player
         {
-            DirectPlay_Send(sithDplay_dplayIdSelf, v5->net_id, &msg->netMsg.cogMsgId, v2);
-            ++sithDplay_dword_8321F4;
-            sithDplay_dword_8321F0 += v2;
+            DirectPlay_Send(stdComm_dplayIdSelf, v5->net_id, &msg->netMsg.cogMsgId, v2);
+            ++stdComm_dword_8321F4;
+            stdComm_dword_8321F0 += v2;
         }
     }
 

@@ -11,7 +11,7 @@
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithIntersect.h"
 #include "Dss/sithMulti.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "World/sithWorld.h"
 #include "Gameplay/sithPlayer.h"
 #include "jk.h"

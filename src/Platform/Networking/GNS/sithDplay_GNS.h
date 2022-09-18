@@ -7,8 +7,8 @@ extern "C" {
 
 #ifdef PLATFORM_GNS
 
-void sithDplay_GNS_Startup();
-void sithDplay_GNS_Shutdown();
+void stdComm_GNS_Startup();
+void stdComm_GNS_Shutdown();
 
 #endif // PLATFORM_GNS
 
