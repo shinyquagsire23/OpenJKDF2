@@ -28,9 +28,9 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->desiredGeoMode = RD_GEOMODE_TEXTURED;
     thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
     thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
-    thing->geometryMode = RD_GEOMODE_TEXTURED;
-    thing->lightingMode = RD_LIGHTMODE_GOURAUD;
-    thing->textureMode = RD_TEXTUREMODE_2_UNK;
+    thing->curGeoMode = RD_GEOMODE_TEXTURED;
+    thing->curLightMode = RD_LIGHTMODE_GOURAUD;
+    thing->curTexMode = RD_TEXTUREMODE_2_UNK;
     thing->parentSithThing = parent;
     return 1;
 }

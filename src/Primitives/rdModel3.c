@@ -1136,7 +1136,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         rdPuppet_BuildJointMatrices(pCurThing, matrix_4_3);
     }
 
-    curGeometryMode = pCurThing->geometryMode;
+    curGeometryMode = pCurThing->curGeoMode;
     if ( curGeometryMode >= rdroid_curGeometryMode )
         curGeometryMode = rdroid_curGeometryMode;
 
@@ -1146,12 +1146,12 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     }
     else
     {
-        curLightingMode = pCurThing->lightingMode;
+        curLightingMode = pCurThing->curLightMode;
         if ( curLightingMode >= rdroid_curLightingMode )
             curLightingMode = rdroid_curLightingMode;
     }
 
-    curTextureMode = pCurThing->textureMode;
+    curTextureMode = pCurThing->curTexMode;
     if ( curTextureMode >= rdroid_curTextureMode )
         curTextureMode = rdroid_curTextureMode;
 

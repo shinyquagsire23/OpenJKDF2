@@ -173,9 +173,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
     if ( curGeometryMode_ >= sprite->face.geometryMode )
         curGeometryMode_ = sprite->face.geometryMode;
-    if ( curGeometryMode_ >= thing->geometryMode )
+    if ( curGeometryMode_ >= thing->curGeoMode )
     {
-        procEntry->geometryMode = thing->geometryMode;
+        procEntry->geometryMode = thing->curGeoMode;
     }    
     else if ( rdroid_curGeometryMode >= sprite->face.geometryMode )
     {
@@ -195,9 +195,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     {
         if ( curLightingMode_ >= sprite->face.lightingMode )
             curLightingMode_ = sprite->face.lightingMode;
-        if ( curLightingMode_ >= thing->lightingMode )
+        if ( curLightingMode_ >= thing->curLightMode )
         {
-            sprite->face.lightingMode = thing->lightingMode;
+            sprite->face.lightingMode = thing->curLightMode;
         }
         else if ( rdroid_curLightingMode < sprite->face.lightingMode )
         {
@@ -209,7 +209,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( curTextureMode_ >= sprite->face.textureMode )
         curTextureMode_ = sprite->face.textureMode;
     
-    procEntry->textureMode = thing->textureMode;
+    procEntry->textureMode = thing->curTexMode;
     if ( curTextureMode_ < procEntry->textureMode )
     {
         if ( curTextureMode_ >= sprite->face.textureMode )

@@ -2006,9 +2006,9 @@ typedef struct rdThing
     int* amputatedJoints;
     uint32_t wallCel;
     uint32_t geosetSelect;
-    rdGeoMode_t geometryMode;
-    rdLightMode_t lightingMode;
-    rdTexMode_t textureMode;
+    rdGeoMode_t curGeoMode;
+    rdLightMode_t curLightMode;
+    rdTexMode_t curTexMode;
     uint32_t clippingIdk;
     sithThing* parentSithThing;
 } rdThing;

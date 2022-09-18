@@ -454,9 +454,9 @@ void jkCog_SetInvis(sithCog *pCog)
     v1 = sithCogVm_PopInt(pCog);
     v2 = sithCogVm_PopThing(pCog);
     if ( v1 <= 0 )
-        v2->rdthing.geometryMode = v2->rdthing.desiredGeoMode;
+        v2->rdthing.curGeoMode = v2->rdthing.desiredGeoMode;
     else
-        v2->rdthing.geometryMode = RD_GEOMODE_VERTICES;
+        v2->rdthing.curGeoMode = RD_GEOMODE_VERTICES;
     if ( sithCogVm_multiplayerFlags )
     {
         if ( (pCog->flags & 0x200) == 0 )

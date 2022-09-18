@@ -1353,7 +1353,7 @@ void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
     {
-        thing->rdthing.geometryMode = mode;
+        thing->rdthing.curGeoMode = mode;
         if (COG_SHOULD_SYNC(ctx))
         {
                 sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
@@ -1366,7 +1366,7 @@ void sithCogFunctionThing_GetThingCurGeoMode(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithCogVm_PushInt(ctx, (int)thing->rdthing.geometryMode);
+        sithCogVm_PushInt(ctx, (int)thing->rdthing.curGeoMode);
 }
 
 void sithCogFunctionThing_SetThingCurLightMode(sithCog *ctx)
@@ -1374,7 +1374,7 @@ void sithCogFunctionThing_SetThingCurLightMode(sithCog *ctx)
     rdLightMode_t mode = (rdLightMode_t)sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        thing->rdthing.lightingMode = mode;
+        thing->rdthing.curLightMode = mode;
 }
 
 void sithCogFunctionThing_GetThingCurLightMode(sithCog *ctx)
@@ -1382,7 +1382,7 @@ void sithCogFunctionThing_GetThingCurLightMode(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithCogVm_PushInt(ctx, (int)thing->rdthing.lightingMode);
+        sithCogVm_PushInt(ctx, (int)thing->rdthing.curLightMode);
 }
 
 void sithCogFunctionThing_SetThingCurTexMode(sithCog *ctx)
@@ -1390,7 +1390,7 @@ void sithCogFunctionThing_SetThingCurTexMode(sithCog *ctx)
     int mode = sithCogVm_PopInt(ctx);
     sithThing* thing = sithCogVm_PopThing(ctx);
     if (thing)
-        thing->rdthing.textureMode = mode;
+        thing->rdthing.curTexMode = mode;
 }
 
 void sithCogFunctionThing_GetThingCurTexMode(sithCog *ctx)
@@ -1398,7 +1398,7 @@ void sithCogFunctionThing_GetThingCurTexMode(sithCog *ctx)
     sithThing* thing = sithCogVm_PopThing(ctx);
 
     if (thing)
-        sithCogVm_PushInt(ctx, thing->rdthing.textureMode);
+        sithCogVm_PushInt(ctx, thing->rdthing.curTexMode);
 }
 
 void sithCogFunctionThing_SetActorExtraSpeed(sithCog *ctx)
