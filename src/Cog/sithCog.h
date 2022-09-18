@@ -7,7 +7,7 @@
 #include "Cog/sithCogScript.h"
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
-#define jkCog_Initialize_ADDR (0x40A0C0)
+#define jkCog_Startup_ADDR (0x40A0C0)
 #define sithCogFunction_Initialize_ADDR (0x00505400)
 #define sithCogFunctionThing_Initialize_ADDR (0x005014E0)
 #define sithCogFunctionAI_Initialize_ADDR (0x00500B00)
