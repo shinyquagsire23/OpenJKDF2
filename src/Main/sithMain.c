@@ -21,7 +21,7 @@
 #include "World/sithSprite.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "World/sithMaterial.h"
 #include "World/sithTemplate.h"
 #include "World/sithModel.h"

@@ -7,7 +7,7 @@
 #include "Gameplay/sithPlayerActions.h"
 #include "Cog/sithCog.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
 #include "AI/sithAIClass.h"

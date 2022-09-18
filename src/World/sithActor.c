@@ -3,7 +3,7 @@
 #include "Cog/sithCog.h"
 #include "World/sithThing.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithCollision.h"
 #include "Engine/sithPhysics.h"

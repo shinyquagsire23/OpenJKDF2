@@ -1,7 +1,7 @@
 #include "sithDSSThing.h"
 
 #include "Cog/sithCog.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Devices/sithSoundMixer.h"
 #include "World/sithSurface.h"
 #include "Devices/sithSound.h"

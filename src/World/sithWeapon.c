@@ -15,7 +15,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"

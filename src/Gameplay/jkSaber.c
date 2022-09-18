@@ -4,7 +4,7 @@
 #include "Engine/rdroid.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Gameplay/sithTime.h"
 #include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"

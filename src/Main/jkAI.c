@@ -3,7 +3,7 @@
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
 #include "World/jkPlayer.h"

@@ -10,7 +10,7 @@
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Dss/sithMulti.h"
 #include "Gameplay/sithTime.h"
 #include "Devices/sithControl.h"

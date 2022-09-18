@@ -13,7 +13,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "stdPlatform.h"
 #include "World/sithSector.h"
 #include "World/sithSurface.h"

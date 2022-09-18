@@ -20,7 +20,7 @@
 #include "Engine/sithPuppet.h"
 #include "World/sithTemplate.h"
 #include "Engine/sithParticle.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "World/sithModel.h"
 #include "World/sithSprite.h"

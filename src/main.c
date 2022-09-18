@@ -90,7 +90,7 @@
 #include "Engine/sithRenderSky.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPolyLine.h"

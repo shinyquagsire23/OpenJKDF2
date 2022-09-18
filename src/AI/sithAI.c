@@ -13,7 +13,7 @@
 #include "AI/sithAIClass.h"
 #include "Main/sithMain.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithAnimClass.h"

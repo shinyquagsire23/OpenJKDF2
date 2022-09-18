@@ -13,7 +13,7 @@
 #include "Main/jkStrings.h"
 #include "World/sithTemplate.h"
 #include "World/sithModel.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithPuppet.h"
 #include "Devices/sithComm.h"

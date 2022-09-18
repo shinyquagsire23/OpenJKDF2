@@ -5,7 +5,7 @@
 #include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "World/sithSurface.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"

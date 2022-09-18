@@ -10,7 +10,7 @@
 #include "World/jkPlayer.h"
 #include "Engine/sithAdjoin.h"
 #include "World/sithSurface.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithPhysics.h"
 #include "General/stdMath.h"

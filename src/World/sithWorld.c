@@ -12,7 +12,7 @@
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithAnimClass.h"
 #include "AI/sithAIClass.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "stdPlatform.h"
 #include "Devices/sithConsole.h"
 #include "General/stdFnames.h"
