@@ -246,6 +246,7 @@ rdActive                       0x1a55     0.625%        100.000%        8 / 8
 sithCogVm                      0x1aec     0.639%        100.000%       31 / 31         
 sithCogParse                   0x1b2a     0.645%        100.000%       26 / 26         
 jkHud                          0x1c9b     0.679%        100.000%       17 / 17         
+jkSaber                        0x1f4a     0.742%        100.000%       40 / 40         
 jkDev                          0x1fd6     0.755%        100.000%       41 / 41         
 sithInventory                  0x2150     0.791%        100.000%       62 / 62         
 sithDSSThing                   0x22aa     0.823%        100.000%       37 / 37         
@@ -289,7 +290,6 @@ rdPrimit3                      0x16e0     0.543%        91.684%         7 / 9
 stdFont                        0x181a     0.572%        75.284%        12 / 20         
 sithSurface                    0x1c6a     0.674%        96.838%        33 / 35         
 sithCog                        0x1ed3     0.731%        90.686%        21 / 28         
-jkSaber                        0x1f4a     0.742%        95.943%        37 / 40         
 sithMulti                      0x252a     0.882%        91.423%        29 / 35         
 sithCollision                  0x2827     0.953%        91.954%        19 / 22         
 sithControl                    0x285a     0.958%        99.613%        31 / 33         
@@ -302,10 +302,10 @@ rdNRaster                      0x304d4    18.339%       0.000%          0 / 87
 
 Total completion:
 -----------------
-56.728% by weight
-95.806% by weight excluding rasterizer
-2691 / 3169 functions
-2691 / 2798 functions excluding rasterizer
+56.758% by weight
+95.857% by weight excluding rasterizer
+2694 / 3169 functions
+2694 / 2798 functions excluding rasterizer
 
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
@@ -315,11 +315,11 @@ stdPlatform    0.168%            6 / 43
 std            1.493%           46 / 359
 jkGui          0.000%            0 / 284
 rd             0.216%           11 / 345
-jk             0.075%            4 / 324
+jk             0.044%            1 / 324
 Raster         40.778%         370 / 371
 other          0.000%            0 / 120
 -----------------------------------------
-total          43.272%         478 / 3169
+total          43.242%         475 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
@@ -329,9 +329,9 @@ stdPlatform    0.283%            6 / 43
 std            2.521%           46 / 359
 jkGui          0.000%            0 / 284
 rd             0.364%           11 / 345
-jk             0.126%            4 / 324
+jk             0.075%            1 / 324
 other          0.000%            0 / 120
 -----------------------------------------
-total          4.213%          108 / 2798
+total          4.162%          105 / 2798
 
 ```

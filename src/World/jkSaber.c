@@ -39,32 +39,6 @@ const char* jkSaber_aKyTeamModels[5] = {
     "kyT0.3do",
 };
 
-
-int jkSaber_Startup()
-{
-    sithComm_SetMsgFunc(DSS_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
-    sithComm_SetMsgFunc(DSS_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
-    sithComm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
-    sithComm_SetMsgFunc(DSS_ID_32, jkSaber_cogMsg_Handlex32);
-    sithComm_SetMsgFunc(DSS_ID_33, jkSaber_cogMsg_Handlex33);
-    sithComm_SetMsgFunc(DSS_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
-    sithComm_SetMsgFunc(DSS_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
-    sithComm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
-    sithComm_SetMsgFunc(DSS_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
-    sithComm_SetMsgFunc(DSS_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithComm_SetMsgFunc(DSS_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithComm_SetMsgFunc(DSS_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
-    sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
-    sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
-    sithMulti_SetHandleridk(jkSaber_idk4);
-    return 1;
-}
-
-void jkSaber_Shutdown()
-{
-    ;
-}
-
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
 {
     float length = 0.0;
@@ -408,37 +382,40 @@ void jkSaber_UpdateCollision(sithThing *player, int joint)
     return;
 }
 
-void jkSaber_Load()
+void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType)
 {
-    char a1[32]; // [esp+0h] [ebp-20h] BYREF
+    sithThing *pTemplate; // eax
+    sithThing *v5; // eax
+    sithThing *pActor; // ecx
+    int v7; // edx
 
-    stdConffile_Read(a1, 32);
-    jkRes_LoadGob(a1);
-    stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
-}
-
-void jkSaber_Write()
-{
-    stdConffile_Write(jkRes_episodeGobName, 32);
-    stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
-}
-
-void jkSaber_player_thingsidkfunc()
-{
-    int v0; // eax
-
-    v0 = jkSmack_GetCurrentGuiState();
-    if ( v0 == 6 || v0 == 5 )
-        jkPlayer_Shutdown();
-}
-
-void jkSaber_nullsub_2()
-{
-}
-
-void jkSaber_Disable(sithThing *player)
-{
-    player->playerInfo->field_1A4 = 0;
+    if ( sithTime_curMs >= pPlayerInfo->lastSparkSpawnMs + 200 )
+    {
+        if ( sparkType == 1 )
+        {
+            pTemplate = pPlayerInfo->blood_sparks;
+        }
+        else if ( sparkType == 2 )
+        {
+            pTemplate = pPlayerInfo->saber_sparks;
+        }
+        else
+        {
+            pTemplate = pPlayerInfo->wall_sparks;
+        }
+        if ( pTemplate )
+        {
+            v5 = sithThing_Create(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
+            if ( v5 )
+            {
+                pActor = pPlayerInfo->actorThing;
+                v7 = sithTime_curMs;
+                v5->prev_thing = pActor;
+                pPlayerInfo->lastSparkSpawnMs = v7;
+                v5->child_signature = pActor->signature;
+            }
+        }
+    }
 }
 
 void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
@@ -454,6 +431,61 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
     _memset(a1->playerInfo->damagedSurfaces, 0, sizeof(a1->playerInfo->damagedSurfaces));
     
     a1->playerInfo->lastSparkSpawnMs = 0;
+}
+
+void jkSaber_Disable(sithThing *player)
+{
+    player->playerInfo->field_1A4 = 0;
+}
+
+int jkSaber_Startup()
+{
+    sithComm_SetMsgFunc(DSS_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
+    sithComm_SetMsgFunc(DSS_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
+    sithComm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
+    sithComm_SetMsgFunc(DSS_ID_32, jkSaber_cogMsg_Handlex32);
+    sithComm_SetMsgFunc(DSS_ID_33, jkSaber_cogMsg_Handlex33);
+    sithComm_SetMsgFunc(DSS_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
+    sithComm_SetMsgFunc(DSS_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
+    sithComm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
+    sithComm_SetMsgFunc(DSS_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
+    sithComm_SetMsgFunc(DSS_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithComm_SetMsgFunc(DSS_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithComm_SetMsgFunc(DSS_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
+    sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
+    sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
+    sithMulti_SetHandleridk(jkSaber_idk4);
+    return 1;
+}
+
+void jkSaber_Shutdown()
+{
+    ;
+}
+
+int jkSaber_idk4()
+{
+    if ( sithPlayer_pLocalPlayerThing )
+    {
+        if ( sithNet_isServer )
+        {
+            if ( sithMulti_leaveJoinType )
+            {
+                sithComm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
+                sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+                sithComm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
+                sithComm_netMsgTmp.netMsg.msg_size = 4;
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+                sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
+            }
+        }
+        jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+        jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
+        return 1;
+    }
+    return 0;
 }
 
 void jkSaber_playerconfig_idksync()
@@ -499,6 +531,176 @@ void jkSaber_playerconfig_idksync()
         
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
     }
+}
+
+void jkSaber_player_thingsidkfunc()
+{
+    int v0; // eax
+
+    v0 = jkSmack_GetCurrentGuiState();
+    if ( v0 == 6 || v0 == 5 )
+        jkPlayer_Shutdown();
+}
+
+void jkSaber_nullsub_2()
+{
+}
+
+void jkSaber_Write()
+{
+    stdConffile_Write(jkRes_episodeGobName, 32);
+    stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
+}
+
+void jkSaber_Load()
+{
+    char a1[32]; // [esp+0h] [ebp-20h] BYREF
+
+    stdConffile_Read(a1, 32);
+    jkRes_LoadGob(a1);
+    stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
+}
+
+int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
+{
+    return jkSaber_cogMsg_SendSaberInfo_alt(
+               sithPlayer_pLocalPlayerThing,
+               jkGuiMultiplayer_mpcInfo.model,
+               jkGuiMultiplayer_mpcInfo.soundClass,
+               jkGuiMultiplayer_mpcInfo.sideMat,
+               jkGuiMultiplayer_mpcInfo.tipMat);
+}
+
+int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr)
+{
+    int result; // eax
+
+    NETMSG_START;
+
+    NETMSG_PUSHS32(pPlayerThing->thing_id);
+    NETMSG_PUSHSTR(pModelStr, 0x20);
+    NETMSG_PUSHSTR(pSoundclassStr, 0x20);
+    NETMSG_PUSHSTR(pSideMatStr, 0x20);
+    NETMSG_PUSHSTR(pTipMatStr, 0x20);
+
+    NETMSG_END(DSS_SABERINFO1);
+
+    if ( sithNet_isServer )
+        result = jkSaber_cogMsg_HandleSetSaberInfo(&sithComm_netMsgTmp);
+    else
+        result = sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
+    return result;
+}
+
+void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS32(thing->thing_id);
+    NETMSG_PUSHSTR(thing->rdthing.model3->filename, 0x20);
+    NETMSG_PUSHSTR(thing->soundclass->snd_fname, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
+
+    NETMSG_END(DSS_SABERINFO2);
+    
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+}
+
+int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
+{
+    sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
+    char model_3do_fname[32]; // [esp+18h] [ebp-80h] BYREF
+    char v14[32]; // [esp+38h] [ebp-60h] BYREF
+    
+    char material_side_fname[32]; // [esp+58h] [ebp-40h] BYREF
+    char material_tip_fname[32]; // [esp+78h] [ebp-20h] BYREF
+
+    NETMSG_IN_START(msg);
+
+    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
+        return 1;
+
+    sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
+    if ( !v2 )
+        return 0;
+    v11 = v2->actorParams.playerinfo;
+    if ( !v11 || !v2->playerInfo )
+        return 0;
+    NETMSG_POPSTR(model_3do_fname, 0x20);
+    NETMSG_POPSTR(v14, 0x20);
+    NETMSG_POPSTR(material_side_fname, 0x20);
+    NETMSG_POPSTR(material_tip_fname, 0x20);
+
+    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
+    {
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_20) != 0 )
+            return 1;
+        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
+        {
+            _strncpy(model_3do_fname, jkSaber_aKyTeamModels[v11->teamNum], 0x1Fu);
+            model_3do_fname[31] = 0;
+            _strncpy(v14, "ky.snd", 0x1Fu);
+            v14[31] = 0;
+        }
+    }
+    rdModel3* v5 = sithModel_LoadEntry(model_3do_fname, 1);
+    if ( !v5 )
+        return 1;
+    sithThing_SetNewModel(v2, v5);
+    sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
+    if ( v6 )
+        sithSoundClass_SetThingSoundClass(v2, v6);
+    sithThing* v10 = sithTemplate_GetEntryByName("+ssparks_saber");
+    sithThing* v9 = sithTemplate_GetEntryByName("+ssparks_blood");
+    sithThing* v7 = sithTemplate_GetEntryByName("+ssparks_wall");
+    jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
+
+    if ( sithNet_isServer )
+    {
+        if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
+        {
+            jkSaber_cogMsg_SendSetSaberInfo(v2);
+        }
+    }
+    return 1;
+}
+
+void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
+{
+    NETMSG_START;
+
+    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
+
+    NETMSG_PUSHS16(pPlayerThing->thingIdx);
+    NETMSG_PUSHF32(pPlayerInfo->damage);
+    NETMSG_PUSHF32(pPlayerInfo->field_1AC);
+    NETMSG_PUSHF32(pPlayerInfo->field_1B0);
+
+    NETMSG_END(DSS_JKENABLESABER);
+
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 0);
+}
+
+int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    if ( !pThing )
+        return 0;
+    if ( !pThing->playerInfo )
+        return 0;
+    int type = pThing->type;
+    if ( type != SITH_THING_PLAYER && type != SITH_THING_ACTOR )
+        return 0;
+
+    float arg1 = NETMSG_POPF32();
+    float arg2 = NETMSG_POPF32();
+    float arg3 = NETMSG_POPF32();
+
+    jkSaber_Enable(pThing, arg1, arg2, arg3);
+    return 1;
 }
 
 void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
@@ -618,77 +820,95 @@ int jkSaber_cogMsg_HandleSetSaberInfo2(sithCogMsg *msg)
     return 1;
 }
 
-void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
+void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(thing->thing_id);
-    NETMSG_PUSHSTR(thing->rdthing.model3->filename, 0x20);
-    NETMSG_PUSHSTR(thing->soundclass->snd_fname, 0x20);
-    NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
-    NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
+    NETMSG_PUSHS32(pPlayerThing->thing_id);
 
-    NETMSG_END(DSS_SABERINFO2);
-    
+    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
+    rdModel3* pModel3 = pPlayerInfo->rd_thing.model3;
+    if ( pModel3 ) {
+        NETMSG_PUSHS32(pModel3->id);
+    }
+    else {
+        NETMSG_PUSHS32(-1);
+    }
+
+    NETMSG_PUSHS16(pPlayerInfo->maxTwinkles);
+    NETMSG_PUSHS16(pPlayerInfo->twinkleSpawnRate);
+
+    NETMSG_END(DSS_JKSETWEAPONMESH);
+
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
-int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
+int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg)
 {
-    sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
-    char model_3do_fname[32]; // [esp+18h] [ebp-80h] BYREF
-    char v14[32]; // [esp+38h] [ebp-60h] BYREF
-    
-    char material_side_fname[32]; // [esp+58h] [ebp-40h] BYREF
-    char material_tip_fname[32]; // [esp+78h] [ebp-20h] BYREF
+    NETMSG_IN_START(msg);
+    int arg0 = NETMSG_POPS32();
+    int arg1 = NETMSG_POPS32();
+    int16_t arg2 = NETMSG_POPS16();
+    int16_t arg3 = NETMSG_POPS16();
 
+    sithThing* pThing = sithThing_GetById(arg0);
+    if ( pThing )
+    {
+        jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
+        if ( pPlayerInfo )
+        {
+            rdModel3* pModel = sithModel_GetByIdx(arg1);
+            if ( pModel )
+            {
+                rdThing_NewEntry(&pPlayerInfo->rd_thing, 0);
+                rdThing_SetModel3(&pPlayerInfo->rd_thing, pModel);
+            }
+            pPlayerInfo->maxTwinkles = arg2;
+            pPlayerInfo->twinkleSpawnRate = arg3;
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+int jkSaber_cogMsg_SendHudTarget()
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS16(jkHud_bHasTarget);
+
+    if ( jkHud_pTargetThing ) {
+        NETMSG_PUSHS16(jkHud_pTargetThing->thingIdx);
+    }
+    else {
+        NETMSG_PUSHS16(-1);
+    }
+
+    NETMSG_PUSHS16(jkHud_targetRed);
+    NETMSG_PUSHS16(jkHud_targetBlue);
+    NETMSG_PUSHS16(jkHud_targetGreen);
+
+    NETMSG_END(DSS_HUDTARGET);
+
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
+}
+
+int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg)
+{
     NETMSG_IN_START(msg);
 
-    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
-        return 1;
+    jkHud_bHasTarget = NETMSG_POPS16();
+    jkHud_pTargetThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    if ( !jkHud_pTargetThing )
+        jkHud_bHasTarget = 0;
 
-    sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
-    if ( !v2 )
-        return 0;
-    v11 = v2->actorParams.playerinfo;
-    if ( !v11 || !v2->playerInfo )
-        return 0;
-    NETMSG_POPSTR(model_3do_fname, 0x20);
-    NETMSG_POPSTR(v14, 0x20);
-    NETMSG_POPSTR(material_side_fname, 0x20);
-    NETMSG_POPSTR(material_tip_fname, 0x20);
-
-    if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
-    {
-        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_20) != 0 )
-            return 1;
-        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
-        {
-            _strncpy(model_3do_fname, jkSaber_aKyTeamModels[v11->teamNum], 0x1Fu);
-            model_3do_fname[31] = 0;
-            _strncpy(v14, "ky.snd", 0x1Fu);
-            v14[31] = 0;
-        }
-    }
-    rdModel3* v5 = sithModel_LoadEntry(model_3do_fname, 1);
-    if ( !v5 )
-        return 1;
-    sithThing_SetNewModel(v2, v5);
-    sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
-    if ( v6 )
-        sithSoundClass_SetThingSoundClass(v2, v6);
-    sithThing* v10 = sithTemplate_GetEntryByName("+ssparks_saber");
-    sithThing* v9 = sithTemplate_GetEntryByName("+ssparks_blood");
-    sithThing* v7 = sithTemplate_GetEntryByName("+ssparks_wall");
-    jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
-
-    if ( sithNet_isServer )
-    {
-        if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 )
-        {
-            jkSaber_cogMsg_SendSetSaberInfo(v2);
-        }
-    }
+    jkHud_targetRed = NETMSG_POPS16();
+    jkHud_targetBlue = NETMSG_POPS16();
+    jkHud_targetGreen = NETMSG_POPS16();
     return 1;
 }
 
@@ -779,172 +999,76 @@ int jkSaber_cogMsg_Handlex32(sithCogMsg *msg)
     return 1;
 }
 
+// Unused?
+int jkSaber_cogMsg_Sendx33(sithThing* pThing, rdKeyframe* pKeyframe, int a3, int16_t a4)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS16(pThing->thingIdx);
+    NETMSG_PUSHS16(pKeyframe->id);
+    NETMSG_PUSHS16(a4);
+    NETMSG_PUSHS32(a3);
+
+    NETMSG_END(DSS_ID_33);
+
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 2, 1);
+}
+
+// Unused?
+int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+    int16_t arg0 = NETMSG_POPS16();
+    int16_t arg1 = NETMSG_POPS16();
+    int16_t arg2 = NETMSG_POPS16();
+    int arg3 = NETMSG_POPS32();
+
+    if ( arg0 > sithWorld_pCurrentWorld->numThingsLoaded )
+        return 0;
+    sithThing* pThing = &sithWorld_pCurrentWorld->things[arg0];
+
+
+    int type = pThing->type;
+    if ( type != SITH_THING_ACTOR && type != SITH_THING_PLAYER )
+        return 0;
+
+    jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
+    if ( !pPlayerInfo )
+        return 0;
+    if ( !pPlayerInfo->povModel.puppet )
+        return 0;
+
+    rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(arg1);
+    if ( !pKeyframe )
+        return 0;
+    sithPuppet_StartKey(
+        pPlayerInfo->povModel.puppet,
+        pKeyframe,
+        arg2,
+        arg2 + 2,
+        arg3,
+        0);
+    return 1;
+}
+
+int jkSaber_cogMsg_Sendx36()
+{
+    NETMSG_START;
+
+    NETMSG_PUSHVEC3(jkPlayer_waggleVec);
+    NETMSG_PUSHF32(jkPlayer_waggleMag);
+
+    NETMSG_END(DSS_ID_36);
+
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
+}
+
 int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
     jkPlayer_waggleVec = NETMSG_POPVEC3();
     jkPlayer_waggleMag = NETMSG_POPF32();
-    return 1;
-}
-
-int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg)
-{
-    NETMSG_IN_START(msg);
-
-    jkHud_bHasTarget = NETMSG_POPS16();
-    sithThing* v1 = sithThing_GetThingByIdx(NETMSG_POPS16());
-    jkHud_pTargetThing = v1;
-    if ( !v1 )
-        jkHud_bHasTarget = 0;
-
-    jkHud_targetRed = NETMSG_POPS16();
-    jkHud_targetBlue = NETMSG_POPS16();
-    jkHud_targetGreen = NETMSG_POPS16();
-    return 1;
-}
-
-
-void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
-{
-    NETMSG_START;
-
-    NETMSG_PUSHS16(playerThingIdx);
-    NETMSG_PUSHS16(teamNum);
-
-    NETMSG_END(DSS_SETTEAM);
-    
-    if ( sithNet_isServer )
-        jkSaber_cogMsg_HandleSetTeam(&sithComm_netMsgTmp);
-    else
-        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
-}
-
-int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
-{
-    unsigned int playerIdx; // edx
-    unsigned int teamNum; // ecx
-    unsigned int v4; // esi
-    rdModel3 *v5; // eax
-
-    NETMSG_IN_START(pMsg);
-
-    playerIdx = NETMSG_POPS16();
-    teamNum = NETMSG_POPS16();
-
-    if ( !sithNet_isServer || playerIdx > jkPlayer_maxPlayers - 1 )
-        return 0;
-
-    if ( !teamNum || teamNum > 4 )
-        return 0;
-
-    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )
-        return 1;
-
-    jkPlayer_playerInfos[playerIdx].teamNum = teamNum;
-    if ( jkPlayer_playerInfos[playerIdx].playerThing )
-    {
-        v5 = sithModel_LoadEntry(jkSaber_aKyTeamModels[teamNum], 1);
-        if ( v5 )
-        {
-            sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
-            jkSaber_cogMsg_SendSetSaberInfo(jkPlayer_playerInfos[playerIdx].playerThing);
-        }
-    }
-
-    sithMulti_SyncScores();
-    return 1;
-}
-
-void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
-{
-    NETMSG_START;
-
-    NETMSG_PUSHS32(pPlayerThing->thing_id);
-
-    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
-    rdModel3* pModel3 = pPlayerInfo->rd_thing.model3;
-    if ( pModel3 ) {
-        NETMSG_PUSHS32(pModel3->id);
-    }
-    else {
-        NETMSG_PUSHS32(-1);
-    }
-
-    NETMSG_PUSHS16(pPlayerInfo->maxTwinkles);
-    NETMSG_PUSHS16(pPlayerInfo->twinkleSpawnRate);
-
-    NETMSG_END(DSS_JKSETWEAPONMESH);
-
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-}
-
-int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg)
-{
-    NETMSG_IN_START(msg);
-    int arg0 = NETMSG_POPS32();
-    int arg1 = NETMSG_POPS32();
-    int16_t arg2 = NETMSG_POPS16();
-    int16_t arg3 = NETMSG_POPS16();
-
-    sithThing* pThing = sithThing_GetById(arg0);
-    if ( pThing )
-    {
-        jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
-        if ( pPlayerInfo )
-        {
-            rdModel3* pModel = sithModel_GetByIdx(arg1);
-            if ( pModel )
-            {
-                rdThing_NewEntry(&pPlayerInfo->rd_thing, 0);
-                rdThing_SetModel3(&pPlayerInfo->rd_thing, pModel);
-            }
-            pPlayerInfo->maxTwinkles = arg2;
-            pPlayerInfo->twinkleSpawnRate = arg3;
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    return 0;
-}
-
-void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
-{
-    NETMSG_START;
-
-    jkPlayerInfo* pPlayerInfo = pPlayerThing->playerInfo;
-
-    NETMSG_PUSHS16(pPlayerThing->thingIdx);
-    NETMSG_PUSHF32(pPlayerInfo->damage);
-    NETMSG_PUSHF32(pPlayerInfo->field_1AC);
-    NETMSG_PUSHF32(pPlayerInfo->field_1B0);
-
-    NETMSG_END(DSS_JKENABLESABER);
-
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 0);
-}
-
-int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg)
-{
-    NETMSG_IN_START(msg);
-
-    sithThing* pThing = sithThing_GetThingByIdx(NETMSG_POPS16());
-    if ( !pThing )
-        return 0;
-    if ( !pThing->playerInfo )
-        return 0;
-    int type = pThing->type;
-    if ( type != SITH_THING_PLAYER && type != SITH_THING_ACTOR )
-        return 0;
-
-    float arg1 = NETMSG_POPF32();
-    float arg2 = NETMSG_POPF32();
-    float arg3 = NETMSG_POPF32();
-
-    jkSaber_Enable(pThing, arg1, arg2, arg3);
     return 1;
 }
 
@@ -1015,131 +1139,53 @@ int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg)
     return 1;
 }
 
-int jkSaber_cogMsg_wrap_SendSaberInfo_alt()
+void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
 {
-    return jkSaber_cogMsg_SendSaberInfo_alt(
-               sithPlayer_pLocalPlayerThing,
-               jkGuiMultiplayer_mpcInfo.model,
-               jkGuiMultiplayer_mpcInfo.soundClass,
-               jkGuiMultiplayer_mpcInfo.sideMat,
-               jkGuiMultiplayer_mpcInfo.tipMat);
-}
-
-int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr)
-{
-    int result; // eax
-
     NETMSG_START;
 
-    NETMSG_PUSHS32(pPlayerThing->thing_id);
-    NETMSG_PUSHSTR(pModelStr, 0x20);
-    NETMSG_PUSHSTR(pSoundclassStr, 0x20);
-    NETMSG_PUSHSTR(pSideMatStr, 0x20);
-    NETMSG_PUSHSTR(pTipMatStr, 0x20);
+    NETMSG_PUSHS16(playerThingIdx);
+    NETMSG_PUSHS16(teamNum);
 
-    NETMSG_END(DSS_SABERINFO1);
-
+    NETMSG_END(DSS_SETTEAM);
+    
     if ( sithNet_isServer )
-        result = jkSaber_cogMsg_HandleSetSaberInfo(&sithComm_netMsgTmp);
+        jkSaber_cogMsg_HandleSetTeam(&sithComm_netMsgTmp);
     else
-        result = sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
-    return result;
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
 }
 
-// Unused?
-int jkSaber_cogMsg_Handlex33(sithCogMsg *msg)
+int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
 {
-    NETMSG_IN_START(msg);
-    int16_t arg0 = NETMSG_POPS16();
-    int16_t arg1 = NETMSG_POPS16();
-    int16_t arg2 = NETMSG_POPS16();
-    int arg3 = NETMSG_POPS32();
+    unsigned int playerIdx; // edx
+    unsigned int teamNum; // ecx
+    unsigned int v4; // esi
+    rdModel3 *v5; // eax
 
-    if ( arg0 > sithWorld_pCurrentWorld->numThingsLoaded )
-        return 0;
-    sithThing* pThing = &sithWorld_pCurrentWorld->things[arg0];
+    NETMSG_IN_START(pMsg);
 
+    playerIdx = NETMSG_POPS16();
+    teamNum = NETMSG_POPS16();
 
-    int type = pThing->type;
-    if ( type != SITH_THING_ACTOR && type != SITH_THING_PLAYER )
+    if ( !sithNet_isServer || playerIdx > jkPlayer_maxPlayers - 1 )
         return 0;
 
-    jkPlayerInfo* pPlayerInfo = pThing->playerInfo;
-    if ( !pPlayerInfo )
-        return 0;
-    if ( !pPlayerInfo->povModel.puppet )
+    if ( !teamNum || teamNum > 4 )
         return 0;
 
-    rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(arg1);
-    if ( !pKeyframe )
-        return 0;
-    sithPuppet_StartKey(
-        pPlayerInfo->povModel.puppet,
-        pKeyframe,
-        arg2,
-        arg2 + 2,
-        arg3,
-        0);
-    return 1;
-}
-
-int jkSaber_idk4()
-{
-    if ( sithPlayer_pLocalPlayerThing )
-    {
-        if ( sithNet_isServer )
-        {
-            if ( sithMulti_leaveJoinType )
-            {
-                sithComm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
-                sithComm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithComm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
-                sithComm_netMsgTmp.netMsg.msg_size = 4;
-                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-                sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
-            }
-        }
-        jkSaber_cogMsg_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
-        jkSaber_cogMsg_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )
         return 1;
-    }
-    return 0;
-}
 
-void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType)
-{
-    sithThing *pTemplate; // eax
-    sithThing *v5; // eax
-    sithThing *pActor; // ecx
-    int v7; // edx
-
-    if ( sithTime_curMs >= pPlayerInfo->lastSparkSpawnMs + 200 )
+    jkPlayer_playerInfos[playerIdx].teamNum = teamNum;
+    if ( jkPlayer_playerInfos[playerIdx].playerThing )
     {
-        if ( sparkType == 1 )
+        v5 = sithModel_LoadEntry(jkSaber_aKyTeamModels[teamNum], 1);
+        if ( v5 )
         {
-            pTemplate = pPlayerInfo->blood_sparks;
-        }
-        else if ( sparkType == 2 )
-        {
-            pTemplate = pPlayerInfo->saber_sparks;
-        }
-        else
-        {
-            pTemplate = pPlayerInfo->wall_sparks;
-        }
-        if ( pTemplate )
-        {
-            v5 = sithThing_Create(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
-            if ( v5 )
-            {
-                pActor = pPlayerInfo->actorThing;
-                v7 = sithTime_curMs;
-                v5->prev_thing = pActor;
-                pPlayerInfo->lastSparkSpawnMs = v7;
-                v5->child_signature = pActor->signature;
-            }
+            sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
+            jkSaber_cogMsg_SendSetSaberInfo(jkPlayer_playerInfos[playerIdx].playerThing);
         }
     }
+
+    sithMulti_SyncScores();
+    return 1;
 }

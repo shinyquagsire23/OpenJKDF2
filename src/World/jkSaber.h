@@ -11,6 +11,7 @@
 #define jkSaber_SpawnSparks_ADDR (0x0040BF40)
 #define jkSaber_Enable_ADDR (0x0040BFC0)
 #define jkSaber_Disable_ADDR (0x0040C020)
+
 #define jkSaber_Startup_ADDR (0x0040C040)
 #define jkSaber_Shutdown_ADDR (0x0040C140)
 #define jkSaber_idk4_ADDR (0x0040C150)
@@ -44,37 +45,50 @@
 #define jkSaber_cogMsg_SendSetTeam_ADDR (0x0040D3E0)
 #define jkSaber_cogMsg_HandleSetTeam_ADDR (0x0040D450)
 
-int jkSaber_Startup();
-void jkSaber_Shutdown();
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks);
 void jkSaber_PolylineRand(rdThing *thing);
 void jkSaber_Draw(rdMatrix34 *posRotMat);
 void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint);
-void jkSaber_Load();
-void jkSaber_Write();
+void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType);
+void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4);
+void jkSaber_Disable(sithThing *player);
+
+int jkSaber_Startup();
+void jkSaber_Shutdown();
+int jkSaber_idk4();
+void jkSaber_playerconfig_idksync();
 void jkSaber_player_thingsidkfunc();
 void jkSaber_nullsub_2();
-void jkSaber_Disable(sithThing *player);
-void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4);
-void jkSaber_playerconfig_idksync();
-void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing);
-int jkSaber_cogMsg_HandleSetSaberInfo2(sithCogMsg *msg);
+void jkSaber_Write();
+void jkSaber_Load();
+
+int jkSaber_cogMsg_wrap_SendSaberInfo_alt();
+int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
+
 void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing);
 int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg);
-void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo);
-int jkSaber_cogMsg_Handlex32(sithCogMsg *msg);
-int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg);
-int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg);
 
-void jkSaber_cogMsg_SendSetTeam(int16_t teamNum);
-int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg);
+void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing);
+int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg);
+
+void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing);
+int jkSaber_cogMsg_HandleSetSaberInfo2(sithCogMsg *msg);
 
 void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing);
 int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg);
 
-void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing);
-int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg);
+int jkSaber_cogMsg_SendHudTarget();
+int jkSaber_cogMsg_HandleHudTarget(sithCogMsg *msg);
+
+void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo);
+int jkSaber_cogMsg_Handlex32(sithCogMsg *msg);
+
+int jkSaber_cogMsg_Sendx33(sithThing* pThing, rdKeyframe* pKeyframe, int a3, int16_t a4);
+int jkSaber_cogMsg_Handlex33(sithCogMsg *msg);
+
+int jkSaber_cogMsg_Sendx36();
+int jkSaber_cogMsg_Handlex36_setwaggle(sithCogMsg *msg);
 
 void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2);
 int jkSaber_cogMsg_HandleJKPrintUniString(sithCogMsg *msg);
@@ -82,12 +96,8 @@ int jkSaber_cogMsg_HandleJKPrintUniString(sithCogMsg *msg);
 void jkSaber_cogMsg_SendEndLevel();
 int jkSaber_cogMsg_HandleEndLevel(sithCogMsg *msg);
 
-int jkSaber_cogMsg_wrap_SendSaberInfo_alt();
-int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
-
-int jkSaber_cogMsg_Handlex33(sithCogMsg *msg);
-int jkSaber_idk4();
-void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType);
+void jkSaber_cogMsg_SendSetTeam(int16_t teamNum);
+int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg);
 
 //static void (*jkSaber_Shutdown)() = (void*)jkSaber_Shutdown_ADDR;
 //static int (*jkSaber_cogMsg_wrap_SendSaberInfo_alt)() = (void*)jkSaber_cogMsg_wrap_SendSaberInfo_alt_ADDR;
