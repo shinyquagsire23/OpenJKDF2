@@ -14,7 +14,7 @@
 #include "Primitives/rdPrimit2.h"
 #include "Primitives/rdPrimit3.h"
 #include "Gameplay/sithOverlayMap.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
 #include "Gui/jkGUITitle.h"

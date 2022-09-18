@@ -17,7 +17,7 @@
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
 #include "Gui/jkGUITitle.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "../jk.h"
 
 static int jkControl_bInit;

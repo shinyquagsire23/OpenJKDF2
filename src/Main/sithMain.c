@@ -31,7 +31,7 @@
 #include "Gameplay/sithTime.h"
 #include "Engine/sithRender.h"
 #include "Devices/sithControl.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"

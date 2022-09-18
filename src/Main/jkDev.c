@@ -13,7 +13,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
 #include "Main/sithCommand.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"

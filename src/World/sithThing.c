@@ -16,7 +16,7 @@
 #include "World/sithActor.h"
 #include "Engine/sithSurface.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithParticle.h"

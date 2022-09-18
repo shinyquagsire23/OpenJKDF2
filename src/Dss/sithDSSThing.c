@@ -6,7 +6,7 @@
 #include "Engine/sithSurface.h"
 #include "Devices/sithSound.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/sithActor.h"

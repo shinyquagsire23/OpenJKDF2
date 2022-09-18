@@ -9,7 +9,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithAdjoin.h"
 #include "Devices/sithComm.h"

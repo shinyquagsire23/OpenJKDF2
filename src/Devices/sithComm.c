@@ -1,6 +1,6 @@
 #include "sithComm.h"
 
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"

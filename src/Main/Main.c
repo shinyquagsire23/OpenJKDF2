@@ -57,7 +57,7 @@
 #include "Main/jkMain.h"
 #include "Engine/rdroid.h"
 #include "Main/sithMain.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/util.h"

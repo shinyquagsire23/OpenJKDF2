@@ -8,7 +8,7 @@
 #include "Devices/sithSoundMixer.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
 #include "Gameplay/sithTime.h"

@@ -26,7 +26,7 @@
 #include "stdPlatform.h"
 #include "Win95/DebugConsole.h"
 #include "Dss/sithDSS.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "jk.h"
 
 stdHashTable* sithAI_commandsHashmap = NULL;

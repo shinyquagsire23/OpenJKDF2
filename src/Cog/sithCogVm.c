@@ -16,7 +16,7 @@
 #include "Win95/sithDplay.h"
 #include "Main/jkGame.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "AI/sithAIClass.h"
 
 #include <stdint.h>

@@ -12,7 +12,7 @@
 #include "World/sithPlayer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "Cog/sithCogFunctionPlayer.h"
 #include "Dss/jkDSS.h"

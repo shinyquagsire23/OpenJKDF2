@@ -1,7 +1,7 @@
 #include "sithDplay_GNS.h"
 
 #include "Win95/sithDplay.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "jk.h"
 

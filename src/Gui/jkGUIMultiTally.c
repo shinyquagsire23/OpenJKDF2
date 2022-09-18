@@ -16,7 +16,7 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdString.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 
 static jkGuiElement jkGuiMultiTally_buttons[92] = {
     { ELEMENT_TEXT, 0, 2, "GUI_MULTIPLAYER_SCORE", 3, { 90, 20, 460, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },

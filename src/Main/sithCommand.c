@@ -10,7 +10,7 @@
 #include "Gameplay/sithPlayerActions.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithIntersect.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Win95/sithDplay.h"
 #include "World/sithWorld.h"
 #include "World/sithPlayer.h"

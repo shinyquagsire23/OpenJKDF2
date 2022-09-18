@@ -2,7 +2,7 @@
 
 #include "Cog/sithCog.h"
 #include "Cog/sithCogVm.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "World/sithThing.h"
 #include "Devices/sithComm.h"
 

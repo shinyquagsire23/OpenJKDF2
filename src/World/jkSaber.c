@@ -9,7 +9,7 @@
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithKeyFrame.h"

@@ -20,7 +20,7 @@
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
 #include "Main/jkMain.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "General/stdMath.h"
 #include "jk.h"
 

@@ -29,7 +29,7 @@
 #include "Main/jkGame.h"
 #include "stdPlatform.h"
 #include "Dss/sithDSSCog.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 
 #include "jk.h"
 

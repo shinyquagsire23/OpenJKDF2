@@ -17,7 +17,7 @@
 #include "World/sithSector.h"
 #include "World/sithActor.h"
 #include "Engine/sithCollision.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "jk.h"
 
 // Added: Targeting for multiple players for co-op

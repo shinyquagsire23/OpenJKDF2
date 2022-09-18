@@ -6,7 +6,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "jk.h"
 
 int sithAIAwareness_Startup()
