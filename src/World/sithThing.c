@@ -18,7 +18,7 @@
 #include "Devices/sithSoundMixer.h"
 #include "Dss/sithMulti.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"

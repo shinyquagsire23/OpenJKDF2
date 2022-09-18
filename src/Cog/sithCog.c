@@ -18,7 +18,7 @@
 #include "Engine/sithKeyFrame.h"
 #include "World/sithMaterial.h"
 #include "World/sithModel.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Gameplay/sithTime.h"
 #include "World/sithSurface.h"
 #include "Engine/sithNet.h"

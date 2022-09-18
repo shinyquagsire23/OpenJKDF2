@@ -12,7 +12,7 @@
 #include "World/sithSurface.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/rdKeyframe.h"
 #include "World/sithModel.h"

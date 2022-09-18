@@ -7,7 +7,7 @@
 #include "stdPlatform.h"
 #include "Engine/sithNet.h"
 #include "World/sithSector.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Devices/sithControl.h"
 #include "World/jkPlayer.h"
 #include "Dss/sithDSSThing.h"

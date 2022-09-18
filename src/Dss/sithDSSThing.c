@@ -12,7 +12,7 @@
 #include "World/sithActor.h"
 #include "Engine/sithPuppet.h"
 #include "World/sithModel.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithItem.h"
 #include "World/sithWeapon.h"
 #include "World/sithTrackThing.h"

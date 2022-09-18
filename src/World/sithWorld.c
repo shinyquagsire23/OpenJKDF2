@@ -3,7 +3,7 @@
 #include "General/stdConffile.h"
 #include "World/sithModel.h"
 #include "World/sithSprite.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithMaterial.h"
 #include "Devices/sithSound.h"
 #include "Engine/rdCache.h" // rdTri

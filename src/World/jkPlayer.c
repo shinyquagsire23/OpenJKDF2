@@ -14,7 +14,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdColormap.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "General/stdMath.h"
 #include "Gameplay/sithInventory.h"
 #include "Gameplay/jkSaber.h"

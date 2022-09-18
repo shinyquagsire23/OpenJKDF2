@@ -11,7 +11,7 @@
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
 #include "Main/jkStrings.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithModel.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithKeyFrame.h"

@@ -23,7 +23,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithSoundClass.h"
 #include "World/sithMaterial.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithModel.h"
 #include "World/sithSurface.h"
 #include "Devices/sithSound.h"

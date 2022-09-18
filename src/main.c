@@ -81,7 +81,7 @@
 #include "Dss/sithGamesave.h"
 #include "World/sithSprite.h"
 #include "World/sithSurface.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithKeyFrame.h"
 #include "Gameplay/sithOverlayMap.h"

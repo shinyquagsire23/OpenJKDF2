@@ -4,7 +4,7 @@
 #include "World/sithThing.h"
 #include "Engine/sithCollision.h"
 #include "World/sithSector.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithSurface.h"
 #include "Engine/sithPhysics.h"
 #include "Primitives/rdMath.h"

@@ -10,7 +10,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
 #include "Dss/sithMulti.h"

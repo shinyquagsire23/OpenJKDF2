@@ -10,7 +10,7 @@
 #include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
 #include "Devices/sithConsole.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Devices/sithSound.h"
 #include "Gameplay/sithTime.h"
 #include "Win95/sithDplay.h"

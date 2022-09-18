@@ -7,7 +7,7 @@
 #include "World/sithActor.h"
 #include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Engine/sithNet.h"
 #include "Gameplay/sithTime.h"
 #include "Devices/sithControl.h"

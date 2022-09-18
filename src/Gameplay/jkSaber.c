@@ -10,7 +10,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"
 #include "Dss/sithMulti.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "World/sithModel.h"
 #include "Engine/sithKeyFrame.h"
 #include "World/sithSector.h"
