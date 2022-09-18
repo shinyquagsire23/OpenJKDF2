@@ -308,17 +308,17 @@ DebugGui_idk 0x008BC000 int
 DebugGui_some_line_amt 0x008BC004 int
 DebugGui_some_num_lines 0x008BC008 int
 DebugLog_buffer 0x008BC020 char[4072]
-DebugConsole_aCmds 0x008358D0 stdDebugConsoleCmd*
-DebugConsole_pCmdHashtable 0x008358D4 stdHashTable*
-DebugConsole_bOpened 0x008358D8 int
-DebugConsole_bInitted 0x008358DC int
-DebugConsole_maxCmds 0x008358E4 int
-DebugConsole_numRegisteredCmds 0x008358E8 int
+sithConsole_aCmds 0x008358D0 stdDebugConsoleCmd*
+sithConsole_pCmdHashtable 0x008358D4 stdHashTable*
+sithConsole_bOpened 0x008358D8 int
+sithConsole_bInitted 0x008358DC int
+sithConsole_maxCmds 0x008358E4 int
+sithConsole_numRegisteredCmds 0x008358E8 int
 DebugGui_maxLines 0x008358EC uint32_t
 DebugGui_fnPrint 0x008358F0 DebugConsolePrintFunc_t
 DebugGui_fnPrintUniStr 0x008358F4 DebugConsolePrintUniStrFunc_t
-DebugConsole_alertSound 0x008358F8 stdSound_buffer_t*
-DebugConsole_idk2 0x008358FC int16_t
+sithConsole_alertSound 0x008358F8 stdSound_buffer_t*
+sithConsole_idk2 0x008358FC int16_t
 
 // std3D
 d3d_maxVertices 0x0055C7F0 uint32_t

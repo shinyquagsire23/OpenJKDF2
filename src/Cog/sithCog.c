@@ -2,7 +2,7 @@
 
 #include "jk.h"
 #include "types.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Cog/sithCogFunction.h"
 #include "Cog/sithCogFunctionThing.h"
 #include "Cog/sithCogFunctionPlayer.h"
@@ -872,7 +872,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
             sourceType,
             sourceIndex,
             linkId);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
     }
 
     if ( (cog->flags & SITH_COG_DISABLED) != 0 )
@@ -880,7 +880,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
             _sprintf(std_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         return;
     }
@@ -896,7 +896,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         if (cog->flags & SITH_COG_DEBUG)
         {
             _sprintf(std_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->cogscript_fpath, msgid);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         return;
     }
@@ -906,7 +906,7 @@ void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderInde
         if (cog->flags & SITH_COG_DEBUG)
         {
             _sprintf(std_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->cogscript_fpath, msgid);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         return;
     }
@@ -954,7 +954,7 @@ execute:
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
             _sprintf(std_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         sithCogVm_ExecCog(cog, v10);
     }
@@ -992,7 +992,7 @@ float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int sende
             param1,
             param2,
             param3);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
     }
     v13 = cog->flags;
     if ( (v13 & 2) != 0 )
@@ -1001,7 +1001,7 @@ float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int sende
         {
             _sprintf(std_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->cogscript_fpath);
 LABEL_18:
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
             return -9999.9873046875;
         }
         return -9999.9873046875;
@@ -1084,7 +1084,7 @@ execute:
         if ( (v13 & 1) != 0 )
         {
             _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         sithCogVm_ExecCog(cog, trigIdx);
         result = cog->returnEx;
@@ -1340,7 +1340,7 @@ void sithCogScript_Tick(sithCog *cog)
             if ((cog->flags & SITH_COG_DEBUG))
             {
                 _sprintf(std_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->cogscript_fpath);
-                DebugConsole_Print(std_genBuffer);
+                sithConsole_Print(std_genBuffer);
             }
 
             sithCogVm_Exec(cog);
@@ -1351,7 +1351,7 @@ void sithCogScript_Tick(sithCog *cog)
             if ((cog->flags & SITH_COG_DEBUG))
             {
                 _sprintf(std_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->cogscript_fpath);
-                DebugConsole_Print(std_genBuffer);
+                sithConsole_Print(std_genBuffer);
             }
 
             sithCogVm_Exec(cog);
@@ -1401,7 +1401,7 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
       && v3->pSymbolTable )
     {
         _sprintf(std_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
         v4 = v3->pSymbolTable;
         v5 = 0;
         v6 = v4->buckets;
@@ -1417,7 +1417,7 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
                     _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", &v6->val.dataAsFloat[0]);
                 else
                     _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->val.data[0]);
-                DebugConsole_Print(std_genBuffer);
+                sithConsole_Print(std_genBuffer);
                 ++v5;
                 ++v6;
             }
@@ -1426,7 +1426,7 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
     }
     else
     {
-        DebugConsole_Print("Error, bad parameters.\n");
+        sithConsole_Print("Error, bad parameters.\n");
     }
 }
 

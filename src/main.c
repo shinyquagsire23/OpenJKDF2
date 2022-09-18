@@ -117,7 +117,7 @@
 #include "Engine/sithIntersect.h"
 #include "Gameplay/sithPlayerActions.h"
 #include "World/sithTrackThing.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Win95/DirectX.h"
 #include "Win95/sithDplay.h"
 #include "Win95/std.h"
@@ -2184,19 +2184,19 @@ void do_hooks()
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     
     // DebugConsole
-    hook_function(DebugConsole_Initialize_ADDR, DebugConsole_Initialize);
-    hook_function(DebugConsole_Shutdown_ADDR, DebugConsole_Shutdown);
-    hook_function(DebugConsole_Open_ADDR, DebugConsole_Open);
-    hook_function(DebugConsole_Close_ADDR, DebugConsole_Close);
-    hook_function(DebugConsole_Print_ADDR, DebugConsole_Print);
-    hook_function(DebugConsole_PrintUniStr_ADDR, DebugConsole_PrintUniStr);
-    hook_function(DebugConsole_TryCommand_ADDR, DebugConsole_TryCommand);
-    hook_function(DebugConsole_sub_4DA100_ADDR, DebugConsole_sub_4DA100);
-    hook_function(DebugConsole_AdvanceLogBuf_ADDR, DebugConsole_AdvanceLogBuf);
-    hook_function(DebugConsole_RegisterDevCmd_ADDR, DebugConsole_RegisterDevCmd);
-    hook_function(DebugConsole_SetPrintFuncs_ADDR, DebugConsole_SetPrintFuncs);
-    hook_function(DebugConsole_PrintHelp_ADDR, DebugConsole_PrintHelp);
-    hook_function(DebugConsole_AlertSound_ADDR, DebugConsole_AlertSound);
+    hook_function(sithConsole_Initialize_ADDR, sithConsole_Initialize);
+    hook_function(sithConsole_Shutdown_ADDR, sithConsole_Shutdown);
+    hook_function(sithConsole_Open_ADDR, sithConsole_Open);
+    hook_function(sithConsole_Close_ADDR, sithConsole_Close);
+    hook_function(sithConsole_Print_ADDR, sithConsole_Print);
+    hook_function(sithConsole_PrintUniStr_ADDR, sithConsole_PrintUniStr);
+    hook_function(sithConsole_TryCommand_ADDR, sithConsole_TryCommand);
+    hook_function(sithConsole_sub_4DA100_ADDR, sithConsole_sub_4DA100);
+    hook_function(sithConsole_AdvanceLogBuf_ADDR, sithConsole_AdvanceLogBuf);
+    hook_function(sithConsole_RegisterDevCmd_ADDR, sithConsole_RegisterDevCmd);
+    hook_function(sithConsole_SetPrintFuncs_ADDR, sithConsole_SetPrintFuncs);
+    hook_function(sithConsole_PrintHelp_ADDR, sithConsole_PrintHelp);
+    hook_function(sithConsole_AlertSound_ADDR, sithConsole_AlertSound);
 
     // sithCommand
     hook_function(sithCommand_Initialize_ADDR, sithCommand_Initialize);

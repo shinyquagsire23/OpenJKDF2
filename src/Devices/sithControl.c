@@ -2,7 +2,7 @@
 
 #include "General/sithStrTable.h"
 #include "Platform/stdControl.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Win95/Window.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
@@ -896,8 +896,8 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
                     {
                         v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTORE");
                     }
-                    DebugConsole_PrintUniStr(v17);
-                    DebugConsole_AlertSound();
+                    sithConsole_PrintUniStr(v17);
+                    sithConsole_AlertSound();
                     sithControl_death_msgtimer = 0;
 LABEL_39:
                     sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
@@ -967,7 +967,7 @@ debug_controls:
 
             // Added
             jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
-            DebugConsole_PrintUniStr(sithControl_debugWStrTmp);
+            sithConsole_PrintUniStr(sithControl_debugWStrTmp);
 
             break;
         }
@@ -993,7 +993,7 @@ debug_controls:
                 jk_snwprintf(sithControl_debugWStrTmp, 256, L"Following %s", jkPlayer_playerInfos[sithControl_followingPlayer].player_name);
             else
                 jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
-            DebugConsole_PrintUniStr(sithControl_debugWStrTmp);
+            sithConsole_PrintUniStr(sithControl_debugWStrTmp);
             
             if (!sithControl_followingPlayer) {
                 sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);

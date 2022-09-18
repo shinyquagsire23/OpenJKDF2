@@ -1,4 +1,4 @@
-#include "DebugConsole.h"
+#include "sithConsole.h"
 
 #include "Main/sithCommand.h"
 #include "Win95/stdSound.h"
@@ -8,65 +8,65 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int DebugConsole_Initialize(int maxCmds)
+int sithConsole_Initialize(int maxCmds)
 {
     stdHashTable *v1; // eax
     stdSound_buffer_t *v2; // eax
     signed int result; // eax
 
-    DebugConsole_aCmds = (stdDebugConsoleCmd *)pSithHS->alloc(sizeof(stdDebugConsoleCmd) * maxCmds);
+    sithConsole_aCmds = (stdDebugConsoleCmd *)pSithHS->alloc(sizeof(stdDebugConsoleCmd) * maxCmds);
     v1 = stdHashTable_New(2 * maxCmds);
-    DebugConsole_pCmdHashtable = v1;
-    if ( DebugConsole_aCmds )
+    sithConsole_pCmdHashtable = v1;
+    if ( sithConsole_aCmds )
     {
         if ( v1 )
         {
-            DebugConsole_maxCmds = maxCmds;
-            _memset(DebugConsole_aCmds, 0, sizeof(stdDebugConsoleCmd) * maxCmds);
+            sithConsole_maxCmds = maxCmds;
+            _memset(sithConsole_aCmds, 0, sizeof(stdDebugConsoleCmd) * maxCmds);
             DebugGui_fnPrint = 0;
             DebugGui_fnPrintUniStr = 0;
             sithCommand_Initialize();
             v2 = sithSound_InitFromPath("set_vlo2.wav");
-            DebugConsole_alertSound = v2;
+            sithConsole_alertSound = v2;
             if ( v2 )
                 stdSound_BufferSetVolume(v2, 0.8);
             result = 1;
-            DebugConsole_bInitted = 1;
+            sithConsole_bInitted = 1;
             return result;
         }
-        if ( DebugConsole_aCmds )
+        if ( sithConsole_aCmds )
         {
-            pSithHS->free(DebugConsole_aCmds);
-            v1 = DebugConsole_pCmdHashtable;
-            DebugConsole_aCmds = 0;
+            pSithHS->free(sithConsole_aCmds);
+            v1 = sithConsole_pCmdHashtable;
+            sithConsole_aCmds = 0;
         }
     }
     if ( v1 )
     {
         stdHashTable_Free(v1);
-        DebugConsole_pCmdHashtable = 0;
+        sithConsole_pCmdHashtable = 0;
     }
     return 0;
 }
 
-void DebugConsole_Shutdown()
+void sithConsole_Shutdown()
 {
-    if ( DebugConsole_aCmds )
+    if ( sithConsole_aCmds )
     {
-        pSithHS->free((void *)DebugConsole_aCmds);
-        DebugConsole_aCmds = 0;
+        pSithHS->free((void *)sithConsole_aCmds);
+        sithConsole_aCmds = 0;
     }
-    if ( DebugConsole_pCmdHashtable )
+    if ( sithConsole_pCmdHashtable )
     {
-        stdHashTable_Free(DebugConsole_pCmdHashtable);
-        DebugConsole_pCmdHashtable = 0;
+        stdHashTable_Free(sithConsole_pCmdHashtable);
+        sithConsole_pCmdHashtable = 0;
     }
-    if ( DebugConsole_alertSound )
-        stdSound_BufferRelease(DebugConsole_alertSound);
-    DebugConsole_bInitted = 0;
+    if ( sithConsole_alertSound )
+        stdSound_BufferRelease(sithConsole_alertSound);
+    sithConsole_bInitted = 0;
 }
 
-int DebugConsole_Open(int maxLines)
+int sithConsole_Open(int maxLines)
 {
     signed int result; // eax
 
@@ -75,7 +75,7 @@ int DebugConsole_Open(int maxLines)
     DebugGui_some_line_amt = 0;
     DebugGui_some_num_lines = 0;
     DebugGui_idk = 0;
-    DebugConsole_bOpened = 1;
+    sithConsole_bOpened = 1;
     
     // Added: Prevent arithmetic exception on modulus
     if (DebugGui_maxLines <= 0)
@@ -84,12 +84,12 @@ int DebugConsole_Open(int maxLines)
     return 1;
 }
 
-void DebugConsole_Close()
+void sithConsole_Close()
 {
-    DebugConsole_bOpened = 0;
+    sithConsole_bOpened = 0;
 }
 
-void DebugConsole_Print(const char *str)
+void sithConsole_Print(const char *str)
 {
     if ( DebugGui_fnPrint )
     {
@@ -100,7 +100,7 @@ void DebugConsole_Print(const char *str)
     else
     {
         // Added
-        if (!DebugConsole_bOpened) return;
+        if (!sithConsole_bOpened) return;
 
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
@@ -111,13 +111,13 @@ void DebugConsole_Print(const char *str)
     }
 }
 
-void DebugConsole_PrintUniStr(const wchar_t *a1)
+void sithConsole_PrintUniStr(const wchar_t *a1)
 {
     if ( DebugGui_fnPrintUniStr )
         DebugGui_fnPrintUniStr(a1);
 }
 
-int DebugConsole_TryCommand(char *cmd)
+int sithConsole_TryCommand(char *cmd)
 {
     char *v1; // esi
     stdDebugConsoleCmd *v2; // edi
@@ -127,7 +127,7 @@ int DebugConsole_TryCommand(char *cmd)
     v1 = _strtok(cmd, ", \t\n\r");
     if ( v1 )
     {
-        v2 = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(DebugConsole_pCmdHashtable, v1);
+        v2 = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(sithConsole_pCmdHashtable, v1);
         if ( v2 )
         {
             v3 = _strtok(0, "\n\r");
@@ -150,12 +150,12 @@ int DebugConsole_TryCommand(char *cmd)
     return 0;
 }
 
-int DebugConsole_sub_4DA100()
+int sithConsole_sub_4DA100()
 {
     return 1;
 }
 
-void DebugConsole_AdvanceLogBuf()
+void sithConsole_AdvanceLogBuf()
 {
     uint32_t v0; // edx
 
@@ -169,29 +169,29 @@ void DebugConsole_AdvanceLogBuf()
     }
 }
 
-int DebugConsole_RegisterDevCmd(void *fn, char *cmd, int extra)
+int sithConsole_RegisterDevCmd(void *fn, char *cmd, int extra)
 {
     stdDebugConsoleCmd *v4; // [esp-4h] [ebp-4h]
 
-    if ( DebugConsole_numRegisteredCmds == DebugConsole_maxCmds )
+    if ( sithConsole_numRegisteredCmds == sithConsole_maxCmds )
         return 0;
-    stdString_SafeStrCopy(DebugConsole_aCmds[DebugConsole_numRegisteredCmds].cmdStr, cmd, 0x20);
-    v4 = &DebugConsole_aCmds[DebugConsole_numRegisteredCmds];
+    stdString_SafeStrCopy(sithConsole_aCmds[sithConsole_numRegisteredCmds].cmdStr, cmd, 0x20);
+    v4 = &sithConsole_aCmds[sithConsole_numRegisteredCmds];
     v4->cmdFunc = fn;
     v4->extra = extra;
-    stdHashTable_SetKeyVal(DebugConsole_pCmdHashtable, v4->cmdStr, v4);
-    ++DebugConsole_numRegisteredCmds;
+    stdHashTable_SetKeyVal(sithConsole_pCmdHashtable, v4->cmdStr, v4);
+    ++sithConsole_numRegisteredCmds;
     return 1;
 }
 
-int DebugConsole_SetPrintFuncs(void *a1, void *a2)
+int sithConsole_SetPrintFuncs(void *a1, void *a2)
 {
     DebugGui_fnPrint = a1;
     DebugGui_fnPrintUniStr = a2;
     return 1;
 }
 
-int DebugConsole_PrintHelp()
+int sithConsole_PrintHelp()
 {
     uint32_t v0; // esi
     unsigned int v1; // ebp
@@ -199,7 +199,7 @@ int DebugConsole_PrintHelp()
     signed int result; // eax
     char v4[80]; // [esp+10h] [ebp-50h] BYREF
 
-    *(int16_t*)v4 = DebugConsole_idk2;
+    *(int16_t*)v4 = sithConsole_idk2;
     _memset(&v4[2], 0, 0x4Cu);
     *(int16_t*)&v4[78] = 0;
     v0 = 0;
@@ -217,7 +217,7 @@ int DebugConsole_PrintHelp()
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
     v2 = 0;
-    for (v1 = 0; v1 < DebugConsole_numRegisteredCmds; v1++ )
+    for (v1 = 0; v1 < sithConsole_numRegisteredCmds; v1++ )
     {
         if ( v0 + 0x10 >= 0x50 )
         {
@@ -235,7 +235,7 @@ int DebugConsole_PrintHelp()
             }
             v0 = 0;
         }
-        _sprintf(&v4[v0], "%-15s", DebugConsole_aCmds[v2].cmdStr);
+        _sprintf(&v4[v0], "%-15s", sithConsole_aCmds[v2].cmdStr);
         v0 += 15;
         ++v2;
     }
@@ -256,11 +256,11 @@ int DebugConsole_PrintHelp()
     return result;
 }
 
-void DebugConsole_AlertSound()
+void sithConsole_AlertSound()
 {
-    if ( DebugConsole_alertSound )
+    if ( sithConsole_alertSound )
     {
-        stdSound_BufferReset(DebugConsole_alertSound);
-        stdSound_BufferPlay(DebugConsole_alertSound, 0);
+        stdSound_BufferReset(sithConsole_alertSound);
+        stdSound_BufferPlay(sithConsole_alertSound, 0);
     }
 }

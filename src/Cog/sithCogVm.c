@@ -9,7 +9,7 @@
 #include "World/sithSector.h"
 #include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Engine/sithTemplate.h"
 #include "Devices/sithSound.h"
 #include "Gameplay/sithTime.h"
@@ -155,7 +155,7 @@ void sithCogVm_Exec(sithCog *cog_ctx)
                 if ( cog_ctx->flags & SITH_COG_DEBUG )
                 {
                     _sprintf(std_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
-                    DebugConsole_Print(std_genBuffer);
+                    sithConsole_Print(std_genBuffer);
                 }
                 sithCogVm_Ret(cog_ctx);
                 break;
@@ -214,7 +214,7 @@ void sithCogVm_ExecCog(sithCog *ctx, int trigIdx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         sithCogVm_Exec(ctx);
         if ( ctx->script_running == 4 )

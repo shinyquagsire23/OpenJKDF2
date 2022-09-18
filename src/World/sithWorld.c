@@ -14,7 +14,7 @@
 #include "AI/sithAIClass.h"
 #include "Engine/sithSoundClass.h"
 #include "stdPlatform.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "General/stdFnames.h"
 #include "Engine/rdColormap.h"
 #include "World/sithThing.h"
@@ -175,7 +175,7 @@ LABEL_11:
                         goto LABEL_19;
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (double)v6 * 0.001, section);
-                    DebugConsole_Print(tmp);
+                    sithConsole_Print(tmp);
                 }
             }
         }

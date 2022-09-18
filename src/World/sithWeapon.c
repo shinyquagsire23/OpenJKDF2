@@ -21,7 +21,7 @@
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Main/jkGame.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
@@ -782,7 +782,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         else
             v5 = "none";
         _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->field_0, surface->parent_sector->id, v5);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
     }
     v6 = surface->surfaceFlags;
     if ( (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 )

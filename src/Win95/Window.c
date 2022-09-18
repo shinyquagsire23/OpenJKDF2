@@ -10,7 +10,7 @@
 #include "World/jkPlayer.h"
 #include "Platform/stdControl.h"
 #include "stdPlatform.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 
 #include "jk.h"
@@ -574,7 +574,7 @@ void Window_UpdateHeadless()
         {
             if (buffer[i] == '\n' || buffer[i] == '\r') {
                 printf("\r> %s\n", Window_headlessBuffer);
-                DebugConsole_TryCommand(Window_headlessBuffer);
+                sithConsole_TryCommand(Window_headlessBuffer);
                 memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
                 continue;
             }

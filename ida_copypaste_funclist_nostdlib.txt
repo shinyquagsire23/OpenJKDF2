@@ -2098,19 +2098,19 @@ sithOverlayMap_Render1	.text	004D92C0	0000023F	00000024	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render2	.text	004D9500	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
 sithOverlayMap_Render3	.text	004D9560	000006DE	00000068	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render4	.text	004D9C40	0000016A	00000024	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
-DebugConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
-DebugConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
-DebugConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
-DebugConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
-DebugConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
-DebugConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
-DebugConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
-DebugConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
-DebugConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
+sithConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
+sithConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
+sithConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
+sithConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
+sithConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
+sithConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
+sithConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
+sithConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
+sithConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
+sithConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
+sithConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
 sithGamesave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
 sithGamesave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
 sithGamesave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.

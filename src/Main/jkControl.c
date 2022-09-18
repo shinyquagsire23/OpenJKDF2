@@ -11,7 +11,7 @@
 #include "Gameplay/sithInventory.h"
 #include "Platform/stdControl.h"
 #include "Win95/Window.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Main/jkGame.h"
 #include "Main/jkHud.h"
 #include "Main/jkDev.h"
@@ -72,7 +72,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
                 jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetText("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Write("quicksave.jks", 1, 0, a4);
-                DebugConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
+                sithConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
             }
         }
 

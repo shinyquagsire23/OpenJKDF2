@@ -5,7 +5,7 @@
 #include "sithCogVm.h"
 #include "jk.h"
 
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Gameplay/sithTime.h"
 #include "stdPlatform.h"
 #include "General/stdString.h"
@@ -92,7 +92,7 @@ void sithCogFunction_Sleep(sithCog *ctx)
     if ( ctx_->flags & SITH_COG_DEBUG )
     {
         _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs_);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
     }
     ctx_->script_running = 2;
     ctx_->wakeTimeMs = sithTime_curMs + (int)(fSecs_ * 1000.0);
@@ -104,7 +104,7 @@ void sithCogFunction_Print(sithCog *ctx)
 
     str = sithCogVm_PopString(ctx);
     if (str)
-        DebugConsole_Print(str);
+        sithConsole_Print(str);
 }
 
 void sithCogFunction_PrintInt(sithCog *ctx)
@@ -112,7 +112,7 @@ void sithCogFunction_PrintInt(sithCog *ctx)
     char tmp[32];
 
     stdString_snprintf(tmp, 32, "%d", sithCogVm_PopInt(ctx));
-    DebugConsole_Print(tmp);
+    sithConsole_Print(tmp);
 }
 
 void sithCogFunction_PrintVector(sithCog *ctx)
@@ -125,7 +125,7 @@ void sithCogFunction_PrintVector(sithCog *ctx)
     else
         stdString_snprintf(tmp, 32, "Bad vector");
 
-    DebugConsole_Print(tmp);
+    sithConsole_Print(tmp);
 }
 
 void sithCogFunction_PrintFlex(sithCog *ctx)
@@ -133,7 +133,7 @@ void sithCogFunction_PrintFlex(sithCog *ctx)
     char tmp[32];
 
     stdString_snprintf(tmp, 32, "%f", sithCogVm_PopFlex(ctx));
-    DebugConsole_Print(tmp);
+    sithConsole_Print(tmp);
 }
 
 void sithCogFunction_SurfaceAnim(sithCog *ctx)
@@ -307,7 +307,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         ctx->flags &= ~4;
     }
@@ -316,7 +316,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         ctx->flags |= 4;
         ctx->pulsePeriodMs = (int)(popFlex * 1000.0);
@@ -332,7 +332,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         ctx->flags &= ~8;
     }
@@ -341,7 +341,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
         ctx->flags |= 8u;
         ctx->field_20 = sithTime_curMs + (int)(popFlex * 1000.0);

@@ -20,7 +20,7 @@
 #include "General/stdFnames.h"
 #include "General/stdConffile.h"
 #include "General/stdFileUtil.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Cog/sithCogVm.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
@@ -389,7 +389,7 @@ int sithGamesave_WriteEntry()
             sithGamesave_saveName[127] = 0;
             _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
             sithGamesave_wsaveName[255] = 0;
-            DebugConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
+            sithConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
         }
         sithComm_multiplayerFlags = multiplayerFlagsSave;
     }

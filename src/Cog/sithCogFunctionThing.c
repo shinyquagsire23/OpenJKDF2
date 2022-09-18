@@ -21,7 +21,7 @@
 #include "Dss/sithDSSCog.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "jk.h"
 
 void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx);
@@ -413,7 +413,7 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
         if ( ctx->flags & 1 )
         {
             _sprintf(std_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
-            DebugConsole_Print(std_genBuffer);
+            sithConsole_Print(std_genBuffer);
         }
     }
 }

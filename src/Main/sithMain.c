@@ -10,7 +10,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "Win95/sithDplay.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Win95/Window.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
@@ -262,7 +262,7 @@ int sithMain_Tick()
             sithSurface_Tick(sithTime_deltaSeconds);
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
         }
-        DebugConsole_AdvanceLogBuf();
+        sithConsole_AdvanceLogBuf();
         return 1;
     }
     else
@@ -367,7 +367,7 @@ int sithMain_Tick()
 
         sithCogScript_TickAll();
         
-        DebugConsole_AdvanceLogBuf();
+        sithConsole_AdvanceLogBuf();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
         sithGamesave_WriteEntry();
         return 0;

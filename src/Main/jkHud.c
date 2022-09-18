@@ -4,7 +4,7 @@
 #include "Win95/Windows.h"
 #include "Platform/stdControl.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdColor.h"
@@ -946,7 +946,7 @@ void jkHud_SendChat(char a1)
             }
             else if ( !jkDev_TryCommand(jkHud_chatStr) )
             {
-                DebugConsole_TryCommand(jkHud_chatStr);
+                sithConsole_TryCommand(jkHud_chatStr);
             }
         }
         jkHud_chatStrPos = 0;
