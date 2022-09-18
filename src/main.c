@@ -79,7 +79,7 @@
 #include "Engine/sithPhysics.h"
 #include "Engine/sithPuppet.h"
 #include "Dss/sithGamesave.h"
-#include "Engine/sithSprite.h"
+#include "World/sithSprite.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithTemplate.h"
 #include "Gameplay/sithEvent.h"

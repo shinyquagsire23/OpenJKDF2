@@ -18,7 +18,7 @@
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSprite.h"
+#include "World/sithSprite.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithSoundClass.h"

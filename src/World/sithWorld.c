@@ -2,7 +2,7 @@
 
 #include "General/stdConffile.h"
 #include "Engine/sithModel.h"
-#include "Engine/sithSprite.h"
+#include "World/sithSprite.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithMaterial.h"
 #include "Devices/sithSound.h"

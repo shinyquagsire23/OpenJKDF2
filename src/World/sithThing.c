@@ -23,7 +23,7 @@
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithModel.h"
-#include "Engine/sithSprite.h"
+#include "World/sithSprite.h"
 #include "Engine/sithNet.h"
 #include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
