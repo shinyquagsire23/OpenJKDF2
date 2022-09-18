@@ -6,7 +6,7 @@
 
 #include "Primitives/rdPolyLine.h"
 #include "Engine/rdThing.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 
 #define jkPlayer_LoadAutosave_ADDR (0x00404600)
 #define jkPlayer_LoadSave_ADDR (0x00404660)

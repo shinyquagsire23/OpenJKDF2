@@ -24,7 +24,7 @@
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPrimit3.h"
 #include "World/jkPlayer.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"

@@ -13,7 +13,7 @@
 #include "Dss/sithMulti.h"
 #include "Win95/sithDplay.h"
 #include "World/sithWorld.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "jk.h"
 
 #define sithCommand_CmdMatList ((void*)sithCommand_CmdMatList_ADDR)

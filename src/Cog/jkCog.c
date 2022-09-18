@@ -9,7 +9,7 @@
 #include "Main/jkMain.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"
 #include "Dss/sithMulti.h"

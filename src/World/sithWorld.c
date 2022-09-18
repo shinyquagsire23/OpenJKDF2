@@ -26,7 +26,7 @@
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "General/util.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "jk.h"
 
 static char jkl_read_copyright[1088];

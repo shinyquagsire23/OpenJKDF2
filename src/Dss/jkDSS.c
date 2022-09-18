@@ -4,7 +4,7 @@
 #include "Dss/sithMulti.h"
 #include "World/jkSaber.h"
 #include "World/jkPlayer.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "Main/jkDev.h"

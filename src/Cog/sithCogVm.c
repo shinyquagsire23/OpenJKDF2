@@ -7,7 +7,7 @@
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"

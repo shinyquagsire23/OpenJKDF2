@@ -12,7 +12,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "World/jkPlayer.h"
 #include "Gameplay/sithInventory.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Windows.h"
 #include "Main/jkStrings.h"

@@ -8,7 +8,7 @@
 #include "World/sithWeapon.h"
 #include "World/sithExplosion.h"
 #include "World/sithItem.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"

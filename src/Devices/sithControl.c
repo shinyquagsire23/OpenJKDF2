@@ -6,7 +6,7 @@
 #include "Win95/Window.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "Gameplay/sithPlayerActions.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"

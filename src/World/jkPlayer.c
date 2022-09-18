@@ -19,7 +19,7 @@
 #include "Gameplay/sithInventory.h"
 #include "World/jkSaber.h"
 #include "World/sithThing.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithWeapon.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"

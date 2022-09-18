@@ -1,7 +1,7 @@
 #include "sithCogFunctionPlayer.h"
 
 #include "World/jkPlayer.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "Dss/sithMulti.h"
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"

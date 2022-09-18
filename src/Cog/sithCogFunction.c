@@ -23,7 +23,7 @@
 #include "Dss/sithGamesave.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithPhysics.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithWorld.h"
 #include "World/sithWeapon.h"
 #include "World/jkPlayer.h"

@@ -3,7 +3,7 @@
 #include "Win95/sithDplay.h"
 #include "Gameplay/sithEvent.h"
 #include "World/sithWorld.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "Cog/sithCog.h"
 #include "Engine/sithCollision.h"
 #include "jk.h"
