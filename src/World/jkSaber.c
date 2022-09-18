@@ -6,7 +6,7 @@
 #include "Engine/rdPuppet.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"

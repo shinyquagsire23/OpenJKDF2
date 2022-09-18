@@ -11,7 +11,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithPhysics.h"
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"

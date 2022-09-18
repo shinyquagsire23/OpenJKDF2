@@ -11,7 +11,7 @@
 #include "Devices/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
 #include "Gameplay/sithEvent.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithAnimClass.h"
 #include "General/sithStrTable.h"

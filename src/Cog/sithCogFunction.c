@@ -6,7 +6,7 @@
 #include "jk.h"
 
 #include "Win95/DebugConsole.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "stdPlatform.h"
 #include "General/stdString.h"
 #include "Engine/sithSurface.h"

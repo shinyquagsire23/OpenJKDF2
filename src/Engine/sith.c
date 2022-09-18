@@ -28,7 +28,7 @@
 #include "Engine/sithSurface.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithRender.h"
 #include "Devices/sithControl.h"
 #include "Engine/sithMulti.h"

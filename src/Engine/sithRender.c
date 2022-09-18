@@ -12,7 +12,7 @@
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdroid.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/rdCache.h"

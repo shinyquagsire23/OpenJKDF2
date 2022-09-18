@@ -12,7 +12,7 @@
 #include "AI/sithAICmd.h"
 #include "AI/sithAIClass.h"
 #include "Engine/sith.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithAdjoin.h"

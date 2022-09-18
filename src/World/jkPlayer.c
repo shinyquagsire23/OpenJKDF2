@@ -7,7 +7,7 @@
 #include "Engine/sithAnimClass.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/rdPuppet.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithCamera.h"
 #include "Engine/rdCache.h"
 #include "Engine/rdPuppet.h"

@@ -2,7 +2,7 @@
 
 #include "jk.h"
 #include "Cog/sithCog.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
 #include "Engine/sithNet.h"

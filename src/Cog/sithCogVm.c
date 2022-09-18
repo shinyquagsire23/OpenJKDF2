@@ -12,7 +12,7 @@
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
 #include "Devices/sithSound.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Win95/sithDplay.h"
 #include "Main/jkGame.h"
 #include "Engine/sithNet.h"

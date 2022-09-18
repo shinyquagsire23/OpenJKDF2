@@ -9,7 +9,7 @@
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Devices/sithControl.h"
 #include "Engine/sithCamera.h"
 #include "AI/sithAI.h"

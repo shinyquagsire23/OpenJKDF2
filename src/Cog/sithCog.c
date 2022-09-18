@@ -19,7 +19,7 @@
 #include "Engine/sithMaterial.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithNet.h"
 #include "AI/sithAIClass.h"

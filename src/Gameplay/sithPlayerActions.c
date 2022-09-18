@@ -6,7 +6,7 @@
 #include "World/jkPlayer.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"

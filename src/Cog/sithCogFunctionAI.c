@@ -1,6 +1,6 @@
 #include "sithCogFunctionAI.h"
 
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Main/jkGame.h"

@@ -13,7 +13,7 @@
 #include "Engine/sithNet.h"
 #include "Engine/sithSurface.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPhysics.h"
 //#include "Engine/rdSurface.h"

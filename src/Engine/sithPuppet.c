@@ -2,7 +2,7 @@
 
 #include "General/stdHashTable.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithCollision.h"

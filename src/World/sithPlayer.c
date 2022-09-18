@@ -12,7 +12,7 @@
 #include "Devices/sithSoundMixer.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithMulti.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Devices/sithControl.h"
 #include "Engine/sithPhysics.h"
 #include "Engine/sithPuppet.h"
