@@ -1109,7 +1109,7 @@ int Main_Startup(const char *cmdline)
 #endif
         sithMain_Startup(&hs); // ~TODO
         jkAI_Startup();
-        jkCog_Initialize();
+        jkCog_Startup();
         jkEpisode_Startup();
         jkDev_Startup();
         jkGame_Initialize();

@@ -251,7 +251,7 @@ void jkCog_RegisterVerbs()
 #endif
 }
 
-int jkCog_Initialize()
+int jkCog_Startup()
 {
     jkCog_RegisterVerbs();
     jkCog_bInitted = 1;

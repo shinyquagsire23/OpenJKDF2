@@ -484,7 +484,7 @@ void do_hooks()
     
     // jkCog
     hook_function(jkCog_RegisterVerbs_ADDR, jkCog_RegisterVerbs);
-    hook_function(jkCog_Initialize_ADDR, jkCog_Initialize);
+    hook_function(jkCog_Startup_ADDR, jkCog_Startup);
     
     // jkCredits
     hook_function(jkCredits_Initialize_ADDR, jkCredits_Initialize);
