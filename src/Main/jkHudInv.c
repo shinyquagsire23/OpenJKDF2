@@ -8,7 +8,7 @@
 #include "Devices/sithControl.h"
 #include "stdPlatform.h"
 #include "Cog/sithCog.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "Main/Main.h"
 #include "jk.h"
 

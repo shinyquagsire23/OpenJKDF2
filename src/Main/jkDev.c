@@ -8,7 +8,7 @@
 #include "Win95/DebugConsole.h"
 #include "Win95/WinIdk.h"
 #include "World/sithThing.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "World/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"

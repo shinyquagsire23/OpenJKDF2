@@ -16,7 +16,7 @@
 #include "Engine/rdColormap.h"
 #include "Engine/sithTemplate.h"
 #include "General/stdMath.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "World/jkSaber.h"
 #include "World/sithThing.h"
 #include "World/sithPlayer.h"

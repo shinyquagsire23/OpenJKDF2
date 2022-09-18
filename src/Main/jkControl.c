@@ -8,7 +8,7 @@
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "World/sithWeapon.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "Platform/stdControl.h"
 #include "Win95/Window.h"
 #include "Win95/DebugConsole.h"

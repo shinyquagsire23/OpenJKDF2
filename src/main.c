@@ -108,7 +108,7 @@
 #include "World/sithExplosion.h"
 #include "World/sithItem.h"
 #include "World/sithWorld.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "World/jkPlayer.h"
 #include "World/jkSaber.h"
 #include "Engine/sithCollision.h"

@@ -4,7 +4,7 @@
 #include "World/sithSector.h"
 #include "World/sithThing.h"
 #include "World/sithTrackThing.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "World/jkPlayer.h"
 #include "World/sithItem.h"
 #include "Engine/sithCollision.h"

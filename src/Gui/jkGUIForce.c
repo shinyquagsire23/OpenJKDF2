@@ -11,7 +11,7 @@
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"
 #include "World/jkPlayer.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "World/sithPlayer.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Windows.h"

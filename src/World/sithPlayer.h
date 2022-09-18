@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "globals.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 
 #define sithPlayer_Open_ADDR (0x004C8610)
 #define sithPlayer_Close_ADDR (0x004C8620)
