@@ -9,7 +9,7 @@
 #include "Engine/rdKeyframe.h"
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 
 #define sithWorld_Startup_ADDR (0x004CF6F0)
 #define sithWorld_Shutdown_ADDR (0x004CFAB0)

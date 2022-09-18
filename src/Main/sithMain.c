@@ -25,7 +25,7 @@
 #include "World/sithMaterial.h"
 #include "Engine/sithTemplate.h"
 #include "World/sithModel.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
 #include "Gameplay/sithTime.h"

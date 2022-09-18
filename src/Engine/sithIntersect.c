@@ -4,7 +4,7 @@
 
 #include "General/stdMath.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Primitives/rdFace.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"

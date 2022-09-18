@@ -16,7 +16,7 @@
 #include "Engine/sithSoundClass.h"
 #include "stdPlatform.h"
 #include "World/sithSector.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Main/sithMain.h"
 #include "Main/Main.h"
 #include "AI/sithAI.h"

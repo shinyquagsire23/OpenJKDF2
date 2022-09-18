@@ -9,7 +9,7 @@
 #include "Gameplay/sithTime.h"
 #include "stdPlatform.h"
 #include "General/stdString.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "Engine/sithTemplate.h"

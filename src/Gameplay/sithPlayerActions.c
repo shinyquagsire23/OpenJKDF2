@@ -4,7 +4,7 @@
 #include "World/sithSector.h"
 #include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithSoundClass.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"

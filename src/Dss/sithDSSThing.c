@@ -3,7 +3,7 @@
 #include "Cog/sithCog.h"
 #include "Engine/sithSoundClass.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Devices/sithSound.h"
 #include "Engine/sithKeyFrame.h"
 #include "Dss/sithMulti.h"

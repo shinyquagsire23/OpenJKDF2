@@ -80,7 +80,7 @@
 #include "Engine/sithPuppet.h"
 #include "Dss/sithGamesave.h"
 #include "World/sithSprite.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithTemplate.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithKeyFrame.h"

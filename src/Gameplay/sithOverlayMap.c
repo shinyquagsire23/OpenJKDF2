@@ -1,6 +1,6 @@
 #include "sithOverlayMap.h"
 
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "World/sithSector.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/rdroid.h"

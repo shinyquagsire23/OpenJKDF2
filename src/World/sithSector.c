@@ -21,7 +21,7 @@
 #include "Engine/sithPuppet.h"
 #include "Engine/sithKeyFrame.h"
 #include "World/sithMaterial.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Dss/sithDSS.h"

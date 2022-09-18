@@ -5,7 +5,7 @@
 #include "World/sithSector.h"
 #include "Engine/sithCollision.h"
 #include "World/sithActor.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithNet.h"

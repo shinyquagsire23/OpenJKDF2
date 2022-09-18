@@ -4,7 +4,7 @@
 #include "Primitives/rdMath.h"
 #include "Engine/sithCollision.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"

@@ -5,7 +5,7 @@
 #include "Engine/sithCollision.h"
 #include "World/sithSector.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithPhysics.h"
 #include "Primitives/rdMath.h"
 #include "jk.h"

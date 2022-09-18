@@ -11,7 +11,7 @@
 #include "Engine/sithCamera.h"
 #include "Engine/rdThing.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithPuppet.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"

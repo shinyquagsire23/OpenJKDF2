@@ -21,7 +21,7 @@
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithParticle.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"

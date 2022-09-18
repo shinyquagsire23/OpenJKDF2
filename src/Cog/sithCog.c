@@ -20,7 +20,7 @@
 #include "World/sithModel.h"
 #include "Engine/sithTemplate.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithNet.h"
 #include "AI/sithAIClass.h"
 #include "General/stdHashTable.h"

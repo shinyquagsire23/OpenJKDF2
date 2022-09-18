@@ -10,7 +10,7 @@
 #include "Main/jkGame.h"
 #include "Engine/rdPuppet.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "stdPlatform.h"
 #include "AI/sithAI.h"
 #include "jk.h"

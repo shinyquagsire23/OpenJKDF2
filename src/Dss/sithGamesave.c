@@ -9,7 +9,7 @@
 #include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
 #include "Devices/sithSoundMixer.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Gameplay/sithEvent.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithNet.h"

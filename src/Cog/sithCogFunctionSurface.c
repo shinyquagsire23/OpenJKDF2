@@ -3,7 +3,7 @@
 #include "Cog/sithCogExec.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 
 void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx);
