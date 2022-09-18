@@ -54,7 +54,7 @@
 #define sithCogScript_RegisterGlobalMessage_ADDR (0x004E06C0)
 #define sithCogScript_RegisterVerb_ADDR (0x004E0700)
 
-#define COG_SHOULD_SYNC(ctx) (sithCogVm_multiplayerFlags && !(ctx->flags & SITH_COG_NO_SYNC) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+#define COG_SHOULD_SYNC(ctx) (sithComm_multiplayerFlags && !(ctx->flags & SITH_COG_NO_SYNC) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
 
 enum SithCogFlag
 {

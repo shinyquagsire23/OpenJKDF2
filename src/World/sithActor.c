@@ -138,7 +138,7 @@ LABEL_32:
         sithActor_HurtSound(sender, amount, flags);
         return amount;
     }
-    if ( sithCogVm_multiplayerFlags )
+    if ( sithComm_multiplayerFlags )
         sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
     sithActor_SpawnDeadBodyMaybe(sender, receiver_, flags);
     return amount - sender->actorParams.health;

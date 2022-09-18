@@ -153,6 +153,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
+#include "Devices/sithComm.h"
 #include "stdPlatform.h"
 
 int openjkdf2_bIsKVM = 1;
@@ -527,18 +528,20 @@ void do_hooks()
     hook_function(sithCogScript_TimerTick_ADDR, sithCogScript_TimerTick);
     hook_function(sithCogScript_DevCmdCogStatus_ADDR, sithCogScript_DevCmdCogStatus);
     
+    // sithComm
+    hook_function(sithComm_Startup_ADDR, sithComm_Startup);
+    hook_function(sithComm_Shutdown_ADDR, sithComm_Shutdown);
+    hook_function(sithComm_SetMsgFunc_ADDR, sithComm_SetMsgFunc);
+    hook_function(sithComm_SendMsgToPlayer_ADDR, sithComm_SendMsgToPlayer);
+    hook_function(sithComm_FileWrite_ADDR, sithComm_FileWrite);
+    hook_function(sithComm_Sync_ADDR, sithComm_Sync);
+    hook_function(sithComm_SetNeedsSync_ADDR, sithComm_SetNeedsSync);
+    hook_function(sithComm_InvokeMsgByIdx_ADDR, sithComm_InvokeMsgByIdx);
+    hook_function(sithComm_SyncWithPlayers_ADDR, sithComm_SyncWithPlayers);
+    hook_function(sithComm_ClearMsgTmpBuf_ADDR, sithComm_ClearMsgTmpBuf);
+    hook_function(sithComm_cogMsg_Reset_ADDR, sithComm_cogMsg_Reset);
+
     // sithCogVm
-    hook_function(sithCogVm_Startup_ADDR, sithCogVm_Startup);
-    hook_function(sithCogVm_Shutdown_ADDR, sithCogVm_Shutdown);
-    hook_function(sithCogVm_SetMsgFunc_ADDR, sithCogVm_SetMsgFunc);
-    hook_function(sithCogVm_SendMsgToPlayer_ADDR, sithCogVm_SendMsgToPlayer);
-    hook_function(sithCogVm_FileWrite_ADDR, sithCogVm_FileWrite);
-    hook_function(sithCogVm_Sync_ADDR, sithCogVm_Sync);
-    hook_function(sithCogVm_SetNeedsSync_ADDR, sithCogVm_SetNeedsSync);
-    hook_function(sithCogVm_InvokeMsgByIdx_ADDR, sithCogVm_InvokeMsgByIdx);
-    hook_function(sithCogVm_SyncWithPlayers_ADDR, sithCogVm_SyncWithPlayers);
-    hook_function(sithCogVm_ClearMsgTmpBuf_ADDR, sithCogVm_ClearMsgTmpBuf);
-    hook_function(sithCogVm_cogMsg_Reset_ADDR, sithCogVm_cogMsg_Reset);
     hook_function(sithCogVm_Exec_ADDR, sithCogVm_Exec);
     hook_function(sithCogVm_ExecCog_ADDR, sithCogVm_ExecCog);
     hook_function(sithCogVm_PopValue_ADDR, sithCogVm_PopValue);

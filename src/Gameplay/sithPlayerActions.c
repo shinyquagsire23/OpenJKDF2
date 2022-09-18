@@ -42,7 +42,7 @@ void sithPlayerActions_Activate(sithThing *thing)
         if ( v4 )
         {
             v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
-            if ( sithCogVm_multiplayerFlags && v5 >= 0 )
+            if ( sithComm_multiplayerFlags && v5 >= 0 )
                 sithDSSThing_SendPlayKeyMode(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
             sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
@@ -135,11 +135,11 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
                     jumpSound = (SITH_TF_EARTH & v12) != 0 ? SITH_SC_JUMPEARTH : SITH_SC_JUMP;
             }
             v15 = sithSoundClass_PlayModeRandom(thing, jumpSound);
-            if ( v15 && sithCogVm_multiplayerFlags )
+            if ( v15 && sithComm_multiplayerFlags )
                 sithDSSThing_SendPlaySoundMode(thing, jumpSound, v15->refid, -1.0);
             sithThing_DetachThing(thing);
         }
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
             sithThing_SetSyncFlags(thing, THING_SYNC_POS);
     }
 }

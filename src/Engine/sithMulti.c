@@ -20,6 +20,7 @@
 #include "Engine/sith.h"
 #include "Main/Main.h"
 #include "AI/sithAI.h"
+#include "Devices/sithComm.h"
 
 #define sithMulti_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
 #define sithMulti_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
@@ -52,7 +53,7 @@ void sithMulti_SendChat(char *pStr, int arg0, int arg1)
 
     NETMSG_END(DSS_CHAT);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
 }
 
 int sithMulti_ProcessChat(sithCogMsg *msg)
@@ -139,8 +140,8 @@ int sithMulti_Startup()
     v4 = 0;
     sithMulti_leaveJoinType = 0;
     sithMulti_bTimelimitMet = 0;
-    sithCogVm_multiplayerFlags |= 1u;
-    sithCogVm_bSyncMultiplayer |= 1u;
+    sithComm_multiplayerFlags |= 1u;
+    sithComm_bSyncMultiplayer |= 1u;
     sithMulti_dword_83265C = 0;
 
     // Remove all actor things from the world
@@ -170,7 +171,7 @@ int sithMulti_Startup()
     sithSurface_numSurfaces_0 = 0;
     sithSector_numSync = 0;
     sithNet_dword_832640 = 0;
-    sithCogVm_ClearMsgTmpBuf();
+    sithComm_ClearMsgTmpBuf();
     if ( sithDplay_bIsServer )
     {
         sithNet_MultiModeFlags = sithMulti_multiModeFlags;
@@ -238,10 +239,10 @@ void sithMulti_FreeThing(int a1)
 
 void sithMulti_Shutdown()
 {
-    sithCogVm_multiplayerFlags &= ~1u;
+    sithComm_multiplayerFlags &= ~1u;
     sithNet_isMulti = 0;
     sithNet_isServer = 0;
-    sithCogVm_bSyncMultiplayer &= ~1u;
+    sithComm_bSyncMultiplayer &= ~1u;
     sithEvent_RegisterFunc(2, 0, 0, 0);
     sithDplay_Close();
     sithDplay_CloseConnection();
@@ -257,7 +258,7 @@ int sithMulti_SendJoinRequest(int sendto_id)
     NETMSG_PUSHU32(sithNet_checksum);
 
     NETMSG_END(DSS_JOINREQUEST);
-    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 1, 0);
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, 1, 0);
 }
 
 int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
@@ -463,7 +464,7 @@ void sithMulti_ProcessScore()
             NETMSG_PUSHSTR(std_genBuffer, v10);
             NETMSG_END(DSS_CHAT);
 
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
 
             sithMulti_bTimelimitMet = 1;
             sithNet_MultiModeFlags &= ~MULTIMODEFLAG_TIMELIMIT;
@@ -489,7 +490,7 @@ void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId)
     NETMSG_PUSHWSTR(jkPlayer_playerInfos[playerIdx].player_name, 0x10);
     NETMSG_END(DSS_WELCOME);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, 1);
 }
 
 void sithMulti_SendQuit(int idx)
@@ -501,7 +502,7 @@ void sithMulti_SendQuit(int idx)
     NETMSG_PUSHS32(idx);
     NETMSG_END(DSS_QUIT);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, idx, 1, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, idx, 1, 1);
 }
 
 int sithMulti_LobbyMessage()
@@ -516,12 +517,12 @@ int sithMulti_LobbyMessage()
         {
             if ( sithMulti_sendto_id )
             {
-                sithCogVm_netMsgTmp.pktData[0] = 3;
-                sithCogVm_netMsgTmp.pktData[1] = 0;
-                sithCogVm_netMsgTmp.netMsg.msg_size = 8;
-                sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
+                sithComm_netMsgTmp.pktData[0] = 3;
+                sithComm_netMsgTmp.pktData[1] = 0;
+                sithComm_netMsgTmp.netMsg.msg_size = 8;
+                sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+                sithComm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithMulti_sendto_id, 1, 0);
             }
             sithNet_dword_832640 = 0;
             sithMulti_sendto_id = 0;
@@ -556,7 +557,7 @@ int sithMulti_LobbyMessage()
                     NETMSG_PUSHS32(v6->score);
                 }
             }
-            DirectPlay_SendLobbyMessage(sithCogVm_netMsgTmp.pktData, NETMSG_LEN());
+            DirectPlay_SendLobbyMessage(sithComm_netMsgTmp.pktData, NETMSG_LEN());
         }
     }
     return sithDplay_DoReceive();
@@ -620,14 +621,14 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
     sithPlayer_idk(v1);
     sithPlayer_ResetPalEffects();
     sithEvent_RegisterFunc(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
-    sithCogVm_SetNeedsSync();
+    sithComm_SetNeedsSync();
     return 1;
 }
 
 int sithMulti_ProcessPing(sithCogMsg *msg)
 {
     msg->netMsg.cogMsgId = DSS_PINGREPLY;
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, msg->netMsg.thingIdx, 1, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, msg->netMsg.thingIdx, 1, 0);
     return 1;
 }
 
@@ -737,11 +738,11 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
                     v2 = v1->net_id;
                     if ( sithNet_isServer )
                     {
-                        sithCogVm_netMsgTmp.pktData[0] = v1->net_id;
-                        sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-                        sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_QUIT;
-                        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 1, 1);
+                        sithComm_netMsgTmp.pktData[0] = v1->net_id;
+                        sithComm_netMsgTmp.netMsg.msg_size = 4;
+                        sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+                        sithComm_netMsgTmp.netMsg.cogMsgId = DSS_QUIT;
+                        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v2, 1, 1);
                     }
                     v3 = sithStrTable_GetString("%s_HAS_LEFT_THE_GAME");
                     jk_snwprintf(a1, 0x80u, v3, v1);
@@ -839,7 +840,7 @@ void sithMulti_SendLeaveJoin(int sendtoId, int bSync)
         }
     }
     NETMSG_END(DSS_LEAVEJOIN);
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 1, bSync);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, bSync);
 }
 
 int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
@@ -955,12 +956,12 @@ void sithMulti_sub_4CA470(int a1)
     {
         if ( sithMulti_sendto_id )
         {
-            sithCogVm_netMsgTmp.pktData[0] = 3;
-            sithCogVm_netMsgTmp.pktData[1] = 0;
-            sithCogVm_netMsgTmp.netMsg.msg_size = 8;
-            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-            sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
+            sithComm_netMsgTmp.pktData[0] = 3;
+            sithComm_netMsgTmp.pktData[1] = 0;
+            sithComm_netMsgTmp.netMsg.msg_size = 8;
+            sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+            sithComm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithMulti_sendto_id, 1, 0);
         }
         sithNet_dword_832640 = 0;
         sithMulti_sendto_id = 0;
@@ -1064,7 +1065,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
             NETMSG_PUSHS32(0);
             NETMSG_END(DSS_JOINING);
 
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
             return 1;
         }
         v3 = 0;
@@ -1095,7 +1096,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
             NETMSG_PUSHS32(0);
             NETMSG_END(DSS_JOINING);
 
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
             return 1;
         }
         if ( sithNet_dword_832640 )
@@ -1107,7 +1108,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
                 NETMSG_PUSHS32(0);
                 NETMSG_PUSHF32(0.5);
                 NETMSG_END(DSS_JOINING);
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
                 return 1;
             }
             else
@@ -1117,7 +1118,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
                 NETMSG_PUSHS32(1);
                 NETMSG_PUSHS32(0);
                 NETMSG_END(DSS_JOINING);
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
                 return 1;
             }
         }
@@ -1141,7 +1142,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
             NETMSG_PUSHS32(5);
             NETMSG_PUSHS32(0);
             NETMSG_END(DSS_JOINING);
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
 
             return 1;
         }
@@ -1172,7 +1173,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
                 NETMSG_PUSHS32(4);
                 NETMSG_PUSHS32(0);
                 NETMSG_END(DSS_JOINING);
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
                 return 1;
 #endif
             }
@@ -1182,7 +1183,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
             NETMSG_PUSHS32(0);
             NETMSG_PUSHF32(0.25);
             NETMSG_END(DSS_JOINING);
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v1, 1, 0);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v1, 1, 0);
 
             sithMulti_SendLeaveJoin(v1, 0);
             sithNet_dword_832640 = 1;
@@ -1212,7 +1213,7 @@ void sithDplay_cogMsg_SendEnumPlayers(int sendtoId)
     }
 
     NETMSG_END_2(DSS_ENUMPLAYERS);
-    sithCogVm_SendMsgToPlayer(&sithDplay_cogMsgTmp, sendtoId, 1, 1);
+    sithComm_SendMsgToPlayer(&sithDplay_cogMsgTmp, sendtoId, 1, 1);
 }
 
 int sithDplay_cogMsg_HandleEnumPlayers(sithCogMsg *msg)
@@ -1325,7 +1326,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
             NETMSG_PUSHSTR(std_genBuffer, v2);
             NETMSG_END(DSS_CHAT);
 
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
             sithMulti_bTimelimitMet = 1;
             sithNet_MultiModeFlags &= ~MULTIMODEFLAG_TIMELIMIT;
         }
@@ -1340,7 +1341,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                     NETMSG_PUSHS32(3);
                     NETMSG_PUSHS32(0);
                     NETMSG_END(DSS_JOINING);
-                    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithMulti_sendto_id, 1, 0);
+                    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithMulti_sendto_id, 1, 0);
                 }
                 sithNet_dword_832640 = 0;
                 sithMulti_sendto_id = 0;
@@ -1515,9 +1516,9 @@ uint32_t sithMulti_IterPlayersnothingidk(int net_id)
 int sithMulti_SendPing(int sendtoId)
 {
     sithMulti_dword_832654 = sithTime_curMs;
-    sithCogVm_netMsgTmp.pktData[0] = sithTime_curMs;
-    sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-    sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-    sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_PING;
-    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp.netMsg, sendtoId, 1, 0);
+    sithComm_netMsgTmp.pktData[0] = sithTime_curMs;
+    sithComm_netMsgTmp.netMsg.msg_size = 4;
+    sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+    sithComm_netMsgTmp.netMsg.cogMsgId = DSS_PING;
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, 0);
 }

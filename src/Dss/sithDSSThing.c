@@ -16,6 +16,7 @@
 #include "World/sithItem.h"
 #include "World/sithWeapon.h"
 #include "World/sithTrackThing.h"
+#include "Devices/sithComm.h"
 #include "jk.h"
 
 void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync)
@@ -50,7 +51,7 @@ void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync)
 
         NETMSG_END(DSS_THINGPOS);
 
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, 255, bSync);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, 255, bSync);
     }
 }
 
@@ -167,7 +168,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
 
     NETMSG_END(DSS_SYNCTHING);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
@@ -275,7 +276,7 @@ void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSoun
     
     NETMSG_END(DSS_PLAYSOUND);
     
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 0);
 }
 
 int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
@@ -330,7 +331,7 @@ void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, float
 
     NETMSG_END(DSS_PLAYSOUNDMODE);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 0);
 }
 
 int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg)
@@ -368,7 +369,7 @@ void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3
 
     NETMSG_END(DSS_PLAYKEY);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a6, a7, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, a6, a7, 0);
 }
 
 int sithDSSThing_ProcessPlayKey(sithCogMsg *msg)
@@ -416,7 +417,7 @@ void sithDSSThing_SendPlayKeyMode(sithThing *pThing, int16_t idx1, int idx2, int
     
     NETMSG_END(DSS_PLAYKEYMODE);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 0);
 }
 
 int sithDSSThing_ProcessPlayKeyMode(sithCogMsg *msg)
@@ -453,7 +454,7 @@ void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId)
 
     NETMSG_END(DSS_SETTHINGMODEL);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 255, 1);
 }
 
 int sithDSSThing_ProcessSetThingModel(sithCogMsg *msg)
@@ -486,7 +487,7 @@ void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId,
 
     NETMSG_END(DSS_STOPKEY);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessStopKey(sithCogMsg *msg)
@@ -527,7 +528,7 @@ void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int 
 
     NETMSG_END(DSS_STOPSOUND);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a3, a4, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, a3, a4, 1);
 }
 
 int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
@@ -578,7 +579,7 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
 
     NETMSG_END(DSS_FIREPROJECTILE);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 0);
 }
 
 int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
@@ -632,7 +633,7 @@ void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, 
     
     NETMSG_END(DSS_DEATH);
     
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessDeath(sithCogMsg *msg)
@@ -679,7 +680,7 @@ void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, fl
 
      NETMSG_END(DSS_DAMAGE);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessDamage(sithCogMsg *msg)
@@ -820,7 +821,7 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
     
     NETMSG_END(DSS_THINGFULLDESC);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
@@ -990,7 +991,7 @@ void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, float a3, int a4, 
 
     NETMSG_END(DSS_PATHMOVE);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, mpFlags, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 1);
 }
 
 int sithDSSThing_ProcessPathMove(sithCogMsg *msg)
@@ -1066,7 +1067,7 @@ void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int m
     
     NETMSG_END(DSS_SYNCTHINGATTACHMENT);
     
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, a4);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, a4);
 }
 
 int sithDSSThing_ProcessSyncThingAttachment(sithCogMsg *msg)
@@ -1131,30 +1132,30 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
 
     itemThingId = pItemThing->thing_id;
     actorId = pActor->thing_id;
-    sithCogVm_netMsgTmp.pktData[0] = itemThingId;
-    sithCogVm_netMsgTmp.pktData[1] = actorId;
-    sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-    sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM1;
-    sithCogVm_netMsgTmp.netMsg.msg_size = 8;
+    sithComm_netMsgTmp.pktData[0] = itemThingId;
+    sithComm_netMsgTmp.pktData[1] = actorId;
+    sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+    sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM1;
+    sithComm_netMsgTmp.netMsg.msg_size = 8;
     if ( !sithNet_isServer )
     {
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, mpFlags, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, mpFlags, 1);
         return;
     }
     pItemThing2 = sithThing_GetById(itemThingId);
     if ( !pItemThing2 && sithNet_isServer )
     {
-        sithCogVm_netMsgTmp.pktData[0] = itemThingId;
-        sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
-        sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithCogVm_netMsgTmp.netMsg.thingIdx, 255, 1);
+        sithComm_netMsgTmp.pktData[0] = itemThingId;
+        sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+        sithComm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
+        sithComm_netMsgTmp.netMsg.msg_size = 4;
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithComm_netMsgTmp.netMsg.thingIdx, 255, 1);
         return;
     }
-    pActor2 = sithThing_GetById(sithCogVm_netMsgTmp.pktData[1]);
+    pActor2 = sithThing_GetById(sithComm_netMsgTmp.pktData[1]);
     if ( pItemThing2 && pActor2 )
     {
-        if ( sithCogVm_netMsgTmp.netMsg.cogMsgId != DSS_TAKEITEM1 )
+        if ( sithComm_netMsgTmp.netMsg.cogMsgId != DSS_TAKEITEM1 )
         {
 LABEL_12:
             sithItem_Take(pItemThing2, pActor2, 1);
@@ -1162,8 +1163,8 @@ LABEL_12:
         }
         if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
         {
-            sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
-            sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 1, 1);
+            sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
+            sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
             goto LABEL_12;
         }
     }
@@ -1181,11 +1182,11 @@ int sithDSSThing_ProcessTakeItem(sithCogMsg *msg)
     if ( !v2 && sithNet_isServer )
     {
         v6 = msg->netMsg.thingIdx;
-        sithCogVm_netMsgTmp.pktData[0] = v1;
-        sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-        sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
-        sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v6, 255, 1);
+        sithComm_netMsgTmp.pktData[0] = v1;
+        sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+        sithComm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
+        sithComm_netMsgTmp.netMsg.msg_size = 4;
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v6, 255, 1);
         return 0;
     }
     v4 = sithThing_GetById(msg->pktData[1]);
@@ -1196,7 +1197,7 @@ int sithDSSThing_ProcessTakeItem(sithCogMsg *msg)
             if ( v2->type != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) != 0 )
                 return 1;
             msg->netMsg.cogMsgId = DSS_TAKEITEM2;
-            sithCogVm_SendMsgToPlayer(msg, -1, 1, 1);
+            sithComm_SendMsgToPlayer(msg, -1, 1, 1);
         }
         sithItem_Take(v2, v4, 1);
         return 1;
@@ -1223,7 +1224,7 @@ void sithDSSThing_SendCreateThing(sithThing *pTemplate, sithThing *pThing, sithT
     NETMSG_PUSHS32(pThing->thing_id);
 
     NETMSG_END(DSS_CREATETHING);
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, mpFlags, bSync);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, mpFlags, bSync);
 }
 
 int sithDSSThing_ProcessCreateThing(sithCogMsg *msg)
@@ -1272,7 +1273,7 @@ void sithDSSThing_SendDestroyThing(int idx, int sendtoId)
     NETMSG_PUSHS32(idx);
     NETMSG_END(DSS_DESTROYTHING);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendtoId, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 255, 1);
 }
 
 int sithDSSThing_ProcessDestroyThing(sithCogMsg *msg)

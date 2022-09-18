@@ -26,6 +26,7 @@
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "Main/jkDev.h"
+#include "Devices/sithComm.h"
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)
@@ -41,19 +42,19 @@ const char* jkSaber_aKyTeamModels[5] = {
 
 int jkSaber_Startup()
 {
-    sithCogVm_SetMsgFunc(DSS_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
-    sithCogVm_SetMsgFunc(DSS_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
-    sithCogVm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
-    sithCogVm_SetMsgFunc(DSS_ID_32, jkSaber_cogMsg_Handlex32);
-    sithCogVm_SetMsgFunc(DSS_ID_33, jkSaber_cogMsg_Handlex33);
-    sithCogVm_SetMsgFunc(DSS_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
-    sithCogVm_SetMsgFunc(DSS_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
-    sithCogVm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
-    sithCogVm_SetMsgFunc(DSS_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
-    sithCogVm_SetMsgFunc(DSS_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithCogVm_SetMsgFunc(DSS_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
-    sithCogVm_SetMsgFunc(DSS_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
-    sithCogVm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
+    sithComm_SetMsgFunc(DSS_JKENABLESABER, jkSaber_cogMsg_HandleJKEnableSaber);
+    sithComm_SetMsgFunc(DSS_SABERINFO3, jkSaber_cogMsg_HandleSetSaberInfo2);
+    sithComm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkSaber_cogMsg_HandleJKSetWeaponMesh);
+    sithComm_SetMsgFunc(DSS_ID_32, jkSaber_cogMsg_Handlex32);
+    sithComm_SetMsgFunc(DSS_ID_33, jkSaber_cogMsg_Handlex33);
+    sithComm_SetMsgFunc(DSS_HUDTARGET, jkSaber_cogMsg_HandleHudTarget);
+    sithComm_SetMsgFunc(DSS_ID_36, jkSaber_cogMsg_Handlex36_setwaggle);
+    sithComm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkSaber_cogMsg_HandleJKPrintUniString);
+    sithComm_SetMsgFunc(DSS_ENDLEVEL, jkSaber_cogMsg_HandleEndLevel);
+    sithComm_SetMsgFunc(DSS_SABERINFO1, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithComm_SetMsgFunc(DSS_SABERINFO2, jkSaber_cogMsg_HandleSetSaberInfo);
+    sithComm_SetMsgFunc(DSS_SETTEAM, jkSaber_cogMsg_HandleSetTeam);
+    sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
     sithGamesave_Setidk(jkSaber_playerconfig_idksync, jkSaber_player_thingsidkfunc, jkSaber_nullsub_2, jkSaber_Write, jkSaber_Load);
     sithMulti_SetHandleridk(jkSaber_idk4);
     return 1;
@@ -470,7 +471,7 @@ void jkSaber_playerconfig_idksync()
 
         NETMSG_END(DSS_ID_36);
 
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
     }
 
     for (int i = 0; i < jkPlayer_numOtherThings; i++)
@@ -496,7 +497,7 @@ void jkSaber_playerconfig_idksync()
         
         NETMSG_END(DSS_HUDTARGET);
         
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 4, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
     }
 }
 
@@ -559,7 +560,7 @@ void jkSaber_cogMsg_SendSetSaberInfo2(sithThing *thing)
         
         NETMSG_END(DSS_SABERINFO3);
         
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
     }
 }
 
@@ -629,7 +630,7 @@ void jkSaber_cogMsg_SendSetSaberInfo(sithThing *thing)
 
     NETMSG_END(DSS_SABERINFO2);
     
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
 int jkSaber_cogMsg_HandleSetSaberInfo(sithCogMsg *msg)
@@ -732,7 +733,7 @@ void jkSaber_cogMsg_Sendx32(jkPlayerInfo *playerInfo)
 
     NETMSG_END(DSS_ID_32);
     
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
 int jkSaber_cogMsg_Handlex32(sithCogMsg *msg)
@@ -814,9 +815,9 @@ void jkSaber_cogMsg_SendSetTeam(int16_t teamNum)
     NETMSG_END(DSS_SETTEAM);
     
     if ( sithNet_isServer )
-        jkSaber_cogMsg_HandleSetTeam(&sithCogVm_netMsgTmp);
+        jkSaber_cogMsg_HandleSetTeam(&sithComm_netMsgTmp);
     else
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, 255, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
 }
 
 int jkSaber_cogMsg_HandleSetTeam(sithCogMsg *pMsg)
@@ -875,7 +876,7 @@ void jkSaber_cogMsg_SendJKSetWeaponMesh(sithThing *pPlayerThing)
 
     NETMSG_END(DSS_JKSETWEAPONMESH);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
 int jkSaber_cogMsg_HandleJKSetWeaponMesh(sithCogMsg *msg)
@@ -923,7 +924,7 @@ void jkSaber_cogMsg_SendJKEnableSaber(sithThing *pPlayerThing)
 
     NETMSG_END(DSS_JKENABLESABER);
 
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 0);
 }
 
 int jkSaber_cogMsg_HandleJKEnableSaber(sithCogMsg *msg)
@@ -962,7 +963,7 @@ void jkSaber_cogMsg_SendJKPrintUniString(int a1, unsigned int a2)
 LABEL_6:
         NETMSG_END(DSS_JKPRINTUNISTRING);
 
-        sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, v2, 255, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v2, 255, 1);
         return;
     }
     if ( a2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[a2].flags & 1) != 0 )
@@ -995,9 +996,9 @@ void jkSaber_cogMsg_SendEndLevel()
     NETMSG_END(DSS_ENDLEVEL);
 
     // lol
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
-    sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
     sithMulti_EndLevel(sithTime_curMs + 10000, 1);
 }
 
@@ -1039,9 +1040,9 @@ int jkSaber_cogMsg_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, c
     NETMSG_END(DSS_SABERINFO1);
 
     if ( sithNet_isServer )
-        result = jkSaber_cogMsg_HandleSetSaberInfo(&sithCogVm_netMsgTmp);
+        result = jkSaber_cogMsg_HandleSetSaberInfo(&sithComm_netMsgTmp);
     else
-        result = sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sithNet_serverNetId, 255, 1);
+        result = sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
     return result;
 }
 
@@ -1090,13 +1091,13 @@ int jkSaber_idk4()
         {
             if ( sithMulti_leaveJoinType )
             {
-                sithCogVm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
-                sithCogVm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithCogVm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
-                sithCogVm_netMsgTmp.netMsg.msg_size = 4;
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
-                sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, -1, 255, 1);
+                sithComm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
+                sithComm_netMsgTmp.netMsg.flag_maybe = 0;
+                sithComm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
+                sithComm_netMsgTmp.netMsg.msg_size = 4;
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
+                sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
                 sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }

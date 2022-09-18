@@ -473,7 +473,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
 
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
-    if ( spawned && sithCogVm_multiplayerFlags )
+    if ( spawned && sithComm_multiplayerFlags )
         sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
 
     return spawned;
@@ -1439,7 +1439,7 @@ LABEL_30:
         a5a = v15 * sithWeapon_fireRate;
         v16 = a5a;
         v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a);
-        if ( v17 && sithCogVm_multiplayerFlags )
+        if ( v17 && sithComm_multiplayerFlags )
             sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
     }
     while ( a1a > 1.0 );
@@ -1450,7 +1450,7 @@ LABEL_31:
     a1b = result;
     if ( result )
     {
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
         {
             sithDSSThing_SendFireProjectile(
                 sender,

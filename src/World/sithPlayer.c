@@ -649,7 +649,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             sithPhysics_ThingStop(player);
             sithWeapon_SyncPuppet(player);
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
-            if ( sithCogVm_multiplayerFlags )
+            if ( sithComm_multiplayerFlags )
                 sithDSSThing_SendSyncThing(player, -1, 255);
         }
     }

@@ -1219,7 +1219,7 @@ rdSurface* sithSurface_GetByIdx(int idx)
 
 void sithSurface_SyncFull(int mpFlags)
 {
-    if (!(sithCogVm_multiplayerFlags & mpFlags)) return;
+    if (!(sithComm_multiplayerFlags & mpFlags)) return;
 
     for (int i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
     {
@@ -1270,7 +1270,7 @@ void sithSurface_SyncSurface(sithSurface *pSurface)
 
 void sithSurface_Sync()
 {
-    if (!sithCogVm_multiplayerFlags) return;
+    if (!sithComm_multiplayerFlags) return;
 
     for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
     {

@@ -162,7 +162,7 @@ int sithDplay_DoReceive()
 
     v1 = 2048;
     do
-        result = DirectPlay_Receive(&v2, sithCogVm_netMsgTmp.pktData, &v1);
+        result = DirectPlay_Receive(&v2, sithComm_netMsgTmp.pktData, &v1);
     while ( result != -1 );
     return result;
 }

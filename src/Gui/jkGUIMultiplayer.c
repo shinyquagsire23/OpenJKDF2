@@ -16,6 +16,7 @@
 #include "Win95/sithDplay.h"
 #include "Platform/wuRegistry.h"
 #include "General/stdString.h"
+#include "Devices/sithComm.h"
 
 static int jkGuiMultiplayer_bInitted = 0;
 static int jkGuiMultiplayer_aElements2_aIdk[2] = {0xd, 0xe};
@@ -436,7 +437,7 @@ int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
 LABEL_9:
                 jkGuiDialog_ErrorDialog(v2, v3);
                 jkGuiMultiplayer_menu4.lastButtonUp = -2;
-                sithCogVm_SetNeedsSync();
+                sithComm_SetNeedsSync();
                 break;
             default:
                 return 1;
@@ -621,7 +622,7 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
         v1 = stdPlatform_GetTimeMsec();
         if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendJoinRequest(sithNet_serverNetId)) )
         {
-            sithCogVm_Sync();
+            sithComm_Sync();
             if ( (g_submodeFlags & 8) == 0 )
                 pMenu->lastButtonUp = 1;
         }

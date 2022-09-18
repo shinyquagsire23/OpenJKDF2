@@ -38,6 +38,7 @@
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Cog/sithCog.h"
+#include "Devices/sithComm.h"
 #include "jk.h"
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -57,7 +58,7 @@ int sith_Startup(struct common_functions *commonFuncs)
     is_started = sithRender_Startup() & is_started;
     is_started = sithCollision_Startup() & is_started;
     is_started = sithThing_Startup() & is_started;
-    is_started = sithCogVm_Startup() & is_started;
+    is_started = sithComm_Startup() & is_started;
     is_started = sithDplay_Startup() & is_started;
     is_started = sithCog_Startup() & is_started;
     is_started = sithAI_Startup() & is_started;
@@ -112,7 +113,7 @@ void sith_Shutdown()
     sithAI_Shutdown();
     sithCog_Shutdown();
     sithDplay_Shutdown();
-    sithCogVm_Shutdown();
+    sithComm_Shutdown();
     sithThing_Shutdown();
     sithCollision_Shutdown();
     sithRender_Shutdown();
@@ -228,7 +229,7 @@ int sith_Tick()
     if ( (g_submodeFlags & 8) != 0 )
     {
         sithTime_Tick();
-        sithCogVm_Sync();
+        sithComm_Sync();
 
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {
@@ -316,8 +317,8 @@ int sith_Tick()
                 sithSoundMixer_Tick(sithTime_deltaSeconds);
                 sithEvent_Advance();
 
-                if ( sithCogVm_bSyncMultiplayer )
-                    sithCogVm_Sync();
+                if ( sithComm_bSyncMultiplayer )
+                    sithComm_Sync();
 
                 if ( (g_debugmodeFlags & 1) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                     sithAI_TickAll();
@@ -343,8 +344,8 @@ int sith_Tick()
             sithSoundMixer_Tick(sithTime_deltaSeconds);
             sithEvent_Advance();
 
-            if ( sithCogVm_bSyncMultiplayer )
-                sithCogVm_Sync();
+            if ( sithComm_bSyncMultiplayer )
+                sithComm_Sync();
 
             if ( (g_debugmodeFlags & 1) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                 sithAI_TickAll();

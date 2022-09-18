@@ -458,18 +458,18 @@ sithCogFunctionAI_apViewThings 0x00855CE8 sithThing*[32]
 sithCogFunctionAI_unk1 0x00855D68 int
 sithCogFunctionAI_viewThingIdx 0x00855D6C int
 
-sithCogVm_MsgTmpBuf 0x00837468 sithCogMsg[32]
-sithCogVm_aMsgPairs 0x00847968 sithCogMsg_Pair[128]
-sithCogVm_msgFuncs 0x00847D68 cogMsg_Handler[65]
-sithCogVm_needsSync 0x00847E6C int
-sithCogVm_multiplayerFlags 0x00847E70 int
-sithCogVm_bSyncMultiplayer 0x00847E74 int
-sithCogVm_idk2 0x00847E7C int
-sithCogVm_bInit 0x00847E80 int
-sithCogVm_dword_847E84 0x00847E84 uint32_t
-sithCogVm_msgId 0x0054B004 int = 1
-sithCogVm_MsgTmpBuf2 0x00836C40 sithCogMsg
-sithCogVm_netMsgTmp 0x008B4C00 sithCogMsg
+sithComm_MsgTmpBuf 0x00837468 sithCogMsg[32]
+sithComm_aMsgPairs 0x00847968 sithCogMsg_Pair[128]
+sithComm_msgFuncs 0x00847D68 cogMsg_Handler[65]
+sithComm_needsSync 0x00847E6C int
+sithComm_multiplayerFlags 0x00847E70 int
+sithComm_bSyncMultiplayer 0x00847E74 int
+sithComm_idk2 0x00847E7C int
+sithComm_bInit 0x00847E80 int
+sithComm_dword_847E84 0x00847E84 uint32_t
+sithComm_msgId 0x0054B004 int = 1
+sithComm_MsgTmpBuf2 0x00836C40 sithCogMsg
+sithComm_netMsgTmp 0x008B4C00 sithCogMsg
 
 jkCog_emptystring 0x005540BC wchar_t[2]
 jkCog_jkstring 0x00553FB8 wchar_t[130]

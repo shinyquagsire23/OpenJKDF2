@@ -221,7 +221,7 @@ void sithCogFunction_StopAnim(sithCog *ctx)
     if ( v2 )
     {
         sithSurface_StopAnim(v2);
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
             sithDSS_SendSurface(v2, -1, 255); // TODO ??
     }
 }
@@ -238,7 +238,7 @@ void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
         if ( v2 )
         {
             sithSurface_StopAnim(v2);
-            if ( sithCogVm_multiplayerFlags )
+            if ( sithComm_multiplayerFlags )
                 sithDSS_SendSurface(v2, -1, 255); // TODO ??
         }
     }

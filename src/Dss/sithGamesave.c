@@ -25,6 +25,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
+#include "Devices/sithComm.h"
 #include "jk.h"
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -130,26 +131,26 @@ LABEL_11:
 //#ifndef LINUX_TMP
     while (1)
     {
-        if ( !stdConffile_Read(&sithCogVm_netMsgTmp.netMsg.cogMsgId, 4) )
+        if ( !stdConffile_Read(&sithComm_netMsgTmp.netMsg.cogMsgId, 4) )
         {
             break;
         }
         
-        if (!stdConffile_Read(&sithCogVm_netMsgTmp.netMsg.msg_size, 4))
+        if (!stdConffile_Read(&sithComm_netMsgTmp.netMsg.msg_size, 4))
         {
             jk_printf("OpenJKDF2: Save load failed to read msg_size\n");
             goto load_fail;
         }
         
-        if (!(!sithCogVm_netMsgTmp.netMsg.msg_size || stdConffile_Read(sithCogVm_netMsgTmp.pktData, sithCogVm_netMsgTmp.netMsg.msg_size)))
+        if (!(!sithComm_netMsgTmp.netMsg.msg_size || stdConffile_Read(sithComm_netMsgTmp.pktData, sithComm_netMsgTmp.netMsg.msg_size)))
         {
-            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithCogVm_netMsgTmp.netMsg.msg_size);
+            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithComm_netMsgTmp.netMsg.msg_size);
             goto load_fail;
         }
         
-        if (!sithCogVm_InvokeMsgByIdx(&sithCogVm_netMsgTmp))
+        if (!sithComm_InvokeMsgByIdx(&sithComm_netMsgTmp))
         {
-            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithCogVm_netMsgTmp.netMsg.cogMsgId);
+            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithComm_netMsgTmp.netMsg.cogMsgId);
 #ifndef SDL2_RENDER
             // Linux fails on SyncSound only
             goto load_fail;
@@ -193,7 +194,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
     int v19; // ebx
     sithItemDescriptor *v20; // esi
 
-    if ( (sithCogVm_multiplayerFlags & mpFlags) == 0 )
+    if ( (sithComm_multiplayerFlags & mpFlags) == 0 )
         return 0;
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
@@ -360,8 +361,8 @@ int sithGamesave_WriteEntry()
     }
     if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
     {
-        int multiplayerFlagsSave = sithCogVm_multiplayerFlags;
-        sithCogVm_multiplayerFlags = 4;
+        int multiplayerFlagsSave = sithComm_multiplayerFlags;
+        sithComm_multiplayerFlags = 4;
         stdConffile_Write((const char*)&sithGamesave_headerTmp, sizeof(sithGamesave_Header));
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
@@ -390,7 +391,7 @@ int sithGamesave_WriteEntry()
             sithGamesave_wsaveName[255] = 0;
             DebugConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
         }
-        sithCogVm_multiplayerFlags = multiplayerFlagsSave;
+        sithComm_multiplayerFlags = multiplayerFlagsSave;
     }
     sithGamesave_dword_835900 = 0;
     return 0;

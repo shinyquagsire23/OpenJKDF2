@@ -114,7 +114,7 @@ enum DSS_ID
 };
 
 
-#define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithCogVm_netMsgTmp.pktData[0];
+#define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithComm_netMsgTmp.pktData[0];
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&sithDplay_cogMsgTmp.pktData[0];
 #define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = (uint8_t)(x); craftingPacket += sizeof(uint8_t);};
 #define NETMSG_PUSHU16(x) {*(uint16_t*)craftingPacket = (uint16_t)(x); craftingPacket += sizeof(uint16_t);};
@@ -128,12 +128,12 @@ enum DSS_ID
 #define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = (x); craftingPacket += sizeof(rdMatrix34);};
 #define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, (x), (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
 #define NETMSG_PUSHWSTR(x,l) {_wcsncpy((wchar_t*)craftingPacket, (x), (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
-#define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0]; \
-                            sithCogVm_netMsgTmp.netMsg.flag_maybe = 0; \
-                            sithCogVm_netMsgTmp.netMsg.cogMsgId = msgid; \
-                            sithCogVm_netMsgTmp.netMsg.msg_size = len; \
+#define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithComm_netMsgTmp.pktData[0]; \
+                            sithComm_netMsgTmp.netMsg.flag_maybe = 0; \
+                            sithComm_netMsgTmp.netMsg.cogMsgId = msgid; \
+                            sithComm_netMsgTmp.netMsg.msg_size = len; \
                           };
-#define NETMSG_LEN(msgid) ((intptr_t)craftingPacket - (intptr_t)&sithCogVm_netMsgTmp.pktData[0])
+#define NETMSG_LEN(msgid) ((intptr_t)craftingPacket - (intptr_t)&sithComm_netMsgTmp.pktData[0])
 
 #define NETMSG_END_2(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithDplay_cogMsgTmp.pktData[0]; \
                             sithDplay_cogMsgTmp.netMsg.flag_maybe = 0; \

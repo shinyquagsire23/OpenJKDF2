@@ -1914,7 +1914,7 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
 
 void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 {
-    if (!sithCogVm_multiplayerFlags) return;
+    if (!sithComm_multiplayerFlags) return;
 
     for (uint32_t v3 = 0; v3 < sithNet_syncIdx; v3++)
     {

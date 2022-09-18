@@ -8,20 +8,9 @@
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
 
-#define sithCogVm_Startup_ADDR (0x004E1700)
-#define sithCogVm_Shutdown_ADDR (0x004E18E0)
-#define sithCogVm_SetMsgFunc_ADDR (0x004E1900)
-#define sithCogVm_SendMsgToPlayer_ADDR (0x004E1910)
-#define sithCogVm_FileWrite_ADDR (0x004E1B30)
-#define sithCogVm_Sync_ADDR (0x004E1B70)
-#define sithCogVm_SetNeedsSync_ADDR (0x004E1DC0)
-#define sithCogVm_InvokeMsgByIdx_ADDR (0x004E1DD0)
-#define sithCogVm_SyncWithPlayers_ADDR (0x004E1E00)
-#define sithCogVm_ClearMsgTmpBuf_ADDR (0x004E1EC0)
-#define sithCogVm_cogMsg_Reset_ADDR (0x004E1EE0)
+
 #define sithCogVm_Exec_ADDR (0x004E1F60)
 #define sithCogVm_ExecCog_ADDR (0x004E2350)
-
 #define sithCogVm_PopValue_ADDR (0x004E2440)
 #define sithCogVm_PopFlex_ADDR (0x004E24F0)
 #define sithCogVm_PopInt_ADDR (0x004E25C0)
@@ -128,17 +117,6 @@ enum COG_OPCODE
     COG_OPCODE_CALL  = 31
 };
 
-int sithCogVm_Startup();
-void sithCogVm_Shutdown();
-void sithCogVm_SetMsgFunc(int msgid, void *func);
-int sithCogVm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4);
-void sithCogVm_FileWrite(sithCogMsg *ctx);
-int sithCogVm_Sync();
-void sithCogVm_SetNeedsSync();
-int sithCogVm_InvokeMsgByIdx(sithCogMsg *a1);
-void sithCogVm_SyncWithPlayers();
-void sithCogVm_ClearMsgTmpBuf();
-int sithCogVm_cogMsg_Reset();
 void sithCogVm_Exec(sithCog *cog_ctx);
 void sithCogVm_ExecCog(sithCog *ctx, int trigIdx);
 int sithCogVm_PopValue(sithCog *ctx, sithCogStackvar *stackVar);

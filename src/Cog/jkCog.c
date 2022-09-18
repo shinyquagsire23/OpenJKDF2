@@ -343,7 +343,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                     rdThing_FreeEntry(v5); // Added: fix memleak
                     rdThing_NewEntry(&v4->rd_thing, v3);
                     rdThing_SetModel3(v5, model3);
-                    if ( sithCogVm_multiplayerFlags )
+                    if ( sithComm_multiplayerFlags )
                     {
                         if ( (ctx->flags & 0x200) == 0 )
                         {
@@ -457,7 +457,7 @@ void jkCog_SetInvis(sithCog *pCog)
         v2->rdthing.geometryMode = v2->rdthing.curGeoMode;
     else
         v2->rdthing.geometryMode = RD_GEOMODE_VERTICES;
-    if ( sithCogVm_multiplayerFlags )
+    if ( sithComm_multiplayerFlags )
     {
         if ( (pCog->flags & 0x200) == 0 )
         {
@@ -484,7 +484,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
     else
         v4 = v3 | 8;
     v2->actorParams.typeflags = v4;
-    if ( sithCogVm_multiplayerFlags )
+    if ( sithComm_multiplayerFlags )
     {
         if ( (pCog->flags & 0x200) == 0 )
         {
@@ -654,7 +654,7 @@ void jkCog_SetSaberInfo(sithCog *ctx)
     if ( v4->playerInfo )
     {
         jkSaber_InitializeSaberInfo(v4, v10->mat_fpath, v9->mat_fpath, base_rad, tip_rad, len, wall_sparks, blood_sparks, saber_sparks);
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
         {
             if ( (ctx->flags & 0x200) == 0 )
             {
@@ -690,7 +690,7 @@ void jkCog_EnableSaber(sithCog *ctx)
     if ( v2 && v2->type == SITH_THING_PLAYER )
     {
         jkSaber_Enable(v2, a2, a3, a1a);
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
             jkSaber_cogMsg_SendJKEnableSaber(v3);
     }
 }
@@ -911,7 +911,7 @@ LABEL_8:
             jkDev_PrintUniString(jkCog_jkstring);
             return;
         }
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
         {
             if ( (ctx->flags & 0x200) == 0 )
             {
@@ -930,7 +930,7 @@ LABEL_8:
             goto LABEL_8;
         }
         jkDev_PrintUniString(jkCog_jkstring);
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
         {
             if ( (ctx->flags & 0x200) == 0 )
             {
