@@ -110,7 +110,7 @@
 #include "World/sithWorld.h"
 #include "Gameplay/sithInventory.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Engine/sithCollision.h"
 #include "World/sithActor.h"
 #include "World/sithMap.h"

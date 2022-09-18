@@ -8,7 +8,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Gameplay/sithPlayer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithNet.h"

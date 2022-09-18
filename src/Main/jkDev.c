@@ -9,7 +9,7 @@
 #include "Win95/WinIdk.h"
 #include "World/sithThing.h"
 #include "Gameplay/sithInventory.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
 #include "Main/sithCommand.h"

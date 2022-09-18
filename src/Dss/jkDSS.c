@@ -2,7 +2,7 @@
 
 #include "Cog/sithCog.h"
 #include "Dss/sithMulti.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "Gameplay/sithPlayer.h"
 #include "General/stdString.h"

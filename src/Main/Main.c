@@ -32,7 +32,7 @@
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Win95/std.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/stdConsole.h"

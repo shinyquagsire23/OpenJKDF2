@@ -17,7 +17,7 @@
 #include "Engine/sithTemplate.h"
 #include "General/stdMath.h"
 #include "Gameplay/sithInventory.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "World/sithThing.h"
 #include "Gameplay/sithPlayer.h"
 #include "World/sithWeapon.h"

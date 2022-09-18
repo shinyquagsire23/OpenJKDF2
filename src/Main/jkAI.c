@@ -9,7 +9,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "Gameplay/sithPlayerActions.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Cog/sithCog.h"
 #include "../jk.h"
 

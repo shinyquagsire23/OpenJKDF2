@@ -34,7 +34,7 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIDisplay.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "World/sithWorld.h"
 #include "Platform/stdControl.h"
 #include "Win95/Windows.h"

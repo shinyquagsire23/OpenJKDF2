@@ -1,7 +1,7 @@
 #include "jkEpisode.h"
 
 #include "World/sithThing.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "stdPlatform.h"
 #include "Main/jkRes.h"
 #include "Main/Main.h"
