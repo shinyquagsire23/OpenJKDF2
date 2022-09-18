@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define stdSound_Initialize_ADDR (0x0436E80)
+#define stdSound_Startup_ADDR (0x0436E80)
 #define stdSound_Shutdown_ADDR (0x04370E0)
 #define stdSound_SetMenuVolume_ADDR (0x0437150)
 #define stdSound_BufferCreate_ADDR (0x0437190)
@@ -97,7 +97,7 @@ uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPe
 extern float stdSound_fMenuVolume;
 
 #ifndef SDL2_RENDER
-static int (*stdSound_Initialize)() = (void*)stdSound_Initialize_ADDR;
+static int (*stdSound_Startup)() = (void*)stdSound_Startup_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;
 static stdSound_buffer_t* (*stdSound_BufferCreate)(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen) = (void*)stdSound_BufferCreate_ADDR;
@@ -122,7 +122,7 @@ static void (*stdSound_SetVelocity)(stdSound_buffer_t* sound, rdVector3 *vel) = 
 static int (*stdSound_IsPlaying)(stdSound_buffer_t* a1, rdVector3 *pos) = (void*)stdSound_IsPlaying_ADDR;
 static void (*stdSound_3DBufferRelease)(stdSound_3dBuffer_t* a1) = (void*)stdSound_3DBufferRelease_ADDR;
 #else
-int stdSound_Initialize();
+int stdSound_Startup();
 void stdSound_Shutdown();
 void stdSound_SetMenuVolume(float a1);
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen);

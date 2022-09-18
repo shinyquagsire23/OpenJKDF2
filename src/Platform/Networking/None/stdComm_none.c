@@ -96,7 +96,7 @@ BOOL DirectPlay_SetSessionFlagidk(int a1)
     return 1;
 }
 
-BOOL DirectPlay_Initialize()
+BOOL DirectPlay_Startup()
 {
     //IDirectPlay3Vtbl *v0; // esi
     //uint32_t *v1; // eax

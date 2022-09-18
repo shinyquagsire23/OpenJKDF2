@@ -31,7 +31,7 @@ extern "C" {
 #define stdComm_cogMsg_HandleEnumPlayers_ADDR (0x004C9A40)
 
 #define DirectPlay_EarlyInit_ADDR (0x0042F840)
-#define DirectPlay_Initialize_ADDR (0x0042FA40)
+#define DirectPlay_Startup_ADDR (0x0042FA40)
 #define DirectPlay_Destroy_ADDR (0x0042FAB0)
 #define DirectPlay_InitConnection_ADDR (0x0042FB10)
 #define DirectPlay_CloseConnection_ADDR (0x0042FB80)
@@ -86,7 +86,7 @@ int stdComm_EarlyInit();
 //static void (*stdComm_EnumSessions2)() = (void*)stdComm_EnumSessions2_ADDR;
 
 #ifdef WIN32_BLOBS
-static int (*DirectPlay_Initialize)() = (void*)DirectPlay_Initialize_ADDR;
+static int (*DirectPlay_Startup)() = (void*)DirectPlay_Startup_ADDR;
 static int (*DirectPlay_EarlyInit)(wchar_t*, wchar_t*) = (void*)DirectPlay_EarlyInit_ADDR;
 //static int (*stdComm_EarlyInit)() = (void*)stdComm_EarlyInit_ADDR;
 static int (*stdComm_Open)(int idx, wchar_t* pwPassword) = (void*)stdComm_Open_ADDR;
@@ -128,7 +128,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut);
 BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize);
 void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers);
 BOOL DirectPlay_SetSessionFlagidk(int a1);
-BOOL DirectPlay_Initialize();
+BOOL DirectPlay_Startup();
 int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
 DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
 void DirectPlay_Close();

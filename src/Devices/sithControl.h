@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#define sithControl_Initialize_ADDR (0x004D6840)
+#define sithControl_Startup_ADDR (0x004D6840)
 #define sithControl_Shutdown_ADDR (0x004D6880)
 #define sithControl_Open_ADDR (0x004D68B0)
 #define sithControl_Close_ADDR (0x004D68D0)
@@ -117,7 +117,7 @@ enum INPUT_FUNC
     INPUT_FUNC_MAX = 74,
 };
 
-int sithControl_Initialize();
+int sithControl_Startup();
 int sithControl_Shutdown();
 int sithControl_IsOpen();
 int sithControl_Open();

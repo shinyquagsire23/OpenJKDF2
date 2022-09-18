@@ -8,13 +8,13 @@
 
 #define jkCog_RegisterVerbs_ADDR (0x40A110)
 #define jkCog_Startup_ADDR (0x40A0C0)
-#define sithCogFunction_Initialize_ADDR (0x00505400)
-#define sithCogFunctionThing_Initialize_ADDR (0x005014E0)
-#define sithCogFunctionAI_Initialize_ADDR (0x00500B00)
-#define sithCogFunctionSound_Initialize_ADDR (0x004FF060)
-#define sithCogFunctionPlayer_Initialize_ADDR (0x004E0780)
-#define sithCogFunctionSector_Initialize_ADDR (0x004FE680)
-#define sithCogFunctionSurface_Initialize_ADDR (0x004FFB50)
+#define sithCogFunction_Startup_ADDR (0x00505400)
+#define sithCogFunctionThing_Startup_ADDR (0x005014E0)
+#define sithCogFunctionAI_Startup_ADDR (0x00500B00)
+#define sithCogFunctionSound_Startup_ADDR (0x004FF060)
+#define sithCogFunctionPlayer_Startup_ADDR (0x004E0780)
+#define sithCogFunctionSector_Startup_ADDR (0x004FE680)
+#define sithCogFunctionSurface_Startup_ADDR (0x004FFB50)
 
 #define sithCog_Startup_ADDR (0x004DE070)
 #define sithCog_Shutdown_ADDR (0x004DE590)
@@ -136,11 +136,11 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
 int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol);
 void sithCog_HandleThingTimerPulse(sithThing *thing);
 
-void sithCogFunction_Initialize(void* a1);
-void sithCogThing_Initialize(void* a1);
-void sithCogFunctionSound_Initialize(void* a1);
-void sithCogFunctionSector_Initialize(void* a1);
-void sithCogSurface_Initialize(void* a1);
+void sithCogFunction_Startup(void* a1);
+void sithCogThing_Startup(void* a1);
+void sithCogFunctionSound_Startup(void* a1);
+void sithCogFunctionSector_Startup(void* a1);
+void sithCogSurface_Startup(void* a1);
 
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3);

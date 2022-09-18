@@ -694,7 +694,7 @@ int jkGuiMouse_Show()
     return v0;
 }
 
-void jkGuiMouse_Initialize()
+void jkGuiMouse_Startup()
 {
     jkGui_InitMenu(&jkGuiMouse_menu, jkGui_stdBitmaps[3]);
 }

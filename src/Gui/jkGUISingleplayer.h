@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define jkGuiSingleplayer_Initialize_ADDR (0x0041A440)
+#define jkGuiSingleplayer_Startup_ADDR (0x0041A440)
 #define jkGuiSingleplayer_Shutdown_ADDR (0x0041A490)
 #define jkGuiSingleplayer_Show_ADDR (0x0041A4A0)
 #define jkGuiSingleplayer_EnumEpisodes_ADDR (0x0041A9B0)
@@ -11,7 +11,7 @@
 #define jkGuiSingleplayer_sub_41AC70_ADDR (0x0041AC70)
 #define jkGuiSingleplayer_sub_41AD00_ADDR (0x0041AD00)
 
-void jkGuiSingleplayer_Initialize();
+void jkGuiSingleplayer_Startup();
 void jkGuiSingleplayer_Shutdown();
 int jkGuiSingleplayer_Show();
 int jkGuiSingleplayer_EnumEpisodes(Darray *array, jkGuiElement *element, int a3, jkEpisodeTypeFlags_t typeMask);

@@ -9,7 +9,7 @@
 #include "Main/sithMain.h"
 #include "jk.h"
 
-int sithOverlayMap_Initialize(const sithMapViewConfig *config)
+int sithOverlayMap_Startup(const sithMapViewConfig *config)
 {
     if (sithOverlayMap_bInitted)
         return 0;

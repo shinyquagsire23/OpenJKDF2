@@ -40,7 +40,7 @@ static jkGuiElement jkGuiControlOptions_buttons[19] = {
 
 static jkGuiMenu jkGuiControlOptions_menu = {jkGuiControlOptions_buttons, 0, 0xFF, 0xE1, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiControlOptions_Initialize()
+void jkGuiControlOptions_Startup()
 {
     jkGui_InitMenu(&jkGuiControlOptions_menu, jkGui_stdBitmaps[3]);
 }

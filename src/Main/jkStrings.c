@@ -6,7 +6,7 @@
 static int jkStrings_bInitialized;
 static stdStrTable jkstrings_hashmap;
 
-int jkStrings_Initialize()
+int jkStrings_Startup()
 {
     int result; // eax
 

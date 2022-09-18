@@ -49,7 +49,7 @@ static jkGuiElement jkGuiSound_elements[25] = {
 
 static jkGuiMenu jkGuiSound_menu = {jkGuiSound_elements, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiSound_Initialize()
+void jkGuiSound_Startup()
 {
     jkGui_InitMenu(&jkGuiSound_menu, jkGui_stdBitmaps[3]);
 

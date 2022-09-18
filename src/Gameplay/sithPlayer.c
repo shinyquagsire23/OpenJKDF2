@@ -23,7 +23,7 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
-void sithPlayer_Initialize(int idx)
+void sithPlayer_Startup(int idx)
 {
     sithPlayerInfo *v1; // esi
     sithThing *v2; // eax

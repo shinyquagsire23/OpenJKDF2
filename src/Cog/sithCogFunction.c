@@ -1469,7 +1469,7 @@ void sithCogFunction_SetCameraFocii(sithCog *ctx)
     }
 }
 
-void sithCogFunction_Initialize(void* ctx)
+void sithCogFunction_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Sleep, "sleep");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Rand, "rand");

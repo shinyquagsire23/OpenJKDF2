@@ -20,7 +20,7 @@
 #define jkGuiJoystick_MenuTick_ADDR (0x0041BB60)
 #define jkGuiJoystick_Show_ADDR (0x0041BF00)
 #define jkGuiJoystick_DisableJoystickClick_ADDR (0x0041C170)
-#define jkGuiJoystick_Initialize_ADDR (0x0041C1C0)
+#define jkGuiJoystick_Startup_ADDR (0x0041C1C0)
 #define jkGuiJoystick_Shutdown_ADDR (0x0041C1E0)
 
 void jkGuiJoystick_nullsub_51();
@@ -40,10 +40,10 @@ int jkGuiJoystick_CalibrateClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int m
 void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu);
 int jkGuiJoystick_Show();
 int jkGuiJoystick_DisableJoystickClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-void jkGuiJoystick_Initialize();
+void jkGuiJoystick_Startup();
 void jkGuiJoystick_Shutdown();
 
-//static int (*jkGuiJoystick_Initialize)() = (void*)jkGuiJoystick_Initialize_ADDR;
+//static int (*jkGuiJoystick_Startup)() = (void*)jkGuiJoystick_Startup_ADDR;
 //static int (*jkGuiJoystick_Show)() = (void*)jkGuiJoystick_Show_ADDR;
 //static void (*jkGuiJoystick_Shutdown)() = (void*)jkGuiJoystick_Shutdown_ADDR;
 

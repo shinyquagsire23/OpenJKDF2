@@ -22,9 +22,9 @@
 
 static int jkControl_bInit;
 
-int jkControl_Initialize()
+int jkControl_Startup()
 {
-    sithControl_Initialize();
+    sithControl_Startup();
     sithControl_AddInputHandler(sithControl_HandlePlayer);
     sithControl_AddInputHandler(sithWeapon_HandleWeaponKeys);
     sithControl_AddInputHandler(sithInventory_HandleInvSkillKeys);

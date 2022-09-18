@@ -599,7 +599,7 @@ void jkHudInv_Close()
     jkHudInv_font = 0;
 }
 
-int jkHudInv_Initialize()
+int jkHudInv_Startup()
 {
     _memset(&jkHudInv_itemTexfmt, 0, sizeof(rdTexformat)); // sizeof(jkHudInv_itemTexfmt)
     return 1;

@@ -178,7 +178,7 @@ LABEL_17:
     jkGui_SetModeGame();
 }
 
-void jkGuiMain_Initialize()
+void jkGuiMain_Startup()
 {
     jkGui_InitMenu(&jkGuiMain_menu, jkGui_stdBitmaps[0]);
 }

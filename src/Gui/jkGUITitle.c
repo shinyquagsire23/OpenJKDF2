@@ -41,7 +41,7 @@ static jkGuiElement jkGuiTitle_elementsLoadStatic[6] = {
 
 static jkGuiMenu jkGuiTitle_menuLoadStatic = {jkGuiTitle_elementsLoadStatic, 0xFFFFFFFF, 0xFF, 0xE3, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-void jkGuiTitle_Initialize()
+void jkGuiTitle_Startup()
 {
     jkGui_InitMenu(&jkGuiTitle_menuLoadStatic, jkGui_stdBitmaps[0]);
     jkGui_InitMenu(&jkGuiTitle_menuLoad, jkGui_stdBitmaps[5]);

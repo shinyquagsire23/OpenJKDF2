@@ -17,7 +17,7 @@
 #define sithWeapon_HitDebug_ADDR (0x004D4E40)
 #define sithWeapon_Remove_ADDR (0x004D5160)
 #define sithWeapon_RemoveAndExplode_ADDR (0x004D51F0)
-#define sithWeapon_InitializeEntry_ADDR (0x004D5270)
+#define sithWeapon_StartupEntry_ADDR (0x004D5270)
 #define sithWeapon_ShutdownEntry_ADDR (0x004D52C0)
 #define sithWeapon_SelectWeapon_ADDR (0x004D52D0)
 #define sithWeapon_SetMountWait_ADDR (0x004D5460)
@@ -79,7 +79,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
 void sithWeapon_Remove(sithThing *weapon);
 void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate);
-void sithWeapon_InitializeEntry();
+void sithWeapon_StartupEntry();
 void sithWeapon_ShutdownEntry();
 int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3);
 void sithWeapon_SetMountWait(sithThing *a1, float mountWait);

@@ -465,7 +465,7 @@ int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerIn
     return result;
 }
 
-void jkGuiMultiTally_Initialize()
+void jkGuiMultiTally_Startup()
 {
     jkGui_InitMenu(&jkGuiMultiTally_menu, jkGui_stdBitmaps[10]);
     jkGui_InitMenu(&jkGuiMultiTally_menu2, jkGui_stdBitmaps[10]);

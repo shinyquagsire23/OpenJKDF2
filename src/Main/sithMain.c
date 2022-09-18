@@ -192,7 +192,7 @@ int sithMain_Open()
     sithControl_Open();
     sithAIAwareness_Startup();
     sithRender_Open();
-    sithWeapon_InitializeEntry();
+    sithWeapon_StartupEntry();
     sithMain_bOpened = 1;
     return 1;
 }

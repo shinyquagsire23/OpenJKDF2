@@ -2113,7 +2113,7 @@ void sithCogFunctionThing_GetMajorMode(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
-void sithCogFunctionThing_Initialize(void* ctx)
+void sithCogFunctionThing_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_WaitForStop, "waitforstop");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_StopThing, "stopthing");

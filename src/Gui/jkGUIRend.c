@@ -415,7 +415,7 @@ void jkGuiRend_sub_50FDB0()
     jkGuiRend_activeMenu = 0;
 }
 
-void jkGuiRend_Initialize()
+void jkGuiRend_Startup()
 {
     jkGuiRend_bInitted = 1;
 }

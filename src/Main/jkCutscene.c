@@ -41,7 +41,7 @@ static double last_displayFrame = 0;
 static double extraUs = 0;
 extern int openjkdf2_bIsKVM;
 
-void jkCutscene_Initialize(char *fpath)
+void jkCutscene_Startup(char *fpath)
 {
     stdStrTable_Load(&jkCutscene_strings, fpath);
     jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);

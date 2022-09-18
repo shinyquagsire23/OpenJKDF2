@@ -15,7 +15,7 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-void jkSmack_Initialize()
+void jkSmack_Startup()
 {
     jkSmack_bInit = 1;
     jkSmack_currentGuiState = 0;

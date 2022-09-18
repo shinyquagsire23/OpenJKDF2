@@ -78,7 +78,7 @@ static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, 0xFFFFFF
 
 wchar_t jkGuiMultiplayer_ipText[256];
 
-void jkGuiMultiplayer_Initialize()
+void jkGuiMultiplayer_Startup()
 {
     jkGui_InitMenu(&jkGuiMultiplayer_menu, jkGui_stdBitmaps[2]);
     jkGui_InitMenu(&jkGuiMultiplayer_menu2, jkGui_stdBitmaps[2]);

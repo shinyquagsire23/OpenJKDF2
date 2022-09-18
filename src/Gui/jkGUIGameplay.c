@@ -60,7 +60,7 @@ static jkGuiElement jkGuiGameplay_buttons[39] = {
 
 static jkGuiMenu jkGuiGameplay_menu = {jkGuiGameplay_buttons, 0, 0xFF, 0xE1, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiGameplay_Initialize()
+void jkGuiGameplay_Startup()
 {
     jkGui_InitMenu(&jkGuiGameplay_menu, jkGui_stdBitmaps[3]);
 }

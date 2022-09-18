@@ -163,7 +163,7 @@ LABEL_23:
     }
 }
 
-void jkGuiSetup_Initialize()
+void jkGuiSetup_Startup()
 {
     jkGui_InitMenu(&jkGuiSetup_menu, jkGui_stdBitmaps[3]);
     jkGui_InitMenu(&jkGuiSetupControls_menu, jkGui_stdBitmaps[3]);

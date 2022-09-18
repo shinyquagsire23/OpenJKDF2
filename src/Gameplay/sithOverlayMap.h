@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#define sithOverlayMap_Initialize_ADDR (0x004D9180)
+#define sithOverlayMap_Startup_ADDR (0x004D9180)
 #define sithOverlayMap_Shutdown_ADDR (0x004D91B0)
 #define sithOverlayMap_ToggleMapDrawn_ADDR (0x004D91D0)
 #define sithOverlayMap_FuncIncrease_ADDR (0x004D91F0)
@@ -14,7 +14,7 @@
 #define sithOverlayMap_Render3_ADDR (0x004D9560)
 #define sithOverlayMap_Render4_ADDR (0x004D9C40)
 
-int sithOverlayMap_Initialize(const sithMapViewConfig *config);
+int sithOverlayMap_Startup(const sithMapViewConfig *config);
 int sithOverlayMap_Shutdown();
 void sithOverlayMap_ToggleMapDrawn();
 void sithOverlayMap_FuncIncrease();

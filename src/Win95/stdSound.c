@@ -53,7 +53,7 @@ void stdSound_DS3DToAL(rdVector3* pOut, rdVector3* pIn)
     pOut->z = pIn->z * 0.1;
 }
 
-int stdSound_Initialize()
+int stdSound_Startup()
 {
     jkGuiSound_b3DSound_3 = 1;
 
@@ -458,7 +458,7 @@ void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer)
 #endif
 
 #ifdef NULL_SOUND
-int stdSound_Initialize()
+int stdSound_Startup()
 {
     jkGuiSound_b3DSound = 0;
 

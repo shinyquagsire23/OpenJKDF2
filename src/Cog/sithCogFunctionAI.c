@@ -25,7 +25,7 @@ void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx);
 void sithCogFunctionAI_AIFlee(sithCog *ctx);
 void sithCogFunctionAI_AISetClass(sithCog *ctx);
 
-void sithCogFunctionAI_Initialize(void* ctx)
+void sithCogFunctionAI_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");

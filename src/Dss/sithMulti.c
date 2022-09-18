@@ -180,7 +180,7 @@ int sithMulti_Startup()
         for ( i = 0; i < 0x20; ++i )
         {
             sithPlayer_sub_4C8910(i);
-            sithPlayer_Initialize(i);
+            sithPlayer_Startup(i);
         }
         sithNet_teamScore[0] = 0;
         sithNet_teamScore[1] = 0;
@@ -212,7 +212,7 @@ int sithMulti_Startup()
         do
         {
             sithPlayer_sub_4C8910(v8);
-            sithPlayer_Initialize(v8++);
+            sithPlayer_Startup(v8++);
         }
         while ( v8 < 0x20 );
         sithNet_teamScore[0] = 0;
@@ -704,7 +704,7 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
                 }
             }
             sithSoundClass_StopSound(jkPlayer_playerInfos[v5].playerThing, 0);
-            sithPlayer_Initialize(v4);
+            sithPlayer_Startup(v4);
             if ( sithNet_isServer )
                 sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v5].playerThing->thingIdx, 0, v4);
         }
@@ -760,7 +760,7 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
                         }
                     }
                     sithSoundClass_StopSound(v1->playerThing, 0);
-                    sithPlayer_Initialize(v0);
+                    sithPlayer_Startup(v0);
                     if ( sithNet_isServer )
                         sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, v1->playerThing->thingIdx, 0, v0);
                 }
@@ -795,7 +795,7 @@ int sithMulti_ServerLeft(int a, sithEventInfo* b)
             }
         }
         sithSoundClass_StopSound(jkPlayer_playerInfos[0].playerThing, 0);
-        sithPlayer_Initialize(0);
+        sithPlayer_Startup(0);
         if ( sithNet_isServer )
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[0].playerThing->thingIdx, 0, 0);
     }
@@ -902,7 +902,7 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
                         }
                     }
                     sithSoundClass_StopSound(v6->playerThing, 0);
-                    sithPlayer_Initialize(v3);
+                    sithPlayer_Startup(v3);
                     if ( sithNet_isServer )
                         sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, v6->playerThing->thingIdx, 0, v3);
                 }
@@ -1004,7 +1004,7 @@ LABEL_10:
             }
         }
         sithSoundClass_StopSound(jkPlayer_playerInfos[v3].playerThing, 0);
-        sithPlayer_Initialize(v3);
+        sithPlayer_Startup(v3);
         if ( sithNet_isServer )
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v3].playerThing->thingIdx, 0, v3);
     }

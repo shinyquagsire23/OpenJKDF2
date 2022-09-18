@@ -479,7 +479,7 @@ void do_hooks()
     hook_function(jkHudInv_InitItems_ADDR, jkHudInv_InitItems);
     hook_function(jkHudInv_LoadItemRes_ADDR, jkHudInv_LoadItemRes);
     hook_function(jkHudInv_Close_ADDR, jkHudInv_Close);
-    hook_function(jkHudInv_Initialize_ADDR, jkHudInv_Initialize);
+    hook_function(jkHudInv_Startup_ADDR, jkHudInv_Startup);
     hook_function(jkHudInv_Shutdown_ADDR, jkHudInv_Shutdown);
     
     // jkCog
@@ -487,10 +487,10 @@ void do_hooks()
     hook_function(jkCog_Startup_ADDR, jkCog_Startup);
     
     // jkCredits
-    hook_function(jkCredits_Initialize_ADDR, jkCredits_Initialize);
+    hook_function(jkCredits_Startup_ADDR, jkCredits_Startup);
     
     // jkCutscene
-    hook_function(jkCutscene_Initialize_ADDR, jkCutscene_Initialize);
+    hook_function(jkCutscene_Startup_ADDR, jkCutscene_Startup);
     hook_function(jkCutscene_Shutdown_ADDR, jkCutscene_Shutdown);
     //hook_function(jkCutscene_sub_421310_ADDR, jkCutscene_sub_421310);
     hook_function(jkCutscene_sub_421410_ADDR, jkCutscene_sub_421410);
@@ -516,13 +516,13 @@ void do_hooks()
     hook_function(sithCog_Free_ADDR, sithCog_Free);
     hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
     hook_function(sithCog_GetByIdx_ADDR, sithCog_GetByIdx);
-    hook_function(sithCogFunction_Initialize_ADDR, sithCogFunction_Initialize);
-    hook_function(sithCogFunctionThing_Initialize_ADDR, sithCogFunctionThing_Initialize);
-    hook_function(sithCogFunctionAI_Initialize_ADDR, sithCogFunctionAI_Initialize);
-    hook_function(sithCogFunctionSurface_Initialize_ADDR, sithCogFunctionSurface_Initialize);
-    hook_function(sithCogFunctionSound_Initialize_ADDR, sithCogFunctionSound_Initialize);
-    hook_function(sithCogFunctionSector_Initialize_ADDR, sithCogFunctionSector_Initialize);
-    hook_function(sithCogFunctionPlayer_Initialize_ADDR, sithCogFunctionPlayer_Initialize);
+    hook_function(sithCogFunction_Startup_ADDR, sithCogFunction_Startup);
+    hook_function(sithCogFunctionThing_Startup_ADDR, sithCogFunctionThing_Startup);
+    hook_function(sithCogFunctionAI_Startup_ADDR, sithCogFunctionAI_Startup);
+    hook_function(sithCogFunctionSurface_Startup_ADDR, sithCogFunctionSurface_Startup);
+    hook_function(sithCogFunctionSound_Startup_ADDR, sithCogFunctionSound_Startup);
+    hook_function(sithCogFunctionSector_Startup_ADDR, sithCogFunctionSector_Startup);
+    hook_function(sithCogFunctionPlayer_Startup_ADDR, sithCogFunctionPlayer_Startup);
     hook_function(sithCogScript_RegisterVerb_ADDR, sithCogScript_RegisterVerb);
     hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
     hook_function(sithCogScript_RegisterGlobalMessage_ADDR, sithCogScript_RegisterGlobalMessage);
@@ -1392,7 +1392,7 @@ void do_hooks()
     hook_function(sithWeapon_HitDebug_ADDR, sithWeapon_HitDebug);
     hook_function(sithWeapon_Remove_ADDR, sithWeapon_Remove);
     hook_function(sithWeapon_RemoveAndExplode_ADDR, sithWeapon_RemoveAndExplode);
-    hook_function(sithWeapon_InitializeEntry_ADDR, sithWeapon_InitializeEntry);
+    hook_function(sithWeapon_StartupEntry_ADDR, sithWeapon_StartupEntry);
     hook_function(sithWeapon_ShutdownEntry_ADDR, sithWeapon_ShutdownEntry);
 
     hook_function(sithWeapon_SetMountWait_ADDR, sithWeapon_SetMountWait);
@@ -1523,7 +1523,7 @@ void do_hooks()
     hook_function(sithInventory_SetBinWait_ADDR, sithInventory_SetBinWait);
 
     // sithPlayer
-    hook_function(sithPlayer_Initialize_ADDR, sithPlayer_Initialize);
+    hook_function(sithPlayer_Startup_ADDR, sithPlayer_Startup);
     hook_function(sithPlayer_GetBinAmt_ADDR, sithPlayer_GetBinAmt);
     hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
@@ -1641,13 +1641,13 @@ void do_hooks()
     hook_function(jkDSS_ProcessHudTarget_ADDR, jkDSS_ProcessHudTarget);
     
     // jkSmack
-    hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);
+    hook_function(jkSmack_Startup_ADDR, jkSmack_Startup);
     hook_function(jkSmack_Shutdown_ADDR, jkSmack_Shutdown);
     hook_function(jkSmack_GetCurrentGuiState_ADDR, jkSmack_GetCurrentGuiState);
     hook_function(jkSmack_SmackPlay_ADDR, jkSmack_SmackPlay);
     
     // jkGame
-    hook_function(jkGame_Initialize_ADDR, jkGame_Initialize);
+    hook_function(jkGame_Startup_ADDR, jkGame_Startup);
     hook_function(jkGame_ParseSection_ADDR, jkGame_ParseSection);
     hook_function(jkGame_Update_ADDR, jkGame_Update);
     hook_function(jkGame_ScreensizeIncrease_ADDR, jkGame_ScreensizeIncrease);
@@ -1673,14 +1673,14 @@ void do_hooks()
     hook_function(jkRes_FileSize_ADDR, jkRes_FileSize);
     
     // jkStrings
-    hook_function(jkStrings_Initialize_ADDR, jkStrings_Initialize);
+    hook_function(jkStrings_Startup_ADDR, jkStrings_Startup);
     hook_function(jkStrings_Shutdown_ADDR, jkStrings_Shutdown);
     hook_function(jkStrings_GetText2_ADDR, jkStrings_GetText2);
     hook_function(jkStrings_GetText_ADDR, jkStrings_GetText);
     hook_function(jkStrings_unused_sub_40B490_ADDR, jkStrings_unused_sub_40B490);
     
     // jkControl
-    hook_function(jkControl_Initialize_ADDR, jkControl_Initialize);
+    hook_function(jkControl_Startup_ADDR, jkControl_Startup);
     hook_function(jkControl_Shutdown_ADDR, jkControl_Shutdown);
     hook_function(jkControl_HandleHudKeys_ADDR, jkControl_HandleHudKeys);
     
@@ -1720,7 +1720,7 @@ void do_hooks()
     hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
     
     // sithMap
-    hook_function(sithMap_Initialize_ADDR, sithMap_Initialize);
+    hook_function(sithMap_Startup_ADDR, sithMap_Startup);
     hook_function(sithMap_Shutdown_ADDR, sithMap_Shutdown);
     
     // sithEvent
@@ -1752,7 +1752,7 @@ void do_hooks()
     hook_function(sithSprite_New_ADDR, sithSprite_New);
     
     // sithMapView
-    hook_function(sithOverlayMap_Initialize_ADDR, sithOverlayMap_Initialize);
+    hook_function(sithOverlayMap_Startup_ADDR, sithOverlayMap_Startup);
     hook_function(sithOverlayMap_Shutdown_ADDR, sithOverlayMap_Shutdown);
     hook_function(sithOverlayMap_ToggleMapDrawn_ADDR, sithOverlayMap_ToggleMapDrawn);
     hook_function(sithOverlayMap_FuncIncrease_ADDR, sithOverlayMap_FuncIncrease);
@@ -1961,7 +1961,7 @@ void do_hooks()
     hook_function(jkGuiRend_gui_sets_handler_framebufs_ADDR, jkGuiRend_gui_sets_handler_framebufs);
     hook_function(jkGuiRend_Menuidk_ADDR, jkGuiRend_Menuidk);
     hook_function(jkGuiRend_sub_50FDB0_ADDR, jkGuiRend_sub_50FDB0);
-    hook_function(jkGuiRend_Initialize_ADDR, jkGuiRend_Initialize);
+    hook_function(jkGuiRend_Startup_ADDR, jkGuiRend_Startup);
     hook_function(jkGuiRend_Shutdown_ADDR, jkGuiRend_Shutdown);
     hook_function(jkGuiRend_Open_ADDR, jkGuiRend_Open);
     hook_function(jkGuiRend_Close_ADDR, jkGuiRend_Close);
@@ -2020,7 +2020,7 @@ void do_hooks()
     // jkGUI
     hook_function(jkGui_InitMenu_ADDR, jkGui_InitMenu);
     hook_function(jkGui_MessageBeep_ADDR, jkGui_MessageBeep);
-    hook_function(jkGui_Initialize_ADDR, jkGui_Initialize);
+    hook_function(jkGui_Startup_ADDR, jkGui_Startup);
     hook_function(jkGui_Shutdown_ADDR, jkGui_Shutdown);
     hook_function(jkGui_SetModeMenu_ADDR, jkGui_SetModeMenu);
     hook_function(jkGui_SetModeGame_ADDR, jkGui_SetModeGame);
@@ -2038,20 +2038,20 @@ void do_hooks()
     hook_function(jkGuiForce_ButtonClick_ADDR, jkGuiForce_ButtonClick);
     hook_function(jkGuiForce_ResetClick_ADDR, jkGuiForce_ResetClick);
     hook_function(jkGuiForce_Show_ADDR, jkGuiForce_Show);
-    hook_function(jkGuiForce_Initialize_ADDR, jkGuiForce_Initialize);
+    hook_function(jkGuiForce_Startup_ADDR, jkGuiForce_Startup);
     hook_function(jkGuiForce_Shutdown_ADDR, jkGuiForce_Shutdown);
     hook_function(jkGuiForce_UpdateViewForRank_ADDR, jkGuiForce_UpdateViewForRank);
     hook_function(jkGuiForce_DarkLightHoverDraw_ADDR, jkGuiForce_DarkLightHoverDraw);
     
     // jkGUIGeneral
-    hook_function(jkGuiGeneral_Initialize_ADDR, jkGuiGeneral_Initialize);
+    hook_function(jkGuiGeneral_Startup_ADDR, jkGuiGeneral_Startup);
     hook_function(jkGuiGeneral_Shutdown_ADDR, jkGuiGeneral_Shutdown);
     hook_function(jkGuiGeneral_Show_ADDR, jkGuiGeneral_Show);
     
     // jkGUIMain
     hook_function(jkGuiMain_Show_ADDR, jkGuiMain_Show);
     hook_function(jkGuiMain_ShowCutscenes_ADDR, jkGuiMain_ShowCutscenes);
-    hook_function(jkGuiMain_Initialize_ADDR, jkGuiMain_Initialize);
+    hook_function(jkGuiMain_Startup_ADDR, jkGuiMain_Startup);
     hook_function(jkGuiMain_Shutdown_ADDR, jkGuiMain_Shutdown);
     hook_function(jkGuiMain_PopulateCutscenes_ADDR, jkGuiMain_PopulateCutscenes);
     hook_function(jkGuiMain_FreeCutscenes_ADDR, jkGuiMain_FreeCutscenes);
@@ -2062,7 +2062,7 @@ void do_hooks()
     hook_function(jkGuiEsc_Show_ADDR, jkGuiEsc_Show);
     
     // jkGUIDecision
-    hook_function(jkGuiDecision_Initialize_ADDR, jkGuiDecision_Initialize);
+    hook_function(jkGuiDecision_Startup_ADDR, jkGuiDecision_Startup);
     hook_function(jkGuiDecision_Shutdown_ADDR, jkGuiDecision_Shutdown);
     hook_function(jkGuiDecision_Show_ADDR, jkGuiDecision_Show);
     
@@ -2074,11 +2074,11 @@ void do_hooks()
     hook_function(jkGuiSaveLoad_SaveSort_ADDR, jkGuiSaveLoad_SaveSort);
     hook_function(jkGuiSaveLoad_Show_ADDR, jkGuiSaveLoad_Show);
     hook_function(jkGuiSaveLoad_PopulateInfoInit_ADDR, jkGuiSaveLoad_PopulateInfoInit);
-    hook_function(jkGuiSaveLoad_Initialize_ADDR, jkGuiSaveLoad_Initialize);
+    hook_function(jkGuiSaveLoad_Startup_ADDR, jkGuiSaveLoad_Startup);
     hook_function(jkGuiSaveLoad_Shutdown_ADDR, jkGuiSaveLoad_Shutdown);
     
     // jkGUISingleplayer
-    hook_function(jkGuiSingleplayer_Initialize_ADDR, jkGuiSingleplayer_Initialize);
+    hook_function(jkGuiSingleplayer_Startup_ADDR, jkGuiSingleplayer_Startup);
     hook_function(jkGuiSingleplayer_Shutdown_ADDR, jkGuiSingleplayer_Shutdown);
     hook_function(jkGuiSingleplayer_Show_ADDR, jkGuiSingleplayer_Show);
     hook_function(jkGuiSingleplayer_EnumEpisodes_ADDR, jkGuiSingleplayer_EnumEpisodes);
@@ -2088,26 +2088,26 @@ void do_hooks()
     
     // jkGUISingleTally
     hook_function(jkGuiSingleTally_Show_ADDR, jkGuiSingleTally_Show);
-    hook_function(jkGuiSingleTally_Initialize_ADDR, jkGuiSingleTally_Initialize);
+    hook_function(jkGuiSingleTally_Startup_ADDR, jkGuiSingleTally_Startup);
     
     // jkGUIControlOptions
-    hook_function(jkGuiControlOptions_Initialize_ADDR, jkGuiControlOptions_Initialize);
+    hook_function(jkGuiControlOptions_Startup_ADDR, jkGuiControlOptions_Startup);
     hook_function(jkGuiControlOptions_Shutdown_ADDR, jkGuiControlOptions_Shutdown);
     hook_function(jkGuiControlOptions_Show_ADDR, jkGuiControlOptions_Show);
     
     // jkGUISetup
     hook_function(jkGuiSetup_sub_412EF0_ADDR, jkGuiSetup_sub_412EF0);
-    hook_function(jkGuiSetup_Initialize_ADDR, jkGuiSetup_Initialize);
+    hook_function(jkGuiSetup_Startup_ADDR, jkGuiSetup_Startup);
     hook_function(jkGuiSetup_Shutdown_ADDR, jkGuiSetup_Shutdown);
     hook_function(jkGuiSetup_Show_ADDR, jkGuiSetup_Show);
     
     // jkGUIGameplay
-    hook_function(jkGuiGameplay_Initialize_ADDR, jkGuiGameplay_Initialize);
+    hook_function(jkGuiGameplay_Startup_ADDR, jkGuiGameplay_Startup);
     hook_function(jkGuiGameplay_Shutdown_ADDR, jkGuiGameplay_Shutdown);
     hook_function(jkGuiGameplay_Show_ADDR, jkGuiGameplay_Show);
     
     // jkGUITitle
-    hook_function(jkGuiTitle_Initialize_ADDR, jkGuiTitle_Initialize);
+    hook_function(jkGuiTitle_Startup_ADDR, jkGuiTitle_Startup);
     hook_function(jkGuiTitle_Shutdown_ADDR, jkGuiTitle_Shutdown);
     hook_function(jkGuiTitle_sub_4189A0_ADDR, jkGuiTitle_sub_4189A0);
     hook_function(jkGuiTitle_quicksave_related_func1_ADDR, jkGuiTitle_quicksave_related_func1);
@@ -2118,30 +2118,30 @@ void do_hooks()
     hook_function(jkGuiTitle_LoadingFinalize_ADDR, jkGuiTitle_LoadingFinalize);
     
     // jkGUISound
-    hook_function(jkGuiSound_Initialize_ADDR, jkGuiSound_Initialize);
+    hook_function(jkGuiSound_Startup_ADDR, jkGuiSound_Startup);
     hook_function(jkGuiSound_Shutdown_ADDR, jkGuiSound_Shutdown);
     hook_function(jkGuiSound_Show_ADDR, jkGuiSound_Show);
     
     // jkGUIObjectives
     hook_function(jkGuiObjectives_CustomRender_ADDR, jkGuiObjectives_CustomRender);
     hook_function(jkGuiObjectives_Show_ADDR, jkGuiObjectives_Show);
-    hook_function(jkGuiObjectives_Initialize_ADDR, jkGuiObjectives_Initialize);
+    hook_function(jkGuiObjectives_Startup_ADDR, jkGuiObjectives_Startup);
     hook_function(jkGuiObjectives_Shutdown_ADDR, jkGuiObjectives_Shutdown);
     
     // jkGUIDialog
-    hook_function(jkGuiDialog_Initialize_ADDR, jkGuiDialog_Initialize);
+    hook_function(jkGuiDialog_Startup_ADDR, jkGuiDialog_Startup);
     hook_function(jkGuiDialog_Shutdown_ADDR, jkGuiDialog_Shutdown);
     hook_function(jkGuiDialog_OkCancelDialog_ADDR, jkGuiDialog_OkCancelDialog);
     hook_function(jkGuiDialog_ErrorDialog_ADDR, jkGuiDialog_ErrorDialog);
     hook_function(jkGuiDialog_YesNoDialog_ADDR, jkGuiDialog_YesNoDialog);
     
     // jkGUIMultiplayer
-    hook_function(jkGuiMultiplayer_Initialize_ADDR, jkGuiMultiplayer_Initialize);
+    hook_function(jkGuiMultiplayer_Startup_ADDR, jkGuiMultiplayer_Startup);
     hook_function(jkGuiMultiplayer_Shutdown_ADDR, jkGuiMultiplayer_Shutdown);
     hook_function(jkGuiMultiplayer_Show_ADDR, jkGuiMultiplayer_Show);
 
     // jkGUIBuildMulti
-    hook_function(jkGuiBuildMulti_InitializeEditCharacter_ADDR, jkGuiBuildMulti_InitializeEditCharacter);
+    hook_function(jkGuiBuildMulti_StartupEditCharacter_ADDR, jkGuiBuildMulti_StartupEditCharacter);
     hook_function(jkGuiBuildMulti_ShutdownEditCharacter_ADDR, jkGuiBuildMulti_ShutdownEditCharacter);
     hook_function(jkGuiBuildMulti_ModelLoader_ADDR, jkGuiBuildMulti_ModelLoader);
     hook_function(jkGuiBuildMulti_MatLoader_ADDR, jkGuiBuildMulti_MatLoader);
@@ -2155,7 +2155,7 @@ void do_hooks()
     hook_function(jkGuiBuildMulti_SaberDrawer_ADDR, jkGuiBuildMulti_SaberDrawer);
     hook_function(jkGuiBuildMulti_sub_41A120_ADDR, jkGuiBuildMulti_sub_41A120);
     hook_function(jkGuiBuildMulti_SaberButtonClicked_ADDR, jkGuiBuildMulti_SaberButtonClicked);
-    hook_function(jkGuiBuildMulti_Initialize_ADDR, jkGuiBuildMulti_Initialize);
+    hook_function(jkGuiBuildMulti_Startup_ADDR, jkGuiBuildMulti_Startup);
     hook_function(jkGuiBuildMulti_Shutdown_ADDR, jkGuiBuildMulti_Shutdown);
     hook_function(jkGuiBuildMulti_Load_ADDR, jkGuiBuildMulti_Load);
     hook_function(jkGuiBuildMulti_Show_ADDR, jkGuiBuildMulti_Show);
@@ -2169,7 +2169,7 @@ void do_hooks()
     // jkGUIMultiTally
     hook_function(jkGuiMultiTally_Show_ADDR, jkGuiMultiTally_Show);
     hook_function(jkGuiMultiTally_SortPlayerScore_ADDR, jkGuiMultiTally_SortPlayerScore);
-    hook_function(jkGuiMultiTally_Initialize_ADDR, jkGuiMultiTally_Initialize);
+    hook_function(jkGuiMultiTally_Startup_ADDR, jkGuiMultiTally_Startup);
     hook_function(jkGuiMultiTally_Shutdown_ADDR, jkGuiMultiTally_Shutdown);
     hook_function(jkGuiMultiTally_ShowTeamScores_ADDR, jkGuiMultiTally_ShowTeamScores);
     hook_function(jkGuiMultiTally_SortTeamScore_ADDR, jkGuiMultiTally_SortTeamScore);
@@ -2183,7 +2183,7 @@ void do_hooks()
     hook_function(Darray_ClearAll_ADDR, Darray_ClearAll);
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     
-    // DebugConsole
+    // sithConsole
     hook_function(sithConsole_Startup_ADDR, sithConsole_Startup);
     hook_function(sithConsole_Shutdown_ADDR, sithConsole_Shutdown);
     hook_function(sithConsole_Open_ADDR, sithConsole_Open);
@@ -2199,7 +2199,7 @@ void do_hooks()
     hook_function(sithConsole_AlertSound_ADDR, sithConsole_AlertSound);
 
     // sithCommand
-    hook_function(sithCommand_Initialize_ADDR, sithCommand_Initialize);
+    hook_function(sithCommand_Startup_ADDR, sithCommand_Startup);
 
     //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
@@ -2254,7 +2254,7 @@ void do_hooks()
     
     hook_function(stdFileUtil_Deltree_ADDR, stdFileUtil_Deltree);
     
-    hook_function(stdSound_Initialize_ADDR, stdSound_Initialize);
+    hook_function(stdSound_Startup_ADDR, stdSound_Startup);
     hook_function(stdSound_Shutdown_ADDR, stdSound_Shutdown);
     hook_function(stdSound_SetMenuVolume_ADDR, stdSound_SetMenuVolume);
     hook_function(stdSound_BufferCreate_ADDR, stdSound_BufferCreate);

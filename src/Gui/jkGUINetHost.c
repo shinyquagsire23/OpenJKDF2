@@ -253,7 +253,7 @@ void jkGuiNetHost_LoadSettings()
 #endif
 }
 
-void jkGuiNetHost_Initialize()
+void jkGuiNetHost_Startup()
 {
     jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[2]);
     jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[3]);

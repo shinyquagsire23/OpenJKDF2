@@ -78,7 +78,7 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
 static jkGuiMenu jkGuiGeneral_menuAdvanced = { jkGuiGeneral_aElementsAdvanced, 0, 0xFF, 0xE1, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
 #endif
 
-void jkGuiGeneral_Initialize()
+void jkGuiGeneral_Startup()
 {
     jkGui_InitMenu(&jkGuiGeneral_menu, jkGui_stdBitmaps[3]);
 #if defined(QOL_IMPROVEMENTS)

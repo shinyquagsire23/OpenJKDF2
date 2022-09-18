@@ -8,7 +8,7 @@
 #define sithPlayer_Open_ADDR (0x004C8610)
 #define sithPlayer_Close_ADDR (0x004C8620)
 #define sithPlayer_NewEntry_ADDR (0x004C8670)
-#define sithPlayer_Initialize_ADDR (0x004C8750)
+#define sithPlayer_Startup_ADDR (0x004C8750)
 #define sithPlayer_sub_4C87C0_ADDR (0x004C87C0)
 #define sithPlayer_idk_ADDR (0x004C8810)
 #define sithPlayer_ResetPalEffects_ADDR (0x004C88D0)
@@ -33,7 +33,7 @@
 #define sithPlayer_SetBinCarries_ADDR (0x004C94C0)
 #define sithPlayer_idk2_ADDR (0x004C9500)
 
-void sithPlayer_Initialize(int idx);
+void sithPlayer_Startup(int idx);
 void sithPlayer_Close();
 void sithPlayer_NewEntry(sithWorld *world);
 float sithPlayer_GetBinAmt(int idx);
@@ -58,7 +58,7 @@ uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx);
 int sithPlayer_FindPlayerByName(wchar_t *pwStr);
 
 //static void (*sithPlayer_debug_ToNextCheckpoint)(sithThing *player) = (void*)sithPlayer_debug_ToNextCheckpoint_ADDR;
-//static void (*sithPlayer_Initialize)(int) = (void*)sithPlayer_Initialize_ADDR;
+//static void (*sithPlayer_Startup)(int) = (void*)sithPlayer_Startup_ADDR;
 //static void (*sithPlayer_Tick)(sithPlayerInfo *playerInfo, float a2) = (void*)sithPlayer_Tick_ADDR;
 //static void (*sithPlayer_SetBinCarries)(int a1, int a2) = (void*)sithPlayer_SetBinCarries_ADDR;
 //static double (*sithPlayer_GetBinAmt)(int idx) = (void*)sithPlayer_GetBinAmt_ADDR;

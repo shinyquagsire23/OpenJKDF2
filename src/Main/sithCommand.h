@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#define sithCommand_Initialize_ADDR (0x004EDC10)
+#define sithCommand_Startup_ADDR (0x004EDC10)
 #define sithCommand_CmdTick_ADDR (0x004EDE70)
 #define sithCommand_CmdSession_ADDR (0x004EDF10)
 #define sithCommand_CheatSetDebugFlags_ADDR (0x004EDFC0)
@@ -25,7 +25,7 @@
 #define sithCommand_CmdKick_ADDR (0x004EEDB0)
 #define sithCommand_matlist_sort_ADDR (0x004EEE70)
 
-void sithCommand_Initialize();
+void sithCommand_Startup();
 int sithCommand_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr);

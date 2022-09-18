@@ -44,7 +44,7 @@ void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx);
 void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx);
 void sithCogFunctionSurface_SyncSurface(sithCog *ctx);
 
-void sithCogFunctionSurface_Initialize(void* ctx)
+void sithCogFunctionSurface_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceAdjoin, "getsurfaceadjoin");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceSector, "getsurfacesector");

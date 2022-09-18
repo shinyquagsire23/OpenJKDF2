@@ -9,7 +9,7 @@
 
 int sithSound_Startup()
 {
-    if ( stdSound_Initialize() )
+    if ( stdSound_Startup() )
     {
         sithSound_hashtable = stdHashTable_New(256);
         if ( sithSound_hashtable )

@@ -22,7 +22,7 @@ static jkGuiElement jkGuiDecision_buttons[4] = {
 };
 static jkGuiMenu jkGuiDecision_menu = {jkGuiDecision_buttons, -1, 0x0E1, 0x0FF, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiDecision_Initialize()
+void jkGuiDecision_Startup()
 {
     jkGui_InitMenu(&jkGuiDecision_menu, jkGui_stdBitmaps[8]);
 }

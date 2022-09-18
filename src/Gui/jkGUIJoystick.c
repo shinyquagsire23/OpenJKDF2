@@ -1126,7 +1126,7 @@ int jkGuiJoystick_DisableJoystickClick(jkGuiElement *pElement, jkGuiMenu *pMenu,
     return 0;
 }
 
-void jkGuiJoystick_Initialize()
+void jkGuiJoystick_Startup()
 {
     jkGui_InitMenu(&jkGuiJoystick_menu, jkGui_stdBitmaps[3]);
 }

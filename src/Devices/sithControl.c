@@ -107,7 +107,7 @@ static const char *sithControl_aFunctionStrs[74] =
     "ACTIVATE31"
 };
 
-int sithControl_Initialize()
+int sithControl_Startup()
 {
     if ( sithControl_bInitted )
         return 0;

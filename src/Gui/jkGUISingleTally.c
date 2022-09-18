@@ -73,7 +73,7 @@ int jkGuiSingleTally_Show()
     return ret;
 }
 
-void jkGuiSingleTally_Initialize()
+void jkGuiSingleTally_Startup()
 {
     jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\foStars.bm", 1, 0);
     jkGui_InitMenu(&jkGuiSingleTally_menu, jkGui_stdBitmaps[10]);

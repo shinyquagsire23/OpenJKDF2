@@ -290,7 +290,7 @@ LABEL_43:
     return -1;
 }
 
-void jkGuiControlSaveLoad_Initialize()
+void jkGuiControlSaveLoad_Startup()
 {
     jkGui_InitMenu(&jkGuiControlSaveLoad_menu, jkGui_stdBitmaps[3]);
 }

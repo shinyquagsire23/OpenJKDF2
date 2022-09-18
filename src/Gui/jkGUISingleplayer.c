@@ -66,7 +66,7 @@ static jkGuiElement jkGuiSingleplayer_buttons3[10] = {
 
 static jkGuiMenu jkGuiSingleplayer_menu3 = {jkGuiSingleplayer_buttons3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiSingleplayer_Initialize()
+void jkGuiSingleplayer_Startup()
 {
     jkGui_InitMenu(&jkGuiSingleplayer_menu1, jkGui_stdBitmaps[1]);
     jkGui_InitMenu(&jkGuiSingleplayer_menu2, jkGui_stdBitmaps[1]);

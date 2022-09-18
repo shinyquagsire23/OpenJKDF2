@@ -157,7 +157,7 @@ int jkHud_Open()
     jkHud_mapRendConfig.numArr = 5;
     jkHud_mapRendConfig.unkArr = jkHud_aFltIdk;
     jkHud_mapRendConfig.bRotateOverlayMap = jkPlayer_setRotateOverlayMap;
-    sithOverlayMap_Initialize(&jkHud_mapRendConfig);
+    sithOverlayMap_Startup(&jkHud_mapRendConfig);
     jkHud_targetRed16 = stdColor_Indexed8ToRGB16(jkHud_targetRed, Video_aPalette, &Video_format.format);
     jkHud_targetGreen16 = stdColor_Indexed8ToRGB16(jkHud_targetBlue, Video_aPalette, &Video_format.format);
     jkHud_targetBlue16 = stdColor_Indexed8ToRGB16(jkHud_targetGreen, Video_aPalette, &Video_format.format);

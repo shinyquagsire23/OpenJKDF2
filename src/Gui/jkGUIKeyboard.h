@@ -16,7 +16,7 @@
 #define jkGuiKeyboard_sub_412740_ADDR (0x00412740)
 #define jkGuiKeyboard_sub_4127C0_ADDR (0x004127C0)
 #define jkGuiKeyboard_Show_ADDR (0x00412830)
-#define jkGuiKeyboard_Initialize_ADDR (0x00412970)
+#define jkGuiKeyboard_Startup_ADDR (0x00412970)
 #define jkGuiKeyboard_Shutdown_ADDR (0x00412990)
 
 const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis);
@@ -31,10 +31,10 @@ int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mo
 int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 int jkGuiKeyboard_Show();
-void jkGuiKeyboard_Initialize();
+void jkGuiKeyboard_Startup();
 void jkGuiKeyboard_Shutdown();
 
-//static int (*jkGuiKeyboard_Initialize)() = (void*)jkGuiKeyboard_Initialize_ADDR;
+//static int (*jkGuiKeyboard_Startup)() = (void*)jkGuiKeyboard_Startup_ADDR;
 //static int (*jkGuiKeyboard_Show)() = (void*)jkGuiKeyboard_Show_ADDR;
 //static void (*jkGuiKeyboard_Shutdown)() = (void*)jkGuiKeyboard_Shutdown_ADDR;
 

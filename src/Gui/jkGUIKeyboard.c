@@ -541,7 +541,7 @@ int jkGuiKeyboard_Show()
     return v0;
 }
 
-void jkGuiKeyboard_Initialize()
+void jkGuiKeyboard_Startup()
 {
     jkGui_InitMenu(&jkGuiKeyboard_menu, jkGui_stdBitmaps[3]);
 }

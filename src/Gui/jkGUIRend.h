@@ -19,7 +19,7 @@
 #define jkGuiRend_gui_sets_handler_framebufs_ADDR (0x0050FC00)
 #define jkGuiRend_Menuidk_ADDR (0x0050FD50)
 #define jkGuiRend_sub_50FDB0_ADDR (0x0050FDB0)
-#define jkGuiRend_Initialize_ADDR (0x0050FDF0)
+#define jkGuiRend_Startup_ADDR (0x0050FDF0)
 #define jkGuiRend_Shutdown_ADDR (0x0050FE00)
 #define jkGuiRend_Open_ADDR (0x0050FE10)
 #define jkGuiRend_Close_ADDR (0x0050FE40)
@@ -142,7 +142,7 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu);
 void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu);
 int jkGuiRend_Menuidk();
 void jkGuiRend_sub_50FDB0();
-void jkGuiRend_Initialize();
+void jkGuiRend_Startup();
 void jkGuiRend_Shutdown();
 void jkGuiRend_Open(stdVBuffer *menuBuffer, stdVBuffer *otherBuf, int fillColor);
 void jkGuiRend_Close();

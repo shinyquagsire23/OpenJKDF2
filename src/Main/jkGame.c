@@ -22,7 +22,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int jkGame_Initialize()
+int jkGame_Startup()
 {
     sithWorld_SetSectionParser("jk", jkGame_ParseSection);
     jkGame_bInitted = 1;

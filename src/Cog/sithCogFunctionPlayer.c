@@ -525,7 +525,7 @@ void sithCogFunctionPlayer_SyncScores(sithCog *ctx)
         sithMulti_SyncScores();
 }
 
-void sithCogFunctionPlayer_Initialize(void* ctx)
+void sithCogFunctionPlayer_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");

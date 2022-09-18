@@ -365,7 +365,7 @@ void sithCogFunctionSound_GetSoundLen(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSound_Initialize(void* ctx)
+void sithCogFunctionSound_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySong, "playsong");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");

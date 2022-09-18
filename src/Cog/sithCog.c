@@ -53,13 +53,13 @@ int sithCog_Startup()
         return 0;
     }
     sithCog_pSymbolTable->bucket_idx = 0x100;
-    sithCogFunction_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionThing_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionAI_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionSurface_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionSound_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionSector_Initialize(sithCog_pSymbolTable);
-    sithCogFunctionPlayer_Initialize(sithCog_pSymbolTable);
+    sithCogFunction_Startup(sithCog_pSymbolTable);
+    sithCogFunctionThing_Startup(sithCog_pSymbolTable);
+    sithCogFunctionAI_Startup(sithCog_pSymbolTable);
+    sithCogFunctionSurface_Startup(sithCog_pSymbolTable);
+    sithCogFunctionSound_Startup(sithCog_pSymbolTable);
+    sithCogFunctionSector_Startup(sithCog_pSymbolTable);
+    sithCogFunctionPlayer_Startup(sithCog_pSymbolTable);
 	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activate");
 	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activated");
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 3, "startup");

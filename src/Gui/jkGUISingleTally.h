@@ -5,7 +5,7 @@
 #include "globals.h"
 
 #define jkGuiSingleTally_Show_ADDR (0x00417E30)
-#define jkGuiSingleTally_Initialize_ADDR (0x00417FC0)
+#define jkGuiSingleTally_Startup_ADDR (0x00417FC0)
 #define jkGuiSingleTally_Shutdown_ADDR (0x00417FF0)
 #define jkGuiSingleTally_ForceStarsRender_ADDR (0x00418000)
 
@@ -14,7 +14,7 @@ typedef struct jkGuiMenu jkGuiMenu;
 typedef struct stdVBuffer stdVBuffer;
 
 int jkGuiSingleTally_Show();
-void jkGuiSingleTally_Initialize();
+void jkGuiSingleTally_Startup();
 void jkGuiSingleTally_Shutdown();
 void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int d);
 

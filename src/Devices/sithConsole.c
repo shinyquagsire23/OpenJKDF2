@@ -25,7 +25,7 @@ int sithConsole_Startup(int maxCmds)
             _memset(sithConsole_aCmds, 0, sizeof(stdDebugConsoleCmd) * maxCmds);
             DebugGui_fnPrint = 0;
             DebugGui_fnPrintUniStr = 0;
-            sithCommand_Initialize();
+            sithCommand_Startup();
             v2 = sithSound_InitFromPath("set_vlo2.wav");
             sithConsole_alertSound = v2;
             if ( v2 )

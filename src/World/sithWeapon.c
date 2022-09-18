@@ -893,7 +893,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
     sithThing_Destroy(weapon);
 }
 
-void sithWeapon_InitializeEntry()
+void sithWeapon_StartupEntry()
 {
     sithWeapon_8BD0A0[0] = -1.0;
     sithWeapon_a8BD030[0] = 0;

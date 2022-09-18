@@ -376,7 +376,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     return clicked;
 }
 
-void jkGuiForce_Initialize()
+void jkGuiForce_Startup()
 {
     char tmp[128];
 

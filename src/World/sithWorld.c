@@ -573,7 +573,7 @@ int sithWorld_Initialize()
 {
     for (int i = 1; i < jkPlayer_maxPlayers; i++)
     {
-        sithPlayer_Initialize(i);
+        sithPlayer_Startup(i);
     }
     sithPlayer_idk(0);
     sithPlayer_ResetPalEffects();

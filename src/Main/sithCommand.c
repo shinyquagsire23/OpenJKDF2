@@ -31,7 +31,7 @@ int sithCommand_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 }
 #endif
 
-void sithCommand_Initialize()
+void sithCommand_Startup()
 {
     sithConsole_RegisterDevCmd(sithCommand_CmdPlayers, "players", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdCoords, "coords", 0);

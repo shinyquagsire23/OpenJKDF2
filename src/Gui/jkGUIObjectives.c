@@ -136,7 +136,7 @@ int jkGuiObjectives_Show()
     return jkGuiRend_DisplayAndReturnClicked(&jkGuiObjectives_menu);
 }
 
-void jkGuiObjectives_Initialize()
+void jkGuiObjectives_Startup()
 {
     jkGui_InitMenu(&jkGuiObjectives_menu, jkGui_stdBitmaps[6]);
 }

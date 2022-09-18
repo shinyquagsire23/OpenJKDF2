@@ -113,7 +113,7 @@ int jkGui_MessageBeep()
     return jk_MessageBeep(0x30u);
 }
 
-int jkGui_Initialize()
+int jkGui_Startup()
 {
     char playerShortName[32];
     char tmp[128];

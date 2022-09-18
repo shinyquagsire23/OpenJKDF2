@@ -3,6 +3,6 @@
 
 #include "sithCog.h"
 
-void sithCogFunctionSurface_Initialize(void* ctx);
+void sithCogFunctionSurface_Startup(void* ctx);
 
 #endif // _SITHCOGFUNCTIONSURFACE_H

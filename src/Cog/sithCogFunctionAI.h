@@ -5,6 +5,6 @@
 #include "types.h"
 #include "globals.h"
 
-void sithCogFunctionAI_Initialize(void* ctx);
+void sithCogFunctionAI_Startup(void* ctx);
 
 #endif // _SITHCOGAI_H

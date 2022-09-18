@@ -27,7 +27,7 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx);
 void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx);
 void sithCogFunctionSector_SyncSector(sithCog *ctx);
 
-void sithCogFunctionSector_Initialize(void* ctx)
+void sithCogFunctionSector_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetTint, "getsectortint");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetTint, "setsectortint");

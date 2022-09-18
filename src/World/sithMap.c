@@ -14,7 +14,7 @@
 #include <math.h>
 #include <float.h>
 
-int sithMap_Initialize(sithMap *map)
+int sithMap_Startup(sithMap *map)
 {
     if ( sithMap_bInitted )
         return 0;

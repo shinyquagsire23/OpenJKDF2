@@ -17,11 +17,11 @@
 #define jkGame_Screenshot_ADDR (0x004025E0)
 #define jkGame_ddraw_idk_palettes_ADDR (0x004027C0)
 #define jkGame_nullsub_36_ADDR (0x00402810)
-#define jkGame_Initialize_ADDR (0x00402820)
+#define jkGame_Startup_ADDR (0x00402820)
 #define jkGame_Shutdown_ADDR (0x00402840)
 #define jkGame_ParseSection_ADDR (0x00402850)
 
-int jkGame_Initialize();
+int jkGame_Startup();
 int jkGame_ParseSection(sithWorld* a1, int a2);
 void jkGame_ForceRefresh();
 void jkGame_Shutdown();
@@ -34,7 +34,7 @@ void jkGame_PrecalcViewSizes(int width, int height, jkViewSize *aOut);
 void jkGame_ddraw_idk_palettes();
 void jkGame_nullsub_36();
 
-//static int (*jkGame_Initialize)(void) = (void*)jkGame_Initialize_ADDR;
+//static int (*jkGame_Startup)(void) = (void*)jkGame_Startup_ADDR;
 //static int (*jkGame_ScreensizeIncrease)() = (void*)jkGame_ScreensizeIncrease_ADDR;
 //static int (*jkGame_ScreensizeDecrease)() = (void*)jkGame_ScreensizeDecrease_ADDR;
 //static void (*jkGame_SetDefaultSettings)() = (void*)jkGame_SetDefaultSettings_ADDR;
