@@ -24,7 +24,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkGame.h"
 #include "jk.h"

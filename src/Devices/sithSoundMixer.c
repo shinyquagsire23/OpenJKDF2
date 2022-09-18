@@ -1,8 +1,8 @@
 #include "sithSoundMixer.h"
 
 #include "AI/sithAIAwareness.h"
-#include "Engine/sithControl.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithControl.h"
+#include "Devices/sithSound.h"
 #include "Engine/sithTime.h"
 #include "Engine/sithNet.h"
 #include "Engine/sithCamera.h"

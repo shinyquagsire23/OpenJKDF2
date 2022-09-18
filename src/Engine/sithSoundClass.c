@@ -3,8 +3,8 @@
 #include "stdPlatform.h"
 #include "General/stdHashTable.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithSound.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSound.h"
+#include "Devices/sithSoundMixer.h"
 #include "Win95/stdSound.h"
 #include "World/sithWorld.h"
 

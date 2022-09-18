@@ -8,7 +8,7 @@
 #include "Main/jkGame.h"
 #include "Engine/sith.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithTime.h"

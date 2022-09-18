@@ -11,7 +11,7 @@
 #include "World/jkPlayer.h"
 #include "Win95/DebugConsole.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Engine/sithTime.h"
 #include "Win95/sithDplay.h"
 #include "Main/jkGame.h"

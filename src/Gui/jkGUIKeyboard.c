@@ -1,6 +1,6 @@
 #include "jkGUIKeyboard.h"
 
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Platform/stdControl.h"
 #include "General/Darray.h"
 #include "Gui/jkGUI.h"

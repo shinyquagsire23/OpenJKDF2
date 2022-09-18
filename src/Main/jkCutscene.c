@@ -13,7 +13,7 @@
 #include "Main/smack.h"
 #include "Gui/jkGUI.h"
 #include "Win95/stdSound.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSoundMixer.h"
 #include "stdPlatform.h"
 
 #include "smacker.h"

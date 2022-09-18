@@ -2,7 +2,7 @@
 
 #include "Engine/sithDebugConsole.h"
 #include "Win95/stdSound.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 #include "stdPlatform.h"

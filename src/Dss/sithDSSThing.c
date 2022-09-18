@@ -2,9 +2,9 @@
 
 #include "Cog/sithCog.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithMulti.h"
 #include "World/sithThing.h"

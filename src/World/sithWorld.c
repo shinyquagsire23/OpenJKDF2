@@ -5,7 +5,7 @@
 #include "Engine/sithSprite.h"
 #include "Engine/sithTemplate.h"
 #include "Engine/sithMaterial.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Engine/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
 #include "Cog/sithCogScript.h"

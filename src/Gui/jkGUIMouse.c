@@ -16,7 +16,7 @@
 #include "World/sithWeapon.h"
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 
 #include <math.h>
 #include <float.h>

@@ -5,7 +5,7 @@
 #include "Cog/sithCog.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSoundMixer.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"

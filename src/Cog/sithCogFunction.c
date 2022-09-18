@@ -18,7 +18,7 @@
 #include "Engine/sithModel.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Engine/sithNet.h"
 #include "Dss/sithGamesave.h"
 #include "Gameplay/sithEvent.h"

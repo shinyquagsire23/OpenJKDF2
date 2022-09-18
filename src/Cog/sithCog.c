@@ -14,7 +14,7 @@
 #include "Cog/sithCogParse.h"
 #include "Cog/jkCog.h"
 #include "Gameplay/sithEvent.h"
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithModel.h"

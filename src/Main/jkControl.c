@@ -1,6 +1,6 @@
 #include "jkControl.h"
 
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"

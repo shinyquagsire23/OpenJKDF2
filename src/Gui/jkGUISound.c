@@ -13,7 +13,7 @@
 #include "Gui/jkGUISetup.h"
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSoundMixer.h"
 #include "Platform/wuRegistry.h"
 #include "Win95/stdSound.h"
 

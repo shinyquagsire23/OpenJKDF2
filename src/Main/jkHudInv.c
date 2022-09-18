@@ -5,7 +5,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "stdPlatform.h"
 #include "Cog/sithCog.h"
 #include "World/sithInventory.h"

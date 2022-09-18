@@ -13,7 +13,7 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdFileUtil.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 
 static int jkGuiControlSaveLoad_aIdk[2] = {0xD, 0xE};
 static wchar_t jkGuiControlSaveLoad_awTmp[256];

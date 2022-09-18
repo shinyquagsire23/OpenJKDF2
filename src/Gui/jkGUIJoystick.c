@@ -13,12 +13,11 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdFileUtil.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Platform/stdControl.h"
 #include "World/jkPlayer.h"
 #include "Win95/Windows.h"
 #include "Gui/jkGUISetup.h"
-#include "Engine/sithControl.h"
 
 #define JKGUIJOYSTICK_NUM_ENTRIES (JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_AXIS_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE + JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE)
 
