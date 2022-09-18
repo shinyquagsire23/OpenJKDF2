@@ -2184,7 +2184,7 @@ void do_hooks()
     hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     
     // DebugConsole
-    hook_function(sithConsole_Initialize_ADDR, sithConsole_Initialize);
+    hook_function(sithConsole_Startup_ADDR, sithConsole_Startup);
     hook_function(sithConsole_Shutdown_ADDR, sithConsole_Shutdown);
     hook_function(sithConsole_Open_ADDR, sithConsole_Open);
     hook_function(sithConsole_Close_ADDR, sithConsole_Close);

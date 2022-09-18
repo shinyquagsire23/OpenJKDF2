@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#define sithConsole_Initialize_ADDR (0x004D9DB0)
+#define sithConsole_Startup_ADDR (0x004D9DB0)
 #define sithConsole_Shutdown_ADDR (0x004D9E90)
 #define sithConsole_Open_ADDR (0x004D9EF0)
 #define sithConsole_Close_ADDR (0x004D9F40)
@@ -18,7 +18,7 @@
 #define sithConsole_PrintHelp_ADDR (0x004DA1D0)
 #define sithConsole_AlertSound_ADDR (0x004DA3D0)
 
-int sithConsole_Initialize(int maxCmds);
+int sithConsole_Startup(int maxCmds);
 void sithConsole_Shutdown();
 int sithConsole_Open(int maxLines);
 void sithConsole_Close();

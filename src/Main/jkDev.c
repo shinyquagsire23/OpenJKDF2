@@ -33,7 +33,7 @@ void jkDev_Startup()
     }
 #endif
 
-    sithConsole_Initialize(64);
+    sithConsole_Startup(64);
     sithConsole_Open(16);
     sithConsole_SetPrintFuncs(jkDev_DebugLog, jkDev_PrintUniString);
 

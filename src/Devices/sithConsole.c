@@ -8,7 +8,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int sithConsole_Initialize(int maxCmds)
+int sithConsole_Startup(int maxCmds)
 {
     stdHashTable *v1; // eax
     stdSound_buffer_t *v2; // eax
