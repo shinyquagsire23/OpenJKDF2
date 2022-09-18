@@ -15,6 +15,7 @@
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
 #include "Cog/sithCogFunctionPlayer.h"
+#include "Dss/jkDSS.h"
 
 #include "jk.h"
 
@@ -349,7 +350,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                         {
                             v6 = ctx->trigId;
                             if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
-                                jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
+                                jkDSS_SendJKSetWeaponMesh(v3);
                         }
                     }
                 }
@@ -366,7 +367,7 @@ void jkCog_EndLevel(sithCog *ctx)
     if ( sithNet_isMulti )
     {
         if ( sithNet_isServer )
-            jkSaber_cogMsg_SendEndLevel();
+            jkDSS_SendEndLevel();
     }
     else
     {
@@ -571,7 +572,7 @@ void jkCog_PrintUniString(sithCog *ctx)
         if ( COG_SHOULD_SYNC(ctx) && v3 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v3].flags & 1) != 0 )
         {
             
-            jkSaber_cogMsg_SendJKPrintUniString(v1, v3);
+            jkDSS_SendJKPrintUniString(v1, v3);
         }
     }
     else
@@ -586,7 +587,7 @@ void jkCog_PrintUniString(sithCog *ctx)
         jkDev_PrintUniString(v4);
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            jkSaber_cogMsg_SendJKPrintUniString(v1, 0xFFFFFFFF);
+            jkDSS_SendJKPrintUniString(v1, 0xFFFFFFFF);
         }
     }
 }
@@ -607,7 +608,7 @@ void jkCog_SetPersuasionInfo(sithCog *ctx)
     v4->twinkleSpawnRate = v1;
     if ( COG_SHOULD_SYNC(ctx) )
     {
-        jkSaber_cogMsg_SendJKSetWeaponMesh(v3);
+        jkDSS_SendJKSetWeaponMesh(v3);
     }
 }
 
@@ -661,8 +662,8 @@ void jkCog_SetSaberInfo(sithCog *ctx)
                 v5 = ctx->trigId;
                 if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
                 {
-                    jkSaber_cogMsg_SendSetSaberInfo(v4);
-                    jkSaber_cogMsg_SendSetSaberInfo2(v4);
+                    jkDSS_SendSetSaberInfo(v4);
+                    jkDSS_SendSetSaberInfo2(v4);
                 }
             }
         }
@@ -691,7 +692,7 @@ void jkCog_EnableSaber(sithCog *ctx)
     {
         jkSaber_Enable(v2, a2, a3, a1a);
         if ( sithComm_multiplayerFlags )
-            jkSaber_cogMsg_SendJKEnableSaber(v3);
+            jkDSS_SendJKEnableSaber(v3);
     }
 }
 

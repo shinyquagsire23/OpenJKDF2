@@ -207,38 +207,38 @@ jkSaber_UpdateCollision	.text	0040B860	000006D8	000000D0	00000008	R	.	.	.	.	.	T	
 jkSaber_SpawnSparks	.text	0040BF40	0000007F	00000004	00000010	R	.	.	.	.	.	T	.
 jkSaber_Enable	.text	0040BFC0	00000055	00000004	00000010	R	.	.	.	.	.	T	.
 jkSaber_Disable	.text	0040C020	00000015	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_Startup	.text	0040C040	000000F7			R	.	.	.	.	.	.	.
-jkSaber_Shutdown	.text	0040C140	00000001			R	.	.	.	.	.	.	.
-jkSaber_idk4	.text	0040C150	000000D0	00000000	00000000	R	.	.	.	.	.	T	.
-jkSaber_playerconfig_idksync	.text	0040C220	0000014F	00000008	00000000	R	.	.	.	.	.	T	.
-jkSaber_player_thingsidkfunc	.text	0040C370	00000015	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_nullsub_2	.text	0040C390	00000001			R	.	.	.	.	.	.	.
-jkSaber_Write	.text	0040C3A0	0000001F	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_Load	.text	0040C3C0	00000032	00000020	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_wrap_SendSaberInfo_alt	.text	0040C400	00000023			R	.	.	.	.	.	.	.
-jkSaber_cogMsg_SendSaberInfo_alt	.text	0040C430	000000C5	00000004	00000014	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetSaberInfo	.text	0040C500	000000C0	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetSaberInfo	.text	0040C5C0	0000027E	00000098	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKEnableSaber	.text	0040C840	0000006D	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKEnableSaber	.text	0040C8B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetSaberInfo2	.text	0040C920	000001DF	00000008	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetSaberInfo2	.text	0040CB00	000001AE	00000054	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKSetWeaponMesh	.text	0040CCB0	0000007F	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKSetWeaponMesh	.text	0040CD30	0000007C	00000010	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendHudTarget	.text	0040CDB0	00000084	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_HandleHudTarget	.text	0040CE40	00000062	00000004	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx32	.text	0040CEB0	000000EF	00000004	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Handlex32	.text	0040CFA0	000000D3	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx33	.text	0040D080	00000064	00000000	0000000E	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Handlex33	.text	0040D0F0	0000009D	00000008	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx36	.text	0040D190	0000005D	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_Handlex36_setwaggle	.text	0040D1F0	00000032	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKPrintUniString	.text	0040D230	00000074	00000000	00000008	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKPrintUniString	.text	0040D2B0	00000054	00000040	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendEndLevel	.text	0040D310	0000008C			R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleEndLevel	.text	0040D3A0	00000040	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetTeam	.text	0040D3E0	00000068	00000000	00000002	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetTeam	.text	0040D450	000000BB	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Startup	.text	0040C040	000000F7			R	.	.	.	.	.	.	.
+jkDSS_Shutdown	.text	0040C140	00000001			R	.	.	.	.	.	.	.
+jkDSS_idk4	.text	0040C150	000000D0	00000000	00000000	R	.	.	.	.	.	T	.
+jkDSS_playerconfig_idksync	.text	0040C220	0000014F	00000008	00000000	R	.	.	.	.	.	T	.
+jkDSS_player_thingsidkfunc	.text	0040C370	00000015	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_nullsub_2	.text	0040C390	00000001			R	.	.	.	.	.	.	.
+jkDSS_Write	.text	0040C3A0	0000001F	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_Load	.text	0040C3C0	00000032	00000020	00000000	R	.	.	.	.	.	.	.
+jkDSS_wrap_SendSaberInfo_alt	.text	0040C400	00000023			R	.	.	.	.	.	.	.
+jkDSS_SendSaberInfo_alt	.text	0040C430	000000C5	00000004	00000014	R	.	.	.	.	.	T	.
+jkDSS_SendSetSaberInfo	.text	0040C500	000000C0	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetSaberInfo	.text	0040C5C0	0000027E	00000098	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKEnableSaber	.text	0040C840	0000006D	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKEnableSaber	.text	0040C8B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendSetSaberInfo2	.text	0040C920	000001DF	00000008	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetSaberInfo2	.text	0040CB00	000001AE	00000054	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKSetWeaponMesh	.text	0040CCB0	0000007F	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKSetWeaponMesh	.text	0040CD30	0000007C	00000010	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendHudTarget	.text	0040CDB0	00000084	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_ProcessHudTarget	.text	0040CE40	00000062	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx32	.text	0040CEB0	000000EF	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Processx32	.text	0040CFA0	000000D3	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx33	.text	0040D080	00000064	00000000	0000000E	R	.	.	.	.	.	T	.
+jkDSS_Processx33	.text	0040D0F0	0000009D	00000008	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx36	.text	0040D190	0000005D	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_Processx36_setwaggle	.text	0040D1F0	00000032	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKPrintUniString	.text	0040D230	00000074	00000000	00000008	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKPrintUniString	.text	0040D2B0	00000054	00000040	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendEndLevel	.text	0040D310	0000008C			R	.	.	.	.	.	T	.
+jkDSS_ProcessEndLevel	.text	0040D3A0	00000040	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendSetTeam	.text	0040D3E0	00000068	00000000	00000002	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetTeam	.text	0040D450	000000BB	00000004	00000004	R	.	.	.	.	.	T	.
 jkEpisode_Startup	.text	0040D510	00000013			R	.	.	.	.	.	.	.
 jkEpisode_Shutdown	.text	0040D530	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkEpisode_UpdateExtra	.text	0040D540	00000017	00000000	00000004	R	.	.	.	.	.	T	.

@@ -63,6 +63,7 @@
 #include "General/util.h"
 #include "General/stdFileUtil.h"
 #include "General/stdJSON.h"
+#include "Dss/jkDSS.h"
 
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
@@ -1115,7 +1116,7 @@ int Main_Startup(const char *cmdline)
         Video_Startup();
         jkControl_Initialize(); // ~TODO
         jkHudInv_Initialize();
-        jkSaber_Startup();
+        jkDSS_Startup();
         jkCutscene_Initialize("ui\\cutStrings.uni");
         jkCredits_Initialize("ui\\credits.uni");
         jkSmack_Initialize();
@@ -1172,7 +1173,7 @@ void Main_Shutdown()
     sithMain_Free();
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
-    jkSaber_Shutdown();
+    jkDSS_Shutdown();
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )
         jkCutscene_sub_421410();

@@ -153,6 +153,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
+#include "Dss/jkDSS.h"
 #include "Devices/sithComm.h"
 #include "stdPlatform.h"
 
@@ -1626,18 +1627,18 @@ void do_hooks()
     hook_function(jkSaber_Draw_ADDR, jkSaber_Draw);
     hook_function(jkSaber_UpdateLength_ADDR, jkSaber_UpdateLength);
     hook_function(jkSaber_UpdateCollision_ADDR, jkSaber_UpdateCollision);
-    hook_function(jkSaber_Load_ADDR, jkSaber_Load);
-    hook_function(jkSaber_player_thingsidkfunc_ADDR, jkSaber_player_thingsidkfunc);
+    hook_function(jkDSS_Load_ADDR, jkDSS_Load);
+    hook_function(jkDSS_player_thingsidkfunc_ADDR, jkDSS_player_thingsidkfunc);
     hook_function(jkSaber_Enable_ADDR, jkSaber_Enable);
-    hook_function(jkSaber_playerconfig_idksync_ADDR, jkSaber_playerconfig_idksync);
-    hook_function(jkSaber_cogMsg_SendSetSaberInfo2_ADDR, jkSaber_cogMsg_SendSetSaberInfo2);
-    hook_function(jkSaber_cogMsg_SendSetSaberInfo_ADDR, jkSaber_cogMsg_SendSetSaberInfo);
-    hook_function(jkSaber_cogMsg_Sendx32_ADDR, jkSaber_cogMsg_Sendx32);
-    hook_function(jkSaber_cogMsg_HandleSetSaberInfo_ADDR, jkSaber_cogMsg_HandleSetSaberInfo);
-    hook_function(jkSaber_cogMsg_HandleSetSaberInfo2_ADDR, jkSaber_cogMsg_HandleSetSaberInfo2);
-    hook_function(jkSaber_cogMsg_Handlex32_ADDR, jkSaber_cogMsg_Handlex32);
-    hook_function(jkSaber_cogMsg_Handlex36_setwaggle_ADDR, jkSaber_cogMsg_Handlex36_setwaggle);
-    hook_function(jkSaber_cogMsg_HandleHudTarget_ADDR, jkSaber_cogMsg_HandleHudTarget);
+    hook_function(jkDSS_playerconfig_idksync_ADDR, jkDSS_playerconfig_idksync);
+    hook_function(jkDSS_SendSetSaberInfo2_ADDR, jkDSS_SendSetSaberInfo2);
+    hook_function(jkDSS_SendSetSaberInfo_ADDR, jkDSS_SendSetSaberInfo);
+    hook_function(jkDSS_Sendx32_ADDR, jkDSS_Sendx32);
+    hook_function(jkDSS_ProcessSetSaberInfo_ADDR, jkDSS_ProcessSetSaberInfo);
+    hook_function(jkDSS_ProcessSetSaberInfo2_ADDR, jkDSS_ProcessSetSaberInfo2);
+    hook_function(jkDSS_Processx32_ADDR, jkDSS_Processx32);
+    hook_function(jkDSS_Processx36_setwaggle_ADDR, jkDSS_Processx36_setwaggle);
+    hook_function(jkDSS_ProcessHudTarget_ADDR, jkDSS_ProcessHudTarget);
     
     // jkSmack
     hook_function(jkSmack_Initialize_ADDR, jkSmack_Initialize);

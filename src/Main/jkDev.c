@@ -18,6 +18,7 @@
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"
 #include "wprintf.h"
+#include "Dss/jkDSS.h"
 #include "../jk.h"
 
 void jkDev_Startup()
@@ -445,7 +446,7 @@ int jkDev_CmdKill(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdEndLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( sithNet_isMulti && sithNet_isServer )
-        jkSaber_cogMsg_SendEndLevel();
+        jkDSS_SendEndLevel();
     return 1;
 }
 
@@ -778,7 +779,7 @@ int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !v2 || v2 >= 5 )
         return 0;
 
-    jkSaber_cogMsg_SendSetTeam(v2);
+    jkDSS_SendSetTeam(v2);
     return 1;
 }
 

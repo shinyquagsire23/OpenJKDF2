@@ -46,6 +46,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdPalEffects.h"
 #include "World/jkPlayer.h"
+#include "Dss/jkDSS.h"
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
@@ -225,7 +226,7 @@ void jkMain_GuiAdvance()
                 {
                     sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
-                        jkSaber_cogMsg_SendEndLevel();
+                        jkDSS_SendEndLevel();
                 }
                 if ( sithMain_bEndLevel )
                 {
@@ -338,7 +339,7 @@ void jkMain_EscapeMenuTick(int a2)
                     {
                         sithMulti_bTimelimitMet = 0;
                         if ( sithNet_isServer )
-                            jkSaber_cogMsg_SendEndLevel();
+                            jkDSS_SendEndLevel();
                     }
                     if ( sithMain_bEndLevel )
                     {
@@ -578,7 +579,7 @@ LABEL_28:
                 DirectPlay_SetSessionDesc(jkMain_aLevelJklFname, v5);
             }
             if ( sithNet_isMulti )
-                jkSaber_cogMsg_wrap_SendSaberInfo_alt();
+                jkDSS_wrap_SendSaberInfo_alt();
         }
         goto LABEL_39;
     }
@@ -629,7 +630,7 @@ void jkMain_GameplayTick(int a2)
                 {
                     sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
-                        jkSaber_cogMsg_SendEndLevel();
+                        jkDSS_SendEndLevel();
                 }
                 if ( sithMain_bEndLevel )
                 {

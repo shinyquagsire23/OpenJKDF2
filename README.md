@@ -215,6 +215,7 @@ rdKeyframe                     0xa99      0.251%        100.000%        8 / 8
 rdCamera                       0xaa8      0.253%        100.000%       26 / 26         
 jkGuiSaveLoad                  0xb21      0.264%        100.000%        9 / 9          
 rdPolyLine                     0xb42      0.267%        100.000%        6 / 6          
+jkSaber                        0xb54      0.269%        100.000%        8 / 8          
 jkGuiKeyboard                  0xb57      0.269%        100.000%       14 / 14         
 jkGuiNetHost                   0xbc6      0.279%        100.000%        6 / 6          
 sithOverlayMap                 0xbf8      0.284%        100.000%        9 / 9          
@@ -236,6 +237,7 @@ sithPuppet                     0x1222     0.430%        100.000%       17 / 17
 sithCamera                     0x124b     0.434%        100.000%       23 / 23         
 jkGuiDisplay                   0x12ff     0.451%        100.000%       11 / 11         
 jkGuiJoystick                  0x13f0     0.473%        100.000%       19 / 19         
+jkDSS                          0x13f6     0.474%        100.000%       32 / 32         
 sithCogYACC                    0x152b     0.502%        100.000%       10 / 10         
 jkRes                          0x15b6     0.515%        100.000%       23 / 23         
 jkMain                         0x16cd     0.541%        100.000%       53 / 53         
@@ -246,7 +248,6 @@ rdActive                       0x1a55     0.625%        100.000%        8 / 8
 sithCogVm                      0x1aec     0.639%        100.000%       31 / 31         
 sithCogParse                   0x1b2a     0.645%        100.000%       26 / 26         
 jkHud                          0x1c9b     0.679%        100.000%       17 / 17         
-jkSaber                        0x1f4a     0.742%        100.000%       40 / 40         
 jkDev                          0x1fd6     0.755%        100.000%       41 / 41         
 sithInventory                  0x2150     0.791%        100.000%       62 / 62         
 sithDSSThing                   0x22aa     0.823%        100.000%       37 / 37         
