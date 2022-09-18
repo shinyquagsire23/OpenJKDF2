@@ -11,7 +11,7 @@
 #include "World/sithWeapon.h"
 #include "AI/sithAICmd.h"
 #include "AI/sithAIClass.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
@@ -1294,7 +1294,7 @@ int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFo
     stdMath_SinCos(a2, &autoaimFov, &sithAI_flt_84DE64);
     a2b = 90.0 - autoaimMaxDist * 0.5;
     stdMath_SinCos(a2b, &autoaimFov, &sithAI_flt_84DE58);
-    sith_sub_4C4D80();
+    sithMain_sub_4C4D80();
     sithAI_dword_84DE60 = 0;
     sithAI_dword_84DE5C = 0;
     sithAI_GetThingsInView(sector, out, 0.0);
@@ -1304,7 +1304,7 @@ int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFo
 int sithAI_sub_4EB860(int a1, float a2)
 {
     if ( a2 > 0.0 )
-        sith_sub_4C4D80();
+        sithMain_sub_4C4D80();
     return 0;
 }
 

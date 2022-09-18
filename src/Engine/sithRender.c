@@ -4,7 +4,7 @@
 #include <float.h>
 
 #include "Cog/sithCog.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/sithMaterial.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithKeyFrame.h"
@@ -277,7 +277,7 @@ void sithRender_Draw()
 
 #ifdef QOL_IMPROVEMENTS
             fov = jkPlayer_fov;
-            aspect = sith_lastAspect;
+            aspect = sithMain_lastAspect;
 #endif
             stdMath_SinCos(sithTime_curSeconds * 70.0, &a3, &a4);
             rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, a3 + fov);

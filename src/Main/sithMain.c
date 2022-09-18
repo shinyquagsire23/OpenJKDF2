@@ -1,4 +1,4 @@
-#include "sith.h"
+#include "sithMain.h"
 
 #include "Main/jkGame.h"
 #include "Main/Main.h"
@@ -45,9 +45,9 @@
 #include <math.h>
 #endif
 
-float sith_lastAspect = 1.0;
+float sithMain_lastAspect = 1.0;
 
-int sith_Startup(struct common_functions *commonFuncs)
+int sithMain_Startup(struct common_functions *commonFuncs)
 {
     int is_started; // esi
 
@@ -93,11 +93,11 @@ int sith_Startup(struct common_functions *commonFuncs)
     if ( !is_started )
         return 0;
 
-    sith_bInitialized = 1;
+    sithMain_bInitialized = 1;
     return 1;
 }
 
-void sith_Shutdown()
+void sithMain_Shutdown()
 {
     sithSoundMixer_Shutdown();
     sithSound_Shutdown();
@@ -120,17 +120,17 @@ void sith_Shutdown()
     sithWorld_Shutdown();
     sithEvent_Shutdown();
     sithStrTable_Shutdown();
-    sith_bInitialized = 0;
+    sithMain_bInitialized = 0;
 }
 
-int sith_Load(char *path)
+int sithMain_Load(char *path)
 {
     sithWorld_pStatic = sithWorld_New();
     sithWorld_pStatic->level_type_maybe |= 1;
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
 }
 
-void sith_Free()
+void sithMain_Free()
 {
     if ( sithWorld_pStatic )
     {
@@ -139,7 +139,7 @@ void sith_Free()
     }
 }
 
-int sith_Mode1Init(char *a1)
+int sithMain_Mode1Init(char *a1)
 {
     sithWorld_pCurrentWorld = sithWorld_New();
 
@@ -148,13 +148,13 @@ int sith_Mode1Init(char *a1)
 
     sithTime_Startup();
     sithWorld_Initialize();
-    sith_Open();
+    sithMain_Open();
     sithTime_Startup();
     g_sithMode = 1;
     return 1;
 }
 
-int sithOpenNormal(char *path)
+int sithMain_OpenNormal(char *path)
 {
     sithWorld_pCurrentWorld = sithWorld_New();
 
@@ -162,24 +162,24 @@ int sithOpenNormal(char *path)
         return 0;
 
     sithWorld_Initialize();
-    sith_Open();
+    sithMain_Open();
     g_sithMode = 1;
     return 1;
 }
 
-int sith_Mode1Init_3(char *fpath)
+int sithMain_Mode1Init_3(char *fpath)
 {
     sithWorld_pCurrentWorld = sithWorld_New();
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
         return 0;
-    sith_Open();
+    sithMain_Open();
     sithTime_Startup();
     sithMulti_Startup();
     g_sithMode = 1;
     return 1;
 }
 
-int sith_Open()
+int sithMain_Open()
 {
     bShowInvisibleThings = 0;
     sithRender_lastRenderTick = 1;
@@ -193,13 +193,13 @@ int sith_Open()
     sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_InitializeEntry();
-    sith_bOpened = 1;
+    sithMain_bOpened = 1;
     return 1;
 }
 
-void sith_Close()
+void sithMain_Close()
 {
-    if ( sith_bOpened )
+    if ( sithMain_bOpened )
     {
         sithSoundMixer_StopSong();
         sithRender_Close();
@@ -215,16 +215,16 @@ void sith_Close()
         sithWeapon_ShutdownEntry();
         g_sithMode = 0;
         g_submodeFlags = 0;
-        sith_bOpened = 0;
+        sithMain_bOpened = 0;
     }
 }
 
-void sith_SetEndLevel()
+void sithMain_SetEndLevel()
 {
-    sith_bEndLevel = 1;
+    sithMain_bEndLevel = 1;
 }
 
-int sith_Tick()
+int sithMain_Tick()
 {
     if ( (g_submodeFlags & 8) != 0 )
     {
@@ -374,7 +374,7 @@ int sith_Tick()
     }
 }
 
-void sith_UpdateCamera()
+void sithMain_UpdateCamera()
 {
     if ( (g_submodeFlags & 8) == 0 )
     {
@@ -390,14 +390,14 @@ void sith_UpdateCamera()
             // Set screen aspect ratio
             float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
             
-            //if (aspect != sith_lastAspect)
+            //if (aspect != sithMain_lastAspect)
             {
                 rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
                 rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
                 rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
             }
             
-            sith_lastAspect = aspect;
+            sithMain_lastAspect = aspect;
         }
 #endif
 
@@ -407,7 +407,7 @@ void sith_UpdateCamera()
     }
 }
 
-void sith_sub_4C4D80()
+void sithMain_sub_4C4D80()
 {
     if ( !++sithRender_lastRenderTick )
     {
@@ -416,18 +416,18 @@ void sith_sub_4C4D80()
     }
 }
 
-void sith_set_sithmode_5()
+void sithMain_set_sithmode_5()
 {
     g_sithMode = 5;
 }
 
-void sith_SetEpisodeName(char *text)
+void sithMain_SetEpisodeName(char *text)
 {
     _strncpy(sithWorld_episodeName, text, 0x1Fu);
     sithWorld_episodeName[31] = 0;
 }
 
-void sith_AutoSave()
+void sithMain_AutoSave()
 {
     sithThing *v3; // esi
     sithCog *v4; // eax

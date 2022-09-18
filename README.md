@@ -186,7 +186,7 @@ sithCogScript                  0x6ca      0.161%        100.000%        9 / 9
 Window                         0x6db      0.163%        100.000%       13 / 13         
 stdGob                         0x6dd      0.163%        100.000%       14 / 14         
 jkAI                           0x6e7      0.164%        100.000%        5 / 5          
-sith                           0x72b      0.170%        100.000%       16 / 16         
+sithMain                       0x72b      0.170%        100.000%       16 / 16         
 jkGuiControlSaveLoad           0x732      0.171%        100.000%        6 / 6          
 jkGuiPlayer                    0x73a      0.171%        100.000%        5 / 5          
 rdSprite                       0x76d      0.176%        100.000%        5 / 5          
@@ -195,6 +195,7 @@ jkGuiMap                       0x793      0.180%        100.000%        8 / 8
 sithTemplate                   0x79d      0.181%        100.000%       10 / 10         
 sithParticle                   0x7f5      0.189%        100.000%       10 / 10         
 sithSector                     0x806      0.190%        100.000%       13 / 13         
+sithComm                       0x80b      0.191%        100.000%       11 / 11         
 sithMap                        0x814      0.192%        100.000%        6 / 6          
 Main                           0x87b      0.201%        100.000%        4 / 4          
 jkGuiMultiTally                0x8aa      0.206%        100.000%        7 / 7          
@@ -242,12 +243,12 @@ sithWorld                      0x1718     0.548%        100.000%       22 / 22
 sithDSS                        0x175d     0.554%        100.000%       22 / 22         
 stdMath                        0x182a     0.573%        100.000%       23 / 23         
 rdActive                       0x1a55     0.625%        100.000%        8 / 8          
+sithCogVm                      0x1aec     0.639%        100.000%       31 / 31         
 sithCogParse                   0x1b2a     0.645%        100.000%       26 / 26         
 jkHud                          0x1c9b     0.679%        100.000%       17 / 17         
 jkDev                          0x1fd6     0.755%        100.000%       41 / 41         
 sithInventory                  0x2150     0.791%        100.000%       62 / 62         
 sithDSSThing                   0x22aa     0.823%        100.000%       37 / 37         
-sithCogVm                      0x22f7     0.830%        100.000%       42 / 42         
 sithRender                     0x23de     0.851%        100.000%       22 / 22         
 jkGuiBuildMulti                0x258b     0.891%        100.000%       24 / 24         
 sithSoundMixer                 0x2626     0.905%        100.000%       37 / 37         
@@ -282,7 +283,7 @@ stdBitmap                      0xeb6      0.349%        47.398%         6 / 14
 sithTrackThing                 0xf9f      0.371%        90.098%        12 / 15         
 rdPuppet                       0x101f     0.383%        97.407%        15 / 19         
 stdGif                         0x1162     0.412%        0.000%          0 / 4          
-sithDebugConsole               0x11b2     0.420%        91.545%        18 / 20         
+sithCommand                    0x11b2     0.420%        91.545%        18 / 20         
 sithIntersect                  0x12a8     0.443%        92.588%         9 / 12         
 rdPrimit3                      0x16e0     0.543%        91.684%         7 / 9          
 stdFont                        0x181a     0.572%        75.284%        12 / 20         

@@ -4,7 +4,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "World/sithWorld.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/rdMaterial.h"
 #include "jk.h"
 

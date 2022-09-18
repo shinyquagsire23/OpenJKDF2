@@ -17,7 +17,7 @@
 #include "stdPlatform.h"
 #include "World/sithSector.h"
 #include "Engine/sithSurface.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Main/Main.h"
 #include "AI/sithAI.h"
 #include "Devices/sithComm.h"
@@ -1292,12 +1292,12 @@ void sithMulti_HandleTimeLimit(int deltaMs)
         if ( sithMulti_leaveJoinType == 1 )
         {
             sithMulti_leaveJoinType = 0;
-            sith_SetEndLevel();
+            sithMain_SetEndLevel();
         }
         else if ( sithMulti_leaveJoinType == 2 )
         {
             sithMulti_leaveJoinType = 0;
-            sith_set_sithmode_5();
+            sithMain_set_sithmode_5();
         }
     }
     else if ( sithNet_isServer )

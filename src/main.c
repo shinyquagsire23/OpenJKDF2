@@ -72,7 +72,7 @@
 #include "Engine/sithCamera.h"
 #include "Devices/sithControl.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Main/sithCommand.h"
 #include "Engine/sithModel.h"
 #include "Engine/sithParticle.h"
@@ -1247,23 +1247,23 @@ void do_hooks()
     hook_function(rdCamera_ClearLights_ADDR, rdCamera_ClearLights);
     hook_function(rdCamera_AdvanceFrame_ADDR, rdCamera_AdvanceFrame);
     
-    // sith
-    hook_function(sith_Startup_ADDR, sith_Startup);
-    hook_function(sith_Shutdown_ADDR, sith_Shutdown);
-    hook_function(sith_Load_ADDR, sith_Load);
-    hook_function(sith_Free_ADDR, sith_Free);
-    hook_function(sith_Mode1Init_ADDR, sith_Mode1Init);
-    hook_function(sithOpenNormal_ADDR, sithOpenNormal);
-    hook_function(sith_Mode1Init_3_ADDR, sith_Mode1Init_3);
-    hook_function(sith_Open_ADDR, sith_Open);
-    hook_function(sith_Close_ADDR, sith_Close);
-    hook_function(sith_SetEndLevel_ADDR, sith_SetEndLevel);
-    hook_function(sith_Tick_ADDR, sith_Tick);
-    hook_function(sith_UpdateCamera_ADDR, sith_UpdateCamera);
-    hook_function(sith_sub_4C4D80_ADDR, sith_sub_4C4D80);
-    hook_function(sith_set_sithmode_5_ADDR, sith_set_sithmode_5);
-    hook_function(sith_SetEpisodeName_ADDR, sith_SetEpisodeName);
-    hook_function(sith_AutoSave_ADDR, sith_AutoSave);
+    // sithMain
+    hook_function(sithMain_Startup_ADDR, sithMain_Startup);
+    hook_function(sithMain_Shutdown_ADDR, sithMain_Shutdown);
+    hook_function(sithMain_Load_ADDR, sithMain_Load);
+    hook_function(sithMain_Free_ADDR, sithMain_Free);
+    hook_function(sithMain_Mode1Init_ADDR, sithMain_Mode1Init);
+    hook_function(sithMain_OpenNormal_ADDR, sithMain_OpenNormal);
+    hook_function(sithMain_Mode1Init_3_ADDR, sithMain_Mode1Init_3);
+    hook_function(sithMain_Open_ADDR, sithMain_Open);
+    hook_function(sithMain_Close_ADDR, sithMain_Close);
+    hook_function(sithMain_SetEndLevel_ADDR, sithMain_SetEndLevel);
+    hook_function(sithMain_Tick_ADDR, sithMain_Tick);
+    hook_function(sithMain_UpdateCamera_ADDR, sithMain_UpdateCamera);
+    hook_function(sithMain_sub_4C4D80_ADDR, sithMain_sub_4C4D80);
+    hook_function(sithMain_set_sithmode_5_ADDR, sithMain_set_sithmode_5);
+    hook_function(sithMain_SetEpisodeName_ADDR, sithMain_SetEpisodeName);
+    hook_function(sithMain_AutoSave_ADDR, sithMain_AutoSave);
     
     // sithAnimClass
     hook_function(sithAnimClass_Free_ADDR, sithAnimClass_Free);

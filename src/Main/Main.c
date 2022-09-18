@@ -56,7 +56,7 @@
 #include "Main/smack.h"
 #include "Main/jkMain.h"
 #include "Engine/rdroid.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/sithMulti.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -855,7 +855,7 @@ int Main_StartupDedicated()
     
     std3D_StartScene();
     std3D_EndScene();
-    sith_Load("static.jkl");
+    sithMain_Load("static.jkl");
     jkHudInv_InitItems();
 
     if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
@@ -1106,7 +1106,7 @@ int Main_Startup(const char *cmdline)
 #ifndef LINUX_TMP
         smack_Initialize(); // TODO
 #endif
-        sith_Startup(&hs); // ~TODO
+        sithMain_Startup(&hs); // ~TODO
         jkAI_Startup();
         jkCog_Initialize();
         jkEpisode_Startup();
@@ -1169,7 +1169,7 @@ void Main_Shutdown()
     jkGuiSingleTally_Shutdown();
     jkGuiRend_Shutdown();
     jkCog_Shutdown();
-    sith_Free();
+    sithMain_Free();
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
     jkSaber_Shutdown();
@@ -1179,7 +1179,7 @@ void Main_Shutdown()
     Video_Shutdown();
     jkGame_Shutdown();
     jkDev_Shutdown();
-    sith_Shutdown();
+    sithMain_Shutdown();
     smack_Shutdown();
     jkGui_Shutdown();
     rdShutdown();

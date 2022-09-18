@@ -25,7 +25,7 @@
 #include "Engine/sithModel.h"
 #include "Engine/sithSprite.h"
 #include "Engine/sithNet.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"

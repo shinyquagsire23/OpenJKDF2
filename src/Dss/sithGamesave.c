@@ -6,7 +6,7 @@
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "Main/jkGame.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
 #include "Devices/sithSoundMixer.h"
 #include "Engine/sithSurface.h"
@@ -98,9 +98,9 @@ int sithGamesave_LoadEntry(char *fpath)
             sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurrentWorld);
             goto LABEL_11;
         }
-        sith_Close();
+        sithMain_Close();
     }
-    if ( !sithOpenNormal(SrcStr) )
+    if ( !sithMain_OpenNormal(SrcStr) )
     {
         goto load_fail;
     }
@@ -181,7 +181,7 @@ LABEL_11:
 load_fail:
     stdConffile_Close();
     sithThing_sub_4CCE60();
-    sith_Close();
+    sithMain_Close();
     return 0;
 }
 
@@ -340,7 +340,7 @@ int sithGamesave_WriteEntry()
             return 1;
         }
         // TODO inlined?
-        sith_set_sithmode_5();
+        sithMain_set_sithmode_5();
         sithGamesave_dword_835900 = 0;
         return 1;
     }
@@ -355,7 +355,7 @@ int sithGamesave_WriteEntry()
             return 1;
         }
         // TODO inlined?
-        sith_set_sithmode_5();
+        sithMain_set_sithmode_5();
         sithGamesave_dword_835900 = 0;
         return 1;
     }

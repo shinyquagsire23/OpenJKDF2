@@ -1,7 +1,7 @@
 #include "jkGame.h"
 
 #include "General/stdPalEffects.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdCache.h"
 #include "Engine/sithRender.h"
@@ -113,13 +113,13 @@ int jkGame_Update()
     rdAdvanceFrame();
     if ( Video_modeStruct.b3DAccel )
     {
-        sith_UpdateCamera();
+        sithMain_UpdateCamera();
     }
     else
     {
         stdDisplay_VBufferLock(Video_pMenuBuffer);
         stdDisplay_VBufferLock(Video_pVbufIdk);
-        sith_UpdateCamera();
+        sithMain_UpdateCamera();
         stdDisplay_VBufferUnlock(Video_pVbufIdk);
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
     }
@@ -219,13 +219,13 @@ int jkGame_Update()
     rdAdvanceFrame();
     //if ( Video_modeStruct.b3DAccel )
     {
-        sith_UpdateCamera();
+        sithMain_UpdateCamera();
     }
     /*else
     {
         stdDisplay_VBufferLock(Video_pMenuBuffer);
         stdDisplay_VBufferLock(Video_pVbufIdk);
-        sith_UpdateCamera();
+        sithMain_UpdateCamera();
         stdDisplay_VBufferUnlock(Video_pVbufIdk);
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
     }*/
