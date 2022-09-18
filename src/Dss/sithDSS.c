@@ -7,7 +7,7 @@
 #include "World/sithThing.h"
 #include "Devices/sithSoundMixer.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "Engine/sithKeyFrame.h"
 #include "Dss/sithMulti.h"
 #include "Gameplay/sithEvent.h"

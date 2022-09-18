@@ -4,7 +4,7 @@
 #include "Primitives/rdParticle.h"
 #include "General/stdHashTable.h"
 #include "General/stdConffile.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "Primitives/rdVector.h"
 #include "stdPlatform.h"
 

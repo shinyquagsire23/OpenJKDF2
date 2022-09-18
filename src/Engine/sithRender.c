@@ -5,7 +5,7 @@
 
 #include "Cog/sithCog.h"
 #include "Main/sithMain.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "World/sithModel.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/rdMaterial.h"

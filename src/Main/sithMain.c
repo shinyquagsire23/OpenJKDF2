@@ -22,7 +22,7 @@
 #include "Engine/sithParticle.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithSoundClass.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "Engine/sithTemplate.h"
 #include "World/sithModel.h"
 #include "Engine/sithSurface.h"

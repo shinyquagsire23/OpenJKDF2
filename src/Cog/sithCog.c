@@ -16,7 +16,7 @@
 #include "Gameplay/sithEvent.h"
 #include "Devices/sithSound.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "World/sithModel.h"
 #include "Engine/sithTemplate.h"
 #include "Gameplay/sithTime.h"

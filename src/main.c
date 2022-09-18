@@ -85,7 +85,7 @@
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithKeyFrame.h"
 #include "Gameplay/sithOverlayMap.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithRenderSky.h"
 #include "Devices/sithSound.h"

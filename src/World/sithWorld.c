@@ -4,7 +4,7 @@
 #include "World/sithModel.h"
 #include "World/sithSprite.h"
 #include "Engine/sithTemplate.h"
-#include "Engine/sithMaterial.h"
+#include "World/sithMaterial.h"
 #include "Devices/sithSound.h"
 #include "Engine/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
