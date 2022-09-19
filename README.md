@@ -178,7 +178,7 @@ sithMaterial                   0x4fd      0.118%        100.000%        9 / 9
 wuRegistry                     0x5b2      0.135%        100.000%       12 / 12         
 stdHashTable                   0x5d6      0.138%        100.000%       10 / 10         
 Video                          0x5dc      0.139%        100.000%        5 / 5          
-DebugConsole                   0x5de      0.139%        100.000%       13 / 13         
+sithConsole                    0x5de      0.139%        100.000%       13 / 13         
 sithExplosion                  0x61d      0.145%        100.000%        4 / 4          
 sithAIClass                    0x689      0.155%        100.000%        7 / 7          
 rdPrimit2                      0x69a      0.157%        100.000%        5 / 5          
@@ -245,7 +245,7 @@ sithWorld                      0x1718     0.548%        100.000%       22 / 22
 sithDSS                        0x175d     0.554%        100.000%       22 / 22         
 stdMath                        0x182a     0.573%        100.000%       23 / 23         
 rdActive                       0x1a55     0.625%        100.000%        8 / 8          
-sithCogVm                      0x1aec     0.639%        100.000%       31 / 31         
+sithCogExec                    0x1aec     0.639%        100.000%       31 / 31         
 sithCogParse                   0x1b2a     0.645%        100.000%       26 / 26         
 jkHud                          0x1c9b     0.679%        100.000%       17 / 17         
 jkDev                          0x1fd6     0.755%        100.000%       41 / 41         
@@ -269,7 +269,7 @@ rdCache                        0x331c     1.213%        100.000%       16 / 16
 sithCogFunctionThing           0x3a4c     1.383%        100.000%      142 / 142        
 rdClip                         0x81f2     3.084%        100.000%       17 / 17         
 sithAIAwareness                0x31f      0.074%        90.488%         5 / 6          
-sithDplay                      0x53c      0.124%        98.955%        16 / 17         
+stdComm                        0x53c      0.124%        98.955%        16 / 17         
 stdFileUtil                    0x687      0.155%        54.159%         6 / 11         
 stdBmp                         0x6b8      0.159%        0.000%          0 / 3          
 sithAnimClass                  0x6cc      0.161%        94.080%         4 / 5          
@@ -311,27 +311,27 @@ Total completion:
 Subsystem Breakdown (Not Decomp'd)
 ----------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           0.543%           41 / 1323
+sith           0.542%           40 / 1319
 stdPlatform    0.168%            6 / 43
-std            1.493%           46 / 359
+std            1.494%           47 / 376
 jkGui          0.000%            0 / 284
 rd             0.216%           11 / 345
 jk             0.044%            1 / 324
 Raster         40.778%         370 / 371
-other          0.000%            0 / 120
+other          0.000%            0 / 107
 -----------------------------------------
 total          43.242%         475 / 3169
 
 Subsystem Breakdown (Not Decomp'd, Excl Raster)
 -----------------------------------------------
 [subsys]       [% of text]  [TODO / total]
-sith           0.918%           41 / 1323
+sith           0.916%           40 / 1319
 stdPlatform    0.283%            6 / 43
-std            2.521%           46 / 359
+std            2.524%           47 / 376
 jkGui          0.000%            0 / 284
 rd             0.364%           11 / 345
 jk             0.075%            1 / 324
-other          0.000%            0 / 120
+other          0.000%            0 / 107
 -----------------------------------------
 total          4.162%          105 / 2798
 

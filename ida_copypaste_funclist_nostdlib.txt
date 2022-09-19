@@ -17,14 +17,14 @@ jkGame_Gamma	.text	004025A0	0000003D			R	.	.	.	.	.	.	.
 jkGame_Screenshot	.text	004025E0	000001E0	000000C8	00000000	R	.	.	.	.	.	.	.
 jkGame_ddraw_idk_palettes	.text	004027C0	00000050			R	.	.	.	.	.	.	.
 jkGame_nullsub_36	.text	00402810	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkGame_Initialize	.text	00402820	0000001D			R	.	.	.	.	.	.	.
+jkGame_Startup	.text	00402820	0000001D			R	.	.	.	.	.	.	.
 jkGame_Shutdown	.text	00402840	0000000B			R	.	.	.	.	.	.	.
 jkGame_ParseSection	.text	00402850	0000000C	00000000	00000008	R	.	.	.	.	.	.	.
-jkControl_Initialize	.text	00402860	00000051			R	.	.	.	.	.	.	.
+jkControl_Startup	.text	00402860	00000051			R	.	.	.	.	.	.	.
 jkControl_Shutdown	.text	004028C0	00000010	00000000	00000000	R	.	.	.	.	.	.	.
 jkControl_nullsub_37	.text	004028D0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkControl_HandleHudKeys	.text	004028E0	000002CF	00000308	00000004	R	.	.	.	.	.	T	.
-jkSmack_Initialize	.text	00402BB0	00000017			R	.	.	.	.	.	T	.
+jkSmack_Startup	.text	00402BB0	00000017			R	.	.	.	.	.	T	.
 jkSmack_Shutdown	.text	00402BD0	0000002A			R	.	.	.	.	.	T	.
 jkSmack_GetCurrentGuiState	.text	00402C00	00000006			R	.	.	.	.	.	.	.
 jkSmack_SmackPlay	.text	00402C10	000000A7	00000000	00000004	R	.	.	.	.	.	T	.
@@ -150,9 +150,9 @@ jkHudInv_InputInit	.text	00409B90	00000071			R	.	.	.	.	.	T	.
 jkHudInv_InitItems	.text	00409C10	000000A0	00000000	00000000	R	.	.	.	.	.	.	.
 jkHudInv_LoadItemRes	.text	00409CB0	00000312	000000B0	00000000	R	.	.	.	.	.	T	.
 jkHudInv_Close	.text	00409FD0	00000019			R	.	.	.	.	.	.	.
-jkHudInv_Initialize	.text	00409FF0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
+jkHudInv_Startup	.text	00409FF0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
 jkHudInv_Shutdown	.text	0040A010	000000A5	00000008	00000000	R	.	.	.	.	.	.	.
-jkCog_Initialize	.text	0040A0C0	00000010			R	.	.	.	.	.	.	.
+jkCog_Startup	.text	0040A0C0	00000010			R	.	.	.	.	.	.	.
 jkCog_Shutdown	.text	0040A0D0	00000018			R	.	.	.	.	.	.	.
 jkCog_StringsInit	.text	0040A0F0	00000020			R	.	.	.	.	.	.	.
 jkCog_RegisterVerbs	.text	0040A110	000002C8	00000004	00000000	R	.	.	.	.	.	T	.
@@ -192,7 +192,7 @@ jkCog_StringConcatVector	.text	0040B1C0	000000A1	0000012C	00000004	R	.	.	.	.	.	T
 jkCog_StringOutput	.text	0040B270	00000132	0000008C	00000004	R	.	.	.	.	.	T	.
 jkCog_GetSaberCam	.text	0040B3B0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 jkCog_GetChoice	.text	0040B3D0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
-jkStrings_Initialize	.text	0040B3F0	0000001D			R	.	.	.	.	.	.	.
+jkStrings_Startup	.text	0040B3F0	0000001D			R	.	.	.	.	.	.	.
 jkStrings_Shutdown	.text	0040B410	00000018			R	.	.	.	.	.	.	.
 jkStrings_GetText2	.text	0040B430	00000027	00000004	00000004	R	.	.	.	.	.	T	.
 jkStrings_GetText	.text	0040B460	00000027	00000004	00000004	R	.	.	.	.	.	.	.
@@ -281,19 +281,19 @@ jkAI_ForcePowers	.text	0040FF40	00000192	00000028	00000014	R	.	.	.	.	.	T	.
 jkAI_SaberMove	.text	004100E0	00000003	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_Show	.text	004100F0	000000FD	00000008	00000000	R	.	.	.	.	.	.	.
 jkGuiMain_ShowCutscenes	.text	00410210	0000028F	0000016C	00000000	R	.	.	.	.	.	.	.
-jkGuiMain_Initialize	.text	004104A0	00000014			R	.	.	.	.	.	.	.
+jkGuiMain_Startup	.text	004104A0	00000014			R	.	.	.	.	.	.	.
 jkGuiMain_Shutdown	.text	004104C0	00000001			R	.	.	.	.	.	.	.
 jkGuiMain_PopulateCutscenes	.text	004104D0	000000DC	00000048	00000008	R	.	.	.	.	.	.	.
 jkGuiMain_FreeCutscenes	.text	004105B0	00000034	00000008	00000004	R	.	.	.	.	.	.	.
-jkGuiPlayer_Initialize	.text	004105F0	00000032			R	.	.	.	.	.	.	.
+jkGuiPlayer_Startup	.text	004105F0	00000032			R	.	.	.	.	.	.	.
 jkGuiPlayer_Shutdown	.text	00410630	0000000B			R	.	.	.	.	.	.	.
 jkGuiPlayer_sub_410640	.text	00410640	00000221	000003C4	00000008	R	.	.	.	.	.	T	.
 jkGuiPlayer_ShowNewPlayer	.text	00410870	00000481	00000674	00000004	R	.	.	.	.	.	.	.
 jkGuiPlayer_DifficultyDraw	.text	00410D10	0000005B	00000000	00000010	R	.	.	.	.	.	T	.
-jkGuiSound_Initialize	.text	00410D70	000000B4			R	.	.	.	.	.	.	.
+jkGuiSound_Startup	.text	00410D70	000000B4			R	.	.	.	.	.	.	.
 jkGuiSound_Shutdown	.text	00410E30	0000003C			R	.	.	.	.	.	T	.
 jkGuiSound_Show	.text	00410E70	00000184	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiNetHost_Initialize	.text	00411000	00000103	00000004	00000000	R	.	.	.	.	.	T	.
+jkGuiNetHost_Startup	.text	00411000	00000103	00000004	00000000	R	.	.	.	.	.	T	.
 jkGuiNetHost_Shutdown	.text	00411110	000000A8			R	.	.	.	.	.	T	.
 jkGuiNetHost_Show	.text	004111C0	000006FF	00000180	00000004	R	.	.	.	.	.	T	.
 jkGuiNetHost_sub_4118C0	.text	004118C0	00000103	00000048	00000004	R	.	.	.	.	.	T	.
@@ -314,11 +314,11 @@ jkGuiKeyboard_CancelClicked	.text	004126F0	00000049	00000000	00000008	R	.	.	.	.	
 jkGuiKeyboard_ControlListClicked	.text	00412740	0000007D	00000000	00000014	R	.	.	.	.	.	T	.
 jkGuiKeyboard_RestoreDefaultsClicked	.text	004127C0	0000006E	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiKeyboard_Show	.text	00412830	00000138	00000010	00000000	R	.	.	.	.	.	.	.
-jkGuiKeyboard_Initialize	.text	00412970	00000014	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiKeyboard_Startup	.text	00412970	00000014	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiKeyboard_Shutdown	.text	00412990	00000001			R	.	.	.	.	.	.	.
 jkGui_InitMenu	.text	004129A0	0000006D	00000004	00000008	R	.	.	.	.	.	T	.
 jkGui_MessageBeep	.text	00412A10	00000009			R	.	.	.	.	.	.	.
-jkGui_Initialize	.text	00412A20	0000014C	000000A4	00000000	R	.	.	.	.	.	.	.
+jkGui_Startup	.text	00412A20	0000014C	000000A4	00000000	R	.	.	.	.	.	.	.
 jkGui_Shutdown	.text	00412B70	00000085	00000024	00000000	R	.	.	.	.	.	T	.
 jkGui_SetModeMenu	.text	00412C00	000001E2	00000074	00000004	R	.	.	.	.	.	T	.
 jkGui_SetModeGame	.text	00412DF0	00000028			R	.	.	.	.	.	.	.
@@ -328,9 +328,9 @@ jkGui_sub_412EC0	.text	00412EC0	00000006	00000000	00000000	R	.	.	.	.	.	.	.
 jkGui_sub_412ED0	.text	00412ED0	00000013			R	.	.	.	.	.	.	.
 jkGuiSetup_sub_412EF0	.text	00412EF0	0000004A	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiSetup_Show	.text	00412F40	000001CD	00000008	00000000	R	.	.	.	.	.	.	.
-jkGuiSetup_Initialize	.text	00413140	00000028			R	.	.	.	.	.	.	.
+jkGuiSetup_Startup	.text	00413140	00000028			R	.	.	.	.	.	.	.
 jkGuiSetup_Shutdown	.text	00413170	00000001			R	.	.	.	.	.	.	.
-jkGuiMultiplayer_Initialize	.text	00413180	00000059			R	.	.	.	.	.	.	.
+jkGuiMultiplayer_Startup	.text	00413180	00000059			R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Shutdown	.text	004131E0	0000000B			R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Show	.text	004131F0	000006E5	00000264	00000000	R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Show2	.text	00413960	00000234	00000148	00000000	R	.	.	.	.	.	.	.
@@ -343,7 +343,7 @@ jkGuiMultiplayer_sub_413E50	.text	00413E50	0000025A	00000028	00000004	R	.	.	.	.	
 jkGuiMultiplayer_sub_4140B0	.text	004140B0	00000175	00000004	00000004	R	.	.	.	.	.	T	.
 jkGuiMultiplayer_idk	.text	00414230	00000089	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiMultiplayer_sub_4142C0	.text	004142C0	00000051	00000000	00000004	R	.	.	.	.	.	T	.
-jkGuiDisplay_Initialize	.text	00414320	000005C8	00000080	00000000	R	.	.	.	.	.	T	.
+jkGuiDisplay_Startup	.text	00414320	000005C8	00000080	00000000	R	.	.	.	.	.	T	.
 jkGuiDisplay_Shutdown	.text	004148F0	000000C1			R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_4149C0	.text	004149C0	00000047	00000004	00000000	R	.	.	.	.	.	T	.
 jkGuiDisplay_Show	.text	00414A10	0000024C	00000154	00000000	R	.	.	.	.	.	.	.
@@ -354,7 +354,7 @@ jkGuiDisplay_sub_415210	.text	00415210	000000C6	00000088	0000000C	R	.	.	.	.	.	.	
 jkGuiDisplay_sub_4152E0	.text	004152E0	00000130	00000098	0000000C	R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_415410	.text	00415410	00000209			R	.	.	.	.	.	.	.
 jkGuiDisplay_sub_415620	.text	00415620	0000004C	00000000	00000008	R	.	.	.	.	.	.	.
-jkGuiMap_Initialize	.text	00415670	00000014			R	.	.	.	.	.	.	.
+jkGuiMap_Startup	.text	00415670	00000014			R	.	.	.	.	.	.	.
 jkGuiMap_Shutdown	.text	00415690	00000001			R	.	.	.	.	.	.	.
 jkGuiMap_DrawMapScreen	.text	004156A0	00000078	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiMap_sub_415720	.text	00415720	000003E0	00000020	00000004	R	.	.	.	.	.	T	.
@@ -369,11 +369,11 @@ jkGuiForce_ExtraClick	.text	00416240	00000003	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiForce_ButtonClick	.text	00416250	0000015A	00000014	00000008	R	.	.	.	.	.	T	.
 jkGuiForce_ResetClick	.text	004163B0	000000CE	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiForce_Show	.text	00416480	0000032F	00000018	00000018	R	.	.	.	.	.	T	.
-jkGuiForce_Initialize	.text	004167B0	00000077	00000084	00000000	R	.	.	.	.	.	T	.
+jkGuiForce_Startup	.text	004167B0	00000077	00000084	00000000	R	.	.	.	.	.	T	.
 jkGuiForce_Shutdown	.text	00416830	00000028	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiForce_UpdateViewForRank	.text	00416860	00000051	00000000	00000000	R	.	.	.	.	.	T	.
 jkGuiForce_DarkLightHoverDraw	.text	004168C0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiDialog_Initialize	.text	004168D0	0000001F			R	.	.	.	.	.	.	.
+jkGuiDialog_Startup	.text	004168D0	0000001F			R	.	.	.	.	.	.	.
 jkGuiDialog_Shutdown	.text	004168F0	00000001			R	.	.	.	.	.	.	.
 jkGuiDialog_sub_416900	.text	00416900	00000062	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiDialog_OkCancelDialog	.text	00416970	00000120	00000008	00000008	R	.	.	.	.	.	T	.
@@ -391,24 +391,24 @@ jkGuiMouse_RemoveClicked	.text	004176B0	00000065	00000004	00000014	R	.	.	.	.	.	T
 jkGuiMouse_CancelOkClicked	.text	00417720	0000013D	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiMouse_RestoreDefaultsClicked	.text	00417860	00000068	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiMouse_Show	.text	004178D0	000001FE	0000000C	00000000	R	.	.	.	.	.	.	.
-jkGuiMouse_Initialize	.text	00417AD0	00000014			R	.	.	.	.	.	.	.
+jkGuiMouse_Startup	.text	00417AD0	00000014			R	.	.	.	.	.	.	.
 jkGuiMouse_Shutdown	.text	00417AF0	00000001			R	.	.	.	.	.	.	.
 jkGuiObjectives_CustomRender	.text	00417B00	000001DA	0000002C	00000010	R	.	.	.	.	.	T	.
 jkGuiObjectives_Show	.text	00417CE0	00000119	0000008C	00000000	R	.	.	.	.	.	.	.
-jkGuiObjectives_Initialize	.text	00417E00	00000014			R	.	.	.	.	.	.	.
+jkGuiObjectives_Startup	.text	00417E00	00000014			R	.	.	.	.	.	.	.
 jkGuiObjectives_Shutdown	.text	00417E20	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Show	.text	00417E30	00000187	00000048	00000000	R	.	.	.	.	.	.	.
-jkGuiSingleTally_Initialize	.text	00417FC0	0000002A			R	.	.	.	.	.	.	.
+jkGuiSingleTally_Startup	.text	00417FC0	0000002A			R	.	.	.	.	.	.	.
 jkGuiSingleTally_Shutdown	.text	00417FF0	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleTally_ForceStarsRender	.text	00418000	00000069	0000000C	0000000C	R	.	.	.	.	.	T	.
 jkGuiMultiTally_Show	.text	00418070	00000525	00029EA0	00000004	R	.	.	.	.	.	.	.
 jkGuiMultiTally_SortPlayerScore	.text	004185A0	00000098	00000008	00000008	R	.	.	.	.	.	T	.
-jkGuiMultiTally_Initialize	.text	00418640	0000003C			R	.	.	.	.	.	.	.
+jkGuiMultiTally_Startup	.text	00418640	0000003C			R	.	.	.	.	.	.	.
 jkGuiMultiTally_Shutdown	.text	00418680	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiMultiTally_ShowTeamScores	.text	00418690	000001CF	00000860	00000004	R	.	.	.	.	.	.	.
 jkGuiMultiTally_SortTeamScore	.text	00418870	0000003C	00000004	00000008	R	.	.	.	.	.	T	.
 jkGuiMultiTally_sub_4188B0	.text	004188B0	000000A5	00000004	00000004	R	.	.	.	.	.	T	.
-jkGuiTitle_Initialize	.text	00418960	00000028			R	.	.	.	.	.	.	.
+jkGuiTitle_Startup	.text	00418960	00000028			R	.	.	.	.	.	.	.
 jkGuiTitle_Shutdown	.text	00418990	00000001			R	.	.	.	.	.	.	.
 jkGuiTitle_sub_4189A0	.text	004189A0	00000023	00000004	00000004	R	.	.	.	.	.	T	.
 jkGuiTitle_quicksave_related_func1	.text	004189D0	000000C4	0000008C	00000008	R	.	.	.	.	.	T	.
@@ -418,7 +418,7 @@ jkGuiTitle_WorldLoadCallback	.text	00418C60	00000085	00000000	00000004	R	.	.	.	.
 jkGuiTitle_ShowLoadingStatic	.text	00418CF0	00000081	00000020	00000000	R	.	.	.	.	.	.	.
 jkGuiTitle_ShowLoading	.text	00418D80	00000121	0000008C	00000008	R	.	.	.	.	.	T	.
 jkGuiTitle_LoadingFinalize	.text	00418EB0	00000014	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_InitializeEditCharacter	.text	00418ED0	00000014			R	.	.	.	.	.	.	.
+jkGuiBuildMulti_StartupEditCharacter	.text	00418ED0	00000014			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_ShutdownEditCharacter	.text	00418EF0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiBuildMulti_ModelLoader	.text	00418F00	00000054	00000084	00000004	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_MatLoader	.text	00418F60	00000080	00000088	00000004	R	.	.	.	.	.	T	.
@@ -432,13 +432,13 @@ jkGuiBuildMulti_ModelDrawer	.text	00419DB0	000002E9	0000001C	0000000C	R	.	.	.	.	
 jkGuiBuildMulti_SaberDrawer	.text	0041A0A0	0000007B	00000014	0000000C	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_sub_41A120	.text	0041A120	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_SaberButtonClicked	.text	0041A140	000001AC	00000010	00000008	R	.	.	.	.	.	T	.
-jkGuiGeneral_Initialize	.text	0041A300	00000014			R	.	.	.	.	.	.	.
+jkGuiGeneral_Startup	.text	0041A300	00000014			R	.	.	.	.	.	.	.
 jkGuiGeneral_Shutdown	.text	0041A320	00000001			R	.	.	.	.	.	.	.
 jkGuiGeneral_Show	.text	0041A330	000000B0	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiDecision_Initialize	.text	0041A3E0	00000014			R	.	.	.	.	.	.	.
+jkGuiDecision_Startup	.text	0041A3E0	00000014			R	.	.	.	.	.	.	.
 jkGuiDecision_Shutdown	.text	0041A400	00000001			R	.	.	.	.	.	.	.
 jkGuiDecision_Show	.text	0041A410	00000030	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiSingleplayer_Initialize	.text	0041A440	00000050			R	.	.	.	.	.	.	.
+jkGuiSingleplayer_Startup	.text	0041A440	00000050			R	.	.	.	.	.	.	.
 jkGuiSingleplayer_Shutdown	.text	0041A490	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleplayer_Show	.text	0041A4A0	0000050D	000001D8	00000000	R	.	.	.	.	.	.	.
 jkGuiSingleplayer_EnumEpisodes	.text	0041A9B0	00000077	0000000C	00000010	R	.	.	.	.	.	T	.
@@ -462,15 +462,15 @@ jkGuiJoystick_CalibrateClick	.text	0041BB30	00000021	00000000	00000014	R	.	.	.	.
 jkGuiJoystick_MenuTick	.text	0041BB60	00000396	00000024	00000004	R	.	.	.	.	.	T	.
 jkGuiJoystick_Show	.text	0041BF00	00000265	0000000C	00000000	R	.	.	.	.	.	.	.
 jkGuiJoystick_DisableJoystickClick	.text	0041C170	0000004A	00000000	00000014	R	.	.	.	.	.	T	.
-jkGuiJoystick_Initialize	.text	0041C1C0	00000014			R	.	.	.	.	.	.	.
+jkGuiJoystick_Startup	.text	0041C1C0	00000014			R	.	.	.	.	.	.	.
 jkGuiJoystick_Shutdown	.text	0041C1E0	00000001			R	.	.	.	.	.	.	.
-jkGuiGameplay_Initialize	.text	0041C1F0	00000014			R	.	.	.	.	.	.	.
+jkGuiGameplay_Startup	.text	0041C1F0	00000014			R	.	.	.	.	.	.	.
 jkGuiGameplay_Shutdown	.text	0041C210	00000001			R	.	.	.	.	.	.	.
 jkGuiGameplay_Show	.text	0041C220	0000029D	00000008	00000000	R	.	.	.	.	.	.	.
-jkGuiControlOptions_Initialize	.text	0041C4C0	00000014			R	.	.	.	.	.	.	.
+jkGuiControlOptions_Startup	.text	0041C4C0	00000014			R	.	.	.	.	.	.	.
 jkGuiControlOptions_Shutdown	.text	0041C4E0	00000001			R	.	.	.	.	.	.	.
 jkGuiControlOptions_Show	.text	0041C4F0	000000F0	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiBuildMulti_Initialize	.text	0041C5E0	00000046			R	.	.	.	.	.	.	.
+jkGuiBuildMulti_Startup	.text	0041C5E0	00000046			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Shutdown	.text	0041C630	0000000B			R	.	.	.	.	.	.	.
 jkGuiBuildMulti_Load	.text	0041C640	000000B8	00000108	00000014	R	.	.	.	.	.	T	.
 jkGuiBuildMulti_Show	.text	0041C700	0000031F	000003EC	00000000	R	.	.	.	.	.	.	.
@@ -487,13 +487,13 @@ jkGuiSaveLoad_PopulateList	.text	0041DDD0	00000205	000007D0	00000000	R	.	.	.	.	.
 jkGuiSaveLoad_SaveSort	.text	0041DFE0	00000029	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_Show	.text	0041E010	00000419	00000294	00000004	R	.	.	.	.	.	T	.
 jkGuiSaveLoad_PopulateInfoInit	.text	0041E430	0000000D	00000000	00000000	R	.	.	.	.	.	T	.
-jkGuiSaveLoad_Initialize	.text	0041E440	00000014			R	.	.	.	.	.	.	.
+jkGuiSaveLoad_Startup	.text	0041E440	00000014			R	.	.	.	.	.	.	.
 jkGuiSaveLoad_Shutdown	.text	0041E460	00000001			R	.	.	.	.	.	.	.
 jkGuiControlSaveLoad_sub_41E470	.text	0041E470	0000007E	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiControlSaveLoad_ConfirmDelete	.text	0041E4F0	00000144	00000084	00000008	R	.	.	.	.	.	T	.
 jkGuiControlSaveLoad_FindFile	.text	0041E640	0000019F	00000218	00000000	R	.	.	.	.	.	T	.
 jkGuiControlSaveLoad_Write	.text	0041E7E0	000003BC	00000198	00000004	R	.	.	.	.	.	T	.
-jkGuiControlSaveLoad_Initialize	.text	0041EBA0	00000014			R	.	.	.	.	.	.	.
+jkGuiControlSaveLoad_Startup	.text	0041EBA0	00000014			R	.	.	.	.	.	.	.
 jkGuiControlSaveLoad_Shutdown	.text	0041EBC0	00000001			R	.	.	.	.	.	.	.
 WinMain(x,x,x,x)	.text	0041EBD0	00000026	00000000	00000010	R	.	.	.	.	.	T	.
 Windows_Startup	.text	0041EC00	0000007B	00000080	00000000	R	.	.	.	.	.	.	.
@@ -548,14 +548,14 @@ jkDev_CmdTeam	.text	00420F80	0000004D	00000000	00000008	R	.	.	.	.	.	T	.
 jkDev_DialogFunc	.text	00420FD0	000000F2	00000408	0000000C	R	.	.	.	.	.	T	.
 jkDev_UpdateEntries	.text	004210D0	000000B7	0000000C	00000000	R	.	.	.	.	.	.	.
 jkDev_DrawEntries	.text	00421190	000000BF	00000018	00000000	R	.	.	.	.	.	T	.
-jkCutscene_Initialize	.text	00421250	0000007E	00000000	00000004	R	.	.	.	.	.	T	.
+jkCutscene_Startup	.text	00421250	0000007E	00000000	00000004	R	.	.	.	.	.	T	.
 jkCutscene_Shutdown	.text	004212D0	00000034			R	.	.	.	.	.	.	.
 jkCutscene_sub_421310	.text	00421310	000000FF	00000084	00000004	R	.	.	.	.	.	.	.
 jkCutscene_sub_421410	.text	00421410	00000036			R	.	.	.	.	.	.	.
 jkCutscene_smack_related_loops	.text	00421450	00000102	00000004	00000000	R	.	.	.	.	.	.	.
 jkCutscene_PauseShow	.text	00421560	0000005E			R	.	.	.	.	.	.	.
 jkCutscene_Handler	.text	004215C0	000000FC	00000004	0000000C	R	.	.	.	.	.	T	.
-jkCredits_Initialize	.text	004216C0	00000049	00000000	00000004	R	.	.	.	.	.	T	.
+jkCredits_Startup	.text	004216C0	00000049	00000000	00000004	R	.	.	.	.	.	T	.
 jkCredits_Shutdown	.text	00421710	00000050			R	.	.	.	.	.	.	.
 jkCredits_Show	.text	00421760	00000358	000000C4	00000000	R	.	.	.	.	.	.	.
 jkCredits_Skip	.text	00421AC0	00000086	00000004	00000000	R	.	.	.	.	.	.	.
@@ -618,7 +618,7 @@ DirectDraw_blitidk	.text	004265B0	00000072	00000404	00000004	R	.	.	.	.	.	.	.
 DirectDraw_setformatidk	.text	00426630	00000012	00000000	00000000	R	.	.	.	.	.	.	.
 DirectDraw_CreateGDISurface	.text	00426650	0000008F	00000000	00000010	R	.	.	.	.	.	T	.
 DirectDraw_ReleaseGDISurface	.text	004266E0	0000002D	00000000	00000000	R	.	.	.	.	.	.	.
-smack_Initialize	.text	00426710	0000000B			R	.	.	.	.	.	.	.
+smack_Startup	.text	00426710	0000000B			R	.	.	.	.	.	.	.
 smack_Shutdown	.text	00426720	0000000B			R	.	.	.	.	.	.	.
 smack_idk	.text	00426730	00000201	00000060	00000014	R	.	.	.	.	.	T	.
 smack_sub_426940	.text	00426940	00000072			R	.	.	.	.	.	.	.
@@ -806,7 +806,7 @@ util_unkcomparison2	.text	0042F750	0000004D	00000008	00000008	R	.	.	.	.	.	.	.
 util_unkcomparison3	.text	0042F7A0	00000065	0000000C	00000008	R	.	.	.	.	.	.	.
 util_Weirdchecksum	.text	0042F810	00000027	00000000	0000000C	R	.	.	.	.	.	T	.
 DirectPlay_EarlyInit	.text	0042F840	000001F3	00000074	00000008	R	.	.	.	.	.	T	.
-DirectPlay_Initialize	.text	0042FA40	00000065	00000008	00000000	R	.	.	.	.	.	.	.
+DirectPlay_Startup	.text	0042FA40	00000065	00000008	00000000	R	.	.	.	.	.	.	.
 DirectPlay_Destroy	.text	0042FAB0	00000051	00000008	00000000	R	.	.	.	.	.	.	.
 DirectPlay_InitConnection	.text	0042FB10	00000062	00000004	00000004	R	.	.	.	.	.	.	.
 DirectPlay_CloseConnection	.text	0042FB80	0000002E			R	.	.	.	.	.	.	.
@@ -961,7 +961,7 @@ stdGdi_GetHInstance	.text	00436D40	00000006			R	.	.	.	.	.	.	.
 WinIdk_SetDplayGuid	.text	00436D50	00000028	00000000	00000004	R	.	.	.	.	.	T	.
 WinIdk_GetDplayGuid	.text	00436D80	00000006			R	.	.	.	.	.	T	.
 WinIdk_PrintConsole	.text	00436D90	000000E3	0000006C	0000000C	R	.	.	.	.	.	T	.
-stdSound_Initialize	.text	00436E80	00000259	00000068	00000000	R	.	.	.	.	.	.	.
+stdSound_Startup	.text	00436E80	00000259	00000068	00000000	R	.	.	.	.	.	.	.
 stdSound_Shutdown	.text	004370E0	0000006B	00000004	00000000	R	.	.	.	.	.	T	.
 stdSound_SetMenuVolume	.text	00437150	00000031	00000004	00000004	R	.	.	.	.	.	T	.
 stdSound_BufferCreate	.text	00437190	00000137	0000002C	00000010	R	.	.	.	.	.	T	.
@@ -1813,7 +1813,7 @@ sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 sithPlayer_Close	.text	004C8620	00000042			R	.	.	.	.	.	.	.
 sithPlayer_NewEntry	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
-sithPlayer_Initialize	.text	004C8750	00000068	00000004	00000004	R	.	.	.	.	.	T	.
+sithPlayer_Startup	.text	004C8750	00000068	00000004	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C87C0	.text	004C87C0	0000004E	00000000	00000008	R	.	.	.	.	.	T	.
 sithPlayer_idk	.text	004C8810	000000B3	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_ResetPalEffects	.text	004C88D0	00000032			R	.	.	.	.	.	T	.
@@ -2036,7 +2036,7 @@ sithWeapon_Collide	.text	004D48C0	0000057D	0000001C	00000010	R	.	.	.	.	.	T	.
 sithWeapon_HitDebug	.text	004D4E40	00000317	0000000C	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_Remove	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	T	.
 sithWeapon_RemoveAndExplode	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	T	.
-sithWeapon_InitializeEntry	.text	004D5270	0000004B			R	.	.	.	.	.	.	.
+sithWeapon_StartupEntry	.text	004D5270	0000004B			R	.	.	.	.	.	.	.
 sithWeapon_ShutdownEntry	.text	004D52C0	00000001			R	.	.	.	.	.	.	.
 sithWeapon_SelectWeapon	.text	004D52D0	00000182	00000010	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_SetMountWait	.text	004D5460	00000011	00000000	00000008	R	.	.	.	.	.	T	.
@@ -2056,7 +2056,7 @@ sithWeapon_ReadConf	.text	004D6430	0000023F	0000000C	00000000	R	.	.	.	.	.	.	.
 sithWeapon_Syncunused1	.text	004D6670	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
 sithWeapon_Syncunused2	.text	004D6750	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
 sithWeapon_SetFireRate	.text	004D6830	0000000A	00000000	00000008	R	.	.	.	.	.	T	.
-sithControl_Initialize	.text	004D6840	0000003D	00000004	00000000	R	.	.	.	.	.	.	.
+sithControl_Startup	.text	004D6840	0000003D	00000004	00000000	R	.	.	.	.	.	.	.
 sithControl_Shutdown	.text	004D6880	00000021	00000000	00000000	R	.	.	.	.	.	.	.
 sithControl_Open	.text	004D68B0	0000001F			R	.	.	.	.	.	.	.
 sithControl_Close	.text	004D68D0	00000026			R	.	.	.	.	.	T	.
@@ -2089,7 +2089,7 @@ sithControl_HandlePlayer	.text	004D8520	000004DB	00000048	00000008	R	.	.	.	.	.	T
 sithControl_PlayerMovement	.text	004D8A00	0000028C	0000000C	00000004	R	.	.	.	.	.	T	.
 sithControl_FreeCam	.text	004D8C90	000002AF	00000040	00000004	R	.	.	.	.	.	T	.
 sithControl_PlayerLook	.text	004D8F40	00000232	00000014	00000008	R	.	.	.	.	.	T	.
-sithOverlayMap_Initialize	.text	004D9180	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
+sithOverlayMap_Startup	.text	004D9180	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithOverlayMap_Shutdown	.text	004D91B0	00000017			R	.	.	.	.	.	.	.
 sithOverlayMap_ToggleMapDrawn	.text	004D91D0	00000013			R	.	.	.	.	.	T	.
 sithOverlayMap_FuncIncrease	.text	004D91F0	00000064			R	.	.	.	.	.	.	.
@@ -2098,7 +2098,7 @@ sithOverlayMap_Render1	.text	004D92C0	0000023F	00000024	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render2	.text	004D9500	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
 sithOverlayMap_Render3	.text	004D9560	000006DE	00000068	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render4	.text	004D9C40	0000016A	00000024	0000000C	R	.	.	.	.	.	T	.
-sithConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
+sithConsole_Startup	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
 sithConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
 sithConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
 sithConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
@@ -2210,7 +2210,7 @@ sithCogScript_TimerTick	.text	004E0640	00000078	00000004	00000008	R	.	.	.	.	.	T	
 sithCogScript_RegisterGlobalMessage	.text	004E06C0	0000003B	00000010	0000000C	R	.	.	.	.	.	.	.
 sithCogScript_RegisterVerb	.text	004E0700	0000003B	00000010	0000000C	R	.	.	.	.	.	T	.
 sithThing_Release	.text	004E0740	00000034	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionPlayer_Initialize	.text	004E0780	00000312	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionPlayer_Startup	.text	004E0780	00000312	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SetInvActivate	.text	004E0AA0	00000066	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SetInvAvailable	.text	004E0B10	00000066	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_IsInvActivated	.text	004E0B80	00000060	00000008	00000004	R	.	.	.	.	.	T	.
@@ -2414,7 +2414,7 @@ sithAI_RandomRotationVector	.text	004EB9A0	00000064	00000010	00000004	R	.	.	.	.	
 sithAI_FireWeapon	.text	004EBA10	00000462	00000030	0000001C	R	.	.	.	.	.	T	.
 sithAI_GetThingsInView	.text	004EBE80	000002B4	00000048	0000000C	R	.	.	.	.	.	T	.
 sithAI_sub_4EC140	.text	004EC140	000001EB	00000004	0000000C	R	.	.	.	.	.	T	.
-sithMap_Initialize	.text	004EC330	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
+sithMap_Startup	.text	004EC330	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithMap_Shutdown	.text	004EC360	00000014			R	.	.	.	.	.	.	.
 sithMap_DrawCircle	.text	004EC380	00000150	00000020	00000008	R	.	.	.	.	.	T	.
 sithMap_sub_4EC4D0	.text	004EC4D0	00000074	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2433,7 +2433,7 @@ sithActor_thing_anim_blocked	.text	004ED3F0	0000036D	00000064	0000000C	R	.	.	.	.
 sithActor_Remove	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	T	.
 sithActor_RemoveCorpse	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithActor_LoadParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
-sithCommand_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
+sithCommand_Startup	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
 sithCommand_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
 sithCommand_CmdSession	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
 sithCommand_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
@@ -2686,7 +2686,7 @@ sithCogParse_ParseFlex	.text	004FDE10	00000221	00000028	00000008	R	.	.	.	.	.	T	.
 sithCogParse_ParseInt	.text	004FE040	00000238	00000028	00000008	R	.	.	.	.	.	T	.
 sithCogParse_ParseVector	.text	004FE280	00000246	00000028	00000008	R	.	.	.	.	.	T	.
 sithCogParse_ParseMessage	.text	004FE4D0	000001A1	00000018	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSector_Initialize	.text	004FE680	0000021B	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSector_Startup	.text	004FE680	0000021B	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSector_GetTint	.text	004FE8A0	00000050	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSector_SetTint	.text	004FE8F0	00000102	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSector_GetSectorLight	.text	004FEA00	0000002D	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2708,7 +2708,7 @@ sithCogFunctionSector_GetNumSectorSurfaces	.text	004FEF60	0000002E	00000004	0000
 sithCogFunctionSector_GetSectorVertexPos	.text	004FEF90	00000060	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSector_GetSectorSurfaceRef	.text	004FEFF0	00000050	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSector_SyncSector	.text	004FF040	0000001D	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSound_Initialize	.text	004FF060	000000FE	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSound_Startup	.text	004FF060	000000FE	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_PlaySong	.text	004FF160	00000044	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_PlaySoundThing	.text	004FF1B0	00000245	0000001C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_PlaySoundPos	.text	004FF400	000001A6	00000024	00000004	R	.	.	.	.	.	T	.
@@ -2722,7 +2722,7 @@ sithCogFunctionSound_ChangeSoundPitch	.text	004FF9F0	00000070	00000008	00000004	
 sithCogFunctionSound_SectorSound	.text	004FFA60	0000003D	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_SetMusicVol	.text	004FFAA0	0000005B	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_GetSoundLen	.text	004FFB00	0000004F	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSurface_Initialize	.text	004FFB50	00000325	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSurface_Startup	.text	004FFB50	00000325	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetSurfaceAdjoin	.text	004FFE80	0000003A	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetSurfaceSector	.text	004FFEC0	00000034	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetNumSurfaceVertices	.text	004FFF00	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2760,7 +2760,7 @@ sithCogFunctionSurface_GetSurfaceCenter	.text	00500A20	00000049	00000010	0000000
 sithCogFunctionSurface_GetSurfaceCount	.text	00500A70	0000002E	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetSurfaceNormal	.text	00500AA0	00000031	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_SyncSurface	.text	00500AE0	0000001B	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionAI_Initialize	.text	00500B00	0000015D	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionAI_Startup	.text	00500B00	0000015D	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetMoveSpeed	.text	00500C60	0000006B	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_SetMovePos	.text	00500CD0	00000051	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AIJump	.text	00500D30	00000067	00000014	00000004	R	.	.	.	.	.	T	.
@@ -2780,7 +2780,7 @@ sithCogFunctionAI_sub_501330	.text	00501330	00000086	0000000C	00000004	R	.	.	.	.
 sithCogFunctionAI_IsAITargetInSight	.text	005013C0	00000051	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AIFlee	.text	00501420	00000065	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetClass	.text	00501490	00000047	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionThing_Initialize	.text	005014E0	00000B9B	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionThing_Startup	.text	005014E0	00000B9B	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionThing_GetThingType	.text	00502080	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionThing_CreateThing	.text	005020B0	0000009C	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionThing_CreateThingNr	.text	00502150	0000009C	00000010	00000004	R	.	.	.	.	.	T	.
@@ -2922,7 +2922,7 @@ sithCogFunctionThing_SyncThingPos	.text	00505340	0000001D	00000000	00000004	R	.	
 sithCogFunctionThing_SyncThingAttachment	.text	00505360	00000024	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionThing_SyncThingState	.text	00505390	0000001D	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionThing_GetMajorMode	.text	005053B0	00000048	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogFunction_Initialize	.text	00505400	000008A3	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunction_Startup	.text	00505400	000008A3	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunction_GetSenderId	.text	00505CB0	00000012	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunction_GetSenderRef	.text	00505CD0	00000012	00000000	00000004	R	.	.	.	.	.	.	.
 sithCogFunction_GetSenderType	.text	00505CF0	00000012	00000000	00000004	R	.	.	.	.	.	T	.
@@ -3128,7 +3128,7 @@ jkGuiRend_sub_50FAD0	.text	0050FAD0	0000012B	00000010	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_gui_sets_handler_framebufs	.text	0050FC00	00000145	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_Menuidk	.text	0050FD50	0000005B	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiRend_sub_50FDB0	.text	0050FDB0	0000003A	00000000	00000000	R	.	.	.	.	.	T	.
-jkGuiRend_Initialize	.text	0050FDF0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
+jkGuiRend_Startup	.text	0050FDF0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 jkGuiRend_Shutdown	.text	0050FE00	0000000B			R	.	.	.	.	.	.	.
 jkGuiRend_Open	.text	0050FE10	00000028	00000000	0000000C	R	.	.	.	.	.	T	.
 jkGuiRend_Close	.text	0050FE40	0000001C			R	.	.	.	.	.	T	.

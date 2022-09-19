@@ -73,7 +73,7 @@ stdPlatform_LockHandle
 stdPlatform_UnlockHandle
 stdPlatform_GetTimeMsec
 stdPlatform_GetDateTime
-smack_Initialize
+smack_Startup
 smack_Shutdown
 smack_idk
 smack_sub_426940
@@ -117,7 +117,7 @@ rdActive_AddActiveFace
 rdCache_DrawFaceN
 rdCache_DrawFaceZ
 rdCache_DrawFaceUser
-stdSound_Initialize
+stdSound_Startup
 stdSound_Shutdown
 stdSound_SetMenuVolume
 stdSound_BufferCreate
@@ -169,7 +169,7 @@ stdComm_Open
 stdComm_Close
 stdComm_EnumSessions
 DirectPlay_EarlyInit
-DirectPlay_Initialize
+DirectPlay_Startup
 DirectPlay_Destroy
 DirectPlay_InitConnection
 DirectPlay_CloseConnection
@@ -199,7 +199,7 @@ DirectPlay_EnumSessionsCallback
 DirectPlay_EnumPlayersCallback
 DirectPlay_sub_4308C0
 DirectPlay_parseSessionDescidk
-jkGuiDisplay_Initialize
+jkGuiDisplay_Startup
 jkGuiDisplay_Shutdown
 jkGuiDisplay_sub_4149C0
 jkGuiDisplay_Show

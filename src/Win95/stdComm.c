@@ -11,7 +11,7 @@ int stdComm_Startup()
         return 0;
 
 #ifdef TARGET_HAS_DPLAY
-    DirectPlay_Initialize();
+    DirectPlay_Startup();
 #endif
 
 #ifdef PLATFORM_BASICSOCKETS
