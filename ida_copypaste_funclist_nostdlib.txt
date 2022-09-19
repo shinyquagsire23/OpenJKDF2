@@ -207,38 +207,38 @@ jkSaber_UpdateCollision	.text	0040B860	000006D8	000000D0	00000008	R	.	.	.	.	.	T	
 jkSaber_SpawnSparks	.text	0040BF40	0000007F	00000004	00000010	R	.	.	.	.	.	T	.
 jkSaber_Enable	.text	0040BFC0	00000055	00000004	00000010	R	.	.	.	.	.	T	.
 jkSaber_Disable	.text	0040C020	00000015	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_Startup	.text	0040C040	000000F7			R	.	.	.	.	.	.	.
-jkSaber_Shutdown	.text	0040C140	00000001			R	.	.	.	.	.	.	.
-jkSaber_idk4	.text	0040C150	000000D0	00000000	00000000	R	.	.	.	.	.	T	.
-jkSaber_playerconfig_idksync	.text	0040C220	0000014F	00000008	00000000	R	.	.	.	.	.	T	.
-jkSaber_player_thingsidkfunc	.text	0040C370	00000015	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_nullsub_2	.text	0040C390	00000001			R	.	.	.	.	.	.	.
-jkSaber_Write	.text	0040C3A0	0000001F	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_Load	.text	0040C3C0	00000032	00000020	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_wrap_SendSaberInfo_alt	.text	0040C400	00000023			R	.	.	.	.	.	.	.
-jkSaber_cogMsg_SendSaberInfo_alt	.text	0040C430	000000C5	00000004	00000014	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetSaberInfo	.text	0040C500	000000C0	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetSaberInfo	.text	0040C5C0	0000027E	00000098	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKEnableSaber	.text	0040C840	0000006D	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKEnableSaber	.text	0040C8B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetSaberInfo2	.text	0040C920	000001DF	00000008	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetSaberInfo2	.text	0040CB00	000001AE	00000054	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKSetWeaponMesh	.text	0040CCB0	0000007F	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKSetWeaponMesh	.text	0040CD30	0000007C	00000010	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendHudTarget	.text	0040CDB0	00000084	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_HandleHudTarget	.text	0040CE40	00000062	00000004	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx32	.text	0040CEB0	000000EF	00000004	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Handlex32	.text	0040CFA0	000000D3	0000000C	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx33	.text	0040D080	00000064	00000000	0000000E	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Handlex33	.text	0040D0F0	0000009D	00000008	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_Sendx36	.text	0040D190	0000005D	00000000	00000000	R	.	.	.	.	.	.	.
-jkSaber_cogMsg_Handlex36_setwaggle	.text	0040D1F0	00000032	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendJKPrintUniString	.text	0040D230	00000074	00000000	00000008	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleJKPrintUniString	.text	0040D2B0	00000054	00000040	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendEndLevel	.text	0040D310	0000008C			R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleEndLevel	.text	0040D3A0	00000040	00000000	00000004	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_SendSetTeam	.text	0040D3E0	00000068	00000000	00000002	R	.	.	.	.	.	T	.
-jkSaber_cogMsg_HandleSetTeam	.text	0040D450	000000BB	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Startup	.text	0040C040	000000F7			R	.	.	.	.	.	.	.
+jkDSS_Shutdown	.text	0040C140	00000001			R	.	.	.	.	.	.	.
+jkDSS_idk4	.text	0040C150	000000D0	00000000	00000000	R	.	.	.	.	.	T	.
+jkDSS_playerconfig_idksync	.text	0040C220	0000014F	00000008	00000000	R	.	.	.	.	.	T	.
+jkDSS_player_thingsidkfunc	.text	0040C370	00000015	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_nullsub_2	.text	0040C390	00000001			R	.	.	.	.	.	.	.
+jkDSS_Write	.text	0040C3A0	0000001F	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_Load	.text	0040C3C0	00000032	00000020	00000000	R	.	.	.	.	.	.	.
+jkDSS_wrap_SendSaberInfo_alt	.text	0040C400	00000023			R	.	.	.	.	.	.	.
+jkDSS_SendSaberInfo_alt	.text	0040C430	000000C5	00000004	00000014	R	.	.	.	.	.	T	.
+jkDSS_SendSetSaberInfo	.text	0040C500	000000C0	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetSaberInfo	.text	0040C5C0	0000027E	00000098	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKEnableSaber	.text	0040C840	0000006D	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKEnableSaber	.text	0040C8B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendSetSaberInfo2	.text	0040C920	000001DF	00000008	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetSaberInfo2	.text	0040CB00	000001AE	00000054	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKSetWeaponMesh	.text	0040CCB0	0000007F	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKSetWeaponMesh	.text	0040CD30	0000007C	00000010	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendHudTarget	.text	0040CDB0	00000084	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_ProcessHudTarget	.text	0040CE40	00000062	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx32	.text	0040CEB0	000000EF	00000004	00000004	R	.	.	.	.	.	T	.
+jkDSS_Processx32	.text	0040CFA0	000000D3	0000000C	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx33	.text	0040D080	00000064	00000000	0000000E	R	.	.	.	.	.	T	.
+jkDSS_Processx33	.text	0040D0F0	0000009D	00000008	00000004	R	.	.	.	.	.	T	.
+jkDSS_Sendx36	.text	0040D190	0000005D	00000000	00000000	R	.	.	.	.	.	.	.
+jkDSS_Processx36_setwaggle	.text	0040D1F0	00000032	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendJKPrintUniString	.text	0040D230	00000074	00000000	00000008	R	.	.	.	.	.	T	.
+jkDSS_ProcessJKPrintUniString	.text	0040D2B0	00000054	00000040	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendEndLevel	.text	0040D310	0000008C			R	.	.	.	.	.	T	.
+jkDSS_ProcessEndLevel	.text	0040D3A0	00000040	00000000	00000004	R	.	.	.	.	.	T	.
+jkDSS_SendSetTeam	.text	0040D3E0	00000068	00000000	00000002	R	.	.	.	.	.	T	.
+jkDSS_ProcessSetTeam	.text	0040D450	000000BB	00000004	00000004	R	.	.	.	.	.	T	.
 jkEpisode_Startup	.text	0040D510	00000013			R	.	.	.	.	.	.	.
 jkEpisode_Shutdown	.text	0040D530	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkEpisode_UpdateExtra	.text	0040D540	00000017	00000000	00000004	R	.	.	.	.	.	T	.
@@ -336,7 +336,7 @@ jkGuiMultiplayer_Show	.text	004131F0	000006E5	00000264	00000000	R	.	.	.	.	.	.	.
 jkGuiMultiplayer_Show2	.text	00413960	00000234	00000148	00000000	R	.	.	.	.	.	.	.
 jkGuiMultiplayer_ShowSynchronizing	.text	00413BA0	00000067	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiMultiplayer_ShowWaitHostSettings	.text	00413C10	00000067	00000004	00000000	R	.	.	.	.	.	.	.
-jkGuiMultiplayer_sub_413C80	.text	00413C80	00000062	00000008	0000000C	R	.	.	.	.	.	T	.
+jkGuiMultiplayer_sub_413C80	.text	00413C80	00000062	00000008	0000000C	R	.	.	.	.	.	.	.
 jkGuiMultiplayer_CogMsgHandleJoining	.text	00413CF0	000000F4	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiMultiplayer_sub_413E00	.text	00413E00	0000004D	00000000	00000014	R	.	.	.	.	.	T	.
 jkGuiMultiplayer_sub_413E50	.text	00413E50	0000025A	00000028	00000004	R	.	.	.	.	.	T	.
@@ -441,7 +441,7 @@ jkGuiDecision_Show	.text	0041A410	00000030	00000004	00000000	R	.	.	.	.	.	.	.
 jkGuiSingleplayer_Initialize	.text	0041A440	00000050			R	.	.	.	.	.	.	.
 jkGuiSingleplayer_Shutdown	.text	0041A490	00000001			R	.	.	.	.	.	.	.
 jkGuiSingleplayer_Show	.text	0041A4A0	0000050D	000001D8	00000000	R	.	.	.	.	.	.	.
-jkGuiSingleplayer_sub_41A9B0	.text	0041A9B0	00000077	0000000C	00000010	R	.	.	.	.	.	T	.
+jkGuiSingleplayer_EnumEpisodes	.text	0041A9B0	00000077	0000000C	00000010	R	.	.	.	.	.	T	.
 jkGuiSingleplayer_sub_41AA30	.text	0041AA30	00000232	000001B4	00000020	R	.	.	.	.	.	T	.
 jkGuiSingleplayer_sub_41AC70	.text	0041AC70	0000008F	00000020	0000000C	R	.	.	.	.	.	T	.
 jkGuiSingleplayer_sub_41AD00	.text	0041AD00	00000042	0000000C	00000004	R	.	.	.	.	.	T	.
@@ -641,12 +641,12 @@ stdPrintf	.text	00426D80	0000009F	0000000C	00000011	R	.	.	.	.	.	T	.
 stdFilePrintf	.text	00426E20	00000034	00000000	00000009	R	.	.	.	.	.	T	.
 stdConsolePrintf	.text	00426E60	00000031	00000000	00000005	R	.	.	.	.	.	T	.
 stdAssert	.text	00426EA0	0000001D	00000000	0000000C	R	.	.	.	.	.	T	.
-stdDebugMalloc	.text	00426EC0	00000033	00000008	00000004	R	.	.	.	.	.	T	.
-stdDebugFree	.text	00426F00	00000030	00000008	00000004	R	.	.	.	.	.	T	.
-stdDebugRealloc	.text	00426F30	0000003B	00000008	00000008	R	.	.	.	.	.	T	.
-stdDelay	.text	00426F70	0000003C	00000008	00000008	R	.	.	.	.	.	T	.
-stdReadLine	.text	00426FB0	00000070	0000000C	00000010	R	.	.	.	.	.	T	.
-stdGetReturnString	.text	00427020	00000034	0000000C	0000000C	R	.	.	.	.	.	T	.
+stdDebugMalloc	.text	00426EC0	00000033	00000008	00000004	R	.	.	.	.	.	.	.
+stdDebugFree	.text	00426F00	00000030	00000008	00000004	R	.	.	.	.	.	.	.
+stdDebugRealloc	.text	00426F30	0000003B	00000008	00000008	R	.	.	.	.	.	.	.
+stdDelay	.text	00426F70	0000003C	00000008	00000008	R	.	.	.	.	.	.	.
+stdReadLine	.text	00426FB0	00000070	0000000C	00000010	R	.	.	.	.	.	.	.
+stdGetReturnString	.text	00427020	00000034	0000000C	0000000C	R	.	.	.	.	.	.	.
 stdFileFromPath	.text	00427060	0000001B	00000004	00000004	R	.	.	.	.	.	T	.
 stdCalcBitPos	.text	00427080	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 stdReadRaw	.text	004270A0	0000004A	00000004	0000000C	R	.	.	.	.	.	T	.
@@ -814,7 +814,7 @@ DirectPlay_Send	.text	0042FBB0	0000002B	00000000	00000010	R	.	.	.	.	.	T	.
 DirectPlay_Receive	.text	0042FBE0	000000A6	00000010	0000000C	R	.	.	.	.	.	T	.
 DirectPlay_OpenHost	.text	0042FC90	00000130	00000158	00000004	R	.	.	.	.	.	T	.
 DirectPlay_GetSession_passwordidk	.text	0042FDC0	00000111	00000118	00000004	R	.	.	.	.	.	.	.
-DirectPlay_IdkSessionDesc	.text	0042FEE0	00000063	00000014	00000004	R	.	.	.	.	.	T	.
+DirectPlay_IdkSessionDesc	.text	0042FEE0	00000063	00000014	00000004	R	.	.	.	.	.	.	.
 DirectPlay_SetSessionFlagidk	.text	0042FF50	00000091	00000014	00000004	R	.	.	.	.	.	.	.
 DirectPlay_SetSessionDesc	.text	0042FFF0	000000DF	00000118	00000008	R	.	.	.	.	.	T	.
 DirectPlay_Open	.text	004300D0	000000A7	00000058	00000008	R	.	.	.	.	.	T	.
@@ -1749,22 +1749,22 @@ rdAFRaster_sub_4C19B0	.text	004C19B0	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 rdAFRaster_sub_4C24D0	.text	004C24D0	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 rdAFRaster_sub_4C2FF0	.text	004C2FF0	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 rdAFRaster_sub_4C3B10	.text	004C3B10	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
-sith_Startup	.text	004C4630	000000CB	00000008	00000004	R	.	.	.	.	.	T	.
-sith_Shutdown	.text	004C4700	00000074			R	.	.	.	.	.	.	.
-sith_Load	.text	004C4780	00000026	00000000	00000004	R	.	.	.	.	.	T	.
-sith_Free	.text	004C47B0	0000001D			R	.	.	.	.	.	.	.
-sith_Mode1Init	.text	004C47D0	000000AA	00000000	00000004	R	.	.	.	.	.	.	.
-sith_AutoSave	.text	004C4880	00000147	00000090	00000000	R	.	.	.	.	.	T	.
-sithOpenNormal	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	T	.
-sith_Mode1Init_3	.text	004C4A70	00000098	00000000	00000004	R	.	.	.	.	.	T	.
-sith_Open	.text	004C4B10	00000064	00000000	00000000	R	.	.	.	.	.	.	.
-sith_Close	.text	004C4B80	00000064			R	.	.	.	.	.	.	.
-sith_SetEndLevel	.text	004C4BF0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
-sith_Tick	.text	004C4C00	00000121			R	.	.	.	.	.	T	.
-sith_UpdateCamera	.text	004C4D30	00000043	00000000	00000000	R	.	.	.	.	.	.	.
-sith_sub_4C4D80	.text	004C4D80	00000026			R	.	.	.	.	.	.	.
-sith_set_sithmode_5	.text	004C4DB0	0000000B			R	.	.	.	.	.	.	.
-sith_SetEpisodeName	.text	004C4DC0	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
+sithMain_Startup	.text	004C4630	000000CB	00000008	00000004	R	.	.	.	.	.	T	.
+sithMain_Shutdown	.text	004C4700	00000074			R	.	.	.	.	.	.	.
+sithMain_Load	.text	004C4780	00000026	00000000	00000004	R	.	.	.	.	.	T	.
+sithMain_Free	.text	004C47B0	0000001D			R	.	.	.	.	.	.	.
+sithMain_Mode1Init	.text	004C47D0	000000AA	00000000	00000004	R	.	.	.	.	.	.	.
+sithMain_AutoSave	.text	004C4880	00000147	00000090	00000000	R	.	.	.	.	.	T	.
+sithMain_OpenNormal	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	T	.
+sithMain_Mode1Init_3	.text	004C4A70	00000098	00000000	00000004	R	.	.	.	.	.	T	.
+sithMain_Open	.text	004C4B10	00000064	00000000	00000000	R	.	.	.	.	.	.	.
+sithMain_Close	.text	004C4B80	00000064			R	.	.	.	.	.	.	.
+sithMain_SetEndLevel	.text	004C4BF0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
+sithMain_Tick	.text	004C4C00	00000121			R	.	.	.	.	.	T	.
+sithMain_UpdateCamera	.text	004C4D30	00000043	00000000	00000000	R	.	.	.	.	.	.	.
+sithMain_sub_4C4D80	.text	004C4D80	00000026			R	.	.	.	.	.	.	.
+sithMain_set_sithmode_5	.text	004C4DB0	0000000B			R	.	.	.	.	.	.	.
+sithMain_SetEpisodeName	.text	004C4DC0	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
 sithCamera_Startup	.text	004C4DE0	00000101			R	.	.	.	.	.	.	.
 sithCamera_Shutdown	.text	004C4EF0	00000029	00000004	00000000	R	.	.	.	.	.	.	.
 sithCamera_Open	.text	004C4F20	00000201	00000000	00000008	R	.	.	.	.	.	T	.
@@ -1837,23 +1837,23 @@ sithPlayer_GetNum	.text	004C9420	0000004E	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_GetNumidk	.text	004C9470	0000004A	0000000C	00000004	R	.	.	.	.	.	.	.
 sithPlayer_SetBinCarries	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	.	T	.
 sithPlayer_idk2	.text	004C9500	0000002C	00000000	00000004	R	.	.	.	.	.	.	.
-sithDplay_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.	.
-sithDplay_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	T	.
-sithDplay_OpenConnection	.text	004C9570	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
-sithDplay_CloseConnection	.text	004C95B0	00000046	00000004	00000000	R	.	.	.	.	.	T	.
-sithDplay_EnumSessions	.text	004C9600	00000013	00000000	00000008	R	.	.	.	.	.	T	.
-sithDplay_EnumSessions2	.text	004C9620	00000005	00000054	00000000	R	.	.	.	.	.	.	.
-sithDplay_EnumPlayers	.text	004C9630	0000000E	00000000	00000004	R	.	.	.	.	.	.	.
-sithDplay_SendToPlayer	.text	004C9640	000000C9	00000010	00000008	R	.	.	.	.	.	T	.
-sithDplay_Recv	.text	004C9710	00000090	00000008	00000004	R	.	.	.	.	.	T	.
-sithDplay_Open	.text	004C97A0	0000007F	00000004	00000008	R	.	.	.	.	.	T	.
-sithDplay_Close	.text	004C9820	00000025			R	.	.	.	.	.	.	.
-sithDplay_CreatePlayer	.text	004C9850	0000007B	00000004	00000004	R	.	.	.	.	.	T	.
-sithDplay_seed_idk	.text	004C98D0	00000055	00000004	00000004	R	.	.	.	.	.	T	.
-sithDplay_EarlyInit	.text	004C9930	00000073			R	.	.	.	.	.	.	.
-sithDplay_DoReceive	.text	004C99B0	0000002B	00000008	00000000	R	.	.	.	.	.	.	.
-sithDplay_cogMsg_SendEnumPlayers	.text	004C99E0	00000060	00000000	00000004	R	.	.	.	.	.	T	.
-sithDplay_cogMsg_HandleEnumPlayers	.text	004C9A40	00000096	00000010	00000004	R	.	.	.	.	.	T	.
+stdComm_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.	.
+stdComm_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	T	.
+stdComm_OpenConnection	.text	004C9570	0000003A	00000000	00000004	R	.	.	.	.	.	.	.
+stdComm_CloseConnection	.text	004C95B0	00000046	00000004	00000000	R	.	.	.	.	.	T	.
+stdComm_EnumSessions	.text	004C9600	00000013	00000000	00000008	R	.	.	.	.	.	T	.
+stdComm_EnumSessions2	.text	004C9620	00000005	00000054	00000000	R	.	.	.	.	.	.	.
+stdComm_EnumPlayers	.text	004C9630	0000000E	00000000	00000004	R	.	.	.	.	.	.	.
+stdComm_SendToPlayer	.text	004C9640	000000C9	00000010	00000008	R	.	.	.	.	.	T	.
+stdComm_Recv	.text	004C9710	00000090	00000008	00000004	R	.	.	.	.	.	T	.
+stdComm_Open	.text	004C97A0	0000007F	00000004	00000008	R	.	.	.	.	.	T	.
+stdComm_Close	.text	004C9820	00000025			R	.	.	.	.	.	.	.
+stdComm_CreatePlayer	.text	004C9850	0000007B	00000004	00000004	R	.	.	.	.	.	T	.
+stdComm_seed_idk	.text	004C98D0	00000055	00000004	00000004	R	.	.	.	.	.	T	.
+stdComm_EarlyInit	.text	004C9930	00000073			R	.	.	.	.	.	.	.
+stdComm_DoReceive	.text	004C99B0	0000002B	00000008	00000000	R	.	.	.	.	.	.	.
+stdComm_cogMsg_SendEnumPlayers	.text	004C99E0	00000060	00000000	00000004	R	.	.	.	.	.	T	.
+stdComm_cogMsg_HandleEnumPlayers	.text	004C9A40	00000096	00000010	00000004	R	.	.	.	.	.	T	.
 sithMulti_Startup	.text	004C9AE0	000001CE	00000010	00000000	R	.	.	.	.	.	.	.
 sithMulti_Shutdown	.text	004C9CB0	00000044	00000000	00000000	R	.	.	.	.	.	T	.
 sithMulti_ServerLeft	.text	004C9D00	000002BD	00000110	00000000	R	.	.	.	.	.	.	.
@@ -1865,29 +1865,29 @@ sithMulti_sub_4CA3B0	.text	004CA3B0	00000052	00000004	00000000	R	.	.	.	.	.	.	.
 sithMulti_sub_4CA410	.text	004CA410	00000060	0000000C	00000004	R	.	.	.	.	.	.	.
 sithMulti_sub_4CA470	.text	004CA470	00000199	0000010C	00000004	R	.	.	.	.	.	.	.
 sithMulti_sendmsgidk4	.text	004CA610	000000F5	00000108	00000004	R	.	.	.	.	.	.	.
-sithMulti_sendmsgidk3	.text	004CA710	0000006E	00000000	0000000C	R	.	.	.	.	.	T	.
-sithMulti_HandleJoinLeave	.text	004CA780	00000181	00000110	00000004	R	.	.	.	.	.	T	.
-sithMulti_HandleJoin_unused	.text	004CA910	000000AB	00000108	00000004	R	.	.	.	.	.	.	.
+sithMulti_SendWelcome	.text	004CA710	0000006E	00000000	0000000C	R	.	.	.	.	.	T	.
+sithMulti_ProcessJoinLeave	.text	004CA780	00000181	00000110	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessJoin_unused	.text	004CA910	000000AB	00000108	00000004	R	.	.	.	.	.	.	.
 sithMulti_SendLeaveJoin	.text	004CA9C0	0000012F	00000030	00000008	R	.	.	.	.	.	T	.
-sithMulti_HandleLeaveJoin	.text	004CAAF0	000002B2	00000230	00000004	R	.	.	.	.	.	T	.
-sithMulti_SendRequestConnect	.text	004CADB0	00000093	00000004	00000004	R	.	.	.	.	.	T	.
-sithMulti_HandleRequestConnect	.text	004CAE50	000003AE	0000002C	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessLeaveJoin	.text	004CAAF0	000002B2	00000230	00000004	R	.	.	.	.	.	T	.
+sithMulti_SendJoinRequest	.text	004CADB0	00000093	00000004	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessJoinRequest	.text	004CAE50	000003AE	0000002C	00000004	R	.	.	.	.	.	T	.
 sithMulti_Send36	.text	004CB200	00000047	00000000	0000000C	R	.	.	.	.	.	.	.
 sithMulti_SendChat	.text	004CB250	00000087	00000008	0000000C	R	.	.	.	.	.	T	.
-sithMulti_HandleChat	.text	004CB2E0	000000AC	0000008C	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessChat	.text	004CB2E0	000000AC	0000008C	00000004	R	.	.	.	.	.	T	.
 sithMulti_SendPing	.text	004CB390	00000043	00000000	00000004	R	.	.	.	.	.	T	.
-sithMulti_HandlePing	.text	004CB3E0	00000025	00000000	00000004	R	.	.	.	.	.	T	.
-sithMulti_HandlePingResponse	.text	004CB410	00000083	00000008	00000004	R	.	.	.	.	.	T	.
-sithMulti_SendKickPlayer	.text	004CB4A0	00000042	00000000	00000004	R	.	.	.	.	.	T	.
-sithMulti_HandleKickPlayer	.text	004CB4F0	00000197	0000010C	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessPing	.text	004CB3E0	00000025	00000000	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessPingResponse	.text	004CB410	00000083	00000008	00000004	R	.	.	.	.	.	T	.
+sithMulti_SendQuit	.text	004CB4A0	00000042	00000000	00000004	R	.	.	.	.	.	T	.
+sithMulti_ProcessQuit	.text	004CB4F0	00000197	0000010C	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandleTimeLimit	.text	004CB690	0000055B	00000014	00000004	R	.	.	.	.	.	T	.
 sithMulti_SyncScores	.text	004CBC00	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 sithMulti_IterPlayersnothingidk	.text	004CBC10	0000002A	00000004	00000004	R	.	.	.	.	.	T	.
 sithMulti_SetHandleridk	.text	004CBC40	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 sithMulti_HandleDeath	.text	004CBC50	00000183	0000010C	0000000C	R	.	.	.	.	.	T	.
-sithMulti_HandleScore	.text	004CBDE0	000001A4	00000010	00000000	R	.	.	.	.	.	T	.
+sithMulti_ProcessScore	.text	004CBDE0	000001A4	00000010	00000000	R	.	.	.	.	.	T	.
 sithMulti_EndLevel	.text	004CBF90	00000026	00000000	00000008	R	.	.	.	.	.	T	.
-sithMulti_sub_4CBFC0	.text	004CBFC0	00000147	000000A0	00000004	R	.	.	.	.	.	T	.
+sithMulti_GetSpawnIdx	.text	004CBFC0	00000147	000000A0	00000004	R	.	.	.	.	.	T	.
 sithMulti_FreeThing	.text	004CC110	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_Startup	.text	004CC130	0000006F	00000008	00000000	R	.	.	.	.	.	T	.
 sithThing_Shutdown	.text	004CC1A0	0000002A			R	.	.	.	.	.	.	.
@@ -1933,8 +1933,8 @@ sithThing_LoadThingParam	.text	004CECB0	000005D2	0000001C	0000000C	R	.	.	.	.	.	T
 sithThing_TypeIdxFromStr	.text	004CF320	0000005A	00000010	00000004	R	.	.	.	.	.	.	.
 sithThing_GetIdxFromThing	.text	004CF380	0000003F	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_Checksum	.text	004CF3C0	00000191	0000000C	00000008	R	.	.	.	.	.	T	.
-sithThing_SyncThingPos	.text	004CF560	00000061	00000004	00000008	R	.	.	.	.	.	T	.
-sithThing_netidk	.text	004CF5D0	00000090	00000008	00000000	R	.	.	.	.	.	.	.
+sithThing_SetSyncFlags	.text	004CF560	00000061	00000004	00000008	R	.	.	.	.	.	T	.
+sithThing_Sync	.text	004CF5D0	00000090	00000008	00000000	R	.	.	.	.	.	.	.
 sithThing_ShouldSync	.text	004CF660	00000026	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_netidk2	.text	004CF690	00000060	00000004	00000004	R	.	.	.	.	.	.	.
 sithWorld_Startup	.text	004CF6F0	000003B7	00000008	00000000	R	.	.	.	.	.	.	.
@@ -2098,24 +2098,24 @@ sithOverlayMap_Render1	.text	004D92C0	0000023F	00000024	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render2	.text	004D9500	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
 sithOverlayMap_Render3	.text	004D9560	000006DE	00000068	00000004	R	.	.	.	.	B	T	.
 sithOverlayMap_Render4	.text	004D9C40	0000016A	00000024	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
-DebugConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
-DebugConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
-DebugConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
-DebugConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
-DebugConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
-DebugConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
-DebugConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
-DebugConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
-DebugConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
-DebugConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
-DebugConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
+sithConsole_Initialize	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
+sithConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
+sithConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
+sithConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
+sithConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
+sithConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
+sithConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
+sithConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
+sithConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
+sithConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
+sithConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
 sithGamesave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
 sithGamesave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
 sithGamesave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.
 sithGamesave_Load	.text	004DA6A0	000000CA	000000A0	0000000C	R	.	.	.	.	.	T	.
-sithGamesave_SerializeAllThings	.text	004DA770	00000249	00000008	00000004	R	.	.	.	.	.	.	.
+sithGamesave_SerializeAllThings	.text	004DA770	00000249	00000008	00000004	R	.	.	.	.	.	T	.
 sithGamesave_WriteEntry	.text	004DA9C0	000001AA	00000008	00000000	R	.	.	.	.	.	.	.
 sithGamesave_LoadEntry	.text	004DAB70	0000028B	0000065C	00000004	R	.	.	.	.	.	T	.
 sithSoundMixer_Startup	.text	004DAE00	0000003F	00000004	00000000	R	.	.	.	.	.	.	.
@@ -2193,7 +2193,7 @@ sithCog_LoadCogscript	.text	004DF7D0	0000015C	00000090	00000004	R	.	.	.	.	.	T	.
 sithCog_GetByIdx	.text	004DF930	00000043	00000000	00000004	R	.	.	.	.	.	T	.
 sithCog_ThingFromSymbolidk	.text	004DF980	00000072	00000008	00000010	R	.	.	.	.	.	T	.
 sithCog_Thingidk	.text	004DFA00	0000005D	00000004	00000010	R	.	.	.	.	.	.	.
-sithCog_Sectoridk	.text	004DFA60	0000005D	00000004	00000010	R	.	.	.	.	.	T	.
+sithCog_Sectoridk	.text	004DFA60	0000005D	00000004	00000010	R	.	.	.	.	.	.	.
 sithCog_SendMessageFromThing	.text	004DFAC0	00000022	00000000	0000000C	R	.	.	.	.	.	T	.
 sithCog_SendMessageFromThingEx	.text	004DFAF0	0000026D	00000018	0000001C	R	.	.	.	.	.	T	.
 sithCog_SendMessageFromSector	.text	004DFD60	00000022	00000000	0000000C	R	.	.	.	.	.	T	.
@@ -2252,48 +2252,48 @@ sithCogFunctionPlayer_GetNumPlayersInTeam	.text	004E15F0	00000047	00000008	00000
 sithCogFunctionPlayer_AddScoreToTeamMembers	.text	004E1640	00000048	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SetBinWait	.text	004E1690	00000056	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SyncScores	.text	004E16F0	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Startup	.text	004E1700	000001D5	00000000	00000000	R	.	.	.	.	.	.	.
-sithCogVm_Shutdown	.text	004E18E0	00000014			R	.	.	.	.	.	T	.
-sithCogVm_SetMsgFunc	.text	004E1900	00000010	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogVm_SendMsgToPlayer	.text	004E1910	00000211	0000000C	00000010	R	.	.	.	.	.	T	.
-sithCogVm_FileWrite	.text	004E1B30	00000034	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Sync	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
-sithCogVm_SetNeedsSync	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
-sithCogVm_InvokeMsgByIdx	.text	004E1DD0	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_SyncWithPlayers	.text	004E1E00	000000BB	00000000	00000000	R	.	.	.	.	.	.	.
-sithCogVm_ClearMsgTmpBuf	.text	004E1EC0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
-sithCogVm_cogMsg_Reset	.text	004E1EE0	0000007F	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Exec	.text	004E1F60	0000038A	000000A0	00000004	R	.	.	.	.	.	T	.
-sithCogVm_ExecCog	.text	004E2350	000000EC	00000008	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PopValue	.text	004E2440	000000A6	00000018	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PopFlex	.text	004E24F0	000000C2	00000028	00000004	R	.	.	.	.	.	T	.
-sithCogVm_PopInt	.text	004E25C0	000000C1	0000001C	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopSymbolIdx	.text	004E2690	0000004E	00000014	00000004	R	.	.	.	.	.	T	.
-sithCogVm_PopVector3	.text	004E26E0	000000CA	00000018	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PopCog	.text	004E27B0	00000104	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopThing	.text	004E28C0	000000F4	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopTemplate	.text	004E29C0	00000105	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopSound	.text	004E2AD0	000000FC	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopSector	.text	004E2BD0	000000E3	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopSurface	.text	004E2CC0	000000EB	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopMaterial	.text	004E2DB0	000000F6	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopModel3	.text	004E2EB0	000000F7	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopKeyframe	.text	004E2FB0	000000FD	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopAIClass	.text	004E30B0	000000F5	00000020	00000004	R	.	.	.	.	B	T	.
-sithCogVm_PopSymbolFunc	.text	004E31B0	000000A5	0000001C	00000004	R	.	.	.	.	.	T	.
-sithCogVm_PopString	.text	004E3260	00000068	00000018	00000004	R	.	.	.	.	.	T	.
-sithCogVm_PushVar	.text	004E32D0	0000006F	00000004	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PushInt	.text	004E3340	0000007B	0000001C	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PushFlex	.text	004E33C0	00000081	00000018	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PushVector3	.text	004E3450	0000008C	00000020	00000008	R	.	.	.	.	.	T	.
-sithCogVm_PopProgramVal	.text	004E34E0	00000026	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogVm_ResetStack	.text	004E3510	00000019	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Call	.text	004E3530	00000059	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_Ret	.text	004E3590	00000041	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogVm_PopStackVar	.text	004E35E0	00000043	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogVm_BitOperation	.text	004E3630	0000021E	00000020	00000008	R	.	.	.	.	B	T	.
-sithCogVm_MathOperation	.text	004E3870	000002EA	00000030	00000008	R	.	.	.	.	.	T	.
-sithCogVm_AssignStackVar	.text	004E3B90	00000067	0000001C	0000000C	R	.	.	.	.	.	T	.
+sithComm_Startup	.text	004E1700	000001D5	00000000	00000000	R	.	.	.	.	.	.	.
+sithComm_Shutdown	.text	004E18E0	00000014			R	.	.	.	.	.	T	.
+sithComm_SetMsgFunc	.text	004E1900	00000010	00000000	00000008	R	.	.	.	.	.	T	.
+sithComm_SendMsgToPlayer	.text	004E1910	00000211	0000000C	00000010	R	.	.	.	.	.	T	.
+sithComm_FileWrite	.text	004E1B30	00000034	00000008	00000004	R	.	.	.	.	.	T	.
+sithComm_Sync	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
+sithComm_SetNeedsSync	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
+sithComm_InvokeMsgByIdx	.text	004E1DD0	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
+sithComm_SyncWithPlayers	.text	004E1E00	000000BB	00000000	00000000	R	.	.	.	.	.	.	.
+sithComm_ClearMsgTmpBuf	.text	004E1EC0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
+sithComm_cogMsg_Reset	.text	004E1EE0	0000007F	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogExec_Exec	.text	004E1F60	0000038A	000000A0	00000004	R	.	.	.	.	.	T	.
+sithCogExec_ExecCog	.text	004E2350	000000EC	00000008	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PopValue	.text	004E2440	000000A6	00000018	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PopFlex	.text	004E24F0	000000C2	00000028	00000004	R	.	.	.	.	.	T	.
+sithCogExec_PopInt	.text	004E25C0	000000C1	0000001C	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopSymbolIdx	.text	004E2690	0000004E	00000014	00000004	R	.	.	.	.	.	T	.
+sithCogExec_PopVector3	.text	004E26E0	000000CA	00000018	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PopCog	.text	004E27B0	00000104	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopThing	.text	004E28C0	000000F4	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopTemplate	.text	004E29C0	00000105	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopSound	.text	004E2AD0	000000FC	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopSector	.text	004E2BD0	000000E3	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopSurface	.text	004E2CC0	000000EB	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopMaterial	.text	004E2DB0	000000F6	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopModel3	.text	004E2EB0	000000F7	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopKeyframe	.text	004E2FB0	000000FD	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopAIClass	.text	004E30B0	000000F5	00000020	00000004	R	.	.	.	.	B	T	.
+sithCogExec_PopSymbolFunc	.text	004E31B0	000000A5	0000001C	00000004	R	.	.	.	.	.	T	.
+sithCogExec_PopString	.text	004E3260	00000068	00000018	00000004	R	.	.	.	.	.	T	.
+sithCogExec_PushVar	.text	004E32D0	0000006F	00000004	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PushInt	.text	004E3340	0000007B	0000001C	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PushFlex	.text	004E33C0	00000081	00000018	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PushVector3	.text	004E3450	0000008C	00000020	00000008	R	.	.	.	.	.	T	.
+sithCogExec_PopProgramVal	.text	004E34E0	00000026	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogExec_ResetStack	.text	004E3510	00000019	00000000	00000004	R	.	.	.	.	.	T	.
+sithCogExec_Call	.text	004E3530	00000059	00000000	00000004	R	.	.	.	.	.	T	.
+sithCogExec_Ret	.text	004E3590	00000041	00000000	00000004	R	.	.	.	.	.	T	.
+sithCogExec_PopStackVar	.text	004E35E0	00000043	00000000	00000008	R	.	.	.	.	.	T	.
+sithCogExec_BitOperation	.text	004E3630	0000021E	00000020	00000008	R	.	.	.	.	B	T	.
+sithCogExec_MathOperation	.text	004E3870	000002EA	00000030	00000008	R	.	.	.	.	.	T	.
+sithCogExec_AssignStackVar	.text	004E3B90	00000067	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithPuppet_Startup	.text	004E3C00	0000009F	00000008	00000000	R	.	.	.	.	.	.	.
 sithPuppet_Shutdown	.text	004E3CA0	00000055			R	.	.	.	.	.	.	.
 sithPuppet_NewEntry	.text	004E3D00	00000070	00000004	00000004	R	.	.	.	.	.	T	.
@@ -2331,8 +2331,8 @@ sithSurface_GetIdxFromPtr	.text	004E6190	00000016	00000000	00000004	R	.	.	.	.	.	
 sithSurface_Verify	.text	004E61B0	00000039	00000004	00000004	R	.	.	.	.	.	T	.
 sithSurface_SendDamageToThing	.text	004E61F0	00000058	00000014	00000010	R	.	.	.	.	.	T	.
 sithSurface_GetCenter	.text	004E6250	000000DD	0000002C	00000008	R	.	.	.	.	.	T	.
-sithSurface_PushSurface	.text	004E6330	00000025	00000000	00000004	R	.	.	.	.	.	T	.
-sithSurface_Syncidk	.text	004E6360	0000004B			R	.	.	.	.	.	T	.
+sithSurface_SyncSurface	.text	004E6330	00000025	00000000	00000004	R	.	.	.	.	.	T	.
+sithSurface_Sync	.text	004E6360	0000004B			R	.	.	.	.	.	T	.
 sithSurface_sub_4E63B0	.text	004E63B0	0000002F	00000000	00000004	R	.	.	.	.	.	T	.
 sithSoundClass_Startup	.text	004E63E0	00000091	00000008	00000000	R	.	.	.	.	.	.	.
 sithSoundClass_Shutdown	.text	004E6480	00000039			R	.	.	.	.	.	.	.
@@ -2433,26 +2433,26 @@ sithActor_thing_anim_blocked	.text	004ED3F0	0000036D	00000064	0000000C	R	.	.	.	.
 sithActor_Remove	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	T	.
 sithActor_RemoveCorpse	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithActor_LoadParams	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
-sithDebugConsole_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
-sithDebugConsole_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdSession	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdCogList	.text	004EE2F0	00000125	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdFly	.text	004EE420	0000007D			R	.	.	.	.	.	T	.
-sithDebugConsole_CmdMem	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdDynamicMem	.text	004EE710	00000039	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdMemDump	.text	004EE750	00000098	00000004	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdMatList	.text	004EE7F0	0000016E	0000000C	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdCoords	.text	004EE960	000000D6	00000044	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdWarp	.text	004EEA40	00000141	00000058	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdActivate	.text	004EEB90	0000009A	00000004	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdJump	.text	004EEC30	00000036	00000000	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdPlayers	.text	004EEC70	0000009F	00000028	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
-sithDebugConsole_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_Initialize	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
+sithCommand_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdSession	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
+sithCommand_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdCogList	.text	004EE2F0	00000125	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdFly	.text	004EE420	0000007D			R	.	.	.	.	.	T	.
+sithCommand_CmdMem	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdDynamicMem	.text	004EE710	00000039	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdMemDump	.text	004EE750	00000098	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdMatList	.text	004EE7F0	0000016E	0000000C	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdCoords	.text	004EE960	000000D6	00000044	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdWarp	.text	004EEA40	00000141	00000058	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdActivate	.text	004EEB90	0000009A	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdJump	.text	004EEC30	00000036	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdPlayers	.text	004EEC70	0000009F	00000028	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	T	.
+sithCommand_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
+sithCommand_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	T	.
 sithSound_Shutdown	.text	004EEEC0	0000003D			R	.	.	.	.	.	.	.
 sithSound_Load	.text	004EEF00	000001B6	00000010	00000008	R	.	.	.	.	.	T	.
@@ -2486,7 +2486,7 @@ sithSurface_GetRdSurface	.text	004F09F0	0000003B	00000008	00000004	R	.	.	.	.	.	T
 sithSurface_DetachThing	.text	004F0A30	00000065	00000008	00000008	R	.	.	.	.	.	T	.
 sithSurface_GetByIdx	.text	004F0AA0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
 sithSurface_Alloc	.text	004F0AF0	00000059			R	.	.	.	.	.	T	.
-sithSurface_Sync	.text	004F0B50	00000061	00000008	00000004	R	.	.	.	.	.	T	.
+sithSurface_SyncFull	.text	004F0B50	00000061	00000008	00000004	R	.	.	.	.	.	T	.
 sithSurface_ScrollSky	.text	004F0BC0	000000F4	00000004	00000010	R	.	.	.	.	.	T	.
 sithMaterial_Startup	.text	004F0CC0	0000001C			R	.	.	.	.	.	.	.
 sithMaterial_Shutdown	.text	004F0CE0	0000001D			R	.	.	.	.	.	.	.
@@ -2544,42 +2544,42 @@ sithRenderSky_Close	.text	004F2DC0	00000001			R	.	.	.	.	.	.	.
 sithRenderSky_Update	.text	004F2DD0	00000060			R	.	.	.	.	.	T	.
 sithRenderSky_TransformHorizontal	.text	004F2E30	00000123	00000014	0000000C	R	.	.	.	.	.	T	.
 sithRenderSky_TransformVertical	.text	004F2F60	000001B7	00000034	00000010	R	.	.	.	.	.	T	.
-sithDSSThing_SendTeleportThing	.text	004F3120	0000014F	00000010	0000000C	R	.	.	.	.	.	T	.
-sithDSSThing_HandleTeleportThing	.text	004F3270	000001A2	00000028	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendPos	.text	004F3120	0000014F	00000010	0000000C	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPos	.text	004F3270	000001A2	00000028	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendSyncThing	.text	004F3420	0000018F	00000004	0000000C	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSyncThing	.text	004F35E0	000001A6	0000000C	00000004	R	.	.	.	.	.	T	.
-sithDSSThing_SendPlaySoundPos	.text	004F37B0	000000B1	00000000	00000024	R	.	.	.	.	.	T	.
-sithDSSThing_HandlePlaySoundPos	.text	004F3870	000000E5	0000001C	00000004	R	.	.	.	.	.	T	.
-sithDSSThing_SoundClassPlay	.text	004F3960	00000060	00000000	00000010	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSoundClassPlay	.text	004F39C0	00000067	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessSyncThing	.text	004F35E0	000001A6	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendPlaySound	.text	004F37B0	000000B1	00000000	00000024	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPlaySound	.text	004F3870	000000E5	0000001C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendPlaySoundMode	.text	004F3960	00000060	00000000	00000010	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPlaySoundMode	.text	004F39C0	00000067	00000004	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendPlayKey	.text	004F3A30	0000006F	00000000	0000001C	R	.	.	.	.	.	T	.
-sithDSSThing_HandlePlayKey	.text	004F3AA0	0000008B	00000008	00000004	R	.	.	.	.	.	T	.
-sithDSSThing_SendOpenDoor	.text	004F3B30	00000059	00000000	00000014	R	.	.	.	.	.	T	.
-sithDSSThing_HandleOpenDoor	.text	004F3B90	00000068	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPlayKey	.text	004F3AA0	0000008B	00000008	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendPlayKeyMode	.text	004F3B30	00000059	00000000	00000014	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPlayKeyMode	.text	004F3B90	00000068	0000000C	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendSetThingModel	.text	004F3C00	00000071	00000000	00000008	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSetThingModel	.text	004F3C80	00000069	00000028	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessSetThingModel	.text	004F3C80	00000069	00000028	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendStopKey	.text	004F3CF0	00000057	00000000	00000014	R	.	.	.	.	.	T	.
-sithDSSThing_HandleStopKey	.text	004F3D50	00000068	00000008	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessStopKey	.text	004F3D50	00000068	00000008	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendStopSound	.text	004F3DC0	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
-sithDSSThing_HandleStopSound	.text	004F3E10	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessStopSound	.text	004F3E10	0000005E	00000004	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendFireProjectile	.text	004F3E70	000000E6	00000000	00000030	R	.	.	.	.	.	T	.
-sithDSSThing_HandleFireProjectile	.text	004F3F60	000000D8	00000024	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessFireProjectile	.text	004F3F60	000000D8	00000024	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendDeath	.text	004F4040	0000006A	00000000	00000014	R	.	.	.	.	.	T	.
-sithDSSThing_HandleDeath	.text	004F40B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessDeath	.text	004F40B0	0000006E	0000000C	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendDamage	.text	004F4120	00000076	00000000	00000018	R	.	.	.	.	.	T	.
-sithDSSThing_HandleDamage	.text	004F41A0	0000006B	0000000C	00000004	R	.	.	.	.	.	T	.
-sithDSSThing_SendSyncThingFull	.text	004F4210	000004BC	00000010	0000000C	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSyncThingFull	.text	004F46F0	00000542	00000010	00000004	R	.	.	.	.	.	T	.
-sithDSSThing_SendSyncThingFrame	.text	004F4C60	000000F7	0000000C	00000018	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSyncThingFrame	.text	004F4D60	0000011E	0000001C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessDamage	.text	004F41A0	0000006B	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendFullDesc	.text	004F4210	000004BC	00000010	0000000C	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessFullDesc	.text	004F46F0	00000542	00000010	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_SendPathMove	.text	004F4C60	000000F7	0000000C	00000018	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessPathMove	.text	004F4D60	0000011E	0000001C	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendSyncThingAttachment	.text	004F4E80	000000D0	00000004	00000010	R	.	.	.	.	.	T	.
-sithDSSThing_HandleSyncThingAttachment	.text	004F4F50	000000E7	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessSyncThingAttachment	.text	004F4F50	000000E7	0000000C	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendTakeItem	.text	004F5040	0000010F	00000008	0000000C	R	.	.	.	.	.	T	.
-sithDSSThing_HandleTakeItem	.text	004F5150	000000C3	00000010	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessTakeItem	.text	004F5150	000000C3	00000010	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendCreateThing	.text	004F5220	000000C0	00000000	00000020	R	.	.	.	.	.	T	.
-sithDSSThing_HandleCreateThing	.text	004F52E0	000000EA	00000054	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessCreateThing	.text	004F52E0	000000EA	00000054	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendDestroyThing	.text	004F53D0	00000040	00000000	00000008	R	.	.	.	.	.	T	.
-sithDSSThing_HandleDestroyThing	.text	004F5410	00000024	00000000	00000004	R	.	.	.	.	.	T	.
+sithDSSThing_ProcessDestroyThing	.text	004F5410	00000024	00000000	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_TransitionMovingThing	.text	004F5440	00000106	00000014	0000000C	R	.	.	.	.	.	T	.
 sithPhysics_FindFloor	.text	004F5550	0000031C	00000030	00000008	R	.	.	.	.	.	T	.
 sithPhysics_ThingPhysIdk_inlined	.text	004F5870	00000083	00000008	00000004	R	.	.	.	.	.	T	.
@@ -2604,31 +2604,31 @@ sithSector_UnsetAdjoins	.text	004F8DE0	00000028	00000008	00000004	R	.	.	.	.	.	T	
 sithSector_SetAdjoins	.text	004F8E10	00000028	00000008	00000004	R	.	.	.	.	.	T	.
 sithSector_GetThingsCount	.text	004F8E40	00000016	00000000	00000004	R	.	.	.	.	.	T	.
 sithSector_GetNumPlayers	.text	004F8E60	00000020	00000000	00000004	R	.	.	.	.	.	T	.
-sithSector_Sync	.text	004F8E80	0000006D	00000008	00000008	R	.	.	.	.	.	T	.
-sithSector_sub_4F8EF0	.text	004F8EF0	00000057	00000004	00000000	R	.	.	.	.	.	T	.
+sithSector_SyncSector	.text	004F8E80	0000006D	00000008	00000008	R	.	.	.	.	.	T	.
+sithSector_Sync	.text	004F8EF0	00000057	00000004	00000000	R	.	.	.	.	.	T	.
 sithSector_GetPtrFromIdx	.text	004F8F50	00000027	00000000	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendSyncSurface	.text	004F8F80	000000CE	00000000	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncSurface	.text	004F9050	000000C1	00000004	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendSyncSector	.text	004F9120	000000C9	00000004	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncSector	.text	004F91F0	000000E5	00000008	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendSyncSectorAlt	.text	004F92E0	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncSectorAlt	.text	004F9350	0000005C	00000004	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendSyncAI	.text	004F93B0	00000286	00000010	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncAI	.text	004F9640	000002B4	00000010	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendSyncItemDesc	.text	004F9900	000000B2	00000000	00000010	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncItemDesc	.text	004F99C0	000000A7	00000004	00000004	R	.	.	.	.	.	T	.
-sithDSS_SendStopAnim	.text	004F9A70	0000012A	0000000C	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleStopAnim	.text	004F9BA0	0000017A	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendSurfaceStatus	.text	004F8F80	000000CE	00000000	0000000C	R	.	.	.	.	.	T	.
+sithDSS_ProcessSurfaceStatus	.text	004F9050	000000C1	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendSectorStatus	.text	004F9120	000000C9	00000004	0000000C	R	.	.	.	.	.	T	.
+sithDSS_ProcessSectorStatus	.text	004F91F0	000000E5	00000008	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendSectorFlags	.text	004F92E0	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
+sithDSS_ProcessSectorFlags	.text	004F9350	0000005C	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendAIStatus	.text	004F93B0	00000286	00000010	0000000C	R	.	.	.	.	.	T	.
+sithDSS_ProcessAIStatus	.text	004F9640	000002B4	00000010	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendInventory	.text	004F9900	000000B2	00000000	00000010	R	.	.	.	.	.	T	.
+sithDSS_ProcessInventory	.text	004F99C0	000000A7	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSS_SendSurface	.text	004F9A70	0000012A	0000000C	0000000C	R	.	.	.	.	.	T	.
+sithDSS_ProcessSurface	.text	004F9BA0	0000017A	0000000C	00000004	R	.	.	.	.	.	T	.
 sithDSS_SendSyncPuppet	.text	004F9D20	000000E5	00000008	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncPuppet	.text	004F9E10	00000110	00000010	00000004	R	.	.	.	.	.	T	.
+sithDSS_ProcessSyncPuppet	.text	004F9E10	00000110	00000010	00000004	R	.	.	.	.	.	T	.
 sithDSS_SendSyncEvents	.text	004F9F20	0000007A	00000000	0000000C	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncEvents	.text	004F9FA0	0000004C	00000014	00000004	R	.	.	.	.	.	T	.
+sithDSS_ProcessSyncEvents	.text	004F9FA0	0000004C	00000014	00000004	R	.	.	.	.	.	T	.
 sithDSS_SendSyncCameras	.text	004F9FF0	0000013E	00000000	00000008	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncCameras	.text	004FA130	0000010E	0000000C	00000004	R	.	.	.	.	.	T	.
+sithDSS_ProcessSyncCameras	.text	004FA130	0000010E	0000000C	00000004	R	.	.	.	.	.	T	.
 sithDSS_SendSyncPalEffects	.text	004FA240	00000104	00000008	00000008	R	.	.	.	.	.	T	.
-sithDSS_HandleSyncPalEffects	.text	004FA350	000000CB	00000008	00000004	R	.	.	.	.	.	T	.
+sithDSS_ProcessSyncPalEffects	.text	004FA350	000000CB	00000008	00000004	R	.	.	.	.	.	T	.
 sithDSS_SendMisc	.text	004FA420	000001B0	00000000	00000008	R	.	.	.	.	.	T	.
-sithDSS_HandleMisc	.text	004FA5D0	0000019C	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSS_ProcessMisc	.text	004FA5D0	0000019C	00000004	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_SkipToFrame	.text	004FA770	000000CB	00000004	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_MoveToFrame	.text	004FA840	00000051	00000004	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_RotatePivot	.text	004FA8A0	000000D3	0000000C	00000010	R	.	.	.	.	.	T	.
@@ -2657,9 +2657,9 @@ sithPlayerActions_Activate	.text	004FC0A0	000001C6	00000058	00000004	R	.	.	.	.	.
 sithPlayerActions_JumpWithVel	.text	004FC270	000001DE	00000014	00000008	R	.	.	.	.	.	T	.
 sithPlayerActions_WarpToCheckpoint	.text	004FC450	000000CB	0000000C	00000008	R	.	.	.	.	.	T	.
 sithDSSCog_SendSendTrigger	.text	004FC520	00000104	0000000C	00000030	R	.	.	.	.	.	T	.
-sithDSSCog_HandleSendTrigger	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
+sithDSSCog_ProcessSendTrigger	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
 sithDSSCog_SendSyncCog	.text	004FC770	0000012C	00000010	0000000C	R	.	.	.	.	.	T	.
-sithDSSCog_HandleSyncCog	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	T	.
+sithDSSCog_ProcessSyncCog	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogParse_Reset	.text	004FC9A0	0000002A			R	.	.	.	.	.	T	.
 sithCogParse_Load	.text	004FC9D0	00000391	00000010	0000000C	R	.	.	.	.	.	T	.
 sithCogParse_LoadEntry	.text	004FCD70	000001F3	00000010	00000004	R	.	.	.	.	.	T	.
@@ -3050,7 +3050,7 @@ sithIntersect_sub_508400	.text	00508400	0000013A	00000020	00000020	R	.	.	.	.	.	T
 sithIntersect_sub_508540	.text	00508540	00000208	0000000C	00000024	R	.	.	.	.	.	T	.
 sithIntersect_sub_508750	.text	00508750	00000233	00000030	00000014	R	.	.	.	.	.	T	.
 sithIntersect_sub_508990	.text	00508990	00000243	00000030	00000018	R	.	.	.	.	.	T	.
-sithIntersect_sub_508BE0	.text	00508BE0	00000139	00000000	00000020	R	.	.	.	.	.	T	.
+sithIntersect_SphereHit	.text	00508BE0	00000139	00000000	00000020	R	.	.	.	.	.	T	.
 sithIntersect_sub_508D20	.text	00508D20	00000383	00000028	00000024	R	.	.	.	.	.	T	.
 sithIntersect_sub_5090B0	.text	005090B0	000000F9	0000001C	00000020	R	.	.	.	.	.	T	.
 sithAICmd_Startup	.text	005091B0	00000238			R	.	.	.	.	.	T	.

@@ -3,17 +3,17 @@
 #include "Cog/sithCog.h"
 #include "World/sithThing.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithCollision.h"
 #include "Engine/sithPhysics.h"
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
@@ -138,7 +138,7 @@ LABEL_32:
         sithActor_HurtSound(sender, amount, flags);
         return amount;
     }
-    if ( sithCogVm_multiplayerFlags )
+    if ( sithComm_multiplayerFlags )
         sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
     sithActor_SpawnDeadBodyMaybe(sender, receiver_, flags);
     return amount - sender->actorParams.health;

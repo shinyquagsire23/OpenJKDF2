@@ -1,6 +1,6 @@
 #include "jkControl.h"
 
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Gameplay/sithOverlayMap.h"
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"
@@ -8,23 +8,23 @@
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "World/sithWeapon.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "Platform/stdControl.h"
 #include "Win95/Window.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Main/jkGame.h"
 #include "Main/jkHud.h"
 #include "Main/jkDev.h"
 #include "Main/jkStrings.h"
 #include "Gui/jkGUITitle.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "../jk.h"
 
 static int jkControl_bInit;
 
-int jkControl_Initialize()
+int jkControl_Startup()
 {
-    sithControl_Initialize();
+    sithControl_Startup();
     sithControl_AddInputHandler(sithControl_HandlePlayer);
     sithControl_AddInputHandler(sithWeapon_HandleWeaponKeys);
     sithControl_AddInputHandler(sithInventory_HandleInvSkillKeys);
@@ -72,7 +72,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
                 jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetText("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Write("quicksave.jks", 1, 0, a4);
-                DebugConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
+                sithConsole_PrintUniStr(jkStrings_GetText("GUI_SLGAMEQUICKSAVED"));
             }
         }
 

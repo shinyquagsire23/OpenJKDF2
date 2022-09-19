@@ -80,7 +80,7 @@ static jkGuiElement jkGuiDisplay_aElements[28] = {
 
 static jkGuiMenu jkGuiDisplay_menu = { jkGuiDisplay_aElements, 0, 0xFF, 0xE1, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
 
-void jkGuiDisplay_Initialize()
+void jkGuiDisplay_Startup()
 {
     jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[3]);
     jkGuiDisplay_aElements[24].wstr = render_level;

@@ -11,7 +11,7 @@
 
 static stdVBuffer* jkCredits_pVbufferTmp;
 
-void jkCredits_Initialize(char *fpath)
+void jkCredits_Startup(char *fpath)
 {
     stdStrTable_Load(&jkCredits_table, fpath);
     jkCredits_fontLarge = stdFont_Load("ui\\sft\\creditlarge.sft", 0, 0);

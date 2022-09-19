@@ -2,7 +2,7 @@
 
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "World/sithThing.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
@@ -14,14 +14,14 @@
 #include "Gameplay/sithEvent.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithSound.h"
-#include "Engine/sithSoundMixer.h"
+#include "Devices/sithSound.h"
+#include "Devices/sithSoundMixer.h"
 #include "Engine/sithRender.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithKeyFrame.h"
-#include "Engine/sithMaterial.h"
-#include "Engine/sithSurface.h"
+#include "World/sithMaterial.h"
+#include "World/sithSurface.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Dss/sithDSS.h"
@@ -258,7 +258,7 @@ void sithSector_SyncSector(sithSector *pSector, int a2)
         pSector->flags |= SITH_SECTOR_SYNC;
     }
 
-    if (!sithCogVm_multiplayerFlags || sithSector_numSync >= 0x10)
+    if (!sithComm_multiplayerFlags || sithSector_numSync >= 0x10)
         return;
 
     for (v4 = 0; v4 < sithSector_numSync; v4++ )

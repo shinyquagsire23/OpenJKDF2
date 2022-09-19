@@ -8,24 +8,24 @@
 #include "World/sithWeapon.h"
 #include "World/sithExplosion.h"
 #include "World/sithItem.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
 #include "World/sithExplosion.h"
 #include "Engine/sithCollision.h"
 #include "World/sithActor.h"
-#include "Engine/sithSurface.h"
-#include "Engine/sithSoundMixer.h"
-#include "Engine/sithMulti.h"
+#include "World/sithSurface.h"
+#include "Devices/sithSoundMixer.h"
+#include "Dss/sithMulti.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Engine/sithParticle.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
-#include "Engine/sithModel.h"
-#include "Engine/sithSprite.h"
+#include "World/sithModel.h"
+#include "World/sithSprite.h"
 #include "Engine/sithNet.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithPhysics.h"
 #include "Main/jkGame.h"
@@ -1914,7 +1914,7 @@ uint32_t sithThing_Checksum(sithThing *thing, unsigned int last_hash)
 
 void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 {
-    if (!sithCogVm_multiplayerFlags) return;
+    if (!sithComm_multiplayerFlags) return;
 
     for (uint32_t v3 = 0; v3 < sithNet_syncIdx; v3++)
     {

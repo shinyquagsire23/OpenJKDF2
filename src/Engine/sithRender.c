@@ -4,27 +4,27 @@
 #include <float.h>
 
 #include "Cog/sithCog.h"
-#include "Engine/sith.h"
-#include "Engine/sithMaterial.h"
-#include "Engine/sithModel.h"
+#include "Main/sithMain.h"
+#include "World/sithMaterial.h"
+#include "World/sithModel.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/rdMaterial.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdroid.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdCamera.h"
 #include "Engine/sithRenderSky.h"
 #include "General/stdMath.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 #include "Primitives/rdModel3.h"
 #include "Primitives/rdPrimit3.h"
 #include "World/jkPlayer.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
@@ -277,7 +277,7 @@ void sithRender_Draw()
 
 #ifdef QOL_IMPROVEMENTS
             fov = jkPlayer_fov;
-            aspect = sith_lastAspect;
+            aspect = sithMain_lastAspect;
 #endif
             stdMath_SinCos(sithTime_curSeconds * 70.0, &a3, &a4);
             rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, a3 + fov);

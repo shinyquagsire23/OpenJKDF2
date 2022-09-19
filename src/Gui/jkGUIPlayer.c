@@ -60,7 +60,7 @@ static jkGuiElement jkGuiPlayer_menuNewElements[12] = {
 
 static jkGuiMenu jkGuiPlayer_menuNew = {jkGuiPlayer_menuNewElements, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0,0};
 
-int jkGuiPlayer_Initialize()
+int jkGuiPlayer_Startup()
 {
     jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[0]);
     jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[0]);

@@ -20,7 +20,7 @@
 #include "Main/jk.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 
 enum jkGuiEscButton_t
 {

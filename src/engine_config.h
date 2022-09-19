@@ -40,6 +40,9 @@
 #define MULTI_BIG_UPDATE_INTERVAL_MS (60)
 #endif
 
+// jkGuiMultiTally delay between maps
+#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && stdComm_bIsServer) ? 0 : 30000)
+
 // UI tickrate limits
 #ifdef QOL_IMPROVEMENTS
 #define TICKRATE_MIN (1)

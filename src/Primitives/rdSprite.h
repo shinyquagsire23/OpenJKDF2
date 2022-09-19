@@ -3,7 +3,7 @@
 
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 
 #define rdSprite_New_ADDR (0x0046C9C0)
 #define rdSprite_NewEntry_ADDR (0x0046CA20)

@@ -3,7 +3,7 @@
 #include "Engine/rdroid.h"
 #include "Engine/rdCamera.h"
 #include "General/stdMath.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"

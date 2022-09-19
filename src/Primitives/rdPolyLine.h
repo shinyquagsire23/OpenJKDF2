@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#include "Primitives/rdFace.h"
+#include "Raster/rdFace.h"
 
 #define rdPolyLine_New_ADDR (0x00448710)
 #define rdPolyLine_NewEntry_ADDR (0x00448770)

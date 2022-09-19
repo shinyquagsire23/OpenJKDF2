@@ -1,15 +1,15 @@
 #include "sithOverlayMap.h"
 
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "World/sithSector.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/rdroid.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Primitives/rdPrimit2.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "jk.h"
 
-int sithOverlayMap_Initialize(const sithMapViewConfig *config)
+int sithOverlayMap_Startup(const sithMapViewConfig *config)
 {
     if (sithOverlayMap_bInitted)
         return 0;
@@ -85,7 +85,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     if (!sithOverlayMap_bShowMap)
         return 0;
 
-    sith_sub_4C4D80();
+    sithMain_sub_4C4D80();
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithOverlayMap_inst.world = sithWorld_pCurrentWorld;

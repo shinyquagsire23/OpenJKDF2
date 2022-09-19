@@ -5,7 +5,7 @@
 #include "globals.h"
 
 #include "Engine/rdThing.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "General/stdConffile.h"
 
 #define sithThing_Startup_ADDR (0x004CC130)

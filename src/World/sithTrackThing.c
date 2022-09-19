@@ -2,7 +2,7 @@
 
 #include "General/stdConffile.h"
 #include "General/stdMath.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "Cog/sithCog.h"

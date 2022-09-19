@@ -9,7 +9,7 @@
 #include "Engine/rdPuppet.h"
 #include "Engine/rdClip.h"
 #include "Win95/std.h"
-#include "Engine/rdCache.h"
+#include "Raster/rdCache.h"
 #include "Engine/rdColormap.h"
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"

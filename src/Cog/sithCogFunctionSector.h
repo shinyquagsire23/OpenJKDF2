@@ -3,6 +3,6 @@
 
 #include "sithCog.h"
 
-void sithCogFunctionSector_Initialize(void* ctx);
+void sithCogFunctionSector_Startup(void* ctx);
 
 #endif // _SITHCOGFUNCTIONSECTOR_H

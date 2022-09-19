@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define jkGuiTitle_Initialize_ADDR (0x00418960)
+#define jkGuiTitle_Startup_ADDR (0x00418960)
 #define jkGuiTitle_Shutdown_ADDR (0x00418990)
 #define jkGuiTitle_sub_4189A0_ADDR (0x004189A0)
 #define jkGuiTitle_quicksave_related_func1_ADDR (0x004189D0)
@@ -19,7 +19,7 @@ typedef struct jkGuiMenu jkGuiMenu;
 typedef struct stdVBuffer stdVBuffer;
 typedef struct stdStrTable stdStrTable;
 
-void jkGuiTitle_Initialize();
+void jkGuiTitle_Startup();
 void jkGuiTitle_Shutdown();
 char jkGuiTitle_sub_4189A0(char *a1);
 wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fname);

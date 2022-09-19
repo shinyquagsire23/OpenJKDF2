@@ -200,7 +200,7 @@ static rdRect jkGuiBuildMulti_rect_5353C8 = {315, 115, 260, 260};
 // Added
 int jkGuiBuildMulti_bRendering = 0;
 
-void jkGuiBuildMulti_InitializeEditCharacter()
+void jkGuiBuildMulti_StartupEditCharacter()
 {
     jkGui_InitMenu(&jkGuiBuildMulti_menu, jkGui_stdBitmaps[11]);
 }
@@ -721,7 +721,7 @@ void jkGuiBuildMulti_sub_41A120(jkGuiMenu *pMenu)
         jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_buttons[6], pMenu, 1);
 }
 
-int jkGuiBuildMulti_Initialize()
+int jkGuiBuildMulti_Startup()
 {
 
     jkGui_InitMenu(&jkGuiBuildMulti_menuNewCharacter, jkGui_stdBitmaps[12]);

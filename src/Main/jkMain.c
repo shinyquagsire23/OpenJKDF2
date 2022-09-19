@@ -3,15 +3,15 @@
 #include "../jk.h"
 #include "Engine/rdroid.h"
 #include "Engine/sithNet.h"
-#include "Engine/sith.h"
-#include "Engine/sithControl.h"
-#include "Engine/sithSoundMixer.h"
+#include "Main/sithMain.h"
+#include "Devices/sithControl.h"
+#include "Devices/sithSoundMixer.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "Main/jkSmack.h"
 #include "Main/jkGame.h"
 #include "Main/jkCredits.h"
@@ -34,18 +34,19 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIDisplay.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "World/sithWorld.h"
 #include "Platform/stdControl.h"
 #include "Win95/Windows.h"
 #include "Win95/Video.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
 #include "General/util.h"
 #include "General/stdBitmap.h"
 #include "General/stdPalEffects.h"
 #include "World/jkPlayer.h"
+#include "Dss/jkDSS.h"
 #include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
@@ -85,7 +86,7 @@ void jkMain_Startup()
 void jkMain_Shutdown()
 {
     jkPlayer_Shutdown();
-    sith_Close();
+    sithMain_Close();
     jkMain_bInit = 0;
 }
 
@@ -209,7 +210,7 @@ void jkMain_GuiAdvance()
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-                    if (!sith_Tick()) return;
+                    if (!sithMain_Tick()) return;
                 }
                 
                 if ( g_sithMode == 5 )
@@ -225,11 +226,11 @@ void jkMain_GuiAdvance()
                 {
                     sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
-                        jkSaber_cogMsg_SendEndLevel();
+                        jkDSS_SendEndLevel();
                 }
-                if ( sith_bEndLevel )
+                if ( sithMain_bEndLevel )
                 {
-                    sith_bEndLevel = 0;
+                    sithMain_bEndLevel = 0;
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
@@ -322,7 +323,7 @@ void jkMain_EscapeMenuTick(int a2)
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-                    if (sith_Tick()) return;
+                    if (sithMain_Tick()) return;
                 }
                 
                 if ( g_sithMode == 5 )
@@ -338,11 +339,11 @@ void jkMain_EscapeMenuTick(int a2)
                     {
                         sithMulti_bTimelimitMet = 0;
                         if ( sithNet_isServer )
-                            jkSaber_cogMsg_SendEndLevel();
+                            jkDSS_SendEndLevel();
                     }
-                    if ( sith_bEndLevel )
+                    if ( sithMain_bEndLevel )
                     {
-                        sith_bEndLevel = 0;
+                        sithMain_bEndLevel = 0;
                         jkMain_EndLevel(1);
                     }
                     jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
@@ -384,7 +385,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         if ( a3 != JK_GAMEMODE_ESCAPE && jkMain_bInit )
         {
             jkPlayer_Shutdown();
-            sith_Close();
+            sithMain_Close();
             jkMain_bInit = 0;
             thing_eight = 0;
         }
@@ -467,7 +468,7 @@ void jkMain_GameplayShow(int a1, int a2)
         jkPlayer_InitForceBins();
         jkMain_bInit = 1;
         jkPlayer_InitSaber();
-        sith_AutoSave();
+        sithMain_AutoSave();
 LABEL_39:
         if ( jkMain_SetVideoMode() )
         {
@@ -508,12 +509,12 @@ LABEL_39:
         {
             if ( jkSmack_gameMode != 2 )
                 goto LABEL_15;
-            v3 = sith_Mode1Init_3(jkMain_aLevelJklFname);
+            v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
         }
     }
     else
     {
-        v3 = sith_Mode1Init(jkMain_aLevelJklFname);
+        v3 = sithMain_Mode1Init(jkMain_aLevelJklFname);
     }
 
     level_loaded = v3;
@@ -547,7 +548,7 @@ LABEL_15:
         {
             sithCamera_SetsFocus();
             jkPlayer_InitSaber();
-            sith_AutoSave();
+            sithMain_AutoSave();
         }
 
         goto LABEL_39;
@@ -565,7 +566,7 @@ LABEL_28:
         {
             sithCamera_SetsFocus();
             jkPlayer_InitSaber();
-            sith_AutoSave();
+            sithMain_AutoSave();
         }
         if ( sithNet_isMulti )
         {
@@ -578,7 +579,7 @@ LABEL_28:
                 DirectPlay_SetSessionDesc(jkMain_aLevelJklFname, v5);
             }
             if ( sithNet_isMulti )
-                jkSaber_cogMsg_wrap_SendSaberInfo_alt();
+                jkDSS_wrap_SendSaberInfo_alt();
         }
         goto LABEL_39;
     }
@@ -590,7 +591,7 @@ LABEL_28:
         stdControl_ToggleCursor(1);
         goto LABEL_28;
     }
-    sith_Close();
+    sithMain_Close();
     sithMulti_Shutdown();
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
@@ -613,7 +614,7 @@ void jkMain_GameplayTick(int a2)
             if (v1 > jkMain_lastTickMs + TICKRATE_MS)
             {
                 jkMain_lastTickMs = v1;
-                if (sith_Tick()) return;
+                if (sithMain_Tick()) return;
             }
             
             if ( g_sithMode == 5 )
@@ -629,11 +630,11 @@ void jkMain_GameplayTick(int a2)
                 {
                     sithMulti_bTimelimitMet = 0;
                     if ( sithNet_isServer )
-                        jkSaber_cogMsg_SendEndLevel();
+                        jkDSS_SendEndLevel();
                 }
-                if ( sith_bEndLevel )
+                if ( sithMain_bEndLevel )
                 {
-                    sith_bEndLevel = 0;
+                    sithMain_bEndLevel = 0;
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
@@ -670,7 +671,7 @@ void jkMain_GameplayLeave(int a2, int a3)
     if ( a3 != 6 && jkMain_bInit )
     {
         jkPlayer_Shutdown();
-        sith_Close();
+        sithMain_Close();
         jkMain_bInit = 0;
         thing_eight = 0;
     }
@@ -700,7 +701,7 @@ void jkMain_GameplayLeave(int a2, int a3)
 void jkMain_TitleShow(int a1, int a2)
 {
     jkGuiTitle_ShowLoadingStatic();
-    sith_Load("static.jkl");
+    sithMain_Load("static.jkl");
     jkHudInv_InitItems();
 }
 

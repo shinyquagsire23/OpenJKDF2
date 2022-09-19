@@ -5,19 +5,20 @@
 #include "General/stdFont.h"
 #include "General/stdString.h"
 #include "Win95/stdDisplay.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Win95/WinIdk.h"
 #include "World/sithThing.h"
-#include "World/sithInventory.h"
-#include "World/jkSaber.h"
+#include "Gameplay/sithInventory.h"
+#include "Gameplay/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
-#include "Engine/sithDebugConsole.h"
-#include "Engine/sithMulti.h"
+#include "Main/sithCommand.h"
+#include "Dss/sithMulti.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"
 #include "wprintf.h"
+#include "Dss/jkDSS.h"
 #include "../jk.h"
 
 void jkDev_Startup()
@@ -32,19 +33,19 @@ void jkDev_Startup()
     }
 #endif
 
-    DebugConsole_Initialize(64);
-    DebugConsole_Open(16);
-    DebugConsole_SetPrintFuncs(jkDev_DebugLog, jkDev_PrintUniString);
+    sithConsole_Startup(64);
+    sithConsole_Open(16);
+    sithConsole_SetPrintFuncs(jkDev_DebugLog, jkDev_PrintUniString);
 
     jkDev_cheatHashtable = stdHashTable_New(64);
     _memset(jkDev_aCheatCmds, 0, sizeof(stdDebugConsoleCmd) * 32);
 
-    DebugConsole_RegisterDevCmd(jkDev_CmdVersion, "version", 0);
-    DebugConsole_RegisterDevCmd(jkDev_CmdTeam, "team", 0);
-    DebugConsole_RegisterDevCmd(jkDev_CmdFramerate, "framerate", 0);
-    DebugConsole_RegisterDevCmd(jkDev_CmdDispStats, "dispstats", 0);
-    DebugConsole_RegisterDevCmd(jkDev_CmdKill, "kill", 0);
-    DebugConsole_RegisterDevCmd(jkDev_CmdEndLevel, "endlevel", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdVersion, "version", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdTeam, "team", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdFramerate, "framerate", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdDispStats, "dispstats", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdKill, "kill", 0);
+    sithConsole_RegisterDevCmd(jkDev_CmdEndLevel, "endlevel", 0);
 
     jkDev_RegisterCmd(jkDev_CmdDebugFlags, "whiteflag", "Disable AI", 0);
     jkDev_RegisterCmd(jkDev_CmdFly, "eriamjh", "", 0);
@@ -75,8 +76,8 @@ void jkDev_Shutdown()
         stdHashTable_Free(jkDev_cheatHashtable);
         jkDev_cheatHashtable = 0;
     }
-    DebugConsole_Close();
-    DebugConsole_Shutdown();
+    sithConsole_Close();
+    sithConsole_Shutdown();
     jkDev_bInitted = 0;
 }
 
@@ -420,7 +421,7 @@ char* jkDev_Decrypt(char *cheatStr)
 int jkDev_CmdVersion(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     _sprintf(std_genBuffer, "Jedi Knight v%d.%d%c %s %s\n", jkGuiTitle_verMajor, jkGuiTitle_verMinor, jkGuiTitle_verRevision, "Sep  8 1997", "16:17:30");
-    DebugConsole_Print(std_genBuffer);
+    sithConsole_Print(std_genBuffer);
     return 1;
 }
 
@@ -445,7 +446,7 @@ int jkDev_CmdKill(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdEndLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( sithNet_isMulti && sithNet_isServer )
-        jkSaber_cogMsg_SendEndLevel();
+        jkDSS_SendEndLevel();
     return 1;
 }
 
@@ -467,21 +468,21 @@ int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdFly(pCmd, pArgStr);
+        sithCommand_CmdFly(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
@@ -496,7 +497,7 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( pArgStr )
         {
             if ( _sscanf(pArgStr, "%f %f %f", &v5, &v4, &v6) == 3 )
-                sithDebugConsole_CmdWarp(pCmd, pArgStr);
+                sithCommand_CmdWarp(pCmd, pArgStr);
         }
     }
     return 1;
@@ -505,21 +506,21 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdActivate(pCmd, pArgStr);
+        sithCommand_CmdActivate(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags3(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithDebugConsole_CmdJump(pCmd, pArgStr);
+        sithCommand_CmdJump(pCmd, pArgStr);
     return 1;
 }
 
@@ -548,7 +549,7 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
 
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_ALLWEAPONS"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLWEAPONS"));
     }
     return 1;
 }
@@ -581,7 +582,7 @@ int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_KEYGREEN, 1.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_ALLITEMS"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLITEMS"));
     }
     return 1;
 }
@@ -616,7 +617,7 @@ int jkDev_CmdLightMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_LIGHTMASTER"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_LIGHTMASTER"));
     }
     return 1;
 }
@@ -651,7 +652,7 @@ int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_DARKMASTER"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_DARKMASTER"));
     }
     return 1;
 }
@@ -691,7 +692,7 @@ int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_UBERJEDI"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_UBERJEDI"));
     }
     return 1;
 }
@@ -733,7 +734,7 @@ int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 v9 = v9 - sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, j) * 5.0;
         }
 
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_LEVELUP"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_LEVELUP"));
     }
     return 1;
 }
@@ -744,7 +745,7 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         sithPlayer_pLocalPlayerThing->actorParams.health = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_SHIELDS, 200.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_HEAL"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_HEAL"));
     }
     return 1;
 }
@@ -754,7 +755,7 @@ int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         g_mapModeFlags ^= 0x42u;
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_ALLMAP"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLMAP"));
     }
     return 1;
 }
@@ -764,7 +765,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
-        DebugConsole_PrintUniStr(jkStrings_GetText("GAME_MANA"));
+        sithConsole_PrintUniStr(jkStrings_GetText("GAME_MANA"));
     }
     return 1;
 }
@@ -778,7 +779,7 @@ int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !v2 || v2 >= 5 )
         return 0;
 
-    jkSaber_cogMsg_SendSetTeam(v2);
+    jkDSS_SendSetTeam(v2);
     return 1;
 }
 

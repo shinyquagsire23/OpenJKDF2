@@ -1,6 +1,6 @@
 #include "Platform/stdControl.h"
 
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "Win95/Window.h"
 #include "stdPlatform.h"
 #include "General/stdMath.h"

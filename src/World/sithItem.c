@@ -1,6 +1,6 @@
 #include "sithItem.h"
 
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "World/sithThing.h"
 #include "Cog/sithCog.h"
 #include "Engine/sithNet.h"
@@ -85,7 +85,7 @@ void sithItem_Remove(sithThing *item)
         sithCog_SendMessageFromThing(item, item, SITH_MESSAGE_RESPAWN);
     }
 
-    if ( sithCogVm_multiplayerFlags )
+    if ( sithComm_multiplayerFlags )
     {
         sithDSSThing_SendSyncThing(item, -1, 255);
         sithDSSThing_SendPos(item, -1, 1);

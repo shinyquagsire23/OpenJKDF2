@@ -2,14 +2,14 @@
 
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
-#include "Engine/sithTime.h"
-#include "Engine/sithSoundClass.h"
+#include "Gameplay/sithTime.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
 #include "World/jkPlayer.h"
 #include "World/sithThing.h"
 #include "Gameplay/sithPlayerActions.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Cog/sithCog.h"
 #include "../jk.h"
 

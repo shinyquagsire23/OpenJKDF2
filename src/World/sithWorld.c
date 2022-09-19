@@ -1,32 +1,32 @@
 #include "sithWorld.h"
 
 #include "General/stdConffile.h"
-#include "Engine/sithModel.h"
-#include "Engine/sithSprite.h"
-#include "Engine/sithTemplate.h"
-#include "Engine/sithMaterial.h"
-#include "Engine/sithSound.h"
-#include "Engine/rdCache.h" // rdTri
+#include "World/sithModel.h"
+#include "World/sithSprite.h"
+#include "World/sithTemplate.h"
+#include "World/sithMaterial.h"
+#include "Devices/sithSound.h"
+#include "Raster/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
 #include "Cog/sithCogScript.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithAnimClass.h"
 #include "AI/sithAIClass.h"
-#include "Engine/sithSoundClass.h"
+#include "World/sithSoundClass.h"
 #include "stdPlatform.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "General/stdFnames.h"
 #include "Engine/rdColormap.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithParticle.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "General/util.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "jk.h"
 
 static char jkl_read_copyright[1088];
@@ -175,7 +175,7 @@ LABEL_11:
                         goto LABEL_19;
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (double)v6 * 0.001, section);
-                    DebugConsole_Print(tmp);
+                    sithConsole_Print(tmp);
                 }
             }
         }
@@ -573,7 +573,7 @@ int sithWorld_Initialize()
 {
     for (int i = 1; i < jkPlayer_maxPlayers; i++)
     {
-        sithPlayer_Initialize(i);
+        sithPlayer_Startup(i);
     }
     sithPlayer_idk(0);
     sithPlayer_ResetPalEffects();

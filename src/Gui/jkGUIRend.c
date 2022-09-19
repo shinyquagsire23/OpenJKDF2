@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
-#include "Engine/sithSound.h"
+#include "Devices/sithSound.h"
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
 #include "Platform/stdControl.h"
@@ -415,7 +415,7 @@ void jkGuiRend_sub_50FDB0()
     jkGuiRend_activeMenu = 0;
 }
 
-void jkGuiRend_Initialize()
+void jkGuiRend_Startup()
 {
     jkGuiRend_bInitted = 1;
 }

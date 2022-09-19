@@ -7,7 +7,7 @@
 #include "sithCog.h"
 
 void jkCog_RegisterVerbs();
-int jkCog_Initialize();
+int jkCog_Startup();
 void jkCog_Shutdown();
 int jkCog_StringsInit();
 

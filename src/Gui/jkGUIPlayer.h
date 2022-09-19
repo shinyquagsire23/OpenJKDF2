@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define jkGuiPlayer_Initialize_ADDR (0x004105F0)
+#define jkGuiPlayer_Startup_ADDR (0x004105F0)
 #define jkGuiPlayer_Shutdown_ADDR (0x00410630)
 #define jkGuiPlayer_sub_410640_ADDR (0x00410640)
 #define jkGuiPlayer_ShowNewPlayer_ADDR (0x00410870)
@@ -15,12 +15,12 @@
 //#define jkGuiPlayer_menuSelectElements ((jkGuiElement*)0x00526D98)
 //#define jkGuiPlayer_bInitted (*(int*)0x00555D20)
 
-int jkGuiPlayer_Initialize();
+int jkGuiPlayer_Startup();
 void jkGuiPlayer_Shutdown();
 void jkGuiPlayer_ShowNewPlayer(int a1);
 int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
 
-//static int (*jkGuiPlayer_Initialize)() = (void*)jkGuiPlayer_Initialize_ADDR;
+//static int (*jkGuiPlayer_Startup)() = (void*)jkGuiPlayer_Startup_ADDR;
 //static void (*jkGuiPlayer_ShowNewPlayer)(int) = (void*)jkGuiPlayer_ShowNewPlayer_ADDR;
 
 #endif // _JKGUIPLAYER_H

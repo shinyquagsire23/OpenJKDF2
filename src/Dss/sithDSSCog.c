@@ -1,9 +1,10 @@
 #include "sithDSSCog.h"
 
 #include "Cog/sithCog.h"
-#include "Cog/sithCogVm.h"
-#include "Engine/sithMulti.h"
+#include "Cog/sithCogExec.h"
+#include "Dss/sithMulti.h"
 #include "World/sithThing.h"
+#include "Devices/sithComm.h"
 
 int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float param0, float param1, float param2, float param3, int a11)
 {
@@ -46,7 +47,7 @@ int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int 
 
     if ( a2 == SITH_MESSAGE_TOUCHED )
         v12 = 0;
-    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, a11, 1, v12);
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, a11, 1, v12);
 }
 
 int sithDSSCog_ProcessSendTrigger(sithCogMsg *in_netMsg)
@@ -163,7 +164,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     }
 
     NETMSG_END(DSS_SYNCCOG);
-    return sithCogVm_SendMsgToPlayer(&sithCogVm_netMsgTmp, sendto_id, mpFlags, 1);
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
 int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)

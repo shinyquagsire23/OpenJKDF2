@@ -31,7 +31,7 @@ jkGuiElement jkGuiDialog_OkCancel_buttons[5] = {
 
 static jkGuiMenu jkGuiDialog_OkCancel_menu  = {jkGuiDialog_OkCancel_buttons, 0xFFFFFFFF, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiDialog_Initialize()
+void jkGuiDialog_Startup()
 {
     jkGui_InitMenu(&jkGuiDialog_OkCancel_menu, 0);
     jkGui_InitMenu(&jkGuiDialog_Ok_menu, 0);

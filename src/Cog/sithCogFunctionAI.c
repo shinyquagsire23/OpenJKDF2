@@ -1,6 +1,6 @@
 #include "sithCogFunctionAI.h"
 
-#include "Engine/sithTime.h"
+#include "Gameplay/sithTime.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Main/jkGame.h"
@@ -25,7 +25,7 @@ void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx);
 void sithCogFunctionAI_AIFlee(sithCog *ctx);
 void sithCogFunctionAI_AISetClass(sithCog *ctx);
 
-void sithCogFunctionAI_Initialize(void* ctx)
+void sithCogFunctionAI_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
@@ -54,7 +54,7 @@ void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
     sithActor *v4; // eax
     float a1a; // [esp+8h] [ebp+4h]
 
-    v2 = sithCogVm_PopFlex(ctx);
+    v2 = sithCogExec_PopFlex(ctx);
     a1a = v2;
     if ( v2 < 0.0 )
     {
@@ -64,7 +64,7 @@ void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
     {
         a1a = 2.0;
     }
-    v3 = sithCogVm_PopThing(ctx);
+    v3 = sithCogExec_PopThing(ctx);
     if ( v3 && v3->thingtype == SITH_THING_ACTOR )
     {
         v4 = v3->actor;
@@ -79,9 +79,9 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    if ( sithCogVm_PopVector3(ctx, &v3) )
+    if ( sithCogExec_PopVector3(ctx, &v3) )
     {
-        v1 = sithCogVm_PopThing(ctx);
+        v1 = sithCogExec_PopThing(ctx);
         
         // Added
         if (g_debugmodeFlags & 1) return;
@@ -106,9 +106,9 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
     float a1; // [esp+18h] [ebp+4h]
 
-    a1 = sithCogVm_PopFlex(ctx);
-    v2 = sithCogVm_PopVector3(ctx, &v5);
-    v3 = sithCogVm_PopThing(ctx);
+    a1 = sithCogExec_PopFlex(ctx);
+    v2 = sithCogExec_PopVector3(ctx, &v5);
+    v3 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -128,8 +128,8 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
     sithActor *v3; // eax
     rdVector3 *v4; // ecx
 
-    v1 = sithCogVm_PopInt(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopInt(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -158,8 +158,8 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
     sithThing *v2; // eax
     sithActor *v3; // eax
 
-    v1 = sithCogVm_PopThing(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -181,9 +181,9 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    if ( sithCogVm_PopVector3(ctx, &v3) )
+    if ( sithCogExec_PopVector3(ctx, &v3) )
     {
-        v1 = sithCogVm_PopThing(ctx);
+        v1 = sithCogExec_PopThing(ctx);
         
         // Added
         if (g_debugmodeFlags & 1) return;
@@ -207,8 +207,8 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
     sithActor *v3; // eax
     rdVector3 *v4; // ecx
 
-    v1 = sithCogVm_PopInt(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopInt(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -236,12 +236,12 @@ void sithCogFunctionAI_GetMovePos(sithCog *ctx)
     sithThing *v1; // eax
     sithActor *v2; // eax
 
-    v1 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->thingtype == SITH_THING_ACTOR )
     {
         v2 = v1->actor;
         if ( v2 )
-            sithCogVm_PushVector3(ctx, &v2->movepos);
+            sithCogExec_PushVector3(ctx, &v2->movepos);
     }
 }
 
@@ -252,8 +252,8 @@ void sithCogFunctionAI_AISetMode(sithCog *ctx)
     sithActor *v3; // ecx
     int v4; // edx
 
-    v1 = sithCogVm_PopInt(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopInt(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -279,11 +279,11 @@ void sithCogFunctionAI_AIGetMode(sithCog *ctx)
     sithThing *v1; // eax
     sithActor *v2; // eax
 
-    v1 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 )
-        sithCogVm_PushInt(ctx, v2->flags);
+        sithCogExec_PushInt(ctx, v2->flags);
     else
-        sithCogVm_PushInt(ctx, -1);
+        sithCogExec_PushInt(ctx, -1);
 }
 
 void sithCogFunctionAI_AIClearMode(sithCog *ctx)
@@ -294,8 +294,8 @@ void sithCogFunctionAI_AIClearMode(sithCog *ctx)
     int v4; // edx
     int mode_inv; // esi
 
-    mode = sithCogVm_PopInt(ctx);
-    thing = sithCogVm_PopThing(ctx);
+    mode = sithCogExec_PopInt(ctx);
+    thing = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -327,15 +327,15 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
     rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
     float a1; // [esp+4Ch] [ebp+4h]
 
-    v5 = sithCogVm_PopInt(ctx);
-    a1 = sithCogVm_PopFlex(ctx);
-    v6 = sithCogVm_PopFlex(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v5 = sithCogExec_PopInt(ctx);
+    a1 = sithCogExec_PopFlex(ctx);
+    v6 = sithCogExec_PopFlex(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1)
     {
-        sithCogVm_PushInt(ctx, -1);
+        sithCogExec_PushInt(ctx, -1);
         return;
     }
     
@@ -353,11 +353,11 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
           (sithCogFunctionAI_unk1 = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_apViewThings, v5, a1), sithCogFunctionAI_viewThingIdx = 0, sithCogFunctionAI_unk1 > 0)
        && sithCogFunctionAI_apViewThings[0]) )
     {
-        sithCogVm_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
+        sithCogExec_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
     }
     else
     {
-        sithCogVm_PushInt(ctx, -1);
+        sithCogExec_PushInt(ctx, -1);
     }
 }
 
@@ -368,9 +368,9 @@ void sithCogFunctionAI_NextThingInView(sithCog *ctx)
 
     v1 = ++sithCogFunctionAI_viewThingIdx;
     if ( sithCogFunctionAI_viewThingIdx < sithCogFunctionAI_unk1 && (v2 = sithCogFunctionAI_apViewThings[v1]) != 0 )
-        sithCogVm_PushInt(ctx, v2->thingIdx);
+        sithCogExec_PushInt(ctx, v2->thingIdx);
     else
-        sithCogVm_PushInt(ctx, -1);
+        sithCogExec_PushInt(ctx, -1);
 }
 
 void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
@@ -383,13 +383,13 @@ void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
     rdVector3 v7; // [esp+20h] [ebp-3Ch] BYREF
     rdMatrix34 v8; // [esp+2Ch] [ebp-30h] BYREF
 
-    v1 = sithCogVm_PopThing(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1)
     {
-        sithCogVm_PushFlex(ctx, -1000.0);
+        sithCogExec_PushFlex(ctx, -1000.0);
         return;
     }
     
@@ -406,11 +406,11 @@ void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
         rdVector_Normalize3Acc(&v6);
         rdVector_Normalize3Acc(&v7);
         a2 = v6.x * v7.x + v6.y * v7.y + v6.z * v7.z;
-        sithCogVm_PushFlex(ctx, a2);
+        sithCogExec_PushFlex(ctx, a2);
     }
     else
     {
-        sithCogVm_PushFlex(ctx, -1000.0);
+        sithCogExec_PushFlex(ctx, -1000.0);
     }
 }
 
@@ -423,8 +423,8 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
     int v5; // ecx
     unsigned int v6; // edx
 
-    v1 = sithCogVm_PopThing(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -463,8 +463,8 @@ void sithCogFunctionAI_sub_501330(sithCog *ctx)
     unsigned int v6; // ecx
     void *v7; // edi
 
-    v1 = sithCogVm_PopString(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopString(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     if ( !v2 )
         goto LABEL_12;
     if ( !v1 )
@@ -491,10 +491,10 @@ void sithCogFunctionAI_sub_501330(sithCog *ctx)
         while ( v6 < v5 );
     }
     if ( v6 < v5 )
-        sithCogVm_PushInt(ctx, v6);
+        sithCogExec_PushInt(ctx, v6);
     else
 LABEL_12:
-        sithCogVm_PushInt(ctx, -1);
+        sithCogExec_PushInt(ctx, -1);
 }
 
 void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
@@ -502,11 +502,11 @@ void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
     sithThing *v1; // eax
     sithActor *v2; // eax
 
-    v1 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->type == SITH_THING_ACTOR && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 && !v2->field_1F4 )
-        sithCogVm_PushInt(ctx, 1);
+        sithCogExec_PushInt(ctx, 1);
     else
-        sithCogVm_PushInt(ctx, 0);
+        sithCogExec_PushInt(ctx, 0);
 }
 
 void sithCogFunctionAI_AIFlee(sithCog *ctx)
@@ -516,8 +516,8 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
     sithActor *v3; // eax
     int v4; // ecx
 
-    v1 = sithCogVm_PopThing(ctx);
-    v2 = sithCogVm_PopThing(ctx);
+    v1 = sithCogExec_PopThing(ctx);
+    v2 = sithCogExec_PopThing(ctx);
     
     // Added
     if (g_debugmodeFlags & 1) return;
@@ -551,8 +551,8 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
     sithActor *v3; // ecx
     int v4; // eax
 
-    aiclass = sithCogVm_PopAIClass(ctx);
-    thing = sithCogVm_PopThing(ctx);
+    aiclass = sithCogExec_PopAIClass(ctx);
+    thing = sithCogExec_PopThing(ctx);
     if ( aiclass && thing && thing->thingtype == SITH_THING_ACTOR )
     {
         v3 = thing->actor;

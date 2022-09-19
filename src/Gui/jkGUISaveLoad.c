@@ -443,7 +443,7 @@ int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int 
     return 0;
 }
 
-void jkGuiSaveLoad_Initialize()
+void jkGuiSaveLoad_Startup()
 {
     jkGui_InitMenu(&jkGuiSaveLoad_menu, jkGui_stdBitmaps[3]);
 }

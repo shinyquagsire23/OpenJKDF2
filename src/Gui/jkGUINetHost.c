@@ -5,7 +5,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -14,7 +14,7 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
-#include "Win95/sithDplay.h"
+#include "Win95/stdComm.h"
 #include "Platform/wuRegistry.h"
 #include "General/stdString.h"
 #include "Main/jkRes.h"
@@ -253,7 +253,7 @@ void jkGuiNetHost_LoadSettings()
 #endif
 }
 
-void jkGuiNetHost_Initialize()
+void jkGuiNetHost_Startup()
 {
     jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[2]);
     jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[3]);

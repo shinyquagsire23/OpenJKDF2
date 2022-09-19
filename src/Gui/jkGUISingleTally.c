@@ -11,7 +11,7 @@
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
@@ -73,7 +73,7 @@ int jkGuiSingleTally_Show()
     return ret;
 }
 
-void jkGuiSingleTally_Initialize()
+void jkGuiSingleTally_Startup()
 {
     jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\foStars.bm", 1, 0);
     jkGui_InitMenu(&jkGuiSingleTally_menu, jkGui_stdBitmaps[10]);

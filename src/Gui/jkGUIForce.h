@@ -10,7 +10,7 @@
 #define jkGuiForce_ButtonClick_ADDR (0x00416250)
 #define jkGuiForce_ResetClick_ADDR (0x004163B0)
 #define jkGuiForce_Show_ADDR (0x00416480)
-#define jkGuiForce_Initialize_ADDR (0x004167B0)
+#define jkGuiForce_Startup_ADDR (0x004167B0)
 #define jkGuiForce_Shutdown_ADDR (0x00416830)
 #define jkGuiForce_UpdateViewForRank_ADDR (0x00416860)
 #define jkGuiForce_DarkLightHoverDraw_ADDR (0x004168C0)
@@ -26,7 +26,7 @@ int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *pbIsLight, int bEnableIdk);
-void jkGuiForce_Initialize();
+void jkGuiForce_Startup();
 void jkGuiForce_Shutdown();
 void jkGuiForce_UpdateViewForRank();
 void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);

@@ -11,8 +11,8 @@
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"
 #include "World/jkPlayer.h"
-#include "World/sithInventory.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithInventory.h"
+#include "Gameplay/sithPlayer.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Windows.h"
 #include "Main/jkStrings.h"
@@ -376,7 +376,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     return clicked;
 }
 
-void jkGuiForce_Initialize()
+void jkGuiForce_Startup()
 {
     char tmp[128];
 

@@ -5,23 +5,23 @@
 #include "World/sithSector.h"
 #include "Engine/sithCollision.h"
 #include "World/sithActor.h"
-#include "Engine/sithSurface.h"
+#include "World/sithSurface.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/sithTemplate.h"
+#include "World/sithTemplate.h"
 #include "Engine/sithNet.h"
-#include "Engine/sithTime.h"
-#include "Engine/sithControl.h"
+#include "Gameplay/sithTime.h"
+#include "Devices/sithControl.h"
 #include "Engine/sithCamera.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
-#include "Engine/sithSoundMixer.h"
-#include "Engine/sithSoundClass.h"
+#include "Devices/sithSoundMixer.h"
+#include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Main/jkGame.h"
-#include "Win95/DebugConsole.h"
+#include "Devices/sithConsole.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
@@ -473,7 +473,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
 
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
-    if ( spawned && sithCogVm_multiplayerFlags )
+    if ( spawned && sithComm_multiplayerFlags )
         sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
 
     return spawned;
@@ -782,7 +782,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         else
             v5 = "none";
         _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->field_0, surface->parent_sector->id, v5);
-        DebugConsole_Print(std_genBuffer);
+        sithConsole_Print(std_genBuffer);
     }
     v6 = surface->surfaceFlags;
     if ( (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 )
@@ -893,7 +893,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
     sithThing_Destroy(weapon);
 }
 
-void sithWeapon_InitializeEntry()
+void sithWeapon_StartupEntry()
 {
     sithWeapon_8BD0A0[0] = -1.0;
     sithWeapon_a8BD030[0] = 0;
@@ -1439,7 +1439,7 @@ LABEL_30:
         a5a = v15 * sithWeapon_fireRate;
         v16 = a5a;
         v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a);
-        if ( v17 && sithCogVm_multiplayerFlags )
+        if ( v17 && sithComm_multiplayerFlags )
             sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
     }
     while ( a1a > 1.0 );
@@ -1450,7 +1450,7 @@ LABEL_31:
     a1b = result;
     if ( result )
     {
-        if ( sithCogVm_multiplayerFlags )
+        if ( sithComm_multiplayerFlags )
         {
             sithDSSThing_SendFireProjectile(
                 sender,

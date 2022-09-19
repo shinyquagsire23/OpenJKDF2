@@ -7,7 +7,7 @@
 #include "General/stdFnames.h"
 #include "stdPlatform.h"
 #include "Win95/Windows.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "General/util.h"
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
@@ -79,7 +79,7 @@ void jkRes_LoadGob(char *a1)
     int v27; // edx
     char v30[128]; // [esp+10h] [ebp-80h] BYREF
 
-    sith_SetEpisodeName(a1);
+    sithMain_SetEpisodeName(a1);
     v1 = 0;
     
     for (v1 = 0; v1 < jkRes_gCtx.gobs[1].numGobs; v1++)
@@ -395,7 +395,7 @@ LABEL_11:
                     __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
                     jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
                 }
-                sith_SetEpisodeName(jkRes_episodeGobName);
+                sithMain_SetEpisodeName(jkRes_episodeGobName);
                 v12 = 0;
                 if ( jkRes_gCtx.gobs[1].numGobs )
                 {
@@ -499,7 +499,7 @@ LABEL_39:
         __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
         jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
     }
-    sith_SetEpisodeName(jkRes_episodeGobName);
+    sithMain_SetEpisodeName(jkRes_episodeGobName);
     v18 = 0;
     for (v18 = 0; v18 < jkRes_gCtx.gobs[1].numGobs; v18++)
     {

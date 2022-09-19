@@ -16,7 +16,7 @@
 #define jkGuiMouse_CancelOkClicked_ADDR (0x00417720)
 #define jkGuiMouse_RestoreDefaultsClicked_ADDR (0x00417860)
 #define jkGuiMouse_Show_ADDR (0x004178D0)
-#define jkGuiMouse_Initialize_ADDR (0x00417AD0)
+#define jkGuiMouse_Startup_ADDR (0x00417AD0)
 #define jkGuiMouse_Shutdown_ADDR (0x00417AF0)
 
 //static int (*jkGuiMouse_ListClicked1)(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5) = (void*)jkGuiMouse_ListClicked1_ADDR;
@@ -41,7 +41,7 @@ int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, in
 int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 int jkGuiMouse_Show();
-void jkGuiMouse_Initialize();
+void jkGuiMouse_Startup();
 void jkGuiMouse_Shutdown();
 
 #endif // _JKGUI_MOUSE_H

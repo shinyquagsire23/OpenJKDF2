@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define jkGuiBuildMulti_InitializeEditCharacter_ADDR (0x00418ED0)
+#define jkGuiBuildMulti_StartupEditCharacter_ADDR (0x00418ED0)
 #define jkGuiBuildMulti_ShutdownEditCharacter_ADDR (0x00418EF0)
 #define jkGuiBuildMulti_ModelLoader_ADDR (0x00418F00)
 #define jkGuiBuildMulti_MatLoader_ADDR (0x00418F60)
@@ -18,7 +18,7 @@
 #define jkGuiBuildMulti_sub_41A120_ADDR (0x0041A120)
 #define jkGuiBuildMulti_SaberButtonClicked_ADDR (0x0041A140)
 
-#define jkGuiBuildMulti_Initialize_ADDR (0x0041C5E0)
+#define jkGuiBuildMulti_Startup_ADDR (0x0041C5E0)
 #define jkGuiBuildMulti_Shutdown_ADDR (0x0041C630)
 #define jkGuiBuildMulti_Load_ADDR (0x0041C640)
 #define jkGuiBuildMulti_Show_ADDR (0x0041C700)
@@ -29,7 +29,7 @@
 #define jkGuiBuildMulti_sub_41D680_ADDR (0x0041D680)
 #define jkGuiBuildMulti_sub_41D830_ADDR (0x0041D830)
 
-void jkGuiBuildMulti_InitializeEditCharacter();
+void jkGuiBuildMulti_StartupEditCharacter();
 void jkGuiBuildMulti_ShutdownEditCharacter();
 rdModel3* jkGuiBuildMulti_ModelLoader(const char *pCharFpath, int unused);
 rdMaterial* jkGuiBuildMulti_MatLoader(const char *pMatFname, int a, int b);
@@ -43,9 +43,9 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw);
 void jkGuiBuildMulti_sub_41A120(jkGuiMenu *pMenu);
 int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
-//static int (*jkGuiBuildMulti_InitializeEditCharacter)() = (void*)jkGuiBuildMulti_InitializeEditCharacter_ADDR;
+//static int (*jkGuiBuildMulti_StartupEditCharacter)() = (void*)jkGuiBuildMulti_StartupEditCharacter_ADDR;
 
-int jkGuiBuildMulti_Initialize();
+int jkGuiBuildMulti_Startup();
 void jkGuiBuildMulti_Shutdown();
 void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, wchar_t *pPlayerName, wchar_t *pCharName, int bCharPath);
 int jkGuiBuildMulti_Show();

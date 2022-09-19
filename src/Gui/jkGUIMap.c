@@ -40,7 +40,7 @@ static jkGuiElement jkGuiMap_aElements[16] =
 
 static jkGuiMenu jkGuiMap_menu = { &jkGuiMap_aElements, 0, 0xFFFF, 0xFFFF, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMap_sub_415720, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL };
 
-void jkGuiMap_Initialize()
+void jkGuiMap_Startup()
 {
     jkGui_InitMenu(&jkGuiMap_menu, jkGui_stdBitmaps[6]);
 }
@@ -287,7 +287,7 @@ int jkGuiMap_Show()
         jkGuiMap_unk4.numArr = 11;
         jkGuiMap_unk4.unkArr = sithMap_unkArr;
         _memcpy(jkGuiMap_unk4.teamColors, jkGuiMap_idk, sizeof(jkGuiMap_unk4.teamColors));
-        sithMap_Initialize(&jkGuiMap_unk4);
+        sithMap_Startup(&jkGuiMap_unk4);
         a2.x = 0.0;
         a2.y = -2.0;
         a2.z = 0.3;

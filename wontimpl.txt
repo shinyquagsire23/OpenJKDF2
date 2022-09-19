@@ -163,11 +163,11 @@ stdDisplay_ddraw_waitforvblank
 stdDisplay_ddraw_surface_flip2
 stdDisplay_RestoreDisplayMode
 stdDisplay_VBufferConvertColorFormat
-sithDplay_OpenConnection
-sithDplay_CloseConnection
-sithDplay_Open
-sithDplay_Close
-sithDplay_EnumSessions
+stdComm_OpenConnection
+stdComm_CloseConnection
+stdComm_Open
+stdComm_Close
+stdComm_EnumSessions
 DirectPlay_EarlyInit
 DirectPlay_Initialize
 DirectPlay_Destroy

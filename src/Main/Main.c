@@ -32,7 +32,7 @@
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "World/jkPlayer.h"
-#include "World/jkSaber.h"
+#include "Gameplay/jkSaber.h"
 #include "Win95/std.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/stdConsole.h"
@@ -56,13 +56,14 @@
 #include "Main/smack.h"
 #include "Main/jkMain.h"
 #include "Engine/rdroid.h"
-#include "Engine/sith.h"
-#include "Engine/sithMulti.h"
+#include "Main/sithMain.h"
+#include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/util.h"
 #include "General/stdFileUtil.h"
 #include "General/stdJSON.h"
+#include "Dss/jkDSS.h"
 
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
@@ -855,7 +856,7 @@ int Main_StartupDedicated()
     
     std3D_StartScene();
     std3D_EndScene();
-    sith_Load("static.jkl");
+    sithMain_Load("static.jkl");
     jkHudInv_InitItems();
 
     if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
@@ -1069,56 +1070,56 @@ int Main_Startup(const char *cmdline)
     jkGob_Startup();
     jkRes_Startup(pHS);
     Windows_Startup();
-    jkStrings_Initialize();
+    jkStrings_Startup();
 
     if (Windows_InitWindow())
     {
         rdStartup(&hs);
-        jkGuiRend_Initialize();
-        jkGui_Initialize();
-        jkGuiMultiplayer_Initialize();
-        jkGuiNetHost_Initialize();
-        jkGuiSetup_Initialize();
-        jkGuiDisplay_Initialize();
-        jkGuiForce_Initialize();
-        jkGuiMain_Initialize();
-        jkGuiPlayer_Initialize();
-        jkGuiSound_Initialize();
+        jkGuiRend_Startup();
+        jkGui_Startup();
+        jkGuiMultiplayer_Startup();
+        jkGuiNetHost_Startup();
+        jkGuiSetup_Startup();
+        jkGuiDisplay_Startup();
+        jkGuiForce_Startup();
+        jkGuiMain_Startup();
+        jkGuiPlayer_Startup();
+        jkGuiSound_Startup();
         jkGuiEsc_Startup();
-        jkGuiMap_Initialize();
-        jkGuiKeyboard_Initialize();
-        jkGuiJoystick_Initialize();
-        jkGuiDialog_Initialize();
-        jkGuiMouse_Initialize();
-        jkGuiControlOptions_Initialize();
-        jkGuiObjectives_Initialize();
-        jkGuiSingleTally_Initialize();
-        jkGuiMultiTally_Initialize();
-        jkGuiBuildMulti_InitializeEditCharacter();
-        jkGuiTitle_Initialize();
-        jkGuiGeneral_Initialize();
-        jkGuiGameplay_Initialize();
-        jkGuiDecision_Initialize();
-        jkGuiSingleplayer_Initialize();
-        jkGuiBuildMulti_Initialize();
-        jkGuiSaveLoad_Initialize();
-        jkGuiControlSaveLoad_Initialize();
+        jkGuiMap_Startup();
+        jkGuiKeyboard_Startup();
+        jkGuiJoystick_Startup();
+        jkGuiDialog_Startup();
+        jkGuiMouse_Startup();
+        jkGuiControlOptions_Startup();
+        jkGuiObjectives_Startup();
+        jkGuiSingleTally_Startup();
+        jkGuiMultiTally_Startup();
+        jkGuiBuildMulti_StartupEditCharacter();
+        jkGuiTitle_Startup();
+        jkGuiGeneral_Startup();
+        jkGuiGameplay_Startup();
+        jkGuiDecision_Startup();
+        jkGuiSingleplayer_Startup();
+        jkGuiBuildMulti_Startup();
+        jkGuiSaveLoad_Startup();
+        jkGuiControlSaveLoad_Startup();
 #ifndef LINUX_TMP
-        smack_Initialize(); // TODO
+        smack_Startup(); // TODO
 #endif
-        sith_Startup(&hs); // ~TODO
+        sithMain_Startup(&hs); // ~TODO
         jkAI_Startup();
-        jkCog_Initialize();
+        jkCog_Startup();
         jkEpisode_Startup();
         jkDev_Startup();
-        jkGame_Initialize();
+        jkGame_Startup();
         Video_Startup();
-        jkControl_Initialize(); // ~TODO
-        jkHudInv_Initialize();
-        jkSaber_Startup();
-        jkCutscene_Initialize("ui\\cutStrings.uni");
-        jkCredits_Initialize("ui\\credits.uni");
-        jkSmack_Initialize();
+        jkControl_Startup(); // ~TODO
+        jkHudInv_Startup();
+        jkDSS_Startup();
+        jkCutscene_Startup("ui\\cutStrings.uni");
+        jkCredits_Startup("ui\\credits.uni");
+        jkSmack_Startup();
 
         if (jkRes_LoadCD(0))
         {
@@ -1169,17 +1170,17 @@ void Main_Shutdown()
     jkGuiSingleTally_Shutdown();
     jkGuiRend_Shutdown();
     jkCog_Shutdown();
-    sith_Free();
+    sithMain_Free();
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
-    jkSaber_Shutdown();
+    jkDSS_Shutdown();
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )
         jkCutscene_sub_421410();
     Video_Shutdown();
     jkGame_Shutdown();
     jkDev_Shutdown();
-    sith_Shutdown();
+    sithMain_Shutdown();
     smack_Shutdown();
     jkGui_Shutdown();
     rdShutdown();

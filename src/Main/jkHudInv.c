@@ -5,10 +5,10 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "Engine/sithControl.h"
+#include "Devices/sithControl.h"
 #include "stdPlatform.h"
 #include "Cog/sithCog.h"
-#include "World/sithInventory.h"
+#include "Gameplay/sithInventory.h"
 #include "Main/Main.h"
 #include "jk.h"
 
@@ -599,7 +599,7 @@ void jkHudInv_Close()
     jkHudInv_font = 0;
 }
 
-int jkHudInv_Initialize()
+int jkHudInv_Startup()
 {
     _memset(&jkHudInv_itemTexfmt, 0, sizeof(rdTexformat)); // sizeof(jkHudInv_itemTexfmt)
     return 1;

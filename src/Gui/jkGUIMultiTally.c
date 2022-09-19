@@ -11,12 +11,12 @@
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"
-#include "World/sithPlayer.h"
+#include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "General/stdString.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 
 static jkGuiElement jkGuiMultiTally_buttons[92] = {
     { ELEMENT_TEXT, 0, 2, "GUI_MULTIPLAYER_SCORE", 3, { 90, 20, 460, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -151,8 +151,6 @@ static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
 
-#define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && sithDplay_bIsServer) ? 0 : 30000)
-
 int jkGuiMultiTally_Show(int a1)
 {
     int result; // eax
@@ -218,7 +216,7 @@ int jkGuiMultiTally_Show(int a1)
 #ifdef QOL_IMPROVEMENTS
     // Added
     uint32_t hack = jkPlayer_playerInfos[0].flags;
-    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
+    if (stdComm_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = 0;
 #endif
 
@@ -425,7 +423,7 @@ LABEL_50:
 
 #ifdef QOL_IMPROVEMENTS
     // Added
-    if (sithDplay_bIsServer && jkGuiNetHost_bIsDedicated)
+    if (stdComm_bIsServer && jkGuiNetHost_bIsDedicated)
         jkPlayer_playerInfos[0].flags = hack;
 #endif
 
@@ -467,7 +465,7 @@ int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerIn
     return result;
 }
 
-void jkGuiMultiTally_Initialize()
+void jkGuiMultiTally_Startup()
 {
     jkGui_InitMenu(&jkGuiMultiTally_menu, jkGui_stdBitmaps[10]);
     jkGui_InitMenu(&jkGuiMultiTally_menu2, jkGui_stdBitmaps[10]);

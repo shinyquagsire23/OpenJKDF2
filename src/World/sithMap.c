@@ -2,9 +2,9 @@
 
 #include "World/sithThing.h"
 #include "Engine/sithAdjoin.h"
-#include "Engine/sith.h"
+#include "Main/sithMain.h"
 #include "Engine/rdroid.h"
-#include "Engine/sithMulti.h"
+#include "Dss/sithMulti.h"
 #include "Primitives/rdPrimit2.h"
 #include "Primitives/rdPrimit3.h"
 #include "Engine/rdClip.h"
@@ -14,7 +14,7 @@
 #include <math.h>
 #include <float.h>
 
-int sithMap_Initialize(sithMap *map)
+int sithMap_Startup(sithMap *map)
 {
     if ( sithMap_bInitted )
         return 0;
@@ -45,7 +45,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     float a2a; // [esp+0h] [ebp-20h]
     rdVector3 vertex_out; // [esp+14h] [ebp-Ch] BYREF
 
-    sith_sub_4C4D80();
+    sithMain_sub_4C4D80();
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithMap_pCurCamera = camera;

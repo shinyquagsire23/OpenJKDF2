@@ -11,7 +11,7 @@
 #define jkHudInv_InitItems_ADDR (0x00409C10)
 #define jkHudInv_LoadItemRes_ADDR (0x00409CB0)
 #define jkHudInv_Close_ADDR (0x00409FD0)
-#define jkHudInv_Initialize_ADDR (0x00409FF0)
+#define jkHudInv_Startup_ADDR (0x00409FF0)
 #define jkHudInv_Shutdown_ADDR (0x0040A010)
 
 int jkHudInv_ItemDatLoad(char *fpath);
@@ -21,7 +21,7 @@ void jkHudInv_InputInit();
 int jkHudInv_InitItems();
 void jkHudInv_LoadItemRes();
 void jkHudInv_Close();
-int jkHudInv_Initialize();
+int jkHudInv_Startup();
 int jkHudInv_Shutdown();
 
 //static void (*jkHudInv_InputInit)() = (void*)jkHudInv_InputInit_ADDR;
