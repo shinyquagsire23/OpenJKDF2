@@ -307,8 +307,8 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     
     if ( rdroid_curGeometryMode >= face->geometryMode )
         rdroid_curGeometryMode = face->geometryMode;
-    geometryMode = thing->geometryMode;
-    if ( rdroid_curGeometryMode < thing->geometryMode )
+    geometryMode = thing->curGeoMode;
+    if ( rdroid_curGeometryMode < thing->curGeoMode )
     {
         if ( rdroid_curGeometryMode >= face->geometryMode )
             geometryMode = face->geometryMode;
@@ -325,9 +325,9 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     {
         if ( rdroid_curLightingMode >= face->lightingMode )
             rdroid_curLightingMode = face->lightingMode;
-        if ( rdroid_curLightingMode >= thing->lightingMode )
+        if ( rdroid_curLightingMode >= thing->curLightMode )
         {
-            face->lightingMode = thing->lightingMode;
+            face->lightingMode = thing->curLightMode;
         }
         else if ( rdroid_curLightingMode < face->lightingMode )
         {
@@ -338,7 +338,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     
     if ( rdroid_curTextureMode >= face->textureMode )
         rdroid_curTextureMode = face->textureMode;
-    textureMode = thing->textureMode;
+    textureMode = thing->curTexMode;
     if ( rdroid_curTextureMode < textureMode )
     {
         if ( rdroid_curTextureMode >= face->textureMode )

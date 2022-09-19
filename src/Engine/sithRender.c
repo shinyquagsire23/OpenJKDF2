@@ -997,7 +997,7 @@ LABEL_150:
                 if ( v63 != 2 )
                 {
                     if ( a2 >= 1.0 )
-                        i->rdthing.curLightMode = RD_LIGHTMODE_FULLYLIT;
+                        i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
                     if ( sithRender_RenderThing(i) )
                         ++sithRender_831980;
                 }
@@ -1285,27 +1285,27 @@ void sithRender_RenderThings()
                         }
                     }
                     
-                    texMode = thingIter->rdthing.curTexMode;
+                    texMode = thingIter->rdthing.desiredTexMode;
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.textureMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
+                        thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
                     {
                         texMode2 = RD_TEXTUREMODE_PERSPECTIVE;
                         if ( texMode <= RD_TEXTUREMODE_PERSPECTIVE)
-                            texMode2 = thingIter->rdthing.curTexMode;
-                        thingIter->rdthing.textureMode = texMode2;
+                            texMode2 = thingIter->rdthing.desiredTexMode;
+                        thingIter->rdthing.curTexMode = texMode2;
                     }
                     if ( thingIter->screenPos.y >= (double)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.textureMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
+                        thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
                     {
                         if ( texMode > RD_TEXTUREMODE_PERSPECTIVE)
                             texMode = RD_TEXTUREMODE_PERSPECTIVE;
-                        thingIter->rdthing.textureMode = texMode;
+                        thingIter->rdthing.curTexMode = texMode;
                     }
                     if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
@@ -1320,7 +1320,7 @@ void sithRender_RenderThings()
                     }
                     if ( a2 >= 1.0 )
                     {
-                        lightMode = thingIter->rdthing.curLightMode;
+                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( v16 )
                         {
                             lightMode = lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : lightMode;
@@ -1333,17 +1333,17 @@ void sithRender_RenderThings()
                     }
                     else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && thingIter->screenPos.y >= (double)sithWorld_pCurrentWorld->gouradDistance )
                     {
-                        lightMode = thingIter->rdthing.curLightMode;
+                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_DIFFUSE)
                             lightMode = RD_LIGHTMODE_DIFFUSE;
                     }
                     else
                     {
-                        lightMode = thingIter->rdthing.curLightMode;
+                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_GOURAUD)
                             lightMode = RD_LIGHTMODE_GOURAUD;
                     }
-                    thingIter->rdthing.lightingMode = lightMode;
+                    thingIter->rdthing.curLightMode = lightMode;
                     if ( sithRender_RenderThing(thingIter) )
                         ++sithRender_831984;
                 }

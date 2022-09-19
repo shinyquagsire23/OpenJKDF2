@@ -455,9 +455,9 @@ void jkCog_SetInvis(sithCog *pCog)
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
     if ( v1 <= 0 )
-        v2->rdthing.geometryMode = v2->rdthing.curGeoMode;
+        v2->rdthing.curGeoMode = v2->rdthing.desiredGeoMode;
     else
-        v2->rdthing.geometryMode = RD_GEOMODE_VERTICES;
+        v2->rdthing.curGeoMode = RD_GEOMODE_VERTICES;
     if ( sithComm_multiplayerFlags )
     {
         if ( (pCog->flags & 0x200) == 0 )
@@ -736,39 +736,47 @@ void jkCog_StringClear(sithCog *pCog)
 
 void jkCog_StringConcatUnistring(sithCog *pCog)
 {
-    signed int v1; // eax
-    wchar_t *v2; // esi
-    size_t v3; // edi
+    signed int uniID; // eax
+    wchar_t *str; // esi
+    size_t finalLen;
     char key[32]; // [esp+8h] [ebp-20h] BYREF
 
-    v1 = sithCogExec_PopInt(pCog);
-    stdString_snprintf(key, 32, "COG_%05d", v1);
-    v2 = stdStrTable_GetUniString(&jkCog_strings, key);
-    if ( !v2 )
-        v2 = jkStrings_GetText(key);
-    v3 = _wcslen(jkCog_jkstring);
-    if ( _wcslen(v2) + v3 < 0x81 )
-        __wcscat(jkCog_jkstring, v2);
+    uniID = sithCogExec_PopInt(pCog);
+    stdString_snprintf(key, 32, "COG_%05d", uniID);
+    str = stdStrTable_GetUniString(&jkCog_strings, key);
+    if ( !str )
+        str = jkStrings_GetText(key);
+
+    finalLen = _wcslen(str) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
+        __wcscat(jkCog_jkstring, str);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatAsciiString(sithCog *pCog)
 {
-    char *v1; // edx
-    size_t v2; // esi
-    wchar_t v3[130]; // [esp+8h] [ebp-104h] BYREF
+    char *mbString; // edx
+    size_t finalLen;
+    wchar_t wcStr[130]; // [esp+8h] [ebp-104h] BYREF
 
-    v1 = sithCogExec_PopString(pCog);
-    stdString_CharToWchar(v3, v1, strlen(v1) + 1);
-    v2 = _wcslen(jkCog_jkstring);
-    if ( _wcslen(v3) + v2 < 0x81 )
-        __wcscat(jkCog_jkstring, v3);
+    mbString = sithCogExec_PopString(pCog);
+    stdString_CharToWchar(wcStr, mbString, strlen(mbString) + 1);
+
+    finalLen = _wcslen(wcStr) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
+        __wcscat(jkCog_jkstring, wcStr);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatPlayerName(sithCog *pCog)
 {
     sithThing *v1; // eax
+    size_t finalLen;
     sithPlayerInfo *v2; // esi
-    size_t v3; // edi
 
     v1 = sithCogExec_PopThing(pCog);
     if ( v1 )
@@ -778,9 +786,12 @@ void jkCog_StringConcatPlayerName(sithCog *pCog)
             v2 = v1->actorParams.playerinfo;
             if ( v2 )
             {
-                v3 = _wcslen(jkCog_jkstring);
-                if ( _wcslen(v2->player_name) + v3 < 0x81 )
+                finalLen = _wcslen(v2->player_name) + _wcslen(jkCog_jkstring);
+                if (finalLen < 0x81)
+                {
                     __wcscat(jkCog_jkstring, v2->player_name);
+                    jkCog_jkstring[finalLen] = 0;
+                }
             }
         }
     }
@@ -788,26 +799,33 @@ void jkCog_StringConcatPlayerName(sithCog *pCog)
 
 void jkCog_StringConcatSpace(sithCog *pCog)
 {
-    size_t v1; // esi
+    size_t finalLen;
     wchar_t v2[130]; // [esp+4h] [ebp-104h] BYREF
 
     _wcscpy(v2, L" ");
-    v1 = _wcslen(jkCog_jkstring);
-    if ( _wcslen(v2) + v1 < 0x81 )
+
+    finalLen = _wcslen(v2) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v2);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatInt(sithCog *pCog)
 {
     signed int v1; // eax
-    size_t v2; // esi
+    size_t finalLen;
     wchar_t v3[130]; // [esp+4h] [ebp-104h] BYREF
 
     v1 = sithCogExec_PopInt(pCog);
     jk_snwprintf(v3, 130, L"%d", v1); // Added: bounds check
-    v2 = _wcslen(v3);
-    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+    finalLen = _wcslen(v3) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v3);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatFormattedInt(sithCog *ctx)
@@ -815,7 +833,7 @@ void jkCog_StringConcatFormattedInt(sithCog *ctx)
     char *v1; // esi
     signed int v2; // eax
     signed int v3; // ebx
-    size_t v4; // esi
+    size_t finalLen; // esi
     wchar_t v5[130]; // [esp+Ch] [ebp-208h] BYREF
     wchar_t v6[130]; // [esp+110h] [ebp-104h] BYREF
 
@@ -831,28 +849,34 @@ void jkCog_StringConcatFormattedInt(sithCog *ctx)
     {
         jk_snwprintf(v5, 130, L"%d", v2);
     }
-    v4 = _wcslen(v5);
-    if ( _wcslen(jkCog_jkstring) + v4 < 0x81 )
+    finalLen = _wcslen(v5) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v5);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatFlex(sithCog *pCog)
 {
     double v1; // st7
-    size_t v2; // esi
+    size_t finalLen; // esi
     wchar_t v3[130]; // [esp+Ch] [ebp-104h] BYREF
 
     v1 = sithCogExec_PopFlex(pCog);
     jk_snwprintf(v3, 130, L"%f", v1); // Added: bounds check
-    v2 = _wcslen(v3);
-    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+    finalLen = _wcslen(v3) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v3);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatFormattedFlex(sithCog *pCog)
 {
     char *v1; // esi
-    size_t v2; // esi
+    size_t finalLen; // esi
     float v3; // [esp+10h] [ebp-20Ch]
     wchar_t v4[130]; // [esp+14h] [ebp-208h] BYREF
     wchar_t v5[130]; // [esp+118h] [ebp-104h] BYREF
@@ -868,14 +892,17 @@ void jkCog_StringConcatFormattedFlex(sithCog *pCog)
     {
         jk_snwprintf(v4, 130, L"%f", v3); // Added: bounds
     }
-    v2 = _wcslen(v4);
-    if ( _wcslen(jkCog_jkstring) + v2 < 0x81 )
+    finalLen = _wcslen(v4) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v4);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringConcatVector(sithCog *pCog)
 {
-    size_t v1; // esi
+    size_t finalLen; // esi
     rdVector3 v2; // [esp+1Ch] [ebp-110h] BYREF
     wchar_t v3[130]; // [esp+28h] [ebp-104h] BYREF
 
@@ -883,9 +910,12 @@ void jkCog_StringConcatVector(sithCog *pCog)
         jk_snwprintf(v3, 130, L"<%f %f %f>", v2.x, v2.y, v2.z);
     else
         _wcscpy(v3, L"<Bad Vector>");
-    v1 = _wcslen(v3);
-    if ( _wcslen(jkCog_jkstring) + v1 < 0x81 )
+    finalLen = _wcslen(v3) + _wcslen(jkCog_jkstring);
+    if (finalLen < 0x81)
+    {
         __wcscat(jkCog_jkstring, v3);
+        jkCog_jkstring[finalLen] = 0;
+    }
 }
 
 void jkCog_StringOutput(sithCog *ctx)

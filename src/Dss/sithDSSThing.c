@@ -130,7 +130,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
     NETMSG_PUSHS16(pThing->collide);
     NETMSG_PUSHVEC3(pThing->position);
     NETMSG_PUSHS32(pThing->thingflags);
-    NETMSG_PUSHS32(pThing->rdthing.geometryMode);
+    NETMSG_PUSHS32(pThing->rdthing.curGeoMode);
 
     if ( pThing->animclass )
     {
@@ -212,7 +212,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
 
     sithAnimclass* pAnimclass = pThing->animclass;
     pThing->thingflags = thingflags;
-    pThing->rdthing.geometryMode = (rdGeoMode_t)NETMSG_POPS32();
+    pThing->rdthing.curGeoMode = (rdGeoMode_t)NETMSG_POPS32();
     if ( pAnimclass )
     {
         sithPuppet_SetArmedMode(pThing, NETMSG_POPS16());
@@ -732,7 +732,7 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
         NETMSG_PUSHS32(thing->pulse_end_ms);
         NETMSG_PUSHS32(thing->pulse_ms);
         NETMSG_PUSHF32(thing->userdata);
-        NETMSG_PUSHU8(thing->rdthing.geometryMode);
+        NETMSG_PUSHU8(thing->rdthing.curGeoMode);
         NETMSG_PUSHS16(thing->collide);
         NETMSG_PUSHF32(thing->collideSize);
         NETMSG_PUSHF32(thing->light);
@@ -882,7 +882,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     thing->pulse_end_ms = NETMSG_POPS32();
     thing->pulse_ms = NETMSG_POPS32();
     thing->userdata = NETMSG_POPF32();
-    thing->rdthing.geometryMode = (rdGeoMode_t)NETMSG_POPU8();
+    thing->rdthing.curGeoMode = (rdGeoMode_t)NETMSG_POPU8();
     thing->collide = NETMSG_POPS16();
     thing->collideSize = NETMSG_POPF32();
     thing->light = NETMSG_POPF32();
