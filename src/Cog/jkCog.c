@@ -346,7 +346,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
                     rdThing_SetModel3(v5, model3);
                     if ( sithComm_multiplayerFlags )
                     {
-                        if ( (ctx->flags & 0x200) == 0 )
+                        if ( (ctx->cogFlags & SITH_COG_NO_SYNC) == 0 )
                         {
                             v6 = ctx->trigId;
                             if ( v6 != SITH_MESSAGE_STARTUP && v6 != SITH_MESSAGE_SHUTDOWN )
@@ -460,7 +460,7 @@ void jkCog_SetInvis(sithCog *pCog)
         v2->rdthing.curGeoMode = RD_GEOMODE_VERTICES;
     if ( sithComm_multiplayerFlags )
     {
-        if ( (pCog->flags & 0x200) == 0 )
+        if ( (pCog->cogFlags & SITH_COG_NO_SYNC) == 0 )
         {
             v3 = pCog->trigId;
             if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
@@ -487,7 +487,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
     v2->actorParams.typeflags = v4;
     if ( sithComm_multiplayerFlags )
     {
-        if ( (pCog->flags & 0x200) == 0 )
+        if ( (pCog->cogFlags & SITH_COG_NO_SYNC) == 0 )
         {
             v5 = pCog->trigId;
             if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
@@ -657,7 +657,7 @@ void jkCog_SetSaberInfo(sithCog *ctx)
         jkSaber_InitializeSaberInfo(v4, v10->mat_fpath, v9->mat_fpath, base_rad, tip_rad, len, wall_sparks, blood_sparks, saber_sparks);
         if ( sithComm_multiplayerFlags )
         {
-            if ( (ctx->flags & 0x200) == 0 )
+            if ( (ctx->cogFlags & SITH_COG_NO_SYNC) == 0 )
             {
                 v5 = ctx->trigId;
                 if ( v5 != SITH_MESSAGE_STARTUP && v5 != SITH_MESSAGE_SHUTDOWN )
@@ -944,7 +944,7 @@ LABEL_8:
         }
         if ( sithComm_multiplayerFlags )
         {
-            if ( (ctx->flags & 0x200) == 0 )
+            if ( (ctx->cogFlags & SITH_COG_NO_SYNC) == 0 )
             {
                 v4 = ctx->trigId;
                 if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN && v2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v2].flags & 1) != 0 )
@@ -963,7 +963,7 @@ LABEL_8:
         jkDev_PrintUniString(jkCog_jkstring);
         if ( sithComm_multiplayerFlags )
         {
-            if ( (ctx->flags & 0x200) == 0 )
+            if ( (ctx->cogFlags & SITH_COG_NO_SYNC) == 0 )
             {
                 v3 = ctx->trigId;
                 if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )

@@ -63,7 +63,7 @@ typedef struct sithCogReference
 
 typedef struct sithCogScript
 {
-    uint32_t debug_maybe;
+    sithCogFlags_t cogFlags;
     char cog_fpath[32];
     int* script_program;
     uint32_t codeSize;

@@ -89,7 +89,7 @@ void sithCogFunction_Sleep(sithCog *ctx)
         fSecs_ = 0.1;
     
     // TODO this is probably an inlined func?
-    if ( ctx_->flags & SITH_COG_DEBUG )
+    if ( ctx_->cogFlags & SITH_COG_DEBUG )
     {
         _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs_);
         sithConsole_Print(std_genBuffer);
@@ -304,21 +304,21 @@ void sithCogFunction_SetPulse(sithCog *ctx)
     popFlex = sithCogExec_PopFlex(ctx);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( ctx->cogFlags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
             sithConsole_Print(std_genBuffer);
         }
-        ctx->flags &= ~4;
+        ctx->cogFlags &= ~SITH_COG_PULSE_SET;
     }
     else
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( ctx->cogFlags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
             sithConsole_Print(std_genBuffer);
         }
-        ctx->flags |= 4;
+        ctx->cogFlags |= SITH_COG_PULSE_SET;
         ctx->pulsePeriodMs = (int)(popFlex * 1000.0);
         ctx->nextPulseMs = (int)(popFlex * 1000.0) + sithTime_curMs;
     }
@@ -329,21 +329,21 @@ void sithCogFunction_SetTimer(sithCog *ctx)
     float popFlex = sithCogExec_PopFlex(ctx);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( ctx->cogFlags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
             sithConsole_Print(std_genBuffer);
         }
-        ctx->flags &= ~8;
+        ctx->cogFlags &= ~SITH_COG_TIMER_SET;
     }
     else
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( ctx->cogFlags & SITH_COG_DEBUG )
         {
             _sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
             sithConsole_Print(std_genBuffer);
         }
-        ctx->flags |= 8u;
+        ctx->cogFlags |= SITH_COG_TIMER_SET;
         ctx->field_20 = sithTime_curMs + (int)(popFlex * 1000.0);
     }
 }
