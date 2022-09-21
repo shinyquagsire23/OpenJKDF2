@@ -1805,7 +1805,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             thing->class_cog = v23;
             if ( !v23 )
                 goto LABEL_58;
-            v23->cogFlags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+            v23->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
             thing->thingflags |= SITH_TF_CAPTURED;
             result = 1;
             break;

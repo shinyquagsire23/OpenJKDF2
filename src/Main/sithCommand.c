@@ -230,15 +230,15 @@ int sithCommand_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             if ( v3 < sithWorld_pCurrentWorld->numCogsLoaded )
             {
                 v4 = &sithWorld_pCurrentWorld->cogs[v3];
-                if ( (v4->cogFlags & SITH_COG_DEBUG) != 0 )
+                if ( (v4->flags & SITH_COG_DEBUG) != 0 )
                 {
                     sithConsole_Print("Cog trace disabled.");
-                    v4->cogFlags &= ~SITH_COG_DEBUG;
+                    v4->flags &= ~SITH_COG_DEBUG;
                 }
                 else
                 {
                     sithConsole_Print("Cog trace enabled.");
-                    v4->cogFlags |= SITH_COG_DEBUG;
+                    v4->flags |= SITH_COG_DEBUG;
                 }
                 return 1;
             }
@@ -277,15 +277,15 @@ int sithCommand_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             if ( v3 < sithWorld_pCurrentWorld->numCogsLoaded )
             {
                 v4 = &sithWorld_pCurrentWorld->cogs[v3];
-                if ( (v4->cogFlags & SITH_COG_DISABLED) != 0 )
+                if ( (v4->flags & SITH_COG_DISABLED) != 0 )
                 {
                     sithConsole_Print("Cog enabled.");
-                    v4->cogFlags &= ~SITH_COG_DISABLED;
+                    v4->flags &= ~SITH_COG_DISABLED;
                 }
                 else
                 {
                     sithConsole_Print("Cog disabled.");
-                    v4->cogFlags |= SITH_COG_DISABLED;
+                    v4->flags |= SITH_COG_DISABLED;
                 }
                 result = 1;
             }
@@ -323,9 +323,9 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         for ( i = sithWorld_pCurrentWorld->cogs; v3 < sithWorld_pCurrentWorld->numCogsLoaded; ++i )
         {
             _sprintf(std_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
-            if ( (i->cogFlags & SITH_COG_DISABLED) != 0 )
+            if ( (i->flags & SITH_COG_DISABLED) != 0 )
                 _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(paused) ");
-            if ( (i->cogFlags & SITH_COG_DEBUG) != 0 )
+            if ( (i->flags & SITH_COG_DEBUG) != 0 )
                 _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(trace)  ");
             _sprintf(&std_genBuffer[strlen(std_genBuffer)], sithCommand_aIdk);
             sithConsole_Print(std_genBuffer);

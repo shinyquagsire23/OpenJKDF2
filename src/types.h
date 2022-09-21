@@ -1704,7 +1704,7 @@ typedef struct sithCogStackvar
 typedef struct sithCog
 {
     sithCogScript* cogscript;
-    sithCogFlags_t cogFlags;
+    sithCogFlags_t flags;
     int selfCog;
     uint32_t script_running;
     uint32_t execPos;

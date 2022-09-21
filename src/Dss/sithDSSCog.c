@@ -116,7 +116,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
 
     NETMSG_PUSHS32(cog->selfCog);
     NETMSG_PUSHS32(cog->script_running);
-    NETMSG_PUSHS32(cog->cogFlags);
+    NETMSG_PUSHS32(cog->flags);
     if (cog->script_running)
     {
         NETMSG_PUSHS32(cog->wakeTimeMs);
@@ -127,12 +127,12 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
         NETMSG_PUSHS32(cog->sourceRef);
         NETMSG_PUSHS32(cog->sourceType);
     }
-    if ( (cog->cogFlags & SITH_COG_PULSE_SET) != 0 )
+    if ( (cog->flags & SITH_COG_PULSE_SET) != 0 )
     {
         NETMSG_PUSHS32(cog->pulsePeriodMs);
         NETMSG_PUSHS32(cog->nextPulseMs);
     }
-    if ( (cog->cogFlags & SITH_COG_TIMER_SET) != 0 )
+    if ( (cog->flags & SITH_COG_TIMER_SET) != 0 )
         NETMSG_PUSHS32(cog->field_20);
     v13 = cog->pSymbolTable;
     if ( v13->entry_cnt )
@@ -179,7 +179,7 @@ int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
         return 0;
 
     cog->script_running = NETMSG_POPS32();
-    cog->cogFlags = NETMSG_POPS32();
+    cog->flags = NETMSG_POPS32();
     if (cog->script_running)
     {
         cog->wakeTimeMs = NETMSG_POPS32();
@@ -191,13 +191,13 @@ int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
         cog->sourceType = NETMSG_POPS32();
     }
 
-    if (cog->cogFlags & SITH_COG_PULSE_SET)
+    if (cog->flags & SITH_COG_PULSE_SET)
     {
         cog->pulsePeriodMs = NETMSG_POPS32();
         cog->nextPulseMs = NETMSG_POPS32();
     }
 
-    if (cog->cogFlags & SITH_COG_TIMER_SET)
+    if (cog->flags & SITH_COG_TIMER_SET)
     {
         cog->field_20 = NETMSG_POPS32();
     }
