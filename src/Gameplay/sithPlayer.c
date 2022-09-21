@@ -140,7 +140,7 @@ void sithPlayer_idk(int idx)
     sithWorld_pCurrentWorld->playerThing = sithPlayer_pLocalPlayerThing;
     sithWorld_pCurrentWorld->cameraFocus = sithPlayer_pLocalPlayerThing;
 
-    sithPlayer_pLocalPlayerThing->thingflags &= ~0x100u;
+    sithPlayer_pLocalPlayerThing->thingflags &= ~SITH_TF_INVULN;
 
     // Added: idk why this is needed?
     sithPlayer_pLocalPlayerThing->thingtype = SITH_THING_PLAYER;
@@ -156,7 +156,7 @@ void sithPlayer_idk(int idx)
         if (jkPlayer_playerInfos[v6].playerThing)
         {
             if ( v6 != idx )
-                jkPlayer_playerInfos[v6].playerThing->thingflags |= 0x100u;
+                jkPlayer_playerInfos[v6].playerThing->thingflags |= SITH_TF_INVULN;
         }
     }
 }

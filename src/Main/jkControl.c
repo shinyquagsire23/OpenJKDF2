@@ -79,7 +79,7 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
         sithControl_ReadFunctionMap(INPUT_FUNC_CAMERAMODE, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
-            if ( (player->thingflags & 0x202) == 0 )
+            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 sithCamera_CycleCamera();
                 if ( (sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 )

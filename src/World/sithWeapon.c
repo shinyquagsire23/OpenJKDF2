@@ -721,7 +721,7 @@ LABEL_45:
                     goto LABEL_53;
                 if ( v27 == sithPlayer_pLocalPlayerThing || v27->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                     sithAIAwareness_AddEntry(v28->sector, &v28->position, 0, 2.0, v27);
-                if ( (physicsThing->thingflags & 0x100) == 0 )
+                if ( (physicsThing->thingflags & SITH_TF_INVULN) == 0 )
                     goto LABEL_53;
                 goto LABEL_52;
             }
