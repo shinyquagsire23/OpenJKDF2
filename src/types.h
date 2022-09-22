@@ -5,6 +5,19 @@
 extern "C" {
 #endif
 
+#ifdef GHIDRA_IMPORT
+typedef char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef uint32_t intptr_t;
+typedef uint32_t size_t;
+#define _SITHCOGYACC_H
+#define JK_H
+#endif
+
 #include "engine_config.h"
 
 #ifdef WIN32
@@ -50,6 +63,8 @@ extern "C" {
 #define ALIGNED_(x) __declspec(align(x))
 #else
 #if defined(__GNUC__)
+#define ALIGNED_(x) __attribute__ ((aligned(x)))
+#else
 #define ALIGNED_(x) __attribute__ ((aligned(x)))
 #endif
 #endif
@@ -101,10 +116,12 @@ typedef int LONG;
 typedef wchar_t WCHAR;
 typedef int PAINTSTRUCT;
 
+#ifndef GHIDRA_IMPORT
 typedef int8_t __int8;
 typedef int16_t __int16;
 typedef int32_t __int32;
 typedef int64_t __int64;
+#endif
 
 typedef struct GUID
 {
@@ -1927,6 +1944,22 @@ typedef struct jkResFile
 
 // end jkRes
 
+#ifdef JKM_TYPES
+typedef struct sithArchLightMesh
+{
+    float* aMono;
+    float* aRed;
+    float* aGreen;
+    float* aBlue;
+    int numVertices;
+} sithArchLightMesh;
+
+typedef struct sithArchLight
+{
+    int numMeshes;
+    sithArchLightMesh* aMeshes;
+} sithArchLight;
+#endif
 
 typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 
@@ -2006,6 +2039,11 @@ typedef struct sithWorld
     int numAnimClassesLoaded;
     int numAnimClasses;
     sithAnimclass* animclasses;
+#ifdef JKM_TYPES
+    int numArchLights;
+    //int sizeArchLights;
+    sithArchLight* aArchlights;
+#endif
 } sithWorld;
 
 typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
@@ -2085,7 +2123,11 @@ typedef struct rdThing
         rdSprite* sprite3;
         rdParticle* particlecloud;
         rdPolyLine* polyline;
+#ifdef GHIDRA_IMPORT
+    } containedObj;
+#else
     };
+#endif
     rdGeoMode_t desiredGeoMode;
     rdLightMode_t desiredLightMode;
     rdTexMode_t desiredTexMode;
@@ -2173,6 +2215,9 @@ typedef struct jkPlayerInfo
     sithThing* damagedThings[6];
     uint32_t numDamagedSurfaces;
     sithSurface* damagedSurfaces[6];
+#ifdef JKM_TYPES
+    uint8_t pad[0x64];
+#endif // JKM_TYPES
     uint32_t lastSparkSpawnMs;
     sithThing* wall_sparks;
     sithThing* blood_sparks;
@@ -2187,6 +2232,9 @@ typedef struct jkPlayerInfo
     uint32_t field_21C;
     int shields;
     uint32_t field_224;
+#ifdef JKM_TYPES
+    uint8_t pad[0x14];
+#endif // JKM_TYPES
 } jkPlayerInfo;
 
 typedef struct jkPlayerMpcInfo
@@ -2553,6 +2601,9 @@ typedef struct sithThing
     uint32_t thingflags;
     uint32_t thingIdx;
     uint32_t thing_id;
+#ifdef JKM_TYPES
+    uint32_t unk;
+#endif // JKM_TYPES
     uint32_t type;
     uint32_t moveType;
     uint32_t thingtype;
@@ -2563,6 +2614,9 @@ typedef struct sithThing
     uint32_t collide;
     float moveSize;
     float collideSize;
+#ifdef JKM_TYPES
+    uint32_t unk;
+#endif // JKM_TYPES
     uint32_t attach_flags;
     rdVector3 field_38;
     sithSurfaceInfo* attachedSufaceInfo;
@@ -2572,7 +2626,11 @@ typedef struct sithThing
     {
         sithThing* attachedThing;
         sithSurface* attachedSurface;
+#ifdef GHIDRA_IMPORT
+    } attached;
+#else
     };
+#endif
     sithSector* sector;
     sithThing* nextThing;
     sithThing* prevThing;
@@ -2601,12 +2659,20 @@ typedef struct sithThing
         sithThingItemParams itemParams;
         sithThingExplosionParams explosionParams;
         sithThingParticleParams particleParams;
+#ifdef GHIDRA_IMPORT
+    } typeParams;
+#else
     };
+#endif
     union
     {
         sithThingPhysParams physicsParams;
         sithThingTrackParams trackParams;
+#ifdef GHIDRA_IMPORT
+    } physParams;
+#else
     };
+#endif
     float field_24C;
     uint32_t field_250;
     int curframe;
@@ -2614,6 +2680,9 @@ typedef struct sithThing
     int goalframe;
     uint32_t field_260;
     float waggle;
+#ifdef JKM_TYPES
+    float waggleY;
+#endif
     rdVector3 field_268;
     sithAIClass* aiclass;
     sithActor* actor;
@@ -2822,6 +2891,10 @@ typedef struct jkHudFont
     stdFont **pFont;
     char *path8bpp;
     char *path16bpp;
+#ifdef JKM_TYPES
+    char *pathS8bpp;
+    char *pathS16bpp;
+#endif // JKM_TYPES
 } jkHudFont;
 
 typedef struct jkHudTeamScore
@@ -3438,6 +3511,173 @@ typedef struct jkGuiJoystickEntry
     float binaryAxisVal;
   };
 } jkGuiJoystickEntry;
+
+#ifdef GHIDRA_IMPORT
+#include "Win95/stdGob.h"
+#include "Engine/rdKeyframe.h"
+#include "Engine/sithAdjoin.h"
+#include "Engine/rdCanvas.h"
+#include "Engine/sithKeyFrame.h"
+#include "Engine/sithAnimClass.h"
+#include "General/stdHashTable.h"
+#include "General/stdStrTable.h"
+#include "General/stdFont.h"
+#include "General/stdFileUtil.h"
+#include "General/stdPcx.h"
+#include "Cog/sithCog.h"
+#include "Cog/sithCogScript.h"
+#include "Dss/sithMulti.h"
+
+#include "Cog/sithCog.h"
+#include "Cog/sithCogExec.h"
+#include "Cog/jkCog.h"
+#include "Cog/sithCogFunction.h"
+#include "Cog/sithCogFunctionThing.h"
+#include "Cog/sithCogFunctionPlayer.h"
+#include "Cog/sithCogFunctionAI.h"
+#include "Cog/sithCogFunctionSurface.h"
+#include "Cog/sithCogFunctionSector.h"
+#include "Cog/sithCogFunctionSound.h"
+#include "General/stdBitmap.h"
+#include "General/stdMath.h"
+#include "General/stdJSON.h"
+#include "Primitives/rdVector.h"
+#include "General/stdMemory.h"
+#include "General/stdColor.h"
+#include "General/stdConffile.h"
+#include "General/stdFont.h"
+#include "General/stdFnames.h"
+#include "General/stdFileUtil.h"
+#include "General/stdHashTable.h"
+#include "General/stdString.h"
+#include "General/stdStrTable.h"
+#include "General/sithStrTable.h"
+#include "General/stdPcx.h"
+#include "General/Darray.h"
+#include "General/stdPalEffects.h"
+#include "Gui/jkGUIRend.h"
+#include "Gui/jkGUI.h"
+#include "Gui/jkGUIMain.h"
+#include "Gui/jkGUIGeneral.h"
+#include "Gui/jkGUIForce.h"
+#include "Gui/jkGUIEsc.h"
+#include "Gui/jkGUIDecision.h"
+#include "Gui/jkGUISaveLoad.h"
+#include "Gui/jkGUISingleplayer.h"
+#include "Gui/jkGUISingleTally.h"
+#include "Gui/jkGUIControlOptions.h"
+#include "Gui/jkGUIObjectives.h"
+#include "Gui/jkGUISetup.h"
+#include "Gui/jkGUIGameplay.h"
+#include "Gui/jkGUIDisplay.h"
+#include "Gui/jkGUISound.h"
+#include "Gui/jkGUIKeyboard.h"
+#include "Gui/jkGUIMouse.h"
+#include "Gui/jkGUIJoystick.h"
+#include "Gui/jkGUITitle.h"
+#include "Gui/jkGUIDialog.h"
+#include "Gui/jkGUIMultiplayer.h"
+#include "Gui/jkGUIBuildMulti.h"
+#include "Gui/jkGUIMultiTally.h"
+#include "Engine/rdroid.h"
+#include "Engine/rdActive.h"
+#include "Engine/rdKeyframe.h"
+#include "Engine/rdLight.h"
+#include "Engine/rdMaterial.h"
+#include "Raster/rdCache.h"
+#include "Engine/rdColormap.h"
+#include "Engine/rdClip.h"
+#include "Engine/rdCanvas.h"
+#include "Engine/rdPuppet.h"
+#include "Engine/rdThing.h"
+#include "Engine/sithCamera.h"
+#include "Devices/sithControl.h"
+#include "Gameplay/sithTime.h"
+#include "Main/sithMain.h"
+#include "Main/sithCommand.h"
+#include "World/sithModel.h"
+#include "Engine/sithParticle.h"
+#include "Engine/sithPhysics.h"
+#include "Engine/sithPuppet.h"
+#include "Dss/sithGamesave.h"
+#include "World/sithSprite.h"
+#include "World/sithSurface.h"
+#include "World/sithTemplate.h"
+#include "Gameplay/sithEvent.h"
+#include "Engine/sithKeyFrame.h"
+#include "Gameplay/sithOverlayMap.h"
+#include "World/sithMaterial.h"
+#include "Engine/sithRender.h"
+#include "Engine/sithRenderSky.h"
+#include "Devices/sithSound.h"
+#include "Devices/sithSoundMixer.h"
+#include "World/sithSoundClass.h"
+#include "Engine/sithAnimClass.h"
+#include "Primitives/rdModel3.h"
+#include "Primitives/rdPolyLine.h"
+#include "Primitives/rdParticle.h"
+#include "Primitives/rdSprite.h"
+#include "Primitives/rdMatrix.h"
+#include "Raster/rdFace.h"
+#include "Primitives/rdMath.h"
+#include "Primitives/rdPrimit2.h"
+#include "Primitives/rdPrimit3.h"
+#include "Raster/rdRaster.h"
+#include "World/sithThing.h"
+#include "World/sithSector.h"
+#include "World/sithWeapon.h"
+#include "World/sithExplosion.h"
+#include "World/sithItem.h"
+#include "World/sithWorld.h"
+#include "Gameplay/sithInventory.h"
+#include "World/jkPlayer.h"
+#include "Gameplay/jkSaber.h"
+#include "Engine/sithCollision.h"
+#include "World/sithActor.h"
+#include "World/sithMap.h"
+#include "Engine/sithIntersect.h"
+#include "Gameplay/sithPlayerActions.h"
+#include "World/sithTrackThing.h"
+#include "Devices/sithConsole.h"
+#include "Win95/DirectX.h"
+#include "Win95/stdComm.h"
+#include "Win95/std.h"
+#include "Win95/stdGob.h"
+#include "Win95/stdMci.h"
+#include "Win95/stdGdi.h"
+#include "Platform/stdControl.h"
+#include "Win95/stdDisplay.h"
+#include "Win95/stdConsole.h"
+#include "Win95/stdSound.h"
+#include "Win95/Window.h"
+#include "Win95/Windows.h"
+#include "Platform/wuRegistry.h"
+#include "AI/sithAI.h"
+#include "AI/sithAIClass.h"
+#include "AI/sithAICmd.h"
+#include "AI/sithAIAwareness.h"
+#include "Main/jkAI.h"
+#include "Main/jkCredits.h"
+#include "Main/jkCutscene.h"
+#include "Main/jkDev.h"
+#include "Main/jkMain.h"
+#include "Main/jkSmack.h"
+#include "Main/jkGame.h"
+#include "Main/jkGob.h"
+#include "Main/jkRes.h"
+#include "Main/jkStrings.h"
+#include "Main/jkControl.h"
+#include "Main/jkEpisode.h"
+#include "Main/jkHud.h"
+#include "Main/jkHudInv.h"
+#include "Main/Main.h"
+#include "Dss/sithDSSThing.h"
+#include "Dss/sithDSS.h"
+#include "Dss/sithDSSCog.h"
+#include "Dss/jkDSS.h"
+#include "Devices/sithComm.h"
+#include "stdPlatform.h"
+#endif
 
 #ifdef __cplusplus
 }

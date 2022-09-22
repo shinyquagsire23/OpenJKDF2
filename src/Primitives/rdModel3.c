@@ -56,6 +56,7 @@ rdModel3* rdModel3_New(char *path)
     return 0;
 }
 
+// MOTS altered (RGB lights?)
 int rdModel3_Load(char *model_fpath, rdModel3 *model)
 {
     rdMesh *mesh; // ebx
@@ -1098,6 +1099,7 @@ int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in
     return 1;
 }
 
+// MOTS altered (RGB lights)
 int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 {
     int frustumCull;
@@ -1195,6 +1197,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     return 1;
 }
 
+// MOTS altered (RGB lights)
 void rdModel3_DrawHNode(rdHierarchyNode *node)
 {
     rdHierarchyNode *iter;
@@ -1214,6 +1217,7 @@ void rdModel3_DrawHNode(rdHierarchyNode *node)
     }
 }
 
+// MOTS altered (RGB lights)
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 {
     rdLight **pGeoLight;
@@ -1331,6 +1335,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     }
 }
 
+// MOTS altered (RGB lights)
 int rdModel3_DrawFace(rdFace *face, int lightFlags)
 {
     rdProcEntry *procEntry;

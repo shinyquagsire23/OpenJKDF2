@@ -85,8 +85,8 @@ jkPlayer_LoadAutosave	.text	00404600	0000005F	00000080	00000000	R	.	.	.	.	.	.	.
 jkPlayer_LoadSave	.text	00404660	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
 jkPlayer_Startup	.text	00404680	0000001B	00000008	00000000	R	.	.	.	.	.	T	.
 jkPlayer_Shutdown	.text	004046A0	00000094	00000008	00000000	R	.	.	.	.	.	T	.
-jkPlayer_nullsub_29	.text	00404740	00000001			R	.	.	.	.	.	.	.
-jkPlayer_nullsub_30	.text	00404750	00000001			R	.	.	.	.	.	.	.
+jkPlayer_Open	.text	00404740	00000001			R	.	.	.	.	.	.	.
+jkPlayer_Close	.text	00404750	00000001			R	.	.	.	.	.	.	.
 jkPlayer_InitSaber	.text	00404760	000000C3	00000008	00000000	R	.	.	.	.	.	T	.
 jkPlayer_InitThings	.text	00404830	000000C5	00000010	00000000	R	.	.	.	.	.	T	.
 jkPlayer_nullsub_1	.text	00404900	00000001			R	.	.	.	.	.	.	.

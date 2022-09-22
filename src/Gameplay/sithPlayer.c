@@ -594,6 +594,7 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
     return 1;
 }
 
+// MOTS altered
 void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
 {
     rdPuppet *v1; // ecx

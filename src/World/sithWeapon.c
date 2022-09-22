@@ -77,6 +77,7 @@ void sithWeapon_Tick(sithThing *weapon, float deltaSeconds)
     }
 }
 
+// MOTS altered
 void sithWeapon_sub_4D35E0(sithThing *weapon)
 {
     float damage; // ecx
@@ -588,6 +589,7 @@ void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
     }
 }
 
+// MOTS altered
 int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5)
 {
     int v4; // eax
@@ -1131,6 +1133,7 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
     return v7;
 }
 
+// MOTS altered
 int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
 {
     float *v3; // edi
@@ -1288,6 +1291,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
     return 0;
 }
 
+// MOTS altered
 void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, float autoaimFov, float autoaimMaxDist)
 {
     double v6; // st7
@@ -1377,6 +1381,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
     }
 }
 
+// MOTS altered
 sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, int16_t scaleFlags, float autoaimFov, float autoaimMaxDist)
 {
     int thingtype; // eax

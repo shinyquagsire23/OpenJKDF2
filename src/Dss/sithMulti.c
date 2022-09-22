@@ -403,6 +403,7 @@ LABEL_15:
     sithMulti_ProcessScore();
 }
 
+// MOTS altered?
 void sithMulti_ProcessScore()
 {
     int score_limit_met;
@@ -1265,6 +1266,7 @@ LABEL_11:
     return 1;
 }
 
+// MOTS altered
 void sithMulti_HandleTimeLimit(int deltaMs)
 {
     wchar_t *v1; // eax

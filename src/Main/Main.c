@@ -1232,6 +1232,10 @@ void Main_ParseCmdLine(char *cmdline)
             v4 = _strtok(0, " \t");
             stdString_SafeStrCopy(Main_path, v4, 0x80);
         }
+        else if ( !__strcmpi(v1, "-fail") || !__strcmpi(v1, "/fail") ) // MOTS added
+        {
+            //Main_failLogFp = fopen("fail.log", "w");
+        }
         else if ( !__strcmpi(v1, "-devMode") || !__strcmpi(v1, "devMode") )
         {
             Main_bDevMode = 1;

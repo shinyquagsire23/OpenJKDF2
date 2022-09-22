@@ -719,6 +719,7 @@ int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
     return 1;
 }
 
+// MOTS altered
 void sithDSS_SendMisc(int sendto_id, int mpFlags)
 {
     NETMSG_START;
@@ -777,6 +778,7 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+// MOTS altered
 int sithDSS_ProcessMisc(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);

@@ -70,6 +70,7 @@ void jkPlayer_Startup()
     _memcpy(&jkSaber_rotateMat, &rdroid_identMatrix34, sizeof(jkSaber_rotateMat));
 }
 
+// MOTS altered, also fixed the memleak lol
 void jkPlayer_Shutdown()
 {
     for (int i = 0; i < jkPlayer_numThings; i++ )
@@ -101,14 +102,15 @@ void jkPlayer_Shutdown()
     
 }
 
-void jkPlayer_nullsub_29()
+void jkPlayer_Open()
 {
 }
 
-void jkPlayer_nullsub_30()
+void jkPlayer_Close()
 {
 }
 
+// MOTS altered
 void jkPlayer_InitSaber()
 {
     jkPlayer_numThings = jkPlayer_maxPlayers;
@@ -176,6 +178,7 @@ void jkPlayer_nullsub_1(jkPlayerInfo* unk)
 {
 }
 
+// MOTS altered?
 void jkPlayer_CreateConf(wchar_t *name)
 {
     int v6; // ebp
@@ -237,6 +240,7 @@ LABEL_7:
     jkPlayer_WriteConf(name);
 }
 
+// MOTS altered
 void jkPlayer_WriteConf(wchar_t *name)
 {
     char nameTmp[32]; // [esp+0h] [ebp-A0h]
@@ -519,7 +523,7 @@ void jkPlayer_DrawPov()
         // TODO is this a macro/func?
         float angleSin, angleCos;
         stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
-        float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel;
+        float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
         jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;

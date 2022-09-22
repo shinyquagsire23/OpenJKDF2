@@ -71,7 +71,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
     }
 }
 
-
+// MOTS altered
 float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int flags)
 {
     sithThing *receiver_; // edi
@@ -188,6 +188,7 @@ void sithActor_HurtSound(sithThing *thing, float amount, int hurtType)
     }
 }
 
+// MOTS altered
 void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 {
     int v7; // ecx
@@ -391,6 +392,7 @@ void sithActor_RotateTurretToEyePYR(sithThing *a1)
     }
 }
 
+// MOTS altered
 int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3)
 {
     int result; // eax

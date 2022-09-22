@@ -12,8 +12,8 @@
 #define jkPlayer_LoadSave_ADDR (0x00404660)
 #define jkPlayer_Startup_ADDR (0x00404680)
 #define jkPlayer_Shutdown_ADDR (0x004046A0)
-#define jkPlayer_nullsub_29_ADDR (0x00404740)
-#define jkPlayer_nullsub_30_ADDR (0x00404750)
+#define jkPlayer_Open_ADDR (0x00404740)
+#define jkPlayer_Close_ADDR (0x00404750)
 #define jkPlayer_InitSaber_ADDR (0x00404760)
 #define jkPlayer_InitThings_ADDR (0x00404830)
 #define jkPlayer_nullsub_1_ADDR (0x00404900)
@@ -72,8 +72,8 @@ int jkPlayer_LoadAutosave();
 int jkPlayer_LoadSave(char *path);
 void jkPlayer_Startup();
 void jkPlayer_Shutdown();
-void jkPlayer_nullsub_29();
-void jkPlayer_nullsub_30();
+void jkPlayer_Open();
+void jkPlayer_Close();
 void jkPlayer_InitSaber();
 void jkPlayer_InitThings();
 void jkPlayer_nullsub_1(jkPlayerInfo* unk);

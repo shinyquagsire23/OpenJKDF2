@@ -126,6 +126,7 @@ void sithCamera_SetsFocus()
     sithCamera_curCameraIdx = 0;
 }
 
+// MOTS altered
 int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near)
 {
     camera->cameraPerspective = a3;
@@ -149,6 +150,7 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     return 1;
 }
 
+// MOTS altered
 void sithCamera_FollowFocus(sithCamera *cam)
 {
     rdVector3 mode64Tmp;

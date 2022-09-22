@@ -65,6 +65,7 @@ void jkSaber_PolylineRand(rdThing *thing)
     }
 }
 
+// MOTS altered
 void jkSaber_Draw(rdMatrix34 *posRotMat)
 {
     if ( playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
@@ -401,6 +402,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
     }
 }
 
+// MOTS altered
 void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
 {
     a1->playerInfo->damage = a2;
@@ -416,6 +418,7 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
     a1->playerInfo->lastSparkSpawnMs = 0;
 }
 
+// MOTS altered
 void jkSaber_Disable(sithThing *player)
 {
     player->playerInfo->field_1A4 = 0;

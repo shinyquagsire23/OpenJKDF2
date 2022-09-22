@@ -171,6 +171,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+// MOTS altered
 int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
@@ -582,6 +583,7 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 0);
 }
 
+// MOTS altered (Added argument to sithWeapon_FireProjectile_0)
 int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);

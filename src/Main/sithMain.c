@@ -224,6 +224,7 @@ void sithMain_SetEndLevel()
     sithMain_bEndLevel = 1;
 }
 
+// MOTS altered
 int sithMain_Tick()
 {
     if ( (g_submodeFlags & 8) != 0 )
@@ -330,6 +331,7 @@ int sithMain_Tick()
                 //    sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
                 //}
                 sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+                // MOTS added: sithThing_MotsTick(0x1F, 0, 0);
             }
 
             sithTime_deltaSeconds = tmp;
@@ -363,6 +365,7 @@ int sithMain_Tick()
             }
 
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+            // MOTS added: sithThing_MotsTick(0x1F, 0, 0);
         }
 
         sithCogScript_TickAll();
@@ -446,7 +449,7 @@ void sithMain_AutoSave()
     {
         v3 = &sithWorld_pCurrentWorld->things[v2];
         v4 = v3->class_cog;
-        if ( v4 )
+        if ( v4 ) // MOTS added something here
         {
             sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
         }

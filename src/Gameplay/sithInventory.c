@@ -686,6 +686,7 @@ void sithInventory_ClearUncarried(sithThing *player)
     }
 }
 
+// MOTS altered
 sithThing* sithInventory_CreateBackpack(sithThing *player)
 {
     sithThing *templateThing;
@@ -762,6 +763,7 @@ int sithInventory_NumBackpackItems(sithThing *item)
     return item->itemParams.numBins;
 }
 
+// MOTS altered
 int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
 {
     sithThing *v1; // edi

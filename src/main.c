@@ -1579,8 +1579,8 @@ void do_hooks()
     hook_function(jkPlayer_LoadSave_ADDR, jkPlayer_LoadSave);
     hook_function(jkPlayer_Startup_ADDR, jkPlayer_Startup);
     hook_function(jkPlayer_Shutdown_ADDR, jkPlayer_Shutdown);
-    hook_function(jkPlayer_nullsub_29_ADDR, jkPlayer_nullsub_29);
-    hook_function(jkPlayer_nullsub_30_ADDR, jkPlayer_nullsub_30);
+    hook_function(jkPlayer_Open_ADDR, jkPlayer_Open);
+    hook_function(jkPlayer_Close_ADDR, jkPlayer_Close);
     hook_function(jkPlayer_InitSaber_ADDR, jkPlayer_InitSaber);
     hook_function(jkPlayer_InitThings_ADDR, jkPlayer_InitThings);
     hook_function(jkPlayer_nullsub_1_ADDR, jkPlayer_nullsub_1);

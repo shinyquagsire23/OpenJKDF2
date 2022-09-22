@@ -35,11 +35,12 @@
 
 static int sithCog_bInitted = 0;
 
+// MOTS altered
 int sithCog_Startup()
 {
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    sithCog_pSymbolTable = sithCogParse_NewSymboltable(1024); // changed from 512 to 1024
+    sithCog_pSymbolTable = sithCogParse_NewSymboltable(1024); // MOTS altered, DW altered, changed from 512 to 1024
     if (!sithCog_pSymbolTable )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
@@ -223,6 +224,7 @@ LABEL_26:
     return result;
 }
 
+// MOTS altered
 void sithCog_Close()
 {
     if ( sithCog_bOpened )
@@ -236,6 +238,7 @@ void sithCog_Close()
     }
 }
 
+// MOTS altered?
 int sithCog_Load(sithWorld *world, int a2)
 {
     int num_cogs; // esi
@@ -1180,6 +1183,7 @@ void sithCog_HandleThingTimerPulse(sithThing *thing)
     }
 }
 
+// MOTS altered?
 int sithCogScript_Load(sithWorld *lvl, int a2)
 {
     int numCogScripts; // esi
@@ -1382,6 +1386,7 @@ int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
     return 1;
 }
 
+// MOTS altered
 void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
 {
     sithWorld *world; // esi

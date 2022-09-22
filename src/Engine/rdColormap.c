@@ -44,6 +44,7 @@ rdColormap* rdColormap_Load(char *colormap_fname)
     return NULL;
 }
 
+// MOTS altered
 int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 {
     intptr_t colormap_fptr; // edi
@@ -197,6 +198,7 @@ void rdColormap_FreeEntry(rdColormap *colormap)
     }
 }
 
+// MOTS altered
 int rdColormap_Write(char *outpath, rdColormap *colormap)
 {
     int fd;

@@ -200,10 +200,11 @@ void rdFinishFrame()
 {
   rdCache_Flush();
   rdCache_FinishFrame();
-  stdDisplay_ddraw_waitforvblank();
-  rdCache_ClearFrameCounters();
-  rdActive_ClearFrameCounters();
-  rdModel3_ClearFrameCounters();
+  // rdPrimit3_ClearFrameCounters(); // MOTS added
+  stdDisplay_ddraw_waitforvblank(); // MOTS removed
+  rdCache_ClearFrameCounters(); // MOTS removed
+  rdActive_ClearFrameCounters(); // MOTS removed
+  rdModel3_ClearFrameCounters(); // MOTS removed
 }
 
 void rdClearPostStatistics()

@@ -194,6 +194,12 @@ void jkGuiNetHost_LoadSettings()
     jkGuiNetHost_scoreLimit = wuRegistry_GetInt("scoreLimit", jkGuiNetHost_scoreLimit);
     jkGuiNetHost_maxPlayers = wuRegistry_GetInt("maxPlayers", jkGuiNetHost_maxPlayers);
     jkGuiNetHost_tickRate = wuRegistry_GetInt("tickRate", jkGuiNetHost_tickRate);
+
+    // MOTS added:
+    //if (jkGuiNetHost_maxRank > 8) {
+    //    jkGuiNetHost_maxRank = 8;
+    //}
+
     memset(jkGuiNetHost_gameName, 0, sizeof(jkGuiNetHost_gameName));
 #ifndef ARCH_WASM
     wuRegistry_GetWString("gameName", jkGuiNetHost_gameName, 0x40u, jkGuiNetHost_gameName);

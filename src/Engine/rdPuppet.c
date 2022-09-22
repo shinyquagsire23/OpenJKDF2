@@ -52,6 +52,7 @@ void rdPuppet_Free(rdPuppet *puppet)
     rdroid_pHS->free(puppet);
 }
 
+// MOTS altered
 void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 {
     rdPuppet *puppet; // eax
@@ -333,6 +334,7 @@ int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
     return 1;
 }
 
+// MOTS altered
 int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
 {
     //return _rdPuppet_UpdateTracks(puppet, deltaSeconds);

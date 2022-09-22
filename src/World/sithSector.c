@@ -26,6 +26,7 @@
 #include "AI/sithAIClass.h"
 #include "Dss/sithDSS.h"
 
+// MOTS altered
 int sithSector_Load(sithWorld *world, int tmp)
 {
     unsigned int alloc_size; // ebx

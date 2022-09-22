@@ -868,6 +868,7 @@ int sithCogExec_PopStackVar(sithCog *cog, sithCogStackvar *out)
     return 1;
 }
 
+// MOTS altered?
 void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
 {
     int operand_a = sithCogExec_PopInt(cog_ctx);
@@ -898,6 +899,7 @@ void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
     }
 }
 
+// MOTS altered?
 void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
 {
     float operand_a = sithCogExec_PopFlex(cog_ctx);

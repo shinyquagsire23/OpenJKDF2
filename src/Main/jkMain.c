@@ -102,7 +102,7 @@ int jkMain_SetVideoMode()
 
     if ( jkGame_isDDraw )
         return 0;
-    jkPlayer_nullsub_29();
+    jkPlayer_Open();
     if ( Video_SetVideoDesc(sithWorld_pCurrentWorld->colormaps->colors) )
         goto LABEL_12;
     if ( !sithNet_isMulti )
@@ -126,7 +126,7 @@ LABEL_12:
     }
     else
     {
-        jkPlayer_nullsub_30();
+        jkPlayer_Close();
         if ( sithControl_IsOpen() )
             sithControl_Close();
         if ( jkGuiRend_thing_five )
@@ -148,7 +148,7 @@ void jkMain_SetVideoModeGdi()
     {
         Windows_ShutdownGdi();
         Video_SwitchToGDI();
-        jkPlayer_nullsub_30();
+        jkPlayer_Close();
         jkGame_isDDraw = 0;
     }
 }
@@ -368,6 +368,8 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 
     if ( !sithNet_isMulti )
         sithTime_Resume();
+
+    // MOTS added something here
     if ( a3 != JK_GAMEMODE_GAMEPLAY )
     {
         if ( a3 == JK_GAMEMODE_ESCAPE )
@@ -379,7 +381,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         {
             Windows_ShutdownGdi();
             Video_SwitchToGDI();
-            jkPlayer_nullsub_30();
+            jkPlayer_Close();
             jkGame_isDDraw = 0;
         }
         if ( a3 != JK_GAMEMODE_ESCAPE && jkMain_bInit )
@@ -452,6 +454,7 @@ void jkMain_GameplayShow(int a1, int a2)
     wchar_t *v6; // [esp-4h] [ebp-Ch]
 
     level_loaded = 0;
+    // MOTS added something here
     if ( a2 == JK_GAMEMODE_ESCAPE )
     {
         sithSoundMixer_ResumeAll();
@@ -526,7 +529,7 @@ LABEL_15:
         {
             Windows_ShutdownGdi();
             Video_SwitchToGDI(1);
-            jkPlayer_nullsub_30();
+            jkPlayer_Close();
             jkGame_isDDraw = 0;
         }
         if ( jkGuiRend_thing_five )
@@ -656,6 +659,7 @@ void jkMain_GameplayLeave(int a2, int a3)
 {
     int v3; // eax
 
+    // MOTS added something here
     if ( a3 == JK_GAMEMODE_ESCAPE )
     {
         stdControl_ToggleCursor(0);
@@ -665,7 +669,7 @@ void jkMain_GameplayLeave(int a2, int a3)
     {
         Windows_ShutdownGdi();
         Video_SwitchToGDI();
-        jkPlayer_nullsub_30();
+        jkPlayer_Close();
         jkGame_isDDraw = 0;
     }
     if ( a3 != 6 && jkMain_bInit )
@@ -702,7 +706,7 @@ void jkMain_TitleShow(int a1, int a2)
 {
     jkGuiTitle_ShowLoadingStatic();
     sithMain_Load("static.jkl");
-    jkHudInv_InitItems();
+    jkHudInv_InitItems(); // MOTS inlined?
 }
 
 void jkMain_TitleTick(int a1)
@@ -1153,6 +1157,7 @@ void jkMain_CdSwitchShow(int a1, int a2)
     jkMain_CdSwitch(0, 1);
 }
 
+// MOTS altered
 void jkMain_VideoShow(int a1, int a2)
 {
     signed int result; // eax

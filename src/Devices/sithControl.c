@@ -830,6 +830,7 @@ void sithControl_AddInputHandler(sithControl_handler_t a1)
     }
 }
 
+// MOTS altered
 int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
 {
     int v3; // esi
@@ -1158,6 +1159,7 @@ LABEL_20:
     }
 }
 
+// MOTS altered?
 void sithControl_PlayerMovement(sithThing *player)
 {
     int new_state; // eax
@@ -1260,6 +1262,7 @@ void sithControl_PlayerMovement(sithThing *player)
     }
 }
 
+// MOTS altered
 void sithControl_FreeCam(sithThing *player)
 {
     sithThing *v1; // esi

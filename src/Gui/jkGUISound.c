@@ -84,12 +84,15 @@ int jkGuiSound_Show()
     jkGuiSound_elements[10].selectedTextEntry = (__int64)(jkGuiSound_musicVolume * 100.0);
     jkGuiSound_elements[14].selectedTextEntry = (__int64)(jkGuiSound_sfxVolume * 100.0);
     jkGuiSound_elements[18].selectedTextEntry = jkGuiSound_numChannels - 8;
+
+    // START MOTS removed:
     if ( jkGuiSound_bLowResSound )
         v0 = jkStrings_GetText("GUI_LOWRESSOUNDS");
     else
         v0 = jkStrings_GetText("GUI_HIGHRESSOUNDS");
 
     jkGuiSound_elements[8].wstr = v0;
+    // END MOTS removed
 
     jkGuiSetup_sub_412EF0(&jkGuiSound_menu, 0);
     jkGuiRend_MenuSetLastElement(&jkGuiSound_menu, &jkGuiSound_elements[22]);

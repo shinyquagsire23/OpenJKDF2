@@ -88,6 +88,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("animclass", sithAnimClass_Load);
     sithWorld_SetSectionParser("aiclass", sithAIClass_ParseSection);
     sithWorld_SetSectionParser("soundclass", sithSoundClass_Load);
+    // MOTS altered: archlighting
     sithWorld_bInitted = 1;
     return 1;
 }
@@ -298,6 +299,7 @@ int sithWorld_NewEntry(sithWorld *world)
     return 1;
 }
 
+// MOTS altered
 void sithWorld_FreeEntry(sithWorld *world)
 {
     unsigned int v1; // edi
@@ -538,6 +540,7 @@ int sithWorld_Verify(sithWorld *world)
     return 0;
 }
 
+// MOTS altered
 uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
 {
     // Starting hash seed
@@ -760,6 +763,7 @@ void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world)
     sithPlayer_ResetPalEffects();
 }
 
+// MOTS altered
 void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuantity)
 {
     _memset(outAllocated, 0, sizeof(int) * 0x11);

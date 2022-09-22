@@ -11,6 +11,7 @@ static uint64_t sithTime_pauseTimeUs;
 // Added
 double sithTime_physicsRolloverFrames = 0.0;
 
+// MOTS altered
 void sithTime_Tick()
 {
     sithTime_SetDelta(stdPlatform_GetTimeMsec() - sithTime_curMsAbsolute);
@@ -44,6 +45,7 @@ void sithTime_Resume()
     }
 }
 
+// MOTS altered
 void sithTime_SetDelta(int deltaMs)
 {
     sithTime_deltaMs = deltaMs;

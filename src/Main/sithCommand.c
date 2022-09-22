@@ -31,6 +31,7 @@ int sithCommand_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 }
 #endif
 
+// MOTS altered
 void sithCommand_Startup()
 {
     sithConsole_RegisterDevCmd(sithCommand_CmdPlayers, "players", 0);
@@ -38,6 +39,7 @@ void sithCommand_Startup()
     sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "trackshots", 3);
     sithConsole_RegisterDevCmd(sithCommand_CmdPing, "ping", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdKick, "kick", 0);
+    sithConsole_RegisterDevCmd(sithCommand_CmdKick, "boot", 0); // MOTS added
     sithConsole_RegisterDevCmd(sithCommand_CmdTick, "tick", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdSession, "session", 0);
 

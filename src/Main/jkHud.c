@@ -926,6 +926,7 @@ int jkHud_Chat()
     return jkDev_sub_41FB80(103, tmp);
 }
 
+// MOTS altered
 void jkHud_SendChat(char a1)
 {
     int v1; // eax

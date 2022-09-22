@@ -7,6 +7,7 @@
 #include "Win95/stdComm.h"
 #include "jk.h"
 
+// MOTS altered
 int sithComm_Startup()
 {
     if (sithComm_bInit)
@@ -71,6 +72,7 @@ void sithComm_SetMsgFunc(int msgid, void *func)
     sithComm_msgFuncs[msgid] = func;
 }
 
+// MOTS altered
 int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
 {
     char multiplayerFlags; // bl
@@ -191,6 +193,7 @@ void sithComm_FileWrite(sithCogMsg *ctx)
     stdConffile_Write((const char*)&ctx->pktData[0], ctx->netMsg.msg_size);
 }
 
+// MOTS altered
 int sithComm_Sync()
 {
     int v1; // eax

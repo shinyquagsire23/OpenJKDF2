@@ -144,6 +144,7 @@ int sithRender_Startup()
     return 1;
 }
 
+// MOTS altered
 int sithRender_Open()
 {
     sithRender_geoMode = RD_GEOMODE_TEXTURED;
@@ -326,6 +327,7 @@ void sithRender_Draw()
     }
 }
 
+// MOTS altered?
 void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 {
     //sithRender_Clip_(sector, frustumArg, a3);
@@ -523,6 +525,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     sector->field_90 = v45;
 }
 
+// MOTS altered
 void sithRender_RenderLevelGeometry()
 {
     rdVector2 *vertices_uvs; // edx
@@ -1027,6 +1030,7 @@ void sithRender_UpdateAllLights()
     }
 }
 
+// MOTS altered
 void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
 {
     sithThing *i;

@@ -416,6 +416,7 @@ float sithPhysics_ThingGetInsertOffsetZ(sithThing *thing)
     return result;
 }
 
+// MOTS altered
 void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
 {
     rdVector3 a1a;
@@ -499,6 +500,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     }
 }
 
+// MOTS altered
 void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 {
     rdMatrix34 a;
@@ -590,6 +592,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     }
 }
 
+// MOTS altered
 void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
 {
     double v35; // st6
@@ -667,6 +670,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     }
 }
 
+// MOTS altered
 void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
 {   
     float a2a; // [esp+0h] [ebp-94h]

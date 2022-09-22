@@ -50,6 +50,10 @@ int jkRes_Shutdown()
             stdGob_Free(jkRes_gCtx.gobs[i].gobs[v1]);
         }
     }
+    // MOTS added: close fail log
+    //if (Main_failLogFp) {
+    //    fclose(Main_failLogFp);
+    //}
     jkRes_bInit = 0;
     return 1;
 }
@@ -575,8 +579,13 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         jkRes_aFiles[resIdx].bOpened = 1;
         v6 = 1;
 LABEL_21:
-        if ( !v6 )
+        if ( !v6 ) {
+            // MOTS added: fail log
+            //if (Main_failLogFp) {
+            //    fputs(Main_failLogFp, "%s", fpath);
+            //}
             return (stdFile_t)0;
+        }
     }
     else
     {

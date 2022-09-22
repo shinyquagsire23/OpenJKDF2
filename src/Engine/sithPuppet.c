@@ -160,6 +160,7 @@ void sithPuppet_sub_4E4760(sithThing *thing, int a2)
     }
 }
 
+// MOTS altered
 int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback_t callback)
 {
     sithAnimclass *v4; // ebx
@@ -278,6 +279,7 @@ void sithPuppet_ResetTrack(sithThing *puppet)
     v2->currentTrack = -1;
 }
 
+// MOTS altered?
 void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
 {
     double v3; // st7
@@ -604,6 +606,7 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
     }
 }
 
+// MOTS altered
 void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
 {
     unsigned int v3; // esi

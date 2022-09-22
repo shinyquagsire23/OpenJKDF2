@@ -175,6 +175,7 @@ void sithThing_SetHandler(sithThing_handler_t handler)
         sithThing_handler = handler;
 }
 
+// MOTS altered?
 void sithThing_TickAll(float deltaSeconds, int deltaMs)
 {
     sithThing *thingIter; // esi
@@ -677,6 +678,7 @@ int sithThing_DoesRdThingInit(sithThing *thing)
     int out = rdThing_NewEntry(&thing->rdthing, thing);
     thing->thingIdx = idx;
     thing->signature = sig;
+    // MOTS added: Set something -1
 
     return out;
 }
@@ -865,6 +867,7 @@ void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot)
     rdVector_Zero3(&this->lookOrientation.scale);
 }
 
+// MOTS altered
 int sithThing_SetNewModel(sithThing *thing, rdModel3 *model)
 {
     rdThing *v2; // edi
@@ -1412,7 +1415,7 @@ void sithThing_detachallchildren(sithThing *thing)
 //sithThing_IsAttachFlagsAnd6
 //sithThing_LotsOfFreeing
 
-
+// MOTS altered
 int sithThing_Load(sithWorld *world, int a2)
 {
     sithThing *v4; // esi
@@ -1617,6 +1620,7 @@ LABEL_18:
     return thing->thingtype == SITH_THING_ACTOR && sithAI_LoadThingActorParams(arg, thing, paramIdx);
 }
 
+// MOTS altered
 int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
 {
     int v3; // ebp

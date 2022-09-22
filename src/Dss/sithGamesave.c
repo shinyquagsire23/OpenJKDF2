@@ -76,6 +76,7 @@ int sithGamesave_Load(char *saveFname, int a2, int a3)
     return 0;
 }
 
+// MOTS altered
 int sithGamesave_LoadEntry(char *fpath)
 {
     int curMs; // [esp+Ch] [ebp-650h] BYREF
