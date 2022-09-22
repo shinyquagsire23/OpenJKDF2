@@ -46,7 +46,7 @@ int jkHudInv_ItemDatLoad(char *fpath)
             {
                 cog_ = sithCog_LoadCogscript(stdConffile_entry.args[v3].value);
                 if ( cog_ )
-                    cog_->flags |= 0x40u;
+                    cog_->flags |= SITH_COG_LOCAL;
                 cog = cog_;
             }
         }

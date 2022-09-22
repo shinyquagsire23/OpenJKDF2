@@ -352,7 +352,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     _strncpy(cog->cogscript_fpath, v8->cog_fpath, 0x1Fu);
     cog->cogscript_fpath[31] = 0;
     cog->cogscript = v8;
-    cog->flags = v8->debug_maybe;
+    cog->flags = v8->flags;
     cog->pSymbolTable = sithCogParse_CopySymboltable(v8->pSymbolTable);
     if ( cog->pSymbolTable )
     {

@@ -410,7 +410,7 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
         ctx->script_running = 3;
         ctx->wakeTimeMs = idx;
 
-        if ( ctx->flags & 1 )
+        if ( ctx->flags & SITH_COG_DEBUG)
         {
             _sprintf(std_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
             sithConsole_Print(std_genBuffer);

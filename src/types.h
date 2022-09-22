@@ -561,6 +561,97 @@ enum RD_TEXTUREMODE
     RD_TEXTUREMODE_4_UNK = 4
 };
 
+typedef uint32_t sithCogFlags_t;
+enum SithCogFlag
+{
+    SITH_COG_DEBUG = 0x1,
+    SITH_COG_DISABLED = 0x2,
+    SITH_COG_PULSE_SET = 0x4,
+    SITH_COG_TIMER_SET = 0x8,
+    SITH_COG_PAUSED = 0x10,
+    SITH_COG_CLASS = 0x20,
+    SITH_COG_LOCAL = 0x40,
+    SITH_COG_SERVER = 0x80,
+    SITH_COG_GLOBAL = 0x100,
+    SITH_COG_NO_SYNC = 0x200,
+};
+
+typedef int SITH_MESSAGE;
+enum SITH_MESSAGE_E
+{
+    SITH_MESSAGE_0 = 0,
+    SITH_MESSAGE_ACTIVATE = 1,
+    SITH_MESSAGE_REMOVED = 2,
+    SITH_MESSAGE_STARTUP = 3,
+    SITH_MESSAGE_TIMER = 4,
+    SITH_MESSAGE_BLOCKED = 5,
+    SITH_MESSAGE_ENTERED = 6,
+    SITH_MESSAGE_EXITED = 7,
+    SITH_MESSAGE_CROSSED = 8,
+    SITH_MESSAGE_SIGHTED = 9,
+    SITH_MESSAGE_DAMAGED = 10,
+    SITH_MESSAGE_ARRIVED = 11,
+    SITH_MESSAGE_KILLED = 12,
+    SITH_MESSAGE_PULSE = 13,
+    SITH_MESSAGE_TOUCHED = 14,
+    SITH_MESSAGE_CREATED = 15,
+    SITH_MESSAGE_LOADING = 16,
+    SITH_MESSAGE_SELECTED = 17,
+    SITH_MESSAGE_DESELECTED = 18,
+    SITH_MESSAGE_AUTOSELECT = 19,
+    SITH_MESSAGE_CHANGED = 20,
+    SITH_MESSAGE_DEACTIVATED = 21,
+    SITH_MESSAGE_SHUTDOWN = 22,
+    SITH_MESSAGE_RESPAWN = 23,
+    SITH_MESSAGE_AIEVENT = 24,
+    SITH_MESSAGE_SKILL = 25,
+    SITH_MESSAGE_TAKEN = 26,
+    SITH_MESSAGE_USER0 = 27,
+    SITH_MESSAGE_USER1 = 28,
+    SITH_MESSAGE_USER2 = 29,
+    SITH_MESSAGE_USER3 = 30,
+    SITH_MESSAGE_USER4 = 31,
+    SITH_MESSAGE_USER5 = 32,
+    SITH_MESSAGE_USER6 = 33,
+    SITH_MESSAGE_USER7 = 34,
+    SITH_MESSAGE_NEWPLAYER = 35,
+    SITH_MESSAGE_FIRE = 36,
+    SITH_MESSAGE_JOIN = 37,
+    SITH_MESSAGE_LEAVE = 38,
+    SITH_MESSAGE_SPLASH = 39,
+    SITH_MESSAGE_TRIGGER = 40,
+    SITH_MESSAGE_MAX = 41,
+};
+
+typedef uint32_t sithWeaponFlags_t;
+enum SITH_WF_E
+{
+    SITH_WF_NO_DAMAGE_TO_SHOOTER = 0x1,
+    SITH_WF_2 = 0x2,
+    SITH_WF_EXPLODE_ON_SURFACE_HIT = 0x4,
+    SITH_WF_EXPLODE_ON_THING_HIT = 0x8,
+    SITH_WF_10 = 0x10,
+    SITH_WF_20 = 0x20,
+    SITH_WF_40 = 0x40,
+    SITH_WF_ATTACH_TO_WALL = 0x80,
+    SITH_WF_EXPLODE_AT_TIMER_TIMEOUT = 0x100,
+    SITH_WF_EXPLODE_WHEN_DAMAGED = 0x200,
+    SITH_WF_IMPACT_SOUND_FX = 0x400,
+    SITH_WF_ATTACH_TO_THING = 0x800,
+    SITH_WF_PROXIMITY = 0x1000, // "Weapon will explode when something touches its sphere."
+    SITH_WF_INSTANT_IMPACT = 0x2000,
+    SITH_WF_DAMAGE_DECAY = 0x4000,
+    SITH_WF_OBJECT_TRAIL = 0x8000,
+    SITH_WF_10000 = 0x10000, // short throw? unsure
+    SITH_WF_20000 = 0x20000,
+    SITH_WF_TRIGGER_AI_AWARENESS = 0x40000,
+    SITH_WF_RICOCHET_OFF_SURFACE = 0x80000,
+    SITH_WF_100000 = 0x100000,
+    SITH_WF_TRIGGER_AIEVENT = 0x200000,
+    SITH_WF_EXPLODES_ON_WORLD_FLOOR_HIT = 0x400000,
+    SITH_WF_MOPHIA_BOMB = 0x800000, // Jones specific
+};
+
 // All the typedefs
 typedef struct rdVector2i
 {
@@ -1642,7 +1733,7 @@ typedef struct sithCogStackvar
 typedef struct sithCog
 {
     sithCogScript* cogscript;
-    uint32_t flags;
+    sithCogFlags_t flags;
     int selfCog;
     uint32_t script_running;
     uint32_t execPos;
@@ -2340,7 +2431,7 @@ typedef struct sithThingItemParams
 
 typedef struct sithThingWeaponParams
 {
-    uint32_t typeflags;
+    sithWeaponFlags_t typeflags;
     uint32_t damageClass;
     float unk8;
     float damage;

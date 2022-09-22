@@ -433,7 +433,7 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
         return 0.0;
     if ( (sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
         return 0.0;
-    if ( (sender->thingflags & 0x400) != 0 && (sender->thingflags & 0x100) == 0 )
+    if ( (sender->thingflags & SITH_TF_CAPTURED) != 0 && (sender->thingflags & SITH_TF_INVULN) == 0 )
     {
         param1 = (float)(unsigned int)damageClass;
         amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
@@ -1625,23 +1625,21 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
     int32_t v6; // eax
     int32_t v7; // eax
     int result; // eax
-    char *v9; // ecx
-    sithAIClass *v10; // eax
-    sithActor *v11; // esi
-    int v12; // eax
-    double v13; // st7
-    int v14; // eax
-    double v15; // st7
-    double v16; // st7
-    double v18; // st7
-    void *v19; // eax
-    rdParticle *v20; // edi
-    rdSprite *v21; // eax
-    sithAnimclass *v22; // eax
-    sithCog *v23; // eax
-    int v24; // eax
-    rdVector3 a3a; // [esp+10h] [ebp-Ch] BYREF
-    int tmpInt;
+    sithAIClass *pAIClass; // eax
+    sithActor *pActor; // esi
+    int collide; // eax
+    double size; // st7
+    uint32_t thingType; // eax
+    double moveSize; // st7
+    double light; // st7
+    double lifeLeftSec; // st7
+    rdModel3 *pModel; // eax
+    rdParticle *pParticle; // edi
+    rdSprite *pSprite; // eax
+    sithAnimclass *pAnimClass; // eax
+    sithCog *pCog; // eax
+    rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
+    uint32_t thingFlags;
 
     switch ( param )
     {
@@ -1682,10 +1680,10 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             }
             break;
         case THINGPARAM_COLLIDE:
-            v12 = _atoi(arg->value);
-            if ( v12 < 0 || v12 > 3 )
+            collide = _atoi(arg->value);
+            if ( collide < 0 || collide > 3 )
                 goto LABEL_59;
-            thing->collide = v12;
+            thing->collide = collide;
             result = 1;
             break;
         case THINGPARAM_MOVE:
@@ -1708,33 +1706,33 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             }
             break;
         case THINGPARAM_SIZE:
-            v13 = _atof(arg->value);
-            if ( v13 < 0.0 )
+            size = _atof(arg->value);
+            if ( size < 0.0 )
                 goto LABEL_56;
-            thing->moveSize = v13;
-            thing->collideSize = v13;
+            thing->moveSize = size;
+            thing->collideSize = size;
             result = 1;
             break;
         case THINGPARAM_THINGFLAGS:
-            if ( _sscanf(arg->value, "%x", &tmpInt) != 1 )
+            if ( _sscanf(arg->value, "%x", &thingFlags) != 1 )
                 goto LABEL_59;
-            thing->thingflags = tmpInt;
+            thing->thingflags = thingFlags;
             result = 1;
             break;
         case THINGPARAM_TIMER:
-            v18 = _atof(arg->value);
-            if ( v18 < 0.0 )
+            lifeLeftSec = _atof(arg->value);
+            if ( lifeLeftSec < 0.0 )
                 goto LABEL_56;
-            thing->lifeLeftMs = (__int64)(v18 * 1000.0);
+            thing->lifeLeftMs = (__int64)(lifeLeftSec * 1000.0);
             result = 1;
             break;
         case THINGPARAM_LIGHT:
-            v16 = _atof(arg->value);
-            if ( v16 < 0.0 )
+            light = _atof(arg->value);
+            if ( light < 0.0 )
                 goto LABEL_56;
-            thing->light = v16;
-            thing->lightMin = v16;
-            thing->thingflags |= 1;
+            thing->light = light;
+            thing->lightMin = light;
+            thing->thingflags |= SITH_TF_LIGHT;
             result = 1;
             break;
         case THINGPARAM_SOUNDCLASS:
@@ -1743,10 +1741,10 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             break;
         case THINGPARAM_MODEL3D:
             rdThing_FreeEntry(&thing->rdthing);
-            v19 = sithModel_LoadEntry(arg->value, 0);
-            if ( v19 )
+            pModel = sithModel_LoadEntry(arg->value, 0);
+            if ( pModel )
             {
-                rdThing_SetModel3(&thing->rdthing, (rdModel3 *)v19);
+                rdThing_SetModel3(&thing->rdthing, pModel);
                 if ( thing->collideSize == 0.0 )
                     thing->collideSize = thing->rdthing.model3->radius;
                 if ( thing->moveSize != 0.0 )
@@ -1768,10 +1766,10 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             break;
         case THINGPARAM_SPRITE:
             rdThing_FreeEntry(&thing->rdthing);
-            v21 = sithSprite_LoadEntry(arg->value);
-            if ( v21 )
+            pSprite = sithSprite_LoadEntry(arg->value);
+            if ( pSprite )
             {
-                rdThing_SetSprite3(&thing->rdthing, v21);
+                rdThing_SetSprite3(&thing->rdthing, pSprite);
                 result = 1;
             }
             else
@@ -1781,55 +1779,54 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             }
             break;
         case THINGPARAM_PUPPET:
-            v22 = sithAnimClass_LoadEntry(arg->value);
-            thing->animclass = v22;
-            if ( !v22 || thing->rdthing.puppet )
+            pAnimClass = sithAnimClass_LoadEntry(arg->value);
+            thing->animclass = pAnimClass;
+            if ( !pAnimClass || thing->rdthing.puppet )
                 goto LABEL_58;
             rdPuppet_New(&thing->rdthing);
             result = 1;
             break;
         case THINGPARAM_AICLASS:
-            v9 = arg->value;
-            thing->thingtype = 2;
-            v10 = sithAIClass_Load(v9);
-            thing->aiclass = v10;
-            v11 = thing->actor;
-            if ( !v11 || !v10 )
+            thing->thingtype = SITH_THING_ACTOR;
+            pAIClass = sithAIClass_Load(arg->value);
+            thing->aiclass = pAIClass;
+            pActor = thing->actor;
+            if ( !pActor || !pAIClass )
                 goto LABEL_58;
-            v11->aiclass = v10;
-            v11->numAIClassEntries = v10->numEntries;
+            pActor->aiclass = pAIClass;
+            pActor->numAIClassEntries = pAIClass->numEntries;
             result = 1;
             break;
         case THINGPARAM_COG:
-            v23 = sithCog_LoadCogscript(arg->value);
-            thing->class_cog = v23;
-            if ( !v23 )
+            pCog = sithCog_LoadCogscript(arg->value);
+            thing->class_cog = pCog;
+            if ( !pCog )
                 goto LABEL_58;
-            v23->flags |= 0x60u;
+            pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
             thing->thingflags |= SITH_TF_CAPTURED;
             result = 1;
             break;
         case THINGPARAM_PARTICLE:
-            v20 = sithParticle_LoadEntry(arg->value);
-            if ( !v20 )
+            pParticle = sithParticle_LoadEntry(arg->value);
+            if ( !pParticle )
                 goto LABEL_58;
             rdThing_FreeEntry(&thing->rdthing);
-            rdThing_SetParticleCloud(&thing->rdthing, v20);
+            rdThing_SetParticleCloud(&thing->rdthing, pParticle);
             result = 1;
             break;
         case THINGPARAM_MOVESIZE:
-            v14 = thing->type;
-            if ( v14 == SITH_THING_ACTOR || v14 == SITH_THING_PLAYER )
+            thingType = thing->type;
+            if ( thingType == SITH_THING_ACTOR || thingType == SITH_THING_PLAYER )
                 goto LABEL_58;
-            v15 = _atof(arg->value);
-            if ( v15 < 0.0 )
+            moveSize = _atof(arg->value);
+            if ( moveSize < 0.0 )
             {
 LABEL_56:
                 result = 0;
             }
             else
             {
-                thing->moveSize = v15;
+                thing->moveSize = moveSize;
                 result = 1;
             }
             break;
@@ -1838,9 +1835,9 @@ LABEL_56:
             result = 1;
             break;
         case THINGPARAM_ORIENT:
-            if ( _sscanf(arg->value, "(%f/%f/%f)", &a3a, &a3a.y, &a3a.z) == 3 )
+            if ( _sscanf(arg->value, "(%f/%f/%f)", &orientation, &orientation.y, &orientation.z) == 3 )
             {
-                rdMatrix_BuildRotate34(&thing->lookOrientation, &a3a);
+                rdMatrix_BuildRotate34(&thing->lookOrientation, &orientation);
 LABEL_58:
                 result = 1;
             }
