@@ -50,7 +50,7 @@ void sithWeapon_Startup()
 
 void sithWeapon_Tick(sithThing *weapon, float deltaSeconds)
 {
-    int typeFlags = weapon->weaponParams.typeflags;
+    sithWeaponFlags_t typeFlags = weapon->weaponParams.typeflags;
     if (typeFlags & SITH_WF_INSTANT_IMPACT) // shooting walls?
     {
         sithWeapon_sub_4D35E0(weapon);
@@ -406,7 +406,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
         case THINGPARAM_TYPEFLAGS:
             if ( _sscanf(arg->value, "%x", &tmp) != 1 )
                 return 1;
-            thing->weaponParams.typeflags = tmp;
+            thing->weaponParams.typeflags = (sithWeaponFlags_t)tmp;
             return 1;
 
         case THINGPARAM_DAMAGE:
@@ -599,18 +599,18 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     double v13; // st7
     double v14; // st7
     int v16; // eax
-    int v17; // eax
+    sithWeaponFlags_t weapFlags; // eax
     sithThing *v19; // ebx
-    sithThing *v20; // eax
-    sithThing *v21; // edi
-    int v22; // eax
+    sithThing *pExplosionThing; // eax
+    sithThing *pExplosionThing2; // edi
+    sithWeaponFlags_t weapFlags2; // eax
     sithThing *fleshHitTemplate; // edi
     sithThing *v24; // ebx
     sithThing *v25; // eax
     sithThing *explodeTemplate; // edi
     sithThing *v27; // ebx
     sithThing *v28; // eax
-    uint32_t v30; // eax
+    uint32_t physFlags; // eax
 
     if ( (physicsThing->weaponParams.typeflags & SITH_WF_PROXIMITY) != 0 )
     {
@@ -654,34 +654,34 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
-        v17 = physicsThing->weaponParams.typeflags;
-        if ( (v17 & SITH_WF_EXPLODE_ON_SURFACE_HIT) != 0 )
+        weapFlags = physicsThing->weaponParams.typeflags;
+        if ( (weapFlags & SITH_WF_EXPLODE_ON_SURFACE_HIT) != 0 )
         {
             if ( !physicsThing->weaponParams.explodeTemplate )
-                goto LABEL_53;
+                goto destroyAndExitTrue;
             v19 = sithThing_GetParent(physicsThing);
-            v20 = sithThing_Create(physicsThing->weaponParams.explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v19);
-            v21 = v20;
-            if ( !v20 )
-                goto LABEL_53;
+            pExplosionThing = sithThing_Create(physicsThing->weaponParams.explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v19);
+            pExplosionThing2 = pExplosionThing;
+            if ( !pExplosionThing )
+                goto destroyAndExitTrue;
             if ( v19 == sithPlayer_pLocalPlayerThing || v19->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
             {
-                sithAIAwareness_AddEntry(v20->sector, &v20->position, 0, 2.0, v19);
+                sithAIAwareness_AddEntry(pExplosionThing->sector, &pExplosionThing->position, 0, 2.0, v19);
                 if ( (physicsThing->thingflags & SITH_TF_INVULN) != 0 )
                 {
-LABEL_52:
-                    v21->thingflags |= SITH_TF_INVULN;
+makeExpInvuln_destroyAndExitTrue:
+                    pExplosionThing2->thingflags |= SITH_TF_INVULN;
                 }
-LABEL_53:
+destroyAndExitTrue:
                 sithThing_Destroy(physicsThing);
                 return 1;
             }
-LABEL_45:
+checkPhysThingInvuln_destroyAndExitTrue:
             if ( (physicsThing->thingflags & SITH_TF_INVULN) != 0 )
-                goto LABEL_52;
-            goto LABEL_53;
+                goto makeExpInvuln_destroyAndExitTrue;
+            goto destroyAndExitTrue;
         }
-        if ( (v17 & SITH_WF_ATTACH_TO_WALL) == 0 )
+        if ( (weapFlags & SITH_WF_ATTACH_TO_WALL) == 0 )
             return sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
         sithPhysics_ThingStop(physicsThing);
         sithSoundClass_ThingPauseSoundclass(physicsThing, SITH_PF_USEGRAVITY);
@@ -706,45 +706,45 @@ LABEL_45:
     {
         if ( physicsThing->weaponParams.damage != 0.0 )
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
-        v22 = physicsThing->weaponParams.typeflags;
-        if ( (v22 & SITH_WF_EXPLODE_ON_THING_HIT) != 0 )
+        weapFlags2 = physicsThing->weaponParams.typeflags;
+        if ( (weapFlags2 & SITH_WF_EXPLODE_ON_THING_HIT) != 0 )
         {
             if ( (collidedThing->weaponParams.typeflags & SITH_WF_EXPLODE_AT_TIMER_TIMEOUT) != 0 )
             {
                 explodeTemplate = physicsThing->weaponParams.explodeTemplate;
                 if ( !explodeTemplate )
-                    goto LABEL_53;
+                    goto destroyAndExitTrue;
                 v27 = sithThing_GetParent(physicsThing);
                 v28 = sithThing_Create(explodeTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v27);
-                v21 = v28;
+                pExplosionThing2 = v28;
                 if ( !v28 )
-                    goto LABEL_53;
+                    goto destroyAndExitTrue;
                 if ( v27 == sithPlayer_pLocalPlayerThing || v27->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                     sithAIAwareness_AddEntry(v28->sector, &v28->position, 0, 2.0, v27);
                 if ( (physicsThing->thingflags & SITH_TF_INVULN) == 0 )
-                    goto LABEL_53;
-                goto LABEL_52;
+                    goto destroyAndExitTrue;
+                goto makeExpInvuln_destroyAndExitTrue;
             }
             fleshHitTemplate = physicsThing->weaponParams.fleshHitTemplate;
             if ( !fleshHitTemplate )
-                goto LABEL_53;
+                goto destroyAndExitTrue;
             v24 = sithThing_GetParent(physicsThing);
             v25 = sithThing_Create(fleshHitTemplate, &physicsThing->position, &rdroid_identMatrix34, physicsThing->sector, v24);
-            v21 = v25;
+            pExplosionThing2 = v25;
             if ( !v25 )
-                goto LABEL_53;
+                goto destroyAndExitTrue;
             if ( v24 == sithPlayer_pLocalPlayerThing || v24->thingtype == SITH_THING_PLAYER) // Added: second comparison, co-op
                 sithAIAwareness_AddEntry(v25->sector, &v25->position, 0, 2.0, v24);
-            goto LABEL_45;
+            goto checkPhysThingInvuln_destroyAndExitTrue;
         }
-        if ( (v22 & SITH_WF_ATTACH_TO_THING) == 0 )
+        if ( (weapFlags2 & SITH_WF_ATTACH_TO_THING) == 0 )
             return SITH_PF_USEGRAVITY;
         sithPhysics_ThingStop(physicsThing);
         sithThing_AttachThing(physicsThing, collidedThing);
 LABEL_56:
-        v30 = physicsThing->physicsParams.physflags | SITH_PF_USEGRAVITY;
+        physFlags = physicsThing->physicsParams.physflags | SITH_PF_USEGRAVITY;
         physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
-        physicsThing->physicsParams.physflags = v30;
+        physicsThing->physicsParams.physflags = physFlags;
         return SITH_PF_USEGRAVITY;
     }
     return result;
