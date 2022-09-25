@@ -47,6 +47,10 @@ int jkDSS_Startup()
     sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
     sithGamesave_Setidk(jkDSS_playerconfig_idksync, jkDSS_player_thingsidkfunc, jkDSS_nullsub_2, jkDSS_Write, jkDSS_Load);
     sithMulti_SetHandleridk(jkDSS_idk4);
+
+    // MOTS added:
+    //sithWorld_unk_func(jkPlayer_FUN_004069f0);
+    //sithEvent_RegisterFunc(5,jkDSS_JKM1,0,2);
     return 1;
 }
 
@@ -55,6 +59,7 @@ void jkDSS_Shutdown()
     ;
 }
 
+// MOTS altered
 int jkDSS_idk4()
 {
     if ( sithPlayer_pLocalPlayerThing )
@@ -85,18 +90,7 @@ void jkDSS_playerconfig_idksync()
     jkDSS_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
     jkDSS_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
     jkDSS_Sendx32(&playerThings[playerThingIdx]);
-
-
-    {
-        NETMSG_START;
-
-        NETMSG_PUSHVEC3(jkPlayer_waggleVec);
-        NETMSG_PUSHF32(jkPlayer_waggleMag);
-
-        NETMSG_END(DSS_ID_36);
-
-        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
-    }
+    jkDSS_Sendx36(); // MOTS didn't inline
 
     for (int i = 0; i < jkPlayer_numOtherThings; i++)
     {
@@ -184,6 +178,7 @@ int jkDSS_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSou
     return result;
 }
 
+// MOTS altered
 void jkDSS_SendSetSaberInfo(sithThing *thing)
 {
     NETMSG_START;
@@ -199,6 +194,7 @@ void jkDSS_SendSetSaberInfo(sithThing *thing)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
+// MOTS altered
 int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
 {
     sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
@@ -295,6 +291,7 @@ int jkDSS_ProcessJKEnableSaber(sithCogMsg *msg)
     return 1;
 }
 
+// MOTS altered
 void jkDSS_SendSetSaberInfo2(sithThing *thing)
 {
     if ( thing->playerInfo )
@@ -412,6 +409,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     return 1;
 }
 
+// MOTS altered
 void jkDSS_SendJKSetWeaponMesh(sithThing *pPlayerThing)
 {
     NETMSG_START;
@@ -643,6 +641,7 @@ int jkDSS_Processx33(sithCogMsg *msg)
     return 1;
 }
 
+// MOTS altered
 int jkDSS_Sendx36()
 {
     NETMSG_START;
@@ -655,6 +654,7 @@ int jkDSS_Sendx36()
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
 }
 
+// MOTS altered
 int jkDSS_Processx36_setwaggle(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
@@ -731,6 +731,7 @@ int jkDSS_ProcessEndLevel(sithCogMsg *msg)
     return 1;
 }
 
+// MOTS altered
 void jkDSS_SendSetTeam(int16_t teamNum)
 {
     NETMSG_START;
@@ -746,6 +747,7 @@ void jkDSS_SendSetTeam(int16_t teamNum)
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, 255, 1);
 }
 
+// MOTS altered
 int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
 {
     unsigned int playerIdx; // edx

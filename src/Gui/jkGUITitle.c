@@ -222,6 +222,7 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
     }
 }
 
+// MOTS altered: Added some string to the printf
 void jkGuiTitle_ShowLoadingStatic()
 {
     wchar_t *guiVersionStr; // eax

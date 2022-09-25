@@ -38,6 +38,7 @@ typedef struct rdHierarchyNode rdHierarchyNode;
 typedef struct rdMesh rdMesh;
 typedef struct rdMeshinfo rdMeshinfo;
 
+#ifndef JKM_TYPES
 typedef struct rdHierarchyNode
 {
     char name[32];
@@ -62,6 +63,24 @@ typedef struct rdHierarchyNode
     rdVector3 rot;
     rdMatrix34 posRotMatrix;
 } rdHierarchyNode;
+#else
+typedef struct rdHierarchyNode
+{
+    uint32_t flags;
+    uint32_t idx;
+    int type;
+    uint32_t meshIdx;
+    rdHierarchyNode* parent;
+    uint32_t numChildren;
+    rdHierarchyNode* child;
+    rdHierarchyNode* nextSibling;
+    rdVector3 pivot;
+    rdVector3 pos;
+    rdVector3 rot;
+    rdMatrix34 posRotMatrix;
+    uint32_t unk;
+} rdHierarchyNode;
+#endif
 
 typedef struct rdGeoset
 {
@@ -90,6 +109,7 @@ typedef struct rdModel3
     rdVector3 insertOffset;
 } rdModel3;
 
+#ifndef JKM_TYPES
 typedef struct rdMesh
 {
     char name[32];
@@ -114,6 +134,39 @@ typedef struct rdMesh
     int field_68;
     int field_6C;
 } rdMesh;
+#else
+
+typedef struct rdMesh
+{
+    //char name[32];
+    int mesh_num;
+    int geometryMode;
+    int lightingMode;
+    int textureMode;
+    rdVector3* vertices;
+    rdVector2* vertexUVs;
+    float* vertices_i;
+    float* vertices_unk;
+    rdFace* faces;
+    rdVector3* vertexNormals;
+    int unk1;
+    int unk2;
+    int unk3;
+    int unk4;
+    int numVertices;
+    int numUVs;
+    int numFaces;
+    float radius;
+    int field_58;
+    int field_5C;
+    int field_60;
+    float field_64;
+    int field_68;
+    int field_6C;
+    
+    int unk5;
+} rdMesh;
+#endif
 
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader);
 model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader);

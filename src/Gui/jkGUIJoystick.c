@@ -215,6 +215,7 @@ int jkGuiJoystick_ClickList1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouse
     return 0;
 }
 
+// MOTS altered?
 void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
 {
     int v2; // eax

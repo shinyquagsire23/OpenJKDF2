@@ -138,6 +138,7 @@ LABEL_17:
                                     if ( !v1 )
                                     {
                                         jkGui_sub_412E20(&jkGuiSetup_menu, 105, 108, i);
+                                        jkGuiSetup_menu.clickables[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
                                         jkGuiRend_Paint(&jkGuiSetup_menu);
                                     }
                                 }
@@ -149,6 +150,7 @@ LABEL_17:
                         default:
 LABEL_23:
                             jkGui_sub_412E20(&jkGuiSetup_menu, 100, 104, i);
+                            jkGuiSetup_menu.clickables[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
                             jkGuiRend_Paint(&jkGuiSetup_menu);
                             if ( i < 100 )
                                 break;

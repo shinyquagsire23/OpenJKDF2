@@ -98,6 +98,7 @@ void jkGuiMultiplayer_Shutdown()
     jkGuiMultiplayer_bInitted = 0;
 }
 
+// MOTS altered?
 int jkGuiMultiplayer_Show()
 {
     int result; // eax
@@ -611,6 +612,7 @@ int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mo
     return 0;
 }
 
+// MOTS added: Weird random waits?
 void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
 {
     uint32_t v1; // eax

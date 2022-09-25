@@ -421,5 +421,9 @@ void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
 // MOTS altered
 void jkSaber_Disable(sithThing *player)
 {
+    //MOTS added:
+    if (!player || !player->playerInfo) return;
+
     player->playerInfo->field_1A4 = 0;
+    //player->playerInfo->jkmUnk1 = 0; // MOTS added
 }

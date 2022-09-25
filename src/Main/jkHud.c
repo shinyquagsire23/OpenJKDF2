@@ -62,6 +62,7 @@ void jkHud_Shutdown()
     }
 }
 
+// MOTS altered: Added a font for smaller (bigger?) screens
 int jkHud_Open()
 {
     signed int result; // eax
@@ -277,6 +278,7 @@ LABEL_30:
     return result;
 }
 
+// MOTS altered
 void jkHud_Draw()
 {
     sithThing *playerThing; // esi

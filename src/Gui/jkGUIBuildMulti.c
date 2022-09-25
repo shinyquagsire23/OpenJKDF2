@@ -653,6 +653,7 @@ void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     stdDisplay_VBufferCopy(pVbuf, *pSabBm->mipSurfaces, pElement->rect.x, pElement->rect.y, &rect, 0);
 }
 
+// MOTS altered
 int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
 {
     int v2; // eax

@@ -54,6 +54,7 @@ enum jkGuiNetHostAdvancedElement_t
 
 static int jkGuiNetHost_aIdk[2] = {0xd, 0xe};
 
+// MOTS altered
 static jkGuiElement jkGuiNetHost_aElements[28] =
 {
     { ELEMENT_TEXT,         0, 0, NULL, 3, { 0, 410, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -274,6 +275,7 @@ void jkGuiNetHost_Shutdown()
     jkGuiNetHost_bInitted = 0;
 }
 
+// MOTS altered
 int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
 {
     wchar_t *v3; // eax
@@ -488,6 +490,7 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
     return v1;
 }
 
+// MOTS altered
 int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw)
 {
     if ( mouseX != -1 || mouseY != -1 )
@@ -514,6 +517,19 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
         jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, 0, 0);
         jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
     }
+
+    // MOTS added
+    /*
+    uVar2 = jkGuiSingleplayer_FUN_0041d590(a1);
+    bVar3 = (uVar2 & 0x10) == 0;
+    if (!bVar3) {
+        jkGuiNetHost_aElements[16].unlabelled16 = 1;
+        jkGuiNetHost_aElements[15].unlabelled16 = 0;
+        jkGuiNetHost_aElements[12].bIsVisible = 1;
+        jkGuiNetHost_aElements[13].bIsVisible = 1;
+        jkGuiNetHost_aElements[14].bIsVisible = 1;
+    }
+    */
 
     if ( mouseX != -1 || mouseY != -1 )
         jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_menu, 1);

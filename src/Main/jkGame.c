@@ -125,10 +125,11 @@ int jkGame_Update()
     }
     jkPlayer_DrawPov();
     rdFinishFrame();
+    //++Video_dword_5528A0; // MOTS added
     /*if ( Main_bDispStats )
     {
         v2 = sithWorld_pCurrentWorld->playerThing;
-        ++Video_dword_5528A0;
+        ++Video_dword_5528A0; // MOTS removed
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
         Video_dword_5528A8 = v3;
@@ -164,7 +165,7 @@ int jkGame_Update()
     }
     else if ( Main_bFrameRate )
     {
-        ++Video_dword_5528A0;
+        ++Video_dword_5528A0; // MOTS removed
         Video_dword_5528A8 = stdPlatform_GetTimeMsec();
         if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 1000 )
         {
@@ -176,17 +177,54 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
         }
     }*/
+
+    // MOTS added
+    /*
+    if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_20000000) != 0) {
+        Unk1_FUN_00412760();
+    }
+    if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
+        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
+            jkHud_Draw();
+        }
+    }
+    else {
+        Unk2_FUN_00412b50();
+    }
+    */
+
+    // MOTS removed
     if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
         jkHud_Draw();
+    // end MOTS removed
+
     jkDev_sub_41F950();
     jkHudInv_Draw();
     if ( Video_modeStruct.b3DAccel )
         std3D_DrawOverlay();
 
+    // MOTS added
+    /*
+    if (Main_bRecord != 0) {
+        jkGame_Screenshot();
+    }
+    */
+
+    // MOTS removed
     if ( Video_modeStruct.b3DAccel )
         result = stdDisplay_DDrawGdiSurfaceFlip();
     else
-        result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, 0, 0);
+        result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, NULL, 0);
+    // end MOTS removed
+
+    // MOTS added
+    /*
+    if ((Video_modeStruct.Video_motsNew1 != 0) && (Video_modeStruct.b3DAccel == 0)) {
+        result = stdDisplay_VBufferCopy(Video_pOtherBuf,Video_pMenuBuffer,0,0,NULL,0);
+        return result;
+    }
+    result = stdDisplay_DDrawGdiSurfaceFlip();
+    */
 
     return result;
 }

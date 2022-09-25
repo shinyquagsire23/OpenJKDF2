@@ -189,6 +189,7 @@ int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int mous
     return 0;
 }
 
+// MOTS altered
 void jkGuiSaveLoad_PopulateList()
 {
     stdFileSearch *v0; // eax
@@ -218,7 +219,7 @@ void jkGuiSaveLoad_PopulateList()
                 v2 = pHS->fileOpen(path, "rb");
                 if ( v2 )
                 {
-                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header) && saveHeader.version == 6 )
+                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header) && saveHeader.version == 6 ) // MOTS altered: 6 -> 0x7D6
                     {
                         v3 = __wcschr(saveHeader.saveName, U'~');
                         v4 = v3;

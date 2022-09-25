@@ -92,8 +92,20 @@ void jkGuiEsc_Show()
         jkGuiEsc_aElements[JKGUIESC_ELMT_OBJECTIVES].bIsVisible = 1;
         jkGuiEsc_aElements[JKGUIESC_ELMT_RESTART].bIsVisible = 1;
 
+        // MOTS removed
         if (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD)
             jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
+
+        // MOTS added:
+        /*
+        if (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD || sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED)
+            jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
+        if (sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED) {
+            jkGuiEsc_aElements[JKGUIESC_ELMT_LOAD].bIsVisible = 0;
+            jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
+            jkGuiEsc_aElements[JKGUIESC_ELMT_RESTART].bIsVisible = 0;
+        }
+        */
     }
 
     while ( 1 )

@@ -45,7 +45,7 @@ void sithTime_Resume()
     }
 }
 
-// MOTS altered
+// MOTS altered: min/max are variables
 void sithTime_SetDelta(int deltaMs)
 {
     sithTime_deltaMs = deltaMs;

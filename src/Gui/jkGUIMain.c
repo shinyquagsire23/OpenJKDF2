@@ -65,6 +65,7 @@ void jkGuiMain_Show()
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !stdComm_dword_8321F8) || jkGuiMultiplayer_Show2() != 1 )
     {
+        //jkGuiMain_aElements[4].bIsVisible = Main_bDevMode; // MOTS added
         do
         {
             jkGuiRend_SetDisplayingStruct(&jkGuiMain_menu, &jkGuiMain_elements[2]);

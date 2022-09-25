@@ -75,6 +75,7 @@ enum JK_GAMEMODE
     JK_GAMEMODE_CUTSCENE = 12,
     JK_GAMEMODE_CREDITS = 13,
     JK_GAMEMODE_UNK = 14,
+    JK_GAMEMODE_MOTS1 = 15,
 };
 
 typedef struct jkGuiStateFuncs

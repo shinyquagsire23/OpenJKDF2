@@ -50,6 +50,7 @@ void jkGuiControlOptions_Shutdown()
     ;
 }
 
+// MOTS altered
 int jkGuiControlOptions_Show()
 {
     int v0; // eax

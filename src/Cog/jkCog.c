@@ -319,6 +319,7 @@ void jkCog_GetFlags(sithCog *ctx)
     sithCogExec_PushInt(ctx, v1);
 }
 
+// MOTS altered
 void jkCog_SetWeaponMesh(sithCog *ctx)
 {
     rdModel3 *model3; // edi
@@ -333,6 +334,10 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
     v3 = actorThing;
     if ( actorThing )
     {
+        // MOTS added:
+        if (!actorThing->playerInfo) {
+            //jkPlayer_FUN_00404fe0(actorThing);
+        }
         v4 = actorThing->playerInfo;
         if ( v4 )
         {

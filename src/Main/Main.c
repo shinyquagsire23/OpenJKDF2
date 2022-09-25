@@ -1301,6 +1301,19 @@ void Main_ParseCmdLine(char *cmdline)
         {
             Main_bNoHUD = 1;
         }
+        else if ( !__strcmpi(v1, "-record") || !__strcmpi(v1, "/record") ) // MOTS added
+        {
+            //sithTime_idk_record(0x53,0x53);
+            //Main_bRecord = 1;
+        }
+        else if ( !__strcmpi(v1, "-fixed") || !__strcmpi(v1, "/fixed") ) // MOTS added
+        {
+            //sithTime_idk_record(0x53,0x53);
+        }
+        else if ( !__strcmpi(v1, "-coglog") || !__strcmpi(v1, "/coglog") ) // MOTS added
+        {
+            //Main_cogLogFp = fopen("cog.log", "wc");
+        }
 #ifdef QOL_IMPROVEMENTS
         else if (!__strcmpi(v1, "-dedicatedServer") || !__strcmpi(v1, "/dedicatedServer") )
         {

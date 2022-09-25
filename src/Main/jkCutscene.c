@@ -41,9 +41,10 @@ static double last_displayFrame = 0;
 static double extraUs = 0;
 extern int openjkdf2_bIsKVM;
 
+// MOTS altered
 void jkCutscene_Startup(char *fpath)
 {
-    stdStrTable_Load(&jkCutscene_strings, fpath);
+    stdStrTable_Load(&jkCutscene_strings, fpath); // MOTS removed
     jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);
     jkCutscene_rect1.x = 10;
     jkCutscene_rect1.y = 360;
@@ -56,6 +57,7 @@ void jkCutscene_Startup(char *fpath)
     jkCutscene_bInitted = 1;
 }
 
+// MOTS altered
 void jkCutscene_Shutdown()
 {
     if ( jkCutscene_subtitlefont )
@@ -63,7 +65,7 @@ void jkCutscene_Shutdown()
         stdFont_Free(jkCutscene_subtitlefont);
         jkCutscene_subtitlefont = 0;
     }
-    stdStrTable_Free(&jkCutscene_strings);
+    stdStrTable_Free(&jkCutscene_strings); // MOTS removed
     jkCutscene_bInitted = 0;
 }
 

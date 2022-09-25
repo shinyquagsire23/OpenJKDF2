@@ -151,6 +151,7 @@ static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
 
+// MOTS altered?
 int jkGuiMultiTally_Show(int a1)
 {
     int result; // eax
@@ -504,6 +505,7 @@ void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)
     }
 }
 
+// MOTS altered
 int jkGuiMultiTally_ShowTeamScores(int a1)
 {
     unsigned int v1; // eax
@@ -529,7 +531,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     jkGuiMultiTally_idkType = a1;
     jkGuiMultiTally_dword_5568D0 = 0;
     jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
-    jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons3[15], &jkGuiMultiTally_menu3, a1);
+    jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons3[15], &jkGuiMultiTally_menu3, a1); // MOTS removed?
     jkGuiMultiTally_buttons3[1].wstr = jkGui_sub_412ED0();
     jkGuiRend_MenuSetLastElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[16]);
     jkGuiRend_SetDisplayingStruct(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[15]);

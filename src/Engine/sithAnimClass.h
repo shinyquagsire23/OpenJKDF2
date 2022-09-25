@@ -71,6 +71,9 @@ typedef struct sithAnimclassMode
     uint32_t field_2A4;
     uint32_t field_2A8;
     uint32_t field_2AC;
+#ifdef JKM_TYPES
+    uint32_t pad[8];
+#endif
 } sithAnimclassMode;
 
 typedef struct sithAnimclass

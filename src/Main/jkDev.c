@@ -21,6 +21,7 @@
 #include "Dss/jkDSS.h"
 #include "../jk.h"
 
+// MOTS altered
 void jkDev_Startup()
 {
 #ifndef PLATFORM_POSIX
@@ -57,8 +58,8 @@ void jkDev_Startup()
     jkDev_RegisterCmd(jkDev_CmdEndLevel2, "thereisnotry", "", 0);
     jkDev_RegisterCmd(jkDev_CmdAllWeapons, "red5", "", 0);
     jkDev_RegisterCmd(jkDev_CmdAllItems, "wamprat", "", 0);
-    jkDev_RegisterCmd(jkDev_CmdLightMaster, "imayoda", "", 0);
-    jkDev_RegisterCmd(jkDev_CmdDarkMaster, "sithlord", "", 0);
+    jkDev_RegisterCmd(jkDev_CmdLightMaster, "imayoda", "", 0); // MOTS removed
+    jkDev_RegisterCmd(jkDev_CmdDarkMaster, "sithlord", "", 0); // MOTS removed
     jkDev_RegisterCmd(jkDev_CmdUberJedi, "raccoonking", "", 0);
     jkDev_RegisterCmd(jkDev_CmdLevelUp, "deeznuts", "", 0);
     jkDev_RegisterCmd(jkDev_CmdHeal, "bactame", "", 0);
@@ -180,6 +181,7 @@ void jkDev_DrawLog()
     }
 }
 
+// MOTS altered
 void jkDev_sub_41F950()
 {
     int v0; // ecx
@@ -226,6 +228,7 @@ void jkDev_sub_41F950()
     }
 }
 
+// MOTS altered? inlined?
 int jkDev_PrintUniString(const wchar_t *str)
 {
     int v1; // ecx
@@ -270,6 +273,7 @@ LABEL_7:
     return v5;
 }
 
+// MOTS altered? inlined?
 int jkDev_DebugLog(const char *lParam)
 {
     HWND v1; // eax
@@ -531,6 +535,7 @@ int jkDev_CmdEndLevel2(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// MOTS altered
 int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
@@ -554,6 +559,7 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// MOTS altered
 int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
@@ -657,6 +663,7 @@ int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// MOTS altered
 int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
@@ -697,6 +704,7 @@ int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// MOTS altered
 int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
@@ -770,6 +778,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// MOTS altered
 int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !pArgStr || !sithNet_isMulti || (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )

@@ -1637,11 +1637,19 @@ typedef struct videoModeStruct
   jkViewSize aViewSizes[11];
   int Video_8606A4;
   int Video_8606A8;
+#ifndef JKM_TYPES
   int geoMode;
   int lightMode;
+#else
+  int lightMode;
+  int geoMode;
+#endif
   int texMode;
   HKEY Video_8606B8;
   HKEY Video_8606BC;
+#ifdef JKM_TYPES
+  int Video_motsNew1;
+#endif
   int Video_8606C0;
 } videoModeStruct;
 
@@ -2215,14 +2223,23 @@ typedef struct jkPlayerInfo
     sithThing* damagedThings[6];
     uint32_t numDamagedSurfaces;
     sithSurface* damagedSurfaces[6];
-#ifdef JKM_TYPES
-    uint8_t pad[0x64];
-#endif // JKM_TYPES
     uint32_t lastSparkSpawnMs;
+#ifdef JKM_TYPES
+    uint32_t jkmUnk1;
+    uint8_t pad1[0x8];
+    sithThing* actorThing;
+    uint8_t pad1_2[0x54];
+#endif // JKM_TYPES
     sithThing* wall_sparks;
     sithThing* blood_sparks;
     sithThing* saber_sparks;
+#ifndef JKM_TYPES
     sithThing* actorThing;
+#endif
+
+#ifdef JKM_TYPES
+    uint8_t pad2[0x8];
+#endif // JKM_TYPES
     uint32_t maxTwinkles;
     uint32_t twinkleSpawnRate;
     uint32_t bRenderTwinkleParticle;
@@ -2233,7 +2250,7 @@ typedef struct jkPlayerInfo
     int shields;
     uint32_t field_224;
 #ifdef JKM_TYPES
-    uint8_t pad[0x14];
+    uint8_t pad3[0x10];
 #endif // JKM_TYPES
 } jkPlayerInfo;
 
@@ -2245,7 +2262,14 @@ typedef struct jkPlayerMpcInfo
   uint8_t gap80[32];
   char sideMat[32];
   char tipMat[32];
+#ifdef JKM_TYPES
+  int unk1;
+#endif
   int jediRank;
+#ifdef JKM_TYPES
+  int personality;
+  int unk2;
+#endif
 } jkPlayerMpcInfo;
 
 typedef int (*sithCollision_collisionHandler_t)(sithThing*, sithThing*, sithCollisionSearchEntry*, int);
@@ -2354,6 +2378,9 @@ typedef struct sithActor
     float moveSpeed;
     sithThing* field_1C0;
     rdVector3 field_1C4;
+#ifdef JKM_TYPES
+    int unk1;
+#endif
     sithThing* field_1D0;
     rdVector3 field_1D4;
     int field_1E0;
@@ -2554,6 +2581,9 @@ typedef struct sithThingActorParams
 typedef struct sithThingPhysParams
 {
     uint32_t physflags;
+#ifdef JKM_TYPES
+    uint32_t unk_4;
+#endif
     rdVector3 vel;
     rdVector3 angVel;
     rdVector3 acceleration;
@@ -2680,9 +2710,6 @@ typedef struct sithThing
     int goalframe;
     uint32_t field_260;
     float waggle;
-#ifdef JKM_TYPES
-    float waggleY;
-#endif
     rdVector3 field_268;
     sithAIClass* aiclass;
     sithActor* actor;
@@ -2692,6 +2719,10 @@ typedef struct sithThing
     jkPlayerInfo* playerInfo;
     uint32_t jkFlags;
     float userdata;
+#ifdef JKM_TYPES
+    int idk1;
+    int idk2;
+#endif
 } sithThing;
 
 typedef int (__cdecl *sithThing_handler_t)(sithThing*);

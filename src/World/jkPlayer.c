@@ -104,6 +104,7 @@ void jkPlayer_Shutdown()
 
 void jkPlayer_Open()
 {
+    // MOTS added
 }
 
 void jkPlayer_Close()
@@ -819,6 +820,7 @@ int jkPlayer_GetChoice()
     return (int)sithPlayer_GetBinAmt(SITHBIN_CHOICE);
 }
 
+//MOTS altered
 float jkPlayer_CalcAlignment(int isMp)
 {
     double v9; // st7
@@ -835,15 +837,10 @@ float jkPlayer_CalcAlignment(int isMp)
         float pedsKilled = sithPlayer_GetBinAmt(SITHBIN_PEDS_KILLED);
         float totalPeds = sithPlayer_GetBinAmt(SITHBIN_PEDS_TOTAL);
 
-        // Added: prevent div 0
-        if (totalPeds == 0.0)
-            totalPeds = 1.0;
-
-        float pedRatio = pedsKilled / totalPeds * 100.0;
-        if (pedsKilled / totalPeds <= 0.0) // ??
+        if (totalPeds <= 0.0) // Prevent div 0
             alignment -= -20.0;
         else
-            alignment -= pedRatio - -20.0;
+            alignment -= (pedsKilled / totalPeds * 100.0) - -20.0;
     }
 
     // TODO macro?
@@ -875,6 +872,7 @@ void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
     }
 }
 
+// MOTS altered
 int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins)
 {
     int v6; // edi
@@ -990,6 +988,7 @@ int jkPlayer_MPCBinWrite()
     return 0;
 }
 
+// MOTS added: weird xor crypt
 int jkPlayer_MPCBinRead()
 {
     float a2;
@@ -1425,6 +1424,8 @@ LABEL_37:
 float jkPlayer_CalcStarsAlign()
 {
     float alignment = 0.0;
+    // MOTS: Return 0.0 always
+
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
         alignment -= sithPlayer_GetBinAmt(i) * 6.25;

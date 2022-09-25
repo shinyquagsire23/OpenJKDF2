@@ -769,7 +769,7 @@ void jkMain_ChoiceLeave(int a1, int a2)
 
 void jkMain_UnkShow(int a1, int a2)
 {
-    ;
+    //jkPlayer_FUN_00406af0(0); // MOTS added
 }
 
 void jkMain_UnkTick(int a1)
@@ -1186,6 +1186,13 @@ void jkMain_VideoShow(int a1, int a2)
             case JK_GAMEMODE_VIDEO4:
                 result = jkMain_CdSwitch(0, 1);
                 break;
+            case JK_GAMEMODE_MOTS1: // MOTS added
+                if (jkGuiRend_thing_five != 0) {
+                    jkGuiRend_thing_four = 1;
+                }
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
+                return;
             default:
                 result = 1;
                 if ( jkGuiRend_thing_five )
@@ -1230,6 +1237,7 @@ void jkMain_VideoTick(int a2)
                 jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
                 break;
             case JK_GAMEMODE_VIDEO4:
+            case JK_GAMEMODE_MOTS1: // MOTS added
                 result = 1;
                 if ( jkGuiRend_thing_five )
                     jkGuiRend_thing_four = 1;
