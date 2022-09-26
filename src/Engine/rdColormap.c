@@ -82,6 +82,9 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         goto safe_fallback;
     }
     rdroid_pHS->fileRead(colormap_fptr, colormap->colors, 0x300);
+
+    // JKDF2
+    /*
     if ( (colormap->flags & 4) == 0 )
     {
         colorsLights = rdroid_pHS->alloc(0x4100);
@@ -155,6 +158,74 @@ LABEL_15:
 LABEL_26:
     rdroid_pHS->fileClose(colormap_fptr);
     return 1;
+    */
+
+    if (!(colormap->flags & 4)) {
+        colormap->rgb16Alloc = NULL;
+    }
+    else {
+        rgb16Alloc = (uint16_t *)rdroid_pHS->alloc(0x8000);
+        colormap->rgb16Alloc = rgb16Alloc;
+        if ( !rgb16Alloc )
+        {
+            jk_printf("OpenJKDF2: rgb16Alloc alloc in `%s` failed!\n", colormap_fname);
+            goto safe_fallback;
+        }
+        rdColormap_BuildRGB16(rgb16Alloc, colormap->colors, 0, 0, 0, &rdColormap_colorInfo);
+    }
+
+    colorsLights = rdroid_pHS->alloc(0x4100);
+    colormap->lightlevelAlloc = colorsLights;
+    if (!colorsLights)
+    {
+        jk_printf("OpenJKDF2: colorsLights alloc in `%s` failed!\n", colormap_fname);
+        goto safe_fallback;
+    }
+
+
+    colormap->lightlevel = colorsLights;
+    if ( (intptr_t)colorsLights & 0xFF )
+        colormap->lightlevel = (void*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
+
+    rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
+
+    if (colormap->flags & 1) 
+    {
+        v10 = rdroid_pHS->alloc(0x10100);
+        colormap->transparencyAlloc = v10;
+        if (!v10)
+        {
+            jk_printf("OpenJKDF2: transparencyAlloc alloc in `%s` failed!\n", colormap_fname);
+            goto safe_fallback;
+        }
+        
+        colormap->transparency = v10;
+        if ( ((intptr_t)v10) & 0xFF )
+            colormap->transparency = (void*)((intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256);
+        rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+
+        if ((colormap->flags & 4) == 0) {
+            colormap->dword34C = NULL;
+        }
+        else {
+            v11 = (*rdroid_pHS->alloc)(0x10000);
+            colormap->dword34C = v11;
+            if (v11 == NULL) goto safe_fallback;
+
+            if (rdColormap_colorInfo.g_bits == 5) {
+                rdroid_pHS->fseek(colormap_fptr,0x10000,1);
+                rdroid_pHS->fileRead(colormap_fptr,colormap->dword34C,0x10000);
+            }
+            else {
+                rdroid_pHS->fileRead(colormap_fptr,v11,0x10000);
+                rdroid_pHS->fseek(colormap_fptr,0x10000,1);
+            }
+        }
+        colormap->dword340 = 0;
+        colormap->dword344 = 0;
+    }
+    rdroid_pHS->fileClose(colormap_fptr);
+    return 1;
 
     // Generate a gray ramp if something fails
 safe_fallback:    
@@ -214,6 +285,9 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
 
     rdroid_pHS->fileWrite(fd, &header, sizeof(header));
     rdroid_pHS->fileWrite(fd, colormap->colors, sizeof(colormap->colors));
+
+    // JKDF2
+    /*
     if ( colormap->flags & 4 )
     {
       if ( colormap->flags & 1 )
@@ -228,6 +302,18 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
       if ( colormap->flags & 1 )
         rdroid_pHS->fileWrite(fd, colormap->transparency, 0x10000);
     }
+    */
+
+    // MOTS
+    rdroid_pHS->fileWrite(fd, colormap->lightlevel, 0x4000);
+    if ( colormap->flags & 1 ) {
+        rdroid_pHS->fileWrite(fd, colormap->transparency, 0x10000);
+        if ( colormap->flags & 4 ) {
+            rdroid_pHS->fileWrite(fd, colormap->dword34C, 0x20000);
+        }
+    }
+
+
     rdroid_pHS->fileClose(fd);
 
     return 1;

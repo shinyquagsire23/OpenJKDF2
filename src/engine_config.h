@@ -55,9 +55,10 @@
 // Run game physics at a fixed timestep
 #define FIXED_TIMESTEP_PHYS
 
-// Backport MOTS RGB lighting
+// Backport MOTS RGB lighting and bone changes
 #ifdef QOL_IMPROVEMENTS
 #define JKM_LIGHTING
+#define JKM_BONES
 #endif
 
 // Disable warnings for Vegetable Studio

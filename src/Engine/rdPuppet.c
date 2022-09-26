@@ -358,6 +358,8 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
             continue;
 
         ++v13;
+        if (track->status & 0x200) continue; // MOTS added
+
         if ( (track->status & 0x10) == 0 )
         {
             rdPuppet_AdvanceTrack(puppet, v2, track->speed * deltaSeconds);

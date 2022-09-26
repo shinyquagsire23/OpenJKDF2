@@ -20,6 +20,7 @@ typedef uint32_t size_t;
 
 #ifdef JKM_TYPES
 #define JKM_LIGHTING
+#define JKM_BONES
 #endif
 
 #include "engine_config.h"
@@ -738,6 +739,11 @@ typedef struct rdLight
     uint32_t active;
     rdVector3 direction;
     float intensity;
+#ifdef JKM_LIGHTING
+    float intensityR;
+    float intensityG;
+    float intensityB;
+#endif
     uint32_t color;
     uint32_t dword20;
     uint32_t dword24;

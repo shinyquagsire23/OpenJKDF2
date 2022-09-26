@@ -54,6 +54,9 @@ typedef struct rdHierarchyNode
     uint32_t idx;
     int type;
     uint32_t meshIdx;
+#ifdef JKM_BONES
+    uint32_t numParents;
+#endif
     rdHierarchyNode* parent;
     uint32_t numChildren;
     rdHierarchyNode* child;
@@ -70,6 +73,7 @@ typedef struct rdHierarchyNode
     uint32_t idx;
     int type;
     uint32_t meshIdx;
+    uint32_t numParents;
     rdHierarchyNode* parent;
     uint32_t numChildren;
     rdHierarchyNode* child;
@@ -78,7 +82,6 @@ typedef struct rdHierarchyNode
     rdVector3 pos;
     rdVector3 rot;
     rdMatrix34 posRotMatrix;
-    uint32_t unk;
 } rdHierarchyNode;
 #endif
 
@@ -184,11 +187,12 @@ void rdModel3_CalcBoundingBoxes(rdModel3 *model);
 void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
 void rdModel3_CalcFaceNormals(rdModel3 *model);
 void rdModel3_CalcVertexNormals(rdModel3 *model);
+void rdModel3_CalcNumParents(rdModel3* pModel); // MOTS added
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);
 int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeIdx, rdMatrix34 *out);
 int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
 int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
-void rdModel3_DrawHNode(rdHierarchyNode *node);
+void rdModel3_DrawHNode(rdHierarchyNode *pNode);
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
 int rdModel3_DrawFace(rdFace *face, int lightFlags);
 

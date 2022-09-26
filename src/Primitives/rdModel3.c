@@ -477,6 +477,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
         node->pivot.y = pivot_y;
         node->pivot.z = pivot_z;
     }
+
+    rdModel3_CalcNumParents(model); // MOTS added
+
     stdConffile_Close();
     return 1;
 
@@ -491,6 +494,27 @@ void rdModel3_LoadPostProcess(rdModel3 *model)
     rdModel3_CalcBoundingBoxes(model);
     rdModel3_CalcFaceNormals(model);
     rdModel3_CalcVertexNormals(model);
+    rdModel3_CalcNumParents(model); // MOTS added
+}
+
+// MOTS added
+void rdModel3_CalcNumParents(rdModel3* pModel)
+{
+#ifdef JKM_BONES
+    for (int nodeIdx = 0; nodeIdx < pModel->numHierarchyNodes; nodeIdx++ )
+    {
+        rdHierarchyNode* node = &pModel->hierarchyNodes[nodeIdx];
+
+        node->numParents = 0;
+        rdHierarchyNode* parent = node->parent;
+        while (parent)
+        {
+            parent = parent->parent;
+            node->numParents++;
+        }
+
+    }
+#endif
 }
 
 // from editors?
@@ -1175,21 +1199,8 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         }
     }
     
-    rootNode = &pCurModel3->hierarchyNodes[0];
-    meshIdx = rootNode->meshIdx;
-    if ( meshIdx != -1 )
-    {
-        rdModel3_DrawMesh(&rdModel3_pCurGeoset->meshes[meshIdx], &pCurThing->hierarchyNodeMatrices[rootNode->idx]);
-    }
-    node = rootNode->child;
-    for (int i = 0; i < rootNode->numChildren; i++ )
-    {
-        if ( !pCurThing->amputatedJoints[node->idx] )
-        {
-            rdModel3_DrawHNode(node);
-        }
-        node = node->nextSibling;
-    }
+    // JKDF2 inlined
+    rdModel3_DrawHNode(pCurModel3->hierarchyNodes);
 #if 0
     rdDebug_DrawBoundingBox(matrix_4_3, pCurModel3->radius, 0xFF0000FF);
 #endif
@@ -1198,18 +1209,28 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 }
 
 // MOTS altered (RGB lights)
-void rdModel3_DrawHNode(rdHierarchyNode *node)
+void rdModel3_DrawHNode(rdHierarchyNode *pNode)
 {
     rdHierarchyNode *iter;
 
-    if ( node->meshIdx != -1 )
-        rdModel3_DrawMesh(&rdModel3_pCurGeoset->meshes[node->meshIdx], &pCurThing->hierarchyNodeMatrices[node->idx]);
+    if ( pNode->meshIdx != -1 ) {
 
-    if (!node->numChildren)
-        return;
+        // MOTS added:
+        if (pNode->flags & 2) {
+            rdHierarchyNode* pParent = pNode->parent;
+            while (pParent && pParent->flags & 2) {  // Added: nullptr check
+                pParent = pParent->parent;
+            }
+            rdModel3_pCurGeoset->meshes[pNode->meshIdx].lightingMode = 6;
+            if (pParent) // Added: nullptr check
+                rdModel3_pCurGeoset->meshes[pNode->meshIdx].radius = rdModel3_pCurGeoset->meshes[pParent->meshIdx].radius;
+        }
+        
+        rdModel3_DrawMesh(&rdModel3_pCurGeoset->meshes[pNode->meshIdx], &pCurThing->hierarchyNodeMatrices[pNode->idx]);
+    }
 
-    iter = node->child;
-    for (int i = 0; i < node->numChildren; i++)
+    iter = pNode->child;
+    for (int i = 0; i < pNode->numChildren; i++)
     {
         if ( !pCurThing->amputatedJoints[iter->idx] )
             rdModel3_DrawHNode(iter);

@@ -267,6 +267,7 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, float 
     out->scale.z = 0.0;
 }
 
+// MOTS altered
 void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, float angle)
 {
     float v7;
