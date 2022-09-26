@@ -22,8 +22,8 @@
 #define stdGob_FileGetws_ADDR (0x00436830)
 
 //#define stdGob_fpath ((char*)0x5635F8)
-//#define gobHS (*(common_functions*)0x563678)
-//#define pGobHS (*(common_functions**)0x5636E8)
+//#define gobHS (*(HostServices*)0x563678)
+//#define pGobHS (*(HostServices**)0x5636E8)
 //#define stdGob_bInit (*(int*)0x5636EC)
 
 #define GOB_VERSION_LATEST (20)
@@ -69,7 +69,7 @@ typedef struct stdGob
     uint32_t viewHandle;
 } stdGob;
 
-int stdGob_Startup(common_functions *pHS_in);
+int stdGob_Startup(HostServices *pHS_in);
 void stdGob_Shutdown();
 stdGob* stdGob_Load(char *fpath, int a2, int a3);
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4);

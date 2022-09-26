@@ -26,7 +26,6 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     stdBitmap *bitmap; // eax
     stdFontCharset *v20; // esi
     stdFontCharset *v21; // edi
-    struct common_functions *v22; // ecx
     int marginY; // [esp+14h] [ebp-40h]
     int marginX; // [esp+18h] [ebp-3Ch]
     int16_t header_field_10; // [esp+1Ch] [ebp-38h]
@@ -122,9 +121,8 @@ LABEL_21:
     if ( bitmap )
     {
         _strncpy((char *)bitmap, "FONTSTRIP", 0x1Fu);
-        v22 = std_pHS;
         fontAlloc_->bitmap->field_1F = 0;
-        v22->fileClose(fd);
+        std_pHS->fileClose(fd);
         result = fontAlloc_;
     }
     else

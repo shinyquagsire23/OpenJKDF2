@@ -37,9 +37,9 @@
 #define stdBuildDisplayEnvironment_ADDR (0x004273E0)
 #define stdFreeDisplayEnvironment_ADDR (0x00427730)
 
-void stdStartup(common_functions *a1);
+void stdStartup(HostServices *a1);
 void stdShutdown();
-void stdInitServices(common_functions *a1);
+void stdInitServices(HostServices *a1);
 
 char* stdFileFromPath(char *fpath);
 int stdCalcBitPos(signed int val);
@@ -53,8 +53,8 @@ void stdDebugFree(void *a1);
 void* stdDebugRealloc(void *a1, unsigned int amt);
 void stdDelay(int a1, float a2);
 
-//static void (*stdStartup)(struct common_functions *a1) = (void*)stdStartup_ADDR;
-//static void (*stdInitServices)(common_functions *a1) = (void*)stdInitServices_ADDR;
+//static void (*stdStartup)(struct HostServices *a1) = (void*)stdStartup_ADDR;
+//static void (*stdInitServices)(HostServices *a1) = (void*)stdInitServices_ADDR;
 //static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
 static stdFile_t (*stdFileOpen)(const char*,const char*) = (void*)stdFileOpen_ADDR;
 static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;

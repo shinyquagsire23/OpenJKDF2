@@ -6,7 +6,7 @@
 
 static int std_bInitialized;
 
-void stdStartup(common_functions *a1)
+void stdStartup(HostServices *a1)
 {
     uint16_t v1;
     std_pHS = a1;
@@ -37,7 +37,7 @@ void stdShutdown()
     std_bInitialized = 1;
 }
 
-void stdInitServices(common_functions *a1)
+void stdInitServices(HostServices *a1)
 {
     stdPlatform_InitServices(a1);
 }

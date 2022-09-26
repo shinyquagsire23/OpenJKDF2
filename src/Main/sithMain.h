@@ -23,7 +23,7 @@
 
 extern float sithMain_lastAspect;
 
-int sithMain_Startup(struct common_functions *commonFuncs);
+int sithMain_Startup(HostServices *commonFuncs);
 void sithMain_Shutdown();
 int sithMain_Load(char *path);
 void sithMain_Free();

@@ -18,6 +18,10 @@ typedef uint32_t size_t;
 #define JK_H
 #endif
 
+#ifdef JKM_TYPES
+#define JKM_LIGHTING
+#endif
+
 #include "engine_config.h"
 
 #ifdef WIN32
@@ -505,7 +509,7 @@ typedef struct jkGuiStringEntry jkGuiStringEntry;
 typedef struct jkGuiKeyboardEntry jkGuiKeyboardEntry;
 
 typedef struct videoModeStruct videoModeStruct;
-typedef struct common_functions common_functions;
+typedef struct HostServices HostServices;
 typedef struct stdDebugConsoleCmd stdDebugConsoleCmd;
 
 typedef struct Darray Darray;
@@ -819,6 +823,11 @@ typedef struct rdProcEntry
     rdVector3* vertices;
     rdVector2* vertexUVs;
     float* vertexIntensities;
+#ifdef JKM_LIGHTING
+    float* paRedIntensities;
+    float* paGreenIntensities;
+    float* paBlueIntensities;
+#endif
     rdMaterial* material;
     uint32_t wallCel;
     float ambientLight;
@@ -1870,7 +1879,7 @@ typedef struct jkEpisodeLoad
 //end jkEpisode
 
 // jkRes
-typedef struct common_functions_basic
+typedef struct HostServicesBasic
 {
     float some_float;
     int (*messagePrint)(const char *, ...);
@@ -1895,9 +1904,9 @@ typedef struct common_functions_basic
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
     wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
-} common_functions_basic;
+} HostServicesBasic;
 
-typedef struct common_functions
+typedef struct HostServices
 {
     uint32_t some_float;
     int (*messagePrint)(const char *, ...);
@@ -1927,7 +1936,7 @@ typedef struct common_functions
     void* (*reallocHandle)(void*, size_t);
     uint32_t (*lockHandle)(uint32_t);
     void (*unlockHandle)(uint32_t);
-} common_functions;
+} HostServices;
 
 typedef struct jkResGob
 {

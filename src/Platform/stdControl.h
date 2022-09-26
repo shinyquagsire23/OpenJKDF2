@@ -11,7 +11,7 @@
 #define stdControl_Flush_ADDR (0x0042E320)
 #define stdControl_Reset_ADDR (0x0042E440)
 #define stdControl_EnableAxis_ADDR (0x0042E490)
-#define stdControl_ReadControls_ADDR (0x0042E560)
+#define stdControl_ReadControls_ADDR (0x0042E560) // MOTS altered
 #define stdControl_ReadAxis_ADDR (0x0042E9B0)
 #define stdControl_ReadAxisRaw_ADDR (0x0042EA80)
 #define stdControl_ReadKeyAsAxis_ADDR (0x0042EAD0)

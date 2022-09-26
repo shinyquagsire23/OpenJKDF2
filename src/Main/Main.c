@@ -86,7 +86,7 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-static common_functions hs;
+static HostServices hs;
 
 #ifdef QOL_IMPROVEMENTS
 int Main_bDedicatedServer = 0;

@@ -28,7 +28,7 @@
 #define jkRes_FileSize_ADDR (0x0040F950)
 #define jkRes_FilePrintf_ADDR (0x0040F970)
 
-int jkRes_Startup(common_functions *a1);
+int jkRes_Startup(HostServices *a1);
 int jkRes_Shutdown();
 void jkRes_New(char *path);
 void jkRes_LoadGob(char *a1);
@@ -42,7 +42,7 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3);
 int jkRes_NewGob(jkResGob *gobFullpath, char *gobFolder, char *gobFname);
 int jkRes_LoadCD(int a1);
 
-//static int (*jkRes_Startup)(common_functions *a1) = (void*)jkRes_Startup_ADDR;
+//static int (*jkRes_Startup)(HostServices *a1) = (void*)jkRes_Startup_ADDR;
 //static int (*jkRes_FileExists)(char *fpath, char *a2, int len) = (void*)jkRes_FileExists_ADDR;
 //static void (*jkRes_LoadGob)(char *a1) = (void*)jkRes_LoadGob_ADDR;
 //static void (*jkRes_LoadCd)(char *a1) = (void*)jkRes_LoadCd_ADDR;

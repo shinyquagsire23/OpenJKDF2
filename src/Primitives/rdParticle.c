@@ -3,6 +3,7 @@
 #include "Engine/rdroid.h"
 #include "stdPlatform.h"
 #include "General/stdConffile.h"
+#include "General/stdString.h"
 #include "jk.h"
 #include "Raster/rdCache.h"
 #include "Engine/rdClip.h"
@@ -117,16 +118,13 @@ rdParticle* rdParticle_Load(char *path)
     return NULL;
 }
 
-int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
+int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
 {
-    char *v2; // edi
-    const char *v3; // eax
     rdParticle *v4; // esi
     int v5; // ebx
     rdMaterial *v7; // eax
     int v8; // ebp
     rdVector3 *v13; // eax
-    struct common_functions *v14; // edx
     int v15; // eax
     rdVector3 *v16; // esi
     int *v17; // edi
@@ -137,119 +135,113 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *particle)
     int versMajor; // [esp+28h] [ebp-8h]
     int v24; // [esp+2Ch] [ebp-4h]
 
-    v2 = fpath;
-    v3 = stdFileFromPath(fpath);
-    v4 = particle;
-    _strncpy(particle->name, v3, 0x1Fu);
+    stdString_SafeStrCopy(pParticle->name, stdFileFromPath(fpath), 0x20);
     v5 = 0;
-    v4->name[31] = 0;
-    v4->hasVertices = 1;
-    if ( stdConffile_OpenRead(v2) )
+    pParticle->hasVertices = 1;
+    if (!stdConffile_OpenRead(fpath))
+        goto done;
+    if (!stdConffile_ReadLine())
+        goto done_close;
+        
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 )
+        goto done_close;
+    
+    if (!stdConffile_ReadLine())
+        goto done_close;
+        
+    _sscanf(stdConffile_aLine, " par %d.%d", &versMajor, &versMinor);
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    if (_sscanf(stdConffile_aLine, " size %f", &size) != 1)
+        goto done_close;
+
+    pParticle->diameter = size;
+    pParticle->radius = size * 0.5;
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    if ( _sscanf(stdConffile_aLine, " material %s", std_genBuffer) != 1 )
+        goto done_close;
+        
+    v7 = rdMaterial_Load(std_genBuffer, 0, 0);
+    pParticle->material = v7;
+    if (!v7)
+        goto done_close;
+
+    v8 = v7->num_texinfo;
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    if ( _sscanf(stdConffile_aLine, " lightingmode %d", &pParticle->lightingMode) != 1 )
+        goto done_close;
+
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 )
+        goto done_close;
+
+    if (!stdConffile_ReadLine() )
+        goto done_close;
+
+    if ( _sscanf(stdConffile_aLine, " radius %f", &v21) != 1 )
+        goto done_close;
+
+    pParticle->cloudRadius = v21;
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &v19, &v19.y, &v19.z) != 3 )
+        goto done_close;
+
+    pParticle->insertOffset.x = v19.x;
+    pParticle->insertOffset.y = v19.y;
+    pParticle->insertOffset.z = v19.z;
+    if (!stdConffile_ReadLine())
+        goto done_close;
+
+    uint32_t numVertices;
+    if ( _sscanf(stdConffile_aLine, " vertices %d", &numVertices) == 1
+      && numVertices <= 0x100 )
     {
-        if ( stdConffile_ReadLine() )
+        pParticle->numVertices = numVertices;
+        v13 = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * numVertices);
+        pParticle->vertices = v13;
+        pParticle->vertexCel = (int*)rdroid_pHS->alloc(sizeof(int) * numVertices);
+        v16 = pParticle->vertices;
+        if ( v16 && pParticle->vertexCel)
         {
-            if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) == 1 )
+            v17 = pParticle->vertexCel;
+            if ( numVertices <= 0 )
             {
-                if ( stdConffile_ReadLine() )
-                {
-                    _sscanf(stdConffile_aLine, " par %d.%d", &versMajor, &versMinor);
-                    if ( stdConffile_ReadLine() )
-                    {
-                        if ( _sscanf(stdConffile_aLine, " size %f", &size) == 1 )
-                        {
-                            v4->diameter = size;
-                            v4->radius = size * 0.5;
-                            if ( stdConffile_ReadLine() )
-                            {
-                                if ( _sscanf(stdConffile_aLine, " material %s", std_genBuffer) == 1 )
-                                {
-                                    v7 = rdMaterial_Load(std_genBuffer, 0, 0);
-                                    v4->material = v7;
-                                    if ( v7 )
-                                    {
-                                        v8 = v7->num_texinfo;
-                                        if ( stdConffile_ReadLine() )
-                                        {
-                                            if ( _sscanf(stdConffile_aLine, " lightingmode %d", &v4->lightingMode) == 1 )
-                                            {
-                                                if ( stdConffile_ReadLine() )
-                                                {
-                                                    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) == 1 )
-                                                    {
-                                                        if ( stdConffile_ReadLine() )
-                                                        {
-                                                            if ( _sscanf(stdConffile_aLine, " radius %f", &v21) == 1 )
-                                                            {
-                                                                v4->cloudRadius = v21;
-                                                                if ( stdConffile_ReadLine() )
-                                                                {
-                                                                    if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &v19, &v19.y, &v19.z) == 3 )
-                                                                    {
-                                                                        v4->insertOffset.x = v19.x;
-                                                                        v4->insertOffset.y = v19.y;
-                                                                        v4->insertOffset.z = v19.z;
-                                                                        if ( stdConffile_ReadLine() )
-                                                                        {
-                                                                            uint32_t numVertices;
-                                                                            if ( _sscanf(stdConffile_aLine, " vertices %d", &numVertices) == 1
-                                                                              && numVertices <= 0x100 )
-                                                                            {
-                                                                                v4->numVertices = numVertices;
-                                                                                v13 = (rdVector3 *)rdroid_pHS->alloc(12 * numVertices);
-                                                                                v14 = rdroid_pHS;
-                                                                                v4->vertices = v13;
-                                                                                v4->vertexCel = (int*)v14->alloc(4 * numVertices);
-                                                                                v16 = v4->vertices;
-                                                                                if ( v16 )
-                                                                                {
-                                                                                    if ( v4->vertexCel )
-                                                                                    {
-                                                                                        v17 = v4->vertexCel;
-                                                                                        if ( numVertices <= 0 )
-                                                                                        {
 LABEL_28:
-                                                                                            stdConffile_Close();
-                                                                                            return 1;
-                                                                                        }
-                                                                                        while ( stdConffile_ReadLine()
-                                                                                             && _sscanf(
-                                                                                                    stdConffile_aLine,
-                                                                                                    " %d: %f %f %f %d",
-                                                                                                    &v24,
-                                                                                                    &v19,
-                                                                                                    &v19.y,
-                                                                                                    &v19.z,
-                                                                                                    v17) == 5
-                                                                                             && *v17 < v8 )
-                                                                                        {
-                                                                                            ++v17;
-                                                                                            *v16 = v19;
-                                                                                            ++v16;
-                                                                                            if ( ++v5 >= numVertices )
-                                                                                                goto LABEL_28;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                stdConffile_Close();
+                return 1;
+            }
+            while ( stdConffile_ReadLine()
+                 && _sscanf(
+                        stdConffile_aLine,
+                        " %d: %f %f %f %d",
+                        &v24,
+                        &v19,
+                        &v19.y,
+                        &v19.z,
+                        v17) == 5
+                 && *v17 < v8 )
+            {
+                ++v17;
+                *v16 = v19;
+                ++v16;
+                if ( ++v5 >= numVertices )
+                    goto LABEL_28;
             }
         }
-        stdConffile_Close();
     }
+
+done_close:
+    stdConffile_Close();
+done:
     return 0;
 }
 

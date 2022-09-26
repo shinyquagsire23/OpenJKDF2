@@ -8,12 +8,12 @@
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 
-static common_functions gobHS;
-static common_functions* pGobHS;
+static HostServices gobHS;
+static HostServices* pGobHS;
 static int stdGob_bInit;
 static char stdGob_fpath[128];
 
-int stdGob_Startup(common_functions *pHS_in)
+int stdGob_Startup(HostServices *pHS_in)
 {
     _memcpy(&gobHS, pHS_in, sizeof(gobHS));
     pGobHS = &gobHS;

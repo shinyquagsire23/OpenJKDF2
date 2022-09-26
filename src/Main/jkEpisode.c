@@ -43,7 +43,6 @@ int jkEpisode_LoadVerify()
     char *i; // ecx
     char v21; // al
     wchar_t *v22; // eax
-    common_functions *v23; // edx
     int v24; // edi
     char *j; // ecx
     char v26; // al
@@ -195,10 +194,9 @@ LABEL_30:
                     stdString_GetQuotedStringContents(v29, jkEpisode_var4, 128);
                     v22 = jkStrings_GetText(jkEpisode_var4);
                     _wcsncpy(v16->unistr, v22, 0x40u);
-                    v23 = pHS;
                     v16->type = JK_EPISODE_SINGLEPLAYER;
                     v24 = 0;
-                    v23->fileGets(v17, v29, 64);
+                    pHS->fileGets(v17, v29, 64);
                     if ( !pHS->feof(v17) )
                     {
                         while ( 1 )

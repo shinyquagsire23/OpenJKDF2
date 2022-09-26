@@ -15,13 +15,13 @@
 
 static int jkRes_bInit;
 
-int jkRes_Startup(common_functions *a1)
+int jkRes_Startup(HostServices *a1)
 {
     if ( jkRes_bInit )
         return 0;
 
-    _memcpy(&lowLevelHS, a1, sizeof(common_functions));
-    pLowLevelHS = (common_functions *)&lowLevelHS;
+    _memcpy(&lowLevelHS, a1, sizeof(HostServices));
+    pLowLevelHS = (HostServices *)&lowLevelHS;
     _memset(&jkRes_gCtx, 0, sizeof(jkRes_gCtx));
     jkRes_pHS = a1;
 

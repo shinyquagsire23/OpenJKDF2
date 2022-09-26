@@ -12,7 +12,7 @@
 #define stdDisplay_RestoreDisplayMode_ADDR (0x04220B0)
 #define stdDisplay_Open_ADDR (0x04220E0)
 #define stdDisplay_Close_ADDR (0x04224D0)
-#define stdDisplay_SetMode_ADDR (0x04226A0)
+#define stdDisplay_SetMode_ADDR (0x04226A0) // MOTS altered
 #define stdDisplay_422A50_ADDR (0x0422A50)
 #define stdDisplay_ClearMode_ADDR (0x0422C30)
 #define stdDisplay_DrawAndFlipGdi_ADDR (0x0422E80)
@@ -92,7 +92,7 @@ int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect);
 int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged);
 int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surface, unsigned int max_modes);
 int stdDisplay_FindClosestDevice(void* a);
-int stdDisplay_Open(int a);
+int stdDisplay_Open(int a); // MOTS altered (added a video mode)
 void stdDisplay_Close();
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *a1, int create_ddraw_surface, int gpu_mem, void* palette);
 int stdDisplay_VBufferLock(stdVBuffer *a1);

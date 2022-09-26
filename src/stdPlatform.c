@@ -135,7 +135,7 @@ uint32_t stdPlatform_GetTimeMsec()
 }
 #endif
 
-void stdPlatform_InitServices(common_functions *handlers)
+void stdPlatform_InitServices(HostServices *handlers)
 {
     handlers->statusPrint = stdPlatform_Printf;
     handlers->messagePrint = stdPlatform_Printf;

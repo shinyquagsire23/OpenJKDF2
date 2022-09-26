@@ -107,7 +107,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
     unsigned int v7; // eax
     unsigned int v10; // eax
     unsigned int frequencyKHz; // eax
-    struct common_functions *v12; // ecx
+    struct HostServices *v12; // ecx
     char tmp[128]; // [esp+14h] [ebp-80h] BYREF
     char tmp2[128];
 

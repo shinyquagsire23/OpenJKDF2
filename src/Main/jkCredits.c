@@ -35,6 +35,7 @@ void jkCredits_Shutdown()
     jkCredits_bInitted = 0;
 }
 
+// MOTS altered (songs?)
 int jkCredits_Show()
 {
     unsigned int v1; // esi

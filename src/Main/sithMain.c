@@ -47,7 +47,7 @@
 
 float sithMain_lastAspect = 1.0;
 
-int sithMain_Startup(struct common_functions *commonFuncs)
+int sithMain_Startup(HostServices *commonFuncs)
 {
     int is_started; // esi
 

@@ -11,6 +11,13 @@
 #ifdef QOL_IMPROVEMENTS
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
+static rdroid_curVertexColorMode = 0; // MOTS added
+#endif
+
+#ifdef JKM_LIGHTING
+static float rdCache_aRedIntensities[RDCACHE_MAX_VERTICES];
+static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
+static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
 int rdCache_Startup()
@@ -80,6 +87,11 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
+#ifdef JKM_LIGHTING
+    out_procEntry->paRedIntensities = &rdCache_aRedIntensities[rdCache_numUsedIntensities];
+    out_procEntry->paGreenIntensities = &rdCache_aGreenIntensities[rdCache_numUsedIntensities];
+    out_procEntry->paBlueIntensities = &rdCache_aBlueIntensities[rdCache_numUsedIntensities];
+#endif
     return out_procEntry;
 }
 
@@ -201,16 +213,13 @@ int rdCache_SendFaceListToHardware()
     int v71; // edx
     double v72; // st7
     double v73; // st7
-    double v74; // st7
     double v75; // st7
     double v76; // st7
-    double v77; // st7
     double v78; // st7
     rdDDrawSurface *v80; // edx
     double v87; // st7
     double v88; // st7
     double v89; // st6
-    int v90; // eax
     rdColormap *v91; // esi
     double v92; // st7
     int v93; // eax
@@ -219,7 +228,6 @@ int rdCache_SendFaceListToHardware()
     int v96; // edi
     int v97; // eax
     int v98; // ecx
-    double v99; // st7
     __int64 v100; // rax
     double v101; // st7
     uint8_t v103; // cl
@@ -301,7 +309,7 @@ int rdCache_SendFaceListToHardware()
         v1 = 1;
         v129 = 1;
     }
-    if ( v0 || v1 )
+    if ( v0 || v1 || (rdroid_curVertexColorMode == 1)) // MOTS added
     {
         flags_idk |= 0x8000;
     }
@@ -410,35 +418,37 @@ int rdCache_SendFaceListToHardware()
         else
         {
             sith_tex_sel = v15->texture_ptr;
+
+            float z_min = active_6c->z_min * rdCamera_GetMipmapScalar(); // MOTS added
             
             mipmap_level = 1;
             if (sith_tex_sel->num_mipmaps == 2)
             {
-                if ( active_6c->z_min <= (double)rdroid_aMipDistances.y )
+                if ( z_min <= (double)rdroid_aMipDistances.y )
                 {
                     mipmap_level = 0;
                 }
             }
             else if (sith_tex_sel->num_mipmaps == 3)
             {
-                if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
+                if ( z_min <= (double)rdroid_aMipDistances.x )
                 {
                     mipmap_level = 0;
                 }
-                else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
+                else if ( z_min > (double)rdroid_aMipDistances.y )
                 {
                     mipmap_level = 2;
                 }
             }
             else if (sith_tex_sel->num_mipmaps == 4)
             {
-                if ( active_6c->z_min <= (double)rdroid_aMipDistances.x )
+                if ( z_min <= (double)rdroid_aMipDistances.x )
                 {
                     mipmap_level = 0;
                 }
-                else if ( active_6c->z_min > (double)rdroid_aMipDistances.y )
+                else if ( z_min > (double)rdroid_aMipDistances.y )
                 {
-                    if ( active_6c->z_min > (double)rdroid_aMipDistances.z )
+                    if ( z_min > (double)rdroid_aMipDistances.z )
                         mipmap_level = 3;
                     else
                         mipmap_level = 2;
@@ -508,20 +518,45 @@ int rdCache_SendFaceListToHardware()
             }
             else if ( lighting_capability == 3 && active_6c->numVertices )
             {
-                vert_lights_iter = active_6c->vertexIntensities;
-                vert_lights_iter_cnt = active_6c->numVertices;
-                do
-                {
-                    v21 = *vert_lights_iter + active_6c->extralight;
+                // MOTS added
+#ifdef JKM_LIGHTING
+                if (rdroid_curVertexColorMode == 1) {
+                    float* iterRedIntense = active_6c->paRedIntensities;
+                    float* iterGreenIntense = active_6c->paGreenIntensities;
+                    float* iterBlueIntense = active_6c->paBlueIntensities;
 
-                    v22 = stdMath_Clamp(v21, 0.0, 1.0);
-                    v23 = stdMath_Clamp(v22, v148, 1.0);
+                    vert_lights_iter_cnt = active_6c->numVertices;
+                    do
+                    {
+                        *iterRedIntense = stdMath_Clamp(stdMath_Clamp(*iterRedIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0) * 255.0;
+                        *iterGreenIntense = stdMath_Clamp(stdMath_Clamp(*iterGreenIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0) * 255.0;
+                        *iterBlueIntense = stdMath_Clamp(stdMath_Clamp(*iterBlueIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0) * 255.0;
 
-                    *vert_lights_iter = v23 * 255.0;
-                    ++vert_lights_iter;
-                    --vert_lights_iter_cnt;
+                        ++iterRedIntense;
+                        ++iterGreenIntense;
+                        ++iterBlueIntense;
+                        --vert_lights_iter_cnt;
+                    }
+                    while ( vert_lights_iter_cnt );
                 }
-                while ( vert_lights_iter_cnt );
+                else
+#endif
+                {
+                    vert_lights_iter = active_6c->vertexIntensities;
+                    vert_lights_iter_cnt = active_6c->numVertices;
+                    do
+                    {
+                        v21 = *vert_lights_iter + active_6c->extralight;
+
+                        v22 = stdMath_Clamp(v21, 0.0, 1.0);
+                        v23 = stdMath_Clamp(v22, v148, 1.0);
+
+                        *vert_lights_iter = v23 * 255.0;
+                        ++vert_lights_iter;
+                        --vert_lights_iter_cnt;
+                    }
+                    while ( vert_lights_iter_cnt );
+                }
 
                 //active_6c->light_level_static = v26 * 255.0;
             }
@@ -555,24 +590,42 @@ int rdCache_SendFaceListToHardware()
                     green = 255;
                     vertex_r = 255;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 1.0;
+                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 1.0;
 #endif
                 }
                 else
                 {
-                    if ( v39 == 3 )
-                        light_level = active_6c->vertexIntensities[vtx_idx];
-                    else
-                        light_level = active_6c->light_level_static;
+                    // MOTS added
+                    if (rdroid_curVertexColorMode != 1 || lighting_capability != 3)
+                    {
+                        if ( v39 == 3 )
+                            light_level = active_6c->vertexIntensities[vtx_idx];
+                        else
+                            light_level = active_6c->light_level_static;
 #ifdef SDL2_RENDER
-
-                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
+                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
 #endif
-                    vertex_b = (__int64)light_level;
-                    vertex_g = vertex_b;
-                    blue = vertex_b;
-                    green = vertex_b;
-                    vertex_r = vertex_b;
+                        vertex_b = (__int64)light_level;
+                        vertex_g = vertex_b;
+                        vertex_r = vertex_b;
+                        blue = vertex_b;
+                        green = vertex_b;
+                    }
+#ifdef JKM_LIGHTING
+                    else
+                    {
+                        double intRed = active_6c->paRedIntensities[vtx_idx];
+                        double intGreen = active_6c->paGreenIntensities[vtx_idx];
+                        double intBlue = active_6c->paBlueIntensities[vtx_idx];
+
+
+                        vertex_b = (int)intBlue;
+                        vertex_g = (int)intGreen;
+                        vertex_r = (int)intRed;
+                        blue = vertex_b;
+                        green = vertex_g;
+                    }
+#endif
                 }
                 red_and_alpha = vertex_r;
                 v45 = active_6c->colormap;
@@ -720,93 +773,61 @@ int rdCache_SendFaceListToHardware()
 solid_tri:
         if ( lighting_capability == 1 )
         {
-            v77 = v148;
-            v78 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
-
-
-            if ( v78 > v148 )
-            {
-                if ( active_6c->extralight >= 0.0 )
-                {
-                    if ( active_6c->extralight <= 1.0 )
-                    {
-                        v77 = active_6c->extralight;
-                    }
-                    else
-                    {
-                        v77 = 1.0;
-                    }
-                }
-                else
-                {
-                    v77 = 0.0;
-                }
-            }
+            v78 = stdMath_Clamp(stdMath_Clamp(active_6c->extralight, 0.0, 1.0), v148, 1.0);
+            active_6c->light_level_static = v78 * 63.0;
         }
         else if ( lighting_capability == 2 )
         {
             v75 = active_6c->extralight + active_6c->light_level_static;
 
-            v76 = stdMath_Clamp(v75, 0.0, 1.0);
-            if ( v76 <= v148 )
-            {
-                v77 = v148;
-            }
-            else if ( v75 < 0.0 )
-            {
-                v77 = 0.0;
-            }
-            else if ( v75 > 1.0 )
-            {
-                v77 = 1.0;
-            }
-            else
-            {
-                v77 = v75;
-            }
+            v76 = stdMath_Clamp(stdMath_Clamp(v75, 0.0, 1.0), v148, 1.0);
+            active_6c->light_level_static = v76 * 63.0;
         }
         else if ( lighting_capability == 3 && active_6c->numVertices )
         {
-            v70 = active_6c->vertexIntensities;
-            v71 = active_6c->numVertices;
-            do
-            {
-                v72 = *v70 + active_6c->extralight;
+            // MOTS added
+#ifdef JKM_LIGHTING
+            if (rdroid_curVertexColorMode == 1) {
+                float* iterRedIntense = active_6c->paRedIntensities;
+                float* iterGreenIntense = active_6c->paGreenIntensities;
+                float* iterBlueIntense = active_6c->paBlueIntensities;
 
-                if ( v72 < 0.0 )
+                v71 = active_6c->numVertices;
+                do
                 {
-                    v73 = 0.0;
-                }
-                else if ( v72 > 1.0 )
-                {
-                    v73 = 1.0;
-                }
-                else
-                {
-                    v73 = v72;
-                }
-                if ( v73 <= v148 )
-                {
-                    v74 = v148;
-                }
-                else if ( v72 < 0.0 )
-                {
-                    v74 = 0.0;
-                }
-                else if ( v72 > 1.0 )
-                {
-                    v74 = 1.0;
-                }
-                else
-                {
-                    v74 = v72;
-                }
+                    v73 = stdMath_Clamp(stdMath_Clamp(*iterRedIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
+                    *iterRedIntense = v73 * 63.0;
 
-                *v70 = v74 * 63.0;
-                ++v70;
-                --v71;
+                    v73 = stdMath_Clamp(stdMath_Clamp(*iterGreenIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
+                    *iterGreenIntense = v73 * 63.0;
+
+                    v73 = stdMath_Clamp(stdMath_Clamp(*iterBlueIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
+                    *iterBlueIntense = v73 * 63.0;
+
+                    ++iterRedIntense;
+                    ++iterGreenIntense;
+                    ++iterBlueIntense;
+                    --v71;
+                }
+                while ( v71 );
             }
-            while ( v71 );
+            else
+#endif
+            {
+                v70 = active_6c->vertexIntensities;
+                v71 = active_6c->numVertices;
+                do
+                {
+                    v72 = *v70 + active_6c->extralight;
+
+                    v73 = stdMath_Clamp(stdMath_Clamp(v72, 0.0, 1.0), v148, 1.0);
+
+                    *v70 = v73 * 63.0;
+                    ++v70;
+                    --v71;
+                }
+                while ( v71 );
+            }
             goto LABEL_232;
         }
         else
@@ -814,7 +835,6 @@ solid_tri:
             goto LABEL_232;
         }
 
-        active_6c->light_level_static = v77 * 63.0;
 LABEL_232:
         tmpiter = 0;
         alpha_upshifta = red_and_alpha << 8;
@@ -832,7 +852,6 @@ LABEL_232:
             if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
-            v90 = lighting_capability;
 
             rdCache_aHWVertices[rdCache_totalVerts].nx = v88 / 32.0;
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
@@ -852,28 +871,54 @@ LABEL_232:
             }
             else
             {
-                v91 = (rdColormap *)active_6c->colormap;
-                if ( v90 == 3 )
-                    v92 = active_6c->vertexIntensities[vtx_idx];
-                else
-                    v92 = active_6c->light_level_static;
+                // MOTS added
+                if (rdroid_curVertexColorMode != 1 || lighting_capability != 3)
+                {
+                    v91 = (rdColormap *)active_6c->colormap;
+                    if ( lighting_capability == 3 )
+                        v92 = active_6c->vertexIntensities[vtx_idx];
+                    else
+                        v92 = active_6c->light_level_static;
 #ifdef SDL2_RENDER
-                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = v92 / 255.0;
+                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel = v92 / 255.0;
 #endif
-                v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
-                v94 = (uint8_t)v91->colors[v93].g;
-                v95 = (uint8_t)v91->colors[v93].b;
-                v96 = (uint8_t)v91->colors[v93].r;
-                red_and_alpha = v96;
-                green = v94;
-                blue = v95;
+                    v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
+                    v94 = (uint8_t)v91->colors[v93].g;
+                    v95 = (uint8_t)v91->colors[v93].b;
+                    v96 = (uint8_t)v91->colors[v93].r;
+                    red_and_alpha = v96;
+                    green = v94;
+                    blue = v95;
+                }
+#ifdef JKM_LIGHTING
+                else
+                {
+                    v91 = (rdColormap *)active_6c->colormap;
+                    uint8_t baseLight = *((uint8_t *)v91->lightlevel + v137->header.field_4);
+                    double intRed = active_6c->paRedIntensities[vtx_idx] * 255.0 - 0.5;
+                    double intGreen = active_6c->paGreenIntensities[vtx_idx] * 255.0 - 0.5;
+                    double intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
+
+
+                    intRed += (float)v91->colors[baseLight].r;
+                    intGreen += (float)v91->colors[baseLight].r;
+                    intBlue += (float)v91->colors[baseLight].r;
+
+                    v94 = (uint8_t)stdMath_Clamp(intGreen, 0.0, 255.0);
+                    v95 = (uint8_t)stdMath_Clamp(intBlue, 0.0, 255.0);
+                    v96 = (uint8_t)stdMath_Clamp(intRed, 0.0, 255.0);
+                    red_and_alpha = v96;
+                    green = v94;
+                    blue = v95;
+                }
+#endif
             }
+
             if ( v91 != rdColormap_pIdentityMap )
             {
-                v99 = v91->tint.y * (double)green;
                 v96 = (uint8_t)(__int64)(v91->tint.x * (double)red_and_alpha);
                 red_and_alpha = v96;
-                v100 = (__int64)v99;
+                v100 = (__int64)(v91->tint.y * (double)green);
                 v101 = v91->tint.z * (double)blue;
                 v94 = (uint8_t)v100;
                 green = (uint8_t)v100;
@@ -1068,6 +1113,7 @@ int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
     return 1;
 }
 
+// MOTS altered
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
 {
     int v6; // edx
@@ -1077,7 +1123,6 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     rdVector3 *v10; // edx
     int y_min_related; // ebx
     double v12; // st7
-    double v13; // st7
     int y_max_related; // [esp+Ch] [ebp-18h]
     float v27; // [esp+10h] [ebp-14h]
     float z_max; // [esp+14h] [ebp-10h]
@@ -1106,9 +1151,9 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     procFace->numVertices = num_vertices;
     procFace->vertexColorMode = v6;
     
-    // Added
-    y_min_related = 0;
-    y_max_related = 0;
+    // Added (MOTS also added? lol)
+    y_min_related = 3.4e38;
+    y_max_related = 3.4e38;
     
     if ( num_vertices )
     {
@@ -1121,16 +1166,16 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
                 x_min = v10->x;
             if ( v12 > x_max )
                 x_max = v10->x;
-            v13 = v10->y;
-            if ( v13 < y_min )
+
+            if ( v10->y < y_min )
             {
                 y_min = v10->y;
-                y_min_related = v9;
+                y_min_related = (float)v9;
             }
-            if ( v13 > y_max )
+            if ( v10->y > y_max )
             {
                 y_max = v10->y;
-                y_max_related = v9;
+                y_max_related = (float)v9;
             }
             if ( v10->z < z_min )
                 z_min = v10->z;
@@ -1154,8 +1199,8 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     if ( procFace->y_min >= (unsigned int)procFace->y_max )
         return 0;
 #endif
-    procFace->y_min_related = y_min_related;
-    procFace->y_max_related = y_max_related;
+    procFace->y_min_related = (int)y_min_related;
+    procFace->y_max_related = (int)y_max_related;
     if ( (flags & 1) != 0 )
         rdCache_numUsedVertices += num_vertices;
     if ( (flags & 2) != 0 )

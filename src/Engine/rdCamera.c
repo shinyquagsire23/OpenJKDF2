@@ -10,6 +10,7 @@
 #include "World/jkPlayer.h"
 
 static rdVector3 rdCamera_camRotation;
+static float rdCamera_mipmapScalar = 1.0; // MOTS added
 
 rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio)
 {
@@ -419,4 +420,10 @@ void rdCamera_AdvanceFrame()
             std3D_ClearZBuffer();
         }
     }
+}
+
+// MOTS added
+float rdCamera_GetMipmapScalar()
+{
+    return rdCamera_mipmapScalar;
 }

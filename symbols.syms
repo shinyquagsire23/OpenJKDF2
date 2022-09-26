@@ -1,7 +1,7 @@
 sithAIClass_hashmap 0x00852F88 stdHashTable*
 
 std_genBuffer 0x866880 char[1024]
-std_pHS 0x866C80 struct common_functions*
+std_pHS 0x866C80 struct HostServices*
 
 rdModel3_pCurGeoset 0x0073A3D8 rdGeoset*
 localCamera 0x0073A3E0 rdVector3
@@ -98,7 +98,7 @@ rdroid_frameTrue 0x00570390 int
 bRDroidStartup 0x00570394 int
 bRDroidOpen 0x00570398 int
 rdroid_curLightingMode 0x00889EA0 int
-rdroid_pHS 0x00889EA4 struct common_functions*
+rdroid_pHS 0x00889EA4 struct HostServices*
 rdroid_curGeometryMode 0x00889EA8 int
 rdroid_curColorEffects 0x00889EC0 stdPalEffect
 rdroid_curOcclusionMethod 0x00889EE8 int
@@ -600,7 +600,7 @@ Main_logLevel 0x0086079C int
 Main_verboseLevel 0x008607A0 int
 Main_path 0x008606E4 char[128]
 debug_log_fp 0x00552880 stdFile_t = 0
-pHS 0x860440 common_functions*
+pHS 0x860440 HostServices*
 
 jkCredits_aPalette 0x0055AA60 char[0x300]
 jkCredits_pVbuffer2 0x0055AD60 stdVBuffer*
@@ -630,14 +630,14 @@ jkGame_updateMsecsTotal 0x00552B58 int
 jkGame_dword_552B5C 0x00552B5C int
 jkGame_isDDraw 0x00552B60 int
 
-jkRes_pHS 0x00555C68 common_functions*
+jkRes_pHS 0x00555C68 HostServices*
 jkRes_episodeGobName 0x00555C70 char[32] = {0}
 jkRes_curDir 0x00555C90 char[128] = {0}
 jkRes_bHookedHS 0x00555D18 int
 jkRes_aFiles 0x00554A68 jkResFile[32]
 jkRes_gCtx 0x005541E0 jkRes
-pLowLevelHS 0x00554974 common_functions*
-lowLevelHS 0x00554978 common_functions
+pLowLevelHS 0x00554974 HostServices*
+lowLevelHS 0x00554978 HostServices
 jkRes_idkGobPath 0x005549E8 char[128]
 
 jkCutscene_rect1 0x0055AA18 rdRect
@@ -834,7 +834,7 @@ jkGuiMultiplayer_dword_5564F0 0x005564F0 int
 
 g_hInstance 0x00855DEC HINSTANCE
 sithCog_pSymbolTable 0x008B5428 sithCogSymboltable*
-pSithHS 0x82F0A4 struct common_functions*
+pSithHS 0x82F0A4 struct HostServices*
 g_hWnd 0x855DE0 HWND
 g_nShowCmd 0x855DE8 uint32_t
 g_app_suspended 0x855E70 uint32_t

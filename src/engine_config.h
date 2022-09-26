@@ -55,6 +55,11 @@
 // Run game physics at a fixed timestep
 #define FIXED_TIMESTEP_PHYS
 
+// Backport MOTS RGB lighting
+#ifdef QOL_IMPROVEMENTS
+#define JKM_LIGHTING
+#endif
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation

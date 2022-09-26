@@ -49,7 +49,6 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 {
     intptr_t colormap_fptr; // edi
     const char *v4; // eax
-    struct common_functions *v5; // edx
     int v6; // eax
     float v7; // edx
     float v8; // eax
@@ -68,9 +67,8 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     }
     v4 = stdFileFromPath(colormap_fname);
     _strncpy(colormap->colormap_fname, v4, 0x1Fu);
-    v5 = rdroid_pHS;
     colormap->colormap_fname[31] = 0;
-    v5->fileRead(colormap_fptr, &header, 0x40);
+    rdroid_pHS->fileRead(colormap_fptr, &header, 0x40);
     v6 = header.flags;
     v7 = header.tint.y;
     colormap->tint.x = header.tint.x;

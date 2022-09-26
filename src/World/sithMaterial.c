@@ -28,7 +28,6 @@ void sithMaterial_Free(sithWorld *world)
     unsigned int v1; // ebx
     int v2; // edi
     void *v3; // eax
-    struct common_functions *v4; // ecx
 
     if (!world->numMaterials)
         return;
@@ -48,10 +47,9 @@ void sithMaterial_Free(sithWorld *world)
     }
     pSithHS->free(world->materials);
     v3 = world->materials2;
-    v4 = pSithHS;
     world->materials = 0;
     world->numMaterialsLoaded = 0;
-    v4->free(v3);
+    pSithHS->free(v3);
     world->materials2 = 0;
 }
 

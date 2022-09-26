@@ -231,6 +231,7 @@ int jkCutscene_sub_421410()
     return 1;
 }
 
+// MOTS altered
 int jkCutscene_smack_related_loops()
 {
     signed int smack_finished; // esi

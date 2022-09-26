@@ -19,7 +19,7 @@
 
 #define stdPlatform_GetTimeMsec_ADDR (0x0042C2B0)
 
-void stdPlatform_InitServices(common_functions *handlers);
+void stdPlatform_InitServices(HostServices *handlers);
 int stdPlatform_Startup();
 
 static void (*stdPlatform_Assert)(const char* a1, const char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;

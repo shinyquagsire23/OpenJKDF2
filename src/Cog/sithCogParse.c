@@ -306,7 +306,6 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
 {
     int entry_cnt; // ebp
     sithCogSymboltable *newTable; // ebx
-    struct common_functions *v3; // edx
     sithCogSymbol *buckets; // eax
     sithCogSymboltable *result; // eax
 
@@ -314,9 +313,8 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
     newTable = (sithCogSymboltable *)pSithHS->alloc(sizeof(sithCogSymboltable));
     if ( !newTable )
         return 0;
-    v3 = pSithHS;
     _memset(newTable, 0, sizeof(sithCogSymboltable));
-    buckets = (sithCogSymbol *)v3->alloc(sizeof(sithCogSymbol) * entry_cnt);
+    buckets = (sithCogSymbol *)pSithHS->alloc(sizeof(sithCogSymbol) * entry_cnt);
     newTable->buckets = buckets;
     if ( !buckets )
         return 0;

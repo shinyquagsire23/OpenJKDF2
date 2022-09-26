@@ -9,7 +9,7 @@
 #include "Win95/stdDisplay.h"
 #include "Primitives/rdPrimit3.h"
 
-int rdStartup(struct common_functions *p_hs)
+int rdStartup(HostServices *p_hs)
 {
     if (bRDroidStartup)
         return 1;
