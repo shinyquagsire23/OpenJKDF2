@@ -11,7 +11,7 @@
 #ifdef QOL_IMPROVEMENTS
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
-static rdroid_curVertexColorMode = 0; // MOTS added
+int rdroid_curVertexColorMode = 0; // MOTS added
 #endif
 
 #ifdef JKM_LIGHTING

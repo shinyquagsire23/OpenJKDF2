@@ -33,6 +33,8 @@
 #define rdFinishFrame_ADDR (0x0043ABF0)
 #define rdClearPostStatistics_ADDR (0x0043AC10)
 
+extern int rdroid_curVertexColorMode;
+
 int rdStartup(HostServices *p_hs);
 void rdShutdown();
 int rdOpen(int a1);

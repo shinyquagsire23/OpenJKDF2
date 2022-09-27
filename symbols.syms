@@ -10,7 +10,8 @@ aFaceVerts 0x0073A3F0 rdVector3[32]
 vertexDst 0x0073A570 rdMeshinfo
 curGeometryMode 0x0073A590 int
 apGeoLights 0x0073A598 rdLight*[64]
-aLocalLightPos 0x0073A698 rdVector3[64]
+rdModel3_aLocalLightPos 0x0073A698 rdVector3[64]
+rdModel3_aLocalLightDir 0x0 rdVector3[64]
 meshFrustrumCull 0x0073A998 int
 curTextureMode 0x0073A99C int
 aView 0x0073A9A0 rdVector3[512]

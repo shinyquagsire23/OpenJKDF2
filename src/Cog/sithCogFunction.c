@@ -9,6 +9,7 @@
 #include "Gameplay/sithTime.h"
 #include "stdPlatform.h"
 #include "General/stdString.h"
+#include "General/stdMath.h"
 #include "World/sithSurface.h"
 #include "World/sithSector.h"
 #include "World/sithTrackThing.h"
@@ -490,6 +491,22 @@ void sithCogFunction_VectorDist(sithCog *ctx)
     sithCogExec_PushFlex(ctx, rdVector_Len3(&tmp));
 }
 
+// MOTS added
+void sithCogFunction_VectorEqual(sithCog *ctx)
+{
+    rdVector3 popB;
+    rdVector3 popA;
+    
+    sithCogExec_PopVector3(ctx,&popA);
+    sithCogExec_PopVector3(ctx,&popB);
+    if (((popB.x == popA.x) && (popB.y == popA.y)) && (popB.z == popA.z)) {
+        sithCogExec_PushInt(ctx,1);
+        return;
+    }
+    sithCogExec_PushInt(ctx,0);
+    return;
+}
+
 void sithCogFunction_SendMessage(sithCog *ctx)
 {
     int msgId = sithCogExec_PopInt(ctx);
@@ -965,6 +982,21 @@ void sithCogFunction_SetMasterCog(sithCog *ctx)
     sithCog_masterCog = sithCogExec_PopCog(ctx);
 }
 
+// MOTS added
+void sithCogFunction_GetActionCog(sithCog *ctx)
+{
+    if ( sithCog_pActionCog )
+        sithCogExec_PushInt(ctx, sithCog_pActionCog->selfCog);
+    else
+        sithCogExec_PushInt(ctx, -1);
+}
+
+// MOTS added
+void sithCogFunction_SetActionCog(sithCog *ctx)
+{
+    sithCog_pActionCog = sithCogExec_PopCog(ctx);
+}
+
 void sithCogFunction_NewColorEffect(sithCog *ctx)
 {
     sithCog *v1; // esi
@@ -1124,6 +1156,69 @@ void sithCogFunction_FireProjectile(sithCog *ctx)
     {
         sithCogExec_PushInt(ctx, -1);
     }
+}
+
+// MOTS added
+void sithCogFunction_FireProjectileData(sithCog *ctx)
+{
+    int popA;
+    
+    popA = sithCogExec_PopInt(ctx);
+    //sithCogFunction_FireProjectile(ctx,popA);
+    {
+        int scaleFlags; // di
+        int mode; // ebx
+        sithSound *fireSound; // ebp
+        sithThing *sender; // eax
+        sithThing *spawnedProjectile; // eax
+        float autoaimFov; // [esp+10h] [ebp-24h]
+        float scale; // [esp+14h] [ebp-20h]
+        sithThing *projectileTemplate; // [esp+18h] [ebp-1Ch]
+        rdVector3 aimError; // [esp+1Ch] [ebp-18h]
+        rdVector3 fireOffset; // [esp+28h] [ebp-Ch]
+        float autoaimMaxDist; // [esp+38h] [ebp+4h]
+
+        autoaimMaxDist = sithCogExec_PopFlex(ctx);
+        autoaimFov = sithCogExec_PopFlex(ctx);
+        scaleFlags = sithCogExec_PopInt(ctx);
+        scale = sithCogExec_PopFlex(ctx);
+        sithCogExec_PopVector3(ctx, &aimError);
+        sithCogExec_PopVector3(ctx, &fireOffset);
+        mode = sithCogExec_PopInt(ctx);
+        fireSound = sithCogExec_PopSound(ctx);
+        projectileTemplate = sithCogExec_PopTemplate(ctx);
+        sender = sithCogExec_PopThing(ctx);
+        if ( sender
+          && (spawnedProjectile = sithWeapon_FireProjectile(
+                                      sender,
+                                      projectileTemplate,
+                                      fireSound,
+                                      mode,
+                                      &fireOffset,
+                                      &aimError,
+                                      scale,
+                                      scaleFlags,
+                                      autoaimFov,
+                                      autoaimMaxDist)) != 0 )
+        {
+            sithCogExec_PushInt(ctx, spawnedProjectile->thingIdx);
+        }
+        else
+        {
+            sithCogExec_PushInt(ctx, -1);
+        }
+    }
+    return;
+}
+
+// MOTS added
+void sithCogFunction_FireProjectileLocal(sithCog *ctx)
+{
+    int tmp = sithComm_multiplayerFlags;
+    sithComm_multiplayerFlags = 0;
+    sithCogFunction_FireProjectile(ctx);
+    sithComm_multiplayerFlags = tmp;
+    return;
 }
 
 void sithCogFunction_SendTrigger(sithCog *ctx)
@@ -1332,7 +1427,17 @@ void sithCogFunction_GetCurWeapon(sithCog *ctx)
     }
 }
 
-void sithCogFunction_GetCameraState(sithCog *ctx)
+// MOTS added
+void sithCogFunction_GetWeaponBin(sithCog *ctx)
+{
+    int popA;
+    
+    popA = sithCogExec_PopInt(ctx);
+    popA = sithInventory_SelectWeaponFollowing(popA);
+    sithCogExec_PushInt(ctx,popA);
+}
+
+void sithCogFunction_GetCameraStateFlags(sithCog *ctx)
 {
     int v1; // eax
 
@@ -1469,9 +1574,94 @@ void sithCogFunction_SetCameraFocii(sithCog *ctx)
     }
 }
 
+// MOTS added
+void sithCogFunction_Pow(sithCog *ctx)
+{
+    float fVar2;
+    float fVar3;
+    
+    fVar2 = sithCogExec_PopFlex(ctx);
+    fVar3 = sithCogExec_PopFlex(ctx);
+    if ((fVar2 == 0.0) && (fVar3 == 0.0)) {
+        sithCogExec_PushFlex(ctx,0.0);
+        return;
+    }
+    sithCogExec_PushFlex(ctx,stdMath_FlexPower(fVar2, fVar3)); // TODO verify
+    return;
+}
+
+// MOTS added
+void sithCogFunction_Wakeup(sithCog *pCtx)
+{
+    sithCogExec_009d39b0 = 1;
+    sithCogExec_pIdkMotsCtx = pCtx;
+    return;
+}
+
+// MOTS added
+void sithCogFunction_Sin(sithCog *ctx)
+{
+    float angle;
+    float outSin;
+    float outCos;
+    
+    angle = sithCogExec_PopFlex(ctx);
+    stdMath_SinCos(angle,&outSin,&outCos);
+    sithCogExec_PushFlex(ctx,outSin);
+}
+
+// MOTS added
+void sithCogFunction_Cos(sithCog *ctx)
+{
+    float angle;
+    float outSin;
+    float outCos;
+    
+    angle = sithCogExec_PopFlex(ctx);
+    stdMath_SinCos(angle,&outSin,&outCos);
+    sithCogExec_PushFlex(ctx,outCos);
+}
+
+// MOTS added
+void sithCogFunction_Tan(sithCog *ctx)
+{
+    float fVar1;
+    
+    fVar1 = sithCogExec_PopFlex(ctx);
+    fVar1 = stdMath_Tan(fVar1);
+    sithCogExec_PushFlex(ctx,fVar1);
+}
+
+// MOTS added
+void sithCogFunction_GetCogFlags(sithCog *ctx)
+{
+    sithCog* pCog = sithCogExec_PopCog(ctx);
+    sithCogExec_PushInt(ctx,pCog->flags);
+}
+
+// MOTS added
+void sithCogFunction_SetCogFlags(sithCog *ctx)
+{
+    int val = sithCogExec_PopInt(ctx);
+    sithCog* pCog = sithCogExec_PopCog(ctx);
+
+    pCog->flags |= val;
+}
+
+// MOTS added
+void sithCogFunction_ClearCogFlags(sithCog *ctx)
+{
+    int val = sithCogExec_PopInt(ctx);
+    sithCog* pCog = sithCogExec_PopCog(ctx);
+
+    pCog->flags &= ~val;
+}
+
 void sithCogFunction_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Sleep, "sleep");
+    sithCogScript_RegisterVerb(ctx, sithCogFunction_Pow, "pow"); // MOTS
+    sithCogScript_RegisterVerb(ctx, sithCogFunction_Wakeup, "wakeup"); // MOTS
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Rand, "rand");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_RandVec, "randvec");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSenderRef, "getsenderref");
@@ -1516,6 +1706,7 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorY, "vectory");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorZ, "vectorz");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorNorm, "vectornorm");
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_VectorEqual,"vectorequal"); // MOTS
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSithMode, "getsithmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetDifficulty, "getdifficulty");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetSubmodeFlags, "setsubmodeflags");
@@ -1528,6 +1719,8 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_BitTest, "bittest");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_BitClear, "bitclear");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_FireProjectile, "fireprojectile");
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal"); // MOTS
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ActivateWeapon, "activateweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DeactivateWeapon, "deactivateweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMountWait, "setmountwait");
@@ -1539,12 +1732,15 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCurWeapon, "setcurweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCurWeapon, "getcurweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCurWeaponMode, "getcurweaponmode");
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetWeaponBin,"getweaponbin"); // MOTS
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ChangeFireRate, "changefirerate");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessage, "sendmessage");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessageEx, "sendmessageex");
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS TODO
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ReturnEx, "returnex");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetParam, "getparam");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetParam, "setparam");
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
     sithCogScript_RegisterVerb(ctx, sithCogFunction_EnableIRMode, "enableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DisableIRMode, "disableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetInvFlags, "setinvflags");
@@ -1566,7 +1762,8 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_CycleCamera, "cyclecamera");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetPovShake, "setpovshake");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
-    sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraState, "getcamerastateflags");
+    sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapNew, "heapnew");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapSet, "heapset");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapGet, "heapget");
@@ -1574,6 +1771,8 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSelfCog, "getselfcog");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMasterCog, "getmastercog");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMasterCog, "setmastercog");
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMultiModeFlags, "setmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMultiModeFlags, "getmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ClearMultiModeFlags, "clearmultimodeflags");
@@ -1587,6 +1786,16 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetScoreLimit, "getscorelimit");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendTrigger, "sendtrigger");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_AutoSaveGame, "autosavegame");
+
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_Sin,"sin"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_Cos,"cos"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_Tan,"tan"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
+    sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS TODO
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
+    //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
     
     // Droidworks
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");

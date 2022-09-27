@@ -47,6 +47,9 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
 int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, float *a3, int numVertices);
 int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices);
 
+int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, float *pR, float *pG, float *pB, int numVertices);
+int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *pR, float *pG, float *pB, int numVertices);
+
 //static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, float rad) = (void*)rdClip_SphereInFrustrum_ADDR;
 static int (*rdClip_Face3SOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3SOrtho_ADDR;
 static int (*rdClip_Face3WOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3WOrtho_ADDR;

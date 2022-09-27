@@ -20,7 +20,7 @@ rdLight *rdLight_New()
 
 int rdLight_NewEntry(rdLight *light)
 {
-    light->dword4 = 2;
+    light->type = 2;
     light->active = 1;
     light->direction.x = 0.0;
     light->direction.y = 0.0;
@@ -42,8 +42,13 @@ void rdLight_FreeEntry(rdLight *light)
 {
 }
 
-void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float scalar)
+double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+#ifdef JKM_LIGHTING
+    rdVector3 *localLightDirs, 
+#endif
+    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float scalar)
 {
+#ifndef JKM_LIGHTING
     int vertexLightsSize;
     rdVector3* vertexIter;
     rdLight **meshLightIter;
@@ -57,7 +62,7 @@ void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPo
     int i, j;
 
     if (!numVertices)
-        return;
+        return 0.0;
 
     // TODO: this was inlined from another (uncalled) function
     vertexNormals = verticesEnd;
@@ -70,9 +75,7 @@ void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPo
         meshLightIter = meshLights;
         for (i = 0; i < numLights; i++)
         {
-            diff.x = localLightPoses[i].x - vertexIter->x;
-            diff.y = localLightPoses[i].y - vertexIter->y;
-            diff.z = localLightPoses[i].z - vertexIter->z;
+            rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
             light = *meshLightIter;
             len = rdVector_Len3(&diff);
             if ( len < (*meshLightIter)->falloffMin )
@@ -92,6 +95,63 @@ void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPo
         ++idkIter;
         ++vertexNormals;
     }
+    return 0.0;
+
+#else
+    int vertexLightsSize;
+    rdVector3* vertexIter;
+    rdLight **meshLightIter;
+    float len;
+    float lightMagnitude;
+    rdLight *light;
+    rdVector3 diff;
+    rdVector3 *vertexNormals;
+    float *outLights;
+    float *idkIter;
+    int i, j;
+
+    float avgLight = 0.0;
+
+    if (!numVertices)
+        return 0.0;
+
+    // TODO: this was inlined from another (uncalled) function
+    vertexNormals = verticesEnd;
+    idkIter = vertices_i_end;
+    outLights = vertices_i;
+    vertexIter = vertices;
+    for (j = 0; j < numVertices; j++)
+    {
+        *outLights = *idkIter;
+        meshLightIter = meshLights;
+        for (i = 0; i < numLights; i++)
+        {
+            rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
+            light = *meshLightIter;
+            len = rdVector_Len3(&diff);
+            if ( len < (*meshLightIter)->falloffMin )
+            {
+                rdVector_Normalize3Acc(&diff);
+                lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
+                if ( lightMagnitude > 0.0 )
+                    *outLights += (light->intensity - len * scalar) * lightMagnitude;
+            }
+            if ( *outLights >= 1.0 )
+                break;
+            ++meshLightIter;
+        }
+
+        ++vertexIter;
+
+        avgLight += *outLights;
+        ++outLights;
+
+        ++idkIter;
+        ++vertexNormals;
+    }
+
+    return avgLight / (double)numVertices;
+#endif
 }
 
 float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, float a7)

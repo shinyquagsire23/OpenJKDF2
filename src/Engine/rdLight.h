@@ -19,7 +19,11 @@ rdLight *rdLight_New();
 int rdLight_NewEntry(rdLight *light);
 void rdLight_Free(rdLight *light);
 void rdLight_FreeEntry(rdLight *light);
-void rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float a9);
+double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+#ifdef JKM_LIGHTING
+    rdVector3 *localLightDirs, 
+#endif
+    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float scalar);
 float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, float a7);
 
 void rdLight_CalcDistVertexIntensities();

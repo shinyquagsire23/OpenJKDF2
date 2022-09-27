@@ -3802,3 +3802,14 @@ LABEL_124:
     }
     return result;
 }
+
+// MOTS TODO
+int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, float *pR, float *pG, float *pB, int numVertices)
+{
+    return 0;
+}
+
+int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *pR, float *pG, float *pB, int numVertices)
+{
+    return 0;
+}

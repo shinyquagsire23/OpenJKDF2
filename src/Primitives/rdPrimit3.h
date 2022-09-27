@@ -25,6 +25,14 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
 int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt);
 void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int color16, int mask);
 
+void rdPrimit3_NoClipFaceRGB
+               (rdGeoMode_t geoMode,int lightMode,int texMode,rdMeshinfo *_vertexSrc,
+               rdMeshinfo *_vertexDst,rdVector2 *idkIn);
+void
+rdPrimit3_ClipFaceRGB
+          (rdClipFrustum *clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
+          rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn);
+
 static void (__cdecl *_rdPrimit3_ClipFace)(rdClipFrustum *a1, signed int a2, signed int a3, int textureMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *a7) = (void*)rdPrimit3_ClipFace_ADDR;
 //static void (__cdecl *rdPrimit3_NoClipFace)(int a1, signed int lightingMode, int textureMode, rdMeshinfo *a4, rdMeshinfo *a5, rdVector2 *a6) = (void*)rdPrimit3_NoClipFace_ADDR;
 

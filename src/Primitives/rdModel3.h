@@ -124,11 +124,19 @@ typedef struct rdMesh
     rdVector2* vertexUVs;
     float* vertices_i;
     float* vertices_unk;
+#ifdef JKM_LIGHTING
+    float* paRedIntensities;
+    float* paGreenIntensities;
+    float* paBlueIntensities;
+#endif
     rdFace* faces;
     rdVector3* vertexNormals;
     int numVertices;
     int numUVs;
     int numFaces;
+#ifdef JKM_LIGHTING
+    float extraLight;
+#endif
     float radius;
     int field_58;
     int field_5C;
@@ -150,15 +158,16 @@ typedef struct rdMesh
     rdVector2* vertexUVs;
     float* vertices_i;
     float* vertices_unk;
+    float* paRedIntensities;
+    float* paGreenIntensities;
+    float* paBlueIntensities;
+    int unk4;
     rdFace* faces;
     rdVector3* vertexNormals;
-    int unk1;
-    int unk2;
-    int unk3;
-    int unk4;
     int numVertices;
     int numUVs;
     int numFaces;
+    float extraLight;
     float radius;
     int field_58;
     int field_5C;
@@ -167,7 +176,6 @@ typedef struct rdMesh
     int field_68;
     int field_6C;
     
-    int unk5;
 } rdMesh;
 #endif
 

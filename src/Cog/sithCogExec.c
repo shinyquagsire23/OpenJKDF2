@@ -22,6 +22,11 @@
 #include <stdint.h>
 #include <math.h>
 
+// MOTS added
+int sithCogExec_009d39b0 = 0;
+sithCog* sithCogExec_pIdkMotsCtx = NULL;
+sithCog* sithCog_pActionCog = NULL;
+
 void sithCogExec_Exec(sithCog *cog_ctx)
 {
     sithCogScript *cogscript;
@@ -36,6 +41,15 @@ void sithCogExec_Exec(sithCog *cog_ctx)
     float fTmp;
     int iTmp;
     sithCogStackvar* tmpStackVar;
+
+    // MOTS added
+    /*
+    if (Main_cogLogFp != 0) {
+        fputs(Main_cogLogFp,"Begin: %s (msg=%s)\n",cog_ctx->cogscript_fpath,
+              (&PTR_s_invalid_005a1f00)[cog_ctx->trigId]);
+        fflush(Main_cogLogFp);
+    }
+    */
     
     //jk_printf("cog trace %s %x\n", cog_ctx->cogscript->cog_fpath, cog_ctx->execPos);
 
@@ -186,8 +200,18 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 jk_printf("unk op %u\n", op); // added
                 break;
         }
-        if ( cog_ctx->script_running == 1 )
+        if ( cog_ctx->script_running == 1 ) {
             continue;
+        }
+        else {
+            // MOTS added
+            /*
+            if (Main_cogLogFp != 0) {
+                fputs(Main_cogLogFp,"  End: %s\n",cog_ctx->cogscript_fpath);
+                fflush(Main_cogLogFp);
+            }
+            */
+        }
         return;
     }
 }
@@ -830,10 +854,18 @@ void sithCogExec_Call(sithCog *ctx)
 {
     if ( ctx->calldepth != 4 )
     {
+        sithCogExec_009d39b0 = 0;
         ctx->callstack[ctx->calldepth].pc = ctx->execPos;
         ctx->callstack[ctx->calldepth].script_running = ctx->script_running;
         ctx->callstack[ctx->calldepth].waketimeMs = ctx->wakeTimeMs;
         ctx->callstack[ctx->calldepth++].trigId = ctx->trigId;
+
+        // MOTS added: wakeup
+        if (((sithCogExec_009d39b0 != 0) && (ctx->script_running == 2)) && (ctx == sithCogExec_pIdkMotsCtx)) {
+            ctx->script_running = 1;
+            sithCogExec_009d39b0 = 0;
+            sithCogExec_pIdkMotsCtx = NULL;
+        }
     }
 }
 

@@ -1221,7 +1221,7 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
             while (pParent && pParent->flags & 2) {  // Added: nullptr check
                 pParent = pParent->parent;
             }
-            rdModel3_pCurGeoset->meshes[pNode->meshIdx].lightingMode = 6;
+            rdModel3_pCurGeoset->meshes[pNode->meshIdx].lightingMode = RD_LIGHTMODE_6_UNK;
             if (pParent) // Added: nullptr check
                 rdModel3_pCurGeoset->meshes[pNode->meshIdx].radius = rdModel3_pCurGeoset->meshes[pParent->meshIdx].radius;
         }
@@ -1269,8 +1269,13 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_geometryMode = curGeometryMode;
 
     rdModel3_lightingMode = pCurMesh->lightingMode;
-    if ( rdModel3_lightingMode >= curLightingMode )
+    if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
+    {
+        rdModel3_lightingMode = RD_LIGHTMODE_6_UNK;
+    }
+    else if ( rdModel3_lightingMode >= curLightingMode ) {
         rdModel3_lightingMode = curLightingMode;
+    }
 
     rdModel3_textureMode = pCurMesh->textureMode;
     if ( rdModel3_textureMode >= curTextureMode )
@@ -1282,13 +1287,13 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     vertexSrc.intensities = 0;
     vertexDst.verticesProjected = aFaceVerts;
 
-    if (rdModel3_lightingMode == 0)
+    if (rdModel3_lightingMode == RD_LIGHTMODE_FULLYLIT)
     {
     }
-    else if (rdModel3_lightingMode == 1)
+    else if (rdModel3_lightingMode == RD_LIGHTMODE_NOTLIT)
     {
     }
-    else if (rdModel3_lightingMode == 2)
+    else if (rdModel3_lightingMode == RD_LIGHTMODE_DIFFUSE)
     {
         rdModel3_numMeshLights = 0;
         pGeoLight = apGeoLights;
@@ -1298,13 +1303,25 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             if ( (*pGeoLight)->falloffMin + pCurMesh->radius > rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
-                rdMatrix_TransformPoint34(&aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                
+                // MOTS added
+                if ((*pGeoLight)->type == 3) {
+                    float tmpZ = mat->scale.z;
+                    rdVector_Zero3(&mat->scale);
+
+                    rdVector3 tmpDir;
+                    rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
+                    rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
+                    mat->scale.z = tmpZ;
+                }
+
                 ++rdModel3_numMeshLights;
             }
             ++pGeoLight;
         }
     }
-    else if (rdModel3_lightingMode == 3)
+    else if (rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
     {
         rdModel3_numMeshLights = 0;
         if (rdModel3_numGeoLights > 0)
@@ -1316,15 +1333,32 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
                 if ( (*pGeoLight)->falloffMin + pCurMesh->radius > rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
                 {
                     apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
-                    rdMatrix_TransformPoint34(&aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                    rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                    
+                    // MOTS added
+                    if ((*pGeoLight)->type == 3) {
+                        float tmpZ = mat->scale.z;
+                        rdVector_Zero3(&mat->scale);
+
+                        rdVector3 tmpDir;
+                        rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
+                        rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
+                        mat->scale.z = tmpZ;
+                    }
+
                     ++rdModel3_numMeshLights;
                 }
                 ++pGeoLight;
             }
         }
-        rdLight_CalcVertexIntensities(
+
+        // MOTS added assignment
+        meshIn->extraLight = rdLight_CalcVertexIntensities(
             apMeshLights,
-            aLocalLightPos,
+            rdModel3_aLocalLightPos,
+#ifdef JKM_LIGHTING
+            rdModel3_aLocalLightDir,
+#endif
             rdModel3_numMeshLights,
             pCurMesh->vertexNormals,
             pCurMesh->vertices,
@@ -1332,6 +1366,14 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             pCurMesh->vertices_unk,
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
+    }
+    else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK)
+    {
+        for (int i = 0; i < meshIn->numFaces; i++)
+        {
+            rdFace* face = &meshIn->faces[i];
+            face->extraLight = meshIn->extraLight;
+        }
     }
 
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
@@ -1382,6 +1424,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     if ( rdModel3_textureMode >= face->textureMode )
         textureMode = face->textureMode;
 
+    if ((face->type & 0x10) != 0) {
+        procEntry->lightingMode = 1;
+    }
     procEntry->geometryMode = geometryMode;
     procEntry->lightingMode = lightingMode;
     procEntry->textureMode = textureMode;
@@ -1392,10 +1437,25 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
 
-    if ( meshFrustrumCull )
-        rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
-    else
-        rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+    // MOTS added: RGB
+    if ((rdroid_curVertexColorMode == 0) || (lightingMode = procEntry->lightingMode, lightingMode == 2)) {
+        if ( meshFrustrumCull )
+            rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
+        else
+            rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+    }
+    else {
+        vertexSrc.paRedIntensities = pCurMesh->paRedIntensities;
+        vertexSrc.paGreenIntensities = pCurMesh->paGreenIntensities;
+        vertexSrc.paBlueIntensities = pCurMesh->paBlueIntensities;
+        vertexDst.paRedIntensities = procEntry->paRedIntensities;
+        vertexDst.paGreenIntensities = procEntry->paGreenIntensities;
+        vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
+        if ( meshFrustrumCull )
+            rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
+        else
+            rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+    }
 
     if ( vertexDst.numVertices < 3u )
         return 0;
@@ -1407,7 +1467,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
             rdVector_Neg3(&faceNormal, &face->normal);
             procEntry->light_level_static = rdLight_CalcFaceIntensity(
                       apMeshLights,
-                      aLocalLightPos,
+                      rdModel3_aLocalLightPos,
                       rdModel3_numMeshLights,
                       face,
                       &faceNormal,
@@ -1418,7 +1478,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         {
             procEntry->light_level_static = rdLight_CalcFaceIntensity(
                       apMeshLights,
-                      aLocalLightPos,
+                      rdModel3_aLocalLightPos,
                       rdModel3_numMeshLights,
                       face,
                       &face->normal,

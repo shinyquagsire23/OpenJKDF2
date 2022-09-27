@@ -735,7 +735,7 @@ typedef struct rdMatrix44
 typedef struct rdLight
 {
     uint32_t id;
-    uint32_t dword4;
+    uint32_t type;
     uint32_t active;
     rdVector3 direction;
     float intensity;
@@ -1446,6 +1446,11 @@ typedef struct rdVertexIdxInfo
     rdVector2* vertexUVs;
     float* paDynamicLight;
     float* intensities;
+#ifdef JKM_LIGHTING
+    float* paRedIntensities;
+    float* paGreenIntensities;
+    float* paBlueIntensities;
+#endif
 } rdVertexIdxInfo;
 
 typedef struct rdMeshinfo
@@ -1457,6 +1462,11 @@ typedef struct rdMeshinfo
     rdVector2* vertexUVs;
     float* paDynamicLight;
     float* intensities;
+#ifdef JKM_LIGHTING
+    float* paRedIntensities;
+    float* paGreenIntensities;
+    float* paBlueIntensities;
+#endif
     rdVector3* verticesOrig;
 } rdMeshinfo;
 

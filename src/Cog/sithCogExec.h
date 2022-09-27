@@ -42,6 +42,11 @@
 #define sithCogExec_MathOperation_ADDR (0x004E3870)
 #define sithCogExec_AssignStackVar_ADDR (0x004E3B90)
 
+// MOTS added
+extern int sithCogExec_009d39b0;
+extern sithCog* sithCogExec_pIdkMotsCtx;
+extern sithCog* sithCog_pActionCog;
+
 enum SENDERTYPE
 {
     SENDERTYPE_0     = 0,
