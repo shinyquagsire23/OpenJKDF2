@@ -1367,7 +1367,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
     }
-    else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK)
+    else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
     {
         for (int i = 0; i < meshIn->numFaces; i++)
         {
@@ -1424,9 +1424,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     if ( rdModel3_textureMode >= face->textureMode )
         textureMode = face->textureMode;
 
+    // MOTS added
     if ((face->type & 0x10) != 0) {
         procEntry->lightingMode = 1;
     }
+
     procEntry->geometryMode = geometryMode;
     procEntry->lightingMode = lightingMode;
     procEntry->textureMode = textureMode;
@@ -1451,6 +1453,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         vertexDst.paRedIntensities = procEntry->paRedIntensities;
         vertexDst.paGreenIntensities = procEntry->paGreenIntensities;
         vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
+        //printf("%p %p %p, %p %p %p\n", vertexSrc.paRedIntensities, vertexSrc.paGreenIntensities, vertexSrc.paBlueIntensities, vertexDst.paRedIntensities, vertexDst.paGreenIntensities, vertexDst.paBlueIntensities);
         if ( meshFrustrumCull )
             rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
         else

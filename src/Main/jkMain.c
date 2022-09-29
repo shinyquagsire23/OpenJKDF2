@@ -1494,7 +1494,11 @@ int jkMain_SetVideoMode()
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
     Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
+#ifdef JKM_LIGHTING
+    sithRender_SetSomeRenderflag(0xaa);
+#else
     sithRender_SetSomeRenderflag(0x2a);
+#endif
     sithRender_SetGeoMode(Video_modeStruct.geoMode);
     sithRender_SetLightMode(Video_modeStruct.lightMode);
     sithRender_SetTexMode(Video_modeStruct.texMode);

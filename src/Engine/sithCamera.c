@@ -167,6 +167,14 @@ void sithCamera_FollowFocus(sithCamera *cam)
     switch ( cam->cameraPerspective )
     {
         case 1:
+            // MOTS added
+            /*
+            if (cam->unk1 != 0.0) {
+                sithCamera_idk_scope_maybe((sithCamera *)cam);
+            }
+            rdCamera_FUN_004484f0(cam->unk3);
+            */
+
             rdMatrix_Copy34(&cam->viewMat, &focusThing->lookOrientation);
             if ( focusThing->moveType == SITH_MT_PATH && focusThing->rdthing.hierarchyNodeMatrices)
             {
@@ -532,20 +540,7 @@ void sithCamera_CycleCamera()
         cam_id = 0;
         sithCamera_curCameraIdx = 0;
     }
+
     v1 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
-    if ( !sithCamera_currentCamera || v1->dword4 >= sithCamera_currentCamera->dword4 )
-    {
-        sithCamera_currentCamera = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
-        sithCamera_dword_8EE5A0 = 1;
-        rdCamera_SetCurrent(&v1->rdCam);
-        if ( v1->cameraPerspective == 32 )
-        {
-            rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
-            rot.x = 0.0;
-            rot.y = -45.0;
-            rot.z = 0.0;
-            rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
-        }
-        sithCamera_FollowFocus(sithCamera_currentCamera);
-    }
+    sithCamera_SetCurrentCamera(v1);
 }

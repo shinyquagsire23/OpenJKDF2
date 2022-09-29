@@ -56,6 +56,7 @@ void sithMulti_SendChat(char *pStr, int arg0, int arg1)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
 }
 
+// MOTS altered
 int sithMulti_ProcessChat(sithCogMsg *msg)
 {
     // Added: 132 -> 256
@@ -459,6 +460,7 @@ void sithMulti_ProcessScore()
                 v10 = 128;
 
             NETMSG_START;
+            //NETMSG_PUSHS16(1);// MOTS added
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(v10);

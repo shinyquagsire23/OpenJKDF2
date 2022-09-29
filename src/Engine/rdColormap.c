@@ -318,3 +318,8 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
 
     return 1;
 }
+
+int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format)
+{
+    return 1;
+}

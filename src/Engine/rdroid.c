@@ -44,6 +44,9 @@ int rdOpen(int a1)
     rdroid_curProcFaceUserData = 0;
     
     stdPalEffects_ResetEffect(&rdroid_curColorEffects);
+
+    // MOTS added
+    rdroid_curVertexColorMode = 0;
     
     rdroid_frameTrue = 0;
     rdCache_ClearFrameCounters();
@@ -106,6 +109,12 @@ void rdSetProcFaceUserData(int a1)
     rdroid_curProcFaceUserData = a1;
 }
 
+// MOTS added
+void rdSetVertexColorMode(int a1)
+{
+    rdroid_curVertexColorMode = a1;
+}
+
 int rdGetRenderOptions(void)
 {
     return rdroid_curRenderOptions;
@@ -149,6 +158,12 @@ int rdGetCullFlags(void)
 int rdGetProcFaceUserData(void)
 {
     return rdroid_curProcFaceUserData;
+}
+
+// MOTS added
+int rdGetVertexColorMode(void)
+{
+    return rdroid_curVertexColorMode;
 }
 
 int rdSetMipDistances(rdVector4 *dists)

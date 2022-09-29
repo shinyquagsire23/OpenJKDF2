@@ -22,6 +22,7 @@
 #include "World/jkPlayer.h"
 #include "Engine/sithParticle.h"
 #include "World/sithSurface.h"
+#include "World/sithArchLighting.h"
 #include "Engine/sithAdjoin.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
@@ -88,7 +89,9 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("animclass", sithAnimClass_Load);
     sithWorld_SetSectionParser("aiclass", sithAIClass_ParseSection);
     sithWorld_SetSectionParser("soundclass", sithSoundClass_Load);
-    // MOTS altered: archlighting
+#ifdef JKM_LIGHTING
+    sithWorld_SetSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
+#endif
     sithWorld_bInitted = 1;
     return 1;
 }
@@ -381,7 +384,14 @@ void sithWorld_FreeEntry(sithWorld *world)
         sithAIClass_Free(world);
     if ( world->soundclasses )
         sithSoundClass_Free2(world);
-        
+
+#ifdef JKM_LIGHTING
+    // MOTS added
+    if (world->aArchlights) {
+        sithArchLighting_Free(world);
+    }
+#endif
+
     // Added: Fix UAF from previous world's viewmodel anims
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
@@ -396,7 +406,12 @@ int sithHeader_Load(sithWorld *world, int junk)
         return 0;
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "version %d", &junk);
+    if (_sscanf(stdConffile_aLine, "version %d", &junk) != 1) // MOTS added: check 1
+        return 0;
+    // MOTS added
+    if (junk != 1) {
+        //return 0;
+    }
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_aLine, "world gravity %f", &world->worldGravity);

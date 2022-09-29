@@ -5,6 +5,20 @@
 
 #include <math.h>
 
+#ifdef JKM_LIGHTING
+float* pSourceRedIVert;
+float* pSourceGreenIVert;
+float* pSourceBlueIVert;
+
+float* pDestRedIVert;
+float* pDestGreenIVert;
+float* pDestBlueIVert;
+
+float workRedIVerts[32];
+float workGreenIVerts[32];
+float workBlueIVerts[32];
+#endif
+
 int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2)
 {
     unsigned int clipOutcodeX1Y1;
@@ -3804,12 +3818,1521 @@ LABEL_124:
 }
 
 // MOTS TODO
-int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, float *pR, float *pG, float *pB, int numVertices)
+
+int rdClip_Face3GSRGB(rdClipFrustum *frustum,rdVector3 *vertices,float *pR,float *pG,float *pB,int numVertices)
 {
-    return 0;
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    float fVar6;
+    float fVar7;
+    float fVar8;
+    float fVar9;
+    float fVar10;
+    float fVar11;
+    intptr_t iVar12;
+    intptr_t iVar13;
+    intptr_t iVar14;
+    uint32_t uVar15;
+    rdVector3 *prVar16;
+    rdVector3 *prVar17;
+    rdVector3 *prVar18;
+    float *pfVar19;
+    rdVector3 *prVar20;
+    float *pfVar21;
+    float *pfVar22;
+    float *pfVar23;
+    float *pfVar24;
+    float *pfVar25;
+    float *pfVar26;
+    float *pfVar27;
+    uint32_t local_30;
+    float *local_2c;
+    float *local_28;
+    float *local_1c;
+    float *local_14;
+    float *local_10;
+    float *local_c;
+    float *local_8;
+    uint32_t local_4;
+    
+    rdClip_faceStatus = 0;
+    local_30 = 0;
+    local_2c = pR + numVertices + -1;
+    pSourceBlueIVert = pB;
+    local_28 = pG + numVertices + -1;
+    pSourceVert = vertices;
+    pSourceRedIVert = pR;
+    pSourceGreenIVert = pG;
+    pDestVert = workVerts;
+    pDestRedIVert = workRedIVerts;
+    pDestGreenIVert = workGreenIVerts;
+    pDestBlueIVert = workBlueIVerts;
+    if (0 < numVertices) {
+        local_c = workGreenIVerts;
+        iVar12 = (intptr_t)pR - (intptr_t)pB;
+        iVar13 = (intptr_t)pG - (intptr_t)pB;
+        local_10 = workBlueIVerts;
+        pfVar26 = workRedIVerts;
+        prVar20 = workVerts;
+        local_4 = numVertices;
+        pfVar27 = pB;
+        prVar17 = vertices + numVertices + -1;
+        pfVar24 = workGreenIVerts;
+        prVar18 = vertices;
+        local_1c = pB + numVertices + -1;
+        do {
+            pfVar25 = pfVar27;
+            fVar11 = prVar17->y * frustum->nearLeft;
+            fVar10 = frustum->nearLeft * prVar18->y;
+            pfVar22 = pfVar24;
+            if ((fVar11 <= prVar17->x) || (fVar10 <= prVar18->x)) {
+                prVar16 = prVar20;
+                pfVar27 = pfVar26;
+                if (((prVar17->x != fVar11) && (prVar18->x != fVar10)) && ((prVar17->x < fVar11 || (prVar18->x < fVar10)))) {
+                    fVar11 = prVar18->y - prVar17->y;
+                    fVar1 = prVar18->x - prVar17->x;
+                    fVar4 = frustum->nearLeft * fVar11 - fVar1;
+                    fVar5 = prVar18->y * prVar17->x - prVar17->y * prVar18->x;
+                    if (fVar4 != 0.0) {
+                        fVar5 = fVar5 / fVar4;
+                    }
+                    fVar4 = frustum->nearLeft * fVar5;
+                    fVar2 = fVar11;
+                    if (fVar11 < 0.0) {
+                        fVar2 = -fVar11;
+                    }
+                    fVar3 = fVar1;
+                    if (fVar1 < 0.0) {
+                        fVar3 = -fVar1;
+                    }
+                    if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                        fVar11 = (fVar5 - prVar17->y) / fVar11;
+                    }
+                    else {
+                        fVar11 = (fVar4 - prVar17->x) / fVar1;
+                    }
+                    prVar16 = prVar20 + 1;
+                    fVar1 = *(float *)(iVar12 + (intptr_t)pfVar25);
+                    pfVar27 = pfVar26 + 1;
+                    fVar2 = *(float *)(iVar13 + (intptr_t)pfVar25);
+                    fVar3 = *pfVar25;
+                    prVar20->x = fVar4;
+                    pfVar22 = pfVar24 + 1;
+                    prVar20->y = fVar5;
+                    fVar4 = *local_2c;
+                    fVar5 = *local_28;
+                    fVar6 = *local_1c;
+                    local_30 = local_30 + 1;
+                    fVar7 = *local_2c;
+                    fVar8 = *local_28;
+                    fVar9 = *local_1c;
+                    prVar20->z = (prVar18->z - prVar17->z) * fVar11 + prVar17->z;
+                    *pfVar26 = (fVar1 - fVar4) * fVar11 + fVar7;
+                    *pfVar24 = (fVar2 - fVar5) * fVar11 + fVar8;
+                    *local_10 = (fVar3 - fVar6) * fVar11 + fVar9;
+                    local_10 = local_10 + 1;
+                    rdClip_faceStatus = rdClip_faceStatus | 0x10;
+                    local_c = pfVar22;
+                }
+                prVar20 = prVar16;
+                pfVar26 = pfVar27;
+                if (fVar10 <= prVar18->x) {
+                    prVar20 = prVar16 + 1;
+                    pfVar26 = pfVar27 + 1;
+                    prVar16->x = prVar18->x;
+                    prVar16->y = prVar18->y;
+                    pfVar22 = local_c + 1;
+                    prVar16->z = prVar18->z;
+                    fVar11 = *pfVar25;
+                    *pfVar27 = *(float *)(iVar12 + (intptr_t)pfVar25);
+                    *local_c = *(float *)(iVar13 + (intptr_t)pfVar25);
+                    *local_10 = fVar11;
+                    local_30 = local_30 + 1;
+                    local_10 = local_10 + 1;
+                    local_c = pfVar22;
+                }
+            }
+            local_2c = (float *)(iVar12 + (intptr_t)pfVar25);
+            local_28 = (float *)(iVar13 + (intptr_t)pfVar25);
+            local_4 = local_4 + -1;
+            pfVar27 = pfVar25 + 1;
+            prVar17 = prVar18;
+            pfVar24 = pfVar22;
+            prVar18 = prVar18 + 1;
+            local_1c = pfVar25;
+        } while (local_4 != 0);
+    }
+    local_4 = local_30;
+    if ((intptr_t)local_30 < 3) {
+        return local_30;
+    }
+    pDestRedIVert = pR;
+    pSourceRedIVert = workRedIVerts;
+    pDestGreenIVert = pG;
+    pSourceGreenIVert = workGreenIVerts;
+    pSourceVert = workVerts;
+    pDestVert = vertices;
+    pDestBlueIVert = pB;
+    pfVar27 = workBlueIVerts;
+    iVar12 = local_30 - 1;
+    local_2c = pSourceRedIVert + (local_30 - 1);
+    local_30 = 0;
+    local_28 = pSourceGreenIVert + (local_4 - 1);
+    pSourceBlueIVert = pfVar27;
+    if (0 < (intptr_t)local_4) {
+        local_c = pG;
+        iVar13 = (intptr_t)pSourceRedIVert - (intptr_t)pfVar27;
+        iVar14 = (intptr_t)pSourceGreenIVert - (intptr_t)pfVar27;
+        local_8 = pB;
+        local_10 = pR;
+        prVar20 = vertices;
+        pfVar24 = pfVar27;
+        prVar17 = pSourceVert + iVar12;
+        pfVar26 = pR;
+        prVar18 = pSourceVert;
+        local_1c = pfVar27 + (local_4 - 1);
+        do {
+            pfVar25 = pfVar24;
+            fVar11 = frustum->right * prVar17->y;
+            fVar10 = frustum->right * prVar18->y;
+            pfVar22 = pfVar26;
+            if (((uint16_t)((uint16_t)(prVar17->x < fVar11) << 8 | (uint16_t)(prVar17->x == fVar11) << 0xe) != 0) || ((uint16_t)((uint16_t)(prVar18->x < fVar10) << 8 | (uint16_t)(prVar18->x == fVar10) << 0xe) != 0)) {
+                prVar16 = prVar20;
+                if (((prVar17->x != fVar11) && (prVar18->x != fVar10)) && (((uint16_t)((uint16_t)(prVar17->x < fVar11) << 8 | (uint16_t)(prVar17->x == fVar11) << 0xe) == 0 || ((uint16_t)((uint16_t)(prVar18->x < fVar10) << 8 | (uint16_t)(prVar18->x == fVar10) << 0xe) == 0)))) {
+                    fVar11 = prVar18->y - prVar17->y;
+                    fVar1 = prVar18->x - prVar17->x;
+                    fVar4 = frustum->right * fVar11 - fVar1;
+                    fVar5 = prVar18->y * prVar17->x - prVar17->y * prVar18->x;
+                    if (fVar4 != 0.0) {
+                        fVar5 = fVar5 / fVar4;
+                    }
+                    fVar4 = frustum->right * fVar5;
+                    fVar2 = fVar11;
+                    if (fVar11 < 0.0) {
+                        fVar2 = -fVar11;
+                    }
+                    fVar3 = fVar1;
+                    if (fVar1 < 0.0) {
+                        fVar3 = -fVar1;
+                    }
+                    if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                        fVar11 = (fVar5 - prVar17->y) / fVar11;
+                    }
+                    else {
+                        fVar11 = (fVar4 - prVar17->x) / fVar1;
+                    }
+                    prVar16 = prVar20 + 1;
+                    fVar1 = *(float *)(iVar13 + (intptr_t)pfVar25);
+                    pfVar22 = pfVar26 + 1;
+                    fVar2 = *(float *)(iVar14 + (intptr_t)pfVar25);
+                    fVar3 = *pfVar25;
+                    prVar20->x = fVar4;
+                    prVar20->y = fVar5;
+                    fVar4 = *local_2c;
+                    fVar5 = *local_28;
+                    fVar6 = *local_1c;
+                    local_30 = local_30 + 1;
+                    fVar7 = *local_2c;
+                    fVar8 = *local_28;
+                    fVar9 = *local_1c;
+                    prVar20->z = (prVar18->z - prVar17->z) * fVar11 + prVar17->z;
+                    *pfVar26 = (fVar1 - fVar4) * fVar11 + fVar7;
+                    *local_c = (fVar2 - fVar5) * fVar11 + fVar8;
+                    local_c = local_c + 1;
+                    *local_8 = (fVar3 - fVar6) * fVar11 + fVar9;
+                    rdClip_faceStatus = rdClip_faceStatus | 0x20;
+                    local_10 = pfVar22;
+                    local_8 = local_8 + 1;
+                }
+                prVar20 = prVar16;
+                if ((uint16_t)((uint16_t)(prVar18->x < fVar10) << 8 | (uint16_t)(prVar18->x == fVar10) << 0xe) != 0) {
+                    prVar20 = prVar16 + 1;
+                    prVar16->x = prVar18->x;
+                    prVar16->y = prVar18->y;
+                    pfVar22 = local_10 + 1;
+                    prVar16->z = prVar18->z;
+                    *local_10 = *(float *)(iVar13 + (intptr_t)pfVar25);
+                    *local_c = *(float *)(iVar14 + (intptr_t)pfVar25);
+                    *local_8 = *pfVar25;
+                    local_30 = local_30 + 1;
+                    local_c = local_c + 1;
+                    local_8 = local_8 + 1;
+                    local_10 = pfVar22;
+                }
+            }
+            local_2c = (float *)(iVar13 + (intptr_t)pfVar25);
+            local_28 = (float *)(iVar14 + (intptr_t)pfVar25);
+            local_4 = local_4 - 1;
+            pfVar24 = pfVar25 + 1;
+            prVar17 = prVar18;
+            pfVar26 = pfVar22;
+            prVar18 = prVar18 + 1;
+            local_1c = pfVar25;
+        } while (local_4 != 0);
+    }
+    uVar15 = local_30;
+    local_c = pSourceRedIVert;
+    local_14 = pSourceGreenIVert;
+    pfVar24 = pDestBlueIVert;
+    local_4 = local_30;
+    if (2 < (intptr_t)local_30) {
+        pSourceRedIVert = pDestRedIVert;
+        local_2c = pDestRedIVert + (local_30 - 1);
+        pSourceGreenIVert = pDestGreenIVert;
+        local_28 = pDestGreenIVert + (local_30 - 1);
+        local_1c = pDestBlueIVert + (local_30 - 1);
+        pSourceBlueIVert = pDestBlueIVert;
+        local_30 = 0;
+        prVar20 = pDestVert + (uVar15 - 1);
+        local_4 = 0;
+        pfVar26 = local_c;
+        pfVar22 = local_14;
+        prVar17 = pSourceVert;
+        prVar18 = pDestVert;
+        if (0 < (intptr_t)uVar15) {
+            pfVar25 = &pDestVert->z;
+            iVar12 = (intptr_t)pDestRedIVert - (intptr_t)pDestBlueIVert;
+            iVar13 = (intptr_t)pDestGreenIVert - (intptr_t)pDestBlueIVert;
+            local_4 = uVar15;
+            prVar16 = pSourceVert;
+            pfVar19 = pDestBlueIVert;
+            pfVar23 = local_c;
+            pDestRedIVert = local_c;
+            pDestBlueIVert = pfVar27;
+            pDestGreenIVert = local_14;
+            prVar17 = pSourceVert;
+            pSourceVert = pDestVert;
+            local_8 = pfVar27;
+            uVar15 = local_4;
+            do {
+                local_4 = uVar15;
+                pDestVert = prVar17;
+                pfVar21 = pfVar19;
+                fVar11 = frustum->nearTop * prVar20->y;
+                fVar10 = pfVar25[-1] * frustum->nearTop;
+                pfVar27 = pfVar23;
+                if (((uint16_t)((uint16_t)(prVar20->z < fVar11) << 8 | (uint16_t)(prVar20->z == fVar11) << 0xe) != 0) || ((uint16_t)((uint16_t)(*pfVar25 < fVar10) << 8 | (uint16_t)(*pfVar25 == fVar10) << 0xe) != 0)) {
+                    prVar17 = prVar16;
+                    if (((prVar20->z != fVar11) && (*pfVar25 != fVar10)) && (((uint16_t)((uint16_t)(prVar20->z < fVar11) << 8 | (uint16_t)(prVar20->z == fVar11) << 0xe) == 0 || ((uint16_t)((uint16_t)(*pfVar25 < fVar10) << 8 | (uint16_t)(*pfVar25 == fVar10) << 0xe) == 0)))) {
+                        fVar11 = pfVar25[-1] - prVar20->y;
+                        fVar1 = *pfVar25 - prVar20->z;
+                        fVar4 = frustum->nearTop * fVar11 - fVar1;
+                        fVar5 = prVar20->z * pfVar25[-1] - prVar20->y * *pfVar25;
+                        if (fVar4 != 0.0) {
+                            fVar5 = fVar5 / fVar4;
+                        }
+                        fVar4 = frustum->nearTop * fVar5;
+                        fVar2 = fVar11;
+                        if (fVar11 < 0.0) {
+                            fVar2 = -fVar11;
+                        }
+                        fVar3 = fVar1;
+                        if (fVar1 < 0.0) {
+                            fVar3 = -fVar1;
+                        }
+                        if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                            fVar11 = (fVar5 - prVar20->y) / fVar11;
+                        }
+                        else {
+                            fVar11 = (fVar4 - prVar20->z) / fVar1;
+                        }
+                        prVar17 = prVar16 + 1;
+                        fVar1 = *(float *)((intptr_t)pfVar21 + iVar12);
+                        pfVar27 = pfVar23 + 1;
+                        fVar2 = *(float *)((intptr_t)pfVar21 + iVar13);
+                        fVar3 = *pfVar21;
+                        fVar6 = *local_2c;
+                        fVar7 = *local_28;
+                        fVar8 = *local_1c;
+                        prVar16->x = (((rdVector3 *)(pfVar25 + -2))->x - prVar20->x) * fVar11 + prVar20->x;
+                        prVar16->y = fVar5;
+                        prVar16->z = fVar4;
+                        local_30 = local_30 + 1;
+                        fVar4 = *local_28;
+                        fVar5 = *local_1c;
+                        *pfVar23 = (fVar1 - fVar6) * fVar11 + *local_2c;
+                        *local_14 = (fVar2 - fVar7) * fVar11 + fVar4;
+                        local_14 = local_14 + 1;
+                        *local_8 = (fVar3 - fVar8) * fVar11 + fVar5;
+                        local_8 = local_8 + 1;
+                        rdClip_faceStatus = rdClip_faceStatus | 4;
+                        local_c = pfVar27;
+                    }
+                    prVar16 = prVar17;
+                    if ((uint16_t)((uint16_t)(*pfVar25 < fVar10) << 8 | (uint16_t)(*pfVar25 == fVar10) << 0xe) != 0) {
+                        prVar16 = prVar17 + 1;
+                        prVar17->x = ((rdVector3 *)(pfVar25 + -2))->x;
+                        prVar17->y = pfVar25[-1];
+                        pfVar27 = local_c + 1;
+                        prVar17->z = *pfVar25;
+                        *local_c = *(float *)((intptr_t)pfVar21 + iVar12);
+                        *local_14 = *(float *)((intptr_t)pfVar21 + iVar13);
+                        *local_8 = *pfVar21;
+                        local_30 = local_30 + 1;
+                        local_14 = local_14 + 1;
+                        local_8 = local_8 + 1;
+                        local_c = pfVar27;
+                    }
+                }
+                prVar20 = (rdVector3 *)(pfVar25 + -2);
+                local_2c = (float *)(iVar12 + (intptr_t)pfVar21);
+                local_28 = (float *)(iVar13 + (intptr_t)pfVar21);
+                pfVar25 = pfVar25 + 3;
+                uVar15 = local_4 - 1;
+                local_4 = local_30;
+                pfVar19 = pfVar21 + 1;
+                pfVar23 = pfVar27;
+                pfVar26 = pDestRedIVert;
+                pfVar27 = pDestBlueIVert;
+                pfVar22 = pDestGreenIVert;
+                prVar17 = pDestVert;
+                prVar18 = pSourceVert;
+                local_1c = pfVar21;
+            } while (uVar15 != 0);
+        }
+        pSourceVert = prVar18;
+        pDestVert = prVar17;
+        pDestGreenIVert = pfVar22;
+        pDestBlueIVert = pfVar27;
+        pDestRedIVert = pfVar26;
+        prVar20 = pSourceVert;
+        local_c = pSourceRedIVert;
+        local_14 = pSourceGreenIVert;
+        pfVar27 = pDestBlueIVert;
+        if (2 < (intptr_t)local_4) {
+            pSourceVert = pDestVert;
+            pSourceRedIVert = pDestRedIVert;
+            pSourceGreenIVert = pDestGreenIVert;
+            local_2c = pDestRedIVert + (local_4 - 1);
+            local_28 = pDestGreenIVert + (local_4 - 1);
+            local_1c = pDestBlueIVert + (local_4 - 1);
+            pSourceBlueIVert = pDestBlueIVert;
+            local_30 = 0;
+            prVar17 = pDestVert + (local_4 - 1);
+            uVar15 = 0;
+            pfVar26 = local_c;
+            pfVar22 = local_14;
+            prVar18 = prVar20;
+            if (0 < (intptr_t)local_4) {
+                local_8 = pfVar24;
+                pfVar25 = &pDestVert->z;
+                iVar12 = (intptr_t)pDestRedIVert - (intptr_t)pDestBlueIVert;
+                iVar13 = (intptr_t)pDestGreenIVert - (intptr_t)pDestBlueIVert;
+                pfVar19 = pDestBlueIVert;
+                pfVar23 = local_c;
+                pDestRedIVert = local_c;
+                pDestBlueIVert = pfVar24;
+                pDestGreenIVert = local_14;
+                pDestVert = prVar20;
+                do {
+                    pfVar21 = pfVar19;
+                    fVar11 = frustum->bottom * prVar17->y;
+                    fVar10 = pfVar25[-1] * frustum->bottom;
+                    pfVar24 = pfVar23;
+                    if ((fVar11 <= prVar17->z) || (fVar10 <= *pfVar25)) {
+                        prVar18 = prVar20;
+                        if (((prVar17->z != fVar11) && (*pfVar25 != fVar10)) && ((prVar17->z < fVar11 || (*pfVar25 < fVar10)))) {
+                            fVar11 = pfVar25[-1] - prVar17->y;
+                            fVar1 = *pfVar25 - prVar17->z;
+                            fVar4 = frustum->bottom * fVar11 - fVar1;
+                            fVar5 = prVar17->z * pfVar25[-1] - prVar17->y * *pfVar25;
+                            if (fVar4 != 0.0) {
+                                fVar5 = fVar5 / fVar4;
+                            }
+                            fVar4 = frustum->bottom * fVar5;
+                            fVar2 = fVar11;
+                            if (fVar11 < 0.0) {
+                                fVar2 = -fVar11;
+                            }
+                            fVar3 = fVar1;
+                            if (fVar1 < 0.0) {
+                                fVar3 = -fVar1;
+                            }
+                            if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                                fVar11 = (fVar5 - prVar17->y) / fVar11;
+                            }
+                            else {
+                                fVar11 = (fVar4 - prVar17->z) / fVar1;
+                            }
+                            prVar18 = prVar20 + 1;
+                            fVar1 = *(float *)((intptr_t)pfVar21 + iVar12);
+                            pfVar24 = pfVar23 + 1;
+                            fVar2 = *(float *)((intptr_t)pfVar21 + iVar13);
+                            fVar3 = *pfVar21;
+                            fVar6 = *local_2c;
+                            fVar7 = *local_28;
+                            fVar8 = *local_1c;
+                            prVar20->x = (((rdVector3 *)(pfVar25 + -2))->x - prVar17->x) * fVar11 + prVar17->x;
+                            prVar20->y = fVar5;
+                            prVar20->z = fVar4;
+                            local_30 = local_30 + 1;
+                            fVar4 = *local_28;
+                            fVar5 = *local_1c;
+                            *pfVar23 = (fVar1 - fVar6) * fVar11 + *local_2c;
+                            *local_14 = (fVar2 - fVar7) * fVar11 + fVar4;
+                            local_14 = local_14 + 1;
+                            *local_8 = (fVar3 - fVar8) * fVar11 + fVar5;
+                            local_8 = local_8 + 1;
+                            rdClip_faceStatus = rdClip_faceStatus | 8;
+                            local_c = pfVar24;
+                        }
+                        prVar20 = prVar18;
+                        if (fVar10 <= *pfVar25) {
+                            prVar20 = prVar18 + 1;
+                            prVar18->x = ((rdVector3 *)(pfVar25 + -2))->x;
+                            prVar18->y = pfVar25[-1];
+                            pfVar24 = local_c + 1;
+                            prVar18->z = *pfVar25;
+                            *local_c = *(float *)((intptr_t)pfVar21 + iVar12);
+                            *local_14 = *(float *)((intptr_t)pfVar21 + iVar13);
+                            *local_8 = *pfVar21;
+                            local_30 = local_30 + 1;
+                            local_14 = local_14 + 1;
+                            local_8 = local_8 + 1;
+                            local_c = pfVar24;
+                        }
+                    }
+                    prVar17 = (rdVector3 *)(pfVar25 + -2);
+                    local_2c = (float *)(iVar12 + (intptr_t)pfVar21);
+                    local_28 = (float *)(iVar13 + (intptr_t)pfVar21);
+                    pfVar25 = pfVar25 + 3;
+                    local_4 = local_4 - 1;
+                    uVar15 = local_30;
+                    pfVar19 = pfVar21 + 1;
+                    pfVar23 = pfVar24;
+                    pfVar26 = pDestRedIVert;
+                    pfVar24 = pDestBlueIVert;
+                    pfVar22 = pDestGreenIVert;
+                    prVar18 = pDestVert;
+                    local_1c = pfVar21;
+                } while (local_4 != 0);
+            }
+            pDestVert = prVar18;
+            pDestGreenIVert = pfVar22;
+            pDestBlueIVert = pfVar24;
+            pDestRedIVert = pfVar26;
+            local_4 = uVar15;
+            prVar20 = pSourceVert;
+            pfVar26 = pSourceRedIVert;
+            local_c = pSourceGreenIVert;
+            pfVar24 = pDestBlueIVert;
+            if (2 < (intptr_t)local_4) {
+                local_30 = 0;
+                pSourceVert = pDestVert;
+                pSourceRedIVert = pDestRedIVert;
+                local_2c = pDestRedIVert + (local_4 - 1);
+                pSourceGreenIVert = pDestGreenIVert;
+                local_28 = pDestGreenIVert + (local_4 - 1);
+                pSourceBlueIVert = pDestBlueIVert;
+                local_1c = pDestBlueIVert + (local_4 - 1);
+                prVar17 = pDestVert + (local_4 - 1);
+                numVertices = 0;
+                pfVar22 = pfVar26;
+                pfVar25 = local_c;
+                if (0 < (intptr_t)local_4) {
+                    pfVar19 = &pDestVert->y;
+                    local_8 = pfVar27;
+                    iVar12 = (intptr_t)pDestRedIVert - (intptr_t)pDestBlueIVert;
+                    iVar13 = (intptr_t)pDestGreenIVert - (intptr_t)pDestBlueIVert;
+                    pfVar23 = pDestBlueIVert;
+                    prVar18 = prVar20;
+                    pDestRedIVert = pfVar26;
+                    pDestBlueIVert = pfVar27;
+                    pDestGreenIVert = local_c;
+                    pDestVert = prVar20;
+                    local_10 = pfVar26;
+                    do {
+                        numVertices = local_4;
+                        pfVar21 = pfVar23;
+                        if (((frustum->field_0).y <= prVar17->y) || (prVar20 = prVar18, (frustum->field_0).y <= *pfVar19)) {
+                            if (((prVar17->y != (frustum->field_0).y) && (*pfVar19 != (frustum->field_0).y)) && ((prVar17->y < (frustum->field_0).y || (*pfVar19 < (frustum->field_0).y)))) {
+                                fVar8 = ((frustum->field_0).y - prVar17->y) / (*pfVar19 - prVar17->y);
+                                prVar18->y = (frustum->field_0).y;
+                                local_30 = local_30 + 1;
+                                fVar11 = *(float *)((intptr_t)pfVar21 + iVar12);
+                                fVar10 = *(float *)((intptr_t)pfVar21 + iVar13);
+                                fVar1 = *pfVar21;
+                                fVar4 = *local_2c;
+                                fVar5 = *local_28;
+                                prVar18->z = (pfVar19[1] - prVar17->z) * fVar8 + prVar17->z;
+                                fVar2 = *local_1c;
+                                fVar3 = *local_2c;
+                                fVar6 = *local_28;
+                                fVar7 = *local_1c;
+                                prVar18->x = (((rdVector3 *)(pfVar19 + -1))->x - prVar17->x) * fVar8 + prVar17->x;
+                                *pfVar26 = (fVar11 - fVar4) * fVar8 + fVar3;
+                                prVar18 = prVar18 + 1;
+                                pfVar26 = pfVar26 + 1;
+                                *local_c = (fVar10 - fVar5) * fVar8 + fVar6;
+                                local_c = local_c + 1;
+                                *local_8 = (fVar1 - fVar2) * fVar8 + fVar7;
+                                local_8 = local_8 + 1;
+                                rdClip_faceStatus = rdClip_faceStatus | 1;
+                                local_10 = pfVar26;
+                            }
+                            prVar20 = prVar18;
+                            if ((frustum->field_0).y <= *pfVar19) {
+                                prVar20 = prVar18 + 1;
+                                prVar18->x = ((rdVector3 *)(pfVar19 + -1))->x;
+                                prVar18->y = *pfVar19;
+                                pfVar26 = local_10 + 1;
+                                prVar18->z = pfVar19[1];
+                                *local_10 = *(float *)((intptr_t)pfVar21 + iVar12);
+                                *local_c = *(float *)((intptr_t)pfVar21 + iVar13);
+                                *local_8 = *pfVar21;
+                                local_30 = local_30 + 1;
+                                local_c = local_c + 1;
+                                local_8 = local_8 + 1;
+                                local_10 = pfVar26;
+                            }
+                        }
+                        prVar17 = (rdVector3 *)(pfVar19 + -1);
+                        local_2c = (float *)(iVar12 + (intptr_t)pfVar21);
+                        local_28 = (float *)(iVar13 + (intptr_t)pfVar21);
+                        pfVar19 = pfVar19 + 3;
+                        local_4 = numVertices + -1;
+                        pfVar23 = pfVar21 + 1;
+                        numVertices = local_30;
+                        prVar18 = prVar20;
+                        pfVar22 = pDestRedIVert;
+                        pfVar27 = pDestBlueIVert;
+                        pfVar25 = pDestGreenIVert;
+                        prVar20 = pDestVert;
+                        local_1c = pfVar21;
+                    } while (local_4 != 0);
+                }
+                pDestVert = prVar20;
+                pDestGreenIVert = pfVar25;
+                pDestBlueIVert = pfVar27;
+                pDestRedIVert = pfVar22;
+                pfVar27 = pSourceRedIVert;
+                local_8 = pSourceGreenIVert;
+                if (numVertices < 3) {
+                    rdClip_faceStatus = rdClip_faceStatus | 0x40;
+                    return numVertices;
+                }
+                local_4 = numVertices;
+                if ((frustum->field_0).x != 0.0) {
+                    pSourceRedIVert = pDestRedIVert;
+                    pSourceGreenIVert = pDestGreenIVert;
+                    local_30 = 0;
+                    pSourceBlueIVert = pDestBlueIVert;
+                    local_28 = pDestGreenIVert + (numVertices - 1);
+                    local_2c = pDestRedIVert + (numVertices - 1);
+                    local_1c = pDestBlueIVert + (numVertices - 1);
+                    prVar20 = pDestVert + (numVertices - 1);
+                    pfVar26 = local_8;
+                    prVar17 = pSourceVert;
+                    prVar18 = pDestVert;
+                    if (0 < numVertices) {
+                        iVar12 = (intptr_t)pDestRedIVert - (intptr_t)pDestBlueIVert;
+                        pfVar19 = &pDestVert->y;
+                        iVar13 = (intptr_t)pDestGreenIVert - (intptr_t)pDestBlueIVert;
+                        local_c = pfVar24;
+                        pfVar22 = pDestBlueIVert;
+                        pfVar25 = pfVar27;
+                        prVar16 = pSourceVert;
+                        pDestRedIVert = pfVar27;
+                        pDestBlueIVert = pfVar24;
+                        pDestGreenIVert = local_8;
+                        prVar17 = pSourceVert;
+                        pSourceVert = pDestVert;
+                        do {
+                            pDestVert = prVar17;
+                            pfVar23 = pfVar22;
+                            fVar11 = (frustum->field_0).z;
+                            if (((uint16_t)((uint16_t)(prVar20->y < fVar11) << 8 | (uint16_t)(prVar20->y == fVar11) << 0xe) != 0) || (fVar11 = (frustum->field_0).z, pfVar27 = pfVar25, prVar17 = prVar16, (uint16_t)((uint16_t)(*pfVar19 < fVar11) << 8 | (uint16_t)(*pfVar19 == fVar11) << 0xe) != 0)) {
+                                if (((prVar20->y != (frustum->field_0).z) && (*pfVar19 != (frustum->field_0).z)) && ((fVar11 = (frustum->field_0).z, (uint16_t)((uint16_t)(prVar20->y < fVar11) << 8 | (uint16_t)(prVar20->y == fVar11) << 0xe) == 0 || (fVar11 = (frustum->field_0).z, (uint16_t)((uint16_t)(*pfVar19 < fVar11) << 8 | (uint16_t)(*pfVar19 == fVar11) << 0xe) == 0)))) {
+                                    fVar8 = ((frustum->field_0).z - prVar20->y) / (*pfVar19 - prVar20->y);
+                                    prVar16->y = (frustum->field_0).z;
+                                    local_30 = local_30 + 1;
+                                    fVar11 = *(float *)((intptr_t)pfVar23 + iVar12);
+                                    fVar10 = *(float *)((intptr_t)pfVar23 + iVar13);
+                                    fVar1 = *pfVar23;
+                                    fVar4 = *local_2c;
+                                    fVar5 = *local_28;
+                                    prVar16->z = (pfVar19[1] - prVar20->z) * fVar8 + prVar20->z;
+                                    fVar2 = *local_1c;
+                                    fVar3 = *local_2c;
+                                    fVar6 = *local_28;
+                                    fVar7 = *local_1c;
+                                    prVar16->x = (((rdVector3 *)(pfVar19 + -1))->x - prVar20->x) * fVar8 + prVar20->x;
+                                    *pfVar25 = (fVar11 - fVar4) * fVar8 + fVar3;
+                                    *local_8 = (fVar10 - fVar5) * fVar8 + fVar6;
+                                    local_8 = local_8 + 1;
+                                    *local_c = (fVar1 - fVar2) * fVar8 + fVar7;
+                                    prVar16 = prVar16 + 1;
+                                    pfVar25 = pfVar25 + 1;
+                                    local_c = local_c + 1;
+                                    rdClip_faceStatus = rdClip_faceStatus | 2;
+                                }
+                                fVar11 = (frustum->field_0).z;
+                                pfVar27 = pfVar25;
+                                prVar17 = prVar16;
+                                if ((uint16_t)((uint16_t)(*pfVar19 < fVar11) << 8 | (uint16_t)(*pfVar19 == fVar11) << 0xe) != 0) {
+                                    prVar17 = prVar16 + 1;
+                                    pfVar27 = pfVar25 + 1;
+                                    prVar16->x = ((rdVector3 *)(pfVar19 + -1))->x;
+                                    prVar16->y = *pfVar19;
+                                    fVar11 = *pfVar23;
+                                    prVar16->z = pfVar19[1];
+                                    *pfVar25 = *(float *)((intptr_t)pfVar23 + iVar12);
+                                    *local_8 = *(float *)((intptr_t)pfVar23 + iVar13);
+                                    local_8 = local_8 + 1;
+                                    *local_c = fVar11;
+                                    local_30 = local_30 + 1;
+                                    local_c = local_c + 1;
+                                }
+                            }
+                            prVar20 = (rdVector3 *)(pfVar19 + -1);
+                            local_2c = (float *)(iVar12 + (intptr_t)pfVar23);
+                            local_28 = (float *)(iVar13 + (intptr_t)pfVar23);
+                            pfVar19 = pfVar19 + 3;
+                            numVertices = numVertices + -1;
+                            pfVar22 = pfVar23 + 1;
+                            pfVar25 = pfVar27;
+                            prVar16 = prVar17;
+                            pfVar27 = pDestRedIVert;
+                            pfVar24 = pDestBlueIVert;
+                            pfVar26 = pDestGreenIVert;
+                            prVar17 = pDestVert;
+                            prVar18 = pSourceVert;
+                            local_1c = pfVar23;
+                        } while (numVertices != 0);
+                    }
+                    pSourceVert = prVar18;
+                    pDestVert = prVar17;
+                    pDestGreenIVert = pfVar26;
+                    pDestBlueIVert = pfVar24;
+                    pDestRedIVert = pfVar27;
+                    local_4 = local_30;
+                    if ((intptr_t)local_30 < 3) {
+                        return local_30;
+                    }
+                }
+                if (pDestVert != vertices) {
+                    prVar20 = pDestVert;
+                    memcpy(vertices, prVar20, local_4 * sizeof(rdVector3));
+                    
+                    pfVar27 = pDestRedIVert;
+                    memcpy(pR, pfVar27, local_4 * sizeof(float));
+                    
+                    pfVar27 = pDestGreenIVert;
+                    memcpy(pG, pfVar27, local_4 * sizeof(float));
+                    
+                    pfVar27 = pDestBlueIVert;
+                    memcpy(pB, pfVar27, local_4 * sizeof(float));
+                }
+            }
+        }
+    }
+    return local_4;
 }
 
-int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, float *pR, float *pG, float *pB, int numVertices)
+
+int rdClip_Face3GTRGB(rdClipFrustum *pFrustum,rdVector3 *paVertices,rdVector2 *paUvs,float *pR,float *pG,float *pB, int numVertices)
 {
-    return 0;
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    float fVar6;
+    float fVar7;
+    float fVar8;
+    float fVar9;
+    float fVar10;
+    float fVar11;
+    float fVar12;
+    float fVar13;
+    float fVar14;
+    float fVar15;
+    intptr_t iVar16;
+    intptr_t iVar17;
+    rdVector3 *prVar18;
+    rdVector3 *prVar19;
+    rdVector3 *prVar20;
+    float *pfVar21;
+    float *pfVar23;
+    float *pfVar24;
+    rdVector2 *prVar25;
+    intptr_t iVar26;
+    intptr_t iVar27;
+    rdVector2 *prVar28;
+    float *pfVar29;
+    float *pfVar30;
+    rdVector2 *prVar31;
+    rdVector2 *prVar32;
+    rdVector2 *prVar33;
+    float *pfVar34;
+    intptr_t local_44;
+    rdVector3 *local_40;
+    float *local_3c;
+    float *local_38;
+    float *local_34;
+    float *local_30;
+    float *local_2c;
+    rdVector2 *local_28;
+    rdVector3 *local_24;
+    float *local_1c;
+    intptr_t local_18;
+    float *local_14;
+    float *local_10;
+    float *local_c;
+    uint32_t local_8;
+    uint32_t local_4;
+    
+    rdClip_faceStatus = 0;
+    local_44 = 0;
+    local_3c = pR + numVertices + -1;
+    local_38 = pG + numVertices + -1;
+    pSourceBlueIVert = pB;
+    local_40 = paVertices + numVertices + -1;
+    pSourceVert = paVertices;
+    pDestVert = workVerts;
+    pSourceTVert = paUvs;
+    pDestTVert = workTVerts;
+    pSourceRedIVert = pR;
+    pSourceGreenIVert = pG;
+    pDestRedIVert = workRedIVerts;
+    pDestGreenIVert = workGreenIVerts;
+    pDestBlueIVert = workBlueIVerts;
+    local_24 = paVertices;
+    if (0 < numVertices) {
+        local_30 = workBlueIVerts;
+        local_2c = workGreenIVerts;
+        iVar26 = (intptr_t)pR - (intptr_t)pB;
+        local_10 = workRedIVerts;
+        iVar27 = (intptr_t)pG - (intptr_t)pB;
+        local_18 = numVertices;
+        pfVar34 = pB;
+        prVar19 = workVerts;
+        prVar25 = paUvs;
+        prVar33 = paUvs + numVertices + -1;
+        prVar28 = workTVerts;
+        local_34 = pB + numVertices + -1;
+        do {
+            prVar31 = prVar25;
+            pfVar30 = pfVar34;
+            fVar14 = pFrustum->nearLeft * local_40->y;
+            fVar15 = pFrustum->nearLeft * local_24->y;
+            if ((fVar14 <= local_40->x) || (prVar18 = prVar19, prVar32 = prVar28, fVar15 <= local_24->x)) {
+                if (((local_40->x != fVar14) && (local_24->x != fVar15)) && ((local_40->x < fVar14 || (local_24->x < fVar15)))) {
+                    fVar14 = local_24->y - local_40->y;
+                    fVar1 = local_24->x - local_40->x;
+                    fVar7 = pFrustum->nearLeft * fVar14 - fVar1;
+                    fVar8 = local_24->y * local_40->x - local_40->y * local_24->x;
+                    if (fVar7 != 0.0) {
+                        fVar8 = fVar8 / fVar7;
+                    }
+                    fVar7 = pFrustum->nearLeft * fVar8;
+                    fVar2 = fVar14;
+                    if (fVar14 < 0.0) {
+                        fVar2 = -fVar14;
+                    }
+                    fVar3 = fVar1;
+                    if (fVar1 < 0.0) {
+                        fVar3 = -fVar1;
+                    }
+                    if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                        fVar14 = (fVar8 - local_40->y) / fVar14;
+                    }
+                    else {
+                        fVar14 = (fVar7 - local_40->x) / fVar1;
+                    }
+                    fVar1 = prVar31->x;
+                    fVar2 = prVar33->x;
+                    fVar3 = *(float *)(iVar26 + (intptr_t)pfVar30);
+                    fVar4 = *(float *)(iVar27 + (intptr_t)pfVar30);
+                    fVar5 = prVar33->x;
+                    fVar6 = *pfVar30;
+                    prVar19->x = fVar7;
+                    prVar19->y = fVar8;
+                    fVar7 = local_24->z;
+                    prVar28->x = (fVar1 - fVar2) * fVar14 + fVar5;
+                    fVar1 = prVar31->y;
+                    fVar8 = *local_3c;
+                    fVar2 = *local_38;
+                    fVar5 = *local_34;
+                    fVar9 = prVar33->y;
+                    fVar10 = prVar33->y;
+                    fVar11 = *local_3c;
+                    fVar12 = *local_38;
+                    fVar13 = *local_34;
+                    prVar19->z = (fVar7 - local_40->z) * fVar14 + local_40->z;
+                    prVar28->y = (fVar1 - fVar9) * fVar14 + fVar10;
+                    *local_10 = (fVar3 - fVar8) * fVar14 + fVar11;
+                    *local_2c = (fVar4 - fVar2) * fVar14 + fVar12;
+                    prVar19 = prVar19 + 1;
+                    *local_30 = (fVar6 - fVar5) * fVar14 + fVar13;
+                    prVar28 = prVar28 + 1;
+                    local_44 = local_44 + 1;
+                    local_10 = local_10 + 1;
+                    local_2c = local_2c + 1;
+                    local_30 = local_30 + 1;
+                    rdClip_faceStatus = rdClip_faceStatus | 0x10;
+                }
+                prVar18 = prVar19;
+                prVar32 = prVar28;
+                if (fVar15 <= local_24->x) {
+                    prVar18 = prVar19 + 1;
+                    prVar32 = prVar28 + 1;
+                    prVar19->x = local_24->x;
+                    prVar19->y = local_24->y;
+                    prVar19->z = local_24->z;
+                    prVar28->x = prVar31->x;
+                    prVar28->y = prVar31->y;
+                    *local_10 = *(float *)(iVar26 + (intptr_t)pfVar30);
+                    local_10 = local_10 + 1;
+                    *local_2c = *(float *)(iVar27 + (intptr_t)pfVar30);
+                    *local_30 = *pfVar30;
+                    local_44 = local_44 + 1;
+                    local_2c = local_2c + 1;
+                    local_30 = local_30 + 1;
+                }
+            }
+            local_3c = (float *)(iVar26 + (intptr_t)pfVar30);
+            local_38 = (float *)(iVar27 + (intptr_t)pfVar30);
+            local_18 = local_18 + -1;
+            pfVar34 = pfVar30 + 1;
+            prVar19 = prVar18;
+            prVar25 = prVar31 + 1;
+            prVar33 = prVar31;
+            prVar28 = prVar32;
+            local_40 = local_24;
+            local_34 = pfVar30;
+            local_24 = local_24 + 1;
+        } while (local_18 != 0);
+    }
+    local_c = (float *)local_44;
+    if (2 < (intptr_t)local_44) {
+        pDestVert = paVertices;
+        pSourceVert = workVerts;
+        pDestTVert = paUvs;
+        pSourceTVert = workTVerts;
+        pDestRedIVert = pR;
+        pSourceRedIVert = workRedIVerts;
+        pDestGreenIVert = pG;
+        pSourceGreenIVert = workGreenIVerts;
+        pDestBlueIVert = pB;
+        pSourceBlueIVert = workBlueIVerts;
+        local_44 = 0;
+        local_3c = pSourceRedIVert + ((intptr_t)local_c - 1);
+        local_38 = pSourceGreenIVert + ((intptr_t)local_c - 1);
+        if (0 < (intptr_t)local_c) {
+            local_14 = pB;
+            local_10 = pR;
+            iVar27 = (intptr_t)pSourceRedIVert - (intptr_t)pSourceBlueIVert;
+            iVar26 = (intptr_t)pSourceGreenIVert - (intptr_t)pSourceBlueIVert;
+            local_1c = pG;
+            prVar19 = paVertices;
+            pfVar34 = pSourceBlueIVert;
+            prVar25 = pSourceTVert + ((intptr_t)local_c - 1);
+            prVar18 = pSourceVert;
+            prVar33 = paUvs;
+            prVar28 = pSourceTVert;
+            local_40 = pSourceVert + ((intptr_t)local_c - 1);
+            local_34 = pSourceBlueIVert + ((intptr_t)local_c - 1);
+            do {
+                prVar20 = prVar18;
+                pfVar30 = pfVar34;
+                fVar14 = pFrustum->right * local_40->y;
+                fVar15 = pFrustum->right * prVar20->y;
+                if (((uint16_t)((uint16_t)(local_40->x < fVar14) << 8 | (uint16_t)(local_40->x == fVar14) << 0xe) != 0) || (prVar18 = prVar19, prVar31 = prVar33, (uint16_t)((uint16_t)(prVar20->x < fVar15) << 8 | (uint16_t)(prVar20->x == fVar15) << 0xe) != 0)) {
+                    if (((local_40->x != fVar14) && (prVar20->x != fVar15)) && (((uint16_t)((uint16_t)(local_40->x < fVar14) << 8 | (uint16_t)(local_40->x == fVar14) << 0xe) == 0 || ((uint16_t)((uint16_t)(prVar20->x < fVar15) << 8 | (uint16_t)(prVar20->x == fVar15) << 0xe) == 0)))) {
+                        fVar14 = prVar20->y - local_40->y;
+                        fVar1 = prVar20->x - local_40->x;
+                        fVar7 = pFrustum->right * fVar14 - fVar1;
+                        fVar8 = prVar20->y * local_40->x - local_40->y * prVar20->x;
+                        if (fVar7 != 0.0) {
+                            fVar8 = fVar8 / fVar7;
+                        }
+                        fVar7 = pFrustum->right * fVar8;
+                        fVar2 = fVar14;
+                        if (fVar14 < 0.0) {
+                            fVar2 = -fVar14;
+                        }
+                        fVar3 = fVar1;
+                        if (fVar1 < 0.0) {
+                            fVar3 = -fVar1;
+                        }
+                        if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                            fVar14 = (fVar8 - local_40->y) / fVar14;
+                        }
+                        else {
+                            fVar14 = (fVar7 - local_40->x) / fVar1;
+                        }
+                        fVar1 = prVar28->x;
+                        fVar2 = prVar25->x;
+                        fVar3 = *(float *)(iVar27 + (intptr_t)pfVar30);
+                        fVar4 = *(float *)(iVar26 + (intptr_t)pfVar30);
+                        fVar5 = prVar25->x;
+                        fVar6 = *pfVar30;
+                        prVar19->x = fVar7;
+                        prVar19->y = fVar8;
+                        fVar7 = prVar20->z;
+                        prVar33->x = (fVar1 - fVar2) * fVar14 + fVar5;
+                        fVar1 = prVar28->y;
+                        fVar8 = *local_3c;
+                        fVar2 = *local_38;
+                        fVar5 = *local_34;
+                        fVar9 = prVar25->y;
+                        fVar10 = prVar25->y;
+                        fVar11 = *local_3c;
+                        fVar12 = *local_38;
+                        fVar13 = *local_34;
+                        prVar19->z = (fVar7 - local_40->z) * fVar14 + local_40->z;
+                        prVar33->y = (fVar1 - fVar9) * fVar14 + fVar10;
+                        *local_10 = (fVar3 - fVar8) * fVar14 + fVar11;
+                        *local_1c = (fVar4 - fVar2) * fVar14 + fVar12;
+                        prVar19 = prVar19 + 1;
+                        *local_14 = (fVar6 - fVar5) * fVar14 + fVar13;
+                        prVar33 = prVar33 + 1;
+                        local_44 = local_44 + 1;
+                        local_10 = local_10 + 1;
+                        local_1c = local_1c + 1;
+                        local_14 = local_14 + 1;
+                        rdClip_faceStatus = rdClip_faceStatus | 0x20;
+                    }
+                    prVar18 = prVar19;
+                    prVar31 = prVar33;
+                    if ((uint16_t)((uint16_t)(prVar20->x < fVar15) << 8 | (uint16_t)(prVar20->x == fVar15) << 0xe) != 0) {
+                        prVar18 = prVar19 + 1;
+                        prVar31 = prVar33 + 1;
+                        prVar19->x = prVar20->x;
+                        prVar19->y = prVar20->y;
+                        prVar19->z = prVar20->z;
+                        prVar33->x = prVar28->x;
+                        prVar33->y = prVar28->y;
+                        *local_10 = *(float *)(iVar27 + (intptr_t)pfVar30);
+                        local_10 = local_10 + 1;
+                        *local_1c = *(float *)(iVar26 + (intptr_t)pfVar30);
+                        *local_14 = *pfVar30;
+                        local_44 = local_44 + 1;
+                        local_1c = local_1c + 1;
+                        local_14 = local_14 + 1;
+                    }
+                }
+                local_3c = (float *)(iVar27 + (intptr_t)pfVar30);
+                local_38 = (float *)(iVar26 + (intptr_t)pfVar30);
+                local_c = (float *)((intptr_t)local_c - 1);
+                prVar19 = prVar18;
+                pfVar34 = pfVar30 + 1;
+                prVar25 = prVar28;
+                prVar18 = prVar20 + 1;
+                prVar33 = prVar31;
+                prVar28 = prVar28 + 1;
+                local_40 = prVar20;
+                local_34 = pfVar30;
+            } while (local_c != (float *)0x0);
+        }
+        local_4 = local_44;
+        local_10 = pSourceRedIVert;
+        prVar25 = pSourceTVert;
+        local_1c = pSourceGreenIVert;
+        pfVar34 = pDestBlueIVert;
+        local_c = pSourceBlueIVert;
+        if ((intptr_t)local_44 < 3) {
+            return local_44;
+        }
+        pSourceTVert = pDestTVert;
+        pSourceRedIVert = pDestRedIVert;
+        pSourceGreenIVert = pDestGreenIVert;
+        pDestBlueIVert = pSourceBlueIVert;
+        pSourceBlueIVert = pfVar34;
+        local_44 = 0;
+        local_40 = pDestVert + (local_4 - 1);
+        local_3c = pDestRedIVert + (local_4 - 1);
+        local_38 = pDestGreenIVert + (local_4 - 1);
+        if ((intptr_t)local_4 < 1) {
+            local_8 = 0;
+            pDestRedIVert = local_10;
+            pDestGreenIVert = local_1c;
+            pDestTVert = prVar25;
+            prVar19 = pSourceVert;
+            pSourceVert = pDestVert;
+        }
+        else {
+            pfVar30 = &pDestVert->z;
+            iVar27 = (intptr_t)pDestRedIVert - (intptr_t)pfVar34;
+            iVar26 = (intptr_t)pDestGreenIVert - (intptr_t)pfVar34;
+            prVar18 = pSourceVert;
+            prVar33 = pDestTVert;
+            prVar28 = pDestTVert + (local_4 - 1);
+            pDestRedIVert = local_10;
+            pDestGreenIVert = local_1c;
+            pDestTVert = prVar25;
+            prVar19 = pSourceVert;
+            pSourceVert = pDestVert;
+            local_34 = pfVar34 + (local_4 - 1);
+            do {
+                pDestVert = prVar19;
+                prVar31 = prVar33;
+                pfVar23 = pfVar34;
+                fVar14 = pFrustum->nearTop * local_40->y;
+                fVar15 = pfVar30[-1] * pFrustum->nearTop;
+                if (((uint16_t)((uint16_t)(local_40->z < fVar14) << 8 | (uint16_t)(local_40->z == fVar14) << 0xe) != 0) || (prVar19 = prVar18, prVar32 = prVar25, (uint16_t)((uint16_t)(*pfVar30 < fVar15) << 8 | (uint16_t)(*pfVar30 == fVar15) << 0xe) != 0)) {
+                    if (((local_40->z != fVar14) && (*pfVar30 != fVar15)) && (((uint16_t)((uint16_t)(local_40->z < fVar14) << 8 | (uint16_t)(local_40->z == fVar14) << 0xe) == 0 || ((uint16_t)((uint16_t)(*pfVar30 < fVar15) << 8 | (uint16_t)(*pfVar30 == fVar15) << 0xe) == 0)))) {
+                        fVar14 = pfVar30[-1] - local_40->y;
+                        fVar1 = *pfVar30 - local_40->z;
+                        fVar7 = pFrustum->nearTop * fVar14 - fVar1;
+                        fVar8 = local_40->z * pfVar30[-1] - local_40->y * *pfVar30;
+                        if (fVar7 != 0.0) {
+                            fVar8 = fVar8 / fVar7;
+                        }
+                        fVar7 = pFrustum->nearTop * fVar8;
+                        fVar2 = fVar14;
+                        if (fVar14 < 0.0) {
+                            fVar2 = -fVar14;
+                        }
+                        fVar3 = fVar1;
+                        if (fVar1 < 0.0) {
+                            fVar3 = -fVar1;
+                        }
+                        if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                            fVar14 = (fVar8 - local_40->y) / fVar14;
+                        }
+                        else {
+                            fVar14 = (fVar7 - local_40->z) / fVar1;
+                        }
+                        fVar1 = ((rdVector3 *)(pfVar30 + -2))->x;
+                        fVar2 = local_40->x;
+                        fVar3 = *(float *)((intptr_t)pfVar23 + iVar27);
+                        fVar4 = *(float *)((intptr_t)pfVar23 + iVar26);
+                        fVar5 = *pfVar23;
+                        fVar6 = *local_3c;
+                        fVar9 = *local_38;
+                        prVar25->x = (prVar31->x - prVar28->x) * fVar14 + prVar28->x;
+                        fVar10 = prVar31->y;
+                        fVar11 = *local_34;
+                        fVar12 = prVar28->y;
+                        local_44 = local_44 + 1;
+                        prVar18->x = (fVar1 - fVar2) * fVar14 + local_40->x;
+                        prVar18->y = fVar8;
+                        fVar1 = prVar28->y;
+                        fVar8 = *local_3c;
+                        fVar2 = *local_38;
+                        fVar13 = *local_34;
+                        prVar18->z = fVar7;
+                        prVar25->y = (fVar10 - fVar12) * fVar14 + fVar1;
+                        *local_10 = (fVar3 - fVar6) * fVar14 + fVar8;
+                        local_10 = local_10 + 1;
+                        prVar18 = prVar18 + 1;
+                        *local_1c = (fVar4 - fVar9) * fVar14 + fVar2;
+                        prVar25 = prVar25 + 1;
+                        local_1c = local_1c + 1;
+                        *local_c = (fVar5 - fVar11) * fVar14 + fVar13;
+                        rdClip_faceStatus = rdClip_faceStatus | 4;
+                        local_c = local_c + 1;
+                    }
+                    prVar19 = prVar18;
+                    prVar32 = prVar25;
+                    if ((uint16_t)((uint16_t)(*pfVar30 < fVar15) << 8 | (uint16_t)(*pfVar30 == fVar15) << 0xe) != 0) {
+                        prVar19 = prVar18 + 1;
+                        prVar32 = prVar25 + 1;
+                        prVar18->x = ((rdVector3 *)(pfVar30 + -2))->x;
+                        prVar18->y = pfVar30[-1];
+                        prVar18->z = *pfVar30;
+                        prVar25->x = prVar31->x;
+                        prVar25->y = prVar31->y;
+                        *local_10 = *(float *)((intptr_t)pfVar23 + iVar27);
+                        local_10 = local_10 + 1;
+                        *local_1c = *(float *)((intptr_t)pfVar23 + iVar26);
+                        *local_c = *pfVar23;
+                        local_44 = local_44 + 1;
+                        local_1c = local_1c + 1;
+                        local_c = local_c + 1;
+                    }
+                }
+                local_40 = (rdVector3 *)(pfVar30 + -2);
+                local_3c = (float *)(iVar27 + (intptr_t)pfVar23);
+                local_38 = (float *)(iVar26 + (intptr_t)pfVar23);
+                pfVar30 = pfVar30 + 3;
+                local_4 = local_4 - 1;
+                prVar18 = prVar19;
+                pfVar34 = pfVar23 + 1;
+                prVar33 = prVar31 + 1;
+                prVar28 = prVar31;
+                local_8 = local_44;
+                prVar25 = prVar32;
+                prVar19 = pDestVert;
+                local_34 = pfVar23;
+            } while (local_4 != 0);
+        }
+        pDestVert = prVar19;
+        local_c = pSourceRedIVert;
+        prVar25 = pSourceTVert;
+        local_1c = pSourceGreenIVert;
+        pfVar34 = pDestBlueIVert;
+        local_10 = pSourceBlueIVert;
+        if ((intptr_t)local_8 < 3) {
+            return local_8;
+        }
+        local_44 = 0;
+        pSourceTVert = pDestTVert;
+        pSourceRedIVert = pDestRedIVert;
+        pSourceGreenIVert = pDestGreenIVert;
+        pDestBlueIVert = pSourceBlueIVert;
+        pSourceBlueIVert = pfVar34;
+        local_38 = pDestGreenIVert + (local_8 - 1);
+        local_40 = pDestVert + (local_8 - 1);
+        local_28 = pDestTVert + (local_8 - 1);
+        local_3c = pDestRedIVert + (local_8 - 1);
+        pfVar30 = local_c;
+        pfVar23 = local_1c;
+        prVar33 = prVar25;
+        prVar19 = pSourceVert;
+        prVar18 = pDestVert;
+        if (0 < (intptr_t)local_8) {
+            iVar26 = (intptr_t)pDestRedIVert - (intptr_t)pfVar34;
+            iVar27 = (intptr_t)pDestGreenIVert - (intptr_t)pfVar34;
+            pfVar21 = &pDestVert->z;
+            prVar20 = pSourceVert;
+            prVar28 = pDestTVert;
+            pfVar29 = local_c;
+            pDestRedIVert = local_c;
+            pDestGreenIVert = local_1c;
+            pDestTVert = prVar25;
+            prVar19 = pSourceVert;
+            pSourceVert = pDestVert;
+            local_34 = pfVar34 + (local_8 - 1);
+            do {
+                pDestVert = prVar19;
+                prVar31 = prVar28;
+                pfVar24 = pfVar34;
+                fVar14 = pFrustum->bottom * local_40->y;
+                fVar15 = pfVar21[-1] * pFrustum->bottom;
+                pfVar30 = pfVar29;
+                if ((fVar14 <= local_40->z) || (fVar15 <= *pfVar21)) {
+                    prVar19 = prVar20;
+                    prVar33 = prVar25;
+                    if (((local_40->z != fVar14) && (*pfVar21 != fVar15)) && ((local_40->z < fVar14 || (*pfVar21 < fVar15)))) {
+                        fVar14 = pfVar21[-1] - local_40->y;
+                        fVar1 = *pfVar21 - local_40->z;
+                        fVar7 = pFrustum->bottom * fVar14 - fVar1;
+                        fVar8 = local_40->z * pfVar21[-1] - local_40->y * *pfVar21;
+                        if (fVar7 != 0.0) {
+                            fVar8 = fVar8 / fVar7;
+                        }
+                        fVar7 = pFrustum->bottom * fVar8;
+                        fVar2 = fVar14;
+                        if (fVar14 < 0.0) {
+                            fVar2 = -fVar14;
+                        }
+                        fVar3 = fVar1;
+                        if (fVar1 < 0.0) {
+                            fVar3 = -fVar1;
+                        }
+                        if ((uint16_t)((uint16_t)(fVar2 < fVar3) << 8 | (uint16_t)(fVar2 == fVar3) << 0xe) == 0) {
+                            fVar14 = (fVar8 - local_40->y) / fVar14;
+                        }
+                        else {
+                            fVar14 = (fVar7 - local_40->z) / fVar1;
+                        }
+                        fVar1 = ((rdVector3 *)(pfVar21 + -2))->x;
+                        fVar2 = local_40->x;
+                        fVar3 = *(float *)((intptr_t)pfVar24 + iVar26);
+                        fVar4 = *(float *)((intptr_t)pfVar24 + iVar27);
+                        fVar5 = *pfVar24;
+                        fVar6 = *local_3c;
+                        fVar9 = *local_38;
+                        prVar25->x = (prVar31->x - local_28->x) * fVar14 + local_28->x;
+                        fVar10 = prVar31->y;
+                        fVar11 = *local_34;
+                        local_44 = local_44 + 1;
+                        fVar12 = local_28->y;
+                        prVar20->x = (fVar1 - fVar2) * fVar14 + local_40->x;
+                        prVar20->y = fVar8;
+                        fVar1 = local_28->y;
+                        fVar8 = *local_3c;
+                        fVar2 = *local_38;
+                        prVar19 = prVar20 + 1;
+                        prVar33 = prVar25 + 1;
+                        pfVar30 = pfVar29 + 1;
+                        fVar13 = *local_34;
+                        prVar20->z = fVar7;
+                        prVar25->y = (fVar10 - fVar12) * fVar14 + fVar1;
+                        *pfVar29 = (fVar3 - fVar6) * fVar14 + fVar8;
+                        *local_1c = (fVar4 - fVar9) * fVar14 + fVar2;
+                        *local_10 = (fVar5 - fVar11) * fVar14 + fVar13;
+                        local_1c = local_1c + 1;
+                        local_10 = local_10 + 1;
+                        rdClip_faceStatus = rdClip_faceStatus | 8;
+                        local_c = pfVar30;
+                    }
+                    prVar20 = prVar19;
+                    prVar25 = prVar33;
+                    if (fVar15 <= *pfVar21) {
+                        prVar20 = prVar19 + 1;
+                        prVar25 = prVar33 + 1;
+                        prVar19->x = ((rdVector3 *)(pfVar21 + -2))->x;
+                        prVar19->y = pfVar21[-1];
+                        pfVar30 = local_c + 1;
+                        prVar19->z = *pfVar21;
+                        prVar33->x = prVar31->x;
+                        prVar33->y = prVar31->y;
+                        *local_c = *(float *)((intptr_t)pfVar24 + iVar26);
+                        *local_1c = *(float *)((intptr_t)pfVar24 + iVar27);
+                        *local_10 = *pfVar24;
+                        local_44 = local_44 + 1;
+                        local_1c = local_1c + 1;
+                        local_10 = local_10 + 1;
+                        local_c = pfVar30;
+                    }
+                }
+                local_40 = (rdVector3 *)(pfVar21 + -2);
+                local_3c = (float *)(iVar26 + (intptr_t)pfVar24);
+                local_38 = (float *)(iVar27 + (intptr_t)pfVar24);
+                pfVar21 = pfVar21 + 3;
+                local_8 = local_8 - 1;
+                pfVar34 = pfVar24 + 1;
+                prVar28 = prVar31 + 1;
+                pfVar29 = pfVar30;
+                pfVar30 = pDestRedIVert;
+                pfVar23 = pDestGreenIVert;
+                prVar33 = pDestTVert;
+                prVar19 = pDestVert;
+                prVar18 = pSourceVert;
+                local_34 = pfVar24;
+                local_28 = prVar31;
+            } while (local_8 != 0);
+        }
+        pSourceVert = prVar18;
+        pDestVert = prVar19;
+        pDestTVert = prVar33;
+        pDestGreenIVert = pfVar23;
+        pDestRedIVert = pfVar30;
+        numVertices = local_44;
+        prVar18 = pSourceVert;
+        prVar19 = pDestVert;
+        prVar33 = pDestTVert;
+        pfVar23 = pDestGreenIVert;
+        local_10 = pSourceRedIVert;
+        prVar25 = pSourceTVert;
+        local_1c = pSourceGreenIVert;
+        pfVar30 = pDestBlueIVert;
+        pfVar34 = pDestRedIVert;
+        local_c = pSourceBlueIVert;
+        if (2 < (intptr_t)local_44) {
+            pDestVert = pSourceVert;
+            pSourceVert = prVar19;
+            pDestTVert = pSourceTVert;
+            pSourceTVert = prVar33;
+            local_44 = 0;
+            pDestRedIVert = pSourceRedIVert;
+            pSourceRedIVert = pfVar34;
+            local_3c = pfVar34 + (numVertices - 1);
+            pDestGreenIVert = pSourceGreenIVert;
+            pSourceGreenIVert = pfVar23;
+            local_38 = pfVar23 + (numVertices - 1);
+            pDestBlueIVert = pSourceBlueIVert;
+            pSourceBlueIVert = pfVar30;
+            prVar20 = prVar19 + (numVertices - 1);
+            if (0 < numVertices) {
+                pfVar21 = &prVar19->y;
+                iVar26 = (intptr_t)pfVar34 - (intptr_t)pfVar30;
+                iVar27 = (intptr_t)pfVar23 - (intptr_t)pfVar30;
+                local_34 = pfVar30 + (numVertices - 1);
+                local_28 = prVar33 + (numVertices - 1);
+                do {
+                    prVar28 = prVar33;
+                    pfVar34 = pfVar30;
+                    if (((pFrustum->field_0).y <= prVar20->y) || ((pFrustum->field_0).y <= *pfVar21)) {
+                        prVar19 = prVar18;
+                        prVar33 = prVar25;
+                        if (((prVar20->y != (pFrustum->field_0).y) && (*pfVar21 != (pFrustum->field_0).y)) && ((prVar20->y < (pFrustum->field_0).y || (*pfVar21 < (pFrustum->field_0).y)))) {
+                            fVar13 = ((pFrustum->field_0).y - prVar20->y) / (*pfVar21 - prVar20->y);
+                            prVar18->y = (pFrustum->field_0).y;
+                            local_44 = local_44 + 1;
+                            fVar14 = prVar28->x;
+                            fVar15 = local_28->x;
+                            fVar1 = local_28->x;
+                            fVar7 = *(float *)((intptr_t)pfVar34 + iVar26);
+                            fVar8 = *(float *)((intptr_t)pfVar34 + iVar27);
+                            fVar2 = *pfVar34;
+                            prVar18->z = (pfVar21[1] - prVar20->z) * fVar13 + prVar20->z;
+                            fVar3 = ((rdVector3 *)(pfVar21 + -1))->x;
+                            fVar4 = prVar20->x;
+                            fVar5 = *local_3c;
+                            fVar6 = *local_38;
+                            fVar9 = *local_34;
+                            prVar25->x = (fVar14 - fVar15) * fVar13 + fVar1;
+                            fVar14 = prVar28->y;
+                            fVar15 = local_28->y;
+                            fVar1 = local_28->y;
+                            prVar19 = prVar18 + 1;
+                            prVar33 = prVar25 + 1;
+                            fVar10 = *local_3c;
+                            fVar11 = *local_38;
+                            fVar12 = *local_34;
+                            prVar18->x = (fVar3 - fVar4) * fVar13 + prVar20->x;
+                            prVar25->y = (fVar14 - fVar15) * fVar13 + fVar1;
+                            *local_10 = (fVar7 - fVar5) * fVar13 + fVar10;
+                            local_10 = local_10 + 1;
+                            *local_1c = (fVar8 - fVar6) * fVar13 + fVar11;
+                            *local_c = (fVar2 - fVar9) * fVar13 + fVar12;
+                            local_1c = local_1c + 1;
+                            local_c = local_c + 1;
+                            rdClip_faceStatus = rdClip_faceStatus | 1;
+                        }
+                        prVar18 = prVar19;
+                        prVar25 = prVar33;
+                        if ((pFrustum->field_0).y <= *pfVar21) {
+                            prVar18 = prVar19 + 1;
+                            prVar25 = prVar33 + 1;
+                            prVar19->x = ((rdVector3 *)(pfVar21 + -1))->x;
+                            prVar19->y = *pfVar21;
+                            prVar19->z = pfVar21[1];
+                            prVar33->x = prVar28->x;
+                            prVar33->y = prVar28->y;
+                            *local_10 = *(float *)((intptr_t)pfVar34 + iVar26);
+                            *local_1c = *(float *)((intptr_t)pfVar34 + iVar27);
+                            *local_c = *pfVar34;
+                            local_44 = local_44 + 1;
+                            local_10 = local_10 + 1;
+                            local_1c = local_1c + 1;
+                            local_c = local_c + 1;
+                        }
+                    }
+                    prVar20 = (rdVector3 *)(pfVar21 + -1);
+                    local_3c = (float *)(iVar26 + (intptr_t)pfVar34);
+                    local_38 = (float *)(iVar27 + (intptr_t)pfVar34);
+                    pfVar21 = pfVar21 + 3;
+                    numVertices = numVertices - 1;
+                    pfVar30 = pfVar34 + 1;
+                    prVar33 = prVar28 + 1;
+                    local_34 = pfVar34;
+                    local_28 = prVar28;
+                } while (numVertices != 0);
+            }
+            numVertices = local_44;
+            prVar18 = pSourceVert;
+            prVar19 = pDestVert;
+            prVar33 = pDestTVert;
+            pfVar23 = pDestGreenIVert;
+            local_10 = pSourceRedIVert;
+            prVar25 = pSourceTVert;
+            local_14 = pSourceGreenIVert;
+            pfVar30 = pDestBlueIVert;
+            pfVar34 = pDestRedIVert;
+            local_c = pSourceBlueIVert;
+            if ((intptr_t)local_44 < 3) {
+                rdClip_faceStatus = rdClip_faceStatus | 0x40;
+                return local_44;
+            }
+            if ((pFrustum->field_0).x != 0.0) {
+                pDestVert = pSourceVert;
+                pSourceVert = prVar19;
+                pDestTVert = pSourceTVert;
+                pSourceTVert = prVar33;
+                pDestRedIVert = pSourceRedIVert;
+                pSourceRedIVert = pfVar34;
+                pDestGreenIVert = pSourceGreenIVert;
+                pSourceGreenIVert = pfVar23;
+                pDestBlueIVert = pSourceBlueIVert;
+                pSourceBlueIVert = pfVar30;
+                local_3c = pfVar34 + (local_44 - 1);
+                local_38 = pfVar23 + (local_44 - 1);
+                prVar20 = prVar19 + (local_44 - 1);
+                iVar26 = local_44 - 1;
+                iVar27 = local_44 - 1;
+                local_44 = 0;
+                if (0 < numVertices) {
+                    pfVar21 = &prVar19->y;
+                    iVar16 = (intptr_t)pfVar34 - (intptr_t)pfVar30;
+                    iVar17 = (intptr_t)pfVar23 - (intptr_t)pfVar30;
+                    local_34 = pfVar30 + iVar27;
+                    local_28 = prVar33 + iVar26;
+                    do {
+                        prVar28 = prVar33;
+                        pfVar34 = pfVar30;
+                        fVar14 = (pFrustum->field_0).z;
+                        if (((uint16_t)((uint16_t)(prVar20->y < fVar14) << 8 | (uint16_t)(prVar20->y == fVar14) << 0xe) != 0) || (fVar14 = (pFrustum->field_0).z, (uint16_t)((uint16_t)(*pfVar21 < fVar14) << 8 | (uint16_t)(*pfVar21 == fVar14) << 0xe) != 0)) {
+                            prVar19 = prVar18;
+                            prVar33 = prVar25;
+                            if (((prVar20->y != (pFrustum->field_0).z) && (*pfVar21 != (pFrustum->field_0).z)) && ((fVar14 = (pFrustum->field_0).z, (uint16_t)((uint16_t)(prVar20->y < fVar14) << 8 | (uint16_t)(prVar20->y == fVar14) << 0xe) == 0 || (fVar14 = (pFrustum->field_0).z, (uint16_t)((uint16_t)(*pfVar21 < fVar14) << 8 | (uint16_t)(*pfVar21 == fVar14) << 0xe) == 0)))) {
+                                fVar13 = ((pFrustum->field_0).z - prVar20->y) / (*pfVar21 - prVar20->y);
+                                prVar18->y = (pFrustum->field_0).z;
+                                local_44 = local_44 + 1;
+                                fVar14 = prVar28->x;
+                                fVar15 = local_28->x;
+                                fVar1 = local_28->x;
+                                fVar7 = *(float *)((intptr_t)pfVar34 + iVar16);
+                                fVar8 = *(float *)((intptr_t)pfVar34 + iVar17);
+                                prVar18->z = (pfVar21[1] - prVar20->z) * fVar13 + prVar20->z;
+                                fVar2 = ((rdVector3 *)(pfVar21 + -1))->x;
+                                fVar3 = prVar20->x;
+                                prVar25->x = (fVar14 - fVar15) * fVar13 + fVar1;
+                                fVar14 = prVar28->y;
+                                fVar15 = local_28->y;
+                                fVar1 = *local_3c;
+                                fVar4 = *pfVar34;
+                                fVar5 = *local_38;
+                                fVar6 = *local_34;
+                                prVar19 = prVar18 + 1;
+                                prVar33 = prVar25 + 1;
+                                fVar9 = local_28->y;
+                                fVar10 = *local_3c;
+                                fVar11 = *local_38;
+                                fVar12 = *local_34;
+                                prVar18->x = (fVar2 - fVar3) * fVar13 + prVar20->x;
+                                prVar25->y = (fVar14 - fVar15) * fVar13 + fVar9;
+                                *local_10 = (fVar7 - fVar1) * fVar13 + fVar10;
+                                local_10 = local_10 + 1;
+                                *local_14 = (fVar8 - fVar5) * fVar13 + fVar11;
+                                local_14 = local_14 + 1;
+                                *local_c = (fVar4 - fVar6) * fVar13 + fVar12;
+                                local_c = local_c + 1;
+                                rdClip_faceStatus = rdClip_faceStatus | 2;
+                            }
+                            fVar14 = (pFrustum->field_0).z;
+                            prVar18 = prVar19;
+                            prVar25 = prVar33;
+                            if ((uint16_t)((uint16_t)(*pfVar21 < fVar14) << 8 | (uint16_t)(*pfVar21 == fVar14) << 0xe) != 0) {
+                                prVar18 = prVar19 + 1;
+                                prVar25 = prVar33 + 1;
+                                prVar19->x = ((rdVector3 *)(pfVar21 + -1))->x;
+                                prVar19->y = *pfVar21;
+                                prVar19->z = pfVar21[1];
+                                prVar33->x = prVar28->x;
+                                prVar33->y = prVar28->y;
+                                *local_10 = *(float *)((intptr_t)pfVar34 + iVar16);
+                                *local_14 = *(float *)((intptr_t)pfVar34 + iVar17);
+                                *local_c = *pfVar34;
+                                local_44 = local_44 + 1;
+                                local_10 = local_10 + 1;
+                                local_14 = local_14 + 1;
+                                local_c = local_c + 1;
+                            }
+                        }
+                        prVar20 = (rdVector3 *)(pfVar21 + -1);
+                        local_3c = (float *)(iVar16 + (intptr_t)pfVar34);
+                        local_38 = (float *)(iVar17 + (intptr_t)pfVar34);
+                        pfVar21 = pfVar21 + 3;
+                        numVertices = numVertices - 1;
+                        pfVar30 = pfVar34 + 1;
+                        prVar33 = prVar28 + 1;
+                        local_34 = pfVar34;
+                        local_28 = prVar28;
+                    } while (numVertices != 0);
+                }
+                if ((intptr_t)local_44 < 3) {
+                    return local_44;
+                }
+            }
+            if (pDestVert != paVertices) {
+                memcpy(paVertices, pDestVert, local_44 * sizeof(rdVector3));
+                memcpy(paUvs, pDestTVert, local_44 * sizeof(rdVector2));
+                memcpy(pR, pDestRedIVert, local_44 * sizeof(float));
+                memcpy(pG, pDestGreenIVert, local_44 * sizeof(float));
+                memcpy(pB, pDestBlueIVert, local_44 * sizeof(float));
+                
+                return local_44;
+            }
+        }
+    }
+    return local_44;
 }

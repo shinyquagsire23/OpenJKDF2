@@ -618,6 +618,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     if ( !sithNet_isMulti || (player->thingflags & SITH_TF_INVULN) == 0 )
     {
         v4 = player->templateBase;
+        player->actorParams.msUnderwater = 0; // MOTS added
         player->actorParams.health = v4->actorParams.health;
         if ( (v4->physicsParams.physflags & SITH_PF_800) != 0 )
         {

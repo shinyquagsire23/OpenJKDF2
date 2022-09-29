@@ -13,6 +13,7 @@
 extern int Main_bDedicatedServer;
 extern int Main_bHeadless;
 extern int Main_bVerboseNetworking;
+extern int Main_bMotsCompat;
 #endif
 
 int Main_Startup(const char *cmdline);

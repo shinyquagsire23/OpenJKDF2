@@ -49,6 +49,7 @@ void rdSetOcclusionMethod(int a1);
 void rdSetZBufferMethod(int a1);
 void rdSetCullFlags(int a1);
 void rdSetProcFaceUserData(int a1);
+void rdSetVertexColorMode(int a1);
 
 int rdGetRenderOptions(void);
 int rdGetGeometryMode(void);
@@ -59,6 +60,7 @@ int rdGetOcclusionMethod(void);
 int rdGetZBufferMethod(void);
 int rdGetCullFlags(void);
 int rdGetProcFaceUserData(void);
+int rdGetVertexColorMode(void);
 
 int rdSetMipDistances(rdVector4 *dists);
 int rdSetColorEffects(stdPalEffect *effects);

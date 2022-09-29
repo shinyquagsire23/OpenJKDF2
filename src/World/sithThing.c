@@ -666,6 +666,7 @@ void sithThing_sub_4CD100(sithThing *thing)
     }
 }
 
+// MOTS altered
 int sithThing_DoesRdThingInit(sithThing *thing)
 {
 
@@ -678,7 +679,10 @@ int sithThing_DoesRdThingInit(sithThing *thing)
     int out = rdThing_NewEntry(&thing->rdthing, thing);
     thing->thingIdx = idx;
     thing->signature = sig;
-    // MOTS added: Set something -1
+
+#ifdef JKM_LIGHTING
+    thing->archlightIdx = -1; // MOTS added
+#endif
 
     return out;
 }
@@ -813,8 +817,15 @@ void sithThing_EnterWater(sithThing *thing, int a2)
             if ( v6 )
                 sithCog_SendMessage(v6, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, thing->thingIdx, 0, 1, 0);
         }
-        if ( thing->moveType == SITH_MT_PHYSICS )
-            thing->physicsParams.vel.z = thing->physicsParams.vel.z * 0.25;
+        if ( thing->moveType == SITH_MT_PHYSICS ) {
+            // MOTS added: wtf??
+            //int tmp;
+            //if (tmp = thing->physicsParams.physflags | SITH_PF_800000, 
+            //    thing->physicsParams.physflags = tmp, 
+            //    tmp == 0) {
+                thing->physicsParams.vel.z *= 0.25;
+            //}
+        }
     }
 }
 

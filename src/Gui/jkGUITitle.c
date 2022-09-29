@@ -17,7 +17,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 
-static wchar_t jkGuiTitle_versionBuffer[32];
+static wchar_t jkGuiTitle_versionBuffer[64];
 static float jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[5] = {
@@ -239,7 +239,7 @@ void jkGuiTitle_ShowLoadingStatic()
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
     guiVersionStr = jkStrings_GetText("GUI_VERSION");
-    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer), guiVersionStr, verMajor, verMinor, verRevision);
+    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);

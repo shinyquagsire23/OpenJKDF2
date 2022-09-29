@@ -224,9 +224,11 @@ int sithSurface_Load(sithWorld *world)
         if ( !face->vertexPosIdx )
             return 0;
 
+#ifndef JKM_LIGHTING
         surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35);
         if ( !surfaceInfo->intensities )
             return 0;
+#endif
 
         if (face->material && (face->material->tex_type & 2))
         {
@@ -253,10 +255,52 @@ int sithSurface_Load(sithWorld *world)
             }
         }
 
+#ifndef JKM_LIGHTING
         for (int v45 = 0; v45 < v35; v45++)
         {
             surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
         }
+#else
+        int testAmt = 0;
+        for (int v45 = 0; v45 < v35; v45++)
+        {
+            if (v61+(v45*4)+3 >= stdConffile_entry.numArgs) break; // Added
+
+            float test1 = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
+            float test2 = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
+            float test3 = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
+            float test4 = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
+
+            if (test1 != test2 || (test1 != test3)) break;
+
+            testAmt += 1;
+        }
+
+        if (testAmt != v35) {
+            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35);
+            if ( !surfaceInfo->intensities )
+                return 0;
+            for (int v45 = 0; v45 < v35; v45++)
+            {
+                surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
+            }
+            surfaceIter->surfaceFlags &= ~SITH_SURFACE_1000000;
+        }
+        else {
+            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35 * 4);
+            if ( !surfaceInfo->intensities )
+                return 0;
+
+            surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
+            for (int v45 = 0; v45 < v35; v45++)
+            {
+                surfaceInfo->intensities[(v45*4)+0] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
+                surfaceInfo->intensities[(v45*4)+1] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
+                surfaceInfo->intensities[(v45*4)+2] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
+                surfaceInfo->intensities[(v45*4)+3] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
+            }
+        }
+#endif
         face->numVertices = v35;
         face->num = v67;
     }

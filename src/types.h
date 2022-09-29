@@ -796,6 +796,13 @@ typedef struct sithCamera
     rdVector3 vec3_1;
     rdVector3 vec3_2;
     rdCamera rdCam;
+#ifdef JKM_TYPES
+    float unk1;
+    float unk2;
+    float unk3;
+    float unk4;
+    float unk5;
+#endif
 } sithCamera;
 #pragma pack(pop)
 
@@ -1977,7 +1984,7 @@ typedef struct jkResFile
 
 // end jkRes
 
-#ifdef JKM_TYPES
+#ifdef JKM_LIGHTING
 typedef struct sithArchLightMesh
 {
     float* aMono;
@@ -2072,7 +2079,7 @@ typedef struct sithWorld
     int numAnimClassesLoaded;
     int numAnimClasses;
     sithAnimclass* animclasses;
-#ifdef JKM_TYPES
+#ifdef JKM_LIGHTING
     int numArchLights;
     //int sizeArchLights;
     sithArchLight* aArchlights;
@@ -2601,13 +2608,16 @@ typedef struct sithThingActorParams
     uint32_t field_1C4;
     uint32_t field_1C8;
     uint32_t field_1CC;
+#ifdef JKM_TYPES
+    uint32_t unk_1D0;
+#endif
 } sithThingActorParams;
 
 typedef struct sithThingPhysParams
 {
     uint32_t physflags;
 #ifdef JKM_TYPES
-    uint32_t unk_4;
+    //uint32_t unk_4;
 #endif
     rdVector3 vel;
     rdVector3 angVel;
@@ -2670,7 +2680,7 @@ typedef struct sithThing
     float moveSize;
     float collideSize;
 #ifdef JKM_TYPES
-    uint32_t unk;
+    uint32_t unk2;
 #endif // JKM_TYPES
     uint32_t attach_flags;
     rdVector3 field_38;
@@ -2746,7 +2756,10 @@ typedef struct sithThing
     float userdata;
 #ifdef JKM_TYPES
     int idk1;
-    int idk2;
+#endif
+
+#ifdef JKM_LIGHTING
+    int archlightIdx;
 #endif
 } sithThing;
 
@@ -2895,7 +2908,11 @@ typedef struct stdConffileArg
 typedef struct stdConffileEntry
 {
     int numArgs;
+#ifdef JKM_LIGHTING
+    stdConffileArg args[256];
+#else
     stdConffileArg args[128];
+#endif
 } stdConffileEntry;
 
 typedef struct stdMemoryAlloc stdMemoryAlloc;

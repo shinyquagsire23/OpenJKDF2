@@ -92,6 +92,7 @@ static HostServices hs;
 int Main_bDedicatedServer = 0;
 int Main_bHeadless = 0;
 int Main_bVerboseNetworking = 0;
+int Main_bMotsCompat = 0;
 #endif
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
@@ -751,6 +752,10 @@ void Main_CheckRequiredAssets(int doInstall)
         }
     }
 
+    // TODO check MoTS files
+    if (Main_bMotsCompat)
+        missingRequireds = false;
+
     if (!missingRequireds) return;
 
     bigList = malloc(bigList_len);
@@ -1326,6 +1331,10 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(v1, "-verboseNetworking") || !__strcmpi(v1, "/verboseNetworking") )
         {
             Main_bVerboseNetworking = 1;
+        }
+        else if (!__strcmpi(v1, "-motsCompat") || !__strcmpi(v1, "/motsCompat"))
+        {
+            Main_bMotsCompat = 1;
         }
 #endif
         else
