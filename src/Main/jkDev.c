@@ -14,6 +14,7 @@
 #include "World/sithActor.h"
 #include "Main/sithCommand.h"
 #include "Dss/sithMulti.h"
+#include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
 #include "stdPlatform.h"
@@ -553,6 +554,33 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_BATTERY, 100.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
+
+        if (Main_bMotsCompat) {
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_FISTS, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_BRYARPISTOL, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_RIFLE, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_THERMAL_DETONATOR, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_PARA_EWEB, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_REPEATER, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_RAIL_DETONATOR, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_SEQUENCER_CHARGE, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_CONCUSSION_RIFLE, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_EWEB, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_LIGHTSABER, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_BLASTECH, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_SCOPE, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_FLASH_BOMB, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_TUSKEN_PROD, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_PARA_REPEATER, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_RAIL_SEEKER, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_MANUAL_SEQUENCER, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_PARA_CONCUSSION, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_CARBO_GUN, 1.0);
+
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_CARBPELLETS, 20.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_SEEKRAILS, 30.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_EWEB_ROUNDS, 800.0);
+        }
 
         sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLWEAPONS"));
     }

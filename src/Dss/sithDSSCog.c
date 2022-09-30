@@ -5,6 +5,7 @@
 #include "Dss/sithMulti.h"
 #include "World/sithThing.h"
 #include "Devices/sithComm.h"
+#include "Main/Main.h"
 
 int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float param0, float param1, float param2, float param3, int a11)
 {
@@ -156,6 +157,10 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
                 NETMSG_PUSHF32(sym->val.dataAsFloat[1]);
                 NETMSG_PUSHF32(sym->val.dataAsFloat[2]);
             }
+            else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            {
+
+            }
             else
             {
                 NETMSG_PUSHS32((uint32_t)sym->val.data[0]); // TODO ??? this is a pointer?
@@ -223,6 +228,10 @@ int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
                 sym->val.dataAsFloat[0] = NETMSG_POPF32();
                 sym->val.dataAsFloat[1] = NETMSG_POPF32();
                 sym->val.dataAsFloat[2] = NETMSG_POPF32();
+            }
+            else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            {
+                
             }
             else
             {

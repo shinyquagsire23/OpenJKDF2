@@ -61,6 +61,7 @@ int sithSector_GetNumPlayers(sithSector *sector);
 sithSector* sithSector_GetPtrFromIdx(int idx);
 void sithSector_SyncSector(sithSector *pSector, int a2);
 void sithSector_Sync();
+sithSector* sithSector_sub_4F8D00(sithWorld *pWorld, rdVector3 *pos);
 
 //static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(sithThing *thing, float deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;

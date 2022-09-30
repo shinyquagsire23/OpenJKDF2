@@ -926,7 +926,6 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     int v11; // eax
     int v12; // eax
     sithItemDescriptor *v13; // ebp
-    sithCog *v14; // eax
     int v15; // esi
     int v18; // [esp-18h] [ebp-28h]
     int playera; // [esp+14h] [ebp+4h]
@@ -959,10 +958,9 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     }
 
     v13 = sithInventory_GetBinByIdx(v4);
-    v14 = v13->cog;
-    if ( v14 )
+    if ( v13 && v13->cog ) // Added: v13 nullptr check
     {
-        sithCog_SendMessage(v14, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->thingIdx, 0);
+        sithCog_SendMessage(v13->cog, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->thingIdx, 0);
         for (int i = 0; i < 2; i++)
         {
             if (sithWeapon_8BD0A0[i] != -1.0 ) {

@@ -931,7 +931,7 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
     wchar_t *a2a; // [esp+0h] [ebp-1A8h]
     wchar_t *a2b; // [esp+0h] [ebp-1A8h]
     float a2d; // [esp+0h] [ebp-1A8h]
-    char v15[16]; // [esp+18h] [ebp-190h] BYREF
+    char v15[32]; // [esp+18h] [ebp-190h] BYREF
     char v16[128]; // [esp+28h] [ebp-180h] BYREF
     char v17[128]; // [esp+A8h] [ebp-100h] BYREF
     char v18[128]; // [esp+128h] [ebp-80h] BYREF

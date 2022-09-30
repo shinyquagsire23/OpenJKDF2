@@ -30,6 +30,9 @@ int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4,
 
 void sithItem_New(sithThing *out)
 {
+#ifdef JKM_PARAMS
+    out->itemParams.respawnFactor = 0.9;
+#endif
     rdVector_Copy3(&out->itemParams.position, &out->position);
     out->itemParams.sector = out->sector;
 }

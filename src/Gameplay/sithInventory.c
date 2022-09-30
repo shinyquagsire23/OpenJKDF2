@@ -11,6 +11,7 @@
 #include "Devices/sithControl.h"
 #include "World/jkPlayer.h"
 #include "Dss/sithDSSThing.h"
+#include "Main/Main.h"
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
 {
@@ -139,8 +140,9 @@ int sithInventory_SelectWeaponFollowing(int idx)
     {
         if ( sithInventory_aDescriptors[i].flags & ITEMINFO_WEAPON )
         {
-            if ( count == idx )
+            if ( count == idx ) {
                 return i;
+            }
             ++count;
         }
     }
@@ -150,6 +152,12 @@ int sithInventory_SelectWeaponFollowing(int idx)
 
 sithItemDescriptor* sithInventory_GetBinByIdx(int idx)
 {
+    // Added: bounds
+    if (idx < 0)
+        return &sithInventory_aDescriptors[0];
+    if (idx >= SITHBIN_NUMBINS)
+        return &sithInventory_aDescriptors[0];
+
     return &sithInventory_aDescriptors[idx];
 }
 
@@ -661,6 +669,20 @@ LABEL_16:
         sithInventory_SetAvailable(player, SITHBIN_F_DESTRUCTION, 1);
         sithInventory_SetAvailable(player, SITHBIN_F_DEADLYSIGHT, 1);
         sithInventory_SetAvailable(player, SITHBIN_F_PROTECTION, 1);
+
+        if (Main_bMotsCompat) {
+            sithInventory_SetBinAmount(player, SITHBIN_F_FARSIGHT, 4.0);
+            sithInventory_SetBinAmount(player, SITHBIN_F_PROJECT, 4.0);
+            sithInventory_SetBinAmount(player, SITHBIN_F_SABERTHROW, 4.0);
+            sithInventory_SetBinAmount(player, SITHBIN_F_PUSH, 4.0);
+            sithInventory_SetBinAmount(player, SITHBIN_F_CHAINLIGHT, 4.0);
+
+            sithInventory_SetAvailable(player, SITHBIN_F_FARSIGHT, 1);
+            sithInventory_SetAvailable(player, SITHBIN_F_PROJECT, 1);
+            sithInventory_SetAvailable(player, SITHBIN_F_SABERTHROW, 1);
+            sithInventory_SetAvailable(player, SITHBIN_F_PUSH, 1);
+            sithInventory_SetAvailable(player, SITHBIN_F_CHAINLIGHT, 1);
+        }
 
         jkPlayer_SetAccessiblePowers(7);
         //jkSaber_InitializeSaberInfo(player, "sabergreen1.mat", "sabergreen0.mat", 0.003, 0.001, 0.100, );

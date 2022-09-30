@@ -291,3 +291,33 @@ void sithSector_Sync()
     }
     sithSector_numSync = 0;
 }
+
+sithSector* sithSector_sub_4F8D00(sithWorld *pWorld, rdVector3 *pos)
+{
+    int v2; // ebx
+    unsigned int v3; // ebp
+    sithSector *v4; // esi
+    int v7; // eax
+
+    v2 = 0;
+    v3 = pWorld->numSectors;
+    v4 = pWorld->sectors;
+    if ( !v3 )
+        return 0;
+    while ( 1 )
+    {
+        if ( pos->x >= (double)v4->boundingbox_onecorner.x
+          && pos->x <= (double)v4->boundingbox_othercorner.x
+          && v4->boundingbox_onecorner.y <= (double)pos->y
+          && v4->boundingbox_othercorner.y >= (double)pos->y )
+        {
+            v7 = v4->boundingbox_onecorner.z <= (double)pos->z && v4->boundingbox_othercorner.z >= (double)pos->z;
+            if ( v7 && sithIntersect_IsSphereInSector(pos, 0.0, v4) )
+                break;
+        }
+        ++v4;
+        if ( ++v2 >= v3 )
+            return 0;
+    }
+    return v4;
+}
