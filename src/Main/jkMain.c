@@ -779,6 +779,10 @@ void jkMain_UnkTick(int a1)
     {
         pHS->free(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
+
+        // Added: prevent UAF
+        jkMain_pEpisodeEnt = NULL;
+        jkMain_pEpisodeEnt2 = NULL;
     }
     jkEpisode_Load(&jkEpisode_mLoad);
 
@@ -820,6 +824,10 @@ int jkMain_LoadFile(char *a1)
         {
             pHS->free(jkEpisode_mLoad.paEntries);
             jkEpisode_mLoad.paEntries = 0;
+
+            // Added: prevent UAF
+            jkMain_pEpisodeEnt = NULL;
+            jkMain_pEpisodeEnt2 = NULL;
         }
         if ( jkEpisode_Load(&jkEpisode_mLoad) )
         {
@@ -847,6 +855,10 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     {
         pHS->free(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
+
+        // Added: prevent UAF
+        jkMain_pEpisodeEnt = NULL;
+        jkMain_pEpisodeEnt2 = NULL;
     }
     v2 = jkEpisode_Load(&jkEpisode_mLoad);
     jkEpisode_idk4(&jkEpisode_mLoad, pEpisodeName);

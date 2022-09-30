@@ -29,6 +29,10 @@ void jkSmack_Shutdown()
     {
         pHS->free(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
+
+        // Added: prevent UAF
+        jkMain_pEpisodeEnt = NULL;
+        jkMain_pEpisodeEnt2 = NULL;
     }
 }
 

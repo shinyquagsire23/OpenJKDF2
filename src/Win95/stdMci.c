@@ -202,6 +202,7 @@ Mix_Music* stdMci_music;
 int stdMci_Startup()
 {
     stdMci_uDeviceID = 0;
+    stdMci_music = NULL;
 
     stdMci_bInitted = 1;
     
