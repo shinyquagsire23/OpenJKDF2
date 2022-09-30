@@ -1440,7 +1440,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
 
     // MOTS added: RGB
-    if ((rdroid_curVertexColorMode == 0) || (lightingMode = procEntry->lightingMode, lightingMode == 2)) {
+    if ((rdroid_curVertexColorMode == 0) || (procEntry->lightingMode == 2)) {
         if ( meshFrustrumCull )
             rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
         else
@@ -1511,7 +1511,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
             }
             goto LABEL_44;
         }
-        if ( procEntry->lightingMode != 3 )
+        if ( (rdroid_curVertexColorMode != 0) || procEntry->lightingMode != 3 )
             goto LABEL_44;
 
         for (int i = 1; i < vertexDst.numVertices; i++ )

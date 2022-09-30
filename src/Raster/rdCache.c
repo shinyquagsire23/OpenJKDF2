@@ -190,7 +190,6 @@ int rdCache_SendFaceListToHardware()
     double v36; // st7
     double d3dvtx_zval; // st7
     double v38; // st6
-    int v39; // eax
     double light_level; // st7
     int vertex_g; // ebx
     int vertex_r; // edi
@@ -579,7 +578,6 @@ int rdCache_SendFaceListToHardware()
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
-                v39 = lighting_capability;
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
                 if ( lighting_capability == 0 )
@@ -592,28 +590,52 @@ int rdCache_SendFaceListToHardware()
 #ifdef SDL2_RENDER
                     rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 1.0;
 #endif
+
+                    /*vertex_r = 0;
+                    vertex_g = 0;
+                    green = 0;
+                    vertex_b = 255;
+                    blue = 255;*/
                 }
                 else
                 {
                     // MOTS added
                     if (rdroid_curVertexColorMode != 1 || lighting_capability != 3)
                     {
-                        if ( v39 == 3 )
+                        if ( lighting_capability == 3 )
                             light_level = active_6c->vertexIntensities[vtx_idx];
                         else
                             light_level = active_6c->light_level_static;
 #ifdef SDL2_RENDER
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
 #endif
+                        
+
                         vertex_b = (__int64)light_level;
                         vertex_g = vertex_b;
                         vertex_r = vertex_b;
                         blue = vertex_b;
                         green = vertex_b;
+
+                        /*vertex_r = 255;
+                    vertex_g = 0;
+                    green = 0;
+                    vertex_b = 255;
+                    blue = 255;*/
                     }
 #ifdef JKM_LIGHTING
                     else
                     {
+                        // Added for SDL2
+#ifdef SDL2_RENDER
+                        if ( lighting_capability == 3 )
+                            light_level = active_6c->vertexIntensities[vtx_idx];
+                        else
+                            light_level = active_6c->light_level_static;
+
+                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
+#endif
+                        //printf("%f\n", active_6c->paRedIntensities[vtx_idx]);
                         double intRed = active_6c->paRedIntensities[vtx_idx];
                         double intGreen = active_6c->paGreenIntensities[vtx_idx];
                         double intBlue = active_6c->paBlueIntensities[vtx_idx];
@@ -624,9 +646,17 @@ int rdCache_SendFaceListToHardware()
                         vertex_r = (int)intRed;
                         blue = vertex_b;
                         green = vertex_g;
+
+                        /*vertex_r = 0;
+                    vertex_g = 255;
+                    green = 255;
+                    vertex_b = 0;
+                    blue = 0;*/
+
                     }
 #endif
                 }
+
                 red_and_alpha = vertex_r;
                 v45 = active_6c->colormap;
                 if ( v45 != rdColormap_pIdentityMap )
@@ -1121,9 +1151,9 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     rdProcEntry *procFace; // esi
     int v9; // ecx
     rdVector3 *v10; // edx
-    int y_min_related; // ebx
+    double y_min_related; // ebx
     double v12; // st7
-    int y_max_related; // [esp+Ch] [ebp-18h]
+    double y_max_related; // [esp+Ch] [ebp-18h]
     float v27; // [esp+10h] [ebp-14h]
     float z_max; // [esp+14h] [ebp-10h]
     float z_min; // [esp+18h] [ebp-Ch]

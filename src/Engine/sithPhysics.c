@@ -422,6 +422,8 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     rdVector3 a1a;
     rdVector3 a3;
     rdMatrix34 a;
+    int bOverrideIdk = 0;
+    float zOverride = 0.0;
 
     rdVector_Zero3(&thing->physicsParams.addedVelocity);
     rdVector_Zero3(&a1a);
@@ -447,6 +449,67 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     {
         rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
     }
+
+    // MOTS added
+    if (thing->type == SITH_THING_WEAPON && thing->weaponParams.field_34 && thing->weaponParams.field_38 != 0.0) {
+        rdVector3 tmp;
+
+        rdVector_Copy3(&tmp, &thing->position);
+        float fVar3 = deltaSeconds * thing->weaponParams.field_38;
+
+        //bOverrideIdk = 1;
+    }
+    /*
+        if (((thing->type == SITH_THING_WEAPON) && (iVar9 = *(int *)&(thing->typeParams).field_0x34, iVar9 != 0)) && (*(float *)&(thing->typeParams).field_0x38 != 0.0)) {
+        fVar3 = deltaSeconds * *(float *)&(thing->typeParams).field_0x38;
+        local_a4.x = *(float *)(iVar9 + 0xc0) - (thing->position).x;
+        local_a4.y = *(float *)(iVar9 + 0xc4) - (thing->position).y;
+        local_a4.z = *(float *)(iVar9 + 200) - (thing->position).z;
+        if (-0.03 <= local_a4.z) {
+            if ((ushort)((ushort)(local_a4.z < 0.03) << 8 | (ushort)(local_a4.z == 0.03) << 0xe) == 0) {
+                local_7c = 0x3f800000;
+            }
+        }
+        else {
+            local_7c = 0xbf800000;
+        }
+        rdVector_Normalize3Acc(&local_a4);
+        rdMatrix_BuildFromLook34(&local_60,&local_a4);
+        rdMatrix_ExtractAngles34(&local_60,&local_6c);
+        prVar10 = &thing->lookOrientation;
+        prVar11 = &local_60;
+        for (iVar9 = 0xc; iVar9 != 0; iVar9 = iVar9 + -1) {
+            (prVar11->rvec).x = (prVar10->rvec).x;
+            prVar10 = (rdMatrix34 *)&(prVar10->rvec).y;
+            prVar11 = (rdMatrix34 *)&(prVar11->rvec).y;
+        }
+        rdMatrix_ExtractAngles34(&local_60,&local_78);
+        local_a4.y = local_6c.y - local_78.y;
+        local_a4.x = -local_78.x;
+        local_a4.z = -local_78.z;
+        if ((ushort)((ushort)(local_a4.y < 180.0) << 8 | (ushort)(local_a4.y == 180.0) << 0xe) == 0) {
+            local_a4.y = local_a4.y - 360.0;
+        }
+        else if (local_a4.y < -180.0) {
+            local_a4.y = local_a4.y - -360.0;
+        }
+        fVar6 = local_a4.y;
+        if (local_a4.y < 0.0) {
+            fVar6 = -local_a4.y;
+        }
+        if ((ushort)((ushort)(fVar6 < fVar3) << 8 | (ushort)(fVar6 == fVar3) << 0xe) == 0) {
+            fVar6 = local_a4.y;
+            if (local_a4.y < 0.0) {
+                fVar6 = -local_a4.y;
+            }
+            local_a4.y = (fVar3 / fVar6) * local_a4.y;
+        }
+        bVar8 = true;
+        local_88.y = local_a4.y;
+        local_88.x = local_a4.x;
+        local_88.z = local_a4.z;
+    }
+    */
 
     if (!rdVector_IsZero3(&a3))
     {
@@ -492,6 +555,9 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     }
 
     rdVector_Add3Acc(&thing->physicsParams.vel, &a1a);
+    if (bOverrideIdk) {
+        thing->physicsParams.vel.z = zOverride;
+    }
     rdMath_ClampVector(&thing->physicsParams.vel, 0.00001);
 
     if (!rdVector_IsZero3(&thing->physicsParams.vel))

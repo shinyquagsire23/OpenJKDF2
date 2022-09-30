@@ -59,6 +59,7 @@
 #ifdef QOL_IMPROVEMENTS
 #define JKM_LIGHTING
 #define JKM_BONES
+#define JKM_PARAMS
 #endif
 
 // Disable warnings for Vegetable Studio

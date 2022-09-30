@@ -21,6 +21,7 @@ typedef uint32_t size_t;
 #ifdef JKM_TYPES
 #define JKM_LIGHTING
 #define JKM_BONES
+#define JKM_PARAMS
 #endif
 
 #include "engine_config.h"
@@ -672,6 +673,14 @@ enum SITH_WF_E
     SITH_WF_TRIGGER_AIEVENT = 0x200000,
     SITH_WF_EXPLODES_ON_WORLD_FLOOR_HIT = 0x400000,
     SITH_WF_MOPHIA_BOMB = 0x800000, // Jones specific
+};
+
+typedef uint32_t sithItemFlags_t;
+enum SITH_ITEMFLAG_E // could be jones specific
+{
+    SITH_ITEM_RESPAWN_MP = 0x1,
+    SITH_ITEM_RESPAWN_SP = 0x2,
+    SITH_ITEM_BACKPACK = 0x4,
 };
 
 // All the typedefs
@@ -2528,7 +2537,10 @@ typedef struct sithThingItemParams
     uint32_t typeflags;
     rdVector3 position;
     sithSector* sector;
-    uint32_t respawn;
+    float respawn;
+#ifdef JKM_PARAMS
+    float respawnFactor;
+#endif
     uint32_t respawnTime;
     int16_t numBins;
     int16_t field_1E;
@@ -2538,22 +2550,26 @@ typedef struct sithThingItemParams
 
 typedef struct sithThingWeaponParams
 {
-    sithWeaponFlags_t typeflags;
-    uint32_t damageClass;
-    float unk8;
-    float damage;
-    sithThing* explodeTemplate;
-    sithThing* fleshHitTemplate;
-    uint32_t numDeflectionBounces;
-    float rate;
-    float mindDamage;
-    sithThing* trailThing;
-    float elementSize;
-    float trailCylRadius;
-    float trainRandAngle;
-    uint32_t field_34;
-    float range;
-    float force;
+    sithWeaponFlags_t typeflags; // 00
+    uint32_t damageClass; // 04
+    float unk8; // 08
+    float damage; // 0C
+    sithThing* explodeTemplate; // 10
+    sithThing* fleshHitTemplate; // 14
+    uint32_t numDeflectionBounces; // 18
+    float rate; // 1C
+    float mindDamage; // 20
+    sithThing* trailThing; // 24
+    float elementSize; // 28
+    float trailCylRadius; // 2C
+    float trainRandAngle; // 30
+    uint32_t field_34; // 34
+#ifdef JKM_PARAMS
+    float field_38; // 38
+    uint32_t field_3C; // 3C
+#endif
+    float range; // 40
+    float force; // 3C
     uint32_t field_40;
     uint32_t field_44;
     uint32_t field_48;
@@ -2572,8 +2588,10 @@ typedef struct sithThingWeaponParams
     uint32_t field_7C;
     uint32_t field_80;
     uint32_t field_84;
+#ifndef JKM_PARAMS
     uint32_t field_88;
     uint32_t field_8C;
+#endif
 } sithThingWeaponParams;
 
 typedef struct sithThingActorParams
@@ -2679,8 +2697,8 @@ typedef struct sithThing
     uint32_t collide;
     float moveSize;
     float collideSize;
-#ifdef JKM_TYPES
-    uint32_t unk2;
+#ifdef JKM_PARAMS
+    float treeSize;
 #endif // JKM_TYPES
     uint32_t attach_flags;
     rdVector3 field_38;

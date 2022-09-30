@@ -4,6 +4,9 @@
 #include "Primitives/rdPrimit2.h"
 #include "Engine/rdCamera.h"
 #include "Engine/rdClip.h"
+#include "General/stdMath.h"
+
+#include "jk.h"
 
 void rdPrimit3_ClearFrameCounters()
 {
@@ -1087,11 +1090,10 @@ void rdPrimit3_NoClipFaceRGB
                     idkIn_--;
                     idxIter++;
                 } while (idkIn_ != 0x0);
-                _vertexDst->numVertices = idxIter;
+                _vertexDst->numVertices = _vertexSrc->numVertices;
                 return;
             }
-LAB_0044da3e:
-            _vertexDst->numVertices = idxIter;
+            _vertexDst->numVertices = _vertexSrc->numVertices;
             return;
         default:
             goto switchD_0044d5a4_caseD_5;
@@ -1101,96 +1103,32 @@ LAB_0044da3e:
     case 4:
         if (-1 < lightMode) {
             if (lightMode < 3) {
-                uVar21 = _vertexSrc->numVertices;
-                if (uVar21 != 0) {
-                    prVar3 = _vertexSrc->verticesProjected;
-                    prVar16 = _vertexSrc->vertexUVs;
-                    piVar14 = _vertexSrc->vertexUVIdx;
-                    piVar9 = _vertexSrc->vertexPosIdx;
-                    prVar13 = _vertexDst->vertexUVs;
-                    piVar17 = piVar14;
-                    prVar18 = _vertexDst->verticesProjected;
-                    geoMode = uVar21;
-                    do {
-                        prVar1 = prVar3 + *piVar9;
-                        prVar18->x = prVar1->x;
-                        prVar18->y = prVar1->y;
-                        prVar18->z = prVar1->z;
-                        iVar19 = *piVar17;
-                        prVar13->x = prVar16[iVar19].x;
-                        prVar13->y = prVar16[iVar19].y;
-                        prVar13->x = idkIn->x + prVar13->x;
-                        geoMode = geoMode + -1;
-                        prVar13->y = prVar13->y + idkIn->y;
-                        prVar13 = prVar13 + 1;
-                        piVar17 = piVar17 + 1;
-                        prVar18 = prVar18 + 1;
-                        piVar9++;
-                    } while (geoMode != 0);
+                for (int i = 0; i < _vertexSrc->numVertices; i++)
+                {
+                    int vtxIdx = _vertexSrc->vertexPosIdx[i];
+                    int uvIdx = _vertexSrc->vertexUVIdx[i];
+                    _vertexDst->verticesProjected[i] = _vertexSrc->verticesProjected[vtxIdx];
+                    _vertexDst->vertexUVs[i] = _vertexSrc->vertexUVs[uvIdx];
+                    rdVector_Add2Acc(&_vertexDst->vertexUVs[i], idkIn);
                 }
-                _vertexDst->numVertices = uVar21;
+
+                _vertexDst->numVertices = _vertexSrc->numVertices;
             }
             else if (lightMode == 3) {
-                if (_vertexSrc->numVertices != 0x0) {
-                    prVar3 = _vertexSrc->verticesProjected;
-                    pfVar4 = _vertexSrc->paRedIntensities;
-                    pfVar5 = _vertexDst->paRedIntensities;
-                    pfVar6 = _vertexSrc->paGreenIntensities;
-                    prVar13 = _vertexSrc->vertexUVs;
-                    pfVar7 = _vertexSrc->paDynamicLight;
-                    pfVar8 = _vertexSrc->paBlueIntensities;
-                    piVar14 = _vertexSrc->vertexPosIdx;
-                    piVar9 = _vertexSrc->vertexUVIdx;
-                    prVar15 = _vertexDst->vertexUVs;
-                    local_14 = _vertexDst->verticesProjected;
-                    pfVar10 = _vertexDst->paGreenIntensities;
-                    float* blueIter = _vertexDst->paBlueIntensities;
-                    int local_10_ = _vertexSrc->numVertices;
-                    idxIter = 0;
-                    do {
-                        prVar18 = prVar3 + *piVar14;
-                        local_14->x = prVar18->x;
-                        local_14->y = prVar18->y;
-                        local_14->z = prVar18->z;
-                        prVar15->x = prVar13[idxIter].x;
-                        prVar15->y = prVar13[idxIter].y;
-                        prVar15->x = idkIn->x + prVar15->x;
-                        prVar15->y = prVar15->y + idkIn->y;
-                        fVar12 = pfVar7[*piVar14] + pfVar4[*piVar14];
-                        if (fVar12 < 0.0) {
-                            fVar12 = 0.0;
-                        }
-                        else if (fVar12 > 1.0) {
-                            fVar12 = 1.0;
-                        }
-                        *pfVar5 = fVar12;
-                        fVar12 = pfVar7[*piVar14] + pfVar6[*piVar14];
-                        if (fVar12 < 0.0) {
-                            fVar12 = 0.0;
-                        }
-                        else if (fVar12 > 1.0) {
-                            fVar12 = 1.0;
-                        }
-                        *pfVar10 = fVar12;
-                        fVar12 = pfVar7[*piVar14] + pfVar8[*piVar14];
-                        if (fVar12 < 0.0) {
-                            fVar12 = 0.0;
-                        }
-                        else if (fVar12 > 1.0) {
-                            fVar12 = 1.0;
-                        }
-                        prVar15 = prVar15 + 1;
-                        *blueIter = fVar12;
-                        piVar14 = piVar14 + 1;
-                        local_14 = local_14 + 1;
-                        pfVar5++;
-                        pfVar10++;
-                        blueIter++;
-                        local_10_--;
-                        idxIter++;
-                    } while (local_10_ != 0x0);
+                for (int i = 0; i < _vertexSrc->numVertices; i++)
+                {
+                    int vtxIdx = _vertexSrc->vertexPosIdx[i];
+                    int uvIdx = _vertexSrc->vertexUVIdx[i];
+                    _vertexDst->verticesProjected[i] = _vertexSrc->verticesProjected[vtxIdx];
+                    _vertexDst->vertexUVs[i] = _vertexSrc->vertexUVs[uvIdx];
+                    rdVector_Add2Acc(&_vertexDst->vertexUVs[i], idkIn);
+                    _vertexDst->paRedIntensities[i] = stdMath_Clamp(_vertexSrc->paRedIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
+                    _vertexDst->paGreenIntensities[i] = stdMath_Clamp(_vertexSrc->paGreenIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
+                    _vertexDst->paBlueIntensities[i] = stdMath_Clamp(_vertexSrc->paBlueIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
                 }
-                goto LAB_0044da3e;
+
+                _vertexDst->numVertices = _vertexSrc->numVertices;
+                return;
             }
         }
     default:
@@ -1416,6 +1354,19 @@ rdPrimit3_ClipFaceRGB
                         piVar9++;
                     } while (local_10 != 0);
                 }
+#if 0
+                for (int i = 0; i < idxInfo->numVertices; i++)
+                {
+                    int vtxIdx = idxInfo->vertexPosIdx[i];
+                    int uvIdx = idxInfo->vertexUVIdx[i];
+                    mesh_out->verticesProjected[i] = idxInfo->verticesProjected[vtxIdx];
+                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    //mesh_out->paRedIntensities[i] = idxInfo->paRedIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                    //mesh_out->paGreenIntensities[i] = idxInfo->paGreenIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                    //mesh_out->paBlueIntensities[i] = idxInfo->paBlueIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                }
+#endif
                 if (rdCamera_pCurCamera->projectType == 1) {
                     uVar15 = rdClip_Face3T(clipFrustum,mesh_out->verticesProjected,
                                            mesh_out->vertexUVs,idxInfo->numVertices);
@@ -1444,8 +1395,8 @@ rdPrimit3_ClipFaceRGB
                     local_10 = idxInfo->numVertices;
 
                     float* redIter = mesh_out->paRedIntensities;
-                    float* greenIter = mesh_out->paRedIntensities;
-                    float* blueIter = mesh_out->paRedIntensities;
+                    float* greenIter = mesh_out->paGreenIntensities;
+                    float* blueIter = mesh_out->paBlueIntensities;
 
                     do {
                         iVar12 = *piVar17;
@@ -1455,10 +1406,8 @@ rdPrimit3_ClipFaceRGB
                         local_18->z = prVar19->z;
                         
                         iVar13 = *piVar9;
-                        prVar16->x = prVar4[iVar13].x;
-                        prVar16->y = prVar4[iVar13].y;
-                        prVar16->x = prVar16->x + idkIn->x;
-                        prVar16->y = prVar16->y + idkIn->y;
+                        prVar16->x = prVar4[iVar13].x + idkIn->x;
+                        prVar16->y = prVar4[iVar13].y + idkIn->y;;
                         fVar14 = pfVar6[iVar12] + pfVar5[iVar12];
                         if (fVar14 < 0.0) {
                             fVar14 = 0.0;
@@ -1467,6 +1416,7 @@ rdPrimit3_ClipFaceRGB
                             fVar14 = 1.0;
                         }
                         *redIter = fVar14;
+
                         fVar14 = pfVar7[iVar12] + pfVar5[iVar12];
                         if (fVar14 < 0.0) {
                             fVar14 = 0.0;
@@ -1495,10 +1445,26 @@ rdPrimit3_ClipFaceRGB
                     } while (local_10 != 0);
                 }
                 uVar15 = rdClip_Face3GTRGB(clipFrustum,mesh_out->verticesProjected,
-                                           mesh_out->vertexUVs,mesh_out->paRedIntensities,
-                                           mesh_out->paGreenIntensities,mesh_out->paBlueIntensities,
+                                           mesh_out->vertexUVs,
+                                           mesh_out->paRedIntensities,
+                                           mesh_out->paGreenIntensities,
+                                           mesh_out->paBlueIntensities,
                                            idxInfo->numVertices);
                 mesh_out->numVertices = uVar15;
+#if 0
+                for (int i = 0; i < idxInfo->numVertices; i++)
+                {
+                    int vtxIdx = idxInfo->vertexPosIdx[i];
+                    int uvIdx = idxInfo->vertexUVIdx[i];
+                    mesh_out->verticesProjected[i] = idxInfo->verticesProjected[vtxIdx];
+                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    mesh_out->paRedIntensities[i] = 1.0;//idxInfo->paRedIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
+                    mesh_out->paGreenIntensities[i] = 0.0;//idxInfo->paGreenIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
+                    mesh_out->paBlueIntensities[i] = 1.0;//idxInfo->paBlueIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
+                }
+                mesh_out->numVertices = idxInfo->numVertices;
+#endif
                 return;
             }
         }
@@ -1651,6 +1617,7 @@ void rdPrimit3_ClipFaceRGBLevel
                 float* greenIter = mesh_out->paGreenIntensities;
                 float* blueIter = mesh_out->paBlueIntensities;
 
+                int idxIter = 0;
                 int idkIn_ = idxInfo->numVertices;
                 do {
                     iVar12 = *piVar18;
@@ -1658,7 +1625,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     prVar20->x = prVar1->x;
                     prVar20->y = prVar1->y;
                     prVar20->z = prVar1->z;
-                    fVar4 = idxInfo->paRedIntensities[iVar12] + pfVar9[iVar12];
+                    fVar4 = idxInfo->paRedIntensities[idxIter] + pfVar9[iVar12];
                     if (fVar4 < 0.0) {
                         fVar4 = 0.0;
                     }
@@ -1667,7 +1634,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     }
                     *redIter = fVar4;
 
-                    fVar3 = idxInfo->paGreenIntensities[iVar12];
+                    fVar3 = idxInfo->paGreenIntensities[idxIter];
                     fVar3 = fVar3 + pfVar9[iVar12];
                     if (fVar3 < 0.0) {
                         fVar3 = 0.0;
@@ -1676,7 +1643,7 @@ void rdPrimit3_ClipFaceRGBLevel
                         fVar3 = 1.0;
                     }
 
-                    fVar4 = idxInfo->paBlueIntensities[iVar12];
+                    fVar4 = idxInfo->paBlueIntensities[idxIter];
                     *greenIter = fVar3;
                     fVar4 = fVar4 + pfVar9[iVar12];
                     if (fVar4 < 0.0) {
@@ -1692,6 +1659,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     redIter++;
                     greenIter++;
                     blueIter++;
+                    idxIter++;
 
                     idkIn_--;
                 } while (idkIn_ != 0x0);
@@ -1702,7 +1670,7 @@ void rdPrimit3_ClipFaceRGBLevel
             mesh_out->numVertices = uVar14;
             return;
         default:
-            goto switchD_0044c2d4_caseD_5;
+            return;
         }
         iVar15 = rdCamera_pCurCamera->projectType;
         break;
@@ -1739,9 +1707,11 @@ void rdPrimit3_ClipFaceRGBLevel
                     mesh_out->numVertices = uVar16;
                     return;
                 }
-                uVar16 = rdClip_Face3TOrtho(clipFrustum,mesh_out->verticesProjected,
+                else {
+                    uVar16 = rdClip_Face3TOrtho(clipFrustum,mesh_out->verticesProjected,
                                             mesh_out->vertexUVs,idxInfo->numVertices);
-                mesh_out->numVertices = uVar16;
+                    mesh_out->numVertices = uVar16;
+                }
             }
             else if (lightMode == 3) {
                 if (idxInfo->numVertices != 0) {
@@ -1768,39 +1738,19 @@ void rdPrimit3_ClipFaceRGBLevel
                         iVar13 = *piVar18;
                         prVar17->x = prVar5[iVar13].x + idkIn->x;
                         prVar17->y = prVar5[iVar13].y + idkIn->y;
-                        fVar4 = pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter];
-                        if (fVar4 < 0.0) {
-                            fVar4 = 0.0;
-                        }
-                        else if (fVar4 > 1.0) {
-                            fVar4 = 1.0;
-                        }
+                        fVar4 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter], 0.0, 1.0);
                         *redIter = fVar4;
 
-                        fVar3 = idxInfo->paGreenIntensities[idxIter];
-                        fVar3 = fVar3 + pfVar9[iVar12];
-                        if (fVar3 < 0.0) {
-                            fVar3 = 0.0;
-                        }
-                        else if (fVar3 > 1.0) {
-                            fVar3 = 1.0;
-                        }
+                        fVar3 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paGreenIntensities[idxIter], 0.0, 1.0);
                         *greenIter = fVar3;
 
-                        fVar4 = idxInfo->paBlueIntensities[idxIter];
-                        fVar4 = fVar4 + pfVar9[iVar12];
-                        if (fVar4 < 0.0) {
-                            fVar4 = 0.0;
-                        }
-                        else if (fVar4 > 1.0) {
-                            fVar4 = 1.0;
-                        }
+                        fVar4 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paBlueIntensities[idxIter], 0.0, 1.0);
                         *blueIter = fVar4;
 
-                        local_10 = local_10 + 1;
-                        prVar17 = prVar17 + 1;
-                        piVar24 = piVar24 + 1;
-                        local_8 = local_8 - 1;
+                        local_10++;
+                        prVar17++;
+                        piVar24++;
+                        local_8--;
 
                         redIter++;
                         greenIter++;
@@ -1818,11 +1768,24 @@ void rdPrimit3_ClipFaceRGBLevel
                                            mesh_out->paBlueIntensities,
                                            idxInfo->numVertices);
                 mesh_out->numVertices = uVar16;
+
+#if 0
+                for (int i = 0; i < idxInfo->numVertices; i++)
+                {
+                    int vtxIdx = idxInfo->vertexPosIdx[i];
+                    int uvIdx = idxInfo->vertexUVIdx[i];
+                    mesh_out->verticesProjected[i] = idxInfo->vertices[vtxIdx];
+                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    mesh_out->paRedIntensities[i] = idxInfo->paRedIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                    mesh_out->paGreenIntensities[i] = idxInfo->paGreenIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                    mesh_out->paBlueIntensities[i] = idxInfo->paBlueIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
+                }
+#endif
                 return;
             }
         }
     default:
-switchD_0044c2d4_caseD_5:
         return;
     }
     if (iVar15 == 1) {

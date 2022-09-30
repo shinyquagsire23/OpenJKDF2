@@ -262,7 +262,7 @@ int sithSurface_Load(sithWorld *world)
         }
 #else
         int testAmt = 0;
-        for (int v45 = 0; v45 < v35; v45++)
+        /*for (int v45 = 0; v45 < v35; v45++)
         {
             if (v61+(v45*4)+3 >= stdConffile_entry.numArgs) break; // Added
 
@@ -274,10 +274,12 @@ int sithSurface_Load(sithWorld *world)
             if (test1 != test2 || (test1 != test3)) break;
 
             testAmt += 1;
-        }
+        }*/
+        testAmt = stdConffile_entry.numArgs - v61;
 
-        if (testAmt != v35) {
-            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35);
+        if (testAmt < v35 * 4) {
+            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35 * 4); // Added: extra
+            memset(surfaceInfo->intensities, 0, sizeof(float) * v35 * 4); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
             for (int v45 = 0; v45 < v35; v45++)
@@ -288,16 +290,17 @@ int sithSurface_Load(sithWorld *world)
         }
         else {
             surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35 * 4);
+            memset(surfaceInfo->intensities, 0, sizeof(float) * v35 * 4); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
 
             surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
             for (int v45 = 0; v45 < v35; v45++)
             {
-                surfaceInfo->intensities[(v45*4)+0] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
-                surfaceInfo->intensities[(v45*4)+1] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
-                surfaceInfo->intensities[(v45*4)+2] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
-                surfaceInfo->intensities[(v45*4)+3] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
+                surfaceInfo->intensities[(v35*0)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
+                surfaceInfo->intensities[(v35*1)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
+                surfaceInfo->intensities[(v35*2)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
+                surfaceInfo->intensities[(v35*3)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
             }
         }
 #endif

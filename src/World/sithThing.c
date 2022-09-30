@@ -38,7 +38,7 @@
 #include "Dss/sithDSS.h"
 #include "jk.h"
 
-#define NUM_THING_PARAMS (72)
+#define NUM_THING_PARAMS (74) // JK is 72
 #define NUM_THING_TYPES (13)
 
 int sithThing_bInitted;
@@ -63,6 +63,9 @@ const char* sithThing_aTypes[NUM_THING_TYPES] = {
 const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "type",
     "collide",
+#ifdef JKM_PARAMS
+    "treesize", // MOTS added
+#endif
     "move",
     "size",
     "thingflags",
@@ -104,6 +107,9 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "aiclass",
     "cog",
     "respawn",
+#ifdef JKM_PARAMS
+    "respawnfactor", // MOTS added
+#endif
     "material",
     "rate",
     "count",
@@ -142,7 +148,7 @@ int sithThing_Startup()
 
     if ( !sithThing_bInitted )
     {
-        sithThing_paramKeyToParamValMap = stdHashTable_New(146);
+        sithThing_paramKeyToParamValMap = stdHashTable_New((NUM_THING_PARAMS+1) * 2);
         if ( sithThing_paramKeyToParamValMap )
         {
             v1 = 1;
@@ -1537,6 +1543,13 @@ int sithThing_Load(sithWorld *world, int a2)
             if ( v23 >= 0 && v23 < sithWorld_pCurrentWorld->numSectors )
             {
                 v24 = &sithWorld_pCurrentWorld->sectors[v23];
+                if ( stdConffile_entry.numArgs >= 11 && (stdConffile_entry.args[10].key == stdConffile_entry.args[10].value)) // MOTS added (w/o comparison)
+                {
+                    // && (!stdConffile_entry.args[10].key || strlen(stdConffile_entry.args[10].key) == 0)
+                    v23 = _atoi(stdConffile_entry.args[10].value);
+                    v21->archlightIdx = v23;
+                    //printf("%p %p %x\n", , v21->archlightIdx);
+                }
                 sithThing_sub_4CD8A0(v21, v22);
                 sithThing_SetPosAndRot(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
@@ -1655,6 +1668,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
     sithCog *pCog; // eax
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
     uint32_t thingFlags;
+    float tmpF;
 
     switch ( param )
     {
@@ -1701,6 +1715,15 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             thing->collide = collide;
             result = 1;
             break;
+#ifdef JKM_PARAMS
+          case THINGPARAM_TREESIZE:
+            tmpF = _atof(arg->value);
+            if (tmpF < 0.0) {
+              return 0;
+            }
+            thing->treeSize = tmpF;
+            return 1;
+#endif
         case THINGPARAM_MOVE:
             if ( !_strcmp(arg->value, "physics") )
             {
@@ -1816,8 +1839,19 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing *thing, int param)
             pCog = sithCog_LoadCogscript(arg->value);
             thing->class_cog = pCog;
             if ( !pCog )
-                goto LABEL_58;
-            pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+                return 1;
+
+            // MOTS added
+            if (Main_bMotsCompat) {
+                pCog->flags |= SITH_COG_CLASS;
+                if (pCog->flags & SITH_COG_SERVER) {
+                    pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+                }
+            }
+            else {
+                pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+            }
+
             thing->thingflags |= SITH_TF_CAPTURED;
             result = 1;
             break;

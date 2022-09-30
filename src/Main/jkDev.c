@@ -268,7 +268,7 @@ LABEL_7:
     stdString_WcharToChar(tmp, str, 255);
     tmp[255] = 0;
     printf("\r                                            \r");
-    printf("%s%c", tmp, tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
+    printf("%s%c", tmp, _strlen(tmp) && tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
 #endif
     return v5;
 }

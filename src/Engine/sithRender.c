@@ -794,20 +794,19 @@ void sithRender_RenderLevelGeometry()
                 else 
                 {
                     if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0) {
-                        sithRender_idxInfo.paRedIntensities =
-                             (v65->surfaceInfo).intensities;
-                        sithRender_idxInfo.paGreenIntensities =
-                             sithRender_idxInfo.paRedIntensities;
-                        sithRender_idxInfo.paBlueIntensities =
-                             sithRender_idxInfo.paRedIntensities;
+                        sithRender_idxInfo.paRedIntensities = (v65->surfaceInfo).intensities;
+                        sithRender_idxInfo.paGreenIntensities = sithRender_idxInfo.paRedIntensities;
+                        sithRender_idxInfo.paBlueIntensities = sithRender_idxInfo.paRedIntensities;
                     }
                     else {
                         sithRender_idxInfo.paRedIntensities =
                              (v65->surfaceInfo).intensities +
                              sithRender_idxInfo.numVertices;
+
                         sithRender_idxInfo.paGreenIntensities =
                              sithRender_idxInfo.paRedIntensities +
                              sithRender_idxInfo.numVertices;
+
                         sithRender_idxInfo.paBlueIntensities =
                              sithRender_idxInfo.paGreenIntensities +
                              sithRender_idxInfo.numVertices;
@@ -864,7 +863,7 @@ void sithRender_RenderLevelGeometry()
                         procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
                     }
                 }
-                else if ( procEntry->lightingMode == RD_LIGHTMODE_GOURAUD)
+                else if ( (rdGetVertexColorMode() == 0) && procEntry->lightingMode == RD_LIGHTMODE_GOURAUD)
                 {
                     v51 = procEntry->vertexIntensities;
                     v67 = *v51;
@@ -932,6 +931,7 @@ void sithRender_RenderLevelGeometry()
                     rend_flags = 3;
                 if ( procEntry->lightingMode >= RD_LIGHTMODE_GOURAUD)
                     rend_flags |= 4u;
+
                 rdCache_AddProcFace(0, num_vertices, rend_flags);
                 continue;
             }
@@ -1027,8 +1027,8 @@ void sithRender_RenderLevelGeometry()
                         sithRender_idxInfo.paGreenIntensities = tmpGreen;
                         sithRender_idxInfo.paBlueIntensities = tmpBlue;
 
-                        meshinfo_out.paGreenIntensities = v20->paGreenIntensities;
                         meshinfo_out.paRedIntensities = v20->paRedIntensities;
+                        meshinfo_out.paGreenIntensities = v20->paGreenIntensities;
                         meshinfo_out.paBlueIntensities = v20->paBlueIntensities;
 
                         rdPrimit3_ClipFaceRGBLevel
@@ -1167,6 +1167,7 @@ LABEL_150:
                     // MOTS added
 #ifdef JKM_LIGHTING
                     if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
+                        printf("%x\n", i->archlightIdx);
                         rdModel3* iVar22 = i->rdthing.model3;
                         for (int k = 0; k < 4; k++) {
                             for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
