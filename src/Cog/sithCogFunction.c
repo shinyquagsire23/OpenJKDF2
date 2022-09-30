@@ -769,6 +769,9 @@ void sithCogFunction_SetInvFlags(sithCog *ctx)
     flags = sithCogExec_PopInt(ctx);
     binIdx = sithCogExec_PopInt(ctx);
     player = sithCogExec_PopThing(ctx);
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
         sithInventory_SetFlags(player, binIdx, flags);
 }
@@ -994,7 +997,9 @@ void sithCogFunction_GetActionCog(sithCog *ctx)
 // MOTS added
 void sithCogFunction_SetActionCog(sithCog *ctx)
 {
-    sithCog_pActionCog = sithCogExec_PopCog(ctx);
+    sithCog_actionCogIdk = sithCogExec_PopInt(ctx);
+    sithCog* pCog = sithCogExec_PopCog(ctx);
+    sithCog_pActionCog = (pCog == -1) ? NULL : pCog;
 }
 
 void sithCogFunction_NewColorEffect(sithCog *ctx)
@@ -1336,6 +1341,10 @@ void sithCogFunction_SelectWeapon(sithCog *ctx)
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
 
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
+
     if ( player )
     {
         if ( binIdx >= 0 )
@@ -1347,6 +1356,10 @@ void sithCogFunction_AssignWeapon(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
 
     if ( player )
     {
@@ -1362,7 +1375,12 @@ void sithCogFunction_AutoSelectWeapon(sithCog *ctx)
 
     if ( weapIdx >= 0 && weapIdx <= 2 && player )
     {
-        sithCogExec_PushInt(ctx, sithWeapon_AutoSelect(player, weapIdx));
+        int binIdx = sithWeapon_AutoSelect(player, weapIdx);
+        if (Main_bMotsCompat) {
+            binIdx = sithInventory_SelectWeaponPrior(binIdx);
+        }
+
+        sithCogExec_PushInt(ctx, binIdx);
     }
     else
     {
@@ -1374,14 +1392,20 @@ void sithCogFunction_SetCurWeapon(sithCog *ctx)
 {
     int v4; // eax
 
-    int idx = sithCogExec_PopInt(ctx);
+    int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
+
     if ( player )
     {
         if ( player->type == SITH_THING_PLAYER )
         {
-            v4 = sithInventory_SelectWeaponFollowing(idx);
-            sithInventory_SetCurWeapon(player, v4);
+            if (!Main_bMotsCompat)
+                binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+            sithInventory_SetCurWeapon(player, binIdx);
         }
     }
 }
@@ -1391,6 +1415,10 @@ void sithCogFunction_GetWeaponPriority(sithCog *ctx)
     int mode = sithCogExec_PopInt(ctx);
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
 
     if ( player && player->type == SITH_THING_PLAYER )
     {
@@ -1419,7 +1447,11 @@ void sithCogFunction_GetCurWeapon(sithCog *ctx)
 
     if ( player && player->type == SITH_THING_PLAYER )
     {
-        sithCogExec_PushInt(ctx, sithInventory_GetCurWeapon(player));
+        int binIdx = sithInventory_GetCurWeapon(player);
+        if (Main_bMotsCompat) {
+            binIdx = sithInventory_SelectWeaponPrior(binIdx);
+        }
+        sithCogExec_PushInt(ctx, binIdx);
     }
     else
     {
@@ -1657,11 +1689,19 @@ void sithCogFunction_ClearCogFlags(sithCog *ctx)
     pCog->flags &= ~val;
 }
 
+// MOTS added
+void sithCogFunction_DebugBreak(sithCog *ctx)
+{
+    // TODO
+}
+
 void sithCogFunction_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Sleep, "sleep");
-    sithCogScript_RegisterVerb(ctx, sithCogFunction_Pow, "pow"); // MOTS
-    sithCogScript_RegisterVerb(ctx, sithCogFunction_Wakeup, "wakeup"); // MOTS
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_Pow, "pow"); // MOTS
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_Wakeup, "wakeup"); // MOTS
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Rand, "rand");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_RandVec, "randvec");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSenderRef, "getsenderref");
@@ -1706,7 +1746,9 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorY, "vectory");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorZ, "vectorz");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_VectorNorm, "vectornorm");
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_VectorEqual,"vectorequal"); // MOTS
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_VectorEqual,"vectorequal"); // MOTS
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSithMode, "getsithmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetDifficulty, "getdifficulty");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetSubmodeFlags, "setsubmodeflags");
@@ -1719,8 +1761,10 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_BitTest, "bittest");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_BitClear, "bitclear");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_FireProjectile, "fireprojectile");
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal"); // MOTS
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal"); // MOTS
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ActivateWeapon, "activateweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DeactivateWeapon, "deactivateweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMountWait, "setmountwait");
@@ -1732,15 +1776,21 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCurWeapon, "setcurweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCurWeapon, "getcurweapon");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCurWeaponMode, "getcurweaponmode");
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetWeaponBin,"getweaponbin"); // MOTS
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetWeaponBin,"getweaponbin"); // MOTS
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ChangeFireRate, "changefirerate");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessage, "sendmessage");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessageEx, "sendmessageex");
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS TODO
+    if (Main_bMotsCompat) {
+        //sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS TODO
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ReturnEx, "returnex");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetParam, "getparam");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetParam, "setparam");
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
+    if (Main_bMotsCompat) {
+        //sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_EnableIRMode, "enableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DisableIRMode, "disableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetInvFlags, "setinvflags");
@@ -1763,7 +1813,9 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetPovShake, "setpovshake");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
+    if (Main_bMotsCompat) {
+        //sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapNew, "heapnew");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapSet, "heapset");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapGet, "heapget");
@@ -1771,8 +1823,10 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetSelfCog, "getselfcog");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMasterCog, "getmastercog");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMasterCog, "setmastercog");
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMultiModeFlags, "setmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMultiModeFlags, "getmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ClearMultiModeFlags, "clearmultimodeflags");
@@ -1787,15 +1841,17 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendTrigger, "sendtrigger");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_AutoSaveGame, "autosavegame");
 
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_Sin,"sin"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_Cos,"cos"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_Tan,"tan"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
-    sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS TODO
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
-    //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Sin,"sin"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Cos,"cos"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Tan,"tan"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS TODO
+        //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
+        //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
+    }
     
     // Droidworks
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");

@@ -5,6 +5,7 @@
 #include "Devices/sithSound.h"
 #include "World/sithSector.h"
 #include "Dss/sithDSSThing.h"
+#include "Main/Main.h"
 
 void sithCogFunctionSound_PlaySong(sithCog *ctx)
 {
@@ -372,6 +373,12 @@ void sithCogFunctionSound_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPos, "playsoundpos");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundLocal, "playsoundlocal");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundGlobal, "playsoundglobal");
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_StopSound, "stopsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_LoadSound, "loadsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundClass, "playsoundclass");

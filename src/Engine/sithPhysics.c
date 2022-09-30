@@ -450,66 +450,53 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
         rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
     }
 
-    // MOTS added
-    if (thing->type == SITH_THING_WEAPON && thing->weaponParams.field_34 && thing->weaponParams.field_38 != 0.0) {
+    // MOTS added: weapon tracking?
+#ifdef JKM_PARAMS
+    if (thing->type == SITH_THING_WEAPON && thing->weaponParams.pTargetThing && thing->weaponParams.field_38 != 0.0) {
         rdVector3 tmp;
+        rdMatrix34 local_60;
+        rdVector3 local_6c, local_78;
 
-        rdVector_Copy3(&tmp, &thing->position);
+        rdVector_Sub3(&tmp, &thing->weaponParams.pTargetThing->position, &thing->position);
         float fVar3 = deltaSeconds * thing->weaponParams.field_38;
 
-        //bOverrideIdk = 1;
-    }
-    /*
-        if (((thing->type == SITH_THING_WEAPON) && (iVar9 = *(int *)&(thing->typeParams).field_0x34, iVar9 != 0)) && (*(float *)&(thing->typeParams).field_0x38 != 0.0)) {
-        fVar3 = deltaSeconds * *(float *)&(thing->typeParams).field_0x38;
-        local_a4.x = *(float *)(iVar9 + 0xc0) - (thing->position).x;
-        local_a4.y = *(float *)(iVar9 + 0xc4) - (thing->position).y;
-        local_a4.z = *(float *)(iVar9 + 200) - (thing->position).z;
-        if (-0.03 <= local_a4.z) {
-            if ((ushort)((ushort)(local_a4.z < 0.03) << 8 | (ushort)(local_a4.z == 0.03) << 0xe) == 0) {
-                local_7c = 0x3f800000;
+        if (-0.03 <= tmp.z) {
+            if (tmp.z > 0.03) {
+                zOverride = 1.0;
             }
         }
         else {
-            local_7c = 0xbf800000;
+            zOverride = -1.0;
         }
-        rdVector_Normalize3Acc(&local_a4);
-        rdMatrix_BuildFromLook34(&local_60,&local_a4);
+        rdVector_Normalize3Acc(&tmp);
+        rdMatrix_BuildFromLook34(&local_60,&tmp);
         rdMatrix_ExtractAngles34(&local_60,&local_6c);
-        prVar10 = &thing->lookOrientation;
-        prVar11 = &local_60;
-        for (iVar9 = 0xc; iVar9 != 0; iVar9 = iVar9 + -1) {
-            (prVar11->rvec).x = (prVar10->rvec).x;
-            prVar10 = (rdMatrix34 *)&(prVar10->rvec).y;
-            prVar11 = (rdMatrix34 *)&(prVar11->rvec).y;
-        }
+        rdMatrix_Copy34(&local_60, &thing->lookOrientation);
         rdMatrix_ExtractAngles34(&local_60,&local_78);
-        local_a4.y = local_6c.y - local_78.y;
-        local_a4.x = -local_78.x;
-        local_a4.z = -local_78.z;
-        if ((ushort)((ushort)(local_a4.y < 180.0) << 8 | (ushort)(local_a4.y == 180.0) << 0xe) == 0) {
-            local_a4.y = local_a4.y - 360.0;
+        tmp.y = local_6c.y - local_78.y;
+        tmp.x = -local_78.x;
+        tmp.z = -local_78.z;
+        if (tmp.y > 180.0) {
+            tmp.y = tmp.y - 360.0;
         }
-        else if (local_a4.y < -180.0) {
-            local_a4.y = local_a4.y - -360.0;
+        else if (tmp.y < -180.0) {
+            tmp.y = tmp.y - -360.0;
         }
-        fVar6 = local_a4.y;
-        if (local_a4.y < 0.0) {
-            fVar6 = -local_a4.y;
+        float fVar6 = tmp.y;
+        if (tmp.y < 0.0) {
+            fVar6 = -tmp.y;
         }
-        if ((ushort)((ushort)(fVar6 < fVar3) << 8 | (ushort)(fVar6 == fVar3) << 0xe) == 0) {
-            fVar6 = local_a4.y;
-            if (local_a4.y < 0.0) {
-                fVar6 = -local_a4.y;
+        if (fVar6 > fVar3) {
+            fVar6 = tmp.y;
+            if (tmp.y < 0.0) {
+                fVar6 = -tmp.y;
             }
-            local_a4.y = (fVar3 / fVar6) * local_a4.y;
+            tmp.y = (fVar3 / fVar6) * tmp.y;
         }
-        bVar8 = true;
-        local_88.y = local_a4.y;
-        local_88.x = local_a4.x;
-        local_88.z = local_a4.z;
+        bOverrideIdk = 0;
+        rdVector_Copy3(&a3, &tmp);
     }
-    */
+#endif
 
     if (!rdVector_IsZero3(&a3))
     {
@@ -555,9 +542,11 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
     }
 
     rdVector_Add3Acc(&thing->physicsParams.vel, &a1a);
+#ifdef JKM_PARAMS
     if (bOverrideIdk) {
         thing->physicsParams.vel.z = zOverride;
     }
+#endif
     rdMath_ClampVector(&thing->physicsParams.vel, 0.00001);
 
     if (!rdVector_IsZero3(&thing->physicsParams.vel))
@@ -572,6 +561,8 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     rdMatrix34 a;
     rdVector3 a3;
     rdVector3 a1a;
+    int bOverrideIdk = 0;
+    float zOverride = 0.0;
 
     rdVector_Zero3(&player->physicsParams.addedVelocity);
     if (player->physicsParams.physflags & SITH_PF_ANGTHRUST)
@@ -595,6 +586,46 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     {
         rdVector_Scale3(&a3, &player->physicsParams.angVel, deltaSeconds);
     }
+
+// MOTS added: weapon tracking? why is this here lol
+#ifdef JKM_PARAMS
+    if (player->type == SITH_THING_WEAPON && player->weaponParams.pTargetThing && player->weaponParams.field_38 != 0.0) {
+        rdVector3 tmp;
+        rdMatrix34 local_60;
+        rdVector3 local_6c, local_78;
+
+        rdVector_Sub3(&tmp, &player->weaponParams.pTargetThing->position, &player->position);
+        float fVar3 = deltaSeconds * player->weaponParams.field_38;
+
+        rdVector_Normalize3Acc(&tmp);
+        rdMatrix_BuildFromLook34(&local_60,&tmp);
+        rdMatrix_ExtractAngles34(&local_60,&local_6c);
+        rdMatrix_Copy34(&local_60, &player->lookOrientation);
+        rdMatrix_ExtractAngles34(&local_60,&local_78);
+        tmp.y = local_6c.y - local_78.y;
+        tmp.x = -local_78.x;
+        tmp.z = -local_78.z;
+        if (tmp.y > 180.0) {
+            tmp.y = tmp.y - 360.0;
+        }
+        else if (tmp.y < -180.0) {
+            tmp.y = tmp.y - -360.0;
+        }
+        float fVar6 = tmp.y;
+        if (tmp.y < 0.0) {
+            fVar6 = -tmp.y;
+        }
+        if (fVar6 > fVar3) {
+            fVar6 = tmp.y;
+            if (tmp.y < 0.0) {
+                fVar6 = -tmp.y;
+            }
+            tmp.y = (fVar3 / fVar6) * tmp.y;
+        }
+        bOverrideIdk = 1;
+        rdVector_Copy3(&a3, &tmp);
+    }
+#endif
 
     if (!rdVector_IsZero3(&a3))
     {
@@ -687,6 +718,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *thing, float deltaSeconds)
     {
         rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
     }
+
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&tmpMat, &a3);
@@ -753,6 +785,8 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     rdVector3 out; // [esp+4Ch] [ebp-48h] BYREF
     rdVector3 a3; // [esp+58h] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+64h] [ebp-30h] BYREF
+    int bOverrideIdk = 0;
+    float zOverride = 0.0;
 
     possibly_undef_1 = 0.0;
     possibly_undef_2 = 0.0;
@@ -822,6 +856,55 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
     if ( thing->physicsParams.angVel.y != 0.0 )
     {
         rdVector_Scale3(&a3, &thing->physicsParams.angVel, deltaSeconds);
+
+// MOTS added: weapon tracking?
+#ifdef JKM_PARAMS
+    if (thing->type == SITH_THING_WEAPON && thing->weaponParams.pTargetThing && thing->weaponParams.field_38 != 0.0) {
+        rdVector3 tmp;
+        rdMatrix34 local_60;
+        rdVector3 local_6c, local_78;
+
+        rdVector_Sub3(&tmp, &thing->weaponParams.pTargetThing->position, &thing->position);
+        float fVar3 = deltaSeconds * thing->weaponParams.field_38;
+
+        if (-0.03 <= tmp.z) {
+            if (tmp.z > 0.03) {
+                zOverride = 1.0;
+            }
+        }
+        else {
+            zOverride = -1.0;
+        }
+        rdVector_Normalize3Acc(&tmp);
+        rdMatrix_BuildFromLook34(&local_60,&tmp);
+        rdMatrix_ExtractAngles34(&local_60,&local_6c);
+        rdMatrix_Copy34(&local_60, &thing->lookOrientation);
+        rdMatrix_ExtractAngles34(&local_60,&local_78);
+        tmp.y = local_6c.y - local_78.y;
+        tmp.x = -local_78.x;
+        tmp.z = -local_78.z;
+        if (tmp.y > 180.0) {
+            tmp.y = tmp.y - 360.0;
+        }
+        else if (tmp.y < -180.0) {
+            tmp.y = tmp.y - -360.0;
+        }
+        float fVar6 = tmp.y;
+        if (tmp.y < 0.0) {
+            fVar6 = -tmp.y;
+        }
+        if (fVar6 > fVar3) {
+            fVar6 = tmp.y;
+            if (tmp.y < 0.0) {
+                fVar6 = -tmp.y;
+            }
+            tmp.y = (fVar3 / fVar6) * tmp.y;
+        }
+        bOverrideIdk = 1;
+        rdVector_Copy3(&a3, &tmp);
+    }
+#endif
+
         rdMatrix_BuildRotate34(&a, &a3);
         sithCollision_sub_4E7670(thing, &a);
         if ( possibly_undef_2 >= 1.0 )
@@ -981,6 +1064,12 @@ void sithPhysics_ThingPhysAttached(sithThing *thing, float deltaSeconds)
             rdVector_MultAcc3(&thing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
+
+#ifdef JKM_PARAMS
+    if (bOverrideIdk) {
+        thing->physicsParams.vel.z = zOverride;
+    }
+#endif
 
     rdVector_ClipPrecision3(&thing->physicsParams.vel);
     if ( !rdVector_IsZero3(&thing->physicsParams.vel) )

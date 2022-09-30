@@ -22,6 +22,7 @@ typedef uint32_t size_t;
 #define JKM_LIGHTING
 #define JKM_BONES
 #define JKM_PARAMS
+#define JKM_AI
 #endif
 
 #include "engine_config.h"
@@ -599,6 +600,9 @@ enum SithCogFlag
     SITH_COG_NO_SYNC = 0x200,
 };
 
+extern int Main_bMotsCompat;
+#define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)
+
 typedef int SITH_MESSAGE;
 enum SITH_MESSAGE_E
 {
@@ -643,7 +647,16 @@ enum SITH_MESSAGE_E
     SITH_MESSAGE_LEAVE = 38,
     SITH_MESSAGE_SPLASH = 39,
     SITH_MESSAGE_TRIGGER = 40,
-    SITH_MESSAGE_MAX = 41,
+
+    // MOTS
+    SITH_MESSAGE_PREBLOCK = 41,
+    SITH_MESSAGE_ESCAPED = 42,
+    SITH_MESSAGE_ATTACHKILLED = 43,
+    SITH_MESSAGE_PLAYERACTION = 44,
+
+    // MOTS ext
+    SITH_MESSAGE_ENTERBUBBLE = 45,
+    SITH_MESSAGE_EXITBUBBLE = 46,
 };
 
 typedef uint32_t sithWeaponFlags_t;
@@ -1821,9 +1834,16 @@ typedef struct sithCog
     sithCogStackvar stack[SITHCOGVM_MAX_STACKSIZE];
     uint32_t stackPos;
     char cogscript_fpath[32];
+#ifdef JKM_TYPES
+    uint32_t unk1;
+    int numHeapVars;
+    sithCogStackvar* heap;
+#endif
     char field_4BC[4096];
+#ifndef JKM_TYPES
     sithCogStackvar* heap;
     int numHeapVars;
+#endif
 } sithCog;
 
 // end sithCogVm
@@ -2412,6 +2432,9 @@ typedef struct sithActor
     sithActorInstinct instincts[16];
     uint32_t numAIClassEntries;
     int nextUpdate;
+#ifdef JKM_AI
+    sithThing* pInterest;
+#endif
     rdVector3 lookVector;
     rdVector3 movePos;
     rdVector3 field_1AC;
@@ -2419,9 +2442,6 @@ typedef struct sithActor
     float moveSpeed;
     sithThing* field_1C0;
     rdVector3 field_1C4;
-#ifdef JKM_TYPES
-    int unk1;
-#endif
     sithThing* field_1D0;
     rdVector3 field_1D4;
     int field_1E0;
@@ -2563,11 +2583,11 @@ typedef struct sithThingWeaponParams
     float elementSize; // 28
     float trailCylRadius; // 2C
     float trainRandAngle; // 30
-    uint32_t field_34; // 34
 #ifdef JKM_PARAMS
+    sithThing* pTargetThing; // 34
     float field_38; // 38
-    uint32_t field_3C; // 3C
 #endif
+    uint32_t field_3C; // 3C
     float range; // 40
     float force; // 3C
     uint32_t field_40;

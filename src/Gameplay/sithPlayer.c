@@ -329,7 +329,7 @@ void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
     double v8; // st7
 
     focusThing = sithWorld_pCurrentWorld->cameraFocus;
-    if ( (focusThing->type & SITH_THING_PLAYER) != 0 ) // ???
+    if ( (focusThing->type & 0xA) != 0 ) // ???
     {
         paleffect = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
         if ( tintR < 0.0 )

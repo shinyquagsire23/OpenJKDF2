@@ -133,6 +133,32 @@ void sithInventory_SelectItemFollowing(sithThing *thing)
     sithInventory_SelectItem(thing, sithInventory_GetNumItemsFollowingIdx(thing, thing->actorParams.playerinfo->curItem));
 }
 
+// MOTS added
+int sithInventory_SelectWeaponPrior(int param_1)
+{
+    int iVar1;
+    sithItemDescriptor *psVar2;
+    
+    if (((param_1 < SITHBIN_NUMBINS) && (-1 < param_1)) && ((sithInventory_aDescriptors[param_1].flags & ITEMINFO_WEAPON) != 0)) {
+        iVar1 = 0;
+        if (0 < param_1) {
+            psVar2 = sithInventory_aDescriptors;
+            do {
+                if ((psVar2->flags & ITEMINFO_WEAPON) != 0) {
+                    iVar1 = iVar1 + 1;
+                }
+                psVar2 = psVar2 + 1;
+                param_1 = param_1 + -1;
+            } while (param_1 != 0);
+            return iVar1;
+        }
+    }
+    else {
+        iVar1 = -1;
+    }
+    return iVar1;
+}
+
 int sithInventory_SelectWeaponFollowing(int idx)
 {
     int count = 0;

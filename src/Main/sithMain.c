@@ -331,7 +331,7 @@ int sithMain_Tick()
                 //    sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
                 //}
                 sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-                // MOTS added: sithThing_MotsTick(0x1F, 0, 0);
+                sithThing_MotsTick(0x1F, 0, 0);
             }
 
             sithTime_deltaSeconds = tmp;
@@ -365,7 +365,7 @@ int sithMain_Tick()
             }
 
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
-            // MOTS added: sithThing_MotsTick(0x1F, 0, 0);
+            sithThing_MotsTick(0x1F, 0, 0);
         }
 
         sithCogScript_TickAll();

@@ -60,6 +60,7 @@
 #define JKM_LIGHTING
 #define JKM_BONES
 #define JKM_PARAMS
+#define JKM_AI
 #endif
 
 // Disable warnings for Vegetable Studio

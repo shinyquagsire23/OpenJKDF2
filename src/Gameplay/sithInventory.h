@@ -244,6 +244,7 @@ int sithInventory_GetNumItemsFollowingIdx(sithThing *thing, signed int binNumSta
 void sithInventory_SelectItem(sithThing *thing, int binIdx);
 void sithInventory_SelectItemPrior(sithThing *thing);
 void sithInventory_SelectItemFollowing(sithThing *thing);
+int sithInventory_SelectWeaponPrior(int param_1); // MOTS added
 int sithInventory_SelectWeaponFollowing(int idx);
 sithItemDescriptor* sithInventory_GetBinByIdx(int idx);
 int sithInventory_GetCurWeapon(sithThing *player);

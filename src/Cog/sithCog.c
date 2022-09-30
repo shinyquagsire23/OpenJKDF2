@@ -27,6 +27,7 @@
 #include "World/sithSector.h"
 #include "World/sithThing.h"
 #include "Main/jkGame.h"
+#include "Main/Main.h"
 #include "stdPlatform.h"
 #include "Dss/sithDSSCog.h"
 #include "Dss/sithMulti.h"
@@ -102,6 +103,12 @@ int sithCog_Startup()
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 38, "leave");
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 39, "splash");
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 41, "preblock");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 42, "escaped");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 43, "attachkilled");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "playeraction");
+    }
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global0", 0);
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global1", 0);
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global2", 0);
@@ -234,6 +241,8 @@ void sithCog_Close()
         sithCog_numSurfaceLinks = 0;
         sithCog_numThingLinks = 0;
         sithCog_masterCog = 0;
+        sithCog_pActionCog = NULL;
+        sithCog_actionCogIdk = -1;
         sithCog_bOpened = 0;
     }
 }

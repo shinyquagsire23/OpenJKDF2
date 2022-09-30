@@ -45,6 +45,7 @@ void jkControl_nullsub_37()
 {
 }
 
+// MOTS altered
 int jkControl_HandleHudKeys(sithThing *player, float b)
 {
     wchar_t *v2; // eax
@@ -59,14 +60,14 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
         if ( !jkHud_bChatOpen )
         {
             sithControl_ReadFunctionMap(INPUT_FUNC_TALK, &v15);
-            if ( v15 )
+            if (v15 && sithThing_MotsTick(0xe,0,1.0))
                 jkHud_Chat();
         }
 
         if ( (g_submodeFlags & 1) == 0 )
         {
             sithControl_ReadFunctionMap(INPUT_FUNC_GAMESAVE, &v15);
-            if ( v15 )
+            if (v15 && sithThing_MotsTick(0xe,0,2.0))
             {
                 v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
                 jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetText("GUI_SLQUICKSAVE"));
@@ -79,9 +80,10 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
         sithControl_ReadFunctionMap(INPUT_FUNC_CAMERAMODE, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
-            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
             {
                 sithCamera_CycleCamera();
+                //DAT_005b9254 = 2; // MOTS TODO
                 if ( (sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 )
                     v5 = jkStrings_GetText("GAME_EXTERNALCAM");
                 else
@@ -96,17 +98,21 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
             sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )
             {
-                jkGame_ScreensizeIncrease();
-                jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_SCREENSIZE"), jkGame_screenSize);
-                jkDev_PrintUniString(v16);
+                if (sithThing_MotsTick(0xe,1,3.0)) { // MOTS altered
+                    jkGame_ScreensizeIncrease();
+                    jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_SCREENSIZE"), jkGame_screenSize);
+                    jkDev_PrintUniString(v16);
+                }
                 i = v15 == 0;
             }
             sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )
             {
-                jkGame_ScreensizeDecrease();
-                jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_SCREENSIZE"), jkGame_screenSize);
-                jkDev_PrintUniString(v16);
+                if (sithThing_MotsTick(0xe,-1,3.0)) { // MOTS altered
+                    jkGame_ScreensizeDecrease();
+                    jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_SCREENSIZE"), jkGame_screenSize);
+                    jkDev_PrintUniString(v16);
+                }
                 i = v15 == 0;
             }
         }
@@ -114,21 +120,23 @@ int jkControl_HandleHudKeys(sithThing *player, float b)
         sithControl_ReadFunctionMap(INPUT_FUNC_GAMMA, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
-            jkGame_Gamma();
-            jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_GAMMA"), jkGame_gamma);
-            jkDev_PrintUniString(v16);
+            if (sithThing_MotsTick(0xe,0,4.0)) { // MOTS altered
+                jkGame_Gamma();
+                jk_snwprintf(v16, 0x80u, jkStrings_GetText("GAME_GAMMA"), jkGame_gamma);
+                jkDev_PrintUniString(v16);
+            }
             i = v15 == 0;
         }
 
         sithControl_ReadFunctionMap(INPUT_FUNC_SCREENSHOT, &v15);
-        if ( v15 )
+        if (v15 && sithThing_MotsTick(0xe,0,6.0))
         {
             jkGame_Screenshot();
             jkDev_PrintUniString(jkStrings_GetText("GAME_SCREENSHOT"));
         }
 
         sithControl_ReadFunctionMap(INPUT_FUNC_TALLY, &v15);
-        if ( v15 )
+        if (v15 && sithThing_MotsTick(0xe,0,5.0))
             jkHud_Tally();
     }
     return 0;

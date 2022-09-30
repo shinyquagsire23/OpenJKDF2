@@ -6,46 +6,6 @@
 #include "Main/jkGame.h"
 #include "jk.h"
 
-void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx);
-void sithCogFunctionAI_SetMovePos(sithCog *ctx);
-void sithCogFunctionAI_AIJump(sithCog *ctx);
-void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx);
-void sithCogFunctionAI_AISetMoveThing(sithCog *ctx);
-void sithCogFunctionAI_AISetLookPos(sithCog *ctx);
-void sithCogFunctionAI_AISetLookFrame(sithCog *ctx);
-void sithCogFunctionAI_GetMovePos(sithCog *ctx);
-void sithCogFunctionAI_AISetMode(sithCog *ctx);
-void sithCogFunctionAI_AIGetMode(sithCog *ctx);
-void sithCogFunctionAI_AIClearMode(sithCog *ctx);
-void sithCogFunctionAI_FirstThingInView(sithCog *ctx);
-void sithCogFunctionAI_NextThingInView(sithCog *ctx);
-void sithCogFunctionAI_ThingViewDot(sithCog *ctx);
-void sithCogFunctionAI_AISetFireTarget(sithCog *ctx);
-void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx);
-void sithCogFunctionAI_AIFlee(sithCog *ctx);
-void sithCogFunctionAI_AISetClass(sithCog *ctx);
-
-void sithCogFunctionAI_Startup(void* ctx)
-{
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_GetMovePos, "aigetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_SetMovePos, "aisetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveThing, "aisetmovething");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookPos, "aisetlookpos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveSpeed, "aisetmovespeed");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookFrame, "aisetlookframe");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveFrame, "aisetmoveframe");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_IsAITargetInSight, "isaitargetinsight");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIFlee, "aiflee");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetClass, "aisetclass");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIJump, "aijump");
-}
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
@@ -564,4 +524,94 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
             v3->numAIClassEntries = v4;
         }
     }
+}
+
+// MOTS added
+void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->aiclass) 
+    {
+        sithCogExec_PushFlex(ctx, pThing->actor->aiclass->alignment);
+        return;
+    }
+    sithCogExec_PushFlex(ctx, 0.0);
+}
+
+// MOTS added
+void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->aiclass) 
+    {
+        pThing->actor->aiclass->alignment = val;
+    }
+}
+
+// MOTS added
+void sithCogFunctionAI_AISetInterest(sithCog *ctx)
+{
+    sithThing* pInterest = sithCogExec_PopThing(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor) 
+    {
+        if (pInterest == sithPlayer_pLocalPlayerThing) {
+            pThing->actor->pInterest = 0;
+        }
+        else {
+            pThing->actor->pInterest = pInterest;
+        }
+    }
+}
+
+// MOTS added
+void sithCogFunctionAI_AIGetInterest(sithCog *ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pInterest) 
+    {
+        sithCogExec_PushInt(ctx, pThing->actor->pInterest->thingIdx);
+        return;
+    }
+    sithCogExec_PushInt(ctx, -1);
+}
+
+void sithCogFunctionAI_Startup(void* ctx)
+{
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_GetMovePos, "aigetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_SetMovePos, "aisetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
+    if (Main_bMotsCompat) {
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone"); // TODO
+    }
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
+    if (Main_bMotsCompat) {
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone"); // TODO
+    }
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveThing, "aisetmovething");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookPos, "aisetlookpos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveSpeed, "aisetmovespeed");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookFrame, "aisetlookframe");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveFrame, "aisetmoveframe");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_IsAITargetInSight, "isaitargetinsight");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIFlee, "aiflee");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetClass, "aisetclass");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIJump, "aijump");
+#ifdef JKM_AI
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor"); // TODO
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority"); // TODO
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority"); // TODO
+    }
+#endif
 }

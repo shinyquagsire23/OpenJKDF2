@@ -26,6 +26,7 @@
 int sithCogExec_009d39b0 = 0;
 sithCog* sithCogExec_pIdkMotsCtx = NULL;
 sithCog* sithCog_pActionCog = NULL;
+int sithCog_actionCogIdk = 0;
 
 void sithCogExec_Exec(sithCog *cog_ctx)
 {

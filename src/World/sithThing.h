@@ -383,6 +383,8 @@ int sithThing_HasAttachment(sithThing *thing);
 void sithThing_Sync();
 int sithThing_Release(sithThing *pThing);
 
+int sithThing_MotsTick(int param_1,int param_2,float param_3); // MOTS added
+
 //static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *world, int a2) = (void*)sithThing_Load_ADDR;

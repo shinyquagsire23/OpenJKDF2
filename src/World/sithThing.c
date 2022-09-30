@@ -2063,3 +2063,19 @@ int sithThing_Release(sithThing *pThing)
     }
     return 1;
 }
+
+// MOTS added
+int sithThing_MotsTick(int param_1,int param_2,float param_3)
+{
+    if (!Main_bMotsCompat) return 1;
+
+    if (sithCog_pActionCog && (sithCog_actionCogIdk & (1 << (param_1 & 0x1f)))) 
+    {
+        float fVar1 = sithCog_SendMessageEx(sithCog_pActionCog,SITH_MESSAGE_PLAYERACTION,0,0,0,0,0,(float)param_1,(float)param_2,param_3,0.0);
+        if (fVar1 == 0.0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+

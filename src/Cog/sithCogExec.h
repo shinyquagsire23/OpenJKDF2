@@ -46,6 +46,7 @@
 extern int sithCogExec_009d39b0;
 extern sithCog* sithCogExec_pIdkMotsCtx;
 extern sithCog* sithCog_pActionCog;
+extern int sithCog_actionCogIdk;
 
 enum SENDERTYPE
 {

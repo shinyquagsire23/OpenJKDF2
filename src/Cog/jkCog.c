@@ -196,6 +196,10 @@ void jkCog_dwGetActivateBin(sithCog *ctx)
 
 void jkCog_RegisterVerbs()
 {
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 45, "enterbubble");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 46, "exitbubble");
+    }
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, sithCogFunctionPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetFlags, "jksetflags");
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetFlags, "jkgetflags");

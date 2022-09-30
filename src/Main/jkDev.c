@@ -556,14 +556,13 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
 
         if (Main_bMotsCompat) {
-            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_FISTS, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_BRYARPISTOL, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_RIFLE, 1.0);
-            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_THERMAL_DETONATOR, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_THERMAL_DETONATOR, 100.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_PARA_EWEB, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_REPEATER, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_RAIL_DETONATOR, 1.0);
-            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_SEQUENCER_CHARGE, 1.0);
+            sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_SEQUENCER_CHARGE, 100.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_CONCUSSION_RIFLE, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_EWEB, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_LIGHTSABER, 1.0);

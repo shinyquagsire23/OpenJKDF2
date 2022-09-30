@@ -21,6 +21,7 @@
 #include "Cog/sithCog.h"
 #include "stdPlatform.h"
 #include "Main/jkGame.h"
+#include "Main/Main.h"
 #include "Devices/sithConsole.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
@@ -1140,7 +1141,6 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
     int inputFunc; // edi
     int v11; // edi
     sithItemDescriptor *v12; // eax
-    sithItemDescriptor *v13; // eax
     signed int v14; // eax
     int v15; // edi
     sithItemDescriptor *v16; // eax
@@ -1182,46 +1182,17 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
             sithControl_ReadFunctionMap(INPUT_FUNC_NEXTWEAPON, &readInput);
             while (readInput--)
             {
-                v11 = sithInventory_GetNumBinsWithFlag(player, sithInventory_GetCurWeapon(player), ITEMINFO_WEAPON);
-                if ( v11 == -1 )
-                    v11 = sithInventory_GetNumBinsWithFlag(player, 0, ITEMINFO_WEAPON);
-                v12 = sithInventory_GetItemDesc(player, v11);
-                if ( sithCog_SendMessageEx(v12->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
-                {
-                    do
-                    {
-                        v11 = sithInventory_GetNumBinsWithFlag(player, v11, ITEMINFO_WEAPON);
-                        if ( v11 == -1 )
-                            v11 = sithInventory_GetNumBinsWithFlag(player, 0, ITEMINFO_WEAPON);
-                        v13 = sithInventory_GetItemDesc(player, v11);
-                    }
-                    while ( sithCog_SendMessageEx(v13->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+                if (sithThing_MotsTick(7,1,1.0)) {
+                    sithWeapon_Syncunused1(player);
                 }
-                sithWeapon_SelectWeapon(player, v11, 0);
             }
 
             sithControl_ReadFunctionMap(INPUT_FUNC_PREVWEAPON, &readInput);
             while (readInput--)
             {
-                v14 = sithInventory_GetCurWeapon(player);
-                
-                v15 = sithInventory_GetNumBinsWithFlagRev(player, v14, ITEMINFO_WEAPON);
-                if ( v15 == -1 )
-                    v15 = sithInventory_GetNumBinsWithFlagRev(player, 0, ITEMINFO_WEAPON);
-                
-                v16 = sithInventory_GetItemDesc(player, v15);
-                if ( sithCog_SendMessageEx(v16->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
-                {
-                    do
-                    {
-                        v15 = sithInventory_GetNumBinsWithFlagRev(player, v15, ITEMINFO_WEAPON);
-                        if ( v15 == -1 )
-                            v15 = sithInventory_GetNumBinsWithFlagRev(player, 0, ITEMINFO_WEAPON);
-                        v17 = sithInventory_GetItemDesc(player, v15);
-                    }
-                    while ( sithCog_SendMessageEx(v17->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+                if (sithThing_MotsTick(7,1,-1.0)) {
+                    sithWeapon_Syncunused2(player);
                 }
-                sithWeapon_SelectWeapon(player, v15, 0);
             }
 
             if ( sithWeapon_8BD024 != -1 )
@@ -1558,8 +1529,125 @@ int sithWeapon_ReadConf()
 }
 
 // TODO these functions are interesting
-void sithWeapon_Syncunused1(){}
-void sithWeapon_Syncunused2(){}
+void sithWeapon_Syncunused1(sithThing* player)
+{
+    if (Main_bMotsCompat) {
+        int iVar1;
+        int binIdx;
+        int iVar2;
+        sithItemDescriptor *psVar3;
+        float fVar4;
+        
+        iVar1 = sithInventory_GetCurWeapon(player);
+        iVar1 = sithInventory_SelectWeaponPrior(iVar1);
+        do {
+            do {
+                do {
+                    if (iVar1 == 0x14) {
+                        iVar1 = 1;
+                    }
+                    else if (iVar1 < 0xb) {
+                        iVar1 = iVar1 + 10;
+                    }
+                    else {
+                        iVar1 = iVar1 + -9;
+                    }
+                    binIdx = sithInventory_SelectWeaponFollowing(iVar1);
+                    if (binIdx == -1) {
+                        iVar1 = 0;
+                        binIdx = sithInventory_SelectWeaponFollowing(0);
+                    }
+                    fVar4 = sithInventory_GetBinAmount(player,binIdx);
+                } while (fVar4 == 0.0);
+                iVar2 = sithInventory_GetAvailable(player,binIdx);
+            } while (iVar2 == 0);
+            psVar3 = sithInventory_GetItemDesc(player,binIdx);
+            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
+        } while (fVar4 == -1.0);
+        sithWeapon_SelectWeapon(player,binIdx,0);
+    }
+    else {
+        sithItemDescriptor *v12; // eax
+        sithItemDescriptor *v13; // eax
+        int binIdx = sithInventory_GetCurWeapon(player);
+
+        int v11 = sithInventory_GetNumBinsWithFlag(player, binIdx, ITEMINFO_WEAPON);
+        if ( v11 == -1 )
+            v11 = sithInventory_GetNumBinsWithFlag(player, 0, ITEMINFO_WEAPON);
+        v12 = sithInventory_GetItemDesc(player, v11);
+        if ( sithCog_SendMessageEx(v12->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
+        {
+            do
+            {
+                v11 = sithInventory_GetNumBinsWithFlag(player, v11, ITEMINFO_WEAPON);
+                if ( v11 == -1 )
+                    v11 = sithInventory_GetNumBinsWithFlag(player, 0, ITEMINFO_WEAPON);
+                v13 = sithInventory_GetItemDesc(player, v11);
+            }
+            while ( sithCog_SendMessageEx(v13->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+        }
+        sithWeapon_SelectWeapon(player, v11, 0);
+    }
+}
+
+void sithWeapon_Syncunused2(sithThing* player)
+{
+    if (Main_bMotsCompat) {
+        int iVar1;
+        int binIdx;
+        int iVar2;
+        sithItemDescriptor *psVar3;
+        float fVar4;
+        
+        iVar1 = sithInventory_GetCurWeapon(player);
+        iVar1 = sithInventory_SelectWeaponPrior(iVar1);
+        do {
+            do {
+                do {
+                    if (iVar1 == 1) {
+                        iVar1 = 0x14;
+                    }
+                    else if (iVar1 < 0xb) {
+                        iVar1 = iVar1 + 9;
+                    }
+                    else {
+                        iVar1 = iVar1 + -10;
+                    }
+                    binIdx = sithInventory_SelectWeaponFollowing(iVar1);
+                    fVar4 = sithInventory_GetBinAmount(player,binIdx);
+                } while (fVar4 == 0.0);
+                iVar2 = sithInventory_GetAvailable(player,binIdx);
+            } while (iVar2 == 0);
+            psVar3 = sithInventory_GetItemDesc(player,binIdx);
+            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
+        } while (fVar4 == -1.0);
+        sithWeapon_SelectWeapon(player,binIdx,0);
+    }
+    else {
+        sithItemDescriptor *v16; // eax
+        sithItemDescriptor *v17; // eax
+
+        int v14 = sithInventory_GetCurWeapon(player);
+                    
+        int v15 = sithInventory_GetNumBinsWithFlagRev(player, v14, ITEMINFO_WEAPON);
+        if ( v15 == -1 )
+            v15 = sithInventory_GetNumBinsWithFlagRev(player, 0, ITEMINFO_WEAPON);
+        
+        v16 = sithInventory_GetItemDesc(player, v15);
+        if ( sithCog_SendMessageEx(v16->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
+        {
+            do
+            {
+                v15 = sithInventory_GetNumBinsWithFlagRev(player, v15, ITEMINFO_WEAPON);
+                if ( v15 == -1 )
+                    v15 = sithInventory_GetNumBinsWithFlagRev(player, 0, ITEMINFO_WEAPON);
+                v17 = sithInventory_GetItemDesc(player, v15);
+            }
+            while ( sithCog_SendMessageEx(v17->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+        }
+        sithWeapon_SelectWeapon(player, v15, 0);
+    }
+}
 
 void sithWeapon_SetFireRate(sithThing *weapon, float fireRate)
 {
