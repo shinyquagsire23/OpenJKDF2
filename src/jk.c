@@ -425,6 +425,15 @@ int __wcsicmp(const wchar_t *a, const wchar_t *b)
     return ca - cb;
 }
 
+void jk_fatal()
+{
+#ifndef WIN32_BLOBS
+    assert(0);
+#else
+    *(uint32_t*)0=0x12345678;
+#endif
+}
+
 void jk_init()
 {
 #ifdef WIN32_BLOBS

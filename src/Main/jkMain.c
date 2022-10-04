@@ -45,6 +45,7 @@
 #include "General/util.h"
 #include "General/stdBitmap.h"
 #include "General/stdPalEffects.h"
+#include "General/stdString.h"
 #include "World/jkPlayer.h"
 #include "Dss/jkDSS.h"
 #include "stdPlatform.h"
@@ -54,6 +55,9 @@
 #else
 #define TICKRATE_MS (20) // 50fps
 #endif
+
+char jkMain_aLevelJklFnameMots[128];
+char jkMain_motsIdk[128];
 
 jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
@@ -454,7 +458,13 @@ void jkMain_GameplayShow(int a1, int a2)
     wchar_t *v6; // [esp-4h] [ebp-Ch]
 
     level_loaded = 0;
-    // MOTS added something here
+
+    // MOTS added something here TODO
+    if (a2 == JK_GAMEMODE_MOTS1) {
+        stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_aLevelJklFnameMots, 128);
+        goto LABEL_39;
+    }
+
     if ( a2 == JK_GAMEMODE_ESCAPE )
     {
         sithSoundMixer_ResumeAll();
@@ -472,6 +482,7 @@ void jkMain_GameplayShow(int a1, int a2)
         jkMain_bInit = 1;
         jkPlayer_InitSaber();
         sithMain_AutoSave();
+
 LABEL_39:
         if ( jkMain_SetVideoMode() )
         {
@@ -491,6 +502,9 @@ LABEL_39:
         return;
     }
 
+    // MOTS added
+    jkMain_motsIdk[0] = 0;
+
     if ( jkSmack_gameMode == 1 )
     {
         jkGui_copies_string(gamemode_1_str);
@@ -502,22 +516,29 @@ LABEL_39:
         jkGuiTitle_ShowLoading(jkMain_aLevelJklFname, 0);
     }
 
-    if ( jkSmack_gameMode )
+    // MOTS added:
+    // jkEpisode_Shutdown
+
+    if ( jkSmack_gameMode == 0)
     {
-        if ( jkSmack_gameMode == 1 )
-        {
-            v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
-        }
-        else
-        {
-            if ( jkSmack_gameMode != 2 )
-                goto LABEL_15;
-            v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
-        }
-    }
-    else
-    {
+#ifdef JKM_DSS
+        jkPlayer_SetAmmoMaximums(0);
+#endif
         v3 = sithMain_Mode1Init(jkMain_aLevelJklFname);
+    }
+    else if ( jkSmack_gameMode == 1 )
+    {
+#ifdef JKM_DSS
+        jkPlayer_SetAmmoMaximums(0);
+#endif
+        v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
+    }
+    else if ( jkSmack_gameMode == 2 )
+    {
+#ifdef JKM_DSS
+        jkPlayer_SetAmmoMaximums(jkPlayer_personality);
+#endif
+        v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
     }
 
     level_loaded = v3;
@@ -541,6 +562,9 @@ LABEL_15:
         jkGuiDialog_ErrorDialog(v4, v6);
         return;
     }
+
+    // MOTS added:
+    //sithWorld_GetMemorySize(sithWorld_pCurrentWorld,local_44,local_88);
 
     if ( !sithNet_isMulti )
     {
@@ -584,6 +608,23 @@ LABEL_28:
             if ( sithNet_isMulti )
                 jkDSS_wrap_SendSaberInfo_alt();
         }
+
+        if (Main_bMotsCompat) {
+            sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
+            if (jkMain_motsIdk[0] != 0) {
+                stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
+                stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
+                if (jkGuiRend_thing_five != 0) {
+                    jkGuiRend_thing_four = 1;
+                }
+                jkMain_aLevelJklFname[127] = '\0';
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_MOTS1;
+                return;
+            }
+        }
+        
+
         goto LABEL_39;
     }
     thing_six = 1;
@@ -769,7 +810,7 @@ void jkMain_ChoiceLeave(int a1, int a2)
 
 void jkMain_UnkShow(int a1, int a2)
 {
-    //jkPlayer_FUN_00406af0(0); // MOTS added
+    jkPlayer_SetAmmoMaximums(0); // MOTS added
 }
 
 void jkMain_UnkTick(int a1)
@@ -1347,6 +1388,19 @@ int jkMain_SwitchTo4(const char *pFpath)
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 4;
     return result;
+}
+
+// MOTS added
+void jkMain_StartupCutscene(char *pCutsceneStr)
+{
+    char local_80 [128];
+    
+    jkPlayer_WriteConfSwap(playerThings + playerThingIdx, 1, pCutsceneStr);
+    _sprintf(local_80,"video%c%s", '\\', pCutsceneStr);
+
+    if (util_FileExists(local_80)) {
+        jkRes_FileExists(local_80, jkMain_motsIdk, 0x80);
+    }
 }
 
 #ifdef SDL2_RENDER

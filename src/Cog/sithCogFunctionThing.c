@@ -757,6 +757,11 @@ void sithCogFunctionThing_GetInv(sithCog *ctx)
 
     binIdx = sithCogExec_PopInt(ctx);
     playerThing = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
+
     if ( playerThing 
          && playerThing->type == SITH_THING_PLAYER 
          && playerThing->actorParams.playerinfo 
@@ -776,6 +781,10 @@ void sithCogFunctionThing_SetInv(sithCog *ctx)
     uint32_t binIdx = sithCogExec_PopInt(ctx);
     sithThing* playerThing = sithCogExec_PopThing(ctx);
 
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
+
     if ( playerThing 
          && playerThing->type == SITH_THING_PLAYER 
          && playerThing->actorParams.playerinfo 
@@ -788,6 +797,10 @@ void sithCogFunctionThing_ChangeInv(sithCog *ctx)
     float amt = sithCogExec_PopFlex(ctx);
     uint32_t binIdx = sithCogExec_PopInt(ctx);
     sithThing* playerThing = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
 
     if ( playerThing 
          && playerThing->type == SITH_THING_PLAYER 
@@ -811,6 +824,11 @@ void sithCogFunctionThing_GetInvCog(sithCog *ctx)
 
     binIdx = sithCogExec_PopInt(ctx);
     playerThing = sithCogExec_PopThing(ctx);
+
+    if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
+        binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+    }
+
     if ( playerThing
       && playerThing->type == SITH_THING_PLAYER
       && playerThing->actorParams.playerinfo
@@ -1061,21 +1079,8 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
     if ( !puppet )
         goto fail;
 
-    if ( Main_bMotsCompat && thing == sithPlayer_pLocalPlayerThing)
-    {
-        sithCogExec_PushInt(ctx, -1);
-        return;
-    }
-
     // MOTS added: bugfix?
-    if ( Main_bMotsCompat && thing == sithPlayer_pLocalPlayerThing)
-    {
-        sithCogExec_PushInt(ctx, -1);
-        return;
-    }
-
-    // MOTS added: bugfix?
-    if ( Main_bMotsCompat && thing->actorParams.health < 1.0)
+    if ( Main_bMotsCompat && thing == sithPlayer_pLocalPlayerThing && thing->actorParams.health < 1.0)
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -1336,9 +1341,11 @@ void sithCogFunctionThing_GetInvMin(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
+
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
+
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo )
     {
         sithCogExec_PushFlex(ctx, sithInventory_GetMin(player, binIdx));
@@ -1353,9 +1360,11 @@ void sithCogFunctionThing_GetInvMax(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
+
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
+
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo )
     {
         sithCogExec_PushFlex(ctx, sithInventory_GetMax(player, binIdx));
@@ -1712,6 +1721,7 @@ void sithCogFunctionThing_SetActorWeapon(sithCog *ctx)
     }
 }
 
+// MOTS altered
 void sithCogFunctionThing_GetActorWeapon(sithCog *ctx)
 {
     int weap_idx = sithCogExec_PopInt(ctx);
@@ -1736,7 +1746,12 @@ void sithCogFunctionThing_GetActorWeapon(sithCog *ctx)
 
         if (weapTemplate)
         {
-            sithCogExec_PushInt(ctx, weapTemplate->thingIdx);
+            if (!Main_bMotsCompat || (Main_bMotsCompat && thing->type != SITH_THING_PLAYER)) {
+                sithCogExec_PushInt(ctx, weapTemplate->thingIdx);
+                return;
+            }
+
+            sithCogExec_PushInt(ctx, sithInventory_SelectWeaponPrior(weapTemplate->thingIdx));
             return;
         }
 
@@ -2213,11 +2228,12 @@ void sithCogFunctionThing_ClearXFlags(sithCog *ctx)
     }
 }
 
+// MOTS altered
 void sithCogFunctionThing_TakeItem(sithCog *ctx)
 {
     sithThing* player = sithCogExec_PopThing(ctx);
     sithThing* itemThing = sithCogExec_PopThing(ctx);
-    if ( itemThing && player && itemThing->type == SITH_THING_ITEM )
+    if ( itemThing && (Main_bMotsCompat ? 1 : player) && itemThing->type == SITH_THING_ITEM )
         sithItem_Take(itemThing, player, 0);
 }
 

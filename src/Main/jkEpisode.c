@@ -11,18 +11,29 @@
 #include "General/stdString.h"
 #include "Win95/Windows.h"
 #include "Cog/jkCog.h"
+#include "World/jkPlayer.h"
 
 #include "../jk.h"
 
+#ifdef JKM_DSS
+int jkEpisode_numBubbles = 0;
+#endif
+
+// MOTS altered
 int jkEpisode_Startup()
 {
     sithThing_SetHandler(jkEpisode_UpdateExtra);
+    jkEpisode_numBubbles = 0;
     return 1;
 }
 
 void jkEpisode_Shutdown()
 {
-    ;
+#ifdef JKM_DSS
+    for (int i = 0; i < 64; i++) {
+        jkPlayer_aBubbleInfo[i].pThing = 0;
+    }
+#endif
 }
 
 int jkEpisode_LoadVerify()
@@ -526,10 +537,93 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
     return 1;
 }
 
-int jkEpisode_UpdateExtra(sithThing *thing)
+// MOTS altered TODO verify
+int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 {
-    if ( (thing->jkFlags & 1) != 0 )
-        jkSaber_UpdateLength(thing);
+    if ( (pPlayerThing->jkFlags & JKFLAG_SABERON) != 0 )
+        jkSaber_UpdateLength(pPlayerThing);
+
+#ifdef JKM_DSS
+    if (Main_bMotsCompat && pPlayerThing == sithPlayer_pLocalPlayerThing) {
+        uint32_t uVar1;
+        int iVar3;
+        int iVar4;
+        uint32_t uVar5;
+        sithCog **ppsVar6;
+        uint32_t bubbleType;
+        int local_14;
+        int bHasBubble;
+        float bubbleRadSqrd;
+
+        sithThing* pBubbleThing = NULL;
+        bHasBubble = jkEpisode_GetBubbleInfo(pPlayerThing,&bubbleType,&pBubbleThing,&bubbleRadSqrd);
+        iVar4 = 0;
+        if (bHasBubble == 0) {
+            if (playerThings[playerThingIdx].jkmUnk4 != 0) {
+                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+
+                for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
+                {
+                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                    }
+                }
+            }
+        }
+        else if (playerThings[playerThingIdx].jkmUnk4 == 0) {
+            sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(float)bubbleType,0.0,0.0,0.0);
+            if (!pBubbleThing) {
+                uVar5 = 0xffffffff;
+                iVar4 = 0;
+            }
+            else {
+                uVar5 = pBubbleThing->thingIdx;
+                iVar4 = 3;
+            }
+
+            for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
+            {
+                if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                    sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                }
+            }
+        }
+        else {
+            if ((float)playerThings[playerThingIdx].jkmUnk5 != (float)bubbleType) 
+            {
+                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                
+                for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
+                {
+                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                    }
+                }
+
+                sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(float)bubbleType,0.0,0.0,0.0);
+                
+                if (!pBubbleThing) {
+                    uVar5 = 0xffffffff;
+                    iVar4 = 0;
+                }
+                else {
+                    uVar5 = pBubbleThing->thingIdx;
+                    iVar4 = 3;
+                }
+
+                for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
+                {
+                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                    }
+                }
+            }
+        }
+        playerThings[playerThingIdx].jkmUnk4 = bHasBubble;
+        playerThings[playerThingIdx].jkmUnk5 = bubbleType;
+        playerThings[playerThingIdx].jkmUnk6 = bubbleRadSqrd;
+    }
+#endif
     return 1;
 }
 
@@ -586,3 +680,105 @@ LABEL_7:
     }
     return result;
 }
+
+// MOTS added
+void jkEpisode_CreateBubble(sithThing *pThing,float radius,uint32_t type)
+{
+    int iVar1;
+    jkBubbleInfo *pjVar2;
+    int iVar3;
+    
+    jkEpisode_DestroyBubble(pThing);
+
+    iVar3 = jkEpisode_numBubbles + 1;
+    iVar1 = jkEpisode_numBubbles;
+    if (iVar3 != jkEpisode_numBubbles) {
+        pjVar2 = jkPlayer_aBubbleInfo + iVar3;
+        do {
+            if (&jkPlayer_aBubbleInfo[64] < pjVar2) {
+                iVar3 = iVar3 - 64;
+                pjVar2 = pjVar2 - 64;
+            }
+            iVar1 = iVar3;
+            if (!pjVar2->pThing) break;
+            iVar3 = iVar3 + 1;
+            pjVar2 = pjVar2 + 1;
+            iVar1 = jkEpisode_numBubbles;
+        } while (iVar3 != jkEpisode_numBubbles);
+    }
+
+    jkEpisode_numBubbles = iVar1;
+    if (!jkPlayer_aBubbleInfo[iVar3].pThing) {
+        jkPlayer_aBubbleInfo[iVar3].pThing = pThing;
+        jkPlayer_aBubbleInfo[iVar3].radiusSquared = radius * radius;
+        jkPlayer_aBubbleInfo[iVar3].type = type;
+        pThing->jkFlags |= JKFLAG_100;
+    }
+}
+
+// MOTS added
+void jkEpisode_DestroyBubble(sithThing *pThing)
+{
+    for (int i = 0; i < 64; i++) {
+        if (jkPlayer_aBubbleInfo[i].pThing == pThing)
+            jkPlayer_aBubbleInfo[i].pThing = 0;
+    }
+
+    pThing->jkFlags &= ~JKFLAG_100;
+}
+
+// MOTS added
+int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,float *pOut)
+{
+    sithThing *psVar1;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    float fVar6;
+    jkBubbleInfo *pjVar7;
+    int iVar8;
+    jkBubbleInfo *pjVar9;
+    int local_4;
+    
+    fVar3 = 1e+12;
+    iVar8 = 0;
+    pjVar9 = jkPlayer_aBubbleInfo;
+    local_4 = 0x40;
+    do {
+        psVar1 = pjVar9->pThing;
+        if (psVar1 != (sithThing *)0x0) {
+            if (psVar1->type == 0) {
+                jkEpisode_DestroyBubble(psVar1);
+            }
+            else {
+                if ((psVar1->jkFlags & JKFLAG_100) == 0) {
+                    jkEpisode_DestroyBubble(psVar1);
+                }
+                else {
+                    fVar6 = (psVar1->position).x - (pThing->position).x;
+                    fVar4 = (psVar1->position).y - (pThing->position).y;
+                    fVar5 = (psVar1->position).z - (pThing->position).z;
+                    fVar4 = fVar5 * fVar5 + fVar4 * fVar4 + fVar6 * fVar6;
+                    if ((fVar4 < pjVar9->radiusSquared) && (fVar4 < fVar3)) 
+                    {
+                        if (pTypeOut) {
+                            *pTypeOut = pjVar9->type;
+                        }
+                        if (pThingOut) {
+                            *pThingOut = psVar1;
+                        }
+                        if (pOut) { // Added: fix it to actually compare the ptr
+                            *pOut = fVar4;
+                        }
+                        iVar8 = 1;
+                        fVar3 = fVar4;
+                    }
+                }
+            }
+        }
+        pjVar9 = pjVar9 + 1;
+        local_4 = local_4 + -1;
+    } while (local_4 != 0);
+    return iVar8;
+}
+

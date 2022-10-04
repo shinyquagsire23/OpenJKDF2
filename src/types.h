@@ -23,6 +23,8 @@ typedef uint32_t size_t;
 #define JKM_BONES
 #define JKM_PARAMS
 #define JKM_AI
+#define JKM_SABER
+#define JKM_DSS
 #endif
 
 #include "engine_config.h"
@@ -45,6 +47,16 @@ typedef uint32_t size_t;
 #else
 #define SITH_MAX_SYNC_THINGS (16)
 #endif
+
+#ifdef QOL_IMPROVEMENTS
+    #define SITH_NUM_EVENTS (6)
+#else // !QOL_IMPROVEMENTS
+    #ifdef JKM_TYPES
+        #define SITH_NUM_EVENTS (6)
+    #else // !JKM_TYPES
+        #define SITH_NUM_EVENTS (5)
+    #endif // JKM_TYPES
+#endif // QOL_IMPROVEMENTS
 
 #define SITHCOGVM_MAX_STACKSIZE (64)
 
@@ -2265,6 +2277,18 @@ typedef struct sithPlayerInfo
     int32_t lastUpdateMs;
 } sithPlayerInfo;
 
+typedef struct jkSaberCollide
+{
+    int32_t field_1A4;
+    float damage;
+    float field_1AC;
+    float field_1B0;
+    uint32_t field_1B4;
+    uint32_t numDamagedThings;
+    sithThing* damagedThings[6];
+    uint32_t numDamagedSurfaces;
+    sithSurface* damagedSurfaces[6];
+} jkSaberCollide;
 
 typedef struct jkPlayerInfo
 {
@@ -2275,31 +2299,19 @@ typedef struct jkPlayerInfo
     uint32_t field_98;
     rdPolyLine polyline;
     rdThing polylineThing;
-    int32_t field_1A4;
-    float damage;
-    float field_1AC;
-    float field_1B0;
-    uint32_t field_1B4;
-    uint32_t numDamagedThings;
-    sithThing* damagedThings[6];
-    uint32_t numDamagedSurfaces;
-    sithSurface* damagedSurfaces[6];
+    jkSaberCollide saberCollideInfo;
     uint32_t lastSparkSpawnMs;
-#ifdef JKM_TYPES
+#ifdef JKM_SABER
     uint32_t jkmUnk1;
-    uint8_t pad1[0x8];
-    sithThing* actorThing;
-    uint8_t pad1_2[0x54];
-#endif // JKM_TYPES
+    rdMatrix34 jkmSaberUnk1;
+    rdMatrix34 jkmSaberUnk2;
+#endif // JKM_SABER
     sithThing* wall_sparks;
     sithThing* blood_sparks;
     sithThing* saber_sparks;
-#ifndef JKM_TYPES
     sithThing* actorThing;
-#endif
-
-#ifdef JKM_TYPES
-    uint8_t pad2[0x8];
+#ifdef JKM_DSS
+    uint32_t thing_id;
 #endif // JKM_TYPES
     uint32_t maxTwinkles;
     uint32_t twinkleSpawnRate;
@@ -2310,8 +2322,11 @@ typedef struct jkPlayerInfo
     uint32_t field_21C;
     int shields;
     uint32_t field_224;
-#ifdef JKM_TYPES
-    uint8_t pad3[0x10];
+#ifdef JKM_DSS
+    int jkmUnk4;
+    uint32_t jkmUnk5;
+    float jkmUnk6;
+    int personality;
 #endif // JKM_TYPES
 } jkPlayerInfo;
 
@@ -2321,15 +2336,15 @@ typedef struct jkPlayerMpcInfo
   char model[32];
   char soundClass[32];
   uint8_t gap80[32];
-  char sideMat[32];
-  char tipMat[32];
-#ifdef JKM_TYPES
+#ifdef JKM_PARAMS
   int unk1;
 #endif
+  char sideMat[32];
+  char tipMat[32];
   int jediRank;
-#ifdef JKM_TYPES
+#ifdef JKM_PARAMS
   int personality;
-  int unk2;
+  sithCog* pCutsceneCog;
 #endif
 } jkPlayerMpcInfo;
 
@@ -3622,6 +3637,15 @@ typedef struct jkGuiJoystickEntry
     float binaryAxisVal;
   };
 } jkGuiJoystickEntry;
+
+typedef uint32_t (*sithWorld_ChecksumHandler_t)(uint32_t);
+
+typedef struct jkBubbleInfo
+{
+    sithThing* pThing;
+    float radiusSquared;
+    uint32_t type;
+} jkBubbleInfo;
 
 #ifdef GHIDRA_IMPORT
 #include "Win95/stdGob.h"

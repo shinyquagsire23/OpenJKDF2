@@ -37,6 +37,7 @@
 #define jkDSS_ProcessSetTeam_ADDR (0x0040D450)
 
 int jkDSS_Startup();
+int jkDSS_JKM1(int unused1, sithEventInfo* unused2); // MOTS added
 void jkDSS_Shutdown();
 int jkDSS_idk4();
 void jkDSS_playerconfig_idksync();
@@ -45,8 +46,13 @@ void jkDSS_nullsub_2();
 void jkDSS_Write();
 void jkDSS_Load();
 
+int jkDSS_SendSaberInfo_alt_Mots(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr, int personality);
+
 int jkDSS_wrap_SendSaberInfo_alt();
 int jkDSS_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr);
+
+void jkDSS_SendSetSaberInfoMots(sithThing *thing, int personality);
+int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg);
 
 void jkDSS_SendSetSaberInfo(sithThing *thing);
 int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg);

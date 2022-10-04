@@ -48,6 +48,13 @@ float jkPlayer_gamma = 1.0;
 int jkPlayer_bJankyPhysics = 0;
 #endif
 
+#ifdef JKM_DSS
+jkPlayerInfo jkPlayer_aMotsInfos[64] = {0};
+jkBubbleInfo jkPlayer_aBubbleInfo[64] = {0};
+int jkPlayer_personality = 0;
+float jkPlayer_aMultiParams[0x100];
+#endif
+
 int jkPlayer_LoadAutosave()
 {
     char tmp[128];
@@ -98,6 +105,18 @@ void jkPlayer_Shutdown()
         }
     }
     _memset(jkPlayer_otherThings, 0, sizeof(jkPlayer_otherThings));
+
+#ifdef JKM_DSS
+    for (int i = 0; i < 64; i++)
+    {
+        if (jkPlayer_aMotsInfos[i].polylineThing.model3)
+        {
+            rdThing_FreeEntry(&jkPlayer_otherThings[i].polylineThing);
+            jkPlayer_aMotsInfos[i].polylineThing.model3 = 0;
+        }
+    }
+    _memset(jkPlayer_aMotsInfos, 0, sizeof(jkPlayer_aMotsInfos));
+#endif
     //nullsub_28_free();
     
 }
@@ -105,6 +124,9 @@ void jkPlayer_Shutdown()
 void jkPlayer_Open()
 {
     // MOTS added
+    if (sithPlayer_pLocalPlayerThing && sithPlayer_pLocalPlayerThing->playerInfo) {
+        sithPlayer_pLocalPlayerThing->playerInfo->personality = jkPlayer_personality;
+    }
 }
 
 void jkPlayer_Close()
@@ -129,11 +151,18 @@ void jkPlayer_InitSaber()
         playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
         playerInfoJk->field_224 = 0;
         
+        // MOTS added
+#ifdef JKM_DSS
+        playerInfoJk->jkmUnk4 = 0;
+        playerInfoJk->jkmUnk5 = 0;
+        playerInfoJk->jkmUnk6 = 0;
+#endif
+
         sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
         sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
         sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
         
-        jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "sabergreen1.mat", "sabergreen0.mat", 0.0031999999, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
+        jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "sabergreen1.mat", "sabergreen0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
     }
 }
 
@@ -160,12 +189,21 @@ void jkPlayer_InitThings()
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
-            && playerInfoIter < &jkPlayer_otherThings[16] ) // off by one?
+            && playerInfoIter < &jkPlayer_otherThings[NUM_JKPLAYER_THINGS] ) // off by one?
         {
             playerInfoIter->actorThing = thingIter;
             thingIter->playerInfo = playerInfoIter;
             playerInfoIter->rd_thing.model3 = 0;
             thingIter->thingflags |= SITH_TF_RENDERWEAPON;
+
+            // MOTS added: weird hack?
+            if (Main_bMotsCompat && !playerInfoIter->polylineThing.polyline) {
+                sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
+                sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
+                sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+                
+                jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
+            }
 
             playerInfoIter++;
             ++num;
@@ -179,7 +217,7 @@ void jkPlayer_nullsub_1(jkPlayerInfo* unk)
 {
 }
 
-// MOTS altered?
+// MOTS altered? TODO
 void jkPlayer_CreateConf(wchar_t *name)
 {
     int v6; // ebp
@@ -524,7 +562,7 @@ void jkPlayer_DrawPov()
         // TODO is this a macro/func?
         float angleSin, angleCos;
         stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
-        float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something
+        float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
         jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
@@ -872,7 +910,7 @@ void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
     }
 }
 
-// MOTS altered
+// MOTS altered TODO
 int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins)
 {
     int v6; // edi
@@ -922,6 +960,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         }
         info->jediRank = jkPlayer_GetJediRank();
         stdConffile_Close();
+        // jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS TODO
         jkPlayer_mpcInfoSet = 1;
         return 1;
     }
@@ -979,7 +1018,7 @@ int jkPlayer_MPCBinWrite()
         if ( !stdConffile_Printf("bin: %d value: %f\n", v0, sithPlayer_GetBinAmt(v0)) )
             break;
 
-        if ( ++v0 > SITHBIN_F_DEADLYSIGHT )
+        if ( ++v0 > (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT) )
         {
             return stdConffile_Printf("spendable stars: %f\n", sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS));
         }
@@ -995,7 +1034,7 @@ int jkPlayer_MPCBinRead()
     int v3;
 
     stdConffile_ReadLine();
-    for (int i = SITHBIN_JEDI_RANK; i <= SITHBIN_F_DEADLYSIGHT; ++i )
+    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
     {
         if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
             return 0;
@@ -1013,7 +1052,7 @@ int jkPlayer_MPCBinRead()
 
 void jkPlayer_InitForceBins()
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= SITHBIN_F_DEADLYSIGHT; ++i )
+    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
         {
@@ -1083,7 +1122,7 @@ int jkPlayer_GetAlignment()
 
 void jkPlayer_SetAccessiblePowers(int rank)
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= SITHBIN_F_DEADLYSIGHT; ++i )
+    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
             jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~ITEMSTATE_CARRIES;
@@ -1124,7 +1163,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
 
 void jkPlayer_ResetPowers()
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= SITHBIN_F_DEADLYSIGHT; ++i )
+    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
             sithPlayer_SetBinAmt(i, 0.0);
@@ -1424,7 +1463,9 @@ LABEL_37:
 float jkPlayer_CalcStarsAlign()
 {
     float alignment = 0.0;
+
     // MOTS: Return 0.0 always
+    if (Main_bMotsCompat) return 0.0;
 
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
@@ -1570,3 +1611,122 @@ void jkPlayer_SetRank(int rank)
 {
     sithPlayer_SetBinAmt(SITHBIN_JEDI_RANK, (float)rank);
 }
+
+// MOTS added
+static char* jkPlayer_aClassNames[5] = {
+    "single",
+    "jedi",
+    "bounty",
+    "scout",
+    "soldier",
+};
+
+// MOTS added
+uint32_t jkPlayer_ChecksumExtra(uint32_t hash)
+{
+    int iVar1;
+    uint32_t uVar2;
+    int64_t lVar3;
+    int local_8c;
+    float local_88;
+    int local_84;
+    char local_80 [128];
+    
+    for (uVar2 = 0; uVar2 < 5; uVar2++) 
+    {
+        stdString_snprintf(local_80, 128, "misc\\per\\%s.per", jkPlayer_aClassNames[uVar2]); // Added: sprintf -> snprintf
+        if (stdConffile_OpenRead(local_80)) 
+        {
+            if ((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
+                hash = hash + 2;
+                while (((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_aLine,"param %d: %f",&local_8c,&local_88), iVar1 == 2)) && ((-1 < local_8c && (local_8c < 0x100))))) {
+                    iVar1 = local_8c + 1;
+                    lVar3 = (int64_t)(local_88 * 1000.0);
+                    hash = hash + (iVar1 + uVar2) * ((uint32_t)lVar3 ^ 0x5b32a);
+                    iVar1 = stdConffile_ReadLine();
+                }
+            }
+            stdConffile_Close();
+        }
+    }
+    return hash;
+}
+
+// MOTS added
+jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing)
+{
+#ifdef JKM_DSS
+    int iVar3;
+    
+    iVar3 = 0;
+    for (iVar3 = 0; iVar3 < 64; iVar3++) {
+        if (jkPlayer_aMotsInfos[iVar3].actorThing)
+            continue;
+
+        jkPlayer_aMotsInfos[iVar3].actorThing = pPlayerThing;
+        jkPlayer_aMotsInfos[iVar3].thing_id = pPlayerThing->thing_id;
+        jkPlayer_aMotsInfos[iVar3].rd_thing.model3 = NULL;
+
+        pPlayerThing->thingflags = pPlayerThing->thingflags | SITH_TF_RENDERWEAPON;
+        pPlayerThing->playerInfo = jkPlayer_aMotsInfos + iVar3;
+        
+        return pPlayerThing->playerInfo;
+    }
+#endif
+    return NULL;
+}
+
+// NOTS added
+int jkPlayer_SetAmmoMaximums(int classIdx)
+{
+    if (!Main_bMotsCompat) return 1;
+
+#ifdef JKM_DSS
+    int iVar1;
+    float *pfVar2;
+    int local_8c;
+    float local_88;
+    int local_84;
+    char local_80 [128];
+    
+    if ((classIdx < 0) || (4 < classIdx)) {
+        classIdx = 0;
+    }
+    _sprintf(local_80,"misc\\per\\%s.per", jkPlayer_aClassNames[classIdx]);
+    iVar1 = stdConffile_OpenRead(local_80);
+    if (iVar1 != 0) {
+        iVar1 = stdConffile_ReadLine();
+        if (((iVar1 != 0) && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
+            pfVar2 = jkPlayer_aMultiParams;
+            for (iVar1 = 0x100; iVar1 != 0; iVar1 = iVar1 + -1) {
+                *pfVar2 = 0.0;
+                pfVar2 = pfVar2 + 1;
+            }
+            iVar1 = stdConffile_ReadLine();
+            while( 1 ) {
+                if (iVar1 == 0) {
+                    stdConffile_Close();
+                    jkHudInv_FixAmmoMaximums();
+                    pfVar2 = jkPlayer_aMultiParams + 0x33;
+                    do {
+                        iVar1 = (int)pfVar2[-1];
+                        if ((-1 < iVar1) && (iVar1 < 200)) {
+                            sithInventory_aDescriptors[iVar1].ammoMax = *pfVar2;
+                        }
+                        pfVar2 = pfVar2 + 2;
+                    } while (pfVar2 < &jkPlayer_aMultiParams[61]);
+                    return 1;
+                }
+                iVar1 = _sscanf(stdConffile_aLine,"param %d: %f",&local_8c,&local_88);
+                if (((iVar1 != 2) || (local_8c < 0)) || (0xff < local_8c)) break;
+                jkPlayer_aMultiParams[local_8c] = local_88;
+                iVar1 = stdConffile_ReadLine();
+            }
+        }
+        stdConffile_Close();
+        return 0;
+    }
+#endif
+    return 0;
+}
+

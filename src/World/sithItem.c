@@ -16,7 +16,7 @@ int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4,
     if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
     {
         // MOTS added
-        if (Main_bMotsCompat && !(a2->actorParams.typeflags & (THING_TYPEFLAGS_40000 | THING_TYPEFLAGS_8000000))) return 0;
+        if (Main_bMotsCompat && (a2->actorParams.typeflags & (THING_TYPEFLAGS_40000 | THING_TYPEFLAGS_8000000))) return 0;
 
         if ( sithCollision_HasLos(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
         {
@@ -46,8 +46,8 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
             sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
         }
 
-        if ( item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti 
-             || item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti )
+        if ( (item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
+             || (item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti) )
         {
             item->thingflags |= SITH_TF_DISABLED;
 
@@ -62,11 +62,12 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
                 float val = item->itemParams.respawn;
                 if (item->itemParams.respawnFactor != 1.0 && sithNet_isMulti) {
                     for (int i = 0; i < jkPlayer_maxPlayers; i++) {
-                        if (jkPlayer_playerInfos[i].flags & 1) {
+                        if ((jkPlayer_playerInfos[i].flags & 1) && (i != playerThingIdx)) {
                             val *= item->itemParams.respawnFactor;
                         }
                     }
                 }
+
                 item->lifeLeftMs = (int)(val * 1000.0 * (_frand() + 0.75));
             }
             else 

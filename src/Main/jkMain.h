@@ -147,6 +147,8 @@ int jkMain_SwitchTo13();
 int jkMain_SwitchTo12();
 int jkMain_SwitchTo4(const char *pFpath);
 
+void jkMain_StartupCutscene(char *pCutsceneStr); // MOTS added
+
 //static int (*jkMain_loadFile)(char *a1) = (void*)jk_loadFile_ADDR;;
 
 //static int (*jkMain_EndLevel)(int a1) = (void*)jkMain_EndLevel_ADDR;

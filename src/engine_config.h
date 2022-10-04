@@ -61,6 +61,14 @@
 #define JKM_BONES
 #define JKM_PARAMS
 #define JKM_AI
+#define JKM_SABER
+#define JKM_DSS
+#endif
+
+#ifdef JKM_DSS
+#define NUM_JKPLAYER_THINGS (64)
+#else
+#define NUM_JKPLAYER_THINGS (16)
 #endif
 
 // Disable warnings for Vegetable Studio

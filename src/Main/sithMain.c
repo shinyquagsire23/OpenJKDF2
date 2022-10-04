@@ -430,6 +430,7 @@ void sithMain_SetEpisodeName(char *text)
     sithWorld_episodeName[31] = 0;
 }
 
+// MOTS altered
 void sithMain_AutoSave()
 {
     sithThing *v3; // esi
@@ -449,7 +450,9 @@ void sithMain_AutoSave()
     {
         v3 = &sithWorld_pCurrentWorld->things[v2];
         v4 = v3->class_cog;
-        if ( v4 ) // MOTS added something here
+        if (Main_bMotsCompat && !v3->type) continue; // MOTS added
+
+        if ( v4 )
         {
             sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
         }

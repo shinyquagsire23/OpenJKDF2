@@ -266,13 +266,14 @@ static wchar_t* (*__wcschr)(const wchar_t *, wchar_t) = (void*)0x005133B0;
 static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (void*)0x00512C70;
 static wchar_t* (*__wcsrchr)(const wchar_t *, wchar_t) = (void*)0x00514650;
 static char* (*_strstr)(const char *, const char *) = (void*)0x00513980;
-#else
+#else // __cplusplus
 static char* (*_strncpy)(char *, const char *, size_t) = (char* (*)(char*, const char*, unsigned int))0x5126A0;
 static size_t (*_wcslen)(const wchar_t *) = (size_t (*)(const wchar_t *))0x512FE0;
 static wchar_t* (*__wcsncpy)(wchar_t *, const wchar_t *, size_t) = (wchar_t* (*)(wchar_t *, const wchar_t *, size_t))0x00512C70;
 static wchar_t* (*_wcsncpy)(wchar_t *, const wchar_t *, size_t) = (wchar_t* (*)(wchar_t *, const wchar_t *, size_t))0x00512C70;
-#endif
-#else
+#endif // __cplusplus
+void jk_fatal();
+#else // WIN32_BLOBS
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count);
 void* _memset(void* ptr, int val, size_t num);
@@ -372,6 +373,7 @@ float _frand();
 
 void jk_init();
 int _iswspace(int a);
+void jk_fatal();
 
 #ifdef __cplusplus
 }

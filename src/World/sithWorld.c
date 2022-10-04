@@ -30,6 +30,9 @@
 #include "Gameplay/sithPlayer.h"
 #include "jk.h"
 
+// MOTS added
+static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
+
 static char jkl_read_copyright[1088];
 
 const char* g_level_header =
@@ -584,6 +587,11 @@ uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
             hash = util_Weirdchecksum((uint8_t *)sithWorld_pStatic->cogScripts[i].script_program, sithWorld_pStatic->cogScripts[i].codeSize, hash);
         }
     }
+
+    if (Main_bMotsCompat && sithWorld_checksumExtraFunc) {
+        hash = sithWorld_checksumExtraFunc(hash);
+    }
+
     return hash;
 }
 
@@ -845,4 +853,10 @@ void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuanti
     outQuantity[15] = world->numThingsLoaded;
     outAllocated[14] = sizeof(sithThing) * world->numTemplatesLoaded;
     outAllocated[15] = sizeof(sithThing) * world->numThingsLoaded;
+}
+
+
+void sithWorld_SetChecksumExtraFunc(sithWorld_ChecksumHandler_t handler)
+{
+    sithWorld_checksumExtraFunc = handler;
 }

@@ -24,6 +24,8 @@ void jkHudInv_Close();
 int jkHudInv_Startup();
 int jkHudInv_Shutdown();
 
+void jkHudInv_FixAmmoMaximums(); // MOTS added
+
 //static void (*jkHudInv_InputInit)() = (void*)jkHudInv_InputInit_ADDR;
 //static int (*jkHudInv_Draw)() = (void*)jkHudInv_Draw_ADDR;
 //static int (*jkHudInv_ClearRects)() = (void*)jkHudInv_ClearRects_ADDR;

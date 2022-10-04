@@ -12,6 +12,10 @@
 #include "Main/Main.h"
 #include "jk.h"
 
+// MOTS added
+float jkHud_aBinMaxAmt[SITHBIN_NUMBINS] = {};
+
+// MOTS altered
 int jkHudInv_ItemDatLoad(char *fpath)
 {
     unsigned int binNum; // esi
@@ -51,6 +55,7 @@ int jkHudInv_ItemDatLoad(char *fpath)
             }
         }
         sithInventory_NewEntry(binNum, cog, stdConffile_entry.args[0].value, min, max, flags);
+        jkHud_aBinMaxAmt[binNum] = max; // MOTS added
     }
     stdConffile_Close();
     return 1;
@@ -637,4 +642,13 @@ int jkHudInv_Shutdown()
         }
     }
     return 1;
+}
+
+// MOTS added
+void jkHudInv_FixAmmoMaximums()
+{
+    for (int i = 0; i < SITHBIN_NUMBINS; i++)
+    {
+        sithInventory_aDescriptors[i].ammoMax = jkHud_aBinMaxAmt[i];
+    }
 }

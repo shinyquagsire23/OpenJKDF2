@@ -54,6 +54,13 @@
 #define jkPlayer_GetJediRank_ADDR (0x004074D0)
 #define jkPlayer_SetRank_ADDR (0x004074E0)
 
+#ifdef JKM_DSS
+extern jkPlayerInfo jkPlayer_aMotsInfos[64];
+extern jkBubbleInfo jkPlayer_aBubbleInfo[64];
+extern int jkPlayer_personality;
+extern float jkPlayer_aMultiParams[0x100];
+#endif
+
 typedef struct sithSurface sithSurface;
 
 enum JKFLAG
@@ -65,7 +72,8 @@ enum JKFLAG
     JKFLAG_DUALSABERS = 0x10,
     JKFLAG_PERSUASION = 0x20,
     JKFLAG_40 = 0x40,
-    JKFLAG_SABERFORCEON = 0x80
+    JKFLAG_SABERFORCEON = 0x80,
+    JKFLAG_100 = 0x100,
 };
 
 int jkPlayer_LoadAutosave();
@@ -113,6 +121,10 @@ int jkPlayer_WriteOptionsConf();
 int jkPlayer_ReadOptionsConf();
 int jkPlayer_GetJediRank();
 void jkPlayer_SetRank(int rank);
+
+uint32_t jkPlayer_ChecksumExtra(uint32_t hash); // MOTS added
+jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing); // MOTS added
+int jkPlayer_SetAmmoMaximums(int classIdx); // MOTS added
 
 #ifdef QOL_IMPROVEMENTS
 extern int jkPlayer_fov;

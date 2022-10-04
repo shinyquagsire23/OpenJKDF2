@@ -8,7 +8,7 @@ int sithEvent_Startup()
     if ( sithEvent_bInit )
         return 0;
 
-    _memset(sithEvent_aTasks, 0, sizeof(sithEventTask) * 5);
+    _memset(sithEvent_aTasks, 0, sizeof(sithEventTask) * SITH_NUM_EVENTS);
 
     sithEvent_Reset();
     sithEvent_bInit = 1;

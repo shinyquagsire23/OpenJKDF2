@@ -26,6 +26,12 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
+// MOTS added
+int sithWeapon_mots_5a3258 = -1;
+int sithWeapon_motsAConv[10] = {
+    10, 11, 2, 3, 4, 5, 6, 7, 8, 9
+};
+
 void sithWeapon_InitDefaults()
 {
     sithWeapon_bAutoPickup = 1;
@@ -917,6 +923,7 @@ void sithWeapon_ShutdownEntry()
     ;
 }
 
+// MOTS altered
 int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
 {
     int v4; // edi
@@ -972,6 +979,8 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
 
     sithWeapon_8BD024 = binIdx;
     sithWeapon_senderIndex = a3 != 0;
+    if (Main_bMotsCompat)
+        sithWeapon_mots_5a3258 = sithInventory_SelectWeaponPrior(binIdx);
     return 1;
 }
 
@@ -1132,7 +1141,7 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
     return v7;
 }
 
-// MOTS altered
+// MOTS altered TODO?
 int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
 {
     float *v3; // edi
@@ -1170,10 +1179,48 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
         while ( 1 )
         {
             sithControl_ReadFunctionMap(inputFunc, &readInput);
-            if ( readInput )
+            if ( readInput && sithThing_MotsTick(7,0,inputFunc))
             {
-                if ( sithWeapon_SelectWeapon(player, sithInventory_SelectWeaponFollowing(inputFunc - INPUT_FUNC_ACTIVATE), 0) )
-                    break;
+                if (!Main_bMotsCompat) {
+                    if ( sithWeapon_SelectWeapon(player, sithInventory_SelectWeaponFollowing(inputFunc - INPUT_FUNC_ACTIVATE), 0) )
+                        break;
+                }
+                else {
+                    float fVar7 = 0.0;
+                    int iVar2 = sithInventory_GetCurWeapon(player);
+                    int iVar5 = inputFunc + -0xc;
+                    if ((iVar5 % 10 != sithWeapon_mots_5a3258 % 10) && ((iVar5 < 0xb && (sithWeapon_motsAConv[iVar5 % 10] != iVar5)))) {
+                        iVar5 = sithWeapon_motsAConv[iVar5 % 10];
+                    }
+                    int iVar4 = sithInventory_SelectWeaponFollowing(iVar5);
+                    if (iVar4 == iVar2) {
+                        if (iVar5 < 0xb) {
+                            iVar5 = iVar5 + 10;
+                        }
+                    }
+                    else if ((iVar5 < 0xb) && ((fVar7 = sithInventory_GetBinAmount(player,iVar4), fVar7 == 0.0 || (iVar2 = sithInventory_GetAvailable(player,iVar4), iVar2 == 0))))
+                    {
+                        iVar5 = iVar5 + 10;
+                    }
+
+                    iVar2 = sithInventory_SelectWeaponFollowing(iVar5);
+                    sithWeapon_motsAConv[iVar5 % 10] = iVar5;
+                    iVar2 = sithWeapon_SelectWeapon(player,iVar2,0);
+                    if (iVar2 == 0) {
+                        if (iVar5 < 0xb) {
+                            iVar5 = iVar5 + 10;
+                        }
+                        else {
+                            iVar5 = iVar5 + -10;
+                        }
+                        iVar2 = sithInventory_SelectWeaponFollowing(iVar5);
+                        sithWeapon_motsAConv[iVar5 % 10] = iVar5;
+                        iVar5 = sithWeapon_SelectWeapon(player,iVar2,0);
+                        if (iVar5 != 0) {
+                            return 0;
+                        }
+                    }
+                }
             }
 
             if ( ++inputFunc <= INPUT_FUNC_SELECT0 )

@@ -858,43 +858,92 @@ LABEL_116:
 
 int jkHud_GetWeaponAmmo(sithThing *player)
 {
-    sithPlayerInfo *v1; // eax
-    int v2; // eax
-    BOOL v3; // ecx
-    int v4; // eax
-    int binidx; // eax
-    sithItemInfo *v6; // eax
-    int weaponToAmmo[11]; // [esp+4h] [ebp-2Ch]
+    if (Main_bMotsCompat) {
+        int binIdxWeap;
+        int binIdx;
+        sithItemInfo *pItemInfo;
+        int weaponToAmmo [21];
+        
+        weaponToAmmo[5] = SITHBIN_CARBPELLETS;
+        weaponToAmmo[20] = SITHBIN_CARBPELLETS;
+        weaponToAmmo[2] = SITHBIN_ENERGY;
+        weaponToAmmo[3] = SITHBIN_ENERGY;
+        weaponToAmmo[12] = SITHBIN_ENERGY;
+        weaponToAmmo[13] = SITHBIN_ENERGY;
+        weaponToAmmo[6] = SITHBIN_POWER;
+        weaponToAmmo[9] = SITHBIN_POWER;
+        weaponToAmmo[15] = SITHBIN_POWER;
+        weaponToAmmo[0] = -1;
+        weaponToAmmo[1] = -1;
+        weaponToAmmo[4] = SITHBIN_MOTS_THERMAL_DETONATOR;
+        weaponToAmmo[7] = SITHBIN_RAILCHARGES;
+        weaponToAmmo[8] = SITHBIN_MOTS_SEQUENCER_CHARGE;
+        weaponToAmmo[10] = SITHBIN_EWEB_ROUNDS;
+        weaponToAmmo[11] = -1;
+        weaponToAmmo[14] = SITHBIN_MOTS_FLASH_BOMB;
+        weaponToAmmo[16] = -1;
+        weaponToAmmo[17] = SITHBIN_SEEKRAILS;
+        weaponToAmmo[18] = SITHBIN_MOTS_SEQUENCER_CHARGE;
+        weaponToAmmo[19] = -1;
 
-    weaponToAmmo[2] = SITHBIN_ENERGY;
-    weaponToAmmo[3] = SITHBIN_ENERGY;
-    weaponToAmmo[5] = SITHBIN_POWER;
-    weaponToAmmo[6] = SITHBIN_POWER;
-    weaponToAmmo[9] = SITHBIN_POWER;
-    v1 = player->actorParams.playerinfo;
-    weaponToAmmo[4] = SITHBIN_THERMAL_DETONATOR;
-    v2 = v1->curWeapon;
-    weaponToAmmo[0] = -1;
-    weaponToAmmo[1] = -1;
-    weaponToAmmo[7] = SITHBIN_RAILCHARGES;
-    weaponToAmmo[8] = SITHBIN_SEQUENCER_CHARGE;
-    weaponToAmmo[10] = -1;
-    if ( v2 < 0 )
-        v3 = 0;
-    else
-        v3 = v2 <= 10;
-    if ( !v3 )
-        return -999;
-    binidx = weaponToAmmo[v2];
-    if ( binidx == -1 )
-        return -999;
-    v6 = sithInventory_GetBin(player, binidx);
-    if ( !v6 )
-        return -999;
-    v4 = (int32_t)v6->ammoAmt;
-    if ( v4 < 0 )
-        v4 = 0;
-    return v4;
+        binIdxWeap = sithInventory_SelectWeaponPrior(player->actorParams.playerinfo->curWeapon);
+        if (binIdxWeap < 0) {
+            return -999;
+        }
+        binIdx = weaponToAmmo[binIdxWeap];
+        if (binIdx < 0xb) {
+            binIdx = sithInventory_SelectWeaponFollowing(binIdx);
+        }
+        if (binIdx == -1) {
+            return -999;
+        }
+        pItemInfo = sithInventory_GetBin(player,binIdx);
+        if (!pItemInfo) {
+            return -999;
+        }
+        binIdxWeap = (int)pItemInfo->ammoAmt;
+        if (binIdxWeap < 0) {
+            binIdxWeap = 0;
+        }
+        return binIdxWeap;
+    }
+    else {
+        sithPlayerInfo *v1; // eax
+        int v2; // eax
+        BOOL v3; // ecx
+        int v4; // eax
+        int binidx; // eax
+        sithItemInfo *v6; // eax
+        int weaponToAmmo[11]; // [esp+4h] [ebp-2Ch]
+
+        weaponToAmmo[2] = SITHBIN_ENERGY;
+        weaponToAmmo[3] = SITHBIN_ENERGY;
+        weaponToAmmo[5] = SITHBIN_POWER;
+        weaponToAmmo[6] = SITHBIN_POWER;
+        weaponToAmmo[9] = SITHBIN_POWER;
+        v1 = player->actorParams.playerinfo;
+        weaponToAmmo[4] = SITHBIN_THERMAL_DETONATOR;
+        v2 = v1->curWeapon;
+        weaponToAmmo[0] = -1;
+        weaponToAmmo[1] = -1;
+        weaponToAmmo[7] = SITHBIN_RAILCHARGES;
+        weaponToAmmo[8] = SITHBIN_SEQUENCER_CHARGE;
+        weaponToAmmo[10] = -1;
+        if ( v2 < 0 )
+            return -999;
+        if (v2 > 10)
+            return -999;
+        binidx = weaponToAmmo[v2];
+        if ( binidx == -1 )
+            return -999;
+        v6 = sithInventory_GetBin(player, binidx);
+        if ( !v6 )
+            return -999;
+        v4 = (int32_t)v6->ammoAmt;
+        if ( v4 < 0 )
+            v4 = 0;
+        return v4;
+    }
 }
 
 int jkHud_Chat()

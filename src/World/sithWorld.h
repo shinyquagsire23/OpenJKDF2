@@ -54,6 +54,8 @@ void sithWorld_sub_4D0A20(sithWorld *world);
 void sithWorld_Free();
 void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world);
 
+void sithWorld_SetChecksumExtraFunc(sithWorld_ChecksumHandler_t handler); // MOTS added
+
 //TODO list
 // sithWorld_GetMemorySize
 
