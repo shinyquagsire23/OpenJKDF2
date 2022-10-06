@@ -493,7 +493,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *thing, float deltaSeconds)
             }
             tmp.y = (fVar3 / fVar6) * tmp.y;
         }
-        bOverrideIdk = 0;
+        bOverrideIdk = 1;
         rdVector_Copy3(&a3, &tmp);
     }
 #endif

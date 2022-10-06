@@ -1118,59 +1118,47 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
 
 // modifycoloreffect, freecoloreffect, adddynamictint, adddynamicadd
 
-void sithCogFunction_FireProjectile(sithCog *ctx)
+// MOTS added
+void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
 {
-    int scaleFlags; // di
-    int mode; // ebx
-    sithSound *fireSound; // ebp
-    sithThing *sender; // eax
-    sithThing *spawnedProjectile; // eax
-    float autoaimFov; // [esp+10h] [ebp-24h]
-    float scale; // [esp+14h] [ebp-20h]
-    sithThing *projectileTemplate; // [esp+18h] [ebp-1Ch]
-    rdVector3 aimError; // [esp+1Ch] [ebp-18h]
-    rdVector3 fireOffset; // [esp+28h] [ebp-Ch]
-    float autoaimMaxDist; // [esp+38h] [ebp+4h]
-
+    int scaleFlags;
+    int mode;
+    sithSound *fireSound;
+    sithThing *projectileTemplate;
+    sithThing *sender;
+    float autoaimMaxDist;
+    float autoaimFov;
+    float scale;
+    rdVector3 aimError;
+    rdVector3 fireOffset;
+    
     autoaimMaxDist = sithCogExec_PopFlex(ctx);
     autoaimFov = sithCogExec_PopFlex(ctx);
     scaleFlags = sithCogExec_PopInt(ctx);
     scale = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx, &aimError);
-    sithCogExec_PopVector3(ctx, &fireOffset);
+    sithCogExec_PopVector3(ctx,&aimError);
+    sithCogExec_PopVector3(ctx,&fireOffset);
     mode = sithCogExec_PopInt(ctx);
     fireSound = sithCogExec_PopSound(ctx);
     projectileTemplate = sithCogExec_PopTemplate(ctx);
     sender = sithCogExec_PopThing(ctx);
-    if ( sender
-      && (spawnedProjectile = sithWeapon_FireProjectile(
-                                  sender,
-                                  projectileTemplate,
-                                  fireSound,
-                                  mode,
-                                  &fireOffset,
-                                  &aimError,
-                                  scale,
-                                  scaleFlags,
-                                  autoaimFov,
-                                  autoaimMaxDist)) != 0 )
-    {
-        sithCogExec_PushInt(ctx, spawnedProjectile->thingIdx);
+    if (sender != (sithThing *)0x0) {
+        projectileTemplate = sithWeapon_FireProjectile(sender,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
+        if (projectileTemplate != (sithThing *)0x0) {
+            sithCogExec_PushInt(ctx,projectileTemplate->thingIdx);
+            return;
+        }
     }
-    else
-    {
-        sithCogExec_PushInt(ctx, -1);
-    }
+    sithCogExec_PushInt(ctx,-1);
 }
 
-// MOTS added
-void sithCogFunction_FireProjectileData(sithCog *ctx)
+void sithCogFunction_FireProjectile(sithCog *ctx)
 {
-    int popA;
-    
-    popA = sithCogExec_PopInt(ctx);
-    //sithCogFunction_FireProjectile(ctx,popA);
+    if (Main_bMotsCompat)
     {
+        sithCogFunction_FireProjectileInternal(ctx, 0);
+    }
+    else {
         int scaleFlags; // di
         int mode; // ebx
         sithSound *fireSound; // ebp
@@ -1204,7 +1192,7 @@ void sithCogFunction_FireProjectileData(sithCog *ctx)
                                       scale,
                                       scaleFlags,
                                       autoaimFov,
-                                      autoaimMaxDist)) != 0 )
+                                      autoaimMaxDist,0)) != 0 )
         {
             sithCogExec_PushInt(ctx, spawnedProjectile->thingIdx);
         }
@@ -1213,7 +1201,13 @@ void sithCogFunction_FireProjectileData(sithCog *ctx)
             sithCogExec_PushInt(ctx, -1);
         }
     }
-    return;
+}
+
+// MOTS added
+void sithCogFunction_FireProjectileData(sithCog *ctx)
+{
+    int popA = sithCogExec_PopInt(ctx);
+    sithCogFunction_FireProjectileInternal(ctx,popA);
 }
 
 // MOTS added

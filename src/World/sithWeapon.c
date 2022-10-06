@@ -24,6 +24,7 @@
 #include "Main/Main.h"
 #include "Devices/sithConsole.h"
 #include "Dss/sithDSSThing.h"
+#include "General/stdMath.h"
 #include "jk.h"
 
 // MOTS added
@@ -479,7 +480,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     if ( fireSound )
         sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
 
-    spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
+    spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
     if ( spawned && sithComm_multiplayerFlags )
         sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
@@ -487,7 +488,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     return spawned;
 }
 
-sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9)
+sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9, int extra)
 {
     sithThing *v9; // esi
     double v12; // st6
@@ -513,10 +514,33 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
     if ( projectileTemplate )
     {
         rdMatrix_BuildFromLook34(&a3a, fireOffset);
+
+        float fVar3, fVar2;
+        if (Main_bMotsCompat) {
+            fVar3 = projectileTemplate->physicsParams.vel.z;
+            fVar2 = stdMath_ArcTan1(projectileTemplate->physicsParams.vel.y,fVar3);
+            rdMatrix_ExtractAngles34(&a3a,&a5a);
+            a5a.x = -fVar2 + a5a.x;
+            if (a5a.x < 0.0) {
+                a5a.x = -a5a.x;
+            }
+            if (a5a.x > 80.0) {
+                projectileTemplate->physicsParams.vel.z = 0;
+            }
+        }
         v9 = sithThing_Create(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
+        if (Main_bMotsCompat) {
+            projectileTemplate->physicsParams.vel.z = fVar3;
+        }
 
         if (!v9 )
             return 0;
+
+        if (Main_bMotsCompat) {
+            a5a.x = (float)extra;
+            a5a.y = 0.0;
+            v9->userdata = (float)extra;
+        }
 
         if ( (scaleFlags & 1) != 0 && v9->moveType == SITH_MT_PHYSICS) // Added: physics check
         {
@@ -774,7 +798,6 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     double v14; // st7
     double v15; // st7
     double v16; // st7
-    int v17; // eax
     sithThing *v18; // edi
     sithThing *v19; // ebx
     sithThing *v20; // eax
@@ -828,8 +851,9 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     {
         if ( thing->weaponParams.damage != 0.0 )
             sithSurface_SendDamageToThing(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageClass);
-        v17 = thing->weaponParams.typeflags;
-        if ( (v17 & SITH_WF_EXPLODE_ON_SURFACE_HIT) != 0 )
+
+        // MOTS added: floor explode?
+        if ( (thing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT) != 0 || (Main_bMotsCompat && (thing->weaponParams.typeflags & SITH_WF_EXPLODES_ON_WORLD_FLOOR_HIT) && (surface->surfaceFlags & SITH_SURFACE_FLOOR)))
         {
             v18 = thing->weaponParams.explodeTemplate;
             if ( v18 )
@@ -851,7 +875,7 @@ LABEL_9:
             sithThing_Destroy(thing);
             return 1;
         }
-        if ( (v17 & SITH_WF_ATTACH_TO_WALL) == 0 )
+        if ( (thing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL) == 0 )
         {
             result = sithCollision_DefaultHitHandler(thing, surface, a3);
         }
@@ -1398,7 +1422,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
 }
 
 // MOTS altered
-sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, int16_t scaleFlags, float autoaimFov, float autoaimMaxDist)
+sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, int16_t scaleFlags, float autoaimFov, float autoaimMaxDist, int extra)
 {
     int thingtype; // eax
     double v13; // st7
@@ -1459,7 +1483,7 @@ LABEL_30:
         a1a = v15;
         a5a = v15 * sithWeapon_fireRate;
         v16 = a5a;
-        v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a);
+        v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, extra);
         if ( v17 && sithComm_multiplayerFlags )
             sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
     }
@@ -1467,7 +1491,7 @@ LABEL_30:
 LABEL_31:
     if ( fireSound )
         sithAIAwareness_AddEntry(sender->sector, &sender->position, 1, 4.0, sender);
-    result = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, fireSound, mode, scale, scaleFlags, v16);
+    result = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, fireSound, mode, scale, scaleFlags, v16, extra);
     a1b = result;
     if ( result )
     {

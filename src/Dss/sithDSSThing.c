@@ -609,7 +609,8 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
                       anim,
                       scale,
                       scaleFlags,
-                      a9);
+                      a9,
+                      0);
         if ( pThing2 )
         {
             pThing2->thing_id = thingId;
