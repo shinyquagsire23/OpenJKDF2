@@ -1142,9 +1142,9 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
     fireSound = sithCogExec_PopSound(ctx);
     projectileTemplate = sithCogExec_PopTemplate(ctx);
     sender = sithCogExec_PopThing(ctx);
-    if (sender != (sithThing *)0x0) {
+    if (sender) {
         projectileTemplate = sithWeapon_FireProjectile(sender,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
-        if (projectileTemplate != (sithThing *)0x0) {
+        if (projectileTemplate) {
             sithCogExec_PushInt(ctx,projectileTemplate->thingIdx);
             return;
         }
@@ -1154,53 +1154,7 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
 
 void sithCogFunction_FireProjectile(sithCog *ctx)
 {
-    if (Main_bMotsCompat)
-    {
-        sithCogFunction_FireProjectileInternal(ctx, 0);
-    }
-    else {
-        int scaleFlags; // di
-        int mode; // ebx
-        sithSound *fireSound; // ebp
-        sithThing *sender; // eax
-        sithThing *spawnedProjectile; // eax
-        float autoaimFov; // [esp+10h] [ebp-24h]
-        float scale; // [esp+14h] [ebp-20h]
-        sithThing *projectileTemplate; // [esp+18h] [ebp-1Ch]
-        rdVector3 aimError; // [esp+1Ch] [ebp-18h]
-        rdVector3 fireOffset; // [esp+28h] [ebp-Ch]
-        float autoaimMaxDist; // [esp+38h] [ebp+4h]
-
-        autoaimMaxDist = sithCogExec_PopFlex(ctx);
-        autoaimFov = sithCogExec_PopFlex(ctx);
-        scaleFlags = sithCogExec_PopInt(ctx);
-        scale = sithCogExec_PopFlex(ctx);
-        sithCogExec_PopVector3(ctx, &aimError);
-        sithCogExec_PopVector3(ctx, &fireOffset);
-        mode = sithCogExec_PopInt(ctx);
-        fireSound = sithCogExec_PopSound(ctx);
-        projectileTemplate = sithCogExec_PopTemplate(ctx);
-        sender = sithCogExec_PopThing(ctx);
-        if ( sender
-          && (spawnedProjectile = sithWeapon_FireProjectile(
-                                      sender,
-                                      projectileTemplate,
-                                      fireSound,
-                                      mode,
-                                      &fireOffset,
-                                      &aimError,
-                                      scale,
-                                      scaleFlags,
-                                      autoaimFov,
-                                      autoaimMaxDist,0)) != 0 )
-        {
-            sithCogExec_PushInt(ctx, spawnedProjectile->thingIdx);
-        }
-        else
-        {
-            sithCogExec_PushInt(ctx, -1);
-        }
-    }
+    sithCogFunction_FireProjectileInternal(ctx, 0);
 }
 
 // MOTS added
