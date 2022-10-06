@@ -28,6 +28,7 @@
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "General/stdHashTable.h"
+#include "General/stdLinklist.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "General/sithStrTable.h"
@@ -810,15 +811,18 @@ void do_hooks()
     hook_function(stdHashTable_FreeKey_ADDR, stdHashTable_FreeKey);
     hook_function(stdHashTable_PrintDiagnostics_ADDR, stdHashTable_PrintDiagnostics);
     hook_function(stdHashTable_Dump_ADDR, stdHashTable_Dump);
-    hook_function(stdHashKey_AddLink_ADDR, stdHashKey_AddLink);
-    hook_function(stdHashKey_InsertAtTop_ADDR, stdHashKey_InsertAtTop);
-    hook_function(stdHashKey_InsertAtEnd_ADDR, stdHashKey_InsertAtEnd);
-    hook_function(stdHashKey_UnlinkChild_ADDR, stdHashKey_UnlinkChild);
-    hook_function(stdHashKey_NumChildren_ADDR, stdHashKey_NumChildren);
-    hook_function(stdHashKey_DisownMaybe_ADDR, stdHashKey_DisownMaybe);
-    hook_function(stdHashKey_OrphanAndDisown_ADDR, stdHashKey_OrphanAndDisown);
-    hook_function(stdHashKey_GetNthChild_ADDR, stdHashKey_GetNthChild);
-    hook_function(stdHashKey_GetFirstParent_ADDR, stdHashKey_GetFirstParent);
+
+    // stdLinkList
+    hook_function(stdLinklist_InsertAfter_ADDR, stdLinklist_InsertAfter);
+    hook_function(stdLinklist_InsertBefore_ADDR, stdLinklist_InsertBefore);
+    hook_function(stdLinklist_InsertAtEnd_ADDR, stdLinklist_InsertAtEnd);
+    hook_function(stdLinklist_UnlinkChild_ADDR, stdLinklist_UnlinkChild);
+    hook_function(stdLinklist_NumChildren_ADDR, stdLinklist_NumChildren);
+    hook_function(stdLinklist_RemoveParent_ADDR, stdLinklist_RemoveParent);
+    hook_function(stdLinklist_UnlinkNode_ADDR, stdLinklist_UnlinkNode);
+    hook_function(stdLinklist_GetNthChild_ADDR, stdLinklist_GetNthChild);
+    hook_function(stdLinklist_GetHead_ADDR, stdLinklist_GetHead);
+    hook_function(stdLinklist_GetTail_ADDR, stdLinklist_GetTail);
 
     // stdPalEffects
     hook_function(stdPalEffects_FreeRequest_ADDR, stdPalEffects_FreeRequest);

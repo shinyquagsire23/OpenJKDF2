@@ -197,8 +197,8 @@ jkStrings_Shutdown	.text	0040B410	00000018			R	.	.	.	.	.	.	.
 jkStrings_GetText2	.text	0040B430	00000027	00000004	00000004	R	.	.	.	.	.	T	.
 jkStrings_GetText	.text	0040B460	00000027	00000004	00000004	R	.	.	.	.	.	.	.
 jkStrings_unused_sub_40B490	.text	0040B490	00000006	00000000	00000000	R	.	.	.	.	.	.	.
-nullsub_46	.text	0040B4A0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
-nullsub_28_free	.text	0040B4B0	00000001			R	.	.	.	.	.	.	.
+jkSaber_Startup	.text	0040B4A0	00000001	00000000	00000000	R	.	.	.	.	.	.	.
+jkSaber_Shutdown	.text	0040B4B0	00000001			R	.	.	.	.	.	.	.
 jkSaber_InitializeSaberInfo	.text	0040B4C0	000000D0	00000014	00000024	R	.	.	.	.	.	T	.
 jkSaber_PolylineRand	.text	0040B590	00000048	00000000	00000004	R	.	.	.	.	.	T	.
 jkSaber_Draw	.text	0040B5E0	000000F0	00000000	00000004	R	.	.	.	.	.	T	.
@@ -1023,16 +1023,16 @@ stdMemory_BlockRealloc	.text	0043A3A0	000000FF	00000008	00000010	R	.	.	.	.	.	T	.
 daAlloc	.text	0043A4A0	000001D6	00000010	00000004	R	.	.	.	.	.	T	.
 daFree	.text	0043A680	000000D2	00000008	00000004	R	.	.	.	.	.	T	.
 daRealloc	.text	0043A760	0000008E	00000010	00000008	R	.	.	.	.	.	.	.
-stdHashKey_AddLink	.text	0043A7F0	0000001A	00000000	00000008	R	.	.	.	.	.	T	.
-stdHashKey_InsertAtTop	.text	0043A810	00000019	00000000	00000008	R	.	.	.	.	.	T	.
-stdHashKey_InsertAtEnd	.text	0043A830	00000025	00000000	00000008	R	.	.	.	.	.	T	.
-stdHashKey_UnlinkChild	.text	0043A860	00000027	00000000	00000004	R	.	.	.	.	.	T	.
-stdHashKey_DisownMaybe	.text	0043A890	00000018	00000000	00000004	R	.	.	.	.	.	T	.
-stdHashKey_OrphanAndDisown	.text	0043A8B0	00000012	00000000	00000004	R	.	.	.	.	.	T	.
-stdHashKey_NumChildren	.text	0043A8D0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
-stdHashKey_GetNthChild	.text	0043A8F0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
-stdHashKey_GetLastChild	.text	0043A910	0000001A	00000000	00000004	R	.	.	.	.	.	T	.
-stdHashKey_GetFirstParent	.text	0043A930	00000018	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_InsertAfter	.text	0043A7F0	0000001A	00000000	00000008	R	.	.	.	.	.	T	.
+stdLinklist_InsertBefore	.text	0043A810	00000019	00000000	00000008	R	.	.	.	.	.	T	.
+stdLinklist_InsertAtEnd	.text	0043A830	00000025	00000000	00000008	R	.	.	.	.	.	T	.
+stdLinklist_UnlinkChild	.text	0043A860	00000027	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_RemoveParent	.text	0043A890	00000018	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_UnlinkNode	.text	0043A8B0	00000012	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_NumChildren	.text	0043A8D0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_GetNthChild	.text	0043A8F0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
+stdLinklist_GetTail	.text	0043A910	0000001A	00000000	00000004	R	.	.	.	.	.	T	.
+stdLinklist_GetHead	.text	0043A930	00000018	00000000	00000004	R	.	.	.	.	.	T	.
 rdStartup	.text	0043A950	00000032	00000000	00000004	R	.	.	.	.	.	T	.
 rdShutdown	.text	0043A990	00000014			R	.	.	.	.	.	.	.
 rdOpen	.text	0043A9B0	00000082	00000004	00000004	R	.	.	.	.	.	.	.
