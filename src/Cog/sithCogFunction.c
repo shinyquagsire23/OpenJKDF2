@@ -886,6 +886,18 @@ void sithCogFunction_CycleCamera(sithCog *ctx)
     sithCamera_CycleCamera();
 }
 
+// MOTS added
+void sithCogFunction_SetCameraZoom(sithCog *ctx)
+{
+    float zoomSpeed = sithCogExec_PopFlex(ctx);
+    float zoomScale = sithCogExec_PopFlex(ctx);
+    int camIdx = sithCogExec_PopInt(ctx);
+
+    if ((-1 < camIdx) && (camIdx < 7)) {
+        sithCamera_SetZoom(sithCamera_cameras + camIdx, zoomScale, zoomSpeed);
+    }
+}
+
 void sithCogFunction_SetPovShake(sithCog *ctx)
 {
     float v2; // [esp+4h] [ebp-1Ch]
@@ -1762,7 +1774,7 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
     if (Main_bMotsCompat) {
-        //sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapNew, "heapnew");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapSet, "heapset");

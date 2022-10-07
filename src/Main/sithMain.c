@@ -394,9 +394,15 @@ void sithMain_UpdateCamera()
             float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
             
             //if (aspect != sithMain_lastAspect)
+            if (!Main_bMotsCompat)
             {
                 rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
                 rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+                rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
+            }
+            else {
+                rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+                //rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->rdCam.fov);
                 rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
             }
             

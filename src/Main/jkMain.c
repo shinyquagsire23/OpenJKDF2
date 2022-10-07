@@ -18,6 +18,8 @@
 #include "Main/jkCutscene.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkHud.h"
+#include "Main/jkHudScope.h"
+#include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
@@ -1458,6 +1460,10 @@ void jkMain_FixRes()
     
     jkDev_Close();
     jkHud_Close();
+    if (Main_bMotsCompat) {
+        jkHudScope_Close();
+        jkHudCameraView_Close();
+    }
     jkHudInv_Close();
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
@@ -1467,6 +1473,10 @@ void jkMain_FixRes()
 
     jkHudInv_LoadItemRes();
     jkHud_Open();
+    if (Main_bMotsCompat) {
+        jkHudScope_Open();
+        jkHudCameraView_Open();
+    }
     jkDev_Open();
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
@@ -1554,7 +1564,15 @@ int jkMain_SetVideoMode()
     jkHudInv_LoadItemRes();
     // Added close
     jkHud_Close();
+    if (Main_bMotsCompat) {
+        jkHudScope_Close();
+        jkHudCameraView_Close();
+    }
     jkHud_Open();
+    if (Main_bMotsCompat) {
+        jkHudScope_Open();
+        jkHudCameraView_Open();
+    }
     jkDev_Open();
     
     rdroid_curAcceleration = 1;

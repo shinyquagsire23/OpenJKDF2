@@ -823,14 +823,24 @@ void sithThing_EnterWater(sithThing *thing, int a2)
             if ( v6 )
                 sithCog_SendMessage(v6, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, thing->thingIdx, 0, 1, 0);
         }
-        if ( thing->moveType == SITH_MT_PHYSICS ) {
-            // MOTS added: wtf??
-            //int tmp;
-            //if (tmp = thing->physicsParams.physflags | SITH_PF_800000, 
-            //    thing->physicsParams.physflags = tmp, 
-            //    tmp == 0) {
+
+        // MOTS added: wtf??
+        if (Main_bMotsCompat) {
+            if ( thing->moveType == SITH_MT_PHYSICS ) {
+                
+                // No water slowdown? Bug??
+                int tmp;
+                if (tmp = thing->physicsParams.physflags | SITH_PF_800000, 
+                    thing->physicsParams.physflags = tmp, 
+                    tmp == 0) {
+                    thing->physicsParams.vel.z *= 0.25;
+                }
+            }
+        }
+        else {
+            if ( thing->moveType == SITH_MT_PHYSICS ) {
                 thing->physicsParams.vel.z *= 0.25;
-            //}
+            }
         }
     }
 }

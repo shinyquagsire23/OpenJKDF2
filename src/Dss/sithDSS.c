@@ -724,11 +724,10 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    if ( sithCog_masterCog ) {
-        NETMSG_PUSHS32(sithCog_masterCog->selfCog);
-    }
-    else {
-        NETMSG_PUSHS32(-1);
+    NETMSG_PUSHS32(sithCog_masterCog ? sithCog_masterCog->selfCog : -1);
+    if (Main_bMotsCompat) {
+        NETMSG_PUSHS32(sithCog_pActionCog ? sithCog_pActionCog->selfCog : -1);
+        NETMSG_PUSHS32(sithCog_actionCogIdk);
     }
 
     for (int i = 0; i < 2; i++)
@@ -772,6 +771,8 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
         NETMSG_PUSHU8(sithSoundMixer_trackFrom);
         NETMSG_PUSHU8(sithSoundMixer_trackTo);
     }
+
+    // TODO: MoTS AI misc
     
     NETMSG_END(DSS_ID_1F);
     
@@ -784,6 +785,10 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     sithCog_masterCog = sithCog_GetByIdx(NETMSG_POPS32());
+    if (Main_bMotsCompat) {
+        sithCog_pActionCog = sithCog_GetByIdx(NETMSG_POPS32());
+        sithCog_actionCogIdk = NETMSG_POPS32();
+    }
 
     for (int i = 0; i < 2; i++)
     {
@@ -827,6 +832,8 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
         sithSoundMixer_trackTo = NETMSG_POPU8();
         sithSoundMixer_ResumeMusic(1);
     }
+
+    // TODO: MoTS AI misc
 
     return 1;
 }

@@ -8,6 +8,8 @@
 #include "General/stdPalEffects.h"
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"
+#include "Main/jkHudScope.h"
+#include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
@@ -81,6 +83,10 @@ int Video_Startup()
     {
         stdDisplay_SetGammaTable(10, aGammaTable);
         jkHud_Startup();
+        if (Main_bMotsCompat) {
+            jkHudScope_Startup();
+            jkHudCameraView_Startup();
+        }
         Video_pOtherBuf = &Video_otherBuf;
         Video_pMenuBuffer = &Video_menuBuffer;
 #ifdef SDL2_RENDER
@@ -98,6 +104,10 @@ void Video_Shutdown()
 {
     sithCamera_Shutdown();
     jkHud_Shutdown();
+    if (Main_bMotsCompat) {
+        jkHudScope_Shutdown();
+        jkHudCameraView_Shutdown();
+    }
     stdPalEffects_Close();
     stdDisplay_Close();
     stdDisplay_RestoreDisplayMode();
@@ -269,6 +279,10 @@ LABEL_25:
         sithRender_SetPalette(v7);
         jkHudInv_LoadItemRes();
         jkHud_Open();
+        if (Main_bMotsCompat) {
+            jkHudScope_Open();
+            jkHudCameraView_Open();
+        }
         jkDev_Open();
         result = 1;
         Video_dword_5528A0 = 0;

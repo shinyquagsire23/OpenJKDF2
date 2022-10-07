@@ -12,6 +12,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithAdjoin.h"
+#include "General/stdMath.h"
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -147,6 +148,14 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     rdVector_Zero3(&camera->vec3_4);
     rdMatrix_Identity34(&camera->viewMat);
 
+#ifdef JKM_CAMERA
+    camera->bZoomed = 0;
+    camera->zoomScale = 1.0;
+    camera->invZoomScale = 1.0;
+    camera->zoomFov = camera->fov;
+    camera->zoomSpeed = 0.0;
+#endif
+
     return 1;
 }
 
@@ -167,13 +176,13 @@ void sithCamera_FollowFocus(sithCamera *cam)
     switch ( cam->cameraPerspective )
     {
         case 1:
-            // MOTS added
-            /*
-            if (cam->unk1 != 0.0) {
-                sithCamera_idk_scope_maybe((sithCamera *)cam);
+            // MOTS added: scope zoom
+#ifdef JKM_CAMERA
+            if (cam->bZoomed) {
+                sithCamera_UpdateZoom(cam);
             }
-            rdCamera_FUN_004484f0(cam->unk3);
-            */
+            rdCamera_SetMipmapScalar(cam->invZoomScale);
+#endif
 
             rdMatrix_Copy34(&cam->viewMat, &focusThing->lookOrientation);
             if ( focusThing->moveType == SITH_MT_PATH && focusThing->rdthing.hierarchyNodeMatrices)
@@ -195,16 +204,21 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 {
                     v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->lookOrientation.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
                 }
-                if ( focusThing == sithPlayer_pLocalPlayerThing )
+
+                // MOTS added: hmm??
+                if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
                 {
                     rdVector_Add3Acc(&v76, &sithCamera_povShakeVector2);
                 }
+
                 rdMatrix_PreRotate34(&cam->viewMat, &v76);
                 rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
                 if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
                     rdMatrix_PreTranslate34(&cam->viewMat, &focusThing->actorParams.eyeOffset);
-                    if ( focusThing == sithPlayer_pLocalPlayerThing )
+                    
+                    // MOTS added: hmm??
+                    if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
                         rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_povShakeVector1);
                 }
                 rdMatrix_Normalize34(&cam->viewMat);
@@ -222,6 +236,13 @@ void sithCamera_FollowFocus(sithCamera *cam)
             {
                 rdVector_Zero3(&v76);
             }
+
+            // MOTS added: hmm??
+            if (Main_bMotsCompat)
+            {
+                rdVector_Add3Acc(&v76, &sithCamera_povShakeVector2);
+            }
+
             rdMatrix_Copy34(&out, &focusThing->lookOrientation);
             rdMatrix_PreRotate34(&out, &v76);
             rdMatrix_PostTranslate34(&out, &focusThing->position);
@@ -230,6 +251,12 @@ void sithCamera_FollowFocus(sithCamera *cam)
             cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, 8704);
             rdVector_Copy3(&v84, &out.scale);
             rdMatrix_Copy34(&cam->viewMat, &out);
+
+            // MOTS added: hmm?
+            if (Main_bMotsCompat) {
+                rdMatrix_PreTranslate34(&cam->viewMat,&sithCamera_povShakeVector1);
+            }
+
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
             rdMatrix_PreTranslate34(&cam->viewMat, &cam->vec3_3);
             rdMatrix_LookAt(&cam->viewMat, &cam->viewMat.scale, &out.scale, 0.0);
@@ -544,3 +571,97 @@ void sithCamera_CycleCamera()
     v1 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
     sithCamera_SetCurrentCamera(v1);
 }
+
+// MOTS added
+void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoomSpeed)
+{
+    if (!pCamera) return;
+    if (!pCamera->rdCam.canvas) return;
+
+#ifdef JKM_CAMERA
+#ifdef QOL_IMPROVEMENTS
+    float zoomFov = jkPlayer_fov / zoomScale;
+#else
+    // I have no idea what's going on here
+    float zoomFov = stdMath_ArcTan4(zoomScale * 0.5, 0.0);
+    zoomFov = -zoomFov * 2.0;
+#endif
+
+    if (zoomFov != pCamera->rdCam.fov) 
+    {
+        if (zoomSpeed != 0.0) 
+        {
+            pCamera->bZoomed = 1;
+            pCamera->zoomScale = zoomScale;
+            pCamera->zoomFov = zoomFov;
+            pCamera->zoomSpeed = zoomSpeed;
+            pCamera->invZoomScale = 1.0 / zoomScale;
+            return;
+        }
+
+        rdCamera_SetFOV(&pCamera->rdCam, zoomFov);
+        pCamera->zoomSpeed = 0.0;
+        pCamera->bZoomed = 0;
+    }
+#endif
+}
+
+// MOTS added
+void sithCamera_UpdateZoom(sithCamera *pCamera)
+{
+    float fVar1;
+    float fVar2;
+    int iVar3;
+    int iVar4;
+    int local_4;
+    
+    if (!pCamera->rdCam.canvas) return;
+    if (!pCamera->bZoomed) return;
+
+    fVar1 = pCamera->rdCam.fov;
+    fVar2 = pCamera->zoomFov - fVar1;
+    if (0.0 <= fVar2) {
+        local_4 = 1;
+        if (fVar2 < 0.0) {
+            local_4 = 0;
+        }
+    }
+    else {
+        local_4 = -1;
+    }
+    fVar2 = fVar1 - pCamera->zoomFov;
+
+    float local_4f = ((float)local_4 * pCamera->zoomSpeed * sithTime_deltaSeconds + fVar1);
+    if (0.0 <= fVar2) {
+        if (fVar2 < 0.0) {
+            iVar4 = 0;
+        }
+        else {
+            iVar4 = 1;
+        }
+    }
+    else {
+        iVar4 = -1;
+    }
+    fVar2 = local_4f - pCamera->zoomFov;
+    if (0.0 <= fVar2) {
+        if (fVar2 > 0.0) {
+            iVar3 = 1;
+        }
+        else {
+            iVar3 = 0;
+        }
+    }
+    else {
+        iVar3 = -1;
+    }
+    if (iVar4 != iVar3) {
+        local_4f = pCamera->zoomFov;
+    }
+    rdCamera_SetFOV(&pCamera->rdCam, local_4f);
+    if ((pCamera->rdCam.fov == fVar1) || (iVar4 != iVar3)) {
+        pCamera->zoomSpeed = 0.0;
+        pCamera->bZoomed = 0;
+    }
+}
+

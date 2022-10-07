@@ -25,6 +25,7 @@ typedef uint32_t size_t;
 #define JKM_AI
 #define JKM_SABER
 #define JKM_DSS
+#define JKM_CAMERA
 #endif
 
 #include "engine_config.h"
@@ -830,12 +831,12 @@ typedef struct sithCamera
     rdVector3 vec3_1;
     rdVector3 vec3_2;
     rdCamera rdCam;
-#ifdef JKM_TYPES
-    float unk1;
-    float unk2;
-    float unk3;
-    float unk4;
-    float unk5;
+#ifdef JKM_CAMERA
+    int bZoomed;
+    float zoomScale;
+    float invZoomScale;
+    float zoomFov;
+    float zoomSpeed;
 #endif
 } sithCamera;
 #pragma pack(pop)
@@ -3022,6 +3023,25 @@ typedef struct jkHudFont
     char *pathS16bpp;
 #endif // JKM_TYPES
 } jkHudFont;
+
+typedef struct jkHudMotsBitmap
+{
+    stdBitmap **pBitmap;
+    char *path8bpp;
+    char *path16bpp;
+    uint32_t unk1;
+    uint32_t unk2;
+    uint32_t unk3;
+    uint32_t unk4;
+    uint32_t unk5;
+} jkHudMotsBitmap;
+
+typedef struct jkHudMotsFont
+{
+    stdFont **pFont;
+    char *path8bpp;
+    char *path16bpp;
+} jkHudMotsFont;
 
 typedef struct jkHudTeamScore
 {

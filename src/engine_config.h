@@ -63,6 +63,7 @@
 #define JKM_AI
 #define JKM_SABER
 #define JKM_DSS
+#define JKM_CAMERA
 #endif
 
 #ifdef JKM_DSS

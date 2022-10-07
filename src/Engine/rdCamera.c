@@ -427,3 +427,9 @@ float rdCamera_GetMipmapScalar()
 {
     return rdCamera_mipmapScalar;
 }
+
+// MOTS added
+void rdCamera_SetMipmapScalar(float val)
+{
+    rdCamera_mipmapScalar = val;
+}

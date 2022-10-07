@@ -15,6 +15,8 @@
 #include "Win95/stdDisplay.h"
 #include "Main/jkHud.h"
 #include "Main/jkHudInv.h"
+#include "Main/jkHudScope.h"
+#include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
@@ -52,15 +54,26 @@ void jkGame_ScreensizeIncrease()
 {
     if ( Video_modeStruct.viewSizeIdx < 0xAu )
     {
+        // MOTS added
+        if (Main_bMotsCompat) {
+            jkHudScope_Close();
+            jkHudCameraView_Close();
+        }
+
 #ifndef LINUX_TMP
         sithCamera_Close();
         rdCanvas_Free(Video_pCanvas);
 #ifdef SDL2_RENDER
-    rdCanvas_Free(Video_pCanvasOverlayMap);
+        rdCanvas_Free(Video_pCanvasOverlayMap);
 #endif
         ++Video_modeStruct.viewSizeIdx;
         Video_camera_related();
 #endif
+        // MOTS added
+        if (Main_bMotsCompat) {
+            jkHudScope_Open();
+            jkHudCameraView_Open();
+        }
     }
 }
 
@@ -68,15 +81,26 @@ void jkGame_ScreensizeDecrease()
 {
     if ( Video_modeStruct.viewSizeIdx )
     {
+        // MOTS added
+        if (Main_bMotsCompat) {
+            jkHudScope_Close();
+            jkHudCameraView_Close();
+        }
+
 #ifndef LINUX_TMP
         sithCamera_Close();
         rdCanvas_Free(Video_pCanvas);
 #ifdef SDL2_RENDER
-    rdCanvas_Free(Video_pCanvasOverlayMap);
+        rdCanvas_Free(Video_pCanvasOverlayMap);
 #endif
         --Video_modeStruct.viewSizeIdx;
         Video_camera_related();
 #endif
+        // MOTS added
+        if (Main_bMotsCompat) {
+            jkHudScope_Open();
+            jkHudCameraView_Open();
+        }
     }
 }
 
@@ -178,25 +202,31 @@ int jkGame_Update()
         }
     }*/
 
-    // MOTS added
-    /*
-    if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_20000000) != 0) {
-        Unk1_FUN_00412760();
-    }
-    if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
-        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
+#ifdef SDL2_RENDER
+    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    stdDisplay_VBufferLock(pOverlayBuffer);
+    stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
+    stdDisplay_VBufferUnlock(pOverlayBuffer);
+#endif
+
+    // MOTS added: scope/security cam overlays
+    if (!Main_bMotsCompat) {
+        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
             jkHud_Draw();
-        }
     }
     else {
-        Unk2_FUN_00412b50();
+        if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
+            jkHudScope_Draw();
+        }
+        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
+                jkHud_Draw();
+            }
+        }
+        else {
+            jkHudCameraView_Draw();
+        }
     }
-    */
-
-    // MOTS removed
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
-        jkHud_Draw();
-    // end MOTS removed
 
     jkDev_sub_41F950();
     jkHudInv_Draw();
@@ -321,8 +351,32 @@ int jkGame_Update()
         }
     }*/
 
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
-        jkHud_Draw();
+#ifdef SDL2_RENDER
+    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    stdDisplay_VBufferLock(pOverlayBuffer);
+    stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
+    stdDisplay_VBufferUnlock(pOverlayBuffer);
+#endif
+
+    // MOTS added: scope/security cam overlays
+    if (!Main_bMotsCompat) {
+        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
+            jkHud_Draw();
+    }
+    else {
+        if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
+            jkHudScope_Draw();
+        }
+        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
+                jkHud_Draw();
+            }
+        }
+        else {
+            jkHudCameraView_Draw();
+        }
+    }
+
     jkDev_sub_41F950();
     jkHudInv_Draw();
     //if ( Video_modeStruct.b3DAccel )

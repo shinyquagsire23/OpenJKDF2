@@ -49,6 +49,12 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
     return result;
 }
 
+// MOTS added
+stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem)
+{
+    return stdBitmap_Load(fpath, bCreateDDrawSurface, gpuMem);
+}
+
 stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int a3)
 {
     stdBitmap *outAlloc; // esi

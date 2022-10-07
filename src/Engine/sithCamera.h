@@ -48,6 +48,8 @@ sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera);
 int sithCamera_SetState(int a1);
 int sithCamera_GetState();
 void sithCamera_CycleCamera();
+void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoom_2); // MOTS added
+void sithCamera_UpdateZoom(sithCamera *pCamera);
 
 #ifndef __cplusplus
 //static void (*sithCamera_Shutdown)() = (void*)sithCamera_Shutdown_ADDR;

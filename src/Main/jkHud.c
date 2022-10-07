@@ -414,7 +414,6 @@ void jkHud_Draw()
 
 #ifdef SDL2_RENDER
     stdDisplay_VBufferLock(pOverlayBuffer);
-    stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
 #endif
 
     sithOverlayMap_Render1(pOverlayCanvas);

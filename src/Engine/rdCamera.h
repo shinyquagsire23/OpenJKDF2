@@ -63,5 +63,6 @@ int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
 int rdCamera_ClearLights(rdCamera *camera);
 void rdCamera_AdvanceFrame();
 float rdCamera_GetMipmapScalar(); // MOTS added
+void rdCamera_SetMipmapScalar(float val); // MOTS added
 
 #endif // _RDCAMERA_H
