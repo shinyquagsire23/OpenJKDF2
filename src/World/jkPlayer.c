@@ -55,6 +55,109 @@ int jkPlayer_personality = 0;
 float jkPlayer_aMultiParams[0x100];
 #endif
 
+int jkPlayer_aMotsFpBins[74] =
+{
+    SITHBIN_F_JUMP,
+    SITHBIN_F_PROJECT,
+    SITHBIN_F_SEEING,
+    SITHBIN_F_SPEED,
+    SITHBIN_F_PUSH,
+    0,
+    0,
+    0,
+    
+    SITHBIN_F_PULL,
+    SITHBIN_F_SABERTHROW,
+    SITHBIN_F_GRIP,
+    SITHBIN_F_FARSIGHT,
+    0,
+    0,
+    0,
+    0,
+    
+    SITHBIN_F_PERSUASION,
+    SITHBIN_F_HEALING,
+    SITHBIN_F_BLINDING,
+    SITHBIN_F_CHAINLIGHT,
+    0,
+    0,
+    0,
+    0,
+    
+    SITHBIN_F_ABSORB,
+    SITHBIN_F_DESTRUCTION,
+    SITHBIN_F_DEADLYSIGHT,
+    SITHBIN_F_PROTECTION,
+    0,
+    0,
+    0,
+    0,
+    
+    // Rank 0
+    0,
+    0,
+    0,
+    0,
+    
+    // Rank 1
+    2,
+    0,
+    0,
+    0,
+    
+    // Rank 2
+    2,
+    1,
+    0,
+    0,
+    
+    // Rank 3
+    3,
+    1,
+    0,
+    0,
+    
+    // Rank 4
+    4,
+    1,
+    0,
+    0,
+    
+    // Rank 5
+    4,
+    2,
+    1,
+    0,
+    
+    // Rank 6
+    4,
+    2,
+    2,
+    0,
+    
+    // Rank 7
+    4,
+    2,
+    2,
+    1,
+    
+    // Rank 8
+    4,
+    2,
+    2,
+    2,
+    
+    // Something else?
+    3,
+    2,
+    1,
+    0,
+    
+    // End
+    -1,
+    0
+};
+
 int jkPlayer_LoadAutosave()
 {
     char tmp[128];

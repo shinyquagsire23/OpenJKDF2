@@ -45,7 +45,7 @@ void jkControl_nullsub_37()
 {
 }
 
-// MOTS altered
+// MOTS altered done
 int jkControl_HandleHudKeys(sithThing *player, float b)
 {
     wchar_t *v2; // eax

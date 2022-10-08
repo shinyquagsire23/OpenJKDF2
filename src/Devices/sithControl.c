@@ -1186,11 +1186,211 @@ LABEL_20:
     }
 }
 
-// MOTS altered?
+
+void sithControl_PlayerMovementMots(sithThing *player)
+{
+    uint32_t uVar1;
+    int iVar2;
+    float fVar3;
+    float fVar4;
+    float local_8;
+    int local_4;
+    sithThing *thing;
+    
+    thing = player;
+    float move_multiplier = 1.0;
+    if (((sithWeapon_controlOptions & 2) != 0) ||
+       (iVar2 = sithControl_ReadFunctionMap(INPUT_FUNC_FAST,(int *)0x0), iVar2 != 0)) {
+        move_multiplier = 2.0;
+    }
+    iVar2 = sithControl_ReadFunctionMap(7,(int *)0x0);
+    if (iVar2 != 0) {
+        move_multiplier *= 0.5;
+    }
+    thing->physicsParams.physflags =
+         thing->physicsParams.physflags & ~0x10000;
+    iVar2 = sithControl_ReadFunctionMap(INPUT_FUNC_DUCK,(int *)0x0);
+    if (iVar2 == 0) {
+        if (sithControl_008d7f58 != 0) {
+            sithThing_MotsTick(1,0,0.0);
+        }
+        sithControl_008d7f58 = 0;
+    }
+    else {
+        local_8 = 1.0;
+        if (sithControl_008d7f58 != 0) {
+            local_8 = 2.0;
+        }
+        sithControl_008d7f58 = 1;
+        iVar2 = sithThing_MotsTick(1,0,local_8);
+        if ((iVar2 != 0) && ((thing->actorParams.typeflags & 0x8040000) == 0)) {
+            move_multiplier = 0.5;
+            thing->physicsParams.physflags =
+                 thing->physicsParams.physflags | 0x10000;
+        }
+    }
+    if ((thing->physicsParams.physflags & 0x200000) != 0) {
+        move_multiplier = 0.5;
+    }
+    if (((thing->attach_flags & 1) != 0) &&
+       (((thing->attachedThing)->type & 0x120000) != 0)) {
+        move_multiplier *= 0.5;
+    }
+    if ((thing->type != 2) && (thing->type != 10)) {
+        return;
+    }
+    iVar2 = sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE,&local_4);
+    if (iVar2 == 0) {
+        fVar4 = sithControl_GetAxis(INPUT_FUNC_TURN);
+        fVar4 = fVar4 * sithTime_TickHz;
+        if (1.0 <= move_multiplier) {
+            local_8 = 1.0;
+        }
+        else {
+            local_8 = move_multiplier;
+        }
+        fVar3 = sithControl_ReadAxisStuff(INPUT_FUNC_TURN);
+#ifdef QOL_IMPROVEMENTS
+        // Scale appropriately to high framerates
+        fVar3 *= (sithTime_TickHz / 50.0);
+#endif
+
+        fVar4 += fVar3 * thing->actorParams.maxRotThrust * local_8;
+
+        if (fVar4 == 0.0) {
+            if (sithControl_008d7f50 != 0) {
+                sithThing_MotsTick(5,0,fVar4);
+                sithControl_008d7f50 = 0;
+            }
+            thing->physicsParams.angVel.y = fVar4;
+            fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+            fVar4 = (thing->actorParams.maxThrust +
+                    thing->actorParams.extraSpeed) * fVar4 * 0.7;
+            if (fVar4 == 0.0) goto joined_r0x00527cfa;
+            sithControl_008d7f54 = 1;
+            iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
+            if (iVar2 != 0) {
+                thing->physicsParams.acceleration.x = fVar4;
+                goto LAB_00527d1c;
+            }
+        }
+        else {
+            fVar4 = fVar4 * sithControl_008d7f44;
+            sithControl_008d7f50 = 1;
+            iVar2 = sithThing_MotsTick(5,0,fVar4);
+            if (iVar2 == 0) {
+                thing->physicsParams.angVel.y = 0.0;
+            }
+            else {
+                thing->physicsParams.angVel.y = fVar4;
+                fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+                fVar4 = (thing->actorParams.maxThrust +
+                        thing->actorParams.extraSpeed) * fVar4 * 0.7;
+                if (fVar4 == 0.0) goto joined_r0x00527cfa;
+                sithControl_008d7f54 = 1;
+                iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
+                if (iVar2 != 0) {
+                    thing->physicsParams.acceleration.x = fVar4;
+                    goto LAB_00527d1c;
+                }
+            }
+        }
+    }
+    else {
+        fVar3 = sithControl_GetAxis2(INPUT_FUNC_TURN);
+        fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+        fVar4 = -fVar3 - fVar4;
+        if (fVar4 < -1.0) {
+            fVar4 = -1.0;
+        }
+        else if (1.0 < fVar4) {
+            fVar4 = 1.0;
+        }
+        fVar4 = (thing->actorParams.maxThrust +
+                thing->actorParams.extraSpeed) * fVar4 * 0.7;
+        if (fVar4 != 0.0) {
+            sithControl_008d7f54 = 1;
+            iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
+            if (iVar2 == 0) {
+                thing->physicsParams.acceleration.x = 0.0;
+                thing->physicsParams.angVel.y = 0.0;
+            }
+            else {
+                thing->physicsParams.angVel.y = 0.0;
+                thing->physicsParams.acceleration.x = fVar4;
+            }
+            goto LAB_00527d1c;
+        }
+joined_r0x00527cfa:
+        if (sithControl_008d7f54 != 0) {
+            sithThing_MotsTick(4,0,0.0);
+        }
+        sithControl_008d7f54 = 0;
+    }
+    thing->physicsParams.acceleration.x = 0.0;
+LAB_00527d1c:
+    if (((sithWeapon_controlOptions & 4) == 0) &&
+       (iVar2 = sithControl_ReadFunctionMap(0x24,(int *)0x0), iVar2 != 0)) {
+        local_8 = 0.0;
+    }
+    else {
+        local_8 = sithControl_GetAxis2(INPUT_FUNC_FORWARD);
+    }
+    fVar4 = (thing->actorParams.maxThrust + thing->actorParams.extraSpeed)
+            * local_8;
+    if (local_8 <= 0.0) {
+        fVar4 = fVar4 * 0.5;
+    }
+    if (fVar4 == 0.0) {
+        thing->physicsParams.acceleration.y = fVar4;
+        if (sithControl_008d7f4c != 0) {
+            sithThing_MotsTick(6,0,fVar4 * move_multiplier);
+            sithControl_008d7f4c = 0;
+        }
+    }
+    else {
+        iVar2 = sithThing_MotsTick(6,0,fVar4 * move_multiplier);
+        if (iVar2 != 0) {
+            thing->physicsParams.acceleration.y = fVar4;
+        }
+        sithControl_008d7f4c = 1;
+    }
+    if (((0.2 < local_8) && ((sithWeapon_controlOptions & 0x10) != 0)) &&
+       (uVar1 = thing->actorParams.typeflags, (uVar1 & 0x10) == 0)) {
+        thing->actorParams.typeflags = uVar1 | 2;
+    }
+    thing->physicsParams.acceleration.z = 0.0;
+    if (move_multiplier != 1.0) {
+        fVar4 = thing->physicsParams.acceleration.x;
+        thing->physicsParams.acceleration.y =
+             thing->physicsParams.acceleration.y * move_multiplier;
+        thing->physicsParams.acceleration.x = fVar4 * move_multiplier;
+    }
+    iVar2 = sithControl_ReadFunctionMap(4,&local_4);
+    if (iVar2 == 0) {
+        if (sithControl_008d7f5c != 0) {
+            sithThing_MotsTick(0,0,0.0);
+        }
+        sithControl_008d7f5c = 0;
+    }
+    else {
+        sithControl_008d7f5c = 1;
+    }
+    if ((local_4 != 0) && (iVar2 = sithThing_MotsTick(0,0,1.0), iVar2 != 0)) {
+        sithPlayerActions_JumpWithVel(thing,1.0);
+    }
+}
+
 void sithControl_PlayerMovement(sithThing *player)
 {
+    if (Main_bMotsCompat) {
+        sithControl_PlayerMovementMots(player);
+        return;
+    }
+
     int new_state; // eax
     double v6; // st7
+    double v7; // st6
     double v11; // st7
     double y_vel; // st6
     int v16; // eax
@@ -1206,30 +1406,14 @@ void sithControl_PlayerMovement(sithThing *player)
     if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0) )
         move_multiplier = move_multiplier * 0.5;
     int old_state = player->physicsParams.physflags;
-    new_state = old_state;
     if ( !sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, 0) )
     {
-        if (sithControl_008d7f58 != 0) {
-            sithThing_MotsTick(1,0,0.0);
-        }
-        sithControl_008d7f58 = 0;
-
         new_state = old_state & ~SITH_PF_CROUCHING;
     }
     else
     {
-        float local_8 = 1.0;
-        if (sithControl_008d7f58 != 0) {
-            local_8 = 2.0;
-        }
-        sithControl_008d7f58 = 1;
-        if (sithThing_MotsTick(1,0,local_8))
-        {
-            if (!Main_bMotsCompat || (Main_bMotsCompat && !(player->actorParams.typeflags & (SITH_AF_IMMOBILE | SITH_AF_8000000)))) {
-                new_state = old_state | SITH_PF_CROUCHING;
-                move_multiplier = 0.5;
-            }
-        }
+        new_state = old_state | SITH_PF_CROUCHING;
+        move_multiplier = 0.5;
     }
     player->physicsParams.physflags = new_state;
     if ( (player->physicsParams.physflags & SITH_PF_200000) != 0 )
@@ -1243,96 +1427,65 @@ void sithControl_PlayerMovement(sithThing *player)
         move_multiplier *= 0.5;
     }
 
-    if ( player->type != SITH_THING_ACTOR && player->type != SITH_THING_PLAYER )
-        return;
-
-    if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
+    if ( player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER )
     {
-        move_multiplier_a = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
-        v6 = move_multiplier_a - sithControl_GetAxis2(INPUT_FUNC_TURN);
-        if ( v6 < -1.0 )
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &v20) )
         {
-            v6 = -1.0;
+            move_multiplier_a = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+            v6 = move_multiplier_a - sithControl_GetAxis2(INPUT_FUNC_TURN);
+            if ( v6 < -1.0 )
+            {
+                v6 = -1.0;
+            }
+            else if ( v6 > 1.0 )
+            {
+                v6 = 1.0;
+            }
+            v7 = player->actorParams.maxThrust + player->actorParams.extraSpeed;
+            player->physicsParams.angVel.y = 0.0;
+            player->physicsParams.acceleration.x = v7 * v6 * 0.7;
         }
-        else if ( v6 > 1.0 )
-        {
-            v6 = 1.0;
-        }
-        player->physicsParams.angVel.y = 0.0;
-        player->physicsParams.acceleration.x = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v6 * 0.7;
-
-        // MOTS TODO TODO
-    }
-    else
-    {
-        // Player yaw handling
-        float turnAxis = sithControl_GetAxis(INPUT_FUNC_TURN);
-        player->physicsParams.angVel.y = turnAxis * sithTime_TickHz;
-        if ( move_multiplier > 1.0 )
-            move_multiplier_ = move_multiplier;
         else
-            move_multiplier_ = 1.0;
-
-        float acc_x = sithControl_GetAxis2(INPUT_FUNC_SLIDE)
-                        * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
-                        * 0.7;
-        
-#ifdef QOL_IMPROVEMENTS
-        // Scale appropriately to high framerates
-        player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
-#else
-        player->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
-#endif
-        player->physicsParams.acceleration.x = acc_x;
-
-        // MOTS TODO TODO
-    }
-    v11 = sithControl_GetAxis2(0);
-    y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
-    if ( v11 <= 0.0 )
-        y_vel = y_vel * 0.5;
-
-    // MOTS added
-    if (y_vel == 0.0) {
-        player->physicsParams.acceleration.y = y_vel;
-        if (sithControl_008d7f4c != 0) {
-            sithThing_MotsTick(6, 0, y_vel * move_multiplier);
-            sithControl_008d7f4c = 0;
-        }
-    }
-    else {
-        if (sithThing_MotsTick(6, 0, y_vel * move_multiplier)) {
-            player->physicsParams.acceleration.y = y_vel;
-        }
-        sithControl_008d7f4c = 1;
-    }
-    
-    if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
-    {
-        if ( (player->actorParams.typeflags & SITH_AF_HEAD_IS_CENTERED) == 0 )
         {
-            player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
+            // Player yaw handling
+            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+            if ( move_multiplier > 1.0 )
+                move_multiplier_ = move_multiplier;
+            else
+                move_multiplier_ = 1.0;
+            
+#ifdef QOL_IMPROVEMENTS
+            // Scale appropriately to high framerates
+            player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
+#else
+            player->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
+#endif
+            player->physicsParams.acceleration.x = sithControl_GetAxis2(INPUT_FUNC_SLIDE)
+                                                            * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
+                                                            * 0.7;
         }
+        v11 = sithControl_GetAxis2(0);
+        y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
+        if ( v11 < 0.0 )
+            y_vel = y_vel * 0.5;
+        player->physicsParams.acceleration.y = y_vel;
+        if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
+        {
+            if ( (player->actorParams.typeflags & SITH_AF_HEAD_IS_CENTERED) == 0 )
+            {
+                player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
+            }
+        }
+        player->physicsParams.acceleration.z = 0;
+        if ( move_multiplier != 1.0 )
+        {
+            player->physicsParams.acceleration.y = player->physicsParams.acceleration.y * move_multiplier;
+            player->physicsParams.acceleration.x = player->physicsParams.acceleration.x * move_multiplier;
+        }
+        sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &v20);
+        if ( v20 )
+            sithPlayerActions_JumpWithVel(player, 1.0);
     }
-    player->physicsParams.acceleration.z = 0;
-    if ( move_multiplier != 1.0 )
-    {
-        player->physicsParams.acceleration.y = player->physicsParams.acceleration.y * move_multiplier;
-        player->physicsParams.acceleration.x = player->physicsParams.acceleration.x * move_multiplier;
-    }
-
-    // MOTS added
-    if (!sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &v20))
-    {
-        if (sithControl_008d7f5c)
-            sithThing_MotsTick(0, 0, 0.0);
-        sithControl_008d7f5c = 0;
-    }
-    else {
-        sithControl_008d7f5c = 1;
-    }
-    if ( v20 && sithThing_MotsTick(0, 0, 1.0))
-        sithPlayerActions_JumpWithVel(player, 1.0);
 }
 
 // MOTS altered
@@ -1353,7 +1506,7 @@ void sithControl_FreeCam(sithThing *player)
 
     v1 = player;
     v2 = 0;
-    if ( (player->physicsParams.physflags & 0x2000) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
+    if ( (player->physicsParams.physflags & SITH_PF_FLY) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
         v2 = 1;
     if ( (sithWeapon_controlOptions & 2) == 0 )
         sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0);
@@ -1366,7 +1519,7 @@ void sithControl_FreeCam(sithThing *player)
         v1->physicsParams.acceleration.z = 0.0;
         v9 = v5 * v6;
         v1->physicsParams.acceleration.y = v9;
-        if ( (v6 != 0.0 || v9 != 0.0) // TODO verify first comparison?
+        if ( (v1->physicsParams.acceleration.x != 0.0 || v1->physicsParams.acceleration.y != 0.0) // TODO verified first comparison?
           && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
           && v2
           && (v1->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
