@@ -107,6 +107,18 @@ const char* aRequiredAssets[] = {
 
 const size_t aRequiredAssets_len = sizeof(aRequiredAssets) / sizeof(const char*);
 
+const char* aRequiredAssetsMots[] = {
+    "episode/JKM_KFY.goo",
+    "episode/JKM_MP.goo",
+    "episode/JKM_SABER.goo",
+    "episode/JKM.goo",
+    "resource/Jkmres.goo",
+    "resource/Jkmsndlo.goo",
+    "resource/jk_.cd",
+};
+
+const size_t aRequiredAssetsMots_len = sizeof(aRequiredAssetsMots) / sizeof(const char*);
+
 #define BUF_SIZE 65536 //2^16
 
 int Main_copy(const char* in_path, const char* out_path){
@@ -740,21 +752,20 @@ void Main_CheckRequiredAssets(int doInstall)
 {
     const char* msg = "OpenJKDF2 is missing the following required assets:\n";
 
+    const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;
+    size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : aRequiredAssets_len;
+
     char* bigList = NULL;
     size_t bigList_len = strlen(msg);
     bool missingRequireds = false;
-    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    for (size_t i = 0; i < paRequiredAssets_len; i++)
     {
-        if (!util_FileExists(aRequiredAssets[i]))
+        if (!util_FileExists(paRequiredAssets[i]))
         {
             missingRequireds = true;
-            bigList_len += strlen(aRequiredAssets[i]) + 2;
+            bigList_len += strlen(paRequiredAssets[i]) + 2;
         }
     }
-
-    // TODO check MoTS files
-    if (Main_bMotsCompat)
-        missingRequireds = false;
 
     if (!missingRequireds) return;
 
@@ -764,19 +775,23 @@ void Main_CheckRequiredAssets(int doInstall)
 
     strcpy(bigList, msg);
 
-    for (size_t i = 0; i < aRequiredAssets_len; i++)
+    for (size_t i = 0; i < paRequiredAssets_len; i++)
     {
-        if (!util_FileExists(aRequiredAssets[i]))
+        if (!util_FileExists(paRequiredAssets[i]))
         {
-            strcat(bigList, aRequiredAssets[i]);
+            strcat(bigList, paRequiredAssets[i]);
             strcat(bigList, "\n");
         }
     }
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", bigList, NULL);
 
-    if (doInstall) {
+    if (doInstall && !Main_bMotsCompat) {
         Main_AttemptInstall();
+    }
+    else if(doInstall && Main_bMotsCompat) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Mysteries of the Sith installation is currently unimplemented.", NULL);
+        jk_exit(1);
     }
 }
 #endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)

@@ -100,7 +100,7 @@ void jkRes_LoadGob(char *a1)
     stdString_SafeStrCopy(jkRes_episodeGobName, a1, 0x20);
     if (*a1 != 0)
     {
-        __snprintf(v30, 0x80u, "%s.gob", jkRes_episodeGobName);
+        __snprintf(v30, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
         __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode\\%s", jkRes_episodeGobName);
         jkRes_UnhookHS();
         jkRes_gCtx.gobs[1].numGobs = 0;
@@ -262,7 +262,7 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
     // Add a mods dir which always overrides resource/
     if (!_strcmp(name, "resource"))
     {
-        v15 = stdFileUtil_NewFind("mods", 3, "gob");
+        v15 = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
         while (stdFileUtil_FindNext(v15, &v18))
         {
             if ( resGob->numGobs >= 0x40u )
@@ -278,7 +278,7 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
         }
     }
 
-    v15 = stdFileUtil_NewFind(name, 3, "gob");
+    v15 = stdFileUtil_NewFind(name, 3, JKRES_GOB_EXT);
     while (stdFileUtil_FindNext(v15, &v18))
     {
         if ( resGob->numGobs >= 0x40u )
@@ -430,7 +430,7 @@ LABEL_11:
                 jkRes_episodeGobName[31] = 0;
                 if ( jkRes_episodeGobName[0] )
                 {
-                    __snprintf(v26, 0x80u, "%s.gob", jkRes_episodeGobName);
+                    __snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
                     __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
                     jkRes_NewGob(&jkRes_gCtx.gobs[1], "episode", v26);
                     if ( jkRes_curDir[0] )
@@ -527,7 +527,7 @@ LABEL_39:
     jkRes_episodeGobName[31] = 0;
     if ( jkRes_episodeGobName[0] )
     {
-        __snprintf(v26, 0x80u, "%s.gob", jkRes_episodeGobName);
+        __snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
         __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
         jkRes_NewGob(&jkRes_gCtx.gobs[1], "episode", v26);
         if ( jkRes_curDir[0] )

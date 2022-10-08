@@ -101,7 +101,7 @@ LABEL_11:
         }
     }
     stdFileUtil_DisposeFind(v0);
-    v5 = stdFileUtil_NewFind("episode", 3, "gob");
+    v5 = stdFileUtil_NewFind("episode", 3, JKRES_GOB_EXT);
     while ( stdFileUtil_FindNext(v5, &v30) )
     {
         if ( v30.fpath[0] != '.' )
@@ -135,7 +135,7 @@ LABEL_20:
     if ( jkRes_curDir[0] )
     {
         _sprintf(jkEpisode_var5, "%s\\gamedata\\episode", jkRes_curDir);
-        v10 = stdFileUtil_NewFind(jkEpisode_var5, 3, "gob");
+        v10 = stdFileUtil_NewFind(jkEpisode_var5, 3, JKRES_GOB_EXT);
         while ( stdFileUtil_FindNext(v10, &v30) )
         {
             if ( v30.fpath[0] != '.' )

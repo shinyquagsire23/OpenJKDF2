@@ -72,6 +72,8 @@
 #define NUM_JKPLAYER_THINGS (16)
 #endif
 
+#define JKRES_GOB_EXT (Main_bMotsCompat ? "goo" : "gob")
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation
