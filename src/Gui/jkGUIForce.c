@@ -37,72 +37,187 @@ static const char* jkGuiForce_bitmaps[17] = {
     "forceMeterBack.bm"
 };
 
+static const char* jkGuiForce_bitmapsMots[19] = {
+    "foAbsorb.bm",
+    "foBlinding.bm",
+    "foChainLight.bm",
+    "foDeadlySight.bm",
+    "foDefense.bm",
+    "foDestruct.bm",
+    "foFarSight.bm",
+    "foGrip.bm",
+    "foHealth.bm",
+    "foJump.bm",
+    "foPersuasion.bm",
+    "foProjection.bm",
+    "foProtection.bm",
+    "foPull.bm",
+    "foPush.bm",
+    "foSaberThrow.bm",
+    "foSeeing.bm",
+    "foSpeed.bm",
+    "foStars.bm",
+};
+
+#define IDX_FOSTARS (Main_bMotsCompat ? 18 : 14)
+
+#define EIDX_NAMETEXT (1)
+#define EIDX_FLAVORTEXT (2)
+#define EIDX_START_FP (3)
+#define EIDX_END_FP_CLICKABLE (Main_bMotsCompat ? 20 : 15)
+#define EIDX_END_FP (Main_bMotsCompat ? 20+1 : 16+1)
+#define EIDX_RESET (Main_bMotsCompat ? 26 : 18)
+#define EIDX_QUIT (Main_bMotsCompat ? 27 : 19)
+#define EIDX_ALIGN_SLIDER (Main_bMotsCompat ? 30 : 23)
+
 static int jkGuiForce_alignment;
 static float jkGuiForce_flt_556674;
 static int jkGuiForce_numSpendStars;
 static int jkGuiForce_bCanSpendStars;
 static float jkGuiForce_isMulti;
-static stdBitmap* jkGuiForce_aBitmaps[17];
+static stdBitmap* jkGuiForce_aBitmaps[19];
 
 static rdVector2i jkGuiForce_idkExtra = {16, 15};
 
+static wchar_t jkGuiForce_waTmp[400];
+
+jkGuiElement jkGuiForce_buttonsMots[31] = { 
+/*0*/        { ELEMENT_TEXT, 0, 2, NULL, 
+                3, { 160, 350, 320, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*1*/        { ELEMENT_TEXT, 0, 2, NULL, 
+                3, { 10, 15, 620, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*2*/        { ELEMENT_TEXT, 0, 2, NULL, 
+                3, { 10, 46, 620, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+
+/*3*/        { ELEMENT_PICBUTTON, SITHBIN_F_JUMP, 0, NULL, 
+                9, { 146, 120, -1, -1 }, 1, 0, "GUI_HINT_JUMP", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*4*/        { ELEMENT_PICBUTTON, SITHBIN_F_PROJECT, 0, NULL, 
+                11, { 146, 150, -1, -1 }, 1, 0, "GUI_HINT_PROJECTION", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*5*/        { ELEMENT_PICBUTTON, SITHBIN_F_SEEING, 0, NULL, 
+                16, { 146, 180, -1, -1 }, 1, 0, "GUI_HINT_SEEING", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*6*/        { ELEMENT_PICBUTTON, SITHBIN_F_SPEED, 0, NULL, 
+                17, { 146, 210, -1, -1 }, 1, 0, "GUI_HINT_SPEED", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*7*/        { ELEMENT_PICBUTTON, SITHBIN_F_PUSH, 0, NULL, 
+                14, { 146, 240, -1, -1 }, 1, 0, "GUI_HINT_PUSH", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*8*/        { ELEMENT_PICBUTTON, SITHBIN_F_PULL, 0, NULL, 
+                13, { 296, 120, -1, -1 }, 1, 0, "GUI_HINT_PULL", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*9*/        { ELEMENT_PICBUTTON, SITHBIN_F_SABERTHROW, 0, NULL, 
+                15, { 296, 150, -1, -1 }, 1, 0, "GUI_HINT_SABERTHROW", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*10*/        { ELEMENT_PICBUTTON, SITHBIN_F_GRIP, 0, NULL, 
+                7, { 296, 180, -1, -1 }, 1, 0, "GUI_HINT_GRIP", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*11*/        { ELEMENT_PICBUTTON, SITHBIN_F_FARSIGHT, 0, NULL, 
+                6, { 296, 210, -1, -1 }, 1, 0, "GUI_HINT_FARSIGHT", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*12*/        { ELEMENT_PICBUTTON, SITHBIN_F_PERSUASION, 0, NULL, 
+                10, { 446, 120, -1, -1 }, 1, 0, "GUI_HINT_PERSUASION", NULL, &jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*13*/        { ELEMENT_PICBUTTON, SITHBIN_F_HEALING, 0, NULL, 
+                8, { 446, 150, -1, -1 }, 1, 0, "GUI_HINT_HEALING", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*14*/        { ELEMENT_PICBUTTON, SITHBIN_F_BLINDING, 0, NULL, 
+                1, { 446, 180, -1, -1 }, 1, 0, "GUI_HINT_BLINDING", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*15*/        { ELEMENT_PICBUTTON, SITHBIN_F_CHAINLIGHT, 0, NULL, 
+                2, { 446, 210, -1, -1 }, 1, 0, "GUI_HINT_CHAINLIGHT", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*16*/        { ELEMENT_PICBUTTON, SITHBIN_F_ABSORB, 0, NULL, 
+                0, { 596, 120, -1, -1 }, 1, 0, "GUI_HINT_ABSORB", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*17*/        { ELEMENT_PICBUTTON, SITHBIN_F_DESTRUCTION, 0, NULL, 
+                5, { 596, 150, -1, -1 }, 1, 0, "GUI_HINT_DESTRUCTION", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*18*/        { ELEMENT_PICBUTTON, SITHBIN_F_PROTECTION, 0, NULL, 
+                12, { 596, 180, -1, -1 }, 1, 0, "GUI_HINT_PROTECTION", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*19*/        { ELEMENT_PICBUTTON, SITHBIN_F_DEADLYSIGHT, 0, NULL, 
+                3, { 596, 210, -1, -1 }, 1, 0, "GUI_HINT_DEADLYSIGHT", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+/*20*/        { ELEMENT_PICBUTTON, SITHBIN_F_DEFENSE, 0, NULL, 
+                4, { 308, 300, -1, -1 }, 1, 0, "GUI_HINT_DEFENSE", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
+
+/*21*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[0], 
+                3, { 20, 90, 150, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*22*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[100], 
+                3, { 170, 90, 150, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*23*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[200], 
+                3, { 320, 90, 150, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*24*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[300], 
+                3, { 470, 90, 150, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+
+/*25*/        { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 
+                3, { 550, 440, 80, 40 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*26*/        { ELEMENT_TEXTBUTTON, 0, 2, "GUI_RESET", 
+                3, { 270, 440, 100, 30 }, 1, 0, NULL, NULL, &jkGuiForce_ResetClick, NULL, {0}, 0 }, 
+/*27*/        { ELEMENT_TEXTBUTTON, 12345, 2, "GUI_QUIT", 
+                3, { 0, 440, 100, 40 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
+/*28*/        { ELEMENT_CUSTOM, 0, 0, NULL, 
+                0, { 0, 390, 640, 30 }, 1, 0, NULL, &jkGuiForce_ForceStarsDraw, NULL, NULL, {0}, 0 }, 
+/*29*/        { ELEMENT_END, 0, 0, NULL, 
+                0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, {0}, 0 },
+
+// HACK: Just make an unused slider
+/*30*/  { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
+        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
+};  
+
+
 static jkGuiElement jkGuiForce_buttons[25] = {
-    { ELEMENT_TEXT,       0,  2, NULL,               
-     3, {160, 320, 320, 30}, 1, 0, NULL,                   0,  0,                      0, {0},  0},
-    { ELEMENT_TEXT,       0,  2, NULL,               
-     3, {10, 15, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
-    { ELEMENT_TEXT,       0,  2, NULL,               
-     3, {10, 46, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
+/*0*/   { ELEMENT_TEXT,       0,  2, NULL,               
+         3, {160, 320, 320, 30}, 1, 0, NULL,                   0,  0,                      0, {0},  0},
+/*1*/   { ELEMENT_TEXT,       0,  2, NULL,               
+         3, {10, 15, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
+/*2*/   { ELEMENT_TEXT,       0,  2, NULL,               
+         3, {10, 46, 620, 30},   1, 0, NULL,                   0,  0,                      0, {0},  0},
 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_ABSORB, 0, NULL,               
-      0, {-1, -1, -1, -1},    1, 0, "GUI_HINT_ABSORB",      0, jkGuiForce_ButtonClick,  0, {0},  0},
-    { ELEMENT_PICBUTTON,  SITHBIN_F_BLINDING, 0, NULL,               
-      1, {-1, -1, -1, -1},    1, 0, "GUI_HINT_BLINDING",    0, jkGuiForce_ButtonClick,  0, {0},  0},
-    { ELEMENT_PICBUTTON,  SITHBIN_F_DESTRUCTION, 0, NULL,               
-      3, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DESTRUCTION", 0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_GRIP, 0, NULL,               
-      4, {-1, -1, -1, -1},    1, 0, "GUI_HINT_GRIP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_HEALING, 0, NULL,               
-      5, {-1, -1, -1, -1},    1, 0, "GUI_HINT_HEALING",     0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_JUMP, 0, NULL,               
-      6, {-1, -1, -1, -1},    1, 0, "GUI_HINT_JUMP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_PERSUASION, 0, NULL,               
-      7, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PERSUASION",  0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_PULL, 0, NULL,               
-      9, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PULL",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_SEEING, 0, NULL,              
-     10, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SEEING",      0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_SPEED, 0, NULL,              
-     11, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SPEED",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_THROW,       0, NULL,              
-     12, {-1, -1, -1, -1},    1, 0, "GUI_HINT_THROW",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_LIGHTNING,   0, NULL,              
-     13, {-1, -1, -1, -1},    1, 0, "GUI_HINT_LIGHTNING",   0, jkGuiForce_ButtonClick,  0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_PROTECTION,  0, NULL,               
-      8, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PROTECTION",  0, jkGuiForce_ExtraClick,   0, {0},  0}, 
-    { ELEMENT_PICBUTTON,  SITHBIN_F_DEADLYSIGHT, 0, NULL,               
-      2, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DEADLYSIGHT", 0, jkGuiForce_ExtraClick,   0, {0},  0}, 
+/*3*/   { ELEMENT_PICBUTTON,  SITHBIN_F_ABSORB, 0, NULL,               
+          0, {-1, -1, -1, -1},    1, 0, "GUI_HINT_ABSORB",      0, jkGuiForce_ButtonClick,  0, {0},  0},
+/*4*/   { ELEMENT_PICBUTTON,  SITHBIN_F_BLINDING, 0, NULL,               
+          1, {-1, -1, -1, -1},    1, 0, "GUI_HINT_BLINDING",    0, jkGuiForce_ButtonClick,  0, {0},  0},
+/*5*/   { ELEMENT_PICBUTTON,  SITHBIN_F_DESTRUCTION, 0, NULL,               
+          3, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DESTRUCTION", 0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*6*/   { ELEMENT_PICBUTTON,  SITHBIN_F_GRIP, 0, NULL,               
+          4, {-1, -1, -1, -1},    1, 0, "GUI_HINT_GRIP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*7*/   { ELEMENT_PICBUTTON,  SITHBIN_F_HEALING, 0, NULL,               
+          5, {-1, -1, -1, -1},    1, 0, "GUI_HINT_HEALING",     0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*8*/   { ELEMENT_PICBUTTON,  SITHBIN_F_JUMP, 0, NULL,               
+          6, {-1, -1, -1, -1},    1, 0, "GUI_HINT_JUMP",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*9*/   { ELEMENT_PICBUTTON,  SITHBIN_F_PERSUASION, 0, NULL,               
+          7, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PERSUASION",  0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*10*/  { ELEMENT_PICBUTTON,  SITHBIN_F_PULL, 0, NULL,               
+          9, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PULL",        0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*11*/  { ELEMENT_PICBUTTON,  SITHBIN_F_SEEING, 0, NULL,              
+         10, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SEEING",      0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*12*/  { ELEMENT_PICBUTTON,  SITHBIN_F_SPEED, 0, NULL,              
+         11, {-1, -1, -1, -1},    1, 0, "GUI_HINT_SPEED",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*13*/  { ELEMENT_PICBUTTON,  SITHBIN_F_THROW,       0, NULL,              
+         12, {-1, -1, -1, -1},    1, 0, "GUI_HINT_THROW",       0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*14*/  { ELEMENT_PICBUTTON,  SITHBIN_F_LIGHTNING,   0, NULL,              
+         13, {-1, -1, -1, -1},    1, 0, "GUI_HINT_LIGHTNING",   0, jkGuiForce_ButtonClick,  0, {0},  0}, 
+/*15*/  { ELEMENT_PICBUTTON,  SITHBIN_F_PROTECTION,  0, NULL,               
+          8, {-1, -1, -1, -1},    1, 0, "GUI_HINT_PROTECTION",  0, jkGuiForce_ExtraClick,   0, {0},  0}, 
+/*16*/  { ELEMENT_PICBUTTON,  SITHBIN_F_DEADLYSIGHT, 0, NULL,               
+          2, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DEADLYSIGHT", 0, jkGuiForce_ExtraClick,   0, {0},  0}, 
 
-    { ELEMENT_TEXTBUTTON,  1, 2, .str = "GUI_OK",    
-      3, {550, 420, 80, 40},  1, 0, NULL,                   0, 0,                       0, {0},  0}, 
-    { ELEMENT_TEXTBUTTON,  0, 2, .str = "GUI_RESET", 
-      3, {270, 350, 100, 30}, 1, 0, NULL,                   0, jkGuiForce_ResetClick,   0, {0},  0}, 
-    { ELEMENT_TEXTBUTTON, -1, 2, .str = "GUI_QUIT",  
-      3, { 0, 420, 100, 40},  1, 0, NULL,                   0,  0,                      0, {0},  0}, 
-    { ELEMENT_CUSTOM,      0, 0, NULL,               
-      0, { 0, 390, 640, 30},  1, 0, NULL,            jkGuiForce_ForceStarsDraw,     0,  0, {0},  0}, 
-    { ELEMENT_CUSTOM,      0, 0, NULL,               
-      0, {320, 418, 170, 40}, 1, 0, "GUI_DARKSIDE",  jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
-    { ELEMENT_CUSTOM,      0, 0, NULL,               
-      0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
-    { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
-    100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
-    { ELEMENT_END,         0, 0, NULL,               
-      0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}
+/*17*/  { ELEMENT_TEXTBUTTON,  1, 2, .str = "GUI_OK",    
+          3, {550, 420, 80, 40},  1, 0, NULL,                   0, 0,                       0, {0},  0}, 
+/*18*/  { ELEMENT_TEXTBUTTON,  0, 2, .str = "GUI_RESET", 
+          3, {270, 350, 100, 30}, 1, 0, NULL,                   0, jkGuiForce_ResetClick,   0, {0},  0}, 
+/*19*/  { ELEMENT_TEXTBUTTON, -1, 2, .str = "GUI_QUIT",  
+          3, { 0, 420, 100, 40},  1, 0, NULL,                   0,  0,                      0, {0},  0}, 
+
+/*20*/  { ELEMENT_CUSTOM,      0, 0, NULL,               
+          0, { 0, 390, 640, 30},  1, 0, NULL,            jkGuiForce_ForceStarsDraw,     0,  0, {0},  0}, 
+/*21*/  { ELEMENT_CUSTOM,      0, 0, NULL,               
+          0, {320, 418, 170, 40}, 1, 0, "GUI_DARKSIDE",  jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
+/*22*/  { ELEMENT_CUSTOM,      0, 0, NULL,               
+          0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
+
+/*23*/  { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
+        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
+/*24*/  { ELEMENT_END,         0, 0, NULL,               
+          0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}
 };
 
 static jkGuiMenu jkGuiForce_menu =
 { jkGuiForce_buttons, 0, 0xe1, 0xff, 0x0f, 0, 0, jkGuiForce_aBitmaps, jkGui_stdFonts, 0, jkGuiForce_ChoiceRemoveStars, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+
+static jkGuiMenu jkGuiForce_menuMots =
+{ jkGuiForce_buttonsMots, 0, 0xe1, 0xff, 0x0f, 0, 0, jkGuiForce_aBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+
+
+static jkGuiElement* jkGuiForce_pElements = jkGuiForce_buttons;
+static jkGuiElement* jkGuiForce_pMenu = &jkGuiForce_menu;
 
 void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
 {
@@ -116,12 +231,12 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
     {
         jkGuiRend_PlayWav("ForceBlind01.wav");
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
+    jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
 
-    for (int i = 3; i < 17; i++)
+    for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
-        int id = jkGuiForce_buttons[i].hoverId;
-        jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        int id = jkGuiForce_pElements[i].hoverId;
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
     }
 
     jkGuiRend_Paint(menu);
@@ -162,11 +277,11 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
         }
 
         jkGuiForce_alignment = 0;
-        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(0.0);
-        for (int i = 3; i < 17; i++)
+        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(0.0);
+        for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
         {
-            int id = jkGuiForce_buttons[i].hoverId;
-            jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+            int id = jkGuiForce_pElements[i].hoverId;
+            jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
         }
         jkGuiRend_Paint(menu);
     }
@@ -181,37 +296,43 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
     }
     else
     {
+        stdVBuffer* bitmap = jkGuiForce_aBitmaps[IDX_FOSTARS]->mipSurfaces[Main_bMotsCompat ? 10 : 0];
+
+        // MOTS added
+        int spendStarsVisualMax = element->rect.width / bitmap->format.width;
+        if (spendStarsVisualMax <= spendStars) {
+            spendStars = spendStarsVisualMax;
+        }
+
         for (int i = 0; i < spendStars; i++)
         {
-            stdVBuffer* bitmap = jkGuiForce_aBitmaps[14]->mipSurfaces[0];
             stdDisplay_VBufferCopy(vbuf, bitmap, element->rect.x + bitmap->format.width * i + ((element->rect.width - bitmap->format.width * spendStars) >> 1), element->rect.y, 0, 1);
-            
         }
     }
     
-    for (int i = 3; i < 15; i++)
+    for (int i = EIDX_START_FP; i < EIDX_END_FP_CLICKABLE; i++)
     {
-        int id = jkGuiForce_buttons[i].hoverId;
+        int id = jkGuiForce_pElements[i].hoverId;
         int numStars = (int)sithPlayer_GetBinAmt(id) - 1;
         if ( numStars >= 0 )
         {
-            if (id >= SITHBIN_F_HEALING && id <= SITHBIN_F_ABSORB)
+            if (!Main_bMotsCompat && id >= SITHBIN_F_HEALING && id <= SITHBIN_F_ABSORB)
             {
                 numStars += 4; // Light side
             }
-            else if (id >= SITHBIN_F_THROW && id <= SITHBIN_F_DESTRUCTION)
+            else if (!Main_bMotsCompat && id >= SITHBIN_F_THROW && id <= SITHBIN_F_DESTRUCTION)
             {
                 numStars += 8; // Dark side
             }
 
             // Show the number of force stars next to each button
             int x;
-            if ( jkGuiForce_buttons[i].rect.x >= 320 )
-                x = jkGuiForce_buttons[i].rect.width + jkGuiForce_buttons[i].rect.x + 19;
+            if ( !Main_bMotsCompat && jkGuiForce_pElements[i].rect.x >= 320 )
+                x = jkGuiForce_pElements[i].rect.width + jkGuiForce_pElements[i].rect.x + 19;
             else
-                x = jkGuiForce_buttons[i].rect.x - jkGuiForce_aBitmaps[14]->mipSurfaces[numStars]->format.width - 19;
+                x = jkGuiForce_pElements[i].rect.x - jkGuiForce_aBitmaps[IDX_FOSTARS]->mipSurfaces[numStars]->format.width - 19;
 
-            stdDisplay_VBufferCopy(vbuf, jkGuiForce_aBitmaps[14]->mipSurfaces[numStars], x, jkGuiForce_buttons[i].rect.y + 3, 0, 1);
+            stdDisplay_VBufferCopy(vbuf, jkGuiForce_aBitmaps[IDX_FOSTARS]->mipSurfaces[numStars], x, jkGuiForce_pElements[i].rect.y + 3, 0, 1);
         }
     }
 }
@@ -234,7 +355,7 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
     {
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars - 1));
         sithPlayer_SetBinAmt(binIdx, (float)(curLevel + 1));
-        jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
+        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
         jkGuiRend_Paint(menu);
     }
 
@@ -244,7 +365,7 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
         {
             sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(spendStars + curLevel));
             sithPlayer_SetBinAmt(binIdx, 0.0);
-            jkGuiForce_buttons[23].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
+            jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
         }
 
         jkGuiForce_UpdateViewForRank();
@@ -259,17 +380,17 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
     if ( !jkGuiForce_bCanSpendStars )
         return 0;
     sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (double)jkGuiForce_numSpendStars);
-    for (int i = 3; i < 15; i++)
+    for (int i = EIDX_START_FP; i < EIDX_END_FP_CLICKABLE; i++)
     {
-        float v5 = (double)(*(int*)&jkGuiForce_buttons[i].anonymous_13);
-        sithPlayer_SetBinAmt(jkGuiForce_buttons[i].hoverId, v5);
+        float v5 = (double)(*(int*)&jkGuiForce_pElements[i].anonymous_13);
+        sithPlayer_SetBinAmt(jkGuiForce_pElements[i].hoverId, v5);
     }
 
     if (jkGuiForce_isMulti)
     {
         jkGuiForce_UpdateViewForRank();
     }
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (uint64_t)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
+    jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (uint64_t)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     jkGuiRend_Paint(menu);
     return 0;
 }
@@ -285,14 +406,14 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[9]->palette);
     
-    jkGuiForce_buttons[1].wstr = jkPlayer_playerShortName;
-    jkGuiForce_buttons[18].bIsVisible = bCanSpendStars;
-    jkGuiForce_buttons[19].bIsVisible = bEnableIdk != 0;
+    jkGuiForce_pElements[EIDX_NAMETEXT].wstr = jkPlayer_playerShortName;
+    jkGuiForce_pElements[EIDX_RESET].bIsVisible = bCanSpendStars;
+    jkGuiForce_pElements[EIDX_QUIT].bIsVisible = bEnableIdk != 0;
 
     float darklight_float = jkPlayer_CalcAlignment(jkGuiForce_isMulti);
 
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
-    jkGuiForce_buttons[2].wstr = jkStrings_GetText(std_genBuffer);
+    jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText(std_genBuffer);
     if ( a4 == 0 )
     {
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
@@ -301,30 +422,30 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(newStars + spendStars));
     }
     jkGuiForce_numSpendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-    jkGuiForce_buttons[23].bIsVisible = 1;
-    jkGuiForce_buttons[23].anonymous_9 = 1;
-    jkGuiForce_buttons[23].selectedTextEntry = 100 - (uint32_t)darklight_float;
+    jkGuiForce_pElements[EIDX_ALIGN_SLIDER].bIsVisible = 1;
+    jkGuiForce_pElements[EIDX_ALIGN_SLIDER].anonymous_9 = 1;
+    jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (uint32_t)darklight_float;
     if (isMulti)
     {
         jkPlayer_SetAccessiblePowers(jkPlayer_GetJediRank());
         jkGuiForce_UpdateViewForRank();
-        jkGuiForce_buttons[1].wstr = (wchar_t *)a5;
+        jkGuiForce_pElements[EIDX_NAMETEXT].wstr = (wchar_t *)a5;
     }
     
-    for (int i = 3; i < 17; i++)
+    for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
-        int id = jkGuiForce_buttons[i].hoverId;
+        int id = jkGuiForce_pElements[i].hoverId;
 
-        *(int*)&jkGuiForce_buttons[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
+        *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
 
-        jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
     }
 
     if ( a4 != 0 )
     {
         if ( darklight_float >= 0.0 )
         {
-            jkGuiForce_buttons[2].wstr = jkStrings_GetText("GUI_PATH_LIGHT");
+            jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText("GUI_PATH_LIGHT");
             if ( jkPlayer_GetAlignment() == 1 )
             {
                 sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 1);
@@ -335,7 +456,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         }
         else
         {
-            jkGuiForce_buttons[2].wstr = jkStrings_GetText("GUI_PATH_DARK");
+            jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText("GUI_PATH_DARK");
             if ( jkPlayer_GetAlignment() == 2 )
             {
                 sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 1);
@@ -345,12 +466,12 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
             isLight = 0;
         }
     }
-    jkGuiRend_MenuSetLastElement(&jkGuiForce_menu, &jkGuiForce_buttons[17]);
+    jkGuiRend_MenuSetLastElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_END_FP]);
 
     int clicked;
     while (1)
     {
-        clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiForce_menu);
+        clicked = jkGuiRend_DisplayAndReturnClicked(jkGuiForce_pMenu);
         if ( clicked == -1 )
         {
             if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_ABORT_GAME"), jkStrings_GetText("GUI_CONFIRM_ABORTCD")) )
@@ -380,19 +501,35 @@ void jkGuiForce_Startup()
 {
     char tmp[128];
 
-    jkGui_InitMenu(&jkGuiForce_menu, jkGui_stdBitmaps[9]);
-    for (int i = 0; i < 17; i++)
-    {
-        stdString_snprintf(tmp, sizeof(tmp), "ui\\bm\\%s", jkGuiForce_bitmaps[i]);
-        jkGuiForce_aBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
-        if (jkGuiForce_aBitmaps[i] == NULL)
-            Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+    if (Main_bMotsCompat) {
+        jkGuiForce_pMenu = &jkGuiForce_menuMots;
+        jkGuiForce_pElements = jkGuiForce_buttonsMots;
+    }
+
+    jkGui_InitMenu(jkGuiForce_pMenu, jkGui_stdBitmaps[9]);
+    if (Main_bMotsCompat) {
+        for (int i = 0; i < 19; i++)
+        {
+            stdString_snprintf(tmp, sizeof(tmp), "ui\\bm\\%s", jkGuiForce_bitmapsMots[i]);
+            jkGuiForce_aBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
+            if (jkGuiForce_aBitmaps[i] == NULL)
+                Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
+    }
+    else {
+        for (int i = 0; i < 17; i++)
+        {
+            stdString_snprintf(tmp, sizeof(tmp), "ui\\bm\\%s", jkGuiForce_bitmaps[i]);
+            jkGuiForce_aBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
+            if (jkGuiForce_aBitmaps[i] == NULL)
+                Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
     }
 }
 
 void jkGuiForce_Shutdown()
 {
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < Main_bMotsCompat ? 19 : 17; i++)
     {
         if ( jkGuiForce_aBitmaps[i] )
         {
@@ -402,15 +539,24 @@ void jkGuiForce_Shutdown()
     }
 }
 
+void jkGuiForce_UpdateViewForRankMots()
+{
+}
+
 void jkGuiForce_UpdateViewForRank()
 {
+    if (Main_bMotsCompat) {
+        jkGuiForce_UpdateViewForRankMots();
+        return;
+    }
+
     jkPlayer_SetProtectionDeadlysight();
     if ( jkPlayer_GetJediRank() >= 7 )
         jkPlayer_DisallowOtherSide(jkPlayer_GetJediRank());
-    for (int i = 3; i < 17; i++)
+    for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
-        int id = jkGuiForce_buttons[i].hoverId;
-        jkGuiForce_buttons[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        int id = jkGuiForce_pElements[i].hoverId;
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
     }
 }
 

@@ -1012,13 +1012,13 @@ int jkPlayer_MPCBinWrite()
     if (!stdConffile_Printf("\nforcepowers:\n") )
         return 0;
 
-    v0 = SITHBIN_JEDI_RANK;
+    v0 = SITHBIN_FP_START;
     while ( 1 )
     {
         if ( !stdConffile_Printf("bin: %d value: %f\n", v0, sithPlayer_GetBinAmt(v0)) )
             break;
 
-        if ( ++v0 > (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT) )
+        if ( ++v0 > SITHBIN_FP_END )
         {
             return stdConffile_Printf("spendable stars: %f\n", sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS));
         }
@@ -1034,7 +1034,7 @@ int jkPlayer_MPCBinRead()
     int v3;
 
     stdConffile_ReadLine();
-    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
+    for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
             return 0;
@@ -1052,7 +1052,7 @@ int jkPlayer_MPCBinRead()
 
 void jkPlayer_InitForceBins()
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
+    for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
         {
@@ -1122,7 +1122,17 @@ int jkPlayer_GetAlignment()
 
 void jkPlayer_SetAccessiblePowers(int rank)
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
+    //MOTS TODO
+    if (Main_bMotsCompat) {
+        for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
+        {
+            if ( i != SITHBIN_JEDI_RANK )
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= ITEMSTATE_CARRIES;
+        }
+        return;
+    }
+
+    for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
             jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~ITEMSTATE_CARRIES;
@@ -1130,7 +1140,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
 
     if ( rank )
     {
-        for (int j = SITHBIN_JEDI_RANK; j <= SITHBIN_F_PULL; ++j )
+        for (int j = SITHBIN_FP_START; j <= SITHBIN_F_PULL; ++j )
         {
             if ( j != SITHBIN_JEDI_RANK )
                 jkPlayer_playerInfos[playerThingIdx].iteminfo[j].state |= ITEMSTATE_CARRIES;
@@ -1163,7 +1173,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
 
 void jkPlayer_ResetPowers()
 {
-    for (int i = SITHBIN_JEDI_RANK; i <= (Main_bMotsCompat ? SITHBIN_F_CHAINLIGHT : SITHBIN_F_DEADLYSIGHT); ++i )
+    for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
             sithPlayer_SetBinAmt(i, 0.0);
@@ -1340,9 +1350,12 @@ void jkPlayer_FixStars()
     float a2l; // [esp+0h] [ebp-14h]
     float a2m; // [esp+0h] [ebp-14h]
 
+    // MOTS TODO
+    if (Main_bMotsCompat) return;
+
     v0 = 3 * jkPlayer_GetJediRank();
     v1 = (__int64)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-    for ( i = SITHBIN_JEDI_RANK; i <= SITHBIN_F_DEADLYSIGHT; ++i )
+    for ( i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK && i != SITHBIN_F_PROTECTION && i != SITHBIN_F_DEADLYSIGHT )
             v1 += (__int64)sithPlayer_GetBinAmt(i);
@@ -1482,6 +1495,9 @@ float jkPlayer_CalcStarsAlign()
 
 int jkPlayer_SetProtectionDeadlysight()
 {
+    // MOTS TODO
+    if (Main_bMotsCompat) return 0;
+
     int hasNoNeutral = 1;
     int rank = jkPlayer_GetJediRank();
 
@@ -1512,7 +1528,7 @@ int jkPlayer_SetProtectionDeadlysight()
         if ( sithPlayer_GetBinAmt(l) < 4.0 )
             hasFullLightside = 0;
     }
-    for (int m = SITHBIN_JEDI_RANK; m <= SITHBIN_F_PULL; ++m )
+    for (int m = SITHBIN_FP_START; m <= SITHBIN_F_PULL; ++m )
     {
         if ( m != SITHBIN_JEDI_RANK && sithPlayer_GetBinAmt(m) > 0.0 )
             hasNoNeutral = 0;
@@ -1545,6 +1561,9 @@ int jkPlayer_SetProtectionDeadlysight()
 
 void jkPlayer_DisallowOtherSide(int rank)
 {
+    // MOTS TODO
+    if (Main_bMotsCompat) return;
+
     float align = jkPlayer_CalcStarsAlign();
 
     if ( rank < 7 )

@@ -428,6 +428,10 @@ float rdVector_Normalize3QuickAcc(rdVector3 *v1)
     }
 
     float len = ((0.34375 * series_3) + (0.25 * series_2) + series_1);
+    // Added: prevent div 0
+    if (len == 0.0) {
+        len = 0.00000001;
+    }
     float len_recip = 1.0 / len;
     v1->x = v1->x * len_recip;
     v1->y = v1->y * len_recip;
