@@ -1134,7 +1134,12 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
     sithThing *pActor2; // edi
 
     itemThingId = pItemThing->thing_id;
-    actorId = pActor->thing_id;
+
+    if (!pActor) // MOTS added
+        actorId = -1;
+    else
+        actorId = pActor->thing_id;
+
     sithComm_netMsgTmp.pktData[0] = itemThingId;
     sithComm_netMsgTmp.pktData[1] = actorId;
     sithComm_netMsgTmp.netMsg.flag_maybe = 0;

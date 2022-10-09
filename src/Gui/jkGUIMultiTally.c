@@ -508,12 +508,7 @@ void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)
 // MOTS altered
 int jkGuiMultiTally_ShowTeamScores(int a1)
 {
-    unsigned int v1; // eax
-    jkHudTeamScore* pScoreIter2; // ecx
     int v3; // ecx
-    sithPlayerInfo* pPlayerInfoIter; // eax
-    jkHudTeamScore* v5; // ecx
-    int *v6; // eax
     int v7; // esi
     jkGuiElement* pElementIter; // esi
     wchar_t *v9; // ebx
@@ -525,7 +520,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     wchar_t *v15; // eax
     wchar_t *v17; // [esp-4h] [ebp-864h]
     jkHudTeamScore aTmpTeamScores[5]; // [esp+10h] [ebp-850h] BYREF
-    wchar_t v19; // [esp+60h] [ebp-800h] BYREF
+    wchar_t v19[32 * 5]; // [esp+60h] [ebp-800h] BYREF
 
     jkGuiMultiTally_msStart = stdPlatform_GetTimeMsec();
     jkGuiMultiTally_idkType = a1;
@@ -535,38 +530,25 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     jkGuiMultiTally_buttons3[1].wstr = jkGui_sub_412ED0();
     jkGuiRend_MenuSetLastElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[16]);
     jkGuiRend_SetDisplayingStruct(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[15]);
-    v1 = 0;
-    pScoreIter2 = &aTmpTeamScores[0];
-    do
+
+    for (int i = 0; i < 5; i++)
     {
-        pScoreIter2->field_0 = v1;
-        pScoreIter2->field_8 = 0;
-        ++v1;
-        ++pScoreIter2;
+        aTmpTeamScores[i].field_0 = i;
+        aTmpTeamScores[i].field_8 = 0;
     }
-    while ( v1 < 5 );
-    v3 = jkPlayer_maxPlayers;
-    if ( jkPlayer_maxPlayers )
+
+    for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
-        pPlayerInfoIter = &jkPlayer_playerInfos[0];
-        do
-        {
-            if ( (pPlayerInfoIter->flags & 4) != 0 )
-                aTmpTeamScores[pPlayerInfoIter->teamNum].field_8 = 1;
-            ++pPlayerInfoIter;
-            --v3;
-        }
-        while ( v3 );
+        sithPlayerInfo* pPlayerInfoIter = &jkPlayer_playerInfos[i];
+        if ( (pPlayerInfoIter->flags & 4) != 0 )
+            aTmpTeamScores[pPlayerInfoIter->teamNum].field_8 = 1;
     }
-    v5 = &aTmpTeamScores[0];
-    v6 = sithNet_teamScore;
-    do
+
+    for (int i = 0; i < 5; i++)
     {
-        v7 = *v6++;
-        v5->score = v7;
-        v5++;
+        aTmpTeamScores[i].score = sithNet_teamScore[i];
     }
-    while ( v6 < &sithNet_teamScore[5] );
+
     _qsort(aTmpTeamScores, 5u, sizeof(jkHudTeamScore), jkGuiMultiTally_SortTeamScore);
     pElementIter = &jkGuiMultiTally_buttons3[4];
     v9 = &v19;

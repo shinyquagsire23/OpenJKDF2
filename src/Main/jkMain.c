@@ -64,7 +64,7 @@ char jkMain_motsIdk[128];
 jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
 
-static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
+static jkGuiStateFuncs jkMain_aGuiStateFuncs[16] = {
     {0,  0,  0},
     {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave},
     {jkMain_TitleShow, jkMain_TitleTick, jkMain_TitleLeave},
@@ -80,6 +80,7 @@ static jkGuiStateFuncs jkMain_aGuiStateFuncs[15] = {
     {jkMain_CutsceneShow, jkMain_CutsceneTick, jkMain_CutsceneLeave},
     {jkMain_CreditsShow, jkMain_CreditsTick, jkMain_CreditsLeave},
     {jkMain_UnkShow, jkMain_UnkTick, jkMain_UnkLeave},
+    {jkMain_VideoShow, jkMain_VideoTick, jkMain_VideoLeave}, // MOTS added
 };
 
 void jkMain_Startup()
@@ -462,188 +463,181 @@ void jkMain_GameplayShow(int a1, int a2)
     level_loaded = 0;
 
     // MOTS added something here TODO
-    if (a2 == JK_GAMEMODE_MOTS1) {
+    if (a2 == JK_GAMEMODE_MOTS_CUTSCENE) {
         stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_aLevelJklFnameMots, 128);
-        goto LABEL_39;
     }
-
-    if ( a2 == JK_GAMEMODE_ESCAPE )
+    else if ( a2 == JK_GAMEMODE_ESCAPE )
     {
         sithSoundMixer_ResumeAll();
         sithSoundMixer_ResumeMusic(1);
 #ifdef SDL2_RENDER
         jkGame_isDDraw = 0;
 #endif
-        goto LABEL_39;
     }
-
-    if ( jkSmack_gameMode == JK_GAMEMODE_VIDEO2 )
+    else if ( jkSmack_gameMode == JK_GAMEMODE_VIDEO2 )
     {
         jkPlayer_Startup();
         jkPlayer_InitForceBins();
         jkMain_bInit = 1;
         jkPlayer_InitSaber();
         sithMain_AutoSave();
+    }
+    else {
+        // MOTS added
+        jkMain_motsIdk[0] = 0;
 
-LABEL_39:
-        if ( jkMain_SetVideoMode() )
+        if ( jkSmack_gameMode == 1 )
         {
-            stdControl_ToggleCursor(1);
-            stdControl_Flush();
-            jkGame_Update();
-            thing_eight = 1;
+            jkGui_copies_string(gamemode_1_str);
+            jkGuiTitle_ShowLoading(gamemode_1_str, 0);
         }
         else
         {
+            jkGui_copies_string(jkMain_aLevelJklFname);
+            jkGuiTitle_ShowLoading(jkMain_aLevelJklFname, 0);
+        }
+
+        // MOTS added:
+        // jkEpisode_Shutdown
+
+        if ( jkSmack_gameMode == 0)
+        {
+#ifdef JKM_DSS
+            jkPlayer_SetAmmoMaximums(0);
+#endif
+            v3 = sithMain_Mode1Init(jkMain_aLevelJklFname);
+        }
+        else if ( jkSmack_gameMode == 1 )
+        {
+#ifdef JKM_DSS
+            jkPlayer_SetAmmoMaximums(0);
+#endif
+            v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
+        }
+        else if ( jkSmack_gameMode == 2 )
+        {
+#ifdef JKM_DSS
+            jkPlayer_SetAmmoMaximums(jkPlayer_personality);
+#endif
+            v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
+        }
+
+        level_loaded = v3;
+LABEL_15:
+        jkGuiTitle_LoadingFinalize();
+        if ( !level_loaded )
+        {
+            if ( jkGame_isDDraw )
+            {
+                Windows_ShutdownGdi();
+                Video_SwitchToGDI(1);
+                jkPlayer_Close();
+                jkGame_isDDraw = 0;
+            }
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            thing_eight = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+            v6 = jkStrings_GetText("ERR_CANNOT_LOAD_LEVEL");
+            v4 = jkStrings_GetText("ERROR");
+            jkGuiDialog_ErrorDialog(v4, v6);
+            return;
         }
-        return;
+
+        // MOTS added:
+        //sithWorld_GetMemorySize(sithWorld_pCurrentWorld,local_44,local_88);
+
+        if ( !sithNet_isMulti )
+        {
+            jkPlayer_Startup();
+            jkPlayer_InitForceBins();
+            jkMain_bInit = 1;
+            if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
+            {
+                sithCamera_SetsFocus();
+                jkPlayer_InitSaber();
+                sithMain_AutoSave();
+            }
+        }
+        else if ( sithNet_isServer )
+        {
+LABEL_28:
+            sithInventory_ClearInventory(sithPlayer_pLocalPlayerThing);
+            jkPlayer_MpcInitBins(sithPlayer_pLocalPlayer);
+            
+            jkPlayer_Startup();
+            jkPlayer_InitForceBins();
+            jkMain_bInit = 1;
+            if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
+            {
+                sithCamera_SetsFocus();
+                jkPlayer_InitSaber();
+                sithMain_AutoSave();
+            }
+            if ( sithNet_isMulti )
+            {
+                if ( sithNet_isServer )
+                {
+                    DirectPlay_SetSessionFlagidk(1);
+                    v5 = idx_13b4_related;
+                    if ( idx_13b4_related >= (unsigned int)jkPlayer_maxPlayers )
+                        v5 = jkPlayer_maxPlayers;
+                    DirectPlay_SetSessionDesc(jkMain_aLevelJklFname, v5);
+                }
+                if ( sithNet_isMulti )
+                    jkDSS_wrap_SendSaberInfo_alt();
+            }
+
+            if (Main_bMotsCompat) {
+                sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
+                if (jkMain_motsIdk[0] != 0) {
+                    stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
+                    stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
+                    if (jkGuiRend_thing_five != 0) {
+                        jkGuiRend_thing_four = 1;
+                    }
+                    jkMain_aLevelJklFname[127] = '\0';
+                    jkSmack_stopTick = 1;
+                    jkSmack_nextGuiState = JK_GAMEMODE_MOTS_CUTSCENE;
+                    return;
+                }
+            }
+        }
+        else {
+            thing_six = 1;
+            stdControl_ToggleCursor(0);
+            if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
+            {
+                thing_six = 0;
+                stdControl_ToggleCursor(1);
+                goto LABEL_28;
+            }
+            sithMain_Close();
+            sithMulti_Shutdown();
+            if ( jkGuiRend_thing_five )
+                jkGuiRend_thing_four = 1;
+            jkSmack_stopTick = 1;
+            jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+            thing_six = 0;
+            return;
+        }
     }
 
-    // MOTS added
-    jkMain_motsIdk[0] = 0;
-
-    if ( jkSmack_gameMode == 1 )
+    if ( jkMain_SetVideoMode() )
     {
-        jkGui_copies_string(gamemode_1_str);
-        jkGuiTitle_ShowLoading(gamemode_1_str, 0);
+        stdControl_ToggleCursor(1);
+        stdControl_Flush();
+        jkGame_Update();
+        thing_eight = 1;
     }
     else
     {
-        jkGui_copies_string(jkMain_aLevelJklFname);
-        jkGuiTitle_ShowLoading(jkMain_aLevelJklFname, 0);
-    }
-
-    // MOTS added:
-    // jkEpisode_Shutdown
-
-    if ( jkSmack_gameMode == 0)
-    {
-#ifdef JKM_DSS
-        jkPlayer_SetAmmoMaximums(0);
-#endif
-        v3 = sithMain_Mode1Init(jkMain_aLevelJklFname);
-    }
-    else if ( jkSmack_gameMode == 1 )
-    {
-#ifdef JKM_DSS
-        jkPlayer_SetAmmoMaximums(0);
-#endif
-        v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
-    }
-    else if ( jkSmack_gameMode == 2 )
-    {
-#ifdef JKM_DSS
-        jkPlayer_SetAmmoMaximums(jkPlayer_personality);
-#endif
-        v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
-    }
-
-    level_loaded = v3;
-LABEL_15:
-    jkGuiTitle_LoadingFinalize();
-    if ( !level_loaded )
-    {
-        if ( jkGame_isDDraw )
-        {
-            Windows_ShutdownGdi();
-            Video_SwitchToGDI(1);
-            jkPlayer_Close();
-            jkGame_isDDraw = 0;
-        }
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
+        thing_eight = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-        v6 = jkStrings_GetText("ERR_CANNOT_LOAD_LEVEL");
-        v4 = jkStrings_GetText("ERROR");
-        jkGuiDialog_ErrorDialog(v4, v6);
-        return;
     }
-
-    // MOTS added:
-    //sithWorld_GetMemorySize(sithWorld_pCurrentWorld,local_44,local_88);
-
-    if ( !sithNet_isMulti )
-    {
-        jkPlayer_Startup();
-        jkPlayer_InitForceBins();
-        jkMain_bInit = 1;
-        if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
-        {
-            sithCamera_SetsFocus();
-            jkPlayer_InitSaber();
-            sithMain_AutoSave();
-        }
-
-        goto LABEL_39;
-    }
-    if ( sithNet_isServer )
-    {
-LABEL_28:
-        sithInventory_ClearInventory(sithPlayer_pLocalPlayerThing);
-        jkPlayer_MpcInitBins(sithPlayer_pLocalPlayer);
-        
-        jkPlayer_Startup();
-        jkPlayer_InitForceBins();
-        jkMain_bInit = 1;
-        if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
-        {
-            sithCamera_SetsFocus();
-            jkPlayer_InitSaber();
-            sithMain_AutoSave();
-        }
-        if ( sithNet_isMulti )
-        {
-            if ( sithNet_isServer )
-            {
-                DirectPlay_SetSessionFlagidk(1);
-                v5 = idx_13b4_related;
-                if ( idx_13b4_related >= (unsigned int)jkPlayer_maxPlayers )
-                    v5 = jkPlayer_maxPlayers;
-                DirectPlay_SetSessionDesc(jkMain_aLevelJklFname, v5);
-            }
-            if ( sithNet_isMulti )
-                jkDSS_wrap_SendSaberInfo_alt();
-        }
-
-        if (Main_bMotsCompat) {
-            sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
-            if (jkMain_motsIdk[0] != 0) {
-                stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
-                stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
-                if (jkGuiRend_thing_five != 0) {
-                    jkGuiRend_thing_four = 1;
-                }
-                jkMain_aLevelJklFname[127] = '\0';
-                jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = JK_GAMEMODE_MOTS1;
-                return;
-            }
-        }
-        
-
-        goto LABEL_39;
-    }
-    thing_six = 1;
-    stdControl_ToggleCursor(0);
-    if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
-    {
-        thing_six = 0;
-        stdControl_ToggleCursor(1);
-        goto LABEL_28;
-    }
-    sithMain_Close();
-    sithMulti_Shutdown();
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
-    jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-    thing_six = 0;
 }
 
 void jkMain_GameplayTick(int a2)
@@ -1076,7 +1070,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 11; // force select/choice?
+            jkSmack_nextGuiState = JK_GAMEMODE_CHOICE; // force select/choice?
             return 1;
         }
         return 1;
@@ -1100,7 +1094,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 10;
+            jkSmack_nextGuiState = JK_GAMEMODE_VIDEO4;
             result = 1;
             break;
         case 5:
@@ -1109,7 +1103,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
-            jkSmack_nextGuiState = 8;
+            jkSmack_nextGuiState = JK_GAMEMODE_VIDEO3;
             result = 1;
             break;
         default:
@@ -1241,7 +1235,7 @@ void jkMain_VideoShow(int a1, int a2)
             case JK_GAMEMODE_VIDEO4:
                 result = jkMain_CdSwitch(0, 1);
                 break;
-            case JK_GAMEMODE_MOTS1: // MOTS added
+            case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
                 if (jkGuiRend_thing_five != 0) {
                     jkGuiRend_thing_four = 1;
                 }
@@ -1292,7 +1286,7 @@ void jkMain_VideoTick(int a2)
                 jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
                 break;
             case JK_GAMEMODE_VIDEO4:
-            case JK_GAMEMODE_MOTS1: // MOTS added
+            case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
                 result = 1;
                 if ( jkGuiRend_thing_five )
                     jkGuiRend_thing_four = 1;
@@ -1320,7 +1314,7 @@ void jkMain_CreditsShow(int a1, int a2)
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
 }
 
@@ -1331,7 +1325,7 @@ void jkMain_CreditsTick(int a1)
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
-        jkSmack_nextGuiState = 3;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
 }
 
@@ -1363,7 +1357,7 @@ int jkMain_SwitchTo13()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 13;
+    jkSmack_nextGuiState = JK_GAMEMODE_CREDITS;
     return result;
 }
 
@@ -1375,7 +1369,7 @@ int jkMain_SwitchTo12()
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 12;
+    jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
     return result;
 }
 
@@ -1388,7 +1382,7 @@ int jkMain_SwitchTo4(const char *pFpath)
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
-    jkSmack_nextGuiState = 4;
+    jkSmack_nextGuiState = JK_GAMEMODE_VIDEO2;
     return result;
 }
 
