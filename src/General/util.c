@@ -2,7 +2,7 @@
 
 #include "stdPlatform.h"
 
-int util_FileExists(char *fpath)
+int util_FileExists(const char *fpath)
 {
     intptr_t f = std_pHS->fileOpen(fpath, "r");
     if ( f )

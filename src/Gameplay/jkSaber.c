@@ -24,6 +24,8 @@
 
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
 {
+    if (!thing) return; // Added: Fix nullptr deref in Mots cutscenes
+
     float length = 0.0;
     jkPlayerInfo* saberinfo = thing->playerInfo;
     if ( saberinfo->polylineThing.polyline )

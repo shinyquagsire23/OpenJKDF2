@@ -14,6 +14,7 @@
 #include "General/stdString.h"
 
 #include "Main/Main.h"
+#include "Main/InstallHelper.h"
 
 #ifdef SDL2_RENDER
 #include <SDL.h>
@@ -272,7 +273,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 
 #ifndef ARCH_WASM
-    Main_CheckRequiredAssets(1);
+    InstallHelper_CheckRequiredAssets(1);
 #endif
 #endif
     jk_exit(1);

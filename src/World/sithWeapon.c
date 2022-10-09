@@ -793,9 +793,6 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     int v9; // eax
     char v10; // bl
     int v11; // eax
-    double v12; // st6
-    double v13; // st4
-    double v14; // st7
     double v15; // st7
     double v16; // st7
     sithThing *v18; // edi
@@ -830,12 +827,9 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
             thing->physicsParams.physflags &= ~SITH_PF_SURFACEBOUNCE;
         }
         rdVector_Normalize3(&thing->lookOrientation.lvec, &thing->physicsParams.vel);
-        v12 = thing->lookOrientation.lvec.x;
-        v13 = thing->lookOrientation.lvec.y;
-        v14 = thing->lookOrientation.lvec.z * 0.0;
-        thing->lookOrientation.rvec.x = v13 * 1.0 - v14;
-        thing->lookOrientation.rvec.y = v14 - v12 * 1.0;
-        thing->lookOrientation.rvec.z = v12 * 0.0 - v13 * 0.0;
+        thing->lookOrientation.rvec.x = (thing->lookOrientation.lvec.y * 1.0) - (thing->lookOrientation.lvec.z * 0.0);
+        thing->lookOrientation.rvec.y = (thing->lookOrientation.lvec.z * 0.0) - (thing->lookOrientation.lvec.x * 1.0);
+        thing->lookOrientation.rvec.z = (thing->lookOrientation.lvec.x * 0.0) - (thing->lookOrientation.lvec.y * 0.0);
         rdVector_Normalize3Acc(&thing->lookOrientation.rvec);
         v15 = thing->lookOrientation.rvec.z * thing->lookOrientation.lvec.x;
         thing->lookOrientation.uvec.x = thing->lookOrientation.rvec.y * thing->lookOrientation.lvec.z

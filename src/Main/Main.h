@@ -21,6 +21,4 @@ void Main_Shutdown();
 void Main_ParseCmdLine(char *cmdline);
 int Main_FPrintf(const char* fmt, ...);
 
-void Main_CheckRequiredAssets(int doInstall);
-
 #endif // _MAINMAIN_H

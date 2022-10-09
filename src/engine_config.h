@@ -73,6 +73,10 @@
 #endif
 
 #define JKRES_GOB_EXT (Main_bMotsCompat ? "goo" : "gob")
+#define JKRES_MAGIC_0 (Main_bMotsCompat ? 0x3B426929 : 0x69973284)
+#define JKRES_MAGIC_1 (Main_bMotsCompat ? 0x3B426929 : 0x699232C4)
+#define JKRES_MAGIC_2 (Main_bMotsCompat ? 0x3B426929 : 0x69923384)
+#define JKRES_MAGIC_3 (Main_bMotsCompat ? 0x3B426929 : 0x69923284)
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER

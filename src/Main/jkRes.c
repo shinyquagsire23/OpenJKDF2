@@ -231,15 +231,15 @@ int jkRes_ReadKey()
 
     pHS->fileRead(fd, &keyval, 4);
     pHS->fileClose(fd);
-    if (keyval == 0x69973284)
+    if (keyval == JKRES_MAGIC_0)
     {
         return 0;
     }
-    else if (keyval == 0x699232C4)
+    else if (keyval == JKRES_MAGIC_1)
     {
         return 1;
     }
-    else if (keyval == 0x69923384)
+    else if (keyval == JKRES_MAGIC_2)
     {
         return 2;
     }
@@ -358,17 +358,17 @@ int jkRes_LoadCD(int a1)
         if ( !v1 )
             goto LABEL_11;
         pHS->fileRead(v1, &keyval, 4);
-        if ( keyval == 0x69973284 )
+        if ( keyval == JKRES_MAGIC_0 )
             goto LABEL_9;
         if ( !a1 )
         {
-            if ( keyval != 0x699232C4 && keyval != 0x69923384 )
+            if ( keyval != JKRES_MAGIC_1 && keyval != JKRES_MAGIC_2 )
                 goto LABEL_10;
 LABEL_9:
             v23 = 1;
             goto LABEL_10;
         }
-        if ( keyval == ((a1 << (a1 + 5)) | 0x69923284) )
+        if ( keyval == ((a1 << (a1 + 5)) | JKRES_MAGIC_3) )
             goto LABEL_9;
 LABEL_10:
         pHS->fileClose(v2);

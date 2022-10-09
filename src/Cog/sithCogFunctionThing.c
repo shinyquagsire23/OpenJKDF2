@@ -1076,14 +1076,18 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         goto fail;
 
     rdPuppet* puppet = thing->rdthing.puppet;
-    if ( !puppet )
+    if ( !puppet ) {
         goto fail;
+    }
 
     // MOTS added: bugfix?
-    if ( Main_bMotsCompat && thing == sithPlayer_pLocalPlayerThing && thing->actorParams.health < 1.0)
-    {
-        sithCogExec_PushInt(ctx, -1);
-        return;
+    if ( Main_bMotsCompat && thing == sithPlayer_pLocalPlayerThing && thing->actorParams.health < 1.0) {
+        goto fail;
+    }
+
+    // MOTS added: nullptr deref fix
+    if (!keyframe) {
+       goto fail;
     }
     
     int track = sithPuppet_StartKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
