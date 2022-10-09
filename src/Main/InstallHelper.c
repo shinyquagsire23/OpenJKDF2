@@ -1079,14 +1079,6 @@ void InstallHelper_SetCwd()
         InstallHelper_CheckRequiredAssets(1);
     }
 #endif
-
-#ifndef __APPLE__
-    stdFile_t tf = std_pHS->fileOpen("is_alive.txt", "w");
-    const char* msg = "OpenJKDF2 is hooked and alive! \nCmdline: \n";
-    std_pHS->fileWrite(tf, msg, _strlen(msg));
-    std_pHS->fileWrite(tf, cmdline, _strlen(cmdline));
-    std_pHS->fileClose(tf);
-#endif
 }
 
 #else
