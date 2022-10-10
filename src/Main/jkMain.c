@@ -194,6 +194,7 @@ int jkMain_SwitchTo5(char *pJklFname)
     return result;
 }
 
+// MOTS altered
 void jkMain_GuiAdvance()
 {
     unsigned int v1; // esi
@@ -264,6 +265,7 @@ void jkMain_GuiAdvance()
             case JK_GAMEMODE_VIDEO2:
             case JK_GAMEMODE_VIDEO3:
             case JK_GAMEMODE_VIDEO4:
+            case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
                 jkCutscene_PauseShow(0);
                 break;
             case JK_GAMEMODE_GAMEPLAY:
@@ -423,6 +425,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
     jkGui_SetModeGame();
 }
 
+// MOTS altered
 void jkMain_EndLevelScreenShow(int a1, int a2)
 {
     stdControl_ToggleCursor(0); // Added
@@ -695,6 +698,8 @@ void jkMain_GameplayTick(int a2)
                 if ( sithMain_bEndLevel )
                 {
                     sithMain_bEndLevel = 0;
+                    if (Main_bMotsCompat)
+                        jkPlayer_idkEndLevel(); // MOTS added
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
@@ -1415,7 +1420,7 @@ int jkMain_SwitchTo4(const char *pFpath)
 void jkMain_StartupCutscene(char *pCutsceneStr)
 {
     char local_80 [128];
-    
+
     jkPlayer_WriteConfSwap(playerThings + playerThingIdx, 1, pCutsceneStr);
     _sprintf(local_80,"video%c%s", '\\', pCutsceneStr);
 

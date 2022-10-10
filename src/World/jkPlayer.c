@@ -1855,6 +1855,8 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
 // MOTS added
 void jkPlayer_idkEndLevel(void)
 {
+    if (!Main_bMotsCompat) return;
+
     int lVar3 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
     int lVar4 = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
     int lVar5 = (int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);

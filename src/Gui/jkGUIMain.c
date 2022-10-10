@@ -56,6 +56,7 @@ static jkGuiElement jkGuiMain_elements[8] = {
 
 static jkGuiMenu jkGuiMain_menu = {jkGuiMain_elements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
+// MOTS altered
 void jkGuiMain_Show()
 {
     int v1; // esi
@@ -65,7 +66,9 @@ void jkGuiMain_Show()
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !stdComm_dword_8321F8) || jkGuiMultiplayer_Show2() != 1 )
     {
-        //jkGuiMain_aElements[4].bIsVisible = Main_bDevMode; // MOTS added
+        if (Main_bMotsCompat)
+            jkGuiMain_elements[4].bIsVisible = Main_bDevMode; // MOTS added
+
         do
         {
             jkGuiRend_SetDisplayingStruct(&jkGuiMain_menu, &jkGuiMain_elements[2]);
