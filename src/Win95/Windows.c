@@ -76,28 +76,37 @@ int Windows_InitWindow()
 void Windows_InitGdi(int windowed)
 {
     Windows_bInittedGdi = 1;
+
+#ifndef SDL2_RENDER
     jk_SetFocus(stdGdi_GetHwnd());
     jk_SetActiveWindow(stdGdi_GetHwnd());
+#endif
 
     Windows_bWindowed = windowed;
+#ifndef SDL2_RENDER
     if ( windowed )
         stdControl_ShowCursor(0);
     else
         Window_ShowCursorUnwindowed(0);
 
     jk_ValidateRect(stdGdi_GetHwnd(), 0);
+#endif
     Window_AddMsgHandler(Windows_GdiHandler);
     Windows_bUnk = 0;
 }
 
 void Windows_ShutdownGdi()
 {
+#ifndef SDL2_RENDER
     if ( Windows_bInittedGdi )
+#endif
     {
         Windows_bInittedGdi = 0;
         Window_RemoveMsgHandler(Windows_GdiHandler);
+#ifndef SDL2_RENDER
         if ( Windows_bWindowed )
             stdControl_ShowCursor(1);
+#endif
         Windows_bUnk = 0;
     }
 }
@@ -130,6 +139,8 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
     signed int v5; // esi
     int v6; // eax
     int v8; // eax
+
+    printf("GDI handler\n");
 
     v5 = 0;
     switch ( msg )
