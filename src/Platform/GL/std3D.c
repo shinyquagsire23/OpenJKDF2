@@ -1059,7 +1059,6 @@ void std3D_DrawMenu()
         // Keep 4:3 aspect
         menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
 
-        printf("%f %f %f %f\n", menu_w/menu_h, menu_w, menu_h, menu_x);
     }
     else if (jkGuiBuildMulti_bRendering)
     {
@@ -1168,8 +1167,6 @@ void std3D_DrawMenu()
 
         float pause_width = 640*upscale3;
         float pause_x = (fake_windowW - pause_width) / 2.0;
-
-        printf("shifts %f %f, %f %f, %f %f\n", shift_x, shift_y, (double)Window_xSize, (double)Window_ySize, fake_windowW, fake_windowH);
 
         //printf("%f %f, %f %f %f, %d %d\n", sub_x, pause_x, upscale, upscale2, upscale3, Window_xSize, Window_ySize);
 
