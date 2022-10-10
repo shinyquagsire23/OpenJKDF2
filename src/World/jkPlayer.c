@@ -1852,3 +1852,30 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
     return 0;
 }
 
+// MOTS added
+void jkPlayer_idkEndLevel(void)
+{
+    int lVar3 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+    int lVar4 = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
+    int lVar5 = (int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+    int local_4 = lVar3 + lVar4 + (lVar5 * 2);
+
+    for (int iVar1 = SITHBIN_F_DEFENSE; iVar1 <= SITHBIN_FP_END; iVar1++) {
+        if ((iVar1 != SITHBIN_JEDI_RANK) && (iVar1 != SITHBIN_F_DEFENSE)) {
+            lVar3 = (int)sithPlayer_GetBinAmt(iVar1);
+            local_4 = local_4 + lVar3;
+        }
+    }
+
+    local_4 = local_4 / 3;
+    if (local_4 < 0) {
+        local_4 = 0;
+    }
+    else if (8 < local_4) {
+        local_4 = 8;
+    }
+
+    sithPlayer_SetBinAmt(SITHBIN_JEDI_RANK,(float)local_4);
+}
+
+

@@ -426,13 +426,32 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 void jkMain_EndLevelScreenShow(int a1, int a2)
 {
     stdControl_ToggleCursor(0); // Added
-    if ( jkEpisode_mLoad.type != JK_EPISODE_SINGLEPLAYER && jkSmack_gameMode == 2
-      || jkGuiSingleTally_Show() != -1
-      && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
-       || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )
-    {
-        jkMain_CdSwitch(0, 1);
-        return;
+
+    if (!Main_bMotsCompat) {
+        if ( jkEpisode_mLoad.type != JK_EPISODE_SINGLEPLAYER && jkSmack_gameMode == 2
+          || jkGuiSingleTally_Show() != -1
+          && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
+           || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )
+        {
+            jkMain_CdSwitch(0, 1);
+            return;
+        }
+    }
+    else 
+    { 
+        // MOTS added
+        if (jkGuiSingleTally_Show() != -1) {
+            if (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0) {
+                jkMain_CdSwitch(0, 1);
+                return;
+            }
+
+            jkPlayer_idkEndLevel();
+            if (jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) {
+                jkMain_CdSwitch(0, 1);
+                return;
+            }
+        }
     }
 
     if ( jkGuiRend_thing_five )
@@ -1180,7 +1199,7 @@ int jkMain_EndLevel(int a1)
     int v2; // eax
     int v4; // eax
 
-    if ( jkEpisode_mLoad.numSeq )
+    if (!Main_bMotsCompat && jkEpisode_mLoad.numSeq )
     {
         v1 = jkEpisode_idk1(&jkEpisode_mLoad);
         if ( v1->darkpow || v1->lightpow )
@@ -1188,17 +1207,22 @@ int jkMain_EndLevel(int a1)
             v2 = v1->lightpow;
             if ( v2 )
             {
-                if ( v2 >= 20 && v2 <= 34 && jkPlayer_GetChoice() != 2 )
+                if ( v2 >= SITHBIN_FP_START && v2 <= SITHBIN_FP_END && jkPlayer_GetChoice() != 2 )
                     sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->lightpow, 1);
             }
             v4 = v1->darkpow;
             if ( v4 )
             {
-                if ( v4 >= 20 && v4 <= 34 && jkPlayer_GetChoice() != 1 )
+                if ( v4 >= SITHBIN_FP_START && v4 <= SITHBIN_FP_END && jkPlayer_GetChoice() != 1 )
                     sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->darkpow, 1);
             }
         }
     }
+
+    if (Main_bMotsCompat) {
+        jkPlayer_idkEndLevel();
+    }
+
     return jkMain_CdSwitch(0, a1);
 }
 
