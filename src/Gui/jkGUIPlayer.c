@@ -62,6 +62,21 @@ static jkGuiMenu jkGuiPlayer_menuNew = {jkGuiPlayer_menuNewElements, 0, 0xFFFF, 
 
 int jkGuiPlayer_Startup()
 {
+    // MOTS added: Move the UI stuff around for MoTS
+    if (Main_bMotsCompat) {
+        jkGuiPlayer_menuSelectElements[1].rect.y = 0xAF;
+        jkGuiPlayer_menuSelectElements[2].rect.y = 0xF0;
+        jkGuiPlayer_menuSelectElements[2].rect.height = 0x9C;
+
+        jkGuiPlayer_menuNewElements[1].rect.y = 0xAF;
+        jkGuiPlayer_menuNewElements[2].rect.y = 0xE6;
+        jkGuiPlayer_menuNewElements[3].rect.y = 0x104;
+        jkGuiPlayer_menuNewElements[4].rect.y = 0x131;
+        jkGuiPlayer_menuNewElements[5].rect.y = 0x14A;
+        jkGuiPlayer_menuNewElements[6].rect.y = 0x163;
+        jkGuiPlayer_menuNewElements[7].rect.y = 0x17C;
+    }
+
     jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[0]);
     jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[0]);
     jkGuiPlayer_bInitted = 1;

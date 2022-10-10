@@ -371,6 +371,7 @@ void jkMain_EscapeMenuTick(int a2)
     }
 }
 
+// MOTS altered
 void jkMain_EscapeMenuLeave(int a2, int a3)
 {
     int v3; // eax
@@ -378,8 +379,8 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
     if ( !sithNet_isMulti )
         sithTime_Resume();
 
-    // MOTS added something here
-    if ( a3 != JK_GAMEMODE_GAMEPLAY )
+    // MOTS added
+    if ( a3 != JK_GAMEMODE_GAMEPLAY && a3 != JK_GAMEMODE_MOTS_CUTSCENE)
     {
         if ( a3 == JK_GAMEMODE_ESCAPE )
         {
@@ -403,10 +404,16 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         if ( sithNet_isMulti && a3 != JK_GAMEMODE_ESCAPE )
         {
             thing_eight = 0;
-            if ( a3 == 3 )
+            if ( a3 == 3 ) {
+                // MOTS added
+                if (Main_bMotsCompat) {
+                    sithMulti_LobbyMessage();
+                }
                 sithMulti_Shutdown();
-            else
+            }
+            else {
                 sithMulti_LobbyMessage();
+            }
             if ( sithNet_isServer )
                 DirectPlay_SetSessionFlagidk(0);
             thing_six = 1;
@@ -717,11 +724,14 @@ void jkMain_GameplayTick(int a2)
     }
 }
 
+// MOTS altered
 void jkMain_GameplayLeave(int a2, int a3)
 {
     int v3; // eax
 
-    // MOTS added something here
+    // MOTS added
+    if (a3 == JK_GAMEMODE_MOTS_CUTSCENE) return;
+
     if ( a3 == JK_GAMEMODE_ESCAPE )
     {
         stdControl_ToggleCursor(0);
@@ -744,10 +754,16 @@ void jkMain_GameplayLeave(int a2, int a3)
     if ( sithNet_isMulti && a3 != 6 )
     {
         thing_eight = 0;
-        if ( a3 == 3 )
+        if ( a3 == 3 ) {
+            // MOTS added
+            if (Main_bMotsCompat) {
+                sithMulti_LobbyMessage();
+            }
             sithMulti_Shutdown();
-        else
+        }
+        else {
             sithMulti_LobbyMessage();
+        }
         if ( sithNet_isServer )
             DirectPlay_SetSessionFlagidk(0);
         thing_six = 1;
