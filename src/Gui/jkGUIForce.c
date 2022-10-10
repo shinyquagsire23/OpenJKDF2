@@ -126,6 +126,7 @@ jkGuiElement jkGuiForce_buttonsMots[31] = {
 /*20*/        { ELEMENT_PICBUTTON, SITHBIN_F_DEFENSE, 0, NULL, 
                 4, { 308, 300, -1, -1 }, 1, 0, "GUI_HINT_DEFENSE", NULL, jkGuiForce_ButtonClick, NULL, {0}, 0 }, 
 
+              // `Choose <num>:` text
 /*21*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[0], 
                 3, { 20, 90, 150, 30 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
 /*22*/        { ELEMENT_TEXT, 0, 2, &jkGuiForce_waTmp[100], 
@@ -314,7 +315,7 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
     {
         int id = jkGuiForce_pElements[i].hoverId;
         int numStars = (int)sithPlayer_GetBinAmt(id) - 1;
-        if ( numStars >= 0 )
+        if ( Main_bMotsCompat || numStars >= 0 )
         {
             if (!Main_bMotsCompat && id >= SITHBIN_F_HEALING && id <= SITHBIN_F_ABSORB)
             {
@@ -324,6 +325,9 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
             {
                 numStars += 8; // Dark side
             }
+
+            if (Main_bMotsCompat)
+                numStars += 1;
 
             // Show the number of force stars next to each button
             int x;
