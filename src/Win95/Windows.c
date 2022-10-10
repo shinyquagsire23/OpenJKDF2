@@ -140,8 +140,6 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
     int v6; // eax
     int v8; // eax
 
-    printf("GDI handler\n");
-
     v5 = 0;
     switch ( msg )
     {
