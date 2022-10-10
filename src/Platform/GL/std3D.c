@@ -1026,6 +1026,9 @@ void std3D_DrawMenu()
     
     int bFixHudScale = 0;
 
+    double fake_windowW = (double)Window_xSize;
+    double fake_windowH = (double)Window_ySize;
+
     if (!jkGame_isDDraw && !jkGuiBuildMulti_bRendering && !jkCutscene_isRendering)
     {
         //menu_w = 640.0;
@@ -1048,8 +1051,15 @@ void std3D_DrawMenu()
         menu_w = Video_menuBuffer.format.width;
         menu_h = Video_menuBuffer.format.height;
 
+        // For ultrawide screens, limit the width to 16:9
+        if (Window_xSize > Window_ySize && ((double)Window_xSize / (double)Window_ySize) > (21.0/9.0)) {
+            fake_windowW = fake_windowH * (16.0/9.0);
+        }
+
         // Keep 4:3 aspect
         menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+
+        printf("%f %f %f %f\n", menu_w/menu_h, menu_w, menu_h, menu_x);
     }
     else if (jkGuiBuildMulti_bRendering)
     {
@@ -1136,46 +1146,54 @@ void std3D_DrawMenu()
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 
         float partial_menu_w = (menu_h * (640.0 / 480.0));
-        float upscale = Window_xSize/640.0;
-        float upscale2 = (Window_ySize - (50 + 300 * upscale))/130.0;
+        float upscale = fake_windowW/640.0;
+        float upscale2 = (fake_windowH - (50 + 300 * upscale))/130.0;
         float upscale3 = 1.0;//Window_ySize/480.0;
 
         if (upscale2 < 1.0) {
             upscale2 = 1.0;
+            if (fake_windowH > 480.0) {
+                upscale2 = 2.0;
+            }
         }
         if (upscale2 > upscale) {
             upscale2 = upscale;
         }
 
+        float shift_y = ((double)Window_ySize - fake_windowH) / 2.0;
+        float shift_x = ((double)Window_xSize - fake_windowW) / 2.0;
+
         float sub_width = 640*upscale2;
-        float sub_x = (Window_xSize - sub_width) / 2.0;
+        float sub_x = (fake_windowW - sub_width) / 2.0;
 
         float pause_width = 640*upscale3;
-        float pause_x = (Window_xSize - pause_width) / 2.0;
+        float pause_x = (fake_windowW - pause_width) / 2.0;
+
+        printf("shifts %f %f, %f %f, %f %f\n", shift_x, shift_y, (double)Window_xSize, (double)Window_ySize, fake_windowW, fake_windowH);
 
         //printf("%f %f, %f %f %f, %d %d\n", sub_x, pause_x, upscale, upscale2, upscale3, Window_xSize, Window_ySize);
 
         // Main View
-        std3D_DrawMenuSubrect(0, 50, 640, 300, 0, 50, upscale);
+        std3D_DrawMenuSubrect(0, 50, 640, 300, shift_x + 0, shift_y + 50, upscale);
 
         // Subtitles
         if (jkCutscene_dword_55B750) {
             // Some monitors might not have a bottom black bar, so draw an outline
-            std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x-2, Window_ySize - (130*upscale2), upscale2);
-            std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x+2, Window_ySize - (130*upscale2), upscale2);
-            std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x, Window_ySize - (130*upscale2) - 2, upscale2);
-            std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x, Window_ySize - (130*upscale2) + 2, upscale2);
+            std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x-2, shift_y + fake_windowH - (130*upscale2), upscale2);
+            std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x+2, shift_y + fake_windowH - (130*upscale2), upscale2);
+            std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x, shift_y + fake_windowH - (130*upscale2) - 2, upscale2);
+            std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x, shift_y + fake_windowH - (130*upscale2) + 2, upscale2);
 
-            //std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x-2, Window_ySize - (130*upscale2) -2, upscale2);
-            //std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x+2, Window_ySize - (130*upscale2) +2, upscale2);
-            //std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x+2, Window_ySize - (130*upscale2) - 2, upscale2);
-            //std3D_DrawMenuSubrect2(0, 350, 640, 130, sub_x-2, Window_ySize - (130*upscale2) + 2, upscale2);
+            //std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x-2, shift_y + fake_windowH - (130*upscale2) -2, upscale2);
+            //std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x+2, shift_y + fake_windowH - (130*upscale2) +2, upscale2);
+            //std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x+2, shift_y + fake_windowH - (130*upscale2) - 2, upscale2);
+            //std3D_DrawMenuSubrect2(0, 350, 640, 130, shift_x + sub_x-2, shift_y + fake_windowH - (130*upscale2) + 2, upscale2);
 
-            std3D_DrawMenuSubrect(0, 350, 640, 130, sub_x, Window_ySize - (130*upscale2), upscale2);
+            std3D_DrawMenuSubrect(0, 350, 640, 130, shift_x + sub_x, shift_y + fake_windowH - (130*upscale2), upscale2);
         }
 
         // Paused
-        std3D_DrawMenuSubrect(0, 10, 640, 40, pause_x, 0*upscale, upscale3);
+        std3D_DrawMenuSubrect(0, 10, 640, 40, shift_x + pause_x, shift_y + 0*upscale, upscale3);
     }
     else
     {
