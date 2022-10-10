@@ -95,8 +95,8 @@ static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttons[15] =
   { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 320, 240, 240, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 0, NULL, 3, { 344, 270, 192, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, &jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 320, 170, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXTBOX, 0, 0, NULL, 0, { 320, 200, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -1029,7 +1029,7 @@ int jkGuiBuildMulti_sub_41D000(jkGuiElement *pElement, jkGuiMenu *pMenu, int mou
     signed int v4; // esi
     signed int v6; // [esp-8h] [ebp-1Ch]
     wchar_t *v7; // [esp-4h] [ebp-18h]
-    char tmp[16]; // [esp+4h] [ebp-10h] BYREF
+    char tmp[32+1]; // [esp+4h] [ebp-10h] BYREF
 
     if ( pElement->hoverId == 103 )
     {
