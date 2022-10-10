@@ -917,9 +917,9 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
     return v5;
 }
 
+// MOTS altered TODO
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
 {
-    wchar_t *v2; // eax
     wchar_t *v3; // eax
     wchar_t *v4; // eax
     signed int v5; // esi
@@ -927,7 +927,6 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
     int v7; // esi
     int v8; // ebp
     wchar_t *v9; // eax
-    wchar_t *a2; // [esp+0h] [ebp-1A8h]
     wchar_t *a2a; // [esp+0h] [ebp-1A8h]
     wchar_t *a2b; // [esp+0h] [ebp-1A8h]
     float a2d; // [esp+0h] [ebp-1A8h]
@@ -936,14 +935,15 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
     char v17[128]; // [esp+A8h] [ebp-100h] BYREF
     char v18[128]; // [esp+128h] [ebp-80h] BYREF
 
+    // MOTS added TODO TODO
+    jkPlayer_personality = 1;
+
     jkGuiBuildMulti_menuNewCharacter_buttons[11].wstr = jkGuiBuildMulti_aWchar_5594C8;
     memset(jkGuiBuildMulti_aWchar_5594C8, 0, 0x20u);
     jkGuiBuildMulti_menuNewCharacter_buttons[11].selectedTextEntry = 16;
     if ( bHasValidChars )
     {
-        a2 = jkStrings_GetText("GUI_NOVALIDCHARACTERS");
-        v2 = jkStrings_GetText("GUI_NOVALIDCHARTITLE");
-        jkGuiDialog_ErrorDialog(v2, a2);
+        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUI_NOVALIDCHARTITLE"), jkStrings_GetText("GUI_NOVALIDCHARACTERS"));
     }
     v3 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, v3, jkPlayer_playerShortName);

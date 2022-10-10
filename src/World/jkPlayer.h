@@ -126,6 +126,9 @@ uint32_t jkPlayer_ChecksumExtra(uint32_t hash); // MOTS added
 jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing); // MOTS added
 int jkPlayer_SetAmmoMaximums(int classIdx); // MOTS added
 void jkPlayer_idkEndLevel(void); // MOTS added
+int jkPlayer_SyncForcePowers(int rank,int bIsMulti); // MOTS added
+
+extern int jkPlayer_aMotsFpBins[74];
 
 #ifdef QOL_IMPROVEMENTS
 extern int jkPlayer_fov;

@@ -361,8 +361,9 @@ void sithCogFunction_SetTimerEx(sithCog *ctx)
     timerInfo.cogIdx = ctx->selfCog;
     a1a = sithCogExec_PopFlex(ctx) * 1000.0;
     timerMs = (signed int)a1a;
-    if ( timerMs >= 0 )
-        sithEvent_Set(4, &timerInfo, (signed int)a1a);
+    if ( timerMs >= 0 ) {
+        sithEvent_Set(4, &timerInfo, timerMs);
+    }
 }
 
 void sithCogFunction_KillTimerEx(sithCog *ctx)

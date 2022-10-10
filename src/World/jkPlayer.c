@@ -1041,6 +1041,9 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         }
         info->jediRank = jkPlayer_GetJediRank();
         stdConffile_Close();
+
+        // MOTS TODO
+        jkPlayer_personality = 1;
         // jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS TODO
         jkPlayer_mpcInfoSet = 1;
         return 1;
@@ -1858,4 +1861,242 @@ void jkPlayer_idkEndLevel(void)
     sithPlayer_SetBinAmt(SITHBIN_JEDI_RANK,(float)local_4);
 }
 
+// MOTS added
+int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
+{
+    int *piVar2;
+    int iVar3;
+    float *pfVar4;
+    int iVar5;
+    int iVar6;
+    double dVar8;
+    float fVar9;
+    int *local_c;
+    int local_8;
+    int local_4;
+    
+    if (rank < 0) {
+        rank = 0;
+    }
+    else if (8 < rank) {
+        rank = 8;
+    }
 
+    if (bIsMulti == 0) 
+    {
+        sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,0.0);
+        if (((0 < rank) &&
+            (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_JUMP), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        {
+            sithPlayer_SetBinAmt(SITHBIN_F_JUMP,1.0);
+            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(float)(fVar9 - 1.0));
+        }
+
+        if (((1 < rank) &&
+            (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_PULL), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        {
+            sithPlayer_SetBinAmt(SITHBIN_F_PULL,1.0);
+            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(float)(fVar9 - 1.0));
+        }
+
+        if (((3 < rank) && (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_SEEING), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        {
+            sithPlayer_SetBinAmt(SITHBIN_F_SEEING,1.0);
+            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(float)(fVar9 - 1.0));
+        }
+
+        iVar3 = rank;
+        if (((4 < rank) && (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_PERSUASION), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        {
+            sithPlayer_SetBinAmt(SITHBIN_F_PERSUASION,1.0);
+            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(float)(fVar9 - 1.0));
+        }
+    }
+    else 
+    {
+        iVar3 = rank * 3 + (int)jkPlayer_aMultiParams[119] * 2;
+        pfVar4 = jkPlayer_aMultiParams + 0x77;
+
+        do {
+            if ((pfVar4 != jkPlayer_aMultiParams + 0x78) && (pfVar4 != jkPlayer_aMultiParams + 0x77)
+               ) {
+                iVar3 = iVar3 + (int)*pfVar4;
+            }
+            pfVar4 = pfVar4 + 1;
+        } while (pfVar4 < &jkPlayer_aMultiParams[0x8C]);
+
+        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+        if (fVar9 < jkPlayer_aMultiParams[119]) {
+            sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,jkPlayer_aMultiParams[119]);
+        }
+        iVar5 = SITHBIN_F_DEFENSE;
+        pfVar4 = jkPlayer_aMultiParams + 0x77;
+
+        do {
+            if ((pfVar4 != jkPlayer_aMultiParams + 0x78) && (pfVar4 != jkPlayer_aMultiParams + 0x77)
+               ) {
+                fVar9 = sithPlayer_GetBinAmt(iVar5);
+                if (fVar9 < *pfVar4) {
+                    sithPlayer_SetBinAmt(iVar5,*pfVar4);
+                }
+            }
+            pfVar4 = pfVar4 + 1;
+            iVar5 = iVar5 + 1;
+        } while (pfVar4 < &jkPlayer_aMultiParams[0x8C]);
+    }
+
+    iVar5 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) + (int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE) * 2;
+    iVar6 = SITHBIN_F_DEFENSE;
+    do 
+    {
+        if ((iVar6 != SITHBIN_JEDI_RANK) && (iVar6 != SITHBIN_F_DEFENSE)) {
+            iVar5 += (int)sithPlayer_GetBinAmt(iVar6);
+        }
+        iVar6 = iVar6 + 1;
+    } while (iVar6 < SITHBIN_BACTATANK);
+
+    int bVar7 = bIsMulti != 0;
+    bIsMulti = 0;
+    if (bVar7) 
+    {
+        if (iVar3 < iVar5) {
+            iVar5 = iVar5 - iVar3;
+            iVar3 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            if (iVar3 < iVar5) {
+                iVar5 = iVar5 - iVar3;
+                sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,0.0);
+                if (0 < iVar5) {
+                    do {
+                        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+                        if (fVar9 <= jkPlayer_aMultiParams[119]) break;
+                        iVar5 = iVar5 + -2;
+                        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+                        sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,(float)(fVar9 - 1.0));
+                    } while (0 < iVar5);
+
+                    if (0 < iVar5) {
+                        iVar3 = SITHBIN_F_DEFENSE;
+                        pfVar4 = jkPlayer_aMultiParams + 0x77;
+                        do {
+                            if ((pfVar4 != jkPlayer_aMultiParams + 0x78) &&
+                               (pfVar4 != jkPlayer_aMultiParams + 0x77)) {
+                                while ((0 < iVar5 &&
+                                       (fVar9 = sithPlayer_GetBinAmt(iVar3),
+                                       *pfVar4 < fVar9))) {
+                                    fVar9 = sithPlayer_GetBinAmt(iVar3);
+                                    sithPlayer_SetBinAmt(iVar3,(float)(fVar9 - 1.0));
+                                    iVar5 = iVar5 + -1;
+                                    if (iVar5 == 0) goto LAB_0040747a;
+                                }
+                            }
+                            pfVar4 = pfVar4 + 1;
+                            iVar3 = iVar3 + 1;
+                        } while (pfVar4 < &jkPlayer_aMultiParams[0x8C]);
+LAB_0040747a:
+                        bIsMulti = 0;
+                        goto LAB_004074a0;
+                    }
+                }
+                bIsMulti = -iVar5;
+            }
+            else {
+                sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(float)(iVar3 - iVar5));
+                bIsMulti = 0;
+            }
+        }
+        else {
+            bIsMulti = iVar3 - iVar5;
+        }
+    }
+LAB_004074a0:
+    for (iVar5 = SITHBIN_FP_START; iVar5 <= SITHBIN_FP_END; iVar5++)
+    {
+        if (iVar5 != SITHBIN_JEDI_RANK) {
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state &= ~ITEMSTATE_CARRIES;
+        }
+    }
+
+    if ((0 < rank) ||
+       (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE), 
+       0.0 < fVar9)) 
+    {
+        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DEFENSE].state |= ITEMSTATE_CARRIES;
+    }
+    local_4 = 3;
+    local_c = jkPlayer_aMotsFpBins + 0x18;
+    do 
+    {
+        if (jkPlayer_aMotsFpBins[(int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE) + 0x44] < local_4) {
+            local_8 = 0;
+        }
+        else {
+            local_8 = jkPlayer_aMotsFpBins[local_4 + rank * 4 + 0x20];
+        }
+        iVar3 = 0;
+        iVar5 = 8;
+        piVar2 = local_c;
+        do {
+            if ((*piVar2 != 0) &&
+               (fVar9 = sithPlayer_GetBinAmt(*piVar2), 0.0 < fVar9)) {
+                iVar3 = iVar3 + 1;
+            }
+            iVar6 = playerThingIdx;
+            piVar2 = piVar2 + 1;
+            iVar5 = iVar5 + -1;
+        } while (iVar5 != 0);
+
+        if (iVar3 < local_8) {
+            iVar3 = 8;
+            piVar2 = local_c;
+            do {
+                if (*piVar2 != 0) {
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[*piVar2].state |= ITEMSTATE_CARRIES;
+                }
+                piVar2 = piVar2 + 1;
+                iVar3 = iVar3 + -1;
+            } while (iVar3 != 0);
+        }
+        else {
+            iVar5 = 0;
+            piVar2 = local_c;
+            do {
+                if (iVar3 <= local_8) break;
+                iVar6 = *piVar2;
+                if ((iVar6 != 0) && (jkPlayer_aMultiParams[iVar6 + 100] < 1.0)) {
+                    bIsMulti = bIsMulti + (int)sithPlayer_GetBinAmt(iVar6);
+                    sithPlayer_SetBinAmt(iVar6,0.0);
+                }
+                iVar5 = iVar5 + 1;
+                piVar2 = piVar2 + 1;
+            } while (iVar5 < 8);
+
+            iVar3 = 8;
+            piVar2 = local_c;
+            do {
+                iVar5 = *piVar2;
+                if ((iVar5 != 0) &&
+                   (fVar9 = sithPlayer_GetBinAmt(iVar5), 0.0 < fVar9)) {
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state |= ITEMSTATE_CARRIES;
+                }
+                piVar2 = piVar2 + 1;
+                iVar3 = iVar3 + -1;
+            } while (iVar3 != 0);
+
+        }
+        local_c = local_c + -8;
+        local_4 = local_4 + -1;
+        if (local_c < jkPlayer_aMotsFpBins) {
+            return bIsMulti;
+        }
+    } while( 1 );
+
+    return bIsMulti;
+}

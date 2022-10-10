@@ -365,7 +365,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
 // MOTS added
 void jkCog_SyncForcePowers(sithCog *ctx)
 {
-    //jkPlayer_SyncForcePowers(jkPlayer_GetJediRank(),sithNet_isMulti); // MOTS TODO
+    jkPlayer_SyncForcePowers(jkPlayer_GetJediRank(),sithNet_isMulti);
 }
 
 void jkCog_EndTarget(sithCog *ctx)
