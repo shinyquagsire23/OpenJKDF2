@@ -13,6 +13,7 @@
 #include "World/sithTemplate.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIAwareness.h"
+#include "AI/sithAIClass.h"
 #include "Dss/sithMulti.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
@@ -111,6 +112,8 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
             sithAI_SetActorFireTarget(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
+
+        float damageMult = 1.0;
         if ( v7
           && flags != 0x20
           && flags != 0x40
@@ -118,8 +121,23 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
           && (v7->actorParams.typeflags & SITH_AF_FULL_ACTOR_DAMAGE) == 0
           && sender->type == SITH_THING_ACTOR )
         {
-            amount = amount * 0.1;
+            damageMult = 0.1;
+
+            // MOTS added: alignment
+            if (Main_bMotsCompat
+                && sender->thingtype == SITH_THING_ACTOR
+                && sender->actor
+                && sender->actor->aiclass
+                && v7->thingtype == SITH_THING_ACTOR
+                && v7->actor
+                && v7->actor->aiclass) {
+
+                if (v7->actor->aiclass->alignment * sender->actor->aiclass->alignment <= -1.0) {
+                    damageMult = 0.5;
+                }
+            }
         }
+        amount *= damageMult;
         if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
             return 0.0;
     }
