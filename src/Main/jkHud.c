@@ -574,7 +574,12 @@ void jkHud_Draw()
     if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD))
     {
         uint32_t tmpInt;
+#ifdef QOL_IMPROVEMENTS
+        // Scale crosshair with vertical resolution, not horizontal.
+        v20 = (double)Video_format.height * (0.0015625 / 3.0) * 4.0;
+#else
         v20 = (double)Video_format.width * 0.0015625;
+#endif // QOL_IMPROVEMENTS
         v21 = (int32_t)(v20 + v20 + Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - -0.5);
         v22 = v21;
         v23 = (int32_t)((double)(unsigned int)Video_format.height * 0.0020833334
@@ -588,10 +593,10 @@ void jkHud_Draw()
         v24 = (int32_t)(v20 * 18.0 - -0.5);
         v25 = (int32_t)(v20 * 6.0 - -0.5);
         
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23, v22 - v25, v23, tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v25 + v22, v23, v24 + v22, v23, tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22, v23 - v24, v22, v23 - v25, tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22, v23 + v25, v22, v23 + v24, tmpInt, -1);
+        rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23,       v22 - v25, v23,       tmpInt, -1);
+        rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
+        rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
+        rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
     }
 
     rdScreenPoint tmpScreenPt;
