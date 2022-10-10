@@ -149,11 +149,12 @@ int jkGame_Update()
     }
     jkPlayer_DrawPov();
     rdFinishFrame();
-    //++Video_dword_5528A0; // MOTS added
-    /*if ( Main_bDispStats )
+    //if (Main_bMotsCompat)
+    ++Video_dword_5528A0; // MOTS added
+    if ( Main_bDispStats )
     {
         v2 = sithWorld_pCurrentWorld->playerThing;
-        ++Video_dword_5528A0; // MOTS removed
+        //++Video_dword_5528A0; // MOTS removed
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
         Video_dword_5528A8 = v3;
@@ -173,8 +174,8 @@ int jkGame_Update()
                     sithRender_831984,
                     rdCache_drawnFaces,
                     v6,
-                    net_things_idx);
-                if ( net_isMulti )
+                    sithNet_thingsIdx);
+                if ( sithNet_isMulti )
                     _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
                 jkDev_sub_41FC40(100, std_genBuffer);
                 v3 = Video_dword_5528A8;
@@ -200,7 +201,7 @@ int jkGame_Update()
             Video_lastTimeMsec = Video_dword_5528A8;
             Video_dword_5528A4 = Video_dword_5528A0;
         }
-    }*/
+    }
 
 #ifdef SDL2_RENDER
     stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
@@ -299,10 +300,12 @@ int jkGame_Update()
     }*/
     jkPlayer_DrawPov();
 
-    /*if ( Main_bDispStats )
+    //if (Main_bMotsCompat)
+    ++Video_dword_5528A0; // MOTS added
+    if ( Main_bDispStats )
     {
         v2 = sithWorld_pCurrentWorld->playerThing;
-        ++Video_dword_5528A0;
+        //++Video_dword_5528A0; // MOTS removed
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
         Video_dword_5528A8 = v3;
@@ -322,8 +325,8 @@ int jkGame_Update()
                     sithRender_831984,
                     rdCache_drawnFaces,
                     v6,
-                    net_things_idx);
-                if ( net_isMulti )
+                    sithNet_thingsIdx);
+                if ( sithNet_isMulti )
                     _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
                 jkDev_sub_41FC40(100, std_genBuffer);
                 v3 = Video_dword_5528A8;
@@ -338,9 +341,9 @@ int jkGame_Update()
     }
     else if ( Main_bFrameRate )
     {
-        ++Video_dword_5528A0;
+        //++Video_dword_5528A0; // MOTS removed
         Video_dword_5528A8 = stdPlatform_GetTimeMsec();
-        if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 0x3E8 )
+        if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 1000 )
         {
             v4 = (double)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (double)(unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec);
             Video_flt_55289C = v4;
@@ -349,7 +352,7 @@ int jkGame_Update()
             Video_lastTimeMsec = Video_dword_5528A8;
             Video_dword_5528A4 = Video_dword_5528A0;
         }
-    }*/
+    }
 
 #ifdef SDL2_RENDER
     stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
