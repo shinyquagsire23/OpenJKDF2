@@ -19,6 +19,8 @@
 #include "General/stdMath.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkGame.h"
+#include "World/sithSector.h"
+#include "Win95/Windows.h"
 
 #include "jk.h"
 
@@ -1064,6 +1066,8 @@ void jkCog_GetOpenFrames(sithCog *ctx)
     sithCogExec_PushInt(ctx,Video_dword_5528A0);
 }
 
+void jkCog_RegisterVerbsExt();
+
 void jkCog_RegisterVerbs()
 {
     if (Main_bMotsCompat) {
@@ -1152,4 +1156,424 @@ void jkCog_RegisterVerbs()
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
 #endif
+
+    if (!Main_bMotsCompat) {
+        jkCog_RegisterVerbsExt();
+    }
+}
+
+/*
+void jkCogExt_(sithCog* ctx)
+{
+
+}
+*/
+
+void jkCogExt_GetThingAttachSurface(sithCog* ctx)
+{
+    int retval = -1;
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing)
+    {
+        if (pThing->attach_flags == SITH_ATTACH_WORLDSURFACE) {
+            sithSurface* pAttached = pThing->attachedSurface;
+            if (pAttached) {
+                retval = pAttached->field_0;
+            }
+        }
+    }
+    sithCogExec_PushInt(ctx, retval);
+}
+
+void jkCogExt_GetThingAttachThing(sithCog* ctx)
+{
+    int retval = -1;
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing)
+    {
+        if (pThing->attach_flags == SITH_ATTACH_THINGSURFACE) {
+            sithThing* pAttached = pThing->attachedThing;
+            if (pAttached) {
+                retval = pAttached->thing_id;
+            }
+        }
+    }
+    sithCogExec_PushInt(ctx, retval);
+}
+
+void jkCogExt_GetCameraFov(sithCog* ctx)
+{
+    int camIdx = sithCogExec_PopInt(ctx);
+
+    // TODO verify
+    sithCogExec_PushFlex(ctx, sithCamera_cameras[camIdx].rdCam.fov);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetCameraOffset(sithCog* ctx)
+{
+    int camIdx = sithCogExec_PopInt(ctx);
+
+    //TODO
+    rdVector3 vec = {0};
+    sithCogExec_PushVector3(ctx, &vec);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetCameraFov(sithCog* ctx)
+{
+    float fov = sithCogExec_PopFlex(ctx);
+    int camIdx = sithCogExec_PopInt(ctx);
+
+    // TODO
+    sithCamera_cameras[camIdx].rdCam.fov = fov;
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetCameraOffset(sithCog* ctx)
+{
+    rdVector3 vec;
+    sithCogExec_PopVector3(ctx, &vec);
+    int camIdx = sithCogExec_PopInt(ctx);
+
+    // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_Absolute(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+
+    if (val == (int)val) {
+        sithCogExec_PushInt(ctx, abs((int)val));
+    }
+    else {
+        sithCogExec_PushFlex(ctx, fabs(val));
+    }
+}
+
+void jkCogExt_Arccosine(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, acos(val) * 57.2957795);
+}
+
+void jkCogExt_Arcsine(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, asin(val) * 57.2957795);
+}
+
+void jkCogExt_Arctangent(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, atan(val) * 57.2957795);
+}
+
+void jkCogExt_Ceiling(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, ceil(val));
+}
+
+void jkCogExt_Cosine(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, cos(val * 0.0174532925));
+}
+
+void jkCogExt_Floor(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, floor(val));
+}
+
+void jkCogExt_Power(sithCog* ctx)
+{
+    float b = sithCogExec_PopFlex(ctx);
+    float a = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, pow(a,b));
+}
+
+void jkCogExt_Randomflex(sithCog* ctx)
+{
+    float b = sithCogExec_PopFlex(ctx);
+    float a = sithCogExec_PopFlex(ctx);
+    float f = _frand();
+    float f2 = b-a+1.0;
+    sithCogExec_PushFlex(ctx, fmodf(f,f2)+a);
+}
+
+void jkCogExt_Randomint(sithCog* ctx)
+{
+    int b = sithCogExec_PopInt(ctx);
+    int a = sithCogExec_PopInt(ctx);
+    
+    sithCogExec_PushInt(ctx, a + (rand() % (b-a+1)));
+}
+
+void jkCogExt_Sine(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, sin(val * 0.0174532925));
+}
+
+void jkCogExt_Squareroot(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    sithCogExec_PushFlex(ctx, sqrtf(val));
+}
+
+void jkCogExt_GetHotkeyCog(sithCog* ctx)
+{
+
+}
+
+void jkCogExt_SetHotkeyCog(sithCog* ctx)
+{
+
+}
+
+void jkCogExt_IsAdjoin(sithCog* ctx)
+{
+    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    int retval = 0;
+    if (pSurface && pSurface->adjoin) {
+        retval = 1;
+    }
+
+    sithCogExec_PushInt(ctx, retval);
+}
+
+void jkCogExt_SetGameSpeed(sithCog* ctx)
+{
+    float val = sithCogExec_PopFlex(ctx);
+    float val2 = sithCogExec_PopFlex(ctx);
+    //TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingHeadLvec(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+
+    // TODO
+    rdVector3 vec = {0};
+    sithCogExec_PushVector3(ctx, &vec);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingHeadPitch(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushFlex(ctx, 0.0); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingHeadPYR(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+
+    // TODO
+    rdVector3 vec = {0};
+    sithCogExec_PushVector3(ctx, &vec);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingPYR(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+
+    // TODO
+    rdVector3 vec = {0};
+    sithCogExec_PushVector3(ctx, &vec);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingHeadPYR(sithCog* ctx)
+{
+    //TODO
+    rdVector3 vec = {0};
+    sithCogExec_PopVector3(ctx, &vec);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingPosEx(sithCog* ctx)
+{
+    //TODO
+    sithSector* pSector = sithCogExec_PopSector(ctx);
+    rdVector3 vec = {0};
+    sithCogExec_PopVector3(ctx, &vec);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingPYR(sithCog* ctx)
+{
+    //TODO
+    rdVector3 vec = {0};
+    sithCogExec_PopVector3(ctx, &vec);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingLRUVecs(sithCog* ctx)
+{
+    //TODO
+    rdVector3 vec = {0};
+    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector3(ctx, &vec);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingSector(sithCog* ctx)
+{
+    sithSector* pSector = sithCogExec_PopSector(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushInt(ctx, -1); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_RestoreJoint(sithCog* ctx)
+{
+    int val = sithCogExec_PopInt(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingAirDrag(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushFlex(ctx, 0.0); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingEyeOffset(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    // TODO
+    rdVector3 vec = {0};
+    sithCogExec_PushVector3(ctx, &vec);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingHeadPitchMax(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushFlex(ctx, 0.0); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingHeadPitchMin(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushFlex(ctx, 0.0); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_GetThingJumpSpeed(sithCog* ctx)
+{
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithCogExec_PushFlex(ctx, 0.0); // TODO
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingAirDrag(sithCog* ctx)
+{
+    float a = sithCogExec_PopFlex(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingEyeOffset(sithCog* ctx)
+{
+    //TODO
+    rdVector3 vec = {0};
+    sithCogExec_PopVector3(ctx, &vec);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingHeadPitchMinMax(sithCog* ctx)
+{
+    float a = sithCogExec_PopFlex(ctx);
+    float b = sithCogExec_PopFlex(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingJumpSpeed(sithCog* ctx)
+{
+    float a = sithCogExec_PopFlex(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingMesh(sithCog* ctx)
+{
+    char* a = sithCogExec_PopString(ctx);
+    rdModel3* model3 = sithCogExec_PopModel3(ctx);
+    char* c = sithCogExec_PopString(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCogExt_SetThingParent(sithCog* ctx)
+{
+    sithThing* pThing2 = sithCogExec_PopThing(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+}
+
+void jkCog_RegisterVerbsExt() {
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "playeraction");
+    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 47, "hotkey");
+
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachSurface, "getthingattachsurface");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachThing, "getthingattachthing");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraFov, "getcamerafov");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraOffset, "getcameraoffset");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraFov, "setcamerafov");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraOffset, "setcameraoffset");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Absolute, "absolute");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arccosine, "arccosine");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arcsine, "arcsine");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arctangent, "arctangent");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Ceiling, "ceiling");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Cosine, "cosine");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Floor, "floor");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Power, "power");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomflex, "randomflex");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomint, "randomint");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Sine, "sine");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Squareroot, "squareroot");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetHotkeyCog, "gethotkeycog");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetHotkeyCog, "sethotkeycog");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_IsAdjoin, "isadjoin");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetGameSpeed, "setgamespeed");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadLvec, "getthingheadlvec");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitch, "getthingheadpitch");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPYR, "getthingheadpyr");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingPYR, "getthingpyr");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPYR, "setthingheadpyr");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPosEx, "setthingposex");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPYR, "setthingpyr");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingLRUVecs, "setthingrluvecs");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingSector, "setthingsector");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_RestoreJoint, "restorejoint");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAirDrag, "getthingairdrag");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingEyeOffset, "getthingeyeoffset");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMax, "getthingheadpitchmax");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMin, "getthingheadpitchmin");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingJumpSpeed, "getthingjumpspeed");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingAirDrag, "setthingairdrag");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingEyeOffset, "setthingeyeoffset");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPitchMinMax, "setthingheadpitchminmax");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingJumpSpeed, "setthingjumpspeed");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingMesh, "setthingmesh");
+    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingParent, "setthingparent");
 }

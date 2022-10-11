@@ -114,31 +114,43 @@ void jkGame_SetDefaultSettings()
     jkPlayer_setSaberCam = 0;
 }
 
-#ifndef SDL2_RENDER
 int jkGame_Update()
 {
     int64_t v0; // rcx
-    char *v1; // eax
     sithThing *v2; // esi
     int v3; // eax
     double v4; // st7
     int result; // eax
     int v6; // [esp+1Ch] [ebp-1Ch]
 
+#ifdef SDL2_RENDER
+    // HACK
+    Video_modeStruct.b3DAccel = 1;
+#endif
+
+#ifndef SDL2_RENDER
     if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
+#endif
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
     jkDev_DrawLog();
     jkHudInv_ClearRects();
     jkHud_ClearRects(0);
-    v1 = stdDisplay_GetPalette();
-    stdPalEffects_UpdatePalette(v1);
+
+    stdPalEffects_UpdatePalette(stdDisplay_GetPalette());
+#ifndef SDL2_RENDER
     if ( Video_modeStruct.b3DAccel )
+#endif
         rdSetColorEffects(&stdPalEffects_state.effect);
+
+    _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
     rdAdvanceFrame();
+#ifndef SDL2_RENDER
     if ( Video_modeStruct.b3DAccel )
+#endif
     {
         sithMain_UpdateCamera();
     }
+#ifndef SDL2_RENDER
     else
     {
         stdDisplay_VBufferLock(Video_pMenuBuffer);
@@ -147,8 +159,10 @@ int jkGame_Update()
         stdDisplay_VBufferUnlock(Video_pVbufIdk);
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
     }
+#endif
     jkPlayer_DrawPov();
-    rdFinishFrame();
+
+#if 0
     //if (Main_bMotsCompat)
     ++Video_dword_5528A0; // MOTS added
     if ( Main_bDispStats )
@@ -190,7 +204,7 @@ int jkGame_Update()
     }
     else if ( Main_bFrameRate )
     {
-        ++Video_dword_5528A0; // MOTS removed
+        //++Video_dword_5528A0; // MOTS removed
         Video_dword_5528A8 = stdPlatform_GetTimeMsec();
         if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 1000 )
         {
@@ -202,6 +216,7 @@ int jkGame_Update()
             Video_dword_5528A4 = Video_dword_5528A0;
         }
     }
+#endif
 
 #ifdef SDL2_RENDER
     stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
@@ -231,8 +246,10 @@ int jkGame_Update()
 
     jkDev_sub_41F950();
     jkHudInv_Draw();
+#ifndef SDL2_RENDER
     if ( Video_modeStruct.b3DAccel )
         std3D_DrawOverlay();
+#endif
 
     // MOTS added
     /*
@@ -241,11 +258,16 @@ int jkGame_Update()
     }
     */
 
+#ifdef SDL2_RENDER
+    std3D_DrawMenu();
+    rdFinishFrame();
+#endif
+
     // MOTS removed
     if ( Video_modeStruct.b3DAccel )
         result = stdDisplay_DDrawGdiSurfaceFlip();
     else
-        result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, NULL, 0);
+        result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, 0, 0);
     // end MOTS removed
 
     // MOTS added
@@ -259,143 +281,6 @@ int jkGame_Update()
 
     return result;
 }
-#else
-int jkGame_Update()
-{
-    int64_t v0; // rcx
-    char *v1; // eax
-    sithThing *v2; // esi
-    int v3; // eax
-    double v4; // st7
-    int result; // eax
-    int v6; // [esp+1Ch] [ebp-1Ch]
-
-    // HACK
-    Video_modeStruct.b3DAccel = 1;
-    
-    //if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
-        stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
-    jkDev_DrawLog();
-    jkHudInv_ClearRects();
-    jkHud_ClearRects(0);
-
-    v1 = stdDisplay_GetPalette();
-    stdPalEffects_UpdatePalette(v1);
-    //if ( Video_modeStruct.b3DAccel )
-        rdSetColorEffects(&stdPalEffects_state.effect);
-
-    _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
-    rdAdvanceFrame();
-    //if ( Video_modeStruct.b3DAccel )
-    {
-        sithMain_UpdateCamera();
-    }
-    /*else
-    {
-        stdDisplay_VBufferLock(Video_pMenuBuffer);
-        stdDisplay_VBufferLock(Video_pVbufIdk);
-        sithMain_UpdateCamera();
-        stdDisplay_VBufferUnlock(Video_pVbufIdk);
-        stdDisplay_VBufferUnlock(Video_pMenuBuffer);
-    }*/
-    jkPlayer_DrawPov();
-
-    //if (Main_bMotsCompat)
-    ++Video_dword_5528A0; // MOTS added
-    if ( Main_bDispStats )
-    {
-        v2 = sithWorld_pCurrentWorld->playerThing;
-        //++Video_dword_5528A0; // MOTS removed
-        v3 = stdPlatform_GetTimeMsec();
-        v0 = v3 - Video_lastTimeMsec;
-        Video_dword_5528A8 = v3;
-        if ( (unsigned int)(v3 - Video_lastTimeMsec) > 0x3E8 )
-        {
-            if ( Main_bDispStats )
-            {
-                v6 = v2->sector->id;
-                Video_flt_55289C = (double)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (double)v0;
-                _sprintf(
-                    std_genBuffer,
-                    "%02.3f (%02d%%)f %3ds %3da %3dz %4dp %3d curSector %3d fo",
-                    Video_flt_55289C,
-                    (unsigned int)(__int64)((double)(unsigned int)jkGame_updateMsecsTotal / (double)(int)v0 * 100.0),
-                    sithRender_surfacesDrawn,
-                    sithRender_831980,
-                    sithRender_831984,
-                    rdCache_drawnFaces,
-                    v6,
-                    sithNet_thingsIdx);
-                if ( sithNet_isMulti )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
-                jkDev_sub_41FC40(100, std_genBuffer);
-                v3 = Video_dword_5528A8;
-            }
-            Video_lastTimeMsec = v3;
-            Video_dword_5528A4 = Video_dword_5528A0;
-            jkGame_dword_552B5C = 0;
-            jkGame_updateMsecsTotal = 0;
-            stdComm_dword_8321F0 = 0;
-            stdComm_dword_8321F4 = 0;
-        }
-    }
-    else if ( Main_bFrameRate )
-    {
-        //++Video_dword_5528A0; // MOTS removed
-        Video_dword_5528A8 = stdPlatform_GetTimeMsec();
-        if ( (unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec) > 1000 )
-        {
-            v4 = (double)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (double)(unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec);
-            Video_flt_55289C = v4;
-            _sprintf(std_genBuffer, "%02.3f", v4);
-            jkDev_sub_41FC40(100, std_genBuffer);
-            Video_lastTimeMsec = Video_dword_5528A8;
-            Video_dword_5528A4 = Video_dword_5528A0;
-        }
-    }
-
-#ifdef SDL2_RENDER
-    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
-    stdDisplay_VBufferLock(pOverlayBuffer);
-    stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
-    stdDisplay_VBufferUnlock(pOverlayBuffer);
-#endif
-
-    // MOTS added: scope/security cam overlays
-    if (!Main_bMotsCompat) {
-        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
-            jkHud_Draw();
-    }
-    else {
-        if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
-            jkHudScope_Draw();
-        }
-        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
-            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
-                jkHud_Draw();
-            }
-        }
-        else {
-            jkHudCameraView_Draw();
-        }
-    }
-
-    jkDev_sub_41F950();
-    jkHudInv_Draw();
-    //if ( Video_modeStruct.b3DAccel )
-    //    std3D_DrawOverlay();
-
-
-    std3D_DrawMenu();
-    rdFinishFrame();
-
-    if ( Video_modeStruct.b3DAccel )
-        result = stdDisplay_DDrawGdiSurfaceFlip();
-    else
-        result = stdDisplay_VBufferCopy(Video_pOtherBuf, Video_pMenuBuffer, 0, 0, 0, 0);
-    return result;
-}
-#endif
 
 #ifdef SDL2_RENDER
 void jkGame_Screenshot()

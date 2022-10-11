@@ -665,6 +665,18 @@ int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
         "MUSIC/Track13.ogg",
         "MUSIC/Track14.ogg",
 
+        // Gog tracks
+        "MUSIC/Track00.ogg",
+        "MUSIC/Track01.ogg",
+        "MUSIC/Track02.ogg",
+        "MUSIC/Track03.ogg",
+        "MUSIC/Track04.ogg",
+        "MUSIC/Track05.ogg",
+        "MUSIC/Track06.ogg",
+        "MUSIC/Track07.ogg",
+        "MUSIC/Track08.ogg",
+        "MUSIC/Track09.ogg",
+
         // OpenJKDF2 song rips
         "MUSIC/1/Track0.ogg",
         "MUSIC/1/Track1.ogg",

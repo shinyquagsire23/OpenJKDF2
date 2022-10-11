@@ -283,7 +283,7 @@ void jkPlayer_InitThings()
                 sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
                 sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
                 
-                jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
+                jkSaber_InitializeSaberInfo(thingIter, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
             }
 
             playerInfoIter++;
@@ -1864,6 +1864,10 @@ void jkPlayer_idkEndLevel(void)
 // MOTS added
 int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
 {
+#ifdef DEBUG_QOL_CHEATS
+    return 0;
+#endif
+
     int *piVar2;
     int iVar3;
     float *pfVar4;

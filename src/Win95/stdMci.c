@@ -220,6 +220,31 @@ void stdMci_Shutdown()
     Mix_CloseAudio();
 }
 
+int stdMci_TryPlay(const char* fpath) {
+    char tmp[256];
+    strncpy(tmp, fpath, 255);
+
+#ifdef LINUX
+    char *r = malloc(strlen(tmp) + 16);
+    if (casepath(tmp, r))
+    {
+        strcpy(tmp, r);
+    }
+    free(r);
+#endif
+
+    stdMci_music = Mix_LoadMUS(tmp); 
+    if (!stdMci_music) {
+        //printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
+        printf("Mix_LoadMUS: %s\n", Mix_GetError());
+    }
+
+    if (stdMci_music)
+        return 1;
+
+    return 0;
+}
+
 void stdMci_trackFinished();
 void stdMci_trackStart(int track)
 {
@@ -238,46 +263,23 @@ void stdMci_trackStart(int track)
 
     // Try and play disk-dumped music
     snprintf(tmp, 255, "MUSIC/%d/Track%d.ogg", cdNum, track);
+    if (stdMci_TryPlay(tmp)) goto done;
 
-#ifdef LINUX
-    char *r = malloc(strlen(tmp) + 16);
-    if (casepath(tmp, r))
-    {
-        strcpy(tmp, r);
+    // Try and play disk-dumped music
+    if (track < 10) {
+        snprintf(tmp, 255, "MUSIC/%d/Track%02d.ogg", cdNum, track);
+        if (stdMci_TryPlay(tmp)) goto done;
     }
-    free(r);
-#endif
-
-    stdMci_music = Mix_LoadMUS(tmp); 
-    if (!stdMci_music) {
-        printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
-        printf("Mix_LoadMUS: %s\n", Mix_GetError());
-    }
-
-    if (stdMci_music)
-        goto done;
 
     // GOG and Steam soundtrack location
     snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+    if (stdMci_TryPlay(tmp)) goto done;
 
-#ifdef LINUX
-    r = malloc(strlen(tmp) + 16);
-    if (casepath(tmp, r))
-    {
-        strcpy(tmp, r);
+    // GOG and Steam soundtrack location (00-09)
+    if (track < 10) {
+        snprintf(tmp, 255, "MUSIC/Track%02d.ogg", track);
+        if (stdMci_TryPlay(tmp)) goto done;
     }
-    free(r);
-#endif
-
-    stdMci_music = Mix_LoadMUS(tmp); 
-    if (!stdMci_music) {
-        printf("WARN: Failed to play music `%s'\n", tmp);
-        printf("Mix_LoadMUS: %s\n", Mix_GetError());
-        //return;
-    }
-
-    if (stdMci_music)
-        goto done;
 
     // Try and convert the OG track numbers to GOG/Steam
     if (!stdMci_music && track < 12)
@@ -293,26 +295,15 @@ void stdMci_trackStart(int track)
 
         // GOG and Steam soundtrack location
         snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
-
-#ifdef LINUX
-        r = malloc(strlen(tmp) + 16);
-        if (casepath(tmp, r))
-        {
-            strcpy(tmp, r);
-        }
-        free(r);
-#endif
-
-        stdMci_music = Mix_LoadMUS(tmp); 
-        if (!stdMci_music) {
-            printf("WARN: Failed to play music `%s' too. Must not have any music.\n", tmp);
-            printf("Mix_LoadMUS: %s\n", Mix_GetError());
-        }
+        if (stdMci_TryPlay(tmp)) goto done;
     }
 
-    if (!stdMci_music) return;
-
 done:
+    if (!stdMci_music) {
+        printf("No music was loaded, must not have any music.\n");
+        return;
+    }
+
     stdMci_trackCurrent = track;
     Mix_HaltMusic();
     if (Mix_PlayMusic(stdMci_music, 0) < 0) {

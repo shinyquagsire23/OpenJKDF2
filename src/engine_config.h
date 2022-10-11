@@ -40,6 +40,21 @@
 #define MULTI_BIG_UPDATE_INTERVAL_MS (60)
 #endif
 
+#ifndef QOL_IMPROVEMENTS
+#define SITH_MAX_THINGS (641)
+#else // QOL_IMPROVEMENTS
+#define SITH_MAX_THINGS (32000)
+#endif // QOL_IMPROVEMENTS
+
+#ifdef QOL_IMPROVEMENTS
+#define SITHCOGVM_MAX_STACKSIZE (0x10000)
+#else // !QOL_IMPROVEMENTS
+#define SITHCOGVM_MAX_STACKSIZE (64)
+#endif // QOL_IMPROVEMENTS
+
+#define RDCACHE_MAX_TRIS (0x400)
+#define RDCACHE_MAX_VERTICES (0x8000)
+
 // jkGuiMultiTally delay between maps
 #define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && stdComm_bIsServer) ? 0 : 30000)
 

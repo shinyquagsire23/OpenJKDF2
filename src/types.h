@@ -59,10 +59,6 @@ typedef uint32_t size_t;
     #endif // JKM_TYPES
 #endif // QOL_IMPROVEMENTS
 
-#define SITHCOGVM_MAX_STACKSIZE (64)
-
-#define RDCACHE_MAX_TRIS (0x400)
-#define RDCACHE_MAX_VERTICES (0x8000)
 
 #if defined(JK_NO_MMAP)
 //#define RDCACHE_MAX_TRIS (0x2000)

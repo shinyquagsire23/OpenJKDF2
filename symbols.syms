@@ -235,7 +235,7 @@ sithNet_isMulti 0x00832624 int
 sithNet_isServer 0x00832628 int
 sithMulti_bTimelimitMet 0x00832638 int
 sithNet_serverNetId 0x008C4BA4 int
-sithNet_things 0x008326AC int[641]
+sithNet_things 0x008326AC int[SITH_MAX_THINGS]
 sithNet_thingsIdx 0x008330F0 int
 sithNet_syncIdx 0x008330F4 int
 sithNet_aSyncFlags 0x008330B0 int[SITH_MAX_SYNC_THINGS]
