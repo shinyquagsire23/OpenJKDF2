@@ -1750,12 +1750,7 @@ void sithCogFunctionThing_GetActorWeapon(sithCog *ctx)
 
         if (weapTemplate)
         {
-            if (!Main_bMotsCompat || (Main_bMotsCompat && thing->type != SITH_THING_PLAYER)) {
-                sithCogExec_PushInt(ctx, weapTemplate->thingIdx);
-                return;
-            }
-
-            sithCogExec_PushInt(ctx, sithInventory_SelectWeaponPrior(weapTemplate->thingIdx));
+            sithCogExec_PushInt(ctx, weapTemplate->thingIdx);
             return;
         }
 
@@ -1791,6 +1786,7 @@ void sithCogFunctionThing_GetActorWeaponMots(sithCog *ctx)
         {
             if (thing->type != SITH_THING_PLAYER) {
                 sithCogExec_PushInt(ctx, weapTemplate->thingIdx);
+                return;
             }
             int idx = sithInventory_SelectWeaponPrior(weapTemplate->thingIdx);
             sithCogExec_PushInt(ctx, idx);
