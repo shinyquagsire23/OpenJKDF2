@@ -256,8 +256,13 @@ void jkPlayer_InitThings()
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
 
         playerInfoJk->actorThing = playerInfo->playerThing;
-        playerInfo->playerThing->playerInfo = playerInfoJk;
-        playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+
+        // Added: Possible nullptr deref in co-op? wtf is this loop doing anyhow
+        if (playerInfo->playerThing)
+        {
+            playerInfo->playerThing->playerInfo = playerInfoJk;
+            playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        }
     }
 
     int num = 0;
