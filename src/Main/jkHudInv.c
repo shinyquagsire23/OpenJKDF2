@@ -13,7 +13,7 @@
 #include "jk.h"
 
 // MOTS added
-float jkHud_aBinMaxAmt[SITHBIN_NUMBINS] = {};
+float jkHud_aBinMaxAmt[SITHBIN_NUMBINS] = {0};
 
 // MOTS altered
 int jkHudInv_ItemDatLoad(char *fpath)
