@@ -1145,7 +1145,7 @@ void sithCogFunctionThing_SetThingModel(sithCog *ctx)
     {
         rdModel3* v4 = thing->rdthing.model3;
         int v5;
-        if (v4)
+        if (!v4)
         {
             v5 = -1;
         }
