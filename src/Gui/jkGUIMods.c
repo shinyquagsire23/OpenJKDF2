@@ -31,6 +31,15 @@
 #include "stdPlatform.h"
 #include "Main/InstallHelper.h"
 
+#if defined(LINUX)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
+#endif
+
 static uint32_t jkGuiMods_listboxIdk[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiMods_cutscenesElements[7] = {
@@ -48,6 +57,61 @@ static jkGuiElement jkGuiMods_cutscenesElements[7] = {
 static jkGuiMenu jkGuiMods_cutscenesMenu = {jkGuiMods_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 static int jkGuiMods_bInitted;
+
+#if defined(LINUX)
+// Lifted from SDL2
+int jkGuiMods_OpenURL(const char *url)
+{
+    /* child process */
+    const pid_t pid1 = fork();
+    if (pid1 == 0) 
+    { 
+        pid_t pid2;
+        /* Clear LD_PRELOAD so Chrome opens correctly when this application is launched by Steam */
+        unsetenv("LD_PRELOAD");
+
+        /* Notice this is vfork and not fork! */
+        pid2 = vfork();
+        if (pid2 == 0) 
+        {  /* Grandchild process will try to launch the url */
+            execlp("xdg-open", "xdg-open", url, NULL);
+            _exit(EXIT_FAILURE);
+        } 
+        else if (pid2 < 0) 
+        {   /* There was an error forking */
+            _exit(EXIT_FAILURE);
+        } 
+        else 
+        {
+            /* Child process doesn't wait for possibly-blocking grandchild. */
+            _exit(EXIT_SUCCESS);
+        }
+    } 
+    else if (pid1 < 0) 
+    {
+        return 1;
+    } 
+    else 
+    {
+        int status;
+        if (waitpid(pid1, &status, 0) == pid1) 
+        {
+            if (WIFEXITED(status)) 
+            {
+                 if (WEXITSTATUS(status) == 0) 
+                 {
+                     return 0;  /* success! */
+                 }
+             }
+        }
+    }
+}
+#else
+int jkGuiMods_OpenURL(const char *url)
+{
+    return SDL_OpenURL(url);
+}
+#endif
 
 void jkGuiMods_Show()
 {
@@ -87,7 +151,7 @@ void jkGuiMods_Show()
             char tmpUrl[512];
             getcwd(tmpCwd, sizeof(tmpCwd));
             snprintf(tmpUrl, sizeof(tmpUrl), "file://%s", tmpCwd);
-            SDL_OpenURL(tmpUrl);
+            jkGuiMods_OpenURL(tmpUrl);
 #endif
         }
         else if ( v4 == 1 )
