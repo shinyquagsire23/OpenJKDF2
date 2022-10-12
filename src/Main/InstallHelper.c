@@ -5,6 +5,7 @@
 #include "General/stdFnames.h"
 #include "General/util.h"
 #include "General/stdFileUtil.h"
+#include "Main/jkRes.h"
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
@@ -34,6 +35,7 @@ const size_t aRequiredAssetsMots_len = sizeof(aRequiredAssetsMots) / sizeof(cons
 #define BUF_SIZE 65536 //2^16
 
 #define INSTALL_APPDATA_FOLDER_NAME (Main_bMotsCompat ? "openjkmots" : "openjkdf2")
+#define INSTALL_OVERRIDE_ENVVAR_NAME (Main_bMotsCompat ? "OPENJKMOTS_ROOT" : "OPENJKDF2_ROOT")
 
 int InstallHelper_copy(const char* in_path, const char* out_path)
 {
@@ -202,69 +204,223 @@ int InstallHelper_CopyFileDisk(const char* pFolder, const char* pName)
     return 1;
 }
 
-void InstallHelper_UseLocalData()
+/*
+Summary of local data override priorities:
+
+Linux:
+ - OPENJKDF2_ROOT (OPENJKMOTS_ROOT for motsCompat) trumps everything, even if files don't exist.
+ - If $CWD/resource/jk_.cd exists, the cwd will be used.
+
+ - if XDG_DATA_HOME is set:
+    - $XDG_DATA_HOME/openjkdf2/resource/jk_.cd (legacy)
+    - $XDG_DATA_HOME/OpenJKDF2/openjkdf2/resource/jk_.cd
+
+ - ~/.local/share/openjkdf2/resource/jk_.cd (legacy)
+ - ~/.local/share/OpenJKDF2/openjkdf2/resource/jk_.cd (install default)
+
+macOS:
+ - OPENJKDF2_ROOT (OPENJKMOTS_ROOT for motsCompat) trumps everything, even if files don't exist.
+ - If OpenJKDF2.app/../resource/jk_.cd exists, assets will be loaded relative to the app bundle.
+
+ - if XDG_DATA_HOME is set:
+    - $XDG_DATA_HOME/openjkdf2/resource/jk_.cd (legacy)
+    - $XDG_DATA_HOME/OpenJKDF2/openjkdf2/resource/jk_.cd
+
+ - ~/.local/share/openjkdf2/resource/jk_.cd (legacy)
+ - ~/Library/Application Support/OpenJKDF2/openjkdf2/resource/jk_.cd (install default)
+
+Windows:
+ - OPENJKDF2_ROOT (OPENJKMOTS_ROOT for motsCompat) trumps everything, even if files don't exist.
+ - If $CWD/resource/jk_.cd exists, assets will be loaded relative to the EXE.
+
+ - %APPDATA\local\openjkdf2\resource\jk_.cd (legacy)
+ - %APPDATA\OpenJKDF2\openjkdf2\resource\jk_.cd (install default)
+*/
+int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
 {
     const char *homedir;
     char fname[256];
+    char fname_tmp[256];
+    int bIsOverride = 0;
+
+    if (pOut_sz > sizeof(fname)) {
+        pOut_sz = sizeof(fname);
+    }
 
 #if defined(MACOS) || defined(LINUX)
     char* data_home;
-    if ((data_home = getenv("OPENJKDF2_ROOT")) != NULL) {
+    if ((data_home = getenv(INSTALL_OVERRIDE_ENVVAR_NAME)) != NULL) {
+
         strncpy(fname, data_home, 256);
+
+        // Expand home directory
+        if (data_home[0] == '~') {
+            if ((homedir = getenv("HOME")) == NULL) {
+                homedir = getpwuid(getuid())->pw_dir;
+            }
+            if (homedir) {
+                char* data_home_shift = data_home+1;
+                 if (*data_home_shift == '/')
+                    data_home_shift++;
+                stdFnames_MakePath(fname, 256, homedir, data_home_shift);
+            }
+        }
+
         stdFileUtil_MkDir(fname);
-        chdir(fname);
-        printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);  
+        if (bChdir) {
+            chdir(fname);
+            printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+        }
+        bIsOverride = 1;
     }
     else if ((data_home = getenv("XDG_DATA_HOME")) != NULL) {
+        char data_home_tmp[256];
+
+        // Expand home directory
+        if (data_home[0] == '~') {
+            if ((homedir = getenv("HOME")) == NULL) {
+                homedir = getpwuid(getuid())->pw_dir;
+            }
+            if (homedir) {
+                char* data_home_shift = data_home+1;
+                 if (*data_home_shift == '/')
+                    data_home_shift++;
+
+
+                stdFnames_MakePath(data_home_tmp, 256, homedir, data_home_shift);
+                data_home = data_home_tmp;
+            }
+        }
+
         stdFnames_MakePath(fname, 256, data_home, INSTALL_APPDATA_FOLDER_NAME);
-        stdFileUtil_MkDir(fname);
-        chdir(fname);
-        printf("Using XDG root directory: %s\n", fname); 
+        
+        // Check if data exists here. If it does not, we want to use the newer organization structure.
+        strncpy(fname_tmp, fname, sizeof(fname_tmp)-1);
+        strncat(fname_tmp, "/resource/jk_.cd", sizeof(fname_tmp)-1);
+
+        if(util_FileExists(fname_tmp)) {
+            stdFileUtil_MkDir(fname);
+            if (bChdir) {
+                chdir(fname);
+                printf("Using XDG root directory: %s\n", fname);
+            }
+        }
+        else {
+            stdFnames_MakePath(fname, 256, data_home, "OpenJKDF2");
+            strncat(fname, "/", sizeof(fname)-1);
+            strncat(fname, INSTALL_APPDATA_FOLDER_NAME, sizeof(fname)-1);
+            stdFileUtil_MkDir(fname);
+
+            if (bChdir) {
+                chdir(fname);
+                printf("Using new XDG root directory: %s\n", fname);
+            }
+        }
     }
-    else {
+    else 
+    {
+        // Legacy folders: Check ~/.local/share/openjkdf2
+        int bFound = 0;
         if ((homedir = getenv("HOME")) == NULL) {
             homedir = getpwuid(getuid())->pw_dir;
         }
 
         if (homedir) {
-            strcpy(fname, homedir);
-            strcat(fname, "/.local");
-            stdFileUtil_MkDir(fname);
-            strcat(fname, "/share");
-            stdFileUtil_MkDir(fname);
-            strcat(fname, "/");
-            strcat(fname, INSTALL_APPDATA_FOLDER_NAME);
-            stdFileUtil_MkDir(fname);
-            chdir(fname);   
-            printf("Using root directory: %s\n", fname);     
+            snprintf(fname, sizeof(fname), "%s/.local/share/%s", homedir, INSTALL_APPDATA_FOLDER_NAME);
+
+            // If ~/.local/share/openjkdf2/resource/jk_.cd exists, use that directory as resource root
+            strncpy(fname_tmp, fname, sizeof(fname_tmp)-1);
+            strncat(fname_tmp, "/resource/jk_.cd", sizeof(fname_tmp)-1);
+            if(util_FileExists(fname_tmp)) {
+                stdFileUtil_MkDir(fname);
+                if (bChdir) {
+                    chdir(fname);
+                    printf("Using root directory: %s\n", fname);
+                }
+                bFound = 1;
+            }
+        }
+
+        if (!bFound) {
+            data_home = SDL_GetPrefPath("OpenJKDF2", INSTALL_APPDATA_FOLDER_NAME);
+            if (data_home) {
+                strncpy(fname, data_home, sizeof(fname));
+                stdFileUtil_MkDir(fname);
+                if (bChdir) {
+                    chdir(fname);
+                    printf("Using SDL_GetPrefPath: %s\n", fname);
+                }
+                SDL_free(data_home);
+                data_home = NULL;
+            }
         }
     }
-
 #elif defined(WIN32)
-    if ((homedir = getenv("OPENJKDF2_ROOT")) != NULL) {
+    char* data_home = NULL;
+
+    if ((homedir = getenv(INSTALL_OVERRIDE_ENVVAR_NAME)) != NULL) {
         strcpy(fname, homedir);
         stdFileUtil_MkDir(fname);
-        chdir(fname);
-        printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+        if (bChdir) {
+            chdir(fname);
+            printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+        }
     }
     else if ((homedir = getenv("AppData")) != NULL) {
+        int bFound = 0;
+
         strcpy(fname, homedir);
         stdFileUtil_MkDir(fname);
-        strcat(fname, "\\Local");
+        strncat(fname, "\\Local", sizeof(fname)-1);
         stdFileUtil_MkDir(fname);
-        strcat(fname, "\\");
-        strcat(fname, INSTALL_APPDATA_FOLDER_NAME);
-        stdFileUtil_MkDir(fname);
-        chdir(fname);
-        printf("Using root directory: %s\n", fname);
+        strncat(fname, "\\", sizeof(fname)-1);
+        strncat(fname, INSTALL_APPDATA_FOLDER_NAME, sizeof(fname)-1);
+
+        strncpy(fname_tmp, fname, sizeof(fname_tmp)-1);
+        strncat(fname_tmp, "\\resource\\jk_.cd", sizeof(fname_tmp)-1);
+
+        // If %appdata%/local/openjkdf2/resource/jk_.cd exists, use that directory as resource root
+        if(util_FileExists(fname_tmp)) {
+            stdFileUtil_MkDir(fname);
+            if (bChdir) {
+                chdir(fname);
+                printf("Using root directory: %s\n", fname);
+            }
+            bFound = 1;
+        }
+
+        if (!bFound) {
+            data_home = SDL_GetPrefPath("OpenJKDF2", INSTALL_APPDATA_FOLDER_NAME);
+            if (data_home) {
+                strncpy(fname, data_home, sizeof(fname));
+                stdFileUtil_MkDir(fname);
+                if (bChdir) {
+                    chdir(fname);
+                    printf("Using SDL_GetPrefPath: %s\n", fname);
+                }
+                SDL_free(data_home);
+                data_home = NULL;
+            }
+        }
     }
 #endif
+
+    if (pOut && pOut_sz) {
+        strncpy(pOut, fname, pOut_sz);
+    }
+    return bIsOverride;
+}
+
+int InstallHelper_UseLocalData()
+{
+    return InstallHelper_GetLocalDataDir(NULL, 0, 1);
 }
 
 int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
 {
     const char* aOptionalAssets[] = {
         "JK.EXE",
+        "JKM.EXE",
 
         // idk if these are possible, but whatever, try it.
         "MUSIC/Track0.ogg",
@@ -279,6 +435,18 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/Track9.ogg",
         "MUSIC/Track10.ogg",
         "MUSIC/Track11.ogg",
+
+        // Gog tracks
+        "MUSIC/Track00.ogg",
+        "MUSIC/Track01.ogg",
+        "MUSIC/Track02.ogg",
+        "MUSIC/Track03.ogg",
+        "MUSIC/Track04.ogg",
+        "MUSIC/Track05.ogg",
+        "MUSIC/Track06.ogg",
+        "MUSIC/Track07.ogg",
+        "MUSIC/Track08.ogg",
+        "MUSIC/Track09.ogg",
 
         // OpenJKDF2 song rips
         "MUSIC/1/Track0.ogg",
@@ -307,6 +475,30 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/2/Track10.ogg",
         "MUSIC/2/Track11.ogg",
 
+        // %02d
+        "MUSIC/1/Track00.ogg",
+        "MUSIC/1/Track01.ogg",
+        "MUSIC/1/Track02.ogg",
+        "MUSIC/1/Track03.ogg",
+        "MUSIC/1/Track04.ogg",
+        "MUSIC/1/Track05.ogg",
+        "MUSIC/1/Track06.ogg",
+        "MUSIC/1/Track07.ogg",
+        "MUSIC/1/Track08.ogg",
+        "MUSIC/1/Track09.ogg",
+
+        // %02d
+        "MUSIC/2/Track00.ogg",
+        "MUSIC/2/Track01.ogg",
+        "MUSIC/2/Track02.ogg",
+        "MUSIC/2/Track03.ogg",
+        "MUSIC/2/Track04.ogg",
+        "MUSIC/2/Track05.ogg",
+        "MUSIC/2/Track06.ogg",
+        "MUSIC/2/Track07.ogg",
+        "MUSIC/2/Track08.ogg",
+        "MUSIC/2/Track09.ogg",
+
         // GOG tracks
         "MUSIC/Track12.ogg",
         "MUSIC/Track13.ogg",
@@ -315,6 +507,9 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/Track16.ogg",
         "MUSIC/Track17.ogg",
         "MUSIC/Track18.ogg",
+        "MUSIC/Track19.ogg",
+        "MUSIC/Track20.ogg",
+        "MUSIC/Track21.ogg",
         "MUSIC/Track22.ogg",
         "MUSIC/Track23.ogg",
         "MUSIC/Track24.ogg",
@@ -389,82 +584,8 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "episode/jk1mpdemo.gob",
         "resource/res1demo.gob",
         "resource/video/splash.smk",
-    };
 
-    const char* aOptionalAssetsMots[] = {
-        "JKM.EXE",
-
-        // Gog tracks
-        "MUSIC/Track0.ogg",
-        "MUSIC/Track1.ogg",
-        "MUSIC/Track2.ogg",
-        "MUSIC/Track3.ogg",
-        "MUSIC/Track4.ogg",
-        "MUSIC/Track5.ogg",
-        "MUSIC/Track6.ogg",
-        "MUSIC/Track7.ogg",
-        "MUSIC/Track8.ogg",
-        "MUSIC/Track9.ogg",
-        "MUSIC/Track10.ogg",
-        "MUSIC/Track11.ogg",
-        "MUSIC/Track12.ogg",
-        "MUSIC/Track13.ogg",
-        "MUSIC/Track14.ogg",
-
-        // OpenJKDF2 song rips
-        "MUSIC/1/Track0.ogg",
-        "MUSIC/1/Track1.ogg",
-        "MUSIC/1/Track2.ogg",
-        "MUSIC/1/Track3.ogg",
-        "MUSIC/1/Track4.ogg",
-        "MUSIC/1/Track5.ogg",
-        "MUSIC/1/Track6.ogg",
-        "MUSIC/1/Track7.ogg",
-        "MUSIC/1/Track8.ogg",
-        "MUSIC/1/Track9.ogg",
-        "MUSIC/1/Track10.ogg",
-        "MUSIC/1/Track11.ogg",
-        "MUSIC/1/Track12.ogg",
-        "MUSIC/1/Track13.ogg",
-        "MUSIC/1/Track14.ogg",
-
-        "MUSIC/2/Track0.ogg",
-        "MUSIC/2/Track1.ogg",
-        "MUSIC/2/Track2.ogg",
-        "MUSIC/2/Track3.ogg",
-        "MUSIC/2/Track4.ogg",
-        "MUSIC/2/Track5.ogg",
-        "MUSIC/2/Track6.ogg",
-        "MUSIC/2/Track7.ogg",
-        "MUSIC/2/Track8.ogg",
-        "MUSIC/2/Track9.ogg",
-        "MUSIC/2/Track10.ogg",
-        "MUSIC/2/Track11.ogg",
-        "MUSIC/2/Track12.ogg",
-        "MUSIC/2/Track13.ogg",
-        "MUSIC/2/Track14.ogg",
-
-        // idk if these are possible but w/e
-        "MUSIC/Track12.ogg",
-        "MUSIC/Track13.ogg",
-        "MUSIC/Track14.ogg",
-        "MUSIC/Track15.ogg",
-        "MUSIC/Track16.ogg",
-        "MUSIC/Track17.ogg",
-        "MUSIC/Track18.ogg",
-        "MUSIC/Track22.ogg",
-        "MUSIC/Track23.ogg",
-        "MUSIC/Track24.ogg",
-        "MUSIC/Track25.ogg",
-        "MUSIC/Track26.ogg",
-        "MUSIC/Track27.ogg",
-        "MUSIC/Track28.ogg",
-        "MUSIC/Track29.ogg",
-        "MUSIC/Track30.ogg",
-        "MUSIC/Track31.ogg",
-        "MUSIC/Track32.ogg",
-
-        // Technically optional
+        // Technically optional (MOTS)
         "Resource/VIDEO/FINALE.SAN",
         "Resource/VIDEO/JKMINTRO.SAN",
         "Resource/VIDEO/S1L1ECS.SAN",
@@ -492,7 +613,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "Resource/VIDEO/UNSUPPORTED.ZIP",
         "Resource/VIDEO/cutscenes.goo",
 
-        // Controls
+        // Controls (MOTS)
         "Controls/assassin.ctm",
         "Controls/chkeybrd.ctm",
         "Controls/fcskybrd.ctm",
@@ -524,10 +645,10 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "Controls/THRUSTMASTER FCS.CTM",
         "Controls/XBOX 360 Controller for Windows.ctm",
 
-        // Demo assets TODO
+        // MoTS demo assets TODO
     };
 
-    const char** paOptionalAssets = Main_bMotsCompat ? aOptionalAssetsMots : aOptionalAssets;
+    const char** paOptionalAssets = aOptionalAssets;
     const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;
     size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : aRequiredAssets_len;
 
@@ -536,7 +657,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         path[strlen(path)-1] = 0;
     }
 
-    const size_t aOptionalAssets_len = (Main_bMotsCompat ? sizeof(aOptionalAssetsMots) : sizeof(aOptionalAssets)) / sizeof(const char*);
+    const size_t aOptionalAssets_len = sizeof(aOptionalAssets) / sizeof(const char*);
 
     InstallHelper_UseLocalData();
     stdFileUtil_MkDir("episode");
@@ -552,6 +673,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         if (!InstallHelper_CopyFile(path, paRequiredAssets[i]))
         {
             char tmp[4096+256];
+
             snprintf(tmp, sizeof(tmp), "Missing required asset `%s`!", paRequiredAssets[i]);
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenJKDF2 Install Helper", tmp, NULL);
         }
@@ -580,6 +702,7 @@ int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
 
     const char* aOptionalAssets[] = {
         "JK.EXE",
+        "JKM.EXE",
 
         // Technically optional
         "resource/video/01-02A.SMK",
@@ -643,94 +766,8 @@ int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
         "episode/jk1mpdemo.gob",
         "resource/res1demo.gob",
         "resource/video/splash.smk",
-    };
 
-    const char* aOptionalAssetsMots[] = {
-        "JKM.EXE",
-
-        // Gog tracks
-        "MUSIC/Track0.ogg",
-        "MUSIC/Track1.ogg",
-        "MUSIC/Track2.ogg",
-        "MUSIC/Track3.ogg",
-        "MUSIC/Track4.ogg",
-        "MUSIC/Track5.ogg",
-        "MUSIC/Track6.ogg",
-        "MUSIC/Track7.ogg",
-        "MUSIC/Track8.ogg",
-        "MUSIC/Track9.ogg",
-        "MUSIC/Track10.ogg",
-        "MUSIC/Track11.ogg",
-        "MUSIC/Track12.ogg",
-        "MUSIC/Track13.ogg",
-        "MUSIC/Track14.ogg",
-
-        // Gog tracks
-        "MUSIC/Track00.ogg",
-        "MUSIC/Track01.ogg",
-        "MUSIC/Track02.ogg",
-        "MUSIC/Track03.ogg",
-        "MUSIC/Track04.ogg",
-        "MUSIC/Track05.ogg",
-        "MUSIC/Track06.ogg",
-        "MUSIC/Track07.ogg",
-        "MUSIC/Track08.ogg",
-        "MUSIC/Track09.ogg",
-
-        // OpenJKDF2 song rips
-        "MUSIC/1/Track0.ogg",
-        "MUSIC/1/Track1.ogg",
-        "MUSIC/1/Track2.ogg",
-        "MUSIC/1/Track3.ogg",
-        "MUSIC/1/Track4.ogg",
-        "MUSIC/1/Track5.ogg",
-        "MUSIC/1/Track6.ogg",
-        "MUSIC/1/Track7.ogg",
-        "MUSIC/1/Track8.ogg",
-        "MUSIC/1/Track9.ogg",
-        "MUSIC/1/Track10.ogg",
-        "MUSIC/1/Track11.ogg",
-        "MUSIC/1/Track12.ogg",
-        "MUSIC/1/Track13.ogg",
-        "MUSIC/1/Track14.ogg",
-
-        "MUSIC/2/Track0.ogg",
-        "MUSIC/2/Track1.ogg",
-        "MUSIC/2/Track2.ogg",
-        "MUSIC/2/Track3.ogg",
-        "MUSIC/2/Track4.ogg",
-        "MUSIC/2/Track5.ogg",
-        "MUSIC/2/Track6.ogg",
-        "MUSIC/2/Track7.ogg",
-        "MUSIC/2/Track8.ogg",
-        "MUSIC/2/Track9.ogg",
-        "MUSIC/2/Track10.ogg",
-        "MUSIC/2/Track11.ogg",
-        "MUSIC/2/Track12.ogg",
-        "MUSIC/2/Track13.ogg",
-        "MUSIC/2/Track14.ogg",
-
-        // idk if these are possible but w/e
-        "MUSIC/Track12.ogg",
-        "MUSIC/Track13.ogg",
-        "MUSIC/Track14.ogg",
-        "MUSIC/Track15.ogg",
-        "MUSIC/Track16.ogg",
-        "MUSIC/Track17.ogg",
-        "MUSIC/Track18.ogg",
-        "MUSIC/Track22.ogg",
-        "MUSIC/Track23.ogg",
-        "MUSIC/Track24.ogg",
-        "MUSIC/Track25.ogg",
-        "MUSIC/Track26.ogg",
-        "MUSIC/Track27.ogg",
-        "MUSIC/Track28.ogg",
-        "MUSIC/Track29.ogg",
-        "MUSIC/Track30.ogg",
-        "MUSIC/Track31.ogg",
-        "MUSIC/Track32.ogg",
-
-        // Technically optional
+        // Technically optional (MOTS)
         "Resource/VIDEO/FINALE.SAN",
         "Resource/VIDEO/JKMINTRO.SAN",
         "Resource/VIDEO/S1L1ECS.SAN",
@@ -758,42 +795,42 @@ int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
         "Resource/VIDEO/UNSUPPORTED.ZIP",
         "Resource/VIDEO/cutscenes.goo",
 
-        // Controls
-        "controls/assassin.ctm",
-        "controls/chkeybrd.ctm",
-        "controls/fcskybrd.ctm",
-        "controls/ms_3dpro.ctm",
-        "controls/wwarrior.ctm",
-        "controls/ch_f-16.ctm",
-        "controls/cybrman2.ctm",
-        "controls/gamepad.ctm",
-        "controls/prcision.ctm",
-        "controls/ch_pro.ctm",
-        "controls/fcs.ctm",
-        "controls/gravis.ctm",
-        "controls/spaceorb.ctm",
-        "controls/CH F-16 COMBAT STICK.CTM",
-        "controls/CH FLIGHTSTICK PRO OPTIMIZED WITH KEYBOARD.CTM",
-        "controls/CH FLIGHTSTICK PRO.CTM",
-        "controls/CHIP'S PRECISION PRO CONFIGURATION.CTM",
-        "controls/FP GAMING ASSASSIN 3D WITH JOYSTICK.CTM",
-        "controls/GRAVIS GAMEPAD PRO.CTM",
-        "controls/LOGITECH CYBERMAN 2.CTM",
-        "controls/LOGITECH THUNDERPAD DIGITAL.CTM",
-        "controls/LOGITECH WINGMAN EXTREME DIGITAL.CTM",
-        "controls/LOGITECH WINGMAN WARRIOR.CTM",
-        "controls/MS SIDEWINDER 3D PRO.CTM",
-        "controls/MS SIDEWINDER GAME PAD.CTM",
-        "controls/MS SIDEWINDER PRECISION PRO OR FF.CTM",
-        "controls/SPACETEC SPACEORB 360.CTM",
-        "controls/THRUSTMASTER FCS OPTIMIZED WITH KEYBOARD.CTM",
-        "controls/THRUSTMASTER FCS.CTM",
-        "controls/XBOX 360 Controller for Windows.ctm",
+        // Controls (MOTS)
+        "Controls/assassin.ctm",
+        "Controls/chkeybrd.ctm",
+        "Controls/fcskybrd.ctm",
+        "Controls/ms_3dpro.ctm",
+        "Controls/wwarrior.ctm",
+        "Controls/ch_f-16.ctm",
+        "Controls/cybrman2.ctm",
+        "Controls/gamepad.ctm",
+        "Controls/prcision.ctm",
+        "Controls/ch_pro.ctm",
+        "Controls/fcs.ctm",
+        "Controls/gravis.ctm",
+        "Controls/spaceorb.ctm",
+        "Controls/CH F-16 COMBAT STICK.CTM",
+        "Controls/CH FLIGHTSTICK PRO OPTIMIZED WITH KEYBOARD.CTM",
+        "Controls/CH FLIGHTSTICK PRO.CTM",
+        "Controls/CHIP'S PRECISION PRO CONFIGURATION.CTM",
+        "Controls/FP GAMING ASSASSIN 3D WITH JOYSTICK.CTM",
+        "Controls/GRAVIS GAMEPAD PRO.CTM",
+        "Controls/LOGITECH CYBERMAN 2.CTM",
+        "Controls/LOGITECH THUNDERPAD DIGITAL.CTM",
+        "Controls/LOGITECH WINGMAN EXTREME DIGITAL.CTM",
+        "Controls/LOGITECH WINGMAN WARRIOR.CTM",
+        "Controls/MS SIDEWINDER 3D PRO.CTM",
+        "Controls/MS SIDEWINDER GAME PAD.CTM",
+        "Controls/MS SIDEWINDER PRECISION PRO OR FF.CTM",
+        "Controls/SPACETEC SPACEORB 360.CTM",
+        "Controls/THRUSTMASTER FCS OPTIMIZED WITH KEYBOARD.CTM",
+        "Controls/THRUSTMASTER FCS.CTM",
+        "Controls/XBOX 360 Controller for Windows.ctm",
 
-        // Demo assets TODO
+        // MoTS demo assets TODO
     };
 
-    const char** paOptionalAssets = Main_bMotsCompat ? aOptionalAssetsMots : aOptionalAssets;
+    const char** paOptionalAssets = aOptionalAssets;
     const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;
     size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : aRequiredAssets_len;
 
@@ -802,7 +839,7 @@ int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
         path[strlen(path)-1] = 0;
     }
 
-    const size_t aOptionalAssets_len = (Main_bMotsCompat ? sizeof(aOptionalAssetsMots) : sizeof(aOptionalAssets)) / sizeof(const char*);
+    const size_t aOptionalAssets_len = sizeof(aOptionalAssets) / sizeof(const char*);
 
     // Check if this is a two-disk set, or one of the new-printed single disks
     char checkDisk1[4096];
@@ -898,11 +935,17 @@ int InstallHelper_AttemptInstall()
             { 205, 202, 53 }
         }
     };
+
+    char tmpMsg[2048];
+    char tmpCwd[256];
+    InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
+    snprintf(tmpMsg, sizeof(tmpMsg), "OpenJKDF2 could not find required game assets.\nWould you like to install assets now?\n\nAssets will be installed to:\n%s", tmpCwd);
+
     const SDL_MessageBoxData messageboxdata = {
         SDL_MESSAGEBOX_INFORMATION, /* .flags */
         NULL, /* .window */
         "OpenJKDF2 Install Helper", /* .title */
-        "OpenJKDF2 could not find required game assets.\nWould you like to install assets now?", /* .message */
+        tmpMsg, /* .message */
         SDL_arraysize(buttons), /* .numbuttons */
         buttons, /* .buttons */
         &colorScheme /* .colorScheme */
@@ -972,6 +1015,8 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
         }
     }
 
+    bigList_len += 512; // root dir msg
+
     if (!missingRequireds) return;
 
     bigList = malloc(bigList_len);
@@ -989,6 +1034,11 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
         }
     }
 
+    char tmpCwd[256];
+    getcwd(tmpCwd, sizeof(tmpCwd));
+    strcat(bigList, "\nRoot dir: ");
+    strcat(bigList, tmpCwd);
+
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", bigList, NULL);
 
     if (doInstall) {
@@ -998,7 +1048,7 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
 
 void InstallHelper_SetCwd()
 {
-#if (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#if (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
     const char *homedir;
     char fname[256];
 
@@ -1012,74 +1062,28 @@ void InstallHelper_SetCwd()
 
     int found_override = 0;
     
-    char* data_home;
-    if ((data_home = getenv("OPENJKDF2_ROOT")) != NULL) {
-        snprintf(fname, 256, "%s/resource/jk_.cd", data_home);
+    char data_home[256];
+    found_override = InstallHelper_GetLocalDataDir(data_home, sizeof(data_home), 0);
 
-        // Always override
+    stdFnames_MakePath(fname, 256, data_home, "resource/jk_.cd");
+
+    // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
+    if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
         InstallHelper_UseLocalData();
         found_override = 1;
     }
-    
-    if (!found_override && (data_home = getenv("XDG_DATA_HOME")) != NULL) {
-        snprintf(fname, 256, "%s/openjkdf2/resource/jk_.cd", data_home);
 
-        // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
-        if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
-            InstallHelper_UseLocalData();
-            found_override = 1;
-        }
-        else {
-            printf("Running from current working directory.\n");
-        }
-    }
-    else if (!found_override) {
-        if ((homedir = getenv("HOME")) == NULL) {
-            homedir = getpwuid(getuid())->pw_dir;
-        }
-        
-        if (homedir) {
-            snprintf(fname, 256, "%s/.local/share/openjkdf2/resource/jk_.cd", homedir);
-
-            // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
-            if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
-                InstallHelper_UseLocalData();
-                found_override = 1;
-            }
-            else {
-                printf("Running from current working directory.\n");
-            }
-        }
-        else {
-            printf("Running from current working directory.\n");
-        }
-    }
-
-#elif defined(WIN32) && defined(SDL2_RENDER)
-    const char *homedir;
-    char fname[256];
-    if ((homedir = getenv("OPENJKDF2_ROOT")) != NULL) {
-        strcpy(fname, homedir);
-        strcat(fname, "\\resource\\jk_.cd");
-
-        // This will be forced
-        InstallHelper_UseLocalData();
-    }
-    else if ((homedir = getenv("AppData")) != NULL) {
-        strcpy(fname, homedir);
-        strcat(fname, "\\Local\\openjkdf2\\resource\\jk_.cd");
-
-        if (util_FileExists(fname) && !util_FileExists("resource\\jk_.cd")) {
-            InstallHelper_UseLocalData();
-        }
-        else {
-            printf("Running from current working directory.\n");
-        }
-    }
-    else {
+    if (!found_override) {
         printf("Running from current working directory.\n");
     }
-#endif // (defined(MACOS) || defined(LINUX)) && defined(SDL2_RENDER)
+
+    // If we can tell that we're loading MoTS assets, enable Main_bMotsCompat
+    int keyval = jkRes_ReadKeyRawEarly();
+    if (JKRES_IS_MOTS_MAGIC(keyval)) {
+        Main_bMotsCompat = 1;
+    }
+
+#endif // (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
     /*if (!util_FileExists("resource/jk_.cd")) {
@@ -1090,6 +1094,8 @@ void InstallHelper_SetCwd()
     if (!util_FileExists("resource/jk_.cd")) {
         InstallHelper_CheckRequiredAssets(1);
     }
+
+    stdFileUtil_MkDir("mods");
 #endif
 }
 

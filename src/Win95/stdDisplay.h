@@ -56,6 +56,8 @@ static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 //static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;
 
+extern rdColor24 stdDisplay_masterPalette[256];
+
 #ifndef SDL2_RENDER
 static int (*stdDisplay_Startup)() = (void*)stdDisplay_Startup_ADDR;
 static int (*stdDisplay_VBufferFill)(stdVBuffer *a2, int fillColor, rdRect *a4) = (void*)stdDisplay_VBufferFill_ADDR;
@@ -80,7 +82,6 @@ static stdVBuffer* (*stdDisplay_VBufferConvertColorFormat)(void* a, stdVBuffer* 
 static int (*stdDisplay_GammaCorrect3)(int a1) = (void*)stdDisplay_GammaCorrect3_ADDR;
 #else
 extern uint32_t Video_menuTexId;
-extern rdColor24 stdDisplay_masterPalette[256];
 
 int stdDisplay_Startup();
 int stdDisplay_VBufferFill(stdVBuffer *a2, int fillColor, rdRect *a4);

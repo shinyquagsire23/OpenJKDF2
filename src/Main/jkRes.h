@@ -37,6 +37,9 @@ void jkRes_HookHS();
 void jkRes_UnhookHS();
 int jkRes_FileExists(const char *fpath, char *a2, int len);
 
+int jkRes_ReadKeyFromFile(const char* fpath); // Added
+int jkRes_ReadKeyRaw(); // Added
+int jkRes_ReadKeyRawEarly(); // Added
 int jkRes_ReadKey();
 int jkRes_LoadNew(jkResGob *resGob, char *name, int a3);
 int jkRes_NewGob(jkResGob *gobFullpath, char *gobFolder, char *gobFname);

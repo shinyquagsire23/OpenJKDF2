@@ -237,8 +237,6 @@ int Main_Startup(const char *cmdline)
     Main_bDevMode = 0;
     jkGuiSound_musicVolume = 1.0;
     Main_ParseCmdLine((char *)cmdline);
-    stdStartup(&hs); // Added
-    InstallHelper_SetCwd(); // Added
 
     if ( Main_logLevel == 1 )
     {
@@ -284,6 +282,9 @@ int Main_Startup(const char *cmdline)
             hs.errorPrint = Main_FPrintf;
         }
     }
+    stdStartup(&hs); // Added
+    InstallHelper_SetCwd(); // Added
+    
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     //stdStartup(&hs); // Moved
 

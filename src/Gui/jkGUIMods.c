@@ -1,0 +1,155 @@
+#include "jkGUIMods.h"
+
+#include "General/stdBitmap.h"
+#include "General/stdFont.h"
+#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "stdPlatform.h"
+#include "jk.h"
+#include "Gui/jkGUIRend.h"
+#include "Gui/jkGUI.h"
+#include "World/jkPlayer.h"
+#include "Main/jkStrings.h"
+#include "General/stdFnames.h"
+#include "General/Darray.h"
+#include "Gui/jkGUITitle.h"
+#include "Gui/jkGUISingleplayer.h"
+#include "Gui/jkGUIMultiplayer.h"
+#include "Gui/jkGUIDialog.h"
+#include "Gui/jkGUIPlayer.h"
+#include "Gui/jkGUISetup.h"
+#include "Gui/jkGUIMods.h"
+#include "Win95/stdComm.h"
+#include "Win95/stdGdi.h"
+#include "Win95/Windows.h"
+#include "Main/Main.h"
+#include "Main/jkMain.h"
+#include "Main/jkRes.h"
+#include "General/stdString.h"
+#include "General/util.h"
+#include "General/stdFnames.h"
+#include "General/stdFileUtil.h"
+#include "stdPlatform.h"
+#include "Main/InstallHelper.h"
+
+static uint32_t jkGuiMods_listboxIdk[2] = {0xd, 0xe};
+
+static jkGuiElement jkGuiMods_cutscenesElements[7] = {
+    {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_LISTBOX, 1, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxIdk, {0}, 0},
+    
+    {ELEMENT_TEXT, 0, 2, L"This menu is not functional yet.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 10, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+
+    {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {340, 420, 140, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {150, 420, 180, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
+};
+
+static jkGuiMenu jkGuiMods_cutscenesMenu = {jkGuiMods_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+
+static int jkGuiMods_bInitted;
+
+void jkGuiMods_Show()
+{
+    char *v0; // ebx
+    char *v1; // ebp
+    char *v2; // edx
+    wchar_t *v3; // eax
+    int v4; // eax
+    const char *v5; // eax
+    const char *v6; // eax
+    int v7; // esi
+    void *i; // eax
+    int v9; // [esp+10h] [ebp-15Ch]
+    Darray darray; // [esp+14h] [ebp-158h] BYREF
+    char v11[64]; // [esp+2Ch] [ebp-140h] BYREF
+    char v12[256]; // [esp+6Ch] [ebp-100h] BYREF
+
+    if ( !jkGuiMods_bInitted )
+        jkGui_InitMenu(&jkGuiMods_cutscenesMenu, jkGui_stdBitmaps[3]);
+    jkGuiMods_bInitted = 1;
+
+    jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+    jkGuiRend_DarrayNewStr(&darray, 32, 1);
+    
+    jkGuiMods_PopulateEntries(&darray, &jkGuiMods_cutscenesElements[1]);
+
+    v4 = -1;
+    do
+    {
+        jkGuiRend_MenuSetLastElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[2]);
+        jkGuiRend_SetDisplayingStruct(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[3]);
+        v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_cutscenesMenu);
+        
+        if (v4 == 10) {
+#ifdef SDL2_RENDER
+            char tmpCwd[256];
+            char tmpUrl[512];
+            getcwd(tmpCwd, sizeof(tmpCwd));
+            snprintf(tmpUrl, sizeof(tmpUrl), "file://%s", tmpCwd);
+            SDL_OpenURL(tmpUrl);
+#endif
+        }
+        else if ( v4 == 1 )
+        {
+            v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMods_cutscenesElements[1].selectedTextEntry);
+            snprintf(v12, 256, "mods%c%s", '\\', v5); // Added: sprintf -> snprintf
+
+            printf("Selected entry %u, %s\n", jkGuiMods_cutscenesElements[1].selectedTextEntry, v12);
+        }
+    }
+    while ( v4 != -1 );
+
+    v7 = 0;
+    for ( i = (void *)jkGuiRend_GetId(&darray, 0); i; i = (void *)jkGuiRend_GetId(&darray, v7) )
+    {
+        //pHS->free(i);
+        ++v7;
+    }
+}
+
+void jkGuiMods_AddEntry(Darray *list, jkGuiElement *element, const char* val)
+{
+    size_t alloc_sz = (_strlen(val) + 1) * sizeof(wchar_t);
+
+    wchar_t* out = (wchar_t *)pHS->alloc(alloc_sz);
+    memset(out, 0, alloc_sz);
+
+    stdString_CharToWchar(out, val, _strlen(val));
+    jkGuiRend_DarrayReallocStr(list, out, (intptr_t)val);
+    pHS->free(out);
+}
+
+void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element)
+{
+    char tmpCwd[256];
+    char tmpKeyPath[256];
+    Main_bMotsCompat = !Main_bMotsCompat;
+    InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
+    Main_bMotsCompat = !Main_bMotsCompat;
+
+    
+    stdFnames_MakePath(tmpKeyPath, 256, tmpCwd, "resource/jk_.cd");
+    int keyval = jkRes_ReadKeyFromFile(tmpKeyPath);
+    printf("%s %x\n", tmpKeyPath, keyval);
+    if (keyval == 0 || !JKRES_IS_MOTS_MAGIC(keyval)) {
+        jkGuiMods_AddEntry(list, element, "Install Mysteries of the Sith");
+    }
+    else {
+        jkGuiMods_AddEntry(list, element, "Launch Mysteries of the Sith");
+    }
+
+    stdFileSearchResult modResult;
+    stdFileSearch* pSearch = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
+    while (stdFileUtil_FindNext(pSearch, &modResult))
+    {
+        if ( modResult.fpath[0] != '.' )
+        {
+            jkGuiMods_AddEntry(list, element, modResult.fpath);
+        }
+    }
+
+    jkGuiRend_AddStringEntry(list, 0, 0);
+    jkGuiRend_SetClickableString(element, list);
+    element->selectedTextEntry = 0;
+}

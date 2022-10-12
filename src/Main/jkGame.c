@@ -142,7 +142,9 @@ int jkGame_Update()
 #endif
         rdSetColorEffects(&stdPalEffects_state.effect);
 
+#ifdef SDL2_RENDER
     _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
+#endif
     rdAdvanceFrame();
 #ifndef SDL2_RENDER
     if ( Video_modeStruct.b3DAccel )

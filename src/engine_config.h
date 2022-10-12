@@ -87,11 +87,28 @@
 #define NUM_JKPLAYER_THINGS (16)
 #endif
 
+//
+// Resource configuration
+//
 #define JKRES_GOB_EXT (Main_bMotsCompat ? "goo" : "gob")
-#define JKRES_MAGIC_0 (Main_bMotsCompat ? 0x3B426929 : 0x69973284)
-#define JKRES_MAGIC_1 (Main_bMotsCompat ? 0x3B426929 : 0x699232C4)
-#define JKRES_MAGIC_2 (Main_bMotsCompat ? 0x3B426929 : 0x69923384)
-#define JKRES_MAGIC_3 (Main_bMotsCompat ? 0x3B426929 : 0x69923284)
+
+#define JKRES_DF2_MAGIC_0 0x69973284
+#define JKRES_DF2_MAGIC_1 0x699232C4
+#define JKRES_DF2_MAGIC_2 0x69923384
+#define JKRES_DF2_MAGIC_3 0x69923284
+
+#define JKRES_MOTS_MAGIC_0 0x3B426929
+#define JKRES_MOTS_MAGIC_1 0x3B426929
+#define JKRES_MOTS_MAGIC_2 0x3B426929
+#define JKRES_MOTS_MAGIC_3 0x3B426929
+
+#define JKRES_MAGIC_0 (Main_bMotsCompat ? JKRES_MOTS_MAGIC_0 : JKRES_DF2_MAGIC_0)
+#define JKRES_MAGIC_1 (Main_bMotsCompat ? JKRES_MOTS_MAGIC_1 : JKRES_DF2_MAGIC_1)
+#define JKRES_MAGIC_2 (Main_bMotsCompat ? JKRES_MOTS_MAGIC_2 : JKRES_DF2_MAGIC_2)
+#define JKRES_MAGIC_3 (Main_bMotsCompat ? JKRES_MOTS_MAGIC_3 : JKRES_DF2_MAGIC_3)
+
+#define JKRES_IS_MOTS_MAGIC(kval) ((kval == JKRES_MOTS_MAGIC_0) || (kval == JKRES_MOTS_MAGIC_1) || (kval == JKRES_MOTS_MAGIC_2) || (kval == JKRES_MOTS_MAGIC_3))
+#define JKRES_IS_DF2_MAGIC(kval) ((kval == JKRES_DF2_MAGIC_0) || (kval == JKRES_DF2_MAGIC_1) || (kval == JKRES_DF2_MAGIC_2) || (kval == JKRES_DF2_MAGIC_3))
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER

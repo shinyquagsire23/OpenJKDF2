@@ -221,16 +221,37 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
     return 1;
 }
 
-int jkRes_ReadKey()
+// Added
+int jkRes_ReadKeyFromFile(const char* fpath)
 {
     int keyval;
 
-    stdFile_t fd = pHS->fileOpen("jk_.cd", "rb");
+    stdFile_t fd = pHS->fileOpen(fpath, "rb");
     if (!fd)
         return 0;
 
+    keyval = 0;
     pHS->fileRead(fd, &keyval, 4);
     pHS->fileClose(fd);
+    return keyval;
+}
+
+// Added
+int jkRes_ReadKeyRaw()
+{
+    return jkRes_ReadKeyFromFile("jk_.cd");
+}
+
+// Added
+int jkRes_ReadKeyRawEarly()
+{
+    return jkRes_ReadKeyFromFile("resource/jk_.cd");
+}
+
+int jkRes_ReadKey()
+{
+    int keyval = jkRes_ReadKeyRaw();
+
     if (keyval == JKRES_MAGIC_0)
     {
         return 0;

@@ -97,8 +97,32 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
     }
 }
 
+// https://stackoverflow.com/questions/1517685/recursive-createdirectory
+int TryCreateDirectory(LPCSTR lpPathName)
+{
+    char *p;
+    int b;
+
+    if( !(b = CreateDirectoryA(lpPathName, 0))
+        && !(b = NULL ==(p = strrchr(lpPathName, '\\')))
+        )
+    {
+        size_t i;
+
+        (p=strncpy((char *)malloc(1+i), lpPathName, i=p-lpPathName))[i] = '\0';
+        b = TryCreateDirectory(p);
+        free(p);
+        b = b ? CreateDirectoryA(lpPathName, 0) : 0;
+    }
+
+    return b;
+}
+
 BOOL stdFileUtil_MkDir(LPCSTR lpPathName)
 {
+    // Added
+    TryCreateDirectory(lpPathName);
+
     return CreateDirectoryA(lpPathName, 0);
 }
 
@@ -296,6 +320,25 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
     }
 }
 
+// https://stackoverflow.com/questions/2336242/recursive-mkdir-system-call-on-unix
+static void _mkdir(const char *dir, int perms) {
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+    for (p = tmp + 1; *p; p++)
+        if (*p == '/') {
+            *p = 0;
+            mkdir(tmp, perms);
+            *p = '/';
+        }
+    mkdir(tmp, perms);
+}
+
 int stdFileUtil_MkDir(char* path)
 {
     char tmp[512];
@@ -315,7 +358,7 @@ int stdFileUtil_MkDir(char* path)
     }
 #endif
 
-    mkdir(tmp, 0777);
+    _mkdir(tmp, 0777);
 
     return 1;
 }

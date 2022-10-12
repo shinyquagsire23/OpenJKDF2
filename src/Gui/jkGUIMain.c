@@ -17,6 +17,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIPlayer.h"
 #include "Gui/jkGUISetup.h"
+#include "Gui/jkGUIMods.h"
 #include "Win95/stdComm.h"
 #include "Win95/stdGdi.h"
 #include "Win95/Windows.h"
@@ -43,14 +44,19 @@ static jkGuiElement jkGuiMain_cutscenesElements[5] = {
 
 static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-static jkGuiElement jkGuiMain_elements[8] = {
+static jkGuiElement jkGuiMain_elements[9] = {
     {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 0xA0, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 0xDC, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {0x14, 0x17C, 0x96, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {0xFA, 0x17C, 0x96, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 13, 2, "GUI_SETUP", 3, {0x1D6, 0x17C, 0x96, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {0xFA, 0x1A4, 0x96, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {20, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {250, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 13, 2, "GUI_SETUP", 3, {470, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#ifdef QOL_IMPROVEMENTS
+    {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {130, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 17, 2, L"Expansions & Mods", 3, {370, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#else
+    {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {250, 420, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#endif
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
@@ -109,6 +115,12 @@ LABEL_12:
                 case 16:
                     jkMain_SwitchTo13();
                     break;
+#ifdef QOL_IMPROVEMENTS
+                case 17:
+                    jkGuiMods_Show();
+                    v1 = -1;
+                    break;
+#endif
                 default:
                     break;
             }
