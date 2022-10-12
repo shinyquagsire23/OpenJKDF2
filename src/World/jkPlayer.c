@@ -947,8 +947,6 @@ int jkPlayer_GetChoice()
 //MOTS altered
 float jkPlayer_CalcAlignment(int isMp)
 {
-    double v9; // st7
-
     if (jkPlayer_GetChoice() == 1)
         return 100.0;
     if (jkPlayer_GetChoice() == 2)
@@ -964,7 +962,9 @@ float jkPlayer_CalcAlignment(int isMp)
         if (totalPeds <= 0.0) // Prevent div 0
             alignment -= -20.0;
         else
-            alignment -= (pedsKilled / totalPeds * 100.0) - -20.0;
+            alignment = (alignment - (pedsKilled / totalPeds) * 100.0) - -20.0;
+            //alignment -= (pedsKilled / totalPeds * 100.0) - -20.0;
+            // These are different between MinGW and Clang??
     }
 
     // TODO macro?
@@ -1571,12 +1571,14 @@ float jkPlayer_CalcStarsAlign()
 
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
-        alignment -= sithPlayer_GetBinAmt(i) * 6.25;
+        float amt = sithPlayer_GetBinAmt(i);
+        alignment -= amt * 6.25;
     }
     
     for (int j = SITHBIN_F_HEALING; j <= SITHBIN_F_ABSORB; ++j )
     {
-        alignment -= sithPlayer_GetBinAmt(j) * -6.25;
+        float amt = sithPlayer_GetBinAmt(j);
+        alignment -= amt * -6.25;
     }
     
     return alignment;
