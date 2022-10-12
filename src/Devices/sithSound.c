@@ -169,7 +169,9 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
 
             sound->sound_len = frequencyKHz;
             if ( sound->bitsPerSample == 16 )
-                sound->sound_len = frequencyKHz >> 1;
+                sound->sound_len = frequencyKHz / 2;
+            if ( sound->bitsPerSample == 24 ) // Added
+                sound->sound_len = frequencyKHz / 3;
             if ( sound->bStereo )
                 sound->sound_len = sound->sound_len >> 1;
             sound->isLoaded = 0;

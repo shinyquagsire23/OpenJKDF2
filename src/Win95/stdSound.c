@@ -28,18 +28,27 @@ uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPe
         *nSamplesPerSec = v10.nSamplesPerSec;
         *bitsPerSample = 8 * (v10.nBlockAlign / (int)v10.nChannels);
         *bStereo = v10.nChannels == 2;
+
         if (seekPos > 0x10 )
             std_pHS->fseek(sound_file, seekPos - 16, 1);
+
         std_pHS->fseek(sound_file, 4, 1);
         std_pHS->fileRead(sound_file, &seekPos, 4);
         v8 = std_pHS->ftell(sound_file);
         *seekOffset = v8;
         result = seekPos;
+#ifdef AL_FORMAT_WAVE_EXT
+        //*seekOffset = 0;
+        //result += v8;
+#endif
     }
     return result;
 }
 
 #ifdef OPENAL_SOUND
+
+#define AL_FORMAT_MONO24 (0xFFFF0000)
+#define AL_FORMAT_STEREO24 (0xFFFF0001)
 
 ALCdevice *device;
 ALCcontext *context;
@@ -152,13 +161,37 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16
     int format = 0;
     if (bStereo)
     {
-        format = (bitsPerSample == 16 ? AL_FORMAT_STEREO16 : AL_FORMAT_STEREO8);
+        switch (bitsPerSample) {
+            case 8:
+                format = AL_FORMAT_STEREO8;
+                break;
+            case 16:
+                format = AL_FORMAT_STEREO16;
+                break;
+            case 24:
+                format = AL_FORMAT_STEREO24;
+                break;
+        }
     }
     else
     {
-        format = (bitsPerSample == 16 ? AL_FORMAT_MONO16 : AL_FORMAT_MONO8);
+        switch (bitsPerSample) {
+            case 8:
+                format = AL_FORMAT_MONO8;
+                break;
+            case 16:
+                format = AL_FORMAT_MONO16;
+                break;
+            case 24:
+                format = AL_FORMAT_MONO24;
+                break;
+        }
     }
     
+#ifdef AL_FORMAT_WAVE_EXT
+    //format = AL_FORMAT_WAVE_EXT;
+#endif
+
     out->format = format;
     
     return out;
@@ -188,8 +221,36 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
 
 int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead)
 {
-    if (!Main_bHeadless)
-        alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
+    if (Main_bHeadless) return 1;
+    
+    if (sound->format == AL_FORMAT_STEREO24 || sound->format == AL_FORMAT_MONO24)
+    {
+        void* tmp = std_pHS->alloc(sound->bufferBytes);
+        memcpy(tmp, sound->data, sound->bufferBytes);
+        memset(sound->data, 0, sound->bufferBytes);
+
+        uint8_t* tmp_8 = tmp;
+        int16_t* out_16 = sound->data;
+        for (size_t i = 0; i < sound->bufferBytes / 3; i += 1)
+        {
+            uint32_t val = 0;
+
+            val = val | *(tmp_8++);
+            val = val | (*(tmp_8++) << 8);
+            val = val | (*(tmp_8++) << 16);
+
+            int32_t val_int = *(int32_t*)&val;
+
+            val_int = val_int >> 8;
+            *(out_16++) = val_int;
+        }
+
+        sound->bufferBytes = (sound->bufferBytes / 3) * 2;
+        sound->format = AL_FORMAT_STEREO16;
+        free(tmp);
+    }
+
+    alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
 
     return 1;
 }
