@@ -1217,7 +1217,14 @@ void std3D_DrawMenu()
         std3D_DrawMenuSubrect((menu_w / 2) - 128, menu_h - 64, 256, 64, (Window_xSize / 2) - (128*hudScale), Window_ySize - 64*hudScale, hudScale);
 
         // Text
-        std3D_DrawMenuSubrect((menu_w / 2) - 256, 0, 512, 128, (Window_xSize / 2) - (256*hudScale), 0, hudScale);
+        float textScale = hudScale;
+        if (jkDev_dword_55A9C8 > 11) {
+            textScale *= 11.0 / (float)jkDev_dword_55A9C8;
+        }
+        float textWidth = menu_w - (48*2);
+        float textHeight = jkDev_dword_55A9C8 * 5;
+        float destTextWidth = textWidth * textScale;
+        std3D_DrawMenuSubrect(48, 0, menu_w - (48*2), textHeight, (Window_xSize / 2) - (destTextWidth / 2), 0, textScale);
 
         // Active forcepowers/items
         std3D_DrawMenuSubrect(menu_w - 48, 0, 48, 128, Window_xSize - (48*hudScale), 0, hudScale);

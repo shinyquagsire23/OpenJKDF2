@@ -98,6 +98,9 @@ int jkDev_Open()
 
     _memcpy(&a1, &stdDisplay_pCurVideoMode->format, sizeof(a1));
     a1.height = 5 * jkDev_dword_55A9C8;
+#ifdef SDL2_RENDER
+    a1.width -= (48*2); // Make sure the hud scaling doesn't cause overlap
+#endif
 
     jkDev_vbuf = stdDisplay_VBufferNew(&a1, 1, 0, 0);
     v3 = jkHud_pMsgFontSft->bitmap;
