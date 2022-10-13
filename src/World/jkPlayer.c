@@ -698,7 +698,7 @@ void jkPlayer_DrawPov()
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
 #ifdef SDL2_RENDER
-            rdSetZBufferMethod(0); // Added: force polyline to be underneath model
+            rdSetZBufferMethod(1); // Added: force polyline to be underneath model
 #endif
             jkSaber_Draw(&viewMat);
         }
