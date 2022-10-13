@@ -337,7 +337,7 @@ void main(void)
 
     if (blend_mode == 5 || blend_mode == 6)
     {
-        should_write_normals = 0.0;
+        should_write_normals = main_color.a;
     }
 
     if (blend_mode == 6)
