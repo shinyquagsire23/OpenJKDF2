@@ -694,24 +694,29 @@ void jkPlayer_DrawPov()
         rdMatrix_PreTranslate34(&viewMat, &trans);
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
+        // Moved: see below.
+#ifndef SDL2_RENDER
         // Render saber if applicable
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
-#ifdef SDL2_RENDER
-            // Added: we want the polyline to render in draw order so the spheres don't clip, 
-            // but we want the POV model to be aware of the depths still.
-            rdSetZBufferMethod(RD_ZBUFFER_NOREAD_WRITE);
-#endif
             jkSaber_Draw(&viewMat);
         }
+#endif
         
+        rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
+        rdCache_Flush();
+
+        // Added: we want the polyline to render in draw order so the spheres don't clip, 
+        // but we want the POV model to be aware of the depths still.
 #ifdef SDL2_RENDER
+        if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
+        {
+            rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+            jkSaber_Draw(&viewMat);
+        }
         rdCache_Flush(); // Added: force polyline to be underneath model
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
-
-        rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
-        rdCache_Flush();
     }
 }
 
