@@ -185,7 +185,11 @@ void sithCamera_FollowFocus(sithCamera *cam)
         case 1:
             // MOTS added: scope zoom
 #ifdef JKM_CAMERA
-            if (cam->bZoomed) {
+#ifndef QOL_IMPROVEMENTS
+            // Redundant
+            if (cam->bZoomed) 
+#endif
+            {
                 sithCamera_UpdateZoom(cam);
             }
             rdCamera_SetMipmapScalar(cam->invZoomScale);
@@ -623,7 +627,14 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
     int local_4;
     
     if (!pCamera->rdCam.canvas) return;
-    if (!pCamera->bZoomed) return;
+    if (!pCamera->bZoomed) {
+#ifdef QOL_IMPROVEMENTS
+        if (Main_bMotsCompat) {
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale);
+        }
+#endif
+        return;
+    }
 
     fVar1 = pCamera->rdCam.fov;
     fVar2 = pCamera->zoomFov - fVar1;
