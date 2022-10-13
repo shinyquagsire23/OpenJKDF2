@@ -2367,6 +2367,7 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 
 int std3D_ClearZBuffer()
 {
+    glClear(GL_DEPTH_BUFFER_BIT);
     return 1;
 }
 

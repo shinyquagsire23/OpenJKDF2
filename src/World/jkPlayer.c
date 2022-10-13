@@ -30,6 +30,7 @@
 #include "jk.h"
 #include "Win95/Window.h"
 #include "General/stdJSON.h"
+#include "Platform/std3D.h"
 
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
@@ -656,10 +657,18 @@ void jkPlayer_DrawPov()
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
+#ifdef SDL2_RENDER
+        // Force weapon to draw in front of scene
+        std3D_ClearZBuffer();
+        rdSetZBufferMethod(2); // set 2 to have guns clip through walls
+        rdSetSortingMethod(2);
+        rdSetOcclusionMethod(0);
+#else
         // Force weapon to draw in front of scene
         rdSetZBufferMethod(0); // set 2 to have guns clip through walls
         rdSetSortingMethod(2);
         rdSetOcclusionMethod(0);
+#endif
 
         float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
         if ( ambLight < 0.0 )
@@ -688,9 +697,16 @@ void jkPlayer_DrawPov()
         // Render saber if applicable
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
+#ifdef SDL2_RENDER
+            rdSetZBufferMethod(0); // Added: force polyline to be underneath model
+#endif
             jkSaber_Draw(&viewMat);
         }
+        
+#ifdef SDL2_RENDER
         rdCache_Flush(); // Added: force polyline to be underneath model
+        rdSetZBufferMethod(2);
+#endif
 
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
         rdCache_Flush();
