@@ -94,9 +94,9 @@ void rdSetOcclusionMethod(int a1)
     rdroid_curOcclusionMethod = a1;
 }
 
-void rdSetZBufferMethod(int a1)
+void rdSetZBufferMethod(rdZBufferMethod_t val)
 {
-    rdroid_curZBufferMethod = a1;
+    rdroid_curZBufferMethod = val;
 }
 
 void rdSetCullFlags(int a1)

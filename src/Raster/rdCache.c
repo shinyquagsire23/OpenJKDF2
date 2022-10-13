@@ -123,7 +123,7 @@ void rdCache_Flush()
         else if ( rdroid_curZBufferMethod )
         {
 
-            if ( rdroid_curZBufferMethod == 2 )
+            if ( rdroid_curZBufferMethod == RD_ZBUFFER_READ_WRITE )
             {
                 for (v1 = 0; v1 < rdCache_numProcFaces; v1++)
                 {
@@ -279,16 +279,20 @@ int rdCache_SendFaceListToHardware()
     v130 = 0;
     v129 = 0;
     alpha_is_opaque = 0;
-    flags_idk = 0x33;
+    
     switch ( rdroid_curZBufferMethod )
     {
-        case 1:
+        case RD_ZBUFFER_NOREAD_NOWRITE:
+        default:
+            flags_idk = 0x33;
+            break;
+        case RD_ZBUFFER_NOREAD_WRITE:
             flags_idk = 0x1033;
             break;
-        case 2:
+        case RD_ZBUFFER_READ_WRITE:
             flags_idk = 0x1833;
             break;
-        case 3:
+        case RD_ZBUFFER_READ_NOWRITE:
             flags_idk = 0x833;
             break;
     }

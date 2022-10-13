@@ -525,10 +525,10 @@ int jkGuiBuildMulti_DisplayModel()
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &jkGuiBuildMulti_colormap);
     rdColormap_SetCurrent(&jkGuiBuildMulti_colormap);
     rdSetRenderOptions(jkGuiBuildMulti_renderOptions);
-    rdSetGeometryMode(4);
-    rdSetLightingMode(3);
-    rdSetTextureMode(1);
-    rdSetZBufferMethod(2);
+    rdSetGeometryMode(RD_GEOMODE_TEXTURED);
+    rdSetLightingMode(RD_LIGHTMODE_GOURAUD);
+    rdSetTextureMode(RD_TEXTUREMODE_PERSPECTIVE);
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
     rdSetSortingMethod(0);
     rdSetOcclusionMethod(0);
     v1.format.bpp = 8;

@@ -103,7 +103,7 @@ rdroid_pHS 0x00889EA4 struct HostServices*
 rdroid_curGeometryMode 0x00889EA8 int
 rdroid_curColorEffects 0x00889EC0 stdPalEffect
 rdroid_curOcclusionMethod 0x00889EE8 int
-rdroid_curZBufferMethod 0x00889EEC int
+rdroid_curZBufferMethod 0x00889EEC rdZBufferMethod_t
 rdroid_curProcFaceUserData 0x00889EF0 int
 rdroid_curSortingMethod 0x00889EF4 int
 rdroid_curAcceleration 0x00889EF8 int

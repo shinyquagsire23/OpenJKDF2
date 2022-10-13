@@ -46,7 +46,7 @@ void rdSetLightingMode(int a1);
 void rdSetTextureMode(int a1);
 void rdSetSortingMethod(int a1);
 void rdSetOcclusionMethod(int a1);
-void rdSetZBufferMethod(int a1);
+void rdSetZBufferMethod(rdZBufferMethod_t val);
 void rdSetCullFlags(int a1);
 void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);

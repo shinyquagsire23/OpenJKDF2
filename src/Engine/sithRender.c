@@ -648,14 +648,14 @@ void sithRender_RenderLevelGeometry()
 
     if ( rdroid_curAcceleration )
     {
-        rdSetZBufferMethod(2);
+        rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
         if (sithRender_flag & 0x80) {
             rdSetVertexColorMode(1);
         }
     }
     else
     {
-        rdSetZBufferMethod(1);
+        rdSetZBufferMethod(RD_ZBUFFER_NOREAD_WRITE);
         if ( (sithRender_flag & 0x20) != 0 )
             rdSetOcclusionMethod(0);
         else
@@ -1386,7 +1386,7 @@ void sithRender_RenderThings()
     uint32_t i; // [esp+14h] [ebp-8h]
     BOOL v16; // [esp+18h] [ebp-4h]
 
-    rdSetZBufferMethod(2);
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
     rdSetOcclusionMethod(0);
     rdSetVertexColorMode(0);
 
@@ -1621,7 +1621,7 @@ void sithRender_RenderAlphaSurfaces()
     float v31; // [esp+4h] [ebp-10h]
     sithSector *surfaceSector; // [esp+Ch] [ebp-8h]
 
-    rdSetZBufferMethod(2);
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
     rdSetOcclusionMethod(0);
     rdSetSortingMethod(2);
 

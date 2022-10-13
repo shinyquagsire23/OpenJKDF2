@@ -594,6 +594,15 @@ enum RD_TEXTUREMODE
     RD_TEXTUREMODE_4_UNK = 4
 };
 
+typedef int32_t rdZBufferMethod_t;
+enum RD_ZBUFFERMETHOD
+{
+    RD_ZBUFFER_NOREAD_NOWRITE = 0,
+    RD_ZBUFFER_NOREAD_WRITE = 1,
+    RD_ZBUFFER_READ_WRITE = 2,
+    RD_ZBUFFER_READ_NOWRITE = 3,
+};
+
 typedef uint32_t sithCogFlags_t;
 enum SithCogFlag
 {
