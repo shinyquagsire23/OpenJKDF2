@@ -176,7 +176,7 @@ LABEL_39:
                                     if ( rdKeyframe_LoadEntry(keyframe_fpath, keyframe) )
                                     {
                                         keyframe->id = world->numKeyframesLoaded;
-                                        if ( !(world->level_type_maybe & 1) )
+                                        if ( (world->level_type_maybe & 1) )
                                         {
                                             keyframe->id |= 0x8000u;
                                         }

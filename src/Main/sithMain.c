@@ -227,6 +227,16 @@ void sithMain_SetEndLevel()
 // MOTS altered
 int sithMain_Tick()
 {
+    if (sithWorld_pCurrentWorld) {
+        for (int i = 0; i < sithWorld_pCurrentWorld->numKeyframesLoaded; i++) {
+            rdKeyframe* keyframe = &sithWorld_pCurrentWorld->keyframes[i];
+            if (keyframe->id != i) {
+                printf("BAD KEYFRAME!! %d -> %d\n", i, keyframe->id);
+            }
+        }
+        
+    }
+    
     if ( (g_submodeFlags & 8) != 0 )
     {
         sithTime_Tick();

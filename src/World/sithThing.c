@@ -1101,7 +1101,6 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     sithSector *v2; // eax
     sithThing *result; // eax
     sithThing *v4; // edi
-    sithSector *v5; // [esp-10h] [ebp-40h]
     rdVector3 diffVec; // [esp+Ch] [ebp-24h] BYREF
     rdVector3 v7; // [esp+18h] [ebp-18h] BYREF
     rdVector3 dstVec; // [esp+24h] [ebp-Ch] BYREF
@@ -1116,9 +1115,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     }
     else
     {
-        diffVec.x = 0.0;
-        diffVec.y = 0.0;
-        diffVec.z = 0.0;
+        rdVector_Zero3(&diffVec);
     }
     if ( spawnThing->rdthing.type == RD_THINGTYPE_MODEL )
     {
@@ -1130,19 +1127,12 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     }
     else
     {
-        v7.x = 0.0;
-        v7.y = 0.0;
-        v7.z = 0.0;
+        rdVector_Zero3(&v7);
     }
-    diffVec.x = diffVec.x - v7.x;
-    diffVec.y = diffVec.y - v7.y;
-    diffVec.z = diffVec.z - v7.z;
+    rdVector_Sub3Acc(&diffVec, &v7);
     rdMatrix_TransformVector34(&dstVec, &diffVec, &spawnThing->lookOrientation);
-    v7.x = dstVec.x + spawnThing->position.x;
-    v5 = spawnThing->sector;
-    v7.y = spawnThing->position.y + dstVec.y;
-    v7.z = spawnThing->position.z + dstVec.z;
-    v2 = sithCollision_GetSectorLookAt(v5, &spawnThing->position, &v7, 0.0);
+    rdVector_Add3(&v7, &dstVec, &spawnThing->position);
+    v2 = sithCollision_GetSectorLookAt(spawnThing->sector, &spawnThing->position, &v7, 0.0);
     result = sithThing_Create(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )

@@ -15,8 +15,7 @@
 #include "AI/sithAI.h"
 #include "jk.h"
 
-
-static const char* sithPuppet_animNames[43] = {
+static const char* sithPuppet_animNames[43+2] = {
     "--RESERVED--",
     "stand",
     "walk",
@@ -59,7 +58,11 @@ static const char* sithPuppet_animNames[43] = {
     "holster",
     "drawfists",
     "drawgun",
-    "drawsaber"
+    "drawsaber",
+
+    // MOTS
+    "charge",
+    "buttpunch"
 };
 
 int sithPuppet_Startup()
@@ -69,8 +72,8 @@ int sithPuppet_Startup()
 
     if ( sithPuppet_hashtable && sithPuppet_keyframesHashtable )
     {
-        sithPuppet_animNamesToIdxHashtable = stdHashTable_New(86);
-        for (int i = 1; i < 43; i++)
+        sithPuppet_animNamesToIdxHashtable = stdHashTable_New(SITHPUPPET_NUMANIMS * 2);
+        for (int i = 1; i < SITHPUPPET_NUMANIMS; i++)
         {
             stdHashTable_SetKeyVal(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)(intptr_t)i);
         }
@@ -179,7 +182,7 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback
         return -1;
     if ( anim < 0 )
         return -1;
-    if ( anim >= 43 )
+    if ( anim >= SITHPUPPET_NUMANIMS )
         return -1;
     v6 = thing->puppet;
     v7 = &v4->modes[v6->majorMode].keyframe[anim];

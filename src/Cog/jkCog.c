@@ -308,6 +308,7 @@ void jkCog_StopPovKey(sithCog *ctx)
     a1a = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopInt(ctx);
     actorThing = sithCogExec_PopThing(ctx);
+
     if ( actorThing )
     {
         if ( actorThing->type == SITH_THING_ACTOR || actorThing->type == SITH_THING_PLAYER )

@@ -28,11 +28,11 @@ int sithAIClass_New(sithWorld *world, int a2)
 {
     intptr_t result; // eax
 
-    result = (intptr_t)pSithHS->alloc(0x94C * a2); //TODO real struct sizes
+    result = (intptr_t)pSithHS->alloc(sizeof(sithAIClass) * a2);
     world->aiclasses = (sithAIClass *)result;
     if ( result )
     {
-        _memset((void *)result, 0, 0x94C * a2);
+        _memset((void *)result, 0, sizeof(sithAIClass) * a2);
         world->numAIClasses = a2;
         world->numAIClassesLoaded = 0;
         result = 1;

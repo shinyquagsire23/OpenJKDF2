@@ -53,7 +53,11 @@ enum SITH_ANIM
     SITH_ANIM_HOLSTER  = 39,
     SITH_ANIM_DRAWFISTS  = 40,
     SITH_ANIM_DRAWGUN  = 41,
-    SITH_ANIM_DRAWSABER  = 42
+    SITH_ANIM_DRAWSABER  = 42,
+
+    // MOTS
+    SITH_ANIM_CHARGE = 43,
+    SITH_ANIM_BUTTPUNCH = 44
 };
 
 typedef struct sithAnimclassEntry

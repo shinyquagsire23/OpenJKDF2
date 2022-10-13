@@ -22,17 +22,30 @@
 #define sithPuppet_sub_4E4A20_ADDR (0x004E4A20)
 #define sithPuppet_DefaultCallback_ADDR (0x004E4B10)
 
+#define SITHPUPPET_NUMANIMS (Main_bMotsCompat ? 45 : 43)
+
 struct sithPuppet
 {
-  int field_0;
-  int field_4;
-  int majorMode;
-  int currentAnimation;
-  sithAnimclassEntry* playingAnim;
-  int otherTrack;
-  int field_18;
-  int currentTrack;
-  int animStartedMs;
+    int field_0;
+    int field_4;
+    int majorMode;
+    int currentAnimation;
+    sithAnimclassEntry* playingAnim;
+    int otherTrack;
+    int field_18;
+    int currentTrack;
+    int animStartedMs;
+};
+
+enum RdAnimFlag
+{
+    ANIMFLAG_USE_PUPPET_FPS = 0x1,
+    ANIMFLAG_NOLOOP = 0x2,
+    ANIMFLAG_PAUSE_ON_LAST_FRAME = 0x4,
+    ANIMFLAG_RSTART_ACTIVE = 0x8,
+    ANIMFLAG_DISABLE_FADEIN = 0x10,
+    ANIMFLAG_FADEOUT_NOLOOP = 0x20,
+    ANIMFLAG_UNKNOWN40 = 0x40,
 };
 
 int sithPuppet_Startup();

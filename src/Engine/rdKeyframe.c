@@ -32,7 +32,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
     if (pKeyframeLoader)
         return (rdKeyframe*)pKeyframeLoader(fname);
 
-    keyframe = (rdKeyframe*)rdroid_pHS->alloc(0x84u);
+    keyframe = (rdKeyframe*)rdroid_pHS->alloc(sizeof(rdKeyframe));
     if (!keyframe)
         return NULL;
 

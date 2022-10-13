@@ -120,11 +120,13 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     }
     else
     {
-        v4 = puppet->tracks;
-        //if (thing->parentSithThing == g_localPlayerThing)
-        //    printf("%s\n", v4->keyframe->name);
         for (int i = 0; i < 4; i++)
         {
+            v4 = &puppet->tracks[i];
+
+            //if (thing->parentSithThing == sithPlayer_pLocalPlayerThing && v4->keyframe)
+            //    printf("%d %s (%x/%u) %p %x %f\n", i, v4->keyframe->name, v4->keyframe->id, v4->keyframe->id, v4->keyframe, v4->status, v4->playSpeed);
+
             // Added: joints check
             if ( v4->status && v4->keyframe && v4->keyframe->joints)
             {
@@ -132,46 +134,43 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 {
                     v8 = &v4->keyframe->joints[j];
                     v9 = 0;
-                    if ( v8->numAnimEntries )
-                    {
-                        // Added: this spot keeps crashing, add bounds checks
-                        if (v8->nodeIdx < 0 || v8->nodeIdx >= 64)
-                        {
-                            v8->nodeIdx = 0;
-                        }
+                    if (!v8->numAnimEntries) continue;
 
-                        v10 = v4->nodes[v8->nodeIdx];// nodeIdx
-                        if ( v10 != v8->numAnimEntries - 1 )
+                    // Added: this spot keeps crashing, add bounds checks
+                    if (v8->nodeIdx < 0 || v8->nodeIdx >= 64)
+                    {
+                        v8->nodeIdx = 0;
+                    }
+
+                    v10 = v4->nodes[v8->nodeIdx];// nodeIdx
+                    if ( v10 != v8->numAnimEntries - 1 )
+                    {
+                        v12 = v10 + 1;
+                        if ( v4->field_120 >= (double)v8->animEntries[v10 + 1].frameNum )
                         {
-                            v12 = v10 + 1;
-                            if ( v4->field_120 >= (double)v8->animEntries[v10 + 1].frameNum )
+                            v13 = &v8->animEntries[v10 + 2];
+                            do
                             {
-                                v13 = &v8->animEntries[v10 + 2];
-                                do
+                                if ( v12 == v8->numAnimEntries - 1 )
                                 {
-                                    if ( v12 == v8->numAnimEntries - 1 )
-                                    {
-                                        v9 = 1;
-                                    }
-                                    else if ( v4->field_120 >= (double)v13->frameNum )
-                                    {
-                                        ++v12;
-                                        v13++;
-                                    }
-                                    else
-                                    {
-                                        v9 = 1;
-                                    }
+                                    v9 = 1;
                                 }
-                                while ( !v9 );
-                                v4->nodes[j] = v12;
+                                else if ( v4->field_120 >= (double)v13->frameNum )
+                                {
+                                    ++v12;
+                                    v13++;
+                                }
+                                else
+                                {
+                                    v9 = 1;
+                                }
                             }
+                            while ( !v9 );
+                            v4->nodes[j] = v12;
                         }
                     }
-                    v8++;
                 }
             }
-            ++v4;
         }
 
         for (v80 = 0; v80 < model->numHierarchyNodes; v80++)
@@ -349,11 +348,6 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
     for (uint32_t v2 = 0; v2 < 4; v2++)
     {
         rdPuppetTrack* track = &puppet->tracks[v2];
-
-        // Added: prevent lingering tracks
-        if (track->playSpeed < 0.0)
-            track->playSpeed = 0.0;
-
         if (!track->status)
             continue;
 
@@ -368,9 +362,8 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
         if (track->status & 4)
         {
             track->playSpeed += track->fadeSpeed * deltaSeconds;
-            if ( track->playSpeed >= 1.0 ) // TODO verify
+            if ( track->playSpeed >= 1.0 ) // verified
             {
-                //printf("asdf1\n");
                 track->playSpeed = 1.0;
                 track->status &= ~0x4;
             }
@@ -378,14 +371,14 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
         else if (track->status & 8)
         {
             track->playSpeed -= track->fadeSpeed * deltaSeconds;
-            if ( track->playSpeed <= 0.0 ) // TODO verify
+            
+            //if (puppet->rdthing->parentSithThing == sithPlayer_pLocalPlayerThing)
+            //    printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
+            
+            if ( track->playSpeed <= 0.0 ) // verified
             {
-                //printf("asdf2\n");
                 if ( (track->status & 0x100) != 0 )
                 {
-                    // Added: prevent lingering tracks
-                    track->playSpeed = 0.0;
-
                     track->status &= ~0x8u;
                     track->status |= 0x10;
                 }
@@ -407,9 +400,9 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
 int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int highPri)
 {
     rdPuppetTrack *v4; // ecx
-    unsigned int newTrackIdx; // esi
+    int newTrackIdx; // esi
     rdPuppetTrack *v6; // eax
-    unsigned int result; // eax
+    int result; // eax
     rdPuppetTrack *newTrack; // edx
 
     v4 = puppet->tracks;
@@ -450,9 +443,9 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     newTrack->playSpeed = 0.0;
     
     // Added: Added in Grim Fandango, bounds checking
-    //if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
-    //    _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(int) * puppet->rdthing->model3->numHierarchyNodes);
-    //else
+    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
+        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
+    else
         _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(puppet->tracks[newTrackIdx].nodes));
     result = newTrackIdx;
     newTrack->field_120 = 0.0;
@@ -504,6 +497,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
     v22 = a3 + puppet->tracks[trackNum].field_124;
     v6 = (double)v4->numFrames;
     puppet->tracks[trackNum].field_120 = v22;
+
     if ( v22 >= v6 )
     {
         if (v5->status & 0x20)
@@ -516,17 +510,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
             puppet->tracks[trackNum].field_120 = v6;
             v5->status |= 0x10;
         }
-        else if ( !(v5->status & 0x80u) )
-        {
-            v21 = floorf(v22 / v6);
-            //v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
-            puppet->tracks[trackNum].field_120 -= (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
-            //_memset(&puppet->tracks[trackNum].nodes, 0, v11);
-
-            // Added: just clear the entire thing
-            _memset(&puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
-        }
-        else
+        else if ( v5->status & 0x80 )
         {
             puppet->tracks[trackNum].fadeSpeed = 4.0;
             puppet->tracks[trackNum].field_120 = v6;
@@ -534,6 +518,19 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
             v5->status |= 0x8;
             v5->status |= 0x10;
         }
+        else
+        {
+            v21 = floorf(v22 / v6);
+            size_t v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
+            puppet->tracks[trackNum].field_120 -= (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
+            
+            // Added: Added in Grim Fandango, bounds checks
+            if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
+                _memset(puppet->tracks[trackNum].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
+            else
+                _memset(puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
+        }
+        
     }
     if ( puppet->tracks[trackNum].callback )
     {
@@ -562,7 +559,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
                     }
                 }
             }
-            else if ( v4->numMarkers )
+            else
             {
                 for (uint32_t v15 = 0; v15 < v4->numMarkers; v15++)
                 {
@@ -627,7 +624,13 @@ void rdPuppet_unk(rdPuppet *puppet, int trackNum)
     rdPuppetTrack *v2; // edx
 
     v2 = &puppet->tracks[trackNum];
-    _memset(&puppet->tracks[trackNum].nodes, 0, 4 * puppet->rdthing->model3->numHierarchyNodes);
+
+    // Added: Added in Grim Fandango, bounds checks
+    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
+        _memset(v2->nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
+    else
+        _memset(v2->nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
+
     v2->field_120 = 0.0;
     v2->field_124 = 0.0;
     v2->status = 3;

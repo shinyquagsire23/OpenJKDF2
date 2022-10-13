@@ -735,11 +735,11 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
         NETMSG_PUSHF32(sithWeapon_a8BD030[i]);
         NETMSG_PUSHF32(sithWeapon_8BD0A0[i]);
     }
-    NETMSG_PUSHF32(sithWeapon_8BD05C[1]);
+    NETMSG_PUSHF32(sithWeapon_8BD060);
     NETMSG_PUSHF32(sithWeapon_LastFireTimeSecs);
     NETMSG_PUSHF32(sithWeapon_fireWait);
     NETMSG_PUSHF32(sithWeapon_mountWait);
-    NETMSG_PUSHF32(sithWeapon_8BD05C[0]);
+    NETMSG_PUSHS32(sithWeapon_8BD05C);
     NETMSG_PUSHF32(sithWeapon_fireRate);
     NETMSG_PUSHU32(sithWeapon_CurWeaponMode);
     NETMSG_PUSHU32(sithWeapon_8BD024);
@@ -795,11 +795,11 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
         sithWeapon_a8BD030[i] = NETMSG_POPF32();
         sithWeapon_8BD0A0[i] = NETMSG_POPF32();
     }
-    sithWeapon_8BD05C[1] = NETMSG_POPF32();
+    sithWeapon_8BD060 = NETMSG_POPF32();
     sithWeapon_LastFireTimeSecs = NETMSG_POPF32();
     sithWeapon_fireWait = NETMSG_POPF32();
     sithWeapon_mountWait = NETMSG_POPF32();
-    sithWeapon_8BD05C[0] = NETMSG_POPF32();
+    sithWeapon_8BD05C = NETMSG_POPS32();
     sithWeapon_fireRate = NETMSG_POPF32();
     sithWeapon_CurWeaponMode = NETMSG_POPU32();
     sithWeapon_8BD024 = NETMSG_POPU32();
@@ -846,13 +846,7 @@ void sithDSS_SendSyncPuppet(sithThing *thing, int sendto_id, int mpFlags)
 
     NETMSG_PUSHS32(thing->thingIdx);
     for (int i = 0; i < 4; i++)
-    {
-        // HACK HACK HACK weird animation glitches on savefile load -- only for player?
-        if (!sithNet_isMulti && thing == sithPlayer_pLocalPlayerThing) {
-            NETMSG_PUSHU32(0);
-            continue;
-        }
-                
+    {           
         NETMSG_PUSHU32(puppet->tracks[i].status);
         if ( puppet->tracks[i].status )
         {
@@ -918,10 +912,16 @@ int sithDSS_ProcessSyncPuppet(sithCogMsg *msg)
             rdpuppet->tracks[i].playSpeed = NETMSG_POPF32();
             rdpuppet->tracks[i].field_120 = NETMSG_POPF32();
             rdpuppet->tracks[i].field_124 = NETMSG_POPF32();
-            
-            // HACK HACK HACK weird animation glitches on savefile load -- only for player?
-            if (!sithNet_isMulti && thing == sithPlayer_pLocalPlayerThing)
-                _memset(&rdpuppet->tracks[i], 0, sizeof(rdpuppet->tracks[i]));
+
+            // Added: Fix lingering animations?
+            if ( rdpuppet->tracks[i].status & 8) {
+                rdPuppet_FadeOutTrack(rdpuppet, i, rdpuppet->tracks[i].speed);
+            }
+            else if ( rdpuppet->tracks[i].status & 4) {
+                int tmp = rdpuppet->tracks[i].status; // TODO idk if this is needed but idk
+                rdPuppet_FadeInTrack(rdpuppet, i, rdpuppet->tracks[i].speed);
+                rdpuppet->tracks[i].status = tmp;
+            }
         }
         else // Added
         {

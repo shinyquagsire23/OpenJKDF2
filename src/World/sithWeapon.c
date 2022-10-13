@@ -925,13 +925,13 @@ void sithWeapon_StartupEntry()
     sithWeapon_8BD0A0[0] = -1.0;
     sithWeapon_a8BD030[0] = 0;
     sithWeapon_8BD0A0[1] = -1.0;
-    sithWeapon_8BD05C[1] = -1.0;
+    sithWeapon_8BD060 = -1.0;
     sithWeapon_LastFireTimeSecs = -1.0;
     sithWeapon_fireWait = -1.0;
     sithWeapon_fireRate = -1.0;
     sithWeapon_a8BD030[1] = 0;
     sithWeapon_mountWait = 0.0;
-    sithWeapon_8BD05C[0] = 0.0;
+    sithWeapon_8BD05C = 0;
     sithWeapon_CurWeaponMode = -1;
     sithWeapon_8BD024 = -1;
 }
@@ -955,6 +955,8 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     int v15; // esi
     int v18; // [esp-18h] [ebp-28h]
     int playera; // [esp+14h] [ebp+4h]
+
+    //printf("%x\n", sithWeapon_8BD024);
 
     v4 = sithInventory_GetCurWeapon(player);
     if ( binIdx == v4 || sithInventory_GetBinAmount(player, binIdx) == 0.0 || !sithInventory_GetAvailable(player, binIdx) || sithWeapon_8BD024 != -1 )
@@ -986,6 +988,7 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     v13 = sithInventory_GetBinByIdx(v4);
     if ( v13 && v13->cog ) // Added: v13 nullptr check
     {
+        //printf("Send deselect %x\n", v4);
         sithCog_SendMessage(v13->cog, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->thingIdx, 0);
         for (int i = 0; i < 2; i++)
         {
@@ -1024,61 +1027,48 @@ void sithWeapon_SetFireWait(sithThing *weapon, float firewait)
 void sithWeapon_handle_inv_msgs(sithThing *player)
 {
     sithItemDescriptor *v1; // eax
-    sithCog *v2; // eax
     int v3; // eax
     sithItemDescriptor *v4; // eax
-    sithCog *v5; // eax
     int v6; // eax
     sithItemDescriptor *v7; // eax
-    sithCog *v8; // eax
     int v9; // [esp-18h] [ebp-1Ch]
+
+    //printf("%x %x %f %f %f\n", sithWeapon_8BD024, sithWeapon_8BD05C, sithWeapon_mountWait, sithWeapon_fireWait, sithTime_curSeconds);
 
     if ( sithWeapon_8BD024 == -1 || sithTime_curSeconds < (double)sithWeapon_mountWait )
     {
         // aaaaaaaaaaa ????? wtf is going on here
-        if ( *(int*)&sithWeapon_8BD05C[0] == 1 && sithTime_curSeconds >= (double)sithWeapon_mountWait )
+        if ( sithWeapon_8BD05C == 1 && sithTime_curSeconds >= (double)sithWeapon_mountWait )
         {
             v3 = sithInventory_GetCurWeapon(player);
             v4 = sithInventory_GetBinByIdx(v3);
-            if ( (v4->flags & ITEMINFO_WEAPON) != 0 && sithWeapon_CurWeaponMode != -1 )
+            if ( v4 && (v4->flags & ITEMINFO_WEAPON) != 0 && sithWeapon_CurWeaponMode != -1 ) // Added: nullptr check
             {
-                v5 = v4->cog;
-                if ( v5 )
-                    sithCog_SendMessage(v5, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, player->thingIdx, 0);
+                if ( v4->cog )
+                    sithCog_SendMessage(v4->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, player->thingIdx, 0);
             }
-            sithWeapon_8BD05C[0] = 0.0;
+            sithWeapon_8BD05C = 0;
         }
         else if ( sithWeapon_CurWeaponMode != -1 && sithWeapon_fireRate > 0.0 && sithTime_curSeconds >= (double)sithWeapon_fireWait )
         {
             v6 = sithInventory_GetCurWeapon(player);
             v7 = sithInventory_GetBinByIdx(v6);
-            if ( (v7->flags & ITEMINFO_WEAPON) != 0 )
+            if ( v7 && (v7->flags & ITEMINFO_WEAPON) && v7->cog ) // Added: nullptr check
             {
-                v8 = v7->cog;
-                if ( v8 )
-                {
-                    v9 = player->thingIdx;
-                    sithWeapon_fireWait = sithWeapon_fireRate + sithTime_curSeconds;
-                    sithCog_SendMessageEx(v8, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, v9, 0, 0.0, 0.0, 0.0, 0.0);
-                }
+                v9 = player->thingIdx;
+                sithWeapon_fireWait = sithWeapon_fireRate + sithTime_curSeconds;
+                sithCog_SendMessageEx(v7->cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, v9, 0, 0.0, 0.0, 0.0, 0.0);
             }
         }
     }
     else
     {
         v1 = sithInventory_GetBinByIdx(sithWeapon_8BD024);
-        if ( (v1->flags & ITEMINFO_WEAPON) != 0 )
+        if ( v1 && (v1->flags & ITEMINFO_WEAPON) && v1->cog && sithWeapon_8BD024 != -1) // Added: nullptr check
         {
-            v2 = v1->cog;
-            if ( v2 )
-            {
-                if ( sithWeapon_8BD024 != -1 )
-                {
-                    sithWeapon_LastFireTimeSecs = -1.0;
-                    sithCog_SendMessage(v2, SITH_MESSAGE_SELECTED, SENDERTYPE_SYSTEM, sithWeapon_senderIndex, SENDERTYPE_THING, player->thingIdx, 0);
-                    *(int*)&sithWeapon_8BD05C[0] = 1;
-                }
-            }
+            sithWeapon_LastFireTimeSecs = -1.0;
+            sithCog_SendMessage(v1->cog, SITH_MESSAGE_SELECTED, SENDERTYPE_SYSTEM, sithWeapon_senderIndex, SENDERTYPE_THING, player->thingIdx, 0);
+            sithWeapon_8BD05C = 1;
         }
         sithWeapon_8BD024 = -1;
     }

@@ -1104,9 +1104,8 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         {
             sithDSSThing_SendPlayKey(thing, keyframe, trackNum, popInt, thing->rdthing.puppet->tracks[track].field_130, -1, 255);
         }
+        return;
     }
-
-    return;
 
 fail:
     sithCogExec_PushInt(ctx, -1);
