@@ -1174,6 +1174,7 @@ typedef struct rdDDrawSurface
     uint32_t emissive_texture_id;
     uint32_t displacement_texture_id;
     float emissive_factor[3];
+    float albedo_factor[4];
     float displacement_factor;
     void* emissive_data;
     void* albedo_data;

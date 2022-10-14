@@ -51,6 +51,7 @@ uniform vec3 colorEffects_filter;
 uniform float colorEffects_fade;
 uniform vec3 colorEffects_add;
 uniform vec3 emissiveFactor;
+uniform vec4 albedoFactor;
 uniform float displacement_factor;
 uniform float light_mult;
 uniform vec2 iResolution;
@@ -226,7 +227,7 @@ void main(void)
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
-    
+    vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
 
     if (tex_mode == 0) {
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -335,6 +336,8 @@ void main(void)
     float should_write_normals = 1.0;
     float orig_alpha = main_color.a;
 
+    main_color *= albedoFactor;
+
     if (blend_mode == 5 || blend_mode == 6)
     {
         should_write_normals = main_color.a;
@@ -349,9 +352,16 @@ void main(void)
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
-        color_add.rgb += sampledEmiss.rgb * (emissiveFactor * 0.06);
+        color_add.rgb += sampledEmiss.rgb * emissiveFactor * 0.1;
         //color_add.rgb *= main_color.a;
         //color_add = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+
+    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    {
+        color_add_emiss.rgb += sampledEmiss.rgb * 0.1;
+        //color_add_emiss.a = 0.2;
+        //color_add_emiss = vec4(1.0, 1.0, 1.0, 1.0);
     }
 
     //color_add.a = 0.0;
@@ -411,7 +421,7 @@ void main(void)
         //should_write_normals = 1.0 - should_write_normals;
     }
 
-    fragColorEmiss = color_add;
+    fragColorEmiss = color_add_emiss + color_add;
 
     //fragColor = vec4(face_normals_parallax.x, face_normals_parallax.y, face_normals_parallax.z, 1.0);
     //fragColor = vec4(face_normals*0.5 + 0.5,1.0);

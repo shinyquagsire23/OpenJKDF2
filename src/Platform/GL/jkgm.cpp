@@ -259,6 +259,7 @@ typedef struct jkgm_cache_entry_t
     std::string emissive_tex;
     std::string displacement_tex;
     float emissive_factor[3];
+    float albedo_factor[4];
     float displacement_factor;
 } jkgm_cache_entry_t;
 
@@ -412,18 +413,33 @@ void jkgm_populate_cache()
                     entry.emissive_factor[0] = json_emissive_factor[0];
                     entry.emissive_factor[1] = json_emissive_factor[1];
                     entry.emissive_factor[2] = json_emissive_factor[2];
-
-                    entry.emissive_tex = it.value("emissive_map", "");
-                    if (entry.emissive_tex != "") {
-                        entry.emissive_tex = base_path + entry.emissive_tex;
-                    }
                 }
                 else
                 {
                     entry.emissive_factor[0] = 0.0f;
                     entry.emissive_factor[1] = 0.0f;
                     entry.emissive_factor[2] = 0.0f;
-                    entry.emissive_tex = "";
+                }
+
+                entry.emissive_tex = it.value("emissive_map", "");
+                if (entry.emissive_tex != "") {
+                    entry.emissive_tex = base_path + entry.emissive_tex;
+                }
+
+                //TODO safety/bounds checks
+                if (it["albedo_factor"].type() != nlohmann::json::value_t::null) {
+                    auto json_albedo_factor = it["albedo_factor"];
+                    entry.albedo_factor[0] = json_albedo_factor[0];
+                    entry.albedo_factor[1] = json_albedo_factor[1];
+                    entry.albedo_factor[2] = json_albedo_factor[2];
+                    entry.albedo_factor[3] = json_albedo_factor[3];
+                }
+                else
+                {
+                    entry.albedo_factor[0] = 1.0f;
+                    entry.albedo_factor[1] = 1.0f;
+                    entry.albedo_factor[2] = 1.0f;
+                    entry.albedo_factor[3] = 1.0f;
                 }
 
                 if (it["displacement_factor"].type() != nlohmann::json::value_t::null) {
@@ -434,7 +450,7 @@ void jkgm_populate_cache()
                     if (entry.displacement_tex != "") {
                         entry.displacement_tex = base_path + entry.displacement_tex;
                     }
-                    printf("%s %f\n", entry.displacement_tex.c_str(), entry.displacement_factor);
+                    //printf("%s %f\n", entry.displacement_tex.c_str(), entry.displacement_factor);
                 }
                 else
                 {
@@ -566,6 +582,10 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     texture->emissive_factor[0] = 0.0f;
     texture->emissive_factor[1] = 0.0f;
     texture->emissive_factor[2] = 0.0f;
+    texture->albedo_factor[0] = 1.0f;
+    texture->albedo_factor[1] = 1.0f;
+    texture->albedo_factor[2] = 1.0f;
+    texture->albedo_factor[3] = 1.0f;
     texture->emissive_data = NULL;
     texture->displacement_texture_id = 0;
     texture->displacement_factor = 0.0;
@@ -596,6 +616,7 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     std::string emissive_tex = "";
     std::string displacement_tex = "";
     float emissive_factor[3] = {0.0f, 0.0f, 0.0f};
+    float albedo_factor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
     float displacement_factor = 0.0;
     bool found_replace = false;
     bool has_emissive = false;
@@ -611,6 +632,10 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
         emissive_factor[0] = entry.emissive_factor[0];
         emissive_factor[1] = entry.emissive_factor[1];
         emissive_factor[2] = entry.emissive_factor[2];
+        albedo_factor[0] = entry.albedo_factor[0];
+        albedo_factor[1] = entry.albedo_factor[1];
+        albedo_factor[2] = entry.albedo_factor[2];
+        albedo_factor[3] = entry.albedo_factor[3];
         has_emissive = (emissive_tex != "");
         displacement_tex = entry.displacement_tex;
         displacement_factor = entry.displacement_factor;
@@ -627,6 +652,10 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
         emissive_factor[0] = entry.emissive_factor[0];
         emissive_factor[1] = entry.emissive_factor[1];
         emissive_factor[2] = entry.emissive_factor[2];
+        albedo_factor[0] = entry.albedo_factor[0];
+        albedo_factor[1] = entry.albedo_factor[1];
+        albedo_factor[2] = entry.albedo_factor[2];
+        albedo_factor[3] = entry.albedo_factor[3];
         has_emissive = (emissive_tex != "");
         displacement_tex = entry.displacement_tex;
         displacement_factor = entry.displacement_factor;
@@ -816,6 +845,10 @@ found_cached:
         texture->emissive_factor[0] = emissive_factor[0];
         texture->emissive_factor[1] = emissive_factor[1];
         texture->emissive_factor[2] = emissive_factor[2];
+        texture->albedo_factor[0] = albedo_factor[0];
+        texture->albedo_factor[1] = albedo_factor[1];
+        texture->albedo_factor[2] = albedo_factor[2];
+        texture->albedo_factor[3] = albedo_factor[3];
         texture->displacement_factor = displacement_factor;
 
         std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;

@@ -87,6 +87,7 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo blur2;
     std3DIntermediateFbo blur3;
     std3DIntermediateFbo blur4;
+    //std3DIntermediateFbo blurBlend;
 
     std3DIntermediateFbo ssaoBlur1;
     std3DIntermediateFbo ssaoBlur2;
@@ -111,7 +112,7 @@ int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
-GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor;
+GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
@@ -177,7 +178,7 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     // Set up our framebuffer texture
     glGenTextures(1, &pFbo->tex);
     glBindTexture(GL_TEXTURE_2D, pFbo->tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, isFloat ? GL_RGBA16F : GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, isFloat ? GL_RGBA16F : GL_RGBA8, width, height, 0, GL_RGBA, isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -237,7 +238,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Set up our emissive fb texture
     glGenTextures(1, &pFb->tex1);
     glBindTexture(GL_TEXTURE_2D, pFb->tex1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -298,10 +299,11 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     if (jkPlayer_enableBloom)
     {
         pFb->enable_extra |= 1;
-        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 0);
-        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 0);
-        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 0);
-        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 0);
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1);
+        //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
+        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 1);
+        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 1);
+        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 1);
 
         /*pFb->blur1.iw = width;
         pFb->blur1.ih = height;
@@ -341,6 +343,7 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->blur2);
     std3D_deleteIntermediateFbo(&pFb->blur3);
     std3D_deleteIntermediateFbo(&pFb->blur4);
+    //std3D_deleteIntermediateFbo(&pFb->blurBlend);
 
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
@@ -475,6 +478,7 @@ int init_resources()
     uniform_fade = std3D_tryFindUniform(programDefault, "colorEffects_fade");
     uniform_add = std3D_tryFindUniform(programDefault, "colorEffects_add");
     uniform_emissiveFactor = std3D_tryFindUniform(programDefault, "emissiveFactor");
+    uniform_albedoFactor = std3D_tryFindUniform(programDefault, "albedoFactor");
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
@@ -708,7 +712,8 @@ int std3D_StartScene()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
     glCullFace(GL_FRONT);
-        
+    //glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
+
     // Technically this should be from Clear2
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -1827,6 +1832,8 @@ void std3D_DrawSceneFbo()
         glClear( GL_COLOR_BUFFER_BIT );
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur4.fbo);
         glClear( GL_COLOR_BUFFER_BIT );
+        //glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blurBlend.fbo);
+        //glClear( GL_COLOR_BUFFER_BIT );
     }
 
     // Clear SSAO stuff
@@ -1843,7 +1850,7 @@ void std3D_DrawSceneFbo()
     if (!draw_ssao)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
         //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
     }
     else
@@ -1860,24 +1867,34 @@ void std3D_DrawSceneFbo()
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
     if (!draw_bloom)
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
 
     if (draw_bloom)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
-        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 3.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
+        std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
 
-        float bloom_intensity = 3.0;
+        float bloom_intensity = 1.0;
+        float bloom_gamma = 1.0;
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, bloom_intensity * 5.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.0, bloom_intensity * 2.5, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 0.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 0.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 0.0, bloom_intensity * 1.2, jkPlayer_gamma, 0);
+        /*std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->tex1, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.2, bloom_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 1.2, bloom_gamma, 0);
+        */
+
+        glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blurBlend.tex, 0, 0, 1.0, 1.0, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.5, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.5, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -1938,6 +1955,7 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
         //printf("%f\n", tex->displacement_factor);
         //tex->displacement_factor = -0.4;
@@ -2094,7 +2112,8 @@ void std3D_DrawRenderList()
     glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
-    glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.45 : (jkPlayer_enableBloom ? 0.45 : 0.85));
+    glUniform4f(uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
+    glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 1.1 : 0.85));
     glUniform1f(uniform_displacement_factor, 1.0);
 
     rdTri* tris = GL_tmpTris;
@@ -2479,6 +2498,10 @@ done_load:
     texture->emissive_factor[0] = 0.0;
     texture->emissive_factor[1] = 0.0;
     texture->emissive_factor[2] = 0.0;
+    texture->albedo_factor[0] = 1.0;
+    texture->albedo_factor[1] = 1.0;
+    texture->albedo_factor[2] = 1.0;
+    texture->albedo_factor[3] = 1.0;
     texture->displacement_factor = 0.0;
     texture->albedo_data = NULL;
     texture->displacement_data = NULL;
@@ -2553,6 +2576,10 @@ void std3D_PurgeTextureCache()
         tex->emissive_factor[0] = 0.0;
         tex->emissive_factor[1] = 0.0;
         tex->emissive_factor[2] = 0.0;
+        tex->albedo_factor[0] = 1.0;
+        tex->albedo_factor[1] = 1.0;
+        tex->albedo_factor[2] = 1.0;
+        tex->albedo_factor[3] = 1.0;
         tex->displacement_factor = 0.0;
 
         tex->texture_loaded = 0;

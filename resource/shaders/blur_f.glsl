@@ -35,7 +35,8 @@ void main(void)
     // Output to screen
     Color /= Quality * Directions;// - (Directions == 16.0 ? 15.0 : 0.0); // HACK
 
-    fragColor =  Color;
+    fragColor = Color;
+    //fragColor.a = 1.0;
 
     //fragColor = vec4(1.0, 1.0, 0.0, 0.5);
 }
