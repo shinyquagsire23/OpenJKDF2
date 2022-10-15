@@ -1619,7 +1619,12 @@ int jkMain_SetVideoMode()
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
     Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
 #ifdef JKM_LIGHTING
-    sithRender_SetSomeRenderflag(0xaa);
+    if (Main_bMotsCompat) {
+        sithRender_SetSomeRenderflag(0xaa);
+    }
+    else {
+        sithRender_SetSomeRenderflag(0x2a);
+    }
 #else
     sithRender_SetSomeRenderflag(0x2a);
 #endif

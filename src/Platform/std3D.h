@@ -1,6 +1,10 @@
 #ifndef _STD3D_H
 #define _STD3D_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 #include "globals.h"
 
@@ -103,5 +107,10 @@ int std3D_SetRenderList(intptr_t a1);
 intptr_t std3D_GetRenderList();
 static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADDR;
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // _STD3D_H

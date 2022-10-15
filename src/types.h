@@ -1155,6 +1155,7 @@ typedef struct ALIGNED_(16) d3d_device
   DWORD d3d_this;
 } d3d_device;
 
+typedef struct jkgm_cache_entry_t jkgm_cache_entry_t;
 
 typedef struct rdDDrawSurface
 {
@@ -1180,6 +1181,7 @@ typedef struct rdDDrawSurface
     void* albedo_data;
     void* displacement_data;
     int skip_jkgm;
+    jkgm_cache_entry_t* cache_entry;
 #endif
 } rdDDrawSurface;
 

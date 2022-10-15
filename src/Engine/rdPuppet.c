@@ -146,6 +146,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                     if ( v10 != v8->numAnimEntries - 1 )
                     {
                         v12 = v10 + 1;
+
+                        // TODO: TODOA had an OOB access here
                         if ( v4->field_120 >= (double)v8->animEntries[v10 + 1].frameNum )
                         {
                             v13 = &v8->animEntries[v10 + 2];

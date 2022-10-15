@@ -6,6 +6,7 @@
 #include "World/sithWorld.h"
 #include "Main/sithMain.h"
 #include "Engine/rdMaterial.h"
+#include "Platform/std3D.h"
 #include "jk.h"
 
 int sithMaterial_Startup()

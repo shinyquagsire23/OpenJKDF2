@@ -184,7 +184,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 
         joint->nodeIdx = node_idx;
         joint->numAnimEntries = anim_entry_cnt;
-        joint->animEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt);
+        joint->animEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
         if (!joint->animEntries)
           goto read_fail;
 

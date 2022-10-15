@@ -267,7 +267,7 @@ LABEL_22:
             surface->emissive_factor[2] = 0.0;
             surface->displacement_factor = 0.0;
 #ifndef ARCH_WASM
-            jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, i);
+            jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, j, i);
 #endif
         }
     }
@@ -290,51 +290,30 @@ void rdMaterial_Free(rdMaterial *material)
     rdMaterial_FreeEntry(material);
 
     rdroid_pHS->free(material);
+    *(uint32_t*)0 = 0;
 }
 
 void rdMaterial_FreeEntry(rdMaterial* material)
 {
-    unsigned int v5;
-    void **v6;
-    rdTexture *v7;
-    unsigned int v8;
-    stdVBuffer **v9;
-    unsigned int gpu_mem;
-
-    v5 = 0;
-    if (material->num_texinfo)
+    for (size_t i = 0; i < material->num_texinfo; i++)
     {
-      v6 = (void **)material->texinfos;
-      do
-      {
-        rdroid_pHS->free(*v6);
-        ++v5;
-        ++v6;
-      }
-      while ( v5 < material->num_texinfo );
+        rdroid_pHS->free(material->texinfos[i]);
     }
-    gpu_mem = 0;
-    if ( material->num_textures )
+
+    for (size_t i = 0; i < material->num_textures; i++)
     {
-      v7 = &material->textures[0];
-      do
-      {
-        v8 = 0;
-        if ( v7->num_mipmaps )
+        rdTexture* pTex = &material->textures[i];
+
+        for (size_t j = 0; j < pTex->num_mipmaps; j++)
         {
-          v9 = v7->texture_struct;
-          do
-          {
-            stdDisplay_VBufferFree(*v9);
-            ++v8;
-            ++v9;
-          }
-          while ( v8 < v7->num_mipmaps );
+            rdDDrawSurface* surface = &pTex->alphaMats[j];
+
+#ifdef SDL2_RENDER
+            jkgm_free_cache_entry(surface->cache_entry);
+#endif
+
+            stdDisplay_VBufferFree(pTex->texture_struct[j]);
         }
-        v7++;
-        ++gpu_mem;
-      }
-      while ( gpu_mem < material->num_textures );
     }
 
     if (material->textures)

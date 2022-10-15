@@ -12,6 +12,8 @@
 #include <filesystem>
 #include <unordered_map>
 #include "General/md5.h"
+#include "Engine/rdMaterial.h"
+#include "Platform/std3D.h"
 #include "jk.h"
 
 namespace fs = std::filesystem;
@@ -63,6 +65,8 @@ extern rdDDrawSurface* std3D_aLoadedSurfaces[1024];
 extern GLuint std3D_aLoadedTextures[1024];
 extern size_t std3D_loadedTexturesAmt;
 extern int jkPlayer_enableTextureFilter;
+extern int jkPlayer_bEnableJkgm;
+extern int jkPlayer_bEnableTexturePrecache;
 extern int Main_bHeadless;
 
 int compare_hashstr(uint8_t *p, const char* str){
@@ -261,6 +265,22 @@ typedef struct jkgm_cache_entry_t
     float emissive_factor[3];
     float albedo_factor[4];
     float displacement_factor;
+
+    void* albedo_data;
+    void* emissive_data;
+    void* displacement_data;
+
+    int albedo_width;
+    int albedo_height;
+    int albedo_hasAlpha;
+
+    int emissive_width;
+    int emissive_height;
+    int emissive_hasAlpha;
+
+    int displacement_width;
+    int displacement_height;
+    int displacement_hasAlpha;
 } jkgm_cache_entry_t;
 
 static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache;
@@ -268,102 +288,7 @@ static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache_hash;
 static bool jkgm_cache_once = false;
 static bool jkgm_fastpath_disable = false;
 
-#if 0
-static void jkgm_populate_cache()
-{
-    for (const auto& entry : fs::directory_iterator(jkgm_materials_path)) {
-        if (!entry.is_directory()) {
-            continue;
-        }
-        const auto dir_iter_str = entry.path().filename().string();
-
-        std::string base_path = "jkgm/materials/" + dir_iter_str + "/";
-        std::string metadata_path = base_path + "metadata.json";
-
-        try
-        {
-            std::ifstream i(metadata_path);
-            nlohmann::json jkgm_metadata;
-            i >> jkgm_metadata;
-
-        //std::cout << jkgm_metadata.dump(4) << std::endl;
-
-       
-            for (auto it : jkgm_metadata["materials"])
-            {
-                //TODO safety/bounds checks
-                for (auto hash_it : it["replaces_signatures"]) {
-                    auto bytes = hex_to_bytes(hash_it);
-                    //print_hash(bytes.data());
-                    //std::cout << hash_it << std::endl;
-                    if (!memcmp(bytes.data(), ctx.digest, bytes.size())) {
-                        found_replace = true;
-                        break;
-                    }
-                }
-
-                //TODO safety/bounds checks
-                for (auto repl_it : it["replaces"]) {
-                    int cel_idx = repl_it["cel"];
-                    if (cel_idx != cel) continue;
-
-                    std::string name = repl_it["name"];
-                    const char* name_c = name.c_str();
-                    if (!strcmp(name_c, material->mat_full_fpath)) {
-                        printf("Hash match!\n");
-                        found_replace = true;
-                        break;
-                    }
-                }
-                
-                if (found_replace) {
-                    printf("Found replace,\n");
-                    //TODO safety/bounds checks
-                    if (it["emissive_factor"].type() != nlohmann::json::value_t::null) {
-                        auto json_emissive_factor = it["emissive_factor"];
-                        emissive_factor[0] = json_emissive_factor[0];
-                        emissive_factor[1] = json_emissive_factor[1];
-                        emissive_factor[2] = json_emissive_factor[2];
-
-                        emissive_tex = base_path + it.value("emissive_map", "");
-                        if (emissive_tex != "")
-                            has_emissive = true;
-                    }
-                    
-                    albedo_tex = base_path + it.value("albedo_map", "");
-                    printf("Found replace done\n");
-
-                    //std::cout << it.dump(4) << std::endl;
-                    break;
-                }
-            }
-
-            if (found_replace) {
-                break;
-            }
-        }
-        catch(nlohmann::json::parse_error& e)
-        {
-            std::cout << "Parse error while reading metadata `" << metadata_path << "`:";
-            std::cout << "message: " << e.what() << '\n'
-                  << "exception id: " << e.id << '\n'
-                  << "byte position of error: " << e.byte << std::endl;
-
-            found_replace = false;
-        }
-        catch(nlohmann::json::exception& e)
-        {
-            std::cout << "Exception while parsing metadata `" << metadata_path << "`:";
-            std::cout << "message: " << e.what() << '\n'
-                  << "exception id: " << e.id << '\n' << std::endl;
-
-            found_replace = false;
-        }
-    }
-}
-#endif
-
-static std::string jkgm_hash_to_str(uint8_t *p){
+static std::string jkgm_hash_to_str(uint8_t *p) {
     char tmp[32+2];
     char* tmp_it = tmp;
     for(unsigned int i = 0; i < 16; ++i){
@@ -460,6 +385,22 @@ void jkgm_populate_cache()
                     
                 entry.albedo_tex = base_path + it.value("albedo_map", "");
 
+                entry.albedo_data = NULL;
+                entry.emissive_data = NULL;
+                entry.displacement_data = NULL;
+
+                entry.albedo_width = 0;
+                entry.albedo_height = 0;
+                entry.albedo_hasAlpha = 0;
+
+                entry.emissive_width = 0;
+                entry.emissive_height = 0;
+                entry.emissive_hasAlpha = 0;
+
+                entry.displacement_width = 0;
+                entry.displacement_height = 0;
+                entry.displacement_hasAlpha = 0;
+
                 for (auto repl_it : it["replaces"]) {
                     int cel_idx = repl_it["cel"];
                     std::string name = repl_it["name"];
@@ -540,16 +481,21 @@ std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMater
     }
     //
     md5Finalize(&ctx);
-    //if (ctx.digest[0] == 0x35 && ctx.digest[1] == 0x8F)
-    //print_hash(ctx.digest);
 
     std::string hash = jkgm_hash_to_str(ctx.digest);
     return hash;
 }
 
-void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int cel)
+void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel)
 {
     if (Main_bHeadless) return;
+
+    // Also preload even if we have no jkgm stuff
+    if (jkPlayer_bEnableTexturePrecache && jkgm_fastpath_disable && vbuf && texture) {
+        std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        return;
+    }
+
     if (!vbuf || !texture || jkgm_fastpath_disable) return;
 
     jkgm_populate_cache();
@@ -563,20 +509,36 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
 
     if (jkgm_cache.find(cache_key) != jkgm_cache.end()) {
         texture->skip_jkgm = 0;
-        return;
     }
-
-    if (jkgm_cache_hash.find(hash) != jkgm_cache_hash.end()) {
+    else if (jkgm_cache_hash.find(hash) != jkgm_cache_hash.end()) {
         texture->skip_jkgm = 0;
+    }
+    else {
+        texture->skip_jkgm = 1;
+    }
+
+    // Also preload non-PNG textures
+    if (texture->skip_jkgm) {
+        if (jkPlayer_bEnableTexturePrecache) {
+            std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        }
         return;
     }
 
-    texture->skip_jkgm = 1;
+    texture->cache_entry = &jkgm_cache[cache_key];
+
+    rdTexture *pRdTexture = &material->textures[cel];
+
+    //printf("Caching %s mipmap_level=%d, cel=%d\n", material->mat_full_fpath, mipmap_level, cel);
+
+    if (jkPlayer_bEnableTexturePrecache)
+        jkgm_std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0, material, cel);
 }
 
 int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
 {
     if (Main_bHeadless) return 0;
+    if (texture->texture_loaded) return 1;
 
     texture->emissive_texture_id = 0;
     texture->emissive_factor[0] = 0.0f;
@@ -592,7 +554,13 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     texture->displacement_data = NULL;
     texture->albedo_data = NULL;
 
-    if (jkgm_fastpath_disable || texture->skip_jkgm) {
+    // If the player disabled Jkgm, free any textures that were loaded
+    if (!jkPlayer_bEnableJkgm && texture->cache_entry) {
+        jkgm_free_cache_entry(texture->cache_entry);
+        return 0;
+    }
+
+    if (!jkPlayer_bEnableJkgm || jkgm_fastpath_disable || texture->skip_jkgm) {
         return 0;
     }
 
@@ -608,7 +576,9 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     width = vbuf->format.width;
     height = vbuf->format.height;
 
-    std::string hash = jkgm_get_tex_hash(vbuf, texture, material, is_alpha_tex);
+    //std::string hash = jkgm_get_tex_hash(vbuf, texture, material, is_alpha_tex);
+
+    jkgm_cache_entry_t* entry;
 
     std::string full_fpath_str = std::string(material->mat_full_fpath);
     std::string cache_key = full_fpath_str + std::to_string(cel);
@@ -621,62 +591,29 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     bool found_replace = false;
     bool has_emissive = false;
     bool has_displacement = false;
-    
+
     jkgm_populate_cache();
 
-    if (jkgm_cache.find(cache_key) != jkgm_cache.end()) {
+    if (texture->cache_entry)
+    {
         //printf("Path match!\n");
-        jkgm_cache_entry_t entry = jkgm_cache[cache_key];
-        albedo_tex = entry.albedo_tex;
-        emissive_tex = entry.emissive_tex;
-        emissive_factor[0] = entry.emissive_factor[0];
-        emissive_factor[1] = entry.emissive_factor[1];
-        emissive_factor[2] = entry.emissive_factor[2];
-        albedo_factor[0] = entry.albedo_factor[0];
-        albedo_factor[1] = entry.albedo_factor[1];
-        albedo_factor[2] = entry.albedo_factor[2];
-        albedo_factor[3] = entry.albedo_factor[3];
+        entry = texture->cache_entry;
+        albedo_tex = entry->albedo_tex;
+        emissive_tex = entry->emissive_tex;
+        emissive_factor[0] = entry->emissive_factor[0];
+        emissive_factor[1] = entry->emissive_factor[1];
+        emissive_factor[2] = entry->emissive_factor[2];
+        albedo_factor[0] = entry->albedo_factor[0];
+        albedo_factor[1] = entry->albedo_factor[1];
+        albedo_factor[2] = entry->albedo_factor[2];
+        albedo_factor[3] = entry->albedo_factor[3];
         has_emissive = (emissive_tex != "");
-        displacement_tex = entry.displacement_tex;
-        displacement_factor = entry.displacement_factor;
+        displacement_tex = entry->displacement_tex;
+        displacement_factor = entry->displacement_factor;
         has_displacement = (displacement_tex != "");
         found_replace = true;
-        goto found_cached;
     }
 
-    if (jkgm_cache_hash.find(hash) != jkgm_cache_hash.end()) {
-        //printf("Hash match!\n");
-        jkgm_cache_entry_t entry = jkgm_cache_hash[hash];
-        albedo_tex = entry.albedo_tex;
-        emissive_tex = entry.emissive_tex;
-        emissive_factor[0] = entry.emissive_factor[0];
-        emissive_factor[1] = entry.emissive_factor[1];
-        emissive_factor[2] = entry.emissive_factor[2];
-        albedo_factor[0] = entry.albedo_factor[0];
-        albedo_factor[1] = entry.albedo_factor[1];
-        albedo_factor[2] = entry.albedo_factor[2];
-        albedo_factor[3] = entry.albedo_factor[3];
-        has_emissive = (emissive_tex != "");
-        displacement_tex = entry.displacement_tex;
-        displacement_factor = entry.displacement_factor;
-        has_displacement = (displacement_tex != "");
-        found_replace = true;
-        goto found_cached;
-    }
-
-#if 0
-    if (found_replace) {
-        jkgm_cache_entry_t entry;
-        entry.albedo_tex = albedo_tex;
-        entry.emissive_tex = emissive_tex;
-        entry.emissive_factor[0] = emissive_factor[0];
-        entry.emissive_factor[1] = emissive_factor[1];
-        entry.emissive_factor[2] = emissive_factor[2];
-        jkgm_cache[full_fpath_str] = entry;
-    }
-#endif
-
-found_cached:
     if (found_replace) // saberpurple0.mat
     {
         GLuint image_texture;
@@ -708,27 +645,30 @@ found_cached:
         {
             const char* path = albedo_tex.c_str();
 
-            GLubyte* data = NULL;
-            int width = 0;
-            int height = 0;
-            int hasAlpha = 0;
+            GLubyte* data = (GLubyte*)entry->albedo_data;
 
-            if (loadPngImage(path, &width, &height, &hasAlpha, &data, 0))
+            if (data) {
+                //printf("Using precached %s\n", path);
+            }
+
+            if (data || loadPngImage(path, &entry->albedo_width, &entry->albedo_height, &entry->albedo_hasAlpha, &data, 0))
             {
                 //printf("Loaded %s %p\n", path, data);
-                //glTexStorage2D(GL_TEXTURE_2D, 1, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
-                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+                //glTexStorage2D(GL_TEXTURE_2D, 1, entry->albedo_hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
+                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->albedo_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height, 0,  hasAlpha ?  GL_BGRA : GL_BGR,     GL_UNSIGNED_BYTE, data);
-                //glGetTexImage(GL_TEXTURE_2D, 0, hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
+                glTexImage2D(GL_TEXTURE_2D, 0, entry->albedo_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->albedo_width, entry->albedo_height, 0,  entry->albedo_hasAlpha ?  GL_BGRA : GL_BGR,     GL_UNSIGNED_BYTE, data);
+                //glGetTexImage(GL_TEXTURE_2D, 0, entry->albedo_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->texture_id = image_texture;
                 texture->albedo_data = data;
+                entry->albedo_data = data;
             }
             else
             {
                 texture->albedo_data = NULL;
+                entry->albedo_data = NULL;
                 glDeleteTextures(1, &image_texture);
                 if (data) {
                     free(data);
@@ -761,27 +701,30 @@ found_cached:
 
             const char* path = emissive_tex.c_str();
 
-            GLubyte* data = NULL;
-            int width = 0;
-            int height = 0;
-            int hasAlpha = 0;
+            GLubyte* data = (GLubyte*)entry->emissive_data;
 
-            if (loadPngImage(path, &width, &height, &hasAlpha, &data, 0))
+            if (data) {
+                //printf("Using precached %s\n", path);
+            }
+
+            if (data || loadPngImage(path, &entry->emissive_width, &entry->emissive_height, &entry->emissive_hasAlpha, &data, 0))
             {
                 //printf("Loaded %s\n", path);
-                //glTexStorage2D(GL_TEXTURE_2D, 1, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
-                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+                //glTexStorage2D(GL_TEXTURE_2D, 1, entry->emissive_hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
+                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->emissive_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height, 0,  hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
-                //glGetTexImage(GL_TEXTURE_2D, 0, hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
+                glTexImage2D(GL_TEXTURE_2D, 0, entry->emissive_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->emissive_width, entry->emissive_height, 0,  entry->emissive_hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
+                //glGetTexImage(GL_TEXTURE_2D, 0, entry->emissive_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->emissive_texture_id = emiss_texture;
-                texture->emissive_data = data;;
+                texture->emissive_data = data;
+                entry->emissive_data = data;
             }
             else
             {
                 texture->emissive_data = NULL;
+                entry->emissive_data = NULL;
                 glDeleteTextures(1, &emiss_texture);
                 if (data) {
                     free(data);
@@ -791,7 +734,7 @@ found_cached:
 
         if (has_displacement)
         {
-            printf("%s\n", displacement_tex.c_str());
+            //printf("%s\n", displacement_tex.c_str());
             GLuint displace_texture;
             glGenTextures(1, &displace_texture);
             glBindTexture(GL_TEXTURE_2D, displace_texture);
@@ -814,27 +757,30 @@ found_cached:
 
             const char* path = displacement_tex.c_str();
 
-            GLubyte* data = NULL;
-            int width = 0;
-            int height = 0;
-            int hasAlpha = 0;
+            GLubyte* data = (GLubyte*)entry->displacement_data;
 
-            if (loadPngImage(path, &width, &height, &hasAlpha, &data, 0))
+            if (data) {
+                //printf("Using precached %s\n", path);
+            }
+
+            if (data || loadPngImage(path, &entry->displacement_width, &entry->displacement_height, &entry->displacement_hasAlpha, &data, 0))
             {
                 //printf("Loaded %s\n", path);
-                //glTexStorage2D(GL_TEXTURE_2D, 1, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
-                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+                //glTexStorage2D(GL_TEXTURE_2D, 1, entry->displacement_hasAlpha ? GL_RGBA8 : GL_RGB8, width, height);
+                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->displacement_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA8 : GL_RGB8, width, height, 0,  hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
-                //glGetTexImage(GL_TEXTURE_2D, 0, hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
+                glTexImage2D(GL_TEXTURE_2D, 0, entry->displacement_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->displacement_width, entry->displacement_height, 0,  entry->displacement_hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
+                //glGetTexImage(GL_TEXTURE_2D, 0, entry->displacement_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->displacement_texture_id = displace_texture;
-                texture->displacement_data = data;;
+                texture->displacement_data = data;
+                entry->displacement_data = data;
             }
             else
             {
                 texture->displacement_data = NULL;
+                entry->displacement_data = NULL;
                 glDeleteTextures(1, &displace_texture);
                 if (data) {
                     free(data);
@@ -864,6 +810,38 @@ found_cached:
     printf("Cache miss, %s\n", cache_key.c_str());
 
     return 0;
+}
+
+void jkgm_free_cache_entry(jkgm_cache_entry_t* entry)
+{
+    if (!entry) return;
+
+    if (entry->albedo_data != NULL) {
+        jkgm_aligned_free(entry->albedo_data);
+        entry->albedo_data = NULL;
+    }
+
+    if (entry->emissive_data != NULL) {
+        jkgm_aligned_free(entry->emissive_data);
+        entry->emissive_data = NULL;
+    }
+
+    if (entry->displacement_data != NULL) {
+        jkgm_aligned_free(entry->displacement_data);
+        entry->displacement_data = NULL;
+    }
+
+    entry->albedo_width = 0;
+    entry->albedo_height = 0;
+    entry->albedo_hasAlpha = 0;
+
+    entry->emissive_width = 0;
+    entry->emissive_height = 0;
+    entry->emissive_hasAlpha = 0;
+
+    entry->displacement_width = 0;
+    entry->displacement_height = 0;
+    entry->displacement_hasAlpha = 0;
 }
 
 #endif // ARCH_WASM

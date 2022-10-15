@@ -43,6 +43,8 @@ int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
 float jkPlayer_ssaaMultiple = 1.0;
 float jkPlayer_gamma = 1.0;
+int jkPlayer_bEnableJkgm = 1;
+int jkPlayer_bEnableTexturePrecache = 1;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -407,6 +409,8 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
         stdJSON_SaveInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
         stdJSON_SaveFloat(ext_fpath, "gamma", jkPlayer_gamma);
+        stdJSON_SaveBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
+        stdJSON_SaveBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -577,6 +581,9 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         Window_SetHiDpi(dpi_tmp);
         Window_SetFullscreen(fulltmp);
+
+        jkPlayer_bEnableJkgm = stdJSON_GetBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
+        jkPlayer_bEnableTexturePrecache = stdJSON_GetBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);

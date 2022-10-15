@@ -142,6 +142,9 @@ extern float jkPlayer_ssaaMultiple;
 extern int jkPlayer_enableSSAO;
 extern float jkPlayer_gamma;
 
+extern int jkPlayer_bEnableJkgm;
+extern int jkPlayer_bEnableTexturePrecache;
+
 #define FOV_MIN (40)
 #define FOV_MAX (170)
 

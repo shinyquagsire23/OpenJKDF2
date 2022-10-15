@@ -55,6 +55,8 @@
 #define RDCACHE_MAX_TRIS (0x400)
 #define RDCACHE_MAX_VERTICES (0x8000)
 
+#define STD3D_MAX_TEXTURES (4096)
+
 // jkGuiMultiTally delay between maps
 #define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && stdComm_bIsServer) ? 0 : 30000)
 

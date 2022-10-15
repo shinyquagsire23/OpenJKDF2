@@ -1,6 +1,10 @@
 #ifndef _RDMATERIAL_H
 #define _RDMATERIAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 #include "globals.h"
 #include "Win95/stdVBuffer.h"
@@ -28,5 +32,8 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material);
 
 //int rdMaterial_AddToTextureCache(rdMaterial *material, sith_tex *a2, int mipmap_level, int no_alpha);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RDMATERIAL_H

@@ -134,8 +134,8 @@ void* displaypal_data;
 GLuint tiledrand_texture;
 rdVector3* tiledrand_data;
 
-rdDDrawSurface* std3D_aLoadedSurfaces[1024];
-GLuint std3D_aLoadedTextures[1024];
+rdDDrawSurface* std3D_aLoadedSurfaces[STD3D_MAX_TEXTURES];
+GLuint std3D_aLoadedTextures[STD3D_MAX_TEXTURES];
 size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[STD3D_MAX_TRIS];
 static size_t GL_tmpTrisAmt = 0;
@@ -2393,6 +2393,13 @@ int std3D_ClearZBuffer()
 int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
+    if (!vbuf || !texture) return 1;
+    if (texture->texture_loaded) return 1;
+
+    if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
+        printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
+        return 1;
+    }
     //printf("Add to texture cache\n");
     
     GLuint image_texture;
@@ -2538,7 +2545,7 @@ void std3D_PurgeTextureCache()
     }
 
     printf("Purging texture cache...\n");
-    for (int i = 0; i < 1024; i++)
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
     {
         rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
         if (!tex) continue;
@@ -2549,17 +2556,17 @@ void std3D_PurgeTextureCache()
         std3D_aLoadedTextures[i] = 0;
 
         if (tex->albedo_data != NULL) {
-            jkgm_aligned_free(tex->albedo_data);
+            //jkgm_aligned_free(tex->albedo_data);
             tex->albedo_data = NULL;
         }
 
         if (tex->emissive_data != NULL) {
-            jkgm_aligned_free(tex->emissive_data);
+            //jkgm_aligned_free(tex->emissive_data);
             tex->emissive_data = NULL;
         }
 
         if (tex->displacement_data != NULL) {
-            jkgm_aligned_free(tex->displacement_data);
+            //jkgm_aligned_free(tex->displacement_data);
             tex->displacement_data = NULL;
         }
 
