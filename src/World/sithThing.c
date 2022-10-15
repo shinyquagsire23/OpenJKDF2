@@ -36,6 +36,7 @@
 #include "Dss/sithDSSThing.h"
 #include "stdPlatform.h"
 #include "Dss/sithDSS.h"
+#include "General/stdMath.h"
 #include "jk.h"
 
 #define NUM_THING_PARAMS (74) // JK is 72
@@ -751,49 +752,44 @@ LABEL_5:
 
 void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
 {
-    sithThing *v4; // ecx
-    char v5; // cl
-    int v6; // eax
     sithSector *v7; // eax
 
-    v4 = sector->thingsList;
-    thing->nextThing = v4;
-    if ( v4 )
-        v4->prevThing = thing;
-    v5 = sector->flags;
+    thing->nextThing = sector->thingsList;
+    if ( sector->thingsList )
+        sector->thingsList->prevThing = thing;
+
     thing->prevThing = 0;
     sector->thingsList = thing;
     thing->sector = sector;
-    if ( (v5 & SITH_SECTOR_UNDERWATER) != 0 )
+
+    if (sector->flags & SITH_SECTOR_UNDERWATER)
     {
-        v6 = thing->attach_flags;
-        if ( v6 && (v6 & 8) == 0 && thing->moveType == SITH_MT_PHYSICS )
+        if ( thing->attach_flags && !(thing->attach_flags & 8) && thing->moveType == SITH_MT_PHYSICS )
             sithThing_DetachThing(thing);
-        if ( (thing->thingflags & SITH_TF_WATER) == 0 )
+
+        if (!(thing->thingflags & SITH_TF_WATER))
             sithThing_EnterWater(thing, a3 | a4);
     }
-    else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
+    else if (thing->thingflags & SITH_TF_WATER)
     {
         sithThing_ExitWater(thing, a3 | a4);
     }
+
     if ( !a4 )
     {
-        v7 = thing->sector;
-        if ( (v7->flags & SITH_SECTOR_COGLINKED) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-            sithCog_SendMessageFromSector(v7, thing, SITH_MESSAGE_ENTERED);
+        if ( (thing->sector->flags & SITH_SECTOR_COGLINKED) != 0 && (thing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
+            sithCog_SendMessageFromSector(thing->sector, thing, SITH_MESSAGE_ENTERED);
     }
 }
 
 void sithThing_EnterWater(sithThing *thing, int a2)
 {
-    sithAnimclass *v2; // eax
     sithThing *v4; // ecx
     sithCog *v5; // eax
     sithCog *v6; // eax
 
-    v2 = thing->animclass;
     thing->thingflags |= SITH_TF_WATER;
-    if ( v2 )
+    if ( thing->animclass )
         sithPuppet_sub_4E4760(thing, 1);
     if ( (thing->thingflags & SITH_TF_DROWNS) != 0 )
     {
@@ -803,7 +799,12 @@ void sithThing_EnterWater(sithThing *thing, int a2)
     }
     else if ( !a2 )
     {
+#ifdef QOL_IMPROVEMENTS
+        // Prevent splash sound spam if they're not actually making significant movement
+        if ( thing->soundclass && fabs(thing->physicsParams.vel.z) > 0.02 )  
+#else
         if ( thing->soundclass )
+#endif
         {
             if ( thing->moveType == SITH_MT_PHYSICS && thing->physicsParams.vel.z > -1.0 )
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_ENTERWATERSLOW);
