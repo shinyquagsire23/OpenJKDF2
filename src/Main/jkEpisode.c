@@ -540,7 +540,12 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
 // MOTS altered TODO verify
 int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 {
-    if ( (pPlayerThing->jkFlags & JKFLAG_SABERON) != 0 )
+    // HACK: Sometimes when the player is killed, the blade isn't restored?
+    if (sithInventory_GetCurWeapon(pPlayerThing) == SITHBIN_LIGHTSABER && !(pPlayerThing->jkFlags & JKFLAG_SABERON)) {
+        pPlayerThing->jkFlags |= JKFLAG_SABERON;
+    }
+
+    if (pPlayerThing->jkFlags & JKFLAG_SABERON)
         jkSaber_UpdateLength(pPlayerThing);
 
 #ifdef JKM_DSS

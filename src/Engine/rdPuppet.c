@@ -143,6 +143,12 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                     }
 
                     v10 = v4->nodes[v8->nodeIdx];// nodeIdx
+
+                    // Added: keep ASAN happy and prevent OOB accesses
+                    if (v10 >= v8->numAnimEntries) {
+                        v10 = v8->numAnimEntries - 1;
+                    }
+
                     if ( v10 != v8->numAnimEntries - 1 )
                     {
                         v12 = v10 + 1;
