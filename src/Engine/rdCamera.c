@@ -258,6 +258,14 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
         fov_calc_height = camera->fov_y;
 #endif
 
+    // UBSAN fixes
+    if (fov_calc_height == 0) {
+        fov_calc_height = 0.000001;
+    }
+    if (fov_calc == 0) {
+        fov_calc = 0.000001;
+    }
+
     outClip->farTop = project_width_half / fov_calc_height;
     outClip->farLeft = -project_height_half / fov_calc;
     outClip->bottom = -project_width_half_2 / fov_calc_height;
