@@ -123,6 +123,7 @@ void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out);
 
 // Added
 float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2);
+float rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2);
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale);
 void rdVector_Zero3(rdVector3 *v);
 void rdVector_Zero2(rdVector2 *v);

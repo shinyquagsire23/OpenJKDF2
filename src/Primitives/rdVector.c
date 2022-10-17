@@ -587,6 +587,15 @@ float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
     return rdVector_Len3(&tmp);
 }
 
+// Added
+float rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
+{
+    rdVector3 tmp;
+    
+    rdVector_Sub3(&tmp, v1, v2);
+    return rdVector_Dot3(&tmp,&tmp);
+}
+
 rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale)
 {
     v1->x += v2->x * scale;

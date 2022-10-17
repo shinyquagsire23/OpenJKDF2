@@ -1264,7 +1264,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                 v22 = v20 - 10;
                 if ( sithControl_ReadFunctionMap(v20, &readInput) )
                 {
-                    if ( !sithWeapon_a8BD030[v25] )
+                    if (sithThing_MotsTick(3, 0, (float)v22) && !sithWeapon_a8BD030[v25]) // MOTS added
                     {
                         sithWeapon_a8BD030[v25] = 1;
                         v23 = v19->cog;

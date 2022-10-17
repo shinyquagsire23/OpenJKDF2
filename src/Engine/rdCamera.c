@@ -212,6 +212,14 @@ int rdCamera_BuildFOV(rdCamera *camera)
                 fov_calc_height = camera->fov_y;
 #endif
 
+            // UBSAN fixes
+            if (fov_calc_height == 0) {
+                fov_calc_height = 0.000001;
+            }
+            if (fov_calc == 0) {
+                fov_calc = 0.000001;
+            }
+
             clipFrustum->farTop = project_height_half / fov_calc_height; // far top
             clipFrustum->farLeft = -project_width_half / fov_calc; // far left
             clipFrustum->bottom = -project_height_half_2 / fov_calc_height; // bottom

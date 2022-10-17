@@ -738,8 +738,6 @@ int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pTh
     sithThing *psVar1;
     float fVar3;
     float fVar4;
-    float fVar5;
-    float fVar6;
     jkBubbleInfo *pjVar7;
     int iVar8;
     jkBubbleInfo *pjVar9;
@@ -760,10 +758,7 @@ int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pTh
                     jkEpisode_DestroyBubble(psVar1);
                 }
                 else {
-                    fVar6 = (psVar1->position).x - (pThing->position).x;
-                    fVar4 = (psVar1->position).y - (pThing->position).y;
-                    fVar5 = (psVar1->position).z - (pThing->position).z;
-                    fVar4 = fVar5 * fVar5 + fVar4 * fVar4 + fVar6 * fVar6;
+                    fVar4 = rdVector_DistSquared3(&psVar1->position, &pThing->position);
                     if ((fVar4 < pjVar9->radiusSquared) && (fVar4 < fVar3)) 
                     {
                         if (pTypeOut) {

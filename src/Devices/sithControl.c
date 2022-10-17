@@ -937,7 +937,7 @@ LABEL_39:
                     sithControl_FreeCam(player);
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
-                if ( input_read != 0 )
+                if ( input_read != 0 &&  sithThing_MotsTick(2,0,1.0)) // MOTS added
                     sithPlayerActions_Activate(player);
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
