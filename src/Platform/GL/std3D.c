@@ -2119,7 +2119,7 @@ void std3D_DrawRenderList()
     glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
     glUniform4f(uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
-    glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 1.1 : 0.85));
+    glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
     glUniform1f(uniform_displacement_factor, 1.0);
 
     rdTri* tris = GL_tmpTris;
