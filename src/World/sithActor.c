@@ -269,13 +269,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                         thing->physicsParams.buoyancy = 0.3;
                     if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
-                        thing->thingflags |= SITH_TF_DEAD;
-                        sithThing_detachallchildren(thing);
-                        v10 = thing->physicsParams.physflags & ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
-                        thing->type = SITH_THING_CORPSE;
-                        thing->physicsParams.physflags = v10 | (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
-                        thing->lifeLeftMs = 20000;
-                        sithPhysics_FindFloor(thing, 0);
+                        sithActor_Remove(thing);
                     }
                     else
                     {
@@ -471,13 +465,13 @@ void sithActor_Remove(sithThing *thing)
     thing->type = SITH_THING_CORPSE;
     thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
     thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
-    thing->lifeLeftMs = 20000;
+    thing->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
     sithPhysics_FindFloor(thing, 0);
 }
 
 void sithActor_RemoveCorpse(sithThing *corpse)
 {
-    if ( corpse->isVisible + 1 == bShowInvisibleThings )
+    if (jkPlayer_bKeepCorpses || corpse->isVisible + 1 == bShowInvisibleThings ) // Added
         corpse->lifeLeftMs = 3000;
     else
         sithThing_Destroy(corpse);

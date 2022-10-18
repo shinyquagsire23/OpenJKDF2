@@ -145,6 +145,8 @@ extern float jkPlayer_gamma;
 extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
 
+extern int jkPlayer_bKeepCorpses;
+
 #define FOV_MIN (40)
 #define FOV_MAX (170)
 
