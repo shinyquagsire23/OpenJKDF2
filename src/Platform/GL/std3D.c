@@ -1931,15 +1931,15 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
 
         // HACK
         if (tri[0].flags & 0x600) {
-            glUniform1i(uniform_blend_mode, 6);
-            last_flags |= 0x200;
+            //glUniform1i(uniform_blend_mode, 6);
+            //last_flags |= 0x200;
         }
 
         
         for (int i = 0; i < tris_left; i++) {
             if (tri[i].texture != tex) break;
             if (tri[i].flags & 0x600) {
-                tri[i].flags |= 0x200;
+                //tri[i].flags |= 0x200;
             }
         }
     }

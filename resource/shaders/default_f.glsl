@@ -38,6 +38,11 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
 #endif
 
 #define LIGHT_DIVISOR (6.0)
+#define TEX_MODE_TEST 0
+#define TEX_MODE_WORLDPAL 1
+#define TEX_MODE_BILINEAR 2
+#define TEX_MODE_16BPP 5
+#define TEX_MODE_BILINEAR_16BPP 6
 
 uniform sampler2D tex;
 uniform sampler2D texEmiss;
@@ -229,12 +234,12 @@ void main(void)
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
 
-    if (tex_mode == 0) {
+    if (tex_mode == TEX_MODE_TEST) {
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     }
-    else if (tex_mode == 5
+    else if (tex_mode == TEX_MODE_16BPP
 #ifndef CAN_BILINEAR_FILTER_16
-    || tex_mode == 6
+    || tex_mode == TEX_MODE_BILINEAR_16BPP
 #endif
     )
     {
@@ -243,7 +248,7 @@ void main(void)
         sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);
     }
 #ifdef CAN_BILINEAR_FILTER_16
-    else if (tex_mode == 6)
+    else if (tex_mode == TEX_MODE_BILINEAR_16BPP)
     {
         if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == 5 || blend_mode == 6))
             discard;
@@ -279,9 +284,9 @@ void main(void)
     }
 #endif
 
-    else if (tex_mode == 1
+    else if (tex_mode == TEX_MODE_WORLDPAL
 #ifndef CAN_BILINEAR_FILTER
-    || tex_mode == 2
+    || tex_mode == TEX_MODE_BILINEAR
 #endif
     )
 
@@ -314,7 +319,7 @@ void main(void)
         //    color_add.a = 0.0;
     }
 #ifdef CAN_BILINEAR_FILTER
-    else if (tex_mode == 2)
+    else if (tex_mode == TEX_MODE_BILINEAR)
     {
         if (index == 0.0)
             discard;
@@ -348,6 +353,7 @@ void main(void)
         //main_color.rgb *= (1.0 - main_color.a);
         //should_write_normals = 0.0;
         //main_color.a = (1.0 - main_color.a);
+        //main_color.rgb += (main_color.rgb * (2.0 + main_color.a));
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)

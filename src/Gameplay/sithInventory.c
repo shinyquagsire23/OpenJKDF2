@@ -193,31 +193,43 @@ sithItemDescriptor* sithInventory_GetBinByIdx(int idx)
 
 int sithInventory_GetCurWeapon(sithThing *player)
 {
+    if (!player || !player->actorParams.playerinfo) return 0; // Added: Prevent nullptr deref
+
     return player->actorParams.playerinfo->curWeapon;
 }
 
 void sithInventory_SetCurWeapon(sithThing *player, int idx)
 {
+    if (!player || !player->actorParams.playerinfo) return; // Added: Prevent nullptr deref
+
     player->actorParams.playerinfo->curWeapon = idx;
 }
 
 int sithInventory_GetCurItem(sithThing *player)
 {
+    if (!player || !player->actorParams.playerinfo) return 0; // Added: Prevent nullptr deref
+
     return player->actorParams.playerinfo->curItem;
 }
 
 void sithInventory_SetCurItem(sithThing *player, int idx)
 {
+    if (!player || !player->actorParams.playerinfo) return; // Added: Prevent nullptr deref
+
     player->actorParams.playerinfo->curItem = idx;
 }
 
 int sithInventory_GetCurPower(sithThing *player)
 {
+    if (!player || !player->actorParams.playerinfo) return 0; // Added: Prevent nullptr deref
+
     return player->actorParams.playerinfo->curPower;
 }
 
 void sithInventory_SetCurPower(sithThing *player, int idx)
 {
+    if (!player || !player->actorParams.playerinfo) return; // Added: Prevent nullptr deref
+
     player->actorParams.playerinfo->curPower = idx;
 }
 

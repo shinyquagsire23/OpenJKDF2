@@ -92,8 +92,17 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
 
 void sithCamera_Close()
 {
-    if ( sithCamera_bOpen )
+    if ( sithCamera_bOpen ) {
         sithCamera_bOpen = 0;
+
+        // Added: Prevent UAF
+        rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, NULL);
+    }
 }
 
 void sithCamera_SetsFocus()
