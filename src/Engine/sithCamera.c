@@ -592,6 +592,10 @@ void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoomSpeed)
 #ifdef JKM_CAMERA
 #ifdef QOL_IMPROVEMENTS
     float zoomFov = jkPlayer_fov / zoomScale;
+    if (jkPlayer_fovIsVertical && pCamera->rdCam.screenAspectRatio != 0.0) {
+        zoomFov = zoomScale * (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) * -2.0);
+    }
+    
 #else
     // I have no idea what's going on here
     float zoomFov = stdMath_ArcTan4(zoomScale * 0.5, 0.0);

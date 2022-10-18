@@ -270,6 +270,9 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
 {
     rdPuppet *pPuppet; // [esp-8h] [ebp-18h]
 
+    int tmp = jkGuiBuildMulti_bRendering; // Added
+    jkGuiBuildMulti_bRendering = 1; // Added
+
     jkGuiBuildMulti_model = rdModel3_New(pModelFpath);
     jkGuiBuildMulti_thing = rdThing_New(0);
     rdThing_SetModel3(jkGuiBuildMulti_thing, jkGuiBuildMulti_model);
@@ -281,10 +284,15 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
     rdPuppet_PlayTrack(pPuppet, jkGuiBuildMulti_trackNum);
     rdPuppet_SetTrackSpeed(jkGuiBuildMulti_thing->puppet, jkGuiBuildMulti_trackNum, 150.0);
     _memcpy(&jkGuiBuildMulti_matrix, &rdroid_identMatrix34, sizeof(jkGuiBuildMulti_matrix));
+
+    jkGuiBuildMulti_bRendering = tmp; // Added
 }
 
 void jkGuiBuildMulti_ThingCleanup()
 {
+    int tmp = jkGuiBuildMulti_bRendering; // Added
+    jkGuiBuildMulti_bRendering = 1; // Added
+
     // Added
     std3D_PurgeTextureCache();
 
@@ -292,6 +300,8 @@ void jkGuiBuildMulti_ThingCleanup()
     rdKeyframe_FreeEntry(jkGuiBuildMulti_keyframe);
     rdThing_Free(jkGuiBuildMulti_thing);
     rdModel3_Free(jkGuiBuildMulti_model);
+
+    jkGuiBuildMulti_bRendering = tmp; // Added
 }
 
 int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
@@ -501,7 +511,6 @@ LABEL_32:
     jkGuiBuildMulti_ThingCleanup(); // inlined
 
     jkGuiBuildMulti_CloseRender(); // inlined
-    jkGuiBuildMulti_bRendering = 0; // Added
 
     jkGuiBuildMulti_bSabersLoaded = 0;
     if ( jkGuiBuildMulti_aModels )
@@ -514,12 +523,21 @@ LABEL_32:
     if ( jkGuiBuildMulti_apSaberBitmaps )
         pHS->free(jkGuiBuildMulti_apSaberBitmaps);
     jkGui_SetModeGame();
+
+    // Added
+    std3D_PurgeTextureCache();
+
+    jkGuiBuildMulti_bRendering = 0; // Added
+
     return v18;
 }
 
 int jkGuiBuildMulti_DisplayModel()
 {
     stdVBufferTexFmt v1; // [esp+8h] [ebp-4Ch] BYREF
+
+    int tmp = jkGuiBuildMulti_bRendering; // Added
+    jkGuiBuildMulti_bRendering = 1; // Added
 
     rdOpen(0);
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &jkGuiBuildMulti_colormap);
@@ -568,7 +586,10 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);
     jkGuiBuildMulti_pModelGun = rdModel3_New("bryg.3do");
     jkGuiBuildMulti_pThingGun = rdThing_New(0);
-    return rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
+    int ret = rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
+
+    jkGuiBuildMulti_bRendering = tmp; // Added
+    return ret;
 }
 
 void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)

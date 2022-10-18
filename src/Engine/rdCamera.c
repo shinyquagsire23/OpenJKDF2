@@ -80,6 +80,7 @@ int rdCamera_SetCurrent(rdCamera *camera)
     return 1;
 }
 
+extern int jkGuiBuildMulti_bRendering;
 int rdCamera_SetFOV(rdCamera *camera, float fovVal)
 {
     if ( fovVal < 5.0 )
@@ -91,7 +92,25 @@ int rdCamera_SetFOV(rdCamera *camera, float fovVal)
         fovVal = 179.0;
     }
 
-    camera->fov = fovVal;
+#ifdef QOL_IMPROVEMENTS
+    if (!jkGuiBuildMulti_bRendering && jkPlayer_fovIsVertical && camera->screenAspectRatio != 0.0) {
+        camera->fov = stdMath_ArcTan3(1.0, stdMath_Tan(fovVal * 0.5) / camera->screenAspectRatio) * -2.0;
+        
+        if ( camera->fov < 5.0 )
+        {
+            camera->fov = 5.0;
+        }
+        else if ( camera->fov > 179.0 )
+        {
+            camera->fov = 179.0;
+        }
+    }
+    else
+#endif
+    {
+        camera->fov = fovVal;
+    }     
+    
     rdCamera_BuildFOV(camera);
     return 1;
 }
@@ -148,6 +167,10 @@ int rdCamera_SetOrthoScale(rdCamera *camera, float scale)
 
 int rdCamera_SetAspectRatio(rdCamera *camera, float ratio)
 {
+#ifdef QOL_IMPROVEMENTS
+    if (jkPlayer_enableOrigAspect) ratio = 1.0;
+#endif
+
     camera->screenAspectRatio = ratio;
     return rdCamera_SetProjectType(camera, camera->projectType);
 }
@@ -191,25 +214,14 @@ int rdCamera_BuildFOV(rdCamera *camera)
             float project_width_half_2 = project_width_half;
             float project_height_half_2 = project_height_half;
             
-#ifdef QOL_IMPROVEMENTS
-            if (jkPlayer_fovIsVertical) {
-                camera->fov_y = project_width_half / ((1.0/camera->screenAspectRatio) * stdMath_Tan(camera->fov * 0.5));
-            }
-            else
-            {
-                camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
-            }
-            
-#else
             camera->fov_y = project_width_half / stdMath_Tan(camera->fov * 0.5);
-#endif
 
             float fov_calc = camera->fov_y;
-            float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
+            float fov_calc_height = camera->fov_y;
 
 #ifdef QOL_IMPROVEMENTS
             if (jkPlayer_enableOrigAspect)
-                fov_calc_height = camera->fov_y;
+                fov_calc_height = camera->fov_y * camera->screenAspectRatio;
 #endif
 
             // UBSAN fixes
@@ -251,11 +263,11 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     rdVector_Copy3(&outClip->field_0, &cameraClip->field_0);
     
     float fov_calc = camera->fov_y;
-    float fov_calc_height = camera->fov_y * camera->screenAspectRatio;
+    float fov_calc_height = camera->fov_y;
 
 #ifdef QOL_IMPROVEMENTS
     if (jkPlayer_enableOrigAspect)
-        fov_calc_height = camera->fov_y;
+        fov_calc_height = camera->fov_y * camera->screenAspectRatio;
 #endif
 
     // UBSAN fixes
@@ -324,7 +336,7 @@ void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
 void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
 {
     out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? 1.0 : rdCamera_pCurCamera->screenAspectRatio) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? rdCamera_pCurCamera->screenAspectRatio : 1.0) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
     out->z = v->y;
 
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);

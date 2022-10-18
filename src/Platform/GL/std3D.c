@@ -2029,6 +2029,12 @@ void std3D_DrawRenderList()
         zoom_xaspect = 1.0;
     }
 
+    // We no longer need all the weird squishing
+    if (!jkGuiBuildMulti_bRendering) {
+        zoom_yaspect = 1.0;
+        zoom_xaspect = 1.0;
+    }
+    
     float shift_add_x = 0;
     float shift_add_y = 0;
 

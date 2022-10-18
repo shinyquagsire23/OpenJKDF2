@@ -68,6 +68,7 @@ extern int jkPlayer_enableTextureFilter;
 extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
 extern int Main_bHeadless;
+extern int jkGuiBuildMulti_bRendering;
 
 int compare_hashstr(uint8_t *p, const char* str){
     char tmp[34];
@@ -491,8 +492,9 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
     if (Main_bHeadless) return;
 
     // Also preload even if we have no jkgm stuff
-    if (jkPlayer_bEnableTexturePrecache && jkgm_fastpath_disable && vbuf && texture) {
-        std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+    if ((!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) && jkgm_fastpath_disable && vbuf && texture) {
+        // Causes some texture confusion when returning from jkGuiBuildMulti?
+        //std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
         return;
     }
 
@@ -507,6 +509,8 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
 
     //printf("%s %s %s\n", full_fpath_str.c_str(), cache_key.c_str(), hash.c_str());
 
+    texture->cache_entry = NULL;
+
     if (jkgm_cache.find(cache_key) != jkgm_cache.end()) {
         texture->skip_jkgm = 0;
     }
@@ -519,8 +523,9 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
 
     // Also preload non-PNG textures
     if (texture->skip_jkgm) {
-        if (jkPlayer_bEnableTexturePrecache) {
-            std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        if (!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) {
+            // Causes some texture confusion when returning from jkGuiBuildMulti?
+            //std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
         }
         return;
     }
@@ -531,8 +536,9 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
 
     //printf("Caching %s mipmap_level=%d, cel=%d\n", material->mat_full_fpath, mipmap_level, cel);
 
-    if (jkPlayer_bEnableTexturePrecache)
+    if (!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) {
         jkgm_std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0, material, cel);
+    }
 }
 
 int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)

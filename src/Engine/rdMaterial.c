@@ -256,16 +256,26 @@ LABEL_22:
         for (int j = 0; j < texture->num_mipmaps; j++) {
             stdVBuffer* mipmap = texture->texture_struct[j];
             rdDDrawSurface* surface = &texture->alphaMats[j];
-
-            surface->albedo_data = NULL;
-            surface->displacement_data = NULL;
-            surface->emissive_data = NULL;
+            
             surface->emissive_texture_id = 0;
             surface->displacement_texture_id = 0;
             surface->emissive_factor[0] = 0.0;
             surface->emissive_factor[1] = 0.0;
             surface->emissive_factor[2] = 0.0;
             surface->displacement_factor = 0.0;
+            surface->albedo_factor[0] = 1.0;
+            surface->albedo_factor[1] = 1.0;
+            surface->albedo_factor[2] = 1.0;
+            surface->albedo_factor[3] = 1.0;
+            surface->albedo_data = NULL;
+            surface->displacement_data = NULL;
+            surface->emissive_data = NULL;
+            surface->skip_jkgm = 0;
+            surface->cache_entry = NULL;
+
+            surface->is_16bit = 0;
+            surface->texture_loaded = 0;
+
 #ifndef ARCH_WASM
             jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, j, i);
 #endif
@@ -290,7 +300,6 @@ void rdMaterial_Free(rdMaterial *material)
     rdMaterial_FreeEntry(material);
 
     rdroid_pHS->free(material);
-    *(uint32_t*)0 = 0;
 }
 
 void rdMaterial_FreeEntry(rdMaterial* material)
