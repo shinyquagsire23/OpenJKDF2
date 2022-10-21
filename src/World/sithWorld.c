@@ -401,6 +401,9 @@ void sithWorld_FreeEntry(sithWorld *world)
         jkPlayerInfo* playerInfoJk = &playerThings[i];
         jkPlayer_SetPovModel(playerInfoJk, NULL);
     }
+
+    // Added (Droidworks): JK and MoTS memleaked the world alloc
+    pSithHS->free(world);
 }
 
 int sithHeader_Load(sithWorld *world, int junk)

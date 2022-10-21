@@ -32,15 +32,20 @@ static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
 int sithCamera_Startup()
 {
-    sithCamera_NewEntry(&sithCamera_cameras[0], 0, 1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[1], 0, 4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_cameras[1].vec3_3.x = 0.0;
     sithCamera_cameras[1].vec3_3.y = -0.2;
     sithCamera_cameras[1].vec3_3.z = 0.06;
-    sithCamera_NewEntry(&sithCamera_cameras[2], 0, 8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[4], 0, 32, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[5], 0, 64, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[6], 0, 128, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[2], 0, 0x8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[4], 0, 0x20, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[5], 0, 0x40, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_cameras[6], 0, 0x80, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+#ifdef DW_CAMERA
+    if (Main_bDwCompat) {
+        sithCamera_NewEntry(&sithCamera_cameras[7], 0, 0x100, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    }
+#endif
     sithCamera_curCameraIdx = 0;
     sithCamera_bInitted = 1;
 
@@ -85,6 +90,14 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
     rdCamera_NewEntry(&sithCamera_cameras[6].rdCam, sithCamera_cameras[6].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, canvas);
+#ifdef DW_CAMERA
+    if (Main_bDwCompat) {
+        sithCamera_cameras[7].aspectRatio = aspect;
+        rdCamera_NewEntry(&sithCamera_cameras[7].rdCam, sithCamera_cameras[7].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+        rdCamera_SetAttenuation(&sithCamera_cameras[7].rdCam, 0.4, 0.8);
+        rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, canvas);
+    }
+#endif // DW_CAMERA
     sithCamera_FollowFocus(sithCamera_currentCamera);
     sithCamera_bOpen = 1;
     return 1;
@@ -102,6 +115,9 @@ void sithCamera_Close()
         rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, NULL);
         rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, NULL);
         rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, NULL);
+#ifdef DW_CAMERA
+        rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, NULL);
+#endif
     }
 }
 
@@ -155,8 +171,9 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     rdCamera_NewEntry(&camera->rdCam, fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
     rdCamera_SetAttenuation(&camera->rdCam, 0.4, 0.8);
 
-    if (canvas)
+    if (canvas) {
         rdCamera_SetCanvas(&camera->rdCam, canvas);
+    }
 
     rdVector_Zero3(&camera->vec3_1);
     rdVector_Zero3(&camera->vec3_2);

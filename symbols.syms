@@ -79,7 +79,7 @@ sithRender_aSurfaces 0x008318F8 sithSurface*[32]
 sithRender_lastRenderTick 0x008EE678 int
 aSithSurfaces 0x00847E98 sithSurface*[32]
 
-sithCamera_cameras 0x008EC380 sithCamera[7]
+sithCamera_cameras 0x008EC380 sithCamera[SITHCAMERA_NUMCAMERAS]
 sithCamera_dword_8EE5A0 0x008EE5A0 int
 sithCamera_state 0x008EE5A4 int
 sithCamera_curCameraIdx 0x008EE5A8 int

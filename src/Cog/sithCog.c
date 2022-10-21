@@ -103,7 +103,17 @@ int sithCog_Startup()
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 38, "leave");
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 39, "splash");
     sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
-    if (Main_bMotsCompat) {
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 41, "laserhit");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 42, "cut");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 43, "injected");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "powerplug");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 45, "welded");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 46, "tugged");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 48, "used");
+        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 47, "converse");
+    }
+    else if (Main_bMotsCompat) {
         sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 41, "preblock");
         sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 42, "escaped");
         sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 43, "attachkilled");

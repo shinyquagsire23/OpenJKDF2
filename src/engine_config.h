@@ -83,10 +83,22 @@
 #define JKM_CAMERA
 #endif
 
+// Backport Droidworks misc
+#ifdef QOL_IMPROVEMENTS
+#define DW_CAMERA
+#endif
+
 #ifdef JKM_DSS
 #define NUM_JKPLAYER_THINGS (64)
 #else
 #define NUM_JKPLAYER_THINGS (16)
+#endif
+
+// Droidworks cameras
+#ifdef DW_CAMERA
+#define SITHCAMERA_NUMCAMERAS (8)
+#else
+#define SITHCAMERA_NUMCAMERAS (7)
 #endif
 
 //

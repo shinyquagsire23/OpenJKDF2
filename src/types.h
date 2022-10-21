@@ -619,6 +619,7 @@ enum SithCogFlag
 };
 
 extern int Main_bMotsCompat;
+extern int Main_bDwCompat;
 #define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)
 
 typedef int SITH_MESSAGE;

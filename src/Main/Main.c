@@ -94,6 +94,7 @@ int Main_bDedicatedServer = 0;
 int Main_bHeadless = 0;
 int Main_bVerboseNetworking = 0;
 int Main_bMotsCompat = 0;
+int Main_bDwCompat = 0;
 #endif
 
 #ifdef QOL_IMPROVEMENTS
@@ -551,6 +552,13 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(v1, "-motsCompat") || !__strcmpi(v1, "/motsCompat"))
         {
             Main_bMotsCompat = 1;
+        }
+        else if (!__strcmpi(v1, "-dwCompat") 
+                 || !__strcmpi(v1, "/dwCompat") 
+                 || !__strcmpi(v1, "-droidworksCompat") 
+                 || !__strcmpi(v1, "/droidworksCompat"))
+        {
+            Main_bDwCompat = 1;
         }
 #endif
         else
