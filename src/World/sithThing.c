@@ -1271,7 +1271,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     }
     else if ( a2->moveType == SITH_MT_PATH )
     {
-        rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.field_20);
+        rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.lerpSpeed);
     }
     rdVector_Sub3(&a2a, &a1->position, &a2->position);
     rdMatrix_TransformVector34Acc_0(&a1->field_4C, &a2a, &a2->lookOrientation);
@@ -1376,9 +1376,9 @@ int sithThing_DetachThing(sithThing *thing)
         {
             if ( v3->moveType != SITH_MT_PATH )
                 goto LABEL_8;
-            thing->physicsParams.vel.x = (v3->trackParams.vel.x * v3->trackParams.field_20) + thing->physicsParams.vel.x;
-            thing->physicsParams.vel.y = (v3->trackParams.vel.y * v3->trackParams.field_20) + thing->physicsParams.vel.y;
-            thing->physicsParams.vel.z = (v3->trackParams.vel.z * v3->trackParams.field_20) + thing->physicsParams.vel.z;
+            thing->physicsParams.vel.x = (v3->trackParams.vel.x * v3->trackParams.lerpSpeed) + thing->physicsParams.vel.x;
+            thing->physicsParams.vel.y = (v3->trackParams.vel.y * v3->trackParams.lerpSpeed) + thing->physicsParams.vel.y;
+            thing->physicsParams.vel.z = (v3->trackParams.vel.z * v3->trackParams.lerpSpeed) + thing->physicsParams.vel.z;
         }
     }
 LABEL_8:

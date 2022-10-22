@@ -12,8 +12,8 @@ void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, float a3)
 {
     if ( goalFrame < thing->trackParams.loadedFrames )
     {
-        thing->trackParams.field_C |= 4u;
-        thing->trackParams.field_20 = a3;
+        thing->trackParams.flags |= 4u;
+        thing->trackParams.lerpSpeed = a3;
         thing->goalframe = goalFrame;
         sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_STARTMOVE);
         sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_MOVING);
@@ -48,16 +48,16 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
         v8 = rdVector_Normalize3Acc(&thing->trackParams.vel);
         if ( v8 != 0.0 )
         {
-            v9 = v8 / thing->trackParams.field_20;
+            v9 = v8 / thing->trackParams.lerpSpeed;
             thing->field_250 = 0;
-            thing->trackParams.field_C |= 1;
+            thing->trackParams.flags |= 1;
             thing->trackParams.field_1C = v9;
         }
         thinga = thing->trackParams.field_1C;
         if ( thing->trackParams.field_1C == 0.0 )
         {
-            thing->trackParams.field_C &= ~0x17;
-            thing->trackParams.field_20 = 0.0;
+            thing->trackParams.flags &= ~0x17;
+            thing->trackParams.lerpSpeed = 0.0;
             thing->goalframe = 0;
             thing->field_258 = 0;
             thing->field_250 = 0;
@@ -90,9 +90,9 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
         v15 = rdVector_Normalize3Acc(&thing->trackParams.vel);
         if ( v15 != 0.0 )
         {
-            v16 = v15 / thing->trackParams.field_20;
+            v16 = v15 / thing->trackParams.lerpSpeed;
             thing->field_250 = 0;
-            thing->trackParams.field_C |= 1;
+            thing->trackParams.flags |= 1;
             thing->trackParams.field_1C = v16;
         }
         thinga = thing->trackParams.field_1C;
@@ -104,7 +104,6 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
 
 void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
 {
-    int v3; // eax
     double v4; // st7
     double v5; // st7
     double v18; // st7
@@ -112,8 +111,6 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
     double v26; // st7
     double v30; // st7
     double v31; // st7
-    int v37; // eax
-    int v38; // ecx
     sithThing *v39; // [esp-14h] [ebp-64h]
     float a6; // [esp+0h] [ebp-50h]
     float v41; // [esp+4h] [ebp-4Ch]
@@ -127,12 +124,11 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
 
     if ( deltaSeconds != 0.0 )
     {
-        v3 = thing->trackParams.field_C;
-        if ( v3 )
+        if ( thing->trackParams.flags )
         {
-            if ( (v3 & 0x80u) == 0 )
+            if ( (thing->trackParams.flags & 0x80u) == 0 )
             {
-                if ( (v3 & 2) != 0 )
+                if ( (thing->trackParams.flags & 2) != 0 )
                 {
                     v4 = thing->trackParams.field_54 * deltaSeconds;
                     v41 = v4;
@@ -144,9 +140,9 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         v41 = 1.0 - thing->field_24C;
                     }
                     rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
-                    _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
+                    rdMatrix_Copy34(&a, &thing->trackParams.field_24);
                     rdMatrix_PostRotate34(&a, &rot);
-                    if ( (thing->trackParams.field_C & 0x10) != 0 )
+                    if ( (thing->trackParams.flags & 0x10) != 0 )
                     {
                         rdVector_Add3(&a1a, &thing->trackParams.field_58, &a.scale);
                         rdVector_Sub3Acc(&a1a, &thing->position);
@@ -158,7 +154,7 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 v18 = sithCollision_UpdateThingCollision(thing, &a1a, a6, 0x44);
                                 if ( v18 < a6 )
                                 {
-                                    _memcpy(&a, &thing->trackParams.field_24, sizeof(a));
+                                    rdMatrix_Copy34(&a, &thing->trackParams.field_24);
                                     a3 = v18 / a6 * v41 + thing->field_24C;
                                     rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
                                     rdMatrix_PreRotate34(&a, &rot);
@@ -171,23 +167,23 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                     sithCollision_sub_4E77A0(thing, &a);
                     if ( thing->field_24C >= 1.0 )
                     {
-                        if ( (thing->trackParams.field_C & 0x10) == 0 )
+                        if ( (thing->trackParams.flags & 0x10) == 0 )
                         {
                             rdMatrix_BuildRotate34(&a, &thing->trackParams.orientation);
                             rdVector_Zero3(&thing->lookOrientation.scale);
                             sithCollision_sub_4E77A0(thing, &a);
                         }
-                        thing->trackParams.field_C &= ~0x12;
+                        thing->trackParams.flags &= ~0x12;
                     }
                 }
-                if ( (thing->trackParams.field_C & 1) != 0 )
+                if ( (thing->trackParams.flags & 1) != 0 )
                 {
                     if ( thing->trackParams.field_1C <= (double)deltaSeconds )
                         v22 = thing->trackParams.field_1C;
                     else
                         v22 = deltaSeconds;
                     v42 = v22;
-                    deltaSecondsa = stdMath_ClipPrecision(thing->trackParams.field_20 * v22);
+                    deltaSecondsa = stdMath_ClipPrecision(thing->trackParams.lerpSpeed * v22);
                     if ( deltaSecondsa != 0.0 )
                     {
                         v26 = sithCollision_UpdateThingCollision(thing, &thing->trackParams.vel, deltaSecondsa, 68);
@@ -216,22 +212,20 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                     v31 = stdMath_ClipPrecision(v31);
                     if ( v31 == 0.0 )
                     {
-                        thing->trackParams.field_C &= ~1;
+                        thing->trackParams.flags &= ~1;
                     }
                     else if ( thing->field_250 > 2u && (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
                     {
                         sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_BLOCKED);
                     }
                 }
-                if ( (thing->trackParams.field_C & 3) == 0 )
+                if ( (thing->trackParams.flags & 3) == 0 )
                 {
-                    if ( (thing->trackParams.field_C & 4) != 0 )
+                    if ( (thing->trackParams.flags & 4) != 0 )
                     {
-                        v37 = thing->field_258;
-                        v38 = thing->goalframe;
-                        thing->curframe = v37;
+                        thing->curframe = thing->field_258;
                         v39 = thing;
-                        if ( v37 != v38 )
+                        if ( thing->curframe != thing->goalframe )
                         {
                             sithTrackThing_Arrivedidk(thing);
                             return;
@@ -251,112 +245,85 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
 
 void sithTrackThing_sub_4FAD50(sithThing *thing, rdVector3 *a2, float a3)
 {
-    double v4; // st7
-    double v7; // st7
-    double v10; // st7
-    float v12; // eax
-    float v13; // edx
-    float v15; // [esp+0h] [ebp-2Ch]
-    float v16; // [esp+14h] [ebp-18h]
-    float v17; // [esp+18h] [ebp-14h]
-    float v18; // [esp+18h] [ebp-14h]
-    float v18_hi;
-    float v19; // [esp+1Ch] [ebp-10h]
-    rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
+    rdVector3 out;
+    rdVector3 angles;
 
     rdMatrix_ExtractAngles34(&thing->lookOrientation, &out);
-    v17 = a2->y - out.y;
-    v19 = a2->z - out.z;
-    v15 = a2->x - out.x;
-    v16 = stdMath_NormalizeAngleAcute(v15);
-    v18 = stdMath_NormalizeAngleAcute(v17);
-    v18_hi = stdMath_NormalizeAngleAcute(v19);
-    v4 = v16;
-    if ( v4 < 0.0 )
-        v4 = -v4;
-    if ( v4 < 2.5 )
-        v16 = 0.0;
-    v7 = v18;
-    if ( v7 < 0.0 )
-        v7 = -v7;
-    if ( v7 < 2.5 )
-        v18 = 0.0;
-    v10 = v18_hi;
-    if ( v10 < 0.0 )
-        v10 = -v10;
-    if ( v10 < 2.5 )
-        v18_hi = 0.0;
-    if ( v16 != 0.0 || v18 != 0.0 || v18_hi != 0.0 )
+    rdVector_Sub3(&angles, a2, &out);
+    angles.x = stdMath_NormalizeAngleAcute(angles.x);
+    angles.y = stdMath_NormalizeAngleAcute(angles.y);
+    angles.z = stdMath_NormalizeAngleAcute(angles.z);
+
+    if (fabs(angles.x) < 2.5)
+        angles.x = 0.0;
+    if (fabs(angles.y) < 2.5)
+        angles.y = 0.0;
+    if (fabs(angles.z) < 2.5)
+        angles.z = 0.0;
+
+    if ( !rdVector_IsZero3(&angles) )
     {
-        _memcpy(&thing->trackParams.field_24, &thing->lookOrientation, 0x30u);
+        rdMatrix_Copy34(&thing->trackParams.field_24, &thing->lookOrientation);
         thing->trackParams.field_54 = 1.0 / a3;
         rdVector_Zero3(&thing->trackParams.field_24.scale);
-        thing->trackParams.field_64.x = v16;
+        rdVector_Copy3(&thing->trackParams.field_64, &angles);
         thing->field_24C = 0.0;
-        thing->trackParams.field_64.y = v18;
-        thing->trackParams.field_64.z = v18_hi;
-        v12 = a2->y;
-        thing->trackParams.orientation.x = a2->x;
-        v13 = a2->z;
-        thing->trackParams.orientation.y = v12;
-        thing->trackParams.orientation.z = v13;
-        thing->trackParams.field_C &= ~0x10;
-        thing->trackParams.field_C |= 2;
+        rdVector_Copy3(&thing->trackParams.orientation, a2);
+        thing->trackParams.flags &= ~0x10;
+        thing->trackParams.flags |= 2;
     }
 }
 
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param)
 {
-    sithThing *v4; // ebp
-    int v5; // eax
-    int v6; // ebx
-    unsigned int v7; // esi
-    sithThing *v8; // edi
-    unsigned int v9; // esi
-    sithThingFrame *v10; // eax
-    rdVector3 v12; // [esp+10h] [ebp-Ch] BYREF
-    rdVector3 v13;
-
-    if ( param == THINGPARAM_FRAME )
+    switch (param)
     {
-        v8 = thing;
-        v9 = thing->trackParams.loadedFrames;
-        if ( v9 < thing->trackParams.sizeFrames )
+        case THINGPARAM_FRAME:
         {
-            if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &v12.x, &v12.y, &v12.z, &v13.x, &v13.y, &v13.z) != 6 )
-                return 0;
-            v10 = &v8->trackParams.aFrames[v9];
-            v8->trackParams.loadedFrames = v9 + 1;
-            rdVector_Copy3(&v10->pos, &v12);
-            rdVector_Copy3(&v10->rot, &v13);
+            rdVector3 tmpPos;
+            rdVector3 tmpRot;
+
+            if ( thing->trackParams.loadedFrames < thing->trackParams.sizeFrames )
+            {
+                if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &tmpPos.x, &tmpPos.y, &tmpPos.z, &tmpRot.x, &tmpRot.y, &tmpRot.z) != 6 )
+                    return 0;
+                sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->trackParams.loadedFrames++];
+                rdVector_Copy3(&pFrame->pos, &tmpPos);
+                rdVector_Copy3(&pFrame->rot, &tmpRot);
+            }
+            return 1;
         }
-        return 1;
+
+        case THINGPARAM_NUMFRAMES:
+        {
+            if ( thing->trackParams.sizeFrames )
+                return 0;
+
+            int numFrames = _atoi(arg->value);
+            if ( numFrames < 1 )
+                return 0;
+
+            size_t alloc_sz = sizeof(sithThingFrame) * numFrames;
+            thing->trackParams.aFrames = pSithHS->alloc(alloc_sz);
+            if ( thing->trackParams.aFrames )
+            {
+                _memset(thing->trackParams.aFrames, 0, alloc_sz);
+                thing->trackParams.sizeFrames = numFrames;
+                thing->trackParams.loadedFrames = 0;
+                return 1;
+            }
+            return 0;
+        }
+
+        default:
+            return 0;
     }
-    if ( param != THINGPARAM_NUMFRAMES )
-        return 0;
-    v4 = thing;
-    if ( thing->trackParams.sizeFrames )
-        return 0;
-    v5 = _atoi(arg->value);
-    v6 = v5;
-    if ( v5 < 1 )
-        return 0;
-    v7 = sizeof(sithThingFrame) * v5;
-    v4->trackParams.aFrames = pSithHS->alloc(sizeof(sithThingFrame) * v5);
-    if ( v4->trackParams.aFrames )
-    {
-        _memset(v4->trackParams.aFrames, 0, v7);
-        v4->trackParams.sizeFrames = v6;
-        v4->trackParams.loadedFrames = 0;
-        return 1;
-    }
-    return 0;
 }
 
 void sithTrackThing_Stop(sithThing *thing)
 {
-    thing->trackParams.field_C &= ~0x17u;
-    thing->trackParams.field_20 = 0.0;
+    thing->trackParams.flags &= ~0x17u;
+    thing->trackParams.lerpSpeed = 0.0;
     thing->goalframe = 0;
     thing->field_258 = 0;
     thing->field_250 = 0;
@@ -412,7 +379,7 @@ void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, 
     float v6; // ecx
     double v7; // st7
 
-    thing->trackParams.field_C |= 0x12u;
+    thing->trackParams.flags |= 0x12u;
     sithSoundClass_ThingPlaySoundclass4(thing, 3u);
     sithSoundClass_ThingPlaySoundclass4(thing, 5u);
     v4 = thing->position.x;
@@ -475,7 +442,7 @@ void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
     }
     if ( v2 != 0.0 )
     {
-        trackThing->trackParams.field_C |= 0x42u;
+        trackThing->trackParams.flags |= 0x42u;
         _memcpy(&trackThing->trackParams.field_24, &trackThing->lookOrientation, sizeof(trackThing->trackParams.field_24));
         v7 = rot->y * v2;
         v8 = rot->z * v2;
@@ -500,45 +467,43 @@ void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, fl
     if ( goalframeNum < trackThing->trackParams.loadedFrames )
     {
         trackThing->goalframe = goalframeNum;
-        trackThing->trackParams.field_C &= ~0x4;
-        trackThing->trackParams.field_20 = a3;
+        trackThing->trackParams.flags &= ~0x4;
+        trackThing->trackParams.lerpSpeed = a3;
         sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_STARTMOVE);
         sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
 
         goalFrame = &trackThing->trackParams.aFrames[trackThing->goalframe];
 
-        trackThing->trackParams.vel.x = goalFrame->pos.x - trackThing->position.x;
-        trackThing->trackParams.vel.y = goalFrame->pos.y - trackThing->position.y;
-        trackThing->trackParams.vel.z = goalFrame->pos.z - trackThing->position.z;
+        rdVector_Sub3(&trackThing->trackParams.vel, &goalFrame->pos, &trackThing->position);
         
         v5 = rdVector_Normalize3Acc(&trackThing->trackParams.vel);
         if ( v5 != 0.0 )
         {
             trackThing->field_250 = 0;
-            trackThing->trackParams.field_C |= 1;
-            trackThing->trackParams.field_1C = v5 / trackThing->trackParams.field_20;
+            trackThing->trackParams.flags |= 1;
+            trackThing->trackParams.field_1C = v5 / trackThing->trackParams.lerpSpeed;
         }
     }
 }
 
 int sithTrackThing_PathMovePause(sithThing *trackThing)
 {
-    if ( (trackThing->trackParams.field_C & 3) == 0 )
+    if ( (trackThing->trackParams.flags & 3) == 0 )
         return 0;
 
     sithSoundClass_ThingPauseSoundclass(trackThing, SITH_SC_MOVING);
 
-    trackThing->trackParams.field_C |= 0x80;
+    trackThing->trackParams.flags |= 0x80;
     return 1;
 }
 
 int sithTrackThing_PathMoveResume(sithThing *trackThing)
 {
-    if (!(trackThing->trackParams.field_C & 0x80))
+    if (!(trackThing->trackParams.flags & 0x80))
         return 0;
 
     sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
 
-    trackThing->trackParams.field_C &= ~0x80;
+    trackThing->trackParams.flags &= ~0x80;
     return 1;
 }

@@ -798,10 +798,10 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
         }
         else if ( thing->moveType == SITH_MT_PATH )
         {
-            NETMSG_PUSHS16(thing->trackParams.field_C);
+            NETMSG_PUSHS16(thing->trackParams.flags);
             NETMSG_PUSHVEC3(thing->trackParams.vel);
             NETMSG_PUSHF32(thing->trackParams.field_1C);
-            NETMSG_PUSHF32(thing->trackParams.field_20);
+            NETMSG_PUSHF32(thing->trackParams.lerpSpeed);
             NETMSG_PUSHF32(thing->trackParams.field_54);
             NETMSG_PUSHVEC3(thing->trackParams.field_58);
             NETMSG_PUSHVEC3(thing->trackParams.field_64);
@@ -938,10 +938,10 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     }
     else if ( thing->moveType == SITH_MT_PATH )
     {
-        thing->trackParams.field_C = NETMSG_POPS16();
+        thing->trackParams.flags = NETMSG_POPS16();
         thing->trackParams.vel = NETMSG_POPVEC3();
         thing->trackParams.field_1C = NETMSG_POPF32();
-        thing->trackParams.field_20 = NETMSG_POPF32();
+        thing->trackParams.lerpSpeed = NETMSG_POPF32();
         thing->trackParams.field_54 = NETMSG_POPF32();
         thing->trackParams.field_58 = NETMSG_POPVEC3();
         thing->trackParams.field_64 = NETMSG_POPVEC3();

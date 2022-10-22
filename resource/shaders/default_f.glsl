@@ -44,6 +44,9 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+#define D3DBLEND_SRCALPHA        (5)
+#define D3DBLEND_INVSRCALPHA     (6)
+
 uniform sampler2D tex;
 uniform sampler2D texEmiss;
 uniform sampler2D worldPalette;
@@ -243,14 +246,14 @@ void main(void)
 #endif
     )
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == 5 || blend_mode == 6))
+        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
             discard;
         sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);
     }
 #ifdef CAN_BILINEAR_FILTER_16
     else if (tex_mode == TEX_MODE_BILINEAR_16BPP)
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == 5 || blend_mode == 6))
+        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
             discard;
 
         // Get texture size in pixels:
@@ -329,7 +332,7 @@ void main(void)
     }
 #endif
 
-    if (blend_mode == 5)
+    if (blend_mode == D3DBLEND_SRCALPHA)
     {
         //if (sampled_color.a < 0.1)
         //    discard;
@@ -343,16 +346,17 @@ void main(void)
 
     main_color *= albedoFactor;
 
-    if (blend_mode == 5 || blend_mode == 6)
+    if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
     {
         should_write_normals = main_color.a;
     }
 
-    if (blend_mode == 6)
+    if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
-        //main_color.rgb *= (1.0 - main_color.a);
+        main_color.rgb *= (1.0 - main_color.a);
         //should_write_normals = 0.0;
-        //main_color.a = (1.0 - main_color.a);
+        main_color.a = (1.0 - main_color.a);
+        orig_alpha = main_color.a;
         //main_color.rgb += (main_color.rgb * (2.0 + main_color.a));
     }
 
@@ -417,12 +421,12 @@ void main(void)
     //color_add = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Dont include any windows or transparent objects in emissivity output
-    if (luma < 0.01 && orig_alpha < 0.5 && (blend_mode == 5 || blend_mode == 6))
+    if (luma < 0.01 && orig_alpha < 0.5 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == 6))
     {
         color_add = vec4(0.0, 0.0, 0.0, 0.0);
     }
 
-    if (blend_mode == 6) {
+    if (blend_mode == D3DBLEND_INVSRCALPHA) {
         //color_add.a = (1.0 - color_add.a);
         //should_write_normals = 1.0 - should_write_normals;
     }

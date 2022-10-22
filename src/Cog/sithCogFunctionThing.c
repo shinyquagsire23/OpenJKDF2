@@ -504,7 +504,7 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
 {
     sithThing* thing = sithCogExec_PopThing(ctx);
 
-    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.field_C & 3 )
+    if ( thing && thing->moveType == SITH_MT_PATH && thing->trackParams.flags & 3 )
     {
         int idx = thing->thingIdx;
         ctx->script_running = 3;
@@ -580,7 +580,7 @@ void sithCogFunctionThing_IsMoving(sithCog *ctx)
 
     if ( thing->moveType == SITH_MT_PHYSICS )
     {
-        if ( thing->physicsParams.vel.x != 0.0 || thing->physicsParams.vel.y != 0.0 || thing->physicsParams.vel.z != 0.0 )
+        if (!rdVector_IsZero3(&thing->physicsParams.vel))
         {
             sithCogExec_PushInt(ctx, 1);
             return;
@@ -588,7 +588,7 @@ void sithCogFunctionThing_IsMoving(sithCog *ctx)
     }
     else if ( thing->moveType == SITH_MT_PATH )
     {
-        sithCogExec_PushInt(ctx, thing->trackParams.field_C & 3);
+        sithCogExec_PushInt(ctx, thing->trackParams.flags & 3);
         return;
     }
 
@@ -858,7 +858,7 @@ void sithCogFunctionThing_GetThingVel(sithCog *ctx)
         }
         else if ( thing->moveType == SITH_MT_PATH )
         {
-            rdVector_Scale3(&retval, &thing->trackParams.vel, thing->trackParams.field_20);
+            rdVector_Scale3(&retval, &thing->trackParams.vel, thing->trackParams.lerpSpeed);
         }
         sithCogExec_PushVector3(ctx, &retval);
     }
@@ -1096,7 +1096,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         sithCogExec_PushInt(ctx, track);
         if ( thing->moveType == SITH_MT_PATH )
         {
-            if ( thing->trackParams.field_C )
+            if ( thing->trackParams.flags )
                 sithTrackThing_Stop(thing);
             rdVector_Copy3(&thing->trackParams.field_24.scale, &thing->position);
         }

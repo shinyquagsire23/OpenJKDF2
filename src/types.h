@@ -923,6 +923,20 @@ typedef struct rdLine
     int flags;
 } rdLine;
 
+#define D3DBLEND_ZERO            (1)
+#define D3DBLEND_ONE             (2)
+#define D3DBLEND_SRCCOLOR        (3)
+#define D3DBLEND_INVSRCCOLOR     (4)
+#define D3DBLEND_SRCALPHA        (5)
+#define D3DBLEND_INVSRCALPHA     (6)
+#define D3DBLEND_DESTALPHA       (7)
+#define D3DBLEND_INVDESTALPHA    (8)
+#define D3DBLEND_DESTCOLOR       (9)
+#define D3DBLEND_INVDESTCOLOR    (10)
+#define D3DBLEND_SRCALPHASAT     (11)
+#define D3DBLEND_BOTHSRCALPHA    (12)
+#define D3DBLEND_BOTHINVSRCALPHA (13)
+
 typedef float D3DVALUE;
 
 #pragma pack(push, 4)
@@ -2713,10 +2727,10 @@ typedef struct sithThingTrackParams
     uint32_t sizeFrames;
     uint32_t loadedFrames;
     sithThingFrame *aFrames;
-    uint32_t field_C;
+    uint32_t flags;
     rdVector3 vel;
     float field_1C;
-    float field_20;
+    float lerpSpeed;
     rdMatrix34 field_24;
     float field_54;
     rdVector3 field_58;

@@ -2160,10 +2160,12 @@ void std3D_DrawRenderList()
     if (last_flags & 0x600) {
         
         if (last_flags & 0x200) {
-            glUniform1i(uniform_blend_mode, 6);
+            glUniform1i(uniform_blend_mode, D3DBLEND_INVSRCALPHA);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         }
         else {
-            glUniform1i(uniform_blend_mode, 5);
+            glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         }
     }
     else {
@@ -2218,11 +2220,13 @@ void std3D_DrawRenderList()
                 if (tris[j].flags & 0x600) {
                     
                     if (tris[j].flags & 0x200) {
-                        glUniform1i(uniform_blend_mode, 6);
+                        glUniform1i(uniform_blend_mode, D3DBLEND_INVSRCALPHA);
+                        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
                     else {
                         //printf ("flags %x\n", tris[j].flags);
-                        glUniform1i(uniform_blend_mode, 5);
+                        glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+                        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
                 }
                 else {

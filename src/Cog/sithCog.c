@@ -1369,7 +1369,7 @@ void sithCogScript_Tick(sithCog *cog)
             sithCogExec_Exec(cog);
             return;
         }
-        if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.field_C & 3) == 0 )
+        if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
         {
             if ((cog->flags & SITH_COG_DEBUG))
             {
