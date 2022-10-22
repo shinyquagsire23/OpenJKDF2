@@ -1098,7 +1098,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         {
             if ( thing->trackParams.flags )
                 sithTrackThing_Stop(thing);
-            rdVector_Copy3(&thing->trackParams.field_24.scale, &thing->position);
+            rdVector_Copy3(&thing->trackParams.moveFrameOrientation.scale, &thing->position);
         }
         if (COG_SHOULD_SYNC(ctx))
         {

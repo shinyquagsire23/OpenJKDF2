@@ -340,7 +340,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
             rdPuppet_BuildJointMatrices(&thing->rdthing, &thing->lookOrientation);
             v20 = thing->rdthing.hierarchyNodeMatrices;
             thing->rdthing.field_18 = 1;
-            rdVector_Add3(&a1a, &thing->trackParams.field_24.scale, &v20->scale);
+            rdVector_Add3(&a1a, &thing->trackParams.moveFrameOrientation.scale, &v20->scale);
             rdVector_Sub3Acc(&a1a, &thing->position);
             if (!rdVector_IsZero3(&a1a))
             {

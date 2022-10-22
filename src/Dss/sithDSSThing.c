@@ -804,13 +804,13 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
             NETMSG_PUSHF32(thing->trackParams.lerpSpeed);
             NETMSG_PUSHF32(thing->trackParams.field_54);
             NETMSG_PUSHVEC3(thing->trackParams.field_58);
-            NETMSG_PUSHVEC3(thing->trackParams.field_64);
+            NETMSG_PUSHVEC3(thing->trackParams.moveFrameDeltaAngles);
             NETMSG_PUSHF32(thing->field_24C);
             NETMSG_PUSHS16(thing->field_250);
             NETMSG_PUSHS16(thing->curframe);
             NETMSG_PUSHS16(thing->field_258);
             NETMSG_PUSHS16(thing->goalframe);
-            NETMSG_PUSHMAT34(thing->trackParams.field_24);
+            NETMSG_PUSHMAT34(thing->trackParams.moveFrameOrientation);
             NETMSG_PUSHVEC3(thing->trackParams.orientation);
             NETMSG_PUSHS16(thing->trackParams.loadedFrames);
 
@@ -944,13 +944,13 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         thing->trackParams.lerpSpeed = NETMSG_POPF32();
         thing->trackParams.field_54 = NETMSG_POPF32();
         thing->trackParams.field_58 = NETMSG_POPVEC3();
-        thing->trackParams.field_64 = NETMSG_POPVEC3();
+        thing->trackParams.moveFrameDeltaAngles = NETMSG_POPVEC3();
         thing->field_24C = NETMSG_POPF32();
         thing->field_250 = NETMSG_POPS16();
         thing->curframe = NETMSG_POPS16();
         thing->field_258 = NETMSG_POPS16();
         thing->goalframe = NETMSG_POPS16();
-        thing->trackParams.field_24 = NETMSG_POPMAT34();
+        thing->trackParams.moveFrameOrientation = NETMSG_POPMAT34();
         thing->trackParams.orientation = NETMSG_POPVEC3();
         thing->trackParams.loadedFrames = NETMSG_POPS16();
 

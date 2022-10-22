@@ -125,8 +125,11 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         a3 = 1.0;
                         v41 = 1.0 - thing->field_24C;
                     }
-                    rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
-                    rdMatrix_Copy34(&a, &thing->trackParams.field_24);
+                    rdVector_Scale3(&rot, &thing->trackParams.moveFrameDeltaAngles, a3);
+                    rdMatrix_Copy34(&a, &thing->trackParams.moveFrameOrientation);
+
+                    // MoTS added: MoveToFrame was kinda just broken in JK?
+                    // MoTS uses absolute rotations, but maybe JK used deltas?
                     if (Main_bMotsCompat) {
                         sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->curframe];
                         rdVector_Add3Acc(&rot, &pFrame->rot);
@@ -149,9 +152,9 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 v18 = sithCollision_UpdateThingCollision(thing, &a1a, a6, 0x44);
                                 if ( v18 < a6 )
                                 {
-                                    rdMatrix_Copy34(&a, &thing->trackParams.field_24);
+                                    rdMatrix_Copy34(&a, &thing->trackParams.moveFrameOrientation);
                                     a3 = v18 / a6 * v41 + thing->field_24C;
-                                    rdVector_Scale3(&rot, &thing->trackParams.field_64, a3);
+                                    rdVector_Scale3(&rot, &thing->trackParams.moveFrameDeltaAngles, a3);
                                     rdMatrix_PreRotate34(&a, &rot);
                                 }
                             }
@@ -269,10 +272,10 @@ void sithTrackThing_sub_4FAD50(sithThing *thing, rdVector3 *pGoalFrameRot, float
 
     if ( !rdVector_IsZero3(&angles) )
     {
-        rdMatrix_Copy34(&thing->trackParams.field_24, &thing->lookOrientation);
+        rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->lookOrientation);
         thing->trackParams.field_54 = 1.0 / a3;
-        rdVector_Zero3(&thing->trackParams.field_24.scale);
-        rdVector_Copy3(&thing->trackParams.field_64, &angles);
+        rdVector_Zero3(&thing->trackParams.moveFrameOrientation.scale);
+        rdVector_Copy3(&thing->trackParams.moveFrameDeltaAngles, &angles);
         thing->field_24C = 0.0;
         rdVector_Copy3(&thing->trackParams.orientation, pGoalFrameRot);
         thing->trackParams.flags &= ~0x10;
@@ -381,9 +384,9 @@ void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, 
     sithSoundClass_ThingPlaySoundclass4(thing, 5u);
     rdVector_Copy3(&thing->trackParams.field_58, a2);
     thing->curframe = -1;
-    rdMatrix_Copy34(&thing->trackParams.field_24, &thing->lookOrientation);
-    rdVector_Sub3(&thing->trackParams.field_24.scale, &thing->position, &thing->trackParams.field_58);
-    rdVector_Copy3(&thing->trackParams.field_64, a3);
+    rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->lookOrientation);
+    rdVector_Sub3(&thing->trackParams.moveFrameOrientation.scale, &thing->position, &thing->trackParams.field_58);
+    rdVector_Copy3(&thing->trackParams.moveFrameDeltaAngles, a3);
     thing->field_24C = 0.0;
     thing->field_250 = 0;
     thing->trackParams.field_54 = 1.0 / a4;
@@ -430,12 +433,10 @@ void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
     if ( v2 != 0.0 )
     {
         trackThing->trackParams.flags |= 0x42u;
-        rdMatrix_Copy34(&trackThing->trackParams.field_24, &trackThing->lookOrientation);
-        rdVector_Scale3(&trackThing->trackParams.field_64, rot, v2);
+        rdMatrix_Copy34(&trackThing->trackParams.moveFrameOrientation, &trackThing->lookOrientation);
+        rdVector_Scale3(&trackThing->trackParams.moveFrameDeltaAngles, rot, v2);
         trackThing->trackParams.field_54 = 1.0 / v2;
-        trackThing->trackParams.field_24.scale.x = 0.0;
-        trackThing->trackParams.field_24.scale.y = 0.0;
-        trackThing->trackParams.field_24.scale.z = 0.0;
+        rdVector_Zero3(&trackThing->trackParams.moveFrameOrientation.scale);
         trackThing->field_24C = 0.0;
         trackThing->field_250 = 0;
         trackThing->curframe = -1;

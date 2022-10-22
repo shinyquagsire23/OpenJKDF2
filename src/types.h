@@ -2734,10 +2734,10 @@ typedef struct sithThingTrackParams
     rdVector3 vel;
     float field_1C;
     float lerpSpeed;
-    rdMatrix34 field_24;
+    rdMatrix34 moveFrameOrientation;
     float field_54;
     rdVector3 field_58;
-    rdVector3 field_64;
+    rdVector3 moveFrameDeltaAngles;
     rdVector3 orientation;
 } sithThingTrackParams;
 
