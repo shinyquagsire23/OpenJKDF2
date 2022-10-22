@@ -63,7 +63,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     if ( _strcmp(stdConffile_entry.args[0].value, "symbols") )
         goto fail_cleanup;
 
-    symboltable = sithCogParse_NewSymboltable(256);
+    symboltable = sithCogParse_NewSymboltable(SITHCOG_LINKED_SYMBOL_LIMIT);
     cogscript->pSymbolTable = symboltable;
     if ( !symboltable )
         goto fail_cleanup;
@@ -299,6 +299,13 @@ LABEL_32:
                 break;
         }
     }
+
+#ifdef QOL_IMPROVEMENTS
+    if (yynerrs) {
+        jk_printf("OpenJKDF2: PARSER error was in file: %s\n", script->cog_fpath);
+    }
+#endif
+
     return result;
 }
 

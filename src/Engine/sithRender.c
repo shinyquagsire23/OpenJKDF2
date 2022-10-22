@@ -418,7 +418,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     else
     {
         sector->field_8C = sithRender_lastRenderTick;
-        if (sithRender_numSectors >= 0x80)
+        if (sithRender_numSectors >= SITH_MAX_VISIBLE_SECTORS)
             return;
 
         sithRender_aSectors[sithRender_numSectors++] = sector;
@@ -717,7 +717,7 @@ void sithRender_RenderLevelGeometry()
 
             if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10->header.texture_type & 8) != 0 && (v10->texture_ptr->alpha_en & 1) != 0) )
             {
-                if (sithRender_numSurfaces < 32)
+                if (sithRender_numSurfaces < SITH_MAX_VISIBLE_ALPHA_SURFACES)
                 {
                     sithRender_aSurfaces[sithRender_numSurfaces++] = v65;
                 }
@@ -1291,7 +1291,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
     }
     if ( prev < 0.8 )
     {
-        if ( sithRender_numSectors2 < 0xA0 )
+        if ( sithRender_numSectors2 < SITH_MAX_VISIBLE_SECTORS_2 )
         {
             sithRender_aSectors2[sithRender_numSectors2++] = sector;
         }

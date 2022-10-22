@@ -18,6 +18,8 @@ typedef struct sith_cog_parser_node sith_cog_parser_node;
 //typedef YYSTYPE sith_cog_yacc_yystype;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
+extern int yynerrs;
+
 extern void yyerror(char* s);
 extern int yylex();
 extern void yyrestart (FILE *input_file);

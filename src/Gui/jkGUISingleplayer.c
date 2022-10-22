@@ -223,7 +223,8 @@ int jkGuiSingleplayer_Show()
                             jkGuiRend_DarrayFree(&array2);
                             if ( clicked == 1 ) {
                                 jkMain_sub_403470(v25);
-                                
+
+#ifdef QOL_IMPROVEMENTS
                                 // Added: progress end of level normally from debug menu, instead of exiting to main menu
                                 jkEpisode_mLoad = jkGui_episodeLoad;
                                 for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
@@ -236,6 +237,7 @@ int jkGuiSingleplayer_Show()
                                         break;
                                     }
                                 }
+#endif
                                 //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.type, jkEpisode_mLoad.field_8);
                             }
                         }

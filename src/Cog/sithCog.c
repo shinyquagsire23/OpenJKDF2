@@ -41,7 +41,7 @@ int sithCog_Startup()
 {
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    sithCog_pSymbolTable = sithCogParse_NewSymboltable(1024); // MOTS altered, DW altered, changed from 512 to 1024
+    sithCog_pSymbolTable = sithCogParse_NewSymboltable(SITHCOG_SYMBOL_LIMIT); // MOTS altered, DW altered, changed from 512 to 1024
     if (!sithCog_pSymbolTable )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
