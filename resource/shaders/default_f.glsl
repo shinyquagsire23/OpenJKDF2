@@ -332,9 +332,9 @@ void main(void)
     }
 #endif
 
-    if (blend_mode == D3DBLEND_SRCALPHA)
+    //if (blend_mode == D3DBLEND_SRCALPHA)
     {
-        //if (sampled_color.a < 0.1)
+        //if (sampled_color.a < 0.5)
         //    discard;
     }
 

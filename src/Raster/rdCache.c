@@ -466,9 +466,28 @@ int rdCache_SendFaceListToHardware()
             if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
             {
 #ifdef SDL2_RENDER
-                if (!sith_tex_sel->has_jkgm_override)
-#endif
+                if (sith_tex_sel->has_jkgm_override)
+                {
+                    tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];
+                    if (tex2_arr_sel->albedo_factor[0] != 0.0
+                        || tex2_arr_sel->albedo_factor[1] != 0.0
+                        || tex2_arr_sel->albedo_factor[2] != 0.0
+                        || tex2_arr_sel->albedo_factor[3] != 0.0)
+                    {
+                        flags_idk_ |= 0;
+                    }
+                    else {
+                        // If a texture is only emissive (blaster shots, etc)
+                        // then we probably want to keep the existing blend modes
+                        flags_idk_ |= 0x400;
+                    }
+                }
+                else {
+                    flags_idk_ |= 0x400;
+                }
+#else
                 flags_idk_ |= 0x400;
+#endif
             }
 
             if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )

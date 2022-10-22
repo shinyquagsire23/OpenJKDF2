@@ -1167,7 +1167,6 @@ LABEL_150:
                     // MOTS added
 #ifdef JKM_LIGHTING
                     if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
-                        printf("%x\n", i->archlightIdx);
                         rdModel3* iVar22 = i->rdthing.model3;
                         for (int k = 0; k < 4; k++) {
                             for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
@@ -1587,9 +1586,7 @@ int sithRender_RenderThing(sithThing *povThing)
     povThing->isVisible = bShowInvisibleThings;
     povThing->lookOrientation.scale = povThing->position;
     ret = rdThing_Draw(&povThing->rdthing, &povThing->lookOrientation);
-    povThing->lookOrientation.scale.x = 0.0;
-    povThing->lookOrientation.scale.y = 0.0;
-    povThing->lookOrientation.scale.z = 0.0;
+    rdVector_Zero3(&povThing->lookOrientation.scale);
     if ( sithRender_weaponRenderHandle && (povThing->thingflags & SITH_TF_RENDERWEAPON) != 0 )
         sithRender_weaponRenderHandle(povThing);
     if ( povThing->type == SITH_THING_EXPLOSION && (povThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS) != 0 )

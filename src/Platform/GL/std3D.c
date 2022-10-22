@@ -2169,7 +2169,8 @@ void std3D_DrawRenderList()
         }
     }
     else {
-        glUniform1i(uniform_blend_mode, 2);
+        glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     if (last_flags & 0x1000)
@@ -2230,7 +2231,8 @@ void std3D_DrawRenderList()
                     }
                 }
                 else {
-                    glUniform1i(uniform_blend_mode, 2);
+                    glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 }
             }
             
