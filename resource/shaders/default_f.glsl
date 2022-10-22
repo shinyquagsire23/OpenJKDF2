@@ -346,7 +346,7 @@ void main(void)
 
     main_color *= albedoFactor;
 
-    if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
+    //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
     {
         should_write_normals = main_color.a;
     }
@@ -354,9 +354,8 @@ void main(void)
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
         main_color.rgb *= (1.0 - main_color.a);
-        //should_write_normals = 0.0;
         main_color.a = (1.0 - main_color.a);
-        orig_alpha = main_color.a;
+        //orig_alpha = main_color.a;
         //main_color.rgb += (main_color.rgb * (2.0 + main_color.a));
     }
 

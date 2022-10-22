@@ -533,6 +533,7 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
     texture->cache_entry = &jkgm_cache[cache_key];
 
     rdTexture *pRdTexture = &material->textures[cel];
+    //pRdTexture->has_jkgm_override = 1;
 
     //printf("Caching %s mipmap_level=%d, cel=%d\n", material->mat_full_fpath, mipmap_level, cel);
 
@@ -545,6 +546,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 {
     if (Main_bHeadless) return 0;
     if (texture->texture_loaded) return 1;
+
+    rdTexture *pRdTexture = &material->textures[cel];
 
     texture->emissive_texture_id = 0;
     texture->emissive_factor[0] = 0.0f;
@@ -562,6 +565,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 
     // If the player disabled Jkgm, free any textures that were loaded
     if (!jkPlayer_bEnableJkgm && texture->cache_entry) {
+        pRdTexture->has_jkgm_override = 0;
+
         jkgm_free_cache_entry(texture->cache_entry);
         return 0;
     }
@@ -808,6 +813,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 
         texture->is_16bit = 1;
         texture->texture_loaded = 1;
+
+        pRdTexture->has_jkgm_override = 1;
         return 1;
     }
 

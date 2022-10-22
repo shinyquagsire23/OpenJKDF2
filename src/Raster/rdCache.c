@@ -465,6 +465,9 @@ int rdCache_SendFaceListToHardware()
 
             if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
             {
+#ifdef SDL2_RENDER
+                if (!sith_tex_sel->has_jkgm_override)
+#endif
                 flags_idk_ |= 0x400;
             }
 

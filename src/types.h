@@ -1306,6 +1306,9 @@ typedef struct rdTexture
     stdVBuffer *texture_struct[4];
     rdDDrawSurface alphaMats[4];
     rdDDrawSurface opaqueMats[4];
+#ifdef SDL2_RENDER
+    int32_t has_jkgm_override;
+#endif
 } rdTexture;
 
 typedef struct rdTextureHeader

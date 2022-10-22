@@ -253,6 +253,7 @@ LABEL_22:
     for (int i = 0; i < material->num_textures; i++)
     {
         rdTexture *texture = &material->textures[i];
+        texture->has_jkgm_override = 0;
         for (int j = 0; j < texture->num_mipmaps; j++) {
             stdVBuffer* mipmap = texture->texture_struct[j];
             rdDDrawSurface* surface = &texture->alphaMats[j];
