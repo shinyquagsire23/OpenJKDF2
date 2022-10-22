@@ -38,8 +38,8 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
 
 #ifdef DEBUG_QOL_CHEATS
     if (thing == sithPlayer_pLocalPlayerThing && !sithNet_isMulti) {
-        material_tip_fname = "saberpurple0.mat";
-        material_side_fname = "saberpurple1.mat";
+        //material_tip_fname = "saberpurple0.mat";
+        //material_side_fname = "saberpurple1.mat";
     }
     if (thing == sithPlayer_pLocalPlayerThing) {
         //thing->jkFlags |= JKFLAG_DUALSABERS;
