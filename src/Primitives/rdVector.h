@@ -131,6 +131,7 @@ int rdVector_IsZero3(rdVector3* v);
 float rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm);
 void rdVector_AbsRound3(rdVector3* v);
 void rdVector_ClipPrecision3(rdVector3* v);
+void rdVector_NormalizeAngleAcute3(rdVector3* v);
 void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal);
 void rdVector_ClampValue3(rdVector3* v, float val);
 

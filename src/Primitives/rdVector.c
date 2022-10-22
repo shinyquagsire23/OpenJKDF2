@@ -638,6 +638,13 @@ void rdVector_ClipPrecision3(rdVector3* v)
     v->z = stdMath_ClipPrecision(v->z);
 }
 
+void rdVector_NormalizeAngleAcute3(rdVector3* v)
+{
+    v->x = stdMath_NormalizeAngleAcute(v->x);
+    v->y = stdMath_NormalizeAngleAcute(v->y);
+    v->z = stdMath_NormalizeAngleAcute(v->z);
+}
+
 void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal)
 {
     if (v->x < minVal)

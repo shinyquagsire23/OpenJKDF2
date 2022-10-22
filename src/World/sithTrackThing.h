@@ -22,6 +22,8 @@
 void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, float a3);
 void sithTrackThing_Arrivedidk(sithThing *thing);
 void sithTrackThing_Tick(sithThing *thing, float deltaSeconds);
+void sithTrackThing_BlockedIdk(sithThing* pThing);
+void sithTrackThing_StoppedMoving(sithThing* pThing);
 void sithTrackThing_sub_4FAD50(sithThing *thing, rdVector3 *a2, float a3);
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param);
 void sithTrackThing_Stop(sithThing *thing);
