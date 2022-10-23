@@ -16,6 +16,7 @@
 #include "World/sithWorld.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
+#include "Platform/std3D.h"
 
 static wchar_t jkGuiTitle_versionBuffer[64];
 static float jkGuiTitle_loadPercent;
@@ -279,6 +280,9 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
 
 void jkGuiTitle_LoadingFinalize()
 {
+#ifdef SDL2_RENDER
+    //std3D_PurgeTextureCache();
+#endif
     jkGui_SetModeGame();
     sithWorld_SetLoadPercentCallback(0);
     jkGuiRend_sub_50FDB0();

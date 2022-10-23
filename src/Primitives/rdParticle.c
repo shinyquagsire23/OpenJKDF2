@@ -255,7 +255,7 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
     v4 = 0;
     if ( !v3 )
         return 0;
-    rdroid_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", particle, madeBy);
+    rdroid_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", particle->name, madeBy);
     rdroid_pHS->filePrintf(v3, "###############\n");
     rdroid_pHS->filePrintf(v3, "SECTION: HEADER\n\n");
     rdroid_pHS->filePrintf(v3, "PAR %d.%d\n\n", 1, 0);
