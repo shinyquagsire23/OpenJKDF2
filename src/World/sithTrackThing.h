@@ -9,7 +9,7 @@
 #define sithTrackThing_Rotate_ADDR (0x004FA980)
 #define sithTrackThing_Arrivedidk_ADDR (0x004FAAC0)
 #define sithTrackThing_sub_4FACC0_ADDR (0x004FACC0)
-#define sithTrackThing_sub_4FAD50_ADDR (0x004FAD50)
+#define sithTrackThing_PrepareForOrient_ADDR (0x004FAD50)
 #define sithTrackThing_Tick_ADDR (0x004FAF00)
 #define sithTrackThing_LoadPathParams_ADDR (0x004FB390)
 #define sithTrackThing_BlockedIdk_ADDR (0x004FB4E0)
@@ -24,7 +24,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing);
 void sithTrackThing_Tick(sithThing *thing, float deltaSeconds);
 void sithTrackThing_BlockedIdk(sithThing* pThing);
 void sithTrackThing_StoppedMoving(sithThing* pThing);
-void sithTrackThing_sub_4FAD50(sithThing *thing, rdVector3 *a2, float a3);
+void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *a2, float a3);
 int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param);
 void sithTrackThing_Stop(sithThing *thing);
 void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *a3);
@@ -45,6 +45,6 @@ int sithTrackThing_PathMoveResume(sithThing *trackThing);
 //static int (*sithTrackThing_PathMoveResume)(sithThing *a1) = (void*)sithTrackThing_PathMoveResume_ADDR;
 //static void (*sithTrackThing_idkpathmove)(sithThing *a1, sithThing *a2, rdVector3 *a3) = (void*)sithTrackThing_idkpathmove_ADDR;
 //static void (*sithTrackThing_Arrivedidk)(sithThing *thing) = (void*)sithTrackThing_Arrivedidk_ADDR;
-//static void (*sithTrackThing_sub_4FAD50)(sithThing *a1, rdVector3 *a2, float a3) = (void*)sithTrackThing_sub_4FAD50_ADDR;
+//static void (*sithTrackThing_PrepareForOrient)(sithThing *a1, rdVector3 *a2, float a3) = (void*)sithTrackThing_PrepareForOrient_ADDR;
 
 #endif // _SITHTRACKTHING_H

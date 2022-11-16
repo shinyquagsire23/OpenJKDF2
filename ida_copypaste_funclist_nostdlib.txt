@@ -2635,7 +2635,7 @@ sithTrackThing_RotatePivot	.text	004FA8A0	000000D3	0000000C	00000010	R	.	.	.	.	.
 sithTrackThing_Rotate	.text	004FA980	00000135	00000010	00000008	R	.	.	.	.	.	T	.
 sithTrackThing_Arrivedidk	.text	004FAAC0	000001F4	0000000C	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_sub_4FACC0	.text	004FACC0	0000008B	00000004	00000008	R	.	.	.	.	.	T	.
-sithTrackThing_sub_4FAD50	.text	004FAD50	000001A9	0000002C	0000000C	R	.	.	.	.	.	T	.
+sithTrackThing_PrepareForOrient	.text	004FAD50	000001A9	0000002C	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_Tick	.text	004FAF00	00000485	00000050	00000008	R	.	.	.	.	.	T	.
 sithTrackThing_LoadPathParams	.text	004FB390	00000149	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithTrackThing_BlockedIdk	.text	004FB4E0	0000001E	00000000	00000004	R	.	.	.	.	.	T	.
