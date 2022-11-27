@@ -499,7 +499,7 @@ jkDev_bOpened 0x0055A9B8 int
 jkDev_cheatHashtable 0x0055A9BC stdHashTable*
 jkDev_hDlg 0x0055A9C0 HWND
 jkDev_vbuf 0x0055A9C4 stdVBuffer*
-jkDev_dword_55A9C8 0x0055A9C8 int
+jkDev_BMFontHeight 0x0055A9C8 int
 jkDev_ColorKey 0x0055A9CC int
 jkDev_dword_55A9D0 0x0055A9D0 int
 jkDev_amt 0x0055A9D4 float

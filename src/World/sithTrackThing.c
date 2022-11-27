@@ -86,7 +86,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     }
     if ( thinga < 1.0 )
         thinga = 1.0;
-    sithTrackThing_sub_4FAD50(thing, &thing->trackParams.aFrames[goalFrame].rot, thinga);
+    sithTrackThing_PrepareForOrient(thing, &thing->trackParams.aFrames[goalFrame].rot, thinga);
 }
 
 void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
@@ -101,9 +101,9 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
     float a6; // [esp+0h] [ebp-50h]
     float v41; // [esp+4h] [ebp-4Ch]
     float v42; // [esp+4h] [ebp-4Ch]
-    rdVector3 rot; // [esp+8h] [ebp-48h] BYREF
+    rdVector3 rotVec; // [esp+8h] [ebp-48h] BYREF
     rdVector3 a1a; // [esp+14h] [ebp-3Ch] BYREF
-    rdMatrix34 a; // [esp+20h] [ebp-30h] BYREF
+    rdMatrix34 rotMat; // [esp+20h] [ebp-30h] BYREF
     float a3; // [esp+54h] [ebp+4h]
     float a3a; // [esp+54h] [ebp+4h]
     float deltaSecondsa; // [esp+58h] [ebp+8h]
@@ -125,24 +125,24 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                         a3 = 1.0;
                         v41 = 1.0 - thing->field_24C;
                     }
-                    rdVector_Scale3(&rot, &thing->trackParams.moveFrameDeltaAngles, a3);
-                    rdMatrix_Copy34(&a, &thing->trackParams.moveFrameOrientation);
+                    rdVector_Scale3(&rotVec, &thing->trackParams.moveFrameDeltaAngles, a3);
+                    rdMatrix_Copy34(&rotMat, &thing->trackParams.moveFrameOrientation);
 
                     // MoTS added: MoveToFrame was kinda just broken in JK?
                     // MoTS uses absolute rotations, but maybe JK used deltas?
                     if (Main_bMotsCompat) {
                         sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->curframe];
-                        rdVector_Add3Acc(&rot, &pFrame->rot);
-                        rdVector_NormalizeAngleAcute3(&rot);
-                        rdMatrix_BuildRotate34(&a, &rot);
+                        rdVector_Add3Acc(&rotVec, &pFrame->rot);
+                        rdVector_NormalizeAngleAcute3(&rotVec);
+                        rdMatrix_BuildRotate34(&rotMat, &rotVec);
                     }
                     else {
-                        rdMatrix_PostRotate34(&a, &rot);
+                        rdMatrix_PostRotate34(&rotMat, &rotVec);
                     }
                     
                     if ( (thing->trackParams.flags & 0x10) != 0 )
                     {
-                        rdVector_Add3(&a1a, &thing->trackParams.field_58, &a.scale);
+                        rdVector_Add3(&a1a, &thing->trackParams.field_58, &rotMat.scale);
                         rdVector_Sub3Acc(&a1a, &thing->position);
                         if (!rdVector_IsZero3(&a1a))
                         {
@@ -152,24 +152,24 @@ void sithTrackThing_Tick(sithThing *thing, float deltaSeconds)
                                 v18 = sithCollision_UpdateThingCollision(thing, &a1a, a6, 0x44);
                                 if ( v18 < a6 )
                                 {
-                                    rdMatrix_Copy34(&a, &thing->trackParams.moveFrameOrientation);
+                                    rdMatrix_Copy34(&rotMat, &thing->trackParams.moveFrameOrientation);
                                     a3 = v18 / a6 * v41 + thing->field_24C;
-                                    rdVector_Scale3(&rot, &thing->trackParams.moveFrameDeltaAngles, a3);
-                                    rdMatrix_PreRotate34(&a, &rot);
+                                    rdVector_Scale3(&rotVec, &thing->trackParams.moveFrameDeltaAngles, a3);
+                                    rdMatrix_PreRotate34(&rotMat, &rotVec);
                                 }
                             }
                         }
                     }
                     thing->field_24C = a3;
                     rdVector_Zero3(&thing->lookOrientation.scale);
-                    sithCollision_sub_4E77A0(thing, &a);
+                    sithCollision_sub_4E77A0(thing, &rotMat);
                     if ( thing->field_24C >= 1.0 )
                     {
                         if ( (thing->trackParams.flags & 0x10) == 0 )
                         {
-                            rdMatrix_BuildRotate34(&a, &thing->trackParams.orientation);
+                            rdMatrix_BuildRotate34(&rotMat, &thing->trackParams.orientation);
                             rdVector_Zero3(&thing->lookOrientation.scale);
-                            sithCollision_sub_4E77A0(thing, &a);
+                            sithCollision_sub_4E77A0(thing, &rotMat);
                         }
                         thing->trackParams.flags &= ~0x12;
                     }
@@ -252,7 +252,7 @@ void sithTrackThing_StoppedMoving(sithThing* pThing)
     sithTrackThing_Stop(pThing);
 }
 
-void sithTrackThing_sub_4FAD50(sithThing *thing, rdVector3 *pGoalFrameRot, float a3)
+void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *pGoalFrameRot, float a3)
 {
     rdVector3 out;
     rdVector3 angles;

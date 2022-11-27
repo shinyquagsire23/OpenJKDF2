@@ -1223,11 +1223,11 @@ void std3D_DrawMenu()
 
         // Text
         float textScale = hudScale;
-        if (jkDev_dword_55A9C8 > 11) {
-            textScale *= 11.0 / (float)jkDev_dword_55A9C8;
+        if (jkDev_BMFontHeight > 11) {
+            textScale *= 11.0 / (float)jkDev_BMFontHeight;
         }
         float textWidth = menu_w - (48*2);
-        float textHeight = jkDev_dword_55A9C8 * 5;
+        float textHeight = jkDev_BMFontHeight * 5;
         float destTextWidth = textWidth * textScale;
         std3D_DrawMenuSubrect(48, 0, menu_w - (48*2), textHeight, (Window_xSize / 2) - (destTextWidth / 2), 0, textScale);
 

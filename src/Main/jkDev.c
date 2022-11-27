@@ -94,10 +94,10 @@ int jkDev_Open()
 
     v1 = jkHud_pMsgFontSft->bitmap->mipSurfaces;
     jkDev_log_55A4A4 = 0;
-    jkDev_dword_55A9C8 = (*v1)->format.height;
+    jkDev_BMFontHeight = (*v1)->format.height;
 
     _memcpy(&a1, &stdDisplay_pCurVideoMode->format, sizeof(a1));
-    a1.height = 5 * jkDev_dword_55A9C8;
+    a1.height = 5 * jkDev_BMFontHeight;
 #ifdef SDL2_RENDER
     a1.width -= (48*2); // Make sure the hud scaling doesn't cause overlap
 #endif
@@ -157,7 +157,7 @@ void jkDev_DrawLog()
     {
         v7 = Video_pCanvas;
         v8 = jkDev_dword_55A9D0;
-        a4.height = jkDev_dword_55A9C8;
+        a4.height = jkDev_BMFontHeight;
         v9 = 4;
         v10 = 0;
         v11 = &jkDev_aEntries[0];
@@ -179,7 +179,7 @@ void jkDev_DrawLog()
             if ( v11->field_10C > 0 )
                 --v11->field_10C;
             ++v11;
-            v9 += jkDev_dword_55A9C8;
+            v9 += jkDev_BMFontHeight;
             v10 += 2;
         }
     }
@@ -199,10 +199,10 @@ void jkDev_sub_41F950()
 
     if ( jkDev_vbuf )
     {
-        v0 = jkDev_dword_55A9C8;
+        v0 = jkDev_BMFontHeight;
         v7.x = 0;
         v7.y = 0;
-        v7.height = jkDev_dword_55A9C8;
+        v7.height = jkDev_BMFontHeight;
         v1 = 4;
         v2 = 0;
         v3 = &jkDev_aEntries[0];
@@ -219,7 +219,7 @@ void jkDev_sub_41F950()
                 v6 = jkDev_dword_55A9D0 + 2 * v2;
                 jkDev_aEntryPositions[v6].x = v4;
                 jkDev_aEntryPositions[v6].y = v5;
-                v0 = jkDev_dword_55A9C8;
+                v0 = jkDev_BMFontHeight;
             }
             if ( v3->bDrawEntry > 0 )
                 --v3->bDrawEntry;
@@ -892,7 +892,7 @@ void jkDev_DrawEntries()
             jkDev_log_55A4A8 = 0;
             if ( jkDev_log_55A4A4 > 0 )
             {
-                v2 = jkDev_dword_55A9C8;
+                v2 = jkDev_BMFontHeight;
                 v3 = &jkDev_aEntries[0];
                 do
                 {
@@ -905,7 +905,7 @@ void jkDev_DrawEntries()
                         a4.y = v1;
                         stdDisplay_VBufferFill(jkDev_vbuf, jkDev_ColorKey, &a4);
                         v3->drawWidth = stdFont_Draw1(jkDev_vbuf, jkHud_pMsgFontSft, 0, v1, jkDev_vbuf->format.width, v3->text, 0);
-                        v2 = jkDev_dword_55A9C8;
+                        v2 = jkDev_BMFontHeight;
                     }
                     v1 += v2;
                     ++v0;
