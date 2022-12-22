@@ -107,6 +107,10 @@ int jkGuiSound_Show()
         jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
         jkGuiSound_b3DSound = jkGuiSound_b3DSound_2;
         wuRegistry_SaveBool("b3DSound", (HKEY)jkGuiSound_elements[7].selectedTextEntry);
+
+        wuRegistry_SaveFloat("musicVolume", jkGuiSound_musicVolume);
+        wuRegistry_SaveFloat("sfxVolume", jkGuiSound_sfxVolume);
+        wuRegistry_SaveInt("numChannels", jkGuiSound_numChannels);
 #else
         if ( jkGuiSound_b3DSound_3 && jkGuiSound_elements[7].selectedTextEntry != jkGuiSound_b3DSound_2 )
         {
