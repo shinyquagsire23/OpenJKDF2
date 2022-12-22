@@ -174,6 +174,7 @@ int jkCutscene_sub_421310(char* fpath)
 	    smk_next(jkCutscene_smk);
 	}
 
+    stdSound_BufferSetVolume(jkCutscene_audioFull, jkGuiSound_musicVolume);
 	stdSound_BufferUnlock(jkCutscene_audioFull, audioBuf, maxSize);
     stdSound_BufferPlay(jkCutscene_audioFull, 0);
 	
