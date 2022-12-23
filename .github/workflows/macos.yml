@@ -16,6 +16,7 @@ jobs:
     - name: Install Packages
       run: |
           set -e
+          brew link --overwrite python3
           brew update
           brew install cmake make imagemagick
           pip3 install cogapp generate-iconset
