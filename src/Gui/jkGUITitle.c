@@ -263,6 +263,10 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     char key[64]; // [esp+Ch] [ebp-80h] BYREF
     char v8[64]; // [esp+4Ch] [ebp-40h] BYREF
 
+#ifdef QOL_IMPROVEMENTS
+    jkGuiTitle_elementsLoad[4].bIsVisible = 0;
+#endif
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     jkGuiTitle_whichLoading = 2;
     jkGuiRend_SetCursorVisible(0);
@@ -321,7 +325,8 @@ void jkGuiTitle_LoadingFinalize()
 
             break;
         }
-        
+
+        jkGuiTitle_elementsLoad[4].bIsVisible = 0;
     }
 #endif
 
