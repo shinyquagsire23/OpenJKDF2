@@ -17,7 +17,7 @@ jobs:
       run: |
           set -e
           brew update
-          brew install cmake make python3 imagemagick
+          brew install cmake make imagemagick
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
           brew install openssl@1.1 protobuf
