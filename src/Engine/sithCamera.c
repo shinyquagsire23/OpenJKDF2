@@ -629,7 +629,6 @@ void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoomSpeed)
         zoomScaleNew = zoomFov / horFov;
     }
 
-
     if (zoomSpeed != 0.0) 
     {
         pCamera->bZoomed = 1;
@@ -736,7 +735,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
         iVar3 = -1;
     }
 
-    printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f %f %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, iVar4, iVar3, newScale, currentScale - pCamera->zoomFov, newScale - pCamera->zoomFov);
+    //printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f %f %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, iVar4, iVar3, newScale, currentScale - pCamera->zoomFov, newScale - pCamera->zoomFov);
 
     if (iVar4 != iVar3) {
         newScale = pCamera->zoomScale;
