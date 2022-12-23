@@ -30,6 +30,10 @@
 
 #ifdef WIN32
 #define GL_R8 GL_RED
+
+// Force Optimus/AMD to use non-integrated GPUs by default.
+__declspec(dllexport) DWORD NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
 #define TEX_MODE_TEST 0
