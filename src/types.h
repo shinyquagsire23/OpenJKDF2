@@ -843,6 +843,9 @@ typedef struct sithCamera
     float invZoomScale;
     float zoomFov;
     float zoomSpeed;
+#ifdef QOL_IMPROVEMENTS
+    float zoomScaleOrig;
+#endif
 #endif
 } sithCamera;
 #pragma pack(pop)
