@@ -53,9 +53,6 @@ set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
-# macOS specific options
-set(MACOSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version" FORCE)
-
 # Options for compiling
 if(DEFINED ENV{OPENJKDF2_NO_ASAN})
     set(OPENJKDF2_NO_ASAN $ENV{OPENJKDF2_NO_ASAN})
@@ -129,6 +126,9 @@ elseif(PLAT_MACOS)
 
     add_definitions(-DARCH_64BIT)
 
+    # macOS specific options
+    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
+
     #set(TARGET_USE_BASICSOCKETS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
@@ -152,6 +152,9 @@ elseif(PLAT_MACOS_X86_64)
     set(BIN_NAME "openjkdf2-64")
 
     add_definitions(-DARCH_64BIT)
+
+    # macOS specific options
+    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
 
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)

@@ -15,6 +15,12 @@ if [ ! -f build_protoc/protoc ]; then
     cd ..
 fi
 
+# Prevent macOS headers from getting linked in
+SDKROOT=""
+MACOSX_DEPLOYMENT_TARGET=""
+CPLUS_INCLUDE_PATH=""
+C_INCLUDE_PATH=""
+
 mkdir -p build_protobuf && cd build_protobuf
 cmake --toolchain ../../cmake_modules/mingw_toolchain.cmake -DCMAKE_INSTALL_PREFIX=. -DCMAKE_BUILD_TYPE=Release -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON ../../3rdparty/protobuf/cmake
 make -j10 install
@@ -44,6 +50,5 @@ cp build_win64/*.exe win64-package
 rm -f win64-debug.zip
 cd win64-package ; zip -r ../win64-debug.zip . ; cd ..
 
-#make -f Makefile.win64 clean
 rm -rf build_win64
 rm -rf win64-package

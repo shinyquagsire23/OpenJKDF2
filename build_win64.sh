@@ -12,6 +12,12 @@ if [ ! -f build_protoc/protoc ]; then
     cd ..
 fi
 
+# Prevent macOS headers from getting linked in
+SDKROOT=""
+MACOSX_DEPLOYMENT_TARGET=""
+CPLUS_INCLUDE_PATH=""
+C_INCLUDE_PATH=""
+
 if [ ! -f build_protobuf/libprotobuf.dll ]; then
     mkdir -p build_protobuf && cd build_protobuf
     PB_BUILD=$(pwd)
