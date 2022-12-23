@@ -53,6 +53,9 @@ set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
+# macOS specific options
+set(MACOSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version" FORCE)
+
 # Options for compiling
 if(DEFINED ENV{OPENJKDF2_NO_ASAN})
     set(OPENJKDF2_NO_ASAN $ENV{OPENJKDF2_NO_ASAN})
