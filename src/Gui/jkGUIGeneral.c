@@ -26,7 +26,7 @@ static wchar_t slider_val_text[5] = {0};
 static int slider_1[2] = {18, 17};
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiGeneral_aElements[22] = { 
+static jkGuiElement jkGuiGeneral_aElements[23] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -40,15 +40,23 @@ static jkGuiElement jkGuiGeneral_aElements[22] = {
     { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1,            2, "GUI_CANCEL",           3, {0, 430, 200, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
 
+    // 12
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"FOV is vertical (Hor+)",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+#else
+    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
 #endif
 
+    // 16
 #if defined(QOL_IMPROVEMENTS)
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, L"Disable mission start confirmation.", 0, {330, 180, 300, 40},  1, 0, L"Enter the mission as soon as the level is loaded.",          0, 0, 0, {0}, 0},
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -150,6 +158,10 @@ int jkGuiGeneral_Show()
     jkGuiGeneral_aElements[15].selectedTextEntry = jkPlayer_fovIsVertical;
 #endif
 
+#if defined(QOL_IMPROVEMENTS)
+    jkGuiGeneral_aElements[17].selectedTextEntry = jkPlayer_bFastMissionText;
+#endif
+
     while (1)
     {
         v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGeneral_menu);
@@ -169,6 +181,10 @@ int jkGuiGeneral_Show()
 
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
             jkPlayer_fovIsVertical = jkGuiGeneral_aElements[15].selectedTextEntry;
+#endif
+
+#if defined(QOL_IMPROVEMENTS)
+            jkPlayer_bFastMissionText = jkGuiGeneral_aElements[17].selectedTextEntry;
 #endif
 
             jkPlayer_WriteConf(jkPlayer_playerShortName);

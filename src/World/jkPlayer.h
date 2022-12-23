@@ -146,6 +146,7 @@ extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
 
 extern int jkPlayer_bKeepCorpses;
+extern int jkPlayer_bFastMissionText;
 
 #define FOV_MIN (40)
 #define FOV_MAX (170)
