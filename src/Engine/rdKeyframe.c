@@ -73,8 +73,10 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     key_fname_only = stdFileFromPath(key_fpath);
     _strncpy(keyframe->name, key_fname_only, 0x1Fu);
     keyframe->name[31] = 0;
-    if (!stdConffile_OpenRead(key_fpath))
-        goto read_fail;
+    if (!stdConffile_OpenRead(key_fpath)) {
+        stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", key_fpath);
+        goto open_fail;
+    }
 
     if (!stdConffile_ReadLine())
       goto read_fail;
@@ -230,6 +232,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
   
 read_fail:
     stdConffile_Close();
+open_fail:
     return 0;
 }
 

@@ -137,7 +137,7 @@ int stdConffile_Printf(char *fmt, ...)
     if ( !writeFile || !fmt )
         return 0;
 
-    len = __vsnprintf(printfBuffer, 0x400, fmt, va);
+    len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, fmt, va);
     return std_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 
