@@ -203,11 +203,11 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
         jkGuiPlayer_menuSelectElements[3].bIsVisible = a1 == 0;
         if ( v1 )
         {
-            jkGuiRend_MenuSetLastElement(&jkGuiPlayer_menuSelect, &jkGuiPlayer_menuSelectElements[6]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiPlayer_menuSelect, &jkGuiPlayer_menuSelectElements[6]);
             if ( a1 )
-                jkGuiRend_SetDisplayingStruct(&jkGuiPlayer_menuSelect, 0);
+                jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiPlayer_menuSelect, 0);
             else
-                jkGuiRend_SetDisplayingStruct(&jkGuiPlayer_menuSelect, &jkGuiPlayer_menuSelectElements[3]);
+                jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiPlayer_menuSelect, &jkGuiPlayer_menuSelectElements[3]);
             v2 = jkGuiRend_DisplayAndReturnClicked(&jkGuiPlayer_menuSelect);
         }
         else
@@ -282,9 +282,9 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
         do
         {
             v6 = 0;
-            jkGuiRend_MenuSetLastElement(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[10]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[10]);
             if ( !v15 )
-                jkGuiRend_SetDisplayingStruct(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[9]);
+                jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[9]);
             v7 = jkGuiRend_DisplayAndReturnClicked(&jkGuiPlayer_menuNew);
             if ( v7 == 1 )
             {

@@ -76,8 +76,8 @@ void jkGuiSetup_Show()
     int v1; // edi
     int v2; // eax
 ;
-    jkGuiRend_MenuSetLastElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
     for ( i = jkGuiRend_DisplayAndReturnClicked(&jkGuiSetup_menu); i != -1; i = jkGuiRend_DisplayAndReturnClicked(&jkGuiSetup_menu) )
     {
         if ( i == 1 )
@@ -107,8 +107,8 @@ void jkGuiSetup_Show()
                             {
                                 jkGui_sub_412E20(&jkGuiSetupControls_menu, 105, 108, 0);
                                 jkGui_sub_412E20(&jkGuiSetupControls_menu, 102, 107, 104);
-                                jkGuiRend_MenuSetLastElement(&jkGuiSetupControls_menu, &jkGuiSetupControls_buttons[11]);
-                                jkGuiRend_SetDisplayingStruct(&jkGuiSetupControls_menu, &jkGuiSetupControls_buttons[11]);
+                                jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSetupControls_menu, &jkGuiSetupControls_buttons[11]);
+                                jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSetupControls_menu, &jkGuiSetupControls_buttons[11]);
                                 i = jkGuiRend_DisplayAndReturnClicked(&jkGuiSetupControls_menu);
                                 v1 = 0;
                                 while ( i >= 105 )
@@ -160,8 +160,8 @@ LABEL_23:
                 break;
             }
         }
-        jkGuiRend_MenuSetLastElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
-        jkGuiRend_SetDisplayingStruct(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSetup_menu, &jkGuiSetup_buttons[7]);
     }
 }
 

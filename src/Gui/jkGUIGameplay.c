@@ -94,8 +94,8 @@ int jkGuiGameplay_Show()
     jkGuiGameplay_buttons[7].selectedTextEntry = sithWeapon_bAutoAim & 1;
     jkGuiGameplay_buttons[8].selectedTextEntry = jkPlayer_setCrosshair;
     jkGuiGameplay_buttons[9].selectedTextEntry = jkPlayer_setSaberCam;
-    jkGuiRend_MenuSetLastElement(&jkGuiGameplay_menu, &jkGuiGameplay_buttons[36]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiGameplay_menu, &jkGuiGameplay_buttons[37]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGameplay_menu, &jkGuiGameplay_buttons[36]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGameplay_menu, &jkGuiGameplay_buttons[37]);
     jkGuiSetup_sub_412EF0(&jkGuiGameplay_menu, 0);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiGameplay_menu);
     if ( v0 != -1 )

@@ -1958,8 +1958,8 @@ void do_hooks()
     hook_function(jkGuiRend_UpdateDrawMenu_ADDR, jkGuiRend_UpdateDrawMenu);
     hook_function(jkGuiRend_Paint_ADDR, jkGuiRend_Paint);
     hook_function(jkGuiRend_SetElementIdk_ADDR, jkGuiRend_SetElementIdk);
-    hook_function(jkGuiRend_MenuSetLastElement_ADDR, jkGuiRend_MenuSetLastElement);
-    hook_function(jkGuiRend_SetDisplayingStruct_ADDR, jkGuiRend_SetDisplayingStruct);
+    hook_function(jkGuiRend_MenuSetReturnKeyShortcutElement_ADDR, jkGuiRend_MenuSetReturnKeyShortcutElement);
+    hook_function(jkGuiRend_MenuSetEscapeKeyShortcutElement_ADDR, jkGuiRend_MenuSetEscapeKeyShortcutElement);
     hook_function(jkGuiRend_DisplayAndReturnClicked_ADDR, jkGuiRend_DisplayAndReturnClicked);
     hook_function(jkGuiRend_sub_50FAD0_ADDR, jkGuiRend_sub_50FAD0);
     hook_function(jkGuiRend_gui_sets_handler_framebufs_ADDR, jkGuiRend_gui_sets_handler_framebufs);

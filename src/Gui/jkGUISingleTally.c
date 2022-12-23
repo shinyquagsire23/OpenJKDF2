@@ -38,8 +38,8 @@ int jkGuiSingleTally_Show()
     wchar_t v14[32]; // [esp+8h] [ebp-40h] BYREF
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
-    jkGuiRend_MenuSetLastElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);
     jkGuiSingleTally_buttons[0].wstr = jkPlayer_playerShortName;
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (jkPlayer_CalcAlignment(0) >= 0.0) ? 'L' : 'D');
     jkGuiSingleTally_buttons[1].wstr = jkStrings_GetText(std_genBuffer);

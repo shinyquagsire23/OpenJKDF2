@@ -77,7 +77,7 @@ void jkGuiMain_Show()
 
         do
         {
-            jkGuiRend_SetDisplayingStruct(&jkGuiMain_menu, &jkGuiMain_elements[2]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMain_menu, &jkGuiMain_elements[2]);
             v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMain_menu);
             switch ( v1 )
             {
@@ -163,8 +163,8 @@ void jkGuiMain_ShowCutscenes()
     {
         while ( 1 )
         {
-            jkGuiRend_MenuSetLastElement(&jkGuiMain_cutscenesMenu, &jkGuiMain_cutscenesElements[2]);
-            jkGuiRend_SetDisplayingStruct(&jkGuiMain_cutscenesMenu, &jkGuiMain_cutscenesElements[3]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMain_cutscenesMenu, &jkGuiMain_cutscenesElements[2]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMain_cutscenesMenu, &jkGuiMain_cutscenesElements[3]);
             v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMain_cutscenesMenu);
             if ( v4 != 1 )
                 break;

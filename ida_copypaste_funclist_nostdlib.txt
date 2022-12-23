@@ -3121,8 +3121,8 @@ jkGuiRend_DrawRect	.text	0050F510	000001E6	00000018	0000000A	R	.	.	.	.	.	T	.
 jkGuiRend_UpdateDrawMenu	.text	0050F700	00000076	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_Paint	.text	0050F780	000000EF	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_SetElementIdk	.text	0050F870	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
-jkGuiRend_MenuSetLastElement	.text	0050F880	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
-jkGuiRend_SetDisplayingStruct	.text	0050F890	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiRend_MenuSetReturnKeyShortcutElement	.text	0050F880	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiRend_MenuSetEscapeKeyShortcutElement	.text	0050F890	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_DisplayAndReturnClicked	.text	0050F8A0	00000223	00000014	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_sub_50FAD0	.text	0050FAD0	0000012B	00000010	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_gui_sets_handler_framebufs	.text	0050FC00	00000145	00000008	00000004	R	.	.	.	.	.	T	.

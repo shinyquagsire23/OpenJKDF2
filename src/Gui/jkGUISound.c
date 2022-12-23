@@ -119,8 +119,8 @@ int jkGuiSound_Show()
     // END MOTS removed
 
     jkGuiSetup_sub_412EF0(&jkGuiSound_menu, 0);
-    jkGuiRend_MenuSetLastElement(&jkGuiSound_menu, &jkGuiSound_elements[22]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiSound_menu, &jkGuiSound_elements[23]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSound_menu, &jkGuiSound_elements[22]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSound_menu, &jkGuiSound_elements[23]);
     v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiSound_menu);
     if ( v1 != -1 )
     {

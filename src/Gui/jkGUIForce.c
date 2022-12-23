@@ -597,7 +597,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     }
     
     
-    jkGuiRend_MenuSetLastElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_END_FP]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_END_FP]);
 
     int clicked;
     while (1)

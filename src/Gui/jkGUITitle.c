@@ -301,8 +301,8 @@ void jkGuiTitle_LoadingFinalize()
         int selected = -1;
 
         jkGuiTitle_elementsLoad[4].bIsVisible = 1;
-        jkGuiRend_MenuSetLastElement(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
-        jkGuiRend_SetDisplayingStruct(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
 
         while (1)
         {

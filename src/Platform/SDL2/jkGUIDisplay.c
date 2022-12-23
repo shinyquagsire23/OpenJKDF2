@@ -157,8 +157,8 @@ int jkGuiDisplay_ShowAdvanced()
     jkGuiDisplay_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bEnableJkgm;
     jkGuiDisplay_aElementsAdvanced[10].selectedTextEntry = jkPlayer_bEnableTexturePrecache;
     
-    jkGuiRend_MenuSetLastElement(&jkGuiDisplay_menuAdvanced, &jkGuiDisplay_aElementsAdvanced[7]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiDisplay_menuAdvanced, &jkGuiDisplay_aElementsAdvanced[8]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDisplay_menuAdvanced, &jkGuiDisplay_aElementsAdvanced[7]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDisplay_menuAdvanced, &jkGuiDisplay_aElementsAdvanced[8]);
     jkGuiSetup_sub_412EF0(&jkGuiDisplay_menuAdvanced, 0);
 
     while (1)
@@ -182,8 +182,8 @@ int jkGuiDisplay_Show()
     int v0; // esi
 
     jkGui_sub_412E20(&jkGuiDisplay_menu, 102, 104, 102);
-    jkGuiRend_MenuSetLastElement(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[7]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[8]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[7]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[8]);
     jkGuiSetup_sub_412EF0(&jkGuiDisplay_menu, 0);
 
     jkGuiDisplay_aElements[10].selectedTextEntry = jkPlayer_fov - FOV_MIN;

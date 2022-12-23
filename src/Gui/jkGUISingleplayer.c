@@ -101,8 +101,8 @@ int jkGuiSingleplayer_Show()
     char v24[128]; // [esp+D8h] [ebp-100h]
     char v25[128]; // [esp+158h] [ebp-80h]
 
-    jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[2]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[5]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[2]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[5]);
     int clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu1);
     if ( clicked == -1 )
         return clicked;
@@ -147,8 +147,8 @@ int jkGuiSingleplayer_Show()
                     }
                     else
                     {
-                        jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[7]);
-                        jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[8]);
+                        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[7]);
+                        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[8]);
                         clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu2);
                     }
                     if ( clicked == 1 )
@@ -177,8 +177,8 @@ int jkGuiSingleplayer_Show()
                     }
                     else
                     {
-                        jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[7]);
-                        jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[8]);
+                        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[7]);
+                        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu2, &jkGuiSingleplayer_buttons2[8]);
                         clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu2);
                     }
                     if ( clicked == 1 )
@@ -201,8 +201,8 @@ int jkGuiSingleplayer_Show()
                             jkGui_sub_412E20(&jkGuiSingleplayer_menu3, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                             jkGuiRend_DarrayNewStr(&array2, 10, 1);
                             jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.type, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.field_8, jkGui_episodeLoad.paEntries);
-                            jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[7]);
-                            jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[8]);
+                            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[7]);
+                            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[8]);
                             clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu3);
                             if ( clicked == 1 )
                             {
@@ -255,8 +255,8 @@ int jkGuiSingleplayer_Show()
         jkGuiRend_UpdateSurface();
         if ( clicked == 1 )
             break;
-        jkGuiRend_MenuSetLastElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[2]);
-        jkGuiRend_SetDisplayingStruct(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[5]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[2]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[5]);
         clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu1);
         if ( clicked == -1 )
             return clicked;

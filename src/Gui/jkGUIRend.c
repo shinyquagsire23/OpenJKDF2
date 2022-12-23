@@ -259,12 +259,12 @@ void jkGuiRend_SetElementIdk(jkGuiElement *element, int idk)
     element->elementIdk = idk;
 }
 
-void jkGuiRend_MenuSetLastElement(jkGuiMenu *menu, jkGuiElement *element)
+void jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element)
 {
     menu->clickables_end = element;
 }
 
-void jkGuiRend_SetDisplayingStruct(jkGuiMenu *menu, jkGuiElement *element)
+void jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element)
 {
     menu->field_48 = element;
 }

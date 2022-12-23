@@ -526,8 +526,8 @@ int jkGuiKeyboard_Show()
     jkGuiKeyboard_aElements[12].selectedTextEntry = 0;
     jkGui_sub_412E20(&jkGuiKeyboard_menu, 100, 104, 104);
     jkGui_sub_412E20(&jkGuiKeyboard_menu, 105, 108, 105);
-    jkGuiRend_MenuSetLastElement(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[15]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[16]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[15]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[16]);
     jkGuiRend_SetElementIdk(&jkGuiKeyboard_aElements[13], 45);
     jkGuiRend_SetElementIdk(&jkGuiKeyboard_aElements[14], 46);
     jkGuiSetup_sub_412EF0(&jkGuiKeyboard_menu, 1);

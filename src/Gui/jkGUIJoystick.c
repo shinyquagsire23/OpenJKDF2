@@ -1080,8 +1080,8 @@ int jkGuiJoystick_Show()
     jkGuiJoystick_Draw(&jkGuiJoystick_menu, 0);
     jkGuiRend_SetElementIdk(&jkGuiJoystick_aElements[14], 45);
     jkGuiRend_SetElementIdk(&jkGuiJoystick_aElements[16], 46);
-    jkGuiRend_MenuSetLastElement(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[23]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[24]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[23]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[24]);
     jkGuiSetup_sub_412EF0(&jkGuiJoystick_menu, 1);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiJoystick_menu);
     if ( jkGuiJoystick_aElements[11].bIsVisible )

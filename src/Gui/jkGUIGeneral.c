@@ -121,8 +121,8 @@ int jkGuiGeneral_ShowAdvanced()
     jkGui_sub_412E20(&jkGuiGeneral_menuAdvanced, 100, 104, 100);
     jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bJankyPhysics;
     
-    jkGuiRend_MenuSetLastElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[7]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[8]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[7]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[8]);
     jkGuiSetup_sub_412EF0(&jkGuiGeneral_menuAdvanced, 0);
 
     while (1)
@@ -149,8 +149,8 @@ int jkGuiGeneral_Show()
     jkGuiGeneral_aElements[7].selectedTextEntry = jkPlayer_setFullSubtitles;
     jkGuiGeneral_aElements[8].selectedTextEntry = jkPlayer_setRotateOverlayMap;
     jkGuiGeneral_aElements[9].selectedTextEntry = jkPlayer_setDisableCutscenes;
-    jkGuiRend_MenuSetLastElement(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[10]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[11]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[10]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGeneral_menu, &jkGuiGeneral_aElements[11]);
     jkGuiSetup_sub_412EF0(&jkGuiGeneral_menu, 0);
 
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
