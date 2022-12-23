@@ -149,11 +149,9 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_OpenRead(v8) )
         {
-LABEL_20:
-            stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 276, "Parse problem in file '%s'.\n", v8);
-            sithWorld_FreeEntry(world);
-            return 0;
+            goto parse_problem;
         }
+
         while ( stdConffile_ReadLine() )
         {
             if ( _sscanf(stdConffile_aLine, " section: %s", section) == 1 )
@@ -178,8 +176,12 @@ LABEL_11:
                 if ( v3 != -1 )
                 {
                     startMsecs = stdPlatform_GetTimeMsec();
-                    if ( !sithWorld_aSectionParsers[v3].funcptr(world, 0) )
+                    if ( !sithWorld_aSectionParsers[v3].funcptr(world, 0) ) {
+                        // Added
+                        _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (double)v6 * 0.001, section);
+                        sithConsole_Print(tmp);
                         goto LABEL_19;
+                    }
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (double)v6 * 0.001, section);
                     sithConsole_Print(tmp);
@@ -192,7 +194,7 @@ LABEL_11:
         {
 LABEL_19:
             stdConffile_Close();
-            goto LABEL_20;
+            goto parse_problem;
         }
         stdConffile_Close();
     }
@@ -202,11 +204,13 @@ LABEL_19:
         sithWorld_bLoaded = 1;
         return 1;
     }
-    else
-    {
-        sithWorld_FreeEntry(world);
-        return 0;
-    }
+    goto cleanup;
+
+parse_problem:
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 276, "Parse problem in file '%s'.\n", v8);
+cleanup:
+    sithWorld_FreeEntry(world);
+    return 0;
 }
 
 sithWorld* sithWorld_New()
@@ -401,6 +405,10 @@ void sithWorld_FreeEntry(sithWorld *world)
         jkPlayerInfo* playerInfoJk = &playerThings[i];
         jkPlayer_SetPovModel(playerInfoJk, NULL);
     }
+
+    // Added: Kinda hacky, but static never gets unloaded.
+    memset(world, 0, sizeof(*world));
+    sithWorld_pCurrentWorld = 0;
 
     // Added (Droidworks): JK and MoTS memleaked the world alloc
     pSithHS->free(world);

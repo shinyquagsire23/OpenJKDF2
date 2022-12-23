@@ -295,7 +295,7 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
 void jkGuiTitle_LoadingFinalize()
 {
 #ifdef QOL_IMPROVEMENTS
-    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti;
+    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_pCurrentWorld;
     if ( jkGuiTitle_whichLoading != 1)
     {
         int selected = -1;
