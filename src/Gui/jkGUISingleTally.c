@@ -75,7 +75,13 @@ int jkGuiSingleTally_Show()
 
 void jkGuiSingleTally_Startup()
 {
-    jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\foStars.bm", 1, 0);
+    if (Main_bMotsCompat) {
+        jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\oneStar.bm", 1, 0);
+    }
+    else {
+        jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\foStars.bm", 1, 0);
+    }
+    
     jkGui_InitMenu(&jkGuiSingleTally_menu, jkGui_stdBitmaps[10]);
 }
 
@@ -95,7 +101,7 @@ void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, s
     {
         v4 = 0;
         v5 = *jkGuiSingleTally_foStars->mipSurfaces;
-        do
+        do {
             stdDisplay_VBufferCopy(
                 vbuf,
                 v5,
@@ -103,6 +109,7 @@ void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, s
                 element->rect.y,
                 0,
                 1);
+        }
         while ( v4 < v3 );
     }
 }
