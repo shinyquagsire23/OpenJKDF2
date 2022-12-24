@@ -294,7 +294,7 @@ void main(void)
     )
 
     {
-        if (index == 0.0)
+        if (index == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
             discard;
 
         // Makes sure light is in a sane range
@@ -324,7 +324,7 @@ void main(void)
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
-        if (index == 0.0)
+        if (index == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
             discard;
         
         sampled_color = bilinear_paletted();
