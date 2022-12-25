@@ -17,8 +17,8 @@ jobs:
       run: |
           set -e
           brew unlink python3
-          brew update
-          brew install cmake make python3 imagemagick
+          brew upgrade && brew install --overwrite python3
+          brew install cmake make imagemagick
           pip3 install cogapp generate-iconset
           brew install mingw-w64 openal-soft sdl2 sdl2_mixer glew
           brew install openssl@1.1 protobuf
