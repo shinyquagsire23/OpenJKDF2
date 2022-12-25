@@ -16,7 +16,7 @@ jobs:
     - name: Install Packages
       run: |
           set -e
-          brew unlink python3 && brew remove python3
+          brew unlink python3
           brew update
           brew install cmake make python3 imagemagick
           pip3 install cogapp generate-iconset
