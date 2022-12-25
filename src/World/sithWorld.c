@@ -406,6 +406,11 @@ void sithWorld_FreeEntry(sithWorld *world)
         jkPlayer_SetPovModel(playerInfoJk, NULL);
     }
 
+    // Added: Fix MoTS UAF
+    for (int i = 0; i < 64; i++) {
+        memset(&jkPlayer_aBubbleInfo[i], 0, sizeof(jkPlayer_aBubbleInfo[i]));
+    }
+
     // Added: Kinda hacky, but static never gets unloaded.
     memset(world, 0, sizeof(*world));
     sithWorld_pCurrentWorld = 0;
