@@ -885,9 +885,9 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
 
     if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
     {
-        if ( (player->thingflags & SITH_TF_DEAD) != 0 )
+        if (player->thingflags & SITH_TF_DEAD)
         {
-            if ( (player->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH) == 0 )
+            if (!(player->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH))
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;
@@ -921,8 +921,10 @@ LABEL_39:
         }
         else
         {
-            if (!Main_bMotsCompat)
+            if (!Main_bMotsCompat) {
+                sithControl_008d7f44 = 1.0;
                 sithControl_PlayerLook(player, deltaSecs);
+            }
             if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & SITH_AF_DISABLED) == 0 )
             {
                 // MOTS added
@@ -1123,7 +1125,7 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
             if ( v5 != 0.0 )
             {
                 v3 = 1;
-                a2.x += v5;
+                a2.x += v5 * sithControl_008d7f44;
                 local_10 = v5 * sithControl_008d7f44;
             }
 
@@ -1134,12 +1136,14 @@ void sithControl_PlayerLook(sithThing *player, float deltaSecs)
                 v3 = 1;
 #ifdef QOL_IMPROVEMENTS
                 // Scale appropriately to high framerates
-                a2.x += v6 * 90.0 * deltaSecs * (sithTime_TickHz / 50.0);
+                a2.x += v6 * sithControl_008d7f44 * 90.0 * deltaSecs * (sithTime_TickHz / 50.0);
+                local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs * (sithTime_TickHz / 50.0);
 #else
-                a2.x += v6 * 90.0 * deltaSecs;
+                a2.x += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;
+                local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;
 #endif
 
-                local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;
+                
             }
 
             if ( v3 )
