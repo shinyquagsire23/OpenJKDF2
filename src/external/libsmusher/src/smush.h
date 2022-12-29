@@ -120,6 +120,11 @@ void smush_destroy(smush_ctx* ctx);
 int smush_done(smush_ctx* ctx);
 int smush_cur_frame(smush_ctx* ctx);
 int smush_num_frames(smush_ctx* ctx);
+uint8_t* smush_get_palette(smush_ctx* ctx);
+uint8_t* smush_get_video(smush_ctx* ctx);
+uint32_t smush_video_width(smush_ctx* ctx);
+uint32_t smush_video_height(smush_ctx* ctx);
+int smush_video_fps(smush_ctx* ctx);
 
 void smush_frame(smush_ctx* ctx);
 void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size);

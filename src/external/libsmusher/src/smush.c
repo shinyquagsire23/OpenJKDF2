@@ -99,6 +99,26 @@ int smush_num_frames(smush_ctx* ctx) {
     return getle16(ctx->ahdr.num_frames);
 }
 
+uint8_t* smush_get_palette(smush_ctx* ctx) {
+    return ctx->palette;
+}
+
+uint8_t* smush_get_video(smush_ctx* ctx) {
+    return ctx->framebuffer;
+}
+
+uint32_t smush_video_width(smush_ctx* ctx) {
+    return ctx->codec_w;
+}
+
+uint32_t smush_video_height(smush_ctx* ctx) {
+    return ctx->codec_h;
+}
+
+int smush_video_fps(smush_ctx* ctx) {
+    return getle32(ctx->ahdr_ext.frame_rate);
+}
+
 void smush_restart(smush_ctx* ctx) {
     ctx->frame_fpos = ctx->start_fpos;
     ctx->cur_frame = 0;
@@ -276,6 +296,9 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
             while (decode_len--) 
             {
                 uint8_t val = *decode_in++;
+
+                // Big endian
+#if 0
                 //printf("%02x %04x %x\n", val, out - ctx->audio_buffer, total_size);
                 if (val == 0x80) {
                     *out++ = *decode_in++;
@@ -297,6 +320,34 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
                     *out++ = val16 >> 8;
                     *out++ = (uint8_t)val16;
                 }
+#endif
+
+                // Little endian
+#if 1
+                //printf("%02x %04x %x\n", val, out - ctx->audio_buffer, total_size);
+                if (val == 0x80) {
+                    uint8_t val_tmp = *decode_in++;
+                    *out++ = *decode_in++;
+                    *out++ = val_tmp;
+                }
+                else {
+                    int16_t val16 = (int8_t)val << lownib;
+                    *out++ = (uint8_t)val16;
+                    *out++ = val16 >> 8;
+                }
+
+                val = *decode_in++;
+                if (val == 0x80) {
+                    uint8_t val_tmp = *decode_in++;
+                    *out++ = *decode_in++;
+                    *out++ = val_tmp;
+                }
+                else {
+                    int16_t val16 = (int8_t)val << hinib;
+                    *out++ = (uint8_t)val16;
+                    *out++ = val16 >> 8;
+                }
+#endif
             }
 
             if (ctx->audio_callback) {
