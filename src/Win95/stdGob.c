@@ -151,6 +151,16 @@ void stdGob_FreeEntry(stdGob *gob)
     }
     else
     {
+        // Added: Fix file handle leak
+        if (gob->fhand) {
+            pGobHS->fileClose(gob->fhand);
+            gob->fhand = 0;
+        }
+        // Added: Fix memleak
+        if (gob->openedFile) {
+            std_pHS->free(gob->openedFile);
+            gob->openedFile = NULL;
+        }
         if ( gob->entries )
         {
             std_pHS->free(gob->entries);
