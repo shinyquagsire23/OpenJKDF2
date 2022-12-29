@@ -23,7 +23,7 @@ int sithSurface_Startup()
 
     for (int i = 0; i < 256; i++)
     {
-        sithSurface_aAvail[i] = 255 - i;
+        sithSurface_aAvail[256-i] = 255 - i;
     }
 
     sithSurface_numAvail = 256;
@@ -1321,7 +1321,7 @@ rdSurface* sithSurface_Alloc()
     v1 = sithSurface_aAvail[sithSurface_numAvail--];
     if ( v1 > sithSurface_numSurfaces )
         sithSurface_numSurfaces = v1;
-
+    
     v2 = &sithSurface_aSurfaces[v1];
     _memset(v2, 0, sizeof(rdSurface));
     v2->index = ((playerThingIdx + 1) << 16) | (uint16_t)v1;
