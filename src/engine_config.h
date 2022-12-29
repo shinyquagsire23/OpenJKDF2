@@ -136,6 +136,12 @@
 #define JKRES_IS_MOTS_MAGIC(kval) ((kval == JKRES_MOTS_MAGIC_0) || (kval == JKRES_MOTS_MAGIC_1) || (kval == JKRES_MOTS_MAGIC_2) || (kval == JKRES_MOTS_MAGIC_3))
 #define JKRES_IS_DF2_MAGIC(kval) ((kval == JKRES_DF2_MAGIC_0) || (kval == JKRES_DF2_MAGIC_1) || (kval == JKRES_DF2_MAGIC_2) || (kval == JKRES_DF2_MAGIC_3))
 
+#ifndef JKM_PARAMS
+#define STDCONF_LINEBUFFER_LEN (1024)
+#else
+#define STDCONF_LINEBUFFER_LEN (2048)
+#endif
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation

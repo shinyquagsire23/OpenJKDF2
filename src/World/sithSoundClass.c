@@ -145,9 +145,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     int num_soundclasses; // ebx
     signed int result; // eax
     sithSoundClass *soundclasses; // edi
-    int v5; // eax
     char *v6; // ebp
-    sithWorld *v7; // ebx
     int idx; // eax
     sithSoundClass *current_soundclass; // esi
     stdHashTable *v10; // [esp-Ch] [ebp-9Ch]
@@ -155,14 +153,21 @@ int sithSoundClass_Load(sithWorld *world, int a2)
 
     if ( a2 )
         return 0;
+
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "soundclasses") )
+    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "soundclasses") ) {
+        printf("failed first strcmp");
         return 0;
+    }
+
     num_soundclasses = _atoi(stdConffile_entry.args[2].value);
-    if ( num_soundclasses <= 0 )
+    if ( num_soundclasses <= 0 ) {
+        printf("num soundclasses <= 0");
         return 1;
-    if ( sithNet_isMulti )
+    }
+    if ( sithNet_isMulti ) {
         num_soundclasses += 32;
+    }
     soundclasses = (sithSoundClass *)pSithHS->alloc(sizeof(sithSoundClass) * num_soundclasses);
     world->soundclasses = soundclasses;
     if ( soundclasses )
@@ -170,52 +175,43 @@ int sithSoundClass_Load(sithWorld *world, int a2)
         world->numSoundClasses = num_soundclasses;
         world->numSoundClassesLoaded = 0;
         _memset(soundclasses, 0, sizeof(sithSoundClass) * num_soundclasses);
-        v5 = 1;
     }
     else
     {
-        v5 = 0;
+        goto failed;
     }
-    if ( v5 )
+    
+    while ( stdConffile_ReadArgs() )
     {
-        while ( stdConffile_ReadArgs() )
+        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+            break;
+        v6 = stdConffile_entry.args[1].value;
+        if ( _strcmp(stdConffile_entry.args[1].value, "none") && sithWorld_pLoading->soundclasses)
         {
-            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
-                break;
-            v6 = stdConffile_entry.args[1].value;
-            v7 = sithWorld_pLoading;
-            if ( _strcmp(stdConffile_entry.args[1].value, "none") )
+            _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_entry.args[1].value);
+            if ( !stdHashTable_GetKeyVal(sithSoundClass_hashtable, v6) )
             {
-                if ( sithWorld_pLoading->soundclasses )
+                idx = sithWorld_pLoading->numSoundClassesLoaded;
+                if ( idx != sithWorld_pLoading->numSoundClasses )
                 {
-                    _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_entry.args[1].value);
-                    if ( !stdHashTable_GetKeyVal(sithSoundClass_hashtable, v6) )
+                    current_soundclass = &sithWorld_pLoading->soundclasses[idx];
+                    _strncpy(current_soundclass->snd_fname, v6, 0x1Fu);
+                    current_soundclass->snd_fname[31] = 0;
+                    if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
                     {
-                        idx = v7->numSoundClassesLoaded;
-                        if ( idx != v7->numSoundClasses )
-                        {
-                            current_soundclass = &v7->soundclasses[idx];
-                            _strncpy(current_soundclass->snd_fname, v6, 0x1Fu);
-                            current_soundclass->snd_fname[31] = 0;
-                            if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
-                            {
-                                v10 = sithSoundClass_hashtable;
-                                ++v7->numSoundClassesLoaded;
-                                stdHashTable_SetKeyVal(v10, current_soundclass->snd_fname, current_soundclass);
-                            }
-                        }
+                        v10 = sithSoundClass_hashtable;
+                        ++sithWorld_pLoading->numSoundClassesLoaded;
+                        stdHashTable_SetKeyVal(v10, current_soundclass->snd_fname, current_soundclass);
                     }
                 }
             }
         }
-        result = 1;
     }
-    else
-    {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading soundclasses, line %d.\n", stdConffile_linenum);
-        result = 0;
-    }
-    return result;
+    return 1;
+
+failed:
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading soundclasses, line %d.\n", stdConffile_linenum);
+    return 0;
 }
 
 sithSoundClass* sithSoundClass_LoadFile(char *fpath)

@@ -164,7 +164,7 @@ int jkGame_Update()
 #endif
     jkPlayer_DrawPov();
 
-#if 0
+#if 1
     //if (Main_bMotsCompat)
     ++Video_dword_5528A0; // MOTS added
     if ( Main_bDispStats )

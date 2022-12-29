@@ -8,6 +8,8 @@
 #define jkGuiSound_Shutdown_ADDR (0x00410E30)
 #define jkGuiSound_Show_ADDR (0x00410E70)
 
+extern float jkGuiSound_cutsceneVolume;
+
 void jkGuiSound_Startup();
 void jkGuiSound_Shutdown();
 int jkGuiSound_Show();

@@ -63,8 +63,8 @@ int jkGuiControlOptions_Show()
     jkGuiControlOptions_buttons[11].boxChecked = sithWeapon_controlOptions & 4;
     jkGuiControlOptions_buttons[12].boxChecked = sithWeapon_controlOptions & 0x10;
     jkGuiControlOptions_buttons[13].boxChecked = sithWeapon_controlOptions & 2;
-    jkGuiRend_MenuSetLastElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[16]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[17]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[16]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[17]);
     jkGuiSetup_sub_412EF0(&jkGuiControlOptions_menu, 1);
     while ( 1 )
     {

@@ -553,7 +553,6 @@ void jkMain_GameplayShow(int a1, int a2)
         }
 
         level_loaded = v3;
-LABEL_15:
         jkGuiTitle_LoadingFinalize();
         if ( !level_loaded )
         {

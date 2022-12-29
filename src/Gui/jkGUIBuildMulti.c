@@ -357,8 +357,8 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     v4 = jkPlayer_GetMpcInfo(&jkGuiBuildMulti_waTmp[32], v28, v34, v33, v32);
     _v23 = v4;
     jkGuiBuildMulti_buttons[3].wstr = &jkGuiBuildMulti_waTmp[32];
-    jkGuiRend_MenuSetLastElement(&jkGuiBuildMulti_menu, &jkGuiBuildMulti_buttons[15]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiBuildMulti_menu, &jkGuiBuildMulti_buttons[13]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menu, &jkGuiBuildMulti_buttons[15]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menu, &jkGuiBuildMulti_buttons[13]);
     jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_buttons[4], &jkGuiBuildMulti_menu, 0);
     jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_buttons[5], &jkGuiBuildMulti_menu, 0);
     jkGuiBuildMulti_numSabers = 0;
@@ -815,8 +815,8 @@ int jkGuiBuildMulti_Show()
         v3 = 1;
         if ( v2 )
         {
-            jkGuiRend_MenuSetLastElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[13]);
-            jkGuiRend_SetDisplayingStruct(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[10]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[13]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[10]);
             v9 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuEditCharacter);
         }
         else
@@ -994,8 +994,8 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
     do
     {
         v7 = 0;
-        jkGuiRend_MenuSetLastElement(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[13]);
-        jkGuiRend_SetDisplayingStruct(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[12]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[13]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[12]);
         v8 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuNewCharacter);
         if ( v8 != 1 )
             goto LABEL_16;
@@ -1167,8 +1167,8 @@ LABEL_7:
         v14 = 1;
         if ( v12 )
         {
-            jkGuiRend_MenuSetLastElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[20]);
-            jkGuiRend_SetDisplayingStruct(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[16]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[20]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[16]);
             v22 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuLoadCharacter);
         }
         else

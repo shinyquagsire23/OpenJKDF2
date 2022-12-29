@@ -310,8 +310,8 @@ int jkGuiSaveLoad_Show(int bIsSave)
     if ( !bIsSave )
         v1 = "GUI_SLLOADGAME";
     jkGuiSaveLoad_aElements[0].wstr = jkStrings_GetText2(v1);
-    jkGuiRend_MenuSetLastElement(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[11]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[12]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[11]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[12]);
     jkGuiSaveLoad_menu.focusedElement = &jkGuiSaveLoad_aElements[2];
     jkGuiSaveLoad_PopulateInfo(0);
     _wcsncpy(jkGuiSaveLoad_word_559830, &jkGuiSaveLoad_word_559C54[8], 0xFFu);

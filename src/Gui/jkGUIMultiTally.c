@@ -210,8 +210,8 @@ int jkGuiMultiTally_Show(int a1)
     }
     jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
     jkGuiMultiTally_buttons[1].wstr = jkGui_sub_412ED0();
-    jkGuiRend_MenuSetLastElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[90]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[89]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[90]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[89]);
     jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons[89], &jkGuiMultiTally_menu, a1);
 
 #ifdef QOL_IMPROVEMENTS
@@ -528,8 +528,8 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
     jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons3[15], &jkGuiMultiTally_menu3, a1); // MOTS removed?
     jkGuiMultiTally_buttons3[1].wstr = jkGui_sub_412ED0();
-    jkGuiRend_MenuSetLastElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[16]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[15]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[16]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[15]);
 
     for (int i = 0; i < 5; i++)
     {

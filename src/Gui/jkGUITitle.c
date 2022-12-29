@@ -14,6 +14,7 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "World/sithWorld.h"
+#include "World/jkPlayer.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "Platform/std3D.h"
@@ -21,11 +22,17 @@
 static wchar_t jkGuiTitle_versionBuffer[64];
 static float jkGuiTitle_loadPercent;
 
-static jkGuiElement jkGuiTitle_elementsLoad[5] = {
+static jkGuiElement jkGuiTitle_elementsLoad[6] = {
     {ELEMENT_TEXT,  0,  2,  0,  3, {250, 50, 390, 80},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_CUSTOM,  0,  0, .extraInt = 0xE1,  0, {330, 131, 240, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_LOADING",  3, {330, 152, 240, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  8,  0,  0, {310, 200, 280, 275},  1,  0,  0, jkGuiTitle_UnkDraw,  0,  0, {0},  0},
+    
+#ifdef QOL_IMPROVEMENTS
+    { ELEMENT_CUSTOM,  0,  8,  0,  0, {310, 200, 280, 230},  1,  0,  0, jkGuiTitle_UnkDraw,  0,  0, {0},  0},
+    { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
+#else
+    { ELEMENT_CUSTOM,  0,  8,  0,  0, {310, 200, 280, 275},  1,  0,  0, jkGuiTitle_UnkDraw,  0,  0, {0},  0},
+#endif
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
 };
 
@@ -46,6 +53,9 @@ void jkGuiTitle_Startup()
 {
     jkGui_InitMenu(&jkGuiTitle_menuLoadStatic, jkGui_stdBitmaps[0]);
     jkGui_InitMenu(&jkGuiTitle_menuLoad, jkGui_stdBitmaps[5]);
+#ifdef QOL_IMPROVEMENTS
+    jkGuiTitle_elementsLoad[4].bIsVisible = 0;
+#endif
 }
 
 void jkGuiTitle_Shutdown()
@@ -253,6 +263,10 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     char key[64]; // [esp+Ch] [ebp-80h] BYREF
     char v8[64]; // [esp+4Ch] [ebp-40h] BYREF
 
+#ifdef QOL_IMPROVEMENTS
+    jkGuiTitle_elementsLoad[4].bIsVisible = 0;
+#endif
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     jkGuiTitle_whichLoading = 2;
     jkGuiRend_SetCursorVisible(0);
@@ -280,6 +294,42 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
 
 void jkGuiTitle_LoadingFinalize()
 {
+#ifdef QOL_IMPROVEMENTS
+    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_pCurrentWorld;
+    if ( jkGuiTitle_whichLoading != 1)
+    {
+        int selected = -1;
+
+        jkGuiTitle_elementsLoad[4].bIsVisible = 1;
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiTitle_menuLoad, &jkGuiTitle_elementsLoad[4]);
+
+        while (1)
+        {
+            if (shouldSkip) break;
+            int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
+
+#ifdef SDL2_RENDER
+#ifdef PLATFORM_POSIX
+            static uint64_t lastRefresh = 0;
+            // Only update loading bar at 30fps, so that we don't waste time
+            // during vsync.
+            if (Linux_TimeUs() - lastRefresh < 32*1000) {
+                return;
+            }
+
+            lastRefresh = Linux_TimeUs();
+#endif
+            stdDisplay_DDrawGdiSurfaceFlip();
+#endif
+
+            break;
+        }
+
+        jkGuiTitle_elementsLoad[4].bIsVisible = 0;
+    }
+#endif
+
 #ifdef SDL2_RENDER
     //std3D_PurgeTextureCache();
 #endif

@@ -349,8 +349,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
     jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].func = jkGuiNetHost_sub_4119D0;
     jkGui_sub_412E20(&jkGuiNetHost_menu, 100, 101, 101);
-    jkGuiRend_MenuSetLastElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[23]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[24]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[23]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[24]);
     
     jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry = 0;
     jkGuiNetHost_sub_4119D0(&jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX], &jkGuiNetHost_menu, -1, -1, 0);
@@ -436,8 +436,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiNetHost_aSettingsElements[4].selectedTextEntry = jkGuiNetHost_bIsDedicated;
             jkGuiNetHost_aSettingsElements[5].selectedTextEntry = jkGuiNetHost_bIsCoop;
 #endif
-            jkGuiRend_MenuSetLastElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
-            jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
             if ( jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menuSettings) == GUI_OK )
             {
                 pMultiEntry->sessionFlags = 0;
@@ -476,8 +476,8 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
     jk_snwprintf(a1a, 0x20u, L"%d", jkGuiNetHost_tickRate);
     jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].wstr = a1a;
     jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].selectedTextEntry = 32;
-    jkGuiRend_MenuSetLastElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[5]);
     v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menuSettings);
     if ( v1 == GUI_OK )
     {

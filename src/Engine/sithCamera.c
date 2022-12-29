@@ -187,6 +187,10 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     camera->invZoomScale = 1.0;
     camera->zoomFov = camera->fov;
     camera->zoomSpeed = 0.0;
+#ifdef QOL_IMPROVEMENTS
+    camera->zoomScaleOrig = 1.0;
+    camera->zoomFov = 1.0;
+#endif
 #endif
 
     return 1;
@@ -617,16 +621,32 @@ void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoomSpeed)
 
 #ifdef JKM_CAMERA
 #ifdef QOL_IMPROVEMENTS
-    float zoomFov = jkPlayer_fov / zoomScale;
+    float zoomScaleNew = zoomScale;
     if (jkPlayer_fovIsVertical && pCamera->rdCam.screenAspectRatio != 0.0) {
-        zoomFov = zoomScale * (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) * -2.0);
+        float horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) *
+ -2.0);
+        float zoomFov = zoomScale * horFov;
+        zoomScaleNew = zoomFov / horFov;
     }
-    
+
+    if (zoomSpeed != 0.0) 
+    {
+        pCamera->bZoomed = 1;
+        pCamera->zoomScaleOrig = zoomScale;
+        pCamera->zoomScale = zoomScaleNew;
+        pCamera->zoomSpeed = zoomSpeed / 5.0; // TODO find a more exact scalar than just guessing
+        pCamera->invZoomScale = 1.0 / zoomScale;
+        return;
+    }
+
+    rdCamera_SetFOV(&pCamera->rdCam, jkPlayer_fov / zoomScale);
+    pCamera->zoomSpeed = 0.0;
+    pCamera->bZoomed = 0;
+    pCamera->zoomFov = zoomScale;
 #else
     // I have no idea what's going on here
     float zoomFov = stdMath_ArcTan4(zoomScale * 0.5, 0.0);
     zoomFov = -zoomFov * 2.0;
-#endif
 
     if (zoomFov != pCamera->rdCam.fov) 
     {
@@ -645,42 +665,52 @@ void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoomSpeed)
         pCamera->bZoomed = 0;
     }
 #endif
+#endif
 }
 
-// MOTS added
+#ifdef QOL_IMPROVEMENTS
+// MOTS added (overhauled, zoomFov is now used as a stored scale value)
 void sithCamera_UpdateZoom(sithCamera *pCamera)
 {
-    float fVar1;
+    float currentScale;
     float fVar2;
     int iVar3;
     int iVar4;
-    int local_4;
-    
+    int zoomDirection;
+
     if (!pCamera->rdCam.canvas) return;
+
+    // Fix zoomscale if screen size changed mid-zoom
+    if (jkPlayer_fovIsVertical && pCamera->rdCam.screenAspectRatio != 0.0) {
+        float horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) *
+ -2.0);
+        float zoomFov = pCamera->zoomScaleOrig * horFov;
+        pCamera->zoomScale = zoomFov / horFov;
+    }
+
     if (!pCamera->bZoomed) {
-#ifdef QOL_IMPROVEMENTS
         if (Main_bMotsCompat) {
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale);
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
         }
-#endif
+        //printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, 999, 999, jkPlayer_fov / pCamera->zoomScale);
         return;
     }
 
-    fVar1 = pCamera->rdCam.fov;
-    fVar2 = pCamera->zoomFov - fVar1;
+    currentScale = pCamera->zoomFov;
+    fVar2 = pCamera->zoomScale - currentScale;
     if (0.0 <= fVar2) {
-        local_4 = 1;
+        zoomDirection = 1;
         if (fVar2 < 0.0) {
-            local_4 = 0;
+            zoomDirection = 0;
         }
     }
     else {
-        local_4 = -1;
+        zoomDirection = -1;
     }
-    fVar2 = fVar1 - pCamera->zoomFov;
+    fVar2 = currentScale - pCamera->zoomScale;
 
-    float local_4f = ((float)local_4 * pCamera->zoomSpeed * sithTime_deltaSeconds + fVar1);
-    if (0.0 <= fVar2) {
+    float newScale = ((float)zoomDirection * pCamera->zoomSpeed * sithTime_deltaSeconds + currentScale);
+    if (fVar2 >= 0.0) {
         if (fVar2 < 0.0) {
             iVar4 = 0;
         }
@@ -691,8 +721,9 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
     else {
         iVar4 = -1;
     }
-    fVar2 = local_4f - pCamera->zoomFov;
-    if (0.0 <= fVar2) {
+
+    fVar2 = newScale - pCamera->zoomScale;
+    if (fVar2 >= 0.0) {
         if (fVar2 > 0.0) {
             iVar3 = 1;
         }
@@ -703,13 +734,101 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
     else {
         iVar3 = -1;
     }
+
+    //printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f %f %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, iVar4, iVar3, newScale, currentScale - pCamera->zoomFov, newScale - pCamera->zoomFov);
+
     if (iVar4 != iVar3) {
-        local_4f = pCamera->zoomFov;
+        newScale = pCamera->zoomScale;
     }
-    rdCamera_SetFOV(&pCamera->rdCam, local_4f);
-    if ((pCamera->rdCam.fov == fVar1) || (iVar4 != iVar3)) {
+    
+    // Added: prevent overshoot
+    if (zoomDirection < 0) {
+        if (newScale < pCamera->zoomScale) {
+            newScale = pCamera->zoomScale;
+        }
+    }
+    else if (zoomDirection > 0) {
+        if (newScale > pCamera->zoomScale) {
+            newScale = pCamera->zoomScale;
+        }
+    }
+
+    pCamera->zoomFov = newScale;
+    rdCamera_SetFOV(&pCamera->rdCam, jkPlayer_fov / newScale);
+    if ((pCamera->zoomFov == currentScale) || (iVar4 != iVar3)) {
         pCamera->zoomSpeed = 0.0;
         pCamera->bZoomed = 0;
     }
 }
+#else
+
+// MOTS added (original)
+void sithCamera_UpdateZoom(sithCamera *pCamera)
+{
+    float currentFov;
+    float fVar2;
+    int iVar3;
+    int iVar4;
+    int zoomDirection;
+
+    if (!pCamera->rdCam.canvas) return;
+    if (!pCamera->bZoomed) {
+
+        // Added
+        if (Main_bMotsCompat) {
+            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
+        }
+        return;
+    }
+
+    currentFov = pCamera->rdCam.fov;
+    fVar2 = pCamera->zoomFov - currentFov;
+    if (0.0 <= fVar2) {
+        zoomDirection = 1;
+        if (fVar2 < 0.0) {
+            zoomDirection = 0;
+        }
+    }
+    else {
+        zoomDirection = -1;
+    }
+    fVar2 = currentFov - pCamera->zoomFov;
+
+    float newFov = ((float)zoomDirection * pCamera->zoomSpeed * sithTime_deltaSeconds + currentFov);
+    if (fVar2 >= 0.0) {
+        if (fVar2 < 0.0) {
+            iVar4 = 0;
+        }
+        else {
+            iVar4 = 1;
+        }
+    }
+    else {
+        iVar4 = -1;
+    }
+
+    fVar2 = newFov - pCamera->zoomFov;
+    if (fVar2 >= 0.0) {
+        if (fVar2 > 0.0) {
+            iVar3 = 1;
+        }
+        else {
+            iVar3 = 0;
+        }
+    }
+    else {
+        iVar3 = -1;
+    }
+
+    if (iVar4 != iVar3) {
+        newFov = pCamera->zoomFov;
+    }
+    
+    rdCamera_SetFOV(&pCamera->rdCam, newFov);
+    if ((pCamera->rdCam.fov == currentFov) || (iVar4 != iVar3)) {
+        pCamera->zoomSpeed = 0.0;
+        pCamera->bZoomed = 0;
+    }
+}
+#endif
 

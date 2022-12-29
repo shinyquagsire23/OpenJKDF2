@@ -90,7 +90,6 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
 {
     int mode; // ebx
     int result; // eax
-    sithAnimclass *v4; // ebp
     unsigned int bodypart_idx; // esi
     int joint_idx; // eax
     int animNameIdx; // ebp
@@ -105,103 +104,94 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
     char keyframe_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     mode = 0;
-    result = stdConffile_OpenRead(fpath);
-    if ( result )
-    {
-        v4 = animclass;
-        _memset(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint));
-        if ( stdConffile_ReadArgs() )
-        {
-            while ( 1 )
-            {
-                if ( !stdConffile_entry.numArgs )
-                    goto LABEL_40;
-                if ( !_strcmp(stdConffile_entry.args[0].key, "mode") )
-                {
-                    mode = _atoi(stdConffile_entry.args[0].value);
-                    if ( stdConffile_entry.numArgs > 1u && !_strcmp(stdConffile_entry.args[1].key, "basedon") )
-                        _memcpy(&v4->modes[mode], &v4->modes[_atoi(stdConffile_entry.args[1].value)], sizeof(v4->modes[mode]));
-                }
-                else if ( !_strcmp(stdConffile_entry.args[0].value, "joints") )
-                {
-                    while ( stdConffile_ReadArgs() )
-                    {
-                        if ( !stdConffile_entry.numArgs || !_strcmp(stdConffile_entry.args[0].key, "end") )
-                            break;
-                        bodypart_idx = _atoi(stdConffile_entry.args[0].key);
-                        joint_idx = _atoi(stdConffile_entry.args[0].value);
-                        if ( bodypart_idx < 0xA )
-                            animclass->bodypart_to_joint[bodypart_idx] = joint_idx;
-                    }
-                }
-                else if ( stdConffile_entry.numArgs > 1u )
-                {
-                    animNameIdx = (int)stdHashTable_GetKeyVal(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
-                    if ( animNameIdx )
-                    {
-                        if ( stdConffile_entry.numArgs <= 2u )
-                            flags = 0;
-                        else
-                            _sscanf(stdConffile_entry.args[2].value, "%x", &flags);
-                        if ( stdConffile_entry.numArgs <= 3u )
-                            lowpri = 0;
-                        else
-                            lowpri = _atoi(stdConffile_entry.args[3].value);
-                        if ( stdConffile_entry.numArgs <= 4u )
-                            hipri = lowpri;
-                        else
-                            hipri = _atoi(stdConffile_entry.args[4].value);
-                        if ( _strcmp(stdConffile_entry.args[1].value, "none") )
-                        {
-                            world = sithWorld_pLoading;
-                            key_fname = stdConffile_entry.args[1].value;
-                            if ( sithWorld_pLoading->keyframes )
-                            {
-                                _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_entry.args[1].value);
-                                v10 = (rdKeyframe *)stdHashTable_GetKeyVal(sithPuppet_keyframesHashtable, key_fname);
-                                if ( v10 )
-                                {
-LABEL_39:
-                                    animclass->modes[mode].keyframe[animNameIdx].keyframe = v10;
-                                    animclass->modes[mode].keyframe[animNameIdx].flags = flags;
-                                    animclass->modes[mode].keyframe[animNameIdx].lowPri = lowpri;
-                                    animclass->modes[mode].keyframe[animNameIdx].highPri = hipri;
+    result = 0;
+    if (!stdConffile_OpenRead(fpath))
+        return 0;
 
-                                    goto LABEL_40;
-                                }
-                                v12 = world->numKeyframesLoaded;
-                                if ( v12 < world->numKeyframes )
-                                {
-                                    keyframe = &world->keyframes[v12];
-                                    if ( rdKeyframe_LoadEntry(keyframe_fpath, keyframe) )
-                                    {
-                                        keyframe->id = world->numKeyframesLoaded;
-                                        if ( (world->level_type_maybe & 1) )
-                                        {
-                                            keyframe->id |= 0x8000u;
-                                        }
-                                        stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
-                                        v10 = keyframe;
-                                        ++world->numKeyframesLoaded;
-                                        goto LABEL_39;
-                                    }
-                                }
-                            }
-                        }
-                        v10 = NULL;
-                        goto LABEL_39;
-                    }
-                }
-LABEL_40:
-                if ( !stdConffile_ReadArgs() )
+    _memset(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint));
+    while ( stdConffile_ReadArgs() )
+    {
+        if ( !stdConffile_entry.numArgs )
+            continue;
+        if ( !_strcmp(stdConffile_entry.args[0].key, "mode") )
+        {
+            mode = _atoi(stdConffile_entry.args[0].value);
+            if ( stdConffile_entry.numArgs > 1u && !_strcmp(stdConffile_entry.args[1].key, "basedon") )
+                _memcpy(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_entry.args[1].value)], sizeof(animclass->modes[mode]));
+        }
+        else if ( !_strcmp(stdConffile_entry.args[0].value, "joints") )
+        {
+            while ( stdConffile_ReadArgs() )
+            {
+                if ( !stdConffile_entry.numArgs || !_strcmp(stdConffile_entry.args[0].key, "end") )
                     break;
-                v4 = animclass;
+                bodypart_idx = _atoi(stdConffile_entry.args[0].key);
+                joint_idx = _atoi(stdConffile_entry.args[0].value);
+                if ( bodypart_idx < 0xA )
+                    animclass->bodypart_to_joint[bodypart_idx] = joint_idx;
             }
         }
-        stdConffile_Close();
-        result = 1;
+        else if ( stdConffile_entry.numArgs > 1u )
+        {
+            animNameIdx = (int)stdHashTable_GetKeyVal(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
+            if ( animNameIdx )
+            {
+                if ( stdConffile_entry.numArgs <= 2u )
+                    flags = 0;
+                else
+                    _sscanf(stdConffile_entry.args[2].value, "%x", &flags);
+                if ( stdConffile_entry.numArgs <= 3u )
+                    lowpri = 0;
+                else
+                    lowpri = _atoi(stdConffile_entry.args[3].value);
+                if ( stdConffile_entry.numArgs <= 4u )
+                    hipri = lowpri;
+                else
+                    hipri = _atoi(stdConffile_entry.args[4].value);
+                if ( _strcmp(stdConffile_entry.args[1].value, "none") )
+                {
+                    world = sithWorld_pLoading;
+                    key_fname = stdConffile_entry.args[1].value;
+                    if ( sithWorld_pLoading->keyframes )
+                    {
+                        _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_entry.args[1].value);
+                        v10 = (rdKeyframe *)stdHashTable_GetKeyVal(sithPuppet_keyframesHashtable, key_fname);
+                        if ( v10 )
+                        {
+LABEL_39:
+                            animclass->modes[mode].keyframe[animNameIdx].keyframe = v10;
+                            animclass->modes[mode].keyframe[animNameIdx].flags = flags;
+                            animclass->modes[mode].keyframe[animNameIdx].lowPri = lowpri;
+                            animclass->modes[mode].keyframe[animNameIdx].highPri = hipri;
+
+                            continue;
+                        }
+                        v12 = world->numKeyframesLoaded;
+                        if ( v12 < world->numKeyframes )
+                        {
+                            keyframe = &world->keyframes[v12];
+                            if ( rdKeyframe_LoadEntry(keyframe_fpath, keyframe) )
+                            {
+                                keyframe->id = world->numKeyframesLoaded;
+                                if ( (world->level_type_maybe & 1) )
+                                {
+                                    keyframe->id |= 0x8000u;
+                                }
+                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
+                                v10 = keyframe;
+                                ++world->numKeyframesLoaded;
+                                goto LABEL_39;
+                            }
+                        }
+                    }
+                }
+                v10 = NULL;
+                goto LABEL_39;
+            }
+        }
     }
-    return result;
+    stdConffile_Close();
+    return 1;
 }
 
 void sithAnimClass_Free(sithWorld *world)

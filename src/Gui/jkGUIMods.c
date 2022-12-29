@@ -141,8 +141,8 @@ void jkGuiMods_Show()
     v4 = -1;
     do
     {
-        jkGuiRend_MenuSetLastElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[2]);
-        jkGuiRend_SetDisplayingStruct(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[3]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[2]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[3]);
         v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_cutscenesMenu);
         
         if (v4 == 10) {

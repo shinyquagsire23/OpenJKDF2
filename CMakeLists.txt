@@ -126,6 +126,9 @@ elseif(PLAT_MACOS)
 
     add_definitions(-DARCH_64BIT)
 
+    # macOS specific options
+    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
+
     #set(TARGET_USE_BASICSOCKETS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
@@ -149,6 +152,9 @@ elseif(PLAT_MACOS_X86_64)
     set(BIN_NAME "openjkdf2-64")
 
     add_definitions(-DARCH_64BIT)
+
+    # macOS specific options
+    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
 
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)

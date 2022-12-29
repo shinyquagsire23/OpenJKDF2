@@ -667,8 +667,8 @@ int jkGuiMouse_Show()
     jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
     jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[14], 45);
     jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[16], 46);
-    jkGuiRend_MenuSetLastElement(&jkGuiMouse_menu, &jkGuiMouse_aElements[21]);
-    jkGuiRend_SetDisplayingStruct(&jkGuiMouse_menu, &jkGuiMouse_aElements[22]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMouse_menu, &jkGuiMouse_aElements[21]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMouse_menu, &jkGuiMouse_aElements[22]);
     jkGuiSetup_sub_412EF0(&jkGuiMouse_menu, 1);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMouse_menu);
     pSubEnt = jkGuiMouse_aEntries[jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry)].pSubEnt;

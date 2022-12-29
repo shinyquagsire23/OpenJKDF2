@@ -110,7 +110,7 @@ void jkGuiEsc_Show()
 
     while ( 1 )
     {
-        jkGuiRend_SetDisplayingStruct(&jkGuiEsc_menu, &jkGuiEsc_aElements[JKGUIESC_ELMT_RETURNTOGAME]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiEsc_menu, &jkGuiEsc_aElements[JKGUIESC_ELMT_RETURNTOGAME]);
         switch (jkGuiRend_DisplayAndReturnClicked(&jkGuiEsc_menu))
         {
             case -1:

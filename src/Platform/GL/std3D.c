@@ -30,6 +30,10 @@
 
 #ifdef WIN32
 #define GL_R8 GL_RED
+
+// Force Optimus/AMD to use non-integrated GPUs by default.
+__declspec(dllexport) DWORD NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
 #define TEX_MODE_TEST 0
@@ -1227,7 +1231,7 @@ void std3D_DrawMenu()
             textScale *= 11.0 / (float)jkDev_BMFontHeight;
         }
         float textWidth = menu_w - (48*2);
-        float textHeight = jkDev_BMFontHeight * 5;
+        float textHeight = jkDev_BMFontHeight * 5.5;
         float destTextWidth = textWidth * textScale;
         std3D_DrawMenuSubrect(48, 0, menu_w - (48*2), textHeight, (Window_xSize / 2) - (destTextWidth / 2), 0, textScale);
 

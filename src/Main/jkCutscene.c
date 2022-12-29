@@ -12,6 +12,7 @@
 #include "Main/jkStrings.h"
 #include "Main/smack.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUISound.h"
 #include "Win95/stdSound.h"
 #include "Devices/sithSoundMixer.h"
 #include "stdPlatform.h"
@@ -174,6 +175,7 @@ int jkCutscene_sub_421310(char* fpath)
 	    smk_next(jkCutscene_smk);
 	}
 
+    stdSound_BufferSetVolume(jkCutscene_audioFull, jkGuiSound_cutsceneVolume);
 	stdSound_BufferUnlock(jkCutscene_audioFull, audioBuf, maxSize);
     stdSound_BufferPlay(jkCutscene_audioFull, 0);
 	

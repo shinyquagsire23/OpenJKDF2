@@ -46,6 +46,7 @@ float jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
+int jkPlayer_bFastMissionText = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -413,6 +414,7 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         stdJSON_SaveBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
         stdJSON_SaveBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
+        stdJSON_SaveBool(ext_fpath, "bFastMissionText", jkPlayer_bFastMissionText);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -587,11 +589,11 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_bEnableJkgm = stdJSON_GetBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         jkPlayer_bEnableTexturePrecache = stdJSON_GetBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
         jkPlayer_bKeepCorpses = stdJSON_GetBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
+        jkPlayer_bFastMissionText = stdJSON_GetBool(ext_fpath, "bFastMissionText", jkPlayer_bFastMissionText);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
-
 
         stdConffile_Close();
         return 1;

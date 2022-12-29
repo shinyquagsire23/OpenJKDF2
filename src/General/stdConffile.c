@@ -40,7 +40,7 @@ int stdConffile_OpenMode(char *fpath, char* mode)
         
         stdConffile_linenum = 0;
         openFile = 0;
-        _memcpy((void *)(aEntryStack + (1028 * stackLevel)), &stdConffile_entry, sizeof(stdConffileEntry));
+        _memcpy((void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), &stdConffile_entry, sizeof(stdConffileEntry));
         stackLevel++;
     }
 
@@ -55,7 +55,7 @@ int stdConffile_OpenMode(char *fpath, char* mode)
             goto fail_open;
     }
 
-    stdConffile_aLine = (char*)std_pHS->alloc(1024);
+    stdConffile_aLine = (char*)std_pHS->alloc(STDCONF_LINEBUFFER_LEN);
     _strncpy(stdConffile_pFilename, fpath, 127);
     stdConffile_pFilename[127] = 0;
     stdConffile_linenum = 0;
@@ -76,7 +76,7 @@ fail_open:
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
     
-    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + (1028 * stackLevel)), sizeof(stdConffileEntry));
+    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
     return 0;
 }
 
@@ -101,7 +101,7 @@ void stdConffile_Close()
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
-    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + (1028 * stackLevel)), sizeof(stdConffileEntry));
+    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
 }
 
 void stdConffile_CloseWrite()
@@ -137,7 +137,7 @@ int stdConffile_Printf(char *fmt, ...)
     if ( !writeFile || !fmt )
         return 0;
 
-    len = __vsnprintf(printfBuffer, 0x400, fmt, va);
+    len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, fmt, va);
     return std_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 
@@ -211,7 +211,7 @@ int stdConffile_ReadLine()
 
   line_iter = stdConffile_aLine;
   is_eol = 0;
-  buf_left = 1023;
+  buf_left = (STDCONF_LINEBUFFER_LEN-1);
   while (buf_left)
   {
     if (!std_pHS->fileGets(openFile, line_iter, buf_left))
@@ -230,7 +230,7 @@ int stdConffile_ReadLine()
       if (line_len >= 2 && stdConffile_aLine[line_len - 2] == '\\' ) // added: line_len >= 2
       {
         line_iter = &stdConffile_aLine[line_len - 2];
-        buf_left = 1024 - line_len;
+        buf_left = STDCONF_LINEBUFFER_LEN - line_len;
       }
       else
       {

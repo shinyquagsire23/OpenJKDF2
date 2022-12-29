@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "stdPlatform.h"
 #include "General/stdHashTable.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
@@ -77,15 +78,29 @@ int sithSurface_Load(sithWorld *world)
     rdTexinfo *v66; // [esp+24h] [ebp-8h] BYREF
     int v61;
 
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " world adjoins %d", &numAdjoins) != 1 )
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " world adjoins %d", &numAdjoins) != 1 ) {
+        stdPrintf(
+            pSithHS->errorPrint,
+            ".\\World\\sithSurface.c",
+            0,
+            "OpenJKDF2: Failed to get num adjoins `%s`\n",
+            stdConffile_aLine);
         return 0;
+    }
     if ( numAdjoins )
     {
         allocSize = sizeof(sithAdjoin) * numAdjoins;
         adjoins = (sithAdjoin *)pSithHS->alloc(sizeof(sithAdjoin) * numAdjoins);
         world->adjoins = adjoins;
-        if ( !adjoins )
+        if ( !adjoins ) {
+            stdPrintf(
+                pSithHS->errorPrint,
+                ".\\World\\sithSurface.c",
+                0,
+                "OpenJKDF2: Failed to allocate %u adjoins\n",
+                numAdjoins);
             return 0;
+        }
         _memset(adjoins, 0, allocSize);
         world->numAdjoins = numAdjoins;
         world->numAdjoinsLoaded = 0;
@@ -112,17 +127,35 @@ int sithSurface_Load(sithWorld *world)
     }
     if (!stdConffile_ReadLine())
     {
+        stdPrintf(
+                pSithHS->errorPrint,
+                ".\\World\\sithSurface.c",
+                0,
+                "OpenJKDF2: Failed to read line?\n",
+                numAdjoins);
         return 0;
     }
     
     if ( _sscanf(stdConffile_aLine, " world surfaces %d", &numSurfaces) != 1 )
     {
+        stdPrintf(
+                pSithHS->errorPrint,
+                ".\\World\\sithSurface.c",
+                0,
+                "OpenJKDF2: Failed to get num surfaces? `%s`\n",
+                stdConffile_aLine);
         return 0;
     }
 
     world->surfaces = (sithSurface *)pSithHS->alloc(sizeof(sithSurface) * numSurfaces);
     if (!world->surfaces)
     {
+        stdPrintf(
+                pSithHS->errorPrint,
+                ".\\World\\sithSurface.c",
+                0,
+                "OpenJKDF2: Failed to alloc %u surfaces\n",
+                numSurfaces);
         return 0;
     }
 
@@ -190,6 +223,7 @@ int sithSurface_Load(sithWorld *world)
         else
         {
             surfaceAdjoin = &world->adjoins[adjoinIdx];
+
             surfaceIter->adjoin = surfaceAdjoin;
             surfaceAdjoin->surface = surfaceIter;
             if ( face->material )
