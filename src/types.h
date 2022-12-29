@@ -707,6 +707,15 @@ enum SITH_WF_E
     SITH_WF_MOPHIA_BOMB = 0x800000, // Jones specific
 };
 
+typedef int32_t sithGamesaveState_t;
+enum SITH_GS_E
+{
+    SITH_GS_NONE = 0,
+    SITH_GS_LOAD = 1,
+    SITH_GS_SAVE = 2,
+    SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT = 3,
+};
+
 typedef uint32_t sithItemFlags_t;
 enum SITH_ITEMFLAG_E // could be jones specific
 {

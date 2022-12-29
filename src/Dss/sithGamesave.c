@@ -48,7 +48,7 @@ int sithGamesave_GetProfilePath(char *out, int outSize, char *a3)
 
 // write
 
-int sithGamesave_Load(char *saveFname, int a2, int a3)
+int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
 {
     char playerName[32]; // [esp+0h] [ebp-A0h] BYREF
     char fpath[128]; // [esp+20h] [ebp-80h] BYREF
@@ -63,7 +63,7 @@ int sithGamesave_Load(char *saveFname, int a2, int a3)
         sithGamesave_dword_835914 = a3;
         if (sithWorld_pCurrentWorld)
         {
-            sithGamesave_dword_835900 = a2 != 0 ? 3 : 1;
+            sithGamesave_currentState = debugNextCheckpoint != 0 ? SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT : SITH_GS_LOAD;
             _strncpy(sithGamesave_fpath, fpath, 0x7Fu);
             sithGamesave_fpath[127] = 0;
             return 1;
@@ -319,7 +319,7 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
             *v7++ = v9;
         }
         while ( (intptr_t)v7 < (intptr_t)sithGamesave_headerTmp.saveName );
-        sithGamesave_dword_835900 = 2;
+        sithGamesave_currentState = SITH_GS_SAVE;
         _strncpy(sithGamesave_fpath, PathName, 0x7Fu);
         sithGamesave_fpath[127] = 0;
         return 1;
@@ -331,33 +331,33 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     }
 }
 
-int sithGamesave_WriteEntry()
+int sithGamesave_Flush()
 {
-    if ( sithGamesave_dword_835900 == 1 )
+    if ( sithGamesave_currentState == SITH_GS_LOAD )
     {
         if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
         {
-            sithGamesave_dword_835900 = 0;
+            sithGamesave_currentState = SITH_GS_NONE;
             return 1;
         }
         // TODO inlined?
         sithMain_set_sithmode_5();
-        sithGamesave_dword_835900 = 0;
+        sithGamesave_currentState = SITH_GS_NONE;
         return 1;
     }
-    if ( sithGamesave_dword_835900 != 2 )
+    if ( sithGamesave_currentState != SITH_GS_SAVE )
     {
-        if ( sithGamesave_dword_835900 != 3 )
-            return sithGamesave_dword_835900 - 3;
+        if ( sithGamesave_currentState != SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT)
+            return sithGamesave_currentState - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
         if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
         {
             sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
-            sithGamesave_dword_835900 = 0;
+            sithGamesave_currentState = SITH_GS_NONE;
             return 1;
         }
         // TODO inlined?
         sithMain_set_sithmode_5();
-        sithGamesave_dword_835900 = 0;
+        sithGamesave_currentState = SITH_GS_NONE;
         return 1;
     }
     if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
@@ -394,6 +394,6 @@ int sithGamesave_WriteEntry()
         }
         sithComm_multiplayerFlags = multiplayerFlagsSave;
     }
-    sithGamesave_dword_835900 = 0;
+    sithGamesave_currentState = SITH_GS_NONE;
     return 0;
 }

@@ -1829,7 +1829,7 @@ void do_hooks()
     hook_function(sithGamesave_Load_ADDR, sithGamesave_Load);
     hook_function(sithGamesave_LoadEntry_ADDR, sithGamesave_LoadEntry);
     hook_function(sithGamesave_Write_ADDR, sithGamesave_Write);
-    hook_function(sithGamesave_WriteEntry_ADDR, sithGamesave_WriteEntry);
+    hook_function(sithGamesave_Flush_ADDR, sithGamesave_Flush);
 
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);
