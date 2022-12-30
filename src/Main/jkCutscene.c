@@ -415,18 +415,28 @@ int jkCutscene_smack_related_loops()
             if (jkCutscene_pSmush)
             {
                 wchar_t* str = NULL;
-                if (jkCutscene_dword_55B750) {
-                    char key[32];
-                    stdString_snprintf(key, 32, "COG_%05d", jkCutscene_dword_55B750);
-                    str = stdStrTable_GetUniString(&jkCog_strings, key);
-                    if ( !str ) {
-                        str = jkStrings_GetText(key);
+                int uVar3 = jkCutscene_dword_55B750 & 0x7FFFFFFF;
+                if (uVar3) {
+                    int uVar4 = uVar3 % 10000;
+                    int iVar2 = 0;
+                    if (uVar3 / 10000 == 1) {
+                      iVar2 = 7;
                     }
+                    else {
+                      iVar2 = (uVar3 / 10000 == 2) + 8;
+                    }
+                    if ((iVar2 == 8) && ((uVar4 == 166 || (uVar4 == 148)))) {
+                      iVar2 = 5;
+                    }
+
+                    char key[32];
+                    stdString_snprintf(key, 32, "COG_%05d", iVar2 * 10000 + uVar4);
+                    str = jkStrings_GetText(key);
                 }
                 
                 if (str) {
                     int forced = 0;
-                    if (str == '|') {
+                    if (*str == '|') {
                         str++;
                         forced = 1;
                     }
@@ -771,9 +781,6 @@ int jkCutscene_smusher_process()
     {
         // TODO subtitles
         jkCutscene_dword_55B750 = smush_get_current_subtitle(jkCutscene_pSmush);
-        if (jkCutscene_dword_55B750) {
-            jkCutscene_dword_55B750 += 60000;
-        }
     }
 
     _memcpy(stdDisplay_masterPalette, smush_get_palette(jkCutscene_pSmush), 0x300);
