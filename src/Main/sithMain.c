@@ -382,7 +382,7 @@ int sithMain_Tick()
         
         sithConsole_AdvanceLogBuf();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
-        sithGamesave_WriteEntry();
+        sithGamesave_Flush();
         return 0;
     }
 }

@@ -2116,7 +2116,7 @@ sithGamesave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.
 sithGamesave_Write	.text	004DA490	00000205	000002AC	00000010	R	.	.	.	.	.	T	.
 sithGamesave_Load	.text	004DA6A0	000000CA	000000A0	0000000C	R	.	.	.	.	.	T	.
 sithGamesave_SerializeAllThings	.text	004DA770	00000249	00000008	00000004	R	.	.	.	.	.	T	.
-sithGamesave_WriteEntry	.text	004DA9C0	000001AA	00000008	00000000	R	.	.	.	.	.	.	.
+sithGamesave_Flush	.text	004DA9C0	000001AA	00000008	00000000	R	.	.	.	.	.	.	.
 sithGamesave_LoadEntry	.text	004DAB70	0000028B	0000065C	00000004	R	.	.	.	.	.	T	.
 sithSoundMixer_Startup	.text	004DAE00	0000003F	00000004	00000000	R	.	.	.	.	.	.	.
 sithSoundMixer_Shutdown	.text	004DAE40	00000019			R	.	.	.	.	.	T	.

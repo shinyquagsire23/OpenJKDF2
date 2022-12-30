@@ -314,9 +314,9 @@ void sithRender_Draw()
         sithRender_numClipFrustums = 0;
         sithRender_numSurfaces = 0;
         sithRender_82F4B4 = 0;
-        sithRender_surfacesDrawn = 0;
-        sithRender_831984 = 0;
-        sithRender_831980 = 0;
+        sithRender_sectorsDrawn = 0;
+        sithRender_nongeoThingsDrawn = 0;
+        sithRender_geoThingsDrawn = 0;
         rdCamera_ClearLights(rdCamera_pCurCamera);
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
 
@@ -1196,7 +1196,7 @@ LABEL_150:
                     }
 #endif // JKM_LIGHTING
                     if ( sithRender_RenderThing(i) )
-                        ++sithRender_831980;
+                        ++sithRender_geoThingsDrawn;
 
                     // MOTS added
 #ifdef JKM_LIGHTING
@@ -1213,7 +1213,7 @@ LABEL_150:
                 }
             }
         }
-        ++sithRender_surfacesDrawn;
+        ++sithRender_sectorsDrawn;
     }
 
     rdCache_Flush();
@@ -1557,7 +1557,7 @@ void sithRender_RenderThings()
                     }
                     thingIter->rdthing.curLightMode = lightMode;
                     if (!(thingIter->thingflags & SITH_TF_80000000) && sithRender_RenderThing(thingIter) ) // MOTS added: flag check
-                        ++sithRender_831984;
+                        ++sithRender_nongeoThingsDrawn;
                 }
             }
         }

@@ -61,10 +61,10 @@ sithRender_numClipFrustums 0x0082FEE8 int32_t
 sithRender_numLights 0x00831978 int32_t
 sithRender_numSectors2 0x0082F640 int32_t
 sithRender_82F4B4 0x0082F4B4 uint32_t
-sithRender_surfacesDrawn 0x0083197C int
+sithRender_sectorsDrawn 0x0083197C int
 sithRender_numSurfaces 0x0082F4B8 int32_t
-sithRender_831980 0x00831980 int
-sithRender_831984 0x00831984 int
+sithRender_geoThingsDrawn 0x00831980 int
+sithRender_nongeoThingsDrawn 0x00831984 int
 sithRender_f_82F4B0 0x0082F4B0 float
 sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
 meshinfo_out 0x0082F490 rdMeshinfo
@@ -216,7 +216,7 @@ sithGamesave_func3 0x00835904 sithSaveHandler_t
 sithGamesave_funcWrite 0x00835F44 sithSaveHandler_t
 sithGamesave_funcRead 0x0083590C sithSaveHandler_t
 sithGamesave_autosave_fname 0x008BBC80 char[128]
-sithGamesave_dword_835900 0x00835900 int
+sithGamesave_currentState 0x00835900 sithGamesaveState_t
 sithGamesave_dword_835914 0x00835914 int
 sithGamesave_fpath 0x00835F48 char[132]
 sithGamesave_wsaveName 0x008BBD00 wchar_t[256]

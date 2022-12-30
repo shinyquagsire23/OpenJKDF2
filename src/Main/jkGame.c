@@ -185,9 +185,9 @@ int jkGame_Update()
                     "%02.3f (%02d%%)f %3ds %3da %3dz %4dp %3d curSector %3d fo",
                     Video_flt_55289C,
                     (unsigned int)(__int64)((double)(unsigned int)jkGame_updateMsecsTotal / (double)(int)v0 * 100.0),
-                    sithRender_surfacesDrawn,
-                    sithRender_831980,
-                    sithRender_831984,
+                    sithRender_sectorsDrawn,
+                    sithRender_geoThingsDrawn,
+                    sithRender_nongeoThingsDrawn,
                     rdCache_drawnFaces,
                     v6,
                     sithNet_thingsIdx);
