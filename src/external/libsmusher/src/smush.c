@@ -119,6 +119,10 @@ int smush_video_fps(smush_ctx* ctx) {
     return getle32(ctx->ahdr_ext.frame_rate);
 }
 
+int smush_get_current_subtitle(smush_ctx* ctx) {
+    return ctx->current_sub;
+}
+
 void smush_restart(smush_ctx* ctx) {
     ctx->frame_fpos = ctx->start_fpos;
     ctx->cur_frame = 0;
@@ -427,6 +431,29 @@ void smush_proc_iact(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     }
 }
 
+void smush_proc_tres(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
+{
+    smush_tres tres;
+    fseek(ctx->f, seek_pos, SEEK_SET);
+    fread(&tres, sizeof(tres), 1, ctx->f);
+
+    uint16_t unk1, unk2, unk4, unk5, unk6, unk7, subtitle_index;
+    uint32_t unk3;
+
+    unk1 = getle16(tres.unk1);
+    unk2 = getle16(tres.unk2);
+    unk3 = getle32(tres.unk3);
+    unk4 = getle16(tres.unk4);
+    unk5 = getle16(tres.unk5);
+    unk6 = getle16(tres.unk6);
+    unk7 = getle16(tres.unk7);
+    subtitle_index = getle16(tres.subtitle_index);
+
+    //smush_error("TRES: %u %u %u %u %u %u %u %u\n", unk1, unk2, unk3, unk4, unk5, unk6, unk7, subtitle_index);
+
+    ctx->current_sub = subtitle_index;
+}
+
 void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
 {
     smush_header tmp;
@@ -441,6 +468,8 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     seek_pos += sizeof(tmp);
 
     uint32_t max_seek_pos = seek_pos + getbe32(tmp.size);
+
+    ctx->current_sub = 0;
 
     while (1)
     {
@@ -470,6 +499,9 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         }
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_STOR) {
             // TODO?
+        }
+        else if (getbe32(tmp.magic) == SMUSH_MAGIC_TRES) {
+            smush_proc_tres(ctx, seek_pos, getbe32(tmp.size));
         }
         else {
             smush_warn("    Unhandled tag: %c%c%c%c\n", tmp.magic[0], tmp.magic[1], tmp.magic[2], tmp.magic[3]);

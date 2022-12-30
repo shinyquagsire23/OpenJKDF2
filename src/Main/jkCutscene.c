@@ -15,6 +15,7 @@
 #include "Gui/jkGUISound.h"
 #include "Win95/stdSound.h"
 #include "Devices/sithSoundMixer.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 
 #include "smacker.h"
@@ -74,14 +75,29 @@ void jkCutscene_Startup(char *fpath)
 {
     stdStrTable_Load(&jkCutscene_strings, fpath); // MOTS removed
     jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);
-    jkCutscene_rect1.x = 10;
-    jkCutscene_rect1.y = 360;
-    jkCutscene_rect1.width = 620;
-    jkCutscene_rect1.height = 120;
-    jkCutscene_rect2.x = 0;
-    jkCutscene_rect2.y = 10;
-    jkCutscene_rect2.width = 640;
-    jkCutscene_rect2.height = 40;
+    
+    if (Main_bMotsCompat) {
+        jkCutscene_rect1.x = 10;
+        jkCutscene_rect1.y = 400; // MoTS was 385?
+        jkCutscene_rect1.width = 620;
+        jkCutscene_rect1.height = 80; // MoTS was 95?
+        jkCutscene_rect2.x = 0;
+        jkCutscene_rect2.y = 10;
+        jkCutscene_rect2.width = 640;
+        jkCutscene_rect2.height = 40;
+    }
+    else {
+        jkCutscene_rect1.x = 10;
+        jkCutscene_rect1.y = 360;
+        jkCutscene_rect1.width = 620;
+        jkCutscene_rect1.height = 120;
+        jkCutscene_rect2.x = 0;
+        jkCutscene_rect2.y = 10;
+        jkCutscene_rect2.width = 640;
+        jkCutscene_rect2.height = 40;
+    }
+    
+
     jkCutscene_bInitted = 1;
 }
 
@@ -395,20 +411,55 @@ int jkCutscene_smack_related_loops()
         else if ( jkCutscene_dword_55B750 != jkCutscene_dword_55AA50 )
         {
             stdDisplay_VBufferFill(&Video_otherBuf, 0, &jkCutscene_rect1);
-            v2 = jkCutscene_dword_55B750;
-            if ( (jkCutscene_dword_55B750 & 0x80000000 || jkPlayer_setFullSubtitles) && (jkCutscene_dword_55B750 & 0x7FFFFFFF) != 0 )
+
+            if (jkCutscene_pSmush)
             {
-                stdFont_Draw3(
-                    &Video_otherBuf,
-                    jkCutscene_subtitlefont,
-                    360,
-                    &jkCutscene_rect1,
-                    1,
-                    jkCutscene_strings.msgs[jkCutscene_dword_55B750 & 0x7FFFFFFF].uniStr,
-                    0);
-                v2 = jkCutscene_dword_55B750;
+                wchar_t* str = NULL;
+                if (jkCutscene_dword_55B750) {
+                    char key[32];
+                    stdString_snprintf(key, 32, "COG_%05d", jkCutscene_dword_55B750);
+                    str = stdStrTable_GetUniString(&jkCog_strings, key);
+                    if ( !str ) {
+                        str = jkStrings_GetText(key);
+                    }
+                }
+                
+                if (str) {
+                    int forced = 0;
+                    if (str == '|') {
+                        str++;
+                        forced = 1;
+                    }
+                    if (jkPlayer_setFullSubtitles || forced) {
+                        stdFont_Draw3(
+                            &Video_otherBuf,
+                            jkCutscene_subtitlefont,
+                            jkCutscene_rect1.y,
+                            &jkCutscene_rect1,
+                            1,
+                            str,
+                            0);
+                    }
+                }
+                jkCutscene_dword_55AA50 = jkCutscene_dword_55B750;
             }
-            jkCutscene_dword_55AA50 = v2;
+            else {
+                v2 = jkCutscene_dword_55B750;
+                if ( (jkCutscene_dword_55B750 & 0x80000000 || jkPlayer_setFullSubtitles) && (jkCutscene_dword_55B750 & 0x7FFFFFFF) != 0 )
+                {
+                    stdFont_Draw3(
+                        &Video_otherBuf,
+                        jkCutscene_subtitlefont,
+                        360,
+                        &jkCutscene_rect1,
+                        1,
+                        jkCutscene_strings.msgs[jkCutscene_dword_55B750 & 0x7FFFFFFF].uniStr,
+                        0);
+                    v2 = jkCutscene_dword_55B750;
+                }
+                jkCutscene_dword_55AA50 = v2;
+            }
+            
         }
         if ( Main_bWindowGUI )
         {
@@ -719,7 +770,10 @@ int jkCutscene_smusher_process()
     //if (s == 4)
     {
         // TODO subtitles
-        jkCutscene_dword_55B750 = 0;//*subtitle_idx;
+        jkCutscene_dword_55B750 = smush_get_current_subtitle(jkCutscene_pSmush);
+        if (jkCutscene_dword_55B750) {
+            jkCutscene_dword_55B750 += 60000;
+        }
     }
 
     _memcpy(stdDisplay_masterPalette, smush_get_palette(jkCutscene_pSmush), 0x300);

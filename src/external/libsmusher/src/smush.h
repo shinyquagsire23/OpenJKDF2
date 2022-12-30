@@ -63,6 +63,18 @@ typedef struct smush_imuse_iact
     uint8_t bytes_left[4];
 } smush_imuse_iact;
 
+typedef struct smush_tres
+{
+    uint8_t unk1[2];
+    uint8_t unk2[2];
+    uint8_t unk3[4];
+    uint8_t unk4[2];
+    uint8_t unk5[2];
+    uint8_t unk6[2];
+    uint8_t unk7[2];
+    uint8_t subtitle_index[2];
+} smush_tres;
+
 
 typedef struct codec48_ctx codec48_ctx; 
 typedef struct smush_ctx
@@ -89,6 +101,8 @@ typedef struct smush_ctx
     uint16_t codec_w;
     uint16_t codec_h;
 
+    int current_sub;
+
     uint16_t delta_palette[256 * 3];
 
     int iact_idx;
@@ -107,6 +121,7 @@ typedef struct smush_ctx
 #define SMUSH_MAGIC_IACT (0x49414354)
 #define SMUSH_MAGIC_FTCH (0x46544348)
 #define SMUSH_MAGIC_STOR (0x53544F52)
+#define SMUSH_MAGIC_TRES (0x54524553)
 
 #define smush_error(...) { printf(__VA_ARGS__); }
 #define smush_warn(...) { printf(__VA_ARGS__); }
@@ -125,6 +140,7 @@ uint8_t* smush_get_video(smush_ctx* ctx);
 uint32_t smush_video_width(smush_ctx* ctx);
 uint32_t smush_video_height(smush_ctx* ctx);
 int smush_video_fps(smush_ctx* ctx);
+int smush_get_current_subtitle(smush_ctx* ctx);
 
 void smush_frame(smush_ctx* ctx);
 void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size);
