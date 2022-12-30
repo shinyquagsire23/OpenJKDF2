@@ -22,6 +22,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5);
 
 #ifdef SDL2_RENDER
 int jkCutscene_smacker_process();
+int jkCutscene_smusher_process();
 #endif
 
 //static void (*jkCutscene_Shutdown)() = (void*)jkCutscene_Shutdown_ADDR;

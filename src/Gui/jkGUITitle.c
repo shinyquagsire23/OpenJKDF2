@@ -240,6 +240,7 @@ void jkGuiTitle_ShowLoadingStatic()
     int verMajor; // [esp-Ch] [ebp-2Ch]
     int verMinor; // [esp-8h] [ebp-28h]
     int verRevision; // [esp-4h] [ebp-24h]
+    char* verMotsStr;
     //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
     // Added: removed undefined behavior, used to use the stack.....
 
@@ -249,8 +250,9 @@ void jkGuiTitle_ShowLoadingStatic()
     verRevision = jkGuiTitle_verRevision;
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
+    verMotsStr = L""; // TODO?
     guiVersionStr = jkStrings_GetText("GUI_VERSION");
-    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision);
+    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);

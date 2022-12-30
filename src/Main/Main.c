@@ -353,7 +353,13 @@ int Main_Startup(const char *cmdline)
                 }
             }
 #endif
-            jkSmack_SmackPlay("01-02a.smk");
+            if (!Main_bMotsCompat) {
+                jkSmack_SmackPlay("01-02a.smk");
+            }
+            else {
+                jkSmack_SmackPlay("jkmintro.san");
+            }
+            
             Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
             return 1;
         }

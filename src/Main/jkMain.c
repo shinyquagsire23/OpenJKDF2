@@ -616,21 +616,6 @@ LABEL_28:
                 if ( sithNet_isMulti )
                     jkDSS_wrap_SendSaberInfo_alt();
             }
-
-            if (Main_bMotsCompat) {
-                sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
-                if (jkMain_motsIdk[0] != 0) {
-                    stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
-                    stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
-                    if (jkGuiRend_thing_five != 0) {
-                        jkGuiRend_thing_four = 1;
-                    }
-                    jkMain_aLevelJklFname[127] = '\0';
-                    jkSmack_stopTick = 1;
-                    jkSmack_nextGuiState = JK_GAMEMODE_MOTS_CUTSCENE;
-                    return;
-                }
-            }
         }
         else {
             thing_six = 1;
@@ -649,6 +634,21 @@ LABEL_28:
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
             thing_six = 0;
             return;
+        }
+
+        if (Main_bMotsCompat) {
+            sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
+            if (jkMain_motsIdk[0] != 0) {
+                stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
+                stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
+                if (jkGuiRend_thing_five != 0) {
+                    jkGuiRend_thing_four = 1;
+                }
+                jkMain_aLevelJklFname[127] = '\0';
+                jkSmack_stopTick = 1;
+                jkSmack_nextGuiState = JK_GAMEMODE_MOTS_CUTSCENE;
+                return;
+            }
         }
     }
 
