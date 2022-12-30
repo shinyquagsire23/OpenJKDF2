@@ -107,6 +107,10 @@ int jkCutscene_sub_421310(char* fpath)
     return 1;
 #endif
 
+    if (jkPlayer_setDisableCutscenes) {
+        return 1;
+    }
+
     char tmp[512];
     size_t len = _strlen(fpath);
 
@@ -313,6 +317,13 @@ int jkCutscene_sub_421410()
 #endif
 
 #ifdef SDL2_RENDER
+    for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
+        if (jkCutscene_audio_queue[i])
+            free(jkCutscene_audio_queue[i]);
+
+        jkCutscene_audio_queue[i] = NULL;
+        jkCutscene_audio_queue_lens[i] = 0;
+    }
     if (jkCutscene_audio_buf)
         free(jkCutscene_audio_buf);
     if (jkCutscene_audio)
