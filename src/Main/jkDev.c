@@ -68,6 +68,9 @@ void jkDev_Startup()
     jkDev_RegisterCmd(jkDev_CmdMana, "yodajammies", "", 0);
     jkDev_RegisterCmd(jkDev_CmdSkipToLevel, "pinotnoir", "", 0);
 
+    // lol add more for fun
+    jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);
+
     jkDev_bInitted = 1;
 }
 
@@ -471,6 +474,19 @@ int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     jkMain_SetMap(argInt);
     return 1;
+}
+
+int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    char tmp[128];
+
+    if (sithNet_isMulti)
+        return 1;
+
+    jkPlayer_dword_525470 = 1;
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
+    stdFnames_ChangeExt(tmp, "jks");
+    return sithGamesave_Load(tmp, 1, 0);
 }
 
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
