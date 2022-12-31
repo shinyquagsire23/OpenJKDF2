@@ -2543,6 +2543,48 @@ void sithCogFunctionThing_InterpolatePYR(sithCog *ctx)
     return;
 }
 
+// MOTS added
+void sithCogFunctionThing_SetThingJointAngle(sithCog *ctx)
+{
+    rdVector3 *prVar1;
+    int arg1;
+    sithThing *pThing;
+    float fVar2;
+
+    fVar2 = sithCogExec_PopFlex(ctx);
+    arg1 = sithCogExec_PopInt(ctx);
+    pThing = sithCogExec_PopThing(ctx);
+    if (((pThing && pThing->animclass) 
+      && (pThing->rdthing.type == RD_THINGTYPE_MODEL)) 
+      && ((prVar1 = pThing->rdthing.hierarchyNodes2, prVar1 != NULL &&
+      (arg1 = pThing->animclass->bodypart_to_joint[arg1],
+      arg1 > -1 && arg1 <= (int)(pThing->rdthing.model3->numHierarchyNodes - 1))))) 
+    {
+        prVar1[arg1].x = fVar2;
+    }
+}
+
+
+void sithCogFunctionThing_GetThingJointAngle(sithCog *ctx)
+{
+    rdVector3 *prVar1;
+
+    float local_4 = -1.0;
+    int arg1 = sithCogExec_PopInt(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing)
+    {
+        if (((pThing->animclass && pThing->rdthing.type == RD_THINGTYPE_MODEL) &&
+            (prVar1 = (pThing->rdthing).hierarchyNodes2, prVar1 != NULL)) &&
+           (arg1 = pThing->animclass->bodypart_to_joint[arg1],
+           arg1 > -1 && arg1 <= (int)(pThing->rdthing.model3->numHierarchyNodes - 1))) 
+        {
+          local_4 = prVar1[arg1].x;
+        }
+        sithCogExec_PushFlex(ctx,local_4);
+    }
+}
+
 void sithCogFunctionThing_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_WaitForStop, "waitforstop");
@@ -2744,8 +2786,8 @@ void sithCogFunctionThing_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxAngularVelocity, "setthingmaxangularvelocity");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorHeadPYR, "getactorheadpyr");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetActorHeadPYR, "setactorheadpyr");
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxHeadPitch, "setthingmaxheadpitch");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");

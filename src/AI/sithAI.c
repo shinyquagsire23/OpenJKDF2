@@ -686,6 +686,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
     v2->lookOrientation.uvec.z = v16 - v18;
 }
 
+// MoTS altered
 void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
 {
     sithThing *v3; // esi
@@ -713,8 +714,9 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
     float actorb; // [esp+34h] [ebp+4h]
     float actora; // [esp+34h] [ebp+4h]
 
+    // MoTS Added: SITH_AF_FREEZE_MOVEMENT
     v3 = actor->thing;
-    if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
+    if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
     {
         v4 = actor->movePos.y - v3->position.y;
         v5 = actor->movePos.z - v3->position.z;

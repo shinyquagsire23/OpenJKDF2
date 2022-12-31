@@ -26,6 +26,7 @@ void jkAI_Startup()
     sithAI_RegisterCommand("specialattack", jkAI_SpecialAttack, 2, 0, 4);
 }
 
+// MoTS altered
 int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
 {
     unsigned int v5; // edi
@@ -58,7 +59,8 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
         return 0;
     if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
-        if ( (v7->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
+        // MoTS Added: SITH_AF_FREEZE_MOVEMENT
+        if ( (v7->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
         {
             if ( v8->polyline.length < (double)v8->length )
             {

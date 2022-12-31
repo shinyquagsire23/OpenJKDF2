@@ -1783,3 +1783,15 @@ int sithRender_SetRenderWeaponHandle(void *a1)
     sithRender_weaponRenderHandle = a1;
     return 1;
 }
+
+// MoTS Added
+void sithRender_WorldFlash(float arg1,float arg2)
+{
+  if ((arg1 != 0.0) && ((uint16_t)((uint16_t)(arg2 < 0.0) << 8 | (uint16_t)(arg2 == 0.0) << 0xe) == 0)) {
+    sithRender_008d4094 = 1;
+    sithRender_008d4098 = arg1;
+    sithRender_008d409c = arg2;
+  }
+}
+
+

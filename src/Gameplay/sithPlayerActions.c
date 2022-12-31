@@ -72,6 +72,7 @@ void sithPlayerActions_Activate(sithThing *thing)
     }
 }
 
+// MoTS altered
 void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
 {
     double final_vel;
@@ -82,7 +83,8 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
     int v14; // eax
     sithPlayingSound *v15; // eax
 
-    if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & SITH_AF_IMMOBILE) == 0 )
+    // MoTS Added: SITH_AF_FREEZE_MOVEMENT
+    if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && (thing->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
     {
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )

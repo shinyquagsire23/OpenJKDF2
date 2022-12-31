@@ -1036,12 +1036,10 @@ debug_controls:
 #else
         v18 = deltaSecs * 90.0;
 #endif
-        a3a.y = sithControl_ReadAxisStuff(INPUT_FUNC_TURN);
-        a3a.x = sithControl_ReadAxisStuff(INPUT_FUNC_PITCH);
+        a3a.y = v18 * sithControl_ReadAxisStuff(INPUT_FUNC_TURN);
+        a3a.x = v18 * sithControl_ReadAxisStuff(INPUT_FUNC_PITCH);
         a3a.z = 0.0;
-        a3a.x = v18 * a3a.x;
-        a3a.y = v18 * a3a.y;
-        if ( a3a.x != 0.0 || a3a.y != 0.0 || a3a.z != 0.0 )
+        if (!rdVector_IsZero3(&a3a))
         {
             rdMatrix_BuildRotate34(&a, &a3a);
             rdMatrix_TransformVector34Acc(&sithControl_vec3_54A570, &a);
@@ -1212,7 +1210,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
         move_multiplier *= 0.5;
     }
     thing->physicsParams.physflags =
-         thing->physicsParams.physflags & ~0x10000;
+         thing->physicsParams.physflags & ~SITH_PF_CROUCHING;
     iVar2 = sithControl_ReadFunctionMap(INPUT_FUNC_DUCK,(int *)0x0);
     if (iVar2 == 0) {
         if (sithControl_008d7f58 != 0) {
@@ -1227,17 +1225,17 @@ void sithControl_PlayerMovementMots(sithThing *player)
         }
         sithControl_008d7f58 = 1;
         iVar2 = sithThing_MotsTick(1,0,local_8);
-        if ((iVar2 != 0) && ((thing->actorParams.typeflags & 0x8040000) == 0)) {
+        if ((iVar2 != 0) && ((thing->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0)) {
             move_multiplier = 0.5;
             thing->physicsParams.physflags =
-                 thing->physicsParams.physflags | 0x10000;
+                 thing->physicsParams.physflags | SITH_PF_CROUCHING;
         }
     }
-    if ((thing->physicsParams.physflags & 0x200000) != 0) {
+    if ((thing->physicsParams.physflags & SITH_PF_200000) != 0) {
         move_multiplier = 0.5;
     }
-    if (((thing->attach_flags & 1) != 0) &&
-       (((thing->attachedThing)->type & 0x120000) != 0)) {
+    if (((thing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0) &&
+       (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER))) {
         move_multiplier *= 0.5;
     }
     if ((thing->type != 2) && (thing->type != 10)) {
@@ -1360,8 +1358,8 @@ LAB_00527d1c:
         sithControl_008d7f4c = 1;
     }
     if (((0.2 < local_8) && ((sithWeapon_controlOptions & 0x10) != 0)) &&
-       (uVar1 = thing->actorParams.typeflags, (uVar1 & 0x10) == 0)) {
-        thing->actorParams.typeflags = uVar1 | 2;
+       (uVar1 = thing->actorParams.typeflags, (uVar1 & SITH_AF_HEAD_IS_CENTERED) == 0)) {
+        thing->actorParams.typeflags = uVar1 | SITH_AF_CENTER_VIEW;
     }
     thing->physicsParams.acceleration.z = 0.0;
     if (move_multiplier != 1.0) {

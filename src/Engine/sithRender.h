@@ -49,6 +49,7 @@ void sithRender_RenderThings();
 int sithRender_RenderThing(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
 int sithRender_SetRenderWeaponHandle(void *a1);
+void sithRender_WorldFlash(float arg1,float arg2);
 
 // Added
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos);

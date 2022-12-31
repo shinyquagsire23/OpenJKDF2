@@ -33,6 +33,9 @@
 #include "General/stdPalEffects.h"
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
+#include "Engine/sithRender.h"
+
+#include <time.h>
 
 void sithCogFunction_ReturnBool(int a1, sithCog *a2);
 
@@ -1656,6 +1659,78 @@ void sithCogFunction_DebugBreak(sithCog *ctx)
     // TODO
 }
 
+// MOTS added
+void sithCogFunction_WorldFlash(sithCog *ctx)
+{
+    float arg2 = sithCogExec_PopFlex(ctx);
+    float arg1 = sithCogExec_PopFlex(ctx);
+    sithRender_WorldFlash(arg1, arg2);
+}
+
+
+
+// MOTS added
+void sithCogFunction_GetSysDate(sithCog *ctx)
+{
+    rdVector3 out;
+
+    time_t t = time(NULL);
+    struct tm* tm = localtime(&t);
+
+    // TODO verify this matches the original behavior
+    /*
+    SYSTEMTIME local_10;
+
+    GetLocalTime(&local_10);
+    local_1c.x = (float)(uint)local_10.wYear;
+    local_1c.y = (float)(uint)local_10.wMonth;
+    local_1c.z = (float)(local_10._6_4_ & 0xffff);
+    */
+
+    if (tm) {
+        out.x = (float)(tm->tm_year + 1900); // year
+        out.y = (float)(tm->tm_mon + 1); // month
+        out.z = (float)(tm->tm_mday); // day
+    }
+    else {
+        rdVector_Zero3(&out);
+    }
+
+    sithCogExec_PushVector3(ctx, &out);
+}
+
+
+void sithCogFunction_GetSysTime(sithCog *ctx)
+{
+    rdVector3 out;
+
+    time_t t = time(NULL);
+    struct tm* tm = localtime(&t);
+  
+    // TODO verify this matches the original behavior
+    /*
+    _SYSTEMTIME local_10;
+    GetLocalTime(&local_10);
+    out.x = (float)(uint)local_10.wHour;
+    out.y = (float)(uint)local_10.wMinute;
+    out.z = (float)(uint)local_10.wSecond;
+    */
+
+    if (tm) {
+        out.x = (float)(tm->tm_hour);
+        out.y = (float)(tm->tm_min);
+        out.z = (float)(tm->tm_sec);
+    }
+    else {
+        rdVector_Zero3(&out);
+    }
+    
+
+    sithCogExec_PushVector3(ctx, &out);
+}
+
+
+
 void sithCogFunction_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Sleep, "sleep");
@@ -1750,7 +1825,7 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetParam, "getparam");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetParam, "setparam");
     if (Main_bMotsCompat) {
-        //sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_EnableIRMode, "enableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DisableIRMode, "disableirmode");
@@ -1810,8 +1885,8 @@ void sithCogFunction_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
         sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
         sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS TODO
-        //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
-        //sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
     }
     
     // Droidworks
