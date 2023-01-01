@@ -68,6 +68,8 @@ int sithAI_Startup()
     if ( sithAI_bInit )
         return 0;
 
+    sithAI_FLOAT_005a79d8 = 1.0; // MoTS added
+
     sithAI_commandList = (sithAICommand *)pSithHS->alloc(sizeof(sithAICommand) * 32);
     if ( sithAI_commandList )
     {
@@ -135,6 +137,7 @@ int sithAI_Open()
     if (sithAI_bOpened)
         return 0;
 
+    sithAI_FLOAT_005a79d8 = 1.0; // MoTS added
     sithAI_bOpened = 1;
     return 1;
 }

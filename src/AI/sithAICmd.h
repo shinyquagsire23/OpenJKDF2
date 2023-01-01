@@ -49,4 +49,8 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
 int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t extra);
 int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra);
 
+int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags);
+int sithAICmd_Leap(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags);
+int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags);
+
 #endif // _SITHAICMD_H

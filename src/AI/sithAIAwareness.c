@@ -37,7 +37,6 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
 {
     int v6; // ecx
     int v7; // eax
-    rdVector3 *v8; // edx
 
     if ( !sithAI_bOpened )
         return 0;
@@ -46,11 +45,8 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
         return 0;
     v7 = sithAIAwareness_numEntries;
     sithAIAwareness_aEntries[v7].sector = sector;
-    v8 = &sithAIAwareness_aEntries[v6].pos;
-    v8->x = pos->x;
     sithAIAwareness_numEntries = v6 + 1;
-    v8->y = pos->y;
-    v8->z = pos->z;
+    rdVector_Copy3(&sithAIAwareness_aEntries[v6].pos, pos);
     sithAIAwareness_aEntries[v7].field_14 = a3;
     sithAIAwareness_aEntries[v7].field_18 = a4;
     sithAIAwareness_aEntries[v7].thing = thing;
