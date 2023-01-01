@@ -19,6 +19,42 @@
 #include <emscripten.h>
 #endif
 
+#ifdef SDL2_RENDER
+
+#include <fcntl.h> 
+#include <stdio.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#if !defined(WIN64_MINGW) && !defined(_WIN32)
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <termios.h>
+#else
+#include <conio.h>
+#endif
+//#include <stropts.h>
+
+#ifdef ARCH_WASM
+#include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif
+
+#include <string.h>
+
+#include <GL/glew.h>
+#ifdef MACOS
+#include "Platform/macOS/SDL_fix.h"
+#else
+#include <GL/gl.h>
+#endif
+#include "Win95/Video.h"
+
+extern int Window_xPos, Window_yPos;
+#endif
+
 int Window_xSize = 640;
 int Window_ySize = 480;
 int Window_screenXSize = 640;
@@ -43,6 +79,19 @@ void Window_SetFullscreen(int val)
 {
     if (Window_isFullscreen != val)
     {
+        // Reset window when exiting fullscreen
+        // TODO: Add settings for these sizes maybe?
+        if (Window_isFullscreen && !val) {
+            Window_xSize = 640;
+            Window_ySize = 480;
+            Window_screenXSize = 640;
+            Window_screenYSize = 480;
+#ifdef SDL2_RENDER
+            Window_xPos = SDL_WINDOWPOS_CENTERED;
+            Window_yPos = SDL_WINDOWPOS_CENTERED;
+#endif
+        }
+
         Window_isFullscreen = val;
         Window_needsRecreate = 1;
     }
@@ -314,37 +363,6 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 #endif
 
 #ifdef SDL2_RENDER
-
-#include <fcntl.h> 
-#include <stdio.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
-#if !defined(WIN64_MINGW) && !defined(_WIN32)
-#include <sys/ioctl.h>
-#include <sys/select.h>
-#include <termios.h>
-#else
-#include <conio.h>
-#endif
-//#include <stropts.h>
-
-#ifdef ARCH_WASM
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
-#endif
-
-#include <string.h>
-
-#include <GL/glew.h>
-#ifdef MACOS
-#include "Platform/macOS/SDL_fix.h"
-#else
-#include <GL/gl.h>
-#endif
-#include "Win95/Video.h"
 
 SDL_Window* displayWindow = NULL;
 SDL_Event event;
@@ -1056,15 +1074,11 @@ void Window_RecreateSDL2Window()
     else
         flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
 
-    if (Window_isFullscreen)
-        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    if (Window_isFullscreen) {
+        //flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
     else {
-        // Hack: Make sure fullscreen windows don't get stuck offscreen
-        if (Window_yPos < 0) {
-            Window_yPos = 1;
-        }
-
-        flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+        //flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
 #if defined(ARCH_WASM)
@@ -1088,8 +1102,8 @@ void Window_RecreateSDL2Window()
     //SDL_FixWindowMacOS(displayWindow);
 #endif
 
-    if (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
-        SDL_SetWindowFullscreen(displayWindow, flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+    if (Window_isFullscreen) {
+        SDL_SetWindowFullscreen(displayWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else {
         SDL_SetWindowFullscreen(displayWindow, 0);
