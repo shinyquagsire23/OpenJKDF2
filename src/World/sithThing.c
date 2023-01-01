@@ -715,6 +715,9 @@ void sithThing_LeaveSector(sithThing *thing)
     sithThing *nextThing; // eax
     rdVector3 pos; // [esp+Ch] [ebp-Ch] BYREF
 
+    // Added
+    if (!thing || !thing->sector) return;
+
     sector = thing->sector;
     if ( (sector->flags & 4) == 0 )
         goto LABEL_5;
@@ -753,6 +756,19 @@ LABEL_5:
 void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
 {
     sithSector *v7; // eax
+    sithThing* i;
+
+    // Added: Check that sector is non-null
+    if (!sector) return;
+
+    // Added: Prevent thing getting linked in twice
+    for ( i = sector->thingsList; i; i = i->nextThing )
+    {
+        if (i == thing) {
+            thing->sector = sector; // just in case?
+            return;
+        }
+    }
 
     thing->nextThing = sector->thingsList;
     if ( sector->thingsList )

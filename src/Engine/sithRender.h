@@ -43,7 +43,7 @@ void sithRender_Draw();
 void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3);
 void sithRender_RenderLevelGeometry();
 void sithRender_UpdateAllLights();
-void sithRender_UpdateLights(sithSector *sector, float prev, float dist);
+void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int depth);
 void sithRender_RenderDynamicLights();
 void sithRender_RenderThings();
 int sithRender_RenderThing(sithThing *povThing);

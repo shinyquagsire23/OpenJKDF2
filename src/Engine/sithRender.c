@@ -433,9 +433,15 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         thing = sector->thingsList;
         sector->clipFrustum = frustum;
         lightIdx = sithRender_numLights;
+
+        int safeguard = 0;
         while ( thing )
         {
             if ( lightIdx >= 0x20 )
+                break;
+
+            // Added
+            if (++safeguard >= SITH_MAX_THINGS)
                 break;
 
             // Debug, add extra light from player
@@ -489,6 +495,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
     sector->field_90 = 1;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
+
+    // Added
+    int safeguard = 0;
     while ( adjoinIter )
     {
         if (adjoinIter->sector->field_90 )
@@ -496,6 +505,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             adjoinIter = adjoinIter->next;
             continue;
         }
+
+        // Added
+        if (++safeguard >= SITH_MAX_VISIBLE_SECTORS_2)
+            break;
 
         adjoinSurface = adjoinIter->surface;
         adjoinMat = adjoinSurface->surfaceInfo.face.material;
@@ -1149,8 +1162,14 @@ LABEL_150:
         }
 
         rdSetProcFaceUserData(level_idk->id | 0x10000);
+        int safeguard = 0;
         for ( i = level_idk->thingsList; i; i = i->nextThing )
         {
+            // Added: safeguards
+            if (++safeguard >= SITH_MAX_THINGS) {
+                break;
+            }
+
             if ( (i->thingflags & SITH_TF_LEVELGEO) != 0
               && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
               && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)
@@ -1231,18 +1250,24 @@ void sithRender_UpdateAllLights()
             if ( i->sector->field_8C != sithRender_lastRenderTick && (i->flags & 1) != 0 )
             {
                 i->sector->clipFrustum = sithRender_aSectors[j]->clipFrustum;
-                sithRender_UpdateLights(i->sector, 0.0, i->dist);
+                sithRender_UpdateLights(i->sector, 0.0, i->dist, 0);
             }
         }
     }
 }
 
 // MOTS altered
-void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
+// Added: recursion depth
+void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int depth)
 {
     sithThing *i;
     sithAdjoin *j;
     rdVector3 vertex_out;
+
+    // Added: safeguards
+    if (depth > SITH_MAX_VISIBLE_SECTORS_2) {
+        return;
+    }
 
     if ( sector->field_8C == sithRender_lastRenderTick )
         return;
@@ -1250,8 +1275,14 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
     sector->field_8C = sithRender_lastRenderTick;
     if ( prev < 2.0 && sithRender_numLights < 0x20)
     {
+        int safeguard = 0;
         for ( i = sector->thingsList; i; i = i->nextThing )
         {
+            // Added: safeguards
+            if (++safeguard >= SITH_MAX_THINGS) {
+                break;
+            }
+
             if ( sithRender_numLights >= 0x20 )
                 break;
 
@@ -1305,7 +1336,10 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
             if ( nextDist < 0.8 || nextDist < 2.0 )
             {
                 j->sector->clipFrustum = sector->clipFrustum;
-                sithRender_UpdateLights(j->sector, nextDist, 0.0);
+                sithRender_UpdateLights(j->sector, nextDist, 0.0, ++depth);
+
+                // Added: safeguards
+                if (depth >= SITH_MAX_VISIBLE_SECTORS_2) break;
             }
         }
     }
@@ -1404,8 +1438,15 @@ void sithRender_RenderThings()
         rdColormap_SetCurrent(v1->colormap);
         thingIter = v1->thingsList;
         v16 = v1->colormap == sithWorld_pCurrentWorld->colormaps;
+
+        int safeguard = 0;
         for (; thingIter; thingIter = thingIter->nextThing)
         {
+            // Added: safeguards
+            if (++safeguard >= SITH_MAX_THINGS) {
+                break;
+            }
+
             if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
               && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
               && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus) )

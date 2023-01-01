@@ -216,6 +216,15 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                             if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
                             {
                                 v21 = v16->nodes[v19];
+
+                                // Added: prevent overflow
+                                if (v21 >= v20->numAnimEntries) {
+                                    v21 = v20->numAnimEntries-1;
+                                }
+                                if (v21 < 0) {
+                                    v21 = 0;
+                                }
+
                                 v23 = v16->field_120 - v20->animEntries[v21].frameNum;
                                 v24 = &v20->animEntries[v21];
                                 v25 = v24->flags;

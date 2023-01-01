@@ -229,12 +229,14 @@ void jkPlayer_InitSaber()
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
 
         playerInfoJk->actorThing = playerInfo->playerThing;
-        playerInfo->playerThing->playerInfo = playerInfoJk;
+        if (playerInfo->playerThing) // Added
+            playerInfo->playerThing->playerInfo = playerInfoJk;
         playerInfoJk->maxTwinkles = 8;
         playerInfoJk->twinkleSpawnRate = 16;
         playerInfoJk->field_21C = 0;
         playerInfoJk->shields = 0;
-        playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        if (playerInfo->playerThing) // Added
+            playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
         playerInfoJk->field_224 = 0;
         
         // MOTS added
