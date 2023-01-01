@@ -483,6 +483,14 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
     if (keyNum >= JK_NUM_KEYS || keyNum < 0)
         return;
 
+    // Added: Prevent idle if not applicable
+    if (bDown && !stdControl_aKeyInfo[keyNum]) {
+        stdControl_bControlsIdle = 0;
+    }
+    if (!bDown && stdControl_aKeyInfo[keyNum]) {
+        stdControl_bControlsIdle = 0;
+    }
+
     if ( !bDown || stdControl_aKeyInfo[keyNum] )
     {
         if ( !bDown && stdControl_aKeyInfo[keyNum] )
