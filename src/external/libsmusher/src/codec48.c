@@ -98,6 +98,14 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
         smush_warn("Unknown block type %x\n", hdr->type);
     }
 
+    /*
+    for (int i = 0; i < ctx->pitch * ctx->height; i++) {
+        uint8_t val = ctx->delta_buf[ctx->cur_buf][i];
+        if (val) {
+            parent_ctx->framebuffer[i] = val;
+        }
+    }
+    */
     memcpy(parent_ctx->framebuffer, ctx->delta_buf[ctx->cur_buf], ctx->pitch * ctx->height);
 
     ctx->last_seq_num = seq_num;
