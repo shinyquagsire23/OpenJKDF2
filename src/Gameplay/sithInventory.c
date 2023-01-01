@@ -994,346 +994,348 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
     int keyRead;
 
     v1 = player;
-    if ( player->type == SITH_THING_PLAYER )
+    if ( player->type != SITH_THING_PLAYER ) {
+        return 0;
+    }
+
+    if (player->thingflags & SITH_TF_DEAD) {
+        return 0;
+    }
+
+    if ( (player->actorParams.typeflags & SITH_AF_DISABLED) != 0 )
     {
-        if ( (player->thingflags & SITH_TF_DEAD) == 0 )
+        v2 = &sithInventory_powerKeybinds[0];
+        do
         {
-            if ( (player->actorParams.typeflags & SITH_AF_DISABLED) != 0 )
+            if ( v2->enabled == 1 )
+                v3 = v2->binding;
+            else
+                v3 = -1;
+            if ( v3 != -1 && v2->idk == 1 )
             {
-                v2 = &sithInventory_powerKeybinds[0];
-                do
+                v2->idk = 0;
+                sithThing_MotsTick(13,0,(float)v3);
+                if ( v3 >= 0
+                  && v1->actorParams.playerinfo != (sithPlayerInfo *)-136
+                  && (sithInventory_aDescriptors[v3].flags & ITEMINFO_VALID) != 0
+                  && (v1->actorParams.playerinfo->iteminfo[v3].state & 4) != 0 )
                 {
-                    if ( v2->enabled == 1 )
-                        v3 = v2->binding;
-                    else
-                        v3 = -1;
-                    if ( v3 != -1 && v2->idk == 1 )
-                    {
-                        v2->idk = 0;
-                        sithThing_MotsTick(13,0,(float)v3);
-                        if ( v3 >= 0
-                          && v1->actorParams.playerinfo != (sithPlayerInfo *)-136
-                          && (sithInventory_aDescriptors[v3].flags & ITEMINFO_VALID) != 0
-                          && (v1->actorParams.playerinfo->iteminfo[v3].state & 4) != 0 )
-                        {
-                            v4 = sithInventory_aDescriptors[v3].cog;
-                            if ( v4 )
-                                sithCog_SendMessage(v4, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v3, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                        }
-                    }
-                    v2++;
+                    v4 = sithInventory_aDescriptors[v3].cog;
+                    if ( v4 )
+                        sithCog_SendMessage(v4, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v3, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
                 }
-                while ( (intptr_t)v2 < (intptr_t)&sithInventory_powerKeybinds[20] );
-                if ( sithInventory_bUnk == 1 )
+            }
+            v2++;
+        }
+        while ( (intptr_t)v2 < (intptr_t)&sithInventory_powerKeybinds[20] );
+        if ( sithInventory_bUnk == 1 )
+        {
+            sithInventory_bUnk = 0;
+            sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
+            v5 = player->actorParams.playerinfo->curItem;
+            if ( v5 >= 0 )
+            {
+                if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curItem) )
                 {
-                    sithInventory_bUnk = 0;
-                    sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
-                    v5 = player->actorParams.playerinfo->curItem;
-                    if ( v5 >= 0 )
+                    v6 = sithInventory_aDescriptors[v5].cog;
+                    if ( v6 )
+                        sithCog_SendMessage(v6, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v5, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
+                }
+            }
+        }
+        if ( sithInventory_bUnkPower == 1 )
+        {
+            sithInventory_bUnkPower = 0;
+            sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
+            v7 = player->actorParams.playerinfo->curPower;
+            if ( v7 >= 0 )
+            {
+                if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curPower) )
+                {
+                    v8 = sithInventory_aDescriptors[v7].cog;
+                    if ( v8 )
                     {
-                        if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curItem) )
-                        {
-                            v6 = sithInventory_aDescriptors[v5].cog;
-                            if ( v6 )
-                                sithCog_SendMessage(v6, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v5, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                        }
+                        sithCog_SendMessage(v8, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v7, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
+                        return 0;
                     }
                 }
-                if ( sithInventory_bUnkPower == 1 )
+            }
+        }
+    }
+    else
+    {
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USEINV, &keyRead) )
+        {
+            if ( !sithInventory_bUnk )
+            {
+                // MOTS added
+                sithInventory_008d60f8 = 1;
+                if (sithThing_MotsTick(12,1,(float)player->actorParams.playerinfo->curItem))
                 {
-                    sithInventory_bUnkPower = 0;
-                    sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
-                    v7 = player->actorParams.playerinfo->curPower;
-                    if ( v7 >= 0 )
+                    v10 = v1->actorParams.playerinfo;
+                    v11 = player->actorParams.playerinfo->curItem;
+                    sithInventory_bUnk = 1;
+                    if ( sithTime_curSeconds >= (double)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
                     {
-                        if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curPower) )
+                        if ( sithInventory_GetAvailable(v1, v11) )
                         {
-                            v8 = sithInventory_aDescriptors[v7].cog;
-                            if ( v8 )
-                            {
-                                sithCog_SendMessage(v8, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v7, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                                return 0;
-                            }
+                            v12 = sithInventory_aDescriptors[v11].cog;
+                            if ( v12 )
+                                sithCog_SendMessage(v12, SITH_MESSAGE_ACTIVATE, SITH_MESSAGE_ACTIVATE, v11, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
                         }
                     }
                 }
             }
-            else
+        }
+        else 
+        {
+            // MOTS added
+            if (sithInventory_008d60f8) {
+                sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
+                sithInventory_008d60f8 = 0;
+            }
+
+            if ( sithInventory_bUnk == 1 )
             {
-                if ( sithControl_ReadFunctionMap(INPUT_FUNC_USEINV, &keyRead) )
+                sithInventory_bUnk = 0;
+                v13 = player->actorParams.playerinfo->curItem;
+                if ( v13 >= 0 )
                 {
-                    if ( !sithInventory_bUnk )
+                    if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curItem) )
                     {
-                        // MOTS added
-                        sithInventory_008d60f8 = 1;
-                        if (sithThing_MotsTick(12,1,(float)player->actorParams.playerinfo->curItem))
+                        v14 = sithInventory_aDescriptors[v13].cog;
+                        if ( v14 )
+                            sithCog_SendMessage(v14, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v13, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
+                    }
+                }
+            }
+        }
+
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USESKILL, &keyRead) )
+        {
+            if ( !sithInventory_bUnkPower )
+            {
+                // MOTS added
+                sithInventory_008d60fc = 1;
+                if (sithThing_MotsTick(13,1,(float)player->actorParams.playerinfo->curItem))
+                {
+                    v15 = v1->actorParams.playerinfo;
+                    v16 = player->actorParams.playerinfo->curPower;
+                    sithInventory_bUnkPower = 1;
+                    if ( sithTime_curSeconds >= (double)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
+                    {
+                        if ( sithInventory_GetAvailable(v1, v16) )
                         {
-                            v10 = v1->actorParams.playerinfo;
-                            v11 = player->actorParams.playerinfo->curItem;
-                            sithInventory_bUnk = 1;
-                            if ( sithTime_curSeconds >= (double)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
+                            v17 = sithInventory_aDescriptors[v16].cog;
+                            if ( v17 )
+                                sithCog_SendMessage(v17, SITH_MESSAGE_ACTIVATE, SITH_MESSAGE_ACTIVATE, v16, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // MOTS added
+            if (sithInventory_008d60fc) {
+                sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
+                sithInventory_008d60fc = 0;
+            }
+
+            if ( sithInventory_bUnkPower == 1 )
+            {
+                sithInventory_bUnkPower = 0;
+                v18 = player->actorParams.playerinfo->curPower;
+                if ( v18 >= SENDERTYPE_0 )
+                {
+                    if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curPower) )
+                    {
+                        v19 = sithInventory_aDescriptors[v18].cog;
+                        if ( v19 )
+                            sithCog_SendMessage(v19, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v18, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
+                    }
+                }
+            }
+        }
+
+        v40 = 0;
+        v20 = &sithInventory_powerKeybinds[0];
+        do
+        {
+            if ( v20->enabled == 1 )
+            {
+                int v21 = sithControl_ReadFunctionMap(v40 + INPUT_FUNC_ACTIVATE0, &keyRead) == 0;
+                v22 = v20->idk;
+                if ( v21 )
+                {
+                    if ( v22 == 1 )
+                    {
+                        v20->idk = 0;
+                        v27 = v20->enabled == 1 ? v20->binding : -1;
+                        v28 = v1->actorParams.playerinfo;
+                        v29 = v28->iteminfo;
+                        if ( v28 == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v27].flags & ITEMINFO_VALID) == 0 )
+                            v30 = 0;
+                        else
+                            v30 = &sithInventory_aDescriptors[v27];
+                        v31 = v30->flags;
+                        if ( (v31 & 0x100) != 0 )
+                        {
+                            // TODO MOTS added some stuff here?
+                            v32 = 0;
+                            if ( (v31 & 8) != 0 && v28->curPower == v27 && sithThing_MotsTick(13, 1, (float)v27)) {
+                                v32 = 1;
+                            }
+                            if ( (v31 & 2) != 0 && v28->curItem == v27 && sithThing_MotsTick(12, 1, (float)v27)) {
+                                v32 = 1;
+                            }
+                            if ( v32 )
                             {
-                                if ( sithInventory_GetAvailable(v1, v11) )
+                                if ( v27 >= 0 )
                                 {
-                                    v12 = sithInventory_aDescriptors[v11].cog;
-                                    if ( v12 )
-                                        sithCog_SendMessage(v12, SITH_MESSAGE_ACTIVATE, SITH_MESSAGE_ACTIVATE, v11, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                                }
-                            }
-                        }
-                    }
-                }
-                else 
-                {
-                    // MOTS added
-                    if (sithInventory_008d60f8) {
-                        sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
-                        sithInventory_008d60f8 = 0;
-                    }
-
-                    if ( sithInventory_bUnk == 1 )
-                    {
-                        sithInventory_bUnk = 0;
-                        v13 = player->actorParams.playerinfo->curItem;
-                        if ( v13 >= 0 )
-                        {
-                            if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curItem) )
-                            {
-                                v14 = sithInventory_aDescriptors[v13].cog;
-                                if ( v14 )
-                                    sithCog_SendMessage(v14, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v13, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                            }
-                        }
-                    }
-                }
-
-                if ( sithControl_ReadFunctionMap(INPUT_FUNC_USESKILL, &keyRead) )
-                {
-                    if ( !sithInventory_bUnkPower )
-                    {
-                        // MOTS added
-                        sithInventory_008d60fc = 1;
-                        if (sithThing_MotsTick(13,1,(float)player->actorParams.playerinfo->curItem))
-                        {
-                            v15 = v1->actorParams.playerinfo;
-                            v16 = player->actorParams.playerinfo->curPower;
-                            sithInventory_bUnkPower = 1;
-                            if ( sithTime_curSeconds >= (double)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
-                            {
-                                if ( sithInventory_GetAvailable(v1, v16) )
-                                {
-                                    v17 = sithInventory_aDescriptors[v16].cog;
-                                    if ( v17 )
-                                        sithCog_SendMessage(v17, SITH_MESSAGE_ACTIVATE, SITH_MESSAGE_ACTIVATE, v16, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // MOTS added
-                    if (sithInventory_008d60fc) {
-                        sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
-                        sithInventory_008d60fc = 0;
-                    }
-
-                    if ( sithInventory_bUnkPower == 1 )
-                    {
-                        sithInventory_bUnkPower = 0;
-                        v18 = player->actorParams.playerinfo->curPower;
-                        if ( v18 >= SENDERTYPE_0 )
-                        {
-                            if ( sithInventory_GetAvailable(v1, player->actorParams.playerinfo->curPower) )
-                            {
-                                v19 = sithInventory_aDescriptors[v18].cog;
-                                if ( v19 )
-                                    sithCog_SendMessage(v19, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_0, v18, SENDERTYPE_THING, v1->thingIdx, SENDERTYPE_0);
-                            }
-                        }
-                    }
-                }
-
-                v40 = 0;
-                v20 = &sithInventory_powerKeybinds[0];
-                do
-                {
-                    if ( v20->enabled == 1 )
-                    {
-                        int v21 = sithControl_ReadFunctionMap(v40 + INPUT_FUNC_ACTIVATE0, &keyRead) == 0;
-                        v22 = v20->idk;
-                        if ( v21 )
-                        {
-                            if ( v22 == 1 )
-                            {
-                                v20->idk = 0;
-                                v27 = v20->enabled == 1 ? v20->binding : -1;
-                                v28 = v1->actorParams.playerinfo;
-                                v29 = v28->iteminfo;
-                                if ( v28 == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v27].flags & ITEMINFO_VALID) == 0 )
-                                    v30 = 0;
-                                else
-                                    v30 = &sithInventory_aDescriptors[v27];
-                                v31 = v30->flags;
-                                if ( (v31 & 0x100) != 0 )
-                                {
-                                    // TODO MOTS added some stuff here?
-                                    v32 = 0;
-                                    if ( (v31 & 8) != 0 && v28->curPower == v27 && sithThing_MotsTick(13, 1, (float)v27)) {
-                                        v32 = 1;
-                                    }
-                                    if ( (v31 & 2) != 0 && v28->curItem == v27 && sithThing_MotsTick(12, 1, (float)v27)) {
-                                        v32 = 1;
-                                    }
-                                    if ( v32 )
+                                    if ( v29 )
                                     {
-                                        if ( v27 >= 0 )
+                                        if ( (sithInventory_aDescriptors[v27].flags & ITEMINFO_VALID) != 0 && (v29[v27].state & 4) != 0 )
                                         {
-                                            if ( v29 )
-                                            {
-                                                if ( (sithInventory_aDescriptors[v27].flags & ITEMINFO_VALID) != 0 && (v29[v27].state & 4) != 0 )
-                                                {
-                                                    v33 = sithInventory_aDescriptors[v27].cog;
-                                                    if ( v33 )
-                                                        sithCog_SendMessage(v33, SITH_MESSAGE_DEACTIVATED, 0, v27, SENDERTYPE_THING, v1->thingIdx, 0);
-                                                }
-                                            }
+                                            v33 = sithInventory_aDescriptors[v27].cog;
+                                            if ( v33 )
+                                                sithCog_SendMessage(v33, SITH_MESSAGE_DEACTIVATED, 0, v27, SENDERTYPE_THING, v1->thingIdx, 0);
                                         }
                                     }
                                 }
                             }
                         }
-                        else if ( !v22 )
+                    }
+                }
+                else if ( !v22 )
+                {
+                    v20->idk = 1;
+                    v23 = v20->enabled == 1 ? v20->binding : -1;
+                    v24 = (int *)(v1->actorParams.playerinfo == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v23].flags & ITEMINFO_VALID) == 0 ? 0 : &sithInventory_aDescriptors[v23]);
+                    v25 = *v24;
+                    if ( (v25 & 0x100) != 0 )
+                    {
+                        sithInventory_8339EC = 1;
+                        if ( (v25 & 8) != 0 )
                         {
-                            v20->idk = 1;
-                            v23 = v20->enabled == 1 ? v20->binding : -1;
-                            v24 = (int *)(v1->actorParams.playerinfo == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v23].flags & ITEMINFO_VALID) == 0 ? 0 : &sithInventory_aDescriptors[v23]);
-                            v25 = *v24;
-                            if ( (v25 & 0x100) != 0 )
-                            {
-                                sithInventory_8339EC = 1;
-                                if ( (v25 & 8) != 0 )
-                                {
-                                    if (!sithThing_MotsTick(11, 0, (float)v23)) goto skip_cog;
-                                    sithInventory_SelectPower(v1, v23);
-                                    if (!sithThing_MotsTick(13, 1, (float)v23)) goto skip_cog;
-                                }
-                                else if ( (v25 & 2) != 0 )
-                                {
-                                    if (!sithThing_MotsTick(10, 0, (float)v23)) goto skip_cog;
-                                    sithInventory_SelectItem(v1, v23);
-                                    if (!sithThing_MotsTick(12, 1, (float)v23)) goto skip_cog;
-                                }
-
-                                if ( sithTime_curSeconds >= (double)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
-                                {
-                                    if ( sithInventory_GetAvailable(v1, v23) )
-                                    {
-                                        v26 = sithInventory_aDescriptors[v23].cog;
-                                        if ( v26 )
-                                            sithCog_SendMessage(v26, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, v23, SENDERTYPE_THING, v1->thingIdx, 0);
-                                    }
-                                }
-                            }
+                            if (!sithThing_MotsTick(11, 0, (float)v23)) goto skip_cog;
+                            sithInventory_SelectPower(v1, v23);
+                            if (!sithThing_MotsTick(13, 1, (float)v23)) goto skip_cog;
                         }
-                        else // MOTS added
+                        else if ( (v25 & 2) != 0 )
                         {
-                            v23 = v20->enabled == 1 ? v20->binding : -1;
-                            v24 = (int *)(v1->actorParams.playerinfo == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v23].flags & ITEMINFO_VALID) == 0 ? 0 : &sithInventory_aDescriptors[v23]);
-                            v25 = *v24;
-                            if (v25 & 0x100)
+                            if (!sithThing_MotsTick(10, 0, (float)v23)) goto skip_cog;
+                            sithInventory_SelectItem(v1, v23);
+                            if (!sithThing_MotsTick(12, 1, (float)v23)) goto skip_cog;
+                        }
+
+                        if ( sithTime_curSeconds >= (double)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
+                        {
+                            if ( sithInventory_GetAvailable(v1, v23) )
                             {
-                                if (v25 & 8)
-                                {
-                                    sithThing_MotsTick(13, 2, (float)v23);
-                                }
-                                else if (v25 & 2)
-                                {
-                                    sithThing_MotsTick(12, 2, (float)v23);
-                                }
+                                v26 = sithInventory_aDescriptors[v23].cog;
+                                if ( v26 )
+                                    sithCog_SendMessage(v26, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, v23, SENDERTYPE_THING, v1->thingIdx, 0);
                             }
                         }
                     }
+                }
+                else // MOTS added
+                {
+                    v23 = v20->enabled == 1 ? v20->binding : -1;
+                    v24 = (int *)(v1->actorParams.playerinfo == (sithPlayerInfo *)-136 || (sithInventory_aDescriptors[v23].flags & ITEMINFO_VALID) == 0 ? 0 : &sithInventory_aDescriptors[v23]);
+                    v25 = *v24;
+                    if (v25 & 0x100)
+                    {
+                        if (v25 & 8)
+                        {
+                            sithThing_MotsTick(13, 2, (float)v23);
+                        }
+                        else if (v25 & 2)
+                        {
+                            sithThing_MotsTick(12, 2, (float)v23);
+                        }
+                    }
+                }
+            }
 skip_cog:
-                    v20++;
-                    ++v40;
-                }
-                while ( (intptr_t)v20 < (intptr_t)&sithInventory_powerKeybinds[20].idk );
-                sithControl_ReadFunctionMap(INPUT_FUNC_NEXTINV, &keyRead);
-                while (keyRead--)
-                {
-                    if (sithThing_MotsTick(10,1,1.0))
-                    {
-                        v34 = sithInventory_GetNumBinsWithFlag(v1, v1->actorParams.playerinfo->curItem, 2);
-                        sithInventory_SelectItem(v1, v34);
-                        sithInventory_bRendIsHidden = 1;
-                        sithInventory_8339F4 = 0;
-                        sithInventory_8339EC = 0;
-                    }
-                }
-                sithControl_ReadFunctionMap(INPUT_FUNC_PREVINV, &keyRead);
+            v20++;
+            ++v40;
+        }
+        while ( (intptr_t)v20 < (intptr_t)&sithInventory_powerKeybinds[20].idk );
+        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTINV, &keyRead);
+        while (keyRead--)
+        {
+            if (sithThing_MotsTick(10,1,1.0))
+            {
+                v34 = sithInventory_GetNumBinsWithFlag(v1, v1->actorParams.playerinfo->curItem, 2);
+                sithInventory_SelectItem(v1, v34);
+                sithInventory_bRendIsHidden = 1;
+                sithInventory_8339F4 = 0;
+                sithInventory_8339EC = 0;
+            }
+        }
+        sithControl_ReadFunctionMap(INPUT_FUNC_PREVINV, &keyRead);
 
-                while (keyRead--)
-                {
-                    v35 = v1->actorParams.playerinfo->curItem;
-                    v36 = v35 - 1;
-                    if ( v35 - 1 < 0 )
-                    {
+        while (keyRead--)
+        {
+            v35 = v1->actorParams.playerinfo->curItem;
+            v36 = v35 - 1;
+            if ( v35 - 1 < 0 )
+            {
 LABEL_103:
-                        v36 = 199;
-                        if ( v35 >= 199 )
-                        {
+                v36 = 199;
+                if ( v35 >= 199 )
+                {
 LABEL_108:
-                            v36 = -1;
-                        }
-                        else
-                        {
-                            v38 = &sithInventory_aDescriptors[199];
-                            while ( (v38->flags & 2) == 0 || !sithInventory_GetAvailable(v1, v36) )
-                            {
-                                --v36;
-                                --v38;
-                                if ( v36 <= v35 )
-                                    goto LABEL_108;
-                            }
-                        }
-                    }
-                    else
+                    v36 = -1;
+                }
+                else
+                {
+                    v38 = &sithInventory_aDescriptors[199];
+                    while ( (v38->flags & 2) == 0 || !sithInventory_GetAvailable(v1, v36) )
                     {
-                        while ( (sithInventory_aDescriptors[v36].flags & 2) == 0 || !sithInventory_GetAvailable(v1, v36) )
-                        {
-                            --v36;
-                            if ( v36 < 0 )
-                                goto LABEL_103;
-                        }
+                        --v36;
+                        --v38;
+                        if ( v36 <= v35 )
+                            goto LABEL_108;
                     }
-                    sithInventory_SelectItem(v1, v36);
-                    sithInventory_8339F4 = 0;
-                    sithInventory_8339EC = 0;
-                    sithInventory_bRendIsHidden = 1;
                 }
-                sithControl_ReadFunctionMap(INPUT_FUNC_NEXTSKILL, &keyRead);
-
-                while (keyRead--)
+            }
+            else
+            {
+                while ( (sithInventory_aDescriptors[v36].flags & 2) == 0 || !sithInventory_GetAvailable(v1, v36) )
                 {
-                    if (sithThing_MotsTick(11, 1, 1.0)) {
-                        sithInventory_SelectPowerPrior(v1);
-                        sithInventory_8339F4 = 1;
-                        sithInventory_bRendIsHidden = 0;
-                        sithInventory_8339EC = 0;
-                    }
+                    --v36;
+                    if ( v36 < 0 )
+                        goto LABEL_103;
                 }
-                sithControl_ReadFunctionMap(INPUT_FUNC_PREVSKILL, &keyRead);
+            }
+            sithInventory_SelectItem(v1, v36);
+            sithInventory_8339F4 = 0;
+            sithInventory_8339EC = 0;
+            sithInventory_bRendIsHidden = 1;
+        }
+        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTSKILL, &keyRead);
 
-                while (keyRead--)
-                {
-                    if (sithThing_MotsTick(11, 1, -1.0)) {
-                        sithInventory_SelectPowerFollowing(v1);
-                        sithInventory_8339F4 = 1;
-                        sithInventory_bRendIsHidden = 0;
-                        sithInventory_8339EC = 0;
-                    }
-                }
+        while (keyRead--)
+        {
+            if (sithThing_MotsTick(11, 1, 1.0)) {
+                sithInventory_SelectPowerPrior(v1);
+                sithInventory_8339F4 = 1;
+                sithInventory_bRendIsHidden = 0;
+                sithInventory_8339EC = 0;
+            }
+        }
+        sithControl_ReadFunctionMap(INPUT_FUNC_PREVSKILL, &keyRead);
+
+        while (keyRead--)
+        {
+            if (sithThing_MotsTick(11, 1, -1.0)) {
+                sithInventory_SelectPowerFollowing(v1);
+                sithInventory_8339F4 = 1;
+                sithInventory_bRendIsHidden = 0;
+                sithInventory_8339EC = 0;
             }
         }
     }

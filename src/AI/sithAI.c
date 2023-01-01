@@ -215,9 +215,7 @@ void sithAI_NewEntry(sithThing *thing)
         {
             actor = &sithAI_actors[v3];
             thing->actor = actor;
-            actor->position.x = thing->position.x;
-            actor->position.y = thing->position.y;
-            actor->position.z = thing->position.z;
+            rdVector_Copy3(&actor->position, &thing->position);
             actor->lookOrientation = thing->lookOrientation.lvec;
             actor->aiclass = sith_ai;
             actor->thing = thing;
@@ -314,29 +312,34 @@ void sithAI_TickActor(sithActor *actor)
 
     uint32_t nextMs = sithTime_curMs + 5000;
     int a3 = actor->flags;
-LABEL_2:
-    for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
-    {
-        if ( (actor->instincts[a1a].field_0 & 1) == 0 )
+
+    while (1) {
+        for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
         {
-            if ((actor->flags & actor->aiclass->entries[a1a].param1) 
-                && !(actor->flags & actor->aiclass->entries[a1a].param2))
+            if ( (actor->instincts[a1a].field_0 & 1) == 0 )
             {
-                if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
+                if ((actor->flags & actor->aiclass->entries[a1a].param1) 
+                    && !(actor->flags & actor->aiclass->entries[a1a].param2))
                 {
-                    actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
-                    if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
+                    if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                     {
-                        sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
-                        a3 = actor->flags;
-                        goto LABEL_2;
+                        actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
+                        if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
+                        {
+                            sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
+                            a3 = actor->flags;
+                            continue;
+                        }
+                    }
+                    if ( actor->instincts[a1a].nextUpdate < nextMs ) {
+                        nextMs = actor->instincts[a1a].nextUpdate;
                     }
                 }
-                if ( actor->instincts[a1a].nextUpdate < nextMs )
-                    nextMs = actor->instincts[a1a].nextUpdate;
             }
         }
+        break;
     }
+    
     actor->nextUpdate = nextMs;
 }
 
@@ -357,9 +360,9 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
         if ( actor->thing->actorParams.health <= 0.0 )
             break;
         old_flags = actor->flags;
-        if ( (actor->flags & SITHAI_MODE_DISABLED) != 0 )
+        if (actor->flags & SITHAI_MODE_DISABLED)
             break;
-        if ( (actor->flags & SITHAI_MODE_SLEEPING) != 0 )
+        if (actor->flags & SITHAI_MODE_SLEEPING)
         {
             if ( a2 != SITHAI_MODE_ATTACKING )
                 return;
@@ -601,9 +604,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
             v9 = &v4->framesAlloc[v7];
             ++v7;
             ++v6;
-            v9->x = v8->x + a1.x;
-            v9->y = v8->y + a1.y;
-            v9->z = v8->z + a1.z;
+            rdVector_Add3(v9, v8, &a1);
             if ( v7 >= v4->loadedFrames )
                 break;
             v3 = a3;
@@ -615,9 +616,9 @@ void sithAI_Tick(sithThing *thing, float deltaSeconds)
 {
     if ( thing->type == SITH_THING_ACTOR && thing->actorParams.health > 0.0 )
     {
-        if ( (thing->actor->flags & SITHAI_MODE_TURNING) != 0 )
+        if (thing->actor->flags & SITHAI_MODE_TURNING)
             sithAI_sub_4EA630(thing->actor, deltaSeconds);
-        if ( (thing->actor->flags & SITHAI_MODE_MOVING) != 0 )
+        if (thing->actor->flags & SITHAI_MODE_MOVING)
             sithAI_idk_msgarrived_target(thing->actor, deltaSeconds);
     }
 }
@@ -647,11 +648,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
     v2 = actor->thing;
     v3 = &actor->lookVector;
     v4 = &actor->thing->lookOrientation;
-    v5 = v4->rvec.x * actor->lookVector.x
-       + actor->lookVector.y * actor->thing->lookOrientation.rvec.y
-       + actor->lookVector.z * actor->thing->lookOrientation.rvec.z;
-    if ( v5 < 0.0 )
-        v5 = -v5;
+    v5 = fabs(rdVector_Dot3(&v4->rvec, &actor->lookVector));
     if ( v5 <= 0.01 )
     {
         v10 = &v2->lookOrientation.lvec;
@@ -700,64 +697,32 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
 void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
 {
     sithThing *v3; // esi
-    double v4; // st5
-    double v5; // st6
-    float *v6; // ebx
-    rdVector3 *v7; // ebp
-    double v8; // st7
     long double v9; // st7
     double v10; // st5
     double v11; // st6
-    long double v12; // st4
     double v13; // st7
-    sithSector *v14; // eax
-    char v15; // cl
-    rdVector3 *v16; // ebp
-    char v17; // al
     sithSector *v18; // eax
     int v19; // eax
     float v20; // [esp+10h] [ebp-20h]
     float v21; // [esp+14h] [ebp-1Ch]
     rdVector3 a4; // [esp+18h] [ebp-18h] BYREF
-    float v23; // [esp+24h] [ebp-Ch]
-    float v24; // [esp+28h] [ebp-8h]
     float actorb; // [esp+34h] [ebp+4h]
-    float actora; // [esp+34h] [ebp+4h]
 
     // MoTS Added: SITH_AF_FREEZE_MOVEMENT
     v3 = actor->thing;
     if ( (actor->flags & SITHAI_MODE_SLEEPING) == 0 && (v3->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
     {
-        v4 = actor->movePos.y - v3->position.y;
-        v5 = actor->movePos.z - v3->position.z;
-        v6 = &v3->position.x;
-        v7 = &actor->field_1AC;
-        v8 = actor->movePos.x - v3->position.x;
+        rdVector3 tmp;
         actorb = v3->actorParams.maxThrust * deltaSeconds * actor->moveSpeed;
-        actor->field_1AC.x = v8;
-        actor->field_1AC.y = v4;
-        actor->field_1AC.z = v5;
+        rdVector_Sub3(&actor->field_1AC, &actor->movePos, &v3->position);
         v9 = rdVector_Normalize3Acc(&actor->field_1AC);
-        v10 = v7->x * actorb;
-        v11 = actor->field_1AC.y * actorb;
-        v12 = v9;
-        v13 = actor->field_1AC.z * actorb;
-        v14 = v3->sector;
-        actor->field_1B8 = v12;
-        v15 = v14->flags;
-        v23 = v10;
-        v24 = v11;
-        if ( (v15 & SITHAI_MODE_ATTACKING) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
-            v13 = 0.0;
-        actora = v23 + v3->physicsParams.vel.x;
-        v16 = &v3->physicsParams.vel;
-        v17 = actor->flags;
-        v20 = v24 + v3->physicsParams.vel.y;
-        v21 = v13 + v3->physicsParams.vel.z;
-        v3->physicsParams.vel.x = actora;
-        v3->physicsParams.vel.y = v20;
-        v3->physicsParams.vel.z = v21;
-        if ( (v17 & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 && v3->attach_flags )
+        rdVector_Scale3(&tmp, &actor->field_1AC, actorb);
+        actor->field_1B8 = v9;
+        if ( (v3->sector->flags & SITHAI_MODE_ATTACKING) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
+            tmp.z = 0.0;
+        rdVector_Add3Acc(&tmp, &v3->physicsParams.vel);
+        rdVector_Copy3(&v3->physicsParams.vel, &tmp);
+        if ( (actor->flags & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 && v3->attach_flags )
         {
             if ( (v3->physicsParams.physflags & SITH_PF_FLY) != 0 )
             {
@@ -766,30 +731,23 @@ LABEL_15:
                 {
                     if ( (v3->thingflags & SITH_TF_WATER) != 0 )
                     {
-                        v16->x = 0.0;
-                        v3->physicsParams.vel.y = 0.0;
-                        v3->physicsParams.vel.z = 0.0;
+                        rdVector_Zero3(&v3->physicsParams.vel);
                     }
                     else
                     {
-                        a4.x = deltaSeconds * actora + *v6;
-                        a4.y = v3->physicsParams.vel.y * deltaSeconds + v3->position.y;
-                        a4.z = v3->physicsParams.vel.z * deltaSeconds + v3->position.z;
+                        rdVector_Copy3(&a4, &v3->position);
+                        rdVector_MultAcc3(&a4, &v3->physicsParams.vel, deltaSeconds);
                         v18 = sithCollision_GetSectorLookAt(v3->sector, &v3->position, &a4, 0.0);
                         if ( !v18 || (v18->flags & SITH_SECTOR_UNDERWATER) == 0 )
                             goto LABEL_22;
-                        v16->x = 0.0;
-                        v3->physicsParams.vel.y = 0.0;
-                        v3->physicsParams.vel.z = 0.0;
+                        rdVector_Zero3(&v3->physicsParams.vel);
                     }
                     v3->physicsParams.vel.z = v3->physicsParams.vel.z - -0.5;
                 }
 LABEL_22:
                 if ( actor->field_1B8 <= (double)v3->moveSize )
                 {
-                    v16->x = 0.0;
-                    v3->physicsParams.vel.y = 0.0;
-                    v3->physicsParams.vel.z = 0.0;
+                    rdVector_Zero3(&v3->physicsParams.vel);
                     actor->flags &= ~SITHAI_MODE_MOVING;
                     sithSoundClass_ThingPauseSoundclass(v3, SITH_SC_MOVING);
                     sithCog_SendMessageFromThing(v3, 0, SITH_MESSAGE_ARRIVED);
@@ -797,16 +755,13 @@ LABEL_22:
                 }
                 return;
             }
-            if ( actora != 0.0 || v20 != 0.0 || v21 != 0.0 )
+            if (!rdVector_IsZero3(&tmp))
             {
-                a4.x = deltaSeconds * actora + *v6;
-                a4.y = v3->physicsParams.vel.y * deltaSeconds + v3->position.y;
-                a4.z = v3->physicsParams.vel.z * deltaSeconds + v3->position.z;
+                rdVector_Copy3(&a4, &v3->position);
+                rdVector_MultAcc3(&a4, &v3->physicsParams.vel, deltaSeconds);
                 if ( !sithAI_physidk(actor, &a4, 0) )
                 {
-                    v16->x = 0.0;
-                    v3->physicsParams.vel.y = 0.0;
-                    v3->physicsParams.vel.z = 0.0;
+                    rdVector_Zero3(&v3->physicsParams.vel);
                     sithAI_SetActorFireTarget(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
                     return;
                 }
@@ -821,23 +776,12 @@ LABEL_22:
 
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
 {
-    sithThing *v2; // eax
-    double v3; // rt2
-    double v4; // rtt
     sithThingActorParams *v5; // edi
     double v6; // st7
-    float v7; // eax
-    float v8; // ecx
-    sithThing *v9; // eax
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
-    v2 = actor->thing;
-    v3 = lookPos->y - actor->thing->position.y;
-    v4 = lookPos->z - actor->thing->position.z;
-    actor->lookVector.x = lookPos->x - actor->thing->position.x;
-    actor->lookVector.y = v3;
-    v5 = &v2->actorParams;
-    actor->lookVector.z = v4;
+    rdVector_Sub3(&actor->lookVector, lookPos, &actor->thing->position);
+    v5 = &actor->thing->actorParams;
     if ( rdVector_Normalize3Acc(&actor->lookVector) != 0.0 )
     {
         if ( (v5->typeflags & SITH_AF_CAN_ROTATE_HEAD) != 0 )
@@ -853,13 +797,10 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
             }
             if ( v6 != v5->eyePYR.x )
             {
-                v7 = v5->eyePYR.y;
-                v8 = v5->eyePYR.z;
                 a2a.x = v6;
-                a2a.y = v7;
-                v9 = actor->thing;
-                a2a.z = v8;
-                sithActor_MoveJointsForEyePYR(v9, &a2a);
+                a2a.y = v5->eyePYR.y;
+                a2a.z = v5->eyePYR.z;
+                sithActor_MoveJointsForEyePYR(actor->thing, &a2a);
             }
         }
         actor->lookVector.z = 0.0;
@@ -898,8 +839,6 @@ void sithAI_sub_4EAD60(sithActor *actor)
     sithThing *v4; // eax
     int v5; // eax
     int v6; // eax
-    float v7; // eax
-    float v8; // edx
     int v9; // [esp+10h] [ebp-4h]
     float actora; // [esp+18h] [ebp+4h]
 
@@ -950,12 +889,8 @@ void sithAI_sub_4EAD60(sithActor *actor)
             actor->field_1F4 = v6;
             if ( !v6 )
             {
-                v7 = actor->field_1D4.y;
-                actor->field_1F8.x = actor->field_1D4.x;
-                v8 = actor->field_1D4.z;
-                actor->field_1F8.y = v7;
+                rdVector_Copy3(&actor->field_1F8, &actor->field_1D4);
                 actor->field_204 = sithTime_curMs;
-                actor->field_1F8.z = v8;
             }
         }
     }
@@ -967,8 +902,6 @@ void sithAI_sub_4EAF40(sithActor *actor)
     sithThing *v2; // ecx
     int v3; // eax
     int v4; // eax
-    float v5; // ecx
-    float v6; // eax
 
     v1 = actor->field_238;
     if ( actor->field_224 != bShowInvisibleThings )
@@ -1008,12 +941,10 @@ void sithAI_sub_4EAF40(sithActor *actor)
             actor->field_238 = v4;
             if ( !v4 )
             {
-                v5 = actor->movepos.y;
                 actor->field_23C.x = actor->movepos.x;
-                v6 = actor->movepos.z;
-                actor->field_23C.y = v5;
+                actor->field_23C.y = actor->movepos.y;
                 actor->field_248 = sithTime_curMs;
-                actor->field_23C.z = v6;
+                actor->field_23C.z = actor->movepos.z;
             }
         }
     }
@@ -1037,21 +968,21 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
         v12 = 0.0;
 
     *a8 = v12;
-    if ( !(a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER) != 0 )
+    if ( !(a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER))
     {
         if ( arg8->moveType != SITH_MT_PHYSICS )
             return 3;
         if ( (arg8->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
             return 3;
     }
-    if ( (a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER) == 0 )
+    if ( (a3->thingflags & SITH_TF_WATER) && !(arg8->thingflags & SITH_TF_WATER))
         return 3;
     if ( v12 - arg8->collideSize > arg10 )
         return 1;
     if ( argC > -1.0 )
     {
-        v18 = a3->lookOrientation.rvec.y * a5->y + a3->lookOrientation.rvec.z * a5->z + a3->lookOrientation.rvec.x * a5->x;
-        a5a = a3->lookOrientation.lvec.z * a5->z + a3->lookOrientation.lvec.y * a5->y + a3->lookOrientation.lvec.x * a5->x;
+        v18 = rdVector_Dot3(&a3->lookOrientation.rvec, a5);
+        a5a = rdVector_Dot3(&a3->lookOrientation.lvec, a5);
 
         if ( v18 < 0.0 )
             v18 = -v18;
@@ -1100,9 +1031,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     float a4a; // [esp+18h] [ebp+8h]
     float arg8a; // [esp+1Ch] [ebp+Ch]
  
-    a5->x = arg8->x - a4->x;
-    a5->y = arg8->y - a4->y;
-    a5->z = arg8->z - a4->z;
+    rdVector_Sub3(a5, arg8, a4);
     v11 = rdVector_Normalize3Acc(a5);
     *a8 = v11;
 
@@ -1111,8 +1040,8 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
 
     if ( argC > -1.0 )
     {
-        v16 = a3->lookOrientation.rvec.y * a5->y + a3->lookOrientation.rvec.z * a5->z + a3->lookOrientation.rvec.x * a5->x;
-        a4a = a3->lookOrientation.lvec.z * a5->z + a3->lookOrientation.lvec.y * a5->y + a3->lookOrientation.lvec.x * a5->x;
+        v16 = rdVector_Dot3(&a3->lookOrientation.rvec, a5);
+        a4a = rdVector_Dot3(&a3->lookOrientation.lvec, a5);
 
         if ( v16 < 0.0 )
             v16 = -v16;
@@ -1149,9 +1078,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     float a7a; // [esp+30h] [ebp+4h]
 
     v4 = a7->thing;
-    a5.x = 0.0;
-    a5.y = 0.0;
-    a5.z = -1.0;
+    rdVector_Neg3(&a5, &rdroid_zVector3);
     a7a = v4->moveSize * 0.25;
     v12 = 0;
     result = (intptr_t)sithCollision_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
@@ -1163,17 +1090,17 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     v7 = sithCollision_NextSearchResult();
     if ( !v7 )
         goto LABEL_20;
-    while ( (v7->hitType & SITHCOLLISION_WORLD) == 0 )
+    while (!(v7->hitType & SITHCOLLISION_WORLD))
     {
-        if ( (v7->hitType & SITHCOLLISION_THING) != 0 )
+        if (v7->hitType & SITHCOLLISION_THING)
         {
             v10 = v7->receiver;
-            if ( (v10->thingflags & SITH_TF_STANDABLE) != 0 )
+            if (v10->thingflags & SITH_TF_STANDABLE)
             {
                 v12 = 1;
                 if ( arg8 )
                 {
-                    if ( (v4->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && v4->attachedThing == v10 )
+                    if ((v4->attach_flags & SITH_ATTACH_THINGSURFACE) && v4->attachedThing == v10 )
                     {
                         *arg8 = 0;
                         sithCollision_SearchClose();
@@ -1199,7 +1126,7 @@ LABEL_8:
     v12 = 2 - ((v8->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
     if ( !arg8 )
         goto LABEL_20;
-    if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v8 )
+    if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) && v4->attachedSurface == v8 )
     {
         *arg8 = 0;
         sithCollision_SearchClose();
@@ -1226,10 +1153,8 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     float a7; // [esp+4h] [ebp-20h]
     rdVector3 a5; // [esp+18h] [ebp-Ch] BYREF
 
-    a5.x = 0.0;
-    a5.y = 0.0;
     v4 = actor->thing;
-    a5.z = -1.0;
+    rdVector_Neg3(&a5, &rdroid_zVector3);
     v5 = 0;
     a7 = v4->moveSize * 0.25;
     a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
@@ -1325,8 +1250,8 @@ void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, flo
     {
         v2 = a4 + a4;
         rot.x = (_frand() * v2) - a4;
-        rot.z = 0.0;
         rot.y = (_frand() * v2) - a4;
+        rot.z = 0.0;
         rdMatrix_PreRotate34(a1, &rot);
     }
 }
@@ -1344,8 +1269,8 @@ void sithAI_RandomRotationVector(rdVector3 *out)
     rdVector3 tmp;
 
     tmp.x = _frand() * 360.0;
-    tmp.z = 0.0;
     tmp.y = _frand() * 360.0;
+    tmp.z = 0.0;
     rdVector_Rotate3(out, &rdroid_yVector3, &tmp);
 }
 
@@ -1353,10 +1278,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
 {
     sithThing *v8; // ebp
     sithThing *v9; // edi
-    float v10; // edx
     sithThing *v11; // ecx
-    double v12; // st6
-    double v13; // st7
     double v14; // rt2
     int16_t v15; // bx
     sithThing *v16; // eax
@@ -1365,15 +1287,14 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
     float v21; // [esp+14h] [ebp-1Ch]
     rdVector3 v1; // [esp+18h] [ebp-18h] BYREF
     rdVector3 a1a; // [esp+24h] [ebp-Ch] BYREF
-    float actora; // [esp+34h] [ebp+4h]
 
     v8 = 0;
     v9 = actor->thing;
     v21 = 1.0;
     v20 = 0;
     if ( (g_debugmodeFlags & 0x80u) != 0
-      || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
-      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) != 0 && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) != 0 )
+      || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
+      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) != 0 )
     {
         return 0;
     }
@@ -1393,10 +1314,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
     if ( !v8 )
         return 0;
     sithAI_sub_4EAD60(actor);
-    v10 = actor->field_1E4.y;
-    v1.x = actor->field_1E4.x;
-    v1.y = v10;
-    v1.z = actor->field_1E4.z;
+    rdVector_Copy3(&v1, &actor->field_1E4);
     if ( (a7 & 8) != 0 )
     {
         v20 = 0;
@@ -1406,7 +1324,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
         return 0;
     if ( actor->field_1F0 < (double)a2 || actor->field_1F0 > (double)a3 )
         return 0;
-    v19 = v9->lookOrientation.rvec.x * v1.x + v9->lookOrientation.rvec.y * v1.y + v9->lookOrientation.rvec.z * v1.z;
+    v19 = rdVector_Dot3(&v9->lookOrientation.rvec, &v1);
     if ( v19 < 0.0 )
         v19 = -v19;
     if ( v19 > 1.0 - a4 )
@@ -1429,31 +1347,22 @@ LABEL_12:
     {
         v11 = actor->pDistractor;
         if ( v11->moveType == SITH_MT_PHYSICS
-          && (v11->physicsParams.vel.x != 0.0 || v11->physicsParams.vel.y != 0.0 || v11->physicsParams.vel.z != 0.0) )
+          && !rdVector_IsZero3(&v11->physicsParams.vel) )
         {
-            a1a.x = v8->physicsParams.vel.y * v1.x;
-            a1a.y = v8->physicsParams.vel.y * v1.y;
-            a1a.z = v8->physicsParams.vel.y * v1.z;
-            a1a.x = a1a.x + v11->physicsParams.vel.x;
-            a1a.y = v11->physicsParams.vel.y + a1a.y;
-            a1a.z = v11->physicsParams.vel.z + a1a.z;
+            rdVector_Scale3(&a1a, &v1, v8->physicsParams.vel.y);
+            rdVector_Add3Acc(&a1a, &v11->physicsParams.vel);
             rdVector_Normalize3Acc(&a1a);
-            if ( a1a.x * v1.x + a1a.y * v1.y + a1a.z * v1.z > 0.5 )
+            if ( rdVector_Dot3(&a1a, &v1) > 0.5 )
                 v1 = a1a;
         }
     }
     if ( (a7 & 2) != 0 && v8->moveType == SITH_MT_PHYSICS) // Added: physics check
     {
-        actora = v8->physicsParams.vel.y;
-        v12 = actor->field_1E4.y * actora;
-        v13 = actor->field_1E4.z * actora;
-        v14 = actor->field_1F0 / actora * 0.5;
-        a1a.x = actor->field_1E4.x * actora;
-        a1a.y = v12;
-        a1a.z = v13;
+        v14 = actor->field_1F0 / v8->physicsParams.vel.y * 0.5;
+        rdVector_Scale3(&a1a, &actor->field_1E4, v8->physicsParams.vel.y);
         a1a.z = v14 * sithWorld_pCurrentWorld->worldGravity + a1a.z;
         v15 = 1;
-        v21 = rdVector_Normalize3(&v1, &a1a) / actora;
+        v21 = rdVector_Normalize3(&v1, &a1a) / v8->physicsParams.vel.y;
     }
     else
     {
@@ -1461,10 +1370,7 @@ LABEL_12:
     }
     if ( a5 != 0.0 && actor->field_1F0 != 0.0 && _frand() > actor->aiclass->accuracy )
     {
-        v1.x = (_frand() - 0.5) * a5 + v1.x;
-        v1.y = (_frand() - 0.5) * a5 + v1.y;
-        v1.z = (_frand() - 0.5) * a5 + v1.z;
-        rdVector_Normalize3Acc(&v1);
+        sithAI_RandomFireVector(&v1, a5);
     }
     sithSoundClass_PlayModeRandom(v9, bAltFire + SITH_SC_FIRE1);
     v16 = sithWeapon_Fire(v9, v8, &v1, &actor->blindAimError, 0, v20, v21, v15, 0.0);
@@ -1490,83 +1396,81 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
     float v17; // [esp+4Ch] [ebp+4h]
     float a2a; // [esp+50h] [ebp+8h]
 
-    if ( a1->field_8C != sithRender_lastRenderTick )
+    if ( a1->field_8C == sithRender_lastRenderTick )
+        return;
+
+    a1->field_8C = sithRender_lastRenderTick;
+    if (sithAI_dword_84DE5C >= 0x80)
+        return;
+
+    v4 = a1->thingsList;
+    ++sithAI_dword_84DE5C;
+    if ( v4 )
     {
-        a1->field_8C = sithRender_lastRenderTick;
-        if ( sithAI_dword_84DE5C < 0x80 )
+        v6 = sithAI_dword_84DE60;
+        do
         {
-            v4 = a1->thingsList;
-            ++sithAI_dword_84DE5C;
-            if ( v4 )
+            if ( v6 >= sithAI_dword_84DE6C )
+                break;
+            if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
             {
-                v6 = sithAI_dword_84DE60;
-                do
+                rdVector_Sub3(&v13, &v4->position, &a2->scale);
+                rdVector_Normalize3Acc(&v13);
+                rdVector_Normalize3(&a1a, &a2->uvec);
+                rdVector_Normalize3(&v1, &a2->rvec);
+                rdVector_Normalize3(&v16, &a2->lvec);
+                v17 = rdVector_Dot3(&a1a, &v13);
+                a2a = rdVector_Dot3(&v1, &v13);
+                if ( v17 > (double)sithAI_flt_84DE58
+                  || v17 < -sithAI_flt_84DE58
+                  || a2a > (double)sithAI_flt_84DE64
+                  || a2a < -sithAI_flt_84DE64
+                  || (v12 = rdVector_Dot3(&v16, &v13), v12 < 0.0) )
                 {
-                    if ( v6 >= sithAI_dword_84DE6C )
-                        break;
-                    if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
-                    {
-                        rdVector_Sub3(&v13, &v4->position, &a2->scale);
-                        rdVector_Normalize3Acc(&v13);
-                        rdVector_Normalize3(&a1a, &a2->uvec);
-                        rdVector_Normalize3(&v1, &a2->rvec);
-                        rdVector_Normalize3(&v16, &a2->lvec);
-                        v17 = a1a.x * v13.x + a1a.y * v13.y + a1a.z * v13.z;
-                        a2a = v1.x * v13.x + v1.y * v13.y + v1.z * v13.z;
-                        if ( v17 > (double)sithAI_flt_84DE58
-                          || v17 < -sithAI_flt_84DE58
-                          || a2a > (double)sithAI_flt_84DE64
-                          || a2a < -sithAI_flt_84DE64
-                          || (v12 = v16.x * v13.x + v16.y * v13.y + v16.z * v13.z, v12 < 0.0) )
-                        {
-                            v6 = sithAI_dword_84DE60;
-                        }
-                        else
-                        {
-                            if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
-                                return;
-                            v6 = sithAI_dword_84DE60 + 1;
-                            sithAI_dword_84DE60 = v6;
-                            sithAI_pThing_84DE68[v6 - 1] = v4;
-                        }
-                    }
-                    v4 = v4->nextThing;
+                    v6 = sithAI_dword_84DE60;
                 }
-                while ( v4 );
-            }
-            if ( a3 <= (double)sithAI_flt_84DE70 )
-            {
-                v7 = a1->adjoins;
-                if ( v7 )
+                else
                 {
-                    v8 = NULL;
-                    do
-                    {
-                        v9 = v7->surface->surfaceInfo.face.material;
-                        if ( v9 )
-                        {
-                            v10 = v7->surface->surfaceInfo.face.wallCel;
-                            if ( v10 == -1 )
-                                v10 = v9->celIdx;
-                            v8 = v9->texinfos[v10];
-                        }
-                        if ( (v7->flags & 1) != 0
-                          && (!v9
-                           || !v7->surface->surfaceInfo.face.geometryMode
-                           || (v7->surface->surfaceInfo.face.type & 2) != 0
-                           || (v8 && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: v8 nullptr check
-                          && a2->lvec.y * v7->surface->surfaceInfo.face.normal.y
-                           + a2->lvec.z * v7->surface->surfaceInfo.face.normal.z
-                           + a2->lvec.x * v7->surface->surfaceInfo.face.normal.x < 0.0 )
-                        {
-                            a3a = v7->mirror->dist + v7->dist + a3;
-                            sithAI_GetThingsInView(v7->sector, a2, a3a);
-                        }
-                        v7 = v7->next;
-                    }
-                    while ( v7 );
+                    if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
+                        return;
+                    v6 = sithAI_dword_84DE60 + 1;
+                    sithAI_dword_84DE60 = v6;
+                    sithAI_pThing_84DE68[v6 - 1] = v4;
                 }
             }
+            v4 = v4->nextThing;
+        }
+        while ( v4 );
+    }
+    if ( a3 <= (double)sithAI_flt_84DE70 )
+    {
+        v7 = a1->adjoins;
+        if ( v7 )
+        {
+            v8 = NULL;
+            do
+            {
+                v9 = v7->surface->surfaceInfo.face.material;
+                if ( v9 )
+                {
+                    v10 = v7->surface->surfaceInfo.face.wallCel;
+                    if ( v10 == -1 )
+                        v10 = v9->celIdx;
+                    v8 = v9->texinfos[v10];
+                }
+                if ( (v7->flags & 1) != 0
+                  && (!v9
+                   || !v7->surface->surfaceInfo.face.geometryMode
+                   || (v7->surface->surfaceInfo.face.type & 2)
+                   || (v8 && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: v8 nullptr check
+                  && rdVector_Dot3(&a2->lvec, &v7->surface->surfaceInfo.face.normal) < 0.0 )
+                {
+                    a3a = v7->mirror->dist + v7->dist + a3;
+                    sithAI_GetThingsInView(v7->sector, a2, a3a);
+                }
+                v7 = v7->next;
+            }
+            while ( v7 );
         }
     }
 }
@@ -1582,26 +1486,18 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
     v8 = 1.0;
     v3 = a1->thing;
     if ( !a2 )
-        goto LABEL_34;
+        return 1;
     if ( a2->type != SITH_THING_ACTOR && a2->type != SITH_THING_PLAYER )
-        goto LABEL_34;
+        return 1;
     if ( a3 >= 2.0 )
     {
-        if ( (a1->flags & SITHAI_MODE_ACTIVE) == 0 )
+        if (!(a1->flags & SITHAI_MODE_ACTIVE))
             v8 = 0.5;
-        if ( (a2->actorParams.typeflags & SITH_AF_FIELDLIGHT) == 0 && (a2->jkFlags & 1) == 0 )
+        if (!(a2->actorParams.typeflags & SITH_AF_FIELDLIGHT) && (a2->jkFlags & 1) == 0 )
         {
-            v5 = (a3 - 2.0) * 0.1;
-            if ( v5 < 0.0 )
-            {
-                v5 = 0.0;
-            }
-            else if ( v5 > 0.6 )
-            {
-                v5 = 0.6;
-            }
+            v5 = stdMath_Clamp((a3 - 2.0) * 0.1, 0.0, 0.6);
             v8 = (1.0 - v5) * v8;
-            if ( (v3->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK) == 0 )
+            if (!(v3->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK))
             {
                 v6 = a2->sector;
                 if ( v6->ambientLight < 0.5 )
@@ -1609,31 +1505,25 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
             }
             if ( a2->moveType == SITH_MT_PHYSICS )
             {
-                if ( (a2->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
+                if (a2->physicsParams.physflags & SITH_PF_CROUCHING)
                     v8 = v8 * 0.75;
-                if ( a2->physicsParams.vel.x == 0.0 && a2->physicsParams.vel.y == 0.0 && a2->physicsParams.vel.z == 0.0 )
+                if (rdVector_IsZero3(&a2->physicsParams.vel))
                     v8 = v8 * 0.5;
             }
         }
     }
-    if ( a2->actorParams.typeflags & SITH_AF_INVISIBLE && (v3->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE) == 0 )
+    if (a2->actorParams.typeflags & SITH_AF_INVISIBLE
+        && !(v3->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE)) {
         v8 = v8 * 0.05;
-    if ( (v3->actorParams.typeflags & SITH_AF_BLIND) != 0 )
+    }
+    if (v3->actorParams.typeflags & SITH_AF_BLIND) {
         v8 = v8 * 0.05;
-    if ( v8 < 0.05 )
-    {
-        v8 = 0.05;
     }
-    else if ( v8 > 1.0 )
-    {
-        v8 = 1.0;
-    }
+    v8 = stdMath_Clamp(v8, 0.05, 1.0);
     if ( _frand() >= v8 )
-        result = 0;
+        return 0;
     else
-LABEL_34:
-        result = 1;
-    return result;
+        return 1;
 }
 
 // MOTS added
@@ -1705,13 +1595,13 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
             rdVector_Normalize3(&a1a, &a2->uvec);
             rdVector_Normalize3(&v1, &a2->rvec);
             rdVector_Normalize3(&v16, &a2->lvec);
-            v17 = a1a.x * v13.x + a1a.y * v13.y + a1a.z * v13.z;
-            a2a = v1.x * v13.x + v1.y * v13.y + v1.z * v13.z;
+            v17 = rdVector_Dot3(&a1a, &v13);
+            a2a = rdVector_Dot3(&v1, &v13);
             if ( v17 > (double)sithAI_flt_84DE58
               || v17 < -sithAI_flt_84DE58
               || a2a > (double)sithAI_flt_84DE64
               || a2a < -sithAI_flt_84DE64
-              || (v12 = v16.x * v13.x + v16.y * v13.y + v16.z * v13.z, v12 < 0.0) )
+              || (v12 = rdVector_Dot3(&v16, &v13), v12 < 0.0) )
             {
                 ;
             }
