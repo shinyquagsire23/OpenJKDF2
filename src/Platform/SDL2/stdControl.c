@@ -778,6 +778,9 @@ void stdControl_ReadControls()
                     idx = (j - JK_NUM_JOY_BUTTONS) + (KEY_JOY1_EXT_STARTIDX + (JK_JOYSTICK_EXT_BUTTON_STRIDE*i));
                 }
                 //printf("%u: %u %x\n", j, val, idx);
+                if (val) {
+                    stdControl_bControlsIdle = 0;
+                }
                 stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
             }
 
