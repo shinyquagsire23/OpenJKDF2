@@ -1058,8 +1058,14 @@ void Window_RecreateSDL2Window()
 
     if (Window_isFullscreen)
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-    else
+    else {
+        // Hack: Make sure fullscreen windows don't get stuck offscreen
+        if (Window_yPos < 0) {
+            Window_yPos = 1;
+        }
+
         flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
 
 #if defined(ARCH_WASM)
     //flags &= ~SDL_WINDOW_RESIZABLE;
@@ -1084,6 +1090,9 @@ void Window_RecreateSDL2Window()
 
     if (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
         SDL_SetWindowFullscreen(displayWindow, flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+    }
+    else {
+        SDL_SetWindowFullscreen(displayWindow, 0);
     }
 
     glWindowContext = SDL_GL_CreateContext(displayWindow);
