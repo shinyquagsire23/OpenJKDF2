@@ -144,6 +144,10 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3);
 void sithAI_SetDistractor(sithThing *pDistractor);
 void sithAI_AddAlignmentPriority(float param_1);
 int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8);
+int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float param_4,int param_5,
+                       float param_6,uint32_t param_7);
+int sithAI_FUN_0053a240(sithActor *pActor,float param_2,float param_3,float param_4,int param_5,
+                       float param_6,uint32_t param_7);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;

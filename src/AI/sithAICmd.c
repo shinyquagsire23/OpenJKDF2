@@ -1518,7 +1518,6 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
 // MOTS added
 int sithAICmd_Leap(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
 {
-#if 0
     sithThing *psVar1;
     int iVar2;
     int64_t lVar3;
@@ -1573,14 +1572,13 @@ LAB_0055c4da:
         actor->flags = actor->flags & ~SITH_AF_DEAF;
     }
     instinct->nextUpdate = sithTime_curMs + 250;
-#endif
+
     return 0;
 }
 
 // MOTS added
 int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags)
 {
-#if 0
     sithThing *psVar1;
     int iVar2;
     int64_t lVar3;
@@ -1633,7 +1631,7 @@ LAB_0055c33d:
         pActor->flags = pActor->flags & ~SITH_AF_DEAF;
     }
     pInstinct->nextUpdate = sithTime_curMs + 0xfa;
-#endif
+
     return 0;
 }
 

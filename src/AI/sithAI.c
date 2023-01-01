@@ -1656,3 +1656,164 @@ int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFo
     sithAI_GetThingsInCone(sector, out, 0.0); // TODO: Did they actually change this?
     return sithAI_dword_84DE60;
 }
+
+
+int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float param_4,int param_5,
+                       float param_6,uint32_t param_7)
+{
+    sithThing *thing;
+    sithThing *psVar1;
+    sithThing *psVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    int bVar6;
+    int anim;
+
+    anim = 0;
+    thing = pActor->thing;
+    if ((((g_debugmodeFlags & 0x80) == 0) 
+        && ((thing->thingflags & 0x202) == 0)) 
+        && (((thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ||
+            ((thing->actorParams.typeflags & 0x80000) == 0)))) {
+        if ((param_5 == 0) || (param_5 == 1)) {
+            anim = SITH_ANIM_CHARGE;
+        }
+        sithAI_sub_4EAD60(pActor);
+        if ((param_7 & 8) != 0) {
+LAB_0053a691:
+            psVar1 = pActor->pDistractor;
+            psVar2 = pActor->thing;
+            fVar5 = (psVar1->position).x - (psVar2->position).x;
+            fVar3 = (psVar1->position).y - (psVar2->position).y;
+            fVar4 = (psVar1->position).z - (psVar2->position).z;
+            pActor->field_28C = sithTime_curMs + 2000;
+            pActor->moveSpeed = 1313.0;
+            pActor->flags = pActor->flags & 0xfffffff6;
+            pActor->field_1E4.x = fVar5;
+            thing->physicsParams.vel.x = param_6 * fVar5;
+            thing->physicsParams.vel.y = param_6 * fVar3;
+            pActor->field_1E4.y = fVar3;
+            pActor->field_1E4.z = fVar4;
+            pActor->field_1F0 = stdMath_Sqrt(fVar4 * fVar4 + fVar3 * fVar3 + fVar5 * fVar5);
+            thing->physicsParams.vel.z = param_6 * fVar4;
+            return 1;
+        }
+        if (((uint32_t)pActor->field_288 < sithTime_curMs || pActor->field_288 == sithTime_curMs) &&
+                (pActor->field_1F4 == 0)) {
+            if ((pActor->field_1F0 < param_2) || (pActor->field_1F0 > param_3)) {
+                bVar6 = 0;
+            }
+            else {
+                bVar6 = 1;
+            }
+            if (bVar6) {
+                fVar3 = (thing->lookOrientation).rvec.z * (pActor->field_1E4).z +
+                        (thing->lookOrientation).rvec.y * (pActor->field_1E4).y +
+                        (thing->lookOrientation).rvec.x * (pActor->field_1E4).x;
+                if (fVar3 < 0.0) {
+                    fVar3 = -fVar3;
+                }
+                if (fVar3 <= 1.0 - param_4) {
+                    if ((thing->actorParams.typeflags & 0x20000) != 0) {
+                        pActor->field_268 = param_7 | 8;
+                        pActor->field_264 = param_6;
+                        pActor->field_26C = param_5;
+                        sithPuppet_PlayMode(thing, anim, (rdPuppetTrackCallback_t)0x0);
+                        return 1;
+                    }
+                    goto LAB_0053a691;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+
+int sithAI_FUN_0053a240(sithActor *pActor,float param_2,float param_3,float param_4,int param_5,
+                       float param_6,uint32_t param_7)
+
+{
+    float fVar1;
+    sithThing *thing;
+    sithThing *psVar2;
+    sithThing *psVar3;
+    int bVar4;
+    uint32_t uVar5;
+    int anim;
+    double fVar6;
+    double fVar7;
+    double fVar8;
+    double fVar9;
+    double fVar10;
+    int64_t lVar11;
+
+    anim = 0;
+    thing = pActor->thing;
+    if ((((g_debugmodeFlags & 0x80) == 0) && ((thing->thingflags & 0x202) == 0)) &&
+    (((thing->sector->flags & 2) == 0 || ((thing->actorParams.typeflags & 0x80000) == 0)))
+       ) {
+        if ((param_5 == 0) || (param_5 == 1)) {
+            anim = SITH_ANIM_JUMP;
+        }
+        sithAI_sub_4EAD60(pActor);
+        uVar5 = sithTime_curMs;
+        if ((param_7 & 8) != 0) {
+LAB_0053a3b9:
+            psVar2 = pActor->pDistractor;
+            psVar3 = pActor->thing;
+            fVar6 = (double)(psVar2->position).x - (double)(psVar3->position).x;
+            fVar7 = (double)(psVar2->position).y - (double)(psVar3->position).y;
+            fVar8 = (double)(psVar2->position).z - (double)(psVar3->position).z;
+            fVar9 = stdMath_Sqrt(fVar8 * (double)(float)fVar8 + fVar7 * fVar7 + fVar6 * (double)(float)fVar6);
+            fVar10 = fVar9 / (double)param_6 - (double) - 0.2;
+            fVar1 = sithWorld_pCurrentWorld->worldGravity;
+            (pActor->field_1E4).x = (float)fVar6;
+            (pActor->field_1E4).y = (float)fVar7;
+            (pActor->field_1E4).z = (float)fVar8;
+            pActor->field_1F0 = (float)fVar9;
+            lVar11 = (int64_t)(fVar10 * 1000.0);
+            pActor->field_28C = (int)lVar11 + uVar5;
+            pActor->flags = pActor->flags & 0xfffffff6;
+            sithThing_DetachThing(thing);
+            thing->physicsParams.vel.x = param_6 * (float)fVar6;
+            thing->physicsParams.vel.y = param_6 * (float)fVar7;
+            thing->physicsParams.vel.z =
+                (float)(fVar10 * 0.5 * fVar1 + (float)(param_6 * (float)fVar8));
+            sithSoundClass_PlayModeRandom(thing, 0x24);
+            return 1;
+        }
+        if (((uint32_t)pActor->field_288 < sithTime_curMs || pActor->field_288 == sithTime_curMs) &&
+                (pActor->field_1F4 == 0)) {
+            if ((pActor->field_1F0 < param_2) ||
+                    (pActor->field_1F0 > param_3)) {
+                bVar4 = 0;
+            }
+            else {
+                bVar4 = 1;
+            }
+            if (bVar4) {
+                fVar1 = (thing->lookOrientation).rvec.z * (pActor->field_1E4).z +
+                        (thing->lookOrientation).rvec.y * (pActor->field_1E4).y +
+                        (thing->lookOrientation).rvec.x * (pActor->field_1E4).x;
+                if (fVar1 < 0.0) {
+                    fVar1 = -fVar1;
+                }
+                if (fVar1 <= 1.0 - param_4) {
+                    if ((thing->actorParams.typeflags & 0x20000) != 0) {
+                        pActor->field_28C = sithTime_curMs + 300;
+                        pActor->field_268 = param_7 | 8;
+                        pActor->field_264 = param_6;
+                        pActor->field_26C = param_5;
+                        sithPuppet_PlayMode(thing, anim, (rdPuppetTrackCallback_t)0x0);
+                        return 1;
+                    }
+                    goto LAB_0053a3b9;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
