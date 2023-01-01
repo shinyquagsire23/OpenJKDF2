@@ -443,7 +443,6 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         v8 = jkStrings_GetText(v16);
         if ( !v8 )
             return 1;
-        printf("%s\n", v16);
         v9 = v15;
     }
     jk_snwprintf(v17, 0xFFu, L"%ls%ls", v9, v8);
@@ -485,7 +484,6 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
         {
             v13 = &jkGuiMouse_aEntries[i];
-            printf("%s %x %x\n", v13->displayStrKey, v13->dxKeyNum, a5);
             if ( a5 == v13->dxKeyNum )
             {
                 v13->inputFuncIdx = a1;
