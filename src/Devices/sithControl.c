@@ -1267,7 +1267,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
             thing->physicsParams.angVel.y = fVar4;
             fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
             fVar4 = (thing->actorParams.maxThrust +
-                    thing->actorParams.extraSpeed) * fVar4 * 0.7; // TODO: Why was it `* -fVar4` and why did I need to change it??
+                    thing->actorParams.extraSpeed) * -fVar4 * 0.7;
             if (fVar4 == 0.0) goto joined_r0x00527cfa;
             sithControl_008d7f54 = 1;
             iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
@@ -1287,7 +1287,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
                 thing->physicsParams.angVel.y = fVar4;
                 fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
                 fVar4 = (thing->actorParams.maxThrust +
-                        thing->actorParams.extraSpeed) * fVar4 * 0.7; // TODO: Why was it `* -fVar4` and why did I need to change it??
+                        thing->actorParams.extraSpeed) * -fVar4 * 0.7;
                 if (fVar4 == 0.0) goto joined_r0x00527cfa;
                 sithControl_008d7f54 = 1;
                 iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
@@ -1301,7 +1301,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
     else {
         fVar3 = sithControl_GetAxis2(INPUT_FUNC_TURN);
         fVar4 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
-        fVar4 = fVar4 - fVar3; // TODO: Why was it `* -fVar4` and why did I need to change it??
+        fVar4 = -fVar4 - fVar3;
         if (fVar4 < -1.0) {
             fVar4 = -1.0;
         }
@@ -1617,10 +1617,20 @@ void sithControl_MapDefaults()
     sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_NUMPAD8, 2);
 
     sithControl_MapFunc(INPUT_FUNC_FORWARD, DIK_NUMPAD2, 4);
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_A, 4);
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_D, 0);
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD1, 4);
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD3, 0);
+
+    if (Main_bMotsCompat) {
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_A, 0);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_D, 4);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD1, 0);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD3, 4);
+    }
+    else {
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_A, 4);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_D, 0);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD1, 4);
+        sithControl_MapFunc(INPUT_FUNC_SLIDE, DIK_NUMPAD3, 0);
+    }
+    
     sithControl_MapFunc(INPUT_FUNC_JUMP, DIK_ADD, 0);
     sithControl_MapFunc(INPUT_FUNC_JUMP, DIK_X, 0);
     sithControl_MapFunc(INPUT_FUNC_DUCK, DIK_C, 0);
