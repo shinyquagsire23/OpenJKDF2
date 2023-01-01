@@ -772,7 +772,15 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
         NETMSG_PUSHU8(sithSoundMixer_trackTo);
     }
 
-    // TODO: MoTS AI misc
+    // MoTS AI misc
+    if (Main_bMotsCompat) {
+        for (int i = 0; i < 10; i++) 
+        {
+            NETMSG_PUSHS32(sithAI_aAlignments[i].bValid);
+            NETMSG_PUSHS32(sithAI_aAlignments[i].field_4);
+            NETMSG_PUSHF32(sithAI_aAlignments[i].field_8);
+        }
+    }
     
     NETMSG_END(DSS_ID_1F);
     
@@ -833,8 +841,16 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
         sithSoundMixer_ResumeMusic(1);
     }
 
-    // TODO: MoTS AI misc
-
+    // MoTS AI misc
+    if (Main_bMotsCompat) {
+        for (int i = 0; i < 10; i++) 
+        {
+            sithAI_aAlignments[i].bValid = NETMSG_POPS32();
+            sithAI_aAlignments[i].field_4 = NETMSG_POPS32();
+            sithAI_aAlignments[i].field_8 = NETMSG_POPF32();
+        }
+    }
+    
     return 1;
 }
 

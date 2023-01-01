@@ -1330,6 +1330,8 @@ int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
     rdVector3 local_3c;
     rdMatrix34 local_30;
 
+    if (!Main_bMotsCompat) return 0;
+
     NETMSG_IN_START(msg);
 
     psVar1 = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
