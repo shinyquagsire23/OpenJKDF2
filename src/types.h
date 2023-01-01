@@ -2496,7 +2496,7 @@ typedef struct sithActor
     float moveSpeed;
     sithThing* field_1C0;
     rdVector3 field_1C4;
-    sithThing* field_1D0;
+    sithThing* pDistractor;
     rdVector3 field_1D4;
     int field_1E0;
     rdVector3 field_1E4;
@@ -2530,6 +2530,13 @@ typedef struct sithActor
     int loadedFrames;
     int sizeFrames;
 } sithActor;
+
+typedef struct sithAIAlign
+{
+    int bValid;
+    int field_4;
+    float field_8;
+} sithAIAlign;
 
 typedef struct sithThingParticleParams
 {

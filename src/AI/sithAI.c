@@ -31,7 +31,7 @@
 
 stdHashTable* sithAI_commandsHashmap = NULL;
 uint32_t sithAI_maxActors = 0;
-int sithAI_actorInitted[256] = {0};
+int sithAI_actorInitted[SITHAI_MAX_ACTORS] = {0};
 int sithAI_bOpened = 0;
 int sithAI_bInit = 0;
 sithAICommand* sithAI_commandList = NULL;
@@ -46,8 +46,15 @@ float sithAI_flt_84DE70 = 0.0f;
 int sithAI_dword_84DE74 = 0;
 
 // These are located in a different part of .data?
-sithActor sithAI_actors[256] = {0};
+sithAIAlign sithAI_aAlignments[10] = {0}; // MoTS Added
+sithActor sithAI_actors[SITHAI_MAX_ACTORS] = {0};
 int sithAI_inittedActors = 0;
+
+// This is also in a different part
+// MoTS Added
+sithThing* sithAI_pDistractor = NULL;
+
+float sithAI_FLOAT_005a79d8 = 1.0;
 
 int sithAI_Startup()
 {
@@ -72,12 +79,12 @@ int sithAI_Startup()
     sithAICmd_Startup();
 
     v0 = sithAI_inittedActors;
-    _memset(sithAI_actors, 0, sizeof(sithActor) * 0x100);
+    _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
 
-    v1 = 255;
+    v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
-    v3 = &sithAI_actors[255];
-    sithAI_maxActors = 0x100;
+    v3 = &sithAI_actors[SITHAI_MAX_ACTORS-1];
+    sithAI_maxActors = SITHAI_MAX_ACTORS;
 
     do
     {
@@ -145,12 +152,12 @@ void sithAI_Close()
         return;
     
     v0 = sithAI_inittedActors;
-    _memset(sithAI_actors, 0, sizeof(sithActor) * 0x100);
+    _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
 
-    v1 = 255;
+    v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
-    v3 = &sithAI_actors[255];
-    sithAI_maxActors = 0x100;
+    v3 = &sithAI_actors[SITHAI_MAX_ACTORS-1];
+    sithAI_maxActors = SITHAI_MAX_ACTORS;
 
     do
     {
@@ -217,6 +224,9 @@ void sithAI_NewEntry(sithThing *thing)
             actor->numAIClassEntries = sith_ai->numEntries;
             actor->flags = (SITHAI_MODE_SLEEPING|SITHAI_MODE_SEARCHING);
             actor->moveSpeed = 1.5;
+
+            // MOTS Added
+            actor->pInterest = NULL;
         }
         else
         {
@@ -904,7 +914,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
         else
             actora = 0.0;
         rdMatrix_TransformVector34(&actor->blindAimError, &v2->actorParams.fireOffset, &v2->lookOrientation);
-        v4 = actor->field_1D0;
+        v4 = actor->pDistractor;
         rdVector_Add3Acc(&actor->blindAimError, &v2->position);
         if ( v4 )
         {
@@ -915,9 +925,9 @@ void sithAI_sub_4EAD60(sithActor *actor)
             actor->field_1F4 = v5;
             if ( !v5 )
             {
-                if ( !v9 || sithAI_sub_4EC140(actor, actor->field_1D0, actor->field_1F0) )
+                if ( !v9 || sithAI_sub_4EC140(actor, actor->pDistractor, actor->field_1F0) )
                 {
-                    actor->field_1F8 = actor->field_1D0->position;
+                    actor->field_1F8 = actor->pDistractor->position;
                     actor->field_204 = sithTime_curMs;
                 }
                 else
@@ -1283,19 +1293,14 @@ LABEL_19:
 
 int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8)
 {
-    float a2; // [esp+0h] [ebp-Ch]
-    float a2b; // [esp+0h] [ebp-Ch]
-
     if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
         return 0;
     sithAI_dword_84DE74 = a7;
     sithAI_dword_84DE6C = a5;
-    a2 = 90.0 - autoaimFov * 0.5;
     sithAI_flt_84DE70 = a8;
     sithAI_pThing_84DE68 = thingList;
-    stdMath_SinCos(a2, &autoaimFov, &sithAI_flt_84DE64);
-    a2b = 90.0 - autoaimMaxDist * 0.5;
-    stdMath_SinCos(a2b, &autoaimFov, &sithAI_flt_84DE58);
+    stdMath_SinCos(90.0 - autoaimFov * 0.5, &autoaimFov, &sithAI_flt_84DE64);
+    stdMath_SinCos(90.0 - autoaimMaxDist * 0.5, &autoaimFov, &sithAI_flt_84DE58);
     sithMain_sub_4C4D80();
     sithAI_dword_84DE60 = 0;
     sithAI_dword_84DE5C = 0;
@@ -1422,7 +1427,7 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
 LABEL_12:
     if ( (a7 & 1) != 0 )
     {
-        v11 = actor->field_1D0;
+        v11 = actor->pDistractor;
         if ( v11->moveType == SITH_MT_PHYSICS
           && (v11->physicsParams.vel.x != 0.0 || v11->physicsParams.vel.y != 0.0 || v11->physicsParams.vel.z != 0.0) )
         {
@@ -1501,9 +1506,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
                         break;
                     if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
                     {
-                        v13.x = v4->position.x - a2->scale.x;
-                        v13.y = v4->position.y - a2->scale.y;
-                        v13.z = v4->position.z - a2->scale.z;
+                        rdVector_Sub3(&v13, &v4->position, &a2->scale);
                         rdVector_Normalize3Acc(&v13);
                         rdVector_Normalize3(&a1a, &a2->uvec);
                         rdVector_Normalize3(&v1, &a2->rvec);
@@ -1631,4 +1634,132 @@ int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
 LABEL_34:
         result = 1;
     return result;
+}
+
+// MOTS added
+void sithAI_SetDistractor(sithThing *pDistractor)
+{
+    sithActor *ppsVar1;
+    sithThing **ppsVar2;
+    sithThing *pPlayer;
+
+    pPlayer = sithPlayer_pLocalPlayerThing;
+    if (sithAI_pDistractor) 
+    {
+        for (int i = 0; i < SITHAI_MAX_ACTORS; i++) {
+            if (sithAI_actors[i].pDistractor == sithAI_pDistractor) {
+                sithAI_actors[i].pDistractor = pPlayer;
+            }
+        };
+    }
+
+    sithAI_pDistractor = pDistractor;
+    if (pDistractor) 
+    {
+        for (int i = 0; i < SITHAI_MAX_ACTORS; i++) {
+            if (sithAI_actors[i].pDistractor == pPlayer) {
+                sithAI_actors[i].pDistractor = pDistractor;
+            }
+        }
+    }
+}
+
+// MOTS added
+void sithAI_AddAlignmentPriority(float param_1)
+{
+    sithAI_FLOAT_005a79d8 = param_1;
+}
+
+void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
+{
+    sithThing *v4; // esi
+    sithAdjoin *v7; // esi
+    rdTexinfo *v8; // ebp
+    rdMaterial *v9; // ecx
+    uint32_t v10; // edx
+    float a3a; // [esp+0h] [ebp-48h]
+    float v12; // [esp+14h] [ebp-34h]
+    rdVector3 v13; // [esp+18h] [ebp-30h] BYREF
+    rdVector3 a1a; // [esp+24h] [ebp-24h] BYREF
+    rdVector3 v1; // [esp+30h] [ebp-18h] BYREF
+    rdVector3 v16; // [esp+3Ch] [ebp-Ch] BYREF
+    float v17; // [esp+4Ch] [ebp+4h]
+    float a2a; // [esp+50h] [ebp+8h]
+    float local_190[100];
+
+    // Added: prevent overflow
+    if (sithAI_dword_84DE6C > 100) {
+        sithAI_dword_84DE6C = 100;
+    }
+
+    int iterIdx = sithWorld_pCurrentWorld->numThings;
+    for (iterIdx; iterIdx >= 0; iterIdx--)
+    {
+        v4 = &sithWorld_pCurrentWorld->things[iterIdx];
+        if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
+            break;
+        if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+        {
+            rdVector_Sub3(&v13, &v4->position, &a2->scale);
+            float dist = rdVector_Normalize3Acc(&v13);
+            rdVector_Normalize3(&a1a, &a2->uvec);
+            rdVector_Normalize3(&v1, &a2->rvec);
+            rdVector_Normalize3(&v16, &a2->lvec);
+            v17 = a1a.x * v13.x + a1a.y * v13.y + a1a.z * v13.z;
+            a2a = v1.x * v13.x + v1.y * v13.y + v1.z * v13.z;
+            if ( v17 > (double)sithAI_flt_84DE58
+              || v17 < -sithAI_flt_84DE58
+              || a2a > (double)sithAI_flt_84DE64
+              || a2a < -sithAI_flt_84DE64
+              || (v12 = v16.x * v13.x + v16.y * v13.y + v16.z * v13.z, v12 < 0.0) )
+            {
+                ;
+            }
+            else
+            {
+                if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
+                    return;
+                local_190[sithAI_dword_84DE60] = dist;
+                sithAI_pThing_84DE68[sithAI_dword_84DE60] = v4;
+                sithAI_dword_84DE60++;
+            }
+        }
+    }
+
+    // Sort the results
+    for (int i = 0; i < sithAI_dword_84DE60-1; i++) {
+        for (int j = 0; j < sithAI_dword_84DE60 - i - 1; j++) {
+            if (local_190[j] > local_190[j+1]) {
+                float val_a_1 = local_190[j];
+                sithThing* val_a_2 = sithAI_pThing_84DE68[j];
+
+                float val_b_1 = local_190[j+1];
+                sithThing* val_b_2 = sithAI_pThing_84DE68[j+1];
+
+                local_190[j] = val_b_1;
+                sithAI_pThing_84DE68[j] = val_b_2;
+
+                local_190[j+1] = val_a_1;
+                sithAI_pThing_84DE68[j+1] = val_a_2;
+            }
+        }
+    }
+}
+
+// MOTS added
+int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8)
+{
+    if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
+        return 0;
+    sithAI_dword_84DE74 = a7;
+    sithAI_dword_84DE6C = a5;
+    sithAI_flt_84DE70 = a8;
+    sithAI_pThing_84DE68 = thingList;
+    stdMath_SinCos(90.0 - autoaimFov * 0.5, &autoaimFov, &sithAI_flt_84DE64);
+    stdMath_SinCos(90.0 - autoaimMaxDist * 0.5, &autoaimFov, &sithAI_flt_84DE58);
+    sithMain_sub_4C4D80();
+    sithAI_dword_84DE60 = 0;
+    sithAI_dword_84DE5C = 0;
+    sithAI_GetThingsInCone(sector, out, 0.0); // TODO: Did they actually change this?
+    return sithAI_dword_84DE60;
 }

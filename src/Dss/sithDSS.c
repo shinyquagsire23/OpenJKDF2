@@ -221,8 +221,8 @@ void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx)
     NETMSG_PUSHVEC3(actor->movepos);
     NETMSG_PUSHVEC3(actor->field_23C);
     NETMSG_PUSHU32(actor->field_248);
-    if ( actor->field_1D0 ) {
-        NETMSG_PUSHS16(actor->field_1D0->thingIdx);
+    if ( actor->pDistractor ) {
+        NETMSG_PUSHS16(actor->pDistractor->thingIdx);
     }
     else {
         NETMSG_PUSHS16(-1);
@@ -303,7 +303,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     actor->field_23C = NETMSG_POPVEC3();
     actor->field_248 = NETMSG_POPU32();
 
-    actor->field_1D0 = sithThing_GetThingByIdx(NETMSG_POPS16());
+    actor->pDistractor = sithThing_GetThingByIdx(NETMSG_POPS16());
     
     actor->field_1D4 = NETMSG_POPVEC3();
     actor->field_1E0 = 0; // interesting?

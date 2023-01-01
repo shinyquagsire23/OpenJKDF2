@@ -1667,8 +1667,6 @@ void sithCogFunction_WorldFlash(sithCog *ctx)
     sithRender_WorldFlash(arg1, arg2);
 }
 
-
-
 // MOTS added
 void sithCogFunction_GetSysDate(sithCog *ctx)
 {
@@ -1699,7 +1697,7 @@ void sithCogFunction_GetSysDate(sithCog *ctx)
     sithCogExec_PushVector3(ctx, &out);
 }
 
-
+// MOTS added
 void sithCogFunction_GetSysTime(sithCog *ctx)
 {
     rdVector3 out;
@@ -1727,6 +1725,60 @@ void sithCogFunction_GetSysTime(sithCog *ctx)
     
 
     sithCogExec_PushVector3(ctx, &out);
+}
+
+// MOTS added
+void sithCogFunction_SendMessageExRadius(sithCog *ctx)
+{
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float param0;
+    float param1;
+    int message;
+    uint32_t uVar4;
+    int iVar5;
+    sithThing *sender;
+    float fVar6;
+    int local_28;
+    rdVector3 local_1c;
+    float local_10;
+    float local_c;
+    float local_8;
+    float local_4;
+
+    local_4 = sithCogExec_PopFlex(ctx);
+    local_8 = sithCogExec_PopFlex(ctx);
+    local_c = sithCogExec_PopFlex(ctx);
+    local_10 = sithCogExec_PopFlex(ctx);
+    message = sithCogExec_PopInt(ctx);
+    uVar4 = sithCogExec_PopInt(ctx);
+    fVar6 = sithCogExec_PopFlex(ctx);
+    iVar5 = sithCogExec_PopVector3(ctx,&local_1c);
+    param1 = local_c;
+    param0 = local_10;
+    if ((((iVar5 != 0) && (-1 < message)) && (message < SITH_MESSAGE_ENTERBUBBLE)) 
+        && (local_28 = sithWorld_pCurrentWorld->numThings, -1 < local_28)) 
+    {
+        int iVar5_idx = local_28;
+        local_28 = local_28 + 1;
+        do 
+        {
+            sender = &sithWorld_pCurrentWorld->things[iVar5_idx];
+            if (((((uVar4 & 1 << (sender->type & 0x1f)) != 0) 
+                && ((sender->thingflags & 0x80202) == 0)) 
+                && ((sender->type != 10 || ((uVar4 & 0x400) != 0)))) 
+                && (fVar3 = (sender->position).x - local_1c.x, fVar1 = (sender->position).y - local_1c.y,
+                    fVar2 = (sender->position).z - local_1c.z,
+                    fVar1 = stdMath_Sqrt(fVar2 * fVar2 + fVar1 * fVar1 + fVar3 * fVar3),
+                    fVar1 <= fVar6))
+            {
+                sithCog_SendMessageFromThingEx(sender, NULL, message, param0, param1, local_8, local_4);
+            }
+            iVar5_idx = iVar5_idx--;
+            local_28 = local_28 + -1;
+        } while (local_28 != 0);
+    }
 }
 
 
@@ -1819,13 +1871,13 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessage, "sendmessage");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendMessageEx, "sendmessageex");
     if (Main_bMotsCompat) {
-        //sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ReturnEx, "returnex");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetParam, "getparam");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetParam, "setparam");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_EnableIRMode, "enableirmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_DisableIRMode, "disableirmode");
@@ -1850,7 +1902,7 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapNew, "heapnew");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_HeapSet, "heapset");
@@ -1884,9 +1936,9 @@ void sithCogFunction_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
         sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
         sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS TODO
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS TODO
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS TODO
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS
     }
     
     // Droidworks

@@ -57,6 +57,10 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_ENUMPLAYERS] = stdComm_cogMsg_HandleEnumPlayers;
     sithComm_msgFuncs[DSS_RESET] = sithComm_cogMsg_Reset;
     sithComm_msgFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
+
+    if (Main_bMotsCompat) {
+        sithComm_msgFuncs[DSS_MOTS_NEW_1] = sithDSSThing_ProcessMOTSNew1;
+    }
     sithComm_bInit = 1;
     return 1;
 }

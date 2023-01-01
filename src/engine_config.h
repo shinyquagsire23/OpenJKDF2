@@ -142,6 +142,8 @@
 #define STDCONF_LINEBUFFER_LEN (2048)
 #endif
 
+#define SITHAI_MAX_ACTORS (256)
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation

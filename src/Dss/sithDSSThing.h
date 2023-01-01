@@ -98,7 +98,9 @@ int sithDSSThing_ProcessDestroyThing(sithCogMsg *msg);
 
 void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sithSector *pSector);
 
-
+int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg);
+void sithDSSThing_SendMOTSNew1(sithThing* pThing1, sithThing* pThing2, sithThing* pThing3, sithSector* pSector, 
+    rdVector3* pVec1, rdVector3* pVec2, int mpFlags, int param_8);
 
 //static void (*sithDSSThing_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_SendPlayKey_ADDR;
 //static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;

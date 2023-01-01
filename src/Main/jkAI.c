@@ -54,7 +54,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     v8 = actor->thing->playerInfo;
     if ( !v8 )
         return 0;
-    v9 = actor->field_1D0;
+    v9 = actor->pDistractor;
     if ( !v9 )
         return 0;
     if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
@@ -75,14 +75,14 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 v12 = actor->field_1F4;
                 if ( v12 == 3
                   && ((actor->thing->actorParams.typeflags & SITH_TF_NOIMPACTDAMAGE) != 0
-                   || (v13 = actor->field_1D0) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
+                   || (v13 = actor->pDistractor) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
                 {
                     actor->field_1F0 = 0.0;
                 }
                 else
                 {
                     if ( v12 != 3 )
-                        sithAI_SetLookFrame(actor, &actor->field_1D0->position);
+                        sithAI_SetLookFrame(actor, &actor->pDistractor->position);
                     if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
                     {
 LABEL_27:
@@ -202,7 +202,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 instinct->param0 = 0.0;
                 instinct->nextUpdate = v11;
             }
-            if ( actor->field_1D0 )
+            if ( actor->pDistractor )
             {
                 instinct->nextUpdate = v10 + aiclass->argsAsInt[0];
                 if ( actor->field_288 <= v10 && aiclass->argsAsFloat[1] >= _frand() )
@@ -262,7 +262,7 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     v14 = 0;
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
     sithAI_sub_4EAD60(actor);
-    if ( !actor->field_1D0 || actor->field_1F4 )
+    if ( !actor->pDistractor || actor->field_1F4 )
         return 0;
     v7 = _frand();
     instincta = v7;
@@ -289,7 +289,7 @@ LABEL_25:
     if ( v6 )
     {
         v13 = (float)v14;
-        v12 = (float)(unsigned int)actor->field_1D0->thingIdx;
+        v12 = (float)(unsigned int)actor->pDistractor->thingIdx;
         sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
         instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[v6 + 9];
     }

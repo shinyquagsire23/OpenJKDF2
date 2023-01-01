@@ -103,6 +103,7 @@ enum SITHAI_EVENT_E
 extern int sithAI_bOpened;
 extern sithActor sithAI_actors[256];
 extern int sithAI_inittedActors;
+extern sithAIAlign sithAI_aAlignments[10];
 
 int sithAI_Startup();
 void sithAI_Shutdown();
@@ -139,6 +140,10 @@ void sithAI_RandomRotationVector(rdVector3 *out);
 int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, int bAltFire, int a7);
 void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3);
 int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3);
+
+void sithAI_SetDistractor(sithThing *pDistractor);
+void sithAI_AddAlignmentPriority(float param_1);
+int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;

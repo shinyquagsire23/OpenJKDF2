@@ -198,7 +198,7 @@ void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithTh
         if ( COG_SHOULD_SYNC(ctx) )
         {
             if (pThingIn) {
-                //sithDSSThing_SendMOTSNew1(); // MOTS added TODO TODO
+                sithDSSThing_SendMOTSNew1(popTemplate, v7, NULL, popSector, &pos, &rot, 0xff, idk); // MOTS added
                 sithCogExec_PushInt(ctx, v7->thingIdx);
                 return;
             }

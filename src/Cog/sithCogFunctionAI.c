@@ -397,7 +397,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
             if ( v3 )
             {
                 v4 = sithTime_curMs;
-                v3->field_1D0 = v1;
+                v3->pDistractor = v1;
                 v3->field_204 = v4;
                 v5 = v3->flags;
                 if ( v1 )
@@ -577,6 +577,151 @@ void sithCogFunctionAI_AIGetInterest(sithCog *ctx)
     sithCogExec_PushInt(ctx, -1);
 }
 
+// MOTS added
+void sithCogFunctionAI_AISetDistractor(sithCog *ctx)
+{
+    sithThing *pThing;
+
+    pThing = sithCogExec_PopThing(ctx);
+    sithAI_SetDistractor(pThing);
+}
+
+// MOTS added
+void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
+{
+    int iVar1;
+    int *piVar3;
+    int iVar4;
+    int val;
+    int iVar5;
+    float fVar6;
+    float local_4;
+
+    local_4 = 1.0;
+    iVar5 = -1000;
+    val = -1;
+    iVar1 = sithCogExec_PopInt(ctx);
+    fVar6 = sithCogExec_PopFlex(ctx);
+    iVar4 = 0;
+
+    for (int i = 0; i < 10; i++) {
+        if (sithAI_aAlignments[i].bValid == 0) {
+            sithAI_aAlignments[i].bValid = 1;
+            sithAI_aAlignments[i].field_4 = iVar1;
+            sithAI_aAlignments[i].field_8 = fVar6;
+            val = i;
+            break;
+        }
+    }
+
+    if (val != -1) 
+    {
+        for (int i = 0; i < 10; i++) {
+            if (sithAI_aAlignments[i].bValid != 0 && iVar5 < sithAI_aAlignments[i].field_4) {
+                iVar5 = sithAI_aAlignments[i].field_4;
+                local_4 = sithAI_aAlignments[i].field_8;
+            }
+        }
+    }
+
+    sithAI_AddAlignmentPriority(local_4);
+    sithCogExec_PushInt(ctx,val);
+    return;
+}
+
+
+void sithCogFunctionAI_AIRemoveAlignmentPriority(sithCog *ctx)
+{
+    int iVar1;
+    sithAIAlign *psVar2;
+    int *piVar3;
+    int iVar4;
+
+    iVar1 = sithCogExec_PopInt(ctx);
+    if (iVar1 == -1) {
+        for (int i = 0; i < 10; i++) {
+            sithAI_aAlignments[i].bValid = 0;
+        }
+        return;
+    }
+
+    if ((-1 < iVar1) && (iVar1 < 11)) 
+    {
+        float tmp = 1.0;
+        iVar4 = -1000;
+        sithAI_aAlignments[iVar1].bValid = 0;
+        for (int i = 0; i < 10; i++) {
+            if (sithAI_aAlignments[i].bValid != 0 && iVar4 < sithAI_aAlignments[i].field_4) {
+                iVar4 = sithAI_aAlignments[i].field_4;
+                tmp = sithAI_aAlignments[i].field_8;
+            }
+        }
+        sithAI_AddAlignmentPriority(tmp);
+    }
+}
+
+// MoTS Added
+void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
+{
+    sithThing *v2; // eax
+    sithThing *v3; // ebx
+    int v4; // eax
+    signed int v5; // [esp+10h] [ebp-38h]
+    float v6; // [esp+14h] [ebp-34h]
+    rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
+    float a1; // [esp+4Ch] [ebp+4h]
+
+    v5 = sithCogExec_PopInt(ctx);
+    a1 = sithCogExec_PopFlex(ctx);
+    v6 = sithCogExec_PopFlex(ctx);
+    v2 = sithCogExec_PopThing(ctx);
+    
+    // Added
+    if (g_debugmodeFlags & 1)
+    {
+        sithCogExec_PushInt(ctx, -1);
+        return;
+    }
+    
+    v3 = v2;
+    if ( v2
+      && ((_memcpy(&v7, &v2->lookOrientation, sizeof(v7)), v4 = v2->type, v4 == SITH_THING_ACTOR) || v4 == SITH_THING_PLAYER ? (rdMatrix_PreRotate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->actorParams.eyePYR),
+                                                                                                                                   rdMatrix_PostTranslate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->position),
+                                                                                                                                   rdMatrix_PreTranslate34(
+                                                                                                                                       &v7,
+                                                                                                                                       &v3->actorParams.eyeOffset)) : rdMatrix_PostTranslate34(&v7, &v3->position),
+          (sithCogFunctionAI_unk1 = sithAI_FirstThingInCone(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_apViewThings, v5, a1), sithCogFunctionAI_viewThingIdx = 0, sithCogFunctionAI_unk1 > 0)
+       && sithCogFunctionAI_apViewThings[0]) )
+    {
+        sithCogExec_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
+    }
+    else
+    {
+        sithCogExec_PushInt(ctx, -1);
+    }
+}
+
+
+// MoTS added
+void sithCogFunctionAI_NextThingInCone(sithCog *ctx)
+{
+    sithCogFunctionAI_viewThingIdx++;
+
+    if (sithCogFunctionAI_viewThingIdx < sithCogFunctionAI_unk1 
+        && sithCogFunctionAI_apViewThings[sithCogFunctionAI_viewThingIdx]) 
+    {
+        sithCogExec_PushInt(ctx,sithCogFunctionAI_apViewThings[sithCogFunctionAI_viewThingIdx]->thingIdx);
+        return;
+    }
+    sithCogExec_PushInt(ctx,-1);
+}
+
+
+
 void sithCogFunctionAI_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
@@ -586,11 +731,11 @@ void sithCogFunctionAI_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_SetMovePos, "aisetmovepos");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
     if (Main_bMotsCompat) {
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone"); // TODO
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
     if (Main_bMotsCompat) {
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone"); // TODO
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
@@ -609,9 +754,9 @@ void sithCogFunctionAI_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor"); // TODO
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority"); // TODO
-        //sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority"); // TODO
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
     }
 #endif
 }

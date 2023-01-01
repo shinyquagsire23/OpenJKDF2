@@ -1315,3 +1315,97 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
         rdVector_Scale3(&pThing->physicsParams.vel, &a1, 4.0);
     }
 }
+
+// MOTS added
+int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
+{
+    int thing_id;
+    sithThing *psVar1;
+    sithThing *psVar2;
+    sithSector *sector;
+    uint32_t uVar3;
+    int puVar4;
+    rdVector3 local_54;
+    rdVector3 local_48;
+    rdVector3 local_3c;
+    rdMatrix34 local_30;
+
+    NETMSG_IN_START(msg);
+
+    psVar1 = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+    if (psVar1 == NULL) 
+    {
+        return 0;
+    }
+    thing_id = NETMSG_POPS32();
+    puVar4 = NETMSG_POPS32();
+    if (thing_id < 0)
+    {
+        sector = sithSector_GetPtrFromIdx(puVar4);
+        if (sector == NULL)
+        {
+            return 0;
+        }
+        local_3c = NETMSG_POPVEC3();
+        local_54 = NETMSG_POPVEC3();
+        rdVector_Zero3(&local_48);
+
+        rdMatrix_BuildRotate34(&local_30,&local_48);
+
+        uVar3 = NETMSG_POPS32();
+        psVar2 = sithThing_GetById(NETMSG_POPS32());
+        psVar1 = sithThing_Create(psVar1,&local_3c,&local_30,sector,psVar2);
+        if (!rdVector_IsZero3(&local_54))
+        {
+            rdVector_Normalize3Acc(&local_54);
+            rdMatrix_BuildFromLook34(&psVar1->lookOrientation,&local_54);
+        }
+    }
+    else 
+    {
+        psVar2 = sithThing_GetById(thing_id);
+        if (psVar2 == NULL)
+        {
+            return 0;
+        }
+        psVar1 = sithThing_SpawnTemplate(psVar1,psVar2);
+        uVar3 = puVar4;
+    }
+
+    if (psVar1 == NULL)
+    {
+        return 0;
+    }
+    psVar1->thing_id = uVar3;
+    psVar1->thingflags |= SITH_TF_INVULN;
+    return 1;
+}
+
+// MOTS added
+void sithDSSThing_SendMOTSNew1(sithThing* pThing1, sithThing* pThing2, sithThing* pThing3, sithSector* pSector, 
+    rdVector3* pVec1, rdVector3* pVec2, int mpFlags, int param_8)
+{
+    NETMSG_START;
+
+    NETMSG_PUSHS16(pThing1->thingIdx);
+
+    if (pThing3 == NULL)
+    {
+        NETMSG_PUSHS32(-1);
+        NETMSG_PUSHS32(pSector->id);
+        NETMSG_PUSHVEC3(*pVec1);
+        NETMSG_PUSHVEC3(*pVec2);
+    }
+    else 
+    {
+        NETMSG_PUSHS32(pThing3->thing_id);
+    }
+
+    sithThing* psVar1 = pThing2->prev_thing;
+    NETMSG_PUSHS32(pThing2->thing_id);
+    NETMSG_PUSHS32(psVar1->thing_id);
+
+    NETMSG_END(DSS_MOTS_NEW_1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, mpFlags, param_8);
+}
+
