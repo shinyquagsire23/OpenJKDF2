@@ -112,8 +112,8 @@ void jkHudInv_Draw()
     int j; // ebp
     sithItemDescriptor *v6; // ebx
     stdBitmap *v7; // eax
-    int v8; // edi
-    int v9; // ebp
+    int curItem; // edi
+    int curPower; // ebp
     unsigned int time_msec; // esi
     int v11; // ecx
     int v12; // eax
@@ -125,7 +125,6 @@ void jkHudInv_Draw()
     int v18; // esi
     int v19; // edi
     unsigned int v20; // ebx
-    stdVBuffer *v21; // ebp
     int v22; // eax
     signed int v23; // eax
     int v24; // ebp
@@ -134,14 +133,12 @@ void jkHudInv_Draw()
     int v27; // edi
     int v28; // ebx
     unsigned int v29; // esi
-    stdVBuffer *v30; // ebp
     int v31; // eax
     sithItemDescriptor *v32; // ebx
     stdBitmap *v33; // edi
     int v34; // esi
     int v35; // ebp
     int v36; // edi
-    stdVBuffer *v37; // ebx
     unsigned int v38; // ebp
     int v39; // eax
     int a2; // [esp+14h] [ebp-2Ch]
@@ -153,253 +150,253 @@ void jkHudInv_Draw()
     wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
 
     player = sithWorld_pCurrentWorld->playerThing;
-    if ( player->type == SITH_THING_PLAYER )
+    if ( player->type != SITH_THING_PLAYER ) {
+        return;
+    }
+
+    v1 = 0;
+    v2 = 0;
+    for ( i = 8; v2 < jkHudInv_numItems; ++v2 )
     {
-        v1 = 0;
-        v2 = 0;
-        for ( i = 8; v2 < jkHudInv_numItems; ++v2 )
+        if ( v1 >= jkHudInv_scroll.scroll )
+            break;
+        if ( sithInventory_GetActivate(player, jkHudInv_aItems[v2]) )
         {
-            if ( v1 >= jkHudInv_scroll.scroll )
-                break;
-            if ( sithInventory_GetActivate(player, jkHudInv_aItems[v2]) )
+            v4 = sithInventory_GetItemDesc(player, jkHudInv_aItems[v2])->hudBitmap;
+            if ( v4 )
             {
-                v4 = sithInventory_GetItemDesc(player, jkHudInv_aItems[v2])->hudBitmap;
-                if ( v4 )
+                stdDisplay_VBufferCopy(Video_pMenuBuffer, *v4->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
+                i += 28;
+                ++v1;
+            }
+        }
+    }
+
+    for ( j = 0; j < SITHBIN_NUMBINS; ++j )
+    {
+        if ( v1 >= jkHudInv_scroll.scroll )
+            break;
+        v6 = sithInventory_GetBinByIdx(j);
+        if (v6->flags & ITEMINFO_ITEM)
+        {
+            if ( sithInventory_GetActivate(player, j) )
+            {
+                v7 = v6->hudBitmap;
+                if ( v7 )
                 {
-                    stdDisplay_VBufferCopy(Video_pMenuBuffer, *v4->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
+                    stdDisplay_VBufferCopy(Video_pMenuBuffer, *v7->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
                     i += 28;
                     ++v1;
                 }
             }
         }
-        for ( j = 0; j < SITHBIN_NUMBINS; ++j )
+    }
+
+    if ( v1 < jkHudInv_scroll.maxItemRend )
+    {
+        jkHudInv_scroll.field_C = 2;
+        jkHudInv_scroll.field_10 = v1;
+        if ( jkHudInv_scroll.rendIdx <= jkHudInv_scroll.maxItemRend - 1 )
+            jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
+    }
+    jkHudInv_scroll.maxItemRend = v1;
+    curItem = sithInventory_GetCurItem(player);
+    curPower = sithInventory_GetCurPower(player);
+    time_msec = stdPlatform_GetTimeMsec();
+    v11 = 0;
+    if ( sithInventory_bRendIsHidden )
+    {
+        sithInventory_bRendIsHidden = 0;
+        jkHudInv_info.rend_timeout_5secs = time_msec + 5000;
+        jkHudInv_rend_isshowing_maybe = 1;
+        jkHudInv_dword_553F94 = 0;
+    }
+    else if ( sithInventory_8339F4 )
+    {
+        sithInventory_8339F4 = 0;
+        jkHudInv_info.rend_timeout_5secs = time_msec + 5000;
+        jkHudInv_dword_553F94 = 1;
+        jkHudInv_rend_isshowing_maybe = 0;
+    }
+    if ( time_msec > jkHudInv_info.rend_timeout_5secs || sithInventory_8339EC == 1 )
+    {
+        if ( jkHudInv_info.field_24 )
         {
-            if ( v1 >= jkHudInv_scroll.scroll )
-                break;
-            v6 = sithInventory_GetBinByIdx(j);
-            if ( (v6->flags & 2) != 0 )
-            {
-                if ( sithInventory_GetActivate(player, j) )
-                {
-                    v7 = v6->hudBitmap;
-                    if ( v7 )
-                    {
-                        stdDisplay_VBufferCopy(Video_pMenuBuffer, *v7->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
-                        i += 28;
-                        ++v1;
-                    }
-                }
-            }
+            jkHudInv_info.field_28 = 2;
+            jkHudInv_info.field_24 = 0;
         }
-        if ( v1 < jkHudInv_scroll.maxItemRend )
+        jkHudInv_rend_isshowing_maybe = 0;
+        jkHudInv_dword_553F94 = 0;
+    }
+    else
+    {
+        jkHudInv_info.field_24 = 1;
+        if ( jkHudInv_rend_isshowing_maybe && curItem )
         {
-            jkHudInv_scroll.field_C = 2;
-            jkHudInv_scroll.field_10 = v1;
-            if ( jkHudInv_scroll.rendIdx <= jkHudInv_scroll.maxItemRend - 1 )
-                jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
-        }
-        jkHudInv_scroll.maxItemRend = v1;
-        v8 = sithInventory_GetCurItem(player);
-        v9 = sithInventory_GetCurPower(player);
-        time_msec = stdPlatform_GetTimeMsec();
-        v11 = 0;
-        if ( sithInventory_bRendIsHidden )
-        {
-            sithInventory_bRendIsHidden = 0;
-            jkHudInv_info.rend_timeout_5secs = time_msec + 5000;
-            jkHudInv_rend_isshowing_maybe = 1;
-            jkHudInv_dword_553F94 = 0;
-        }
-        else if ( sithInventory_8339F4 )
-        {
-            sithInventory_8339F4 = 0;
-            jkHudInv_info.rend_timeout_5secs = time_msec + 5000;
-            jkHudInv_dword_553F94 = 1;
-            jkHudInv_rend_isshowing_maybe = 0;
-        }
-        if ( time_msec > jkHudInv_info.rend_timeout_5secs || sithInventory_8339EC == 1 )
-        {
-            if ( jkHudInv_info.field_24 )
-            {
-                jkHudInv_info.field_28 = 2;
-                jkHudInv_info.field_24 = 0;
-            }
-            jkHudInv_rend_isshowing_maybe = 0;
-            jkHudInv_dword_553F94 = 0;
+            v12 = 2;
         }
         else
         {
-            jkHudInv_info.field_24 = 1;
-            if ( jkHudInv_rend_isshowing_maybe && v8 )
+            if ( !jkHudInv_dword_553F94 || !curPower )
+                return;
+            v12 = 8;
+        }
+        jkHudInv_flags = v12;
+        if ( v12 == jkHudInv_dword_553F64 )
+        {
+            v13 = jkHudInv_info.field_18;
+        }
+        else
+        {
+            v13 = 0;
+            jkHudInv_info.field_1C = time_msec + 100;
+            jkHudInv_dword_553F64 = v12;
+            jkHudInv_info.field_28 = 2;
+            jkHudInv_info.field_18 = 0;
+            v11 = 0;
+        }
+        if ( v12 == 8 )
+        {
+            a2 = curPower;
+            v11 = 1;
+        }
+        else
+        {
+            a2 = curItem;
+        }
+        v14 = jkHudInv_aBitmaps[v11];
+        if ( v14 )
+        {
+            v15 = v14->numMips;
+            if ( v15 > 1 && time_msec > jkHudInv_info.field_1C )
             {
-                v12 = 2;
-            }
-            else
-            {
-                if ( !jkHudInv_dword_553F94 || !v9 )
-                    return;
-                v12 = 8;
-            }
-            jkHudInv_flags = v12;
-            if ( v12 == jkHudInv_dword_553F64 )
-            {
-                v13 = jkHudInv_info.field_18;
-            }
-            else
-            {
-                v13 = 0;
+                v13 = (v13 + 1) % v15;
                 jkHudInv_info.field_1C = time_msec + 100;
-                jkHudInv_dword_553F64 = v12;
-                jkHudInv_info.field_28 = 2;
-                jkHudInv_info.field_18 = 0;
-                v11 = 0;
+                jkHudInv_info.field_18 = v13;
             }
-            if ( v12 == 8 )
+            stdDisplay_VBufferCopy(Video_pMenuBuffer, v14->mipSurfaces[v13], jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], 0, 1);
+        }
+        v16 = sithInventory_GetItemDesc(player, a2);
+        v17 = v16->hudBitmap;
+        if ( v17 || (v17 = jkHudInv_aBitmaps[2]) != 0 )
+        {
+            v18 = (__int64)sithInventory_GetBinAmount(player, a2);
+            if ( v18 <= 0 )
             {
-                a2 = v9;
-                v11 = 1;
+                jkHudInv_rend_isshowing_maybe = 0;
+                jkHudInv_dword_553F94 = 0;
+                return;
             }
-            else
+            stdDisplay_VBufferCopy(Video_pMenuBuffer, *v17->mipSurfaces, jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
+            if (v16->flags & ITEMINFO_ITEM)
             {
-                a2 = v8;
-            }
-            v14 = jkHudInv_aBitmaps[v11];
-            if ( v14 )
-            {
-                v15 = v14->numMips;
-                if ( v15 > 1 && time_msec > jkHudInv_info.field_1C )
+                char tmpChars[4];
+                v19 = jkHudInv_info.field_4;
+                v20 = jkHudInv_info.field_0;
+                stdString_snprintf(tmpChars, 4, "%d", v18);
+                stdString_CharToWchar(a6, tmpChars, 3);
+                v22 = 99;
+                if ( v18 <= 99 )
+                    v22 = v18;
+                if ( v22 <= 9 )
                 {
-                    v13 = (v13 + 1) % v15;
-                    jkHudInv_info.field_1C = time_msec + 100;
-                    jkHudInv_info.field_18 = v13;
+                    if ( v22 > 1 )
+                        stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v20 + 18, v19 + 2, 640, a6, 1);
                 }
-                stdDisplay_VBufferCopy(Video_pMenuBuffer, v14->mipSurfaces[v13], jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], 0, 1);
-            }
-            v16 = sithInventory_GetItemDesc(player, a2);
-            v17 = v16->hudBitmap;
-            if ( v17 || (v17 = jkHudInv_aBitmaps[2]) != 0 )
-            {
-                v18 = (__int64)sithInventory_GetBinAmount(player, a2);
-                if ( v18 <= 0 )
+                else
                 {
-                    jkHudInv_rend_isshowing_maybe = 0;
-                    jkHudInv_dword_553F94 = 0;
-                    return;
-                }
-                stdDisplay_VBufferCopy(Video_pMenuBuffer, *v17->mipSurfaces, jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
-                if ( (v16->flags & 2) != 0 )
-                {
-                    char tmpChars[4];
-                    v19 = jkHudInv_info.field_4;
-                    v20 = jkHudInv_info.field_0;
-                    v21 = Video_pMenuBuffer;
-                    stdString_snprintf(tmpChars, 4, "%d", v18);
-                    stdString_CharToWchar(a6, tmpChars, 3);
-                    v22 = 99;
-                    if ( v18 <= 99 )
-                        v22 = v18;
-                    if ( v22 <= 9 )
-                    {
-                        if ( v22 > 1 )
-                            stdFont_Draw1(v21, jkHudInv_font, v20 + 18, v19 + 2, 640, a6, 1);
-                    }
-                    else
-                    {
-                        stdFont_Draw1(v21, jkHudInv_font, v20 + 14, v19 + 2, 640, a6, 1);
-                    }
+                    stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v20 + 14, v19 + 2, 640, a6, 1);
                 }
             }
-            v23 = a2;
-            v24 = 32;
-            idx = a2;
-            v43 = 32;
-            while ( 1 )
+        }
+        v23 = a2;
+        v24 = 32;
+        idx = a2;
+        v43 = 32;
+        while ( 1 )
+        {
+            if ( v23 >= 0 )
+                idx = sithInventory_GetNumBinsWithFlagRev(player, v23, jkHudInv_flags);
+            if ( idx == a2 )
+                break;
+            if ( idx >= 0 )
             {
-                if ( v23 >= 0 )
-                    idx = sithInventory_GetNumBinsWithFlagRev(player, v23, jkHudInv_flags);
-                if ( idx == a2 )
-                    break;
-                if ( idx >= 0 )
+                v25 = sithInventory_GetItemDesc(player, idx);
+                v26 = v25->hudBitmap;
+                if ( v26 || (v26 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v25 = sithInventory_GetItemDesc(player, idx);
-                    v26 = v25->hudBitmap;
-                    if ( v26 || (v26 = jkHudInv_aBitmaps[2]) != 0 )
+                    v27 = (__int64)sithInventory_GetBinAmount(player, idx);
+                    if ( v27 <= 0 )
+                        goto LABEL_84;
+                    stdDisplay_VBufferCopy(Video_pMenuBuffer, *v26->mipSurfaces, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, 0, 1);
+                    if (v25->flags & ITEMINFO_ITEM)
                     {
-                        v27 = (__int64)sithInventory_GetBinAmount(player, idx);
-                        if ( v27 <= 0 )
-                            goto LABEL_84;
-                        stdDisplay_VBufferCopy(Video_pMenuBuffer, *v26->mipSurfaces, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, 0, 1);
-                        if ( (v25->flags & 2) != 0 )
+                        v28 = jkHudInv_info.field_4;
+                        v29 = jkHudInv_info.field_0 - v24;
+                        stdString_snprintf(v44, 4, "%d", v27);
+                        stdString_CharToWchar(v48, v44, 3);
+                        v31 = 99;
+                        if ( v27 <= 99 )
+                            v31 = v27;
+                        if ( v31 <= 9 )
                         {
-                            v28 = jkHudInv_info.field_4;
-                            v29 = jkHudInv_info.field_0 - v24;
-                            v30 = Video_pMenuBuffer;
-                            stdString_snprintf(v44, 4, "%d", v27);
-                            stdString_CharToWchar(v48, v44, 3);
-                            v31 = 99;
-                            if ( v27 <= 99 )
-                                v31 = v27;
-                            if ( v31 <= 9 )
-                            {
-                                if ( v31 > 1 )
-                                    stdFont_Draw1(v30, jkHudInv_font, v29 + 18, v28 + 2, 640, v48, 1);
-                            }
-                            else
-                            {
-                                stdFont_Draw1(v30, jkHudInv_font, v29 + 14, v28 + 2, 640, v48, 1);
-                            }
+                            if ( v31 > 1 )
+                                stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v29 + 18, v28 + 2, 640, v48, 1);
+                        }
+                        else
+                        {
+                            stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v29 + 14, v28 + 2, 640, v48, 1);
                         }
                     }
                 }
-                if ( a2 >= 0 )
-                    a2 = sithInventory_GetNumBinsWithFlag(player, a2, jkHudInv_flags);
-                if ( idx == a2 )
-                    return;
-                if ( a2 >= 0 )
+            }
+            if ( a2 >= 0 )
+                a2 = sithInventory_GetNumBinsWithFlag(player, a2, jkHudInv_flags);
+            if ( idx == a2 )
+                return;
+            if ( a2 >= 0 )
+            {
+                v32 = sithInventory_GetItemDesc(player, a2);
+                v33 = v32->hudBitmap;
+                if ( v33 || (v33 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v32 = sithInventory_GetItemDesc(player, a2);
-                    v33 = v32->hudBitmap;
-                    if ( v33 || (v33 = jkHudInv_aBitmaps[2]) != 0 )
+                    v34 = (__int64)sithInventory_GetBinAmount(player, a2);
+                    if ( v34 <= 0 )
                     {
-                        v34 = (__int64)sithInventory_GetBinAmount(player, a2);
-                        if ( v34 <= 0 )
-                        {
 LABEL_84:
-                            jkHudInv_rend_isshowing_maybe = 0;
-                            jkHudInv_dword_553F94 = 0;
-                            return;
-                        }
-                        v35 = v43;
-                        stdDisplay_VBufferCopy(Video_pMenuBuffer, *v33->mipSurfaces, v43 + jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
-                        if ( (v32->flags & 2) != 0 )
+                        jkHudInv_rend_isshowing_maybe = 0;
+                        jkHudInv_dword_553F94 = 0;
+                        return;
+                    }
+                    v35 = v43;
+                    stdDisplay_VBufferCopy(Video_pMenuBuffer, *v33->mipSurfaces, v43 + jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
+                    if (v32->flags & ITEMINFO_ITEM)
+                    {
+                        char tmpChars[4];
+                        v36 = jkHudInv_info.field_4;
+                        v38 = jkHudInv_info.field_0 + v35;
+                        stdString_snprintf(tmpChars, 4, "%d", v34);
+                        stdString_CharToWchar(v50, tmpChars, 3);
+                        v39 = 99;
+                        if ( v34 <= 99 )
+                            v39 = v34;
+                        if ( v39 <= 9 )
                         {
-                            char tmpChars[4];
-                            v36 = jkHudInv_info.field_4;
-                            v37 = Video_pMenuBuffer;
-                            v38 = jkHudInv_info.field_0 + v35;
-                            stdString_snprintf(tmpChars, 4, "%d", v34);
-                            stdString_CharToWchar(v50, tmpChars, 3);
-                            v39 = 99;
-                            if ( v34 <= 99 )
-                                v39 = v34;
-                            if ( v39 <= 9 )
-                            {
-                                if ( v39 > 1 )
-                                    stdFont_Draw1(v37, jkHudInv_font, v38 + 18, v36 + 2, 640, v50, 1);
-                            }
-                            else
-                            {
-                                stdFont_Draw1(v37, jkHudInv_font, v38 + 14, v36 + 2, 640, v50, 1);
-                            }
+                            if ( v39 > 1 )
+                                stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v38 + 18, v36 + 2, 640, v50, 1);
+                        }
+                        else
+                        {
+                            stdFont_Draw1(Video_pMenuBuffer, jkHudInv_font, v38 + 14, v36 + 2, 640, v50, 1);
                         }
                     }
                 }
-                v24 = v43 + 32;
-                v43 += 32;
-                if ( v43 >= 96 )
-                    return;
-                v23 = idx;
             }
+            v24 = v43 + 32;
+            v43 += 32;
+            if ( v43 >= 96 )
+                return;
+            v23 = idx;
         }
     }
 }

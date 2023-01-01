@@ -16,6 +16,7 @@
 // MOTS added
 static int sithInventory_008d60f8;
 static int sithInventory_008d60fc;
+static const int sithInventory_aMotsForcePowerBins[18] = {0, SITHBIN_F_JUMP, SITHBIN_F_SPEED, SITHBIN_F_SEEING, SITHBIN_F_PROJECT, SITHBIN_F_PUSH, SITHBIN_F_PULL, SITHBIN_F_GRIP, SITHBIN_F_FARSIGHT, SITHBIN_F_SABERTHROW, SITHBIN_F_HEALING, SITHBIN_F_PERSUASION, SITHBIN_F_BLINDING, SITHBIN_F_CHAINLIGHT, SITHBIN_F_ABSORB, SITHBIN_F_PROTECTION, SITHBIN_F_DESTRUCTION, SITHBIN_F_DEADLYSIGHT};
 
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
 {
@@ -32,54 +33,178 @@ void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, flo
 
 int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags)
 {
-    if ( binNum + 1 < SITHBIN_NUMBINS )
+    if (flags == 8 && Main_bMotsCompat)
     {
-        for (int i = binNum + 1; i < SITHBIN_NUMBINS; i++)
+        sithPlayerInfo *puVar1;
+        sithPlayerInfo *puVar2;
+        sithPlayerInfo *puVar3;
+        sithPlayerInfo *puVar4;
+        sithPlayerInfo *psVar3;
+        int iVar4;
+        int iVar2 = 0;
+        const int* piVar1 = sithInventory_aMotsForcePowerBins + 1;
+        do 
+        {
+            iVar4 = iVar2;
+            if (*piVar1 == binNum) break;
+            piVar1 = piVar1 + 1;
+            iVar2 = iVar2 + 1;
+            iVar4 = binNum;
+        } 
+        while (piVar1 < &sithInventory_aMotsForcePowerBins[18]);
+
+        if (iVar2 == 0x11) {
+            iVar4 = 0;
+        }
+        uint32_t uVar5 = iVar4 + 1;
+        if (uVar5 < 0x11)
+        {
+            puVar1 = thing->actorParams.playerinfo;
+            piVar1 = sithInventory_aMotsForcePowerBins + iVar4 + 2;
+            do 
+            {
+                if (((puVar1 != (sithPlayerInfo *)0xffffff78) &&
+                    ((sithInventory_aDescriptors[*piVar1].flags & 1) != 0)) &&
+                    ((puVar1->iteminfo[*piVar1].state & 4) != 0)) {
+                    return sithInventory_aMotsForcePowerBins[uVar5 + 1];
+                }
+                piVar1 = piVar1 + 1;
+                uVar5 = uVar5 + 1;
+            }
+            while (piVar1 < &sithInventory_aMotsForcePowerBins[18]);
+        }
+
+        uVar5 = 0;
+        if (0 < iVar4)
+        {
+            puVar2 = thing->actorParams.playerinfo;
+            piVar1 = sithInventory_aMotsForcePowerBins;
+            do
+            {
+                piVar1 = piVar1 + 1;
+                if (((puVar2 != (sithPlayerInfo *)0xffffff78) &&
+                    ((sithInventory_aDescriptors[*piVar1].flags & 1) != 0)) &&
+                    ((puVar2->iteminfo[*piVar1].state & 4) != 0)) {
+                    return sithInventory_aMotsForcePowerBins[uVar5 + 1];
+                }
+                uVar5 = uVar5 + 1;
+            } while ((int)uVar5 < iVar4);
+        }
+        return -1;
+    }
+    else {
+        if ( binNum + 1 < SITHBIN_NUMBINS )
+        {
+            for (int i = binNum + 1; i < SITHBIN_NUMBINS; i++)
+            {
+                sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
+
+                if ((flags & desc->flags) && thing->actorParams.playerinfo != (sithPlayerInfo *)-136 && (desc->flags & ITEMINFO_VALID) && (thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE))
+                    return i;
+            }
+        }
+       
+        if ( binNum <= 0 )
+            return -1;
+
+        for (int i = 0; i < SITHBIN_NUMBINS; i++)
         {
             sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
 
             if ((flags & desc->flags) && thing->actorParams.playerinfo != (sithPlayerInfo *)-136 && (desc->flags & ITEMINFO_VALID) && (thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE))
                 return i;
         }
-    }
-   
-    if ( binNum <= 0 )
+
         return -1;
-
-    for (int i = 0; i < SITHBIN_NUMBINS; i++)
-    {
-        sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
-
-        if ((flags & desc->flags) && thing->actorParams.playerinfo != (sithPlayerInfo *)-136 && (desc->flags & ITEMINFO_VALID) && (thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE))
-            return i;
     }
-
-    return -1;
 }
 
 int sithInventory_GetNumBinsWithFlagRev(sithThing *thing, int binNumEnd, int flags)
 {
-    if ( binNumEnd - 1 >= 0 )
+    if (flags == 8 && Main_bMotsCompat)
     {
-        for (int i = binNumEnd - 1; i >= 0; --i)
+        int iVar8 = 0;
+        sithPlayerInfo *puVar1;
+        sithPlayerInfo *puVar2;
+        sithPlayerInfo *puVar3;
+        sithPlayerInfo *puVar7;
+
+        int iVar6 = 0;
+        const int* piVar5 = sithInventory_aMotsForcePowerBins + 1;
+        do 
+        {
+            iVar8 = iVar6;
+            if (*piVar5 == binNumEnd) break;
+            piVar5 = piVar5 + 1;
+            iVar6 = iVar6 + 1;
+            iVar8 = binNumEnd;
+        } 
+        while (piVar5 < &sithInventory_aMotsForcePowerBins[18]);
+
+        if (iVar6 == 0x11) {
+          iVar8 = 0;
+        }
+
+        iVar6 = iVar8 + -1;
+        if (-1 < iVar6)
+        {
+            puVar1 = thing->actorParams.playerinfo;
+            piVar5 = sithInventory_aMotsForcePowerBins + iVar8;
+            do 
+            {
+                if (((puVar1 != (sithPlayerInfo *)0xffffff78) &&
+                    ((sithInventory_aDescriptors[*piVar5].flags & 1) != 0)) &&
+                    ((puVar1->iteminfo[*piVar5].state & 4) != 0)) {
+                    return sithInventory_aMotsForcePowerBins[iVar6 + 1];
+                }
+                iVar6 = iVar6 + -1;
+                piVar5 = piVar5 + -1;
+            }
+            while (-1 < iVar6);
+        }
+
+        iVar6 = 0x10;
+        if (iVar8 < 0x10)
+        {
+            puVar2 = thing->actorParams.playerinfo;
+            piVar5 = sithInventory_aMotsForcePowerBins + 0x11;
+            do 
+            {
+                if (((puVar2 != (sithPlayerInfo *)0xffffff78) &&
+                    ((sithInventory_aDescriptors[*piVar5].flags & 1) != 0)) &&
+                    ((puVar2->iteminfo[*piVar5].state & 4) != 0)) {
+                    return sithInventory_aMotsForcePowerBins[iVar6 + 1];
+                }
+                iVar6 = iVar6 + -1;
+                piVar5 = piVar5 + -1;
+            }
+            while (iVar8 < iVar6);
+        }
+        return -1;
+    }
+    else {
+        if ( binNumEnd - 1 >= 0 )
+        {
+            for (int i = binNumEnd - 1; i >= 0; --i)
+            {
+                sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+                if (!(!(flags & desc->flags) || thing->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(desc->flags & ITEMINFO_VALID) || !(thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE)))
+                    return i;
+            }
+        }
+        
+        if ( binNumEnd >= 199 )
+            return -1;
+
+        for (int i = 199; i > binNumEnd - 1; --i)
         {
             sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
             if (!(!(flags & desc->flags) || thing->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(desc->flags & ITEMINFO_VALID) || !(thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE)))
                 return i;
         }
-    }
-    
-    if ( binNumEnd >= 199 )
+
         return -1;
-
-    for (int i = 199; i > binNumEnd - 1; --i)
-    {
-        sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
-        if (!(!(flags & desc->flags) || thing->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(desc->flags & ITEMINFO_VALID) || !(thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE)))
-            return i;
     }
-
-    return -1;
 }
 
 int sithInventory_GetNumItemsPriorToIdx(sithThing *thing, signed int binNumStart)
@@ -865,14 +990,12 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
     int v35; // ebx
     int v36; // esi
     sithItemDescriptor *v38; // ebp
-    sithItemInfo *v39; // [esp+10h] [ebp-4h]
     int v40; // [esp+10h] [ebp-4h]
     int keyRead;
 
     v1 = player;
     if ( player->type == SITH_THING_PLAYER )
     {
-        v39 = player->actorParams.playerinfo->iteminfo;
         if ( (player->thingflags & SITH_TF_DEAD) == 0 )
         {
             if ( (player->actorParams.typeflags & SITH_AF_DISABLED) != 0 )
