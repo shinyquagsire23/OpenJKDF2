@@ -1387,7 +1387,7 @@ int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
 void sithDSSThing_SendMOTSNew1(sithThing* pThing1, sithThing* pThing2, sithThing* pThing3, sithSector* pSector, 
     rdVector3* pVec1, rdVector3* pVec2, int mpFlags, int param_8)
 {
-    if (!Main_bMotsCompat) return 0;
+    if (!Main_bMotsCompat) return;
 
     NETMSG_START;
 
