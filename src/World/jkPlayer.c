@@ -54,8 +54,8 @@ int jkPlayer_bJankyPhysics = 0;
 #endif
 
 #ifdef JKM_DSS
-jkPlayerInfo jkPlayer_aMotsInfos[64] = {0};
-jkBubbleInfo jkPlayer_aBubbleInfo[64] = {0};
+jkPlayerInfo jkPlayer_aMotsInfos[NUM_JKPLAYER_THINGS] = {0};
+jkBubbleInfo jkPlayer_aBubbleInfo[NUM_JKPLAYER_THINGS] = {0};
 int jkPlayer_personality = 0;
 float jkPlayer_aMultiParams[0x100];
 #endif
@@ -193,13 +193,19 @@ void jkPlayer_Shutdown()
     _memset(jkPlayer_otherThings, 0, sizeof(jkPlayer_otherThings));
 
 #ifdef JKM_DSS
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < NUM_JKPLAYER_THINGS; i++)
     {
+        rdPolyLine_FreeEntry(&jkPlayer_aMotsInfos[i].polyline); // Added: prevent memleak
+
         if (jkPlayer_aMotsInfos[i].polylineThing.model3)
         {
             rdThing_FreeEntry(&jkPlayer_otherThings[i].polylineThing);
             jkPlayer_aMotsInfos[i].polylineThing.model3 = 0;
         }
+
+        rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].povModel); // Added: prevent memleak
+
+        rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].rd_thing); // Added: fix memleak
     }
     _memset(jkPlayer_aMotsInfos, 0, sizeof(jkPlayer_aMotsInfos));
 #endif
@@ -737,8 +743,15 @@ void jkPlayer_DrawPov()
 void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 {
     jkPlayerInfo* playerInfo = thing->playerInfo;
-    if (!playerInfo)
+    if (!playerInfo) {
+        // Added: hackfix for weird blades?
+        if (thing->actorParams.typeflags & SITH_AF_BOSS ) {
+            jk_printf("OpenJKDF2: Boss w/o a blade? Fixing... %p\n", thing);
+
+            jkPlayer_FUN_00404fe0(thing);
+        }
         return;
+    }
 
     if (!thing->animclass)
         return;
@@ -1806,7 +1819,7 @@ jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing)
     int iVar3;
     
     iVar3 = 0;
-    for (iVar3 = 0; iVar3 < 64; iVar3++) {
+    for (iVar3 = 0; iVar3 < NUM_JKPLAYER_THINGS; iVar3++) {
         if (jkPlayer_aMotsInfos[iVar3].actorThing)
             continue;
 
@@ -1814,8 +1827,8 @@ jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing)
         jkPlayer_aMotsInfos[iVar3].thing_id = pPlayerThing->thing_id;
         jkPlayer_aMotsInfos[iVar3].rd_thing.model3 = NULL;
 
-        pPlayerThing->thingflags = pPlayerThing->thingflags | SITH_TF_RENDERWEAPON;
-        pPlayerThing->playerInfo = jkPlayer_aMotsInfos + iVar3;
+        pPlayerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        pPlayerThing->playerInfo = &jkPlayer_aMotsInfos[iVar3];
         
         return pPlayerThing->playerInfo;
     }
