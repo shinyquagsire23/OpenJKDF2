@@ -379,6 +379,8 @@ int sithMain_Tick()
         }
 
         sithCogScript_TickAll();
+
+        //sithAI_PrintThings();
         
         sithConsole_AdvanceLogBuf();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);

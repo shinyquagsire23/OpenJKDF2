@@ -144,6 +144,9 @@
 
 #define SITHAI_MAX_ACTORS (256)
 
+#define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )
+#define MOTS_ONLY_FLAG(_flag) (Main_bMotsCompat ? (_flag) : (0))
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation

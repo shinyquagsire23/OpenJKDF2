@@ -486,7 +486,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
             v19 = sithAIClass_Load(val);
             if ( v19 )
             {
-                cogSymbol->val.dataAsPtrs[0] = (intptr_t)v19;
+                cogSymbol->val.data[0] = v19->index;
                 return 1;
             }
             else

@@ -749,6 +749,23 @@ LABEL_50:
         case 0xEu:
             thing->jkFlags |= 0x40u;
             return;
+
+        // MoTS added
+        case 0xF:
+            if (!Main_bMotsCompat) return;
+
+            if ((thing->thingtype == SITH_THING_ACTOR) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+                sithAI_Leap(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
+                return;
+            }
+            return;
+        case 0x10:
+            if (!Main_bMotsCompat) return;
+
+            if ((thing->thingtype == SITH_THING_ACTOR) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+                sithAI_FUN_0053a520(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
+            }
+            return;
         default:
             return;
     }

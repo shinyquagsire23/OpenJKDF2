@@ -72,11 +72,12 @@ void jkGuiSingleplayer_Startup()
     jkGui_InitMenu(&jkGuiSingleplayer_menu2, jkGui_stdBitmaps[1]);
     jkGui_InitMenu(&jkGuiSingleplayer_menu3, jkGui_stdBitmaps[1]);
 
+    int old_Main_bDevMode = Main_bDevMode;
     Main_bDevMode = 1;
     jkGuiSingleplayer_buttons1[4].bIsVisible = Main_bDevMode;
     jkGuiSingleplayer_buttons2[4].bIsVisible = Main_bDevMode;
     jkGuiSingleplayer_buttons3[4].bIsVisible = Main_bDevMode;
-    Main_bDevMode = 0;
+    Main_bDevMode = old_Main_bDevMode;
 }
 
 void jkGuiSingleplayer_Shutdown()
