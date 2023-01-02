@@ -8,7 +8,7 @@
 #include "Win95/stdSound.h"
 #include "World/sithWorld.h"
 
-static const char* sithSoundClass_aKeys[96] = {
+static const char* sithSoundClass_aKeys[SITH_SC_MAX] = {
     "--reserved--",
     "create",
     "activate",
@@ -113,7 +113,7 @@ int sithSoundClass_Startup()
     sithSoundClass_nameToKeyHashtable = stdHashTable_New(192);
     if ( sithSoundClass_hashtable && sithSoundClass_nameToKeyHashtable )
     {
-        for (int i = 1; i < 96; i++)
+        for (int i = 1; i < SITH_SC_MAX; i++)
         {
             stdHashTable_SetKeyVal(sithSoundClass_nameToKeyHashtable, sithSoundClass_aKeys[i], (void *)(intptr_t)i);
         }
@@ -156,13 +156,15 @@ int sithSoundClass_Load(sithWorld *world, int a2)
 
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "soundclasses") ) {
-        printf("failed first strcmp");
+        jk_printf("OpenJKDF2: sithSoundClass_Load failed first strcmp");
         return 0;
     }
 
     num_soundclasses = _atoi(stdConffile_entry.args[2].value);
+
+    // Added
     if ( num_soundclasses <= 0 ) {
-        printf("num soundclasses <= 0");
+        jk_printf("OpenJKDF2: num soundclasses <= 0");
         return 1;
     }
     if ( sithNet_isMulti ) {
@@ -259,61 +261,62 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
 
     while ( stdConffile_ReadArgs() )
     {
-        if ( stdConffile_entry.numArgs >= 2u )
+        if ( stdConffile_entry.numArgs < 2u ) {
+            continue;
+        }
+
+        soundIdx = (uint32_t)((intptr_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, (void*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
+        if (soundIdx < 0 || soundIdx >= SITH_SC_MAX) {
+            continue;
+        }
+
+        //printf("%s, %s\n", fpath, stdConffile_entry.args[1].value);
+        if ( !_strcmp(stdConffile_entry.args[1].value, "none") )
         {
-            soundIdx = (uint32_t)((intptr_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, (void*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
-            if (soundIdx)
+            v5 = 0;
+        }
+        else {
+            v5 = sithSound_LoadEntry(stdConffile_entry.args[1].value, 0);
+            if (!v5)
+                continue;
+        }
+
+        newEntry = (sithSoundClassEntry *)pSithHS->alloc(sizeof(sithSoundClassEntry));
+        if ( newEntry )
+        {
+            _memset(newEntry, 0, sizeof(sithSoundClassEntry));
+            newEntry->sound = v5;
+            newEntry->playflags = 64;
+            newEntry->minRadius = 0.5;
+            newEntry->maxRadius = 2.5;
+            newEntry->maxVolume = 1.0;
+            if (stdConffile_entry.numArgs > 2u)
+                _sscanf(stdConffile_entry.args[2].value, "%x", &newEntry->playflags);
+            if ( stdConffile_entry.numArgs > 3u )
+                newEntry->minRadius = _atof(stdConffile_entry.args[3].value);
+            if ( stdConffile_entry.numArgs > 4u )
+                newEntry->maxRadius = _atof(stdConffile_entry.args[4].value);
+            if ( stdConffile_entry.numArgs > 5u )
+                newEntry->maxVolume = _atof(stdConffile_entry.args[5].value);
+            if ( (newEntry->playflags & 0x4000) != 0 && newEntry->sound )
+                sithSound_LoadFileData(newEntry->sound);
+            v8 = soundClass->entries[soundIdx];
+            if ( v8 )
             {
-                if (soundIdx < 0x60)
+                v9 = soundClass->entries[soundIdx];
+                v10 = 1;
+                for ( i = v8->nextSound; i; i = i->nextSound )
                 {
-                    if ( !_strcmp(stdConffile_entry.args[1].value, "none") )
-                    {
-                        v5 = 0;
-LABEL_9:
-                        newEntry = (sithSoundClassEntry *)pSithHS->alloc(sizeof(sithSoundClassEntry));
-                        if ( newEntry )
-                        {
-                            _memset(newEntry, 0, sizeof(sithSoundClassEntry));
-                            newEntry->sound = v5;
-                            newEntry->playflags = 64;
-                            newEntry->minRadius = 0.5;
-                            newEntry->maxRadius = 2.5;
-                            newEntry->maxVolume = 1.0;
-                            if (stdConffile_entry.numArgs > 2u)
-                                _sscanf(stdConffile_entry.args[2].value, "%x", &newEntry->playflags);
-                            if ( stdConffile_entry.numArgs > 3u )
-                                newEntry->minRadius = _atof(stdConffile_entry.args[3].value);
-                            if ( stdConffile_entry.numArgs > 4u )
-                                newEntry->maxRadius = _atof(stdConffile_entry.args[4].value);
-                            if ( stdConffile_entry.numArgs > 5u )
-                                newEntry->maxVolume = _atof(stdConffile_entry.args[5].value);
-                            if ( (newEntry->playflags & 0x4000) != 0 && newEntry->sound )
-                                sithSound_LoadFileData(newEntry->sound);
-                            v8 = soundClass->entries[soundIdx];
-                            if ( v8 )
-                            {
-                                v9 = soundClass->entries[soundIdx];
-                                v10 = 1;
-                                for ( i = v8->nextSound; i; i = i->nextSound )
-                                {
-                                    v9 = i;
-                                    ++v10;
-                                }
-                                v9->nextSound = newEntry;
-                                v8->listIdx = v10 + 1;
-                            }
-                            else
-                            {
-                                soundClass->entries[soundIdx] = newEntry;
-                                newEntry->listIdx = 1;
-                            }
-                        }
-                        continue;
-                    }
-                    v5 = sithSound_LoadEntry(stdConffile_entry.args[1].value, 0);
-                    if ( v5 )
-                        goto LABEL_9;
+                    v9 = i;
+                    ++v10;
                 }
+                v9->nextSound = newEntry;
+                v8->listIdx = v10 + 1;
+            }
+            else
+            {
+                soundClass->entries[soundIdx] = newEntry;
+                newEntry->listIdx = 1;
             }
         }
     }
@@ -328,7 +331,7 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     sithSoundClassEntry *v3; // eax
 
     soundclass = thing->soundclass;
-    if ( soundclass && soundclass_id < 0x60 )
+    if ( soundclass && soundclass_id < SITH_SC_MAX )
     {
         v3 = soundclass->entries[soundclass_id];
         if ( v3 )
@@ -338,39 +341,36 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
 
 sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, float a3)
 {
-    sithSoundClass *v3; // eax
     sithSoundClassEntry *v4; // esi
     unsigned int v5; // edi
     uint32_t v6; // eax
     int v7; // eax
 
-    v3 = thing->soundclass;
-    if ( v3 )
+    if (!thing->soundclass) return NULL;
+
+    if ( (unsigned int)sc_id < SITH_SC_MAX )
     {
-        if ( (unsigned int)sc_id < 0x60 )
+        v4 = thing->soundclass->entries[sc_id];
+        if ( v4 )
         {
-            v4 = v3->entries[sc_id];
-            if ( v4 )
+            v5 = v4->listIdx;
+            if ( v5 > 1 )
             {
-                v5 = v4->listIdx;
-                if ( v5 > 1 )
+                v6 = (uint32_t)((double)v5 * a3);
+                if ( v6 > v5 - 1 )
+                    v6 = v5 - 1;
+                if ( v6 > 1 )
                 {
-                    v6 = (uint32_t)((double)v5 * a3);
-                    if ( v6 > v5 - 1 )
-                        v6 = v5 - 1;
-                    if ( v6 > 1 )
+                    v7 = v6 - 1;
+                    do
                     {
-                        v7 = v6 - 1;
-                        do
-                        {
-                            v4 = v4->nextSound;
-                            --v7;
-                        }
-                        while ( v7 );
+                        v4 = v4->nextSound;
+                        --v7;
                     }
+                    while ( v7 );
                 }
-                return sithSoundClass_PlayMode(thing, v4, 1.0);
             }
+            return sithSoundClass_PlayMode(thing, v4, 1.0);
         }
     }
     return NULL;
@@ -378,13 +378,11 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_i
 
 void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
 {
-    sithSoundClass *v3; // eax
     sithSoundClassEntry *entry; // eax
 
-    v3 = thing->soundclass;
-    if ( v3 && (unsigned int)sc_id < 0x60 )
+    if ( thing->soundclass && (unsigned int)sc_id < SITH_SC_MAX )
     {
-        entry = v3->entries[sc_id];
+        entry = thing->soundclass->entries[sc_id];
         if ( entry )
             sithSoundClass_PlayMode(thing, entry, a3);
     }
@@ -392,13 +390,11 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, float a3)
 
 void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id)
 {
-    sithSoundClass *v2; // eax
     sithSoundClassEntry *v3; // eax
 
-    v2 = thing->soundclass;
-    if ( v2 && sc_id < 0x60 )
+    if ( thing->soundclass && sc_id < SITH_SC_MAX )
     {
-        v3 = v2->entries[sc_id];
+        v3 = thing->soundclass->entries[sc_id];
         if ( v3 )
             sithSoundClass_StopSound(thing, v3->sound);
     }
@@ -412,61 +408,59 @@ void sithSoundClass_Free2(sithWorld *world)
     sithSoundClassEntry *v6; // esi
     int v8; // [esp+8h] [ebp-4h]
 
-    if ( world->numSoundClasses )
+    if (!world->numSoundClasses)
+        return;
+
+    for (v8 = 0; v8 < world->numSoundClassesLoaded; v8++)
     {
-        for (v8 = 0; v8 < world->numSoundClassesLoaded; v8++)
+        v2 = &world->soundclasses[v8];
+        stdHashTable_FreeKey(sithSoundClass_hashtable, v2->snd_fname);
+        v3 = v2->entries;
+        for (int i = 0; i < SITH_SC_MAX; i++)
         {
-            v2 = &world->soundclasses[v8];
-            stdHashTable_FreeKey(sithSoundClass_hashtable, v2->snd_fname);
-            v3 = v2->entries;
-            for (int i = 0; i < 96; i++)
+            v5 = *v3;
+            if ( *v3 )
             {
-                v5 = *v3;
-                if ( *v3 )
+                do
                 {
-                    do
-                    {
-                        v6 = v5->nextSound;
-                        v5->nextSound = NULL; // Added
-                        pSithHS->free(v5);
-                        v5 = v6;
-                    }
-                    while ( v6 );
+                    v6 = v5->nextSound;
+                    v5->nextSound = NULL; // Added
+                    pSithHS->free(v5);
+                    v5 = v6;
                 }
-                ++v3;
+                while ( v6 );
             }
+            ++v3;
         }
-        pSithHS->free(world->soundclasses);
-        world->soundclasses = 0;
-        world->numSoundClasses = 0;
-        world->numSoundClassesLoaded = 0;
     }
+    pSithHS->free(world->soundclasses);
+    world->soundclasses = 0;
+    world->numSoundClasses = 0;
+    world->numSoundClassesLoaded = 0;
 }
 
 sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
 {
-    sithSoundClass *v2; // eax
     sithSoundClassEntry *v3; // esi
     uint32_t v5; // rax
 
-    v2 = thing->soundclass;
-    if ( v2 )
+    if (!thing->soundclass) return NULL;
+
+    if ( a2 < SITH_SC_MAX )
     {
-        if ( a2 < SITH_SC_MAX )
+        v3 = thing->soundclass->entries[a2];
+        if ( v3 )
         {
-            v3 = v2->entries[a2];
-            if ( v3 )
+            if ( v3->listIdx > 1u )
             {
-                if ( v3->listIdx > 1u )
-                {
-                    v5 = (uint32_t)(_frand() * (double)v3->listIdx);
-                    if ( v5 > v3->listIdx - 1 )
-                        v5 = v3->listIdx - 1;
-                    for ( ; v5; v5-- )
-                        v3 = v3->nextSound;
-                }
-                return sithSoundClass_PlayMode(thing, v3, 1.0);
+                v5 = (uint32_t)(_frand() * (double)v3->listIdx);
+                if ( v5 > v3->listIdx - 1 )
+                    v5 = v3->listIdx - 1;
+                for ( ; v5; v5-- )
+                    v3 = v3->nextSound;
             }
+
+            return sithSoundClass_PlayMode(thing, v3, 1.0);
         }
     }
     return NULL;
@@ -478,23 +472,33 @@ sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry 
     if ( !entry->sound )
         return 0;
 
-    if ( (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_ABOLUTE) != 0 )
+    //printf("sithSoundClass_PlayMode: %s %p %f, %f\n", pSithSound->sound_fname, thing, entry->maxVolume, a3);
+
+    if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_ABOLUTE)
     {
-        if ( sithSoundMixer_GetThingSoundIdx(0, pSithSound) >= 0 )
+        if ( sithSoundMixer_GetThingSoundIdx(0, pSithSound) >= 0 ) {
+            //printf("sithSoundClass_PlayMode: %s already playing\n", pSithSound->sound_fname);
             return 0;
+        }
     }
     else
     {
         if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_THING) {
-            if ( sithSoundMixer_GetThingSoundIdx(thing, pSithSound) >= 0 )
+            if ( sithSoundMixer_GetThingSoundIdx(thing, pSithSound) >= 0 ) {
+                //printf("sithSoundClass_PlayMode: %s already playing at thing\n", pSithSound->sound_fname);
                 return 0;
+            }
         }
     }
     
-    if ( (entry->playflags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
+    if (entry->playflags & SITHSOUNDFLAG_ABSOLUTE) {
+        //printf("absolute\n");
         return sithSoundMixer_PlaySoundPosAbsolute(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
-    else
+    }
+    else {
+        //printf("thing\n");
         return sithSoundMixer_PlaySoundPosThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+    }
 }
 
 void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)

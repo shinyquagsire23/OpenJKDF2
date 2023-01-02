@@ -5,14 +5,15 @@
 #include "stdPlatform.h"
 #include "Platform/wuRegistry.h"
 
+#include <stdio.h>
+
 #include "jk.h"
 
 float stdSound_fMenuVolume = 1.0f;
 
-uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
+uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *bitsPerSample, int *bStereo, int *seekOffset)
 {
     unsigned int result; // eax
-    int v8; // eax
     char v9[4]; // [esp+Ch] [ebp-14h] BYREF
     stdWaveFormat v10; // [esp+10h] [ebp-10h] BYREF
     uint32_t seekPos;
@@ -22,7 +23,7 @@ uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPe
     result = 0;
     if ( !_memcmp(v9, "WAVE", 4) )
     {
-        std_pHS->fseek(sound_file, 4, 1);
+        std_pHS->fseek(sound_file, 4, SEEK_CUR);
         std_pHS->fileRead(sound_file, &seekPos, 4);
         std_pHS->fileRead(sound_file, &v10, sizeof(stdWaveFormat));
         *nSamplesPerSec = v10.nSamplesPerSec;
@@ -32,10 +33,21 @@ uint32_t stdSound_ParseWav(int sound_file, uint32_t *nSamplesPerSec, int *bitsPe
         if (seekPos > 0x10 )
             std_pHS->fseek(sound_file, seekPos - 16, 1);
 
-        std_pHS->fseek(sound_file, 4, 1);
-        std_pHS->fileRead(sound_file, &seekPos, 4);
-        v8 = std_pHS->ftell(sound_file);
-        *seekOffset = v8;
+        // MoTS removed
+        //std_pHS->fseek(sound_file, 4, SEEK_CUR);
+        //std_pHS->fileRead(sound_file, &seekPos, 4);
+
+        // MoTS added
+        while (!std_pHS->feof(sound_file))
+        {
+            std_pHS->fileRead(sound_file, v9, 4);
+            std_pHS->fileRead(sound_file, &seekPos, 4);
+
+            if (!_memcmp(v9, "data", 4)) break;
+            std_pHS->fseek(sound_file, seekPos, SEEK_CUR);
+        }
+
+        *seekOffset = std_pHS->ftell(sound_file);
         result = seekPos;
 #ifdef AL_FORMAT_WAVE_EXT
         //*seekOffset = 0;

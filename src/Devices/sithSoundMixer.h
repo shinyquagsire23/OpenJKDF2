@@ -105,7 +105,7 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound);
 void sithSoundMixer_SectorSound(sithSector *sector, sithSound *sound, float vol);
 int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound);
 int sithSoundMixer_sub_4DD5D0(sithPlayingSound *sound);
-uint32_t sithSoundMixer_GetThingSoundIdx(sithThing *thing, sithSound *sound);
+int32_t sithSoundMixer_GetThingSoundIdx(sithThing *thing, sithSound *sound);
 void sithSoundMixer_StopSound(sithPlayingSound *sound);
 sithPlayingSound* sithSoundMixer_GetSoundFromIdx(signed int idx);
 

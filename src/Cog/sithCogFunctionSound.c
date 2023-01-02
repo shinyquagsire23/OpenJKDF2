@@ -37,6 +37,8 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     sithThing* thing = sithCogExec_PopThing(ctx);
     sithSound* sound = sithCogExec_PopSound(ctx);
 
+    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
+
     if ( !sound )
     {
         sithCogExec_PushInt(ctx, -1);
@@ -163,6 +165,8 @@ void sithCogFunctionSound_PlaySoundLocal(sithCog *ctx)
     float volume = sithCogExec_PopFlex(ctx);
     sithSound* sound = sithCogExec_PopSound(ctx);
 
+    //printf("sithCogFunctionSound_PlaySoundLocal %s\n", ctx->cogscript_fpath);
+
     if (!sound)
     {
         sithCogExec_PushInt(ctx, -1);
@@ -201,6 +205,9 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     float pan = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
     sithSound* sound = sithCogExec_PopSound(ctx);
+
+    //printf("sithCogFunctionSound_PlaySoundGlobal %s\n", ctx->cogscript_fpath);
+
     if (!sound)
     {
         sithCogExec_PushInt(ctx, -1);

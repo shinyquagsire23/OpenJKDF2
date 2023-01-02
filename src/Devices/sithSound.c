@@ -119,6 +119,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
     if ( !_strcmp(sound_fname, "none") )
         return 0;
 
+    //printf("sithSound_LoadEntry %s\n", sound_fname);
     sound = (sithSound *)stdHashTable_GetKeyVal(sithSound_hashtable, sound_fname);
     if ( sound )
     {
@@ -284,6 +285,7 @@ stdSound_buffer_t* sithSound_LoadData(sithSound *sound)
 {
     if (!(sound->isLoaded & 1))
     {
+        //printf("sithSound_LoadData %s\n", sound->sound_fname);
         sithSound_LoadFileData(sound);
         if (!(sound->isLoaded & 1))
             return 0;
