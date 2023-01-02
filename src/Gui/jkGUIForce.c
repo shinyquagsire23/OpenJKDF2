@@ -592,6 +592,10 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         {
             int id = jkGuiForce_pElements[i].hoverId;
 
+            // Added?
+            if (i == EIDX_MOTS_DEFENSE)
+                jkGuiForce_pElements[i].bIsVisible = !!jkGuiForce_isMulti;
+
             *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
         }
     }
