@@ -574,7 +574,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             v5 = 1;
         if ( aiclass->argsAsFloat[7] != 0.0 && aiclass->argsAsFloat[7] >= _frand() )
             v6 = 1;
-        
+
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
             actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
@@ -960,9 +960,6 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
         if ( aiclass->argsAsInt[1] && aiclass->argsAsInt[1] + actor->field_204 < sithTime_curMs )
         {
             actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
-            if (Main_bMotsCompat) {
-                actor->flags &= ~SITHAI_MODE_MOVING;
-            }
             actor->flags |= SITHAI_MODE_SEARCHING;
             sithActor_MoveJointsForEyePYR(actor->thing, &rdroid_zeroVector3);
             return 1;
@@ -984,7 +981,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 && (uVar1 = sithAI_pDistractor->thingflags, actor->pDistractor = sithAI_pDistractor,
             (uVar1 & 0x202) == 0)) && (sithAI_sub_4EAD60(actor), actor->field_1F4 == 0)) 
             {
-                actor->flags &= ~(SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
+                actor->flags &= ~(SITHAI_MODE_SEARCHING);
                 actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                 sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
@@ -1003,7 +1000,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 sithAI_sub_4EAD60(actor);
                 if (actor->field_1F4 == 0) 
                 {
-                    actor->flags &= ~(SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
+                    actor->flags &= ~(SITHAI_MODE_SEARCHING);
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
@@ -1647,7 +1644,6 @@ p1 - Time to sleep before check again (msec)
 */
 int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags)
 {
-    uint32_t uVar1;
     sithAIClass *psVar2;
     sithThing *psVar3;
 
@@ -1656,10 +1652,9 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
     if (g_debugmodeFlags & 0x200)
         return 0;
 
-    uVar1 = pActor->flags;
-    if ((uVar1 & SITHAI_MODE_ACTIVE) == 0)
+    if ((pActor->flags & SITHAI_MODE_ACTIVE) == 0)
     {
-        if (!(uVar1 & SITHAI_MODE_SEARCHING))
+        if (!(pActor->flags & SITHAI_MODE_SEARCHING))
             return 0;
 
         psVar2 = pActor->aiclass;
@@ -1696,7 +1691,8 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
     else if ((pAiclass->argsAsInt[1] != 0) &&
              ((uint32_t)(pActor->field_204 + pAiclass->argsAsInt[1]) < sithTime_curMs))
     {
-        pActor->flags = uVar1 & 0xfffff9dd | SITHAI_MODE_SEARCHING;
+        pActor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING); 
+        pActor->flags |= SITHAI_MODE_SEARCHING;
         sithActor_MoveJointsForEyePYR(pActor->thing, &rdroid_zeroVector3);
         return 1;
     }
@@ -1839,7 +1835,7 @@ LAB_0055c33d:
     if (pActor->field_1F4 == 3) {
         pActor->flags = pActor->flags & ~SITHAI_MODE_TARGET_VISIBLE;
     }
-    pInstinct->nextUpdate = sithTime_curMs + 0xfa;
+    pInstinct->nextUpdate = sithTime_curMs + 250;
 
     return 0;
 }

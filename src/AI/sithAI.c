@@ -1741,7 +1741,7 @@ LAB_0053a691:
         fVar4 = (psVar1->position).z - (psVar2->position).z;
         pActor->field_28C = sithTime_curMs + 2000;
         pActor->moveSpeed = 1313.0;
-        pActor->flags = pActor->flags & ~(SITHAI_MODE_TURNING | SITHAI_MODE_ATTACKING);
+        pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         pActor->field_1E4.x = fVar5;
         thing->physicsParams.vel.x = param_6 * fVar5;
         thing->physicsParams.vel.y = param_6 * fVar3;
@@ -1838,7 +1838,7 @@ LAB_0053a3b9:
         pActor->field_1F0 = (float)fVar9;
         lVar11 = (int64_t)(fVar10 * 1000.0);
         pActor->field_28C = (int)lVar11 + uVar5;
-        pActor->flags = pActor->flags & ~(SITHAI_MODE_TURNING | SITHAI_MODE_ATTACKING);
+        pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         sithThing_DetachThing(thing);
         thing->physicsParams.vel.x = param_6 * (float)fVar6;
         thing->physicsParams.vel.y = param_6 * (float)fVar7;
