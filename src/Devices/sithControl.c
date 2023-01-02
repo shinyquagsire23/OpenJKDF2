@@ -1532,6 +1532,11 @@ void sithControl_FreeCam(sithThing *player)
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE, &tmp) )
         {
             v15 = sithControl_GetAxis2(INPUT_FUNC_SLIDE);
+
+            // Why did MoTS do this lol
+            if (Main_bMotsCompat)
+                v15 = -v15;
+
             v11 = v15 - sithControl_GetAxis2(INPUT_FUNC_TURN);
             if ( v11 < -1.0 )
             {
@@ -1547,7 +1552,8 @@ void sithControl_FreeCam(sithThing *player)
         }
         else
         {
-            v7->x = sithControl_GetAxis2(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
+            // Why did MoTS do this lol
+            v7->x = (Main_bMotsCompat ? -1 : 1) * sithControl_GetAxis2(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
             v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
