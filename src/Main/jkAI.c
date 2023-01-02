@@ -27,6 +27,21 @@ void jkAI_Startup()
 }
 
 // MoTS altered
+/*
+p0 - Strike% 0 never 1 continuous
+p1 - Att1 Range
+p2 - Att1 Damage
+p3 - Att1 Duration
+p4 - Att2 Range
+p5 - Att2 Damage
+p6 - Att2 Duration
+p7 - Att3 Range
+p8 - Att3 Damage
+p9 - Att3 Duration
+p10 - Att4 Range
+p11 - Att4 Damage
+p12 - Att4 Duration
+*/
 int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
 {
     unsigned int v5; // edi
@@ -247,6 +262,21 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     return 0;
 }
 
+/*
+p0 - Interval for Force power check
+p1 - Min Dist for FP1
+p2 - Max Dist for FP1
+p3 - Min Dist for FP2
+p4 - Max Dist for FP2
+p5 - Min Dist for FP3
+p6 - Max Dist for FP3
+p7 - % Interval for FP1
+p8 - % Interval for FP2
+p9 - % Interval for FP3
+p10 - recharge time for FP1 (msec)
+p11 - recharge time for FP2 (msec)
+p12 - recharge time for FP3 (msec)
+*/
 int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
 {
     int v6; // ebx

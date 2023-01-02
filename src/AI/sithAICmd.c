@@ -543,25 +543,26 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     v7 = actor->thing;
     if ( flags )
     {
-        if ( flags == SITHAI_MODE_UNK100 )
+        if ( flags != SITHAI_MODE_UNK100 )
         {
-            if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
-            {
-                sithPuppet_SetArmedMode(v7, 1);
-                v9 = sithTime_curMs + aiclass->argsAsInt[5];
-                instinct->param0 = aiclass->argsAsFloat[8];
-                instinct->nextUpdate = v9;
-            }
-            else
-            {
-                sithPuppet_SetArmedMode(v7, 0);
-            }
-
-            // Added: co-op
-            if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-                sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
-            }
             return 0;
+        }
+
+        if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
+        {
+            sithPuppet_SetArmedMode(v7, 1);
+            v9 = sithTime_curMs + aiclass->argsAsInt[5];
+            instinct->param0 = aiclass->argsAsFloat[8];
+            instinct->nextUpdate = v9;
+        }
+        else
+        {
+            sithPuppet_SetArmedMode(v7, 0);
+        }
+
+        // Added: co-op
+        if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
+            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
         }
         return 0;
     }
@@ -573,6 +574,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             v5 = 1;
         if ( aiclass->argsAsFloat[7] != 0.0 && aiclass->argsAsFloat[7] >= _frand() )
             v6 = 1;
+        
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
             actor->flags |= SITHAI_MODE_TARGET_VISIBLE;

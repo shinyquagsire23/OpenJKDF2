@@ -1364,15 +1364,14 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
         return 0;
 
     // MoTS added
-    if (Main_bMotsCompat && a4 > 0.0) {
+    if (Main_bMotsCompat && a4 < 0.0) {
         return 0;
     }
 
-    v19 = rdVector_Dot3(&v9->lookOrientation.rvec, &v1);
-    if ( v19 < 0.0 )
-        v19 = -v19;
+    v19 = fabs(rdVector_Dot3(&v9->lookOrientation.rvec, &v1));
     if ( v19 > 1.0 - a4 )
         return 0;
+    
     if ( (v9->actorParams.typeflags & SITH_AF_DELAYFIRE) != 0 )
     {
         actor->field_268 = a7 | 8;
