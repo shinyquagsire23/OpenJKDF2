@@ -44,6 +44,8 @@ float sithRender_008d4098 = 0.0;
 float sithRender_008d409c = 0.0;
 #endif
 
+int sithRender_008d1668 = 0;
+
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
 {
 #if 0
@@ -1170,67 +1172,78 @@ LABEL_150:
                 break;
             }
 
-            if ( (i->thingflags & SITH_TF_LEVELGEO) != 0
-              && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
-              && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)
-              && i->rdthing.type == RD_THINGTYPE_MODEL )
-            {
-                rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
-                v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
-                i->rdthing.clippingIdk = v63;
-                if ( v63 != 2 )
-                {
-                    if ( a2 >= 1.0 )
-                        i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+            if (!(i->thingflags & SITH_TF_LEVELGEO)) {
+                continue;
+            }
 
-                    // MOTS added
-#ifdef JKM_LIGHTING
-                    if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
-                        rdModel3* iVar22 = i->rdthing.model3;
-                        for (int k = 0; k < 4; k++) {
-                            for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
-                            {
-                                if (rdGetVertexColorMode() == 0) {
-                                    iVar22->geosets[k].meshes[j].vertices_unk = iVar22->geosets[k].meshes[j].vertices_i;
-                                    iVar22->geosets[k].meshes[j].vertices_i = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aMono;
-                                }
-                                else {
-                                    iVar22->geosets[k].meshes[j].paRedIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aRed;
-                                    iVar22->geosets[k].meshes[j].paGreenIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aGreen;
-                                    iVar22->geosets[k].meshes[j].paBlueIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aBlue;
-                                }
-                            }
-                        }
-                    }
-                    if ((i->archlightIdx == -1) && (rdGetVertexColorMode() == 1)) {
-                        rdModel3* iVar13 = i->rdthing.model3;
-                        for (int k = 0; k < 4; k++) {
-                            for (int j = 0; j < iVar13->geosets[k].numMeshes; j++) 
-                            {
-                                iVar13->geosets[k].meshes[j].paRedIntensities = iVar13->geosets[k].meshes[j].vertices_i;
-                                iVar13->geosets[k].meshes[j].paGreenIntensities = iVar13->geosets[k].meshes[j].vertices_i;
-                                iVar13->geosets[k].meshes[j].paBlueIntensities = iVar13->geosets[k].meshes[j].vertices_i;
-                            }
-                        }
-                    }
-#endif // JKM_LIGHTING
-                    if ( sithRender_RenderThing(i) )
-                        ++sithRender_geoThingsDrawn;
+            if (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) {
+                continue;
+            }
 
-                    // MOTS added
+            if (!((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)) {
+                continue;
+            }
+
+            if (i->rdthing.type != RD_THINGTYPE_MODEL) {
+                continue;
+            }
+
+            rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
+            v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
+            i->rdthing.clippingIdk = v63;
+            if ( v63 == 2 ) {
+                continue;
+            }
+
+            if ( a2 >= 1.0 )
+                i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+
+            // MOTS added
 #ifdef JKM_LIGHTING
-                    if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THINGTYPE_MODEL)) && (rdGetVertexColorMode() == 0)) {
-                        rdModel3* iVar14 = i->rdthing.model3;
-                        for (int k = 0; k < 4; k++) {
-                            for (int j = 0; j < iVar14->geosets[k].numMeshes; j++) 
-                            {
-                                iVar14->geosets[k].meshes[j].vertices_i = iVar14->geosets[k].meshes[j].vertices_unk;
-                            }
+            if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
+                rdModel3* iVar22 = i->rdthing.model3;
+                for (int k = 0; k < 4; k++) {
+                    for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
+                    {
+                        if (rdGetVertexColorMode() == 0) {
+                            iVar22->geosets[k].meshes[j].vertices_unk = iVar22->geosets[k].meshes[j].vertices_i;
+                            iVar22->geosets[k].meshes[j].vertices_i = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aMono;
+                        }
+                        else {
+                            iVar22->geosets[k].meshes[j].paRedIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aRed;
+                            iVar22->geosets[k].meshes[j].paGreenIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aGreen;
+                            iVar22->geosets[k].meshes[j].paBlueIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aBlue;
                         }
                     }
-#endif
                 }
             }
+            if ((i->archlightIdx == -1) && (rdGetVertexColorMode() == 1)) {
+                rdModel3* iVar13 = i->rdthing.model3;
+                for (int k = 0; k < 4; k++) {
+                    for (int j = 0; j < iVar13->geosets[k].numMeshes; j++) 
+                    {
+                        iVar13->geosets[k].meshes[j].paRedIntensities = iVar13->geosets[k].meshes[j].vertices_i;
+                        iVar13->geosets[k].meshes[j].paGreenIntensities = iVar13->geosets[k].meshes[j].vertices_i;
+                        iVar13->geosets[k].meshes[j].paBlueIntensities = iVar13->geosets[k].meshes[j].vertices_i;
+                    }
+                }
+            }
+#endif // JKM_LIGHTING
+            if ( sithRender_RenderThing(i) )
+                ++sithRender_geoThingsDrawn;
+
+            // MOTS added
+#ifdef JKM_LIGHTING
+            if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THINGTYPE_MODEL)) && (rdGetVertexColorMode() == 0)) {
+                rdModel3* iVar14 = i->rdthing.model3;
+                for (int k = 0; k < 4; k++) {
+                    for (int j = 0; j < iVar14->geosets[k].numMeshes; j++) 
+                    {
+                        iVar14->geosets[k].meshes[j].vertices_i = iVar14->geosets[k].meshes[j].vertices_unk;
+                    }
+                }
+            }
+#endif
         }
         ++sithRender_sectorsDrawn;
     }
@@ -1401,6 +1414,7 @@ void sithRender_RenderDynamicLights()
     }
 }
 
+// MoTS altered
 void sithRender_RenderThings()
 {
     sithSector *v1; // ebp
@@ -1418,6 +1432,12 @@ void sithRender_RenderThings()
     float clipRadius; // [esp+Ch] [ebp-10h]
     uint32_t i; // [esp+14h] [ebp-8h]
     BOOL v16; // [esp+18h] [ebp-4h]
+
+    // MoTS added
+    sithThing* lastDrawn = NULL;
+    if (sithRender_008d1668) {
+        rdSetCullFlags(0);
+    }
 
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
     rdSetOcclusionMethod(0);
@@ -1488,12 +1508,19 @@ void sithRender_RenderThings()
                             break;
                     }
                     thingIter->rdthing.clippingIdk = clippingVal;
-                    if ( clippingVal == 2 )
+                    if ( clippingVal == 2 || sithRender_008d1668) // MoTS added: sithRender_008d1668
                         continue;
                     curWorld = sithWorld_pCurrentWorld;
                     if ( thingIter->rdthing.type == RD_THINGTYPE_MODEL )
                     {
                         model3 = thingIter->rdthing.model3;
+
+                        float yval = thingIter->screenPos.y;
+                        // MoTS added
+                        if (sithCamera_currentCamera->zoomScale != 1.0) {
+                            yval = sithCamera_currentCamera->invZoomScale * (thingIter->screenPos).y;
+                        }
+
                         switch ( model3->numGeosets )
                         {
                             case 1:
@@ -1597,13 +1624,32 @@ void sithRender_RenderThings()
                             lightMode = RD_LIGHTMODE_GOURAUD;
                     }
                     thingIter->rdthing.curLightMode = lightMode;
-                    if (!(thingIter->thingflags & SITH_TF_80000000) && sithRender_RenderThing(thingIter) ) // MOTS added: flag check
+                    if (thingIter->thingflags & SITH_TF_80000000) {
+                        lastDrawn = thingIter;
+                        continue;
+                    }
+
+                    if (sithRender_RenderThing(thingIter) ) // MOTS added: flag check
                         ++sithRender_nongeoThingsDrawn;
                 }
             }
         }
     }
     rdCache_Flush();
+
+    // MoTS added
+    if (lastDrawn) 
+    {
+        if (sithRender_RenderThing(lastDrawn)) {
+            ++sithRender_nongeoThingsDrawn;
+        }
+    }
+    rdCache_Flush();
+
+    if (sithRender_008d1668) {
+        rdSetCullFlags(1);
+    }
+    
 }
 
 int sithRender_RenderThing(sithThing *povThing)
@@ -1624,6 +1670,7 @@ int sithRender_RenderThing(sithThing *povThing)
         }
         povThing->thingflags |= SITH_TF_INCAMFOV;
     }
+
     povThing->isVisible = bShowInvisibleThings;
     povThing->lookOrientation.scale = povThing->position;
     ret = rdThing_Draw(&povThing->rdthing, &povThing->lookOrientation);

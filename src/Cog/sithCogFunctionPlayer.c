@@ -5,6 +5,7 @@
 #include "Dss/sithMulti.h"
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
+#include "Gameplay/sithInventory.h"
 
 void sithCogFunctionPlayer_SetInvActivate(sithCog *ctx)
 {
@@ -43,11 +44,17 @@ void sithCogFunctionPlayer_IsInvActivated(sithCog *ctx)
 
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
     {
-        if ( sithInventory_GetActivate(player, binIdx) )
+        if ( sithInventory_GetActivate(player, binIdx) ) {
             sithCogExec_PushInt(ctx, 1);
-        else
+        }
+        else {
             sithCogExec_PushInt(ctx, 0);
+        }
+        return;
     }
+
+    // Added: We need to push *something*??
+    sithCogExec_PushInt(ctx, 0);
 }
 
 void sithCogFunctionPlayer_IsInvAvailable(sithCog *ctx)
@@ -61,7 +68,11 @@ void sithCogFunctionPlayer_IsInvAvailable(sithCog *ctx)
             sithCogExec_PushInt(ctx, 1);
         else
             sithCogExec_PushInt(ctx, 0);
+        return;
     }
+
+    // Added: We need to push *something*??
+    sithCogExec_PushInt(ctx, 0);
 }
 
 void sithCogFunctionPlayer_SetGoalFlags(sithCog *ctx)
