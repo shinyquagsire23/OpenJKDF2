@@ -114,4 +114,169 @@ int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info);
 void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra);
 sithCog* sithCog_GetByIdx(int idx);
 
+
+
+
+// General
+extern void sithCogFunction_Pow(sithCog* ctx);
+extern void sithCogFunction_Wakeup(sithCog* ctx);
+extern void sithCogFunction_VectorEqual(sithCog* ctx);
+extern void sithCogFunction_FireProjectileData(sithCog* ctx);
+extern void sithCogFunction_FireProjectileLocal(sithCog* ctx);
+extern void sithCogFunction_GetWeaponBin(sithCog* ctx);
+extern void sithCogFunction_SendMessageExRadius(sithCog* ctx);
+extern void sithCogFunction_WorldFlash(sithCog* ctx);
+extern void sithCogFunction_SetCameraZoom(sithCog* ctx);
+extern void sithCogFunction_GetActionCog(sithCog* ctx);
+extern void sithCogFunction_SetActionCog(sithCog* ctx);
+extern void sithCogFunction_Sin(sithCog* ctx);
+extern void sithCogFunction_Cos(sithCog* ctx);
+extern void sithCogFunction_Tan(sithCog* ctx);
+extern void sithCogFunction_GetCogFlags(sithCog* ctx);
+extern void sithCogFunction_SetCogFlags(sithCog* ctx);
+extern void sithCogFunction_ClearCogFlags(sithCog* ctx);
+extern void sithCogFunction_DebugBreak(sithCog* ctx);
+extern void sithCogFunction_GetSysDate(sithCog* ctx);
+extern void sithCogFunction_GetSysTime(sithCog* ctx);
+extern void sithCogFunction_SetCameraFocii(sithCog* ctx);
+
+// AI
+extern void sithCogFunctionAI_FirstThingInCone(sithCog *ctx);
+extern void sithCogFunctionAI_NextThingInCone(sithCog *ctx);
+
+extern void sithCogFunctionAI_AIGetAlignment(sithCog *ctx);
+extern void sithCogFunctionAI_AISetAlignment(sithCog *ctx);
+extern void sithCogFunctionAI_AISetInterest(sithCog *ctx);
+extern void sithCogFunctionAI_AIGetInterest(sithCog *ctx);
+extern void sithCogFunctionAI_AISetDistractor(sithCog *ctx);
+extern void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx);
+extern void sithCogFunctionAI_AIRemoveAlignmentPriority(sithCog *ctx);
+
+// Player
+extern void sithCogFunctionPlayer_KillPlayerQuietly(sithCog* ctx);
+
+// Sector
+extern void sithCogFunctionSector_ChangeAllSectorsLight(sithCog* ctx);
+extern void sithCogFunctionSector_FindSectorAtPos(sithCog* ctx);
+extern void sithCogFunctionSector_IsSphereInSector(sithCog* ctx);
+extern void sithCogFunctionSector_GetSectorAmbientLight(sithCog* ctx);
+extern void sithCogFunctionSector_SetSectorAmbientLight(sithCog* ctx);
+
+// Sound
+extern void sithCogFunctionSound_PlaySoundThingLocal(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundPosLocal(sithCog* ctx);
+
+extern void sithCogFunctionSound_PlaySoundThing(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundPos(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundLocal(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundGlobal(sithCog* ctx);
+
+// Surface
+extern void sithCogFunctionSurface_GetSurfaceVertexLight(sithCog* ctx);
+extern void sithCogFunctionSurface_SetSurfaceVertexLight(sithCog* ctx);
+extern void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog* ctx);
+extern void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog* ctx);
+
+// Thing
+extern void sithCogFunctionThing_CreateThingLocal(sithCog* ctx);
+extern void sithCogFunctionThing_CreateThingAtPosOwner(sithCog* ctx);
+extern void sithCogFunctionThing_CreateThingAtPos(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingParent(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingPosEx(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingLvecPYR(sithCog* ctx);
+extern void sithCogFunctionThing_GetCurInvWeapon(sithCog* ctx);
+extern void sithCogFunctionThing_GetActorWeapon(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingLookPYR(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingGUID(sithCog* ctx);
+extern void sithCogFunctionThing_GetGUIDThing(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingMaxVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingMaxAngularVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxAngularVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_GetActorHeadPYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetActorHeadPYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingJointAngle(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingJointAngle(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxHeadPitch(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMinHeadPitch(sithCog* ctx);
+extern void sithCogFunctionThing_InterpolatePYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetWeaponTarget(sithCog* ctx);
+extern void sithCogFunctionThing_GetCurInvWeaponMots(sithCog* ctx);
+
+// JK
+extern void jkCog_PrintUniVoice(sithCog* ctx);
+extern void jkCog_GetSaberSideMat(sithCog* ctx);
+extern void jkCog_SyncForcePowers(sithCog* ctx);
+extern void jkCog_BeginCutscene(sithCog* ctx);
+extern void jkCog_EndCutscene(sithCog* ctx);
+extern void jkCog_StartupCutscene(sithCog* ctx);
+extern void jkCog_GetMultiParam(sithCog* ctx);
+extern void jkCog_InsideLeia(sithCog* ctx);
+extern void jkCog_CreateBubble(sithCog* ctx);
+extern void jkCog_DestroyBubble(sithCog* ctx);
+extern void jkCog_GetBubbleDistance(sithCog* ctx);
+extern void jkCog_ThingInBubble(sithCog* ctx);
+extern void jkCog_GetFirstBubble(sithCog* ctx);
+extern void jkCog_GetNextBubble(sithCog* ctx);
+extern void jkCog_GetBubbleType(sithCog* ctx);
+extern void jkCog_GetBubbleRadius(sithCog* ctx);
+extern void jkCog_SetBubbleType(sithCog* ctx);
+extern void jkCog_SetBubbleRadius(sithCog* ctx);
+extern void jkCog_Screenshot(sithCog* ctx);
+extern void jkCog_GetOpenFrames(sithCog* ctx);
+extern void jkCog_dwGetActivateBin(sithCog* ctx);
+extern void jkCog_addBeam(sithCog* ctx);
+extern void jkCog_addLaser(sithCog* ctx);
+extern void jkCog_removeLaser(sithCog* ctx);
+extern void jkCog_getLaserId(sithCog* ctx);
+extern void jkCog_dwPlayCammySpeech(sithCog* ctx);
+extern void jkCog_stub0Args(sithCog* ctx);
+extern void jkCog_stub1Args(sithCog* ctx);
+extern void jkCog_stub2Args(sithCog* ctx);
+
+// JK13
+extern void jkCogExt_GetThingAttachSurface(sithCog* ctx);
+extern void jkCogExt_GetThingAttachThing(sithCog* ctx);
+extern void jkCogExt_GetCameraFov(sithCog* ctx);
+extern void jkCogExt_GetCameraOffset(sithCog* ctx);
+extern void jkCogExt_SetCameraFov(sithCog* ctx);
+extern void jkCogExt_SetCameraOffset(sithCog* ctx);
+extern void jkCogExt_Absolute(sithCog* ctx);
+extern void jkCogExt_Arccosine(sithCog* ctx);
+extern void jkCogExt_Arcsine(sithCog* ctx);
+extern void jkCogExt_Arctangent(sithCog* ctx);
+extern void jkCogExt_Ceiling(sithCog* ctx);
+extern void jkCogExt_Cosine(sithCog* ctx);
+extern void jkCogExt_Floor(sithCog* ctx);
+extern void jkCogExt_Power(sithCog* ctx);
+extern void jkCogExt_Randomflex(sithCog* ctx);
+extern void jkCogExt_Randomint(sithCog* ctx);
+extern void jkCogExt_Sine(sithCog* ctx);
+extern void jkCogExt_Squareroot(sithCog* ctx);
+extern void jkCogExt_GetHotkeyCog(sithCog* ctx);
+extern void jkCogExt_SetHotkeyCog(sithCog* ctx);
+extern void jkCogExt_IsAdjoin(sithCog* ctx);
+extern void jkCogExt_SetGameSpeed(sithCog* ctx);
+extern void jkCogExt_GetThingHeadLvec(sithCog* ctx);
+extern void jkCogExt_GetThingHeadPitch(sithCog* ctx);
+extern void jkCogExt_GetThingHeadPYR(sithCog* ctx);
+extern void jkCogExt_GetThingPYR(sithCog* ctx);
+extern void jkCogExt_SetThingHeadPYR(sithCog* ctx);
+extern void jkCogExt_SetThingPosEx(sithCog* ctx);
+extern void jkCogExt_SetThingPYR(sithCog* ctx);
+extern void jkCogExt_SetThingLRUVecs(sithCog* ctx);
+extern void jkCogExt_SetThingSector(sithCog* ctx);
+extern void jkCogExt_RestoreJoint(sithCog* ctx);
+extern void jkCogExt_GetThingAirDrag(sithCog* ctx);
+extern void jkCogExt_GetThingEyeOffset(sithCog* ctx);
+extern void jkCogExt_GetThingHeadPitchMax(sithCog* ctx);
+extern void jkCogExt_GetThingHeadPitchMin(sithCog* ctx);
+extern void jkCogExt_GetThingJumpSpeed(sithCog* ctx);
+extern void jkCogExt_SetThingAirDrag(sithCog* ctx);
+extern void jkCogExt_SetThingEyeOffset(sithCog* ctx);
+extern void jkCogExt_SetThingHeadPitchMinMax(sithCog* ctx);
+extern void jkCogExt_SetThingJumpSpeed(sithCog* ctx);
+extern void jkCogExt_SetThingMesh(sithCog* ctx);
+extern void jkCogExt_SetThingParent(sithCog* ctx);
+
 #endif // _SITHCOG_H

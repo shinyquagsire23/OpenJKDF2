@@ -1143,24 +1143,22 @@ void jkCog_RegisterVerbs()
     }
     
 #ifdef QOL_IMPROVEMENTS
-    // Added for droidwork tests
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addBeam, "addbeam");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addLaser, "addlaser");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_removeLaser, "removelaser");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_getLaserId, "getlaserid");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
-#endif
-
-    if (!Main_bMotsCompat) {
-        jkCog_RegisterVerbsExt();
+    if (Main_bDwCompat) {
+        // Added for droidwork tests
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addBeam, "addbeam");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addLaser, "addlaser");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_removeLaser, "removelaser");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_getLaserId, "getlaserid");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
     }
+#endif
 }
 
 /*
@@ -1527,54 +1525,4 @@ void jkCogExt_SetThingParent(sithCog* ctx)
     sithThing* pThing2 = sithCogExec_PopThing(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
-}
-
-void jkCog_RegisterVerbsExt() {
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "playeraction");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 47, "hotkey");
-
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachSurface, "getthingattachsurface");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachThing, "getthingattachthing");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraFov, "getcamerafov");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraOffset, "getcameraoffset");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraFov, "setcamerafov");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraOffset, "setcameraoffset");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Absolute, "absolute");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arccosine, "arccosine");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arcsine, "arcsine");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arctangent, "arctangent");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Ceiling, "ceiling");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Cosine, "cosine");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Floor, "floor");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Power, "power");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomflex, "randomflex");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomint, "randomint");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Sine, "sine");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Squareroot, "squareroot");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetHotkeyCog, "gethotkeycog");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetHotkeyCog, "sethotkeycog");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_IsAdjoin, "isadjoin");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetGameSpeed, "setgamespeed");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadLvec, "getthingheadlvec");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitch, "getthingheadpitch");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPYR, "getthingheadpyr");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingPYR, "getthingpyr");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPYR, "setthingheadpyr");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPosEx, "setthingposex");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPYR, "setthingpyr");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingLRUVecs, "setthingrluvecs");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingSector, "setthingsector");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_RestoreJoint, "restorejoint");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAirDrag, "getthingairdrag");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingEyeOffset, "getthingeyeoffset");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMax, "getthingheadpitchmax");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMin, "getthingheadpitchmin");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingJumpSpeed, "getthingjumpspeed");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingAirDrag, "setthingairdrag");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingEyeOffset, "setthingeyeoffset");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPitchMinMax, "setthingheadpitchminmax");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingJumpSpeed, "setthingjumpspeed");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingMesh, "setthingmesh");
-    sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingParent, "setthingparent");
 }
