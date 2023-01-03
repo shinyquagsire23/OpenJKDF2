@@ -72,6 +72,10 @@ static const char* jkGuiForce_bitmapsMots[19] = {
 #define EIDX_QUIT (Main_bMotsCompat ? 27 : 19)
 #define EIDX_ALIGN_SLIDER (Main_bMotsCompat ? 30 : 23)
 
+#define EIDX_OK_BUTTON (Main_bMotsCompat ? EIDX_END_FP +  4 : EIDX_END_FP)
+#define EIDX_RESET_BUTTON (EIDX_OK_BUTTON + 1)
+#define EIDX_QUIT_BUTTON (EIDX_RESET_BUTTON + 1)
+
 static int jkGuiForce_alignment;
 static float jkGuiForce_flt_556674;
 static int jkGuiForce_numSpendStars;
@@ -142,7 +146,7 @@ jkGuiElement jkGuiForce_buttonsMots[31] = {
                 3, { 550, 440, 80, 40 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
 /*26*/        { ELEMENT_TEXTBUTTON, 0, 2, "GUI_RESET", 
                 3, { 270, 440, 100, 30 }, 1, 0, NULL, NULL, &jkGuiForce_ResetClick, NULL, {0}, 0 }, 
-/*27*/        { ELEMENT_TEXTBUTTON, 12345, 2, "GUI_QUIT", 
+/*27*/        { ELEMENT_TEXTBUTTON, /*12345*/-1, 2, "GUI_QUIT", 
                 3, { 0, 440, 100, 40 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0 }, 
 /*28*/        { ELEMENT_CUSTOM, 0, 0, NULL, 
                 0, { 0, 390, 640, 30 }, 1, 0, NULL, &jkGuiForce_ForceStarsDraw, NULL, NULL, {0}, 0 }, 
@@ -593,15 +597,19 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
             int id = jkGuiForce_pElements[i].hoverId;
 
             // Added?
-            if (i == EIDX_MOTS_DEFENSE)
+            if (i == EIDX_MOTS_DEFENSE) {
                 jkGuiForce_pElements[i].bIsVisible = !!jkGuiForce_isMulti;
+            }
+            else {
+                jkGuiForce_pElements[i].bIsVisible = 1;
+            }
 
             *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
         }
     }
     
     
-    jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_END_FP]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_OK_BUTTON]);
 
     int clicked;
     while (1)
@@ -730,6 +738,11 @@ void jkGuiForce_UpdateViewForRankMots(void)
             {
                 int id = jkGuiForce_pElements[i].hoverId;
                 jkGuiForce_pElements[i].bIsVisible = (sithPlayer_GetBinAmt(id) > 0.0);
+
+                // Added?
+                if (i == EIDX_MOTS_DEFENSE) {
+                    jkGuiForce_pElements[i].bIsVisible = !!jkGuiForce_isMulti;
+                }
             }
 
             for (int i = 0; i < 4; i++) {
@@ -740,7 +753,7 @@ void jkGuiForce_UpdateViewForRankMots(void)
             return;
         }
     }
-    jkGuiForce_buttons[20].bIsVisible = 0;
+    jkGuiForce_pElements[EIDX_MOTS_DEFENSE].bIsVisible = 0;
 }
 
 void jkGuiForce_UpdateViewForRank()
