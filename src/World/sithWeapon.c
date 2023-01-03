@@ -473,6 +473,22 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
     }
 }
 
+// Mots added: unused
+sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, int16_t scaleFlags, float a9, int extra)
+{
+    sithThing *spawned; // esi
+
+    if ( fireSound )
+        sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
+
+    spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
+
+    if ( spawned && sithComm_multiplayerFlags )
+        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, extra);
+
+    return spawned;
+}
+
 sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, int16_t scaleFlags, float a9)
 {
     sithThing *spawned; // esi
@@ -483,7 +499,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
     if ( spawned && sithComm_multiplayerFlags )
-        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255);
+        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, 0);
 
     return spawned;
 }
@@ -1469,7 +1485,7 @@ LABEL_30:
         v16 = a5a;
         v17 = sithWeapon_FireProjectile_0(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, extra);
         if ( v17 && sithComm_multiplayerFlags )
-            sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255);
+            sithDSSThing_SendFireProjectile(sender, projectileTemplate, &v19, fireOffset, 0, mode, scale, scaleFlags, a5a, v17->thing_id, -1, 255, extra);
     }
     while ( a1a > 1.0 );
 LABEL_31:
@@ -1493,7 +1509,8 @@ LABEL_31:
                 v16,
                 result->thing_id,
                 -1,
-                255);
+                255,
+                extra);
             result = a1b;
         }
     }

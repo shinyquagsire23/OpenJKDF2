@@ -2769,7 +2769,7 @@ typedef struct sithThing
     uint32_t thingflags;
     uint32_t thingIdx;
     uint32_t thing_id;
-#ifdef JKM_TYPES
+#ifdef JKM_PARAMS
     uint32_t unk;
 #endif // JKM_TYPES
     uint32_t type;

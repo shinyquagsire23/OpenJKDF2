@@ -102,8 +102,10 @@
 
 #ifdef JKM_DSS
 #define NUM_JKPLAYER_THINGS (64)
+#define SITHINVENTORY_NUM_POWERKEYBINDS (32+1)
 #else
 #define NUM_JKPLAYER_THINGS (16)
+#define SITHINVENTORY_NUM_POWERKEYBINDS (20+1)
 #endif
 
 // Droidworks cameras
@@ -146,6 +148,9 @@
 
 #define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_FLAG(_flag) (Main_bMotsCompat ? (_flag) : (0))
+
+#define COMPAT_SAVE_VERSION (Main_bMotsCompat ? 0x7D6 : 0x6)
+#define JKSAVE_FORMATSTR (Main_bMotsCompat ? "msav%04d.jks" : "save%04d.jks")
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER

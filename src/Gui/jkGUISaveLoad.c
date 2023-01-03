@@ -219,7 +219,7 @@ void jkGuiSaveLoad_PopulateList()
                 v2 = pHS->fileOpen(path, "rb");
                 if ( v2 )
                 {
-                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header) && saveHeader.version == 6 ) // MOTS altered: 6 -> 0x7D6
+                    if ( pHS->fileRead(v2, &saveHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header) && (saveHeader.version == 6 || saveHeader.version == 0x7D6) ) // MOTS altered: 6 -> 0x7D6
                     {
                         v3 = __wcschr(saveHeader.saveName, U'~');
                         v4 = v3;
@@ -379,6 +379,12 @@ LABEL_24:
                         if ( v29 <= jkGuiSaveLoad_numEntries )
                             v15[v29] = 1;
                     }
+                    else if (Main_bMotsCompat && v20 && _sscanf(v20->fpath, "msav%04d.jks", &v29) == 1 ) // Added: Mots
+                    {
+                        v14 = jkGuiSaveLoad_numEntries;
+                        if ( v29 <= jkGuiSaveLoad_numEntries )
+                            v15[v29] = 1;
+                    }
                     else
                     {
                         v14 = jkGuiSaveLoad_numEntries;
@@ -392,7 +398,7 @@ LABEL_24:
                 if ( !v15[i] )
                     break;
             }
-            _sprintf(v30, "save%04d.jks", i);
+            _sprintf(v30, JKSAVE_FORMATSTR, i);
             pHS->free(v15);
 LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;

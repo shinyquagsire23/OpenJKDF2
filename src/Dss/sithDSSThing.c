@@ -25,7 +25,7 @@ void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync)
 
     NETMSG_START;
 
-    if ( pThing && pThing->type && pThing->sector)
+    if ( pThing && pThing->type && pThing->sector && MOTS_ONLY_COND(!(pThing->physicsParams.physflags & SITH_PF_4000000)))
     {
         sithSector* pSector = pThing->sector;
         NETMSG_PUSHS32(pThing->thing_id);
@@ -116,11 +116,12 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
     return 1;
 }
 
+// MoTS altered
 void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) )
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_COND(pThing->physicsParams.physflags & SITH_PF_4000000))
         return;
 
     NETMSG_PUSHS32(pThing->thing_id);
@@ -202,7 +203,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     sithThing_MoveToSector(pThing, pSector, 0);
 
     uint32_t thingflags = NETMSG_POPS32();
-    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD))
+    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_pLocalPlayerThing))
         sithPlayer_debug_loadauto(pThing);
     
     // Lol, anticheat?
@@ -210,6 +211,14 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
         thingflags |= SITH_TF_INVULN;
     else
         thingflags &= ~SITH_TF_INVULN;
+
+    // MoTS added
+    /*
+    if ((((thing->thingflags & SITH_TF_DISABLED) != 0) && ((uVar8 & SITH_TF_DISABLED) == 0)) &&
+       (((thing->type == 5 && (((sithNet_isMulti != 0 && (sithNet_isServer == 0)) && (*(int *)&(thing->typeParams).field_0x10 != 0)))) && ((*(byte *)&thing->typeParams & 1) != 0)))) {
+        sithCog_SendMessageFromThing(thing,thing,SITH_MESSAGE_RESPAWN);
+    }
+    */
 
     sithAnimclass* pAnimclass = pThing->animclass;
     pThing->thingflags = thingflags;
@@ -552,7 +561,8 @@ int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags)
+// MoTS altered
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags, int idk)
 {
     NETMSG_START;
 
@@ -578,7 +588,13 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
     NETMSG_PUSHF32(a9);
     NETMSG_PUSHS32(thingId);
 
-    NETMSG_END(DSS_FIREPROJECTILE);
+    if (idk == 0) {
+        NETMSG_END(DSS_FIREPROJECTILE);
+    }
+    else if (Main_bMotsCompat) {
+        NETMSG_PUSHS32(idk);
+        NETMSG_END(DSS_MOTS_NEW_2);
+    }
 
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 0);
 }
@@ -611,6 +627,44 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
                       scaleFlags,
                       a9,
                       0);
+        if ( pThing2 )
+        {
+            pThing2->thing_id = thingId;
+            pThing2->thingflags |= SITH_TF_INVULN;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg)
+{
+    NETMSG_IN_START(msg);
+
+    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    if ( pThing )
+    {
+        int16_t scaleFlags = NETMSG_POPS16();
+        sithThing* pTemplate = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+        sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
+        int anim = NETMSG_POPS16();
+        rdVector3 aimError = NETMSG_POPVEC3();
+        rdVector3 fireOffset = NETMSG_POPVEC3();
+        float scale = NETMSG_POPF32();
+        float a9 = NETMSG_POPF32();
+        int thingId = NETMSG_POPS32();
+        int idk = NETMSG_POPS32();
+        sithThing* pThing2 = sithWeapon_FireProjectile_0(
+                      pThing,
+                      pTemplate,
+                      &fireOffset,
+                      &aimError,
+                      pSound,
+                      anim,
+                      scale,
+                      scaleFlags,
+                      a9,
+                      idk);
         if ( pThing2 )
         {
             pThing2->thing_id = thingId;
@@ -708,6 +762,7 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg)
     return 0;
 }
 
+// MoTS altered
 void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
@@ -755,6 +810,43 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
                 NETMSG_PUSHS16(-1);
             }
         }
+
+        // MOTS added
+        if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THINGTYPE_MODEL) {
+            rdModel3* model = thing->rdthing.model3;
+            if (thing->unk && model) 
+            {
+                NETMSG_PUSHS16(1);
+
+                char tmp_model[32+1];
+                NETMSG_PUSHSTR(model->filename, 0x20);
+                NETMSG_PUSHS16(0);
+            }
+            else 
+            {
+                NETMSG_PUSHS16(0);
+            }
+
+            if (thing->rdthing.amputatedJoints) {
+
+                int numJoints = 0;
+                for (int i = 0; i < model->numHierarchyNodes; i++) {
+                    if (thing->rdthing.amputatedJoints[i]) {
+                        numJoints++;
+                    }
+                }
+                NETMSG_PUSHS16(numJoints);
+                for (int i = 0; i < model->numHierarchyNodes; i++) {
+                    if (thing->rdthing.amputatedJoints[i]) {
+                        NETMSG_PUSHS16(i);
+                    }
+                }
+            }
+            else {
+                NETMSG_PUSHS16(0);
+            }
+        }
+
         switch ( thing->type )
         {
             case SITH_THING_ACTOR:
@@ -777,6 +869,14 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
                 else
                 {
                     NETMSG_PUSHS32(-1);
+                }
+                if (sithComm_version == 0x7D6) {
+                    if (thing->actorParams.templateWeapon) {
+                        NETMSG_PUSHS16(1);
+                    }
+                    else {
+                        NETMSG_PUSHS16(0);
+                    }
                 }
                 break;
             case SITH_THING_WEAPON:
@@ -827,6 +927,7 @@ void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+// MoTS altered
 int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
 {
     int16_t thingIdx; // ebp
@@ -896,6 +997,34 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         thing->class_cog = sithCog_GetByIdx(NETMSG_POPS16());
         thing->capture_cog = sithCog_GetByIdx(NETMSG_POPS16());
     }
+
+    // MOTS added
+    if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THINGTYPE_MODEL) {
+        thing->unk = NETMSG_POPS16();
+
+        rdModel3* model = thing->rdthing.model3;
+        if (thing->unk) {
+            char tmp_model[32+1];
+            NETMSG_POPSTR(tmp_model, 0x20);
+            int unused = NETMSG_POPS16();
+            rdModel3* pModel = sithModel_LoadEntry(tmp_model, 0);
+            sithThing_SetNewModel(thing, pModel);
+
+            model = pModel;
+        }
+
+        int numJoints = NETMSG_POPS16();
+        if (model && numJoints > 0) {
+            for (int i = 0; i < numJoints; i++)
+            {
+                int val = NETMSG_POPS16();
+                if (thing->rdthing.amputatedJoints && (uint32_t)val < model->numHierarchyNodes) {
+                    thing->rdthing.amputatedJoints[val] = 1;
+                }
+            }
+        }
+    }
+
     switch ( thing->type )
     {
         case SITH_THING_ACTOR:
@@ -917,6 +1046,13 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
                 thing->actorParams.playerinfo = &jkPlayer_playerInfos[playerInfo_idx];
                 thing->actorParams.playerinfo->palEffectsIdx1 = NETMSG_POPS32();
                 thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPS32();
+            }
+
+            // MOTS added
+            if (sithComm_version == 0x7D6) {
+                if (!NETMSG_POPS16()) {
+                    thing->actorParams.templateWeapon = NULL;
+                }
             }
             break;
         case SITH_THING_WEAPON:

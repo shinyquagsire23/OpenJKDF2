@@ -7,6 +7,9 @@
 #include "Win95/stdComm.h"
 #include "jk.h"
 
+int sithComm_009a1160 = 0;
+int sithComm_version = 6;
+
 // MOTS altered
 int sithComm_Startup()
 {
@@ -60,6 +63,7 @@ int sithComm_Startup()
 
     if (Main_bMotsCompat) {
         sithComm_msgFuncs[DSS_MOTS_NEW_1] = sithDSSThing_ProcessMOTSNew1;
+        sithComm_msgFuncs[DSS_MOTS_NEW_2] = sithDSSThing_ProcessMOTSNew2;
     }
     sithComm_bInit = 1;
     return 1;
@@ -190,8 +194,13 @@ LABEL_35:
     return ret;
 }
 
+// MOTS altered
 void sithComm_FileWrite(sithCogMsg *ctx)
 {
+    // Added: multiple version handling
+    if (sithComm_version == 0x7D6) {
+        stdConffile_Write((const char*)&sithComm_009a1160, sizeof(sithComm_009a1160));
+    }
     stdConffile_Write((const char*)&ctx->netMsg.cogMsgId, sizeof(int));
     stdConffile_Write((const char*)&ctx->netMsg.msg_size, sizeof(int));
     stdConffile_Write((const char*)&ctx->pktData[0], ctx->netMsg.msg_size);

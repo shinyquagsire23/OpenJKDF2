@@ -69,8 +69,9 @@ int sithDSSThing_ProcessStopKey(sithCogMsg *msg);
 void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4);
 int sithDSSThing_ProcessStopSound(sithCogMsg *msg);
 
-void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags);
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags, int idk);
 int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg);
+int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg);
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessDeath(sithCogMsg *msg);

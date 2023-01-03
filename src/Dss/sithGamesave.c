@@ -26,6 +26,9 @@
 #include "Dss/sithDSS.h"
 #include "Dss/sithDSSCog.h"
 #include "Devices/sithComm.h"
+#include "Dss/sithMulti.h"
+#include "Gui/jkGUIDialog.h"
+#include "Main/jkStrings.h"
 #include "jk.h"
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -83,11 +86,28 @@ int sithGamesave_LoadEntry(char *fpath)
     char SrcStr[32]; // [esp+10h] [ebp-64Ch] BYREF
     sithGamesave_Header header; // [esp+30h] [ebp-62Ch] BYREF
 
+    int bIsOutdatedSave = 0;
+
     if ( !stdConffile_OpenMode(fpath, "rb") )
         goto load_fail;
     stdConffile_Read(&header, sizeof(sithGamesave_Header));
-    if ( header.version != 6 )
+
+    if (!Main_bMotsCompat) {
+        if ( header.version != 6 )
         goto load_fail;
+    }
+    else {
+        if ( header.version != 6 && header.version != 0x7D6)
+            goto load_fail;
+         
+        if ( header.version == 6) {
+            bIsOutdatedSave = 1;
+        }
+    }
+
+    // Added: multiple versions
+    sithComm_version = header.version;
+    
     if ( sithGamesave_funcRead )
         sithGamesave_funcRead();
     stdConffile_Read(SrcStr, 32);
@@ -125,13 +145,36 @@ LABEL_11:
     stdConffile_Read((char*)&jkPlayer_setDiff, sizeof(int32_t));
     stdConffile_Read((char*)&g_mapModeFlags, sizeof(int32_t));
 
+    if (bIsOutdatedSave) {
+        //stdConffile_Close();
+        
+        // TODO add message
+        //sithGamesave_currentState = SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
+        curMs = 0;
+        sithCamera_SetsFocus();
+        goto skip_free_things;
+    }
+
     sithThing_freestuff(sithWorld_pCurrentWorld);
-    
+
+skip_free_things:
     // Apparently this works by interpreting a bunch of netMsg packets from the
     // savefile? Funky.
 //#ifndef LINUX_TMP
     while (1)
     {
+        // Added: Determinism
+        memset(&sithComm_netMsgTmp, 0, sizeof(sithComm_netMsgTmp));
+
+        // TODO
+        if (sithComm_version == 0x7D6) {
+            int32_t tmp = 0;
+            if ( !stdConffile_Read(&tmp, sizeof(tmp)) )
+            {
+                break;
+            }
+        }
+
         if ( !stdConffile_Read(&sithComm_netMsgTmp.netMsg.cogMsgId, 4) )
         {
             break;
@@ -142,11 +185,18 @@ LABEL_11:
             jk_printf("OpenJKDF2: Save load failed to read msg_size\n");
             goto load_fail;
         }
+
+        //printf("%x %x\n", sithComm_netMsgTmp.netMsg.cogMsgId, sithComm_netMsgTmp.netMsg.msg_size);
         
         if (!(!sithComm_netMsgTmp.netMsg.msg_size || stdConffile_Read(sithComm_netMsgTmp.pktData, sithComm_netMsgTmp.netMsg.msg_size)))
         {
             jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithComm_netMsgTmp.netMsg.msg_size);
             goto load_fail;
+        }
+
+        // If the save is outdated, only try to load inventory data
+        if (bIsOutdatedSave && sithComm_netMsgTmp.netMsg.cogMsgId != DSS_INVENTORY) {
+            continue;
         }
         
         if (!sithComm_InvokeMsgByIdx(&sithComm_netMsgTmp))
@@ -156,14 +206,27 @@ LABEL_11:
             // Linux fails on SyncSound only
             goto load_fail;
 #endif
-        }   
+        }
     }
 //#endif
+
+    if (bIsOutdatedSave)
+    {
+        jkPlayer_Startup();
+        jkPlayer_InitForceBins();
+        jkPlayer_InitSaber();
+        sithMain_AutoSave();
+
+        jkGuiDialog_ErrorDialog(jkStrings_GetText("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
+
+        goto skip_dss;
+    }
 
     sithThing_sub_4CCE60();
     sithPlayer_idk(0);
     if ( sithGamesave_func3 )
         sithGamesave_func3();
+skip_dss:
     stdConffile_Close();
     _memcpy(&sithGamesave_headerTmp, &header, sizeof(sithGamesave_headerTmp));
     _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(fpath), 0x7Fu);
@@ -283,6 +346,10 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         return 0;
     if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
+
+    // Added: multiple versions
+    sithComm_version = COMPAT_SAVE_VERSION;
+
     v5 = saveName;
     if ( !saveName )
     {
@@ -301,7 +368,7 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     if ( a2 || !stdConffile_OpenRead(PathName) )
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
-        sithGamesave_headerTmp.version = 6;
+        sithGamesave_headerTmp.version = COMPAT_SAVE_VERSION;
         _strncpy(sithGamesave_headerTmp.episodeName, sithWorld_pCurrentWorld->episodeName, 0x7Fu);
         sithGamesave_headerTmp.episodeName[127] = 0;
         _strncpy(sithGamesave_headerTmp.jklName, sithWorld_pCurrentWorld->map_jkl_fname, 0x7Fu);

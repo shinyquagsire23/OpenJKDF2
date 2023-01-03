@@ -422,6 +422,8 @@ int sithDSS_ProcessInventory(sithCogMsg *msg)
     iteminfo->activationDelaySecs = NETMSG_POPF32();
     iteminfo->binWait = NETMSG_POPF32();
 
+    //printf("%x %f\n", binIdx, iteminfo->ammoAmt);
+
     // Added: idk if this is necessary
     sithInventory_aDescriptors[binIdx].flags |= ITEMINFO_VALID;
 
@@ -747,7 +749,7 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags)
     NETMSG_PUSHU32(sithPlayer_pLocalPlayer->curWeapon);
     NETMSG_PUSHU32(sithPlayer_pLocalPlayer->curPower);
 
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < ((sithComm_version == 0x7D6) ? 32 : 20); i++)
     {
         NETMSG_PUSHU32(sithInventory_powerKeybinds[i].idk);
     }
@@ -815,7 +817,7 @@ int sithDSS_ProcessMisc(sithCogMsg *msg)
     sithPlayer_pLocalPlayer->curWeapon = NETMSG_POPU32();
     sithPlayer_pLocalPlayer->curPower = NETMSG_POPU32();
 
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < ((sithComm_version == 0x7D6) ? 32 : 20); i++)
     {
         sithInventory_powerKeybinds[i].idk = NETMSG_POPU32();
     }

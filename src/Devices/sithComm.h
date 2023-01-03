@@ -15,6 +15,8 @@
 
 #include "types.h"
 
+extern int sithComm_version;
+
 int sithComm_Startup();
 void sithComm_Shutdown();
 void sithComm_SetMsgFunc(int msgid, void *func);

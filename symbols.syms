@@ -673,7 +673,7 @@ sithWorld_bInitted 0x8339D8 uint32_t
 sithWorld_bLoaded 0x008339DC int
 sithWorld_episodeName 0x008EE620 char[32]
 
-sithInventory_powerKeybinds 0x008BD0C0 sithKeybind[21]
+sithInventory_powerKeybinds 0x008BD0C0 sithKeybind[SITHINVENTORY_NUM_POWERKEYBINDS]
 sithInventory_549FA0 0x00549FA0 int = 1
 sithInventory_aDescriptors 0x008BD1C0 sithItemDescriptor[SITHBIN_NUMBINS]
 sithInventory_bUnk 0x008339E4 int
