@@ -242,10 +242,10 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
             lightDirIter++;
         }
     
+        local_28 += *outLights;
         vertexNormals++;
         vertexIter++;
         outLights++;
-        local_28 += *outLights;
     } 
     return (double)(local_28 / (float)numVertices);
 #endif
