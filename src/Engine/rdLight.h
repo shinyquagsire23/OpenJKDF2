@@ -19,6 +19,10 @@ rdLight *rdLight_New();
 int rdLight_NewEntry(rdLight *light);
 void rdLight_Free(rdLight *light);
 void rdLight_FreeEntry(rdLight *light);
+#ifdef JKM_LIGHTING
+void rdLight_SetAngles(rdLight *pLight, float angleX, float angleY);
+#endif
+
 double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 

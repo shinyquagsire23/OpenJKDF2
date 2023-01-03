@@ -785,18 +785,22 @@ typedef struct rdMatrix44
 typedef struct rdLight
 {
     uint32_t id;
-    uint32_t type;
+    int32_t type;
     uint32_t active;
     rdVector3 direction;
     float intensity;
-#ifdef JKM_LIGHTING
-    float intensityR;
-    float intensityG;
-    float intensityB;
-#endif
     uint32_t color;
+    
+#ifdef JKM_LIGHTING
+    float angleX;
+    float cosAngleX;
+    float angleY;
+    float cosAngleY;
+    float lux;
+#else
     uint32_t dword20;
     uint32_t dword24;
+#endif
     float falloffMin;
     float falloffMax;
 } rdLight;

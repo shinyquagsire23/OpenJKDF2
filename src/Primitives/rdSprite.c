@@ -189,7 +189,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     procEntry->geometryMode = procEntry->geometryMode;
     if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
-        procEntry->lightingMode = 0;
+        procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
     {

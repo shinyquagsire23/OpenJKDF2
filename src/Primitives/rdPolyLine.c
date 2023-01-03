@@ -287,8 +287,6 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
 {
     rdProcEntry *procEntry;
-    rdGeoMode_t geometryMode;
-    int textureMode;
     rdMeshinfo mesh_out;
     float staticLight;
 
@@ -305,27 +303,35 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     idxInfo->vertexPosIdx = face->vertexPosIdx;
     idxInfo->vertexUVIdx = face->vertexUVIdx;
     
-    if ( rdroid_curGeometryMode >= face->geometryMode )
-        rdroid_curGeometryMode = face->geometryMode;
-    geometryMode = thing->curGeoMode;
-    if ( rdroid_curGeometryMode < thing->curGeoMode )
+    rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
+    rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+    rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
+
+    if ( curGeometryMode_ >= face->geometryMode )
+        curGeometryMode_ = face->geometryMode;
+    if ( curGeometryMode_ >= thing->curGeoMode )
     {
-        if ( rdroid_curGeometryMode >= face->geometryMode )
-            geometryMode = face->geometryMode;
-        else
-            geometryMode = rdroid_curGeometryMode;
+        procEntry->geometryMode = thing->curGeoMode;
+    }    
+    else if ( rdroid_curGeometryMode >= face->geometryMode )
+    {
+        procEntry->geometryMode = face->geometryMode;
+    }
+    else
+    {
+        procEntry->geometryMode = rdroid_curGeometryMode;
     }
     
-    procEntry->geometryMode = geometryMode;
+    procEntry->geometryMode = procEntry->geometryMode;
     if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
     {
-        if ( rdroid_curLightingMode >= face->lightingMode )
-            rdroid_curLightingMode = face->lightingMode;
-        if ( rdroid_curLightingMode >= thing->curLightMode )
+        if ( curLightingMode_ >= face->lightingMode )
+            curLightingMode_ = face->lightingMode;
+        if ( curLightingMode_ >= thing->curLightMode )
         {
             face->lightingMode = thing->curLightMode;
         }
@@ -335,20 +341,20 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
         }
         procEntry->lightingMode = face->lightingMode;
     }
+
+    if ( curTextureMode_ >= face->textureMode )
+        curTextureMode_ = face->textureMode;
     
-    if ( rdroid_curTextureMode >= face->textureMode )
-        rdroid_curTextureMode = face->textureMode;
-    textureMode = thing->curTexMode;
-    if ( rdroid_curTextureMode < textureMode )
+    procEntry->textureMode = thing->curTexMode;
+    if ( curTextureMode_ < procEntry->textureMode )
     {
-        if ( rdroid_curTextureMode >= face->textureMode )
-            textureMode = face->textureMode;
+        if ( curTextureMode_ >= face->textureMode )
+            procEntry->textureMode = face->textureMode;
         else
-            textureMode = rdroid_curTextureMode;
+            procEntry->textureMode = rdroid_curTextureMode;
     }
-    
-    procEntry->textureMode = textureMode;
-    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, procEntry->lightingMode, textureMode, idxInfo, &mesh_out, &face->clipIdk);
+
+    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
     if ( mesh_out.numVertices < 3 )
         return;
 
