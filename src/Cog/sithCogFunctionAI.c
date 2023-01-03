@@ -757,6 +757,8 @@ void sithCogFunctionAI_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
+    
+        //TODO: actor_rc.cog references a "AISetMoveTarget"?
     }
 #endif
 }

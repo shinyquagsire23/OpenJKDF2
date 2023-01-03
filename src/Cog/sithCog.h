@@ -67,6 +67,7 @@ static int (*_sithCog_Load)(sithWorld *world, int a2) = (void*)sithCog_Load_ADDR
 static sithCog* (*_sithCog_LoadCogscript)(const char *fpath) = (void*)sithCog_LoadCogscript_ADDR;
 
 int sithCog_Startup();
+int sithCog_StartupEnhanced(); // Added
 void sithCog_Shutdown();
 int sithCog_Open();
 void sithCog_Close();

@@ -5,6 +5,7 @@
 #include "Dss/sithMulti.h"
 #include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
+#include "World/sithActor.h"
 #include "Gameplay/sithInventory.h"
 
 void sithCogFunctionPlayer_SetInvActivate(sithCog *ctx)
@@ -536,6 +537,15 @@ void sithCogFunctionPlayer_SyncScores(sithCog *ctx)
         sithMulti_SyncScores();
 }
 
+// MOTS added
+void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
+{
+    sithActor_SpawnDeadBodyMaybe(sithPlayer_pLocalPlayerThing, NULL, 0xbc614e); // Magic number, not a pointer?
+    return;
+}
+
+
+
 void sithCogFunctionPlayer_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
@@ -579,5 +589,8 @@ void sithCogFunctionPlayer_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SyncScores, "syncscores");
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
+    }
 
 }

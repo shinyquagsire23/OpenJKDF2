@@ -25,6 +25,9 @@ void sithCogYACC_yy_init_buffer(){}
 
 extern int yyparse();
 
+// Added: debug
+char* sithCogParse_lastParsedFile = "INVALID";
+
 void sithCogParse_Reset()
 {
     if ( cogparser_nodes_alloc )
@@ -43,6 +46,9 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
 
     if (!stdConffile_OpenRead(cog_fpath))
         return 0;
+
+    // Added
+    sithCogParse_lastParsedFile = cog_fpath;
 
     _memset(cogscript, 0, sizeof(sithCogScript));
     _strncpy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 0x1Fu);
@@ -507,7 +513,10 @@ sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char 
     if (result = stdHashTable_GetKeyVal(pSymbolTable->hashtable, a2))
         return result;
 
-    if (pSymbolTable == sithCog_pSymbolTable) return NULL;
+    if (pSymbolTable == sithCog_pSymbolTable) {
+        //jk_printf("OpenJKDF2: Missing symbol `%s` in `%s`!\n", a2, sithCogParse_lastParsedFile);
+        return NULL;
+    }
 
     return sithCogParse_GetSymbolVal(sithCog_pSymbolTable, a2);
 }

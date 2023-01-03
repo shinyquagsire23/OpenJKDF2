@@ -107,16 +107,23 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 if (!sithCogExec_PopStackVar(cog_ctx, &var))
                     break;
                 tmpStackVar = &var;
-                if ( tmpStackVar->type != COG_VARTYPE_SYMBOL )
+                if ( tmpStackVar->type != COG_VARTYPE_SYMBOL ) {
                     break;
+                }
                 v12 = sithCogParse_GetSymbol(cog_ctx->pSymbolTable, tmpStackVar->data[0]);
 
                 if (!v12 )
                     break;
-                if (v12->val.type)
+                if (v12->val.type) {
+                    printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
                     break;
-                if ( v12->val.dataAsFunc )
+                }
+                if ( v12->val.dataAsFunc ) {
                     v12->val.dataAsFunc(cog_ctx); 
+                }
+                else {
+                    printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
+                }
                 //func = sithCogExec_PopSymbolFunc(cog_ctx); // this function is slightly different?
                 break;
 
@@ -198,7 +205,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 break;
 
             default:
-                jk_printf("unk op %u\n", op); // added
+                jk_printf("OpenJKDF2: unk op %u\n", op); // added
                 break;
         }
         if ( cog_ctx->script_running == 1 ) {

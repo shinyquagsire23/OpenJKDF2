@@ -1942,5 +1942,7 @@ void sithCogFunction_Startup(void* ctx)
     }
     
     // Droidworks
-    sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
+    }
 }

@@ -140,6 +140,229 @@ int sithCog_Startup()
     return 1;
 }
 
+extern void sithCogFunction_Pow(sithCog* ctx);
+extern void sithCogFunction_Wakeup(sithCog* ctx);
+extern void sithCogFunction_VectorEqual(sithCog* ctx);
+extern void sithCogFunction_FireProjectileData(sithCog* ctx);
+extern void sithCogFunction_FireProjectileLocal(sithCog* ctx);
+extern void sithCogFunction_GetWeaponBin(sithCog* ctx);
+extern void sithCogFunction_SendMessageExRadius(sithCog* ctx);
+extern void sithCogFunction_WorldFlash(sithCog* ctx);
+extern void sithCogFunction_SetCameraZoom(sithCog* ctx);
+extern void sithCogFunction_GetActionCog(sithCog* ctx);
+extern void sithCogFunction_SetActionCog(sithCog* ctx);
+extern void sithCogFunction_Sin(sithCog* ctx);
+extern void sithCogFunction_Cos(sithCog* ctx);
+extern void sithCogFunction_Tan(sithCog* ctx);
+extern void sithCogFunction_GetCogFlags(sithCog* ctx);
+extern void sithCogFunction_SetCogFlags(sithCog* ctx);
+extern void sithCogFunction_ClearCogFlags(sithCog* ctx);
+extern void sithCogFunction_DebugBreak(sithCog* ctx);
+extern void sithCogFunction_GetSysDate(sithCog* ctx);
+extern void sithCogFunction_GetSysTime(sithCog* ctx);
+extern void sithCogFunction_SetCameraFocii(sithCog* ctx);
+
+extern void sithCogFunctionAI_FirstThingInCone(sithCog *ctx);
+extern void sithCogFunctionAI_NextThingInCone(sithCog *ctx);
+
+extern void sithCogFunctionAI_AIGetAlignment(sithCog *ctx);
+extern void sithCogFunctionAI_AISetAlignment(sithCog *ctx);
+extern void sithCogFunctionAI_AISetInterest(sithCog *ctx);
+extern void sithCogFunctionAI_AIGetInterest(sithCog *ctx);
+extern void sithCogFunctionAI_AISetDistractor(sithCog *ctx);
+extern void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx);
+extern void sithCogFunctionAI_AIRemoveAlignmentPriority(sithCog *ctx);
+
+extern void sithCogFunctionPlayer_KillPlayerQuietly(sithCog* ctx);
+
+extern void sithCogFunctionSector_ChangeAllSectorsLight(sithCog* ctx);
+extern void sithCogFunctionSector_FindSectorAtPos(sithCog* ctx);
+extern void sithCogFunctionSector_IsSphereInSector(sithCog* ctx);
+extern void sithCogFunctionSector_GetSectorAmbientLight(sithCog* ctx);
+extern void sithCogFunctionSector_SetSectorAmbientLight(sithCog* ctx);
+
+extern void sithCogFunctionSound_PlaySoundThingLocal(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundPosLocal(sithCog* ctx);
+
+extern void sithCogFunctionSound_PlaySoundThing(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundPos(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundLocal(sithCog* ctx);
+extern void sithCogFunctionSound_PlaySoundGlobal(sithCog* ctx);
+
+extern void sithCogFunctionSurface_GetSurfaceVertexLight(sithCog* ctx);
+extern void sithCogFunctionSurface_SetSurfaceVertexLight(sithCog* ctx);
+extern void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog* ctx);
+extern void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog* ctx);
+
+extern void sithCogFunctionThing_CreateThingLocal(sithCog* ctx);
+extern void sithCogFunctionThing_CreateThingAtPosOwner(sithCog* ctx);
+extern void sithCogFunctionThing_CreateThingAtPos(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingParent(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingPosEx(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingLvecPYR(sithCog* ctx);
+extern void sithCogFunctionThing_GetCurInvWeapon(sithCog* ctx);
+extern void sithCogFunctionThing_GetActorWeapon(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingLookPYR(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingGUID(sithCog* ctx);
+extern void sithCogFunctionThing_GetGUIDThing(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingMaxVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingMaxAngularVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxAngularVelocity(sithCog* ctx);
+extern void sithCogFunctionThing_GetActorHeadPYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetActorHeadPYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingJointAngle(sithCog* ctx);
+extern void sithCogFunctionThing_GetThingJointAngle(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMaxHeadPitch(sithCog* ctx);
+extern void sithCogFunctionThing_SetThingMinHeadPitch(sithCog* ctx);
+extern void sithCogFunctionThing_InterpolatePYR(sithCog* ctx);
+extern void sithCogFunctionThing_SetWeaponTarget(sithCog* ctx);
+extern void sithCogFunctionThing_GetCurInvWeaponMots(sithCog* ctx);
+
+// Added: Register all new COG verbs last
+int sithCog_StartupEnhanced()
+{
+    if (!Main_bEnhancedCogVerbs) return 1;
+
+    sithCogSymboltable* ctx = sithCog_pSymbolTable;
+
+    // Generic
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_Pow, "pow");
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_Wakeup, "wakeup");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_VectorEqual,"vectorequal");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetWeaponBin,"getweaponbin");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Sin,"sin");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Cos,"cos");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_Tan,"tan");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate");
+        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime");
+    }
+    
+    // Droidworks generic
+    if (!Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
+    }
+
+    // AI
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
+    }
+    
+#ifdef JKM_AI
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
+    
+        //TODO: actor_rc.cog references a "AISetMoveTarget"?
+    }
+#endif
+
+    // Player
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
+    }
+
+    // Sector
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_ChangeAllSectorsLight,"changeallsectorslight");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_FindSectorAtPos,"findsectoratpos");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_IsSphereInSector,"issphereinsector");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_GetSectorAmbientLight,"getsectorambientlight");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_SetSectorAmbientLight,"setsectorambientlight");
+    }
+
+    // Sound
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThingLocal, "playsoundthinglocal");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPosLocal, "playsoundposlocal");
+        
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
+    }
+
+    // Surface
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceVertexLight, "getsurfacevertexlight");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceVertexLight, "setsurfacevertexlight");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceVertexLightRGB, "getsurfacevertexlightrgb");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceVertexLightRGB, "setsurfacevertexlightrgb");
+    }
+
+    // Thing
+    
+    if (!Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingLocal, "createthinglocal");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPosOwner, "createthingatposowner");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPos, "createthingatposold");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingParent, "setthingparent");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingPosEx, "setthingposex");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingLvecPYR, "getthinglvecpyr");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon2");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorWeapon, "getactorweapon2");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
+
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionThing_GetThingGUID,"getthingguid");
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionThing_GetGUIDThing,"getguidthing");
+
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingMaxVelocity, "getthingmaxvelocity");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxVelocity, "setthingmaxvelocity");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingMaxAngularVelocity, "getthingmaxangularvelocity");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxAngularVelocity, "setthingmaxangularvelocity");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorHeadPYR, "getactorheadpyr");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetActorHeadPYR, "setactorheadpyr");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxHeadPitch, "setthingmaxheadpitch");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetWeaponTarget, "setweapontarget");
+
+        // TODO: weap_eweb_m.cog references a "SetThingCollide" verb? Superceded by "SetThingCollideSize"?
+        // TODO: exp_hrail.cog references a "GetUserData" verb? Superceded by "GetThingUserData"?
+    }
+
+    // Present in files, but registered?
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeaponMots, "getcurinvweapon");
+    }
+    return 1;
+}
+
 void sithCog_Shutdown()
 {
     sithCogParse_FreeSymboltable(sithCog_pSymbolTable);

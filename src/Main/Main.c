@@ -95,6 +95,7 @@ int Main_bHeadless = 0;
 int Main_bVerboseNetworking = 0;
 int Main_bMotsCompat = 0;
 int Main_bDwCompat = 0;
+int Main_bEnhancedCogVerbs = 0;
 #endif
 
 #ifdef QOL_IMPROVEMENTS
@@ -332,6 +333,7 @@ int Main_Startup(const char *cmdline)
         sithMain_Startup(&hs); // ~TODO
         jkAI_Startup();
         jkCog_Startup();
+        sithCog_StartupEnhanced();
         jkEpisode_Startup();
         jkDev_Startup();
         jkGame_Startup();
@@ -558,6 +560,10 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(v1, "-motsCompat") || !__strcmpi(v1, "/motsCompat"))
         {
             Main_bMotsCompat = 1;
+        }
+        else if (!__strcmpi(v1, "-enhancedCogVerbs") || !__strcmpi(v1, "/enhancedCogVerbs"))
+        {
+            Main_bEnhancedCogVerbs = 1;
         }
         else if (!__strcmpi(v1, "-dwCompat") 
                  || !__strcmpi(v1, "/dwCompat") 

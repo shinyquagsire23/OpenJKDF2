@@ -2704,7 +2704,7 @@ void sithCogFunctionThing_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetInvMax, "getinvmax");
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon2");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeaponMots, "getcurinvweapon");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeaponMots, "getcurinvweapon");
     }
     else {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon");
@@ -2819,5 +2819,8 @@ void sithCogFunctionThing_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetWeaponTarget, "setweapontarget");
+
+        // TODO: weap_eweb_m.cog references a "SetThingCollide" verb? Superceded by "SetThingCollideSize"?
+        // TODO: exp_hrail.cog references a "GetUserData" verb? Superceded by "GetThingUserData"?
     }
 }

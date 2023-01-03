@@ -15,6 +15,7 @@ extern int Main_bHeadless;
 extern int Main_bVerboseNetworking;
 extern int Main_bMotsCompat;
 extern int Main_bDwCompat;
+extern int Main_bEnhancedCogVerbs;
 #endif
 
 int Main_Startup(const char *cmdline);

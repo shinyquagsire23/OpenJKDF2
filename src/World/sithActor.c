@@ -222,54 +222,76 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
         if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_SendMessageFromThing(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
         {
             sithSoundClass_StopSound(thing, 0);
-            if ( a4 == 0x20 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DROWNED);
-            }
-            else if ( a4 == 0x40 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_SPLATTERED);
-            }
-            else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATHUNDER);
-            }
-            else if ( thing->actorParams.health >= -10.0 )
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH1);
-            }
-            else
-            {
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH2);
+
+            // MOTS added: quiet death
+            if (!Main_bMotsCompat || a4 != 12345678) {
+                if ( a4 == 0x20 )
+                {
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_DROWNED);
+                }
+                else if ( a4 == 0x40 )
+                {
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_SPLATTERED);
+                }
+                else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
+                {
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATHUNDER);
+                }
+                else if ( thing->actorParams.health >= -10.0 )
+                {
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH1);
+                }
+                else
+                {
+                    sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH2);
+                }
             }
             sithActor_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
-            sithAIAwareness_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
+
+            // MOTS added: quiet death
+            if (!Main_bMotsCompat || a4 != 12345678) {
+                sithAIAwareness_AddEntry(thing->sector, &thing->position, 0, 5.0, a3);
+            }
             if ( thing->type == SITH_THING_PLAYER )
                 sithPlayer_sub_4C9150(thing, a3);
-            if ( thing == sithWorld_pCurrentWorld->cameraFocus )
-                sithCamera_SetCurrentCamera(&sithCamera_cameras[5]);
-            if ( thing->animclass )
-            {
-                sithPuppet_ResetTrack(thing);
-                if ( thing->actorParams.health >= -10.0 )
-                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH, 0);
-                else
-                    thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH2, 0);
+
+            // MOTS added: quiet death
+            if (!Main_bMotsCompat || a4 != 12345678) {
+                if ( thing == sithWorld_pCurrentWorld->cameraFocus )
+                    sithCamera_SetCurrentCamera(&sithCamera_cameras[5]);
+
+                // MOTS added: quiet death
+                if (!Main_bMotsCompat || a4 != 12345678) {
+                    if ( thing->animclass )
+                    {
+                        sithPuppet_ResetTrack(thing);
+                        if ( thing->actorParams.health >= -10.0 )
+                            thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH, 0);
+                        else
+                            thing->puppet->field_18 = sithPuppet_PlayMode(thing, SITH_ANIM_DEATH2, 0);
+                    }
+                }
             }
 
             thing->physicsParams.physflags &= ~SITH_PF_CROUCHING;
             if ( thing->type != SITH_THING_PLAYER )
             {
                 v7 = thing->actorParams.typeflags;
-                if ( (v7 & SITH_AF_EXPLODE_WHEN_KILLED) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
+
+                // MOTS added: quiet death
+                if ((!Main_bMotsCompat || a4 != 12345678) && (v7 & SITH_AF_EXPLODE_WHEN_KILLED) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
                 {
                     sithThing_Create(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
                     sithThing_Destroy(thing);
                 }
                 else
                 {
-                    if ( (v7 & SITH_AF_BREATH_UNDER_WATER) != 0 )
+                    if ( (v7 & SITH_AF_BREATH_UNDER_WATER) != 0 ) {
                         thing->physicsParams.buoyancy = 0.3;
+                    }
+                    else if (Main_bMotsCompat) {
+                        thing->physicsParams.buoyancy = 0.01; // MOTS added
+                    }
                     if ( (thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     {
                         sithActor_Remove(thing);
