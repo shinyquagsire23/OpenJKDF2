@@ -930,8 +930,10 @@ void sithCogFunctionThing_GetThingLvec(sithCog *ctx)
 void sithCogFunctionThing_GetThingLvecPYR(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (!pThing)
+    if (!pThing) {
         sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        return;
+    }
 
     rdVector3 pyrOut;
     rdMatrix34 lookOrient;
@@ -2564,7 +2566,7 @@ void sithCogFunctionThing_SetThingJointAngle(sithCog *ctx)
     }
 }
 
-
+// MOTS added
 void sithCogFunctionThing_GetThingJointAngle(sithCog *ctx)
 {
     rdVector3 *prVar1;
@@ -2583,6 +2585,28 @@ void sithCogFunctionThing_GetThingJointAngle(sithCog *ctx)
         }
         sithCogExec_PushFlex(ctx,local_4);
     }
+}
+
+// MOTS added
+void sithCogFunctionThing_SetThingLookPYR(sithCog *ctx)
+{
+    int iVar1;
+    sithThing *pThing;
+    rdVector3 pyr;
+    rdMatrix34 tmp_mat;
+
+    iVar1 = sithCogExec_PopVector3(ctx, &pyr);
+    pThing = sithCogExec_PopThing(ctx);
+    if (pThing && iVar1 == 1) 
+    {
+        rdMatrix_BuildRotate34(&tmp_mat, &pyr);
+        rdVector_Normalize3Acc(&tmp_mat.lvec);
+        rdMatrix_BuildFromLook34(&pThing->lookOrientation, &tmp_mat.lvec);
+        if (COG_SHOULD_SYNC(ctx)) {
+            sithThing_SetSyncFlags(pThing, 1);
+        }
+    }
+    return;
 }
 
 void sithCogFunctionThing_Startup(void* ctx)
@@ -2725,6 +2749,9 @@ void sithCogFunctionThing_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingRotVel, "getthingrotvel");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingRotVel, "setthingrotvel");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingLook, "setthinglook");
+    if (Main_bMotsCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "isthingcrouching");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "iscrouching");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingClassCog, "getthingclasscog");
