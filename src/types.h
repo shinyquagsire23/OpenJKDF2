@@ -3716,6 +3716,30 @@ typedef struct jkBubbleInfo
     uint32_t type;
 } jkBubbleInfo;
 
+// g_debugmodeFlags defines
+
+#define DEBUGFLAG_1         (0x1)
+#define DEBUGFLAG_2         (0x2)
+#define DEBUGFLAG_4         (0x4)
+#define DEBUGFLAG_8         (0x8)
+#define DEBUGFLAG_10        (0x10)
+#define DEBUGFLAG_20        (0x20)
+#define DEBUGFLAG_40        (0x40)
+#define DEBUGFLAG_80        (0x80)
+#define DEBUGFLAG_100       (0x100)
+#define DEBUGFLAG_200       (0x200)
+#define DEBUGFLAG_400       (0x400)
+#define DEBUGFLAG_800       (0x800)
+#define DEBUGFLAG_1000      (0x1000)
+#define DEBUGFLAG_2000      (0x2000)
+#define DEBUGFLAG_4000      (0x4000)
+#define DEBUGFLAG_8000      (0x8000)
+#define DEBUGFLAG_10000     (0x10000)
+#define DEBUGFLAG_20000     (0x20000)
+#define DEBUGFLAG_40000     (0x40000)
+#define DEBUGFLAG_80000     (0x80000)
+
+
 #ifdef GHIDRA_IMPORT
 #include "Win95/stdGob.h"
 #include "Engine/rdKeyframe.h"

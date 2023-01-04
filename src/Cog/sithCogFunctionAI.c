@@ -44,7 +44,7 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
         v1 = sithCogExec_PopThing(ctx);
         
         // Added
-        if (g_debugmodeFlags & 1) return;
+        if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
         if ( v1 )
         {
@@ -71,7 +71,7 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     v3 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v3 && v2 && v3->attach_flags && v3->thingtype == SITH_THING_ACTOR )
     {
@@ -92,7 +92,7 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v2 )
     {
@@ -122,7 +122,7 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v2 && v1 && v2->thingtype == SITH_THING_ACTOR )
     {
@@ -146,7 +146,7 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
         v1 = sithCogExec_PopThing(ctx);
         
         // Added
-        if (g_debugmodeFlags & 1) return;
+        if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
         if ( v1 )
         {
@@ -171,7 +171,7 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v2 )
     {
@@ -216,7 +216,7 @@ void sithCogFunctionAI_AISetMode(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v2 )
     {
@@ -258,7 +258,7 @@ void sithCogFunctionAI_AIClearMode(sithCog *ctx)
     thing = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( thing )
     {
@@ -293,7 +293,7 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1)
+    if (g_debugmodeFlags & DEBUGFLAG_1)
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -347,7 +347,7 @@ void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1)
+    if (g_debugmodeFlags & DEBUGFLAG_1)
     {
         sithCogExec_PushFlex(ctx, -1000.0);
         return;
@@ -387,7 +387,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v2 )
     {
@@ -480,7 +480,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1) return;
+    if (g_debugmodeFlags & DEBUGFLAG_1) return;
     
     if ( v1 )
     {
@@ -677,7 +677,7 @@ void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
-    if (g_debugmodeFlags & 1)
+    if (g_debugmodeFlags & DEBUGFLAG_1)
     {
         sithCogExec_PushInt(ctx, -1);
         return;
