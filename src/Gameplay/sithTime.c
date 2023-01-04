@@ -58,9 +58,15 @@ void sithTime_SetDelta(int deltaMs)
     {
         sithTime_deltaMs = SITHTIME_MAXDELTA;
     }
+    if (g_debugmodeFlags & DEBUGFLAG_SLOWMO) {
+        sithTime_deltaMs = (uint32_t)((double)sithTime_deltaMs * 0.2);
+    }
     sithTime_curMs += sithTime_deltaMs;
 #ifdef MICROSECOND_TIME
     sithTime_deltaUs = Linux_TimeUs() - sithTime_curUsAbsolute;
+    if (g_debugmodeFlags & DEBUGFLAG_SLOWMO) {
+        sithTime_deltaUs = (uint64_t)((double)sithTime_deltaUs * 0.2);
+    }
     sithTime_curUsAbsolute = Linux_TimeUs();
     sithTime_deltaSeconds = (double)sithTime_deltaUs * 0.001 * 0.001;
     //printf("%u %u %f\n", sithTime_deltaMs, sithTime_deltaUs, sithTime_deltaSeconds);

@@ -3728,7 +3728,7 @@ typedef struct jkBubbleInfo
 #define DEBUGFLAG_80        (0x80)
 #define DEBUGFLAG_100       (0x100)
 #define DEBUGFLAG_200       (0x200)
-#define DEBUGFLAG_400       (0x400)
+#define DEBUGFLAG_SLOWMO    (0x400)
 #define DEBUGFLAG_800       (0x800)
 #define DEBUGFLAG_1000      (0x1000)
 #define DEBUGFLAG_2000      (0x2000)
