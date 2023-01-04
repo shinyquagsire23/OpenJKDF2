@@ -1755,12 +1755,20 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     v20 = sithControl_aInputFuncToKeyinfo;
     for (int j = 0; j < 74; j++)
     {
+        int typeflags = sithControl_inputFuncToControlType[v7];
+
+        // Added: Allow binding Forward with mouse buttons
+        if (a4 && v7 == INPUT_FUNC_FORWARD) {
+            typeflags = 4 | 1;
+        }
+
         v18 = 0;
         v19 = 0;
         v17 = 0;
-        v21 = sithControl_inputFuncToControlType[v7] & 2;
+        v21 = typeflags & 2;
         v16 = 0;
         v8 = &result->aEntries[0];
+
         for ( i = v8; v16 < v20->numEntries; v8 = i )
         {
             v9 = v8->flags;
@@ -1772,7 +1780,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
               && (((v9 & 1) == 0 || v10 >= AXIS_MOUSE_X) 
               && (!v11 || v10 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v10)) || a3) )
             {
-                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], v16, v10, v9, v8, a5);
+                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, v16, v10, v9, v8, a5);
                 if ( v18 || (v12 = i, (i->dxKeyNum & 2) != 0) && (i->dxKeyNum & 4) == 0 )
                 {
                     v12 = i;
@@ -1794,16 +1802,16 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
         if ( v6 && v21 && !v17 )
         {
             v13 = a5;
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 1, 0, a5);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 1, 0, a5);
         }
         else
         {
             v13 = a5;
         }
         if ( v6 && !v18 || !v20->numEntries )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 2, 0, v13);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 2, 0, v13);
         if ( v6 && v21 && !v19 )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], sithControl_inputFuncToControlType[v7], -1u, 0, 6, 0, v13);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 6, 0, v13);
         ++v7;
         result = ++v20;
     }

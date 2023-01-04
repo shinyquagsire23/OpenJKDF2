@@ -350,7 +350,7 @@ void jkGuiMouse_sub_417210()
     jkGuiMouseEntry* v2; // esi
     wchar_t *v3; // edi
     wchar_t *v4; // eax
-    wchar_t v5[256]; // [esp+10h] [ebp-200h] BYREF
+    wchar_t v5[512]; // Added: 256 -> 512
 
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_5566B8);
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_556698);
@@ -372,6 +372,9 @@ void jkGuiMouse_sub_417210()
     for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
     {
         v3 = jkStrings_GetText(v2->displayStrKey);
+
+        // Added
+        if (!v3) v3 = L"";
         if ( v2->inputFuncIdx == -1 )
         {
             v4 = L"--";
@@ -384,6 +387,9 @@ void jkGuiMouse_sub_417210()
         {
             v4 = jkGuiRend_GetString(&jkGuiMouse_Darray_556698, v2->mouseEntryIdx);
         }
+
+        // Added
+        if (!v4) v4 = L"";
         jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
 
         if ( i >= 3 || (stdControl_aJoysticks[v2->dxKeyNum].flags & 1) != 0 )
@@ -409,8 +415,8 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     int i; // esi
     jkGuiMouseEntry* v13; // eax
     wchar_t *v15; // [esp+10h] [ebp-224h]
-    char v16[32]; // [esp+14h] [ebp-220h] BYREF
-    wchar_t v17[256]; // [esp+34h] [ebp-200h] BYREF
+    char v16[64]; // Added: 32 -> 64
+    wchar_t v17[512]; // Added: 256 -> 512
 
     v7 = 0;
     v8 = &jkGuiMouse_pWStr_5566E8;
