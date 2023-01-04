@@ -226,7 +226,7 @@ skip_free_things:
     sithPlayer_idk(0);
     if ( sithGamesave_func3 )
         sithGamesave_func3();
-skip_dss:
+
     stdConffile_Close();
     _memcpy(&sithGamesave_headerTmp, &header, sizeof(sithGamesave_headerTmp));
     _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(fpath), 0x7Fu);
@@ -238,6 +238,7 @@ skip_dss:
         _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
         sithGamesave_wsaveName[255] = 0;
     }
+skip_dss:
     sithTime_SetMs(curMs);
     sithCamera_SetCurrentCamera(sithCamera_currentCamera);
     return 1;
