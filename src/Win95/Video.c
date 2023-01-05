@@ -59,7 +59,7 @@ void Video_SwitchToGDI()
     rdClose();
     if ( Video_modeStruct.b3DAccel )
     {
-        std3D_PurgeTextureCache();
+        //std3D_PurgeTextureCache(); // Added: Don't purge
         std3D_Shutdown();
     }
 

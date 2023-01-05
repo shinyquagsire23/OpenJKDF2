@@ -28,6 +28,7 @@
 #include "Cog/sithCog.h"
 #include "General/util.h"
 #include "Gameplay/sithPlayer.h"
+#include "Platform/std3D.h"
 #include "jk.h"
 
 // MOTS added
@@ -135,6 +136,10 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
 
     if ( !world )
         return 0;
+#ifdef SDL2_RENDER
+    std3D_PurgeTextureCache();
+#endif
+
     if ( map_jkl_fname )
     {
         // aaaaaa these sizes are wrong
@@ -201,6 +206,9 @@ LABEL_19:
 
     if ( sithWorld_NewEntry(world) )
     {
+#ifdef SDL2_RENDER
+        std3D_UpdateSettings();
+#endif
         sithWorld_bLoaded = 1;
         return 1;
     }

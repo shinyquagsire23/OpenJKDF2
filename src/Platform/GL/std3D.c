@@ -2369,6 +2369,8 @@ void std3D_UnloadAllTextures()
         glDeleteTextures(std3D_loadedTexturesAmt, std3D_aLoadedTextures);
     }
     std3D_loadedTexturesAmt = 0;
+#else
+    std3D_UpdateSettings();
 #endif
 }
 
@@ -2575,6 +2577,36 @@ void std3D_UpdateSettings()
         {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+
+        if (tex->emissive_texture_id != 0) {
+            glBindTexture(GL_TEXTURE_2D, tex->emissive_texture_id);
+            
+            if (jkPlayer_enableTextureFilter)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            }
+        }
+
+        if (tex->displacement_texture_id != 0) {
+            glBindTexture(GL_TEXTURE_2D, tex->displacement_texture_id);
+            
+            if (jkPlayer_enableTextureFilter)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            }
         }
     }
 
