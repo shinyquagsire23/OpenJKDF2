@@ -1757,11 +1757,6 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     {
         int typeflags = sithControl_inputFuncToControlType[v7];
 
-        // Added: Allow binding Forward with mouse buttons
-        if (a4 && v7 == INPUT_FUNC_FORWARD) {
-            typeflags = 4 | 1;
-        }
-
         v18 = 0;
         v19 = 0;
         v17 = 0;

@@ -431,7 +431,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     {
         _strncpy(v16, a2, 0x1Fu);
         v16[31] = 0;
-        a6 |= 1; // TODO: HACK
+        //a6 |= 1; // TODO: HACK
         if ( (a6 & 1) != 0 )
         {
             strncat(v16, "_A", 0x20u);
