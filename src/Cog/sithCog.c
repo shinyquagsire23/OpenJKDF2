@@ -775,8 +775,10 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
             v17 = idk->mask;
             v18 = idk->linkid;
             v19 = &sithWorld_pCurrentWorld->things[v3];
+            //printf("OpenJKDF2: Linking thing %x to cog `%s`? %x %x %x\n", v3, cog->cogscript_fpath, sithThing_GetIdxFromThing(v19), v19->type, idk->linkid);
             if ( sithThing_GetIdxFromThing(v19) && v19->type && v18 >= 0 )
             {
+                //printf("OpenJKDF2: Linked thing `%s` to cog `%s`\n", v19->template_name, cog->cogscript_fpath);
                 v19->thingflags |= SITH_TF_CAPTURED;
                 sithCog_aThingLinks[sithCog_numThingLinks].thing = v19;
                 sithCog_aThingLinks[sithCog_numThingLinks].cog = cog;
@@ -867,6 +869,12 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
     v9 = sender->class_cog;
     if ( v9 )
     {
+#ifdef DEBUG_QOL_CHEATS
+        if (message == SITH_MESSAGE_ACTIVATE) {
+            jk_printf("OpenJKDF2: Debug thing cog class %s\n", v9->cogscript_fpath);
+        }
+#endif
+
         if ( message == SITH_MESSAGE_DAMAGED )
         {
             v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
@@ -888,6 +896,11 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
     v12 = sender->capture_cog;
     if ( v12 )
     {
+#ifdef DEBUG_QOL_CHEATS
+        if (message == SITH_MESSAGE_ACTIVATE) {
+            jk_printf("OpenJKDF2: Debug thing cog capture %s\n", v12->cogscript_fpath);
+        }
+#endif
         if ( message == SITH_MESSAGE_DAMAGED )
         {
             v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
@@ -909,6 +922,11 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
         sithCogThingLink* v15 = &sithCog_aThingLinks[i];
         if ( v15->thing == sender && v15->signature == sender->signature && (receivera & v15->mask) != 0 )
         {
+#ifdef DEBUG_QOL_CHEATS
+            if (message == SITH_MESSAGE_ACTIVATE && v15->cog) {
+                jk_printf("OpenJKDF2: Debug thing cog link %s\n", v15->cog->cogscript_fpath);
+            }
+#endif
             if ( message == SITH_MESSAGE_DAMAGED )
             {
                 v16 = sithCog_SendMessageEx(
@@ -986,6 +1004,9 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
         sithCogSurfaceLink* surfaceLink = &sithCog_aSurfaceLinks[i];
         if ( surfaceLink->surface == sender && (surfaceLink->mask & v15) != 0 )
         {
+            if (msg == SITH_MESSAGE_ACTIVATE) {
+                printf("OpenJKDF2: Debug %s\n", surfaceLink->cog->cogscript_fpath);
+            }
             if ( msg == SITH_MESSAGE_DAMAGED )
             {
                 v11 = sithCog_SendMessageEx(

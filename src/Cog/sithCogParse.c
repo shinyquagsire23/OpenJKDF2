@@ -47,6 +47,8 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     if (!stdConffile_OpenRead(cog_fpath))
         return 0;
 
+    //printf("%s\n", cog_fpath);
+
     // Added
     sithCogParse_lastParsedFile = cog_fpath;
 
@@ -76,6 +78,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
 
     while ( stdConffile_ReadArgs() )
     {
+        //printf("%s\n", stdConffile_entry.args[0].value);
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
         if ( cogscript->pSymbolTable->entry_cnt < (unsigned int)cogscript->pSymbolTable->max_entries )

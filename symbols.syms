@@ -480,12 +480,12 @@ jkCog_strings 0x0553FA0 stdStrTable
 
 sithCog_bOpened 0x00836C2C int
 sithCog_pScriptHashtable 0x00836C3C stdHashTable*
-sithCog_aSectorLinks 0x008B5440 sithCogSectorLink[512]
+sithCog_aSectorLinks 0x008B5440 sithCogSectorLink[SITHCOG_MAX_LINKS]
 sithCog_numSectorLinks 0x00836C38 int
-sithCog_aThingLinks 0x008B7460 sithCogThingLink[512]
+sithCog_aThingLinks 0x008B7460 sithCogThingLink[SITHCOG_MAX_LINKS]
 sithCog_numThingLinks 0x00836C30 int
 sithCog_numSurfaceLinks 0x00836C34 int
-sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[512]
+sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[SITHCOG_MAX_LINKS]
 sithCog_masterCog 0x008B542C sithCog*
 
 jkDev_aEntryPositions 0x00559EF0 rdVector2i[10]

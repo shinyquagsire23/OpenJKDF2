@@ -50,7 +50,11 @@ void sithPlayerActions_Activate(sithThing *thing)
             {
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
-                    if ( (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
+#ifdef DEBUG_QOL_CHEATS
+                    if (searchResult->surface && searchResult->surface->surfaceInfo.face.material)
+                        jk_printf("OpenJKDF2: Debug surf %s\n", searchResult->surface->surfaceInfo.face.material->mat_fpath);
+#endif
+                    if (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED)
                     {
                         sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
                         sithCollision_SearchClose();
@@ -60,6 +64,10 @@ void sithPlayerActions_Activate(sithThing *thing)
                 else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
                 {
                     v7 = searchResult->receiver;
+#ifdef DEBUG_QOL_CHEATS
+                    if (v7)
+                        jk_printf("OpenJKDF2: Debug thing %s\n", v7->template_name);
+#endif
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
                     {
                         sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);

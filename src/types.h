@@ -1894,7 +1894,7 @@ typedef struct sithCog
     int numHeapVars;
     sithCogStackvar* heap;
 #endif
-    char field_4BC[4096];
+    char field_4BC[32*128];
 #ifndef JKM_TYPES
     sithCogStackvar* heap;
     int numHeapVars;

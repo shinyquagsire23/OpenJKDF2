@@ -1931,7 +1931,7 @@ int sithThing_GetIdxFromThing(sithThing *thing)
     if ( thing )
     {
         v1 = thing->thingIdx;
-        if ( v1 == thing - sithWorld_pCurrentWorld->things && v1 < 0x280 )
+        if ( v1 == thing - sithWorld_pCurrentWorld->things && v1 < (SITH_MAX_THINGS-1) )
             result = 1;
     }
     return result;
