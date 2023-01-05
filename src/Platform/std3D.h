@@ -108,6 +108,10 @@ intptr_t std3D_GetRenderList();
 static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADDR;
 #endif
 
+void std3D_PurgeTextureEntry(int i);
+void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture);
+void std3D_UpdateSettings();
+
 #ifdef __cplusplus
 }
 #endif

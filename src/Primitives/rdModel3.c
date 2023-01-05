@@ -530,7 +530,7 @@ int rdModel3_WriteText(char *fout, rdModel3 *model, char *createdfrom)
     if (!fd)
         return 0;
 
-    rdroid_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", model, createdfrom);
+    rdroid_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", model->filename, createdfrom);
     rdroid_pHS->filePrintf(fd, "###############\n");
     rdroid_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
     rdroid_pHS->filePrintf(fd, "3DO %d.%d\n\n", 2, 1);

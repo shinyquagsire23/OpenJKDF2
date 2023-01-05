@@ -308,6 +308,9 @@ void rdMaterial_FreeEntry(rdMaterial* material)
     for (size_t i = 0; i < material->num_texinfo; i++)
     {
         rdroid_pHS->free(material->texinfos[i]);
+
+        // Added:
+        material->texinfos[i] = NULL;
     }
 
     for (size_t i = 0; i < material->num_textures; i++)
@@ -319,6 +322,8 @@ void rdMaterial_FreeEntry(rdMaterial* material)
             rdDDrawSurface* surface = &pTex->alphaMats[j];
 
 #ifdef SDL2_RENDER
+            //printf("Deinit %s %x\n", material->mat_fpath, surface->texture_id);
+            std3D_PurgeSurfaceRefs(surface);
             jkgm_free_cache_entry(surface->cache_entry);
 #endif
 
@@ -326,28 +331,27 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         }
     }
 
-    if (material->textures)
+    if (material->textures) {
       rdroid_pHS->free(material->textures);
 
-    if (material->tex_type & 1)
+      // Added
+      material->textures = NULL;
+    }
+
+    if (material->tex_type & 1) {
       rdroid_pHS->free(material->palette_alloc);
+
+      // Added
+      material->palette_alloc = NULL;
+    }
 }
 
 // rdMaterial_Write
-
-int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha)
+extern int std3D_loadedTexturesAmt;
+// Added: cel_idx
+int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha, int cel_idx)
 {
     stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
-
-    int celIdx = 0;
-    for (int i = 0; i < material->num_textures; i++)
-    {
-        if (texture == &material->textures[i])
-        {
-            celIdx = i;
-            break;
-        }
-    }
 
 #ifdef SDL2_RENDER
     mipmap->palette = material->palette_alloc;
@@ -363,15 +367,16 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
         }
 #ifdef SDL2_RENDER
 #ifndef ARCH_WASM
-        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
+        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
-            //printf("%s\n", material->mat_fpath);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
 #endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
         {
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
         return 0;
@@ -386,15 +391,16 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
         }
 #ifdef SDL2_RENDER
 #ifndef ARCH_WASM
-        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, celIdx))
+        else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
-            //printf("%s\n", material->mat_fpath);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
 #endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
         {
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
         return 0;
@@ -409,6 +415,9 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material)
         for (int j = 0; j < texIter->num_mipmaps; j++)
         {
             rdDDrawSurface* matIter = &texIter->alphaMats[j];
+#ifdef SDL2_RENDER
+            std3D_PurgeSurfaceRefs(matIter);
+#endif
             matIter->texture_loaded = 0;
             matIter->gpu_accel_maybe = 0;
             matIter[4].texture_loaded = 0;

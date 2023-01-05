@@ -138,14 +138,14 @@ void* displaypal_data;
 GLuint tiledrand_texture;
 rdVector3* tiledrand_data;
 
-rdDDrawSurface* std3D_aLoadedSurfaces[STD3D_MAX_TEXTURES];
-GLuint std3D_aLoadedTextures[STD3D_MAX_TEXTURES];
+rdDDrawSurface* std3D_aLoadedSurfaces[STD3D_MAX_TEXTURES] = {0};
+GLuint std3D_aLoadedTextures[STD3D_MAX_TEXTURES] = {0};
 size_t std3D_loadedTexturesAmt = 0;
-static rdTri GL_tmpTris[STD3D_MAX_TRIS];
+static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
 static size_t GL_tmpTrisAmt = 0;
-static rdLine GL_tmpLines[STD3D_MAX_VERTICES];
+static rdLine GL_tmpLines[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpLinesAmt = 0;
-static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES];
+static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
@@ -163,6 +163,8 @@ GLuint menu_vbo_vertices, menu_vbo_colors, menu_vbo_uvs;
 GLuint menu_ibo_triangle;
 
 extern int jkGuiBuildMulti_bRendering;
+
+
 
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
 {
@@ -2362,9 +2364,12 @@ int std3D_DrawOverlay()
 
 void std3D_UnloadAllTextures()
 {
-    if (!Main_bHeadless)
+#ifndef SDL2_RENDER
+    if (!Main_bHeadless) {
         glDeleteTextures(std3D_loadedTexturesAmt, std3D_aLoadedTextures);
+    }
     std3D_loadedTexturesAmt = 0;
+#endif
 }
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
@@ -2475,7 +2480,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     }
 
-#if 0    
+#if 0
     void* image_data = malloc(width*height*4);
     
     for (int j = 0; j < height; j++)
@@ -2539,6 +2544,8 @@ done_load:
     texture->albedo_data = NULL;
     texture->displacement_data = NULL;
     texture->emissive_data = NULL;
+
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
     
     return 1;
 }
@@ -2548,6 +2555,32 @@ void std3D_UpdateFrameCount(rdDDrawSurface *surface)
 }
 
 // Added helpers
+void std3D_UpdateSettings()
+{
+    jk_printf("Updating texture cache...\n");
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    {
+        rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+        if (!tex) continue;
+
+        if (!std3D_aLoadedTextures[i]) continue;
+        glBindTexture(GL_TEXTURE_2D, std3D_aLoadedTextures[i]);
+
+        if (jkPlayer_enableTextureFilter && tex->is_16bit)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, blank_tex);
+}
+
 int std3D_HasAlpha()
 {
     return 1;
@@ -2563,6 +2596,67 @@ int std3D_HasAlphaFlatStippled()
     return 1;
 }
 
+void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture)
+{
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    {
+        rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+        if (!tex) continue;
+        if (tex != texture) continue;
+
+        std3D_PurgeTextureEntry(i);
+    }
+}
+
+void std3D_PurgeTextureEntry(int i) {
+    if (std3D_aLoadedTextures[i]) {
+        glDeleteTextures(1, &std3D_aLoadedTextures[i]);
+        std3D_aLoadedTextures[i] = 0;
+    }
+
+    rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+    if (!tex) return;
+
+    if (tex->albedo_data != NULL) {
+        //jkgm_aligned_free(tex->albedo_data);
+        tex->albedo_data = NULL;
+    }
+
+    if (tex->emissive_data != NULL) {
+        //jkgm_aligned_free(tex->emissive_data);
+        tex->emissive_data = NULL;
+    }
+
+    if (tex->displacement_data != NULL) {
+        //jkgm_aligned_free(tex->displacement_data);
+        tex->displacement_data = NULL;
+    }
+
+    if (tex->emissive_texture_id != 0) {
+        glDeleteTextures(1, &tex->emissive_texture_id);
+        tex->emissive_texture_id = 0;
+    }
+
+    if (tex->displacement_texture_id != 0) {
+        glDeleteTextures(1, &tex->displacement_texture_id);
+        tex->displacement_texture_id = 0;
+    }
+
+    tex->emissive_factor[0] = 0.0;
+    tex->emissive_factor[1] = 0.0;
+    tex->emissive_factor[2] = 0.0;
+    tex->albedo_factor[0] = 1.0;
+    tex->albedo_factor[1] = 1.0;
+    tex->albedo_factor[2] = 1.0;
+    tex->albedo_factor[3] = 1.0;
+    tex->displacement_factor = 0.0;
+
+    tex->texture_loaded = 0;
+    tex->texture_id = 0;
+
+    std3D_aLoadedSurfaces[i] = NULL;
+}
+
 void std3D_PurgeTextureCache()
 {
     if (Main_bHeadless) {
@@ -2570,55 +2664,10 @@ void std3D_PurgeTextureCache()
         return;
     }
 
-    printf("Purging texture cache...\n");
+    jk_printf("Purging texture cache...\n");
     for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
     {
-        rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
-        if (!tex) continue;
-
-        if (std3D_aLoadedTextures[i])
-            glDeleteTextures(1, &std3D_aLoadedTextures[i]);
-
-        std3D_aLoadedTextures[i] = 0;
-
-        if (tex->albedo_data != NULL) {
-            //jkgm_aligned_free(tex->albedo_data);
-            tex->albedo_data = NULL;
-        }
-
-        if (tex->emissive_data != NULL) {
-            //jkgm_aligned_free(tex->emissive_data);
-            tex->emissive_data = NULL;
-        }
-
-        if (tex->displacement_data != NULL) {
-            //jkgm_aligned_free(tex->displacement_data);
-            tex->displacement_data = NULL;
-        }
-
-        if (tex->emissive_texture_id != NULL) {
-            glDeleteTextures(1, &tex->emissive_texture_id);
-            tex->emissive_texture_id = 0;
-        }
-
-        if (tex->displacement_texture_id != NULL) {
-            glDeleteTextures(1, &tex->displacement_texture_id);
-            tex->displacement_texture_id = 0;
-        }
-
-        tex->emissive_factor[0] = 0.0;
-        tex->emissive_factor[1] = 0.0;
-        tex->emissive_factor[2] = 0.0;
-        tex->albedo_factor[0] = 1.0;
-        tex->albedo_factor[1] = 1.0;
-        tex->albedo_factor[2] = 1.0;
-        tex->albedo_factor[3] = 1.0;
-        tex->displacement_factor = 0.0;
-
-        tex->texture_loaded = 0;
-        tex->texture_id = 0;
-
-        std3D_aLoadedSurfaces[i] = NULL;
+        std3D_PurgeTextureEntry(i);
     }
     std3D_loadedTexturesAmt = 0;
 }

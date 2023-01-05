@@ -11,6 +11,7 @@
 #include "Gui/jkGUISetup.h"
 #include "World/jkPlayer.h"
 #include "Win95/Window.h"
+#include "Platform/std3D.h"
 
 #include "jk.h"
 
@@ -232,6 +233,9 @@ continue_menu:
         }
 
         jkPlayer_WriteConf(jkPlayer_playerShortName);
+
+        // Make sure filter settings get applied
+        std3D_UpdateSettings();
     }
     return v0;
 }

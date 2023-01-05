@@ -69,6 +69,7 @@ extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
 extern int Main_bHeadless;
 extern int jkGuiBuildMulti_bRendering;
+extern GLuint worldpal_texture;
 
 int compare_hashstr(uint8_t *p, const char* str){
     char tmp[34];
@@ -490,11 +491,14 @@ std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMater
 void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel)
 {
     if (Main_bHeadless) return;
+    if (texture && texture->texture_loaded) return;
 
     // Also preload even if we have no jkgm stuff
     if ((!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) && jkgm_fastpath_disable && vbuf && texture) {
         // Causes some texture confusion when returning from jkGuiBuildMulti?
-        //std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        //printf("PreInit %s %x %x %p %x\n", material->mat_fpath, texture->texture_id, texture->texture_loaded, vbuf, std3D_loadedTexturesAmt);
+        std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        //printf("Init %s %x %x\n", material->mat_fpath, texture->texture_id, std3D_loadedTexturesAmt);
         return;
     }
 
@@ -525,7 +529,9 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
     if (texture->skip_jkgm) {
         if (!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) {
             // Causes some texture confusion when returning from jkGuiBuildMulti?
-            //std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+            //printf("PreInit %s %x %x %p%x \n", material->mat_fpath, texture->texture_id, texture->texture_loaded, vbuf, std3D_loadedTexturesAmt);
+            std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+            //printf("Init %s %x %x\n", material->mat_fpath, texture->texture_id, std3D_loadedTexturesAmt);
         }
         return;
     }
@@ -538,7 +544,12 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
     //printf("Caching %s mipmap_level=%d, cel=%d\n", material->mat_full_fpath, mipmap_level, cel);
 
     if (!jkGuiBuildMulti_bRendering && jkPlayer_bEnableTexturePrecache) {
-        jkgm_std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0, material, cel);
+        //printf("PreInit %s %x %x %p %x\n", material->mat_fpath, texture->texture_id, texture->texture_loaded, vbuf, std3D_loadedTexturesAmt);
+        if (!jkgm_std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0, material, cel)) {
+            //printf("PreInit2 %s %x %x %p %x\n", material->mat_fpath, texture->texture_id, texture->texture_loaded, vbuf, std3D_loadedTexturesAmt);
+            std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, 0);
+        }
+        //printf("Init %s %x %x\n", material->mat_fpath, texture->texture_id, std3D_loadedTexturesAmt);
     }
 }
 
@@ -548,6 +559,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
     if (texture->texture_loaded) return 1;
 
     rdTexture *pRdTexture = &material->textures[cel];
+
+    //printf("Cache %s\n", material->mat_full_fpath);
 
     texture->emissive_texture_id = 0;
     texture->emissive_factor[0] = 0.0f;
@@ -589,7 +602,7 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 
     //std::string hash = jkgm_get_tex_hash(vbuf, texture, material, is_alpha_tex);
 
-    jkgm_cache_entry_t* entry;
+    jkgm_cache_entry_t* entry = NULL;
 
     std::string full_fpath_str = std::string(material->mat_full_fpath);
     std::string cache_key = full_fpath_str + std::to_string(cel);
@@ -684,6 +697,21 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
                 if (data) {
                     free(data);
                 }
+
+                texture->emissive_texture_id = 0;
+                texture->emissive_factor[0] = 0.0f;
+                texture->emissive_factor[1] = 0.0f;
+                texture->emissive_factor[2] = 0.0f;
+                texture->albedo_factor[0] = 1.0f;
+                texture->albedo_factor[1] = 1.0f;
+                texture->albedo_factor[2] = 1.0f;
+                texture->albedo_factor[3] = 1.0f;
+                texture->emissive_data = NULL;
+                texture->displacement_texture_id = 0;
+                texture->displacement_factor = 0.0;
+                texture->displacement_data = NULL;
+                texture->albedo_data = NULL;
+
                 return 0;
             }
         }
@@ -813,6 +841,8 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 
         texture->is_16bit = 1;
         texture->texture_loaded = 1;
+
+        glBindTexture(GL_TEXTURE_2D, worldpal_texture);
 
         pRdTexture->has_jkgm_override = 1;
         return 1;

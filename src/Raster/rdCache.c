@@ -490,11 +490,11 @@ int rdCache_SendFaceListToHardware()
 #endif
             }
 
-            if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
+            if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
             {
                 rdCache_DrawRenderList();
                 rdCache_ResetRenderList();
-                if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque) )
+                if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
                     return 0;
             }
 

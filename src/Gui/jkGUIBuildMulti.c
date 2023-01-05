@@ -294,7 +294,7 @@ void jkGuiBuildMulti_ThingCleanup()
     jkGuiBuildMulti_bRendering = 1; // Added
 
     // Added
-    std3D_PurgeTextureCache();
+    //std3D_PurgeTextureCache();
 
     rdPuppet_ResetTrack(jkGuiBuildMulti_thing->puppet, jkGuiBuildMulti_trackNum);
     rdKeyframe_FreeEntry(jkGuiBuildMulti_keyframe);
@@ -525,7 +525,7 @@ LABEL_32:
     jkGui_SetModeGame();
 
     // Added
-    std3D_PurgeTextureCache();
+    //std3D_PurgeTextureCache();
 
     jkGuiBuildMulti_bRendering = 0; // Added
 
