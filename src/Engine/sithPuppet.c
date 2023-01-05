@@ -692,10 +692,10 @@ LABEL_14:
             }
             return;
         case 4u:
-            thing->jkFlags |= 2u;
+            thing->jkFlags |= JKFLAG_SABERDAMAGE;
             return;
         case 5u:
-            thing->jkFlags &= ~2u;
+            thing->jkFlags &= ~JKFLAG_SABERDAMAGE;
             return;
         case 6u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
@@ -747,7 +747,7 @@ LABEL_50:
             }
             return;
         case 0xEu:
-            thing->jkFlags |= 0x40u;
+            thing->jkFlags |= JKFLAG_40;
             return;
 
         // MoTS added

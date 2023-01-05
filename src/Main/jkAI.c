@@ -80,7 +80,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
             if ( v8->polyline.length < (double)v8->length )
             {
                 sithPuppet_SetArmedMode(v7, SITH_ANIM_WALK);
-                actor->thing->jkFlags |= 4u;
+                actor->thing->jkFlags |= JKFLAG_SABEREXTEND;
             }
             v11 = sithTime_curMs;
             instinct->nextUpdate = sithTime_curMs + 500;

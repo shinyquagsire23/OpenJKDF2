@@ -95,7 +95,30 @@ void jkSaber_UpdateLength(sithThing *thing)
         thing->jkFlags &= ~JKFLAG_SABERON;
         return;
     }
-    
+
+#if 0
+    printf("Saber state: ");
+    if (thing->jkFlags & JKFLAG_SABERON) {
+        printf("ON ");
+    }
+    if (thing->jkFlags & JKFLAG_SABERDAMAGE) {
+        printf("DAMAGE ");
+    }
+    if (thing->jkFlags & JKFLAG_SABEREXTEND) {
+        printf("EXTEND ");
+    }
+    if (thing->jkFlags & JKFLAG_SABERRETRACT) {
+        printf("RETRACT ");
+    }
+    if (thing->jkFlags & JKFLAG_DUALSABERS) {
+        printf("DUALSABERS ");
+    }
+    if (thing->jkFlags & JKFLAG_SABERFORCEON) {
+        printf("FORCEON ");
+    }
+    printf(" len=%f %f\n", playerInfo->polyline.length, thing->actorParams.timeLeftLengthChange);
+#endif
+
     if (thing->thingflags & SITH_TF_DEAD || thing->type == SITH_THING_CORPSE)
     {
         thing->jkFlags |= JKFLAG_SABERRETRACT;
@@ -140,12 +163,15 @@ void jkSaber_UpdateLength(sithThing *thing)
             thing->actorParams.timeLeftLengthChange = 0.0;
         }
     }
-    else if (thing->jkFlags & JKFLAG_SABERFORCEON)
+    else if (thing->jkFlags & JKFLAG_SABERFORCEON) // Used for starting a level with the saber on, ie DF2 lv4
     {
         playerInfo->polyline.length = playerInfo->length;
         thing->actorParams.timeLeftLengthChange = (1.0 - JKSABER_EXTENDTIME);
         thing->jkFlags &= ~(JKFLAG_SABERRETRACT | JKFLAG_SABEREXTEND);
         thing->jkFlags |= JKFLAG_SABERON;
+
+        // Added? I think my RETRACT | EXTEND fix inavertently exposed a bug
+        thing->jkFlags &= ~JKFLAG_SABERFORCEON;
     }
 
     if ( thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP] >= 0 )
@@ -332,7 +358,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
         playerInfo->saberCollideInfo.numDamagedThings = 0;
         playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
     }
-    if ( !(player->jkFlags & JKFLAG_SABERNODAMAGE) )
+    if ( !(player->jkFlags & JKFLAG_SABERDAMAGE) )
         return;
     if ( !playerInfo->saberCollideInfo.field_1A4 )
         return;

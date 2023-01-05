@@ -66,7 +66,7 @@ typedef struct sithSurface sithSurface;
 enum JKFLAG
 {
     JKFLAG_SABERON = 1,
-    JKFLAG_SABERNODAMAGE = 2,
+    JKFLAG_SABERDAMAGE = 2,
     JKFLAG_SABEREXTEND = 4,
     JKFLAG_SABERRETRACT = 8,
     JKFLAG_DUALSABERS = 0x10,
