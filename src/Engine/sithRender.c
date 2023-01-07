@@ -695,7 +695,7 @@ void sithRender_RenderLevelGeometry()
         }
         else
         {
-            float baseLight = level_idk->ambientLight + level_idk->extraLight;
+            float baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
         }
@@ -853,7 +853,7 @@ void sithRender_RenderLevelGeometry()
                 }
                 else
                 {
-                    procEntry->ambientLight = stdMath_Clamp(level_idk->extraLight, 0.0, 1.0);
+                    procEntry->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
                 }
                 if ( procEntry->ambientLight >= 1.0 )
                 {
@@ -1070,7 +1070,7 @@ void sithRender_RenderLevelGeometry()
                     }
                     else
                     {
-                        v20->ambientLight = stdMath_Clamp(level_idk->extraLight, 0.0, 1.0);
+                        v20->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
                     }
                     if ( v20->ambientLight >= 1.0 )
                     {
@@ -1452,7 +1452,7 @@ void sithRender_RenderThings()
         }
         else
         {
-            v2 = v1->ambientLight + v1->extraLight;
+            v2 = v1->ambientLight + v1->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(v2, 0.0, 1.0);
         }
         rdColormap_SetCurrent(v1->colormap);
@@ -1721,7 +1721,7 @@ void sithRender_RenderAlphaSurfaces()
         }
         else
         {
-            v2 = v1->extraLight + v1->ambientLight;
+            v2 = v1->extraLight + v1->ambientLight + sithRender_008d4098;
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(v2, 0.0, 1.0));
         }
         rdColormap_SetCurrent(v1->colormap);
@@ -1776,7 +1776,7 @@ void sithRender_RenderAlphaSurfaces()
         }
         rdCamera_pCurCamera->projectLst(v9->vertices, vertices_tmp, meshinfo_out.numVertices);
         
-        v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight, 0.0, 1.0);
+        v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 
         if ( v9->ambientLight < 1.0 )
         {
