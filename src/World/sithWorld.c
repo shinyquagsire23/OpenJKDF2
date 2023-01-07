@@ -803,9 +803,7 @@ void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world)
     for (int i = 0; i < world->numSectors; i++)
     {
         rdVector_Zero3(&world->sectors[i].thrust);
-        world->sectors[i].id = 0;
-        world->sectors[i].ambientLight = 0.0;
-        world->sectors[i].extraLight = 0.0;
+        rdVector_Zero3(&world->sectors[i].tint);
     }
     sithPlayer_ResetPalEffects();
 }

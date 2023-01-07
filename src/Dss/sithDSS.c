@@ -115,7 +115,7 @@ int sithDSS_ProcessSectorStatus(sithCogMsg *msg)
     if ( idx >= sithWorld_pCurrentWorld->numSectors )
         return 0;
     sector = &sithWorld_pCurrentWorld->sectors[idx];
-    sector->id = idx; // Not in original?
+    //sector->id = idx; // Not in original?
 
     colormapIdx = NETMSG_POPS16();
     if ( colormapIdx >= sithWorld_pCurrentWorld->numColormaps )
