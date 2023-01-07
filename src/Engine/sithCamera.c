@@ -34,9 +34,9 @@ int sithCamera_Startup()
 {
     sithCamera_NewEntry(&sithCamera_cameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_cameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_cameras[1].vec3_3.x = 0.0;
-    sithCamera_cameras[1].vec3_3.y = -0.2;
-    sithCamera_cameras[1].vec3_3.z = 0.06;
+    sithCamera_cameras[1].collisionOffset.x = 0.0;
+    sithCamera_cameras[1].collisionOffset.y = -0.2;
+    sithCamera_cameras[1].collisionOffset.z = 0.06;
     sithCamera_NewEntry(&sithCamera_cameras[2], 0, 0x8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_cameras[4], 0, 0x20, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_cameras[5], 0, 0x40, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
@@ -176,9 +176,9 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     }
 
     rdVector_Zero3(&camera->vec3_1);
-    rdVector_Zero3(&camera->vec3_2);
-    rdVector_Zero3(&camera->vec3_3);
-    rdVector_Zero3(&camera->vec3_4);
+    rdVector_Zero3(&camera->viewPYR);
+    rdVector_Zero3(&camera->collisionOffset);
+    rdVector_Zero3(&camera->unused1);
     rdMatrix_Identity34(&camera->viewMat);
 
 #ifdef JKM_CAMERA
@@ -299,7 +299,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             }
 
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
-            rdMatrix_PreTranslate34(&cam->viewMat, &cam->vec3_3);
+            rdMatrix_PreTranslate34(&cam->viewMat, &cam->collisionOffset);
             rdMatrix_LookAt(&cam->viewMat, &cam->viewMat.scale, &out.scale, 0.0);
             cam->sector = sithCamera_create_unk_struct(0, cam->sector, &v84, &cam->viewMat.scale, 0.02, 8704);
             break;
@@ -320,15 +320,16 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdVector_Normalize3Acc(&sithCamera_trans3);
             rdVector_Neg3(&mode64Tmp, &sithCamera_trans3);
             
+            // rdMatrix_BuildFromLook34 ish?
             cam->viewMat.lvec.x = mode64Tmp.x;
             cam->viewMat.lvec.y = mode64Tmp.y;
             cam->viewMat.lvec.z = mode64Tmp.z;
             cam->viewMat.rvec.x = (1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z);
             cam->viewMat.rvec.y = (0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x);
             cam->viewMat.rvec.z = (0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y);
-            cam->viewMat.uvec.x = (((0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x)) * mode64Tmp.z) - (((0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y)) * mode64Tmp.y);
-            cam->viewMat.uvec.y = (((0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y)) * mode64Tmp.x) - ((1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z)) * mode64Tmp.z;
-            cam->viewMat.uvec.z = (((1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z)) * mode64Tmp.y) - (((0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x)) * mode64Tmp.x);
+            cam->viewMat.uvec.x = (cam->viewMat.rvec.y * mode64Tmp.z) - (cam->viewMat.rvec.z * mode64Tmp.y);
+            cam->viewMat.uvec.y = (cam->viewMat.rvec.z * mode64Tmp.x) - (cam->viewMat.rvec.x * mode64Tmp.z);
+            cam->viewMat.uvec.z = (cam->viewMat.rvec.x * mode64Tmp.y) - (cam->viewMat.rvec.y * mode64Tmp.x);
 
             rdMatrix_Normalize34(&cam->viewMat);
             rdVector_Scale3(&cam->viewMat.scale, &sithCamera_trans3, 0.2);
@@ -345,19 +346,23 @@ void sithCamera_FollowFocus(sithCamera *cam)
             break;
     }
     cam->vec3_1 = cam->viewMat.scale;
-    rdMatrix_ExtractAngles34(&cam->viewMat, &cam->vec3_2);
+    rdMatrix_ExtractAngles34(&cam->viewMat, &cam->viewPYR);
 
     // TODO what inlined func is this
-    if ( sithCamera_povShakeVector1.x < 0.0 )
+    if ( sithCamera_povShakeVector1.x <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.x >= 0.0 )
-            goto LABEL_42;
-        float v42 = v78 + sithCamera_povShakeVector1.x;
-        if ( v42 < 0.0 )
+        if ( sithCamera_povShakeVector1.x < 0.0 )
         {
-            sithCamera_povShakeVector1.x = v42;
-            goto LABEL_42;
+            float v42 = v78 + sithCamera_povShakeVector1.x;
+            if ( v42 < 0.0 )
+            {
+                sithCamera_povShakeVector1.x = v42;
+            }
+            else {
+                sithCamera_povShakeVector1.x = 0.0;
+            }
         }
+        
     }
     else
     {
@@ -365,21 +370,24 @@ void sithCamera_FollowFocus(sithCamera *cam)
         if ( v41 > 0.0 )
         {
             sithCamera_povShakeVector1.x = v41;
-            goto LABEL_42;
+        }
+        else {
+            sithCamera_povShakeVector1.x = 0.0;
         }
     }
-    sithCamera_povShakeVector1.x = 0.0;
-LABEL_42:
 
-    if ( sithCamera_povShakeVector1.y < 0.0 )
+    if ( sithCamera_povShakeVector1.y <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.y >= 0.0 )
-            goto LABEL_49;
-        float v48 = v78 + sithCamera_povShakeVector1.y;
-        if ( v48 < 0.0 )
+        if ( sithCamera_povShakeVector1.y < 0.0 )
         {
-            sithCamera_povShakeVector1.y = v48;
-            goto LABEL_49;
+            float v48 = v78 + sithCamera_povShakeVector1.y;
+            if ( v48 < 0.0 )
+            {
+                sithCamera_povShakeVector1.y = v48;
+            }
+            else {
+                sithCamera_povShakeVector1.y = 0.0;
+            }
         }
     }
     else
@@ -388,20 +396,24 @@ LABEL_42:
         if ( v47 > 0.0 )
         {
             sithCamera_povShakeVector1.y = v47;
-            goto LABEL_49;
+        }
+        else {
+            sithCamera_povShakeVector1.y = 0.0;
         }
     }
-    sithCamera_povShakeVector1.y = 0.0;
-LABEL_49:
-    if ( sithCamera_povShakeVector1.z < 0.0 )
+
+    if ( sithCamera_povShakeVector1.z <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.z >= 0.0 )
-            goto LABEL_56;
-        float v54 = v78 + sithCamera_povShakeVector1.z;
-        if ( v54 < 0.0 )
+        if ( sithCamera_povShakeVector1.z < 0.0 )
         {
-            sithCamera_povShakeVector1.z = v54;
-            goto LABEL_56;
+            float v54 = v78 + sithCamera_povShakeVector1.z;
+            if ( v54 < 0.0 )
+            {
+                sithCamera_povShakeVector1.z = v54;
+            }
+            else {
+                sithCamera_povShakeVector1.z = 0.0;
+            }
         }
     }
     else
@@ -410,20 +422,24 @@ LABEL_49:
         if ( v53 > 0.0 )
         {
             sithCamera_povShakeVector1.z = v53;
-            goto LABEL_56;
+        }
+        else {
+            sithCamera_povShakeVector1.z = 0.0;
         }
     }
-    sithCamera_povShakeVector1.z = 0.0;
-LABEL_56:
-    if ( sithCamera_povShakeVector2.x < 0.0 )
+    
+    if ( sithCamera_povShakeVector2.x <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.x >= 0.0 )
-            goto LABEL_63;
-        float v60 = v77 + sithCamera_povShakeVector2.x;
-        if ( v60 < 0.0 )
+        if ( sithCamera_povShakeVector2.x < 0.0 )
         {
-            sithCamera_povShakeVector2.x = v60;
-            goto LABEL_63;
+            float v60 = v77 + sithCamera_povShakeVector2.x;
+            if ( v60 < 0.0 )
+            {
+                sithCamera_povShakeVector2.x = v60;
+            }
+            else {
+                sithCamera_povShakeVector2.x = 0.0;
+            }
         }
     }
     else
@@ -432,21 +448,26 @@ LABEL_56:
         if ( v59 > 0.0 )
         {
             sithCamera_povShakeVector2.x = v59;
-            goto LABEL_63;
+        }
+        else {
+            sithCamera_povShakeVector2.x = 0.0;
         }
     }
-    sithCamera_povShakeVector2.x = 0.0;
-LABEL_63:
-    if ( sithCamera_povShakeVector2.y < 0.0 )
+
+    if ( sithCamera_povShakeVector2.y <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.y >= 0.0 )
-            goto LABEL_70;
-        float v66 = v77 + sithCamera_povShakeVector2.y;
-        if ( v66 < 0.0 )
+        if ( sithCamera_povShakeVector2.y < 0.0 )
         {
-            sithCamera_povShakeVector2.y = v66;
-            goto LABEL_70;
+            float v66 = v77 + sithCamera_povShakeVector2.y;
+            if ( v66 < 0.0 )
+            {
+                sithCamera_povShakeVector2.y = v66;
+            }
+            else {
+                sithCamera_povShakeVector2.y = 0.0;
+            }
         }
+        
     }
     else
     {
@@ -454,21 +475,26 @@ LABEL_63:
         if ( v65 > 0.0 )
         {
             sithCamera_povShakeVector2.y = v65;
-            goto LABEL_70;
+        }
+        else {
+            sithCamera_povShakeVector2.y = 0.0;
         }
     }
-    sithCamera_povShakeVector2.y = 0.0;
-LABEL_70:
-    if ( sithCamera_povShakeVector2.z < 0.0 )
+    
+    if ( sithCamera_povShakeVector2.z <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.z >= 0.0 )
-            return;
-        float v72 = v77 + sithCamera_povShakeVector2.z;
-        if ( v72 < 0.0 )
+        if ( sithCamera_povShakeVector2.z < 0.0 )
         {
-            sithCamera_povShakeVector2.z = v72;
-            return;
+            float v72 = v77 + sithCamera_povShakeVector2.z;
+            if ( v72 < 0.0 )
+            {
+                sithCamera_povShakeVector2.z = v72;
+            }
+            else {
+                sithCamera_povShakeVector2.z = 0.0;
+            }
         }
+        
     }
     else
     {
@@ -476,10 +502,12 @@ LABEL_70:
         if ( v71 > 0.0 )
         {
             sithCamera_povShakeVector2.z = v71;
-            return;
+        }
+        else {
+            sithCamera_povShakeVector2.z = 0.0;
         }
     }
-    sithCamera_povShakeVector2.z = 0.0;
+    
 }
 
 void sithCamera_SetRdCameraAndRenderidk()
@@ -531,21 +559,16 @@ void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing
 sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14)
 {
     double v7; // st7
-    int v8; // ecx
     sithSector *v9; // ebx
     sithCollisionSearchEntry *i; // ecx
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     float a6a; // [esp+28h] [ebp+10h]
 
-    a5.x = a6->x - a4->x;
-    a5.y = a6->y - a4->y;
-    a5.z = a6->z - a4->z;
+    rdVector_Sub3(&a5, a6, a4);
     v7 = rdVector_Normalize3Acc(&a5);
-    v8 = arg14;
     a6a = v7;
-    v8 |= 0x800;
     v9 = a2;
-    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, v8);
+    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, arg14 | 0x800);
     for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
     {
         if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
@@ -554,9 +577,8 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
         }
         else if ( (i->hitType & SITHCOLLISION_THING) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
         {
-            a6->x = i->distance * a5.x + a4->x;
-            a6->y = i->distance * a5.y + a4->y;
-            a6->z = i->distance * a5.z + a4->z;
+            rdVector_Copy3(a6, a4);
+            rdVector_MultAcc3(a6, &a5, i->distance);
             break;
         }
     }

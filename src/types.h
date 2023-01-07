@@ -844,11 +844,11 @@ typedef struct sithCamera
     sithThing* primaryFocus;
     sithThing* secondaryFocus;
     sithSector* sector;
-    rdVector3 vec3_3;
-    rdVector3 vec3_4;
+    rdVector3 collisionOffset;
+    rdVector3 unused1;
     rdMatrix34 viewMat;
     rdVector3 vec3_1;
-    rdVector3 vec3_2;
+    rdVector3 viewPYR;
     rdCamera rdCam;
 #ifdef JKM_CAMERA
     int bZoomed;

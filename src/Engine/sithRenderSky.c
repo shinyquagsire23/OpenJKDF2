@@ -30,11 +30,11 @@ void sithRenderSky_Update()
     double v0; // st7
     float v1; // [esp-Ch] [ebp-Ch]
 
-    v1 = sithCamera_currentCamera->vec3_2.z;
+    v1 = sithCamera_currentCamera->viewPYR.z;
     sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fov_y;
     stdMath_SinCos(v1, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
-    v0 = -(sithCamera_currentCamera->vec3_2.x * sithSector_horizontalPixelsPerRev_idk);
-    sithSector_flt_8553B8 = -(sithCamera_currentCamera->vec3_2.y * sithSector_horizontalPixelsPerRev_idk);
+    v0 = -(sithCamera_currentCamera->viewPYR.x * sithSector_horizontalPixelsPerRev_idk);
+    sithSector_flt_8553B8 = -(sithCamera_currentCamera->viewPYR.y * sithSector_horizontalPixelsPerRev_idk);
     sithSector_flt_8553C4 = v0;
 }
 
