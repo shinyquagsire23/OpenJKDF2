@@ -359,7 +359,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
 
             --v23;
         }
-        while ( v23 > 1 ); // Added: != -> >
+        while ( v23 >= 1 ); // Added: != -> >
     }
     jkGuiRend_AddStringEntry(array, 0, 0);
     jkGuiRend_SetClickableString(element, array);
