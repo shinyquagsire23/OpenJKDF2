@@ -814,51 +814,22 @@ void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const r
     a1->z = v8 * v9 + v6 * v11 + a3->uvec.x * a2->x;
 }
 
-void rdMatrix_TransformVector34Acc(rdVector3 *a1, const rdMatrix34 *a2)
+void rdMatrix_TransformVector34Acc(rdVector3 *pAcc, const rdMatrix34 *pIn)
 {
-    float v2; // ST08_4
-    float v3; // ST0C_4
-    double v4; // st7
-    float v5; // ST10_4
+    rdVector3 tmp;
 
-    v2 = a2->uvec.x * a1->z + a2->lvec.x * a1->y + a2->rvec.x * a1->x;
-    v3 = a2->lvec.y * a1->y + a2->uvec.y * a1->z + a2->rvec.y * a1->x;
-    v4 = a2->uvec.z * a1->z + a2->lvec.z * a1->y + a2->rvec.z * a1->x;
-    a1->x = v2;
-    v5 = v4;
-    a1->y = v3;
-    a1->z = v5;
+    tmp.x = pIn->uvec.x * pAcc->z + pIn->lvec.x * pAcc->y + pIn->rvec.x * pAcc->x;
+    tmp.y = pIn->lvec.y * pAcc->y + pIn->uvec.y * pAcc->z + pIn->rvec.y * pAcc->x;
+    tmp.z = pIn->uvec.z * pAcc->z + pIn->lvec.z * pAcc->y + pIn->rvec.z * pAcc->x;
+    *pAcc = tmp;
 }
 
-void rdMatrix_TransformVector44(rdMatrix44 *a1, const rdVector4 *a2, const rdMatrix44 *a3)
+void rdMatrix_TransformVector44(rdMatrix44 *pOut, const rdVector4 *pTrans4, const rdMatrix44 *pIn)
 {
-    double v3; // st5
-    double v4; // st4
-    double v5; // st3
-    double v6; // st6
-    double v7; // st7
-    double v8; // rt2
-    double v9; // st5
-    double v10; // st4
-    double v11; // st3
-    double v12; // st2
-    double v13; // st5
-
-    v3 = a3->vD.y;
-    v4 = a3->vC.y;
-    v5 = a3->vD.z;
-    v6 = a3->vC.z;
-    v7 = a2->w;
-    a1->vA.x = a3->vD.x * v7 + a3->vC.x * a2->z + a3->vB.x * a2->y + a3->vA.x * a2->x;
-    v8 = v5;
-    v9 = v3 * v7 + v4 * a2->z;
-    v10 = a2->w;
-    v11 = a2->z;
-    v12 = v9 + a3->vB.y * a2->y + a3->vA.y * a2->x;
-    v13 = a3->vB.z;
-    a1->vA.y = v12;
-    a1->vA.z = v8 * v10 + v6 * v11 + v13 * a2->y + a3->vA.z * a2->x;
-    a1->vA.w = a3->vD.w * a2->w + a3->vC.w * a2->z + a3->vB.w * a2->y + a3->vA.w * a2->x;
+    pOut->vA.x = (pIn->vD.x * pTrans4->w + pIn->vC.x * pTrans4->z) + (pIn->vB.x * pTrans4->y + pIn->vA.x * pTrans4->x);
+    pOut->vA.y = (pIn->vD.y * pTrans4->w + pIn->vC.y * pTrans4->z) + (pIn->vB.y * pTrans4->y + pIn->vA.y * pTrans4->x);
+    pOut->vA.z = (pIn->vD.z * pTrans4->w + pIn->vC.z * pTrans4->z) + (pIn->vB.z * pTrans4->y + pIn->vA.z * pTrans4->x);
+    pOut->vA.w = (pIn->vD.w * pTrans4->w + pIn->vC.w * pTrans4->z) + (pIn->vB.w * pTrans4->y + pIn->vA.w * pTrans4->x);
 }
 
 void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
