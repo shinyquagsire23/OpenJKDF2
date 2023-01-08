@@ -283,11 +283,7 @@ int sithMain_Tick()
         //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
         
         ++bShowInvisibleThings;
-        if (sithRender_lastRenderTick++ == -1)
-        {
-            sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
-            sithRender_lastRenderTick = 1;
-        }
+        sithMain_sub_4C4D80();
         sithSoundMixer_ResumeMusic(0);
         sithTime_Tick();
 
@@ -393,11 +389,7 @@ void sithMain_UpdateCamera()
 {
     if ( (g_submodeFlags & 8) == 0 )
     {
-        if ( !++sithRender_lastRenderTick )
-        {
-            sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
-            sithRender_lastRenderTick = 1;
-        }
+        sithMain_sub_4C4D80();
 
 #ifdef QOL_IMPROVEMENTS
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
