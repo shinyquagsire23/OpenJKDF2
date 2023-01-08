@@ -243,7 +243,7 @@ void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, float a3
         pThing->lookOrientation.uvec.y = look->z * v20 + pThing->lookOrientation.uvec.y;
         pThing->lookOrientation.uvec.z = look->y * v20 + pThing->lookOrientation.uvec.z;
         rdVector_Normalize3Acc(&pThing->lookOrientation.uvec);
-        pThing->lookOrientation.lvec.x = (pThing->lookOrientation.rvec.z * thing->lookOrientation.uvec.y) - (pThing->lookOrientation.rvec.y * thing->lookOrientation.uvec.z);
+        pThing->lookOrientation.lvec.x = (pThing->lookOrientation.rvec.z * pThing->lookOrientation.uvec.y) - (pThing->lookOrientation.rvec.y * pThing->lookOrientation.uvec.z);
         pThing->lookOrientation.lvec.y = (pThing->lookOrientation.rvec.x * pThing->lookOrientation.uvec.z) - pThing->lookOrientation.rvec.z * pThing->lookOrientation.uvec.x;
         pThing->lookOrientation.lvec.z = (pThing->lookOrientation.rvec.y * pThing->lookOrientation.uvec.x) - (pThing->lookOrientation.rvec.x * pThing->lookOrientation.uvec.y);
         rdVector_Normalize3Acc(&pThing->lookOrientation.lvec);
