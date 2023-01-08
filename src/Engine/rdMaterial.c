@@ -369,14 +369,14 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
 #ifndef ARCH_WASM
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
-            printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
 #endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
         {
-            printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
         return 0;
@@ -393,14 +393,14 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
 #ifndef ARCH_WASM
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
-            printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
 #endif
 #endif
         else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
         {
-            printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
+            //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
         }
         return 0;
