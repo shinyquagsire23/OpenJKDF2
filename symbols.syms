@@ -65,7 +65,7 @@ sithRender_sectorsDrawn 0x0083197C int
 sithRender_numSurfaces 0x0082F4B8 int32_t
 sithRender_geoThingsDrawn 0x00831980 int
 sithRender_nongeoThingsDrawn 0x00831984 int
-sithRender_f_82F4B0 0x0082F4B0 float
+sithRender_f_82F4B0 0x0082F4B0 float = 0.0
 sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
 meshinfo_out 0x0082F490 rdMeshinfo
 sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t

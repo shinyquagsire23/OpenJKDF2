@@ -242,8 +242,8 @@ int sithWorld_NewEntry(sithWorld *world)
     int *v7; // edi
     sithSector **v8; // edx
     int v9; // edi
-    sithAdjoin *v10; // eax
-    sithAdjoin *v11; // ecx
+    sithAdjoin *adjoinIter; // eax
+    sithAdjoin *adjoinIterMirror; // ecx
     sithSector *v12; // ecx
     sithThing *v15; // edx
     sithThing *v16; // eax
@@ -279,22 +279,22 @@ int sithWorld_NewEntry(sithWorld *world)
             _memset(v7, 0, sizeof(int) * world->numVertices);
             for (int i = 0; i < world->numSurfaces; i++)
             {
-                v10 = world->surfaces[i].adjoin;
-                if ( v10 )
+                adjoinIter = world->surfaces[i].adjoin;
+                if ( adjoinIter )
                 {
-                    v11 = v10->mirror;
-                    if ( v11 )
-                        v10->sector = v11->surface->parent_sector;
+                    adjoinIterMirror = adjoinIter->mirror;
+                    if ( adjoinIterMirror )
+                        adjoinIter->sector = adjoinIterMirror->surface->parent_sector;
                     if ( v1 && (v12 = world->surfaces[i].parent_sector, v2 == world->surfaces[i].parent_sector) )
                     {
-                        v1->next = v10;
+                        v1->next = adjoinIter;
                     }
                     else
                     {
                         v12 = world->surfaces[i].parent_sector;
-                        world->surfaces[i].parent_sector->adjoins = v10;
+                        world->surfaces[i].parent_sector->adjoins = adjoinIter;
                     }
-                    v1 = v10;
+                    v1 = adjoinIter;
                     v2 = v12;
                 }
             }

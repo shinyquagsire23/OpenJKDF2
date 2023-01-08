@@ -715,6 +715,10 @@ void sithThing_LeaveSector(sithThing *thing)
     sithThing *nextThing; // eax
     rdVector3 pos; // [esp+Ch] [ebp-Ch] BYREF
 
+    if (thing == sithPlayer_pLocalPlayerThing) {
+        //jk_printf("OpenJKDF2: Leave sector %p, idx %d\n", thing->sector, thing->sector ? thing->sector->id : -1);
+    }
+
     // Added
     if (!thing || !thing->sector) return;
 
@@ -758,14 +762,22 @@ void sithThing_EnterSector(sithThing *thing, sithSector *sector, int a3, int a4)
     sithSector *v7; // eax
     sithThing* i;
 
+    if (thing == sithPlayer_pLocalPlayerThing) {
+        //jk_printf("OpenJKDF2: Enter sector %p, idx %d\n", sector, sector ? sector->id : -1);
+    }
+
     // Added: Check that sector is non-null
-    if (!sector) return;
+    if (!sector) {
+        jk_printf("OpenJKDF2: Tried to enter NULL sector??\n");
+        return;
+    }
 
     // Added: Prevent thing getting linked in twice
     for ( i = sector->thingsList; i; i = i->nextThing )
     {
         if (i == thing) {
             thing->sector = sector; // just in case?
+            jk_printf("OpenJKDF2: Tried to double enter sector??\n");
             return;
         }
     }
