@@ -968,8 +968,10 @@ void Window_SdlUpdate()
             //menu_framelimit_amt_ms = 64;
         }
 
-        if (Window_needsRecreate)
+        if (Window_needsRecreate) {
+            std3D_PurgeTextureCache();
             Window_RecreateSDL2Window();
+        }
         
         // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.
         if (sampleTime_roundtrip < menu_framelimit_amt_ms) {
