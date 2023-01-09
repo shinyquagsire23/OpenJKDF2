@@ -481,7 +481,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
                 if ( !a5 )
                     return 0;
                 rdVector_Normalize2Acc(&a1a);
-                float idk2 = stdMath_ClipPrecision(v30 * a1a.y - v31 * a1a.x);
+                float idk2 = v30 * a1a.y - v31 * a1a.x;
                 
                 // TODO: Somehow we need to return 0 here for slopes which match our current normal?
 
