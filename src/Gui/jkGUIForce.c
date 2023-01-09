@@ -600,9 +600,6 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
             if (i == EIDX_MOTS_DEFENSE) {
                 jkGuiForce_pElements[i].bIsVisible = !!jkGuiForce_isMulti;
             }
-            else {
-                jkGuiForce_pElements[i].bIsVisible = 1;
-            }
 
             *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
         }
