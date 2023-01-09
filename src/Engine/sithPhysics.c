@@ -476,7 +476,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
         rdMatrix_BuildRotate34(&a, &a3);
         sithCollision_sub_4E7670(pThing, &a);
 
-        if ( (pThing->physicsParams.physflags & SITH_PF_FLY) != 0 )
+        if (pThing->physicsParams.physflags & SITH_PF_FLY)
             rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
 
         if ( ((bShowInvisibleThings + (pThing->thingIdx & 0xFF)) & 7) == 0 )

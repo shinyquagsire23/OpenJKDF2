@@ -19,6 +19,31 @@ static rdVector2i sithIntersect_unkArr[3] = {
     {1, 0},
 };
 
+// Added
+int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, float radius, sithSector *sector)
+{
+    rdVector3 *v7; // ebp
+    double v8; // st7
+    double v10; // st6
+    
+    // Added
+    if (!sector)
+        return 0;
+
+    if ( (sector->flags & SITH_SECTOR_HAS_COLLIDE_BOX) != 0
+      && pos->z - radius > sector->collidebox_onecorner.z
+      && pos->y - radius > sector->collidebox_onecorner.y
+      && pos->x - radius > sector->collidebox_onecorner.x
+      && pos->x + radius < sector->collidebox_othercorner.x
+      && radius + pos->y < sector->collidebox_othercorner.y
+      && radius + pos->z < sector->collidebox_othercorner.z )
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
@@ -44,7 +69,8 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSecto
     {
         sithSurface* surface = &sector->surfaces[i];
         sithAdjoin* adjoin = surface->adjoin;
-        if ( (surface->surfaceFlags & SITH_SURFACE_HAS_COLLISION) != 0 || adjoin && (adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) != 0 )
+        if ( (surface->surfaceFlags & SITH_SURFACE_HAS_COLLISION)
+            || (adjoin && adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
         {
             v7 = sithWorld_pCurrentWorld->vertices;
             v8 = stdMath_ClipPrecision(rdMath_DistancePointToPlane(pos, &surface->surfaceInfo.face.normal, &v7[*surface->surfaceInfo.face.vertexPosIdx]));
@@ -356,6 +382,7 @@ int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pMoveNo
     }
 }
 
+extern int sithCollision_bDebugCollide;
 int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
     double v7; // st7
@@ -446,7 +473,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
             v14 = v28;
             a1a.x += *(&a4[v19[v23]].x + v13);
             a1a.y += *(&a4[v19[v23]].x + v28);
-            float idk = stdMath_ClipPrecision(v30 * a1a.y - v31 * a1a.x);
+            float idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipPrecision(); // Added at some point?
             if ( idk <= 0.0 )
             {
                 if ( radius == 0.0 )
@@ -472,31 +499,29 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
 }
 
 // Seems to handle interaction when crossing adjoins?
-int sithIntersect_sub_5090B0(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, sithSurfaceInfo *a5, rdVector3 *a6, float *a7, int a8)
+int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, float moveDistance, float radius, sithSurfaceInfo *a5, rdVector3 *a6, float *pSphereHitDist, int a8)
 {
     sithSurfaceInfo *v8; // edi
-    float *v9; // esi
     int result; // eax
     rdVector3 v15; // [esp+10h] [ebp-Ch] BYREF
 
     v8 = a5;
-    v9 = a7;
-    result = sithIntersect_SphereHit(a1, a2, a3, a4, &a5->face.normal, &a6[*a5->face.vertexPosIdx], a7, a8);
+    result = sithIntersect_SphereHit(pStartPos, pMoveNorm, moveDistance, radius, &a5->face.normal, &a6[*a5->face.vertexPosIdx], pSphereHitDist, a8);
     if ( result )
     {
-        if ( a4 == 0.0 )
+        if ( radius == 0.0 )
         {
-            rdVector_Copy3(&v15, a1);
-            rdVector_MultAcc3(&v15, a2, *v9);
+            rdVector_Copy3(&v15, pStartPos);
+            rdVector_MultAcc3(&v15, pMoveNorm, *pSphereHitDist);
             
-            int tmp;
-            result = sithIntersect_sub_508750(&v15, a4, &v8->face, a6, &tmp);
+            int tmp = 0;
+            result = sithIntersect_sub_508750(&v15, radius, &v8->face, a6, &tmp);
             if ( result )
             {
                 if ( !tmp)
                     return SITHCOLLISION_THINGADJOINCROSS;
                 else
-                    return sithIntersect_sub_508990(&v15, a4, &v8->face, a6, tmp, 0);
+                    return sithIntersect_sub_508990(&v15, radius, &v8->face, a6, tmp, 0);
             }
         }
         else

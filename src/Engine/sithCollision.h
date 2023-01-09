@@ -27,6 +27,7 @@
 #define sithCollision_FallHurt_ADDR (0x004E9550)
 #define sithCollision_DebrisPlayerCollide_ADDR (0x004E95A0)
 
+// hitType
 enum SITHCOLLISION
 {
     SITHCOLLISION_NONE = 0x0,

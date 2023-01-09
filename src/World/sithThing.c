@@ -303,7 +303,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
     }
 }
 
-void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
+void sithThing_TickPhysics(sithThing *pThing, float deltaSecs)
 {
     int v2; // ebp
     sithSurface *v5; // eax
@@ -312,38 +312,38 @@ void sithThing_TickPhysics(sithThing *thing, float deltaSecs)
     float arg4a; // [esp+2Ch] [ebp+8h]
 
     v2 = 0;
-    if ((thing->attach_flags & SITH_ATTACH_NO_MOVE))
+    if ((pThing->attach_flags & SITH_ATTACH_NO_MOVE))
         return;
-        
-    if ( thing->moveType == SITH_MT_PHYSICS )
+
+    if ( pThing->moveType == SITH_MT_PHYSICS )
     {
-        rdVector_Copy3(&thing->field_268, &thing->physicsParams.velocityMaybe);
+        rdVector_Copy3(&pThing->field_268, &pThing->physicsParams.velocityMaybe);
     }
     else
     {
         v2 = 4;
-        rdVector_Zero3(&thing->field_268);
+        rdVector_Zero3(&pThing->field_268);
     }
 
-    if (thing->attach_flags && thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
+    if (pThing->attach_flags && pThing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
-        v5 = thing->attachedSurface;
+        v5 = pThing->attachedSurface;
         if ( (v5->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 )
         {
             sithSurface_DetachThing(v5, &v8);
-            rdVector_MultAcc3(&thing->field_268, &v8, deltaSecs);
+            rdVector_MultAcc3(&pThing->field_268, &v8, deltaSecs);
         }
     }
     
-    if (rdVector_IsZero3(&thing->field_268))
+    if (rdVector_IsZero3(&pThing->field_268))
     {
-        if ( thing->moveType == SITH_MT_PHYSICS && (thing->attach_flags & (SITH_ATTACH_THINGSURFACE|SITH_ATTACH_THING)) != 0 && thing->attachedThing->moveType == SITH_MT_PATH )
-            sithPhysics_FindFloor(thing, 0);
+        if ( pThing->moveType == SITH_MT_PHYSICS && (pThing->attach_flags & (SITH_ATTACH_THINGSURFACE|SITH_ATTACH_THING)) != 0 && pThing->attachedThing->moveType == SITH_MT_PATH )
+            sithPhysics_FindFloor(pThing, 0);
     }
     else
     {
-        arg4a = rdVector_Normalize3(&v1, &thing->field_268);
-        thing->waggle = sithCollision_UpdateThingCollision(thing, &v1, arg4a, v2);
+        arg4a = rdVector_Normalize3(&v1, &pThing->field_268);
+        pThing->waggle = sithCollision_UpdateThingCollision(pThing, &v1, arg4a, v2);
     }
 }
 
