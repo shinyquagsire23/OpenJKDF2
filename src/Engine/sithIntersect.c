@@ -237,6 +237,7 @@ LABEL_11:
     return result;
 }
 
+extern int sithCollision_bDebugCollide;
 int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, float moveDistance, float radius, rdFace *pFace, rdVector3 *aVertices, float *pSphereHitDist, rdVector3 *pPushVelOut, int raycastFlags)
 {
     int result; // eax
@@ -382,10 +383,8 @@ int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pMoveNo
     }
 }
 
-extern int sithCollision_bDebugCollide;
 int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
-    double v7; // st7
     double v10; // st7
     int v12; // edx
     int v13; // ebx
@@ -407,19 +406,14 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
     double v33; // [esp+2Ch] [ebp-4h]
     int v34; // [esp+34h] [ebp+4h]
 
-    //printf("?? %f, %f %f %f, %f %f %f, %f %f %f\n", a2, a1->x, a1->y, a1->z, a4->x, a4->y, a4->z, pFace->normal.x, pFace->normal.y, pFace->normal.z);
+    //if (sithCollision_bDebugCollide)
+    //printf("?? %f, %f %f %f, %f %f %f, %f %f %f\n", radius, a1->x, a1->y, a1->z, a4->x, a4->y, a4->z, pFace->normal.x, pFace->normal.y, pFace->normal.z);
 
     if ( a5 )
         *a5 = 0;
     v25 = stdMath_Fabs(pFace->normal.x);
-
-    v7 = pFace->normal.y;
-    if ( v7 < 0.0 )
-        v7 = -v7;
-    v27 = v7;
-    v10 = pFace->normal.z;
-    if ( v10 < 0.0 )
-        v10 = -v10;
+    v27 = stdMath_Fabs(pFace->normal.y);
+    v10 = stdMath_Fabs(pFace->normal.z);
 
     if ( v25 <= (double)v27 )
     {
@@ -474,7 +468,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
             a1a.x += *(&a4[v19[v23]].x + v13);
             a1a.y += *(&a4[v19[v23]].x + v28);
             float idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipPrecision(); // Added at some point?
-            if ( idk <= 0.0 )
+            if ( idk < 0.0 )
             {
                 if ( radius == 0.0 )
                     return 0;

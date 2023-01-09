@@ -503,8 +503,10 @@ void sithCogFunctionSurface_GetSurfaceLight(sithCog *ctx)
     sithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
-    if ( v1 )
+    if ( v1 ) {
         sithCogExec_PushFlex(ctx, v1->surfaceInfo.face.extraLight);
+    }
+    // TODO: Always return *something*?
 }
 
 void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)

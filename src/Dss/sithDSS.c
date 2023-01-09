@@ -60,7 +60,7 @@ int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
     surface = &sithWorld_pCurrentWorld->surfaces[v1];
 
     surface->surfaceFlags = NETMSG_POPU32();
-    surface->surfaceInfo.face.material = sithMaterial_GetByIdx(NETMSG_POPS32());;
+    surface->surfaceInfo.face.material = sithMaterial_GetByIdx(NETMSG_POPS32());
 
     v4 = NETMSG_POPS16();
     if ( v4 == -1 || !surface->surfaceInfo.face.material || v4 >= surface->surfaceInfo.face.material->num_texinfo )

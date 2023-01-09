@@ -144,7 +144,7 @@ void sithCogFunction_SurfaceAnim(sithCog *ctx)
 {
     sithCog *ctx_;
     int popInt; // edi
-    void *surface; // ecx
+    sithSurface *surface; // ecx
     rdSurface *v4; // eax
     float popFlex; // [esp+Ch] [ebp+4h]
 

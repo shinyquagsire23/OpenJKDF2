@@ -722,7 +722,7 @@ LABEL_78:
 
             sithCollision_bDebugCollide = 0; // Added
             if (pThing == sithPlayer_pLocalPlayerThing) {
-                sithCollision_bDebugCollide = 1;
+                sithCollision_bDebugCollide = 0;
             }
             sithCollision_SearchRadiusForThings(sectTmp, v5, &v5->position, &direction, a6, v17, a8);
             sithCollision_bDebugCollide = 0; // Added

@@ -23,7 +23,7 @@ int sithSurface_Startup()
 
     for (int i = 0; i < 256; i++)
     {
-        sithSurface_aAvail[256-i] = 255 - i;
+        sithSurface_aAvail[255-i] = 255 - i;
     }
 
     sithSurface_numAvail = 256;
@@ -338,6 +338,7 @@ int sithSurface_Load(sithWorld *world)
             }
         }
 #endif
+
         face->numVertices = v35;
         face->num = v67;
     }
@@ -1219,8 +1220,6 @@ rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a
 {
     double v5; // st7
     rdSurface *result; // eax
-    int v7; // edx
-    rdSurface *v8; // esi
     int v9; // edx
     double v11; // st7
     float a1a; // [esp+4h] [ebp+4h]
@@ -1228,17 +1227,9 @@ rdSurface* sithSurface_SetThingLight(sithThing *thing, float a2, float a3, int a
     v5 = a2 - thing->light;
     if ( v5 == 0.0 )
         return 0;
-    result = NULL;
-    if ( sithSurface_numAvail )
-    {
-        v7 = sithSurface_aAvail[sithSurface_numAvail--];
-        if ( v7 > sithSurface_numSurfaces )
-            sithSurface_numSurfaces = v7;
-        v8 = &sithSurface_aSurfaces[v7];
-        _memset(v8, 0, sizeof(rdSurface));
-        result = v8;
-        v8->index = ((playerThingIdx + 1) << 16) | (uint16_t)v7;
-    }
+
+    result = sithSurface_Alloc();
+
     if ( result )
     {
         v9 = thing->signature;
