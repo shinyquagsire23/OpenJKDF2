@@ -751,6 +751,11 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
             jk_printf("OpenJKDF2: Boss w/o a blade? Fixing... %p\n", thing);
 
             jkPlayer_FUN_00404fe0(thing);
+
+            sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
+            sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
+            sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+            jkSaber_InitializeSaberInfo(thing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
         }
         return;
     }
