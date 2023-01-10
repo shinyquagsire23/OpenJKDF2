@@ -2513,7 +2513,7 @@ typedef struct sithActor
     rdVector3 movepos;
     int field_224;
     rdVector3 field_228;
-    float field_234;
+    float currentDistanceFromTarget;
     int field_238;
     rdVector3 field_23C;
     int field_248;

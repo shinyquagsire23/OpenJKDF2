@@ -937,11 +937,11 @@ void sithAI_sub_4EAF40(sithActor *actor)
         {
             if ( (actor->thingidk->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
                 v1 = 3;
-            v3 = sithAI_sub_4EB090(actor->thing, &actor->thing->position, actor->thingidk, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->field_234);
+            v3 = sithAI_sub_4EB090(actor->thing, &actor->thing->position, actor->thingidk, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
             actor->field_238 = v3;
             if ( !v3 )
             {
-                if ( !v1 || sithAI_sub_4EC140(actor, actor->thingidk, actor->field_234) )
+                if ( !v1 || sithAI_sub_4EC140(actor, actor->thingidk, actor->currentDistanceFromTarget) )
                 {
                     actor->field_23C = actor->thingidk->position;
                     actor->field_248 = sithTime_curMs;
@@ -962,14 +962,12 @@ void sithAI_sub_4EAF40(sithActor *actor)
                      actor->aiclass->sightDist,
                      0.0,
                      &actor->field_228,
-                     &actor->field_234);
+                     &actor->currentDistanceFromTarget);
             actor->field_238 = v4;
             if ( !v4 )
             {
-                actor->field_23C.x = actor->movepos.x;
-                actor->field_23C.y = actor->movepos.y;
+                rdVector_Copy3(&actor->field_23C, &actor->movepos);
                 actor->field_248 = sithTime_curMs;
-                actor->field_23C.z = actor->movepos.z;
             }
         }
     }
@@ -1054,6 +1052,7 @@ int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC,
     return v22 != 0 ? 3 : 0;
 }
 
+// MOTS altered
 int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8)
 {
     float v11; // st7
@@ -1089,6 +1088,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
             return 2;
     }
 
+    // MOTS added
     if (a3->sector == NULL) {
         return 3;
     }
@@ -1312,7 +1312,7 @@ void sithAI_RandomRotationVector(rdVector3 *out)
 }
 
 // MoTS altered
-int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, int bAltFire, int a7)
+int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire, float minDot, float percentageErrorInAim, int bAltFire, int a7)
 {
     sithThing *v8; // ebp
     sithThing *v9; // edi
@@ -1360,22 +1360,22 @@ int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, 
     }
     if ( actor->field_288 > sithTime_curMs || actor->field_1F4 )
         return 0;
-    if ( actor->field_1F0 < (double)a2 || actor->field_1F0 > (double)a3 )
+    if ( actor->field_1F0 < (double)minDistToFire || actor->field_1F0 > (double)maxDistToFire )
         return 0;
 
     // MoTS added
-    if (Main_bMotsCompat && a4 < 0.0) {
+    if (Main_bMotsCompat && (minDot > 0.0 && rdVector_Dot3(&v9->lookOrientation.lvec, &v1) < 0.0)) {
         return 0;
     }
 
     v19 = fabs(rdVector_Dot3(&v9->lookOrientation.rvec, &v1));
-    if ( v19 > 1.0 - a4 )
+    if ( v19 > 1.0 - minDot )
         return 0;
     
     if ( (v9->actorParams.typeflags & SITH_AF_DELAYFIRE) != 0 )
     {
         actor->field_268 = a7 | 8;
-        actor->field_264 = a5;
+        actor->field_264 = percentageErrorInAim;
         actor->field_26C = bAltFire;
         sithPuppet_PlayMode(v9, v20, 0);
 
@@ -1401,19 +1401,25 @@ LABEL_12:
     }
     if ( (a7 & 2) != 0 && v8->moveType == SITH_MT_PHYSICS) // Added: physics check
     {
-        v14 = actor->field_1F0 / v8->physicsParams.vel.y * 0.5;
+        double yvel = 0.00001;
+        // Added: div 0 fix
+        if (v8->physicsParams.vel.y != 0.0) {
+            yvel = v8->physicsParams.vel.y;
+        }
+
+        v14 = actor->field_1F0 / yvel * 0.5;
         rdVector_Scale3(&a1a, &actor->field_1E4, v8->physicsParams.vel.y);
         a1a.z = v14 * sithWorld_pCurrentWorld->worldGravity + a1a.z;
         v15 = 1;
-        v21 = rdVector_Normalize3(&v1, &a1a) / v8->physicsParams.vel.y;
+        v21 = rdVector_Normalize3(&v1, &a1a) / yvel;
     }
     else
     {
         v15 = 0;
     }
-    if ( a5 != 0.0 && actor->field_1F0 != 0.0 && _frand() > actor->aiclass->accuracy )
+    if ( percentageErrorInAim != 0.0 && actor->field_1F0 != 0.0 && _frand() > actor->aiclass->accuracy )
     {
-        sithAI_RandomFireVector(&v1, a5);
+        sithAI_RandomFireVector(&v1, percentageErrorInAim);
     }
     sithSoundClass_PlayModeRandom(v9, bAltFire + SITH_SC_FIRE1);
     v16 = sithWeapon_Fire(v9, v8, &v1, &actor->blindAimError, 0, v20, v21, v15, 0.0);

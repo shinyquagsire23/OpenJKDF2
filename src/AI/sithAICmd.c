@@ -167,17 +167,15 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     sithAIClassEntry *v8; // ebx
     sithActorInstinct *v9; // edi
     int v10; // eax
-    double v13; // st7
     double v16; // st7
-    double v18; // st7
     rdVector3 a4a; // [esp+10h] [ebp-3Ch] BYREF
     rdVector3 arg8a; // [esp+1Ch] [ebp-30h] BYREF
     rdVector3 a1; // [esp+28h] [ebp-24h] BYREF
     rdVector3 a2; // [esp+34h] [ebp-18h] BYREF
     rdVector3 a5; // [esp+40h] [ebp-Ch] BYREF
-    float a1a; // [esp+50h] [ebp+4h]
-    float tmp1;
-    float tmp2;
+    float argMaxDistToAllow; // [esp+50h] [ebp+4h]
+    float argMaxMeleeDist;
+    float argMinDistToAllow;
     float tmp;
 
     if ( flags > SITHAI_MODE_ACTIVE )
@@ -210,77 +208,78 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
         if ( !flags)
         {
             v7 = actor->thingidk;
-            if ( v7 )
-            {
-                v8 = aiclass;
-                v9 = instinct;
-                tmp2 = aiclass->argsAsFloat[0];
-                a1a = aiclass->argsAsFloat[1];
-                tmp1 = aiclass->argsAsFloat[2];
-                v9->nextUpdate = sithTime_curMs + 1000;
-                sithAI_sub_4EAF40(actor);
-                v10 = actor->field_238;
-                if ( v10 && v10 != 2 )
-                {
-                    if (Main_bMotsCompat && sithAI_pDistractor && actor->pDistractor == sithAI_pDistractor) 
-                    {
-                        actor->pDistractor = sithAICmd_NearestPlayer(actor);
-                        return 0;
-                    }
-                    if (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND)
-                    {
-                        return 0;
-                    }
-                    if (v9->param0 != 0.0 )
-                    {
-                        return 0;
-                    }
-                    v9->param0 = 1.0;
-                    sithAI_SetMoveThing(actor, &actor->field_23C, 2.0);
-                    sithAI_SetLookFrame(actor, &actor->field_23C);
-                    return 0;
-                }
-                v9->param0 = 0.0;
-                sithAI_SetLookFrame(actor, &v7->position);
-                v13 = actor->field_234;
- 
-                if ( v13 > tmp1 )
-                {
-                    v16 = v13 - a1a;
-LABEL_16:
-                    rdVector_Copy3(&arg8a, &actor->thing->position);
-                    rdVector_MultAcc3(&arg8a, &actor->field_228, v16);
-                    if ( (actor->thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
-                    {
-                        arg8a.z = v7->position.z - -0.02;
-                    }
-                    else if ( (actor->thing->thingflags & SITH_TF_WATER) != 0 )
-                    {
-                        arg8a.z = v7->position.z;
-                    }
-                    else
-                    {
-                        arg8a.z = actor->thing->position.z;
-                    }
-                    if ( v8->argsAsFloat[3] != 0.0
-                      || !sithAI_sub_4EB300(v7, &v7->position, &arg8a, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
-                    {
-                        sithAI_SetMoveThing(actor, &arg8a, 1.5);
-                        return 0;
-                    }
-                    return 0;
-                }
-                if ( v13 < tmp2 )
-                {
-                    v18 = actor->field_234;
-                    // TODO verify
-                    if ( tmp1 == 0.0 )
-                        v16 = v18 - tmp2;
-                    else
-                        v16 = v18 - tmp1;
-                    goto LABEL_16;
-                }
+            if (!v7) {
+                return 0;
             }
+            
+            v8 = aiclass;
+            v9 = instinct;
+            argMinDistToAllow = aiclass->argsAsFloat[0];
+            argMaxDistToAllow = aiclass->argsAsFloat[1];
+            argMaxMeleeDist = aiclass->argsAsFloat[2];
+            v9->nextUpdate = sithTime_curMs + 1000;
+            sithAI_sub_4EAF40(actor);
+            v10 = actor->field_238;
+            if ( v10 && v10 != 2 )
+            {
+                if (Main_bMotsCompat && sithAI_pDistractor && actor->pDistractor == sithAI_pDistractor) 
+                {
+                    actor->pDistractor = sithAICmd_NearestPlayer(actor);
+                    return 0;
+                }
+                if (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND)
+                {
+                    return 0;
+                }
+                if (v9->param0 != 0.0 )
+                {
+                    return 0;
+                }
+                v9->param0 = 1.0;
+                sithAI_SetMoveThing(actor, &actor->field_23C, 2.0);
+                sithAI_SetLookFrame(actor, &actor->field_23C);
+                return 0;
+            }
+            v9->param0 = 0.0;
+            sithAI_SetLookFrame(actor, &v7->position);
+
+            if ( actor->currentDistanceFromTarget <= argMaxDistToAllow )
+            {
+                if ( actor->currentDistanceFromTarget >= argMinDistToAllow ) {
+                    return 0;
+                }
+
+                // TODO verify
+                if ( argMaxMeleeDist == 0.0 )
+                    v16 = actor->currentDistanceFromTarget - argMinDistToAllow;
+                else
+                    v16 = actor->currentDistanceFromTarget - argMaxMeleeDist;
+            }
+            else {
+                v16 = actor->currentDistanceFromTarget - argMaxDistToAllow;
+            }
+
+            rdVector_Copy3(&arg8a, &actor->thing->position);
+            rdVector_MultAcc3(&arg8a, &actor->field_228, v16);
+            if ( (actor->thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
+            {
+                arg8a.z = v7->position.z - -0.02;
+            }
+            else if ( (actor->thing->thingflags & SITH_TF_WATER) != 0 )
+            {
+                arg8a.z = v7->position.z;
+            }
+            else
+            {
+                arg8a.z = actor->thing->position.z;
+            }
+            if ( v8->argsAsFloat[3] != 0.0
+              || !sithAI_sub_4EB300(v7, &v7->position, &arg8a, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
+            {
+                sithAI_SetMoveThing(actor, &arg8a, 1.5);
+                return 0;
+            }
+            return 0;
         }
         return 0;
     }
@@ -331,9 +330,9 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
     {
         v8 = aiclass->argsAsInt[4];
         sithAI_sub_4EAF40(actor);
-        if ( aiclass->argsAsFloat[2] >= (double)actor->field_234 && !actor->field_238 )
+        if ( aiclass->argsAsFloat[2] >= (double)actor->currentDistanceFromTarget && !actor->field_238 )
         {
-            rdVector_Scale3(&a2a, &actor->field_228, -actor->field_234);
+            rdVector_Scale3(&a2a, &actor->field_228, -actor->currentDistanceFromTarget);
             if ( v8
               || actor->thingidk->lookOrientation.lvec.y * a2a.y + actor->thingidk->lookOrientation.lvec.z * a2a.z + actor->thingidk->lookOrientation.lvec.x * a2a.x >= 0.0 )
             {
@@ -535,7 +534,6 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     int v5; // ebp
     int v6; // ebx
     sithThing *v7; // eax
-    int v9; // edx
     rdVector3 v18; // [esp+28h] [ebp-Ch] BYREF
 
     v5 = 0;
@@ -551,9 +549,8 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
         {
             sithPuppet_SetArmedMode(v7, 1);
-            v9 = sithTime_curMs + aiclass->argsAsInt[5];
             instinct->param0 = aiclass->argsAsFloat[8];
-            instinct->nextUpdate = v9;
+            instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[5];
         }
         else
         {
