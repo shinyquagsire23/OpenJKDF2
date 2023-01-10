@@ -21,9 +21,9 @@ int sithSurface_Startup()
 {
     _memset(sithSurface_aSurfaces, 0, sizeof(rdSurface) * 256); // sizeof(sithSurface_aSurfaces)
 
-    for (int i = 0; i < 256; i++)
+    for (int i = 255; i >= 0; i--)
     {
-        sithSurface_aAvail[255-i] = 255 - i;
+        sithSurface_aAvail[i+1] = 255-i;
     }
 
     sithSurface_numAvail = 256;
@@ -45,7 +45,8 @@ int sithSurface_Open()
 int sithSurface_Startup2()
 {
     sithSurface_Startup();
-    return sithSurface_Open();
+    sithSurface_bOpened = 0;
+    return 1;
 }
 
 int sithSurface_Startup3()
@@ -585,8 +586,9 @@ void sithSurface_Tick(float deltaSecs)
                     v10 = surface->sithSurfaceParent;
                     if ( v10 )
                     {
-                        float scroll_x = surface->field_1C.x * deltaSecs;
-                        float scroll_y = surface->field_1C.y * deltaSecs;
+                        float scroll_x = surface->scrollVector.x * deltaSecs;
+                        float scroll_y = surface->scrollVector.y * deltaSecs;
+                        //printf("%x: %f %f %x\n", surface->index, scroll_x, scroll_y, surface->flags);
 
                         v10->surfaceInfo.face.clipIdk.x = scroll_x + v10->surfaceInfo.face.clipIdk.x;
                         v10->surfaceInfo.face.clipIdk.y = scroll_y + v10->surfaceInfo.face.clipIdk.y;
@@ -742,8 +744,8 @@ void sithSurface_Tick(float deltaSecs)
 
 void sithSurface_ScrollSky(rdSurface *surface, int skyType, float deltaSecs, uint8_t a4)
 {
-    float scroll_x = surface->field_1C.x * deltaSecs;
-    float scroll_y = surface->field_1C.y * deltaSecs;
+    float scroll_x = surface->scrollVector.x * deltaSecs;
+    float scroll_y = surface->scrollVector.y * deltaSecs;
 
     if ( skyType == SITH_SURFACE_HORIZONSKY )
     {
@@ -787,7 +789,7 @@ int sithSurface_StopAnim(rdSurface *surface)
         v2 = surface->sithSurfaceParent;
         v2->surfaceFlags &= ~SITH_SURFACE_SCROLLING;
         rdVector_Zero3(&surface->field_24);
-        rdVector_Zero2(&surface->field_1C);
+        rdVector_Zero2(&surface->scrollVector);
     }
     surface->flags = 0;
     v4 = sithSurface_numAvail;
@@ -1017,8 +1019,8 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     rdMatrix_PostScale34(&a3, &a1a_2);
     rdMatrix_TransformVector34(&a1a, a2, &a3);
     result = v32;
-    v32->field_1C.x = -a1a.x;
-    v32->field_1C.y = -a1a.y;
+    v32->scrollVector.x = -a1a.x;
+    v32->scrollVector.y = -a1a.y;
     surface->surfaceFlags |= SITH_SURFACE_SCROLLING;
     return result;
 }
@@ -1160,13 +1162,13 @@ rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
         if ( skyType == SITH_SURFACE_HORIZONSKY )
         {
             result->flags = 0x900000;
-            rdVector_Copy2(&result->field_1C, a2);
+            rdVector_Copy2(&result->scrollVector, a2);
         }
         else
         {
             if ( skyType == SITH_SURFACE_CEILINGSKY )
                 result->flags = 0x1100000;
-            rdVector_Copy2(&result->field_1C, a2);
+            rdVector_Copy2(&result->scrollVector, a2);
         }
     }
     return result;

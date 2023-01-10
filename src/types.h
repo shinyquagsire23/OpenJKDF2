@@ -1587,7 +1587,7 @@ struct rdSurface
   rdMaterial* material; // -10
   sithSurface *sithSurfaceParent; // -9
   sithSector* sector; // -8
-  rdVector2 field_1C;
+  rdVector2 scrollVector;
   rdVector3 field_24;
   uint32_t field_30;
   uint32_t field_34;

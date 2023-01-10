@@ -446,7 +446,7 @@ void sithDSS_SendSurface(rdSurface *surface, int sendto_id, int mpFlags)
     if (surface->flags & 0x100000)
     {
         NETMSG_PUSHVEC3(surface->field_24);
-        NETMSG_PUSHVEC2(surface->field_1C);
+        NETMSG_PUSHVEC2(surface->scrollVector);
     }
     if (surface->flags & 0x200000)
     {
@@ -479,66 +479,73 @@ int sithDSS_ProcessSurface(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    rdsurface = sithSurface_GetByIdx(NETMSG_POPS32());
-    if ( rdsurface || (surface = sithSurface_Alloc(), (rdsurface = surface) != 0) )
+    int idx = NETMSG_POPS32();
+    rdsurface = sithSurface_GetByIdx(idx);
+    if (!rdsurface) {
+        rdsurface = sithSurface_Alloc();
+    }
+
+    if (!rdsurface)
     {
-        rdsurface->flags = NETMSG_POPU32();
-        if (!rdsurface->flags )
-        {
-            sithSurface_StopAnim(rdsurface);
-            return 1;
-        }
-        
-        if (rdsurface->flags & 0xC0000)
-        {
-            rdsurface->parent_thing = sithThing_GetThingByIdx(NETMSG_POPS32());
-            if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THINGTYPE_SPRITE3 )
-                rdsurface->material = rdsurface->parent_thing->rdthing.sprite3->face.material;
-            rdsurface->signature = NETMSG_POPU32();
-        }
+        return 0;
+    }
 
-        if (rdsurface->flags & 0x20000)
-        {
-            v7 = NETMSG_POPS32();
-            if ( v7 >= 0 && v7 < sithWorld_pCurrentWorld->numSurfaces )
-            {
-                rdsurface->sithSurfaceParent = &sithWorld_pCurrentWorld->surfaces[v7];
-                rdsurface->material = sithWorld_pCurrentWorld->surfaces[v7].surfaceInfo.face.material;
-            }
-        }
 
-        if (rdsurface->flags & 0x100000)
-        {
-            rdsurface->field_24 = NETMSG_POPVEC3();
-            rdsurface->field_1C = NETMSG_POPVEC2();
-        }
-
-        if (rdsurface->flags & 0x200000)
-        {
-            rdsurface->field_30 = NETMSG_POPU32();
-            rdsurface->field_34 = NETMSG_POPU32();
-            rdsurface->wallCel = NETMSG_POPU32();
-        }
-
-        if (rdsurface->flags & 0x400000)
-        {
-            rdsurface->field_44 = NETMSG_POPF32();
-            rdsurface->field_48 = NETMSG_POPF32();
-            rdsurface->field_40 = NETMSG_POPF32();
-            rdsurface->field_3C = NETMSG_POPF32();
-        }
-
-        if (rdsurface->flags & 0x10000)
-        {
-            rdsurface->material = sithMaterial_GetByIdx(NETMSG_POPS32());
-        }
-
-        if (rdsurface->flags & 0x2000000)
-            rdsurface->sector = sithSector_GetPtrFromIdx(NETMSG_POPS32());
-
+    rdsurface->flags = NETMSG_POPU32();
+    if (!rdsurface->flags )
+    {
+        sithSurface_StopAnim(rdsurface);
         return 1;
     }
-    return 0;
+    
+    if (rdsurface->flags & 0xC0000)
+    {
+        rdsurface->parent_thing = sithThing_GetThingByIdx(NETMSG_POPS32());
+        if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+            rdsurface->material = rdsurface->parent_thing->rdthing.sprite3->face.material;
+        rdsurface->signature = NETMSG_POPU32();
+    }
+
+    if (rdsurface->flags & 0x20000)
+    {
+        v7 = NETMSG_POPS32();
+        if ( v7 >= 0 && v7 < sithWorld_pCurrentWorld->numSurfaces )
+        {
+            rdsurface->sithSurfaceParent = &sithWorld_pCurrentWorld->surfaces[v7];
+            rdsurface->material = sithWorld_pCurrentWorld->surfaces[v7].surfaceInfo.face.material;
+        }
+    }
+
+    if (rdsurface->flags & 0x100000)
+    {
+        rdsurface->field_24 = NETMSG_POPVEC3();
+        rdsurface->scrollVector = NETMSG_POPVEC2();
+    }
+
+    if (rdsurface->flags & 0x200000)
+    {
+        rdsurface->field_30 = NETMSG_POPU32();
+        rdsurface->field_34 = NETMSG_POPU32();
+        rdsurface->wallCel = NETMSG_POPU32();
+    }
+
+    if (rdsurface->flags & 0x400000)
+    {
+        rdsurface->field_44 = NETMSG_POPF32();
+        rdsurface->field_48 = NETMSG_POPF32();
+        rdsurface->field_40 = NETMSG_POPF32();
+        rdsurface->field_3C = NETMSG_POPF32();
+    }
+
+    if (rdsurface->flags & 0x10000)
+    {
+        rdsurface->material = sithMaterial_GetByIdx(NETMSG_POPS32());
+    }
+
+    if (rdsurface->flags & 0x2000000)
+        rdsurface->sector = sithSector_GetPtrFromIdx(NETMSG_POPS32());
+
+    return 1;
 }
 
 void sithDSS_SendSyncEvents(sithEvent *timer, int sendto_id, int mpFlags)
