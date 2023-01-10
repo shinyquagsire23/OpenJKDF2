@@ -281,14 +281,37 @@ void jkPlayer_InitThings()
     int num = 0;
     jkPlayer_numOtherThings = 0;
 
-    jkPlayerInfo* playerInfoIter = jkPlayer_otherThings;
+    // Added: Properly serialize sabers.
+#ifdef QOL_IMPROVEMENTS
     for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
         sithThing* thingIter = &sithWorld_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
-            && playerInfoIter < &jkPlayer_otherThings[NUM_JKPLAYER_THINGS] ) // off by one?
+            && thingIter->playerInfo )
+        {
+            thingIter->playerInfo->actorThing = thingIter;
+            thingIter->playerInfo->rd_thing.model3 = 0;
+            thingIter->thingflags |= SITH_TF_RENDERWEAPON;
+
+            jkPlayer_numOtherThings++;
+            num++;
+        }
+    }
+#endif
+    
+    // Added: skip already initted
+    jkPlayerInfo* playerInfoIter = &jkPlayer_otherThings[jkPlayer_numOtherThings];
+    for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    {
+        sithThing* thingIter = &sithWorld_pCurrentWorld->things[i];
+
+        if (thingIter->type == SITH_THING_ACTOR 
+            && thingIter->actorParams.typeflags & SITH_AF_BOSS 
+            && playerInfoIter < &jkPlayer_otherThings[NUM_JKPLAYER_THINGS] // off by one?
+            && !thingIter->playerInfo // Added: skip already initted
+            ) 
         {
             playerInfoIter->actorThing = thingIter;
             thingIter->playerInfo = playerInfoIter;
@@ -300,7 +323,7 @@ void jkPlayer_InitThings()
                 sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
                 sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
                 sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
-                
+
                 jkSaber_InitializeSaberInfo(thingIter, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
             }
 

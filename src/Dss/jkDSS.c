@@ -161,6 +161,18 @@ void jkDSS_playerconfig_idksync()
     {
         jkDSS_SendSetSaberInfo2(jkPlayer_otherThings[i].actorThing);
     }
+
+#ifdef QOL_IMPROVEMENTS
+    // Also sync the AI sabers (usually statues)
+    if (Main_bMotsCompat) {
+        for (int i = 0; i < NUM_JKPLAYER_THINGS; i++)
+        {
+            if (!jkPlayer_aMotsInfos[i].actorThing)
+                continue;
+            jkDSS_SendSetSaberInfo2(jkPlayer_aMotsInfos[i].actorThing);
+        }
+    }
+#endif
     
     {
         NETMSG_START;
@@ -504,7 +516,25 @@ void jkDSS_SendSetSaberInfo2(sithThing *thing)
     NETMSG_START;
 
     NETMSG_PUSHU16(thing->type != SITH_THING_PLAYER);
-    NETMSG_PUSHU16((thing->type != SITH_THING_PLAYER) ? thing->playerInfo - jkPlayer_otherThings : thing->playerInfo - playerThings);
+    if (thing->type != SITH_THING_PLAYER) {
+        if (thing->playerInfo >= &jkPlayer_otherThings[0] && thing->playerInfo < &jkPlayer_otherThings[NUM_JKPLAYER_THINGS]) {
+            NETMSG_PUSHU16(thing->playerInfo - jkPlayer_otherThings);
+        }
+#ifdef QOL_IMPROVEMENTS
+        // Added: Actually sync enemies sabers
+        else if (thing->playerInfo >= &jkPlayer_aMotsInfos[0] && thing->playerInfo < &jkPlayer_aMotsInfos[NUM_JKPLAYER_THINGS]) {
+            NETMSG_PUSHU16(0x4000 | (thing->playerInfo - jkPlayer_aMotsInfos));
+        }
+#endif
+        else {
+            NETMSG_PUSHU16(0x7FFF); // Added
+        }
+        
+    }
+    else {
+        NETMSG_PUSHU16(thing->playerInfo - playerThings);
+    }
+    
     NETMSG_PUSHU32(thing->thing_id);
     if ( thing->playerInfo->rd_thing.model3 ) {
         NETMSG_PUSHS32(thing->playerInfo->rd_thing.model3->id);
@@ -575,12 +605,30 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     // MOTS altered: added checks
     if (Main_bMotsCompat) {
         if ( isNotPlayer ) {
-            if (playerInfoIdx < jkPlayer_maxPlayers)
+            // Added: Why?
+            if ((playerInfoIdx+1) > jkPlayer_numOtherThings && playerInfoIdx < NUM_JKPLAYER_THINGS) {
+                jkPlayer_numOtherThings = playerInfoIdx+1;
+            }
+
+            if (playerInfoIdx < NUM_JKPLAYER_THINGS) {
                 playerInfo = &jkPlayer_otherThings[playerInfoIdx];
+            }
+#ifdef QOL_IMPROVEMENTS
+            // Added: Actually sync enemies sabers
+            else if (playerInfoIdx & 0x4000 && (playerInfoIdx & 0x3FFF) >= 0 && (playerInfoIdx & 0x3FFF) < NUM_JKPLAYER_THINGS) {
+                playerInfo = &jkPlayer_aMotsInfos[playerInfoIdx & 0x3FFF];
+            }
+#endif
         }
         else {
-            if (playerInfoIdx < 0x40)
+            // Added: Why?
+            if ((playerInfoIdx+1) > jkPlayer_maxPlayers && playerInfoIdx < NUM_JKPLAYER_THINGS) {
+                jkPlayer_maxPlayers = playerInfoIdx+1;
+            }
+
+            if (playerInfoIdx < jkPlayer_maxPlayers) {
                 playerInfo = &playerThings[playerInfoIdx];
+            }
         }
 
         if (!playerInfo)
@@ -596,9 +644,11 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     }
     
 
-    sithThing* thing = sithThing_GetById(NETMSG_POPS32());
-    if (!thing)
+    int idx = NETMSG_POPS32();
+    sithThing* thing = sithThing_GetById(idx);
+    if (!thing) {
         return Main_bMotsCompat ? 1 : 0; // MOTS altered
+    }
 
     int modelIdx = NETMSG_POPS32();
     thing->playerInfo = playerInfo;
@@ -657,6 +707,7 @@ void jkDSS_SendJKSetWeaponMesh(sithThing *pPlayerThing)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
+// MOTS altered
 int jkDSS_ProcessJKSetWeaponMesh(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
