@@ -148,6 +148,12 @@
 
 #define SITHAI_MAX_ACTORS (256)
 
+#ifdef QOL_IMPROVEMENTS
+#define SITH_MIXER_NUMPLAYINGSOUNDS (256)
+#else
+#define SITH_MIXER_NUMPLAYINGSOUNDS (32)
+#endif
+
 #define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_FLAG(_flag) (Main_bMotsCompat ? (_flag) : (0))
 

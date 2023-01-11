@@ -42,8 +42,6 @@
 #define sithSoundMixer_sub_4DD3F0_ADDR (0x004DD3F0)
 #define sithSoundMixer_sub_4DD5D0_ADDR (0x004DD5D0)
 
-#define MIXER_NUMPLAYINGSOUNDS (32)
-
 enum SITHSOUNDFLAG
 {
     SITHSOUNDFLAG_LOOP = 0x1,

@@ -177,8 +177,8 @@ sithSoundMixer_musicVolume 0x0054A678 float = 1.0f
 sithSoundMixer_globalVolume 0x0054A67C float = 1.0f
 sithSoundMixer_numSoundsAvailable2 0x00835FE0 int
 sithSoundMixer_numSoundsAvailable 0x00835FE4 int
-sithSoundMixer_aPlayingSounds 0x00835FE8 sithPlayingSound[32]
-sithSoundMixer_aIdk 0x00836B68 int[32]
+sithSoundMixer_aPlayingSounds 0x00835FE8 sithPlayingSound[SITH_MIXER_NUMPLAYINGSOUNDS]
+sithSoundMixer_aIdk 0x00836B68 int[SITH_MIXER_NUMPLAYINGSOUNDS]
 sithSoundMixer_activeChannels 0x00836BE8 int
 sithSoundMixer_bOpened 0x00836BEC int
 sithSoundMixer_pLastSectorSoundSector 0x00836BF4 sithSector*

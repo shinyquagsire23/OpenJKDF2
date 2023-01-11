@@ -206,17 +206,17 @@ void sithSoundMixer_Close()
 
 void sithSoundMixer_ClearAll()
 {
-    _memset(sithSoundMixer_aPlayingSounds, 0, sizeof(sithPlayingSound) * MIXER_NUMPLAYINGSOUNDS);
-    for (int i = 0; i < MIXER_NUMPLAYINGSOUNDS; i++)
+    _memset(sithSoundMixer_aPlayingSounds, 0, sizeof(sithPlayingSound) * SITH_MIXER_NUMPLAYINGSOUNDS);
+    for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++)
     {
         sithSoundMixer_aPlayingSounds[i].idx = i;
     }
 
-    sithSoundMixer_numSoundsAvailable = MIXER_NUMPLAYINGSOUNDS;
-    sithSoundMixer_numSoundsAvailable2 = MIXER_NUMPLAYINGSOUNDS;
+    sithSoundMixer_numSoundsAvailable = SITH_MIXER_NUMPLAYINGSOUNDS;
+    sithSoundMixer_numSoundsAvailable2 = SITH_MIXER_NUMPLAYINGSOUNDS;
 
     // Someone please help whoever programmed this    
-    for (int i = 31; i >= 0; i--)
+    for (int i = SITH_MIXER_NUMPLAYINGSOUNDS-1; i >= 0; i--)
     {
         // Setting the index?
         sithSoundMixer_aPlayingSounds[i].idx = i;
@@ -226,7 +226,7 @@ void sithSoundMixer_ClearAll()
 
         // but gotta set that index again
         sithSoundMixer_aPlayingSounds[i].idx = i;
-        sithSoundMixer_aIdk[31 - i] = i;
+        sithSoundMixer_aIdk[(SITH_MIXER_NUMPLAYINGSOUNDS - 1) - i] = i;
     }
 
     sithSoundMixer_pPlayingSoundIdk = 0;
@@ -317,7 +317,7 @@ sithPlayingSound* sithSoundMixer_cog_playsound_internal(sithSound *sound, float 
 #endif
 
 #ifdef OPENAL_SOUND
-    jkGuiSound_numChannels = 256;
+    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
 #endif
 
     v6 = sithSoundMixer_PlayingSoundFromSound(sound, flags);
@@ -355,7 +355,7 @@ sithPlayingSound* sithSoundMixer_cog_playsound_internal(sithSound *sound, float 
     if ( sithSoundMixer_activeChannels >= jkGuiSound_numChannels )
     {
         v15 = 0;
-        while ( sithSoundMixer_dword_836C04 >= MIXER_NUMPLAYINGSOUNDS )
+        while ( sithSoundMixer_dword_836C04 >= SITH_MIXER_NUMPLAYINGSOUNDS )
         {
 LABEL_35:
             if ( v15 )
@@ -369,7 +369,7 @@ LABEL_35:
         {
             v16++;
             sithSoundMixer_dword_836C04++;
-            if ( v16 >= &sithSoundMixer_aPlayingSounds[MIXER_NUMPLAYINGSOUNDS] )
+            if ( v16 >= &sithSoundMixer_aPlayingSounds[SITH_MIXER_NUMPLAYINGSOUNDS] )
                 goto LABEL_35;
         }
 
@@ -472,7 +472,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
 #endif
 
 #ifdef OPENAL_SOUND
-    jkGuiSound_numChannels = 256;
+    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
     //jkGuiSound_b3DSound = 1;
 #endif
 
@@ -540,7 +540,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
                     {
                         v19 = sithSoundMixer_dword_836C04;
                         v20 = 0;
-                        while ( v19 >= MIXER_NUMPLAYINGSOUNDS )
+                        while ( v19 >= SITH_MIXER_NUMPLAYINGSOUNDS )
                         {
 LABEL_46:
                             if ( v20 )
@@ -555,7 +555,7 @@ LABEL_46:
                         {
                             v21++;
                             sithSoundMixer_dword_836C04++;
-                            if ( v21 >= &sithSoundMixer_aPlayingSounds[MIXER_NUMPLAYINGSOUNDS] )
+                            if ( v21 >= &sithSoundMixer_aPlayingSounds[SITH_MIXER_NUMPLAYINGSOUNDS] )
                                 goto LABEL_46;
                         }
                         v22 = &sithSoundMixer_aPlayingSounds[sithSoundMixer_dword_836C04];
@@ -731,7 +731,7 @@ void sithSoundMixer_Tick(float deltaSecs)
     rdVector3 v44; // [esp+8h] [ebp-Ch] BYREF
 
 #ifdef OPENAL_SOUND
-    jkGuiSound_numChannels = 256;
+    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
 #endif
 
     if ( !sithCamera_currentCamera )
@@ -1145,7 +1145,7 @@ void sithSoundMixer_SetVelocity(sithPlayingSound *sound)
 
 void sithSoundMixer_SyncSounds()
 {
-    for (int i = 0; i < MIXER_NUMPLAYINGSOUNDS; i++)
+    for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++)
     {
         sithPlayingSound* iter = &sithSoundMixer_aPlayingSounds[i];
         if (iter != sithSoundMixer_pPlayingSoundIdk)
@@ -1213,14 +1213,14 @@ sithPlayingSound* sithSoundMixer_GetSoundFromRef(int refid)
         return NULL;
 
     playingsound_idx = 0;
-    for (int i = 0; i < MIXER_NUMPLAYINGSOUNDS; i++)
+    for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++)
     {
         if ( sithSoundMixer_aPlayingSounds[i].sound && sithSoundMixer_aPlayingSounds[i].refid == refid )
             break;
         ++playingsound_idx;
     }
 
-    if ( playingsound_idx < MIXER_NUMPLAYINGSOUNDS )
+    if ( playingsound_idx < SITH_MIXER_NUMPLAYINGSOUNDS )
         return &sithSoundMixer_aPlayingSounds[playingsound_idx];
     else
         return NULL;
@@ -1294,14 +1294,14 @@ int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound)
     stdSound_buffer_t *v14; // [esp-4h] [ebp-Ch]
 
 #ifdef OPENAL_SOUND
-    jkGuiSound_numChannels = 256;
+    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
     //jkGuiSound_b3DSound = 1;
 #endif
 
     if ( sithSoundMixer_activeChannels >= jkGuiSound_numChannels )
     {
         v2 = 0;
-        while ( sithSoundMixer_dword_836C04 >= MIXER_NUMPLAYINGSOUNDS )
+        while ( sithSoundMixer_dword_836C04 >= SITH_MIXER_NUMPLAYINGSOUNDS )
         {
 LABEL_8:
             if ( v2 )
@@ -1314,7 +1314,7 @@ LABEL_8:
         {
             v3++;
             sithSoundMixer_dword_836C04++;
-            if ( v3 >= &sithSoundMixer_aPlayingSounds[MIXER_NUMPLAYINGSOUNDS] )
+            if ( v3 >= &sithSoundMixer_aPlayingSounds[SITH_MIXER_NUMPLAYINGSOUNDS] )
                 goto LABEL_8;
         }
 
@@ -1414,7 +1414,7 @@ sithPlayingSound* sithSoundMixer_GetSoundFromIdx(signed int idx)
 {
     sithPlayingSound *result; // eax
 
-    if ( idx < 0 || idx >= MIXER_NUMPLAYINGSOUNDS )
+    if ( idx < 0 || idx >= SITH_MIXER_NUMPLAYINGSOUNDS )
         result = 0;
     else
         result = &sithSoundMixer_aPlayingSounds[idx];
