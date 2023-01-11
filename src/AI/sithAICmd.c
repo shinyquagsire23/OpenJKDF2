@@ -990,9 +990,8 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
             if (!actor->pInterest) {
                 psVar3 = sithAICmd_NearestPlayer(actor);
             }
-            uVar1 = psVar3->thingflags;
             actor->pDistractor = psVar3;
-            if ((uVar1 & 0x202) == 0) 
+            if ((psVar3->thingflags & 0x202) == 0) 
             {
                 sithAI_sub_4EAD60(actor);
                 if (actor->field_1F4 == 0) 
@@ -1001,8 +1000,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
-                    sithAIAwareness_AddEntry
-                    (actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
+                    sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                     actor->thingidk = actor->pDistractor;
                     return 1;
                 }
@@ -1670,12 +1668,11 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
         {
             sithAI_sub_4EAD60(pActor);
             if (pActor->field_1F4 == 0) {
-                pActor->flags = pActor->flags & 0xfffffffbU | 0x232;
-                sithSoundClass_PlayModeRandom(pActor->thing, 0x4c);
-                sithSoundClass_ThingPlaySoundclass4(pActor->thing, 2);
-                sithAIAwareness_AddEntry
-                (pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0,
-                 pActor->pDistractor);
+                pActor->flags &= ~SITHAI_MODE_SEARCHING;
+                pActor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
+                sithSoundClass_PlayModeRandom(pActor->thing, SITH_SC_ALERT);
+                sithSoundClass_ThingPlaySoundclass4(pActor->thing, SITH_SC_ACTIVATE);
+                sithAIAwareness_AddEntry(pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0, pActor->pDistractor);
                 pActor->thingidk = pActor->pDistractor;
                 return 1;
             }

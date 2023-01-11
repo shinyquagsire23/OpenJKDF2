@@ -1371,10 +1371,11 @@ int32_t sithSoundMixer_GetThingSoundIdx(sithThing *thing, sithSound *sound)
 
     for (int i = 0; i < sithSoundMixer_numSoundsAvailable; i++) {
         if (sithSoundMixer_aPlayingSounds[i].sound == sound) {
-            return i;
-        }
-        if (thing && sithSoundMixer_aPlayingSounds[i].thing == thing) {
-            return i;
+            if (!thing)
+                return i;
+            if (thing && sithSoundMixer_aPlayingSounds[i].thing == thing) {
+                return i;
+            }
         }
     }
 
