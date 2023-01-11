@@ -77,6 +77,28 @@ static inline float stdMath_Fabs(float val)
     return fabs(val);
 }
 
+static inline int32_t stdMath_ClampInt(int32_t val, int32_t valMin, int32_t valMax)
+{
+    if (val < valMin)
+        return valMin;
+    
+    if (val > valMax)
+        return valMax;
+
+    return val;
+}
+
+static inline uint8_t stdMath_ClampU8(uint8_t val, uint8_t valMin, uint8_t valMax)
+{
+    if (val < valMin)
+        return valMin;
+    
+    if (val > valMax)
+        return valMax;
+
+    return val;
+}
+
 extern const float aSinTable[4096];
 extern const float aTanTable[4096];
 

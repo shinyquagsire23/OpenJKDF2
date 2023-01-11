@@ -20,6 +20,7 @@
 #include "General/stdPalEffects.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
+#include "General/stdMath.h"
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
@@ -175,18 +176,9 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
 {
     int v2; // edi
     sithThing *v3; // esi
-    stdPalEffect *v4; // ebx
+    stdPalEffect *pPalEffect; // ebx
     double v5; // st7
-    double v6; // st7
-    double v7; // st7
-    int v8; // eax
-    int v9; // eax
-    int v10; // eax
-    int v11; // eax
-    int v12; // eax
-    int v13; // eax
     int v14; // ecx
-    sithSector *v15; // eax
     float v20; // [esp+0h] [ebp-4h]
 
     v20 = a2 * 0.4;
@@ -194,87 +186,30 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
     if ( playerInfo == sithPlayer_pLocalPlayer )
     {
         v3 = playerInfo->playerThing;
-        v4 = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
-        if ( v4->tint.x != 0.0 )
+        pPalEffect = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
+        if ( pPalEffect->tint.x != 0.0 )
         {
-            v5 = v4->tint.x - v20;
-            if ( v5 < 0.0 )
-            {
-                v5 = 0.0;
-            }
-            else if ( v5 > 1.0 )
-            {
-                v5 = 1.0;
-            }
-            v4->tint.x = v5;
+            pPalEffect->tint.x = stdMath_Clamp(pPalEffect->tint.x - v20, 0.0, 1.0);
         }
-        if ( v4->tint.y != 0.0 )
+        if ( pPalEffect->tint.y != 0.0 )
         {
-            v6 = v4->tint.y - v20;
-            if ( v6 < 0.0 )
-            {
-                v6 = 0.0;
-            }
-            else if ( v6 > 1.0 )
-            {
-                v6 = 1.0;
-            }
-            v4->tint.y = v6;
+            pPalEffect->tint.y = stdMath_Clamp(pPalEffect->tint.y - v20, 0.0, 1.0);
         }
-        if ( v4->tint.z != 0.0 )
+        if ( pPalEffect->tint.z != 0.0 )
         {
-            v7 = v4->tint.z - v20;
-            if ( v7 < 0.0 )
-            {
-                v7 = 0.0;
-            }
-            else if ( v7 > 1.0 )
-            {
-                v7 = 1.0;
-            }
-            v4->tint.z = v7;
+            pPalEffect->tint.z = stdMath_Clamp(pPalEffect->tint.z - v20, 0.0, 1.0);
         }
-        v8 = v4->add.x;
-        if ( v8 )
+        if ( pPalEffect->add.x )
         {
-            v9 = v8 - v2;
-            if ( v9 < 0 )
-            {
-                v9 = 0;
-            }
-            else if ( v9 > 255 )
-            {
-                v9 = 255;
-            }
-            v4->add.x = v9;
+            pPalEffect->add.x = stdMath_ClampInt(pPalEffect->add.x - v2, 0, 255);
         }
-        v10 = v4->add.y;
-        if ( v10 )
+        if ( pPalEffect->add.y )
         {
-            v11 = v10 - v2;
-            if ( v11 < 0 )
-            {
-                v11 = 0;
-            }
-            else if ( v11 > 255 )
-            {
-                v11 = 255;
-            }
-            v4->add.y = v11;
+            pPalEffect->add.y = stdMath_ClampInt(pPalEffect->add.y - v2, 0, 255);
         }
-        v12 = v4->add.z;
-        if ( v12 )
+        if ( pPalEffect->add.z )
         {
-            v13 = v12 - v2;
-            if ( v13 < 0 )
-            {
-                v13 = 0;
-            }
-            else if ( v13 > 255 )
-            {
-                v13 = 255;
-            }
-            v4->add.z = v13;
+            pPalEffect->add.z = stdMath_ClampInt(pPalEffect->add.z - v2, 0, 255);
         }
         sithWeapon_handle_inv_msgs(v3);
         sithInventory_SendFire(v3);
@@ -283,10 +218,9 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
             v14 = v3->actorParams.typeflags;
             if ( (v14 & SITH_AF_FALLING_TO_DEATH) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
             {
-                v15 = v3->sector;
-                if ( v15 )
+                if ( v3->sector )
                 {
-                    if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
+                    if ( (v3->sector->flags & SITH_SECTOR_FALLDEATH) != 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
                     {
                         v3->thingflags |= SITH_TF_DEAD;
                         v3->actorParams.typeflags |= SITH_AF_FALLING_TO_DEATH;
@@ -298,8 +232,8 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
         }
         if ( (v3->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH) != 0 )
         {
-            v4->fade -= a2 * 0.7;
-            if (v4->fade <= 0.0)
+            pPalEffect->fade -= a2 * 0.7;
+            if (pPalEffect->fade <= 0.0)
                 sithPlayer_HandleSentDeathPkt(v3);
         }
     }
@@ -327,120 +261,38 @@ void sithPlayer_debug_loadauto(sithThing *player)
 void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
 {
     sithThing *focusThing; // eax
-    stdPalEffect *paleffect; // ecx
-    double v5; // st7
+    stdPalEffect *pPalEffects; // ecx
     double v8; // st7
 
     focusThing = sithWorld_pCurrentWorld->cameraFocus;
     if ( (focusThing->type & 0xA) != 0 ) // ???
     {
-        paleffect = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
-        if ( tintR < 0.0 )
-        {
-            v5 = 0.0;
-        }
-        else if ( tintR > 1.0 )
-        {
-            v5 = 1.0;
-        }
-        else
-        {
-            v5 = tintR;
-        }
-        paleffect->tint.x = v5;
-        if ( tintG < 0.0 )
-        {
-            v8 = 0.0;
-        }
-        else if ( tintG > 1.0 )
-        {
-            v8 = 1.0;
-        }
-        else
-        {
-            v8 = tintG;
-        }
-        paleffect->tint.y = v8;
-        if ( tintB < 0.0 )
-        {
-            paleffect->tint.z = 0.0;
-        }
-        else if ( tintB > 1.0 )
-        {
-            paleffect->tint.z = 1.0;
-        }
-        else
-        {
-            paleffect->tint.z = tintB;
-        }
+        pPalEffects = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
+
+        pPalEffects->tint.x = stdMath_Clamp(tintR, 0.0, 1.0);
+        pPalEffects->tint.y = stdMath_Clamp(tintG, 0.0, 1.0);
+        pPalEffects->tint.z = stdMath_Clamp(tintB, 0.0, 1.0);
     }
 }
 
 void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
 {
-    stdPalEffect *v3; // ecx
-    double v4; // st7
-    double v5; // st6
-    double v6; // st7
-    double v7; // st6
-    double v8; // st7
+    stdPalEffect *pPalEffects; // ecx
 
-    v3 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
-    v4 = fR + v3->tint.x;
-    if ( v4 < 0.0 )
-    {
-        v4 = 0.0;
-    }
-    else if ( v4 > 1.0 )
-    {
-        v4 = 1.0;
-    }
-    v5 = v4;
-    v6 = fG + v3->tint.y;
-    v3->tint.x = v5;
-    if ( v6 < 0.0 )
-    {
-        v6 = 0.0;
-    }
-    else if ( v6 > 1.0 )
-    {
-        v6 = 1.0;
-    }
-    v7 = v6;
-    v8 = fB + v3->tint.z;
-    v3->tint.y = v7;
-    if ( v8 < 0.0 )
-    {
-        v8 = 0.0;
-    }
-    else if ( v8 > 0.5 )
-    {
-        v3->tint.z = 0.5;
-        return;
-    }
-    v3->tint.z = v8;
+    pPalEffects = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
+    pPalEffects->tint.x = stdMath_Clamp(fR + pPalEffects->tint.x, 0.0, 1.0);
+    pPalEffects->tint.y = stdMath_Clamp(fG + pPalEffects->tint.y, 0.0, 1.0);
+    pPalEffects->tint.z = stdMath_Clamp(fB + pPalEffects->tint.z, 0.0, 1.0);
 }
 
 void sithPlayer_AddDyamicAdd(int r, int g, int b)
 {
-    stdPalEffect *v3; // eax
-    unsigned int v4; // ecx
-    unsigned int v5; // ecx
-    unsigned int v6; // ecx
+    stdPalEffect *pPalEffects; // eax
 
-    v3 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
-    v4 = r + v3->add.x;
-    if ( v4 > 0xFF )
-        v4 = 255;
-    v3->add.x = v4;
-    v5 = g + v3->add.y;
-    if ( v5 > 0xFF )
-        v5 = 255;
-    v3->add.y = v5;
-    v6 = b + v3->add.z;
-    if ( v6 > 0xFF )
-        v6 = 255;
-    v3->add.z = v6;
+    pPalEffects = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
+    pPalEffects->add.x = stdMath_ClampU8(r + pPalEffects->add.x, 0x0, 0xFF);
+    pPalEffects->add.y = stdMath_ClampU8(g + pPalEffects->add.y, 0x0, 0xFF);
+    pPalEffects->add.z = stdMath_ClampU8(b + pPalEffects->add.z, 0x0, 0xFF);
 }
 
 int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
@@ -452,17 +304,14 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
 
     if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && thing1 != thing2 && thing1->type == SITH_THING_PLAYER && thing2->type == SITH_THING_PLAYER )
     {
-        v2 = thing1->actorParams.playerinfo;
-        if ( v2 )
+        // Yes, these are assigns not ==
+        if ( v2 = thing1->actorParams.playerinfo )
         {
-            v3 = thing2->actorParams.playerinfo;
-            if ( v3 )
+            if ( v3 = thing2->actorParams.playerinfo )
             {
-                v4 = v2->teamNum;
-                if ( v4 )
+                if ( v4 = v2->teamNum )
                 {
-                    v5 = v3->teamNum;
-                    if ( v5 )
+                    if ( v5 = v3->teamNum )
                     {
                         if ( v4 == v5 )
                             return 1;
@@ -583,16 +432,13 @@ void sithPlayer_sub_4C8910(unsigned int idx)
 
 int sithPlayer_sub_4C87C0(int idx, int netId)
 {
-    sithThing *v2; // ecx
-
-    v2 = jkPlayer_playerInfos[idx].playerThing;
-    if ( !v2 )
+    if ( !jkPlayer_playerInfos[idx].playerThing )
         return 0;
     jkPlayer_playerInfos[idx].flags |= 5;
     jkPlayer_playerInfos[idx].net_id = netId;
-    v2->thingflags &= ~SITH_TF_DISABLED;
+    jkPlayer_playerInfos[idx].playerThing->thingflags &= ~SITH_TF_DISABLED;
 
-    v2->thingtype = SITH_THING_PLAYER; // TODO: WHY IS THIS NEEDED?
+    jkPlayer_playerInfos[idx].playerThing->thingtype = SITH_THING_PLAYER; // TODO: WHY IS THIS NEEDED?
 
     return 1;
 }
@@ -601,7 +447,6 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
 void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
 {
     rdPuppet *v1; // ecx
-    sithPuppet *v2; // eax
     int v3; // eax
     sithThing *v4; // eax
     stdPalEffect *v6; // eax
@@ -610,10 +455,9 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     v1 = player->rdthing.puppet;
     if ( v1 )
     {
-        v2 = player->puppet;
-        if ( v2 )
+        if ( player->puppet )
         {
-            v3 = v2->field_18;
+            v3 = player->puppet->field_18;
             if ( v3 >= 0 )
                 sithPuppet_StopKey(v1, v3, 0.0);
         }
