@@ -154,6 +154,12 @@
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
 #endif
 
+#ifdef QOL_IMPROVEMENTS
+#define JKDEV_NUM_CHEATS (64)
+#else
+#define JKDEV_NUM_CHEATS (32)
+#endif
+
 #define DF2_ONLY_COND(cond) ( Main_bMotsCompat || (!Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_FLAG(_flag) (Main_bMotsCompat ? (_flag) : (0))

@@ -35,12 +35,12 @@ void jkDev_Startup()
     }
 #endif
 
-    sithConsole_Startup(64);
+    sithConsole_Startup(JKDEV_NUM_CHEATS*2);
     sithConsole_Open(16);
     sithConsole_SetPrintFuncs(jkDev_DebugLog, jkDev_PrintUniString);
 
-    jkDev_cheatHashtable = stdHashTable_New(64);
-    _memset(jkDev_aCheatCmds, 0, sizeof(stdDebugConsoleCmd) * 32);
+    jkDev_cheatHashtable = stdHashTable_New(JKDEV_NUM_CHEATS*2);
+    _memset(jkDev_aCheatCmds, 0, sizeof(stdDebugConsoleCmd) * JKDEV_NUM_CHEATS);
 
     sithConsole_RegisterDevCmd(jkDev_CmdVersion, "version", 0);
     sithConsole_RegisterDevCmd(jkDev_CmdTeam, "team", 0);
@@ -392,7 +392,7 @@ void jkDev_sub_41FC90(int a1)
 
 int jkDev_RegisterCmd(void *pfCheatFunc, const char *pCryptCheatStr, const char *pCheatFlavortext, int extra)
 {
-    if ( jkDev_numCheats == 32 )
+    if ( jkDev_numCheats == JKDEV_NUM_CHEATS )
         return 0;
 
     _strncpy(jkDev_aCheatCmds[jkDev_numCheats].cmdStr, pCheatFlavortext, 0x1Fu);

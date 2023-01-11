@@ -492,7 +492,7 @@ jkDev_aEntryPositions 0x00559EF0 rdVector2i[10]
 jkDev_aEntries 0x00559F40 jkDevLogEnt[5]
 jkDev_log_55A4A4 0x0055A4A4 int
 jkDev_log_55A4A8 0x0055A4A8 int
-jkDev_aCheatCmds 0x0055A4B0 stdDebugConsoleCmd[32]
+jkDev_aCheatCmds 0x0055A4B0 stdDebugConsoleCmd[JKDEV_NUM_CHEATS]
 jkDev_numCheats 0x0055A9B0 uint32_t
 jkDev_bInitted 0x0055A9B4 int
 jkDev_bOpened 0x0055A9B8 int
