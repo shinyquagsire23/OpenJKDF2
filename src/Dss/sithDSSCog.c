@@ -233,6 +233,12 @@ int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
             {
                 
             }
+#ifdef QOL_IMPROVEMENTS
+            else if (!Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            {
+                
+            }
+#endif
             else
             {
                 sym->val.data[0] = NETMSG_POPS32();
