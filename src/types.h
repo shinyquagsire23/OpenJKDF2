@@ -3738,6 +3738,7 @@ typedef struct jkBubbleInfo
 #define DEBUGFLAG_20000     (0x20000)
 #define DEBUGFLAG_40000     (0x40000)
 #define DEBUGFLAG_80000     (0x80000)
+#define DEBUGFLAG_NOCLIP    (0x40000000)
 
 
 #ifdef GHIDRA_IMPORT

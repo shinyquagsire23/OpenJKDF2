@@ -1509,6 +1509,11 @@ void sithControl_FreeCam(sithThing *player)
     rdMatrix34 a; // [esp+10h] [ebp-30h] BYREF
     int tmp;
 
+    if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
+    {
+        rdVector_Zero3(&v1->physicsParams.vel);
+    }
+
     v1 = player;
     v2 = 0;
     if ( (player->physicsParams.physflags & SITH_PF_FLY) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
@@ -1567,9 +1572,55 @@ void sithControl_FreeCam(sithThing *player)
         }
         if ( v2 )
         {
+            // Added: noclip
+            if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+                rdMatrix34 a;
+                rdVector3 addVec;
+
+                float mult = 1.0;
+                if (sithControl_ReadFunctionMap(INPUT_FUNC_FAST, 0)) {
+                    mult *= 5.0;
+                }
+                else if (sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp)) {
+                    mult *= 5.0;
+                }
+                if (sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp)) {
+                    mult *= 0.5;
+                }
+                else if ( sithControl_ReadFunctionMap(INPUT_FUNC_SLOW, 0) ) {
+                    mult *= 0.5;
+                }
+
+                rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+                rdVector_Zero3(&addVec);
+                rdVector_MultAcc3(&addVec, &rdroid_yVector3, sithControl_ReadAxisStuff(INPUT_FUNC_FORWARD) * mult);
+
+                rdMatrix_TransformVector34Acc(&addVec, &a);
+                rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);
+                rdVector_Add3Acc(&v1->physicsParams.vel, &addVec);
+            }
+
+            // Added: noclip
+            if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+                rdMatrix34 a;
+                rdVector3 addVec;
+
+                rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+                rdVector_Zero3(&addVec);
+                rdVector_MultAcc3(&addVec, &rdroid_xVector3, (Main_bMotsCompat ? -1.0 : 1.0) * sithControl_ReadAxisStuff(INPUT_FUNC_SLIDE));
+
+                rdMatrix_TransformVector34Acc(&addVec, &a);
+                rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);
+                rdVector_Add3Acc(&v1->physicsParams.vel, &addVec);
+            }
+
             if ( sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp) )
             {
-                if ( (v1->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
+                // Added: noclip
+                if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+                    
+                }
+                else if ( (v1->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
                 {
                     if ( tmp )
                         sithPlayerActions_JumpWithVel(v1, 1.0);
@@ -1579,6 +1630,8 @@ void sithControl_FreeCam(sithThing *player)
                     v1->physicsParams.acceleration.z = v1->actorParams.maxThrust * 0.5 + v1->physicsParams.acceleration.z;
                 }
             }
+            else 
+
             if ( sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp) )
                 v1->physicsParams.acceleration.z = v1->physicsParams.acceleration.z - v1->actorParams.maxThrust * 0.5;
         }

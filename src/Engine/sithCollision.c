@@ -757,16 +757,23 @@ LABEL_78:
                 }
                 if ( (v19->hitType & SITHCOLLISION_THING) != 0 )
                 {
-                    v34 = v19->receiver;
-                    v35 = v34->type + 12 * v5->type;
-                    if ( sithCollision_collisionHandlers[v35].inverse )
-                        v36 = sithCollision_collisionHandlers[v35].handler(v34, v5, v19, 1);
-                    else
-                        v36 = sithCollision_collisionHandlers[v35].handler(
-                                  v5,
-                                  v34,
-                                  v19,
-                                  0);
+                    // Added: noclip
+                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+                    {
+                        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && v19->receiver != sithPlayer_pLocalPlayerThing))
+                        {
+                            v34 = v19->receiver;
+                            v35 = v34->type + 12 * v5->type;
+                            if ( sithCollision_collisionHandlers[v35].inverse )
+                                v36 = sithCollision_collisionHandlers[v35].handler(v34, v5, v19, 1);
+                            else
+                                v36 = sithCollision_collisionHandlers[v35].handler(
+                                          v5,
+                                          v34,
+                                          v19,
+                                          0);
+                        }
+                    }
                 }
                 else if ( (v19->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
                 {
@@ -779,11 +786,15 @@ LABEL_78:
                 }
                 else
                 {
-                    amount = v19->surface;
-                    if ( sithCollision_funcList[v5->type] )
-                        v36 = sithCollision_funcList[v5->type](v5, amount, v19);
-                    else
-                        v36 = sithCollision_DefaultHitHandler(v5, amount, v19);
+                    // Added: noclip
+                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+                    {
+                        amount = v19->surface;
+                        if ( sithCollision_funcList[v5->type] )
+                            v36 = sithCollision_funcList[v5->type](v5, amount, v19);
+                        else
+                            v36 = sithCollision_DefaultHitHandler(v5, amount, v19);
+                    }
                 }
                 v16 = v36;
                 if ( v65 != 0.0 && v5->moveType == SITH_MT_PHYSICS) // Added: physics check
@@ -827,11 +838,33 @@ LABEL_81:
     v64 = stdMath_ClipPrecision(v64);
     if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithIntersect_IsSphereInSector(&v5->position, 0.0, v5->sector) )
     {
-        rdVector_Copy3(&v5->position, &posCopy);
-        rdVector_Copy3(&direction, &out);
-        sithThing_MoveToSector(v5, sectTmp, 0);
-        if ( v5->lifeLeftMs )
-            sithThing_Destroy(v5);
+        // Added: noclip
+        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+        {
+            rdVector_Copy3(&v5->position, &posCopy);
+            rdVector_Copy3(&direction, &out);
+            sithThing_MoveToSector(v5, sectTmp, 0);
+            if ( v5->lifeLeftMs )
+                sithThing_Destroy(v5);
+        }
+        else {
+            for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
+            {
+                int found = 0;
+                if (sithIntersect_IsSphereInSector(&v5->position, 0.0, &sithWorld_pCurrentWorld->sectors[i]))
+                {
+                    found = 1;
+                    sithPlayer_bNoClippingRend = 0;
+                    sithThing_MoveToSector(v5, &sithWorld_pCurrentWorld->sectors[i], 0);
+                    break;
+                }
+
+                if (!found)
+                {
+                    sithPlayer_bNoClippingRend = 1;
+                }
+            }
+        }
     }
     for ( i = v5->attachedParentMaybe; i; i = i->childThing )
     {

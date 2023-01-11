@@ -437,6 +437,11 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
 {
     float param1; // [esp+0h] [ebp-20h]
 
+    // Added: noclip
+    if (sender == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+        return 0.0;
+    }
+
     if ( amount <= 0.0 )
         return 0.0;
     if ( (sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )

@@ -326,7 +326,17 @@ void sithRender_Draw()
     rdCamera_ClearLights(rdCamera_pCurCamera);
     //printf("------\n");
     sithRender_adjoinSafeguard = 0; // Added: safeguard
-    sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+
+    // Added: noclip
+    if (!sithPlayer_bNoClippingRend) {
+        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+    }
+    else {
+        for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
+        {
+            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+        }
+    }
 
     sithRender_UpdateAllLights();
     
@@ -621,6 +631,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int)v49);
                     v31 = &outClip;
                 }
+
+                // Added: noclip
+                if (sithPlayer_bNoClippingRend) continue;
                 
                 float a3a = adjoinIter->dist + adjoinIter->mirror->dist + a3;
                 if (!(sithRender_flag & 4) || a3a < sithRender_f_82F4B0 ) // wtf is with this float?

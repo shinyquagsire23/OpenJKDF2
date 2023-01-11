@@ -86,6 +86,10 @@ void jkDev_Startup()
     jkDev_RegisterCmd(jkDev_CmdMana, "trixie", "", 0);
     jkDev_RegisterCmd(jkDev_CmdSkipToLevel, "takemeto", "", 0); // Undoc'd?
 
+#ifdef QOL_IMPROVEMENTS
+    jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+#endif
+
     jkDev_bInitted = 1;
 }
 
@@ -1036,3 +1040,48 @@ void jkDev_DrawEntries()
         }
     }
 }
+
+#ifdef QOL_IMPROVEMENTS
+int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    if (sithNet_isMulti ) return 1;
+
+    sithThing *v0; // ecx
+    wchar_t *v3; // eax
+
+    if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->playerThing) {
+        sithConsole_Print("No world.");
+        return 0;
+    }
+
+    v0 = sithWorld_pCurrentWorld->playerThing;
+
+    if ( v0->moveType == SITH_MT_PHYSICS )
+    {
+        if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP))
+        {
+            v0->physicsParams.physflags &= ~SITH_PF_FLY;
+            v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
+            g_debugmodeFlags &= ~DEBUGFLAG_NOCLIP;
+            sithPlayer_bNoClippingRend = 0;
+            sithConsole_Print("Noclip OFF");
+        }
+        else
+        {
+            v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
+            v0->physicsParams.physflags |= SITH_PF_FLY;
+            g_debugmodeFlags |= DEBUGFLAG_NOCLIP;
+            sithConsole_Print("Noclip ON");
+        }
+        
+        return 1;
+    }
+    else
+    {
+        sithConsole_Print("Not physics thing.");
+        return 0;
+    }
+
+    return 0;
+}
+#endif

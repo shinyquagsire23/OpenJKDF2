@@ -23,6 +23,9 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
+// Added: noclip
+int sithPlayer_bNoClippingRend = 0;
+
 void sithPlayer_Startup(int idx)
 {
     sithPlayerInfo *v1; // esi
@@ -283,7 +286,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
                 v15 = v3->sector;
                 if ( v15 )
                 {
-                    if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 )
+                    if ( (v15->flags & SITH_SECTOR_FALLDEATH) != 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
                     {
                         v3->thingflags |= SITH_TF_DEAD;
                         v3->actorParams.typeflags |= SITH_AF_FALLING_TO_DEATH;

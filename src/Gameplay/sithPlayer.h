@@ -33,6 +33,8 @@
 #define sithPlayer_SetBinCarries_ADDR (0x004C94C0)
 #define sithPlayer_idk2_ADDR (0x004C9500)
 
+extern int sithPlayer_bNoClippingRend;
+
 void sithPlayer_Startup(int idx);
 void sithPlayer_Close();
 void sithPlayer_NewEntry(sithWorld *world);

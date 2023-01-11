@@ -25,6 +25,16 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     rdVector3 a1; // [esp+24h] [ebp-Ch] BYREF
     float thinga; // [esp+34h] [ebp+4h]
 
+    // Added: noclip
+    if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_pLocalPlayerThing)
+    {
+        pThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
+        pThing->physicsParams.physflags |= SITH_PF_FLY;
+
+        sithThing_DetachThing(pThing);
+        return;
+    }
+
     range = 0.0;
     v14 = 0;
     if (!pThing->sector)
@@ -196,6 +206,11 @@ void sithPhysics_ThingTick(sithThing *pThing, float deltaSecs)
 
 void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
 {
+    // Added: noclip
+    if (pThing == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+        return;
+    }
+
     if ( pThing->moveType == SITH_MT_PHYSICS && pThing->physicsParams.mass > 0.0 )
     {
         float invMass = 1.0 / pThing->physicsParams.mass;
