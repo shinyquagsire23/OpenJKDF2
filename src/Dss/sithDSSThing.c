@@ -1216,7 +1216,7 @@ int sithDSSThing_ProcessSyncThingAttachment(sithCogMsg *msg)
     sithThing* v1 = sithThing_GetById(NETMSG_POPS32());
     if ( !v1 )
         return 0;
-    int v3 = NETMSG_POPS16();
+    int v3 = NETMSG_POPU16();
     if (v3 & SITH_ATTACH_WORLDSURFACE)
     {
         sithSurface* v5 = sithSurface_sub_4E63B0(NETMSG_POPS16());

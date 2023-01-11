@@ -250,6 +250,7 @@ load_fail:
     return 0;
 }
 
+// MOTS altered
 int sithGamesave_SerializeAllThings(int mpFlags)
 {
     unsigned int v15; // ebx
@@ -279,7 +280,10 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         {
             if ( v7->attach_flags )
             {
-                if ( (v7->attach_flags & 8) != 0 || v7->moveType != SITH_MT_PHYSICS )
+                // MOTS altered: Jail Key
+                if (!Main_bMotsCompat && (v7->attach_flags & SITH_ATTACH_NO_MOVE) != 0 || v7->moveType != SITH_MT_PHYSICS )
+                    sithDSSThing_SendSyncThingAttachment(v7, 0, mpFlags, 1);
+                else if (Main_bMotsCompat && v7->attach_flags && (v7->attach_flags & (SITH_ATTACH_NO_MOVE|SITH_ATTACH_FORCE_SERIALIZE)) != 0 || v7->moveType != SITH_MT_PHYSICS )
                     sithDSSThing_SendSyncThingAttachment(v7, 0, mpFlags, 1);
             }
         }

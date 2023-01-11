@@ -1355,9 +1355,7 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
 
     parent->parentThing = 0;
     child->attachedParentMaybe = parent;
-    a2.x = parent->position.x - child->position.x;
-    a2.y = parent->position.y - child->position.y;
-    a2.z = parent->position.z - child->position.z;
+    rdVector_Sub3(&a2, &parent->position, &child->position);
     rdMatrix_TransformVector34Acc_0(&parent->field_4C, &a2, &child->lookOrientation);
     if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_SendMessageFromThing(child, parent, SITH_MESSAGE_ENTERED);
