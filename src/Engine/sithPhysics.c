@@ -153,7 +153,7 @@ void sithPhysics_ThingTick(sithThing *pThing, float deltaSecs)
     rdVector_Zero3(&pThing->physicsParams.addedVelocity);
 
     if ((pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) 
-        && (pThing->actorParams.typeflags & SITH_TF_TIMER))
+        && (pThing->actorParams.typeflags & SITH_AF_COMBO_FREEZE))
     {
         rdVector_Zero3(&pThing->physicsParams.acceleration);
     }

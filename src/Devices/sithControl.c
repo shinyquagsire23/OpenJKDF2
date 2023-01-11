@@ -212,13 +212,16 @@ void sithControl_InitFuncToControlType()
         sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 4 | 1;
 }
 
+// MOTS altered
 void sithControl_Tick(float deltaSecs, int deltaMs)
 {
     if ( !sithControl_bOpened )
         return;
 
+    // MOTS altered
     if ( !sithPlayer_pLocalPlayerThing
-      || (SITH_AF_NOHUD & sithPlayer_pLocalPlayerThing->actorParams.typeflags) != 0
+      || DF2_ONLY_COND(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_NOHUD)
+      || MOTS_ONLY_COND(sithPlayer_pLocalPlayerThing->actorParams.typeflags & (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000))
       || (sithPlayer_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_state & 1) != 0 )
     {
