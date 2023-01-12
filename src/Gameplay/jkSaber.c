@@ -96,6 +96,11 @@ void jkSaber_UpdateLength(sithThing *thing)
         return;
     }
 
+    if (!(thing->jkFlags & JKFLAG_SABERON)) {
+        playerInfo->polyline.length = 0;
+        return; // Added: Wanted more logic in jkSaber_UpdateLength
+    }
+
 #if 0
     printf("Saber state: ");
     if (thing->jkFlags & JKFLAG_SABERON) {

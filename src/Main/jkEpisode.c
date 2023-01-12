@@ -545,8 +545,12 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
         pPlayerThing->jkFlags |= JKFLAG_SABERON;
     }
 
-    if (pPlayerThing->jkFlags & JKFLAG_SABERON)
-        jkSaber_UpdateLength(pPlayerThing);
+    // Removed: I want more logic in jkSaber_UpdateLength
+    //if (pPlayerThing->jkFlags & JKFLAG_SABERON)
+    //    jkSaber_UpdateLength(pPlayerThing);
+
+    // Added: I want more logic in jkSaber_UpdateLength
+    jkSaber_UpdateLength(pPlayerThing);
 
 #ifdef JKM_DSS
     if (Main_bMotsCompat && pPlayerThing == sithPlayer_pLocalPlayerThing) {
