@@ -490,6 +490,11 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     if ( tmp.type == COG_VARTYPE_INT )
     {
         idx = tmp.data[0];
+
+        // Added: wat
+        if (Main_bMotsCompat && idx == 0) {
+            idx = -1;
+        }
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {

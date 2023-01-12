@@ -84,8 +84,14 @@ void sithSound_Free(sithWorld *world)
     }
 }
 
+// MOTS altered
 int sithSound_New(sithWorld *world, int num)
 {
+    // MOTS added: reserve sound 0?
+    if (Main_bMotsCompat) {
+        num++;
+    }
+
     sithSound* sounds  = (sithSound *)pSithHS->alloc(sizeof(sithSound) * num);
     world->sounds = sounds;
     if ( sounds )
@@ -93,6 +99,11 @@ int sithSound_New(sithWorld *world, int num)
         _memset(sounds, 0, sizeof(sithSound) * num);
         world->numSounds = num;
         world->numSoundsLoaded = 0;
+
+        //  MOTS added TODO: wat?
+        if (Main_bMotsCompat) {
+            //world->numSoundsLoaded = 1;
+        }
         return 1;
     }
     return 0;
