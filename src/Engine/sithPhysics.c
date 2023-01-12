@@ -1102,6 +1102,13 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         v131 = orig_v131;
 #endif
 
+        // Added: Fix turret slowly drifting up?
+        if ((pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) 
+            && (pThing->actorParams.typeflags & SITH_AF_COMBO_FREEZE))
+        {
+            v131 = orig_v131;
+        }
+
         if ( (pThing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
             rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
