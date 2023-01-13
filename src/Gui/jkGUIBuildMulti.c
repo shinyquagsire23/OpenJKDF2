@@ -29,6 +29,9 @@
 
 #include "jk.h"
 
+// MOTS added
+int jkGuiBuildMulti_jediRank = 0;
+
 static jkGuiElement jkGuiBuildMulti_buttons[17] =
 {
   { ELEMENT_TEXT, 0, 5, "GUI_EDIT_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -850,7 +853,7 @@ int jkGuiBuildMulti_Show()
                 }
                 break;
             case 100:
-                if ( jkGuiBuildMulti_ShowNewCharacter(-1, 0) < 0 && !v2 )
+                if ( jkGuiBuildMulti_ShowNewCharacter(-1, 1, 0) < 0 && !v2 ) // MOTS altered TODO
 LABEL_8:
                     v3 = 0;
                 break;
@@ -939,7 +942,7 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
 }
 
 // MOTS altered TODO
-int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
+int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars)
 {
     wchar_t *v3; // eax
     wchar_t *v4; // eax
@@ -956,13 +959,38 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
     char v17[128]; // [esp+A8h] [ebp-100h] BYREF
     char v18[128]; // [esp+128h] [ebp-80h] BYREF
 
+    // MOTS added
+    Darray daPersonalities;
+    char personalityTmp[128];
+
+    // MOTS added
+    if (bGameFormatIsJK == 0) {
+        jkGuiBuildMulti_jediRank = 8;
+    }
+    else {
+        jkGuiBuildMulti_jediRank = rank;
+    }
+
+    // MOTS added
+    jkGuiRend_DarrayNewStr(&daPersonalities,8,1);
+    for (int i = 0; i < 8; i++)
+    {
+        if ((bGameFormatIsJK == 0) || (i == 0)) {
+            stdString_snprintf(personalityTmp, 128, "GUI_PERSONALITY%d", i + 1); // Added: sprintf -> snprintf
+            wchar_t* pwVar1 = jkStrings_GetText2(personalityTmp);
+            if (pwVar1 == NULL) break;
+            jkGuiRend_DarrayReallocStr(&daPersonalities, pwVar1, 0);
+        }
+    }
+    jkGuiRend_DarrayReallocStr(&daPersonalities,(wchar_t *)0x0,0);
+
     // MOTS added TODO TODO
     jkPlayer_personality = 1;
 
     jkGuiBuildMulti_menuNewCharacter_buttons[11].wstr = jkGuiBuildMulti_aWchar_5594C8;
     memset(jkGuiBuildMulti_aWchar_5594C8, 0, 0x20u);
     jkGuiBuildMulti_menuNewCharacter_buttons[11].selectedTextEntry = 16;
-    if ( bHasValidChars )
+    if ( bHasNoValidChars )
     {
         jkGuiDialog_ErrorDialog(jkStrings_GetText("GUI_NOVALIDCHARTITLE"), jkStrings_GetText("GUI_NOVALIDCHARACTERS"));
     }
@@ -1028,8 +1056,10 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bHasValidChars)
         }
         jkGuiBuildMulti_menuNewCharacter_buttons[0].wstr = v9;
 LABEL_16:
-        if ( v8 == -1 )
+        if ( v8 == -1 ) {
+            jkGuiRend_DarrayFree(&daPersonalities); // MOTS added
             return -1;
+        }
     }
     while ( v7 );
     a2d = (double)jkPlayer_GetJediRank() * 3.0;
@@ -1040,6 +1070,7 @@ LABEL_16:
     jkPlayer_mpcInfoSet = 0;
     jkGuiBuildMulti_ShowEditCharacter(1);
     jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, jkGuiBuildMulti_aWchar_5594C8);
+    jkGuiRend_DarrayFree(&daPersonalities); // MOTS added
     return v8;
 }
 
@@ -1196,7 +1227,7 @@ LABEL_7:
                 }
                 break;
             case 100:
-                if ( jkGuiBuildMulti_ShowNewCharacter(a5, v13) < 0 && !v12 )
+                if ( jkGuiBuildMulti_ShowNewCharacter(a5, 1, v13) < 0 && !v12 ) // MOTS altered TODO
 LABEL_18:
                     v14 = 0;
                 break;

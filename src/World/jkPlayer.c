@@ -1127,9 +1127,8 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         info->jediRank = jkPlayer_GetJediRank();
         stdConffile_Close();
 
-        // MOTS TODO
-        jkPlayer_personality = 1;
-        // jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS TODO
+        jkPlayer_personality = 1; // MOTS TODO TODO TODO not real just a hack
+        jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
         jkPlayer_mpcInfoSet = 1;
         return 1;
     }
@@ -1293,11 +1292,13 @@ void jkPlayer_SetAccessiblePowers(int rank)
 {
     //MOTS TODO
     if (Main_bMotsCompat) {
+#ifdef DEBUG_QOL_CHEATS
         for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
         {
             if ( i != SITHBIN_JEDI_RANK )
                 jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= ITEMSTATE_CARRIES;
         }
+#endif
         return;
     }
 

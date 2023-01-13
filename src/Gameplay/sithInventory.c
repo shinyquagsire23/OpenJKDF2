@@ -838,6 +838,9 @@ LABEL_16:
         sithInventory_SetAvailable(player, SITHBIN_F_PROTECTION, 1);
 
         if (Main_bMotsCompat) {
+            sithInventory_SetBinAmount(player, SITHBIN_JEDI_RANK, 8.0);
+            jkPlayer_SetRank(8);
+
             sithInventory_SetBinAmount(player, SITHBIN_F_FARSIGHT, 4.0);
             sithInventory_SetBinAmount(player, SITHBIN_F_PROJECT, 4.0);
             sithInventory_SetBinAmount(player, SITHBIN_F_SABERTHROW, 4.0);

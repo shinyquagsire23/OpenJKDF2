@@ -29,6 +29,8 @@
 #include "Dss/sithMulti.h"
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
+#include "Main/jkMain.h"
+#include "Main/jkEpisode.h"
 #include "jk.h"
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -112,6 +114,25 @@ int sithGamesave_LoadEntry(char *fpath)
         sithGamesave_funcRead();
     stdConffile_Read(SrcStr, 32);
     _strtolower(SrcStr);
+
+    // Added: Fix soundtrack on levels that use disk 2
+#ifdef QOL_IMPROVEMENTS
+    if ( jkEpisode_Load(&jkGui_episodeLoad) )
+    {
+        jkEpisode_mLoad = jkGui_episodeLoad;
+        for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
+        {
+            //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
+            if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, SrcStr)) {
+                jkEpisode_mLoad.field_8 = j;
+                jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
+                jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
+                break;
+            }
+        }
+    }
+#endif
+
     if ( sithWorld_pCurrentWorld )
     {
         if ( !_strcmp(SrcStr, sithWorld_pCurrentWorld->map_jkl_fname) )
