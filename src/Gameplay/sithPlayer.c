@@ -286,18 +286,18 @@ void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
 }
 
 void sithPlayer_AddDyamicAdd(int r, int g, int b)
-{=
+{
     stdPalEffect* pPalEffects = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
     
-    pPalEffects->add.x = r + v3->add.x;
+    pPalEffects->add.x = r + pPalEffects->add.x;
     if ( pPalEffects->add.x > 0xFF )
         pPalEffects->add.x = 255;
 
-    pPalEffects->add.y = g + v3->add.y;
+    pPalEffects->add.y = g + pPalEffects->add.y;
     if ( pPalEffects->add.y > 0xFF )
         pPalEffects->add.y = 255;
 
-    pPalEffects->add.z = b + v3->add.z;
+    pPalEffects->add.z = b + pPalEffects->add.z;
     if ( pPalEffects->add.z > 0xFF )
         pPalEffects->add.z = 255;
 }
