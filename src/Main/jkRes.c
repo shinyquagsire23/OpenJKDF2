@@ -376,7 +376,7 @@ LABEL_11:
                 sithMain_SetEpisodeName(jkRes_episodeGobName);
                 jkRes_FreeGobs(1);
                 jkRes_FreeGobs(2);
-                stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32);
+                //stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32);  // TODO ???
                 if ( jkRes_episodeGobName[0] )
                 {
                     stdString_snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
@@ -429,7 +429,7 @@ LABEL_39:
     sithMain_SetEpisodeName(jkRes_episodeGobName);
     jkRes_FreeGobs(1);
     jkRes_FreeGobs(2);
-    stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32);
+    //stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32); // TODO ???
 
     if ( jkRes_episodeGobName[0] )
     {

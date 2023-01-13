@@ -1115,17 +1115,35 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         }
         return 1;
     }
-    if ( jkPlayer_setDisableCutscenes )
-        v4 = 0;
-    else
-        v4 = jkRes_LoadCD(ent->cdNum);
+
+    // Added: Move down
+    //if ( jkPlayer_setDisableCutscenes )
+    //    v4 = 0;
+    //else
+    //    v4 = jkRes_LoadCD(ent->cdNum);
 
     jkPlayer_WriteConfSwap(&playerThings[playerThingIdx], ent->cdNum, ent->fileName);
-    if ( !v4 )
+    // Added: Move down
+    //if ( !v4 )
+    //    return jkMain_CdSwitch(0, 1);
+
+    // Added: Cutscenes disabled
+    if ( jkPlayer_setDisableCutscenes )
         return jkMain_CdSwitch(0, 1);
+
     _sprintf(v9, "video%c%s", 92, ent->fileName);
-    if ( !util_FileExists(v9) )
-        return jkMain_CdSwitch(0, 1);
+    if ( !util_FileExists(v9) ) {
+        // Added: check file first before asking for CDs
+        v4 = jkRes_LoadCD(ent->cdNum);
+
+        if ( !v4 ) {
+            return jkMain_CdSwitch(0, 1);
+        }
+
+        if ( !util_FileExists(v9) ) {
+            return jkMain_CdSwitch(0, 1);
+        }
+    }
     jkRes_FileExists(v9, jkMain_aLevelJklFname, 128);
     switch ( jkSmack_currentGuiState )
     {

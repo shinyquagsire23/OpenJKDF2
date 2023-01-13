@@ -168,10 +168,15 @@ void jkGuiMain_ShowCutscenes()
             v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMain_cutscenesMenu);
             if ( v4 != 1 )
                 break;
-            if ( jkRes_LoadCD(jkPlayer_aCutsceneVal[jkGuiMain_cutscenesElements[1].selectedTextEntry]) )
+
+            // Added: Moved these up
+            v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
+            snprintf(v12, 256, "video%c%s", '\\', v5); // Added: sprintf -> snprintf
+            if ( util_FileExists(v12) || jkRes_LoadCD(jkPlayer_aCutsceneVal[jkGuiMain_cutscenesElements[1].selectedTextEntry]) ) // Added: Don't need a CD switch if it exists.
             {
-                v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
-                snprintf(v12, 256, "video%c%s", '\\', v5); // Added: sprintf -> snprintf
+                // Added: move up
+                //v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMain_cutscenesElements[1].selectedTextEntry);
+                //snprintf(v12, 256, "video%c%s", '\\', v5); // Added: sprintf -> snprintf
                 if ( util_FileExists(v12) )
                 {
                     jkMain_SwitchTo4(v12);
