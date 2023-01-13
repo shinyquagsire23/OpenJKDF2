@@ -2045,16 +2045,16 @@ typedef struct HostServices
     void (*unlockHandle)(uint32_t);
 } HostServices;
 
-typedef struct jkResGob
+typedef struct jkResGobDirectory
 {
   char name[128];
   int numGobs;
   stdGob *gobs[64];
-} jkResGob;
+} jkResGobDirectory;
 
 typedef struct jkRes
 {
-    jkResGob gobs[5];
+    jkResGobDirectory aGobDirectories[5];
 } jkRes;
 
 typedef struct jkResFile

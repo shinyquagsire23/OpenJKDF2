@@ -30,7 +30,7 @@ int jkRes_Startup(HostServices *a1)
     {
         jkRes_New(Main_path);
     }
-    jkRes_LoadNew(&jkRes_gCtx.gobs[3], "resource", 1);
+    jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[3], "resource", 1);
     _memset(jkRes_aFiles, 0, sizeof(jkRes_aFiles));
     jkRes_bInit = 1;
     return 1;
@@ -45,10 +45,7 @@ int jkRes_Shutdown()
     
     for (int i = 0; i < 5; i++)
     {
-        for (int v1 = 0; v1 < jkRes_gCtx.gobs[i].numGobs; v1++)
-        {
-            stdGob_Free(jkRes_gCtx.gobs[i].gobs[v1]);
-        }
+        jkRes_FreeGobs(i);
     }
     // MOTS added: close fail log
     //if (Main_failLogFp) {
@@ -60,15 +57,20 @@ int jkRes_Shutdown()
 
 void jkRes_New(char *path)
 {
-    for (int v1 = 0; v1 < jkRes_gCtx.gobs[0].numGobs; v1++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[0].gobs[v1]);
-    }
-
-    jkRes_gCtx.gobs[0].numGobs = 0;
+    jkRes_FreeGobs(0);
 
     if ( *path )
-        jkRes_LoadNew(jkRes_gCtx.gobs, path, 1);
+        jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[0], path, 1);
+}
+
+// Added: This seems to be inlined everywhere
+void jkRes_FreeGobs(int idx)
+{
+    for (int i = 0; i < jkRes_gCtx.aGobDirectories[idx].numGobs; i++)
+    {
+        stdGob_Free(jkRes_gCtx.aGobDirectories[idx].gobs[i]);
+    }
+    jkRes_gCtx.aGobDirectories[idx].numGobs = 0;
 }
 
 void jkRes_LoadGob(char *a1)
@@ -84,79 +86,43 @@ void jkRes_LoadGob(char *a1)
     char v30[128]; // [esp+10h] [ebp-80h] BYREF
 
     sithMain_SetEpisodeName(a1);
-    v1 = 0;
     
-    for (v1 = 0; v1 < jkRes_gCtx.gobs[1].numGobs; v1++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[1].gobs[v1]);
-    }
-    v3 = 0;
-    jkRes_gCtx.gobs[1].numGobs = 0;
-    for (v3 = 0; v3 < jkRes_gCtx.gobs[2].numGobs; v3++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[2].gobs[v3]);
-    }
-    jkRes_gCtx.gobs[2].numGobs = 0;
+    jkRes_FreeGobs(1);
+    jkRes_FreeGobs(2);
+
     stdString_SafeStrCopy(jkRes_episodeGobName, a1, 0x20);
-    if (*a1 != 0)
+    if (a1[0] == 0)
+        return;
+
+    stdString_snprintf(v30, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
+    stdString_snprintf(jkRes_gCtx.aGobDirectories[1].name, 0x80u, "episode\\%s", jkRes_episodeGobName);
+    
+    jkRes_NewGob(&jkRes_gCtx.aGobDirectories[1], "episode", v30);
+
+    if ( jkRes_curDir[0] && Windows_installType < 1 )
     {
-        __snprintf(v30, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
-        __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode\\%s", jkRes_episodeGobName);
-        jkRes_UnhookHS();
-        jkRes_gCtx.gobs[1].numGobs = 0;
-        __snprintf(jkRes_idkGobPath, 0x80u, "%s\\%s", "episode", v30);
-        if ( util_FileExists(jkRes_idkGobPath) )
-        {
-            if ( jkRes_gCtx.gobs[1].numGobs < 0x40u )
-            {
-                jkRes_gCtx.gobs[1].gobs[jkRes_gCtx.gobs[1].numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
-                if ( jkRes_gCtx.gobs[1].gobs[jkRes_gCtx.gobs[1].numGobs] )
-                    ++jkRes_gCtx.gobs[1].numGobs;
-            }
-        }
-        jkRes_HookHS();
-        if ( jkRes_curDir[0] && Windows_installType < 1 )
-        {
-            __snprintf(std_genBuffer, 0x80u, "%s\\gamedata\\episode", jkRes_curDir);
-            __snprintf(jkRes_gCtx.gobs[2].name, 0x80u, "%s\\gamedata\\episode\\%s", jkRes_curDir, jkRes_episodeGobName);
-            jkRes_UnhookHS();
-            jkRes_gCtx.gobs[2].numGobs = 0;
-            __snprintf(jkRes_idkGobPath, 0x80u, "%s\\%s", std_genBuffer, v30);
-            if ( util_FileExists(jkRes_idkGobPath) )
-            {
-                if ( jkRes_gCtx.gobs[2].numGobs < 0x40u )
-                {
-                    jkRes_gCtx.gobs[2].gobs[jkRes_gCtx.gobs[2].numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
-                    if ( jkRes_gCtx.gobs[2].gobs[jkRes_gCtx.gobs[2].numGobs] )
-                        ++jkRes_gCtx.gobs[2].numGobs;
-                }
-            }
-            jkRes_HookHS();
-        }
+        stdString_snprintf(std_genBuffer, 0x80u, "%s\\gamedata\\episode", jkRes_curDir);
+        stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s\\gamedata\\episode\\%s", jkRes_curDir, jkRes_episodeGobName);
+        
+        jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v30);
     }
 }
 
 int jkRes_LoadCd(char *a1)
 {
-    unsigned int v1; // esi
     char v4[128]; // [esp+Ch] [ebp-80h] BYREF
 
     // Added: prevent overlap
-    if (jkRes_curDir != a1)
-        _strncpy(jkRes_curDir, a1, 0x7Fu);
-
-    v1 = 0;
-    jkRes_curDir[127] = 0;
-    for (v1 = 0; v1 < jkRes_gCtx.gobs[4].numGobs; v1++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[4].gobs[v1]);
+    if (jkRes_curDir != a1) {
+        stdString_SafeStrCopy(jkRes_curDir, a1, 128);
     }
 
-    jkRes_gCtx.gobs[4].numGobs = 0;
+    jkRes_FreeGobs(4);
+
     if ( *a1 )
     {
-        __snprintf(v4, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
-        return jkRes_LoadNew(&jkRes_gCtx.gobs[4], v4, Windows_installType != 9);
+        stdString_snprintf(v4, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+        return jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[4], v4, Windows_installType != 9);
     }
     return 0;
 }
@@ -209,8 +175,7 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
         return 0;
 
     resFile = &jkRes_aFiles[fd-1];
-    _strncpy(a2, resFile->fpath, len - 1);
-    a2[len - 1] = 0;
+    stdString_SafeStrCopy(a2, resFile->fpath, len);
 
     if ( resFile->useLowLevel )
         pLowLevelHS->fileClose(resFile->fsHandle);
@@ -267,13 +232,12 @@ int jkRes_ReadKey()
     return 0;
 }
 
-int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
+int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
 {
     stdFileSearch *v15; // ebp
     stdFileSearchResult v18; // [esp+8h] [ebp-10Ch] BYREF
 
-    _strncpy(resGob->name, name, 0x7Fu);
-    resGob->name[127] = 0;
+    stdString_SafeStrCopy(resGob->name, name, 128);
     resGob->numGobs = 0;
     if (!a3)
         return 0;
@@ -290,7 +254,7 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
                 break;
             if ( v18.fpath[0] != '.' )
             {
-                __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", "mods", LEC_PATH_SEPARATOR_CHR, v18.fpath);
+                stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", "mods", LEC_PATH_SEPARATOR_CHR, v18.fpath);
                 resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
 
                 if ( resGob->gobs[resGob->numGobs] )
@@ -306,7 +270,7 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
             break;
         if ( v18.fpath[0] != '.' )
         {
-            __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, v18.fpath);
+            stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, v18.fpath);
             resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
 
             if ( resGob->gobs[resGob->numGobs] )
@@ -321,12 +285,12 @@ int jkRes_LoadNew(jkResGob *resGob, char *name, int a3)
     return jkRes_bHookedHS;
 }
 
-int jkRes_NewGob(jkResGob *gobFullpath, char *gobFolder, char *gobFname)
+int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname)
 {
     jkRes_UnhookHS();
     
     gobFullpath->numGobs = 0;
-    __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", gobFolder, LEC_PATH_SEPARATOR_CHR, gobFname);
+    stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", gobFolder, LEC_PATH_SEPARATOR_CHR, gobFname);
     if ( util_FileExists(jkRes_idkGobPath) )
     {
         if ( gobFullpath->numGobs < 0x40u )
@@ -342,7 +306,7 @@ int jkRes_NewGob(jkResGob *gobFullpath, char *gobFolder, char *gobFname)
     return jkRes_bHookedHS;
 }
 
-int jkRes_LoadCD(int a1)
+int jkRes_LoadCD(int cdNumberNeeded)
 {
     int v1; // eax
     int v2; // esi
@@ -381,7 +345,7 @@ int jkRes_LoadCD(int a1)
         pHS->fileRead(v1, &keyval, 4);
         if ( keyval == JKRES_MAGIC_0 )
             goto LABEL_9;
-        if ( !a1 )
+        if ( !cdNumberNeeded )
         {
             if ( keyval != JKRES_MAGIC_1 && keyval != JKRES_MAGIC_2 )
                 goto LABEL_10;
@@ -389,7 +353,7 @@ LABEL_9:
             v23 = 1;
             goto LABEL_10;
         }
-        if ( keyval == ((a1 << (a1 + 5)) | JKRES_MAGIC_3) )
+        if ( keyval == ((cdNumberNeeded << (cdNumberNeeded + 5)) | JKRES_MAGIC_3) )
             goto LABEL_9;
 LABEL_10:
         pHS->fileClose(v2);
@@ -398,106 +362,47 @@ LABEL_11:
         {
             if ( v24 )
             {
-                //_strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu); //TODO ??
+                //stdString_SafeStrCopy(jkRes_curDir, jkRes_curDir, 128); //TODO ??
                 //jkRes_curDir[0] = 0; // Added
 
-                v10 = 0;
                 jkRes_curDir[127] = 0;
-                if ( jkRes_gCtx.gobs[4].numGobs )
-                {
-                    v11 = jkRes_gCtx.gobs[4].gobs;
-                    do
-                    {
-                        stdGob_Free(*v11);
-                        ++v10;
-                        ++v11;
-                    }
-                    while ( v10 < jkRes_gCtx.gobs[4].numGobs );
-                }
-                jkRes_gCtx.gobs[4].numGobs = 0;
+
+                jkRes_FreeGobs(4);
                 if ( jkRes_curDir[0] )
                 {
-                    __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
-                    jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
+                    stdString_snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+                    jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[4], a2, Windows_installType != 9);
                 }
                 sithMain_SetEpisodeName(jkRes_episodeGobName);
-                v12 = 0;
-                if ( jkRes_gCtx.gobs[1].numGobs )
-                {
-                    v13 = jkRes_gCtx.gobs[1].gobs;
-                    do
-                    {
-                        stdGob_Free(*v13);
-                        ++v12;
-                        ++v13;
-                    }
-                    while ( v12 < jkRes_gCtx.gobs[1].numGobs );
-                }
-                v14 = 0;
-                jkRes_gCtx.gobs[1].numGobs = 0;
-                if ( jkRes_gCtx.gobs[2].numGobs )
-                {
-                    v15 = jkRes_gCtx.gobs[2].gobs;
-                    do
-                    {
-                        stdGob_Free(*v15);
-                        ++v14;
-                        ++v15;
-                    }
-                    while ( v14 < jkRes_gCtx.gobs[2].numGobs );
-                }
-                jkRes_gCtx.gobs[2].numGobs = 0;
-                _strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
-                jkRes_episodeGobName[31] = 0;
+                jkRes_FreeGobs(1);
+                jkRes_FreeGobs(2);
+                stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32);
                 if ( jkRes_episodeGobName[0] )
                 {
-                    __snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
-                    __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-                    jkRes_NewGob(&jkRes_gCtx.gobs[1], "episode", v26);
+                    stdString_snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
+                    stdString_snprintf(jkRes_gCtx.aGobDirectories[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
+                    jkRes_NewGob(&jkRes_gCtx.aGobDirectories[1], "episode", v26);
                     if ( jkRes_curDir[0] )
                     {
                         if ( Windows_installType < 1 )
                         {
-                            __snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
-                            __snprintf(jkRes_gCtx.gobs[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-                            jkRes_NewGob(&jkRes_gCtx.gobs[2], std_genBuffer, v26);
+                            stdString_snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+                            stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
+                            jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v26);
                         }
                     }
                 }
             }
             goto LABEL_39;
         }
-        v3 = 0;
-        if ( jkRes_gCtx.gobs[2].numGobs )
-        {
-            v4 = jkRes_gCtx.gobs[2].gobs;
-            do
-            {
-                stdGob_Free(*v4);
-                ++v3;
-                ++v4;
-            }
-            while ( v3 < jkRes_gCtx.gobs[2].numGobs );
-        }
-        v5 = 0;
-        jkRes_gCtx.gobs[2].numGobs = 0;
-        if ( jkRes_gCtx.gobs[4].numGobs )
-        {
-            v6 = jkRes_gCtx.gobs[4].gobs;
-            do
-            {
-                stdGob_Free(*v6);
-                ++v5;
-                ++v6;
-            }
-            while ( v5 < jkRes_gCtx.gobs[4].numGobs );
-        }
-        jkRes_gCtx.gobs[4].numGobs = 0;
+        jkRes_FreeGobs(2);
+        jkRes_FreeGobs(4);
+
         v24 = 1;
-        if ( a1 )
+        if ( cdNumberNeeded )
         {
             v8 = jkStrings_GetText("GUI_INSERTCD");
-            jk_snwprintf(v28, 0x40u, v8, a1);
+            jk_snwprintf(v28, 0x40u, v8, cdNumberNeeded);
         }
         else
         {
@@ -511,53 +416,33 @@ LABEL_39:
         if ( v23 )
             return 1;
     }
-    //_strncpy(jkRes_curDir, jkRes_curDir, 0x7Fu); // TODO ???
+    //stdString_SafeStrCopy(jkRes_curDir, jkRes_curDir, 128); // TODO ???
     //jkRes_curDir[0] = 0; // Added
     jkRes_curDir[127] = 0;
-    for (v16 = 0; v16 < jkRes_gCtx.gobs[4].numGobs; v16++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[4].gobs[v16]);
-    }
-    jkRes_gCtx.gobs[4].numGobs = 0;
+    jkRes_FreeGobs(4);
+
     if ( jkRes_curDir[0] )
     {
-        __snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
-        jkRes_LoadNew(&jkRes_gCtx.gobs[4], a2, Windows_installType != 9);
+        stdString_snprintf(a2, 0x80u, "%s%cgamedata%cresource", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+        jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[4], a2, Windows_installType != 9);
     }
     sithMain_SetEpisodeName(jkRes_episodeGobName);
-    v18 = 0;
-    for (v18 = 0; v18 < jkRes_gCtx.gobs[1].numGobs; v18++)
-    {
-        stdGob_Free(jkRes_gCtx.gobs[1].gobs[v18]);
-    }
-    v20 = 0;
-    jkRes_gCtx.gobs[1].numGobs = 0;
-    if ( jkRes_gCtx.gobs[2].numGobs )
-    {
-        v21 = jkRes_gCtx.gobs[2].gobs;
-        do
-        {
-            stdGob_Free(*v21);
-            ++v20;
-            ++v21;
-        }
-        while ( v20 < jkRes_gCtx.gobs[2].numGobs );
-    }
-    jkRes_gCtx.gobs[2].numGobs = 0;
-    _strncpy(jkRes_episodeGobName, jkRes_episodeGobName, 0x1Fu);
-    jkRes_episodeGobName[31] = 0;
+    jkRes_FreeGobs(1);
+    jkRes_FreeGobs(2);
+    stdString_SafeStrCopy(jkRes_episodeGobName, jkRes_episodeGobName, 32);
+
     if ( jkRes_episodeGobName[0] )
     {
-        __snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
-        __snprintf(jkRes_gCtx.gobs[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-        jkRes_NewGob(&jkRes_gCtx.gobs[1], "episode", v26);
+        stdString_snprintf(v26, 0x80u, "%s.%s", jkRes_episodeGobName, JKRES_GOB_EXT);
+        stdString_snprintf(jkRes_gCtx.aGobDirectories[1].name, 0x80u, "episode%c%s", LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
+        jkRes_NewGob(&jkRes_gCtx.aGobDirectories[1], "episode", v26);
         if ( jkRes_curDir[0] )
         {
             if ( Windows_installType < 1 )
             {
-                __snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
-                __snprintf(jkRes_gCtx.gobs[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-                jkRes_NewGob(&jkRes_gCtx.gobs[2], std_genBuffer, v26);
+                stdString_snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+                stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
+                jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v26);
             }
         }
     }
@@ -595,72 +480,55 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         v8 = resIdx;
         jkRes_aFiles[v8].useLowLevel = 1;
         jkRes_aFiles[v8].fsHandle = fhand;
-        _strncpy(jkRes_aFiles[resIdx].fpath, fpath, 0x7Fu);
-        jkRes_aFiles[resIdx].fpath[127] = 0;
+        stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, fpath, 128);
         jkRes_aFiles[resIdx].bOpened = 1;
         v6 = 1;
-LABEL_21:
-        if ( !v6 ) {
-            // MOTS added: fail log
-            //if (Main_failLogFp) {
-            //    fputs(Main_failLogFp, "%s", fpath);
-            //}
-            return (stdFile_t)0;
-        }
     }
     else
     {
-        v19 = 0;
-        while ( !v6 )
+        for (v19 = 0; v19 < 5; v19++)
         {
-            v11 = jkRes_gCtx.gobs[v19].name;
-            if ( v11 )
+            v11 = jkRes_gCtx.aGobDirectories[v19].name;
+            if (!v11) continue;
+
+            stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
+            v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
+            if ( v12 )
             {
-                __snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
-                v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
-                if ( v12 )
+                v13 = resIdx;
+                jkRes_aFiles[v13].useLowLevel = 1;
+                jkRes_aFiles[v13].fsHandle = v12;
+                stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, jkRes_idkGobPath, 128);
+                jkRes_aFiles[resIdx].bOpened = 1;
+                v6 = 1;
+            }
+            if ( !v6 )
+            {
+                for (v18 = 0; v18 < jkRes_gCtx.aGobDirectories[v19].numGobs; v18++)
                 {
-                    v13 = resIdx;
-                    jkRes_aFiles[v13].useLowLevel = 1;
-                    jkRes_aFiles[v13].fsHandle = v12;
-                    _strncpy(jkRes_aFiles[resIdx].fpath, jkRes_idkGobPath, 0x7Fu);
-                    jkRes_aFiles[resIdx].fpath[127] = 0;
-                    jkRes_aFiles[resIdx].bOpened = 1;
-                    v6 = 1;
-                }
-                if ( !v6 )
-                {
-                    v18 = 0;
-                    if (jkRes_gCtx.gobs[v19].numGobs)
+                    v17 = &jkRes_gCtx.aGobDirectories[v19].gobs[v18];
+                    if ( v6 )
+                        break;
+                    v14 = stdGob_FileOpen(*v17, fpath);
+                    if ( v14 )
                     {
-                        v17 = jkRes_gCtx.gobs[v19].gobs;
-                        do
-                        {
-                            if ( v6 )
-                                break;
-                            v14 = stdGob_FileOpen(*v17, fpath);
-                            if ( v14 )
-                            {
-                                v15 = resIdx;
-                                jkRes_aFiles[v15].useLowLevel = 0;
-                                jkRes_aFiles[v15].gobHandle = v14;
-                                _strncpy(jkRes_aFiles[resIdx].fpath, fpath, 0x7Fu);
-                                jkRes_aFiles[resIdx].fpath[127] = 0;
-                                jkRes_aFiles[resIdx].bOpened = 1;
-                                v6 = 1;
-                            }
-                            ++v17;
-                            ++v18;
-                        }
-                        while ( v18 < jkRes_gCtx.gobs[v19].numGobs );
+                        v15 = resIdx;
+                        jkRes_aFiles[v15].useLowLevel = 0;
+                        jkRes_aFiles[v15].gobHandle = v14;
+                        stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, fpath, 128);
+                        jkRes_aFiles[resIdx].bOpened = 1;
+                        v6 = 1;
                     }
                 }
             }
-            v16 = (unsigned int)(v19 + 1) < 5;
-            ++v19;
-            if ( !v16 )
-                goto LABEL_21;
         }
+    }
+    if ( !v6 ) {
+        // MOTS added: fail log
+        //if (Main_failLogFp) {
+        //    fputs(Main_failLogFp, "%s", fpath);
+        //}
+        return (stdFile_t)0;
     }
     return (stdFile_t)(resIdx + 1);
 }
@@ -768,6 +636,7 @@ int jkRes_FilePrintf(stdFile_t fd, const char* fmt, ...)
     // No GOB impl
     if ( resFile->useLowLevel )
         return pLowLevelHS->filePrintf(resFile->fsHandle, std_genBuffer, v3);
-    
+
+    return 0;
 }
 

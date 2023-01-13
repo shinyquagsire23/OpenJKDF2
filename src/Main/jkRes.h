@@ -31,6 +31,7 @@
 int jkRes_Startup(HostServices *a1);
 int jkRes_Shutdown();
 void jkRes_New(char *path);
+void jkRes_FreeGobs(int idx); // Added: This seems to be inlined everywhere
 void jkRes_LoadGob(char *a1);
 int jkRes_LoadCd(char *a1);
 void jkRes_HookHS();
@@ -41,8 +42,8 @@ int jkRes_ReadKeyFromFile(const char* fpath); // Added
 int jkRes_ReadKeyRaw(); // Added
 int jkRes_ReadKeyRawEarly(); // Added
 int jkRes_ReadKey();
-int jkRes_LoadNew(jkResGob *resGob, char *name, int a3);
-int jkRes_NewGob(jkResGob *gobFullpath, char *gobFolder, char *gobFname);
+int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3);
+int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname);
 int jkRes_LoadCD(int a1);
 
 //static int (*jkRes_Startup)(HostServices *a1) = (void*)jkRes_Startup_ADDR;
