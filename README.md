@@ -97,6 +97,17 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
 
 When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied the GLSL shaders from `resource/shaders/*` to `<JK.EXE base folder>/resource/shaders/*`, as shown above.
 
+## Using jkgfxmod
+
+OpenJKDF2 supports enhanced textures and effects using [jkgfxmod](https://www.moddb.com/mods/jkgfxmod). Regardless of which platform you're using, the installation instructions are identical to the original `JK.EXE`.
+
+> **Note**
+>
+> On Linux, when using the [Flatpak](https://flathub.org/apps/details/org.openjkdf2.OpenJKDF2), the paths you need to install jkgfxmod in are:
+>
+> **Jedi Knight II: Dark Forces:** `$HOME/.var/app/org.openjkdf2.OpenJKDF2/data/OpenJKDF2/openjkdf2/`
+> **Mysteries of the Sith:** `$HOME/.var/app/org.openjkdf2.OpenJKDF2/data/OpenJKDF2/openjkmots/`
+
 ## Building
 
 See [here](BUILDING.md) for instructions.
