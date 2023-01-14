@@ -206,10 +206,11 @@ int rdCamera_BuildFOV(rdCamera *camera)
         
         case rdCameraProjectType_Perspective:
         {
+            float overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
             float width = canvas->xStart;
             float height = canvas->yStart;
-            float project_width_half = (canvas->widthMinusOne - (double)width) * 0.5;
-            float project_height_half = (canvas->heightMinusOne - (double)height) * 0.5;
+            float project_width_half = overdraw + (canvas->widthMinusOne - (double)width) * 0.5;
+            float project_height_half = overdraw + (canvas->heightMinusOne - (double)height) * 0.5;
             
             float project_width_half_2 = project_width_half;
             float project_height_half_2 = project_height_half;
@@ -254,8 +255,9 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     if ( !canvas )
         return 0;
 
-    float project_width_half = canvas->screen_width_half - ((double)width - 0.5);
-    float project_height_half = canvas->screen_height_half - ((double)height - 0.5);
+    float overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
+    float project_width_half = overdraw + canvas->screen_width_half - ((double)width - 0.5);
+    float project_height_half = overdraw + canvas->screen_height_half - ((double)height - 0.5);
     
     float project_width_half_2 = -canvas->screen_width_half + ((double)width2 - 0.5);
     float project_height_half_2 = -canvas->screen_height_half + ((double)height2 - 0.5);
