@@ -120,6 +120,7 @@ int jkGuiGeneral_ShowAdvanced()
 
     jkGui_sub_412E20(&jkGuiGeneral_menuAdvanced, 100, 104, 100);
     jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bJankyPhysics;
+    jkGuiGeneral_aElementsAdvanced[10].selectedTextEntry = jkPlayer_bKeepCorpses;
     
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[7]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[8]);
