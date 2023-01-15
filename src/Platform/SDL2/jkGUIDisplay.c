@@ -171,6 +171,8 @@ int jkGuiDisplay_ShowAdvanced()
             jkPlayer_bEnableJkgm = jkGuiDisplay_aElementsAdvanced[9].selectedTextEntry;
             jkPlayer_bEnableTexturePrecache = jkGuiDisplay_aElementsAdvanced[10].selectedTextEntry;
 
+            std3D_PurgeTextureCache();
+
             jkPlayer_WriteConf(jkPlayer_playerShortName);
         }
         break;
