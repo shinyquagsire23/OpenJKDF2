@@ -37,6 +37,14 @@ if [ ! -f build_gns/bin/libGameNetworkingSockets.dylib ]; then
     cd ..
 fi
 
+if [ ! -f build_physfs/libphysfs.a ]; then
+    mkdir -p build_physfs && cd build_physfs
+    PHYSFS_BUILD=$(pwd)
+    cmake -DCMAKE_BUILD_TYPE=Release -DPHYSFS_ARCHIVE_GRP=FALSE -DPHYSFS_ARCHIVE_WAD=FALSE -DPHYSFS_ARCHIVE_HOG=FALSE -DPHYSFS_ARCHIVE_MVL=FALSE -DPHYSFS_ARCHIVE_QPAK=FALSE -DPHYSFS_ARCHIVE_SLB=FALSE -DPHYSFS_ARCHIVE_VDF=FALSE $PHYSFS_BUILD/../../3rdparty/physfs
+    make -j10
+    cd ..
+fi
+
 export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/opt/homebrew/opt/openssl@1.1/lib/pkgconfig
 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 cmake .. &&

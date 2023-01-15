@@ -37,6 +37,7 @@ if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS
 endif()
 
 # Internal targets: Stuff like OpenGL vs D3D, OpenAL vs null sound, etc
+set(TARGET_USE_PHYSFS FALSE)
 set(TARGET_USE_BASICSOCKETS FALSE)
 set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)
 set(TARGET_USE_LIBSMACKER FALSE)
@@ -81,6 +82,7 @@ if(PLAT_LINUX_32)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
 
+    set(TARGET_USE_PHYSFS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_LIBSMUSHER TRUE)
@@ -108,6 +110,7 @@ elseif(PLAT_LINUX_64)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
 
+    set(TARGET_USE_PHYSFS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_LIBSMUSHER TRUE)
@@ -132,6 +135,7 @@ elseif(PLAT_MACOS)
     # macOS specific options
     set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
 
+    set(TARGET_USE_PHYSFS TRUE)
     #set(TARGET_USE_BASICSOCKETS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
@@ -160,6 +164,7 @@ elseif(PLAT_MACOS_X86_64)
     # macOS specific options
     set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
 
+    set(TARGET_USE_PHYSFS TRUE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_LIBSMUSHER TRUE)
@@ -191,6 +196,7 @@ elseif(PLAT_MINGW_X86_64)
     add_definitions(-DWIN64_MINGW)
 
     if (NOT DEFINED GITHUB_RUNNER_COMPILE)
+        set(TARGET_USE_PHYSFS TRUE)
         set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     endif()
     set(OPENJKDF2_NO_ASAN TRUE)
@@ -225,6 +231,7 @@ elseif(PLAT_WASM)
 
     add_definitions(-DARCH_WASM)
 
+    set(TARGET_USE_PHYSFS FALSE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
     set(TARGET_USE_LIBSMUSHER TRUE)
@@ -273,6 +280,7 @@ elseif(PLAT_MSVC)
     add_definitions(-DARCH_64BIT)
     add_definitions(-DWIN32)
 
+    set(TARGET_USE_PHYSFS FALSE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_LIBSMACKER TRUE)
@@ -360,6 +368,11 @@ if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)
 endif()
 
+if(TARGET_USE_PHYSFS)
+    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/physfs/src)
+    add_definitions(-DPLATFORM_PHYSFS)
+endif()
+
 if (NOT TARGET_USE_BASICSOCKETS AND NOT TARGET_USE_GAMENETWORKINGSOCKETS)
     set(TARGET_USE_NOSOCKETS TRUE)
 endif()
@@ -369,8 +382,6 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     list(APPEND SOURCE_FILES ${TARGET_GNS_SRCS})
 
     add_definitions(-DPLATFORM_GNS)
-
-
 endif()
 
 if(TARGET_USE_BASICSOCKETS)
@@ -530,14 +541,13 @@ if(TARGET_MACOS)
     link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 
-if(TARGET_USE_GAMENETWORKINGSOCKETS)
-    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
-    target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_gns/bin" GameNetworkingSockets)
-    target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_protobuf/" protobuf)
-    find_package(OpenSSL REQUIRED)
-    target_link_libraries(${BIN_NAME} PUBLIC OpenSSL::Crypto)
-endif()
-
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
+        target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_gns/bin" GameNetworkingSockets)
+        target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_protobuf/" protobuf)
+        find_package(OpenSSL REQUIRED)
+        target_link_libraries(${BIN_NAME} PUBLIC OpenSSL::Crypto)
+    endif()
 endif()
 
 if(TARGET_LINUX)
@@ -554,6 +564,10 @@ if(TARGET_LINUX)
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
+    endif()
+
+    if(TARGET_USE_PHYSFS)
+        include_directories(${PROJECT_SOURCE_DIR}/3rdparty/physfs/src)
     endif()
 endif()
 
@@ -618,6 +632,10 @@ if(PLAT_MINGW_X86_64)
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.dll ${CMAKE_CURRENT_BINARY_DIR}
         )
     endif()
+
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
+    endif()
 elseif(PLAT_HOOKS)
     target_link_libraries(${BIN_NAME} PRIVATE -static-libgcc)
     target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
@@ -630,6 +648,10 @@ elseif(TARGET_LINUX)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
         #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
+    endif()
+
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
     endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
@@ -692,6 +714,10 @@ else()
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW ${LIBPNG_LIST}/libpng.a ${ZLIB_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
     #target_link_libraries(${BIN_NAME} PRIVATE 3rdparty/protobuf/libprotobufd.a)
+
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
+    endif()
 endif()
 
 if(TARGET_MACOS)

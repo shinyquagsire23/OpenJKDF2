@@ -32,6 +32,16 @@ if [ ! -f libGameNetworkingSockets.so ]; then
     cp build_gns/bin/libGameNetworkingSockets.so .
 fi
 
+if [ ! -f build_physfs/libphysfs.a ]; then
+    mkdir -p build_physfs && cd build_physfs
+    PHYSFS_BUILD=$(pwd)
+    cmake -DCMAKE_BUILD_TYPE=Release -DPHYSFS_ARCHIVE_GRP=FALSE -DPHYSFS_ARCHIVE_WAD=FALSE -DPHYSFS_ARCHIVE_HOG=FALSE -DPHYSFS_ARCHIVE_MVL=FALSE -DPHYSFS_ARCHIVE_QPAK=FALSE -DPHYSFS_ARCHIVE_SLB=FALSE -DPHYSFS_ARCHIVE_VDF=FALSE $PHYSFS_BUILD/../../3rdparty/physfs
+    (($? != 0)) && { printf '%s\n' "Command exited with non-zero"; exit 1; }
+    make -j10
+    (($? != 0)) && { printf '%s\n' "Command exited with non-zero"; exit 1; }
+    cd ..
+fi
+
 cmake -DCMAKE_INSTALL_PREFIX=$FLATPAK_DEST .. &&
 make -j10 &&
 cd .. &&

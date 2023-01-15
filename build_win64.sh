@@ -34,6 +34,14 @@ if [ ! -f build_gns/bin/libGameNetworkingSockets.dll ]; then
     cd ..
 fi
 
+if [ ! -f build_physfs/libphysfs.a ]; then
+    mkdir -p build_physfs && cd build_physfs
+    PHYSFS_BUILD=$(pwd)
+    cmake --toolchain $GNS_BUILD/../../cmake_modules/mingw_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DPHYSFS_ARCHIVE_GRP=FALSE -DPHYSFS_ARCHIVE_WAD=FALSE -DPHYSFS_ARCHIVE_HOG=FALSE -DPHYSFS_ARCHIVE_MVL=FALSE -DPHYSFS_ARCHIVE_QPAK=FALSE -DPHYSFS_ARCHIVE_SLB=FALSE -DPHYSFS_ARCHIVE_VDF=FALSE $PHYSFS_BUILD/../../3rdparty/physfs
+    make -j10
+    cd ..
+fi
+
 #cmake .. --toolchain ../cmake_modules/mingw_toolchain.cmake -D USE_CRYPTO="BCrypt" -Dprotobuf_BUILD_TESTS=OFF
 cmake .. --toolchain ../cmake_modules/mingw_toolchain.cmake && make -j10 openjkdf2-64
 cd ..
