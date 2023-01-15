@@ -726,6 +726,7 @@ LABEL_78:
             }
             sithCollision_SearchRadiusForThings(sectTmp, v5, &v5->position, &direction, a6, v17, a8);
             sithCollision_bDebugCollide = 0; // Added
+            v36 = 0; // Added
             while ( 1 )
             {
                 v19 = sithCollision_NextSearchResult();
@@ -774,6 +775,9 @@ LABEL_78:
                                           0);
                         }
                     }
+                    else {
+                        v36 = 0; // Added: noclip
+                    }
                 }
                 else if ( (v19->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
                 {
@@ -795,6 +799,9 @@ LABEL_78:
                         else
                             v36 = sithCollision_DefaultHitHandler(v5, amount, v19);
                     }
+                    else {
+                        v36 = 0; // Added: noclip
+                    }
                 }
                 v16 = v36;
                 if ( v65 != 0.0 && v5->moveType == SITH_MT_PHYSICS) // Added: physics check
@@ -808,6 +815,12 @@ LABEL_78:
                 }
             }
             sithCollision_SearchClose();
+
+            // Added: noclip
+            if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_pLocalPlayerThing) {
+                v16 = 0;
+            }
+
             if ( v16 )
             {
                 v64 = v19->distance + v64;
@@ -831,8 +844,13 @@ LABEL_78:
                 goto LABEL_78;
         }
     }
-    if ( v5->moveType == SITH_MT_PHYSICS )
-        sithPhysics_ThingStop(v5);
+
+    // Added: noclip
+    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+    {
+        if ( v5->moveType == SITH_MT_PHYSICS )
+            sithPhysics_ThingStop(v5);
+    }
 LABEL_81:
     
     v64 = stdMath_ClipPrecision(v64);
@@ -866,6 +884,7 @@ LABEL_81:
             }
         }
     }
+
     for ( i = v5->attachedParentMaybe; i; i = i->childThing )
     {
         if (!(i->attach_flags & SITH_ATTACH_NO_MOVE)) continue;

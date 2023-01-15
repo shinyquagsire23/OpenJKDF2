@@ -381,6 +381,7 @@ int sithCog_StartupEnhanced()
         sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingJumpSpeed, "setthingjumpspeed");
         sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingMesh, "setthingmesh");
         //sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingParent, "setthingparent");
+        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetSaberFaceFlags, "jksetsaberfaceflags");
     }
 
     return 1;

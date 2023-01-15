@@ -1511,7 +1511,7 @@ void sithControl_FreeCam(sithThing *player)
 
     if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
     {
-        rdVector_Zero3(&v1->physicsParams.vel);
+        rdVector_Zero3(&player->physicsParams.vel);
     }
 
     v1 = player;

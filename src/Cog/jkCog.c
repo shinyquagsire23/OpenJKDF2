@@ -1526,3 +1526,16 @@ void jkCogExt_SetThingParent(sithCog* ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
+
+void jkCogExt_SetSaberFaceFlags(sithCog* ctx)
+{
+    sithThing* pPlayer = sithCogExec_PopThing(ctx);
+    int flags = sithCogExec_PopInt(ctx);
+
+    jkPlayerInfo* pPlayerInfo = pPlayer->playerInfo;
+    if ( pPlayerInfo && pPlayerInfo->polylineThing.polyline )
+    {
+        pPlayerInfo->polylineThing.polyline->edgeFace.type = flags;
+        pPlayerInfo->polylineThing.polyline->tipFace.type = flags;
+    }
+}

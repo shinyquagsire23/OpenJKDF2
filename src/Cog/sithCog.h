@@ -278,5 +278,6 @@ extern void jkCogExt_SetThingHeadPitchMinMax(sithCog* ctx);
 extern void jkCogExt_SetThingJumpSpeed(sithCog* ctx);
 extern void jkCogExt_SetThingMesh(sithCog* ctx);
 extern void jkCogExt_SetThingParent(sithCog* ctx);
+extern void jkCogExt_SetSaberFaceFlags(sithCog* ctx);
 
 #endif // _SITHCOG_H

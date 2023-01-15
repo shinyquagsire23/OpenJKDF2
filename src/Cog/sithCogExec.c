@@ -119,6 +119,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                     break;
                 }
                 if ( v12->val.dataAsFunc ) {
+                    //printf("OpenJKDF2: Script `%s` call `%s`\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
                     v12->val.dataAsFunc(cog_ctx); 
                 }
                 else {
