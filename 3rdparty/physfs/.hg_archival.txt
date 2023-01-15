@@ -1,0 +1,6 @@
+repo: 7672c9962ce627edaaa67ff54fe4ad8f9a46dc2b
+node: ae84e126219c52e7e4d35f22c3ccfe1413718961
+branch: stable-3.0
+latesttag: release-3.0.2
+latesttagdistance: 1
+changessincelatesttag: 1
