@@ -324,7 +324,9 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 #ifdef SDL2_RENDER
             //printf("Deinit %s %x\n", material->mat_fpath, surface->texture_id);
             std3D_PurgeSurfaceRefs(surface);
+#ifndef ARCH_WASM
             jkgm_free_cache_entry(surface->cache_entry);
+#endif
 #endif
 
             stdDisplay_VBufferFree(pTex->texture_struct[j]);

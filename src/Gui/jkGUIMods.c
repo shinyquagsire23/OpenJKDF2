@@ -188,9 +188,14 @@ void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element)
 {
     char tmpCwd[256];
     char tmpKeyPath[256];
+
+#ifndef ARCH_WASM
     Main_bMotsCompat = !Main_bMotsCompat;
     InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
     Main_bMotsCompat = !Main_bMotsCompat;
+#else
+    strcpy(tmpCwd, ".");
+#endif
 
     
     stdFnames_MakePath(tmpKeyPath, 256, tmpCwd, "resource/jk_.cd");

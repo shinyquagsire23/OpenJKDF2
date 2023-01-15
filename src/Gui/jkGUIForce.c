@@ -425,7 +425,7 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
             sithPlayer_SetBinAmt
                       (SITHBIN_SPEND_STARS,
                        (float)((curLevel - *(int*)&element->anonymous_13) * bIsDefense + spendStars));
-            *(int*)&pvVar1 = element->anonymous_13;
+            pvVar1 = *(int*)&element->anonymous_13;
         }
         else {
             
